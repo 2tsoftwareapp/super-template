@@ -2,12 +2,19 @@ import { expect, test } from "@playwright/test";
 
 const SESSION_MOCK = {
   data: {
-    id: "user-1",
-    email: "test@example.com",
-    displayName: "Test User",
+    user: {
+      id: "user-1",
+      email: "test@example.com",
+      displayName: "Test User",
+      status: "ACTIVE",
+      roles: [],
+      createdAt: "2024-01-01T00:00:00.000Z",
+      updatedAt: "2024-01-01T00:00:00.000Z",
+    },
     permissions: ["projects.read", "projects.write"],
-    roles: [],
+    sessionId: "session-1",
   },
+  meta: { requestId: "req-1" },
 };
 
 const PROJECTS_MOCK = {

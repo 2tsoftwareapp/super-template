@@ -27,7 +27,7 @@ const main = async (): Promise<void> => {
     await db.execute('drop schema public cascade;');
     await db.execute('create schema public;');
     await migrate(db, {
-      migrationsFolder: resolve(process.cwd(), 'apps/api/drizzle'),
+      migrationsFolder: resolve(__dirname, '../../drizzle'),
     });
   } finally {
     await pool.end();

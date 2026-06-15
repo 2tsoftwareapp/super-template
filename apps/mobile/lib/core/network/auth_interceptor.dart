@@ -35,7 +35,8 @@ class AuthInterceptor extends Interceptor {
     ErrorInterceptorHandler handler,
   ) async {
     if (err.response?.statusCode != 401 ||
-        err.requestOptions.extra['retried'] == true) {
+        err.requestOptions.extra['retried'] == true ||
+        err.requestOptions.path.contains('/auth/refresh')) {
       handler.next(err);
       return;
     }

@@ -36,7 +36,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       if (!isAuthed && !isPublic) {
         return '/login';
       }
-      if (isAuthed && isPublic && location != '/splash') {
+      if (isAuthed && isPublic) {
         return '/home';
       }
       return null;

@@ -9,6 +9,8 @@ const generate = async (): Promise<void> => {
     logger: false,
   });
 
+  app.setGlobalPrefix('api/v1');
+
   const config = new DocumentBuilder()
     .setTitle('Super Template API')
     .setDescription('Generated OpenAPI contract')

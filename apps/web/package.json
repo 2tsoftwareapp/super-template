@@ -5,6 +5,7 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev --port ${WEB_PORT:-3000}",
+    "start": "next start --port ${WEB_PORT:-3000}",
     "format": "prettier --write .",
     "generate": "pnpm --filter api openapi:generate && pnpm --filter api contract:generate",
     "lint": "eslint .",

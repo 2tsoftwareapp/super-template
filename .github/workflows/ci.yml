@@ -114,6 +114,12 @@ jobs:
       - name: Build
         run: pnpm build
 
+      - name: Install Playwright browsers
+        run: pnpm --filter web exec playwright install --with-deps chromium
+
+      - name: Web E2E tests
+        run: pnpm --filter web test:e2e
+
       - name: Flutter format check
         run: cd apps/mobile && dart format --set-exit-if-changed .
 
