@@ -1,0 +1,194 @@
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { ERROR_CODES } from '../../../common/constants/error-codes';
+import { AppError } from '../../../common/errors/app-error';
+import type { AuthenticatedRequestUser } from '../../../common/types/request-context';
+import type { DatabaseExecutor } from '../../../database/database.types';
+import {
+  ADMIN_PERMISSIONS,
+  ALL_PERMISSIONS as ALL_PERMISSION_NAMES,
+  PERMISSION_NAMES,
+  ROLE_NAMES,
+  USER_PERMISSIONS,
+} from '../access-control.constants';
+import { AccessControlRepository } from '../infrastructure/access-control.repository';
+
+@Injectable()
+export class AccessControlService {
+  constructor(
+    private readonly accessControlRepository: AccessControlRepository,
+  ) {}
+
+  async ensureSeedData(executor?: DatabaseExecutor): Promise<void> {
+    const roles = await this.accessControlRepository.ensureRoles(
+      [
+        { name: ROLE_NAMES.SUPER_ADMIN, description: 'Platform owner role' },
+        { name: ROLE_NAMES.ADMIN, description: 'Administrative role' },
+        { name: ROLE_NAMES.USER, description: 'Standard user role' },
+      ],
+      executor,
+    );
+
+    const permissions = await this.accessControlRepository.ensurePermissions(
+      [
+        { name: PERMISSION_NAMES.USERS_READ, description: 'Read users' },
+        { name: PERMISSION_NAMES.USERS_CREATE, description: 'Create users' },
+        { name: PERMISSION_NAMES.USERS_UPDATE, description: 'Update users' },
+        { name: PERMISSION_NAMES.USERS_DELETE, description: 'Delete users' },
+        { name: PERMISSION_NAMES.ROLES_READ, description: 'Read roles' },
+        { name: PERMISSION_NAMES.ROLES_MANAGE, description: 'Manage roles' },
+        { name: PERMISSION_NAMES.PROJECTS_READ, description: 'Read projects' },
+        {
+          name: PERMISSION_NAMES.PROJECTS_CREATE,
+          description: 'Create projects',
+        },
+        {
+          name: PERMISSION_NAMES.PROJECTS_UPDATE,
+          description: 'Update projects',
+        },
+        {
+          name: PERMISSION_NAMES.PROJECTS_DELETE,
+          description: 'Delete projects',
+        },
+        {
+          name: PERMISSION_NAMES.NOTIFICATIONS_READ,
+          description: 'Read notifications',
+        },
+        {
+          name: PERMISSION_NAMES.NOTIFICATIONS_SEND,
+          description: 'Send notifications',
+        },
+        { name: PERMISSION_NAMES.AUDIT_READ, description: 'Read audit logs' },
+      ],
+      executor,
+    );
+
+    const roleByName = new Map(roles.map((role) => [role.name, role]));
+    const permissionByName = new Map(
+      permissions.map((permission) => [permission.name, permission]),
+    );
+    const allPermissionIds = ALL_PERMISSION_NAMES.map(
+      (name) => permissionByName.get(name)?.id,
+    ).filter(Boolean) as string[];
+    const adminPermissionIds = ADMIN_PERMISSIONS.map(
+      (name) => permissionByName.get(name)?.id,
+    ).filter(Boolean) as string[];
+    const userPermissionIds = USER_PERMISSIONS.map(
+      (name) => permissionByName.get(name)?.id,
+    ).filter(Boolean) as string[];
+    const superAdminRole = roleByName.get(ROLE_NAMES.SUPER_ADMIN);
+    const adminRole = roleByName.get(ROLE_NAMES.ADMIN);
+    const userRole = roleByName.get(ROLE_NAMES.USER);
+
+    if (!superAdminRole || !adminRole || !userRole) {
+      throw new AppError(
+        ERROR_CODES.INTERNAL_ERROR,
+        'Role seed state is inconsistent',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
+    await this.accessControlRepository.replaceRolePermissions(
+      superAdminRole.id,
+      allPermissionIds,
+      executor,
+    );
+    await this.accessControlRepository.replaceRolePermissions(
+      adminRole.id,
+      adminPermissionIds,
+      executor,
+    );
+    await this.accessControlRepository.replaceRolePermissions(
+      userRole.id,
+      userPermissionIds,
+      executor,
+    );
+  }
+
+  async getAccessProfile(userId: string) {
+    const [roles, permissions] = await Promise.all([
+      this.accessControlRepository.findRoleNamesForUser(userId),
+      this.accessControlRepository.findPermissionNamesForUser(userId),
+    ]);
+
+    return {
+      roles,
+      permissions,
+    };
+  }
+
+  async getRoleNamesForUsers(userIds: string[]) {
+    const rows =
+      await this.accessControlRepository.findRoleNamesForUsers(userIds);
+    const grouped = new Map<string, string[]>();
+
+    for (const row of rows) {
+      const existing = grouped.get(row.userId) ?? [];
+      existing.push(row.roleName);
+      grouped.set(row.userId, existing);
+    }
+
+    return grouped;
+  }
+
+  async validateRoleIds(roleIds: string[]) {
+    const foundRoles =
+      await this.accessControlRepository.findRolesByIds(roleIds);
+
+    if (foundRoles.length !== roleIds.length) {
+      throw new AppError(
+        ERROR_CODES.RESOURCE_CONFLICT,
+        'One or more roles do not exist',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    return foundRoles;
+  }
+
+  async getRoleByName(name: string, executor?: DatabaseExecutor) {
+    return this.accessControlRepository.findRoleByName(name, executor);
+  }
+
+  async replaceUserRoles(
+    userId: string,
+    roleIds: string[],
+    executor?: DatabaseExecutor,
+  ) {
+    await this.accessControlRepository.replaceUserRoles(
+      userId,
+      roleIds,
+      executor,
+    );
+  }
+
+  assertCanAssignRoles(
+    actor: AuthenticatedRequestUser,
+    targetRoleNames: string[],
+    desiredRoleNames: string[],
+  ): void {
+    const actorIsSuperAdmin = actor.roles.includes(ROLE_NAMES.SUPER_ADMIN);
+    const targetIsSuperAdmin = targetRoleNames.includes(ROLE_NAMES.SUPER_ADMIN);
+    const assigningSuperAdmin = desiredRoleNames.includes(
+      ROLE_NAMES.SUPER_ADMIN,
+    );
+
+    if (!actorIsSuperAdmin && (targetIsSuperAdmin || assigningSuperAdmin)) {
+      throw new AppError(
+        ERROR_CODES.AUTH_FORBIDDEN,
+        'Only SUPER_ADMIN can manage SUPER_ADMIN role assignments',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    if (
+      !actor.permissions.includes(PERMISSION_NAMES.ROLES_MANAGE) &&
+      !actorIsSuperAdmin
+    ) {
+      throw new AppError(
+        ERROR_CODES.AUTH_FORBIDDEN,
+        'You do not have permission to manage roles',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+  }
+}

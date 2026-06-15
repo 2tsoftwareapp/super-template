@@ -1,0 +1,12 @@
+{
+  "extends": "@repo/tsconfig/nest.json",
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "dist",
+    "tsBuildInfoFile": "dist/tsconfig.build.tsbuildinfo",
+    "paths": {
+      "src/*": ["src/*"]
+    }
+  },
+  "include": ["src/**/*.ts", "test/**/*.ts", "drizzle.config.ts"]
+}

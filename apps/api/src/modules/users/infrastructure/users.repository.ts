@@ -1,0 +1,160 @@
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { and, asc, count, desc, eq, inArray, isNull, sql } from 'drizzle-orm';
+import { ERROR_CODES } from '../../../common/constants/error-codes';
+import { AppError } from '../../../common/errors/app-error';
+import { DATABASE } from '../../../database/database.provider';
+import type {
+  DatabaseClient,
+  DatabaseExecutor,
+} from '../../../database/database.types';
+import { roles, userRoles, users } from '../../../database/schema';
+
+type ListUsersParams = {
+  page: number;
+  limit: number;
+  search?: string;
+  status?: 'PENDING' | 'ACTIVE' | 'BLOCKED';
+  role?: string;
+  sortField: 'createdAt' | 'displayName' | 'email' | 'status';
+  sortOrder: 'asc' | 'desc';
+};
+
+const USER_SORT_FIELDS = {
+  createdAt: users.createdAt,
+  displayName: users.displayName,
+  email: users.email,
+  status: users.status,
+} as const;
+
+@Injectable()
+export class UsersRepository {
+  constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
+
+  async create(
+    values: typeof users.$inferInsert,
+    executor: DatabaseExecutor = this.database,
+  ) {
+    const [user] = await executor.insert(users).values(values).returning();
+
+    if (!user) {
+      throw new Error('User insert returned no rows');
+    }
+
+    return user;
+  }
+
+  async findById(userId: string, executor: DatabaseExecutor = this.database) {
+    const [user] = await executor
+      .select()
+      .from(users)
+      .where(and(eq(users.id, userId), isNull(users.deletedAt)))
+      .limit(1);
+
+    return user ?? null;
+  }
+
+  async findByEmail(email: string, executor: DatabaseExecutor = this.database) {
+    const [user] = await executor
+      .select()
+      .from(users)
+      .where(and(eq(users.email, email), isNull(users.deletedAt)))
+      .limit(1);
+
+    return user ?? null;
+  }
+
+  async update(
+    userId: string,
+    values: Partial<typeof users.$inferInsert>,
+    executor: DatabaseExecutor = this.database,
+  ) {
+    const [user] = await executor
+      .update(users)
+      .set({
+        ...values,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, userId))
+      .returning();
+
+    return user ?? null;
+  }
+
+  async softDelete(userId: string, executor: DatabaseExecutor = this.database) {
+    return this.update(
+      userId,
+      {
+        deletedAt: new Date(),
+        status: 'BLOCKED',
+      },
+      executor,
+    );
+  }
+
+  async list(
+    params: ListUsersParams,
+    executor: DatabaseExecutor = this.database,
+  ) {
+    const filters = [isNull(users.deletedAt)];
+
+    if (params.search) {
+      filters.push(
+        sql`(${users.email} ilike ${`%${params.search}%`} or ${users.displayName} ilike ${`%${params.search}%`})`,
+      );
+    }
+
+    if (params.status) {
+      filters.push(eq(users.status, params.status));
+    }
+
+    if (params.role) {
+      const roleUserIds = executor
+        .select({
+          userId: userRoles.userId,
+        })
+        .from(userRoles)
+        .innerJoin(roles, eq(userRoles.roleId, roles.id))
+        .where(eq(roles.name, params.role));
+
+      filters.push(inArray(users.id, roleUserIds));
+    }
+
+    const sortColumn = USER_SORT_FIELDS[params.sortField];
+    const whereClause = filters.length > 0 ? and(...filters) : undefined;
+    const offset = (params.page - 1) * params.limit;
+
+    const [rows, totalRows] = await Promise.all([
+      executor
+        .select()
+        .from(users)
+        .where(whereClause)
+        .orderBy(
+          params.sortOrder === 'asc' ? asc(sortColumn) : desc(sortColumn),
+        )
+        .limit(params.limit)
+        .offset(offset),
+      executor.select({ total: count() }).from(users).where(whereClause),
+    ]);
+
+    return {
+      rows,
+      total: Number(totalRows[0]?.total ?? 0),
+    };
+  }
+
+  async assertEmailAvailable(
+    email: string,
+    executor: DatabaseExecutor = this.database,
+    currentUserId?: string,
+  ) {
+    const existing = await this.findByEmail(email, executor);
+
+    if (existing && existing.id !== currentUserId) {
+      throw new AppError(
+        ERROR_CODES.USER_EMAIL_ALREADY_EXISTS,
+        'A user with this email already exists',
+        HttpStatus.CONFLICT,
+      );
+    }
+  }
+}
