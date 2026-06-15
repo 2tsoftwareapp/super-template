@@ -3,12 +3,23 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
+import { useQueryState } from "nuqs";
 import { Card } from "@/components/ui/card";
 import type { ProjectResponse } from "@/lib/api-types";
 import { webFetch } from "@/lib/http";
+import {
+  buildProjectEditPath,
+  normalizeProjectReturnTo,
+  projectNavigationSearchParams,
+} from "@/lib/search-params";
 
 export default function ProjectDetailPage() {
   const params = useParams<{ id: string }>();
+  const [returnTo] = useQueryState(
+    "returnTo",
+    projectNavigationSearchParams.returnTo,
+  );
+  const backToProjects = normalizeProjectReturnTo(returnTo);
   const project = useQuery({
     queryKey: ["project", params.id],
     queryFn: () => webFetch<ProjectResponse>(`/api/bff/projects/${params.id}`),
@@ -18,6 +29,9 @@ export default function ProjectDetailPage() {
     <Card className="max-w-4xl">
       <div className="flex items-start justify-between">
         <div>
+          <Link href={backToProjects} className="text-sm text-neutral-500 underline">
+            Back to projects
+          </Link>
           <p className="text-sm uppercase tracking-[0.28em] text-neutral-500">
             Project detail
           </p>
@@ -26,7 +40,7 @@ export default function ProjectDetailPage() {
           </h1>
         </div>
         <Link
-          href={`/projects/${params.id}/edit`}
+          href={buildProjectEditPath(params.id, backToProjects)}
           className="text-sm underline"
         >
           Edit

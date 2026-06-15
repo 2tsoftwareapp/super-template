@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -7,11 +8,17 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { useQueryState } from "nuqs";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import type { ProjectResponse, UpdateProjectInput } from "@/lib/api-types";
 import { webFetch } from "@/lib/http";
+import {
+  buildProjectDetailPath,
+  normalizeProjectReturnTo,
+  projectNavigationSearchParams,
+} from "@/lib/search-params";
 
 const schema = z.object({
   name: z.string().min(2).max(160).optional(),
@@ -33,6 +40,11 @@ const toUpdateProjectInput = (values: EditProjectFormValues): UpdateProjectInput
 export default function EditProjectPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
+  const [returnTo] = useQueryState(
+    "returnTo",
+    projectNavigationSearchParams.returnTo,
+  );
+  const backToProjects = normalizeProjectReturnTo(returnTo);
   const project = useQuery({
     queryKey: ["project", params.id],
     queryFn: () => webFetch<ProjectResponse>(`/api/bff/projects/${params.id}`),
@@ -66,13 +78,16 @@ export default function EditProjectPage() {
       }),
     onSuccess: () => {
       toast.success("Project updated");
-      router.replace(`/projects/${params.id}`);
+      router.replace(buildProjectDetailPath(params.id, backToProjects));
     },
     onError: (error: Error) => toast.error(error.message),
   });
 
   return (
     <Card className="max-w-3xl">
+      <Link href={backToProjects} className="text-sm text-neutral-500 underline">
+        Back to projects
+      </Link>
       <h1 className="text-4xl font-semibold">Edit project</h1>
       <form
         className="mt-8 space-y-4"

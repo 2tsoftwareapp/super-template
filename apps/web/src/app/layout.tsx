@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Mono, Space_Grotesk } from "next/font/google";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Providers } from "@/components/providers";
 import "./globals.css";
 
@@ -31,7 +32,9 @@ export default function RootLayout({
       className={`${sans.variable} ${mono.variable}`}
     >
       <body>
-        <Providers>{children}</Providers>
+        <NuqsAdapter>
+          <Providers>{children}</Providers>
+        </NuqsAdapter>
       </body>
     </html>
   );

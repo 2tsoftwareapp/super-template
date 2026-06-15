@@ -1,8 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
+import { useQueryState } from "nuqs";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -11,6 +13,11 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import type { CreateProjectInput, ProjectResponse } from "@/lib/api-types";
 import { webFetch } from "@/lib/http";
+import {
+  buildProjectDetailPath,
+  normalizeProjectReturnTo,
+  projectNavigationSearchParams,
+} from "@/lib/search-params";
 
 const schema = z.object({
   name: z.string().min(2).max(160),
@@ -31,6 +38,11 @@ const toCreateProjectInput = (values: NewProjectFormValues): CreateProjectInput 
 
 export default function NewProjectPage() {
   const router = useRouter();
+  const [returnTo] = useQueryState(
+    "returnTo",
+    projectNavigationSearchParams.returnTo,
+  );
+  const backToProjects = normalizeProjectReturnTo(returnTo);
   const form = useForm<NewProjectFormInput, undefined, NewProjectFormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -48,13 +60,16 @@ export default function NewProjectPage() {
       }),
     onSuccess: (result) => {
       toast.success("Project created");
-      router.replace(`/projects/${result.data.id}`);
+      router.replace(buildProjectDetailPath(result.data.id, backToProjects));
     },
     onError: (error: Error) => toast.error(error.message),
   });
 
   return (
     <Card className="max-w-3xl">
+      <Link href={backToProjects} className="text-sm text-neutral-500 underline">
+        Back to projects
+      </Link>
       <p className="text-sm uppercase tracking-[0.28em] text-neutral-500">
         Create project
       </p>

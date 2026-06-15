@@ -11,6 +11,10 @@ import type {
   UsersListResponse,
 } from "@/lib/api-types";
 import { webFetch } from "@/lib/http";
+import {
+  buildAdminUsersListPath,
+  buildProjectsListPath,
+} from "@/lib/search-params";
 
 export default function DashboardPage() {
   const session = useSession();
@@ -18,8 +22,7 @@ export default function DashboardPage() {
     session.data?.data.permissions.includes("users.read") ?? false;
   const projects = useQuery({
     queryKey: ["dashboard-projects"],
-    queryFn: () =>
-      webFetch<ProjectsListResponse>("/api/bff/projects?page=1&limit=5"),
+    queryFn: () => webFetch<ProjectsListResponse>(buildProjectsListPath({ limit: 5 })),
   });
   const notifications = useQuery({
     queryKey: ["dashboard-notifications-unread"],
@@ -30,8 +33,7 @@ export default function DashboardPage() {
   });
   const users = useQuery({
     queryKey: ["dashboard-users"],
-    queryFn: () =>
-      webFetch<UsersListResponse>("/api/bff/admin/users?page=1&limit=5"),
+    queryFn: () => webFetch<UsersListResponse>(buildAdminUsersListPath({ limit: 5 })),
     enabled: canReadUsers,
   });
 

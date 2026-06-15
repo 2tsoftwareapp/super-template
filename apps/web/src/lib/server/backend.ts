@@ -6,6 +6,7 @@ import {
   setAuthCookies,
 } from "@/lib/auth/cookies";
 import { env } from "@/lib/env";
+import { normalizeBffListPath } from "@/lib/search-params";
 
 const backendUrl = (path: string) =>
   new URL(`/api/v1/${path.replace(/^\/+/, "")}`, env.API_INTERNAL_URL);
@@ -134,9 +135,10 @@ export const proxyWithRefresh = async (request: NextRequest, path: string) => {
     method === "GET" || method === "HEAD" ? null : await request.text();
   const { accessToken, refreshToken, csrfToken } = await readAuthCookies();
   const headers = pickHeaders(request);
+  const normalizedPath = normalizeBffListPath(path, request.nextUrl.searchParams);
 
   let response = await callBackend({
-    path,
+    path: normalizedPath,
     method,
     headers,
     body,
@@ -148,13 +150,17 @@ export const proxyWithRefresh = async (request: NextRequest, path: string) => {
     refreshToken: string;
   } | null = null;
 
-  if (response.status === 401 && refreshToken && !path.startsWith("auth/")) {
+  if (
+    response.status === 401 &&
+    refreshToken &&
+    !normalizedPath.startsWith("auth/")
+  ) {
     const refreshed = await refreshSession(refreshToken);
 
     if (refreshed) {
       refreshedTokens = refreshed.data;
       response = await callBackend({
-        path,
+        path: normalizedPath,
         method,
         headers: pickHeaders(request),
         body,

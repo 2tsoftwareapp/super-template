@@ -135,4 +135,41 @@ describe("proxyWithRefresh", () => {
     expect(clearAuthCookiesMock).toHaveBeenCalledWith(response);
     expect(setAuthCookiesMock).not.toHaveBeenCalled();
   });
+
+  it("normalizes list-route query params before proxying to the backend", async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          data: [],
+          meta: { page: 2, limit: 5, total: 0, totalPages: 0 },
+        }),
+        {
+          status: 200,
+          headers: { "content-type": "application/json" },
+        },
+      ),
+    );
+
+    const request = new NextRequest(
+      "http://localhost/api/bff/projects?page=2&limit=5&status=ACTIVE&sortField=name&sortOrder=asc&unknown=drop-me",
+      {
+        method: "GET",
+        headers: {
+          accept: "application/json",
+        },
+      },
+    );
+
+    const response = await proxyWithRefresh(request, "projects");
+
+    expect(response.status).toBe(200);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    const [url] = fetchMock.mock.calls[0] ?? [];
+
+    expect(String(url)).toContain(
+      "/api/v1/projects?page=2&limit=5&status=ACTIVE&sortField=name&sortOrder=asc",
+    );
+    expect(String(url)).not.toContain("unknown=drop-me");
+  });
 });
