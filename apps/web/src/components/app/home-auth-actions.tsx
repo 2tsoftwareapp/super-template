@@ -14,7 +14,7 @@ export function HomeAuthActions() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const session = useQuery({
-    queryKey: ["landing-session"],
+    queryKey: ["session"],
     queryFn: async () => {
       try {
         return await webFetch<AuthSessionResponse>("/api/auth/session");
@@ -32,7 +32,7 @@ export function HomeAuthActions() {
   const signOut = useMutation({
     mutationFn: () => webFetch("/api/auth/logout", { method: "POST" }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["landing-session"] });
+      await queryClient.invalidateQueries({ queryKey: ["session"] });
       router.refresh();
     },
   });
