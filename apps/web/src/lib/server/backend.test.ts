@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { ApiEnvelope } from "@/lib/api-types";
 import { proxyWithRefresh } from "./backend";
 
 const readAuthCookiesMock = vi.fn();
@@ -7,9 +8,9 @@ const setAuthCookiesMock = vi.fn();
 const clearAuthCookiesMock = vi.fn();
 
 vi.mock("@/lib/auth/cookies", () => ({
-  readAuthCookies: () => readAuthCookiesMock(),
-  setAuthCookies: (...args: unknown[]) => setAuthCookiesMock(...args),
-  clearAuthCookies: (...args: unknown[]) => clearAuthCookiesMock(...args),
+  readAuthCookies: readAuthCookiesMock,
+  setAuthCookies: setAuthCookiesMock,
+  clearAuthCookies: clearAuthCookiesMock,
 }));
 
 describe("proxyWithRefresh", () => {
@@ -82,7 +83,7 @@ describe("proxyWithRefresh", () => {
     });
 
     const response = await proxyWithRefresh(request, "projects");
-    const payload = await response.json();
+    const payload = (await response.json()) as ApiEnvelope<{ id: string }[]>;
 
     expect(response.status).toBe(200);
     expect(payload.data).toEqual([{ id: "project-1" }]);
@@ -165,11 +166,19 @@ describe("proxyWithRefresh", () => {
     expect(response.status).toBe(200);
     expect(fetchMock).toHaveBeenCalledTimes(1);
 
-    const [url] = fetchMock.mock.calls[0] ?? [];
+    const firstCall = fetchMock.mock.calls[0];
+    expect(firstCall).toBeDefined();
+    const [url] = firstCall!;
+    const requestUrl =
+      typeof url === "string"
+        ? url
+        : url instanceof URL
+          ? url.href
+          : "";
 
-    expect(String(url)).toContain(
+    expect(requestUrl).toContain(
       "/api/v1/projects?page=2&limit=5&status=ACTIVE&sortField=name&sortOrder=asc",
     );
-    expect(String(url)).not.toContain("unknown=drop-me");
+    expect(requestUrl).not.toContain("unknown=drop-me");
   });
 });

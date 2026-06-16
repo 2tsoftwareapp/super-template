@@ -6,12 +6,12 @@ import {
   Settings,
 } from "lucide-react";
 
-export type NavItem = {
+export interface NavItem {
   href: string;
   label: string;
   icon: ComponentType<{ className?: string }>;
   permission?: string;
-};
+}
 
 export const clientNavItems: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -31,5 +31,5 @@ export const clientNavItems: NavItem[] = [
 ];
 
 export function getPostLoginPath() {
-  return "/dashboard";
+  return "/";
 }

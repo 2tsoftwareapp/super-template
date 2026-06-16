@@ -5,17 +5,53 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-type UploadedFile = {
+interface UploadedFile {
   id: string;
   originalName: string;
   mimeType: string;
   sizeBytes: number;
-};
+}
 
-type FileUploadProps = {
+interface FileUploadProps {
   onUploaded?: (file: UploadedFile) => void;
   accept?: string;
   label?: string;
+}
+
+interface UploadFileSuccessResponse {
+  data: UploadedFile;
+}
+
+interface UploadFileErrorResponse {
+  error?: {
+    message?: string;
+  };
+}
+
+const hasUploadedFile = (
+  payload: UploadFileSuccessResponse | UploadFileErrorResponse,
+): payload is UploadFileSuccessResponse => "data" in payload;
+
+const getUploadErrorMessage = (
+  payload: UploadFileSuccessResponse | UploadFileErrorResponse,
+): string => {
+  if (
+    "error" in payload &&
+    payload.error &&
+    typeof payload.error.message === "string"
+  ) {
+    return payload.error.message;
+  }
+
+  return "Upload failed";
+};
+
+const parseUploadResponse = async (
+  response: Response,
+): Promise<UploadFileSuccessResponse | UploadFileErrorResponse> => {
+  return (await response.json()) as
+    | UploadFileSuccessResponse
+    | UploadFileErrorResponse;
 };
 
 export function FileUpload({
@@ -50,9 +86,12 @@ export function FileUpload({
         },
       });
 
-      const payload = await response.json();
+      const payload = await parseUploadResponse(response);
       if (!response.ok) {
-        throw new Error(payload?.error?.message ?? "Upload failed");
+        throw new Error(getUploadErrorMessage(payload));
+      }
+      if (!hasUploadedFile(payload)) {
+        throw new Error("Upload failed");
       }
 
       onUploaded?.(payload.data);
@@ -105,10 +144,13 @@ export async function uploadFile(file: File): Promise<UploadedFile> {
     },
   });
 
-  const payload = await response.json();
+  const payload = await parseUploadResponse(response);
   if (!response.ok) {
-    throw new Error(payload?.error?.message ?? "Upload failed");
+    throw new Error(getUploadErrorMessage(payload));
+  }
+  if (!hasUploadedFile(payload)) {
+    throw new Error("Upload failed");
   }
 
-  return payload.data as UploadedFile;
+  return payload.data;
 }

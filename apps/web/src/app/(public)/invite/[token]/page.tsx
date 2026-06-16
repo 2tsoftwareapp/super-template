@@ -40,11 +40,11 @@ export default function InviteAcceptPage() {
     <AuthShell
       eyebrow="Invitation"
       title="Accept invitation"
-      body="Create your account to join the workspace."
+      body="Create your account to join the starter."
     >
       <Card className="border-border">
         <CardHeader>
-          <CardTitle>Join workspace</CardTitle>
+          <CardTitle>Join starter</CardTitle>
           <CardDescription>
             Complete your profile to accept the invite.
           </CardDescription>

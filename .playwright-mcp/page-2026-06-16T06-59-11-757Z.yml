@@ -1,0 +1,57 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e6]: Reusable full-stack starter
+        - paragraph [ref=e7]: A clean landing page for the template, with separate app surfaces and API support behind it.
+      - generic [ref=e8]:
+        - link "Open workspace" [ref=e9] [cursor=pointer]:
+          - /url: /dashboard
+          - text: Open workspace
+          - img
+        - button "Sign out" [ref=e10]:
+          - img
+          - text: Sign out
+    - generic [ref=e11]:
+      - generic [ref=e12]:
+        - generic [ref=e13]:
+          - generic [ref=e14]: Modular monolith starter
+          - generic [ref=e15]: Showcase the stack, not the internals.
+          - generic [ref=e16]: Start with a landing page that presents the template clearly, then let the companion app handle operational workflows elsewhere.
+        - generic [ref=e17]:
+          - separator [ref=e18]
+          - generic [ref=e19]:
+            - generic [ref=e20]: Landing page and auth flows
+            - generic [ref=e21]: Separate app workspace
+            - generic [ref=e22]: API contract generation
+            - generic [ref=e23]: Default shadcn styling
+      - generic [ref=e24]:
+        - generic [ref=e25]:
+          - generic [ref=e26]: Included flows
+          - generic [ref=e27]: The landing highlights the template surface area.
+        - list [ref=e29]:
+          - listitem [ref=e30]: Reusable shadcn-based component system
+          - listitem [ref=e31]: Public auth pages for sign in and registration
+          - listitem [ref=e32]: Separate app for management tasks
+          - listitem [ref=e33]: Contracts and API wiring for the backend
+          - listitem [ref=e34]: Client-facing product copy and feature sections
+    - generic [ref=e35]:
+      - generic [ref=e36]:
+        - generic [ref=e37]:
+          - img [ref=e39]
+          - generic [ref=e42]: Landing-first web
+        - paragraph [ref=e44]: The Next.js app is a polished showcase, not an internal workspace.
+      - generic [ref=e45]:
+        - generic [ref=e46]:
+          - img [ref=e48]
+          - generic [ref=e54]: Shadcn UI foundation
+        - paragraph [ref=e56]: Built from default primitives so the template stays predictable and clean.
+      - generic [ref=e57]:
+        - generic [ref=e58]:
+          - img [ref=e60]
+          - generic [ref=e62]: Multiple surfaces
+        - paragraph [ref=e64]: The repo still ships API and companion apps, but this site stays focused on marketing.
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e70] [cursor=pointer]:
+    - img [ref=e71]
+  - alert [ref=e74]

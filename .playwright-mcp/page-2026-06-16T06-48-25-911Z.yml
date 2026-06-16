@@ -1,0 +1,110 @@
+- generic [ref=e2]:
+  - generic [ref=e4]:
+    - complementary [ref=e5]:
+      - generic [ref=e6]:
+        - generic [ref=e8]:
+          - generic [ref=e9]:
+            - generic [ref=e10]: Admin app
+            - generic [ref=e11]: Super Template Admin
+            - generic [ref=e12]: A separate React + Vite workspace for management tasks.
+          - img [ref=e13]
+        - generic [ref=e15]:
+          - separator [ref=e16]
+          - navigation [ref=e17]:
+            - link "Dashboard" [ref=e18] [cursor=pointer]:
+              - /url: /
+              - img [ref=e19]
+              - text: Dashboard
+            - link "Users" [ref=e24] [cursor=pointer]:
+              - /url: /users
+              - img [ref=e25]
+              - text: Users
+            - link "Projects" [ref=e30] [cursor=pointer]:
+              - /url: /projects
+              - img [ref=e31]
+              - text: Projects
+            - link "Audit logs" [ref=e33] [cursor=pointer]:
+              - /url: /audit-logs
+              - img [ref=e34]
+              - text: Audit logs
+            - link "Notifications" [ref=e36] [cursor=pointer]:
+              - /url: /notifications
+              - img [ref=e37]
+              - text: Notifications
+            - link "Jobs" [ref=e40] [cursor=pointer]:
+              - /url: /jobs
+              - img [ref=e41]
+              - text: Jobs
+            - link "Mail" [ref=e45] [cursor=pointer]:
+              - /url: /mail
+              - img [ref=e46]
+              - text: Mail
+            - link "Imports" [ref=e49] [cursor=pointer]:
+              - /url: /imports
+              - img [ref=e50]
+              - text: Imports
+            - link "Roles" [ref=e52] [cursor=pointer]:
+              - /url: /roles
+              - img [ref=e53]
+              - text: Roles
+            - link "Settings" [ref=e55] [cursor=pointer]:
+              - /url: /settings
+              - img [ref=e56]
+              - text: Settings
+          - separator [ref=e59]
+          - generic [ref=e60]:
+            - paragraph [ref=e61]: Seed Admin
+            - paragraph [ref=e62]: SUPER_ADMIN
+            - button "Sign out" [ref=e63]:
+              - img
+              - text: Sign out
+    - main [ref=e64]:
+      - generic [ref=e67]:
+        - generic [ref=e68]:
+          - generic [ref=e69]: Users
+          - generic [ref=e71]:
+            - heading "User management" [level=1] [ref=e72]
+            - paragraph [ref=e73]: Create accounts, inspect roles, and move between detail and status controls.
+        - generic [ref=e74]:
+          - generic [ref=e75]:
+            - generic [ref=e76]:
+              - generic [ref=e77]: Users
+              - generic [ref=e78]: Table powered by TanStack Table.
+            - table [ref=e81]:
+              - rowgroup [ref=e82]:
+                - row "Name Email Status Roles" [ref=e83]:
+                  - columnheader "Name" [ref=e84]
+                  - columnheader "Email" [ref=e85]
+                  - columnheader "Status" [ref=e86]
+                  - columnheader "Roles" [ref=e87]
+              - rowgroup [ref=e88]:
+                - row "Seed Admin admin@example.local ACTIVE SUPER_ADMIN" [ref=e89]:
+                  - cell "Seed Admin" [ref=e90]
+                  - cell "admin@example.local" [ref=e91]
+                  - cell "ACTIVE" [ref=e92]
+                  - cell "SUPER_ADMIN" [ref=e93]
+                - row "Seed User user@example.local ACTIVE USER" [ref=e94]:
+                  - cell "Seed User" [ref=e95]
+                  - cell "user@example.local" [ref=e96]
+                  - cell "ACTIVE" [ref=e97]
+                  - cell "USER" [ref=e98]
+          - generic [ref=e99]:
+            - generic [ref=e100]:
+              - generic [ref=e101]: Create user
+              - generic [ref=e102]: Add an account and optionally assign roles by id.
+            - generic [ref=e104]:
+              - generic [ref=e105]:
+                - text: Email
+                - textbox "Email" [ref=e106]
+              - generic [ref=e107]:
+                - text: Password
+                - textbox "Password" [ref=e108]
+              - generic [ref=e109]:
+                - text: Display name
+                - textbox "Display name" [ref=e110]
+              - generic [ref=e111]:
+                - text: Role IDs
+                - textbox "Role IDs" [ref=e112]:
+                  - /placeholder: role-1, role-2
+              - button "Create user" [ref=e113]
+  - region "Notifications alt+T"

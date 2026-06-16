@@ -11,6 +11,8 @@ const buttonVariants = cva(
           "bg-[var(--primary)] text-[var(--primary-foreground)] shadow-xs hover:bg-[color-mix(in_oklch,var(--primary),black_10%)]",
         outline:
           "border border-[var(--input)] bg-[var(--background)] text-[var(--foreground)] shadow-xs hover:bg-[var(--accent)] hover:text-[var(--accent-foreground)]",
+        destructive:
+          "bg-[var(--destructive)] text-[var(--destructive-foreground)] shadow-xs hover:bg-[color-mix(in_oklch,var(--destructive),black_10%)]",
         ghost:
           "text-[var(--foreground)] hover:bg-[var(--accent)] hover:text-[var(--accent-foreground)]",
         link: "text-[var(--primary)] underline-offset-4 hover:underline",

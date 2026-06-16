@@ -6,6 +6,7 @@ import {
   setAuthCookies,
 } from "@/lib/auth/cookies";
 import { env } from "@/lib/env";
+import type { ApiEnvelope } from "@/lib/api-types";
 import { normalizeBffListPath } from "@/lib/search-params";
 
 const backendUrl = (path: string) =>
@@ -60,23 +61,23 @@ const pickHeaders = (request: NextRequest) => {
   return headers;
 };
 
-const parseJson = async (response: Response) => {
+const parseJson = async <T>(response: Response): Promise<T | null> => {
   const contentType = response.headers.get("content-type") ?? "";
 
   if (!contentType.includes("application/json")) {
     return null;
   }
 
-  return response.json();
+  return (await response.json()) as T;
 };
 
-type ProxyOptions = {
+interface ProxyOptions {
   accessToken?: string | null;
   body?: BodyInit | null;
   headers?: Headers;
   method: string;
   path: string;
-};
+}
 
 export const callBackend = async ({
   accessToken,
@@ -84,7 +85,7 @@ export const callBackend = async ({
   headers = new Headers(),
   method,
   path,
-}: ProxyOptions) => {
+}: ProxyOptions): Promise<Response> => {
   if (accessToken) {
     headers.set("authorization", `Bearer ${accessToken}`);
   }
@@ -110,7 +111,16 @@ export const callBackend = async ({
   }
 };
 
-export const refreshSession = async (refreshToken: string) => {
+interface RefreshSessionPayload {
+  data: {
+    accessToken: string;
+    refreshToken: string;
+  };
+}
+
+export const refreshSession = async (
+  refreshToken: string,
+): Promise<RefreshSessionPayload | null> => {
   let response: Response;
 
   try {
@@ -130,7 +140,7 @@ export const refreshSession = async (refreshToken: string) => {
     throw error;
   }
 
-  const payload = await parseJson(response);
+  const payload = await parseJson<RefreshSessionPayload>(response);
 
   if (
     !response.ok ||
@@ -139,13 +149,7 @@ export const refreshSession = async (refreshToken: string) => {
   ) {
     return null;
   }
-
-  return payload as {
-    data: {
-      accessToken: string;
-      refreshToken: string;
-    };
-  };
+  return payload;
 };
 
 export const enforceCsrf = async (request: NextRequest) => {
@@ -230,7 +234,7 @@ export const proxyWithRefresh = async (request: NextRequest, path: string) => {
     }
   }
 
-  const payload = await parseJson(response);
+  const payload = await parseJson<ApiEnvelope<unknown>>(response);
   const nextResponse = NextResponse.json(payload, { status: response.status });
 
   if (refreshedTokens) {

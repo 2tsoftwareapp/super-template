@@ -7,7 +7,17 @@ import type { NotificationDto } from "@/lib/api-types";
 
 const parseNotificationEvent = (payload: string): NotificationDto | null => {
   try {
-    return JSON.parse(payload) as NotificationDto;
+    const parsed = JSON.parse(payload) as unknown;
+    if (
+      typeof parsed === "object" &&
+      parsed !== null &&
+      "title" in parsed &&
+      "body" in parsed
+    ) {
+      return parsed as NotificationDto;
+    }
+
+    return null;
   } catch {
     return null;
   }
@@ -24,7 +34,8 @@ export function useNotificationStream(enabled = true) {
     const source = new EventSource("/api/notifications/stream");
 
     source.onmessage = (event) => {
-      const notification = parseNotificationEvent(event.data);
+      const payload = typeof event.data === "string" ? event.data : "";
+      const notification = parseNotificationEvent(payload);
 
       if (!notification) {
         return;

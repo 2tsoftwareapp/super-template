@@ -1,7 +1,8 @@
+import type {
+  inferParserType} from "nuqs/server";
 import {
   createLoader,
   createSerializer,
-  inferParserType,
   parseAsBoolean,
   parseAsInteger,
   parseAsString,
@@ -14,10 +15,10 @@ const userStatuses = ["ALL", "PENDING", "ACTIVE", "BLOCKED"] as const;
 const projectSortFields = ["updatedAt", "createdAt", "name", "status"] as const;
 const userSortFields = ["createdAt", "displayName", "email", "status"] as const;
 
-type SelectOption<T extends string | number | boolean> = {
+interface SelectOption<T extends string | number | boolean> {
   label: string;
   value: T;
-};
+}
 
 const normalizeQueryString = (query: string) =>
   query.startsWith("?") ? query.slice(1) : query;
@@ -246,22 +247,22 @@ export const serializeSessionsSearch = (state: SessionsSearchState) =>
   });
 
 export const normalizeProjectsSearch = (input: SyncLoaderInput) =>
-  loadProjectsSearchParams(input) as ProjectsSearchState;
+  loadProjectsSearchParams(input);
 
 export const normalizeUsersSearch = (input: SyncLoaderInput) =>
-  loadUsersSearchParams(input) as UsersSearchState;
+  loadUsersSearchParams(input);
 
 export const normalizeNotificationsSearch = (input: SyncLoaderInput) =>
-  loadNotificationsSearchParams(input) as NotificationsSearchState;
+  loadNotificationsSearchParams(input);
 
 export const normalizeAuditLogsSearch = (input: SyncLoaderInput) =>
-  loadAuditLogsSearchParams(input) as AuditLogsSearchState;
+  loadAuditLogsSearchParams(input);
 
 export const normalizeSessionsSearch = (input: SyncLoaderInput) =>
-  loadSessionsSearchParams(input) as SessionsSearchState;
+  loadSessionsSearchParams(input);
 
 export const normalizeProjectNavigation = (input: SyncLoaderInput) =>
-  loadProjectNavigationSearchParams(input) as ProjectNavigationState;
+  loadProjectNavigationSearchParams(input);
 
 export const buildProjectsListPath = (
   overrides: Partial<ProjectsSearchState> = {},

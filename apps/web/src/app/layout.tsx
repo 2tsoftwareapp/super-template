@@ -4,9 +4,9 @@ import { Providers } from "@/components/providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Super Template Control Room",
+  title: "Super Template",
   description:
-    "Production-oriented full-stack starter template with a shadcn UI system",
+    "Landing page for a full-stack starter with shadcn UI and companion apps",
 };
 
 export default function RootLayout({

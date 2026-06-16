@@ -46,8 +46,8 @@ export function AuthShell({
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <Link href="/dashboard" className={buttonVariants()}>
-              Open workspace
+            <Link href="/" className={buttonVariants()}>
+              View showcase
             </Link>
             <Link href="/" className={buttonVariants({ variant: "outline" })}>
               <ArrowLeft className="mr-2 size-4" />

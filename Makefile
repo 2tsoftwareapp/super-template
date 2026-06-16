@@ -6,9 +6,10 @@ help:
 	@printf '%s\n' \
 		'Available targets:' \
 		'  bootstrap    Install deps, start infra, migrate, seed, generate contracts' \
-		'  dev          Start API + Web (docker infra + pnpm dev)' \
+		'  dev          Start API + Web + Admin (docker infra + pnpm dev)' \
 		'  dev-api      Start API only' \
 		'  dev-web      Start Web only' \
+		'  dev-admin    Start Admin only' \
 		'  dev-mobile   Run Flutter app' \
 		'  infra-up     Start Postgres + Mailpit' \
 		'  infra-down   Stop docker infra' \
@@ -39,6 +40,10 @@ dev-api:
 dev-web:
 	@printf '%s\n' 'Note: Web proxies to API at $${API_INTERNAL_URL:-http://localhost:3001}. Run `make dev-api` in another terminal if login fails.'
 	set -a; source .env; set +a; pnpm --filter web dev
+
+dev-admin:
+	@printf '%s\n' 'Note: Admin proxies to API at $${API_INTERNAL_URL:-http://localhost:3001}. Run `make dev-api` in another terminal if login fails.'
+	set -a; source .env; set +a; pnpm --filter admin dev
 
 dev-mobile:
 	cd apps/mobile && flutter run --dart-define-from-file=env/dev.json

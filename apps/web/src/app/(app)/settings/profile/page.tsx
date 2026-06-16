@@ -48,7 +48,7 @@ export default function ProfileSettingsPage() {
         method: "PATCH",
         body: JSON.stringify({
           displayName: values.displayName,
-          avatarUrl: values.avatarUrl || undefined,
+          avatarUrl: values.avatarUrl === "" ? undefined : values.avatarUrl,
           avatarFileId: values.avatarFileId,
         }),
       }),

@@ -1,6 +1,6 @@
 import type { components, operations } from "@repo/api-contract";
 
-export type ApiEnvelope<T> = {
+export interface ApiEnvelope<T> {
   data: T;
   meta: {
     requestId: string;
@@ -9,9 +9,9 @@ export type ApiEnvelope<T> = {
     total?: number;
     totalPages?: number;
   };
-};
+}
 
-export type ApiErrorEnvelope = {
+export interface ApiErrorEnvelope {
   error: {
     code: string;
     message: string;
@@ -20,7 +20,7 @@ export type ApiErrorEnvelope = {
   meta: {
     requestId: string;
   };
-};
+}
 
 export type LoginInput = components["schemas"]["LoginDto"];
 export type RegisterInput = components["schemas"]["RegisterDto"];

@@ -1,0 +1,21 @@
+- generic [ref=e2]:
+  - generic [ref=e4]:
+    - generic [ref=e5]:
+      - generic [ref=e6]: Admin workspace
+      - generic [ref=e7]:
+        - paragraph [ref=e8]: Separate project
+        - heading "Sign in to the admin app" [level=1] [ref=e9]
+        - paragraph [ref=e10]: This app is split away from the client web. It owns management workflows, review queues, and system controls.
+    - generic [ref=e11]:
+      - generic [ref=e12]:
+        - generic [ref=e13]: Admin login
+        - generic [ref=e14]: Use the seeded admin account.
+      - generic [ref=e16]:
+        - generic [ref=e17]:
+          - text: Email
+          - textbox "Email" [ref=e18]: admin@example.local
+        - generic [ref=e19]:
+          - text: Password
+          - textbox "Password" [ref=e20]: ChangeMe123!
+        - button "Sign in" [ref=e21]
+  - region "Notifications alt+T"

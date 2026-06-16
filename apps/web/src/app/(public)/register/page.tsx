@@ -48,8 +48,8 @@ export default function RegisterPage() {
   return (
     <AuthShell
       eyebrow="New account"
-      title="Create a workspace user"
-      body="Register a developer or admin account for the local starter."
+      title="Create a starter account"
+      body="Register a developer account for the local starter."
       footer={
         <p>
           Already registered? <Link href="/login">Sign in</Link>

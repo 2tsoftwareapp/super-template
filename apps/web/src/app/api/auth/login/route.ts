@@ -1,6 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import { clearAuthCookies, setAuthCookies } from "@/lib/auth/cookies";
-import type { LoginInput } from "@/lib/api-types";
+import type { AuthLoginResponse, LoginInput } from "@/lib/api-types";
 import { callBackend } from "@/lib/server/backend";
 
 export async function POST(request: NextRequest) {
@@ -12,7 +13,7 @@ export async function POST(request: NextRequest) {
     body: JSON.stringify(body),
   });
 
-  const payload = await response.json();
+  const payload = (await response.json()) as AuthLoginResponse;
   const nextResponse = NextResponse.json(payload, { status: response.status });
 
   if (response.ok) {

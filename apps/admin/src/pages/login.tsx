@@ -8,9 +8,13 @@ import { Button } from "../components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
+import { setStoredAuthTokens } from "../lib/auth";
 import { webFetch } from "../lib/http";
-import type { SessionResponse } from "../lib/types";
 import { sessionQueryKey } from "../lib/session";
+import type { operations } from "@repo/api-contract";
+
+type AuthLoginResponse =
+  operations["AuthController_login"]["responses"][201]["content"]["application/json"];
 
 const schema = z.object({
   email: z.email(),
@@ -32,11 +36,16 @@ export function LoginPage() {
 
   const mutation = useMutation({
     mutationFn: (values: LoginInput) =>
-      webFetch<SessionResponse>("/api/auth/login", {
+      webFetch<AuthLoginResponse>("/api/v1/auth/login", {
         method: "POST",
         body: JSON.stringify(values),
       }),
-    onSuccess: async () => {
+    onSuccess: async (response) => {
+      setStoredAuthTokens({
+        accessToken: response.data.accessToken,
+        refreshToken: response.data.refreshToken,
+      });
+
       await queryClient.invalidateQueries({ queryKey: sessionQueryKey });
       await navigate("/", { replace: true });
     },

@@ -14,9 +14,10 @@
 
 - API: `make dev-api`
 - Web: `make dev-web`
+- Admin: `make dev-admin`
 - Mobile: `make dev-mobile`
 
-`make dev` starts PostgreSQL, Mailpit, NestJS, and Next.js. Flutter still runs separately on a selected device or simulator.
+`make dev` starts PostgreSQL, Mailpit, NestJS, Next.js, and the separate admin Vite app. Flutter still runs separately on a selected device or simulator.
 
 ## Emulator Networking
 

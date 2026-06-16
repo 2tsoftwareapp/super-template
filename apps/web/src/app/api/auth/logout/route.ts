@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { clearAuthCookies, readAuthCookies } from "@/lib/auth/cookies";
+import type { ApiEnvelope } from "@/lib/api-types";
 import { callBackend } from "@/lib/server/backend";
 
 export async function POST() {
@@ -12,7 +13,7 @@ export async function POST() {
       headers: new Headers(),
       accessToken,
     });
-    const payload = await response.json();
+    const payload = (await response.json()) as ApiEnvelope<{ success: boolean }>;
     const nextResponse = NextResponse.json(payload, {
       status: response.status,
     });

@@ -1,0 +1,110 @@
+- generic [ref=e2]:
+  - generic [ref=e23]:
+    - complementary [ref=e24]:
+      - generic [ref=e25]:
+        - generic [ref=e27]:
+          - generic [ref=e28]:
+            - generic [ref=e29]: Admin app
+            - generic [ref=e30]: Super Template Admin
+            - generic [ref=e31]: A separate React + Vite workspace for management tasks.
+          - img [ref=e32]
+        - generic [ref=e34]:
+          - separator [ref=e35]
+          - navigation [ref=e36]:
+            - link "Dashboard" [ref=e37] [cursor=pointer]:
+              - /url: /
+              - img [ref=e38]
+              - text: Dashboard
+            - link "Users" [ref=e43] [cursor=pointer]:
+              - /url: /users
+              - img [ref=e44]
+              - text: Users
+            - link "Projects" [ref=e49] [cursor=pointer]:
+              - /url: /projects
+              - img [ref=e50]
+              - text: Projects
+            - link "Audit logs" [ref=e52] [cursor=pointer]:
+              - /url: /audit-logs
+              - img [ref=e53]
+              - text: Audit logs
+            - link "Notifications" [ref=e55] [cursor=pointer]:
+              - /url: /notifications
+              - img [ref=e56]
+              - text: Notifications
+            - link "Jobs" [ref=e59] [cursor=pointer]:
+              - /url: /jobs
+              - img [ref=e60]
+              - text: Jobs
+            - link "Mail" [ref=e64] [cursor=pointer]:
+              - /url: /mail
+              - img [ref=e65]
+              - text: Mail
+            - link "Imports" [ref=e68] [cursor=pointer]:
+              - /url: /imports
+              - img [ref=e69]
+              - text: Imports
+            - link "Roles" [ref=e71] [cursor=pointer]:
+              - /url: /roles
+              - img [ref=e72]
+              - text: Roles
+            - link "Settings" [ref=e74] [cursor=pointer]:
+              - /url: /settings
+              - img [ref=e75]
+              - text: Settings
+          - separator [ref=e78]
+          - generic [ref=e79]:
+            - paragraph [ref=e80]: Seed Admin
+            - paragraph [ref=e81]: SUPER_ADMIN
+            - button "Sign out" [ref=e82]:
+              - img
+              - text: Sign out
+    - main [ref=e83]:
+      - generic [ref=e86]:
+        - generic [ref=e87]:
+          - generic [ref=e88]: Admin
+          - heading "Admin overview" [level=1] [ref=e89]
+          - paragraph [ref=e90]: Management hub for people, projects, and system controls.
+        - generic [ref=e91]:
+          - generic [ref=e93]:
+            - generic [ref=e94]:
+              - generic [ref=e95]: Permissions
+              - generic [ref=e96]: "31"
+            - img [ref=e97]
+          - generic [ref=e101]:
+            - generic [ref=e102]:
+              - generic [ref=e103]: Users
+              - generic [ref=e104]: "2"
+            - img [ref=e105]
+          - generic [ref=e111]:
+            - generic [ref=e112]:
+              - generic [ref=e113]: Projects
+              - generic [ref=e114]: "1"
+            - img [ref=e115]
+        - generic [ref=e117]:
+          - generic [ref=e118]:
+            - generic [ref=e119]:
+              - generic [ref=e120]: Recent users
+              - generic [ref=e121]: Latest users returned by the admin endpoint.
+            - table [ref=e124]:
+              - rowgroup [ref=e125]:
+                - row "Name Email Status" [ref=e126]:
+                  - columnheader "Name" [ref=e127]
+                  - columnheader "Email" [ref=e128]
+                  - columnheader "Status" [ref=e129]
+              - rowgroup [ref=e130]:
+                - row "Seed Admin admin@example.local ACTIVE" [ref=e131]:
+                  - cell "Seed Admin" [ref=e132]
+                  - cell "admin@example.local" [ref=e133]
+                  - cell "ACTIVE" [ref=e134]
+                - row "Seed User user@example.local ACTIVE" [ref=e135]:
+                  - cell "Seed User" [ref=e136]
+                  - cell "user@example.local" [ref=e137]
+                  - cell "ACTIVE" [ref=e138]
+          - generic [ref=e139]:
+            - generic [ref=e140]:
+              - generic [ref=e141]: Recent projects
+              - generic [ref=e142]: Projects visible to the admin workspace.
+            - generic [ref=e144]:
+              - paragraph [ref=e145]: Helllo
+              - paragraph [ref=e146]: DRAFT
+  - region "Notifications alt+T"

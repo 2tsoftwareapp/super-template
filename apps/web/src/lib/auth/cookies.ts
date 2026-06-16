@@ -24,10 +24,10 @@ export const readAuthCookies = async () => {
   };
 };
 
-type TokenPayload = {
+interface TokenPayload {
   accessToken: string;
   refreshToken: string;
-};
+}
 
 export const setAuthCookies = (
   response: NextResponse,

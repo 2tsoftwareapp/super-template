@@ -34,7 +34,7 @@ vi.mock("sonner", () => ({
 }));
 
 vi.mock("@/lib/http", () => ({
-  webFetch: (...args: unknown[]) => webFetchMock(...args),
+  webFetch: webFetchMock,
 }));
 
 describe("LoginPage", () => {
@@ -61,15 +61,15 @@ describe("LoginPage", () => {
     expect(replaceMock).not.toHaveBeenCalled();
   });
 
-  it("redirects admin users to the admin overview", async () => {
+  it("redirects signed-in users to the landing page", async () => {
     const user = userEvent.setup();
     const queryClient = new QueryClient();
 
     webFetchMock.mockResolvedValueOnce({
       data: {
         user: {
-          displayName: "Admin User",
-          roles: ["ADMIN"],
+          displayName: "Template User",
+          roles: ["USER"],
         },
       },
     });
@@ -82,6 +82,6 @@ describe("LoginPage", () => {
 
     await user.click(screen.getByRole("button", { name: "Sign in" }));
 
-    expect(replaceMock).toHaveBeenCalledWith("/admin");
+    expect(replaceMock).toHaveBeenCalledWith("/");
   });
 });

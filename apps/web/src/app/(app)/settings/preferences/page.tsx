@@ -2,7 +2,7 @@
 
 import { standardSchemaResolver as zodResolver } from "@hookform/resolvers/standard-schema";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { SettingsNav } from "@/components/app/settings-nav";
@@ -28,13 +28,13 @@ import { Switch } from "@/components/ui/switch";
 import type { ApiEnvelope } from "@/lib/api-types";
 import { webFetch } from "@/lib/http";
 
-type Preferences = {
+interface Preferences {
   theme: string;
   language: string;
   timezone: string;
   notificationPreferences: Record<string, unknown>;
   emailPreferences: Record<string, unknown>;
-};
+}
 
 const schema = z.object({
   theme: z.enum(["system", "light", "dark"]),
@@ -69,6 +69,15 @@ export default function PreferencesSettingsPage() {
         (preferences.data?.data.notificationPreferences?.push as boolean) ??
         true,
     },
+  });
+  const theme = useWatch({ control: form.control, name: "theme" });
+  const emailEnabled = useWatch({
+    control: form.control,
+    name: "emailEnabled",
+  });
+  const pushEnabled = useWatch({
+    control: form.control,
+    name: "pushEnabled",
   });
 
   const mutation = useMutation({
@@ -113,11 +122,11 @@ export default function PreferencesSettingsPage() {
             <div className="space-y-2">
               <Label>Theme</Label>
               <Select
-                value={form.watch("theme")}
+                value={theme}
                 onValueChange={(value) =>
                   form.setValue(
                     "theme",
-                    value as PreferencesFormValues["theme"],
+                    value!,
                   )
                 }
               >
@@ -143,7 +152,7 @@ export default function PreferencesSettingsPage() {
               <Label htmlFor="emailEnabled">Email notifications</Label>
               <Switch
                 id="emailEnabled"
-                checked={form.watch("emailEnabled")}
+                checked={emailEnabled}
                 onCheckedChange={(checked) =>
                   form.setValue("emailEnabled", checked)
                 }
@@ -153,7 +162,7 @@ export default function PreferencesSettingsPage() {
               <Label htmlFor="pushEnabled">Push notifications</Label>
               <Switch
                 id="pushEnabled"
-                checked={form.watch("pushEnabled")}
+                checked={pushEnabled}
                 onCheckedChange={(checked) =>
                   form.setValue("pushEnabled", checked)
                 }

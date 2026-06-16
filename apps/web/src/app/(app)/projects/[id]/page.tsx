@@ -28,33 +28,33 @@ import {
   projectNavigationSearchParams,
 } from "@/lib/search-params";
 
-type Attachment = {
+interface Attachment {
   id: string;
   fileId: string;
   entityType: string;
   entityId: string;
   originalName?: string;
-};
+}
 
-type Comment = {
+interface Comment {
   id: string;
   content: string;
   authorId: string;
   createdAt: string;
-};
+}
 
-type Activity = {
+interface Activity {
   id: string;
   summary: string;
   actorId: string | null;
   createdAt: string;
-};
+}
 
-type Invitation = {
+interface Invitation {
   id: string;
   email: string;
   status: string;
-};
+}
 
 export default function ProjectDetailPage() {
   const params = useParams<{ id: string }>();

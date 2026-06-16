@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest} from "next/server";
+import { NextResponse } from "next/server";
 import type { RegisterInput } from "@/lib/api-types";
 import { callBackend } from "@/lib/server/backend";
 

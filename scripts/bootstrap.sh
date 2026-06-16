@@ -37,6 +37,7 @@ pnpm --filter api db:seed
 cat <<EOF
 Bootstrap complete.
 Web: http://localhost:${WEB_PORT:-3000}
+Admin: http://localhost:${ADMIN_PORT:-3002}
 API: http://localhost:${API_PORT:-3001}/api/v1
 Swagger: http://localhost:${API_PORT:-3001}/api/docs
 Mailpit: http://localhost:${MAILPIT_HTTP_PORT:-8025}

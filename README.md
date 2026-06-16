@@ -3,7 +3,8 @@
 Production-oriented reusable full-stack starter with:
 
 - NestJS API
-- Next.js App Router web client with a backend-for-frontend layer
+- Next.js App Router client web with a backend-for-frontend layer
+- React + Vite admin app with shadcn UI and TanStack
 - Flutter mobile client
 - PostgreSQL
 - Drizzle ORM with `pg`
@@ -14,6 +15,7 @@ Production-oriented reusable full-stack starter with:
 
 - Backend: NestJS 11, Swagger, JWT, Argon2id, Drizzle ORM, PostgreSQL
 - Web: Next.js 16, React 19, Tailwind CSS, TanStack Query, React Hook Form, Zod
+- Admin: React 19, Vite, shadcn UI primitives, TanStack Query/Table
 - Mobile: Flutter stable, Riverpod, Go Router, Dio, secure storage
 - Tooling: pnpm workspaces, Turborepo, Biome for backend, ESLint for web, Makefile
 
@@ -23,6 +25,7 @@ Production-oriented reusable full-stack starter with:
 super-template/
 ├── apps/
 │   ├── api/
+│   ├── admin/
 │   ├── mobile/
 │   └── web/
 ├── infra/
@@ -61,12 +64,14 @@ make dev-mobile
 ## Local URLs
 
 - Web: `http://localhost:3000`
+- Admin: `http://localhost:3002`
 - API: `http://localhost:3001/api/v1`
 - Swagger UI: `http://localhost:3001/api/docs`
 - Swagger JSON: `http://localhost:3001/api/docs-json`
 - Mailpit: `http://localhost:8025`
 
 If port `3000` is already occupied locally, override `WEB_PORT`, `WEB_ORIGIN`, and `NEXT_PUBLIC_WEB_URL` in `.env`.
+If port `3002` is already occupied locally, override `ADMIN_PORT` in `.env`.
 
 ## Environment
 
@@ -111,6 +116,7 @@ See [examples/firebase-demo/README.md](examples/firebase-demo/README.md) for ful
 - `make dev`
 - `make dev-api`
 - `make dev-web`
+- `make dev-admin`
 - `make dev-mobile`
 - `make infra-up`
 - `make infra-down`

@@ -1,9 +1,9 @@
-import { AppShell } from "@/components/app/shell";
+import { redirect } from "next/navigation";
 
 export default function ProtectedLayout({
-  children,
+  children: _children,
 }: {
   children: React.ReactNode;
 }) {
-  return <AppShell>{children}</AppShell>;
+  redirect("/");
 }

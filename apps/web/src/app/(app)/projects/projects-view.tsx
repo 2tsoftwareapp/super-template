@@ -112,7 +112,7 @@ export function ProjectsView() {
               value={filters.status}
               onValueChange={(value) =>
                 void setFilters({
-                  status: value as typeof filters.status,
+                  status: value!,
                   page: 1,
                 })
               }
@@ -135,7 +135,7 @@ export function ProjectsView() {
               value={filters.sortField}
               onValueChange={(value) =>
                 void setFilters({
-                  sortField: value as typeof filters.sortField,
+                  sortField: value!,
                 })
               }
             >
@@ -157,7 +157,7 @@ export function ProjectsView() {
               value={filters.sortOrder}
               onValueChange={(value) =>
                 void setFilters({
-                  sortOrder: value as typeof filters.sortOrder,
+                  sortOrder: value!,
                 })
               }
             >

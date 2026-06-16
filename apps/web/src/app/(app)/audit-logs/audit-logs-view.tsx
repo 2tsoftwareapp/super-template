@@ -113,7 +113,7 @@ export function AuditLogsView() {
               value={filters.sortOrder}
               onValueChange={(value) =>
                 void setFilters({
-                  sortOrder: value as typeof filters.sortOrder,
+                  sortOrder: value!,
                 })
               }
             >
@@ -152,21 +152,29 @@ export function AuditLogsView() {
               </TableHeader>
               <TableBody>
                 {auditLogs.data.data.map((log) => {
-                  const entityId = log.entityId ? String(log.entityId) : null;
-                  const actorId = log.actorId ? String(log.actorId) : "system";
+                  const entityId =
+                    typeof log.entityId === "string" ||
+                    typeof log.entityId === "number"
+                      ? String(log.entityId)
+                      : null;
+                  const actorId =
+                    typeof log.actorId === "string" ||
+                    typeof log.actorId === "number"
+                      ? String(log.actorId)
+                      : "system";
 
                   return (
-                  <TableRow key={log.id}>
-                    <TableCell>
-                      {new Date(log.createdAt).toLocaleString()}
-                    </TableCell>
-                    <TableCell>{log.action}</TableCell>
-                    <TableCell>
-                      {log.entityType}
-                      {entityId ? ` / ${entityId.slice(0, 8)}` : ""}
-                    </TableCell>
-                    <TableCell>{actorId}</TableCell>
-                  </TableRow>
+                    <TableRow key={log.id}>
+                      <TableCell>
+                        {new Date(log.createdAt).toLocaleString()}
+                      </TableCell>
+                      <TableCell>{log.action}</TableCell>
+                      <TableCell>
+                        {log.entityType}
+                        {entityId ? ` / ${entityId.slice(0, 8)}` : ""}
+                      </TableCell>
+                      <TableCell>{actorId}</TableCell>
+                    </TableRow>
                   );
                 })}
               </TableBody>
