@@ -3,6 +3,8 @@
 //
 
 // ignore_for_file: unused_element
+// @dart=3.0
+
 import 'package:built_collection/built_collection.dart';
 import 'package:built_value/json_object.dart';
 import 'package:built_value/built_value.dart';
@@ -131,59 +133,47 @@ class _$CreateAdminUserDtoSerializer
       final value = serializedList[i + 1];
       switch (key) {
         case r'email':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(String),
-                  )
-                  as String;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
           result.email = valueDes;
           break;
         case r'password':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(String),
-                  )
-                  as String;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
           result.password = valueDes;
           break;
         case r'displayName':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(String),
-                  )
-                  as String;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
           result.displayName = valueDes;
           break;
         case r'avatarUrl':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(JsonObject),
-                  )
-                  as JsonObject;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(JsonObject),
+          ) as JsonObject;
           result.avatarUrl = valueDes;
           break;
         case r'status':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(CreateAdminUserDtoStatusEnum),
-                  )
-                  as CreateAdminUserDtoStatusEnum;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(CreateAdminUserDtoStatusEnum),
+          ) as CreateAdminUserDtoStatusEnum;
           result.status = valueDes;
           break;
         case r'roleIds':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(BuiltList, [
-                      FullType(String),
-                    ]),
-                  )
-                  as BuiltList<String>;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(BuiltList, [
+              FullType(String),
+            ]),
+          ) as BuiltList<String>;
           result.roleIds.replace(valueDes);
           break;
         default:

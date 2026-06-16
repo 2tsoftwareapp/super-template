@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// @dart=3.0
+
 part of 'update_project_dto.dart';
 
 // **************************************************************************
@@ -28,10 +30,10 @@ UpdateProjectDtoStatusEnum _$updateProjectDtoStatusEnumValueOf(String name) {
 
 final BuiltSet<UpdateProjectDtoStatusEnum> _$updateProjectDtoStatusEnumValues =
     BuiltSet<UpdateProjectDtoStatusEnum>(const <UpdateProjectDtoStatusEnum>[
-      _$updateProjectDtoStatusEnum_DRAFT,
-      _$updateProjectDtoStatusEnum_ACTIVE,
-      _$updateProjectDtoStatusEnum_ARCHIVED,
-    ]);
+  _$updateProjectDtoStatusEnum_DRAFT,
+  _$updateProjectDtoStatusEnum_ACTIVE,
+  _$updateProjectDtoStatusEnum_ARCHIVED,
+]);
 
 Serializer<UpdateProjectDtoStatusEnum> _$updateProjectDtoStatusEnumSerializer =
     _$UpdateProjectDtoStatusEnumSerializer();
@@ -55,20 +57,16 @@ class _$UpdateProjectDtoStatusEnumSerializer
   final String wireName = 'UpdateProjectDtoStatusEnum';
 
   @override
-  Object serialize(
-    Serializers serializers,
-    UpdateProjectDtoStatusEnum object, {
-    FullType specifiedType = FullType.unspecified,
-  }) => _toWire[object.name] ?? object.name;
+  Object serialize(Serializers serializers, UpdateProjectDtoStatusEnum object,
+          {FullType specifiedType = FullType.unspecified}) =>
+      _toWire[object.name] ?? object.name;
 
   @override
   UpdateProjectDtoStatusEnum deserialize(
-    Serializers serializers,
-    Object serialized, {
-    FullType specifiedType = FullType.unspecified,
-  }) => UpdateProjectDtoStatusEnum.valueOf(
-    _fromWire[serialized] ?? (serialized is String ? serialized : ''),
-  );
+          Serializers serializers, Object serialized,
+          {FullType specifiedType = FullType.unspecified}) =>
+      UpdateProjectDtoStatusEnum.valueOf(
+          _fromWire[serialized] ?? (serialized is String ? serialized : ''));
 }
 
 class _$UpdateProjectDto extends UpdateProjectDto {
@@ -81,12 +79,12 @@ class _$UpdateProjectDto extends UpdateProjectDto {
   @override
   final String? ownerId;
 
-  factory _$UpdateProjectDto([
-    void Function(UpdateProjectDtoBuilder)? updates,
-  ]) => (UpdateProjectDtoBuilder()..update(updates))._build();
+  factory _$UpdateProjectDto(
+          [void Function(UpdateProjectDtoBuilder)? updates]) =>
+      (UpdateProjectDtoBuilder()..update(updates))._build();
 
   _$UpdateProjectDto._({this.name, this.description, this.status, this.ownerId})
-    : super._();
+      : super._();
   @override
   UpdateProjectDto rebuild(void Function(UpdateProjectDtoBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -177,8 +175,7 @@ class UpdateProjectDtoBuilder
   UpdateProjectDto build() => _build();
 
   _$UpdateProjectDto _build() {
-    final _$result =
-        _$v ??
+    final _$result = _$v ??
         _$UpdateProjectDto._(
           name: name,
           description: description,

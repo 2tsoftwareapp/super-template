@@ -3,6 +3,8 @@
 //
 
 // ignore_for_file: unused_element
+// @dart=3.0
+
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
@@ -73,9 +75,8 @@ class _$CountDtoSerializer implements PrimitiveSerializer<CountDto> {
       final value = serializedList[i + 1];
       switch (key) {
         case r'count':
-          final valueDes =
-              serializers.deserialize(value, specifiedType: const FullType(num))
-                  as num;
+          final valueDes = serializers.deserialize(value,
+              specifiedType: const FullType(num)) as num;
           result.count = valueDes;
           break;
         default:

@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// @dart=3.0
+
 part of 'admin_users_controller_delete_user200_response.dart';
 
 // **************************************************************************
@@ -13,19 +15,20 @@ class _$AdminUsersControllerDeleteUser200Response
   @override
   final RequestMetaDto meta;
 
-  factory _$AdminUsersControllerDeleteUser200Response([
-    void Function(AdminUsersControllerDeleteUser200ResponseBuilder)? updates,
-  ]) => (AdminUsersControllerDeleteUser200ResponseBuilder()..update(updates))
-      ._build();
+  factory _$AdminUsersControllerDeleteUser200Response(
+          [void Function(AdminUsersControllerDeleteUser200ResponseBuilder)?
+              updates]) =>
+      (AdminUsersControllerDeleteUser200ResponseBuilder()..update(updates))
+          ._build();
 
-  _$AdminUsersControllerDeleteUser200Response._({
-    required this.data,
-    required this.meta,
-  }) : super._();
+  _$AdminUsersControllerDeleteUser200Response._(
+      {required this.data, required this.meta})
+      : super._();
   @override
   AdminUsersControllerDeleteUser200Response rebuild(
-    void Function(AdminUsersControllerDeleteUser200ResponseBuilder) updates,
-  ) => (toBuilder()..update(updates)).build();
+          void Function(AdminUsersControllerDeleteUser200ResponseBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
 
   @override
   AdminUsersControllerDeleteUser200ResponseBuilder toBuilder() =>
@@ -51,8 +54,7 @@ class _$AdminUsersControllerDeleteUser200Response
   @override
   String toString() {
     return (newBuiltValueToStringHelper(
-            r'AdminUsersControllerDeleteUser200Response',
-          )
+            r'AdminUsersControllerDeleteUser200Response')
           ..add('data', data)
           ..add('meta', meta))
         .toString();
@@ -61,10 +63,8 @@ class _$AdminUsersControllerDeleteUser200Response
 
 class AdminUsersControllerDeleteUser200ResponseBuilder
     implements
-        Builder<
-          AdminUsersControllerDeleteUser200Response,
-          AdminUsersControllerDeleteUser200ResponseBuilder
-        > {
+        Builder<AdminUsersControllerDeleteUser200Response,
+            AdminUsersControllerDeleteUser200ResponseBuilder> {
   _$AdminUsersControllerDeleteUser200Response? _$v;
 
   SuccessFlagDtoBuilder? _data;
@@ -96,8 +96,8 @@ class AdminUsersControllerDeleteUser200ResponseBuilder
 
   @override
   void update(
-    void Function(AdminUsersControllerDeleteUser200ResponseBuilder)? updates,
-  ) {
+      void Function(AdminUsersControllerDeleteUser200ResponseBuilder)?
+          updates) {
     if (updates != null) updates(this);
   }
 
@@ -107,8 +107,7 @@ class AdminUsersControllerDeleteUser200ResponseBuilder
   _$AdminUsersControllerDeleteUser200Response _build() {
     _$AdminUsersControllerDeleteUser200Response _$result;
     try {
-      _$result =
-          _$v ??
+      _$result = _$v ??
           _$AdminUsersControllerDeleteUser200Response._(
             data: data.build(),
             meta: meta.build(),
@@ -122,10 +121,9 @@ class AdminUsersControllerDeleteUser200ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-          r'AdminUsersControllerDeleteUser200Response',
-          _$failedField,
-          e.toString(),
-        );
+            r'AdminUsersControllerDeleteUser200Response',
+            _$failedField,
+            e.toString());
       }
       rethrow;
     }

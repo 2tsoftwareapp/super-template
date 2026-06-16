@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// @dart=3.0
+
 part of 'create_project_dto.dart';
 
 // **************************************************************************
@@ -28,10 +30,10 @@ CreateProjectDtoStatusEnum _$createProjectDtoStatusEnumValueOf(String name) {
 
 final BuiltSet<CreateProjectDtoStatusEnum> _$createProjectDtoStatusEnumValues =
     BuiltSet<CreateProjectDtoStatusEnum>(const <CreateProjectDtoStatusEnum>[
-      _$createProjectDtoStatusEnum_DRAFT,
-      _$createProjectDtoStatusEnum_ACTIVE,
-      _$createProjectDtoStatusEnum_ARCHIVED,
-    ]);
+  _$createProjectDtoStatusEnum_DRAFT,
+  _$createProjectDtoStatusEnum_ACTIVE,
+  _$createProjectDtoStatusEnum_ARCHIVED,
+]);
 
 Serializer<CreateProjectDtoStatusEnum> _$createProjectDtoStatusEnumSerializer =
     _$CreateProjectDtoStatusEnumSerializer();
@@ -55,20 +57,16 @@ class _$CreateProjectDtoStatusEnumSerializer
   final String wireName = 'CreateProjectDtoStatusEnum';
 
   @override
-  Object serialize(
-    Serializers serializers,
-    CreateProjectDtoStatusEnum object, {
-    FullType specifiedType = FullType.unspecified,
-  }) => _toWire[object.name] ?? object.name;
+  Object serialize(Serializers serializers, CreateProjectDtoStatusEnum object,
+          {FullType specifiedType = FullType.unspecified}) =>
+      _toWire[object.name] ?? object.name;
 
   @override
   CreateProjectDtoStatusEnum deserialize(
-    Serializers serializers,
-    Object serialized, {
-    FullType specifiedType = FullType.unspecified,
-  }) => CreateProjectDtoStatusEnum.valueOf(
-    _fromWire[serialized] ?? (serialized is String ? serialized : ''),
-  );
+          Serializers serializers, Object serialized,
+          {FullType specifiedType = FullType.unspecified}) =>
+      CreateProjectDtoStatusEnum.valueOf(
+          _fromWire[serialized] ?? (serialized is String ? serialized : ''));
 }
 
 class _$CreateProjectDto extends CreateProjectDto {
@@ -81,16 +79,13 @@ class _$CreateProjectDto extends CreateProjectDto {
   @override
   final String? ownerId;
 
-  factory _$CreateProjectDto([
-    void Function(CreateProjectDtoBuilder)? updates,
-  ]) => (CreateProjectDtoBuilder()..update(updates))._build();
+  factory _$CreateProjectDto(
+          [void Function(CreateProjectDtoBuilder)? updates]) =>
+      (CreateProjectDtoBuilder()..update(updates))._build();
 
-  _$CreateProjectDto._({
-    required this.name,
-    this.description,
-    this.status,
-    this.ownerId,
-  }) : super._();
+  _$CreateProjectDto._(
+      {required this.name, this.description, this.status, this.ownerId})
+      : super._();
   @override
   CreateProjectDto rebuild(void Function(CreateProjectDtoBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -181,14 +176,10 @@ class CreateProjectDtoBuilder
   CreateProjectDto build() => _build();
 
   _$CreateProjectDto _build() {
-    final _$result =
-        _$v ??
+    final _$result = _$v ??
         _$CreateProjectDto._(
           name: BuiltValueNullFieldError.checkNotNull(
-            name,
-            r'CreateProjectDto',
-            'name',
-          ),
+              name, r'CreateProjectDto', 'name'),
           description: description,
           status: status,
           ownerId: ownerId,

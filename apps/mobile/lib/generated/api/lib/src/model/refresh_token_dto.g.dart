@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// @dart=3.0
+
 part of 'refresh_token_dto.dart';
 
 // **************************************************************************
@@ -37,9 +39,9 @@ class _$RefreshTokenDto extends RefreshTokenDto {
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper(
-      r'RefreshTokenDto',
-    )..add('refreshToken', refreshToken)).toString();
+    return (newBuiltValueToStringHelper(r'RefreshTokenDto')
+          ..add('refreshToken', refreshToken))
+        .toString();
   }
 }
 
@@ -78,14 +80,10 @@ class RefreshTokenDtoBuilder
   RefreshTokenDto build() => _build();
 
   _$RefreshTokenDto _build() {
-    final _$result =
-        _$v ??
+    final _$result = _$v ??
         _$RefreshTokenDto._(
           refreshToken: BuiltValueNullFieldError.checkNotNull(
-            refreshToken,
-            r'RefreshTokenDto',
-            'refreshToken',
-          ),
+              refreshToken, r'RefreshTokenDto', 'refreshToken'),
         );
     replace(_$result);
     return _$result;

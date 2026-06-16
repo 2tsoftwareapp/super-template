@@ -2,6 +2,8 @@
 // AUTO-GENERATED FILE, DO NOT MODIFY!
 //
 
+// @dart=3.0
+
 export 'package:super_template_api/src/api.dart';
 export 'package:super_template_api/src/auth/api_key_auth.dart';
 export 'package:super_template_api/src/auth/basic_auth.dart';

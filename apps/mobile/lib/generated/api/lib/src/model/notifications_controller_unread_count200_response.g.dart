@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// @dart=3.0
+
 part of 'notifications_controller_unread_count200_response.dart';
 
 // **************************************************************************
@@ -13,21 +15,20 @@ class _$NotificationsControllerUnreadCount200Response
   @override
   final RequestMetaDto meta;
 
-  factory _$NotificationsControllerUnreadCount200Response([
-    void Function(NotificationsControllerUnreadCount200ResponseBuilder)?
-    updates,
-  ]) =>
+  factory _$NotificationsControllerUnreadCount200Response(
+          [void Function(NotificationsControllerUnreadCount200ResponseBuilder)?
+              updates]) =>
       (NotificationsControllerUnreadCount200ResponseBuilder()..update(updates))
           ._build();
 
-  _$NotificationsControllerUnreadCount200Response._({
-    required this.data,
-    required this.meta,
-  }) : super._();
+  _$NotificationsControllerUnreadCount200Response._(
+      {required this.data, required this.meta})
+      : super._();
   @override
   NotificationsControllerUnreadCount200Response rebuild(
-    void Function(NotificationsControllerUnreadCount200ResponseBuilder) updates,
-  ) => (toBuilder()..update(updates)).build();
+          void Function(NotificationsControllerUnreadCount200ResponseBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
 
   @override
   NotificationsControllerUnreadCount200ResponseBuilder toBuilder() =>
@@ -53,8 +54,7 @@ class _$NotificationsControllerUnreadCount200Response
   @override
   String toString() {
     return (newBuiltValueToStringHelper(
-            r'NotificationsControllerUnreadCount200Response',
-          )
+            r'NotificationsControllerUnreadCount200Response')
           ..add('data', data)
           ..add('meta', meta))
         .toString();
@@ -63,10 +63,8 @@ class _$NotificationsControllerUnreadCount200Response
 
 class NotificationsControllerUnreadCount200ResponseBuilder
     implements
-        Builder<
-          NotificationsControllerUnreadCount200Response,
-          NotificationsControllerUnreadCount200ResponseBuilder
-        > {
+        Builder<NotificationsControllerUnreadCount200Response,
+            NotificationsControllerUnreadCount200ResponseBuilder> {
   _$NotificationsControllerUnreadCount200Response? _$v;
 
   CountDtoBuilder? _data;
@@ -98,9 +96,8 @@ class NotificationsControllerUnreadCount200ResponseBuilder
 
   @override
   void update(
-    void Function(NotificationsControllerUnreadCount200ResponseBuilder)?
-    updates,
-  ) {
+      void Function(NotificationsControllerUnreadCount200ResponseBuilder)?
+          updates) {
     if (updates != null) updates(this);
   }
 
@@ -110,8 +107,7 @@ class NotificationsControllerUnreadCount200ResponseBuilder
   _$NotificationsControllerUnreadCount200Response _build() {
     _$NotificationsControllerUnreadCount200Response _$result;
     try {
-      _$result =
-          _$v ??
+      _$result = _$v ??
           _$NotificationsControllerUnreadCount200Response._(
             data: data.build(),
             meta: meta.build(),
@@ -125,10 +121,9 @@ class NotificationsControllerUnreadCount200ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-          r'NotificationsControllerUnreadCount200Response',
-          _$failedField,
-          e.toString(),
-        );
+            r'NotificationsControllerUnreadCount200Response',
+            _$failedField,
+            e.toString());
       }
       rethrow;
     }

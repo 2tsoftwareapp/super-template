@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// @dart=3.0
+
 part of 'auth_session_dto.dart';
 
 // **************************************************************************
@@ -31,18 +33,18 @@ class _$AuthSessionDto extends AuthSessionDto {
   factory _$AuthSessionDto([void Function(AuthSessionDtoBuilder)? updates]) =>
       (AuthSessionDtoBuilder()..update(updates))._build();
 
-  _$AuthSessionDto._({
-    required this.id,
-    required this.userId,
-    required this.expiresAt,
-    this.revokedAt,
-    this.lastUsedAt,
-    this.ipAddress,
-    this.userAgent,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.current,
-  }) : super._();
+  _$AuthSessionDto._(
+      {required this.id,
+      required this.userId,
+      required this.expiresAt,
+      this.revokedAt,
+      this.lastUsedAt,
+      this.ipAddress,
+      this.userAgent,
+      required this.createdAt,
+      required this.updatedAt,
+      required this.current})
+      : super._();
   @override
   AuthSessionDto rebuild(void Function(AuthSessionDtoBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -180,43 +182,24 @@ class AuthSessionDtoBuilder
   AuthSessionDto build() => _build();
 
   _$AuthSessionDto _build() {
-    final _$result =
-        _$v ??
+    final _$result = _$v ??
         _$AuthSessionDto._(
           id: BuiltValueNullFieldError.checkNotNull(
-            id,
-            r'AuthSessionDto',
-            'id',
-          ),
+              id, r'AuthSessionDto', 'id'),
           userId: BuiltValueNullFieldError.checkNotNull(
-            userId,
-            r'AuthSessionDto',
-            'userId',
-          ),
+              userId, r'AuthSessionDto', 'userId'),
           expiresAt: BuiltValueNullFieldError.checkNotNull(
-            expiresAt,
-            r'AuthSessionDto',
-            'expiresAt',
-          ),
+              expiresAt, r'AuthSessionDto', 'expiresAt'),
           revokedAt: revokedAt,
           lastUsedAt: lastUsedAt,
           ipAddress: ipAddress,
           userAgent: userAgent,
           createdAt: BuiltValueNullFieldError.checkNotNull(
-            createdAt,
-            r'AuthSessionDto',
-            'createdAt',
-          ),
+              createdAt, r'AuthSessionDto', 'createdAt'),
           updatedAt: BuiltValueNullFieldError.checkNotNull(
-            updatedAt,
-            r'AuthSessionDto',
-            'updatedAt',
-          ),
+              updatedAt, r'AuthSessionDto', 'updatedAt'),
           current: BuiltValueNullFieldError.checkNotNull(
-            current,
-            r'AuthSessionDto',
-            'current',
-          ),
+              current, r'AuthSessionDto', 'current'),
         );
     replace(_$result);
     return _$result;

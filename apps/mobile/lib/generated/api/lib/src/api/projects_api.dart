@@ -2,6 +2,8 @@
 // AUTO-GENERATED FILE, DO NOT MODIFY!
 //
 
+// @dart=3.0
+
 import 'dart:async';
 
 import 'package:built_value/serializer.dart';
@@ -36,7 +38,7 @@ class ProjectsApi {
   /// Returns a [Future] containing a [Response] with a [ProjectsControllerCreate201Response] as data
   /// Throws [DioException] if API call or serialization fails
   Future<Response<ProjectsControllerCreate201Response>>
-  projectsControllerCreate({
+      projectsControllerCreate({
     required CreateProjectDto createProjectDto,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
@@ -92,12 +94,11 @@ class ProjectsApi {
       _responseData = rawResponse == null
           ? null
           : _serializers.deserialize(
-                  rawResponse,
-                  specifiedType: const FullType(
-                    ProjectsControllerCreate201Response,
-                  ),
-                )
-                as ProjectsControllerCreate201Response;
+              rawResponse,
+              specifiedType: const FullType(
+                ProjectsControllerCreate201Response,
+              ),
+            ) as ProjectsControllerCreate201Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -135,7 +136,7 @@ class ProjectsApi {
   /// Returns a [Future] containing a [Response] with a [ProjectsControllerCreate201Response] as data
   /// Throws [DioException] if API call or serialization fails
   Future<Response<ProjectsControllerCreate201Response>>
-  projectsControllerGetById({
+      projectsControllerGetById({
     required String id,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
@@ -177,12 +178,11 @@ class ProjectsApi {
       _responseData = rawResponse == null
           ? null
           : _serializers.deserialize(
-                  rawResponse,
-                  specifiedType: const FullType(
-                    ProjectsControllerCreate201Response,
-                  ),
-                )
-                as ProjectsControllerCreate201Response;
+              rawResponse,
+              specifiedType: const FullType(
+                ProjectsControllerCreate201Response,
+              ),
+            ) as ProjectsControllerCreate201Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -302,12 +302,11 @@ class ProjectsApi {
       _responseData = rawResponse == null
           ? null
           : _serializers.deserialize(
-                  rawResponse,
-                  specifiedType: const FullType(
-                    ProjectsControllerList200Response,
-                  ),
-                )
-                as ProjectsControllerList200Response;
+              rawResponse,
+              specifiedType: const FullType(
+                ProjectsControllerList200Response,
+              ),
+            ) as ProjectsControllerList200Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -345,7 +344,7 @@ class ProjectsApi {
   /// Returns a [Future] containing a [Response] with a [AdminUsersControllerDeleteUser200Response] as data
   /// Throws [DioException] if API call or serialization fails
   Future<Response<AdminUsersControllerDeleteUser200Response>>
-  projectsControllerRemove({
+      projectsControllerRemove({
     required String id,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
@@ -387,12 +386,11 @@ class ProjectsApi {
       _responseData = rawResponse == null
           ? null
           : _serializers.deserialize(
-                  rawResponse,
-                  specifiedType: const FullType(
-                    AdminUsersControllerDeleteUser200Response,
-                  ),
-                )
-                as AdminUsersControllerDeleteUser200Response;
+              rawResponse,
+              specifiedType: const FullType(
+                AdminUsersControllerDeleteUser200Response,
+              ),
+            ) as AdminUsersControllerDeleteUser200Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -430,7 +428,7 @@ class ProjectsApi {
   /// Returns a [Future] containing a [Response] with a [ProjectsControllerCreate201Response] as data
   /// Throws [DioException] if API call or serialization fails
   Future<Response<ProjectsControllerCreate201Response>>
-  projectsControllerRestore({
+      projectsControllerRestore({
     required String id,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
@@ -472,12 +470,11 @@ class ProjectsApi {
       _responseData = rawResponse == null
           ? null
           : _serializers.deserialize(
-                  rawResponse,
-                  specifiedType: const FullType(
-                    ProjectsControllerCreate201Response,
-                  ),
-                )
-                as ProjectsControllerCreate201Response;
+              rawResponse,
+              specifiedType: const FullType(
+                ProjectsControllerCreate201Response,
+              ),
+            ) as ProjectsControllerCreate201Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -516,7 +513,7 @@ class ProjectsApi {
   /// Returns a [Future] containing a [Response] with a [ProjectsControllerCreate201Response] as data
   /// Throws [DioException] if API call or serialization fails
   Future<Response<ProjectsControllerCreate201Response>>
-  projectsControllerUpdate({
+      projectsControllerUpdate({
     required String id,
     required UpdateProjectDto updateProjectDto,
     CancelToken? cancelToken,
@@ -578,12 +575,11 @@ class ProjectsApi {
       _responseData = rawResponse == null
           ? null
           : _serializers.deserialize(
-                  rawResponse,
-                  specifiedType: const FullType(
-                    ProjectsControllerCreate201Response,
-                  ),
-                )
-                as ProjectsControllerCreate201Response;
+              rawResponse,
+              specifiedType: const FullType(
+                ProjectsControllerCreate201Response,
+              ),
+            ) as ProjectsControllerCreate201Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,

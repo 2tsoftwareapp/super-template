@@ -2,6 +2,8 @@
 // AUTO-GENERATED FILE, DO NOT MODIFY!
 //
 
+// @dart=3.0
+
 import 'package:built_collection/built_collection.dart';
 import 'package:built_value/serializer.dart';
 import 'package:super_template_api/src/model/date.dart';

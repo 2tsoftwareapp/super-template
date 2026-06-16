@@ -2,6 +2,8 @@
 // AUTO-GENERATED FILE, DO NOT MODIFY!
 //
 
+// @dart=3.0
+
 import 'dart:async';
 
 import 'package:built_value/serializer.dart';
@@ -32,7 +34,7 @@ class AdminNotificationsApi {
   /// Returns a [Future] containing a [Response] with a [NotificationsControllerMarkRead200Response] as data
   /// Throws [DioException] if API call or serialization fails
   Future<Response<NotificationsControllerMarkRead200Response>>
-  adminNotificationsControllerSend({
+      adminNotificationsControllerSend({
     required SendNotificationDto sendNotificationDto,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
@@ -88,12 +90,11 @@ class AdminNotificationsApi {
       _responseData = rawResponse == null
           ? null
           : _serializers.deserialize(
-                  rawResponse,
-                  specifiedType: const FullType(
-                    NotificationsControllerMarkRead200Response,
-                  ),
-                )
-                as NotificationsControllerMarkRead200Response;
+              rawResponse,
+              specifiedType: const FullType(
+                NotificationsControllerMarkRead200Response,
+              ),
+            ) as NotificationsControllerMarkRead200Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,

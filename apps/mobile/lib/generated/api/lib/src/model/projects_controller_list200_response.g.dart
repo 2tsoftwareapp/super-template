@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// @dart=3.0
+
 part of 'projects_controller_list200_response.dart';
 
 // **************************************************************************
@@ -13,18 +15,17 @@ class _$ProjectsControllerList200Response
   @override
   final PaginationMetaDto meta;
 
-  factory _$ProjectsControllerList200Response([
-    void Function(ProjectsControllerList200ResponseBuilder)? updates,
-  ]) => (ProjectsControllerList200ResponseBuilder()..update(updates))._build();
+  factory _$ProjectsControllerList200Response(
+          [void Function(ProjectsControllerList200ResponseBuilder)? updates]) =>
+      (ProjectsControllerList200ResponseBuilder()..update(updates))._build();
 
-  _$ProjectsControllerList200Response._({
-    required this.data,
-    required this.meta,
-  }) : super._();
+  _$ProjectsControllerList200Response._(
+      {required this.data, required this.meta})
+      : super._();
   @override
   ProjectsControllerList200Response rebuild(
-    void Function(ProjectsControllerList200ResponseBuilder) updates,
-  ) => (toBuilder()..update(updates)).build();
+          void Function(ProjectsControllerList200ResponseBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
 
   @override
   ProjectsControllerList200ResponseBuilder toBuilder() =>
@@ -58,10 +59,8 @@ class _$ProjectsControllerList200Response
 
 class ProjectsControllerList200ResponseBuilder
     implements
-        Builder<
-          ProjectsControllerList200Response,
-          ProjectsControllerList200ResponseBuilder
-        > {
+        Builder<ProjectsControllerList200Response,
+            ProjectsControllerList200ResponseBuilder> {
   _$ProjectsControllerList200Response? _$v;
 
   ListBuilder<ProjectDto>? _data;
@@ -95,8 +94,7 @@ class ProjectsControllerList200ResponseBuilder
 
   @override
   void update(
-    void Function(ProjectsControllerList200ResponseBuilder)? updates,
-  ) {
+      void Function(ProjectsControllerList200ResponseBuilder)? updates) {
     if (updates != null) updates(this);
   }
 
@@ -106,8 +104,7 @@ class ProjectsControllerList200ResponseBuilder
   _$ProjectsControllerList200Response _build() {
     _$ProjectsControllerList200Response _$result;
     try {
-      _$result =
-          _$v ??
+      _$result = _$v ??
           _$ProjectsControllerList200Response._(
             data: data.build(),
             meta: meta.build(),
@@ -121,10 +118,7 @@ class ProjectsControllerList200ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-          r'ProjectsControllerList200Response',
-          _$failedField,
-          e.toString(),
-        );
+            r'ProjectsControllerList200Response', _$failedField, e.toString());
       }
       rethrow;
     }

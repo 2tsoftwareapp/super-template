@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// @dart=3.0
+
 part of 'auth_controller_get_me200_response.dart';
 
 // **************************************************************************
@@ -12,16 +14,16 @@ class _$AuthControllerGetMe200Response extends AuthControllerGetMe200Response {
   @override
   final RequestMetaDto meta;
 
-  factory _$AuthControllerGetMe200Response([
-    void Function(AuthControllerGetMe200ResponseBuilder)? updates,
-  ]) => (AuthControllerGetMe200ResponseBuilder()..update(updates))._build();
+  factory _$AuthControllerGetMe200Response(
+          [void Function(AuthControllerGetMe200ResponseBuilder)? updates]) =>
+      (AuthControllerGetMe200ResponseBuilder()..update(updates))._build();
 
   _$AuthControllerGetMe200Response._({required this.data, required this.meta})
-    : super._();
+      : super._();
   @override
   AuthControllerGetMe200Response rebuild(
-    void Function(AuthControllerGetMe200ResponseBuilder) updates,
-  ) => (toBuilder()..update(updates)).build();
+          void Function(AuthControllerGetMe200ResponseBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
 
   @override
   AuthControllerGetMe200ResponseBuilder toBuilder() =>
@@ -55,10 +57,8 @@ class _$AuthControllerGetMe200Response extends AuthControllerGetMe200Response {
 
 class AuthControllerGetMe200ResponseBuilder
     implements
-        Builder<
-          AuthControllerGetMe200Response,
-          AuthControllerGetMe200ResponseBuilder
-        > {
+        Builder<AuthControllerGetMe200Response,
+            AuthControllerGetMe200ResponseBuilder> {
   _$AuthControllerGetMe200Response? _$v;
 
   AuthMeDtoBuilder? _data;
@@ -99,8 +99,7 @@ class AuthControllerGetMe200ResponseBuilder
   _$AuthControllerGetMe200Response _build() {
     _$AuthControllerGetMe200Response _$result;
     try {
-      _$result =
-          _$v ??
+      _$result = _$v ??
           _$AuthControllerGetMe200Response._(
             data: data.build(),
             meta: meta.build(),
@@ -114,10 +113,7 @@ class AuthControllerGetMe200ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-          r'AuthControllerGetMe200Response',
-          _$failedField,
-          e.toString(),
-        );
+            r'AuthControllerGetMe200Response', _$failedField, e.toString());
       }
       rethrow;
     }

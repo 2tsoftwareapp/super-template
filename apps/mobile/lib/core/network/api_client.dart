@@ -8,6 +8,13 @@ final appConfigProvider = Provider<AppConfig>(
   (_) => AppConfig.fromEnvironment(),
 );
 
+/// Dio without auth interceptor — for login, register, token refresh, etc.
+final publicDioProvider = Provider<Dio>((ref) {
+  final config = ref.watch(appConfigProvider);
+  return Dio(BaseOptions(baseUrl: config.apiBaseUrl));
+});
+
+/// Dio with auth interceptor — for all protected API calls.
 final dioProvider = Provider<Dio>((ref) {
   final config = ref.watch(appConfigProvider);
   final dio = Dio(BaseOptions(baseUrl: config.apiBaseUrl));
@@ -15,6 +22,15 @@ final dioProvider = Provider<Dio>((ref) {
   return dio;
 });
 
+/// API client for public (unauthenticated) endpoints.
+final publicApiClientProvider = Provider<SuperTemplateApi>((ref) {
+  return SuperTemplateApi(
+    dio: ref.watch(publicDioProvider),
+    serializers: standardSerializers,
+  );
+});
+
+/// API client for protected (authenticated) endpoints.
 final apiClientProvider = Provider<SuperTemplateApi>((ref) {
   return SuperTemplateApi(
     dio: ref.watch(dioProvider),

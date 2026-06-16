@@ -3,6 +3,8 @@
 //
 
 // ignore_for_file: unused_element
+// @dart=3.0
+
 import 'package:super_template_api/src/model/request_meta_dto.dart';
 import 'package:super_template_api/src/model/user_dto.dart';
 import 'package:built_value/built_value.dart';
@@ -18,10 +20,8 @@ part 'admin_users_controller_create_user201_response.g.dart';
 @BuiltValue()
 abstract class AdminUsersControllerCreateUser201Response
     implements
-        Built<
-          AdminUsersControllerCreateUser201Response,
-          AdminUsersControllerCreateUser201ResponseBuilder
-        > {
+        Built<AdminUsersControllerCreateUser201Response,
+            AdminUsersControllerCreateUser201ResponseBuilder> {
   @BuiltValueField(wireName: r'data')
   UserDto get data;
 
@@ -97,21 +97,17 @@ class _$AdminUsersControllerCreateUser201ResponseSerializer
       final value = serializedList[i + 1];
       switch (key) {
         case r'data':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(UserDto),
-                  )
-                  as UserDto;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(UserDto),
+          ) as UserDto;
           result.data.replace(valueDes);
           break;
         case r'meta':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(RequestMetaDto),
-                  )
-                  as RequestMetaDto;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(RequestMetaDto),
+          ) as RequestMetaDto;
           result.meta.replace(valueDes);
           break;
         default:

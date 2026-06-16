@@ -3,6 +3,8 @@
 //
 
 // ignore_for_file: unused_element
+// @dart=3.0
+
 import 'package:built_collection/built_collection.dart';
 import 'package:built_value/json_object.dart';
 import 'package:built_value/built_value.dart';
@@ -152,86 +154,68 @@ class _$UserDtoSerializer implements PrimitiveSerializer<UserDto> {
       final value = serializedList[i + 1];
       switch (key) {
         case r'id':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(String),
-                  )
-                  as String;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
           result.id = valueDes;
           break;
         case r'email':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(String),
-                  )
-                  as String;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
           result.email = valueDes;
           break;
         case r'displayName':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(String),
-                  )
-                  as String;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
           result.displayName = valueDes;
           break;
         case r'avatarUrl':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(JsonObject),
-                  )
-                  as JsonObject;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(JsonObject),
+          ) as JsonObject;
           result.avatarUrl = valueDes;
           break;
         case r'status':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(UserDtoStatusEnum),
-                  )
-                  as UserDtoStatusEnum;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(UserDtoStatusEnum),
+          ) as UserDtoStatusEnum;
           result.status = valueDes;
           break;
         case r'emailVerifiedAt':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(JsonObject),
-                  )
-                  as JsonObject;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(JsonObject),
+          ) as JsonObject;
           result.emailVerifiedAt = valueDes;
           break;
         case r'roles':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(BuiltList, [
-                      FullType(String),
-                    ]),
-                  )
-                  as BuiltList<String>;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(BuiltList, [
+              FullType(String),
+            ]),
+          ) as BuiltList<String>;
           result.roles.replace(valueDes);
           break;
         case r'createdAt':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(String),
-                  )
-                  as String;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
           result.createdAt = valueDes;
           break;
         case r'updatedAt':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(String),
-                  )
-                  as String;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
           result.updatedAt = valueDes;
           break;
         default:

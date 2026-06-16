@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// @dart=3.0
+
 part of 'reset_password_dto.dart';
 
 // **************************************************************************
@@ -12,12 +14,12 @@ class _$ResetPasswordDto extends ResetPasswordDto {
   @override
   final String newPassword;
 
-  factory _$ResetPasswordDto([
-    void Function(ResetPasswordDtoBuilder)? updates,
-  ]) => (ResetPasswordDtoBuilder()..update(updates))._build();
+  factory _$ResetPasswordDto(
+          [void Function(ResetPasswordDtoBuilder)? updates]) =>
+      (ResetPasswordDtoBuilder()..update(updates))._build();
 
   _$ResetPasswordDto._({required this.token, required this.newPassword})
-    : super._();
+      : super._();
   @override
   ResetPasswordDto rebuild(void Function(ResetPasswordDtoBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -92,19 +94,12 @@ class ResetPasswordDtoBuilder
   ResetPasswordDto build() => _build();
 
   _$ResetPasswordDto _build() {
-    final _$result =
-        _$v ??
+    final _$result = _$v ??
         _$ResetPasswordDto._(
           token: BuiltValueNullFieldError.checkNotNull(
-            token,
-            r'ResetPasswordDto',
-            'token',
-          ),
+              token, r'ResetPasswordDto', 'token'),
           newPassword: BuiltValueNullFieldError.checkNotNull(
-            newPassword,
-            r'ResetPasswordDto',
-            'newPassword',
-          ),
+              newPassword, r'ResetPasswordDto', 'newPassword'),
         );
     replace(_$result);
     return _$result;

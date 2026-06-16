@@ -4,6 +4,8 @@
 
 // ignore_for_file: unused_import
 
+// @dart=3.0
+
 import 'package:one_of_serializer/any_of_serializer.dart';
 import 'package:one_of_serializer/one_of_serializer.dart';
 import 'package:built_collection/built_collection.dart';
@@ -101,13 +103,12 @@ part 'serializers.g.dart';
   UserDto,
   VerifyEmailDto,
 ])
-Serializers serializers =
-    (_$serializers.toBuilder()
-          ..add(const OneOfSerializer())
-          ..add(const AnyOfSerializer())
-          ..add(const DateSerializer())
-          ..add(Iso8601DateTimeSerializer()))
-        .build();
+Serializers serializers = (_$serializers.toBuilder()
+      ..add(const OneOfSerializer())
+      ..add(const AnyOfSerializer())
+      ..add(const DateSerializer())
+      ..add(Iso8601DateTimeSerializer()))
+    .build();
 
 Serializers standardSerializers =
     (serializers.toBuilder()..addPlugin(StandardJsonPlugin())).build();

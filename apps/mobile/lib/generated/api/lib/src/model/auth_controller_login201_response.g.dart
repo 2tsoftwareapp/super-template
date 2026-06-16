@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// @dart=3.0
+
 part of 'auth_controller_login201_response.dart';
 
 // **************************************************************************
@@ -12,16 +14,16 @@ class _$AuthControllerLogin201Response extends AuthControllerLogin201Response {
   @override
   final RequestMetaDto meta;
 
-  factory _$AuthControllerLogin201Response([
-    void Function(AuthControllerLogin201ResponseBuilder)? updates,
-  ]) => (AuthControllerLogin201ResponseBuilder()..update(updates))._build();
+  factory _$AuthControllerLogin201Response(
+          [void Function(AuthControllerLogin201ResponseBuilder)? updates]) =>
+      (AuthControllerLogin201ResponseBuilder()..update(updates))._build();
 
   _$AuthControllerLogin201Response._({required this.data, required this.meta})
-    : super._();
+      : super._();
   @override
   AuthControllerLogin201Response rebuild(
-    void Function(AuthControllerLogin201ResponseBuilder) updates,
-  ) => (toBuilder()..update(updates)).build();
+          void Function(AuthControllerLogin201ResponseBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
 
   @override
   AuthControllerLogin201ResponseBuilder toBuilder() =>
@@ -55,10 +57,8 @@ class _$AuthControllerLogin201Response extends AuthControllerLogin201Response {
 
 class AuthControllerLogin201ResponseBuilder
     implements
-        Builder<
-          AuthControllerLogin201Response,
-          AuthControllerLogin201ResponseBuilder
-        > {
+        Builder<AuthControllerLogin201Response,
+            AuthControllerLogin201ResponseBuilder> {
   _$AuthControllerLogin201Response? _$v;
 
   AuthResponseDtoBuilder? _data;
@@ -99,8 +99,7 @@ class AuthControllerLogin201ResponseBuilder
   _$AuthControllerLogin201Response _build() {
     _$AuthControllerLogin201Response _$result;
     try {
-      _$result =
-          _$v ??
+      _$result = _$v ??
           _$AuthControllerLogin201Response._(
             data: data.build(),
             meta: meta.build(),
@@ -114,10 +113,7 @@ class AuthControllerLogin201ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-          r'AuthControllerLogin201Response',
-          _$failedField,
-          e.toString(),
-        );
+            r'AuthControllerLogin201Response', _$failedField, e.toString());
       }
       rethrow;
     }

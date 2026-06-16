@@ -3,6 +3,8 @@
 //
 
 // ignore_for_file: unused_element
+// @dart=3.0
+
 import 'package:super_template_api/src/model/request_meta_dto.dart';
 import 'package:super_template_api/src/model/success_flag_dto.dart';
 import 'package:built_value/built_value.dart';
@@ -18,10 +20,8 @@ part 'admin_users_controller_delete_user200_response.g.dart';
 @BuiltValue()
 abstract class AdminUsersControllerDeleteUser200Response
     implements
-        Built<
-          AdminUsersControllerDeleteUser200Response,
-          AdminUsersControllerDeleteUser200ResponseBuilder
-        > {
+        Built<AdminUsersControllerDeleteUser200Response,
+            AdminUsersControllerDeleteUser200ResponseBuilder> {
   @BuiltValueField(wireName: r'data')
   SuccessFlagDto get data;
 
@@ -97,21 +97,17 @@ class _$AdminUsersControllerDeleteUser200ResponseSerializer
       final value = serializedList[i + 1];
       switch (key) {
         case r'data':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(SuccessFlagDto),
-                  )
-                  as SuccessFlagDto;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(SuccessFlagDto),
+          ) as SuccessFlagDto;
           result.data.replace(valueDes);
           break;
         case r'meta':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(RequestMetaDto),
-                  )
-                  as RequestMetaDto;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(RequestMetaDto),
+          ) as RequestMetaDto;
           result.meta.replace(valueDes);
           break;
         default:

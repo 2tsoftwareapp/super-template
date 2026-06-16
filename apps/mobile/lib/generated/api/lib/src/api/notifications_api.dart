@@ -2,6 +2,8 @@
 // AUTO-GENERATED FILE, DO NOT MODIFY!
 //
 
+// @dart=3.0
+
 import 'dart:async';
 
 import 'package:built_value/serializer.dart';
@@ -35,7 +37,7 @@ class NotificationsApi {
   /// Returns a [Future] containing a [Response] with a [AdminUsersControllerDeleteUser200Response] as data
   /// Throws [DioException] if API call or serialization fails
   Future<Response<AdminUsersControllerDeleteUser200Response>>
-  notificationsControllerDelete({
+      notificationsControllerDelete({
     required String id,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
@@ -77,12 +79,11 @@ class NotificationsApi {
       _responseData = rawResponse == null
           ? null
           : _serializers.deserialize(
-                  rawResponse,
-                  specifiedType: const FullType(
-                    AdminUsersControllerDeleteUser200Response,
-                  ),
-                )
-                as AdminUsersControllerDeleteUser200Response;
+              rawResponse,
+              specifiedType: const FullType(
+                AdminUsersControllerDeleteUser200Response,
+              ),
+            ) as AdminUsersControllerDeleteUser200Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -124,7 +125,7 @@ class NotificationsApi {
   /// Returns a [Future] containing a [Response] with a [NotificationsControllerList200Response] as data
   /// Throws [DioException] if API call or serialization fails
   Future<Response<NotificationsControllerList200Response>>
-  notificationsControllerList({
+      notificationsControllerList({
     num? page = 1,
     num? limit = 20,
     String? sortOrder = 'desc',
@@ -195,12 +196,11 @@ class NotificationsApi {
       _responseData = rawResponse == null
           ? null
           : _serializers.deserialize(
-                  rawResponse,
-                  specifiedType: const FullType(
-                    NotificationsControllerList200Response,
-                  ),
-                )
-                as NotificationsControllerList200Response;
+              rawResponse,
+              specifiedType: const FullType(
+                NotificationsControllerList200Response,
+              ),
+            ) as NotificationsControllerList200Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -237,7 +237,7 @@ class NotificationsApi {
   /// Returns a [Future] containing a [Response] with a [AdminUsersControllerDeleteUser200Response] as data
   /// Throws [DioException] if API call or serialization fails
   Future<Response<AdminUsersControllerDeleteUser200Response>>
-  notificationsControllerMarkAllRead({
+      notificationsControllerMarkAllRead({
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? extra,
@@ -273,12 +273,11 @@ class NotificationsApi {
       _responseData = rawResponse == null
           ? null
           : _serializers.deserialize(
-                  rawResponse,
-                  specifiedType: const FullType(
-                    AdminUsersControllerDeleteUser200Response,
-                  ),
-                )
-                as AdminUsersControllerDeleteUser200Response;
+              rawResponse,
+              specifiedType: const FullType(
+                AdminUsersControllerDeleteUser200Response,
+              ),
+            ) as AdminUsersControllerDeleteUser200Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -316,7 +315,7 @@ class NotificationsApi {
   /// Returns a [Future] containing a [Response] with a [NotificationsControllerMarkRead200Response] as data
   /// Throws [DioException] if API call or serialization fails
   Future<Response<NotificationsControllerMarkRead200Response>>
-  notificationsControllerMarkRead({
+      notificationsControllerMarkRead({
     required String id,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
@@ -358,12 +357,11 @@ class NotificationsApi {
       _responseData = rawResponse == null
           ? null
           : _serializers.deserialize(
-                  rawResponse,
-                  specifiedType: const FullType(
-                    NotificationsControllerMarkRead200Response,
-                  ),
-                )
-                as NotificationsControllerMarkRead200Response;
+              rawResponse,
+              specifiedType: const FullType(
+                NotificationsControllerMarkRead200Response,
+              ),
+            ) as NotificationsControllerMarkRead200Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -400,7 +398,7 @@ class NotificationsApi {
   /// Returns a [Future] containing a [Response] with a [NotificationsControllerUnreadCount200Response] as data
   /// Throws [DioException] if API call or serialization fails
   Future<Response<NotificationsControllerUnreadCount200Response>>
-  notificationsControllerUnreadCount({
+      notificationsControllerUnreadCount({
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? extra,
@@ -436,12 +434,11 @@ class NotificationsApi {
       _responseData = rawResponse == null
           ? null
           : _serializers.deserialize(
-                  rawResponse,
-                  specifiedType: const FullType(
-                    NotificationsControllerUnreadCount200Response,
-                  ),
-                )
-                as NotificationsControllerUnreadCount200Response;
+              rawResponse,
+              specifiedType: const FullType(
+                NotificationsControllerUnreadCount200Response,
+              ),
+            ) as NotificationsControllerUnreadCount200Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,

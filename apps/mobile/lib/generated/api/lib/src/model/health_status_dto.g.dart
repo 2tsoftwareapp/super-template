@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// @dart=3.0
+
 part of 'health_status_dto.dart';
 
 // **************************************************************************
@@ -24,9 +26,9 @@ HealthStatusDtoStatusEnum _$healthStatusDtoStatusEnumValueOf(String name) {
 
 final BuiltSet<HealthStatusDtoStatusEnum> _$healthStatusDtoStatusEnumValues =
     BuiltSet<HealthStatusDtoStatusEnum>(const <HealthStatusDtoStatusEnum>[
-      _$healthStatusDtoStatusEnum_ok,
-      _$healthStatusDtoStatusEnum_ready,
-    ]);
+  _$healthStatusDtoStatusEnum_ok,
+  _$healthStatusDtoStatusEnum_ready,
+]);
 
 Serializer<HealthStatusDtoStatusEnum> _$healthStatusDtoStatusEnumSerializer =
     _$HealthStatusDtoStatusEnumSerializer();
@@ -48,20 +50,16 @@ class _$HealthStatusDtoStatusEnumSerializer
   final String wireName = 'HealthStatusDtoStatusEnum';
 
   @override
-  Object serialize(
-    Serializers serializers,
-    HealthStatusDtoStatusEnum object, {
-    FullType specifiedType = FullType.unspecified,
-  }) => _toWire[object.name] ?? object.name;
+  Object serialize(Serializers serializers, HealthStatusDtoStatusEnum object,
+          {FullType specifiedType = FullType.unspecified}) =>
+      _toWire[object.name] ?? object.name;
 
   @override
   HealthStatusDtoStatusEnum deserialize(
-    Serializers serializers,
-    Object serialized, {
-    FullType specifiedType = FullType.unspecified,
-  }) => HealthStatusDtoStatusEnum.valueOf(
-    _fromWire[serialized] ?? (serialized is String ? serialized : ''),
-  );
+          Serializers serializers, Object serialized,
+          {FullType specifiedType = FullType.unspecified}) =>
+      HealthStatusDtoStatusEnum.valueOf(
+          _fromWire[serialized] ?? (serialized is String ? serialized : ''));
 }
 
 class _$HealthStatusDto extends HealthStatusDto {
@@ -95,9 +93,9 @@ class _$HealthStatusDto extends HealthStatusDto {
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper(
-      r'HealthStatusDto',
-    )..add('status', status)).toString();
+    return (newBuiltValueToStringHelper(r'HealthStatusDto')
+          ..add('status', status))
+        .toString();
   }
 }
 
@@ -136,14 +134,10 @@ class HealthStatusDtoBuilder
   HealthStatusDto build() => _build();
 
   _$HealthStatusDto _build() {
-    final _$result =
-        _$v ??
+    final _$result = _$v ??
         _$HealthStatusDto._(
           status: BuiltValueNullFieldError.checkNotNull(
-            status,
-            r'HealthStatusDto',
-            'status',
-          ),
+              status, r'HealthStatusDto', 'status'),
         );
     replace(_$result);
     return _$result;

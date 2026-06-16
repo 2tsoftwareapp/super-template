@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// @dart=3.0
+
 part of 'notifications_controller_mark_read200_response.dart';
 
 // **************************************************************************
@@ -13,19 +15,20 @@ class _$NotificationsControllerMarkRead200Response
   @override
   final RequestMetaDto meta;
 
-  factory _$NotificationsControllerMarkRead200Response([
-    void Function(NotificationsControllerMarkRead200ResponseBuilder)? updates,
-  ]) => (NotificationsControllerMarkRead200ResponseBuilder()..update(updates))
-      ._build();
+  factory _$NotificationsControllerMarkRead200Response(
+          [void Function(NotificationsControllerMarkRead200ResponseBuilder)?
+              updates]) =>
+      (NotificationsControllerMarkRead200ResponseBuilder()..update(updates))
+          ._build();
 
-  _$NotificationsControllerMarkRead200Response._({
-    required this.data,
-    required this.meta,
-  }) : super._();
+  _$NotificationsControllerMarkRead200Response._(
+      {required this.data, required this.meta})
+      : super._();
   @override
   NotificationsControllerMarkRead200Response rebuild(
-    void Function(NotificationsControllerMarkRead200ResponseBuilder) updates,
-  ) => (toBuilder()..update(updates)).build();
+          void Function(NotificationsControllerMarkRead200ResponseBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
 
   @override
   NotificationsControllerMarkRead200ResponseBuilder toBuilder() =>
@@ -51,8 +54,7 @@ class _$NotificationsControllerMarkRead200Response
   @override
   String toString() {
     return (newBuiltValueToStringHelper(
-            r'NotificationsControllerMarkRead200Response',
-          )
+            r'NotificationsControllerMarkRead200Response')
           ..add('data', data)
           ..add('meta', meta))
         .toString();
@@ -61,10 +63,8 @@ class _$NotificationsControllerMarkRead200Response
 
 class NotificationsControllerMarkRead200ResponseBuilder
     implements
-        Builder<
-          NotificationsControllerMarkRead200Response,
-          NotificationsControllerMarkRead200ResponseBuilder
-        > {
+        Builder<NotificationsControllerMarkRead200Response,
+            NotificationsControllerMarkRead200ResponseBuilder> {
   _$NotificationsControllerMarkRead200Response? _$v;
 
   NotificationDtoBuilder? _data;
@@ -96,8 +96,8 @@ class NotificationsControllerMarkRead200ResponseBuilder
 
   @override
   void update(
-    void Function(NotificationsControllerMarkRead200ResponseBuilder)? updates,
-  ) {
+      void Function(NotificationsControllerMarkRead200ResponseBuilder)?
+          updates) {
     if (updates != null) updates(this);
   }
 
@@ -107,8 +107,7 @@ class NotificationsControllerMarkRead200ResponseBuilder
   _$NotificationsControllerMarkRead200Response _build() {
     _$NotificationsControllerMarkRead200Response _$result;
     try {
-      _$result =
-          _$v ??
+      _$result = _$v ??
           _$NotificationsControllerMarkRead200Response._(
             data: data.build(),
             meta: meta.build(),
@@ -122,10 +121,9 @@ class NotificationsControllerMarkRead200ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-          r'NotificationsControllerMarkRead200Response',
-          _$failedField,
-          e.toString(),
-        );
+            r'NotificationsControllerMarkRead200Response',
+            _$failedField,
+            e.toString());
       }
       rethrow;
     }

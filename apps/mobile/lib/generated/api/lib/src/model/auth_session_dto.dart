@@ -3,6 +3,8 @@
 //
 
 // ignore_for_file: unused_element
+// @dart=3.0
+
 import 'package:built_value/json_object.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
@@ -167,93 +169,73 @@ class _$AuthSessionDtoSerializer
       final value = serializedList[i + 1];
       switch (key) {
         case r'id':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(String),
-                  )
-                  as String;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
           result.id = valueDes;
           break;
         case r'userId':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(String),
-                  )
-                  as String;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
           result.userId = valueDes;
           break;
         case r'expiresAt':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(String),
-                  )
-                  as String;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
           result.expiresAt = valueDes;
           break;
         case r'revokedAt':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(JsonObject),
-                  )
-                  as JsonObject;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(JsonObject),
+          ) as JsonObject;
           result.revokedAt = valueDes;
           break;
         case r'lastUsedAt':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(JsonObject),
-                  )
-                  as JsonObject;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(JsonObject),
+          ) as JsonObject;
           result.lastUsedAt = valueDes;
           break;
         case r'ipAddress':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(JsonObject),
-                  )
-                  as JsonObject;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(JsonObject),
+          ) as JsonObject;
           result.ipAddress = valueDes;
           break;
         case r'userAgent':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(JsonObject),
-                  )
-                  as JsonObject;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(JsonObject),
+          ) as JsonObject;
           result.userAgent = valueDes;
           break;
         case r'createdAt':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(String),
-                  )
-                  as String;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
           result.createdAt = valueDes;
           break;
         case r'updatedAt':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(String),
-                  )
-                  as String;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
           result.updatedAt = valueDes;
           break;
         case r'current':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(bool),
-                  )
-                  as bool;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(bool),
+          ) as bool;
           result.current = valueDes;
           break;
         default:

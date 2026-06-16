@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// @dart=3.0
+
 part of 'auth_me_dto.dart';
 
 // **************************************************************************
@@ -17,11 +19,9 @@ class _$AuthMeDto extends AuthMeDto {
   factory _$AuthMeDto([void Function(AuthMeDtoBuilder)? updates]) =>
       (AuthMeDtoBuilder()..update(updates))._build();
 
-  _$AuthMeDto._({
-    required this.user,
-    required this.permissions,
-    required this.sessionId,
-  }) : super._();
+  _$AuthMeDto._(
+      {required this.user, required this.permissions, required this.sessionId})
+      : super._();
   @override
   AuthMeDto rebuild(void Function(AuthMeDtoBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -106,16 +106,12 @@ class AuthMeDtoBuilder implements Builder<AuthMeDto, AuthMeDtoBuilder> {
   _$AuthMeDto _build() {
     _$AuthMeDto _$result;
     try {
-      _$result =
-          _$v ??
+      _$result = _$v ??
           _$AuthMeDto._(
             user: user.build(),
             permissions: permissions.build(),
             sessionId: BuiltValueNullFieldError.checkNotNull(
-              sessionId,
-              r'AuthMeDto',
-              'sessionId',
-            ),
+                sessionId, r'AuthMeDto', 'sessionId'),
           );
     } catch (_) {
       late String _$failedField;
@@ -126,10 +122,7 @@ class AuthMeDtoBuilder implements Builder<AuthMeDto, AuthMeDtoBuilder> {
         permissions.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-          r'AuthMeDto',
-          _$failedField,
-          e.toString(),
-        );
+            r'AuthMeDto', _$failedField, e.toString());
       }
       rethrow;
     }

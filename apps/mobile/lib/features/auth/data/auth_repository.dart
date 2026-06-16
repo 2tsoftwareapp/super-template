@@ -10,18 +10,32 @@ import 'package:super_template_api/super_template_api.dart';
 
 final authRepositoryProvider = Provider<AuthRepository>(
   (ref) => AuthRepository(
-    ref.watch(apiClientProvider),
-    ref.watch(tokenStorageProvider),
+    publicClient: ref.watch(publicApiClientProvider),
+    authenticatedClient: ref.watch(apiClientProvider),
+    storage: ref.watch(tokenStorageProvider),
   ),
 );
 
 class AuthRepository {
-  AuthRepository(this._client, this._storage);
+  AuthRepository._({
+    required this._publicAuthApi,
+    required this._authApi,
+    required this._storage,
+  });
 
-  final SuperTemplateApi _client;
+  factory AuthRepository({
+    required SuperTemplateApi publicClient,
+    required SuperTemplateApi authenticatedClient,
+    required TokenStorage storage,
+  }) => AuthRepository._(
+    publicAuthApi: publicClient.getAuthApi(),
+    authApi: authenticatedClient.getAuthApi(),
+    storage: storage,
+  );
+
+  final AuthApi _publicAuthApi;
+  final AuthApi _authApi;
   final TokenStorage _storage;
-
-  AuthApi get _authApi => _client.getAuthApi();
 
   Future<AuthSession?> restoreSession() async {
     final tokens = await _storage.read();
@@ -39,7 +53,7 @@ class AuthRepository {
 
   Future<AuthSession> login(String email, String password) async {
     try {
-      final response = await _authApi.authControllerLogin(
+      final response = await _publicAuthApi.authControllerLogin(
         loginDto: LoginDto(
           (b) => b
             ..email = email
@@ -65,7 +79,7 @@ class AuthRepository {
     required String displayName,
   }) async {
     try {
-      await _authApi.authControllerRegister(
+      await _publicAuthApi.authControllerRegister(
         registerDto: RegisterDto(
           (b) => b
             ..email = email
@@ -80,7 +94,7 @@ class AuthRepository {
 
   Future<void> forgotPassword(String email) async {
     try {
-      await _authApi.authControllerForgotPassword(
+      await _publicAuthApi.authControllerForgotPassword(
         forgotPasswordDto: ForgotPasswordDto((b) => b..email = email),
       );
     } on DioException catch (error) {
@@ -88,13 +102,15 @@ class AuthRepository {
     }
   }
 
+  /// Refreshes tokens using the public (unauthenticated) client so that the
+  /// AuthInterceptor on the authenticated client is never triggered recursively.
   Future<TokenBundle?> refresh() async {
     final tokens = await _storage.read();
     if (tokens == null) {
       return null;
     }
     try {
-      final response = await _authApi.authControllerRefresh(
+      final response = await _publicAuthApi.authControllerRefresh(
         refreshTokenDto: RefreshTokenDto(
           (b) => b..refreshToken = tokens.refreshToken,
         ),

@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// @dart=3.0
+
 part of 'count_dto.dart';
 
 // **************************************************************************
@@ -37,9 +39,8 @@ class _$CountDto extends CountDto {
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper(
-      r'CountDto',
-    )..add('count', count)).toString();
+    return (newBuiltValueToStringHelper(r'CountDto')..add('count', count))
+        .toString();
   }
 }
 
@@ -77,14 +78,10 @@ class CountDtoBuilder implements Builder<CountDto, CountDtoBuilder> {
   CountDto build() => _build();
 
   _$CountDto _build() {
-    final _$result =
-        _$v ??
+    final _$result = _$v ??
         _$CountDto._(
           count: BuiltValueNullFieldError.checkNotNull(
-            count,
-            r'CountDto',
-            'count',
-          ),
+              count, r'CountDto', 'count'),
         );
     replace(_$result);
     return _$result;

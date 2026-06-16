@@ -2,6 +2,8 @@
 // AUTO-GENERATED FILE, DO NOT MODIFY!
 //
 
+// @dart=3.0
+
 import 'package:dio/dio.dart';
 
 abstract class AuthInterceptor extends Interceptor {

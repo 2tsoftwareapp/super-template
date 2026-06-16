@@ -3,6 +3,8 @@
 //
 
 // ignore_for_file: unused_element
+// @dart=3.0
+
 import 'package:super_template_api/src/model/request_meta_dto.dart';
 import 'package:super_template_api/src/model/notification_dto.dart';
 import 'package:built_value/built_value.dart';
@@ -18,10 +20,8 @@ part 'notifications_controller_mark_read200_response.g.dart';
 @BuiltValue()
 abstract class NotificationsControllerMarkRead200Response
     implements
-        Built<
-          NotificationsControllerMarkRead200Response,
-          NotificationsControllerMarkRead200ResponseBuilder
-        > {
+        Built<NotificationsControllerMarkRead200Response,
+            NotificationsControllerMarkRead200ResponseBuilder> {
   @BuiltValueField(wireName: r'data')
   NotificationDto get data;
 
@@ -40,7 +40,8 @@ abstract class NotificationsControllerMarkRead200Response
 
   @BuiltValueSerializer(custom: true)
   static Serializer<NotificationsControllerMarkRead200Response>
-  get serializer => _$NotificationsControllerMarkRead200ResponseSerializer();
+      get serializer =>
+          _$NotificationsControllerMarkRead200ResponseSerializer();
 }
 
 class _$NotificationsControllerMarkRead200ResponseSerializer
@@ -97,21 +98,17 @@ class _$NotificationsControllerMarkRead200ResponseSerializer
       final value = serializedList[i + 1];
       switch (key) {
         case r'data':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(NotificationDto),
-                  )
-                  as NotificationDto;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(NotificationDto),
+          ) as NotificationDto;
           result.data.replace(valueDes);
           break;
         case r'meta':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(RequestMetaDto),
-                  )
-                  as RequestMetaDto;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(RequestMetaDto),
+          ) as RequestMetaDto;
           result.meta.replace(valueDes);
           break;
         default:

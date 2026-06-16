@@ -3,6 +3,8 @@
 //
 
 // ignore_for_file: unused_element
+// @dart=3.0
+
 import 'package:built_collection/built_collection.dart';
 import 'package:super_template_api/src/model/user_dto.dart';
 import 'package:super_template_api/src/model/pagination_meta_dto.dart';
@@ -19,10 +21,8 @@ part 'admin_users_controller_list_users200_response.g.dart';
 @BuiltValue()
 abstract class AdminUsersControllerListUsers200Response
     implements
-        Built<
-          AdminUsersControllerListUsers200Response,
-          AdminUsersControllerListUsers200ResponseBuilder
-        > {
+        Built<AdminUsersControllerListUsers200Response,
+            AdminUsersControllerListUsers200ResponseBuilder> {
   @BuiltValueField(wireName: r'data')
   BuiltList<UserDto> get data;
 
@@ -97,23 +97,19 @@ class _$AdminUsersControllerListUsers200ResponseSerializer
       final value = serializedList[i + 1];
       switch (key) {
         case r'data':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(BuiltList, [
-                      FullType(UserDto),
-                    ]),
-                  )
-                  as BuiltList<UserDto>;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(BuiltList, [
+              FullType(UserDto),
+            ]),
+          ) as BuiltList<UserDto>;
           result.data.replace(valueDes);
           break;
         case r'meta':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(PaginationMetaDto),
-                  )
-                  as PaginationMetaDto;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(PaginationMetaDto),
+          ) as PaginationMetaDto;
           result.meta.replace(valueDes);
           break;
         default:

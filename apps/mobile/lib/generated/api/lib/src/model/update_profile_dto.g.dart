@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// @dart=3.0
+
 part of 'update_profile_dto.dart';
 
 // **************************************************************************
@@ -12,9 +14,9 @@ class _$UpdateProfileDto extends UpdateProfileDto {
   @override
   final JsonObject? avatarUrl;
 
-  factory _$UpdateProfileDto([
-    void Function(UpdateProfileDtoBuilder)? updates,
-  ]) => (UpdateProfileDtoBuilder()..update(updates))._build();
+  factory _$UpdateProfileDto(
+          [void Function(UpdateProfileDtoBuilder)? updates]) =>
+      (UpdateProfileDtoBuilder()..update(updates))._build();
 
   _$UpdateProfileDto._({this.displayName, this.avatarUrl}) : super._();
   @override
@@ -91,9 +93,11 @@ class UpdateProfileDtoBuilder
   UpdateProfileDto build() => _build();
 
   _$UpdateProfileDto _build() {
-    final _$result =
-        _$v ??
-        _$UpdateProfileDto._(displayName: displayName, avatarUrl: avatarUrl);
+    final _$result = _$v ??
+        _$UpdateProfileDto._(
+          displayName: displayName,
+          avatarUrl: avatarUrl,
+        );
     replace(_$result);
     return _$result;
   }

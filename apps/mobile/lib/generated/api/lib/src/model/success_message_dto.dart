@@ -3,6 +3,8 @@
 //
 
 // ignore_for_file: unused_element
+// @dart=3.0
+
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
@@ -86,21 +88,17 @@ class _$SuccessMessageDtoSerializer
       final value = serializedList[i + 1];
       switch (key) {
         case r'success':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(bool),
-                  )
-                  as bool;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(bool),
+          ) as bool;
           result.success = valueDes;
           break;
         case r'message':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(String),
-                  )
-                  as String;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
           result.message = valueDes;
           break;
         default:

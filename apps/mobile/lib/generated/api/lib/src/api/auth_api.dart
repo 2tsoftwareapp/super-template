@@ -2,6 +2,8 @@
 // AUTO-GENERATED FILE, DO NOT MODIFY!
 //
 
+// @dart=3.0
+
 import 'dart:async';
 
 import 'package:built_value/serializer.dart';
@@ -43,7 +45,7 @@ class AuthApi {
   /// Returns a [Future] containing a [Response] with a [AuthControllerRegister201Response] as data
   /// Throws [DioException] if API call or serialization fails
   Future<Response<AuthControllerRegister201Response>>
-  authControllerForgotPassword({
+      authControllerForgotPassword({
     required ForgotPasswordDto forgotPasswordDto,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
@@ -99,12 +101,11 @@ class AuthApi {
       _responseData = rawResponse == null
           ? null
           : _serializers.deserialize(
-                  rawResponse,
-                  specifiedType: const FullType(
-                    AuthControllerRegister201Response,
-                  ),
-                )
-                as AuthControllerRegister201Response;
+              rawResponse,
+              specifiedType: const FullType(
+                AuthControllerRegister201Response,
+              ),
+            ) as AuthControllerRegister201Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -176,10 +177,9 @@ class AuthApi {
       _responseData = rawResponse == null
           ? null
           : _serializers.deserialize(
-                  rawResponse,
-                  specifiedType: const FullType(AuthControllerGetMe200Response),
-                )
-                as AuthControllerGetMe200Response;
+              rawResponse,
+              specifiedType: const FullType(AuthControllerGetMe200Response),
+            ) as AuthControllerGetMe200Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -216,7 +216,7 @@ class AuthApi {
   /// Returns a [Future] containing a [Response] with a [AuthControllerGetSessions200Response] as data
   /// Throws [DioException] if API call or serialization fails
   Future<Response<AuthControllerGetSessions200Response>>
-  authControllerGetSessions({
+      authControllerGetSessions({
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? extra,
@@ -252,12 +252,11 @@ class AuthApi {
       _responseData = rawResponse == null
           ? null
           : _serializers.deserialize(
-                  rawResponse,
-                  specifiedType: const FullType(
-                    AuthControllerGetSessions200Response,
-                  ),
-                )
-                as AuthControllerGetSessions200Response;
+              rawResponse,
+              specifiedType: const FullType(
+                AuthControllerGetSessions200Response,
+              ),
+            ) as AuthControllerGetSessions200Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -347,10 +346,9 @@ class AuthApi {
       _responseData = rawResponse == null
           ? null
           : _serializers.deserialize(
-                  rawResponse,
-                  specifiedType: const FullType(AuthControllerLogin201Response),
-                )
-                as AuthControllerLogin201Response;
+              rawResponse,
+              specifiedType: const FullType(AuthControllerLogin201Response),
+            ) as AuthControllerLogin201Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -387,7 +385,7 @@ class AuthApi {
   /// Returns a [Future] containing a [Response] with a [AdminUsersControllerDeleteUser200Response] as data
   /// Throws [DioException] if API call or serialization fails
   Future<Response<AdminUsersControllerDeleteUser200Response>>
-  authControllerLogout({
+      authControllerLogout({
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? extra,
@@ -423,12 +421,11 @@ class AuthApi {
       _responseData = rawResponse == null
           ? null
           : _serializers.deserialize(
-                  rawResponse,
-                  specifiedType: const FullType(
-                    AdminUsersControllerDeleteUser200Response,
-                  ),
-                )
-                as AdminUsersControllerDeleteUser200Response;
+              rawResponse,
+              specifiedType: const FullType(
+                AdminUsersControllerDeleteUser200Response,
+              ),
+            ) as AdminUsersControllerDeleteUser200Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -465,7 +462,7 @@ class AuthApi {
   /// Returns a [Future] containing a [Response] with a [AdminUsersControllerDeleteUser200Response] as data
   /// Throws [DioException] if API call or serialization fails
   Future<Response<AdminUsersControllerDeleteUser200Response>>
-  authControllerLogoutAll({
+      authControllerLogoutAll({
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? extra,
@@ -501,12 +498,11 @@ class AuthApi {
       _responseData = rawResponse == null
           ? null
           : _serializers.deserialize(
-                  rawResponse,
-                  specifiedType: const FullType(
-                    AdminUsersControllerDeleteUser200Response,
-                  ),
-                )
-                as AdminUsersControllerDeleteUser200Response;
+              rawResponse,
+              specifiedType: const FullType(
+                AdminUsersControllerDeleteUser200Response,
+              ),
+            ) as AdminUsersControllerDeleteUser200Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -596,10 +592,9 @@ class AuthApi {
       _responseData = rawResponse == null
           ? null
           : _serializers.deserialize(
-                  rawResponse,
-                  specifiedType: const FullType(AuthControllerLogin201Response),
-                )
-                as AuthControllerLogin201Response;
+              rawResponse,
+              specifiedType: const FullType(AuthControllerLogin201Response),
+            ) as AuthControllerLogin201Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -689,12 +684,11 @@ class AuthApi {
       _responseData = rawResponse == null
           ? null
           : _serializers.deserialize(
-                  rawResponse,
-                  specifiedType: const FullType(
-                    AuthControllerRegister201Response,
-                  ),
-                )
-                as AuthControllerRegister201Response;
+              rawResponse,
+              specifiedType: const FullType(
+                AuthControllerRegister201Response,
+              ),
+            ) as AuthControllerRegister201Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -732,7 +726,7 @@ class AuthApi {
   /// Returns a [Future] containing a [Response] with a [AuthControllerRegister201Response] as data
   /// Throws [DioException] if API call or serialization fails
   Future<Response<AuthControllerRegister201Response>>
-  authControllerResendVerification({
+      authControllerResendVerification({
     required ResendVerificationDto resendVerificationDto,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
@@ -788,12 +782,11 @@ class AuthApi {
       _responseData = rawResponse == null
           ? null
           : _serializers.deserialize(
-                  rawResponse,
-                  specifiedType: const FullType(
-                    AuthControllerRegister201Response,
-                  ),
-                )
-                as AuthControllerRegister201Response;
+              rawResponse,
+              specifiedType: const FullType(
+                AuthControllerRegister201Response,
+              ),
+            ) as AuthControllerRegister201Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -831,7 +824,7 @@ class AuthApi {
   /// Returns a [Future] containing a [Response] with a [AdminUsersControllerDeleteUser200Response] as data
   /// Throws [DioException] if API call or serialization fails
   Future<Response<AdminUsersControllerDeleteUser200Response>>
-  authControllerResetPassword({
+      authControllerResetPassword({
     required ResetPasswordDto resetPasswordDto,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
@@ -887,12 +880,11 @@ class AuthApi {
       _responseData = rawResponse == null
           ? null
           : _serializers.deserialize(
-                  rawResponse,
-                  specifiedType: const FullType(
-                    AdminUsersControllerDeleteUser200Response,
-                  ),
-                )
-                as AdminUsersControllerDeleteUser200Response;
+              rawResponse,
+              specifiedType: const FullType(
+                AdminUsersControllerDeleteUser200Response,
+              ),
+            ) as AdminUsersControllerDeleteUser200Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -930,7 +922,7 @@ class AuthApi {
   /// Returns a [Future] containing a [Response] with a [AdminUsersControllerDeleteUser200Response] as data
   /// Throws [DioException] if API call or serialization fails
   Future<Response<AdminUsersControllerDeleteUser200Response>>
-  authControllerRevokeSession({
+      authControllerRevokeSession({
     required String sessionId,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
@@ -976,12 +968,11 @@ class AuthApi {
       _responseData = rawResponse == null
           ? null
           : _serializers.deserialize(
-                  rawResponse,
-                  specifiedType: const FullType(
-                    AdminUsersControllerDeleteUser200Response,
-                  ),
-                )
-                as AdminUsersControllerDeleteUser200Response;
+              rawResponse,
+              specifiedType: const FullType(
+                AdminUsersControllerDeleteUser200Response,
+              ),
+            ) as AdminUsersControllerDeleteUser200Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -1019,7 +1010,7 @@ class AuthApi {
   /// Returns a [Future] containing a [Response] with a [AdminUsersControllerDeleteUser200Response] as data
   /// Throws [DioException] if API call or serialization fails
   Future<Response<AdminUsersControllerDeleteUser200Response>>
-  authControllerVerifyEmail({
+      authControllerVerifyEmail({
     required VerifyEmailDto verifyEmailDto,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
@@ -1072,12 +1063,11 @@ class AuthApi {
       _responseData = rawResponse == null
           ? null
           : _serializers.deserialize(
-                  rawResponse,
-                  specifiedType: const FullType(
-                    AdminUsersControllerDeleteUser200Response,
-                  ),
-                )
-                as AdminUsersControllerDeleteUser200Response;
+              rawResponse,
+              specifiedType: const FullType(
+                AdminUsersControllerDeleteUser200Response,
+              ),
+            ) as AdminUsersControllerDeleteUser200Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,

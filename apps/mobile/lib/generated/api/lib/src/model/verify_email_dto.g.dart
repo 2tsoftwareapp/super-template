@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// @dart=3.0
+
 part of 'verify_email_dto.dart';
 
 // **************************************************************************
@@ -37,9 +39,8 @@ class _$VerifyEmailDto extends VerifyEmailDto {
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper(
-      r'VerifyEmailDto',
-    )..add('token', token)).toString();
+    return (newBuiltValueToStringHelper(r'VerifyEmailDto')..add('token', token))
+        .toString();
   }
 }
 
@@ -78,14 +79,10 @@ class VerifyEmailDtoBuilder
   VerifyEmailDto build() => _build();
 
   _$VerifyEmailDto _build() {
-    final _$result =
-        _$v ??
+    final _$result = _$v ??
         _$VerifyEmailDto._(
           token: BuiltValueNullFieldError.checkNotNull(
-            token,
-            r'VerifyEmailDto',
-            'token',
-          ),
+              token, r'VerifyEmailDto', 'token'),
         );
     replace(_$result);
     return _$result;

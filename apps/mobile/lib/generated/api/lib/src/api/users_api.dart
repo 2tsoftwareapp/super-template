@@ -2,6 +2,8 @@
 // AUTO-GENERATED FILE, DO NOT MODIFY!
 //
 
+// @dart=3.0
+
 import 'dart:async';
 
 import 'package:built_value/serializer.dart';
@@ -34,7 +36,7 @@ class UsersApi {
   /// Returns a [Future] containing a [Response] with a [AdminUsersControllerDeleteUser200Response] as data
   /// Throws [DioException] if API call or serialization fails
   Future<Response<AdminUsersControllerDeleteUser200Response>>
-  usersControllerChangePassword({
+      usersControllerChangePassword({
     required ChangePasswordDto changePasswordDto,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
@@ -90,12 +92,11 @@ class UsersApi {
       _responseData = rawResponse == null
           ? null
           : _serializers.deserialize(
-                  rawResponse,
-                  specifiedType: const FullType(
-                    AdminUsersControllerDeleteUser200Response,
-                  ),
-                )
-                as AdminUsersControllerDeleteUser200Response;
+              rawResponse,
+              specifiedType: const FullType(
+                AdminUsersControllerDeleteUser200Response,
+              ),
+            ) as AdminUsersControllerDeleteUser200Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -132,7 +133,7 @@ class UsersApi {
   /// Returns a [Future] containing a [Response] with a [AdminUsersControllerCreateUser201Response] as data
   /// Throws [DioException] if API call or serialization fails
   Future<Response<AdminUsersControllerCreateUser201Response>>
-  usersControllerGetMe({
+      usersControllerGetMe({
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? extra,
@@ -168,12 +169,11 @@ class UsersApi {
       _responseData = rawResponse == null
           ? null
           : _serializers.deserialize(
-                  rawResponse,
-                  specifiedType: const FullType(
-                    AdminUsersControllerCreateUser201Response,
-                  ),
-                )
-                as AdminUsersControllerCreateUser201Response;
+              rawResponse,
+              specifiedType: const FullType(
+                AdminUsersControllerCreateUser201Response,
+              ),
+            ) as AdminUsersControllerCreateUser201Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -211,7 +211,7 @@ class UsersApi {
   /// Returns a [Future] containing a [Response] with a [AdminUsersControllerCreateUser201Response] as data
   /// Throws [DioException] if API call or serialization fails
   Future<Response<AdminUsersControllerCreateUser201Response>>
-  usersControllerUpdateMe({
+      usersControllerUpdateMe({
     required UpdateProfileDto updateProfileDto,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
@@ -267,12 +267,11 @@ class UsersApi {
       _responseData = rawResponse == null
           ? null
           : _serializers.deserialize(
-                  rawResponse,
-                  specifiedType: const FullType(
-                    AdminUsersControllerCreateUser201Response,
-                  ),
-                )
-                as AdminUsersControllerCreateUser201Response;
+              rawResponse,
+              specifiedType: const FullType(
+                AdminUsersControllerCreateUser201Response,
+              ),
+            ) as AdminUsersControllerCreateUser201Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,

@@ -2,6 +2,8 @@
 // AUTO-GENERATED FILE, DO NOT MODIFY!
 //
 
+// @dart=3.0
+
 import 'dart:async';
 
 import 'package:built_value/serializer.dart';
@@ -30,7 +32,7 @@ class HealthApi {
   /// Returns a [Future] containing a [Response] with a [HealthControllerGetHealth200Response] as data
   /// Throws [DioException] if API call or serialization fails
   Future<Response<HealthControllerGetHealth200Response>>
-  healthControllerGetHealth({
+      healthControllerGetHealth({
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? extra,
@@ -61,12 +63,11 @@ class HealthApi {
       _responseData = rawResponse == null
           ? null
           : _serializers.deserialize(
-                  rawResponse,
-                  specifiedType: const FullType(
-                    HealthControllerGetHealth200Response,
-                  ),
-                )
-                as HealthControllerGetHealth200Response;
+              rawResponse,
+              specifiedType: const FullType(
+                HealthControllerGetHealth200Response,
+              ),
+            ) as HealthControllerGetHealth200Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -103,7 +104,7 @@ class HealthApi {
   /// Returns a [Future] containing a [Response] with a [HealthControllerGetHealth200Response] as data
   /// Throws [DioException] if API call or serialization fails
   Future<Response<HealthControllerGetHealth200Response>>
-  healthControllerGetReady({
+      healthControllerGetReady({
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? extra,
@@ -134,12 +135,11 @@ class HealthApi {
       _responseData = rawResponse == null
           ? null
           : _serializers.deserialize(
-                  rawResponse,
-                  specifiedType: const FullType(
-                    HealthControllerGetHealth200Response,
-                  ),
-                )
-                as HealthControllerGetHealth200Response;
+              rawResponse,
+              specifiedType: const FullType(
+                HealthControllerGetHealth200Response,
+              ),
+            ) as HealthControllerGetHealth200Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,

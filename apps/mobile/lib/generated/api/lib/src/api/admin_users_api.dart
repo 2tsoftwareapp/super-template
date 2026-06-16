@@ -2,6 +2,8 @@
 // AUTO-GENERATED FILE, DO NOT MODIFY!
 //
 
+// @dart=3.0
+
 import 'dart:async';
 
 import 'package:built_value/serializer.dart';
@@ -38,7 +40,7 @@ class AdminUsersApi {
   /// Returns a [Future] containing a [Response] with a [AdminUsersControllerCreateUser201Response] as data
   /// Throws [DioException] if API call or serialization fails
   Future<Response<AdminUsersControllerCreateUser201Response>>
-  adminUsersControllerCreateUser({
+      adminUsersControllerCreateUser({
     required CreateAdminUserDto createAdminUserDto,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
@@ -94,12 +96,11 @@ class AdminUsersApi {
       _responseData = rawResponse == null
           ? null
           : _serializers.deserialize(
-                  rawResponse,
-                  specifiedType: const FullType(
-                    AdminUsersControllerCreateUser201Response,
-                  ),
-                )
-                as AdminUsersControllerCreateUser201Response;
+              rawResponse,
+              specifiedType: const FullType(
+                AdminUsersControllerCreateUser201Response,
+              ),
+            ) as AdminUsersControllerCreateUser201Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -137,7 +138,7 @@ class AdminUsersApi {
   /// Returns a [Future] containing a [Response] with a [AdminUsersControllerDeleteUser200Response] as data
   /// Throws [DioException] if API call or serialization fails
   Future<Response<AdminUsersControllerDeleteUser200Response>>
-  adminUsersControllerDeleteUser({
+      adminUsersControllerDeleteUser({
     required String id,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
@@ -179,12 +180,11 @@ class AdminUsersApi {
       _responseData = rawResponse == null
           ? null
           : _serializers.deserialize(
-                  rawResponse,
-                  specifiedType: const FullType(
-                    AdminUsersControllerDeleteUser200Response,
-                  ),
-                )
-                as AdminUsersControllerDeleteUser200Response;
+              rawResponse,
+              specifiedType: const FullType(
+                AdminUsersControllerDeleteUser200Response,
+              ),
+            ) as AdminUsersControllerDeleteUser200Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -222,7 +222,7 @@ class AdminUsersApi {
   /// Returns a [Future] containing a [Response] with a [AdminUsersControllerCreateUser201Response] as data
   /// Throws [DioException] if API call or serialization fails
   Future<Response<AdminUsersControllerCreateUser201Response>>
-  adminUsersControllerGetUser({
+      adminUsersControllerGetUser({
     required String id,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
@@ -264,12 +264,11 @@ class AdminUsersApi {
       _responseData = rawResponse == null
           ? null
           : _serializers.deserialize(
-                  rawResponse,
-                  specifiedType: const FullType(
-                    AdminUsersControllerCreateUser201Response,
-                  ),
-                )
-                as AdminUsersControllerCreateUser201Response;
+              rawResponse,
+              specifiedType: const FullType(
+                AdminUsersControllerCreateUser201Response,
+              ),
+            ) as AdminUsersControllerCreateUser201Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -313,7 +312,7 @@ class AdminUsersApi {
   /// Returns a [Future] containing a [Response] with a [AdminUsersControllerListUsers200Response] as data
   /// Throws [DioException] if API call or serialization fails
   Future<Response<AdminUsersControllerListUsers200Response>>
-  adminUsersControllerListUsers({
+      adminUsersControllerListUsers({
     num? page = 1,
     num? limit = 20,
     String? sortOrder = 'desc',
@@ -398,12 +397,11 @@ class AdminUsersApi {
       _responseData = rawResponse == null
           ? null
           : _serializers.deserialize(
-                  rawResponse,
-                  specifiedType: const FullType(
-                    AdminUsersControllerListUsers200Response,
-                  ),
-                )
-                as AdminUsersControllerListUsers200Response;
+              rawResponse,
+              specifiedType: const FullType(
+                AdminUsersControllerListUsers200Response,
+              ),
+            ) as AdminUsersControllerListUsers200Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -442,7 +440,7 @@ class AdminUsersApi {
   /// Returns a [Future] containing a [Response] with a [AdminUsersControllerCreateUser201Response] as data
   /// Throws [DioException] if API call or serialization fails
   Future<Response<AdminUsersControllerCreateUser201Response>>
-  adminUsersControllerReplaceRoles({
+      adminUsersControllerReplaceRoles({
     required String id,
     required ReplaceUserRolesDto replaceUserRolesDto,
     CancelToken? cancelToken,
@@ -504,12 +502,11 @@ class AdminUsersApi {
       _responseData = rawResponse == null
           ? null
           : _serializers.deserialize(
-                  rawResponse,
-                  specifiedType: const FullType(
-                    AdminUsersControllerCreateUser201Response,
-                  ),
-                )
-                as AdminUsersControllerCreateUser201Response;
+              rawResponse,
+              specifiedType: const FullType(
+                AdminUsersControllerCreateUser201Response,
+              ),
+            ) as AdminUsersControllerCreateUser201Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -548,7 +545,7 @@ class AdminUsersApi {
   /// Returns a [Future] containing a [Response] with a [AdminUsersControllerCreateUser201Response] as data
   /// Throws [DioException] if API call or serialization fails
   Future<Response<AdminUsersControllerCreateUser201Response>>
-  adminUsersControllerUpdateStatus({
+      adminUsersControllerUpdateStatus({
     required String id,
     required UpdateUserStatusDto updateUserStatusDto,
     CancelToken? cancelToken,
@@ -610,12 +607,11 @@ class AdminUsersApi {
       _responseData = rawResponse == null
           ? null
           : _serializers.deserialize(
-                  rawResponse,
-                  specifiedType: const FullType(
-                    AdminUsersControllerCreateUser201Response,
-                  ),
-                )
-                as AdminUsersControllerCreateUser201Response;
+              rawResponse,
+              specifiedType: const FullType(
+                AdminUsersControllerCreateUser201Response,
+              ),
+            ) as AdminUsersControllerCreateUser201Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -654,7 +650,7 @@ class AdminUsersApi {
   /// Returns a [Future] containing a [Response] with a [AdminUsersControllerCreateUser201Response] as data
   /// Throws [DioException] if API call or serialization fails
   Future<Response<AdminUsersControllerCreateUser201Response>>
-  adminUsersControllerUpdateUser({
+      adminUsersControllerUpdateUser({
     required String id,
     required UpdateAdminUserDto updateAdminUserDto,
     CancelToken? cancelToken,
@@ -716,12 +712,11 @@ class AdminUsersApi {
       _responseData = rawResponse == null
           ? null
           : _serializers.deserialize(
-                  rawResponse,
-                  specifiedType: const FullType(
-                    AdminUsersControllerCreateUser201Response,
-                  ),
-                )
-                as AdminUsersControllerCreateUser201Response;
+              rawResponse,
+              specifiedType: const FullType(
+                AdminUsersControllerCreateUser201Response,
+              ),
+            ) as AdminUsersControllerCreateUser201Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,

@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// @dart=3.0
+
 part of 'auth_response_dto.dart';
 
 // **************************************************************************
@@ -21,13 +23,13 @@ class _$AuthResponseDto extends AuthResponseDto {
   factory _$AuthResponseDto([void Function(AuthResponseDtoBuilder)? updates]) =>
       (AuthResponseDtoBuilder()..update(updates))._build();
 
-  _$AuthResponseDto._({
-    required this.accessToken,
-    required this.refreshToken,
-    required this.user,
-    required this.permissions,
-    required this.session,
-  }) : super._();
+  _$AuthResponseDto._(
+      {required this.accessToken,
+      required this.refreshToken,
+      required this.user,
+      required this.permissions,
+      required this.session})
+      : super._();
   @override
   AuthResponseDto rebuild(void Function(AuthResponseDtoBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -130,19 +132,12 @@ class AuthResponseDtoBuilder
   _$AuthResponseDto _build() {
     _$AuthResponseDto _$result;
     try {
-      _$result =
-          _$v ??
+      _$result = _$v ??
           _$AuthResponseDto._(
             accessToken: BuiltValueNullFieldError.checkNotNull(
-              accessToken,
-              r'AuthResponseDto',
-              'accessToken',
-            ),
+                accessToken, r'AuthResponseDto', 'accessToken'),
             refreshToken: BuiltValueNullFieldError.checkNotNull(
-              refreshToken,
-              r'AuthResponseDto',
-              'refreshToken',
-            ),
+                refreshToken, r'AuthResponseDto', 'refreshToken'),
             user: user.build(),
             permissions: permissions.build(),
             session: session.build(),
@@ -158,10 +153,7 @@ class AuthResponseDtoBuilder
         session.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-          r'AuthResponseDto',
-          _$failedField,
-          e.toString(),
-        );
+            r'AuthResponseDto', _$failedField, e.toString());
       }
       rethrow;
     }

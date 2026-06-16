@@ -3,6 +3,8 @@
 //
 
 // ignore_for_file: unused_element
+// @dart=3.0
+
 import 'package:super_template_api/src/model/request_meta_dto.dart';
 import 'package:built_collection/built_collection.dart';
 import 'package:super_template_api/src/model/auth_session_dto.dart';
@@ -19,10 +21,8 @@ part 'auth_controller_get_sessions200_response.g.dart';
 @BuiltValue()
 abstract class AuthControllerGetSessions200Response
     implements
-        Built<
-          AuthControllerGetSessions200Response,
-          AuthControllerGetSessions200ResponseBuilder
-        > {
+        Built<AuthControllerGetSessions200Response,
+            AuthControllerGetSessions200ResponseBuilder> {
   @BuiltValueField(wireName: r'data')
   BuiltList<AuthSessionDto> get data;
 
@@ -97,23 +97,19 @@ class _$AuthControllerGetSessions200ResponseSerializer
       final value = serializedList[i + 1];
       switch (key) {
         case r'data':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(BuiltList, [
-                      FullType(AuthSessionDto),
-                    ]),
-                  )
-                  as BuiltList<AuthSessionDto>;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(BuiltList, [
+              FullType(AuthSessionDto),
+            ]),
+          ) as BuiltList<AuthSessionDto>;
           result.data.replace(valueDes);
           break;
         case r'meta':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(RequestMetaDto),
-                  )
-                  as RequestMetaDto;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(RequestMetaDto),
+          ) as RequestMetaDto;
           result.meta.replace(valueDes);
           break;
         default:

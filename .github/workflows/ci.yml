@@ -93,6 +93,13 @@ jobs:
       - name: Seed development data
         run: pnpm --filter api db:seed
 
+      - name: Create and migrate test database
+        run: |
+          PGPASSWORD=postgres psql -h localhost -U postgres -c "CREATE DATABASE fullstack_starter_test;"
+          pnpm --filter api db:migrate
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/fullstack_starter_test
+
       - name: Generate contracts
         run: ./scripts/generate-contracts.sh
 

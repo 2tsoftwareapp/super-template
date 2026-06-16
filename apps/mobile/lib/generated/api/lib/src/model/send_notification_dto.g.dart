@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// @dart=3.0
+
 part of 'send_notification_dto.dart';
 
 // **************************************************************************
@@ -16,20 +18,20 @@ class _$SendNotificationDto extends SendNotificationDto {
   @override
   final String body;
 
-  factory _$SendNotificationDto([
-    void Function(SendNotificationDtoBuilder)? updates,
-  ]) => (SendNotificationDtoBuilder()..update(updates))._build();
+  factory _$SendNotificationDto(
+          [void Function(SendNotificationDtoBuilder)? updates]) =>
+      (SendNotificationDtoBuilder()..update(updates))._build();
 
-  _$SendNotificationDto._({
-    required this.userId,
-    required this.type,
-    required this.title,
-    required this.body,
-  }) : super._();
+  _$SendNotificationDto._(
+      {required this.userId,
+      required this.type,
+      required this.title,
+      required this.body})
+      : super._();
   @override
   SendNotificationDto rebuild(
-    void Function(SendNotificationDtoBuilder) updates,
-  ) => (toBuilder()..update(updates)).build();
+          void Function(SendNotificationDtoBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
 
   @override
   SendNotificationDtoBuilder toBuilder() =>
@@ -117,29 +119,16 @@ class SendNotificationDtoBuilder
   SendNotificationDto build() => _build();
 
   _$SendNotificationDto _build() {
-    final _$result =
-        _$v ??
+    final _$result = _$v ??
         _$SendNotificationDto._(
           userId: BuiltValueNullFieldError.checkNotNull(
-            userId,
-            r'SendNotificationDto',
-            'userId',
-          ),
+              userId, r'SendNotificationDto', 'userId'),
           type: BuiltValueNullFieldError.checkNotNull(
-            type,
-            r'SendNotificationDto',
-            'type',
-          ),
+              type, r'SendNotificationDto', 'type'),
           title: BuiltValueNullFieldError.checkNotNull(
-            title,
-            r'SendNotificationDto',
-            'title',
-          ),
+              title, r'SendNotificationDto', 'title'),
           body: BuiltValueNullFieldError.checkNotNull(
-            body,
-            r'SendNotificationDto',
-            'body',
-          ),
+              body, r'SendNotificationDto', 'body'),
         );
     replace(_$result);
     return _$result;

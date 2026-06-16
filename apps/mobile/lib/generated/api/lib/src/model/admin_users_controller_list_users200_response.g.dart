@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// @dart=3.0
+
 part of 'admin_users_controller_list_users200_response.dart';
 
 // **************************************************************************
@@ -13,19 +15,20 @@ class _$AdminUsersControllerListUsers200Response
   @override
   final PaginationMetaDto meta;
 
-  factory _$AdminUsersControllerListUsers200Response([
-    void Function(AdminUsersControllerListUsers200ResponseBuilder)? updates,
-  ]) => (AdminUsersControllerListUsers200ResponseBuilder()..update(updates))
-      ._build();
+  factory _$AdminUsersControllerListUsers200Response(
+          [void Function(AdminUsersControllerListUsers200ResponseBuilder)?
+              updates]) =>
+      (AdminUsersControllerListUsers200ResponseBuilder()..update(updates))
+          ._build();
 
-  _$AdminUsersControllerListUsers200Response._({
-    required this.data,
-    required this.meta,
-  }) : super._();
+  _$AdminUsersControllerListUsers200Response._(
+      {required this.data, required this.meta})
+      : super._();
   @override
   AdminUsersControllerListUsers200Response rebuild(
-    void Function(AdminUsersControllerListUsers200ResponseBuilder) updates,
-  ) => (toBuilder()..update(updates)).build();
+          void Function(AdminUsersControllerListUsers200ResponseBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
 
   @override
   AdminUsersControllerListUsers200ResponseBuilder toBuilder() =>
@@ -51,8 +54,7 @@ class _$AdminUsersControllerListUsers200Response
   @override
   String toString() {
     return (newBuiltValueToStringHelper(
-            r'AdminUsersControllerListUsers200Response',
-          )
+            r'AdminUsersControllerListUsers200Response')
           ..add('data', data)
           ..add('meta', meta))
         .toString();
@@ -61,10 +63,8 @@ class _$AdminUsersControllerListUsers200Response
 
 class AdminUsersControllerListUsers200ResponseBuilder
     implements
-        Builder<
-          AdminUsersControllerListUsers200Response,
-          AdminUsersControllerListUsers200ResponseBuilder
-        > {
+        Builder<AdminUsersControllerListUsers200Response,
+            AdminUsersControllerListUsers200ResponseBuilder> {
   _$AdminUsersControllerListUsers200Response? _$v;
 
   ListBuilder<UserDto>? _data;
@@ -97,8 +97,7 @@ class AdminUsersControllerListUsers200ResponseBuilder
 
   @override
   void update(
-    void Function(AdminUsersControllerListUsers200ResponseBuilder)? updates,
-  ) {
+      void Function(AdminUsersControllerListUsers200ResponseBuilder)? updates) {
     if (updates != null) updates(this);
   }
 
@@ -108,8 +107,7 @@ class AdminUsersControllerListUsers200ResponseBuilder
   _$AdminUsersControllerListUsers200Response _build() {
     _$AdminUsersControllerListUsers200Response _$result;
     try {
-      _$result =
-          _$v ??
+      _$result = _$v ??
           _$AdminUsersControllerListUsers200Response._(
             data: data.build(),
             meta: meta.build(),
@@ -123,10 +121,9 @@ class AdminUsersControllerListUsers200ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-          r'AdminUsersControllerListUsers200Response',
-          _$failedField,
-          e.toString(),
-        );
+            r'AdminUsersControllerListUsers200Response',
+            _$failedField,
+            e.toString());
       }
       rethrow;
     }

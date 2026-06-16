@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// @dart=3.0
+
 part of 'notification_dto.dart';
 
 // **************************************************************************
@@ -27,16 +29,16 @@ class _$NotificationDto extends NotificationDto {
   factory _$NotificationDto([void Function(NotificationDtoBuilder)? updates]) =>
       (NotificationDtoBuilder()..update(updates))._build();
 
-  _$NotificationDto._({
-    required this.id,
-    required this.userId,
-    required this.type,
-    required this.title,
-    required this.body,
-    this.data,
-    this.readAt,
-    required this.createdAt,
-  }) : super._();
+  _$NotificationDto._(
+      {required this.id,
+      required this.userId,
+      required this.type,
+      required this.title,
+      required this.body,
+      this.data,
+      this.readAt,
+      required this.createdAt})
+      : super._();
   @override
   NotificationDto rebuild(void Function(NotificationDtoBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -158,41 +160,22 @@ class NotificationDtoBuilder
   NotificationDto build() => _build();
 
   _$NotificationDto _build() {
-    final _$result =
-        _$v ??
+    final _$result = _$v ??
         _$NotificationDto._(
           id: BuiltValueNullFieldError.checkNotNull(
-            id,
-            r'NotificationDto',
-            'id',
-          ),
+              id, r'NotificationDto', 'id'),
           userId: BuiltValueNullFieldError.checkNotNull(
-            userId,
-            r'NotificationDto',
-            'userId',
-          ),
+              userId, r'NotificationDto', 'userId'),
           type: BuiltValueNullFieldError.checkNotNull(
-            type,
-            r'NotificationDto',
-            'type',
-          ),
+              type, r'NotificationDto', 'type'),
           title: BuiltValueNullFieldError.checkNotNull(
-            title,
-            r'NotificationDto',
-            'title',
-          ),
+              title, r'NotificationDto', 'title'),
           body: BuiltValueNullFieldError.checkNotNull(
-            body,
-            r'NotificationDto',
-            'body',
-          ),
+              body, r'NotificationDto', 'body'),
           data: data,
           readAt: readAt,
           createdAt: BuiltValueNullFieldError.checkNotNull(
-            createdAt,
-            r'NotificationDto',
-            'createdAt',
-          ),
+              createdAt, r'NotificationDto', 'createdAt'),
         );
     replace(_$result);
     return _$result;

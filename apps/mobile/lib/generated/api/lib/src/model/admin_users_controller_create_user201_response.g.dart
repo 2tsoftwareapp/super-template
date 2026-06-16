@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// @dart=3.0
+
 part of 'admin_users_controller_create_user201_response.dart';
 
 // **************************************************************************
@@ -13,19 +15,20 @@ class _$AdminUsersControllerCreateUser201Response
   @override
   final RequestMetaDto meta;
 
-  factory _$AdminUsersControllerCreateUser201Response([
-    void Function(AdminUsersControllerCreateUser201ResponseBuilder)? updates,
-  ]) => (AdminUsersControllerCreateUser201ResponseBuilder()..update(updates))
-      ._build();
+  factory _$AdminUsersControllerCreateUser201Response(
+          [void Function(AdminUsersControllerCreateUser201ResponseBuilder)?
+              updates]) =>
+      (AdminUsersControllerCreateUser201ResponseBuilder()..update(updates))
+          ._build();
 
-  _$AdminUsersControllerCreateUser201Response._({
-    required this.data,
-    required this.meta,
-  }) : super._();
+  _$AdminUsersControllerCreateUser201Response._(
+      {required this.data, required this.meta})
+      : super._();
   @override
   AdminUsersControllerCreateUser201Response rebuild(
-    void Function(AdminUsersControllerCreateUser201ResponseBuilder) updates,
-  ) => (toBuilder()..update(updates)).build();
+          void Function(AdminUsersControllerCreateUser201ResponseBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
 
   @override
   AdminUsersControllerCreateUser201ResponseBuilder toBuilder() =>
@@ -51,8 +54,7 @@ class _$AdminUsersControllerCreateUser201Response
   @override
   String toString() {
     return (newBuiltValueToStringHelper(
-            r'AdminUsersControllerCreateUser201Response',
-          )
+            r'AdminUsersControllerCreateUser201Response')
           ..add('data', data)
           ..add('meta', meta))
         .toString();
@@ -61,10 +63,8 @@ class _$AdminUsersControllerCreateUser201Response
 
 class AdminUsersControllerCreateUser201ResponseBuilder
     implements
-        Builder<
-          AdminUsersControllerCreateUser201Response,
-          AdminUsersControllerCreateUser201ResponseBuilder
-        > {
+        Builder<AdminUsersControllerCreateUser201Response,
+            AdminUsersControllerCreateUser201ResponseBuilder> {
   _$AdminUsersControllerCreateUser201Response? _$v;
 
   UserDtoBuilder? _data;
@@ -96,8 +96,8 @@ class AdminUsersControllerCreateUser201ResponseBuilder
 
   @override
   void update(
-    void Function(AdminUsersControllerCreateUser201ResponseBuilder)? updates,
-  ) {
+      void Function(AdminUsersControllerCreateUser201ResponseBuilder)?
+          updates) {
     if (updates != null) updates(this);
   }
 
@@ -107,8 +107,7 @@ class AdminUsersControllerCreateUser201ResponseBuilder
   _$AdminUsersControllerCreateUser201Response _build() {
     _$AdminUsersControllerCreateUser201Response _$result;
     try {
-      _$result =
-          _$v ??
+      _$result = _$v ??
           _$AdminUsersControllerCreateUser201Response._(
             data: data.build(),
             meta: meta.build(),
@@ -122,10 +121,9 @@ class AdminUsersControllerCreateUser201ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-          r'AdminUsersControllerCreateUser201Response',
-          _$failedField,
-          e.toString(),
-        );
+            r'AdminUsersControllerCreateUser201Response',
+            _$failedField,
+            e.toString());
       }
       rethrow;
     }

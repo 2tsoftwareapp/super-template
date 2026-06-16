@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver as zodResolver } from "@hookform/resolvers/standard-schema";
 import { useMutation } from "@tanstack/react-query";
 import { useQueryState } from "nuqs";
 import { useForm } from "react-hook-form";

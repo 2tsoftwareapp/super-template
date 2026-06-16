@@ -3,6 +3,8 @@
 //
 
 // ignore_for_file: unused_element
+// @dart=3.0
+
 import 'package:super_template_api/src/model/request_meta_dto.dart';
 import 'package:super_template_api/src/model/auth_response_dto.dart';
 import 'package:built_value/built_value.dart';
@@ -18,10 +20,8 @@ part 'auth_controller_login201_response.g.dart';
 @BuiltValue()
 abstract class AuthControllerLogin201Response
     implements
-        Built<
-          AuthControllerLogin201Response,
-          AuthControllerLogin201ResponseBuilder
-        > {
+        Built<AuthControllerLogin201Response,
+            AuthControllerLogin201ResponseBuilder> {
   @BuiltValueField(wireName: r'data')
   AuthResponseDto get data;
 
@@ -96,21 +96,17 @@ class _$AuthControllerLogin201ResponseSerializer
       final value = serializedList[i + 1];
       switch (key) {
         case r'data':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(AuthResponseDto),
-                  )
-                  as AuthResponseDto;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(AuthResponseDto),
+          ) as AuthResponseDto;
           result.data.replace(valueDes);
           break;
         case r'meta':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(RequestMetaDto),
-                  )
-                  as RequestMetaDto;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(RequestMetaDto),
+          ) as RequestMetaDto;
           result.meta.replace(valueDes);
           break;
         default:

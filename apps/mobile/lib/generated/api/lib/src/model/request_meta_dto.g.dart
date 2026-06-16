@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// @dart=3.0
+
 part of 'request_meta_dto.dart';
 
 // **************************************************************************
@@ -37,9 +39,9 @@ class _$RequestMetaDto extends RequestMetaDto {
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper(
-      r'RequestMetaDto',
-    )..add('requestId', requestId)).toString();
+    return (newBuiltValueToStringHelper(r'RequestMetaDto')
+          ..add('requestId', requestId))
+        .toString();
   }
 }
 
@@ -78,14 +80,10 @@ class RequestMetaDtoBuilder
   RequestMetaDto build() => _build();
 
   _$RequestMetaDto _build() {
-    final _$result =
-        _$v ??
+    final _$result = _$v ??
         _$RequestMetaDto._(
           requestId: BuiltValueNullFieldError.checkNotNull(
-            requestId,
-            r'RequestMetaDto',
-            'requestId',
-          ),
+              requestId, r'RequestMetaDto', 'requestId'),
         );
     replace(_$result);
     return _$result;

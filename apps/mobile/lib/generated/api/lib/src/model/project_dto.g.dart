@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// @dart=3.0
+
 part of 'project_dto.dart';
 
 // **************************************************************************
@@ -28,10 +30,10 @@ ProjectDtoStatusEnum _$projectDtoStatusEnumValueOf(String name) {
 
 final BuiltSet<ProjectDtoStatusEnum> _$projectDtoStatusEnumValues =
     BuiltSet<ProjectDtoStatusEnum>(const <ProjectDtoStatusEnum>[
-      _$projectDtoStatusEnum_DRAFT,
-      _$projectDtoStatusEnum_ACTIVE,
-      _$projectDtoStatusEnum_ARCHIVED,
-    ]);
+  _$projectDtoStatusEnum_DRAFT,
+  _$projectDtoStatusEnum_ACTIVE,
+  _$projectDtoStatusEnum_ARCHIVED,
+]);
 
 Serializer<ProjectDtoStatusEnum> _$projectDtoStatusEnumSerializer =
     _$ProjectDtoStatusEnumSerializer();
@@ -55,20 +57,15 @@ class _$ProjectDtoStatusEnumSerializer
   final String wireName = 'ProjectDtoStatusEnum';
 
   @override
-  Object serialize(
-    Serializers serializers,
-    ProjectDtoStatusEnum object, {
-    FullType specifiedType = FullType.unspecified,
-  }) => _toWire[object.name] ?? object.name;
+  Object serialize(Serializers serializers, ProjectDtoStatusEnum object,
+          {FullType specifiedType = FullType.unspecified}) =>
+      _toWire[object.name] ?? object.name;
 
   @override
-  ProjectDtoStatusEnum deserialize(
-    Serializers serializers,
-    Object serialized, {
-    FullType specifiedType = FullType.unspecified,
-  }) => ProjectDtoStatusEnum.valueOf(
-    _fromWire[serialized] ?? (serialized is String ? serialized : ''),
-  );
+  ProjectDtoStatusEnum deserialize(Serializers serializers, Object serialized,
+          {FullType specifiedType = FullType.unspecified}) =>
+      ProjectDtoStatusEnum.valueOf(
+          _fromWire[serialized] ?? (serialized is String ? serialized : ''));
 }
 
 class _$ProjectDto extends ProjectDto {
@@ -96,18 +93,18 @@ class _$ProjectDto extends ProjectDto {
   factory _$ProjectDto([void Function(ProjectDtoBuilder)? updates]) =>
       (ProjectDtoBuilder()..update(updates))._build();
 
-  _$ProjectDto._({
-    required this.id,
-    required this.name,
-    this.description,
-    required this.status,
-    required this.ownerId,
-    required this.createdById,
-    this.updatedById,
-    required this.createdAt,
-    required this.updatedAt,
-    this.deletedAt,
-  }) : super._();
+  _$ProjectDto._(
+      {required this.id,
+      required this.name,
+      this.description,
+      required this.status,
+      required this.ownerId,
+      required this.createdById,
+      this.updatedById,
+      required this.createdAt,
+      required this.updatedAt,
+      this.deletedAt})
+      : super._();
   @override
   ProjectDto rebuild(void Function(ProjectDtoBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -244,42 +241,23 @@ class ProjectDtoBuilder implements Builder<ProjectDto, ProjectDtoBuilder> {
   ProjectDto build() => _build();
 
   _$ProjectDto _build() {
-    final _$result =
-        _$v ??
+    final _$result = _$v ??
         _$ProjectDto._(
           id: BuiltValueNullFieldError.checkNotNull(id, r'ProjectDto', 'id'),
           name: BuiltValueNullFieldError.checkNotNull(
-            name,
-            r'ProjectDto',
-            'name',
-          ),
+              name, r'ProjectDto', 'name'),
           description: description,
           status: BuiltValueNullFieldError.checkNotNull(
-            status,
-            r'ProjectDto',
-            'status',
-          ),
+              status, r'ProjectDto', 'status'),
           ownerId: BuiltValueNullFieldError.checkNotNull(
-            ownerId,
-            r'ProjectDto',
-            'ownerId',
-          ),
+              ownerId, r'ProjectDto', 'ownerId'),
           createdById: BuiltValueNullFieldError.checkNotNull(
-            createdById,
-            r'ProjectDto',
-            'createdById',
-          ),
+              createdById, r'ProjectDto', 'createdById'),
           updatedById: updatedById,
           createdAt: BuiltValueNullFieldError.checkNotNull(
-            createdAt,
-            r'ProjectDto',
-            'createdAt',
-          ),
+              createdAt, r'ProjectDto', 'createdAt'),
           updatedAt: BuiltValueNullFieldError.checkNotNull(
-            updatedAt,
-            r'ProjectDto',
-            'updatedAt',
-          ),
+              updatedAt, r'ProjectDto', 'updatedAt'),
           deletedAt: deletedAt,
         );
     replace(_$result);

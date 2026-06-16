@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// @dart=3.0
+
 part of 'forgot_password_dto.dart';
 
 // **************************************************************************
@@ -10,9 +12,9 @@ class _$ForgotPasswordDto extends ForgotPasswordDto {
   @override
   final String email;
 
-  factory _$ForgotPasswordDto([
-    void Function(ForgotPasswordDtoBuilder)? updates,
-  ]) => (ForgotPasswordDtoBuilder()..update(updates))._build();
+  factory _$ForgotPasswordDto(
+          [void Function(ForgotPasswordDtoBuilder)? updates]) =>
+      (ForgotPasswordDtoBuilder()..update(updates))._build();
 
   _$ForgotPasswordDto._({required this.email}) : super._();
   @override
@@ -39,9 +41,9 @@ class _$ForgotPasswordDto extends ForgotPasswordDto {
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper(
-      r'ForgotPasswordDto',
-    )..add('email', email)).toString();
+    return (newBuiltValueToStringHelper(r'ForgotPasswordDto')
+          ..add('email', email))
+        .toString();
   }
 }
 
@@ -80,14 +82,10 @@ class ForgotPasswordDtoBuilder
   ForgotPasswordDto build() => _build();
 
   _$ForgotPasswordDto _build() {
-    final _$result =
-        _$v ??
+    final _$result = _$v ??
         _$ForgotPasswordDto._(
           email: BuiltValueNullFieldError.checkNotNull(
-            email,
-            r'ForgotPasswordDto',
-            'email',
-          ),
+              email, r'ForgotPasswordDto', 'email'),
         );
     replace(_$result);
     return _$result;

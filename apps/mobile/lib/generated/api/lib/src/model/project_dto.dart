@@ -3,6 +3,8 @@
 //
 
 // ignore_for_file: unused_element
+// @dart=3.0
+
 import 'package:built_collection/built_collection.dart';
 import 'package:built_value/json_object.dart';
 import 'package:built_value/built_value.dart';
@@ -163,93 +165,73 @@ class _$ProjectDtoSerializer implements PrimitiveSerializer<ProjectDto> {
       final value = serializedList[i + 1];
       switch (key) {
         case r'id':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(String),
-                  )
-                  as String;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
           result.id = valueDes;
           break;
         case r'name':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(String),
-                  )
-                  as String;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
           result.name = valueDes;
           break;
         case r'description':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(JsonObject),
-                  )
-                  as JsonObject;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(JsonObject),
+          ) as JsonObject;
           result.description = valueDes;
           break;
         case r'status':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(ProjectDtoStatusEnum),
-                  )
-                  as ProjectDtoStatusEnum;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(ProjectDtoStatusEnum),
+          ) as ProjectDtoStatusEnum;
           result.status = valueDes;
           break;
         case r'ownerId':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(String),
-                  )
-                  as String;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
           result.ownerId = valueDes;
           break;
         case r'createdById':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(String),
-                  )
-                  as String;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
           result.createdById = valueDes;
           break;
         case r'updatedById':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(JsonObject),
-                  )
-                  as JsonObject;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(JsonObject),
+          ) as JsonObject;
           result.updatedById = valueDes;
           break;
         case r'createdAt':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(String),
-                  )
-                  as String;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
           result.createdAt = valueDes;
           break;
         case r'updatedAt':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(String),
-                  )
-                  as String;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
           result.updatedAt = valueDes;
           break;
         case r'deletedAt':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(JsonObject),
-                  )
-                  as JsonObject;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(JsonObject),
+          ) as JsonObject;
           result.deletedAt = valueDes;
           break;
         default:

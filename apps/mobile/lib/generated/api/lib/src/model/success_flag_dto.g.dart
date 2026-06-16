@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// @dart=3.0
+
 part of 'success_flag_dto.dart';
 
 // **************************************************************************
@@ -37,9 +39,9 @@ class _$SuccessFlagDto extends SuccessFlagDto {
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper(
-      r'SuccessFlagDto',
-    )..add('success', success)).toString();
+    return (newBuiltValueToStringHelper(r'SuccessFlagDto')
+          ..add('success', success))
+        .toString();
   }
 }
 
@@ -78,14 +80,10 @@ class SuccessFlagDtoBuilder
   SuccessFlagDto build() => _build();
 
   _$SuccessFlagDto _build() {
-    final _$result =
-        _$v ??
+    final _$result = _$v ??
         _$SuccessFlagDto._(
           success: BuiltValueNullFieldError.checkNotNull(
-            success,
-            r'SuccessFlagDto',
-            'success',
-          ),
+              success, r'SuccessFlagDto', 'success'),
         );
     replace(_$result);
     return _$result;

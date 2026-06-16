@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// @dart=3.0
+
 part of 'success_message_dto.dart';
 
 // **************************************************************************
@@ -12,12 +14,12 @@ class _$SuccessMessageDto extends SuccessMessageDto {
   @override
   final String message;
 
-  factory _$SuccessMessageDto([
-    void Function(SuccessMessageDtoBuilder)? updates,
-  ]) => (SuccessMessageDtoBuilder()..update(updates))._build();
+  factory _$SuccessMessageDto(
+          [void Function(SuccessMessageDtoBuilder)? updates]) =>
+      (SuccessMessageDtoBuilder()..update(updates))._build();
 
   _$SuccessMessageDto._({required this.success, required this.message})
-    : super._();
+      : super._();
   @override
   SuccessMessageDto rebuild(void Function(SuccessMessageDtoBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -92,19 +94,12 @@ class SuccessMessageDtoBuilder
   SuccessMessageDto build() => _build();
 
   _$SuccessMessageDto _build() {
-    final _$result =
-        _$v ??
+    final _$result = _$v ??
         _$SuccessMessageDto._(
           success: BuiltValueNullFieldError.checkNotNull(
-            success,
-            r'SuccessMessageDto',
-            'success',
-          ),
+              success, r'SuccessMessageDto', 'success'),
           message: BuiltValueNullFieldError.checkNotNull(
-            message,
-            r'SuccessMessageDto',
-            'message',
-          ),
+              message, r'SuccessMessageDto', 'message'),
         );
     replace(_$result);
     return _$result;

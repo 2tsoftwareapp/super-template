@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// @dart=3.0
+
 part of 'notifications_controller_list200_response.dart';
 
 // **************************************************************************
@@ -13,19 +15,20 @@ class _$NotificationsControllerList200Response
   @override
   final PaginationMetaDto meta;
 
-  factory _$NotificationsControllerList200Response([
-    void Function(NotificationsControllerList200ResponseBuilder)? updates,
-  ]) => (NotificationsControllerList200ResponseBuilder()..update(updates))
-      ._build();
+  factory _$NotificationsControllerList200Response(
+          [void Function(NotificationsControllerList200ResponseBuilder)?
+              updates]) =>
+      (NotificationsControllerList200ResponseBuilder()..update(updates))
+          ._build();
 
-  _$NotificationsControllerList200Response._({
-    required this.data,
-    required this.meta,
-  }) : super._();
+  _$NotificationsControllerList200Response._(
+      {required this.data, required this.meta})
+      : super._();
   @override
   NotificationsControllerList200Response rebuild(
-    void Function(NotificationsControllerList200ResponseBuilder) updates,
-  ) => (toBuilder()..update(updates)).build();
+          void Function(NotificationsControllerList200ResponseBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
 
   @override
   NotificationsControllerList200ResponseBuilder toBuilder() =>
@@ -51,8 +54,7 @@ class _$NotificationsControllerList200Response
   @override
   String toString() {
     return (newBuiltValueToStringHelper(
-            r'NotificationsControllerList200Response',
-          )
+            r'NotificationsControllerList200Response')
           ..add('data', data)
           ..add('meta', meta))
         .toString();
@@ -61,10 +63,8 @@ class _$NotificationsControllerList200Response
 
 class NotificationsControllerList200ResponseBuilder
     implements
-        Builder<
-          NotificationsControllerList200Response,
-          NotificationsControllerList200ResponseBuilder
-        > {
+        Builder<NotificationsControllerList200Response,
+            NotificationsControllerList200ResponseBuilder> {
   _$NotificationsControllerList200Response? _$v;
 
   ListBuilder<NotificationDto>? _data;
@@ -98,8 +98,7 @@ class NotificationsControllerList200ResponseBuilder
 
   @override
   void update(
-    void Function(NotificationsControllerList200ResponseBuilder)? updates,
-  ) {
+      void Function(NotificationsControllerList200ResponseBuilder)? updates) {
     if (updates != null) updates(this);
   }
 
@@ -109,8 +108,7 @@ class NotificationsControllerList200ResponseBuilder
   _$NotificationsControllerList200Response _build() {
     _$NotificationsControllerList200Response _$result;
     try {
-      _$result =
-          _$v ??
+      _$result = _$v ??
           _$NotificationsControllerList200Response._(
             data: data.build(),
             meta: meta.build(),
@@ -124,10 +122,9 @@ class NotificationsControllerList200ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-          r'NotificationsControllerList200Response',
-          _$failedField,
-          e.toString(),
-        );
+            r'NotificationsControllerList200Response',
+            _$failedField,
+            e.toString());
       }
       rethrow;
     }

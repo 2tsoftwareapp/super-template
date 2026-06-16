@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// @dart=3.0
+
 part of 'health_controller_get_health200_response.dart';
 
 // **************************************************************************
@@ -13,19 +15,18 @@ class _$HealthControllerGetHealth200Response
   @override
   final RequestMetaDto meta;
 
-  factory _$HealthControllerGetHealth200Response([
-    void Function(HealthControllerGetHealth200ResponseBuilder)? updates,
-  ]) =>
+  factory _$HealthControllerGetHealth200Response(
+          [void Function(HealthControllerGetHealth200ResponseBuilder)?
+              updates]) =>
       (HealthControllerGetHealth200ResponseBuilder()..update(updates))._build();
 
-  _$HealthControllerGetHealth200Response._({
-    required this.data,
-    required this.meta,
-  }) : super._();
+  _$HealthControllerGetHealth200Response._(
+      {required this.data, required this.meta})
+      : super._();
   @override
   HealthControllerGetHealth200Response rebuild(
-    void Function(HealthControllerGetHealth200ResponseBuilder) updates,
-  ) => (toBuilder()..update(updates)).build();
+          void Function(HealthControllerGetHealth200ResponseBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
 
   @override
   HealthControllerGetHealth200ResponseBuilder toBuilder() =>
@@ -59,10 +60,8 @@ class _$HealthControllerGetHealth200Response
 
 class HealthControllerGetHealth200ResponseBuilder
     implements
-        Builder<
-          HealthControllerGetHealth200Response,
-          HealthControllerGetHealth200ResponseBuilder
-        > {
+        Builder<HealthControllerGetHealth200Response,
+            HealthControllerGetHealth200ResponseBuilder> {
   _$HealthControllerGetHealth200Response? _$v;
 
   HealthStatusDtoBuilder? _data;
@@ -94,8 +93,7 @@ class HealthControllerGetHealth200ResponseBuilder
 
   @override
   void update(
-    void Function(HealthControllerGetHealth200ResponseBuilder)? updates,
-  ) {
+      void Function(HealthControllerGetHealth200ResponseBuilder)? updates) {
     if (updates != null) updates(this);
   }
 
@@ -105,8 +103,7 @@ class HealthControllerGetHealth200ResponseBuilder
   _$HealthControllerGetHealth200Response _build() {
     _$HealthControllerGetHealth200Response _$result;
     try {
-      _$result =
-          _$v ??
+      _$result = _$v ??
           _$HealthControllerGetHealth200Response._(
             data: data.build(),
             meta: meta.build(),
@@ -120,10 +117,9 @@ class HealthControllerGetHealth200ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-          r'HealthControllerGetHealth200Response',
-          _$failedField,
-          e.toString(),
-        );
+            r'HealthControllerGetHealth200Response',
+            _$failedField,
+            e.toString());
       }
       rethrow;
     }

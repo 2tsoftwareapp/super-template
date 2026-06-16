@@ -3,6 +3,8 @@
 //
 
 // ignore_for_file: unused_element
+// @dart=3.0
+
 import 'package:built_collection/built_collection.dart';
 import 'package:super_template_api/src/model/notification_dto.dart';
 import 'package:super_template_api/src/model/pagination_meta_dto.dart';
@@ -19,10 +21,8 @@ part 'notifications_controller_list200_response.g.dart';
 @BuiltValue()
 abstract class NotificationsControllerList200Response
     implements
-        Built<
-          NotificationsControllerList200Response,
-          NotificationsControllerList200ResponseBuilder
-        > {
+        Built<NotificationsControllerList200Response,
+            NotificationsControllerList200ResponseBuilder> {
   @BuiltValueField(wireName: r'data')
   BuiltList<NotificationDto> get data;
 
@@ -97,23 +97,19 @@ class _$NotificationsControllerList200ResponseSerializer
       final value = serializedList[i + 1];
       switch (key) {
         case r'data':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(BuiltList, [
-                      FullType(NotificationDto),
-                    ]),
-                  )
-                  as BuiltList<NotificationDto>;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(BuiltList, [
+              FullType(NotificationDto),
+            ]),
+          ) as BuiltList<NotificationDto>;
           result.data.replace(valueDes);
           break;
         case r'meta':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(PaginationMetaDto),
-                  )
-                  as PaginationMetaDto;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(PaginationMetaDto),
+          ) as PaginationMetaDto;
           result.meta.replace(valueDes);
           break;
         default:

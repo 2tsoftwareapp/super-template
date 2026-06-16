@@ -30,15 +30,22 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         '/forgot-password',
       }.contains(location);
 
-      if (isLoading && location != '/splash') {
-        return '/splash';
+      // While loading, stay on or redirect to splash
+      if (isLoading) {
+        return location == '/splash' ? null : '/splash';
       }
-      if (!isAuthed && !isPublic) {
-        return '/login';
+
+      // Loading complete — unauthenticated
+      if (!isAuthed) {
+        // Allow login/register/forgot-password to render; splash → login
+        return (isPublic && location != '/splash') ? null : '/login';
       }
-      if (isAuthed && isPublic) {
+
+      // Loading complete — authenticated on any public page
+      if (isPublic) {
         return '/home';
       }
+
       return null;
     },
     routes: [

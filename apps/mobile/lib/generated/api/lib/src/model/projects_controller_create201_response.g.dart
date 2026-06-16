@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// @dart=3.0
+
 part of 'projects_controller_create201_response.dart';
 
 // **************************************************************************
@@ -13,19 +15,18 @@ class _$ProjectsControllerCreate201Response
   @override
   final RequestMetaDto meta;
 
-  factory _$ProjectsControllerCreate201Response([
-    void Function(ProjectsControllerCreate201ResponseBuilder)? updates,
-  ]) =>
+  factory _$ProjectsControllerCreate201Response(
+          [void Function(ProjectsControllerCreate201ResponseBuilder)?
+              updates]) =>
       (ProjectsControllerCreate201ResponseBuilder()..update(updates))._build();
 
-  _$ProjectsControllerCreate201Response._({
-    required this.data,
-    required this.meta,
-  }) : super._();
+  _$ProjectsControllerCreate201Response._(
+      {required this.data, required this.meta})
+      : super._();
   @override
   ProjectsControllerCreate201Response rebuild(
-    void Function(ProjectsControllerCreate201ResponseBuilder) updates,
-  ) => (toBuilder()..update(updates)).build();
+          void Function(ProjectsControllerCreate201ResponseBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
 
   @override
   ProjectsControllerCreate201ResponseBuilder toBuilder() =>
@@ -59,10 +60,8 @@ class _$ProjectsControllerCreate201Response
 
 class ProjectsControllerCreate201ResponseBuilder
     implements
-        Builder<
-          ProjectsControllerCreate201Response,
-          ProjectsControllerCreate201ResponseBuilder
-        > {
+        Builder<ProjectsControllerCreate201Response,
+            ProjectsControllerCreate201ResponseBuilder> {
   _$ProjectsControllerCreate201Response? _$v;
 
   ProjectDtoBuilder? _data;
@@ -94,8 +93,7 @@ class ProjectsControllerCreate201ResponseBuilder
 
   @override
   void update(
-    void Function(ProjectsControllerCreate201ResponseBuilder)? updates,
-  ) {
+      void Function(ProjectsControllerCreate201ResponseBuilder)? updates) {
     if (updates != null) updates(this);
   }
 
@@ -105,8 +103,7 @@ class ProjectsControllerCreate201ResponseBuilder
   _$ProjectsControllerCreate201Response _build() {
     _$ProjectsControllerCreate201Response _$result;
     try {
-      _$result =
-          _$v ??
+      _$result = _$v ??
           _$ProjectsControllerCreate201Response._(
             data: data.build(),
             meta: meta.build(),
@@ -119,11 +116,8 @@ class ProjectsControllerCreate201ResponseBuilder
         _$failedField = 'meta';
         meta.build();
       } catch (e) {
-        throw BuiltValueNestedFieldError(
-          r'ProjectsControllerCreate201Response',
-          _$failedField,
-          e.toString(),
-        );
+        throw BuiltValueNestedFieldError(r'ProjectsControllerCreate201Response',
+            _$failedField, e.toString());
       }
       rethrow;
     }

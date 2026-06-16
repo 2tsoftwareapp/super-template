@@ -6,6 +6,7 @@ import 'package:mobile_app/core/auth/token_bundle.dart';
 import 'package:mobile_app/core/auth/token_storage.dart';
 import 'package:mobile_app/core/errors/app_exception.dart';
 import 'package:mobile_app/features/auth/data/auth_repository.dart';
+import 'package:mobile_app/features/auth/presentation/auth_controller.dart';
 
 final authInterceptorProvider = Provider<AuthInterceptor>(
   (ref) => AuthInterceptor(ref),
@@ -15,6 +16,9 @@ class AuthInterceptor extends Interceptor {
   AuthInterceptor(this._ref);
 
   final Ref _ref;
+
+  /// Shared future for in-flight token refresh.
+  /// Concurrent 401s await the same future so refresh is called only once.
   Future<TokenBundle?>? _refreshFlight;
 
   @override
@@ -35,15 +39,13 @@ class AuthInterceptor extends Interceptor {
     ErrorInterceptorHandler handler,
   ) async {
     if (err.response?.statusCode != 401 ||
-        err.requestOptions.extra['retried'] == true ||
-        err.requestOptions.path.contains('/auth/refresh')) {
+        err.requestOptions.extra['retried'] == true) {
       handler.next(err);
       return;
     }
 
     try {
       final refreshed = await (_refreshFlight ??= _refresh());
-      _refreshFlight = null;
 
       if (refreshed == null) {
         handler.next(err);
@@ -57,13 +59,16 @@ class AuthInterceptor extends Interceptor {
       final response = await retryDio.fetch<dynamic>(request);
       handler.resolve(response);
     } on AppException {
-      _refreshFlight = null;
       await _ref.read(tokenStorageProvider).clear();
+      _ref.read(authControllerProvider.notifier).invalidate();
       handler.next(err);
+    } catch (_) {
+      handler.next(err);
+    } finally {
+      _refreshFlight = null;
     }
   }
 
-  Future<TokenBundle?> _refresh() async {
-    return _ref.read(authRepositoryProvider).refresh();
-  }
+  Future<TokenBundle?> _refresh() =>
+      _ref.read(authRepositoryProvider).refresh();
 }

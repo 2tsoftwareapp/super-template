@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// @dart=3.0
+
 part of 'resend_verification_dto.dart';
 
 // **************************************************************************
@@ -10,15 +12,15 @@ class _$ResendVerificationDto extends ResendVerificationDto {
   @override
   final String email;
 
-  factory _$ResendVerificationDto([
-    void Function(ResendVerificationDtoBuilder)? updates,
-  ]) => (ResendVerificationDtoBuilder()..update(updates))._build();
+  factory _$ResendVerificationDto(
+          [void Function(ResendVerificationDtoBuilder)? updates]) =>
+      (ResendVerificationDtoBuilder()..update(updates))._build();
 
   _$ResendVerificationDto._({required this.email}) : super._();
   @override
   ResendVerificationDto rebuild(
-    void Function(ResendVerificationDtoBuilder) updates,
-  ) => (toBuilder()..update(updates)).build();
+          void Function(ResendVerificationDtoBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
 
   @override
   ResendVerificationDtoBuilder toBuilder() =>
@@ -40,9 +42,9 @@ class _$ResendVerificationDto extends ResendVerificationDto {
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper(
-      r'ResendVerificationDto',
-    )..add('email', email)).toString();
+    return (newBuiltValueToStringHelper(r'ResendVerificationDto')
+          ..add('email', email))
+        .toString();
   }
 }
 
@@ -81,14 +83,10 @@ class ResendVerificationDtoBuilder
   ResendVerificationDto build() => _build();
 
   _$ResendVerificationDto _build() {
-    final _$result =
-        _$v ??
+    final _$result = _$v ??
         _$ResendVerificationDto._(
           email: BuiltValueNullFieldError.checkNotNull(
-            email,
-            r'ResendVerificationDto',
-            'email',
-          ),
+              email, r'ResendVerificationDto', 'email'),
         );
     replace(_$result);
     return _$result;

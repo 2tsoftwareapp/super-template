@@ -3,6 +3,8 @@
 //
 
 // ignore_for_file: unused_element
+// @dart=3.0
+
 import 'package:built_collection/built_collection.dart';
 import 'package:super_template_api/src/model/user_dto.dart';
 import 'package:super_template_api/src/model/auth_session_dto.dart';
@@ -116,50 +118,40 @@ class _$AuthResponseDtoSerializer
       final value = serializedList[i + 1];
       switch (key) {
         case r'accessToken':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(String),
-                  )
-                  as String;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
           result.accessToken = valueDes;
           break;
         case r'refreshToken':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(String),
-                  )
-                  as String;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
           result.refreshToken = valueDes;
           break;
         case r'user':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(UserDto),
-                  )
-                  as UserDto;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(UserDto),
+          ) as UserDto;
           result.user.replace(valueDes);
           break;
         case r'permissions':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(BuiltList, [
-                      FullType(String),
-                    ]),
-                  )
-                  as BuiltList<String>;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(BuiltList, [
+              FullType(String),
+            ]),
+          ) as BuiltList<String>;
           result.permissions.replace(valueDes);
           break;
         case r'session':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(AuthSessionDto),
-                  )
-                  as AuthSessionDto;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(AuthSessionDto),
+          ) as AuthSessionDto;
           result.session.replace(valueDes);
           break;
         default:

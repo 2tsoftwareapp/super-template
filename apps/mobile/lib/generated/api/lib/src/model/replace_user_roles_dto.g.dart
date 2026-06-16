@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// @dart=3.0
+
 part of 'replace_user_roles_dto.dart';
 
 // **************************************************************************
@@ -10,15 +12,15 @@ class _$ReplaceUserRolesDto extends ReplaceUserRolesDto {
   @override
   final BuiltList<String> roleIds;
 
-  factory _$ReplaceUserRolesDto([
-    void Function(ReplaceUserRolesDtoBuilder)? updates,
-  ]) => (ReplaceUserRolesDtoBuilder()..update(updates))._build();
+  factory _$ReplaceUserRolesDto(
+          [void Function(ReplaceUserRolesDtoBuilder)? updates]) =>
+      (ReplaceUserRolesDtoBuilder()..update(updates))._build();
 
   _$ReplaceUserRolesDto._({required this.roleIds}) : super._();
   @override
   ReplaceUserRolesDto rebuild(
-    void Function(ReplaceUserRolesDtoBuilder) updates,
-  ) => (toBuilder()..update(updates)).build();
+          void Function(ReplaceUserRolesDtoBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
 
   @override
   ReplaceUserRolesDtoBuilder toBuilder() =>
@@ -40,9 +42,9 @@ class _$ReplaceUserRolesDto extends ReplaceUserRolesDto {
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper(
-      r'ReplaceUserRolesDto',
-    )..add('roleIds', roleIds)).toString();
+    return (newBuiltValueToStringHelper(r'ReplaceUserRolesDto')
+          ..add('roleIds', roleIds))
+        .toString();
   }
 }
 
@@ -83,7 +85,10 @@ class ReplaceUserRolesDtoBuilder
   _$ReplaceUserRolesDto _build() {
     _$ReplaceUserRolesDto _$result;
     try {
-      _$result = _$v ?? _$ReplaceUserRolesDto._(roleIds: roleIds.build());
+      _$result = _$v ??
+          _$ReplaceUserRolesDto._(
+            roleIds: roleIds.build(),
+          );
     } catch (_) {
       late String _$failedField;
       try {
@@ -91,10 +96,7 @@ class ReplaceUserRolesDtoBuilder
         roleIds.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-          r'ReplaceUserRolesDto',
-          _$failedField,
-          e.toString(),
-        );
+            r'ReplaceUserRolesDto', _$failedField, e.toString());
       }
       rethrow;
     }

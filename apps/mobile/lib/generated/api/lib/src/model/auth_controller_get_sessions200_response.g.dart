@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// @dart=3.0
+
 part of 'auth_controller_get_sessions200_response.dart';
 
 // **************************************************************************
@@ -13,19 +15,18 @@ class _$AuthControllerGetSessions200Response
   @override
   final RequestMetaDto meta;
 
-  factory _$AuthControllerGetSessions200Response([
-    void Function(AuthControllerGetSessions200ResponseBuilder)? updates,
-  ]) =>
+  factory _$AuthControllerGetSessions200Response(
+          [void Function(AuthControllerGetSessions200ResponseBuilder)?
+              updates]) =>
       (AuthControllerGetSessions200ResponseBuilder()..update(updates))._build();
 
-  _$AuthControllerGetSessions200Response._({
-    required this.data,
-    required this.meta,
-  }) : super._();
+  _$AuthControllerGetSessions200Response._(
+      {required this.data, required this.meta})
+      : super._();
   @override
   AuthControllerGetSessions200Response rebuild(
-    void Function(AuthControllerGetSessions200ResponseBuilder) updates,
-  ) => (toBuilder()..update(updates)).build();
+          void Function(AuthControllerGetSessions200ResponseBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
 
   @override
   AuthControllerGetSessions200ResponseBuilder toBuilder() =>
@@ -59,10 +60,8 @@ class _$AuthControllerGetSessions200Response
 
 class AuthControllerGetSessions200ResponseBuilder
     implements
-        Builder<
-          AuthControllerGetSessions200Response,
-          AuthControllerGetSessions200ResponseBuilder
-        > {
+        Builder<AuthControllerGetSessions200Response,
+            AuthControllerGetSessions200ResponseBuilder> {
   _$AuthControllerGetSessions200Response? _$v;
 
   ListBuilder<AuthSessionDto>? _data;
@@ -95,8 +94,7 @@ class AuthControllerGetSessions200ResponseBuilder
 
   @override
   void update(
-    void Function(AuthControllerGetSessions200ResponseBuilder)? updates,
-  ) {
+      void Function(AuthControllerGetSessions200ResponseBuilder)? updates) {
     if (updates != null) updates(this);
   }
 
@@ -106,8 +104,7 @@ class AuthControllerGetSessions200ResponseBuilder
   _$AuthControllerGetSessions200Response _build() {
     _$AuthControllerGetSessions200Response _$result;
     try {
-      _$result =
-          _$v ??
+      _$result = _$v ??
           _$AuthControllerGetSessions200Response._(
             data: data.build(),
             meta: meta.build(),
@@ -121,10 +118,9 @@ class AuthControllerGetSessions200ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-          r'AuthControllerGetSessions200Response',
-          _$failedField,
-          e.toString(),
-        );
+            r'AuthControllerGetSessions200Response',
+            _$failedField,
+            e.toString());
       }
       rethrow;
     }

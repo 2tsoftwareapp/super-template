@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// @dart=3.0
+
 part of 'update_user_status_dto.dart';
 
 // **************************************************************************
@@ -14,8 +16,7 @@ const UpdateUserStatusDtoStatusEnum _$updateUserStatusDtoStatusEnum_BLOCKED =
     const UpdateUserStatusDtoStatusEnum._('BLOCKED');
 
 UpdateUserStatusDtoStatusEnum _$updateUserStatusDtoStatusEnumValueOf(
-  String name,
-) {
+    String name) {
   switch (name) {
     case 'PENDING':
       return _$updateUserStatusDtoStatusEnum_PENDING;
@@ -29,16 +30,15 @@ UpdateUserStatusDtoStatusEnum _$updateUserStatusDtoStatusEnumValueOf(
 }
 
 final BuiltSet<UpdateUserStatusDtoStatusEnum>
-_$updateUserStatusDtoStatusEnumValues = BuiltSet<UpdateUserStatusDtoStatusEnum>(
-  const <UpdateUserStatusDtoStatusEnum>[
-    _$updateUserStatusDtoStatusEnum_PENDING,
-    _$updateUserStatusDtoStatusEnum_ACTIVE,
-    _$updateUserStatusDtoStatusEnum_BLOCKED,
-  ],
-);
+    _$updateUserStatusDtoStatusEnumValues = BuiltSet<
+        UpdateUserStatusDtoStatusEnum>(const <UpdateUserStatusDtoStatusEnum>[
+  _$updateUserStatusDtoStatusEnum_PENDING,
+  _$updateUserStatusDtoStatusEnum_ACTIVE,
+  _$updateUserStatusDtoStatusEnum_BLOCKED,
+]);
 
 Serializer<UpdateUserStatusDtoStatusEnum>
-_$updateUserStatusDtoStatusEnumSerializer =
+    _$updateUserStatusDtoStatusEnumSerializer =
     _$UpdateUserStatusDtoStatusEnumSerializer();
 
 class _$UpdateUserStatusDtoStatusEnumSerializer
@@ -61,34 +61,31 @@ class _$UpdateUserStatusDtoStatusEnumSerializer
 
   @override
   Object serialize(
-    Serializers serializers,
-    UpdateUserStatusDtoStatusEnum object, {
-    FullType specifiedType = FullType.unspecified,
-  }) => _toWire[object.name] ?? object.name;
+          Serializers serializers, UpdateUserStatusDtoStatusEnum object,
+          {FullType specifiedType = FullType.unspecified}) =>
+      _toWire[object.name] ?? object.name;
 
   @override
   UpdateUserStatusDtoStatusEnum deserialize(
-    Serializers serializers,
-    Object serialized, {
-    FullType specifiedType = FullType.unspecified,
-  }) => UpdateUserStatusDtoStatusEnum.valueOf(
-    _fromWire[serialized] ?? (serialized is String ? serialized : ''),
-  );
+          Serializers serializers, Object serialized,
+          {FullType specifiedType = FullType.unspecified}) =>
+      UpdateUserStatusDtoStatusEnum.valueOf(
+          _fromWire[serialized] ?? (serialized is String ? serialized : ''));
 }
 
 class _$UpdateUserStatusDto extends UpdateUserStatusDto {
   @override
   final UpdateUserStatusDtoStatusEnum status;
 
-  factory _$UpdateUserStatusDto([
-    void Function(UpdateUserStatusDtoBuilder)? updates,
-  ]) => (UpdateUserStatusDtoBuilder()..update(updates))._build();
+  factory _$UpdateUserStatusDto(
+          [void Function(UpdateUserStatusDtoBuilder)? updates]) =>
+      (UpdateUserStatusDtoBuilder()..update(updates))._build();
 
   _$UpdateUserStatusDto._({required this.status}) : super._();
   @override
   UpdateUserStatusDto rebuild(
-    void Function(UpdateUserStatusDtoBuilder) updates,
-  ) => (toBuilder()..update(updates)).build();
+          void Function(UpdateUserStatusDtoBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
 
   @override
   UpdateUserStatusDtoBuilder toBuilder() =>
@@ -110,9 +107,9 @@ class _$UpdateUserStatusDto extends UpdateUserStatusDto {
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper(
-      r'UpdateUserStatusDto',
-    )..add('status', status)).toString();
+    return (newBuiltValueToStringHelper(r'UpdateUserStatusDto')
+          ..add('status', status))
+        .toString();
   }
 }
 
@@ -151,14 +148,10 @@ class UpdateUserStatusDtoBuilder
   UpdateUserStatusDto build() => _build();
 
   _$UpdateUserStatusDto _build() {
-    final _$result =
-        _$v ??
+    final _$result = _$v ??
         _$UpdateUserStatusDto._(
           status: BuiltValueNullFieldError.checkNotNull(
-            status,
-            r'UpdateUserStatusDto',
-            'status',
-          ),
+              status, r'UpdateUserStatusDto', 'status'),
         );
     replace(_$result);
     return _$result;

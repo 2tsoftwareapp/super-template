@@ -36,6 +36,12 @@ class AuthController extends AsyncNotifier<AuthSession?> {
     return ref.read(authRepositoryProvider).forgotPassword(email);
   }
 
+  /// Clears auth state without making a network call.
+  /// Called by AuthInterceptor when token refresh fails.
+  void invalidate() {
+    state = const AsyncData(null);
+  }
+
   Future<void> logout() async {
     await ref.read(authRepositoryProvider).logout();
     state = const AsyncData(null);

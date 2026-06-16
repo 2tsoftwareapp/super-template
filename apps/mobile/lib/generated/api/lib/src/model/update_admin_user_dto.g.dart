@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// @dart=3.0
+
 part of 'update_admin_user_dto.dart';
 
 // **************************************************************************
@@ -14,8 +16,7 @@ const UpdateAdminUserDtoStatusEnum _$updateAdminUserDtoStatusEnum_BLOCKED =
     const UpdateAdminUserDtoStatusEnum._('BLOCKED');
 
 UpdateAdminUserDtoStatusEnum _$updateAdminUserDtoStatusEnumValueOf(
-  String name,
-) {
+    String name) {
   switch (name) {
     case 'PENDING':
       return _$updateAdminUserDtoStatusEnum_PENDING;
@@ -29,15 +30,15 @@ UpdateAdminUserDtoStatusEnum _$updateAdminUserDtoStatusEnumValueOf(
 }
 
 final BuiltSet<UpdateAdminUserDtoStatusEnum>
-_$updateAdminUserDtoStatusEnumValues =
+    _$updateAdminUserDtoStatusEnumValues =
     BuiltSet<UpdateAdminUserDtoStatusEnum>(const <UpdateAdminUserDtoStatusEnum>[
-      _$updateAdminUserDtoStatusEnum_PENDING,
-      _$updateAdminUserDtoStatusEnum_ACTIVE,
-      _$updateAdminUserDtoStatusEnum_BLOCKED,
-    ]);
+  _$updateAdminUserDtoStatusEnum_PENDING,
+  _$updateAdminUserDtoStatusEnum_ACTIVE,
+  _$updateAdminUserDtoStatusEnum_BLOCKED,
+]);
 
 Serializer<UpdateAdminUserDtoStatusEnum>
-_$updateAdminUserDtoStatusEnumSerializer =
+    _$updateAdminUserDtoStatusEnumSerializer =
     _$UpdateAdminUserDtoStatusEnumSerializer();
 
 class _$UpdateAdminUserDtoStatusEnumSerializer
@@ -59,20 +60,16 @@ class _$UpdateAdminUserDtoStatusEnumSerializer
   final String wireName = 'UpdateAdminUserDtoStatusEnum';
 
   @override
-  Object serialize(
-    Serializers serializers,
-    UpdateAdminUserDtoStatusEnum object, {
-    FullType specifiedType = FullType.unspecified,
-  }) => _toWire[object.name] ?? object.name;
+  Object serialize(Serializers serializers, UpdateAdminUserDtoStatusEnum object,
+          {FullType specifiedType = FullType.unspecified}) =>
+      _toWire[object.name] ?? object.name;
 
   @override
   UpdateAdminUserDtoStatusEnum deserialize(
-    Serializers serializers,
-    Object serialized, {
-    FullType specifiedType = FullType.unspecified,
-  }) => UpdateAdminUserDtoStatusEnum.valueOf(
-    _fromWire[serialized] ?? (serialized is String ? serialized : ''),
-  );
+          Serializers serializers, Object serialized,
+          {FullType specifiedType = FullType.unspecified}) =>
+      UpdateAdminUserDtoStatusEnum.valueOf(
+          _fromWire[serialized] ?? (serialized is String ? serialized : ''));
 }
 
 class _$UpdateAdminUserDto extends UpdateAdminUserDto {
@@ -89,22 +86,22 @@ class _$UpdateAdminUserDto extends UpdateAdminUserDto {
   @override
   final BuiltList<String>? roleIds;
 
-  factory _$UpdateAdminUserDto([
-    void Function(UpdateAdminUserDtoBuilder)? updates,
-  ]) => (UpdateAdminUserDtoBuilder()..update(updates))._build();
+  factory _$UpdateAdminUserDto(
+          [void Function(UpdateAdminUserDtoBuilder)? updates]) =>
+      (UpdateAdminUserDtoBuilder()..update(updates))._build();
 
-  _$UpdateAdminUserDto._({
-    this.email,
-    this.password,
-    this.displayName,
-    this.avatarUrl,
-    this.status,
-    this.roleIds,
-  }) : super._();
+  _$UpdateAdminUserDto._(
+      {this.email,
+      this.password,
+      this.displayName,
+      this.avatarUrl,
+      this.status,
+      this.roleIds})
+      : super._();
   @override
   UpdateAdminUserDto rebuild(
-    void Function(UpdateAdminUserDtoBuilder) updates,
-  ) => (toBuilder()..update(updates)).build();
+          void Function(UpdateAdminUserDtoBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
 
   @override
   UpdateAdminUserDtoBuilder toBuilder() =>
@@ -210,8 +207,7 @@ class UpdateAdminUserDtoBuilder
   _$UpdateAdminUserDto _build() {
     _$UpdateAdminUserDto _$result;
     try {
-      _$result =
-          _$v ??
+      _$result = _$v ??
           _$UpdateAdminUserDto._(
             email: email,
             password: password,
@@ -227,10 +223,7 @@ class UpdateAdminUserDtoBuilder
         _roleIds?.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-          r'UpdateAdminUserDto',
-          _$failedField,
-          e.toString(),
-        );
+            r'UpdateAdminUserDto', _$failedField, e.toString());
       }
       rethrow;
     }

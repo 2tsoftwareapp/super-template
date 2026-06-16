@@ -3,6 +3,8 @@
 //
 
 // ignore_for_file: unused_element
+// @dart=3.0
+
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
@@ -113,36 +115,30 @@ class _$PaginationMetaDtoSerializer
       final value = serializedList[i + 1];
       switch (key) {
         case r'requestId':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(String),
-                  )
-                  as String;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
           result.requestId = valueDes;
           break;
         case r'page':
-          final valueDes =
-              serializers.deserialize(value, specifiedType: const FullType(num))
-                  as num;
+          final valueDes = serializers.deserialize(value,
+              specifiedType: const FullType(num)) as num;
           result.page = valueDes;
           break;
         case r'limit':
-          final valueDes =
-              serializers.deserialize(value, specifiedType: const FullType(num))
-                  as num;
+          final valueDes = serializers.deserialize(value,
+              specifiedType: const FullType(num)) as num;
           result.limit = valueDes;
           break;
         case r'total':
-          final valueDes =
-              serializers.deserialize(value, specifiedType: const FullType(num))
-                  as num;
+          final valueDes = serializers.deserialize(value,
+              specifiedType: const FullType(num)) as num;
           result.total = valueDes;
           break;
         case r'totalPages':
-          final valueDes =
-              serializers.deserialize(value, specifiedType: const FullType(num))
-                  as num;
+          final valueDes = serializers.deserialize(value,
+              specifiedType: const FullType(num)) as num;
           result.totalPages = valueDes;
           break;
         default:

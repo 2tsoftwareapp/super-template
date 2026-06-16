@@ -15,8 +15,7 @@ loadEnv({ path: resolve(process.cwd(), '.env'), quiet: true });
 
 process.env.APP_ENV = 'test';
 
-const resolveTestDatabaseUrl = () =>
-  process.env.DATABASE_URL_TEST ?? process.env.DATABASE_URL;
+const resolveTestDatabaseUrl = () => process.env.DATABASE_URL_TEST;
 
 const resolveMigrationsFolder = () => {
   const candidates = [
@@ -90,7 +89,10 @@ export const resetTestDatabase = async (): Promise<void> => {
   const databaseUrl = resolveTestDatabaseUrl();
 
   if (!databaseUrl) {
-    throw new Error('DATABASE_URL_TEST or DATABASE_URL is required for tests');
+    throw new Error(
+      'DATABASE_URL_TEST is required for tests. ' +
+        'Set it to a dedicated test database to avoid wiping the development database.',
+    );
   }
 
   await ensureTestDatabaseExists(databaseUrl);

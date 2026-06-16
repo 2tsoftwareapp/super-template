@@ -1,20 +1,19 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// @dart=3.0
+
 part of 'user_dto.dart';
 
 // **************************************************************************
 // BuiltValueGenerator
 // **************************************************************************
 
-const UserDtoStatusEnum _$userDtoStatusEnum_PENDING = const UserDtoStatusEnum._(
-  'PENDING',
-);
-const UserDtoStatusEnum _$userDtoStatusEnum_ACTIVE = const UserDtoStatusEnum._(
-  'ACTIVE',
-);
-const UserDtoStatusEnum _$userDtoStatusEnum_BLOCKED = const UserDtoStatusEnum._(
-  'BLOCKED',
-);
+const UserDtoStatusEnum _$userDtoStatusEnum_PENDING =
+    const UserDtoStatusEnum._('PENDING');
+const UserDtoStatusEnum _$userDtoStatusEnum_ACTIVE =
+    const UserDtoStatusEnum._('ACTIVE');
+const UserDtoStatusEnum _$userDtoStatusEnum_BLOCKED =
+    const UserDtoStatusEnum._('BLOCKED');
 
 UserDtoStatusEnum _$userDtoStatusEnumValueOf(String name) {
   switch (name) {
@@ -31,10 +30,10 @@ UserDtoStatusEnum _$userDtoStatusEnumValueOf(String name) {
 
 final BuiltSet<UserDtoStatusEnum> _$userDtoStatusEnumValues =
     BuiltSet<UserDtoStatusEnum>(const <UserDtoStatusEnum>[
-      _$userDtoStatusEnum_PENDING,
-      _$userDtoStatusEnum_ACTIVE,
-      _$userDtoStatusEnum_BLOCKED,
-    ]);
+  _$userDtoStatusEnum_PENDING,
+  _$userDtoStatusEnum_ACTIVE,
+  _$userDtoStatusEnum_BLOCKED,
+]);
 
 Serializer<UserDtoStatusEnum> _$userDtoStatusEnumSerializer =
     _$UserDtoStatusEnumSerializer();
@@ -58,20 +57,15 @@ class _$UserDtoStatusEnumSerializer
   final String wireName = 'UserDtoStatusEnum';
 
   @override
-  Object serialize(
-    Serializers serializers,
-    UserDtoStatusEnum object, {
-    FullType specifiedType = FullType.unspecified,
-  }) => _toWire[object.name] ?? object.name;
+  Object serialize(Serializers serializers, UserDtoStatusEnum object,
+          {FullType specifiedType = FullType.unspecified}) =>
+      _toWire[object.name] ?? object.name;
 
   @override
-  UserDtoStatusEnum deserialize(
-    Serializers serializers,
-    Object serialized, {
-    FullType specifiedType = FullType.unspecified,
-  }) => UserDtoStatusEnum.valueOf(
-    _fromWire[serialized] ?? (serialized is String ? serialized : ''),
-  );
+  UserDtoStatusEnum deserialize(Serializers serializers, Object serialized,
+          {FullType specifiedType = FullType.unspecified}) =>
+      UserDtoStatusEnum.valueOf(
+          _fromWire[serialized] ?? (serialized is String ? serialized : ''));
 }
 
 class _$UserDto extends UserDto {
@@ -97,17 +91,17 @@ class _$UserDto extends UserDto {
   factory _$UserDto([void Function(UserDtoBuilder)? updates]) =>
       (UserDtoBuilder()..update(updates))._build();
 
-  _$UserDto._({
-    required this.id,
-    required this.email,
-    required this.displayName,
-    this.avatarUrl,
-    required this.status,
-    this.emailVerifiedAt,
-    required this.roles,
-    required this.createdAt,
-    required this.updatedAt,
-  }) : super._();
+  _$UserDto._(
+      {required this.id,
+      required this.email,
+      required this.displayName,
+      this.avatarUrl,
+      required this.status,
+      this.emailVerifiedAt,
+      required this.roles,
+      required this.createdAt,
+      required this.updatedAt})
+      : super._();
   @override
   UserDto rebuild(void Function(UserDtoBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -239,38 +233,22 @@ class UserDtoBuilder implements Builder<UserDto, UserDtoBuilder> {
   _$UserDto _build() {
     _$UserDto _$result;
     try {
-      _$result =
-          _$v ??
+      _$result = _$v ??
           _$UserDto._(
             id: BuiltValueNullFieldError.checkNotNull(id, r'UserDto', 'id'),
             email: BuiltValueNullFieldError.checkNotNull(
-              email,
-              r'UserDto',
-              'email',
-            ),
+                email, r'UserDto', 'email'),
             displayName: BuiltValueNullFieldError.checkNotNull(
-              displayName,
-              r'UserDto',
-              'displayName',
-            ),
+                displayName, r'UserDto', 'displayName'),
             avatarUrl: avatarUrl,
             status: BuiltValueNullFieldError.checkNotNull(
-              status,
-              r'UserDto',
-              'status',
-            ),
+                status, r'UserDto', 'status'),
             emailVerifiedAt: emailVerifiedAt,
             roles: roles.build(),
             createdAt: BuiltValueNullFieldError.checkNotNull(
-              createdAt,
-              r'UserDto',
-              'createdAt',
-            ),
+                createdAt, r'UserDto', 'createdAt'),
             updatedAt: BuiltValueNullFieldError.checkNotNull(
-              updatedAt,
-              r'UserDto',
-              'updatedAt',
-            ),
+                updatedAt, r'UserDto', 'updatedAt'),
           );
     } catch (_) {
       late String _$failedField;
@@ -279,10 +257,7 @@ class UserDtoBuilder implements Builder<UserDto, UserDtoBuilder> {
         roles.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-          r'UserDto',
-          _$failedField,
-          e.toString(),
-        );
+            r'UserDto', _$failedField, e.toString());
       }
       rethrow;
     }

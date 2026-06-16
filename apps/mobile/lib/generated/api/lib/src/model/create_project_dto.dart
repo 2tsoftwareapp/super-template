@@ -3,6 +3,8 @@
 //
 
 // ignore_for_file: unused_element
+// @dart=3.0
+
 import 'package:built_collection/built_collection.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
@@ -112,39 +114,31 @@ class _$CreateProjectDtoSerializer
       final value = serializedList[i + 1];
       switch (key) {
         case r'name':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(String),
-                  )
-                  as String;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
           result.name = valueDes;
           break;
         case r'description':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(String),
-                  )
-                  as String;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
           result.description = valueDes;
           break;
         case r'status':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(CreateProjectDtoStatusEnum),
-                  )
-                  as CreateProjectDtoStatusEnum;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(CreateProjectDtoStatusEnum),
+          ) as CreateProjectDtoStatusEnum;
           result.status = valueDes;
           break;
         case r'ownerId':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(String),
-                  )
-                  as String;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
           result.ownerId = valueDes;
           break;
         default:

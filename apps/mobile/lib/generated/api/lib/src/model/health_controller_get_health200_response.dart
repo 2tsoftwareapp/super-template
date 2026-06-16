@@ -3,6 +3,8 @@
 //
 
 // ignore_for_file: unused_element
+// @dart=3.0
+
 import 'package:super_template_api/src/model/request_meta_dto.dart';
 import 'package:super_template_api/src/model/health_status_dto.dart';
 import 'package:built_value/built_value.dart';
@@ -18,10 +20,8 @@ part 'health_controller_get_health200_response.g.dart';
 @BuiltValue()
 abstract class HealthControllerGetHealth200Response
     implements
-        Built<
-          HealthControllerGetHealth200Response,
-          HealthControllerGetHealth200ResponseBuilder
-        > {
+        Built<HealthControllerGetHealth200Response,
+            HealthControllerGetHealth200ResponseBuilder> {
   @BuiltValueField(wireName: r'data')
   HealthStatusDto get data;
 
@@ -96,21 +96,17 @@ class _$HealthControllerGetHealth200ResponseSerializer
       final value = serializedList[i + 1];
       switch (key) {
         case r'data':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(HealthStatusDto),
-                  )
-                  as HealthStatusDto;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(HealthStatusDto),
+          ) as HealthStatusDto;
           result.data.replace(valueDes);
           break;
         case r'meta':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(RequestMetaDto),
-                  )
-                  as RequestMetaDto;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(RequestMetaDto),
+          ) as RequestMetaDto;
           result.meta.replace(valueDes);
           break;
         default:

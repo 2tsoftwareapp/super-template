@@ -3,6 +3,8 @@
 //
 
 // ignore_for_file: unused_element
+// @dart=3.0
+
 import 'package:built_value/json_object.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
@@ -91,21 +93,17 @@ class _$UpdateProfileDtoSerializer
       final value = serializedList[i + 1];
       switch (key) {
         case r'displayName':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(String),
-                  )
-                  as String;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
           result.displayName = valueDes;
           break;
         case r'avatarUrl':
-          final valueDes =
-              serializers.deserialize(
-                    value,
-                    specifiedType: const FullType(JsonObject),
-                  )
-                  as JsonObject;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(JsonObject),
+          ) as JsonObject;
           result.avatarUrl = valueDes;
           break;
         default:
