@@ -1,12 +1,12 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { ERROR_CODES } from '@repo/api-core/common/constants/error-codes';
-import { AppError } from '@repo/api-core/common/errors/app-error';
+import { ERROR_CODES } from '@repo/api-core';
+import { AppError } from '@repo/api-core';
 import type {
   AuthenticatedRequestUser,
   RequestContext,
-} from '@repo/api-core/common/types/request-context';
+} from '@repo/api-core';
 import { PERMISSION_NAMES } from '@repo/api-identity/modules/access-control/access-control.constants';
-import { requireOrganizationId } from '@repo/api-core/common/utils/require-organization';
+import { requireOrganizationId } from '@repo/api-core';
 import { AuditService } from '@repo/api-platform/modules/audit/application/audit.service';
 import { CommentsRepository } from '../infrastructure/comments.repository';
 import type {

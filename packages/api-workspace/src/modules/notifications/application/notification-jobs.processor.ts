@@ -3,7 +3,7 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import {
   APP_LOGGER,
   type AppLogger,
-} from '@repo/api-core/common/logging/logger.interface';
+} from '@repo/api-core';
 import { NotificationsService } from '../application/notifications.service';
 
 @Injectable()

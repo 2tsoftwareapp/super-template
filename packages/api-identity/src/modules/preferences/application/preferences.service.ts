@@ -1,7 +1,7 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { ERROR_CODES } from '@repo/api-core/common/constants/error-codes';
-import { AppError } from '@repo/api-core/common/errors/app-error';
-import type { RequestContext } from '@repo/api-core/common/types/request-context';
+import { ERROR_CODES } from '@repo/api-core';
+import { AppError } from '@repo/api-core';
+import type { RequestContext } from '@repo/api-core';
 import { AuditService } from '@repo/api-platform/modules/audit/application/audit.service';
 import { PreferencesRepository } from '../infrastructure/preferences.repository';
 import type { UpdatePreferencesDto } from '../presentation/preferences.dto';

@@ -1,11 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { and, count, desc, eq, isNull } from 'drizzle-orm';
-import { DATABASE } from '@repo/api-database/database.provider';
+import { DATABASE } from '@repo/api-database';
 import type {
   DatabaseClient,
   DatabaseExecutor,
-} from '@repo/api-database/database.types';
-import { comments } from '@repo/api-database/schema';
+} from '@repo/api-database';
+import { comments } from '@repo/api-database';
 
 type ListCommentsParams = {
   page: number;

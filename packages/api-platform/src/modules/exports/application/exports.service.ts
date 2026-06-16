@@ -1,12 +1,12 @@
 import { randomUUID } from 'node:crypto';
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { ERROR_CODES } from '@repo/api-core/common/constants/error-codes';
-import { AppError } from '@repo/api-core/common/errors/app-error';
+import { ERROR_CODES } from '@repo/api-core';
+import { AppError } from '@repo/api-core';
 import type {
   AuthenticatedRequestUser,
   RequestContext,
-} from '@repo/api-core/common/types/request-context';
-import { requireOrganizationId } from '@repo/api-core/common/utils/require-organization';
+} from '@repo/api-core';
+import { requireOrganizationId } from '@repo/api-core';
 import { AuditService } from '../../audit/application/audit.service';
 import { FilesRepository } from '../../files/infrastructure/files.repository';
 import { ProjectsRepository } from '@repo/api-workspace/modules/projects/infrastructure/projects.repository';
@@ -130,20 +130,25 @@ export class ExportsService {
       mimeType: 'text/csv',
     });
 
-    const file = await this.filesRepository.create({
-      organizationId,
-      storageKey,
-      originalName: `projects-export-${Date.now()}.csv`,
-      mimeType: 'text/csv',
-      sizeBytes: body.length,
-      uploadedById: actor.userId,
-    });
+    try {
+      const file = await this.filesRepository.create({
+        organizationId,
+        storageKey,
+        originalName: `projects-export-${Date.now()}.csv`,
+        mimeType: 'text/csv',
+        sizeBytes: body.length,
+        uploadedById: actor.userId,
+      });
 
-    if (!file) {
-      throw new Error('Export file insert returned no rows');
+      if (!file) {
+        throw new Error('Export file insert returned no rows');
+      }
+
+      return file.id;
+    } catch (error) {
+      await this.objectStorage.delete(storageKey).catch(() => undefined);
+      throw error;
     }
-
-    return file.id;
   }
 
   private escapeCsv(value: string) {

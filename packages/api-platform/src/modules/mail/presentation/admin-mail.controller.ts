@@ -3,8 +3,8 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import {
   ApiDataResponse,
   ApiPaginatedResponse,
-} from '@repo/api-core/common/decorators/api-response.decorator';
-import { Permissions } from '@repo/api-core/common/decorators/permissions.decorator';
+} from '@repo/api-core';
+import { Permissions } from '@repo/api-core';
 import { PERMISSION_NAMES } from '@repo/api-identity/modules/access-control/access-control.constants';
 import { MailService } from '../application/mail.service';
 import {

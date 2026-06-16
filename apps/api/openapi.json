@@ -4312,7 +4312,8 @@
             "type": "string"
           },
           "actorId": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "action": {
             "type": "string"
@@ -4321,20 +4322,24 @@
             "type": "string"
           },
           "entityId": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "metadata": {
             "type": "object",
             "additionalProperties": true
           },
           "ipAddress": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "userAgent": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "requestId": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "createdAt": {
             "type": "string"
@@ -4379,6 +4384,12 @@
               "type": "string"
             }
           },
+          "roleIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
           "createdAt": {
             "type": "string"
           },
@@ -4392,6 +4403,7 @@
           "displayName",
           "status",
           "roles",
+          "roleIds",
           "createdAt",
           "updatedAt"
         ]
@@ -5028,7 +5040,8 @@
             "type": "object"
           },
           "createdById": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "createdAt": {
             "type": "string"
@@ -5151,7 +5164,8 @@
             "type": "string"
           },
           "actorId": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "audience": {
             "type": "string",
@@ -5162,7 +5176,8 @@
             ]
           },
           "targetUserId": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "userIds": {
             "type": "array",
@@ -5494,7 +5509,8 @@
             "type": "string"
           },
           "actorId": {
-            "type": "object"
+            "type": "string",
+            "nullable": true
           },
           "visibility": {
             "type": "string",

@@ -1,5 +1,5 @@
 import type { INestApplicationContext } from '@nestjs/common';
-import { EnvironmentService } from '@repo/api-core/config/environment.service';
+import { EnvironmentService } from '@repo/api-core';
 import { ROLE_NAMES } from '@repo/api-identity/modules/access-control/access-control.constants';
 import { AccessControlService } from '@repo/api-identity/modules/access-control/application/access-control.service';
 import { hashPassword } from '@repo/api-identity/modules/auth/application/auth.helpers';
@@ -83,11 +83,12 @@ export const seedDatabase = async (
         transaction,
       );
 
-      const organizationId = await organizationsService.ensurePersonalOrganization(
-        user.id,
-        user.displayName,
-        transaction,
-      );
+      const organizationId =
+        await organizationsService.ensurePersonalOrganization(
+          user.id,
+          user.displayName,
+          transaction,
+        );
 
       return { user, organizationId };
     };

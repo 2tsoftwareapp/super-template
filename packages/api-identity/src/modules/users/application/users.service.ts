@@ -1,15 +1,16 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { ERROR_CODES } from '@repo/api-core/common/constants/error-codes';
-import { AppError } from '@repo/api-core/common/errors/app-error';
+import { ERROR_CODES } from '@repo/api-core';
+import { AppError } from '@repo/api-core';
 import type {
   AuthenticatedRequestUser,
   RequestContext,
-} from '@repo/api-core/common/types/request-context';
-import { normalizeEmail } from '@repo/api-core/common/utils/normalize-email';
-import { DATABASE } from '@repo/api-database/database.provider';
-import type { DatabaseClient } from '@repo/api-database/database.types';
-import { runInTransaction } from '@repo/api-database/transaction';
+} from '@repo/api-core';
+import { normalizeEmail } from '@repo/api-core';
+import { DATABASE } from '@repo/api-database';
+import type { DatabaseClient, DatabaseExecutor } from '@repo/api-database';
+import { runInTransaction } from '@repo/api-database';
 import { AccessControlService } from '../../access-control/application/access-control.service';
+import { ROLE_NAMES } from '../../access-control/access-control.constants';
 import { AuditService } from '@repo/api-platform/modules/audit/application/audit.service';
 import {
   hashPassword,
@@ -38,20 +39,7 @@ export class UsersService {
   ) {}
 
   async getProfile(userId: string) {
-    const user = await this.usersRepository.findById(userId);
-
-    if (!user) {
-      throw new AppError(
-        ERROR_CODES.USER_NOT_FOUND,
-        'User not found',
-        HttpStatus.NOT_FOUND,
-      );
-    }
-
-    const accessProfile =
-      await this.accessControlService.getAccessProfile(userId);
-
-    return this.toUserDto(user, accessProfile.roles);
+    return this.getUserDetails(userId);
   }
 
   async updateProfile(
@@ -81,7 +69,7 @@ export class UsersService {
       }
     }
 
-    const updated = await this.usersRepository.update(userId, {
+    await this.usersRepository.update(userId, {
       displayName: input.displayName ?? user.displayName,
       avatarUrl:
         input.avatarUrl === undefined ? user.avatarUrl : input.avatarUrl,
@@ -99,9 +87,7 @@ export class UsersService {
       requestContext,
     });
 
-    const accessProfile =
-      await this.accessControlService.getAccessProfile(userId);
-    return this.toUserDto(updated ?? user, accessProfile.roles);
+    return this.getUserDetails(userId);
   }
 
   async changePassword(
@@ -168,32 +154,29 @@ export class UsersService {
     sortOrder: 'asc' | 'desc';
   }) {
     const result = await this.usersRepository.list(query);
-    const rolesByUserId = await this.accessControlService.getRoleNamesForUsers(
-      result.rows.map((row) => row.id),
-    );
+    const [rolesByUserId, roleIdsByUserId] = await Promise.all([
+      this.accessControlService.getRoleNamesForUsers(
+        result.rows.map((row) => row.id),
+      ),
+      this.accessControlService.getRoleIdsForUsers(
+        result.rows.map((row) => row.id),
+      ),
+    ]);
 
     return {
       rows: result.rows.map((row) =>
-        this.toUserDto(row, rolesByUserId.get(row.id) ?? []),
+        this.toUserDto(
+          row,
+          rolesByUserId.get(row.id) ?? [],
+          roleIdsByUserId.get(row.id) ?? [],
+        ),
       ),
       total: result.total,
     };
   }
 
   async getUserById(userId: string) {
-    const user = await this.usersRepository.findById(userId);
-
-    if (!user) {
-      throw new AppError(
-        ERROR_CODES.USER_NOT_FOUND,
-        'User not found',
-        HttpStatus.NOT_FOUND,
-      );
-    }
-
-    const accessProfile =
-      await this.accessControlService.getAccessProfile(userId);
-    return this.toUserDto(user, accessProfile.roles);
+    return this.getUserDetails(userId);
   }
 
   async createAdminUser(
@@ -220,16 +203,25 @@ export class UsersService {
         );
 
         const roleIds = input.roleIds ?? [];
-        const foundRoles =
-          await this.accessControlService.validateRoleIds(roleIds);
-        this.accessControlService.assertCanAssignRoles(
+        const foundRoles = await this.accessControlService.validateRoleIds(
+          roleIds,
+        );
+        const desiredRoleIds = foundRoles.length > 0 ? foundRoles : [];
+        const desiredRoles =
+          desiredRoleIds.length > 0
+            ? desiredRoleIds.map((role) => role.name)
+            : [ROLE_NAMES.USER];
+
+        this.accessControlService.assertCanAssignUserRoles(
           actor,
           [],
-          foundRoles.map((role) => role.name),
+          desiredRoles,
         );
         await this.accessControlService.replaceUserRoles(
           user.id,
-          roleIds,
+          desiredRoleIds.length > 0
+            ? desiredRoleIds.map((role) => role.id)
+            : [await this.resolveRoleIdByName(ROLE_NAMES.USER, transaction)],
           transaction,
         );
 
@@ -276,6 +268,13 @@ export class UsersService {
         HttpStatus.NOT_FOUND,
       );
     }
+
+    const targetProfile =
+      await this.accessControlService.getAccessProfile(userId);
+    this.accessControlService.assertCanManageUserAccount(
+      actor,
+      targetProfile.roles,
+    );
 
     if (input.email) {
       await this.usersRepository.assertEmailAvailable(
@@ -326,6 +325,21 @@ export class UsersService {
       );
     }
 
+    if (actor.userId === userId) {
+      throw new AppError(
+        ERROR_CODES.AUTH_FORBIDDEN,
+        'You cannot delete your own account',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    const targetProfile =
+      await this.accessControlService.getAccessProfile(userId);
+    this.accessControlService.assertCanManageUserAccount(
+      actor,
+      targetProfile.roles,
+    );
+
     await runInTransaction(this.database, async (transaction) => {
       await this.usersRepository.softDelete(userId, transaction);
       await this.authRepository.revokeAllSessionsForUser(userId, transaction);
@@ -357,6 +371,21 @@ export class UsersService {
         HttpStatus.NOT_FOUND,
       );
     }
+
+    if (actor.userId === userId) {
+      throw new AppError(
+        ERROR_CODES.AUTH_FORBIDDEN,
+        'You cannot change your own account status',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    const targetProfile =
+      await this.accessControlService.getAccessProfile(userId);
+    this.accessControlService.assertCanManageUserAccount(
+      actor,
+      targetProfile.roles,
+    );
 
     await runInTransaction(this.database, async (transaction) => {
       await this.usersRepository.update(
@@ -407,12 +436,20 @@ export class UsersService {
       );
     }
 
+    if (actor.userId === userId) {
+      throw new AppError(
+        ERROR_CODES.AUTH_FORBIDDEN,
+        'You cannot change your own roles',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
     const [currentAccess, desiredRoles] = await Promise.all([
       this.accessControlService.getAccessProfile(userId),
       this.accessControlService.validateRoleIds(roleIds),
     ]);
 
-    this.accessControlService.assertCanAssignRoles(
+    this.accessControlService.assertCanAssignUserRoles(
       actor,
       currentAccess.roles,
       desiredRoles.map((role) => role.name),
@@ -447,6 +484,7 @@ export class UsersService {
       ? Exclude<T, null>
       : never,
     roles: string[],
+    roleIds: string[],
   ) {
     return {
       id: user.id,
@@ -456,8 +494,48 @@ export class UsersService {
       status: user.status,
       emailVerifiedAt: user.emailVerifiedAt?.toISOString() ?? null,
       roles,
+      roleIds,
       createdAt: user.createdAt.toISOString(),
       updatedAt: user.updatedAt.toISOString(),
     };
+  }
+
+  private async getUserDetails(userId: string) {
+    const user = await this.usersRepository.findById(userId);
+
+    if (!user) {
+      throw new AppError(
+        ERROR_CODES.USER_NOT_FOUND,
+        'User not found',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const [accessProfile, roleIds] = await Promise.all([
+      this.accessControlService.getAccessProfile(userId),
+      this.accessControlService.getRoleIdsForUser(userId),
+    ]);
+
+    return this.toUserDto(user, accessProfile.roles, roleIds);
+  }
+
+  private async resolveRoleIdByName(
+    roleName: string,
+    executor?: DatabaseExecutor,
+  ) {
+    const role = await this.accessControlService.getRoleByName(
+      roleName,
+      executor,
+    );
+
+    if (!role) {
+      throw new AppError(
+        ERROR_CODES.INTERNAL_ERROR,
+        `Role ${roleName} is missing`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
+    return role.id;
   }
 }

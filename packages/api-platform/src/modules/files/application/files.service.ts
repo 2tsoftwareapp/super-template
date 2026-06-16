@@ -1,13 +1,13 @@
 import { randomUUID } from 'node:crypto';
 import { extname } from 'node:path';
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { ERROR_CODES } from '@repo/api-core/common/constants/error-codes';
-import { AppError } from '@repo/api-core/common/errors/app-error';
+import { ERROR_CODES } from '@repo/api-core';
+import { AppError } from '@repo/api-core';
 import type {
   AuthenticatedRequestUser,
   RequestContext,
-} from '@repo/api-core/common/types/request-context';
-import { requireOrganizationId } from '@repo/api-core/common/utils/require-organization';
+} from '@repo/api-core';
+import { requireOrganizationId } from '@repo/api-core';
 import { AuditService } from '../../audit/application/audit.service';
 import {
   OBJECT_STORAGE,
@@ -61,28 +61,33 @@ export class FilesService {
       mimeType: file.mimetype,
     });
 
-    const record = await this.filesRepository.create({
-      organizationId: requireOrganizationId(actor),
-      storageKey,
-      originalName: file.originalname,
-      mimeType: file.mimetype,
-      sizeBytes: file.size,
-      uploadedById: actor.userId,
-    });
+    try {
+      const record = await this.filesRepository.create({
+        organizationId: requireOrganizationId(actor),
+        storageKey,
+        originalName: file.originalname,
+        mimeType: file.mimetype,
+        sizeBytes: file.size,
+        uploadedById: actor.userId,
+      });
 
-    if (!record) {
-      throw new Error('File insert returned no rows');
+      if (!record) {
+        throw new Error('File insert returned no rows');
+      }
+
+      await this.auditService.log({
+        actorId: actor.userId,
+        action: 'file.uploaded',
+        entityType: 'file',
+        entityId: record.id,
+        requestContext,
+      });
+
+      return this.toFileDto(record);
+    } catch (error) {
+      await this.objectStorage.delete(storageKey).catch(() => undefined);
+      throw error;
     }
-
-    await this.auditService.log({
-      actorId: actor.userId,
-      action: 'file.uploaded',
-      entityType: 'file',
-      entityId: record.id,
-      requestContext,
-    });
-
-    return this.toFileDto(record);
   }
 
   async getById(actor: AuthenticatedRequestUser, fileId: string) {
@@ -108,7 +113,16 @@ export class FilesService {
   ) {
     const file = await this.findAccessibleFile(actor, fileId);
     await this.filesRepository.softDelete(file.id);
-    await this.objectStorage.delete(file.storageKey);
+
+    try {
+      await this.objectStorage.delete(file.storageKey);
+    } catch {
+      throw new AppError(
+        ERROR_CODES.INTERNAL_ERROR,
+        'File record was deleted but storage cleanup failed',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
 
     await this.auditService.log({
       actorId: actor.userId,

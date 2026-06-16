@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import {
   BarChart3,
@@ -34,7 +34,10 @@ interface SidebarCtx {
   collapsed: boolean;
   setCollapsed: (v: boolean) => void;
 }
-const SidebarContext = createContext<SidebarCtx>({ collapsed: false, setCollapsed: () => {} });
+const SidebarContext = createContext<SidebarCtx>({
+  collapsed: false,
+  setCollapsed: () => undefined,
+});
 export function useSidebar() {
   return useContext(SidebarContext);
 }
@@ -87,7 +90,9 @@ export function AdminShell() {
     setCollapsed(v);
     try {
       localStorage.setItem("admin-sidebar-collapsed", String(v));
-    } catch {}
+    } catch {
+      return;
+    }
   };
 
   useEffect(() => {

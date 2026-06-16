@@ -3,9 +3,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { ApiEnvelope } from "@/lib/api-types";
 import { proxyWithRefresh } from "./backend";
 
-const readAuthCookiesMock = vi.fn();
-const setAuthCookiesMock = vi.fn();
-const clearAuthCookiesMock = vi.fn();
+const { readAuthCookiesMock, setAuthCookiesMock, clearAuthCookiesMock } =
+  vi.hoisted(() => ({
+    readAuthCookiesMock: vi.fn(),
+    setAuthCookiesMock: vi.fn(),
+    clearAuthCookiesMock: vi.fn(),
+  }));
 
 vi.mock("@/lib/auth/cookies", () => ({
   readAuthCookies: readAuthCookiesMock,

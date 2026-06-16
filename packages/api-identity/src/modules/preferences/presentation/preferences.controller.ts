@@ -1,9 +1,9 @@
 import { Body, Controller, Get, Patch, Req } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import type { Request } from 'express';
-import { ApiDataResponse } from '@repo/api-core/common/decorators/api-response.decorator';
-import { CurrentUser } from '@repo/api-core/common/decorators/current-user.decorator';
-import type { AuthenticatedRequestUser } from '@repo/api-core/common/types/request-context';
+import { ApiDataResponse } from '@repo/api-core';
+import { CurrentUser } from '@repo/api-core';
+import type { AuthenticatedRequestUser } from '@repo/api-core';
 import { PreferencesService } from '../application/preferences.service';
 import { UpdatePreferencesDto, UserPreferencesDto } from './preferences.dto';
 

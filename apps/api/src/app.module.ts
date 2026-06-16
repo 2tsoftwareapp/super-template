@@ -4,31 +4,43 @@ import {
   type NestModule,
   RequestMethod,
 } from '@nestjs/common';
-import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
-import { Reflector } from '@nestjs/core';
+import {
+  APP_FILTER,
+  APP_GUARD,
+  APP_INTERCEPTOR,
+  Reflector,
+} from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
-import { AppConfigModule } from '@repo/api-core/config/app-config.module';
-import { EnvironmentService } from '@repo/api-core/config/environment.service';
-import { AppExceptionFilter } from '@repo/api-core/common/filters/app-exception.filter';
-import { PermissionsGuard } from '@repo/api-core/common/guards/permissions.guard';
-import { ResponseEnvelopeInterceptor } from '@repo/api-core/common/interceptors/response-envelope.interceptor';
-import { LoggingModule } from '@repo/api-core/common/logging/logging.module';
-import { RequestContextMiddleware } from '@repo/api-core/common/middleware/request-context.middleware';
-import { RequestLoggerMiddleware } from '@repo/api-core/common/middleware/request-logger.middleware';
-import { TenantContextService } from '@repo/api-database';
-import { DatabaseModule } from '@repo/api-database';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import {
+  AppConfigModule,
+  AppExceptionFilter,
+  EnvironmentService,
+  LoggingModule,
+  PermissionsGuard,
+  RequestContextMiddleware,
+  RequestLoggerMiddleware,
+  ResponseEnvelopeInterceptor,
+} from '@repo/api-core';
+import { DatabaseModule, TenantContextService } from '@repo/api-database';
 import { IdentityModule } from '@repo/api-identity';
 import { AuthService } from '@repo/api-identity/modules/auth/application/auth.service';
 import { PlatformModule } from '@repo/api-platform';
 import { WorkspaceModule } from '@repo/api-workspace';
+import { HealthModule } from './modules/health/health.module';
 import { AuthGuard } from './shell/auth.guard';
 import { TenantContextInterceptor } from './shell/tenant-context.interceptor';
-import { HealthModule } from './modules/health/health.module';
 
 @Module({
   imports: [
     AppConfigModule,
     LoggingModule,
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60_000,
+        limit: 120,
+      },
+    ]),
     ScheduleModule.forRoot(),
     DatabaseModule,
     HealthModule,
@@ -54,6 +66,10 @@ import { HealthModule } from './modules/health/health.module';
       provide: APP_GUARD,
       useFactory: (reflector: Reflector) => new PermissionsGuard(reflector),
       inject: [Reflector],
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
     },
     {
       provide: APP_INTERCEPTOR,

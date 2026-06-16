@@ -4,9 +4,9 @@ import type { Request } from 'express';
 import {
   ApiDataResponse,
   SuccessFlagDto,
-} from '@repo/api-core/common/decorators/api-response.decorator';
-import { CurrentUser } from '@repo/api-core/common/decorators/current-user.decorator';
-import type { AuthenticatedRequestUser } from '@repo/api-core/common/types/request-context';
+} from '@repo/api-core';
+import { CurrentUser } from '@repo/api-core';
+import type { AuthenticatedRequestUser } from '@repo/api-core';
 import { UsersService } from '../application/users.service';
 import { ChangePasswordDto, UpdateProfileDto, UserDto } from './users.dto';
 

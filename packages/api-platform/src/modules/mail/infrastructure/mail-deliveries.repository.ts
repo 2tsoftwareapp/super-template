@@ -1,11 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { and, count, desc, eq } from 'drizzle-orm';
-import { DATABASE } from '@repo/api-database/database.provider';
+import { DATABASE } from '@repo/api-database';
 import type {
   DatabaseClient,
   DatabaseExecutor,
-} from '@repo/api-database/database.types';
-import { mailDeliveries } from '@repo/api-database/schema';
+} from '@repo/api-database';
+import { mailDeliveries } from '@repo/api-database';
 
 type ListDeliveriesParams = {
   page: number;

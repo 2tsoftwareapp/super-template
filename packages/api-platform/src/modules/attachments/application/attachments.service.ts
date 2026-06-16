@@ -1,10 +1,10 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { ERROR_CODES } from '@repo/api-core/common/constants/error-codes';
-import { AppError } from '@repo/api-core/common/errors/app-error';
+import { ERROR_CODES } from '@repo/api-core';
+import { AppError } from '@repo/api-core';
 import type {
   AuthenticatedRequestUser,
   RequestContext,
-} from '@repo/api-core/common/types/request-context';
+} from '@repo/api-core';
 import { AuditService } from '../../audit/application/audit.service';
 import { FilesRepository } from '../../files/infrastructure/files.repository';
 import { AttachmentsRepository } from '../infrastructure/attachments.repository';

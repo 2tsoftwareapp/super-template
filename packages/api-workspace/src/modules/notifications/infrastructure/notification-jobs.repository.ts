@@ -1,11 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { and, asc, count, desc, eq, lte, sql } from 'drizzle-orm';
-import { DATABASE } from '@repo/api-database/database.provider';
+import { DATABASE } from '@repo/api-database';
 import type {
   DatabaseClient,
   DatabaseExecutor,
-} from '@repo/api-database/database.types';
-import { notificationJobs } from '@repo/api-database/schema';
+} from '@repo/api-database';
+import { notificationJobs } from '@repo/api-database';
 
 type ListJobsParams = {
   page: number;

@@ -1,12 +1,12 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsDateString, IsOptional, IsString, IsUUID } from 'class-validator';
-import { PaginationQueryDto } from '@repo/api-core/common/pagination/pagination.dto';
+import { PaginationQueryDto } from '@repo/api-core';
 
 export class AuditLogDto {
   @ApiProperty()
   id: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: String, nullable: true })
   actorId: string | null;
 
   @ApiProperty()
@@ -15,19 +15,19 @@ export class AuditLogDto {
   @ApiProperty()
   entityType: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: String, nullable: true })
   entityId: string | null;
 
   @ApiPropertyOptional({ type: 'object', additionalProperties: true })
   metadata: Record<string, unknown> | null;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: String, nullable: true })
   ipAddress: string | null;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: String, nullable: true })
   userAgent: string | null;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: String, nullable: true })
   requestId: string | null;
 
   @ApiProperty()

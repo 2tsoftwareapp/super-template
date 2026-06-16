@@ -1,7 +1,7 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { ERROR_CODES } from '@repo/api-core/common/constants/error-codes';
-import { AppError } from '@repo/api-core/common/errors/app-error';
-import type { AuthenticatedRequestUser } from '@repo/api-core/common/types/request-context';
+import { ERROR_CODES } from '@repo/api-core';
+import { AppError } from '@repo/api-core';
+import type { AuthenticatedRequestUser } from '@repo/api-core';
 import { AuthRepository } from '@repo/api-identity/modules/auth/infrastructure/auth.repository';
 import { MailService } from '../../mail/application/mail.service';
 import { NotificationsService } from '@repo/api-workspace/modules/notifications/application/notifications.service';
@@ -9,7 +9,12 @@ import { JobsRepository } from '../infrastructure/jobs.repository';
 
 export type JobHandler = {
   type: string;
-  handle: (payload: Record<string, unknown>) => Promise<void>;
+  handle: (job: {
+    jobId: string;
+    payload: Record<string, unknown>;
+    organizationId: string | null;
+    createdById: string | null;
+  }) => Promise<void>;
 };
 
 @Injectable()
@@ -22,7 +27,7 @@ export class JobsService {
     private readonly authRepository: AuthRepository,
     private readonly notificationsService: NotificationsService,
   ) {
-    this.registerHandler('mail.send', async (payload) => {
+    this.registerHandler('mail.send', async ({ payload }) => {
       const templateKey = String(payload.templateKey ?? '');
       const to = String(payload.to ?? '');
       const variables =
@@ -49,7 +54,7 @@ export class JobsService {
       await this.authRepository.cleanupExpiredTokens();
     });
 
-    this.registerHandler('notification.send', async (payload) => {
+    this.registerHandler('notification.send', async ({ payload, organizationId }) => {
       const userId = String(payload.userId ?? '');
       const type = String(payload.type ?? '');
       const title = String(payload.title ?? '');
@@ -62,6 +67,7 @@ export class JobsService {
       }
 
       await this.notificationsService.sendToUser(null, {
+        ...(organizationId ? { organizationId } : {}),
         userId,
         type,
         title,
@@ -83,6 +89,7 @@ export class JobsService {
     scheduledAt?: Date;
     priority?: number;
     createdById?: string | null;
+    organizationId?: string | null;
     maxAttempts?: number;
   }) {
     const job = await this.jobsRepository.create({
@@ -91,6 +98,7 @@ export class JobsService {
       scheduledAt: input.scheduledAt ?? new Date(),
       priority: input.priority ?? 0,
       createdById: input.createdById ?? null,
+      organizationId: input.organizationId ?? null,
       maxAttempts: input.maxAttempts ?? 3,
       status: 'PENDING',
     });
@@ -167,7 +175,12 @@ export class JobsService {
     }
 
     try {
-      await handler(job.payload);
+      await handler({
+        jobId: job.id,
+        payload: job.payload,
+        organizationId: job.organizationId ?? null,
+        createdById: job.createdById ?? null,
+      });
       await this.jobsRepository.markCompleted(job.id);
     } catch (error) {
       const message =

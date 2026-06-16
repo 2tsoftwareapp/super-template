@@ -14,10 +14,10 @@ import {
   ApiDataResponse,
   SuccessFlagDto,
   SuccessMessageDto,
-} from '@repo/api-core/common/decorators/api-response.decorator';
-import { CurrentUser } from '@repo/api-core/common/decorators/current-user.decorator';
-import { Public } from '@repo/api-core/common/decorators/public.decorator';
-import type { AuthenticatedRequestUser } from '@repo/api-core/common/types/request-context';
+} from '@repo/api-core';
+import { CurrentUser } from '@repo/api-core';
+import { Public } from '@repo/api-core';
+import type { AuthenticatedRequestUser } from '@repo/api-core';
 import { AuthService } from '../application/auth.service';
 import {
   AuthMeDto,

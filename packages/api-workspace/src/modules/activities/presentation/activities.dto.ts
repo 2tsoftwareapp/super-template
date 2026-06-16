@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
-import { PaginationQueryDto } from '@repo/api-core/common/pagination/pagination.dto';
+import { PaginationQueryDto } from '@repo/api-core';
 
 export class ActivityDto {
   @ApiProperty()
@@ -15,7 +15,7 @@ export class ActivityDto {
   @ApiProperty()
   entityId: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: String, nullable: true })
   actorId: string | null;
 
   @ApiProperty({ enum: ['PUBLIC', 'PRIVATE', 'INTERNAL'] })

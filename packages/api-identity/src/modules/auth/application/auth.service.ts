@@ -1,21 +1,21 @@
 import { randomUUID } from 'node:crypto';
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { ERROR_CODES } from '@repo/api-core/common/constants/error-codes';
-import { AppError } from '@repo/api-core/common/errors/app-error';
+import { ERROR_CODES } from '@repo/api-core';
+import { AppError } from '@repo/api-core';
 import type {
   AuthenticatedRequestUser,
   RequestContext,
-} from '@repo/api-core/common/types/request-context';
-import { durationToMilliseconds } from '@repo/api-core/common/utils/duration';
-import { normalizeEmail } from '@repo/api-core/common/utils/normalize-email';
-import { EnvironmentService } from '@repo/api-core/config/environment.service';
-import { DATABASE } from '@repo/api-database/database.provider';
+} from '@repo/api-core';
+import { durationToMilliseconds } from '@repo/api-core';
+import { normalizeEmail } from '@repo/api-core';
+import { EnvironmentService } from '@repo/api-core';
+import { DATABASE } from '@repo/api-database';
 import type {
   DatabaseClient,
   DatabaseExecutor,
-} from '@repo/api-database/database.types';
-import { runInTransaction } from '@repo/api-database/transaction';
+} from '@repo/api-database';
+import { runInTransaction } from '@repo/api-database';
 import { AccessControlService } from '../../access-control/application/access-control.service';
 import { AuditService } from '@repo/api-platform/modules/audit/application/audit.service';
 import { MailService } from '@repo/api-platform/modules/mail/application/mail.service';
@@ -307,6 +307,7 @@ export class AuthService {
       );
     const refreshedSession = await this.rotateSessionTokens(
       session.id,
+      session.refreshTokenHash,
       user.id,
       organizationId,
       {
@@ -715,6 +716,7 @@ export class AuthService {
 
   private async rotateSessionTokens(
     sessionId: string,
+    refreshTokenHash: string,
     userId: string,
     organizationId: string,
     metadata: { ipAddress: string | null; userAgent: string | null },
@@ -731,22 +733,28 @@ export class AuthService {
       'refresh',
       organizationId,
     );
-    const refreshTokenHash = await hashRefreshToken(refreshToken);
-    const session = await this.authRepository.updateSession(sessionId, {
+    const nextRefreshTokenHash = await hashRefreshToken(refreshToken);
+    const session = await this.authRepository.updateSessionIfMatches(
+      sessionId,
       refreshTokenHash,
-      expiresAt: new Date(
-        Date.now() +
-          durationToMilliseconds(
-            this.environmentService.values.JWT_REFRESH_TTL,
-          ),
-      ),
-      lastUsedAt: new Date(),
-      ipAddress: metadata.ipAddress,
-      userAgent: metadata.userAgent,
-    });
+      {
+        refreshTokenHash: nextRefreshTokenHash,
+        expiresAt: new Date(
+          Date.now() +
+            durationToMilliseconds(this.environmentService.values.JWT_REFRESH_TTL),
+        ),
+        lastUsedAt: new Date(),
+        ipAddress: metadata.ipAddress,
+        userAgent: metadata.userAgent,
+      },
+    );
 
     if (!session) {
-      throw new Error('Session update returned no rows');
+      throw new AppError(
+        ERROR_CODES.AUTH_REFRESH_TOKEN_REUSED,
+        'Refresh token reuse detected',
+        HttpStatus.UNAUTHORIZED,
+      );
     }
 
     return {

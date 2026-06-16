@@ -14,10 +14,10 @@ import {
   ApiArrayResponse,
   ApiDataResponse,
   SuccessFlagDto,
-} from '@repo/api-core/common/decorators/api-response.decorator';
-import { CurrentUser } from '@repo/api-core/common/decorators/current-user.decorator';
-import { Permissions } from '@repo/api-core/common/decorators/permissions.decorator';
-import type { AuthenticatedRequestUser } from '@repo/api-core/common/types/request-context';
+} from '@repo/api-core';
+import { CurrentUser } from '@repo/api-core';
+import { Permissions } from '@repo/api-core';
+import type { AuthenticatedRequestUser } from '@repo/api-core';
 import { PERMISSION_NAMES } from '@repo/api-identity/modules/access-control/access-control.constants';
 import { AttachmentsService } from '../application/attachments.service';
 import {

@@ -1,11 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { and, asc, count, desc, eq, ilike, isNull, or } from 'drizzle-orm';
-import { DATABASE } from '@repo/api-database/database.provider';
+import { DATABASE } from '@repo/api-database';
 import type {
   DatabaseClient,
   DatabaseExecutor,
-} from '@repo/api-database/database.types';
-import { projects } from '@repo/api-database/schema';
+} from '@repo/api-database';
+import { projects } from '@repo/api-database';
 
 type ListProjectsParams = {
   page: number;

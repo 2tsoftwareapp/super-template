@@ -1,14 +1,14 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { ERROR_CODES } from '@repo/api-core/common/constants/error-codes';
-import { AppError } from '@repo/api-core/common/errors/app-error';
+import { ERROR_CODES } from '@repo/api-core';
+import { AppError } from '@repo/api-core';
 import type {
   AuthenticatedRequestUser,
   RequestContext,
-} from '@repo/api-core/common/types/request-context';
-import { durationToMilliseconds } from '@repo/api-core/common/utils/duration';
-import { normalizeEmail } from '@repo/api-core/common/utils/normalize-email';
-import { requireOrganizationId } from '@repo/api-core/common/utils/require-organization';
-import { EnvironmentService } from '@repo/api-core/config/environment.service';
+} from '@repo/api-core';
+import { durationToMilliseconds } from '@repo/api-core';
+import { normalizeEmail } from '@repo/api-core';
+import { requireOrganizationId } from '@repo/api-core';
+import { EnvironmentService } from '@repo/api-core';
 import { PERMISSION_NAMES } from '@repo/api-identity/modules/access-control/access-control.constants';
 import { AuditService } from '@repo/api-platform/modules/audit/application/audit.service';
 import {
@@ -74,6 +74,7 @@ export class InvitationsService {
 
     await this.jobsService.enqueue({
       type: 'mail.send',
+      organizationId,
       payload: {
         templateKey: 'auth.welcome',
         to: email,

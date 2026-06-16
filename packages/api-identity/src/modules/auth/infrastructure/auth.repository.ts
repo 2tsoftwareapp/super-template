@@ -1,15 +1,15 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { and, eq, gt, isNull, sql } from 'drizzle-orm';
-import { DATABASE } from '@repo/api-database/database.provider';
+import { DATABASE } from '@repo/api-database';
 import type {
   DatabaseClient,
   DatabaseExecutor,
-} from '@repo/api-database/database.types';
+} from '@repo/api-database';
 import {
   authSessions,
   emailVerificationTokens,
   passwordResetTokens,
-} from '@repo/api-database/schema';
+} from '@repo/api-database';
 
 @Injectable()
 export class AuthRepository {
@@ -65,6 +65,30 @@ export class AuthRepository {
         updatedAt: new Date(),
       })
       .where(eq(authSessions.id, sessionId))
+      .returning();
+
+    return session ?? null;
+  }
+
+  async updateSessionIfMatches(
+    sessionId: string,
+    refreshTokenHash: string,
+    values: Partial<typeof authSessions.$inferInsert>,
+    executor: DatabaseExecutor = this.database,
+  ) {
+    const [session] = await executor
+      .update(authSessions)
+      .set({
+        ...values,
+        updatedAt: new Date(),
+      })
+      .where(
+        and(
+          eq(authSessions.id, sessionId),
+          eq(authSessions.refreshTokenHash, refreshTokenHash),
+          isNull(authSessions.revokedAt),
+        ),
+      )
       .returning();
 
     return session ?? null;

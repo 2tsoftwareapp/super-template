@@ -3,6 +3,7 @@ export { DATABASE, DATABASE_POOL, databaseProviders } from './database.provider'
 export { createDatabaseClient } from './database.types';
 export type { DatabaseClient, DatabaseExecutor, DatabaseTransaction } from './database.types';
 export { runInTransaction } from './transaction';
+export * from './schema';
 export { schema } from './schema';
 export * from './tenant-context';
 export { TenantContextService } from './tenant-context.service';

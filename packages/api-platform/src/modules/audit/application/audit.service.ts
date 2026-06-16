@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import type { RequestContext } from '@repo/api-core/common/types/request-context';
-import { redactSensitive } from '@repo/api-core/common/utils/redact';
-import type { DatabaseExecutor } from '@repo/api-database/database.types';
+import type { RequestContext } from '@repo/api-core';
+import { redactSensitive } from '@repo/api-core';
+import type { DatabaseExecutor } from '@repo/api-database';
 import { AuditRepository } from '../infrastructure/audit.repository';
 import type { AuditLogsQueryDto } from '../presentation/audit.dto';
 

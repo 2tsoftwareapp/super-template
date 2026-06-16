@@ -1,12 +1,13 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { ERROR_CODES } from '@repo/api-core/common/constants/error-codes';
-import { AppError } from '@repo/api-core/common/errors/app-error';
-import type { AuthenticatedRequestUser } from '@repo/api-core/common/types/request-context';
-import type { DatabaseExecutor } from '@repo/api-database/database.types';
+import { ERROR_CODES } from '@repo/api-core';
+import { AppError } from '@repo/api-core';
+import type { AuthenticatedRequestUser } from '@repo/api-core';
+import type { DatabaseExecutor } from '@repo/api-database';
 import {
   ADMIN_PERMISSIONS,
   ALL_PERMISSIONS as ALL_PERMISSION_NAMES,
   PERMISSION_NAMES,
+  PRIVILEGED_ROLE_NAMES,
   ROLE_NAMES,
   USER_PERMISSIONS,
 } from '../access-control.constants';
@@ -193,6 +194,23 @@ export class AccessControlService {
     return grouped;
   }
 
+  async getRoleIdsForUser(userId: string) {
+    return this.accessControlRepository.findRoleIdsForUser(userId);
+  }
+
+  async getRoleIdsForUsers(userIds: string[]) {
+    const rows = await this.accessControlRepository.findRoleIdsForUsers(userIds);
+    const grouped = new Map<string, string[]>();
+
+    for (const row of rows) {
+      const existing = grouped.get(row.userId) ?? [];
+      existing.push(row.roleId);
+      grouped.set(row.userId, existing);
+    }
+
+    return grouped;
+  }
+
   async validateRoleIds(roleIds: string[]) {
     const foundRoles =
       await this.accessControlRepository.findRolesByIds(roleIds);
@@ -206,6 +224,33 @@ export class AccessControlService {
     }
 
     return foundRoles;
+  }
+
+  assertCanManageUserAccount(
+    actor: AuthenticatedRequestUser,
+    targetRoleNames: string[],
+  ): void {
+    const targetIsPrivileged = targetRoleNames.some((roleName) =>
+      PRIVILEGED_ROLE_NAMES.includes(
+        roleName as (typeof PRIVILEGED_ROLE_NAMES)[number],
+      ),
+    );
+
+    if (targetIsPrivileged && !actor.roles.includes(ROLE_NAMES.SUPER_ADMIN)) {
+      throw new AppError(
+        ERROR_CODES.AUTH_FORBIDDEN,
+        'Only SUPER_ADMIN can manage privileged user accounts',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+  }
+
+  assertCanAssignUserRoles(
+    actor: AuthenticatedRequestUser,
+    targetRoleNames: string[],
+    desiredRoleNames: string[],
+  ): void {
+    this.assertCanAssignRoles(actor, targetRoleNames, desiredRoleNames);
   }
 
   async getRoleByName(name: string, executor?: DatabaseExecutor) {
@@ -240,15 +285,21 @@ export class AccessControlService {
     desiredRoleNames: string[],
   ): void {
     const actorIsSuperAdmin = actor.roles.includes(ROLE_NAMES.SUPER_ADMIN);
-    const targetIsSuperAdmin = targetRoleNames.includes(ROLE_NAMES.SUPER_ADMIN);
-    const assigningSuperAdmin = desiredRoleNames.includes(
-      ROLE_NAMES.SUPER_ADMIN,
+    const targetIsPrivileged = targetRoleNames.some((roleName) =>
+      PRIVILEGED_ROLE_NAMES.includes(
+        roleName as (typeof PRIVILEGED_ROLE_NAMES)[number],
+      ),
+    );
+    const assigningPrivilegedRole = desiredRoleNames.some((roleName) =>
+      PRIVILEGED_ROLE_NAMES.includes(
+        roleName as (typeof PRIVILEGED_ROLE_NAMES)[number],
+      ),
     );
 
-    if (!actorIsSuperAdmin && (targetIsSuperAdmin || assigningSuperAdmin)) {
+    if (!actorIsSuperAdmin && (targetIsPrivileged || assigningPrivilegedRole)) {
       throw new AppError(
         ERROR_CODES.AUTH_FORBIDDEN,
-        'Only SUPER_ADMIN can manage SUPER_ADMIN role assignments',
+        'Only SUPER_ADMIN can manage privileged accounts or roles',
         HttpStatus.FORBIDDEN,
       );
     }

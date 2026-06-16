@@ -1,9 +1,7 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { AppError, ERROR_CODES } from '@repo/api-core';
+import { DATABASE, type DatabaseClient } from '@repo/api-database';
 import { sql } from 'drizzle-orm';
-import { ERROR_CODES } from '@repo/api-core/common/constants/error-codes';
-import { AppError } from '@repo/api-core/common/errors/app-error';
-import { DATABASE } from '@repo/api-database';
-import type { DatabaseClient } from '@repo/api-database';
 
 @Injectable()
 export class HealthService {

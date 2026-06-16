@@ -1,6 +1,6 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { ERROR_CODES } from '@repo/api-core/common/constants/error-codes';
-import { AppError } from '@repo/api-core/common/errors/app-error';
+import { ERROR_CODES } from '@repo/api-core';
+import { AppError } from '@repo/api-core';
 import { MailDeliveriesRepository } from '../infrastructure/mail-deliveries.repository';
 import { TemplateRendererService } from '../infrastructure/template-renderer.service';
 import { MAILER, type Mailer } from './mailer.interface';

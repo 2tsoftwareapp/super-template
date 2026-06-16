@@ -1060,16 +1060,16 @@ export interface components {
         };
         AuditLogDto: {
             id: string;
-            actorId?: Record<string, never>;
+            actorId?: string | null;
             action: string;
             entityType: string;
-            entityId?: Record<string, never>;
+            entityId?: string | null;
             metadata?: {
                 [key: string]: unknown;
             };
-            ipAddress?: Record<string, never>;
-            userAgent?: Record<string, never>;
-            requestId?: Record<string, never>;
+            ipAddress?: string | null;
+            userAgent?: string | null;
+            requestId?: string | null;
             createdAt: string;
         };
         UserDto: {
@@ -1081,6 +1081,7 @@ export interface components {
             status: "PENDING" | "ACTIVE" | "BLOCKED";
             emailVerifiedAt?: Record<string, never>;
             roles: string[];
+            roleIds: string[];
             createdAt: string;
             updatedAt: string;
         };
@@ -1259,7 +1260,7 @@ export interface components {
             completedAt?: Record<string, never>;
             cancelledAt?: Record<string, never>;
             errorMessage?: Record<string, never>;
-            createdById?: Record<string, never>;
+            createdById?: string | null;
             createdAt: string;
             updatedAt: string;
         };
@@ -1290,10 +1291,10 @@ export interface components {
         };
         NotificationJobDto: {
             id: string;
-            actorId?: Record<string, never>;
+            actorId?: string | null;
             /** @enum {string} */
             audience: "USER" | "USERS" | "ALL";
-            targetUserId?: Record<string, never>;
+            targetUserId?: string | null;
             userIds?: string[];
             type: string;
             title: string;
@@ -1382,7 +1383,7 @@ export interface components {
             summary: string;
             entityType: string;
             entityId: string;
-            actorId?: Record<string, never>;
+            actorId?: string | null;
             /** @enum {string} */
             visibility: "PUBLIC" | "PRIVATE" | "INTERNAL";
             metadata?: {

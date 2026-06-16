@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { standardSchemaResolver as zodResolver } from "@hookform/resolvers/standard-schema";
+import { Alert } from "../components/ui/alert";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
@@ -35,11 +36,18 @@ export function LoginPage() {
   });
 
   const mutation = useMutation({
-    mutationFn: (values: LoginInput) =>
-      webFetch<AuthLoginResponse>("/api/v1/auth/login", {
+    mutationFn: async (values: LoginInput) => {
+      const response = await webFetch<AuthLoginResponse>("/api/v1/auth/login", {
         method: "POST",
         body: JSON.stringify(values),
-      }),
+      });
+
+      if (!response.data.user.roles.includes("SUPER_ADMIN")) {
+        throw new Error("not-admin");
+      }
+
+      return response;
+    },
     onSuccess: async (response) => {
       setStoredAuthTokens({
         accessToken: response.data.accessToken,
@@ -91,8 +99,25 @@ export function LoginPage() {
                 <Label htmlFor="password">Password</Label>
                 <Input id="password" type="password" {...form.register("password")} />
               </div>
+              {mutation.isError && (
+                <Alert>
+                  {mutation.error instanceof Error &&
+                  mutation.error.message === "not-admin"
+                    ? "Access denied. This portal is for administrators only."
+                    : mutation.error instanceof Error &&
+                        mutation.error.message.includes("401")
+                      ? "Invalid email or password."
+                      : mutation.error instanceof Error &&
+                          mutation.error.message.includes("403")
+                        ? "Your account is not active or has not been verified."
+                        : mutation.error instanceof Error &&
+                            mutation.error.message.includes("failed to fetch")
+                          ? "Cannot reach the API. Make sure the server is running."
+                          : "Sign in failed. Please try again."}
+                </Alert>
+              )}
               <Button className="w-full" type="submit" disabled={mutation.isPending}>
-                {mutation.isPending ? "Signing in..." : "Sign in"}
+                {mutation.isPending ? "Signing in…" : "Sign in"}
               </Button>
             </form>
           </CardContent>

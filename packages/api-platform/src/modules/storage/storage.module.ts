@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { EnvironmentService } from '@repo/api-core/config/environment.service';
+import { EnvironmentService } from '@repo/api-core';
 import { OBJECT_STORAGE } from './application/object-storage.interface';
 import { LocalObjectStorage } from './infrastructure/local-object-storage.service';
 import { S3ObjectStorage } from './infrastructure/s3-object-storage.service';

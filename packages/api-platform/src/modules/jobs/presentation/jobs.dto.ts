@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEnum, IsOptional, IsString } from 'class-validator';
-import { PaginationQueryDto } from '@repo/api-core/common/pagination/pagination.dto';
+import { PaginationQueryDto } from '@repo/api-core';
 
 export class JobDto {
   @ApiProperty()
@@ -41,7 +41,7 @@ export class JobDto {
   @ApiPropertyOptional()
   errorMessage: string | null;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: String, nullable: true })
   createdById: string | null;
 
   @ApiProperty()

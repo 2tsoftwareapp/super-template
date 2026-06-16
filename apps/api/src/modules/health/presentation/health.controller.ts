@@ -1,7 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiProperty, ApiTags } from '@nestjs/swagger';
-import { ApiDataResponse } from '@repo/api-core/common/decorators/api-response.decorator';
-import { Public } from '@repo/api-core/common/decorators/public.decorator';
+import { ApiDataResponse, Public } from '@repo/api-core';
 import { HealthService } from '../application/health.service';
 
 class HealthStatusDto {

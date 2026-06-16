@@ -1,16 +1,16 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { eq, inArray } from 'drizzle-orm';
-import { DATABASE } from '@repo/api-database/database.provider';
+import { DATABASE } from '@repo/api-database';
 import type {
   DatabaseClient,
   DatabaseExecutor,
-} from '@repo/api-database/database.types';
+} from '@repo/api-database';
 import {
   permissions,
   rolePermissions,
   roles,
   userRoles,
-} from '@repo/api-database/schema';
+} from '@repo/api-database';
 
 @Injectable()
 export class AccessControlRepository {
@@ -161,6 +161,39 @@ export class AccessControlRepository {
       .select({
         userId: userRoles.userId,
         roleName: roles.name,
+      })
+      .from(userRoles)
+      .innerJoin(roles, eq(userRoles.roleId, roles.id))
+      .where(inArray(userRoles.userId, userIds));
+  }
+
+  async findRoleIdsForUser(
+    userId: string,
+    executor: DatabaseExecutor = this.database,
+  ): Promise<string[]> {
+    const rows = await executor
+      .select({
+        roleId: roles.id,
+      })
+      .from(userRoles)
+      .innerJoin(roles, eq(userRoles.roleId, roles.id))
+      .where(eq(userRoles.userId, userId));
+
+    return rows.map((row) => row.roleId);
+  }
+
+  async findRoleIdsForUsers(
+    userIds: string[],
+    executor: DatabaseExecutor = this.database,
+  ) {
+    if (userIds.length === 0) {
+      return [];
+    }
+
+    return executor
+      .select({
+        userId: userRoles.userId,
+        roleId: roles.id,
       })
       .from(userRoles)
       .innerJoin(roles, eq(userRoles.roleId, roles.id))

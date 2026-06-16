@@ -6,7 +6,7 @@ import {
   IsUUID,
   MaxLength,
 } from 'class-validator';
-import { PaginationQueryDto } from '@repo/api-core/common/pagination/pagination.dto';
+import { PaginationQueryDto } from '@repo/api-core';
 
 export class ProjectDto {
   @ApiProperty()

@@ -8,7 +8,6 @@ import { config as loadEnv } from 'dotenv';
 import { Pool } from 'pg';
 import request from 'supertest';
 import { AppModule } from '../../src/app.module';
-import { createDatabaseClient } from '@repo/api-database';
 import { seedDatabase } from '../../src/database/seed-data';
 
 loadEnv({ path: resolve(process.cwd(), '.env'), quiet: true });

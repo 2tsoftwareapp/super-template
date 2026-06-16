@@ -10,7 +10,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { PaginationQueryDto } from '@repo/api-core/common/pagination/pagination.dto';
+import { PaginationQueryDto } from '@repo/api-core';
 
 export class UserDto {
   @ApiProperty()
@@ -33,6 +33,9 @@ export class UserDto {
 
   @ApiProperty({ type: [String] })
   roles: string[];
+
+  @ApiProperty({ type: [String] })
+  roleIds: string[];
 
   @ApiProperty()
   createdAt: string;
@@ -116,6 +119,7 @@ export class UpdateUserStatusDto {
 export class ReplaceUserRolesDto {
   @ApiProperty({ type: [String] })
   @IsArray()
+  @ArrayNotEmpty()
   @IsUUID('4', { each: true })
   roleIds: string[];
 }

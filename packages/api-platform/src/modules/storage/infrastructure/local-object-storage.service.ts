@@ -1,7 +1,7 @@
 import { mkdir, readFile, unlink, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { Injectable } from '@nestjs/common';
-import { EnvironmentService } from '@repo/api-core/config/environment.service';
+import { EnvironmentService } from '@repo/api-core';
 import type {
   ObjectStorage,
   UploadInput,

@@ -1,11 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { and, eq } from 'drizzle-orm';
-import { DATABASE } from '@repo/api-database/database.provider';
+import { DATABASE } from '@repo/api-database';
 import type {
   DatabaseClient,
   DatabaseExecutor,
-} from '@repo/api-database/database.types';
-import { notificationDeviceTokens } from '@repo/api-database/schema';
+} from '@repo/api-database';
+import { notificationDeviceTokens } from '@repo/api-database';
 
 export type NotificationDevicePlatform = 'IOS' | 'ANDROID';
 

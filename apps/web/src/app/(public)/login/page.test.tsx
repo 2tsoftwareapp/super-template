@@ -5,8 +5,10 @@ import userEvent from "@testing-library/user-event";
 import LoginPage from "./page";
 import { describe, expect, it, vi } from "vitest";
 
-const replaceMock = vi.fn();
-const webFetchMock = vi.fn();
+const { replaceMock, webFetchMock } = vi.hoisted(() => ({
+  replaceMock: vi.fn(),
+  webFetchMock: vi.fn(),
+}));
 
 vi.mock("next/link", () => ({
   default: ({

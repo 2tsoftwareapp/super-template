@@ -1,11 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { and, desc, eq, isNotNull, isNull } from 'drizzle-orm';
-import { DATABASE } from '@repo/api-database/database.provider';
+import { DATABASE } from '@repo/api-database';
 import type {
   DatabaseClient,
   DatabaseExecutor,
-} from '@repo/api-database/database.types';
-import { files } from '@repo/api-database/schema';
+} from '@repo/api-database';
+import { files } from '@repo/api-database';
 
 @Injectable()
 export class FilesRepository {

@@ -1,10 +1,10 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { EnvironmentService } from '@repo/api-core';
 import { json, urlencoded } from 'express';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
-import { EnvironmentService } from '@repo/api-core/config/environment.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -21,6 +21,7 @@ async function bootstrap() {
     origin: environmentService.corsOrigins,
     credentials: true,
   });
+  app.enableShutdownHooks();
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

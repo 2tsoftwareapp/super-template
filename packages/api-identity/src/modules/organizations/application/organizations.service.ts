@@ -1,13 +1,13 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { ERROR_CODES } from '@repo/api-core/common/constants/error-codes';
-import { AppError } from '@repo/api-core/common/errors/app-error';
-import type { AuthenticatedRequestUser } from '@repo/api-core/common/types/request-context';
-import { DATABASE } from '@repo/api-database/database.provider';
+import { ERROR_CODES } from '@repo/api-core';
+import { AppError } from '@repo/api-core';
+import type { AuthenticatedRequestUser } from '@repo/api-core';
+import { DATABASE } from '@repo/api-database';
 import type {
   DatabaseClient,
   DatabaseExecutor,
-} from '@repo/api-database/database.types';
-import { runInTransaction } from '@repo/api-database/transaction';
+} from '@repo/api-database';
+import { runInTransaction } from '@repo/api-database';
 import { OrganizationsRepository } from '../infrastructure/organizations.repository';
 import type { CreateOrganizationDto } from '../presentation/organizations.dto';
 

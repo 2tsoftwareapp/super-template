@@ -4,6 +4,9 @@ import type { TenantContext } from './tenant-context';
 
 const tenantContextStorage = new AsyncLocalStorage<TenantContext>();
 
+export const getTenantContext = (): TenantContext | undefined =>
+  tenantContextStorage.getStore();
+
 @Injectable()
 export class TenantContextService {
   run<T>(context: TenantContext, operation: () => T): T {

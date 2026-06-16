@@ -11,7 +11,7 @@ import {
   IsUUID,
   ValidateIf,
 } from 'class-validator';
-import { PaginationQueryDto } from '@repo/api-core/common/pagination/pagination.dto';
+import { PaginationQueryDto } from '@repo/api-core';
 
 export class NotificationDto {
   @ApiProperty()
@@ -141,13 +141,13 @@ export class NotificationJobDto {
   @ApiProperty()
   id: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: String, nullable: true })
   actorId: string | null;
 
   @ApiProperty({ enum: NotificationAudienceDto })
   audience: NotificationAudienceDto;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: String, nullable: true })
   targetUserId: string | null;
 
   @ApiPropertyOptional({ type: [String] })

@@ -1,13 +1,10 @@
 import type { INestApplication } from '@nestjs/common';
+import { ERROR_CODES } from '@repo/api-core';
+import { auditLogs, DATABASE, type DatabaseClient } from '@repo/api-database';
+import { AccessControlService, ROLE_NAMES } from '@repo/api-identity';
 import { eq } from 'drizzle-orm';
 import request from 'supertest';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { ERROR_CODES } from '@repo/api-core/common/constants/error-codes';
-import { DATABASE } from '@repo/api-database';
-import type { DatabaseClient } from '@repo/api-database';
-import { auditLogs } from '@repo/api-database/schema';
-import { ROLE_NAMES } from '@repo/api-identity/modules/access-control/access-control.constants';
-import { AccessControlService } from '@repo/api-identity/modules/access-control/application/access-control.service';
 import {
   bearer,
   createTestApp,
@@ -435,6 +432,134 @@ describe('Auth, Projects, and Notifications (e2e)', () => {
 
     expect(blockedAccess.body.error.code).toBe(
       ERROR_CODES.AUTH_SESSION_REVOKED,
+    );
+  });
+
+  it('defaults new users to USER and prevents admins from managing privileged accounts', async () => {
+    const superAdminSession = await loginAs(
+      app,
+      'admin@example.local',
+      'ChangeMe123!',
+    );
+    const accessControlService = app.get(AccessControlService);
+    const adminRole = await accessControlService.getRoleByName(
+      ROLE_NAMES.ADMIN,
+    );
+    const userRole = await accessControlService.getRoleByName(ROLE_NAMES.USER);
+
+    if (!adminRole || !userRole) {
+      throw new Error('Required roles were not found');
+    }
+
+    const defaultRoleResponse = await request(app.getHttpServer())
+      .post('/api/v1/admin/users')
+      .set(bearer(superAdminSession.accessToken))
+      .send({
+        email: 'default-role@example.local',
+        password: 'DefaultPass123!',
+        displayName: 'Default Role User',
+        status: 'ACTIVE',
+      })
+      .expect(201);
+
+    expect(defaultRoleResponse.body.data.roles).toEqual(
+      expect.arrayContaining([ROLE_NAMES.USER]),
+    );
+
+    const managerResponse = await request(app.getHttpServer())
+      .post('/api/v1/admin/users')
+      .set(bearer(superAdminSession.accessToken))
+      .send({
+        email: 'manager@example.local',
+        password: 'ManagerPass123!',
+        displayName: 'Manager Admin',
+        status: 'ACTIVE',
+        roleIds: [adminRole.id],
+      })
+      .expect(201);
+
+    const privilegedTargetResponse = await request(app.getHttpServer())
+      .post('/api/v1/admin/users')
+      .set(bearer(superAdminSession.accessToken))
+      .send({
+        email: 'privileged-target@example.local',
+        password: 'PrivilegedPass123!',
+        displayName: 'Privileged Target',
+        status: 'ACTIVE',
+        roleIds: [adminRole.id],
+      })
+      .expect(201);
+
+    const regularTargetResponse = await request(app.getHttpServer())
+      .post('/api/v1/admin/users')
+      .set(bearer(superAdminSession.accessToken))
+      .send({
+        email: 'regular-target@example.local',
+        password: 'RegularPass123!',
+        displayName: 'Regular Target',
+        status: 'ACTIVE',
+        roleIds: [userRole.id],
+      })
+      .expect(201);
+
+    const managerSession = await loginAs(
+      app,
+      'manager@example.local',
+      'ManagerPass123!',
+    );
+
+    await request(app.getHttpServer())
+      .post('/api/v1/admin/users')
+      .set(bearer(managerSession.accessToken))
+      .send({
+        email: 'blocked-role@example.local',
+        password: 'BlockedRole123!',
+        displayName: 'Blocked Role',
+        status: 'ACTIVE',
+        roleIds: [adminRole.id],
+      })
+      .expect(403);
+
+    await request(app.getHttpServer())
+      .delete(`/api/v1/admin/users/${managerResponse.body.data.id}`)
+      .set(bearer(managerSession.accessToken))
+      .expect(403);
+
+    await request(app.getHttpServer())
+      .patch(
+        `/api/v1/admin/users/${privilegedTargetResponse.body.data.id}/status`,
+      )
+      .set(bearer(managerSession.accessToken))
+      .send({ status: 'BLOCKED' })
+      .expect(403);
+
+    await request(app.getHttpServer())
+      .delete(`/api/v1/admin/users/${regularTargetResponse.body.data.id}`)
+      .set(bearer(managerSession.accessToken))
+      .expect(200);
+  });
+
+  it('prevents users from changing their own roles', async () => {
+    const superAdminSession = await loginAs(
+      app,
+      'admin@example.local',
+      'ChangeMe123!',
+    );
+    const accessControlService = app.get(AccessControlService);
+    const userRole = await accessControlService.getRoleByName(ROLE_NAMES.USER);
+
+    if (!userRole) {
+      throw new Error('USER role was not found');
+    }
+
+    const selfRoleChangeResponse = await request(app.getHttpServer())
+      .put(`/api/v1/admin/users/${superAdminSession.userId}/roles`)
+      .set(bearer(superAdminSession.accessToken))
+      .send({ roleIds: [userRole.id] })
+      .expect(403);
+
+    expect(selfRoleChangeResponse.body.error.code).toBe(
+      ERROR_CODES.AUTH_FORBIDDEN,
     );
   });
 

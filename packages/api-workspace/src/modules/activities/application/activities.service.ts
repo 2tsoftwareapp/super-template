@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import type { DatabaseExecutor } from '@repo/api-database/database.types';
+import type { DatabaseExecutor } from '@repo/api-database';
 import { ActivitiesRepository } from '../infrastructure/activities.repository';
 import type { ActivitiesQueryDto } from '../presentation/activities.dto';
 

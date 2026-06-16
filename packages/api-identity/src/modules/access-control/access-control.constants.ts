@@ -4,6 +4,11 @@ export const ROLE_NAMES = {
   USER: 'USER',
 } as const;
 
+export const PRIVILEGED_ROLE_NAMES = [
+  ROLE_NAMES.SUPER_ADMIN,
+  ROLE_NAMES.ADMIN,
+] as const;
+
 export const PERMISSION_NAMES = {
   USERS_READ: 'users.read',
   USERS_CREATE: 'users.create',

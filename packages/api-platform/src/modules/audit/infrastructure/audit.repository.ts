@@ -1,11 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { and, count, desc, eq, gte, lte, type SQL } from 'drizzle-orm';
-import { DATABASE } from '@repo/api-database/database.provider';
+import { DATABASE } from '@repo/api-database';
 import type {
   DatabaseClient,
   DatabaseExecutor,
-} from '@repo/api-database/database.types';
-import { auditLogs } from '@repo/api-database/schema';
+} from '@repo/api-database';
+import { auditLogs } from '@repo/api-database';
 
 type ListAuditLogsParams = {
   page: number;

@@ -1,13 +1,13 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { and, asc, count, desc, eq, inArray, isNull, sql } from 'drizzle-orm';
-import { ERROR_CODES } from '@repo/api-core/common/constants/error-codes';
-import { AppError } from '@repo/api-core/common/errors/app-error';
-import { DATABASE } from '@repo/api-database/database.provider';
+import { ERROR_CODES } from '@repo/api-core';
+import { AppError } from '@repo/api-core';
+import { DATABASE } from '@repo/api-database';
 import type {
   DatabaseClient,
   DatabaseExecutor,
-} from '@repo/api-database/database.types';
-import { roles, userRoles, users } from '@repo/api-database/schema';
+} from '@repo/api-database';
+import { roles, userRoles, users } from '@repo/api-database';
 
 type ListUsersParams = {
   page: number;
