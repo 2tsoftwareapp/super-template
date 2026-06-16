@@ -2,12 +2,12 @@ import type { INestApplication } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
 import request from 'supertest';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { ERROR_CODES } from '../src/common/constants/error-codes';
-import { DATABASE } from '../src/database/database.provider';
-import type { DatabaseClient } from '../src/database/database.types';
-import { auditLogs } from '../src/database/schema';
-import { ROLE_NAMES } from '../src/modules/access-control/access-control.constants';
-import { AccessControlService } from '../src/modules/access-control/application/access-control.service';
+import { ERROR_CODES } from '@repo/api-core/common/constants/error-codes';
+import { DATABASE } from '@repo/api-database';
+import type { DatabaseClient } from '@repo/api-database';
+import { auditLogs } from '@repo/api-database/schema';
+import { ROLE_NAMES } from '@repo/api-identity/modules/access-control/access-control.constants';
+import { AccessControlService } from '@repo/api-identity/modules/access-control/application/access-control.service';
 import {
   bearer,
   createTestApp,
@@ -229,6 +229,7 @@ describe('Auth, Projects, and Notifications (e2e)', () => {
       .post('/api/v1/admin/notifications')
       .set(bearer(adminSession.accessToken))
       .send({
+        audience: 'USER',
         userId: targetUserId,
         type: 'ops.alert',
         title: 'Ops alert',
@@ -236,7 +237,24 @@ describe('Auth, Projects, and Notifications (e2e)', () => {
       })
       .expect(201);
 
-    const targetNotificationId = sendNotificationResponse.body.data
+    expect(sendNotificationResponse.body.data).toMatchObject({
+      audience: 'USER',
+      status: 'COMPLETED',
+      recipientCount: 1,
+    });
+
+    const targetUserSession = await loginAs(
+      app,
+      'notify-owner@example.local',
+      'NotifyPass123!',
+    );
+
+    const targetNotificationsResponse = await request(app.getHttpServer())
+      .get('/api/v1/notifications?type=ops.alert')
+      .set(bearer(targetUserSession.accessToken))
+      .expect(200);
+
+    const targetNotificationId = targetNotificationsResponse.body.data[0]
       .id as string;
 
     const foreignMutation = await request(app.getHttpServer())
@@ -260,6 +278,113 @@ describe('Auth, Projects, and Notifications (e2e)', () => {
     expect(validationResponse.body.error.code).toBe(
       ERROR_CODES.VALIDATION_FAILED,
     );
+  });
+
+  it('supports multi-user, broadcast, and scheduled notification jobs', async () => {
+    const adminSession = await loginAs(
+      app,
+      'admin@example.local',
+      'ChangeMe123!',
+    );
+    const userSession = await loginAs(
+      app,
+      'user@example.local',
+      'ChangeMe123!',
+    );
+    const accessControlService = app.get(AccessControlService);
+    const userRole = await accessControlService.getRoleByName(ROLE_NAMES.USER);
+
+    if (!userRole) {
+      throw new Error('USER role was not found');
+    }
+
+    const secondUserResponse = await request(app.getHttpServer())
+      .post('/api/v1/admin/users')
+      .set(bearer(adminSession.accessToken))
+      .send({
+        email: 'notify-peer@example.local',
+        password: 'NotifyPass123!',
+        displayName: 'Notify Peer',
+        status: 'ACTIVE',
+        roleIds: [userRole.id],
+      })
+      .expect(201);
+
+    const multiSendResponse = await request(app.getHttpServer())
+      .post('/api/v1/admin/notifications')
+      .set(bearer(adminSession.accessToken))
+      .send({
+        audience: 'USERS',
+        userIds: [userSession.userId, secondUserResponse.body.data.id],
+        type: 'ops.broadcast',
+        title: 'Peer alert',
+        body: 'Sent to selected users',
+      })
+      .expect(201);
+
+    expect(multiSendResponse.body.data).toMatchObject({
+      audience: 'USERS',
+      status: 'COMPLETED',
+      recipientCount: 2,
+    });
+
+    const broadcastResponse = await request(app.getHttpServer())
+      .post('/api/v1/admin/notifications')
+      .set(bearer(adminSession.accessToken))
+      .send({
+        audience: 'ALL',
+        type: 'ops.broadcast',
+        title: 'Everyone alert',
+        body: 'Sent to all active users',
+      })
+      .expect(201);
+
+    expect(broadcastResponse.body.data.status).toBe('COMPLETED');
+    expect(broadcastResponse.body.data.recipientCount).toBeGreaterThanOrEqual(
+      3,
+    );
+
+    const scheduledAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();
+    const scheduledResponse = await request(app.getHttpServer())
+      .post('/api/v1/admin/notifications')
+      .set(bearer(adminSession.accessToken))
+      .send({
+        audience: 'USER',
+        userId: userSession.userId,
+        type: 'ops.scheduled',
+        title: 'Scheduled alert',
+        body: 'Deliver later',
+        scheduledAt,
+      })
+      .expect(201);
+
+    expect(scheduledResponse.body.data).toMatchObject({
+      audience: 'USER',
+      status: 'PENDING',
+    });
+
+    const jobsResponse = await request(app.getHttpServer())
+      .get('/api/v1/admin/notifications/jobs?status=PENDING')
+      .set(bearer(adminSession.accessToken))
+      .expect(200);
+
+    expect(jobsResponse.body.data).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: scheduledResponse.body.data.id,
+          status: 'PENDING',
+        }),
+      ]),
+    );
+
+    const cancelResponse = await request(app.getHttpServer())
+      .delete(
+        `/api/v1/admin/notifications/jobs/${scheduledResponse.body.data.id}`,
+      )
+      .set(bearer(adminSession.accessToken))
+      .expect(200);
+
+    expect(cancelResponse.body.data.status).toBe('CANCELLED');
   });
 
   it('enforces admin boundaries and revokes active sessions when a user is blocked', async () => {
@@ -311,5 +436,36 @@ describe('Auth, Projects, and Notifications (e2e)', () => {
     expect(blockedAccess.body.error.code).toBe(
       ERROR_CODES.AUTH_SESSION_REVOKED,
     );
+  });
+
+  it('lists audit logs for admins with audit.read permission', async () => {
+    const adminSession = await loginAs(
+      app,
+      'admin@example.local',
+      'ChangeMe123!',
+    );
+
+    const auditResponse = await request(app.getHttpServer())
+      .get('/api/v1/admin/audit-logs')
+      .set(bearer(adminSession.accessToken))
+      .expect(200);
+
+    expect(auditResponse.body.data).toBeInstanceOf(Array);
+    expect(auditResponse.body.meta.total).toBeGreaterThanOrEqual(0);
+  });
+
+  it('lists roles for admins with roles.read permission', async () => {
+    const adminSession = await loginAs(
+      app,
+      'admin@example.local',
+      'ChangeMe123!',
+    );
+
+    const rolesResponse = await request(app.getHttpServer())
+      .get('/api/v1/admin/roles')
+      .set(bearer(adminSession.accessToken))
+      .expect(200);
+
+    expect(rolesResponse.body.data.length).toBeGreaterThan(0);
   });
 });

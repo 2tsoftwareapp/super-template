@@ -11,13 +11,25 @@
 
 ## Backend Boundaries
 
+### Core (default)
+
 - `health`: liveness and readiness
 - `auth`: registration, login, refresh rotation, logout, reset, verification, session management
 - `users`: self-service profile plus administrative user management
 - `access-control`: roles, permissions, enforcement helpers
-- `projects`: reference CRUD module with ownership and audit behavior
-- `notifications`: in-app notification reads and admin send flow
-- `audit`: append-only audit logging integration
+- `audit`: append-only audit logging (write + admin read API)
+- `notifications`: inbox CRUD, web SSE, FCM push, scheduled sends
+- `projects`: reference domain CRUD with ownership and audit behavior
+
+### Reusable capability modules
+
+- `storage` + `files` + `attachments`: object storage adapters, upload metadata, polymorphic attachments
+- `mail`: SMTP delivery, file-based templates, delivery log
+- `preferences` + `settings`: user preferences and application settings
+- `jobs`: PostgreSQL-backed background job queue
+- `invitations`: polymorphic invitation flows
+- `imports` + `exports`: CSV import/export framework (projects demo)
+- `comments` + `activities`: entity comments and human-readable activity feed
 
 The backend uses explicit repositories and feature modules. It does not use a generic repository abstraction.
 

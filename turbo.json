@@ -2,7 +2,7 @@
   "$schema": "https://turbo.build/schema.json",
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
+      "dependsOn": [],
       "outputs": ["dist/**", ".next/**"]
     },
     "dev": {
@@ -14,16 +14,16 @@
       "outputs": ["apps/api/openapi.json", "packages/api-contract/src/generated/**"]
     },
     "lint": {
-      "dependsOn": ["^lint"]
+      "dependsOn": []
     },
     "format": {
       "cache": false
     },
     "test": {
-      "dependsOn": ["^test"]
+      "dependsOn": []
     },
     "typecheck": {
-      "dependsOn": ["^typecheck"]
+      "dependsOn": []
     }
   }
 }

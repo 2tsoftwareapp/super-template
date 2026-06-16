@@ -5,13 +5,29 @@ import { useParams, useRouter } from "next/navigation";
 import { standardSchemaResolver as zodResolver } from "@hookform/resolvers/standard-schema";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { useQueryState } from "nuqs";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import type { ProjectResponse, UpdateProjectInput } from "@/lib/api-types";
 import { webFetch } from "@/lib/http";
 import {
@@ -30,7 +46,9 @@ const schema = z.object({
 type EditProjectFormInput = z.input<typeof schema>;
 type EditProjectFormValues = z.output<typeof schema>;
 
-const toUpdateProjectInput = (values: EditProjectFormValues): UpdateProjectInput => ({
+const toUpdateProjectInput = (
+  values: EditProjectFormValues,
+): UpdateProjectInput => ({
   ...(values.name ? { name: values.name } : {}),
   ...(values.description ? { description: values.description } : {}),
   ...(values.status ? { status: values.status } : {}),
@@ -84,27 +102,58 @@ export default function EditProjectPage() {
   });
 
   return (
-    <Card className="max-w-3xl">
-      <Link href={backToProjects} className="text-sm text-neutral-500 underline">
-        Back to projects
-      </Link>
-      <h1 className="text-4xl font-semibold">Edit project</h1>
-      <form
-        className="mt-8 space-y-4"
-        onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
-      >
-        <Input {...form.register("name")} />
-        <Input {...form.register("description")} />
-        <select
-          className="h-11 w-full rounded-2xl border border-black/10 bg-white/80 px-4 text-sm dark:border-white/10 dark:bg-white/5"
-          {...form.register("status")}
+    <Card className="max-w-3xl border-border">
+      <CardHeader className="space-y-3">
+        <Button
+          variant="ghost"
+          size="sm"
+          render={<Link href={backToProjects} />}
         >
-          <option value="DRAFT">Draft</option>
-          <option value="ACTIVE">Active</option>
-          <option value="ARCHIVED">Archived</option>
-        </select>
-        <Button type="submit">Save changes</Button>
-      </form>
+          Back to projects
+        </Button>
+        <Badge variant="outline" className="w-fit">
+          Edit project
+        </Badge>
+        <CardTitle className="text-4xl">Edit project</CardTitle>
+        <CardDescription>
+          Update the record and return to the detail view.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form
+          className="space-y-4"
+          onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
+        >
+          <div className="space-y-2">
+            <Label htmlFor="name">Project name</Label>
+            <Input id="name" {...form.register("name")} />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="description">Description</Label>
+            <Textarea id="description" {...form.register("description")} />
+          </div>
+          <div className="space-y-2">
+            <Label>Status</Label>
+            <Controller
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="DRAFT">Draft</SelectItem>
+                    <SelectItem value="ACTIVE">Active</SelectItem>
+                    <SelectItem value="ARCHIVED">Archived</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </div>
+          <Button type="submit">Save changes</Button>
+        </form>
+      </CardContent>
     </Card>
   );
 }

@@ -65,6 +65,11 @@ class HomeScreen extends ConsumerWidget {
             onTap: () => context.go('/profile'),
           ),
           _NavTile(
+            title: 'Preferences',
+            icon: Icons.tune,
+            onTap: () => context.go('/preferences'),
+          ),
+          _NavTile(
             title: 'Security',
             icon: Icons.lock,
             onTap: () => context.go('/security'),
@@ -74,6 +79,18 @@ class HomeScreen extends ConsumerWidget {
             icon: Icons.devices,
             onTap: () => context.go('/sessions'),
           ),
+          if (authState?.permissions.contains('users.read') ?? false)
+            _NavTile(
+              title: 'Admin users',
+              icon: Icons.admin_panel_settings,
+              onTap: () => context.go('/admin/users'),
+            ),
+          if (authState?.permissions.contains('audit.read') ?? false)
+            _NavTile(
+              title: 'Audit logs',
+              icon: Icons.history,
+              onTap: () => context.go('/admin/audit-logs'),
+            ),
         ],
       ),
     );

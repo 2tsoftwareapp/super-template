@@ -48,3 +48,13 @@ export type NotificationsListResponse =
   operations["NotificationsController_list"]["responses"][200]["content"]["application/json"];
 export type NotificationsUnreadResponse =
   operations["NotificationsController_unreadCount"]["responses"][200]["content"]["application/json"];
+export type AuditLogsListResponse =
+  operations["AuditController_listAuditLogs"]["responses"][200]["content"]["application/json"];
+export type UserDto = components["schemas"]["UserDto"];
+export type RoleDto = components["schemas"]["RoleDto"];
+export type CreateAdminUserInput = components["schemas"]["CreateAdminUserDto"];
+export type UpdateUserStatusInput =
+  components["schemas"]["UpdateUserStatusDto"];
+export type ReplaceUserRolesInput =
+  components["schemas"]["ReplaceUserRolesDto"];
+export type NotificationDto = components["schemas"]["NotificationDto"];

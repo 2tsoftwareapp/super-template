@@ -5,47 +5,71 @@ import {
   RequestMethod,
 } from '@nestjs/common';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
-import { AppExceptionFilter } from './common/filters/app-exception.filter';
-import { AuthGuard } from './common/guards/auth.guard';
-import { PermissionsGuard } from './common/guards/permissions.guard';
-import { ResponseEnvelopeInterceptor } from './common/interceptors/response-envelope.interceptor';
-import { RequestContextMiddleware } from './common/middleware/request-context.middleware';
-import { RequestLoggerMiddleware } from './common/middleware/request-logger.middleware';
-import { AppConfigModule } from './config/app-config.module';
-import { DatabaseModule } from './database/database.module';
-import { AuthModule } from './modules/auth/auth.module';
+import { Reflector } from '@nestjs/core';
+import { ScheduleModule } from '@nestjs/schedule';
+import { AppConfigModule } from '@repo/api-core/config/app-config.module';
+import { EnvironmentService } from '@repo/api-core/config/environment.service';
+import { AppExceptionFilter } from '@repo/api-core/common/filters/app-exception.filter';
+import { PermissionsGuard } from '@repo/api-core/common/guards/permissions.guard';
+import { ResponseEnvelopeInterceptor } from '@repo/api-core/common/interceptors/response-envelope.interceptor';
+import { LoggingModule } from '@repo/api-core/common/logging/logging.module';
+import { RequestContextMiddleware } from '@repo/api-core/common/middleware/request-context.middleware';
+import { RequestLoggerMiddleware } from '@repo/api-core/common/middleware/request-logger.middleware';
+import { TenantContextService } from '@repo/api-database';
+import { DatabaseModule } from '@repo/api-database';
+import { IdentityModule } from '@repo/api-identity';
+import { AuthService } from '@repo/api-identity/modules/auth/application/auth.service';
+import { PlatformModule } from '@repo/api-platform';
+import { WorkspaceModule } from '@repo/api-workspace';
+import { AuthGuard } from './shell/auth.guard';
+import { TenantContextInterceptor } from './shell/tenant-context.interceptor';
 import { HealthModule } from './modules/health/health.module';
-import { NotificationsModule } from './modules/notifications/notifications.module';
-import { ProjectsModule } from './modules/projects/projects.module';
-import { UsersModule } from './modules/users/users.module';
 
 @Module({
   imports: [
     AppConfigModule,
+    LoggingModule,
+    ScheduleModule.forRoot(),
     DatabaseModule,
     HealthModule,
-    UsersModule,
-    AuthModule,
-    NotificationsModule,
-    ProjectsModule,
+    IdentityModule,
+    PlatformModule,
+    WorkspaceModule,
   ],
   providers: [
+    RequestLoggerMiddleware,
     {
       provide: APP_FILTER,
-      useClass: AppExceptionFilter,
+      useFactory: (environmentService: EnvironmentService) =>
+        new AppExceptionFilter(environmentService),
+      inject: [EnvironmentService],
     },
     {
       provide: APP_GUARD,
-      useClass: AuthGuard,
+      useFactory: (reflector: Reflector, authService: AuthService) =>
+        new AuthGuard(reflector, authService),
+      inject: [Reflector, AuthService],
     },
     {
       provide: APP_GUARD,
-      useClass: PermissionsGuard,
+      useFactory: (reflector: Reflector) => new PermissionsGuard(reflector),
+      inject: [Reflector],
     },
     {
       provide: APP_INTERCEPTOR,
-      useClass: ResponseEnvelopeInterceptor,
+      useFactory: (reflector: Reflector) =>
+        new ResponseEnvelopeInterceptor(reflector),
+      inject: [Reflector],
     },
+    {
+      provide: APP_INTERCEPTOR,
+      useFactory: (
+        reflector: Reflector,
+        tenantContextService: TenantContextService,
+      ) => new TenantContextInterceptor(reflector, tenantContextService),
+      inject: [Reflector, TenantContextService],
+    },
+    TenantContextService,
   ],
 })
 export class AppModule implements NestModule {

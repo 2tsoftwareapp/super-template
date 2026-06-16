@@ -31,9 +31,9 @@ abstract class AdminUsersControllerListUsers200Response
 
   AdminUsersControllerListUsers200Response._();
 
-  factory AdminUsersControllerListUsers200Response([
-    void updates(AdminUsersControllerListUsers200ResponseBuilder b),
-  ]) = _$AdminUsersControllerListUsers200Response;
+  factory AdminUsersControllerListUsers200Response(
+          [void updates(AdminUsersControllerListUsers200ResponseBuilder b)]) =
+      _$AdminUsersControllerListUsers200Response;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(AdminUsersControllerListUsers200ResponseBuilder b) => b;
@@ -48,7 +48,7 @@ class _$AdminUsersControllerListUsers200ResponseSerializer
   @override
   final Iterable<Type> types = const [
     AdminUsersControllerListUsers200Response,
-    _$AdminUsersControllerListUsers200Response,
+    _$AdminUsersControllerListUsers200Response
   ];
 
   @override
@@ -77,11 +77,9 @@ class _$AdminUsersControllerListUsers200ResponseSerializer
     AdminUsersControllerListUsers200Response object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(
-      serializers,
-      object,
-      specifiedType: specifiedType,
-    ).toList();
+    return _serializeProperties(serializers, object,
+            specifiedType: specifiedType)
+        .toList();
   }
 
   void _deserializeProperties(
@@ -99,9 +97,7 @@ class _$AdminUsersControllerListUsers200ResponseSerializer
         case r'data':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(BuiltList, [
-              FullType(UserDto),
-            ]),
+            specifiedType: const FullType(BuiltList, [FullType(UserDto)]),
           ) as BuiltList<UserDto>;
           result.data.replace(valueDes);
           break;

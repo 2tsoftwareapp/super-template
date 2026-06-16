@@ -17,6 +17,8 @@ class _$SendNotificationDto extends SendNotificationDto {
   final String title;
   @override
   final String body;
+  @override
+  final JsonObject? data;
 
   factory _$SendNotificationDto(
           [void Function(SendNotificationDtoBuilder)? updates]) =>
@@ -26,7 +28,8 @@ class _$SendNotificationDto extends SendNotificationDto {
       {required this.userId,
       required this.type,
       required this.title,
-      required this.body})
+      required this.body,
+      this.data})
       : super._();
   @override
   SendNotificationDto rebuild(
@@ -44,7 +47,8 @@ class _$SendNotificationDto extends SendNotificationDto {
         userId == other.userId &&
         type == other.type &&
         title == other.title &&
-        body == other.body;
+        body == other.body &&
+        data == other.data;
   }
 
   @override
@@ -54,6 +58,7 @@ class _$SendNotificationDto extends SendNotificationDto {
     _$hash = $jc(_$hash, type.hashCode);
     _$hash = $jc(_$hash, title.hashCode);
     _$hash = $jc(_$hash, body.hashCode);
+    _$hash = $jc(_$hash, data.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -64,7 +69,8 @@ class _$SendNotificationDto extends SendNotificationDto {
           ..add('userId', userId)
           ..add('type', type)
           ..add('title', title)
-          ..add('body', body))
+          ..add('body', body)
+          ..add('data', data))
         .toString();
   }
 }
@@ -89,6 +95,10 @@ class SendNotificationDtoBuilder
   String? get body => _$this._body;
   set body(String? body) => _$this._body = body;
 
+  JsonObject? _data;
+  JsonObject? get data => _$this._data;
+  set data(JsonObject? data) => _$this._data = data;
+
   SendNotificationDtoBuilder() {
     SendNotificationDto._defaults(this);
   }
@@ -100,6 +110,7 @@ class SendNotificationDtoBuilder
       _type = $v.type;
       _title = $v.title;
       _body = $v.body;
+      _data = $v.data;
       _$v = null;
     }
     return this;
@@ -129,6 +140,7 @@ class SendNotificationDtoBuilder
               title, r'SendNotificationDto', 'title'),
           body: BuiltValueNullFieldError.checkNotNull(
               body, r'SendNotificationDto', 'body'),
+          data: data,
         );
     replace(_$result);
     return _$result;

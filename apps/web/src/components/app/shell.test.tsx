@@ -54,8 +54,11 @@ describe("AppShell", () => {
       </QueryClientProvider>,
     );
 
+    expect(screen.getByText("Client")).toBeInTheDocument();
     expect(screen.getByText("Dashboard")).toBeInTheDocument();
     expect(screen.getByText("Projects")).toBeInTheDocument();
+    expect(screen.getByText("Admin")).toBeInTheDocument();
+    expect(screen.getByText("Admin overview")).toBeInTheDocument();
     expect(screen.queryByText("Users")).not.toBeInTheDocument();
     expect(screen.queryByText("Notifications")).not.toBeInTheDocument();
     expect(screen.getByText("Workspace")).toBeInTheDocument();

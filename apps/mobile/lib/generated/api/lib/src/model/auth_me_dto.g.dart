@@ -15,12 +15,17 @@ class _$AuthMeDto extends AuthMeDto {
   final BuiltList<String> permissions;
   @override
   final String sessionId;
+  @override
+  final JsonObject? organizationId;
 
   factory _$AuthMeDto([void Function(AuthMeDtoBuilder)? updates]) =>
       (AuthMeDtoBuilder()..update(updates))._build();
 
   _$AuthMeDto._(
-      {required this.user, required this.permissions, required this.sessionId})
+      {required this.user,
+      required this.permissions,
+      required this.sessionId,
+      this.organizationId})
       : super._();
   @override
   AuthMeDto rebuild(void Function(AuthMeDtoBuilder) updates) =>
@@ -35,7 +40,8 @@ class _$AuthMeDto extends AuthMeDto {
     return other is AuthMeDto &&
         user == other.user &&
         permissions == other.permissions &&
-        sessionId == other.sessionId;
+        sessionId == other.sessionId &&
+        organizationId == other.organizationId;
   }
 
   @override
@@ -44,6 +50,7 @@ class _$AuthMeDto extends AuthMeDto {
     _$hash = $jc(_$hash, user.hashCode);
     _$hash = $jc(_$hash, permissions.hashCode);
     _$hash = $jc(_$hash, sessionId.hashCode);
+    _$hash = $jc(_$hash, organizationId.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -53,7 +60,8 @@ class _$AuthMeDto extends AuthMeDto {
     return (newBuiltValueToStringHelper(r'AuthMeDto')
           ..add('user', user)
           ..add('permissions', permissions)
-          ..add('sessionId', sessionId))
+          ..add('sessionId', sessionId)
+          ..add('organizationId', organizationId))
         .toString();
   }
 }
@@ -75,6 +83,11 @@ class AuthMeDtoBuilder implements Builder<AuthMeDto, AuthMeDtoBuilder> {
   String? get sessionId => _$this._sessionId;
   set sessionId(String? sessionId) => _$this._sessionId = sessionId;
 
+  JsonObject? _organizationId;
+  JsonObject? get organizationId => _$this._organizationId;
+  set organizationId(JsonObject? organizationId) =>
+      _$this._organizationId = organizationId;
+
   AuthMeDtoBuilder() {
     AuthMeDto._defaults(this);
   }
@@ -85,6 +98,7 @@ class AuthMeDtoBuilder implements Builder<AuthMeDto, AuthMeDtoBuilder> {
       _user = $v.user.toBuilder();
       _permissions = $v.permissions.toBuilder();
       _sessionId = $v.sessionId;
+      _organizationId = $v.organizationId;
       _$v = null;
     }
     return this;
@@ -112,6 +126,7 @@ class AuthMeDtoBuilder implements Builder<AuthMeDto, AuthMeDtoBuilder> {
             permissions: permissions.build(),
             sessionId: BuiltValueNullFieldError.checkNotNull(
                 sessionId, r'AuthMeDto', 'sessionId'),
+            organizationId: organizationId,
           );
     } catch (_) {
       late String _$failedField;

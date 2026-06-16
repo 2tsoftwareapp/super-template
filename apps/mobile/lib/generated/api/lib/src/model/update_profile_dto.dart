@@ -5,7 +5,6 @@
 // ignore_for_file: unused_element
 // @dart=3.0
 
-import 'package:built_value/json_object.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
@@ -16,6 +15,7 @@ part 'update_profile_dto.g.dart';
 /// Properties:
 /// * [displayName]
 /// * [avatarUrl]
+/// * [avatarFileId]
 @BuiltValue()
 abstract class UpdateProfileDto
     implements Built<UpdateProfileDto, UpdateProfileDtoBuilder> {
@@ -24,6 +24,9 @@ abstract class UpdateProfileDto
 
   @BuiltValueField(wireName: r'avatarUrl')
   JsonObject? get avatarUrl;
+
+  @BuiltValueField(wireName: r'avatarFileId')
+  JsonObject? get avatarFileId;
 
   UpdateProfileDto._();
 
@@ -65,6 +68,13 @@ class _$UpdateProfileDtoSerializer
         specifiedType: const FullType(JsonObject),
       );
     }
+    if (object.avatarFileId != null) {
+      yield r'avatarFileId';
+      yield serializers.serialize(
+        object.avatarFileId,
+        specifiedType: const FullType(JsonObject),
+      );
+    }
   }
 
   @override
@@ -73,11 +83,9 @@ class _$UpdateProfileDtoSerializer
     UpdateProfileDto object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(
-      serializers,
-      object,
-      specifiedType: specifiedType,
-    ).toList();
+    return _serializeProperties(serializers, object,
+            specifiedType: specifiedType)
+        .toList();
   }
 
   void _deserializeProperties(
@@ -105,6 +113,13 @@ class _$UpdateProfileDtoSerializer
             specifiedType: const FullType(JsonObject),
           ) as JsonObject;
           result.avatarUrl = valueDes;
+          break;
+        case r'avatarFileId':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(JsonObject),
+          ) as JsonObject;
+          result.avatarFileId = valueDes;
           break;
         default:
           unhandled.add(key);

@@ -1,0 +1,3 @@
+<p>Hi {{displayName}},</p>
+<p>Welcome! Your email has been verified and your account is ready.</p>
+<p><a href="{{webUrl}}">Sign in</a></p>

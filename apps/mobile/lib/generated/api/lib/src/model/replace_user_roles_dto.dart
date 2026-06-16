@@ -39,7 +39,7 @@ class _$ReplaceUserRolesDtoSerializer
   @override
   final Iterable<Type> types = const [
     ReplaceUserRolesDto,
-    _$ReplaceUserRolesDto,
+    _$ReplaceUserRolesDto
   ];
 
   @override
@@ -63,11 +63,9 @@ class _$ReplaceUserRolesDtoSerializer
     ReplaceUserRolesDto object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(
-      serializers,
-      object,
-      specifiedType: specifiedType,
-    ).toList();
+    return _serializeProperties(serializers, object,
+            specifiedType: specifiedType)
+        .toList();
   }
 
   void _deserializeProperties(
@@ -85,9 +83,7 @@ class _$ReplaceUserRolesDtoSerializer
         case r'roleIds':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(BuiltList, [
-              FullType(String),
-            ]),
+            specifiedType: const FullType(BuiltList, [FullType(String)]),
           ) as BuiltList<String>;
           result.roleIds.replace(valueDes);
           break;

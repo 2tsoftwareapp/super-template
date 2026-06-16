@@ -5,12 +5,28 @@ import { useRouter } from "next/navigation";
 import { standardSchemaResolver as zodResolver } from "@hookform/resolvers/standard-schema";
 import { useMutation } from "@tanstack/react-query";
 import { useQueryState } from "nuqs";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import type { CreateProjectInput, ProjectResponse } from "@/lib/api-types";
 import { webFetch } from "@/lib/http";
 import {
@@ -29,7 +45,9 @@ const schema = z.object({
 type NewProjectFormInput = z.input<typeof schema>;
 type NewProjectFormValues = z.output<typeof schema>;
 
-const toCreateProjectInput = (values: NewProjectFormValues): CreateProjectInput => ({
+const toCreateProjectInput = (
+  values: NewProjectFormValues,
+): CreateProjectInput => ({
   name: values.name,
   ...(values.description ? { description: values.description } : {}),
   ...(values.status ? { status: values.status } : {}),
@@ -66,32 +84,60 @@ export default function NewProjectPage() {
   });
 
   return (
-    <Card className="max-w-3xl">
-      <Link href={backToProjects} className="text-sm text-neutral-500 underline">
-        Back to projects
-      </Link>
-      <p className="text-sm uppercase tracking-[0.28em] text-neutral-500">
-        Create project
-      </p>
-      <h1 className="mt-3 text-4xl font-semibold">New project</h1>
-      <form
-        className="mt-8 space-y-4"
-        onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
-      >
-        <Input placeholder="Project name" {...form.register("name")} />
-        <Input placeholder="Description" {...form.register("description")} />
-        <select
-          className="h-11 w-full rounded-2xl border border-black/10 bg-white/80 px-4 text-sm dark:border-white/10 dark:bg-white/5"
-          {...form.register("status")}
+    <Card className="max-w-3xl border-border">
+      <CardHeader className="space-y-3">
+        <Button
+          variant="ghost"
+          size="sm"
+          render={<Link href={backToProjects} />}
         >
-          <option value="DRAFT">Draft</option>
-          <option value="ACTIVE">Active</option>
-          <option value="ARCHIVED">Archived</option>
-        </select>
-        <Button type="submit" disabled={mutation.isPending}>
-          {mutation.isPending ? "Saving..." : "Create project"}
+          Back to projects
         </Button>
-      </form>
+        <Badge variant="outline" className="w-fit">
+          Create project
+        </Badge>
+        <CardTitle className="text-4xl">New project</CardTitle>
+        <CardDescription>
+          Create a project record with structured defaults.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form
+          className="space-y-4"
+          onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
+        >
+          <div className="space-y-2">
+            <Label htmlFor="name">Project name</Label>
+            <Input id="name" {...form.register("name")} />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="description">Description</Label>
+            <Textarea id="description" {...form.register("description")} />
+          </div>
+          <div className="space-y-2">
+            <Label>Status</Label>
+            <Controller
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="DRAFT">Draft</SelectItem>
+                    <SelectItem value="ACTIVE">Active</SelectItem>
+                    <SelectItem value="ARCHIVED">Archived</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </div>
+          <Button type="submit" disabled={mutation.isPending}>
+            {mutation.isPending ? "Saving..." : "Create project"}
+          </Button>
+        </form>
+      </CardContent>
     </Card>
   );
 }

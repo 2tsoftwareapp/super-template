@@ -6,8 +6,10 @@ import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { AuthShell } from "@/components/auth/auth-shell";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import type { ForgotPasswordInput } from "@/lib/api-types";
 import { webFetch } from "@/lib/http";
@@ -33,27 +35,36 @@ export default function ForgotPasswordPage() {
   });
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-6 py-8">
-      <Card className="w-full max-w-lg">
-        <h1 className="text-3xl font-semibold">Reset your password</h1>
-        <p className="mt-3 text-sm text-neutral-500">
-          Development emails are delivered to Mailpit.
+    <AuthShell
+      eyebrow="Password recovery"
+      title="Reset your password"
+      body="Development emails are delivered to Mailpit."
+      footer={
+        <p>
+          <Link href="/login">Back to sign in</Link>
         </p>
-        <form
-          className="mt-8 space-y-4"
-          onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
-        >
-          <Input placeholder="you@example.local" {...form.register("email")} />
-          <Button className="w-full" type="submit">
-            Send reset email
-          </Button>
-        </form>
-        <p className="mt-6 text-sm text-neutral-500">
-          <Link href="/login" className="underline">
-            Back to sign in
-          </Link>
-        </p>
+      }
+    >
+      <Card className="border-0 bg-transparent shadow-none">
+        <CardContent className="space-y-4 p-6">
+          <form
+            className="space-y-4"
+            onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
+          >
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                placeholder="you@example.local"
+                {...form.register("email")}
+              />
+            </div>
+            <Button className="w-full" type="submit">
+              Send reset email
+            </Button>
+          </form>
+        </CardContent>
       </Card>
-    </div>
+    </AuthShell>
   );
 }

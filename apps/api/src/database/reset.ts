@@ -4,7 +4,7 @@ import { config as loadEnv } from 'dotenv';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import { Pool } from 'pg';
 import { AppModule } from '../app.module';
-import { createDatabaseClient } from './database.types';
+import { createDatabaseClient } from '@repo/api-database';
 import { seedDatabase } from './seed-data';
 
 loadEnv({

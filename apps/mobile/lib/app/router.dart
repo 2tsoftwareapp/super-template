@@ -1,5 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mobile_app/features/admin/presentation/admin_user_detail_screen.dart';
+import 'package:mobile_app/features/admin/presentation/admin_users_screen.dart';
+import 'package:mobile_app/features/admin/presentation/audit_logs_screen.dart';
 import 'package:mobile_app/features/auth/presentation/auth_controller.dart';
 import 'package:mobile_app/features/auth/presentation/screens/forgot_password_screen.dart';
 import 'package:mobile_app/features/auth/presentation/screens/login_screen.dart';
@@ -7,6 +10,7 @@ import 'package:mobile_app/features/auth/presentation/screens/register_screen.da
 import 'package:mobile_app/features/auth/presentation/screens/splash_screen.dart';
 import 'package:mobile_app/features/home/presentation/home_screen.dart';
 import 'package:mobile_app/features/notifications/presentation/notifications_screen.dart';
+import 'package:mobile_app/features/profile/presentation/preferences_screen.dart';
 import 'package:mobile_app/features/profile/presentation/profile_screen.dart';
 import 'package:mobile_app/features/profile/presentation/security_screen.dart';
 import 'package:mobile_app/features/profile/presentation/sessions_screen.dart';
@@ -77,8 +81,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (_, _) => const NotificationsScreen(),
       ),
       GoRoute(path: '/profile', builder: (_, _) => const ProfileScreen()),
+      GoRoute(path: '/preferences', builder: (_, _) => const PreferencesScreen()),
       GoRoute(path: '/security', builder: (_, _) => const SecurityScreen()),
       GoRoute(path: '/sessions', builder: (_, _) => const SessionsScreen()),
+      GoRoute(path: '/admin/users', builder: (_, _) => const AdminUsersScreen()),
+      GoRoute(
+        path: '/admin/users/:id',
+        builder: (_, state) => AdminUserDetailScreen(
+          userId: state.pathParameters['id']!,
+        ),
+      ),
+      GoRoute(path: '/admin/audit-logs', builder: (_, _) => const AuditLogsScreen()),
     ],
   );
 });

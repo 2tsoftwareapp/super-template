@@ -6,8 +6,10 @@ import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { AuthShell } from "@/components/auth/auth-shell";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import type { ResetPasswordInput } from "@/lib/api-types";
 import { webFetch } from "@/lib/http";
@@ -43,24 +45,40 @@ export default function ResetPasswordPage() {
   });
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-6 py-8">
-      <Card className="w-full max-w-lg">
-        <h1 className="text-3xl font-semibold">Choose a new password</h1>
-        <form
-          className="mt-8 space-y-4"
-          onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
-        >
-          <Input placeholder="Reset token" {...form.register("token")} />
-          <Input
-            type="password"
-            placeholder="New password"
-            {...form.register("newPassword")}
-          />
-          <Button className="w-full" type="submit">
-            Reset password
-          </Button>
-        </form>
+    <AuthShell
+      eyebrow="Password recovery"
+      title="Choose a new password"
+      body="Paste the reset token from Mailpit and pick a new secret."
+    >
+      <Card className="border-0 bg-transparent shadow-none">
+        <CardContent className="space-y-4 p-6">
+          <form
+            className="space-y-4"
+            onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
+          >
+            <div className="space-y-2">
+              <Label htmlFor="token">Reset token</Label>
+              <Input
+                id="token"
+                placeholder="Reset token"
+                {...form.register("token")}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="newPassword">New password</Label>
+              <Input
+                id="newPassword"
+                type="password"
+                placeholder="New password"
+                {...form.register("newPassword")}
+              />
+            </div>
+            <Button className="w-full" type="submit">
+              Reset password
+            </Button>
+          </form>
+        </CardContent>
       </Card>
-    </div>
+    </AuthShell>
   );
 }

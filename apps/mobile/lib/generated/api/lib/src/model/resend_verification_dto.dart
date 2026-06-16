@@ -22,9 +22,8 @@ abstract class ResendVerificationDto
 
   ResendVerificationDto._();
 
-  factory ResendVerificationDto([
-    void updates(ResendVerificationDtoBuilder b),
-  ]) = _$ResendVerificationDto;
+  factory ResendVerificationDto(
+      [void updates(ResendVerificationDtoBuilder b)]) = _$ResendVerificationDto;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(ResendVerificationDtoBuilder b) => b;
@@ -39,7 +38,7 @@ class _$ResendVerificationDtoSerializer
   @override
   final Iterable<Type> types = const [
     ResendVerificationDto,
-    _$ResendVerificationDto,
+    _$ResendVerificationDto
   ];
 
   @override
@@ -63,11 +62,9 @@ class _$ResendVerificationDtoSerializer
     ResendVerificationDto object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(
-      serializers,
-      object,
-      specifiedType: specifiedType,
-    ).toList();
+    return _serializeProperties(serializers, object,
+            specifiedType: specifiedType)
+        .toList();
   }
 
   void _deserializeProperties(

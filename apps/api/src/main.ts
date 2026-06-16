@@ -4,7 +4,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { json, urlencoded } from 'express';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
-import { EnvironmentService } from './config/environment.service';
+import { EnvironmentService } from '@repo/api-core/config/environment.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {

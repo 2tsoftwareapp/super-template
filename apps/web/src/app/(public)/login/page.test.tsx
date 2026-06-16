@@ -60,4 +60,28 @@ describe("LoginPage", () => {
     expect(webFetchMock).not.toHaveBeenCalled();
     expect(replaceMock).not.toHaveBeenCalled();
   });
+
+  it("redirects admin users to the admin overview", async () => {
+    const user = userEvent.setup();
+    const queryClient = new QueryClient();
+
+    webFetchMock.mockResolvedValueOnce({
+      data: {
+        user: {
+          displayName: "Admin User",
+          roles: ["ADMIN"],
+        },
+      },
+    });
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <LoginPage />
+      </QueryClientProvider>,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Sign in" }));
+
+    expect(replaceMock).toHaveBeenCalledWith("/admin");
+  });
 });

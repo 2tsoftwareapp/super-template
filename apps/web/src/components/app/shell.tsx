@@ -3,50 +3,29 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
-import {
-  Bell,
-  FolderKanban,
-  LayoutDashboard,
-  LogOut,
-  Settings,
-  Shield,
-  Users,
-} from "lucide-react";
+import { LogOut, Shield } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Spinner } from "@/components/ui/spinner";
 import { useSession } from "@/hooks/use-session";
+import { useNotificationStream } from "@/hooks/use-notification-stream";
+import { clientNavItems } from "@/lib/navigation";
 import { webFetch } from "@/lib/http";
 import { cn } from "@/lib/utils";
-
-type NavItem = {
-  href: string;
-  label: string;
-  icon: React.ComponentType<{ className?: string }>;
-  permission?: string;
-};
-
-const navItems: NavItem[] = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  {
-    href: "/projects",
-    label: "Projects",
-    icon: FolderKanban,
-    permission: "projects.read",
-  },
-  { href: "/users", label: "Users", icon: Users, permission: "users.read" },
-  {
-    href: "/notifications",
-    label: "Notifications",
-    icon: Bell,
-    permission: "notifications.read",
-  },
-  { href: "/settings/profile", label: "Settings", icon: Settings },
-];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const session = useSession();
+  useNotificationStream(Boolean(session.data));
 
   useEffect(() => {
     if (session.isError) {
@@ -56,14 +35,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   if (session.isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center px-6">
-        <Card className="max-w-md text-center">
-          <p className="text-sm uppercase tracking-[0.24em] text-neutral-500">
-            Loading workspace
-          </p>
-          <h1 className="mt-3 text-2xl font-semibold">
-            Restoring your session
-          </h1>
+      <div className="flex min-h-screen items-center justify-center px-4">
+        <Card className="w-full max-w-md border-border bg-card text-center">
+          <CardHeader className="items-center">
+            <Spinner className="size-5 text-primary" />
+            <CardTitle className="text-2xl">Restoring your session</CardTitle>
+            <CardDescription>
+              Loading workspace state and permissions.
+            </CardDescription>
+          </CardHeader>
         </Card>
       </div>
     );
@@ -73,67 +53,80 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     return null;
   }
 
-  const allowedItems = navItems.filter(
+  const allowedClientItems = clientNavItems.filter(
     (item) =>
       !item.permission ||
       session.data.data.permissions.includes(item.permission),
   );
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(251,191,36,0.18),transparent_28%),linear-gradient(180deg,#f4f1ea_0%,#ece7df_52%,#e6e0d7_100%)] px-4 py-4 text-neutral-950 dark:bg-[radial-gradient(circle_at_top_left,_rgba(251,191,36,0.14),transparent_24%),linear-gradient(180deg,#111111_0%,#171717_40%,#090909_100%)] dark:text-white md:px-6">
-      <div className="mx-auto grid min-h-[calc(100vh-2rem)] max-w-7xl gap-4 md:grid-cols-[260px_minmax(0,1fr)]">
-        <aside className="rounded-[32px] border border-black/10 bg-white/75 p-5 backdrop-blur dark:border-white/10 dark:bg-neutral-950/75">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-neutral-500">
-                Super Template
-              </p>
-              <h1 className="mt-2 text-2xl font-semibold">Control Room</h1>
-            </div>
-            <Shield className="h-6 w-6 text-amber-500" />
-          </div>
-          <div className="mt-8 space-y-2">
-            {allowedItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={cn(
-                    "flex items-center gap-3 rounded-2xl px-4 py-3 text-sm transition",
-                    pathname.startsWith(item.href)
-                      ? "bg-neutral-950 text-white dark:bg-amber-300 dark:text-neutral-950"
-                      : "text-neutral-600 hover:bg-black/5 dark:text-neutral-300 dark:hover:bg-white/5",
-                  )}
+    <div className="min-h-screen px-4 py-4 md:px-6 lg:px-8">
+      <div className="mx-auto grid min-h-[calc(100vh-2rem)] max-w-7xl gap-4 lg:grid-cols-[280px_minmax(0,1fr)]">
+        <aside className="lg:sticky lg:top-4 lg:h-[calc(100vh-2rem)]">
+          <Card className="h-full border-border bg-card ">
+            <CardHeader className="space-y-4">
+              <div className="flex items-start justify-between gap-4">
+                <div className="space-y-2">
+                  <Badge variant="outline" className="w-fit">
+                    Client workspace
+                  </Badge>
+                  <CardTitle className="text-2xl">Super Template</CardTitle>
+                  <CardDescription>
+                    The Next.js app is reserved for client-facing work.
+                  </CardDescription>
+                </div>
+                <Shield className="size-5 text-primary" />
+              </div>
+            </CardHeader>
+            <CardContent className="flex h-full flex-col gap-4">
+              <Separator />
+              <nav className="space-y-1">
+                {allowedClientItems.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={cn(
+                        "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition",
+                        pathname.startsWith(item.href)
+                          ? "bg-primary text-primary-foreground shadow-sm"
+                          : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                      )}
+                    >
+                      <Icon className="h-4 w-4" />
+                      {item.label}
+                    </Link>
+                  );
+                })}
+              </nav>
+              <Separator />
+              <div className="mt-auto rounded-2xl border border-border bg-muted/50 p-4">
+                <p className="text-sm font-medium">
+                  {session.data.data.user.displayName}
+                </p>
+                <p className="mt-1 text-xs uppercase tracking-[0.22em] text-muted-foreground">
+                  {session.data.data.user.roles.join(" / ")}
+                </p>
+                <Button
+                  className="mt-4 w-full"
+                  variant="outline"
+                  onClick={async () => {
+                    await webFetch("/api/auth/logout", { method: "POST" });
+                    router.replace("/login");
+                  }}
                 >
-                  <Icon className="h-4 w-4" />
-                  {item.label}
-                </Link>
-              );
-            })}
-          </div>
-          <div className="mt-8 rounded-3xl bg-neutral-950 px-4 py-5 text-white dark:bg-white/10">
-            <p className="text-sm font-medium">
-              {session.data.data.user.displayName}
-            </p>
-            <p className="mt-1 text-xs uppercase tracking-[0.22em] text-white/60">
-              {session.data.data.user.roles.join(" / ")}
-            </p>
-            <Button
-              className="mt-4 w-full"
-              variant="secondary"
-              onClick={async () => {
-                await webFetch("/api/auth/logout", { method: "POST" });
-                router.replace("/login");
-              }}
-            >
-              <LogOut className="mr-2 h-4 w-4" />
-              Sign out
-            </Button>
-          </div>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Sign out
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </aside>
-        <main className="rounded-[32px] border border-black/10 bg-white/65 p-4 backdrop-blur dark:border-white/10 dark:bg-neutral-950/70 md:p-6">
-          {children}
+        <main className="min-w-0">
+          <Card className="min-h-full border-border bg-card ">
+            <CardContent className="p-4 md:p-6">{children}</CardContent>
+          </Card>
         </main>
       </div>
     </div>

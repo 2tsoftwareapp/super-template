@@ -31,10 +31,10 @@
 
 ## Out of Scope for v1
 
-- Redis
-- queues
+- Redis-backed queues (PostgreSQL jobs are used instead)
 - WebSocket notifications
-- object storage
 - social login
 - multi-tenancy
 - Kubernetes or Terraform
+
+Object storage is supported via local filesystem (development) or S3-compatible storage (production).

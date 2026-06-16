@@ -55,11 +55,9 @@ class _$CountDtoSerializer implements PrimitiveSerializer<CountDto> {
     CountDto object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(
-      serializers,
-      object,
-      specifiedType: specifiedType,
-    ).toList();
+    return _serializeProperties(serializers, object,
+            specifiedType: specifiedType)
+        .toList();
   }
 
   void _deserializeProperties(
@@ -75,8 +73,10 @@ class _$CountDtoSerializer implements PrimitiveSerializer<CountDto> {
       final value = serializedList[i + 1];
       switch (key) {
         case r'count':
-          final valueDes = serializers.deserialize(value,
-              specifiedType: const FullType(num)) as num;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(num),
+          ) as num;
           result.count = valueDes;
           break;
         default:

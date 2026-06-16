@@ -1,13 +1,22 @@
 packages:
   - "apps/api"
+  - "apps/admin"
   - "apps/web"
   - "apps/web/e2e"
   - "packages/*"
+overrides:
+  "@nestjs/common": "11.1.27"
+  "@nestjs/core": "11.1.27"
+  "@nestjs/platform-express": "11.1.27"
+  "@nestjs/testing": "11.1.27"
+  "@nestjs/throttler": "6.5.0"
 allowBuilds:
+  '@firebase/util': set this to true or false
   '@scarf/scarf': true
   argon2: true
   esbuild: true
   msw: true
+  protobufjs: set this to true or false
   sharp: true
   unrs-resolver: true
 minimumReleaseAgeExclude:

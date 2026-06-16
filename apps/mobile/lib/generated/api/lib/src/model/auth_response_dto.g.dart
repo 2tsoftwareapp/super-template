@@ -19,6 +19,8 @@ class _$AuthResponseDto extends AuthResponseDto {
   final BuiltList<String> permissions;
   @override
   final AuthSessionDto session;
+  @override
+  final JsonObject? organizationId;
 
   factory _$AuthResponseDto([void Function(AuthResponseDtoBuilder)? updates]) =>
       (AuthResponseDtoBuilder()..update(updates))._build();
@@ -28,7 +30,8 @@ class _$AuthResponseDto extends AuthResponseDto {
       required this.refreshToken,
       required this.user,
       required this.permissions,
-      required this.session})
+      required this.session,
+      this.organizationId})
       : super._();
   @override
   AuthResponseDto rebuild(void Function(AuthResponseDtoBuilder) updates) =>
@@ -45,7 +48,8 @@ class _$AuthResponseDto extends AuthResponseDto {
         refreshToken == other.refreshToken &&
         user == other.user &&
         permissions == other.permissions &&
-        session == other.session;
+        session == other.session &&
+        organizationId == other.organizationId;
   }
 
   @override
@@ -56,6 +60,7 @@ class _$AuthResponseDto extends AuthResponseDto {
     _$hash = $jc(_$hash, user.hashCode);
     _$hash = $jc(_$hash, permissions.hashCode);
     _$hash = $jc(_$hash, session.hashCode);
+    _$hash = $jc(_$hash, organizationId.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -67,7 +72,8 @@ class _$AuthResponseDto extends AuthResponseDto {
           ..add('refreshToken', refreshToken)
           ..add('user', user)
           ..add('permissions', permissions)
-          ..add('session', session))
+          ..add('session', session)
+          ..add('organizationId', organizationId))
         .toString();
   }
 }
@@ -99,6 +105,11 @@ class AuthResponseDtoBuilder
       _$this._session ??= AuthSessionDtoBuilder();
   set session(AuthSessionDtoBuilder? session) => _$this._session = session;
 
+  JsonObject? _organizationId;
+  JsonObject? get organizationId => _$this._organizationId;
+  set organizationId(JsonObject? organizationId) =>
+      _$this._organizationId = organizationId;
+
   AuthResponseDtoBuilder() {
     AuthResponseDto._defaults(this);
   }
@@ -111,6 +122,7 @@ class AuthResponseDtoBuilder
       _user = $v.user.toBuilder();
       _permissions = $v.permissions.toBuilder();
       _session = $v.session.toBuilder();
+      _organizationId = $v.organizationId;
       _$v = null;
     }
     return this;
@@ -141,6 +153,7 @@ class AuthResponseDtoBuilder
             user: user.build(),
             permissions: permissions.build(),
             session: session.build(),
+            organizationId: organizationId,
           );
     } catch (_) {
       late String _$failedField;

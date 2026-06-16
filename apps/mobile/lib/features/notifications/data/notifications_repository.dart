@@ -42,4 +42,29 @@ class NotificationsRepository {
       throw AppException.fromDio(error);
     }
   }
+
+  Future<void> registerDevice({
+    required String token,
+    required RegisterDeviceDtoPlatformEnum platform,
+  }) async {
+    try {
+      await _api.notificationsControllerRegisterDevice(
+        registerDeviceDto: RegisterDeviceDto(
+          (builder) => builder
+            ..token = token
+            ..platform = platform,
+        ),
+      );
+    } on DioException catch (error) {
+      throw AppException.fromDio(error);
+    }
+  }
+
+  Future<void> unregisterDevice(String token) async {
+    try {
+      await _api.notificationsControllerUnregisterDevice(token: token);
+    } on DioException catch (error) {
+      throw AppException.fromDio(error);
+    }
+  }
 }

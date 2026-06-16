@@ -12,12 +12,7 @@ const sortOrders = ["asc", "desc"] as const;
 const projectStatuses = ["ALL", "DRAFT", "ACTIVE", "ARCHIVED"] as const;
 const userStatuses = ["ALL", "PENDING", "ACTIVE", "BLOCKED"] as const;
 const projectSortFields = ["updatedAt", "createdAt", "name", "status"] as const;
-const userSortFields = [
-  "createdAt",
-  "displayName",
-  "email",
-  "status",
-] as const;
+const userSortFields = ["createdAt", "displayName", "email", "status"] as const;
 
 type SelectOption<T extends string | number | boolean> = {
   label: string;
@@ -97,6 +92,18 @@ export const notificationsSearchParams = {
   type: parseAsString.withDefault(""),
 };
 
+export const auditLogsSearchParams = {
+  page: parseAsInteger.withDefault(1),
+  limit: parseAsInteger.withDefault(20),
+  actorId: parseAsString.withDefault(""),
+  action: parseAsString.withDefault(""),
+  resourceType: parseAsString.withDefault(""),
+  resourceId: parseAsString.withDefault(""),
+  from: parseAsString.withDefault(""),
+  to: parseAsString.withDefault(""),
+  sortOrder: parseAsStringLiteral(sortOrders).withDefault("desc"),
+};
+
 export const sessionsSearchParams = {
   page: parseAsInteger.withDefault(1),
   limit: parseAsInteger.withDefault(20),
@@ -109,6 +116,7 @@ export const projectNavigationSearchParams = {
 const loadProjectsSearchParams = createLoader(projectsSearchParams);
 const loadUsersSearchParams = createLoader(usersSearchParams);
 const loadNotificationsSearchParams = createLoader(notificationsSearchParams);
+const loadAuditLogsSearchParams = createLoader(auditLogsSearchParams);
 const loadSessionsSearchParams = createLoader(sessionsSearchParams);
 const loadProjectNavigationSearchParams = createLoader(
   projectNavigationSearchParams,
@@ -124,12 +132,16 @@ type SyncLoaderInput =
 const projectsSerializer = createSerializer(projectsSearchParams);
 const usersSerializer = createSerializer(usersSearchParams);
 const notificationsSerializer = createSerializer(notificationsSearchParams);
+const auditLogsSerializer = createSerializer(auditLogsSearchParams);
 const sessionsSerializer = createSerializer(sessionsSearchParams);
 
 export type ProjectsSearchState = inferParserType<typeof projectsSearchParams>;
 export type UsersSearchState = inferParserType<typeof usersSearchParams>;
 export type NotificationsSearchState = inferParserType<
   typeof notificationsSearchParams
+>;
+export type AuditLogsSearchState = inferParserType<
+  typeof auditLogsSearchParams
 >;
 export type SessionsSearchState = inferParserType<typeof sessionsSearchParams>;
 export type ProjectNavigationState = inferParserType<
@@ -143,6 +155,8 @@ export const defaultUsersSearch: UsersSearchState = loadUsersSearchParams(
 );
 export const defaultNotificationsSearch: NotificationsSearchState =
   loadNotificationsSearchParams(new URLSearchParams());
+export const defaultAuditLogsSearch: AuditLogsSearchState =
+  loadAuditLogsSearchParams(new URLSearchParams());
 export const defaultSessionsSearch: SessionsSearchState =
   loadSessionsSearchParams(new URLSearchParams());
 export const defaultProjectNavigation: ProjectNavigationState =
@@ -166,6 +180,13 @@ const mergeNotificationsSearch = (
   overrides: Partial<NotificationsSearchState> = {},
 ): NotificationsSearchState => ({
   ...defaultNotificationsSearch,
+  ...overrides,
+});
+
+const mergeAuditLogsSearch = (
+  overrides: Partial<AuditLogsSearchState> = {},
+): AuditLogsSearchState => ({
+  ...defaultAuditLogsSearch,
   ...overrides,
 });
 
@@ -205,6 +226,19 @@ export const serializeNotificationsSearch = (state: NotificationsSearchState) =>
     ...(state.type ? { type: state.type } : {}),
   });
 
+export const serializeAuditLogsSearch = (state: AuditLogsSearchState) =>
+  auditLogsSerializer({
+    page: state.page,
+    limit: state.limit,
+    ...(state.actorId ? { actorId: state.actorId } : {}),
+    ...(state.action ? { action: state.action } : {}),
+    ...(state.resourceType ? { resourceType: state.resourceType } : {}),
+    ...(state.resourceId ? { resourceId: state.resourceId } : {}),
+    ...(state.from ? { from: state.from } : {}),
+    ...(state.to ? { to: state.to } : {}),
+    ...(state.sortOrder !== "desc" ? { sortOrder: state.sortOrder } : {}),
+  });
+
 export const serializeSessionsSearch = (state: SessionsSearchState) =>
   sessionsSerializer({
     page: state.page,
@@ -220,6 +254,9 @@ export const normalizeUsersSearch = (input: SyncLoaderInput) =>
 export const normalizeNotificationsSearch = (input: SyncLoaderInput) =>
   loadNotificationsSearchParams(input) as NotificationsSearchState;
 
+export const normalizeAuditLogsSearch = (input: SyncLoaderInput) =>
+  loadAuditLogsSearchParams(input) as AuditLogsSearchState;
+
 export const normalizeSessionsSearch = (input: SyncLoaderInput) =>
   loadSessionsSearchParams(input) as SessionsSearchState;
 
@@ -228,11 +265,19 @@ export const normalizeProjectNavigation = (input: SyncLoaderInput) =>
 
 export const buildProjectsListPath = (
   overrides: Partial<ProjectsSearchState> = {},
-) => withQuery("/api/bff/projects", serializeProjectsSearch(mergeProjectsSearch(overrides)));
+) =>
+  withQuery(
+    "/api/bff/projects",
+    serializeProjectsSearch(mergeProjectsSearch(overrides)),
+  );
 
 export const buildAdminUsersListPath = (
   overrides: Partial<UsersSearchState> = {},
-) => withQuery("/api/bff/admin/users", serializeUsersSearch(mergeUsersSearch(overrides)));
+) =>
+  withQuery(
+    "/api/bff/admin/users",
+    serializeUsersSearch(mergeUsersSearch(overrides)),
+  );
 
 export const buildNotificationsListPath = (
   overrides: Partial<NotificationsSearchState> = {},
@@ -240,6 +285,14 @@ export const buildNotificationsListPath = (
   withQuery(
     "/api/bff/notifications",
     serializeNotificationsSearch(mergeNotificationsSearch(overrides)),
+  );
+
+export const buildAuditLogsListPath = (
+  overrides: Partial<AuditLogsSearchState> = {},
+) =>
+  withQuery(
+    "/api/bff/admin/audit-logs",
+    serializeAuditLogsSearch(mergeAuditLogsSearch(overrides)),
   );
 
 export const buildSessionsListPath = (
@@ -252,10 +305,12 @@ export const buildSessionsListPath = (
 
 export const buildProjectReturnTo = (
   filters: Partial<ProjectsSearchState> = {},
-) => withQuery("/projects", serializeProjectsSearch(mergeProjectsSearch(filters)));
+) =>
+  withQuery("/projects", serializeProjectsSearch(mergeProjectsSearch(filters)));
 
 export const normalizeProjectReturnTo = (value: string | null | undefined) => {
-  const candidate = typeof value === "string" ? value : defaultProjectNavigation.returnTo;
+  const candidate =
+    typeof value === "string" ? value : defaultProjectNavigation.returnTo;
 
   if (!candidate.startsWith("/projects") || candidate.startsWith("//")) {
     return defaultProjectNavigation.returnTo;
@@ -273,7 +328,10 @@ export const buildProjectDetailPath = (projectId: string, returnTo?: string) =>
   withQuery(`/projects/${projectId}`, buildProjectNavigationQuery(returnTo));
 
 export const buildProjectEditPath = (projectId: string, returnTo?: string) =>
-  withQuery(`/projects/${projectId}/edit`, buildProjectNavigationQuery(returnTo));
+  withQuery(
+    `/projects/${projectId}/edit`,
+    buildProjectNavigationQuery(returnTo),
+  );
 
 export const buildProjectCreatePath = (returnTo?: string) =>
   withQuery("/projects/new", buildProjectNavigationQuery(returnTo));
@@ -300,6 +358,13 @@ export const normalizeBffListPath = (
     return withQuery(
       path,
       serializeNotificationsSearch(normalizeNotificationsSearch(searchParams)),
+    );
+  }
+
+  if (path === "admin/audit-logs") {
+    return withQuery(
+      path,
+      serializeAuditLogsSearch(normalizeAuditLogsSearch(searchParams)),
     );
   }
 

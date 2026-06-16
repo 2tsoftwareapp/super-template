@@ -1,11 +1,10 @@
-import { normalizeUsersSearch } from "@/lib/search-params";
-import { UsersView } from "./users-view";
+import { AdminMovedNotice } from "@/components/app/admin-moved";
 
-export default async function UsersPage({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string | string[]>>;
-}) {
-  normalizeUsersSearch(await searchParams);
-  return <UsersView />;
+export default function UsersPage() {
+  return (
+    <AdminMovedNotice
+      title="Users moved to the admin app"
+      description="User and role management now live in the separate admin workspace."
+    />
+  );
 }

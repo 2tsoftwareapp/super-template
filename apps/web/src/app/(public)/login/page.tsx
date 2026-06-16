@@ -7,11 +7,14 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { AuthShell } from "@/components/auth/auth-shell";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import type { AuthLoginResponse, LoginInput } from "@/lib/api-types";
 import { webFetch } from "@/lib/http";
+import { getPostLoginPath } from "@/lib/navigation";
 
 const schema = z.object({
   email: z.email(),
@@ -38,7 +41,7 @@ export default function LoginPage() {
     onSuccess: async (result) => {
       await queryClient.invalidateQueries({ queryKey: ["session"] });
       toast.success(`Welcome back, ${result.data.user.displayName}`);
-      router.replace("/dashboard");
+      router.replace(getPostLoginPath());
     },
     onError: (error: Error) => {
       toast.error(error.message);
@@ -46,7 +49,7 @@ export default function LoginPage() {
   });
 
   return (
-    <AuthPageFrame
+    <AuthShell
       eyebrow="Session access"
       title="Sign in to the starter"
       body="Use the seeded development accounts or your own registered user."
@@ -62,56 +65,38 @@ export default function LoginPage() {
         </p>
       }
     >
-      <form
-        className="space-y-4"
-        onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
-      >
-        <div>
-          <label className="mb-2 block text-sm font-medium">Email</label>
-          <Input {...form.register("email")} />
-        </div>
-        <div>
-          <label className="mb-2 block text-sm font-medium">Password</label>
-          <Input type="password" {...form.register("password")} />
-        </div>
-        <Button className="w-full" type="submit" disabled={mutation.isPending}>
-          {mutation.isPending ? "Signing in..." : "Sign in"}
-        </Button>
-      </form>
-      <div className="mt-4 flex justify-between text-sm text-neutral-500">
+      <Card className="border-0 bg-transparent shadow-none">
+        <CardContent className="space-y-4 p-6">
+          <form
+            className="space-y-4"
+            onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
+          >
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input id="email" {...form.register("email")} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                {...form.register("password")}
+              />
+            </div>
+            <Button
+              className="w-full"
+              type="submit"
+              disabled={mutation.isPending}
+            >
+              {mutation.isPending ? "Signing in..." : "Sign in"}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+      <div className="flex justify-between text-sm text-muted-foreground">
         <Link href="/forgot-password">Forgot password?</Link>
         <Link href="/">Back home</Link>
       </div>
-    </AuthPageFrame>
-  );
-}
-
-function AuthPageFrame({
-  body,
-  children,
-  eyebrow,
-  footer,
-  title,
-}: {
-  body: string;
-  children: React.ReactNode;
-  eyebrow: string;
-  footer?: React.ReactNode;
-  title: string;
-}) {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-[radial-gradient(circle_at_top_left,_rgba(251,191,36,0.22),transparent_26%),linear-gradient(180deg,#f4f1ea_0%,#e7dfd4_60%,#dfd6ca_100%)] px-6 py-8 dark:bg-[radial-gradient(circle_at_top_left,_rgba(251,191,36,0.14),transparent_22%),linear-gradient(180deg,#111111_0%,#171717_48%,#090909_100%)]">
-      <Card className="w-full max-w-lg">
-        <p className="text-xs uppercase tracking-[0.32em] text-neutral-500">
-          {eyebrow}
-        </p>
-        <h1 className="mt-4 text-4xl font-semibold">{title}</h1>
-        <p className="mt-3 text-sm leading-7 text-neutral-600 dark:text-neutral-300">
-          {body}
-        </p>
-        <div className="mt-8">{children}</div>
-        {footer ? <div className="mt-6">{footer}</div> : null}
-      </Card>
-    </div>
+    </AuthShell>
   );
 }

@@ -6,7 +6,6 @@
 // @dart=3.0
 
 import 'package:built_collection/built_collection.dart';
-import 'package:built_value/json_object.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
@@ -119,11 +118,9 @@ class _$UpdateAdminUserDtoSerializer
     UpdateAdminUserDto object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(
-      serializers,
-      object,
-      specifiedType: specifiedType,
-    ).toList();
+    return _serializeProperties(serializers, object,
+            specifiedType: specifiedType)
+        .toList();
   }
 
   void _deserializeProperties(
@@ -176,9 +173,7 @@ class _$UpdateAdminUserDtoSerializer
         case r'roleIds':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(BuiltList, [
-              FullType(String),
-            ]),
+            specifiedType: const FullType(BuiltList, [FullType(String)]),
           ) as BuiltList<String>;
           result.roleIds.replace(valueDes);
           break;

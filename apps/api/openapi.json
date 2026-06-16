@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.0",
   "paths": {
-    "/health": {
+    "/api/v1/health": {
       "get": {
         "operationId": "HealthController_getHealth",
         "parameters": [],
@@ -34,7 +34,7 @@
         ]
       }
     },
-    "/health/ready": {
+    "/api/v1/health/ready": {
       "get": {
         "operationId": "HealthController_getReady",
         "parameters": [],
@@ -67,7 +67,341 @@
         ]
       }
     },
-    "/admin/users": {
+    "/api/v1/admin/roles": {
+      "get": {
+        "operationId": "AdminRolesController_listRoles",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/RoleDto"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "admin-roles"
+        ]
+      }
+    },
+    "/api/v1/organizations": {
+      "get": {
+        "operationId": "OrganizationsController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/OrganizationDto"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "organizations"
+        ]
+      },
+      "post": {
+        "operationId": "OrganizationsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrganizationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/OrganizationDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "organizations"
+        ]
+      }
+    },
+    "/api/v1/users/me/preferences": {
+      "get": {
+        "operationId": "PreferencesController_getMyPreferences",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/UserPreferencesDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "users"
+        ]
+      },
+      "patch": {
+        "operationId": "PreferencesController_updateMyPreferences",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePreferencesDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/UserPreferencesDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/api/v1/admin/audit-logs": {
+      "get": {
+        "operationId": "AuditController_listAuditLogs",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "desc",
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          },
+          {
+            "name": "actorId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "action",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "resourceType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "resourceId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/AuditLogDto"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PaginationMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "admin-audit"
+        ]
+      }
+    },
+    "/api/v1/admin/users": {
       "get": {
         "operationId": "AdminUsersController_listUsers",
         "parameters": [
@@ -231,7 +565,7 @@
         ]
       }
     },
-    "/admin/users/{id}": {
+    "/api/v1/admin/users/{id}": {
       "get": {
         "operationId": "AdminUsersController_getUser",
         "parameters": [
@@ -378,7 +712,7 @@
         ]
       }
     },
-    "/admin/users/{id}/status": {
+    "/api/v1/admin/users/{id}/status": {
       "patch": {
         "operationId": "AdminUsersController_updateStatus",
         "parameters": [
@@ -435,7 +769,7 @@
         ]
       }
     },
-    "/admin/users/{id}/roles": {
+    "/api/v1/admin/users/{id}/roles": {
       "put": {
         "operationId": "AdminUsersController_replaceRoles",
         "parameters": [
@@ -492,7 +826,7 @@
         ]
       }
     },
-    "/users/me": {
+    "/api/v1/users/me": {
       "get": {
         "operationId": "UsersController_getMe",
         "parameters": [],
@@ -576,7 +910,7 @@
         ]
       }
     },
-    "/users/me/password": {
+    "/api/v1/users/me/password": {
       "patch": {
         "operationId": "UsersController_changePassword",
         "parameters": [],
@@ -624,7 +958,200 @@
         ]
       }
     },
-    "/auth/register": {
+    "/api/v1/files": {
+      "post": {
+        "operationId": "FilesController_upload",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/FileDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "files"
+        ]
+      }
+    },
+    "/api/v1/files/{id}": {
+      "get": {
+        "operationId": "FilesController_getById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/FileDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "files"
+        ]
+      },
+      "delete": {
+        "operationId": "FilesController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/SuccessFlagDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "files"
+        ]
+      }
+    },
+    "/api/v1/files/{id}/url": {
+      "get": {
+        "operationId": "FilesController_getUrl",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/FileUrlDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "files"
+        ]
+      }
+    },
+    "/api/v1/auth/register": {
       "post": {
         "operationId": "AuthController_register",
         "parameters": [],
@@ -672,7 +1199,7 @@
         ]
       }
     },
-    "/auth/login": {
+    "/api/v1/auth/login": {
       "post": {
         "operationId": "AuthController_login",
         "parameters": [],
@@ -720,7 +1247,7 @@
         ]
       }
     },
-    "/auth/refresh": {
+    "/api/v1/auth/refresh": {
       "post": {
         "operationId": "AuthController_refresh",
         "parameters": [],
@@ -768,7 +1295,7 @@
         ]
       }
     },
-    "/auth/logout": {
+    "/api/v1/auth/logout": {
       "post": {
         "operationId": "AuthController_logout",
         "parameters": [],
@@ -806,7 +1333,7 @@
         ]
       }
     },
-    "/auth/logout-all": {
+    "/api/v1/auth/logout-all": {
       "post": {
         "operationId": "AuthController_logoutAll",
         "parameters": [],
@@ -844,7 +1371,7 @@
         ]
       }
     },
-    "/auth/forgot-password": {
+    "/api/v1/auth/forgot-password": {
       "post": {
         "operationId": "AuthController_forgotPassword",
         "parameters": [],
@@ -892,7 +1419,7 @@
         ]
       }
     },
-    "/auth/reset-password": {
+    "/api/v1/auth/reset-password": {
       "post": {
         "operationId": "AuthController_resetPassword",
         "parameters": [],
@@ -940,7 +1467,7 @@
         ]
       }
     },
-    "/auth/verify-email": {
+    "/api/v1/auth/verify-email": {
       "post": {
         "operationId": "AuthController_verifyEmail",
         "parameters": [],
@@ -988,7 +1515,7 @@
         ]
       }
     },
-    "/auth/resend-verification": {
+    "/api/v1/auth/resend-verification": {
       "post": {
         "operationId": "AuthController_resendVerification",
         "parameters": [],
@@ -1036,7 +1563,7 @@
         ]
       }
     },
-    "/auth/me": {
+    "/api/v1/auth/me": {
       "get": {
         "operationId": "AuthController_getMe",
         "parameters": [],
@@ -1074,7 +1601,55 @@
         ]
       }
     },
-    "/auth/sessions": {
+    "/api/v1/auth/switch-organization": {
+      "post": {
+        "operationId": "AuthController_switchOrganization",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwitchOrganizationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/SuccessFlagDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/v1/auth/sessions": {
       "get": {
         "operationId": "AuthController_getSessions",
         "parameters": [],
@@ -1115,7 +1690,7 @@
         ]
       }
     },
-    "/auth/sessions/{sessionId}": {
+    "/api/v1/auth/sessions/{sessionId}": {
       "delete": {
         "operationId": "AuthController_revokeSession",
         "parameters": [
@@ -1162,7 +1737,541 @@
         ]
       }
     },
-    "/notifications": {
+    "/api/v1/admin/mail/deliveries": {
+      "get": {
+        "operationId": "AdminMailController_listDeliveries",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "desc",
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          },
+          {
+            "name": "templateKey",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "SENT",
+                "FAILED"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/MailDeliveryDto"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PaginationMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "admin-mail"
+        ]
+      }
+    },
+    "/api/v1/admin/mail/preview/{templateKey}": {
+      "get": {
+        "operationId": "AdminMailController_preview",
+        "parameters": [
+          {
+            "name": "templateKey",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/MailPreviewDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "admin-mail"
+        ]
+      }
+    },
+    "/api/v1/admin/settings": {
+      "get": {
+        "operationId": "AdminSettingsController_listSettings",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ApplicationSettingDto"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "admin-settings"
+        ]
+      }
+    },
+    "/api/v1/admin/settings/{key}": {
+      "patch": {
+        "operationId": "AdminSettingsController_updateSetting",
+        "parameters": [
+          {
+            "name": "key",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSettingDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ApplicationSettingDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "admin-settings"
+        ]
+      }
+    },
+    "/api/v1/attachments": {
+      "post": {
+        "operationId": "AttachmentsController_attach",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AttachEntityDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/AttachmentDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "attachments"
+        ]
+      },
+      "get": {
+        "operationId": "AttachmentsController_list",
+        "parameters": [
+          {
+            "name": "entityType",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "entityId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/AttachmentDto"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "attachments"
+        ]
+      }
+    },
+    "/api/v1/attachments/{id}": {
+      "delete": {
+        "operationId": "AttachmentsController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/SuccessFlagDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "attachments"
+        ]
+      }
+    },
+    "/api/v1/admin/jobs": {
+      "get": {
+        "operationId": "AdminJobsController_listJobs",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "desc",
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "PENDING",
+                "PROCESSING",
+                "COMPLETED",
+                "CANCELLED",
+                "FAILED"
+              ]
+            }
+          },
+          {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/JobDto"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PaginationMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "admin-jobs"
+        ]
+      }
+    },
+    "/api/v1/admin/jobs/{id}": {
+      "delete": {
+        "operationId": "AdminJobsController_cancelJob",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/JobDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "admin-jobs"
+        ]
+      }
+    },
+    "/api/v1/notifications": {
       "get": {
         "operationId": "NotificationsController_list",
         "parameters": [
@@ -1252,7 +2361,26 @@
         ]
       }
     },
-    "/notifications/unread-count": {
+    "/api/v1/notifications/stream": {
+      "get": {
+        "operationId": "NotificationsController_stream",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/api/v1/notifications/unread-count": {
       "get": {
         "operationId": "NotificationsController_unreadCount",
         "parameters": [],
@@ -1290,7 +2418,102 @@
         ]
       }
     },
-    "/notifications/{id}/read": {
+    "/api/v1/notifications/devices": {
+      "post": {
+        "operationId": "NotificationsController_registerDevice",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterDeviceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/DeviceTokenDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/api/v1/notifications/devices/{token}": {
+      "delete": {
+        "operationId": "NotificationsController_unregisterDevice",
+        "parameters": [
+          {
+            "name": "token",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/SuccessFlagDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/api/v1/notifications/{id}/read": {
       "patch": {
         "operationId": "NotificationsController_markRead",
         "parameters": [
@@ -1337,7 +2560,7 @@
         ]
       }
     },
-    "/notifications/read-all": {
+    "/api/v1/notifications/read-all": {
       "patch": {
         "operationId": "NotificationsController_markAllRead",
         "parameters": [],
@@ -1375,7 +2598,7 @@
         ]
       }
     },
-    "/notifications/{id}": {
+    "/api/v1/notifications/{id}": {
       "delete": {
         "operationId": "NotificationsController_delete",
         "parameters": [
@@ -1422,7 +2645,7 @@
         ]
       }
     },
-    "/admin/notifications": {
+    "/api/v1/admin/notifications": {
       "post": {
         "operationId": "AdminNotificationsController_send",
         "parameters": [],
@@ -1431,7 +2654,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/SendNotificationDto"
+                "$ref": "#/components/schemas/SendNotificationRequestDto"
               }
             }
           }
@@ -1449,7 +2672,7 @@
                   ],
                   "properties": {
                     "data": {
-                      "$ref": "#/components/schemas/NotificationDto"
+                      "$ref": "#/components/schemas/NotificationJobDto"
                     },
                     "meta": {
                       "$ref": "#/components/schemas/RequestMetaDto"
@@ -1470,7 +2693,330 @@
         ]
       }
     },
-    "/projects": {
+    "/api/v1/admin/notifications/jobs": {
+      "get": {
+        "operationId": "AdminNotificationsController_listJobs",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "desc",
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "PENDING",
+                "PROCESSING",
+                "COMPLETED",
+                "CANCELLED",
+                "FAILED"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/NotificationJobDto"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PaginationMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "admin-notifications"
+        ]
+      }
+    },
+    "/api/v1/admin/notifications/jobs/{id}": {
+      "get": {
+        "operationId": "AdminNotificationsController_getJob",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/NotificationJobDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "admin-notifications"
+        ]
+      },
+      "delete": {
+        "operationId": "AdminNotificationsController_cancelJob",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/NotificationJobDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "admin-notifications"
+        ]
+      }
+    },
+    "/api/v1/imports": {
+      "post": {
+        "operationId": "ImportsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateImportDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ImportJobDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "imports"
+        ]
+      }
+    },
+    "/api/v1/imports/{id}": {
+      "get": {
+        "operationId": "ImportsController_getById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ImportJobDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "imports"
+        ]
+      }
+    },
+    "/api/v1/imports/{id}/confirm": {
+      "post": {
+        "operationId": "ImportsController_confirm",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ImportJobDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "imports"
+        ]
+      }
+    },
+    "/api/v1/projects": {
       "get": {
         "operationId": "ProjectsController_list",
         "parameters": [
@@ -1626,7 +3172,57 @@
         ]
       }
     },
-    "/projects/{id}": {
+    "/api/v1/projects/{id}/attachments": {
+      "get": {
+        "operationId": "ProjectsController_listAttachments",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ProjectAttachmentDto"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "projects"
+        ]
+      }
+    },
+    "/api/v1/projects/{id}": {
       "get": {
         "operationId": "ProjectsController_getById",
         "parameters": [
@@ -1773,7 +3369,7 @@
         ]
       }
     },
-    "/projects/{id}/restore": {
+    "/api/v1/projects/{id}/restore": {
       "post": {
         "operationId": "ProjectsController_restore",
         "parameters": [
@@ -1817,6 +3413,690 @@
         ],
         "tags": [
           "projects"
+        ]
+      }
+    },
+    "/api/v1/activities": {
+      "get": {
+        "operationId": "ActivitiesController_list",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "desc",
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          },
+          {
+            "name": "entityType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "entityId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "actorId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ActivityDto"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PaginationMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "activities"
+        ]
+      }
+    },
+    "/api/v1/exports": {
+      "post": {
+        "operationId": "ExportsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateExportDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ExportJobDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "exports"
+        ]
+      }
+    },
+    "/api/v1/exports/{id}": {
+      "get": {
+        "operationId": "ExportsController_getById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ExportJobDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "exports"
+        ]
+      }
+    },
+    "/api/v1/comments": {
+      "get": {
+        "operationId": "CommentsController_list",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "desc",
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          },
+          {
+            "name": "entityType",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "entityId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CommentDto"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PaginationMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "comments"
+        ]
+      },
+      "post": {
+        "operationId": "CommentsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCommentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CommentDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "comments"
+        ]
+      }
+    },
+    "/api/v1/comments/{id}": {
+      "patch": {
+        "operationId": "CommentsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCommentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CommentDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "comments"
+        ]
+      },
+      "delete": {
+        "operationId": "CommentsController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/SuccessFlagDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "comments"
+        ]
+      }
+    },
+    "/api/v1/invitations": {
+      "post": {
+        "operationId": "InvitationsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateInvitationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/InvitationDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "invitations"
+        ]
+      },
+      "get": {
+        "operationId": "InvitationsController_list",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "desc",
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          },
+          {
+            "name": "email",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "entityType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "entityId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "PENDING",
+                "ACCEPTED",
+                "EXPIRED",
+                "REVOKED"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/InvitationDto"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PaginationMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "invitations"
+        ]
+      }
+    },
+    "/api/v1/invitations/accept": {
+      "post": {
+        "operationId": "InvitationsController_accept",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcceptInvitationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/InvitationDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "invitations"
+        ]
+      }
+    },
+    "/api/v1/invitations/{id}": {
+      "delete": {
+        "operationId": "InvitationsController_revoke",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/InvitationDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "invitations"
         ]
       }
     }
@@ -1864,6 +4144,140 @@
           "status"
         ]
       },
+      "RoleDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "description"
+        ]
+      },
+      "OrganizationDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "OWNER",
+              "ADMIN",
+              "MEMBER"
+            ]
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          },
+          "current": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "slug",
+          "role",
+          "createdAt",
+          "updatedAt",
+          "current"
+        ]
+      },
+      "CreateOrganizationDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Acme Corp"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "UserPreferencesDto": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string"
+          },
+          "theme": {
+            "type": "string"
+          },
+          "language": {
+            "type": "string"
+          },
+          "timezone": {
+            "type": "string"
+          },
+          "notificationPreferences": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "emailPreferences": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "userId",
+          "theme",
+          "language",
+          "timezone",
+          "notificationPreferences",
+          "emailPreferences",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "UpdatePreferencesDto": {
+        "type": "object",
+        "properties": {
+          "theme": {
+            "type": "string"
+          },
+          "language": {
+            "type": "string"
+          },
+          "timezone": {
+            "type": "string"
+          },
+          "notificationPreferences": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "emailPreferences": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        }
+      },
       "PaginationMetaDto": {
         "type": "object",
         "properties": {
@@ -1889,6 +4303,48 @@
           "limit",
           "total",
           "totalPages"
+        ]
+      },
+      "AuditLogDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "actorId": {
+            "type": "object"
+          },
+          "action": {
+            "type": "string"
+          },
+          "entityType": {
+            "type": "string"
+          },
+          "entityId": {
+            "type": "object"
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "ipAddress": {
+            "type": "object"
+          },
+          "userAgent": {
+            "type": "object"
+          },
+          "requestId": {
+            "type": "object"
+          },
+          "createdAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "action",
+          "entityType",
+          "createdAt"
         ]
       },
       "UserDto": {
@@ -2056,6 +4512,9 @@
           },
           "avatarUrl": {
             "type": "object"
+          },
+          "avatarFileId": {
+            "type": "object"
           }
         }
       },
@@ -2072,6 +4531,65 @@
         "required": [
           "currentPassword",
           "newPassword"
+        ]
+      },
+      "FileDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "storageKey": {
+            "type": "string"
+          },
+          "originalName": {
+            "type": "string"
+          },
+          "mimeType": {
+            "type": "string"
+          },
+          "sizeBytes": {
+            "type": "number"
+          },
+          "uploadedById": {
+            "type": "object",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "storageKey",
+          "originalName",
+          "mimeType",
+          "sizeBytes",
+          "uploadedById",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "FileUrlDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "expiresInSeconds": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "url",
+          "expiresInSeconds"
         ]
       },
       "SuccessMessageDto": {
@@ -2171,6 +4689,10 @@
           },
           "session": {
             "$ref": "#/components/schemas/AuthSessionDto"
+          },
+          "organizationId": {
+            "type": "object",
+            "nullable": true
           }
         },
         "required": [
@@ -2178,7 +4700,8 @@
           "refreshToken",
           "user",
           "permissions",
-          "session"
+          "session",
+          "organizationId"
         ]
       },
       "LoginDto": {
@@ -2269,12 +4792,262 @@
           },
           "sessionId": {
             "type": "string"
+          },
+          "organizationId": {
+            "type": "object",
+            "nullable": true
           }
         },
         "required": [
           "user",
           "permissions",
-          "sessionId"
+          "sessionId",
+          "organizationId"
+        ]
+      },
+      "SwitchOrganizationDto": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "organizationId"
+        ]
+      },
+      "MailDeliveryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "templateKey": {
+            "type": "string"
+          },
+          "recipient": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "SENT",
+              "FAILED"
+            ]
+          },
+          "errorMessage": {
+            "type": "object"
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "sentAt": {
+            "type": "object"
+          },
+          "createdAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "templateKey",
+          "recipient",
+          "subject",
+          "status",
+          "createdAt"
+        ]
+      },
+      "MailPreviewDto": {
+        "type": "object",
+        "properties": {
+          "subject": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "html": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "subject",
+          "text",
+          "html"
+        ]
+      },
+      "ApplicationSettingDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "value": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "updatedById": {
+            "type": "object"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "value",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "UpdateSettingDto": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "value"
+        ]
+      },
+      "AttachmentDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "fileId": {
+            "type": "string"
+          },
+          "entityType": {
+            "type": "string"
+          },
+          "entityId": {
+            "type": "string"
+          },
+          "label": {
+            "type": "object",
+            "nullable": true
+          },
+          "createdById": {
+            "type": "object",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "fileId",
+          "entityType",
+          "entityId",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "AttachEntityDto": {
+        "type": "object",
+        "properties": {
+          "fileId": {
+            "type": "string"
+          },
+          "entityType": {
+            "type": "string"
+          },
+          "entityId": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "fileId",
+          "entityType",
+          "entityId"
+        ]
+      },
+      "JobDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "payload": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "PROCESSING",
+              "COMPLETED",
+              "CANCELLED",
+              "FAILED"
+            ]
+          },
+          "scheduledAt": {
+            "type": "string"
+          },
+          "priority": {
+            "type": "number"
+          },
+          "attempts": {
+            "type": "number"
+          },
+          "maxAttempts": {
+            "type": "number"
+          },
+          "startedAt": {
+            "type": "object"
+          },
+          "completedAt": {
+            "type": "object"
+          },
+          "cancelledAt": {
+            "type": "object"
+          },
+          "errorMessage": {
+            "type": "object"
+          },
+          "createdById": {
+            "type": "object"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "payload",
+          "status",
+          "scheduledAt",
+          "priority",
+          "attempts",
+          "maxAttempts",
+          "createdAt",
+          "updatedAt"
         ]
       },
       "NotificationDto": {
@@ -2325,11 +5098,77 @@
           "count"
         ]
       },
-      "SendNotificationDto": {
+      "DeviceTokenDto": {
         "type": "object",
         "properties": {
-          "userId": {
+          "id": {
             "type": "string"
+          },
+          "platform": {
+            "type": "string",
+            "enum": [
+              "IOS",
+              "ANDROID"
+            ]
+          },
+          "token": {
+            "type": "string"
+          },
+          "lastUsedAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "platform",
+          "token",
+          "lastUsedAt"
+        ]
+      },
+      "RegisterDeviceDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "platform": {
+            "type": "string",
+            "enum": [
+              "IOS",
+              "ANDROID"
+            ]
+          }
+        },
+        "required": [
+          "token",
+          "platform"
+        ]
+      },
+      "NotificationJobDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "actorId": {
+            "type": "object"
+          },
+          "audience": {
+            "type": "string",
+            "enum": [
+              "USER",
+              "USERS",
+              "ALL"
+            ]
+          },
+          "targetUserId": {
+            "type": "object"
+          },
+          "userIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "type": {
             "type": "string"
@@ -2339,13 +5178,171 @@
           },
           "body": {
             "type": "string"
+          },
+          "data": {
+            "type": "object"
+          },
+          "scheduledAt": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "PROCESSING",
+              "COMPLETED",
+              "CANCELLED",
+              "FAILED"
+            ]
+          },
+          "recipientCount": {
+            "type": "object"
+          },
+          "processedAt": {
+            "type": "object"
+          },
+          "errorMessage": {
+            "type": "object"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
           }
         },
         "required": [
-          "userId",
+          "id",
+          "audience",
+          "type",
+          "title",
+          "body",
+          "scheduledAt",
+          "status",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "SendNotificationRequestDto": {
+        "type": "object",
+        "properties": {
+          "audience": {
+            "type": "string",
+            "enum": [
+              "USER",
+              "USERS",
+              "ALL"
+            ]
+          },
+          "userId": {
+            "type": "string"
+          },
+          "userIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "type": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object"
+          },
+          "scheduledAt": {
+            "type": "string",
+            "description": "ISO-8601 datetime. Omit or set to now for immediate delivery."
+          }
+        },
+        "required": [
+          "audience",
           "type",
           "title",
           "body"
+        ]
+      },
+      "ImportJobDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "fileId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "PROCESSING",
+              "COMPLETED",
+              "FAILED",
+              "CANCELLED"
+            ]
+          },
+          "rowCount": {
+            "type": "object"
+          },
+          "successCount": {
+            "type": "object"
+          },
+          "errorCount": {
+            "type": "object"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "createdById": {
+            "type": "string"
+          },
+          "confirmedAt": {
+            "type": "object"
+          },
+          "completedAt": {
+            "type": "object"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "fileId",
+          "status",
+          "createdById",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CreateImportDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "fileId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "fileId"
         ]
       },
       "ProjectDto": {
@@ -2422,6 +5419,43 @@
           "name"
         ]
       },
+      "ProjectAttachmentDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "fileId": {
+            "type": "string"
+          },
+          "entityType": {
+            "type": "string"
+          },
+          "entityId": {
+            "type": "string"
+          },
+          "label": {
+            "type": "object"
+          },
+          "createdById": {
+            "type": "object"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "fileId",
+          "entityType",
+          "entityId",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
       "UpdateProjectDto": {
         "type": "object",
         "properties": {
@@ -2443,6 +5477,274 @@
             "type": "string"
           }
         }
+      },
+      "ActivityDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "entityType": {
+            "type": "string"
+          },
+          "entityId": {
+            "type": "string"
+          },
+          "actorId": {
+            "type": "object"
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "PUBLIC",
+              "PRIVATE",
+              "INTERNAL"
+            ]
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "createdAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "summary",
+          "entityType",
+          "entityId",
+          "visibility",
+          "createdAt"
+        ]
+      },
+      "ExportJobDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "PROCESSING",
+              "COMPLETED",
+              "FAILED",
+              "CANCELLED"
+            ]
+          },
+          "fileId": {
+            "type": "object"
+          },
+          "filters": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "createdById": {
+            "type": "string"
+          },
+          "completedAt": {
+            "type": "object"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "status",
+          "createdById",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CreateExportDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "filters": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "CommentDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "entityType": {
+            "type": "string"
+          },
+          "entityId": {
+            "type": "string"
+          },
+          "parentId": {
+            "type": "object"
+          },
+          "authorId": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "entityType",
+          "entityId",
+          "authorId",
+          "content",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CreateCommentDto": {
+        "type": "object",
+        "properties": {
+          "entityType": {
+            "type": "string"
+          },
+          "entityId": {
+            "type": "string"
+          },
+          "parentId": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "entityType",
+          "entityId",
+          "content"
+        ]
+      },
+      "UpdateCommentDto": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "content"
+        ]
+      },
+      "InvitationDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "entityType": {
+            "type": "string"
+          },
+          "entityId": {
+            "type": "string"
+          },
+          "role": {
+            "type": "object"
+          },
+          "invitedById": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "ACCEPTED",
+              "EXPIRED",
+              "REVOKED"
+            ]
+          },
+          "expiresAt": {
+            "type": "string"
+          },
+          "acceptedAt": {
+            "type": "object"
+          },
+          "acceptedById": {
+            "type": "object"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "entityType",
+          "entityId",
+          "invitedById",
+          "status",
+          "expiresAt",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CreateInvitationDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "entityType": {
+            "type": "string"
+          },
+          "entityId": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "entityType",
+          "entityId"
+        ]
+      },
+      "AcceptInvitationDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "token"
+        ]
       }
     }
   }

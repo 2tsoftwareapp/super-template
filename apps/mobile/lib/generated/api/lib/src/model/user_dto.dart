@@ -6,7 +6,6 @@
 // @dart=3.0
 
 import 'package:built_collection/built_collection.dart';
-import 'package:built_value/json_object.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
@@ -134,11 +133,9 @@ class _$UserDtoSerializer implements PrimitiveSerializer<UserDto> {
     UserDto object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(
-      serializers,
-      object,
-      specifiedType: specifiedType,
-    ).toList();
+    return _serializeProperties(serializers, object,
+            specifiedType: specifiedType)
+        .toList();
   }
 
   void _deserializeProperties(
@@ -198,9 +195,7 @@ class _$UserDtoSerializer implements PrimitiveSerializer<UserDto> {
         case r'roles':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(BuiltList, [
-              FullType(String),
-            ]),
+            specifiedType: const FullType(BuiltList, [FullType(String)]),
           ) as BuiltList<String>;
           result.roles.replace(valueDes);
           break;

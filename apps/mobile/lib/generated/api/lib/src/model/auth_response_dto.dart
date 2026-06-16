@@ -21,6 +21,7 @@ part 'auth_response_dto.g.dart';
 /// * [user]
 /// * [permissions]
 /// * [session]
+/// * [organizationId]
 @BuiltValue()
 abstract class AuthResponseDto
     implements Built<AuthResponseDto, AuthResponseDtoBuilder> {
@@ -38,6 +39,9 @@ abstract class AuthResponseDto
 
   @BuiltValueField(wireName: r'session')
   AuthSessionDto get session;
+
+  @BuiltValueField(wireName: r'organizationId')
+  JsonObject? get organizationId;
 
   AuthResponseDto._();
 
@@ -90,6 +94,13 @@ class _$AuthResponseDtoSerializer
       object.session,
       specifiedType: const FullType(AuthSessionDto),
     );
+    yield r'organizationId';
+    yield object.organizationId == null
+        ? null
+        : serializers.serialize(
+            object.organizationId,
+            specifiedType: const FullType.nullable(JsonObject),
+          );
   }
 
   @override
@@ -98,11 +109,9 @@ class _$AuthResponseDtoSerializer
     AuthResponseDto object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(
-      serializers,
-      object,
-      specifiedType: specifiedType,
-    ).toList();
+    return _serializeProperties(serializers, object,
+            specifiedType: specifiedType)
+        .toList();
   }
 
   void _deserializeProperties(
@@ -141,9 +150,7 @@ class _$AuthResponseDtoSerializer
         case r'permissions':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(BuiltList, [
-              FullType(String),
-            ]),
+            specifiedType: const FullType(BuiltList, [FullType(String)]),
           ) as BuiltList<String>;
           result.permissions.replace(valueDes);
           break;
@@ -153,6 +160,14 @@ class _$AuthResponseDtoSerializer
             specifiedType: const FullType(AuthSessionDto),
           ) as AuthSessionDto;
           result.session.replace(valueDes);
+          break;
+        case r'organizationId':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType.nullable(JsonObject),
+          ) as JsonObject?;
+          if (valueDes == null) continue;
+          result.organizationId = valueDes;
           break;
         default:
           unhandled.add(key);

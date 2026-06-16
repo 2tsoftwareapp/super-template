@@ -13,12 +13,15 @@ class _$UpdateProfileDto extends UpdateProfileDto {
   final String? displayName;
   @override
   final JsonObject? avatarUrl;
+  @override
+  final JsonObject? avatarFileId;
 
   factory _$UpdateProfileDto(
           [void Function(UpdateProfileDtoBuilder)? updates]) =>
       (UpdateProfileDtoBuilder()..update(updates))._build();
 
-  _$UpdateProfileDto._({this.displayName, this.avatarUrl}) : super._();
+  _$UpdateProfileDto._({this.displayName, this.avatarUrl, this.avatarFileId})
+      : super._();
   @override
   UpdateProfileDto rebuild(void Function(UpdateProfileDtoBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -32,7 +35,8 @@ class _$UpdateProfileDto extends UpdateProfileDto {
     if (identical(other, this)) return true;
     return other is UpdateProfileDto &&
         displayName == other.displayName &&
-        avatarUrl == other.avatarUrl;
+        avatarUrl == other.avatarUrl &&
+        avatarFileId == other.avatarFileId;
   }
 
   @override
@@ -40,6 +44,7 @@ class _$UpdateProfileDto extends UpdateProfileDto {
     var _$hash = 0;
     _$hash = $jc(_$hash, displayName.hashCode);
     _$hash = $jc(_$hash, avatarUrl.hashCode);
+    _$hash = $jc(_$hash, avatarFileId.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -48,7 +53,8 @@ class _$UpdateProfileDto extends UpdateProfileDto {
   String toString() {
     return (newBuiltValueToStringHelper(r'UpdateProfileDto')
           ..add('displayName', displayName)
-          ..add('avatarUrl', avatarUrl))
+          ..add('avatarUrl', avatarUrl)
+          ..add('avatarFileId', avatarFileId))
         .toString();
   }
 }
@@ -65,6 +71,11 @@ class UpdateProfileDtoBuilder
   JsonObject? get avatarUrl => _$this._avatarUrl;
   set avatarUrl(JsonObject? avatarUrl) => _$this._avatarUrl = avatarUrl;
 
+  JsonObject? _avatarFileId;
+  JsonObject? get avatarFileId => _$this._avatarFileId;
+  set avatarFileId(JsonObject? avatarFileId) =>
+      _$this._avatarFileId = avatarFileId;
+
   UpdateProfileDtoBuilder() {
     UpdateProfileDto._defaults(this);
   }
@@ -74,6 +85,7 @@ class UpdateProfileDtoBuilder
     if ($v != null) {
       _displayName = $v.displayName;
       _avatarUrl = $v.avatarUrl;
+      _avatarFileId = $v.avatarFileId;
       _$v = null;
     }
     return this;
@@ -97,6 +109,7 @@ class UpdateProfileDtoBuilder
         _$UpdateProfileDto._(
           displayName: displayName,
           avatarUrl: avatarUrl,
+          avatarFileId: avatarFileId,
         );
     replace(_$result);
     return _$result;

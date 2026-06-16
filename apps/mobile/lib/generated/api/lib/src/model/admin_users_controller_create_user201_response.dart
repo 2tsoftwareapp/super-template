@@ -30,9 +30,9 @@ abstract class AdminUsersControllerCreateUser201Response
 
   AdminUsersControllerCreateUser201Response._();
 
-  factory AdminUsersControllerCreateUser201Response([
-    void updates(AdminUsersControllerCreateUser201ResponseBuilder b),
-  ]) = _$AdminUsersControllerCreateUser201Response;
+  factory AdminUsersControllerCreateUser201Response(
+          [void updates(AdminUsersControllerCreateUser201ResponseBuilder b)]) =
+      _$AdminUsersControllerCreateUser201Response;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(AdminUsersControllerCreateUser201ResponseBuilder b) =>
@@ -48,7 +48,7 @@ class _$AdminUsersControllerCreateUser201ResponseSerializer
   @override
   final Iterable<Type> types = const [
     AdminUsersControllerCreateUser201Response,
-    _$AdminUsersControllerCreateUser201Response,
+    _$AdminUsersControllerCreateUser201Response
   ];
 
   @override
@@ -77,11 +77,9 @@ class _$AdminUsersControllerCreateUser201ResponseSerializer
     AdminUsersControllerCreateUser201Response object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(
-      serializers,
-      object,
-      specifiedType: specifiedType,
-    ).toList();
+    return _serializeProperties(serializers, object,
+            specifiedType: specifiedType)
+        .toList();
   }
 
   void _deserializeProperties(

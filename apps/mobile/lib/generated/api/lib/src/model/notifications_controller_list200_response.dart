@@ -31,9 +31,9 @@ abstract class NotificationsControllerList200Response
 
   NotificationsControllerList200Response._();
 
-  factory NotificationsControllerList200Response([
-    void updates(NotificationsControllerList200ResponseBuilder b),
-  ]) = _$NotificationsControllerList200Response;
+  factory NotificationsControllerList200Response(
+          [void updates(NotificationsControllerList200ResponseBuilder b)]) =
+      _$NotificationsControllerList200Response;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(NotificationsControllerList200ResponseBuilder b) => b;
@@ -48,7 +48,7 @@ class _$NotificationsControllerList200ResponseSerializer
   @override
   final Iterable<Type> types = const [
     NotificationsControllerList200Response,
-    _$NotificationsControllerList200Response,
+    _$NotificationsControllerList200Response
   ];
 
   @override
@@ -77,11 +77,9 @@ class _$NotificationsControllerList200ResponseSerializer
     NotificationsControllerList200Response object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(
-      serializers,
-      object,
-      specifiedType: specifiedType,
-    ).toList();
+    return _serializeProperties(serializers, object,
+            specifiedType: specifiedType)
+        .toList();
   }
 
   void _deserializeProperties(
@@ -99,9 +97,8 @@ class _$NotificationsControllerList200ResponseSerializer
         case r'data':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(BuiltList, [
-              FullType(NotificationDto),
-            ]),
+            specifiedType:
+                const FullType(BuiltList, [FullType(NotificationDto)]),
           ) as BuiltList<NotificationDto>;
           result.data.replace(valueDes);
           break;

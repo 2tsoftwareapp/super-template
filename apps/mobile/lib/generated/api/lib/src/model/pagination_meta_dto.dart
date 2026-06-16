@@ -95,11 +95,9 @@ class _$PaginationMetaDtoSerializer
     PaginationMetaDto object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(
-      serializers,
-      object,
-      specifiedType: specifiedType,
-    ).toList();
+    return _serializeProperties(serializers, object,
+            specifiedType: specifiedType)
+        .toList();
   }
 
   void _deserializeProperties(
@@ -122,23 +120,31 @@ class _$PaginationMetaDtoSerializer
           result.requestId = valueDes;
           break;
         case r'page':
-          final valueDes = serializers.deserialize(value,
-              specifiedType: const FullType(num)) as num;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(num),
+          ) as num;
           result.page = valueDes;
           break;
         case r'limit':
-          final valueDes = serializers.deserialize(value,
-              specifiedType: const FullType(num)) as num;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(num),
+          ) as num;
           result.limit = valueDes;
           break;
         case r'total':
-          final valueDes = serializers.deserialize(value,
-              specifiedType: const FullType(num)) as num;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(num),
+          ) as num;
           result.total = valueDes;
           break;
         case r'totalPages':
-          final valueDes = serializers.deserialize(value,
-              specifiedType: const FullType(num)) as num;
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(num),
+          ) as num;
           result.totalPages = valueDes;
           break;
         default:

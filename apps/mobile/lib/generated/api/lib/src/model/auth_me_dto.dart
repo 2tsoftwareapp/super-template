@@ -18,6 +18,7 @@ part 'auth_me_dto.g.dart';
 /// * [user]
 /// * [permissions]
 /// * [sessionId]
+/// * [organizationId]
 @BuiltValue()
 abstract class AuthMeDto implements Built<AuthMeDto, AuthMeDtoBuilder> {
   @BuiltValueField(wireName: r'user')
@@ -28,6 +29,9 @@ abstract class AuthMeDto implements Built<AuthMeDto, AuthMeDtoBuilder> {
 
   @BuiltValueField(wireName: r'sessionId')
   String get sessionId;
+
+  @BuiltValueField(wireName: r'organizationId')
+  JsonObject? get organizationId;
 
   AuthMeDto._();
 
@@ -67,6 +71,13 @@ class _$AuthMeDtoSerializer implements PrimitiveSerializer<AuthMeDto> {
       object.sessionId,
       specifiedType: const FullType(String),
     );
+    yield r'organizationId';
+    yield object.organizationId == null
+        ? null
+        : serializers.serialize(
+            object.organizationId,
+            specifiedType: const FullType.nullable(JsonObject),
+          );
   }
 
   @override
@@ -75,11 +86,9 @@ class _$AuthMeDtoSerializer implements PrimitiveSerializer<AuthMeDto> {
     AuthMeDto object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(
-      serializers,
-      object,
-      specifiedType: specifiedType,
-    ).toList();
+    return _serializeProperties(serializers, object,
+            specifiedType: specifiedType)
+        .toList();
   }
 
   void _deserializeProperties(
@@ -104,9 +113,7 @@ class _$AuthMeDtoSerializer implements PrimitiveSerializer<AuthMeDto> {
         case r'permissions':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(BuiltList, [
-              FullType(String),
-            ]),
+            specifiedType: const FullType(BuiltList, [FullType(String)]),
           ) as BuiltList<String>;
           result.permissions.replace(valueDes);
           break;
@@ -116,6 +123,14 @@ class _$AuthMeDtoSerializer implements PrimitiveSerializer<AuthMeDto> {
             specifiedType: const FullType(String),
           ) as String;
           result.sessionId = valueDes;
+          break;
+        case r'organizationId':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType.nullable(JsonObject),
+          ) as JsonObject?;
+          if (valueDes == null) continue;
+          result.organizationId = valueDes;
           break;
         default:
           unhandled.add(key);

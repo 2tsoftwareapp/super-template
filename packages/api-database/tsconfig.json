@@ -1,0 +1,14 @@
+{
+  "extends": "@repo/tsconfig/nest.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "baseUrl": ".",
+    "strictPropertyInitialization": false,
+    "paths": {
+      "@repo/api-core": ["../api-core/src/index.ts"],
+      "@repo/api-core/common/*": ["../api-core/src/common/*"],
+      "@repo/api-core/config/*": ["../api-core/src/config/*"]
+    }
+  },
+  "include": ["src/**/*.ts", "../api-core/src/common/types/express.d.ts"]
+}

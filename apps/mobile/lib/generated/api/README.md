@@ -47,14 +47,19 @@ Please follow the [installation procedure](#installation--usage) and then run th
 import 'package:super_template_api/super_template_api.dart';
 
 
-final api = SuperTemplateApi().getAdminNotificationsApi();
-final SendNotificationDto sendNotificationDto = ; // SendNotificationDto | 
+final api = SuperTemplateApi().getActivitiesApi();
+final num page = 8.14; // num | 
+final num limit = 8.14; // num | 
+final String sortOrder = sortOrder_example; // String | 
+final String entityType = entityType_example; // String | 
+final String entityId = entityId_example; // String | 
+final String actorId = actorId_example; // String | 
 
 try {
-    final response = await api.adminNotificationsControllerSend(sendNotificationDto);
+    final response = await api.activitiesControllerList(page, limit, sortOrder, entityType, entityId, actorId);
     print(response);
 } catch on DioException (e) {
-    print("Exception when calling AdminNotificationsApi->adminNotificationsControllerSend: $e\n");
+    print("Exception when calling ActivitiesApi->activitiesControllerList: $e\n");
 }
 
 ```
@@ -65,49 +70,109 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-[*AdminNotificationsApi*](doc/AdminNotificationsApi.md) | [**adminNotificationsControllerSend**](doc/AdminNotificationsApi.md#adminnotificationscontrollersend) | **POST** /admin/notifications | 
-[*AdminUsersApi*](doc/AdminUsersApi.md) | [**adminUsersControllerCreateUser**](doc/AdminUsersApi.md#adminuserscontrollercreateuser) | **POST** /admin/users | 
-[*AdminUsersApi*](doc/AdminUsersApi.md) | [**adminUsersControllerDeleteUser**](doc/AdminUsersApi.md#adminuserscontrollerdeleteuser) | **DELETE** /admin/users/{id} | 
-[*AdminUsersApi*](doc/AdminUsersApi.md) | [**adminUsersControllerGetUser**](doc/AdminUsersApi.md#adminuserscontrollergetuser) | **GET** /admin/users/{id} | 
-[*AdminUsersApi*](doc/AdminUsersApi.md) | [**adminUsersControllerListUsers**](doc/AdminUsersApi.md#adminuserscontrollerlistusers) | **GET** /admin/users | 
-[*AdminUsersApi*](doc/AdminUsersApi.md) | [**adminUsersControllerReplaceRoles**](doc/AdminUsersApi.md#adminuserscontrollerreplaceroles) | **PUT** /admin/users/{id}/roles | 
-[*AdminUsersApi*](doc/AdminUsersApi.md) | [**adminUsersControllerUpdateStatus**](doc/AdminUsersApi.md#adminuserscontrollerupdatestatus) | **PATCH** /admin/users/{id}/status | 
-[*AdminUsersApi*](doc/AdminUsersApi.md) | [**adminUsersControllerUpdateUser**](doc/AdminUsersApi.md#adminuserscontrollerupdateuser) | **PATCH** /admin/users/{id} | 
-[*AuthApi*](doc/AuthApi.md) | [**authControllerForgotPassword**](doc/AuthApi.md#authcontrollerforgotpassword) | **POST** /auth/forgot-password | 
-[*AuthApi*](doc/AuthApi.md) | [**authControllerGetMe**](doc/AuthApi.md#authcontrollergetme) | **GET** /auth/me | 
-[*AuthApi*](doc/AuthApi.md) | [**authControllerGetSessions**](doc/AuthApi.md#authcontrollergetsessions) | **GET** /auth/sessions | 
-[*AuthApi*](doc/AuthApi.md) | [**authControllerLogin**](doc/AuthApi.md#authcontrollerlogin) | **POST** /auth/login | 
-[*AuthApi*](doc/AuthApi.md) | [**authControllerLogout**](doc/AuthApi.md#authcontrollerlogout) | **POST** /auth/logout | 
-[*AuthApi*](doc/AuthApi.md) | [**authControllerLogoutAll**](doc/AuthApi.md#authcontrollerlogoutall) | **POST** /auth/logout-all | 
-[*AuthApi*](doc/AuthApi.md) | [**authControllerRefresh**](doc/AuthApi.md#authcontrollerrefresh) | **POST** /auth/refresh | 
-[*AuthApi*](doc/AuthApi.md) | [**authControllerRegister**](doc/AuthApi.md#authcontrollerregister) | **POST** /auth/register | 
-[*AuthApi*](doc/AuthApi.md) | [**authControllerResendVerification**](doc/AuthApi.md#authcontrollerresendverification) | **POST** /auth/resend-verification | 
-[*AuthApi*](doc/AuthApi.md) | [**authControllerResetPassword**](doc/AuthApi.md#authcontrollerresetpassword) | **POST** /auth/reset-password | 
-[*AuthApi*](doc/AuthApi.md) | [**authControllerRevokeSession**](doc/AuthApi.md#authcontrollerrevokesession) | **DELETE** /auth/sessions/{sessionId} | 
-[*AuthApi*](doc/AuthApi.md) | [**authControllerVerifyEmail**](doc/AuthApi.md#authcontrollerverifyemail) | **POST** /auth/verify-email | 
-[*HealthApi*](doc/HealthApi.md) | [**healthControllerGetHealth**](doc/HealthApi.md#healthcontrollergethealth) | **GET** /health | 
-[*HealthApi*](doc/HealthApi.md) | [**healthControllerGetReady**](doc/HealthApi.md#healthcontrollergetready) | **GET** /health/ready | 
-[*NotificationsApi*](doc/NotificationsApi.md) | [**notificationsControllerDelete**](doc/NotificationsApi.md#notificationscontrollerdelete) | **DELETE** /notifications/{id} | 
-[*NotificationsApi*](doc/NotificationsApi.md) | [**notificationsControllerList**](doc/NotificationsApi.md#notificationscontrollerlist) | **GET** /notifications | 
-[*NotificationsApi*](doc/NotificationsApi.md) | [**notificationsControllerMarkAllRead**](doc/NotificationsApi.md#notificationscontrollermarkallread) | **PATCH** /notifications/read-all | 
-[*NotificationsApi*](doc/NotificationsApi.md) | [**notificationsControllerMarkRead**](doc/NotificationsApi.md#notificationscontrollermarkread) | **PATCH** /notifications/{id}/read | 
-[*NotificationsApi*](doc/NotificationsApi.md) | [**notificationsControllerUnreadCount**](doc/NotificationsApi.md#notificationscontrollerunreadcount) | **GET** /notifications/unread-count | 
-[*ProjectsApi*](doc/ProjectsApi.md) | [**projectsControllerCreate**](doc/ProjectsApi.md#projectscontrollercreate) | **POST** /projects | 
-[*ProjectsApi*](doc/ProjectsApi.md) | [**projectsControllerGetById**](doc/ProjectsApi.md#projectscontrollergetbyid) | **GET** /projects/{id} | 
-[*ProjectsApi*](doc/ProjectsApi.md) | [**projectsControllerList**](doc/ProjectsApi.md#projectscontrollerlist) | **GET** /projects | 
-[*ProjectsApi*](doc/ProjectsApi.md) | [**projectsControllerRemove**](doc/ProjectsApi.md#projectscontrollerremove) | **DELETE** /projects/{id} | 
-[*ProjectsApi*](doc/ProjectsApi.md) | [**projectsControllerRestore**](doc/ProjectsApi.md#projectscontrollerrestore) | **POST** /projects/{id}/restore | 
-[*ProjectsApi*](doc/ProjectsApi.md) | [**projectsControllerUpdate**](doc/ProjectsApi.md#projectscontrollerupdate) | **PATCH** /projects/{id} | 
-[*UsersApi*](doc/UsersApi.md) | [**usersControllerChangePassword**](doc/UsersApi.md#userscontrollerchangepassword) | **PATCH** /users/me/password | 
-[*UsersApi*](doc/UsersApi.md) | [**usersControllerGetMe**](doc/UsersApi.md#userscontrollergetme) | **GET** /users/me | 
-[*UsersApi*](doc/UsersApi.md) | [**usersControllerUpdateMe**](doc/UsersApi.md#userscontrollerupdateme) | **PATCH** /users/me | 
+[*ActivitiesApi*](doc/ActivitiesApi.md) | [**activitiesControllerList**](doc/ActivitiesApi.md#activitiescontrollerlist) | **GET** /api/v1/activities | 
+[*AdminAuditApi*](doc/AdminAuditApi.md) | [**auditControllerListAuditLogs**](doc/AdminAuditApi.md#auditcontrollerlistauditlogs) | **GET** /api/v1/admin/audit-logs | 
+[*AdminJobsApi*](doc/AdminJobsApi.md) | [**adminJobsControllerCancelJob**](doc/AdminJobsApi.md#adminjobscontrollercanceljob) | **DELETE** /api/v1/admin/jobs/{id} | 
+[*AdminJobsApi*](doc/AdminJobsApi.md) | [**adminJobsControllerListJobs**](doc/AdminJobsApi.md#adminjobscontrollerlistjobs) | **GET** /api/v1/admin/jobs | 
+[*AdminMailApi*](doc/AdminMailApi.md) | [**adminMailControllerListDeliveries**](doc/AdminMailApi.md#adminmailcontrollerlistdeliveries) | **GET** /api/v1/admin/mail/deliveries | 
+[*AdminMailApi*](doc/AdminMailApi.md) | [**adminMailControllerPreview**](doc/AdminMailApi.md#adminmailcontrollerpreview) | **GET** /api/v1/admin/mail/preview/{templateKey} | 
+[*AdminNotificationsApi*](doc/AdminNotificationsApi.md) | [**adminNotificationsControllerCancelJob**](doc/AdminNotificationsApi.md#adminnotificationscontrollercanceljob) | **DELETE** /api/v1/admin/notifications/jobs/{id} | 
+[*AdminNotificationsApi*](doc/AdminNotificationsApi.md) | [**adminNotificationsControllerGetJob**](doc/AdminNotificationsApi.md#adminnotificationscontrollergetjob) | **GET** /api/v1/admin/notifications/jobs/{id} | 
+[*AdminNotificationsApi*](doc/AdminNotificationsApi.md) | [**adminNotificationsControllerListJobs**](doc/AdminNotificationsApi.md#adminnotificationscontrollerlistjobs) | **GET** /api/v1/admin/notifications/jobs | 
+[*AdminNotificationsApi*](doc/AdminNotificationsApi.md) | [**adminNotificationsControllerSend**](doc/AdminNotificationsApi.md#adminnotificationscontrollersend) | **POST** /api/v1/admin/notifications | 
+[*AdminRolesApi*](doc/AdminRolesApi.md) | [**adminRolesControllerListRoles**](doc/AdminRolesApi.md#adminrolescontrollerlistroles) | **GET** /api/v1/admin/roles | 
+[*AdminSettingsApi*](doc/AdminSettingsApi.md) | [**adminSettingsControllerListSettings**](doc/AdminSettingsApi.md#adminsettingscontrollerlistsettings) | **GET** /api/v1/admin/settings | 
+[*AdminSettingsApi*](doc/AdminSettingsApi.md) | [**adminSettingsControllerUpdateSetting**](doc/AdminSettingsApi.md#adminsettingscontrollerupdatesetting) | **PATCH** /api/v1/admin/settings/{key} | 
+[*AdminUsersApi*](doc/AdminUsersApi.md) | [**adminUsersControllerCreateUser**](doc/AdminUsersApi.md#adminuserscontrollercreateuser) | **POST** /api/v1/admin/users | 
+[*AdminUsersApi*](doc/AdminUsersApi.md) | [**adminUsersControllerDeleteUser**](doc/AdminUsersApi.md#adminuserscontrollerdeleteuser) | **DELETE** /api/v1/admin/users/{id} | 
+[*AdminUsersApi*](doc/AdminUsersApi.md) | [**adminUsersControllerGetUser**](doc/AdminUsersApi.md#adminuserscontrollergetuser) | **GET** /api/v1/admin/users/{id} | 
+[*AdminUsersApi*](doc/AdminUsersApi.md) | [**adminUsersControllerListUsers**](doc/AdminUsersApi.md#adminuserscontrollerlistusers) | **GET** /api/v1/admin/users | 
+[*AdminUsersApi*](doc/AdminUsersApi.md) | [**adminUsersControllerReplaceRoles**](doc/AdminUsersApi.md#adminuserscontrollerreplaceroles) | **PUT** /api/v1/admin/users/{id}/roles | 
+[*AdminUsersApi*](doc/AdminUsersApi.md) | [**adminUsersControllerUpdateStatus**](doc/AdminUsersApi.md#adminuserscontrollerupdatestatus) | **PATCH** /api/v1/admin/users/{id}/status | 
+[*AdminUsersApi*](doc/AdminUsersApi.md) | [**adminUsersControllerUpdateUser**](doc/AdminUsersApi.md#adminuserscontrollerupdateuser) | **PATCH** /api/v1/admin/users/{id} | 
+[*AttachmentsApi*](doc/AttachmentsApi.md) | [**attachmentsControllerAttach**](doc/AttachmentsApi.md#attachmentscontrollerattach) | **POST** /api/v1/attachments | 
+[*AttachmentsApi*](doc/AttachmentsApi.md) | [**attachmentsControllerDelete**](doc/AttachmentsApi.md#attachmentscontrollerdelete) | **DELETE** /api/v1/attachments/{id} | 
+[*AttachmentsApi*](doc/AttachmentsApi.md) | [**attachmentsControllerList**](doc/AttachmentsApi.md#attachmentscontrollerlist) | **GET** /api/v1/attachments | 
+[*AuthApi*](doc/AuthApi.md) | [**authControllerForgotPassword**](doc/AuthApi.md#authcontrollerforgotpassword) | **POST** /api/v1/auth/forgot-password | 
+[*AuthApi*](doc/AuthApi.md) | [**authControllerGetMe**](doc/AuthApi.md#authcontrollergetme) | **GET** /api/v1/auth/me | 
+[*AuthApi*](doc/AuthApi.md) | [**authControllerGetSessions**](doc/AuthApi.md#authcontrollergetsessions) | **GET** /api/v1/auth/sessions | 
+[*AuthApi*](doc/AuthApi.md) | [**authControllerLogin**](doc/AuthApi.md#authcontrollerlogin) | **POST** /api/v1/auth/login | 
+[*AuthApi*](doc/AuthApi.md) | [**authControllerLogout**](doc/AuthApi.md#authcontrollerlogout) | **POST** /api/v1/auth/logout | 
+[*AuthApi*](doc/AuthApi.md) | [**authControllerLogoutAll**](doc/AuthApi.md#authcontrollerlogoutall) | **POST** /api/v1/auth/logout-all | 
+[*AuthApi*](doc/AuthApi.md) | [**authControllerRefresh**](doc/AuthApi.md#authcontrollerrefresh) | **POST** /api/v1/auth/refresh | 
+[*AuthApi*](doc/AuthApi.md) | [**authControllerRegister**](doc/AuthApi.md#authcontrollerregister) | **POST** /api/v1/auth/register | 
+[*AuthApi*](doc/AuthApi.md) | [**authControllerResendVerification**](doc/AuthApi.md#authcontrollerresendverification) | **POST** /api/v1/auth/resend-verification | 
+[*AuthApi*](doc/AuthApi.md) | [**authControllerResetPassword**](doc/AuthApi.md#authcontrollerresetpassword) | **POST** /api/v1/auth/reset-password | 
+[*AuthApi*](doc/AuthApi.md) | [**authControllerRevokeSession**](doc/AuthApi.md#authcontrollerrevokesession) | **DELETE** /api/v1/auth/sessions/{sessionId} | 
+[*AuthApi*](doc/AuthApi.md) | [**authControllerSwitchOrganization**](doc/AuthApi.md#authcontrollerswitchorganization) | **POST** /api/v1/auth/switch-organization | 
+[*AuthApi*](doc/AuthApi.md) | [**authControllerVerifyEmail**](doc/AuthApi.md#authcontrollerverifyemail) | **POST** /api/v1/auth/verify-email | 
+[*CommentsApi*](doc/CommentsApi.md) | [**commentsControllerCreate**](doc/CommentsApi.md#commentscontrollercreate) | **POST** /api/v1/comments | 
+[*CommentsApi*](doc/CommentsApi.md) | [**commentsControllerDelete**](doc/CommentsApi.md#commentscontrollerdelete) | **DELETE** /api/v1/comments/{id} | 
+[*CommentsApi*](doc/CommentsApi.md) | [**commentsControllerList**](doc/CommentsApi.md#commentscontrollerlist) | **GET** /api/v1/comments | 
+[*CommentsApi*](doc/CommentsApi.md) | [**commentsControllerUpdate**](doc/CommentsApi.md#commentscontrollerupdate) | **PATCH** /api/v1/comments/{id} | 
+[*ExportsApi*](doc/ExportsApi.md) | [**exportsControllerCreate**](doc/ExportsApi.md#exportscontrollercreate) | **POST** /api/v1/exports | 
+[*ExportsApi*](doc/ExportsApi.md) | [**exportsControllerGetById**](doc/ExportsApi.md#exportscontrollergetbyid) | **GET** /api/v1/exports/{id} | 
+[*FilesApi*](doc/FilesApi.md) | [**filesControllerDelete**](doc/FilesApi.md#filescontrollerdelete) | **DELETE** /api/v1/files/{id} | 
+[*FilesApi*](doc/FilesApi.md) | [**filesControllerGetById**](doc/FilesApi.md#filescontrollergetbyid) | **GET** /api/v1/files/{id} | 
+[*FilesApi*](doc/FilesApi.md) | [**filesControllerGetUrl**](doc/FilesApi.md#filescontrollergeturl) | **GET** /api/v1/files/{id}/url | 
+[*FilesApi*](doc/FilesApi.md) | [**filesControllerUpload**](doc/FilesApi.md#filescontrollerupload) | **POST** /api/v1/files | 
+[*HealthApi*](doc/HealthApi.md) | [**healthControllerGetHealth**](doc/HealthApi.md#healthcontrollergethealth) | **GET** /api/v1/health | 
+[*HealthApi*](doc/HealthApi.md) | [**healthControllerGetReady**](doc/HealthApi.md#healthcontrollergetready) | **GET** /api/v1/health/ready | 
+[*ImportsApi*](doc/ImportsApi.md) | [**importsControllerConfirm**](doc/ImportsApi.md#importscontrollerconfirm) | **POST** /api/v1/imports/{id}/confirm | 
+[*ImportsApi*](doc/ImportsApi.md) | [**importsControllerCreate**](doc/ImportsApi.md#importscontrollercreate) | **POST** /api/v1/imports | 
+[*ImportsApi*](doc/ImportsApi.md) | [**importsControllerGetById**](doc/ImportsApi.md#importscontrollergetbyid) | **GET** /api/v1/imports/{id} | 
+[*InvitationsApi*](doc/InvitationsApi.md) | [**invitationsControllerAccept**](doc/InvitationsApi.md#invitationscontrolleraccept) | **POST** /api/v1/invitations/accept | 
+[*InvitationsApi*](doc/InvitationsApi.md) | [**invitationsControllerCreate**](doc/InvitationsApi.md#invitationscontrollercreate) | **POST** /api/v1/invitations | 
+[*InvitationsApi*](doc/InvitationsApi.md) | [**invitationsControllerList**](doc/InvitationsApi.md#invitationscontrollerlist) | **GET** /api/v1/invitations | 
+[*InvitationsApi*](doc/InvitationsApi.md) | [**invitationsControllerRevoke**](doc/InvitationsApi.md#invitationscontrollerrevoke) | **DELETE** /api/v1/invitations/{id} | 
+[*NotificationsApi*](doc/NotificationsApi.md) | [**notificationsControllerDelete**](doc/NotificationsApi.md#notificationscontrollerdelete) | **DELETE** /api/v1/notifications/{id} | 
+[*NotificationsApi*](doc/NotificationsApi.md) | [**notificationsControllerList**](doc/NotificationsApi.md#notificationscontrollerlist) | **GET** /api/v1/notifications | 
+[*NotificationsApi*](doc/NotificationsApi.md) | [**notificationsControllerMarkAllRead**](doc/NotificationsApi.md#notificationscontrollermarkallread) | **PATCH** /api/v1/notifications/read-all | 
+[*NotificationsApi*](doc/NotificationsApi.md) | [**notificationsControllerMarkRead**](doc/NotificationsApi.md#notificationscontrollermarkread) | **PATCH** /api/v1/notifications/{id}/read | 
+[*NotificationsApi*](doc/NotificationsApi.md) | [**notificationsControllerRegisterDevice**](doc/NotificationsApi.md#notificationscontrollerregisterdevice) | **POST** /api/v1/notifications/devices | 
+[*NotificationsApi*](doc/NotificationsApi.md) | [**notificationsControllerStream**](doc/NotificationsApi.md#notificationscontrollerstream) | **GET** /api/v1/notifications/stream | 
+[*NotificationsApi*](doc/NotificationsApi.md) | [**notificationsControllerUnreadCount**](doc/NotificationsApi.md#notificationscontrollerunreadcount) | **GET** /api/v1/notifications/unread-count | 
+[*NotificationsApi*](doc/NotificationsApi.md) | [**notificationsControllerUnregisterDevice**](doc/NotificationsApi.md#notificationscontrollerunregisterdevice) | **DELETE** /api/v1/notifications/devices/{token} | 
+[*OrganizationsApi*](doc/OrganizationsApi.md) | [**organizationsControllerCreate**](doc/OrganizationsApi.md#organizationscontrollercreate) | **POST** /api/v1/organizations | 
+[*OrganizationsApi*](doc/OrganizationsApi.md) | [**organizationsControllerList**](doc/OrganizationsApi.md#organizationscontrollerlist) | **GET** /api/v1/organizations | 
+[*ProjectsApi*](doc/ProjectsApi.md) | [**projectsControllerCreate**](doc/ProjectsApi.md#projectscontrollercreate) | **POST** /api/v1/projects | 
+[*ProjectsApi*](doc/ProjectsApi.md) | [**projectsControllerGetById**](doc/ProjectsApi.md#projectscontrollergetbyid) | **GET** /api/v1/projects/{id} | 
+[*ProjectsApi*](doc/ProjectsApi.md) | [**projectsControllerList**](doc/ProjectsApi.md#projectscontrollerlist) | **GET** /api/v1/projects | 
+[*ProjectsApi*](doc/ProjectsApi.md) | [**projectsControllerListAttachments**](doc/ProjectsApi.md#projectscontrollerlistattachments) | **GET** /api/v1/projects/{id}/attachments | 
+[*ProjectsApi*](doc/ProjectsApi.md) | [**projectsControllerRemove**](doc/ProjectsApi.md#projectscontrollerremove) | **DELETE** /api/v1/projects/{id} | 
+[*ProjectsApi*](doc/ProjectsApi.md) | [**projectsControllerRestore**](doc/ProjectsApi.md#projectscontrollerrestore) | **POST** /api/v1/projects/{id}/restore | 
+[*ProjectsApi*](doc/ProjectsApi.md) | [**projectsControllerUpdate**](doc/ProjectsApi.md#projectscontrollerupdate) | **PATCH** /api/v1/projects/{id} | 
+[*UsersApi*](doc/UsersApi.md) | [**preferencesControllerGetMyPreferences**](doc/UsersApi.md#preferencescontrollergetmypreferences) | **GET** /api/v1/users/me/preferences | 
+[*UsersApi*](doc/UsersApi.md) | [**preferencesControllerUpdateMyPreferences**](doc/UsersApi.md#preferencescontrollerupdatemypreferences) | **PATCH** /api/v1/users/me/preferences | 
+[*UsersApi*](doc/UsersApi.md) | [**usersControllerChangePassword**](doc/UsersApi.md#userscontrollerchangepassword) | **PATCH** /api/v1/users/me/password | 
+[*UsersApi*](doc/UsersApi.md) | [**usersControllerGetMe**](doc/UsersApi.md#userscontrollergetme) | **GET** /api/v1/users/me | 
+[*UsersApi*](doc/UsersApi.md) | [**usersControllerUpdateMe**](doc/UsersApi.md#userscontrollerupdateme) | **PATCH** /api/v1/users/me | 
 
 
 ## Documentation For Models
 
+ - [AcceptInvitationDto](doc/AcceptInvitationDto.md)
+ - [ActivitiesControllerList200Response](doc/ActivitiesControllerList200Response.md)
+ - [ActivityDto](doc/ActivityDto.md)
+ - [AdminJobsControllerCancelJob200Response](doc/AdminJobsControllerCancelJob200Response.md)
+ - [AdminJobsControllerListJobs200Response](doc/AdminJobsControllerListJobs200Response.md)
+ - [AdminMailControllerListDeliveries200Response](doc/AdminMailControllerListDeliveries200Response.md)
+ - [AdminMailControllerPreview200Response](doc/AdminMailControllerPreview200Response.md)
+ - [AdminNotificationsControllerListJobs200Response](doc/AdminNotificationsControllerListJobs200Response.md)
+ - [AdminNotificationsControllerSend201Response](doc/AdminNotificationsControllerSend201Response.md)
+ - [AdminRolesControllerListRoles200Response](doc/AdminRolesControllerListRoles200Response.md)
+ - [AdminSettingsControllerListSettings200Response](doc/AdminSettingsControllerListSettings200Response.md)
+ - [AdminSettingsControllerUpdateSetting200Response](doc/AdminSettingsControllerUpdateSetting200Response.md)
  - [AdminUsersControllerCreateUser201Response](doc/AdminUsersControllerCreateUser201Response.md)
  - [AdminUsersControllerDeleteUser200Response](doc/AdminUsersControllerDeleteUser200Response.md)
  - [AdminUsersControllerListUsers200Response](doc/AdminUsersControllerListUsers200Response.md)
+ - [ApplicationSettingDto](doc/ApplicationSettingDto.md)
+ - [AttachEntityDto](doc/AttachEntityDto.md)
+ - [AttachmentDto](doc/AttachmentDto.md)
+ - [AttachmentsControllerAttach201Response](doc/AttachmentsControllerAttach201Response.md)
+ - [AttachmentsControllerList200Response](doc/AttachmentsControllerList200Response.md)
+ - [AuditControllerListAuditLogs200Response](doc/AuditControllerListAuditLogs200Response.md)
+ - [AuditLogDto](doc/AuditLogDto.md)
  - [AuthControllerGetMe200Response](doc/AuthControllerGetMe200Response.md)
  - [AuthControllerGetSessions200Response](doc/AuthControllerGetSessions200Response.md)
  - [AuthControllerLogin201Response](doc/AuthControllerLogin201Response.md)
@@ -116,35 +181,73 @@ Class | Method | HTTP request | Description
  - [AuthResponseDto](doc/AuthResponseDto.md)
  - [AuthSessionDto](doc/AuthSessionDto.md)
  - [ChangePasswordDto](doc/ChangePasswordDto.md)
+ - [CommentDto](doc/CommentDto.md)
+ - [CommentsControllerCreate201Response](doc/CommentsControllerCreate201Response.md)
+ - [CommentsControllerList200Response](doc/CommentsControllerList200Response.md)
  - [CountDto](doc/CountDto.md)
  - [CreateAdminUserDto](doc/CreateAdminUserDto.md)
+ - [CreateCommentDto](doc/CreateCommentDto.md)
+ - [CreateExportDto](doc/CreateExportDto.md)
+ - [CreateImportDto](doc/CreateImportDto.md)
+ - [CreateInvitationDto](doc/CreateInvitationDto.md)
+ - [CreateOrganizationDto](doc/CreateOrganizationDto.md)
  - [CreateProjectDto](doc/CreateProjectDto.md)
+ - [DeviceTokenDto](doc/DeviceTokenDto.md)
+ - [ExportJobDto](doc/ExportJobDto.md)
+ - [ExportsControllerCreate201Response](doc/ExportsControllerCreate201Response.md)
+ - [FileDto](doc/FileDto.md)
+ - [FileUrlDto](doc/FileUrlDto.md)
+ - [FilesControllerGetUrl200Response](doc/FilesControllerGetUrl200Response.md)
+ - [FilesControllerUpload201Response](doc/FilesControllerUpload201Response.md)
  - [ForgotPasswordDto](doc/ForgotPasswordDto.md)
  - [HealthControllerGetHealth200Response](doc/HealthControllerGetHealth200Response.md)
  - [HealthStatusDto](doc/HealthStatusDto.md)
+ - [ImportJobDto](doc/ImportJobDto.md)
+ - [ImportsControllerCreate201Response](doc/ImportsControllerCreate201Response.md)
+ - [InvitationDto](doc/InvitationDto.md)
+ - [InvitationsControllerCreate201Response](doc/InvitationsControllerCreate201Response.md)
+ - [InvitationsControllerList200Response](doc/InvitationsControllerList200Response.md)
+ - [JobDto](doc/JobDto.md)
  - [LoginDto](doc/LoginDto.md)
+ - [MailDeliveryDto](doc/MailDeliveryDto.md)
+ - [MailPreviewDto](doc/MailPreviewDto.md)
  - [NotificationDto](doc/NotificationDto.md)
+ - [NotificationJobDto](doc/NotificationJobDto.md)
  - [NotificationsControllerList200Response](doc/NotificationsControllerList200Response.md)
  - [NotificationsControllerMarkRead200Response](doc/NotificationsControllerMarkRead200Response.md)
+ - [NotificationsControllerRegisterDevice201Response](doc/NotificationsControllerRegisterDevice201Response.md)
  - [NotificationsControllerUnreadCount200Response](doc/NotificationsControllerUnreadCount200Response.md)
+ - [OrganizationDto](doc/OrganizationDto.md)
+ - [OrganizationsControllerCreate200Response](doc/OrganizationsControllerCreate200Response.md)
+ - [OrganizationsControllerList200Response](doc/OrganizationsControllerList200Response.md)
  - [PaginationMetaDto](doc/PaginationMetaDto.md)
+ - [PreferencesControllerGetMyPreferences200Response](doc/PreferencesControllerGetMyPreferences200Response.md)
+ - [ProjectAttachmentDto](doc/ProjectAttachmentDto.md)
  - [ProjectDto](doc/ProjectDto.md)
  - [ProjectsControllerCreate201Response](doc/ProjectsControllerCreate201Response.md)
  - [ProjectsControllerList200Response](doc/ProjectsControllerList200Response.md)
+ - [ProjectsControllerListAttachments200Response](doc/ProjectsControllerListAttachments200Response.md)
  - [RefreshTokenDto](doc/RefreshTokenDto.md)
+ - [RegisterDeviceDto](doc/RegisterDeviceDto.md)
  - [RegisterDto](doc/RegisterDto.md)
  - [ReplaceUserRolesDto](doc/ReplaceUserRolesDto.md)
  - [RequestMetaDto](doc/RequestMetaDto.md)
  - [ResendVerificationDto](doc/ResendVerificationDto.md)
  - [ResetPasswordDto](doc/ResetPasswordDto.md)
- - [SendNotificationDto](doc/SendNotificationDto.md)
+ - [RoleDto](doc/RoleDto.md)
+ - [SendNotificationRequestDto](doc/SendNotificationRequestDto.md)
  - [SuccessFlagDto](doc/SuccessFlagDto.md)
  - [SuccessMessageDto](doc/SuccessMessageDto.md)
+ - [SwitchOrganizationDto](doc/SwitchOrganizationDto.md)
  - [UpdateAdminUserDto](doc/UpdateAdminUserDto.md)
+ - [UpdateCommentDto](doc/UpdateCommentDto.md)
+ - [UpdatePreferencesDto](doc/UpdatePreferencesDto.md)
  - [UpdateProfileDto](doc/UpdateProfileDto.md)
  - [UpdateProjectDto](doc/UpdateProjectDto.md)
+ - [UpdateSettingDto](doc/UpdateSettingDto.md)
  - [UpdateUserStatusDto](doc/UpdateUserStatusDto.md)
  - [UserDto](doc/UserDto.md)
+ - [UserPreferencesDto](doc/UserPreferencesDto.md)
  - [VerifyEmailDto](doc/VerifyEmailDto.md)
 
 

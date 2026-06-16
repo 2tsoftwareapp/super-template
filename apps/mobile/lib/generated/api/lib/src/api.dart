@@ -11,11 +11,24 @@ import 'package:super_template_api/src/auth/api_key_auth.dart';
 import 'package:super_template_api/src/auth/basic_auth.dart';
 import 'package:super_template_api/src/auth/bearer_auth.dart';
 import 'package:super_template_api/src/auth/oauth.dart';
+import 'package:super_template_api/src/api/activities_api.dart';
+import 'package:super_template_api/src/api/admin_audit_api.dart';
+import 'package:super_template_api/src/api/admin_jobs_api.dart';
+import 'package:super_template_api/src/api/admin_mail_api.dart';
 import 'package:super_template_api/src/api/admin_notifications_api.dart';
+import 'package:super_template_api/src/api/admin_roles_api.dart';
+import 'package:super_template_api/src/api/admin_settings_api.dart';
 import 'package:super_template_api/src/api/admin_users_api.dart';
+import 'package:super_template_api/src/api/attachments_api.dart';
 import 'package:super_template_api/src/api/auth_api.dart';
+import 'package:super_template_api/src/api/comments_api.dart';
+import 'package:super_template_api/src/api/exports_api.dart';
+import 'package:super_template_api/src/api/files_api.dart';
 import 'package:super_template_api/src/api/health_api.dart';
+import 'package:super_template_api/src/api/imports_api.dart';
+import 'package:super_template_api/src/api/invitations_api.dart';
 import 'package:super_template_api/src/api/notifications_api.dart';
+import 'package:super_template_api/src/api/organizations_api.dart';
 import 'package:super_template_api/src/api/projects_api.dart';
 import 'package:super_template_api/src/api/users_api.dart';
 
@@ -32,13 +45,11 @@ class SuperTemplateApi {
     List<Interceptor>? interceptors,
   })  : this.serializers = serializers ?? standardSerializers,
         this.dio = dio ??
-            Dio(
-              BaseOptions(
-                baseUrl: basePathOverride ?? basePath,
-                connectTimeout: const Duration(milliseconds: 5000),
-                receiveTimeout: const Duration(milliseconds: 3000),
-              ),
-            ) {
+            Dio(BaseOptions(
+              baseUrl: basePathOverride ?? basePath,
+              connectTimeout: const Duration(milliseconds: 5000),
+              receiveTimeout: const Duration(milliseconds: 3000),
+            )) {
     if (interceptors == null) {
       this.dio.interceptors.addAll([
         OAuthInterceptor(),
@@ -71,20 +82,43 @@ class SuperTemplateApi {
     if (this.dio.interceptors.any((i) => i is BasicAuthInterceptor)) {
       (this.dio.interceptors.firstWhere((i) => i is BasicAuthInterceptor)
               as BasicAuthInterceptor)
-          .authInfo[name] = BasicAuthInfo(
-        username,
-        password,
-      );
+          .authInfo[name] = BasicAuthInfo(username, password);
     }
   }
 
   void setApiKey(String name, String apiKey) {
     if (this.dio.interceptors.any((i) => i is ApiKeyAuthInterceptor)) {
-      (this.dio.interceptors.firstWhere(
-                (element) => element is ApiKeyAuthInterceptor,
-              ) as ApiKeyAuthInterceptor)
+      (this
+                  .dio
+                  .interceptors
+                  .firstWhere((element) => element is ApiKeyAuthInterceptor)
+              as ApiKeyAuthInterceptor)
           .apiKeys[name] = apiKey;
     }
+  }
+
+  /// Get ActivitiesApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  ActivitiesApi getActivitiesApi() {
+    return ActivitiesApi(dio, serializers);
+  }
+
+  /// Get AdminAuditApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  AdminAuditApi getAdminAuditApi() {
+    return AdminAuditApi(dio, serializers);
+  }
+
+  /// Get AdminJobsApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  AdminJobsApi getAdminJobsApi() {
+    return AdminJobsApi(dio, serializers);
+  }
+
+  /// Get AdminMailApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  AdminMailApi getAdminMailApi() {
+    return AdminMailApi(dio, serializers);
   }
 
   /// Get AdminNotificationsApi instance, base route and serializer can be overridden by a given but be careful,
@@ -93,10 +127,28 @@ class SuperTemplateApi {
     return AdminNotificationsApi(dio, serializers);
   }
 
+  /// Get AdminRolesApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  AdminRolesApi getAdminRolesApi() {
+    return AdminRolesApi(dio, serializers);
+  }
+
+  /// Get AdminSettingsApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  AdminSettingsApi getAdminSettingsApi() {
+    return AdminSettingsApi(dio, serializers);
+  }
+
   /// Get AdminUsersApi instance, base route and serializer can be overridden by a given but be careful,
   /// by doing that all interceptors will not be executed
   AdminUsersApi getAdminUsersApi() {
     return AdminUsersApi(dio, serializers);
+  }
+
+  /// Get AttachmentsApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  AttachmentsApi getAttachmentsApi() {
+    return AttachmentsApi(dio, serializers);
   }
 
   /// Get AuthApi instance, base route and serializer can be overridden by a given but be careful,
@@ -105,16 +157,52 @@ class SuperTemplateApi {
     return AuthApi(dio, serializers);
   }
 
+  /// Get CommentsApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  CommentsApi getCommentsApi() {
+    return CommentsApi(dio, serializers);
+  }
+
+  /// Get ExportsApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  ExportsApi getExportsApi() {
+    return ExportsApi(dio, serializers);
+  }
+
+  /// Get FilesApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  FilesApi getFilesApi() {
+    return FilesApi(dio, serializers);
+  }
+
   /// Get HealthApi instance, base route and serializer can be overridden by a given but be careful,
   /// by doing that all interceptors will not be executed
   HealthApi getHealthApi() {
     return HealthApi(dio, serializers);
   }
 
+  /// Get ImportsApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  ImportsApi getImportsApi() {
+    return ImportsApi(dio, serializers);
+  }
+
+  /// Get InvitationsApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  InvitationsApi getInvitationsApi() {
+    return InvitationsApi(dio, serializers);
+  }
+
   /// Get NotificationsApi instance, base route and serializer can be overridden by a given but be careful,
   /// by doing that all interceptors will not be executed
   NotificationsApi getNotificationsApi() {
     return NotificationsApi(dio, serializers);
+  }
+
+  /// Get OrganizationsApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  OrganizationsApi getOrganizationsApi() {
+    return OrganizationsApi(dio, serializers);
   }
 
   /// Get ProjectsApi instance, base route and serializer can be overridden by a given but be careful,

@@ -1,12 +1,14 @@
 import type { INestApplicationContext } from '@nestjs/common';
-import { EnvironmentService } from '../config/environment.service';
-import { ROLE_NAMES } from '../modules/access-control/access-control.constants';
-import { AccessControlService } from '../modules/access-control/application/access-control.service';
-import { hashPassword } from '../modules/auth/application/auth.helpers';
-import { AuthRepository } from '../modules/auth/infrastructure/auth.repository';
-import { NotificationsRepository } from '../modules/notifications/infrastructure/notifications.repository';
-import { ProjectsRepository } from '../modules/projects/infrastructure/projects.repository';
-import { UsersRepository } from '../modules/users/infrastructure/users.repository';
+import { EnvironmentService } from '@repo/api-core/config/environment.service';
+import { ROLE_NAMES } from '@repo/api-identity/modules/access-control/access-control.constants';
+import { AccessControlService } from '@repo/api-identity/modules/access-control/application/access-control.service';
+import { hashPassword } from '@repo/api-identity/modules/auth/application/auth.helpers';
+import { AuthRepository } from '@repo/api-identity/modules/auth/infrastructure/auth.repository';
+import { OrganizationsService } from '@repo/api-identity/modules/organizations/application/organizations.service';
+import { UsersRepository } from '@repo/api-identity/modules/users/infrastructure/users.repository';
+import { SettingsService } from '@repo/api-platform/modules/settings/application/settings.service';
+import { NotificationsRepository } from '@repo/api-workspace/modules/notifications/infrastructure/notifications.repository';
+import { ProjectsRepository } from '@repo/api-workspace/modules/projects/infrastructure/projects.repository';
 
 export const seedDatabase = async (
   app: INestApplicationContext,
@@ -14,12 +16,15 @@ export const seedDatabase = async (
   const accessControlService = app.get(AccessControlService);
   const authRepository = app.get(AuthRepository);
   const notificationsRepository = app.get(NotificationsRepository);
+  const organizationsService = app.get(OrganizationsService);
   const projectsRepository = app.get(ProjectsRepository);
+  const settingsService = app.get(SettingsService);
   const usersRepository = app.get(UsersRepository);
   const environmentService = app.get(EnvironmentService);
 
   await projectsRepository.client.transaction(async (transaction) => {
     await accessControlService.ensureSeedData(transaction);
+    await settingsService.ensureSeedData(transaction);
 
     const ensureUser = async (params: {
       email: string;
@@ -77,24 +82,34 @@ export const seedDatabase = async (
         [role.id],
         transaction,
       );
-      return user;
+
+      const organizationId = await organizationsService.ensurePersonalOrganization(
+        user.id,
+        user.displayName,
+        transaction,
+      );
+
+      return { user, organizationId };
     };
 
-    const adminUser = await ensureUser({
-      email: environmentService.values.SEED_ADMIN_EMAIL,
-      displayName: 'Seed Admin',
-      password: environmentService.values.SEED_ADMIN_PASSWORD,
-      roleName: ROLE_NAMES.SUPER_ADMIN,
-    });
-    const regularUser = await ensureUser({
-      email: environmentService.values.SEED_USER_EMAIL,
-      displayName: 'Seed User',
-      password: environmentService.values.SEED_USER_PASSWORD,
-      roleName: ROLE_NAMES.USER,
-    });
+    const { user: adminUser, organizationId: adminOrganizationId } =
+      await ensureUser({
+        email: environmentService.values.SEED_ADMIN_EMAIL,
+        displayName: 'Seed Admin',
+        password: environmentService.values.SEED_ADMIN_PASSWORD,
+        roleName: ROLE_NAMES.SUPER_ADMIN,
+      });
+    const { user: regularUser, organizationId: regularOrganizationId } =
+      await ensureUser({
+        email: environmentService.values.SEED_USER_EMAIL,
+        displayName: 'Seed User',
+        password: environmentService.values.SEED_USER_PASSWORD,
+        roleName: ROLE_NAMES.USER,
+      });
 
     const ensureProject = async (
       ownerId: string,
+      organizationId: string,
       name: string,
       description: string,
     ) => {
@@ -108,6 +123,7 @@ export const seedDatabase = async (
         await projectsRepository.create(
           {
             ownerId,
+            organizationId,
             name,
             description,
             status: 'ACTIVE',
@@ -120,11 +136,13 @@ export const seedDatabase = async (
 
     await ensureProject(
       adminUser.id,
+      adminOrganizationId,
       'Starter Admin Project',
       'Reference admin-owned project',
     );
     await ensureProject(
       regularUser.id,
+      regularOrganizationId,
       'Starter User Project',
       'Reference user-owned project',
     );
@@ -143,6 +161,7 @@ export const seedDatabase = async (
       await notificationsRepository.create(
         {
           userId: regularUser.id,
+          organizationId: regularOrganizationId,
           type: 'system.seed',
           title: 'Welcome to the starter',
           body: 'Your account has been provisioned with sample data.',

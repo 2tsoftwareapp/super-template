@@ -1,0 +1,7 @@
+Hi {{displayName}},
+
+Please verify your email by visiting the link below:
+
+{{verifyUrl}}
+
+If you did not create an account, you can ignore this message.

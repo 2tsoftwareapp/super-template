@@ -1,8 +1,35 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { Bell } from "lucide-react";
 import { useQueryStates } from "nuqs";
-import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Spinner } from "@/components/ui/spinner";
+import { useNotificationStream } from "@/hooks/use-notification-stream";
 import type { NotificationsListResponse } from "@/lib/api-types";
 import { webFetch } from "@/lib/http";
 import {
@@ -13,6 +40,7 @@ import {
 
 export function NotificationsView() {
   const [filters, setFilters] = useQueryStates(notificationsSearchParams);
+  useNotificationStream();
   const notifications = useQuery({
     queryKey: ["notifications", filters],
     queryFn: () =>
@@ -21,75 +49,120 @@ export function NotificationsView() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <p className="text-sm uppercase tracking-[0.28em] text-neutral-500">
+      <div className="space-y-2">
+        <Badge variant="outline" className="w-fit">
           Inbox
-        </p>
-        <h1 className="mt-3 text-4xl font-semibold">Notifications</h1>
+        </Badge>
+        <h1 className="text-4xl font-semibold">Notifications</h1>
       </div>
-      <Card className="space-y-4">
-        <div className="grid gap-3 md:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
-          <input
-            className="h-11 rounded-2xl border border-black/10 bg-white/80 px-4 text-sm dark:border-white/10 dark:bg-white/5"
-            placeholder="Filter by type"
-            value={filters.type}
-            onChange={(event) =>
-              void setFilters({
-                type: event.target.value,
-                page: 1,
-              })
-            }
-          />
-          <select
-            className="h-11 rounded-2xl border border-black/10 bg-white/80 px-4 text-sm dark:border-white/10 dark:bg-white/5"
-            value={String(filters.unread)}
-            onChange={(event) =>
-              void setFilters({
-                unread: event.target.value === "true",
-                page: 1,
-              })
-            }
-          >
-            {notificationUnreadOptions.map((option) => (
-              <option key={String(option.value)} value={String(option.value)}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </div>
+      <Card className="border-border">
+        <CardHeader>
+          <CardTitle className="text-xl">Filters</CardTitle>
+          <CardDescription>
+            Scope the inbox by type and unread state.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-4 md:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+          <div className="space-y-2">
+            <Label htmlFor="type">Type</Label>
+            <Input
+              id="type"
+              placeholder="Filter by type"
+              value={filters.type}
+              onChange={(event) =>
+                void setFilters({
+                  type: event.target.value,
+                  page: 1,
+                })
+              }
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Unread</Label>
+            <Select
+              value={String(filters.unread)}
+              onValueChange={(value) =>
+                void setFilters({
+                  unread: value === "true",
+                  page: 1,
+                })
+              }
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Unread" />
+              </SelectTrigger>
+              <SelectContent>
+                {notificationUnreadOptions.map((option) => (
+                  <SelectItem
+                    key={String(option.value)}
+                    value={String(option.value)}
+                  >
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
       </Card>
       <div className="space-y-4">
-        {notifications.data?.data.map((notification) => (
-          <Card key={notification.id}>
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h2 className="text-lg font-semibold">{notification.title}</h2>
-                <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">
-                  {notification.body}
-                </p>
-              </div>
-              <span className="text-xs uppercase tracking-[0.22em] text-neutral-400">
-                {notification.type}
-              </span>
-            </div>
+        {notifications.isLoading ? (
+          <Card className="border-border">
+            <CardContent className="flex min-h-40 items-center justify-center">
+              <Spinner className="size-5 text-primary" />
+            </CardContent>
           </Card>
-        ))}
+        ) : notifications.data?.data.length ? (
+          notifications.data.data.map((notification) => (
+            <Card key={notification.id} className="border-border">
+              <CardHeader className="flex-row items-start justify-between space-y-0">
+                <div className="space-y-2">
+                  <CardTitle className="text-lg">
+                    {notification.title}
+                  </CardTitle>
+                  <CardDescription>{notification.body}</CardDescription>
+                </div>
+                <Badge variant="outline">{notification.type}</Badge>
+              </CardHeader>
+            </Card>
+          ))
+        ) : (
+          <Card className="border-border">
+            <CardContent className="py-10">
+              <Empty className="border-border bg-muted/30">
+                <EmptyHeader>
+                  <EmptyMedia variant="icon">
+                    <Bell className="size-4" />
+                  </EmptyMedia>
+                  <EmptyTitle>No notifications</EmptyTitle>
+                  <EmptyDescription>
+                    Try another filter or create activity in the API.
+                  </EmptyDescription>
+                </EmptyHeader>
+              </Empty>
+            </CardContent>
+          </Card>
+        )}
       </div>
-      <div className="flex items-center justify-between text-sm text-neutral-500">
+      <div className="flex flex-col gap-3 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between">
         <p>
           Page {notifications.data?.meta.page ?? filters.page} of{" "}
           {notifications.data?.meta.totalPages ?? 1}
         </p>
         <div className="flex gap-2">
-          <button
-            className="rounded-full border border-black/10 px-4 py-2 disabled:opacity-40 dark:border-white/10"
+          <Button
+            variant="outline"
+            size="sm"
             disabled={filters.page <= 1}
-            onClick={() => void setFilters({ page: Math.max(1, filters.page - 1) })}
+            onClick={() =>
+              void setFilters({ page: Math.max(1, filters.page - 1) })
+            }
           >
             Previous
-          </button>
-          <button
-            className="rounded-full border border-black/10 px-4 py-2 disabled:opacity-40 dark:border-white/10"
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
             disabled={
               (notifications.data?.meta.totalPages ?? filters.page) <=
               filters.page
@@ -97,7 +170,7 @@ export function NotificationsView() {
             onClick={() => void setFilters({ page: filters.page + 1 })}
           >
             Next
-          </button>
+          </Button>
         </div>
       </div>
     </div>

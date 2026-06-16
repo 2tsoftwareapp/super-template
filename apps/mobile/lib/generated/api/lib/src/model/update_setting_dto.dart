@@ -1,0 +1,116 @@
+//
+// AUTO-GENERATED FILE, DO NOT MODIFY!
+//
+
+// ignore_for_file: unused_element
+// @dart=3.0
+
+import 'package:built_collection/built_collection.dart';
+import 'package:built_value/built_value.dart';
+import 'package:built_value/serializer.dart';
+
+part 'update_setting_dto.g.dart';
+
+/// UpdateSettingDto
+///
+/// Properties:
+/// * [value]
+@BuiltValue()
+abstract class UpdateSettingDto
+    implements Built<UpdateSettingDto, UpdateSettingDtoBuilder> {
+  @BuiltValueField(wireName: r'value')
+  BuiltMap<String, JsonObject?> get value;
+
+  UpdateSettingDto._();
+
+  factory UpdateSettingDto([void updates(UpdateSettingDtoBuilder b)]) =
+      _$UpdateSettingDto;
+
+  @BuiltValueHook(initializeBuilder: true)
+  static void _defaults(UpdateSettingDtoBuilder b) => b;
+
+  @BuiltValueSerializer(custom: true)
+  static Serializer<UpdateSettingDto> get serializer =>
+      _$UpdateSettingDtoSerializer();
+}
+
+class _$UpdateSettingDtoSerializer
+    implements PrimitiveSerializer<UpdateSettingDto> {
+  @override
+  final Iterable<Type> types = const [UpdateSettingDto, _$UpdateSettingDto];
+
+  @override
+  final String wireName = r'UpdateSettingDto';
+
+  Iterable<Object?> _serializeProperties(
+    Serializers serializers,
+    UpdateSettingDto object, {
+    FullType specifiedType = FullType.unspecified,
+  }) sync* {
+    yield r'value';
+    yield serializers.serialize(
+      object.value,
+      specifiedType: const FullType(
+          BuiltMap, [FullType(String), FullType.nullable(JsonObject)]),
+    );
+  }
+
+  @override
+  Object serialize(
+    Serializers serializers,
+    UpdateSettingDto object, {
+    FullType specifiedType = FullType.unspecified,
+  }) {
+    return _serializeProperties(serializers, object,
+            specifiedType: specifiedType)
+        .toList();
+  }
+
+  void _deserializeProperties(
+    Serializers serializers,
+    Object serialized, {
+    FullType specifiedType = FullType.unspecified,
+    required List<Object?> serializedList,
+    required UpdateSettingDtoBuilder result,
+    required List<Object?> unhandled,
+  }) {
+    for (var i = 0; i < serializedList.length; i += 2) {
+      final key = serializedList[i] as String;
+      final value = serializedList[i + 1];
+      switch (key) {
+        case r'value':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(
+                BuiltMap, [FullType(String), FullType.nullable(JsonObject)]),
+          ) as BuiltMap<String, JsonObject?>;
+          result.value.replace(valueDes);
+          break;
+        default:
+          unhandled.add(key);
+          unhandled.add(value);
+          break;
+      }
+    }
+  }
+
+  @override
+  UpdateSettingDto deserialize(
+    Serializers serializers,
+    Object serialized, {
+    FullType specifiedType = FullType.unspecified,
+  }) {
+    final result = UpdateSettingDtoBuilder();
+    final serializedList = (serialized as Iterable<Object?>).toList();
+    final unhandled = <Object?>[];
+    _deserializeProperties(
+      serializers,
+      serialized,
+      specifiedType: specifiedType,
+      serializedList: serializedList,
+      unhandled: unhandled,
+      result: result,
+    );
+    return result.build();
+  }
+}

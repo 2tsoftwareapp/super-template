@@ -1,0 +1,224 @@
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  ArrayMinSize,
+  IsArray,
+  IsBoolean,
+  IsDateString,
+  IsEnum,
+  IsObject,
+  IsOptional,
+  IsString,
+  IsUUID,
+  ValidateIf,
+} from 'class-validator';
+import { PaginationQueryDto } from '@repo/api-core/common/pagination/pagination.dto';
+
+export class NotificationDto {
+  @ApiProperty()
+  id: string;
+
+  @ApiProperty()
+  userId: string;
+
+  @ApiProperty()
+  type: string;
+
+  @ApiProperty()
+  title: string;
+
+  @ApiProperty()
+  body: string;
+
+  @ApiPropertyOptional()
+  data: Record<string, unknown> | null;
+
+  @ApiPropertyOptional()
+  readAt: string | null;
+
+  @ApiProperty()
+  createdAt: string;
+}
+
+export class NotificationsQueryDto extends PaginationQueryDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  unread?: boolean;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  type?: string;
+}
+
+export enum NotificationAudienceDto {
+  USER = 'USER',
+  USERS = 'USERS',
+  ALL = 'ALL',
+}
+
+export enum NotificationJobStatusDto {
+  PENDING = 'PENDING',
+  PROCESSING = 'PROCESSING',
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED',
+  FAILED = 'FAILED',
+}
+
+export class SendNotificationRequestDto {
+  @ApiProperty({ enum: NotificationAudienceDto })
+  @IsEnum(NotificationAudienceDto)
+  audience: NotificationAudienceDto;
+
+  @ApiPropertyOptional()
+  @ValidateIf((input) => input.audience === NotificationAudienceDto.USER)
+  @IsUUID()
+  userId?: string;
+
+  @ApiPropertyOptional({ type: [String] })
+  @ValidateIf((input) => input.audience === NotificationAudienceDto.USERS)
+  @IsArray()
+  @ArrayMinSize(1)
+  @IsUUID('4', { each: true })
+  userIds?: string[];
+
+  @ApiProperty()
+  @IsString()
+  type: string;
+
+  @ApiProperty()
+  @IsString()
+  title: string;
+
+  @ApiProperty()
+  @IsString()
+  body: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsObject()
+  data?: Record<string, unknown>;
+
+  @ApiPropertyOptional({
+    description:
+      'ISO-8601 datetime. Omit or set to now for immediate delivery.',
+  })
+  @IsOptional()
+  @IsDateString()
+  scheduledAt?: string;
+}
+
+/** @deprecated Use SendNotificationRequestDto with audience USER */
+export class SendNotificationDto {
+  @ApiProperty()
+  @IsUUID()
+  userId: string;
+
+  @ApiProperty()
+  @IsString()
+  type: string;
+
+  @ApiProperty()
+  @IsString()
+  title: string;
+
+  @ApiProperty()
+  @IsString()
+  body: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsObject()
+  data?: Record<string, unknown>;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsUUID()
+  organizationId?: string;
+}
+
+export class NotificationJobDto {
+  @ApiProperty()
+  id: string;
+
+  @ApiPropertyOptional()
+  actorId: string | null;
+
+  @ApiProperty({ enum: NotificationAudienceDto })
+  audience: NotificationAudienceDto;
+
+  @ApiPropertyOptional()
+  targetUserId: string | null;
+
+  @ApiPropertyOptional({ type: [String] })
+  userIds: string[] | null;
+
+  @ApiProperty()
+  type: string;
+
+  @ApiProperty()
+  title: string;
+
+  @ApiProperty()
+  body: string;
+
+  @ApiPropertyOptional()
+  data: Record<string, unknown> | null;
+
+  @ApiProperty()
+  scheduledAt: string;
+
+  @ApiProperty({ enum: NotificationJobStatusDto })
+  status: NotificationJobStatusDto;
+
+  @ApiPropertyOptional()
+  recipientCount: number | null;
+
+  @ApiPropertyOptional()
+  processedAt: string | null;
+
+  @ApiPropertyOptional()
+  errorMessage: string | null;
+
+  @ApiProperty()
+  createdAt: string;
+
+  @ApiProperty()
+  updatedAt: string;
+}
+
+export class NotificationJobsQueryDto extends PaginationQueryDto {
+  @ApiPropertyOptional({ enum: NotificationJobStatusDto })
+  @IsOptional()
+  @IsEnum(NotificationJobStatusDto)
+  status?: NotificationJobStatusDto;
+}
+
+export enum NotificationDevicePlatformDto {
+  IOS = 'IOS',
+  ANDROID = 'ANDROID',
+}
+
+export class RegisterDeviceDto {
+  @ApiProperty()
+  @IsString()
+  token: string;
+
+  @ApiProperty({ enum: NotificationDevicePlatformDto })
+  @IsEnum(NotificationDevicePlatformDto)
+  platform: NotificationDevicePlatformDto;
+}
+
+export class DeviceTokenDto {
+  @ApiProperty()
+  id: string;
+
+  @ApiProperty({ enum: NotificationDevicePlatformDto })
+  platform: NotificationDevicePlatformDto;
+
+  @ApiProperty()
+  token: string;
+
+  @ApiProperty()
+  lastUsedAt: string;
+}

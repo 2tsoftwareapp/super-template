@@ -1,0 +1,60 @@
+import { index, integer, jsonb, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { timestamps } from '../shared/timestamps';
+import { organizations } from '../identity/organizations';
+import { users } from '../identity/users';
+import { importExportJobStatusEnum } from './enums';
+import { files } from './files';
+
+export const importJobs = pgTable(
+  'import_jobs',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    organizationId: uuid('organization_id')
+      .notNull()
+      .references(() => organizations.id, { onDelete: 'restrict' }),
+    type: text('type').notNull(),
+    fileId: uuid('file_id')
+      .notNull()
+      .references(() => files.id, { onDelete: 'restrict' }),
+    status: importExportJobStatusEnum('status').notNull().default('PENDING'),
+    rowCount: integer('row_count'),
+    successCount: integer('success_count'),
+    errorCount: integer('error_count'),
+    errors: jsonb('errors').$type<Record<string, unknown>[] | null>(),
+    createdById: uuid('created_by_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'restrict' }),
+    confirmedAt: timestamp('confirmed_at', { withTimezone: true }),
+    completedAt: timestamp('completed_at', { withTimezone: true }),
+    ...timestamps,
+  },
+  (table) => [
+    index('import_jobs_status_idx').on(table.status),
+    index('import_jobs_created_by_id_idx').on(table.createdById),
+  ],
+);
+
+export const exportJobs = pgTable(
+  'export_jobs',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    organizationId: uuid('organization_id')
+      .notNull()
+      .references(() => organizations.id, { onDelete: 'restrict' }),
+    type: text('type').notNull(),
+    status: importExportJobStatusEnum('status').notNull().default('PENDING'),
+    fileId: uuid('file_id').references(() => files.id, {
+      onDelete: 'set null',
+    }),
+    filters: jsonb('filters').$type<Record<string, unknown> | null>(),
+    createdById: uuid('created_by_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'restrict' }),
+    completedAt: timestamp('completed_at', { withTimezone: true }),
+    ...timestamps,
+  },
+  (table) => [
+    index('export_jobs_status_idx').on(table.status),
+    index('export_jobs_created_by_id_idx').on(table.createdById),
+  ],
+);

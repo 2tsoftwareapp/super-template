@@ -11,6 +11,40 @@ import { normalizeBffListPath } from "@/lib/search-params";
 const backendUrl = (path: string) =>
   new URL(`/api/v1/${path.replace(/^\/+/, "")}`, env.API_INTERNAL_URL);
 
+const isBackendConnectionError = (error: unknown): boolean => {
+  if (!(error instanceof TypeError) || error.message !== "fetch failed") {
+    return false;
+  }
+
+  const cause = (error as TypeError & { cause?: { code?: string } }).cause;
+  return (
+    cause?.code === "ECONNREFUSED" ||
+    cause?.code === "ENOTFOUND" ||
+    cause?.code === "ECONNRESET"
+  );
+};
+
+const backendUnavailableResponse = () =>
+  new Response(
+    JSON.stringify({
+      error: {
+        code: "BACKEND_UNAVAILABLE",
+        message:
+          "API server is not reachable. Start it with `make dev-api` or `make dev`.",
+        details: null,
+      },
+      meta: {
+        requestId: crypto.randomUUID(),
+      },
+    }),
+    {
+      status: 503,
+      headers: {
+        "content-type": "application/json",
+      },
+    },
+  );
+
 const forwardableHeaderNames = ["accept", "content-type", "user-agent"];
 
 const pickHeaders = (request: NextRequest) => {
@@ -65,18 +99,36 @@ export const callBackend = async ({
     init.body = body;
   }
 
-  return fetch(backendUrl(path), init);
+  try {
+    return await fetch(backendUrl(path), init);
+  } catch (error) {
+    if (isBackendConnectionError(error)) {
+      return backendUnavailableResponse();
+    }
+
+    throw error;
+  }
 };
 
 export const refreshSession = async (refreshToken: string) => {
-  const response = await fetch(backendUrl("auth/refresh"), {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-    },
-    body: JSON.stringify({ refreshToken }),
-    cache: "no-store",
-  });
+  let response: Response;
+
+  try {
+    response = await fetch(backendUrl("auth/refresh"), {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({ refreshToken }),
+      cache: "no-store",
+    });
+  } catch (error) {
+    if (isBackendConnectionError(error)) {
+      return null;
+    }
+
+    throw error;
+  }
 
   const payload = await parseJson(response);
 
@@ -131,11 +183,20 @@ export const enforceCsrf = async (request: NextRequest) => {
 
 export const proxyWithRefresh = async (request: NextRequest, path: string) => {
   const method = request.method.toUpperCase();
+  const contentType = request.headers.get("content-type") ?? "";
+  const isMultipart = contentType.includes("multipart/form-data");
   const body =
-    method === "GET" || method === "HEAD" ? null : await request.text();
+    method === "GET" || method === "HEAD"
+      ? null
+      : isMultipart
+        ? await request.arrayBuffer()
+        : await request.text();
   const { accessToken, refreshToken, csrfToken } = await readAuthCookies();
   const headers = pickHeaders(request);
-  const normalizedPath = normalizeBffListPath(path, request.nextUrl.searchParams);
+  const normalizedPath = normalizeBffListPath(
+    path,
+    request.nextUrl.searchParams,
+  );
 
   let response = await callBackend({
     path: normalizedPath,

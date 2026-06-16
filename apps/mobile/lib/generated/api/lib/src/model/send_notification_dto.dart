@@ -17,6 +17,7 @@ part 'send_notification_dto.g.dart';
 /// * [type]
 /// * [title]
 /// * [body]
+/// * [data]
 @BuiltValue()
 abstract class SendNotificationDto
     implements Built<SendNotificationDto, SendNotificationDtoBuilder> {
@@ -31,6 +32,9 @@ abstract class SendNotificationDto
 
   @BuiltValueField(wireName: r'body')
   String get body;
+
+  @BuiltValueField(wireName: r'data')
+  JsonObject? get data;
 
   SendNotificationDto._();
 
@@ -50,7 +54,7 @@ class _$SendNotificationDtoSerializer
   @override
   final Iterable<Type> types = const [
     SendNotificationDto,
-    _$SendNotificationDto,
+    _$SendNotificationDto
   ];
 
   @override
@@ -81,6 +85,13 @@ class _$SendNotificationDtoSerializer
       object.body,
       specifiedType: const FullType(String),
     );
+    if (object.data != null) {
+      yield r'data';
+      yield serializers.serialize(
+        object.data,
+        specifiedType: const FullType(JsonObject),
+      );
+    }
   }
 
   @override
@@ -89,11 +100,9 @@ class _$SendNotificationDtoSerializer
     SendNotificationDto object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(
-      serializers,
-      object,
-      specifiedType: specifiedType,
-    ).toList();
+    return _serializeProperties(serializers, object,
+            specifiedType: specifiedType)
+        .toList();
   }
 
   void _deserializeProperties(
@@ -135,6 +144,13 @@ class _$SendNotificationDtoSerializer
             specifiedType: const FullType(String),
           ) as String;
           result.body = valueDes;
+          break;
+        case r'data':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(JsonObject),
+          ) as JsonObject;
+          result.data = valueDes;
           break;
         default:
           unhandled.add(key);

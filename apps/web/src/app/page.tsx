@@ -1,8 +1,15 @@
 import Link from "next/link";
 import { ArrowRight, Lock, Smartphone, Workflow } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { buttonVariants } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
 const features = [
   {
@@ -24,63 +31,101 @@ const features = [
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(251,191,36,0.22),transparent_26%),linear-gradient(180deg,#f4f1ea_0%,#e7dfd4_60%,#dfd6ca_100%)] px-6 py-8 text-neutral-950 dark:bg-[radial-gradient(circle_at_top_left,_rgba(251,191,36,0.14),transparent_22%),linear-gradient(180deg,#111111_0%,#171717_48%,#090909_100%)] dark:text-white">
-      <div className="mx-auto max-w-7xl">
-        <div className="flex items-center justify-between">
-          <Badge>Reusable Full-Stack Starter</Badge>
-          <div className="flex gap-3">
-            <Link href="/login">
-              <Button variant="ghost">Sign in</Button>
-            </Link>
-            <Link href="/dashboard">
-              <Button>
-                Open workspace
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-        <div className="mt-20 grid gap-8 lg:grid-cols-[1.3fr_0.9fr]">
-          <div>
-            <p className="text-sm uppercase tracking-[0.34em] text-neutral-500">
-              Modular monolith starter
-            </p>
-            <h1 className="mt-5 max-w-4xl text-5xl font-semibold leading-tight md:text-7xl">
-              Production defaults without the dead weight.
-            </h1>
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-neutral-600 dark:text-neutral-300">
-              Start with real auth, real permissions, real session management,
-              local infra, generated contracts, and a clean path across API,
-              web, and mobile.
+    <div className="min-h-screen px-4 py-4 md:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl space-y-6">
+        <header className="flex flex-col gap-4 rounded-lg border border-border bg-card p-5  md:flex-row md:items-center md:justify-between">
+          <div className="space-y-2">
+            <Badge variant="outline" className="w-fit">
+              Reusable full-stack starter
+            </Badge>
+            <p className="text-sm text-muted-foreground">
+              Auth, permissions, contracts, and a BFF layer packed into one
+              production-ready workspace.
             </p>
           </div>
-          <Card className="bg-neutral-950 text-white dark:bg-white/6">
-            <p className="text-xs uppercase tracking-[0.28em] text-white/50">
-              Included flows
-            </p>
-            <ul className="mt-6 space-y-4 text-sm leading-7 text-white/86">
-              <li>Authentication with rotating refresh tokens</li>
-              <li>Role and permission enforcement from the backend</li>
-              <li>Projects CRUD with notifications and audit events</li>
-              <li>Next.js BFF with secure cookie handling</li>
-              <li>Flutter app with generated API client output path</li>
-            </ul>
+          <div className="flex flex-wrap items-center gap-3">
+            <Link
+              href="/login"
+              className={buttonVariants({ variant: "outline" })}
+            >
+              Sign in
+            </Link>
+            <Link href="/dashboard" className={buttonVariants()}>
+              Open workspace
+              <ArrowRight className="ml-2 size-4" />
+            </Link>
+          </div>
+        </header>
+        <section className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+          <Card className="border-border bg-card ">
+            <CardHeader className="space-y-4">
+              <Badge className="w-fit">Modular monolith starter</Badge>
+              <CardTitle className="text-4xl leading-tight md:text-6xl">
+                Production defaults without the dead weight.
+              </CardTitle>
+              <CardDescription className="max-w-2xl text-base leading-7">
+                Start with real auth, real permissions, real session management,
+                local infra, generated contracts, and a clean path across API,
+                web, and mobile.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Separator />
+              <div className="grid gap-4 sm:grid-cols-2">
+                {[
+                  "Rotating refresh tokens",
+                  "Backend permission enforcement",
+                  "Projects CRUD and notifications",
+                  "Secure cookie BFF routes",
+                ].map((item) => (
+                  <div
+                    key={item}
+                    className="rounded-2xl border border-border bg-background px-4 py-3 text-sm text-muted-foreground"
+                  >
+                    {item}
+                  </div>
+                ))}
+              </div>
+            </CardContent>
           </Card>
-        </div>
-        <div className="mt-16 grid gap-5 md:grid-cols-3">
+          <Card className="border-border bg-card">
+            <CardHeader>
+              <CardTitle className="text-2xl">Included flows</CardTitle>
+              <CardDescription>
+                The app already carries the important product paths.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-3 text-sm leading-7 text-muted-foreground">
+                <li>Authentication with rotating refresh tokens</li>
+                <li>Role and permission enforcement from the backend</li>
+                <li>Projects CRUD with notifications and audit events</li>
+                <li>Next.js BFF with secure cookie handling</li>
+                <li>Flutter app with generated API client output path</li>
+              </ul>
+            </CardContent>
+          </Card>
+        </section>
+        <section className="grid gap-4 md:grid-cols-3">
           {features.map((feature) => {
             const Icon = feature.icon;
             return (
-              <Card key={feature.title}>
-                <Icon className="h-6 w-6 text-amber-500" />
-                <h2 className="mt-4 text-xl font-semibold">{feature.title}</h2>
-                <p className="mt-3 text-sm leading-7 text-neutral-600 dark:text-neutral-300">
-                  {feature.body}
-                </p>
+              <Card key={feature.title} className="border-border bg-card">
+                <CardHeader className="space-y-3">
+                  <div className="flex size-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                    <Icon className="size-5" />
+                  </div>
+                  <CardTitle className="text-xl">{feature.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm leading-7 text-muted-foreground">
+                    {feature.body}
+                  </p>
+                </CardContent>
               </Card>
             );
           })}
-        </div>
+        </section>
       </div>
     </div>
   );

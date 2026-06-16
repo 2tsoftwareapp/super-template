@@ -1,0 +1,95 @@
+import { Injectable, Logger } from '@nestjs/common';
+import { type App, cert, getApps, initializeApp } from 'firebase-admin/app';
+import { getMessaging } from 'firebase-admin/messaging';
+import { EnvironmentService } from '@repo/api-core/config/environment.service';
+import type { PushMessage, PushNotifier } from '../application/push.interface';
+import { DeviceTokensRepository } from './device-tokens.repository';
+
+@Injectable()
+export class FcmPushService implements PushNotifier {
+  private readonly logger = new Logger(FcmPushService.name);
+  private readonly app: App | null;
+
+  constructor(
+    private readonly environmentService: EnvironmentService,
+    private readonly deviceTokensRepository: DeviceTokensRepository,
+  ) {
+    const { FCM_PROJECT_ID, FCM_CLIENT_EMAIL, FCM_PRIVATE_KEY } =
+      this.environmentService.values;
+
+    if (!FCM_PROJECT_ID || !FCM_CLIENT_EMAIL || !FCM_PRIVATE_KEY) {
+      this.app = null;
+      return;
+    }
+
+    this.app =
+      getApps()[0] ??
+      initializeApp({
+        credential: cert({
+          projectId: FCM_PROJECT_ID,
+          clientEmail: FCM_CLIENT_EMAIL,
+          privateKey: FCM_PRIVATE_KEY.replace(/\\n/g, '\n'),
+        }),
+      });
+  }
+
+  async sendToUser(userId: string, message: PushMessage): Promise<void> {
+    if (!this.app) {
+      return;
+    }
+
+    const deviceTokens = await this.deviceTokensRepository.listByUserId(userId);
+
+    if (deviceTokens.length === 0) {
+      return;
+    }
+
+    const tokens = deviceTokens.map((deviceToken) => deviceToken.token);
+    const response = await getMessaging(this.app).sendEachForMulticast({
+      tokens,
+      notification: {
+        title: message.title,
+        body: message.body,
+      },
+      data: this.toFcmData(message),
+    });
+
+    const invalidTokens = response.responses.flatMap((result, index) => {
+      const token = tokens[index];
+
+      if (
+        result.success ||
+        !result.error ||
+        result.error.code !== 'messaging/registration-token-not-registered' ||
+        !token
+      ) {
+        return [];
+      }
+
+      return [token];
+    });
+
+    if (invalidTokens.length > 0) {
+      await this.deviceTokensRepository.deleteTokens(invalidTokens);
+      this.logger.warn(
+        `Removed ${invalidTokens.length} invalid FCM token(s) for user ${userId}`,
+      );
+    }
+  }
+
+  private toFcmData(message: PushMessage): Record<string, string> {
+    const data: Record<string, string> = {
+      notificationId: message.notificationId,
+      type: message.type,
+    };
+
+    if (message.data) {
+      for (const [key, value] of Object.entries(message.data)) {
+        data[key] =
+          typeof value === 'string' ? value : JSON.stringify(value ?? null);
+      }
+    }
+
+    return data;
+  }
+}

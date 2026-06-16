@@ -1,6 +1,31 @@
 SHELL := /bin/bash
 
-.PHONY: bootstrap dev dev-api dev-web dev-mobile infra-up infra-down db-generate db-migrate db-seed db-reset db-studio generate lint format test test-api test-web test-mobile build verify
+.PHONY: help bootstrap dev dev-api dev-web dev-mobile infra-up infra-down db-generate db-migrate db-seed db-reset db-studio generate lint format test test-api test-web test-mobile build verify
+
+help:
+	@printf '%s\n' \
+		'Available targets:' \
+		'  bootstrap    Install deps, start infra, migrate, seed, generate contracts' \
+		'  dev          Start API + Web (docker infra + pnpm dev)' \
+		'  dev-api      Start API only' \
+		'  dev-web      Start Web only' \
+		'  dev-mobile   Run Flutter app' \
+		'  infra-up     Start Postgres + Mailpit' \
+		'  infra-down   Stop docker infra' \
+		'  db-generate  Drizzle generate migration' \
+		'  db-migrate   Apply migrations' \
+		'  db-seed      Seed database' \
+		'  db-reset     Reset database' \
+		'  db-studio    Open Drizzle Studio' \
+		'  generate     Regenerate OpenAPI + Dart client' \
+		'  lint         Lint all packages' \
+		'  format       Format all packages' \
+		'  test         Run all tests' \
+		'  test-api     Run API unit tests' \
+		'  test-web     Run Web tests' \
+		'  test-mobile  Run Flutter tests' \
+		'  build        Build all packages' \
+		'  verify       Full CI-style verify script'
 
 bootstrap:
 	./scripts/bootstrap.sh
@@ -12,6 +37,7 @@ dev-api:
 	set -a; source .env; set +a; pnpm --filter api dev
 
 dev-web:
+	@printf '%s\n' 'Note: Web proxies to API at $${API_INTERNAL_URL:-http://localhost:3001}. Run `make dev-api` in another terminal if login fails.'
 	set -a; source .env; set +a; pnpm --filter web dev
 
 dev-mobile:

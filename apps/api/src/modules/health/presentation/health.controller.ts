@@ -1,12 +1,12 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiProperty, ApiTags } from '@nestjs/swagger';
-import { ApiDataResponse } from '../../../common/decorators/api-response.decorator';
-import { Public } from '../../../common/decorators/public.decorator';
+import { ApiDataResponse } from '@repo/api-core/common/decorators/api-response.decorator';
+import { Public } from '@repo/api-core/common/decorators/public.decorator';
 import { HealthService } from '../application/health.service';
 
 class HealthStatusDto {
   @ApiProperty({ enum: ['ok', 'ready'] })
-  status!: 'ok' | 'ready';
+  status: 'ok' | 'ready';
 }
 
 @ApiTags('health')

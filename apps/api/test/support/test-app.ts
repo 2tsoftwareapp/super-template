@@ -8,10 +8,11 @@ import { config as loadEnv } from 'dotenv';
 import { Pool } from 'pg';
 import request from 'supertest';
 import { AppModule } from '../../src/app.module';
-import { createDatabaseClient } from '../../src/database/database.types';
+import { createDatabaseClient } from '@repo/api-database';
 import { seedDatabase } from '../../src/database/seed-data';
 
 loadEnv({ path: resolve(process.cwd(), '.env'), quiet: true });
+loadEnv({ path: resolve(process.cwd(), '../../.env'), quiet: true });
 
 process.env.APP_ENV = 'test';
 
@@ -34,9 +35,7 @@ const resolveMigrationsFolder = () => {
   return folder;
 };
 
-const applySqlMigrations = async (
-  database: ReturnType<typeof createDatabaseClient>,
-) => {
+const applySqlMigrations = async (pool: Pool) => {
   const migrationsFolder = resolveMigrationsFolder();
   const migrationFiles = readdirSync(migrationsFolder)
     .filter((file) => file.endsWith('.sql'))
@@ -50,7 +49,7 @@ const applySqlMigrations = async (
       .filter(Boolean);
 
     for (const statement of statements) {
-      await database.execute(statement);
+      await pool.query(statement);
     }
   }
 };
@@ -100,12 +99,21 @@ export const resetTestDatabase = async (): Promise<void> => {
   const pool = new Pool({
     connectionString: databaseUrl,
   });
-  const database = createDatabaseClient(pool);
 
   try {
-    await database.execute('drop schema public cascade;');
-    await database.execute('create schema public;');
-    await applySqlMigrations(database);
+    await pool.query('drop schema if exists public cascade;');
+    await pool.query('create schema public;');
+    await applySqlMigrations(pool);
+
+    const verification = await pool.query<{ exists: boolean }>(
+      "select exists(select 1 from information_schema.tables where table_schema = 'public' and table_name = 'organizations') as exists",
+    );
+
+    if (!verification.rows[0]?.exists) {
+      throw new Error(
+        'Migrations did not create organizations table in the test database',
+      );
+    }
   } finally {
     await pool.end();
   }

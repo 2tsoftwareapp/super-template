@@ -30,9 +30,9 @@ abstract class HealthControllerGetHealth200Response
 
   HealthControllerGetHealth200Response._();
 
-  factory HealthControllerGetHealth200Response([
-    void updates(HealthControllerGetHealth200ResponseBuilder b),
-  ]) = _$HealthControllerGetHealth200Response;
+  factory HealthControllerGetHealth200Response(
+          [void updates(HealthControllerGetHealth200ResponseBuilder b)]) =
+      _$HealthControllerGetHealth200Response;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(HealthControllerGetHealth200ResponseBuilder b) => b;
@@ -47,7 +47,7 @@ class _$HealthControllerGetHealth200ResponseSerializer
   @override
   final Iterable<Type> types = const [
     HealthControllerGetHealth200Response,
-    _$HealthControllerGetHealth200Response,
+    _$HealthControllerGetHealth200Response
   ];
 
   @override
@@ -76,11 +76,9 @@ class _$HealthControllerGetHealth200ResponseSerializer
     HealthControllerGetHealth200Response object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(
-      serializers,
-      object,
-      specifiedType: specifiedType,
-    ).toList();
+    return _serializeProperties(serializers, object,
+            specifiedType: specifiedType)
+        .toList();
   }
 
   void _deserializeProperties(

@@ -30,9 +30,9 @@ abstract class NotificationsControllerMarkRead200Response
 
   NotificationsControllerMarkRead200Response._();
 
-  factory NotificationsControllerMarkRead200Response([
-    void updates(NotificationsControllerMarkRead200ResponseBuilder b),
-  ]) = _$NotificationsControllerMarkRead200Response;
+  factory NotificationsControllerMarkRead200Response(
+          [void updates(NotificationsControllerMarkRead200ResponseBuilder b)]) =
+      _$NotificationsControllerMarkRead200Response;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(NotificationsControllerMarkRead200ResponseBuilder b) =>
@@ -49,7 +49,7 @@ class _$NotificationsControllerMarkRead200ResponseSerializer
   @override
   final Iterable<Type> types = const [
     NotificationsControllerMarkRead200Response,
-    _$NotificationsControllerMarkRead200Response,
+    _$NotificationsControllerMarkRead200Response
   ];
 
   @override
@@ -78,11 +78,9 @@ class _$NotificationsControllerMarkRead200ResponseSerializer
     NotificationsControllerMarkRead200Response object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(
-      serializers,
-      object,
-      specifiedType: specifiedType,
-    ).toList();
+    return _serializeProperties(serializers, object,
+            specifiedType: specifiedType)
+        .toList();
   }
 
   void _deserializeProperties(

@@ -85,8 +85,25 @@ Key variables:
 - `SEED_ADMIN_PASSWORD`
 - `SEED_USER_EMAIL`
 - `SEED_USER_PASSWORD`
+- `FCM_PROJECT_ID`, `FCM_CLIENT_EMAIL`, `FCM_PRIVATE_KEY` (optional — mobile push via Firebase)
 
 The API validates environment variables at startup and fails fast on invalid or missing values.
+
+## Firebase demo (FCM — mobile only)
+
+Web notifications use **SSE**, not Firebase. Firebase is for **mobile FCM push** only.
+
+Demo project: `examples/firebase-demo/` (`super-template-demo`)
+
+```bash
+# Link Android google-services.json into the Flutter app
+./examples/firebase-demo/scripts/link-configs.sh
+
+# After downloading a service account key from Firebase Console:
+./examples/firebase-demo/scripts/print-fcm-env.sh ~/.secrets/super-template-demo-firebase-adminsdk.json
+```
+
+See [examples/firebase-demo/README.md](examples/firebase-demo/README.md) for full setup.
 
 ## Commands
 

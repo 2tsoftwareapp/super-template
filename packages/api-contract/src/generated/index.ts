@@ -4,7 +4,7 @@
  */
 
 export interface paths {
-    "/health": {
+    "/api/v1/health": {
         parameters: {
             query?: never;
             header?: never;
@@ -20,7 +20,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/health/ready": {
+    "/api/v1/health/ready": {
         parameters: {
             query?: never;
             header?: never;
@@ -36,7 +36,71 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/admin/users": {
+    "/api/v1/admin/roles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AdminRolesController_listRoles"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["OrganizationsController_list"];
+        put?: never;
+        post: operations["OrganizationsController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/me/preferences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["PreferencesController_getMyPreferences"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["PreferencesController_updateMyPreferences"];
+        trace?: never;
+    };
+    "/api/v1/admin/audit-logs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AuditController_listAuditLogs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/users": {
         parameters: {
             query?: never;
             header?: never;
@@ -52,7 +116,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/admin/users/{id}": {
+    "/api/v1/admin/users/{id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -68,7 +132,7 @@ export interface paths {
         patch: operations["AdminUsersController_updateUser"];
         trace?: never;
     };
-    "/admin/users/{id}/status": {
+    "/api/v1/admin/users/{id}/status": {
         parameters: {
             query?: never;
             header?: never;
@@ -84,7 +148,7 @@ export interface paths {
         patch: operations["AdminUsersController_updateStatus"];
         trace?: never;
     };
-    "/admin/users/{id}/roles": {
+    "/api/v1/admin/users/{id}/roles": {
         parameters: {
             query?: never;
             header?: never;
@@ -100,7 +164,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/users/me": {
+    "/api/v1/users/me": {
         parameters: {
             query?: never;
             header?: never;
@@ -116,7 +180,7 @@ export interface paths {
         patch: operations["UsersController_updateMe"];
         trace?: never;
     };
-    "/users/me/password": {
+    "/api/v1/users/me/password": {
         parameters: {
             query?: never;
             header?: never;
@@ -132,7 +196,55 @@ export interface paths {
         patch: operations["UsersController_changePassword"];
         trace?: never;
     };
-    "/auth/register": {
+    "/api/v1/files": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["FilesController_upload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/files/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["FilesController_getById"];
+        put?: never;
+        post?: never;
+        delete: operations["FilesController_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/files/{id}/url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["FilesController_getUrl"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/register": {
         parameters: {
             query?: never;
             header?: never;
@@ -148,7 +260,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/auth/login": {
+    "/api/v1/auth/login": {
         parameters: {
             query?: never;
             header?: never;
@@ -164,7 +276,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/auth/refresh": {
+    "/api/v1/auth/refresh": {
         parameters: {
             query?: never;
             header?: never;
@@ -180,7 +292,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/auth/logout": {
+    "/api/v1/auth/logout": {
         parameters: {
             query?: never;
             header?: never;
@@ -196,7 +308,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/auth/logout-all": {
+    "/api/v1/auth/logout-all": {
         parameters: {
             query?: never;
             header?: never;
@@ -212,7 +324,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/auth/forgot-password": {
+    "/api/v1/auth/forgot-password": {
         parameters: {
             query?: never;
             header?: never;
@@ -228,7 +340,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/auth/reset-password": {
+    "/api/v1/auth/reset-password": {
         parameters: {
             query?: never;
             header?: never;
@@ -244,7 +356,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/auth/verify-email": {
+    "/api/v1/auth/verify-email": {
         parameters: {
             query?: never;
             header?: never;
@@ -260,7 +372,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/auth/resend-verification": {
+    "/api/v1/auth/resend-verification": {
         parameters: {
             query?: never;
             header?: never;
@@ -276,7 +388,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/auth/me": {
+    "/api/v1/auth/me": {
         parameters: {
             query?: never;
             header?: never;
@@ -292,7 +404,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/auth/sessions": {
+    "/api/v1/auth/switch-organization": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["AuthController_switchOrganization"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/sessions": {
         parameters: {
             query?: never;
             header?: never;
@@ -308,7 +436,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/auth/sessions/{sessionId}": {
+    "/api/v1/auth/sessions/{sessionId}": {
         parameters: {
             query?: never;
             header?: never;
@@ -324,7 +452,135 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/notifications": {
+    "/api/v1/admin/mail/deliveries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AdminMailController_listDeliveries"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mail/preview/{templateKey}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AdminMailController_preview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AdminSettingsController_listSettings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/settings/{key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["AdminSettingsController_updateSetting"];
+        trace?: never;
+    };
+    "/api/v1/attachments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AttachmentsController_list"];
+        put?: never;
+        post: operations["AttachmentsController_attach"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/attachments/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["AttachmentsController_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/jobs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AdminJobsController_listJobs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/jobs/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["AdminJobsController_cancelJob"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications": {
         parameters: {
             query?: never;
             header?: never;
@@ -340,7 +596,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/notifications/unread-count": {
+    "/api/v1/notifications/stream": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["NotificationsController_stream"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/unread-count": {
         parameters: {
             query?: never;
             header?: never;
@@ -356,7 +628,39 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/notifications/{id}/read": {
+    "/api/v1/notifications/devices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["NotificationsController_registerDevice"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/devices/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["NotificationsController_unregisterDevice"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/{id}/read": {
         parameters: {
             query?: never;
             header?: never;
@@ -372,7 +676,7 @@ export interface paths {
         patch: operations["NotificationsController_markRead"];
         trace?: never;
     };
-    "/notifications/read-all": {
+    "/api/v1/notifications/read-all": {
         parameters: {
             query?: never;
             header?: never;
@@ -388,7 +692,7 @@ export interface paths {
         patch: operations["NotificationsController_markAllRead"];
         trace?: never;
     };
-    "/notifications/{id}": {
+    "/api/v1/notifications/{id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -404,7 +708,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/admin/notifications": {
+    "/api/v1/admin/notifications": {
         parameters: {
             query?: never;
             header?: never;
@@ -420,7 +724,87 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/projects": {
+    "/api/v1/admin/notifications/jobs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AdminNotificationsController_listJobs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/notifications/jobs/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AdminNotificationsController_getJob"];
+        put?: never;
+        post?: never;
+        delete: operations["AdminNotificationsController_cancelJob"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/imports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ImportsController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/imports/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ImportsController_getById"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/imports/{id}/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ImportsController_confirm"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects": {
         parameters: {
             query?: never;
             header?: never;
@@ -436,7 +820,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/projects/{id}": {
+    "/api/v1/projects/{id}/attachments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ProjectsController_listAttachments"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -452,7 +852,7 @@ export interface paths {
         patch: operations["ProjectsController_update"];
         trace?: never;
     };
-    "/projects/{id}/restore": {
+    "/api/v1/projects/{id}/restore": {
         parameters: {
             query?: never;
             header?: never;
@@ -463,6 +863,134 @@ export interface paths {
         put?: never;
         post: operations["ProjectsController_restore"];
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/activities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ActivitiesController_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/exports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ExportsController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/exports/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ExportsController_getById"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/comments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["CommentsController_list"];
+        put?: never;
+        post: operations["CommentsController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/comments/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["CommentsController_delete"];
+        options?: never;
+        head?: never;
+        patch: operations["CommentsController_update"];
+        trace?: never;
+    };
+    "/api/v1/invitations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["InvitationsController_list"];
+        put?: never;
+        post: operations["InvitationsController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/invitations/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["InvitationsController_accept"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/invitations/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["InvitationsController_revoke"];
         options?: never;
         head?: never;
         patch?: never;
@@ -479,12 +1007,70 @@ export interface components {
             /** @enum {string} */
             status: "ok" | "ready";
         };
+        RoleDto: {
+            id: string;
+            name: string;
+            description: string;
+        };
+        OrganizationDto: {
+            id: string;
+            name: string;
+            slug: string;
+            /** @enum {string} */
+            role: "OWNER" | "ADMIN" | "MEMBER";
+            createdAt: string;
+            updatedAt: string;
+            current: boolean;
+        };
+        CreateOrganizationDto: {
+            /** @example Acme Corp */
+            name: string;
+        };
+        UserPreferencesDto: {
+            userId: string;
+            theme: string;
+            language: string;
+            timezone: string;
+            notificationPreferences: {
+                [key: string]: unknown;
+            };
+            emailPreferences: {
+                [key: string]: unknown;
+            };
+            createdAt: string;
+            updatedAt: string;
+        };
+        UpdatePreferencesDto: {
+            theme?: string;
+            language?: string;
+            timezone?: string;
+            notificationPreferences?: {
+                [key: string]: unknown;
+            };
+            emailPreferences?: {
+                [key: string]: unknown;
+            };
+        };
         PaginationMetaDto: {
             requestId: string;
             page: number;
             limit: number;
             total: number;
             totalPages: number;
+        };
+        AuditLogDto: {
+            id: string;
+            actorId?: Record<string, never>;
+            action: string;
+            entityType: string;
+            entityId?: Record<string, never>;
+            metadata?: {
+                [key: string]: unknown;
+            };
+            ipAddress?: Record<string, never>;
+            userAgent?: Record<string, never>;
+            requestId?: Record<string, never>;
+            createdAt: string;
         };
         UserDto: {
             id: string;
@@ -529,10 +1115,26 @@ export interface components {
         UpdateProfileDto: {
             displayName?: string;
             avatarUrl?: Record<string, never>;
+            avatarFileId?: Record<string, never>;
         };
         ChangePasswordDto: {
             currentPassword: string;
             newPassword: string;
+        };
+        FileDto: {
+            id: string;
+            storageKey: string;
+            originalName: string;
+            mimeType: string;
+            sizeBytes: number;
+            uploadedById: Record<string, never> | null;
+            createdAt: string;
+            updatedAt: string;
+        };
+        FileUrlDto: {
+            id: string;
+            url: string;
+            expiresInSeconds: number;
         };
         SuccessMessageDto: {
             success: boolean;
@@ -561,6 +1163,7 @@ export interface components {
             user: components["schemas"]["UserDto"];
             permissions: string[];
             session: components["schemas"]["AuthSessionDto"];
+            organizationId: Record<string, never> | null;
         };
         LoginDto: {
             email: string;
@@ -586,6 +1189,79 @@ export interface components {
             user: components["schemas"]["UserDto"];
             permissions: string[];
             sessionId: string;
+            organizationId: Record<string, never> | null;
+        };
+        SwitchOrganizationDto: {
+            organizationId: string;
+        };
+        MailDeliveryDto: {
+            id: string;
+            templateKey: string;
+            recipient: string;
+            subject: string;
+            /** @enum {string} */
+            status: "SENT" | "FAILED";
+            errorMessage?: Record<string, never>;
+            metadata?: {
+                [key: string]: unknown;
+            };
+            sentAt?: Record<string, never>;
+            createdAt: string;
+        };
+        MailPreviewDto: {
+            subject: string;
+            text: string;
+            html: string;
+        };
+        ApplicationSettingDto: {
+            key: string;
+            value: {
+                [key: string]: unknown;
+            };
+            updatedById?: Record<string, never>;
+            createdAt: string;
+            updatedAt: string;
+        };
+        UpdateSettingDto: {
+            value: {
+                [key: string]: unknown;
+            };
+        };
+        AttachmentDto: {
+            id: string;
+            fileId: string;
+            entityType: string;
+            entityId: string;
+            label?: Record<string, never> | null;
+            createdById?: Record<string, never> | null;
+            createdAt: string;
+            updatedAt: string;
+        };
+        AttachEntityDto: {
+            fileId: string;
+            entityType: string;
+            entityId: string;
+            label?: string;
+        };
+        JobDto: {
+            id: string;
+            type: string;
+            payload: {
+                [key: string]: unknown;
+            };
+            /** @enum {string} */
+            status: "PENDING" | "PROCESSING" | "COMPLETED" | "CANCELLED" | "FAILED";
+            scheduledAt: string;
+            priority: number;
+            attempts: number;
+            maxAttempts: number;
+            startedAt?: Record<string, never>;
+            completedAt?: Record<string, never>;
+            cancelledAt?: Record<string, never>;
+            errorMessage?: Record<string, never>;
+            createdById?: Record<string, never>;
+            createdAt: string;
+            updatedAt: string;
         };
         NotificationDto: {
             id: string;
@@ -600,11 +1276,69 @@ export interface components {
         CountDto: {
             count: number;
         };
-        SendNotificationDto: {
-            userId: string;
+        DeviceTokenDto: {
+            id: string;
+            /** @enum {string} */
+            platform: "IOS" | "ANDROID";
+            token: string;
+            lastUsedAt: string;
+        };
+        RegisterDeviceDto: {
+            token: string;
+            /** @enum {string} */
+            platform: "IOS" | "ANDROID";
+        };
+        NotificationJobDto: {
+            id: string;
+            actorId?: Record<string, never>;
+            /** @enum {string} */
+            audience: "USER" | "USERS" | "ALL";
+            targetUserId?: Record<string, never>;
+            userIds?: string[];
             type: string;
             title: string;
             body: string;
+            data?: Record<string, never>;
+            scheduledAt: string;
+            /** @enum {string} */
+            status: "PENDING" | "PROCESSING" | "COMPLETED" | "CANCELLED" | "FAILED";
+            recipientCount?: Record<string, never>;
+            processedAt?: Record<string, never>;
+            errorMessage?: Record<string, never>;
+            createdAt: string;
+            updatedAt: string;
+        };
+        SendNotificationRequestDto: {
+            /** @enum {string} */
+            audience: "USER" | "USERS" | "ALL";
+            userId?: string;
+            userIds?: string[];
+            type: string;
+            title: string;
+            body: string;
+            data?: Record<string, never>;
+            /** @description ISO-8601 datetime. Omit or set to now for immediate delivery. */
+            scheduledAt?: string;
+        };
+        ImportJobDto: {
+            id: string;
+            type: string;
+            fileId: string;
+            /** @enum {string} */
+            status: "PENDING" | "PROCESSING" | "COMPLETED" | "FAILED" | "CANCELLED";
+            rowCount?: Record<string, never>;
+            successCount?: Record<string, never>;
+            errorCount?: Record<string, never>;
+            errors?: Record<string, never>[];
+            createdById: string;
+            confirmedAt?: Record<string, never>;
+            completedAt?: Record<string, never>;
+            createdAt: string;
+            updatedAt: string;
+        };
+        CreateImportDto: {
+            type: string;
+            fileId: string;
         };
         ProjectDto: {
             id: string;
@@ -626,12 +1360,98 @@ export interface components {
             status?: "DRAFT" | "ACTIVE" | "ARCHIVED";
             ownerId?: string;
         };
+        ProjectAttachmentDto: {
+            id: string;
+            fileId: string;
+            entityType: string;
+            entityId: string;
+            label?: Record<string, never>;
+            createdById?: Record<string, never>;
+            createdAt: string;
+            updatedAt: string;
+        };
         UpdateProjectDto: {
             name?: string;
             description?: string;
             /** @enum {string} */
             status?: "DRAFT" | "ACTIVE" | "ARCHIVED";
             ownerId?: string;
+        };
+        ActivityDto: {
+            id: string;
+            summary: string;
+            entityType: string;
+            entityId: string;
+            actorId?: Record<string, never>;
+            /** @enum {string} */
+            visibility: "PUBLIC" | "PRIVATE" | "INTERNAL";
+            metadata?: {
+                [key: string]: unknown;
+            };
+            createdAt: string;
+        };
+        ExportJobDto: {
+            id: string;
+            type: string;
+            /** @enum {string} */
+            status: "PENDING" | "PROCESSING" | "COMPLETED" | "FAILED" | "CANCELLED";
+            fileId?: Record<string, never>;
+            filters?: {
+                [key: string]: unknown;
+            };
+            createdById: string;
+            completedAt?: Record<string, never>;
+            createdAt: string;
+            updatedAt: string;
+        };
+        CreateExportDto: {
+            type: string;
+            filters?: {
+                [key: string]: unknown;
+            };
+        };
+        CommentDto: {
+            id: string;
+            entityType: string;
+            entityId: string;
+            parentId?: Record<string, never>;
+            authorId: string;
+            content: string;
+            createdAt: string;
+            updatedAt: string;
+        };
+        CreateCommentDto: {
+            entityType: string;
+            entityId: string;
+            parentId?: string;
+            content: string;
+        };
+        UpdateCommentDto: {
+            content: string;
+        };
+        InvitationDto: {
+            id: string;
+            email: string;
+            entityType: string;
+            entityId: string;
+            role?: Record<string, never>;
+            invitedById: string;
+            /** @enum {string} */
+            status: "PENDING" | "ACCEPTED" | "EXPIRED" | "REVOKED";
+            expiresAt: string;
+            acceptedAt?: Record<string, never>;
+            acceptedById?: Record<string, never>;
+            createdAt: string;
+            updatedAt: string;
+        };
+        CreateInvitationDto: {
+            email: string;
+            entityType: string;
+            entityId: string;
+            role?: string;
+        };
+        AcceptInvitationDto: {
+            token: string;
         };
     };
     responses: never;
@@ -681,6 +1501,156 @@ export interface operations {
                     "application/json": {
                         data: components["schemas"]["HealthStatusDto"];
                         meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    AdminRolesController_listRoles: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["RoleDto"][];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    OrganizationsController_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["OrganizationDto"][];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    OrganizationsController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateOrganizationDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["OrganizationDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    PreferencesController_getMyPreferences: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["UserPreferencesDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    PreferencesController_updateMyPreferences: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdatePreferencesDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["UserPreferencesDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    AuditController_listAuditLogs: {
+        parameters: {
+            query?: {
+                page?: number;
+                limit?: number;
+                sortOrder?: "asc" | "desc";
+                actorId?: string;
+                action?: string;
+                resourceType?: string;
+                resourceId?: string;
+                from?: string;
+                to?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["AuditLogDto"][];
+                        meta: components["schemas"]["PaginationMetaDto"];
                     };
                 };
             };
@@ -948,6 +1918,107 @@ export interface operations {
             };
         };
     };
+    FilesController_upload: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file?: string;
+                };
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["FileDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    FilesController_getById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["FileDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    FilesController_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SuccessFlagDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    FilesController_getUrl: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["FileUrlDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
     AuthController_register: {
         parameters: {
             query?: never;
@@ -1196,6 +2267,32 @@ export interface operations {
             };
         };
     };
+    AuthController_switchOrganization: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SwitchOrganizationDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SuccessFlagDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
     AuthController_getSessions: {
         parameters: {
             query?: never;
@@ -1242,6 +2339,235 @@ export interface operations {
             };
         };
     };
+    AdminMailController_listDeliveries: {
+        parameters: {
+            query?: {
+                page?: number;
+                limit?: number;
+                sortOrder?: "asc" | "desc";
+                templateKey?: string;
+                status?: "SENT" | "FAILED";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["MailDeliveryDto"][];
+                        meta: components["schemas"]["PaginationMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    AdminMailController_preview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                templateKey: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["MailPreviewDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    AdminSettingsController_listSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ApplicationSettingDto"][];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    AdminSettingsController_updateSetting: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateSettingDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ApplicationSettingDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    AttachmentsController_list: {
+        parameters: {
+            query: {
+                entityType: string;
+                entityId: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["AttachmentDto"][];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    AttachmentsController_attach: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AttachEntityDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["AttachmentDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    AttachmentsController_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SuccessFlagDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    AdminJobsController_listJobs: {
+        parameters: {
+            query?: {
+                page?: number;
+                limit?: number;
+                sortOrder?: "asc" | "desc";
+                status?: "PENDING" | "PROCESSING" | "COMPLETED" | "CANCELLED" | "FAILED";
+                type?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["JobDto"][];
+                        meta: components["schemas"]["PaginationMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    AdminJobsController_cancelJob: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["JobDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
     NotificationsController_list: {
         parameters: {
             query?: {
@@ -1270,6 +2596,23 @@ export interface operations {
             };
         };
     };
+    NotificationsController_stream: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     NotificationsController_unreadCount: {
         parameters: {
             query?: never;
@@ -1286,6 +2629,56 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: components["schemas"]["CountDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    NotificationsController_registerDevice: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RegisterDeviceDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["DeviceTokenDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    NotificationsController_unregisterDevice: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SuccessFlagDto"];
                         meta: components["schemas"]["RequestMetaDto"];
                     };
                 };
@@ -1371,7 +2764,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["SendNotificationDto"];
+                "application/json": components["schemas"]["SendNotificationRequestDto"];
             };
         };
         responses: {
@@ -1381,7 +2774,156 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        data: components["schemas"]["NotificationDto"];
+                        data: components["schemas"]["NotificationJobDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    AdminNotificationsController_listJobs: {
+        parameters: {
+            query?: {
+                page?: number;
+                limit?: number;
+                sortOrder?: "asc" | "desc";
+                status?: "PENDING" | "PROCESSING" | "COMPLETED" | "CANCELLED" | "FAILED";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["NotificationJobDto"][];
+                        meta: components["schemas"]["PaginationMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    AdminNotificationsController_getJob: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["NotificationJobDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    AdminNotificationsController_cancelJob: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["NotificationJobDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    ImportsController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateImportDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ImportJobDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    ImportsController_getById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ImportJobDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    ImportsController_confirm: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ImportJobDto"];
                         meta: components["schemas"]["RequestMetaDto"];
                     };
                 };
@@ -1437,6 +2979,30 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: components["schemas"]["ProjectDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    ProjectsController_listAttachments: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ProjectAttachmentDto"][];
                         meta: components["schemas"]["RequestMetaDto"];
                     };
                 };
@@ -1537,6 +3103,297 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: components["schemas"]["ProjectDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    ActivitiesController_list: {
+        parameters: {
+            query?: {
+                page?: number;
+                limit?: number;
+                sortOrder?: "asc" | "desc";
+                entityType?: string;
+                entityId?: string;
+                actorId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ActivityDto"][];
+                        meta: components["schemas"]["PaginationMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    ExportsController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateExportDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ExportJobDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    ExportsController_getById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["ExportJobDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    CommentsController_list: {
+        parameters: {
+            query: {
+                page?: number;
+                limit?: number;
+                sortOrder?: "asc" | "desc";
+                entityType: string;
+                entityId: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CommentDto"][];
+                        meta: components["schemas"]["PaginationMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    CommentsController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCommentDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CommentDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    CommentsController_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SuccessFlagDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    CommentsController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateCommentDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["CommentDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    InvitationsController_list: {
+        parameters: {
+            query?: {
+                page?: number;
+                limit?: number;
+                sortOrder?: "asc" | "desc";
+                email?: string;
+                entityType?: string;
+                entityId?: string;
+                status?: "PENDING" | "ACCEPTED" | "EXPIRED" | "REVOKED";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["InvitationDto"][];
+                        meta: components["schemas"]["PaginationMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    InvitationsController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateInvitationDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["InvitationDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    InvitationsController_accept: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AcceptInvitationDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["InvitationDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    InvitationsController_revoke: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["InvitationDto"];
                         meta: components["schemas"]["RequestMetaDto"];
                     };
                 };
