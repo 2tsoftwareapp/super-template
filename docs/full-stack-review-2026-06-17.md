@@ -73,9 +73,8 @@ The file upload path now validates file type more defensively and returns downlo
 ### SEC-4 — SSE refresh now persists rotated tokens — **Resolved**
 The notifications stream route now writes rotated cookies back to the response, matching the main BFF refresh path.
 
-### SEC-5 — `CSRF_SECRET` is dead/duplicated config — **Low**
-`CSRF_SECRET` is required (`env.schema.ts:73`, min 24) and present in `.env.example`/CI, but no code consumes it (grep). Actual CSRF is an origin check + random-UUID double-submit cookie in the BFF (`backend.ts:158`, `cookies.ts:39`). The double-submit token is not bound to the session or signed with any secret. The mechanism (origin + same-value cookie/header, SameSite=Lax) is acceptable, but the unused secret is misleading and the token is weaker than a signed/HMAC token.
-- **Recommendation.** Either bind the CSRF token with `CSRF_SECRET` (HMAC of session) or remove the unused env var so config reflects reality.
+### SEC-5 — CSRF tokens are now signed when configured — **Resolved**
+The BFF now signs CSRF nonces with `CSRF_SECRET` when the secret is present and validates the signature on unsafe requests. In local/dev without the secret it still falls back to the previous token-only behavior, so the mechanism remains configurable without breaking existing environments.
 
 ### SEC-6 — Local storage downloads are now served through the file controller — **Resolved**
 The files module now exposes an authenticated download route and the local storage path is covered by a signed token flow. The earlier “missing controller” statement is no longer current.
@@ -83,9 +82,8 @@ The files module now exposes an authenticated download route and the local stora
 ### SEC-7 — Login timing padding is now in place — **Resolved**
 `login` now uses `verifyPasswordWithTimingPadding(...)` for both the missing-user and real-user paths, which removes the earlier measurable shortcut on unknown email. `forgotPassword`/`resendVerification` still keep neutral responses.
 
-### SEC-8 — Web cookie flags ignore env config — **Low**
-`apps/web/src/lib/auth/cookies.ts` hardcodes `sameSite: "lax"` and never reads `COOKIE_SAMESITE`/`COOKIE_DOMAIN` (those exist in the API env schema but the cookies are set by the web BFF). `secure` is driven by `isSecureCookie`. For cross-site or subdomain deployments this requires code edits rather than config.
-- **Recommendation.** Drive web cookie `sameSite`/`domain`/`secure` from web env so deployment topology is configurable; document that `SameSite=None` requires `Secure`.
+### SEC-8 — Web cookie flags are now config-driven — **Resolved**
+The web BFF cookie layer now reads `COOKIE_SAMESITE`, `COOKIE_DOMAIN`, and `COOKIE_SECURE`/`NODE_ENV`, so cross-site and subdomain deployments no longer require code changes for the common cookie topology settings.
 
 ### SEC-9 — No Redis: single-instance assumptions break under horizontal scaling — **Medium**
 There is no Redis (or equivalent shared store) wired anywhere in source (grep finds it only in `docs/deployment.md` and skill docs). Three runtime concerns are all currently in-process and therefore correct only for a **single API instance**:
@@ -111,7 +109,7 @@ There is no Redis (or equivalent shared store) wired anywhere in source (grep fi
 - **Route param validation is now mostly explicit.** The main UUID id routes in projects/files/jobs/admin-users/auth use `ParseUUIDPipe`, so the earlier blanket complaint no longer holds. Any remaining gaps should be treated as isolated leftovers, not a systemic issue.
 - **Multi-step writes still mix concerns.** `FilesService.upload` writes to object storage *before* the DB insert but does compensate by deleting the object on failure (`files.service.ts:90`) — acceptable. `delete` removes the DB row before storage and throws if storage cleanup fails, diverging state. Exports/notification-jobs flows still lack idempotency keys; partial failure can orphan files or duplicate sends.
 - **Tracked artifacts have been cleaned up.** The previously committed runtime upload and `tsconfig.tsbuildinfo` files are no longer in the tree; keep them out via `.gitignore`/CI if they reappear.
-- **Orphan config**: `.env.example` defines `WORKSPACE_PORT` and `INTERNAL_SERVICE_KEY` (lines 18-19) that are absent from `env.schema.ts` (zod strips them silently) — dead config.
+- **Config parity is tighter.** `.env.example` now matches the active web/API schema more closely; keep future sample keys wired into validation before adding them.
 
 ---
 
@@ -122,13 +120,13 @@ There is no Redis (or equivalent shared store) wired anywhere in source (grep fi
 | 1 | High | Security/Arch | RLS runtime proof still missing | Same-transaction DB-local context test as production DB role and org `ADMIN` |
 | 2 | Medium | Infra/Scale | No Redis — in-memory throttler, in-process SSE fan-out, no shared cache | Add Redis; back throttler + SSE pub/sub + access-profile cache |
 | 3 | Medium | Arch | Cross-feature package coupling (323 boundary issues) | Ports/events via `api-core`; enforce `turbo boundaries` in CI |
-| 4 | Low | Security | `CSRF_SECRET` unused; double-submit token unsigned | HMAC-bind the token or remove the secret |
+| 4 | Low | Security | CSRF token integrity | Resolved in current web BFF path |
 | 5 | Low | Security | Login timing enumeration | Resolved in current code path |
-| 6 | Low | Security | Web cookie flags ignore env | Drive sameSite/domain/secure from web env |
+| 6 | Low | Security | Web cookie flags ignore env | Resolved in current web BFF path |
 | 7 | Low | Quality | Remaining `ParseUUIDPipe` gaps, if any | Audit the few leftover id routes and normalize them |
 | 8 | Low | Quality/Repo | Tracked upload + tsbuildinfo artifacts | Keep them out of the tree; CI check on generated files |
 | 9 | Low | CI | Mobile not verified | Restore Flutter format/analyze/test in CI |
-| 10 | Low | Config | Orphan `.env.example` keys | Remove or add to schema |
+| 10 | Low | Config | Orphan `.env.example` keys | Resolved in current env example |
 
 ---
 
@@ -143,7 +141,7 @@ Resolved:
 - **Local download path** — authenticated file download exists in the files module.
 - **SSE refresh cookies** — notification stream refresh now persists rotated cookies.
 
-Still open: RLS runtime proof (P1), package boundaries (P1), some transactional/idempotency gaps (P1), Redis / single-instance scaling (P1), mobile CI (P3), orphan env keys.
+Still open: RLS runtime proof (P1), package boundaries (P1), some transactional/idempotency gaps (P1), Redis / single-instance scaling (P1), mobile CI (P3).
 
 Open question now answered: admin roles are **org-scoped** (`ADMIN`) vs **global** (`SUPER_ADMIN`), with `USER` as the normal role — see §2.1 and SEC-1.
 

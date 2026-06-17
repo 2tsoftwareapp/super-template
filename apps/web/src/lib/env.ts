@@ -34,6 +34,7 @@ const envSchema = z.object({
   WEB_ORIGIN: z.url(),
   COOKIE_DOMAIN: emptyStringToUndefined,
   COOKIE_SAMESITE: z.enum(["lax", "strict", "none"]).default("lax"),
+  CSRF_SECRET: emptyStringToUndefined,
   COOKIE_SECURE: booleanFromString.optional(),
   NODE_ENV: z
     .enum(["development", "test", "production"])
@@ -46,6 +47,7 @@ export const env = envSchema.parse({
   WEB_ORIGIN: process.env.WEB_ORIGIN,
   COOKIE_DOMAIN: process.env.COOKIE_DOMAIN,
   COOKIE_SAMESITE: process.env.COOKIE_SAMESITE,
+  CSRF_SECRET: process.env.CSRF_SECRET,
   COOKIE_SECURE: process.env.COOKIE_SECURE,
   NODE_ENV: process.env.NODE_ENV,
 });

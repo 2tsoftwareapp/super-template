@@ -6,6 +6,7 @@ import type { ApiEnvelope } from "@/lib/api-types";
 
 import {
   clearAuthCookies,
+  isValidCsrfToken,
   readAuthCookies,
   setAuthCookies,
 } from "@/lib/auth/cookies";
@@ -168,7 +169,8 @@ export const enforceCsrf = async (request: NextRequest) => {
   if (
     origin !== env.WEB_ORIGIN ||
     !csrfToken ||
-    requestCsrfToken !== csrfToken
+    requestCsrfToken !== csrfToken ||
+    !isValidCsrfToken(csrfToken)
   ) {
     return NextResponse.json(
       {

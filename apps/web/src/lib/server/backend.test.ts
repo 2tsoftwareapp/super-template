@@ -19,6 +19,7 @@ vi.mock("@/lib/env", () => ({
     WEB_ORIGIN: "http://localhost:3000",
     COOKIE_DOMAIN: undefined,
     COOKIE_SAMESITE: "lax",
+    CSRF_SECRET: undefined,
     COOKIE_SECURE: false,
     NODE_ENV: "test",
   },

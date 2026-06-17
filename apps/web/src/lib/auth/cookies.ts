@@ -1,7 +1,7 @@
 import type { NextResponse } from "next/server";
 
 import { cookies } from "next/headers";
-import { randomUUID } from "node:crypto";
+import { createHmac, randomUUID, timingSafeEqual } from "node:crypto";
 
 import { env, isSecureCookie } from "@/lib/env";
 
@@ -15,6 +15,48 @@ const baseCookieOptions = {
   sameSite: env.COOKIE_SAMESITE,
   path: "/",
   secure: isSecureCookie,
+};
+
+const CSRF_SEPARATOR = ".";
+const CSRF_HMAC_ALGORITHM = "sha256";
+
+const signCsrfNonce = (nonce: string) => {
+  if (!env.CSRF_SECRET) {
+    return nonce;
+  }
+
+  const signature = createHmac(CSRF_HMAC_ALGORITHM, env.CSRF_SECRET)
+    .update(nonce)
+    .digest("base64url");
+
+  return `${nonce}${CSRF_SEPARATOR}${signature}`;
+};
+
+export const createCsrfToken = () => signCsrfNonce(randomUUID());
+
+export const isValidCsrfToken = (value: string) => {
+  if (!env.CSRF_SECRET) {
+    return value.length > 0;
+  }
+
+  const [nonce, signature] = value.split(CSRF_SEPARATOR);
+
+  if (!nonce || !signature) {
+    return false;
+  }
+
+  const expectedSignature = createHmac(CSRF_HMAC_ALGORITHM, env.CSRF_SECRET)
+    .update(nonce)
+    .digest("base64url");
+
+  const providedBuffer = Buffer.from(signature);
+  const expectedBuffer = Buffer.from(expectedSignature);
+
+  if (providedBuffer.length !== expectedBuffer.length) {
+    return false;
+  }
+
+  return timingSafeEqual(providedBuffer, expectedBuffer);
 };
 
 export const readAuthCookies = async () => {
@@ -37,7 +79,8 @@ export const setAuthCookies = (
   payload: TokenPayload,
   csrfToken?: string,
 ) => {
-  const resolvedCsrfToken = csrfToken ?? randomUUID();
+  const resolvedCsrfToken =
+    csrfToken && isValidCsrfToken(csrfToken) ? csrfToken : createCsrfToken();
 
   response.cookies.set(
     ACCESS_TOKEN_COOKIE,
