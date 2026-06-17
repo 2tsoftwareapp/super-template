@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { PaginationQueryDto } from '@repo/api-core';
 import {
   IsEmail,
   IsEnum,
@@ -7,7 +8,6 @@ import {
   IsUUID,
   MaxLength,
 } from 'class-validator';
-import { PaginationQueryDto } from '@repo/api-core';
 
 export class InvitationDto {
   @ApiProperty()

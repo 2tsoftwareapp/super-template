@@ -3,6 +3,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Laptop2 } from "lucide-react";
 import { toast } from "sonner";
+
+import type { AuthSessionsResponse } from "@/lib/api-types";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,7 +22,6 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
-import type { AuthSessionsResponse } from "@/lib/api-types";
 import { webFetch } from "@/lib/http";
 
 export default function SessionsPage() {

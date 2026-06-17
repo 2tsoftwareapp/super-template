@@ -1,5 +1,3 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import {
   BarChart3,
   ChevronLeft,
@@ -17,16 +15,20 @@ import {
   Workflow,
   Zap,
 } from "lucide-react";
-import { Avatar } from "./ui/avatar";
-import { Dropdown, type DropdownItem } from "./ui/dropdown";
-import { Tooltip } from "./ui/tooltip";
-import { Spinner } from "./ui/spinner";
-import { Card, CardDescription, CardHeader, CardTitle } from "./ui/card";
-import { Separator } from "./ui/separator";
+import { createContext, useContext, useEffect, useState } from "react";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
+
 import { clearStoredAuthTokens } from "@/lib/auth";
-import { useSession } from "@/lib/session";
 import { webFetch } from "@/lib/http";
+import { useSession } from "@/lib/session";
 import { cn } from "@/lib/utils";
+
+import { Avatar } from "./ui/avatar";
+import { Card, CardDescription, CardHeader, CardTitle } from "./ui/card";
+import { Dropdown, type DropdownItem } from "./ui/dropdown";
+import { Separator } from "./ui/separator";
+import { Spinner } from "./ui/spinner";
+import { Tooltip } from "./ui/tooltip";
 
 // ── Sidebar context ──────────────────────────────────────────────────────────
 

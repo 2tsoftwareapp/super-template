@@ -7,6 +7,7 @@ import {
   uniqueIndex,
   uuid,
 } from 'drizzle-orm/pg-core';
+
 import { timestamps } from '../shared/timestamps';
 import { organizationMemberRoleEnum } from './enums';
 import { users } from './users';

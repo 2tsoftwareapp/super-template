@@ -1,4 +1,5 @@
 import { normalizeNotificationsSearch } from "@/lib/search-params";
+
 import { NotificationsView } from "./notifications-view";
 
 export default async function NotificationsPage({

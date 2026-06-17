@@ -1,13 +1,14 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { and, count, desc, eq, gte, lte, type SQL } from 'drizzle-orm';
-import { DATABASE } from '@repo/api-database';
 import type {
   DatabaseClient,
   DatabaseExecutor,
 } from '@repo/api-database';
-import { auditLogs } from '@repo/api-database';
 
-type ListAuditLogsParams = {
+import { Inject, Injectable } from '@nestjs/common';
+import { DATABASE } from '@repo/api-database';
+import { auditLogs } from '@repo/api-database';
+import { and, count, desc, eq, gte, lte, type SQL } from 'drizzle-orm';
+
+interface ListAuditLogsParams {
   page: number;
   limit: number;
   actorId?: string;
@@ -17,7 +18,7 @@ type ListAuditLogsParams = {
   from?: string;
   to?: string;
   sortOrder: 'asc' | 'desc';
-};
+}
 
 @Injectable()
 export class AuditRepository {

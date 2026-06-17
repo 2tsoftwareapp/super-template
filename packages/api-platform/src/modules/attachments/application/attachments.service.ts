@@ -1,17 +1,20 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
-import { ERROR_CODES } from '@repo/api-core';
-import { AppError } from '@repo/api-core';
 import type {
   AuthenticatedRequestUser,
   RequestContext,
 } from '@repo/api-core';
-import { AuditService } from '../../audit/application/audit.service';
-import { FilesRepository } from '../../files/infrastructure/files.repository';
-import { AttachmentsRepository } from '../infrastructure/attachments.repository';
+
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { ERROR_CODES } from '@repo/api-core';
+import { AppError } from '@repo/api-core';
+
 import type {
   AttachEntityDto,
   AttachmentsQueryDto,
 } from '../presentation/attachments.dto';
+
+import { AuditService } from '../../audit/application/audit.service';
+import { FilesRepository } from '../../files/infrastructure/files.repository';
+import { AttachmentsRepository } from '../infrastructure/attachments.repository';
 
 @Injectable()
 export class AttachmentsService {

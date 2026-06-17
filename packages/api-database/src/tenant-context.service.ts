@@ -1,5 +1,6 @@
-import { AsyncLocalStorage } from 'node:async_hooks';
 import { Injectable } from '@nestjs/common';
+import { AsyncLocalStorage } from 'node:async_hooks';
+
 import type { TenantContext } from './tenant-context';
 
 const tenantContextStorage = new AsyncLocalStorage<TenantContext>();

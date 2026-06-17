@@ -1,9 +1,10 @@
 "use client";
 
+import { LogOut, Shield } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { LogOut, Shield } from "lucide-react";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,10 +16,10 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
-import { useSession } from "@/hooks/use-session";
 import { useNotificationStream } from "@/hooks/use-notification-stream";
-import { clientNavItems } from "@/lib/navigation";
+import { useSession } from "@/hooks/use-session";
 import { webFetch } from "@/lib/http";
+import { clientNavItems } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
 
 export function AppShell({ children }: { children: React.ReactNode }) {

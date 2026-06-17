@@ -1,4 +1,5 @@
 import { index, jsonb, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+
 import { organizations } from '../identity/organizations';
 import { users } from '../identity/users';
 import { activityVisibilityEnum } from './enums';

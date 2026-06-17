@@ -1,5 +1,7 @@
+import type { ProjectsRepository } from '@repo/api-workspace/modules/projects/infrastructure/projects.repository';
+
 import { type DatabaseExecutor } from '@repo/api-database';
-import { ProjectsRepository } from '@repo/api-workspace/modules/projects/infrastructure/projects.repository';
+
 import { type SeededUsersContext } from '../types';
 
 export async function seedProjects(

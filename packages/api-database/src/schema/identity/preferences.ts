@@ -1,4 +1,5 @@
 import { jsonb, pgTable, text, uuid } from 'drizzle-orm/pg-core';
+
 import { timestamps } from '../shared/timestamps';
 import { users } from './users';
 

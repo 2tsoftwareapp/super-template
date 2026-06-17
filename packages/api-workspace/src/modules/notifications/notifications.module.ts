@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
-import { AuditModule } from '@repo/api-platform/modules/audit/audit.module';
 import { UsersModule } from '@repo/api-identity/modules/users/users.module';
+import { AuditModule } from '@repo/api-platform/modules/audit/audit.module';
+
 import { NotificationJobsProcessor } from './application/notification-jobs.processor';
 import { NotificationsService } from './application/notifications.service';
 import { PUSH_NOTIFIER } from './application/push.interface';

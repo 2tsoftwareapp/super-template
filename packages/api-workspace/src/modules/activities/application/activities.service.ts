@@ -1,9 +1,12 @@
-import { Injectable } from '@nestjs/common';
 import type { DatabaseExecutor } from '@repo/api-database';
-import { ActivitiesRepository } from '../infrastructure/activities.repository';
+
+import { Injectable } from '@nestjs/common';
+
 import type { ActivitiesQueryDto } from '../presentation/activities.dto';
 
-type EmitActivityInput = {
+import { ActivitiesRepository } from '../infrastructure/activities.repository';
+
+interface EmitActivityInput {
   organizationId: string;
   summary: string;
   entityType: string;
@@ -11,7 +14,7 @@ type EmitActivityInput = {
   actorId?: string | null;
   visibility?: 'PUBLIC' | 'PRIVATE' | 'INTERNAL';
   metadata?: Record<string, unknown> | null;
-};
+}
 
 @Injectable()
 export class ActivitiesService {

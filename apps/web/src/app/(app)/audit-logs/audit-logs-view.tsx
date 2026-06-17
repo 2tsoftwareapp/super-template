@@ -3,6 +3,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { ScrollText } from "lucide-react";
 import { useQueryStates } from "nuqs";
+
+import type { AuditLogsListResponse } from "@/lib/api-types";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,6 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Spinner } from "@/components/ui/spinner";
 import {
   Table,
   TableBody,
@@ -36,9 +40,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Spinner } from "@/components/ui/spinner";
 import { useSession } from "@/hooks/use-session";
-import type { AuditLogsListResponse } from "@/lib/api-types";
 import { webFetch } from "@/lib/http";
 import {
   auditLogsSearchParams,

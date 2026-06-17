@@ -1,7 +1,10 @@
 import type { NextRequest } from "next/server";
+
 import { NextResponse } from "next/server";
-import { clearAuthCookies, setAuthCookies } from "@/lib/auth/cookies";
+
 import type { AuthLoginResponse, LoginInput } from "@/lib/api-types";
+
+import { clearAuthCookies, setAuthCookies } from "@/lib/auth/cookies";
 import { callBackend } from "@/lib/server/backend";
 
 export async function POST(request: NextRequest) {

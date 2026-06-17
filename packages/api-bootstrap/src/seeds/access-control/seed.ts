@@ -1,5 +1,6 @@
+import type { AccessControlService } from '@repo/api-identity/modules/access-control/application/access-control.service';
+
 import { type DatabaseExecutor } from '@repo/api-database';
-import { AccessControlService } from '@repo/api-identity/modules/access-control/application/access-control.service';
 
 export async function seedAccessControl(
   accessControlService: AccessControlService,

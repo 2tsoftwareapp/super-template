@@ -1,8 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { EnvironmentService } from '@repo/api-core';
 import { type App, cert, getApps, initializeApp } from 'firebase-admin/app';
 import { getMessaging } from 'firebase-admin/messaging';
-import { EnvironmentService } from '@repo/api-core';
+
 import type { PushMessage, PushNotifier } from '../application/push.interface';
+
 import { DeviceTokensRepository } from './device-tokens.repository';
 
 @Injectable()
@@ -59,8 +61,7 @@ export class FcmPushService implements PushNotifier {
 
       if (
         result.success ||
-        !result.error ||
-        result.error.code !== 'messaging/registration-token-not-registered' ||
+        result.error?.code !== 'messaging/registration-token-not-registered' ||
         !token
       ) {
         return [];

@@ -13,9 +13,12 @@ import {
 import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import {
+  APP_LOGGER,
   AppConfigModule,
   AppExceptionFilter,
+  type AppLogger,
   EnvironmentService,
+  ErrorReporterService,
   LoggingModule,
   PermissionsGuard,
   RequestContextMiddleware,
@@ -28,6 +31,7 @@ import { IdentityModule } from '@repo/api-identity';
 import { AuthService } from '@repo/api-identity/modules/auth/application/auth.service';
 import { PlatformModule } from '@repo/api-platform';
 import { WorkspaceModule } from '@repo/api-workspace';
+
 import { AuthGuard } from './shell/auth.guard';
 import { TenantContextInterceptor } from './shell/tenant-context.interceptor';
 
@@ -52,9 +56,12 @@ import { TenantContextInterceptor } from './shell/tenant-context.interceptor';
     RequestLoggerMiddleware,
     {
       provide: APP_FILTER,
-      useFactory: (environmentService: EnvironmentService) =>
-        new AppExceptionFilter(environmentService),
-      inject: [EnvironmentService],
+      useFactory: (
+        environmentService: EnvironmentService,
+        logger: AppLogger,
+        errorReporter: ErrorReporterService,
+      ) => new AppExceptionFilter(environmentService, logger, errorReporter),
+      inject: [EnvironmentService, APP_LOGGER, ErrorReporterService],
     },
     {
       provide: APP_GUARD,

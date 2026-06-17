@@ -3,7 +3,9 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import {
   APP_LOGGER,
   type AppLogger,
+  ErrorReporterService,
 } from '@repo/api-core';
+
 import { NotificationsService } from '../application/notifications.service';
 
 @Injectable()
@@ -13,6 +15,7 @@ export class NotificationJobsProcessor {
   constructor(
     private readonly notificationsService: NotificationsService,
     @Inject(APP_LOGGER) private readonly logger: AppLogger,
+    private readonly errorReporter: ErrorReporterService,
   ) {}
 
   @Cron(CronExpression.EVERY_MINUTE)
@@ -30,6 +33,20 @@ export class NotificationJobsProcessor {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
       });
+      if (error instanceof Error) {
+        this.errorReporter.reportException(error, {
+          errorCode: 'NOTIFICATION_JOB_PROCESSING_FAILED',
+          tags: { job: 'notification-due-jobs' },
+        });
+      } else {
+        this.errorReporter.reportMessage(
+          'Failed to process due notification jobs',
+          {
+            errorCode: 'NOTIFICATION_JOB_PROCESSING_FAILED',
+            tags: { job: 'notification-due-jobs' },
+          },
+        );
+      }
     } finally {
       this.processing = false;
     }

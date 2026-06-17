@@ -1,5 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+
+import type { ListResponse, MailDeliveryDto, MailPreviewDto } from "../lib/types";
+
+import { PageHeader } from "../components/page-header";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
@@ -7,10 +11,8 @@ import { Input } from "../components/ui/input";
 import { Separator } from "../components/ui/separator";
 import { Spinner } from "../components/ui/spinner";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui/table";
-import { PageHeader } from "../components/page-header";
-import { webFetch } from "../lib/http";
 import { timeAgo } from "../lib/format";
-import type { ListResponse, MailDeliveryDto, MailPreviewDto } from "../lib/types";
+import { webFetch } from "../lib/http";
 import { cn } from "../lib/utils";
 
 function mailStatusProps(status: string): {

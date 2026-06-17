@@ -1,25 +1,28 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
-import { ERROR_CODES } from '@repo/api-core';
-import { AppError } from '@repo/api-core';
 import type {
   AuthenticatedRequestUser,
   RequestContext,
 } from '@repo/api-core';
+
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { ERROR_CODES } from '@repo/api-core';
+import { AppError } from '@repo/api-core';
 import { requireOrganizationId } from '@repo/api-core';
 import { runInTransaction } from '@repo/api-database';
 import { PERMISSION_NAMES } from '@repo/api-identity/modules/access-control/access-control.constants';
-import { ActivitiesService } from '../../activities/application/activities.service';
+import { UsersRepository } from '@repo/api-identity/modules/users/infrastructure/users.repository';
 import { AttachmentsRepository } from '@repo/api-platform/modules/attachments/infrastructure/attachments.repository';
 import { AuditService } from '@repo/api-platform/modules/audit/application/audit.service';
+
 import type { NotificationDto } from '../../notifications/application/notifications.service';
-import { NotificationsService } from '../../notifications/application/notifications.service';
-import { UsersRepository } from '@repo/api-identity/modules/users/infrastructure/users.repository';
-import { ProjectsRepository } from '../infrastructure/projects.repository';
 import type {
   CreateProjectDto,
   ProjectsQueryDto,
   UpdateProjectDto,
 } from '../presentation/projects.dto';
+
+import { ActivitiesService } from '../../activities/application/activities.service';
+import { NotificationsService } from '../../notifications/application/notifications.service';
+import { ProjectsRepository } from '../infrastructure/projects.repository';
 
 @Injectable()
 export class ProjectsService {

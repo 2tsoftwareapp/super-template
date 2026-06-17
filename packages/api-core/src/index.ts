@@ -1,27 +1,28 @@
-export { AppConfigModule } from './config/app-config.module';
-export { APP_ENVIRONMENT } from './config/config.constants';
-export { EnvironmentService } from './config/environment.service';
-export type { AppEnvironment } from './config/env.schema';
-export { validateEnvironment } from './config/env.schema';
-
 export * from './common/constants/error-codes';
 export * from './common/decorators/api-response.decorator';
 export * from './common/decorators/current-user.decorator';
 export * from './common/decorators/permissions.decorator';
 export * from './common/decorators/public.decorator';
+
 export * from './common/decorators/skip-envelope.decorator';
 export * from './common/errors/app-error';
 export * from './common/filters/app-exception.filter';
 export { PermissionsGuard } from './common/guards/permissions.guard';
-export { ConsoleAppLogger } from './common/logging/console-logger.service';
 export * from './common/interceptors/response-envelope.interceptor';
-export { LoggingModule } from './common/logging/logging.module';
+export { ConsoleAppLogger } from './common/logging/console-logger.service';
 export * from './common/logging/logger.interface';
+export { LoggingModule } from './common/logging/logging.module';
 export { RequestContextMiddleware } from './common/middleware/request-context.middleware';
 export { RequestLoggerMiddleware } from './common/middleware/request-logger.middleware';
+export { ErrorReporterService } from './common/observability/error-reporter.service';
 export * from './common/pagination/pagination.dto';
 export * from './common/types/request-context';
 export * from './common/utils/duration';
 export * from './common/utils/normalize-email';
 export * from './common/utils/redact';
 export * from './common/utils/require-organization';
+export { AppConfigModule } from './config/app-config.module';
+export { APP_ENVIRONMENT } from './config/config.constants';
+export type { AppEnvironment } from './config/env.schema';
+export { validateEnvironment } from './config/env.schema';
+export { EnvironmentService } from './config/environment.service';

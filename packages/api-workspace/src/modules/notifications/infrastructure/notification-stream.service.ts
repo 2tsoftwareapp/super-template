@@ -2,7 +2,7 @@ import { Injectable, type MessageEvent } from '@nestjs/common';
 import { Observable, Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-export type NotificationStreamEvent = {
+export interface NotificationStreamEvent {
   id: string;
   userId: string;
   type: string;
@@ -11,7 +11,7 @@ export type NotificationStreamEvent = {
   data: Record<string, unknown> | null;
   readAt: string | null;
   createdAt: string;
-};
+}
 
 @Injectable()
 export class NotificationStreamService {

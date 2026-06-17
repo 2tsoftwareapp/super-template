@@ -1,5 +1,7 @@
-import { Inject, Injectable, type NestMiddleware } from '@nestjs/common';
 import type { NextFunction, Request, Response } from 'express';
+
+import { Inject, Injectable, type NestMiddleware } from '@nestjs/common';
+
 import { APP_LOGGER, type AppLogger } from '../logging/logger.interface';
 
 @Injectable()
@@ -24,7 +26,10 @@ export class RequestLoggerMiddleware implements NestMiddleware {
         statusCode: response.statusCode,
         duration: Date.now() - startedAt,
         userId: request.user?.userId ?? null,
-        errorCode: response.locals.errorCode ?? null,
+        errorCode:
+          typeof response.locals.errorCode === 'string'
+            ? response.locals.errorCode
+            : null,
       };
 
       if (level === 'error') {

@@ -1,21 +1,24 @@
-import { randomUUID } from 'node:crypto';
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { ERROR_CODES } from '@repo/api-core';
-import { AppError } from '@repo/api-core';
 import type {
   AuthenticatedRequestUser,
   RequestContext,
 } from '@repo/api-core';
+
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { ERROR_CODES } from '@repo/api-core';
+import { AppError } from '@repo/api-core';
 import { requireOrganizationId } from '@repo/api-core';
+import { ProjectsRepository } from '@repo/api-workspace/modules/projects/infrastructure/projects.repository';
+import { randomUUID } from 'node:crypto';
+
+import type { CreateExportDto } from '../presentation/exports.dto';
+
 import { AuditService } from '../../audit/application/audit.service';
 import { FilesRepository } from '../../files/infrastructure/files.repository';
-import { ProjectsRepository } from '@repo/api-workspace/modules/projects/infrastructure/projects.repository';
 import {
   OBJECT_STORAGE,
   type ObjectStorage,
 } from '../../storage/application/object-storage.interface';
 import { ExportJobsRepository } from '../infrastructure/export-jobs.repository';
-import type { CreateExportDto } from '../presentation/exports.dto';
 
 @Injectable()
 export class ExportsService {
@@ -77,7 +80,7 @@ export class ExportsService {
   async getById(actor: AuthenticatedRequestUser, jobId: string) {
     const job = await this.exportJobsRepository.findById(jobId);
 
-    if (!job || job.createdById !== actor.userId) {
+    if (job?.createdById !== actor.userId) {
       throw new AppError(
         ERROR_CODES.EXPORT_JOB_NOT_FOUND,
         'Export job not found',

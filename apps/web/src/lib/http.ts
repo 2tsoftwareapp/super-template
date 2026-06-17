@@ -1,4 +1,5 @@
 import { getCsrfTokenFromDocument } from "@/lib/utils";
+
 import type { ApiErrorEnvelope } from "./api-types";
 
 export class ApiClientError extends Error {

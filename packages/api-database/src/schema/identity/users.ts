@@ -1,5 +1,6 @@
 import { sql } from 'drizzle-orm';
 import { pgTable, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
+
 import { timestamps } from '../shared/timestamps';
 import { userStatusEnum } from './enums';
 

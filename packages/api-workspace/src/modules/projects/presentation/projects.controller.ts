@@ -1,3 +1,6 @@
+import type { AuthenticatedRequestUser } from '@repo/api-core';
+import type { Request } from 'express';
+
 import {
   Body,
   Controller,
@@ -10,7 +13,6 @@ import {
   Req,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import type { Request } from 'express';
 import {
   ApiArrayResponse,
   ApiDataResponse,
@@ -18,7 +20,7 @@ import {
   SuccessFlagDto,
 } from '@repo/api-core';
 import { CurrentUser } from '@repo/api-core';
-import type { AuthenticatedRequestUser } from '@repo/api-core';
+
 import { ProjectsService } from '../application/projects.service';
 import {
   CreateProjectDto,

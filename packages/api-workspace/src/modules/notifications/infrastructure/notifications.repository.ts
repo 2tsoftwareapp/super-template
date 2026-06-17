@@ -1,18 +1,19 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { and, count, desc, eq, isNull } from 'drizzle-orm';
-import { DATABASE } from '@repo/api-database';
 import type {
   DatabaseClient,
   DatabaseExecutor,
 } from '@repo/api-database';
-import { notifications } from '@repo/api-database';
 
-type ListNotificationsParams = {
+import { Inject, Injectable } from '@nestjs/common';
+import { DATABASE } from '@repo/api-database';
+import { notifications } from '@repo/api-database';
+import { and, count, desc, eq, isNull } from 'drizzle-orm';
+
+interface ListNotificationsParams {
   page: number;
   limit: number;
   unread?: boolean;
   type?: string;
-};
+}
 
 @Injectable()
 export class NotificationsRepository {
@@ -30,7 +31,7 @@ export class NotificationsRepository {
   }
 
   async createMany(
-    values: Array<typeof notifications.$inferInsert>,
+    values: typeof notifications.$inferInsert[],
     executor: DatabaseExecutor = this.database,
   ) {
     if (values.length === 0) {

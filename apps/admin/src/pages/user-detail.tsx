@@ -1,27 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { standardSchemaResolver as zodResolver } from "@hookform/resolvers/standard-schema";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { AlertTriangle, ArrowLeft, CheckCircle2, Circle, ShieldAlert, Trash2 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { useForm } from "react-hook-form";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { z } from "zod";
-import { standardSchemaResolver as zodResolver } from "@hookform/resolvers/standard-schema";
-import { useForm } from "react-hook-form";
-import { AlertTriangle, ArrowLeft, CheckCircle2, Circle, ShieldAlert, Trash2 } from "lucide-react";
-import { Alert } from "../components/ui/alert";
-import { Avatar } from "../components/ui/avatar";
-import { Badge } from "../components/ui/badge";
-import { Button } from "../components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
-import { Input } from "../components/ui/input";
-import { Label } from "../components/ui/label";
-import { Spinner } from "../components/ui/spinner";
-import { webFetch } from "../lib/http";
-import {
-  buildRoleLookup,
-  formatRoleName,
-  getAssignableRoles,
-  isPrivilegedRoleName,
-} from "../lib/roles";
-import { useSession } from "../lib/session";
-import { timeAgo, statusProps } from "../lib/format";
+
 import type {
   AdminUserDto,
   ListResponse,
@@ -30,6 +14,24 @@ import type {
   UpdateAdminUserInput,
   UpdateUserStatusInput,
 } from "../lib/types";
+
+import { Alert } from "../components/ui/alert";
+import { Avatar } from "../components/ui/avatar";
+import { Badge } from "../components/ui/badge";
+import { Button } from "../components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import { Spinner } from "../components/ui/spinner";
+import { statusProps, timeAgo } from "../lib/format";
+import { webFetch } from "../lib/http";
+import {
+  buildRoleLookup,
+  formatRoleName,
+  getAssignableRoles,
+  isPrivilegedRoleName,
+} from "../lib/roles";
+import { useSession } from "../lib/session";
 import { cn } from "../lib/utils";
 
 const profileSchema = z.object({

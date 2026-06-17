@@ -1,18 +1,19 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { and, count, desc, eq } from 'drizzle-orm';
-import { DATABASE } from '@repo/api-database';
 import type {
   DatabaseClient,
   DatabaseExecutor,
 } from '@repo/api-database';
-import { mailDeliveries } from '@repo/api-database';
 
-type ListDeliveriesParams = {
+import { Inject, Injectable } from '@nestjs/common';
+import { DATABASE } from '@repo/api-database';
+import { mailDeliveries } from '@repo/api-database';
+import { and, count, desc, eq } from 'drizzle-orm';
+
+interface ListDeliveriesParams {
   page: number;
   limit: number;
   templateKey?: string;
   status?: 'SENT' | 'FAILED';
-};
+}
 
 @Injectable()
 export class MailDeliveriesRepository {

@@ -1,6 +1,6 @@
+import { Injectable } from '@nestjs/common';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class TemplateRendererService {

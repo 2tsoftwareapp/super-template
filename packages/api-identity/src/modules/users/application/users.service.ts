@@ -1,30 +1,33 @@
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { ERROR_CODES } from '@repo/api-core';
-import { AppError } from '@repo/api-core';
 import type {
   AuthenticatedRequestUser,
   RequestContext,
 } from '@repo/api-core';
+import type { DatabaseClient, DatabaseExecutor } from '@repo/api-database';
+
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { ERROR_CODES } from '@repo/api-core';
+import { AppError } from '@repo/api-core';
 import { normalizeEmail } from '@repo/api-core';
 import { DATABASE } from '@repo/api-database';
-import type { DatabaseClient, DatabaseExecutor } from '@repo/api-database';
 import { runInTransaction } from '@repo/api-database';
-import { AccessControlService } from '../../access-control/application/access-control.service';
-import { ROLE_NAMES } from '../../access-control/access-control.constants';
 import { AuditService } from '@repo/api-platform/modules/audit/application/audit.service';
-import {
-  hashPassword,
-  verifyPassword,
-} from '../../auth/application/auth.helpers';
-import { AuthRepository } from '../../auth/infrastructure/auth.repository';
 import { FilesRepository } from '@repo/api-platform/modules/files/infrastructure/files.repository';
-import { OrganizationsService } from '../../organizations/application/organizations.service';
-import { UsersRepository } from '../infrastructure/users.repository';
+
 import type {
   CreateAdminUserDto,
   UpdateAdminUserDto,
   UpdateProfileDto,
 } from '../presentation/users.dto';
+
+import { ROLE_NAMES } from '../../access-control/access-control.constants';
+import { AccessControlService } from '../../access-control/application/access-control.service';
+import {
+  hashPassword,
+  verifyPassword,
+} from '../../auth/application/auth.helpers';
+import { AuthRepository } from '../../auth/infrastructure/auth.repository';
+import { OrganizationsService } from '../../organizations/application/organizations.service';
+import { UsersRepository } from '../infrastructure/users.repository';
 
 @Injectable()
 export class UsersService {
@@ -60,7 +63,7 @@ export class UsersService {
     if (input.avatarFileId) {
       const file = await this.filesRepository.findById(input.avatarFileId);
 
-      if (!file || file.uploadedById !== userId) {
+      if (file?.uploadedById !== userId) {
         throw new AppError(
           ERROR_CODES.FILE_NOT_FOUND,
           'Avatar file not found',

@@ -1,10 +1,12 @@
+import type { EnvironmentService } from '@repo/api-core';
+import type { AccessControlService } from '@repo/api-identity/modules/access-control/application/access-control.service';
+import type { OrganizationsService } from '@repo/api-identity/modules/organizations/application/organizations.service';
+import type { UsersRepository } from '@repo/api-identity/modules/users/infrastructure/users.repository';
+
 import { type DatabaseExecutor } from '@repo/api-database';
-import { EnvironmentService } from '@repo/api-core';
 import { ROLE_NAMES } from '@repo/api-identity/modules/access-control/access-control.constants';
-import { AccessControlService } from '@repo/api-identity/modules/access-control/application/access-control.service';
 import { hashPassword } from '@repo/api-identity/modules/auth/application/auth.helpers';
-import { OrganizationsService } from '@repo/api-identity/modules/organizations/application/organizations.service';
-import { UsersRepository } from '@repo/api-identity/modules/users/infrastructure/users.repository';
+
 import { type SeededUsersContext } from '../types';
 
 export async function seedUsers(

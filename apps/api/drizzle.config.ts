@@ -1,6 +1,6 @@
-import { resolve } from 'node:path';
 import { config as loadEnv } from 'dotenv';
 import { defineConfig } from 'drizzle-kit';
+import { resolve } from 'node:path';
 
 loadEnv({
   path: resolve(__dirname, '../../.env'),

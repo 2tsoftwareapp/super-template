@@ -1,28 +1,31 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
-import { ERROR_CODES } from '@repo/api-core';
-import { AppError } from '@repo/api-core';
 import type {
   AuthenticatedRequestUser,
   RequestContext,
 } from '@repo/api-core';
+
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { ERROR_CODES } from '@repo/api-core';
+import { AppError } from '@repo/api-core';
 import { durationToMilliseconds } from '@repo/api-core';
 import { normalizeEmail } from '@repo/api-core';
 import { requireOrganizationId } from '@repo/api-core';
 import { EnvironmentService } from '@repo/api-core';
 import { PERMISSION_NAMES } from '@repo/api-identity/modules/access-control/access-control.constants';
-import { AuditService } from '@repo/api-platform/modules/audit/application/audit.service';
 import {
   generateOpaqueToken,
   hashOpaqueToken,
 } from '@repo/api-identity/modules/auth/application/auth.helpers';
+import { AuditService } from '@repo/api-platform/modules/audit/application/audit.service';
 import { JobsService } from '@repo/api-platform/modules/jobs/application/jobs.service';
-import { ProjectsRepository } from '../../projects/infrastructure/projects.repository';
-import { InvitationsRepository } from '../infrastructure/invitations.repository';
+
 import type {
   AcceptInvitationDto,
   CreateInvitationDto,
   InvitationsQueryDto,
 } from '../presentation/invitations.dto';
+
+import { ProjectsRepository } from '../../projects/infrastructure/projects.repository';
+import { InvitationsRepository } from '../infrastructure/invitations.repository';
 
 @Injectable()
 export class InvitationsService {
@@ -129,7 +132,7 @@ export class InvitationsService {
     const invitation =
       await this.invitationsRepository.findByTokenHash(tokenHash);
 
-    if (!invitation || invitation.status !== 'PENDING') {
+    if (invitation?.status !== 'PENDING') {
       throw new AppError(
         ERROR_CODES.INVITATION_NOT_FOUND,
         'Invitation is invalid or no longer available',

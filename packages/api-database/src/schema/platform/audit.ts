@@ -7,6 +7,7 @@ import {
   uuid,
   varchar,
 } from 'drizzle-orm/pg-core';
+
 import { organizations } from '../identity/organizations';
 import { users } from '../identity/users';
 

@@ -1,10 +1,12 @@
+import type { Pool } from 'pg';
+
 import {
   Global,
   Inject,
   Module,
   type OnApplicationShutdown,
 } from '@nestjs/common';
-import type { Pool } from 'pg';
+
 import { DATABASE_POOL, databaseProviders } from './database.provider';
 import { TenantContextService } from './tenant-context.service';
 

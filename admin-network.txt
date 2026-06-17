@@ -1,3 +1,0 @@
-46. [POST] http://localhost:3002/api/auth/login => [404] Not Found
-
-Note: 45 static requests not shown, run with "static" option to see them.

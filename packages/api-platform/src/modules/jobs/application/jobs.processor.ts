@@ -3,7 +3,9 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import {
   APP_LOGGER,
   type AppLogger,
+  ErrorReporterService,
 } from '@repo/api-core';
+
 import { JobsService } from './jobs.service';
 
 @Injectable()
@@ -13,6 +15,7 @@ export class JobsProcessor {
   constructor(
     private readonly jobsService: JobsService,
     @Inject(APP_LOGGER) private readonly logger: AppLogger,
+    private readonly errorReporter: ErrorReporterService,
   ) {}
 
   @Cron(CronExpression.EVERY_MINUTE)
@@ -30,6 +33,17 @@ export class JobsProcessor {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
       });
+      if (error instanceof Error) {
+        this.errorReporter.reportException(error, {
+          errorCode: 'JOB_PROCESSING_FAILED',
+          tags: { job: 'due-jobs' },
+        });
+      } else {
+        this.errorReporter.reportMessage('Failed to process due jobs', {
+          errorCode: 'JOB_PROCESSING_FAILED',
+          tags: { job: 'due-jobs' },
+        });
+      }
     } finally {
       this.processing = false;
     }

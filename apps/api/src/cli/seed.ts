@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { seedDatabase } from '@repo/api-bootstrap';
+
 import { AppModule } from '../app.module';
 
 const main = async (): Promise<void> => {

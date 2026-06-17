@@ -1,4 +1,5 @@
 import { HttpStatus } from '@nestjs/common';
+
 import type { ErrorCode } from '../constants/error-codes';
 
 // AppError is the canonical typed failure for domain and application-layer rules.

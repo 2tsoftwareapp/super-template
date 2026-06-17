@@ -1,5 +1,7 @@
+import type { NotificationsRepository } from '@repo/api-workspace/modules/notifications/infrastructure/notifications.repository';
+
 import { type DatabaseExecutor } from '@repo/api-database';
-import { NotificationsRepository } from '@repo/api-workspace/modules/notifications/infrastructure/notifications.repository';
+
 import { type SeededUsersContext } from '../types';
 
 export async function seedNotifications(

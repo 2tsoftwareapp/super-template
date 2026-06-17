@@ -1,6 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { APP_ENVIRONMENT } from './config.constants';
+
 import type { AppEnvironment } from './env.schema';
+
+import { APP_ENVIRONMENT } from './config.constants';
 
 @Injectable()
 export class EnvironmentService {

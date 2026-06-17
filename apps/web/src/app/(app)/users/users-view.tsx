@@ -1,11 +1,19 @@
 "use client";
 
-import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Users } from "lucide-react";
+import Link from "next/link";
 import { useQueryStates } from "nuqs";
 import { useState } from "react";
 import { toast } from "sonner";
+
+import type {
+  ApiEnvelope,
+  CreateAdminUserInput,
+  UserDto,
+  UsersListResponse,
+} from "@/lib/api-types";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -40,6 +48,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Spinner } from "@/components/ui/spinner";
 import {
   Table,
   TableBody,
@@ -48,21 +57,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Spinner } from "@/components/ui/spinner";
 import { useSession } from "@/hooks/use-session";
-import type {
-  ApiEnvelope,
-  CreateAdminUserInput,
-  UserDto,
-  UsersListResponse,
-} from "@/lib/api-types";
 import { webFetch } from "@/lib/http";
 import {
   buildAdminUsersListPath,
   sortOrderOptions,
   userSortFieldOptions,
-  userStatusOptions,
   usersSearchParams,
+  userStatusOptions,
 } from "@/lib/search-params";
 
 export function UsersView() {

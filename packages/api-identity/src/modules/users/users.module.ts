@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common';
-import { AccessControlModule } from '../access-control/access-control.module';
 import { AuditModule } from '@repo/api-platform/modules/audit/audit.module';
-import { AuthDataModule } from '../auth/auth-data.module';
 import { FilesModule } from '@repo/api-platform/modules/files/files.module';
+
+import { AccessControlModule } from '../access-control/access-control.module';
+import { AuthDataModule } from '../auth/auth-data.module';
 import { OrganizationsModule } from '../organizations/organizations.module';
 import { UsersService } from './application/users.service';
 import { UsersRepository } from './infrastructure/users.repository';

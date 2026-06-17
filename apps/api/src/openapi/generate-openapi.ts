@@ -1,7 +1,8 @@
-import { writeFile } from 'node:fs/promises';
-import { resolve } from 'node:path';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { writeFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
+
 import { AppModule } from '../app.module';
 
 const generate = async (): Promise<void> => {

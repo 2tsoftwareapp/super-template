@@ -1,5 +1,6 @@
 import js from '@eslint/js';
 import globals from 'globals';
+import perfectionistPlugin from 'eslint-plugin-perfectionist';
 import tseslint from 'typescript-eslint';
 import eslintConfigPrettier from 'eslint-config-prettier';
 
@@ -9,6 +10,9 @@ export const baseConfig = [
   ...tseslint.configs.stylisticTypeChecked,
   eslintConfigPrettier,
   {
+    plugins: {
+      perfectionist: perfectionistPlugin,
+    },
     languageOptions: {
       parserOptions: {
         projectService: true,
@@ -35,6 +39,10 @@ export const baseConfig = [
           varsIgnorePattern: '^_',
         },
       ],
+      'perfectionist/sort-exports': 'error',
+      'perfectionist/sort-imports': 'error',
+      'perfectionist/sort-named-exports': 'error',
+      'perfectionist/sort-named-imports': 'error',
     },
   },
 ];

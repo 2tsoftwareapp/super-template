@@ -1,19 +1,20 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { and, count, desc, eq } from 'drizzle-orm';
-import { DATABASE } from '@repo/api-database';
 import type {
   DatabaseClient,
   DatabaseExecutor,
 } from '@repo/api-database';
-import { activities } from '@repo/api-database';
 
-type ListActivitiesParams = {
+import { Inject, Injectable } from '@nestjs/common';
+import { DATABASE } from '@repo/api-database';
+import { activities } from '@repo/api-database';
+import { and, count, desc, eq } from 'drizzle-orm';
+
+interface ListActivitiesParams {
   page: number;
   limit: number;
   entityType?: string;
   entityId?: string;
   actorId?: string;
-};
+}
 
 @Injectable()
 export class ActivitiesRepository {

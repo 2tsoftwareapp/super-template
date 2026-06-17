@@ -1,3 +1,7 @@
+import type { AuthenticatedRequestUser } from '@repo/api-core';
+import type { Request } from 'express';
+import type { Observable } from 'rxjs';
+
 import {
   Body,
   Controller,
@@ -12,8 +16,6 @@ import {
   Sse,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import type { Request } from 'express';
-import type { Observable } from 'rxjs';
 import {
   ApiDataResponse,
   ApiPaginatedResponse,
@@ -23,8 +25,8 @@ import {
 import { CurrentUser } from '@repo/api-core';
 import { Permissions } from '@repo/api-core';
 import { SkipEnvelope } from '@repo/api-core';
-import type { AuthenticatedRequestUser } from '@repo/api-core';
 import { PERMISSION_NAMES } from '@repo/api-identity/modules/access-control/access-control.constants';
+
 import { NotificationsService } from '../application/notifications.service';
 import { NotificationStreamService } from '../infrastructure/notification-stream.service';
 import {

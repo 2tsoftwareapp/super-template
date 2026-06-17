@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
-import { AccessControlModule } from '../access-control/access-control.module';
 import { AuditModule } from '@repo/api-platform/modules/audit/audit.module';
 import { MailModule } from '@repo/api-platform/modules/mail/mail.module';
+
+import { AccessControlModule } from '../access-control/access-control.module';
 import { OrganizationsModule } from '../organizations/organizations.module';
 import { UsersModule } from '../users/users.module';
 import { AuthService } from './application/auth.service';

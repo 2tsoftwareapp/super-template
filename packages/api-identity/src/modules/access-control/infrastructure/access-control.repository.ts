@@ -1,16 +1,17 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { eq, inArray } from 'drizzle-orm';
-import { DATABASE } from '@repo/api-database';
 import type {
   DatabaseClient,
   DatabaseExecutor,
 } from '@repo/api-database';
+
+import { Inject, Injectable } from '@nestjs/common';
+import { DATABASE } from '@repo/api-database';
 import {
   permissions,
   rolePermissions,
   roles,
   userRoles,
 } from '@repo/api-database';
+import { eq, inArray } from 'drizzle-orm';
 
 @Injectable()
 export class AccessControlRepository {
@@ -57,7 +58,7 @@ export class AccessControlRepository {
   }
 
   async ensureRoles(
-    roleValues: Array<{ name: string; description: string }>,
+    roleValues: { name: string; description: string }[],
     executor: DatabaseExecutor = this.database,
   ) {
     await executor.insert(roles).values(roleValues).onConflictDoNothing();
@@ -68,7 +69,7 @@ export class AccessControlRepository {
   }
 
   async ensurePermissions(
-    permissionValues: Array<{ name: string; description: string }>,
+    permissionValues: { name: string; description: string }[],
     executor: DatabaseExecutor = this.database,
   ) {
     await executor

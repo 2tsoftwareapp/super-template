@@ -1,13 +1,15 @@
-import { randomUUID } from 'node:crypto';
-import { extname } from 'node:path';
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { ERROR_CODES } from '@repo/api-core';
-import { AppError } from '@repo/api-core';
 import type {
   AuthenticatedRequestUser,
   RequestContext,
 } from '@repo/api-core';
+
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { ERROR_CODES } from '@repo/api-core';
+import { AppError } from '@repo/api-core';
 import { requireOrganizationId } from '@repo/api-core';
+import { randomUUID } from 'node:crypto';
+import { extname } from 'node:path';
+
 import { AuditService } from '../../audit/application/audit.service';
 import {
   OBJECT_STORAGE,
@@ -17,12 +19,12 @@ import { FilesRepository } from '../infrastructure/files.repository';
 
 const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
 
-type UploadedFile = {
+interface UploadedFile {
   buffer: Buffer;
   mimetype: string;
   originalname: string;
   size: number;
-};
+}
 
 @Injectable()
 export class FilesService {

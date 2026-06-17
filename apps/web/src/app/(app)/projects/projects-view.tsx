@@ -1,9 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
+import Link from "next/link";
 import { useQueryStates } from "nuqs";
+
+import type { ApiEnvelope, ProjectsListResponse } from "@/lib/api-types";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,7 +33,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
-import type { ApiEnvelope, ProjectsListResponse } from "@/lib/api-types";
 import { webFetch } from "@/lib/http";
 import {
   buildProjectCreatePath,
@@ -38,8 +40,8 @@ import {
   buildProjectReturnTo,
   buildProjectsListPath,
   projectSortFieldOptions,
-  projectStatusOptions,
   projectsSearchParams,
+  projectStatusOptions,
   sortOrderOptions,
 } from "@/lib/search-params";
 

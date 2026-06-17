@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
-import { clearAuthCookies, readAuthCookies } from "@/lib/auth/cookies";
+
 import type { ApiEnvelope } from "@/lib/api-types";
+
+import { clearAuthCookies, readAuthCookies } from "@/lib/auth/cookies";
 import { callBackend } from "@/lib/server/backend";
 
 export async function POST() {

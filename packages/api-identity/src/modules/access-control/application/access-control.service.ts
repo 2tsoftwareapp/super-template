@@ -1,8 +1,10 @@
+import type { AuthenticatedRequestUser } from '@repo/api-core';
+import type { DatabaseExecutor } from '@repo/api-database';
+
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { ERROR_CODES } from '@repo/api-core';
 import { AppError } from '@repo/api-core';
-import type { AuthenticatedRequestUser } from '@repo/api-core';
-import type { DatabaseExecutor } from '@repo/api-database';
+
 import {
   ADMIN_PERMISSIONS,
   ALL_PERMISSIONS as ALL_PERMISSION_NAMES,

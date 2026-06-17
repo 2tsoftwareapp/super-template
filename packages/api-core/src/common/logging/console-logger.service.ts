@@ -1,9 +1,18 @@
 import { Injectable, Logger } from '@nestjs/common';
-import type { AppLogger, LogContext } from './logger.interface';
+
+import { HttpLogTransportService } from './http-log-transport.service';
+import {
+  type AppLogger,
+  type LogContext,
+  type LogEntry,
+  type LogLevel,
+} from './logger.interface';
 
 @Injectable()
 export class ConsoleAppLogger implements AppLogger {
   private readonly logger = new Logger('App');
+
+  constructor(private readonly httpLogTransport: HttpLogTransportService) {}
 
   info(message: string, context?: LogContext): void {
     this.write('info', message, context);
@@ -18,29 +27,30 @@ export class ConsoleAppLogger implements AppLogger {
   }
 
   private write(
-    level: 'info' | 'warn' | 'error',
+    level: LogLevel,
     message: string,
     context?: LogContext,
   ): void {
-    const payload = {
+    const payload: LogEntry = {
       timestamp: new Date().toISOString(),
       level,
       message,
-      ...context,
+      ...(context ? { context } : {}),
     };
 
-    const serialized = JSON.stringify(payload);
+    const serialized = JSON.stringify({
+      ...payload,
+      ...(context ?? {}),
+    });
 
     if (level === 'error') {
       this.logger.error(serialized);
-      return;
-    }
-
-    if (level === 'warn') {
+    } else if (level === 'warn') {
       this.logger.warn(serialized);
-      return;
+    } else {
+      this.logger.log(serialized);
     }
 
-    this.logger.log(serialized);
+    void this.httpLogTransport.send(payload);
   }
 }

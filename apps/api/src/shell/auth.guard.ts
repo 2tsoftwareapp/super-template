@@ -1,3 +1,5 @@
+import type { Request as ExpressRequest } from 'express';
+
 import {
   type CanActivate,
   type ExecutionContext,
@@ -7,7 +9,6 @@ import {
 import { Reflector } from '@nestjs/core';
 import { AppError, ERROR_CODES, IS_PUBLIC_KEY } from '@repo/api-core';
 import { AuthService } from '@repo/api-identity/modules/auth/application/auth.service';
-import type { Request as ExpressRequest } from 'express';
 
 @Injectable()
 export class AuthGuard implements CanActivate {

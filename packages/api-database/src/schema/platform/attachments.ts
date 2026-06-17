@@ -1,7 +1,8 @@
 import { index, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
-import { timestamps } from '../shared/timestamps';
+
 import { organizations } from '../identity/organizations';
 import { users } from '../identity/users';
+import { timestamps } from '../shared/timestamps';
 import { files } from './files';
 
 export const attachments = pgTable(

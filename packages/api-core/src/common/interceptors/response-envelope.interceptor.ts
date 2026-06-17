@@ -6,12 +6,13 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { map, type Observable } from 'rxjs';
+
 import { SKIP_ENVELOPE_KEY } from '../decorators/skip-envelope.decorator';
 
-type Envelope<T> = {
+interface Envelope<T> {
   data: T;
   meta?: Record<string, unknown>;
-};
+}
 
 @Injectable()
 export class ResponseEnvelopeInterceptor<T>

@@ -1,17 +1,19 @@
 "use client";
 
-import Link from "next/link";
 import { standardSchemaResolver as zodResolver } from "@hookform/resolvers/standard-schema";
 import { useMutation } from "@tanstack/react-query";
+import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+
+import type { ForgotPasswordInput } from "@/lib/api-types";
+
 import { AuthShell } from "@/components/auth/auth-shell";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import type { ForgotPasswordInput } from "@/lib/api-types";
+import { Label } from "@/components/ui/label";
 import { webFetch } from "@/lib/http";
 
 const schema = z.object({

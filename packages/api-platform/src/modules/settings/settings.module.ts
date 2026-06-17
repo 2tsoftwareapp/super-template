@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+
 import { AuditModule } from '../audit/audit.module';
 import { SettingsService } from './application/settings.service';
 import { SettingsRepository } from './infrastructure/settings.repository';

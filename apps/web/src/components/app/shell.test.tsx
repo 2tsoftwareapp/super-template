@@ -1,8 +1,10 @@
 import type { AnchorHTMLAttributes } from "react";
+
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
-import { AppShell } from "@/components/app/shell";
 import { describe, expect, it, vi } from "vitest";
+
+import { AppShell } from "@/components/app/shell";
 
 const replaceMock = vi.fn();
 const sessionState = {

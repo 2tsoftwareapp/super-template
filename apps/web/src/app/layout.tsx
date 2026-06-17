@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
+
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+
 import { Providers } from "@/components/providers";
+
 import "./globals.css";
 
 export const metadata: Metadata = {

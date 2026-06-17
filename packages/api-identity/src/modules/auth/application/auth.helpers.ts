@@ -1,5 +1,5 @@
-import { createHash, randomBytes } from 'node:crypto';
 import * as argon2 from 'argon2';
+import { createHash, randomBytes } from 'node:crypto';
 
 export const hashPassword = (value: string): Promise<string> =>
   argon2.hash(value, {

@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
+import { PaginationQueryDto } from '@repo/api-core';
 import {
   ArrayNotEmpty,
   IsArray,
@@ -10,7 +11,6 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { PaginationQueryDto } from '@repo/api-core';
 
 export class UserDto {
   @ApiProperty()

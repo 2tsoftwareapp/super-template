@@ -1,15 +1,17 @@
+import { standardSchemaResolver as zodResolver } from "@hookform/resolvers/standard-schema";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { z } from "zod";
-import { standardSchemaResolver as zodResolver } from "@hookform/resolvers/standard-schema";
+
+import type { ProjectDto, UpdateProjectInput } from "../lib/types";
+
+import { PageHeader } from "../components/page-header";
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
-import { PageHeader } from "../components/page-header";
 import { webFetch } from "../lib/http";
-import type { ProjectDto, UpdateProjectInput } from "../lib/types";
 
 const schema = z.object({
   name: z.string().min(2),

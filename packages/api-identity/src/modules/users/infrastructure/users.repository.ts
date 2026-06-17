@@ -1,15 +1,16 @@
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { and, asc, count, desc, eq, inArray, isNull, sql } from 'drizzle-orm';
-import { ERROR_CODES } from '@repo/api-core';
-import { AppError } from '@repo/api-core';
-import { DATABASE } from '@repo/api-database';
 import type {
   DatabaseClient,
   DatabaseExecutor,
 } from '@repo/api-database';
-import { roles, userRoles, users } from '@repo/api-database';
 
-type ListUsersParams = {
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { ERROR_CODES } from '@repo/api-core';
+import { AppError } from '@repo/api-core';
+import { DATABASE } from '@repo/api-database';
+import { roles, userRoles, users } from '@repo/api-database';
+import { and, asc, count, desc, eq, inArray, isNull, sql } from 'drizzle-orm';
+
+interface ListUsersParams {
   page: number;
   limit: number;
   search?: string;
@@ -17,7 +18,7 @@ type ListUsersParams = {
   role?: string;
   sortField: 'createdAt' | 'displayName' | 'email' | 'status';
   sortOrder: 'asc' | 'desc';
-};
+}
 
 const USER_SORT_FIELDS = {
   createdAt: users.createdAt,

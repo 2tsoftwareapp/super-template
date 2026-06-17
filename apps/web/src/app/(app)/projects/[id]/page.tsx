@@ -1,11 +1,14 @@
 "use client";
 
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useQueryState } from "nuqs";
 import { useState } from "react";
 import { toast } from "sonner";
+
+import type { ApiEnvelope, ProjectResponse } from "@/lib/api-types";
+
 import { FileUpload } from "@/components/app/file-upload";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -20,7 +23,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import type { ApiEnvelope, ProjectResponse } from "@/lib/api-types";
 import { webFetch } from "@/lib/http";
 import {
   buildProjectEditPath,

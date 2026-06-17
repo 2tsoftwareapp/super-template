@@ -1,13 +1,14 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { and, asc, count, desc, eq, ilike, isNull, or } from 'drizzle-orm';
-import { DATABASE } from '@repo/api-database';
 import type {
   DatabaseClient,
   DatabaseExecutor,
 } from '@repo/api-database';
-import { projects } from '@repo/api-database';
 
-type ListProjectsParams = {
+import { Inject, Injectable } from '@nestjs/common';
+import { DATABASE } from '@repo/api-database';
+import { projects } from '@repo/api-database';
+import { and, asc, count, desc, eq, ilike, isNull, or } from 'drizzle-orm';
+
+interface ListProjectsParams {
   page: number;
   limit: number;
   search?: string;
@@ -17,7 +18,7 @@ type ListProjectsParams = {
   ownerId?: string;
   organizationId?: string;
   includeDeleted?: boolean;
-};
+}
 
 const PROJECT_SORT_FIELDS = {
   createdAt: projects.createdAt,

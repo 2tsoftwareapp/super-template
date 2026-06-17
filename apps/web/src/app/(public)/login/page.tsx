@@ -1,18 +1,20 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { standardSchemaResolver as zodResolver } from "@hookform/resolvers/standard-schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+
+import type { AuthLoginResponse, LoginInput } from "@/lib/api-types";
+
 import { AuthShell } from "@/components/auth/auth-shell";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import type { AuthLoginResponse, LoginInput } from "@/lib/api-types";
+import { Label } from "@/components/ui/label";
 import { webFetch } from "@/lib/http";
 import { getPostLoginPath } from "@/lib/navigation";
 

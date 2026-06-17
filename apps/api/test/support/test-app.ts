@@ -1,13 +1,16 @@
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import type { Server } from 'node:http';
+
 import { type INestApplication, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { seedDatabase } from '@repo/api-bootstrap';
 import { config as loadEnv } from 'dotenv';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { Pool } from 'pg';
 import request from 'supertest';
+
 import { AppModule } from '../../src/app.module';
 
 loadEnv({ path: resolve(process.cwd(), '.env'), quiet: true });
@@ -155,31 +158,46 @@ export const createTestApp = async (): Promise<INestApplication> => {
   return app;
 };
 
-export type LoginResult = {
+export interface LoginResult {
   accessToken: string;
   refreshToken: string;
   sessionId: string;
   userId: string;
-};
+}
+
+interface LoginResponseBody {
+  data: {
+    accessToken: string;
+    refreshToken: string;
+    session: {
+      id: string;
+    };
+    user: {
+      id: string;
+    };
+  };
+}
 
 export const loginAs = async (
   app: INestApplication,
   email: string,
   password: string,
 ): Promise<LoginResult> => {
-  const response = await request(app.getHttpServer())
+  const httpServer = app.getHttpServer() as Server;
+  const response = await request(httpServer)
     .post('/api/v1/auth/login')
     .send({
       email,
       password,
     })
     .expect(201);
+  const body = response.body as LoginResponseBody;
 
   return {
-    accessToken: response.body.data.accessToken,
-    refreshToken: response.body.data.refreshToken,
-    sessionId: response.body.data.session.id,
-    userId: response.body.data.user.id,
+    accessToken: body.data.accessToken,
+    refreshToken: body.data.refreshToken,
+    sessionId: body.data.session.id,
+    userId: body.data.user.id,
   };
 };
 

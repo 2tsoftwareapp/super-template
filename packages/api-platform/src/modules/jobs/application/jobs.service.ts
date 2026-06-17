@@ -1,13 +1,15 @@
+import type { AuthenticatedRequestUser } from '@repo/api-core';
+
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { ERROR_CODES } from '@repo/api-core';
 import { AppError } from '@repo/api-core';
-import type { AuthenticatedRequestUser } from '@repo/api-core';
 import { AuthRepository } from '@repo/api-identity/modules/auth/infrastructure/auth.repository';
-import { MailService } from '../../mail/application/mail.service';
 import { NotificationsService } from '@repo/api-workspace/modules/notifications/application/notifications.service';
+
+import { MailService } from '../../mail/application/mail.service';
 import { JobsRepository } from '../infrastructure/jobs.repository';
 
-export type JobHandler = {
+export interface JobHandler {
   type: string;
   handle: (job: {
     jobId: string;
@@ -15,7 +17,7 @@ export type JobHandler = {
     organizationId: string | null;
     createdById: string | null;
   }) => Promise<void>;
-};
+}
 
 @Injectable()
 export class JobsService {
@@ -28,8 +30,9 @@ export class JobsService {
     private readonly notificationsService: NotificationsService,
   ) {
     this.registerHandler('mail.send', async ({ payload }) => {
-      const templateKey = String(payload.templateKey ?? '');
-      const to = String(payload.to ?? '');
+      const templateKey =
+        typeof payload.templateKey === 'string' ? payload.templateKey : '';
+      const to = typeof payload.to === 'string' ? payload.to : '';
       const variables =
         (payload.variables as Record<string, string> | undefined) ?? {};
 
@@ -55,10 +58,10 @@ export class JobsService {
     });
 
     this.registerHandler('notification.send', async ({ payload, organizationId }) => {
-      const userId = String(payload.userId ?? '');
-      const type = String(payload.type ?? '');
-      const title = String(payload.title ?? '');
-      const body = String(payload.body ?? '');
+      const userId = typeof payload.userId === 'string' ? payload.userId : '';
+      const type = typeof payload.type === 'string' ? payload.type : '';
+      const title = typeof payload.title === 'string' ? payload.title : '';
+      const body = typeof payload.body === 'string' ? payload.body : '';
 
       if (!userId || !type || !title || !body) {
         throw new Error(

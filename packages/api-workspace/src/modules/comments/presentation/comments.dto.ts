@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { PaginationQueryDto } from '@repo/api-core';
 import {
   IsOptional,
   IsString,
@@ -6,7 +7,6 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { PaginationQueryDto } from '@repo/api-core';
 
 export class CommentDto {
   @ApiProperty()

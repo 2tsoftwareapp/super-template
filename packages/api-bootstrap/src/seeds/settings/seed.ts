@@ -1,5 +1,6 @@
+import type { SettingsService } from '@repo/api-platform/modules/settings/application/settings.service';
+
 import { type DatabaseExecutor } from '@repo/api-database';
-import { SettingsService } from '@repo/api-platform/modules/settings/application/settings.service';
 
 export async function seedSettings(
   settingsService: SettingsService,

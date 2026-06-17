@@ -3,14 +3,17 @@
 import { useQuery } from "@tanstack/react-query";
 import { Bell } from "lucide-react";
 import { useQueryStates } from "nuqs";
+
+import type { NotificationsListResponse } from "@/lib/api-types";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
-  CardDescription,
 } from "@/components/ui/card";
 import {
   Empty,
@@ -30,12 +33,11 @@ import {
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { useNotificationStream } from "@/hooks/use-notification-stream";
-import type { NotificationsListResponse } from "@/lib/api-types";
 import { webFetch } from "@/lib/http";
 import {
   buildNotificationsListPath,
-  notificationUnreadOptions,
   notificationsSearchParams,
+  notificationUnreadOptions,
 } from "@/lib/search-params";
 
 export function NotificationsView() {

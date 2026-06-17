@@ -1,7 +1,9 @@
 import { HttpStatus } from '@nestjs/common';
+
+import type { AuthenticatedRequestUser } from '../types/request-context';
+
 import { ERROR_CODES } from '../constants/error-codes';
 import { AppError } from '../errors/app-error';
-import type { AuthenticatedRequestUser } from '../types/request-context';
 
 export const requireOrganizationId = (
   user: Pick<AuthenticatedRequestUser, 'organizationId'>,

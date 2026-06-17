@@ -1,14 +1,16 @@
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { ERROR_CODES } from '@repo/api-core';
-import { AppError } from '@repo/api-core';
 import type {
   AuthenticatedRequestUser,
   RequestContext,
 } from '@repo/api-core';
 import type { DatabaseExecutor } from '@repo/api-database';
+
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { ERROR_CODES } from '@repo/api-core';
+import { AppError } from '@repo/api-core';
 import { requireOrganizationId } from '@repo/api-core';
-import { AuditService } from '@repo/api-platform/modules/audit/application/audit.service';
 import { UsersRepository } from '@repo/api-identity/modules/users/infrastructure/users.repository';
+import { AuditService } from '@repo/api-platform/modules/audit/application/audit.service';
+
 import {
   PUSH_NOTIFIER,
   type PushNotifier,
@@ -17,15 +19,16 @@ import { DeviceTokensRepository } from '../infrastructure/device-tokens.reposito
 import { NotificationJobsRepository } from '../infrastructure/notification-jobs.repository';
 import { NotificationStreamService } from '../infrastructure/notification-stream.service';
 import { NotificationsRepository } from '../infrastructure/notifications.repository';
-import type {
-  NotificationJobsQueryDto,
-  NotificationsQueryDto,
-  RegisterDeviceDto,
-  SendNotificationDto,
-  SendNotificationRequestDto,
+import {
+  NotificationAudienceDto,
+  type NotificationJobsQueryDto,
+  type NotificationsQueryDto,
+  type RegisterDeviceDto,
+  type SendNotificationDto,
+  type SendNotificationRequestDto,
 } from '../presentation/notifications.dto';
 
-export type NotificationDto = {
+export interface NotificationDto {
   id: string;
   userId: string;
   type: string;
@@ -34,9 +37,9 @@ export type NotificationDto = {
   data: Record<string, unknown> | null;
   readAt: string | null;
   createdAt: string;
-};
+}
 
-export type NotificationJobDto = {
+export interface NotificationJobDto {
   id: string;
   actorId: string | null;
   audience: 'USER' | 'USERS' | 'ALL';
@@ -53,7 +56,7 @@ export type NotificationJobDto = {
   errorMessage: string | null;
   createdAt: string;
   updatedAt: string;
-};
+}
 
 const DUE_JOB_BATCH_SIZE = 20;
 const RECIPIENT_BATCH_SIZE = 100;
@@ -153,8 +156,14 @@ export class NotificationsService {
       organizationId: requireOrganizationId(actor),
       actorId: actor.userId,
       audience: input.audience,
-      targetUserId: input.audience === 'USER' ? (input.userId ?? null) : null,
-      userIds: input.audience === 'USERS' ? (input.userIds ?? null) : null,
+      targetUserId:
+        input.audience === NotificationAudienceDto.USER
+          ? (input.userId ?? null)
+          : null,
+      userIds:
+        input.audience === NotificationAudienceDto.USERS
+          ? (input.userIds ?? null)
+          : null,
       type: input.type,
       title: input.title,
       body: input.body,
@@ -392,7 +401,7 @@ export class NotificationsService {
     const notification =
       await this.notificationsRepository.findById(notificationId);
 
-    if (!notification || notification.userId !== user.userId) {
+    if (notification?.userId !== user.userId) {
       throw new AppError(
         ERROR_CODES.NOTIFICATION_NOT_FOUND,
         'Notification not found',
@@ -412,7 +421,7 @@ export class NotificationsService {
     const notification =
       await this.notificationsRepository.findById(notificationId);
 
-    if (!notification || notification.userId !== user.userId) {
+    if (notification?.userId !== user.userId) {
       throw new AppError(
         ERROR_CODES.NOTIFICATION_NOT_FOUND,
         'Notification not found',
@@ -424,7 +433,7 @@ export class NotificationsService {
   }
 
   private assertAudiencePayload(input: SendNotificationRequestDto) {
-    if (input.audience === 'USER' && !input.userId) {
+    if (input.audience === NotificationAudienceDto.USER && !input.userId) {
       throw new AppError(
         ERROR_CODES.NOTIFICATION_INVALID_AUDIENCE,
         'userId is required when audience is USER',
@@ -433,7 +442,7 @@ export class NotificationsService {
     }
 
     if (
-      input.audience === 'USERS' &&
+      input.audience === NotificationAudienceDto.USERS &&
       (!input.userIds || input.userIds.length === 0)
     ) {
       throw new AppError(
@@ -451,16 +460,18 @@ export class NotificationsService {
       ? Exclude<T, null>
       : never,
   ) {
-    if (job.audience === 'USER') {
+    const audience = job.audience as NotificationAudienceDto;
+
+    if (audience === NotificationAudienceDto.USER) {
       if (!job.targetUserId) {
         return [];
       }
 
       const user = await this.usersRepository.findById(job.targetUserId);
-      return user && user.status === 'ACTIVE' ? [user.id] : [];
+      return user?.status === 'ACTIVE' ? [user.id] : [];
     }
 
-    if (job.audience === 'USERS') {
+    if (audience === NotificationAudienceDto.USERS) {
       return this.usersRepository.filterExistingUserIds(job.userIds ?? []);
     }
 

@@ -1,12 +1,15 @@
 import type { NextRequest } from "next/server";
+
 import { NextResponse } from "next/server";
+
+import type { ApiEnvelope } from "@/lib/api-types";
+
 import {
   clearAuthCookies,
   readAuthCookies,
   setAuthCookies,
 } from "@/lib/auth/cookies";
 import { env } from "@/lib/env";
-import type { ApiEnvelope } from "@/lib/api-types";
 import { normalizeBffListPath } from "@/lib/search-params";
 
 const backendUrl = (path: string) =>

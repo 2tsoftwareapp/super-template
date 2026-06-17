@@ -1,5 +1,6 @@
 import type {
   inferParserType} from "nuqs/server";
+
 import {
   createLoader,
   createSerializer,

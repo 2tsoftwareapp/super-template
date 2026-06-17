@@ -1,12 +1,14 @@
+import type { AuthenticatedRequestUser } from '@repo/api-core';
+import type { Request } from 'express';
+
 import { Body, Controller, Get, Patch, Req } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import type { Request } from 'express';
 import {
   ApiDataResponse,
   SuccessFlagDto,
 } from '@repo/api-core';
 import { CurrentUser } from '@repo/api-core';
-import type { AuthenticatedRequestUser } from '@repo/api-core';
+
 import { UsersService } from '../application/users.service';
 import { ChangePasswordDto, UpdateProfileDto, UserDto } from './users.dto';
 

@@ -7,6 +7,7 @@ import {
   uuid,
   varchar,
 } from 'drizzle-orm/pg-core';
+
 import { timestamps } from '../shared/timestamps';
 import { users } from './users';
 

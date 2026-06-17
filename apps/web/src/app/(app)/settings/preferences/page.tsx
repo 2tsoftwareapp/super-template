@@ -5,6 +5,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+
+import type { ApiEnvelope } from "@/lib/api-types";
+
 import { SettingsNav } from "@/components/app/settings-nav";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -25,7 +28,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import type { ApiEnvelope } from "@/lib/api-types";
 import { webFetch } from "@/lib/http";
 
 interface Preferences {

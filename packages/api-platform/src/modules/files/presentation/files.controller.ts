@@ -1,3 +1,6 @@
+import type { AuthenticatedRequestUser } from '@repo/api-core';
+import type { Request } from 'express';
+
 import {
   Controller,
   Delete,
@@ -10,15 +13,14 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
-import type { Request } from 'express';
 import {
   ApiDataResponse,
   SuccessFlagDto,
 } from '@repo/api-core';
 import { CurrentUser } from '@repo/api-core';
 import { Permissions } from '@repo/api-core';
-import type { AuthenticatedRequestUser } from '@repo/api-core';
 import { PERMISSION_NAMES } from '@repo/api-identity/modules/access-control/access-control.constants';
+
 import { FilesService } from '../application/files.service';
 import { FileDto, FileUrlDto } from './files.dto';
 

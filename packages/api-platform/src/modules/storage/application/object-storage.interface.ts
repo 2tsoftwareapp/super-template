@@ -1,12 +1,12 @@
-export type UploadInput = {
+export interface UploadInput {
   key: string;
   body: Buffer;
   mimeType: string;
-};
+}
 
-export type UploadResult = {
+export interface UploadResult {
   key: string;
-};
+}
 
 export const OBJECT_STORAGE = Symbol('OBJECT_STORAGE');
 

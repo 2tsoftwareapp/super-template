@@ -1,20 +1,29 @@
+import type { Request, Response } from 'express';
+
 import {
   type ArgumentsHost,
   Catch,
   type ExceptionFilter,
   HttpException,
   HttpStatus,
+  Inject,
   Injectable,
 } from '@nestjs/common';
-import type { Request, Response } from 'express';
+
 import { EnvironmentService } from '../../config/environment.service';
 import { ERROR_CODES, type ErrorCode } from '../constants/error-codes';
 import { AppError } from '../errors/app-error';
+import { APP_LOGGER, type AppLogger } from '../logging/logger.interface';
+import { ErrorReporterService } from '../observability/error-reporter.service';
 
 @Injectable()
 @Catch()
 export class AppExceptionFilter implements ExceptionFilter {
-  constructor(private readonly environmentService: EnvironmentService) {}
+  constructor(
+    private readonly environmentService: EnvironmentService,
+    @Inject(APP_LOGGER) private readonly logger: AppLogger,
+    private readonly errorReporter: ErrorReporterService,
+  ) {}
 
   catch(exception: unknown, host: ArgumentsHost): void {
     const context = host.switchToHttp();
@@ -43,7 +52,9 @@ export class AppExceptionFilter implements ExceptionFilter {
         const rawMessage = body.message;
         message = Array.isArray(rawMessage)
           ? 'Validation failed'
-          : String(rawMessage ?? exception.message);
+          : typeof rawMessage === 'string'
+            ? rawMessage
+            : exception.message;
         details = Array.isArray(rawMessage) ? rawMessage : body;
         if (statusCode === HttpStatus.BAD_REQUEST) {
           code = ERROR_CODES.VALIDATION_FAILED;
@@ -54,24 +65,31 @@ export class AppExceptionFilter implements ExceptionFilter {
     // Persist the resolved code for downstream logging/middleware that runs after the exception handler.
     response.locals.errorCode = code;
 
-    console[statusCode >= 500 ? 'error' : 'warn'](
-      JSON.stringify({
-        timestamp: new Date().toISOString(),
-        level: statusCode >= 500 ? 'error' : 'warn',
-        requestId: request.requestId,
-        method: request.method,
-        path: request.originalUrl,
-        statusCode,
-        userId: request.user?.userId ?? null,
-        errorCode: code,
-        message,
-        details,
-        stack:
-          !this.environmentService.isProduction && exception instanceof Error
-            ? exception.stack
-            : undefined,
-      }),
-    );
+    const logContext = {
+      requestId: request.requestId,
+      method: request.method,
+      path: request.originalUrl,
+      statusCode,
+      userId: request.user?.userId ?? null,
+      errorCode: code,
+      details,
+      ...( !this.environmentService.isProduction &&
+      exception instanceof Error &&
+      exception.stack
+        ? { stack: exception.stack }
+        : {}),
+    };
+
+    if (statusCode >= HttpStatus.INTERNAL_SERVER_ERROR) {
+      this.logger.error('Unhandled request exception', logContext);
+      if (exception instanceof Error) {
+        this.errorReporter.reportException(exception, logContext);
+      } else {
+        this.errorReporter.reportMessage('Unhandled non-error exception', logContext);
+      }
+    } else {
+      this.logger.warn('Handled request exception', logContext);
+    }
 
     response.status(statusCode).json({
       error: {

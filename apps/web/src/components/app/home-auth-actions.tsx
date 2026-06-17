@@ -1,14 +1,16 @@
 "use client";
 
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
+import { ArrowRight, LogOut } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ArrowRight, LogOut } from "lucide-react";
-import { buttonVariants } from "@/components/ui/button";
+
 import type { AuthSessionResponse } from "@/lib/api-types";
+
+import { buttonVariants } from "@/components/ui/button";
 import { ApiClientError, webFetch } from "@/lib/http";
 import { cn } from "@/lib/utils";
-import { useQuery } from "@tanstack/react-query";
 
 export function HomeAuthActions() {
   const router = useRouter();

@@ -1,9 +1,9 @@
-import { getCsrfTokenFromDocument } from "./utils";
 import {
   clearStoredAuthTokens,
   getStoredAuthTokens,
   setStoredAuthTokens,
 } from "./auth";
+import { getCsrfTokenFromDocument } from "./utils";
 
 interface AuthEnvelope<T> {
   data: T;

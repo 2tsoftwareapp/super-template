@@ -3,6 +3,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { toast } from "sonner";
+
 import type { NotificationDto } from "@/lib/api-types";
 
 const parseNotificationEvent = (payload: string): NotificationDto | null => {

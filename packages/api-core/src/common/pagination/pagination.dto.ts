@@ -19,8 +19,8 @@ export class PaginationQueryDto {
   limit = 20;
 
   @ApiPropertyOptional({ default: 'desc', enum: ['asc', 'desc'] })
-  @Transform(({ value }) =>
-    typeof value === 'string' ? value.toLowerCase() : value,
+  @Transform(({ value }): string =>
+    typeof value === 'string' ? value.toLowerCase() : String(value),
   )
   @IsIn(['asc', 'desc'])
   @IsOptional()

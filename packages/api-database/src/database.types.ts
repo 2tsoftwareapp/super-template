@@ -1,5 +1,7 @@
-import { drizzle } from 'drizzle-orm/node-postgres';
 import type { Pool } from 'pg';
+
+import { drizzle } from 'drizzle-orm/node-postgres';
+
 import { schema } from './schema';
 
 export const createDatabaseClient = (pool: Pool) =>

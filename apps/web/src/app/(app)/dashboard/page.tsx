@@ -1,8 +1,14 @@
 "use client";
 
-import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-import { Bell, FolderKanban, Plus, ShieldCheck, Settings, Workflow } from "lucide-react";
+import { Bell, FolderKanban, Plus, Settings, ShieldCheck, Workflow } from "lucide-react";
+import Link from "next/link";
+
+import type {
+  NotificationsUnreadResponse,
+  ProjectsListResponse,
+} from "@/lib/api-types";
+
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import {
@@ -20,10 +26,6 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import { useSession } from "@/hooks/use-session";
-import type {
-  NotificationsUnreadResponse,
-  ProjectsListResponse,
-} from "@/lib/api-types";
 import { webFetch } from "@/lib/http";
 import {
   buildProjectsListPath,

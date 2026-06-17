@@ -1,3 +1,6 @@
+import type { AuthenticatedRequestUser } from '@repo/api-core';
+import type { Request } from 'express';
+
 import {
   Body,
   Controller,
@@ -10,7 +13,6 @@ import {
   Req,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import type { Request } from 'express';
 import {
   ApiDataResponse,
   ApiPaginatedResponse,
@@ -18,8 +20,8 @@ import {
 } from '@repo/api-core';
 import { CurrentUser } from '@repo/api-core';
 import { Permissions } from '@repo/api-core';
-import type { AuthenticatedRequestUser } from '@repo/api-core';
 import { PERMISSION_NAMES } from '@repo/api-identity/modules/access-control/access-control.constants';
+
 import { CommentsService } from '../application/comments.service';
 import {
   CommentDto,

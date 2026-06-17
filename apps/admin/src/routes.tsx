@@ -1,14 +1,15 @@
 import { Navigate, Route, Routes } from "react-router-dom";
+
 import { AdminShell } from "./components/admin-shell";
 import { AuditLogsPage } from "./pages/audit-logs";
 import { DashboardPage } from "./pages/dashboard";
 import { ImportsPage } from "./pages/imports";
 import { JobsPage } from "./pages/jobs";
+import { LoginPage } from "./pages/login";
 import { MailPage } from "./pages/mail";
 import { NotificationsPage } from "./pages/notifications";
 import { ProjectDetailPage } from "./pages/project-detail";
 import { ProjectEditPage } from "./pages/project-edit";
-import { LoginPage } from "./pages/login";
 import { ProjectsPage } from "./pages/projects";
 import { RolesPage } from "./pages/roles";
 import { SettingsPage } from "./pages/settings";

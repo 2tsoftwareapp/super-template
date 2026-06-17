@@ -7,7 +7,7 @@ const DURATION_MULTIPLIER: Record<string, number> = {
 };
 
 export const durationToMilliseconds = (value: string): number => {
-  const match = value.trim().match(/^(\d+)([smhdw])$/);
+  const match = /^(\d+)([smhdw])$/.exec(value.trim());
 
   if (!match) {
     throw new Error(`Unsupported duration value: ${value}`);

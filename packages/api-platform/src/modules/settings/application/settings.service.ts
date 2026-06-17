@@ -1,14 +1,17 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
-import { ERROR_CODES } from '@repo/api-core';
-import { AppError } from '@repo/api-core';
 import type {
   AuthenticatedRequestUser,
   RequestContext,
 } from '@repo/api-core';
 import type { DatabaseExecutor } from '@repo/api-database';
+
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { ERROR_CODES } from '@repo/api-core';
+import { AppError } from '@repo/api-core';
+
+import type { UpdateSettingDto } from '../presentation/settings.dto';
+
 import { AuditService } from '../../audit/application/audit.service';
 import { SettingsRepository } from '../infrastructure/settings.repository';
-import type { UpdateSettingDto } from '../presentation/settings.dto';
 
 @Injectable()
 export class SettingsService {

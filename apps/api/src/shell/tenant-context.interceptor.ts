@@ -39,7 +39,7 @@ export class TenantContextInterceptor implements NestInterceptor {
     return new Observable((subscriber) => {
       this.tenantContextService.run(
         {
-          tenantId: user.organizationId as string,
+          tenantId: user.organizationId!,
           userId: user.userId,
           bypassRls,
         },

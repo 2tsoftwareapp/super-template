@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEnum, IsOptional, IsString } from 'class-validator';
 import { PaginationQueryDto } from '@repo/api-core';
+import { IsEnum, IsOptional, IsString } from 'class-validator';
 
 export class MailDeliveryDto {
   @ApiProperty()

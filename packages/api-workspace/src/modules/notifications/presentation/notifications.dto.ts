@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { PaginationQueryDto } from '@repo/api-core';
 import {
   ArrayMinSize,
   IsArray,
@@ -11,7 +12,15 @@ import {
   IsUUID,
   ValidateIf,
 } from 'class-validator';
-import { PaginationQueryDto } from '@repo/api-core';
+
+export const NOTIFICATION_AUDIENCE_VALUES = ['USER', 'USERS', 'ALL'] as const;
+export const NOTIFICATION_JOB_STATUS_VALUES = [
+  'PENDING',
+  'PROCESSING',
+  'COMPLETED',
+  'CANCELLED',
+  'FAILED',
+] as const;
 
 export class NotificationDto {
   @ApiProperty()
@@ -66,17 +75,23 @@ export enum NotificationJobStatusDto {
 }
 
 export class SendNotificationRequestDto {
-  @ApiProperty({ enum: NotificationAudienceDto })
+  @ApiProperty({ enum: NOTIFICATION_AUDIENCE_VALUES })
   @IsEnum(NotificationAudienceDto)
   audience: NotificationAudienceDto;
 
   @ApiPropertyOptional()
-  @ValidateIf((input) => input.audience === NotificationAudienceDto.USER)
+  @ValidateIf(
+    (input: SendNotificationRequestDto) =>
+      input.audience === NotificationAudienceDto.USER,
+  )
   @IsUUID()
   userId?: string;
 
   @ApiPropertyOptional({ type: [String] })
-  @ValidateIf((input) => input.audience === NotificationAudienceDto.USERS)
+  @ValidateIf(
+    (input: SendNotificationRequestDto) =>
+      input.audience === NotificationAudienceDto.USERS,
+  )
   @IsArray()
   @ArrayMinSize(1)
   @IsUUID('4', { each: true })
@@ -168,7 +183,7 @@ export class NotificationJobDto {
   @ApiProperty()
   scheduledAt: string;
 
-  @ApiProperty({ enum: NotificationJobStatusDto })
+  @ApiProperty({ enum: NOTIFICATION_JOB_STATUS_VALUES })
   status: NotificationJobStatusDto;
 
   @ApiPropertyOptional()

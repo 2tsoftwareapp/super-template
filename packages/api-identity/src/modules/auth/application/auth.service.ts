@@ -1,27 +1,25 @@
-import { randomUUID } from 'node:crypto';
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { ERROR_CODES } from '@repo/api-core';
-import { AppError } from '@repo/api-core';
 import type {
   AuthenticatedRequestUser,
   RequestContext,
 } from '@repo/api-core';
-import { durationToMilliseconds } from '@repo/api-core';
-import { normalizeEmail } from '@repo/api-core';
-import { EnvironmentService } from '@repo/api-core';
-import { DATABASE } from '@repo/api-database';
 import type {
   DatabaseClient,
   DatabaseExecutor,
 } from '@repo/api-database';
+
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { ERROR_CODES } from '@repo/api-core';
+import { AppError } from '@repo/api-core';
+import { durationToMilliseconds } from '@repo/api-core';
+import { normalizeEmail } from '@repo/api-core';
+import { EnvironmentService } from '@repo/api-core';
+import { DATABASE } from '@repo/api-database';
 import { runInTransaction } from '@repo/api-database';
-import { AccessControlService } from '../../access-control/application/access-control.service';
 import { AuditService } from '@repo/api-platform/modules/audit/application/audit.service';
 import { MailService } from '@repo/api-platform/modules/mail/application/mail.service';
-import { OrganizationsService } from '../../organizations/application/organizations.service';
-import { UsersRepository } from '../../users/infrastructure/users.repository';
-import { AuthRepository } from '../infrastructure/auth.repository';
+import { randomUUID } from 'node:crypto';
+
 import type {
   ForgotPasswordDto,
   LoginDto,
@@ -31,6 +29,11 @@ import type {
   ResetPasswordDto,
   VerifyEmailDto,
 } from '../presentation/auth.dto';
+
+import { AccessControlService } from '../../access-control/application/access-control.service';
+import { OrganizationsService } from '../../organizations/application/organizations.service';
+import { UsersRepository } from '../../users/infrastructure/users.repository';
+import { AuthRepository } from '../infrastructure/auth.repository';
 import {
   generateOpaqueToken,
   hashOpaqueToken,
@@ -40,13 +43,13 @@ import {
   verifyRefreshTokenHash,
 } from './auth.helpers';
 
-type TokenPayload = {
+interface TokenPayload {
   sub: string;
   sid: string;
   jti: string;
   typ: 'access' | 'refresh';
   oid?: string;
-};
+}
 
 @Injectable()
 export class AuthService {
@@ -587,7 +590,7 @@ export class AuthService {
     const email = normalizeEmail(input.email);
     const user = await this.usersRepository.findByEmail(email);
 
-    if (user && user.status === 'PENDING') {
+    if (user?.status === 'PENDING') {
       const token = await this.issueEmailVerificationToken(user.id);
       await this.sendVerificationEmail(user.email, token);
     }

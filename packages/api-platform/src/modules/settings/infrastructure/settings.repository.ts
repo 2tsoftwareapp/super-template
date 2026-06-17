@@ -1,11 +1,12 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { eq } from 'drizzle-orm';
-import { DATABASE } from '@repo/api-database';
 import type {
   DatabaseClient,
   DatabaseExecutor,
 } from '@repo/api-database';
+
+import { Inject, Injectable } from '@nestjs/common';
+import { DATABASE } from '@repo/api-database';
 import { applicationSettings } from '@repo/api-database';
+import { eq } from 'drizzle-orm';
 
 @Injectable()
 export class SettingsRepository {
@@ -60,7 +61,7 @@ export class SettingsRepository {
   }
 
   async ensureDefaults(
-    defaults: Array<{ key: string; value: Record<string, unknown> }>,
+    defaults: { key: string; value: Record<string, unknown> }[],
     executor: DatabaseExecutor = this.database,
   ) {
     for (const item of defaults) {

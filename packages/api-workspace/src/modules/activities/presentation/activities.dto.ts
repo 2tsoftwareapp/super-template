@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
 import { PaginationQueryDto } from '@repo/api-core';
+import { IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class ActivityDto {
   @ApiProperty()

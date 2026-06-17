@@ -1,18 +1,19 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { and, count, desc, eq, isNull } from 'drizzle-orm';
-import { DATABASE } from '@repo/api-database';
 import type {
   DatabaseClient,
   DatabaseExecutor,
 } from '@repo/api-database';
-import { comments } from '@repo/api-database';
 
-type ListCommentsParams = {
+import { Inject, Injectable } from '@nestjs/common';
+import { DATABASE } from '@repo/api-database';
+import { comments } from '@repo/api-database';
+import { and, count, desc, eq, isNull } from 'drizzle-orm';
+
+interface ListCommentsParams {
   page: number;
   limit: number;
   entityType: string;
   entityId: string;
-};
+}
 
 @Injectable()
 export class CommentsRepository {

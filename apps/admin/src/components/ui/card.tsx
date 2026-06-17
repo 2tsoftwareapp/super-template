@@ -1,4 +1,5 @@
 import * as React from "react";
+
 import { cn } from "@/lib/utils";
 
 function Card({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
@@ -33,4 +34,4 @@ function CardContent({ className, ...props }: React.HTMLAttributes<HTMLDivElemen
   return <div data-slot="card-content" className={cn("px-5 py-5", className)} {...props} />;
 }
 
-export { Card, CardHeader, CardTitle, CardDescription, CardContent };
+export { Card, CardContent, CardDescription, CardHeader, CardTitle };

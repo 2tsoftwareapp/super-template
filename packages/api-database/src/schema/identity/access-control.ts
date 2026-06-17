@@ -1,4 +1,5 @@
 import { index, pgTable, primaryKey, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+
 import { timestamps } from '../shared/timestamps';
 import { users } from './users';
 

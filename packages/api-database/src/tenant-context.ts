@@ -1,16 +1,18 @@
-import { sql } from 'drizzle-orm';
 import type { PoolClient } from 'pg';
+
+import { sql } from 'drizzle-orm';
+
 import type {
   DatabaseClient,
   DatabaseExecutor,
   DatabaseTransaction,
 } from './database.types';
 
-export type TenantContext = {
+export interface TenantContext {
   tenantId: string;
   userId: string;
   bypassRls?: boolean;
-};
+}
 
 export const setTenantContextOnExecutor = async (
   executor: DatabaseExecutor,

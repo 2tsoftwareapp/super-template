@@ -1,4 +1,5 @@
 import type { NextRequest } from "next/server";
+
 import { enforceCsrf, proxyWithRefresh } from "@/lib/server/backend";
 
 const normalizePath = (segments: string[]) => segments.join("/");

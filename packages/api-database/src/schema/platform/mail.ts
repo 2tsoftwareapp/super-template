@@ -1,4 +1,5 @@
 import { index, jsonb, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+
 import { mailDeliveryStatusEnum } from './enums';
 
 export const mailDeliveries = pgTable(

@@ -6,9 +6,10 @@ import {
   uniqueIndex,
   uuid,
 } from 'drizzle-orm/pg-core';
-import { timestamps } from '../shared/timestamps';
+
 import { organizations } from '../identity/organizations';
 import { users } from '../identity/users';
+import { timestamps } from '../shared/timestamps';
 import { invitationStatusEnum } from './enums';
 
 export const invitations = pgTable(

@@ -1,15 +1,18 @@
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { ERROR_CODES } from '@repo/api-core';
-import { AppError } from '@repo/api-core';
 import type { AuthenticatedRequestUser } from '@repo/api-core';
-import { DATABASE } from '@repo/api-database';
 import type {
   DatabaseClient,
   DatabaseExecutor,
 } from '@repo/api-database';
+
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { ERROR_CODES } from '@repo/api-core';
+import { AppError } from '@repo/api-core';
+import { DATABASE } from '@repo/api-database';
 import { runInTransaction } from '@repo/api-database';
-import { OrganizationsRepository } from '../infrastructure/organizations.repository';
+
 import type { CreateOrganizationDto } from '../presentation/organizations.dto';
+
+import { OrganizationsRepository } from '../infrastructure/organizations.repository';
 
 const slugify = (value: string) =>
   value

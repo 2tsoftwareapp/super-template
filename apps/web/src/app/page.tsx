@@ -1,15 +1,16 @@
 import {
   CheckCircle2,
   Code2,
+  Github,
   Monitor,
   Shield,
   Smartphone,
   Zap,
-  Github,
 } from "lucide-react";
+
+import { ArchDiagram } from "@/components/arch-diagram";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { ArchDiagram } from "@/components/arch-diagram";
 
 const features = [
   {

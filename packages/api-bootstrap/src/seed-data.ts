@@ -1,4 +1,5 @@
 import type { INestApplicationContext } from '@nestjs/common';
+
 import { EnvironmentService } from '@repo/api-core';
 import { AccessControlService } from '@repo/api-identity/modules/access-control/application/access-control.service';
 import { AuthRepository } from '@repo/api-identity/modules/auth/infrastructure/auth.repository';
@@ -7,6 +8,7 @@ import { UsersRepository } from '@repo/api-identity/modules/users/infrastructure
 import { SettingsService } from '@repo/api-platform/modules/settings/application/settings.service';
 import { NotificationsRepository } from '@repo/api-workspace/modules/notifications/infrastructure/notifications.repository';
 import { ProjectsRepository } from '@repo/api-workspace/modules/projects/infrastructure/projects.repository';
+
 import { seedAccessControl } from './seeds/access-control/seed';
 import { seedNotifications } from './seeds/notifications/seed';
 import { seedProjects } from './seeds/projects/seed';

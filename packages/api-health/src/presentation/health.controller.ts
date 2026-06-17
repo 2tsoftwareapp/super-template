@@ -1,7 +1,8 @@
 import { Controller, Get } from '@nestjs/common';
-import { HealthCheckService } from '@nestjs/terminus';
 import { ApiProperty, ApiTags } from '@nestjs/swagger';
+import { HealthCheckService } from '@nestjs/terminus';
 import { ApiDataResponse, Public } from '@repo/api-core';
+
 import {
   AppHealthIndicator,
   DatabaseHealthIndicator,

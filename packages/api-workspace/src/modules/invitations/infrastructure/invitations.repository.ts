@@ -1,20 +1,21 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { and, count, desc, eq } from 'drizzle-orm';
-import { DATABASE } from '@repo/api-database';
 import type {
   DatabaseClient,
   DatabaseExecutor,
 } from '@repo/api-database';
-import { invitations } from '@repo/api-database';
 
-type ListInvitationsParams = {
+import { Inject, Injectable } from '@nestjs/common';
+import { DATABASE } from '@repo/api-database';
+import { invitations } from '@repo/api-database';
+import { and, count, desc, eq } from 'drizzle-orm';
+
+interface ListInvitationsParams {
   page: number;
   limit: number;
   email?: string;
   entityType?: string;
   entityId?: string;
   status?: 'PENDING' | 'ACCEPTED' | 'EXPIRED' | 'REVOKED';
-};
+}
 
 @Injectable()
 export class InvitationsRepository {

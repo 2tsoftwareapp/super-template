@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
+import { PaginationQueryDto } from '@repo/api-core';
 import {
   IsEnum,
   IsOptional,
@@ -6,7 +7,6 @@ import {
   IsUUID,
   MaxLength,
 } from 'class-validator';
-import { PaginationQueryDto } from '@repo/api-core';
 
 export class ProjectDto {
   @ApiProperty()

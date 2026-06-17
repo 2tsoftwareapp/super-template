@@ -1,17 +1,18 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { and, asc, count, desc, eq, lte, sql } from 'drizzle-orm';
-import { DATABASE } from '@repo/api-database';
 import type {
   DatabaseClient,
   DatabaseExecutor,
 } from '@repo/api-database';
-import { notificationJobs } from '@repo/api-database';
 
-type ListJobsParams = {
+import { Inject, Injectable } from '@nestjs/common';
+import { DATABASE } from '@repo/api-database';
+import { notificationJobs } from '@repo/api-database';
+import { and, asc, count, desc, eq, lte, sql } from 'drizzle-orm';
+
+interface ListJobsParams {
   page: number;
   limit: number;
   status?: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'CANCELLED' | 'FAILED';
-};
+}
 
 @Injectable()
 export class NotificationJobsRepository {

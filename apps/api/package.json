@@ -8,7 +8,7 @@
     "dev": "nest start --watch",
     "format": "biome format --write .",
     "generate": "pnpm run openapi:generate && pnpm run contract:generate",
-    "lint": "biome check .",
+    "lint": "eslint .",
     "openapi:generate": "ts-node -r tsconfig-paths/register --files --project tsconfig.json src/openapi/generate-openapi.ts",
     "contract:generate": "openapi-typescript ../../apps/api/openapi.json -o ../../packages/api-contract/src/generated/index.ts",
     "db:generate": "drizzle-kit generate --config drizzle.config.ts",
