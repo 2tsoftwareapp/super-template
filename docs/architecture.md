@@ -6,6 +6,13 @@
 - `apps/web`: Next.js App Router web app with a same-origin BFF layer
 - `apps/mobile`: Flutter app using generated Dart API client
 - `packages/api-contract`: generated TypeScript OpenAPI types
+- `packages/api-bootstrap`: API bootstrap and shared startup helpers
+- `packages/api-health`: health-check module
+- `packages/api-database`: Drizzle schema and migrations
+- `packages/api-core`: shared backend primitives
+- `packages/api-identity`: authentication and identity helpers
+- `packages/api-platform`: platform-level backend primitives
+- `packages/api-workspace`: workspace/domain helpers
 - `infra`: Docker Compose for PostgreSQL and Mailpit
 - `scripts`: bootstrap, contract generation, verification, and infra helpers
 
@@ -57,6 +64,8 @@ The Flutter app stores tokens in secure storage and uses a single-flight refresh
 2. TypeScript contract types are generated to `packages/api-contract`
 3. Dart Dio client is generated to `apps/mobile/lib/generated/api`
 4. `build_runner` generates built value companions for the Dart client
+
+The same flow is wrapped by `./scripts/generate-contracts.sh`.
 
 ## Dependency Rules
 
@@ -227,9 +236,9 @@ flowchart LR
     DartDio["apps/mobile/lib/\ngenerated/api/\nDart Dio client"]
     BuiltValue["built_value\ncompanions\n(build_runner)"]
 
-    NestSwagger -->|"pnpm generate:openapi"| OpenAPIJson
-    OpenAPIJson -->|"openapi-typescript"| TSTypes
-    OpenAPIJson -->|"openapi-generator"| DartDio
+    NestSwagger -->|"pnpm --filter api openapi:generate"| OpenAPIJson
+    OpenAPIJson -->|"pnpm --filter api contract:generate"| TSTypes
+    OpenAPIJson -->|"openapi-generator-cli dart-dio"| DartDio
     DartDio -->|"dart run build_runner"| BuiltValue
 ```
 

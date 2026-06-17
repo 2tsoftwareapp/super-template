@@ -26,7 +26,7 @@
 
 ## Migration Workflow
 
-1. Edit `apps/api/src/database/schema.ts`
+1. Edit `packages/api-database/src/schema.ts`
 2. Run `make db-generate`
 3. Review generated SQL under `apps/api/drizzle/`
 4. Run `make db-migrate`

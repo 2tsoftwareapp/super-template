@@ -1,17 +1,26 @@
-# mobile_app
+# Mobile
 
-A new Flutter project.
+Flutter client for Super Template.
 
-## Getting Started
+## Run
 
-This project is a starting point for a Flutter application.
+- `make dev-mobile` launches the app with `apps/mobile/env/dev.json`
+- `make test-mobile` runs the Flutter test suite
+- `make generate` refreshes the generated API client before Flutter codegen
 
-A few resources to get you started if this is your first Flutter project:
+## Environment Files
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+- `apps/mobile/env/dev.json`
+- `apps/mobile/env/staging.json`
+- `apps/mobile/env/prod.json`
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Networking
+
+- iOS simulator: `http://localhost:3001/api/v1`
+- Android emulator: `http://10.0.2.2:3001/api/v1`
+- physical device: use the host machine LAN IP
+
+## Generated Client
+
+The generated Dart API client lives in `lib/generated/api`.
+It is produced from the API OpenAPI document by `make generate`.

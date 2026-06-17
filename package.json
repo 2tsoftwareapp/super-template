@@ -7,7 +7,7 @@
     "pnpm": ">=11.7.0"
   },
   "scripts": {
-    "lint:policy": "node scripts/check-source-policy.mjs",
+    "lint:policy": "sh scripts/check-source-policy.sh",
     "build": "turbo run build",
     "dev": "turbo run dev --parallel",
     "lint": "pnpm run lint:policy && turbo run lint",

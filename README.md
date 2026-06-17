@@ -31,7 +31,14 @@ super-template/
 ├── infra/
 │   └── docker-compose.yml
 ├── packages/
+│   ├── api-bootstrap/
 │   ├── api-contract/
+│   ├── api-core/
+│   ├── api-database/
+│   ├── api-health/
+│   ├── api-identity/
+│   ├── api-platform/
+│   ├── api-workspace/
 │   ├── eslint-config/
 │   └── tsconfig/
 ├── scripts/
@@ -184,7 +191,7 @@ Passwords come from `.env`:
 
 - If `make bootstrap` fails waiting for PostgreSQL, inspect `docker compose -f infra/docker-compose.yml ps` and container logs.
 - If the web app cannot authenticate, verify `WEB_ORIGIN`, `API_INTERNAL_URL`, and `CSRF_SECRET`.
-- If Flutter cannot reach the backend on emulator or device, use the environment guidance in [development.md](/Users/truongdq/tx/GitHub/super-template/docs/development.md).
+- If Flutter cannot reach the backend on emulator or device, use the environment guidance in [Development](docs/development.md).
 - If generated client files drift, rerun `make generate`.
 
 ## Production Notes
@@ -196,9 +203,9 @@ Passwords come from `.env`:
 
 See the detailed documents:
 
-- [Architecture](/Users/truongdq/tx/GitHub/super-template/docs/architecture.md)
-- [Authentication](/Users/truongdq/tx/GitHub/super-template/docs/authentication.md)
-- [Database](/Users/truongdq/tx/GitHub/super-template/docs/database.md)
-- [Development](/Users/truongdq/tx/GitHub/super-template/docs/development.md)
-- [Deployment](/Users/truongdq/tx/GitHub/super-template/docs/deployment.md)
-- [ERD](/Users/truongdq/tx/GitHub/super-template/docs/erd.md)
+- [Architecture](docs/architecture.md)
+- [Authentication](docs/authentication.md)
+- [Database](docs/database.md)
+- [Development](docs/development.md)
+- [Deployment](docs/deployment.md)
+- [ERD](docs/erd.md)

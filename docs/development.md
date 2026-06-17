@@ -33,7 +33,7 @@ Adjust `apps/mobile/env/*.json` or pass a different `--dart-define-from-file`.
 make generate
 ```
 
-This regenerates OpenAPI output plus TypeScript and Dart clients.
+This regenerates the API OpenAPI document, the TypeScript contract package, and the Dart client used by Flutter.
 
 ## Adding a NestJS Module
 
