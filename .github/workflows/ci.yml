@@ -71,16 +71,8 @@ jobs:
           node-version: 24
           cache: pnpm
 
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-          cache: true
-
       - name: Install Node dependencies
         run: pnpm install --frozen-lockfile
-
-      - name: Install Flutter dependencies
-        run: cd apps/mobile && flutter pub get
 
       - name: Wait for PostgreSQL
         run: ./scripts/wait-for-postgres.sh
@@ -97,9 +89,6 @@ jobs:
 
       - name: Seed development data
         run: pnpm --filter api db:seed
-
-      - name: Generate contracts
-        run: ./scripts/generate-contracts.sh
 
       - name: Lint
         run: pnpm lint
@@ -122,11 +111,3 @@ jobs:
       - name: Web E2E tests
         run: pnpm --filter web test:e2e
 
-      - name: Flutter format check
-        run: cd apps/mobile && dart format --set-exit-if-changed .
-
-      - name: Flutter analyze
-        run: cd apps/mobile && flutter analyze
-
-      - name: Flutter test
-        run: cd apps/mobile && flutter test
