@@ -44,6 +44,14 @@ export const envSchema = z.object({
   API_INTERNAL_URL: z.url(),
   NEXT_PUBLIC_WEB_URL: z.url(),
   NEXT_PUBLIC_API_BASE_PATH: z.string().min(1).default('/api'),
+  // Optional Redis endpoint for shared throttling, cache, and fan-out. Leave empty to keep single-instance behavior.
+  REDIS_URL: emptyStringToUndefined,
+  // Access-profile cache TTL in seconds. Uses in-process memory when REDIS_URL is unset.
+  ACCESS_PROFILE_CACHE_TTL_SECONDS: z.coerce
+    .number()
+    .int()
+    .positive()
+    .default(60),
   // Optional HTTP log export sink. Leave empty in local dev to keep logs console-only.
   LOGGING_HTTP_ENDPOINT: emptyStringToUndefined,
   LOGGING_HTTP_AUTH_TOKEN: emptyStringToUndefined,

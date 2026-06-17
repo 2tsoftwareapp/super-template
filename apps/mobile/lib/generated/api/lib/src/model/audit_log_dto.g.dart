@@ -12,21 +12,21 @@ class _$AuditLogDto extends AuditLogDto {
   @override
   final String id;
   @override
-  final JsonObject? actorId;
+  final String? actorId;
   @override
   final String action;
   @override
   final String entityType;
   @override
-  final JsonObject? entityId;
+  final String? entityId;
   @override
   final BuiltMap<String, JsonObject?>? metadata;
   @override
-  final JsonObject? ipAddress;
+  final String? ipAddress;
   @override
-  final JsonObject? userAgent;
+  final String? userAgent;
   @override
-  final JsonObject? requestId;
+  final String? requestId;
   @override
   final String createdAt;
 
@@ -109,9 +109,9 @@ class AuditLogDtoBuilder implements Builder<AuditLogDto, AuditLogDtoBuilder> {
   String? get id => _$this._id;
   set id(String? id) => _$this._id = id;
 
-  JsonObject? _actorId;
-  JsonObject? get actorId => _$this._actorId;
-  set actorId(JsonObject? actorId) => _$this._actorId = actorId;
+  String? _actorId;
+  String? get actorId => _$this._actorId;
+  set actorId(String? actorId) => _$this._actorId = actorId;
 
   String? _action;
   String? get action => _$this._action;
@@ -121,9 +121,9 @@ class AuditLogDtoBuilder implements Builder<AuditLogDto, AuditLogDtoBuilder> {
   String? get entityType => _$this._entityType;
   set entityType(String? entityType) => _$this._entityType = entityType;
 
-  JsonObject? _entityId;
-  JsonObject? get entityId => _$this._entityId;
-  set entityId(JsonObject? entityId) => _$this._entityId = entityId;
+  String? _entityId;
+  String? get entityId => _$this._entityId;
+  set entityId(String? entityId) => _$this._entityId = entityId;
 
   MapBuilder<String, JsonObject?>? _metadata;
   MapBuilder<String, JsonObject?> get metadata =>
@@ -131,17 +131,17 @@ class AuditLogDtoBuilder implements Builder<AuditLogDto, AuditLogDtoBuilder> {
   set metadata(MapBuilder<String, JsonObject?>? metadata) =>
       _$this._metadata = metadata;
 
-  JsonObject? _ipAddress;
-  JsonObject? get ipAddress => _$this._ipAddress;
-  set ipAddress(JsonObject? ipAddress) => _$this._ipAddress = ipAddress;
+  String? _ipAddress;
+  String? get ipAddress => _$this._ipAddress;
+  set ipAddress(String? ipAddress) => _$this._ipAddress = ipAddress;
 
-  JsonObject? _userAgent;
-  JsonObject? get userAgent => _$this._userAgent;
-  set userAgent(JsonObject? userAgent) => _$this._userAgent = userAgent;
+  String? _userAgent;
+  String? get userAgent => _$this._userAgent;
+  set userAgent(String? userAgent) => _$this._userAgent = userAgent;
 
-  JsonObject? _requestId;
-  JsonObject? get requestId => _$this._requestId;
-  set requestId(JsonObject? requestId) => _$this._requestId = requestId;
+  String? _requestId;
+  String? get requestId => _$this._requestId;
+  set requestId(String? requestId) => _$this._requestId = requestId;
 
   String? _createdAt;
   String? get createdAt => _$this._createdAt;

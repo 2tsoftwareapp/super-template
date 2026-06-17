@@ -92,7 +92,7 @@ class _$SendNotificationRequestDto extends SendNotificationRequestDto {
   @override
   final String body;
   @override
-  final JsonObject? data;
+  final BuiltMap<String, JsonObject?>? data;
   @override
   final String? scheduledAt;
 
@@ -193,9 +193,10 @@ class SendNotificationRequestDtoBuilder
   String? get body => _$this._body;
   set body(String? body) => _$this._body = body;
 
-  JsonObject? _data;
-  JsonObject? get data => _$this._data;
-  set data(JsonObject? data) => _$this._data = data;
+  MapBuilder<String, JsonObject?>? _data;
+  MapBuilder<String, JsonObject?> get data =>
+      _$this._data ??= MapBuilder<String, JsonObject?>();
+  set data(MapBuilder<String, JsonObject?>? data) => _$this._data = data;
 
   String? _scheduledAt;
   String? get scheduledAt => _$this._scheduledAt;
@@ -214,7 +215,7 @@ class SendNotificationRequestDtoBuilder
       _type = $v.type;
       _title = $v.title;
       _body = $v.body;
-      _data = $v.data;
+      _data = $v.data?.toBuilder();
       _scheduledAt = $v.scheduledAt;
       _$v = null;
     }
@@ -249,7 +250,7 @@ class SendNotificationRequestDtoBuilder
                 title, r'SendNotificationRequestDto', 'title'),
             body: BuiltValueNullFieldError.checkNotNull(
                 body, r'SendNotificationRequestDto', 'body'),
-            data: data,
+            data: _data?.build(),
             scheduledAt: scheduledAt,
           );
     } catch (_) {
@@ -257,6 +258,9 @@ class SendNotificationRequestDtoBuilder
       try {
         _$failedField = 'userIds';
         _userIds?.build();
+
+        _$failedField = 'data';
+        _data?.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
             r'SendNotificationRequestDto', _$failedField, e.toString());

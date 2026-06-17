@@ -6,6 +6,7 @@
 // @dart=3.0
 
 import 'package:built_collection/built_collection.dart';
+import 'package:built_value/json_object.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
@@ -37,14 +38,14 @@ abstract class NotificationJobDto
   String get id;
 
   @BuiltValueField(wireName: r'actorId')
-  JsonObject? get actorId;
+  String? get actorId;
 
   @BuiltValueField(wireName: r'audience')
   NotificationJobDtoAudienceEnum get audience;
   // enum audienceEnum {  USER,  USERS,  ALL,  };
 
   @BuiltValueField(wireName: r'targetUserId')
-  JsonObject? get targetUserId;
+  String? get targetUserId;
 
   @BuiltValueField(wireName: r'userIds')
   BuiltList<String>? get userIds;
@@ -59,7 +60,7 @@ abstract class NotificationJobDto
   String get body;
 
   @BuiltValueField(wireName: r'data')
-  JsonObject? get data;
+  BuiltMap<String, JsonObject?>? get data;
 
   @BuiltValueField(wireName: r'scheduledAt')
   String get scheduledAt;
@@ -118,7 +119,7 @@ class _$NotificationJobDtoSerializer
       yield r'actorId';
       yield serializers.serialize(
         object.actorId,
-        specifiedType: const FullType(JsonObject),
+        specifiedType: const FullType.nullable(String),
       );
     }
     yield r'audience';
@@ -130,7 +131,7 @@ class _$NotificationJobDtoSerializer
       yield r'targetUserId';
       yield serializers.serialize(
         object.targetUserId,
-        specifiedType: const FullType(JsonObject),
+        specifiedType: const FullType.nullable(String),
       );
     }
     if (object.userIds != null) {
@@ -159,7 +160,8 @@ class _$NotificationJobDtoSerializer
       yield r'data';
       yield serializers.serialize(
         object.data,
-        specifiedType: const FullType(JsonObject),
+        specifiedType: const FullType(
+            BuiltMap, [FullType(String), FullType.nullable(JsonObject)]),
       );
     }
     yield r'scheduledAt';
@@ -238,8 +240,9 @@ class _$NotificationJobDtoSerializer
         case r'actorId':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(JsonObject),
-          ) as JsonObject;
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
+          if (valueDes == null) continue;
           result.actorId = valueDes;
           break;
         case r'audience':
@@ -252,8 +255,9 @@ class _$NotificationJobDtoSerializer
         case r'targetUserId':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(JsonObject),
-          ) as JsonObject;
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
+          if (valueDes == null) continue;
           result.targetUserId = valueDes;
           break;
         case r'userIds':
@@ -287,9 +291,10 @@ class _$NotificationJobDtoSerializer
         case r'data':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(JsonObject),
-          ) as JsonObject;
-          result.data = valueDes;
+            specifiedType: const FullType(
+                BuiltMap, [FullType(String), FullType.nullable(JsonObject)]),
+          ) as BuiltMap<String, JsonObject?>;
+          result.data.replace(valueDes);
           break;
         case r'scheduledAt':
           final valueDes = serializers.deserialize(

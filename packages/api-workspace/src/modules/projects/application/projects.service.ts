@@ -3,17 +3,24 @@ import type {
   RequestContext,
 } from '@repo/api-core';
 
-import { HttpStatus, Injectable } from '@nestjs/common';
-import { ERROR_CODES } from '@repo/api-core';
-import { AppError } from '@repo/api-core';
-import { requireOrganizationId } from '@repo/api-core';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import {
+  AppError,
+  AUDIT_WRITER,
+  type AuditWriter,
+  ENTITY_ATTACHMENT_LISTING,
+  type EntityAttachmentListing,
+  ERROR_CODES,
+  type NotificationMessage,
+  PERMISSION_NAMES,
+  requireOrganizationId,
+  USER_LOOKUP,
+  USER_NOTIFICATION_SENDER,
+  type UserLookup,
+  type UserNotificationSender,
+} from '@repo/api-core';
 import { runInTransaction } from '@repo/api-database';
-import { PERMISSION_NAMES } from '@repo/api-identity/modules/access-control/access-control.constants';
-import { UsersRepository } from '@repo/api-identity/modules/users/infrastructure/users.repository';
-import { AttachmentsRepository } from '@repo/api-platform/modules/attachments/infrastructure/attachments.repository';
-import { AuditService } from '@repo/api-platform/modules/audit/application/audit.service';
 
-import type { NotificationDto } from '../../notifications/application/notifications.service';
 import type {
   CreateProjectDto,
   ProjectsQueryDto,
@@ -21,18 +28,19 @@ import type {
 } from '../presentation/projects.dto';
 
 import { ActivitiesService } from '../../activities/application/activities.service';
-import { NotificationsService } from '../../notifications/application/notifications.service';
 import { ProjectsRepository } from '../infrastructure/projects.repository';
 
 @Injectable()
 export class ProjectsService {
   constructor(
     private readonly projectsRepository: ProjectsRepository,
-    private readonly usersRepository: UsersRepository,
-    private readonly notificationsService: NotificationsService,
-    private readonly auditService: AuditService,
+    @Inject(USER_LOOKUP) private readonly userLookup: UserLookup,
+    @Inject(USER_NOTIFICATION_SENDER)
+    private readonly notificationSender: UserNotificationSender,
+    @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
     private readonly activitiesService: ActivitiesService,
-    private readonly attachmentsRepository: AttachmentsRepository,
+    @Inject(ENTITY_ATTACHMENT_LISTING)
+    private readonly entityAttachments: EntityAttachmentListing,
   ) {}
 
   async list(user: AuthenticatedRequestUser, query: ProjectsQueryDto) {
@@ -80,7 +88,7 @@ export class ProjectsService {
     requestContext?: RequestContext,
   ) {
     const ownerId = this.resolveOwnerId(user, input.ownerId);
-    const owner = await this.usersRepository.findById(ownerId);
+    const owner = await this.userLookup.findById(ownerId);
 
     if (!owner) {
       throw new AppError(
@@ -123,10 +131,10 @@ export class ProjectsService {
           throw new Error('Project insert returned no rows');
         }
 
-        let notificationToDispatch: NotificationDto | null = null;
+        let notificationToDispatch: NotificationMessage | null = null;
 
         if (ownerId !== user.userId) {
-          notificationToDispatch = await this.notificationsService.sendToUser(
+          notificationToDispatch = await this.notificationSender.sendToUser(
             user,
             {
               userId: ownerId,
@@ -140,7 +148,7 @@ export class ProjectsService {
           );
         }
 
-        await this.auditService.log(
+        await this.auditWriter.log(
           {
             actorId: user.userId,
             action: 'project.created',
@@ -174,7 +182,7 @@ export class ProjectsService {
     );
 
     if (projectDto.notificationToDispatch) {
-      void this.notificationsService.dispatch(
+      void this.notificationSender.dispatch(
         projectDto.notificationToDispatch,
       );
     }
@@ -241,10 +249,10 @@ export class ProjectsService {
           );
         }
 
-        let notificationToDispatch: NotificationDto | null = null;
+        let notificationToDispatch: NotificationMessage | null = null;
 
         if (ownerId !== project.ownerId) {
-          notificationToDispatch = await this.notificationsService.sendToUser(
+          notificationToDispatch = await this.notificationSender.sendToUser(
             user,
             {
               userId: ownerId,
@@ -258,7 +266,7 @@ export class ProjectsService {
           );
         }
 
-        await this.auditService.log(
+        await this.auditWriter.log(
           {
             actorId: user.userId,
             action: 'project.updated',
@@ -288,7 +296,7 @@ export class ProjectsService {
     );
 
     if (projectDto.notificationToDispatch) {
-      void this.notificationsService.dispatch(
+      void this.notificationSender.dispatch(
         projectDto.notificationToDispatch,
       );
     }
@@ -317,7 +325,7 @@ export class ProjectsService {
       updatedById: user.userId,
     });
 
-    await this.auditService.log({
+    await this.auditWriter.log({
       actorId: user.userId,
       action: 'project.deleted',
       entityType: 'project',
@@ -361,7 +369,7 @@ export class ProjectsService {
       updatedById: user.userId,
     });
 
-    await this.auditService.log({
+    await this.auditWriter.log({
       actorId: user.userId,
       action: 'project.restored',
       entityType: 'project',
@@ -385,7 +393,7 @@ export class ProjectsService {
 
     this.assertCanAccessProject(user, project.ownerId);
 
-    const attachments = await this.attachmentsRepository.listByEntity(
+    const attachments = await this.entityAttachments.listByEntity(
       'project',
       projectId,
     );

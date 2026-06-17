@@ -6,6 +6,7 @@
 // @dart=3.0
 
 import 'package:built_collection/built_collection.dart';
+import 'package:built_value/json_object.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
@@ -30,7 +31,7 @@ abstract class AuditLogDto implements Built<AuditLogDto, AuditLogDtoBuilder> {
   String get id;
 
   @BuiltValueField(wireName: r'actorId')
-  JsonObject? get actorId;
+  String? get actorId;
 
   @BuiltValueField(wireName: r'action')
   String get action;
@@ -39,19 +40,19 @@ abstract class AuditLogDto implements Built<AuditLogDto, AuditLogDtoBuilder> {
   String get entityType;
 
   @BuiltValueField(wireName: r'entityId')
-  JsonObject? get entityId;
+  String? get entityId;
 
   @BuiltValueField(wireName: r'metadata')
   BuiltMap<String, JsonObject?>? get metadata;
 
   @BuiltValueField(wireName: r'ipAddress')
-  JsonObject? get ipAddress;
+  String? get ipAddress;
 
   @BuiltValueField(wireName: r'userAgent')
-  JsonObject? get userAgent;
+  String? get userAgent;
 
   @BuiltValueField(wireName: r'requestId')
-  JsonObject? get requestId;
+  String? get requestId;
 
   @BuiltValueField(wireName: r'createdAt')
   String get createdAt;
@@ -88,7 +89,7 @@ class _$AuditLogDtoSerializer implements PrimitiveSerializer<AuditLogDto> {
       yield r'actorId';
       yield serializers.serialize(
         object.actorId,
-        specifiedType: const FullType(JsonObject),
+        specifiedType: const FullType.nullable(String),
       );
     }
     yield r'action';
@@ -105,7 +106,7 @@ class _$AuditLogDtoSerializer implements PrimitiveSerializer<AuditLogDto> {
       yield r'entityId';
       yield serializers.serialize(
         object.entityId,
-        specifiedType: const FullType(JsonObject),
+        specifiedType: const FullType.nullable(String),
       );
     }
     if (object.metadata != null) {
@@ -120,21 +121,21 @@ class _$AuditLogDtoSerializer implements PrimitiveSerializer<AuditLogDto> {
       yield r'ipAddress';
       yield serializers.serialize(
         object.ipAddress,
-        specifiedType: const FullType(JsonObject),
+        specifiedType: const FullType.nullable(String),
       );
     }
     if (object.userAgent != null) {
       yield r'userAgent';
       yield serializers.serialize(
         object.userAgent,
-        specifiedType: const FullType(JsonObject),
+        specifiedType: const FullType.nullable(String),
       );
     }
     if (object.requestId != null) {
       yield r'requestId';
       yield serializers.serialize(
         object.requestId,
-        specifiedType: const FullType(JsonObject),
+        specifiedType: const FullType.nullable(String),
       );
     }
     yield r'createdAt';
@@ -177,8 +178,9 @@ class _$AuditLogDtoSerializer implements PrimitiveSerializer<AuditLogDto> {
         case r'actorId':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(JsonObject),
-          ) as JsonObject;
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
+          if (valueDes == null) continue;
           result.actorId = valueDes;
           break;
         case r'action':
@@ -198,8 +200,9 @@ class _$AuditLogDtoSerializer implements PrimitiveSerializer<AuditLogDto> {
         case r'entityId':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(JsonObject),
-          ) as JsonObject;
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
+          if (valueDes == null) continue;
           result.entityId = valueDes;
           break;
         case r'metadata':
@@ -213,22 +216,25 @@ class _$AuditLogDtoSerializer implements PrimitiveSerializer<AuditLogDto> {
         case r'ipAddress':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(JsonObject),
-          ) as JsonObject;
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
+          if (valueDes == null) continue;
           result.ipAddress = valueDes;
           break;
         case r'userAgent':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(JsonObject),
-          ) as JsonObject;
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
+          if (valueDes == null) continue;
           result.userAgent = valueDes;
           break;
         case r'requestId':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(JsonObject),
-          ) as JsonObject;
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
+          if (valueDes == null) continue;
           result.requestId = valueDes;
           break;
         case r'createdAt':

@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { MAIL_TEMPLATE_SENDER } from '@repo/api-core';
 
 import { MailService } from './application/mail.service';
 import { MAILER } from './application/mailer.interface';
@@ -18,7 +19,11 @@ import { AdminMailController } from './presentation/admin-mail.controller';
       provide: MAILER,
       useExisting: SmtpMailerService,
     },
+    {
+      provide: MAIL_TEMPLATE_SENDER,
+      useExisting: MailService,
+    },
   ],
-  exports: [MAILER, SmtpMailerService, MailService],
+  exports: [MAILER, MAIL_TEMPLATE_SENDER, SmtpMailerService, MailService],
 })
 export class MailModule {}

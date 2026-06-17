@@ -5,13 +5,17 @@ import type {
 import type { DatabaseClient, DatabaseExecutor } from '@repo/api-database';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { ERROR_CODES } from '@repo/api-core';
-import { AppError } from '@repo/api-core';
-import { normalizeEmail } from '@repo/api-core';
+import {
+  AppError,
+  AUDIT_WRITER,
+  type AuditWriter,
+  ERROR_CODES,
+  FILE_LOOKUP,
+  type FileLookup,
+  normalizeEmail,
+} from '@repo/api-core';
 import { DATABASE } from '@repo/api-database';
 import { runInTransaction } from '@repo/api-database';
-import { AuditService } from '@repo/api-platform/modules/audit/application/audit.service';
-import { FilesRepository } from '@repo/api-platform/modules/files/infrastructure/files.repository';
 
 import type {
   CreateAdminUserDto,
@@ -35,9 +39,9 @@ export class UsersService {
     @Inject(DATABASE) private readonly database: DatabaseClient,
     private readonly usersRepository: UsersRepository,
     private readonly accessControlService: AccessControlService,
-    private readonly auditService: AuditService,
+    @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
     private readonly authRepository: AuthRepository,
-    private readonly filesRepository: FilesRepository,
+    @Inject(FILE_LOOKUP) private readonly fileLookup: FileLookup,
     private readonly organizationsService: OrganizationsService,
   ) {}
 
@@ -61,7 +65,7 @@ export class UsersService {
     }
 
     if (input.avatarFileId) {
-      const file = await this.filesRepository.findById(input.avatarFileId);
+      const file = await this.fileLookup.findById(input.avatarFileId);
 
       if (file?.uploadedById !== userId) {
         throw new AppError(
@@ -82,7 +86,7 @@ export class UsersService {
           : input.avatarFileId,
     });
 
-    await this.auditService.log({
+    await this.auditWriter.log({
       actorId: userId,
       action: 'user.profile.updated',
       entityType: 'user',
@@ -134,7 +138,7 @@ export class UsersService {
         actor.userId,
         transaction,
       );
-      await this.auditService.log(
+      await this.auditWriter.log(
         {
           actorId: actor.userId,
           action: 'user.password.changed',
@@ -234,7 +238,7 @@ export class UsersService {
           transaction,
         );
 
-        await this.auditService.log(
+        await this.auditWriter.log(
           {
             actorId: actor.userId,
             action: 'admin.user.created',
@@ -302,7 +306,7 @@ export class UsersService {
           : (user.emailVerifiedAt ?? new Date()),
     });
 
-    await this.auditService.log({
+    await this.auditWriter.log({
       actorId: actor.userId,
       action: 'admin.user.updated',
       entityType: 'user',
@@ -346,7 +350,7 @@ export class UsersService {
     await runInTransaction(this.database, async (transaction) => {
       await this.usersRepository.softDelete(userId, transaction);
       await this.authRepository.revokeAllSessionsForUser(userId, transaction);
-      await this.auditService.log(
+      await this.auditWriter.log(
         {
           actorId: actor.userId,
           action: 'admin.user.deleted',
@@ -407,7 +411,7 @@ export class UsersService {
         await this.authRepository.revokeAllSessionsForUser(userId, transaction);
       }
 
-      await this.auditService.log(
+      await this.auditWriter.log(
         {
           actorId: actor.userId,
           action: status === 'BLOCKED' ? 'user.blocked' : 'user.unblocked',
@@ -466,7 +470,7 @@ export class UsersService {
         roleIds,
         transaction,
       );
-      await this.auditService.log(
+      await this.auditWriter.log(
         {
           actorId: actor.userId,
           action: 'user.roles.replaced',

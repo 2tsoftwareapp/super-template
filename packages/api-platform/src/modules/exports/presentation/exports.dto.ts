@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsObject, IsOptional, IsString } from 'class-validator';
+import { IsObject, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class ExportJobDto {
   @ApiProperty()
@@ -41,4 +41,13 @@ export class CreateExportDto {
   @IsOptional()
   @IsObject()
   filters?: Record<string, unknown>;
+
+  @ApiPropertyOptional({
+    description:
+      'Client-supplied idempotency key. Retries with the same key return the original export job.',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(128)
+  idempotencyKey?: string;
 }

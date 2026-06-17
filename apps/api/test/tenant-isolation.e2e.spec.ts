@@ -1,4 +1,5 @@
 import type { INestApplication } from '@nestjs/common';
+import { AccessControlService, ROLE_NAMES } from '@repo/api-identity';
 import request from 'supertest';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
@@ -80,5 +81,97 @@ describe('Tenant isolation (e2e)', () => {
       current: true,
       role: 'OWNER',
     });
+  });
+
+  it('prevents an org-scoped ADMIN from reading another organization project', async () => {
+    const superAdminSession = await loginAs(
+      app,
+      'admin@example.local',
+      'ChangeMe123!',
+    );
+    const accessControlService = app.get(AccessControlService);
+    const adminRole = await accessControlService.getRoleByName(ROLE_NAMES.ADMIN);
+
+    if (!adminRole) {
+      throw new Error('ADMIN role was not found');
+    }
+
+    const orgAdminA = await request(app.getHttpServer())
+      .post('/api/v1/admin/users')
+      .set(bearer(superAdminSession.accessToken))
+      .send({
+        email: 'org-admin-a@example.local',
+        password: 'OrgAdminPass123!',
+        displayName: 'Org Admin A',
+        status: 'ACTIVE',
+        roleIds: [adminRole.id],
+      })
+      .expect(201);
+
+    const orgAdminB = await request(app.getHttpServer())
+      .post('/api/v1/admin/users')
+      .set(bearer(superAdminSession.accessToken))
+      .send({
+        email: 'org-admin-b@example.local',
+        password: 'OrgAdminPass123!',
+        displayName: 'Org Admin B',
+        status: 'ACTIVE',
+        roleIds: [adminRole.id],
+      })
+      .expect(201);
+
+    const orgAdminBSession = await loginAs(
+      app,
+      'org-admin-b@example.local',
+      'OrgAdminPass123!',
+    );
+
+    const createdProject = await request(app.getHttpServer())
+      .post('/api/v1/projects')
+      .set(bearer(orgAdminBSession.accessToken))
+      .send({
+        name: 'Org B Confidential Project',
+        description: 'Should stay invisible to org A admin',
+      })
+      .expect(201);
+
+    const orgAdminASession = await loginAs(
+      app,
+      'org-admin-a@example.local',
+      'OrgAdminPass123!',
+    );
+
+    const listResponse = await request(app.getHttpServer())
+      .get('/api/v1/projects')
+      .set(bearer(orgAdminASession.accessToken))
+      .expect(200);
+
+    const visibleNames = listResponse.body.data.map(
+      (project: { name: string }) => project.name,
+    );
+
+    expect(visibleNames).not.toContain('Org B Confidential Project');
+
+    const forbiddenRead = await request(app.getHttpServer())
+      .get(`/api/v1/projects/${createdProject.body.data.id}`)
+      .set(bearer(orgAdminASession.accessToken))
+      .expect(404);
+
+    expect(forbiddenRead.body.error.code).toBe('PROJECT_NOT_FOUND');
+
+    const forbiddenUpdate = await request(app.getHttpServer())
+      .patch(`/api/v1/projects/${createdProject.body.data.id}`)
+      .set(bearer(orgAdminASession.accessToken))
+      .send({ name: 'Compromised project name' })
+      .expect(404);
+
+    expect(forbiddenUpdate.body.error.code).toBe('PROJECT_NOT_FOUND');
+
+    expect(orgAdminA.body.data.roles).toEqual(
+      expect.arrayContaining([ROLE_NAMES.ADMIN]),
+    );
+    expect(orgAdminB.body.data.roles).toEqual(
+      expect.arrayContaining([ROLE_NAMES.ADMIN]),
+    );
   });
 });

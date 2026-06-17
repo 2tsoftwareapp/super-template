@@ -1,11 +1,18 @@
 import { Test } from '@nestjs/testing';
+import { EnvironmentService } from '@repo/api-core';
 import { describe, expect, it } from 'vitest';
 import { NotificationStreamService } from '../infrastructure/notification-stream.service';
 
 describe('NotificationStreamService', () => {
   it('emits notification events to subscribed streams', async () => {
     const moduleRef = await Test.createTestingModule({
-      providers: [NotificationStreamService],
+      providers: [
+        NotificationStreamService,
+        {
+          provide: EnvironmentService,
+          useValue: { values: { REDIS_URL: undefined } },
+        },
+      ],
     }).compile();
 
     const service = moduleRef.get(NotificationStreamService);

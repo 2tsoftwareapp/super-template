@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { USER_NOTIFICATION_SENDER } from '@repo/api-core';
 import { UsersModule } from '@repo/api-identity/modules/users/users.module';
 import { AuditModule } from '@repo/api-platform/modules/audit/audit.module';
 
@@ -30,7 +31,11 @@ import {
       provide: PUSH_NOTIFIER,
       useExisting: FcmPushService,
     },
+    {
+      provide: USER_NOTIFICATION_SENDER,
+      useExisting: NotificationsService,
+    },
   ],
-  exports: [NotificationsRepository, NotificationsService],
+  exports: [NotificationsRepository, NotificationsService, USER_NOTIFICATION_SENDER],
 })
 export class NotificationsModule {}

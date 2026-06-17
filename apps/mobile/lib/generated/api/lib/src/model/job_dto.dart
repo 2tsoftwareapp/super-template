@@ -6,6 +6,7 @@
 // @dart=3.0
 
 import 'package:built_collection/built_collection.dart';
+import 'package:built_value/json_object.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
@@ -69,7 +70,7 @@ abstract class JobDto implements Built<JobDto, JobDtoBuilder> {
   JsonObject? get errorMessage;
 
   @BuiltValueField(wireName: r'createdById')
-  JsonObject? get createdById;
+  String? get createdById;
 
   @BuiltValueField(wireName: r'createdAt')
   String get createdAt;
@@ -173,7 +174,7 @@ class _$JobDtoSerializer implements PrimitiveSerializer<JobDto> {
       yield r'createdById';
       yield serializers.serialize(
         object.createdById,
-        specifiedType: const FullType(JsonObject),
+        specifiedType: const FullType.nullable(String),
       );
     }
     yield r'createdAt';
@@ -299,8 +300,9 @@ class _$JobDtoSerializer implements PrimitiveSerializer<JobDto> {
         case r'createdById':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(JsonObject),
-          ) as JsonObject;
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
+          if (valueDes == null) continue;
           result.createdById = valueDes;
           break;
         case r'createdAt':

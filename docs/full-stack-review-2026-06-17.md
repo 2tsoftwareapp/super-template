@@ -14,9 +14,9 @@ The template is a credible, well-structured full-stack starter: NestJS modular m
 
 The intended authority model is now confirmed: **`USER`** = normal user, **`ADMIN`** = administrator scoped to one organization, **`SUPER_ADMIN`** = global manager. The code already encodes this (only `SUPER_ADMIN` bypasses RLS), which makes **multi-tenant isolation the dominant risk**: an org `ADMIN` bypasses ownership checks in services and is kept inside their organization *solely* by Row-Level Security. The current migration set has expanded RLS coverage beyond the original 4-table baseline, and the test harness now runs against a restricted app role and asserts that tenant-scoped queries execute under that non-superuser identity.
 
-Secondary themes that still matter: **no Redis** (so rate limiting, SSE notification fan-out, and caching are single-instance only), package coupling, and mobile CI coverage.
+Secondary themes that still matter: mobile CI coverage is in place; package boundaries are enforced in CI policy.
 
-Overall posture: **solid base, with one remaining high-risk tenancy proof and a few infrastructure gaps.**
+Overall posture: **solid base for production iteration** — tenancy is covered by RLS plus restricted-role e2e tests; package boundaries and idempotency are enforced in CI policy.
 
 ---
 
@@ -31,9 +31,9 @@ Overall posture: **solid base, with one remaining high-risk tenancy proof and a 
 
 ### Architectural concerns
 1. **Authority model (confirmed).** `USER` = normal end user; `ADMIN` = administrator **scoped to one organization**; `SUPER_ADMIN` = global manager across all organizations. The code already encodes this: `TenantContextInterceptor` sets `bypassRls = user.roles.includes(SUPER_ADMIN)` (`tenant-context.interceptor.ts:37`) — **only `SUPER_ADMIN` bypasses RLS; `ADMIN` is meant to be confined to its org by RLS.** The consequence is critical: `ProjectsService.assertCanAccessProject` (`projects.service.ts:424`) and `FilesService.findAccessibleFile` (`files.service.ts:142`) let any `ADMIN` bypass *ownership* checks, so an `ADMIN`'s confinement to their own organization depends **entirely** on RLS being effective. If RLS is not enforced (see SEC-1), an org `ADMIN` becomes a de-facto global admin. This authority model should be documented explicitly and covered by tests.
-2. **Cross-feature package coupling.** Feature packages import each other's internals (e.g. `projects.service.ts` imports `AttachmentsRepository` and `AuditService` from `api-platform`; jobs/exports reach into `api-identity`/`api-workspace`). The 2026-06-16 review measured 323 `turbo boundaries` issues, and a fresh `turbo boundaries` run still exposes the `api-identity` / `api-platform` / `api-workspace` cycle. The package *names* imply independence the code does not honor. Introduce ports/events (`AuditWriter`, `NotificationPublisher`, `UserLookup`) so features depend on `api-core` abstractions, not each other.
+2. **Cross-feature package coupling (resolved).** Service-level imports now go through `api-core` ports (`FILE_LOOKUP`, `ENTITY_ATTACHMENT_LISTING`, etc.). `@Global()` `PlatformPortsModule` / `WorkspacePortsModule` wire Nest providers without cyclic `package.json` deps. `pnpm lint:policy` runs `check-package-cycles.sh` and `turbo boundaries`.
 3. **Tenant-context propagation is indirect.** `TenantContextInterceptor` stores tenant data in `AsyncLocalStorage`; `TenantAwarePool.connect()` reads it and runs `set_config(...)`. This couples correctness to pool-checkout timing (see [§4 SEC-1](#sec-1-rls-isolation-is-fragile-and-incomplete--high-needs-verification)).
-4. **Docs describe the intended graph, not the real one.** `docs/architecture.md` shows clean app→package layering; the import reality is cross-feature. Generate the dependency diagram from the actual import graph.
+4. **Package dependency graph is documented.** `docs/architecture.md` now records the acyclic runtime graph (`identity` → `platform` → `workspace`) and the port-based decoupling strategy; `turbo boundaries` validates layer tags in CI policy.
 
 ---
 
@@ -83,13 +83,8 @@ The files module now exposes an authenticated download route and the local stora
 ### SEC-8 — Web cookie flags are now config-driven — **Resolved**
 The web BFF cookie layer now reads `COOKIE_SAMESITE`, `COOKIE_DOMAIN`, and `COOKIE_SECURE`/`NODE_ENV`, so cross-site and subdomain deployments no longer require code changes for the common cookie topology settings.
 
-### SEC-9 — No Redis: single-instance assumptions break under horizontal scaling — **Medium**
-There is no Redis (or equivalent shared store) wired anywhere in source (grep finds it only in `docs/deployment.md` and skill docs). Three runtime concerns are all currently in-process and therefore correct only for a **single API instance**:
-- **Rate limiting** — `ThrottlerModule.forRoot([...])` uses the default in-memory storage. Behind N replicas the effective limit is ~N× the configured value and resets on every deploy/restart. This compounds SEC-2: distributed brute-force protection is effectively absent in production.
-- **SSE notification fan-out** — `NotificationStreamService` keeps an in-process `Map<userId, Subject>` (`notification-stream.service.ts:18`). A notification emitted on instance A is never delivered to a client whose SSE connection is held by instance B. Multi-instance deployments will silently drop real-time notifications.
-- **Caching** — every authenticated request recomputes the access profile (`AuthService.authenticateAccessToken` → `getAccessProfile`) and resolves the organization with no cache layer; there is no shared cache for sessions/permissions.
-
-- **Recommendation.** Add Redis to `infra/docker-compose.yml` and env/config, then back: (a) the throttler with `@nest-lab/throttler-storage-redis` (or equivalent) for global limits; (b) SSE/notification fan-out with Redis Pub/Sub (or move to a broker) so emits propagate across instances; (c) an optional cache for access profiles/permissions with explicit invalidation on role/permission changes. Document single-instance as the only supported topology until this exists.
+### SEC-9 — Redis-backed access-profile cache is now available — **Resolved**
+`infra/docker-compose.yml` includes a Redis service and the env schema exposes `REDIS_URL`. The rate limiter uses a Redis-backed `ThrottlerStorage` when Redis is configured, notification SSE emits publish through Redis Pub/Sub when available, and `AccessProfileCache` now caches per-user roles/permissions with invalidation on role assignment and role-permission updates. Without `REDIS_URL`, the cache falls back to in-process memory (single-instance safe).
 
 ### Positive security notes
 - Strict global `ValidationPipe` (`whitelist`, `forbidNonWhitelisted`, `transform`) — `main.ts:26`.
@@ -105,7 +100,7 @@ There is no Redis (or equivalent shared store) wired anywhere in source (grep fi
 
 - **Consistent and readable.** Uniform module shape, typed DTOs, centralized `ERROR_CODES`, response envelope interceptor, Zod-validated env that fails fast.
 - **Route param validation is now mostly explicit.** The main UUID id routes in projects/files/jobs/admin-users/auth use `ParseUUIDPipe`, so the earlier blanket complaint no longer holds. Any remaining gaps should be treated as isolated leftovers, not a systemic issue.
-- **Multi-step writes still mix concerns.** `FilesService.upload` writes to object storage *before* the DB insert but does compensate by deleting the object on failure (`files.service.ts:90`) — acceptable. `delete` removes the DB row before storage and throws if storage cleanup fails, diverging state. Exports/notification-jobs flows still lack idempotency keys; partial failure can orphan files or duplicate sends.
+- **Multi-step writes still mix concerns.** `FilesService.upload` compensates on failure; `FilesService.delete` now removes storage before soft-deleting the DB row so a failed cleanup does not orphan the metadata record. Export/import/notification/background jobs accept optional `idempotencyKey` with unique indexes to dedupe retries.
 - **Tracked artifacts have been cleaned up.** The previously committed runtime upload and `tsconfig.tsbuildinfo` files are no longer in the tree; keep them out via `.gitignore`/CI if they reappear.
 - **Config parity is tighter.** `.env.example` now matches the active web/API schema more closely; keep future sample keys wired into validation before adding them.
 
@@ -116,12 +111,12 @@ There is no Redis (or equivalent shared store) wired anywhere in source (grep fi
 | # | Severity | Area | Gap | Recommendation |
 |---|----------|------|-----|----------------|
 | 1 | High | Security/Arch | RLS runtime proof under restricted app role | Resolved in current test harness and CI |
-| 2 | Medium | Infra/Scale | No Redis — in-memory throttler, in-process SSE fan-out, no shared cache | Add Redis; back throttler + SSE pub/sub + access-profile cache |
-| 3 | Medium | Arch | Cross-feature package coupling (323 boundary issues) | Ports/events via `api-core`; enforce `turbo boundaries` in CI |
+| 2 | Medium | Infra/Scale | Shared access-profile cache | Resolved — `AccessProfileCache` with Redis + in-memory fallback |
+| 3 | Medium | Arch | Cross-feature package coupling (323 boundary issues) | Resolved — api-core ports, global port modules, acyclic package deps, `check-package-cycles.sh` + `turbo boundaries` in CI policy |
 | 4 | Low | Security | CSRF token integrity | Resolved in current web BFF path |
 | 5 | Low | Security | Login timing enumeration | Resolved in current code path |
 | 6 | Low | Security | Web cookie flags ignore env | Resolved in current web BFF path |
-| 7 | Low | Quality | Remaining `ParseUUIDPipe` gaps, if any | Audit the few leftover id routes and normalize them |
+| 7 | Low | Quality | Remaining `ParseUUIDPipe` gaps, if any | Resolved — UUID id routes use `ParseUUIDPipe`; non-UUID params (`token`, `key`, `templateKey`) remain string-validated by design |
 | 8 | Low | Quality/Repo | Tracked upload + tsbuildinfo artifacts | Keep them out of the tree; CI check on generated files |
 | 9 | Low | CI | Mobile not verified | Resolved in current CI workflow |
 | 10 | Low | Config | Orphan `.env.example` keys | Resolved in current env example |
@@ -141,7 +136,7 @@ Resolved:
 - **Local download path** — authenticated file download exists in the files module.
 - **SSE refresh cookies** — notification stream refresh now persists rotated cookies.
 
-Still open: package boundaries (P1), some transactional/idempotency gaps (P1), Redis / single-instance scaling (P1).
+Still open: none from the original review backlog. Package graph is acyclic (`identity` → `platform` → `workspace`); port tokens and idempotency keys are in place; `turbo boundaries` passes with layer tags.
 
 Open question now answered: admin roles are **org-scoped** (`ADMIN`) vs **global** (`SUPER_ADMIN`), with `USER` as the normal role — see §2.1 and SEC-1.
 
@@ -154,5 +149,4 @@ Open question now answered: admin roles are **org-scoped** (`ADMIN`) vs **global
 - Recommended next commands:
   - `pnpm lint && pnpm typecheck && pnpm --filter api test && pnpm --filter web test` (confirm gates are green on current tree)
   - Keep the restricted-role cross-tenant RLS integration test in CI — assert that an org-`A` **`ADMIN`** cannot read/modify org-`B` projects/files (the strongest test of the authority model)
-  - `pnpm exec turbo boundaries` (quantify current coupling; current runs still fail on the `api-identity` / `api-platform` / `api-workspace` cycle)
-  - Add Redis to `infra/docker-compose.yml` and back the throttler, SSE fan-out, and access-profile cache before any multi-instance deployment
+  - `pnpm exec turbo boundaries` (now passes with layer tags and package exports; no tsconfig path aliases bypassing workspace boundaries)

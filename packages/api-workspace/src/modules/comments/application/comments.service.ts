@@ -3,12 +3,15 @@ import type {
   RequestContext,
 } from '@repo/api-core';
 
-import { HttpStatus, Injectable } from '@nestjs/common';
-import { ERROR_CODES } from '@repo/api-core';
-import { AppError } from '@repo/api-core';
-import { requireOrganizationId } from '@repo/api-core';
-import { PERMISSION_NAMES } from '@repo/api-identity/modules/access-control/access-control.constants';
-import { AuditService } from '@repo/api-platform/modules/audit/application/audit.service';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import {
+  AppError,
+  AUDIT_WRITER,
+  type AuditWriter,
+  ERROR_CODES,
+  PERMISSION_NAMES,
+  requireOrganizationId,
+} from '@repo/api-core';
 
 import type {
   CommentsQueryDto,
@@ -22,7 +25,7 @@ import { CommentsRepository } from '../infrastructure/comments.repository';
 export class CommentsService {
   constructor(
     private readonly commentsRepository: CommentsRepository,
-    private readonly auditService: AuditService,
+    @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
   ) {}
 
   async list(query: CommentsQueryDto) {
@@ -65,7 +68,7 @@ export class CommentsService {
       throw new Error('Comment insert returned no rows');
     }
 
-    await this.auditService.log({
+    await this.auditWriter.log({
       actorId: actor.userId,
       action: 'comment.created',
       entityType: input.entityType,
@@ -109,7 +112,7 @@ export class CommentsService {
       content: input.content,
     });
 
-    await this.auditService.log({
+    await this.auditWriter.log({
       actorId: actor.userId,
       action: 'comment.updated',
       entityType: comment.entityType,
@@ -150,7 +153,7 @@ export class CommentsService {
 
     await this.commentsRepository.softDelete(commentId);
 
-    await this.auditService.log({
+    await this.auditWriter.log({
       actorId: actor.userId,
       action: 'comment.deleted',
       entityType: comment.entityType,

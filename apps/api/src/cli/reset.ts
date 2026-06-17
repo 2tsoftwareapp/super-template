@@ -1,16 +1,13 @@
 import { NestFactory } from '@nestjs/core';
 import { seedDatabase } from '@repo/api-bootstrap';
 import { createDatabaseClient } from '@repo/api-database';
-import { config as loadEnv } from 'dotenv';
-import { resolve } from 'node:path';
 import { Pool } from 'pg';
 
 import { AppModule } from '../app.module';
+import { loadCliEnv } from './load-cli-env';
 import { applySqlMigrations } from './migrations';
 
-loadEnv({
-  path: resolve(process.cwd(), '.env'),
-});
+loadCliEnv();
 
 const main = async (): Promise<void> => {
   const databaseUrl = process.env.DATABASE_URL;

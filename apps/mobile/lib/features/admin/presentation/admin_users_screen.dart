@@ -8,8 +8,7 @@ class AdminUsersScreen extends ConsumerStatefulWidget {
   const AdminUsersScreen({super.key});
 
   @override
-  ConsumerState<AdminUsersScreen> createState() =>
-      _AdminUsersScreenState();
+  ConsumerState<AdminUsersScreen> createState() => _AdminUsersScreenState();
 }
 
 class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
@@ -34,9 +33,7 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
     if (!canRead) {
       return Scaffold(
         appBar: AppBar(title: const Text('Users')),
-        body: const Center(
-          child: Text('Missing users.read permission'),
-        ),
+        body: const Center(child: Text('Missing users.read permission')),
       );
     }
 
@@ -109,11 +106,13 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
           ),
           FilledButton(
             onPressed: () async {
-              await ref.read(adminRepositoryProvider).createUser(
-                email: _emailController.text.trim(),
-                password: _passwordController.text,
-                displayName: _nameController.text.trim(),
-              );
+              await ref
+                  .read(adminRepositoryProvider)
+                  .createUser(
+                    email: _emailController.text.trim(),
+                    password: _passwordController.text,
+                    displayName: _nameController.text.trim(),
+                  );
               if (context.mounted) {
                 Navigator.pop(context);
                 setState(() {});

@@ -9,15 +9,19 @@ import type {
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { ERROR_CODES } from '@repo/api-core';
-import { AppError } from '@repo/api-core';
-import { durationToMilliseconds } from '@repo/api-core';
-import { normalizeEmail } from '@repo/api-core';
-import { EnvironmentService } from '@repo/api-core';
+import {
+  AppError,
+  AUDIT_WRITER,
+  type AuditWriter,
+  durationToMilliseconds,
+  EnvironmentService,
+  ERROR_CODES,
+  MAIL_TEMPLATE_SENDER,
+  type MailTemplateSender,
+  normalizeEmail,
+} from '@repo/api-core';
 import { DATABASE } from '@repo/api-database';
 import { runInTransaction } from '@repo/api-database';
-import { AuditService } from '@repo/api-platform/modules/audit/application/audit.service';
-import { MailService } from '@repo/api-platform/modules/mail/application/mail.service';
 import { randomUUID } from 'node:crypto';
 
 import type {
@@ -59,9 +63,10 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly usersRepository: UsersRepository,
     private readonly accessControlService: AccessControlService,
-    private readonly auditService: AuditService,
+    @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
     private readonly authRepository: AuthRepository,
-    private readonly mailService: MailService,
+    @Inject(MAIL_TEMPLATE_SENDER)
+    private readonly mailSender: MailTemplateSender,
     private readonly organizationsService: OrganizationsService,
   ) {}
 
@@ -112,7 +117,7 @@ export class AuthService {
           transaction,
         );
 
-        await this.auditService.log(
+        await this.auditWriter.log(
           {
             actorId: user.id,
             action: 'auth.registered',
@@ -152,7 +157,7 @@ export class AuthService {
     );
 
     if (!user || !passwordMatches) {
-      await this.auditService.log({
+      await this.auditWriter.log({
         ...(user ? { actorId: user.id, entityId: user.id } : {}),
         action: 'auth.login.failed',
         entityType: 'user',
@@ -196,7 +201,7 @@ export class AuthService {
       },
     );
 
-    await this.auditService.log({
+    await this.auditWriter.log({
       actorId: user.id,
       action: 'auth.login.succeeded',
       entityType: 'user',
@@ -343,7 +348,7 @@ export class AuthService {
       organizationId,
     );
 
-    await this.auditService.log({
+    await this.auditWriter.log({
       actorId: user.userId,
       action: 'auth.organization.switched',
       entityType: 'organization',
@@ -364,7 +369,7 @@ export class AuthService {
     requestContext?: RequestContext,
   ) {
     await this.authRepository.revokeSession(user.sessionId);
-    await this.auditService.log({
+    await this.auditWriter.log({
       actorId: user.userId,
       action: 'auth.logout',
       entityType: 'session',
@@ -378,7 +383,7 @@ export class AuthService {
     requestContext?: RequestContext,
   ) {
     await this.authRepository.revokeAllSessionsForUser(user.userId);
-    await this.auditService.log({
+    await this.auditWriter.log({
       actorId: user.userId,
       action: 'auth.logout_all',
       entityType: 'user',
@@ -442,7 +447,7 @@ export class AuthService {
     }
 
     await this.authRepository.revokeSession(sessionId);
-    await this.auditService.log({
+    await this.auditWriter.log({
       actorId: user.userId,
       action: 'auth.session.revoked',
       entityType: 'session',
@@ -500,7 +505,7 @@ export class AuthService {
         token.userId,
         transaction,
       );
-      await this.auditService.log(
+      await this.auditWriter.log(
         {
           actorId: token.userId,
           action: 'auth.password_reset.completed',
@@ -545,7 +550,7 @@ export class AuthService {
         token.id,
         transaction,
       );
-      await this.auditService.log(
+      await this.auditWriter.log(
         {
           actorId: token.userId,
           action: 'auth.email_verified',
@@ -845,7 +850,7 @@ export class AuthService {
 
   private async sendVerificationEmail(email: string, token: string) {
     const verifyUrl = `${this.environmentService.values.NEXT_PUBLIC_WEB_URL}/verify-email?token=${token}`;
-    await this.mailService.sendTemplate({
+    await this.mailSender.sendTemplate({
       templateKey: 'auth.verify-email',
       to: email,
       variables: {
@@ -857,7 +862,7 @@ export class AuthService {
 
   private async sendPasswordResetEmail(email: string, token: string) {
     const resetUrl = `${this.environmentService.values.NEXT_PUBLIC_WEB_URL}/reset-password?token=${token}`;
-    await this.mailService.sendTemplate({
+    await this.mailSender.sendTemplate({
       templateKey: 'auth.reset-password',
       to: email,
       variables: {
@@ -868,7 +873,7 @@ export class AuthService {
   }
 
   private async sendWelcomeEmail(email: string, displayName: string) {
-    await this.mailService.sendTemplate({
+    await this.mailSender.sendTemplate({
       templateKey: 'auth.welcome',
       to: email,
       variables: {

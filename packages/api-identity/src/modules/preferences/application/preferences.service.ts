@@ -1,9 +1,12 @@
 import type { RequestContext } from '@repo/api-core';
 
-import { HttpStatus, Injectable } from '@nestjs/common';
-import { ERROR_CODES } from '@repo/api-core';
-import { AppError } from '@repo/api-core';
-import { AuditService } from '@repo/api-platform/modules/audit/application/audit.service';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import {
+  AppError,
+  AUDIT_WRITER,
+  type AuditWriter,
+  ERROR_CODES,
+} from '@repo/api-core';
 
 import type { UpdatePreferencesDto } from '../presentation/preferences.dto';
 
@@ -13,7 +16,7 @@ import { PreferencesRepository } from '../infrastructure/preferences.repository'
 export class PreferencesService {
   constructor(
     private readonly preferencesRepository: PreferencesRepository,
-    private readonly auditService: AuditService,
+    @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
   ) {}
 
   async getForUser(userId: string) {
@@ -57,7 +60,7 @@ export class PreferencesService {
       );
     }
 
-    await this.auditService.log({
+    await this.auditWriter.log({
       actorId: userId,
       action: 'user.preferences.updated',
       entityType: 'user_preferences',

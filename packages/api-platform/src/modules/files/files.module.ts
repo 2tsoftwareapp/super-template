@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { FILE_LOOKUP } from '@repo/api-core';
 
 import { AuditModule } from '../audit/audit.module';
 import { StorageModule } from '../storage/storage.module';
@@ -10,7 +11,15 @@ import { FilesController } from './presentation/files.controller';
 @Module({
   imports: [StorageModule, AuditModule],
   controllers: [FilesController],
-  providers: [FilesRepository, FilesService, LocalFileDownloadUrlService],
-  exports: [FilesRepository, FilesService],
+  providers: [
+    FilesRepository,
+    FilesService,
+    LocalFileDownloadUrlService,
+    {
+      provide: FILE_LOOKUP,
+      useExisting: FilesRepository,
+    },
+  ],
+  exports: [FilesRepository, FilesService, FILE_LOOKUP],
 })
 export class FilesModule {}

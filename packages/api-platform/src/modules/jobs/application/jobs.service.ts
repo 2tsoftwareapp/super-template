@@ -1,10 +1,14 @@
 import type { AuthenticatedRequestUser } from '@repo/api-core';
 
-import { HttpStatus, Injectable } from '@nestjs/common';
-import { ERROR_CODES } from '@repo/api-core';
-import { AppError } from '@repo/api-core';
-import { AuthRepository } from '@repo/api-identity/modules/auth/infrastructure/auth.repository';
-import { NotificationsService } from '@repo/api-workspace/modules/notifications/application/notifications.service';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import {
+  AppError,
+  AUTH_TOKEN_CLEANUP,
+  type AuthTokenCleanup,
+  ERROR_CODES,
+  USER_NOTIFICATION_SENDER,
+  type UserNotificationSender,
+} from '@repo/api-core';
 
 import { MailService } from '../../mail/application/mail.service';
 import { JobsRepository } from '../infrastructure/jobs.repository';
@@ -26,8 +30,10 @@ export class JobsService {
   constructor(
     private readonly jobsRepository: JobsRepository,
     private readonly mailService: MailService,
-    private readonly authRepository: AuthRepository,
-    private readonly notificationsService: NotificationsService,
+    @Inject(AUTH_TOKEN_CLEANUP)
+    private readonly authTokenCleanup: AuthTokenCleanup,
+    @Inject(USER_NOTIFICATION_SENDER)
+    private readonly notificationSender: UserNotificationSender,
   ) {
     this.registerHandler('mail.send', async ({ payload }) => {
       const templateKey =
@@ -54,7 +60,7 @@ export class JobsService {
     });
 
     this.registerHandler('auth.cleanup-tokens', async () => {
-      await this.authRepository.cleanupExpiredTokens();
+      await this.authTokenCleanup.cleanupExpiredTokens();
     });
 
     this.registerHandler('notification.send', async ({ payload, organizationId }) => {
@@ -69,7 +75,7 @@ export class JobsService {
         );
       }
 
-      await this.notificationsService.sendToUser(null, {
+      await this.notificationSender.sendToUser(null, {
         ...(organizationId ? { organizationId } : {}),
         userId,
         type,
@@ -94,16 +100,31 @@ export class JobsService {
     createdById?: string | null;
     organizationId?: string | null;
     maxAttempts?: number;
+    idempotencyKey?: string;
   }) {
+    const createdById = input.createdById ?? null;
+
+    if (input.idempotencyKey && createdById) {
+      const existing = await this.jobsRepository.findByIdempotencyKey(
+        createdById,
+        input.idempotencyKey,
+      );
+
+      if (existing) {
+        return this.toJobDto(existing);
+      }
+    }
+
     const job = await this.jobsRepository.create({
       type: input.type,
       payload: input.payload,
       scheduledAt: input.scheduledAt ?? new Date(),
       priority: input.priority ?? 0,
-      createdById: input.createdById ?? null,
+      createdById,
       organizationId: input.organizationId ?? null,
       maxAttempts: input.maxAttempts ?? 3,
       status: 'PENDING',
+      ...(input.idempotencyKey ? { idempotencyKey: input.idempotencyKey } : {}),
     });
 
     if (!job) {

@@ -1,5 +1,110 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "boundaries": {
+    "tags": {
+      "layer:core": {
+        "dependencies": {
+          "allow": ["layer:core", "layer:tsconfig", "layer:eslint"]
+        }
+      },
+      "layer:database": {
+        "dependencies": {
+          "allow": ["layer:core", "layer:database", "layer:tsconfig", "layer:eslint"]
+        }
+      },
+      "layer:contract": {
+        "dependencies": {
+          "allow": ["layer:contract", "layer:tsconfig", "layer:eslint"]
+        }
+      },
+      "layer:health": {
+        "dependencies": {
+          "allow": ["layer:core", "layer:database", "layer:health", "layer:tsconfig", "layer:eslint"]
+        }
+      },
+      "layer:identity": {
+        "dependencies": {
+          "allow": [
+            "layer:core",
+            "layer:database",
+            "layer:identity",
+            "layer:platform",
+            "layer:workspace",
+            "layer:tsconfig",
+            "layer:eslint"
+          ]
+        }
+      },
+      "layer:platform": {
+        "dependencies": {
+          "allow": [
+            "layer:core",
+            "layer:database",
+            "layer:identity",
+            "layer:platform",
+            "layer:workspace",
+            "layer:tsconfig",
+            "layer:eslint"
+          ]
+        }
+      },
+      "layer:workspace": {
+        "dependencies": {
+          "allow": [
+            "layer:core",
+            "layer:database",
+            "layer:identity",
+            "layer:platform",
+            "layer:workspace",
+            "layer:tsconfig",
+            "layer:eslint"
+          ]
+        }
+      },
+      "layer:bootstrap": {
+        "dependencies": {
+          "allow": [
+            "layer:core",
+            "layer:database",
+            "layer:identity",
+            "layer:platform",
+            "layer:workspace",
+            "layer:bootstrap",
+            "layer:health",
+            "layer:tsconfig",
+            "layer:eslint"
+          ]
+        }
+      },
+      "layer:app": {
+        "dependencies": {
+          "allow": [
+            "layer:core",
+            "layer:database",
+            "layer:identity",
+            "layer:platform",
+            "layer:workspace",
+            "layer:bootstrap",
+            "layer:health",
+            "layer:contract",
+            "layer:app",
+            "layer:tsconfig",
+            "layer:eslint"
+          ]
+        }
+      },
+      "layer:tsconfig": {
+        "dependencies": {
+          "allow": ["layer:tsconfig"]
+        }
+      },
+      "layer:eslint": {
+        "dependencies": {
+          "allow": ["layer:eslint", "layer:tsconfig"]
+        }
+      }
+    }
+  },
   "tasks": {
     "build": {
       "dependsOn": ["^build"],

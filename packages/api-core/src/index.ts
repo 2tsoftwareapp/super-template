@@ -1,9 +1,13 @@
+export {
+  AccessProfileCache,
+  type AccessProfileSnapshot,
+} from './common/cache/access-profile.cache';
 export * from './common/constants/error-codes';
 export * from './common/decorators/api-response.decorator';
 export * from './common/decorators/current-user.decorator';
 export * from './common/decorators/permissions.decorator';
-export * from './common/decorators/public.decorator';
 
+export * from './common/decorators/public.decorator';
 export * from './common/decorators/skip-envelope.decorator';
 export * from './common/errors/app-error';
 export * from './common/filters/app-exception.filter';
@@ -16,9 +20,12 @@ export { RequestContextMiddleware } from './common/middleware/request-context.mi
 export { RequestLoggerMiddleware } from './common/middleware/request-logger.middleware';
 export { ErrorReporterService } from './common/observability/error-reporter.service';
 export * from './common/pagination/pagination.dto';
+export * from './common/rbac/access-control.constants';
+export { RedisThrottlerStorage } from './common/throttling/redis-throttler.storage';
 export * from './common/types/request-context';
 export * from './common/utils/duration';
 export * from './common/utils/normalize-email';
+export * from './common/utils/opaque-token';
 export * from './common/utils/redact';
 export * from './common/utils/require-organization';
 export { AppConfigModule } from './config/app-config.module';
@@ -26,3 +33,48 @@ export { APP_ENVIRONMENT } from './config/config.constants';
 export type { AppEnvironment } from './config/env.schema';
 export { validateEnvironment } from './config/env.schema';
 export { EnvironmentService } from './config/environment.service';
+export {
+  AUDIT_WRITER,
+  type AuditLogInput,
+  type AuditWriter,
+} from './ports/audit-writer.port';
+export {
+  AUTH_TOKEN_CLEANUP,
+  type AuthTokenCleanup,
+} from './ports/auth-token-cleanup.port';
+export {
+  BACKGROUND_JOB_ENQUEUER,
+  type BackgroundJobEnqueueInput,
+  type BackgroundJobEnqueuer,
+} from './ports/background-job-enqueuer.port';
+export {
+  ENTITY_ATTACHMENT_LISTING,
+  type EntityAttachmentListing,
+  type EntityAttachmentRecord,
+} from './ports/entity-attachment-listing.port';
+export {
+  FILE_LOOKUP,
+  type FileLookup,
+  type FileOwnerRecord,
+} from './ports/file-lookup.port';
+export {
+  MAIL_TEMPLATE_SENDER,
+  type MailTemplateSender,
+  type MailTemplateSendInput,
+} from './ports/mail-template-sender.port';
+export {
+  PROJECT_DEMO_GATEWAY,
+  type ProjectDemoGateway,
+  type ProjectDemoRecord,
+} from './ports/project-demo-gateway.port';
+export {
+  USER_LOOKUP,
+  type UserLookup,
+  type UserSummary,
+} from './ports/user-lookup.port';
+export {
+  type NotificationMessage,
+  type SendUserNotificationInput,
+  USER_NOTIFICATION_SENDER,
+  type UserNotificationSender,
+} from './ports/user-notification-sender.port';

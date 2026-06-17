@@ -17,6 +17,7 @@ export { SettingsService } from './modules/settings/application/settings.service
 export { SettingsModule } from './modules/settings/settings.module';
 export { ObjectStorage } from './modules/storage/application/object-storage.interface';
 export { StorageModule } from './modules/storage/storage.module';
+export { PlatformPortsModule } from './platform-ports.module';
 import { AttachmentsModule } from './modules/attachments/attachments.module';
 import { AuditModule } from './modules/audit/audit.module';
 import { ExportsModule } from './modules/exports/exports.module';
@@ -26,9 +27,11 @@ import { JobsModule } from './modules/jobs/jobs.module';
 import { MailModule } from './modules/mail/mail.module';
 import { SettingsModule } from './modules/settings/settings.module';
 import { StorageModule } from './modules/storage/storage.module';
+import { PlatformPortsModule } from './platform-ports.module';
 
 @Module({
   imports: [
+    PlatformPortsModule,
     StorageModule,
     AuditModule,
     MailModule,
@@ -40,6 +43,7 @@ import { StorageModule } from './modules/storage/storage.module';
     ExportsModule,
   ],
   exports: [
+    PlatformPortsModule,
     StorageModule,
     AuditModule,
     MailModule,

@@ -1,6 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { AuditService } from '@repo/api-platform/modules/audit/application/audit.service';
-import { UsersRepository } from '@repo/api-identity/modules/users/infrastructure/users.repository';
+import { AUDIT_WRITER, USER_LOOKUP } from '@repo/api-core';
 import { NotificationsService } from '../application/notifications.service';
 import { PUSH_NOTIFIER } from '../application/push.interface';
 import { DeviceTokensRepository } from '../infrastructure/device-tokens.repository';
@@ -10,7 +9,7 @@ import { NotificationsRepository } from '../infrastructure/notifications.reposit
 
 describe('NotificationsService delivery jobs', () => {
   it('resolves recipients for USER, USERS, and ALL audiences', async () => {
-    const usersRepository = {
+    const userLookup = {
       findById: vi.fn(async (userId: string) =>
         userId === 'active-user'
           ? { id: 'active-user', status: 'ACTIVE' }
@@ -25,11 +24,11 @@ describe('NotificationsService delivery jobs', () => {
     const service = new NotificationsService(
       {} as NotificationsRepository,
       {} as NotificationJobsRepository,
-      usersRepository as unknown as UsersRepository,
+      userLookup,
       {} as DeviceTokensRepository,
       {} as NotificationStreamService,
       { sendToUser: vi.fn() },
-      { log: vi.fn() } as unknown as AuditService,
+      { log: vi.fn() },
     );
 
     await expect(

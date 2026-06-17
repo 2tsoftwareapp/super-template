@@ -20,7 +20,7 @@ class _$NotificationDto extends NotificationDto {
   @override
   final String body;
   @override
-  final JsonObject? data;
+  final BuiltMap<String, JsonObject?>? data;
   @override
   final JsonObject? readAt;
   @override
@@ -114,9 +114,10 @@ class NotificationDtoBuilder
   String? get body => _$this._body;
   set body(String? body) => _$this._body = body;
 
-  JsonObject? _data;
-  JsonObject? get data => _$this._data;
-  set data(JsonObject? data) => _$this._data = data;
+  MapBuilder<String, JsonObject?>? _data;
+  MapBuilder<String, JsonObject?> get data =>
+      _$this._data ??= MapBuilder<String, JsonObject?>();
+  set data(MapBuilder<String, JsonObject?>? data) => _$this._data = data;
 
   JsonObject? _readAt;
   JsonObject? get readAt => _$this._readAt;
@@ -138,7 +139,7 @@ class NotificationDtoBuilder
       _type = $v.type;
       _title = $v.title;
       _body = $v.body;
-      _data = $v.data;
+      _data = $v.data?.toBuilder();
       _readAt = $v.readAt;
       _createdAt = $v.createdAt;
       _$v = null;
@@ -160,23 +161,36 @@ class NotificationDtoBuilder
   NotificationDto build() => _build();
 
   _$NotificationDto _build() {
-    final _$result = _$v ??
-        _$NotificationDto._(
-          id: BuiltValueNullFieldError.checkNotNull(
-              id, r'NotificationDto', 'id'),
-          userId: BuiltValueNullFieldError.checkNotNull(
-              userId, r'NotificationDto', 'userId'),
-          type: BuiltValueNullFieldError.checkNotNull(
-              type, r'NotificationDto', 'type'),
-          title: BuiltValueNullFieldError.checkNotNull(
-              title, r'NotificationDto', 'title'),
-          body: BuiltValueNullFieldError.checkNotNull(
-              body, r'NotificationDto', 'body'),
-          data: data,
-          readAt: readAt,
-          createdAt: BuiltValueNullFieldError.checkNotNull(
-              createdAt, r'NotificationDto', 'createdAt'),
-        );
+    _$NotificationDto _$result;
+    try {
+      _$result = _$v ??
+          _$NotificationDto._(
+            id: BuiltValueNullFieldError.checkNotNull(
+                id, r'NotificationDto', 'id'),
+            userId: BuiltValueNullFieldError.checkNotNull(
+                userId, r'NotificationDto', 'userId'),
+            type: BuiltValueNullFieldError.checkNotNull(
+                type, r'NotificationDto', 'type'),
+            title: BuiltValueNullFieldError.checkNotNull(
+                title, r'NotificationDto', 'title'),
+            body: BuiltValueNullFieldError.checkNotNull(
+                body, r'NotificationDto', 'body'),
+            data: _data?.build(),
+            readAt: readAt,
+            createdAt: BuiltValueNullFieldError.checkNotNull(
+                createdAt, r'NotificationDto', 'createdAt'),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'data';
+        _data?.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'NotificationDto', _$failedField, e.toString());
+      }
+      rethrow;
+    }
     replace(_$result);
     return _$result;
   }

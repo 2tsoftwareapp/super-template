@@ -108,7 +108,7 @@ class _$JobDto extends JobDto {
   @override
   final JsonObject? errorMessage;
   @override
-  final JsonObject? createdById;
+  final String? createdById;
   @override
   final String createdAt;
   @override
@@ -260,9 +260,9 @@ class JobDtoBuilder implements Builder<JobDto, JobDtoBuilder> {
   set errorMessage(JsonObject? errorMessage) =>
       _$this._errorMessage = errorMessage;
 
-  JsonObject? _createdById;
-  JsonObject? get createdById => _$this._createdById;
-  set createdById(JsonObject? createdById) => _$this._createdById = createdById;
+  String? _createdById;
+  String? get createdById => _$this._createdById;
+  set createdById(String? createdById) => _$this._createdById = createdById;
 
   String? _createdAt;
   String? get createdAt => _$this._createdAt;

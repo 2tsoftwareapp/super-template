@@ -101,6 +101,20 @@ export class AccessControlRepository {
     }
   }
 
+  async findUserIdsForRole(
+    roleId: string,
+    executor: DatabaseExecutor = this.database,
+  ): Promise<string[]> {
+    const rows = await executor
+      .select({
+        userId: userRoles.userId,
+      })
+      .from(userRoles)
+      .where(eq(userRoles.roleId, roleId));
+
+    return rows.map((row) => row.userId);
+  }
+
   async replaceUserRoles(
     userId: string,
     roleIds: string[],

@@ -1,4 +1,5 @@
-import { index, integer, jsonb, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm';
+import { index, integer, jsonb, pgTable, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
 
 import { organizations } from '../identity/organizations';
 import { users } from '../identity/users';
@@ -27,11 +28,15 @@ export const importJobs = pgTable(
       .references(() => users.id, { onDelete: 'restrict' }),
     confirmedAt: timestamp('confirmed_at', { withTimezone: true }),
     completedAt: timestamp('completed_at', { withTimezone: true }),
+    idempotencyKey: text('idempotency_key'),
     ...timestamps,
   },
   (table) => [
     index('import_jobs_status_idx').on(table.status),
     index('import_jobs_created_by_id_idx').on(table.createdById),
+    uniqueIndex('import_jobs_created_by_idempotency_key_unique')
+      .on(table.createdById, table.idempotencyKey)
+      .where(sql`${table.idempotencyKey} is not null`),
   ],
 );
 
@@ -52,10 +57,14 @@ export const exportJobs = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: 'restrict' }),
     completedAt: timestamp('completed_at', { withTimezone: true }),
+    idempotencyKey: text('idempotency_key'),
     ...timestamps,
   },
   (table) => [
     index('export_jobs_status_idx').on(table.status),
     index('export_jobs_created_by_id_idx').on(table.createdById),
+    uniqueIndex('export_jobs_created_by_idempotency_key_unique')
+      .on(table.createdById, table.idempotencyKey)
+      .where(sql`${table.idempotencyKey} is not null`),
   ],
 );

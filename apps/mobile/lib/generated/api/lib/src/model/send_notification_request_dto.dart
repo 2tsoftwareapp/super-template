@@ -6,6 +6,7 @@
 // @dart=3.0
 
 import 'package:built_collection/built_collection.dart';
+import 'package:built_value/json_object.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
@@ -46,7 +47,7 @@ abstract class SendNotificationRequestDto
   String get body;
 
   @BuiltValueField(wireName: r'data')
-  JsonObject? get data;
+  BuiltMap<String, JsonObject?>? get data;
 
   /// ISO-8601 datetime. Omit or set to now for immediate delivery.
   @BuiltValueField(wireName: r'scheduledAt')
@@ -120,7 +121,8 @@ class _$SendNotificationRequestDtoSerializer
       yield r'data';
       yield serializers.serialize(
         object.data,
-        specifiedType: const FullType(JsonObject),
+        specifiedType: const FullType(
+            BuiltMap, [FullType(String), FullType.nullable(JsonObject)]),
       );
     }
     if (object.scheduledAt != null) {
@@ -201,9 +203,10 @@ class _$SendNotificationRequestDtoSerializer
         case r'data':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(JsonObject),
-          ) as JsonObject;
-          result.data = valueDes;
+            specifiedType: const FullType(
+                BuiltMap, [FullType(String), FullType.nullable(JsonObject)]),
+          ) as BuiltMap<String, JsonObject?>;
+          result.data.replace(valueDes);
           break;
         case r'scheduledAt':
           final valueDes = serializers.deserialize(

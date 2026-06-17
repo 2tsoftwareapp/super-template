@@ -166,17 +166,18 @@ export class FilesService {
     requestContext?: RequestContext,
   ) {
     const file = await this.findAccessibleFile(actor, fileId);
-    await this.filesRepository.softDelete(file.id);
 
     try {
       await this.objectStorage.delete(file.storageKey);
     } catch {
       throw new AppError(
         ERROR_CODES.INTERNAL_ERROR,
-        'File record was deleted but storage cleanup failed',
+        'File storage cleanup failed',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+
+    await this.filesRepository.softDelete(file.id);
 
     await this.auditService.log({
       actorId: actor.userId,

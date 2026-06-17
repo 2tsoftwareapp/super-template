@@ -28,6 +28,11 @@ if [ "${SKIP_FLUTTER_GENERATION:-}" = "1" ] || [ "${CI:-}" = "true" ]; then
   exit 0
 fi
 
+if ! docker info >/dev/null 2>&1; then
+  printf '[generate] Docker unavailable; keeping existing Dart client at apps/mobile/lib/generated/api\n' >&2
+  exit 0
+fi
+
 rm -rf apps/mobile/lib/generated/api
 mkdir -p apps/mobile/lib/generated/api
 run_step \
@@ -53,8 +58,6 @@ function walk(dir) {
     if (entry.isDirectory()) walk(p);
     else if (entry.name.endsWith('.dart')) {
       let src = fs.readFileSync(p, 'utf8');
-      // Remove unused json_object import injected by openapi-generator.
-      src = src.replace(/^import 'package:built_value\\/json_object\\.dart';\\n/gm, '');
       // Add explicit language version so library and part files match under
       // Flutter's patched Dart SDK (avoids CFE language-version-override error).
       if (!src.includes('// @dart=')) {

@@ -21,6 +21,7 @@ import {
   ErrorReporterService,
   LoggingModule,
   PermissionsGuard,
+  RedisThrottlerStorage,
   RequestContextMiddleware,
   RequestLoggerMiddleware,
   ResponseEnvelopeInterceptor,
@@ -39,18 +40,24 @@ import { TenantContextInterceptor } from './shell/tenant-context.interceptor';
   imports: [
     AppConfigModule,
     LoggingModule,
-    ThrottlerModule.forRoot([
-      {
-        ttl: 60_000,
-        limit: 120,
-      },
-    ]),
+    ThrottlerModule.forRootAsync({
+      inject: [EnvironmentService],
+      useFactory: (environmentService: EnvironmentService) => ({
+        throttlers: [
+          {
+            ttl: 60_000,
+            limit: 120,
+          },
+        ],
+        storage: new RedisThrottlerStorage(environmentService),
+      }),
+    }),
     ScheduleModule.forRoot(),
     DatabaseModule,
     HealthModule,
-    IdentityModule,
-    PlatformModule,
     WorkspaceModule,
+    PlatformModule,
+    IdentityModule,
   ],
   providers: [
     RequestLoggerMiddleware,

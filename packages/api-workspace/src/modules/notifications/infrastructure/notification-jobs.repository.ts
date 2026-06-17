@@ -40,6 +40,25 @@ export class NotificationJobsRepository {
     return job ?? null;
   }
 
+  async findByIdempotencyKey(
+    actorId: string,
+    idempotencyKey: string,
+    executor: DatabaseExecutor = this.database,
+  ) {
+    const [job] = await executor
+      .select()
+      .from(notificationJobs)
+      .where(
+        and(
+          eq(notificationJobs.actorId, actorId),
+          eq(notificationJobs.idempotencyKey, idempotencyKey),
+        ),
+      )
+      .limit(1);
+
+    return job ?? null;
+  }
+
   async list(
     params: ListJobsParams,
     executor: DatabaseExecutor = this.database,

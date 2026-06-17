@@ -2,6 +2,7 @@ import type { AuthenticatedRequestUser } from '@repo/api-core';
 import type { DatabaseExecutor } from '@repo/api-database';
 
 import { HttpStatus, Injectable } from '@nestjs/common';
+import { AccessProfileCache } from '@repo/api-core';
 import { ERROR_CODES } from '@repo/api-core';
 import { AppError } from '@repo/api-core';
 
@@ -19,6 +20,7 @@ import { AccessControlRepository } from '../infrastructure/access-control.reposi
 export class AccessControlService {
   constructor(
     private readonly accessControlRepository: AccessControlRepository,
+    private readonly accessProfileCache: AccessProfileCache,
   ) {}
 
   async ensureSeedData(executor?: DatabaseExecutor): Promise<void> {
@@ -169,18 +171,47 @@ export class AccessControlService {
       userPermissionIds,
       executor,
     );
+    await this.invalidateUsersForRole(superAdminRole.id, executor);
+    await this.invalidateUsersForRole(adminRole.id, executor);
+    await this.invalidateUsersForRole(userRole.id, executor);
   }
 
   async getAccessProfile(userId: string) {
+    const cached = await this.accessProfileCache.get(userId);
+
+    if (cached) {
+      return cached;
+    }
+
     const [roles, permissions] = await Promise.all([
       this.accessControlRepository.findRoleNamesForUser(userId),
       this.accessControlRepository.findPermissionNamesForUser(userId),
     ]);
 
-    return {
+    const profile = {
       roles,
       permissions,
     };
+
+    await this.accessProfileCache.set(userId, profile);
+
+    return profile;
+  }
+
+  async invalidateAccessProfile(userId: string): Promise<void> {
+    await this.accessProfileCache.invalidateUser(userId);
+  }
+
+  private async invalidateUsersForRole(
+    roleId: string,
+    executor?: DatabaseExecutor,
+  ): Promise<void> {
+    const userIds = await this.accessControlRepository.findUserIdsForRole(
+      roleId,
+      executor,
+    );
+
+    await this.accessProfileCache.invalidateUsers(userIds);
   }
 
   async getRoleNamesForUsers(userIds: string[]) {
@@ -283,6 +314,7 @@ export class AccessControlService {
       roleIds,
       executor,
     );
+    await this.accessProfileCache.invalidateUser(userId);
   }
 
   assertCanAssignRoles(

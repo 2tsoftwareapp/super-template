@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { PROJECT_DEMO_GATEWAY } from '@repo/api-core';
 import { UsersModule } from '@repo/api-identity/modules/users/users.module';
 import { AttachmentsModule } from '@repo/api-platform/modules/attachments/attachments.module';
 import { AuditModule } from '@repo/api-platform/modules/audit/audit.module';
@@ -18,7 +19,14 @@ import { ProjectsController } from './presentation/projects.controller';
     AttachmentsModule,
   ],
   controllers: [ProjectsController],
-  providers: [ProjectsRepository, ProjectsService],
-  exports: [ProjectsRepository, ProjectsService],
+  providers: [
+    ProjectsRepository,
+    ProjectsService,
+    {
+      provide: PROJECT_DEMO_GATEWAY,
+      useExisting: ProjectsRepository,
+    },
+  ],
+  exports: [ProjectsRepository, ProjectsService, PROJECT_DEMO_GATEWAY],
 })
 export class ProjectsModule {}

@@ -13,14 +13,17 @@ export { NotificationsModule } from './modules/notifications/notifications.modul
 export { ProjectsService } from './modules/projects/application/projects.service';
 export { ProjectsRepository } from './modules/projects/infrastructure/projects.repository';
 export { ProjectsModule } from './modules/projects/projects.module';
+export { WorkspacePortsModule } from './workspace-ports.module';
 import { ActivitiesModule } from './modules/activities/activities.module';
 import { CommentsModule } from './modules/comments/comments.module';
 import { InvitationsModule } from './modules/invitations/invitations.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { ProjectsModule } from './modules/projects/projects.module';
+import { WorkspacePortsModule } from './workspace-ports.module';
 
 @Module({
   imports: [
+    WorkspacePortsModule,
     ActivitiesModule,
     CommentsModule,
     NotificationsModule,
@@ -28,6 +31,7 @@ import { ProjectsModule } from './modules/projects/projects.module';
     InvitationsModule,
   ],
   exports: [
+    WorkspacePortsModule,
     ActivitiesModule,
     CommentsModule,
     NotificationsModule,

@@ -6,7 +6,7 @@ import type {
 import { Inject, Injectable } from '@nestjs/common';
 import { DATABASE } from '@repo/api-database';
 import { exportJobs } from '@repo/api-database';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 
 @Injectable()
 export class ExportJobsRepository {
@@ -26,6 +26,25 @@ export class ExportJobsRepository {
       .select()
       .from(exportJobs)
       .where(eq(exportJobs.id, jobId))
+      .limit(1);
+
+    return job ?? null;
+  }
+
+  async findByIdempotencyKey(
+    createdById: string,
+    idempotencyKey: string,
+    executor: DatabaseExecutor = this.database,
+  ) {
+    const [job] = await executor
+      .select()
+      .from(exportJobs)
+      .where(
+        and(
+          eq(exportJobs.createdById, createdById),
+          eq(exportJobs.idempotencyKey, idempotencyKey),
+        ),
+      )
       .limit(1);
 
     return job ?? null;

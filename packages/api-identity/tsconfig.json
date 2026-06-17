@@ -3,20 +3,7 @@
   "compilerOptions": {
     "outDir": "dist",
     "baseUrl": ".",
-    "strictPropertyInitialization": false,
-    "paths": {
-      "@repo/api-core": ["../api-core/src/index.ts"],
-      "@repo/api-core/common/*": ["../api-core/src/common/*"],
-      "@repo/api-core/config/*": ["../api-core/src/config/*"],
-      "@repo/api-database": ["../api-database/src/index.ts"],
-      "@repo/api-database/*": ["../api-database/src/*"],
-      "@repo/api-identity": ["../api-identity/src/index.ts"],
-      "@repo/api-identity/modules/*": ["../api-identity/src/modules/*"],
-      "@repo/api-platform": ["../api-platform/src/index.ts"],
-      "@repo/api-platform/modules/*": ["../api-platform/src/modules/*"],
-      "@repo/api-workspace": ["../api-workspace/src/index.ts"],
-      "@repo/api-workspace/modules/*": ["../api-workspace/src/modules/*"]
-    }
+    "strictPropertyInitialization": false
   },
   "include": ["src/**/*.ts", "../api-core/src/common/types/express.d.ts"],
   "exclude": ["src/**/*.spec.ts"]

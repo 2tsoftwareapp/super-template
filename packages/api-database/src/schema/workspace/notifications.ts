@@ -1,3 +1,4 @@
+import { sql } from 'drizzle-orm';
 import {
   index,
   integer,
@@ -88,6 +89,7 @@ export const notificationJobs = pgTable(
     recipientCount: integer('recipient_count'),
     processedAt: timestamp('processed_at', { withTimezone: true }),
     errorMessage: text('error_message'),
+    idempotencyKey: text('idempotency_key'),
     ...timestamps,
   },
   (table) => [
@@ -96,5 +98,8 @@ export const notificationJobs = pgTable(
       table.scheduledAt,
     ),
     index('notification_jobs_actor_id_idx').on(table.actorId),
+    uniqueIndex('notification_jobs_actor_idempotency_key_unique')
+      .on(table.actorId, table.idempotencyKey)
+      .where(sql`${table.idempotencyKey} is not null`),
   ],
 );

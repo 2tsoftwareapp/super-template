@@ -4,10 +4,13 @@ import type {
 } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { ERROR_CODES } from '@repo/api-core';
-import { AppError } from '@repo/api-core';
-import { requireOrganizationId } from '@repo/api-core';
-import { ProjectsRepository } from '@repo/api-workspace/modules/projects/infrastructure/projects.repository';
+import {
+  AppError,
+  ERROR_CODES,
+  PROJECT_DEMO_GATEWAY,
+  type ProjectDemoGateway,
+  requireOrganizationId,
+} from '@repo/api-core';
 import { randomUUID } from 'node:crypto';
 
 import type { CreateExportDto } from '../presentation/exports.dto';
@@ -25,7 +28,8 @@ export class ExportsService {
   constructor(
     private readonly exportJobsRepository: ExportJobsRepository,
     private readonly filesRepository: FilesRepository,
-    private readonly projectsRepository: ProjectsRepository,
+    @Inject(PROJECT_DEMO_GATEWAY)
+    private readonly projectDemoGateway: ProjectDemoGateway,
     @Inject(OBJECT_STORAGE) private readonly objectStorage: ObjectStorage,
     private readonly auditService: AuditService,
   ) {}
@@ -36,12 +40,27 @@ export class ExportsService {
     requestContext?: RequestContext,
   ) {
     const organizationId = requireOrganizationId(actor);
+
+    if (input.idempotencyKey) {
+      const existing = await this.exportJobsRepository.findByIdempotencyKey(
+        actor.userId,
+        input.idempotencyKey,
+      );
+
+      if (existing) {
+        return this.toDto(existing);
+      }
+    }
+
     const job = await this.exportJobsRepository.create({
       organizationId,
       type: input.type,
       status: 'PROCESSING',
       filters: input.filters ?? null,
       createdById: actor.userId,
+      ...(input.idempotencyKey
+        ? { idempotencyKey: input.idempotencyKey }
+        : {}),
     });
 
     if (!job) {
@@ -104,7 +123,7 @@ export class ExportsService {
       );
     }
 
-    const result = await this.projectsRepository.list({
+    const result = await this.projectDemoGateway.list({
       page: 1,
       limit: 1000,
       ownerId: actor.userId,

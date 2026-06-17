@@ -1,8 +1,10 @@
+import { generateOpaqueToken, hashOpaqueToken } from '@repo/api-core';
 import * as argon2 from 'argon2';
-import { createHash, randomBytes } from 'node:crypto';
 
 const DUMMY_PASSWORD_HASH =
   '$argon2id$v=19$m=65536,t=3,p=4$EnMqZqWbztDZjMH5GrNZJQ$jEXMP23MqS+/Dp20m83Kwq7wktQ3jyT+BEfr7UqSFZo';
+
+export { generateOpaqueToken, hashOpaqueToken };
 
 export const hashPassword = (value: string): Promise<string> =>
   argon2.hash(value, {
@@ -29,8 +31,3 @@ export const verifyPasswordWithTimingPadding = async (
 export const hashRefreshToken = hashPassword;
 export const verifyRefreshTokenHash = verifyPassword;
 
-export const generateOpaqueToken = (): string =>
-  randomBytes(32).toString('hex');
-
-export const hashOpaqueToken = (token: string): string =>
-  createHash('sha256').update(token).digest('hex');

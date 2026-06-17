@@ -5,11 +5,15 @@ import type {
 import type { DatabaseExecutor } from '@repo/api-database';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { ERROR_CODES } from '@repo/api-core';
-import { AppError } from '@repo/api-core';
-import { requireOrganizationId } from '@repo/api-core';
-import { UsersRepository } from '@repo/api-identity/modules/users/infrastructure/users.repository';
-import { AuditService } from '@repo/api-platform/modules/audit/application/audit.service';
+import {
+  AppError,
+  AUDIT_WRITER,
+  type AuditWriter,
+  ERROR_CODES,
+  requireOrganizationId,
+  USER_LOOKUP,
+  type UserLookup,
+} from '@repo/api-core';
 
 import {
   PUSH_NOTIFIER,
@@ -66,11 +70,11 @@ export class NotificationsService {
   constructor(
     private readonly notificationsRepository: NotificationsRepository,
     private readonly notificationJobsRepository: NotificationJobsRepository,
-    private readonly usersRepository: UsersRepository,
+    @Inject(USER_LOOKUP) private readonly userLookup: UserLookup,
     private readonly deviceTokensRepository: DeviceTokensRepository,
     private readonly notificationStreamService: NotificationStreamService,
     @Inject(PUSH_NOTIFIER) private readonly pushNotifier: PushNotifier,
-    private readonly auditService: AuditService,
+    @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
   ) {}
 
   async sendToUser(
@@ -108,7 +112,7 @@ export class NotificationsService {
     }
 
     if (actor) {
-      await this.auditService.log(
+      await this.auditWriter.log(
         {
           actorId: actor.userId,
           action: 'notification.sent',
@@ -152,6 +156,17 @@ export class NotificationsService {
       );
     }
 
+    if (input.idempotencyKey) {
+      const existing = await this.notificationJobsRepository.findByIdempotencyKey(
+        actor.userId,
+        input.idempotencyKey,
+      );
+
+      if (existing) {
+        return this.toNotificationJobDto(existing);
+      }
+    }
+
     const job = await this.notificationJobsRepository.create({
       organizationId: requireOrganizationId(actor),
       actorId: actor.userId,
@@ -170,13 +185,16 @@ export class NotificationsService {
       data: input.data ?? null,
       scheduledAt,
       status: 'PENDING',
+      ...(input.idempotencyKey
+        ? { idempotencyKey: input.idempotencyKey }
+        : {}),
     });
 
     if (!job) {
       throw new Error('Notification job insert returned no rows');
     }
 
-    await this.auditService.log({
+    await this.auditWriter.log({
       actorId: actor.userId,
       action: 'notification.job.created',
       entityType: 'notification_job',
@@ -248,7 +266,7 @@ export class NotificationsService {
       );
     }
 
-    await this.auditService.log({
+    await this.auditWriter.log({
       actorId: actor.userId,
       action: 'notification.job.cancelled',
       entityType: 'notification_job',
@@ -467,15 +485,15 @@ export class NotificationsService {
         return [];
       }
 
-      const user = await this.usersRepository.findById(job.targetUserId);
+      const user = await this.userLookup.findById(job.targetUserId);
       return user?.status === 'ACTIVE' ? [user.id] : [];
     }
 
     if (audience === NotificationAudienceDto.USERS) {
-      return this.usersRepository.filterExistingUserIds(job.userIds ?? []);
+      return this.userLookup.filterExistingUserIds(job.userIds ?? []);
     }
 
-    return this.usersRepository.listDeliverableUserIds();
+    return this.userLookup.listDeliverableUserIds();
   }
 
   private toNotificationDto(

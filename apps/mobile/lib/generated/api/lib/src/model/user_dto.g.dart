@@ -84,6 +84,8 @@ class _$UserDto extends UserDto {
   @override
   final BuiltList<String> roles;
   @override
+  final BuiltList<String> roleIds;
+  @override
   final String createdAt;
   @override
   final String updatedAt;
@@ -99,6 +101,7 @@ class _$UserDto extends UserDto {
       required this.status,
       this.emailVerifiedAt,
       required this.roles,
+      required this.roleIds,
       required this.createdAt,
       required this.updatedAt})
       : super._();
@@ -120,6 +123,7 @@ class _$UserDto extends UserDto {
         status == other.status &&
         emailVerifiedAt == other.emailVerifiedAt &&
         roles == other.roles &&
+        roleIds == other.roleIds &&
         createdAt == other.createdAt &&
         updatedAt == other.updatedAt;
   }
@@ -134,6 +138,7 @@ class _$UserDto extends UserDto {
     _$hash = $jc(_$hash, status.hashCode);
     _$hash = $jc(_$hash, emailVerifiedAt.hashCode);
     _$hash = $jc(_$hash, roles.hashCode);
+    _$hash = $jc(_$hash, roleIds.hashCode);
     _$hash = $jc(_$hash, createdAt.hashCode);
     _$hash = $jc(_$hash, updatedAt.hashCode);
     _$hash = $jf(_$hash);
@@ -150,6 +155,7 @@ class _$UserDto extends UserDto {
           ..add('status', status)
           ..add('emailVerifiedAt', emailVerifiedAt)
           ..add('roles', roles)
+          ..add('roleIds', roleIds)
           ..add('createdAt', createdAt)
           ..add('updatedAt', updatedAt))
         .toString();
@@ -188,6 +194,10 @@ class UserDtoBuilder implements Builder<UserDto, UserDtoBuilder> {
   ListBuilder<String> get roles => _$this._roles ??= ListBuilder<String>();
   set roles(ListBuilder<String>? roles) => _$this._roles = roles;
 
+  ListBuilder<String>? _roleIds;
+  ListBuilder<String> get roleIds => _$this._roleIds ??= ListBuilder<String>();
+  set roleIds(ListBuilder<String>? roleIds) => _$this._roleIds = roleIds;
+
   String? _createdAt;
   String? get createdAt => _$this._createdAt;
   set createdAt(String? createdAt) => _$this._createdAt = createdAt;
@@ -210,6 +220,7 @@ class UserDtoBuilder implements Builder<UserDto, UserDtoBuilder> {
       _status = $v.status;
       _emailVerifiedAt = $v.emailVerifiedAt;
       _roles = $v.roles.toBuilder();
+      _roleIds = $v.roleIds.toBuilder();
       _createdAt = $v.createdAt;
       _updatedAt = $v.updatedAt;
       _$v = null;
@@ -245,6 +256,7 @@ class UserDtoBuilder implements Builder<UserDto, UserDtoBuilder> {
                 status, r'UserDto', 'status'),
             emailVerifiedAt: emailVerifiedAt,
             roles: roles.build(),
+            roleIds: roleIds.build(),
             createdAt: BuiltValueNullFieldError.checkNotNull(
                 createdAt, r'UserDto', 'createdAt'),
             updatedAt: BuiltValueNullFieldError.checkNotNull(
@@ -255,6 +267,8 @@ class UserDtoBuilder implements Builder<UserDto, UserDtoBuilder> {
       try {
         _$failedField = 'roles';
         roles.build();
+        _$failedField = 'roleIds';
+        roleIds.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
             r'UserDto', _$failedField, e.toString());

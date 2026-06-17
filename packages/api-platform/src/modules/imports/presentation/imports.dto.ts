@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, IsUUID } from 'class-validator';
+import { IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
 
 export class ImportJobDto {
   @ApiProperty()
@@ -52,4 +52,13 @@ export class CreateImportDto {
   @ApiProperty()
   @IsUUID()
   fileId: string;
+
+  @ApiPropertyOptional({
+    description:
+      'Client-supplied idempotency key. Retries with the same key return the original import job.',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(128)
+  idempotencyKey?: string;
 }

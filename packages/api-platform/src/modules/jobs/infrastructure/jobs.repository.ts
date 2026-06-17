@@ -38,6 +38,25 @@ export class JobsRepository {
     return job ?? null;
   }
 
+  async findByIdempotencyKey(
+    createdById: string,
+    idempotencyKey: string,
+    executor: DatabaseExecutor = this.database,
+  ) {
+    const [job] = await executor
+      .select()
+      .from(jobs)
+      .where(
+        and(
+          eq(jobs.createdById, createdById),
+          eq(jobs.idempotencyKey, idempotencyKey),
+        ),
+      )
+      .limit(1);
+
+    return job ?? null;
+  }
+
   async list(
     params: ListJobsParams,
     executor: DatabaseExecutor = this.database,

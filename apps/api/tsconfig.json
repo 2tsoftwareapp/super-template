@@ -6,22 +6,7 @@
     "strictPropertyInitialization": false,
     "tsBuildInfoFile": "dist/tsconfig.build.tsbuildinfo",
     "paths": {
-      "src/*": ["src/*"],
-      "@repo/api-core": ["../../packages/api-core/src/index.ts"],
-      "@repo/api-core/common/*": ["../../packages/api-core/src/common/*"],
-      "@repo/api-core/config/*": ["../../packages/api-core/src/config/*"],
-      "@repo/api-bootstrap": ["../../packages/api-bootstrap/src/index.ts"],
-      "@repo/api-bootstrap/*": ["../../packages/api-bootstrap/src/*"],
-      "@repo/api-health": ["../../packages/api-health/src/index.ts"],
-      "@repo/api-health/*": ["../../packages/api-health/src/*"],
-      "@repo/api-database": ["../../packages/api-database/src/index.ts"],
-      "@repo/api-database/*": ["../../packages/api-database/src/*"],
-      "@repo/api-identity": ["../../packages/api-identity/src/index.ts"],
-      "@repo/api-identity/modules/*": ["../../packages/api-identity/src/modules/*"],
-      "@repo/api-platform": ["../../packages/api-platform/src/index.ts"],
-      "@repo/api-platform/modules/*": ["../../packages/api-platform/src/modules/*"],
-      "@repo/api-workspace": ["../../packages/api-workspace/src/index.ts"],
-      "@repo/api-workspace/modules/*": ["../../packages/api-workspace/src/modules/*"]
+      "src/*": ["src/*"]
     }
   },
   "include": [

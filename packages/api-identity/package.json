@@ -5,7 +5,9 @@
   "type": "commonjs",
   "exports": {
     ".": "./src/index.ts",
-    "./modules/*": "./src/modules/*"
+    "./*": "./src/*.ts",
+    "./modules/*/*": "./src/modules/*/*.ts",
+    "./modules/*/*/*": "./src/modules/*/*/*.ts"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json --noEmit",

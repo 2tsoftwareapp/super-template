@@ -3,20 +3,22 @@ import type {
   RequestContext,
 } from '@repo/api-core';
 
-import { HttpStatus, Injectable } from '@nestjs/common';
-import { ERROR_CODES } from '@repo/api-core';
-import { AppError } from '@repo/api-core';
-import { durationToMilliseconds } from '@repo/api-core';
-import { normalizeEmail } from '@repo/api-core';
-import { requireOrganizationId } from '@repo/api-core';
-import { EnvironmentService } from '@repo/api-core';
-import { PERMISSION_NAMES } from '@repo/api-identity/modules/access-control/access-control.constants';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import {
+  AppError,
+  AUDIT_WRITER,
+  type AuditWriter,
+  BACKGROUND_JOB_ENQUEUER,
+  type BackgroundJobEnqueuer,
+  durationToMilliseconds,
+  EnvironmentService,
+  ERROR_CODES,
   generateOpaqueToken,
   hashOpaqueToken,
-} from '@repo/api-identity/modules/auth/application/auth.helpers';
-import { AuditService } from '@repo/api-platform/modules/audit/application/audit.service';
-import { JobsService } from '@repo/api-platform/modules/jobs/application/jobs.service';
+  normalizeEmail,
+  PERMISSION_NAMES,
+  requireOrganizationId,
+} from '@repo/api-core';
 
 import type {
   AcceptInvitationDto,
@@ -32,8 +34,9 @@ export class InvitationsService {
   constructor(
     private readonly invitationsRepository: InvitationsRepository,
     private readonly projectsRepository: ProjectsRepository,
-    private readonly auditService: AuditService,
-    private readonly jobsService: JobsService,
+    @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
+    @Inject(BACKGROUND_JOB_ENQUEUER)
+    private readonly jobEnqueuer: BackgroundJobEnqueuer,
     private readonly environmentService: EnvironmentService,
   ) {}
 
@@ -75,7 +78,7 @@ export class InvitationsService {
 
     const acceptUrl = `${this.environmentService.values.NEXT_PUBLIC_WEB_URL}/invitations/accept?token=${token}`;
 
-    await this.jobsService.enqueue({
+    await this.jobEnqueuer.enqueue({
       type: 'mail.send',
       organizationId,
       payload: {
@@ -93,7 +96,7 @@ export class InvitationsService {
       createdById: actor.userId,
     });
 
-    await this.auditService.log({
+    await this.auditWriter.log({
       actorId: actor.userId,
       action: 'invitation.created',
       entityType: input.entityType,
@@ -171,7 +174,7 @@ export class InvitationsService {
       acceptedById,
     });
 
-    await this.auditService.log({
+    await this.auditWriter.log({
       actorId: acceptedById,
       action: 'invitation.accepted',
       entityType: invitation.entityType,
@@ -216,7 +219,7 @@ export class InvitationsService {
       status: 'REVOKED',
     });
 
-    await this.auditService.log({
+    await this.auditWriter.log({
       actorId: actor.userId,
       action: 'invitation.revoked',
       entityType: invitation.entityType,

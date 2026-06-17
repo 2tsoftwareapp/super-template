@@ -4,9 +4,12 @@ import type {
 } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { ERROR_CODES } from '@repo/api-core';
-import { AppError } from '@repo/api-core';
-import { ProjectsRepository } from '@repo/api-workspace/modules/projects/infrastructure/projects.repository';
+import {
+  AppError,
+  ERROR_CODES,
+  PROJECT_DEMO_GATEWAY,
+  type ProjectDemoGateway,
+} from '@repo/api-core';
 
 import type { CreateImportDto } from '../presentation/imports.dto';
 
@@ -29,7 +32,8 @@ export class ImportsService {
   constructor(
     private readonly importJobsRepository: ImportJobsRepository,
     private readonly filesRepository: FilesRepository,
-    private readonly projectsRepository: ProjectsRepository,
+    @Inject(PROJECT_DEMO_GATEWAY)
+    private readonly projectDemoGateway: ProjectDemoGateway,
     @Inject(OBJECT_STORAGE) private readonly objectStorage: ObjectStorage,
     private readonly auditService: AuditService,
   ) {}
@@ -49,12 +53,26 @@ export class ImportsService {
       );
     }
 
+    if (input.idempotencyKey) {
+      const existing = await this.importJobsRepository.findByIdempotencyKey(
+        actor.userId,
+        input.idempotencyKey,
+      );
+
+      if (existing) {
+        return this.toDto(existing);
+      }
+    }
+
     const job = await this.importJobsRepository.create({
       organizationId: file.organizationId,
       type: input.type,
       fileId: input.fileId,
       status: 'PENDING',
       createdById: actor.userId,
+      ...(input.idempotencyKey
+        ? { idempotencyKey: input.idempotencyKey }
+        : {}),
     });
 
     if (!job) {
@@ -147,7 +165,7 @@ export class ImportsService {
       try {
         if (job.type === 'projects') {
           const existing =
-            await this.projectsRepository.findActiveByOwnerAndName(
+            await this.projectDemoGateway.findActiveByOwnerAndName(
               actor.userId,
               row.name,
             );
@@ -156,11 +174,11 @@ export class ImportsService {
             throw new Error('A project with this name already exists');
           }
 
-          await this.projectsRepository.create({
+          await this.projectDemoGateway.create({
             organizationId: file.organizationId,
             ownerId: actor.userId,
             name: row.name,
-            description: row.description,
+            description: row.description ?? '',
             status: row.status,
             createdById: actor.userId,
           });

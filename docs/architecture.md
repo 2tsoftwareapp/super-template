@@ -74,6 +74,75 @@ The same flow is wrapped by `./scripts/generate-contracts.sh`.
 - Permission checks in the frontend are UX hints only
 - Backend guards remain the source of truth
 
+## Authority Model & Tenancy
+
+The template uses three primary roles:
+
+| Role | Scope | RLS behavior |
+|------|-------|--------------|
+| `USER` | End user within their organization | Tenant-scoped by RLS and ownership checks |
+| `ADMIN` | Organization administrator | Bypasses ownership checks in services but remains confined to the active organization by RLS |
+| `SUPER_ADMIN` | Global platform manager | Sets `app.bypass_rls=true` and can operate across organizations |
+
+`TenantContextInterceptor` sets `bypassRls` only when the authenticated user includes `SUPER_ADMIN`. Organization `ADMIN` accounts therefore depend on Postgres RLS for cross-tenant isolation; `tenant-isolation.e2e.spec.ts` exercises that path under the restricted `super_template_app` database role.
+
+## Shared Runtime Cache (Optional Redis)
+
+When `REDIS_URL` is configured:
+
+- Rate limiting uses a Redis-backed `ThrottlerStorage`
+- Notification SSE fan-out uses Redis Pub/Sub
+- Access profiles (`roles` + `permissions`) are cached per user with `ACCESS_PROFILE_CACHE_TTL_SECONDS` (default `60`)
+
+Without `REDIS_URL`, those features fall back to single-instance in-memory behavior. Access-profile cache entries are invalidated when user roles change or when role permissions are reseeded/updated.
+
+## Package Ports (Decoupling)
+
+Feature packages should depend on `api-core` abstractions instead of importing each other's services:
+
+| Port | Token | Implemented by |
+|------|-------|----------------|
+| Audit logging | `AUDIT_WRITER` | `AuditService` |
+| Templated email | `MAIL_TEMPLATE_SENDER` | `MailService` |
+| User directory lookups | `USER_LOOKUP` | `UsersRepository` |
+| Auth token cleanup jobs | `AUTH_TOKEN_CLEANUP` | `AuthRepository` |
+| User notifications | `USER_NOTIFICATION_SENDER` | `NotificationsService` |
+| Background jobs | `BACKGROUND_JOB_ENQUEUER` | `JobsService` |
+| Demo import/export projects | `PROJECT_DEMO_GATEWAY` | `ProjectsRepository` |
+| File ownership lookup | `FILE_LOOKUP` | `FilesRepository` |
+| Entity attachments | `ENTITY_ATTACHMENT_LISTING` | `AttachmentsRepository` |
+
+Nest composition uses `@Global()` `PlatformPortsModule` and `WorkspacePortsModule` so identity/platform services receive port providers without cyclic `package.json` dependencies.
+
+RBAC constants (`ROLE_NAMES`, `PERMISSION_NAMES`, …) live in `api-core`. `scripts/check-package-cycles.sh` runs as part of `pnpm lint:policy` and fails on direct cross-package service/repository imports. `pnpm exec turbo boundaries` enforces layer tags (`layer:core`, `layer:identity`, `layer:platform`, `layer:workspace`, …) and acyclic package dependencies.
+
+### Runtime package graph (acyclic)
+
+```mermaid
+flowchart TD
+  app[apps/api] --> bootstrap[api-bootstrap]
+  app --> health[api-health]
+  app --> identity[api-identity]
+  app --> platform[api-platform]
+  app --> workspace[api-workspace]
+  bootstrap --> identity
+  bootstrap --> platform
+  bootstrap --> workspace
+  platform --> identity
+  workspace --> identity
+  workspace --> platform
+  identity --> core[api-core]
+  platform --> core
+  workspace --> core
+  identity --> database[api-database]
+  platform --> database
+  workspace --> database
+```
+
+Nest wiring uses `@Global()` `PlatformPortsModule` and `WorkspacePortsModule` so services can inject port tokens without cyclic `package.json` dependencies between identity, platform, and workspace.
+
+Job endpoints accept optional `idempotencyKey` on export/import/notification/background-job create paths; duplicate keys return the original job row instead of enqueueing again.
+
 ## Why Drizzle
 
 - Typed schema close to SQL

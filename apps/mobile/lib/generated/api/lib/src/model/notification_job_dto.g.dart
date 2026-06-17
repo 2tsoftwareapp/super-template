@@ -154,11 +154,11 @@ class _$NotificationJobDto extends NotificationJobDto {
   @override
   final String id;
   @override
-  final JsonObject? actorId;
+  final String? actorId;
   @override
   final NotificationJobDtoAudienceEnum audience;
   @override
-  final JsonObject? targetUserId;
+  final String? targetUserId;
   @override
   final BuiltList<String>? userIds;
   @override
@@ -168,7 +168,7 @@ class _$NotificationJobDto extends NotificationJobDto {
   @override
   final String body;
   @override
-  final JsonObject? data;
+  final BuiltMap<String, JsonObject?>? data;
   @override
   final String scheduledAt;
   @override
@@ -291,19 +291,18 @@ class NotificationJobDtoBuilder
   String? get id => _$this._id;
   set id(String? id) => _$this._id = id;
 
-  JsonObject? _actorId;
-  JsonObject? get actorId => _$this._actorId;
-  set actorId(JsonObject? actorId) => _$this._actorId = actorId;
+  String? _actorId;
+  String? get actorId => _$this._actorId;
+  set actorId(String? actorId) => _$this._actorId = actorId;
 
   NotificationJobDtoAudienceEnum? _audience;
   NotificationJobDtoAudienceEnum? get audience => _$this._audience;
   set audience(NotificationJobDtoAudienceEnum? audience) =>
       _$this._audience = audience;
 
-  JsonObject? _targetUserId;
-  JsonObject? get targetUserId => _$this._targetUserId;
-  set targetUserId(JsonObject? targetUserId) =>
-      _$this._targetUserId = targetUserId;
+  String? _targetUserId;
+  String? get targetUserId => _$this._targetUserId;
+  set targetUserId(String? targetUserId) => _$this._targetUserId = targetUserId;
 
   ListBuilder<String>? _userIds;
   ListBuilder<String> get userIds => _$this._userIds ??= ListBuilder<String>();
@@ -321,9 +320,10 @@ class NotificationJobDtoBuilder
   String? get body => _$this._body;
   set body(String? body) => _$this._body = body;
 
-  JsonObject? _data;
-  JsonObject? get data => _$this._data;
-  set data(JsonObject? data) => _$this._data = data;
+  MapBuilder<String, JsonObject?>? _data;
+  MapBuilder<String, JsonObject?> get data =>
+      _$this._data ??= MapBuilder<String, JsonObject?>();
+  set data(MapBuilder<String, JsonObject?>? data) => _$this._data = data;
 
   String? _scheduledAt;
   String? get scheduledAt => _$this._scheduledAt;
@@ -370,7 +370,7 @@ class NotificationJobDtoBuilder
       _type = $v.type;
       _title = $v.title;
       _body = $v.body;
-      _data = $v.data;
+      _data = $v.data?.toBuilder();
       _scheduledAt = $v.scheduledAt;
       _status = $v.status;
       _recipientCount = $v.recipientCount;
@@ -414,7 +414,7 @@ class NotificationJobDtoBuilder
                 title, r'NotificationJobDto', 'title'),
             body: BuiltValueNullFieldError.checkNotNull(
                 body, r'NotificationJobDto', 'body'),
-            data: data,
+            data: _data?.build(),
             scheduledAt: BuiltValueNullFieldError.checkNotNull(
                 scheduledAt, r'NotificationJobDto', 'scheduledAt'),
             status: BuiltValueNullFieldError.checkNotNull(
@@ -432,6 +432,9 @@ class NotificationJobDtoBuilder
       try {
         _$failedField = 'userIds';
         _userIds?.build();
+
+        _$failedField = 'data';
+        _data?.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
             r'NotificationJobDto', _$failedField, e.toString());

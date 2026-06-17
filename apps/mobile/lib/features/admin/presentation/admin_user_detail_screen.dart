@@ -48,7 +48,7 @@ class _AdminUserDetailScreenState extends ConsumerState<AdminUserDetailScreen> {
                 Text(user.email),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
-                  value: _status,
+                  initialValue: _status,
                   items: const [
                     DropdownMenuItem(value: 'PENDING', child: Text('PENDING')),
                     DropdownMenuItem(value: 'ACTIVE', child: Text('ACTIVE')),

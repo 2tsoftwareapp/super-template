@@ -1,4 +1,5 @@
-import { index, integer, jsonb, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm';
+import { index, integer, jsonb, pgTable, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
 
 import { organizations } from '../identity/organizations';
 import { users } from '../identity/users';
@@ -26,10 +27,14 @@ export const jobs = pgTable(
     createdById: uuid('created_by_id').references(() => users.id, {
       onDelete: 'set null',
     }),
+    idempotencyKey: text('idempotency_key'),
     ...timestamps,
   },
   (table) => [
     index('jobs_status_scheduled_at_idx').on(table.status, table.scheduledAt),
     index('jobs_type_idx').on(table.type),
+    uniqueIndex('jobs_created_by_idempotency_key_unique')
+      .on(table.createdById, table.idempotencyKey)
+      .where(sql`${table.idempotencyKey} is not null`),
   ],
 );

@@ -10,6 +10,7 @@ import {
   IsOptional,
   IsString,
   IsUUID,
+  MaxLength,
   ValidateIf,
 } from 'class-validator';
 
@@ -121,6 +122,15 @@ export class SendNotificationRequestDto {
   @IsOptional()
   @IsDateString()
   scheduledAt?: string;
+
+  @ApiPropertyOptional({
+    description:
+      'Client-supplied idempotency key. Retries with the same key return the original notification job.',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(128)
+  idempotencyKey?: string;
 }
 
 /** @deprecated Use SendNotificationRequestDto with audience USER */

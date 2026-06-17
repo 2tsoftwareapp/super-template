@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
-import { AuditModule } from '@repo/api-platform/modules/audit/audit.module';
-import { FilesModule } from '@repo/api-platform/modules/files/files.module';
+import { USER_LOOKUP } from '@repo/api-core';
 
 import { AccessControlModule } from '../access-control/access-control.module';
 import { AuthDataModule } from '../auth/auth-data.module';
@@ -13,13 +12,18 @@ import { UsersController } from './presentation/users.controller';
 @Module({
   imports: [
     AccessControlModule,
-    AuditModule,
     AuthDataModule,
-    FilesModule,
     OrganizationsModule,
   ],
   controllers: [AdminUsersController, UsersController],
-  providers: [UsersRepository, UsersService],
-  exports: [UsersRepository, UsersService],
+  providers: [
+    UsersRepository,
+    UsersService,
+    {
+      provide: USER_LOOKUP,
+      useExisting: UsersRepository,
+    },
+  ],
+  exports: [UsersRepository, UsersService, USER_LOOKUP],
 })
 export class UsersModule {}

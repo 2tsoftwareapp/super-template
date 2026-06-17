@@ -64,4 +64,15 @@ check_policy() {
 check_policy '@boundaries-ignore' '@boundaries-ignore' 'Remove boundary-ignore comments and fix the underlying import surface.'
 check_policy 'explicit any' ':\s*any\b|<\s*any\s*>|\bas\s+any\b' 'Use concrete types instead of explicit any.'
 
+if command -v git >/dev/null 2>&1; then
+  tracked_artifacts=$(git ls-files '*.tsbuildinfo' 'apps/api/storage/uploads/*' 2>/dev/null || true)
+
+  if [ -n "$tracked_artifacts" ]; then
+    failed=1
+    printf 'Policy violation: tracked generated artifacts\n' >&2
+    printf '%s\n' "$tracked_artifacts" >&2
+    printf 'Remove generated uploads and tsbuildinfo files from git and keep them ignored.\n' >&2
+  fi
+fi
+
 exit "$failed"
