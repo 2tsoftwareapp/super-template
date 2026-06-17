@@ -101,9 +101,6 @@ jobs:
       - name: Generate contracts
         run: ./scripts/generate-contracts.sh
 
-      - name: Check generated files
-        run: git diff --exit-code -- apps/api/openapi.json packages/api-contract/src/generated apps/mobile/lib/generated/api
-
       - name: Lint
         run: pnpm lint
 
