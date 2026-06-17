@@ -154,6 +154,65 @@ class AuthRepository {
     }
   }
 
+  Future<void> verifyEmail(String token) async {
+    try {
+      await _publicAuthApi.authControllerVerifyEmail(
+        verifyEmailDto: VerifyEmailDto((b) => b..token = token),
+      );
+    } on DioException catch (error) {
+      throw AppException.fromDio(error);
+    }
+  }
+
+  Future<void> resendVerification(String email) async {
+    try {
+      await _publicAuthApi.authControllerResendVerification(
+        resendVerificationDto: ResendVerificationDto((b) => b..email = email),
+      );
+    } on DioException catch (error) {
+      throw AppException.fromDio(error);
+    }
+  }
+
+  Future<void> resetPassword({
+    required String token,
+    required String newPassword,
+  }) async {
+    try {
+      await _publicAuthApi.authControllerResetPassword(
+        resetPasswordDto: ResetPasswordDto(
+          (b) => b
+            ..token = token
+            ..newPassword = newPassword,
+        ),
+      );
+    } on DioException catch (error) {
+      throw AppException.fromDio(error);
+    }
+  }
+
+  Future<void> logoutAll() async {
+    try {
+      await _authApi.authControllerLogoutAll();
+    } on DioException {
+      // Local logout must still clear the secure store even if the API is unavailable.
+    } finally {
+      await _storage.clear();
+    }
+  }
+
+  Future<void> switchOrganization(String organizationId) async {
+    try {
+      await _authApi.authControllerSwitchOrganization(
+        switchOrganizationDto: SwitchOrganizationDto(
+          (b) => b..organizationId = organizationId,
+        ),
+      );
+    } on DioException catch (error) {
+      throw AppException.fromDio(error);
+    }
+  }
+
   AuthSession _toAuthResponse(AuthResponseDto data) {
     return AuthSession(
       userId: data.user.id,

@@ -79,22 +79,46 @@ class HomeScreen extends ConsumerWidget {
             icon: Icons.devices,
             onTap: () => context.go('/sessions'),
           ),
-          if (authState?.permissions.contains('users.read') ?? false)
+          _NavTile(
+            title: 'Organizations',
+            icon: Icons.business,
+            onTap: () => context.go('/organizations'),
+          ),
+          if (authState?.permissions.contains('imports.manage') ?? false)
             _NavTile(
-              title: 'Admin users',
-              icon: Icons.admin_panel_settings,
-              onTap: () => context.go('/admin/users'),
+              title: 'Imports',
+              icon: Icons.upload,
+              onTap: () => context.go('/imports'),
             ),
-          if (authState?.permissions.contains('audit.read') ?? false)
+          if (authState?.permissions.contains('exports.manage') ?? false)
             _NavTile(
-              title: 'Audit logs',
-              icon: Icons.history,
-              onTap: () => context.go('/admin/audit-logs'),
+              title: 'Exports',
+              icon: Icons.download,
+              onTap: () => context.go('/exports'),
+            ),
+          if (_hasAdminAccess(authState?.permissions ?? const []))
+            _NavTile(
+              title: 'Admin',
+              icon: Icons.admin_panel_settings,
+              onTap: () => context.go('/admin'),
             ),
         ],
       ),
     );
   }
+}
+
+bool _hasAdminAccess(List<String> permissions) {
+  const adminPermissions = {
+    'users.read',
+    'roles.read',
+    'jobs.read',
+    'mail.read',
+    'settings.read',
+    'notifications.send',
+    'audit.read',
+  };
+  return permissions.any(adminPermissions.contains);
 }
 
 class _NavTile extends StatelessWidget {

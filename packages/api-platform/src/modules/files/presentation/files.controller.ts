@@ -16,7 +16,7 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiProduces, ApiTags } from '@nestjs/swagger';
 import {
   ApiDataResponse,
   SuccessFlagDto,
@@ -83,6 +83,7 @@ export class FilesController {
 
   @Get(':id/download')
   @Permissions(PERMISSION_NAMES.FILES_READ)
+  @ApiProduces('application/octet-stream')
   async download(
     @CurrentUser() user: AuthenticatedRequestUser,
     @Param('id', new ParseUUIDPipe()) fileId: string,

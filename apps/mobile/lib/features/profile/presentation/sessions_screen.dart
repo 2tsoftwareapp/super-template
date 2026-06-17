@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:built_value/json_object.dart';
 import 'package:mobile_app/features/auth/data/auth_repository.dart';
+import 'package:mobile_app/features/auth/presentation/auth_controller.dart';
+import 'package:go_router/go_router.dart';
 
 final sessionsProvider = FutureProvider(
   (ref) => ref.watch(authRepositoryProvider).sessions(),
@@ -14,7 +16,20 @@ class SessionsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final sessions = ref.watch(sessionsProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text('Active sessions')),
+      appBar: AppBar(
+        title: const Text('Active sessions'),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              await ref.read(authControllerProvider.notifier).logoutAll();
+              if (context.mounted) {
+                context.go('/login');
+              }
+            },
+            child: const Text('Logout all'),
+          ),
+        ],
+      ),
       body: sessions.when(
         data: (rows) => ListView.separated(
           padding: const EdgeInsets.all(16),

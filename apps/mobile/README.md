@@ -24,3 +24,84 @@ Flutter client for Super Template.
 
 The generated Dart API client lives in `lib/generated/api`.
 It is produced from the API OpenAPI document by `make generate`.
+
+## Feature Matrix
+
+| Route | Permission | API |
+| --- | --- | --- |
+| `/login` | public | `AuthApi.login` |
+| `/register` | public | `AuthApi.register` |
+| `/forgot-password` | public | `AuthApi.forgotPassword` |
+| `/verify-email` | public | `AuthApi.verifyEmail` |
+| `/reset-password` | public | `AuthApi.resetPassword` |
+| `/invite/:token` | authenticated | `InvitationsApi.accept` |
+| `/home` | authenticated | — |
+| `/projects` | `projects.read` | `ProjectsApi.list` |
+| `/notifications` | `notifications.read` | `NotificationsApi.list` |
+| `/profile` | authenticated | `AuthApi.getMe` |
+| `/preferences` | authenticated | `UsersApi.preferences` |
+| `/security` | authenticated | `AuthApi.changePassword` |
+| `/sessions` | authenticated | `AuthApi.getSessions` |
+| `/organizations` | authenticated | `OrganizationsApi.list/create` |
+| `/imports` | `imports.manage` | `ImportsApi` + `FilesApi.upload` |
+| `/exports` | `exports.manage` | `ExportsApi` + `FilesApi.getUrl` |
+| `/admin` | any admin permission | hub |
+| `/admin/users` | `users.read` | `AdminUsersApi` |
+| `/admin/roles` | `roles.read` | `AdminRolesApi` |
+| `/admin/jobs` | `jobs.read` | `AdminJobsApi` |
+| `/admin/mail` | `mail.read` | `AdminMailApi` |
+| `/admin/settings` | `settings.read` | `AdminSettingsApi` |
+| `/admin/notifications` | `notifications.send` | `AdminNotificationsApi` |
+| `/admin/audit-logs` | `audit.read` | `AdminAuditApi` |
+
+## Push Notifications (FCM)
+
+FCM is **optional**. Without Firebase config the app still works; inbox and SSE-backed flows are unchanged. When configured, the app registers the device token on login and unregisters on logout via `NotificationsApi.registerDevice`. Foreground messages show a snackbar with a shortcut to `/notifications`.
+
+Web notifications use **SSE**, not Firebase. Firebase is for **mobile push only**.
+
+### 1. Create a Firebase project
+
+1. Open [Firebase Console](https://console.firebase.google.com/) and create a project (or use an existing one).
+2. Register an **Android** app with package name `com.example.mobile_app` (must match `applicationId` in `android/app/build.gradle.kts`).
+3. Download `google-services.json` and place it at:
+
+   `android/app/google-services.json`
+
+   Or copy the template and fill in your values:
+
+   ```bash
+   cp android/app/google-services.json.example android/app/google-services.json
+   ```
+
+4. **iOS (optional):** register an iOS app, download `GoogleService-Info.plist`, and place it at:
+
+   `ios/Runner/GoogleService-Info.plist`
+
+   Template: `ios/Runner/GoogleService-Info.plist.example`
+
+These files are **gitignored**. Commit only the `*.example` templates. The Google Services Gradle plugin is applied automatically when `google-services.json` exists.
+
+### 2. API credentials (server-side FCM)
+
+The NestJS API sends push via Firebase Admin SDK. In the monorepo root `.env`:
+
+```env
+FCM_PROJECT_ID=your-firebase-project-id
+FCM_CLIENT_EMAIL=firebase-adminsdk-xxxxx@your-project.iam.gserviceaccount.com
+FCM_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+```
+
+Generate a service account key: Firebase Console → Project settings → Service accounts → **Generate new private key**.
+
+Map fields from the downloaded JSON (`project_id`, `client_email`, `private_key`). Newlines in `FCM_PRIVATE_KEY` must be escaped as `\n` inside the quoted string.
+
+### 3. Run and verify
+
+```bash
+make db-migrate
+make dev-api          # API with FCM_* in .env
+make dev-mobile       # Flutter with google-services.json in place
+```
+
+After login, the app calls `POST /api/v1/notifications/devices` with the FCM token. Send a test push from the admin API (`POST /api/v1/admin/notifications`) or Firebase Console.

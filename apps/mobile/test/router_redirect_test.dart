@@ -6,19 +6,29 @@ String? resolveRedirect({
   required bool isLoading,
   required String location,
 }) {
-  final isPublic = {
+  const publicRoutes = {
     '/splash',
     '/login',
     '/register',
     '/forgot-password',
-  }.contains(location);
+    '/verify-email',
+    '/reset-password',
+  };
+  final isPublic = publicRoutes.contains(location);
+  final isInvite = location.startsWith('/invite/');
 
   if (isLoading) {
     return location == '/splash' ? null : '/splash';
   }
 
   if (!isAuthenticated) {
-    return (isPublic && location != '/splash') ? null : '/login';
+    if (isPublic && location != '/splash') {
+      return null;
+    }
+    if (isInvite) {
+      return '/login';
+    }
+    return '/login';
   }
 
   if (isPublic) {
@@ -109,6 +119,39 @@ void main() {
       );
     });
 
+    test('/verify-email renders without redirect', () {
+      expect(
+        resolveRedirect(
+          isAuthenticated: false,
+          isLoading: false,
+          location: '/verify-email',
+        ),
+        null,
+      );
+    });
+
+    test('/reset-password renders without redirect', () {
+      expect(
+        resolveRedirect(
+          isAuthenticated: false,
+          isLoading: false,
+          location: '/reset-password',
+        ),
+        null,
+      );
+    });
+
+    test('/invite/:token redirects to /login', () {
+      expect(
+        resolveRedirect(
+          isAuthenticated: false,
+          isLoading: false,
+          location: '/invite/abc123',
+        ),
+        '/login',
+      );
+    });
+
     test('protected route redirects to /login', () {
       expect(
         resolveRedirect(
@@ -177,12 +220,45 @@ void main() {
       );
     });
 
+    test('/verify-email redirects to /home', () {
+      expect(
+        resolveRedirect(
+          isAuthenticated: true,
+          isLoading: false,
+          location: '/verify-email',
+        ),
+        '/home',
+      );
+    });
+
+    test('/reset-password redirects to /home', () {
+      expect(
+        resolveRedirect(
+          isAuthenticated: true,
+          isLoading: false,
+          location: '/reset-password',
+        ),
+        '/home',
+      );
+    });
+
     test('protected route renders without redirect', () {
       expect(
         resolveRedirect(
           isAuthenticated: true,
           isLoading: false,
           location: '/projects',
+        ),
+        null,
+      );
+    });
+
+    test('/admin renders without redirect', () {
+      expect(
+        resolveRedirect(
+          isAuthenticated: true,
+          isLoading: false,
+          location: '/admin',
         ),
         null,
       );

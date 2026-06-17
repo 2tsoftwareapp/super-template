@@ -27,3 +27,7 @@ android/app/release
 apps/api/drizzle/meta
 apps/api/storage/uploads/
 *.tsbuildinfo
+
+# Firebase — copy from *.example after creating your Firebase project
+apps/mobile/android/app/google-services.json
+apps/mobile/ios/Runner/GoogleService-Info.plist

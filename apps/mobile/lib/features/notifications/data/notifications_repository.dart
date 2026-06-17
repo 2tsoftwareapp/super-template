@@ -67,4 +67,28 @@ class NotificationsRepository {
       throw AppException.fromDio(error);
     }
   }
+
+  Future<void> markRead(String id) async {
+    try {
+      await _api.notificationsControllerMarkRead(id: id);
+    } on DioException catch (error) {
+      throw AppException.fromDio(error);
+    }
+  }
+
+  Future<void> markAllRead() async {
+    try {
+      await _api.notificationsControllerMarkAllRead();
+    } on DioException catch (error) {
+      throw AppException.fromDio(error);
+    }
+  }
+
+  Future<void> delete(String id) async {
+    try {
+      await _api.notificationsControllerDelete(id: id);
+    } on DioException catch (error) {
+      throw AppException.fromDio(error);
+    }
+  }
 }

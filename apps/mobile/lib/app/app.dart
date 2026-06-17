@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_app/app/router.dart';
 import 'package:mobile_app/app/theme.dart';
+import 'package:mobile_app/core/deep_links/deep_link_listener.dart';
 
 class StarterApp extends ConsumerWidget {
   const StarterApp({super.key});
@@ -11,12 +12,14 @@ class StarterApp extends ConsumerWidget {
     final router = ref.watch(appRouterProvider);
     final themeMode = ref.watch(themeModeProvider);
 
-    return MaterialApp.router(
-      title: 'Super Template',
-      theme: buildLightTheme(),
-      darkTheme: buildDarkTheme(),
-      themeMode: themeMode,
-      routerConfig: router,
+    return DeepLinkListener(
+      child: MaterialApp.router(
+        title: 'Super Template',
+        theme: buildLightTheme(),
+        darkTheme: buildDarkTheme(),
+        themeMode: themeMode,
+        routerConfig: router,
+      ),
     );
   }
 }

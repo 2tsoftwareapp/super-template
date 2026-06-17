@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_app/core/errors/app_exception.dart';
 import 'package:mobile_app/core/network/api_client.dart';
+import 'package:mobile_app/features/projects/domain/project_attachment_summary.dart';
 import 'package:mobile_app/features/projects/domain/project_summary.dart';
 import 'package:super_template_api/super_template_api.dart';
 
@@ -43,6 +44,7 @@ class ProjectsRepository {
         name: project.name,
         status: project.status.name,
         description: _jsonObjectToString(project.description),
+        isDeleted: project.deletedAt != null,
       );
     } on DioException catch (error) {
       throw AppException.fromDio(error);
@@ -106,5 +108,47 @@ class ProjectsRepository {
   String? _jsonObjectToString(JsonObject? value) {
     final raw = value?.value;
     return raw is String ? raw : null;
+  }
+
+  Future<void> remove(String id) async {
+    try {
+      await _api.projectsControllerRemove(id: id);
+    } on DioException catch (error) {
+      throw AppException.fromDio(error);
+    }
+  }
+
+  Future<ProjectSummary> restore(String id) async {
+    try {
+      final response = await _api.projectsControllerRestore(id: id);
+      final project = response.data!.data;
+      return ProjectSummary(
+        id: project.id,
+        name: project.name,
+        status: project.status.name,
+        description: _jsonObjectToString(project.description),
+        isDeleted: project.deletedAt != null,
+      );
+    } on DioException catch (error) {
+      throw AppException.fromDio(error);
+    }
+  }
+
+  Future<List<ProjectAttachmentSummary>> listAttachments(String id) async {
+    try {
+      final response = await _api.projectsControllerListAttachments(id: id);
+      return response.data!.data
+          .map(
+            (item) => ProjectAttachmentSummary(
+              id: item.id,
+              fileId: item.fileId,
+              label: _jsonObjectToString(item.label),
+              createdAt: DateTime.parse(item.createdAt),
+            ),
+          )
+          .toList();
+    } on DioException catch (error) {
+      throw AppException.fromDio(error);
+    }
   }
 }

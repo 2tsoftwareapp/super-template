@@ -18,6 +18,49 @@ class _ProjectEditorScreenState extends ConsumerState<ProjectEditorScreen> {
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
   String _status = 'DRAFT';
+  bool _loaded = false;
+  bool _loading = false;
+  String? _loadError;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.projectId != null) {
+      _preloadProject();
+    } else {
+      _loaded = true;
+    }
+  }
+
+  Future<void> _preloadProject() async {
+    setState(() {
+      _loading = true;
+      _loadError = null;
+    });
+    try {
+      final project = await ref
+          .read(projectsRepositoryProvider)
+          .getById(widget.projectId!);
+      if (!mounted) {
+        return;
+      }
+      _nameController.text = project.name;
+      _descriptionController.text = project.description ?? '';
+      _status = project.status;
+      setState(() {
+        _loaded = true;
+        _loading = false;
+      });
+    } catch (error) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _loadError = error.toString();
+        _loading = false;
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -28,6 +71,28 @@ class _ProjectEditorScreenState extends ConsumerState<ProjectEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_loading) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(
+            widget.projectId == null ? 'Create project' : 'Edit project',
+          ),
+        ),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (_loadError != null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Edit project')),
+        body: Center(child: Text(_loadError!)),
+      );
+    }
+
+    if (!_loaded) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
