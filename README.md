@@ -86,7 +86,8 @@ Copy `.env.example` to `.env` and adjust as needed.
 
 Key variables:
 
-- `DATABASE_URL`
+- `DATABASE_URL` (restricted application role — RLS enforced at runtime)
+- `DATABASE_MIGRATE_URL` (privileged role for `db:migrate` / `db:reset`)
 - `DATABASE_URL_TEST`
 - `WEB_ORIGIN`
 - `API_INTERNAL_URL`
@@ -100,21 +101,13 @@ Key variables:
 
 The API validates environment variables at startup and fails fast on invalid or missing values.
 
-## Firebase demo (FCM — mobile only)
+## Firebase / FCM (mobile push — optional)
 
 Web notifications use **SSE**, not Firebase. Firebase is for **mobile FCM push** only.
 
-Demo project: `examples/firebase-demo/` (`super-template-demo`)
+Setup: place `google-services.json` (and optionally `GoogleService-Info.plist`) in the Flutter app, then add `FCM_PROJECT_ID`, `FCM_CLIENT_EMAIL`, and `FCM_PRIVATE_KEY` to the root `.env`.
 
-```bash
-# Link Android google-services.json into the Flutter app
-./examples/firebase-demo/scripts/link-configs.sh
-
-# After downloading a service account key from Firebase Console:
-./examples/firebase-demo/scripts/print-fcm-env.sh ~/.secrets/super-template-demo-firebase-adminsdk.json
-```
-
-See [examples/firebase-demo/README.md](examples/firebase-demo/README.md) for full setup.
+See [apps/mobile/README.md](apps/mobile/README.md#push-notifications-fcm) for step-by-step instructions.
 
 ## Commands
 

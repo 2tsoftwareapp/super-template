@@ -11,6 +11,8 @@ export const DATABASE_POOL = Symbol('DATABASE_POOL');
 export const DATABASE = Symbol('DATABASE');
 
 const createTenantAwarePool = (config: PoolConfig): Pool => {
+  // Every pool checkout must re-apply tenant GUCs; bypassing this pool with a raw
+  // DATABASE_POOL client would leak or drop tenant context across requests.
   const pool = new Pool(config);
   const originalConnect = pool.connect.bind(pool);
 

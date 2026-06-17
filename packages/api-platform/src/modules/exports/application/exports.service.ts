@@ -41,30 +41,31 @@ export class ExportsService {
   ) {
     const organizationId = requireOrganizationId(actor);
 
-    if (input.idempotencyKey) {
-      const existing = await this.exportJobsRepository.findByIdempotencyKey(
-        actor.userId,
-        input.idempotencyKey,
-      );
-
-      if (existing) {
-        return this.toDto(existing);
-      }
-    }
-
-    const job = await this.exportJobsRepository.create({
+    const jobValues = {
       organizationId,
       type: input.type,
-      status: 'PROCESSING',
+      status: 'PROCESSING' as const,
       filters: input.filters ?? null,
       createdById: actor.userId,
-      ...(input.idempotencyKey
-        ? { idempotencyKey: input.idempotencyKey }
-        : {}),
-    });
+    };
+
+    const idempotentResult = input.idempotencyKey
+      ? await this.exportJobsRepository.createIdempotent({
+          ...jobValues,
+          idempotencyKey: input.idempotencyKey,
+        })
+      : null;
+
+    const job = idempotentResult
+      ? idempotentResult.value
+      : await this.exportJobsRepository.create(jobValues);
 
     if (!job) {
       throw new Error('Export job insert returned no rows');
+    }
+
+    if (idempotentResult && !idempotentResult.created) {
+      return this.toDto(job);
     }
 
     try {

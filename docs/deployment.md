@@ -8,6 +8,7 @@
 - Replace all development secrets and seed credentials
 - Enable HTTPS and `COOKIE_SECURE=true`
 - Disable or protect Swagger in production
+- Point `DATABASE_URL` at a **non-superuser** application role so Postgres RLS is enforced; run migrations with a separate privileged `DATABASE_MIGRATE_URL` (see `docs/database.md`)
 
 ## Security
 

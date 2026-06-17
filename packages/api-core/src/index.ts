@@ -63,6 +63,10 @@ export {
   type MailTemplateSendInput,
 } from './ports/mail-template-sender.port';
 export {
+  ORGANIZATION_LOOKUP,
+  type OrganizationLookup,
+} from './ports/organization-lookup.port';
+export {
   PROJECT_DEMO_GATEWAY,
   type ProjectDemoGateway,
   type ProjectDemoRecord,

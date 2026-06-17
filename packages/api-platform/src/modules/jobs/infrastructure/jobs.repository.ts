@@ -4,7 +4,7 @@ import type {
 } from '@repo/api-database';
 
 import { Inject, Injectable } from '@nestjs/common';
-import { DATABASE } from '@repo/api-database';
+import { DATABASE, runIdempotentInsert } from '@repo/api-database';
 import { jobs } from '@repo/api-database';
 import { and, count, desc, eq, sql } from 'drizzle-orm';
 
@@ -19,6 +19,10 @@ interface ListJobsParams {
 export class JobsRepository {
   constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
 
+  get client(): DatabaseClient {
+    return this.database;
+  }
+
   async create(
     values: typeof jobs.$inferInsert,
     executor: DatabaseExecutor = this.database,
@@ -26,6 +30,30 @@ export class JobsRepository {
     const [job] = await executor.insert(jobs).values(values).returning();
 
     return job ?? null;
+  }
+
+  async createIdempotent(
+    values: typeof jobs.$inferInsert & {
+      createdById: string;
+      idempotencyKey: string;
+    },
+    executor: DatabaseExecutor = this.database,
+  ) {
+    const result = await runIdempotentInsert(
+      async () => {
+        const [inserted] = await executor.insert(jobs).values(values).returning();
+
+        return inserted ?? undefined;
+      },
+      () =>
+        this.findByIdempotencyKey(
+          values.createdById,
+          values.idempotencyKey,
+          executor,
+        ),
+    );
+
+    return result?.value ?? null;
   }
 
   async findById(jobId: string, executor: DatabaseExecutor = this.database) {

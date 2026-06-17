@@ -43,6 +43,7 @@ import { TenantContextInterceptor } from './shell/tenant-context.interceptor';
     ThrottlerModule.forRootAsync({
       inject: [EnvironmentService],
       useFactory: (environmentService: EnvironmentService) => ({
+        skipIf: () => environmentService.isTest,
         throttlers: [
           {
             ttl: 60_000,
@@ -72,6 +73,10 @@ import { TenantContextInterceptor } from './shell/tenant-context.interceptor';
     },
     {
       provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+    {
+      provide: APP_GUARD,
       useFactory: (reflector: Reflector, authService: AuthService) =>
         new AuthGuard(reflector, authService),
       inject: [Reflector, AuthService],
@@ -80,10 +85,6 @@ import { TenantContextInterceptor } from './shell/tenant-context.interceptor';
       provide: APP_GUARD,
       useFactory: (reflector: Reflector) => new PermissionsGuard(reflector),
       inject: [Reflector],
-    },
-    {
-      provide: APP_GUARD,
-      useClass: ThrottlerGuard,
     },
     {
       provide: APP_INTERCEPTOR,

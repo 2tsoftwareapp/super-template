@@ -32,7 +32,8 @@ jobs:
       POSTGRES_DB: fullstack_starter
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/fullstack_starter
+      DATABASE_URL: postgresql://fullstack_starter_app:fullstack_starter_app@localhost:5432/fullstack_starter
+      DATABASE_MIGRATE_URL: postgresql://postgres:postgres@localhost:5432/fullstack_starter
       DATABASE_URL_TEST: postgresql://fullstack_starter_app:fullstack_starter_app@localhost:5432/fullstack_starter_test
       DATABASE_URL_TEST_ADMIN: postgresql://postgres:postgres@localhost:5432/fullstack_starter_test
       API_PORT: 3001
@@ -85,13 +86,11 @@ jobs:
           PGPASSWORD=postgres psql -h localhost -U postgres -c "CREATE DATABASE fullstack_starter_test;"
           pnpm --filter api db:migrate
         env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/fullstack_starter_test
-          DATABASE_URL_TEST: postgresql://postgres:postgres@localhost:5432/fullstack_starter_test
+          POSTGRES_DB: fullstack_starter_test
+          DATABASE_MIGRATE_URL: postgresql://postgres:postgres@localhost:5432/fullstack_starter_test
 
       - name: Seed development data
         run: pnpm --filter api db:seed
-        env:
-          DATABASE_URL_TEST: postgresql://postgres:postgres@localhost:5432/fullstack_starter_test
 
       - name: Lint
         run: pnpm lint

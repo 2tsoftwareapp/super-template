@@ -14,6 +14,13 @@ export class TenantContextService {
     return tenantContextStorage.run(context, operation);
   }
 
+  runAsync<T>(
+    context: TenantContext,
+    operation: () => Promise<T>,
+  ): Promise<T> {
+    return tenantContextStorage.run(context, operation);
+  }
+
   get(): TenantContext | undefined {
     return tenantContextStorage.getStore();
   }

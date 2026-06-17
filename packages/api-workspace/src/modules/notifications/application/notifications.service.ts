@@ -10,10 +10,17 @@ import {
   AUDIT_WRITER,
   type AuditWriter,
   ERROR_CODES,
+  ORGANIZATION_LOOKUP,
+  type OrganizationLookup,
   requireOrganizationId,
   USER_LOOKUP,
   type UserLookup,
 } from '@repo/api-core';
+import {
+  tenantContextForJob,
+  TenantContextService,
+  WORKER_DISPATCH_CONTEXT,
+} from '@repo/api-database';
 
 import {
   PUSH_NOTIFIER,
@@ -70,6 +77,9 @@ export class NotificationsService {
   constructor(
     private readonly notificationsRepository: NotificationsRepository,
     private readonly notificationJobsRepository: NotificationJobsRepository,
+    @Inject(ORGANIZATION_LOOKUP)
+    private readonly organizationLookup: OrganizationLookup,
+    private readonly tenantContextService: TenantContextService,
     @Inject(USER_LOOKUP) private readonly userLookup: UserLookup,
     private readonly deviceTokensRepository: DeviceTokensRepository,
     private readonly notificationStreamService: NotificationStreamService,
@@ -84,8 +94,17 @@ export class NotificationsService {
     executor?: DatabaseExecutor,
     options?: { deferDispatch?: boolean },
   ) {
+    const recipientOrganizationId = input.userId
+      ? await this.organizationLookup.findPrimaryOrganizationId(
+          input.userId,
+          executor,
+        )
+      : null;
     const resolvedOrganizationId =
-      actor?.organizationId ?? input.organizationId ?? null;
+      input.organizationId ??
+      recipientOrganizationId ??
+      actor?.organizationId ??
+      null;
 
     if (!resolvedOrganizationId) {
       throw new AppError(
@@ -156,18 +175,7 @@ export class NotificationsService {
       );
     }
 
-    if (input.idempotencyKey) {
-      const existing = await this.notificationJobsRepository.findByIdempotencyKey(
-        actor.userId,
-        input.idempotencyKey,
-      );
-
-      if (existing) {
-        return this.toNotificationJobDto(existing);
-      }
-    }
-
-    const job = await this.notificationJobsRepository.create({
+    const jobValues = {
       organizationId: requireOrganizationId(actor),
       actorId: actor.userId,
       audience: input.audience,
@@ -184,14 +192,26 @@ export class NotificationsService {
       body: input.body,
       data: input.data ?? null,
       scheduledAt,
-      status: 'PENDING',
-      ...(input.idempotencyKey
-        ? { idempotencyKey: input.idempotencyKey }
-        : {}),
-    });
+      status: 'PENDING' as const,
+    };
+
+    const idempotentResult = input.idempotencyKey
+      ? await this.notificationJobsRepository.createIdempotent({
+          ...jobValues,
+          idempotencyKey: input.idempotencyKey,
+        })
+      : null;
+
+    const job = idempotentResult
+      ? idempotentResult.value
+      : await this.notificationJobsRepository.create(jobValues);
 
     if (!job) {
       throw new Error('Notification job insert returned no rows');
+    }
+
+    if (idempotentResult && !idempotentResult.created) {
+      return this.toNotificationJobDto(job);
     }
 
     await this.auditWriter.log({
@@ -277,11 +297,19 @@ export class NotificationsService {
   }
 
   async processDueJobs() {
-    const dueJobs =
-      await this.notificationJobsRepository.listDue(DUE_JOB_BATCH_SIZE);
+    const dueJobs = await this.tenantContextService.runAsync(
+      WORKER_DISPATCH_CONTEXT,
+      () => this.notificationJobsRepository.listDue(DUE_JOB_BATCH_SIZE),
+    );
 
     for (const job of dueJobs) {
-      await this.processJob(job.id);
+      await this.tenantContextService.runAsync(
+        tenantContextForJob({
+          organizationId: job.organizationId ?? null,
+          actorUserId: job.actorId ?? null,
+        }),
+        () => this.processJob(job.id),
+      );
     }
   }
 
@@ -314,14 +342,19 @@ export class NotificationsService {
       ) {
         const batch = recipientIds.slice(offset, offset + RECIPIENT_BATCH_SIZE);
         const notifications = await this.notificationsRepository.createMany(
-          batch.map((userId) => ({
-            organizationId,
-            userId,
-            type: locked.type,
-            title: locked.title,
-            body: locked.body,
-            data: locked.data ?? null,
-          })),
+          await Promise.all(
+            batch.map(async (userId) => ({
+              organizationId:
+                (await this.organizationLookup.findPrimaryOrganizationId(
+                  userId,
+                )) ?? organizationId,
+              userId,
+              type: locked.type,
+              title: locked.title,
+              body: locked.body,
+              data: locked.data ?? null,
+            })),
+          ),
         );
 
         for (const notification of notifications) {

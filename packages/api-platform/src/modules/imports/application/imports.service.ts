@@ -53,30 +53,31 @@ export class ImportsService {
       );
     }
 
-    if (input.idempotencyKey) {
-      const existing = await this.importJobsRepository.findByIdempotencyKey(
-        actor.userId,
-        input.idempotencyKey,
-      );
-
-      if (existing) {
-        return this.toDto(existing);
-      }
-    }
-
-    const job = await this.importJobsRepository.create({
+    const jobValues = {
       organizationId: file.organizationId,
       type: input.type,
       fileId: input.fileId,
-      status: 'PENDING',
+      status: 'PENDING' as const,
       createdById: actor.userId,
-      ...(input.idempotencyKey
-        ? { idempotencyKey: input.idempotencyKey }
-        : {}),
-    });
+    };
+
+    const idempotentResult = input.idempotencyKey
+      ? await this.importJobsRepository.createIdempotent({
+          ...jobValues,
+          idempotencyKey: input.idempotencyKey,
+        })
+      : null;
+
+    const job = idempotentResult
+      ? idempotentResult.value
+      : await this.importJobsRepository.create(jobValues);
 
     if (!job) {
       throw new Error('Import job insert returned no rows');
+    }
+
+    if (idempotentResult && !idempotentResult.created) {
+      return this.toDto(job);
     }
 
     const parsed = await this.parseImportFile(input.type, file.storageKey);

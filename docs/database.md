@@ -29,10 +29,20 @@
 1. Edit `packages/api-database/src/schema.ts`
 2. Run `make db-generate`
 3. Review generated SQL under `apps/api/drizzle/`
-4. Run `make db-migrate`
+4. Run `make db-migrate` (uses `DATABASE_MIGRATE_URL` or `POSTGRES_*` admin credentials)
 5. Run `make db-seed` if needed
 
 `db:push` is available only as a local convenience and is not part of CI or production workflow.
+
+## Application Database Role
+
+Tenant isolation depends on Postgres row-level security. Superusers and roles with `BYPASSRLS` ignore every policy, including `FORCE ROW LEVEL SECURITY`.
+
+- **`DATABASE_URL`** — restricted runtime role used by the API (`fullstack_starter_app` in local `.env.example`). The API refuses to boot when this connection is superuser or `BYPASSRLS`.
+- **`DATABASE_MIGRATE_URL`** — privileged role for `db:migrate`, `db:reset`, and Drizzle kit (`postgres` in local `.env.example`).
+- Migration `0007_app_database_role.sql` provisions the application role and table grants on each database.
+
+Production must create an equivalent non-superuser role, rotate its password, and keep migrations on a separate privileged connection.
 
 ## Transaction Convention
 

@@ -7,12 +7,13 @@ import {
   type OnApplicationShutdown,
 } from '@nestjs/common';
 
+import { DatabaseRlsGuard } from './database-rls.guard';
 import { DATABASE_POOL, databaseProviders } from './database.provider';
 import { TenantContextService } from './tenant-context.service';
 
 @Global()
 @Module({
-  providers: [...databaseProviders, TenantContextService],
+  providers: [...databaseProviders, TenantContextService, DatabaseRlsGuard],
   exports: [...databaseProviders, TenantContextService],
 })
 export class DatabaseModule implements OnApplicationShutdown {

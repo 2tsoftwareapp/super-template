@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { PROJECT_DEMO_GATEWAY } from '@repo/api-core';
+import { OrganizationsModule } from '@repo/api-identity/modules/organizations/organizations.module';
 import { UsersModule } from '@repo/api-identity/modules/users/users.module';
 import { AttachmentsModule } from '@repo/api-platform/modules/attachments/attachments.module';
 import { AuditModule } from '@repo/api-platform/modules/audit/audit.module';
@@ -13,6 +14,7 @@ import { ProjectsController } from './presentation/projects.controller';
 @Module({
   imports: [
     UsersModule,
+    OrganizationsModule,
     NotificationsModule,
     AuditModule,
     ActivitiesModule,

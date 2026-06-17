@@ -59,7 +59,8 @@ Trust boundaries inspected: browser↔BFF, BFF↔API, API auth/permission guards
 
 ### SEC-1 — RLS isolation is now exercised under the restricted app role — **Resolved**
 - **Coverage has expanded.** The current migrations add RLS policies for the original core tables and the remaining org-scoped tables (`0005_expand_organization_rls.sql`), so the original “4 of 13” gap is no longer accurate.
-- **The runtime proof now exists.** `apps/api/test/support/test-app.ts` provisions a non-superuser `super_template_app` role, seeds and resets through the privileged role, then serves the test app through the restricted role; `tenant-isolation.e2e.spec.ts` also asserts `current_user` matches that app role before checking cross-org project visibility.
+- **The runtime proof now exists.** `apps/api/test/support/test-app.ts` provisions a non-superuser `fullstack_starter_app` role, seeds and resets through the privileged role, then serves the test app through the restricted role; `tenant-isolation.e2e.spec.ts` and `background-jobs-tenant.e2e.spec.ts` assert tenant-scoped work under that identity.
+- **Production default is now restricted.** Migration `0007_app_database_role.sql` provisions the app role; `.env.example` points `DATABASE_URL` at it; `DatabaseRlsGuard` fails fast when the runtime pool connects as superuser/`BYPASSRLS`.
 - **Admin org-confinement remains by design.** `ADMIN` still depends on RLS to stay inside its organization while `SUPER_ADMIN` bypasses the boundary. The current app-role test coverage is now the concrete evidence for that design rather than a missing proof point.
 
 ### SEC-2 — Per-route rate limiting is now present on auth endpoints — **Resolved**
@@ -100,7 +101,7 @@ The web BFF cookie layer now reads `COOKIE_SAMESITE`, `COOKIE_DOMAIN`, and `COOK
 
 - **Consistent and readable.** Uniform module shape, typed DTOs, centralized `ERROR_CODES`, response envelope interceptor, Zod-validated env that fails fast.
 - **Route param validation is now mostly explicit.** The main UUID id routes in projects/files/jobs/admin-users/auth use `ParseUUIDPipe`, so the earlier blanket complaint no longer holds. Any remaining gaps should be treated as isolated leftovers, not a systemic issue.
-- **Multi-step writes still mix concerns.** `FilesService.upload` compensates on failure; `FilesService.delete` now removes storage before soft-deleting the DB row so a failed cleanup does not orphan the metadata record. Export/import/notification/background jobs accept optional `idempotencyKey` with unique indexes to dedupe retries.
+- **Multi-step writes still mix concerns.** `FilesService.upload` compensates on failure; `FilesService.delete` now removes storage before soft-deleting the DB row so a failed cleanup does not orphan the metadata record. Export/import/notification/background jobs use `runIdempotentInsert` (insert + unique-violation refetch) so concurrent retries return the existing row instead of surfacing 500s.
 - **Tracked artifacts have been cleaned up.** The previously committed runtime upload and `tsconfig.tsbuildinfo` files are no longer in the tree; keep them out via `.gitignore`/CI if they reappear.
 - **Config parity is tighter.** `.env.example` now matches the active web/API schema more closely; keep future sample keys wired into validation before adding them.
 
@@ -127,8 +128,11 @@ The web BFF cookie layer now reads `COOKIE_SAMESITE`, `COOKIE_DOMAIN`, and `COOK
 
 Resolved:
 - **Graceful shutdown** — `app.enableShutdownHooks()` now called (`main.ts:25`).
-- **Throttler wired and scoped** — `ThrottlerModule` + global `ThrottlerGuard` are registered, and sensitive auth routes now have explicit `@Throttle` overrides.
-- **Atomic refresh rotation** — `updateSessionIfMatches` is a CAS on `id + refreshTokenHash + revokedAt IS NULL` (`auth.repository.ts:74`).
+- **Throttler wired and scoped** — `ThrottlerModule` + global `ThrottlerGuard` are registered before auth, and sensitive auth routes have explicit `@Throttle` overrides.
+- **Atomic refresh rotation** — `updateSessionIfMatches` is a CAS on `id + refreshTokenHash + revokedAt IS NULL` (`auth.repository.ts:74`); CAS failure now revokes the session like hash mismatch.
+- **Background jobs under RLS** — cron workers dispatch with `WORKER_DISPATCH_CONTEXT`, then process each job inside per-tenant context (`background-jobs-tenant.e2e.spec.ts`).
+- **Restricted runtime DB role** — `0007_app_database_role.sql`, `DATABASE_MIGRATE_URL` split, `DatabaseRlsGuard` startup check.
+- **Idempotency races** — `runIdempotentInsert` across jobs, exports, imports, and notification jobs.
 - **CI quality gates enforced** — `ci.yml` runs lint, typecheck, API tests, web tests, build, and Playwright E2E.
 - **Restricted test role** — API e2e now executes under a dedicated non-superuser DB role, with an explicit `current_user` assertion in tenant isolation tests.
 - **Mobile CI added** — `ci.yml` now also runs Flutter format, analyze, and test in a dedicated mobile job.

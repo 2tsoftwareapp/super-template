@@ -173,10 +173,10 @@ describe('Auth, Projects, and Notifications (e2e)', () => {
     const forbiddenProjectAccess = await request(app.getHttpServer())
       .get(`/api/v1/projects/${projectId}`)
       .set(bearer(viewerSession.accessToken))
-      .expect(403);
+      .expect(404);
 
     expect(forbiddenProjectAccess.body.error.code).toBe(
-      ERROR_CODES.AUTH_FORBIDDEN,
+      ERROR_CODES.PROJECT_NOT_FOUND,
     );
 
     const database = app.get<DatabaseClient>(DATABASE);

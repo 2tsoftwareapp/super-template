@@ -2,15 +2,12 @@ import { Pool } from 'pg';
 
 import { loadCliEnv } from './load-cli-env';
 import { applySqlMigrations } from './migrations';
+import { resolveMigrateDatabaseUrl } from './resolve-migrate-database-url';
 
 loadCliEnv();
 
 const main = async (): Promise<void> => {
-  const databaseUrl = process.env.DATABASE_URL;
-
-  if (!databaseUrl) {
-    throw new Error('DATABASE_URL is required for db migrate.');
-  }
+  const databaseUrl = resolveMigrateDatabaseUrl();
 
   const pool = new Pool({
     connectionString: databaseUrl,

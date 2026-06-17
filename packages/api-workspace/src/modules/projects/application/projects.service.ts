@@ -12,6 +12,8 @@ import {
   type EntityAttachmentListing,
   ERROR_CODES,
   type NotificationMessage,
+  ORGANIZATION_LOOKUP,
+  type OrganizationLookup,
   PERMISSION_NAMES,
   requireOrganizationId,
   USER_LOOKUP,
@@ -41,6 +43,8 @@ export class ProjectsService {
     private readonly activitiesService: ActivitiesService,
     @Inject(ENTITY_ATTACHMENT_LISTING)
     private readonly entityAttachments: EntityAttachmentListing,
+    @Inject(ORGANIZATION_LOOKUP)
+    private readonly organizationLookup: OrganizationLookup,
   ) {}
 
   async list(user: AuthenticatedRequestUser, query: ProjectsQueryDto) {
@@ -111,7 +115,12 @@ export class ProjectsService {
       );
     }
 
-    const organizationId = requireOrganizationId(user);
+    const actorOrganizationId = requireOrganizationId(user);
+    const organizationId =
+      ownerId === user.userId
+        ? actorOrganizationId
+        : ((await this.organizationLookup.findPrimaryOrganizationId(ownerId)) ??
+          actorOrganizationId);
     const projectDto = await runInTransaction(
       this.projectsRepository.client,
       async (transaction) => {

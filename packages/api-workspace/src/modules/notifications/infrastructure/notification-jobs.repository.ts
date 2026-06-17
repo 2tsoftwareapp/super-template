@@ -4,7 +4,7 @@ import type {
 } from '@repo/api-database';
 
 import { Inject, Injectable } from '@nestjs/common';
-import { DATABASE } from '@repo/api-database';
+import { DATABASE, runIdempotentInsert } from '@repo/api-database';
 import { notificationJobs } from '@repo/api-database';
 import { and, asc, count, desc, eq, lte, sql } from 'drizzle-orm';
 
@@ -28,6 +28,31 @@ export class NotificationJobsRepository {
       .returning();
 
     return job ?? null;
+  }
+
+  async createIdempotent(
+    values: typeof notificationJobs.$inferInsert & {
+      actorId: string;
+      idempotencyKey: string;
+    },
+    executor: DatabaseExecutor = this.database,
+  ) {
+    return runIdempotentInsert(
+      async () => {
+        const [inserted] = await executor
+          .insert(notificationJobs)
+          .values(values)
+          .returning();
+
+        return inserted ?? undefined;
+      },
+      () =>
+        this.findByIdempotencyKey(
+          values.actorId,
+          values.idempotencyKey,
+          executor,
+        ),
+    );
   }
 
   async findById(jobId: string, executor: DatabaseExecutor = this.database) {

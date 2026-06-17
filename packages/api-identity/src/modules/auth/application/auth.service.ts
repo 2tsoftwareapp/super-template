@@ -742,6 +742,7 @@ export class AuthService {
     );
 
     if (!session) {
+      await this.authRepository.revokeSession(sessionId);
       throw new AppError(
         ERROR_CODES.AUTH_REFRESH_TOKEN_REUSED,
         'Refresh token reuse detected',

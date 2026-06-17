@@ -6,12 +6,37 @@
 - The token includes the user id, session id, and a per-token `jti`
 - Backend guards authorize requests from the bearer token
 
+## Session-Backed Access Tokens (Deliberate Tradeoff)
+
+Access tokens are signed JWTs, but **every authenticated request re-validates the session row** in PostgreSQL (`authenticateAccessToken` loads the session, checks revocation/expiry, then resolves roles and organization context).
+
+| Benefit | Cost |
+| --- | --- |
+| Instant revocation — logout, block, or reuse detection takes effect on the next request | Extra DB round-trips on every authenticated call (~3–4 queries including access profile and org resolution) |
+| Short JWT TTL is a defense-in-depth layer, not the sole revocation mechanism | Access tokens are not fully stateless; horizontal scale depends on the database session lookup path |
+
+This is intentional: the template prioritizes **revocable sessions** over minimizing per-request latency. If you need stateless verification later, introduce a session version claim or a distributed denylist and document the revocation delay you accept.
+
+## Auth Rate Limiting
+
+A global limit (120 requests/minute per client) applies to all routes. Sensitive public auth endpoints use stricter `@Throttle` overrides:
+
+| Route | Limit |
+| --- | --- |
+| `POST /auth/login`, `POST /auth/register` | 5 / minute |
+| `POST /auth/refresh` | 20 / minute |
+| `POST /auth/forgot-password`, `POST /auth/reset-password`, `POST /auth/resend-verification` | 3 / hour |
+| `POST /auth/verify-email` | 10 / hour |
+
+`ThrottlerGuard` runs before `AuthGuard`, so rate limiting applies before session validation work on protected routes.
+
 ## Refresh Rotation
 
 - Refresh tokens are longer-lived JWTs
 - The API stores only the refresh token hash in PostgreSQL
 - Every successful refresh rotates the refresh token
 - Reusing an old refresh token triggers session revocation
+- Concurrent refresh races use a compare-and-swap update on `refreshTokenHash`; a failed CAS revokes the session the same way as a hash mismatch
 
 ## Web Cookie Flow
 

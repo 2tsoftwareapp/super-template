@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { USER_NOTIFICATION_SENDER } from '@repo/api-core';
+import { OrganizationsModule } from '@repo/api-identity/modules/organizations/organizations.module';
 import { UsersModule } from '@repo/api-identity/modules/users/users.module';
 import { AuditModule } from '@repo/api-platform/modules/audit/audit.module';
 
@@ -17,7 +18,7 @@ import {
 } from './presentation/notifications.controller';
 
 @Module({
-  imports: [AuditModule, UsersModule],
+  imports: [AuditModule, OrganizationsModule, UsersModule],
   controllers: [NotificationsController, AdminNotificationsController],
   providers: [
     NotificationsRepository,

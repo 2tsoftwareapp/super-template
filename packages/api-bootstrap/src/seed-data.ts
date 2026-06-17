@@ -1,6 +1,7 @@
 import type { INestApplicationContext } from '@nestjs/common';
 
 import { EnvironmentService } from '@repo/api-core';
+import { TenantContextService, WORKER_DISPATCH_CONTEXT } from '@repo/api-database';
 import { AccessControlService } from '@repo/api-identity/modules/access-control/application/access-control.service';
 import { AuthRepository } from '@repo/api-identity/modules/auth/infrastructure/auth.repository';
 import { OrganizationsService } from '@repo/api-identity/modules/organizations/application/organizations.service';
@@ -27,30 +28,36 @@ export const seedDatabase = async (
   const settingsService = app.get(SettingsService);
   const usersRepository = app.get(UsersRepository);
   const environmentService = app.get(EnvironmentService);
+  const tenantContextService = app.get(TenantContextService);
 
-  await projectsRepository.client.transaction(async (transaction) => {
-    // Seed order matters: policies and settings first, then identities, then dependent workspace records.
-    await seedAccessControl(accessControlService, transaction);
-    await seedSettings(settingsService, transaction);
+  await tenantContextService.runAsync(WORKER_DISPATCH_CONTEXT, () =>
+    projectsRepository.client.transaction(async (transaction) => {
+      // Seed order matters: policies and settings first, then identities, then dependent workspace records.
+      await seedAccessControl(accessControlService, transaction);
+      await seedSettings(settingsService, transaction);
 
-    const seededUsers = await seedUsers(
-      {
-        accessControlService,
-        environmentService,
-        organizationsService,
-        usersRepository,
-      },
-      transaction,
-    );
+      const seededUsers = await seedUsers(
+        {
+          accessControlService,
+          environmentService,
+          organizationsService,
+          usersRepository,
+        },
+        transaction,
+      );
 
-    await seedProjects(projectsRepository, seededUsers, transaction);
-    await seedNotifications(notificationsRepository, seededUsers, transaction);
+      await seedProjects(projectsRepository, seededUsers, transaction);
+      await seedNotifications(notificationsRepository, seededUsers, transaction);
 
-    // Remove pre-existing sessions so a reset always boots into a clean, deterministic auth state.
-    await authRepository.revokeAllSessionsForUser(seededUsers.adminUserId, transaction);
-    await authRepository.revokeAllSessionsForUser(
-      seededUsers.regularUserId,
-      transaction,
-    );
-  });
+      // Remove pre-existing sessions so a reset always boots into a clean, deterministic auth state.
+      await authRepository.revokeAllSessionsForUser(
+        seededUsers.adminUserId,
+        transaction,
+      );
+      await authRepository.revokeAllSessionsForUser(
+        seededUsers.regularUserId,
+        transaction,
+      );
+    }),
+  );
 };

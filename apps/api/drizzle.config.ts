@@ -6,8 +6,10 @@ loadEnv({
   path: resolve(__dirname, '../../.env'),
 });
 
-if (!process.env.DATABASE_URL) {
-  throw new Error('DATABASE_URL is required for Drizzle commands.');
+if (!process.env.DATABASE_MIGRATE_URL && !process.env.DATABASE_URL) {
+  throw new Error(
+    'DATABASE_MIGRATE_URL or DATABASE_URL is required for Drizzle commands.',
+  );
 }
 
 export default defineConfig({
@@ -15,7 +17,10 @@ export default defineConfig({
   out: './drizzle',
   dialect: 'postgresql',
   dbCredentials: {
-    url: process.env.DATABASE_URL,
+    url:
+      process.env.DATABASE_MIGRATE_URL ??
+      process.env.DATABASE_URL ??
+      'postgresql://localhost:5432/postgres',
   },
   strict: true,
   verbose: true,

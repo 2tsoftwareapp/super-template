@@ -73,6 +73,7 @@ The same flow is wrapped by `./scripts/generate-contracts.sh`.
 - Drizzle schema remains backend-only
 - Permission checks in the frontend are UX hints only
 - Backend guards remain the source of truth
+- Global guard order: `ThrottlerGuard` → `AuthGuard` → `PermissionsGuard` (rate limits apply before session DB work)
 
 ## Authority Model & Tenancy
 
@@ -84,7 +85,7 @@ The template uses three primary roles:
 | `ADMIN` | Organization administrator | Bypasses ownership checks in services but remains confined to the active organization by RLS |
 | `SUPER_ADMIN` | Global platform manager | Sets `app.bypass_rls=true` and can operate across organizations |
 
-`TenantContextInterceptor` sets `bypassRls` only when the authenticated user includes `SUPER_ADMIN`. Organization `ADMIN` accounts therefore depend on Postgres RLS for cross-tenant isolation; `tenant-isolation.e2e.spec.ts` exercises that path under the restricted `super_template_app` database role.
+`TenantContextInterceptor` sets `bypassRls` only when the authenticated user includes `SUPER_ADMIN`. Organization `ADMIN` accounts therefore depend on Postgres RLS for cross-tenant isolation; `tenant-isolation.e2e.spec.ts` exercises that path under the restricted `fullstack_starter_app` database role.
 
 ## Shared Runtime Cache (Optional Redis)
 

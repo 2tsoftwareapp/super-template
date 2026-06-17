@@ -35,7 +35,10 @@ const existingJob = {
 describe('ExportsService idempotency', () => {
   it('returns an existing export job when the idempotency key matches', async () => {
     const exportJobsRepository = {
-      findByIdempotencyKey: vi.fn().mockResolvedValue(existingJob),
+      createIdempotent: vi.fn().mockResolvedValue({
+        value: existingJob,
+        created: false,
+      }),
       create: vi.fn(),
       update: vi.fn(),
     };
@@ -66,9 +69,11 @@ describe('ExportsService idempotency', () => {
       idempotencyKey: 'export-attempt-1',
     });
 
-    expect(exportJobsRepository.findByIdempotencyKey).toHaveBeenCalledWith(
-      actor.userId,
-      'export-attempt-1',
+    expect(exportJobsRepository.createIdempotent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        createdById: actor.userId,
+        idempotencyKey: 'export-attempt-1',
+      }),
     );
     expect(exportJobsRepository.create).not.toHaveBeenCalled();
     expect(result).toMatchObject({

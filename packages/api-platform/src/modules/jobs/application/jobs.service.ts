@@ -9,6 +9,12 @@ import {
   USER_NOTIFICATION_SENDER,
   type UserNotificationSender,
 } from '@repo/api-core';
+import {
+  tenantContextForJob,
+  TenantContextService,
+  withTenantContext,
+  WORKER_DISPATCH_CONTEXT,
+} from '@repo/api-database';
 
 import { MailService } from '../../mail/application/mail.service';
 import { JobsRepository } from '../infrastructure/jobs.repository';
@@ -30,6 +36,7 @@ export class JobsService {
   constructor(
     private readonly jobsRepository: JobsRepository,
     private readonly mailService: MailService,
+    private readonly tenantContextService: TenantContextService,
     @Inject(AUTH_TOKEN_CLEANUP)
     private readonly authTokenCleanup: AuthTokenCleanup,
     @Inject(USER_NOTIFICATION_SENDER)
@@ -105,14 +112,23 @@ export class JobsService {
     const createdById = input.createdById ?? null;
 
     if (input.idempotencyKey && createdById) {
-      const existing = await this.jobsRepository.findByIdempotencyKey(
+      const job = await this.jobsRepository.createIdempotent({
+        type: input.type,
+        payload: input.payload,
+        scheduledAt: input.scheduledAt ?? new Date(),
+        priority: input.priority ?? 0,
         createdById,
-        input.idempotencyKey,
-      );
+        organizationId: input.organizationId ?? null,
+        maxAttempts: input.maxAttempts ?? 3,
+        status: 'PENDING',
+        idempotencyKey: input.idempotencyKey,
+      });
 
-      if (existing) {
-        return this.toJobDto(existing);
+      if (!job) {
+        throw new Error('Job insert returned no rows');
       }
+
+      return this.toJobDto(job);
     }
 
     const job = await this.jobsRepository.create({
@@ -178,10 +194,19 @@ export class JobsService {
   }
 
   async processDueJobs() {
-    const dueJobs = await this.jobsRepository.claimDueJobs(20);
+    const dueJobs = await this.tenantContextService.runAsync(
+      WORKER_DISPATCH_CONTEXT,
+      () => this.jobsRepository.claimDueJobs(20),
+    );
 
     for (const job of dueJobs) {
-      await this.processJob(job);
+      await this.tenantContextService.runAsync(
+        tenantContextForJob({
+          organizationId: job.organizationId ?? null,
+          actorUserId: job.createdById ?? null,
+        }),
+        () => this.processJob(job),
+      );
     }
   }
 
@@ -191,9 +216,16 @@ export class JobsService {
     const handler = this.handlers.get(job.type);
 
     if (!handler) {
-      await this.jobsRepository.markFailed(
-        job.id,
-        `No handler registered for job type "${job.type}"`,
+      await withTenantContext(
+        this.jobsRepository.client,
+        WORKER_DISPATCH_CONTEXT,
+        async (transaction) => {
+          await this.jobsRepository.markFailed(
+            job.id,
+            `No handler registered for job type "${job.type}"`,
+            transaction,
+          );
+        },
       );
       return;
     }
@@ -205,21 +237,34 @@ export class JobsService {
         organizationId: job.organizationId ?? null,
         createdById: job.createdById ?? null,
       });
-      await this.jobsRepository.markCompleted(job.id);
+      await withTenantContext(
+        this.jobsRepository.client,
+        WORKER_DISPATCH_CONTEXT,
+        async (transaction) => {
+          await this.jobsRepository.markCompleted(job.id, transaction);
+        },
+      );
     } catch (error) {
       const message =
         error instanceof Error ? error.message : 'Unknown processing error';
 
-      if (job.attempts < job.maxAttempts) {
-        await this.jobsRepository.requeueForRetry(
-          job.id,
-          new Date(Date.now() + 60_000),
-          message,
-        );
-        return;
-      }
+      await withTenantContext(
+        this.jobsRepository.client,
+        WORKER_DISPATCH_CONTEXT,
+        async (transaction) => {
+          if (job.attempts < job.maxAttempts) {
+            await this.jobsRepository.requeueForRetry(
+              job.id,
+              new Date(Date.now() + 60_000),
+              message,
+              transaction,
+            );
+            return;
+          }
 
-      await this.jobsRepository.markFailed(job.id, message);
+          await this.jobsRepository.markFailed(job.id, message, transaction);
+        },
+      );
     }
   }
 
