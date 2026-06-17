@@ -49,7 +49,6 @@ Implemented and reasonably complete:
 - **Clients**: web (App Router + BFF), admin (Vite + shadcn + TanStack), mobile (Riverpod + Dio + secure storage + single-flight refresh).
 
 Feature gaps:
-- **Mobile is not verified in CI.** Recent commits skip Flutter steps (`d940b45 ci: skip flutter pipeline steps`); `ci.yml` has no Flutter format/analyze/test. Mobile can regress silently.
 - **Imports/exports appear demo-scoped** (projects only); fine for a template but should be labeled as such.
 
 ---
@@ -125,7 +124,7 @@ There is no Redis (or equivalent shared store) wired anywhere in source (grep fi
 | 6 | Low | Security | Web cookie flags ignore env | Resolved in current web BFF path |
 | 7 | Low | Quality | Remaining `ParseUUIDPipe` gaps, if any | Audit the few leftover id routes and normalize them |
 | 8 | Low | Quality/Repo | Tracked upload + tsbuildinfo artifacts | Keep them out of the tree; CI check on generated files |
-| 9 | Low | CI | Mobile not verified | Restore Flutter format/analyze/test in CI |
+| 9 | Low | CI | Mobile not verified | Resolved in current CI workflow |
 | 10 | Low | Config | Orphan `.env.example` keys | Resolved in current env example |
 
 ---
@@ -137,11 +136,12 @@ Resolved:
 - **Throttler wired and scoped** — `ThrottlerModule` + global `ThrottlerGuard` are registered, and sensitive auth routes now have explicit `@Throttle` overrides.
 - **Atomic refresh rotation** — `updateSessionIfMatches` is a CAS on `id + refreshTokenHash + revokedAt IS NULL` (`auth.repository.ts:74`).
 - **CI quality gates enforced** — `ci.yml` runs lint, typecheck, API tests, web tests, build, and Playwright E2E.
+- **Mobile CI added** — `ci.yml` now also runs Flutter format, analyze, and test in a dedicated mobile job.
 - **Modularization** — backend split from `apps/api/src/modules/*` into `packages/api-*`.
 - **Local download path** — authenticated file download exists in the files module.
 - **SSE refresh cookies** — notification stream refresh now persists rotated cookies.
 
-Still open: RLS runtime proof (P1), package boundaries (P1), some transactional/idempotency gaps (P1), Redis / single-instance scaling (P1), mobile CI (P3).
+Still open: RLS runtime proof (P1), package boundaries (P1), some transactional/idempotency gaps (P1), Redis / single-instance scaling (P1).
 
 Open question now answered: admin roles are **org-scoped** (`ADMIN`) vs **global** (`SUPER_ADMIN`), with `USER` as the normal role — see §2.1 and SEC-1.
 

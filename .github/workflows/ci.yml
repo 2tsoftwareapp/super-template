@@ -110,3 +110,30 @@ jobs:
       - name: Web E2E tests
         run: pnpm --filter web test:e2e
 
+  mobile:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install mobile dependencies
+        working-directory: apps/mobile
+        run: flutter pub get
+
+      - name: Format mobile sources
+        working-directory: apps/mobile
+        run: dart format --set-exit-if-changed .
+
+      - name: Analyze mobile sources
+        working-directory: apps/mobile
+        run: flutter analyze
+
+      - name: Run mobile tests
+        working-directory: apps/mobile
+        run: flutter test
