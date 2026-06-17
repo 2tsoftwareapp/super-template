@@ -8,6 +8,7 @@ export default defineConfig([
     '**/dist/**',
     '**/coverage/**',
     '**/node_modules/**',
+    'packages/api-contract/src/generated/**',
     '**/*.spec.ts',
     '**/*.spec.tsx',
     '**/*.test.ts',

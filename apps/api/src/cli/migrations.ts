@@ -1,6 +1,7 @@
+import type { Pool } from 'pg';
+
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { Pool } from 'pg';
 
 export const resolveMigrationsFolder = (): string => {
   const candidates = [
