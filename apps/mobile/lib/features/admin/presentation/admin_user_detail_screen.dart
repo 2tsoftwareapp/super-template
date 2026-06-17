@@ -28,7 +28,9 @@ class _AdminUserDetailScreenState extends ConsumerState<AdminUserDetailScreen> {
             return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError || !snapshot.hasData) {
-            return Center(child: Text(snapshot.error?.toString() ?? 'Not found'));
+            return Center(
+              child: Text(snapshot.error?.toString() ?? 'Not found'),
+            );
           }
           final user = snapshot.data!;
           _status ??= user.status;
@@ -38,7 +40,10 @@ class _AdminUserDetailScreenState extends ConsumerState<AdminUserDetailScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(user.displayName, style: Theme.of(context).textTheme.headlineSmall),
+                Text(
+                  user.displayName,
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
                 const SizedBox(height: 8),
                 Text(user.email),
                 const SizedBox(height: 16),

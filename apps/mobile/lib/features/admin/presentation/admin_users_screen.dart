@@ -107,10 +107,10 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
           FilledButton(
             onPressed: () async {
               await ref.read(adminRepositoryProvider).createUser(
-                    email: _emailController.text.trim(),
-                    password: _passwordController.text,
-                    displayName: _nameController.text.trim(),
-                  );
+                email: _emailController.text.trim(),
+                password: _passwordController.text,
+                displayName: _nameController.text.trim(),
+              );
               if (context.mounted) {
                 Navigator.pop(context);
                 setState(() {});
