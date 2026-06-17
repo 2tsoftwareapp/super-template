@@ -35,7 +35,6 @@ run_step \
   --additional-properties=pubName=super_template_api,pubAuthor=OpenAI,serializationLibrary=built_value,useEnumExtension=true,nullableFields=true
 (
   cd apps/mobile/lib/generated/api
-  rm -f lib/src/model/send_notification_dto.dart lib/src/model/send_notification_dto.g.dart
   run_step "Install Dart client dependencies" dart pub get
   run_step "Build generated Dart serializers" dart run build_runner build
   node -e "
