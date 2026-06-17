@@ -436,6 +436,7 @@ export class UsersService {
       );
     }
 
+    // Self role changes are forbidden so an admin cannot silently downgrade or lock out their own session.
     if (actor.userId === userId) {
       throw new AppError(
         ERROR_CODES.AUTH_FORBIDDEN,
@@ -449,6 +450,7 @@ export class UsersService {
       this.accessControlService.validateRoleIds(roleIds),
     ]);
 
+    // The final authorization check compares the target's current roles against the proposed ones.
     this.accessControlService.assertCanAssignUserRoles(
       actor,
       currentAccess.roles,

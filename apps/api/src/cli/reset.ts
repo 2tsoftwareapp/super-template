@@ -1,11 +1,11 @@
 import { resolve } from 'node:path';
 import { NestFactory } from '@nestjs/core';
+import { seedDatabase } from '@repo/api-bootstrap';
 import { createDatabaseClient } from '@repo/api-database';
 import { config as loadEnv } from 'dotenv';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import { Pool } from 'pg';
 import { AppModule } from '../app.module';
-import { seedDatabase } from './seed-data';
 
 loadEnv({
   path: resolve(process.cwd(), '.env'),

@@ -4,11 +4,11 @@ import { type INestApplication, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
 import { ThrottlerGuard } from '@nestjs/throttler';
+import { seedDatabase } from '@repo/api-bootstrap';
 import { config as loadEnv } from 'dotenv';
 import { Pool } from 'pg';
 import request from 'supertest';
 import { AppModule } from '../../src/app.module';
-import { seedDatabase } from '../../src/database/seed-data';
 
 loadEnv({ path: resolve(process.cwd(), '.env'), quiet: true });
 loadEnv({ path: resolve(process.cwd(), '../../.env'), quiet: true });

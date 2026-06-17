@@ -20,6 +20,7 @@ export class AccessControlService {
   ) {}
 
   async ensureSeedData(executor?: DatabaseExecutor): Promise<void> {
+    // Seed the immutable role/permission graph in one place so every env uses the same policy baseline.
     const roles = await this.accessControlRepository.ensureRoles(
       [
         { name: ROLE_NAMES.SUPER_ADMIN, description: 'Platform owner role' },
@@ -181,6 +182,7 @@ export class AccessControlService {
   }
 
   async getRoleNamesForUsers(userIds: string[]) {
+    // Group the flat join result by user so callers can render role badges without extra joins.
     const rows =
       await this.accessControlRepository.findRoleNamesForUsers(userIds);
     const grouped = new Map<string, string[]>();
@@ -199,6 +201,7 @@ export class AccessControlService {
   }
 
   async getRoleIdsForUsers(userIds: string[]) {
+    // Same grouping strategy as names, but keeps the stable IDs needed for role editing.
     const rows = await this.accessControlRepository.findRoleIdsForUsers(userIds);
     const grouped = new Map<string, string[]>();
 
@@ -230,6 +233,7 @@ export class AccessControlService {
     actor: AuthenticatedRequestUser,
     targetRoleNames: string[],
   ): void {
+    // Privileged accounts are a hard boundary: only SUPER_ADMIN can touch them.
     const targetIsPrivileged = targetRoleNames.some((roleName) =>
       PRIVILEGED_ROLE_NAMES.includes(
         roleName as (typeof PRIVILEGED_ROLE_NAMES)[number],
@@ -284,6 +288,9 @@ export class AccessControlService {
     targetRoleNames: string[],
     desiredRoleNames: string[],
   ): void {
+    // Role assignment has two gates:
+    // 1) non-superadmins cannot touch privileged accounts or grant privileged roles;
+    // 2) the actor still needs the generic ROLES_MANAGE permission unless they are SUPER_ADMIN.
     const actorIsSuperAdmin = actor.roles.includes(ROLE_NAMES.SUPER_ADMIN);
     const targetIsPrivileged = targetRoleNames.some((roleName) =>
       PRIVILEGED_ROLE_NAMES.includes(

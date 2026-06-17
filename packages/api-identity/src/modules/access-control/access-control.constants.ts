@@ -4,11 +4,13 @@ export const ROLE_NAMES = {
   USER: 'USER',
 } as const;
 
+// Roles that carry elevated operational authority in the admin workspace.
 export const PRIVILEGED_ROLE_NAMES = [
   ROLE_NAMES.SUPER_ADMIN,
   ROLE_NAMES.ADMIN,
 ] as const;
 
+// Canonical permission names used across controllers, guards, and seed data.
 export const PERMISSION_NAMES = {
   USERS_READ: 'users.read',
   USERS_CREATE: 'users.create',
@@ -43,8 +45,10 @@ export const PERMISSION_NAMES = {
   MAIL_READ: 'mail.read',
 } as const;
 
+// Full permission set assigned to the platform owner role.
 export const ALL_PERMISSIONS = Object.values(PERMISSION_NAMES);
 
+// Permissions available to staff-facing admin accounts.
 export const ADMIN_PERMISSIONS = [
   PERMISSION_NAMES.USERS_READ,
   PERMISSION_NAMES.USERS_CREATE,
@@ -79,6 +83,7 @@ export const ADMIN_PERMISSIONS = [
   PERMISSION_NAMES.MAIL_READ,
 ] as const;
 
+// Permissions available to standard end users.
 export const USER_PERMISSIONS = [
   PERMISSION_NAMES.PROJECTS_READ,
   PERMISSION_NAMES.PROJECTS_CREATE,

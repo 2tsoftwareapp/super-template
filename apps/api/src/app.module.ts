@@ -23,11 +23,11 @@ import {
   ResponseEnvelopeInterceptor,
 } from '@repo/api-core';
 import { DatabaseModule, TenantContextService } from '@repo/api-database';
+import { HealthModule } from '@repo/api-health';
 import { IdentityModule } from '@repo/api-identity';
 import { AuthService } from '@repo/api-identity/modules/auth/application/auth.service';
 import { PlatformModule } from '@repo/api-platform';
 import { WorkspaceModule } from '@repo/api-workspace';
-import { HealthModule } from './modules/health/health.module';
 import { AuthGuard } from './shell/auth.guard';
 import { TenantContextInterceptor } from './shell/tenant-context.interceptor';
 

@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
+import { seedDatabase } from '@repo/api-bootstrap';
 import { AppModule } from '../app.module';
-import { seedDatabase } from './seed-data';
 
 const main = async (): Promise<void> => {
   const app = await NestFactory.createApplicationContext(AppModule, {
