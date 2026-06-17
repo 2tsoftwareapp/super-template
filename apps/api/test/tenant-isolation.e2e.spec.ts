@@ -4,6 +4,8 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
   bearer,
   createTestApp,
+  getCurrentDatabaseUser,
+  getTestAppRoleName,
   loginAs,
   resetTestDatabase,
 } from './support/test-app';
@@ -55,6 +57,10 @@ describe('Tenant isolation (e2e)', () => {
     expect(userNames).toContain('Starter User Project');
     expect(adminNames).not.toContain('Starter User Project');
     expect(userNames).not.toContain('Starter Admin Project');
+  });
+
+  it('runs tenant-scoped queries under the restricted test role', async () => {
+    expect(await getCurrentDatabaseUser(app)).toBe(getTestAppRoleName());
   });
 
   it('lists organizations for the authenticated user', async () => {

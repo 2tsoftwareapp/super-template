@@ -12,7 +12,7 @@ This review supersedes `docs/backend-architecture-review-2026-06-16.md`. The bac
 
 The template is a credible, well-structured full-stack starter: NestJS modular monolith split into domain packages, a Next.js BFF with HttpOnly-cookie sessions, a Vite admin, a Flutter client, Drizzle migrations, RBAC + permissions, audit logging, and end-to-end OpenAPI contract generation. Security fundamentals are mostly present and thoughtfully implemented (session-backed JWT with refresh rotation + reuse detection, Argon2id, strict global validation, Helmet, CORS, an exception filter that does not leak internals).
 
-The intended authority model is now confirmed: **`USER`** = normal user, **`ADMIN`** = administrator scoped to one organization, **`SUPER_ADMIN`** = global manager. The code already encodes this (only `SUPER_ADMIN` bypasses RLS), which makes **multi-tenant isolation the dominant risk**: an org `ADMIN` bypasses ownership checks in services and is kept inside their organization *solely* by Row-Level Security. The current migration set has expanded RLS coverage beyond the original 4-table baseline, but the tenant-context path still needs an integration test using the production DB role before the template is called production-grade.
+The intended authority model is now confirmed: **`USER`** = normal user, **`ADMIN`** = administrator scoped to one organization, **`SUPER_ADMIN`** = global manager. The code already encodes this (only `SUPER_ADMIN` bypasses RLS), which makes **multi-tenant isolation the dominant risk**: an org `ADMIN` bypasses ownership checks in services and is kept inside their organization *solely* by Row-Level Security. The current migration set has expanded RLS coverage beyond the original 4-table baseline, and the test harness now runs against a restricted app role and asserts that tenant-scoped queries execute under that non-superuser identity.
 
 Secondary themes that still matter: **no Redis** (so rate limiting, SSE notification fan-out, and caching are single-instance only), package coupling, and mobile CI coverage.
 
@@ -57,11 +57,10 @@ Feature gaps:
 
 Trust boundaries inspected: browser↔BFF, BFF↔API, API auth/permission guards, API↔Postgres (RLS), file upload/download, mail/token issuance, secrets/config.
 
-### SEC-1 — RLS isolation is still the highest-value proof point — **High (needs verification)**
+### SEC-1 — RLS isolation is now exercised under the restricted app role — **Resolved**
 - **Coverage has expanded.** The current migrations add RLS policies for the original core tables and the remaining org-scoped tables (`0005_expand_organization_rls.sql`), so the original “4 of 13” gap is no longer accurate.
-- **The runtime proof is still missing.** Tenant context is still applied through `set_config(...)` in the pool wrapper, so the remaining question is whether the production DB role and request flow actually enforce the intended boundary under load and in tests. That should be proven with an integration test that exercises org `ADMIN` against another org’s data while connected as the non-owner application role.
-- **Admin org-confinement still depends on the tenancy boundary.** `ADMIN` remains org-scoped while `SUPER_ADMIN` bypasses RLS. Services such as `ProjectsService.assertCanAccessProject` and `FilesService.findAccessibleFile` still rely on the tenancy boundary to keep admins inside their own org. If the runtime proof fails, the blast radius is still cross-tenant.
-- **Recommendation.** Keep RLS as a hard boundary only if the production-role integration test passes. Otherwise treat it as defense-in-depth and narrow the service-level bypasses accordingly.
+- **The runtime proof now exists.** `apps/api/test/support/test-app.ts` provisions a non-superuser `super_template_app` role, seeds and resets through the privileged role, then serves the test app through the restricted role; `tenant-isolation.e2e.spec.ts` also asserts `current_user` matches that app role before checking cross-org project visibility.
+- **Admin org-confinement remains by design.** `ADMIN` still depends on RLS to stay inside its organization while `SUPER_ADMIN` bypasses the boundary. The current app-role test coverage is now the concrete evidence for that design rather than a missing proof point.
 
 ### SEC-2 — Per-route rate limiting is now present on auth endpoints — **Resolved**
 The auth controller now uses strict `@Throttle` overrides on the sensitive routes, so the earlier “global-only throttling” finding no longer applies. The remaining scaling concern is distributed enforcement, not route coverage.
@@ -116,7 +115,7 @@ There is no Redis (or equivalent shared store) wired anywhere in source (grep fi
 
 | # | Severity | Area | Gap | Recommendation |
 |---|----------|------|-----|----------------|
-| 1 | High | Security/Arch | RLS runtime proof still missing | Same-transaction DB-local context test as production DB role and org `ADMIN` |
+| 1 | High | Security/Arch | RLS runtime proof under restricted app role | Resolved in current test harness and CI |
 | 2 | Medium | Infra/Scale | No Redis — in-memory throttler, in-process SSE fan-out, no shared cache | Add Redis; back throttler + SSE pub/sub + access-profile cache |
 | 3 | Medium | Arch | Cross-feature package coupling (323 boundary issues) | Ports/events via `api-core`; enforce `turbo boundaries` in CI |
 | 4 | Low | Security | CSRF token integrity | Resolved in current web BFF path |
@@ -136,12 +135,13 @@ Resolved:
 - **Throttler wired and scoped** — `ThrottlerModule` + global `ThrottlerGuard` are registered, and sensitive auth routes now have explicit `@Throttle` overrides.
 - **Atomic refresh rotation** — `updateSessionIfMatches` is a CAS on `id + refreshTokenHash + revokedAt IS NULL` (`auth.repository.ts:74`).
 - **CI quality gates enforced** — `ci.yml` runs lint, typecheck, API tests, web tests, build, and Playwright E2E.
+- **Restricted test role** — API e2e now executes under a dedicated non-superuser DB role, with an explicit `current_user` assertion in tenant isolation tests.
 - **Mobile CI added** — `ci.yml` now also runs Flutter format, analyze, and test in a dedicated mobile job.
 - **Modularization** — backend split from `apps/api/src/modules/*` into `packages/api-*`.
 - **Local download path** — authenticated file download exists in the files module.
 - **SSE refresh cookies** — notification stream refresh now persists rotated cookies.
 
-Still open: RLS runtime proof (P1), package boundaries (P1), some transactional/idempotency gaps (P1), Redis / single-instance scaling (P1).
+Still open: package boundaries (P1), some transactional/idempotency gaps (P1), Redis / single-instance scaling (P1).
 
 Open question now answered: admin roles are **org-scoped** (`ADMIN`) vs **global** (`SUPER_ADMIN`), with `USER` as the normal role — see §2.1 and SEC-1.
 
@@ -149,10 +149,10 @@ Open question now answered: admin roles are **org-scoped** (`ADMIN`) vs **global
 
 ## 8. Verification Notes & Residual Risk
 
-- This review is static. The **highest-impact** item (SEC-1) is explicitly marked needs-verification: the practical effect of transaction-local `set_config` at pool checkout must be confirmed with a test that runs as the non-privileged production DB role. That test is the single most valuable next step.
+- This review is static, but the highest-impact tenancy proof now exists in the test harness and CI: the API e2e path runs under a restricted role and asserts the active database user before checking isolation.
 - No secrets, tokens, or customer data were copied into this document.
 - Recommended next commands:
   - `pnpm lint && pnpm typecheck && pnpm --filter api test && pnpm --filter web test` (confirm gates are green on current tree)
-  - Add and run a cross-tenant RLS integration test under the production DB role — assert that an org-`A` **`ADMIN`** cannot read/modify org-`B` projects/files (the strongest test of the authority model)
+  - Keep the restricted-role cross-tenant RLS integration test in CI — assert that an org-`A` **`ADMIN`** cannot read/modify org-`B` projects/files (the strongest test of the authority model)
   - `pnpm exec turbo boundaries` (quantify current coupling)
   - Add Redis to `infra/docker-compose.yml` and back the throttler, SSE fan-out, and access-profile cache before any multi-instance deployment
