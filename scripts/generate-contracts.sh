@@ -22,6 +22,12 @@ run_step() {
 }
 
 pnpm --filter api contract:generate
+
+if [ "${SKIP_FLUTTER_GENERATION:-}" = "1" ] || [ "${CI:-}" = "true" ]; then
+  printf '[generate] Skip Flutter/Dart client generation\n'
+  exit 0
+fi
+
 rm -rf apps/mobile/lib/generated/api
 mkdir -p apps/mobile/lib/generated/api
 run_step \
