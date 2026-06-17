@@ -26,6 +26,7 @@ mkdir -p apps/mobile/lib/generated/api
 run_step \
   "Generate Dart Dio client" \
   docker run --rm \
+  --user "$(id -u):$(id -g)" \
   -v "$ROOT_DIR:/local" \
   openapitools/openapi-generator-cli:v7.16.0 generate \
   -g dart-dio \
