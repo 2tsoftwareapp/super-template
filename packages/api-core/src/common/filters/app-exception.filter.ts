@@ -21,6 +21,7 @@ export class AppExceptionFilter implements ExceptionFilter {
     const response = context.getResponse<Response>();
     const request = context.getRequest<Request>();
 
+    // Default to a generic 500 so unexpected exceptions never leak an untyped response.
     let statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
     let code: ErrorCode = ERROR_CODES.INTERNAL_ERROR;
     let message = 'An unexpected error occurred';
@@ -50,6 +51,7 @@ export class AppExceptionFilter implements ExceptionFilter {
       }
     }
 
+    // Persist the resolved code for downstream logging/middleware that runs after the exception handler.
     response.locals.errorCode = code;
 
     console[statusCode >= 500 ? 'error' : 'warn'](

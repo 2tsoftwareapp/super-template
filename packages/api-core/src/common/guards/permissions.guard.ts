@@ -20,6 +20,7 @@ export class PermissionsGuard implements CanActivate {
       context.getClass(),
     ]);
 
+    // Public routes bypass auth and permission checks by design.
     if (isPublic) {
       return true;
     }
@@ -30,6 +31,7 @@ export class PermissionsGuard implements CanActivate {
         context.getClass(),
       ]) ?? [];
 
+    // Routes without a permission decorator are treated as authenticated-only.
     if (requiredPermissions.length === 0) {
       return true;
     }
@@ -37,6 +39,7 @@ export class PermissionsGuard implements CanActivate {
     const request = context.switchToHttp().getRequest<Express.Request>();
     const user = request.user;
 
+    // Missing user context means the auth guard did not populate the request.
     if (!user) {
       throw new AppError(
         ERROR_CODES.AUTH_UNAUTHORIZED,
