@@ -22,6 +22,7 @@ run_step() {
 }
 
 pnpm --filter api contract:generate
+rm -rf apps/mobile/lib/generated/api
 mkdir -p apps/mobile/lib/generated/api
 run_step \
   "Generate Dart Dio client" \
