@@ -80,13 +80,22 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/notifications',
         builder: (_, _) => const NotificationsScreen(),
       ),
-      GoRoute(path: '/profile', builder: (_, _) => const ProfileScreen()),
+      GoRoute(
+        path: '/profile',
+        builder: (_, _) => const ProfileScreen(),
+      ),
       GoRoute(
         path: '/preferences',
         builder: (_, _) => const PreferencesScreen(),
       ),
-      GoRoute(path: '/security', builder: (_, _) => const SecurityScreen()),
-      GoRoute(path: '/sessions', builder: (_, _) => const SessionsScreen()),
+      GoRoute(
+        path: '/security',
+        builder: (_, _) => const SecurityScreen(),
+      ),
+      GoRoute(
+        path: '/sessions',
+        builder: (_, _) => const SessionsScreen(),
+      ),
       GoRoute(
         path: '/admin/users',
         builder: (_, _) => const AdminUsersScreen(),
