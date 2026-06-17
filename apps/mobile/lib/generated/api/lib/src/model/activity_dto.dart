@@ -37,7 +37,7 @@ abstract class ActivityDto implements Built<ActivityDto, ActivityDtoBuilder> {
   String get entityId;
 
   @BuiltValueField(wireName: r'actorId')
-  JsonObject? get actorId;
+  String? get actorId;
 
   @BuiltValueField(wireName: r'visibility')
   ActivityDtoVisibilityEnum get visibility;
@@ -96,7 +96,7 @@ class _$ActivityDtoSerializer implements PrimitiveSerializer<ActivityDto> {
       yield r'actorId';
       yield serializers.serialize(
         object.actorId,
-        specifiedType: const FullType(JsonObject),
+        specifiedType: const FullType.nullable(String),
       );
     }
     yield r'visibility';
@@ -173,8 +173,9 @@ class _$ActivityDtoSerializer implements PrimitiveSerializer<ActivityDto> {
         case r'actorId':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(JsonObject),
-          ) as JsonObject;
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
+          if (valueDes == null) continue;
           result.actorId = valueDes;
           break;
         case r'visibility':

@@ -79,7 +79,7 @@ class _$ActivityDto extends ActivityDto {
   @override
   final String entityId;
   @override
-  final JsonObject? actorId;
+  final String? actorId;
   @override
   final ActivityDtoVisibilityEnum visibility;
   @override
@@ -170,9 +170,9 @@ class ActivityDtoBuilder implements Builder<ActivityDto, ActivityDtoBuilder> {
   String? get entityId => _$this._entityId;
   set entityId(String? entityId) => _$this._entityId = entityId;
 
-  JsonObject? _actorId;
-  JsonObject? get actorId => _$this._actorId;
-  set actorId(JsonObject? actorId) => _$this._actorId = actorId;
+  String? _actorId;
+  String? get actorId => _$this._actorId;
+  set actorId(String? actorId) => _$this._actorId = actorId;
 
   ActivityDtoVisibilityEnum? _visibility;
   ActivityDtoVisibilityEnum? get visibility => _$this._visibility;
