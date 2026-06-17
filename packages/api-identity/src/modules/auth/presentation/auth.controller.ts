@@ -7,10 +7,12 @@ import {
   Delete,
   Get,
   Param,
+  ParseUUIDPipe,
   Post,
   Req,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import {
   ApiArrayResponse,
   ApiDataResponse,
@@ -43,6 +45,7 @@ export class AuthController {
 
   @Public()
   @Post('register')
+  @Throttle({ default: { limit: 5, ttl: 60_000 } })
   @ApiDataResponse(SuccessMessageDto, 201)
   register(@Body() input: RegisterDto, @Req() request: Request) {
     return this.authService.register(input, request.requestContext);
@@ -50,6 +53,7 @@ export class AuthController {
 
   @Public()
   @Post('login')
+  @Throttle({ default: { limit: 5, ttl: 60_000 } })
   @ApiDataResponse(AuthResponseDto, 201)
   login(@Body() input: LoginDto, @Req() request: Request) {
     return this.authService.login(input, request.requestContext);
@@ -57,6 +61,7 @@ export class AuthController {
 
   @Public()
   @Post('refresh')
+  @Throttle({ default: { limit: 20, ttl: 60_000 } })
   @ApiDataResponse(AuthResponseDto, 201)
   refresh(@Body() input: RefreshTokenDto, @Req() request: Request) {
     return this.authService.refresh(input, request.requestContext);
@@ -94,6 +99,7 @@ export class AuthController {
 
   @Public()
   @Post('forgot-password')
+  @Throttle({ default: { limit: 3, ttl: 3_600_000 } })
   @ApiDataResponse(SuccessMessageDto, 201)
   forgotPassword(@Body() input: ForgotPasswordDto) {
     return this.authService.forgotPassword(input);
@@ -101,6 +107,7 @@ export class AuthController {
 
   @Public()
   @Post('reset-password')
+  @Throttle({ default: { limit: 3, ttl: 3_600_000 } })
   @ApiDataResponse(SuccessFlagDto, 201)
   resetPassword(@Body() input: ResetPasswordDto, @Req() request: Request) {
     return this.authService.resetPassword(input, request.requestContext);
@@ -108,6 +115,7 @@ export class AuthController {
 
   @Public()
   @Post('verify-email')
+  @Throttle({ default: { limit: 10, ttl: 3_600_000 } })
   @ApiDataResponse(SuccessFlagDto, 201)
   verifyEmail(@Body() input: VerifyEmailDto, @Req() request: Request) {
     return this.authService.verifyEmail(input, request.requestContext);
@@ -115,6 +123,7 @@ export class AuthController {
 
   @Public()
   @Post('resend-verification')
+  @Throttle({ default: { limit: 3, ttl: 3_600_000 } })
   @ApiDataResponse(SuccessMessageDto, 201)
   resendVerification(@Body() input: ResendVerificationDto) {
     return this.authService.resendVerification(input);
@@ -150,7 +159,7 @@ export class AuthController {
   @ApiDataResponse(SuccessFlagDto)
   async revokeSession(
     @CurrentUser() user: AuthenticatedRequestUser,
-    @Param('sessionId') sessionId: string,
+    @Param('sessionId', new ParseUUIDPipe()) sessionId: string,
     @Req() request: Request,
   ) {
     await this.authService.revokeSession(

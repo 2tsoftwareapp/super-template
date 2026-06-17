@@ -8,7 +8,6 @@ import { ERROR_CODES } from '@repo/api-core';
 import { AppError } from '@repo/api-core';
 import { requireOrganizationId } from '@repo/api-core';
 import { randomUUID } from 'node:crypto';
-import { extname } from 'node:path';
 
 import { AuditService } from '../../audit/application/audit.service';
 import {
@@ -16,8 +15,12 @@ import {
   type ObjectStorage,
 } from '../../storage/application/object-storage.interface';
 import { FilesRepository } from '../infrastructure/files.repository';
-
-const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
+import {
+  getUploadExtension,
+  MAX_FILE_SIZE_BYTES,
+  resolveUploadedFileMimeType,
+} from './files-upload.policy';
+import { LocalFileDownloadUrlService } from './local-file-download-url.service';
 
 interface UploadedFile {
   buffer: Buffer;
@@ -32,6 +35,7 @@ export class FilesService {
     private readonly filesRepository: FilesRepository,
     @Inject(OBJECT_STORAGE) private readonly objectStorage: ObjectStorage,
     private readonly auditService: AuditService,
+    private readonly localFileDownloadUrlService: LocalFileDownloadUrlService,
   ) {}
 
   async upload(
@@ -55,12 +59,25 @@ export class FilesService {
       );
     }
 
-    const extension = extname(file.originalname) || '';
+    const extension = getUploadExtension(file.originalname);
+    const detectedMimeType = resolveUploadedFileMimeType(
+      file.buffer,
+      file.originalname,
+    );
+
+    if (!detectedMimeType) {
+      throw new AppError(
+        ERROR_CODES.VALIDATION_FAILED,
+        'Unsupported or invalid file type',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     const storageKey = `uploads/${actor.userId}/${randomUUID()}${extension}`;
     await this.objectStorage.upload({
       key: storageKey,
       body: file.buffer,
-      mimeType: file.mimetype,
+      mimeType: detectedMimeType,
     });
 
     try {
@@ -68,7 +85,7 @@ export class FilesService {
         organizationId: requireOrganizationId(actor),
         storageKey,
         originalName: file.originalname,
-        mimeType: file.mimetype,
+        mimeType: detectedMimeType,
         sizeBytes: file.size,
         uploadedById: actor.userId,
       });
@@ -99,12 +116,47 @@ export class FilesService {
 
   async getSignedUrl(actor: AuthenticatedRequestUser, fileId: string) {
     const file = await this.findAccessibleFile(actor, fileId);
-    const url = await this.objectStorage.getSignedUrl(file.storageKey);
+    let url: string;
+
+    if (this.localFileDownloadUrlService.isEnabled()) {
+      url = this.localFileDownloadUrlService.createSignedUrl(
+        file.id,
+        file.storageKey,
+      );
+    } else {
+      url = await this.objectStorage.getSignedUrl(
+        file.storageKey,
+        this.localFileDownloadUrlService.expiresInSeconds,
+      );
+    }
 
     return {
       id: file.id,
       url,
-      expiresInSeconds: 3600,
+      expiresInSeconds: this.localFileDownloadUrlService.expiresInSeconds,
+    };
+  }
+
+  async download(
+    actor: AuthenticatedRequestUser,
+    fileId: string,
+    token?: string,
+  ) {
+    const file = await this.findAccessibleFile(actor, fileId);
+
+    if (this.localFileDownloadUrlService.isEnabled()) {
+      this.localFileDownloadUrlService.assertValidToken(
+        file.id,
+        file.storageKey,
+        token,
+      );
+    }
+
+    const content = await this.objectStorage.read(file.storageKey);
+
+    return {
+      content,
+      file,
     };
   }
 

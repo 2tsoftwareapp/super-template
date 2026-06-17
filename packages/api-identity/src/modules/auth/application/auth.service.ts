@@ -39,7 +39,7 @@ import {
   hashOpaqueToken,
   hashPassword,
   hashRefreshToken,
-  verifyPassword,
+  verifyPasswordWithTimingPadding,
   verifyRefreshTokenHash,
 } from './auth.helpers';
 
@@ -146,32 +146,16 @@ export class AuthService {
   async login(input: LoginDto, requestContext?: RequestContext) {
     const email = normalizeEmail(input.email);
     const user = await this.usersRepository.findByEmail(email);
-
-    if (!user) {
-      await this.auditService.log({
-        action: 'auth.login.failed',
-        entityType: 'user',
-        metadata: { email },
-        requestContext,
-      });
-      throw new AppError(
-        ERROR_CODES.AUTH_INVALID_CREDENTIALS,
-        'Invalid email or password',
-        HttpStatus.UNAUTHORIZED,
-      );
-    }
-
-    const passwordMatches = await verifyPassword(
-      user.passwordHash,
+    const passwordMatches = await verifyPasswordWithTimingPadding(
+      user?.passwordHash,
       input.password,
     );
 
-    if (!passwordMatches) {
+    if (!user || !passwordMatches) {
       await this.auditService.log({
-        actorId: user.id,
+        ...(user ? { actorId: user.id, entityId: user.id } : {}),
         action: 'auth.login.failed',
         entityType: 'user',
-        entityId: user.id,
         metadata: { email },
         requestContext,
       });

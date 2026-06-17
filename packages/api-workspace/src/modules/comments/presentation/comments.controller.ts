@@ -7,6 +7,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
   Query,
@@ -69,7 +70,7 @@ export class CommentsController {
   @ApiDataResponse(CommentDto)
   update(
     @CurrentUser() user: AuthenticatedRequestUser,
-    @Param('id') commentId: string,
+    @Param('id', new ParseUUIDPipe()) commentId: string,
     @Body() input: UpdateCommentDto,
     @Req() request: Request,
   ) {
@@ -86,7 +87,7 @@ export class CommentsController {
   @ApiDataResponse(SuccessFlagDto)
   async delete(
     @CurrentUser() user: AuthenticatedRequestUser,
-    @Param('id') commentId: string,
+    @Param('id', new ParseUUIDPipe()) commentId: string,
     @Req() request: Request,
   ) {
     await this.commentsService.delete(user, commentId, request.requestContext);

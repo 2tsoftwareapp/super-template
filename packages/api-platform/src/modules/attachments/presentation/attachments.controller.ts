@@ -7,6 +7,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseUUIDPipe,
   Post,
   Query,
   Req,
@@ -57,7 +58,7 @@ export class AttachmentsController {
   @ApiDataResponse(SuccessFlagDto)
   async delete(
     @CurrentUser() user: AuthenticatedRequestUser,
-    @Param('id') attachmentId: string,
+    @Param('id', new ParseUUIDPipe()) attachmentId: string,
     @Req() request: Request,
   ) {
     await this.attachmentsService.delete(

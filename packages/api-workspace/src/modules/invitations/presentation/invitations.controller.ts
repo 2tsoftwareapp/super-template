@@ -7,11 +7,13 @@ import {
   Delete,
   Get,
   Param,
+  ParseUUIDPipe,
   Post,
   Query,
   Req,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import {
   ApiDataResponse,
   ApiPaginatedResponse,
@@ -37,6 +39,7 @@ export class InvitationsController {
 
   @Post()
   @Permissions(PERMISSION_NAMES.INVITATIONS_CREATE)
+  @Throttle({ default: { limit: 5, ttl: 3_600_000 } })
   @ApiDataResponse(InvitationDto, 201)
   create(
     @CurrentUser() user: AuthenticatedRequestUser,
@@ -68,6 +71,7 @@ export class InvitationsController {
 
   @Post('accept')
   @Public()
+  @Throttle({ default: { limit: 10, ttl: 3_600_000 } })
   @ApiDataResponse(InvitationDto)
   accept(@Body() input: AcceptInvitationDto, @Req() request: Request) {
     return this.invitationsService.accept(
@@ -79,10 +83,11 @@ export class InvitationsController {
 
   @Delete(':id')
   @Permissions(PERMISSION_NAMES.INVITATIONS_CREATE)
+  @Throttle({ default: { limit: 10, ttl: 3_600_000 } })
   @ApiDataResponse(InvitationDto)
   revoke(
     @CurrentUser() user: AuthenticatedRequestUser,
-    @Param('id') invitationId: string,
+    @Param('id', new ParseUUIDPipe()) invitationId: string,
     @Req() request: Request,
   ) {
     return this.invitationsService.revoke(

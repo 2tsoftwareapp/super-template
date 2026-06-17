@@ -1,6 +1,13 @@
 import type { AuthenticatedRequestUser } from '@repo/api-core';
 
-import { Controller, Delete, Get, Param, Query } from '@nestjs/common';
+import {
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Query,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import {
   ApiDataResponse,
@@ -41,7 +48,7 @@ export class AdminJobsController {
   @ApiDataResponse(JobDto)
   cancelJob(
     @CurrentUser() user: AuthenticatedRequestUser,
-    @Param('id') jobId: string,
+    @Param('id', new ParseUUIDPipe()) jobId: string,
   ) {
     return this.jobsService.cancelJob(user, jobId);
   }

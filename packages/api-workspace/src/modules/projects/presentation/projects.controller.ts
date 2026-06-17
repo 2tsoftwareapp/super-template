@@ -7,6 +7,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
   Query,
@@ -69,7 +70,7 @@ export class ProjectsController {
   @ApiArrayResponse(ProjectAttachmentDto)
   async listAttachments(
     @CurrentUser() user: AuthenticatedRequestUser,
-    @Param('id') projectId: string,
+    @Param('id', new ParseUUIDPipe()) projectId: string,
   ) {
     const attachments = await this.projectsService.listAttachments(
       user,
@@ -86,7 +87,7 @@ export class ProjectsController {
   @ApiDataResponse(ProjectDto)
   getById(
     @CurrentUser() user: AuthenticatedRequestUser,
-    @Param('id') projectId: string,
+    @Param('id', new ParseUUIDPipe()) projectId: string,
   ) {
     return this.projectsService.getById(user, projectId);
   }
@@ -95,7 +96,7 @@ export class ProjectsController {
   @ApiDataResponse(ProjectDto)
   update(
     @CurrentUser() user: AuthenticatedRequestUser,
-    @Param('id') projectId: string,
+    @Param('id', new ParseUUIDPipe()) projectId: string,
     @Body() input: UpdateProjectDto,
     @Req() request: Request,
   ) {
@@ -111,7 +112,7 @@ export class ProjectsController {
   @ApiDataResponse(SuccessFlagDto)
   remove(
     @CurrentUser() user: AuthenticatedRequestUser,
-    @Param('id') projectId: string,
+    @Param('id', new ParseUUIDPipe()) projectId: string,
     @Req() request: Request,
   ) {
     return this.projectsService.remove(user, projectId, request.requestContext);
@@ -121,7 +122,7 @@ export class ProjectsController {
   @ApiDataResponse(ProjectDto, 201)
   restore(
     @CurrentUser() user: AuthenticatedRequestUser,
-    @Param('id') projectId: string,
+    @Param('id', new ParseUUIDPipe()) projectId: string,
     @Req() request: Request,
   ) {
     return this.projectsService.restore(

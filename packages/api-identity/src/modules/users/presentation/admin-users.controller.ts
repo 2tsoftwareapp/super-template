@@ -7,6 +7,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
   Put,
@@ -74,7 +75,7 @@ export class AdminUsersController {
   @Get(':id')
   @Permissions(PERMISSION_NAMES.USERS_READ)
   @ApiDataResponse(UserDto)
-  getUser(@Param('id') userId: string) {
+  getUser(@Param('id', new ParseUUIDPipe()) userId: string) {
     return this.usersService.getUserById(userId);
   }
 
@@ -83,7 +84,7 @@ export class AdminUsersController {
   @ApiDataResponse(UserDto)
   updateUser(
     @CurrentUser() actor: AuthenticatedRequestUser,
-    @Param('id') userId: string,
+    @Param('id', new ParseUUIDPipe()) userId: string,
     @Body() input: UpdateAdminUserDto,
     @Req() request: Request,
   ) {
@@ -100,7 +101,7 @@ export class AdminUsersController {
   @ApiDataResponse(SuccessFlagDto)
   async deleteUser(
     @CurrentUser() actor: AuthenticatedRequestUser,
-    @Param('id') userId: string,
+    @Param('id', new ParseUUIDPipe()) userId: string,
     @Req() request: Request,
   ) {
     await this.usersService.deleteUser(actor, userId, request.requestContext);
@@ -117,7 +118,7 @@ export class AdminUsersController {
   @ApiDataResponse(UserDto)
   updateStatus(
     @CurrentUser() actor: AuthenticatedRequestUser,
-    @Param('id') userId: string,
+    @Param('id', new ParseUUIDPipe()) userId: string,
     @Body() input: UpdateUserStatusDto,
     @Req() request: Request,
   ) {
@@ -134,7 +135,7 @@ export class AdminUsersController {
   @ApiDataResponse(UserDto)
   replaceRoles(
     @CurrentUser() actor: AuthenticatedRequestUser,
-    @Param('id') userId: string,
+    @Param('id', new ParseUUIDPipe()) userId: string,
     @Body() input: ReplaceUserRolesDto,
     @Req() request: Request,
   ) {

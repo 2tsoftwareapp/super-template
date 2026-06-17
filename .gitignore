@@ -25,3 +25,5 @@ android/app/release
 .env.test
 .env.production
 apps/api/drizzle/meta
+apps/api/storage/uploads/
+*.tsbuildinfo

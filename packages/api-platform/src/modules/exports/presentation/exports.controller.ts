@@ -1,7 +1,15 @@
 import type { AuthenticatedRequestUser } from '@repo/api-core';
 import type { Request } from 'express';
 
-import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Post,
+  Req,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ApiDataResponse } from '@repo/api-core';
 import { CurrentUser } from '@repo/api-core';
@@ -33,7 +41,7 @@ export class ExportsController {
   @ApiDataResponse(ExportJobDto)
   getById(
     @CurrentUser() user: AuthenticatedRequestUser,
-    @Param('id') jobId: string,
+    @Param('id', new ParseUUIDPipe()) jobId: string,
   ) {
     return this.exportsService.getById(user, jobId);
   }

@@ -92,7 +92,6 @@ Key variables:
 - `API_INTERNAL_URL`
 - `JWT_ACCESS_SECRET`
 - `JWT_REFRESH_SECRET`
-- `CSRF_SECRET`
 - `SEED_ADMIN_EMAIL`
 - `SEED_ADMIN_PASSWORD`
 - `SEED_USER_EMAIL`
@@ -190,7 +189,7 @@ Passwords come from `.env`:
 ## Troubleshooting
 
 - If `make bootstrap` fails waiting for PostgreSQL, inspect `docker compose -f infra/docker-compose.yml ps` and container logs.
-- If the web app cannot authenticate, verify `WEB_ORIGIN`, `API_INTERNAL_URL`, and `CSRF_SECRET`.
+- If the web app cannot authenticate, verify `WEB_ORIGIN`, `API_INTERNAL_URL`, and cookie settings.
 - If Flutter cannot reach the backend on emulator or device, use the environment guidance in [Development](docs/development.md).
 - If generated client files drift, rerun `make generate`.
 

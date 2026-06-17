@@ -12,6 +12,19 @@ const { readAuthCookiesMock, setAuthCookiesMock, clearAuthCookiesMock } =
     clearAuthCookiesMock: vi.fn(),
   }));
 
+vi.mock("@/lib/env", () => ({
+  env: {
+    API_INTERNAL_URL: "http://localhost:3001",
+    NEXT_PUBLIC_WEB_URL: "http://localhost:3000",
+    WEB_ORIGIN: "http://localhost:3000",
+    COOKIE_DOMAIN: undefined,
+    COOKIE_SAMESITE: "lax",
+    COOKIE_SECURE: false,
+    NODE_ENV: "test",
+  },
+  isSecureCookie: false,
+}));
+
 vi.mock("@/lib/auth/cookies", () => ({
   readAuthCookies: readAuthCookiesMock,
   setAuthCookies: setAuthCookiesMock,

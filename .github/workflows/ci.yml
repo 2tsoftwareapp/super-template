@@ -53,7 +53,6 @@ jobs:
       COOKIE_SECURE: "false"
       COOKIE_DOMAIN: ""
       COOKIE_SAMESITE: lax
-      CSRF_SECRET: ci-csrf-secret-ci-csrf-secret-ci
       SEED_ADMIN_EMAIL: admin@example.local
       SEED_ADMIN_PASSWORD: ChangeMe123!
       SEED_USER_EMAIL: user@example.local

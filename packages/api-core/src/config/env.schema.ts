@@ -70,7 +70,6 @@ export const envSchema = z.object({
   COOKIE_SECURE: booleanFromString.default(false),
   COOKIE_DOMAIN: emptyStringToUndefined,
   COOKIE_SAMESITE: z.enum(['lax', 'strict', 'none']).default('lax'),
-  CSRF_SECRET: z.string().min(24),
   // Seed credentials are used by bootstrap data and e2e setup only.
   SEED_ADMIN_EMAIL: z.email(),
   SEED_ADMIN_PASSWORD: z.string().min(8),

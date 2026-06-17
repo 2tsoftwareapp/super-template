@@ -3,7 +3,7 @@ import type { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { randomUUID } from "node:crypto";
 
-import { isSecureCookie } from "@/lib/env";
+import { env, isSecureCookie } from "@/lib/env";
 
 export const ACCESS_TOKEN_COOKIE = "st_access_token";
 export const REFRESH_TOKEN_COOKIE = "st_refresh_token";
@@ -11,7 +11,8 @@ export const CSRF_TOKEN_COOKIE = "csrf_token";
 
 const baseCookieOptions = {
   httpOnly: true,
-  sameSite: "lax" as const,
+  domain: env.COOKIE_DOMAIN,
+  sameSite: env.COOKIE_SAMESITE,
   path: "/",
   secure: isSecureCookie,
 };

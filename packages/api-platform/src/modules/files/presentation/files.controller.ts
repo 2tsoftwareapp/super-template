@@ -1,17 +1,21 @@
 import type { AuthenticatedRequestUser } from '@repo/api-core';
 import type { Request } from 'express';
+import type { Response } from 'express';
 
 import {
   Controller,
   Delete,
   Get,
   Param,
+  ParseUUIDPipe,
   Post,
+  Query,
   Req,
+  Res,
+  StreamableFile,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import {
   ApiDataResponse,
@@ -22,6 +26,7 @@ import { Permissions } from '@repo/api-core';
 import { PERMISSION_NAMES } from '@repo/api-identity/modules/access-control/access-control.constants';
 
 import { FilesService } from '../application/files.service';
+import { UploadFileInterceptor } from './files-upload.interceptor';
 import { FileDto, FileUrlDto } from './files.dto';
 
 @ApiTags('files')
@@ -32,7 +37,7 @@ export class FilesController {
 
   @Post()
   @Permissions(PERMISSION_NAMES.FILES_UPLOAD)
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(UploadFileInterceptor)
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -61,7 +66,7 @@ export class FilesController {
   @ApiDataResponse(FileDto)
   getById(
     @CurrentUser() user: AuthenticatedRequestUser,
-    @Param('id') fileId: string,
+    @Param('id', new ParseUUIDPipe()) fileId: string,
   ) {
     return this.filesService.getById(user, fileId);
   }
@@ -71,9 +76,35 @@ export class FilesController {
   @ApiDataResponse(FileUrlDto)
   getUrl(
     @CurrentUser() user: AuthenticatedRequestUser,
-    @Param('id') fileId: string,
+    @Param('id', new ParseUUIDPipe()) fileId: string,
   ) {
     return this.filesService.getSignedUrl(user, fileId);
+  }
+
+  @Get(':id/download')
+  @Permissions(PERMISSION_NAMES.FILES_READ)
+  async download(
+    @CurrentUser() user: AuthenticatedRequestUser,
+    @Param('id', new ParseUUIDPipe()) fileId: string,
+    @Query('token') token: string | undefined,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const { content, file } = await this.filesService.download(
+      user,
+      fileId,
+      token,
+    );
+    const safeFilename = file.originalName.replace(/["\\\r\n]/g, '_');
+
+    response.setHeader('Content-Type', 'application/octet-stream');
+    response.setHeader(
+      'Content-Disposition',
+      `attachment; filename="${safeFilename}"; filename*=UTF-8''${encodeURIComponent(file.originalName)}`,
+    );
+    response.setHeader('Content-Length', content.length.toString());
+    response.setHeader('X-Content-Type-Options', 'nosniff');
+
+    return new StreamableFile(content);
   }
 
   @Delete(':id')
@@ -81,7 +112,7 @@ export class FilesController {
   @ApiDataResponse(SuccessFlagDto)
   async delete(
     @CurrentUser() user: AuthenticatedRequestUser,
-    @Param('id') fileId: string,
+    @Param('id', new ParseUUIDPipe()) fileId: string,
     @Req() request: Request,
   ) {
     await this.filesService.delete(user, fileId, request.requestContext);

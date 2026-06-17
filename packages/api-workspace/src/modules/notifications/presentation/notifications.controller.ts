@@ -9,6 +9,7 @@ import {
   Get,
   MessageEvent,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
   Query,
@@ -115,7 +116,7 @@ export class NotificationsController {
   @ApiDataResponse(NotificationDto)
   markRead(
     @CurrentUser() user: AuthenticatedRequestUser,
-    @Param('id') notificationId: string,
+    @Param('id', new ParseUUIDPipe()) notificationId: string,
   ) {
     return this.notificationsService.markRead(user, notificationId);
   }
@@ -136,7 +137,7 @@ export class NotificationsController {
   @ApiDataResponse(SuccessFlagDto)
   async delete(
     @CurrentUser() user: AuthenticatedRequestUser,
-    @Param('id') notificationId: string,
+    @Param('id', new ParseUUIDPipe()) notificationId: string,
   ) {
     await this.notificationsService.delete(user, notificationId);
 
@@ -189,7 +190,7 @@ export class AdminNotificationsController {
   @Get('jobs/:id')
   @Permissions(PERMISSION_NAMES.NOTIFICATIONS_SEND)
   @ApiDataResponse(NotificationJobDto)
-  async getJob(@Param('id') jobId: string) {
+  async getJob(@Param('id', new ParseUUIDPipe()) jobId: string) {
     return {
       data: await this.notificationsService.getJob(jobId),
     };
@@ -200,7 +201,7 @@ export class AdminNotificationsController {
   @ApiDataResponse(NotificationJobDto)
   async cancelJob(
     @CurrentUser() actor: AuthenticatedRequestUser,
-    @Param('id') jobId: string,
+    @Param('id', new ParseUUIDPipe()) jobId: string,
   ) {
     return {
       data: await this.notificationsService.cancelJob(actor, jobId),
