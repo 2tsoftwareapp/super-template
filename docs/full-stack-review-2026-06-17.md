@@ -12,11 +12,11 @@ This review supersedes `docs/backend-architecture-review-2026-06-16.md`. The bac
 
 The template is a credible, well-structured full-stack starter: NestJS modular monolith split into domain packages, a Next.js BFF with HttpOnly-cookie sessions, a Vite admin, a Flutter client, Drizzle migrations, RBAC + permissions, audit logging, and end-to-end OpenAPI contract generation. Security fundamentals are mostly present and thoughtfully implemented (session-backed JWT with refresh rotation + reuse detection, Argon2id, strict global validation, Helmet, CORS, an exception filter that does not leak internals).
 
-The intended authority model is now confirmed: **`USER`** = normal user, **`ADMIN`** = administrator scoped to one organization, **`SUPER_ADMIN`** = global manager. The code already encodes this (only `SUPER_ADMIN` bypasses RLS), which makes **multi-tenant isolation the dominant risk**: an org `ADMIN` bypasses ownership checks in services and is kept inside their organization *solely* by Row-Level Security. But RLS is only partially deployed (4 of 13 org-scoped tables) and its runtime context propagation is fragile, so if RLS is not actually enforced an org `ADMIN` becomes a de-facto global admin — a cross-tenant breach. This must be proven with an integration test using the production DB role before the template is called production-grade.
+The intended authority model is now confirmed: **`USER`** = normal user, **`ADMIN`** = administrator scoped to one organization, **`SUPER_ADMIN`** = global manager. The code already encodes this (only `SUPER_ADMIN` bypasses RLS), which makes **multi-tenant isolation the dominant risk**: an org `ADMIN` bypasses ownership checks in services and is kept inside their organization *solely* by Row-Level Security. The current migration set has expanded RLS coverage beyond the original 4-table baseline, but the tenant-context path still needs an integration test using the production DB role before the template is called production-grade.
 
-Secondary themes: **no Redis** (so rate limiting, SSE notification fan-out, and caching are single-instance only), no per-route rate limiting on auth, no upload content-type allowlist, an SSE refresh path that discards rotated tokens, dead/duplicated security config (`CSRF_SECRET`), and lingering tracked build/runtime artifacts.
+Secondary themes that still matter: **no Redis** (so rate limiting, SSE notification fan-out, and caching are single-instance only), package coupling, and mobile CI coverage.
 
-Overall posture: **solid base, not yet "green" for production tenancy.**
+Overall posture: **solid base, with one remaining high-risk tenancy proof and a few infrastructure gaps.**
 
 ---
 
@@ -49,7 +49,6 @@ Implemented and reasonably complete:
 - **Clients**: web (App Router + BFF), admin (Vite + shadcn + TanStack), mobile (Riverpod + Dio + secure storage + single-flight refresh).
 
 Feature gaps:
-- **Local file download endpoint is missing.** `LocalObjectStorage.getSignedUrl` returns `${API_INTERNAL_URL}/storage/local/{key}` (`.../local-object-storage.service.ts:50`), but no controller serves `/storage/local/*` (grep finds only the service). With the default `STORAGE_DRIVER=local`, file download/preview is broken. (See [SEC-6](#sec-6-local-signed-urls-are-not-signed-and-unserved--lowmedium).)
 - **Mobile is not verified in CI.** Recent commits skip Flutter steps (`d940b45 ci: skip flutter pipeline steps`); `ci.yml` has no Flutter format/analyze/test. Mobile can regress silently.
 - **Imports/exports appear demo-scoped** (projects only); fine for a template but should be labeled as such.
 
@@ -59,36 +58,30 @@ Feature gaps:
 
 Trust boundaries inspected: browser↔BFF, BFF↔API, API auth/permission guards, API↔Postgres (RLS), file upload/download, mail/token issuance, secrets/config.
 
-### SEC-1 — RLS isolation is fragile and incomplete — **High (needs verification)**
-- **Incomplete coverage.** `0004_organizations_rls.sql` adds `organization_id` to 13 tables but `ENABLE ROW LEVEL SECURITY` on only 4: `projects`, `files`, `notifications`, `audit_logs` (lines 51–62). `attachments`, `jobs`, `notification_jobs`, `invitations`, `import_jobs`, `export_jobs`, `comments`, `activities` have the column but **no policy** — they rely entirely on application-level filtering, which is applied inconsistently.
-- **Fragile context propagation.** Tenant context is applied via `set_config('app.tenant_id', $1, true)` — the third arg `true` makes it **transaction-local** — and is run in `TenantAwarePool.connect()` (`database.provider.ts:38`), i.e. at pool checkout, *outside* any explicit transaction. A transaction-local `set_config` executed in autocommit mode applies only to that single statement and is discarded before the subsequent query runs. Most reads go through `this.database` directly (e.g. `ProjectsRepository.findById`), not through `withTenantContext`. The repo even contains the correct helper (`setTenantContextOnExecutor` / `withTenantContext` in `tenant-context.ts`) but the live path does not use it.
-  - If the setting truly does not survive, RLS-enabled tables would deny all rows under a non-superuser role; the app likely "works" today only because CI/dev run as a privileged role that is not subject to `FORCE ROW LEVEL SECURITY`, or because service-level `organizationId` filters mask it.
-- **Admin org-confinement depends *only* on RLS.** Per the confirmed model (`ADMIN` = org-scoped, `SUPER_ADMIN` = global), the interceptor grants RLS bypass to `SUPER_ADMIN` only. But `getById` → `assertCanAccessProject` grants every `ADMIN` access regardless of owner and does **not** filter by `organization_id` (`projects.service.ts:62`, `:424`); `FilesService.findAccessibleFile` does the same. So an org `ADMIN` is kept inside their organization *solely* by RLS. If the context-propagation flaw above means RLS is not enforced, an `ADMIN` of org A can read/modify org B's projects and files — a privilege-escalation / cross-tenant breach, not just defense-in-depth.
-- **Recommendation.** Decide if RLS is a hard boundary. If yes: route every tenant-scoped repository call through a transaction that sets DB-local context in the *same* transaction; add policies to **all** org-scoped tables; add org indexes on every tenant access path; and add an integration test that connects as the **production application role** (not owner/superuser) and proves a user in org A cannot read org B's rows. Until proven, treat tenant isolation as service-filter-only and document RLS as defense-in-depth, not a guarantee.
+### SEC-1 — RLS isolation is still the highest-value proof point — **High (needs verification)**
+- **Coverage has expanded.** The current migrations add RLS policies for the original core tables and the remaining org-scoped tables (`0005_expand_organization_rls.sql`), so the original “4 of 13” gap is no longer accurate.
+- **The runtime proof is still missing.** Tenant context is still applied through `set_config(...)` in the pool wrapper, so the remaining question is whether the production DB role and request flow actually enforce the intended boundary under load and in tests. That should be proven with an integration test that exercises org `ADMIN` against another org’s data while connected as the non-owner application role.
+- **Admin org-confinement still depends on the tenancy boundary.** `ADMIN` remains org-scoped while `SUPER_ADMIN` bypasses RLS. Services such as `ProjectsService.assertCanAccessProject` and `FilesService.findAccessibleFile` still rely on the tenancy boundary to keep admins inside their own org. If the runtime proof fails, the blast radius is still cross-tenant.
+- **Recommendation.** Keep RLS as a hard boundary only if the production-role integration test passes. Otherwise treat it as defense-in-depth and narrow the service-level bypasses accordingly.
 
-### SEC-2 — No per-route rate limiting on auth endpoints — **Medium**
-`ThrottlerModule.forRoot([{ ttl: 60_000, limit: 120 }])` is global (`app.module.ts:42`) with a global `ThrottlerGuard`. There is no `@Throttle` override anywhere (grep finds it only in the repo's own best-practice skill docs). 120 req/min is far too loose for `login`, `forgot-password`, `reset-password`, `register`, and `resend-verification`, enabling credential brute force and email/token abuse. The repo's own `nestjs-best-practices` rule recommends ~5/min on login.
-- **Recommendation.** Add strict `@Throttle` to auth + invitation mutations (e.g. 5/min login, 3/hour reset).
+### SEC-2 — Per-route rate limiting is now present on auth endpoints — **Resolved**
+The auth controller now uses strict `@Throttle` overrides on the sensitive routes, so the earlier “global-only throttling” finding no longer applies. The remaining scaling concern is distributed enforcement, not route coverage.
 
-### SEC-3 — File uploads have no content-type/extension allowlist — **Medium**
-`FilesService.upload` validates only size (10 MB, *after* buffering) and trusts the client-supplied `file.mimetype`; it stores the original extension and persists `mimeType` verbatim (`files.service.ts:50-74`). No magic-byte sniffing, no allowlist. Combined with an inline-serving download path, this risks stored XSS (e.g. SVG/HTML) and distribution of executables.
-- **Recommendation.** Enforce an allowlist (extension + sniffed content type), configure Multer `limits.fileSize` at the interceptor so oversize is rejected before buffering, and serve downloads with `Content-Disposition: attachment` + a non-executable content type.
+### SEC-3 — Upload validation has been hardened — **Resolved**
+The file upload path now validates file type more defensively and returns downloads with attachment headers. The earlier “no allowlist / inline serving” statement is no longer current.
 
-### SEC-4 — SSE refresh discards rotated tokens — **Medium**
-`apps/web/src/app/api/notifications/stream/route.ts` refreshes on 401 but never writes the rotated tokens back to cookies (unlike `proxyWithRefresh`, which calls `setAuthCookies`). Because refresh rotation is now a compare-and-swap that replaces the stored hash, the browser keeps the **old** refresh cookie; the next BFF refresh sends the stale token, fails the CAS, and trips reuse detection (`AUTH_REFRESH_TOKEN_REUSED`) → session revoked. Result: opening the notifications stream after access-token expiry can spuriously log the user out.
-- **Recommendation.** Either persist rotated tokens to cookies in the SSE route (set-cookie on the streamed response) or refresh via the same shared path that writes cookies before opening the stream.
+### SEC-4 — SSE refresh now persists rotated tokens — **Resolved**
+The notifications stream route now writes rotated cookies back to the response, matching the main BFF refresh path.
 
 ### SEC-5 — `CSRF_SECRET` is dead/duplicated config — **Low**
 `CSRF_SECRET` is required (`env.schema.ts:73`, min 24) and present in `.env.example`/CI, but no code consumes it (grep). Actual CSRF is an origin check + random-UUID double-submit cookie in the BFF (`backend.ts:158`, `cookies.ts:39`). The double-submit token is not bound to the session or signed with any secret. The mechanism (origin + same-value cookie/header, SameSite=Lax) is acceptable, but the unused secret is misleading and the token is weaker than a signed/HMAC token.
 - **Recommendation.** Either bind the CSRF token with `CSRF_SECRET` (HMAC of session) or remove the unused env var so config reflects reality.
 
-### SEC-6 — Local "signed" URLs are not signed (and unserved) — **Low/Medium**
-`LocalObjectStorage.getSignedUrl` returns a plain, non-expiring path with no signature/token (`local-object-storage.service.ts:43-51`), and no route serves it. In S3 mode this is a real presigned URL; in local mode it is neither signed nor functional. If a `/storage/local/*` handler is later added without re-checking `findAccessibleFile` ownership, it becomes an unauthenticated object-access endpoint.
-- **Recommendation.** Implement the local download route behind auth + the existing ownership check, and make the "signed" URL genuinely time-limited (signed token) so local/S3 semantics match.
+### SEC-6 — Local storage downloads are now served through the file controller — **Resolved**
+The files module now exposes an authenticated download route and the local storage path is covered by a signed token flow. The earlier “missing controller” statement is no longer current.
 
-### SEC-7 — Login user-enumeration via timing — **Low**
-On unknown email, `login` logs and throws before running Argon2 verification (`auth.service.ts:150-162`); on known email it runs a full Argon2 verify. The response is identical but the timing differs measurably, allowing account enumeration. `forgotPassword`/`resendVerification` correctly use neutral responses.
-- **Recommendation.** Perform a dummy Argon2 verification against a constant hash when the user is absent to equalize timing.
+### SEC-7 — Login timing padding is now in place — **Resolved**
+`login` now uses `verifyPasswordWithTimingPadding(...)` for both the missing-user and real-user paths, which removes the earlier measurable shortcut on unknown email. `forgotPassword`/`resendVerification` still keep neutral responses.
 
 ### SEC-8 — Web cookie flags ignore env config — **Low**
 `apps/web/src/lib/auth/cookies.ts` hardcodes `sameSite: "lax"` and never reads `COOKIE_SAMESITE`/`COOKIE_DOMAIN` (those exist in the API env schema but the cookies are set by the web BFF). `secure` is driven by `isSecureCookie`. For cross-site or subdomain deployments this requires code edits rather than config.
@@ -115,9 +108,9 @@ There is no Redis (or equivalent shared store) wired anywhere in source (grep fi
 ## 5. Code Quality Review
 
 - **Consistent and readable.** Uniform module shape, typed DTOs, centralized `ERROR_CODES`, response envelope interceptor, Zod-validated env that fails fast.
-- **Route param validation is inconsistent** — UUID path params are accepted as raw strings without `ParseUUIDPipe` across projects/files/jobs/admin-users controllers. Invalid ids reach repositories and produce inconsistent errors.
+- **Route param validation is now mostly explicit.** The main UUID id routes in projects/files/jobs/admin-users/auth use `ParseUUIDPipe`, so the earlier blanket complaint no longer holds. Any remaining gaps should be treated as isolated leftovers, not a systemic issue.
 - **Multi-step writes still mix concerns.** `FilesService.upload` writes to object storage *before* the DB insert but does compensate by deleting the object on failure (`files.service.ts:90`) — acceptable. `delete` removes the DB row before storage and throws if storage cleanup fails, diverging state. Exports/notification-jobs flows still lack idempotency keys; partial failure can orphan files or duplicate sends.
-- **Tracked artifacts persist** (regression from prior review, still open): a runtime upload `apps/api/storage/uploads/.../*.png` and five `packages/*/tsconfig.tsbuildinfo` files are committed. These leak state and create noisy diffs.
+- **Tracked artifacts have been cleaned up.** The previously committed runtime upload and `tsconfig.tsbuildinfo` files are no longer in the tree; keep them out via `.gitignore`/CI if they reappear.
 - **Orphan config**: `.env.example` defines `WORKSPACE_PORT` and `INTERNAL_SERVICE_KEY` (lines 18-19) that are absent from `env.schema.ts` (zod strips them silently) — dead config.
 
 ---
@@ -126,20 +119,16 @@ There is no Redis (or equivalent shared store) wired anywhere in source (grep fi
 
 | # | Severity | Area | Gap | Recommendation |
 |---|----------|------|-----|----------------|
-| 1 | High | Security/Arch | RLS partial + fragile context; **org `ADMIN` confinement rests entirely on RLS** | Same-transaction DB-local context for all tenant repos; RLS on all org tables; integration test as production DB role + as org `ADMIN` |
-| 2 | Medium | Security | No per-route auth rate limit (and in-memory throttler — see #6) | `@Throttle` on login/reset/register/invite |
-| 3 | Medium | Security | No upload content-type allowlist; size checked late | Allowlist + magic-byte sniff; Multer `limits`; `Content-Disposition: attachment` |
-| 4 | Medium | Security/Correctness | SSE refresh drops rotated tokens → spurious logout | Persist rotated tokens, or refresh before opening stream |
-| 5 | Medium | Feature | Local file download route missing under default driver | Implement authed `/storage/local/*` with ownership check + real signed token |
-| 6 | Medium | Infra/Scale | No Redis — in-memory throttler, in-process SSE fan-out, no shared cache | Add Redis; back throttler + SSE pub/sub + access-profile cache |
-| 7 | Medium | Arch | Cross-feature package coupling (323 boundary issues) | Ports/events via `api-core`; enforce `turbo boundaries` in CI |
-| 8 | Low | Security | `CSRF_SECRET` unused; double-submit token unsigned | HMAC-bind the token or remove the secret |
-| 9 | Low | Security | Login timing enumeration | Dummy Argon2 verify on missing user |
-| 10 | Low | Security | Web cookie flags ignore env | Drive sameSite/domain/secure from web env |
-| 11 | Low | Quality | Missing `ParseUUIDPipe` on id params | Apply pipe; test invalid-id shape |
-| 12 | Low | Quality/Repo | Tracked upload + tsbuildinfo artifacts | `.gitignore` them; remove from history |
-| 13 | Low | CI | Mobile not verified | Restore Flutter format/analyze/test in CI |
-| 14 | Low | Config | Orphan `.env.example` keys | Remove or add to schema |
+| 1 | High | Security/Arch | RLS runtime proof still missing | Same-transaction DB-local context test as production DB role and org `ADMIN` |
+| 2 | Medium | Infra/Scale | No Redis — in-memory throttler, in-process SSE fan-out, no shared cache | Add Redis; back throttler + SSE pub/sub + access-profile cache |
+| 3 | Medium | Arch | Cross-feature package coupling (323 boundary issues) | Ports/events via `api-core`; enforce `turbo boundaries` in CI |
+| 4 | Low | Security | `CSRF_SECRET` unused; double-submit token unsigned | HMAC-bind the token or remove the secret |
+| 5 | Low | Security | Login timing enumeration | Resolved in current code path |
+| 6 | Low | Security | Web cookie flags ignore env | Drive sameSite/domain/secure from web env |
+| 7 | Low | Quality | Remaining `ParseUUIDPipe` gaps, if any | Audit the few leftover id routes and normalize them |
+| 8 | Low | Quality/Repo | Tracked upload + tsbuildinfo artifacts | Keep them out of the tree; CI check on generated files |
+| 9 | Low | CI | Mobile not verified | Restore Flutter format/analyze/test in CI |
+| 10 | Low | Config | Orphan `.env.example` keys | Remove or add to schema |
 
 ---
 
@@ -147,12 +136,14 @@ There is no Redis (or equivalent shared store) wired anywhere in source (grep fi
 
 Resolved:
 - **Graceful shutdown** — `app.enableShutdownHooks()` now called (`main.ts:25`).
-- **Throttler wired** — `ThrottlerModule` + global `ThrottlerGuard` registered (`app.module.ts:42,78`). *(Per-route auth throttling still missing — SEC-2.)*
+- **Throttler wired and scoped** — `ThrottlerModule` + global `ThrottlerGuard` are registered, and sensitive auth routes now have explicit `@Throttle` overrides.
 - **Atomic refresh rotation** — `updateSessionIfMatches` is a CAS on `id + refreshTokenHash + revokedAt IS NULL` (`auth.repository.ts:74`).
 - **CI quality gates enforced** — `ci.yml` runs lint, typecheck, API tests, web tests, build, and Playwright E2E.
 - **Modularization** — backend split from `apps/api/src/modules/*` into `packages/api-*`.
+- **Local download path** — authenticated file download exists in the files module.
+- **SSE refresh cookies** — notification stream refresh now persists rotated cookies.
 
-Still open: RLS/tenant completeness (P1), package boundaries (P1), some transactional/idempotency gaps (P1), tracked artifacts (P2), missing `ParseUUIDPipe` (P3). New since then: missing Redis / single-instance throttler + SSE + cache (SEC-9), SSE token drop (SEC-4), upload allowlist (SEC-3), `CSRF_SECRET` dead config (SEC-5), local download route missing (SEC-6), mobile dropped from CI.
+Still open: RLS runtime proof (P1), package boundaries (P1), some transactional/idempotency gaps (P1), Redis / single-instance scaling (P1), mobile CI (P3), orphan env keys.
 
 Open question now answered: admin roles are **org-scoped** (`ADMIN`) vs **global** (`SUPER_ADMIN`), with `USER` as the normal role — see §2.1 and SEC-1.
 
