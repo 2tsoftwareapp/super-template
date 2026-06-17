@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "build": "next build",
-    "dev": "next dev --port ${WEB_PORT:-3000}",
-    "start": "next start --port ${WEB_PORT:-3000}",
+    "dev": "node ../../scripts/run-with-port.mjs WEB_PORT 3000 pnpm exec next dev",
+    "start": "node ../../scripts/run-with-port.mjs WEB_PORT 3000 pnpm exec next start",
     "format": "prettier --write .",
     "generate": "pnpm --filter api contract:generate",
     "lint": "eslint .",

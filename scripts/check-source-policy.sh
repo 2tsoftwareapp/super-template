@@ -6,13 +6,34 @@ ROOT_DIR=$(cd "$SCRIPT_DIR/.." && pwd)
 cd "$ROOT_DIR"
 
 failed=0
+SEARCH_DIRS="
+apps/api/src
+apps/api/test
+packages/api-core/src
+packages/api-database/src
+packages/api-identity/src
+packages/api-platform/src
+packages/api-workspace/src
+"
 
-check_policy() {
-  name=$1
-  pattern=$2
-  message=$3
+search_matches() {
+  pattern=$1
 
-  output=$(rg -n "$pattern" \
+  if command -v rg >/dev/null 2>&1; then
+    rg -n "$pattern" \
+      apps/api/src \
+      apps/api/test \
+      packages/api-core/src \
+      packages/api-database/src \
+      packages/api-identity/src \
+      packages/api-platform/src \
+      packages/api-workspace/src \
+      --glob '!**/*.tsbuildinfo' \
+      --glob '!**/generated/**'
+    return
+  fi
+
+  find \
     apps/api/src \
     apps/api/test \
     packages/api-core/src \
@@ -20,8 +41,17 @@ check_policy() {
     packages/api-identity/src \
     packages/api-platform/src \
     packages/api-workspace/src \
-    --glob '!**/*.tsbuildinfo' \
-    --glob '!**/generated/**' || true)
+    \( -path '*/generated/*' -o -name '*.tsbuildinfo' \) -prune -o \
+    -type f -print |
+    xargs grep -nE "$pattern"
+}
+
+check_policy() {
+  name=$1
+  pattern=$2
+  message=$3
+
+  output=$(search_matches "$pattern" || true)
 
   if [ -n "$output" ]; then
     failed=1
