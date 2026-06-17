@@ -1,15 +1,14 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/usr/bin/env sh
+set -eu
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ROOT_DIR=$(pwd)
 cd "$ROOT_DIR"
 
 run_step() {
-  local label="$1"
+  label=$1
   shift
 
-  local log_file
-  log_file="$(mktemp)"
+  log_file=$(mktemp)
 
   printf '[generate] %s\n' "$label"
 
@@ -22,7 +21,6 @@ run_step() {
   rm -f "$log_file"
 }
 
-pnpm --filter api openapi:generate
 pnpm --filter api contract:generate
 mkdir -p apps/mobile/lib/generated/api
 run_step \

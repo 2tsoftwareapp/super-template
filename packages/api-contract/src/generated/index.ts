@@ -1031,8 +1031,12 @@ export interface components {
             theme: string;
             language: string;
             timezone: string;
-            notificationPreferences: Record<string, unknown>;
-            emailPreferences: Record<string, unknown>;
+            notificationPreferences: {
+                [key: string]: unknown;
+            };
+            emailPreferences: {
+                [key: string]: unknown;
+            };
             createdAt: string;
             updatedAt: string;
         };
@@ -1040,8 +1044,12 @@ export interface components {
             theme?: string;
             language?: string;
             timezone?: string;
-            notificationPreferences?: Record<string, unknown>;
-            emailPreferences?: Record<string, unknown>;
+            notificationPreferences?: {
+                [key: string]: unknown;
+            };
+            emailPreferences?: {
+                [key: string]: unknown;
+            };
         };
         PaginationMetaDto: {
             requestId: string;
@@ -1056,7 +1064,9 @@ export interface components {
             action: string;
             entityType: string;
             entityId?: string | null;
-            metadata?: Record<string, unknown>;
+            metadata?: {
+                [key: string]: unknown;
+            };
             ipAddress?: string | null;
             userAgent?: string | null;
             requestId?: string | null;
@@ -1193,7 +1203,9 @@ export interface components {
             /** @enum {string} */
             status: "SENT" | "FAILED";
             errorMessage?: Record<string, never>;
-            metadata?: Record<string, unknown>;
+            metadata?: {
+                [key: string]: unknown;
+            };
             sentAt?: Record<string, never>;
             createdAt: string;
         };
@@ -1204,13 +1216,17 @@ export interface components {
         };
         ApplicationSettingDto: {
             key: string;
-            value: Record<string, unknown>;
+            value: {
+                [key: string]: unknown;
+            };
             updatedById?: Record<string, never>;
             createdAt: string;
             updatedAt: string;
         };
         UpdateSettingDto: {
-            value: Record<string, unknown>;
+            value: {
+                [key: string]: unknown;
+            };
         };
         AttachmentDto: {
             id: string;
@@ -1231,7 +1247,9 @@ export interface components {
         JobDto: {
             id: string;
             type: string;
-            payload: Record<string, unknown>;
+            payload: {
+                [key: string]: unknown;
+            };
             /** @enum {string} */
             status: "PENDING" | "PROCESSING" | "COMPLETED" | "CANCELLED" | "FAILED";
             scheduledAt: string;
@@ -1252,7 +1270,9 @@ export interface components {
             type: string;
             title: string;
             body: string;
-            data?: Record<string, never>;
+            data?: {
+                [key: string]: unknown;
+            };
             readAt?: Record<string, never>;
             createdAt: string;
         };
@@ -1281,7 +1301,9 @@ export interface components {
             type: string;
             title: string;
             body: string;
-            data?: Record<string, never>;
+            data?: {
+                [key: string]: unknown;
+            };
             scheduledAt: string;
             /** @enum {string} */
             status: "PENDING" | "PROCESSING" | "COMPLETED" | "CANCELLED" | "FAILED";
@@ -1299,7 +1321,9 @@ export interface components {
             type: string;
             title: string;
             body: string;
-            data?: Record<string, never>;
+            data?: {
+                [key: string]: unknown;
+            };
             /** @description ISO-8601 datetime. Omit or set to now for immediate delivery. */
             scheduledAt?: string;
         };
@@ -1368,7 +1392,9 @@ export interface components {
             actorId?: string | null;
             /** @enum {string} */
             visibility: "PUBLIC" | "PRIVATE" | "INTERNAL";
-            metadata?: Record<string, unknown>;
+            metadata?: {
+                [key: string]: unknown;
+            };
             createdAt: string;
         };
         ExportJobDto: {
@@ -1377,7 +1403,9 @@ export interface components {
             /** @enum {string} */
             status: "PENDING" | "PROCESSING" | "COMPLETED" | "FAILED" | "CANCELLED";
             fileId?: Record<string, never>;
-            filters?: Record<string, unknown>;
+            filters?: {
+                [key: string]: unknown;
+            };
             createdById: string;
             completedAt?: Record<string, never>;
             createdAt: string;
@@ -1385,7 +1413,9 @@ export interface components {
         };
         CreateExportDto: {
             type: string;
-            filters?: Record<string, unknown>;
+            filters?: {
+                [key: string]: unknown;
+            };
         };
         CommentDto: {
             id: string;
@@ -1449,7 +1479,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["HealthStatusDto"];
@@ -1469,7 +1501,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["HealthStatusDto"];
@@ -1489,7 +1523,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["RoleDto"][];
@@ -1509,7 +1545,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["OrganizationDto"][];
@@ -1533,7 +1571,9 @@ export interface operations {
         };
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["OrganizationDto"];
@@ -1553,7 +1593,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["UserPreferencesDto"];
@@ -1577,7 +1619,9 @@ export interface operations {
         };
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["UserPreferencesDto"];
@@ -1607,7 +1651,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["AuditLogDto"][];
@@ -1635,7 +1681,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["UserDto"][];
@@ -1659,7 +1707,9 @@ export interface operations {
         };
         responses: {
             201: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["UserDto"];
@@ -1681,7 +1731,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["UserDto"];
@@ -1703,7 +1755,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["SuccessFlagDto"];
@@ -1729,7 +1783,9 @@ export interface operations {
         };
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["UserDto"];
@@ -1755,7 +1811,9 @@ export interface operations {
         };
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["UserDto"];
@@ -1781,7 +1839,9 @@ export interface operations {
         };
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["UserDto"];
@@ -1801,7 +1861,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["UserDto"];
@@ -1825,7 +1887,9 @@ export interface operations {
         };
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["UserDto"];
@@ -1849,7 +1913,9 @@ export interface operations {
         };
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["SuccessFlagDto"];
@@ -1876,7 +1942,9 @@ export interface operations {
         };
         responses: {
             201: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["FileDto"];
@@ -1898,7 +1966,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["FileDto"];
@@ -1920,7 +1990,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["SuccessFlagDto"];
@@ -1942,7 +2014,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["FileUrlDto"];
@@ -1966,7 +2040,9 @@ export interface operations {
         };
         responses: {
             201: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["SuccessMessageDto"];
@@ -1990,7 +2066,9 @@ export interface operations {
         };
         responses: {
             201: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["AuthResponseDto"];
@@ -2014,7 +2092,9 @@ export interface operations {
         };
         responses: {
             201: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["AuthResponseDto"];
@@ -2034,7 +2114,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             201: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["SuccessFlagDto"];
@@ -2054,7 +2136,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             201: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["SuccessFlagDto"];
@@ -2078,7 +2162,9 @@ export interface operations {
         };
         responses: {
             201: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["SuccessMessageDto"];
@@ -2102,7 +2188,9 @@ export interface operations {
         };
         responses: {
             201: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["SuccessFlagDto"];
@@ -2126,7 +2214,9 @@ export interface operations {
         };
         responses: {
             201: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["SuccessFlagDto"];
@@ -2150,7 +2240,9 @@ export interface operations {
         };
         responses: {
             201: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["SuccessMessageDto"];
@@ -2170,7 +2262,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["AuthMeDto"];
@@ -2194,7 +2288,9 @@ export interface operations {
         };
         responses: {
             201: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["SuccessFlagDto"];
@@ -2214,7 +2310,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["AuthSessionDto"][];
@@ -2236,7 +2334,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["SuccessFlagDto"];
@@ -2262,7 +2362,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["MailDeliveryDto"][];
@@ -2284,7 +2386,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["MailPreviewDto"];
@@ -2304,7 +2408,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["ApplicationSettingDto"][];
@@ -2330,7 +2436,9 @@ export interface operations {
         };
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["ApplicationSettingDto"];
@@ -2353,7 +2461,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["AttachmentDto"][];
@@ -2377,7 +2487,9 @@ export interface operations {
         };
         responses: {
             201: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["AttachmentDto"];
@@ -2399,7 +2511,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["SuccessFlagDto"];
@@ -2425,7 +2539,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["JobDto"][];
@@ -2447,7 +2563,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["JobDto"];
@@ -2473,7 +2591,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["NotificationDto"][];
@@ -2493,7 +2613,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content?: never;
             };
         };
@@ -2508,7 +2630,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["CountDto"];
@@ -2532,7 +2656,9 @@ export interface operations {
         };
         responses: {
             201: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["DeviceTokenDto"];
@@ -2554,7 +2680,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["SuccessFlagDto"];
@@ -2576,7 +2704,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["NotificationDto"];
@@ -2596,7 +2726,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["SuccessFlagDto"];
@@ -2618,7 +2750,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["SuccessFlagDto"];
@@ -2642,7 +2776,9 @@ export interface operations {
         };
         responses: {
             201: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["NotificationJobDto"];
@@ -2667,7 +2803,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["NotificationJobDto"][];
@@ -2689,7 +2827,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["NotificationJobDto"];
@@ -2711,7 +2851,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["NotificationJobDto"];
@@ -2735,7 +2877,9 @@ export interface operations {
         };
         responses: {
             201: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["ImportJobDto"];
@@ -2757,7 +2901,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["ImportJobDto"];
@@ -2779,7 +2925,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["ImportJobDto"];
@@ -2806,7 +2954,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["ProjectDto"][];
@@ -2830,7 +2980,9 @@ export interface operations {
         };
         responses: {
             201: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["ProjectDto"];
@@ -2852,7 +3004,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["ProjectAttachmentDto"][];
@@ -2874,7 +3028,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["ProjectDto"];
@@ -2896,7 +3052,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["SuccessFlagDto"];
@@ -2922,7 +3080,9 @@ export interface operations {
         };
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["ProjectDto"];
@@ -2944,7 +3104,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             201: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["ProjectDto"];
@@ -2971,7 +3133,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["ActivityDto"][];
@@ -2995,7 +3159,9 @@ export interface operations {
         };
         responses: {
             201: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["ExportJobDto"];
@@ -3017,7 +3183,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["ExportJobDto"];
@@ -3043,7 +3211,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["CommentDto"][];
@@ -3067,7 +3237,9 @@ export interface operations {
         };
         responses: {
             201: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["CommentDto"];
@@ -3089,7 +3261,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["SuccessFlagDto"];
@@ -3115,7 +3289,9 @@ export interface operations {
         };
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["CommentDto"];
@@ -3143,7 +3319,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["InvitationDto"][];
@@ -3167,7 +3345,9 @@ export interface operations {
         };
         responses: {
             201: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["InvitationDto"];
@@ -3191,7 +3371,9 @@ export interface operations {
         };
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["InvitationDto"];
@@ -3213,7 +3395,9 @@ export interface operations {
         requestBody?: never;
         responses: {
             200: {
-                headers: Record<string, unknown>;
+                headers: {
+                    [name: string]: unknown;
+                };
                 content: {
                     "application/json": {
                         data: components["schemas"]["InvitationDto"];

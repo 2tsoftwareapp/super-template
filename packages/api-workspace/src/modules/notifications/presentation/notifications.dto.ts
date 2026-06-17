@@ -38,7 +38,7 @@ export class NotificationDto {
   @ApiProperty()
   body: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: 'object', additionalProperties: true })
   data: Record<string, unknown> | null;
 
   @ApiPropertyOptional()
@@ -109,7 +109,7 @@ export class SendNotificationRequestDto {
   @IsString()
   body: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: 'object', additionalProperties: true })
   @IsOptional()
   @IsObject()
   data?: Record<string, unknown>;
@@ -141,7 +141,7 @@ export class SendNotificationDto {
   @IsString()
   body: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: 'object', additionalProperties: true })
   @IsOptional()
   @IsObject()
   data?: Record<string, unknown>;
@@ -177,7 +177,7 @@ export class NotificationJobDto {
   @ApiProperty()
   body: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: 'object', additionalProperties: true })
   data: Record<string, unknown> | null;
 
   @ApiProperty()
