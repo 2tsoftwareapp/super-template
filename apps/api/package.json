@@ -12,7 +12,7 @@
     "openapi:generate": "ts-node -r tsconfig-paths/register --files --project tsconfig.json src/openapi/generate-openapi.ts",
     "contract:generate": "openapi-typescript ../../apps/api/openapi.json -o ../../packages/api-contract/src/generated/index.ts",
     "db:generate": "drizzle-kit generate --config drizzle.config.ts",
-    "db:migrate": "drizzle-kit migrate --config drizzle.config.ts",
+    "db:migrate": "ts-node -r tsconfig-paths/register --files --project tsconfig.json src/cli/migrate.ts",
     "db:push": "drizzle-kit push --config drizzle.config.ts",
     "db:seed": "ts-node -r tsconfig-paths/register --files --project tsconfig.json src/cli/seed.ts",
     "db:reset": "ts-node -r tsconfig-paths/register --files --project tsconfig.json src/cli/reset.ts",

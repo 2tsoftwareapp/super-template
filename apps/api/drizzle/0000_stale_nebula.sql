@@ -1,3 +1,4 @@
+CREATE EXTENSION IF NOT EXISTS pgcrypto;--> statement-breakpoint
 CREATE TYPE "public"."project_status" AS ENUM('DRAFT', 'ACTIVE', 'ARCHIVED');--> statement-breakpoint
 CREATE TYPE "public"."user_status" AS ENUM('PENDING', 'ACTIVE', 'BLOCKED');--> statement-breakpoint
 CREATE TABLE "audit_logs" (

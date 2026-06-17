@@ -6,12 +6,12 @@ import { Test } from '@nestjs/testing';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { seedDatabase } from '@repo/api-bootstrap';
 import { config as loadEnv } from 'dotenv';
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { Pool } from 'pg';
 import request from 'supertest';
 
 import { AppModule } from '../../src/app.module';
+import { applySqlMigrations } from '../../src/cli/migrations';
 
 loadEnv({ path: resolve(process.cwd(), '.env'), quiet: true });
 loadEnv({ path: resolve(process.cwd(), '../../.env'), quiet: true });
@@ -19,42 +19,6 @@ loadEnv({ path: resolve(process.cwd(), '../../.env'), quiet: true });
 process.env.APP_ENV = 'test';
 
 const resolveTestDatabaseUrl = () => process.env.DATABASE_URL_TEST;
-
-const resolveMigrationsFolder = () => {
-  const candidates = [
-    resolve(process.cwd(), 'drizzle'),
-    resolve(process.cwd(), 'apps/api/drizzle'),
-  ];
-
-  const folder = candidates.find((candidate) =>
-    existsSync(resolve(candidate, 'meta/_journal.json')),
-  );
-
-  if (!folder) {
-    throw new Error('Could not resolve the Drizzle migrations folder');
-  }
-
-  return folder;
-};
-
-const applySqlMigrations = async (pool: Pool) => {
-  const migrationsFolder = resolveMigrationsFolder();
-  const migrationFiles = readdirSync(migrationsFolder)
-    .filter((file) => file.endsWith('.sql'))
-    .sort((left, right) => left.localeCompare(right));
-
-  for (const migrationFile of migrationFiles) {
-    const sql = readFileSync(resolve(migrationsFolder, migrationFile), 'utf8');
-    const statements = sql
-      .split('--> statement-breakpoint')
-      .map((statement) => statement.trim())
-      .filter(Boolean);
-
-    for (const statement of statements) {
-      await pool.query(statement);
-    }
-  }
-};
 
 const ensureTestDatabaseExists = async (databaseUrl: string) => {
   const url = new URL(databaseUrl);
