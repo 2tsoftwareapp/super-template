@@ -4,14 +4,14 @@ export {
 } from './common/cache/access-profile.cache';
 export * from './common/constants/error-codes';
 export * from './common/decorators/api-response.decorator';
+export * from './common/decorators/authorize.decorator';
 export * from './common/decorators/current-user.decorator';
-export * from './common/decorators/permissions.decorator';
 
 export * from './common/decorators/public.decorator';
 export * from './common/decorators/skip-envelope.decorator';
 export * from './common/errors/app-error';
 export * from './common/filters/app-exception.filter';
-export { PermissionsGuard } from './common/guards/permissions.guard';
+export { AuthorizeGuard } from './common/guards/authorize.guard';
 export * from './common/interceptors/response-envelope.interceptor';
 export { ConsoleAppLogger } from './common/logging/console-logger.service';
 export * from './common/logging/logger.interface';

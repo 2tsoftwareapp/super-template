@@ -14,7 +14,7 @@ import {
   ApiPaginatedResponse,
 } from '@repo/api-core';
 import { CurrentUser } from '@repo/api-core';
-import { Permissions } from '@repo/api-core';
+import { Authorize } from '@repo/api-core';
 import { PERMISSION_NAMES } from '@repo/api-core';
 
 import { JobsService } from '../application/jobs.service';
@@ -27,7 +27,7 @@ export class AdminJobsController {
   constructor(private readonly jobsService: JobsService) {}
 
   @Get()
-  @Permissions(PERMISSION_NAMES.JOBS_READ)
+  @Authorize({ permissions: [PERMISSION_NAMES.JOBS_READ] })
   @ApiPaginatedResponse(JobDto)
   async listJobs(@Query() query: JobsQueryDto) {
     const result = await this.jobsService.listJobs(query);
@@ -44,7 +44,7 @@ export class AdminJobsController {
   }
 
   @Delete(':id')
-  @Permissions(PERMISSION_NAMES.JOBS_MANAGE)
+  @Authorize({ permissions: [PERMISSION_NAMES.JOBS_MANAGE] })
   @ApiDataResponse(JobDto)
   cancelJob(
     @CurrentUser() user: AuthenticatedRequestUser,

@@ -13,7 +13,7 @@ import {
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ApiDataResponse } from '@repo/api-core';
 import { CurrentUser } from '@repo/api-core';
-import { Permissions } from '@repo/api-core';
+import { Authorize } from '@repo/api-core';
 import { PERMISSION_NAMES } from '@repo/api-core';
 
 import { ImportsService } from '../application/imports.service';
@@ -26,7 +26,7 @@ export class ImportsController {
   constructor(private readonly importsService: ImportsService) {}
 
   @Post()
-  @Permissions(PERMISSION_NAMES.IMPORTS_MANAGE)
+  @Authorize({ permissions: [PERMISSION_NAMES.IMPORTS_MANAGE] })
   @ApiDataResponse(ImportJobDto, 201)
   create(
     @CurrentUser() user: AuthenticatedRequestUser,
@@ -47,7 +47,7 @@ export class ImportsController {
   }
 
   @Get(':id')
-  @Permissions(PERMISSION_NAMES.IMPORTS_MANAGE)
+  @Authorize({ permissions: [PERMISSION_NAMES.IMPORTS_MANAGE] })
   @ApiDataResponse(ImportJobDto)
   getById(
     @CurrentUser() user: AuthenticatedRequestUser,
@@ -57,7 +57,7 @@ export class ImportsController {
   }
 
   @Post(':id/confirm')
-  @Permissions(PERMISSION_NAMES.IMPORTS_MANAGE)
+  @Authorize({ permissions: [PERMISSION_NAMES.IMPORTS_MANAGE] })
   @ApiDataResponse(ImportJobDto)
   confirm(
     @CurrentUser() user: AuthenticatedRequestUser,

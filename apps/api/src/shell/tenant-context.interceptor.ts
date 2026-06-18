@@ -5,9 +5,8 @@ import {
   type NestInterceptor,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { IS_PUBLIC_KEY } from '@repo/api-core';
+import { IS_PUBLIC_KEY, ROLE_NAMES } from '@repo/api-core';
 import { TenantContextService } from '@repo/api-database';
-import { ROLE_NAMES } from '@repo/api-identity/modules/access-control/access-control.constants';
 import { Observable } from 'rxjs';
 
 @Injectable()

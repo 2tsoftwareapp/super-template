@@ -1,7 +1,7 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ApiPaginatedResponse } from '@repo/api-core';
-import { Permissions } from '@repo/api-core';
+import { Authorize } from '@repo/api-core';
 import { PERMISSION_NAMES } from '@repo/api-core';
 
 import { AuditService } from '../application/audit.service';
@@ -14,7 +14,7 @@ export class AuditController {
   constructor(private readonly auditService: AuditService) {}
 
   @Get()
-  @Permissions(PERMISSION_NAMES.AUDIT_READ)
+  @Authorize({ permissions: [PERMISSION_NAMES.AUDIT_READ] })
   @ApiPaginatedResponse(AuditLogDto)
   async listAuditLogs(@Query() query: AuditLogsQueryDto) {
     const result = await this.auditService.listAuditLogs({

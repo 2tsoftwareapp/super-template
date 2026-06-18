@@ -13,7 +13,7 @@ import {
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ApiDataResponse } from '@repo/api-core';
 import { CurrentUser } from '@repo/api-core';
-import { Permissions } from '@repo/api-core';
+import { Authorize } from '@repo/api-core';
 import { PERMISSION_NAMES } from '@repo/api-core';
 
 import { ExportsService } from '../application/exports.service';
@@ -26,7 +26,7 @@ export class ExportsController {
   constructor(private readonly exportsService: ExportsService) {}
 
   @Post()
-  @Permissions(PERMISSION_NAMES.EXPORTS_MANAGE)
+  @Authorize({ permissions: [PERMISSION_NAMES.EXPORTS_MANAGE] })
   @ApiDataResponse(ExportJobDto, 201)
   create(
     @CurrentUser() user: AuthenticatedRequestUser,
@@ -47,7 +47,7 @@ export class ExportsController {
   }
 
   @Get(':id')
-  @Permissions(PERMISSION_NAMES.EXPORTS_MANAGE)
+  @Authorize({ permissions: [PERMISSION_NAMES.EXPORTS_MANAGE] })
   @ApiDataResponse(ExportJobDto)
   getById(
     @CurrentUser() user: AuthenticatedRequestUser,

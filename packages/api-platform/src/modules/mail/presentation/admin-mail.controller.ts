@@ -4,7 +4,7 @@ import {
   ApiDataResponse,
   ApiPaginatedResponse,
 } from '@repo/api-core';
-import { Permissions } from '@repo/api-core';
+import { Authorize } from '@repo/api-core';
 import { PERMISSION_NAMES } from '@repo/api-core';
 
 import { MailService } from '../application/mail.service';
@@ -21,7 +21,7 @@ export class AdminMailController {
   constructor(private readonly mailService: MailService) {}
 
   @Get('deliveries')
-  @Permissions(PERMISSION_NAMES.MAIL_READ)
+  @Authorize({ permissions: [PERMISSION_NAMES.MAIL_READ] })
   @ApiPaginatedResponse(MailDeliveryDto)
   async listDeliveries(@Query() query: MailDeliveriesQueryDto) {
     const result = await this.mailService.listDeliveries(query);
@@ -38,7 +38,7 @@ export class AdminMailController {
   }
 
   @Get('preview/:templateKey')
-  @Permissions(PERMISSION_NAMES.MAIL_READ)
+  @Authorize({ permissions: [PERMISSION_NAMES.MAIL_READ] })
   @ApiDataResponse(MailPreviewDto)
   preview(@Param('templateKey') templateKey: string) {
     return this.mailService.previewTemplate(templateKey);

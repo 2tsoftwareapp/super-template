@@ -21,7 +21,7 @@ import {
   SuccessFlagDto,
 } from '@repo/api-core';
 import { CurrentUser } from '@repo/api-core';
-import { Permissions } from '@repo/api-core';
+import { Authorize } from '@repo/api-core';
 
 import { PERMISSION_NAMES } from '../../access-control/access-control.constants';
 import { UsersService } from '../application/users.service';
@@ -41,7 +41,7 @@ export class AdminUsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  @Permissions(PERMISSION_NAMES.USERS_READ)
+  @Authorize({ permissions: [PERMISSION_NAMES.USERS_READ] })
   @ApiPaginatedResponse(UserDto)
   async listUsers(@Query() query: AdminUsersQueryDto) {
     const result = await this.usersService.listUsers({
@@ -66,7 +66,7 @@ export class AdminUsersController {
   }
 
   @Post()
-  @Permissions(PERMISSION_NAMES.USERS_CREATE)
+  @Authorize({ permissions: [PERMISSION_NAMES.USERS_CREATE] })
   @ApiDataResponse(UserDto, 201)
   createUser(
     @CurrentUser() actor: AuthenticatedRequestUser,
@@ -88,14 +88,14 @@ export class AdminUsersController {
   }
 
   @Get(':id')
-  @Permissions(PERMISSION_NAMES.USERS_READ)
+  @Authorize({ permissions: [PERMISSION_NAMES.USERS_READ] })
   @ApiDataResponse(UserDto)
   getUser(@Param('id', new ParseUUIDPipe()) userId: string) {
     return this.usersService.getUserById(userId);
   }
 
   @Patch(':id')
-  @Permissions(PERMISSION_NAMES.USERS_UPDATE)
+  @Authorize({ permissions: [PERMISSION_NAMES.USERS_UPDATE] })
   @ApiDataResponse(UserDto)
   updateUser(
     @CurrentUser() actor: AuthenticatedRequestUser,
@@ -120,7 +120,7 @@ export class AdminUsersController {
   }
 
   @Delete(':id')
-  @Permissions(PERMISSION_NAMES.USERS_DELETE)
+  @Authorize({ permissions: [PERMISSION_NAMES.USERS_DELETE] })
   @ApiDataResponse(SuccessFlagDto)
   async deleteUser(
     @CurrentUser() actor: AuthenticatedRequestUser,
@@ -137,7 +137,7 @@ export class AdminUsersController {
   }
 
   @Patch(':id/status')
-  @Permissions(PERMISSION_NAMES.USERS_UPDATE)
+  @Authorize({ permissions: [PERMISSION_NAMES.USERS_UPDATE] })
   @ApiDataResponse(UserDto)
   updateStatus(
     @CurrentUser() actor: AuthenticatedRequestUser,
@@ -154,7 +154,7 @@ export class AdminUsersController {
   }
 
   @Put(':id/roles')
-  @Permissions(PERMISSION_NAMES.ROLES_MANAGE)
+  @Authorize({ permissions: [PERMISSION_NAMES.ROLES_MANAGE] })
   @ApiDataResponse(UserDto)
   replaceRoles(
     @CurrentUser() actor: AuthenticatedRequestUser,

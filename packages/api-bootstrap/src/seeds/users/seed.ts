@@ -71,6 +71,7 @@ export async function seedUsers(
     await params.accessControlService.replaceUserRoles(
       user.id,
       [role.id],
+      undefined,
       executor,
     );
 

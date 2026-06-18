@@ -22,7 +22,7 @@ import {
   SuccessFlagDto,
 } from '@repo/api-core';
 import { CurrentUser } from '@repo/api-core';
-import { Permissions } from '@repo/api-core';
+import { Authorize } from '@repo/api-core';
 import { PERMISSION_NAMES } from '@repo/api-core';
 
 import { FilesService } from '../application/files.service';
@@ -36,7 +36,7 @@ export class FilesController {
   constructor(private readonly filesService: FilesService) {}
 
   @Post()
-  @Permissions(PERMISSION_NAMES.FILES_UPLOAD)
+  @Authorize({ permissions: [PERMISSION_NAMES.FILES_UPLOAD] })
   @UseInterceptors(UploadFileInterceptor)
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -62,7 +62,7 @@ export class FilesController {
   }
 
   @Get(':id')
-  @Permissions(PERMISSION_NAMES.FILES_READ)
+  @Authorize({ permissions: [PERMISSION_NAMES.FILES_READ] })
   @ApiDataResponse(FileDto)
   getById(
     @CurrentUser() user: AuthenticatedRequestUser,
@@ -72,7 +72,7 @@ export class FilesController {
   }
 
   @Get(':id/url')
-  @Permissions(PERMISSION_NAMES.FILES_READ)
+  @Authorize({ permissions: [PERMISSION_NAMES.FILES_READ] })
   @ApiDataResponse(FileUrlDto)
   getUrl(
     @CurrentUser() user: AuthenticatedRequestUser,
@@ -82,7 +82,7 @@ export class FilesController {
   }
 
   @Get(':id/download')
-  @Permissions(PERMISSION_NAMES.FILES_READ)
+  @Authorize({ permissions: [PERMISSION_NAMES.FILES_READ] })
   @ApiProduces('application/octet-stream')
   async download(
     @CurrentUser() user: AuthenticatedRequestUser,
@@ -109,7 +109,7 @@ export class FilesController {
   }
 
   @Delete(':id')
-  @Permissions(PERMISSION_NAMES.FILES_DELETE)
+  @Authorize({ permissions: [PERMISSION_NAMES.FILES_DELETE] })
   @ApiDataResponse(SuccessFlagDto)
   async delete(
     @CurrentUser() user: AuthenticatedRequestUser,

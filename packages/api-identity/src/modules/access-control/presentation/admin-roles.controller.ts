@@ -19,7 +19,7 @@ import {
   CurrentUser,
   SuccessFlagDto,
 } from '@repo/api-core';
-import { Permissions } from '@repo/api-core';
+import { Authorize } from '@repo/api-core';
 
 import { PERMISSION_NAMES } from '../access-control.constants';
 import { AccessControlService } from '../application/access-control.service';
@@ -39,7 +39,7 @@ export class AdminRolesController {
   constructor(private readonly accessControlService: AccessControlService) {}
 
   @Get()
-  @Permissions(PERMISSION_NAMES.ROLES_READ)
+  @Authorize({ permissions: [PERMISSION_NAMES.ROLES_READ] })
   @ApiArrayResponse(RoleDto)
   async listRoles(@CurrentUser() actor: AuthenticatedRequestUser) {
     const roles = await this.accessControlService.listRoles(actor);
@@ -50,7 +50,7 @@ export class AdminRolesController {
   }
 
   @Get('permissions')
-  @Permissions(PERMISSION_NAMES.ROLES_READ)
+  @Authorize({ permissions: [PERMISSION_NAMES.ROLES_READ] })
   @ApiArrayResponse(PermissionDto)
   async listPermissions() {
     const permissions = await this.accessControlService.listPermissions();
@@ -61,7 +61,7 @@ export class AdminRolesController {
   }
 
   @Post('permissions')
-  @Permissions(PERMISSION_NAMES.ROLES_MANAGE)
+  @Authorize({ permissions: [PERMISSION_NAMES.ROLES_MANAGE] })
   @ApiDataResponse(PermissionDto, 201)
   createPermission(
     @CurrentUser() actor: AuthenticatedRequestUser,
@@ -81,7 +81,7 @@ export class AdminRolesController {
   }
 
   @Patch('permissions/:id')
-  @Permissions(PERMISSION_NAMES.ROLES_MANAGE)
+  @Authorize({ permissions: [PERMISSION_NAMES.ROLES_MANAGE] })
   @ApiDataResponse(PermissionDto)
   updatePermission(
     @CurrentUser() actor: AuthenticatedRequestUser,
@@ -103,7 +103,7 @@ export class AdminRolesController {
   }
 
   @Delete('permissions/:id')
-  @Permissions(PERMISSION_NAMES.ROLES_MANAGE)
+  @Authorize({ permissions: [PERMISSION_NAMES.ROLES_MANAGE] })
   @ApiDataResponse(SuccessFlagDto)
   async deletePermission(
     @CurrentUser() actor: AuthenticatedRequestUser,
@@ -124,7 +124,7 @@ export class AdminRolesController {
   }
 
   @Post()
-  @Permissions(PERMISSION_NAMES.ROLES_MANAGE)
+  @Authorize({ permissions: [PERMISSION_NAMES.ROLES_MANAGE] })
   @ApiDataResponse(RoleDto, 201)
   createRole(
     @CurrentUser() actor: AuthenticatedRequestUser,
@@ -148,7 +148,7 @@ export class AdminRolesController {
   }
 
   @Patch(':id')
-  @Permissions(PERMISSION_NAMES.ROLES_MANAGE)
+  @Authorize({ permissions: [PERMISSION_NAMES.ROLES_MANAGE] })
   @ApiDataResponse(RoleDto)
   updateRole(
     @CurrentUser() actor: AuthenticatedRequestUser,
@@ -173,7 +173,7 @@ export class AdminRolesController {
   }
 
   @Delete(':id')
-  @Permissions(PERMISSION_NAMES.ROLES_MANAGE)
+  @Authorize({ permissions: [PERMISSION_NAMES.ROLES_MANAGE] })
   @ApiDataResponse(SuccessFlagDto)
   async deleteRole(
     @CurrentUser() actor: AuthenticatedRequestUser,

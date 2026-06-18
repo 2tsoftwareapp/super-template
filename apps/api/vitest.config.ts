@@ -18,6 +18,7 @@ export default defineConfig({
     maxWorkers: 1,
     include: [
       'test/**/*.{test,spec}.ts',
+      '../../packages/api-core/src/**/*.{test,spec}.ts',
       '../../packages/api-identity/src/**/*.{test,spec}.ts',
       '../../packages/api-workspace/src/**/*.{test,spec}.ts',
     ],

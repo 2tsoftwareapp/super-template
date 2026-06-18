@@ -16,10 +16,10 @@ import {
   APP_LOGGER,
   AppExceptionFilter,
   type AppLogger,
+  AuthorizeGuard,
   EnvironmentService,
   ErrorReporterService,
   LoggingModule,
-  PermissionsGuard,
   RedisThrottlerStorage,
   RequestContextMiddleware,
   RequestLoggerMiddleware,
@@ -83,7 +83,7 @@ import { TenantContextInterceptor } from './shell/tenant-context.interceptor';
     },
     {
       provide: APP_GUARD,
-      useFactory: (reflector: Reflector) => new PermissionsGuard(reflector),
+      useFactory: (reflector: Reflector) => new AuthorizeGuard(reflector),
       inject: [Reflector],
     },
     {

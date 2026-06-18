@@ -1,7 +1,7 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ApiPaginatedResponse } from '@repo/api-core';
-import { Permissions } from '@repo/api-core';
+import { Authorize } from '@repo/api-core';
 import { PERMISSION_NAMES } from '@repo/api-core';
 
 import { ActivitiesService } from '../application/activities.service';
@@ -14,7 +14,7 @@ export class ActivitiesController {
   constructor(private readonly activitiesService: ActivitiesService) {}
 
   @Get()
-  @Permissions(PERMISSION_NAMES.ACTIVITIES_READ)
+  @Authorize({ permissions: [PERMISSION_NAMES.ACTIVITIES_READ] })
   @ApiPaginatedResponse(ActivityDto)
   async list(@Query() query: ActivitiesQueryDto) {
     const result = await this.activitiesService.list({

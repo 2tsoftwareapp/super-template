@@ -19,7 +19,7 @@ import {
   ApiPaginatedResponse,
 } from '@repo/api-core';
 import { CurrentUser } from '@repo/api-core';
-import { Permissions } from '@repo/api-core';
+import { Authorize } from '@repo/api-core';
 import { Public } from '@repo/api-core';
 import { PERMISSION_NAMES } from '@repo/api-core';
 
@@ -38,7 +38,7 @@ export class InvitationsController {
   constructor(private readonly invitationsService: InvitationsService) {}
 
   @Post()
-  @Permissions(PERMISSION_NAMES.INVITATIONS_CREATE)
+  @Authorize({ permissions: [PERMISSION_NAMES.INVITATIONS_CREATE] })
   @Throttle({ default: { limit: 5, ttl: 3_600_000 } })
   @ApiDataResponse(InvitationDto, 201)
   create(
@@ -59,7 +59,7 @@ export class InvitationsController {
   }
 
   @Get()
-  @Permissions(PERMISSION_NAMES.INVITATIONS_READ)
+  @Authorize({ permissions: [PERMISSION_NAMES.INVITATIONS_READ] })
   @ApiPaginatedResponse(InvitationDto)
   async list(
     @CurrentUser() user: AuthenticatedRequestUser,
@@ -100,7 +100,7 @@ export class InvitationsController {
   }
 
   @Delete(':id')
-  @Permissions(PERMISSION_NAMES.INVITATIONS_CREATE)
+  @Authorize({ permissions: [PERMISSION_NAMES.INVITATIONS_CREATE] })
   @Throttle({ default: { limit: 10, ttl: 3_600_000 } })
   @ApiDataResponse(InvitationDto)
   revoke(

@@ -20,7 +20,7 @@ import {
   SuccessFlagDto,
 } from '@repo/api-core';
 import { CurrentUser } from '@repo/api-core';
-import { Permissions } from '@repo/api-core';
+import { Authorize } from '@repo/api-core';
 import { PERMISSION_NAMES } from '@repo/api-core';
 
 import { CommentsService } from '../application/comments.service';
@@ -38,7 +38,7 @@ export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
 
   @Get()
-  @Permissions(PERMISSION_NAMES.COMMENTS_READ)
+  @Authorize({ permissions: [PERMISSION_NAMES.COMMENTS_READ] })
   @ApiPaginatedResponse(CommentDto)
   async list(@Query() query: CommentsQueryDto) {
     const result = await this.commentsService.list({
@@ -60,7 +60,7 @@ export class CommentsController {
   }
 
   @Post()
-  @Permissions(PERMISSION_NAMES.COMMENTS_CREATE)
+  @Authorize({ permissions: [PERMISSION_NAMES.COMMENTS_CREATE] })
   @ApiDataResponse(CommentDto, 201)
   create(
     @CurrentUser() user: AuthenticatedRequestUser,
@@ -80,7 +80,7 @@ export class CommentsController {
   }
 
   @Patch(':id')
-  @Permissions(PERMISSION_NAMES.COMMENTS_CREATE)
+  @Authorize({ permissions: [PERMISSION_NAMES.COMMENTS_CREATE] })
   @ApiDataResponse(CommentDto)
   update(
     @CurrentUser() user: AuthenticatedRequestUser,
@@ -97,7 +97,7 @@ export class CommentsController {
   }
 
   @Delete(':id')
-  @Permissions(PERMISSION_NAMES.COMMENTS_CREATE)
+  @Authorize({ permissions: [PERMISSION_NAMES.COMMENTS_CREATE] })
   @ApiDataResponse(SuccessFlagDto)
   async delete(
     @CurrentUser() user: AuthenticatedRequestUser,

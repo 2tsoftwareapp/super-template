@@ -8,7 +8,7 @@ import {
   ApiDataResponse,
 } from '@repo/api-core';
 import { CurrentUser } from '@repo/api-core';
-import { Permissions } from '@repo/api-core';
+import { Authorize } from '@repo/api-core';
 import { PERMISSION_NAMES } from '@repo/api-core';
 
 import { SettingsService } from '../application/settings.service';
@@ -21,7 +21,7 @@ export class AdminSettingsController {
   constructor(private readonly settingsService: SettingsService) {}
 
   @Get()
-  @Permissions(PERMISSION_NAMES.SETTINGS_READ)
+  @Authorize({ permissions: [PERMISSION_NAMES.SETTINGS_READ] })
   @ApiArrayResponse(ApplicationSettingDto)
   async listSettings() {
     const settings = await this.settingsService.listAll();
@@ -33,7 +33,7 @@ export class AdminSettingsController {
   }
 
   @Patch(':key')
-  @Permissions(PERMISSION_NAMES.SETTINGS_MANAGE)
+  @Authorize({ permissions: [PERMISSION_NAMES.SETTINGS_MANAGE] })
   @ApiDataResponse(ApplicationSettingDto)
   updateSetting(
     @CurrentUser() user: AuthenticatedRequestUser,
