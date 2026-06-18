@@ -19,11 +19,13 @@ export class ReplaceUserRolesUseCase {
   async execute(
     userId: string,
     roleIds: string[],
+    organizationId?: string | null,
     executor?: DatabaseExecutor,
   ): Promise<void> {
     await this.accessControlRepository.replaceUserRoles(
       userId,
       roleIds,
+      organizationId,
       executor,
     );
     await this.accessProfileUseCase.invalidateAccessProfile(userId);

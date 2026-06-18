@@ -1,19 +1,48 @@
-import { index, pgTable, primaryKey, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm';
+import {
+  boolean,
+  index,
+  pgTable,
+  primaryKey,
+  text,
+  timestamp,
+  uniqueIndex,
+  uuid,
+} from 'drizzle-orm/pg-core';
 
 import { timestamps } from '../shared/timestamps';
+import { organizations } from './organizations';
 import { users } from './users';
 
-export const roles = pgTable('roles', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  name: text('name').notNull().unique(),
-  description: text('description'),
-  ...timestamps,
-});
+export const roles = pgTable(
+  'roles',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    organizationId: uuid('organization_id').references(() => organizations.id, {
+      onDelete: 'cascade',
+    }),
+    name: text('name').notNull(),
+    description: text('description'),
+    isSystem: boolean('is_system').notNull().default(false),
+    ...timestamps,
+  },
+  (table) => [
+    uniqueIndex('roles_platform_name_unique')
+      .on(table.name)
+      .where(sql`${table.organizationId} is null`),
+    uniqueIndex('roles_organization_name_unique').on(
+      table.organizationId,
+      table.name,
+    ),
+    index('roles_organization_id_idx').on(table.organizationId),
+  ],
+);
 
 export const permissions = pgTable('permissions', {
   id: uuid('id').defaultRandom().primaryKey(),
   name: text('name').notNull().unique(),
   description: text('description'),
+  isSystem: boolean('is_system').notNull().default(false),
   ...timestamps,
 });
 
@@ -23,6 +52,9 @@ export const userRoles = pgTable(
     userId: uuid('user_id')
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
+    organizationId: uuid('organization_id').references(() => organizations.id, {
+      onDelete: 'cascade',
+    }),
     roleId: uuid('role_id')
       .notNull()
       .references(() => roles.id, { onDelete: 'cascade' }),
@@ -34,6 +66,7 @@ export const userRoles = pgTable(
     primaryKey({ columns: [table.userId, table.roleId] }),
     index('user_roles_user_id_idx').on(table.userId),
     index('user_roles_role_id_idx').on(table.roleId),
+    index('user_roles_organization_id_idx').on(table.organizationId),
   ],
 );
 

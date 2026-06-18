@@ -3,7 +3,10 @@ import type { DatabaseExecutor } from '@repo/api-database';
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { AppError, ERROR_CODES } from '@repo/api-core';
 
-import type { RoleView } from './access-control.types';
+import type { AuthenticatedRequestUser } from '@repo/api-core';
+
+import { ROLE_NAMES } from '../access-control.constants';
+import type { PermissionView, RoleView } from './access-control.types';
 
 import { AccessControlMapper } from './access-control.mapper';
 import {
@@ -66,13 +69,55 @@ export class RoleQueryUseCase {
     return foundRoles;
   }
 
-  getRoleByName(name: string, executor?: DatabaseExecutor) {
-    return this.accessControlRepository.findRoleByName(name, executor);
+  getRoleByName(
+    name: string,
+    organizationId: string | null = null,
+    executor?: DatabaseExecutor,
+  ) {
+    return this.accessControlRepository.findRoleByName(
+      name,
+      organizationId,
+      executor,
+    );
   }
 
-  async listRoles(): Promise<RoleView[]> {
-    const roles = await this.accessControlRepository.findAllRoles();
+  async listRoles(actor?: AuthenticatedRequestUser): Promise<RoleView[]> {
+    const roles = actor
+      ? await this.accessControlRepository.findManageableRolesForActor(
+          actor.organizationId,
+          actor.roles.includes(ROLE_NAMES.SUPER_ADMIN),
+        )
+      : await this.accessControlRepository.findAllRoles();
+    const permissionRows =
+      await this.accessControlRepository.findPermissionsForRoleIds(
+        roles.map((role) => role.id),
+      );
+    const permissionsByRoleId = new Map<string, PermissionView[]>();
 
-    return roles.map((role) => this.accessControlMapper.toRoleView(role));
+    for (const row of permissionRows) {
+      const existing = permissionsByRoleId.get(row.roleId) ?? [];
+      existing.push({
+        id: row.id,
+        name: row.name,
+        description: row.description,
+        isSystem: row.isSystem,
+      });
+      permissionsByRoleId.set(row.roleId, existing);
+    }
+
+    return roles.map((role) =>
+      this.accessControlMapper.toRoleView(
+        role,
+        permissionsByRoleId.get(role.id) ?? [],
+      ),
+    );
+  }
+
+  async listPermissions(): Promise<PermissionView[]> {
+    const permissions = await this.accessControlRepository.findAllPermissions();
+
+    return permissions.map((permission) =>
+      this.accessControlMapper.toPermissionView(permission),
+    );
   }
 }

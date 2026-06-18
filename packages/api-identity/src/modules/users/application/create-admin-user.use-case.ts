@@ -18,6 +18,10 @@ import type { CreateAdminUserCommand, UserView } from './users.types';
 
 import { ROLE_NAMES } from '../../access-control/access-control.constants';
 import { AccessControlService } from '../../access-control/application/access-control.service';
+import {
+  assertCanAssignRoleTargets,
+  assertRoleScopeCanBeAssigned,
+} from '../../access-control/domain/role-assignment.policy';
 import { hashPassword } from '../../auth/application/auth.helpers';
 import { OrganizationsService } from '../../organizations/application/organizations.service';
 import { GetUserUseCase } from './get-user.use-case';
@@ -71,6 +75,8 @@ export class CreateAdminUserUseCase {
             ? desiredRoleIds.map((role) => role.name)
             : [ROLE_NAMES.USER];
 
+        desiredRoleIds.forEach((role) => assertRoleScopeCanBeAssigned(role));
+        assertCanAssignRoleTargets(actor, desiredRoleIds);
         this.accessControlService.assertCanAssignUserRoles(
           actor,
           [],
@@ -81,6 +87,9 @@ export class CreateAdminUserUseCase {
           desiredRoleIds.length > 0
             ? desiredRoleIds.map((role) => role.id)
             : [await this.resolveRoleIdByName(ROLE_NAMES.USER, transaction)],
+          actor.roles.includes(ROLE_NAMES.SUPER_ADMIN)
+            ? undefined
+            : actor.organizationId,
           transaction,
         );
 

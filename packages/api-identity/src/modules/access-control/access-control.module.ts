@@ -7,6 +7,7 @@ import { ACCESS_CONTROL_REPOSITORY } from './application/access-control.reposito
 import { AccessControlService } from './application/access-control.service';
 import { AccessProfileUseCase } from './application/access-profile.use-case';
 import { ReplaceUserRolesUseCase } from './application/replace-user-roles.use-case';
+import { RoleManagementUseCase } from './application/role-management.use-case';
 import { RoleQueryUseCase } from './application/role-query.use-case';
 import { SeedAccessControlUseCase } from './application/seed-access-control.use-case';
 import { AccessControlRepository } from './infrastructure/access-control.repository';
@@ -21,6 +22,7 @@ import { AdminRolesController } from './presentation/admin-roles.controller';
     AccessProfileUseCase,
     SeedAccessControlUseCase,
     RoleQueryUseCase,
+    RoleManagementUseCase,
     ReplaceUserRolesUseCase,
     AccessControlService,
     AccessProfileCache,

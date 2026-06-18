@@ -66,14 +66,15 @@ export class AuthenticateAccessTokenUseCase {
       );
     }
 
-    const accessProfile = await this.accessControlService.getAccessProfile(
-      user.id,
-    );
     const organizationId =
       await this.organizationsService.resolveOrganizationIdForUser(
         user.id,
         payload.oid,
       );
+    const accessProfile = await this.accessControlService.getAccessProfile(
+      user.id,
+      organizationId,
+    );
 
     return {
       userId: user.id,

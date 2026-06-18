@@ -12,6 +12,7 @@ import { runInTransaction } from '@repo/api-database';
 
 import type { CreateOrganizationCommand } from './organizations.types';
 
+import { AccessControlService } from '../../access-control/application/access-control.service';
 import { OrganizationsRepository } from '../infrastructure/organizations.repository';
 
 const slugify = (value: string) =>
@@ -27,6 +28,7 @@ export class OrganizationsService {
   constructor(
     @Inject(DATABASE) private readonly database: DatabaseClient,
     private readonly organizationsRepository: OrganizationsRepository,
+    private readonly accessControlService: AccessControlService,
   ) {}
 
   async listForUser(user: AuthenticatedRequestUser) {
@@ -88,6 +90,11 @@ export class OrganizationsService {
           },
           transaction,
         );
+        await this.accessControlService.ensureOrganizationAdminRole(
+          created.id,
+          user.userId,
+          transaction,
+        );
 
         return created;
       },
@@ -144,6 +151,11 @@ export class OrganizationsService {
         userId,
         role: 'OWNER',
       },
+      executor,
+    );
+    await this.accessControlService.ensureOrganizationAdminRole(
+      organization.id,
+      userId,
       executor,
     );
 

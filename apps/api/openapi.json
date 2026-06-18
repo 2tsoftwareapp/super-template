@@ -106,6 +106,343 @@
         "tags": [
           "admin-roles"
         ]
+      },
+      "post": {
+        "operationId": "AdminRolesController_createRole",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRoleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/RoleDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "admin-roles"
+        ]
+      }
+    },
+    "/api/v1/admin/roles/permissions": {
+      "get": {
+        "operationId": "AdminRolesController_listPermissions",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PermissionDto"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "admin-roles"
+        ]
+      },
+      "post": {
+        "operationId": "AdminRolesController_createPermission",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePermissionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/PermissionDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "admin-roles"
+        ]
+      }
+    },
+    "/api/v1/admin/roles/permissions/{id}": {
+      "patch": {
+        "operationId": "AdminRolesController_updatePermission",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePermissionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/PermissionDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "admin-roles"
+        ]
+      },
+      "delete": {
+        "operationId": "AdminRolesController_deletePermission",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/SuccessFlagDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "admin-roles"
+        ]
+      }
+    },
+    "/api/v1/admin/roles/{id}": {
+      "patch": {
+        "operationId": "AdminRolesController_updateRole",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRoleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/RoleDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "admin-roles"
+        ]
+      },
+      "delete": {
+        "operationId": "AdminRolesController_deleteRole",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/SuccessFlagDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "admin-roles"
+        ]
       }
     },
     "/api/v1/organizations": {
@@ -192,212 +529,6 @@
         ],
         "tags": [
           "organizations"
-        ]
-      }
-    },
-    "/api/v1/users/me/preferences": {
-      "get": {
-        "operationId": "PreferencesController_getMyPreferences",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "data",
-                    "meta"
-                  ],
-                  "properties": {
-                    "data": {
-                      "$ref": "#/components/schemas/UserPreferencesDto"
-                    },
-                    "meta": {
-                      "$ref": "#/components/schemas/RequestMetaDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "tags": [
-          "users"
-        ]
-      },
-      "patch": {
-        "operationId": "PreferencesController_updateMyPreferences",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdatePreferencesDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "data",
-                    "meta"
-                  ],
-                  "properties": {
-                    "data": {
-                      "$ref": "#/components/schemas/UserPreferencesDto"
-                    },
-                    "meta": {
-                      "$ref": "#/components/schemas/RequestMetaDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "tags": [
-          "users"
-        ]
-      }
-    },
-    "/api/v1/admin/audit-logs": {
-      "get": {
-        "operationId": "AuditController_listAuditLogs",
-        "parameters": [
-          {
-            "name": "page",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "default": 1,
-              "type": "number"
-            }
-          },
-          {
-            "name": "limit",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "maximum": 100,
-              "default": 20,
-              "type": "number"
-            }
-          },
-          {
-            "name": "sortOrder",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "default": "desc",
-              "type": "string",
-              "enum": [
-                "asc",
-                "desc"
-              ]
-            }
-          },
-          {
-            "name": "actorId",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "action",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "resourceType",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "resourceId",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "from",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "to",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "data",
-                    "meta"
-                  ],
-                  "properties": {
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/AuditLogDto"
-                      }
-                    },
-                    "meta": {
-                      "$ref": "#/components/schemas/PaginationMetaDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "tags": [
-          "admin-audit"
         ]
       }
     },
@@ -958,73 +1089,56 @@
         ]
       }
     },
-    "/api/v1/files": {
-      "post": {
-        "operationId": "FilesController_upload",
+    "/api/v1/users/me/preferences": {
+      "get": {
+        "operationId": "PreferencesController_getMyPreferences",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/UserPreferencesDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "users"
+        ]
+      },
+      "patch": {
+        "operationId": "PreferencesController_updateMyPreferences",
         "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
-            "multipart/form-data": {
+            "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "file": {
-                    "type": "string",
-                    "format": "binary"
-                  }
-                }
+                "$ref": "#/components/schemas/UpdatePreferencesDto"
               }
             }
           }
         },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "data",
-                    "meta"
-                  ],
-                  "properties": {
-                    "data": {
-                      "$ref": "#/components/schemas/FileDto"
-                    },
-                    "meta": {
-                      "$ref": "#/components/schemas/RequestMetaDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "tags": [
-          "files"
-        ]
-      }
-    },
-    "/api/v1/files/{id}": {
-      "get": {
-        "operationId": "FilesController_getById",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "description": "",
@@ -1038,7 +1152,7 @@
                   ],
                   "properties": {
                     "data": {
-                      "$ref": "#/components/schemas/FileDto"
+                      "$ref": "#/components/schemas/UserPreferencesDto"
                     },
                     "meta": {
                       "$ref": "#/components/schemas/RequestMetaDto"
@@ -1055,99 +1169,7 @@
           }
         ],
         "tags": [
-          "files"
-        ]
-      },
-      "delete": {
-        "operationId": "FilesController_delete",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "data",
-                    "meta"
-                  ],
-                  "properties": {
-                    "data": {
-                      "$ref": "#/components/schemas/SuccessFlagDto"
-                    },
-                    "meta": {
-                      "$ref": "#/components/schemas/RequestMetaDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "tags": [
-          "files"
-        ]
-      }
-    },
-    "/api/v1/files/{id}/url": {
-      "get": {
-        "operationId": "FilesController_getUrl",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "data",
-                    "meta"
-                  ],
-                  "properties": {
-                    "data": {
-                      "$ref": "#/components/schemas/FileUrlDto"
-                    },
-                    "meta": {
-                      "$ref": "#/components/schemas/RequestMetaDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "tags": [
-          "files"
+          "users"
         ]
       }
     },
@@ -1737,6 +1759,128 @@
         ]
       }
     },
+    "/api/v1/admin/audit-logs": {
+      "get": {
+        "operationId": "AuditController_listAuditLogs",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "desc",
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          },
+          {
+            "name": "actorId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "action",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "resourceType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "resourceId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/AuditLogDto"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PaginationMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "admin-audit"
+        ]
+      }
+    },
     "/api/v1/admin/mail/deliveries": {
       "get": {
         "operationId": "AdminMailController_listDeliveries",
@@ -1878,12 +2022,28 @@
         ]
       }
     },
-    "/api/v1/admin/settings": {
-      "get": {
-        "operationId": "AdminSettingsController_listSettings",
+    "/api/v1/files": {
+      "post": {
+        "operationId": "FilesController_upload",
         "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses": {
-          "200": {
+          "201": {
             "description": "",
             "content": {
               "application/json": {
@@ -1895,10 +2055,7 @@
                   ],
                   "properties": {
                     "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/ApplicationSettingDto"
-                      }
+                      "$ref": "#/components/schemas/FileDto"
                     },
                     "meta": {
                       "$ref": "#/components/schemas/RequestMetaDto"
@@ -1915,16 +2072,16 @@
           }
         ],
         "tags": [
-          "admin-settings"
+          "files"
         ]
       }
     },
-    "/api/v1/admin/settings/{key}": {
-      "patch": {
-        "operationId": "AdminSettingsController_updateSetting",
+    "/api/v1/files/{id}": {
+      "get": {
+        "operationId": "FilesController_getById",
         "parameters": [
           {
-            "name": "key",
+            "name": "id",
             "required": true,
             "in": "path",
             "schema": {
@@ -1932,16 +2089,6 @@
             }
           }
         ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateSettingDto"
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "",
@@ -1955,7 +2102,7 @@
                   ],
                   "properties": {
                     "data": {
-                      "$ref": "#/components/schemas/ApplicationSettingDto"
+                      "$ref": "#/components/schemas/FileDto"
                     },
                     "meta": {
                       "$ref": "#/components/schemas/RequestMetaDto"
@@ -1972,7 +2119,127 @@
           }
         ],
         "tags": [
-          "admin-settings"
+          "files"
+        ]
+      },
+      "delete": {
+        "operationId": "FilesController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/SuccessFlagDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "files"
+        ]
+      }
+    },
+    "/api/v1/files/{id}/url": {
+      "get": {
+        "operationId": "FilesController_getUrl",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/FileUrlDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "files"
+        ]
+      }
+    },
+    "/api/v1/files/{id}/download": {
+      "get": {
+        "operationId": "FilesController_download",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "files"
         ]
       }
     },
@@ -2268,6 +2535,341 @@
         ],
         "tags": [
           "admin-jobs"
+        ]
+      }
+    },
+    "/api/v1/admin/settings": {
+      "get": {
+        "operationId": "AdminSettingsController_listSettings",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ApplicationSettingDto"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "admin-settings"
+        ]
+      }
+    },
+    "/api/v1/admin/settings/{key}": {
+      "patch": {
+        "operationId": "AdminSettingsController_updateSetting",
+        "parameters": [
+          {
+            "name": "key",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSettingDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ApplicationSettingDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "admin-settings"
+        ]
+      }
+    },
+    "/api/v1/imports": {
+      "post": {
+        "operationId": "ImportsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateImportDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ImportJobDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "imports"
+        ]
+      }
+    },
+    "/api/v1/imports/{id}": {
+      "get": {
+        "operationId": "ImportsController_getById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ImportJobDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "imports"
+        ]
+      }
+    },
+    "/api/v1/imports/{id}/confirm": {
+      "post": {
+        "operationId": "ImportsController_confirm",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ImportJobDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "imports"
+        ]
+      }
+    },
+    "/api/v1/exports": {
+      "post": {
+        "operationId": "ExportsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateExportDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ExportJobDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "exports"
+        ]
+      }
+    },
+    "/api/v1/exports/{id}": {
+      "get": {
+        "operationId": "ExportsController_getById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ExportJobDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "exports"
         ]
       }
     },
@@ -2874,148 +3476,6 @@
         ]
       }
     },
-    "/api/v1/imports": {
-      "post": {
-        "operationId": "ImportsController_create",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateImportDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "data",
-                    "meta"
-                  ],
-                  "properties": {
-                    "data": {
-                      "$ref": "#/components/schemas/ImportJobDto"
-                    },
-                    "meta": {
-                      "$ref": "#/components/schemas/RequestMetaDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "tags": [
-          "imports"
-        ]
-      }
-    },
-    "/api/v1/imports/{id}": {
-      "get": {
-        "operationId": "ImportsController_getById",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "data",
-                    "meta"
-                  ],
-                  "properties": {
-                    "data": {
-                      "$ref": "#/components/schemas/ImportJobDto"
-                    },
-                    "meta": {
-                      "$ref": "#/components/schemas/RequestMetaDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "tags": [
-          "imports"
-        ]
-      }
-    },
-    "/api/v1/imports/{id}/confirm": {
-      "post": {
-        "operationId": "ImportsController_confirm",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "data",
-                    "meta"
-                  ],
-                  "properties": {
-                    "data": {
-                      "$ref": "#/components/schemas/ImportJobDto"
-                    },
-                    "meta": {
-                      "$ref": "#/components/schemas/RequestMetaDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "tags": [
-          "imports"
-        ]
-      }
-    },
     "/api/v1/projects": {
       "get": {
         "operationId": "ProjectsController_list",
@@ -3511,101 +3971,6 @@
         ],
         "tags": [
           "activities"
-        ]
-      }
-    },
-    "/api/v1/exports": {
-      "post": {
-        "operationId": "ExportsController_create",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateExportDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "data",
-                    "meta"
-                  ],
-                  "properties": {
-                    "data": {
-                      "$ref": "#/components/schemas/ExportJobDto"
-                    },
-                    "meta": {
-                      "$ref": "#/components/schemas/RequestMetaDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "tags": [
-          "exports"
-        ]
-      }
-    },
-    "/api/v1/exports/{id}": {
-      "get": {
-        "operationId": "ExportsController_getById",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "data",
-                    "meta"
-                  ],
-                  "properties": {
-                    "data": {
-                      "$ref": "#/components/schemas/ExportJobDto"
-                    },
-                    "meta": {
-                      "$ref": "#/components/schemas/RequestMetaDto"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "tags": [
-          "exports"
         ]
       }
     },
@@ -4144,7 +4509,7 @@
           "status"
         ]
       },
-      "RoleDto": {
+      "PermissionDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -4154,14 +4519,145 @@
             "type": "string"
           },
           "description": {
-            "type": "string"
+            "type": "object",
+            "nullable": true
+          },
+          "isSystem": {
+            "type": "boolean"
           }
         },
         "required": [
           "id",
           "name",
-          "description"
+          "description",
+          "isSystem"
         ]
+      },
+      "RoleDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "organizationId": {
+            "type": "object",
+            "nullable": true
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "object",
+            "nullable": true
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "platform",
+              "organization"
+            ]
+          },
+          "isSystem": {
+            "type": "boolean"
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PermissionDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "organizationId",
+          "name",
+          "description",
+          "scope",
+          "isSystem",
+          "permissions"
+        ]
+      },
+      "CreatePermissionDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "object",
+            "nullable": true
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "UpdatePermissionDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "object",
+            "nullable": true
+          }
+        }
+      },
+      "SuccessFlagDto": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "success"
+        ]
+      },
+      "CreateRoleDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "object",
+            "nullable": true
+          },
+          "organizationId": {
+            "type": "object",
+            "nullable": true
+          },
+          "permissionIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "name",
+          "permissionIds"
+        ]
+      },
+      "UpdateRoleDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "object",
+            "nullable": true
+          },
+          "permissionIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
       },
       "OrganizationDto": {
         "type": "object",
@@ -4215,69 +4711,6 @@
           "name"
         ]
       },
-      "UserPreferencesDto": {
-        "type": "object",
-        "properties": {
-          "userId": {
-            "type": "string"
-          },
-          "theme": {
-            "type": "string"
-          },
-          "language": {
-            "type": "string"
-          },
-          "timezone": {
-            "type": "string"
-          },
-          "notificationPreferences": {
-            "type": "object",
-            "additionalProperties": true
-          },
-          "emailPreferences": {
-            "type": "object",
-            "additionalProperties": true
-          },
-          "createdAt": {
-            "type": "string"
-          },
-          "updatedAt": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "userId",
-          "theme",
-          "language",
-          "timezone",
-          "notificationPreferences",
-          "emailPreferences",
-          "createdAt",
-          "updatedAt"
-        ]
-      },
-      "UpdatePreferencesDto": {
-        "type": "object",
-        "properties": {
-          "theme": {
-            "type": "string"
-          },
-          "language": {
-            "type": "string"
-          },
-          "timezone": {
-            "type": "string"
-          },
-          "notificationPreferences": {
-            "type": "object",
-            "additionalProperties": true
-          },
-          "emailPreferences": {
-            "type": "object",
-            "additionalProperties": true
-          }
-        }
-      },
       "PaginationMetaDto": {
         "type": "object",
         "properties": {
@@ -4303,53 +4736,6 @@
           "limit",
           "total",
           "totalPages"
-        ]
-      },
-      "AuditLogDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "actorId": {
-            "type": "string",
-            "nullable": true
-          },
-          "action": {
-            "type": "string"
-          },
-          "entityType": {
-            "type": "string"
-          },
-          "entityId": {
-            "type": "string",
-            "nullable": true
-          },
-          "metadata": {
-            "type": "object",
-            "additionalProperties": true
-          },
-          "ipAddress": {
-            "type": "string",
-            "nullable": true
-          },
-          "userAgent": {
-            "type": "string",
-            "nullable": true
-          },
-          "requestId": {
-            "type": "string",
-            "nullable": true
-          },
-          "createdAt": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "action",
-          "entityType",
-          "createdAt"
         ]
       },
       "UserDto": {
@@ -4475,17 +4861,6 @@
           }
         }
       },
-      "SuccessFlagDto": {
-        "type": "object",
-        "properties": {
-          "success": {
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "success"
-        ]
-      },
       "UpdateUserStatusDto": {
         "type": "object",
         "properties": {
@@ -4545,27 +4920,28 @@
           "newPassword"
         ]
       },
-      "FileDto": {
+      "UserPreferencesDto": {
         "type": "object",
         "properties": {
-          "id": {
+          "userId": {
             "type": "string"
           },
-          "storageKey": {
+          "theme": {
             "type": "string"
           },
-          "originalName": {
+          "language": {
             "type": "string"
           },
-          "mimeType": {
+          "timezone": {
             "type": "string"
           },
-          "sizeBytes": {
-            "type": "number"
-          },
-          "uploadedById": {
+          "notificationPreferences": {
             "type": "object",
-            "nullable": true
+            "additionalProperties": true
+          },
+          "emailPreferences": {
+            "type": "object",
+            "additionalProperties": true
           },
           "createdAt": {
             "type": "string"
@@ -4575,34 +4951,37 @@
           }
         },
         "required": [
-          "id",
-          "storageKey",
-          "originalName",
-          "mimeType",
-          "sizeBytes",
-          "uploadedById",
+          "userId",
+          "theme",
+          "language",
+          "timezone",
+          "notificationPreferences",
+          "emailPreferences",
           "createdAt",
           "updatedAt"
         ]
       },
-      "FileUrlDto": {
+      "UpdatePreferencesDto": {
         "type": "object",
         "properties": {
-          "id": {
+          "theme": {
             "type": "string"
           },
-          "url": {
+          "language": {
             "type": "string"
           },
-          "expiresInSeconds": {
-            "type": "number"
+          "timezone": {
+            "type": "string"
+          },
+          "notificationPreferences": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "emailPreferences": {
+            "type": "object",
+            "additionalProperties": true
           }
-        },
-        "required": [
-          "id",
-          "url",
-          "expiresInSeconds"
-        ]
+        }
       },
       "SuccessMessageDto": {
         "type": "object",
@@ -4828,6 +5207,53 @@
           "organizationId"
         ]
       },
+      "AuditLogDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "actorId": {
+            "type": "string",
+            "nullable": true
+          },
+          "action": {
+            "type": "string"
+          },
+          "entityType": {
+            "type": "string"
+          },
+          "entityId": {
+            "type": "string",
+            "nullable": true
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "ipAddress": {
+            "type": "string",
+            "nullable": true
+          },
+          "userAgent": {
+            "type": "string",
+            "nullable": true
+          },
+          "requestId": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "action",
+          "entityType",
+          "createdAt"
+        ]
+      },
       "MailDeliveryDto": {
         "type": "object",
         "properties": {
@@ -4892,18 +5318,27 @@
           "html"
         ]
       },
-      "ApplicationSettingDto": {
+      "FileDto": {
         "type": "object",
         "properties": {
-          "key": {
+          "id": {
             "type": "string"
           },
-          "value": {
-            "type": "object",
-            "additionalProperties": true
+          "storageKey": {
+            "type": "string"
           },
-          "updatedById": {
-            "type": "object"
+          "originalName": {
+            "type": "string"
+          },
+          "mimeType": {
+            "type": "string"
+          },
+          "sizeBytes": {
+            "type": "number"
+          },
+          "uploadedById": {
+            "type": "object",
+            "nullable": true
           },
           "createdAt": {
             "type": "string"
@@ -4913,22 +5348,33 @@
           }
         },
         "required": [
-          "key",
-          "value",
+          "id",
+          "storageKey",
+          "originalName",
+          "mimeType",
+          "sizeBytes",
+          "uploadedById",
           "createdAt",
           "updatedAt"
         ]
       },
-      "UpdateSettingDto": {
+      "FileUrlDto": {
         "type": "object",
         "properties": {
-          "value": {
-            "type": "object",
-            "additionalProperties": true
+          "id": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "expiresInSeconds": {
+            "type": "number"
           }
         },
         "required": [
-          "value"
+          "id",
+          "url",
+          "expiresInSeconds"
         ]
       },
       "AttachmentDto": {
@@ -5061,6 +5507,194 @@
           "maxAttempts",
           "createdAt",
           "updatedAt"
+        ]
+      },
+      "ApplicationSettingDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "value": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "updatedById": {
+            "type": "object"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "value",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "UpdateSettingDto": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "value"
+        ]
+      },
+      "ImportJobDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "fileId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "PROCESSING",
+              "COMPLETED",
+              "FAILED",
+              "CANCELLED"
+            ]
+          },
+          "rowCount": {
+            "type": "object"
+          },
+          "successCount": {
+            "type": "object"
+          },
+          "errorCount": {
+            "type": "object"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "createdById": {
+            "type": "string"
+          },
+          "confirmedAt": {
+            "type": "object"
+          },
+          "completedAt": {
+            "type": "object"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "fileId",
+          "status",
+          "createdById",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CreateImportDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "fileId": {
+            "type": "string"
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "description": "Client-supplied idempotency key. Retries with the same key return the original import job."
+          }
+        },
+        "required": [
+          "type",
+          "fileId"
+        ]
+      },
+      "ExportJobDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "PROCESSING",
+              "COMPLETED",
+              "FAILED",
+              "CANCELLED"
+            ]
+          },
+          "fileId": {
+            "type": "object"
+          },
+          "filters": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "createdById": {
+            "type": "string"
+          },
+          "completedAt": {
+            "type": "object"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "status",
+          "createdById",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CreateExportDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "filters": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "description": "Client-supplied idempotency key. Retries with the same key return the original export job."
+          }
+        },
+        "required": [
+          "type"
         ]
       },
       "NotificationDto": {
@@ -5276,6 +5910,10 @@
           "scheduledAt": {
             "type": "string",
             "description": "ISO-8601 datetime. Omit or set to now for immediate delivery."
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "description": "Client-supplied idempotency key. Retries with the same key return the original notification job."
           }
         },
         "required": [
@@ -5283,84 +5921,6 @@
           "type",
           "title",
           "body"
-        ]
-      },
-      "ImportJobDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "type": {
-            "type": "string"
-          },
-          "fileId": {
-            "type": "string"
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "PENDING",
-              "PROCESSING",
-              "COMPLETED",
-              "FAILED",
-              "CANCELLED"
-            ]
-          },
-          "rowCount": {
-            "type": "object"
-          },
-          "successCount": {
-            "type": "object"
-          },
-          "errorCount": {
-            "type": "object"
-          },
-          "errors": {
-            "type": "array",
-            "items": {
-              "type": "object"
-            }
-          },
-          "createdById": {
-            "type": "string"
-          },
-          "confirmedAt": {
-            "type": "object"
-          },
-          "completedAt": {
-            "type": "object"
-          },
-          "createdAt": {
-            "type": "string"
-          },
-          "updatedAt": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "type",
-          "fileId",
-          "status",
-          "createdById",
-          "createdAt",
-          "updatedAt"
-        ]
-      },
-      "CreateImportDto": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string"
-          },
-          "fileId": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "type",
-          "fileId"
         ]
       },
       "ProjectDto": {
@@ -5538,69 +6098,6 @@
           "entityId",
           "visibility",
           "createdAt"
-        ]
-      },
-      "ExportJobDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "type": {
-            "type": "string"
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "PENDING",
-              "PROCESSING",
-              "COMPLETED",
-              "FAILED",
-              "CANCELLED"
-            ]
-          },
-          "fileId": {
-            "type": "object"
-          },
-          "filters": {
-            "type": "object",
-            "additionalProperties": true
-          },
-          "createdById": {
-            "type": "string"
-          },
-          "completedAt": {
-            "type": "object"
-          },
-          "createdAt": {
-            "type": "string"
-          },
-          "updatedAt": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "type",
-          "status",
-          "createdById",
-          "createdAt",
-          "updatedAt"
-        ]
-      },
-      "CreateExportDto": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string"
-          },
-          "filters": {
-            "type": "object",
-            "additionalProperties": true
-          }
-        },
-        "required": [
-          "type"
         ]
       },
       "CommentDto": {

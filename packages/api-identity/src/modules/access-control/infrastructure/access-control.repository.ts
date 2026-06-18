@@ -11,7 +11,7 @@ import {
   roles,
   userRoles,
 } from '@repo/api-database';
-import { eq, inArray } from 'drizzle-orm';
+import { and, eq, inArray, isNull, or } from 'drizzle-orm';
 
 @Injectable()
 export class AccessControlRepository {
@@ -19,6 +19,81 @@ export class AccessControlRepository {
 
   async findAllRoles(executor: DatabaseExecutor = this.database) {
     return executor.select().from(roles).orderBy(roles.name);
+  }
+
+  async findManageableRolesForActor(
+    organizationId: string | null,
+    includePlatformRoles: boolean,
+    executor: DatabaseExecutor = this.database,
+  ) {
+    if (includePlatformRoles) {
+      return executor.select().from(roles).orderBy(roles.name);
+    }
+
+    return executor
+      .select()
+      .from(roles)
+      .where(
+        or(
+          and(isNull(roles.organizationId), eq(roles.isSystem, true)),
+          organizationId
+            ? eq(roles.organizationId, organizationId)
+            : isNull(roles.organizationId),
+        ),
+      )
+      .orderBy(roles.name);
+  }
+
+  async findAllPermissions(executor: DatabaseExecutor = this.database) {
+    return executor.select().from(permissions).orderBy(permissions.name);
+  }
+
+  async findRoleById(
+    roleId: string,
+    executor: DatabaseExecutor = this.database,
+  ) {
+    const [role] = await executor
+      .select()
+      .from(roles)
+      .where(eq(roles.id, roleId))
+      .limit(1);
+    return role ?? null;
+  }
+
+  async findPermissionIdsForRole(
+    roleId: string,
+    executor: DatabaseExecutor = this.database,
+  ) {
+    const rows = await executor
+      .select({
+        permissionId: rolePermissions.permissionId,
+      })
+      .from(rolePermissions)
+      .where(eq(rolePermissions.roleId, roleId));
+
+    return rows.map((row) => row.permissionId);
+  }
+
+  async findPermissionsForRoleIds(
+    roleIds: string[],
+    executor: DatabaseExecutor = this.database,
+  ) {
+    if (roleIds.length === 0) {
+      return [];
+    }
+
+    return executor
+      .select({
+        roleId: rolePermissions.roleId,
+        id: permissions.id,
+        name: permissions.name,
+        description: permissions.description,
+        isSystem: permissions.isSystem,
+      })
+      .from(rolePermissions)
+      .innerJoin(permissions, eq(rolePermissions.permissionId, permissions.id))
+      .where(inArray(rolePermissions.roleId, roleIds))
+      .orderBy(permissions.name);
   }
 
   async findRolesByIds(
@@ -57,8 +132,27 @@ export class AccessControlRepository {
       .where(inArray(permissions.name, permissionNames));
   }
 
+  async findPermissionsByIds(
+    permissionIds: string[],
+    executor: DatabaseExecutor = this.database,
+  ) {
+    if (permissionIds.length === 0) {
+      return [];
+    }
+
+    return executor
+      .select()
+      .from(permissions)
+      .where(inArray(permissions.id, permissionIds));
+  }
+
   async ensureRoles(
-    roleValues: { name: string; description: string }[],
+    roleValues: {
+      name: string;
+      description: string;
+      organizationId?: string | null;
+      isSystem?: boolean;
+    }[],
     executor: DatabaseExecutor = this.database,
   ) {
     await executor.insert(roles).values(roleValues).onConflictDoNothing();
@@ -68,8 +162,43 @@ export class AccessControlRepository {
     );
   }
 
+  async createRole(
+    values: typeof roles.$inferInsert,
+    executor: DatabaseExecutor = this.database,
+  ) {
+    const [role] = await executor.insert(roles).values(values).returning();
+    return role ?? null;
+  }
+
+  async updateRole(
+    roleId: string,
+    values: Partial<typeof roles.$inferInsert>,
+    executor: DatabaseExecutor = this.database,
+  ) {
+    const [role] = await executor
+      .update(roles)
+      .set({
+        ...values,
+        updatedAt: new Date(),
+      })
+      .where(eq(roles.id, roleId))
+      .returning();
+    return role ?? null;
+  }
+
+  async deleteRole(
+    roleId: string,
+    executor: DatabaseExecutor = this.database,
+  ): Promise<void> {
+    await executor.delete(roles).where(eq(roles.id, roleId));
+  }
+
   async ensurePermissions(
-    permissionValues: { name: string; description: string }[],
+    permissionValues: {
+      name: string;
+      description: string;
+      isSystem?: boolean;
+    }[],
     executor: DatabaseExecutor = this.database,
   ) {
     await executor
@@ -115,18 +244,61 @@ export class AccessControlRepository {
     return rows.map((row) => row.userId);
   }
 
+  async findUserIdsForPermission(
+    permissionId: string,
+    executor: DatabaseExecutor = this.database,
+  ): Promise<string[]> {
+    const rows = await executor
+      .select({
+        userId: userRoles.userId,
+      })
+      .from(rolePermissions)
+      .innerJoin(userRoles, eq(userRoles.roleId, rolePermissions.roleId))
+      .where(eq(rolePermissions.permissionId, permissionId));
+
+    return [...new Set(rows.map((row) => row.userId))];
+  }
+
   async replaceUserRoles(
     userId: string,
     roleIds: string[],
+    organizationId?: string | null,
     executor: DatabaseExecutor = this.database,
   ): Promise<void> {
-    await executor.delete(userRoles).where(eq(userRoles.userId, userId));
+    if (organizationId === undefined) {
+      await executor.delete(userRoles).where(eq(userRoles.userId, userId));
+    } else if (organizationId === null) {
+      await executor
+        .delete(userRoles)
+        .where(and(eq(userRoles.userId, userId), isNull(userRoles.organizationId)));
+    } else {
+      await executor
+        .delete(userRoles)
+        .where(
+          and(
+            eq(userRoles.userId, userId),
+            eq(userRoles.organizationId, organizationId),
+          ),
+        );
+    }
 
     if (roleIds.length > 0) {
+      const assignedRoles =
+        organizationId === undefined
+          ? await this.findRolesByIds(roleIds, executor)
+          : await this.findRolesByIds(roleIds, executor).then((roles) =>
+              roles.filter(
+                (role) =>
+                  role.organizationId === null ||
+                  role.organizationId === organizationId,
+              ),
+            );
+
       await executor.insert(userRoles).values(
-        roleIds.map((roleId) => ({
+        assignedRoles.map((role) => ({
           userId,
-          roleId,
+          roleId: role.id,
+          organizationId: role.organizationId,
         })),
       );
     }
@@ -134,6 +306,7 @@ export class AccessControlRepository {
 
   async findRoleNamesForUser(
     userId: string,
+    organizationId: string | null = null,
     executor: DatabaseExecutor = this.database,
   ): Promise<string[]> {
     const rows = await executor
@@ -142,13 +315,30 @@ export class AccessControlRepository {
       })
       .from(userRoles)
       .innerJoin(roles, eq(userRoles.roleId, roles.id))
-      .where(eq(userRoles.userId, userId));
+      .where(
+        and(
+          eq(userRoles.userId, userId),
+          organizationId
+            ? or(
+                isNull(userRoles.organizationId),
+                eq(userRoles.organizationId, organizationId),
+              )
+            : isNull(userRoles.organizationId),
+          organizationId
+            ? or(
+                isNull(roles.organizationId),
+                eq(roles.organizationId, organizationId),
+              )
+            : isNull(roles.organizationId),
+        ),
+      );
 
     return rows.map((row) => row.roleName);
   }
 
   async findPermissionNamesForUser(
     userId: string,
+    organizationId: string | null = null,
     executor: DatabaseExecutor = this.database,
   ): Promise<string[]> {
     const rows = await executor
@@ -159,7 +349,23 @@ export class AccessControlRepository {
       .innerJoin(roles, eq(userRoles.roleId, roles.id))
       .innerJoin(rolePermissions, eq(rolePermissions.roleId, roles.id))
       .innerJoin(permissions, eq(rolePermissions.permissionId, permissions.id))
-      .where(eq(userRoles.userId, userId));
+      .where(
+        and(
+          eq(userRoles.userId, userId),
+          organizationId
+            ? or(
+                isNull(userRoles.organizationId),
+                eq(userRoles.organizationId, organizationId),
+              )
+            : isNull(userRoles.organizationId),
+          organizationId
+            ? or(
+                isNull(roles.organizationId),
+                eq(roles.organizationId, organizationId),
+              )
+            : isNull(roles.organizationId),
+        ),
+      );
 
     return [...new Set(rows.map((row) => row.permissionName))];
   }
@@ -217,13 +423,83 @@ export class AccessControlRepository {
 
   async findRoleByName(
     name: string,
+    organizationId: string | null = null,
     executor: DatabaseExecutor = this.database,
   ) {
     const [role] = await executor
       .select()
       .from(roles)
-      .where(eq(roles.name, name))
+      .where(
+        and(
+          eq(roles.name, name),
+          organizationId
+            ? eq(roles.organizationId, organizationId)
+            : isNull(roles.organizationId),
+        ),
+      )
       .limit(1);
     return role ?? null;
+  }
+
+  async findPermissionById(
+    permissionId: string,
+    executor: DatabaseExecutor = this.database,
+  ) {
+    const [permission] = await executor
+      .select()
+      .from(permissions)
+      .where(eq(permissions.id, permissionId))
+      .limit(1);
+    return permission ?? null;
+  }
+
+  async createPermission(
+    values: typeof permissions.$inferInsert,
+    executor: DatabaseExecutor = this.database,
+  ) {
+    const [permission] = await executor
+      .insert(permissions)
+      .values(values)
+      .returning();
+    return permission ?? null;
+  }
+
+  async updatePermission(
+    permissionId: string,
+    values: Partial<typeof permissions.$inferInsert>,
+    executor: DatabaseExecutor = this.database,
+  ) {
+    const [permission] = await executor
+      .update(permissions)
+      .set({
+        ...values,
+        updatedAt: new Date(),
+      })
+      .where(eq(permissions.id, permissionId))
+      .returning();
+    return permission ?? null;
+  }
+
+  async deletePermission(
+    permissionId: string,
+    executor: DatabaseExecutor = this.database,
+  ): Promise<void> {
+    await executor.delete(permissions).where(eq(permissions.id, permissionId));
+  }
+
+  async assignUserRole(
+    userId: string,
+    roleId: string,
+    organizationId: string | null,
+    executor: DatabaseExecutor = this.database,
+  ): Promise<void> {
+    await executor
+      .insert(userRoles)
+      .values({
+        userId,
+        roleId,
+        organizationId,
+      })
+      .onConflictDoNothing();
   }
 }

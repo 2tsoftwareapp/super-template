@@ -1,12 +1,25 @@
 import type { RoleRecord } from './access-control.repository.port';
-import type { RoleView } from './access-control.types';
+import type { PermissionView, RoleView } from './access-control.types';
 
 export class AccessControlMapper {
-  toRoleView(role: RoleRecord): RoleView {
+  toPermissionView(permission: PermissionView): PermissionView {
+    return {
+      id: permission.id,
+      name: permission.name,
+      description: permission.description,
+      isSystem: permission.isSystem,
+    };
+  }
+
+  toRoleView(role: RoleRecord, permissions: PermissionView[] = []): RoleView {
     return {
       id: role.id,
+      organizationId: role.organizationId,
       name: role.name,
       description: role.description,
+      scope: role.organizationId ? 'organization' : 'platform',
+      isSystem: role.isSystem,
+      permissions,
     };
   }
 }

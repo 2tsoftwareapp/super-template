@@ -18,16 +18,24 @@ export class AccessProfileUseCase {
     private readonly accessProfileCache: AccessProfileCache,
   ) {}
 
-  async getAccessProfile(userId: string): Promise<AccessProfileView> {
-    const cached = await this.accessProfileCache.get(userId);
+  async getAccessProfile(
+    userId: string,
+    organizationId: string | null = null,
+  ): Promise<AccessProfileView> {
+    const cached = organizationId
+      ? null
+      : await this.accessProfileCache.get(userId);
 
     if (cached) {
       return cached;
     }
 
     const [roles, permissions] = await Promise.all([
-      this.accessControlRepository.findRoleNamesForUser(userId),
-      this.accessControlRepository.findPermissionNamesForUser(userId),
+      this.accessControlRepository.findRoleNamesForUser(userId, organizationId),
+      this.accessControlRepository.findPermissionNamesForUser(
+        userId,
+        organizationId,
+      ),
     ]);
 
     const profile: AccessProfileView = {
@@ -35,7 +43,9 @@ export class AccessProfileUseCase {
       permissions,
     };
 
-    await this.accessProfileCache.set(userId, profile);
+    if (!organizationId) {
+      await this.accessProfileCache.set(userId, profile);
+    }
 
     return profile;
   }
@@ -50,6 +60,18 @@ export class AccessProfileUseCase {
   ): Promise<void> {
     const userIds = await this.accessControlRepository.findUserIdsForRole(
       roleId,
+      executor,
+    );
+
+    await this.accessProfileCache.invalidateUsers(userIds);
+  }
+
+  async invalidateUsersForPermission(
+    permissionId: string,
+    executor?: DatabaseExecutor,
+  ): Promise<void> {
+    const userIds = await this.accessControlRepository.findUserIdsForPermission(
+      permissionId,
       executor,
     );
 

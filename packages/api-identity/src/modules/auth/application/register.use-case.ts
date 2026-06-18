@@ -71,6 +71,7 @@ export class RegisterUseCase {
         await this.accessControlService.replaceUserRoles(
           user.id,
           [userRole.id],
+          undefined,
           transaction,
         );
 

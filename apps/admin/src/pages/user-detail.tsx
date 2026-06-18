@@ -400,9 +400,9 @@ export function UserDetailPage() {
                         </span>
                         <div className="min-w-0">
                           <p className="text-sm font-medium">{formatRoleName(role.name)}</p>
-                          {role.description && (
+                          {typeof role.description === "string" && role.description ? (
                             <p className="truncate text-xs text-muted-foreground">{role.description}</p>
-                          )}
+                          ) : null}
                         </div>
                       </button>
                     );

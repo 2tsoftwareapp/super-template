@@ -15,7 +15,12 @@ import { DATABASE, runInTransaction } from '@repo/api-database';
 
 import type { UserView } from './users.types';
 
+import { ROLE_NAMES } from '../../access-control/access-control.constants';
 import { AccessControlService } from '../../access-control/application/access-control.service';
+import {
+  assertCanAssignRoleTargets,
+  assertRoleScopeCanBeAssigned,
+} from '../../access-control/domain/role-assignment.policy';
 import { GetUserUseCase } from './get-user.use-case';
 import {
   USERS_REPOSITORY,
@@ -58,7 +63,12 @@ export class ReplaceUserRolesUseCase {
     }
 
     const [currentAccess, desiredRoles] = await Promise.all([
-      this.accessControlService.getAccessProfile(userId),
+      this.accessControlService.getAccessProfile(
+        userId,
+        actor.roles.includes(ROLE_NAMES.SUPER_ADMIN)
+          ? null
+          : actor.organizationId,
+      ),
       this.accessControlService.validateRoleIds(roleIds),
     ]);
 
@@ -67,11 +77,16 @@ export class ReplaceUserRolesUseCase {
       currentAccess.roles,
       desiredRoles.map((role) => role.name),
     );
+    assertCanAssignRoleTargets(actor, desiredRoles);
+    desiredRoles.forEach((role) => assertRoleScopeCanBeAssigned(role));
 
     await runInTransaction(this.database, async (transaction) => {
       await this.accessControlService.replaceUserRoles(
         userId,
         roleIds,
+        actor.roles.includes(ROLE_NAMES.SUPER_ADMIN)
+          ? undefined
+          : actor.organizationId,
         transaction,
       );
       await this.auditWriter.log(
