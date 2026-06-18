@@ -1,5 +1,11 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "extends": ["//"],
-  "tags": ["layer:workspace"]
+  "tags": ["layer:workspace"],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": []
+    }
+  }
 }

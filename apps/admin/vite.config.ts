@@ -7,6 +7,12 @@ const apiPort = process.env.API_PORT ?? "3001";
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  build: {
+    // Bundle budget: route-level code splitting keeps the initial chunk well
+    // under this limit. Lowering it from Vite's 500 kB default surfaces
+    // regressions early.
+    chunkSizeWarningLimit: 350,
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

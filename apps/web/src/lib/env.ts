@@ -3,7 +3,9 @@ import { resolve } from "node:path";
 import { z } from "zod";
 
 loadEnv({ path: resolve(process.cwd(), ".env"), quiet: true });
+loadEnv({ path: resolve(process.cwd(), ".env.example"), quiet: true });
 loadEnv({ path: resolve(process.cwd(), "../../.env"), quiet: true });
+loadEnv({ path: resolve(process.cwd(), "../../.env.example"), quiet: true });
 
 const booleanFromString = z.preprocess((value) => {
   if (typeof value === "boolean") {

@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-.PHONY: help bootstrap dev dev-api dev-web dev-mobile infra-up infra-down db-generate db-migrate db-seed db-reset db-studio generate lint format test test-api test-web test-mobile build verify
+.PHONY: help bootstrap dev dev-api dev-web dev-mobile infra-up infra-down db-generate db-migrate db-seed db-reset db-studio generate generate-check lint format test test-api test-web test-mobile build verify
 
 help:
 	@printf '%s\n' \
@@ -19,6 +19,7 @@ help:
 		'  db-reset     Reset database' \
 		'  db-studio    Open Drizzle Studio' \
 		'  generate     Regenerate OpenAPI + Dart client' \
+		'  generate-check Verify generated contracts are up to date (non-mutating)' \
 		'  lint         Lint all packages' \
 		'  format       Format all packages' \
 		'  test         Run all tests' \
@@ -46,7 +47,7 @@ dev-admin:
 	set -a; source .env; set +a; pnpm --filter admin dev
 
 dev-mobile:
-	cd apps/mobile && flutter run --dart-define-from-file=env/dev.json
+	sh scripts/mobile.sh dev
 
 infra-up:
 	docker compose -f infra/docker-compose.yml up -d
@@ -72,12 +73,15 @@ db-studio:
 generate:
 	./scripts/generate-contracts.sh
 
+generate-check:
+	./scripts/generate-check.sh
+
 lint:
 	pnpm lint
 
 format:
 	pnpm format
-	cd apps/mobile && dart format --set-exit-if-changed .
+	sh scripts/mobile.sh format
 
 test:
 	pnpm test
@@ -89,7 +93,7 @@ test-web:
 	pnpm --filter web test
 
 test-mobile:
-	cd apps/mobile && flutter test
+	sh scripts/mobile.sh test
 
 build:
 	pnpm build

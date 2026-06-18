@@ -28,7 +28,7 @@
 - contracts regenerate cleanly
 - generated files are not stale
 - lint, typecheck, test, and build all pass
-- Flutter format, analyze, and test all pass
+- Flutter format-check, analyze, and test all pass
 
 ## Out of Scope for v1
 

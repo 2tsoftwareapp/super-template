@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
-required_tools=(node pnpm docker flutter psql)
+required_tools=(node pnpm docker psql)
 missing_tools=()
 
 for tool in "${required_tools[@]}"; do
@@ -27,7 +27,11 @@ source .env
 set +a
 
 pnpm install
-(cd apps/mobile && flutter pub get)
+if sh scripts/mobile.sh doctor >/dev/null 2>&1; then
+  sh scripts/mobile.sh setup
+else
+  printf '%s\n' 'Flutter unavailable; skipping apps/mobile dependency bootstrap on this machine.'
+fi
 docker compose -f infra/docker-compose.yml --env-file .env up -d
 ./scripts/wait-for-postgres.sh
 pnpm --filter api db:migrate

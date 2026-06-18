@@ -6,7 +6,9 @@
   "exports": {
     ".": "./src/index.ts",
     "./common/*": "./src/common/*",
-    "./config/*": "./src/config/*"
+    "./config/*": "./src/config/*",
+    "./config/app-config.module": "./src/config/app-config.module.ts",
+    "./config/environment.service": "./src/config/environment.service.ts"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json --noEmit",

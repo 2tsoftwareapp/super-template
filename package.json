@@ -9,13 +9,21 @@
   "scripts": {
     "lint:policy": "sh scripts/check-source-policy.sh && sh scripts/check-package-cycles.sh && pnpm exec turbo boundaries",
     "build": "turbo run build",
-    "dev": "turbo run dev --parallel",
+    "dev": "turbo run dev",
     "lint": "pnpm run lint:policy && turbo run lint",
+    "mobile:doctor": "sh scripts/mobile.sh doctor",
+    "mobile:setup": "sh scripts/mobile.sh setup",
+    "mobile:dev": "sh scripts/mobile.sh dev",
+    "mobile:test": "sh scripts/mobile.sh test",
+    "mobile:analyze": "sh scripts/mobile.sh analyze",
+    "mobile:format": "sh scripts/mobile.sh format",
+    "mobile:format-check": "sh scripts/mobile.sh format-check",
     "format": "turbo run format",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck",
     "generate": "turbo run generate",
-    "verify": "pnpm run generate && pnpm run lint && pnpm run typecheck && pnpm run test && pnpm run build"
+    "generate:check": "sh ./scripts/generate-check.sh",
+    "verify": "sh ./scripts/verify.sh"
   },
   "devDependencies": {
     "@eslint/js": "9.39.1",

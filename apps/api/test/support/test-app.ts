@@ -77,15 +77,17 @@ const resolveTestDatabaseUrl = () => process.env.DATABASE_URL_TEST;
 const resolveTestDatabaseAdminUrl = () =>
   process.env.DATABASE_URL_TEST_ADMIN ?? process.env.DATABASE_URL_TEST;
 
-const ensureTestDatabaseExists = async (databaseUrl: string) => {
-  const url = new URL(databaseUrl);
-  const databaseName = url.pathname.replace(/^\//, '');
+const ensureTestDatabaseExists = async (
+  databaseUrl: string,
+  adminDatabaseUrl: string,
+) => {
+  const databaseName = new URL(databaseUrl).pathname.replace(/^\//, '');
 
   if (!databaseName) {
     throw new Error('Test database name could not be resolved');
   }
 
-  const adminUrl = new URL(databaseUrl);
+  const adminUrl = new URL(adminDatabaseUrl);
   adminUrl.pathname = '/postgres';
 
   const adminPool = new Pool({
@@ -157,7 +159,7 @@ export const resetTestDatabase = async (): Promise<void> => {
     );
   }
 
-  await ensureTestDatabaseExists(databaseUrl);
+  await ensureTestDatabaseExists(databaseUrl, adminDatabaseUrl);
   await ensureRestrictedTestRole(adminDatabaseUrl);
 
   const pool = new Pool({

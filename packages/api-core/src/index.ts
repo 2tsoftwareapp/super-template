@@ -29,7 +29,6 @@ export * from './common/utils/normalize-email';
 export * from './common/utils/opaque-token';
 export * from './common/utils/redact';
 export * from './common/utils/require-organization';
-export { AppConfigModule } from './config/app-config.module';
 export { APP_ENVIRONMENT } from './config/config.constants';
 export type { AppEnvironment } from './config/env.schema';
 export { validateEnvironment } from './config/env.schema';

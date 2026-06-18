@@ -9,6 +9,11 @@
 - `make test-api`
 - `make test-web`
 - `make test-mobile`
+- `pnpm run mobile:doctor`
+- `pnpm run mobile:setup`
+- `pnpm run mobile:dev`
+- `pnpm run mobile:test`
+- `pnpm run mobile:format-check`
 
 ## Running Individual Apps
 
@@ -19,6 +24,17 @@
 
 `make dev` starts PostgreSQL, Mailpit, NestJS, Next.js, and the separate admin Vite app. Flutter still runs separately on a selected device or simulator.
 
+On Windows/PowerShell, prefer the Node-based mobile commands over shell-specific `make` targets:
+
+```powershell
+pnpm run mobile:doctor
+pnpm run mobile:setup
+pnpm run mobile:dev
+```
+
+`mobile:doctor` validates `flutter` and `dart` on `PATH` and then runs `flutter doctor`. `mobile:setup` runs `flutter pub get` inside `apps/mobile`.
+`mobile:format-check` runs `dart format --set-exit-if-changed .` inside `apps/mobile`.
+
 ## Emulator Networking
 
 - iOS simulator: `http://localhost:3001/api/v1`
@@ -26,6 +42,12 @@
 - physical device: use the host machine LAN IP
 
 Adjust `apps/mobile/env/*.json` or pass a different `--dart-define-from-file`.
+
+Example:
+
+```powershell
+sh scripts/mobile.sh dev --env env/staging.json
+```
 
 ## Contract Regeneration
 

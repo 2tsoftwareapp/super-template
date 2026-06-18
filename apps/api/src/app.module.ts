@@ -14,7 +14,6 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import {
   APP_LOGGER,
-  AppConfigModule,
   AppExceptionFilter,
   type AppLogger,
   EnvironmentService,
@@ -26,6 +25,7 @@ import {
   RequestLoggerMiddleware,
   ResponseEnvelopeInterceptor,
 } from '@repo/api-core';
+import { AppConfigModule } from '@repo/api-core/config/app-config.module';
 import { DatabaseModule, TenantContextService } from '@repo/api-database';
 import { HealthModule } from '@repo/api-health';
 import { IdentityModule } from '@repo/api-identity';

@@ -7,6 +7,23 @@ Flutter client for Super Template.
 - `make dev-mobile` launches the app with `apps/mobile/env/dev.json`
 - `make test-mobile` runs the Flutter test suite
 - `make generate` refreshes the generated API client before Flutter codegen
+- `pnpm run mobile:doctor` checks Flutter/Dart and runs `flutter doctor`
+- `pnpm run mobile:setup` runs `flutter pub get`
+- `pnpm run mobile:dev` launches the app without relying on Make/bash
+- `pnpm run mobile:format-check` validates Dart formatting without rewriting files
+
+## Windows / PowerShell
+
+If you are on a Windows company PC, use the root mobile scripts instead of shell-specific commands:
+
+```powershell
+pnpm run mobile:doctor
+pnpm run mobile:setup
+pnpm run mobile:dev
+pnpm run mobile:test
+```
+
+If Flutter is not installed yet, `mobile:doctor` fails early with the expected next step instead of dropping you into a deeper Make/bash error.
 
 ## Environment Files
 

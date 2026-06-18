@@ -8,9 +8,13 @@ import { EnvironmentService } from './environment.service';
 
 const envFilePaths = [
   resolve(process.cwd(), '.env'),
+  resolve(process.cwd(), '.env.example'),
   resolve(process.cwd(), '../../.env'),
+  resolve(process.cwd(), '../../.env.example'),
   resolve(__dirname, '../../../../.env'),
+  resolve(__dirname, '../../../../.env.example'),
   resolve(__dirname, '../../../.env'),
+  resolve(__dirname, '../../../.env.example'),
 ];
 
 @Global()

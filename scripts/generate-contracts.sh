@@ -4,6 +4,10 @@ set -eu
 ROOT_DIR=$(pwd)
 cd "$ROOT_DIR"
 
+has_command() {
+  command -v "$1" >/dev/null 2>&1
+}
+
 run_step() {
   label=$1
   shift
@@ -21,6 +25,7 @@ run_step() {
   rm -f "$log_file"
 }
 
+pnpm --filter api openapi:generate
 pnpm --filter api contract:generate
 
 if [ "${SKIP_FLUTTER_GENERATION:-}" = "1" ] || [ "${CI:-}" = "true" ]; then
@@ -33,8 +38,14 @@ if ! docker info >/dev/null 2>&1; then
   exit 0
 fi
 
-rm -rf apps/mobile/lib/generated/api
-mkdir -p apps/mobile/lib/generated/api
+if ! has_command dart; then
+  printf '[generate] Dart unavailable; keeping existing Dart client at apps/mobile/lib/generated/api\n' >&2
+  exit 0
+fi
+
+TMP_GEN_DIR="$ROOT_DIR/apps/mobile/lib/generated/.api-tmp"
+rm -rf "$TMP_GEN_DIR"
+mkdir -p "$TMP_GEN_DIR"
 run_step \
   "Generate Dart Dio client" \
   docker run --rm \
@@ -43,10 +54,10 @@ run_step \
   openapitools/openapi-generator-cli:v7.16.0 generate \
   -g dart-dio \
   -i /local/apps/api/openapi.json \
-  -o /local/apps/mobile/lib/generated/api \
+  -o /local/apps/mobile/lib/generated/.api-tmp \
   --additional-properties=pubName=super_template_api,pubAuthor=OpenAI,serializationLibrary=built_value,useEnumExtension=true,nullableFields=true
 (
-  cd apps/mobile/lib/generated/api
+  cd "$TMP_GEN_DIR"
   run_step "Install Dart client dependencies" dart pub get
   run_step "Build generated Dart serializers" dart run build_runner build
   node -e "
@@ -81,3 +92,6 @@ walk('lib');
   rm -rf .dart_tool doc test .openapi-generator pubspec.lock
   run_step "Format generated Dart client" dart format .
 )
+
+rm -rf apps/mobile/lib/generated/api
+mv "$TMP_GEN_DIR" apps/mobile/lib/generated/api

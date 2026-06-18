@@ -68,6 +68,14 @@ Run Flutter separately because it needs a selected simulator or device:
 make dev-mobile
 ```
 
+On Windows/PowerShell, use the cross-platform mobile scripts instead of relying on `make`:
+
+```powershell
+pnpm run mobile:doctor
+pnpm run mobile:setup
+pnpm run mobile:dev
+```
+
 ## Local URLs
 
 - Web: `http://localhost:3000`
@@ -117,6 +125,11 @@ See [apps/mobile/README.md](apps/mobile/README.md#push-notifications-fcm) for st
 - `make dev-web`
 - `make dev-admin`
 - `make dev-mobile`
+- `pnpm run mobile:doctor`
+- `pnpm run mobile:setup`
+- `pnpm run mobile:dev`
+- `pnpm run mobile:test`
+- `pnpm run mobile:format-check`
 - `make infra-up`
 - `make infra-down`
 - `make db-generate`
@@ -165,9 +178,9 @@ This regenerates:
 
 - API: `pnpm --filter api test`
 - Web: `pnpm --filter web test`
-- Mobile: `cd apps/mobile && flutter test`
+- Mobile: `pnpm run mobile:test`
 
-`make verify` runs generation, lint, typecheck, tests, builds, Flutter format check, Flutter analyze, and Flutter tests.
+`make verify` runs generation, lint, typecheck, tests, and builds. When Flutter/Dart are available it also runs Flutter format-check, analyze, and tests; otherwise it skips the mobile verification path with an explicit message.
 
 ## Seeded Development Accounts
 
@@ -183,6 +196,7 @@ Passwords come from `.env`:
 
 - If `make bootstrap` fails waiting for PostgreSQL, inspect `docker compose -f infra/docker-compose.yml ps` and container logs.
 - If the web app cannot authenticate, verify `WEB_ORIGIN`, `API_INTERNAL_URL`, and cookie settings.
+- If Flutter is not installed on this machine yet, start with `pnpm run mobile:doctor`; it prints the expected next step instead of failing deep inside Make/bash.
 - If Flutter cannot reach the backend on emulator or device, use the environment guidance in [Development](docs/development.md).
 - If generated client files drift, rerun `make generate`.
 
