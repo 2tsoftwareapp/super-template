@@ -60,7 +60,7 @@ export class CreateAdminUserUseCase {
             displayName: input.displayName,
             avatarUrl: input.avatarUrl ?? null,
             status: input.status ?? 'ACTIVE',
-            emailVerifiedAt: input.status === 'PENDING' ? null : new Date(),
+            emailVerifiedAt: null,
           },
           transaction,
         );
@@ -75,7 +75,9 @@ export class CreateAdminUserUseCase {
             ? desiredRoleIds.map((role) => role.name)
             : [ROLE_NAMES.USER];
 
-        desiredRoleIds.forEach((role) => assertRoleScopeCanBeAssigned(role));
+        desiredRoleIds.forEach((role) =>
+          assertRoleScopeCanBeAssigned(role, actor),
+        );
         assertCanAssignRoleTargets(actor, desiredRoleIds);
         this.accessControlService.assertCanAssignUserRoles(
           actor,

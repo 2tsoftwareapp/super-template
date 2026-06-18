@@ -21,6 +21,7 @@
     "@nestjs/platform-express": "11.1.27",
     "@nestjs/swagger": "11.4.4",
     "@nestjs/throttler": "6.5.0",
+    "@repo/api-contract": "workspace:*",
     "@repo/api-core": "workspace:*",
     "@repo/api-database": "workspace:*",
     "argon2": "0.44.0",

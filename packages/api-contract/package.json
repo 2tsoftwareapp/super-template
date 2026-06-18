@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./sort/multi-sort": "./src/sort/multi-sort.ts"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",

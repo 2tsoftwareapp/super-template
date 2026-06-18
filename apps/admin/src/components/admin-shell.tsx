@@ -114,13 +114,13 @@ export function AdminShell() {
           <button
             type="button"
             aria-label="Close navigation"
-            className="fixed inset-0 bg-foreground/35 backdrop-blur-[2px] lg:hidden"
+            className="fixed inset-0 z-30 bg-foreground/35 backdrop-blur-[2px] lg:hidden"
             onClick={() => setMobileMenuOpen(false)}
           />
         ) : null}
         <div
           className={cn(
-            "fixed inset-y-0 left-0 w-[280px] border-r border-border bg-card transition-transform lg:hidden",
+            "fixed inset-y-0 left-0 z-40 w-[280px] border-r border-border bg-card transition-transform lg:hidden",
             mobileMenuOpen ? "translate-x-0" : "-translate-x-full",
           )}
         >
@@ -247,7 +247,7 @@ function DesktopSidebar({
   return (
     <aside
       className={cn(
-        "sticky top-0 hidden h-dvh shrink-0 flex-col border-r border-border bg-card transition-all duration-200 lg:flex",
+        "sticky top-0 z-20 hidden h-dvh shrink-0 flex-col border-r border-border bg-card transition-all duration-200 lg:flex",
         collapsed ? "w-[68px]" : "w-[272px]",
       )}
     >
@@ -390,7 +390,7 @@ function TopHeader({
   const { collapsed, setCollapsed } = useSidebar();
 
   return (
-    <header className="sticky top-0 flex min-h-14 shrink-0 items-center justify-between border-b border-border bg-card px-3 md:px-6">
+    <header className="sticky top-0 z-20 flex min-h-14 shrink-0 items-center justify-between border-b border-border bg-card px-3 md:px-6">
       <div className="flex min-w-0 items-center gap-2">
         <Button
           variant="ghost"

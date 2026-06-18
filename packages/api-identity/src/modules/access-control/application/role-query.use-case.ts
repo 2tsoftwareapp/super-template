@@ -29,7 +29,9 @@ export class RoleQueryUseCase {
 
     for (const row of rows) {
       const existing = grouped.get(row.userId) ?? [];
-      existing.push(row.roleName);
+      if (!existing.includes(row.roleName)) {
+        existing.push(row.roleName);
+      }
       grouped.set(row.userId, existing);
     }
 

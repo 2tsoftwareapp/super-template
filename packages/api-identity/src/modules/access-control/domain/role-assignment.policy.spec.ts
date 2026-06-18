@@ -122,7 +122,7 @@ describe('RoleAssignmentPolicy', () => {
     ).not.toThrow();
   });
 
-  it('blocks platform ADMIN role assignment', () => {
+  it('blocks platform ADMIN role assignment for non-super-admins', () => {
     expect(() =>
       assertRoleScopeCanBeAssigned({
         name: ROLE_NAMES.ADMIN,
@@ -130,6 +130,30 @@ describe('RoleAssignmentPolicy', () => {
         isSystem: true,
       }),
     ).toThrow(AppError);
+
+    expect(() =>
+      assertRoleScopeCanBeAssigned(
+        {
+          name: ROLE_NAMES.ADMIN,
+          organizationId: null,
+          isSystem: true,
+        },
+        admin,
+      ),
+    ).toThrow(AppError);
+  });
+
+  it('allows super admin to assign platform ADMIN during user management', () => {
+    expect(() =>
+      assertRoleScopeCanBeAssigned(
+        {
+          name: ROLE_NAMES.ADMIN,
+          organizationId: null,
+          isSystem: true,
+        },
+        superAdmin,
+      ),
+    ).not.toThrow();
   });
 
   it('allows organization ADMIN role assignment', () => {

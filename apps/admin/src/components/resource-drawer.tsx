@@ -30,7 +30,7 @@ export function ResourceDrawer({
       <button
         type="button"
         aria-label="Close panel"
-        className="fixed inset-0 bg-foreground/35 backdrop-blur-[2px]"
+        className="fixed inset-0 z-40 bg-foreground/35 backdrop-blur-[2px]"
         onClick={onClose}
       />
       <section
@@ -38,7 +38,7 @@ export function ResourceDrawer({
         role="dialog"
         aria-labelledby="resource-drawer-title"
         className={cn(
-          "fixed right-0 top-0 flex h-dvh w-full max-w-[440px] flex-col border-l border-border bg-card shadow-2xl",
+          "fixed right-0 top-0 z-50 flex h-dvh w-full max-w-[440px] flex-col border-l border-border bg-card shadow-2xl",
           className,
         )}
       >

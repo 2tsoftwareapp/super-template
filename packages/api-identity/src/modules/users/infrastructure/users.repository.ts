@@ -10,14 +10,15 @@ import { DATABASE } from '@repo/api-database';
 import { roles, userRoles, users } from '@repo/api-database';
 import { and, asc, count, desc, eq, inArray, isNull, sql } from 'drizzle-orm';
 
+import type { UserSortCriterion } from '../application/user-sort';
+
 interface ListUsersParams {
   page: number;
   limit: number;
   search?: string;
   status?: 'PENDING' | 'ACTIVE' | 'BLOCKED';
   role?: string;
-  sortField: 'createdAt' | 'displayName' | 'email' | 'status';
-  sortOrder: 'asc' | 'desc';
+  sort: UserSortCriterion[];
 }
 
 const USER_SORT_FIELDS = {
@@ -120,7 +121,10 @@ export class UsersRepository {
       filters.push(inArray(users.id, roleUserIds));
     }
 
-    const sortColumn = USER_SORT_FIELDS[params.sortField];
+    const sortClauses = params.sort.map((criterion) => {
+      const sortColumn = USER_SORT_FIELDS[criterion.field];
+      return criterion.order === 'asc' ? asc(sortColumn) : desc(sortColumn);
+    });
     const whereClause = filters.length > 0 ? and(...filters) : undefined;
     const offset = (params.page - 1) * params.limit;
 
@@ -129,9 +133,7 @@ export class UsersRepository {
         .select()
         .from(users)
         .where(whereClause)
-        .orderBy(
-          params.sortOrder === 'asc' ? asc(sortColumn) : desc(sortColumn),
-        )
+        .orderBy(...sortClauses)
         .limit(params.limit)
         .offset(offset),
       executor.select({ total: count() }).from(users).where(whereClause),

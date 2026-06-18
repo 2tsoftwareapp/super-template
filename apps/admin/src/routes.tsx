@@ -14,7 +14,7 @@ const DashboardPage = lazy(() =>
   import("./pages/dashboard").then((m) => ({ default: m.DashboardPage })),
 );
 const UsersPage = lazy(() =>
-  import("./pages/users").then((m) => ({ default: m.UsersPage })),
+  import("./pages/users/users-page").then((m) => ({ default: m.UsersPage })),
 );
 const UserDetailPage = lazy(() =>
   import("./pages/user-detail").then((m) => ({ default: m.UserDetailPage })),

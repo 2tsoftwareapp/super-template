@@ -18,6 +18,7 @@ export default defineConfig({
     maxWorkers: 1,
     include: [
       'test/**/*.{test,spec}.ts',
+      '../../packages/api-contract/src/**/*.{test,spec}.ts',
       '../../packages/api-core/src/**/*.{test,spec}.ts',
       '../../packages/api-identity/src/**/*.{test,spec}.ts',
       '../../packages/api-workspace/src/**/*.{test,spec}.ts',
@@ -25,6 +26,8 @@ export default defineConfig({
   },
   resolve: {
     alias: [
+      packageAlias('api-contract'),
+      packageSubpathAlias('api-contract'),
       packageAlias('api-core'),
       packageSubpathAlias('api-core'),
       packageAlias('api-database'),

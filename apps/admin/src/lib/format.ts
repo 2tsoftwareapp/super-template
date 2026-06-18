@@ -21,3 +21,16 @@ export function statusProps(status: string): {
     return { variant: "outline", className: "text-destructive border-destructive/40" };
   return { variant: "secondary" };
 }
+
+export function formatDateTime(dateStr: string | undefined | null): string {
+  if (!dateStr) return "—";
+  return new Date(dateStr).toLocaleString(undefined, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
+}
+
+export function truncateId(id: string, length = 8): string {
+  if (id.length <= length) return id;
+  return `${id.slice(0, length)}…`;
+}

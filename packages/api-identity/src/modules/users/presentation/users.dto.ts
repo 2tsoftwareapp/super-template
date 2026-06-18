@@ -141,6 +141,15 @@ export class AdminUsersQueryDto extends PaginationQueryDto {
   role?: string;
 
   @ApiPropertyOptional({
+    description:
+      'Comma-separated sort rules in field:order format, e.g. status:asc,createdAt:desc',
+    example: 'status:asc,createdAt:desc',
+  })
+  @IsOptional()
+  @IsString()
+  sort?: string;
+
+  @ApiPropertyOptional({
     enum: ['createdAt', 'displayName', 'email', 'status'],
     default: 'createdAt',
   })

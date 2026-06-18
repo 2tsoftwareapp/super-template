@@ -11,9 +11,9 @@ import {
 } from "./roles";
 
 const roles: RoleDto[] = [
-  { id: "1", name: "SUPER_ADMIN" } as RoleDto,
-  { id: "2", name: "ADMIN" } as RoleDto,
-  { id: "3", name: "USER" } as RoleDto,
+  { id: "1", name: "SUPER_ADMIN", scope: "platform" } as RoleDto,
+  { id: "2", name: "ADMIN", scope: "platform" } as RoleDto,
+  { id: "3", name: "USER", scope: "platform" } as RoleDto,
 ];
 
 describe("formatRoleName", () => {
@@ -34,8 +34,14 @@ describe("isPrivilegedRoleName", () => {
 });
 
 describe("canAssignRole", () => {
-  it("lets a super admin assign any role", () => {
+  it("blocks SUPER_ADMIN for everyone", () => {
+    expect(canAssignRole(["SUPER_ADMIN"], "SUPER_ADMIN")).toBe(false);
+    expect(canAssignRole(["ADMIN"], "SUPER_ADMIN")).toBe(false);
+  });
+
+  it("lets a super admin assign ADMIN and USER", () => {
     expect(canAssignRole(["SUPER_ADMIN"], "ADMIN")).toBe(true);
+    expect(canAssignRole(["SUPER_ADMIN"], "USER")).toBe(true);
   });
 
   it("limits non-super-admins to the USER role", () => {
@@ -51,8 +57,27 @@ describe("getAssignableRoles", () => {
     ]);
   });
 
-  it("returns all roles for a super admin", () => {
-    expect(getAssignableRoles(["SUPER_ADMIN"], roles)).toHaveLength(3);
+  it("returns ADMIN and USER for a super admin", () => {
+    expect(getAssignableRoles(["SUPER_ADMIN"], roles).map((r) => r.name)).toEqual([
+      "ADMIN",
+      "USER",
+    ]);
+  });
+
+  it("deduplicates by name and prefers platform roles in the picker", () => {
+    const rolesWithOrgScopedDuplicates: RoleDto[] = [
+      { id: "1", name: "SUPER_ADMIN", scope: "platform" } as RoleDto,
+      { id: "2", name: "ADMIN", scope: "platform" } as RoleDto,
+      { id: "3", name: "ADMIN", scope: "organization" } as RoleDto,
+      { id: "4", name: "ADMIN", scope: "organization" } as RoleDto,
+      { id: "5", name: "USER", scope: "platform" } as RoleDto,
+    ];
+
+    expect(
+      getAssignableRoles(["SUPER_ADMIN"], rolesWithOrgScopedDuplicates).map(
+        (r) => r.id,
+      ),
+    ).toEqual(["2", "5"]);
   });
 });
 

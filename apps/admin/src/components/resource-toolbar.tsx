@@ -36,8 +36,18 @@ export function ResourceToolbar({
               value={search}
               onChange={(event) => onSearchChange(event.target.value)}
               placeholder={searchPlaceholder}
-              className="pl-9"
+              className={cn("pl-9", search && "pr-9")}
             />
+            {search ? (
+              <button
+                type="button"
+                onClick={() => onSearchChange("")}
+                aria-label="Clear search"
+                className="absolute inset-y-0 right-0 flex w-9 items-center justify-center text-muted-foreground transition-colors hover:text-foreground"
+              >
+                <X className="size-4" />
+              </button>
+            ) : null}
           </div>
           {filters}
           {hasFilters && onClearFilters ? (

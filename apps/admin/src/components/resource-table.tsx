@@ -24,14 +24,21 @@ export function ResourceTable<T>({
   emptyTitle,
   emptyDescription,
   onRowClick,
+  binarySort = false,
+  multiSort = false,
 }: {
   table: ReactTable<T>;
   isLoading?: boolean;
   emptyTitle: string;
   emptyDescription?: string;
   onRowClick?: (row: Row<T>) => void;
+  /** When true, sorted columns show only asc/desc icons (no neutral state). */
+  binarySort?: boolean;
+  /** When true, show sort priority badges for multi-column sorting. */
+  multiSort?: boolean;
 }) {
   const columnCount = table.getAllLeafColumns().length;
+  const activeSortCount = table.getState().sorting.length;
 
   return (
     <Table>
@@ -41,6 +48,9 @@ export function ResourceTable<T>({
             {group.headers.map((header) => {
               const sorted = header.column.getIsSorted();
               const canSort = header.column.getCanSort();
+              const sortIndex = header.column.getSortIndex();
+              const showSortPriority =
+                multiSort && activeSortCount > 1 && sortIndex >= 0;
               return (
                 <TableHead
                   key={header.id}
@@ -50,12 +60,17 @@ export function ResourceTable<T>({
                   {header.isPlaceholder ? null : (
                     <span className="inline-flex items-center gap-1">
                       {flexRender(header.column.columnDef.header, header.getContext())}
+                      {showSortPriority ? (
+                        <span className="inline-flex size-4 items-center justify-center rounded-full bg-muted text-[10px] font-medium text-muted-foreground">
+                          {sortIndex + 1}
+                        </span>
+                      ) : null}
                       {canSort ? (
                         sorted === "asc" ? (
                           <ChevronUp />
                         ) : sorted === "desc" ? (
                           <ChevronDown />
-                        ) : (
+                        ) : binarySort ? null : (
                           <ArrowUpDown className="opacity-40" />
                         )
                       ) : null}

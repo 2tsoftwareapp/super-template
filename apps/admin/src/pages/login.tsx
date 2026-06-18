@@ -12,6 +12,7 @@ import { Button } from "../components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
+import { PasswordInput } from "../components/ui/password-input";
 import { setStoredAuthTokens } from "../lib/auth";
 import { webFetch } from "../lib/http";
 import { sessionQueryKey } from "../lib/session";
@@ -99,7 +100,7 @@ export function LoginPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
-                <Input id="password" type="password" {...form.register("password")} />
+                <PasswordInput id="password" {...form.register("password")} />
               </div>
               {mutation.isError && (
                 <Alert>

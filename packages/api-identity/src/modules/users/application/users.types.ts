@@ -1,3 +1,5 @@
+import type { UserSortCriterion } from './user-sort';
+
 export type UserStatus = 'PENDING' | 'ACTIVE' | 'BLOCKED';
 
 export type UserSortField = 'createdAt' | 'displayName' | 'email' | 'status';
@@ -27,8 +29,7 @@ export interface ListUsersQuery {
   search?: string;
   status?: UserStatus;
   role?: string;
-  sortField: UserSortField;
-  sortOrder: 'asc' | 'desc';
+  sort: UserSortCriterion[];
 }
 
 export interface CreateAdminUserCommand {

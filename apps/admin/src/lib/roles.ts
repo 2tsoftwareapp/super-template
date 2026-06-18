@@ -13,8 +13,12 @@ export function isPrivilegedRoleName(name: string) {
 }
 
 export function canAssignRole(actorRoles: string[], roleName: string) {
+  if (roleName === "SUPER_ADMIN") {
+    return false;
+  }
+
   if (actorRoles.includes("SUPER_ADMIN")) {
-    return true;
+    return roleName === "ADMIN" || roleName === "USER";
   }
 
   return roleName === "USER";
@@ -24,7 +28,17 @@ export function getAssignableRoles(
   actorRoles: string[],
   roles: RoleDto[],
 ): RoleDto[] {
-  return roles.filter((role) => canAssignRole(actorRoles, role.name));
+  const assignable = roles.filter((role) => canAssignRole(actorRoles, role.name));
+  const byName = new Map<string, RoleDto>();
+
+  for (const role of assignable) {
+    const existing = byName.get(role.name);
+    if (!existing || role.scope === "platform") {
+      byName.set(role.name, role);
+    }
+  }
+
+  return Array.from(byName.values()).sort((a, b) => a.name.localeCompare(b.name));
 }
 
 export function buildRoleLookup(roles: RoleDto[]) {

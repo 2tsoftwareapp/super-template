@@ -24,6 +24,7 @@ import { CurrentUser } from '@repo/api-core';
 import { Authorize } from '@repo/api-core';
 
 import { PERMISSION_NAMES } from '../../access-control/access-control.constants';
+import { userSortsFromQuery } from '../application/user-sort';
 import { UsersService } from '../application/users.service';
 import {
   AdminUsersQueryDto,
@@ -44,11 +45,16 @@ export class AdminUsersController {
   @Authorize({ permissions: [PERMISSION_NAMES.USERS_READ] })
   @ApiPaginatedResponse(UserDto)
   async listUsers(@Query() query: AdminUsersQueryDto) {
+    const sort = userSortsFromQuery({
+      sort: query.sort,
+      sortField: query.sortField,
+      sortOrder: query.sortOrder,
+    });
+
     const result = await this.usersService.listUsers({
       page: query.page,
       limit: query.limit,
-      sortField: query.sortField,
-      sortOrder: query.sortOrder,
+      sort,
       ...(query.search !== undefined ? { search: query.search } : {}),
       ...(query.status !== undefined ? { status: query.status } : {}),
       ...(query.role !== undefined ? { role: query.role } : {}),

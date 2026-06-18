@@ -78,7 +78,7 @@ export class ReplaceUserRolesUseCase {
       desiredRoles.map((role) => role.name),
     );
     assertCanAssignRoleTargets(actor, desiredRoles);
-    desiredRoles.forEach((role) => assertRoleScopeCanBeAssigned(role));
+    desiredRoles.forEach((role) => assertRoleScopeCanBeAssigned(role, actor));
 
     await runInTransaction(this.database, async (transaction) => {
       await this.accessControlService.replaceUserRoles(

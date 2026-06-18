@@ -165,8 +165,15 @@ export function assertRoleNameIsNotReserved(name: string): void {
   }
 }
 
-export function assertRoleScopeCanBeAssigned(role: RolePolicyTarget): void {
+export function assertRoleScopeCanBeAssigned(
+  role: RolePolicyTarget,
+  actor?: Pick<AuthenticatedRequestUser, 'roles'>,
+): void {
   if (role.name === ROLE_NAMES.ADMIN && role.organizationId === null) {
+    if (actor?.roles.includes(ROLE_NAMES.SUPER_ADMIN)) {
+      return;
+    }
+
     throw new AppError(
       ERROR_CODES.AUTH_FORBIDDEN,
       'ADMIN must be assigned as an organization-scoped role',
