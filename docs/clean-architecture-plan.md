@@ -75,15 +75,17 @@ modules/<feature>/
 
 ## 4. Cross-context communication — the #1 scalability rule
 
-Today contexts reach into each other's internals. Example (`notifications.module.ts`):
+Today contexts reach into each other's internals **only at the composition root** (`apps/api`, `api-bootstrap`). Feature modules inside a context inject `api-core` port tokens; global `*PortsModule` wiring provides the implementations.
+
+Historical anti-pattern (now removed):
 
 ```ts
+// ❌ do not reintroduce
 import { OrganizationsModule } from '@repo/api-identity/modules/organizations/organizations.module';
-import { UsersModule }        from '@repo/api-identity/modules/users/users.module';
 import { AuditModule }        from '@repo/api-platform/modules/audit/audit.module';
 ```
 
-This couples `api-workspace` directly to `api-identity` and `api-platform` and is exactly why the repo has a "remaining package boundary cycle" (see `turbo.json` — `layer:identity` is allowed to depend on `platform` AND `workspace`, and vice versa = a cycle the tags permit).
+This used to couple `api-workspace` directly to other contexts and permitted a package-level cycle in `turbo.json`. The DAG is now strict: `identity → (core, database)` · `platform → (core, database, identity)` · `workspace → (core, database, identity, platform)` with **no cross-context `*.module.ts` imports** inside feature code.
 
 ### Target rule
 
@@ -100,7 +102,7 @@ export const AUDIT_WRITER = Symbol('AUDIT_WRITER');
 // any context consumes it:      constructor(@Inject(AUDIT_WRITER) private audit: AuditWriter) {}
 ```
 
-Already-correct ports to model after: `USER_NOTIFICATION_SENDER`, `AUDIT_WRITER`, `MAIL_TEMPLATE_SENDER`, `USER_LOOKUP`. The job is to **convert the remaining deep imports** (orgs, users, etc.) to the same shape, then tighten `turbo.json` tags so the cycle is impossible.
+Already-correct ports to model after: `USER_NOTIFICATION_SENDER`, `AUDIT_WRITER`, `MAIL_TEMPLATE_SENDER`, `USER_LOOKUP`, `ORGANIZATION_LOOKUP`, `PROJECT_LOOKUP`, `ACTIVITY_EMITTER` (workspace-local). Global `IdentityPortsModule`, `PlatformPortsModule`, and `WorkspacePortsModule` register providers once at the composition root.
 
 ### Port hygiene
 
@@ -187,24 +189,30 @@ Add each as a `check_policy`/`record_violation` entry so violations fail CI with
 
 > Do these as small PRs; each is independently shippable and keeps `pnpm verify` green.
 
-**Phase 1 — Stop the leaks (mechanical, safe)**
-- [ ] Remove repository/infra exports from every package `index.ts`; fix the (few) composition-root usages.
-- [ ] Add the `index.ts`-no-repository and presentation/application import policies to `check-source-policy.sh`.
+**Phase 1 — Stop the leaks (mechanical, safe)** ✅
+- [x] Remove repository/infra exports from every package `index.ts`; fix the (few) composition-root usages.
+- [x] Add the `index.ts`-no-repository and presentation/application import policies to `check-source-policy.sh`.
 
-**Phase 2 — Break the context cycle (the big maintainability win)**
-- [ ] Inventory every cross-context import (`grep "from '@repo/api-\(identity\|platform\|workspace\)/modules"`).
-- [ ] For each, introduce/relocate a port in `api-core` (e.g. `OrganizationLookup`, `UserLookup` already exists) and bind it in the provider context.
-- [ ] Replace deep module imports (orgs/users/audit in `notifications.module.ts`, etc.) with token injection.
-- [ ] Tighten `turbo.json` tags to a strict DAG; extend cycle script to forbid cross-context `*.module.ts` imports.
+**Phase 2 — Break the context cycle (the big maintainability win)** ✅
+- [x] Inventory every cross-context import (`grep "from '@repo/api-\(identity\|platform\|workspace\)/modules"`).
+- [x] For each, introduce/relocate a port in `api-core` (e.g. `OrganizationLookup`, `UserLookup`, `ProjectLookup`) and bind it in the provider context.
+- [x] Replace deep module imports with token injection + global `*PortsModule`.
+- [x] Tighten `turbo.json` tags to a strict DAG; extend cycle script to forbid cross-context `*.module.ts` imports.
 
-**Phase 3 — Decompose god-services**
-- [ ] Split `auth.service.ts` into use-cases + `SessionTokenService` + `AuthMapper`; dedupe the user view-object.
-- [ ] Extract `RoleAssignmentPolicy` / privileged-role gates from `access-control.service.ts` into `domain/`, unit-test them.
-- [ ] Move side-effects (verification/reset/welcome emails) fully behind the mail port.
+**Phase 3 — Decompose god-services** ✅
+- [x] Split `auth.service.ts` into use-cases + `SessionTokenService` + `AuthMapper`; dedupe the user view-object.
+- [x] Extract `RoleAssignmentPolicy` / privileged-role gates from `access-control.service.ts` into `domain/`, unit-test them.
+- [x] Move side-effects (verification/reset/welcome emails) fully behind the mail port (`AuthMailService` → `MAIL_TEMPLATE_SENDER`).
 
-**Phase 4 — Mapping & domain consistency**
-- [ ] Move every `toXDto` out of services into `application/*.mapper.ts`.
-- [ ] Add the file-size budget warning; address the worst offenders.
+**Phase 4 — Mapping & domain consistency** ✅ (ongoing hygiene)
+- [x] Move `toXDto` for auth, projects, notifications, audit into `application/*.mapper.ts`.
+- [x] Pilot `PROJECTS_REPOSITORY` port on projects.
+- [x] Add the file-size budget warning; address the worst offenders incrementally.
+
+**Follow-ups (not blocking)**
+- [ ] Shrink remaining >250-line services (`users`, `notifications`, `projects`, …).
+- [ ] Introduce internal input types so application layer can stop importing `presentation/*.dto` (policy is warn-only today).
+- [ ] Repository ports on notifications/auth when those features next change.
 
 ---
 

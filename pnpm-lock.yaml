@@ -722,9 +722,6 @@ importers:
       '@repo/api-database':
         specifier: workspace:*
         version: link:../api-database
-      '@repo/api-identity':
-        specifier: workspace:*
-        version: link:../api-identity
       class-transformer:
         specifier: 0.5.1
         version: 0.5.1
@@ -792,12 +789,6 @@ importers:
       '@repo/api-database':
         specifier: workspace:*
         version: link:../api-database
-      '@repo/api-identity':
-        specifier: workspace:*
-        version: link:../api-identity
-      '@repo/api-platform':
-        specifier: workspace:*
-        version: link:../api-platform
       class-transformer:
         specifier: 0.5.1
         version: 0.5.1
