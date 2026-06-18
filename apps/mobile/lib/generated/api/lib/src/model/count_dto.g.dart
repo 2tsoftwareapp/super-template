@@ -39,7 +39,9 @@ class _$CountDto extends CountDto {
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper(r'CountDto')..add('count', count))
+    return (newBuiltValueToStringHelper(
+      r'CountDto',
+    )..add('count', count))
         .toString();
   }
 }
@@ -81,7 +83,10 @@ class CountDtoBuilder implements Builder<CountDto, CountDtoBuilder> {
     final _$result = _$v ??
         _$CountDto._(
           count: BuiltValueNullFieldError.checkNotNull(
-              count, r'CountDto', 'count'),
+            count,
+            r'CountDto',
+            'count',
+          ),
         );
     replace(_$result);
     return _$result;

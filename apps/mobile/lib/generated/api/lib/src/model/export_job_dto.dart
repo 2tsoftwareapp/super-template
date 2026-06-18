@@ -104,8 +104,10 @@ class _$ExportJobDtoSerializer implements PrimitiveSerializer<ExportJobDto> {
       yield r'filters';
       yield serializers.serialize(
         object.filters,
-        specifiedType: const FullType(
-            BuiltMap, [FullType(String), FullType.nullable(JsonObject)]),
+        specifiedType: const FullType(BuiltMap, [
+          FullType(String),
+          FullType.nullable(JsonObject),
+        ]),
       );
     }
     yield r'createdById';
@@ -138,9 +140,11 @@ class _$ExportJobDtoSerializer implements PrimitiveSerializer<ExportJobDto> {
     ExportJobDto object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(
@@ -186,8 +190,10 @@ class _$ExportJobDtoSerializer implements PrimitiveSerializer<ExportJobDto> {
         case r'filters':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(
-                BuiltMap, [FullType(String), FullType.nullable(JsonObject)]),
+            specifiedType: const FullType(BuiltMap, [
+              FullType(String),
+              FullType.nullable(JsonObject),
+            ]),
           ) as BuiltMap<String, JsonObject?>;
           result.filters.replace(valueDes);
           break;

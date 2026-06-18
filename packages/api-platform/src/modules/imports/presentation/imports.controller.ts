@@ -26,7 +26,7 @@ export class ImportsController {
   constructor(private readonly importsService: ImportsService) {}
 
   @Post()
-  @Authorize({ permissions: [PERMISSION_NAMES.IMPORTS_MANAGE] })
+  @Authorize({ permissions: [PERMISSION_NAMES.IMPORTS_CREATE] })
   @ApiDataResponse(ImportJobDto, 201)
   create(
     @CurrentUser() user: AuthenticatedRequestUser,
@@ -47,7 +47,7 @@ export class ImportsController {
   }
 
   @Get(':id')
-  @Authorize({ permissions: [PERMISSION_NAMES.IMPORTS_MANAGE] })
+  @Authorize({ permissions: [PERMISSION_NAMES.IMPORTS_READ] })
   @ApiDataResponse(ImportJobDto)
   getById(
     @CurrentUser() user: AuthenticatedRequestUser,
@@ -57,7 +57,7 @@ export class ImportsController {
   }
 
   @Post(':id/confirm')
-  @Authorize({ permissions: [PERMISSION_NAMES.IMPORTS_MANAGE] })
+  @Authorize({ permissions: [PERMISSION_NAMES.IMPORTS_UPDATE] })
   @ApiDataResponse(ImportJobDto)
   confirm(
     @CurrentUser() user: AuthenticatedRequestUser,

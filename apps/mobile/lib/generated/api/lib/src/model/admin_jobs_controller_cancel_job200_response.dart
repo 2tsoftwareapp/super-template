@@ -30,9 +30,9 @@ abstract class AdminJobsControllerCancelJob200Response
 
   AdminJobsControllerCancelJob200Response._();
 
-  factory AdminJobsControllerCancelJob200Response(
-          [void updates(AdminJobsControllerCancelJob200ResponseBuilder b)]) =
-      _$AdminJobsControllerCancelJob200Response;
+  factory AdminJobsControllerCancelJob200Response([
+    void updates(AdminJobsControllerCancelJob200ResponseBuilder b),
+  ]) = _$AdminJobsControllerCancelJob200Response;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(AdminJobsControllerCancelJob200ResponseBuilder b) => b;
@@ -47,7 +47,7 @@ class _$AdminJobsControllerCancelJob200ResponseSerializer
   @override
   final Iterable<Type> types = const [
     AdminJobsControllerCancelJob200Response,
-    _$AdminJobsControllerCancelJob200Response
+    _$AdminJobsControllerCancelJob200Response,
   ];
 
   @override
@@ -76,9 +76,11 @@ class _$AdminJobsControllerCancelJob200ResponseSerializer
     AdminJobsControllerCancelJob200Response object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(

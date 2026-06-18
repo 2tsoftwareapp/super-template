@@ -21,12 +21,12 @@ class _$AuthMeDto extends AuthMeDto {
   factory _$AuthMeDto([void Function(AuthMeDtoBuilder)? updates]) =>
       (AuthMeDtoBuilder()..update(updates))._build();
 
-  _$AuthMeDto._(
-      {required this.user,
-      required this.permissions,
-      required this.sessionId,
-      this.organizationId})
-      : super._();
+  _$AuthMeDto._({
+    required this.user,
+    required this.permissions,
+    required this.sessionId,
+    this.organizationId,
+  }) : super._();
   @override
   AuthMeDto rebuild(void Function(AuthMeDtoBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -125,7 +125,10 @@ class AuthMeDtoBuilder implements Builder<AuthMeDto, AuthMeDtoBuilder> {
             user: user.build(),
             permissions: permissions.build(),
             sessionId: BuiltValueNullFieldError.checkNotNull(
-                sessionId, r'AuthMeDto', 'sessionId'),
+              sessionId,
+              r'AuthMeDto',
+              'sessionId',
+            ),
             organizationId: organizationId,
           );
     } catch (_) {
@@ -137,7 +140,10 @@ class AuthMeDtoBuilder implements Builder<AuthMeDto, AuthMeDtoBuilder> {
         permissions.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'AuthMeDto', _$failedField, e.toString());
+          r'AuthMeDto',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

@@ -57,16 +57,10 @@ class ActivitiesApi {
     final _path = r'/api/v1/activities';
     final _options = Options(
       method: r'GET',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -77,20 +71,35 @@ class ActivitiesApi {
       if (page != null)
         r'page': encodeQueryParameter(_serializers, page, const FullType(num)),
       if (limit != null)
-        r'limit':
-            encodeQueryParameter(_serializers, limit, const FullType(num)),
+        r'limit': encodeQueryParameter(
+          _serializers,
+          limit,
+          const FullType(num),
+        ),
       if (sortOrder != null)
         r'sortOrder': encodeQueryParameter(
-            _serializers, sortOrder, const FullType(String)),
+          _serializers,
+          sortOrder,
+          const FullType(String),
+        ),
       if (entityType != null)
         r'entityType': encodeQueryParameter(
-            _serializers, entityType, const FullType(String)),
+          _serializers,
+          entityType,
+          const FullType(String),
+        ),
       if (entityId != null)
         r'entityId': encodeQueryParameter(
-            _serializers, entityId, const FullType(String)),
+          _serializers,
+          entityId,
+          const FullType(String),
+        ),
       if (actorId != null)
-        r'actorId':
-            encodeQueryParameter(_serializers, actorId, const FullType(String)),
+        r'actorId': encodeQueryParameter(
+          _serializers,
+          actorId,
+          const FullType(String),
+        ),
     };
 
     final _response = await _dio.request<Object>(
@@ -110,8 +119,9 @@ class ActivitiesApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType:
-                  const FullType(ActivitiesControllerList200Response),
+              specifiedType: const FullType(
+                ActivitiesControllerList200Response,
+              ),
             ) as ActivitiesControllerList200Response;
     } catch (error, stackTrace) {
       throw DioException(

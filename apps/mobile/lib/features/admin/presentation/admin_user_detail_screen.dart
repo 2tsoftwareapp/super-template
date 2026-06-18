@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:mobile_app/features/admin/data/admin_repository.dart';
 import 'package:mobile_app/features/auth/presentation/auth_controller.dart';
 
+const _assignableRoles = ['ADMIN', 'USER'];
+
 class AdminUserDetailScreen extends ConsumerStatefulWidget {
   const AdminUserDetailScreen({super.key, required this.userId});
 
@@ -16,9 +18,7 @@ class AdminUserDetailScreen extends ConsumerStatefulWidget {
 
 class _AdminUserDetailScreenState extends ConsumerState<AdminUserDetailScreen> {
   String? _status;
-  Set<String> _selectedRoleIds = {};
-  List<AdminRole> _allRoles = [];
-  bool _rolesLoaded = false;
+  String? _selectedRole;
 
   @override
   Widget build(BuildContext context) {
@@ -52,22 +52,11 @@ class _AdminUserDetailScreenState extends ConsumerState<AdminUserDetailScreen> {
           }
           final user = snapshot.data!;
           _status ??= user.status;
-
-          if (!_rolesLoaded) {
-            _rolesLoaded = true;
-            repository.listRoles().then((roles) {
-              if (!mounted) {
-                return;
-              }
-              setState(() {
-                _allRoles = roles;
-                _selectedRoleIds = roles
-                    .where((role) => user.roles.contains(role.name))
-                    .map((role) => role.id)
-                    .toSet();
-              });
-            });
-          }
+          _selectedRole ??=
+              user.roles
+                  .where((role) => _assignableRoles.contains(role))
+                  .firstOrNull ??
+              'USER';
 
           return Padding(
             padding: const EdgeInsets.all(20),
@@ -80,6 +69,10 @@ class _AdminUserDetailScreenState extends ConsumerState<AdminUserDetailScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(user.email),
+                if (user.roles.contains('SUPER_ADMIN')) ...[
+                  const SizedBox(height: 8),
+                  const Chip(label: Text('SUPER_ADMIN')),
+                ],
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
                   initialValue: _status,
@@ -93,33 +86,22 @@ class _AdminUserDetailScreenState extends ConsumerState<AdminUserDetailScreen> {
                       : null,
                 ),
                 const SizedBox(height: 16),
-                Text('Roles', style: Theme.of(context).textTheme.titleMedium),
+                Text('Role', style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: 8),
-                if (_allRoles.isEmpty)
-                  const Text('Loading roles...')
+                if (user.roles.contains('SUPER_ADMIN'))
+                  const Text('SUPER_ADMIN role cannot be changed here.')
                 else
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: _allRoles
+                  DropdownButtonFormField<String>(
+                    initialValue: _selectedRole,
+                    items: _assignableRoles
                         .map(
-                          (role) => FilterChip(
-                            label: Text(role.name),
-                            selected: _selectedRoleIds.contains(role.id),
-                            onSelected: canUpdate
-                                ? (selected) {
-                                    setState(() {
-                                      if (selected) {
-                                        _selectedRoleIds.add(role.id);
-                                      } else {
-                                        _selectedRoleIds.remove(role.id);
-                                      }
-                                    });
-                                  }
-                                : null,
-                          ),
+                          (role) =>
+                              DropdownMenuItem(value: role, child: Text(role)),
                         )
                         .toList(),
+                    onChanged: canUpdate
+                        ? (value) => setState(() => _selectedRole = value)
+                        : null,
                   ),
                 const Spacer(),
                 if (canUpdate)
@@ -131,10 +113,13 @@ class _AdminUserDetailScreenState extends ConsumerState<AdminUserDetailScreen> {
                               id: widget.userId,
                               status: _status!,
                             );
-                            await repository.replaceRoles(
-                              id: widget.userId,
-                              roleIds: _selectedRoleIds.toList(),
-                            );
+                            if (!user.roles.contains('SUPER_ADMIN') &&
+                                _selectedRole != null) {
+                              await repository.replaceRoles(
+                                id: widget.userId,
+                                role: _selectedRole!,
+                              );
+                            }
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(content: Text('User updated')),

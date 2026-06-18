@@ -15,19 +15,20 @@ class _$AdminUsersControllerListUsers200Response
   @override
   final PaginationMetaDto meta;
 
-  factory _$AdminUsersControllerListUsers200Response(
-          [void Function(AdminUsersControllerListUsers200ResponseBuilder)?
-              updates]) =>
+  factory _$AdminUsersControllerListUsers200Response([
+    void Function(AdminUsersControllerListUsers200ResponseBuilder)? updates,
+  ]) =>
       (AdminUsersControllerListUsers200ResponseBuilder()..update(updates))
           ._build();
 
-  _$AdminUsersControllerListUsers200Response._(
-      {required this.data, required this.meta})
-      : super._();
+  _$AdminUsersControllerListUsers200Response._({
+    required this.data,
+    required this.meta,
+  }) : super._();
   @override
   AdminUsersControllerListUsers200Response rebuild(
-          void Function(AdminUsersControllerListUsers200ResponseBuilder)
-              updates) =>
+    void Function(AdminUsersControllerListUsers200ResponseBuilder) updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -54,7 +55,8 @@ class _$AdminUsersControllerListUsers200Response
   @override
   String toString() {
     return (newBuiltValueToStringHelper(
-            r'AdminUsersControllerListUsers200Response')
+      r'AdminUsersControllerListUsers200Response',
+    )
           ..add('data', data)
           ..add('meta', meta))
         .toString();
@@ -97,7 +99,8 @@ class AdminUsersControllerListUsers200ResponseBuilder
 
   @override
   void update(
-      void Function(AdminUsersControllerListUsers200ResponseBuilder)? updates) {
+    void Function(AdminUsersControllerListUsers200ResponseBuilder)? updates,
+  ) {
     if (updates != null) updates(this);
   }
 
@@ -121,9 +124,10 @@ class AdminUsersControllerListUsers200ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'AdminUsersControllerListUsers200Response',
-            _$failedField,
-            e.toString());
+          r'AdminUsersControllerListUsers200Response',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

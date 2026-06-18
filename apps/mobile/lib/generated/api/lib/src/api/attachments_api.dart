@@ -50,16 +50,10 @@ class AttachmentsApi {
     final _path = r'/api/v1/attachments';
     final _options = Options(
       method: r'POST',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -74,10 +68,7 @@ class AttachmentsApi {
       _bodyData = _serializers.serialize(attachEntityDto, specifiedType: _type);
     } catch (error, stackTrace) {
       throw DioException(
-        requestOptions: _options.compose(
-          _dio.options,
-          _path,
-        ),
+        requestOptions: _options.compose(_dio.options, _path),
         type: DioExceptionType.unknown,
         error: error,
         stackTrace: stackTrace,
@@ -101,8 +92,9 @@ class AttachmentsApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType:
-                  const FullType(AttachmentsControllerAttach201Response),
+              specifiedType: const FullType(
+                AttachmentsControllerAttach201Response,
+              ),
             ) as AttachmentsControllerAttach201Response;
     } catch (error, stackTrace) {
       throw DioException(
@@ -151,21 +143,17 @@ class AttachmentsApi {
     ProgressCallback? onReceiveProgress,
   }) async {
     final _path = r'/api/v1/attachments/{id}'.replaceAll(
-        '{' r'id' '}',
-        encodeQueryParameter(_serializers, id, const FullType(String))
-            .toString());
+      '{'
+      r'id'
+      '}',
+      encodeQueryParameter(_serializers, id, const FullType(String)).toString(),
+    );
     final _options = Options(
       method: r'DELETE',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -188,8 +176,9 @@ class AttachmentsApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType:
-                  const FullType(AdminUsersControllerDeleteUser200Response),
+              specifiedType: const FullType(
+                AdminUsersControllerDeleteUser200Response,
+              ),
             ) as AdminUsersControllerDeleteUser200Response;
     } catch (error, stackTrace) {
       throw DioException(
@@ -242,16 +231,10 @@ class AttachmentsApi {
     final _path = r'/api/v1/attachments';
     final _options = Options(
       method: r'GET',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -260,9 +243,15 @@ class AttachmentsApi {
 
     final _queryParameters = <String, dynamic>{
       r'entityType': encodeQueryParameter(
-          _serializers, entityType, const FullType(String)),
-      r'entityId':
-          encodeQueryParameter(_serializers, entityId, const FullType(String)),
+        _serializers,
+        entityType,
+        const FullType(String),
+      ),
+      r'entityId': encodeQueryParameter(
+        _serializers,
+        entityId,
+        const FullType(String),
+      ),
     };
 
     final _response = await _dio.request<Object>(
@@ -282,8 +271,9 @@ class AttachmentsApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType:
-                  const FullType(AttachmentsControllerList200Response),
+              specifiedType: const FullType(
+                AttachmentsControllerList200Response,
+              ),
             ) as AttachmentsControllerList200Response;
     } catch (error, stackTrace) {
       throw DioException(

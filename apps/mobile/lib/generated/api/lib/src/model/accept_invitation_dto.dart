@@ -38,7 +38,7 @@ class _$AcceptInvitationDtoSerializer
   @override
   final Iterable<Type> types = const [
     AcceptInvitationDto,
-    _$AcceptInvitationDto
+    _$AcceptInvitationDto,
   ];
 
   @override
@@ -62,9 +62,11 @@ class _$AcceptInvitationDtoSerializer
     AcceptInvitationDto object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(

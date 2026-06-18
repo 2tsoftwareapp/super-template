@@ -12,14 +12,16 @@ class _$ResendVerificationDto extends ResendVerificationDto {
   @override
   final String email;
 
-  factory _$ResendVerificationDto(
-          [void Function(ResendVerificationDtoBuilder)? updates]) =>
+  factory _$ResendVerificationDto([
+    void Function(ResendVerificationDtoBuilder)? updates,
+  ]) =>
       (ResendVerificationDtoBuilder()..update(updates))._build();
 
   _$ResendVerificationDto._({required this.email}) : super._();
   @override
   ResendVerificationDto rebuild(
-          void Function(ResendVerificationDtoBuilder) updates) =>
+    void Function(ResendVerificationDtoBuilder) updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -42,8 +44,9 @@ class _$ResendVerificationDto extends ResendVerificationDto {
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper(r'ResendVerificationDto')
-          ..add('email', email))
+    return (newBuiltValueToStringHelper(
+      r'ResendVerificationDto',
+    )..add('email', email))
         .toString();
   }
 }
@@ -86,7 +89,10 @@ class ResendVerificationDtoBuilder
     final _$result = _$v ??
         _$ResendVerificationDto._(
           email: BuiltValueNullFieldError.checkNotNull(
-              email, r'ResendVerificationDto', 'email'),
+            email,
+            r'ResendVerificationDto',
+            'email',
+          ),
         );
     replace(_$result);
     return _$result;

@@ -13,7 +13,7 @@ import {
 } from '@repo/api-core';
 import { DATABASE, runInTransaction } from '@repo/api-database';
 
-import type { UserView } from './users.types';
+import type { AssignableRoleName, UserView } from './users.types';
 
 import { ROLE_NAMES } from '../../access-control/access-control.constants';
 import { AccessControlService } from '../../access-control/application/access-control.service';
@@ -21,6 +21,8 @@ import {
   assertCanAssignRoleTargets,
   assertRoleScopeCanBeAssigned,
 } from '../../access-control/domain/role-assignment.policy';
+import { resolveAssignableRole } from '../domain/assignable-role.resolver';
+import { assertUserBelongsToOrganization } from '../domain/user-org-scope.policy';
 import { GetUserUseCase } from './get-user.use-case';
 import {
   USERS_REPOSITORY,
@@ -41,7 +43,8 @@ export class ReplaceUserRolesUseCase {
   async execute(
     actor: AuthenticatedRequestUser,
     userId: string,
-    roleIds: string[],
+    role: AssignableRoleName,
+    organizationId: string | undefined,
     requestContext?: RequestContext,
   ): Promise<UserView> {
     const user = await this.usersRepository.findById(userId);
@@ -62,33 +65,62 @@ export class ReplaceUserRolesUseCase {
       );
     }
 
-    const [currentAccess, desiredRoles] = await Promise.all([
+    await assertUserBelongsToOrganization(
+      (targetUserId, orgId) =>
+        this.usersRepository.isUserInOrganization(targetUserId, orgId),
+      actor,
+      userId,
+    );
+
+    const actorIsSuperAdmin = actor.roles.includes(ROLE_NAMES.SUPER_ADMIN);
+    const resolvedOrganizationId = actorIsSuperAdmin
+      ? (organizationId ?? null)
+      : (actor.organizationId ?? null);
+
+    if (role === ROLE_NAMES.ADMIN && !resolvedOrganizationId) {
+      throw new AppError(
+        ERROR_CODES.VALIDATION_FAILED,
+        'organizationId is required when assigning ADMIN',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const [currentAccess, resolvedRole] = await Promise.all([
       this.accessControlService.getAccessProfile(
         userId,
-        actor.roles.includes(ROLE_NAMES.SUPER_ADMIN)
-          ? null
-          : actor.organizationId,
+        actorIsSuperAdmin ? null : actor.organizationId,
       ),
-      this.accessControlService.validateRoleIds(roleIds),
+      resolveAssignableRole(
+        this.accessControlService,
+        role,
+        resolvedOrganizationId,
+      ),
     ]);
 
     this.accessControlService.assertCanAssignUserRoles(
       actor,
       currentAccess.roles,
-      desiredRoles.map((role) => role.name),
+      [resolvedRole.target.name],
     );
-    assertCanAssignRoleTargets(actor, desiredRoles);
-    desiredRoles.forEach((role) => assertRoleScopeCanBeAssigned(role, actor));
+    assertCanAssignRoleTargets(actor, [resolvedRole.target]);
+    assertRoleScopeCanBeAssigned(resolvedRole.target, actor);
 
     await runInTransaction(this.database, async (transaction) => {
-      await this.accessControlService.replaceUserRoles(
-        userId,
-        roleIds,
-        actor.roles.includes(ROLE_NAMES.SUPER_ADMIN)
-          ? undefined
-          : actor.organizationId,
-        transaction,
-      );
+      if (role === ROLE_NAMES.ADMIN && resolvedOrganizationId) {
+        await this.accessControlService.ensureOrganizationAdminRole(
+          resolvedOrganizationId,
+          userId,
+          transaction,
+        );
+      } else {
+        await this.accessControlService.replaceUserRoles(
+          userId,
+          [resolvedRole.id],
+          actorIsSuperAdmin ? undefined : actor.organizationId,
+          transaction,
+        );
+      }
+
       await this.auditWriter.log(
         {
           actorId: actor.userId,
@@ -96,7 +128,8 @@ export class ReplaceUserRolesUseCase {
           entityType: 'user',
           entityId: userId,
           metadata: {
-            roleIds,
+            role,
+            organizationId: resolvedOrganizationId,
           },
           requestContext,
         },
@@ -104,6 +137,6 @@ export class ReplaceUserRolesUseCase {
       );
     });
 
-    return this.getUserUseCase.execute(userId);
+    return this.getUserUseCase.execute(userId, actor);
   }
 }

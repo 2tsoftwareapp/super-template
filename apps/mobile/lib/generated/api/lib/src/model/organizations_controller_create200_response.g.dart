@@ -15,19 +15,20 @@ class _$OrganizationsControllerCreate200Response
   @override
   final RequestMetaDto meta;
 
-  factory _$OrganizationsControllerCreate200Response(
-          [void Function(OrganizationsControllerCreate200ResponseBuilder)?
-              updates]) =>
+  factory _$OrganizationsControllerCreate200Response([
+    void Function(OrganizationsControllerCreate200ResponseBuilder)? updates,
+  ]) =>
       (OrganizationsControllerCreate200ResponseBuilder()..update(updates))
           ._build();
 
-  _$OrganizationsControllerCreate200Response._(
-      {required this.data, required this.meta})
-      : super._();
+  _$OrganizationsControllerCreate200Response._({
+    required this.data,
+    required this.meta,
+  }) : super._();
   @override
   OrganizationsControllerCreate200Response rebuild(
-          void Function(OrganizationsControllerCreate200ResponseBuilder)
-              updates) =>
+    void Function(OrganizationsControllerCreate200ResponseBuilder) updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -54,7 +55,8 @@ class _$OrganizationsControllerCreate200Response
   @override
   String toString() {
     return (newBuiltValueToStringHelper(
-            r'OrganizationsControllerCreate200Response')
+      r'OrganizationsControllerCreate200Response',
+    )
           ..add('data', data)
           ..add('meta', meta))
         .toString();
@@ -96,7 +98,8 @@ class OrganizationsControllerCreate200ResponseBuilder
 
   @override
   void update(
-      void Function(OrganizationsControllerCreate200ResponseBuilder)? updates) {
+    void Function(OrganizationsControllerCreate200ResponseBuilder)? updates,
+  ) {
     if (updates != null) updates(this);
   }
 
@@ -120,9 +123,10 @@ class OrganizationsControllerCreate200ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'OrganizationsControllerCreate200Response',
-            _$failedField,
-            e.toString());
+          r'OrganizationsControllerCreate200Response',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

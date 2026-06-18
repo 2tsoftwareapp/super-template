@@ -45,7 +45,7 @@ export interface paths {
         };
         get: operations["AdminRolesController_listRoles"];
         put?: never;
-        post: operations["AdminRolesController_createRole"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -61,43 +61,11 @@ export interface paths {
         };
         get: operations["AdminRolesController_listPermissions"];
         put?: never;
-        post: operations["AdminRolesController_createPermission"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/roles/permissions/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete: operations["AdminRolesController_deletePermission"];
-        options?: never;
-        head?: never;
-        patch: operations["AdminRolesController_updatePermission"];
-        trace?: never;
-    };
-    "/api/v1/admin/roles/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete: operations["AdminRolesController_deleteRole"];
-        options?: never;
-        head?: never;
-        patch: operations["AdminRolesController_updateRole"];
         trace?: never;
     };
     "/api/v1/organizations": {
@@ -1087,28 +1055,6 @@ export interface components {
             isSystem: boolean;
             permissions: components["schemas"]["PermissionDto"][];
         };
-        CreatePermissionDto: {
-            name: string;
-            description?: Record<string, never> | null;
-        };
-        UpdatePermissionDto: {
-            name?: string;
-            description?: Record<string, never> | null;
-        };
-        SuccessFlagDto: {
-            success: boolean;
-        };
-        CreateRoleDto: {
-            name: string;
-            description?: Record<string, never> | null;
-            organizationId?: Record<string, never> | null;
-            permissionIds: string[];
-        };
-        UpdateRoleDto: {
-            name?: string;
-            description?: Record<string, never> | null;
-            permissionIds?: string[];
-        };
         OrganizationDto: {
             id: string;
             name: string;
@@ -1150,7 +1096,12 @@ export interface components {
             avatarUrl?: Record<string, never>;
             /** @enum {string} */
             status?: "PENDING" | "ACTIVE" | "BLOCKED";
-            roleIds?: string[];
+            /**
+             * @default USER
+             * @enum {string}
+             */
+            role: "ADMIN" | "USER";
+            organizationId?: string;
         };
         UpdateAdminUserDto: {
             email?: string;
@@ -1159,14 +1110,18 @@ export interface components {
             avatarUrl?: Record<string, never>;
             /** @enum {string} */
             status?: "PENDING" | "ACTIVE" | "BLOCKED";
-            roleIds?: string[];
+        };
+        SuccessFlagDto: {
+            success: boolean;
         };
         UpdateUserStatusDto: {
             /** @enum {string} */
             status: "PENDING" | "ACTIVE" | "BLOCKED";
         };
         ReplaceUserRolesDto: {
-            roleIds: string[];
+            /** @enum {string} */
+            role: "ADMIN" | "USER";
+            organizationId?: string;
         };
         UpdateProfileDto: {
             displayName?: string;
@@ -1635,32 +1590,6 @@ export interface operations {
             };
         };
     };
-    AdminRolesController_createRole: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreateRoleDto"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["RoleDto"];
-                        meta: components["schemas"]["RequestMetaDto"];
-                    };
-                };
-            };
-        };
-    };
     AdminRolesController_listPermissions: {
         parameters: {
             query?: never;
@@ -1677,136 +1606,6 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: components["schemas"]["PermissionDto"][];
-                        meta: components["schemas"]["RequestMetaDto"];
-                    };
-                };
-            };
-        };
-    };
-    AdminRolesController_createPermission: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreatePermissionDto"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["PermissionDto"];
-                        meta: components["schemas"]["RequestMetaDto"];
-                    };
-                };
-            };
-        };
-    };
-    AdminRolesController_deletePermission: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["SuccessFlagDto"];
-                        meta: components["schemas"]["RequestMetaDto"];
-                    };
-                };
-            };
-        };
-    };
-    AdminRolesController_updatePermission: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdatePermissionDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["PermissionDto"];
-                        meta: components["schemas"]["RequestMetaDto"];
-                    };
-                };
-            };
-        };
-    };
-    AdminRolesController_deleteRole: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["SuccessFlagDto"];
-                        meta: components["schemas"]["RequestMetaDto"];
-                    };
-                };
-            };
-        };
-    };
-    AdminRolesController_updateRole: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateRoleDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["RoleDto"];
                         meta: components["schemas"]["RequestMetaDto"];
                     };
                 };
@@ -1870,6 +1669,8 @@ export interface operations {
                 search?: string;
                 status?: "PENDING" | "ACTIVE" | "BLOCKED";
                 role?: string;
+                /** @description Comma-separated sort rules in field:order format, e.g. status:asc,createdAt:desc */
+                sort?: string;
                 sortField?: "createdAt" | "displayName" | "email" | "status";
             };
             header?: never;

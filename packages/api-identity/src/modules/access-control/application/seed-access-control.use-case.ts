@@ -4,6 +4,7 @@ import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { AppError, ERROR_CODES } from '@repo/api-core';
 
 import {
+  ADMIN_PERMISSIONS,
   ALL_PERMISSIONS as ALL_PERMISSION_NAMES,
   ROLE_NAMES,
   USER_PERMISSIONS,
@@ -47,6 +48,9 @@ export class SeedAccessControlUseCase {
     const userPermissionIds = USER_PERMISSIONS.map(
       (name) => permissionByName.get(name)?.id,
     ).filter(Boolean) as string[];
+    const adminPermissionIds = ADMIN_PERMISSIONS.map(
+      (name) => permissionByName.get(name)?.id,
+    ).filter(Boolean) as string[];
     const superAdminRole = roleByName.get(ROLE_NAMES.SUPER_ADMIN);
     const adminRole = roleByName.get(ROLE_NAMES.ADMIN);
     const userRole = roleByName.get(ROLE_NAMES.USER);
@@ -66,7 +70,7 @@ export class SeedAccessControlUseCase {
     );
     await this.accessControlRepository.replaceRolePermissions(
       adminRole.id,
-      [],
+      adminPermissionIds,
       executor,
     );
     await this.accessControlRepository.replaceRolePermissions(

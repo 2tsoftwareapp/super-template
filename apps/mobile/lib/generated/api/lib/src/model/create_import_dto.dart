@@ -15,6 +15,7 @@ part 'create_import_dto.g.dart';
 /// Properties:
 /// * [type]
 /// * [fileId]
+/// * [idempotencyKey] - Client-supplied idempotency key. Retries with the same key return the original import job.
 @BuiltValue()
 abstract class CreateImportDto
     implements Built<CreateImportDto, CreateImportDtoBuilder> {
@@ -23,6 +24,10 @@ abstract class CreateImportDto
 
   @BuiltValueField(wireName: r'fileId')
   String get fileId;
+
+  /// Client-supplied idempotency key. Retries with the same key return the original import job.
+  @BuiltValueField(wireName: r'idempotencyKey')
+  String? get idempotencyKey;
 
   CreateImportDto._();
 
@@ -60,6 +65,13 @@ class _$CreateImportDtoSerializer
       object.fileId,
       specifiedType: const FullType(String),
     );
+    if (object.idempotencyKey != null) {
+      yield r'idempotencyKey';
+      yield serializers.serialize(
+        object.idempotencyKey,
+        specifiedType: const FullType(String),
+      );
+    }
   }
 
   @override
@@ -68,9 +80,11 @@ class _$CreateImportDtoSerializer
     CreateImportDto object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(
@@ -98,6 +112,13 @@ class _$CreateImportDtoSerializer
             specifiedType: const FullType(String),
           ) as String;
           result.fileId = valueDes;
+          break;
+        case r'idempotencyKey':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.idempotencyKey = valueDes;
           break;
         default:
           unhandled.add(key);

@@ -19,7 +19,7 @@ class _AdminSettingsScreenState extends ConsumerState<AdminSettingsScreen> {
     final permissions =
         ref.watch(authControllerProvider).valueOrNull?.permissions ?? [];
     final canRead = permissions.contains('settings.read');
-    final canManage = permissions.contains('settings.manage');
+    final canManage = permissions.contains('settings.update');
 
     if (!canRead) {
       return Scaffold(

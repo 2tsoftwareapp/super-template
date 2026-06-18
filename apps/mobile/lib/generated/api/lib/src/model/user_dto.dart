@@ -143,9 +143,11 @@ class _$UserDtoSerializer implements PrimitiveSerializer<UserDto> {
     UserDto object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(
@@ -205,14 +207,18 @@ class _$UserDtoSerializer implements PrimitiveSerializer<UserDto> {
         case r'roles':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(BuiltList, [FullType(String)]),
+            specifiedType: const FullType(BuiltList, [
+              FullType(String),
+            ]),
           ) as BuiltList<String>;
           result.roles.replace(valueDes);
           break;
         case r'roleIds':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(BuiltList, [FullType(String)]),
+            specifiedType: const FullType(BuiltList, [
+              FullType(String),
+            ]),
           ) as BuiltList<String>;
           result.roleIds.replace(valueDes);
           break;

@@ -26,23 +26,25 @@ class _$UserPreferencesDto extends UserPreferencesDto {
   @override
   final String updatedAt;
 
-  factory _$UserPreferencesDto(
-          [void Function(UserPreferencesDtoBuilder)? updates]) =>
+  factory _$UserPreferencesDto([
+    void Function(UserPreferencesDtoBuilder)? updates,
+  ]) =>
       (UserPreferencesDtoBuilder()..update(updates))._build();
 
-  _$UserPreferencesDto._(
-      {required this.userId,
-      required this.theme,
-      required this.language,
-      required this.timezone,
-      required this.notificationPreferences,
-      required this.emailPreferences,
-      required this.createdAt,
-      required this.updatedAt})
-      : super._();
+  _$UserPreferencesDto._({
+    required this.userId,
+    required this.theme,
+    required this.language,
+    required this.timezone,
+    required this.notificationPreferences,
+    required this.emailPreferences,
+    required this.createdAt,
+    required this.updatedAt,
+  }) : super._();
   @override
   UserPreferencesDto rebuild(
-          void Function(UserPreferencesDtoBuilder) updates) =>
+    void Function(UserPreferencesDtoBuilder) updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -117,7 +119,8 @@ class UserPreferencesDtoBuilder
   MapBuilder<String, JsonObject?> get notificationPreferences =>
       _$this._notificationPreferences ??= MapBuilder<String, JsonObject?>();
   set notificationPreferences(
-          MapBuilder<String, JsonObject?>? notificationPreferences) =>
+    MapBuilder<String, JsonObject?>? notificationPreferences,
+  ) =>
       _$this._notificationPreferences = notificationPreferences;
 
   MapBuilder<String, JsonObject?>? _emailPreferences;
@@ -173,19 +176,37 @@ class UserPreferencesDtoBuilder
       _$result = _$v ??
           _$UserPreferencesDto._(
             userId: BuiltValueNullFieldError.checkNotNull(
-                userId, r'UserPreferencesDto', 'userId'),
+              userId,
+              r'UserPreferencesDto',
+              'userId',
+            ),
             theme: BuiltValueNullFieldError.checkNotNull(
-                theme, r'UserPreferencesDto', 'theme'),
+              theme,
+              r'UserPreferencesDto',
+              'theme',
+            ),
             language: BuiltValueNullFieldError.checkNotNull(
-                language, r'UserPreferencesDto', 'language'),
+              language,
+              r'UserPreferencesDto',
+              'language',
+            ),
             timezone: BuiltValueNullFieldError.checkNotNull(
-                timezone, r'UserPreferencesDto', 'timezone'),
+              timezone,
+              r'UserPreferencesDto',
+              'timezone',
+            ),
             notificationPreferences: notificationPreferences.build(),
             emailPreferences: emailPreferences.build(),
             createdAt: BuiltValueNullFieldError.checkNotNull(
-                createdAt, r'UserPreferencesDto', 'createdAt'),
+              createdAt,
+              r'UserPreferencesDto',
+              'createdAt',
+            ),
             updatedAt: BuiltValueNullFieldError.checkNotNull(
-                updatedAt, r'UserPreferencesDto', 'updatedAt'),
+              updatedAt,
+              r'UserPreferencesDto',
+              'updatedAt',
+            ),
           );
     } catch (_) {
       late String _$failedField;
@@ -196,7 +217,10 @@ class UserPreferencesDtoBuilder
         emailPreferences.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'UserPreferencesDto', _$failedField, e.toString());
+          r'UserPreferencesDto',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

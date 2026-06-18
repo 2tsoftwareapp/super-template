@@ -18,16 +18,17 @@ class _$CreateCommentDto extends CreateCommentDto {
   @override
   final String content;
 
-  factory _$CreateCommentDto(
-          [void Function(CreateCommentDtoBuilder)? updates]) =>
+  factory _$CreateCommentDto([
+    void Function(CreateCommentDtoBuilder)? updates,
+  ]) =>
       (CreateCommentDtoBuilder()..update(updates))._build();
 
-  _$CreateCommentDto._(
-      {required this.entityType,
-      required this.entityId,
-      this.parentId,
-      required this.content})
-      : super._();
+  _$CreateCommentDto._({
+    required this.entityType,
+    required this.entityId,
+    this.parentId,
+    required this.content,
+  }) : super._();
   @override
   CreateCommentDto rebuild(void Function(CreateCommentDtoBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -121,12 +122,21 @@ class CreateCommentDtoBuilder
     final _$result = _$v ??
         _$CreateCommentDto._(
           entityType: BuiltValueNullFieldError.checkNotNull(
-              entityType, r'CreateCommentDto', 'entityType'),
+            entityType,
+            r'CreateCommentDto',
+            'entityType',
+          ),
           entityId: BuiltValueNullFieldError.checkNotNull(
-              entityId, r'CreateCommentDto', 'entityId'),
+            entityId,
+            r'CreateCommentDto',
+            'entityId',
+          ),
           parentId: parentId,
           content: BuiltValueNullFieldError.checkNotNull(
-              content, r'CreateCommentDto', 'content'),
+            content,
+            r'CreateCommentDto',
+            'content',
+          ),
         );
     replace(_$result);
     return _$result;

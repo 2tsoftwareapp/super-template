@@ -20,20 +20,22 @@ class _$UpdatePreferencesDto extends UpdatePreferencesDto {
   @override
   final BuiltMap<String, JsonObject?>? emailPreferences;
 
-  factory _$UpdatePreferencesDto(
-          [void Function(UpdatePreferencesDtoBuilder)? updates]) =>
+  factory _$UpdatePreferencesDto([
+    void Function(UpdatePreferencesDtoBuilder)? updates,
+  ]) =>
       (UpdatePreferencesDtoBuilder()..update(updates))._build();
 
-  _$UpdatePreferencesDto._(
-      {this.theme,
-      this.language,
-      this.timezone,
-      this.notificationPreferences,
-      this.emailPreferences})
-      : super._();
+  _$UpdatePreferencesDto._({
+    this.theme,
+    this.language,
+    this.timezone,
+    this.notificationPreferences,
+    this.emailPreferences,
+  }) : super._();
   @override
   UpdatePreferencesDto rebuild(
-          void Function(UpdatePreferencesDtoBuilder) updates) =>
+    void Function(UpdatePreferencesDtoBuilder) updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -95,7 +97,8 @@ class UpdatePreferencesDtoBuilder
   MapBuilder<String, JsonObject?> get notificationPreferences =>
       _$this._notificationPreferences ??= MapBuilder<String, JsonObject?>();
   set notificationPreferences(
-          MapBuilder<String, JsonObject?>? notificationPreferences) =>
+    MapBuilder<String, JsonObject?>? notificationPreferences,
+  ) =>
       _$this._notificationPreferences = notificationPreferences;
 
   MapBuilder<String, JsonObject?>? _emailPreferences;
@@ -154,7 +157,10 @@ class UpdatePreferencesDtoBuilder
         _emailPreferences?.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'UpdatePreferencesDto', _$failedField, e.toString());
+          r'UpdatePreferencesDto',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

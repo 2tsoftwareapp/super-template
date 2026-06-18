@@ -5,9 +5,7 @@ import { PERMISSION_NAMES, ROLE_NAMES } from '@repo/api-core';
 import {
   assertCanAssignRoles,
   assertCanAssignRoleTargets,
-  assertCanManageRoleCatalog,
   assertCanManagePrivilegedAccount,
-  assertRoleNameIsNotReserved,
   assertRoleScopeCanBeAssigned,
 } from './role-assignment.policy';
 
@@ -27,7 +25,7 @@ describe('RoleAssignmentPolicy', () => {
     ...superAdmin,
     userId: 'admin',
     roles: [ROLE_NAMES.ADMIN],
-    permissions: [PERMISSION_NAMES.ROLES_MANAGE],
+    permissions: [PERMISSION_NAMES.ROLES_UPDATE],
   };
 
   const user = {
@@ -43,90 +41,49 @@ describe('RoleAssignmentPolicy', () => {
     ).toThrow(AppError);
   });
 
-  it('allows super admin to assign privileged roles', () => {
+  it('allows super admin to assign ADMIN and USER roles', () => {
     expect(() =>
-      assertCanAssignRoles(
-        superAdmin,
-        [ROLE_NAMES.USER],
-        [ROLE_NAMES.ADMIN],
-      ),
+      assertCanAssignRoles(superAdmin, [ROLE_NAMES.USER], [ROLE_NAMES.ADMIN]),
     ).not.toThrow();
   });
 
-  it('requires roles.manage for non-super-admin role changes', () => {
+  it('requires roles.update for non-super-admin role changes', () => {
     expect(() =>
       assertCanAssignRoles(user, [ROLE_NAMES.USER], [ROLE_NAMES.USER]),
     ).toThrow(AppError);
   });
 
-  it('allows org admins to assign the platform USER role and org roles', () => {
+  it('allows org admins to assign only the platform USER role', () => {
     expect(() =>
       assertCanAssignRoleTargets(admin, [
         { name: ROLE_NAMES.USER, organizationId: null, isSystem: true },
-        { name: 'BILLING_MANAGER', organizationId: 'org-1', isSystem: false },
       ]),
     ).not.toThrow();
   });
 
-  it('blocks org admins from assigning roles outside their organization', () => {
+  it('blocks org admins from assigning ADMIN', () => {
     expect(() =>
       assertCanAssignRoleTargets(admin, [
-        { name: 'BILLING_MANAGER', organizationId: 'org-2', isSystem: false },
+        {
+          name: ROLE_NAMES.ADMIN,
+          organizationId: 'org-1',
+          isSystem: true,
+        },
       ]),
     ).toThrow(AppError);
   });
 
-  it('blocks reserved role creation outside system initialization', () => {
-    expect(() => assertRoleNameIsNotReserved(ROLE_NAMES.SUPER_ADMIN)).toThrow(
-      AppError,
-    );
-  });
-
-  it('allows org admins to manage custom roles in their active organization', () => {
+  it('blocks org admins from assigning roles outside USER', () => {
     expect(() =>
-      assertCanManageRoleCatalog(
-        admin,
-        { name: 'BILLING_MANAGER', organizationId: 'org-1', isSystem: false },
-        'org-1',
-      ),
-    ).not.toThrow();
-  });
-
-  it('blocks org admins from managing roles in another organization', () => {
-    expect(() =>
-      assertCanManageRoleCatalog(
-        admin,
-        { name: 'BILLING_MANAGER', organizationId: 'org-2', isSystem: false },
-        'org-2',
-      ),
+      assertCanAssignRoles(admin, [ROLE_NAMES.USER], [ROLE_NAMES.ADMIN]),
     ).toThrow(AppError);
-  });
-
-  it('blocks org admins from managing system roles', () => {
-    expect(() =>
-      assertCanManageRoleCatalog(
-        admin,
-        { name: ROLE_NAMES.ADMIN, organizationId: null, isSystem: true },
-        null,
-      ),
-    ).toThrow(AppError);
-  });
-
-  it('allows super admin to manage platform roles', () => {
-    expect(() =>
-      assertCanManageRoleCatalog(
-        superAdmin,
-        { name: ROLE_NAMES.ADMIN, organizationId: null, isSystem: true },
-        null,
-      ),
-    ).not.toThrow();
   });
 
   it('blocks platform ADMIN role assignment for non-super-admins', () => {
     expect(() =>
       assertRoleScopeCanBeAssigned({
         name: ROLE_NAMES.ADMIN,
-        organizationId: null,
+        organizationId: 'org-1',
         isSystem: true,
       }),
     ).toThrow(AppError);
@@ -135,7 +92,7 @@ describe('RoleAssignmentPolicy', () => {
       assertRoleScopeCanBeAssigned(
         {
           name: ROLE_NAMES.ADMIN,
-          organizationId: null,
+          organizationId: 'org-1',
           isSystem: true,
         },
         admin,
@@ -143,26 +100,16 @@ describe('RoleAssignmentPolicy', () => {
     ).toThrow(AppError);
   });
 
-  it('allows super admin to assign platform ADMIN during user management', () => {
+  it('allows super admin to assign organization ADMIN during user management', () => {
     expect(() =>
       assertRoleScopeCanBeAssigned(
         {
           name: ROLE_NAMES.ADMIN,
-          organizationId: null,
+          organizationId: 'org-1',
           isSystem: true,
         },
         superAdmin,
       ),
-    ).not.toThrow();
-  });
-
-  it('allows organization ADMIN role assignment', () => {
-    expect(() =>
-      assertRoleScopeCanBeAssigned({
-        name: ROLE_NAMES.ADMIN,
-        organizationId: 'org-1',
-        isSystem: true,
-      }),
     ).not.toThrow();
   });
 

@@ -31,9 +31,9 @@ abstract class AuditControllerListAuditLogs200Response
 
   AuditControllerListAuditLogs200Response._();
 
-  factory AuditControllerListAuditLogs200Response(
-          [void updates(AuditControllerListAuditLogs200ResponseBuilder b)]) =
-      _$AuditControllerListAuditLogs200Response;
+  factory AuditControllerListAuditLogs200Response([
+    void updates(AuditControllerListAuditLogs200ResponseBuilder b),
+  ]) = _$AuditControllerListAuditLogs200Response;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(AuditControllerListAuditLogs200ResponseBuilder b) => b;
@@ -48,7 +48,7 @@ class _$AuditControllerListAuditLogs200ResponseSerializer
   @override
   final Iterable<Type> types = const [
     AuditControllerListAuditLogs200Response,
-    _$AuditControllerListAuditLogs200Response
+    _$AuditControllerListAuditLogs200Response,
   ];
 
   @override
@@ -77,9 +77,11 @@ class _$AuditControllerListAuditLogs200ResponseSerializer
     AuditControllerListAuditLogs200Response object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(
@@ -97,7 +99,9 @@ class _$AuditControllerListAuditLogs200ResponseSerializer
         case r'data':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(BuiltList, [FullType(AuditLogDto)]),
+            specifiedType: const FullType(BuiltList, [
+              FullType(AuditLogDto),
+            ]),
           ) as BuiltList<AuditLogDto>;
           result.data.replace(valueDes);
           break;

@@ -30,9 +30,9 @@ abstract class CommentsControllerCreate201Response
 
   CommentsControllerCreate201Response._();
 
-  factory CommentsControllerCreate201Response(
-          [void updates(CommentsControllerCreate201ResponseBuilder b)]) =
-      _$CommentsControllerCreate201Response;
+  factory CommentsControllerCreate201Response([
+    void updates(CommentsControllerCreate201ResponseBuilder b),
+  ]) = _$CommentsControllerCreate201Response;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(CommentsControllerCreate201ResponseBuilder b) => b;
@@ -47,7 +47,7 @@ class _$CommentsControllerCreate201ResponseSerializer
   @override
   final Iterable<Type> types = const [
     CommentsControllerCreate201Response,
-    _$CommentsControllerCreate201Response
+    _$CommentsControllerCreate201Response,
   ];
 
   @override
@@ -76,9 +76,11 @@ class _$CommentsControllerCreate201ResponseSerializer
     CommentsControllerCreate201Response object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(

@@ -56,7 +56,7 @@ class _$UpdatePreferencesDtoSerializer
   @override
   final Iterable<Type> types = const [
     UpdatePreferencesDto,
-    _$UpdatePreferencesDto
+    _$UpdatePreferencesDto,
   ];
 
   @override
@@ -92,16 +92,20 @@ class _$UpdatePreferencesDtoSerializer
       yield r'notificationPreferences';
       yield serializers.serialize(
         object.notificationPreferences,
-        specifiedType: const FullType(
-            BuiltMap, [FullType(String), FullType.nullable(JsonObject)]),
+        specifiedType: const FullType(BuiltMap, [
+          FullType(String),
+          FullType.nullable(JsonObject),
+        ]),
       );
     }
     if (object.emailPreferences != null) {
       yield r'emailPreferences';
       yield serializers.serialize(
         object.emailPreferences,
-        specifiedType: const FullType(
-            BuiltMap, [FullType(String), FullType.nullable(JsonObject)]),
+        specifiedType: const FullType(BuiltMap, [
+          FullType(String),
+          FullType.nullable(JsonObject),
+        ]),
       );
     }
   }
@@ -112,9 +116,11 @@ class _$UpdatePreferencesDtoSerializer
     UpdatePreferencesDto object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(
@@ -153,16 +159,20 @@ class _$UpdatePreferencesDtoSerializer
         case r'notificationPreferences':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(
-                BuiltMap, [FullType(String), FullType.nullable(JsonObject)]),
+            specifiedType: const FullType(BuiltMap, [
+              FullType(String),
+              FullType.nullable(JsonObject),
+            ]),
           ) as BuiltMap<String, JsonObject?>;
           result.notificationPreferences.replace(valueDes);
           break;
         case r'emailPreferences':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(
-                BuiltMap, [FullType(String), FullType.nullable(JsonObject)]),
+            specifiedType: const FullType(BuiltMap, [
+              FullType(String),
+              FullType.nullable(JsonObject),
+            ]),
           ) as BuiltMap<String, JsonObject?>;
           result.emailPreferences.replace(valueDes);
           break;

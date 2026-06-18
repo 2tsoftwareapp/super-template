@@ -87,9 +87,11 @@ class _$AuthMeDtoSerializer implements PrimitiveSerializer<AuthMeDto> {
     AuthMeDto object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(
@@ -114,7 +116,9 @@ class _$AuthMeDtoSerializer implements PrimitiveSerializer<AuthMeDto> {
         case r'permissions':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(BuiltList, [FullType(String)]),
+            specifiedType: const FullType(BuiltList, [
+              FullType(String),
+            ]),
           ) as BuiltList<String>;
           result.permissions.replace(valueDes);
           break;

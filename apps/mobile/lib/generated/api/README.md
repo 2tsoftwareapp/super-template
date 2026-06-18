@@ -80,6 +80,7 @@ Class | Method | HTTP request | Description
 [*AdminNotificationsApi*](doc/AdminNotificationsApi.md) | [**adminNotificationsControllerGetJob**](doc/AdminNotificationsApi.md#adminnotificationscontrollergetjob) | **GET** /api/v1/admin/notifications/jobs/{id} | 
 [*AdminNotificationsApi*](doc/AdminNotificationsApi.md) | [**adminNotificationsControllerListJobs**](doc/AdminNotificationsApi.md#adminnotificationscontrollerlistjobs) | **GET** /api/v1/admin/notifications/jobs | 
 [*AdminNotificationsApi*](doc/AdminNotificationsApi.md) | [**adminNotificationsControllerSend**](doc/AdminNotificationsApi.md#adminnotificationscontrollersend) | **POST** /api/v1/admin/notifications | 
+[*AdminRolesApi*](doc/AdminRolesApi.md) | [**adminRolesControllerListPermissions**](doc/AdminRolesApi.md#adminrolescontrollerlistpermissions) | **GET** /api/v1/admin/roles/permissions | 
 [*AdminRolesApi*](doc/AdminRolesApi.md) | [**adminRolesControllerListRoles**](doc/AdminRolesApi.md#adminrolescontrollerlistroles) | **GET** /api/v1/admin/roles | 
 [*AdminSettingsApi*](doc/AdminSettingsApi.md) | [**adminSettingsControllerListSettings**](doc/AdminSettingsApi.md#adminsettingscontrollerlistsettings) | **GET** /api/v1/admin/settings | 
 [*AdminSettingsApi*](doc/AdminSettingsApi.md) | [**adminSettingsControllerUpdateSetting**](doc/AdminSettingsApi.md#adminsettingscontrollerupdatesetting) | **PATCH** /api/v1/admin/settings/{key} | 
@@ -113,6 +114,7 @@ Class | Method | HTTP request | Description
 [*ExportsApi*](doc/ExportsApi.md) | [**exportsControllerCreate**](doc/ExportsApi.md#exportscontrollercreate) | **POST** /api/v1/exports | 
 [*ExportsApi*](doc/ExportsApi.md) | [**exportsControllerGetById**](doc/ExportsApi.md#exportscontrollergetbyid) | **GET** /api/v1/exports/{id} | 
 [*FilesApi*](doc/FilesApi.md) | [**filesControllerDelete**](doc/FilesApi.md#filescontrollerdelete) | **DELETE** /api/v1/files/{id} | 
+[*FilesApi*](doc/FilesApi.md) | [**filesControllerDownload**](doc/FilesApi.md#filescontrollerdownload) | **GET** /api/v1/files/{id}/download | 
 [*FilesApi*](doc/FilesApi.md) | [**filesControllerGetById**](doc/FilesApi.md#filescontrollergetbyid) | **GET** /api/v1/files/{id} | 
 [*FilesApi*](doc/FilesApi.md) | [**filesControllerGetUrl**](doc/FilesApi.md#filescontrollergeturl) | **GET** /api/v1/files/{id}/url | 
 [*FilesApi*](doc/FilesApi.md) | [**filesControllerUpload**](doc/FilesApi.md#filescontrollerupload) | **POST** /api/v1/files | 
@@ -160,6 +162,7 @@ Class | Method | HTTP request | Description
  - [AdminMailControllerPreview200Response](doc/AdminMailControllerPreview200Response.md)
  - [AdminNotificationsControllerListJobs200Response](doc/AdminNotificationsControllerListJobs200Response.md)
  - [AdminNotificationsControllerSend201Response](doc/AdminNotificationsControllerSend201Response.md)
+ - [AdminRolesControllerListPermissions200Response](doc/AdminRolesControllerListPermissions200Response.md)
  - [AdminRolesControllerListRoles200Response](doc/AdminRolesControllerListRoles200Response.md)
  - [AdminSettingsControllerListSettings200Response](doc/AdminSettingsControllerListSettings200Response.md)
  - [AdminSettingsControllerUpdateSetting200Response](doc/AdminSettingsControllerUpdateSetting200Response.md)
@@ -221,6 +224,7 @@ Class | Method | HTTP request | Description
  - [OrganizationsControllerCreate200Response](doc/OrganizationsControllerCreate200Response.md)
  - [OrganizationsControllerList200Response](doc/OrganizationsControllerList200Response.md)
  - [PaginationMetaDto](doc/PaginationMetaDto.md)
+ - [PermissionDto](doc/PermissionDto.md)
  - [PreferencesControllerGetMyPreferences200Response](doc/PreferencesControllerGetMyPreferences200Response.md)
  - [ProjectAttachmentDto](doc/ProjectAttachmentDto.md)
  - [ProjectDto](doc/ProjectDto.md)

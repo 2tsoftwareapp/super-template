@@ -60,6 +60,7 @@ export async function seedUsers(
 
     const role = await params.accessControlService.getRoleByName(
       input.roleName,
+      null,
       executor,
     );
 

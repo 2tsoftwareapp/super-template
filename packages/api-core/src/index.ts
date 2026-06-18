@@ -12,6 +12,7 @@ export * from './common/decorators/skip-envelope.decorator';
 export * from './common/errors/app-error';
 export * from './common/filters/app-exception.filter';
 export { AuthorizeGuard } from './common/guards/authorize.guard';
+export { ImportExportModule } from './common/import-export/import-export.module';
 export * from './common/interceptors/response-envelope.interceptor';
 export { ConsoleAppLogger } from './common/logging/console-logger.service';
 export * from './common/logging/logger.interface';
@@ -21,6 +22,7 @@ export { RequestLoggerMiddleware } from './common/middleware/request-logger.midd
 export { ErrorReporterService } from './common/observability/error-reporter.service';
 export * from './common/pagination/pagination.dto';
 export * from './common/rbac/access-control.constants';
+export * from './common/sort/multi-sort';
 export { RedisThrottlerStorage } from './common/throttling/redis-throttler.storage';
 export * from './common/types/request-context';
 export * from './common/types/transaction-executor';
@@ -58,6 +60,11 @@ export {
   type FileOwnerRecord,
 } from './ports/file-lookup.port';
 export {
+  type ImportExportAdapter,
+  ImportExportAdapterRegistry,
+  type ImportExportRowContext,
+} from './ports/import-export-adapter.port';
+export {
   MAIL_TEMPLATE_SENDER,
   type MailTemplateSender,
   type MailTemplateSendInput,
@@ -66,11 +73,6 @@ export {
   ORGANIZATION_LOOKUP,
   type OrganizationLookup,
 } from './ports/organization-lookup.port';
-export {
-  PROJECT_DEMO_GATEWAY,
-  type ProjectDemoGateway,
-  type ProjectDemoRecord,
-} from './ports/project-demo-gateway.port';
 export {
   PROJECT_LOOKUP,
   type ProjectLookup,

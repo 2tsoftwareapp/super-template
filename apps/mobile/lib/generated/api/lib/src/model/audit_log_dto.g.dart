@@ -33,18 +33,18 @@ class _$AuditLogDto extends AuditLogDto {
   factory _$AuditLogDto([void Function(AuditLogDtoBuilder)? updates]) =>
       (AuditLogDtoBuilder()..update(updates))._build();
 
-  _$AuditLogDto._(
-      {required this.id,
-      this.actorId,
-      required this.action,
-      required this.entityType,
-      this.entityId,
-      this.metadata,
-      this.ipAddress,
-      this.userAgent,
-      this.requestId,
-      required this.createdAt})
-      : super._();
+  _$AuditLogDto._({
+    required this.id,
+    this.actorId,
+    required this.action,
+    required this.entityType,
+    this.entityId,
+    this.metadata,
+    this.ipAddress,
+    this.userAgent,
+    this.requestId,
+    required this.createdAt,
+  }) : super._();
   @override
   AuditLogDto rebuild(void Function(AuditLogDtoBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -190,16 +190,25 @@ class AuditLogDtoBuilder implements Builder<AuditLogDto, AuditLogDtoBuilder> {
             id: BuiltValueNullFieldError.checkNotNull(id, r'AuditLogDto', 'id'),
             actorId: actorId,
             action: BuiltValueNullFieldError.checkNotNull(
-                action, r'AuditLogDto', 'action'),
+              action,
+              r'AuditLogDto',
+              'action',
+            ),
             entityType: BuiltValueNullFieldError.checkNotNull(
-                entityType, r'AuditLogDto', 'entityType'),
+              entityType,
+              r'AuditLogDto',
+              'entityType',
+            ),
             entityId: entityId,
             metadata: _metadata?.build(),
             ipAddress: ipAddress,
             userAgent: userAgent,
             requestId: requestId,
             createdAt: BuiltValueNullFieldError.checkNotNull(
-                createdAt, r'AuditLogDto', 'createdAt'),
+              createdAt,
+              r'AuditLogDto',
+              'createdAt',
+            ),
           );
     } catch (_) {
       late String _$failedField;
@@ -208,7 +217,10 @@ class AuditLogDtoBuilder implements Builder<AuditLogDto, AuditLogDtoBuilder> {
         _metadata?.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'AuditLogDto', _$failedField, e.toString());
+          r'AuditLogDto',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

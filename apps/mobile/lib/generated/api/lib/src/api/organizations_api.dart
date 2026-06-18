@@ -48,16 +48,10 @@ class OrganizationsApi {
     final _path = r'/api/v1/organizations';
     final _options = Options(
       method: r'POST',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -69,14 +63,13 @@ class OrganizationsApi {
 
     try {
       const _type = FullType(CreateOrganizationDto);
-      _bodyData =
-          _serializers.serialize(createOrganizationDto, specifiedType: _type);
+      _bodyData = _serializers.serialize(
+        createOrganizationDto,
+        specifiedType: _type,
+      );
     } catch (error, stackTrace) {
       throw DioException(
-        requestOptions: _options.compose(
-          _dio.options,
-          _path,
-        ),
+        requestOptions: _options.compose(_dio.options, _path),
         type: DioExceptionType.unknown,
         error: error,
         stackTrace: stackTrace,
@@ -100,8 +93,9 @@ class OrganizationsApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType:
-                  const FullType(OrganizationsControllerCreate200Response),
+              specifiedType: const FullType(
+                OrganizationsControllerCreate200Response,
+              ),
             ) as OrganizationsControllerCreate200Response;
     } catch (error, stackTrace) {
       throw DioException(
@@ -150,16 +144,10 @@ class OrganizationsApi {
     final _path = r'/api/v1/organizations';
     final _options = Options(
       method: r'GET',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -182,8 +170,9 @@ class OrganizationsApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType:
-                  const FullType(OrganizationsControllerList200Response),
+              specifiedType: const FullType(
+                OrganizationsControllerList200Response,
+              ),
             ) as OrganizationsControllerList200Response;
     } catch (error, stackTrace) {
       throw DioException(

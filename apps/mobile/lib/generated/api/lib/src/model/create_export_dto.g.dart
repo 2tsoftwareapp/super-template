@@ -13,11 +13,14 @@ class _$CreateExportDto extends CreateExportDto {
   final String type;
   @override
   final BuiltMap<String, JsonObject?>? filters;
+  @override
+  final String? idempotencyKey;
 
   factory _$CreateExportDto([void Function(CreateExportDtoBuilder)? updates]) =>
       (CreateExportDtoBuilder()..update(updates))._build();
 
-  _$CreateExportDto._({required this.type, this.filters}) : super._();
+  _$CreateExportDto._({required this.type, this.filters, this.idempotencyKey})
+      : super._();
   @override
   CreateExportDto rebuild(void Function(CreateExportDtoBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -30,7 +33,8 @@ class _$CreateExportDto extends CreateExportDto {
     if (identical(other, this)) return true;
     return other is CreateExportDto &&
         type == other.type &&
-        filters == other.filters;
+        filters == other.filters &&
+        idempotencyKey == other.idempotencyKey;
   }
 
   @override
@@ -38,6 +42,7 @@ class _$CreateExportDto extends CreateExportDto {
     var _$hash = 0;
     _$hash = $jc(_$hash, type.hashCode);
     _$hash = $jc(_$hash, filters.hashCode);
+    _$hash = $jc(_$hash, idempotencyKey.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -46,7 +51,8 @@ class _$CreateExportDto extends CreateExportDto {
   String toString() {
     return (newBuiltValueToStringHelper(r'CreateExportDto')
           ..add('type', type)
-          ..add('filters', filters))
+          ..add('filters', filters)
+          ..add('idempotencyKey', idempotencyKey))
         .toString();
   }
 }
@@ -65,6 +71,11 @@ class CreateExportDtoBuilder
   set filters(MapBuilder<String, JsonObject?>? filters) =>
       _$this._filters = filters;
 
+  String? _idempotencyKey;
+  String? get idempotencyKey => _$this._idempotencyKey;
+  set idempotencyKey(String? idempotencyKey) =>
+      _$this._idempotencyKey = idempotencyKey;
+
   CreateExportDtoBuilder() {
     CreateExportDto._defaults(this);
   }
@@ -74,6 +85,7 @@ class CreateExportDtoBuilder
     if ($v != null) {
       _type = $v.type;
       _filters = $v.filters?.toBuilder();
+      _idempotencyKey = $v.idempotencyKey;
       _$v = null;
     }
     return this;
@@ -98,8 +110,12 @@ class CreateExportDtoBuilder
       _$result = _$v ??
           _$CreateExportDto._(
             type: BuiltValueNullFieldError.checkNotNull(
-                type, r'CreateExportDto', 'type'),
+              type,
+              r'CreateExportDto',
+              'type',
+            ),
             filters: _filters?.build(),
+            idempotencyKey: idempotencyKey,
           );
     } catch (_) {
       late String _$failedField;
@@ -108,7 +124,10 @@ class CreateExportDtoBuilder
         _filters?.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'CreateExportDto', _$failedField, e.toString());
+          r'CreateExportDto',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

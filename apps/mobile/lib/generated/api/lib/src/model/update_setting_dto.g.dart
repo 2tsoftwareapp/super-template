@@ -12,8 +12,9 @@ class _$UpdateSettingDto extends UpdateSettingDto {
   @override
   final BuiltMap<String, JsonObject?> value;
 
-  factory _$UpdateSettingDto(
-          [void Function(UpdateSettingDtoBuilder)? updates]) =>
+  factory _$UpdateSettingDto([
+    void Function(UpdateSettingDtoBuilder)? updates,
+  ]) =>
       (UpdateSettingDtoBuilder()..update(updates))._build();
 
   _$UpdateSettingDto._({required this.value}) : super._();
@@ -41,8 +42,9 @@ class _$UpdateSettingDto extends UpdateSettingDto {
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper(r'UpdateSettingDto')
-          ..add('value', value))
+    return (newBuiltValueToStringHelper(
+      r'UpdateSettingDto',
+    )..add('value', value))
         .toString();
   }
 }
@@ -85,10 +87,7 @@ class UpdateSettingDtoBuilder
   _$UpdateSettingDto _build() {
     _$UpdateSettingDto _$result;
     try {
-      _$result = _$v ??
-          _$UpdateSettingDto._(
-            value: value.build(),
-          );
+      _$result = _$v ?? _$UpdateSettingDto._(value: value.build());
     } catch (_) {
       late String _$failedField;
       try {
@@ -96,7 +95,10 @@ class UpdateSettingDtoBuilder
         value.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'UpdateSettingDto', _$failedField, e.toString());
+          r'UpdateSettingDto',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

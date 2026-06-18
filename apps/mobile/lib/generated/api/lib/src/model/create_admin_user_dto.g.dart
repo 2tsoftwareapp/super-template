@@ -16,7 +16,8 @@ const CreateAdminUserDtoStatusEnum _$createAdminUserDtoStatusEnum_BLOCKED =
     const CreateAdminUserDtoStatusEnum._('BLOCKED');
 
 CreateAdminUserDtoStatusEnum _$createAdminUserDtoStatusEnumValueOf(
-    String name) {
+  String name,
+) {
   switch (name) {
     case 'PENDING':
       return _$createAdminUserDtoStatusEnum_PENDING;
@@ -37,9 +38,33 @@ final BuiltSet<CreateAdminUserDtoStatusEnum>
   _$createAdminUserDtoStatusEnum_BLOCKED,
 ]);
 
+const CreateAdminUserDtoRoleEnum _$createAdminUserDtoRoleEnum_ADMIN =
+    const CreateAdminUserDtoRoleEnum._('ADMIN');
+const CreateAdminUserDtoRoleEnum _$createAdminUserDtoRoleEnum_USER =
+    const CreateAdminUserDtoRoleEnum._('USER');
+
+CreateAdminUserDtoRoleEnum _$createAdminUserDtoRoleEnumValueOf(String name) {
+  switch (name) {
+    case 'ADMIN':
+      return _$createAdminUserDtoRoleEnum_ADMIN;
+    case 'USER':
+      return _$createAdminUserDtoRoleEnum_USER;
+    default:
+      throw ArgumentError(name);
+  }
+}
+
+final BuiltSet<CreateAdminUserDtoRoleEnum> _$createAdminUserDtoRoleEnumValues =
+    BuiltSet<CreateAdminUserDtoRoleEnum>(const <CreateAdminUserDtoRoleEnum>[
+  _$createAdminUserDtoRoleEnum_ADMIN,
+  _$createAdminUserDtoRoleEnum_USER,
+]);
+
 Serializer<CreateAdminUserDtoStatusEnum>
     _$createAdminUserDtoStatusEnumSerializer =
     _$CreateAdminUserDtoStatusEnumSerializer();
+Serializer<CreateAdminUserDtoRoleEnum> _$createAdminUserDtoRoleEnumSerializer =
+    _$CreateAdminUserDtoRoleEnumSerializer();
 
 class _$CreateAdminUserDtoStatusEnumSerializer
     implements PrimitiveSerializer<CreateAdminUserDtoStatusEnum> {
@@ -60,16 +85,57 @@ class _$CreateAdminUserDtoStatusEnumSerializer
   final String wireName = 'CreateAdminUserDtoStatusEnum';
 
   @override
-  Object serialize(Serializers serializers, CreateAdminUserDtoStatusEnum object,
-          {FullType specifiedType = FullType.unspecified}) =>
+  Object serialize(
+    Serializers serializers,
+    CreateAdminUserDtoStatusEnum object, {
+    FullType specifiedType = FullType.unspecified,
+  }) =>
       _toWire[object.name] ?? object.name;
 
   @override
   CreateAdminUserDtoStatusEnum deserialize(
-          Serializers serializers, Object serialized,
-          {FullType specifiedType = FullType.unspecified}) =>
+    Serializers serializers,
+    Object serialized, {
+    FullType specifiedType = FullType.unspecified,
+  }) =>
       CreateAdminUserDtoStatusEnum.valueOf(
-          _fromWire[serialized] ?? (serialized is String ? serialized : ''));
+        _fromWire[serialized] ?? (serialized is String ? serialized : ''),
+      );
+}
+
+class _$CreateAdminUserDtoRoleEnumSerializer
+    implements PrimitiveSerializer<CreateAdminUserDtoRoleEnum> {
+  static const Map<String, Object> _toWire = const <String, Object>{
+    'ADMIN': 'ADMIN',
+    'USER': 'USER',
+  };
+  static const Map<Object, String> _fromWire = const <Object, String>{
+    'ADMIN': 'ADMIN',
+    'USER': 'USER',
+  };
+
+  @override
+  final Iterable<Type> types = const <Type>[CreateAdminUserDtoRoleEnum];
+  @override
+  final String wireName = 'CreateAdminUserDtoRoleEnum';
+
+  @override
+  Object serialize(
+    Serializers serializers,
+    CreateAdminUserDtoRoleEnum object, {
+    FullType specifiedType = FullType.unspecified,
+  }) =>
+      _toWire[object.name] ?? object.name;
+
+  @override
+  CreateAdminUserDtoRoleEnum deserialize(
+    Serializers serializers,
+    Object serialized, {
+    FullType specifiedType = FullType.unspecified,
+  }) =>
+      CreateAdminUserDtoRoleEnum.valueOf(
+        _fromWire[serialized] ?? (serialized is String ? serialized : ''),
+      );
 }
 
 class _$CreateAdminUserDto extends CreateAdminUserDto {
@@ -84,23 +150,28 @@ class _$CreateAdminUserDto extends CreateAdminUserDto {
   @override
   final CreateAdminUserDtoStatusEnum? status;
   @override
-  final BuiltList<String>? roleIds;
+  final CreateAdminUserDtoRoleEnum? role;
+  @override
+  final String? organizationId;
 
-  factory _$CreateAdminUserDto(
-          [void Function(CreateAdminUserDtoBuilder)? updates]) =>
+  factory _$CreateAdminUserDto([
+    void Function(CreateAdminUserDtoBuilder)? updates,
+  ]) =>
       (CreateAdminUserDtoBuilder()..update(updates))._build();
 
-  _$CreateAdminUserDto._(
-      {required this.email,
-      required this.password,
-      required this.displayName,
-      this.avatarUrl,
-      this.status,
-      this.roleIds})
-      : super._();
+  _$CreateAdminUserDto._({
+    required this.email,
+    required this.password,
+    required this.displayName,
+    this.avatarUrl,
+    this.status,
+    this.role,
+    this.organizationId,
+  }) : super._();
   @override
   CreateAdminUserDto rebuild(
-          void Function(CreateAdminUserDtoBuilder) updates) =>
+    void Function(CreateAdminUserDtoBuilder) updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -116,7 +187,8 @@ class _$CreateAdminUserDto extends CreateAdminUserDto {
         displayName == other.displayName &&
         avatarUrl == other.avatarUrl &&
         status == other.status &&
-        roleIds == other.roleIds;
+        role == other.role &&
+        organizationId == other.organizationId;
   }
 
   @override
@@ -127,7 +199,8 @@ class _$CreateAdminUserDto extends CreateAdminUserDto {
     _$hash = $jc(_$hash, displayName.hashCode);
     _$hash = $jc(_$hash, avatarUrl.hashCode);
     _$hash = $jc(_$hash, status.hashCode);
-    _$hash = $jc(_$hash, roleIds.hashCode);
+    _$hash = $jc(_$hash, role.hashCode);
+    _$hash = $jc(_$hash, organizationId.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -140,7 +213,8 @@ class _$CreateAdminUserDto extends CreateAdminUserDto {
           ..add('displayName', displayName)
           ..add('avatarUrl', avatarUrl)
           ..add('status', status)
-          ..add('roleIds', roleIds))
+          ..add('role', role)
+          ..add('organizationId', organizationId))
         .toString();
   }
 }
@@ -169,9 +243,14 @@ class CreateAdminUserDtoBuilder
   CreateAdminUserDtoStatusEnum? get status => _$this._status;
   set status(CreateAdminUserDtoStatusEnum? status) => _$this._status = status;
 
-  ListBuilder<String>? _roleIds;
-  ListBuilder<String> get roleIds => _$this._roleIds ??= ListBuilder<String>();
-  set roleIds(ListBuilder<String>? roleIds) => _$this._roleIds = roleIds;
+  CreateAdminUserDtoRoleEnum? _role;
+  CreateAdminUserDtoRoleEnum? get role => _$this._role;
+  set role(CreateAdminUserDtoRoleEnum? role) => _$this._role = role;
+
+  String? _organizationId;
+  String? get organizationId => _$this._organizationId;
+  set organizationId(String? organizationId) =>
+      _$this._organizationId = organizationId;
 
   CreateAdminUserDtoBuilder() {
     CreateAdminUserDto._defaults(this);
@@ -185,7 +264,8 @@ class CreateAdminUserDtoBuilder
       _displayName = $v.displayName;
       _avatarUrl = $v.avatarUrl;
       _status = $v.status;
-      _roleIds = $v.roleIds?.toBuilder();
+      _role = $v.role;
+      _organizationId = $v.organizationId;
       _$v = null;
     }
     return this;
@@ -205,31 +285,28 @@ class CreateAdminUserDtoBuilder
   CreateAdminUserDto build() => _build();
 
   _$CreateAdminUserDto _build() {
-    _$CreateAdminUserDto _$result;
-    try {
-      _$result = _$v ??
-          _$CreateAdminUserDto._(
-            email: BuiltValueNullFieldError.checkNotNull(
-                email, r'CreateAdminUserDto', 'email'),
-            password: BuiltValueNullFieldError.checkNotNull(
-                password, r'CreateAdminUserDto', 'password'),
-            displayName: BuiltValueNullFieldError.checkNotNull(
-                displayName, r'CreateAdminUserDto', 'displayName'),
-            avatarUrl: avatarUrl,
-            status: status,
-            roleIds: _roleIds?.build(),
-          );
-    } catch (_) {
-      late String _$failedField;
-      try {
-        _$failedField = 'roleIds';
-        _roleIds?.build();
-      } catch (e) {
-        throw BuiltValueNestedFieldError(
-            r'CreateAdminUserDto', _$failedField, e.toString());
-      }
-      rethrow;
-    }
+    final _$result = _$v ??
+        _$CreateAdminUserDto._(
+          email: BuiltValueNullFieldError.checkNotNull(
+            email,
+            r'CreateAdminUserDto',
+            'email',
+          ),
+          password: BuiltValueNullFieldError.checkNotNull(
+            password,
+            r'CreateAdminUserDto',
+            'password',
+          ),
+          displayName: BuiltValueNullFieldError.checkNotNull(
+            displayName,
+            r'CreateAdminUserDto',
+            'displayName',
+          ),
+          avatarUrl: avatarUrl,
+          status: status,
+          role: role,
+          organizationId: organizationId,
+        );
     replace(_$result);
     return _$result;
   }

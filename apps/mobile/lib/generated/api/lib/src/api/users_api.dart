@@ -49,16 +49,10 @@ class UsersApi {
     final _path = r'/api/v1/users/me/preferences';
     final _options = Options(
       method: r'GET',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -82,7 +76,8 @@ class UsersApi {
           : _serializers.deserialize(
               rawResponse,
               specifiedType: const FullType(
-                  PreferencesControllerGetMyPreferences200Response),
+                PreferencesControllerGetMyPreferences200Response,
+              ),
             ) as PreferencesControllerGetMyPreferences200Response;
     } catch (error, stackTrace) {
       throw DioException(
@@ -133,16 +128,10 @@ class UsersApi {
     final _path = r'/api/v1/users/me/preferences';
     final _options = Options(
       method: r'PATCH',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -154,14 +143,13 @@ class UsersApi {
 
     try {
       const _type = FullType(UpdatePreferencesDto);
-      _bodyData =
-          _serializers.serialize(updatePreferencesDto, specifiedType: _type);
+      _bodyData = _serializers.serialize(
+        updatePreferencesDto,
+        specifiedType: _type,
+      );
     } catch (error, stackTrace) {
       throw DioException(
-        requestOptions: _options.compose(
-          _dio.options,
-          _path,
-        ),
+        requestOptions: _options.compose(_dio.options, _path),
         type: DioExceptionType.unknown,
         error: error,
         stackTrace: stackTrace,
@@ -186,7 +174,8 @@ class UsersApi {
           : _serializers.deserialize(
               rawResponse,
               specifiedType: const FullType(
-                  PreferencesControllerGetMyPreferences200Response),
+                PreferencesControllerGetMyPreferences200Response,
+              ),
             ) as PreferencesControllerGetMyPreferences200Response;
     } catch (error, stackTrace) {
       throw DioException(
@@ -237,16 +226,10 @@ class UsersApi {
     final _path = r'/api/v1/users/me/password';
     final _options = Options(
       method: r'PATCH',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -258,14 +241,13 @@ class UsersApi {
 
     try {
       const _type = FullType(ChangePasswordDto);
-      _bodyData =
-          _serializers.serialize(changePasswordDto, specifiedType: _type);
+      _bodyData = _serializers.serialize(
+        changePasswordDto,
+        specifiedType: _type,
+      );
     } catch (error, stackTrace) {
       throw DioException(
-        requestOptions: _options.compose(
-          _dio.options,
-          _path,
-        ),
+        requestOptions: _options.compose(_dio.options, _path),
         type: DioExceptionType.unknown,
         error: error,
         stackTrace: stackTrace,
@@ -289,8 +271,9 @@ class UsersApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType:
-                  const FullType(AdminUsersControllerDeleteUser200Response),
+              specifiedType: const FullType(
+                AdminUsersControllerDeleteUser200Response,
+              ),
             ) as AdminUsersControllerDeleteUser200Response;
     } catch (error, stackTrace) {
       throw DioException(
@@ -339,16 +322,10 @@ class UsersApi {
     final _path = r'/api/v1/users/me';
     final _options = Options(
       method: r'GET',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -371,8 +348,9 @@ class UsersApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType:
-                  const FullType(AdminUsersControllerCreateUser201Response),
+              specifiedType: const FullType(
+                AdminUsersControllerCreateUser201Response,
+              ),
             ) as AdminUsersControllerCreateUser201Response;
     } catch (error, stackTrace) {
       throw DioException(
@@ -423,16 +401,10 @@ class UsersApi {
     final _path = r'/api/v1/users/me';
     final _options = Options(
       method: r'PATCH',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -444,14 +416,13 @@ class UsersApi {
 
     try {
       const _type = FullType(UpdateProfileDto);
-      _bodyData =
-          _serializers.serialize(updateProfileDto, specifiedType: _type);
+      _bodyData = _serializers.serialize(
+        updateProfileDto,
+        specifiedType: _type,
+      );
     } catch (error, stackTrace) {
       throw DioException(
-        requestOptions: _options.compose(
-          _dio.options,
-          _path,
-        ),
+        requestOptions: _options.compose(_dio.options, _path),
         type: DioExceptionType.unknown,
         error: error,
         stackTrace: stackTrace,
@@ -475,8 +446,9 @@ class UsersApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType:
-                  const FullType(AdminUsersControllerCreateUser201Response),
+              specifiedType: const FullType(
+                AdminUsersControllerCreateUser201Response,
+              ),
             ) as AdminUsersControllerCreateUser201Response;
     } catch (error, stackTrace) {
       throw DioException(

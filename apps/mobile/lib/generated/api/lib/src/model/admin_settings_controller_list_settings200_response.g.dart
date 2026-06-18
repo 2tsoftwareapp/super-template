@@ -15,19 +15,22 @@ class _$AdminSettingsControllerListSettings200Response
   @override
   final RequestMetaDto meta;
 
-  factory _$AdminSettingsControllerListSettings200Response(
-          [void Function(AdminSettingsControllerListSettings200ResponseBuilder)?
-              updates]) =>
+  factory _$AdminSettingsControllerListSettings200Response([
+    void Function(AdminSettingsControllerListSettings200ResponseBuilder)?
+        updates,
+  ]) =>
       (AdminSettingsControllerListSettings200ResponseBuilder()..update(updates))
           ._build();
 
-  _$AdminSettingsControllerListSettings200Response._(
-      {required this.data, required this.meta})
-      : super._();
+  _$AdminSettingsControllerListSettings200Response._({
+    required this.data,
+    required this.meta,
+  }) : super._();
   @override
   AdminSettingsControllerListSettings200Response rebuild(
-          void Function(AdminSettingsControllerListSettings200ResponseBuilder)
-              updates) =>
+    void Function(AdminSettingsControllerListSettings200ResponseBuilder)
+        updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -54,7 +57,8 @@ class _$AdminSettingsControllerListSettings200Response
   @override
   String toString() {
     return (newBuiltValueToStringHelper(
-            r'AdminSettingsControllerListSettings200Response')
+      r'AdminSettingsControllerListSettings200Response',
+    )
           ..add('data', data)
           ..add('meta', meta))
         .toString();
@@ -97,8 +101,9 @@ class AdminSettingsControllerListSettings200ResponseBuilder
 
   @override
   void update(
-      void Function(AdminSettingsControllerListSettings200ResponseBuilder)?
-          updates) {
+    void Function(AdminSettingsControllerListSettings200ResponseBuilder)?
+        updates,
+  ) {
     if (updates != null) updates(this);
   }
 
@@ -122,9 +127,10 @@ class AdminSettingsControllerListSettings200ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'AdminSettingsControllerListSettings200Response',
-            _$failedField,
-            e.toString());
+          r'AdminSettingsControllerListSettings200Response',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

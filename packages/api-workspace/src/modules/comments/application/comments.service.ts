@@ -97,7 +97,7 @@ export class CommentsService {
     }
 
     const canModerate = actor.permissions.includes(
-      PERMISSION_NAMES.COMMENTS_MODERATE,
+      PERMISSION_NAMES.COMMENTS_UPDATE,
     );
 
     if (comment.authorId !== actor.userId && !canModerate) {
@@ -139,11 +139,11 @@ export class CommentsService {
       );
     }
 
-    const canModerate = actor.permissions.includes(
-      PERMISSION_NAMES.COMMENTS_MODERATE,
+    const canDeleteOthers = actor.permissions.includes(
+      PERMISSION_NAMES.COMMENTS_DELETE,
     );
 
-    if (comment.authorId !== actor.userId && !canModerate) {
+    if (comment.authorId !== actor.userId && !canDeleteOthers) {
       throw new AppError(
         ERROR_CODES.AUTH_FORBIDDEN,
         'You cannot delete this comment',

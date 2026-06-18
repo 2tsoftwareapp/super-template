@@ -15,21 +15,23 @@ class _$PreferencesControllerGetMyPreferences200Response
   @override
   final RequestMetaDto meta;
 
-  factory _$PreferencesControllerGetMyPreferences200Response(
-          [void Function(
-                  PreferencesControllerGetMyPreferences200ResponseBuilder)?
-              updates]) =>
+  factory _$PreferencesControllerGetMyPreferences200Response([
+    void Function(PreferencesControllerGetMyPreferences200ResponseBuilder)?
+        updates,
+  ]) =>
       (PreferencesControllerGetMyPreferences200ResponseBuilder()
             ..update(updates))
           ._build();
 
-  _$PreferencesControllerGetMyPreferences200Response._(
-      {required this.data, required this.meta})
-      : super._();
+  _$PreferencesControllerGetMyPreferences200Response._({
+    required this.data,
+    required this.meta,
+  }) : super._();
   @override
   PreferencesControllerGetMyPreferences200Response rebuild(
-          void Function(PreferencesControllerGetMyPreferences200ResponseBuilder)
-              updates) =>
+    void Function(PreferencesControllerGetMyPreferences200ResponseBuilder)
+        updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -56,7 +58,8 @@ class _$PreferencesControllerGetMyPreferences200Response
   @override
   String toString() {
     return (newBuiltValueToStringHelper(
-            r'PreferencesControllerGetMyPreferences200Response')
+      r'PreferencesControllerGetMyPreferences200Response',
+    )
           ..add('data', data)
           ..add('meta', meta))
         .toString();
@@ -99,8 +102,9 @@ class PreferencesControllerGetMyPreferences200ResponseBuilder
 
   @override
   void update(
-      void Function(PreferencesControllerGetMyPreferences200ResponseBuilder)?
-          updates) {
+    void Function(PreferencesControllerGetMyPreferences200ResponseBuilder)?
+        updates,
+  ) {
     if (updates != null) updates(this);
   }
 
@@ -124,9 +128,10 @@ class PreferencesControllerGetMyPreferences200ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'PreferencesControllerGetMyPreferences200Response',
-            _$failedField,
-            e.toString());
+          r'PreferencesControllerGetMyPreferences200Response',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

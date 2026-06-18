@@ -15,19 +15,20 @@ class _$NotificationsControllerMarkRead200Response
   @override
   final RequestMetaDto meta;
 
-  factory _$NotificationsControllerMarkRead200Response(
-          [void Function(NotificationsControllerMarkRead200ResponseBuilder)?
-              updates]) =>
+  factory _$NotificationsControllerMarkRead200Response([
+    void Function(NotificationsControllerMarkRead200ResponseBuilder)? updates,
+  ]) =>
       (NotificationsControllerMarkRead200ResponseBuilder()..update(updates))
           ._build();
 
-  _$NotificationsControllerMarkRead200Response._(
-      {required this.data, required this.meta})
-      : super._();
+  _$NotificationsControllerMarkRead200Response._({
+    required this.data,
+    required this.meta,
+  }) : super._();
   @override
   NotificationsControllerMarkRead200Response rebuild(
-          void Function(NotificationsControllerMarkRead200ResponseBuilder)
-              updates) =>
+    void Function(NotificationsControllerMarkRead200ResponseBuilder) updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -54,7 +55,8 @@ class _$NotificationsControllerMarkRead200Response
   @override
   String toString() {
     return (newBuiltValueToStringHelper(
-            r'NotificationsControllerMarkRead200Response')
+      r'NotificationsControllerMarkRead200Response',
+    )
           ..add('data', data)
           ..add('meta', meta))
         .toString();
@@ -96,8 +98,8 @@ class NotificationsControllerMarkRead200ResponseBuilder
 
   @override
   void update(
-      void Function(NotificationsControllerMarkRead200ResponseBuilder)?
-          updates) {
+    void Function(NotificationsControllerMarkRead200ResponseBuilder)? updates,
+  ) {
     if (updates != null) updates(this);
   }
 
@@ -121,9 +123,10 @@ class NotificationsControllerMarkRead200ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'NotificationsControllerMarkRead200Response',
-            _$failedField,
-            e.toString());
+          r'NotificationsControllerMarkRead200Response',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

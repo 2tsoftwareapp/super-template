@@ -4,13 +4,14 @@ import {
   sortCriteriaEqual,
 } from "@repo/api-contract/sort/multi-sort";
 
-import { DEFAULT_USERS_LIST_PARAMS, USERS_PAGE_SIZE } from "./constants";
 import type {
-  UserStatusFilter,
   UsersListParams,
   UsersPageSize,
   UsersSortField,
+  UserStatusFilter,
 } from "./types";
+
+import { DEFAULT_USERS_LIST_PARAMS, USERS_PAGE_SIZE } from "./constants";
 
 const SORT_FIELDS = [
   "createdAt",

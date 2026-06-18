@@ -59,8 +59,33 @@ export function assertCanAssignRoles(
     );
   }
 
+  if (!actorIsSuperAdmin) {
+    const invalidRole = desiredRoleNames.find(
+      (roleName) => roleName !== ROLE_NAMES.USER,
+    );
+
+    if (invalidRole) {
+      throw new AppError(
+        ERROR_CODES.AUTH_FORBIDDEN,
+        'Admins can only assign the USER role',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+  }
+
   if (
-    !actor.permissions.includes(PERMISSION_NAMES.ROLES_MANAGE) &&
+    desiredRoleNames.includes(ROLE_NAMES.SUPER_ADMIN) ||
+    (!actorIsSuperAdmin && desiredRoleNames.includes(ROLE_NAMES.ADMIN))
+  ) {
+    throw new AppError(
+      ERROR_CODES.AUTH_FORBIDDEN,
+      'This role cannot be assigned through the API',
+      HttpStatus.FORBIDDEN,
+    );
+  }
+
+  if (
+    !actor.permissions.includes(PERMISSION_NAMES.ROLES_UPDATE) &&
     !actorIsSuperAdmin
   ) {
     throw new AppError(
@@ -92,74 +117,14 @@ export function assertCanAssignRoleTargets(
   for (const role of desiredRoles) {
     const isPlatformUserRole =
       role.organizationId === null && role.name === ROLE_NAMES.USER;
-    const isCurrentOrganizationRole = role.organizationId === actor.organizationId;
 
-    if (isPlatformUserRole || isCurrentOrganizationRole) {
+    if (isPlatformUserRole) {
       continue;
     }
 
     throw new AppError(
       ERROR_CODES.AUTH_FORBIDDEN,
-      'Admins can only assign roles in their active organization',
-      HttpStatus.FORBIDDEN,
-    );
-  }
-}
-
-export function assertCanManageRoleCatalog(
-  actor: AuthenticatedRequestUser,
-  target: RolePolicyTarget | null,
-  organizationId: string | null,
-): void {
-  const actorIsSuperAdmin = actor.roles.includes(ROLE_NAMES.SUPER_ADMIN);
-
-  if (actorIsSuperAdmin) {
-    return;
-  }
-
-  if (!actor.permissions.includes(PERMISSION_NAMES.ROLES_MANAGE)) {
-    throw new AppError(
-      ERROR_CODES.AUTH_FORBIDDEN,
-      'You do not have permission to manage roles',
-      HttpStatus.FORBIDDEN,
-    );
-  }
-
-  if (!actor.organizationId) {
-    throw new AppError(
-      ERROR_CODES.AUTH_FORBIDDEN,
-      'An organization context is required to manage roles',
-      HttpStatus.FORBIDDEN,
-    );
-  }
-
-  if (!organizationId || organizationId !== actor.organizationId) {
-    throw new AppError(
-      ERROR_CODES.AUTH_FORBIDDEN,
-      'Admins can only manage roles in their active organization',
-      HttpStatus.FORBIDDEN,
-    );
-  }
-
-  if (target?.isSystem || target?.organizationId === null) {
-    throw new AppError(
-      ERROR_CODES.AUTH_FORBIDDEN,
-      'Only SUPER_ADMIN can manage platform or system roles',
-      HttpStatus.FORBIDDEN,
-    );
-  }
-}
-
-export function assertRoleNameIsNotReserved(name: string): void {
-  const normalizedName = name.trim().toUpperCase();
-  const isReserved = Object.values(ROLE_NAMES).some(
-    (roleName) => roleName === normalizedName,
-  );
-
-  if (isReserved) {
-    throw new AppError(
-      ERROR_CODES.AUTH_FORBIDDEN,
-      'Reserved roles can only be created by system initialization',
+      'Admins can only assign the USER role',
       HttpStatus.FORBIDDEN,
     );
   }
@@ -169,16 +134,24 @@ export function assertRoleScopeCanBeAssigned(
   role: RolePolicyTarget,
   actor?: Pick<AuthenticatedRequestUser, 'roles'>,
 ): void {
-  if (role.name === ROLE_NAMES.ADMIN && role.organizationId === null) {
-    if (actor?.roles.includes(ROLE_NAMES.SUPER_ADMIN)) {
-      return;
+  if (role.name === ROLE_NAMES.ADMIN) {
+    if (!actor?.roles.includes(ROLE_NAMES.SUPER_ADMIN)) {
+      throw new AppError(
+        ERROR_CODES.AUTH_FORBIDDEN,
+        'Only SUPER_ADMIN can assign the ADMIN role',
+        HttpStatus.FORBIDDEN,
+      );
     }
 
-    throw new AppError(
-      ERROR_CODES.AUTH_FORBIDDEN,
-      'ADMIN must be assigned as an organization-scoped role',
-      HttpStatus.FORBIDDEN,
-    );
+    if (!role.organizationId) {
+      throw new AppError(
+        ERROR_CODES.AUTH_FORBIDDEN,
+        'ADMIN must be assigned as an organization-scoped role',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    return;
   }
 
   if (role.name === ROLE_NAMES.SUPER_ADMIN) {

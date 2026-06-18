@@ -1,9 +1,12 @@
+import type { AuthenticatedRequestUser } from '@repo/api-core';
+
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { AppError, ERROR_CODES } from '@repo/api-core';
 
 import type { UserView } from './users.types';
 
 import { AccessControlService } from '../../access-control/application/access-control.service';
+import { assertUserBelongsToOrganization } from '../domain/user-org-scope.policy';
 import { UsersMapper } from './users.mapper';
 import {
   USERS_REPOSITORY,
@@ -20,7 +23,10 @@ export class GetUserUseCase {
     private readonly accessControlService: AccessControlService,
   ) {}
 
-  async execute(userId: string): Promise<UserView> {
+  async execute(
+    userId: string,
+    actor?: AuthenticatedRequestUser,
+  ): Promise<UserView> {
     const user = await this.usersRepository.findById(userId);
 
     if (!user) {
@@ -28,6 +34,18 @@ export class GetUserUseCase {
         ERROR_CODES.USER_NOT_FOUND,
         'User not found',
         HttpStatus.NOT_FOUND,
+      );
+    }
+
+    if (actor) {
+      await assertUserBelongsToOrganization(
+        (targetUserId, organizationId) =>
+          this.usersRepository.isUserInOrganization(
+            targetUserId,
+            organizationId,
+          ),
+        actor,
+        userId,
       );
     }
 

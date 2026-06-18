@@ -15,19 +15,20 @@ class _$AttachmentsControllerAttach201Response
   @override
   final RequestMetaDto meta;
 
-  factory _$AttachmentsControllerAttach201Response(
-          [void Function(AttachmentsControllerAttach201ResponseBuilder)?
-              updates]) =>
+  factory _$AttachmentsControllerAttach201Response([
+    void Function(AttachmentsControllerAttach201ResponseBuilder)? updates,
+  ]) =>
       (AttachmentsControllerAttach201ResponseBuilder()..update(updates))
           ._build();
 
-  _$AttachmentsControllerAttach201Response._(
-      {required this.data, required this.meta})
-      : super._();
+  _$AttachmentsControllerAttach201Response._({
+    required this.data,
+    required this.meta,
+  }) : super._();
   @override
   AttachmentsControllerAttach201Response rebuild(
-          void Function(AttachmentsControllerAttach201ResponseBuilder)
-              updates) =>
+    void Function(AttachmentsControllerAttach201ResponseBuilder) updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -54,7 +55,8 @@ class _$AttachmentsControllerAttach201Response
   @override
   String toString() {
     return (newBuiltValueToStringHelper(
-            r'AttachmentsControllerAttach201Response')
+      r'AttachmentsControllerAttach201Response',
+    )
           ..add('data', data)
           ..add('meta', meta))
         .toString();
@@ -96,7 +98,8 @@ class AttachmentsControllerAttach201ResponseBuilder
 
   @override
   void update(
-      void Function(AttachmentsControllerAttach201ResponseBuilder)? updates) {
+    void Function(AttachmentsControllerAttach201ResponseBuilder)? updates,
+  ) {
     if (updates != null) updates(this);
   }
 
@@ -120,9 +123,10 @@ class AttachmentsControllerAttach201ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'AttachmentsControllerAttach201Response',
-            _$failedField,
-            e.toString());
+          r'AttachmentsControllerAttach201Response',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

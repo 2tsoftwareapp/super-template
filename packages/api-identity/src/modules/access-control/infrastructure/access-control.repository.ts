@@ -4,6 +4,7 @@ import type {
 } from '@repo/api-database';
 
 import { Inject, Injectable } from '@nestjs/common';
+import { FIXED_ROLE_NAMES, ROLE_NAMES } from '@repo/api-core';
 import { DATABASE } from '@repo/api-database';
 import {
   permissions,
@@ -27,7 +28,16 @@ export class AccessControlRepository {
     executor: DatabaseExecutor = this.database,
   ) {
     if (includePlatformRoles) {
-      return executor.select().from(roles).orderBy(roles.name);
+      return executor
+        .select()
+        .from(roles)
+        .where(
+          and(
+            inArray(roles.name, [...FIXED_ROLE_NAMES]),
+            isNull(roles.organizationId),
+          ),
+        )
+        .orderBy(roles.name);
     }
 
     return executor
@@ -35,10 +45,13 @@ export class AccessControlRepository {
       .from(roles)
       .where(
         or(
-          and(isNull(roles.organizationId), eq(roles.isSystem, true)),
+          and(eq(roles.name, ROLE_NAMES.USER), isNull(roles.organizationId)),
           organizationId
-            ? eq(roles.organizationId, organizationId)
-            : isNull(roles.organizationId),
+            ? and(
+                eq(roles.name, ROLE_NAMES.ADMIN),
+                eq(roles.organizationId, organizationId),
+              )
+            : undefined,
         ),
       )
       .orderBy(roles.name);

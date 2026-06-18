@@ -1,4 +1,3 @@
-import 'package:built_collection/built_collection.dart';
 import 'package:built_value/json_object.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -169,25 +168,25 @@ class AdminRepository {
     required String email,
     required String password,
     required String displayName,
+    String role = 'USER',
+    String? organizationId,
   }) async {
     try {
-      final response = await _usersApi.adminUsersControllerCreateUser(
-        createAdminUserDto: CreateAdminUserDto(
-          (b) => b
-            ..email = email
-            ..password = password
-            ..displayName = displayName
-            ..status = CreateAdminUserDtoStatusEnum.ACTIVE,
-        ),
+      final payload = <String, dynamic>{
+        'email': email,
+        'password': password,
+        'displayName': displayName,
+        'status': 'ACTIVE',
+        'role': role,
+      };
+      if (organizationId != null) {
+        payload['organizationId'] = organizationId;
+      }
+      final response = await _client.dio.post<Map<String, dynamic>>(
+        '/api/v1/admin/users',
+        data: payload,
       );
-      final user = response.data!.data;
-      return AdminUserSummary(
-        id: user.id,
-        email: user.email,
-        displayName: user.displayName,
-        status: user.status.name,
-        roles: user.roles.toList(),
-      );
+      return _userFromEnvelope(response.data!);
     } on DioException catch (error) {
       throw AppException.fromDio(error);
     }
@@ -225,7 +224,7 @@ class AdminRepository {
             (role) => AdminRole(
               id: role.id,
               name: role.name,
-              description: role.description,
+              description: role.description?.toString() ?? '',
             ),
           )
           .toList();
@@ -238,7 +237,6 @@ class AdminRepository {
     required String id,
     String? displayName,
     String? email,
-    List<String>? roleIds,
   }) async {
     try {
       final response = await _usersApi.adminUsersControllerUpdateUser(
@@ -246,8 +244,7 @@ class AdminRepository {
         updateAdminUserDto: UpdateAdminUserDto(
           (b) => b
             ..displayName = displayName
-            ..email = email
-            ..roleIds = roleIds == null ? null : ListBuilder<String>(roleIds),
+            ..email = email,
         ),
       );
       final user = response.data!.data;
@@ -273,26 +270,33 @@ class AdminRepository {
 
   Future<AdminUserSummary> replaceRoles({
     required String id,
-    required List<String> roleIds,
+    required String role,
+    String? organizationId,
   }) async {
     try {
-      final response = await _usersApi.adminUsersControllerReplaceRoles(
-        id: id,
-        replaceUserRolesDto: ReplaceUserRolesDto(
-          (b) => b..roleIds.replace(roleIds),
-        ),
+      final payload = <String, dynamic>{'role': role};
+      if (organizationId != null) {
+        payload['organizationId'] = organizationId;
+      }
+      final response = await _client.dio.put<Map<String, dynamic>>(
+        '/api/v1/admin/users/$id/roles',
+        data: payload,
       );
-      final user = response.data!.data;
-      return AdminUserSummary(
-        id: user.id,
-        email: user.email,
-        displayName: user.displayName,
-        status: user.status.name,
-        roles: user.roles.toList(),
-      );
+      return _userFromEnvelope(response.data!);
     } on DioException catch (error) {
       throw AppException.fromDio(error);
     }
+  }
+
+  AdminUserSummary _userFromEnvelope(Map<String, dynamic> envelope) {
+    final user = envelope['data'] as Map<String, dynamic>;
+    return AdminUserSummary(
+      id: user['id'] as String,
+      email: user['email'] as String,
+      displayName: user['displayName'] as String,
+      status: user['status'] as String,
+      roles: (user['roles'] as List<dynamic>).cast<String>(),
+    );
   }
 
   Future<List<AdminJobSummary>> listJobs() async {

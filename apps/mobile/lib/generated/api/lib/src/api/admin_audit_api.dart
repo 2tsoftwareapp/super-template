@@ -63,16 +63,10 @@ class AdminAuditApi {
     final _path = r'/api/v1/admin/audit-logs';
     final _options = Options(
       method: r'GET',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -83,26 +77,47 @@ class AdminAuditApi {
       if (page != null)
         r'page': encodeQueryParameter(_serializers, page, const FullType(num)),
       if (limit != null)
-        r'limit':
-            encodeQueryParameter(_serializers, limit, const FullType(num)),
+        r'limit': encodeQueryParameter(
+          _serializers,
+          limit,
+          const FullType(num),
+        ),
       if (sortOrder != null)
         r'sortOrder': encodeQueryParameter(
-            _serializers, sortOrder, const FullType(String)),
+          _serializers,
+          sortOrder,
+          const FullType(String),
+        ),
       if (actorId != null)
-        r'actorId':
-            encodeQueryParameter(_serializers, actorId, const FullType(String)),
+        r'actorId': encodeQueryParameter(
+          _serializers,
+          actorId,
+          const FullType(String),
+        ),
       if (action != null)
-        r'action':
-            encodeQueryParameter(_serializers, action, const FullType(String)),
+        r'action': encodeQueryParameter(
+          _serializers,
+          action,
+          const FullType(String),
+        ),
       if (resourceType != null)
         r'resourceType': encodeQueryParameter(
-            _serializers, resourceType, const FullType(String)),
+          _serializers,
+          resourceType,
+          const FullType(String),
+        ),
       if (resourceId != null)
         r'resourceId': encodeQueryParameter(
-            _serializers, resourceId, const FullType(String)),
+          _serializers,
+          resourceId,
+          const FullType(String),
+        ),
       if (from != null)
-        r'from':
-            encodeQueryParameter(_serializers, from, const FullType(String)),
+        r'from': encodeQueryParameter(
+          _serializers,
+          from,
+          const FullType(String),
+        ),
       if (to != null)
         r'to': encodeQueryParameter(_serializers, to, const FullType(String)),
     };
@@ -124,8 +139,9 @@ class AdminAuditApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType:
-                  const FullType(AuditControllerListAuditLogs200Response),
+              specifiedType: const FullType(
+                AuditControllerListAuditLogs200Response,
+              ),
             ) as AuditControllerListAuditLogs200Response;
     } catch (error, stackTrace) {
       throw DioException(

@@ -2,7 +2,7 @@ import type {
   AuthenticatedRequestUser,
   RequestContext,
 } from '@repo/api-core';
-import type { DatabaseClient, DatabaseExecutor } from '@repo/api-database';
+import type { DatabaseClient } from '@repo/api-database';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import {
@@ -24,6 +24,8 @@ import {
 } from '../../access-control/domain/role-assignment.policy';
 import { hashPassword } from '../../auth/application/auth.helpers';
 import { OrganizationsService } from '../../organizations/application/organizations.service';
+import { OrganizationsRepository } from '../../organizations/infrastructure/organizations.repository';
+import { resolveAssignableRole } from '../domain/assignable-role.resolver';
 import { GetUserUseCase } from './get-user.use-case';
 import {
   USERS_REPOSITORY,
@@ -39,6 +41,7 @@ export class CreateAdminUserUseCase {
     private readonly accessControlService: AccessControlService,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
     private readonly organizationsService: OrganizationsService,
+    private readonly organizationsRepository: OrganizationsRepository,
     private readonly getUserUseCase: GetUserUseCase,
   ) {}
 
@@ -49,6 +52,22 @@ export class CreateAdminUserUseCase {
   ): Promise<UserView> {
     const email = normalizeEmail(input.email);
     await this.usersRepository.assertEmailAvailable(email);
+
+    const actorIsSuperAdmin = actor.roles.includes(ROLE_NAMES.SUPER_ADMIN);
+    const roleName = actorIsSuperAdmin
+      ? (input.role ?? ROLE_NAMES.USER)
+      : ROLE_NAMES.USER;
+    const organizationId = actorIsSuperAdmin
+      ? (input.organizationId ?? null)
+      : (actor.organizationId ?? null);
+
+    if (roleName === ROLE_NAMES.ADMIN && !organizationId) {
+      throw new AppError(
+        ERROR_CODES.VALIDATION_FAILED,
+        'organizationId is required when creating an ADMIN user',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
 
     const createdUserId = await runInTransaction(
       this.database,
@@ -65,41 +84,60 @@ export class CreateAdminUserUseCase {
           transaction,
         );
 
-        const roleIds = input.roleIds ?? [];
-        const foundRoles = await this.accessControlService.validateRoleIds(
-          roleIds,
+        const resolvedRole = await resolveAssignableRole(
+          this.accessControlService,
+          roleName,
+          organizationId,
+          transaction,
         );
-        const desiredRoleIds = foundRoles.length > 0 ? foundRoles : [];
-        const desiredRoles =
-          desiredRoleIds.length > 0
-            ? desiredRoleIds.map((role) => role.name)
-            : [ROLE_NAMES.USER];
 
-        desiredRoleIds.forEach((role) =>
-          assertRoleScopeCanBeAssigned(role, actor),
-        );
-        assertCanAssignRoleTargets(actor, desiredRoleIds);
+        assertRoleScopeCanBeAssigned(resolvedRole.target, actor);
+        assertCanAssignRoleTargets(actor, [resolvedRole.target]);
         this.accessControlService.assertCanAssignUserRoles(
           actor,
           [],
-          desiredRoles,
-        );
-        await this.accessControlService.replaceUserRoles(
-          user.id,
-          desiredRoleIds.length > 0
-            ? desiredRoleIds.map((role) => role.id)
-            : [await this.resolveRoleIdByName(ROLE_NAMES.USER, transaction)],
-          actor.roles.includes(ROLE_NAMES.SUPER_ADMIN)
-            ? undefined
-            : actor.organizationId,
-          transaction,
+          [resolvedRole.target.name],
         );
 
-        await this.organizationsService.ensurePersonalOrganization(
-          user.id,
-          user.displayName,
-          transaction,
-        );
+        if (roleName === ROLE_NAMES.ADMIN && organizationId) {
+          await this.organizationsRepository.addMember(
+            {
+              organizationId,
+              userId: user.id,
+              role: 'MEMBER',
+            },
+            transaction,
+          );
+          await this.accessControlService.ensureOrganizationAdminRole(
+            organizationId,
+            user.id,
+            transaction,
+          );
+        } else {
+          await this.accessControlService.replaceUserRoles(
+            user.id,
+            [resolvedRole.id],
+            actorIsSuperAdmin ? undefined : actor.organizationId,
+            transaction,
+          );
+
+          if (actorIsSuperAdmin && !organizationId) {
+            await this.organizationsService.ensurePersonalOrganization(
+              user.id,
+              user.displayName,
+              transaction,
+            );
+          } else if (organizationId) {
+            await this.organizationsRepository.addMember(
+              {
+                organizationId,
+                userId: user.id,
+                role: 'MEMBER',
+              },
+              transaction,
+            );
+          }
+        }
 
         await this.auditWriter.log(
           {
@@ -110,6 +148,8 @@ export class CreateAdminUserUseCase {
             metadata: {
               email,
               status: user.status,
+              role: roleName,
+              organizationId,
             },
             requestContext,
           },
@@ -120,26 +160,6 @@ export class CreateAdminUserUseCase {
       },
     );
 
-    return this.getUserUseCase.execute(createdUserId);
-  }
-
-  private async resolveRoleIdByName(
-    roleName: string,
-    executor?: DatabaseExecutor,
-  ) {
-    const role = await this.accessControlService.getRoleByName(
-      roleName,
-      executor,
-    );
-
-    if (!role) {
-      throw new AppError(
-        ERROR_CODES.INTERNAL_ERROR,
-        `Role ${roleName} is missing`,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-
-    return role.id;
+    return this.getUserUseCase.execute(createdUserId, actor);
   }
 }

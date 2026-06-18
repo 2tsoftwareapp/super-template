@@ -8,16 +8,21 @@ part of 'job_dto.dart';
 // BuiltValueGenerator
 // **************************************************************************
 
-const JobDtoStatusEnum _$jobDtoStatusEnum_PENDING =
-    const JobDtoStatusEnum._('PENDING');
-const JobDtoStatusEnum _$jobDtoStatusEnum_PROCESSING =
-    const JobDtoStatusEnum._('PROCESSING');
-const JobDtoStatusEnum _$jobDtoStatusEnum_COMPLETED =
-    const JobDtoStatusEnum._('COMPLETED');
-const JobDtoStatusEnum _$jobDtoStatusEnum_CANCELLED =
-    const JobDtoStatusEnum._('CANCELLED');
-const JobDtoStatusEnum _$jobDtoStatusEnum_FAILED =
-    const JobDtoStatusEnum._('FAILED');
+const JobDtoStatusEnum _$jobDtoStatusEnum_PENDING = const JobDtoStatusEnum._(
+  'PENDING',
+);
+const JobDtoStatusEnum _$jobDtoStatusEnum_PROCESSING = const JobDtoStatusEnum._(
+  'PROCESSING',
+);
+const JobDtoStatusEnum _$jobDtoStatusEnum_COMPLETED = const JobDtoStatusEnum._(
+  'COMPLETED',
+);
+const JobDtoStatusEnum _$jobDtoStatusEnum_CANCELLED = const JobDtoStatusEnum._(
+  'CANCELLED',
+);
+const JobDtoStatusEnum _$jobDtoStatusEnum_FAILED = const JobDtoStatusEnum._(
+  'FAILED',
+);
 
 JobDtoStatusEnum _$jobDtoStatusEnumValueOf(String name) {
   switch (name) {
@@ -71,15 +76,22 @@ class _$JobDtoStatusEnumSerializer
   final String wireName = 'JobDtoStatusEnum';
 
   @override
-  Object serialize(Serializers serializers, JobDtoStatusEnum object,
-          {FullType specifiedType = FullType.unspecified}) =>
+  Object serialize(
+    Serializers serializers,
+    JobDtoStatusEnum object, {
+    FullType specifiedType = FullType.unspecified,
+  }) =>
       _toWire[object.name] ?? object.name;
 
   @override
-  JobDtoStatusEnum deserialize(Serializers serializers, Object serialized,
-          {FullType specifiedType = FullType.unspecified}) =>
+  JobDtoStatusEnum deserialize(
+    Serializers serializers,
+    Object serialized, {
+    FullType specifiedType = FullType.unspecified,
+  }) =>
       JobDtoStatusEnum.valueOf(
-          _fromWire[serialized] ?? (serialized is String ? serialized : ''));
+        _fromWire[serialized] ?? (serialized is String ? serialized : ''),
+      );
 }
 
 class _$JobDto extends JobDto {
@@ -117,23 +129,23 @@ class _$JobDto extends JobDto {
   factory _$JobDto([void Function(JobDtoBuilder)? updates]) =>
       (JobDtoBuilder()..update(updates))._build();
 
-  _$JobDto._(
-      {required this.id,
-      required this.type,
-      required this.payload,
-      required this.status,
-      required this.scheduledAt,
-      required this.priority,
-      required this.attempts,
-      required this.maxAttempts,
-      this.startedAt,
-      this.completedAt,
-      this.cancelledAt,
-      this.errorMessage,
-      this.createdById,
-      required this.createdAt,
-      required this.updatedAt})
-      : super._();
+  _$JobDto._({
+    required this.id,
+    required this.type,
+    required this.payload,
+    required this.status,
+    required this.scheduledAt,
+    required this.priority,
+    required this.attempts,
+    required this.maxAttempts,
+    this.startedAt,
+    this.completedAt,
+    this.cancelledAt,
+    this.errorMessage,
+    this.createdById,
+    required this.createdAt,
+    required this.updatedAt,
+  }) : super._();
   @override
   JobDto rebuild(void Function(JobDtoBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -318,28 +330,52 @@ class JobDtoBuilder implements Builder<JobDto, JobDtoBuilder> {
       _$result = _$v ??
           _$JobDto._(
             id: BuiltValueNullFieldError.checkNotNull(id, r'JobDto', 'id'),
-            type:
-                BuiltValueNullFieldError.checkNotNull(type, r'JobDto', 'type'),
+            type: BuiltValueNullFieldError.checkNotNull(
+              type,
+              r'JobDto',
+              'type',
+            ),
             payload: payload.build(),
             status: BuiltValueNullFieldError.checkNotNull(
-                status, r'JobDto', 'status'),
+              status,
+              r'JobDto',
+              'status',
+            ),
             scheduledAt: BuiltValueNullFieldError.checkNotNull(
-                scheduledAt, r'JobDto', 'scheduledAt'),
+              scheduledAt,
+              r'JobDto',
+              'scheduledAt',
+            ),
             priority: BuiltValueNullFieldError.checkNotNull(
-                priority, r'JobDto', 'priority'),
+              priority,
+              r'JobDto',
+              'priority',
+            ),
             attempts: BuiltValueNullFieldError.checkNotNull(
-                attempts, r'JobDto', 'attempts'),
+              attempts,
+              r'JobDto',
+              'attempts',
+            ),
             maxAttempts: BuiltValueNullFieldError.checkNotNull(
-                maxAttempts, r'JobDto', 'maxAttempts'),
+              maxAttempts,
+              r'JobDto',
+              'maxAttempts',
+            ),
             startedAt: startedAt,
             completedAt: completedAt,
             cancelledAt: cancelledAt,
             errorMessage: errorMessage,
             createdById: createdById,
             createdAt: BuiltValueNullFieldError.checkNotNull(
-                createdAt, r'JobDto', 'createdAt'),
+              createdAt,
+              r'JobDto',
+              'createdAt',
+            ),
             updatedAt: BuiltValueNullFieldError.checkNotNull(
-                updatedAt, r'JobDto', 'updatedAt'),
+              updatedAt,
+              r'JobDto',
+              'updatedAt',
+            ),
           );
     } catch (_) {
       late String _$failedField;
@@ -348,7 +384,10 @@ class JobDtoBuilder implements Builder<JobDto, JobDtoBuilder> {
         payload.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'JobDto', _$failedField, e.toString());
+          r'JobDto',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

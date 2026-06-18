@@ -30,14 +30,14 @@ abstract class PreferencesControllerGetMyPreferences200Response
 
   PreferencesControllerGetMyPreferences200Response._();
 
-  factory PreferencesControllerGetMyPreferences200Response(
-          [void updates(
-              PreferencesControllerGetMyPreferences200ResponseBuilder b)]) =
-      _$PreferencesControllerGetMyPreferences200Response;
+  factory PreferencesControllerGetMyPreferences200Response([
+    void updates(PreferencesControllerGetMyPreferences200ResponseBuilder b),
+  ]) = _$PreferencesControllerGetMyPreferences200Response;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(
-          PreferencesControllerGetMyPreferences200ResponseBuilder b) =>
+    PreferencesControllerGetMyPreferences200ResponseBuilder b,
+  ) =>
       b;
 
   @BuiltValueSerializer(custom: true)
@@ -52,7 +52,7 @@ class _$PreferencesControllerGetMyPreferences200ResponseSerializer
   @override
   final Iterable<Type> types = const [
     PreferencesControllerGetMyPreferences200Response,
-    _$PreferencesControllerGetMyPreferences200Response
+    _$PreferencesControllerGetMyPreferences200Response,
   ];
 
   @override
@@ -81,9 +81,11 @@ class _$PreferencesControllerGetMyPreferences200ResponseSerializer
     PreferencesControllerGetMyPreferences200Response object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(

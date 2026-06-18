@@ -29,8 +29,11 @@ export interface ListUsersQuery {
   search?: string;
   status?: UserStatus;
   role?: string;
+  organizationId?: string;
   sort: UserSortCriterion[];
 }
+
+export type AssignableRoleName = 'ADMIN' | 'USER';
 
 export interface CreateAdminUserCommand {
   email: string;
@@ -38,7 +41,8 @@ export interface CreateAdminUserCommand {
   displayName: string;
   avatarUrl?: string | null;
   status?: UserStatus;
-  roleIds?: string[];
+  role?: AssignableRoleName;
+  organizationId?: string;
 }
 
 export interface UpdateAdminUserCommand {

@@ -113,8 +113,10 @@ class _$AuditLogDtoSerializer implements PrimitiveSerializer<AuditLogDto> {
       yield r'metadata';
       yield serializers.serialize(
         object.metadata,
-        specifiedType: const FullType(
-            BuiltMap, [FullType(String), FullType.nullable(JsonObject)]),
+        specifiedType: const FullType(BuiltMap, [
+          FullType(String),
+          FullType.nullable(JsonObject),
+        ]),
       );
     }
     if (object.ipAddress != null) {
@@ -151,9 +153,11 @@ class _$AuditLogDtoSerializer implements PrimitiveSerializer<AuditLogDto> {
     AuditLogDto object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(
@@ -208,8 +212,10 @@ class _$AuditLogDtoSerializer implements PrimitiveSerializer<AuditLogDto> {
         case r'metadata':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(
-                BuiltMap, [FullType(String), FullType.nullable(JsonObject)]),
+            specifiedType: const FullType(BuiltMap, [
+              FullType(String),
+              FullType.nullable(JsonObject),
+            ]),
           ) as BuiltMap<String, JsonObject?>;
           result.metadata.replace(valueDes);
           break;

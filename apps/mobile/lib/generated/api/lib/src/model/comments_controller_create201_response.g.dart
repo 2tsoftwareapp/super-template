@@ -15,17 +15,19 @@ class _$CommentsControllerCreate201Response
   @override
   final RequestMetaDto meta;
 
-  factory _$CommentsControllerCreate201Response(
-          [void Function(CommentsControllerCreate201ResponseBuilder)?
-              updates]) =>
+  factory _$CommentsControllerCreate201Response([
+    void Function(CommentsControllerCreate201ResponseBuilder)? updates,
+  ]) =>
       (CommentsControllerCreate201ResponseBuilder()..update(updates))._build();
 
-  _$CommentsControllerCreate201Response._(
-      {required this.data, required this.meta})
-      : super._();
+  _$CommentsControllerCreate201Response._({
+    required this.data,
+    required this.meta,
+  }) : super._();
   @override
   CommentsControllerCreate201Response rebuild(
-          void Function(CommentsControllerCreate201ResponseBuilder) updates) =>
+    void Function(CommentsControllerCreate201ResponseBuilder) updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -93,7 +95,8 @@ class CommentsControllerCreate201ResponseBuilder
 
   @override
   void update(
-      void Function(CommentsControllerCreate201ResponseBuilder)? updates) {
+    void Function(CommentsControllerCreate201ResponseBuilder)? updates,
+  ) {
     if (updates != null) updates(this);
   }
 
@@ -116,8 +119,11 @@ class CommentsControllerCreate201ResponseBuilder
         _$failedField = 'meta';
         meta.build();
       } catch (e) {
-        throw BuiltValueNestedFieldError(r'CommentsControllerCreate201Response',
-            _$failedField, e.toString());
+        throw BuiltValueNestedFieldError(
+          r'CommentsControllerCreate201Response',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

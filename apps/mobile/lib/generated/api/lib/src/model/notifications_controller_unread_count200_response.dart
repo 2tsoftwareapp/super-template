@@ -30,14 +30,14 @@ abstract class NotificationsControllerUnreadCount200Response
 
   NotificationsControllerUnreadCount200Response._();
 
-  factory NotificationsControllerUnreadCount200Response(
-          [void updates(
-              NotificationsControllerUnreadCount200ResponseBuilder b)]) =
-      _$NotificationsControllerUnreadCount200Response;
+  factory NotificationsControllerUnreadCount200Response([
+    void updates(NotificationsControllerUnreadCount200ResponseBuilder b),
+  ]) = _$NotificationsControllerUnreadCount200Response;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(
-          NotificationsControllerUnreadCount200ResponseBuilder b) =>
+    NotificationsControllerUnreadCount200ResponseBuilder b,
+  ) =>
       b;
 
   @BuiltValueSerializer(custom: true)
@@ -52,7 +52,7 @@ class _$NotificationsControllerUnreadCount200ResponseSerializer
   @override
   final Iterable<Type> types = const [
     NotificationsControllerUnreadCount200Response,
-    _$NotificationsControllerUnreadCount200Response
+    _$NotificationsControllerUnreadCount200Response,
   ];
 
   @override
@@ -81,9 +81,11 @@ class _$NotificationsControllerUnreadCount200ResponseSerializer
     NotificationsControllerUnreadCount200Response object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(

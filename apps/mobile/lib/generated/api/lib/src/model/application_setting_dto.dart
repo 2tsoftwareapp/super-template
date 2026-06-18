@@ -40,8 +40,9 @@ abstract class ApplicationSettingDto
 
   ApplicationSettingDto._();
 
-  factory ApplicationSettingDto(
-      [void updates(ApplicationSettingDtoBuilder b)]) = _$ApplicationSettingDto;
+  factory ApplicationSettingDto([
+    void updates(ApplicationSettingDtoBuilder b),
+  ]) = _$ApplicationSettingDto;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(ApplicationSettingDtoBuilder b) => b;
@@ -56,7 +57,7 @@ class _$ApplicationSettingDtoSerializer
   @override
   final Iterable<Type> types = const [
     ApplicationSettingDto,
-    _$ApplicationSettingDto
+    _$ApplicationSettingDto,
   ];
 
   @override
@@ -75,8 +76,10 @@ class _$ApplicationSettingDtoSerializer
     yield r'value';
     yield serializers.serialize(
       object.value,
-      specifiedType: const FullType(
-          BuiltMap, [FullType(String), FullType.nullable(JsonObject)]),
+      specifiedType: const FullType(BuiltMap, [
+        FullType(String),
+        FullType.nullable(JsonObject),
+      ]),
     );
     if (object.updatedById != null) {
       yield r'updatedById';
@@ -103,9 +106,11 @@ class _$ApplicationSettingDtoSerializer
     ApplicationSettingDto object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(
@@ -130,8 +135,10 @@ class _$ApplicationSettingDtoSerializer
         case r'value':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(
-                BuiltMap, [FullType(String), FullType.nullable(JsonObject)]),
+            specifiedType: const FullType(BuiltMap, [
+              FullType(String),
+              FullType.nullable(JsonObject),
+            ]),
           ) as BuiltMap<String, JsonObject?>;
           result.value.replace(valueDes);
           break;

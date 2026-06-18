@@ -15,19 +15,20 @@ class _$AdminUsersControllerDeleteUser200Response
   @override
   final RequestMetaDto meta;
 
-  factory _$AdminUsersControllerDeleteUser200Response(
-          [void Function(AdminUsersControllerDeleteUser200ResponseBuilder)?
-              updates]) =>
+  factory _$AdminUsersControllerDeleteUser200Response([
+    void Function(AdminUsersControllerDeleteUser200ResponseBuilder)? updates,
+  ]) =>
       (AdminUsersControllerDeleteUser200ResponseBuilder()..update(updates))
           ._build();
 
-  _$AdminUsersControllerDeleteUser200Response._(
-      {required this.data, required this.meta})
-      : super._();
+  _$AdminUsersControllerDeleteUser200Response._({
+    required this.data,
+    required this.meta,
+  }) : super._();
   @override
   AdminUsersControllerDeleteUser200Response rebuild(
-          void Function(AdminUsersControllerDeleteUser200ResponseBuilder)
-              updates) =>
+    void Function(AdminUsersControllerDeleteUser200ResponseBuilder) updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -54,7 +55,8 @@ class _$AdminUsersControllerDeleteUser200Response
   @override
   String toString() {
     return (newBuiltValueToStringHelper(
-            r'AdminUsersControllerDeleteUser200Response')
+      r'AdminUsersControllerDeleteUser200Response',
+    )
           ..add('data', data)
           ..add('meta', meta))
         .toString();
@@ -96,8 +98,8 @@ class AdminUsersControllerDeleteUser200ResponseBuilder
 
   @override
   void update(
-      void Function(AdminUsersControllerDeleteUser200ResponseBuilder)?
-          updates) {
+    void Function(AdminUsersControllerDeleteUser200ResponseBuilder)? updates,
+  ) {
     if (updates != null) updates(this);
   }
 
@@ -121,9 +123,10 @@ class AdminUsersControllerDeleteUser200ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'AdminUsersControllerDeleteUser200Response',
-            _$failedField,
-            e.toString());
+          r'AdminUsersControllerDeleteUser200Response',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

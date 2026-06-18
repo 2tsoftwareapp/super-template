@@ -15,21 +15,23 @@ class _$AdminSettingsControllerUpdateSetting200Response
   @override
   final RequestMetaDto meta;
 
-  factory _$AdminSettingsControllerUpdateSetting200Response(
-          [void Function(
-                  AdminSettingsControllerUpdateSetting200ResponseBuilder)?
-              updates]) =>
+  factory _$AdminSettingsControllerUpdateSetting200Response([
+    void Function(AdminSettingsControllerUpdateSetting200ResponseBuilder)?
+        updates,
+  ]) =>
       (AdminSettingsControllerUpdateSetting200ResponseBuilder()
             ..update(updates))
           ._build();
 
-  _$AdminSettingsControllerUpdateSetting200Response._(
-      {required this.data, required this.meta})
-      : super._();
+  _$AdminSettingsControllerUpdateSetting200Response._({
+    required this.data,
+    required this.meta,
+  }) : super._();
   @override
   AdminSettingsControllerUpdateSetting200Response rebuild(
-          void Function(AdminSettingsControllerUpdateSetting200ResponseBuilder)
-              updates) =>
+    void Function(AdminSettingsControllerUpdateSetting200ResponseBuilder)
+        updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -56,7 +58,8 @@ class _$AdminSettingsControllerUpdateSetting200Response
   @override
   String toString() {
     return (newBuiltValueToStringHelper(
-            r'AdminSettingsControllerUpdateSetting200Response')
+      r'AdminSettingsControllerUpdateSetting200Response',
+    )
           ..add('data', data)
           ..add('meta', meta))
         .toString();
@@ -99,8 +102,9 @@ class AdminSettingsControllerUpdateSetting200ResponseBuilder
 
   @override
   void update(
-      void Function(AdminSettingsControllerUpdateSetting200ResponseBuilder)?
-          updates) {
+    void Function(AdminSettingsControllerUpdateSetting200ResponseBuilder)?
+        updates,
+  ) {
     if (updates != null) updates(this);
   }
 
@@ -124,9 +128,10 @@ class AdminSettingsControllerUpdateSetting200ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'AdminSettingsControllerUpdateSetting200Response',
-            _$failedField,
-            e.toString());
+          r'AdminSettingsControllerUpdateSetting200Response',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

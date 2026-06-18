@@ -33,7 +33,7 @@ export class AdminSettingsController {
   }
 
   @Patch(':key')
-  @Authorize({ permissions: [PERMISSION_NAMES.SETTINGS_MANAGE] })
+  @Authorize({ permissions: [PERMISSION_NAMES.SETTINGS_UPDATE] })
   @ApiDataResponse(ApplicationSettingDto)
   updateSetting(
     @CurrentUser() user: AuthenticatedRequestUser,

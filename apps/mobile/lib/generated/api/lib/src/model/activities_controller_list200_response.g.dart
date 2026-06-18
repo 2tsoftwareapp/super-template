@@ -15,17 +15,19 @@ class _$ActivitiesControllerList200Response
   @override
   final PaginationMetaDto meta;
 
-  factory _$ActivitiesControllerList200Response(
-          [void Function(ActivitiesControllerList200ResponseBuilder)?
-              updates]) =>
+  factory _$ActivitiesControllerList200Response([
+    void Function(ActivitiesControllerList200ResponseBuilder)? updates,
+  ]) =>
       (ActivitiesControllerList200ResponseBuilder()..update(updates))._build();
 
-  _$ActivitiesControllerList200Response._(
-      {required this.data, required this.meta})
-      : super._();
+  _$ActivitiesControllerList200Response._({
+    required this.data,
+    required this.meta,
+  }) : super._();
   @override
   ActivitiesControllerList200Response rebuild(
-          void Function(ActivitiesControllerList200ResponseBuilder) updates) =>
+    void Function(ActivitiesControllerList200ResponseBuilder) updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -95,7 +97,8 @@ class ActivitiesControllerList200ResponseBuilder
 
   @override
   void update(
-      void Function(ActivitiesControllerList200ResponseBuilder)? updates) {
+    void Function(ActivitiesControllerList200ResponseBuilder)? updates,
+  ) {
     if (updates != null) updates(this);
   }
 
@@ -118,8 +121,11 @@ class ActivitiesControllerList200ResponseBuilder
         _$failedField = 'meta';
         meta.build();
       } catch (e) {
-        throw BuiltValueNestedFieldError(r'ActivitiesControllerList200Response',
-            _$failedField, e.toString());
+        throw BuiltValueNestedFieldError(
+          r'ActivitiesControllerList200Response',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

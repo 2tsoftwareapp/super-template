@@ -30,9 +30,9 @@ abstract class FilesControllerUpload201Response
 
   FilesControllerUpload201Response._();
 
-  factory FilesControllerUpload201Response(
-          [void updates(FilesControllerUpload201ResponseBuilder b)]) =
-      _$FilesControllerUpload201Response;
+  factory FilesControllerUpload201Response([
+    void updates(FilesControllerUpload201ResponseBuilder b),
+  ]) = _$FilesControllerUpload201Response;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(FilesControllerUpload201ResponseBuilder b) => b;
@@ -47,7 +47,7 @@ class _$FilesControllerUpload201ResponseSerializer
   @override
   final Iterable<Type> types = const [
     FilesControllerUpload201Response,
-    _$FilesControllerUpload201Response
+    _$FilesControllerUpload201Response,
   ];
 
   @override
@@ -76,9 +76,11 @@ class _$FilesControllerUpload201ResponseSerializer
     FilesControllerUpload201Response object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(

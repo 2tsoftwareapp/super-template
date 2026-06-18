@@ -56,16 +56,10 @@ class AdminMailApi {
     final _path = r'/api/v1/admin/mail/deliveries';
     final _options = Options(
       method: r'GET',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -76,17 +70,29 @@ class AdminMailApi {
       if (page != null)
         r'page': encodeQueryParameter(_serializers, page, const FullType(num)),
       if (limit != null)
-        r'limit':
-            encodeQueryParameter(_serializers, limit, const FullType(num)),
+        r'limit': encodeQueryParameter(
+          _serializers,
+          limit,
+          const FullType(num),
+        ),
       if (sortOrder != null)
         r'sortOrder': encodeQueryParameter(
-            _serializers, sortOrder, const FullType(String)),
+          _serializers,
+          sortOrder,
+          const FullType(String),
+        ),
       if (templateKey != null)
         r'templateKey': encodeQueryParameter(
-            _serializers, templateKey, const FullType(String)),
+          _serializers,
+          templateKey,
+          const FullType(String),
+        ),
       if (status != null)
-        r'status':
-            encodeQueryParameter(_serializers, status, const FullType(String)),
+        r'status': encodeQueryParameter(
+          _serializers,
+          status,
+          const FullType(String),
+        ),
     };
 
     final _response = await _dio.request<Object>(
@@ -106,8 +112,9 @@ class AdminMailApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType:
-                  const FullType(AdminMailControllerListDeliveries200Response),
+              specifiedType: const FullType(
+                AdminMailControllerListDeliveries200Response,
+              ),
             ) as AdminMailControllerListDeliveries200Response;
     } catch (error, stackTrace) {
       throw DioException(
@@ -156,21 +163,21 @@ class AdminMailApi {
     ProgressCallback? onReceiveProgress,
   }) async {
     final _path = r'/api/v1/admin/mail/preview/{templateKey}'.replaceAll(
-        '{' r'templateKey' '}',
-        encodeQueryParameter(_serializers, templateKey, const FullType(String))
-            .toString());
+      '{'
+      r'templateKey'
+      '}',
+      encodeQueryParameter(
+        _serializers,
+        templateKey,
+        const FullType(String),
+      ).toString(),
+    );
     final _options = Options(
       method: r'GET',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -193,8 +200,9 @@ class AdminMailApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType:
-                  const FullType(AdminMailControllerPreview200Response),
+              specifiedType: const FullType(
+                AdminMailControllerPreview200Response,
+              ),
             ) as AdminMailControllerPreview200Response;
     } catch (error, stackTrace) {
       throw DioException(

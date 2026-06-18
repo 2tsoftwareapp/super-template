@@ -15,6 +15,7 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
   final _emailController = TextEditingController();
   final _nameController = TextEditingController();
   final _passwordController = TextEditingController();
+  String _createRole = 'USER';
 
   @override
   void dispose() {
@@ -97,6 +98,20 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
               decoration: const InputDecoration(labelText: 'Password'),
               obscureText: true,
             ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<String>(
+              initialValue: _createRole,
+              decoration: const InputDecoration(labelText: 'Role'),
+              items: const [
+                DropdownMenuItem(value: 'USER', child: Text('USER')),
+                DropdownMenuItem(value: 'ADMIN', child: Text('ADMIN')),
+              ],
+              onChanged: (value) {
+                if (value != null) {
+                  setState(() => _createRole = value);
+                }
+              },
+            ),
           ],
         ),
         actions: [
@@ -112,6 +127,7 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
                     email: _emailController.text.trim(),
                     password: _passwordController.text,
                     displayName: _nameController.text.trim(),
+                    role: _createRole,
                   );
               if (context.mounted) {
                 Navigator.pop(context);

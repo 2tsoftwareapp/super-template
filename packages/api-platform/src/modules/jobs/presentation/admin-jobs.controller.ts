@@ -44,7 +44,7 @@ export class AdminJobsController {
   }
 
   @Delete(':id')
-  @Authorize({ permissions: [PERMISSION_NAMES.JOBS_MANAGE] })
+  @Authorize({ permissions: [PERMISSION_NAMES.JOBS_UPDATE] })
   @ApiDataResponse(JobDto)
   cancelJob(
     @CurrentUser() user: AuthenticatedRequestUser,

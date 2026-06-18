@@ -40,7 +40,7 @@ class _$UpdateUserStatusDtoSerializer
   @override
   final Iterable<Type> types = const [
     UpdateUserStatusDto,
-    _$UpdateUserStatusDto
+    _$UpdateUserStatusDto,
   ];
 
   @override
@@ -64,9 +64,11 @@ class _$UpdateUserStatusDtoSerializer
     UpdateUserStatusDto object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(
@@ -84,7 +86,9 @@ class _$UpdateUserStatusDtoSerializer
         case r'status':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(UpdateUserStatusDtoStatusEnum),
+            specifiedType: const FullType(
+              UpdateUserStatusDtoStatusEnum,
+            ),
           ) as UpdateUserStatusDtoStatusEnum;
           result.status = valueDes;
           break;

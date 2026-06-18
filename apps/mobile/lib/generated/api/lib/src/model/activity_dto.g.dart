@@ -57,16 +57,22 @@ class _$ActivityDtoVisibilityEnumSerializer
   final String wireName = 'ActivityDtoVisibilityEnum';
 
   @override
-  Object serialize(Serializers serializers, ActivityDtoVisibilityEnum object,
-          {FullType specifiedType = FullType.unspecified}) =>
+  Object serialize(
+    Serializers serializers,
+    ActivityDtoVisibilityEnum object, {
+    FullType specifiedType = FullType.unspecified,
+  }) =>
       _toWire[object.name] ?? object.name;
 
   @override
   ActivityDtoVisibilityEnum deserialize(
-          Serializers serializers, Object serialized,
-          {FullType specifiedType = FullType.unspecified}) =>
+    Serializers serializers,
+    Object serialized, {
+    FullType specifiedType = FullType.unspecified,
+  }) =>
       ActivityDtoVisibilityEnum.valueOf(
-          _fromWire[serialized] ?? (serialized is String ? serialized : ''));
+        _fromWire[serialized] ?? (serialized is String ? serialized : ''),
+      );
 }
 
 class _$ActivityDto extends ActivityDto {
@@ -90,16 +96,16 @@ class _$ActivityDto extends ActivityDto {
   factory _$ActivityDto([void Function(ActivityDtoBuilder)? updates]) =>
       (ActivityDtoBuilder()..update(updates))._build();
 
-  _$ActivityDto._(
-      {required this.id,
-      required this.summary,
-      required this.entityType,
-      required this.entityId,
-      this.actorId,
-      required this.visibility,
-      this.metadata,
-      required this.createdAt})
-      : super._();
+  _$ActivityDto._({
+    required this.id,
+    required this.summary,
+    required this.entityType,
+    required this.entityId,
+    this.actorId,
+    required this.visibility,
+    this.metadata,
+    required this.createdAt,
+  }) : super._();
   @override
   ActivityDto rebuild(void Function(ActivityDtoBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -229,17 +235,32 @@ class ActivityDtoBuilder implements Builder<ActivityDto, ActivityDtoBuilder> {
           _$ActivityDto._(
             id: BuiltValueNullFieldError.checkNotNull(id, r'ActivityDto', 'id'),
             summary: BuiltValueNullFieldError.checkNotNull(
-                summary, r'ActivityDto', 'summary'),
+              summary,
+              r'ActivityDto',
+              'summary',
+            ),
             entityType: BuiltValueNullFieldError.checkNotNull(
-                entityType, r'ActivityDto', 'entityType'),
+              entityType,
+              r'ActivityDto',
+              'entityType',
+            ),
             entityId: BuiltValueNullFieldError.checkNotNull(
-                entityId, r'ActivityDto', 'entityId'),
+              entityId,
+              r'ActivityDto',
+              'entityId',
+            ),
             actorId: actorId,
             visibility: BuiltValueNullFieldError.checkNotNull(
-                visibility, r'ActivityDto', 'visibility'),
+              visibility,
+              r'ActivityDto',
+              'visibility',
+            ),
             metadata: _metadata?.build(),
             createdAt: BuiltValueNullFieldError.checkNotNull(
-                createdAt, r'ActivityDto', 'createdAt'),
+              createdAt,
+              r'ActivityDto',
+              'createdAt',
+            ),
           );
     } catch (_) {
       late String _$failedField;
@@ -248,7 +269,10 @@ class ActivityDtoBuilder implements Builder<ActivityDto, ActivityDtoBuilder> {
         _metadata?.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'ActivityDto', _$failedField, e.toString());
+          r'ActivityDto',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

@@ -57,16 +57,22 @@ class _$UpdateProjectDtoStatusEnumSerializer
   final String wireName = 'UpdateProjectDtoStatusEnum';
 
   @override
-  Object serialize(Serializers serializers, UpdateProjectDtoStatusEnum object,
-          {FullType specifiedType = FullType.unspecified}) =>
+  Object serialize(
+    Serializers serializers,
+    UpdateProjectDtoStatusEnum object, {
+    FullType specifiedType = FullType.unspecified,
+  }) =>
       _toWire[object.name] ?? object.name;
 
   @override
   UpdateProjectDtoStatusEnum deserialize(
-          Serializers serializers, Object serialized,
-          {FullType specifiedType = FullType.unspecified}) =>
+    Serializers serializers,
+    Object serialized, {
+    FullType specifiedType = FullType.unspecified,
+  }) =>
       UpdateProjectDtoStatusEnum.valueOf(
-          _fromWire[serialized] ?? (serialized is String ? serialized : ''));
+        _fromWire[serialized] ?? (serialized is String ? serialized : ''),
+      );
 }
 
 class _$UpdateProjectDto extends UpdateProjectDto {
@@ -79,8 +85,9 @@ class _$UpdateProjectDto extends UpdateProjectDto {
   @override
   final String? ownerId;
 
-  factory _$UpdateProjectDto(
-          [void Function(UpdateProjectDtoBuilder)? updates]) =>
+  factory _$UpdateProjectDto([
+    void Function(UpdateProjectDtoBuilder)? updates,
+  ]) =>
       (UpdateProjectDtoBuilder()..update(updates))._build();
 
   _$UpdateProjectDto._({this.name, this.description, this.status, this.ownerId})

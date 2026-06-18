@@ -30,9 +30,9 @@ abstract class ImportsControllerCreate201Response
 
   ImportsControllerCreate201Response._();
 
-  factory ImportsControllerCreate201Response(
-          [void updates(ImportsControllerCreate201ResponseBuilder b)]) =
-      _$ImportsControllerCreate201Response;
+  factory ImportsControllerCreate201Response([
+    void updates(ImportsControllerCreate201ResponseBuilder b),
+  ]) = _$ImportsControllerCreate201Response;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(ImportsControllerCreate201ResponseBuilder b) => b;
@@ -47,7 +47,7 @@ class _$ImportsControllerCreate201ResponseSerializer
   @override
   final Iterable<Type> types = const [
     ImportsControllerCreate201Response,
-    _$ImportsControllerCreate201Response
+    _$ImportsControllerCreate201Response,
   ];
 
   @override
@@ -76,9 +76,11 @@ class _$ImportsControllerCreate201ResponseSerializer
     ImportsControllerCreate201Response object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(

@@ -12,13 +12,19 @@ import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Spinner } from "@/components/ui/spinner";
 import { webFetch } from "@/lib/http";
-import { formatRoleName, getAssignableRoles } from "@/lib/roles";
+import { canAssignRole, formatRoleName } from "@/lib/roles";
+
+import type { AdminUserDto, CreateAdminUserInput } from "../../lib/types";
 
 import { USERS_QUERY_KEY } from "./constants";
 
-import type { AdminUserDto, CreateAdminUserInput, RoleDto } from "../../lib/types";
+const ASSIGNABLE_ROLES = ["USER", "ADMIN"] as const;
 
-function createUserSchema(assignableRoleIds: string[]) {
+function createUserSchema(actorRoles: string[]) {
+  const allowedRoles = ASSIGNABLE_ROLES.filter((role) =>
+    canAssignRole(actorRoles, role),
+  );
+
   return z.object({
     displayName: z
       .string()
@@ -27,13 +33,7 @@ function createUserSchema(assignableRoleIds: string[]) {
       .max(120, "Display name must be at most 120 characters"),
     email: z.email("Enter a valid email address"),
     password: z.string().min(8, "Password must be at least 8 characters"),
-    roleIds: z
-      .array(z.uuid())
-      .min(1, "Select at least one role")
-      .refine(
-        (roleIds) => roleIds.every((roleId) => assignableRoleIds.includes(roleId)),
-        "One or more selected roles cannot be assigned",
-      ),
+    role: z.enum(allowedRoles.length > 0 ? allowedRoles : ["USER"]),
   });
 }
 
@@ -43,32 +43,19 @@ export function CreateUserDrawer({
   open,
   onClose,
   actorRoles,
-  roles,
 }: {
   open: boolean;
   onClose: () => void;
   actorRoles: string[];
-  roles: RoleDto[];
 }) {
   const queryClient = useQueryClient();
   const assignableRoles = useMemo(
-    () => getAssignableRoles(actorRoles, roles),
-    [actorRoles, roles],
-  );
-  const assignableRoleIds = useMemo(
-    () => assignableRoles.map((role) => role.id),
-    [assignableRoles],
-  );
-  const defaultRoleIds = useMemo(
-    () =>
-      assignableRoles
-        .filter((role) => role.name === "USER")
-        .map((role) => role.id),
-    [assignableRoles],
+    () => ASSIGNABLE_ROLES.filter((role) => canAssignRole(actorRoles, role)),
+    [actorRoles],
   );
   const createSchema = useMemo(
-    () => createUserSchema(assignableRoleIds),
-    [assignableRoleIds],
+    () => createUserSchema(actorRoles),
+    [actorRoles],
   );
 
   const form = useForm<CreateForm>({
@@ -77,7 +64,7 @@ export function CreateUserDrawer({
       email: "",
       password: "",
       displayName: "",
-      roleIds: defaultRoleIds,
+      role: "USER",
     },
   });
 
@@ -87,9 +74,9 @@ export function CreateUserDrawer({
       email: "",
       password: "",
       displayName: "",
-      roleIds: defaultRoleIds,
+      role: assignableRoles[0] ?? "USER",
     });
-  }, [open, defaultRoleIds, form]);
+  }, [open, assignableRoles, form]);
 
   const createUser = useMutation({
     mutationFn: (input: CreateAdminUserInput) =>
@@ -103,27 +90,20 @@ export function CreateUserDrawer({
         email: "",
         password: "",
         displayName: "",
-        roleIds: defaultRoleIds,
+        role: assignableRoles[0] ?? "USER",
       });
       toast.success("User created");
       onClose();
     },
   });
 
-  const selectedRoleIds = form.watch("roleIds");
-
-  const toggleRole = (id: string) => {
-    const next = selectedRoleIds.includes(id)
-      ? selectedRoleIds.filter((roleId) => roleId !== id)
-      : [...selectedRoleIds, id];
-    form.setValue("roleIds", next, { shouldValidate: true });
-  };
+  const selectedRole = form.watch("role");
 
   return (
     <ResourceDrawer
       open={open}
       title="New user"
-      description="Create an account and assign the roles this operator can grant."
+      description="Create an account and assign a fixed platform role."
       onClose={onClose}
       footer={
         <Button
@@ -145,7 +125,7 @@ export function CreateUserDrawer({
             email: values.email,
             password: values.password,
             displayName: values.displayName,
-            roleIds: values.roleIds,
+            role: values.role,
           });
         })}
       >
@@ -191,30 +171,27 @@ export function CreateUserDrawer({
         </div>
 
         <div className="flex flex-col gap-2">
-          <Label>Roles</Label>
+          <Label>Role</Label>
           {assignableRoles.length === 0 ? (
             <p className="text-sm text-muted-foreground">No roles available.</p>
           ) : (
             <div className="flex flex-wrap gap-2">
-              {assignableRoles.map((role) => {
-                const selected = selectedRoleIds.includes(role.id);
-                return (
-                  <Button
-                    key={role.id}
-                    type="button"
-                    variant={selected ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => toggleRole(role.id)}
-                  >
-                    {formatRoleName(role.name)}
-                  </Button>
-                );
-              })}
+              {assignableRoles.map((role) => (
+                <Button
+                  key={role}
+                  type="button"
+                  variant={selectedRole === role ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => form.setValue("role", role, { shouldValidate: true })}
+                >
+                  {formatRoleName(role)}
+                </Button>
+              ))}
             </div>
           )}
-          {form.formState.errors.roleIds ? (
+          {form.formState.errors.role ? (
             <p className="text-xs text-destructive">
-              {form.formState.errors.roleIds.message}
+              {form.formState.errors.role.message}
             </p>
           ) : null}
         </div>

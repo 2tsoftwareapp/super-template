@@ -26,7 +26,7 @@ export class ExportsController {
   constructor(private readonly exportsService: ExportsService) {}
 
   @Post()
-  @Authorize({ permissions: [PERMISSION_NAMES.EXPORTS_MANAGE] })
+  @Authorize({ permissions: [PERMISSION_NAMES.EXPORTS_CREATE] })
   @ApiDataResponse(ExportJobDto, 201)
   create(
     @CurrentUser() user: AuthenticatedRequestUser,
@@ -47,7 +47,7 @@ export class ExportsController {
   }
 
   @Get(':id')
-  @Authorize({ permissions: [PERMISSION_NAMES.EXPORTS_MANAGE] })
+  @Authorize({ permissions: [PERMISSION_NAMES.EXPORTS_READ] })
   @ApiDataResponse(ExportJobDto)
   getById(
     @CurrentUser() user: AuthenticatedRequestUser,

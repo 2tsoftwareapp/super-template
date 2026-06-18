@@ -39,8 +39,9 @@ class _$RequestMetaDto extends RequestMetaDto {
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper(r'RequestMetaDto')
-          ..add('requestId', requestId))
+    return (newBuiltValueToStringHelper(
+      r'RequestMetaDto',
+    )..add('requestId', requestId))
         .toString();
   }
 }
@@ -83,7 +84,10 @@ class RequestMetaDtoBuilder
     final _$result = _$v ??
         _$RequestMetaDto._(
           requestId: BuiltValueNullFieldError.checkNotNull(
-              requestId, r'RequestMetaDto', 'requestId'),
+            requestId,
+            r'RequestMetaDto',
+            'requestId',
+          ),
         );
     replace(_$result);
     return _$result;

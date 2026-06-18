@@ -160,8 +160,10 @@ class _$NotificationJobDtoSerializer
       yield r'data';
       yield serializers.serialize(
         object.data,
-        specifiedType: const FullType(
-            BuiltMap, [FullType(String), FullType.nullable(JsonObject)]),
+        specifiedType: const FullType(BuiltMap, [
+          FullType(String),
+          FullType.nullable(JsonObject),
+        ]),
       );
     }
     yield r'scheduledAt';
@@ -213,9 +215,11 @@ class _$NotificationJobDtoSerializer
     NotificationJobDto object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(
@@ -248,7 +252,9 @@ class _$NotificationJobDtoSerializer
         case r'audience':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(NotificationJobDtoAudienceEnum),
+            specifiedType: const FullType(
+              NotificationJobDtoAudienceEnum,
+            ),
           ) as NotificationJobDtoAudienceEnum;
           result.audience = valueDes;
           break;
@@ -263,7 +269,9 @@ class _$NotificationJobDtoSerializer
         case r'userIds':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(BuiltList, [FullType(String)]),
+            specifiedType: const FullType(BuiltList, [
+              FullType(String),
+            ]),
           ) as BuiltList<String>;
           result.userIds.replace(valueDes);
           break;
@@ -291,8 +299,10 @@ class _$NotificationJobDtoSerializer
         case r'data':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(
-                BuiltMap, [FullType(String), FullType.nullable(JsonObject)]),
+            specifiedType: const FullType(BuiltMap, [
+              FullType(String),
+              FullType.nullable(JsonObject),
+            ]),
           ) as BuiltMap<String, JsonObject?>;
           result.data.replace(valueDes);
           break;

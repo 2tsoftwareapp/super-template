@@ -20,7 +20,8 @@ part 'create_admin_user_dto.g.dart';
 /// * [displayName]
 /// * [avatarUrl]
 /// * [status]
-/// * [roleIds]
+/// * [role]
+/// * [organizationId]
 @BuiltValue()
 abstract class CreateAdminUserDto
     implements Built<CreateAdminUserDto, CreateAdminUserDtoBuilder> {
@@ -40,8 +41,12 @@ abstract class CreateAdminUserDto
   CreateAdminUserDtoStatusEnum? get status;
   // enum statusEnum {  PENDING,  ACTIVE,  BLOCKED,  };
 
-  @BuiltValueField(wireName: r'roleIds')
-  BuiltList<String>? get roleIds;
+  @BuiltValueField(wireName: r'role')
+  CreateAdminUserDtoRoleEnum? get role;
+  // enum roleEnum {  ADMIN,  USER,  };
+
+  @BuiltValueField(wireName: r'organizationId')
+  String? get organizationId;
 
   CreateAdminUserDto._();
 
@@ -49,7 +54,8 @@ abstract class CreateAdminUserDto
       _$CreateAdminUserDto;
 
   @BuiltValueHook(initializeBuilder: true)
-  static void _defaults(CreateAdminUserDtoBuilder b) => b;
+  static void _defaults(CreateAdminUserDtoBuilder b) =>
+      b..role = CreateAdminUserDtoRoleEnum.USER;
 
   @BuiltValueSerializer(custom: true)
   static Serializer<CreateAdminUserDto> get serializer =>
@@ -98,11 +104,18 @@ class _$CreateAdminUserDtoSerializer
         specifiedType: const FullType(CreateAdminUserDtoStatusEnum),
       );
     }
-    if (object.roleIds != null) {
-      yield r'roleIds';
+    if (object.role != null) {
+      yield r'role';
       yield serializers.serialize(
-        object.roleIds,
-        specifiedType: const FullType(BuiltList, [FullType(String)]),
+        object.role,
+        specifiedType: const FullType(CreateAdminUserDtoRoleEnum),
+      );
+    }
+    if (object.organizationId != null) {
+      yield r'organizationId';
+      yield serializers.serialize(
+        object.organizationId,
+        specifiedType: const FullType(String),
       );
     }
   }
@@ -113,9 +126,11 @@ class _$CreateAdminUserDtoSerializer
     CreateAdminUserDto object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(
@@ -165,12 +180,19 @@ class _$CreateAdminUserDtoSerializer
           ) as CreateAdminUserDtoStatusEnum;
           result.status = valueDes;
           break;
-        case r'roleIds':
+        case r'role':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(BuiltList, [FullType(String)]),
-          ) as BuiltList<String>;
-          result.roleIds.replace(valueDes);
+            specifiedType: const FullType(CreateAdminUserDtoRoleEnum),
+          ) as CreateAdminUserDtoRoleEnum;
+          result.role = valueDes;
+          break;
+        case r'organizationId':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.organizationId = valueDes;
           break;
         default:
           unhandled.add(key);
@@ -221,4 +243,23 @@ class CreateAdminUserDtoStatusEnum extends EnumClass {
       _$createAdminUserDtoStatusEnumValues;
   static CreateAdminUserDtoStatusEnum valueOf(String name) =>
       _$createAdminUserDtoStatusEnumValueOf(name);
+}
+
+class CreateAdminUserDtoRoleEnum extends EnumClass {
+  @BuiltValueEnumConst(wireName: r'ADMIN')
+  static const CreateAdminUserDtoRoleEnum ADMIN =
+      _$createAdminUserDtoRoleEnum_ADMIN;
+  @BuiltValueEnumConst(wireName: r'USER')
+  static const CreateAdminUserDtoRoleEnum USER =
+      _$createAdminUserDtoRoleEnum_USER;
+
+  static Serializer<CreateAdminUserDtoRoleEnum> get serializer =>
+      _$createAdminUserDtoRoleEnumSerializer;
+
+  const CreateAdminUserDtoRoleEnum._(String name) : super(name);
+
+  static BuiltSet<CreateAdminUserDtoRoleEnum> get values =>
+      _$createAdminUserDtoRoleEnumValues;
+  static CreateAdminUserDtoRoleEnum valueOf(String name) =>
+      _$createAdminUserDtoRoleEnumValueOf(name);
 }

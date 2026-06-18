@@ -15,15 +15,17 @@ class _$FilesControllerUpload201Response
   @override
   final RequestMetaDto meta;
 
-  factory _$FilesControllerUpload201Response(
-          [void Function(FilesControllerUpload201ResponseBuilder)? updates]) =>
+  factory _$FilesControllerUpload201Response([
+    void Function(FilesControllerUpload201ResponseBuilder)? updates,
+  ]) =>
       (FilesControllerUpload201ResponseBuilder()..update(updates))._build();
 
   _$FilesControllerUpload201Response._({required this.data, required this.meta})
       : super._();
   @override
   FilesControllerUpload201Response rebuild(
-          void Function(FilesControllerUpload201ResponseBuilder) updates) =>
+    void Function(FilesControllerUpload201ResponseBuilder) updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -114,7 +116,10 @@ class FilesControllerUpload201ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'FilesControllerUpload201Response', _$failedField, e.toString());
+          r'FilesControllerUpload201Response',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

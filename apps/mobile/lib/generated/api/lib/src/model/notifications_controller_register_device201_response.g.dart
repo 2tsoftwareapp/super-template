@@ -15,21 +15,23 @@ class _$NotificationsControllerRegisterDevice201Response
   @override
   final RequestMetaDto meta;
 
-  factory _$NotificationsControllerRegisterDevice201Response(
-          [void Function(
-                  NotificationsControllerRegisterDevice201ResponseBuilder)?
-              updates]) =>
+  factory _$NotificationsControllerRegisterDevice201Response([
+    void Function(NotificationsControllerRegisterDevice201ResponseBuilder)?
+        updates,
+  ]) =>
       (NotificationsControllerRegisterDevice201ResponseBuilder()
             ..update(updates))
           ._build();
 
-  _$NotificationsControllerRegisterDevice201Response._(
-      {required this.data, required this.meta})
-      : super._();
+  _$NotificationsControllerRegisterDevice201Response._({
+    required this.data,
+    required this.meta,
+  }) : super._();
   @override
   NotificationsControllerRegisterDevice201Response rebuild(
-          void Function(NotificationsControllerRegisterDevice201ResponseBuilder)
-              updates) =>
+    void Function(NotificationsControllerRegisterDevice201ResponseBuilder)
+        updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -56,7 +58,8 @@ class _$NotificationsControllerRegisterDevice201Response
   @override
   String toString() {
     return (newBuiltValueToStringHelper(
-            r'NotificationsControllerRegisterDevice201Response')
+      r'NotificationsControllerRegisterDevice201Response',
+    )
           ..add('data', data)
           ..add('meta', meta))
         .toString();
@@ -98,8 +101,9 @@ class NotificationsControllerRegisterDevice201ResponseBuilder
 
   @override
   void update(
-      void Function(NotificationsControllerRegisterDevice201ResponseBuilder)?
-          updates) {
+    void Function(NotificationsControllerRegisterDevice201ResponseBuilder)?
+        updates,
+  ) {
     if (updates != null) updates(this);
   }
 
@@ -123,9 +127,10 @@ class NotificationsControllerRegisterDevice201ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'NotificationsControllerRegisterDevice201Response',
-            _$failedField,
-            e.toString());
+          r'NotificationsControllerRegisterDevice201Response',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

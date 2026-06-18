@@ -15,19 +15,20 @@ class _$AdminMailControllerPreview200Response
   @override
   final RequestMetaDto meta;
 
-  factory _$AdminMailControllerPreview200Response(
-          [void Function(AdminMailControllerPreview200ResponseBuilder)?
-              updates]) =>
+  factory _$AdminMailControllerPreview200Response([
+    void Function(AdminMailControllerPreview200ResponseBuilder)? updates,
+  ]) =>
       (AdminMailControllerPreview200ResponseBuilder()..update(updates))
           ._build();
 
-  _$AdminMailControllerPreview200Response._(
-      {required this.data, required this.meta})
-      : super._();
+  _$AdminMailControllerPreview200Response._({
+    required this.data,
+    required this.meta,
+  }) : super._();
   @override
   AdminMailControllerPreview200Response rebuild(
-          void Function(AdminMailControllerPreview200ResponseBuilder)
-              updates) =>
+    void Function(AdminMailControllerPreview200ResponseBuilder) updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -54,7 +55,8 @@ class _$AdminMailControllerPreview200Response
   @override
   String toString() {
     return (newBuiltValueToStringHelper(
-            r'AdminMailControllerPreview200Response')
+      r'AdminMailControllerPreview200Response',
+    )
           ..add('data', data)
           ..add('meta', meta))
         .toString();
@@ -96,7 +98,8 @@ class AdminMailControllerPreview200ResponseBuilder
 
   @override
   void update(
-      void Function(AdminMailControllerPreview200ResponseBuilder)? updates) {
+    void Function(AdminMailControllerPreview200ResponseBuilder)? updates,
+  ) {
     if (updates != null) updates(this);
   }
 
@@ -120,9 +123,10 @@ class AdminMailControllerPreview200ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'AdminMailControllerPreview200Response',
-            _$failedField,
-            e.toString());
+          r'AdminMailControllerPreview200Response',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

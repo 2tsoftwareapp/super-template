@@ -27,18 +27,25 @@ class _ImportsScreenState extends ConsumerState<ImportsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final canManage =
+    final canRead =
         ref
             .watch(authControllerProvider)
             .valueOrNull
             ?.permissions
-            .contains('imports.manage') ??
+            .contains('imports.read') ??
+        false;
+    final canCreate =
+        ref
+            .watch(authControllerProvider)
+            .valueOrNull
+            ?.permissions
+            .contains('imports.create') ??
         false;
 
-    if (!canManage) {
+    if (!canRead) {
       return Scaffold(
         appBar: AppBar(title: const Text('Imports')),
-        body: const Center(child: Text('Missing imports.manage permission')),
+        body: const Center(child: Text('Missing imports.read permission')),
       );
     }
 
@@ -50,7 +57,7 @@ class _ImportsScreenState extends ConsumerState<ImportsScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             FilledButton.icon(
-              onPressed: _working ? null : _startImport,
+              onPressed: _working || !canCreate ? null : _startImport,
               icon: const Icon(Icons.upload_file),
               label: const Text('Pick CSV and import projects'),
             ),

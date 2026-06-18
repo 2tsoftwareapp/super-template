@@ -31,9 +31,9 @@ abstract class ActivitiesControllerList200Response
 
   ActivitiesControllerList200Response._();
 
-  factory ActivitiesControllerList200Response(
-          [void updates(ActivitiesControllerList200ResponseBuilder b)]) =
-      _$ActivitiesControllerList200Response;
+  factory ActivitiesControllerList200Response([
+    void updates(ActivitiesControllerList200ResponseBuilder b),
+  ]) = _$ActivitiesControllerList200Response;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(ActivitiesControllerList200ResponseBuilder b) => b;
@@ -48,7 +48,7 @@ class _$ActivitiesControllerList200ResponseSerializer
   @override
   final Iterable<Type> types = const [
     ActivitiesControllerList200Response,
-    _$ActivitiesControllerList200Response
+    _$ActivitiesControllerList200Response,
   ];
 
   @override
@@ -77,9 +77,11 @@ class _$ActivitiesControllerList200ResponseSerializer
     ActivitiesControllerList200Response object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(
@@ -97,7 +99,9 @@ class _$ActivitiesControllerList200ResponseSerializer
         case r'data':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(BuiltList, [FullType(ActivityDto)]),
+            specifiedType: const FullType(BuiltList, [
+              FullType(ActivityDto),
+            ]),
           ) as BuiltList<ActivityDto>;
           result.data.replace(valueDes);
           break;

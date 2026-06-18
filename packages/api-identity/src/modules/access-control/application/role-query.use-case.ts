@@ -1,13 +1,12 @@
+import type { AuthenticatedRequestUser } from '@repo/api-core';
 import type { DatabaseExecutor } from '@repo/api-database';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { AppError, ERROR_CODES } from '@repo/api-core';
 
-import type { AuthenticatedRequestUser } from '@repo/api-core';
-
-import { ROLE_NAMES } from '../access-control.constants';
 import type { PermissionView, RoleView } from './access-control.types';
 
+import { ROLE_NAMES } from '../access-control.constants';
 import { AccessControlMapper } from './access-control.mapper';
 import {
   ACCESS_CONTROL_REPOSITORY,

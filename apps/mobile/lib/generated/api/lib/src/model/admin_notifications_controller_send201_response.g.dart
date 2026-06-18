@@ -15,19 +15,20 @@ class _$AdminNotificationsControllerSend201Response
   @override
   final RequestMetaDto meta;
 
-  factory _$AdminNotificationsControllerSend201Response(
-          [void Function(AdminNotificationsControllerSend201ResponseBuilder)?
-              updates]) =>
+  factory _$AdminNotificationsControllerSend201Response([
+    void Function(AdminNotificationsControllerSend201ResponseBuilder)? updates,
+  ]) =>
       (AdminNotificationsControllerSend201ResponseBuilder()..update(updates))
           ._build();
 
-  _$AdminNotificationsControllerSend201Response._(
-      {required this.data, required this.meta})
-      : super._();
+  _$AdminNotificationsControllerSend201Response._({
+    required this.data,
+    required this.meta,
+  }) : super._();
   @override
   AdminNotificationsControllerSend201Response rebuild(
-          void Function(AdminNotificationsControllerSend201ResponseBuilder)
-              updates) =>
+    void Function(AdminNotificationsControllerSend201ResponseBuilder) updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -54,7 +55,8 @@ class _$AdminNotificationsControllerSend201Response
   @override
   String toString() {
     return (newBuiltValueToStringHelper(
-            r'AdminNotificationsControllerSend201Response')
+      r'AdminNotificationsControllerSend201Response',
+    )
           ..add('data', data)
           ..add('meta', meta))
         .toString();
@@ -97,8 +99,8 @@ class AdminNotificationsControllerSend201ResponseBuilder
 
   @override
   void update(
-      void Function(AdminNotificationsControllerSend201ResponseBuilder)?
-          updates) {
+    void Function(AdminNotificationsControllerSend201ResponseBuilder)? updates,
+  ) {
     if (updates != null) updates(this);
   }
 
@@ -122,9 +124,10 @@ class AdminNotificationsControllerSend201ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'AdminNotificationsControllerSend201Response',
-            _$failedField,
-            e.toString());
+          r'AdminNotificationsControllerSend201Response',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

@@ -26,7 +26,6 @@ import { Spinner } from "../components/ui/spinner";
 import { statusProps, timeAgo } from "../lib/format";
 import { webFetch } from "../lib/http";
 import {
-  buildRoleLookup,
   formatRoleName,
   getAssignableRoles,
   isPrivilegedRoleName,
@@ -52,7 +51,7 @@ export function UserDetailPage() {
   const session = useSession();
 
   const [selectedStatus, setSelectedStatus] = useState<UserStatus>("PENDING");
-  const [selectedRoleIds, setSelectedRoleIds] = useState<Set<string>>(new Set());
+  const [selectedRole, setSelectedRole] = useState<"ADMIN" | "USER">("USER");
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   const user = useQuery({
@@ -68,11 +67,17 @@ export function UserDetailPage() {
 
   const currentUser = user.data?.data;
   const roleList = roles.data?.data ?? EMPTY_ROLE_LIST;
-  const roleLookup = useMemo(() => buildRoleLookup(roleList), [roleList]);
   const actorRoles = session.data?.data.user.roles ?? EMPTY_ROLES;
   const assignableRoles = useMemo(
     () => getAssignableRoles(actorRoles, roleList),
     [actorRoles, roleList],
+  );
+  const assignableRoleNames = useMemo(
+    () =>
+      Array.from(new Set(assignableRoles.map((role) => role.name))).filter(
+        (name): name is "ADMIN" | "USER" => name === "ADMIN" || name === "USER",
+      ),
+    [assignableRoles],
   );
 
   // ── Derived protection flags ───────────────────────────────────────────────
@@ -92,17 +97,11 @@ export function UserDetailPage() {
   }, [currentUser]);
 
   useEffect(() => {
-    if (!currentUser || !roles.data) return;
-    const matched = new Set(
-      currentUser.roleIds?.length
-        ? currentUser.roleIds.filter((roleId) => roleLookup.has(roleId))
-        : roleList
-            .filter((role) => currentUser.roles.includes(role.name))
-            .map((role) => role.id),
-    );
+    if (!currentUser) return;
+    const primaryRole = currentUser.roles.includes("ADMIN") ? "ADMIN" : "USER";
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setSelectedRoleIds(matched);
-  }, [currentUser, roleLookup, roleList, roles.data]);
+    setSelectedRole(primaryRole);
+  }, [currentUser]);
 
   const profileForm = useForm<ProfileForm>({
     resolver: zodResolver(profileSchema),
@@ -174,13 +173,7 @@ export function UserDetailPage() {
 
   const { variant: sv, className: sc } = statusProps(currentUser.status);
 
-  const toggleRole = (id: string) =>
-    setSelectedRoleIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+  const toggleRole = (roleName: "ADMIN" | "USER") => setSelectedRole(roleName);
 
   return (
     <div className="space-y-6">
@@ -370,15 +363,15 @@ export function UserDetailPage() {
                 <Spinner className="size-4" />
               ) : (
                 <div className="space-y-1.5">
-                  {assignableRoles.map((role) => {
-                    const checked = selectedRoleIds.has(role.id);
+                  {assignableRoleNames.map((roleName) => {
+                    const checked = selectedRole === roleName;
                     const disabled = !canEditRoles;
                     return (
                       <button
-                        key={role.id}
+                        key={roleName}
                         type="button"
                         disabled={disabled}
-                        onClick={() => !disabled && toggleRole(role.id)}
+                        onClick={() => !disabled && toggleRole(roleName)}
                         className={cn(
                           "flex w-full items-center gap-2.5 rounded-lg border px-3 py-2.5 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-40",
                           checked
@@ -399,10 +392,7 @@ export function UserDetailPage() {
                           )}
                         </span>
                         <div className="min-w-0">
-                          <p className="text-sm font-medium">{formatRoleName(role.name)}</p>
-                          {typeof role.description === "string" && role.description ? (
-                            <p className="truncate text-xs text-muted-foreground">{role.description}</p>
-                          ) : null}
+                          <p className="text-sm font-medium">{formatRoleName(roleName)}</p>
                         </div>
                       </button>
                     );
@@ -414,7 +404,7 @@ export function UserDetailPage() {
                 size="sm"
                 className="w-full"
                 disabled={replaceRoles.isPending || !canEditRoles}
-                onClick={() => void replaceRoles.mutateAsync({ roleIds: Array.from(selectedRoleIds) })}
+                onClick={() => void replaceRoles.mutateAsync({ role: selectedRole })}
               >
                 {replaceRoles.isPending ? (
                   <><Spinner className="size-3.5" /> Saving…</>

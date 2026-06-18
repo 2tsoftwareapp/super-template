@@ -31,9 +31,9 @@ abstract class AdminJobsControllerListJobs200Response
 
   AdminJobsControllerListJobs200Response._();
 
-  factory AdminJobsControllerListJobs200Response(
-          [void updates(AdminJobsControllerListJobs200ResponseBuilder b)]) =
-      _$AdminJobsControllerListJobs200Response;
+  factory AdminJobsControllerListJobs200Response([
+    void updates(AdminJobsControllerListJobs200ResponseBuilder b),
+  ]) = _$AdminJobsControllerListJobs200Response;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(AdminJobsControllerListJobs200ResponseBuilder b) => b;
@@ -48,7 +48,7 @@ class _$AdminJobsControllerListJobs200ResponseSerializer
   @override
   final Iterable<Type> types = const [
     AdminJobsControllerListJobs200Response,
-    _$AdminJobsControllerListJobs200Response
+    _$AdminJobsControllerListJobs200Response,
   ];
 
   @override
@@ -77,9 +77,11 @@ class _$AdminJobsControllerListJobs200ResponseSerializer
     AdminJobsControllerListJobs200Response object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(
@@ -97,7 +99,9 @@ class _$AdminJobsControllerListJobs200ResponseSerializer
         case r'data':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(BuiltList, [FullType(JobDto)]),
+            specifiedType: const FullType(BuiltList, [
+              FullType(JobDto),
+            ]),
           ) as BuiltList<JobDto>;
           result.data.replace(valueDes);
           break;

@@ -48,7 +48,7 @@ class AdminHubScreen extends ConsumerWidget {
             title: 'Notifications',
             icon: Icons.campaign,
             route: '/admin/notifications',
-            permission: 'notifications.send',
+            permission: 'notifications.read',
           ),
           (
             title: 'Audit logs',

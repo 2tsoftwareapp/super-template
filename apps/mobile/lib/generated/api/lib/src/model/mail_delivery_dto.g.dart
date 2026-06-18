@@ -50,16 +50,22 @@ class _$MailDeliveryDtoStatusEnumSerializer
   final String wireName = 'MailDeliveryDtoStatusEnum';
 
   @override
-  Object serialize(Serializers serializers, MailDeliveryDtoStatusEnum object,
-          {FullType specifiedType = FullType.unspecified}) =>
+  Object serialize(
+    Serializers serializers,
+    MailDeliveryDtoStatusEnum object, {
+    FullType specifiedType = FullType.unspecified,
+  }) =>
       _toWire[object.name] ?? object.name;
 
   @override
   MailDeliveryDtoStatusEnum deserialize(
-          Serializers serializers, Object serialized,
-          {FullType specifiedType = FullType.unspecified}) =>
+    Serializers serializers,
+    Object serialized, {
+    FullType specifiedType = FullType.unspecified,
+  }) =>
       MailDeliveryDtoStatusEnum.valueOf(
-          _fromWire[serialized] ?? (serialized is String ? serialized : ''));
+        _fromWire[serialized] ?? (serialized is String ? serialized : ''),
+      );
 }
 
 class _$MailDeliveryDto extends MailDeliveryDto {
@@ -85,17 +91,17 @@ class _$MailDeliveryDto extends MailDeliveryDto {
   factory _$MailDeliveryDto([void Function(MailDeliveryDtoBuilder)? updates]) =>
       (MailDeliveryDtoBuilder()..update(updates))._build();
 
-  _$MailDeliveryDto._(
-      {required this.id,
-      required this.templateKey,
-      required this.recipient,
-      required this.subject,
-      required this.status,
-      this.errorMessage,
-      this.metadata,
-      this.sentAt,
-      required this.createdAt})
-      : super._();
+  _$MailDeliveryDto._({
+    required this.id,
+    required this.templateKey,
+    required this.recipient,
+    required this.subject,
+    required this.status,
+    this.errorMessage,
+    this.metadata,
+    this.sentAt,
+    required this.createdAt,
+  }) : super._();
   @override
   MailDeliveryDto rebuild(void Function(MailDeliveryDtoBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -233,20 +239,38 @@ class MailDeliveryDtoBuilder
       _$result = _$v ??
           _$MailDeliveryDto._(
             id: BuiltValueNullFieldError.checkNotNull(
-                id, r'MailDeliveryDto', 'id'),
+              id,
+              r'MailDeliveryDto',
+              'id',
+            ),
             templateKey: BuiltValueNullFieldError.checkNotNull(
-                templateKey, r'MailDeliveryDto', 'templateKey'),
+              templateKey,
+              r'MailDeliveryDto',
+              'templateKey',
+            ),
             recipient: BuiltValueNullFieldError.checkNotNull(
-                recipient, r'MailDeliveryDto', 'recipient'),
+              recipient,
+              r'MailDeliveryDto',
+              'recipient',
+            ),
             subject: BuiltValueNullFieldError.checkNotNull(
-                subject, r'MailDeliveryDto', 'subject'),
+              subject,
+              r'MailDeliveryDto',
+              'subject',
+            ),
             status: BuiltValueNullFieldError.checkNotNull(
-                status, r'MailDeliveryDto', 'status'),
+              status,
+              r'MailDeliveryDto',
+              'status',
+            ),
             errorMessage: errorMessage,
             metadata: _metadata?.build(),
             sentAt: sentAt,
             createdAt: BuiltValueNullFieldError.checkNotNull(
-                createdAt, r'MailDeliveryDto', 'createdAt'),
+              createdAt,
+              r'MailDeliveryDto',
+              'createdAt',
+            ),
           );
     } catch (_) {
       late String _$failedField;
@@ -255,7 +279,10 @@ class MailDeliveryDtoBuilder
         _metadata?.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'MailDeliveryDto', _$failedField, e.toString());
+          r'MailDeliveryDto',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

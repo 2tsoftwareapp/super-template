@@ -6,6 +6,7 @@ import type {
 import { Injectable } from '@nestjs/common';
 
 import type {
+  AssignableRoleName,
   CreateAdminUserCommand,
   ListUsersQuery,
   UpdateAdminUserCommand,
@@ -61,12 +62,12 @@ export class UsersService {
     );
   }
 
-  listUsers(query: ListUsersQuery) {
-    return this.listUsersUseCase.execute(query);
+  listUsers(actor: AuthenticatedRequestUser, query: ListUsersQuery) {
+    return this.listUsersUseCase.execute(actor, query);
   }
 
-  getUserById(userId: string) {
-    return this.getUserUseCase.execute(userId);
+  getUserById(actor: AuthenticatedRequestUser, userId: string) {
+    return this.getUserUseCase.execute(userId, actor);
   }
 
   createAdminUser(
@@ -120,13 +121,15 @@ export class UsersService {
   replaceUserRoles(
     actor: AuthenticatedRequestUser,
     userId: string,
-    roleIds: string[],
+    role: AssignableRoleName,
+    organizationId: string | undefined,
     requestContext?: RequestContext,
   ) {
     return this.replaceUserRolesUseCase.execute(
       actor,
       userId,
-      roleIds,
+      role,
+      organizationId,
       requestContext,
     );
   }

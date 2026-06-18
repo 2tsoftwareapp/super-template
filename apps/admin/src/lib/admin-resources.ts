@@ -110,7 +110,7 @@ export const adminResources: AdminResourceConfig[] = [
     path: "/imports",
     icon: Ticket,
     features: ["list", "create"],
-    permissions: ["imports.manage"],
+    permissions: ["imports.read"],
     queryKey: "admin-imports",
   },
   {

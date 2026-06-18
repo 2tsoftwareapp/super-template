@@ -27,18 +27,25 @@ class _ExportsScreenState extends ConsumerState<ExportsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final canManage =
+    final canRead =
         ref
             .watch(authControllerProvider)
             .valueOrNull
             ?.permissions
-            .contains('exports.manage') ??
+            .contains('exports.read') ??
+        false;
+    final canCreate =
+        ref
+            .watch(authControllerProvider)
+            .valueOrNull
+            ?.permissions
+            .contains('exports.create') ??
         false;
 
-    if (!canManage) {
+    if (!canRead) {
       return Scaffold(
         appBar: AppBar(title: const Text('Exports')),
-        body: const Center(child: Text('Missing exports.manage permission')),
+        body: const Center(child: Text('Missing exports.read permission')),
       );
     }
 
@@ -50,7 +57,7 @@ class _ExportsScreenState extends ConsumerState<ExportsScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             FilledButton.icon(
-              onPressed: _working ? null : _startExport,
+              onPressed: _working || !canCreate ? null : _startExport,
               icon: const Icon(Icons.download),
               label: const Text('Export projects CSV'),
             ),

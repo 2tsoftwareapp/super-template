@@ -30,10 +30,9 @@ abstract class AdminNotificationsControllerSend201Response
 
   AdminNotificationsControllerSend201Response._();
 
-  factory AdminNotificationsControllerSend201Response(
-          [void updates(
-              AdminNotificationsControllerSend201ResponseBuilder b)]) =
-      _$AdminNotificationsControllerSend201Response;
+  factory AdminNotificationsControllerSend201Response([
+    void updates(AdminNotificationsControllerSend201ResponseBuilder b),
+  ]) = _$AdminNotificationsControllerSend201Response;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(AdminNotificationsControllerSend201ResponseBuilder b) =>
@@ -51,7 +50,7 @@ class _$AdminNotificationsControllerSend201ResponseSerializer
   @override
   final Iterable<Type> types = const [
     AdminNotificationsControllerSend201Response,
-    _$AdminNotificationsControllerSend201Response
+    _$AdminNotificationsControllerSend201Response,
   ];
 
   @override
@@ -80,9 +79,11 @@ class _$AdminNotificationsControllerSend201ResponseSerializer
     AdminNotificationsControllerSend201Response object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(

@@ -15,19 +15,20 @@ class _$OrganizationsControllerList200Response
   @override
   final RequestMetaDto meta;
 
-  factory _$OrganizationsControllerList200Response(
-          [void Function(OrganizationsControllerList200ResponseBuilder)?
-              updates]) =>
+  factory _$OrganizationsControllerList200Response([
+    void Function(OrganizationsControllerList200ResponseBuilder)? updates,
+  ]) =>
       (OrganizationsControllerList200ResponseBuilder()..update(updates))
           ._build();
 
-  _$OrganizationsControllerList200Response._(
-      {required this.data, required this.meta})
-      : super._();
+  _$OrganizationsControllerList200Response._({
+    required this.data,
+    required this.meta,
+  }) : super._();
   @override
   OrganizationsControllerList200Response rebuild(
-          void Function(OrganizationsControllerList200ResponseBuilder)
-              updates) =>
+    void Function(OrganizationsControllerList200ResponseBuilder) updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -54,7 +55,8 @@ class _$OrganizationsControllerList200Response
   @override
   String toString() {
     return (newBuiltValueToStringHelper(
-            r'OrganizationsControllerList200Response')
+      r'OrganizationsControllerList200Response',
+    )
           ..add('data', data)
           ..add('meta', meta))
         .toString();
@@ -97,7 +99,8 @@ class OrganizationsControllerList200ResponseBuilder
 
   @override
   void update(
-      void Function(OrganizationsControllerList200ResponseBuilder)? updates) {
+    void Function(OrganizationsControllerList200ResponseBuilder)? updates,
+  ) {
     if (updates != null) updates(this);
   }
 
@@ -121,9 +124,10 @@ class OrganizationsControllerList200ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'OrganizationsControllerList200Response',
-            _$failedField,
-            e.toString());
+          r'OrganizationsControllerList200Response',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

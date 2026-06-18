@@ -70,9 +70,11 @@ class _$RegisterDeviceDtoSerializer
     RegisterDeviceDto object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(
@@ -97,7 +99,9 @@ class _$RegisterDeviceDtoSerializer
         case r'platform':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(RegisterDeviceDtoPlatformEnum),
+            specifiedType: const FullType(
+              RegisterDeviceDtoPlatformEnum,
+            ),
           ) as RegisterDeviceDtoPlatformEnum;
           result.platform = valueDes;
           break;

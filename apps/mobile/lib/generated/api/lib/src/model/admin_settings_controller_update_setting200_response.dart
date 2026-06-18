@@ -30,14 +30,14 @@ abstract class AdminSettingsControllerUpdateSetting200Response
 
   AdminSettingsControllerUpdateSetting200Response._();
 
-  factory AdminSettingsControllerUpdateSetting200Response(
-          [void updates(
-              AdminSettingsControllerUpdateSetting200ResponseBuilder b)]) =
-      _$AdminSettingsControllerUpdateSetting200Response;
+  factory AdminSettingsControllerUpdateSetting200Response([
+    void updates(AdminSettingsControllerUpdateSetting200ResponseBuilder b),
+  ]) = _$AdminSettingsControllerUpdateSetting200Response;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(
-          AdminSettingsControllerUpdateSetting200ResponseBuilder b) =>
+    AdminSettingsControllerUpdateSetting200ResponseBuilder b,
+  ) =>
       b;
 
   @BuiltValueSerializer(custom: true)
@@ -52,7 +52,7 @@ class _$AdminSettingsControllerUpdateSetting200ResponseSerializer
   @override
   final Iterable<Type> types = const [
     AdminSettingsControllerUpdateSetting200Response,
-    _$AdminSettingsControllerUpdateSetting200Response
+    _$AdminSettingsControllerUpdateSetting200Response,
   ];
 
   @override
@@ -81,9 +81,11 @@ class _$AdminSettingsControllerUpdateSetting200ResponseSerializer
     AdminSettingsControllerUpdateSetting200Response object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(

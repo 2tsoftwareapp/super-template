@@ -14,12 +14,17 @@ part 'replace_user_roles_dto.g.dart';
 /// ReplaceUserRolesDto
 ///
 /// Properties:
-/// * [roleIds]
+/// * [role]
+/// * [organizationId]
 @BuiltValue()
 abstract class ReplaceUserRolesDto
     implements Built<ReplaceUserRolesDto, ReplaceUserRolesDtoBuilder> {
-  @BuiltValueField(wireName: r'roleIds')
-  BuiltList<String> get roleIds;
+  @BuiltValueField(wireName: r'role')
+  ReplaceUserRolesDtoRoleEnum get role;
+  // enum roleEnum {  ADMIN,  USER,  };
+
+  @BuiltValueField(wireName: r'organizationId')
+  String? get organizationId;
 
   ReplaceUserRolesDto._();
 
@@ -39,7 +44,7 @@ class _$ReplaceUserRolesDtoSerializer
   @override
   final Iterable<Type> types = const [
     ReplaceUserRolesDto,
-    _$ReplaceUserRolesDto
+    _$ReplaceUserRolesDto,
   ];
 
   @override
@@ -50,11 +55,18 @@ class _$ReplaceUserRolesDtoSerializer
     ReplaceUserRolesDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'roleIds';
+    yield r'role';
     yield serializers.serialize(
-      object.roleIds,
-      specifiedType: const FullType(BuiltList, [FullType(String)]),
+      object.role,
+      specifiedType: const FullType(ReplaceUserRolesDtoRoleEnum),
     );
+    if (object.organizationId != null) {
+      yield r'organizationId';
+      yield serializers.serialize(
+        object.organizationId,
+        specifiedType: const FullType(String),
+      );
+    }
   }
 
   @override
@@ -63,9 +75,11 @@ class _$ReplaceUserRolesDtoSerializer
     ReplaceUserRolesDto object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(
@@ -80,12 +94,19 @@ class _$ReplaceUserRolesDtoSerializer
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'roleIds':
+        case r'role':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(BuiltList, [FullType(String)]),
-          ) as BuiltList<String>;
-          result.roleIds.replace(valueDes);
+            specifiedType: const FullType(ReplaceUserRolesDtoRoleEnum),
+          ) as ReplaceUserRolesDtoRoleEnum;
+          result.role = valueDes;
+          break;
+        case r'organizationId':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.organizationId = valueDes;
           break;
         default:
           unhandled.add(key);
@@ -114,4 +135,23 @@ class _$ReplaceUserRolesDtoSerializer
     );
     return result.build();
   }
+}
+
+class ReplaceUserRolesDtoRoleEnum extends EnumClass {
+  @BuiltValueEnumConst(wireName: r'ADMIN')
+  static const ReplaceUserRolesDtoRoleEnum ADMIN =
+      _$replaceUserRolesDtoRoleEnum_ADMIN;
+  @BuiltValueEnumConst(wireName: r'USER')
+  static const ReplaceUserRolesDtoRoleEnum USER =
+      _$replaceUserRolesDtoRoleEnum_USER;
+
+  static Serializer<ReplaceUserRolesDtoRoleEnum> get serializer =>
+      _$replaceUserRolesDtoRoleEnumSerializer;
+
+  const ReplaceUserRolesDtoRoleEnum._(String name) : super(name);
+
+  static BuiltSet<ReplaceUserRolesDtoRoleEnum> get values =>
+      _$replaceUserRolesDtoRoleEnumValues;
+  static ReplaceUserRolesDtoRoleEnum valueOf(String name) =>
+      _$replaceUserRolesDtoRoleEnumValueOf(name);
 }

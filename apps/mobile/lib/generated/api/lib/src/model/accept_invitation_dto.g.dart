@@ -12,14 +12,16 @@ class _$AcceptInvitationDto extends AcceptInvitationDto {
   @override
   final String token;
 
-  factory _$AcceptInvitationDto(
-          [void Function(AcceptInvitationDtoBuilder)? updates]) =>
+  factory _$AcceptInvitationDto([
+    void Function(AcceptInvitationDtoBuilder)? updates,
+  ]) =>
       (AcceptInvitationDtoBuilder()..update(updates))._build();
 
   _$AcceptInvitationDto._({required this.token}) : super._();
   @override
   AcceptInvitationDto rebuild(
-          void Function(AcceptInvitationDtoBuilder) updates) =>
+    void Function(AcceptInvitationDtoBuilder) updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -42,8 +44,9 @@ class _$AcceptInvitationDto extends AcceptInvitationDto {
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper(r'AcceptInvitationDto')
-          ..add('token', token))
+    return (newBuiltValueToStringHelper(
+      r'AcceptInvitationDto',
+    )..add('token', token))
         .toString();
   }
 }
@@ -86,7 +89,10 @@ class AcceptInvitationDtoBuilder
     final _$result = _$v ??
         _$AcceptInvitationDto._(
           token: BuiltValueNullFieldError.checkNotNull(
-              token, r'AcceptInvitationDto', 'token'),
+            token,
+            r'AcceptInvitationDto',
+            'token',
+          ),
         );
     replace(_$result);
     return _$result;

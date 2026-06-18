@@ -15,17 +15,19 @@ class _$AttachmentsControllerList200Response
   @override
   final RequestMetaDto meta;
 
-  factory _$AttachmentsControllerList200Response(
-          [void Function(AttachmentsControllerList200ResponseBuilder)?
-              updates]) =>
+  factory _$AttachmentsControllerList200Response([
+    void Function(AttachmentsControllerList200ResponseBuilder)? updates,
+  ]) =>
       (AttachmentsControllerList200ResponseBuilder()..update(updates))._build();
 
-  _$AttachmentsControllerList200Response._(
-      {required this.data, required this.meta})
-      : super._();
+  _$AttachmentsControllerList200Response._({
+    required this.data,
+    required this.meta,
+  }) : super._();
   @override
   AttachmentsControllerList200Response rebuild(
-          void Function(AttachmentsControllerList200ResponseBuilder) updates) =>
+    void Function(AttachmentsControllerList200ResponseBuilder) updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -94,7 +96,8 @@ class AttachmentsControllerList200ResponseBuilder
 
   @override
   void update(
-      void Function(AttachmentsControllerList200ResponseBuilder)? updates) {
+    void Function(AttachmentsControllerList200ResponseBuilder)? updates,
+  ) {
     if (updates != null) updates(this);
   }
 
@@ -118,9 +121,10 @@ class AttachmentsControllerList200ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'AttachmentsControllerList200Response',
-            _$failedField,
-            e.toString());
+          r'AttachmentsControllerList200Response',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

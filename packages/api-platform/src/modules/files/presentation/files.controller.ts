@@ -36,7 +36,7 @@ export class FilesController {
   constructor(private readonly filesService: FilesService) {}
 
   @Post()
-  @Authorize({ permissions: [PERMISSION_NAMES.FILES_UPLOAD] })
+  @Authorize({ permissions: [PERMISSION_NAMES.FILES_CREATE] })
   @UseInterceptors(UploadFileInterceptor)
   @ApiConsumes('multipart/form-data')
   @ApiBody({

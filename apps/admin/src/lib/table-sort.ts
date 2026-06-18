@@ -1,13 +1,12 @@
-import type { SortingState } from "@tanstack/react-table";
-
 import type { SortCriterion, SortOrder } from "@repo/api-contract/sort/multi-sort";
+import type { SortingState } from "@tanstack/react-table";
 
 export function createTableSortBridge<TField extends string>(config: {
   fieldByColumn: Record<string, TField | undefined>;
   columnByField: Record<TField, string>;
 }) {
   return {
-    sortingStateFromParams(sort: ReadonlyArray<SortCriterion<TField>>): SortingState {
+    sortingStateFromParams(sort: readonly SortCriterion<TField>[]): SortingState {
       return sort.map((criterion) => ({
         id: config.columnByField[criterion.field] ?? criterion.field,
         desc: criterion.order === "desc",
@@ -16,7 +15,7 @@ export function createTableSortBridge<TField extends string>(config: {
 
     paramsFromSortingState(
       sorting: SortingState,
-      current: ReadonlyArray<SortCriterion<TField>>,
+      current: readonly SortCriterion<TField>[],
     ): SortCriterion<TField>[] {
       if (sorting.length === 0) {
         return [...current];

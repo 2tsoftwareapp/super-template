@@ -8,12 +8,15 @@ part of 'user_dto.dart';
 // BuiltValueGenerator
 // **************************************************************************
 
-const UserDtoStatusEnum _$userDtoStatusEnum_PENDING =
-    const UserDtoStatusEnum._('PENDING');
-const UserDtoStatusEnum _$userDtoStatusEnum_ACTIVE =
-    const UserDtoStatusEnum._('ACTIVE');
-const UserDtoStatusEnum _$userDtoStatusEnum_BLOCKED =
-    const UserDtoStatusEnum._('BLOCKED');
+const UserDtoStatusEnum _$userDtoStatusEnum_PENDING = const UserDtoStatusEnum._(
+  'PENDING',
+);
+const UserDtoStatusEnum _$userDtoStatusEnum_ACTIVE = const UserDtoStatusEnum._(
+  'ACTIVE',
+);
+const UserDtoStatusEnum _$userDtoStatusEnum_BLOCKED = const UserDtoStatusEnum._(
+  'BLOCKED',
+);
 
 UserDtoStatusEnum _$userDtoStatusEnumValueOf(String name) {
   switch (name) {
@@ -57,15 +60,22 @@ class _$UserDtoStatusEnumSerializer
   final String wireName = 'UserDtoStatusEnum';
 
   @override
-  Object serialize(Serializers serializers, UserDtoStatusEnum object,
-          {FullType specifiedType = FullType.unspecified}) =>
+  Object serialize(
+    Serializers serializers,
+    UserDtoStatusEnum object, {
+    FullType specifiedType = FullType.unspecified,
+  }) =>
       _toWire[object.name] ?? object.name;
 
   @override
-  UserDtoStatusEnum deserialize(Serializers serializers, Object serialized,
-          {FullType specifiedType = FullType.unspecified}) =>
+  UserDtoStatusEnum deserialize(
+    Serializers serializers,
+    Object serialized, {
+    FullType specifiedType = FullType.unspecified,
+  }) =>
       UserDtoStatusEnum.valueOf(
-          _fromWire[serialized] ?? (serialized is String ? serialized : ''));
+        _fromWire[serialized] ?? (serialized is String ? serialized : ''),
+      );
 }
 
 class _$UserDto extends UserDto {
@@ -93,18 +103,18 @@ class _$UserDto extends UserDto {
   factory _$UserDto([void Function(UserDtoBuilder)? updates]) =>
       (UserDtoBuilder()..update(updates))._build();
 
-  _$UserDto._(
-      {required this.id,
-      required this.email,
-      required this.displayName,
-      this.avatarUrl,
-      required this.status,
-      this.emailVerifiedAt,
-      required this.roles,
-      required this.roleIds,
-      required this.createdAt,
-      required this.updatedAt})
-      : super._();
+  _$UserDto._({
+    required this.id,
+    required this.email,
+    required this.displayName,
+    this.avatarUrl,
+    required this.status,
+    this.emailVerifiedAt,
+    required this.roles,
+    required this.roleIds,
+    required this.createdAt,
+    required this.updatedAt,
+  }) : super._();
   @override
   UserDto rebuild(void Function(UserDtoBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -248,19 +258,34 @@ class UserDtoBuilder implements Builder<UserDto, UserDtoBuilder> {
           _$UserDto._(
             id: BuiltValueNullFieldError.checkNotNull(id, r'UserDto', 'id'),
             email: BuiltValueNullFieldError.checkNotNull(
-                email, r'UserDto', 'email'),
+              email,
+              r'UserDto',
+              'email',
+            ),
             displayName: BuiltValueNullFieldError.checkNotNull(
-                displayName, r'UserDto', 'displayName'),
+              displayName,
+              r'UserDto',
+              'displayName',
+            ),
             avatarUrl: avatarUrl,
             status: BuiltValueNullFieldError.checkNotNull(
-                status, r'UserDto', 'status'),
+              status,
+              r'UserDto',
+              'status',
+            ),
             emailVerifiedAt: emailVerifiedAt,
             roles: roles.build(),
             roleIds: roleIds.build(),
             createdAt: BuiltValueNullFieldError.checkNotNull(
-                createdAt, r'UserDto', 'createdAt'),
+              createdAt,
+              r'UserDto',
+              'createdAt',
+            ),
             updatedAt: BuiltValueNullFieldError.checkNotNull(
-                updatedAt, r'UserDto', 'updatedAt'),
+              updatedAt,
+              r'UserDto',
+              'updatedAt',
+            ),
           );
     } catch (_) {
       late String _$failedField;
@@ -271,7 +296,10 @@ class UserDtoBuilder implements Builder<UserDto, UserDtoBuilder> {
         roleIds.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'UserDto', _$failedField, e.toString());
+          r'UserDto',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

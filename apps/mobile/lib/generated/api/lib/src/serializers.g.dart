@@ -19,6 +19,7 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(AdminMailControllerPreview200Response.serializer)
       ..add(AdminNotificationsControllerListJobs200Response.serializer)
       ..add(AdminNotificationsControllerSend201Response.serializer)
+      ..add(AdminRolesControllerListPermissions200Response.serializer)
       ..add(AdminRolesControllerListRoles200Response.serializer)
       ..add(AdminSettingsControllerListSettings200Response.serializer)
       ..add(AdminSettingsControllerUpdateSetting200Response.serializer)
@@ -45,6 +46,7 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(CommentsControllerList200Response.serializer)
       ..add(CountDto.serializer)
       ..add(CreateAdminUserDto.serializer)
+      ..add(CreateAdminUserDtoRoleEnum.serializer)
       ..add(CreateAdminUserDtoStatusEnum.serializer)
       ..add(CreateCommentDto.serializer)
       ..add(CreateExportDto.serializer)
@@ -92,6 +94,7 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(OrganizationsControllerCreate200Response.serializer)
       ..add(OrganizationsControllerList200Response.serializer)
       ..add(PaginationMetaDto.serializer)
+      ..add(PermissionDto.serializer)
       ..add(PreferencesControllerGetMyPreferences200Response.serializer)
       ..add(ProjectAttachmentDto.serializer)
       ..add(ProjectDto.serializer)
@@ -104,10 +107,12 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(RegisterDeviceDtoPlatformEnum.serializer)
       ..add(RegisterDto.serializer)
       ..add(ReplaceUserRolesDto.serializer)
+      ..add(ReplaceUserRolesDtoRoleEnum.serializer)
       ..add(RequestMetaDto.serializer)
       ..add(ResendVerificationDto.serializer)
       ..add(ResetPasswordDto.serializer)
       ..add(RoleDto.serializer)
+      ..add(RoleDtoScopeEnum.serializer)
       ..add(SendNotificationRequestDto.serializer)
       ..add(SendNotificationRequestDtoAudienceEnum.serializer)
       ..add(SuccessFlagDto.serializer)
@@ -128,175 +133,216 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(UserPreferencesDto.serializer)
       ..add(VerifyEmailDto.serializer)
       ..addBuilderFactory(
-          const FullType(BuiltList, const [const FullType(ActivityDto)]),
-          () => ListBuilder<ActivityDto>())
+        const FullType(BuiltList, const [const FullType(ActivityDto)]),
+        () => ListBuilder<ActivityDto>(),
+      )
       ..addBuilderFactory(
-          const FullType(
-              BuiltList, const [const FullType(ApplicationSettingDto)]),
-          () => ListBuilder<ApplicationSettingDto>())
+        const FullType(BuiltList, const [
+          const FullType(ApplicationSettingDto),
+        ]),
+        () => ListBuilder<ApplicationSettingDto>(),
+      )
       ..addBuilderFactory(
-          const FullType(BuiltList, const [const FullType(AttachmentDto)]),
-          () => ListBuilder<AttachmentDto>())
+        const FullType(BuiltList, const [const FullType(AttachmentDto)]),
+        () => ListBuilder<AttachmentDto>(),
+      )
       ..addBuilderFactory(
-          const FullType(BuiltList, const [const FullType(AuditLogDto)]),
-          () => ListBuilder<AuditLogDto>())
+        const FullType(BuiltList, const [const FullType(AuditLogDto)]),
+        () => ListBuilder<AuditLogDto>(),
+      )
       ..addBuilderFactory(
-          const FullType(BuiltList, const [const FullType(AuthSessionDto)]),
-          () => ListBuilder<AuthSessionDto>())
+        const FullType(BuiltList, const [const FullType(AuthSessionDto)]),
+        () => ListBuilder<AuthSessionDto>(),
+      )
       ..addBuilderFactory(
-          const FullType(BuiltList, const [const FullType(CommentDto)]),
-          () => ListBuilder<CommentDto>())
+        const FullType(BuiltList, const [const FullType(CommentDto)]),
+        () => ListBuilder<CommentDto>(),
+      )
       ..addBuilderFactory(
-          const FullType(BuiltList, const [const FullType(InvitationDto)]),
-          () => ListBuilder<InvitationDto>())
+        const FullType(BuiltList, const [const FullType(InvitationDto)]),
+        () => ListBuilder<InvitationDto>(),
+      )
       ..addBuilderFactory(
-          const FullType(BuiltList, const [const FullType(JobDto)]),
-          () => ListBuilder<JobDto>())
+        const FullType(BuiltList, const [const FullType(JobDto)]),
+        () => ListBuilder<JobDto>(),
+      )
       ..addBuilderFactory(
-          const FullType(BuiltList, const [const FullType(JsonObject)]),
-          () => ListBuilder<JsonObject>())
+        const FullType(BuiltList, const [const FullType(JsonObject)]),
+        () => ListBuilder<JsonObject>(),
+      )
       ..addBuilderFactory(
-          const FullType(BuiltList, const [const FullType(MailDeliveryDto)]),
-          () => ListBuilder<MailDeliveryDto>())
+        const FullType(BuiltList, const [const FullType(MailDeliveryDto)]),
+        () => ListBuilder<MailDeliveryDto>(),
+      )
       ..addBuilderFactory(
-          const FullType(BuiltList, const [const FullType(NotificationDto)]),
-          () => ListBuilder<NotificationDto>())
+        const FullType(BuiltList, const [const FullType(NotificationDto)]),
+        () => ListBuilder<NotificationDto>(),
+      )
       ..addBuilderFactory(
-          const FullType(BuiltList, const [const FullType(NotificationJobDto)]),
-          () => ListBuilder<NotificationJobDto>())
+        const FullType(BuiltList, const [
+          const FullType(NotificationJobDto),
+        ]),
+        () => ListBuilder<NotificationJobDto>(),
+      )
       ..addBuilderFactory(
-          const FullType(BuiltList, const [const FullType(OrganizationDto)]),
-          () => ListBuilder<OrganizationDto>())
+        const FullType(BuiltList, const [const FullType(OrganizationDto)]),
+        () => ListBuilder<OrganizationDto>(),
+      )
       ..addBuilderFactory(
-          const FullType(
-              BuiltList, const [const FullType(ProjectAttachmentDto)]),
-          () => ListBuilder<ProjectAttachmentDto>())
+        const FullType(BuiltList, const [const FullType(PermissionDto)]),
+        () => ListBuilder<PermissionDto>(),
+      )
       ..addBuilderFactory(
-          const FullType(BuiltList, const [const FullType(ProjectDto)]),
-          () => ListBuilder<ProjectDto>())
+        const FullType(BuiltList, const [const FullType(PermissionDto)]),
+        () => ListBuilder<PermissionDto>(),
+      )
       ..addBuilderFactory(
-          const FullType(BuiltList, const [const FullType(RoleDto)]),
-          () => ListBuilder<RoleDto>())
+        const FullType(BuiltList, const [
+          const FullType(ProjectAttachmentDto),
+        ]),
+        () => ListBuilder<ProjectAttachmentDto>(),
+      )
       ..addBuilderFactory(
-          const FullType(BuiltList, const [const FullType(String)]),
-          () => ListBuilder<String>())
+        const FullType(BuiltList, const [const FullType(ProjectDto)]),
+        () => ListBuilder<ProjectDto>(),
+      )
       ..addBuilderFactory(
-          const FullType(BuiltList, const [const FullType(String)]),
-          () => ListBuilder<String>())
+        const FullType(BuiltList, const [const FullType(RoleDto)]),
+        () => ListBuilder<RoleDto>(),
+      )
       ..addBuilderFactory(
-          const FullType(BuiltList, const [const FullType(String)]),
-          () => ListBuilder<String>())
+        const FullType(BuiltList, const [const FullType(String)]),
+        () => ListBuilder<String>(),
+      )
       ..addBuilderFactory(
-          const FullType(BuiltList, const [const FullType(String)]),
-          () => ListBuilder<String>())
+        const FullType(BuiltList, const [const FullType(String)]),
+        () => ListBuilder<String>(),
+      )
       ..addBuilderFactory(
-          const FullType(BuiltList, const [const FullType(String)]),
-          () => ListBuilder<String>())
+        const FullType(BuiltList, const [const FullType(String)]),
+        () => ListBuilder<String>(),
+      )
       ..addBuilderFactory(
-          const FullType(BuiltList, const [const FullType(String)]),
-          () => ListBuilder<String>())
+        const FullType(BuiltList, const [const FullType(String)]),
+        () => ListBuilder<String>(),
+      )
       ..addBuilderFactory(
-          const FullType(BuiltList, const [const FullType(String)]),
-          () => ListBuilder<String>())
+        const FullType(BuiltList, const [const FullType(String)]),
+        () => ListBuilder<String>(),
+      )
       ..addBuilderFactory(
-          const FullType(BuiltList, const [const FullType(String)]),
-          () => ListBuilder<String>())
+        const FullType(BuiltMap, const [
+          const FullType(String),
+          const FullType.nullable(JsonObject),
+        ]),
+        () => MapBuilder<String, JsonObject?>(),
+      )
       ..addBuilderFactory(
-          const FullType(BuiltMap, const [
-            const FullType(String),
-            const FullType.nullable(JsonObject)
-          ]),
-          () => MapBuilder<String, JsonObject?>())
+        const FullType(BuiltList, const [const FullType(String)]),
+        () => ListBuilder<String>(),
+      )
       ..addBuilderFactory(
-          const FullType(BuiltList, const [const FullType(String)]),
-          () => ListBuilder<String>())
+        const FullType(BuiltMap, const [
+          const FullType(String),
+          const FullType.nullable(JsonObject),
+        ]),
+        () => MapBuilder<String, JsonObject?>(),
+      )
       ..addBuilderFactory(
-          const FullType(BuiltMap, const [
-            const FullType(String),
-            const FullType.nullable(JsonObject)
-          ]),
-          () => MapBuilder<String, JsonObject?>())
+        const FullType(BuiltList, const [const FullType(UserDto)]),
+        () => ListBuilder<UserDto>(),
+      )
       ..addBuilderFactory(
-          const FullType(BuiltList, const [const FullType(UserDto)]),
-          () => ListBuilder<UserDto>())
+        const FullType(BuiltMap, const [
+          const FullType(String),
+          const FullType.nullable(JsonObject),
+        ]),
+        () => MapBuilder<String, JsonObject?>(),
+      )
       ..addBuilderFactory(
-          const FullType(BuiltMap, const [
-            const FullType(String),
-            const FullType.nullable(JsonObject)
-          ]),
-          () => MapBuilder<String, JsonObject?>())
+        const FullType(BuiltMap, const [
+          const FullType(String),
+          const FullType.nullable(JsonObject),
+        ]),
+        () => MapBuilder<String, JsonObject?>(),
+      )
       ..addBuilderFactory(
-          const FullType(BuiltMap, const [
-            const FullType(String),
-            const FullType.nullable(JsonObject)
-          ]),
-          () => MapBuilder<String, JsonObject?>())
+        const FullType(BuiltMap, const [
+          const FullType(String),
+          const FullType.nullable(JsonObject),
+        ]),
+        () => MapBuilder<String, JsonObject?>(),
+      )
       ..addBuilderFactory(
-          const FullType(BuiltMap, const [
-            const FullType(String),
-            const FullType.nullable(JsonObject)
-          ]),
-          () => MapBuilder<String, JsonObject?>())
+        const FullType(BuiltMap, const [
+          const FullType(String),
+          const FullType.nullable(JsonObject),
+        ]),
+        () => MapBuilder<String, JsonObject?>(),
+      )
       ..addBuilderFactory(
-          const FullType(BuiltMap, const [
-            const FullType(String),
-            const FullType.nullable(JsonObject)
-          ]),
-          () => MapBuilder<String, JsonObject?>())
+        const FullType(BuiltMap, const [
+          const FullType(String),
+          const FullType.nullable(JsonObject),
+        ]),
+        () => MapBuilder<String, JsonObject?>(),
+      )
       ..addBuilderFactory(
-          const FullType(BuiltMap, const [
-            const FullType(String),
-            const FullType.nullable(JsonObject)
-          ]),
-          () => MapBuilder<String, JsonObject?>())
+        const FullType(BuiltMap, const [
+          const FullType(String),
+          const FullType.nullable(JsonObject),
+        ]),
+        () => MapBuilder<String, JsonObject?>(),
+      )
       ..addBuilderFactory(
-          const FullType(BuiltMap, const [
-            const FullType(String),
-            const FullType.nullable(JsonObject)
-          ]),
-          () => MapBuilder<String, JsonObject?>())
+        const FullType(BuiltMap, const [
+          const FullType(String),
+          const FullType.nullable(JsonObject),
+        ]),
+        () => MapBuilder<String, JsonObject?>(),
+      )
       ..addBuilderFactory(
-          const FullType(BuiltMap, const [
-            const FullType(String),
-            const FullType.nullable(JsonObject)
-          ]),
-          () => MapBuilder<String, JsonObject?>())
+        const FullType(BuiltMap, const [
+          const FullType(String),
+          const FullType.nullable(JsonObject),
+        ]),
+        () => MapBuilder<String, JsonObject?>(),
+      )
       ..addBuilderFactory(
-          const FullType(BuiltMap, const [
-            const FullType(String),
-            const FullType.nullable(JsonObject)
-          ]),
-          () => MapBuilder<String, JsonObject?>())
+        const FullType(BuiltMap, const [
+          const FullType(String),
+          const FullType.nullable(JsonObject),
+        ]),
+        () => MapBuilder<String, JsonObject?>(),
+      )
       ..addBuilderFactory(
-          const FullType(BuiltMap, const [
-            const FullType(String),
-            const FullType.nullable(JsonObject)
-          ]),
-          () => MapBuilder<String, JsonObject?>())
+        const FullType(BuiltMap, const [
+          const FullType(String),
+          const FullType.nullable(JsonObject),
+        ]),
+        () => MapBuilder<String, JsonObject?>(),
+      )
       ..addBuilderFactory(
-          const FullType(BuiltMap, const [
-            const FullType(String),
-            const FullType.nullable(JsonObject)
-          ]),
-          () => MapBuilder<String, JsonObject?>())
+        const FullType(BuiltMap, const [
+          const FullType(String),
+          const FullType.nullable(JsonObject),
+        ]),
+        () => MapBuilder<String, JsonObject?>(),
+      )
       ..addBuilderFactory(
-          const FullType(BuiltMap, const [
-            const FullType(String),
-            const FullType.nullable(JsonObject)
-          ]),
-          () => MapBuilder<String, JsonObject?>())
+        const FullType(BuiltMap, const [
+          const FullType(String),
+          const FullType.nullable(JsonObject),
+        ]),
+        () => MapBuilder<String, JsonObject?>(),
+      )
       ..addBuilderFactory(
-          const FullType(BuiltMap, const [
-            const FullType(String),
-            const FullType.nullable(JsonObject)
-          ]),
-          () => MapBuilder<String, JsonObject?>())
-      ..addBuilderFactory(
-          const FullType(BuiltMap, const [
-            const FullType(String),
-            const FullType.nullable(JsonObject)
-          ]),
-          () => MapBuilder<String, JsonObject?>()))
+        const FullType(BuiltMap, const [
+          const FullType(String),
+          const FullType.nullable(JsonObject),
+        ]),
+        () => MapBuilder<String, JsonObject?>(),
+      ))
     .build();
 
 // ignore_for_file: deprecated_member_use_from_same_package,type=lint

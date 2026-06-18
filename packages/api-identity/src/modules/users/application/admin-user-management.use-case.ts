@@ -19,6 +19,7 @@ import type { UpdateAdminUserCommand, UserStatus, UserView } from './users.types
 import { AccessControlService } from '../../access-control/application/access-control.service';
 import { hashPassword } from '../../auth/application/auth.helpers';
 import { AuthRepository } from '../../auth/infrastructure/auth.repository';
+import { assertUserBelongsToOrganization } from '../domain/user-org-scope.policy';
 import { GetUserUseCase } from './get-user.use-case';
 import {
   USERS_REPOSITORY,
@@ -43,6 +44,13 @@ export class AdminUserManagementUseCase {
     input: UpdateAdminUserCommand,
     requestContext?: RequestContext,
   ): Promise<UserView> {
+    await assertUserBelongsToOrganization(
+      (targetUserId, organizationId) =>
+        this.usersRepository.isUserInOrganization(targetUserId, organizationId),
+      actor,
+      userId,
+    );
+
     const user = await this.usersRepository.findById(userId);
 
     if (!user) {
@@ -91,7 +99,7 @@ export class AdminUserManagementUseCase {
       requestContext,
     });
 
-    return this.getUserUseCase.execute(updated?.id ?? userId);
+    return this.getUserUseCase.execute(updated?.id ?? userId, actor);
   }
 
   async delete(
@@ -99,6 +107,13 @@ export class AdminUserManagementUseCase {
     userId: string,
     requestContext?: RequestContext,
   ) {
+    await assertUserBelongsToOrganization(
+      (targetUserId, organizationId) =>
+        this.usersRepository.isUserInOrganization(targetUserId, organizationId),
+      actor,
+      userId,
+    );
+
     const user = await this.usersRepository.findById(userId);
 
     if (!user) {
@@ -146,6 +161,13 @@ export class AdminUserManagementUseCase {
     status: UserStatus,
     requestContext?: RequestContext,
   ): Promise<UserView> {
+    await assertUserBelongsToOrganization(
+      (targetUserId, organizationId) =>
+        this.usersRepository.isUserInOrganization(targetUserId, organizationId),
+      actor,
+      userId,
+    );
+
     const user = await this.usersRepository.findById(userId);
 
     if (!user) {
@@ -201,6 +223,6 @@ export class AdminUserManagementUseCase {
       );
     });
 
-    return this.getUserUseCase.execute(userId);
+    return this.getUserUseCase.execute(userId, actor);
   }
 }

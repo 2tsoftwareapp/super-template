@@ -13,7 +13,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../co
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { PasswordInput } from "../components/ui/password-input";
-import { clearStoredAuthTokens, setStoredAuthTokens } from "../lib/auth";
 import { hasAdminAppAccess } from "../lib/admin-resources";
 import { webFetch } from "../lib/http";
 import { sessionQueryKey } from "../lib/session";
@@ -52,18 +51,13 @@ export function LoginPage() {
           permissions: response.data.permissions,
         })
       ) {
-        clearStoredAuthTokens();
+        await webFetch("/api/v1/auth/logout", { method: "POST" });
         throw new Error("not-admin");
       }
 
       return response;
     },
-    onSuccess: async (response) => {
-      setStoredAuthTokens({
-        accessToken: response.data.accessToken,
-        refreshToken: response.data.refreshToken,
-      });
-
+    onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: sessionQueryKey });
       await navigate("/", { replace: true });
     },

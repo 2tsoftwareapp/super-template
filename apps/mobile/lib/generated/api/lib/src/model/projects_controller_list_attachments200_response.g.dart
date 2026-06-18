@@ -15,19 +15,20 @@ class _$ProjectsControllerListAttachments200Response
   @override
   final RequestMetaDto meta;
 
-  factory _$ProjectsControllerListAttachments200Response(
-          [void Function(ProjectsControllerListAttachments200ResponseBuilder)?
-              updates]) =>
+  factory _$ProjectsControllerListAttachments200Response([
+    void Function(ProjectsControllerListAttachments200ResponseBuilder)? updates,
+  ]) =>
       (ProjectsControllerListAttachments200ResponseBuilder()..update(updates))
           ._build();
 
-  _$ProjectsControllerListAttachments200Response._(
-      {required this.data, required this.meta})
-      : super._();
+  _$ProjectsControllerListAttachments200Response._({
+    required this.data,
+    required this.meta,
+  }) : super._();
   @override
   ProjectsControllerListAttachments200Response rebuild(
-          void Function(ProjectsControllerListAttachments200ResponseBuilder)
-              updates) =>
+    void Function(ProjectsControllerListAttachments200ResponseBuilder) updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -54,7 +55,8 @@ class _$ProjectsControllerListAttachments200Response
   @override
   String toString() {
     return (newBuiltValueToStringHelper(
-            r'ProjectsControllerListAttachments200Response')
+      r'ProjectsControllerListAttachments200Response',
+    )
           ..add('data', data)
           ..add('meta', meta))
         .toString();
@@ -97,8 +99,8 @@ class ProjectsControllerListAttachments200ResponseBuilder
 
   @override
   void update(
-      void Function(ProjectsControllerListAttachments200ResponseBuilder)?
-          updates) {
+    void Function(ProjectsControllerListAttachments200ResponseBuilder)? updates,
+  ) {
     if (updates != null) updates(this);
   }
 
@@ -122,9 +124,10 @@ class ProjectsControllerListAttachments200ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'ProjectsControllerListAttachments200Response',
-            _$failedField,
-            e.toString());
+          r'ProjectsControllerListAttachments200Response',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

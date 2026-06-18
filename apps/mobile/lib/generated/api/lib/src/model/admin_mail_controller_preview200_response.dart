@@ -30,9 +30,9 @@ abstract class AdminMailControllerPreview200Response
 
   AdminMailControllerPreview200Response._();
 
-  factory AdminMailControllerPreview200Response(
-          [void updates(AdminMailControllerPreview200ResponseBuilder b)]) =
-      _$AdminMailControllerPreview200Response;
+  factory AdminMailControllerPreview200Response([
+    void updates(AdminMailControllerPreview200ResponseBuilder b),
+  ]) = _$AdminMailControllerPreview200Response;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(AdminMailControllerPreview200ResponseBuilder b) => b;
@@ -47,7 +47,7 @@ class _$AdminMailControllerPreview200ResponseSerializer
   @override
   final Iterable<Type> types = const [
     AdminMailControllerPreview200Response,
-    _$AdminMailControllerPreview200Response
+    _$AdminMailControllerPreview200Response,
   ];
 
   @override
@@ -76,9 +76,11 @@ class _$AdminMailControllerPreview200ResponseSerializer
     AdminMailControllerPreview200Response object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(

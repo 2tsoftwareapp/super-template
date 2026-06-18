@@ -13,11 +13,17 @@ class _$CreateImportDto extends CreateImportDto {
   final String type;
   @override
   final String fileId;
+  @override
+  final String? idempotencyKey;
 
   factory _$CreateImportDto([void Function(CreateImportDtoBuilder)? updates]) =>
       (CreateImportDtoBuilder()..update(updates))._build();
 
-  _$CreateImportDto._({required this.type, required this.fileId}) : super._();
+  _$CreateImportDto._({
+    required this.type,
+    required this.fileId,
+    this.idempotencyKey,
+  }) : super._();
   @override
   CreateImportDto rebuild(void Function(CreateImportDtoBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -30,7 +36,8 @@ class _$CreateImportDto extends CreateImportDto {
     if (identical(other, this)) return true;
     return other is CreateImportDto &&
         type == other.type &&
-        fileId == other.fileId;
+        fileId == other.fileId &&
+        idempotencyKey == other.idempotencyKey;
   }
 
   @override
@@ -38,6 +45,7 @@ class _$CreateImportDto extends CreateImportDto {
     var _$hash = 0;
     _$hash = $jc(_$hash, type.hashCode);
     _$hash = $jc(_$hash, fileId.hashCode);
+    _$hash = $jc(_$hash, idempotencyKey.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -46,7 +54,8 @@ class _$CreateImportDto extends CreateImportDto {
   String toString() {
     return (newBuiltValueToStringHelper(r'CreateImportDto')
           ..add('type', type)
-          ..add('fileId', fileId))
+          ..add('fileId', fileId)
+          ..add('idempotencyKey', idempotencyKey))
         .toString();
   }
 }
@@ -63,6 +72,11 @@ class CreateImportDtoBuilder
   String? get fileId => _$this._fileId;
   set fileId(String? fileId) => _$this._fileId = fileId;
 
+  String? _idempotencyKey;
+  String? get idempotencyKey => _$this._idempotencyKey;
+  set idempotencyKey(String? idempotencyKey) =>
+      _$this._idempotencyKey = idempotencyKey;
+
   CreateImportDtoBuilder() {
     CreateImportDto._defaults(this);
   }
@@ -72,6 +86,7 @@ class CreateImportDtoBuilder
     if ($v != null) {
       _type = $v.type;
       _fileId = $v.fileId;
+      _idempotencyKey = $v.idempotencyKey;
       _$v = null;
     }
     return this;
@@ -94,9 +109,16 @@ class CreateImportDtoBuilder
     final _$result = _$v ??
         _$CreateImportDto._(
           type: BuiltValueNullFieldError.checkNotNull(
-              type, r'CreateImportDto', 'type'),
+            type,
+            r'CreateImportDto',
+            'type',
+          ),
           fileId: BuiltValueNullFieldError.checkNotNull(
-              fileId, r'CreateImportDto', 'fileId'),
+            fileId,
+            r'CreateImportDto',
+            'fileId',
+          ),
+          idempotencyKey: idempotencyKey,
         );
     replace(_$result);
     return _$result;

@@ -15,16 +15,19 @@ class _$CommentsControllerList200Response
   @override
   final PaginationMetaDto meta;
 
-  factory _$CommentsControllerList200Response(
-          [void Function(CommentsControllerList200ResponseBuilder)? updates]) =>
+  factory _$CommentsControllerList200Response([
+    void Function(CommentsControllerList200ResponseBuilder)? updates,
+  ]) =>
       (CommentsControllerList200ResponseBuilder()..update(updates))._build();
 
-  _$CommentsControllerList200Response._(
-      {required this.data, required this.meta})
-      : super._();
+  _$CommentsControllerList200Response._({
+    required this.data,
+    required this.meta,
+  }) : super._();
   @override
   CommentsControllerList200Response rebuild(
-          void Function(CommentsControllerList200ResponseBuilder) updates) =>
+    void Function(CommentsControllerList200ResponseBuilder) updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -94,7 +97,8 @@ class CommentsControllerList200ResponseBuilder
 
   @override
   void update(
-      void Function(CommentsControllerList200ResponseBuilder)? updates) {
+    void Function(CommentsControllerList200ResponseBuilder)? updates,
+  ) {
     if (updates != null) updates(this);
   }
 
@@ -118,7 +122,10 @@ class CommentsControllerList200ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'CommentsControllerList200Response', _$failedField, e.toString());
+          r'CommentsControllerList200Response',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

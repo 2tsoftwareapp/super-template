@@ -29,13 +29,14 @@ class _AdminNotificationsScreenState
   Widget build(BuildContext context) {
     final permissions =
         ref.watch(authControllerProvider).valueOrNull?.permissions ?? [];
-    final canSend = permissions.contains('notifications.send');
+    final canRead = permissions.contains('notifications.read');
+    final canSend = permissions.contains('notifications.create');
 
-    if (!canSend) {
+    if (!canRead && !canSend) {
       return Scaffold(
         appBar: AppBar(title: const Text('Admin notifications')),
         body: const Center(
-          child: Text('Missing notifications.send permission'),
+          child: Text('Missing notifications.read permission'),
         ),
       );
     }
@@ -50,10 +51,12 @@ class _AdminNotificationsScreenState
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _sendNotification(context),
-        child: const Icon(Icons.send),
-      ),
+      floatingActionButton: canSend
+          ? FloatingActionButton(
+              onPressed: () => _sendNotification(context),
+              child: const Icon(Icons.send),
+            )
+          : null,
       body: FutureBuilder(
         key: ValueKey(_refreshKey),
         future: ref.read(adminRepositoryProvider).listNotificationJobs(),

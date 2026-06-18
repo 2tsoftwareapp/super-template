@@ -30,9 +30,9 @@ abstract class AdminUsersControllerDeleteUser200Response
 
   AdminUsersControllerDeleteUser200Response._();
 
-  factory AdminUsersControllerDeleteUser200Response(
-          [void updates(AdminUsersControllerDeleteUser200ResponseBuilder b)]) =
-      _$AdminUsersControllerDeleteUser200Response;
+  factory AdminUsersControllerDeleteUser200Response([
+    void updates(AdminUsersControllerDeleteUser200ResponseBuilder b),
+  ]) = _$AdminUsersControllerDeleteUser200Response;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(AdminUsersControllerDeleteUser200ResponseBuilder b) =>
@@ -48,7 +48,7 @@ class _$AdminUsersControllerDeleteUser200ResponseSerializer
   @override
   final Iterable<Type> types = const [
     AdminUsersControllerDeleteUser200Response,
-    _$AdminUsersControllerDeleteUser200Response
+    _$AdminUsersControllerDeleteUser200Response,
   ];
 
   @override
@@ -77,9 +77,11 @@ class _$AdminUsersControllerDeleteUser200ResponseSerializer
     AdminUsersControllerDeleteUser200Response object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(

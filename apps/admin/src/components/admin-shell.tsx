@@ -18,7 +18,6 @@ import {
   getResourceForPath,
   hasAdminAppAccess,
 } from "@/lib/admin-resources";
-import { clearStoredAuthTokens } from "@/lib/auth";
 import { webFetch } from "@/lib/http";
 import { useSession } from "@/lib/session";
 import { cn } from "@/lib/utils";
@@ -72,11 +71,7 @@ export function AdminShell() {
   }, [navigate, session.isError]);
 
   const onSignOut = async () => {
-    try {
-      await webFetch("/api/v1/auth/logout", { method: "POST" });
-    } finally {
-      clearStoredAuthTokens();
-    }
+    await webFetch("/api/v1/auth/logout", { method: "POST" });
     await navigate("/login", { replace: true });
   };
 
@@ -101,8 +96,9 @@ export function AdminShell() {
     }
 
     if (!canUseAdminApp) {
-      clearStoredAuthTokens();
-      void navigate("/login", { replace: true });
+      void webFetch("/api/v1/auth/logout", { method: "POST" }).finally(() =>
+        navigate("/login", { replace: true }),
+      );
       return;
     }
 

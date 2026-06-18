@@ -50,16 +50,22 @@ class _$DeviceTokenDtoPlatformEnumSerializer
   final String wireName = 'DeviceTokenDtoPlatformEnum';
 
   @override
-  Object serialize(Serializers serializers, DeviceTokenDtoPlatformEnum object,
-          {FullType specifiedType = FullType.unspecified}) =>
+  Object serialize(
+    Serializers serializers,
+    DeviceTokenDtoPlatformEnum object, {
+    FullType specifiedType = FullType.unspecified,
+  }) =>
       _toWire[object.name] ?? object.name;
 
   @override
   DeviceTokenDtoPlatformEnum deserialize(
-          Serializers serializers, Object serialized,
-          {FullType specifiedType = FullType.unspecified}) =>
+    Serializers serializers,
+    Object serialized, {
+    FullType specifiedType = FullType.unspecified,
+  }) =>
       DeviceTokenDtoPlatformEnum.valueOf(
-          _fromWire[serialized] ?? (serialized is String ? serialized : ''));
+        _fromWire[serialized] ?? (serialized is String ? serialized : ''),
+      );
 }
 
 class _$DeviceTokenDto extends DeviceTokenDto {
@@ -75,12 +81,12 @@ class _$DeviceTokenDto extends DeviceTokenDto {
   factory _$DeviceTokenDto([void Function(DeviceTokenDtoBuilder)? updates]) =>
       (DeviceTokenDtoBuilder()..update(updates))._build();
 
-  _$DeviceTokenDto._(
-      {required this.id,
-      required this.platform,
-      required this.token,
-      required this.lastUsedAt})
-      : super._();
+  _$DeviceTokenDto._({
+    required this.id,
+    required this.platform,
+    required this.token,
+    required this.lastUsedAt,
+  }) : super._();
   @override
   DeviceTokenDto rebuild(void Function(DeviceTokenDtoBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -174,13 +180,25 @@ class DeviceTokenDtoBuilder
     final _$result = _$v ??
         _$DeviceTokenDto._(
           id: BuiltValueNullFieldError.checkNotNull(
-              id, r'DeviceTokenDto', 'id'),
+            id,
+            r'DeviceTokenDto',
+            'id',
+          ),
           platform: BuiltValueNullFieldError.checkNotNull(
-              platform, r'DeviceTokenDto', 'platform'),
+            platform,
+            r'DeviceTokenDto',
+            'platform',
+          ),
           token: BuiltValueNullFieldError.checkNotNull(
-              token, r'DeviceTokenDto', 'token'),
+            token,
+            r'DeviceTokenDto',
+            'token',
+          ),
           lastUsedAt: BuiltValueNullFieldError.checkNotNull(
-              lastUsedAt, r'DeviceTokenDto', 'lastUsedAt'),
+            lastUsedAt,
+            r'DeviceTokenDto',
+            'lastUsedAt',
+          ),
         );
     replace(_$result);
     return _$result;

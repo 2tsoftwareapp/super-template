@@ -15,16 +15,19 @@ class _$AuthControllerRegister201Response
   @override
   final RequestMetaDto meta;
 
-  factory _$AuthControllerRegister201Response(
-          [void Function(AuthControllerRegister201ResponseBuilder)? updates]) =>
+  factory _$AuthControllerRegister201Response([
+    void Function(AuthControllerRegister201ResponseBuilder)? updates,
+  ]) =>
       (AuthControllerRegister201ResponseBuilder()..update(updates))._build();
 
-  _$AuthControllerRegister201Response._(
-      {required this.data, required this.meta})
-      : super._();
+  _$AuthControllerRegister201Response._({
+    required this.data,
+    required this.meta,
+  }) : super._();
   @override
   AuthControllerRegister201Response rebuild(
-          void Function(AuthControllerRegister201ResponseBuilder) updates) =>
+    void Function(AuthControllerRegister201ResponseBuilder) updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -93,7 +96,8 @@ class AuthControllerRegister201ResponseBuilder
 
   @override
   void update(
-      void Function(AuthControllerRegister201ResponseBuilder)? updates) {
+    void Function(AuthControllerRegister201ResponseBuilder)? updates,
+  ) {
     if (updates != null) updates(this);
   }
 
@@ -117,7 +121,10 @@ class AuthControllerRegister201ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'AuthControllerRegister201Response', _$failedField, e.toString());
+          r'AuthControllerRegister201Response',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

@@ -63,7 +63,7 @@ export function UsersPagination({
           <Button
             variant="outline"
             size="sm"
-            disabled={isLoading || page <= 1}
+            disabled={(isLoading ?? false) || page <= 1}
             onClick={() => onPageChange(page - 1)}
           >
             Previous
@@ -71,7 +71,7 @@ export function UsersPagination({
           <Button
             variant="outline"
             size="sm"
-            disabled={isLoading || page >= safeTotalPages}
+            disabled={(isLoading ?? false) || page >= safeTotalPages}
             onClick={() => onPageChange(page + 1)}
           >
             Next

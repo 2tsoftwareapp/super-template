@@ -121,9 +121,11 @@ class _$FileDtoSerializer implements PrimitiveSerializer<FileDto> {
     FileDto object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(
@@ -167,10 +169,8 @@ class _$FileDtoSerializer implements PrimitiveSerializer<FileDto> {
           result.mimeType = valueDes;
           break;
         case r'sizeBytes':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(num),
-          ) as num;
+          final valueDes = serializers.deserialize(value,
+              specifiedType: const FullType(num)) as num;
           result.sizeBytes = valueDes;
           break;
         case r'uploadedById':

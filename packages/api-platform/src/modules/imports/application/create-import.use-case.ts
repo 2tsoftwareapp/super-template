@@ -11,7 +11,7 @@ import type { CreateImportCommand, ImportJobView } from './imports.types';
 import { AuditService } from '../../audit/application/audit.service';
 import { FilesRepository } from '../../files/infrastructure/files.repository';
 import { GetImportUseCase } from './get-import.use-case';
-import { ImportProjectParserService } from './import-project-parser.service';
+import { ImportFileParserService } from './import-file-parser.service';
 import {
   IMPORT_JOBS_REPOSITORY,
   type ImportJobsRepositoryPort,
@@ -23,7 +23,7 @@ export class CreateImportUseCase {
     @Inject(IMPORT_JOBS_REPOSITORY)
     private readonly importJobsRepository: ImportJobsRepositoryPort,
     private readonly filesRepository: FilesRepository,
-    private readonly importProjectParser: ImportProjectParserService,
+    private readonly importFileParser: ImportFileParserService,
     private readonly auditService: AuditService,
     private readonly getImportUseCase: GetImportUseCase,
   ) {}
@@ -70,11 +70,14 @@ export class CreateImportUseCase {
       return this.getImportUseCase.execute(actor, job.id);
     }
 
-    const parsed = await this.importProjectParser.parseImportFile(
+    const parsed = await this.importFileParser.parseImportFile(
       input.type,
       file.storageKey,
     );
-    const errors = this.importProjectParser.validateProjectRows(parsed.rows);
+    const errors = this.importFileParser.validateRows(
+      input.type,
+      parsed.rows,
+    );
 
     await this.importJobsRepository.update(job.id, {
       status: errors.length > 0 ? 'FAILED' : 'PROCESSING',

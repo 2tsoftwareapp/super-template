@@ -16,7 +16,8 @@ const NotificationJobDtoAudienceEnum _$notificationJobDtoAudienceEnum_ALL =
     const NotificationJobDtoAudienceEnum._('ALL');
 
 NotificationJobDtoAudienceEnum _$notificationJobDtoAudienceEnumValueOf(
-    String name) {
+  String name,
+) {
   switch (name) {
     case 'USER':
       return _$notificationJobDtoAudienceEnum_USER;
@@ -30,12 +31,14 @@ NotificationJobDtoAudienceEnum _$notificationJobDtoAudienceEnumValueOf(
 }
 
 final BuiltSet<NotificationJobDtoAudienceEnum>
-    _$notificationJobDtoAudienceEnumValues = BuiltSet<
-        NotificationJobDtoAudienceEnum>(const <NotificationJobDtoAudienceEnum>[
-  _$notificationJobDtoAudienceEnum_USER,
-  _$notificationJobDtoAudienceEnum_USERS,
-  _$notificationJobDtoAudienceEnum_ALL,
-]);
+    _$notificationJobDtoAudienceEnumValues =
+    BuiltSet<NotificationJobDtoAudienceEnum>(
+  const <NotificationJobDtoAudienceEnum>[
+    _$notificationJobDtoAudienceEnum_USER,
+    _$notificationJobDtoAudienceEnum_USERS,
+    _$notificationJobDtoAudienceEnum_ALL,
+  ],
+);
 
 const NotificationJobDtoStatusEnum _$notificationJobDtoStatusEnum_PENDING =
     const NotificationJobDtoStatusEnum._('PENDING');
@@ -49,7 +52,8 @@ const NotificationJobDtoStatusEnum _$notificationJobDtoStatusEnum_FAILED =
     const NotificationJobDtoStatusEnum._('FAILED');
 
 NotificationJobDtoStatusEnum _$notificationJobDtoStatusEnumValueOf(
-    String name) {
+  String name,
+) {
   switch (name) {
     case 'PENDING':
       return _$notificationJobDtoStatusEnum_PENDING;
@@ -103,16 +107,21 @@ class _$NotificationJobDtoAudienceEnumSerializer
 
   @override
   Object serialize(
-          Serializers serializers, NotificationJobDtoAudienceEnum object,
-          {FullType specifiedType = FullType.unspecified}) =>
+    Serializers serializers,
+    NotificationJobDtoAudienceEnum object, {
+    FullType specifiedType = FullType.unspecified,
+  }) =>
       _toWire[object.name] ?? object.name;
 
   @override
   NotificationJobDtoAudienceEnum deserialize(
-          Serializers serializers, Object serialized,
-          {FullType specifiedType = FullType.unspecified}) =>
+    Serializers serializers,
+    Object serialized, {
+    FullType specifiedType = FullType.unspecified,
+  }) =>
       NotificationJobDtoAudienceEnum.valueOf(
-          _fromWire[serialized] ?? (serialized is String ? serialized : ''));
+        _fromWire[serialized] ?? (serialized is String ? serialized : ''),
+      );
 }
 
 class _$NotificationJobDtoStatusEnumSerializer
@@ -138,16 +147,22 @@ class _$NotificationJobDtoStatusEnumSerializer
   final String wireName = 'NotificationJobDtoStatusEnum';
 
   @override
-  Object serialize(Serializers serializers, NotificationJobDtoStatusEnum object,
-          {FullType specifiedType = FullType.unspecified}) =>
+  Object serialize(
+    Serializers serializers,
+    NotificationJobDtoStatusEnum object, {
+    FullType specifiedType = FullType.unspecified,
+  }) =>
       _toWire[object.name] ?? object.name;
 
   @override
   NotificationJobDtoStatusEnum deserialize(
-          Serializers serializers, Object serialized,
-          {FullType specifiedType = FullType.unspecified}) =>
+    Serializers serializers,
+    Object serialized, {
+    FullType specifiedType = FullType.unspecified,
+  }) =>
       NotificationJobDtoStatusEnum.valueOf(
-          _fromWire[serialized] ?? (serialized is String ? serialized : ''));
+        _fromWire[serialized] ?? (serialized is String ? serialized : ''),
+      );
 }
 
 class _$NotificationJobDto extends NotificationJobDto {
@@ -184,31 +199,33 @@ class _$NotificationJobDto extends NotificationJobDto {
   @override
   final String updatedAt;
 
-  factory _$NotificationJobDto(
-          [void Function(NotificationJobDtoBuilder)? updates]) =>
+  factory _$NotificationJobDto([
+    void Function(NotificationJobDtoBuilder)? updates,
+  ]) =>
       (NotificationJobDtoBuilder()..update(updates))._build();
 
-  _$NotificationJobDto._(
-      {required this.id,
-      this.actorId,
-      required this.audience,
-      this.targetUserId,
-      this.userIds,
-      required this.type,
-      required this.title,
-      required this.body,
-      this.data,
-      required this.scheduledAt,
-      required this.status,
-      this.recipientCount,
-      this.processedAt,
-      this.errorMessage,
-      required this.createdAt,
-      required this.updatedAt})
-      : super._();
+  _$NotificationJobDto._({
+    required this.id,
+    this.actorId,
+    required this.audience,
+    this.targetUserId,
+    this.userIds,
+    required this.type,
+    required this.title,
+    required this.body,
+    this.data,
+    required this.scheduledAt,
+    required this.status,
+    this.recipientCount,
+    this.processedAt,
+    this.errorMessage,
+    required this.createdAt,
+    required this.updatedAt,
+  }) : super._();
   @override
   NotificationJobDto rebuild(
-          void Function(NotificationJobDtoBuilder) updates) =>
+    void Function(NotificationJobDtoBuilder) updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -402,30 +419,57 @@ class NotificationJobDtoBuilder
       _$result = _$v ??
           _$NotificationJobDto._(
             id: BuiltValueNullFieldError.checkNotNull(
-                id, r'NotificationJobDto', 'id'),
+              id,
+              r'NotificationJobDto',
+              'id',
+            ),
             actorId: actorId,
             audience: BuiltValueNullFieldError.checkNotNull(
-                audience, r'NotificationJobDto', 'audience'),
+              audience,
+              r'NotificationJobDto',
+              'audience',
+            ),
             targetUserId: targetUserId,
             userIds: _userIds?.build(),
             type: BuiltValueNullFieldError.checkNotNull(
-                type, r'NotificationJobDto', 'type'),
+              type,
+              r'NotificationJobDto',
+              'type',
+            ),
             title: BuiltValueNullFieldError.checkNotNull(
-                title, r'NotificationJobDto', 'title'),
+              title,
+              r'NotificationJobDto',
+              'title',
+            ),
             body: BuiltValueNullFieldError.checkNotNull(
-                body, r'NotificationJobDto', 'body'),
+              body,
+              r'NotificationJobDto',
+              'body',
+            ),
             data: _data?.build(),
             scheduledAt: BuiltValueNullFieldError.checkNotNull(
-                scheduledAt, r'NotificationJobDto', 'scheduledAt'),
+              scheduledAt,
+              r'NotificationJobDto',
+              'scheduledAt',
+            ),
             status: BuiltValueNullFieldError.checkNotNull(
-                status, r'NotificationJobDto', 'status'),
+              status,
+              r'NotificationJobDto',
+              'status',
+            ),
             recipientCount: recipientCount,
             processedAt: processedAt,
             errorMessage: errorMessage,
             createdAt: BuiltValueNullFieldError.checkNotNull(
-                createdAt, r'NotificationJobDto', 'createdAt'),
+              createdAt,
+              r'NotificationJobDto',
+              'createdAt',
+            ),
             updatedAt: BuiltValueNullFieldError.checkNotNull(
-                updatedAt, r'NotificationJobDto', 'updatedAt'),
+              updatedAt,
+              r'NotificationJobDto',
+              'updatedAt',
+            ),
           );
     } catch (_) {
       late String _$failedField;
@@ -437,7 +481,10 @@ class NotificationJobDtoBuilder
         _data?.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'NotificationJobDto', _$failedField, e.toString());
+          r'NotificationJobDto',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

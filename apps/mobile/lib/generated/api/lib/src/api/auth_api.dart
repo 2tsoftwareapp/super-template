@@ -59,16 +59,10 @@ class AuthApi {
     final _path = r'/api/v1/auth/forgot-password';
     final _options = Options(
       method: r'POST',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -80,14 +74,13 @@ class AuthApi {
 
     try {
       const _type = FullType(ForgotPasswordDto);
-      _bodyData =
-          _serializers.serialize(forgotPasswordDto, specifiedType: _type);
+      _bodyData = _serializers.serialize(
+        forgotPasswordDto,
+        specifiedType: _type,
+      );
     } catch (error, stackTrace) {
       throw DioException(
-        requestOptions: _options.compose(
-          _dio.options,
-          _path,
-        ),
+        requestOptions: _options.compose(_dio.options, _path),
         type: DioExceptionType.unknown,
         error: error,
         stackTrace: stackTrace,
@@ -111,7 +104,9 @@ class AuthApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType: const FullType(AuthControllerRegister201Response),
+              specifiedType: const FullType(
+                AuthControllerRegister201Response,
+              ),
             ) as AuthControllerRegister201Response;
     } catch (error, stackTrace) {
       throw DioException(
@@ -159,16 +154,10 @@ class AuthApi {
     final _path = r'/api/v1/auth/me';
     final _options = Options(
       method: r'GET',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -240,16 +229,10 @@ class AuthApi {
     final _path = r'/api/v1/auth/sessions';
     final _options = Options(
       method: r'GET',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -272,8 +255,9 @@ class AuthApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType:
-                  const FullType(AuthControllerGetSessions200Response),
+              specifiedType: const FullType(
+                AuthControllerGetSessions200Response,
+              ),
             ) as AuthControllerGetSessions200Response;
     } catch (error, stackTrace) {
       throw DioException(
@@ -323,16 +307,10 @@ class AuthApi {
     final _path = r'/api/v1/auth/login';
     final _options = Options(
       method: r'POST',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -347,10 +325,7 @@ class AuthApi {
       _bodyData = _serializers.serialize(loginDto, specifiedType: _type);
     } catch (error, stackTrace) {
       throw DioException(
-        requestOptions: _options.compose(
-          _dio.options,
-          _path,
-        ),
+        requestOptions: _options.compose(_dio.options, _path),
         type: DioExceptionType.unknown,
         error: error,
         stackTrace: stackTrace,
@@ -423,16 +398,10 @@ class AuthApi {
     final _path = r'/api/v1/auth/logout';
     final _options = Options(
       method: r'POST',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -455,8 +424,9 @@ class AuthApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType:
-                  const FullType(AdminUsersControllerDeleteUser200Response),
+              specifiedType: const FullType(
+                AdminUsersControllerDeleteUser200Response,
+              ),
             ) as AdminUsersControllerDeleteUser200Response;
     } catch (error, stackTrace) {
       throw DioException(
@@ -505,16 +475,10 @@ class AuthApi {
     final _path = r'/api/v1/auth/logout-all';
     final _options = Options(
       method: r'POST',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -537,8 +501,9 @@ class AuthApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType:
-                  const FullType(AdminUsersControllerDeleteUser200Response),
+              specifiedType: const FullType(
+                AdminUsersControllerDeleteUser200Response,
+              ),
             ) as AdminUsersControllerDeleteUser200Response;
     } catch (error, stackTrace) {
       throw DioException(
@@ -588,16 +553,10 @@ class AuthApi {
     final _path = r'/api/v1/auth/refresh';
     final _options = Options(
       method: r'POST',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -612,10 +571,7 @@ class AuthApi {
       _bodyData = _serializers.serialize(refreshTokenDto, specifiedType: _type);
     } catch (error, stackTrace) {
       throw DioException(
-        requestOptions: _options.compose(
-          _dio.options,
-          _path,
-        ),
+        requestOptions: _options.compose(_dio.options, _path),
         type: DioExceptionType.unknown,
         error: error,
         stackTrace: stackTrace,
@@ -689,16 +645,10 @@ class AuthApi {
     final _path = r'/api/v1/auth/register';
     final _options = Options(
       method: r'POST',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -713,10 +663,7 @@ class AuthApi {
       _bodyData = _serializers.serialize(registerDto, specifiedType: _type);
     } catch (error, stackTrace) {
       throw DioException(
-        requestOptions: _options.compose(
-          _dio.options,
-          _path,
-        ),
+        requestOptions: _options.compose(_dio.options, _path),
         type: DioExceptionType.unknown,
         error: error,
         stackTrace: stackTrace,
@@ -740,7 +687,9 @@ class AuthApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType: const FullType(AuthControllerRegister201Response),
+              specifiedType: const FullType(
+                AuthControllerRegister201Response,
+              ),
             ) as AuthControllerRegister201Response;
     } catch (error, stackTrace) {
       throw DioException(
@@ -791,16 +740,10 @@ class AuthApi {
     final _path = r'/api/v1/auth/resend-verification';
     final _options = Options(
       method: r'POST',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -812,14 +755,13 @@ class AuthApi {
 
     try {
       const _type = FullType(ResendVerificationDto);
-      _bodyData =
-          _serializers.serialize(resendVerificationDto, specifiedType: _type);
+      _bodyData = _serializers.serialize(
+        resendVerificationDto,
+        specifiedType: _type,
+      );
     } catch (error, stackTrace) {
       throw DioException(
-        requestOptions: _options.compose(
-          _dio.options,
-          _path,
-        ),
+        requestOptions: _options.compose(_dio.options, _path),
         type: DioExceptionType.unknown,
         error: error,
         stackTrace: stackTrace,
@@ -843,7 +785,9 @@ class AuthApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType: const FullType(AuthControllerRegister201Response),
+              specifiedType: const FullType(
+                AuthControllerRegister201Response,
+              ),
             ) as AuthControllerRegister201Response;
     } catch (error, stackTrace) {
       throw DioException(
@@ -894,16 +838,10 @@ class AuthApi {
     final _path = r'/api/v1/auth/reset-password';
     final _options = Options(
       method: r'POST',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -915,14 +853,13 @@ class AuthApi {
 
     try {
       const _type = FullType(ResetPasswordDto);
-      _bodyData =
-          _serializers.serialize(resetPasswordDto, specifiedType: _type);
+      _bodyData = _serializers.serialize(
+        resetPasswordDto,
+        specifiedType: _type,
+      );
     } catch (error, stackTrace) {
       throw DioException(
-        requestOptions: _options.compose(
-          _dio.options,
-          _path,
-        ),
+        requestOptions: _options.compose(_dio.options, _path),
         type: DioExceptionType.unknown,
         error: error,
         stackTrace: stackTrace,
@@ -946,8 +883,9 @@ class AuthApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType:
-                  const FullType(AdminUsersControllerDeleteUser200Response),
+              specifiedType: const FullType(
+                AdminUsersControllerDeleteUser200Response,
+              ),
             ) as AdminUsersControllerDeleteUser200Response;
     } catch (error, stackTrace) {
       throw DioException(
@@ -996,21 +934,21 @@ class AuthApi {
     ProgressCallback? onReceiveProgress,
   }) async {
     final _path = r'/api/v1/auth/sessions/{sessionId}'.replaceAll(
-        '{' r'sessionId' '}',
-        encodeQueryParameter(_serializers, sessionId, const FullType(String))
-            .toString());
+      '{'
+      r'sessionId'
+      '}',
+      encodeQueryParameter(
+        _serializers,
+        sessionId,
+        const FullType(String),
+      ).toString(),
+    );
     final _options = Options(
       method: r'DELETE',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -1033,8 +971,9 @@ class AuthApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType:
-                  const FullType(AdminUsersControllerDeleteUser200Response),
+              specifiedType: const FullType(
+                AdminUsersControllerDeleteUser200Response,
+              ),
             ) as AdminUsersControllerDeleteUser200Response;
     } catch (error, stackTrace) {
       throw DioException(
@@ -1085,16 +1024,10 @@ class AuthApi {
     final _path = r'/api/v1/auth/switch-organization';
     final _options = Options(
       method: r'POST',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -1106,14 +1039,13 @@ class AuthApi {
 
     try {
       const _type = FullType(SwitchOrganizationDto);
-      _bodyData =
-          _serializers.serialize(switchOrganizationDto, specifiedType: _type);
+      _bodyData = _serializers.serialize(
+        switchOrganizationDto,
+        specifiedType: _type,
+      );
     } catch (error, stackTrace) {
       throw DioException(
-        requestOptions: _options.compose(
-          _dio.options,
-          _path,
-        ),
+        requestOptions: _options.compose(_dio.options, _path),
         type: DioExceptionType.unknown,
         error: error,
         stackTrace: stackTrace,
@@ -1137,8 +1069,9 @@ class AuthApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType:
-                  const FullType(AdminUsersControllerDeleteUser200Response),
+              specifiedType: const FullType(
+                AdminUsersControllerDeleteUser200Response,
+              ),
             ) as AdminUsersControllerDeleteUser200Response;
     } catch (error, stackTrace) {
       throw DioException(
@@ -1189,16 +1122,10 @@ class AuthApi {
     final _path = r'/api/v1/auth/verify-email';
     final _options = Options(
       method: r'POST',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -1213,10 +1140,7 @@ class AuthApi {
       _bodyData = _serializers.serialize(verifyEmailDto, specifiedType: _type);
     } catch (error, stackTrace) {
       throw DioException(
-        requestOptions: _options.compose(
-          _dio.options,
-          _path,
-        ),
+        requestOptions: _options.compose(_dio.options, _path),
         type: DioExceptionType.unknown,
         error: error,
         stackTrace: stackTrace,
@@ -1240,8 +1164,9 @@ class AuthApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType:
-                  const FullType(AdminUsersControllerDeleteUser200Response),
+              specifiedType: const FullType(
+                AdminUsersControllerDeleteUser200Response,
+              ),
             ) as AdminUsersControllerDeleteUser200Response;
     } catch (error, stackTrace) {
       throw DioException(

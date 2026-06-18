@@ -57,6 +57,7 @@ export class RegisterUseCase {
 
         const userRole = await this.accessControlService.getRoleByName(
           'USER',
+          null,
           transaction,
         );
 

@@ -14,15 +14,17 @@ class _$AuthControllerGetMe200Response extends AuthControllerGetMe200Response {
   @override
   final RequestMetaDto meta;
 
-  factory _$AuthControllerGetMe200Response(
-          [void Function(AuthControllerGetMe200ResponseBuilder)? updates]) =>
+  factory _$AuthControllerGetMe200Response([
+    void Function(AuthControllerGetMe200ResponseBuilder)? updates,
+  ]) =>
       (AuthControllerGetMe200ResponseBuilder()..update(updates))._build();
 
   _$AuthControllerGetMe200Response._({required this.data, required this.meta})
       : super._();
   @override
   AuthControllerGetMe200Response rebuild(
-          void Function(AuthControllerGetMe200ResponseBuilder) updates) =>
+    void Function(AuthControllerGetMe200ResponseBuilder) updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -113,7 +115,10 @@ class AuthControllerGetMe200ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'AuthControllerGetMe200Response', _$failedField, e.toString());
+          r'AuthControllerGetMe200Response',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

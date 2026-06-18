@@ -15,17 +15,19 @@ class _$HealthControllerGetHealth200Response
   @override
   final RequestMetaDto meta;
 
-  factory _$HealthControllerGetHealth200Response(
-          [void Function(HealthControllerGetHealth200ResponseBuilder)?
-              updates]) =>
+  factory _$HealthControllerGetHealth200Response([
+    void Function(HealthControllerGetHealth200ResponseBuilder)? updates,
+  ]) =>
       (HealthControllerGetHealth200ResponseBuilder()..update(updates))._build();
 
-  _$HealthControllerGetHealth200Response._(
-      {required this.data, required this.meta})
-      : super._();
+  _$HealthControllerGetHealth200Response._({
+    required this.data,
+    required this.meta,
+  }) : super._();
   @override
   HealthControllerGetHealth200Response rebuild(
-          void Function(HealthControllerGetHealth200ResponseBuilder) updates) =>
+    void Function(HealthControllerGetHealth200ResponseBuilder) updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -93,7 +95,8 @@ class HealthControllerGetHealth200ResponseBuilder
 
   @override
   void update(
-      void Function(HealthControllerGetHealth200ResponseBuilder)? updates) {
+    void Function(HealthControllerGetHealth200ResponseBuilder)? updates,
+  ) {
     if (updates != null) updates(this);
   }
 
@@ -117,9 +120,10 @@ class HealthControllerGetHealth200ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'HealthControllerGetHealth200Response',
-            _$failedField,
-            e.toString());
+          r'HealthControllerGetHealth200Response',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

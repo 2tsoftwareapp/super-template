@@ -23,6 +23,7 @@ part 'send_notification_request_dto.g.dart';
 /// * [body]
 /// * [data]
 /// * [scheduledAt] - ISO-8601 datetime. Omit or set to now for immediate delivery.
+/// * [idempotencyKey] - Client-supplied idempotency key. Retries with the same key return the original notification job.
 @BuiltValue()
 abstract class SendNotificationRequestDto
     implements
@@ -53,11 +54,15 @@ abstract class SendNotificationRequestDto
   @BuiltValueField(wireName: r'scheduledAt')
   String? get scheduledAt;
 
+  /// Client-supplied idempotency key. Retries with the same key return the original notification job.
+  @BuiltValueField(wireName: r'idempotencyKey')
+  String? get idempotencyKey;
+
   SendNotificationRequestDto._();
 
-  factory SendNotificationRequestDto(
-          [void updates(SendNotificationRequestDtoBuilder b)]) =
-      _$SendNotificationRequestDto;
+  factory SendNotificationRequestDto([
+    void updates(SendNotificationRequestDtoBuilder b),
+  ]) = _$SendNotificationRequestDto;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(SendNotificationRequestDtoBuilder b) => b;
@@ -72,7 +77,7 @@ class _$SendNotificationRequestDtoSerializer
   @override
   final Iterable<Type> types = const [
     SendNotificationRequestDto,
-    _$SendNotificationRequestDto
+    _$SendNotificationRequestDto,
   ];
 
   @override
@@ -121,14 +126,23 @@ class _$SendNotificationRequestDtoSerializer
       yield r'data';
       yield serializers.serialize(
         object.data,
-        specifiedType: const FullType(
-            BuiltMap, [FullType(String), FullType.nullable(JsonObject)]),
+        specifiedType: const FullType(BuiltMap, [
+          FullType(String),
+          FullType.nullable(JsonObject),
+        ]),
       );
     }
     if (object.scheduledAt != null) {
       yield r'scheduledAt';
       yield serializers.serialize(
         object.scheduledAt,
+        specifiedType: const FullType(String),
+      );
+    }
+    if (object.idempotencyKey != null) {
+      yield r'idempotencyKey';
+      yield serializers.serialize(
+        object.idempotencyKey,
         specifiedType: const FullType(String),
       );
     }
@@ -140,9 +154,11 @@ class _$SendNotificationRequestDtoSerializer
     SendNotificationRequestDto object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(
@@ -160,8 +176,9 @@ class _$SendNotificationRequestDtoSerializer
         case r'audience':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType:
-                const FullType(SendNotificationRequestDtoAudienceEnum),
+            specifiedType: const FullType(
+              SendNotificationRequestDtoAudienceEnum,
+            ),
           ) as SendNotificationRequestDtoAudienceEnum;
           result.audience = valueDes;
           break;
@@ -175,7 +192,9 @@ class _$SendNotificationRequestDtoSerializer
         case r'userIds':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(BuiltList, [FullType(String)]),
+            specifiedType: const FullType(BuiltList, [
+              FullType(String),
+            ]),
           ) as BuiltList<String>;
           result.userIds.replace(valueDes);
           break;
@@ -203,8 +222,10 @@ class _$SendNotificationRequestDtoSerializer
         case r'data':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(
-                BuiltMap, [FullType(String), FullType.nullable(JsonObject)]),
+            specifiedType: const FullType(BuiltMap, [
+              FullType(String),
+              FullType.nullable(JsonObject),
+            ]),
           ) as BuiltMap<String, JsonObject?>;
           result.data.replace(valueDes);
           break;
@@ -214,6 +235,13 @@ class _$SendNotificationRequestDtoSerializer
             specifiedType: const FullType(String),
           ) as String;
           result.scheduledAt = valueDes;
+          break;
+        case r'idempotencyKey':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.idempotencyKey = valueDes;
           break;
         default:
           unhandled.add(key);

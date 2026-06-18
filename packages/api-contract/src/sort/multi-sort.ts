@@ -12,14 +12,14 @@ function toAllowedFieldSet<TField extends string>(
 }
 
 export function formatSortParam<TField extends string>(
-  sort: ReadonlyArray<SortCriterion<TField>>,
+  sort: readonly SortCriterion<TField>[],
 ): string {
   return sort.map((criterion) => `${criterion.field}:${criterion.order}`).join(',');
 }
 
 export function sortCriteriaEqual<TField extends string>(
-  left: ReadonlyArray<SortCriterion<TField>>,
-  right: ReadonlyArray<SortCriterion<TField>>,
+  left: readonly SortCriterion<TField>[],
+  right: readonly SortCriterion<TField>[],
 ): boolean {
   if (left.length !== right.length) {
     return false;
@@ -35,7 +35,7 @@ export function sortCriteriaEqual<TField extends string>(
 export function parseSortParam<TField extends string>(
   sort: string | undefined,
   allowedFields: ReadonlySet<TField> | readonly TField[],
-  fallback: ReadonlyArray<SortCriterion<TField>>,
+  fallback: readonly SortCriterion<TField>[],
 ): SortCriterion<TField>[] {
   if (!sort?.trim()) {
     return [...fallback];

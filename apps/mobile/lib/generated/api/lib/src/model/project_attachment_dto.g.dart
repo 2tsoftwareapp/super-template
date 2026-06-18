@@ -26,23 +26,25 @@ class _$ProjectAttachmentDto extends ProjectAttachmentDto {
   @override
   final String updatedAt;
 
-  factory _$ProjectAttachmentDto(
-          [void Function(ProjectAttachmentDtoBuilder)? updates]) =>
+  factory _$ProjectAttachmentDto([
+    void Function(ProjectAttachmentDtoBuilder)? updates,
+  ]) =>
       (ProjectAttachmentDtoBuilder()..update(updates))._build();
 
-  _$ProjectAttachmentDto._(
-      {required this.id,
-      required this.fileId,
-      required this.entityType,
-      required this.entityId,
-      this.label,
-      this.createdById,
-      required this.createdAt,
-      required this.updatedAt})
-      : super._();
+  _$ProjectAttachmentDto._({
+    required this.id,
+    required this.fileId,
+    required this.entityType,
+    required this.entityId,
+    this.label,
+    this.createdById,
+    required this.createdAt,
+    required this.updatedAt,
+  }) : super._();
   @override
   ProjectAttachmentDto rebuild(
-          void Function(ProjectAttachmentDtoBuilder) updates) =>
+    void Function(ProjectAttachmentDtoBuilder) updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -166,19 +168,37 @@ class ProjectAttachmentDtoBuilder
     final _$result = _$v ??
         _$ProjectAttachmentDto._(
           id: BuiltValueNullFieldError.checkNotNull(
-              id, r'ProjectAttachmentDto', 'id'),
+            id,
+            r'ProjectAttachmentDto',
+            'id',
+          ),
           fileId: BuiltValueNullFieldError.checkNotNull(
-              fileId, r'ProjectAttachmentDto', 'fileId'),
+            fileId,
+            r'ProjectAttachmentDto',
+            'fileId',
+          ),
           entityType: BuiltValueNullFieldError.checkNotNull(
-              entityType, r'ProjectAttachmentDto', 'entityType'),
+            entityType,
+            r'ProjectAttachmentDto',
+            'entityType',
+          ),
           entityId: BuiltValueNullFieldError.checkNotNull(
-              entityId, r'ProjectAttachmentDto', 'entityId'),
+            entityId,
+            r'ProjectAttachmentDto',
+            'entityId',
+          ),
           label: label,
           createdById: createdById,
           createdAt: BuiltValueNullFieldError.checkNotNull(
-              createdAt, r'ProjectAttachmentDto', 'createdAt'),
+            createdAt,
+            r'ProjectAttachmentDto',
+            'createdAt',
+          ),
           updatedAt: BuiltValueNullFieldError.checkNotNull(
-              updatedAt, r'ProjectAttachmentDto', 'updatedAt'),
+            updatedAt,
+            r'ProjectAttachmentDto',
+            'updatedAt',
+          ),
         );
     replace(_$result);
     return _$result;

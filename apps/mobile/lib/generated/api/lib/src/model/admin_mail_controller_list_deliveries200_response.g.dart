@@ -15,19 +15,20 @@ class _$AdminMailControllerListDeliveries200Response
   @override
   final PaginationMetaDto meta;
 
-  factory _$AdminMailControllerListDeliveries200Response(
-          [void Function(AdminMailControllerListDeliveries200ResponseBuilder)?
-              updates]) =>
+  factory _$AdminMailControllerListDeliveries200Response([
+    void Function(AdminMailControllerListDeliveries200ResponseBuilder)? updates,
+  ]) =>
       (AdminMailControllerListDeliveries200ResponseBuilder()..update(updates))
           ._build();
 
-  _$AdminMailControllerListDeliveries200Response._(
-      {required this.data, required this.meta})
-      : super._();
+  _$AdminMailControllerListDeliveries200Response._({
+    required this.data,
+    required this.meta,
+  }) : super._();
   @override
   AdminMailControllerListDeliveries200Response rebuild(
-          void Function(AdminMailControllerListDeliveries200ResponseBuilder)
-              updates) =>
+    void Function(AdminMailControllerListDeliveries200ResponseBuilder) updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -54,7 +55,8 @@ class _$AdminMailControllerListDeliveries200Response
   @override
   String toString() {
     return (newBuiltValueToStringHelper(
-            r'AdminMailControllerListDeliveries200Response')
+      r'AdminMailControllerListDeliveries200Response',
+    )
           ..add('data', data)
           ..add('meta', meta))
         .toString();
@@ -98,8 +100,8 @@ class AdminMailControllerListDeliveries200ResponseBuilder
 
   @override
   void update(
-      void Function(AdminMailControllerListDeliveries200ResponseBuilder)?
-          updates) {
+    void Function(AdminMailControllerListDeliveries200ResponseBuilder)? updates,
+  ) {
     if (updates != null) updates(this);
   }
 
@@ -123,9 +125,10 @@ class AdminMailControllerListDeliveries200ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'AdminMailControllerListDeliveries200Response',
-            _$failedField,
-            e.toString());
+          r'AdminMailControllerListDeliveries200Response',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

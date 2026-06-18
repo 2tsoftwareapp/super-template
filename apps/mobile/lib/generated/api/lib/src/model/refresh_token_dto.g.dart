@@ -39,8 +39,9 @@ class _$RefreshTokenDto extends RefreshTokenDto {
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper(r'RefreshTokenDto')
-          ..add('refreshToken', refreshToken))
+    return (newBuiltValueToStringHelper(
+      r'RefreshTokenDto',
+    )..add('refreshToken', refreshToken))
         .toString();
   }
 }
@@ -83,7 +84,10 @@ class RefreshTokenDtoBuilder
     final _$result = _$v ??
         _$RefreshTokenDto._(
           refreshToken: BuiltValueNullFieldError.checkNotNull(
-              refreshToken, r'RefreshTokenDto', 'refreshToken'),
+            refreshToken,
+            r'RefreshTokenDto',
+            'refreshToken',
+          ),
         );
     replace(_$result);
     return _$result;

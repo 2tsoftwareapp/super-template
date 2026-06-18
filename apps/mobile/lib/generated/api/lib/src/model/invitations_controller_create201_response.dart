@@ -30,9 +30,9 @@ abstract class InvitationsControllerCreate201Response
 
   InvitationsControllerCreate201Response._();
 
-  factory InvitationsControllerCreate201Response(
-          [void updates(InvitationsControllerCreate201ResponseBuilder b)]) =
-      _$InvitationsControllerCreate201Response;
+  factory InvitationsControllerCreate201Response([
+    void updates(InvitationsControllerCreate201ResponseBuilder b),
+  ]) = _$InvitationsControllerCreate201Response;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(InvitationsControllerCreate201ResponseBuilder b) => b;
@@ -47,7 +47,7 @@ class _$InvitationsControllerCreate201ResponseSerializer
   @override
   final Iterable<Type> types = const [
     InvitationsControllerCreate201Response,
-    _$InvitationsControllerCreate201Response
+    _$InvitationsControllerCreate201Response,
   ];
 
   @override
@@ -76,9 +76,11 @@ class _$InvitationsControllerCreate201ResponseSerializer
     InvitationsControllerCreate201Response object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(

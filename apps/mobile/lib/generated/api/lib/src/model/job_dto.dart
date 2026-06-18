@@ -114,8 +114,10 @@ class _$JobDtoSerializer implements PrimitiveSerializer<JobDto> {
     yield r'payload';
     yield serializers.serialize(
       object.payload,
-      specifiedType: const FullType(
-          BuiltMap, [FullType(String), FullType.nullable(JsonObject)]),
+      specifiedType: const FullType(BuiltMap, [
+        FullType(String),
+        FullType.nullable(JsonObject),
+      ]),
     );
     yield r'status';
     yield serializers.serialize(
@@ -195,9 +197,11 @@ class _$JobDtoSerializer implements PrimitiveSerializer<JobDto> {
     JobDto object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(
@@ -229,8 +233,10 @@ class _$JobDtoSerializer implements PrimitiveSerializer<JobDto> {
         case r'payload':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(
-                BuiltMap, [FullType(String), FullType.nullable(JsonObject)]),
+            specifiedType: const FullType(BuiltMap, [
+              FullType(String),
+              FullType.nullable(JsonObject),
+            ]),
           ) as BuiltMap<String, JsonObject?>;
           result.payload.replace(valueDes);
           break;
@@ -249,24 +255,18 @@ class _$JobDtoSerializer implements PrimitiveSerializer<JobDto> {
           result.scheduledAt = valueDes;
           break;
         case r'priority':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(num),
-          ) as num;
+          final valueDes = serializers.deserialize(value,
+              specifiedType: const FullType(num)) as num;
           result.priority = valueDes;
           break;
         case r'attempts':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(num),
-          ) as num;
+          final valueDes = serializers.deserialize(value,
+              specifiedType: const FullType(num)) as num;
           result.attempts = valueDes;
           break;
         case r'maxAttempts':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(num),
-          ) as num;
+          final valueDes = serializers.deserialize(value,
+              specifiedType: const FullType(num)) as num;
           result.maxAttempts = valueDes;
           break;
         case r'startedAt':

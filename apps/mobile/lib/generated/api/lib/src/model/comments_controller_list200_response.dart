@@ -31,9 +31,9 @@ abstract class CommentsControllerList200Response
 
   CommentsControllerList200Response._();
 
-  factory CommentsControllerList200Response(
-          [void updates(CommentsControllerList200ResponseBuilder b)]) =
-      _$CommentsControllerList200Response;
+  factory CommentsControllerList200Response([
+    void updates(CommentsControllerList200ResponseBuilder b),
+  ]) = _$CommentsControllerList200Response;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(CommentsControllerList200ResponseBuilder b) => b;
@@ -48,7 +48,7 @@ class _$CommentsControllerList200ResponseSerializer
   @override
   final Iterable<Type> types = const [
     CommentsControllerList200Response,
-    _$CommentsControllerList200Response
+    _$CommentsControllerList200Response,
   ];
 
   @override
@@ -77,9 +77,11 @@ class _$CommentsControllerList200ResponseSerializer
     CommentsControllerList200Response object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(
@@ -97,7 +99,9 @@ class _$CommentsControllerList200ResponseSerializer
         case r'data':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(BuiltList, [FullType(CommentDto)]),
+            specifiedType: const FullType(BuiltList, [
+              FullType(CommentDto),
+            ]),
           ) as BuiltList<CommentDto>;
           result.data.replace(valueDes);
           break;

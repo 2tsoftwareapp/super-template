@@ -30,9 +30,9 @@ abstract class AttachmentsControllerAttach201Response
 
   AttachmentsControllerAttach201Response._();
 
-  factory AttachmentsControllerAttach201Response(
-          [void updates(AttachmentsControllerAttach201ResponseBuilder b)]) =
-      _$AttachmentsControllerAttach201Response;
+  factory AttachmentsControllerAttach201Response([
+    void updates(AttachmentsControllerAttach201ResponseBuilder b),
+  ]) = _$AttachmentsControllerAttach201Response;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(AttachmentsControllerAttach201ResponseBuilder b) => b;
@@ -47,7 +47,7 @@ class _$AttachmentsControllerAttach201ResponseSerializer
   @override
   final Iterable<Type> types = const [
     AttachmentsControllerAttach201Response,
-    _$AttachmentsControllerAttach201Response
+    _$AttachmentsControllerAttach201Response,
   ];
 
   @override
@@ -76,9 +76,11 @@ class _$AttachmentsControllerAttach201ResponseSerializer
     AttachmentsControllerAttach201Response object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(

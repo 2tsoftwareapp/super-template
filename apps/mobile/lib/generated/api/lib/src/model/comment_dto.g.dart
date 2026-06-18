@@ -29,16 +29,16 @@ class _$CommentDto extends CommentDto {
   factory _$CommentDto([void Function(CommentDtoBuilder)? updates]) =>
       (CommentDtoBuilder()..update(updates))._build();
 
-  _$CommentDto._(
-      {required this.id,
-      required this.entityType,
-      required this.entityId,
-      this.parentId,
-      required this.authorId,
-      required this.content,
-      required this.createdAt,
-      required this.updatedAt})
-      : super._();
+  _$CommentDto._({
+    required this.id,
+    required this.entityType,
+    required this.entityId,
+    this.parentId,
+    required this.authorId,
+    required this.content,
+    required this.createdAt,
+    required this.updatedAt,
+  }) : super._();
   @override
   CommentDto rebuild(void Function(CommentDtoBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -163,18 +163,36 @@ class CommentDtoBuilder implements Builder<CommentDto, CommentDtoBuilder> {
         _$CommentDto._(
           id: BuiltValueNullFieldError.checkNotNull(id, r'CommentDto', 'id'),
           entityType: BuiltValueNullFieldError.checkNotNull(
-              entityType, r'CommentDto', 'entityType'),
+            entityType,
+            r'CommentDto',
+            'entityType',
+          ),
           entityId: BuiltValueNullFieldError.checkNotNull(
-              entityId, r'CommentDto', 'entityId'),
+            entityId,
+            r'CommentDto',
+            'entityId',
+          ),
           parentId: parentId,
           authorId: BuiltValueNullFieldError.checkNotNull(
-              authorId, r'CommentDto', 'authorId'),
+            authorId,
+            r'CommentDto',
+            'authorId',
+          ),
           content: BuiltValueNullFieldError.checkNotNull(
-              content, r'CommentDto', 'content'),
+            content,
+            r'CommentDto',
+            'content',
+          ),
           createdAt: BuiltValueNullFieldError.checkNotNull(
-              createdAt, r'CommentDto', 'createdAt'),
+            createdAt,
+            r'CommentDto',
+            'createdAt',
+          ),
           updatedAt: BuiltValueNullFieldError.checkNotNull(
-              updatedAt, r'CommentDto', 'updatedAt'),
+            updatedAt,
+            r'CommentDto',
+            'updatedAt',
+          ),
         );
     replace(_$result);
     return _$result;

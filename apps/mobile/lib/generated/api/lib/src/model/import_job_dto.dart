@@ -179,9 +179,11 @@ class _$ImportJobDtoSerializer implements PrimitiveSerializer<ImportJobDto> {
     ImportJobDto object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(
@@ -248,7 +250,9 @@ class _$ImportJobDtoSerializer implements PrimitiveSerializer<ImportJobDto> {
         case r'errors':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(BuiltList, [FullType(JsonObject)]),
+            specifiedType: const FullType(BuiltList, [
+              FullType(JsonObject),
+            ]),
           ) as BuiltList<JsonObject>;
           result.errors.replace(valueDes);
           break;

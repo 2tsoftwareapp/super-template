@@ -160,7 +160,7 @@ export class AdminNotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
 
   @Post()
-  @Authorize({ permissions: [PERMISSION_NAMES.NOTIFICATIONS_SEND] })
+  @Authorize({ permissions: [PERMISSION_NAMES.NOTIFICATIONS_CREATE] })
   @ApiDataResponse(NotificationJobDto, 201)
   send(
     @CurrentUser() actor: AuthenticatedRequestUser,
@@ -189,7 +189,7 @@ export class AdminNotificationsController {
   }
 
   @Get('jobs')
-  @Authorize({ permissions: [PERMISSION_NAMES.NOTIFICATIONS_SEND] })
+  @Authorize({ permissions: [PERMISSION_NAMES.NOTIFICATIONS_CREATE] })
   @ApiPaginatedResponse(NotificationJobDto)
   async listJobs(@Query() query: NotificationJobsQueryDto) {
     const result = await this.notificationsService.listJobs({
@@ -210,7 +210,7 @@ export class AdminNotificationsController {
   }
 
   @Get('jobs/:id')
-  @Authorize({ permissions: [PERMISSION_NAMES.NOTIFICATIONS_SEND] })
+  @Authorize({ permissions: [PERMISSION_NAMES.NOTIFICATIONS_CREATE] })
   @ApiDataResponse(NotificationJobDto)
   async getJob(@Param('id', new ParseUUIDPipe()) jobId: string) {
     return {
@@ -219,7 +219,7 @@ export class AdminNotificationsController {
   }
 
   @Delete('jobs/:id')
-  @Authorize({ permissions: [PERMISSION_NAMES.NOTIFICATIONS_SEND] })
+  @Authorize({ permissions: [PERMISSION_NAMES.NOTIFICATIONS_CREATE] })
   @ApiDataResponse(NotificationJobDto)
   async cancelJob(
     @CurrentUser() actor: AuthenticatedRequestUser,

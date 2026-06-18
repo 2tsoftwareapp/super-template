@@ -30,14 +30,14 @@ abstract class NotificationsControllerRegisterDevice201Response
 
   NotificationsControllerRegisterDevice201Response._();
 
-  factory NotificationsControllerRegisterDevice201Response(
-          [void updates(
-              NotificationsControllerRegisterDevice201ResponseBuilder b)]) =
-      _$NotificationsControllerRegisterDevice201Response;
+  factory NotificationsControllerRegisterDevice201Response([
+    void updates(NotificationsControllerRegisterDevice201ResponseBuilder b),
+  ]) = _$NotificationsControllerRegisterDevice201Response;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(
-          NotificationsControllerRegisterDevice201ResponseBuilder b) =>
+    NotificationsControllerRegisterDevice201ResponseBuilder b,
+  ) =>
       b;
 
   @BuiltValueSerializer(custom: true)
@@ -52,7 +52,7 @@ class _$NotificationsControllerRegisterDevice201ResponseSerializer
   @override
   final Iterable<Type> types = const [
     NotificationsControllerRegisterDevice201Response,
-    _$NotificationsControllerRegisterDevice201Response
+    _$NotificationsControllerRegisterDevice201Response,
   ];
 
   @override
@@ -81,9 +81,11 @@ class _$NotificationsControllerRegisterDevice201ResponseSerializer
     NotificationsControllerRegisterDevice201Response object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(

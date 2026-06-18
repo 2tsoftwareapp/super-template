@@ -19,9 +19,11 @@ class _$FileUrlDto extends FileUrlDto {
   factory _$FileUrlDto([void Function(FileUrlDtoBuilder)? updates]) =>
       (FileUrlDtoBuilder()..update(updates))._build();
 
-  _$FileUrlDto._(
-      {required this.id, required this.url, required this.expiresInSeconds})
-      : super._();
+  _$FileUrlDto._({
+    required this.id,
+    required this.url,
+    required this.expiresInSeconds,
+  }) : super._();
   @override
   FileUrlDto rebuild(void Function(FileUrlDtoBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -108,7 +110,10 @@ class FileUrlDtoBuilder implements Builder<FileUrlDto, FileUrlDtoBuilder> {
           id: BuiltValueNullFieldError.checkNotNull(id, r'FileUrlDto', 'id'),
           url: BuiltValueNullFieldError.checkNotNull(url, r'FileUrlDto', 'url'),
           expiresInSeconds: BuiltValueNullFieldError.checkNotNull(
-              expiresInSeconds, r'FileUrlDto', 'expiresInSeconds'),
+            expiresInSeconds,
+            r'FileUrlDto',
+            'expiresInSeconds',
+          ),
         );
     replace(_$result);
     return _$result;

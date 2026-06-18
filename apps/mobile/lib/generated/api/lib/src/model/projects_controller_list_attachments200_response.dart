@@ -31,14 +31,14 @@ abstract class ProjectsControllerListAttachments200Response
 
   ProjectsControllerListAttachments200Response._();
 
-  factory ProjectsControllerListAttachments200Response(
-          [void updates(
-              ProjectsControllerListAttachments200ResponseBuilder b)]) =
-      _$ProjectsControllerListAttachments200Response;
+  factory ProjectsControllerListAttachments200Response([
+    void updates(ProjectsControllerListAttachments200ResponseBuilder b),
+  ]) = _$ProjectsControllerListAttachments200Response;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(
-          ProjectsControllerListAttachments200ResponseBuilder b) =>
+    ProjectsControllerListAttachments200ResponseBuilder b,
+  ) =>
       b;
 
   @BuiltValueSerializer(custom: true)
@@ -53,7 +53,7 @@ class _$ProjectsControllerListAttachments200ResponseSerializer
   @override
   final Iterable<Type> types = const [
     ProjectsControllerListAttachments200Response,
-    _$ProjectsControllerListAttachments200Response
+    _$ProjectsControllerListAttachments200Response,
   ];
 
   @override
@@ -67,8 +67,9 @@ class _$ProjectsControllerListAttachments200ResponseSerializer
     yield r'data';
     yield serializers.serialize(
       object.data,
-      specifiedType:
-          const FullType(BuiltList, [FullType(ProjectAttachmentDto)]),
+      specifiedType: const FullType(BuiltList, [
+        FullType(ProjectAttachmentDto),
+      ]),
     );
     yield r'meta';
     yield serializers.serialize(
@@ -83,9 +84,11 @@ class _$ProjectsControllerListAttachments200ResponseSerializer
     ProjectsControllerListAttachments200Response object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(
@@ -103,8 +106,9 @@ class _$ProjectsControllerListAttachments200ResponseSerializer
         case r'data':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType:
-                const FullType(BuiltList, [FullType(ProjectAttachmentDto)]),
+            specifiedType: const FullType(BuiltList, [
+              FullType(ProjectAttachmentDto),
+            ]),
           ) as BuiltList<ProjectAttachmentDto>;
           result.data.replace(valueDes);
           break;

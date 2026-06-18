@@ -73,9 +73,11 @@ class _$FileUrlDtoSerializer implements PrimitiveSerializer<FileUrlDto> {
     FileUrlDto object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(
@@ -105,10 +107,8 @@ class _$FileUrlDtoSerializer implements PrimitiveSerializer<FileUrlDto> {
           result.url = valueDes;
           break;
         case r'expiresInSeconds':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(num),
-          ) as num;
+          final valueDes = serializers.deserialize(value,
+              specifiedType: const FullType(num)) as num;
           result.expiresInSeconds = valueDes;
           break;
         default:

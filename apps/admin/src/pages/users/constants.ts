@@ -1,4 +1,4 @@
-import type { UserStatusFilter, UsersListParams, UsersPageSize } from "./types";
+import type { UsersListParams, UsersPageSize, UserStatusFilter } from "./types";
 
 export { USERS_PAGE_SIZE_OPTIONS, type UsersPageSize } from "./types";
 
@@ -7,7 +7,7 @@ export const USERS_PAGE_SIZE = 20 satisfies UsersPageSize;
 export const USERS_QUERY_KEY = "admin-users" as const;
 export const ROLES_QUERY_KEY = "admin-roles" as const;
 
-export const STATUS_FILTERS: Array<{ value: UserStatusFilter; label: string }> = [
+export const STATUS_FILTERS: { value: UserStatusFilter; label: string }[] = [
   { value: "all", label: "All" },
   { value: "ACTIVE", label: "Active" },
   { value: "PENDING", label: "Pending" },

@@ -47,16 +47,10 @@ class AdminSettingsApi {
     final _path = r'/api/v1/admin/settings';
     final _options = Options(
       method: r'GET',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -80,7 +74,8 @@ class AdminSettingsApi {
           : _serializers.deserialize(
               rawResponse,
               specifiedType: const FullType(
-                  AdminSettingsControllerListSettings200Response),
+                AdminSettingsControllerListSettings200Response,
+              ),
             ) as AdminSettingsControllerListSettings200Response;
     } catch (error, stackTrace) {
       throw DioException(
@@ -131,21 +126,21 @@ class AdminSettingsApi {
     ProgressCallback? onReceiveProgress,
   }) async {
     final _path = r'/api/v1/admin/settings/{key}'.replaceAll(
-        '{' r'key' '}',
-        encodeQueryParameter(_serializers, key, const FullType(String))
-            .toString());
+      '{'
+      r'key'
+      '}',
+      encodeQueryParameter(
+        _serializers,
+        key,
+        const FullType(String),
+      ).toString(),
+    );
     final _options = Options(
       method: r'PATCH',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -157,14 +152,13 @@ class AdminSettingsApi {
 
     try {
       const _type = FullType(UpdateSettingDto);
-      _bodyData =
-          _serializers.serialize(updateSettingDto, specifiedType: _type);
+      _bodyData = _serializers.serialize(
+        updateSettingDto,
+        specifiedType: _type,
+      );
     } catch (error, stackTrace) {
       throw DioException(
-        requestOptions: _options.compose(
-          _dio.options,
-          _path,
-        ),
+        requestOptions: _options.compose(_dio.options, _path),
         type: DioExceptionType.unknown,
         error: error,
         stackTrace: stackTrace,
@@ -189,7 +183,8 @@ class AdminSettingsApi {
           : _serializers.deserialize(
               rawResponse,
               specifiedType: const FullType(
-                  AdminSettingsControllerUpdateSetting200Response),
+                AdminSettingsControllerUpdateSetting200Response,
+              ),
             ) as AdminSettingsControllerUpdateSetting200Response;
     } catch (error, stackTrace) {
       throw DioException(

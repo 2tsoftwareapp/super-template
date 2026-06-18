@@ -3,8 +3,8 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { formatRoleName } from "@/lib/roles";
 import { formatDateTime, statusProps, timeAgo, truncateId } from "@/lib/format";
+import { formatRoleName } from "@/lib/roles";
 import { cn } from "@/lib/utils";
 
 import type { AdminUserDto } from "../../lib/types";

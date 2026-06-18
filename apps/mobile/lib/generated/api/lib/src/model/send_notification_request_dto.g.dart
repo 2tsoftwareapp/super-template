@@ -33,12 +33,14 @@ SendNotificationRequestDtoAudienceEnum
 }
 
 final BuiltSet<SendNotificationRequestDtoAudienceEnum>
-    _$sendNotificationRequestDtoAudienceEnumValues = BuiltSet<
-        SendNotificationRequestDtoAudienceEnum>(const <SendNotificationRequestDtoAudienceEnum>[
-  _$sendNotificationRequestDtoAudienceEnum_USER,
-  _$sendNotificationRequestDtoAudienceEnum_USERS,
-  _$sendNotificationRequestDtoAudienceEnum_ALL,
-]);
+    _$sendNotificationRequestDtoAudienceEnumValues =
+    BuiltSet<SendNotificationRequestDtoAudienceEnum>(
+  const <SendNotificationRequestDtoAudienceEnum>[
+    _$sendNotificationRequestDtoAudienceEnum_USER,
+    _$sendNotificationRequestDtoAudienceEnum_USERS,
+    _$sendNotificationRequestDtoAudienceEnum_ALL,
+  ],
+);
 
 Serializer<SendNotificationRequestDtoAudienceEnum>
     _$sendNotificationRequestDtoAudienceEnumSerializer =
@@ -59,23 +61,28 @@ class _$SendNotificationRequestDtoAudienceEnumSerializer
 
   @override
   final Iterable<Type> types = const <Type>[
-    SendNotificationRequestDtoAudienceEnum
+    SendNotificationRequestDtoAudienceEnum,
   ];
   @override
   final String wireName = 'SendNotificationRequestDtoAudienceEnum';
 
   @override
-  Object serialize(Serializers serializers,
-          SendNotificationRequestDtoAudienceEnum object,
-          {FullType specifiedType = FullType.unspecified}) =>
+  Object serialize(
+    Serializers serializers,
+    SendNotificationRequestDtoAudienceEnum object, {
+    FullType specifiedType = FullType.unspecified,
+  }) =>
       _toWire[object.name] ?? object.name;
 
   @override
   SendNotificationRequestDtoAudienceEnum deserialize(
-          Serializers serializers, Object serialized,
-          {FullType specifiedType = FullType.unspecified}) =>
+    Serializers serializers,
+    Object serialized, {
+    FullType specifiedType = FullType.unspecified,
+  }) =>
       SendNotificationRequestDtoAudienceEnum.valueOf(
-          _fromWire[serialized] ?? (serialized is String ? serialized : ''));
+        _fromWire[serialized] ?? (serialized is String ? serialized : ''),
+      );
 }
 
 class _$SendNotificationRequestDto extends SendNotificationRequestDto {
@@ -95,24 +102,29 @@ class _$SendNotificationRequestDto extends SendNotificationRequestDto {
   final BuiltMap<String, JsonObject?>? data;
   @override
   final String? scheduledAt;
+  @override
+  final String? idempotencyKey;
 
-  factory _$SendNotificationRequestDto(
-          [void Function(SendNotificationRequestDtoBuilder)? updates]) =>
+  factory _$SendNotificationRequestDto([
+    void Function(SendNotificationRequestDtoBuilder)? updates,
+  ]) =>
       (SendNotificationRequestDtoBuilder()..update(updates))._build();
 
-  _$SendNotificationRequestDto._(
-      {required this.audience,
-      this.userId,
-      this.userIds,
-      required this.type,
-      required this.title,
-      required this.body,
-      this.data,
-      this.scheduledAt})
-      : super._();
+  _$SendNotificationRequestDto._({
+    required this.audience,
+    this.userId,
+    this.userIds,
+    required this.type,
+    required this.title,
+    required this.body,
+    this.data,
+    this.scheduledAt,
+    this.idempotencyKey,
+  }) : super._();
   @override
   SendNotificationRequestDto rebuild(
-          void Function(SendNotificationRequestDtoBuilder) updates) =>
+    void Function(SendNotificationRequestDtoBuilder) updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -130,7 +142,8 @@ class _$SendNotificationRequestDto extends SendNotificationRequestDto {
         title == other.title &&
         body == other.body &&
         data == other.data &&
-        scheduledAt == other.scheduledAt;
+        scheduledAt == other.scheduledAt &&
+        idempotencyKey == other.idempotencyKey;
   }
 
   @override
@@ -144,6 +157,7 @@ class _$SendNotificationRequestDto extends SendNotificationRequestDto {
     _$hash = $jc(_$hash, body.hashCode);
     _$hash = $jc(_$hash, data.hashCode);
     _$hash = $jc(_$hash, scheduledAt.hashCode);
+    _$hash = $jc(_$hash, idempotencyKey.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -158,7 +172,8 @@ class _$SendNotificationRequestDto extends SendNotificationRequestDto {
           ..add('title', title)
           ..add('body', body)
           ..add('data', data)
-          ..add('scheduledAt', scheduledAt))
+          ..add('scheduledAt', scheduledAt)
+          ..add('idempotencyKey', idempotencyKey))
         .toString();
   }
 }
@@ -202,6 +217,11 @@ class SendNotificationRequestDtoBuilder
   String? get scheduledAt => _$this._scheduledAt;
   set scheduledAt(String? scheduledAt) => _$this._scheduledAt = scheduledAt;
 
+  String? _idempotencyKey;
+  String? get idempotencyKey => _$this._idempotencyKey;
+  set idempotencyKey(String? idempotencyKey) =>
+      _$this._idempotencyKey = idempotencyKey;
+
   SendNotificationRequestDtoBuilder() {
     SendNotificationRequestDto._defaults(this);
   }
@@ -217,6 +237,7 @@ class SendNotificationRequestDtoBuilder
       _body = $v.body;
       _data = $v.data?.toBuilder();
       _scheduledAt = $v.scheduledAt;
+      _idempotencyKey = $v.idempotencyKey;
       _$v = null;
     }
     return this;
@@ -241,17 +262,30 @@ class SendNotificationRequestDtoBuilder
       _$result = _$v ??
           _$SendNotificationRequestDto._(
             audience: BuiltValueNullFieldError.checkNotNull(
-                audience, r'SendNotificationRequestDto', 'audience'),
+              audience,
+              r'SendNotificationRequestDto',
+              'audience',
+            ),
             userId: userId,
             userIds: _userIds?.build(),
             type: BuiltValueNullFieldError.checkNotNull(
-                type, r'SendNotificationRequestDto', 'type'),
+              type,
+              r'SendNotificationRequestDto',
+              'type',
+            ),
             title: BuiltValueNullFieldError.checkNotNull(
-                title, r'SendNotificationRequestDto', 'title'),
+              title,
+              r'SendNotificationRequestDto',
+              'title',
+            ),
             body: BuiltValueNullFieldError.checkNotNull(
-                body, r'SendNotificationRequestDto', 'body'),
+              body,
+              r'SendNotificationRequestDto',
+              'body',
+            ),
             data: _data?.build(),
             scheduledAt: scheduledAt,
+            idempotencyKey: idempotencyKey,
           );
     } catch (_) {
       late String _$failedField;
@@ -263,7 +297,10 @@ class SendNotificationRequestDtoBuilder
         _data?.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'SendNotificationRequestDto', _$failedField, e.toString());
+          r'SendNotificationRequestDto',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

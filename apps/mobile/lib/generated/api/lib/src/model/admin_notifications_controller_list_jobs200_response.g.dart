@@ -15,21 +15,23 @@ class _$AdminNotificationsControllerListJobs200Response
   @override
   final PaginationMetaDto meta;
 
-  factory _$AdminNotificationsControllerListJobs200Response(
-          [void Function(
-                  AdminNotificationsControllerListJobs200ResponseBuilder)?
-              updates]) =>
+  factory _$AdminNotificationsControllerListJobs200Response([
+    void Function(AdminNotificationsControllerListJobs200ResponseBuilder)?
+        updates,
+  ]) =>
       (AdminNotificationsControllerListJobs200ResponseBuilder()
             ..update(updates))
           ._build();
 
-  _$AdminNotificationsControllerListJobs200Response._(
-      {required this.data, required this.meta})
-      : super._();
+  _$AdminNotificationsControllerListJobs200Response._({
+    required this.data,
+    required this.meta,
+  }) : super._();
   @override
   AdminNotificationsControllerListJobs200Response rebuild(
-          void Function(AdminNotificationsControllerListJobs200ResponseBuilder)
-              updates) =>
+    void Function(AdminNotificationsControllerListJobs200ResponseBuilder)
+        updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -56,7 +58,8 @@ class _$AdminNotificationsControllerListJobs200Response
   @override
   String toString() {
     return (newBuiltValueToStringHelper(
-            r'AdminNotificationsControllerListJobs200Response')
+      r'AdminNotificationsControllerListJobs200Response',
+    )
           ..add('data', data)
           ..add('meta', meta))
         .toString();
@@ -100,8 +103,9 @@ class AdminNotificationsControllerListJobs200ResponseBuilder
 
   @override
   void update(
-      void Function(AdminNotificationsControllerListJobs200ResponseBuilder)?
-          updates) {
+    void Function(AdminNotificationsControllerListJobs200ResponseBuilder)?
+        updates,
+  ) {
     if (updates != null) updates(this);
   }
 
@@ -125,9 +129,10 @@ class AdminNotificationsControllerListJobs200ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'AdminNotificationsControllerListJobs200Response',
-            _$failedField,
-            e.toString());
+          r'AdminNotificationsControllerListJobs200Response',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

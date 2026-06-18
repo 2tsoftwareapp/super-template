@@ -7,15 +7,14 @@ import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import {
   AppError,
   ERROR_CODES,
-  PROJECT_DEMO_GATEWAY,
-  type ProjectDemoGateway,
+  ImportExportAdapterRegistry,
 } from '@repo/api-core';
 
 import type { ImportJobView } from './imports.types';
 
 import { AuditService } from '../../audit/application/audit.service';
 import { FilesRepository } from '../../files/infrastructure/files.repository';
-import { ImportProjectParserService } from './import-project-parser.service';
+import { ImportFileParserService } from './import-file-parser.service';
 import { ImportsMapper } from './imports.mapper';
 import {
   IMPORT_JOBS_REPOSITORY,
@@ -30,9 +29,8 @@ export class ConfirmImportUseCase {
     @Inject(IMPORT_JOBS_REPOSITORY)
     private readonly importJobsRepository: ImportJobsRepositoryPort,
     private readonly filesRepository: FilesRepository,
-    @Inject(PROJECT_DEMO_GATEWAY)
-    private readonly projectDemoGateway: ProjectDemoGateway,
-    private readonly importProjectParser: ImportProjectParserService,
+    private readonly importExportAdapters: ImportExportAdapterRegistry,
+    private readonly importFileParser: ImportFileParserService,
     private readonly auditService: AuditService,
   ) {}
 
@@ -77,35 +75,21 @@ export class ConfirmImportUseCase {
       );
     }
 
-    const parsed = await this.importProjectParser.parseImportFile(
+    const parsed = await this.importFileParser.parseImportFile(
       job.type,
       file.storageKey,
     );
+    const adapter = this.importExportAdapters.resolve(job.type);
     let successCount = 0;
     const errors: Record<string, unknown>[] = [];
 
     for (const [index, row] of parsed.rows.entries()) {
       try {
-        if (job.type === 'projects') {
-          const existing =
-            await this.projectDemoGateway.findActiveByOwnerAndName(
-              actor.userId,
-              row.name,
-            );
-
-          if (existing) {
-            throw new Error('A project with this name already exists');
-          }
-
-          await this.projectDemoGateway.create({
-            organizationId: file.organizationId,
-            ownerId: actor.userId,
-            name: row.name,
-            description: row.description ?? '',
-            status: row.status,
-            createdById: actor.userId,
-          });
-        }
+        await adapter.importRow(row, {
+          organizationId: file.organizationId,
+          ownerId: actor.userId,
+          createdById: actor.userId,
+        });
 
         successCount += 1;
       } catch (error) {

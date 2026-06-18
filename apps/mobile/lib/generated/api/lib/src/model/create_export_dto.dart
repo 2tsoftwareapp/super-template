@@ -17,6 +17,7 @@ part 'create_export_dto.g.dart';
 /// Properties:
 /// * [type]
 /// * [filters]
+/// * [idempotencyKey] - Client-supplied idempotency key. Retries with the same key return the original export job.
 @BuiltValue()
 abstract class CreateExportDto
     implements Built<CreateExportDto, CreateExportDtoBuilder> {
@@ -25,6 +26,10 @@ abstract class CreateExportDto
 
   @BuiltValueField(wireName: r'filters')
   BuiltMap<String, JsonObject?>? get filters;
+
+  /// Client-supplied idempotency key. Retries with the same key return the original export job.
+  @BuiltValueField(wireName: r'idempotencyKey')
+  String? get idempotencyKey;
 
   CreateExportDto._();
 
@@ -61,8 +66,17 @@ class _$CreateExportDtoSerializer
       yield r'filters';
       yield serializers.serialize(
         object.filters,
-        specifiedType: const FullType(
-            BuiltMap, [FullType(String), FullType.nullable(JsonObject)]),
+        specifiedType: const FullType(BuiltMap, [
+          FullType(String),
+          FullType.nullable(JsonObject),
+        ]),
+      );
+    }
+    if (object.idempotencyKey != null) {
+      yield r'idempotencyKey';
+      yield serializers.serialize(
+        object.idempotencyKey,
+        specifiedType: const FullType(String),
       );
     }
   }
@@ -73,9 +87,11 @@ class _$CreateExportDtoSerializer
     CreateExportDto object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(
@@ -100,10 +116,19 @@ class _$CreateExportDtoSerializer
         case r'filters':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(
-                BuiltMap, [FullType(String), FullType.nullable(JsonObject)]),
+            specifiedType: const FullType(BuiltMap, [
+              FullType(String),
+              FullType.nullable(JsonObject),
+            ]),
           ) as BuiltMap<String, JsonObject?>;
           result.filters.replace(valueDes);
+          break;
+        case r'idempotencyKey':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.idempotencyKey = valueDes;
           break;
         default:
           unhandled.add(key);

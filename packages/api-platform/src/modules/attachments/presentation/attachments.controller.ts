@@ -36,7 +36,7 @@ export class AttachmentsController {
   constructor(private readonly attachmentsService: AttachmentsService) {}
 
   @Post()
-  @Authorize({ permissions: [PERMISSION_NAMES.ATTACHMENTS_MANAGE] })
+  @Authorize({ permissions: [PERMISSION_NAMES.ATTACHMENTS_CREATE] })
   @ApiDataResponse(AttachmentDto, 201)
   attach(
     @CurrentUser() user: AuthenticatedRequestUser,
@@ -56,7 +56,7 @@ export class AttachmentsController {
   }
 
   @Get()
-  @Authorize({ permissions: [PERMISSION_NAMES.ATTACHMENTS_MANAGE] })
+  @Authorize({ permissions: [PERMISSION_NAMES.ATTACHMENTS_READ] })
   @ApiArrayResponse(AttachmentDto)
   list(@Query() query: AttachmentsQueryDto) {
     return this.attachmentsService.list({
@@ -66,7 +66,7 @@ export class AttachmentsController {
   }
 
   @Delete(':id')
-  @Authorize({ permissions: [PERMISSION_NAMES.ATTACHMENTS_MANAGE] })
+  @Authorize({ permissions: [PERMISSION_NAMES.ATTACHMENTS_DELETE] })
   @ApiDataResponse(SuccessFlagDto)
   async delete(
     @CurrentUser() user: AuthenticatedRequestUser,

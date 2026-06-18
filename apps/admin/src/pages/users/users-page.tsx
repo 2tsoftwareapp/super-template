@@ -18,8 +18,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { adminResources } from "@/lib/admin-resources";
 import { useSession } from "@/lib/session";
 
-import { CreateUserDrawer } from "./create-user-drawer";
+import type { UsersListParams, UserStatusFilter } from "./types";
+
 import { STATUS_FILTERS } from "./constants";
+import { CreateUserDrawer } from "./create-user-drawer";
 import { paramsFromSortingState, sortingStateFromParams, usersSortChanged } from "./sorting";
 import { useDebouncedValue } from "./use-debounced-value";
 import {
@@ -27,13 +29,12 @@ import {
   useUpdateUsersStatusMutation,
   useUsersListQuery,
 } from "./use-users-queries";
+import { UsersPagination } from "./users-pagination";
 import {
   parseUsersListSearchParams,
   serializeUsersListSearchParams,
 } from "./users-search-params";
 import { createUsersTableColumns } from "./users-table-columns";
-import { UsersPagination } from "./users-pagination";
-import type { UserStatusFilter, UsersListParams } from "./types";
 
 const usersResource = adminResources.find((resource) => resource.id === "users")!;
 
@@ -158,7 +159,6 @@ export function UsersPage() {
           open={showCreate}
           onClose={() => setShowCreate(false)}
           actorRoles={actorRoles}
-          roles={roles.data?.data ?? []}
         />
       ) : null}
 

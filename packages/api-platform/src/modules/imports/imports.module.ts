@@ -6,7 +6,7 @@ import { StorageModule } from '../storage/storage.module';
 import { ConfirmImportUseCase } from './application/confirm-import.use-case';
 import { CreateImportUseCase } from './application/create-import.use-case';
 import { GetImportUseCase } from './application/get-import.use-case';
-import { ImportProjectParserService } from './application/import-project-parser.service';
+import { ImportFileParserService } from './application/import-file-parser.service';
 import { ImportsMapper } from './application/imports.mapper';
 import { IMPORT_JOBS_REPOSITORY } from './application/imports.repository.port';
 import { ImportsService } from './application/imports.service';
@@ -19,7 +19,7 @@ import { ImportsController } from './presentation/imports.controller';
   providers: [
     ImportJobsRepository,
     ImportsMapper,
-    ImportProjectParserService,
+    ImportFileParserService,
     GetImportUseCase,
     CreateImportUseCase,
     ConfirmImportUseCase,

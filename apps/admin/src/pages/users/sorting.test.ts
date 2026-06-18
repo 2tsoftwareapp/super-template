@@ -2,8 +2,9 @@ import { describe, expect, it } from "vitest";
 
 import { createTableSortBridge } from "@/lib/table-sort";
 
-import { paramsFromSortingState, sortingStateFromParams } from "./sorting";
 import type { UsersSortCriterion } from "./types";
+
+import { paramsFromSortingState, sortingStateFromParams } from "./sorting";
 
 const defaultSort: UsersSortCriterion[] = [{ field: "createdAt", order: "desc" }];
 

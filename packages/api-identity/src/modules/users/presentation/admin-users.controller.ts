@@ -44,14 +44,17 @@ export class AdminUsersController {
   @Get()
   @Authorize({ permissions: [PERMISSION_NAMES.USERS_READ] })
   @ApiPaginatedResponse(UserDto)
-  async listUsers(@Query() query: AdminUsersQueryDto) {
+  async listUsers(
+    @CurrentUser() actor: AuthenticatedRequestUser,
+    @Query() query: AdminUsersQueryDto,
+  ) {
     const sort = userSortsFromQuery({
       sort: query.sort,
       sortField: query.sortField,
       sortOrder: query.sortOrder,
     });
 
-    const result = await this.usersService.listUsers({
+    const result = await this.usersService.listUsers(actor, {
       page: query.page,
       limit: query.limit,
       sort,
@@ -87,7 +90,10 @@ export class AdminUsersController {
         displayName: input.displayName,
         ...(input.avatarUrl !== undefined ? { avatarUrl: input.avatarUrl } : {}),
         ...(input.status !== undefined ? { status: input.status } : {}),
-        ...(input.roleIds !== undefined ? { roleIds: input.roleIds } : {}),
+        ...(input.role !== undefined ? { role: input.role } : {}),
+        ...(input.organizationId !== undefined
+          ? { organizationId: input.organizationId }
+          : {}),
       },
       request.requestContext,
     );
@@ -96,8 +102,11 @@ export class AdminUsersController {
   @Get(':id')
   @Authorize({ permissions: [PERMISSION_NAMES.USERS_READ] })
   @ApiDataResponse(UserDto)
-  getUser(@Param('id', new ParseUUIDPipe()) userId: string) {
-    return this.usersService.getUserById(userId);
+  getUser(
+    @CurrentUser() actor: AuthenticatedRequestUser,
+    @Param('id', new ParseUUIDPipe()) userId: string,
+  ) {
+    return this.usersService.getUserById(actor, userId);
   }
 
   @Patch(':id')
@@ -160,7 +169,7 @@ export class AdminUsersController {
   }
 
   @Put(':id/roles')
-  @Authorize({ permissions: [PERMISSION_NAMES.ROLES_MANAGE] })
+  @Authorize({ permissions: [PERMISSION_NAMES.ROLES_UPDATE] })
   @ApiDataResponse(UserDto)
   replaceRoles(
     @CurrentUser() actor: AuthenticatedRequestUser,
@@ -171,7 +180,8 @@ export class AdminUsersController {
     return this.usersService.replaceUserRoles(
       actor,
       userId,
-      input.roleIds,
+      input.role,
+      input.organizationId,
       request.requestContext,
     );
   }

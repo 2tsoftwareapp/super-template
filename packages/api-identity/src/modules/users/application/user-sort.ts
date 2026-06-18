@@ -1,9 +1,9 @@
 import {
   parseSortParam,
-  sortsFromQuery,
   type SortCriterion,
   type SortOrder,
-} from '@repo/api-contract/sort/multi-sort';
+  sortsFromQuery,
+} from '@repo/api-core';
 
 export const USER_SORT_FIELDS = [
   'createdAt',

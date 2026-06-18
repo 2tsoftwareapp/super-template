@@ -15,19 +15,21 @@ class _$NotificationsControllerUnreadCount200Response
   @override
   final RequestMetaDto meta;
 
-  factory _$NotificationsControllerUnreadCount200Response(
-          [void Function(NotificationsControllerUnreadCount200ResponseBuilder)?
-              updates]) =>
+  factory _$NotificationsControllerUnreadCount200Response([
+    void Function(NotificationsControllerUnreadCount200ResponseBuilder)?
+        updates,
+  ]) =>
       (NotificationsControllerUnreadCount200ResponseBuilder()..update(updates))
           ._build();
 
-  _$NotificationsControllerUnreadCount200Response._(
-      {required this.data, required this.meta})
-      : super._();
+  _$NotificationsControllerUnreadCount200Response._({
+    required this.data,
+    required this.meta,
+  }) : super._();
   @override
   NotificationsControllerUnreadCount200Response rebuild(
-          void Function(NotificationsControllerUnreadCount200ResponseBuilder)
-              updates) =>
+    void Function(NotificationsControllerUnreadCount200ResponseBuilder) updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -54,7 +56,8 @@ class _$NotificationsControllerUnreadCount200Response
   @override
   String toString() {
     return (newBuiltValueToStringHelper(
-            r'NotificationsControllerUnreadCount200Response')
+      r'NotificationsControllerUnreadCount200Response',
+    )
           ..add('data', data)
           ..add('meta', meta))
         .toString();
@@ -96,8 +99,9 @@ class NotificationsControllerUnreadCount200ResponseBuilder
 
   @override
   void update(
-      void Function(NotificationsControllerUnreadCount200ResponseBuilder)?
-          updates) {
+    void Function(NotificationsControllerUnreadCount200ResponseBuilder)?
+        updates,
+  ) {
     if (updates != null) updates(this);
   }
 
@@ -121,9 +125,10 @@ class NotificationsControllerUnreadCount200ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'NotificationsControllerUnreadCount200Response',
-            _$failedField,
-            e.toString());
+          r'NotificationsControllerUnreadCount200Response',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

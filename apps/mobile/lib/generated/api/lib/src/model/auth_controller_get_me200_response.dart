@@ -30,9 +30,9 @@ abstract class AuthControllerGetMe200Response
 
   AuthControllerGetMe200Response._();
 
-  factory AuthControllerGetMe200Response(
-          [void updates(AuthControllerGetMe200ResponseBuilder b)]) =
-      _$AuthControllerGetMe200Response;
+  factory AuthControllerGetMe200Response([
+    void updates(AuthControllerGetMe200ResponseBuilder b),
+  ]) = _$AuthControllerGetMe200Response;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(AuthControllerGetMe200ResponseBuilder b) => b;
@@ -47,7 +47,7 @@ class _$AuthControllerGetMe200ResponseSerializer
   @override
   final Iterable<Type> types = const [
     AuthControllerGetMe200Response,
-    _$AuthControllerGetMe200Response
+    _$AuthControllerGetMe200Response,
   ];
 
   @override
@@ -76,9 +76,11 @@ class _$AuthControllerGetMe200ResponseSerializer
     AuthControllerGetMe200Response object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(

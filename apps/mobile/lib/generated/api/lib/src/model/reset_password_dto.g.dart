@@ -14,8 +14,9 @@ class _$ResetPasswordDto extends ResetPasswordDto {
   @override
   final String newPassword;
 
-  factory _$ResetPasswordDto(
-          [void Function(ResetPasswordDtoBuilder)? updates]) =>
+  factory _$ResetPasswordDto([
+    void Function(ResetPasswordDtoBuilder)? updates,
+  ]) =>
       (ResetPasswordDtoBuilder()..update(updates))._build();
 
   _$ResetPasswordDto._({required this.token, required this.newPassword})
@@ -97,9 +98,15 @@ class ResetPasswordDtoBuilder
     final _$result = _$v ??
         _$ResetPasswordDto._(
           token: BuiltValueNullFieldError.checkNotNull(
-              token, r'ResetPasswordDto', 'token'),
+            token,
+            r'ResetPasswordDto',
+            'token',
+          ),
           newPassword: BuiltValueNullFieldError.checkNotNull(
-              newPassword, r'ResetPasswordDto', 'newPassword'),
+            newPassword,
+            r'ResetPasswordDto',
+            'newPassword',
+          ),
         );
     replace(_$result);
     return _$result;

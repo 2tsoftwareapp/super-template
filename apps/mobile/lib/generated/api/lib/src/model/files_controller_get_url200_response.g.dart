@@ -15,15 +15,17 @@ class _$FilesControllerGetUrl200Response
   @override
   final RequestMetaDto meta;
 
-  factory _$FilesControllerGetUrl200Response(
-          [void Function(FilesControllerGetUrl200ResponseBuilder)? updates]) =>
+  factory _$FilesControllerGetUrl200Response([
+    void Function(FilesControllerGetUrl200ResponseBuilder)? updates,
+  ]) =>
       (FilesControllerGetUrl200ResponseBuilder()..update(updates))._build();
 
   _$FilesControllerGetUrl200Response._({required this.data, required this.meta})
       : super._();
   @override
   FilesControllerGetUrl200Response rebuild(
-          void Function(FilesControllerGetUrl200ResponseBuilder) updates) =>
+    void Function(FilesControllerGetUrl200ResponseBuilder) updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -114,7 +116,10 @@ class FilesControllerGetUrl200ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'FilesControllerGetUrl200Response', _$failedField, e.toString());
+          r'FilesControllerGetUrl200Response',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

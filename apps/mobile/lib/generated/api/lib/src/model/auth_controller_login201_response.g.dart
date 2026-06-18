@@ -14,15 +14,17 @@ class _$AuthControllerLogin201Response extends AuthControllerLogin201Response {
   @override
   final RequestMetaDto meta;
 
-  factory _$AuthControllerLogin201Response(
-          [void Function(AuthControllerLogin201ResponseBuilder)? updates]) =>
+  factory _$AuthControllerLogin201Response([
+    void Function(AuthControllerLogin201ResponseBuilder)? updates,
+  ]) =>
       (AuthControllerLogin201ResponseBuilder()..update(updates))._build();
 
   _$AuthControllerLogin201Response._({required this.data, required this.meta})
       : super._();
   @override
   AuthControllerLogin201Response rebuild(
-          void Function(AuthControllerLogin201ResponseBuilder) updates) =>
+    void Function(AuthControllerLogin201ResponseBuilder) updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -113,7 +115,10 @@ class AuthControllerLogin201ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'AuthControllerLogin201Response', _$failedField, e.toString());
+          r'AuthControllerLogin201Response',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

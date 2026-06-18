@@ -30,9 +30,9 @@ abstract class AuthControllerLogin201Response
 
   AuthControllerLogin201Response._();
 
-  factory AuthControllerLogin201Response(
-          [void updates(AuthControllerLogin201ResponseBuilder b)]) =
-      _$AuthControllerLogin201Response;
+  factory AuthControllerLogin201Response([
+    void updates(AuthControllerLogin201ResponseBuilder b),
+  ]) = _$AuthControllerLogin201Response;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(AuthControllerLogin201ResponseBuilder b) => b;
@@ -47,7 +47,7 @@ class _$AuthControllerLogin201ResponseSerializer
   @override
   final Iterable<Type> types = const [
     AuthControllerLogin201Response,
-    _$AuthControllerLogin201Response
+    _$AuthControllerLogin201Response,
   ];
 
   @override
@@ -76,9 +76,11 @@ class _$AuthControllerLogin201ResponseSerializer
     AuthControllerLogin201Response object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(

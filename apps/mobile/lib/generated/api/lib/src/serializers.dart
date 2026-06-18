@@ -25,6 +25,7 @@ import 'package:super_template_api/src/model/admin_mail_controller_list_deliveri
 import 'package:super_template_api/src/model/admin_mail_controller_preview200_response.dart';
 import 'package:super_template_api/src/model/admin_notifications_controller_list_jobs200_response.dart';
 import 'package:super_template_api/src/model/admin_notifications_controller_send201_response.dart';
+import 'package:super_template_api/src/model/admin_roles_controller_list_permissions200_response.dart';
 import 'package:super_template_api/src/model/admin_roles_controller_list_roles200_response.dart';
 import 'package:super_template_api/src/model/admin_settings_controller_list_settings200_response.dart';
 import 'package:super_template_api/src/model/admin_settings_controller_update_setting200_response.dart';
@@ -86,6 +87,7 @@ import 'package:super_template_api/src/model/organization_dto.dart';
 import 'package:super_template_api/src/model/organizations_controller_create200_response.dart';
 import 'package:super_template_api/src/model/organizations_controller_list200_response.dart';
 import 'package:super_template_api/src/model/pagination_meta_dto.dart';
+import 'package:super_template_api/src/model/permission_dto.dart';
 import 'package:super_template_api/src/model/preferences_controller_get_my_preferences200_response.dart';
 import 'package:super_template_api/src/model/project_attachment_dto.dart';
 import 'package:super_template_api/src/model/project_dto.dart';
@@ -127,6 +129,7 @@ part 'serializers.g.dart';
   AdminMailControllerPreview200Response,
   AdminNotificationsControllerListJobs200Response,
   AdminNotificationsControllerSend201Response,
+  AdminRolesControllerListPermissions200Response,
   AdminRolesControllerListRoles200Response,
   AdminSettingsControllerListSettings200Response,
   AdminSettingsControllerUpdateSetting200Response,
@@ -188,6 +191,7 @@ part 'serializers.g.dart';
   OrganizationsControllerCreate200Response,
   OrganizationsControllerList200Response,
   PaginationMetaDto,
+  PermissionDto,
   PreferencesControllerGetMyPreferences200Response,
   ProjectAttachmentDto,
   ProjectDto,

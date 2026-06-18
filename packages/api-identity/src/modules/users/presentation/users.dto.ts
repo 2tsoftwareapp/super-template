@@ -1,8 +1,6 @@
-import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional, OmitType, PartialType } from '@nestjs/swagger';
 import { PaginationQueryDto } from '@repo/api-core';
 import {
-  ArrayNotEmpty,
-  IsArray,
   IsEmail,
   IsEnum,
   IsOptional,
@@ -100,15 +98,20 @@ export class CreateAdminUserDto {
   @IsEnum(['PENDING', 'ACTIVE', 'BLOCKED'])
   status?: 'PENDING' | 'ACTIVE' | 'BLOCKED';
 
-  @ApiPropertyOptional({ type: [String] })
+  @ApiPropertyOptional({ enum: ['ADMIN', 'USER'], default: 'USER' })
   @IsOptional()
-  @IsArray()
-  @ArrayNotEmpty()
-  @IsUUID('4', { each: true })
-  roleIds?: string[];
+  @IsEnum(['ADMIN', 'USER'])
+  role?: 'ADMIN' | 'USER';
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsUUID()
+  organizationId?: string;
 }
 
-export class UpdateAdminUserDto extends PartialType(CreateAdminUserDto) {}
+export class UpdateAdminUserDto extends PartialType(
+  OmitType(CreateAdminUserDto, ['role', 'organizationId'] as const),
+) {}
 
 export class UpdateUserStatusDto {
   @ApiProperty({ enum: ['PENDING', 'ACTIVE', 'BLOCKED'] })
@@ -117,11 +120,14 @@ export class UpdateUserStatusDto {
 }
 
 export class ReplaceUserRolesDto {
-  @ApiProperty({ type: [String] })
-  @IsArray()
-  @ArrayNotEmpty()
-  @IsUUID('4', { each: true })
-  roleIds: string[];
+  @ApiProperty({ enum: ['ADMIN', 'USER'] })
+  @IsEnum(['ADMIN', 'USER'])
+  role: 'ADMIN' | 'USER';
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsUUID()
+  organizationId?: string;
 }
 
 export class AdminUsersQueryDto extends PaginationQueryDto {

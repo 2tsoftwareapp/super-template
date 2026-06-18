@@ -64,16 +64,22 @@ class _$InvitationDtoStatusEnumSerializer
   final String wireName = 'InvitationDtoStatusEnum';
 
   @override
-  Object serialize(Serializers serializers, InvitationDtoStatusEnum object,
-          {FullType specifiedType = FullType.unspecified}) =>
+  Object serialize(
+    Serializers serializers,
+    InvitationDtoStatusEnum object, {
+    FullType specifiedType = FullType.unspecified,
+  }) =>
       _toWire[object.name] ?? object.name;
 
   @override
   InvitationDtoStatusEnum deserialize(
-          Serializers serializers, Object serialized,
-          {FullType specifiedType = FullType.unspecified}) =>
+    Serializers serializers,
+    Object serialized, {
+    FullType specifiedType = FullType.unspecified,
+  }) =>
       InvitationDtoStatusEnum.valueOf(
-          _fromWire[serialized] ?? (serialized is String ? serialized : ''));
+        _fromWire[serialized] ?? (serialized is String ? serialized : ''),
+      );
 }
 
 class _$InvitationDto extends InvitationDto {
@@ -105,20 +111,20 @@ class _$InvitationDto extends InvitationDto {
   factory _$InvitationDto([void Function(InvitationDtoBuilder)? updates]) =>
       (InvitationDtoBuilder()..update(updates))._build();
 
-  _$InvitationDto._(
-      {required this.id,
-      required this.email,
-      required this.entityType,
-      required this.entityId,
-      this.role,
-      required this.invitedById,
-      required this.status,
-      required this.expiresAt,
-      this.acceptedAt,
-      this.acceptedById,
-      required this.createdAt,
-      required this.updatedAt})
-      : super._();
+  _$InvitationDto._({
+    required this.id,
+    required this.email,
+    required this.entityType,
+    required this.entityId,
+    this.role,
+    required this.invitedById,
+    required this.status,
+    required this.expiresAt,
+    this.acceptedAt,
+    this.acceptedById,
+    required this.createdAt,
+    required this.updatedAt,
+  }) : super._();
   @override
   InvitationDto rebuild(void Function(InvitationDtoBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -277,24 +283,48 @@ class InvitationDtoBuilder
         _$InvitationDto._(
           id: BuiltValueNullFieldError.checkNotNull(id, r'InvitationDto', 'id'),
           email: BuiltValueNullFieldError.checkNotNull(
-              email, r'InvitationDto', 'email'),
+            email,
+            r'InvitationDto',
+            'email',
+          ),
           entityType: BuiltValueNullFieldError.checkNotNull(
-              entityType, r'InvitationDto', 'entityType'),
+            entityType,
+            r'InvitationDto',
+            'entityType',
+          ),
           entityId: BuiltValueNullFieldError.checkNotNull(
-              entityId, r'InvitationDto', 'entityId'),
+            entityId,
+            r'InvitationDto',
+            'entityId',
+          ),
           role: role,
           invitedById: BuiltValueNullFieldError.checkNotNull(
-              invitedById, r'InvitationDto', 'invitedById'),
+            invitedById,
+            r'InvitationDto',
+            'invitedById',
+          ),
           status: BuiltValueNullFieldError.checkNotNull(
-              status, r'InvitationDto', 'status'),
+            status,
+            r'InvitationDto',
+            'status',
+          ),
           expiresAt: BuiltValueNullFieldError.checkNotNull(
-              expiresAt, r'InvitationDto', 'expiresAt'),
+            expiresAt,
+            r'InvitationDto',
+            'expiresAt',
+          ),
           acceptedAt: acceptedAt,
           acceptedById: acceptedById,
           createdAt: BuiltValueNullFieldError.checkNotNull(
-              createdAt, r'InvitationDto', 'createdAt'),
+            createdAt,
+            r'InvitationDto',
+            'createdAt',
+          ),
           updatedAt: BuiltValueNullFieldError.checkNotNull(
-              updatedAt, r'InvitationDto', 'updatedAt'),
+            updatedAt,
+            r'InvitationDto',
+            'updatedAt',
+          ),
         );
     replace(_$result);
     return _$result;

@@ -46,21 +46,17 @@ class ImportsApi {
     ProgressCallback? onReceiveProgress,
   }) async {
     final _path = r'/api/v1/imports/{id}/confirm'.replaceAll(
-        '{' r'id' '}',
-        encodeQueryParameter(_serializers, id, const FullType(String))
-            .toString());
+      '{'
+      r'id'
+      '}',
+      encodeQueryParameter(_serializers, id, const FullType(String)).toString(),
+    );
     final _options = Options(
       method: r'POST',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -83,7 +79,9 @@ class ImportsApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType: const FullType(ImportsControllerCreate201Response),
+              specifiedType: const FullType(
+                ImportsControllerCreate201Response,
+              ),
             ) as ImportsControllerCreate201Response;
     } catch (error, stackTrace) {
       throw DioException(
@@ -133,16 +131,10 @@ class ImportsApi {
     final _path = r'/api/v1/imports';
     final _options = Options(
       method: r'POST',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -157,10 +149,7 @@ class ImportsApi {
       _bodyData = _serializers.serialize(createImportDto, specifiedType: _type);
     } catch (error, stackTrace) {
       throw DioException(
-        requestOptions: _options.compose(
-          _dio.options,
-          _path,
-        ),
+        requestOptions: _options.compose(_dio.options, _path),
         type: DioExceptionType.unknown,
         error: error,
         stackTrace: stackTrace,
@@ -184,7 +173,9 @@ class ImportsApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType: const FullType(ImportsControllerCreate201Response),
+              specifiedType: const FullType(
+                ImportsControllerCreate201Response,
+              ),
             ) as ImportsControllerCreate201Response;
     } catch (error, stackTrace) {
       throw DioException(
@@ -233,21 +224,17 @@ class ImportsApi {
     ProgressCallback? onReceiveProgress,
   }) async {
     final _path = r'/api/v1/imports/{id}'.replaceAll(
-        '{' r'id' '}',
-        encodeQueryParameter(_serializers, id, const FullType(String))
-            .toString());
+      '{'
+      r'id'
+      '}',
+      encodeQueryParameter(_serializers, id, const FullType(String)).toString(),
+    );
     final _options = Options(
       method: r'GET',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -270,7 +257,9 @@ class ImportsApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType: const FullType(ImportsControllerCreate201Response),
+              specifiedType: const FullType(
+                ImportsControllerCreate201Response,
+              ),
             ) as ImportsControllerCreate201Response;
     } catch (error, stackTrace) {
       throw DioException(

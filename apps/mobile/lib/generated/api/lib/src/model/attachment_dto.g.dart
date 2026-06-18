@@ -29,16 +29,16 @@ class _$AttachmentDto extends AttachmentDto {
   factory _$AttachmentDto([void Function(AttachmentDtoBuilder)? updates]) =>
       (AttachmentDtoBuilder()..update(updates))._build();
 
-  _$AttachmentDto._(
-      {required this.id,
-      required this.fileId,
-      required this.entityType,
-      required this.entityId,
-      this.label,
-      this.createdById,
-      required this.createdAt,
-      required this.updatedAt})
-      : super._();
+  _$AttachmentDto._({
+    required this.id,
+    required this.fileId,
+    required this.entityType,
+    required this.entityId,
+    this.label,
+    this.createdById,
+    required this.createdAt,
+    required this.updatedAt,
+  }) : super._();
   @override
   AttachmentDto rebuild(void Function(AttachmentDtoBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -164,17 +164,32 @@ class AttachmentDtoBuilder
         _$AttachmentDto._(
           id: BuiltValueNullFieldError.checkNotNull(id, r'AttachmentDto', 'id'),
           fileId: BuiltValueNullFieldError.checkNotNull(
-              fileId, r'AttachmentDto', 'fileId'),
+            fileId,
+            r'AttachmentDto',
+            'fileId',
+          ),
           entityType: BuiltValueNullFieldError.checkNotNull(
-              entityType, r'AttachmentDto', 'entityType'),
+            entityType,
+            r'AttachmentDto',
+            'entityType',
+          ),
           entityId: BuiltValueNullFieldError.checkNotNull(
-              entityId, r'AttachmentDto', 'entityId'),
+            entityId,
+            r'AttachmentDto',
+            'entityId',
+          ),
           label: label,
           createdById: createdById,
           createdAt: BuiltValueNullFieldError.checkNotNull(
-              createdAt, r'AttachmentDto', 'createdAt'),
+            createdAt,
+            r'AttachmentDto',
+            'createdAt',
+          ),
           updatedAt: BuiltValueNullFieldError.checkNotNull(
-              updatedAt, r'AttachmentDto', 'updatedAt'),
+            updatedAt,
+            r'AttachmentDto',
+            'updatedAt',
+          ),
         );
     replace(_$result);
     return _$result;

@@ -7,7 +7,7 @@ import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ERROR_CODES } from '@repo/api-core';
 import { AppError } from '@repo/api-core';
 import { DATABASE } from '@repo/api-database';
-import { roles, userRoles, users } from '@repo/api-database';
+import { organizationMembers, roles, userRoles, users } from '@repo/api-database';
 import { and, asc, count, desc, eq, inArray, isNull, sql } from 'drizzle-orm';
 
 import type { UserSortCriterion } from '../application/user-sort';
@@ -18,6 +18,7 @@ interface ListUsersParams {
   search?: string;
   status?: 'PENDING' | 'ACTIVE' | 'BLOCKED';
   role?: string;
+  organizationId?: string;
   sort: UserSortCriterion[];
 }
 
@@ -121,6 +122,17 @@ export class UsersRepository {
       filters.push(inArray(users.id, roleUserIds));
     }
 
+    if (params.organizationId) {
+      const organizationUserIds = executor
+        .select({
+          userId: organizationMembers.userId,
+        })
+        .from(organizationMembers)
+        .where(eq(organizationMembers.organizationId, params.organizationId));
+
+      filters.push(inArray(users.id, organizationUserIds));
+    }
+
     const sortClauses = params.sort.map((criterion) => {
       const sortColumn = USER_SORT_FIELDS[criterion.field];
       return criterion.order === 'asc' ? asc(sortColumn) : desc(sortColumn);
@@ -143,6 +155,25 @@ export class UsersRepository {
       rows,
       total: Number(totalRows[0]?.total ?? 0),
     };
+  }
+
+  async isUserInOrganization(
+    userId: string,
+    organizationId: string,
+    executor: DatabaseExecutor = this.database,
+  ) {
+    const [membership] = await executor
+      .select({ userId: organizationMembers.userId })
+      .from(organizationMembers)
+      .where(
+        and(
+          eq(organizationMembers.userId, userId),
+          eq(organizationMembers.organizationId, organizationId),
+        ),
+      )
+      .limit(1);
+
+    return Boolean(membership);
   }
 
   async assertEmailAvailable(

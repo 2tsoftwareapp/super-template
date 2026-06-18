@@ -1,6 +1,5 @@
 import type { INestApplication } from '@nestjs/common';
 import { ROLE_NAMES } from '@repo/api-core';
-import { AccessControlService } from '@repo/api-identity/modules/access-control/application/access-control.service';
 import request from 'supertest';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
@@ -90,12 +89,21 @@ describe('Tenant isolation (e2e)', () => {
       'admin@example.local',
       'ChangeMe123!',
     );
-    const accessControlService = app.get(AccessControlService);
-    const adminRole = await accessControlService.getRoleByName(ROLE_NAMES.ADMIN);
-
-    if (!adminRole) {
-      throw new Error('ADMIN role was not found');
-    }
+    const seededUserSession = await loginAs(
+      app,
+      'user@example.local',
+      'ChangeMe123!',
+    );
+    const superAdminMe = await request(app.getHttpServer())
+      .get('/api/v1/auth/me')
+      .set(bearer(superAdminSession.accessToken))
+      .expect(200);
+    const seededUserMe = await request(app.getHttpServer())
+      .get('/api/v1/auth/me')
+      .set(bearer(seededUserSession.accessToken))
+      .expect(200);
+    const organizationAId = superAdminMe.body.data.organizationId as string;
+    const organizationBId = seededUserMe.body.data.organizationId as string;
 
     const orgAdminA = await request(app.getHttpServer())
       .post('/api/v1/admin/users')
@@ -105,7 +113,8 @@ describe('Tenant isolation (e2e)', () => {
         password: 'OrgAdminPass123!',
         displayName: 'Org Admin A',
         status: 'ACTIVE',
-        roleIds: [adminRole.id],
+        role: 'ADMIN',
+        organizationId: organizationAId,
       })
       .expect(201);
 
@@ -117,7 +126,8 @@ describe('Tenant isolation (e2e)', () => {
         password: 'OrgAdminPass123!',
         displayName: 'Org Admin B',
         status: 'ACTIVE',
-        roleIds: [adminRole.id],
+        role: 'ADMIN',
+        organizationId: organizationBId,
       })
       .expect(201);
 

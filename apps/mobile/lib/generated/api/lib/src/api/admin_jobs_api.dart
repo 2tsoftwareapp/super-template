@@ -46,21 +46,17 @@ class AdminJobsApi {
     ProgressCallback? onReceiveProgress,
   }) async {
     final _path = r'/api/v1/admin/jobs/{id}'.replaceAll(
-        '{' r'id' '}',
-        encodeQueryParameter(_serializers, id, const FullType(String))
-            .toString());
+      '{'
+      r'id'
+      '}',
+      encodeQueryParameter(_serializers, id, const FullType(String)).toString(),
+    );
     final _options = Options(
       method: r'DELETE',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -83,8 +79,9 @@ class AdminJobsApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType:
-                  const FullType(AdminJobsControllerCancelJob200Response),
+              specifiedType: const FullType(
+                AdminJobsControllerCancelJob200Response,
+              ),
             ) as AdminJobsControllerCancelJob200Response;
     } catch (error, stackTrace) {
       throw DioException(
@@ -143,16 +140,10 @@ class AdminJobsApi {
     final _path = r'/api/v1/admin/jobs';
     final _options = Options(
       method: r'GET',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -163,17 +154,29 @@ class AdminJobsApi {
       if (page != null)
         r'page': encodeQueryParameter(_serializers, page, const FullType(num)),
       if (limit != null)
-        r'limit':
-            encodeQueryParameter(_serializers, limit, const FullType(num)),
+        r'limit': encodeQueryParameter(
+          _serializers,
+          limit,
+          const FullType(num),
+        ),
       if (sortOrder != null)
         r'sortOrder': encodeQueryParameter(
-            _serializers, sortOrder, const FullType(String)),
+          _serializers,
+          sortOrder,
+          const FullType(String),
+        ),
       if (status != null)
-        r'status':
-            encodeQueryParameter(_serializers, status, const FullType(String)),
+        r'status': encodeQueryParameter(
+          _serializers,
+          status,
+          const FullType(String),
+        ),
       if (type != null)
-        r'type':
-            encodeQueryParameter(_serializers, type, const FullType(String)),
+        r'type': encodeQueryParameter(
+          _serializers,
+          type,
+          const FullType(String),
+        ),
     };
 
     final _response = await _dio.request<Object>(
@@ -193,8 +196,9 @@ class AdminJobsApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType:
-                  const FullType(AdminJobsControllerListJobs200Response),
+              specifiedType: const FullType(
+                AdminJobsControllerListJobs200Response,
+              ),
             ) as AdminJobsControllerListJobs200Response;
     } catch (error, stackTrace) {
       throw DioException(

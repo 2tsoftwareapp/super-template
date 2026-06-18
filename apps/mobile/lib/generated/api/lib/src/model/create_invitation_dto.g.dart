@@ -18,19 +18,21 @@ class _$CreateInvitationDto extends CreateInvitationDto {
   @override
   final String? role;
 
-  factory _$CreateInvitationDto(
-          [void Function(CreateInvitationDtoBuilder)? updates]) =>
+  factory _$CreateInvitationDto([
+    void Function(CreateInvitationDtoBuilder)? updates,
+  ]) =>
       (CreateInvitationDtoBuilder()..update(updates))._build();
 
-  _$CreateInvitationDto._(
-      {required this.email,
-      required this.entityType,
-      required this.entityId,
-      this.role})
-      : super._();
+  _$CreateInvitationDto._({
+    required this.email,
+    required this.entityType,
+    required this.entityId,
+    this.role,
+  }) : super._();
   @override
   CreateInvitationDto rebuild(
-          void Function(CreateInvitationDtoBuilder) updates) =>
+    void Function(CreateInvitationDtoBuilder) updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -122,11 +124,20 @@ class CreateInvitationDtoBuilder
     final _$result = _$v ??
         _$CreateInvitationDto._(
           email: BuiltValueNullFieldError.checkNotNull(
-              email, r'CreateInvitationDto', 'email'),
+            email,
+            r'CreateInvitationDto',
+            'email',
+          ),
           entityType: BuiltValueNullFieldError.checkNotNull(
-              entityType, r'CreateInvitationDto', 'entityType'),
+            entityType,
+            r'CreateInvitationDto',
+            'entityType',
+          ),
           entityId: BuiltValueNullFieldError.checkNotNull(
-              entityId, r'CreateInvitationDto', 'entityId'),
+            entityId,
+            r'CreateInvitationDto',
+            'entityId',
+          ),
           role: role,
         );
     replace(_$result);

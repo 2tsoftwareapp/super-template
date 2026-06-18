@@ -26,14 +26,6 @@ export async function assertCanInvite(
   }
 
   if (entityType === 'project') {
-    if (!actor.permissions.includes(PERMISSION_NAMES.PROJECTS_INVITE)) {
-      throw new AppError(
-        ERROR_CODES.AUTH_FORBIDDEN,
-        'You do not have permission to invite project collaborators',
-        HttpStatus.FORBIDDEN,
-      );
-    }
-
     const project = await projectLookup.findById(entityId);
 
     if (!project) {

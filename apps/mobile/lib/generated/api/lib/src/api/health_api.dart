@@ -44,13 +44,8 @@ class HealthApi {
     final _path = r'/api/v1/health';
     final _options = Options(
       method: r'GET',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
-      extra: <String, dynamic>{
-        'secure': <Map<String, String>>[],
-        ...?extra,
-      },
+      headers: <String, dynamic>{...?headers},
+      extra: <String, dynamic>{'secure': <Map<String, String>>[], ...?extra},
       validateStatus: validateStatus,
     );
 
@@ -70,8 +65,9 @@ class HealthApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType:
-                  const FullType(HealthControllerGetHealth200Response),
+              specifiedType: const FullType(
+                HealthControllerGetHealth200Response,
+              ),
             ) as HealthControllerGetHealth200Response;
     } catch (error, stackTrace) {
       throw DioException(
@@ -120,13 +116,8 @@ class HealthApi {
     final _path = r'/api/v1/health/ready';
     final _options = Options(
       method: r'GET',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
-      extra: <String, dynamic>{
-        'secure': <Map<String, String>>[],
-        ...?extra,
-      },
+      headers: <String, dynamic>{...?headers},
+      extra: <String, dynamic>{'secure': <Map<String, String>>[], ...?extra},
       validateStatus: validateStatus,
     );
 
@@ -146,8 +137,9 @@ class HealthApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType:
-                  const FullType(HealthControllerGetHealth200Response),
+              specifiedType: const FullType(
+                HealthControllerGetHealth200Response,
+              ),
             ) as HealthControllerGetHealth200Response;
     } catch (error, stackTrace) {
       throw DioException(

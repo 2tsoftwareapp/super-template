@@ -15,17 +15,19 @@ class _$InvitationsControllerList200Response
   @override
   final PaginationMetaDto meta;
 
-  factory _$InvitationsControllerList200Response(
-          [void Function(InvitationsControllerList200ResponseBuilder)?
-              updates]) =>
+  factory _$InvitationsControllerList200Response([
+    void Function(InvitationsControllerList200ResponseBuilder)? updates,
+  ]) =>
       (InvitationsControllerList200ResponseBuilder()..update(updates))._build();
 
-  _$InvitationsControllerList200Response._(
-      {required this.data, required this.meta})
-      : super._();
+  _$InvitationsControllerList200Response._({
+    required this.data,
+    required this.meta,
+  }) : super._();
   @override
   InvitationsControllerList200Response rebuild(
-          void Function(InvitationsControllerList200ResponseBuilder) updates) =>
+    void Function(InvitationsControllerList200ResponseBuilder) updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -95,7 +97,8 @@ class InvitationsControllerList200ResponseBuilder
 
   @override
   void update(
-      void Function(InvitationsControllerList200ResponseBuilder)? updates) {
+    void Function(InvitationsControllerList200ResponseBuilder)? updates,
+  ) {
     if (updates != null) updates(this);
   }
 
@@ -119,9 +122,10 @@ class InvitationsControllerList200ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'InvitationsControllerList200Response',
-            _$failedField,
-            e.toString());
+          r'InvitationsControllerList200Response',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

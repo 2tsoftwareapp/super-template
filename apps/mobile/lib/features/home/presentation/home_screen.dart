@@ -84,13 +84,13 @@ class HomeScreen extends ConsumerWidget {
             icon: Icons.business,
             onTap: () => context.go('/organizations'),
           ),
-          if (authState?.permissions.contains('imports.manage') ?? false)
+          if (authState?.permissions.contains('imports.read') ?? false)
             _NavTile(
               title: 'Imports',
               icon: Icons.upload,
               onTap: () => context.go('/imports'),
             ),
-          if (authState?.permissions.contains('exports.manage') ?? false)
+          if (authState?.permissions.contains('exports.read') ?? false)
             _NavTile(
               title: 'Exports',
               icon: Icons.download,
@@ -115,7 +115,7 @@ bool _hasAdminAccess(List<String> permissions) {
     'jobs.read',
     'mail.read',
     'settings.read',
-    'notifications.send',
+    'notifications.read',
     'audit.read',
   };
   return permissions.any(adminPermissions.contains);

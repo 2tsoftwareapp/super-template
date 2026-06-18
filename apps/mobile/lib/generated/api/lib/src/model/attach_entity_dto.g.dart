@@ -21,12 +21,12 @@ class _$AttachEntityDto extends AttachEntityDto {
   factory _$AttachEntityDto([void Function(AttachEntityDtoBuilder)? updates]) =>
       (AttachEntityDtoBuilder()..update(updates))._build();
 
-  _$AttachEntityDto._(
-      {required this.fileId,
-      required this.entityType,
-      required this.entityId,
-      this.label})
-      : super._();
+  _$AttachEntityDto._({
+    required this.fileId,
+    required this.entityType,
+    required this.entityId,
+    this.label,
+  }) : super._();
   @override
   AttachEntityDto rebuild(void Function(AttachEntityDtoBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -119,11 +119,20 @@ class AttachEntityDtoBuilder
     final _$result = _$v ??
         _$AttachEntityDto._(
           fileId: BuiltValueNullFieldError.checkNotNull(
-              fileId, r'AttachEntityDto', 'fileId'),
+            fileId,
+            r'AttachEntityDto',
+            'fileId',
+          ),
           entityType: BuiltValueNullFieldError.checkNotNull(
-              entityType, r'AttachEntityDto', 'entityType'),
+            entityType,
+            r'AttachEntityDto',
+            'entityType',
+          ),
           entityId: BuiltValueNullFieldError.checkNotNull(
-              entityId, r'AttachEntityDto', 'entityId'),
+            entityId,
+            r'AttachEntityDto',
+            'entityId',
+          ),
           label: label,
         );
     replace(_$result);

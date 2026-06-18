@@ -31,14 +31,14 @@ abstract class AdminMailControllerListDeliveries200Response
 
   AdminMailControllerListDeliveries200Response._();
 
-  factory AdminMailControllerListDeliveries200Response(
-          [void updates(
-              AdminMailControllerListDeliveries200ResponseBuilder b)]) =
-      _$AdminMailControllerListDeliveries200Response;
+  factory AdminMailControllerListDeliveries200Response([
+    void updates(AdminMailControllerListDeliveries200ResponseBuilder b),
+  ]) = _$AdminMailControllerListDeliveries200Response;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(
-          AdminMailControllerListDeliveries200ResponseBuilder b) =>
+    AdminMailControllerListDeliveries200ResponseBuilder b,
+  ) =>
       b;
 
   @BuiltValueSerializer(custom: true)
@@ -53,7 +53,7 @@ class _$AdminMailControllerListDeliveries200ResponseSerializer
   @override
   final Iterable<Type> types = const [
     AdminMailControllerListDeliveries200Response,
-    _$AdminMailControllerListDeliveries200Response
+    _$AdminMailControllerListDeliveries200Response,
   ];
 
   @override
@@ -82,9 +82,11 @@ class _$AdminMailControllerListDeliveries200ResponseSerializer
     AdminMailControllerListDeliveries200Response object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(
@@ -102,8 +104,9 @@ class _$AdminMailControllerListDeliveries200ResponseSerializer
         case r'data':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType:
-                const FullType(BuiltList, [FullType(MailDeliveryDto)]),
+            specifiedType: const FullType(BuiltList, [
+              FullType(MailDeliveryDto),
+            ]),
           ) as BuiltList<MailDeliveryDto>;
           result.data.replace(valueDes);
           break;

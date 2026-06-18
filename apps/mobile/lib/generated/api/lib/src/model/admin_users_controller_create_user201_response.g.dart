@@ -15,19 +15,20 @@ class _$AdminUsersControllerCreateUser201Response
   @override
   final RequestMetaDto meta;
 
-  factory _$AdminUsersControllerCreateUser201Response(
-          [void Function(AdminUsersControllerCreateUser201ResponseBuilder)?
-              updates]) =>
+  factory _$AdminUsersControllerCreateUser201Response([
+    void Function(AdminUsersControllerCreateUser201ResponseBuilder)? updates,
+  ]) =>
       (AdminUsersControllerCreateUser201ResponseBuilder()..update(updates))
           ._build();
 
-  _$AdminUsersControllerCreateUser201Response._(
-      {required this.data, required this.meta})
-      : super._();
+  _$AdminUsersControllerCreateUser201Response._({
+    required this.data,
+    required this.meta,
+  }) : super._();
   @override
   AdminUsersControllerCreateUser201Response rebuild(
-          void Function(AdminUsersControllerCreateUser201ResponseBuilder)
-              updates) =>
+    void Function(AdminUsersControllerCreateUser201ResponseBuilder) updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -54,7 +55,8 @@ class _$AdminUsersControllerCreateUser201Response
   @override
   String toString() {
     return (newBuiltValueToStringHelper(
-            r'AdminUsersControllerCreateUser201Response')
+      r'AdminUsersControllerCreateUser201Response',
+    )
           ..add('data', data)
           ..add('meta', meta))
         .toString();
@@ -96,8 +98,8 @@ class AdminUsersControllerCreateUser201ResponseBuilder
 
   @override
   void update(
-      void Function(AdminUsersControllerCreateUser201ResponseBuilder)?
-          updates) {
+    void Function(AdminUsersControllerCreateUser201ResponseBuilder)? updates,
+  ) {
     if (updates != null) updates(this);
   }
 
@@ -121,9 +123,10 @@ class AdminUsersControllerCreateUser201ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'AdminUsersControllerCreateUser201Response',
-            _$failedField,
-            e.toString());
+          r'AdminUsersControllerCreateUser201Response',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

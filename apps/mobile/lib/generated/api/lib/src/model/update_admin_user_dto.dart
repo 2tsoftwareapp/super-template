@@ -20,7 +20,6 @@ part 'update_admin_user_dto.g.dart';
 /// * [displayName]
 /// * [avatarUrl]
 /// * [status]
-/// * [roleIds]
 @BuiltValue()
 abstract class UpdateAdminUserDto
     implements Built<UpdateAdminUserDto, UpdateAdminUserDtoBuilder> {
@@ -39,9 +38,6 @@ abstract class UpdateAdminUserDto
   @BuiltValueField(wireName: r'status')
   UpdateAdminUserDtoStatusEnum? get status;
   // enum statusEnum {  PENDING,  ACTIVE,  BLOCKED,  };
-
-  @BuiltValueField(wireName: r'roleIds')
-  BuiltList<String>? get roleIds;
 
   UpdateAdminUserDto._();
 
@@ -104,13 +100,6 @@ class _$UpdateAdminUserDtoSerializer
         specifiedType: const FullType(UpdateAdminUserDtoStatusEnum),
       );
     }
-    if (object.roleIds != null) {
-      yield r'roleIds';
-      yield serializers.serialize(
-        object.roleIds,
-        specifiedType: const FullType(BuiltList, [FullType(String)]),
-      );
-    }
   }
 
   @override
@@ -119,9 +108,11 @@ class _$UpdateAdminUserDtoSerializer
     UpdateAdminUserDto object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(
@@ -170,13 +161,6 @@ class _$UpdateAdminUserDtoSerializer
             specifiedType: const FullType(UpdateAdminUserDtoStatusEnum),
           ) as UpdateAdminUserDtoStatusEnum;
           result.status = valueDes;
-          break;
-        case r'roleIds':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(BuiltList, [FullType(String)]),
-          ) as BuiltList<String>;
-          result.roleIds.replace(valueDes);
           break;
         default:
           unhandled.add(key);

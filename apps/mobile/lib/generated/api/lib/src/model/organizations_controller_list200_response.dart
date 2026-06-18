@@ -31,9 +31,9 @@ abstract class OrganizationsControllerList200Response
 
   OrganizationsControllerList200Response._();
 
-  factory OrganizationsControllerList200Response(
-          [void updates(OrganizationsControllerList200ResponseBuilder b)]) =
-      _$OrganizationsControllerList200Response;
+  factory OrganizationsControllerList200Response([
+    void updates(OrganizationsControllerList200ResponseBuilder b),
+  ]) = _$OrganizationsControllerList200Response;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(OrganizationsControllerList200ResponseBuilder b) => b;
@@ -48,7 +48,7 @@ class _$OrganizationsControllerList200ResponseSerializer
   @override
   final Iterable<Type> types = const [
     OrganizationsControllerList200Response,
-    _$OrganizationsControllerList200Response
+    _$OrganizationsControllerList200Response,
   ];
 
   @override
@@ -77,9 +77,11 @@ class _$OrganizationsControllerList200ResponseSerializer
     OrganizationsControllerList200Response object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(
@@ -97,8 +99,9 @@ class _$OrganizationsControllerList200ResponseSerializer
         case r'data':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType:
-                const FullType(BuiltList, [FullType(OrganizationDto)]),
+            specifiedType: const FullType(BuiltList, [
+              FullType(OrganizationDto),
+            ]),
           ) as BuiltList<OrganizationDto>;
           result.data.replace(valueDes);
           break;

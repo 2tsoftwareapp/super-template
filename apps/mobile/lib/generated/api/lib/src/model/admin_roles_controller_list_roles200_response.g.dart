@@ -15,19 +15,20 @@ class _$AdminRolesControllerListRoles200Response
   @override
   final RequestMetaDto meta;
 
-  factory _$AdminRolesControllerListRoles200Response(
-          [void Function(AdminRolesControllerListRoles200ResponseBuilder)?
-              updates]) =>
+  factory _$AdminRolesControllerListRoles200Response([
+    void Function(AdminRolesControllerListRoles200ResponseBuilder)? updates,
+  ]) =>
       (AdminRolesControllerListRoles200ResponseBuilder()..update(updates))
           ._build();
 
-  _$AdminRolesControllerListRoles200Response._(
-      {required this.data, required this.meta})
-      : super._();
+  _$AdminRolesControllerListRoles200Response._({
+    required this.data,
+    required this.meta,
+  }) : super._();
   @override
   AdminRolesControllerListRoles200Response rebuild(
-          void Function(AdminRolesControllerListRoles200ResponseBuilder)
-              updates) =>
+    void Function(AdminRolesControllerListRoles200ResponseBuilder) updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -54,7 +55,8 @@ class _$AdminRolesControllerListRoles200Response
   @override
   String toString() {
     return (newBuiltValueToStringHelper(
-            r'AdminRolesControllerListRoles200Response')
+      r'AdminRolesControllerListRoles200Response',
+    )
           ..add('data', data)
           ..add('meta', meta))
         .toString();
@@ -96,7 +98,8 @@ class AdminRolesControllerListRoles200ResponseBuilder
 
   @override
   void update(
-      void Function(AdminRolesControllerListRoles200ResponseBuilder)? updates) {
+    void Function(AdminRolesControllerListRoles200ResponseBuilder)? updates,
+  ) {
     if (updates != null) updates(this);
   }
 
@@ -120,9 +123,10 @@ class AdminRolesControllerListRoles200ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'AdminRolesControllerListRoles200Response',
-            _$failedField,
-            e.toString());
+          r'AdminRolesControllerListRoles200Response',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

@@ -18,7 +18,7 @@ class _AdminJobsScreenState extends ConsumerState<AdminJobsScreen> {
     final permissions =
         ref.watch(authControllerProvider).valueOrNull?.permissions ?? [];
     final canRead = permissions.contains('jobs.read');
-    final canManage = permissions.contains('jobs.manage');
+    final canManage = permissions.contains('jobs.update');
 
     if (!canRead) {
       return Scaffold(

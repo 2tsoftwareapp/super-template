@@ -93,9 +93,15 @@ class LoginDtoBuilder implements Builder<LoginDto, LoginDtoBuilder> {
     final _$result = _$v ??
         _$LoginDto._(
           email: BuiltValueNullFieldError.checkNotNull(
-              email, r'LoginDto', 'email'),
+            email,
+            r'LoginDto',
+            'email',
+          ),
           password: BuiltValueNullFieldError.checkNotNull(
-              password, r'LoginDto', 'password'),
+            password,
+            r'LoginDto',
+            'password',
+          ),
         );
     replace(_$result);
     return _$result;

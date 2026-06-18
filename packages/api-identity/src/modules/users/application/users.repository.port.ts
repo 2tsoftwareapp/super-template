@@ -34,6 +34,11 @@ export interface UsersRepositoryPort {
     params: ListUsersQuery,
     executor?: DatabaseExecutor,
   ): Promise<UsersListResult>;
+  isUserInOrganization(
+    userId: string,
+    organizationId: string,
+    executor?: DatabaseExecutor,
+  ): Promise<boolean>;
   assertEmailAvailable(
     email: string,
     executor?: DatabaseExecutor,

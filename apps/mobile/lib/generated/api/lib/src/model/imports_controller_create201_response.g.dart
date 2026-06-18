@@ -15,17 +15,19 @@ class _$ImportsControllerCreate201Response
   @override
   final RequestMetaDto meta;
 
-  factory _$ImportsControllerCreate201Response(
-          [void Function(ImportsControllerCreate201ResponseBuilder)?
-              updates]) =>
+  factory _$ImportsControllerCreate201Response([
+    void Function(ImportsControllerCreate201ResponseBuilder)? updates,
+  ]) =>
       (ImportsControllerCreate201ResponseBuilder()..update(updates))._build();
 
-  _$ImportsControllerCreate201Response._(
-      {required this.data, required this.meta})
-      : super._();
+  _$ImportsControllerCreate201Response._({
+    required this.data,
+    required this.meta,
+  }) : super._();
   @override
   ImportsControllerCreate201Response rebuild(
-          void Function(ImportsControllerCreate201ResponseBuilder) updates) =>
+    void Function(ImportsControllerCreate201ResponseBuilder) updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -93,7 +95,8 @@ class ImportsControllerCreate201ResponseBuilder
 
   @override
   void update(
-      void Function(ImportsControllerCreate201ResponseBuilder)? updates) {
+    void Function(ImportsControllerCreate201ResponseBuilder)? updates,
+  ) {
     if (updates != null) updates(this);
   }
 
@@ -117,7 +120,10 @@ class ImportsControllerCreate201ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'ImportsControllerCreate201Response', _$failedField, e.toString());
+          r'ImportsControllerCreate201Response',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

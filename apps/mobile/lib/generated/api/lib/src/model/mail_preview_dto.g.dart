@@ -19,9 +19,11 @@ class _$MailPreviewDto extends MailPreviewDto {
   factory _$MailPreviewDto([void Function(MailPreviewDtoBuilder)? updates]) =>
       (MailPreviewDtoBuilder()..update(updates))._build();
 
-  _$MailPreviewDto._(
-      {required this.subject, required this.text, required this.html})
-      : super._();
+  _$MailPreviewDto._({
+    required this.subject,
+    required this.text,
+    required this.html,
+  }) : super._();
   @override
   MailPreviewDto rebuild(void Function(MailPreviewDtoBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -106,11 +108,20 @@ class MailPreviewDtoBuilder
     final _$result = _$v ??
         _$MailPreviewDto._(
           subject: BuiltValueNullFieldError.checkNotNull(
-              subject, r'MailPreviewDto', 'subject'),
+            subject,
+            r'MailPreviewDto',
+            'subject',
+          ),
           text: BuiltValueNullFieldError.checkNotNull(
-              text, r'MailPreviewDto', 'text'),
+            text,
+            r'MailPreviewDto',
+            'text',
+          ),
           html: BuiltValueNullFieldError.checkNotNull(
-              html, r'MailPreviewDto', 'html'),
+            html,
+            r'MailPreviewDto',
+            'html',
+          ),
         );
     replace(_$result);
     return _$result;

@@ -14,8 +14,9 @@ class _$SuccessMessageDto extends SuccessMessageDto {
   @override
   final String message;
 
-  factory _$SuccessMessageDto(
-          [void Function(SuccessMessageDtoBuilder)? updates]) =>
+  factory _$SuccessMessageDto([
+    void Function(SuccessMessageDtoBuilder)? updates,
+  ]) =>
       (SuccessMessageDtoBuilder()..update(updates))._build();
 
   _$SuccessMessageDto._({required this.success, required this.message})
@@ -97,9 +98,15 @@ class SuccessMessageDtoBuilder
     final _$result = _$v ??
         _$SuccessMessageDto._(
           success: BuiltValueNullFieldError.checkNotNull(
-              success, r'SuccessMessageDto', 'success'),
+            success,
+            r'SuccessMessageDto',
+            'success',
+          ),
           message: BuiltValueNullFieldError.checkNotNull(
-              message, r'SuccessMessageDto', 'message'),
+            message,
+            r'SuccessMessageDto',
+            'message',
+          ),
         );
     replace(_$result);
     return _$result;

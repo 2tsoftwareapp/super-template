@@ -50,16 +50,22 @@ class _$HealthStatusDtoStatusEnumSerializer
   final String wireName = 'HealthStatusDtoStatusEnum';
 
   @override
-  Object serialize(Serializers serializers, HealthStatusDtoStatusEnum object,
-          {FullType specifiedType = FullType.unspecified}) =>
+  Object serialize(
+    Serializers serializers,
+    HealthStatusDtoStatusEnum object, {
+    FullType specifiedType = FullType.unspecified,
+  }) =>
       _toWire[object.name] ?? object.name;
 
   @override
   HealthStatusDtoStatusEnum deserialize(
-          Serializers serializers, Object serialized,
-          {FullType specifiedType = FullType.unspecified}) =>
+    Serializers serializers,
+    Object serialized, {
+    FullType specifiedType = FullType.unspecified,
+  }) =>
       HealthStatusDtoStatusEnum.valueOf(
-          _fromWire[serialized] ?? (serialized is String ? serialized : ''));
+        _fromWire[serialized] ?? (serialized is String ? serialized : ''),
+      );
 }
 
 class _$HealthStatusDto extends HealthStatusDto {
@@ -93,8 +99,9 @@ class _$HealthStatusDto extends HealthStatusDto {
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper(r'HealthStatusDto')
-          ..add('status', status))
+    return (newBuiltValueToStringHelper(
+      r'HealthStatusDto',
+    )..add('status', status))
         .toString();
   }
 }
@@ -137,7 +144,10 @@ class HealthStatusDtoBuilder
     final _$result = _$v ??
         _$HealthStatusDto._(
           status: BuiltValueNullFieldError.checkNotNull(
-              status, r'HealthStatusDto', 'status'),
+            status,
+            r'HealthStatusDto',
+            'status',
+          ),
         );
     replace(_$result);
     return _$result;

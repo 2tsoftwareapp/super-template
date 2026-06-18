@@ -31,14 +31,14 @@ abstract class AdminSettingsControllerListSettings200Response
 
   AdminSettingsControllerListSettings200Response._();
 
-  factory AdminSettingsControllerListSettings200Response(
-          [void updates(
-              AdminSettingsControllerListSettings200ResponseBuilder b)]) =
-      _$AdminSettingsControllerListSettings200Response;
+  factory AdminSettingsControllerListSettings200Response([
+    void updates(AdminSettingsControllerListSettings200ResponseBuilder b),
+  ]) = _$AdminSettingsControllerListSettings200Response;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(
-          AdminSettingsControllerListSettings200ResponseBuilder b) =>
+    AdminSettingsControllerListSettings200ResponseBuilder b,
+  ) =>
       b;
 
   @BuiltValueSerializer(custom: true)
@@ -53,7 +53,7 @@ class _$AdminSettingsControllerListSettings200ResponseSerializer
   @override
   final Iterable<Type> types = const [
     AdminSettingsControllerListSettings200Response,
-    _$AdminSettingsControllerListSettings200Response
+    _$AdminSettingsControllerListSettings200Response,
   ];
 
   @override
@@ -67,8 +67,9 @@ class _$AdminSettingsControllerListSettings200ResponseSerializer
     yield r'data';
     yield serializers.serialize(
       object.data,
-      specifiedType:
-          const FullType(BuiltList, [FullType(ApplicationSettingDto)]),
+      specifiedType: const FullType(BuiltList, [
+        FullType(ApplicationSettingDto),
+      ]),
     );
     yield r'meta';
     yield serializers.serialize(
@@ -83,9 +84,11 @@ class _$AdminSettingsControllerListSettings200ResponseSerializer
     AdminSettingsControllerListSettings200Response object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(
@@ -103,8 +106,9 @@ class _$AdminSettingsControllerListSettings200ResponseSerializer
         case r'data':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType:
-                const FullType(BuiltList, [FullType(ApplicationSettingDto)]),
+            specifiedType: const FullType(BuiltList, [
+              FullType(ApplicationSettingDto),
+            ]),
           ) as BuiltList<ApplicationSettingDto>;
           result.data.replace(valueDes);
           break;

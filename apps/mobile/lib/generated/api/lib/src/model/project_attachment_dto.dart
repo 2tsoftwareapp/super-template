@@ -67,7 +67,7 @@ class _$ProjectAttachmentDtoSerializer
   @override
   final Iterable<Type> types = const [
     ProjectAttachmentDto,
-    _$ProjectAttachmentDto
+    _$ProjectAttachmentDto,
   ];
 
   @override
@@ -130,9 +130,11 @@ class _$ProjectAttachmentDtoSerializer
     ProjectAttachmentDto object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(

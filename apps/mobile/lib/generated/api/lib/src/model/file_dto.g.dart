@@ -29,16 +29,16 @@ class _$FileDto extends FileDto {
   factory _$FileDto([void Function(FileDtoBuilder)? updates]) =>
       (FileDtoBuilder()..update(updates))._build();
 
-  _$FileDto._(
-      {required this.id,
-      required this.storageKey,
-      required this.originalName,
-      required this.mimeType,
-      required this.sizeBytes,
-      this.uploadedById,
-      required this.createdAt,
-      required this.updatedAt})
-      : super._();
+  _$FileDto._({
+    required this.id,
+    required this.storageKey,
+    required this.originalName,
+    required this.mimeType,
+    required this.sizeBytes,
+    this.uploadedById,
+    required this.createdAt,
+    required this.updatedAt,
+  }) : super._();
   @override
   FileDto rebuild(void Function(FileDtoBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -164,18 +164,36 @@ class FileDtoBuilder implements Builder<FileDto, FileDtoBuilder> {
         _$FileDto._(
           id: BuiltValueNullFieldError.checkNotNull(id, r'FileDto', 'id'),
           storageKey: BuiltValueNullFieldError.checkNotNull(
-              storageKey, r'FileDto', 'storageKey'),
+            storageKey,
+            r'FileDto',
+            'storageKey',
+          ),
           originalName: BuiltValueNullFieldError.checkNotNull(
-              originalName, r'FileDto', 'originalName'),
+            originalName,
+            r'FileDto',
+            'originalName',
+          ),
           mimeType: BuiltValueNullFieldError.checkNotNull(
-              mimeType, r'FileDto', 'mimeType'),
+            mimeType,
+            r'FileDto',
+            'mimeType',
+          ),
           sizeBytes: BuiltValueNullFieldError.checkNotNull(
-              sizeBytes, r'FileDto', 'sizeBytes'),
+            sizeBytes,
+            r'FileDto',
+            'sizeBytes',
+          ),
           uploadedById: uploadedById,
           createdAt: BuiltValueNullFieldError.checkNotNull(
-              createdAt, r'FileDto', 'createdAt'),
+            createdAt,
+            r'FileDto',
+            'createdAt',
+          ),
           updatedAt: BuiltValueNullFieldError.checkNotNull(
-              updatedAt, r'FileDto', 'updatedAt'),
+            updatedAt,
+            r'FileDto',
+            'updatedAt',
+          ),
         );
     replace(_$result);
     return _$result;

@@ -31,14 +31,14 @@ abstract class AdminNotificationsControllerListJobs200Response
 
   AdminNotificationsControllerListJobs200Response._();
 
-  factory AdminNotificationsControllerListJobs200Response(
-          [void updates(
-              AdminNotificationsControllerListJobs200ResponseBuilder b)]) =
-      _$AdminNotificationsControllerListJobs200Response;
+  factory AdminNotificationsControllerListJobs200Response([
+    void updates(AdminNotificationsControllerListJobs200ResponseBuilder b),
+  ]) = _$AdminNotificationsControllerListJobs200Response;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(
-          AdminNotificationsControllerListJobs200ResponseBuilder b) =>
+    AdminNotificationsControllerListJobs200ResponseBuilder b,
+  ) =>
       b;
 
   @BuiltValueSerializer(custom: true)
@@ -53,7 +53,7 @@ class _$AdminNotificationsControllerListJobs200ResponseSerializer
   @override
   final Iterable<Type> types = const [
     AdminNotificationsControllerListJobs200Response,
-    _$AdminNotificationsControllerListJobs200Response
+    _$AdminNotificationsControllerListJobs200Response,
   ];
 
   @override
@@ -82,9 +82,11 @@ class _$AdminNotificationsControllerListJobs200ResponseSerializer
     AdminNotificationsControllerListJobs200Response object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(
@@ -102,8 +104,9 @@ class _$AdminNotificationsControllerListJobs200ResponseSerializer
         case r'data':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType:
-                const FullType(BuiltList, [FullType(NotificationJobDto)]),
+            specifiedType: const FullType(BuiltList, [
+              FullType(NotificationJobDto),
+            ]),
           ) as BuiltList<NotificationJobDto>;
           result.data.replace(valueDes);
           break;

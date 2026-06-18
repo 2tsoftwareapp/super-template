@@ -47,21 +47,17 @@ class AdminNotificationsApi {
     ProgressCallback? onReceiveProgress,
   }) async {
     final _path = r'/api/v1/admin/notifications/jobs/{id}'.replaceAll(
-        '{' r'id' '}',
-        encodeQueryParameter(_serializers, id, const FullType(String))
-            .toString());
+      '{'
+      r'id'
+      '}',
+      encodeQueryParameter(_serializers, id, const FullType(String)).toString(),
+    );
     final _options = Options(
       method: r'DELETE',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -84,8 +80,9 @@ class AdminNotificationsApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType:
-                  const FullType(AdminNotificationsControllerSend201Response),
+              specifiedType: const FullType(
+                AdminNotificationsControllerSend201Response,
+              ),
             ) as AdminNotificationsControllerSend201Response;
     } catch (error, stackTrace) {
       throw DioException(
@@ -134,21 +131,17 @@ class AdminNotificationsApi {
     ProgressCallback? onReceiveProgress,
   }) async {
     final _path = r'/api/v1/admin/notifications/jobs/{id}'.replaceAll(
-        '{' r'id' '}',
-        encodeQueryParameter(_serializers, id, const FullType(String))
-            .toString());
+      '{'
+      r'id'
+      '}',
+      encodeQueryParameter(_serializers, id, const FullType(String)).toString(),
+    );
     final _options = Options(
       method: r'GET',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -171,8 +164,9 @@ class AdminNotificationsApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType:
-                  const FullType(AdminNotificationsControllerSend201Response),
+              specifiedType: const FullType(
+                AdminNotificationsControllerSend201Response,
+              ),
             ) as AdminNotificationsControllerSend201Response;
     } catch (error, stackTrace) {
       throw DioException(
@@ -229,16 +223,10 @@ class AdminNotificationsApi {
     final _path = r'/api/v1/admin/notifications/jobs';
     final _options = Options(
       method: r'GET',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -249,14 +237,23 @@ class AdminNotificationsApi {
       if (page != null)
         r'page': encodeQueryParameter(_serializers, page, const FullType(num)),
       if (limit != null)
-        r'limit':
-            encodeQueryParameter(_serializers, limit, const FullType(num)),
+        r'limit': encodeQueryParameter(
+          _serializers,
+          limit,
+          const FullType(num),
+        ),
       if (sortOrder != null)
         r'sortOrder': encodeQueryParameter(
-            _serializers, sortOrder, const FullType(String)),
+          _serializers,
+          sortOrder,
+          const FullType(String),
+        ),
       if (status != null)
-        r'status':
-            encodeQueryParameter(_serializers, status, const FullType(String)),
+        r'status': encodeQueryParameter(
+          _serializers,
+          status,
+          const FullType(String),
+        ),
     };
 
     final _response = await _dio.request<Object>(
@@ -277,7 +274,8 @@ class AdminNotificationsApi {
           : _serializers.deserialize(
               rawResponse,
               specifiedType: const FullType(
-                  AdminNotificationsControllerListJobs200Response),
+                AdminNotificationsControllerListJobs200Response,
+              ),
             ) as AdminNotificationsControllerListJobs200Response;
     } catch (error, stackTrace) {
       throw DioException(
@@ -328,16 +326,10 @@ class AdminNotificationsApi {
     final _path = r'/api/v1/admin/notifications';
     final _options = Options(
       method: r'POST',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -349,14 +341,13 @@ class AdminNotificationsApi {
 
     try {
       const _type = FullType(SendNotificationRequestDto);
-      _bodyData = _serializers.serialize(sendNotificationRequestDto,
-          specifiedType: _type);
+      _bodyData = _serializers.serialize(
+        sendNotificationRequestDto,
+        specifiedType: _type,
+      );
     } catch (error, stackTrace) {
       throw DioException(
-        requestOptions: _options.compose(
-          _dio.options,
-          _path,
-        ),
+        requestOptions: _options.compose(_dio.options, _path),
         type: DioExceptionType.unknown,
         error: error,
         stackTrace: stackTrace,
@@ -380,8 +371,9 @@ class AdminNotificationsApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType:
-                  const FullType(AdminNotificationsControllerSend201Response),
+              specifiedType: const FullType(
+                AdminNotificationsControllerSend201Response,
+              ),
             ) as AdminNotificationsControllerSend201Response;
     } catch (error, stackTrace) {
       throw DioException(

@@ -7,8 +7,7 @@ import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import {
   AppError,
   ERROR_CODES,
-  PROJECT_DEMO_GATEWAY,
-  type ProjectDemoGateway,
+  ImportExportAdapterRegistry,
   requireOrganizationId,
 } from '@repo/api-core';
 import { randomUUID } from 'node:crypto';
@@ -28,8 +27,7 @@ export class ExportsService {
   constructor(
     private readonly exportJobsRepository: ExportJobsRepository,
     private readonly filesRepository: FilesRepository,
-    @Inject(PROJECT_DEMO_GATEWAY)
-    private readonly projectDemoGateway: ProjectDemoGateway,
+    private readonly importExportAdapters: ImportExportAdapterRegistry,
     @Inject(OBJECT_STORAGE) private readonly objectStorage: ObjectStorage,
     private readonly auditService: AuditService,
   ) {}
@@ -116,31 +114,19 @@ export class ExportsService {
     organizationId: string,
     input: CreateExportCommand,
   ) {
-    if (input.type !== 'projects') {
-      throw new AppError(
-        ERROR_CODES.VALIDATION_FAILED,
-        `Unsupported export type "${input.type}"`,
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
-    const result = await this.projectDemoGateway.list({
-      page: 1,
-      limit: 1000,
-      ownerId: actor.userId,
+    const adapter = this.importExportAdapters.resolve(input.type);
+    const rows = await adapter.listForExport({
       organizationId,
-      sortField: 'updatedAt',
-      sortOrder: 'desc',
+      ownerId: actor.userId,
     });
 
     const lines = [
-      'name,description,status',
-      ...result.rows.map((project) =>
-        [
-          this.escapeCsv(project.name),
-          this.escapeCsv(project.description ?? ''),
-          project.status,
-        ].join(','),
+      adapter.csvHeader.join(','),
+      ...rows.map((row) =>
+        adapter
+          .toCsvRow(row)
+          .map((value) => this.escapeCsv(value))
+          .join(','),
       ),
     ];
 
@@ -157,7 +143,7 @@ export class ExportsService {
       const file = await this.filesRepository.create({
         organizationId,
         storageKey,
-        originalName: `projects-export-${Date.now()}.csv`,
+        originalName: `${input.type}-export-${Date.now()}.csv`,
         mimeType: 'text/csv',
         sizeBytes: body.length,
         uploadedById: actor.userId,
@@ -175,11 +161,18 @@ export class ExportsService {
   }
 
   private escapeCsv(value: string) {
-    if (value.includes(',') || value.includes('"') || value.includes('\n')) {
-      return `"${value.replace(/"/g, '""')}"`;
+    // Neutralize formula injection: spreadsheet apps execute cells starting with these characters.
+    const sanitized = /^[=+\-@\t\r]/.test(value) ? `'${value}` : value;
+
+    if (
+      sanitized.includes(',') ||
+      sanitized.includes('"') ||
+      sanitized.includes('\n')
+    ) {
+      return `"${sanitized.replace(/"/g, '""')}"`;
     }
 
-    return value;
+    return sanitized;
   }
 
   private toDto(

@@ -31,9 +31,9 @@ abstract class InvitationsControllerList200Response
 
   InvitationsControllerList200Response._();
 
-  factory InvitationsControllerList200Response(
-          [void updates(InvitationsControllerList200ResponseBuilder b)]) =
-      _$InvitationsControllerList200Response;
+  factory InvitationsControllerList200Response([
+    void updates(InvitationsControllerList200ResponseBuilder b),
+  ]) = _$InvitationsControllerList200Response;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(InvitationsControllerList200ResponseBuilder b) => b;
@@ -48,7 +48,7 @@ class _$InvitationsControllerList200ResponseSerializer
   @override
   final Iterable<Type> types = const [
     InvitationsControllerList200Response,
-    _$InvitationsControllerList200Response
+    _$InvitationsControllerList200Response,
   ];
 
   @override
@@ -77,9 +77,11 @@ class _$InvitationsControllerList200ResponseSerializer
     InvitationsControllerList200Response object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(
@@ -97,7 +99,9 @@ class _$InvitationsControllerList200ResponseSerializer
         case r'data':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(BuiltList, [FullType(InvitationDto)]),
+            specifiedType: const FullType(BuiltList, [
+              FullType(InvitationDto),
+            ]),
           ) as BuiltList<InvitationDto>;
           result.data.replace(valueDes);
           break;

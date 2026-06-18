@@ -39,7 +39,9 @@ class _$VerifyEmailDto extends VerifyEmailDto {
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper(r'VerifyEmailDto')..add('token', token))
+    return (newBuiltValueToStringHelper(
+      r'VerifyEmailDto',
+    )..add('token', token))
         .toString();
   }
 }
@@ -82,7 +84,10 @@ class VerifyEmailDtoBuilder
     final _$result = _$v ??
         _$VerifyEmailDto._(
           token: BuiltValueNullFieldError.checkNotNull(
-              token, r'VerifyEmailDto', 'token'),
+            token,
+            r'VerifyEmailDto',
+            'token',
+          ),
         );
     replace(_$result);
     return _$result;

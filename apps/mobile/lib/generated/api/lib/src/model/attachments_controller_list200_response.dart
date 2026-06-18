@@ -31,9 +31,9 @@ abstract class AttachmentsControllerList200Response
 
   AttachmentsControllerList200Response._();
 
-  factory AttachmentsControllerList200Response(
-          [void updates(AttachmentsControllerList200ResponseBuilder b)]) =
-      _$AttachmentsControllerList200Response;
+  factory AttachmentsControllerList200Response([
+    void updates(AttachmentsControllerList200ResponseBuilder b),
+  ]) = _$AttachmentsControllerList200Response;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(AttachmentsControllerList200ResponseBuilder b) => b;
@@ -48,7 +48,7 @@ class _$AttachmentsControllerList200ResponseSerializer
   @override
   final Iterable<Type> types = const [
     AttachmentsControllerList200Response,
-    _$AttachmentsControllerList200Response
+    _$AttachmentsControllerList200Response,
   ];
 
   @override
@@ -77,9 +77,11 @@ class _$AttachmentsControllerList200ResponseSerializer
     AttachmentsControllerList200Response object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(
@@ -97,7 +99,9 @@ class _$AttachmentsControllerList200ResponseSerializer
         case r'data':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(BuiltList, [FullType(AttachmentDto)]),
+            specifiedType: const FullType(BuiltList, [
+              FullType(AttachmentDto),
+            ]),
           ) as BuiltList<AttachmentDto>;
           result.data.replace(valueDes);
           break;

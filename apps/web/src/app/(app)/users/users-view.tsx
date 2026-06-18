@@ -81,6 +81,7 @@ export function UsersView() {
     password: "",
     displayName: "",
     status: "ACTIVE",
+    role: "USER",
   });
   const users = useQuery({
     queryKey: ["users", filters],
@@ -103,6 +104,7 @@ export function UsersView() {
         password: "",
         displayName: "",
         status: "ACTIVE",
+        role: "USER",
       });
       void queryClient.invalidateQueries({ queryKey: ["users"] });
     },

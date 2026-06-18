@@ -71,15 +71,22 @@ class _$ImportJobDtoStatusEnumSerializer
   final String wireName = 'ImportJobDtoStatusEnum';
 
   @override
-  Object serialize(Serializers serializers, ImportJobDtoStatusEnum object,
-          {FullType specifiedType = FullType.unspecified}) =>
+  Object serialize(
+    Serializers serializers,
+    ImportJobDtoStatusEnum object, {
+    FullType specifiedType = FullType.unspecified,
+  }) =>
       _toWire[object.name] ?? object.name;
 
   @override
-  ImportJobDtoStatusEnum deserialize(Serializers serializers, Object serialized,
-          {FullType specifiedType = FullType.unspecified}) =>
+  ImportJobDtoStatusEnum deserialize(
+    Serializers serializers,
+    Object serialized, {
+    FullType specifiedType = FullType.unspecified,
+  }) =>
       ImportJobDtoStatusEnum.valueOf(
-          _fromWire[serialized] ?? (serialized is String ? serialized : ''));
+        _fromWire[serialized] ?? (serialized is String ? serialized : ''),
+      );
 }
 
 class _$ImportJobDto extends ImportJobDto {
@@ -113,21 +120,21 @@ class _$ImportJobDto extends ImportJobDto {
   factory _$ImportJobDto([void Function(ImportJobDtoBuilder)? updates]) =>
       (ImportJobDtoBuilder()..update(updates))._build();
 
-  _$ImportJobDto._(
-      {required this.id,
-      required this.type,
-      required this.fileId,
-      required this.status,
-      this.rowCount,
-      this.successCount,
-      this.errorCount,
-      this.errors,
-      required this.createdById,
-      this.confirmedAt,
-      this.completedAt,
-      required this.createdAt,
-      required this.updatedAt})
-      : super._();
+  _$ImportJobDto._({
+    required this.id,
+    required this.type,
+    required this.fileId,
+    required this.status,
+    this.rowCount,
+    this.successCount,
+    this.errorCount,
+    this.errors,
+    required this.createdById,
+    this.confirmedAt,
+    this.completedAt,
+    required this.createdAt,
+    required this.updatedAt,
+  }) : super._();
   @override
   ImportJobDto rebuild(void Function(ImportJobDtoBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -296,25 +303,46 @@ class ImportJobDtoBuilder
       _$result = _$v ??
           _$ImportJobDto._(
             id: BuiltValueNullFieldError.checkNotNull(
-                id, r'ImportJobDto', 'id'),
+              id,
+              r'ImportJobDto',
+              'id',
+            ),
             type: BuiltValueNullFieldError.checkNotNull(
-                type, r'ImportJobDto', 'type'),
+              type,
+              r'ImportJobDto',
+              'type',
+            ),
             fileId: BuiltValueNullFieldError.checkNotNull(
-                fileId, r'ImportJobDto', 'fileId'),
+              fileId,
+              r'ImportJobDto',
+              'fileId',
+            ),
             status: BuiltValueNullFieldError.checkNotNull(
-                status, r'ImportJobDto', 'status'),
+              status,
+              r'ImportJobDto',
+              'status',
+            ),
             rowCount: rowCount,
             successCount: successCount,
             errorCount: errorCount,
             errors: _errors?.build(),
             createdById: BuiltValueNullFieldError.checkNotNull(
-                createdById, r'ImportJobDto', 'createdById'),
+              createdById,
+              r'ImportJobDto',
+              'createdById',
+            ),
             confirmedAt: confirmedAt,
             completedAt: completedAt,
             createdAt: BuiltValueNullFieldError.checkNotNull(
-                createdAt, r'ImportJobDto', 'createdAt'),
+              createdAt,
+              r'ImportJobDto',
+              'createdAt',
+            ),
             updatedAt: BuiltValueNullFieldError.checkNotNull(
-                updatedAt, r'ImportJobDto', 'updatedAt'),
+              updatedAt,
+              r'ImportJobDto',
+              'updatedAt',
+            ),
           );
     } catch (_) {
       late String _$failedField;
@@ -323,7 +351,10 @@ class ImportJobDtoBuilder
         _errors?.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'ImportJobDto', _$failedField, e.toString());
+          r'ImportJobDto',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

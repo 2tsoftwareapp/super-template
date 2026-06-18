@@ -68,8 +68,12 @@ export class AccessControlService {
     assertCanAssignRoles(actor, targetRoleNames, desiredRoleNames);
   }
 
-  getRoleByName(name: string, executor?: DatabaseExecutor) {
-    return this.roleQueryUseCase.getRoleByName(name, null, executor);
+  getRoleByName(
+    name: string,
+    organizationId?: string | null,
+    executor?: DatabaseExecutor,
+  ) {
+    return this.roleQueryUseCase.getRoleByName(name, organizationId ?? null, executor);
   }
 
   getOrganizationRoleByName(
@@ -88,36 +92,6 @@ export class AccessControlService {
     return this.roleQueryUseCase.listPermissions();
   }
 
-  createRole(
-    actor: AuthenticatedRequestUser,
-    input: Parameters<RoleManagementUseCase['create']>[1],
-    requestContext?: Parameters<RoleManagementUseCase['create']>[2],
-  ) {
-    return this.roleManagementUseCase.create(actor, input, requestContext);
-  }
-
-  updateRole(
-    actor: AuthenticatedRequestUser,
-    roleId: string,
-    input: Parameters<RoleManagementUseCase['update']>[2],
-    requestContext?: Parameters<RoleManagementUseCase['update']>[3],
-  ) {
-    return this.roleManagementUseCase.update(
-      actor,
-      roleId,
-      input,
-      requestContext,
-    );
-  }
-
-  deleteRole(
-    actor: AuthenticatedRequestUser,
-    roleId: string,
-    requestContext?: Parameters<RoleManagementUseCase['delete']>[2],
-  ) {
-    return this.roleManagementUseCase.delete(actor, roleId, requestContext);
-  }
-
   ensureOrganizationAdminRole(
     organizationId: string,
     userId: string,
@@ -127,44 +101,6 @@ export class AccessControlService {
       organizationId,
       userId,
       executor,
-    );
-  }
-
-  createPermission(
-    actor: AuthenticatedRequestUser,
-    input: Parameters<RoleManagementUseCase['createPermission']>[1],
-    requestContext?: Parameters<RoleManagementUseCase['createPermission']>[2],
-  ) {
-    return this.roleManagementUseCase.createPermission(
-      actor,
-      input,
-      requestContext,
-    );
-  }
-
-  updatePermission(
-    actor: AuthenticatedRequestUser,
-    permissionId: string,
-    input: Parameters<RoleManagementUseCase['updatePermission']>[2],
-    requestContext?: Parameters<RoleManagementUseCase['updatePermission']>[3],
-  ) {
-    return this.roleManagementUseCase.updatePermission(
-      actor,
-      permissionId,
-      input,
-      requestContext,
-    );
-  }
-
-  deletePermission(
-    actor: AuthenticatedRequestUser,
-    permissionId: string,
-    requestContext?: Parameters<RoleManagementUseCase['deletePermission']>[2],
-  ) {
-    return this.roleManagementUseCase.deletePermission(
-      actor,
-      permissionId,
-      requestContext,
     );
   }
 

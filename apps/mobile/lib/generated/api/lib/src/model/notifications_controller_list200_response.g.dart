@@ -15,19 +15,20 @@ class _$NotificationsControllerList200Response
   @override
   final PaginationMetaDto meta;
 
-  factory _$NotificationsControllerList200Response(
-          [void Function(NotificationsControllerList200ResponseBuilder)?
-              updates]) =>
+  factory _$NotificationsControllerList200Response([
+    void Function(NotificationsControllerList200ResponseBuilder)? updates,
+  ]) =>
       (NotificationsControllerList200ResponseBuilder()..update(updates))
           ._build();
 
-  _$NotificationsControllerList200Response._(
-      {required this.data, required this.meta})
-      : super._();
+  _$NotificationsControllerList200Response._({
+    required this.data,
+    required this.meta,
+  }) : super._();
   @override
   NotificationsControllerList200Response rebuild(
-          void Function(NotificationsControllerList200ResponseBuilder)
-              updates) =>
+    void Function(NotificationsControllerList200ResponseBuilder) updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -54,7 +55,8 @@ class _$NotificationsControllerList200Response
   @override
   String toString() {
     return (newBuiltValueToStringHelper(
-            r'NotificationsControllerList200Response')
+      r'NotificationsControllerList200Response',
+    )
           ..add('data', data)
           ..add('meta', meta))
         .toString();
@@ -98,7 +100,8 @@ class NotificationsControllerList200ResponseBuilder
 
   @override
   void update(
-      void Function(NotificationsControllerList200ResponseBuilder)? updates) {
+    void Function(NotificationsControllerList200ResponseBuilder)? updates,
+  ) {
     if (updates != null) updates(this);
   }
 
@@ -122,9 +125,10 @@ class NotificationsControllerList200ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'NotificationsControllerList200Response',
-            _$failedField,
-            e.toString());
+          r'NotificationsControllerList200Response',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

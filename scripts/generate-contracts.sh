@@ -60,38 +60,15 @@ run_step \
   cd "$TMP_GEN_DIR"
   run_step "Install Dart client dependencies" dart pub get
   run_step "Build generated Dart serializers" dart run build_runner build
-  node -e "
-const fs = require('fs');
-const path = require('path');
-function walk(dir) {
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    const p = path.join(dir, entry.name);
-    if (entry.isDirectory()) walk(p);
-    else if (entry.name.endsWith('.dart')) {
-      let src = fs.readFileSync(p, 'utf8');
-      // Add explicit language version so library and part files match under
-      // Flutter's patched Dart SDK (avoids CFE language-version-override error).
-      if (!src.includes('// @dart=')) {
-        const lines = src.split('\\n');
-        let insert = 0;
-        for (let i = 0; i < lines.length; i++) {
-          if (lines[i].trim() !== '' && !lines[i].startsWith('//')) {
-            insert = i;
-            break;
-          }
-        }
-        lines.splice(insert, 0, '// @dart=3.0', '');
-        src = lines.join('\\n');
-      }
-      fs.writeFileSync(p, src);
-    }
-  }
-}
-walk('lib');
-"
   rm -rf .dart_tool doc test .openapi-generator pubspec.lock
   run_step "Format generated Dart client" dart format .
 )
 
 rm -rf apps/mobile/lib/generated/api
 mv "$TMP_GEN_DIR" apps/mobile/lib/generated/api
+run_step \
+  "Patch generated Dart client" \
+  node "$ROOT_DIR/scripts/patch-dart-openapi-client.mjs" apps/mobile/lib/generated/api
+if has_command dart; then
+  run_step "Format generated Dart client in app" dart format apps/mobile/lib/generated/api
+fi

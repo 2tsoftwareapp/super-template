@@ -39,8 +39,9 @@ class _$SuccessFlagDto extends SuccessFlagDto {
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper(r'SuccessFlagDto')
-          ..add('success', success))
+    return (newBuiltValueToStringHelper(
+      r'SuccessFlagDto',
+    )..add('success', success))
         .toString();
   }
 }
@@ -83,7 +84,10 @@ class SuccessFlagDtoBuilder
     final _$result = _$v ??
         _$SuccessFlagDto._(
           success: BuiltValueNullFieldError.checkNotNull(
-              success, r'SuccessFlagDto', 'success'),
+            success,
+            r'SuccessFlagDto',
+            'success',
+          ),
         );
     replace(_$result);
     return _$result;

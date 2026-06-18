@@ -22,8 +22,9 @@ abstract class CreateOrganizationDto
 
   CreateOrganizationDto._();
 
-  factory CreateOrganizationDto(
-      [void updates(CreateOrganizationDtoBuilder b)]) = _$CreateOrganizationDto;
+  factory CreateOrganizationDto([
+    void updates(CreateOrganizationDtoBuilder b),
+  ]) = _$CreateOrganizationDto;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(CreateOrganizationDtoBuilder b) => b;
@@ -38,7 +39,7 @@ class _$CreateOrganizationDtoSerializer
   @override
   final Iterable<Type> types = const [
     CreateOrganizationDto,
-    _$CreateOrganizationDto
+    _$CreateOrganizationDto,
   ];
 
   @override
@@ -62,9 +63,11 @@ class _$CreateOrganizationDtoSerializer
     CreateOrganizationDto object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(

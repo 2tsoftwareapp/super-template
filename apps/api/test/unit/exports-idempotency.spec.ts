@@ -1,5 +1,5 @@
 import { Test } from '@nestjs/testing';
-import { PROJECT_DEMO_GATEWAY } from '@repo/api-core';
+import { ImportExportAdapterRegistry } from '@repo/api-core';
 import { ExportsService } from '@repo/api-platform/modules/exports/application/exports.service';
 import { ExportJobsRepository } from '@repo/api-platform/modules/exports/infrastructure/export-jobs.repository';
 import { AuditService } from '@repo/api-platform/modules/audit/application/audit.service';
@@ -49,8 +49,8 @@ describe('ExportsService idempotency', () => {
         { provide: ExportJobsRepository, useValue: exportJobsRepository },
         { provide: FilesRepository, useValue: {} },
         {
-          provide: PROJECT_DEMO_GATEWAY,
-          useValue: { list: vi.fn() },
+          provide: ImportExportAdapterRegistry,
+          useValue: { resolve: vi.fn() },
         },
         {
           provide: OBJECT_STORAGE,

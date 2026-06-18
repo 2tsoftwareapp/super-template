@@ -57,16 +57,22 @@ class _$OrganizationDtoRoleEnumSerializer
   final String wireName = 'OrganizationDtoRoleEnum';
 
   @override
-  Object serialize(Serializers serializers, OrganizationDtoRoleEnum object,
-          {FullType specifiedType = FullType.unspecified}) =>
+  Object serialize(
+    Serializers serializers,
+    OrganizationDtoRoleEnum object, {
+    FullType specifiedType = FullType.unspecified,
+  }) =>
       _toWire[object.name] ?? object.name;
 
   @override
   OrganizationDtoRoleEnum deserialize(
-          Serializers serializers, Object serialized,
-          {FullType specifiedType = FullType.unspecified}) =>
+    Serializers serializers,
+    Object serialized, {
+    FullType specifiedType = FullType.unspecified,
+  }) =>
       OrganizationDtoRoleEnum.valueOf(
-          _fromWire[serialized] ?? (serialized is String ? serialized : ''));
+        _fromWire[serialized] ?? (serialized is String ? serialized : ''),
+      );
 }
 
 class _$OrganizationDto extends OrganizationDto {
@@ -88,15 +94,15 @@ class _$OrganizationDto extends OrganizationDto {
   factory _$OrganizationDto([void Function(OrganizationDtoBuilder)? updates]) =>
       (OrganizationDtoBuilder()..update(updates))._build();
 
-  _$OrganizationDto._(
-      {required this.id,
-      required this.name,
-      required this.slug,
-      required this.role,
-      required this.createdAt,
-      required this.updatedAt,
-      required this.current})
-      : super._();
+  _$OrganizationDto._({
+    required this.id,
+    required this.name,
+    required this.slug,
+    required this.role,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.current,
+  }) : super._();
   @override
   OrganizationDto rebuild(void Function(OrganizationDtoBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -213,19 +219,40 @@ class OrganizationDtoBuilder
     final _$result = _$v ??
         _$OrganizationDto._(
           id: BuiltValueNullFieldError.checkNotNull(
-              id, r'OrganizationDto', 'id'),
+            id,
+            r'OrganizationDto',
+            'id',
+          ),
           name: BuiltValueNullFieldError.checkNotNull(
-              name, r'OrganizationDto', 'name'),
+            name,
+            r'OrganizationDto',
+            'name',
+          ),
           slug: BuiltValueNullFieldError.checkNotNull(
-              slug, r'OrganizationDto', 'slug'),
+            slug,
+            r'OrganizationDto',
+            'slug',
+          ),
           role: BuiltValueNullFieldError.checkNotNull(
-              role, r'OrganizationDto', 'role'),
+            role,
+            r'OrganizationDto',
+            'role',
+          ),
           createdAt: BuiltValueNullFieldError.checkNotNull(
-              createdAt, r'OrganizationDto', 'createdAt'),
+            createdAt,
+            r'OrganizationDto',
+            'createdAt',
+          ),
           updatedAt: BuiltValueNullFieldError.checkNotNull(
-              updatedAt, r'OrganizationDto', 'updatedAt'),
+            updatedAt,
+            r'OrganizationDto',
+            'updatedAt',
+          ),
           current: BuiltValueNullFieldError.checkNotNull(
-              current, r'OrganizationDto', 'current'),
+            current,
+            r'OrganizationDto',
+            'current',
+          ),
         );
     replace(_$result);
     return _$result;

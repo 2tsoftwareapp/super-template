@@ -20,20 +20,22 @@ class _$ApplicationSettingDto extends ApplicationSettingDto {
   @override
   final String updatedAt;
 
-  factory _$ApplicationSettingDto(
-          [void Function(ApplicationSettingDtoBuilder)? updates]) =>
+  factory _$ApplicationSettingDto([
+    void Function(ApplicationSettingDtoBuilder)? updates,
+  ]) =>
       (ApplicationSettingDtoBuilder()..update(updates))._build();
 
-  _$ApplicationSettingDto._(
-      {required this.key,
-      required this.value,
-      this.updatedById,
-      required this.createdAt,
-      required this.updatedAt})
-      : super._();
+  _$ApplicationSettingDto._({
+    required this.key,
+    required this.value,
+    this.updatedById,
+    required this.createdAt,
+    required this.updatedAt,
+  }) : super._();
   @override
   ApplicationSettingDto rebuild(
-          void Function(ApplicationSettingDtoBuilder) updates) =>
+    void Function(ApplicationSettingDtoBuilder) updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -136,13 +138,22 @@ class ApplicationSettingDtoBuilder
       _$result = _$v ??
           _$ApplicationSettingDto._(
             key: BuiltValueNullFieldError.checkNotNull(
-                key, r'ApplicationSettingDto', 'key'),
+              key,
+              r'ApplicationSettingDto',
+              'key',
+            ),
             value: value.build(),
             updatedById: updatedById,
             createdAt: BuiltValueNullFieldError.checkNotNull(
-                createdAt, r'ApplicationSettingDto', 'createdAt'),
+              createdAt,
+              r'ApplicationSettingDto',
+              'createdAt',
+            ),
             updatedAt: BuiltValueNullFieldError.checkNotNull(
-                updatedAt, r'ApplicationSettingDto', 'updatedAt'),
+              updatedAt,
+              r'ApplicationSettingDto',
+              'updatedAt',
+            ),
           );
     } catch (_) {
       late String _$failedField;
@@ -151,7 +162,10 @@ class ApplicationSettingDtoBuilder
         value.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'ApplicationSettingDto', _$failedField, e.toString());
+          r'ApplicationSettingDto',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

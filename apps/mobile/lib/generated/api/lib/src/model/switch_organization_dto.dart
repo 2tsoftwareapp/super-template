@@ -22,8 +22,9 @@ abstract class SwitchOrganizationDto
 
   SwitchOrganizationDto._();
 
-  factory SwitchOrganizationDto(
-      [void updates(SwitchOrganizationDtoBuilder b)]) = _$SwitchOrganizationDto;
+  factory SwitchOrganizationDto([
+    void updates(SwitchOrganizationDtoBuilder b),
+  ]) = _$SwitchOrganizationDto;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(SwitchOrganizationDtoBuilder b) => b;
@@ -38,7 +39,7 @@ class _$SwitchOrganizationDtoSerializer
   @override
   final Iterable<Type> types = const [
     SwitchOrganizationDto,
-    _$SwitchOrganizationDto
+    _$SwitchOrganizationDto,
   ];
 
   @override
@@ -62,9 +63,11 @@ class _$SwitchOrganizationDtoSerializer
     SwitchOrganizationDto object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(

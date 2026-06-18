@@ -12,14 +12,16 @@ class _$CreateOrganizationDto extends CreateOrganizationDto {
   @override
   final String name;
 
-  factory _$CreateOrganizationDto(
-          [void Function(CreateOrganizationDtoBuilder)? updates]) =>
+  factory _$CreateOrganizationDto([
+    void Function(CreateOrganizationDtoBuilder)? updates,
+  ]) =>
       (CreateOrganizationDtoBuilder()..update(updates))._build();
 
   _$CreateOrganizationDto._({required this.name}) : super._();
   @override
   CreateOrganizationDto rebuild(
-          void Function(CreateOrganizationDtoBuilder) updates) =>
+    void Function(CreateOrganizationDtoBuilder) updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -42,8 +44,9 @@ class _$CreateOrganizationDto extends CreateOrganizationDto {
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper(r'CreateOrganizationDto')
-          ..add('name', name))
+    return (newBuiltValueToStringHelper(
+      r'CreateOrganizationDto',
+    )..add('name', name))
         .toString();
   }
 }
@@ -86,7 +89,10 @@ class CreateOrganizationDtoBuilder
     final _$result = _$v ??
         _$CreateOrganizationDto._(
           name: BuiltValueNullFieldError.checkNotNull(
-              name, r'CreateOrganizationDto', 'name'),
+            name,
+            r'CreateOrganizationDto',
+            'name',
+          ),
         );
     replace(_$result);
     return _$result;

@@ -31,9 +31,9 @@ abstract class AuthControllerGetSessions200Response
 
   AuthControllerGetSessions200Response._();
 
-  factory AuthControllerGetSessions200Response(
-          [void updates(AuthControllerGetSessions200ResponseBuilder b)]) =
-      _$AuthControllerGetSessions200Response;
+  factory AuthControllerGetSessions200Response([
+    void updates(AuthControllerGetSessions200ResponseBuilder b),
+  ]) = _$AuthControllerGetSessions200Response;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(AuthControllerGetSessions200ResponseBuilder b) => b;
@@ -48,7 +48,7 @@ class _$AuthControllerGetSessions200ResponseSerializer
   @override
   final Iterable<Type> types = const [
     AuthControllerGetSessions200Response,
-    _$AuthControllerGetSessions200Response
+    _$AuthControllerGetSessions200Response,
   ];
 
   @override
@@ -77,9 +77,11 @@ class _$AuthControllerGetSessions200ResponseSerializer
     AuthControllerGetSessions200Response object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(
@@ -97,8 +99,9 @@ class _$AuthControllerGetSessions200ResponseSerializer
         case r'data':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType:
-                const FullType(BuiltList, [FullType(AuthSessionDto)]),
+            specifiedType: const FullType(BuiltList, [
+              FullType(AuthSessionDto),
+            ]),
           ) as BuiltList<AuthSessionDto>;
           result.data.replace(valueDes);
           break;

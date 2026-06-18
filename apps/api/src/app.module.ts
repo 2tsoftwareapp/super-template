@@ -19,6 +19,7 @@ import {
   AuthorizeGuard,
   EnvironmentService,
   ErrorReporterService,
+  ImportExportModule,
   LoggingModule,
   RedisThrottlerStorage,
   RequestContextMiddleware,
@@ -40,6 +41,7 @@ import { TenantContextInterceptor } from './shell/tenant-context.interceptor';
   imports: [
     AppConfigModule,
     LoggingModule,
+    ImportExportModule,
     ThrottlerModule.forRootAsync({
       inject: [EnvironmentService],
       useFactory: (environmentService: EnvironmentService) => ({

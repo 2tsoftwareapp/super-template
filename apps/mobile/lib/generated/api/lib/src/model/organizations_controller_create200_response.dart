@@ -30,9 +30,9 @@ abstract class OrganizationsControllerCreate200Response
 
   OrganizationsControllerCreate200Response._();
 
-  factory OrganizationsControllerCreate200Response(
-          [void updates(OrganizationsControllerCreate200ResponseBuilder b)]) =
-      _$OrganizationsControllerCreate200Response;
+  factory OrganizationsControllerCreate200Response([
+    void updates(OrganizationsControllerCreate200ResponseBuilder b),
+  ]) = _$OrganizationsControllerCreate200Response;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(OrganizationsControllerCreate200ResponseBuilder b) => b;
@@ -47,7 +47,7 @@ class _$OrganizationsControllerCreate200ResponseSerializer
   @override
   final Iterable<Type> types = const [
     OrganizationsControllerCreate200Response,
-    _$OrganizationsControllerCreate200Response
+    _$OrganizationsControllerCreate200Response,
   ];
 
   @override
@@ -76,9 +76,11 @@ class _$OrganizationsControllerCreate200ResponseSerializer
     OrganizationsControllerCreate200Response object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(

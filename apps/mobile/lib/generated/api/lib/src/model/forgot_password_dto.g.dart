@@ -12,8 +12,9 @@ class _$ForgotPasswordDto extends ForgotPasswordDto {
   @override
   final String email;
 
-  factory _$ForgotPasswordDto(
-          [void Function(ForgotPasswordDtoBuilder)? updates]) =>
+  factory _$ForgotPasswordDto([
+    void Function(ForgotPasswordDtoBuilder)? updates,
+  ]) =>
       (ForgotPasswordDtoBuilder()..update(updates))._build();
 
   _$ForgotPasswordDto._({required this.email}) : super._();
@@ -41,8 +42,9 @@ class _$ForgotPasswordDto extends ForgotPasswordDto {
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper(r'ForgotPasswordDto')
-          ..add('email', email))
+    return (newBuiltValueToStringHelper(
+      r'ForgotPasswordDto',
+    )..add('email', email))
         .toString();
   }
 }
@@ -85,7 +87,10 @@ class ForgotPasswordDtoBuilder
     final _$result = _$v ??
         _$ForgotPasswordDto._(
           email: BuiltValueNullFieldError.checkNotNull(
-              email, r'ForgotPasswordDto', 'email'),
+            email,
+            r'ForgotPasswordDto',
+            'email',
+          ),
         );
     replace(_$result);
     return _$result;

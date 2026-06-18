@@ -47,16 +47,10 @@ class ExportsApi {
     final _path = r'/api/v1/exports';
     final _options = Options(
       method: r'POST',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -71,10 +65,7 @@ class ExportsApi {
       _bodyData = _serializers.serialize(createExportDto, specifiedType: _type);
     } catch (error, stackTrace) {
       throw DioException(
-        requestOptions: _options.compose(
-          _dio.options,
-          _path,
-        ),
+        requestOptions: _options.compose(_dio.options, _path),
         type: DioExceptionType.unknown,
         error: error,
         stackTrace: stackTrace,
@@ -98,7 +89,9 @@ class ExportsApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType: const FullType(ExportsControllerCreate201Response),
+              specifiedType: const FullType(
+                ExportsControllerCreate201Response,
+              ),
             ) as ExportsControllerCreate201Response;
     } catch (error, stackTrace) {
       throw DioException(
@@ -147,21 +140,17 @@ class ExportsApi {
     ProgressCallback? onReceiveProgress,
   }) async {
     final _path = r'/api/v1/exports/{id}'.replaceAll(
-        '{' r'id' '}',
-        encodeQueryParameter(_serializers, id, const FullType(String))
-            .toString());
+      '{'
+      r'id'
+      '}',
+      encodeQueryParameter(_serializers, id, const FullType(String)).toString(),
+    );
     final _options = Options(
       method: r'GET',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -184,7 +173,9 @@ class ExportsApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType: const FullType(ExportsControllerCreate201Response),
+              specifiedType: const FullType(
+                ExportsControllerCreate201Response,
+              ),
             ) as ExportsControllerCreate201Response;
     } catch (error, stackTrace) {
       throw DioException(

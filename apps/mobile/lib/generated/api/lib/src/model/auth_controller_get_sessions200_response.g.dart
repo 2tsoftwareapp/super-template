@@ -15,17 +15,19 @@ class _$AuthControllerGetSessions200Response
   @override
   final RequestMetaDto meta;
 
-  factory _$AuthControllerGetSessions200Response(
-          [void Function(AuthControllerGetSessions200ResponseBuilder)?
-              updates]) =>
+  factory _$AuthControllerGetSessions200Response([
+    void Function(AuthControllerGetSessions200ResponseBuilder)? updates,
+  ]) =>
       (AuthControllerGetSessions200ResponseBuilder()..update(updates))._build();
 
-  _$AuthControllerGetSessions200Response._(
-      {required this.data, required this.meta})
-      : super._();
+  _$AuthControllerGetSessions200Response._({
+    required this.data,
+    required this.meta,
+  }) : super._();
   @override
   AuthControllerGetSessions200Response rebuild(
-          void Function(AuthControllerGetSessions200ResponseBuilder) updates) =>
+    void Function(AuthControllerGetSessions200ResponseBuilder) updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -94,7 +96,8 @@ class AuthControllerGetSessions200ResponseBuilder
 
   @override
   void update(
-      void Function(AuthControllerGetSessions200ResponseBuilder)? updates) {
+    void Function(AuthControllerGetSessions200ResponseBuilder)? updates,
+  ) {
     if (updates != null) updates(this);
   }
 
@@ -118,9 +121,10 @@ class AuthControllerGetSessions200ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'AuthControllerGetSessions200Response',
-            _$failedField,
-            e.toString());
+          r'AuthControllerGetSessions200Response',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

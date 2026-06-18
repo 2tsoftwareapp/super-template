@@ -15,19 +15,20 @@ class _$AdminJobsControllerListJobs200Response
   @override
   final PaginationMetaDto meta;
 
-  factory _$AdminJobsControllerListJobs200Response(
-          [void Function(AdminJobsControllerListJobs200ResponseBuilder)?
-              updates]) =>
+  factory _$AdminJobsControllerListJobs200Response([
+    void Function(AdminJobsControllerListJobs200ResponseBuilder)? updates,
+  ]) =>
       (AdminJobsControllerListJobs200ResponseBuilder()..update(updates))
           ._build();
 
-  _$AdminJobsControllerListJobs200Response._(
-      {required this.data, required this.meta})
-      : super._();
+  _$AdminJobsControllerListJobs200Response._({
+    required this.data,
+    required this.meta,
+  }) : super._();
   @override
   AdminJobsControllerListJobs200Response rebuild(
-          void Function(AdminJobsControllerListJobs200ResponseBuilder)
-              updates) =>
+    void Function(AdminJobsControllerListJobs200ResponseBuilder) updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -54,7 +55,8 @@ class _$AdminJobsControllerListJobs200Response
   @override
   String toString() {
     return (newBuiltValueToStringHelper(
-            r'AdminJobsControllerListJobs200Response')
+      r'AdminJobsControllerListJobs200Response',
+    )
           ..add('data', data)
           ..add('meta', meta))
         .toString();
@@ -97,7 +99,8 @@ class AdminJobsControllerListJobs200ResponseBuilder
 
   @override
   void update(
-      void Function(AdminJobsControllerListJobs200ResponseBuilder)? updates) {
+    void Function(AdminJobsControllerListJobs200ResponseBuilder)? updates,
+  ) {
     if (updates != null) updates(this);
   }
 
@@ -121,9 +124,10 @@ class AdminJobsControllerListJobs200ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'AdminJobsControllerListJobs200Response',
-            _$failedField,
-            e.toString());
+          r'AdminJobsControllerListJobs200Response',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

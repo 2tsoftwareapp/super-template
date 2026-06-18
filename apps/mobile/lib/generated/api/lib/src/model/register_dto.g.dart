@@ -19,9 +19,11 @@ class _$RegisterDto extends RegisterDto {
   factory _$RegisterDto([void Function(RegisterDtoBuilder)? updates]) =>
       (RegisterDtoBuilder()..update(updates))._build();
 
-  _$RegisterDto._(
-      {required this.email, required this.password, required this.displayName})
-      : super._();
+  _$RegisterDto._({
+    required this.email,
+    required this.password,
+    required this.displayName,
+  }) : super._();
   @override
   RegisterDto rebuild(void Function(RegisterDtoBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -105,11 +107,20 @@ class RegisterDtoBuilder implements Builder<RegisterDto, RegisterDtoBuilder> {
     final _$result = _$v ??
         _$RegisterDto._(
           email: BuiltValueNullFieldError.checkNotNull(
-              email, r'RegisterDto', 'email'),
+            email,
+            r'RegisterDto',
+            'email',
+          ),
           password: BuiltValueNullFieldError.checkNotNull(
-              password, r'RegisterDto', 'password'),
+            password,
+            r'RegisterDto',
+            'password',
+          ),
           displayName: BuiltValueNullFieldError.checkNotNull(
-              displayName, r'RegisterDto', 'displayName'),
+            displayName,
+            r'RegisterDto',
+            'displayName',
+          ),
         );
     replace(_$result);
     return _$result;

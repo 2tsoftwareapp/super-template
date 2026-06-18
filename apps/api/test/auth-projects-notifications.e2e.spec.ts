@@ -123,7 +123,7 @@ describe('Auth, Projects, and Notifications (e2e)', () => {
         password: 'ViewerPass123!',
         displayName: 'Viewer User',
         status: 'ACTIVE',
-        roleIds: [userRole.id],
+        role: 'USER',
       })
       .expect(201);
 
@@ -217,7 +217,7 @@ describe('Auth, Projects, and Notifications (e2e)', () => {
         password: 'NotifyPass123!',
         displayName: 'Notification Owner',
         status: 'ACTIVE',
-        roleIds: [userRole.id],
+        role: 'USER',
       })
       .expect(201);
 
@@ -304,7 +304,7 @@ describe('Auth, Projects, and Notifications (e2e)', () => {
         password: 'NotifyPass123!',
         displayName: 'Notify Peer',
         status: 'ACTIVE',
-        roleIds: [userRole.id],
+        role: 'USER',
       })
       .expect(201);
 
@@ -442,15 +442,11 @@ describe('Auth, Projects, and Notifications (e2e)', () => {
       'admin@example.local',
       'ChangeMe123!',
     );
-    const accessControlService = app.get(AccessControlService);
-    const adminRole = await accessControlService.getRoleByName(
-      ROLE_NAMES.ADMIN,
-    );
-    const userRole = await accessControlService.getRoleByName(ROLE_NAMES.USER);
-
-    if (!adminRole || !userRole) {
-      throw new Error('Required roles were not found');
-    }
+    const superAdminMe = await request(app.getHttpServer())
+      .get('/api/v1/auth/me')
+      .set(bearer(superAdminSession.accessToken))
+      .expect(200);
+    const organizationId = superAdminMe.body.data.organizationId as string;
 
     const defaultRoleResponse = await request(app.getHttpServer())
       .post('/api/v1/admin/users')
@@ -475,7 +471,8 @@ describe('Auth, Projects, and Notifications (e2e)', () => {
         password: 'ManagerPass123!',
         displayName: 'Manager Admin',
         status: 'ACTIVE',
-        roleIds: [adminRole.id],
+        role: 'ADMIN',
+        organizationId,
       })
       .expect(201);
 
@@ -487,19 +484,8 @@ describe('Auth, Projects, and Notifications (e2e)', () => {
         password: 'PrivilegedPass123!',
         displayName: 'Privileged Target',
         status: 'ACTIVE',
-        roleIds: [adminRole.id],
-      })
-      .expect(201);
-
-    const regularTargetResponse = await request(app.getHttpServer())
-      .post('/api/v1/admin/users')
-      .set(bearer(superAdminSession.accessToken))
-      .send({
-        email: 'regular-target@example.local',
-        password: 'RegularPass123!',
-        displayName: 'Regular Target',
-        status: 'ACTIVE',
-        roleIds: [userRole.id],
+        role: 'ADMIN',
+        organizationId,
       })
       .expect(201);
 
@@ -509,6 +495,18 @@ describe('Auth, Projects, and Notifications (e2e)', () => {
       'ManagerPass123!',
     );
 
+    const regularTargetResponse = await request(app.getHttpServer())
+      .post('/api/v1/admin/users')
+      .set(bearer(managerSession.accessToken))
+      .send({
+        email: 'regular-target@example.local',
+        password: 'RegularPass123!',
+        displayName: 'Regular Target',
+        status: 'ACTIVE',
+        role: 'USER',
+      })
+      .expect(201);
+
     await request(app.getHttpServer())
       .post('/api/v1/admin/users')
       .set(bearer(managerSession.accessToken))
@@ -517,7 +515,7 @@ describe('Auth, Projects, and Notifications (e2e)', () => {
         password: 'BlockedRole123!',
         displayName: 'Blocked Role',
         status: 'ACTIVE',
-        roleIds: [adminRole.id],
+        role: 'ADMIN',
       })
       .expect(403);
 
@@ -538,6 +536,36 @@ describe('Auth, Projects, and Notifications (e2e)', () => {
       .delete(`/api/v1/admin/users/${regularTargetResponse.body.data.id}`)
       .set(bearer(managerSession.accessToken))
       .expect(200);
+
+    const outsiderResponse = await request(app.getHttpServer())
+      .post('/api/v1/admin/users')
+      .set(bearer(superAdminSession.accessToken))
+      .send({
+        email: 'outsider@example.local',
+        password: 'OutsiderPass123!',
+        displayName: 'Outsider User',
+        status: 'ACTIVE',
+        role: 'USER',
+      })
+      .expect(201);
+
+    const managerUserList = await request(app.getHttpServer())
+      .get('/api/v1/admin/users')
+      .set(bearer(managerSession.accessToken))
+      .expect(200);
+
+    expect(
+      managerUserList.body.data.some(
+        (candidate: { id: string }) =>
+          candidate.id === outsiderResponse.body.data.id,
+      ),
+    ).toBe(false);
+    expect(
+      managerUserList.body.data.some(
+        (candidate: { id: string }) =>
+          candidate.id === regularTargetResponse.body.data.id,
+      ),
+    ).toBe(true);
   });
 
   it('prevents users from changing their own roles', async () => {
@@ -546,17 +574,11 @@ describe('Auth, Projects, and Notifications (e2e)', () => {
       'admin@example.local',
       'ChangeMe123!',
     );
-    const accessControlService = app.get(AccessControlService);
-    const userRole = await accessControlService.getRoleByName(ROLE_NAMES.USER);
-
-    if (!userRole) {
-      throw new Error('USER role was not found');
-    }
 
     const selfRoleChangeResponse = await request(app.getHttpServer())
       .put(`/api/v1/admin/users/${superAdminSession.userId}/roles`)
       .set(bearer(superAdminSession.accessToken))
-      .send({ roleIds: [userRole.id] })
+      .send({ role: 'USER' })
       .expect(403);
 
     expect(selfRoleChangeResponse.body.error.code).toBe(

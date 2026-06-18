@@ -50,21 +50,17 @@ class NotificationsApi {
     ProgressCallback? onReceiveProgress,
   }) async {
     final _path = r'/api/v1/notifications/{id}'.replaceAll(
-        '{' r'id' '}',
-        encodeQueryParameter(_serializers, id, const FullType(String))
-            .toString());
+      '{'
+      r'id'
+      '}',
+      encodeQueryParameter(_serializers, id, const FullType(String)).toString(),
+    );
     final _options = Options(
       method: r'DELETE',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -87,8 +83,9 @@ class NotificationsApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType:
-                  const FullType(AdminUsersControllerDeleteUser200Response),
+              specifiedType: const FullType(
+                AdminUsersControllerDeleteUser200Response,
+              ),
             ) as AdminUsersControllerDeleteUser200Response;
     } catch (error, stackTrace) {
       throw DioException(
@@ -147,16 +144,10 @@ class NotificationsApi {
     final _path = r'/api/v1/notifications';
     final _options = Options(
       method: r'GET',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -167,17 +158,29 @@ class NotificationsApi {
       if (page != null)
         r'page': encodeQueryParameter(_serializers, page, const FullType(num)),
       if (limit != null)
-        r'limit':
-            encodeQueryParameter(_serializers, limit, const FullType(num)),
+        r'limit': encodeQueryParameter(
+          _serializers,
+          limit,
+          const FullType(num),
+        ),
       if (sortOrder != null)
         r'sortOrder': encodeQueryParameter(
-            _serializers, sortOrder, const FullType(String)),
+          _serializers,
+          sortOrder,
+          const FullType(String),
+        ),
       if (unread != null)
-        r'unread':
-            encodeQueryParameter(_serializers, unread, const FullType(bool)),
+        r'unread': encodeQueryParameter(
+          _serializers,
+          unread,
+          const FullType(bool),
+        ),
       if (type != null)
-        r'type':
-            encodeQueryParameter(_serializers, type, const FullType(String)),
+        r'type': encodeQueryParameter(
+          _serializers,
+          type,
+          const FullType(String),
+        ),
     };
 
     final _response = await _dio.request<Object>(
@@ -197,8 +200,9 @@ class NotificationsApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType:
-                  const FullType(NotificationsControllerList200Response),
+              specifiedType: const FullType(
+                NotificationsControllerList200Response,
+              ),
             ) as NotificationsControllerList200Response;
     } catch (error, stackTrace) {
       throw DioException(
@@ -247,16 +251,10 @@ class NotificationsApi {
     final _path = r'/api/v1/notifications/read-all';
     final _options = Options(
       method: r'PATCH',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -279,8 +277,9 @@ class NotificationsApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType:
-                  const FullType(AdminUsersControllerDeleteUser200Response),
+              specifiedType: const FullType(
+                AdminUsersControllerDeleteUser200Response,
+              ),
             ) as AdminUsersControllerDeleteUser200Response;
     } catch (error, stackTrace) {
       throw DioException(
@@ -329,21 +328,17 @@ class NotificationsApi {
     ProgressCallback? onReceiveProgress,
   }) async {
     final _path = r'/api/v1/notifications/{id}/read'.replaceAll(
-        '{' r'id' '}',
-        encodeQueryParameter(_serializers, id, const FullType(String))
-            .toString());
+      '{'
+      r'id'
+      '}',
+      encodeQueryParameter(_serializers, id, const FullType(String)).toString(),
+    );
     final _options = Options(
       method: r'PATCH',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -366,8 +361,9 @@ class NotificationsApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType:
-                  const FullType(NotificationsControllerMarkRead200Response),
+              specifiedType: const FullType(
+                NotificationsControllerMarkRead200Response,
+              ),
             ) as NotificationsControllerMarkRead200Response;
     } catch (error, stackTrace) {
       throw DioException(
@@ -418,16 +414,10 @@ class NotificationsApi {
     final _path = r'/api/v1/notifications/devices';
     final _options = Options(
       method: r'POST',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -439,14 +429,13 @@ class NotificationsApi {
 
     try {
       const _type = FullType(RegisterDeviceDto);
-      _bodyData =
-          _serializers.serialize(registerDeviceDto, specifiedType: _type);
+      _bodyData = _serializers.serialize(
+        registerDeviceDto,
+        specifiedType: _type,
+      );
     } catch (error, stackTrace) {
       throw DioException(
-        requestOptions: _options.compose(
-          _dio.options,
-          _path,
-        ),
+        requestOptions: _options.compose(_dio.options, _path),
         type: DioExceptionType.unknown,
         error: error,
         stackTrace: stackTrace,
@@ -471,7 +460,8 @@ class NotificationsApi {
           : _serializers.deserialize(
               rawResponse,
               specifiedType: const FullType(
-                  NotificationsControllerRegisterDevice201Response),
+                NotificationsControllerRegisterDevice201Response,
+              ),
             ) as NotificationsControllerRegisterDevice201Response;
     } catch (error, stackTrace) {
       throw DioException(
@@ -519,16 +509,10 @@ class NotificationsApi {
     final _path = r'/api/v1/notifications/stream';
     final _options = Options(
       method: r'GET',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -571,16 +555,10 @@ class NotificationsApi {
     final _path = r'/api/v1/notifications/unread-count';
     final _options = Options(
       method: r'GET',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -603,8 +581,9 @@ class NotificationsApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType:
-                  const FullType(NotificationsControllerUnreadCount200Response),
+              specifiedType: const FullType(
+                NotificationsControllerUnreadCount200Response,
+              ),
             ) as NotificationsControllerUnreadCount200Response;
     } catch (error, stackTrace) {
       throw DioException(
@@ -653,21 +632,21 @@ class NotificationsApi {
     ProgressCallback? onReceiveProgress,
   }) async {
     final _path = r'/api/v1/notifications/devices/{token}'.replaceAll(
-        '{' r'token' '}',
-        encodeQueryParameter(_serializers, token, const FullType(String))
-            .toString());
+      '{'
+      r'token'
+      '}',
+      encodeQueryParameter(
+        _serializers,
+        token,
+        const FullType(String),
+      ).toString(),
+    );
     final _options = Options(
       method: r'DELETE',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -690,8 +669,9 @@ class NotificationsApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType:
-                  const FullType(AdminUsersControllerDeleteUser200Response),
+              specifiedType: const FullType(
+                AdminUsersControllerDeleteUser200Response,
+              ),
             ) as AdminUsersControllerDeleteUser200Response;
     } catch (error, stackTrace) {
       throw DioException(

@@ -3,17 +3,17 @@ import { toast } from "sonner";
 
 import { webFetch } from "@/lib/http";
 
-import { buildUsersListPath } from "./api";
-import { ROLES_QUERY_KEY, USERS_QUERY_KEY } from "./constants";
-import { usersSortKey } from "./sorting";
-import type { UsersListParams } from "./types";
-
 import type {
   AdminUserDto,
   ListResponse,
   RoleDto,
   UpdateUserStatusInput,
 } from "../../lib/types";
+import type { UsersListParams } from "./types";
+
+import { buildUsersListPath } from "./api";
+import { ROLES_QUERY_KEY, USERS_QUERY_KEY } from "./constants";
+import { usersSortKey } from "./sorting";
 
 export function useAdminRolesQuery(options?: { enabled?: boolean }) {
   return useQuery({

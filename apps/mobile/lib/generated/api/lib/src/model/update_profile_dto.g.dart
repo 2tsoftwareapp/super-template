@@ -16,8 +16,9 @@ class _$UpdateProfileDto extends UpdateProfileDto {
   @override
   final JsonObject? avatarFileId;
 
-  factory _$UpdateProfileDto(
-          [void Function(UpdateProfileDtoBuilder)? updates]) =>
+  factory _$UpdateProfileDto([
+    void Function(UpdateProfileDtoBuilder)? updates,
+  ]) =>
       (UpdateProfileDtoBuilder()..update(updates))._build();
 
   _$UpdateProfileDto._({this.displayName, this.avatarUrl, this.avatarFileId})

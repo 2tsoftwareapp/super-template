@@ -15,19 +15,20 @@ class _$AuditControllerListAuditLogs200Response
   @override
   final PaginationMetaDto meta;
 
-  factory _$AuditControllerListAuditLogs200Response(
-          [void Function(AuditControllerListAuditLogs200ResponseBuilder)?
-              updates]) =>
+  factory _$AuditControllerListAuditLogs200Response([
+    void Function(AuditControllerListAuditLogs200ResponseBuilder)? updates,
+  ]) =>
       (AuditControllerListAuditLogs200ResponseBuilder()..update(updates))
           ._build();
 
-  _$AuditControllerListAuditLogs200Response._(
-      {required this.data, required this.meta})
-      : super._();
+  _$AuditControllerListAuditLogs200Response._({
+    required this.data,
+    required this.meta,
+  }) : super._();
   @override
   AuditControllerListAuditLogs200Response rebuild(
-          void Function(AuditControllerListAuditLogs200ResponseBuilder)
-              updates) =>
+    void Function(AuditControllerListAuditLogs200ResponseBuilder) updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -54,7 +55,8 @@ class _$AuditControllerListAuditLogs200Response
   @override
   String toString() {
     return (newBuiltValueToStringHelper(
-            r'AuditControllerListAuditLogs200Response')
+      r'AuditControllerListAuditLogs200Response',
+    )
           ..add('data', data)
           ..add('meta', meta))
         .toString();
@@ -98,7 +100,8 @@ class AuditControllerListAuditLogs200ResponseBuilder
 
   @override
   void update(
-      void Function(AuditControllerListAuditLogs200ResponseBuilder)? updates) {
+    void Function(AuditControllerListAuditLogs200ResponseBuilder)? updates,
+  ) {
     if (updates != null) updates(this);
   }
 
@@ -122,9 +125,10 @@ class AuditControllerListAuditLogs200ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'AuditControllerListAuditLogs200Response',
-            _$failedField,
-            e.toString());
+          r'AuditControllerListAuditLogs200Response',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

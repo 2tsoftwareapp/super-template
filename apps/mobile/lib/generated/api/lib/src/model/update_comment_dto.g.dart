@@ -12,8 +12,9 @@ class _$UpdateCommentDto extends UpdateCommentDto {
   @override
   final String content;
 
-  factory _$UpdateCommentDto(
-          [void Function(UpdateCommentDtoBuilder)? updates]) =>
+  factory _$UpdateCommentDto([
+    void Function(UpdateCommentDtoBuilder)? updates,
+  ]) =>
       (UpdateCommentDtoBuilder()..update(updates))._build();
 
   _$UpdateCommentDto._({required this.content}) : super._();
@@ -41,8 +42,9 @@ class _$UpdateCommentDto extends UpdateCommentDto {
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper(r'UpdateCommentDto')
-          ..add('content', content))
+    return (newBuiltValueToStringHelper(
+      r'UpdateCommentDto',
+    )..add('content', content))
         .toString();
   }
 }
@@ -85,7 +87,10 @@ class UpdateCommentDtoBuilder
     final _$result = _$v ??
         _$UpdateCommentDto._(
           content: BuiltValueNullFieldError.checkNotNull(
-              content, r'UpdateCommentDto', 'content'),
+            content,
+            r'UpdateCommentDto',
+            'content',
+          ),
         );
     replace(_$result);
     return _$result;

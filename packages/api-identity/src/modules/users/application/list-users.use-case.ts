@@ -1,8 +1,11 @@
+import type { AuthenticatedRequestUser } from '@repo/api-core';
+
 import { Inject, Injectable } from '@nestjs/common';
 
 import type { ListUsersQuery } from './users.types';
 
 import { AccessControlService } from '../../access-control/application/access-control.service';
+import { resolveUsersListOrganizationId } from '../domain/user-org-scope.policy';
 import { UsersMapper } from './users.mapper';
 import {
   USERS_REPOSITORY,
@@ -19,8 +22,12 @@ export class ListUsersUseCase {
     private readonly accessControlService: AccessControlService,
   ) {}
 
-  async execute(query: ListUsersQuery) {
-    const result = await this.usersRepository.list(query);
+  async execute(actor: AuthenticatedRequestUser, query: ListUsersQuery) {
+    const organizationId = resolveUsersListOrganizationId(actor);
+    const result = await this.usersRepository.list({
+      ...query,
+      ...(organizationId ? { organizationId } : {}),
+    });
     const [rolesByUserId, roleIdsByUserId] = await Promise.all([
       this.accessControlService.getRoleNamesForUsers(
         result.rows.map((row) => row.id),

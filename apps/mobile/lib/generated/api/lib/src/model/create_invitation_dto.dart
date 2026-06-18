@@ -50,7 +50,7 @@ class _$CreateInvitationDtoSerializer
   @override
   final Iterable<Type> types = const [
     CreateInvitationDto,
-    _$CreateInvitationDto
+    _$CreateInvitationDto,
   ];
 
   @override
@@ -91,9 +91,11 @@ class _$CreateInvitationDtoSerializer
     CreateInvitationDto object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(

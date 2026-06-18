@@ -26,9 +26,3 @@ export interface CreateImportCommand {
   fileId: string;
   idempotencyKey?: string;
 }
-
-export interface ParsedProjectRow {
-  name: string;
-  description: string | null;
-  status: 'DRAFT' | 'ACTIVE' | 'ARCHIVED';
-}

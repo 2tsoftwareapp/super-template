@@ -71,15 +71,22 @@ class _$ExportJobDtoStatusEnumSerializer
   final String wireName = 'ExportJobDtoStatusEnum';
 
   @override
-  Object serialize(Serializers serializers, ExportJobDtoStatusEnum object,
-          {FullType specifiedType = FullType.unspecified}) =>
+  Object serialize(
+    Serializers serializers,
+    ExportJobDtoStatusEnum object, {
+    FullType specifiedType = FullType.unspecified,
+  }) =>
       _toWire[object.name] ?? object.name;
 
   @override
-  ExportJobDtoStatusEnum deserialize(Serializers serializers, Object serialized,
-          {FullType specifiedType = FullType.unspecified}) =>
+  ExportJobDtoStatusEnum deserialize(
+    Serializers serializers,
+    Object serialized, {
+    FullType specifiedType = FullType.unspecified,
+  }) =>
       ExportJobDtoStatusEnum.valueOf(
-          _fromWire[serialized] ?? (serialized is String ? serialized : ''));
+        _fromWire[serialized] ?? (serialized is String ? serialized : ''),
+      );
 }
 
 class _$ExportJobDto extends ExportJobDto {
@@ -105,17 +112,17 @@ class _$ExportJobDto extends ExportJobDto {
   factory _$ExportJobDto([void Function(ExportJobDtoBuilder)? updates]) =>
       (ExportJobDtoBuilder()..update(updates))._build();
 
-  _$ExportJobDto._(
-      {required this.id,
-      required this.type,
-      required this.status,
-      this.fileId,
-      this.filters,
-      required this.createdById,
-      this.completedAt,
-      required this.createdAt,
-      required this.updatedAt})
-      : super._();
+  _$ExportJobDto._({
+    required this.id,
+    required this.type,
+    required this.status,
+    this.fileId,
+    this.filters,
+    required this.createdById,
+    this.completedAt,
+    required this.createdAt,
+    required this.updatedAt,
+  }) : super._();
   @override
   ExportJobDto rebuild(void Function(ExportJobDtoBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -252,20 +259,38 @@ class ExportJobDtoBuilder
       _$result = _$v ??
           _$ExportJobDto._(
             id: BuiltValueNullFieldError.checkNotNull(
-                id, r'ExportJobDto', 'id'),
+              id,
+              r'ExportJobDto',
+              'id',
+            ),
             type: BuiltValueNullFieldError.checkNotNull(
-                type, r'ExportJobDto', 'type'),
+              type,
+              r'ExportJobDto',
+              'type',
+            ),
             status: BuiltValueNullFieldError.checkNotNull(
-                status, r'ExportJobDto', 'status'),
+              status,
+              r'ExportJobDto',
+              'status',
+            ),
             fileId: fileId,
             filters: _filters?.build(),
             createdById: BuiltValueNullFieldError.checkNotNull(
-                createdById, r'ExportJobDto', 'createdById'),
+              createdById,
+              r'ExportJobDto',
+              'createdById',
+            ),
             completedAt: completedAt,
             createdAt: BuiltValueNullFieldError.checkNotNull(
-                createdAt, r'ExportJobDto', 'createdAt'),
+              createdAt,
+              r'ExportJobDto',
+              'createdAt',
+            ),
             updatedAt: BuiltValueNullFieldError.checkNotNull(
-                updatedAt, r'ExportJobDto', 'updatedAt'),
+              updatedAt,
+              r'ExportJobDto',
+              'updatedAt',
+            ),
           );
     } catch (_) {
       late String _$failedField;
@@ -274,7 +299,10 @@ class ExportJobDtoBuilder
         _filters?.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'ExportJobDto', _$failedField, e.toString());
+          r'ExportJobDto',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

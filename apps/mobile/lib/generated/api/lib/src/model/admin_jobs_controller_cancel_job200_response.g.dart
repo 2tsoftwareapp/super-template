@@ -15,19 +15,20 @@ class _$AdminJobsControllerCancelJob200Response
   @override
   final RequestMetaDto meta;
 
-  factory _$AdminJobsControllerCancelJob200Response(
-          [void Function(AdminJobsControllerCancelJob200ResponseBuilder)?
-              updates]) =>
+  factory _$AdminJobsControllerCancelJob200Response([
+    void Function(AdminJobsControllerCancelJob200ResponseBuilder)? updates,
+  ]) =>
       (AdminJobsControllerCancelJob200ResponseBuilder()..update(updates))
           ._build();
 
-  _$AdminJobsControllerCancelJob200Response._(
-      {required this.data, required this.meta})
-      : super._();
+  _$AdminJobsControllerCancelJob200Response._({
+    required this.data,
+    required this.meta,
+  }) : super._();
   @override
   AdminJobsControllerCancelJob200Response rebuild(
-          void Function(AdminJobsControllerCancelJob200ResponseBuilder)
-              updates) =>
+    void Function(AdminJobsControllerCancelJob200ResponseBuilder) updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -54,7 +55,8 @@ class _$AdminJobsControllerCancelJob200Response
   @override
   String toString() {
     return (newBuiltValueToStringHelper(
-            r'AdminJobsControllerCancelJob200Response')
+      r'AdminJobsControllerCancelJob200Response',
+    )
           ..add('data', data)
           ..add('meta', meta))
         .toString();
@@ -96,7 +98,8 @@ class AdminJobsControllerCancelJob200ResponseBuilder
 
   @override
   void update(
-      void Function(AdminJobsControllerCancelJob200ResponseBuilder)? updates) {
+    void Function(AdminJobsControllerCancelJob200ResponseBuilder)? updates,
+  ) {
     if (updates != null) updates(this);
   }
 
@@ -120,9 +123,10 @@ class AdminJobsControllerCancelJob200ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'AdminJobsControllerCancelJob200Response',
-            _$failedField,
-            e.toString());
+          r'AdminJobsControllerCancelJob200Response',
+          _$failedField,
+          e.toString(),
+        );
       }
       rethrow;
     }

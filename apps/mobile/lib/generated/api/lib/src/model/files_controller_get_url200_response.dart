@@ -30,9 +30,9 @@ abstract class FilesControllerGetUrl200Response
 
   FilesControllerGetUrl200Response._();
 
-  factory FilesControllerGetUrl200Response(
-          [void updates(FilesControllerGetUrl200ResponseBuilder b)]) =
-      _$FilesControllerGetUrl200Response;
+  factory FilesControllerGetUrl200Response([
+    void updates(FilesControllerGetUrl200ResponseBuilder b),
+  ]) = _$FilesControllerGetUrl200Response;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(FilesControllerGetUrl200ResponseBuilder b) => b;
@@ -47,7 +47,7 @@ class _$FilesControllerGetUrl200ResponseSerializer
   @override
   final Iterable<Type> types = const [
     FilesControllerGetUrl200Response,
-    _$FilesControllerGetUrl200Response
+    _$FilesControllerGetUrl200Response,
   ];
 
   @override
@@ -76,9 +76,11 @@ class _$FilesControllerGetUrl200ResponseSerializer
     FilesControllerGetUrl200Response object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(

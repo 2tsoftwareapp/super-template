@@ -20,17 +20,18 @@ class _$PaginationMetaDto extends PaginationMetaDto {
   @override
   final num totalPages;
 
-  factory _$PaginationMetaDto(
-          [void Function(PaginationMetaDtoBuilder)? updates]) =>
+  factory _$PaginationMetaDto([
+    void Function(PaginationMetaDtoBuilder)? updates,
+  ]) =>
       (PaginationMetaDtoBuilder()..update(updates))._build();
 
-  _$PaginationMetaDto._(
-      {required this.requestId,
-      required this.page,
-      required this.limit,
-      required this.total,
-      required this.totalPages})
-      : super._();
+  _$PaginationMetaDto._({
+    required this.requestId,
+    required this.page,
+    required this.limit,
+    required this.total,
+    required this.totalPages,
+  }) : super._();
   @override
   PaginationMetaDto rebuild(void Function(PaginationMetaDtoBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -132,15 +133,30 @@ class PaginationMetaDtoBuilder
     final _$result = _$v ??
         _$PaginationMetaDto._(
           requestId: BuiltValueNullFieldError.checkNotNull(
-              requestId, r'PaginationMetaDto', 'requestId'),
+            requestId,
+            r'PaginationMetaDto',
+            'requestId',
+          ),
           page: BuiltValueNullFieldError.checkNotNull(
-              page, r'PaginationMetaDto', 'page'),
+            page,
+            r'PaginationMetaDto',
+            'page',
+          ),
           limit: BuiltValueNullFieldError.checkNotNull(
-              limit, r'PaginationMetaDto', 'limit'),
+            limit,
+            r'PaginationMetaDto',
+            'limit',
+          ),
           total: BuiltValueNullFieldError.checkNotNull(
-              total, r'PaginationMetaDto', 'total'),
+            total,
+            r'PaginationMetaDto',
+            'total',
+          ),
           totalPages: BuiltValueNullFieldError.checkNotNull(
-              totalPages, r'PaginationMetaDto', 'totalPages'),
+            totalPages,
+            r'PaginationMetaDto',
+            'totalPages',
+          ),
         );
     replace(_$result);
     return _$result;

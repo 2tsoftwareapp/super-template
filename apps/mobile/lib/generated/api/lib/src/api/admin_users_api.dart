@@ -53,16 +53,10 @@ class AdminUsersApi {
     final _path = r'/api/v1/admin/users';
     final _options = Options(
       method: r'POST',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -74,14 +68,13 @@ class AdminUsersApi {
 
     try {
       const _type = FullType(CreateAdminUserDto);
-      _bodyData =
-          _serializers.serialize(createAdminUserDto, specifiedType: _type);
+      _bodyData = _serializers.serialize(
+        createAdminUserDto,
+        specifiedType: _type,
+      );
     } catch (error, stackTrace) {
       throw DioException(
-        requestOptions: _options.compose(
-          _dio.options,
-          _path,
-        ),
+        requestOptions: _options.compose(_dio.options, _path),
         type: DioExceptionType.unknown,
         error: error,
         stackTrace: stackTrace,
@@ -105,8 +98,9 @@ class AdminUsersApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType:
-                  const FullType(AdminUsersControllerCreateUser201Response),
+              specifiedType: const FullType(
+                AdminUsersControllerCreateUser201Response,
+              ),
             ) as AdminUsersControllerCreateUser201Response;
     } catch (error, stackTrace) {
       throw DioException(
@@ -155,21 +149,17 @@ class AdminUsersApi {
     ProgressCallback? onReceiveProgress,
   }) async {
     final _path = r'/api/v1/admin/users/{id}'.replaceAll(
-        '{' r'id' '}',
-        encodeQueryParameter(_serializers, id, const FullType(String))
-            .toString());
+      '{'
+      r'id'
+      '}',
+      encodeQueryParameter(_serializers, id, const FullType(String)).toString(),
+    );
     final _options = Options(
       method: r'DELETE',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -192,8 +182,9 @@ class AdminUsersApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType:
-                  const FullType(AdminUsersControllerDeleteUser200Response),
+              specifiedType: const FullType(
+                AdminUsersControllerDeleteUser200Response,
+              ),
             ) as AdminUsersControllerDeleteUser200Response;
     } catch (error, stackTrace) {
       throw DioException(
@@ -242,21 +233,17 @@ class AdminUsersApi {
     ProgressCallback? onReceiveProgress,
   }) async {
     final _path = r'/api/v1/admin/users/{id}'.replaceAll(
-        '{' r'id' '}',
-        encodeQueryParameter(_serializers, id, const FullType(String))
-            .toString());
+      '{'
+      r'id'
+      '}',
+      encodeQueryParameter(_serializers, id, const FullType(String)).toString(),
+    );
     final _options = Options(
       method: r'GET',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -279,8 +266,9 @@ class AdminUsersApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType:
-                  const FullType(AdminUsersControllerCreateUser201Response),
+              specifiedType: const FullType(
+                AdminUsersControllerCreateUser201Response,
+              ),
             ) as AdminUsersControllerCreateUser201Response;
     } catch (error, stackTrace) {
       throw DioException(
@@ -314,6 +302,7 @@ class AdminUsersApi {
   /// * [search]
   /// * [status]
   /// * [role]
+  /// * [sort] - Comma-separated sort rules in field:order format, e.g. status:asc,createdAt:desc
   /// * [sortField]
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
   /// * [headers] - Can be used to add additional headers to the request
@@ -332,6 +321,7 @@ class AdminUsersApi {
     String? search,
     String? status,
     String? role,
+    String? sort,
     String? sortField = 'createdAt',
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
@@ -343,16 +333,10 @@ class AdminUsersApi {
     final _path = r'/api/v1/admin/users';
     final _options = Options(
       method: r'GET',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -363,23 +347,47 @@ class AdminUsersApi {
       if (page != null)
         r'page': encodeQueryParameter(_serializers, page, const FullType(num)),
       if (limit != null)
-        r'limit':
-            encodeQueryParameter(_serializers, limit, const FullType(num)),
+        r'limit': encodeQueryParameter(
+          _serializers,
+          limit,
+          const FullType(num),
+        ),
       if (sortOrder != null)
         r'sortOrder': encodeQueryParameter(
-            _serializers, sortOrder, const FullType(String)),
+          _serializers,
+          sortOrder,
+          const FullType(String),
+        ),
       if (search != null)
-        r'search':
-            encodeQueryParameter(_serializers, search, const FullType(String)),
+        r'search': encodeQueryParameter(
+          _serializers,
+          search,
+          const FullType(String),
+        ),
       if (status != null)
-        r'status':
-            encodeQueryParameter(_serializers, status, const FullType(String)),
+        r'status': encodeQueryParameter(
+          _serializers,
+          status,
+          const FullType(String),
+        ),
       if (role != null)
-        r'role':
-            encodeQueryParameter(_serializers, role, const FullType(String)),
+        r'role': encodeQueryParameter(
+          _serializers,
+          role,
+          const FullType(String),
+        ),
+      if (sort != null)
+        r'sort': encodeQueryParameter(
+          _serializers,
+          sort,
+          const FullType(String),
+        ),
       if (sortField != null)
         r'sortField': encodeQueryParameter(
-            _serializers, sortField, const FullType(String)),
+          _serializers,
+          sortField,
+          const FullType(String),
+        ),
     };
 
     final _response = await _dio.request<Object>(
@@ -399,8 +407,9 @@ class AdminUsersApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType:
-                  const FullType(AdminUsersControllerListUsers200Response),
+              specifiedType: const FullType(
+                AdminUsersControllerListUsers200Response,
+              ),
             ) as AdminUsersControllerListUsers200Response;
     } catch (error, stackTrace) {
       throw DioException(
@@ -451,21 +460,17 @@ class AdminUsersApi {
     ProgressCallback? onReceiveProgress,
   }) async {
     final _path = r'/api/v1/admin/users/{id}/roles'.replaceAll(
-        '{' r'id' '}',
-        encodeQueryParameter(_serializers, id, const FullType(String))
-            .toString());
+      '{'
+      r'id'
+      '}',
+      encodeQueryParameter(_serializers, id, const FullType(String)).toString(),
+    );
     final _options = Options(
       method: r'PUT',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -477,14 +482,13 @@ class AdminUsersApi {
 
     try {
       const _type = FullType(ReplaceUserRolesDto);
-      _bodyData =
-          _serializers.serialize(replaceUserRolesDto, specifiedType: _type);
+      _bodyData = _serializers.serialize(
+        replaceUserRolesDto,
+        specifiedType: _type,
+      );
     } catch (error, stackTrace) {
       throw DioException(
-        requestOptions: _options.compose(
-          _dio.options,
-          _path,
-        ),
+        requestOptions: _options.compose(_dio.options, _path),
         type: DioExceptionType.unknown,
         error: error,
         stackTrace: stackTrace,
@@ -508,8 +512,9 @@ class AdminUsersApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType:
-                  const FullType(AdminUsersControllerCreateUser201Response),
+              specifiedType: const FullType(
+                AdminUsersControllerCreateUser201Response,
+              ),
             ) as AdminUsersControllerCreateUser201Response;
     } catch (error, stackTrace) {
       throw DioException(
@@ -560,21 +565,17 @@ class AdminUsersApi {
     ProgressCallback? onReceiveProgress,
   }) async {
     final _path = r'/api/v1/admin/users/{id}/status'.replaceAll(
-        '{' r'id' '}',
-        encodeQueryParameter(_serializers, id, const FullType(String))
-            .toString());
+      '{'
+      r'id'
+      '}',
+      encodeQueryParameter(_serializers, id, const FullType(String)).toString(),
+    );
     final _options = Options(
       method: r'PATCH',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -586,14 +587,13 @@ class AdminUsersApi {
 
     try {
       const _type = FullType(UpdateUserStatusDto);
-      _bodyData =
-          _serializers.serialize(updateUserStatusDto, specifiedType: _type);
+      _bodyData = _serializers.serialize(
+        updateUserStatusDto,
+        specifiedType: _type,
+      );
     } catch (error, stackTrace) {
       throw DioException(
-        requestOptions: _options.compose(
-          _dio.options,
-          _path,
-        ),
+        requestOptions: _options.compose(_dio.options, _path),
         type: DioExceptionType.unknown,
         error: error,
         stackTrace: stackTrace,
@@ -617,8 +617,9 @@ class AdminUsersApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType:
-                  const FullType(AdminUsersControllerCreateUser201Response),
+              specifiedType: const FullType(
+                AdminUsersControllerCreateUser201Response,
+              ),
             ) as AdminUsersControllerCreateUser201Response;
     } catch (error, stackTrace) {
       throw DioException(
@@ -669,21 +670,17 @@ class AdminUsersApi {
     ProgressCallback? onReceiveProgress,
   }) async {
     final _path = r'/api/v1/admin/users/{id}'.replaceAll(
-        '{' r'id' '}',
-        encodeQueryParameter(_serializers, id, const FullType(String))
-            .toString());
+      '{'
+      r'id'
+      '}',
+      encodeQueryParameter(_serializers, id, const FullType(String)).toString(),
+    );
     final _options = Options(
       method: r'PATCH',
-      headers: <String, dynamic>{
-        ...?headers,
-      },
+      headers: <String, dynamic>{...?headers},
       extra: <String, dynamic>{
         'secure': <Map<String, String>>[
-          {
-            'type': 'http',
-            'scheme': 'bearer',
-            'name': 'bearer',
-          },
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
         ],
         ...?extra,
       },
@@ -695,14 +692,13 @@ class AdminUsersApi {
 
     try {
       const _type = FullType(UpdateAdminUserDto);
-      _bodyData =
-          _serializers.serialize(updateAdminUserDto, specifiedType: _type);
+      _bodyData = _serializers.serialize(
+        updateAdminUserDto,
+        specifiedType: _type,
+      );
     } catch (error, stackTrace) {
       throw DioException(
-        requestOptions: _options.compose(
-          _dio.options,
-          _path,
-        ),
+        requestOptions: _options.compose(_dio.options, _path),
         type: DioExceptionType.unknown,
         error: error,
         stackTrace: stackTrace,
@@ -726,8 +722,9 @@ class AdminUsersApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType:
-                  const FullType(AdminUsersControllerCreateUser201Response),
+              specifiedType: const FullType(
+                AdminUsersControllerCreateUser201Response,
+              ),
             ) as AdminUsersControllerCreateUser201Response;
     } catch (error, stackTrace) {
       throw DioException(

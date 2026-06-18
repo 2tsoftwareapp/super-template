@@ -12,14 +12,16 @@ class _$SwitchOrganizationDto extends SwitchOrganizationDto {
   @override
   final String organizationId;
 
-  factory _$SwitchOrganizationDto(
-          [void Function(SwitchOrganizationDtoBuilder)? updates]) =>
+  factory _$SwitchOrganizationDto([
+    void Function(SwitchOrganizationDtoBuilder)? updates,
+  ]) =>
       (SwitchOrganizationDtoBuilder()..update(updates))._build();
 
   _$SwitchOrganizationDto._({required this.organizationId}) : super._();
   @override
   SwitchOrganizationDto rebuild(
-          void Function(SwitchOrganizationDtoBuilder) updates) =>
+    void Function(SwitchOrganizationDtoBuilder) updates,
+  ) =>
       (toBuilder()..update(updates)).build();
 
   @override
@@ -43,8 +45,9 @@ class _$SwitchOrganizationDto extends SwitchOrganizationDto {
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper(r'SwitchOrganizationDto')
-          ..add('organizationId', organizationId))
+    return (newBuiltValueToStringHelper(
+      r'SwitchOrganizationDto',
+    )..add('organizationId', organizationId))
         .toString();
   }
 }
@@ -88,7 +91,10 @@ class SwitchOrganizationDtoBuilder
     final _$result = _$v ??
         _$SwitchOrganizationDto._(
           organizationId: BuiltValueNullFieldError.checkNotNull(
-              organizationId, r'SwitchOrganizationDto', 'organizationId'),
+            organizationId,
+            r'SwitchOrganizationDto',
+            'organizationId',
+          ),
         );
     replace(_$result);
     return _$result;

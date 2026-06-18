@@ -31,9 +31,9 @@ abstract class AdminRolesControllerListRoles200Response
 
   AdminRolesControllerListRoles200Response._();
 
-  factory AdminRolesControllerListRoles200Response(
-          [void updates(AdminRolesControllerListRoles200ResponseBuilder b)]) =
-      _$AdminRolesControllerListRoles200Response;
+  factory AdminRolesControllerListRoles200Response([
+    void updates(AdminRolesControllerListRoles200ResponseBuilder b),
+  ]) = _$AdminRolesControllerListRoles200Response;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(AdminRolesControllerListRoles200ResponseBuilder b) => b;
@@ -48,7 +48,7 @@ class _$AdminRolesControllerListRoles200ResponseSerializer
   @override
   final Iterable<Type> types = const [
     AdminRolesControllerListRoles200Response,
-    _$AdminRolesControllerListRoles200Response
+    _$AdminRolesControllerListRoles200Response,
   ];
 
   @override
@@ -77,9 +77,11 @@ class _$AdminRolesControllerListRoles200ResponseSerializer
     AdminRolesControllerListRoles200Response object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(
+      serializers,
+      object,
+      specifiedType: specifiedType,
+    ).toList();
   }
 
   void _deserializeProperties(
@@ -97,7 +99,9 @@ class _$AdminRolesControllerListRoles200ResponseSerializer
         case r'data':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(BuiltList, [FullType(RoleDto)]),
+            specifiedType: const FullType(BuiltList, [
+              FullType(RoleDto),
+            ]),
           ) as BuiltList<RoleDto>;
           result.data.replace(valueDes);
           break;
