@@ -14,7 +14,9 @@ import {
   adminResourceGroups,
   adminResources,
   canAccessResource,
+  getFirstAccessibleResourcePath,
   getResourceForPath,
+  hasAdminAppAccess,
 } from "@/lib/admin-resources";
 import { clearStoredAuthTokens } from "@/lib/auth";
 import { webFetch } from "@/lib/http";
@@ -45,6 +47,7 @@ export function useSidebar() {
 
 export function AdminShell() {
   const session = useSession();
+  const location = useLocation();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [collapsed, setCollapsed] = useState<boolean>(() => {
@@ -77,6 +80,44 @@ export function AdminShell() {
     await navigate("/login", { replace: true });
   };
 
+  const user = session.data?.data.user;
+  const permissions = session.data?.data.permissions ?? [];
+  const displayName = user?.displayName ?? "";
+  const roles = user?.roles.join(" / ") ?? "";
+  const currentResource = getResourceForPath(location.pathname);
+  const canUseAdminApp = user
+    ? hasAdminAppAccess({
+        roles: user.roles,
+        permissions,
+      })
+    : false;
+  const canAccessCurrentRoute = user
+    ? canAccessResource(currentResource, permissions)
+    : false;
+
+  useEffect(() => {
+    if (!session.data) {
+      return;
+    }
+
+    if (!canUseAdminApp) {
+      clearStoredAuthTokens();
+      void navigate("/login", { replace: true });
+      return;
+    }
+
+    if (!canAccessCurrentRoute) {
+      void navigate(getFirstAccessibleResourcePath(permissions), { replace: true });
+    }
+  }, [
+    canAccessCurrentRoute,
+    canUseAdminApp,
+    location.pathname,
+    navigate,
+    permissions,
+    session.data,
+  ]);
+
   if (session.isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-muted/30 p-4">
@@ -91,12 +132,21 @@ export function AdminShell() {
     );
   }
 
-  if (!session.data) return null;
+  if (!session.data || !user) return null;
 
-  const user = session.data.data.user;
-  const permissions = session.data.data.permissions;
-  const displayName = user.displayName;
-  const roles = user.roles.join(" / ");
+  if (!canUseAdminApp || !canAccessCurrentRoute) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-muted/30 p-4">
+        <Card className="w-full max-w-sm text-center">
+          <CardHeader className="items-center gap-3">
+            <Spinner className="size-5" />
+            <CardTitle>Checking admin access</CardTitle>
+            <CardDescription>Redirecting to a permitted workspace.</CardDescription>
+          </CardHeader>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <SidebarContext.Provider value={{ collapsed, setCollapsed: toggleCollapsed }}>

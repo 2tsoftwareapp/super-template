@@ -13,7 +13,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../co
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { PasswordInput } from "../components/ui/password-input";
-import { setStoredAuthTokens } from "../lib/auth";
+import { clearStoredAuthTokens, setStoredAuthTokens } from "../lib/auth";
+import { hasAdminAppAccess } from "../lib/admin-resources";
 import { webFetch } from "../lib/http";
 import { sessionQueryKey } from "../lib/session";
 
@@ -45,7 +46,13 @@ export function LoginPage() {
         body: JSON.stringify(values),
       });
 
-      if (!response.data.user.roles.includes("SUPER_ADMIN")) {
+      if (
+        !hasAdminAppAccess({
+          roles: response.data.user.roles,
+          permissions: response.data.permissions,
+        })
+      ) {
+        clearStoredAuthTokens();
         throw new Error("not-admin");
       }
 

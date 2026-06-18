@@ -21,7 +21,7 @@ describe("users search params", () => {
   it("round-trips list filters through the URL", () => {
     const params = {
       page: 2,
-      limit: 50,
+      limit: 50 as const,
       search: "alice",
       status: "ACTIVE" as const,
       sort: [

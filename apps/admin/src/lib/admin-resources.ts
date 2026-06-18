@@ -127,6 +127,12 @@ export const adminResources: AdminResourceConfig[] = [
 
 export const adminResourceGroups = ["Overview", "People", "Operations", "System"] as const;
 
+export const adminAppPermissions = Array.from(
+  new Set(
+    adminResources.flatMap((resource) => resource.permissions ?? []),
+  ),
+);
+
 export function getResourceForPath(pathname: string) {
   return (
     [...adminResources]
@@ -141,4 +147,31 @@ export function getResourceForPath(pathname: string) {
 export function canAccessResource(resource: AdminResourceConfig, permissions: string[]) {
   if (!resource.permissions?.length) return true;
   return resource.permissions.some((permission) => permissions.includes(permission));
+}
+
+export function hasAdminAppAccess(input: {
+  roles?: string[];
+  permissions?: string[];
+}) {
+  const roles = input.roles ?? [];
+  const permissions = input.permissions ?? [];
+
+  if (roles.includes("SUPER_ADMIN")) {
+    return true;
+  }
+
+  return adminAppPermissions.some((permission) => permissions.includes(permission));
+}
+
+export function getFirstAccessibleResourcePath(permissions: string[]) {
+  const firstProtectedResource = adminResources.find(
+    (resource) =>
+      resource.permissions?.length && canAccessResource(resource, permissions),
+  );
+
+  return (
+    firstProtectedResource?.path ??
+    adminResources.find((resource) => canAccessResource(resource, permissions))?.path ??
+    "/"
+  );
 }
