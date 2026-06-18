@@ -2,111 +2,49 @@ import { standardSchemaResolver as zodResolver } from "@hookform/resolvers/stand
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   createColumnHelper,
-  flexRender,
   getCoreRowModel,
   getSortedRowModel,
+  type RowSelectionState,
   type SortingState,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, ChevronUp, Search, UserPlus, X } from "lucide-react";
+import { UserPlus } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import { z } from "zod";
+
+import { BulkActionBar } from "@/components/bulk-action-bar";
+import { ResourceDrawer } from "@/components/resource-drawer";
+import { ResourcePageShell } from "@/components/resource-page-shell";
+import { ResourceTable } from "@/components/resource-table";
+import { ResourceToolbar } from "@/components/resource-toolbar";
+import { Avatar } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Spinner } from "@/components/ui/spinner";
+import { adminResources } from "@/lib/admin-resources";
+import { statusProps, timeAgo } from "@/lib/format";
+import { webFetch } from "@/lib/http";
+import { formatRoleName, getAssignableRoles } from "@/lib/roles";
+import { useSession } from "@/lib/session";
+import { cn } from "@/lib/utils";
 
 import type {
   AdminUserDto,
   CreateAdminUserInput,
   ListResponse,
   RoleDto,
+  UpdateUserStatusInput,
 } from "../lib/types";
 
-import { Avatar } from "../components/ui/avatar";
-import { Badge } from "../components/ui/badge";
-import { Button } from "../components/ui/button";
-import { Card, CardContent, CardHeader } from "../components/ui/card";
-import { Input } from "../components/ui/input";
-import { Label } from "../components/ui/label";
-import { Spinner } from "../components/ui/spinner";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "../components/ui/table";
-import { statusProps, timeAgo } from "../lib/format";
-import { webFetch } from "../lib/http";
-import { formatRoleName, getAssignableRoles } from "../lib/roles";
-import { useSession } from "../lib/session";
-import { cn } from "../lib/utils";
-
-// ── Column definitions ────────────────────────────────────────────────────────
-
+const usersResource = adminResources.find((resource) => resource.id === "users")!;
 const columnHelper = createColumnHelper<AdminUserDto>();
-
-const columns = [
-  columnHelper.accessor("displayName", {
-    id: "user",
-    header: "User",
-    enableSorting: true,
-    cell: ({ row }) => (
-      <div className="flex items-center gap-3 py-0.5">
-        <Avatar name={row.original.displayName} size="sm" />
-        <div className="min-w-0">
-          <p className="truncate text-sm font-medium">{row.original.displayName}</p>
-          <p className="truncate text-xs text-muted-foreground">{row.original.email}</p>
-        </div>
-      </div>
-    ),
-  }),
-  columnHelper.accessor("status", {
-    header: "Status",
-    enableSorting: true,
-    cell: ({ getValue }) => {
-      const s = getValue();
-      const { variant, className } = statusProps(s);
-      return (
-        <Badge variant={variant} className={cn("capitalize", className)}>
-          {s.toLowerCase()}
-        </Badge>
-      );
-    },
-  }),
-  columnHelper.accessor("roles", {
-    header: "Roles",
-    enableSorting: false,
-    cell: ({ getValue }) => {
-      const roles = getValue();
-      if (!roles.length)
-        return <span className="text-xs text-muted-foreground">—</span>;
-      return (
-        <div className="flex flex-wrap gap-1">
-          {roles.slice(0, 3).map((role) => (
-            <Badge key={role} variant="secondary" className="text-xs">
-              {formatRoleName(role)}
-            </Badge>
-          ))}
-          {roles.length > 3 && (
-            <Badge variant="outline" className="text-xs">
-              +{roles.length - 3}
-            </Badge>
-          )}
-        </div>
-      );
-    },
-  }),
-  columnHelper.accessor("createdAt", {
-    header: "Joined",
-    enableSorting: true,
-    cell: ({ getValue }) => (
-      <span className="text-xs text-muted-foreground">{timeAgo(getValue())}</span>
-    ),
-  }),
-];
-
-// ── Create user drawer ────────────────────────────────────────────────────────
 
 const createSchema = z.object({
   email: z.email(),
@@ -139,9 +77,7 @@ function CreateUserDrawer({
         .map((role) => role.id),
     [assignableRoles],
   );
-  const [selectedRoleIds, setSelectedRoleIds] = useState<string[]>(
-    defaultRoleIds,
-  );
+  const [selectedRoleIds, setSelectedRoleIds] = useState<string[]>(defaultRoleIds);
 
   const form = useForm<CreateForm>({
     resolver: zodResolver(createSchema),
@@ -158,149 +94,121 @@ function CreateUserDrawer({
       await queryClient.invalidateQueries({ queryKey: ["admin-users"] });
       form.reset();
       setSelectedRoleIds(defaultRoleIds);
+      toast.success("User created");
       onClose();
     },
   });
 
   const toggleRole = (id: string) =>
     setSelectedRoleIds((prev) =>
-      prev.includes(id) ? prev.filter((r) => r !== id) : [...prev, id],
+      prev.includes(id) ? prev.filter((roleId) => roleId !== id) : [...prev, id],
     );
 
-  if (!open) return null;
-
   return (
-    <>
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 z-40 bg-black/25 backdrop-blur-[2px]"
-        onClick={onClose}
-      />
-
-      {/* Panel */}
-      <div className="fixed right-0 top-0 z-50 flex h-full w-full max-w-[420px] flex-col border-l border-border bg-card shadow-2xl">
-        {/* Header */}
-        <div className="flex shrink-0 items-start justify-between border-b border-border px-5 py-4">
-          <div>
-            <h2 className="font-semibold">New user</h2>
-            <p className="mt-0.5 text-xs text-muted-foreground">
-              Create an account and optionally assign roles.
+    <ResourceDrawer
+      open={open}
+      title="New user"
+      description="Create an account and assign the roles this operator can grant."
+      onClose={onClose}
+      footer={
+        <Button
+          type="submit"
+          form="create-user-form"
+          className="w-full"
+          disabled={createUser.isPending}
+        >
+          {createUser.isPending ? <Spinner data-icon="inline-start" /> : null}
+          Create user
+        </Button>
+      }
+    >
+      <form
+        id="create-user-form"
+        className="flex flex-col gap-4"
+        onSubmit={form.handleSubmit((values) => {
+          void createUser.mutateAsync({
+            email: values.email,
+            password: values.password,
+            displayName: values.displayName,
+            roleIds: selectedRoleIds.length > 0 ? selectedRoleIds : defaultRoleIds,
+          });
+        })}
+      >
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="displayName">Display name</Label>
+          <Input
+            id="displayName"
+            aria-invalid={Boolean(form.formState.errors.displayName)}
+            {...form.register("displayName")}
+          />
+          {form.formState.errors.displayName ? (
+            <p className="text-xs text-destructive">
+              {form.formState.errors.displayName.message}
             </p>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-          >
-            <X className="size-4" />
-          </button>
+          ) : null}
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="email">Email</Label>
+          <Input
+            id="email"
+            type="email"
+            aria-invalid={Boolean(form.formState.errors.email)}
+            {...form.register("email")}
+          />
+          {form.formState.errors.email ? (
+            <p className="text-xs text-destructive">
+              {form.formState.errors.email.message}
+            </p>
+          ) : null}
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="password">Password</Label>
+          <Input
+            id="password"
+            type="password"
+            aria-invalid={Boolean(form.formState.errors.password)}
+            {...form.register("password")}
+          />
+          {form.formState.errors.password ? (
+            <p className="text-xs text-destructive">
+              {form.formState.errors.password.message}
+            </p>
+          ) : null}
         </div>
 
-        {/* Body */}
-        <div className="flex-1 overflow-y-auto px-5 py-5">
-          <form
-            id="create-user-form"
-            className="space-y-4"
-            onSubmit={form.handleSubmit((values) => {
-              void createUser.mutateAsync({
-                email: values.email,
-                password: values.password,
-                displayName: values.displayName,
-                roleIds:
-                  selectedRoleIds.length > 0 ? selectedRoleIds : defaultRoleIds,
-              });
-            })}
-          >
-            <div className="space-y-1.5">
-              <Label>Display name</Label>
-              <Input {...form.register("displayName")} />
-              {form.formState.errors.displayName && (
-                <p className="text-xs text-destructive">
-                  {form.formState.errors.displayName.message}
-                </p>
-              )}
+        <div className="flex flex-col gap-2">
+          <Label>Roles</Label>
+          {assignableRoles.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No roles available.</p>
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {assignableRoles.map((role) => {
+                const selected = selectedRoleIds.includes(role.id);
+                return (
+                  <Button
+                    key={role.id}
+                    type="button"
+                    variant={selected ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => toggleRole(role.id)}
+                  >
+                    {formatRoleName(role.name)}
+                  </Button>
+                );
+              })}
             </div>
-            <div className="space-y-1.5">
-              <Label>Email</Label>
-              <Input type="email" {...form.register("email")} />
-              {form.formState.errors.email && (
-                <p className="text-xs text-destructive">
-                  {form.formState.errors.email.message}
-                </p>
-              )}
-            </div>
-            <div className="space-y-1.5">
-              <Label>Password</Label>
-              <Input type="password" {...form.register("password")} />
-              {form.formState.errors.password && (
-                <p className="text-xs text-destructive">
-                  {form.formState.errors.password.message}
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label>
-                Roles{" "}
-                <span className="font-normal text-muted-foreground">(required)</span>
-              </Label>
-              {assignableRoles.length === 0 ? (
-                <p className="text-xs text-muted-foreground">No roles available.</p>
-              ) : (
-                <div className="flex flex-wrap gap-1.5">
-                  {assignableRoles.map((role) => {
-                    const selected = selectedRoleIds.includes(role.id);
-                    return (
-                      <button
-                        key={role.id}
-                        type="button"
-                        onClick={() => toggleRole(role.id)}
-                        className={cn(
-                          "rounded-md border px-2.5 py-1 text-xs font-medium capitalize transition-colors",
-                          selected
-                            ? "border-foreground bg-foreground text-background"
-                            : "border-border text-muted-foreground hover:border-foreground/50 hover:text-foreground",
-                        )}
-                      >
-                        {formatRoleName(role.name)}
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-
-            {createUser.isError && (
-              <p className="text-xs text-destructive">
-                Failed to create user. Check inputs and role permissions.
-              </p>
-            )}
-          </form>
+          )}
         </div>
 
-        {/* Footer */}
-        <div className="shrink-0 border-t border-border px-5 py-4">
-          <Button
-            type="submit"
-            form="create-user-form"
-            className="w-full"
-            disabled={createUser.isPending}
-          >
-            {createUser.isPending ? (
-              <>
-                <Spinner className="size-4" /> Creating…
-              </>
-            ) : (
-              "Create user"
-            )}
-          </Button>
-        </div>
-      </div>
-    </>
+        {createUser.isError ? (
+          <p className="text-sm text-destructive">
+            Failed to create user. Check inputs and role permissions.
+          </p>
+        ) : null}
+      </form>
+    </ResourceDrawer>
   );
 }
-
-// ── Stat chip ─────────────────────────────────────────────────────────────────
 
 function StatChip({
   label,
@@ -314,17 +222,15 @@ function StatChip({
   return (
     <div
       className={cn(
-        "rounded-xl border border-border px-4 py-3",
+        "rounded-lg border border-border px-4 py-3",
         active && "border-primary/30 bg-primary/5",
       )}
     >
-      <p className="text-2xl font-bold tabular-nums">{count}</p>
+      <p className="text-2xl font-semibold tabular-nums">{count}</p>
       <p className="mt-0.5 text-xs text-muted-foreground">{label}</p>
     </div>
   );
 }
-
-// ── Status filter tabs ────────────────────────────────────────────────────────
 
 const STATUS_TABS = [
   { value: "all", label: "All" },
@@ -333,14 +239,14 @@ const STATUS_TABS = [
   { value: "BLOCKED", label: "Blocked" },
 ];
 
-// ── Page ──────────────────────────────────────────────────────────────────────
-
 export function UsersPage() {
   const navigate = useNavigate();
   const session = useSession();
+  const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [showCreate, setShowCreate] = useState(false);
 
   const roles = useQuery({
@@ -353,15 +259,41 @@ export function UsersPage() {
     queryFn: () => webFetch<ListResponse<AdminUserDto>>("/api/v1/admin/users?limit=100"),
   });
 
+  const updateUserStatus = useMutation({
+    mutationFn: ({
+      userIds,
+      status,
+    }: {
+      userIds: string[];
+      status: UpdateUserStatusInput["status"];
+    }) =>
+      Promise.all(
+        userIds.map((userId) =>
+          webFetch<{ data: AdminUserDto }>(`/api/v1/admin/users/${userId}/status`, {
+            method: "PATCH",
+            body: JSON.stringify({ status } satisfies UpdateUserStatusInput),
+          }),
+        ),
+      ),
+    onSuccess: async (_result, variables) => {
+      await queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      setRowSelection({});
+      toast.success(`${variables.userIds.length} users updated`);
+    },
+  });
+
   const allUsers = useMemo(() => users.data?.data ?? [], [users.data?.data]);
   const actorRoles = session.data?.data.user.roles ?? [];
+  const permissions = session.data?.data.permissions ?? [];
+  const canCreate = permissions.includes("users.create");
+  const canUpdate = permissions.includes("users.update");
 
   const stats = useMemo(
     () => ({
       total: allUsers.length,
-      active: allUsers.filter((u) => u.status === "ACTIVE").length,
-      pending: allUsers.filter((u) => u.status === "PENDING").length,
-      blocked: allUsers.filter((u) => u.status === "BLOCKED").length,
+      active: allUsers.filter((user) => user.status === "ACTIVE").length,
+      pending: allUsers.filter((user) => user.status === "PENDING").length,
+      blocked: allUsers.filter((user) => user.status === "BLOCKED").length,
     }),
     [allUsers],
   );
@@ -371,178 +303,230 @@ export function UsersPage() {
     if (search) {
       const q = search.toLowerCase();
       data = data.filter(
-        (u) =>
-          u.displayName.toLowerCase().includes(q) ||
-          u.email.toLowerCase().includes(q),
+        (user) =>
+          user.displayName.toLowerCase().includes(q) ||
+          user.email.toLowerCase().includes(q),
       );
     }
     if (statusFilter !== "all") {
-      data = data.filter((u) => u.status === statusFilter);
+      data = data.filter((user) => user.status === statusFilter);
     }
     return data;
   }, [allUsers, search, statusFilter]);
+
+  const columns = useMemo(
+    () => [
+      columnHelper.display({
+        id: "select",
+        header: ({ table }) => (
+          <Checkbox
+            aria-label="Select all users"
+            checked={table.getIsAllPageRowsSelected()}
+            onChange={table.getToggleAllPageRowsSelectedHandler()}
+            onClick={(event) => event.stopPropagation()}
+          />
+        ),
+        cell: ({ row }) => (
+          <Checkbox
+            aria-label={`Select ${row.original.displayName}`}
+            checked={row.getIsSelected()}
+            onChange={row.getToggleSelectedHandler()}
+            onClick={(event) => event.stopPropagation()}
+          />
+        ),
+        enableSorting: false,
+      }),
+      columnHelper.accessor("displayName", {
+        id: "user",
+        header: "User",
+        enableSorting: true,
+        cell: ({ row }) => (
+          <div className="flex items-center gap-3 py-0.5">
+            <Avatar name={row.original.displayName} size="sm" />
+            <div className="min-w-0">
+              <p className="truncate text-sm font-medium">{row.original.displayName}</p>
+              <p className="truncate text-xs text-muted-foreground">{row.original.email}</p>
+            </div>
+          </div>
+        ),
+      }),
+      columnHelper.accessor("status", {
+        header: "Status",
+        enableSorting: true,
+        cell: ({ getValue }) => {
+          const status = getValue();
+          const { variant, className } = statusProps(status);
+          return (
+            <Badge variant={variant} className={cn("capitalize", className)}>
+              {status.toLowerCase()}
+            </Badge>
+          );
+        },
+      }),
+      columnHelper.accessor("roles", {
+        header: "Roles",
+        enableSorting: false,
+        cell: ({ getValue }) => {
+          const roleNames = getValue();
+          if (!roleNames.length) {
+            return <span className="text-xs text-muted-foreground">None</span>;
+          }
+          return (
+            <div className="flex flex-wrap gap-1">
+              {roleNames.slice(0, 3).map((role) => (
+                <Badge key={role} variant="secondary" className="text-xs">
+                  {formatRoleName(role)}
+                </Badge>
+              ))}
+              {roleNames.length > 3 ? (
+                <Badge variant="outline" className="text-xs">
+                  +{roleNames.length - 3}
+                </Badge>
+              ) : null}
+            </div>
+          );
+        },
+      }),
+      columnHelper.accessor("createdAt", {
+        header: "Joined",
+        enableSorting: true,
+        cell: ({ getValue }) => (
+          <span className="text-xs text-muted-foreground">{timeAgo(getValue())}</span>
+        ),
+      }),
+    ],
+    [],
+  );
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data: filteredData,
     columns,
+    getRowId: (row) => row.id,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     onSortingChange: setSorting,
-    state: { sorting },
+    onRowSelectionChange: setRowSelection,
+    state: { sorting, rowSelection },
   });
+
+  const selectedIds = table.getSelectedRowModel().rows.map((row) => row.original.id);
+  const hasFilters = Boolean(search || statusFilter !== "all");
 
   return (
     <>
-      {showCreate && (
-        <CreateUserDrawer
-          key={`create-user:${actorRoles.join(",")}:${roles.data?.data.map((role) => role.id).join(",")}`}
-          open
-          onClose={() => setShowCreate(false)}
-          actorRoles={actorRoles}
-          roles={roles.data?.data ?? []}
-        />
-      )}
+      <CreateUserDrawer
+        key={`create-user:${actorRoles.join(",")}:${roles.data?.data.map((role) => role.id).join(",")}`}
+        open={showCreate}
+        onClose={() => setShowCreate(false)}
+        actorRoles={actorRoles}
+        roles={roles.data?.data ?? []}
+      />
 
-      <div className="space-y-6">
-        {/* Page header */}
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Users</h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Manage accounts, roles, and access.
-            </p>
-          </div>
-          <Button onClick={() => setShowCreate(true)} className="shrink-0">
-            <UserPlus className="size-4" />
-            New user
-          </Button>
-        </div>
-
-        {/* Stats */}
-        {!users.isLoading && (
+      <ResourcePageShell
+        resource={usersResource}
+        description="Manage accounts, roles, status, and operational access from one resource view."
+        isRefreshing={users.isFetching || roles.isFetching}
+        onRefresh={() => {
+          void users.refetch();
+          void roles.refetch();
+        }}
+        actions={
+          canCreate ? (
+            <Button onClick={() => setShowCreate(true)}>
+              <UserPlus data-icon="inline-start" />
+              New user
+            </Button>
+          ) : null
+        }
+      >
+        {!users.isLoading ? (
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <StatChip label="Total" count={stats.total} />
             <StatChip label="Active" count={stats.active} active />
             <StatChip label="Pending" count={stats.pending} />
             <StatChip label="Blocked" count={stats.blocked} />
           </div>
-        )}
+        ) : null}
 
-        {/* Table card */}
         <Card>
-          <CardHeader className="space-y-3 pb-3">
-            {/* Toolbar */}
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="relative min-w-[200px] flex-1">
-                <Search className="absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  placeholder="Search name or email…"
-                  className="pl-8"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
-              </div>
-              <div className="flex items-center gap-1 rounded-lg border border-border p-1">
+          <ResourceToolbar
+            search={search}
+            onSearchChange={setSearch}
+            searchPlaceholder="Search name or email"
+            hasFilters={hasFilters}
+            onClearFilters={() => {
+              setSearch("");
+              setStatusFilter("all");
+            }}
+            filters={
+              <div className="flex flex-wrap items-center gap-1 rounded-lg border border-border p-1">
                 {STATUS_TABS.map((tab) => (
-                  <button
+                  <Button
                     key={tab.value}
                     type="button"
+                    variant={statusFilter === tab.value ? "default" : "ghost"}
+                    size="sm"
                     onClick={() => setStatusFilter(tab.value)}
-                    className={cn(
-                      "rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
-                      statusFilter === tab.value
-                        ? "bg-foreground text-background"
-                        : "text-muted-foreground hover:text-foreground",
-                    )}
                   >
                     {tab.label}
-                  </button>
+                  </Button>
                 ))}
               </div>
-            </div>
-
-            {!users.isLoading && (
-              <p className="text-xs text-muted-foreground">
-                {filteredData.length === allUsers.length
+            }
+            resultLabel={
+              users.isLoading
+                ? "Loading users"
+                : filteredData.length === allUsers.length
                   ? `${allUsers.length} users`
-                  : `${filteredData.length} of ${allUsers.length} users`}
-              </p>
-            )}
-          </CardHeader>
-
+                  : `${filteredData.length} of ${allUsers.length} users`
+            }
+          />
+          <BulkActionBar
+            selectedCount={selectedIds.length}
+            onClear={() => setRowSelection({})}
+            actions={
+              canUpdate ? (
+                <>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={updateUserStatus.isPending}
+                    onClick={() =>
+                      updateUserStatus.mutate({ userIds: selectedIds, status: "ACTIVE" })
+                    }
+                  >
+                    Activate
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={updateUserStatus.isPending}
+                    onClick={() =>
+                      updateUserStatus.mutate({ userIds: selectedIds, status: "BLOCKED" })
+                    }
+                  >
+                    Block
+                  </Button>
+                </>
+              ) : null
+            }
+          />
           <CardContent className="p-0 pb-1">
-            <Table>
-              <TableHeader>
-                {table.getHeaderGroups().map((group) => (
-                  <TableRow key={group.id}>
-                    {group.headers.map((header) => {
-                      const sorted = header.column.getIsSorted();
-                      const canSort = header.column.getCanSort();
-                      return (
-                        <TableHead
-                          key={header.id}
-                          className={cn(canSort && "cursor-pointer select-none")}
-                          onClick={header.column.getToggleSortingHandler()}
-                        >
-                          {header.isPlaceholder ? null : (
-                            <span className="inline-flex items-center gap-1">
-                              {flexRender(header.column.columnDef.header, header.getContext())}
-                              {canSort && (
-                                sorted === "asc" ? (
-                                  <ChevronUp className="size-3 shrink-0" />
-                                ) : sorted === "desc" ? (
-                                  <ChevronDown className="size-3 shrink-0" />
-                                ) : (
-                                  <ArrowUpDown className="size-3 shrink-0 opacity-30" />
-                                )
-                              )}
-                            </span>
-                          )}
-                        </TableHead>
-                      );
-                    })}
-                  </TableRow>
-                ))}
-              </TableHeader>
-              <TableBody>
-                {users.isLoading ? (
-                  <TableRow>
-                    <TableCell colSpan={columns.length} className="py-16 text-center">
-                      <Spinner className="mx-auto size-5" />
-                    </TableCell>
-                  </TableRow>
-                ) : table.getRowModel().rows.length === 0 ? (
-                  <TableRow>
-                    <TableCell
-                      colSpan={columns.length}
-                      className="py-16 text-center text-sm text-muted-foreground"
-                    >
-                      {search || statusFilter !== "all"
-                        ? "No users match your filters."
-                        : "No users yet."}
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  table.getRowModel().rows.map((row) => (
-                    <TableRow
-                      key={row.id}
-                      className="cursor-pointer"
-                      onClick={() => void navigate(`/users/${row.original.id}`)}
-                    >
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
+            <ResourceTable
+              table={table}
+              isLoading={users.isLoading}
+              emptyTitle={hasFilters ? "No users match your filters" : "No users yet"}
+              emptyDescription={
+                hasFilters
+                  ? "Clear filters or adjust the search terms."
+                  : "Create a user to start managing access."
+              }
+              onRowClick={(row) => void navigate(`/users/${row.original.id}`)}
+            />
           </CardContent>
         </Card>
-      </div>
+      </ResourcePageShell>
     </>
   );
 }

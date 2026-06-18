@@ -1,10 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import { RefreshCw, Search, X } from "lucide-react";
+import { RefreshCw } from "lucide-react";
 import { useState } from "react";
 
 import type { AuditLogDto, ListResponse } from "../lib/types";
 
-import { PageHeader } from "../components/page-header";
+import { ResourcePageShell } from "../components/resource-page-shell";
+import { ResourceToolbar } from "../components/resource-toolbar";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
@@ -12,6 +13,7 @@ import { Input } from "../components/ui/input";
 import { Spinner } from "../components/ui/spinner";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui/table";
 import { Tooltip } from "../components/ui/tooltip";
+import { adminResources } from "../lib/admin-resources";
 import { timeAgo } from "../lib/format";
 import { webFetch } from "../lib/http";
 import { cn } from "../lib/utils";
@@ -24,6 +26,7 @@ function formatAction(action: string): string {
 }
 
 export function AuditLogsPage() {
+  const auditResource = adminResources.find((resource) => resource.id === "audit-logs")!;
   const [actorId, setActorId] = useState("");
   const [action, setAction] = useState("");
 
@@ -45,56 +48,47 @@ export function AuditLogsPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        label="Audit"
-        title="Audit logs"
-        description="Track admin actions and quickly inspect who changed what."
-      />
-
-      {/* Filters */}
+    <ResourcePageShell
+      resource={auditResource}
+      description="Track admin actions and quickly inspect who changed what."
+      isRefreshing={auditLogs.isFetching}
+      onRefresh={() => void auditLogs.refetch()}
+    >
       <Card>
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-base">Filters</CardTitle>
-              <CardDescription className="text-xs">Query the recent audit stream.</CardDescription>
-            </div>
-            <div className="flex items-center gap-2">
-              {hasFilters && (
-                <Button variant="ghost" size="sm" onClick={clearFilters} className="h-7 text-xs">
-                  <X className="size-3" />
-                  Clear
-                </Button>
-              )}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => void auditLogs.refetch()}
-                disabled={auditLogs.isFetching}
-              >
-                <RefreshCw className={cn("size-3.5", auditLogs.isFetching && "animate-spin")} />
-                Refresh
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="grid gap-3 pb-4 md:grid-cols-2">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
+        <ResourceToolbar
+          search={actorId}
+          onSearchChange={setActorId}
+          searchPlaceholder="Actor ID"
+          hasFilters={hasFilters}
+          onClearFilters={clearFilters}
+          filters={
             <Input
-              placeholder="Actor ID"
-              className="pl-8"
-              value={actorId}
-              onChange={(e) => setActorId(e.target.value)}
+              placeholder="Action, e.g. user.created"
+              value={action}
+              onChange={(event) => setAction(event.target.value)}
+              className="md:max-w-sm"
             />
-          </div>
-          <Input
-            placeholder="Action (e.g. user.created)"
-            value={action}
-            onChange={(e) => setAction(e.target.value)}
-          />
-        </CardContent>
+          }
+          actions={
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => void auditLogs.refetch()}
+              disabled={auditLogs.isFetching}
+            >
+              <RefreshCw
+                data-icon="inline-start"
+                className={cn(auditLogs.isFetching && "animate-spin")}
+              />
+              Refresh
+            </Button>
+          }
+          resultLabel={
+            auditLogs.data
+              ? `${auditLogs.data.data.length} events returned`
+              : "Latest logs returned by the API."
+          }
+      />
       </Card>
 
       {/* Events table */}
@@ -166,6 +160,6 @@ export function AuditLogsPage() {
           </Table>
         </CardContent>
       </Card>
-    </div>
+    </ResourcePageShell>
   );
 }
