@@ -33,7 +33,17 @@ export class ExportsController {
     @Body() input: CreateExportDto,
     @Req() request: Request,
   ) {
-    return this.exportsService.create(user, input, request.requestContext);
+    return this.exportsService.create(
+      user,
+      {
+        type: input.type,
+        ...(input.filters !== undefined ? { filters: input.filters } : {}),
+        ...(input.idempotencyKey !== undefined
+          ? { idempotencyKey: input.idempotencyKey }
+          : {}),
+      },
+      request.requestContext,
+    );
   }
 
   @Get(':id')

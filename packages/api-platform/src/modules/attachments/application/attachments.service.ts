@@ -8,9 +8,9 @@ import { ERROR_CODES } from '@repo/api-core';
 import { AppError } from '@repo/api-core';
 
 import type {
-  AttachEntityDto,
-  AttachmentsQueryDto,
-} from '../presentation/attachments.dto';
+  AttachEntityCommand,
+  ListAttachmentsQuery,
+} from './attachments.types';
 
 import { AuditService } from '../../audit/application/audit.service';
 import { FilesRepository } from '../../files/infrastructure/files.repository';
@@ -26,7 +26,7 @@ export class AttachmentsService {
 
   async attach(
     actor: AuthenticatedRequestUser,
-    input: AttachEntityDto,
+    input: AttachEntityCommand,
     requestContext?: RequestContext,
   ) {
     const file = await this.filesRepository.findById(input.fileId);
@@ -64,7 +64,7 @@ export class AttachmentsService {
     return this.toAttachmentDto(attachment);
   }
 
-  async list(query: AttachmentsQueryDto) {
+  async list(query: ListAttachmentsQuery) {
     const rows = await this.attachmentsRepository.listByEntity(
       query.entityType,
       query.entityId,

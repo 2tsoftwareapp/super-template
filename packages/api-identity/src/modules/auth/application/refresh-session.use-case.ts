@@ -3,7 +3,7 @@ import type { RequestContext } from '@repo/api-core';
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { AppError, ERROR_CODES } from '@repo/api-core';
 
-import type { RefreshTokenDto } from '../presentation/auth.dto';
+import type { RefreshSessionCommand } from './auth.types';
 
 import { AccessControlService } from '../../access-control/application/access-control.service';
 import { OrganizationsService } from '../../organizations/application/organizations.service';
@@ -25,7 +25,7 @@ export class RefreshSessionUseCase {
     private readonly sessionTokenService: SessionTokenService,
   ) {}
 
-  async execute(input: RefreshTokenDto, requestContext?: RequestContext) {
+  async execute(input: RefreshSessionCommand, requestContext?: RequestContext) {
     const payload = await this.sessionTokenService.verifyToken(
       input.refreshToken,
       'refresh',

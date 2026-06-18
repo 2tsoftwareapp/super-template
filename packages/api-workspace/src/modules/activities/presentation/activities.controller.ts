@@ -17,7 +17,15 @@ export class ActivitiesController {
   @Permissions(PERMISSION_NAMES.ACTIVITIES_READ)
   @ApiPaginatedResponse(ActivityDto)
   async list(@Query() query: ActivitiesQueryDto) {
-    const result = await this.activitiesService.list(query);
+    const result = await this.activitiesService.list({
+      page: query.page,
+      limit: query.limit,
+      ...(query.entityType !== undefined
+        ? { entityType: query.entityType }
+        : {}),
+      ...(query.entityId !== undefined ? { entityId: query.entityId } : {}),
+      ...(query.actorId !== undefined ? { actorId: query.actorId } : {}),
+    });
 
     return {
       data: result.rows,

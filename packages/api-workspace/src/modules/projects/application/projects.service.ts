@@ -3,479 +3,85 @@ import type {
   RequestContext,
 } from '@repo/api-core';
 
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import {
-  AppError,
-  AUDIT_WRITER,
-  type AuditWriter,
-  ENTITY_ATTACHMENT_LISTING,
-  type EntityAttachmentListing,
-  ERROR_CODES,
-  type NotificationMessage,
-  ORGANIZATION_LOOKUP,
-  type OrganizationLookup,
-  PERMISSION_NAMES,
-  requireOrganizationId,
-  USER_LOOKUP,
-  USER_NOTIFICATION_SENDER,
-  type UserLookup,
-  type UserNotificationSender,
-} from '@repo/api-core';
-import { runInTransaction } from '@repo/api-database';
+import { Injectable } from '@nestjs/common';
 
 import type {
-  CreateProjectDto,
-  ProjectsQueryDto,
-  UpdateProjectDto,
-} from '../presentation/projects.dto';
+  CreateProjectCommand,
+  ListProjectsQuery,
+  UpdateProjectCommand,
+} from './projects.types';
 
-import {
-  ACTIVITY_EMITTER,
-  type ActivityEmitter,
-} from '../../activities/application/activity-emitter.port';
-import { ProjectsMapper } from './projects.mapper';
-import {
-  PROJECTS_REPOSITORY,
-  type ProjectsRepositoryPort,
-} from './projects.repository.port';
+import { CreateProjectUseCase } from './create-project.use-case';
+import { GetProjectUseCase } from './get-project.use-case';
+import { ListProjectAttachmentsUseCase } from './list-project-attachments.use-case';
+import { ListProjectsUseCase } from './list-projects.use-case';
+import { ProjectLifecycleUseCase } from './project-lifecycle.use-case';
+import { UpdateProjectUseCase } from './update-project.use-case';
+
+export type { ProjectView as ProjectDto } from './projects.types';
 
 @Injectable()
 export class ProjectsService {
   constructor(
-    @Inject(PROJECTS_REPOSITORY)
-    private readonly projectsRepository: ProjectsRepositoryPort,
-    private readonly projectsMapper: ProjectsMapper,
-    @Inject(USER_LOOKUP) private readonly userLookup: UserLookup,
-    @Inject(USER_NOTIFICATION_SENDER)
-    private readonly notificationSender: UserNotificationSender,
-    @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
-    @Inject(ACTIVITY_EMITTER) private readonly activityEmitter: ActivityEmitter,
-    @Inject(ENTITY_ATTACHMENT_LISTING)
-    private readonly entityAttachments: EntityAttachmentListing,
-    @Inject(ORGANIZATION_LOOKUP)
-    private readonly organizationLookup: OrganizationLookup,
+    private readonly listProjectsUseCase: ListProjectsUseCase,
+    private readonly getProjectUseCase: GetProjectUseCase,
+    private readonly createProjectUseCase: CreateProjectUseCase,
+    private readonly updateProjectUseCase: UpdateProjectUseCase,
+    private readonly projectLifecycleUseCase: ProjectLifecycleUseCase,
+    private readonly listProjectAttachmentsUseCase: ListProjectAttachmentsUseCase,
   ) {}
 
-  async list(user: AuthenticatedRequestUser, query: ProjectsQueryDto) {
-    const canReadAll =
-      user.permissions.includes(PERMISSION_NAMES.PROJECTS_READ) &&
-      !user.roles.includes('USER');
-    const organizationId = requireOrganizationId(user);
-    const result = await this.projectsRepository.list(
-      canReadAll
-        ? {
-            ...query,
-            organizationId,
-          }
-        : {
-            ...query,
-            ownerId: user.userId,
-            organizationId,
-          },
-    );
-
-    return {
-      rows: result.rows.map((row) => this.projectsMapper.toProjectDto(row)),
-      total: result.total,
-    };
+  list(user: AuthenticatedRequestUser, query: ListProjectsQuery) {
+    return this.listProjectsUseCase.execute(user, query);
   }
 
-  async getById(user: AuthenticatedRequestUser, projectId: string) {
-    const project = await this.projectsRepository.findById(projectId);
-
-    if (!project) {
-      throw new AppError(
-        ERROR_CODES.PROJECT_NOT_FOUND,
-        'Project not found',
-        HttpStatus.NOT_FOUND,
-      );
-    }
-
-    this.assertCanAccessProject(user, project.ownerId);
-    return this.projectsMapper.toProjectDto(project);
+  getById(user: AuthenticatedRequestUser, projectId: string) {
+    return this.getProjectUseCase.execute(user, projectId);
   }
 
-  async create(
+  create(
     user: AuthenticatedRequestUser,
-    input: CreateProjectDto,
+    input: CreateProjectCommand,
     requestContext?: RequestContext,
   ) {
-    const ownerId = this.resolveOwnerId(user, input.ownerId);
-    const owner = await this.userLookup.findById(ownerId);
-
-    if (!owner) {
-      throw new AppError(
-        ERROR_CODES.USER_NOT_FOUND,
-        'Owner not found',
-        HttpStatus.NOT_FOUND,
-      );
-    }
-
-    const existing = await this.projectsRepository.findActiveByOwnerAndName(
-      ownerId,
-      input.name,
-    );
-
-    if (existing) {
-      throw new AppError(
-        ERROR_CODES.RESOURCE_CONFLICT,
-        'A project with this name already exists',
-        HttpStatus.CONFLICT,
-      );
-    }
-
-    const actorOrganizationId = requireOrganizationId(user);
-    const organizationId =
-      ownerId === user.userId
-        ? actorOrganizationId
-        : ((await this.organizationLookup.findPrimaryOrganizationId(ownerId)) ??
-          actorOrganizationId);
-    const projectDto = await runInTransaction(
-      this.projectsRepository.client,
-      async (transaction) => {
-        const project = await this.projectsRepository.create(
-          {
-            organizationId,
-            ownerId,
-            name: input.name,
-            description: input.description ?? null,
-            status: input.status ?? 'DRAFT',
-            createdById: user.userId,
-          },
-          transaction,
-        );
-
-        if (!project) {
-          throw new Error('Project insert returned no rows');
-        }
-
-        let notificationToDispatch: NotificationMessage | null = null;
-
-        if (ownerId !== user.userId) {
-          notificationToDispatch = await this.notificationSender.sendToUser(
-            user,
-            {
-              userId: ownerId,
-              type: 'project.assigned',
-              title: 'Project assigned',
-              body: `${user.displayName} assigned you to project ${project.name}.`,
-            },
-            requestContext,
-            transaction,
-            { deferDispatch: true },
-          );
-        }
-
-        await this.auditWriter.log(
-          {
-            actorId: user.userId,
-            action: 'project.created',
-            entityType: 'project',
-            entityId: project.id,
-            metadata: {
-              ownerId,
-            },
-            requestContext,
-          },
-          transaction,
-        );
-
-        await this.activityEmitter.emit(
-          {
-            organizationId,
-            summary: `Project "${project.name}" was created`,
-            entityType: 'project',
-            entityId: project.id,
-            actorId: user.userId,
-            metadata: { ownerId },
-          },
-          transaction,
-        );
-
-        return {
-          project: this.projectsMapper.toProjectDto(project),
-          notificationToDispatch,
-        };
-      },
-    );
-
-    if (projectDto.notificationToDispatch) {
-      void this.notificationSender.dispatch(
-        projectDto.notificationToDispatch,
-      );
-    }
-
-    return projectDto.project;
+    return this.createProjectUseCase.execute(user, input, requestContext);
   }
 
-  async update(
+  update(
     user: AuthenticatedRequestUser,
     projectId: string,
-    input: UpdateProjectDto,
+    input: UpdateProjectCommand,
     requestContext?: RequestContext,
   ) {
-    const project = await this.projectsRepository.findById(projectId);
-
-    if (!project) {
-      throw new AppError(
-        ERROR_CODES.PROJECT_NOT_FOUND,
-        'Project not found',
-        HttpStatus.NOT_FOUND,
-      );
-    }
-
-    this.assertCanMutateProject(user, project.ownerId);
-    const ownerId = input.ownerId
-      ? this.resolveOwnerId(user, input.ownerId)
-      : project.ownerId;
-
-    if (input.name && input.name !== project.name) {
-      const existing = await this.projectsRepository.findActiveByOwnerAndName(
-        ownerId,
-        input.name,
-      );
-
-      if (existing && existing.id !== project.id) {
-        throw new AppError(
-          ERROR_CODES.RESOURCE_CONFLICT,
-          'A project with this name already exists',
-          HttpStatus.CONFLICT,
-        );
-      }
-    }
-
-    const projectDto = await runInTransaction(
-      this.projectsRepository.client,
-      async (transaction) => {
-        const updated = await this.projectsRepository.update(
-          projectId,
-          {
-            name: input.name ?? project.name,
-            description: input.description ?? project.description,
-            status: input.status ?? project.status,
-            ownerId,
-            updatedById: user.userId,
-          },
-          transaction,
-        );
-
-        if (!updated) {
-          throw new AppError(
-            ERROR_CODES.PROJECT_NOT_FOUND,
-            'Project not found',
-            HttpStatus.NOT_FOUND,
-          );
-        }
-
-        let notificationToDispatch: NotificationMessage | null = null;
-
-        if (ownerId !== project.ownerId) {
-          notificationToDispatch = await this.notificationSender.sendToUser(
-            user,
-            {
-              userId: ownerId,
-              type: 'project.reassigned',
-              title: 'Project reassigned',
-              body: `${user.displayName} reassigned project ${updated.name} to you.`,
-            },
-            requestContext,
-            transaction,
-            { deferDispatch: true },
-          );
-        }
-
-        await this.auditWriter.log(
-          {
-            actorId: user.userId,
-            action: 'project.updated',
-            entityType: 'project',
-            entityId: projectId,
-            requestContext,
-          },
-          transaction,
-        );
-
-        await this.activityEmitter.emit(
-          {
-            organizationId: updated.organizationId,
-            summary: `Project "${updated.name}" was updated`,
-            entityType: 'project',
-            entityId: projectId,
-            actorId: user.userId,
-          },
-          transaction,
-        );
-
-        return {
-          project: this.projectsMapper.toProjectDto(updated),
-          notificationToDispatch,
-        };
-      },
-    );
-
-    if (projectDto.notificationToDispatch) {
-      void this.notificationSender.dispatch(
-        projectDto.notificationToDispatch,
-      );
-    }
-
-    return projectDto.project;
-  }
-
-  async remove(
-    user: AuthenticatedRequestUser,
-    projectId: string,
-    requestContext?: RequestContext,
-  ) {
-    const project = await this.projectsRepository.findById(projectId);
-
-    if (!project) {
-      throw new AppError(
-        ERROR_CODES.PROJECT_NOT_FOUND,
-        'Project not found',
-        HttpStatus.NOT_FOUND,
-      );
-    }
-
-    this.assertCanMutateProject(user, project.ownerId);
-    const updated = await this.projectsRepository.update(projectId, {
-      deletedAt: new Date(),
-      updatedById: user.userId,
-    });
-
-    await this.auditWriter.log({
-      actorId: user.userId,
-      action: 'project.deleted',
-      entityType: 'project',
-      entityId: projectId,
-      requestContext,
-    });
-
-    await this.activityEmitter.emit({
-      organizationId: project.organizationId,
-      summary: `Project "${project.name}" was deleted`,
-      entityType: 'project',
-      entityId: projectId,
-      actorId: user.userId,
-    });
-
-    return this.projectsMapper.toProjectDto(updated ?? project);
-  }
-
-  async restore(
-    user: AuthenticatedRequestUser,
-    projectId: string,
-    requestContext?: RequestContext,
-  ) {
-    const project = await this.projectsRepository.findById(
+    return this.updateProjectUseCase.execute(
+      user,
       projectId,
-      undefined,
-      true,
-    );
-
-    if (!project) {
-      throw new AppError(
-        ERROR_CODES.PROJECT_NOT_FOUND,
-        'Project not found',
-        HttpStatus.NOT_FOUND,
-      );
-    }
-
-    this.assertCanMutateProject(user, project.ownerId);
-    const updated = await this.projectsRepository.update(projectId, {
-      deletedAt: null,
-      updatedById: user.userId,
-    });
-
-    await this.auditWriter.log({
-      actorId: user.userId,
-      action: 'project.restored',
-      entityType: 'project',
-      entityId: projectId,
+      input,
       requestContext,
-    });
-
-    return this.projectsMapper.toProjectDto(updated ?? project);
-  }
-
-  async listAttachments(user: AuthenticatedRequestUser, projectId: string) {
-    const project = await this.projectsRepository.findById(projectId);
-
-    if (!project) {
-      throw new AppError(
-        ERROR_CODES.PROJECT_NOT_FOUND,
-        'Project not found',
-        HttpStatus.NOT_FOUND,
-      );
-    }
-
-    this.assertCanAccessProject(user, project.ownerId);
-
-    const attachments = await this.entityAttachments.listByEntity(
-      'project',
-      projectId,
     );
-
-    return attachments.map((attachment) => ({
-      id: attachment.id,
-      fileId: attachment.fileId,
-      entityType: attachment.entityType,
-      entityId: attachment.entityId,
-      label: attachment.label,
-      createdById: attachment.createdById,
-      createdAt: attachment.createdAt.toISOString(),
-      updatedAt: attachment.updatedAt.toISOString(),
-    }));
   }
 
-  private resolveOwnerId(
+  remove(
     user: AuthenticatedRequestUser,
-    requestedOwnerId?: string,
+    projectId: string,
+    requestContext?: RequestContext,
   ) {
-    if (!requestedOwnerId || requestedOwnerId === user.userId) {
-      return user.userId;
-    }
-
-    if (!user.roles.includes('SUPER_ADMIN') && !user.roles.includes('ADMIN')) {
-      throw new AppError(
-        ERROR_CODES.AUTH_FORBIDDEN,
-        'You can only assign projects to yourself',
-        HttpStatus.FORBIDDEN,
-      );
-    }
-
-    return requestedOwnerId;
+    return this.projectLifecycleUseCase.remove(user, projectId, requestContext);
   }
 
-  private assertCanAccessProject(
+  restore(
     user: AuthenticatedRequestUser,
-    ownerId: string,
+    projectId: string,
+    requestContext?: RequestContext,
   ) {
-    if (
-      ownerId !== user.userId &&
-      !user.roles.includes('SUPER_ADMIN') &&
-      !user.roles.includes('ADMIN')
-    ) {
-      throw new AppError(
-        ERROR_CODES.AUTH_FORBIDDEN,
-        'You cannot access this project',
-        HttpStatus.FORBIDDEN,
-      );
-    }
+    return this.projectLifecycleUseCase.restore(
+      user,
+      projectId,
+      requestContext,
+    );
   }
 
-  private assertCanMutateProject(
-    user: AuthenticatedRequestUser,
-    ownerId: string,
-  ) {
-    this.assertCanAccessProject(user, ownerId);
-
-    if (!user.permissions.includes(PERMISSION_NAMES.PROJECTS_UPDATE)) {
-      throw new AppError(
-        ERROR_CODES.AUTH_FORBIDDEN,
-        'You cannot modify this project',
-        HttpStatus.FORBIDDEN,
-      );
-    }
+  listAttachments(user: AuthenticatedRequestUser, projectId: string) {
+    return this.listProjectAttachmentsUseCase.execute(user, projectId);
   }
 }

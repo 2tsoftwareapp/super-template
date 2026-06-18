@@ -13,7 +13,7 @@ import {
 } from '@repo/api-core';
 import { randomUUID } from 'node:crypto';
 
-import type { CreateExportDto } from '../presentation/exports.dto';
+import type { CreateExportCommand } from './exports.types';
 
 import { AuditService } from '../../audit/application/audit.service';
 import { FilesRepository } from '../../files/infrastructure/files.repository';
@@ -36,7 +36,7 @@ export class ExportsService {
 
   async create(
     actor: AuthenticatedRequestUser,
-    input: CreateExportDto,
+    input: CreateExportCommand,
     requestContext?: RequestContext,
   ) {
     const organizationId = requireOrganizationId(actor);
@@ -114,7 +114,7 @@ export class ExportsService {
   private async generateExportFile(
     actor: AuthenticatedRequestUser,
     organizationId: string,
-    input: CreateExportDto,
+    input: CreateExportCommand,
   ) {
     if (input.type !== 'projects') {
       throw new AppError(

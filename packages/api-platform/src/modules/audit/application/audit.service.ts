@@ -4,7 +4,7 @@ import type { DatabaseExecutor } from '@repo/api-database';
 import { Injectable } from '@nestjs/common';
 import { redactSensitive } from '@repo/api-core';
 
-import type { AuditLogsQueryDto } from '../presentation/audit.dto';
+import type { ListAuditLogsQuery } from './audit.types';
 
 import { AuditRepository } from '../infrastructure/audit.repository';
 import { AuditMapper } from './audit.mapper';
@@ -52,7 +52,7 @@ export class AuditService {
     );
   }
 
-  async listAuditLogs(query: AuditLogsQueryDto) {
+  async listAuditLogs(query: ListAuditLogsQuery) {
     const result = await this.auditRepository.list({
       page: query.page,
       limit: query.limit,

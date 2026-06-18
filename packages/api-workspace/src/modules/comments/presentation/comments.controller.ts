@@ -41,7 +41,12 @@ export class CommentsController {
   @Permissions(PERMISSION_NAMES.COMMENTS_READ)
   @ApiPaginatedResponse(CommentDto)
   async list(@Query() query: CommentsQueryDto) {
-    const result = await this.commentsService.list(query);
+    const result = await this.commentsService.list({
+      page: query.page,
+      limit: query.limit,
+      entityType: query.entityType,
+      entityId: query.entityId,
+    });
 
     return {
       data: result.rows,
@@ -62,7 +67,16 @@ export class CommentsController {
     @Body() input: CreateCommentDto,
     @Req() request: Request,
   ) {
-    return this.commentsService.create(user, input, request.requestContext);
+    return this.commentsService.create(
+      user,
+      {
+        entityType: input.entityType,
+        entityId: input.entityId,
+        content: input.content,
+        ...(input.parentId !== undefined ? { parentId: input.parentId } : {}),
+      },
+      request.requestContext,
+    );
   }
 
   @Patch(':id')
@@ -77,7 +91,7 @@ export class CommentsController {
     return this.commentsService.update(
       user,
       commentId,
-      input,
+      { content: input.content },
       request.requestContext,
     );
   }

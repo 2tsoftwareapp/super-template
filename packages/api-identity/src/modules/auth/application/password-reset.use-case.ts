@@ -14,9 +14,9 @@ import { DATABASE } from '@repo/api-database';
 import { runInTransaction } from '@repo/api-database';
 
 import type {
-  ForgotPasswordDto,
-  ResetPasswordDto,
-} from '../presentation/auth.dto';
+  ForgotPasswordCommand,
+  ResetPasswordCommand,
+} from './auth.types';
 
 import { UsersRepository } from '../../users/infrastructure/users.repository';
 import { AuthRepository } from '../infrastructure/auth.repository';
@@ -37,7 +37,7 @@ export class PasswordResetUseCase {
     private readonly authMailService: AuthMailService,
   ) {}
 
-  async forgotPassword(input: ForgotPasswordDto) {
+  async forgotPassword(input: ForgotPasswordCommand) {
     const email = normalizeEmail(input.email);
     const user = await this.usersRepository.findByEmail(email);
 
@@ -60,7 +60,7 @@ export class PasswordResetUseCase {
   }
 
   async resetPassword(
-    input: ResetPasswordDto,
+    input: ResetPasswordCommand,
     requestContext?: RequestContext,
   ) {
     const tokenHash = hashOpaqueToken(input.token);

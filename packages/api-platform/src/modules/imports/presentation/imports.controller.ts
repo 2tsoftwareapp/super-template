@@ -33,7 +33,17 @@ export class ImportsController {
     @Body() input: CreateImportDto,
     @Req() request: Request,
   ) {
-    return this.importsService.create(user, input, request.requestContext);
+    return this.importsService.create(
+      user,
+      {
+        type: input.type,
+        fileId: input.fileId,
+        ...(input.idempotencyKey !== undefined
+          ? { idempotencyKey: input.idempotencyKey }
+          : {}),
+      },
+      request.requestContext,
+    );
   }
 
   @Get(':id')

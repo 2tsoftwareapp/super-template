@@ -30,7 +30,17 @@ export class PreferencesController {
   ) {
     return this.preferencesService.updateForUser(
       user.userId,
-      input,
+      {
+        ...(input.theme !== undefined ? { theme: input.theme } : {}),
+        ...(input.language !== undefined ? { language: input.language } : {}),
+        ...(input.timezone !== undefined ? { timezone: input.timezone } : {}),
+        ...(input.notificationPreferences !== undefined
+          ? { notificationPreferences: input.notificationPreferences }
+          : {}),
+        ...(input.emailPreferences !== undefined
+          ? { emailPreferences: input.emailPreferences }
+          : {}),
+      },
       request.requestContext,
     );
   }

@@ -6,14 +6,14 @@ import type {
 import { Injectable } from '@nestjs/common';
 
 import type {
-  ForgotPasswordDto,
-  LoginDto,
-  RefreshTokenDto,
-  RegisterDto,
-  ResendVerificationDto,
-  ResetPasswordDto,
-  VerifyEmailDto,
-} from '../presentation/auth.dto';
+  ForgotPasswordCommand,
+  LoginCommand,
+  RefreshSessionCommand,
+  RegisterCommand,
+  ResendVerificationCommand,
+  ResetPasswordCommand,
+  VerifyEmailCommand,
+} from './auth.types';
 
 import { AuthenticateAccessTokenUseCase } from './authenticate-access-token.use-case';
 import { EmailVerificationUseCase } from './email-verification.use-case';
@@ -35,15 +35,15 @@ export class AuthService {
     private readonly authenticateAccessTokenUseCase: AuthenticateAccessTokenUseCase,
   ) {}
 
-  register(input: RegisterDto, requestContext?: RequestContext) {
+  register(input: RegisterCommand, requestContext?: RequestContext) {
     return this.registerUseCase.execute(input, requestContext);
   }
 
-  login(input: LoginDto, requestContext?: RequestContext) {
+  login(input: LoginCommand, requestContext?: RequestContext) {
     return this.loginUseCase.execute(input, requestContext);
   }
 
-  refresh(input: RefreshTokenDto, requestContext?: RequestContext) {
+  refresh(input: RefreshSessionCommand, requestContext?: RequestContext) {
     return this.refreshSessionUseCase.execute(input, requestContext);
   }
 
@@ -87,19 +87,19 @@ export class AuthService {
     );
   }
 
-  forgotPassword(input: ForgotPasswordDto) {
+  forgotPassword(input: ForgotPasswordCommand) {
     return this.passwordResetUseCase.forgotPassword(input);
   }
 
-  resetPassword(input: ResetPasswordDto, requestContext?: RequestContext) {
+  resetPassword(input: ResetPasswordCommand, requestContext?: RequestContext) {
     return this.passwordResetUseCase.resetPassword(input, requestContext);
   }
 
-  verifyEmail(input: VerifyEmailDto, requestContext?: RequestContext) {
+  verifyEmail(input: VerifyEmailCommand, requestContext?: RequestContext) {
     return this.emailVerificationUseCase.verifyEmail(input, requestContext);
   }
 
-  resendVerification(input: ResendVerificationDto) {
+  resendVerification(input: ResendVerificationCommand) {
     return this.emailVerificationUseCase.resendVerification(input);
   }
 

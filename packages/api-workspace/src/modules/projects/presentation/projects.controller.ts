@@ -43,7 +43,14 @@ export class ProjectsController {
     @CurrentUser() user: AuthenticatedRequestUser,
     @Query() query: ProjectsQueryDto,
   ) {
-    const result = await this.projectsService.list(user, query);
+    const result = await this.projectsService.list(user, {
+      page: query.page,
+      limit: query.limit,
+      sortField: query.sortField,
+      sortOrder: query.sortOrder,
+      ...(query.search !== undefined ? { search: query.search } : {}),
+      ...(query.status !== undefined ? { status: query.status } : {}),
+    });
 
     return {
       data: result.rows,
@@ -63,7 +70,18 @@ export class ProjectsController {
     @Body() input: CreateProjectDto,
     @Req() request: Request,
   ) {
-    return this.projectsService.create(user, input, request.requestContext);
+    return this.projectsService.create(
+      user,
+      {
+        name: input.name,
+        ...(input.description !== undefined
+          ? { description: input.description }
+          : {}),
+        ...(input.status !== undefined ? { status: input.status } : {}),
+        ...(input.ownerId !== undefined ? { ownerId: input.ownerId } : {}),
+      },
+      request.requestContext,
+    );
   }
 
   @Get(':id/attachments')
@@ -103,7 +121,14 @@ export class ProjectsController {
     return this.projectsService.update(
       user,
       projectId,
-      input,
+      {
+        ...(input.name !== undefined ? { name: input.name } : {}),
+        ...(input.description !== undefined
+          ? { description: input.description }
+          : {}),
+        ...(input.status !== undefined ? { status: input.status } : {}),
+        ...(input.ownerId !== undefined ? { ownerId: input.ownerId } : {}),
+      },
       request.requestContext,
     );
   }

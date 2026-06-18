@@ -2,7 +2,7 @@ import type { DatabaseExecutor } from '@repo/api-database';
 
 import { Injectable } from '@nestjs/common';
 
-import type { ActivitiesQueryDto } from '../presentation/activities.dto';
+import type { ListActivitiesQuery } from './activities.types';
 
 import { ActivitiesRepository } from '../infrastructure/activities.repository';
 
@@ -37,7 +37,7 @@ export class ActivitiesService {
     return activity;
   }
 
-  async list(query: ActivitiesQueryDto) {
+  async list(query: ListActivitiesQuery) {
     const result = await this.activitiesRepository.list({
       page: query.page,
       limit: query.limit,

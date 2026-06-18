@@ -44,7 +44,7 @@ export class AdminSettingsController {
     return this.settingsService.updateByKey(
       user,
       key,
-      input,
+      { value: input.value },
       request.requestContext,
     );
   }

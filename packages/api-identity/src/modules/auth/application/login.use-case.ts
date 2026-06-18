@@ -9,7 +9,7 @@ import {
   normalizeEmail,
 } from '@repo/api-core';
 
-import type { LoginDto } from '../presentation/auth.dto';
+import type { LoginCommand } from './auth.types';
 
 import { AccessControlService } from '../../access-control/application/access-control.service';
 import { OrganizationsService } from '../../organizations/application/organizations.service';
@@ -30,7 +30,7 @@ export class LoginUseCase {
     private readonly sessionTokenService: SessionTokenService,
   ) {}
 
-  async execute(input: LoginDto, requestContext?: RequestContext) {
+  async execute(input: LoginCommand, requestContext?: RequestContext) {
     const email = normalizeEmail(input.email);
     const user = await this.usersRepository.findByEmail(email);
     const passwordMatches = await verifyPasswordWithTimingPadding(

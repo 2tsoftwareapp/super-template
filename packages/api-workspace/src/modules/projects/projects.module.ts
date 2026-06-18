@@ -1,9 +1,15 @@
 import { Module } from '@nestjs/common';
 import { PROJECT_DEMO_GATEWAY, PROJECT_LOOKUP } from '@repo/api-core';
 
+import { CreateProjectUseCase } from './application/create-project.use-case';
+import { GetProjectUseCase } from './application/get-project.use-case';
+import { ListProjectAttachmentsUseCase } from './application/list-project-attachments.use-case';
+import { ListProjectsUseCase } from './application/list-projects.use-case';
+import { ProjectLifecycleUseCase } from './application/project-lifecycle.use-case';
 import { ProjectsMapper } from './application/projects.mapper';
 import { PROJECTS_REPOSITORY } from './application/projects.repository.port';
 import { ProjectsService } from './application/projects.service';
+import { UpdateProjectUseCase } from './application/update-project.use-case';
 import { ProjectsRepository } from './infrastructure/projects.repository';
 import { ProjectsController } from './presentation/projects.controller';
 
@@ -12,6 +18,12 @@ import { ProjectsController } from './presentation/projects.controller';
   providers: [
     ProjectsRepository,
     ProjectsMapper,
+    ListProjectsUseCase,
+    GetProjectUseCase,
+    CreateProjectUseCase,
+    UpdateProjectUseCase,
+    ProjectLifecycleUseCase,
+    ListProjectAttachmentsUseCase,
     ProjectsService,
     {
       provide: PROJECT_DEMO_GATEWAY,

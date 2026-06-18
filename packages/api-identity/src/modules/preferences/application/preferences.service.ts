@@ -8,7 +8,7 @@ import {
   ERROR_CODES,
 } from '@repo/api-core';
 
-import type { UpdatePreferencesDto } from '../presentation/preferences.dto';
+import type { UpdatePreferencesCommand } from './preferences.types';
 
 import { PreferencesRepository } from '../infrastructure/preferences.repository';
 
@@ -37,7 +37,7 @@ export class PreferencesService {
 
   async updateForUser(
     userId: string,
-    input: UpdatePreferencesDto,
+    input: UpdatePreferencesCommand,
     requestContext?: RequestContext,
   ) {
     const updated = await this.preferencesRepository.upsert(userId, {

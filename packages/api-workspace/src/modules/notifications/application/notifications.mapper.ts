@@ -1,24 +1,9 @@
-import type { NotificationJobsRepository } from '../infrastructure/notification-jobs.repository';
-import type { NotificationsRepository } from '../infrastructure/notifications.repository';
-import type {
-  NotificationAudienceDto,
-  NotificationJobStatusDto} from '../presentation/notifications.dto';
-
-import {
-  type NotificationDto,
-  type NotificationJobDto
-} from '../presentation/notifications.dto';
-
-type NotificationRecord = NonNullable<
-  Awaited<ReturnType<NotificationsRepository['findById']>>
->;
-
-type NotificationJobRecord = NonNullable<
-  Awaited<ReturnType<NotificationJobsRepository['findById']>>
->;
+import type { NotificationJobRecord } from './notification-jobs.repository.port';
+import type { NotificationRecord } from './notifications.repository.port';
+import type { NotificationJobView, NotificationView } from './notifications.types';
 
 export class NotificationsMapper {
-  toNotificationDto(notification: NotificationRecord): NotificationDto {
+  toNotificationView(notification: NotificationRecord): NotificationView {
     return {
       id: notification.id,
       userId: notification.userId,
@@ -31,11 +16,11 @@ export class NotificationsMapper {
     };
   }
 
-  toNotificationJobDto(job: NotificationJobRecord): NotificationJobDto {
+  toNotificationJobView(job: NotificationJobRecord): NotificationJobView {
     return {
       id: job.id,
       actorId: job.actorId,
-      audience: job.audience as NotificationAudienceDto,
+      audience: job.audience,
       targetUserId: job.targetUserId,
       userIds: job.userIds ?? null,
       type: job.type,
@@ -43,12 +28,22 @@ export class NotificationsMapper {
       body: job.body,
       data: job.data ?? null,
       scheduledAt: job.scheduledAt.toISOString(),
-      status: job.status as NotificationJobStatusDto,
+      status: job.status,
       recipientCount: job.recipientCount,
       processedAt: job.processedAt?.toISOString() ?? null,
       errorMessage: job.errorMessage,
       createdAt: job.createdAt.toISOString(),
       updatedAt: job.updatedAt.toISOString(),
     };
+  }
+
+  /** @deprecated Use toNotificationView */
+  toNotificationDto(notification: NotificationRecord): NotificationView {
+    return this.toNotificationView(notification);
+  }
+
+  /** @deprecated Use toNotificationJobView */
+  toNotificationJobDto(job: NotificationJobRecord): NotificationJobView {
+    return this.toNotificationJobView(job);
   }
 }

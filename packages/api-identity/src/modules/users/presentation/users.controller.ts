@@ -33,7 +33,15 @@ export class UsersController {
   ) {
     return this.usersService.updateProfile(
       user.userId,
-      input,
+      {
+        ...(input.displayName !== undefined
+          ? { displayName: input.displayName }
+          : {}),
+        ...(input.avatarUrl !== undefined ? { avatarUrl: input.avatarUrl } : {}),
+        ...(input.avatarFileId !== undefined
+          ? { avatarFileId: input.avatarFileId }
+          : {}),
+      },
       request.requestContext,
     );
   }

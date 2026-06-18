@@ -44,7 +44,15 @@ export class AdminUsersController {
   @Permissions(PERMISSION_NAMES.USERS_READ)
   @ApiPaginatedResponse(UserDto)
   async listUsers(@Query() query: AdminUsersQueryDto) {
-    const result = await this.usersService.listUsers(query);
+    const result = await this.usersService.listUsers({
+      page: query.page,
+      limit: query.limit,
+      sortField: query.sortField,
+      sortOrder: query.sortOrder,
+      ...(query.search !== undefined ? { search: query.search } : {}),
+      ...(query.status !== undefined ? { status: query.status } : {}),
+      ...(query.role !== undefined ? { role: query.role } : {}),
+    });
 
     return {
       data: result.rows,
@@ -67,7 +75,14 @@ export class AdminUsersController {
   ) {
     return this.usersService.createAdminUser(
       actor,
-      input,
+      {
+        email: input.email,
+        password: input.password,
+        displayName: input.displayName,
+        ...(input.avatarUrl !== undefined ? { avatarUrl: input.avatarUrl } : {}),
+        ...(input.status !== undefined ? { status: input.status } : {}),
+        ...(input.roleIds !== undefined ? { roleIds: input.roleIds } : {}),
+      },
       request.requestContext,
     );
   }
@@ -91,7 +106,15 @@ export class AdminUsersController {
     return this.usersService.updateAdminUser(
       actor,
       userId,
-      input,
+      {
+        ...(input.email !== undefined ? { email: input.email } : {}),
+        ...(input.password !== undefined ? { password: input.password } : {}),
+        ...(input.displayName !== undefined
+          ? { displayName: input.displayName }
+          : {}),
+        ...(input.avatarUrl !== undefined ? { avatarUrl: input.avatarUrl } : {}),
+        ...(input.status !== undefined ? { status: input.status } : {}),
+      },
       request.requestContext,
     );
   }

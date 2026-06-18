@@ -14,9 +14,9 @@ import { DATABASE } from '@repo/api-database';
 import { runInTransaction } from '@repo/api-database';
 
 import type {
-  ResendVerificationDto,
-  VerifyEmailDto,
-} from '../presentation/auth.dto';
+  ResendVerificationCommand,
+  VerifyEmailCommand,
+} from './auth.types';
 
 import { UsersRepository } from '../../users/infrastructure/users.repository';
 import { AuthRepository } from '../infrastructure/auth.repository';
@@ -33,7 +33,7 @@ export class EmailVerificationUseCase {
     private readonly authMailService: AuthMailService,
   ) {}
 
-  async verifyEmail(input: VerifyEmailDto, requestContext?: RequestContext) {
+  async verifyEmail(input: VerifyEmailCommand, requestContext?: RequestContext) {
     const tokenHash = hashOpaqueToken(input.token);
     const token =
       await this.authRepository.findValidEmailVerificationToken(tokenHash);
@@ -84,7 +84,7 @@ export class EmailVerificationUseCase {
     };
   }
 
-  async resendVerification(input: ResendVerificationDto) {
+  async resendVerification(input: ResendVerificationCommand) {
     const email = normalizeEmail(input.email);
     const user = await this.usersRepository.findByEmail(email);
 

@@ -13,7 +13,7 @@ import {
 import { DATABASE } from '@repo/api-database';
 import { runInTransaction } from '@repo/api-database';
 
-import type { RegisterDto } from '../presentation/auth.dto';
+import type { RegisterCommand } from './auth.types';
 
 import { AccessControlService } from '../../access-control/application/access-control.service';
 import { OrganizationsService } from '../../organizations/application/organizations.service';
@@ -38,7 +38,7 @@ export class RegisterUseCase {
     private readonly authMailService: AuthMailService,
   ) {}
 
-  async execute(input: RegisterDto, requestContext?: RequestContext) {
+  async execute(input: RegisterCommand, requestContext?: RequestContext) {
     const email = normalizeEmail(input.email);
     await this.usersRepository.assertEmailAvailable(email);
 

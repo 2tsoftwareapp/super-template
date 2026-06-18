@@ -26,6 +26,6 @@ export class OrganizationsController {
     @CurrentUser() user: AuthenticatedRequestUser,
     @Body() input: CreateOrganizationDto,
   ) {
-    return this.organizationsService.create(user, input);
+    return this.organizationsService.create(user, { name: input.name });
   }
 }

@@ -43,14 +43,26 @@ export class AttachmentsController {
     @Body() input: AttachEntityDto,
     @Req() request: Request,
   ) {
-    return this.attachmentsService.attach(user, input, request.requestContext);
+    return this.attachmentsService.attach(
+      user,
+      {
+        fileId: input.fileId,
+        entityType: input.entityType,
+        entityId: input.entityId,
+        ...(input.label !== undefined ? { label: input.label } : {}),
+      },
+      request.requestContext,
+    );
   }
 
   @Get()
   @Permissions(PERMISSION_NAMES.ATTACHMENTS_MANAGE)
   @ApiArrayResponse(AttachmentDto)
   list(@Query() query: AttachmentsQueryDto) {
-    return this.attachmentsService.list(query);
+    return this.attachmentsService.list({
+      entityType: query.entityType,
+      entityId: query.entityId,
+    });
   }
 
   @Delete(':id')

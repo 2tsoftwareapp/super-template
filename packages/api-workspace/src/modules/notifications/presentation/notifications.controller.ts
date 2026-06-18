@@ -51,7 +51,12 @@ export class NotificationsController {
     @CurrentUser() user: AuthenticatedRequestUser,
     @Query() query: NotificationsQueryDto,
   ) {
-    const result = await this.notificationsService.listForUser(user, query);
+    const result = await this.notificationsService.listForUser(user, {
+      page: query.page,
+      limit: query.limit,
+      ...(query.unread !== undefined ? { unread: query.unread } : {}),
+      ...(query.type !== undefined ? { type: query.type } : {}),
+    });
 
     return {
       data: result.rows,
@@ -89,7 +94,10 @@ export class NotificationsController {
     @Body() input: RegisterDeviceDto,
   ) {
     return {
-      data: await this.notificationsService.registerDevice(user, input),
+      data: await this.notificationsService.registerDevice(user, {
+        token: input.token,
+        platform: input.platform,
+      }),
     };
   }
 
@@ -161,7 +169,21 @@ export class AdminNotificationsController {
   ) {
     return this.notificationsService.createDeliveryJob(
       actor,
-      input,
+      {
+        audience: input.audience,
+        type: input.type,
+        title: input.title,
+        body: input.body,
+        ...(input.userId !== undefined ? { userId: input.userId } : {}),
+        ...(input.userIds !== undefined ? { userIds: input.userIds } : {}),
+        ...(input.data !== undefined ? { data: input.data } : {}),
+        ...(input.scheduledAt !== undefined
+          ? { scheduledAt: input.scheduledAt }
+          : {}),
+        ...(input.idempotencyKey !== undefined
+          ? { idempotencyKey: input.idempotencyKey }
+          : {}),
+      },
       request.requestContext,
     );
   }
@@ -170,7 +192,11 @@ export class AdminNotificationsController {
   @Permissions(PERMISSION_NAMES.NOTIFICATIONS_SEND)
   @ApiPaginatedResponse(NotificationJobDto)
   async listJobs(@Query() query: NotificationJobsQueryDto) {
-    const result = await this.notificationsService.listJobs(query);
+    const result = await this.notificationsService.listJobs({
+      page: query.page,
+      limit: query.limit,
+      ...(query.status !== undefined ? { status: query.status } : {}),
+    });
 
     return {
       data: result.rows,

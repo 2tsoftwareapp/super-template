@@ -46,7 +46,16 @@ export class InvitationsController {
     @Body() input: CreateInvitationDto,
     @Req() request: Request,
   ) {
-    return this.invitationsService.create(user, input, request.requestContext);
+    return this.invitationsService.create(
+      user,
+      {
+        email: input.email,
+        entityType: input.entityType,
+        entityId: input.entityId,
+        ...(input.role !== undefined ? { role: input.role } : {}),
+      },
+      request.requestContext,
+    );
   }
 
   @Get()
@@ -56,7 +65,16 @@ export class InvitationsController {
     @CurrentUser() user: AuthenticatedRequestUser,
     @Query() query: InvitationsQueryDto,
   ) {
-    const result = await this.invitationsService.list(user, query);
+    const result = await this.invitationsService.list(user, {
+      page: query.page,
+      limit: query.limit,
+      ...(query.email !== undefined ? { email: query.email } : {}),
+      ...(query.entityType !== undefined
+        ? { entityType: query.entityType }
+        : {}),
+      ...(query.entityId !== undefined ? { entityId: query.entityId } : {}),
+      ...(query.status !== undefined ? { status: query.status } : {}),
+    });
 
     return {
       data: result.rows,
@@ -75,7 +93,7 @@ export class InvitationsController {
   @ApiDataResponse(InvitationDto)
   accept(@Body() input: AcceptInvitationDto, @Req() request: Request) {
     return this.invitationsService.accept(
-      input,
+      { token: input.token },
       undefined,
       request.requestContext,
     );

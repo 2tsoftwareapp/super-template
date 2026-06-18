@@ -14,10 +14,10 @@ import {
 } from '@repo/api-core';
 
 import type {
-  CommentsQueryDto,
-  CreateCommentDto,
-  UpdateCommentDto,
-} from '../presentation/comments.dto';
+  CreateCommentCommand,
+  ListCommentsQuery,
+  UpdateCommentCommand,
+} from './comments.types';
 
 import { CommentsRepository } from '../infrastructure/comments.repository';
 
@@ -28,7 +28,7 @@ export class CommentsService {
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
   ) {}
 
-  async list(query: CommentsQueryDto) {
+  async list(query: ListCommentsQuery) {
     const result = await this.commentsRepository.listByEntity({
       page: query.page,
       limit: query.limit,
@@ -44,7 +44,7 @@ export class CommentsService {
 
   async create(
     actor: AuthenticatedRequestUser,
-    input: CreateCommentDto,
+    input: CreateCommentCommand,
     requestContext?: RequestContext,
   ) {
     if (!actor.permissions.includes(PERMISSION_NAMES.COMMENTS_CREATE)) {
@@ -83,7 +83,7 @@ export class CommentsService {
   async update(
     actor: AuthenticatedRequestUser,
     commentId: string,
-    input: UpdateCommentDto,
+    input: UpdateCommentCommand,
     requestContext?: RequestContext,
   ) {
     const comment = await this.commentsRepository.findById(commentId);

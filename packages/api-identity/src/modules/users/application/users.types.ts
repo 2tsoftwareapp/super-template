@@ -1,0 +1,49 @@
+export type UserStatus = 'PENDING' | 'ACTIVE' | 'BLOCKED';
+
+export type UserSortField = 'createdAt' | 'displayName' | 'email' | 'status';
+
+export interface UserView {
+  id: string;
+  email: string;
+  displayName: string;
+  avatarUrl: string | null;
+  status: UserStatus;
+  emailVerifiedAt: string | null;
+  roles: string[];
+  roleIds: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UpdateProfileCommand {
+  displayName?: string;
+  avatarUrl?: string | null;
+  avatarFileId?: string | null;
+}
+
+export interface ListUsersQuery {
+  page: number;
+  limit: number;
+  search?: string;
+  status?: UserStatus;
+  role?: string;
+  sortField: UserSortField;
+  sortOrder: 'asc' | 'desc';
+}
+
+export interface CreateAdminUserCommand {
+  email: string;
+  password: string;
+  displayName: string;
+  avatarUrl?: string | null;
+  status?: UserStatus;
+  roleIds?: string[];
+}
+
+export interface UpdateAdminUserCommand {
+  email?: string;
+  password?: string;
+  displayName?: string;
+  avatarUrl?: string | null;
+  status?: UserStatus;
+}

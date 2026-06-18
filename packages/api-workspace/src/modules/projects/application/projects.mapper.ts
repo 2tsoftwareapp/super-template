@@ -1,11 +1,8 @@
-import type { ProjectsRepository } from '../infrastructure/projects.repository';
-
-export type ProjectRecord = NonNullable<
-  Awaited<ReturnType<ProjectsRepository['findById']>>
->;
+import type { ProjectRecord } from './projects.repository.port';
+import type { ProjectView } from './projects.types';
 
 export class ProjectsMapper {
-  toProjectDto(project: ProjectRecord) {
+  toProjectView(project: ProjectRecord): ProjectView {
     return {
       id: project.id,
       name: project.name,
@@ -18,5 +15,10 @@ export class ProjectsMapper {
       updatedAt: project.updatedAt.toISOString(),
       deletedAt: project.deletedAt?.toISOString() ?? null,
     };
+  }
+
+  /** @deprecated Use toProjectView */
+  toProjectDto(project: ProjectRecord): ProjectView {
+    return this.toProjectView(project);
   }
 }

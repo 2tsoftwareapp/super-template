@@ -17,7 +17,21 @@ export class AuditController {
   @Permissions(PERMISSION_NAMES.AUDIT_READ)
   @ApiPaginatedResponse(AuditLogDto)
   async listAuditLogs(@Query() query: AuditLogsQueryDto) {
-    const result = await this.auditService.listAuditLogs(query);
+    const result = await this.auditService.listAuditLogs({
+      page: query.page,
+      limit: query.limit,
+      sortOrder: query.sortOrder,
+      ...(query.actorId !== undefined ? { actorId: query.actorId } : {}),
+      ...(query.action !== undefined ? { action: query.action } : {}),
+      ...(query.resourceType !== undefined
+        ? { resourceType: query.resourceType }
+        : {}),
+      ...(query.resourceId !== undefined
+        ? { resourceId: query.resourceId }
+        : {}),
+      ...(query.from !== undefined ? { from: query.from } : {}),
+      ...(query.to !== undefined ? { to: query.to } : {}),
+    });
 
     return {
       data: result.rows,

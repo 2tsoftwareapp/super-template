@@ -8,7 +8,7 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { ERROR_CODES } from '@repo/api-core';
 import { AppError } from '@repo/api-core';
 
-import type { UpdateSettingDto } from '../presentation/settings.dto';
+import type { UpdateSettingCommand } from './settings.types';
 
 import { AuditService } from '../../audit/application/audit.service';
 import { SettingsRepository } from '../infrastructure/settings.repository';
@@ -45,7 +45,7 @@ export class SettingsService {
   async updateByKey(
     actor: AuthenticatedRequestUser,
     key: string,
-    input: UpdateSettingDto,
+    input: UpdateSettingCommand,
     requestContext?: RequestContext,
   ) {
     const updated = await this.settingsRepository.upsert(

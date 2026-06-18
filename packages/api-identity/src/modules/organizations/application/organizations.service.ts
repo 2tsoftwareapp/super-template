@@ -10,7 +10,7 @@ import { AppError } from '@repo/api-core';
 import { DATABASE } from '@repo/api-database';
 import { runInTransaction } from '@repo/api-database';
 
-import type { CreateOrganizationDto } from '../presentation/organizations.dto';
+import type { CreateOrganizationCommand } from './organizations.types';
 
 import { OrganizationsRepository } from '../infrastructure/organizations.repository';
 
@@ -44,7 +44,7 @@ export class OrganizationsService {
     };
   }
 
-  async create(user: AuthenticatedRequestUser, input: CreateOrganizationDto) {
+  async create(user: AuthenticatedRequestUser, input: CreateOrganizationCommand) {
     const baseSlug = slugify(input.name);
     const organization = await runInTransaction(
       this.database,
