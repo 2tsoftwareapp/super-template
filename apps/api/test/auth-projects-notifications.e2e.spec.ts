@@ -1,7 +1,8 @@
 import type { INestApplication } from '@nestjs/common';
 import { ERROR_CODES } from '@repo/api-core';
 import { auditLogs, DATABASE, type DatabaseClient } from '@repo/api-database';
-import { AccessControlService, ROLE_NAMES } from '@repo/api-identity';
+import { ROLE_NAMES } from '@repo/api-core';
+import { AccessControlService } from '@repo/api-identity/modules/access-control/application/access-control.service';
 import { eq } from 'drizzle-orm';
 import request from 'supertest';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';

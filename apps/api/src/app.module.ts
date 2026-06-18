@@ -56,9 +56,9 @@ import { TenantContextInterceptor } from './shell/tenant-context.interceptor';
     ScheduleModule.forRoot(),
     DatabaseModule,
     HealthModule,
-    WorkspaceModule,
-    PlatformModule,
     IdentityModule,
+    PlatformModule,
+    WorkspaceModule,
   ],
   providers: [
     RequestLoggerMiddleware,

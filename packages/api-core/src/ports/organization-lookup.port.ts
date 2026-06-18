@@ -1,7 +1,9 @@
+import type { TransactionExecutor } from '../common/types/transaction-executor';
+
 export interface OrganizationLookup {
   findPrimaryOrganizationId(
     userId: string,
-    executor?: unknown,
+    executor?: TransactionExecutor,
   ): Promise<string | null>;
 }
 

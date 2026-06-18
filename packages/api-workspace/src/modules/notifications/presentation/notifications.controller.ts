@@ -26,10 +26,9 @@ import {
 import { CurrentUser } from '@repo/api-core';
 import { Permissions } from '@repo/api-core';
 import { SkipEnvelope } from '@repo/api-core';
-import { PERMISSION_NAMES } from '@repo/api-identity/modules/access-control/access-control.constants';
+import { PERMISSION_NAMES } from '@repo/api-core';
 
 import { NotificationsService } from '../application/notifications.service';
-import { NotificationStreamService } from '../infrastructure/notification-stream.service';
 import {
   DeviceTokenDto,
   NotificationDto,
@@ -44,10 +43,7 @@ import {
 @ApiBearerAuth()
 @Controller('notifications')
 export class NotificationsController {
-  constructor(
-    private readonly notificationsService: NotificationsService,
-    private readonly notificationStreamService: NotificationStreamService,
-  ) {}
+  constructor(private readonly notificationsService: NotificationsService) {}
 
   @Get()
   @ApiPaginatedResponse(NotificationDto)
@@ -73,7 +69,7 @@ export class NotificationsController {
   stream(
     @CurrentUser() user: AuthenticatedRequestUser,
   ): Observable<MessageEvent> {
-    return this.notificationStreamService.stream(user.userId);
+    return this.notificationsService.streamForUser(user.userId);
   }
 
   @Get('unread-count')

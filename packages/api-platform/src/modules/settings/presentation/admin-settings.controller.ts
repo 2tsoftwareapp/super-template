@@ -9,7 +9,7 @@ import {
 } from '@repo/api-core';
 import { CurrentUser } from '@repo/api-core';
 import { Permissions } from '@repo/api-core';
-import { PERMISSION_NAMES } from '@repo/api-identity/modules/access-control/access-control.constants';
+import { PERMISSION_NAMES } from '@repo/api-core';
 
 import { SettingsService } from '../application/settings.service';
 import { ApplicationSettingDto, UpdateSettingDto } from './settings.dto';

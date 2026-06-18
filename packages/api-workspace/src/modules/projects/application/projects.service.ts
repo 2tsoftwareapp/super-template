@@ -29,18 +29,27 @@ import type {
   UpdateProjectDto,
 } from '../presentation/projects.dto';
 
-import { ActivitiesService } from '../../activities/application/activities.service';
-import { ProjectsRepository } from '../infrastructure/projects.repository';
+import {
+  ACTIVITY_EMITTER,
+  type ActivityEmitter,
+} from '../../activities/application/activity-emitter.port';
+import { ProjectsMapper } from './projects.mapper';
+import {
+  PROJECTS_REPOSITORY,
+  type ProjectsRepositoryPort,
+} from './projects.repository.port';
 
 @Injectable()
 export class ProjectsService {
   constructor(
-    private readonly projectsRepository: ProjectsRepository,
+    @Inject(PROJECTS_REPOSITORY)
+    private readonly projectsRepository: ProjectsRepositoryPort,
+    private readonly projectsMapper: ProjectsMapper,
     @Inject(USER_LOOKUP) private readonly userLookup: UserLookup,
     @Inject(USER_NOTIFICATION_SENDER)
     private readonly notificationSender: UserNotificationSender,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
-    private readonly activitiesService: ActivitiesService,
+    @Inject(ACTIVITY_EMITTER) private readonly activityEmitter: ActivityEmitter,
     @Inject(ENTITY_ATTACHMENT_LISTING)
     private readonly entityAttachments: EntityAttachmentListing,
     @Inject(ORGANIZATION_LOOKUP)
@@ -66,7 +75,7 @@ export class ProjectsService {
     );
 
     return {
-      rows: result.rows.map((row) => this.toProjectDto(row)),
+      rows: result.rows.map((row) => this.projectsMapper.toProjectDto(row)),
       total: result.total,
     };
   }
@@ -83,7 +92,7 @@ export class ProjectsService {
     }
 
     this.assertCanAccessProject(user, project.ownerId);
-    return this.toProjectDto(project);
+    return this.projectsMapper.toProjectDto(project);
   }
 
   async create(
@@ -171,7 +180,7 @@ export class ProjectsService {
           transaction,
         );
 
-        await this.activitiesService.emit(
+        await this.activityEmitter.emit(
           {
             organizationId,
             summary: `Project "${project.name}" was created`,
@@ -184,7 +193,7 @@ export class ProjectsService {
         );
 
         return {
-          project: this.toProjectDto(project),
+          project: this.projectsMapper.toProjectDto(project),
           notificationToDispatch,
         };
       },
@@ -286,7 +295,7 @@ export class ProjectsService {
           transaction,
         );
 
-        await this.activitiesService.emit(
+        await this.activityEmitter.emit(
           {
             organizationId: updated.organizationId,
             summary: `Project "${updated.name}" was updated`,
@@ -298,7 +307,7 @@ export class ProjectsService {
         );
 
         return {
-          project: this.toProjectDto(updated),
+          project: this.projectsMapper.toProjectDto(updated),
           notificationToDispatch,
         };
       },
@@ -342,7 +351,7 @@ export class ProjectsService {
       requestContext,
     });
 
-    await this.activitiesService.emit({
+    await this.activityEmitter.emit({
       organizationId: project.organizationId,
       summary: `Project "${project.name}" was deleted`,
       entityType: 'project',
@@ -350,7 +359,7 @@ export class ProjectsService {
       actorId: user.userId,
     });
 
-    return this.toProjectDto(updated ?? project);
+    return this.projectsMapper.toProjectDto(updated ?? project);
   }
 
   async restore(
@@ -386,7 +395,7 @@ export class ProjectsService {
       requestContext,
     });
 
-    return this.toProjectDto(updated ?? project);
+    return this.projectsMapper.toProjectDto(updated ?? project);
   }
 
   async listAttachments(user: AuthenticatedRequestUser, projectId: string) {
@@ -468,24 +477,5 @@ export class ProjectsService {
         HttpStatus.FORBIDDEN,
       );
     }
-  }
-
-  private toProjectDto(
-    project: Awaited<ReturnType<ProjectsRepository['findById']>> extends infer T
-      ? Exclude<T, null>
-      : never,
-  ) {
-    return {
-      id: project.id,
-      name: project.name,
-      description: project.description ?? null,
-      status: project.status,
-      ownerId: project.ownerId,
-      createdById: project.createdById,
-      updatedById: project.updatedById ?? null,
-      createdAt: project.createdAt.toISOString(),
-      updatedAt: project.updatedAt.toISOString(),
-      deletedAt: project.deletedAt?.toISOString() ?? null,
-    };
   }
 }

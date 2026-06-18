@@ -7,6 +7,7 @@ import { redactSensitive } from '@repo/api-core';
 import type { AuditLogsQueryDto } from '../presentation/audit.dto';
 
 import { AuditRepository } from '../infrastructure/audit.repository';
+import { AuditMapper } from './audit.mapper';
 
 interface AuditInput {
   actorId?: string | null;
@@ -19,6 +20,8 @@ interface AuditInput {
 
 @Injectable()
 export class AuditService {
+  private readonly auditMapper = new AuditMapper();
+
   constructor(private readonly auditRepository: AuditRepository) {}
 
   async log(
@@ -67,18 +70,7 @@ export class AuditService {
     });
 
     return {
-      rows: result.rows.map((row) => ({
-        id: row.id,
-        actorId: row.actorId,
-        action: row.action,
-        entityType: row.entityType,
-        entityId: row.entityId,
-        metadata: row.metadata,
-        ipAddress: row.ipAddress,
-        userAgent: row.userAgent,
-        requestId: row.requestId,
-        createdAt: row.createdAt.toISOString(),
-      })),
+      rows: result.rows.map((row) => this.auditMapper.toAuditLogDto(row)),
       total: result.total,
     };
   }

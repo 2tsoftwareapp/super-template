@@ -14,13 +14,12 @@ search_matches() {
   if command -v rg >/dev/null 2>&1; then
     rg -n "$pattern" "$@" \
       --glob '!**/*.spec.ts' \
-      --glob '!**/*.module.ts' \
       --glob '!**/generated/**'
     return
   fi
 
   find "$@" \
-    \( -path '*/generated/*' -o -name '*.spec.ts' -o -name '*.module.ts' \) -prune -o \
+    \( -path '*/generated/*' -o -name '*.spec.ts' \) -prune -o \
     -type f -name '*.ts' -print |
     xargs grep -nE "$pattern"
 }
@@ -86,6 +85,24 @@ record_violation \
   'workspace must not import platform infrastructure' \
   'Depend on api-core ports instead of concrete platform repositories.' \
   "from '@repo/api-platform/modules/.+/infrastructure/" \
+  packages/api-workspace/src
+
+record_violation \
+  'identity must not import cross-context Nest modules' \
+  'Register providers via global *PortsModule and depend on api-core port tokens.' \
+  "from '@repo/api-(platform|workspace)/modules/.+\\.module'" \
+  packages/api-identity/src
+
+record_violation \
+  'platform must not import cross-context Nest modules' \
+  'Register providers via global *PortsModule and depend on api-core port tokens.' \
+  "from '@repo/api-(identity|workspace)/modules/.+\\.module'" \
+  packages/api-platform/src
+
+record_violation \
+  'workspace must not import cross-context Nest modules' \
+  'Register providers via global *PortsModule and depend on api-core port tokens.' \
+  "from '@repo/api-(identity|platform)/modules/.+\\.module'" \
   packages/api-workspace/src
 
 exit "$failed"

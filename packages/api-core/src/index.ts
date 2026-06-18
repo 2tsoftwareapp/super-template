@@ -23,6 +23,7 @@ export * from './common/pagination/pagination.dto';
 export * from './common/rbac/access-control.constants';
 export { RedisThrottlerStorage } from './common/throttling/redis-throttler.storage';
 export * from './common/types/request-context';
+export * from './common/types/transaction-executor';
 export * from './common/utils/duration';
 export * from './common/utils/normalize-email';
 export * from './common/utils/opaque-token';
@@ -71,6 +72,11 @@ export {
   type ProjectDemoGateway,
   type ProjectDemoRecord,
 } from './ports/project-demo-gateway.port';
+export {
+  PROJECT_LOOKUP,
+  type ProjectLookup,
+  type ProjectSummary,
+} from './ports/project-lookup.port';
 export {
   USER_LOOKUP,
   type UserLookup,

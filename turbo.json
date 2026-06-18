@@ -28,8 +28,6 @@
             "layer:core",
             "layer:database",
             "layer:identity",
-            "layer:platform",
-            "layer:workspace",
             "layer:tsconfig",
             "layer:eslint"
           ]
@@ -42,7 +40,6 @@
             "layer:database",
             "layer:identity",
             "layer:platform",
-            "layer:workspace",
             "layer:tsconfig",
             "layer:eslint"
           ]

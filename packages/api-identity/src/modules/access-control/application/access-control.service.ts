@@ -10,10 +10,13 @@ import {
   ADMIN_PERMISSIONS,
   ALL_PERMISSIONS as ALL_PERMISSION_NAMES,
   PERMISSION_NAMES,
-  PRIVILEGED_ROLE_NAMES,
   ROLE_NAMES,
   USER_PERMISSIONS,
 } from '../access-control.constants';
+import {
+  assertCanAssignRoles,
+  assertCanManagePrivilegedAccount,
+} from '../domain/role-assignment.policy';
 import { AccessControlRepository } from '../infrastructure/access-control.repository';
 
 @Injectable()
@@ -266,20 +269,7 @@ export class AccessControlService {
     actor: AuthenticatedRequestUser,
     targetRoleNames: string[],
   ): void {
-    // Privileged accounts are a hard boundary: only SUPER_ADMIN can touch them.
-    const targetIsPrivileged = targetRoleNames.some((roleName) =>
-      PRIVILEGED_ROLE_NAMES.includes(
-        roleName as (typeof PRIVILEGED_ROLE_NAMES)[number],
-      ),
-    );
-
-    if (targetIsPrivileged && !actor.roles.includes(ROLE_NAMES.SUPER_ADMIN)) {
-      throw new AppError(
-        ERROR_CODES.AUTH_FORBIDDEN,
-        'Only SUPER_ADMIN can manage privileged user accounts',
-        HttpStatus.FORBIDDEN,
-      );
-    }
+    assertCanManagePrivilegedAccount(actor, targetRoleNames);
   }
 
   assertCanAssignUserRoles(
@@ -287,7 +277,7 @@ export class AccessControlService {
     targetRoleNames: string[],
     desiredRoleNames: string[],
   ): void {
-    this.assertCanAssignRoles(actor, targetRoleNames, desiredRoleNames);
+    assertCanAssignRoles(actor, targetRoleNames, desiredRoleNames);
   }
 
   async getRoleByName(name: string, executor?: DatabaseExecutor) {
@@ -315,45 +305,5 @@ export class AccessControlService {
       executor,
     );
     await this.accessProfileCache.invalidateUser(userId);
-  }
-
-  assertCanAssignRoles(
-    actor: AuthenticatedRequestUser,
-    targetRoleNames: string[],
-    desiredRoleNames: string[],
-  ): void {
-    // Role assignment has two gates:
-    // 1) non-superadmins cannot touch privileged accounts or grant privileged roles;
-    // 2) the actor still needs the generic ROLES_MANAGE permission unless they are SUPER_ADMIN.
-    const actorIsSuperAdmin = actor.roles.includes(ROLE_NAMES.SUPER_ADMIN);
-    const targetIsPrivileged = targetRoleNames.some((roleName) =>
-      PRIVILEGED_ROLE_NAMES.includes(
-        roleName as (typeof PRIVILEGED_ROLE_NAMES)[number],
-      ),
-    );
-    const assigningPrivilegedRole = desiredRoleNames.some((roleName) =>
-      PRIVILEGED_ROLE_NAMES.includes(
-        roleName as (typeof PRIVILEGED_ROLE_NAMES)[number],
-      ),
-    );
-
-    if (!actorIsSuperAdmin && (targetIsPrivileged || assigningPrivilegedRole)) {
-      throw new AppError(
-        ERROR_CODES.AUTH_FORBIDDEN,
-        'Only SUPER_ADMIN can manage privileged accounts or roles',
-        HttpStatus.FORBIDDEN,
-      );
-    }
-
-    if (
-      !actor.permissions.includes(PERMISSION_NAMES.ROLES_MANAGE) &&
-      !actorIsSuperAdmin
-    ) {
-      throw new AppError(
-        ERROR_CODES.AUTH_FORBIDDEN,
-        'You do not have permission to manage roles',
-        HttpStatus.FORBIDDEN,
-      );
-    }
   }
 }

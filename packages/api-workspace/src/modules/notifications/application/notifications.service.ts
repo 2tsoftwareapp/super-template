@@ -1,8 +1,10 @@
+import type { MessageEvent } from '@nestjs/common';
 import type {
   AuthenticatedRequestUser,
   RequestContext,
 } from '@repo/api-core';
 import type { DatabaseExecutor } from '@repo/api-database';
+import type { Observable } from 'rxjs';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import {
@@ -38,6 +40,7 @@ import {
   type SendNotificationDto,
   type SendNotificationRequestDto,
 } from '../presentation/notifications.dto';
+import { NotificationsMapper } from './notifications.mapper';
 
 export interface NotificationDto {
   id: string;
@@ -74,6 +77,8 @@ const RECIPIENT_BATCH_SIZE = 100;
 
 @Injectable()
 export class NotificationsService {
+  private readonly notificationsMapper = new NotificationsMapper();
+
   constructor(
     private readonly notificationsRepository: NotificationsRepository,
     private readonly notificationJobsRepository: NotificationJobsRepository,
@@ -147,7 +152,7 @@ export class NotificationsService {
       );
     }
 
-    const dto = this.toNotificationDto(notification);
+    const dto = this.notificationsMapper.toNotificationDto(notification);
 
     if (!options?.deferDispatch) {
       void this.dispatch(dto);
@@ -211,7 +216,7 @@ export class NotificationsService {
     }
 
     if (idempotentResult && !idempotentResult.created) {
-      return this.toNotificationJobDto(job);
+      return this.notificationsMapper.toNotificationJobDto(job);
     }
 
     await this.auditWriter.log({
@@ -226,12 +231,12 @@ export class NotificationsService {
       requestContext,
     });
 
-    const jobDto = this.toNotificationJobDto(job);
+    const jobDto = this.notificationsMapper.toNotificationJobDto(job);
 
     if (scheduledAt.getTime() <= Date.now()) {
       await this.processJob(job.id);
       const processed = await this.notificationJobsRepository.findById(job.id);
-      return processed ? this.toNotificationJobDto(processed) : jobDto;
+      return processed ? this.notificationsMapper.toNotificationJobDto(processed) : jobDto;
     }
 
     return jobDto;
@@ -245,7 +250,7 @@ export class NotificationsService {
     });
 
     return {
-      rows: result.rows.map((row) => this.toNotificationJobDto(row)),
+      rows: result.rows.map((row) => this.notificationsMapper.toNotificationJobDto(row)),
       total: result.total,
     };
   }
@@ -261,7 +266,7 @@ export class NotificationsService {
       );
     }
 
-    return this.toNotificationJobDto(job);
+    return this.notificationsMapper.toNotificationJobDto(job);
   }
 
   async cancelJob(actor: AuthenticatedRequestUser, jobId: string) {
@@ -293,7 +298,7 @@ export class NotificationsService {
       entityId: jobId,
     });
 
-    return this.toNotificationJobDto(cancelled);
+    return this.notificationsMapper.toNotificationJobDto(cancelled);
   }
 
   async processDueJobs() {
@@ -358,7 +363,7 @@ export class NotificationsService {
         );
 
         for (const notification of notifications) {
-          void this.dispatch(this.toNotificationDto(notification));
+          void this.dispatch(this.notificationsMapper.toNotificationDto(notification));
         }
 
         deliveredCount += notifications.length;
@@ -390,6 +395,10 @@ export class NotificationsService {
     } catch {
       // Push delivery is best-effort; inbox state remains the source of truth.
     }
+  }
+
+  streamForUser(userId: string): Observable<MessageEvent> {
+    return this.notificationStreamService.stream(userId);
   }
 
   async registerDevice(
@@ -439,7 +448,7 @@ export class NotificationsService {
     );
 
     return {
-      rows: result.rows.map((row) => this.toNotificationDto(row)),
+      rows: result.rows.map((row) => this.notificationsMapper.toNotificationDto(row)),
       total: result.total,
     };
   }
@@ -461,7 +470,7 @@ export class NotificationsService {
     }
 
     const updated = await this.notificationsRepository.markRead(notificationId);
-    return this.toNotificationDto(updated ?? notification);
+    return this.notificationsMapper.toNotificationDto(updated ?? notification);
   }
 
   async markAllRead(user: AuthenticatedRequestUser) {
@@ -527,51 +536,5 @@ export class NotificationsService {
     }
 
     return this.userLookup.listDeliverableUserIds();
-  }
-
-  private toNotificationDto(
-    notification: Awaited<
-      ReturnType<NotificationsRepository['findById']>
-    > extends infer T
-      ? Exclude<T, null>
-      : never,
-  ): NotificationDto {
-    return {
-      id: notification.id,
-      userId: notification.userId,
-      type: notification.type,
-      title: notification.title,
-      body: notification.body,
-      data: notification.data ?? null,
-      readAt: notification.readAt?.toISOString() ?? null,
-      createdAt: notification.createdAt.toISOString(),
-    };
-  }
-
-  private toNotificationJobDto(
-    job: Awaited<
-      ReturnType<NotificationJobsRepository['findById']>
-    > extends infer T
-      ? Exclude<T, null>
-      : never,
-  ): NotificationJobDto {
-    return {
-      id: job.id,
-      actorId: job.actorId,
-      audience: job.audience,
-      targetUserId: job.targetUserId,
-      userIds: job.userIds ?? null,
-      type: job.type,
-      title: job.title,
-      body: job.body,
-      data: job.data ?? null,
-      scheduledAt: job.scheduledAt.toISOString(),
-      status: job.status,
-      recipientCount: job.recipientCount,
-      processedAt: job.processedAt?.toISOString() ?? null,
-      errorMessage: job.errorMessage,
-      createdAt: job.createdAt.toISOString(),
-      updatedAt: job.updatedAt.toISOString(),
-    };
   }
 }

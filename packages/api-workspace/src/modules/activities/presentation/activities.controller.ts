@@ -2,7 +2,7 @@ import { Controller, Get, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ApiPaginatedResponse } from '@repo/api-core';
 import { Permissions } from '@repo/api-core';
-import { PERMISSION_NAMES } from '@repo/api-identity/modules/access-control/access-control.constants';
+import { PERMISSION_NAMES } from '@repo/api-core';
 
 import { ActivitiesService } from '../application/activities.service';
 import { ActivitiesQueryDto, ActivityDto } from './activities.dto';

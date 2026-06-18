@@ -1,4 +1,5 @@
 import type { AuthenticatedRequestUser, RequestContext } from '../common/types/request-context';
+import type { TransactionExecutor } from '../common/types/transaction-executor';
 
 export interface SendUserNotificationInput {
   organizationId?: string;
@@ -25,7 +26,7 @@ export interface UserNotificationSender {
     actor: AuthenticatedRequestUser | null,
     input: SendUserNotificationInput,
     requestContext?: RequestContext,
-    executor?: unknown,
+    executor?: TransactionExecutor,
     options?: { deferDispatch?: boolean },
   ): Promise<NotificationMessage | null>;
   dispatch(notification: NotificationMessage): Promise<void>;

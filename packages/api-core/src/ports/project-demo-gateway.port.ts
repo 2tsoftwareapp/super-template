@@ -1,3 +1,5 @@
+import type { TransactionExecutor } from '../common/types/transaction-executor';
+
 export interface ProjectDemoRecord {
   id: string;
   name: string;
@@ -11,7 +13,7 @@ export interface ProjectDemoGateway {
   findActiveByOwnerAndName(
     ownerId: string,
     name: string,
-    executor?: unknown,
+    executor?: TransactionExecutor,
   ): Promise<ProjectDemoRecord | null>;
   create(
     values: {
@@ -22,7 +24,7 @@ export interface ProjectDemoGateway {
       status: string;
       createdById: string;
     },
-    executor?: unknown,
+    executor?: TransactionExecutor,
   ): Promise<ProjectDemoRecord>;
   list(
     params: {
@@ -36,7 +38,7 @@ export interface ProjectDemoGateway {
       status?: 'DRAFT' | 'ACTIVE' | 'ARCHIVED';
       includeDeleted?: boolean;
     },
-    executor?: unknown,
+    executor?: TransactionExecutor,
   ): Promise<{ rows: ProjectDemoRecord[]; total: number }>;
 }
 

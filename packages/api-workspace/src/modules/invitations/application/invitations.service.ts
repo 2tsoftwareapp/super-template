@@ -17,6 +17,8 @@ import {
   hashOpaqueToken,
   normalizeEmail,
   PERMISSION_NAMES,
+  PROJECT_LOOKUP,
+  type ProjectLookup,
   requireOrganizationId,
 } from '@repo/api-core';
 
@@ -26,14 +28,13 @@ import type {
   InvitationsQueryDto,
 } from '../presentation/invitations.dto';
 
-import { ProjectsRepository } from '../../projects/infrastructure/projects.repository';
 import { InvitationsRepository } from '../infrastructure/invitations.repository';
 
 @Injectable()
 export class InvitationsService {
   constructor(
     private readonly invitationsRepository: InvitationsRepository,
-    private readonly projectsRepository: ProjectsRepository,
+    @Inject(PROJECT_LOOKUP) private readonly projectLookup: ProjectLookup,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
     @Inject(BACKGROUND_JOB_ENQUEUER)
     private readonly jobEnqueuer: BackgroundJobEnqueuer,
@@ -237,7 +238,7 @@ export class InvitationsService {
     entityId: string,
   ) {
     if (entityType === 'project') {
-      const project = await this.projectsRepository.findById(entityId);
+      const project = await this.projectLookup.findById(entityId);
 
       if (!project) {
         throw new AppError(
@@ -275,7 +276,7 @@ export class InvitationsService {
         );
       }
 
-      const project = await this.projectsRepository.findById(entityId);
+      const project = await this.projectLookup.findById(entityId);
 
       if (!project) {
         throw new AppError(

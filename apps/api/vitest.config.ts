@@ -16,6 +16,11 @@ const packageSubpathAlias = (name: string) => ({
 export default defineConfig({
   test: {
     maxWorkers: 1,
+    include: [
+      'test/**/*.{test,spec}.ts',
+      '../../packages/api-identity/src/**/*.{test,spec}.ts',
+      '../../packages/api-workspace/src/**/*.{test,spec}.ts',
+    ],
   },
   resolve: {
     alias: [

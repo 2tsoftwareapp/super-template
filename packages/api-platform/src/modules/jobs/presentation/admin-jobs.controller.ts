@@ -15,7 +15,7 @@ import {
 } from '@repo/api-core';
 import { CurrentUser } from '@repo/api-core';
 import { Permissions } from '@repo/api-core';
-import { PERMISSION_NAMES } from '@repo/api-identity/modules/access-control/access-control.constants';
+import { PERMISSION_NAMES } from '@repo/api-core';
 
 import { JobsService } from '../application/jobs.service';
 import { JobDto, JobsQueryDto } from './jobs.dto';

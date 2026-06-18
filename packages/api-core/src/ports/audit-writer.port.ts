@@ -1,4 +1,5 @@
 import type { RequestContext } from '../common/types/request-context';
+import type { TransactionExecutor } from '../common/types/transaction-executor';
 
 export interface AuditLogInput {
   actorId?: string | null;
@@ -10,7 +11,7 @@ export interface AuditLogInput {
 }
 
 export interface AuditWriter {
-  log(input: AuditLogInput, executor?: unknown): Promise<unknown>;
+  log(input: AuditLogInput, executor?: TransactionExecutor): Promise<unknown>;
 }
 
 export const AUDIT_WRITER = Symbol('AUDIT_WRITER');

@@ -18,38 +18,43 @@ Ask the user for the following before writing any code:
 
 ## Scaffold Steps
 
-### 1. NestJS Module (`apps/api/src/<feature>/`)
+### 1. NestJS feature module (`packages/api-<context>/src/modules/<feature>/`)
 
-Create the following files:
+Create the following layout inside the correct bounded-context package (`api-identity`, `api-platform`, or `api-workspace`):
 
-**`<feature>.module.ts`**
-```typescript
-import { Module } from '@nestjs/common';
-import { <Feature>Controller } from './<feature>.controller';
-import { <Feature>Service } from './<feature>.service';
-
-@Module({
-  controllers: [<Feature>Controller],
-  providers: [<Feature>Service],
-})
-export class <Feature>Module {}
+```
+modules/<feature>/
+  <feature>.module.ts
+  presentation/
+    <feature>.controller.ts
+    <feature>.dto.ts
+  application/
+    <feature>.service.ts
+    <feature>.mapper.ts          # optional; response shaping
+    <feature>.repository.port.ts # optional; repository interface + token
+  infrastructure/
+    <feature>.repository.ts
 ```
 
-**`<feature>.controller.ts`** — include all requested HTTP methods with:
+**`<feature>.module.ts`** — register controller, repository, service, and any port bindings (`{ provide: TOKEN, useExisting: Repository }`).
+
+**`presentation/<feature>.controller.ts`** — HTTP layer only:
 - `@ApiTags('<feature>')` on the class
 - `@ApiBearerAuth()` on the class
-- `@ApiOperation({ summary: '...' })` on each method
-- `@ApiOkResponse` / `@ApiCreatedResponse` with the response DTO
+- `@Permissions(PERMISSION_NAMES.*)` from `@repo/api-core`
+- Delegate to the application service; do not import infrastructure
 
-**`<feature>.service.ts`** — stub methods that match the controller, returning typed placeholder data
+**`application/<feature>.service.ts`** — business logic; depend on repositories via port tokens when crossing layers, and on `api-core` ports for other contexts
 
-**`dto/create-<feature>.dto.ts`** and **`dto/update-<feature>.dto.ts`** — use `class-validator` decorators and `@ApiProperty()` on every field
+**`application/<feature>.mapper.ts`** — map repository records to response DTOs (keeps services free of presentation imports over time)
 
-**`dto/<feature>-response.dto.ts`** — response shape with `@ApiProperty()` on every field
+**`presentation/<feature>.dto.ts`** — `class-validator` + `@ApiProperty()` on every field
+
+Do **not** add features under `apps/api/src/<feature>/`. `apps/api` is the composition root only.
 
 ### 2. Register Module
 
-Add `<Feature>Module` to the `imports` array in `apps/api/src/app.module.ts`.
+Add `<Feature>Module` to the aggregate module in the context package (`IdentityModule`, `PlatformModule`, or `WorkspaceModule`). Those aggregates are already imported in `apps/api/src/app.module.ts`.
 
 ### 3. Regenerate Contracts
 

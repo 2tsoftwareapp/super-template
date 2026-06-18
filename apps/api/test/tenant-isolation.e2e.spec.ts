@@ -1,5 +1,6 @@
 import type { INestApplication } from '@nestjs/common';
-import { AccessControlService, ROLE_NAMES } from '@repo/api-identity';
+import { ROLE_NAMES } from '@repo/api-core';
+import { AccessControlService } from '@repo/api-identity/modules/access-control/application/access-control.service';
 import request from 'supertest';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {

@@ -1,7 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
-import { AUDIT_WRITER, USER_LOOKUP } from '@repo/api-core';
+
 import { NotificationsService } from '../application/notifications.service';
-import { PUSH_NOTIFIER } from '../application/push.interface';
 import { DeviceTokensRepository } from '../infrastructure/device-tokens.repository';
 import { NotificationJobsRepository } from '../infrastructure/notification-jobs.repository';
 import { NotificationStreamService } from '../infrastructure/notification-stream.service';
@@ -24,10 +23,12 @@ describe('NotificationsService delivery jobs', () => {
     const service = new NotificationsService(
       {} as NotificationsRepository,
       {} as NotificationJobsRepository,
+      {} as never,
+      {} as never,
       userLookup,
       {} as DeviceTokensRepository,
       {} as NotificationStreamService,
-      { sendToUser: vi.fn() },
+      { send: vi.fn() },
       { log: vi.fn() },
     );
 
