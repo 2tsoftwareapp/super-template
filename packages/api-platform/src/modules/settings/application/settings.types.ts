@@ -1,3 +1,4 @@
+import type { JsonObject } from '@repo/api-core';
 export interface UpdateSettingCommand {
-  value: Record<string, unknown>;
+  value: JsonObject;
 }

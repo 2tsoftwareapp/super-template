@@ -1,3 +1,5 @@
+import type { JsonObject } from '@repo/api-core';
+
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsObject } from 'class-validator';
 
@@ -6,7 +8,7 @@ export class ApplicationSettingDto {
   key: string;
 
   @ApiProperty({ type: 'object', additionalProperties: true })
-  value: Record<string, unknown>;
+  value: JsonObject;
 
   @ApiPropertyOptional()
   updatedById: string | null;
@@ -21,5 +23,5 @@ export class ApplicationSettingDto {
 export class UpdateSettingDto {
   @ApiProperty({ type: 'object', additionalProperties: true })
   @IsObject()
-  value: Record<string, unknown>;
+  value: JsonObject;
 }

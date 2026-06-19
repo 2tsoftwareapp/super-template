@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 import type { ApiEnvelope } from "@/lib/api-types";
+import type { JsonObject } from "@/lib/json";
 
 import { SettingsNav } from "@/components/app/settings-nav";
 import { Badge } from "@/components/ui/badge";
@@ -34,8 +35,8 @@ interface Preferences {
   theme: string;
   language: string;
   timezone: string;
-  notificationPreferences: Record<string, unknown>;
-  emailPreferences: Record<string, unknown>;
+  notificationPreferences: JsonObject;
+  emailPreferences: JsonObject;
 }
 
 const schema = z.object({

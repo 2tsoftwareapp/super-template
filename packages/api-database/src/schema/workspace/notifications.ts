@@ -1,3 +1,5 @@
+import type { JsonObject } from '@repo/api-core';
+
 import { sql } from 'drizzle-orm';
 import {
   index,
@@ -32,7 +34,7 @@ export const notifications = pgTable(
     type: text('type').notNull(),
     title: text('title').notNull(),
     body: text('body').notNull(),
-    data: jsonb('data').$type<Record<string, unknown> | null>(),
+    data: jsonb('data').$type<JsonObject | null>(),
     readAt: timestamp('read_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true })
       .notNull()
@@ -83,7 +85,7 @@ export const notificationJobs = pgTable(
     type: text('type').notNull(),
     title: text('title').notNull(),
     body: text('body').notNull(),
-    data: jsonb('data').$type<Record<string, unknown> | null>(),
+    data: jsonb('data').$type<JsonObject | null>(),
     scheduledAt: timestamp('scheduled_at', { withTimezone: true }).notNull(),
     status: notificationJobStatusEnum('status').notNull().default('PENDING'),
     recipientCount: integer('recipient_count'),

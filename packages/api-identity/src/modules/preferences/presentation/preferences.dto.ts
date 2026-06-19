@@ -1,3 +1,5 @@
+import type { JsonObject } from '@repo/api-core';
+
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsObject, IsOptional, IsString, MaxLength } from 'class-validator';
 
@@ -15,10 +17,10 @@ export class UserPreferencesDto {
   timezone: string;
 
   @ApiProperty({ type: 'object', additionalProperties: true })
-  notificationPreferences: Record<string, unknown>;
+  notificationPreferences: JsonObject;
 
   @ApiProperty({ type: 'object', additionalProperties: true })
-  emailPreferences: Record<string, unknown>;
+  emailPreferences: JsonObject;
 
   @ApiProperty()
   createdAt: string;
@@ -49,10 +51,10 @@ export class UpdatePreferencesDto {
   @ApiPropertyOptional({ type: 'object', additionalProperties: true })
   @IsOptional()
   @IsObject()
-  notificationPreferences?: Record<string, unknown>;
+  notificationPreferences?: JsonObject;
 
   @ApiPropertyOptional({ type: 'object', additionalProperties: true })
   @IsOptional()
   @IsObject()
-  emailPreferences?: Record<string, unknown>;
+  emailPreferences?: JsonObject;
 }

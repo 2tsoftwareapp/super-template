@@ -1,5 +1,6 @@
+import type { JsonObject } from '@repo/api-core';
 export interface CreateExportCommand {
   type: string;
-  filters?: Record<string, unknown>;
+  filters?: JsonObject;
   idempotencyKey?: string;
 }

@@ -9,7 +9,12 @@ export interface ImportExportRowContext {
   createdById: string;
 }
 
-export interface ImportExportAdapter<TRow = unknown> {
+export interface ImportValidationError {
+  row: number;
+  message: string;
+}
+
+export interface ImportExportAdapter<TRow extends object> {
   readonly type: string;
   readonly csvHeader: string[];
 
@@ -29,13 +34,13 @@ export interface ImportExportAdapter<TRow = unknown> {
 
 @Injectable()
 export class ImportExportAdapterRegistry {
-  private readonly adapters = new Map<string, ImportExportAdapter>();
+  private readonly adapters = new Map<string, ImportExportAdapter<object>>();
 
-  register(adapter: ImportExportAdapter): void {
+  register<TRow extends object>(adapter: ImportExportAdapter<TRow>): void {
     this.adapters.set(adapter.type, adapter);
   }
 
-  resolve(type: string): ImportExportAdapter {
+  resolve(type: string): ImportExportAdapter<object> {
     const adapter = this.adapters.get(type);
 
     if (!adapter) {

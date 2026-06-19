@@ -1,3 +1,4 @@
+import type { JsonObject } from '@repo/api-core';
 import type { DatabaseExecutor } from '@repo/api-database';
 
 import { Injectable } from '@nestjs/common';
@@ -13,7 +14,7 @@ interface EmitActivityInput {
   entityId: string;
   actorId?: string | null;
   visibility?: 'PUBLIC' | 'PRIVATE' | 'INTERNAL';
-  metadata?: Record<string, unknown> | null;
+  metadata?: JsonObject | null;
 }
 
 @Injectable()

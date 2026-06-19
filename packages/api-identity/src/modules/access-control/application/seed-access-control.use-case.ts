@@ -44,13 +44,13 @@ export class SeedAccessControlUseCase {
     );
     const allPermissionIds = ALL_PERMISSION_NAMES.map(
       (name) => permissionByName.get(name)?.id,
-    ).filter(Boolean) as string[];
+    ).filter((id): id is string => typeof id === 'string');
     const userPermissionIds = USER_PERMISSIONS.map(
       (name) => permissionByName.get(name)?.id,
-    ).filter(Boolean) as string[];
+    ).filter((id): id is string => typeof id === 'string');
     const adminPermissionIds = ADMIN_PERMISSIONS.map(
       (name) => permissionByName.get(name)?.id,
-    ).filter(Boolean) as string[];
+    ).filter((id): id is string => typeof id === 'string');
     const superAdminRole = roleByName.get(ROLE_NAMES.SUPER_ADMIN);
     const adminRole = roleByName.get(ROLE_NAMES.ADMIN);
     const userRole = roleByName.get(ROLE_NAMES.USER);

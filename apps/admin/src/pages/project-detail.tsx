@@ -95,7 +95,7 @@ export function ProjectDetailPage() {
   );
 }
 
-function renderValue(value: unknown, fallback: string) {
+function renderValue(value: string | null | undefined | object, fallback: string) {
   if (value == null) {
     return fallback;
   }

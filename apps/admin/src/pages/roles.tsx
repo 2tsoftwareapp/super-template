@@ -31,7 +31,7 @@ type ManagedRoleDto = RoleDto & {
 
 const rolesResource = adminResources.find((resource) => resource.id === "roles")!;
 
-function optionalText(value: unknown) {
+function optionalText(value: string | null | undefined | object) {
   return typeof value === "string" ? value : "";
 }
 

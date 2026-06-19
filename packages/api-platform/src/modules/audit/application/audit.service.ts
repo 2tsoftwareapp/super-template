@@ -1,8 +1,8 @@
-import type { RequestContext } from '@repo/api-core';
+import type { JsonObject, RequestContext } from '@repo/api-core';
 import type { DatabaseExecutor } from '@repo/api-database';
 
 import { Injectable } from '@nestjs/common';
-import { redactSensitive } from '@repo/api-core';
+import { isJsonObject, redactSensitive } from '@repo/api-core';
 
 import type { ListAuditLogsQuery } from './audit.types';
 
@@ -14,7 +14,7 @@ interface AuditInput {
   action: string;
   entityType: string;
   entityId?: string | null;
-  metadata?: Record<string, unknown> | null;
+  metadata?: JsonObject | null;
   requestContext?: RequestContext | undefined;
 }
 
@@ -42,7 +42,10 @@ export class AuditService {
         entityType,
         entityId: entityId ?? null,
         metadata: metadata
-          ? (redactSensitive(metadata) as Record<string, unknown>)
+          ? (() => {
+              const redacted = redactSensitive(metadata);
+              return isJsonObject(redacted) ? redacted : null;
+            })()
           : null,
         ipAddress: requestContext?.ipAddress ?? null,
         userAgent: requestContext?.userAgent ?? null,

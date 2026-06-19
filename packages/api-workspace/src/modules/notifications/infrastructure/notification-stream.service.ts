@@ -4,8 +4,13 @@ import {
   OnModuleDestroy,
   OnModuleInit,
 } from '@nestjs/common';
-import { EnvironmentService } from '@repo/api-core';
-import { createClient } from 'redis';
+import {
+  adaptRedisClient,
+  createRedisClient,
+  EnvironmentService,
+  isJsonObject,
+  type JsonObject,
+} from '@repo/api-core';
 import { Observable, Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -15,7 +20,7 @@ export interface NotificationStreamEvent {
   type: string;
   title: string;
   body: string;
-  data: Record<string, unknown> | null;
+  data: JsonObject | null;
   readAt: string | null;
   createdAt: string;
 }
@@ -30,10 +35,6 @@ interface RedisStreamClient {
   ) => Promise<void>;
   duplicate: () => RedisStreamClient;
   on: (event: 'error', listener: (error: Error) => void) => void;
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null;
 }
 
 @Injectable()
@@ -98,7 +99,9 @@ export class NotificationStreamService implements OnModuleInit, OnModuleDestroy 
     }
 
     this.redisReady = (async () => {
-      const publisher = createClient({ url: redisUrl }) as unknown as RedisStreamClient;
+      const publisher = adaptRedisClient<RedisStreamClient>(
+        createRedisClient(redisUrl),
+      );
       const subscriber = publisher.duplicate();
       const noop = () => void 0;
 
@@ -144,7 +147,7 @@ export class NotificationStreamService implements OnModuleInit, OnModuleDestroy 
     try {
       const parsed: unknown = JSON.parse(message);
 
-      if (!isRecord(parsed)) {
+      if (!isJsonObject(parsed)) {
         return null;
       }
 
@@ -162,10 +165,7 @@ export class NotificationStreamService implements OnModuleInit, OnModuleDestroy 
           type: parsed.type,
           title: parsed.title,
           body: parsed.body,
-          data:
-            isRecord(parsed.data)
-              ? parsed.data
-              : null,
+          data: isJsonObject(parsed.data) ? parsed.data : null,
           readAt: typeof parsed.readAt === 'string' ? parsed.readAt : null,
           createdAt:
             typeof parsed.createdAt === 'string'

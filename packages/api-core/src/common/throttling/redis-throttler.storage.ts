@@ -1,8 +1,8 @@
 import type { ThrottlerStorage } from '@nestjs/throttler';
 
-import { createClient } from 'redis';
-
 import type { EnvironmentService } from '../../config/environment.service';
+
+import { adaptRedisClient, createRedisClient } from '../redis/redis-client.adapter';
 
 interface RedisStorageClient {
   connect: () => Promise<void>;
@@ -147,7 +147,9 @@ export class RedisThrottlerStorage implements ThrottlerStorage {
     }
 
     this.redisReady = (async () => {
-      const client = createClient({ url: redisUrl }) as unknown as RedisStorageClient;
+      const client = adaptRedisClient<RedisStorageClient>(
+        createRedisClient(redisUrl),
+      );
       client.on('error', () => void 0);
 
       try {

@@ -57,10 +57,13 @@ export class ProjectsImportExportAdapter
   }
 
   parseCsvRecord(record: Record<string, string>): ProjectImportExportRow {
+    const rawStatus = record.status ?? 'DRAFT';
+    const status = PROJECT_STATUSES.find((value) => value === rawStatus) ?? 'DRAFT';
+
     return {
       name: record.name ?? '',
       description: record.description ?? null,
-      status: (record.status ?? 'DRAFT') as ProjectImportExportRow['status'],
+      status,
     };
   }
 

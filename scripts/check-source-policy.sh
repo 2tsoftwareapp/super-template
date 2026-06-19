@@ -6,9 +6,12 @@ ROOT_DIR=$(cd "$SCRIPT_DIR/.." && pwd)
 cd "$ROOT_DIR"
 
 failed=0
-SEARCH_DIRS="
+
+POLICY_SEARCH_DIRS="
 apps/api/src
 apps/api/test
+apps/admin/src
+apps/web/src
 packages/api-core/src
 packages/api-database/src
 packages/api-identity/src
@@ -18,40 +21,72 @@ packages/api-workspace/src
 
 search_matches() {
   pattern=$1
+  shift
 
   if command -v rg >/dev/null 2>&1; then
-    rg -n "$pattern" \
-      apps/api/src \
-      apps/api/test \
-      packages/api-core/src \
-      packages/api-database/src \
-      packages/api-identity/src \
-      packages/api-platform/src \
-      packages/api-workspace/src \
+    rg -n "$pattern" "$@" \
       --glob '!**/*.tsbuildinfo' \
-      --glob '!**/generated/**'
+      --glob '!**/generated/**' \
+      --glob '!**/*.spec.ts' \
+      --glob '!**/*.test.ts'
     return
   fi
 
-  find \
-    apps/api/src \
-    apps/api/test \
-    packages/api-core/src \
-    packages/api-database/src \
-    packages/api-identity/src \
-    packages/api-platform/src \
-    packages/api-workspace/src \
-    \( -path '*/generated/*' -o -name '*.tsbuildinfo' \) -prune -o \
-    -type f -print |
-    xargs grep -nE "$pattern"
+  for dir in "$@"; do
+    find "$dir" \
+      \( -path '*/generated/*' -o -name '*.tsbuildinfo' -o -name '*.spec.ts' -o -name '*.test.ts' \) -prune -o \
+      -type f \( -name '*.ts' -o -name '*.tsx' \) -print
+  done | xargs grep -nE "$pattern" 2>/dev/null || true
+}
+
+filter_unknown_allowlist() {
+  awk -F: '
+    /\/filters\// { next }
+    /postgres-errors\.ts:/ { next }
+    /env\.schema\.ts:/ { next }
+    /redis/ { next }
+    /access-profile\.cache\.ts:/ { next }
+    /notification-stream\.service\.ts:/ { next }
+    /redact\.ts:/ { next }
+    /current-user\.decorator\.ts:/ { next }
+    /api-response\.decorator\.ts:/ { next }
+    /apps\/api\/src\/main\.ts:/ { next }
+    /database\.provider\.ts:/ { next }
+    /app-error\.ts:/ { next }
+    /observability\.types\.ts:/ { next }
+    /transaction-executor\.ts:/ { next }
+    { print }
+  '
+}
+
+search_unknown_targets() {
+  pattern=$1
+
+  if command -v rg >/dev/null 2>&1; then
+    rg -n "$pattern" \
+      packages/api-identity/src/modules \
+      packages/api-platform/src/modules \
+      packages/api-workspace/src/modules \
+      apps/admin/src \
+      apps/web/src \
+      --glob '**/application/**' \
+      --glob '**/presentation/**' \
+      --glob '!**/*.spec.ts' \
+      --glob '!**/*.test.ts' \
+      --glob '!**/generated/**' | filter_unknown_allowlist
+    return
+  fi
+
+  true
 }
 
 check_policy() {
   name=$1
   pattern=$2
   message=$3
+  shift 3
 
-  output=$(search_matches "$pattern" || true)
+  output=$(search_matches "$pattern" "$@" || true)
 
   if [ -n "$output" ]; then
     failed=1
@@ -61,8 +96,30 @@ check_policy() {
   fi
 }
 
-check_policy '@boundaries-ignore' '@boundaries-ignore' 'Remove boundary-ignore comments and fix the underlying import surface.'
-check_policy 'explicit any' ':\s*any\b|<\s*any\s*>|\bas\s+any\b' 'Use concrete types instead of explicit any.'
+check_unknown_policy() {
+  name=$1
+  pattern=$2
+  message=$3
+
+  output=$(search_unknown_targets "$pattern" || true)
+
+  if [ -n "$output" ]; then
+    failed=1
+    printf 'Policy violation: %s\n' "$name" >&2
+    printf '%s\n' "$output" >&2
+    printf '%s\n' "$message" >&2
+  fi
+}
+
+# shellcheck disable=SC2086
+check_policy '@boundaries-ignore' '@boundaries-ignore' 'Remove boundary-ignore comments and fix the underlying import surface.' $POLICY_SEARCH_DIRS
+# shellcheck disable=SC2086
+check_policy 'explicit any' ':\s*any\b|<\s*any\s*>|\bas\s+any\b' 'Use concrete types instead of explicit any.' $POLICY_SEARCH_DIRS
+
+check_unknown_policy \
+  'unknown outside boundary' \
+  ':\s*unknown\b|<\s*unknown\s*>|\bas\s+unknown\b|Record<string,\s*unknown>' \
+  'Use JsonValue/JsonObject or narrow unknown at explicit boundaries only.'
 
 search_index_exports() {
   pattern=$1

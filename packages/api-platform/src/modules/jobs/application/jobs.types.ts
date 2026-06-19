@@ -1,3 +1,4 @@
+import type { JsonObject } from '@repo/api-core';
 export type JobStatus =
   | 'PENDING'
   | 'PROCESSING'
@@ -8,7 +9,7 @@ export type JobStatus =
 export interface JobView {
   id: string;
   type: string;
-  payload: Record<string, unknown>;
+  payload: JsonObject;
   status: JobStatus;
   scheduledAt: string;
   priority: number;
@@ -25,7 +26,7 @@ export interface JobView {
 
 export interface EnqueueJobCommand {
   type: string;
-  payload: Record<string, unknown>;
+  payload: JsonObject;
   scheduledAt?: Date;
   priority?: number;
   createdById?: string | null;
@@ -43,7 +44,7 @@ export interface ListJobsQuery {
 
 export interface JobHandlerContext {
   jobId: string;
-  payload: Record<string, unknown>;
+  payload: JsonObject;
   organizationId: string | null;
   createdById: string | null;
 }

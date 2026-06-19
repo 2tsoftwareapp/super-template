@@ -1,6 +1,5 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { ERROR_CODES } from '@repo/api-core';
-import { AppError } from '@repo/api-core';
+import { AppError, ERROR_CODES, type JsonObject } from '@repo/api-core';
 
 import { MailDeliveriesRepository } from '../infrastructure/mail-deliveries.repository';
 import { TemplateRendererService } from '../infrastructure/template-renderer.service';
@@ -10,7 +9,7 @@ interface SendTemplateInput {
   templateKey: string;
   to: string;
   variables: Record<string, string>;
-  metadata?: Record<string, unknown> | null;
+  metadata?: JsonObject | null;
 }
 
 @Injectable()

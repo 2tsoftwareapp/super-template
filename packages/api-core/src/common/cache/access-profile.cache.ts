@@ -1,12 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import { createClient } from 'redis';
+import { z } from 'zod';
 
 import { EnvironmentService } from '../../config/environment.service';
+import { adaptRedisClient, createRedisClient } from '../redis/redis-client.adapter';
 
 export interface AccessProfileSnapshot {
   permissions: string[];
   roles: string[];
 }
+
+const AccessProfileSnapshotSchema = z.object({
+  permissions: z.array(z.string()),
+  roles: z.array(z.string()),
+});
 
 interface RedisCacheClient {
   connect: () => Promise<void>;
@@ -33,6 +39,18 @@ function cacheKey(userId: string): string {
   return `${CACHE_KEY_PREFIX}${userId}`;
 }
 
+function parseAccessProfileSnapshot(
+  cached: string,
+): AccessProfileSnapshot | null {
+  try {
+    const parsed: unknown = JSON.parse(cached);
+    const result = AccessProfileSnapshotSchema.safeParse(parsed);
+    return result.success ? result.data : null;
+  } catch {
+    return null;
+  }
+}
+
 @Injectable()
 export class AccessProfileCache {
   private readonly localEntries = new Map<string, LocalCacheEntry>();
@@ -51,12 +69,14 @@ export class AccessProfileCache {
         return null;
       }
 
-      try {
-        return JSON.parse(cached) as AccessProfileSnapshot;
-      } catch {
+      const profile = parseAccessProfileSnapshot(cached);
+
+      if (!profile) {
         await redis.del(cacheKey(userId));
         return null;
       }
+
+      return profile;
     }
 
     const entry = this.localEntries.get(userId);
@@ -129,7 +149,9 @@ export class AccessProfileCache {
     }
 
     this.redisReady = (async () => {
-      const client = createClient({ url: redisUrl }) as unknown as RedisCacheClient;
+      const client = adaptRedisClient<RedisCacheClient>(
+        createRedisClient(redisUrl),
+      );
 
       client.on('error', () => {
         this.redisClient = null;

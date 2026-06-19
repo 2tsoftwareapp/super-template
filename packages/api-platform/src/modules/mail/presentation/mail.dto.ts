@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { PaginationQueryDto } from '@repo/api-core';
+import { type JsonObject, PaginationQueryDto } from '@repo/api-core';
 import { IsEnum, IsOptional, IsString } from 'class-validator';
 
 export class MailDeliveryDto {
@@ -22,7 +22,7 @@ export class MailDeliveryDto {
   errorMessage: string | null;
 
   @ApiPropertyOptional({ type: 'object', additionalProperties: true })
-  metadata: Record<string, unknown> | null;
+  metadata: JsonObject | null;
 
   @ApiPropertyOptional()
   sentAt: string | null;

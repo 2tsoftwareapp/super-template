@@ -1,3 +1,4 @@
+import type { ImportValidationError } from '@repo/api-core';
 export type ImportJobStatus =
   | 'PENDING'
   | 'PROCESSING'
@@ -13,7 +14,7 @@ export interface ImportJobView {
   rowCount: number | null;
   successCount: number | null;
   errorCount: number | null;
-  errors: Record<string, unknown>[] | null;
+  errors: ImportValidationError[] | null;
   createdById: string;
   confirmedAt: string | null;
   completedAt: string | null;

@@ -1,3 +1,4 @@
+import type { JsonObject } from '@repo/api-core';
 export type NotificationAudience = 'USER' | 'USERS' | 'ALL';
 
 export type NotificationJobStatus =
@@ -15,7 +16,7 @@ export interface NotificationView {
   type: string;
   title: string;
   body: string;
-  data: Record<string, unknown> | null;
+  data: JsonObject | null;
   readAt: string | null;
   createdAt: string;
 }
@@ -29,7 +30,7 @@ export interface NotificationJobView {
   type: string;
   title: string;
   body: string;
-  data: Record<string, unknown> | null;
+  data: JsonObject | null;
   scheduledAt: string;
   status: NotificationJobStatus;
   recipientCount: number | null;
@@ -44,7 +45,7 @@ export interface SendNotificationCommand {
   type: string;
   title: string;
   body: string;
-  data?: Record<string, unknown>;
+  data?: JsonObject;
   organizationId?: string;
 }
 
@@ -55,7 +56,7 @@ export interface SendNotificationRequestCommand {
   type: string;
   title: string;
   body: string;
-  data?: Record<string, unknown>;
+  data?: JsonObject;
   scheduledAt?: string;
   idempotencyKey?: string;
 }

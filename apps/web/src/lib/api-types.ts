@@ -1,5 +1,7 @@
 import type { components, operations } from "@repo/api-contract";
 
+import type { JsonValue } from "@/lib/json";
+
 export interface ApiEnvelope<T> {
   data: T;
   meta: {
@@ -15,7 +17,7 @@ export interface ApiErrorEnvelope {
   error: {
     code: string;
     message: string;
-    details: unknown;
+    details: JsonValue | null;
   };
   meta: {
     requestId: string;

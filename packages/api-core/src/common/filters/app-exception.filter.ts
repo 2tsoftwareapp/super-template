@@ -10,11 +10,38 @@ import {
   Injectable,
 } from '@nestjs/common';
 
+import type { ErrorReportContext } from '../observability/observability.types';
+import type { JsonObject, JsonValue } from '../types/json-value';
+
 import { EnvironmentService } from '../../config/environment.service';
 import { ERROR_CODES, type ErrorCode } from '../constants/error-codes';
 import { AppError } from '../errors/app-error';
 import { APP_LOGGER, type AppLogger } from '../logging/logger.interface';
 import { ErrorReporterService } from '../observability/error-reporter.service';
+
+function toLogDetails(value: unknown): JsonValue | null {
+  if (value === null || value === undefined) {
+    return null;
+  }
+
+  if (
+    typeof value === 'string' ||
+    typeof value === 'number' ||
+    typeof value === 'boolean'
+  ) {
+    return value;
+  }
+
+  if (value instanceof Error) {
+    return value.message;
+  }
+
+  try {
+    return JSON.parse(JSON.stringify(value)) as JsonValue;
+  } catch {
+    return null;
+  }
+}
 
 @Injectable()
 @Catch()
@@ -65,7 +92,7 @@ export class AppExceptionFilter implements ExceptionFilter {
     // Persist the resolved code for downstream logging/middleware that runs after the exception handler.
     response.locals.errorCode = code;
 
-    const logContext = {
+    const reportContext: ErrorReportContext = {
       requestId: request.requestId,
       method: request.method,
       path: request.originalUrl,
@@ -80,12 +107,27 @@ export class AppExceptionFilter implements ExceptionFilter {
         : {}),
     };
 
+    const logContext: JsonObject = {
+      requestId: request.requestId,
+      method: request.method,
+      path: request.originalUrl,
+      statusCode,
+      userId: request.user?.userId ?? null,
+      errorCode: code,
+      details: toLogDetails(details),
+      ...( !this.environmentService.isProduction &&
+      exception instanceof Error &&
+      exception.stack
+        ? { stack: exception.stack }
+        : {}),
+    };
+
     if (statusCode >= HttpStatus.INTERNAL_SERVER_ERROR) {
       this.logger.error('Unhandled request exception', logContext);
       if (exception instanceof Error) {
-        this.errorReporter.reportException(exception, logContext);
+        this.errorReporter.reportException(exception, reportContext);
       } else {
-        this.errorReporter.reportMessage('Unhandled non-error exception', logContext);
+        this.errorReporter.reportMessage('Unhandled non-error exception', reportContext);
       }
     } else {
       this.logger.warn('Handled request exception', logContext);

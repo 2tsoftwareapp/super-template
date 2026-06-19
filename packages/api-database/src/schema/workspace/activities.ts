@@ -1,3 +1,5 @@
+import type { JsonObject } from '@repo/api-core';
+
 import { index, jsonb, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 import { organizations } from '../identity/organizations';
@@ -20,7 +22,7 @@ export const activities = pgTable(
     visibility: activityVisibilityEnum('visibility')
       .notNull()
       .default('INTERNAL'),
-    metadata: jsonb('metadata').$type<Record<string, unknown> | null>(),
+    metadata: jsonb('metadata').$type<JsonObject | null>(),
     createdAt: timestamp('created_at', { withTimezone: true })
       .notNull()
       .defaultNow(),

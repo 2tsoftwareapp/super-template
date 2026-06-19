@@ -1,3 +1,5 @@
+import type { JsonObject } from '@repo/api-core';
+
 import { jsonb, pgTable, text, uuid } from 'drizzle-orm/pg-core';
 
 import { timestamps } from '../shared/timestamps';
@@ -11,11 +13,11 @@ export const userPreferences = pgTable('user_preferences', {
   language: text('language').notNull().default('en'),
   timezone: text('timezone').notNull().default('UTC'),
   notificationPreferences: jsonb('notification_preferences')
-    .$type<Record<string, unknown>>()
+    .$type<JsonObject>()
     .notNull()
     .default({}),
   emailPreferences: jsonb('email_preferences')
-    .$type<Record<string, unknown>>()
+    .$type<JsonObject>()
     .notNull()
     .default({}),
   ...timestamps,

@@ -7,11 +7,31 @@ import {
 import { Reflector } from '@nestjs/core';
 import { map, type Observable } from 'rxjs';
 
+import type { JsonObject } from '../types/json-value';
+
 import { SKIP_ENVELOPE_KEY } from '../decorators/skip-envelope.decorator';
 
 interface Envelope<T> {
   data: T;
-  meta?: Record<string, unknown>;
+  meta?: JsonObject;
+}
+
+function asEnvelopeIfPresent<T>(value: T): Envelope<T> | null {
+  if (!value || typeof value !== 'object') {
+    return null;
+  }
+
+  const record = value as { data?: unknown; meta?: unknown };
+  const keys = Object.keys(record);
+
+  if (
+    !('data' in record) ||
+    !keys.every((key) => key === 'data' || key === 'meta')
+  ) {
+    return null;
+  }
+
+  return value as unknown as Envelope<T>;
 }
 
 @Injectable()
@@ -37,16 +57,9 @@ export class ResponseEnvelopeInterceptor<T>
 
     return next.handle().pipe(
       map((value) => {
-        const valueKeys =
-          value && typeof value === 'object' ? Object.keys(value) : [];
-        const isEnvelopeCandidate =
-          value &&
-          typeof value === 'object' &&
-          'data' in (value as Record<string, unknown>) &&
-          valueKeys.every((key) => key === 'data' || key === 'meta');
+        const envelope = asEnvelopeIfPresent(value);
 
-        if (isEnvelopeCandidate) {
-          const envelope = value as unknown as Envelope<T>;
+        if (envelope) {
           return {
             ...envelope,
             meta: {

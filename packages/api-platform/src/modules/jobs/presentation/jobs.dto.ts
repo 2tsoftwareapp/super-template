@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { PaginationQueryDto } from '@repo/api-core';
+import { type JsonObject, PaginationQueryDto } from '@repo/api-core';
 import { IsEnum, IsOptional, IsString } from 'class-validator';
 
 export class JobDto {
@@ -10,7 +10,7 @@ export class JobDto {
   type: string;
 
   @ApiProperty({ type: 'object', additionalProperties: true })
-  payload: Record<string, unknown>;
+  payload: JsonObject;
 
   @ApiProperty({
     enum: ['PENDING', 'PROCESSING', 'COMPLETED', 'CANCELLED', 'FAILED'],

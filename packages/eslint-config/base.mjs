@@ -23,7 +23,15 @@ export const baseConfig = [
       },
     },
     rules: {
+      '@typescript-eslint/consistent-type-assertions': [
+        'error',
+        {
+          assertionStyle: 'as',
+          objectLiteralTypeAssertions: 'allow',
+        },
+      ],
       '@typescript-eslint/consistent-type-imports': 'error',
+      '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/no-misused-promises': [
         'error',
         {

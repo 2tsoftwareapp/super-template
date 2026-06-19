@@ -4,6 +4,7 @@ import type {
 } from '@repo/api-database';
 
 import { Inject, Injectable } from '@nestjs/common';
+import { type JsonObject } from '@repo/api-core';
 import { DATABASE } from '@repo/api-database';
 import { applicationSettings } from '@repo/api-database';
 import { eq } from 'drizzle-orm';
@@ -28,7 +29,7 @@ export class SettingsRepository {
 
   async upsert(
     key: string,
-    value: Record<string, unknown>,
+    value: JsonObject,
     updatedById: string | null,
     executor: DatabaseExecutor = this.database,
   ) {
@@ -61,7 +62,7 @@ export class SettingsRepository {
   }
 
   async ensureDefaults(
-    defaults: { key: string; value: Record<string, unknown> }[],
+    defaults: { key: string; value: JsonObject }[],
     executor: DatabaseExecutor = this.database,
   ) {
     for (const item of defaults) {

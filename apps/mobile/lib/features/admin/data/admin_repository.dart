@@ -172,21 +172,18 @@ class AdminRepository {
     String? organizationId,
   }) async {
     try {
-      final payload = <String, dynamic>{
-        'email': email,
-        'password': password,
-        'displayName': displayName,
-        'status': 'ACTIVE',
-        'role': role,
-      };
-      if (organizationId != null) {
-        payload['organizationId'] = organizationId;
-      }
-      final response = await _client.dio.post<Map<String, dynamic>>(
-        '/api/v1/admin/users',
-        data: payload,
+      final response = await _usersApi.adminUsersControllerCreateUser(
+        createAdminUserDto: CreateAdminUserDto(
+          (b) => b
+            ..email = email
+            ..password = password
+            ..displayName = displayName
+            ..status = CreateAdminUserDtoStatusEnum.ACTIVE
+            ..role = CreateAdminUserDtoRoleEnum.valueOf(role)
+            ..organizationId = organizationId,
+        ),
       );
-      return _userFromEnvelope(response.data!);
+      return _userFromDto(response.data!.data);
     } on DioException catch (error) {
       throw AppException.fromDio(error);
     }
@@ -274,28 +271,27 @@ class AdminRepository {
     String? organizationId,
   }) async {
     try {
-      final payload = <String, dynamic>{'role': role};
-      if (organizationId != null) {
-        payload['organizationId'] = organizationId;
-      }
-      final response = await _client.dio.put<Map<String, dynamic>>(
-        '/api/v1/admin/users/$id/roles',
-        data: payload,
+      final response = await _usersApi.adminUsersControllerReplaceRoles(
+        id: id,
+        replaceUserRolesDto: ReplaceUserRolesDto(
+          (b) => b
+            ..role = ReplaceUserRolesDtoRoleEnum.valueOf(role)
+            ..organizationId = organizationId,
+        ),
       );
-      return _userFromEnvelope(response.data!);
+      return _userFromDto(response.data!.data);
     } on DioException catch (error) {
       throw AppException.fromDio(error);
     }
   }
 
-  AdminUserSummary _userFromEnvelope(Map<String, dynamic> envelope) {
-    final user = envelope['data'] as Map<String, dynamic>;
+  AdminUserSummary _userFromDto(UserDto user) {
     return AdminUserSummary(
-      id: user['id'] as String,
-      email: user['email'] as String,
-      displayName: user['displayName'] as String,
-      status: user['status'] as String,
-      roles: (user['roles'] as List<dynamic>).cast<String>(),
+      id: user.id,
+      email: user.email,
+      displayName: user.displayName,
+      status: user.status.name,
+      roles: user.roles.toList(),
     );
   }
 

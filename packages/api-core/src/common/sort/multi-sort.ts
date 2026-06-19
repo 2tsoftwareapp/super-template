@@ -11,6 +11,35 @@ function toAllowedFieldSet<TField extends string>(
   return allowedFields instanceof Set ? allowedFields : new Set(allowedFields);
 }
 
+function parseSortOrder(value: string | undefined): SortOrder | null {
+  const order = (value ?? 'asc').trim().toLowerCase();
+
+  if (order === 'asc' || order === 'desc') {
+    return order;
+  }
+
+  return null;
+}
+
+function resolveAllowedField<TField extends string>(
+  fieldRaw: string | undefined,
+  allowed: ReadonlySet<TField>,
+): TField | null {
+  if (!fieldRaw) {
+    return null;
+  }
+
+  const trimmed = fieldRaw.trim();
+
+  for (const field of allowed) {
+    if (field === trimmed) {
+      return field;
+    }
+  }
+
+  return null;
+}
+
 export function formatSortParam<TField extends string>(
   sort: readonly SortCriterion<TField>[],
 ): string {
@@ -51,15 +80,11 @@ export function parseSortParam<TField extends string>(
       continue;
     }
 
-    const [fieldRaw, orderRaw = 'asc'] = trimmed.split(':');
-    const field = fieldRaw?.trim() as TField;
-    const order = orderRaw.trim().toLowerCase() as SortOrder;
+    const [fieldRaw, orderRaw] = trimmed.split(':');
+    const field = resolveAllowedField<TField>(fieldRaw, allowed);
+    const order = parseSortOrder(orderRaw);
 
-    if (!allowed.has(field)) {
-      continue;
-    }
-
-    if (order !== 'asc' && order !== 'desc') {
+    if (!field || !order) {
       continue;
     }
 

@@ -1,3 +1,5 @@
+import type { JsonObject } from '@repo/api-core';
+
 import {
   index,
   jsonb,
@@ -24,7 +26,7 @@ export const auditLogs = pgTable(
     action: text('action').notNull(),
     entityType: text('entity_type').notNull(),
     entityId: uuid('entity_id'),
-    metadata: jsonb('metadata').$type<Record<string, unknown> | null>(),
+    metadata: jsonb('metadata').$type<JsonObject | null>(),
     ipAddress: varchar('ip_address', { length: 64 }),
     userAgent: text('user_agent'),
     requestId: text('request_id'),

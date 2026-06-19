@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { PaginationQueryDto } from '@repo/api-core';
+import { type JsonObject, PaginationQueryDto } from '@repo/api-core';
 import { IsDateString, IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class AuditLogDto {
@@ -19,7 +19,7 @@ export class AuditLogDto {
   entityId: string | null;
 
   @ApiPropertyOptional({ type: 'object', additionalProperties: true })
-  metadata: Record<string, unknown> | null;
+  metadata: JsonObject | null;
 
   @ApiPropertyOptional({ type: String, nullable: true })
   ipAddress: string | null;

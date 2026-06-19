@@ -1,13 +1,13 @@
 import type { AuthenticatedRequestUser } from '@repo/api-core';
 
 import { HttpStatus } from '@nestjs/common';
-import { AppError, ERROR_CODES } from '@repo/api-core';
-
 import {
+  AppError,
+  ERROR_CODES,
+  isPrivilegedRoleName,
   PERMISSION_NAMES,
-  PRIVILEGED_ROLE_NAMES,
   ROLE_NAMES,
-} from '../access-control.constants';
+} from '@repo/api-core';
 
 export interface RolePolicyTarget {
   name: string;
@@ -19,11 +19,7 @@ export function assertCanManagePrivilegedAccount(
   actor: AuthenticatedRequestUser,
   targetRoleNames: string[],
 ): void {
-  const targetIsPrivileged = targetRoleNames.some((roleName) =>
-    PRIVILEGED_ROLE_NAMES.includes(
-      roleName as (typeof PRIVILEGED_ROLE_NAMES)[number],
-    ),
-  );
+  const targetIsPrivileged = targetRoleNames.some(isPrivilegedRoleName);
 
   if (targetIsPrivileged && !actor.roles.includes(ROLE_NAMES.SUPER_ADMIN)) {
     throw new AppError(
@@ -40,16 +36,8 @@ export function assertCanAssignRoles(
   desiredRoleNames: string[],
 ): void {
   const actorIsSuperAdmin = actor.roles.includes(ROLE_NAMES.SUPER_ADMIN);
-  const targetIsPrivileged = targetRoleNames.some((roleName) =>
-    PRIVILEGED_ROLE_NAMES.includes(
-      roleName as (typeof PRIVILEGED_ROLE_NAMES)[number],
-    ),
-  );
-  const assigningPrivilegedRole = desiredRoleNames.some((roleName) =>
-    PRIVILEGED_ROLE_NAMES.includes(
-      roleName as (typeof PRIVILEGED_ROLE_NAMES)[number],
-    ),
-  );
+  const targetIsPrivileged = targetRoleNames.some(isPrivilegedRoleName);
+  const assigningPrivilegedRole = desiredRoleNames.some(isPrivilegedRoleName);
 
   if (!actorIsSuperAdmin && (targetIsPrivileged || assigningPrivilegedRole)) {
     throw new AppError(

@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { PaginationQueryDto } from '@repo/api-core';
+import { type JsonObject, PaginationQueryDto } from '@repo/api-core';
 import {
   ArrayMinSize,
   IsArray,
@@ -40,7 +40,7 @@ export class NotificationDto {
   body: string;
 
   @ApiPropertyOptional({ type: 'object', additionalProperties: true })
-  data: Record<string, unknown> | null;
+  data: JsonObject | null;
 
   @ApiPropertyOptional()
   readAt: string | null;
@@ -113,7 +113,7 @@ export class SendNotificationRequestDto {
   @ApiPropertyOptional({ type: 'object', additionalProperties: true })
   @IsOptional()
   @IsObject()
-  data?: Record<string, unknown>;
+  data?: JsonObject;
 
   @ApiPropertyOptional({
     description:
@@ -154,7 +154,7 @@ export class SendNotificationDto {
   @ApiPropertyOptional({ type: 'object', additionalProperties: true })
   @IsOptional()
   @IsObject()
-  data?: Record<string, unknown>;
+  data?: JsonObject;
 
   @ApiPropertyOptional()
   @IsOptional()
@@ -188,7 +188,7 @@ export class NotificationJobDto {
   body: string;
 
   @ApiPropertyOptional({ type: 'object', additionalProperties: true })
-  data: Record<string, unknown> | null;
+  data: JsonObject | null;
 
   @ApiProperty()
   scheduledAt: string;

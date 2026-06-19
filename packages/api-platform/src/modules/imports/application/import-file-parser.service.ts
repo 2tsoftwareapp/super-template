@@ -1,5 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { ImportExportAdapterRegistry } from '@repo/api-core';
+import {
+  ImportExportAdapterRegistry,
+  type ImportValidationError,
+} from '@repo/api-core';
 
 import {
   OBJECT_STORAGE,
@@ -13,7 +16,10 @@ export class ImportFileParserService {
     private readonly importExportAdapters: ImportExportAdapterRegistry,
   ) {}
 
-  async parseImportFile(type: string, storageKey: string) {
+  async parseImportFile(
+    type: string,
+    storageKey: string,
+  ): Promise<{ rows: object[] }> {
     const adapter = this.importExportAdapters.resolve(type);
     const content = await this.objectStorage.read(storageKey);
     const lines = content
@@ -23,7 +29,7 @@ export class ImportFileParserService {
       .filter(Boolean);
 
     if (lines.length === 0) {
-      return { rows: [] as unknown[] };
+      return { rows: [] };
     }
 
     const [headerLine, ...dataLines] = lines;
@@ -41,9 +47,9 @@ export class ImportFileParserService {
     return { rows };
   }
 
-  validateRows(type: string, rows: unknown[]) {
+  validateRows(type: string, rows: object[]): ImportValidationError[] {
     const adapter = this.importExportAdapters.resolve(type);
-    const errors: Record<string, unknown>[] = [];
+    const errors: ImportValidationError[] = [];
 
     rows.forEach((row, index) => {
       const message = adapter.validateRow(row);

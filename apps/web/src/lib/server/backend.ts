@@ -3,6 +3,7 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 import type { ApiEnvelope } from "@/lib/api-types";
+import type { JsonValue } from "@/lib/json";
 
 import {
   clearAuthCookies,
@@ -16,7 +17,7 @@ import { normalizeBffListPath } from "@/lib/search-params";
 const backendUrl = (path: string) =>
   new URL(`/api/v1/${path.replace(/^\/+/, "")}`, env.API_INTERNAL_URL);
 
-const isBackendConnectionError = (error: unknown): boolean => {
+const isBackendConnectionError = (error: Error): boolean => {
   if (!(error instanceof TypeError) || error.message !== "fetch failed") {
     return false;
   }
@@ -107,7 +108,7 @@ export const callBackend = async ({
   try {
     return await fetch(backendUrl(path), init);
   } catch (error) {
-    if (isBackendConnectionError(error)) {
+    if (error instanceof Error && isBackendConnectionError(error)) {
       return backendUnavailableResponse();
     }
 
@@ -137,7 +138,7 @@ export const refreshSession = async (
       cache: "no-store",
     });
   } catch (error) {
-    if (isBackendConnectionError(error)) {
+    if (error instanceof Error && isBackendConnectionError(error)) {
       return null;
     }
 
@@ -239,7 +240,7 @@ export const proxyWithRefresh = async (request: NextRequest, path: string) => {
     }
   }
 
-  const payload = await parseJson<ApiEnvelope<unknown>>(response);
+  const payload = await parseJson<ApiEnvelope<JsonValue>>(response);
   const nextResponse = NextResponse.json(payload, { status: response.status });
 
   if (refreshedTokens) {

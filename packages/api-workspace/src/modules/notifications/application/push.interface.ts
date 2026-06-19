@@ -1,9 +1,10 @@
+import type { JsonObject } from '@repo/api-core';
 export interface PushMessage {
   notificationId: string;
   type: string;
   title: string;
   body: string;
-  data?: Record<string, unknown> | null;
+  data?: JsonObject | null;
 }
 
 export const PUSH_NOTIFIER = Symbol('PUSH_NOTIFIER');

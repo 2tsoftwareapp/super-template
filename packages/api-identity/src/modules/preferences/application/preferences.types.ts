@@ -1,7 +1,8 @@
+import type { JsonObject } from '@repo/api-core';
 export interface UpdatePreferencesCommand {
   theme?: string;
   language?: string;
   timezone?: string;
-  notificationPreferences?: Record<string, unknown>;
-  emailPreferences?: Record<string, unknown>;
+  notificationPreferences?: JsonObject;
+  emailPreferences?: JsonObject;
 }

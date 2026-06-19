@@ -10,8 +10,9 @@ import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Spinner } from "../components/ui/spinner";
 import { webFetch } from "../lib/http";
+import { parseJsonValue } from "../lib/json";
 
-function displayValue(value: unknown): string {
+function displayValue(value: ApplicationSettingDto["value"]): string {
   if (value == null) return "—";
   if (typeof value === "string") return value;
   return JSON.stringify(value, null, 2);
@@ -26,7 +27,7 @@ export function SettingsPage() {
   const [draftValues, setDraftValues] = useState<Record<string, string>>({});
 
   const updateSetting = useMutation({
-    mutationFn: ({ key, value }: { key: string; value: unknown }) =>
+    mutationFn: ({ key, value }: { key: string; value: ApplicationSettingDto["value"] }) =>
       webFetch<{ data: ApplicationSettingDto }>(`/api/v1/admin/settings/${key}`, {
         method: "PATCH",
         body: JSON.stringify({ value }),
@@ -96,10 +97,13 @@ export function SettingsPage() {
                           variant="outline"
                           size="sm"
                           onClick={() => {
-                            const next = safeJsonParse(
+                            const next = parseJsonValue(
                               draftValues[setting.key] ?? JSON.stringify(setting.value),
                             );
-                            void updateSetting.mutateAsync({ key: setting.key, value: next });
+                            void updateSetting.mutateAsync({
+                              key: setting.key,
+                              value: next as ApplicationSettingDto["value"],
+                            });
                           }}
                           disabled={updateSetting.isPending}
                         >
@@ -118,10 +122,3 @@ export function SettingsPage() {
   );
 }
 
-function safeJsonParse(input: string): unknown {
-  try {
-    return JSON.parse(input);
-  } catch {
-    return input;
-  }
-}

@@ -1,3 +1,4 @@
+import type { JsonObject } from '@repo/api-core';
 import type { DatabaseExecutor } from '@repo/api-database';
 
 export interface ActivityEmitInput {
@@ -7,14 +8,14 @@ export interface ActivityEmitInput {
   entityId: string;
   actorId?: string | null;
   visibility?: 'PUBLIC' | 'PRIVATE' | 'INTERNAL';
-  metadata?: Record<string, unknown> | null;
+  metadata?: JsonObject | null;
 }
 
 export interface ActivityEmitter {
   emit(
     input: ActivityEmitInput,
     executor?: DatabaseExecutor,
-  ): Promise<unknown>;
+  ): Promise<void>;
 }
 
 export const ACTIVITY_EMITTER = Symbol('ACTIVITY_EMITTER');

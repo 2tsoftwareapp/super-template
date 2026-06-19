@@ -3,22 +3,40 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { toast } from "sonner";
+import { z } from "zod";
 
 import type { NotificationDto } from "@/lib/api-types";
 
+const notificationStreamEventSchema = z.object({
+  id: z.string(),
+  userId: z.string(),
+  type: z.string(),
+  title: z.string(),
+  body: z.string(),
+  data: z.record(z.string(), z.unknown()).nullable().optional(),
+  readAt: z.string().nullable().optional(),
+  createdAt: z.string().optional(),
+});
+
 const parseNotificationEvent = (payload: string): NotificationDto | null => {
   try {
-    const parsed = JSON.parse(payload) as unknown;
-    if (
-      typeof parsed === "object" &&
-      parsed !== null &&
-      "title" in parsed &&
-      "body" in parsed
-    ) {
-      return parsed as NotificationDto;
+    const parsed: unknown = JSON.parse(payload);
+    const result = notificationStreamEventSchema.safeParse(parsed);
+
+    if (!result.success) {
+      return null;
     }
 
-    return null;
+    return {
+      id: result.data.id,
+      userId: result.data.userId,
+      type: result.data.type,
+      title: result.data.title,
+      body: result.data.body,
+      data: result.data.data ?? undefined,
+      readAt: result.data.readAt ?? undefined,
+      createdAt: result.data.createdAt ?? new Date().toISOString(),
+    } as unknown as NotificationDto;
   } catch {
     return null;
   }

@@ -1,3 +1,4 @@
+import type { JsonObject } from '../common/types/json-value';
 import type { AuthenticatedRequestUser, RequestContext } from '../common/types/request-context';
 import type { TransactionExecutor } from '../common/types/transaction-executor';
 
@@ -7,7 +8,7 @@ export interface SendUserNotificationInput {
   type: string;
   title: string;
   body: string;
-  data?: Record<string, unknown>;
+  data?: JsonObject;
 }
 
 export interface NotificationMessage {
@@ -16,7 +17,7 @@ export interface NotificationMessage {
   type: string;
   title: string;
   body: string;
-  data: Record<string, unknown> | null;
+  data: JsonObject | null;
   readAt: string | null;
   createdAt: string;
 }

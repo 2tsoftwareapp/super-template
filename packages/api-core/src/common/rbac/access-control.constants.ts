@@ -11,6 +11,14 @@ export const PRIVILEGED_ROLE_NAMES = [
   ROLE_NAMES.ADMIN,
 ] as const;
 
+export type PrivilegedRoleName = (typeof PRIVILEGED_ROLE_NAMES)[number];
+
+export function isPrivilegedRoleName(
+  name: string,
+): name is PrivilegedRoleName {
+  return (PRIVILEGED_ROLE_NAMES as readonly string[]).includes(name);
+}
+
 export const PERMISSION_NAMES = {
   USERS_READ: 'users.read',
   USERS_CREATE: 'users.create',

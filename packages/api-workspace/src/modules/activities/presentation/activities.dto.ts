@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { PaginationQueryDto } from '@repo/api-core';
+import { type JsonObject, PaginationQueryDto } from '@repo/api-core';
 import { IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class ActivityDto {
@@ -22,7 +22,7 @@ export class ActivityDto {
   visibility: 'PUBLIC' | 'PRIVATE' | 'INTERNAL';
 
   @ApiPropertyOptional({ type: 'object', additionalProperties: true })
-  metadata: Record<string, unknown> | null;
+  metadata: JsonObject | null;
 
   @ApiProperty()
   createdAt: string;

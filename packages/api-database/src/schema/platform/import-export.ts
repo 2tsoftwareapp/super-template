@@ -1,3 +1,5 @@
+import type { ImportValidationError, JsonObject } from '@repo/api-core';
+
 import { sql } from 'drizzle-orm';
 import { index, integer, jsonb, pgTable, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
 
@@ -22,7 +24,7 @@ export const importJobs = pgTable(
     rowCount: integer('row_count'),
     successCount: integer('success_count'),
     errorCount: integer('error_count'),
-    errors: jsonb('errors').$type<Record<string, unknown>[] | null>(),
+    errors: jsonb('errors').$type<ImportValidationError[] | null>(),
     createdById: uuid('created_by_id')
       .notNull()
       .references(() => users.id, { onDelete: 'restrict' }),
@@ -52,7 +54,7 @@ export const exportJobs = pgTable(
     fileId: uuid('file_id').references(() => files.id, {
       onDelete: 'set null',
     }),
-    filters: jsonb('filters').$type<Record<string, unknown> | null>(),
+    filters: jsonb('filters').$type<JsonObject | null>(),
     createdById: uuid('created_by_id')
       .notNull()
       .references(() => users.id, { onDelete: 'restrict' }),

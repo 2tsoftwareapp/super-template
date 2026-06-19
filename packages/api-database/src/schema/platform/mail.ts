@@ -1,3 +1,5 @@
+import type { JsonObject } from '@repo/api-core';
+
 import { index, jsonb, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 import { mailDeliveryStatusEnum } from './enums';
@@ -11,7 +13,7 @@ export const mailDeliveries = pgTable(
     subject: text('subject').notNull(),
     status: mailDeliveryStatusEnum('status').notNull(),
     errorMessage: text('error_message'),
-    metadata: jsonb('metadata').$type<Record<string, unknown> | null>(),
+    metadata: jsonb('metadata').$type<JsonObject | null>(),
     sentAt: timestamp('sent_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true })
       .notNull()

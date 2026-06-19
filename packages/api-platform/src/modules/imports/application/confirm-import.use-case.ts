@@ -8,6 +8,7 @@ import {
   AppError,
   ERROR_CODES,
   ImportExportAdapterRegistry,
+  type ImportValidationError,
 } from '@repo/api-core';
 
 import type { ImportJobView } from './imports.types';
@@ -81,7 +82,7 @@ export class ConfirmImportUseCase {
     );
     const adapter = this.importExportAdapters.resolve(job.type);
     let successCount = 0;
-    const errors: Record<string, unknown>[] = [];
+    const errors: ImportValidationError[] = [];
 
     for (const [index, row] of parsed.rows.entries()) {
       try {

@@ -22,8 +22,13 @@ export { RequestLoggerMiddleware } from './common/middleware/request-logger.midd
 export { ErrorReporterService } from './common/observability/error-reporter.service';
 export * from './common/pagination/pagination.dto';
 export * from './common/rbac/access-control.constants';
+export {
+  adaptRedisClient,
+  createRedisClient,
+} from './common/redis/redis-client.adapter';
 export * from './common/sort/multi-sort';
 export { RedisThrottlerStorage } from './common/throttling/redis-throttler.storage';
+export * from './common/types/json-value';
 export * from './common/types/request-context';
 export * from './common/types/transaction-executor';
 export * from './common/utils/duration';
@@ -63,6 +68,7 @@ export {
   type ImportExportAdapter,
   ImportExportAdapterRegistry,
   type ImportExportRowContext,
+  type ImportValidationError,
 } from './ports/import-export-adapter.port';
 export {
   MAIL_TEMPLATE_SENDER,

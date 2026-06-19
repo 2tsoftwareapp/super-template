@@ -29,10 +29,13 @@ export class NotificationJobsProcessor {
     try {
       await this.notificationsService.processDueJobs();
     } catch (error) {
-      this.logger.error('Failed to process due notification jobs', {
+      const logContext: Record<string, string> = {
         error: error instanceof Error ? error.message : String(error),
-        stack: error instanceof Error ? error.stack : undefined,
-      });
+      };
+      if (error instanceof Error && error.stack) {
+        logContext.stack = error.stack;
+      }
+      this.logger.error('Failed to process due notification jobs', logContext);
       if (error instanceof Error) {
         this.errorReporter.reportException(error, {
           errorCode: 'NOTIFICATION_JOB_PROCESSING_FAILED',

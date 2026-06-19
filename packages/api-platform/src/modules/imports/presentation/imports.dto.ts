@@ -1,3 +1,5 @@
+import type { ImportValidationError } from '@repo/api-core';
+
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
 
@@ -26,7 +28,7 @@ export class ImportJobDto {
   errorCount: number | null;
 
   @ApiPropertyOptional({ type: 'array', items: { type: 'object' } })
-  errors: Record<string, unknown>[] | null;
+  errors: ImportValidationError[] | null;
 
   @ApiProperty()
   createdById: string;

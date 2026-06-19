@@ -1,6 +1,8 @@
+import type { JsonObject } from '../types/json-value';
+
 export const APP_LOGGER = Symbol('APP_LOGGER');
 
-export type LogContext = Record<string, unknown>;
+export type LogContext = JsonObject;
 
 export type LogLevel = 'info' | 'warn' | 'error';
 

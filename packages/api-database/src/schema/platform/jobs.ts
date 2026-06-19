@@ -1,3 +1,5 @@
+import type { JsonObject } from '@repo/api-core';
+
 import { sql } from 'drizzle-orm';
 import { index, integer, jsonb, pgTable, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
 
@@ -14,7 +16,7 @@ export const jobs = pgTable(
       onDelete: 'set null',
     }),
     type: text('type').notNull(),
-    payload: jsonb('payload').$type<Record<string, unknown>>().notNull(),
+    payload: jsonb('payload').$type<JsonObject>().notNull(),
     status: jobStatusEnum('status').notNull().default('PENDING'),
     scheduledAt: timestamp('scheduled_at', { withTimezone: true }).notNull(),
     priority: integer('priority').notNull().default(0),
