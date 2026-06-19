@@ -18,7 +18,10 @@ export function statusProps(status: string): {
 } {
   if (status === "ACTIVE") return { variant: "default" };
   if (status === "BLOCKED")
-    return { variant: "outline", className: "text-destructive border-destructive/40" };
+    return {
+      variant: "outline",
+      className: "text-destructive border-destructive/40",
+    };
   return { variant: "secondary" };
 }
 

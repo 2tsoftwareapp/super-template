@@ -84,6 +84,9 @@
             "layer:bootstrap",
             "layer:health",
             "layer:contract",
+            "layer:frontend-core",
+            "layer:frontend-ui",
+            "layer:frontend-test",
             "layer:app",
             "layer:tsconfig",
             "layer:eslint"
@@ -99,6 +102,34 @@
         "dependencies": {
           "allow": ["layer:eslint", "layer:tsconfig"]
         }
+      },
+      "layer:frontend-core": {
+        "dependencies": {
+          "allow": ["layer:frontend-core", "layer:contract", "layer:tsconfig", "layer:eslint"]
+        }
+      },
+      "layer:frontend-ui": {
+        "dependencies": {
+          "allow": [
+            "layer:frontend-core",
+            "layer:frontend-ui",
+            "layer:contract",
+            "layer:tsconfig",
+            "layer:eslint"
+          ]
+        }
+      },
+      "layer:frontend-test": {
+        "dependencies": {
+          "allow": [
+            "layer:frontend-core",
+            "layer:frontend-ui",
+            "layer:frontend-test",
+            "layer:contract",
+            "layer:tsconfig",
+            "layer:eslint"
+          ]
+        }
       }
     }
   },
@@ -109,6 +140,7 @@
       "env": [
         "API_INTERNAL_URL",
         "WEB_ORIGIN",
+        "ADMIN_ORIGIN",
         "NEXT_PUBLIC_WEB_URL",
         "NEXT_PUBLIC_API_BASE_PATH"
       ]

@@ -1,7 +1,14 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { Bell, FolderKanban, Plus, Settings, ShieldCheck, Workflow } from "lucide-react";
+import {
+  Bell,
+  FolderKanban,
+  Plus,
+  Settings,
+  ShieldCheck,
+  Workflow,
+} from "lucide-react";
 import Link from "next/link";
 
 import type {
@@ -10,7 +17,7 @@ import type {
 } from "@/lib/api-types";
 
 import { Badge } from "@/components/ui/badge";
-import { buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button-variants";
 import {
   Card,
   CardContent,
@@ -27,9 +34,7 @@ import {
 } from "@/components/ui/empty";
 import { useSession } from "@/hooks/use-session";
 import { webFetch } from "@/lib/http";
-import {
-  buildProjectsListPath,
-} from "@/lib/search-params";
+import { buildProjectsListPath } from "@/lib/search-params";
 
 export default function DashboardPage() {
   const session = useSession();

@@ -126,12 +126,7 @@ export default function PreferencesSettingsPage() {
               <Label>Theme</Label>
               <Select
                 value={theme}
-                onValueChange={(value) =>
-                  form.setValue(
-                    "theme",
-                    value!,
-                  )
-                }
+                onValueChange={(value) => form.setValue("theme", value!)}
               >
                 <SelectTrigger>
                   <SelectValue />

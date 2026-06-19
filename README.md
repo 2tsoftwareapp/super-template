@@ -4,7 +4,7 @@ Production-oriented reusable full-stack starter with:
 
 - NestJS API
 - Next.js App Router client web with a backend-for-frontend layer
-- React + Vite admin app with shadcn UI and TanStack
+- Next.js App Router admin app with shadcn UI and TanStack
 - Flutter mobile client
 - PostgreSQL
 - Drizzle ORM with `pg`
@@ -15,7 +15,7 @@ Production-oriented reusable full-stack starter with:
 
 - Backend: NestJS 11, Swagger, JWT, Argon2id, Drizzle ORM, PostgreSQL
 - Web: Next.js 16, React 19, Tailwind CSS, TanStack Query, React Hook Form, Zod
-- Admin: React 19, Vite, shadcn UI primitives, TanStack Query/Table
+- Admin: Next.js 16, React 19, Tailwind CSS, TanStack Query/Table
 - Mobile: Flutter stable, Riverpod, Go Router, Dio, secure storage
 - Tooling: pnpm workspaces, Turborepo, Biome for backend, ESLint for web, Makefile
 

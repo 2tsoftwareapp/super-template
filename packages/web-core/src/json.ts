@@ -1,0 +1,38 @@
+export type JsonPrimitive = string | number | boolean | null;
+
+export interface JsonObject {
+  [key: string]: JsonValue;
+}
+
+export type JsonArray = JsonValue[];
+export type JsonValue = JsonPrimitive | JsonObject | JsonArray;
+
+export function isJsonObject(value: unknown): value is JsonObject {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+export function isJsonValue(value: unknown): value is JsonValue {
+  if (
+    value === null ||
+    typeof value === "string" ||
+    typeof value === "number" ||
+    typeof value === "boolean"
+  ) {
+    return true;
+  }
+
+  if (Array.isArray(value)) {
+    return value.every(isJsonValue);
+  }
+
+  return isJsonObject(value) && Object.values(value).every(isJsonValue);
+}
+
+export function parseJsonValue(input: string): JsonValue {
+  try {
+    const parsed: unknown = JSON.parse(input);
+    return isJsonValue(parsed) ? parsed : input;
+  } catch {
+    return input;
+  }
+}

@@ -1,3 +1,5 @@
+"use client";
+
 import {
   BarChart3,
   ChevronLeft,
@@ -7,9 +9,18 @@ import {
   Settings,
   Zap,
 } from "lucide-react";
-import { createContext, useContext, useEffect, useState } from "react";
-import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import {
+  createContext,
+  type ReactNode,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
+import { useSession } from "@/hooks/use-session";
 import {
   adminResourceGroups,
   adminResources,
@@ -19,7 +30,6 @@ import {
   hasAdminAppAccess,
 } from "@/lib/admin-resources";
 import { webFetch } from "@/lib/http";
-import { useSession } from "@/lib/session";
 import { cn } from "@/lib/utils";
 
 import { Avatar } from "./ui/avatar";
@@ -44,10 +54,10 @@ export function useSidebar() {
   return useContext(SidebarContext);
 }
 
-export function AdminShell() {
+export function AdminShell({ children }: { children: ReactNode }) {
   const session = useSession();
-  const location = useLocation();
-  const navigate = useNavigate();
+  const pathname = usePathname();
+  const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [collapsed, setCollapsed] = useState<boolean>(() => {
     try {
@@ -67,19 +77,22 @@ export function AdminShell() {
   };
 
   useEffect(() => {
-    if (session.isError) void navigate("/login", { replace: true });
-  }, [navigate, session.isError]);
+    if (session.isError) router.replace("/login");
+  }, [router, session.isError]);
 
   const onSignOut = async () => {
-    await webFetch("/api/v1/auth/logout", { method: "POST" });
-    await navigate("/login", { replace: true });
+    await webFetch("/api/auth/logout", { method: "POST" });
+    router.replace("/login");
   };
 
   const user = session.data?.data.user;
-  const permissions = session.data?.data.permissions ?? [];
+  const permissions = useMemo(
+    () => session.data?.data.permissions ?? [],
+    [session.data?.data.permissions],
+  );
   const displayName = user?.displayName ?? "";
   const roles = user?.roles.join(" / ") ?? "";
-  const currentResource = getResourceForPath(location.pathname);
+  const currentResource = getResourceForPath(pathname);
   const canUseAdminApp = user
     ? hasAdminAppAccess({
         roles: user.roles,
@@ -96,21 +109,21 @@ export function AdminShell() {
     }
 
     if (!canUseAdminApp) {
-      void webFetch("/api/v1/auth/logout", { method: "POST" }).finally(() =>
-        navigate("/login", { replace: true }),
+      void webFetch("/api/auth/logout", { method: "POST" }).finally(() =>
+        router.replace("/login"),
       );
       return;
     }
 
     if (!canAccessCurrentRoute) {
-      void navigate(getFirstAccessibleResourcePath(permissions), { replace: true });
+      router.replace(getFirstAccessibleResourcePath(permissions));
     }
   }, [
     canAccessCurrentRoute,
     canUseAdminApp,
-    location.pathname,
-    navigate,
+    pathname,
     permissions,
+    router,
     session.data,
   ]);
 
@@ -121,7 +134,9 @@ export function AdminShell() {
           <CardHeader className="items-center gap-3">
             <Spinner className="size-5" />
             <CardTitle>Restoring admin session</CardTitle>
-            <CardDescription>Loading permissions and workspace state.</CardDescription>
+            <CardDescription>
+              Loading permissions and workspace state.
+            </CardDescription>
           </CardHeader>
         </Card>
       </div>
@@ -137,7 +152,9 @@ export function AdminShell() {
           <CardHeader className="items-center gap-3">
             <Spinner className="size-5" />
             <CardTitle>Checking admin access</CardTitle>
-            <CardDescription>Redirecting to a permitted workspace.</CardDescription>
+            <CardDescription>
+              Redirecting to a permitted workspace.
+            </CardDescription>
           </CardHeader>
         </Card>
       </div>
@@ -145,13 +162,16 @@ export function AdminShell() {
   }
 
   return (
-    <SidebarContext.Provider value={{ collapsed, setCollapsed: toggleCollapsed }}>
+    <SidebarContext.Provider
+      value={{ collapsed, setCollapsed: toggleCollapsed }}
+    >
       <div className="flex min-h-dvh bg-muted/30">
         <DesktopSidebar
           collapsed={collapsed}
           displayName={displayName}
           roles={roles}
           permissions={permissions}
+          pathname={pathname}
           onCollapseChange={toggleCollapsed}
           onSignOut={onSignOut}
         />
@@ -174,6 +194,7 @@ export function AdminShell() {
             displayName={displayName}
             roles={roles}
             permissions={permissions}
+            pathname={pathname}
             onNavigate={() => setMobileMenuOpen(false)}
             onSignOut={onSignOut}
           />
@@ -185,9 +206,7 @@ export function AdminShell() {
             onSignOut={onSignOut}
             onOpenMobileMenu={() => setMobileMenuOpen(true)}
           />
-          <main className="flex-1 p-4 md:p-6">
-            <Outlet />
-          </main>
+          <main className="flex-1 p-4 md:p-6">{children}</main>
         </div>
       </div>
     </SidebarContext.Provider>
@@ -196,14 +215,20 @@ export function AdminShell() {
 
 function Brand({ collapsed }: { collapsed?: boolean }) {
   return (
-    <div className={cn("flex items-center gap-2.5", collapsed && "justify-center")}>
+    <div
+      className={cn("flex items-center gap-2.5", collapsed && "justify-center")}
+    >
       <div className="flex size-8 items-center justify-center rounded-lg bg-foreground">
         <Zap className="size-4 text-background" />
       </div>
       {!collapsed ? (
         <div className="min-w-0">
-          <p className="truncate text-sm font-semibold tracking-tight">Super Admin</p>
-          <p className="truncate text-[11px] text-muted-foreground">Resource console</p>
+          <p className="truncate text-sm font-semibold tracking-tight">
+            Super Admin
+          </p>
+          <p className="truncate text-[11px] text-muted-foreground">
+            Resource console
+          </p>
         </div>
       ) : null}
     </div>
@@ -213,10 +238,12 @@ function Brand({ collapsed }: { collapsed?: boolean }) {
 function ResourceNav({
   collapsed,
   permissions,
+  pathname,
   onNavigate,
 }: {
   collapsed?: boolean;
   permissions: string[];
+  pathname: string;
   onNavigate?: () => void;
 }) {
   return (
@@ -224,7 +251,8 @@ function ResourceNav({
       {adminResourceGroups.map((group) => {
         const resources = adminResources.filter(
           (resource) =>
-            resource.group === group && canAccessResource(resource, permissions),
+            resource.group === group &&
+            canAccessResource(resource, permissions),
         );
         if (resources.length === 0) return null;
 
@@ -238,29 +266,37 @@ function ResourceNav({
             <div className="flex flex-col gap-1">
               {resources.map((resource) => {
                 const Icon = resource.icon;
+                const isActive =
+                  resource.path === "/"
+                    ? pathname === "/"
+                    : pathname === resource.path ||
+                      pathname.startsWith(`${resource.path}/`);
                 const link = (
-                  <NavLink
+                  <Link
                     key={resource.path}
-                    to={resource.path}
-                    end={resource.path === "/"}
-                    onClick={onNavigate}
-                    className={({ isActive }) =>
-                      cn(
-                        "flex min-h-10 items-center rounded-md px-2 text-sm transition-colors",
-                        collapsed ? "justify-center" : "gap-3",
-                        isActive
-                          ? "bg-primary text-primary-foreground"
-                          : "text-muted-foreground hover:bg-muted hover:text-foreground",
-                      )
-                    }
+                    href={resource.path}
+                    {...(onNavigate ? { onClick: onNavigate } : {})}
+                    className={cn(
+                      "flex min-h-10 items-center rounded-md px-2 text-sm transition-colors",
+                      collapsed ? "justify-center" : "gap-3",
+                      isActive
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                    )}
                   >
                     <Icon className="shrink-0" />
-                    {!collapsed ? <span className="truncate">{resource.label}</span> : null}
-                  </NavLink>
+                    {!collapsed ? (
+                      <span className="truncate">{resource.label}</span>
+                    ) : null}
+                  </Link>
                 );
 
                 return collapsed ? (
-                  <Tooltip key={resource.path} content={resource.label} side="right">
+                  <Tooltip
+                    key={resource.path}
+                    content={resource.label}
+                    side="right"
+                  >
                     {link}
                   </Tooltip>
                 ) : (
@@ -280,6 +316,7 @@ function DesktopSidebar({
   displayName,
   roles,
   permissions,
+  pathname,
   onCollapseChange,
   onSignOut,
 }: {
@@ -287,6 +324,7 @@ function DesktopSidebar({
   displayName: string;
   roles: string;
   permissions: string[];
+  pathname: string;
   onCollapseChange: (collapsed: boolean) => void;
   onSignOut: () => void;
 }) {
@@ -316,7 +354,11 @@ function DesktopSidebar({
         ) : null}
       </div>
 
-      <ResourceNav collapsed={collapsed} permissions={permissions} />
+      <ResourceNav
+        collapsed={collapsed}
+        permissions={permissions}
+        pathname={pathname}
+      />
 
       {collapsed ? (
         <div className="flex justify-center border-t border-border py-2">
@@ -346,12 +388,14 @@ function MobileSidebar({
   displayName,
   roles,
   permissions,
+  pathname,
   onNavigate,
   onSignOut,
 }: {
   displayName: string;
   roles: string;
   permissions: string[];
+  pathname: string;
   onNavigate: () => void;
   onSignOut: () => void;
 }) {
@@ -360,7 +404,11 @@ function MobileSidebar({
       <div className="flex min-h-14 items-center justify-between border-b border-border px-4">
         <Brand />
       </div>
-      <ResourceNav permissions={permissions} onNavigate={onNavigate} />
+      <ResourceNav
+        permissions={permissions}
+        pathname={pathname}
+        onNavigate={onNavigate}
+      />
       <Separator />
       <UserMenu displayName={displayName} roles={roles} onSignOut={onSignOut} />
     </aside>
@@ -401,7 +449,9 @@ function UserMenu({
               <Avatar name={displayName} size="sm" />
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium">{displayName}</p>
-                <p className="truncate text-xs text-muted-foreground">{roles}</p>
+                <p className="truncate text-xs text-muted-foreground">
+                  {roles}
+                </p>
               </div>
             </button>
           )
@@ -470,7 +520,10 @@ function TopHeader({
             </Button>
           }
           items={[
-            { label: "View dashboard", icon: <BarChart3 /> } satisfies DropdownItem,
+            {
+              label: "View dashboard",
+              icon: <BarChart3 />,
+            } satisfies DropdownItem,
           ]}
         />
         <Dropdown
@@ -485,7 +538,10 @@ function TopHeader({
             </button>
           }
           items={[
-            { label: displayName, icon: <Avatar name={displayName} size="sm" /> } satisfies DropdownItem,
+            {
+              label: displayName,
+              icon: <Avatar name={displayName} size="sm" />,
+            } satisfies DropdownItem,
             { separator: true } satisfies DropdownItem,
             {
               label: "Settings",
@@ -506,8 +562,8 @@ function TopHeader({
 }
 
 function PageTitle() {
-  const location = useLocation();
-  const matched = getResourceForPath(location.pathname);
+  const pathname = usePathname();
+  const matched = getResourceForPath(pathname);
   const Icon = matched.icon;
 
   return (

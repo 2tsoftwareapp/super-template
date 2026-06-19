@@ -4,6 +4,7 @@
 
 - `apps/api`: modular monolith NestJS backend
 - `apps/web`: Next.js App Router web app with a same-origin BFF layer
+- `apps/admin`: Next.js App Router admin app with a same-origin BFF layer
 - `apps/mobile`: Flutter app using generated Dart API client
 - `packages/api-contract`: generated TypeScript OpenAPI types
 - `packages/api-bootstrap`: API bootstrap and shared startup helpers
@@ -159,7 +160,8 @@ Job endpoints accept optional `idempotencyKey` on export/import/notification/bac
 flowchart LR
   UserWeb[Web Browser] --> Next[Next.js BFF]
   UserMobile[Flutter App] --> API[NestJS API]
-  AdminBrowser[Admin Browser] --> API
+  AdminBrowser[Admin Browser] --> NextAdmin[Next.js Admin BFF]
+  NextAdmin --> API
   Next --> API
   API --> DB[(PostgreSQL)]
   API --> Mailpit[Mailpit / SMTP]
@@ -183,8 +185,9 @@ graph TB
             BFF["Route Handlers\nBFF Layer — HttpOnly cookies\nCSRF + token refresh"]
         end
 
-        subgraph AdminApp["apps/admin — React + Vite"]
-            AdminUI["shadcn UI primitives\nTanStack Query + Table"]
+        subgraph AdminApp["apps/admin — Next.js 16"]
+            AdminUI["App Router\nReact 19 + Tailwind CSS"]
+            AdminBFF["Route Handlers\nBFF Layer — HttpOnly cookies\nCSRF + token refresh"]
         end
 
         subgraph NestAPI["apps/api — NestJS 11"]
@@ -237,10 +240,11 @@ graph TB
     Browser --> AppRouter
     AppRouter --> BFF
     AdminBrowser --> AdminUI
+    AdminUI --> AdminBFF
     MobileApp --> DartClient
 
     BFF -->|"internal HTTP"| NestAPI
-    AdminUI -->|"REST"| NestAPI
+    AdminBFF -->|"internal HTTP"| NestAPI
     DartClient -->|"REST"| NestAPI
 
     DrizzleORM --> PostgreSQL
@@ -267,7 +271,7 @@ graph LR
     subgraph apps["apps/"]
         API["api\nNestJS"]
         Web["web\nNext.js"]
-        Admin["admin\nVite"]
+        Admin["admin\nNext.js"]
         Mobile["mobile\nFlutter"]
     end
 

@@ -59,7 +59,10 @@ export function ResourceTable<T>({
                 >
                   {header.isPlaceholder ? null : (
                     <span className="inline-flex items-center gap-1">
-                      {flexRender(header.column.columnDef.header, header.getContext())}
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
                       {showSortPriority ? (
                         <span className="inline-flex size-4 items-center justify-center rounded-full bg-muted text-[10px] font-medium text-muted-foreground">
                           {sortIndex + 1}

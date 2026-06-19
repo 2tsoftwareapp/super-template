@@ -1,0 +1,10 @@
+.next
+coverage
+dist
+build
+out
+playwright-report
+test-results
+.turbo
+node_modules
+.dart_tool

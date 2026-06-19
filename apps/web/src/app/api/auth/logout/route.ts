@@ -15,7 +15,9 @@ export async function POST() {
       headers: new Headers(),
       accessToken,
     });
-    const payload = (await response.json()) as ApiEnvelope<{ success: boolean }>;
+    const payload = (await response.json()) as ApiEnvelope<{
+      success: boolean;
+    }>;
     const nextResponse = NextResponse.json(payload, {
       status: response.status,
     });

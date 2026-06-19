@@ -33,7 +33,7 @@ const emptyStringToUndefined = z.preprocess(
 const envSchema = z.object({
   API_INTERNAL_URL: z.url(),
   NEXT_PUBLIC_WEB_URL: z.url(),
-  WEB_ORIGIN: z.url(),
+  WEB_ORIGIN: z.string().min(1),
   COOKIE_DOMAIN: emptyStringToUndefined,
   COOKIE_SAMESITE: z.enum(["lax", "strict", "none"]).default("lax"),
   CSRF_SECRET: emptyStringToUndefined,
@@ -54,4 +54,5 @@ export const env = envSchema.parse({
   NODE_ENV: process.env.NODE_ENV,
 });
 
-export const isSecureCookie = env.COOKIE_SECURE ?? env.NODE_ENV === "production";
+export const isSecureCookie =
+  env.COOKIE_SECURE ?? env.NODE_ENV === "production";

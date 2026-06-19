@@ -189,11 +189,7 @@ describe("proxyWithRefresh", () => {
     expect(firstCall).toBeDefined();
     const [url] = firstCall!;
     const requestUrl =
-      typeof url === "string"
-        ? url
-        : url instanceof URL
-          ? url.href
-          : "";
+      typeof url === "string" ? url : url instanceof URL ? url.href : "";
 
     expect(requestUrl).toContain(
       "/api/v1/projects?page=2&limit=5&status=ACTIVE&sortField=name&sortOrder=asc",

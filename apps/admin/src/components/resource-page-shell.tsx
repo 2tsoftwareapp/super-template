@@ -45,7 +45,9 @@ export function ResourcePageShell({
               <p className="mt-1 max-w-3xl text-sm leading-6 text-muted-foreground">
                 {description}
               </p>
-              {meta ? <div className="mt-3 flex flex-wrap gap-2">{meta}</div> : null}
+              {meta ? (
+                <div className="mt-3 flex flex-wrap gap-2">{meta}</div>
+              ) : null}
             </div>
           </div>
         </div>

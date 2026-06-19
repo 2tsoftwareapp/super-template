@@ -22,7 +22,7 @@
 - Admin: `make dev-admin`
 - Mobile: `make dev-mobile`
 
-`make dev` starts PostgreSQL, Mailpit, NestJS, Next.js, and the separate admin Vite app. Flutter still runs separately on a selected device or simulator.
+`make dev` starts PostgreSQL, Mailpit, NestJS, Next.js web, and the Next.js admin app. Flutter still runs separately on a selected device or simulator.
 
 On Windows/PowerShell, prefer the Node-based mobile commands over shell-specific `make` targets:
 

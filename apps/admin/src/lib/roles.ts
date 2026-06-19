@@ -1,4 +1,4 @@
-import type { RoleDto } from "./types";
+import type { RoleDto } from "./api-types";
 
 export const PRIVILEGED_ROLE_NAMES = ["SUPER_ADMIN", "ADMIN"] as const;
 
@@ -28,7 +28,9 @@ export function getAssignableRoles(
   actorRoles: string[],
   roles: RoleDto[],
 ): RoleDto[] {
-  const assignable = roles.filter((role) => canAssignRole(actorRoles, role.name));
+  const assignable = roles.filter((role) =>
+    canAssignRole(actorRoles, role.name),
+  );
   const byName = new Map<string, RoleDto>();
 
   for (const role of assignable) {
@@ -38,7 +40,9 @@ export function getAssignableRoles(
     }
   }
 
-  return Array.from(byName.values()).sort((a, b) => a.name.localeCompare(b.name));
+  return Array.from(byName.values()).sort((a, b) =>
+    a.name.localeCompare(b.name),
+  );
 }
 
 export function buildRoleLookup(roles: RoleDto[]) {

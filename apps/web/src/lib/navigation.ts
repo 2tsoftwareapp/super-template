@@ -1,11 +1,6 @@
 import type { ComponentType } from "react";
 
-import {
-  Bell,
-  FolderKanban,
-  LayoutDashboard,
-  Settings,
-} from "lucide-react";
+import { Bell, FolderKanban, LayoutDashboard, Settings } from "lucide-react";
 
 export interface NavItem {
   href: string;

@@ -1,17 +1,9 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { createUseSession } from "@repo/web-core/session";
 
-import type { AuthSessionResponse } from "@/lib/api-types";
+export const sessionQueryKey = ["session"] as const;
 
-import { webFetch } from "@/lib/http";
-
-export const sessionQueryKey = ["session"];
-
-export function useSession() {
-  return useQuery({
-    queryKey: sessionQueryKey,
-    queryFn: () => webFetch<AuthSessionResponse>("/api/auth/session"),
-    retry: false,
-  });
-}
+export const useSession = createUseSession({
+  queryKey: sessionQueryKey,
+});

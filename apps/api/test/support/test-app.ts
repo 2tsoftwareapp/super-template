@@ -135,7 +135,9 @@ const ensureRestrictedTestRole = async (adminDatabaseUrl: string) => {
     await pool.query(
       `alter default privileges in schema public grant usage, select, update on sequences to ${quotedRoleName}`,
     );
-    await pool.query(`grant connect on database ${quotedDatabaseName} to ${quotedRoleName}`);
+    await pool.query(
+      `grant connect on database ${quotedDatabaseName} to ${quotedRoleName}`,
+    );
   } finally {
     await pool.end();
   }
@@ -170,7 +172,9 @@ export const resetTestDatabase = async (): Promise<void> => {
     await pool.query('drop schema if exists public cascade;');
     await pool.query('create schema public;');
     await applySqlMigrations(pool);
-    await pool.query('grant usage, create on schema public to fullstack_starter_app');
+    await pool.query(
+      'grant usage, create on schema public to fullstack_starter_app',
+    );
     await pool.query(
       'grant select, insert, update, delete on all tables in schema public to fullstack_starter_app',
     );

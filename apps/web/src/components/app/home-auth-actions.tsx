@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 
 import type { AuthSessionResponse } from "@/lib/api-types";
 
-import { buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button-variants";
 import { ApiClientError, webFetch } from "@/lib/http";
 import { cn } from "@/lib/utils";
 

@@ -8,12 +8,10 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   const { accessToken, refreshToken, csrfToken } = await readAuthCookies();
   let activeAccessToken = accessToken;
-  let refreshedTokens:
-    | {
-        accessToken: string;
-        refreshToken: string;
-      }
-    | null = null;
+  let refreshedTokens: {
+    accessToken: string;
+    refreshToken: string;
+  } | null = null;
 
   let response = await callBackend({
     path: "notifications/stream",

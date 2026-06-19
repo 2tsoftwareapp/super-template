@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { RoleDto } from "./types";
+import type { RoleDto } from "./api-types";
 
 import {
   buildRoleLookup,
@@ -58,10 +58,9 @@ describe("getAssignableRoles", () => {
   });
 
   it("returns ADMIN and USER for a super admin", () => {
-    expect(getAssignableRoles(["SUPER_ADMIN"], roles).map((r) => r.name)).toEqual([
-      "ADMIN",
-      "USER",
-    ]);
+    expect(
+      getAssignableRoles(["SUPER_ADMIN"], roles).map((r) => r.name),
+    ).toEqual(["ADMIN", "USER"]);
   });
 
   it("deduplicates by name and prefers platform roles in the picker", () => {

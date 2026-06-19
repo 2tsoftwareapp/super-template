@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
-import { buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button-variants";
 import {
   Card,
   CardContent,
@@ -32,12 +32,12 @@ export function AdminMovedNotice({
         <CardHeader>
           <CardTitle className="text-xl">Use the admin app</CardTitle>
           <CardDescription>
-            The management UI now lives in the separate React + Vite workspace.
+            The management UI now lives in the separate Next.js admin app.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Link
-            href="http://127.0.0.1:3001"
+            href="http://127.0.0.1:3002"
             target="_blank"
             rel="noreferrer"
             className={buttonVariants({ className: "w-full sm:w-auto" })}

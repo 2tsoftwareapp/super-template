@@ -1,14 +1,3 @@
-import * as React from "react";
+"use client";
 
-import { cn } from "@/lib/utils";
-
-function Label({
-  className,
-  ...props
-}: React.LabelHTMLAttributes<HTMLLabelElement>) {
-  return (
-    <label className={cn("text-sm font-medium leading-none", className)} {...props} />
-  );
-}
-
-export { Label };
+export * from "@repo/web-core/components/label";

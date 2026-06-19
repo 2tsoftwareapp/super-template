@@ -1,0 +1,8 @@
+.next
+coverage
+dist
+build
+out
+playwright-report
+test-results
+.turbo
