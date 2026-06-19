@@ -83,12 +83,14 @@ export class RoleQueryUseCase {
   }
 
   async listRoles(actor?: AuthenticatedRequestUser): Promise<RoleView[]> {
-    const roles = actor
-      ? await this.accessControlRepository.findManageableRolesForActor(
-          actor.organizationId,
-          actor.roles.includes(ROLE_NAMES.SUPER_ADMIN),
-        )
-      : await this.accessControlRepository.findAllRoles();
+    const roles = actor?.roles.includes(ROLE_NAMES.SUPER_ADMIN)
+      ? await this.accessControlRepository.findAllRoles()
+      : actor
+        ? await this.accessControlRepository.findManageableRolesForActor(
+            actor.organizationId,
+            false,
+          )
+        : await this.accessControlRepository.findAllRoles();
     const permissionRows =
       await this.accessControlRepository.findPermissionsForRoleIds(
         roles.map((role) => role.id),

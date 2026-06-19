@@ -6,16 +6,11 @@ import {
   Get,
   Param,
   ParseUUIDPipe,
-  Query,
-} from '@nestjs/common';
+  Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import {
-  ApiDataResponse,
-  ApiPaginatedResponse,
-} from '@repo/api-core';
+import {  ACTION, ApiDataResponse, ApiPaginatedResponse, perm } from '@repo/api-core';
 import { CurrentUser } from '@repo/api-core';
 import { Authorize } from '@repo/api-core';
-import { PERMISSION_NAMES } from '@repo/api-core';
 
 import { JobsService } from '../application/jobs.service';
 import { JobDto, JobsQueryDto } from './jobs.dto';
@@ -27,7 +22,7 @@ export class AdminJobsController {
   constructor(private readonly jobsService: JobsService) {}
 
   @Get()
-  @Authorize({ permissions: [PERMISSION_NAMES.JOBS_READ] })
+  @Authorize({ permissions: [perm('jobs', ACTION.READ)] })
   @ApiPaginatedResponse(JobDto)
   async listJobs(@Query() query: JobsQueryDto) {
     const result = await this.jobsService.listJobs(query);
@@ -38,13 +33,11 @@ export class AdminJobsController {
         page: query.page,
         limit: query.limit,
         total: result.total,
-        totalPages: Math.ceil(result.total / query.limit),
-      },
-    };
+        totalPages: Math.ceil(result.total / query.limit) } };
   }
 
   @Delete(':id')
-  @Authorize({ permissions: [PERMISSION_NAMES.JOBS_UPDATE] })
+  @Authorize({ permissions: [perm('jobs', ACTION.UPDATE)] })
   @ApiDataResponse(JobDto)
   cancelJob(
     @CurrentUser() user: AuthenticatedRequestUser,

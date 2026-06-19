@@ -2,43 +2,43 @@
 
 // @dart=3.0
 
-part of 'admin_users_controller_delete_user200_response.dart';
+part of 'admin_roles_controller_delete_role200_response.dart';
 
 // **************************************************************************
 // BuiltValueGenerator
 // **************************************************************************
 
-class _$AdminUsersControllerDeleteUser200Response
-    extends AdminUsersControllerDeleteUser200Response {
+class _$AdminRolesControllerDeleteRole200Response
+    extends AdminRolesControllerDeleteRole200Response {
   @override
   final SuccessFlagDto data;
   @override
   final RequestMetaDto meta;
 
-  factory _$AdminUsersControllerDeleteUser200Response([
-    void Function(AdminUsersControllerDeleteUser200ResponseBuilder)? updates,
+  factory _$AdminRolesControllerDeleteRole200Response([
+    void Function(AdminRolesControllerDeleteRole200ResponseBuilder)? updates,
   ]) =>
-      (AdminUsersControllerDeleteUser200ResponseBuilder()..update(updates))
+      (AdminRolesControllerDeleteRole200ResponseBuilder()..update(updates))
           ._build();
 
-  _$AdminUsersControllerDeleteUser200Response._({
+  _$AdminRolesControllerDeleteRole200Response._({
     required this.data,
     required this.meta,
   }) : super._();
   @override
-  AdminUsersControllerDeleteUser200Response rebuild(
-    void Function(AdminUsersControllerDeleteUser200ResponseBuilder) updates,
+  AdminRolesControllerDeleteRole200Response rebuild(
+    void Function(AdminRolesControllerDeleteRole200ResponseBuilder) updates,
   ) =>
       (toBuilder()..update(updates)).build();
 
   @override
-  AdminUsersControllerDeleteUser200ResponseBuilder toBuilder() =>
-      AdminUsersControllerDeleteUser200ResponseBuilder()..replace(this);
+  AdminRolesControllerDeleteRole200ResponseBuilder toBuilder() =>
+      AdminRolesControllerDeleteRole200ResponseBuilder()..replace(this);
 
   @override
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
-    return other is AdminUsersControllerDeleteUser200Response &&
+    return other is AdminRolesControllerDeleteRole200Response &&
         data == other.data &&
         meta == other.meta;
   }
@@ -55,7 +55,7 @@ class _$AdminUsersControllerDeleteUser200Response
   @override
   String toString() {
     return (newBuiltValueToStringHelper(
-      r'AdminUsersControllerDeleteUser200Response',
+      r'AdminRolesControllerDeleteRole200Response',
     )
           ..add('data', data)
           ..add('meta', meta))
@@ -63,11 +63,11 @@ class _$AdminUsersControllerDeleteUser200Response
   }
 }
 
-class AdminUsersControllerDeleteUser200ResponseBuilder
+class AdminRolesControllerDeleteRole200ResponseBuilder
     implements
-        Builder<AdminUsersControllerDeleteUser200Response,
-            AdminUsersControllerDeleteUser200ResponseBuilder> {
-  _$AdminUsersControllerDeleteUser200Response? _$v;
+        Builder<AdminRolesControllerDeleteRole200Response,
+            AdminRolesControllerDeleteRole200ResponseBuilder> {
+  _$AdminRolesControllerDeleteRole200Response? _$v;
 
   SuccessFlagDtoBuilder? _data;
   SuccessFlagDtoBuilder get data => _$this._data ??= SuccessFlagDtoBuilder();
@@ -77,11 +77,11 @@ class AdminUsersControllerDeleteUser200ResponseBuilder
   RequestMetaDtoBuilder get meta => _$this._meta ??= RequestMetaDtoBuilder();
   set meta(RequestMetaDtoBuilder? meta) => _$this._meta = meta;
 
-  AdminUsersControllerDeleteUser200ResponseBuilder() {
-    AdminUsersControllerDeleteUser200Response._defaults(this);
+  AdminRolesControllerDeleteRole200ResponseBuilder() {
+    AdminRolesControllerDeleteRole200Response._defaults(this);
   }
 
-  AdminUsersControllerDeleteUser200ResponseBuilder get _$this {
+  AdminRolesControllerDeleteRole200ResponseBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
       _data = $v.data.toBuilder();
@@ -92,25 +92,25 @@ class AdminUsersControllerDeleteUser200ResponseBuilder
   }
 
   @override
-  void replace(AdminUsersControllerDeleteUser200Response other) {
-    _$v = other as _$AdminUsersControllerDeleteUser200Response;
+  void replace(AdminRolesControllerDeleteRole200Response other) {
+    _$v = other as _$AdminRolesControllerDeleteRole200Response;
   }
 
   @override
   void update(
-    void Function(AdminUsersControllerDeleteUser200ResponseBuilder)? updates,
+    void Function(AdminRolesControllerDeleteRole200ResponseBuilder)? updates,
   ) {
     if (updates != null) updates(this);
   }
 
   @override
-  AdminUsersControllerDeleteUser200Response build() => _build();
+  AdminRolesControllerDeleteRole200Response build() => _build();
 
-  _$AdminUsersControllerDeleteUser200Response _build() {
-    _$AdminUsersControllerDeleteUser200Response _$result;
+  _$AdminRolesControllerDeleteRole200Response _build() {
+    _$AdminRolesControllerDeleteRole200Response _$result;
     try {
       _$result = _$v ??
-          _$AdminUsersControllerDeleteUser200Response._(
+          _$AdminRolesControllerDeleteRole200Response._(
             data: data.build(),
             meta: meta.build(),
           );
@@ -123,7 +123,7 @@ class AdminUsersControllerDeleteUser200ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-          r'AdminUsersControllerDeleteUser200Response',
+          r'AdminRolesControllerDeleteRole200Response',
           _$failedField,
           e.toString(),
         );

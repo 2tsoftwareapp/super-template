@@ -90,6 +90,13 @@ export class UpdateRoleDto {
   permissionIds?: string[];
 }
 
+export class ReplaceRolePermissionsDto {
+  @ApiProperty({ type: [String] })
+  @IsArray()
+  @IsUUID('4', { each: true })
+  permissionIds: string[];
+}
+
 export class CreatePermissionDto {
   @ApiProperty()
   @IsString()

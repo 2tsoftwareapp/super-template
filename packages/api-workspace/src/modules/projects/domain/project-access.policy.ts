@@ -1,7 +1,7 @@
 import type { AuthenticatedRequestUser } from '@repo/api-core';
 
 import { HttpStatus } from '@nestjs/common';
-import { AppError, ERROR_CODES, PERMISSION_NAMES } from '@repo/api-core';
+import { ACTION, AppError, ERROR_CODES, perm } from '@repo/api-core';
 
 export function resolveProjectOwnerId(
   user: AuthenticatedRequestUser,
@@ -45,7 +45,7 @@ export function assertCanMutateProject(
 ): void {
   assertCanAccessProject(user, ownerId);
 
-  if (!user.permissions.includes(PERMISSION_NAMES.PROJECTS_UPDATE)) {
+  if (!user.permissions.includes(perm('projects', ACTION.UPDATE))) {
     throw new AppError(
       ERROR_CODES.AUTH_FORBIDDEN,
       'You cannot modify this project',

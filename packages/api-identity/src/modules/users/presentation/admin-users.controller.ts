@@ -12,18 +12,12 @@ import {
   Post,
   Put,
   Query,
-  Req,
-} from '@nestjs/common';
+  Req } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import {
-  ApiDataResponse,
-  ApiPaginatedResponse,
-  SuccessFlagDto,
-} from '@repo/api-core';
+import {  ACTION, ApiDataResponse, ApiPaginatedResponse, perm, SuccessFlagDto } from '@repo/api-core';
 import { CurrentUser } from '@repo/api-core';
 import { Authorize } from '@repo/api-core';
 
-import { PERMISSION_NAMES } from '../../access-control/access-control.constants';
 import { userSortsFromQuery } from '../application/user-sort';
 import { UsersService } from '../application/users.service';
 import {
@@ -32,8 +26,7 @@ import {
   ReplaceUserRolesDto,
   UpdateAdminUserDto,
   UpdateUserStatusDto,
-  UserDto,
-} from './users.dto';
+  UserDto } from './users.dto';
 
 @ApiTags('admin-users')
 @ApiBearerAuth()
@@ -42,7 +35,7 @@ export class AdminUsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  @Authorize({ permissions: [PERMISSION_NAMES.USERS_READ] })
+  @Authorize({ permissions: [perm('users', ACTION.READ)] })
   @ApiPaginatedResponse(UserDto)
   async listUsers(
     @CurrentUser() actor: AuthenticatedRequestUser,
@@ -51,8 +44,7 @@ export class AdminUsersController {
     const sort = userSortsFromQuery({
       sort: query.sort,
       sortField: query.sortField,
-      sortOrder: query.sortOrder,
-    });
+      sortOrder: query.sortOrder });
 
     const result = await this.usersService.listUsers(actor, {
       page: query.page,
@@ -60,8 +52,7 @@ export class AdminUsersController {
       sort,
       ...(query.search !== undefined ? { search: query.search } : {}),
       ...(query.status !== undefined ? { status: query.status } : {}),
-      ...(query.role !== undefined ? { role: query.role } : {}),
-    });
+      ...(query.role !== undefined ? { role: query.role } : {}) });
 
     return {
       data: result.rows,
@@ -69,13 +60,11 @@ export class AdminUsersController {
         page: query.page,
         limit: query.limit,
         total: result.total,
-        totalPages: Math.ceil(result.total / query.limit),
-      },
-    };
+        totalPages: Math.ceil(result.total / query.limit) } };
   }
 
   @Post()
-  @Authorize({ permissions: [PERMISSION_NAMES.USERS_CREATE] })
+  @Authorize({ permissions: [perm('users', ACTION.CREATE)] })
   @ApiDataResponse(UserDto, 201)
   createUser(
     @CurrentUser() actor: AuthenticatedRequestUser,
@@ -93,14 +82,13 @@ export class AdminUsersController {
         ...(input.role !== undefined ? { role: input.role } : {}),
         ...(input.organizationId !== undefined
           ? { organizationId: input.organizationId }
-          : {}),
-      },
+          : {}) },
       request.requestContext,
     );
   }
 
   @Get(':id')
-  @Authorize({ permissions: [PERMISSION_NAMES.USERS_READ] })
+  @Authorize({ permissions: [perm('users', ACTION.READ)] })
   @ApiDataResponse(UserDto)
   getUser(
     @CurrentUser() actor: AuthenticatedRequestUser,
@@ -110,7 +98,7 @@ export class AdminUsersController {
   }
 
   @Patch(':id')
-  @Authorize({ permissions: [PERMISSION_NAMES.USERS_UPDATE] })
+  @Authorize({ permissions: [perm('users', ACTION.UPDATE)] })
   @ApiDataResponse(UserDto)
   updateUser(
     @CurrentUser() actor: AuthenticatedRequestUser,
@@ -128,14 +116,13 @@ export class AdminUsersController {
           ? { displayName: input.displayName }
           : {}),
         ...(input.avatarUrl !== undefined ? { avatarUrl: input.avatarUrl } : {}),
-        ...(input.status !== undefined ? { status: input.status } : {}),
-      },
+        ...(input.status !== undefined ? { status: input.status } : {}) },
       request.requestContext,
     );
   }
 
   @Delete(':id')
-  @Authorize({ permissions: [PERMISSION_NAMES.USERS_DELETE] })
+  @Authorize({ permissions: [perm('users', ACTION.DELETE)] })
   @ApiDataResponse(SuccessFlagDto)
   async deleteUser(
     @CurrentUser() actor: AuthenticatedRequestUser,
@@ -146,13 +133,11 @@ export class AdminUsersController {
 
     return {
       data: {
-        success: true,
-      },
-    };
+        success: true } };
   }
 
   @Patch(':id/status')
-  @Authorize({ permissions: [PERMISSION_NAMES.USERS_UPDATE] })
+  @Authorize({ permissions: [perm('users', ACTION.UPDATE)] })
   @ApiDataResponse(UserDto)
   updateStatus(
     @CurrentUser() actor: AuthenticatedRequestUser,
@@ -169,7 +154,7 @@ export class AdminUsersController {
   }
 
   @Put(':id/roles')
-  @Authorize({ permissions: [PERMISSION_NAMES.ROLES_UPDATE] })
+  @Authorize({ permissions: [perm('roles', ACTION.UPDATE)] })
   @ApiDataResponse(UserDto)
   replaceRoles(
     @CurrentUser() actor: AuthenticatedRequestUser,

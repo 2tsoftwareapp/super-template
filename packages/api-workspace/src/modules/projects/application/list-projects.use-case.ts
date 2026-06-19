@@ -1,15 +1,14 @@
 import type { AuthenticatedRequestUser } from '@repo/api-core';
 
 import { Inject, Injectable } from '@nestjs/common';
-import { PERMISSION_NAMES, requireOrganizationId } from '@repo/api-core';
+import { ACTION, perm, requireOrganizationId } from '@repo/api-core';
 
 import type { ListProjectsQuery } from './projects.types';
 
 import { ProjectsMapper } from './projects.mapper';
 import {
   PROJECTS_REPOSITORY,
-  type ProjectsRepositoryPort,
-} from './projects.repository.port';
+  type ProjectsRepositoryPort } from './projects.repository.port';
 
 @Injectable()
 export class ListProjectsUseCase {
@@ -21,25 +20,22 @@ export class ListProjectsUseCase {
 
   async execute(user: AuthenticatedRequestUser, query: ListProjectsQuery) {
     const canReadAll =
-      user.permissions.includes(PERMISSION_NAMES.PROJECTS_READ) &&
+      user.permissions.includes(perm('projects', ACTION.READ)) &&
       !user.roles.includes('USER');
     const organizationId = requireOrganizationId(user);
     const result = await this.projectsRepository.list(
       canReadAll
         ? {
             ...query,
-            organizationId,
-          }
+            organizationId }
         : {
             ...query,
             ownerId: user.userId,
-            organizationId,
-          },
+            organizationId },
     );
 
     return {
       rows: result.rows.map((row) => this.projectsMapper.toProjectView(row)),
-      total: result.total,
-    };
+      total: result.total };
   }
 }

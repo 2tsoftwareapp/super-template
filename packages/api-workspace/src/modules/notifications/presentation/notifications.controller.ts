@@ -14,19 +14,12 @@ import {
   Post,
   Query,
   Req,
-  Sse,
-} from '@nestjs/common';
+  Sse } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import {
-  ApiDataResponse,
-  ApiPaginatedResponse,
-  CountDto,
-  SuccessFlagDto,
-} from '@repo/api-core';
+import { ACTION, ApiDataResponse, ApiPaginatedResponse, CountDto, perm, SuccessFlagDto } from '@repo/api-core';
 import { CurrentUser } from '@repo/api-core';
 import { Authorize } from '@repo/api-core';
 import { SkipEnvelope } from '@repo/api-core';
-import { PERMISSION_NAMES } from '@repo/api-core';
 
 import { NotificationsService } from '../application/notifications.service';
 import {
@@ -36,8 +29,7 @@ import {
   NotificationJobsQueryDto,
   NotificationsQueryDto,
   RegisterDeviceDto,
-  SendNotificationRequestDto,
-} from './notifications.dto';
+  SendNotificationRequestDto } from './notifications.dto';
 
 @ApiTags('notifications')
 @ApiBearerAuth()
@@ -55,8 +47,7 @@ export class NotificationsController {
       page: query.page,
       limit: query.limit,
       ...(query.unread !== undefined ? { unread: query.unread } : {}),
-      ...(query.type !== undefined ? { type: query.type } : {}),
-    });
+      ...(query.type !== undefined ? { type: query.type } : {}) });
 
     return {
       data: result.rows,
@@ -64,9 +55,7 @@ export class NotificationsController {
         page: query.page,
         limit: query.limit,
         total: result.total,
-        totalPages: Math.ceil(result.total / query.limit),
-      },
-    };
+        totalPages: Math.ceil(result.total / query.limit) } };
   }
 
   @Sse('stream')
@@ -82,9 +71,7 @@ export class NotificationsController {
   async unreadCount(@CurrentUser() user: AuthenticatedRequestUser) {
     return {
       data: {
-        count: await this.notificationsService.unreadCount(user),
-      },
-    };
+        count: await this.notificationsService.unreadCount(user) } };
   }
 
   @Post('devices')
@@ -96,9 +83,7 @@ export class NotificationsController {
     return {
       data: await this.notificationsService.registerDevice(user, {
         token: input.token,
-        platform: input.platform,
-      }),
-    };
+        platform: input.platform }) };
   }
 
   @Delete('devices/:token')
@@ -111,9 +96,7 @@ export class NotificationsController {
 
     return {
       data: {
-        success: true,
-      },
-    };
+        success: true } };
   }
 
   @Patch(':id/read')
@@ -132,9 +115,7 @@ export class NotificationsController {
 
     return {
       data: {
-        success: true,
-      },
-    };
+        success: true } };
   }
 
   @Delete(':id')
@@ -147,9 +128,7 @@ export class NotificationsController {
 
     return {
       data: {
-        success: true,
-      },
-    };
+        success: true } };
   }
 }
 
@@ -160,7 +139,7 @@ export class AdminNotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
 
   @Post()
-  @Authorize({ permissions: [PERMISSION_NAMES.NOTIFICATIONS_CREATE] })
+  @Authorize({ permissions: [perm('notifications', ACTION.CREATE)] })
   @ApiDataResponse(NotificationJobDto, 201)
   send(
     @CurrentUser() actor: AuthenticatedRequestUser,
@@ -182,21 +161,19 @@ export class AdminNotificationsController {
           : {}),
         ...(input.idempotencyKey !== undefined
           ? { idempotencyKey: input.idempotencyKey }
-          : {}),
-      },
+          : {}) },
       request.requestContext,
     );
   }
 
   @Get('jobs')
-  @Authorize({ permissions: [PERMISSION_NAMES.NOTIFICATIONS_CREATE] })
+  @Authorize({ permissions: [perm('notifications', ACTION.CREATE)] })
   @ApiPaginatedResponse(NotificationJobDto)
   async listJobs(@Query() query: NotificationJobsQueryDto) {
     const result = await this.notificationsService.listJobs({
       page: query.page,
       limit: query.limit,
-      ...(query.status !== undefined ? { status: query.status } : {}),
-    });
+      ...(query.status !== undefined ? { status: query.status } : {}) });
 
     return {
       data: result.rows,
@@ -204,29 +181,25 @@ export class AdminNotificationsController {
         page: query.page,
         limit: query.limit,
         total: result.total,
-        totalPages: Math.ceil(result.total / query.limit),
-      },
-    };
+        totalPages: Math.ceil(result.total / query.limit) } };
   }
 
   @Get('jobs/:id')
-  @Authorize({ permissions: [PERMISSION_NAMES.NOTIFICATIONS_CREATE] })
+  @Authorize({ permissions: [perm('notifications', ACTION.CREATE)] })
   @ApiDataResponse(NotificationJobDto)
   async getJob(@Param('id', new ParseUUIDPipe()) jobId: string) {
     return {
-      data: await this.notificationsService.getJob(jobId),
-    };
+      data: await this.notificationsService.getJob(jobId) };
   }
 
   @Delete('jobs/:id')
-  @Authorize({ permissions: [PERMISSION_NAMES.NOTIFICATIONS_CREATE] })
+  @Authorize({ permissions: [perm('notifications', ACTION.CREATE)] })
   @ApiDataResponse(NotificationJobDto)
   async cancelJob(
     @CurrentUser() actor: AuthenticatedRequestUser,
     @Param('id', new ParseUUIDPipe()) jobId: string,
   ) {
     return {
-      data: await this.notificationsService.cancelJob(actor, jobId),
-    };
+      data: await this.notificationsService.cancelJob(actor, jobId) };
   }
 }

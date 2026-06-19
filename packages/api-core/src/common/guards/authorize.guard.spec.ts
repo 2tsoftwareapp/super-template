@@ -76,6 +76,16 @@ describe('AuthorizeGuard', () => {
     expect(() => guard.canActivate(context)).toThrow(AppError);
   });
 
+  it('allows super admin to bypass role and permission checks', () => {
+    const { reflector, context } = makeContext({
+      authorize: { roles: ['SUPER_ADMIN'], permissions: ['users.delete'] },
+      user: { roles: ['SUPER_ADMIN'], permissions: [] },
+    });
+    const guard = new AuthorizeGuard(reflector);
+
+    expect(guard.canActivate(context)).toBe(true);
+  });
+
   it('allows when user has all required permissions', () => {
     const { reflector, context } = makeContext({
       authorize: { permissions: ['users.read', 'users.update'] },

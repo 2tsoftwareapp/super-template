@@ -1,23 +1,14 @@
 import type {
   AuthenticatedRequestUser,
-  RequestContext,
-} from '@repo/api-core';
+  RequestContext } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import {
-  AppError,
-  AUDIT_WRITER,
-  type AuditWriter,
-  ERROR_CODES,
-  PERMISSION_NAMES,
-  requireOrganizationId,
-} from '@repo/api-core';
+import { ACTION, AppError, AUDIT_WRITER, type AuditWriter, ERROR_CODES, perm, requireOrganizationId } from '@repo/api-core';
 
 import type {
   CreateCommentCommand,
   ListCommentsQuery,
-  UpdateCommentCommand,
-} from './comments.types';
+  UpdateCommentCommand } from './comments.types';
 
 import { CommentsRepository } from '../infrastructure/comments.repository';
 
@@ -33,13 +24,11 @@ export class CommentsService {
       page: query.page,
       limit: query.limit,
       entityType: query.entityType,
-      entityId: query.entityId,
-    });
+      entityId: query.entityId });
 
     return {
       rows: result.rows.map((row) => this.toDto(row)),
-      total: result.total,
-    };
+      total: result.total };
   }
 
   async create(
@@ -47,7 +36,7 @@ export class CommentsService {
     input: CreateCommentCommand,
     requestContext?: RequestContext,
   ) {
-    if (!actor.permissions.includes(PERMISSION_NAMES.COMMENTS_CREATE)) {
+    if (!actor.permissions.includes(perm('comments', ACTION.CREATE))) {
       throw new AppError(
         ERROR_CODES.AUTH_FORBIDDEN,
         'You do not have permission to create comments',
@@ -61,8 +50,7 @@ export class CommentsService {
       entityId: input.entityId,
       parentId: input.parentId ?? null,
       authorId: actor.userId,
-      content: input.content,
-    });
+      content: input.content });
 
     if (!comment) {
       throw new Error('Comment insert returned no rows');
@@ -74,8 +62,7 @@ export class CommentsService {
       entityType: input.entityType,
       entityId: input.entityId,
       metadata: { commentId: comment.id },
-      requestContext,
-    });
+      requestContext });
 
     return this.toDto(comment);
   }
@@ -97,7 +84,7 @@ export class CommentsService {
     }
 
     const canModerate = actor.permissions.includes(
-      PERMISSION_NAMES.COMMENTS_UPDATE,
+      perm('comments', ACTION.UPDATE),
     );
 
     if (comment.authorId !== actor.userId && !canModerate) {
@@ -109,8 +96,7 @@ export class CommentsService {
     }
 
     const updated = await this.commentsRepository.update(commentId, {
-      content: input.content,
-    });
+      content: input.content });
 
     await this.auditWriter.log({
       actorId: actor.userId,
@@ -118,8 +104,7 @@ export class CommentsService {
       entityType: comment.entityType,
       entityId: comment.entityId,
       metadata: { commentId },
-      requestContext,
-    });
+      requestContext });
 
     return this.toDto(updated ?? comment);
   }
@@ -140,7 +125,7 @@ export class CommentsService {
     }
 
     const canDeleteOthers = actor.permissions.includes(
-      PERMISSION_NAMES.COMMENTS_DELETE,
+      perm('comments', ACTION.DELETE),
     );
 
     if (comment.authorId !== actor.userId && !canDeleteOthers) {
@@ -159,8 +144,7 @@ export class CommentsService {
       entityType: comment.entityType,
       entityId: comment.entityId,
       metadata: { commentId },
-      requestContext,
-    });
+      requestContext });
   }
 
   private toDto(
@@ -174,7 +158,6 @@ export class CommentsService {
       authorId: comment.authorId,
       content: comment.content,
       createdAt: comment.createdAt.toISOString(),
-      updatedAt: comment.updatedAt.toISOString(),
-    };
+      updatedAt: comment.updatedAt.toISOString() };
   }
 }

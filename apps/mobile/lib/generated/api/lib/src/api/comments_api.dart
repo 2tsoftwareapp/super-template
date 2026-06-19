@@ -11,7 +11,7 @@ import 'package:built_value/serializer.dart';
 import 'package:dio/dio.dart';
 
 import 'package:super_template_api/src/api_util.dart';
-import 'package:super_template_api/src/model/admin_users_controller_delete_user200_response.dart';
+import 'package:super_template_api/src/model/admin_roles_controller_delete_role200_response.dart';
 import 'package:super_template_api/src/model/comments_controller_create201_response.dart';
 import 'package:super_template_api/src/model/comments_controller_list200_response.dart';
 import 'package:super_template_api/src/model/create_comment_dto.dart';
@@ -134,9 +134,9 @@ class CommentsApi {
   /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
   /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
   ///
-  /// Returns a [Future] containing a [Response] with a [AdminUsersControllerDeleteUser200Response] as data
+  /// Returns a [Future] containing a [Response] with a [AdminRolesControllerDeleteRole200Response] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<AdminUsersControllerDeleteUser200Response>>
+  Future<Response<AdminRolesControllerDeleteRole200Response>>
       commentsControllerDelete({
     required String id,
     CancelToken? cancelToken,
@@ -172,7 +172,7 @@ class CommentsApi {
       onReceiveProgress: onReceiveProgress,
     );
 
-    AdminUsersControllerDeleteUser200Response? _responseData;
+    AdminRolesControllerDeleteRole200Response? _responseData;
 
     try {
       final rawResponse = _response.data;
@@ -181,9 +181,9 @@ class CommentsApi {
           : _serializers.deserialize(
               rawResponse,
               specifiedType: const FullType(
-                AdminUsersControllerDeleteUser200Response,
+                AdminRolesControllerDeleteRole200Response,
               ),
-            ) as AdminUsersControllerDeleteUser200Response;
+            ) as AdminRolesControllerDeleteRole200Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -194,7 +194,7 @@ class CommentsApi {
       );
     }
 
-    return Response<AdminUsersControllerDeleteUser200Response>(
+    return Response<AdminRolesControllerDeleteRole200Response>(
       data: _responseData,
       headers: _response.headers,
       isRedirect: _response.isRedirect,

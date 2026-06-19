@@ -1,13 +1,7 @@
 import type { AuthenticatedRequestUser } from '@repo/api-core';
 
 import { HttpStatus } from '@nestjs/common';
-import {
-  AppError,
-  ERROR_CODES,
-  isPrivilegedRoleName,
-  PERMISSION_NAMES,
-  ROLE_NAMES,
-} from '@repo/api-core';
+import { ACTION, AppError, ERROR_CODES, hasPermission, isPrivilegedRoleName, perm, ROLE_NAMES } from '@repo/api-core';
 
 export interface RolePolicyTarget {
   name: string;
@@ -73,7 +67,7 @@ export function assertCanAssignRoles(
   }
 
   if (
-    !actor.permissions.includes(PERMISSION_NAMES.ROLES_UPDATE) &&
+    !actor.permissions.includes(perm('roles', ACTION.UPDATE)) &&
     !actorIsSuperAdmin
   ) {
     throw new AppError(
@@ -110,9 +104,85 @@ export function assertCanAssignRoleTargets(
       continue;
     }
 
+    const isOrgCustomRole =
+      !role.isSystem &&
+      role.organizationId !== null &&
+      role.organizationId === actor.organizationId;
+
+    if (isOrgCustomRole) {
+      continue;
+    }
+
     throw new AppError(
       ERROR_CODES.AUTH_FORBIDDEN,
-      'Admins can only assign the USER role',
+      'Admins can only assign the USER role or organization custom roles',
+      HttpStatus.FORBIDDEN,
+    );
+  }
+}
+
+export function assertCanManageCustomRoleCatalog(
+  actor: AuthenticatedRequestUser,
+): void {
+  if (actor.roles.includes(ROLE_NAMES.SUPER_ADMIN)) {
+    return;
+  }
+
+  const canManage =
+    hasPermission(actor.permissions, 'roles', ACTION.CREATE) ||
+    hasPermission(actor.permissions, 'roles', ACTION.UPDATE) ||
+    hasPermission(actor.permissions, 'roles', ACTION.DELETE);
+
+  if (!canManage) {
+    throw new AppError(
+      ERROR_CODES.AUTH_FORBIDDEN,
+      'You do not have permission to manage roles',
+      HttpStatus.FORBIDDEN,
+    );
+  }
+}
+
+export function assertCanCreateCustomRole(
+  actor: AuthenticatedRequestUser,
+  organizationId: string | null,
+): void {
+  assertCanManageCustomRoleCatalog(actor);
+
+  if (actor.roles.includes(ROLE_NAMES.SUPER_ADMIN)) {
+    return;
+  }
+
+  if (!organizationId || organizationId !== actor.organizationId) {
+    throw new AppError(
+      ERROR_CODES.AUTH_FORBIDDEN,
+      'Custom roles can only be created within your organization',
+      HttpStatus.FORBIDDEN,
+    );
+  }
+}
+
+export function assertCanModifyCustomRole(
+  actor: AuthenticatedRequestUser,
+  role: RolePolicyTarget,
+): void {
+  if (role.isSystem) {
+    throw new AppError(
+      ERROR_CODES.AUTH_FORBIDDEN,
+      'System roles cannot be modified',
+      HttpStatus.FORBIDDEN,
+    );
+  }
+
+  assertCanManageCustomRoleCatalog(actor);
+
+  if (actor.roles.includes(ROLE_NAMES.SUPER_ADMIN)) {
+    return;
+  }
+
+  if (!role.organizationId || role.organizationId !== actor.organizationId) {
+    throw new AppError(
+      ERROR_CODES.AUTH_FORBIDDEN,
+      'You can only manage custom roles in your organization',
       HttpStatus.FORBIDDEN,
     );
   }

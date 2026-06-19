@@ -19,12 +19,13 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(AdminMailControllerPreview200Response.serializer)
       ..add(AdminNotificationsControllerListJobs200Response.serializer)
       ..add(AdminNotificationsControllerSend201Response.serializer)
+      ..add(AdminRolesControllerCreateRole201Response.serializer)
+      ..add(AdminRolesControllerDeleteRole200Response.serializer)
       ..add(AdminRolesControllerListPermissions200Response.serializer)
       ..add(AdminRolesControllerListRoles200Response.serializer)
       ..add(AdminSettingsControllerListSettings200Response.serializer)
       ..add(AdminSettingsControllerUpdateSetting200Response.serializer)
       ..add(AdminUsersControllerCreateUser201Response.serializer)
-      ..add(AdminUsersControllerDeleteUser200Response.serializer)
       ..add(AdminUsersControllerListUsers200Response.serializer)
       ..add(ApplicationSettingDto.serializer)
       ..add(AttachEntityDto.serializer)
@@ -55,6 +56,7 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(CreateOrganizationDto.serializer)
       ..add(CreateProjectDto.serializer)
       ..add(CreateProjectDtoStatusEnum.serializer)
+      ..add(CreateRoleDto.serializer)
       ..add(DeviceTokenDto.serializer)
       ..add(DeviceTokenDtoPlatformEnum.serializer)
       ..add(ExportJobDto.serializer)
@@ -106,6 +108,7 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(RegisterDeviceDto.serializer)
       ..add(RegisterDeviceDtoPlatformEnum.serializer)
       ..add(RegisterDto.serializer)
+      ..add(ReplaceRolePermissionsDto.serializer)
       ..add(ReplaceUserRolesDto.serializer)
       ..add(ReplaceUserRolesDtoRoleEnum.serializer)
       ..add(RequestMetaDto.serializer)
@@ -125,6 +128,7 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(UpdateProfileDto.serializer)
       ..add(UpdateProjectDto.serializer)
       ..add(UpdateProjectDtoStatusEnum.serializer)
+      ..add(UpdateRoleDto.serializer)
       ..add(UpdateSettingDto.serializer)
       ..add(UpdateUserStatusDto.serializer)
       ..add(UpdateUserStatusDtoStatusEnum.serializer)
@@ -209,6 +213,18 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..addBuilderFactory(
         const FullType(BuiltList, const [const FullType(RoleDto)]),
         () => ListBuilder<RoleDto>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, const [const FullType(String)]),
+        () => ListBuilder<String>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, const [const FullType(String)]),
+        () => ListBuilder<String>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, const [const FullType(String)]),
+        () => ListBuilder<String>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltList, const [const FullType(String)]),

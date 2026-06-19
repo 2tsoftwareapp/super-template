@@ -14,16 +14,11 @@ import {
   Res,
   StreamableFile,
   UploadedFile,
-  UseInterceptors,
-} from '@nestjs/common';
+  UseInterceptors } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiProduces, ApiTags } from '@nestjs/swagger';
-import {
-  ApiDataResponse,
-  SuccessFlagDto,
-} from '@repo/api-core';
+import {  ACTION, ApiDataResponse, perm, SuccessFlagDto } from '@repo/api-core';
 import { CurrentUser } from '@repo/api-core';
 import { Authorize } from '@repo/api-core';
-import { PERMISSION_NAMES } from '@repo/api-core';
 
 import { FilesService } from '../application/files.service';
 import { UploadFileInterceptor } from './files-upload.interceptor';
@@ -36,17 +31,14 @@ export class FilesController {
   constructor(private readonly filesService: FilesService) {}
 
   @Post()
-  @Authorize({ permissions: [PERMISSION_NAMES.FILES_CREATE] })
+  @Authorize({ permissions: [perm('files', ACTION.CREATE)] })
   @UseInterceptors(UploadFileInterceptor)
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
       type: 'object',
       properties: {
-        file: { type: 'string', format: 'binary' },
-      },
-    },
-  })
+        file: { type: 'string', format: 'binary' } } } })
   @ApiDataResponse(FileDto, 201)
   upload(
     @CurrentUser() user: AuthenticatedRequestUser,
@@ -62,7 +54,7 @@ export class FilesController {
   }
 
   @Get(':id')
-  @Authorize({ permissions: [PERMISSION_NAMES.FILES_READ] })
+  @Authorize({ permissions: [perm('files', ACTION.READ)] })
   @ApiDataResponse(FileDto)
   getById(
     @CurrentUser() user: AuthenticatedRequestUser,
@@ -72,7 +64,7 @@ export class FilesController {
   }
 
   @Get(':id/url')
-  @Authorize({ permissions: [PERMISSION_NAMES.FILES_READ] })
+  @Authorize({ permissions: [perm('files', ACTION.READ)] })
   @ApiDataResponse(FileUrlDto)
   getUrl(
     @CurrentUser() user: AuthenticatedRequestUser,
@@ -82,7 +74,7 @@ export class FilesController {
   }
 
   @Get(':id/download')
-  @Authorize({ permissions: [PERMISSION_NAMES.FILES_READ] })
+  @Authorize({ permissions: [perm('files', ACTION.READ)] })
   @ApiProduces('application/octet-stream')
   async download(
     @CurrentUser() user: AuthenticatedRequestUser,
@@ -109,7 +101,7 @@ export class FilesController {
   }
 
   @Delete(':id')
-  @Authorize({ permissions: [PERMISSION_NAMES.FILES_DELETE] })
+  @Authorize({ permissions: [perm('files', ACTION.DELETE)] })
   @ApiDataResponse(SuccessFlagDto)
   async delete(
     @CurrentUser() user: AuthenticatedRequestUser,
@@ -119,7 +111,6 @@ export class FilesController {
     await this.filesService.delete(user, fileId, request.requestContext);
 
     return {
-      data: { success: true },
-    };
+      data: { success: true } };
   }
 }

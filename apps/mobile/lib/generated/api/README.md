@@ -80,8 +80,12 @@ Class | Method | HTTP request | Description
 [*AdminNotificationsApi*](doc/AdminNotificationsApi.md) | [**adminNotificationsControllerGetJob**](doc/AdminNotificationsApi.md#adminnotificationscontrollergetjob) | **GET** /api/v1/admin/notifications/jobs/{id} | 
 [*AdminNotificationsApi*](doc/AdminNotificationsApi.md) | [**adminNotificationsControllerListJobs**](doc/AdminNotificationsApi.md#adminnotificationscontrollerlistjobs) | **GET** /api/v1/admin/notifications/jobs | 
 [*AdminNotificationsApi*](doc/AdminNotificationsApi.md) | [**adminNotificationsControllerSend**](doc/AdminNotificationsApi.md#adminnotificationscontrollersend) | **POST** /api/v1/admin/notifications | 
+[*AdminRolesApi*](doc/AdminRolesApi.md) | [**adminRolesControllerCreateRole**](doc/AdminRolesApi.md#adminrolescontrollercreaterole) | **POST** /api/v1/admin/roles | 
+[*AdminRolesApi*](doc/AdminRolesApi.md) | [**adminRolesControllerDeleteRole**](doc/AdminRolesApi.md#adminrolescontrollerdeleterole) | **DELETE** /api/v1/admin/roles/{id} | 
 [*AdminRolesApi*](doc/AdminRolesApi.md) | [**adminRolesControllerListPermissions**](doc/AdminRolesApi.md#adminrolescontrollerlistpermissions) | **GET** /api/v1/admin/roles/permissions | 
 [*AdminRolesApi*](doc/AdminRolesApi.md) | [**adminRolesControllerListRoles**](doc/AdminRolesApi.md#adminrolescontrollerlistroles) | **GET** /api/v1/admin/roles | 
+[*AdminRolesApi*](doc/AdminRolesApi.md) | [**adminRolesControllerReplaceRolePermissions**](doc/AdminRolesApi.md#adminrolescontrollerreplacerolepermissions) | **PUT** /api/v1/admin/roles/{id}/permissions | 
+[*AdminRolesApi*](doc/AdminRolesApi.md) | [**adminRolesControllerUpdateRole**](doc/AdminRolesApi.md#adminrolescontrollerupdaterole) | **PATCH** /api/v1/admin/roles/{id} | 
 [*AdminSettingsApi*](doc/AdminSettingsApi.md) | [**adminSettingsControllerListSettings**](doc/AdminSettingsApi.md#adminsettingscontrollerlistsettings) | **GET** /api/v1/admin/settings | 
 [*AdminSettingsApi*](doc/AdminSettingsApi.md) | [**adminSettingsControllerUpdateSetting**](doc/AdminSettingsApi.md#adminsettingscontrollerupdatesetting) | **PATCH** /api/v1/admin/settings/{key} | 
 [*AdminUsersApi*](doc/AdminUsersApi.md) | [**adminUsersControllerCreateUser**](doc/AdminUsersApi.md#adminuserscontrollercreateuser) | **POST** /api/v1/admin/users | 
@@ -162,12 +166,13 @@ Class | Method | HTTP request | Description
  - [AdminMailControllerPreview200Response](doc/AdminMailControllerPreview200Response.md)
  - [AdminNotificationsControllerListJobs200Response](doc/AdminNotificationsControllerListJobs200Response.md)
  - [AdminNotificationsControllerSend201Response](doc/AdminNotificationsControllerSend201Response.md)
+ - [AdminRolesControllerCreateRole201Response](doc/AdminRolesControllerCreateRole201Response.md)
+ - [AdminRolesControllerDeleteRole200Response](doc/AdminRolesControllerDeleteRole200Response.md)
  - [AdminRolesControllerListPermissions200Response](doc/AdminRolesControllerListPermissions200Response.md)
  - [AdminRolesControllerListRoles200Response](doc/AdminRolesControllerListRoles200Response.md)
  - [AdminSettingsControllerListSettings200Response](doc/AdminSettingsControllerListSettings200Response.md)
  - [AdminSettingsControllerUpdateSetting200Response](doc/AdminSettingsControllerUpdateSetting200Response.md)
  - [AdminUsersControllerCreateUser201Response](doc/AdminUsersControllerCreateUser201Response.md)
- - [AdminUsersControllerDeleteUser200Response](doc/AdminUsersControllerDeleteUser200Response.md)
  - [AdminUsersControllerListUsers200Response](doc/AdminUsersControllerListUsers200Response.md)
  - [ApplicationSettingDto](doc/ApplicationSettingDto.md)
  - [AttachEntityDto](doc/AttachEntityDto.md)
@@ -195,6 +200,7 @@ Class | Method | HTTP request | Description
  - [CreateInvitationDto](doc/CreateInvitationDto.md)
  - [CreateOrganizationDto](doc/CreateOrganizationDto.md)
  - [CreateProjectDto](doc/CreateProjectDto.md)
+ - [CreateRoleDto](doc/CreateRoleDto.md)
  - [DeviceTokenDto](doc/DeviceTokenDto.md)
  - [ExportJobDto](doc/ExportJobDto.md)
  - [ExportsControllerCreate201Response](doc/ExportsControllerCreate201Response.md)
@@ -234,6 +240,7 @@ Class | Method | HTTP request | Description
  - [RefreshTokenDto](doc/RefreshTokenDto.md)
  - [RegisterDeviceDto](doc/RegisterDeviceDto.md)
  - [RegisterDto](doc/RegisterDto.md)
+ - [ReplaceRolePermissionsDto](doc/ReplaceRolePermissionsDto.md)
  - [ReplaceUserRolesDto](doc/ReplaceUserRolesDto.md)
  - [RequestMetaDto](doc/RequestMetaDto.md)
  - [ResendVerificationDto](doc/ResendVerificationDto.md)
@@ -248,6 +255,7 @@ Class | Method | HTTP request | Description
  - [UpdatePreferencesDto](doc/UpdatePreferencesDto.md)
  - [UpdateProfileDto](doc/UpdateProfileDto.md)
  - [UpdateProjectDto](doc/UpdateProjectDto.md)
+ - [UpdateRoleDto](doc/UpdateRoleDto.md)
  - [UpdateSettingDto](doc/UpdateSettingDto.md)
  - [UpdateUserStatusDto](doc/UpdateUserStatusDto.md)
  - [UserDto](doc/UserDto.md)

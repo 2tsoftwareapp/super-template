@@ -11,7 +11,7 @@ import 'package:built_value/serializer.dart';
 import 'package:dio/dio.dart';
 
 import 'package:super_template_api/src/api_util.dart';
-import 'package:super_template_api/src/model/admin_users_controller_delete_user200_response.dart';
+import 'package:super_template_api/src/model/admin_roles_controller_delete_role200_response.dart';
 import 'package:super_template_api/src/model/auth_controller_get_me200_response.dart';
 import 'package:super_template_api/src/model/auth_controller_get_sessions200_response.dart';
 import 'package:super_template_api/src/model/auth_controller_login201_response.dart';
@@ -384,9 +384,9 @@ class AuthApi {
   /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
   /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
   ///
-  /// Returns a [Future] containing a [Response] with a [AdminUsersControllerDeleteUser200Response] as data
+  /// Returns a [Future] containing a [Response] with a [AdminRolesControllerDeleteRole200Response] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<AdminUsersControllerDeleteUser200Response>>
+  Future<Response<AdminRolesControllerDeleteRole200Response>>
       authControllerLogout({
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
@@ -416,7 +416,7 @@ class AuthApi {
       onReceiveProgress: onReceiveProgress,
     );
 
-    AdminUsersControllerDeleteUser200Response? _responseData;
+    AdminRolesControllerDeleteRole200Response? _responseData;
 
     try {
       final rawResponse = _response.data;
@@ -425,9 +425,9 @@ class AuthApi {
           : _serializers.deserialize(
               rawResponse,
               specifiedType: const FullType(
-                AdminUsersControllerDeleteUser200Response,
+                AdminRolesControllerDeleteRole200Response,
               ),
-            ) as AdminUsersControllerDeleteUser200Response;
+            ) as AdminRolesControllerDeleteRole200Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -438,7 +438,7 @@ class AuthApi {
       );
     }
 
-    return Response<AdminUsersControllerDeleteUser200Response>(
+    return Response<AdminRolesControllerDeleteRole200Response>(
       data: _responseData,
       headers: _response.headers,
       isRedirect: _response.isRedirect,
@@ -461,9 +461,9 @@ class AuthApi {
   /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
   /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
   ///
-  /// Returns a [Future] containing a [Response] with a [AdminUsersControllerDeleteUser200Response] as data
+  /// Returns a [Future] containing a [Response] with a [AdminRolesControllerDeleteRole200Response] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<AdminUsersControllerDeleteUser200Response>>
+  Future<Response<AdminRolesControllerDeleteRole200Response>>
       authControllerLogoutAll({
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
@@ -493,7 +493,7 @@ class AuthApi {
       onReceiveProgress: onReceiveProgress,
     );
 
-    AdminUsersControllerDeleteUser200Response? _responseData;
+    AdminRolesControllerDeleteRole200Response? _responseData;
 
     try {
       final rawResponse = _response.data;
@@ -502,9 +502,9 @@ class AuthApi {
           : _serializers.deserialize(
               rawResponse,
               specifiedType: const FullType(
-                AdminUsersControllerDeleteUser200Response,
+                AdminRolesControllerDeleteRole200Response,
               ),
-            ) as AdminUsersControllerDeleteUser200Response;
+            ) as AdminRolesControllerDeleteRole200Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -515,7 +515,7 @@ class AuthApi {
       );
     }
 
-    return Response<AdminUsersControllerDeleteUser200Response>(
+    return Response<AdminRolesControllerDeleteRole200Response>(
       data: _responseData,
       headers: _response.headers,
       isRedirect: _response.isRedirect,
@@ -823,9 +823,9 @@ class AuthApi {
   /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
   /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
   ///
-  /// Returns a [Future] containing a [Response] with a [AdminUsersControllerDeleteUser200Response] as data
+  /// Returns a [Future] containing a [Response] with a [AdminRolesControllerDeleteRole200Response] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<AdminUsersControllerDeleteUser200Response>>
+  Future<Response<AdminRolesControllerDeleteRole200Response>>
       authControllerResetPassword({
     required ResetPasswordDto resetPasswordDto,
     CancelToken? cancelToken,
@@ -875,7 +875,7 @@ class AuthApi {
       onReceiveProgress: onReceiveProgress,
     );
 
-    AdminUsersControllerDeleteUser200Response? _responseData;
+    AdminRolesControllerDeleteRole200Response? _responseData;
 
     try {
       final rawResponse = _response.data;
@@ -884,9 +884,9 @@ class AuthApi {
           : _serializers.deserialize(
               rawResponse,
               specifiedType: const FullType(
-                AdminUsersControllerDeleteUser200Response,
+                AdminRolesControllerDeleteRole200Response,
               ),
-            ) as AdminUsersControllerDeleteUser200Response;
+            ) as AdminRolesControllerDeleteRole200Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -897,7 +897,7 @@ class AuthApi {
       );
     }
 
-    return Response<AdminUsersControllerDeleteUser200Response>(
+    return Response<AdminRolesControllerDeleteRole200Response>(
       data: _responseData,
       headers: _response.headers,
       isRedirect: _response.isRedirect,
@@ -921,9 +921,9 @@ class AuthApi {
   /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
   /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
   ///
-  /// Returns a [Future] containing a [Response] with a [AdminUsersControllerDeleteUser200Response] as data
+  /// Returns a [Future] containing a [Response] with a [AdminRolesControllerDeleteRole200Response] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<AdminUsersControllerDeleteUser200Response>>
+  Future<Response<AdminRolesControllerDeleteRole200Response>>
       authControllerRevokeSession({
     required String sessionId,
     CancelToken? cancelToken,
@@ -963,7 +963,7 @@ class AuthApi {
       onReceiveProgress: onReceiveProgress,
     );
 
-    AdminUsersControllerDeleteUser200Response? _responseData;
+    AdminRolesControllerDeleteRole200Response? _responseData;
 
     try {
       final rawResponse = _response.data;
@@ -972,9 +972,9 @@ class AuthApi {
           : _serializers.deserialize(
               rawResponse,
               specifiedType: const FullType(
-                AdminUsersControllerDeleteUser200Response,
+                AdminRolesControllerDeleteRole200Response,
               ),
-            ) as AdminUsersControllerDeleteUser200Response;
+            ) as AdminRolesControllerDeleteRole200Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -985,7 +985,7 @@ class AuthApi {
       );
     }
 
-    return Response<AdminUsersControllerDeleteUser200Response>(
+    return Response<AdminRolesControllerDeleteRole200Response>(
       data: _responseData,
       headers: _response.headers,
       isRedirect: _response.isRedirect,
@@ -1009,9 +1009,9 @@ class AuthApi {
   /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
   /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
   ///
-  /// Returns a [Future] containing a [Response] with a [AdminUsersControllerDeleteUser200Response] as data
+  /// Returns a [Future] containing a [Response] with a [AdminRolesControllerDeleteRole200Response] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<AdminUsersControllerDeleteUser200Response>>
+  Future<Response<AdminRolesControllerDeleteRole200Response>>
       authControllerSwitchOrganization({
     required SwitchOrganizationDto switchOrganizationDto,
     CancelToken? cancelToken,
@@ -1061,7 +1061,7 @@ class AuthApi {
       onReceiveProgress: onReceiveProgress,
     );
 
-    AdminUsersControllerDeleteUser200Response? _responseData;
+    AdminRolesControllerDeleteRole200Response? _responseData;
 
     try {
       final rawResponse = _response.data;
@@ -1070,9 +1070,9 @@ class AuthApi {
           : _serializers.deserialize(
               rawResponse,
               specifiedType: const FullType(
-                AdminUsersControllerDeleteUser200Response,
+                AdminRolesControllerDeleteRole200Response,
               ),
-            ) as AdminUsersControllerDeleteUser200Response;
+            ) as AdminRolesControllerDeleteRole200Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -1083,7 +1083,7 @@ class AuthApi {
       );
     }
 
-    return Response<AdminUsersControllerDeleteUser200Response>(
+    return Response<AdminRolesControllerDeleteRole200Response>(
       data: _responseData,
       headers: _response.headers,
       isRedirect: _response.isRedirect,
@@ -1107,9 +1107,9 @@ class AuthApi {
   /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
   /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
   ///
-  /// Returns a [Future] containing a [Response] with a [AdminUsersControllerDeleteUser200Response] as data
+  /// Returns a [Future] containing a [Response] with a [AdminRolesControllerDeleteRole200Response] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<AdminUsersControllerDeleteUser200Response>>
+  Future<Response<AdminRolesControllerDeleteRole200Response>>
       authControllerVerifyEmail({
     required VerifyEmailDto verifyEmailDto,
     CancelToken? cancelToken,
@@ -1156,7 +1156,7 @@ class AuthApi {
       onReceiveProgress: onReceiveProgress,
     );
 
-    AdminUsersControllerDeleteUser200Response? _responseData;
+    AdminRolesControllerDeleteRole200Response? _responseData;
 
     try {
       final rawResponse = _response.data;
@@ -1165,9 +1165,9 @@ class AuthApi {
           : _serializers.deserialize(
               rawResponse,
               specifiedType: const FullType(
-                AdminUsersControllerDeleteUser200Response,
+                AdminRolesControllerDeleteRole200Response,
               ),
-            ) as AdminUsersControllerDeleteUser200Response;
+            ) as AdminRolesControllerDeleteRole200Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -1178,7 +1178,7 @@ class AuthApi {
       );
     }
 
-    return Response<AdminUsersControllerDeleteUser200Response>(
+    return Response<AdminRolesControllerDeleteRole200Response>(
       data: _responseData,
       headers: _response.headers,
       isRedirect: _response.isRedirect,

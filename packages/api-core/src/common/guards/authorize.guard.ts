@@ -13,6 +13,7 @@ import {
 } from '../decorators/authorize.decorator';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 import { AppError } from '../errors/app-error';
+import { ROLE_NAMES } from '../rbac/role.constants';
 
 @Injectable()
 export class AuthorizeGuard implements CanActivate {
@@ -49,6 +50,10 @@ export class AuthorizeGuard implements CanActivate {
         'Authentication is required',
         HttpStatus.UNAUTHORIZED,
       );
+    }
+
+    if (user.roles.includes(ROLE_NAMES.SUPER_ADMIN)) {
+      return true;
     }
 
     const hasRequiredRole =

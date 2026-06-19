@@ -52,6 +52,12 @@ export class AccessControlRepository {
                 eq(roles.organizationId, organizationId),
               )
             : undefined,
+          organizationId
+            ? and(
+                eq(roles.isSystem, false),
+                eq(roles.organizationId, organizationId),
+              )
+            : undefined,
         ),
       )
       .orderBy(roles.name);

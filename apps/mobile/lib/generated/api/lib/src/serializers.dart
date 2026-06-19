@@ -25,12 +25,13 @@ import 'package:super_template_api/src/model/admin_mail_controller_list_deliveri
 import 'package:super_template_api/src/model/admin_mail_controller_preview200_response.dart';
 import 'package:super_template_api/src/model/admin_notifications_controller_list_jobs200_response.dart';
 import 'package:super_template_api/src/model/admin_notifications_controller_send201_response.dart';
+import 'package:super_template_api/src/model/admin_roles_controller_create_role201_response.dart';
+import 'package:super_template_api/src/model/admin_roles_controller_delete_role200_response.dart';
 import 'package:super_template_api/src/model/admin_roles_controller_list_permissions200_response.dart';
 import 'package:super_template_api/src/model/admin_roles_controller_list_roles200_response.dart';
 import 'package:super_template_api/src/model/admin_settings_controller_list_settings200_response.dart';
 import 'package:super_template_api/src/model/admin_settings_controller_update_setting200_response.dart';
 import 'package:super_template_api/src/model/admin_users_controller_create_user201_response.dart';
-import 'package:super_template_api/src/model/admin_users_controller_delete_user200_response.dart';
 import 'package:super_template_api/src/model/admin_users_controller_list_users200_response.dart';
 import 'package:super_template_api/src/model/application_setting_dto.dart';
 import 'package:super_template_api/src/model/attach_entity_dto.dart';
@@ -58,6 +59,7 @@ import 'package:super_template_api/src/model/create_import_dto.dart';
 import 'package:super_template_api/src/model/create_invitation_dto.dart';
 import 'package:super_template_api/src/model/create_organization_dto.dart';
 import 'package:super_template_api/src/model/create_project_dto.dart';
+import 'package:super_template_api/src/model/create_role_dto.dart';
 import 'package:super_template_api/src/model/device_token_dto.dart';
 import 'package:super_template_api/src/model/export_job_dto.dart';
 import 'package:super_template_api/src/model/exports_controller_create201_response.dart';
@@ -97,6 +99,7 @@ import 'package:super_template_api/src/model/projects_controller_list_attachment
 import 'package:super_template_api/src/model/refresh_token_dto.dart';
 import 'package:super_template_api/src/model/register_device_dto.dart';
 import 'package:super_template_api/src/model/register_dto.dart';
+import 'package:super_template_api/src/model/replace_role_permissions_dto.dart';
 import 'package:super_template_api/src/model/replace_user_roles_dto.dart';
 import 'package:super_template_api/src/model/request_meta_dto.dart';
 import 'package:super_template_api/src/model/resend_verification_dto.dart';
@@ -111,6 +114,7 @@ import 'package:super_template_api/src/model/update_comment_dto.dart';
 import 'package:super_template_api/src/model/update_preferences_dto.dart';
 import 'package:super_template_api/src/model/update_profile_dto.dart';
 import 'package:super_template_api/src/model/update_project_dto.dart';
+import 'package:super_template_api/src/model/update_role_dto.dart';
 import 'package:super_template_api/src/model/update_setting_dto.dart';
 import 'package:super_template_api/src/model/update_user_status_dto.dart';
 import 'package:super_template_api/src/model/user_dto.dart';
@@ -129,12 +133,13 @@ part 'serializers.g.dart';
   AdminMailControllerPreview200Response,
   AdminNotificationsControllerListJobs200Response,
   AdminNotificationsControllerSend201Response,
+  AdminRolesControllerCreateRole201Response,
+  AdminRolesControllerDeleteRole200Response,
   AdminRolesControllerListPermissions200Response,
   AdminRolesControllerListRoles200Response,
   AdminSettingsControllerListSettings200Response,
   AdminSettingsControllerUpdateSetting200Response,
   AdminUsersControllerCreateUser201Response,
-  AdminUsersControllerDeleteUser200Response,
   AdminUsersControllerListUsers200Response,
   ApplicationSettingDto,
   AttachEntityDto,
@@ -162,6 +167,7 @@ part 'serializers.g.dart';
   CreateInvitationDto,
   CreateOrganizationDto,
   CreateProjectDto,
+  CreateRoleDto,
   DeviceTokenDto,
   ExportJobDto,
   ExportsControllerCreate201Response,
@@ -201,6 +207,7 @@ part 'serializers.g.dart';
   RefreshTokenDto,
   RegisterDeviceDto,
   RegisterDto,
+  ReplaceRolePermissionsDto,
   ReplaceUserRolesDto,
   RequestMetaDto,
   ResendVerificationDto,
@@ -215,6 +222,7 @@ part 'serializers.g.dart';
   UpdatePreferencesDto,
   UpdateProfileDto,
   UpdateProjectDto,
+  UpdateRoleDto,
   UpdateSettingDto,
   UpdateUserStatusDto,
   UserDto,

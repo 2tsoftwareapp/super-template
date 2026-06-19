@@ -1,4 +1,7 @@
-import { ALL_PERMISSIONS, ROLE_NAMES } from '@repo/api-core';
+import {
+  allSeedPermissionNames,
+  ROLE_NAMES,
+} from '@repo/api-core';
 
 export interface RoleSeedEntry {
   name: string;
@@ -23,7 +26,7 @@ export const ROLE_SEED_ENTRIES: RoleSeedEntry[] = [
 ];
 
 export const PERMISSION_SEED_ENTRIES: PermissionSeedEntry[] =
-  ALL_PERMISSIONS.map((name) => ({
+  allSeedPermissionNames().map((name) => ({
     name,
     description: name,
     isSystem: true,

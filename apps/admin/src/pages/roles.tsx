@@ -1,10 +1,12 @@
-import { useQuery } from "@tanstack/react-query";
-import { LockKeyhole, ShieldCheck } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { LockKeyhole, Pencil, Plus, ShieldCheck, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
+import { toast } from "sonner";
 
 import { ResourcePageShell } from "@/components/resource-page-shell";
 import { ResourceToolbar } from "@/components/resource-toolbar";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Empty } from "@/components/ui/empty";
 import { Spinner } from "@/components/ui/spinner";
@@ -12,8 +14,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { adminResources } from "@/lib/admin-resources";
 import { webFetch } from "@/lib/http";
 import { formatRoleName } from "@/lib/roles";
+import { useSession } from "@/lib/session";
 
 import type { ListResponse, RoleDto } from "../lib/types";
+
+import { type EditableRole, RoleFormDrawer } from "./roles/role-form-drawer";
 
 interface PermissionDto {
   id: string;
@@ -40,20 +45,50 @@ function permissionDomain(permissionName: string) {
 }
 
 export function RolesPage() {
+  const queryClient = useQueryClient();
+  const session = useSession();
+  const permissions = session.data?.data.permissions ?? [];
+  const canCreate = permissions.includes("roles.create");
+  const canUpdate = permissions.includes("roles.update");
+  const canDelete = permissions.includes("roles.delete");
+
   const [search, setSearch] = useState("");
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [editingRole, setEditingRole] = useState<EditableRole | null>(null);
 
   const roles = useQuery({
     queryKey: ["admin-roles"],
     queryFn: () => webFetch<ListResponse<ManagedRoleDto>>("/api/v1/admin/roles"),
   });
 
-  const permissions = useQuery({
+  const permissionCatalog = useQuery({
     queryKey: ["admin-permissions"],
     queryFn: () =>
       webFetch<ListResponse<PermissionDto>>("/api/v1/admin/roles/permissions"),
   });
 
+  const deleteRole = useMutation({
+    mutationFn: (roleId: string) =>
+      webFetch(`/api/v1/admin/roles/${roleId}`, { method: "DELETE" }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["admin-roles"] });
+      toast.success("Role deleted");
+    },
+    onError: () => {
+      toast.error("Could not delete role");
+    },
+  });
+
   const allRoles = useMemo(() => roles.data?.data ?? [], [roles.data?.data]);
+  const systemRoles = useMemo(
+    () => allRoles.filter((role) => role.isSystem),
+    [allRoles],
+  );
+  const customRoles = useMemo(
+    () => allRoles.filter((role) => !role.isSystem),
+    [allRoles],
+  );
+
   const filteredRoles = useMemo(() => {
     if (!search) return allRoles;
     const q = search.toLowerCase();
@@ -67,42 +102,65 @@ export function RolesPage() {
 
   const permissionGroups = useMemo(() => {
     const grouped = new Map<string, PermissionDto[]>();
-    for (const permission of permissions.data?.data ?? []) {
+    for (const permission of permissionCatalog.data?.data ?? []) {
       const domain = permissionDomain(permission.name);
       const existing = grouped.get(domain) ?? [];
       existing.push(permission);
       grouped.set(domain, existing);
     }
     return Array.from(grouped.entries()).sort(([a], [b]) => a.localeCompare(b));
-  }, [permissions.data?.data]);
+  }, [permissionCatalog.data?.data]);
+
+  const openCreateDrawer = () => {
+    setEditingRole(null);
+    setDrawerOpen(true);
+  };
+
+  const openEditDrawer = (role: ManagedRoleDto) => {
+    setEditingRole({
+      id: role.id,
+      name: role.name,
+      description: optionalText(role.description) || null,
+      permissions: role.permissions,
+    });
+    setDrawerOpen(true);
+  };
 
   return (
     <ResourcePageShell
       resource={rolesResource}
-      description="Read-only catalog of the three fixed platform roles and their CRUD permissions."
-      isRefreshing={roles.isFetching || permissions.isFetching}
+      description="System roles are seeded from the platform matrix. Organization admins can create custom roles from the permission catalog."
+      isRefreshing={roles.isFetching || permissionCatalog.isFetching}
       onRefresh={() => {
         void roles.refetch();
-        void permissions.refetch();
+        void permissionCatalog.refetch();
       }}
+      actions={
+        canCreate ? (
+          <Button size="sm" onClick={openCreateDrawer}>
+            <Plus data-icon="inline-start" />
+            New custom role
+          </Button>
+        ) : null
+      }
     >
       <div className="grid gap-3 sm:grid-cols-3">
         <Card>
           <CardHeader className="pb-2">
-            <CardDescription>Fixed roles</CardDescription>
-            <CardTitle>{allRoles.length}</CardTitle>
+            <CardDescription>System roles</CardDescription>
+            <CardTitle>{systemRoles.length}</CardTitle>
           </CardHeader>
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardDescription>System permissions</CardDescription>
-            <CardTitle>{permissions.data?.data.length ?? 0}</CardTitle>
+            <CardDescription>Custom roles</CardDescription>
+            <CardTitle>{customRoles.length}</CardTitle>
           </CardHeader>
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardDescription>Permission domains</CardDescription>
-            <CardTitle>{permissionGroups.length}</CardTitle>
+            <CardDescription>Catalog permissions</CardDescription>
+            <CardTitle>{permissionCatalog.data?.data.length ?? 0}</CardTitle>
           </CardHeader>
         </Card>
       </div>
@@ -117,14 +175,14 @@ export function RolesPage() {
           resultLabel={`${filteredRoles.length} of ${allRoles.length} roles`}
         />
         <CardContent className="p-0 pb-1">
-          {roles.isLoading || permissions.isLoading ? (
+          {roles.isLoading || permissionCatalog.isLoading ? (
             <div className="flex min-h-64 items-center justify-center">
               <Spinner className="size-5" />
             </div>
           ) : filteredRoles.length === 0 ? (
             <Empty
               title={search ? "No roles match your search" : "No roles available"}
-              description="Roles are provisioned automatically during platform bootstrap."
+              description="Roles are provisioned during bootstrap. Create a custom role to tailor organization access."
             />
           ) : (
             <Table>
@@ -133,6 +191,7 @@ export function RolesPage() {
                   <TableHead>Role</TableHead>
                   <TableHead>Scope</TableHead>
                   <TableHead>Permissions</TableHead>
+                  <TableHead className="w-28 text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -151,7 +210,7 @@ export function RolesPage() {
                           <div className="flex flex-wrap items-center gap-2">
                             <span className="font-medium">{formatRoleName(role.name)}</span>
                             <Badge variant="secondary" className="text-xs">
-                              fixed
+                              {role.isSystem ? "system" : "custom"}
                             </Badge>
                           </div>
                           <p className="mt-1 max-w-xl truncate text-xs text-muted-foreground">
@@ -174,6 +233,35 @@ export function RolesPage() {
                         ))}
                       </div>
                     </TableCell>
+                    <TableCell className="text-right">
+                      {!role.isSystem && (canUpdate || canDelete) ? (
+                        <div className="flex justify-end gap-1">
+                          {canUpdate ? (
+                            <Button
+                              type="button"
+                              size="icon"
+                              variant="ghost"
+                              aria-label={`Edit ${role.name}`}
+                              onClick={() => openEditDrawer(role)}
+                            >
+                              <Pencil className="size-4" />
+                            </Button>
+                          ) : null}
+                          {canDelete ? (
+                            <Button
+                              type="button"
+                              size="icon"
+                              variant="ghost"
+                              aria-label={`Delete ${role.name}`}
+                              disabled={deleteRole.isPending}
+                              onClick={() => deleteRole.mutate(role.id)}
+                            >
+                              <Trash2 className="size-4" />
+                            </Button>
+                          ) : null}
+                        </div>
+                      ) : null}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -186,7 +274,7 @@ export function RolesPage() {
         <CardHeader>
           <CardTitle className="text-base">Permission catalog</CardTitle>
           <CardDescription>
-            CRUD permissions are code-backed and cannot be edited at runtime.
+            Custom roles can only assign permissions from this seeded catalog.
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
@@ -204,6 +292,13 @@ export function RolesPage() {
           ))}
         </CardContent>
       </Card>
+
+      <RoleFormDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        role={editingRole}
+        permissions={permissionCatalog.data?.data ?? []}
+      />
     </ResourcePageShell>
   );
 }

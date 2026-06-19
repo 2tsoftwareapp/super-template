@@ -1,8 +1,13 @@
 export {
-  ADMIN_PERMISSIONS,
-  ALL_PERMISSIONS,
-  PERMISSION_NAMES,
+  ACTION,
+  ALL_ACTIONS,
+  allSeedPermissionNames,
+  DEFAULT_ROLE_GRANTS,
+  hasPermission,
+  isFixedRoleName,
+  isPrivilegedRoleName,
+  perm,
+  permissionNamesForRole,
   PRIVILEGED_ROLE_NAMES,
   ROLE_NAMES,
-  USER_PERMISSIONS,
 } from '@repo/api-core';

@@ -106,6 +106,52 @@
         "tags": [
           "admin-roles"
         ]
+      },
+      "post": {
+        "operationId": "AdminRolesController_createRole",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRoleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/RoleDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "admin-roles"
+        ]
       }
     },
     "/api/v1/admin/roles/permissions": {
@@ -129,6 +175,165 @@
                       "items": {
                         "$ref": "#/components/schemas/PermissionDto"
                       }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "admin-roles"
+        ]
+      }
+    },
+    "/api/v1/admin/roles/{id}": {
+      "patch": {
+        "operationId": "AdminRolesController_updateRole",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRoleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/RoleDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "admin-roles"
+        ]
+      },
+      "delete": {
+        "operationId": "AdminRolesController_deleteRole",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/SuccessFlagDto"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/RequestMetaDto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "admin-roles"
+        ]
+      }
+    },
+    "/api/v1/admin/roles/{id}/permissions": {
+      "put": {
+        "operationId": "AdminRolesController_replaceRolePermissions",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReplaceRolePermissionsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/RoleDto"
                     },
                     "meta": {
                       "$ref": "#/components/schemas/RequestMetaDto"
@@ -4291,6 +4496,75 @@
           "permissions"
         ]
       },
+      "CreateRoleDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "object",
+            "nullable": true
+          },
+          "organizationId": {
+            "type": "object",
+            "nullable": true
+          },
+          "permissionIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "name",
+          "permissionIds"
+        ]
+      },
+      "UpdateRoleDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "object",
+            "nullable": true
+          },
+          "permissionIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ReplaceRolePermissionsDto": {
+        "type": "object",
+        "properties": {
+          "permissionIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "permissionIds"
+        ]
+      },
+      "SuccessFlagDto": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "success"
+        ]
+      },
       "OrganizationDto": {
         "type": "object",
         "properties": {
@@ -4491,17 +4765,6 @@
             ]
           }
         }
-      },
-      "SuccessFlagDto": {
-        "type": "object",
-        "properties": {
-          "success": {
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "success"
-        ]
       },
       "UpdateUserStatusDto": {
         "type": "object",

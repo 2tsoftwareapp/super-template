@@ -10,24 +10,17 @@ import {
   ParseUUIDPipe,
   Post,
   Query,
-  Req,
-} from '@nestjs/common';
+  Req } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import {
-  ApiArrayResponse,
-  ApiDataResponse,
-  SuccessFlagDto,
-} from '@repo/api-core';
+import {  ACTION, ApiArrayResponse, ApiDataResponse, perm, SuccessFlagDto } from '@repo/api-core';
 import { CurrentUser } from '@repo/api-core';
 import { Authorize } from '@repo/api-core';
-import { PERMISSION_NAMES } from '@repo/api-core';
 
 import { AttachmentsService } from '../application/attachments.service';
 import {
   AttachEntityDto,
   AttachmentDto,
-  AttachmentsQueryDto,
-} from './attachments.dto';
+  AttachmentsQueryDto } from './attachments.dto';
 
 @ApiTags('attachments')
 @ApiBearerAuth()
@@ -36,7 +29,7 @@ export class AttachmentsController {
   constructor(private readonly attachmentsService: AttachmentsService) {}
 
   @Post()
-  @Authorize({ permissions: [PERMISSION_NAMES.ATTACHMENTS_CREATE] })
+  @Authorize({ permissions: [perm('attachments', ACTION.CREATE)] })
   @ApiDataResponse(AttachmentDto, 201)
   attach(
     @CurrentUser() user: AuthenticatedRequestUser,
@@ -49,24 +42,22 @@ export class AttachmentsController {
         fileId: input.fileId,
         entityType: input.entityType,
         entityId: input.entityId,
-        ...(input.label !== undefined ? { label: input.label } : {}),
-      },
+        ...(input.label !== undefined ? { label: input.label } : {}) },
       request.requestContext,
     );
   }
 
   @Get()
-  @Authorize({ permissions: [PERMISSION_NAMES.ATTACHMENTS_READ] })
+  @Authorize({ permissions: [perm('attachments', ACTION.READ)] })
   @ApiArrayResponse(AttachmentDto)
   list(@Query() query: AttachmentsQueryDto) {
     return this.attachmentsService.list({
       entityType: query.entityType,
-      entityId: query.entityId,
-    });
+      entityId: query.entityId });
   }
 
   @Delete(':id')
-  @Authorize({ permissions: [PERMISSION_NAMES.ATTACHMENTS_DELETE] })
+  @Authorize({ permissions: [perm('attachments', ACTION.DELETE)] })
   @ApiDataResponse(SuccessFlagDto)
   async delete(
     @CurrentUser() user: AuthenticatedRequestUser,

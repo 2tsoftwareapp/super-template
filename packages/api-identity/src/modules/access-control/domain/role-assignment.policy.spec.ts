@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { AppError } from '@repo/api-core';
-import { PERMISSION_NAMES, ROLE_NAMES } from '@repo/api-core';
+import { ACTION, AppError, perm, ROLE_NAMES } from '@repo/api-core';
 
 import {
   assertCanAssignRoles,
@@ -25,7 +24,7 @@ describe('RoleAssignmentPolicy', () => {
     ...superAdmin,
     userId: 'admin',
     roles: [ROLE_NAMES.ADMIN],
-    permissions: [PERMISSION_NAMES.ROLES_UPDATE],
+    permissions: [perm('roles', ACTION.UPDATE)],
   };
 
   const user = {
@@ -59,6 +58,30 @@ describe('RoleAssignmentPolicy', () => {
         { name: ROLE_NAMES.USER, organizationId: null, isSystem: true },
       ]),
     ).not.toThrow();
+  });
+
+  it('allows org admins to assign organization custom roles', () => {
+    expect(() =>
+      assertCanAssignRoleTargets(admin, [
+        {
+          name: 'Project Manager',
+          organizationId: 'org-1',
+          isSystem: false,
+        },
+      ]),
+    ).not.toThrow();
+  });
+
+  it('blocks org admins from assigning custom roles in another organization', () => {
+    expect(() =>
+      assertCanAssignRoleTargets(admin, [
+        {
+          name: 'Project Manager',
+          organizationId: 'org-2',
+          isSystem: false,
+        },
+      ]),
+    ).toThrow(AppError);
   });
 
   it('blocks org admins from assigning ADMIN', () => {

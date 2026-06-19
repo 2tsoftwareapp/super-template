@@ -1,14 +1,13 @@
 import type { DatabaseExecutor } from '@repo/api-database';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { AppError, ERROR_CODES } from '@repo/api-core';
-
 import {
-  ADMIN_PERMISSIONS,
-  ALL_PERMISSIONS as ALL_PERMISSION_NAMES,
+  AppError,
+  ERROR_CODES,
+  permissionNamesForRole,
   ROLE_NAMES,
-  USER_PERMISSIONS,
-} from '../access-control.constants';
+} from '@repo/api-core';
+
 import {
   PERMISSION_SEED_ENTRIES,
   ROLE_SEED_ENTRIES,
@@ -42,15 +41,12 @@ export class SeedAccessControlUseCase {
     const permissionByName = new Map(
       permissions.map((permission) => [permission.name, permission]),
     );
-    const allPermissionIds = ALL_PERMISSION_NAMES.map(
-      (name) => permissionByName.get(name)?.id,
-    ).filter((id): id is string => typeof id === 'string');
-    const userPermissionIds = USER_PERMISSIONS.map(
-      (name) => permissionByName.get(name)?.id,
-    ).filter((id): id is string => typeof id === 'string');
-    const adminPermissionIds = ADMIN_PERMISSIONS.map(
-      (name) => permissionByName.get(name)?.id,
-    ).filter((id): id is string => typeof id === 'string');
+
+    const resolvePermissionIds = (names: string[]) =>
+      names
+        .map((name) => permissionByName.get(name)?.id)
+        .filter((id): id is string => typeof id === 'string');
+
     const superAdminRole = roleByName.get(ROLE_NAMES.SUPER_ADMIN);
     const adminRole = roleByName.get(ROLE_NAMES.ADMIN);
     const userRole = roleByName.get(ROLE_NAMES.USER);
@@ -65,17 +61,17 @@ export class SeedAccessControlUseCase {
 
     await this.accessControlRepository.replaceRolePermissions(
       superAdminRole.id,
-      allPermissionIds,
+      resolvePermissionIds(permissionNamesForRole(ROLE_NAMES.SUPER_ADMIN)),
       executor,
     );
     await this.accessControlRepository.replaceRolePermissions(
       adminRole.id,
-      adminPermissionIds,
+      resolvePermissionIds(permissionNamesForRole(ROLE_NAMES.ADMIN)),
       executor,
     );
     await this.accessControlRepository.replaceRolePermissions(
       userRole.id,
-      userPermissionIds,
+      resolvePermissionIds(permissionNamesForRole(ROLE_NAMES.USER)),
       executor,
     );
 

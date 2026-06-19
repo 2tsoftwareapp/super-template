@@ -11,25 +11,18 @@ import {
   Patch,
   Post,
   Query,
-  Req,
-} from '@nestjs/common';
+  Req } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import {
-  ApiDataResponse,
-  ApiPaginatedResponse,
-  SuccessFlagDto,
-} from '@repo/api-core';
+import { ACTION, ApiDataResponse, ApiPaginatedResponse, perm, SuccessFlagDto } from '@repo/api-core';
 import { CurrentUser } from '@repo/api-core';
 import { Authorize } from '@repo/api-core';
-import { PERMISSION_NAMES } from '@repo/api-core';
 
 import { CommentsService } from '../application/comments.service';
 import {
   CommentDto,
   CommentsQueryDto,
   CreateCommentDto,
-  UpdateCommentDto,
-} from './comments.dto';
+  UpdateCommentDto } from './comments.dto';
 
 @ApiTags('comments')
 @ApiBearerAuth()
@@ -38,15 +31,14 @@ export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
 
   @Get()
-  @Authorize({ permissions: [PERMISSION_NAMES.COMMENTS_READ] })
+  @Authorize({ permissions: [perm('comments', ACTION.READ)] })
   @ApiPaginatedResponse(CommentDto)
   async list(@Query() query: CommentsQueryDto) {
     const result = await this.commentsService.list({
       page: query.page,
       limit: query.limit,
       entityType: query.entityType,
-      entityId: query.entityId,
-    });
+      entityId: query.entityId });
 
     return {
       data: result.rows,
@@ -54,13 +46,11 @@ export class CommentsController {
         page: query.page,
         limit: query.limit,
         total: result.total,
-        totalPages: Math.ceil(result.total / query.limit),
-      },
-    };
+        totalPages: Math.ceil(result.total / query.limit) } };
   }
 
   @Post()
-  @Authorize({ permissions: [PERMISSION_NAMES.COMMENTS_CREATE] })
+  @Authorize({ permissions: [perm('comments', ACTION.CREATE)] })
   @ApiDataResponse(CommentDto, 201)
   create(
     @CurrentUser() user: AuthenticatedRequestUser,
@@ -73,14 +63,13 @@ export class CommentsController {
         entityType: input.entityType,
         entityId: input.entityId,
         content: input.content,
-        ...(input.parentId !== undefined ? { parentId: input.parentId } : {}),
-      },
+        ...(input.parentId !== undefined ? { parentId: input.parentId } : {}) },
       request.requestContext,
     );
   }
 
   @Patch(':id')
-  @Authorize({ permissions: [PERMISSION_NAMES.COMMENTS_CREATE] })
+  @Authorize({ permissions: [perm('comments', ACTION.CREATE)] })
   @ApiDataResponse(CommentDto)
   update(
     @CurrentUser() user: AuthenticatedRequestUser,
@@ -97,7 +86,7 @@ export class CommentsController {
   }
 
   @Delete(':id')
-  @Authorize({ permissions: [PERMISSION_NAMES.COMMENTS_CREATE] })
+  @Authorize({ permissions: [perm('comments', ACTION.CREATE)] })
   @ApiDataResponse(SuccessFlagDto)
   async delete(
     @CurrentUser() user: AuthenticatedRequestUser,
@@ -107,7 +96,6 @@ export class CommentsController {
     await this.commentsService.delete(user, commentId, request.requestContext);
 
     return {
-      data: { success: true },
-    };
+      data: { success: true } };
   }
 }

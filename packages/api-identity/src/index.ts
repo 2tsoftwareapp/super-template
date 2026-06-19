@@ -3,12 +3,11 @@ import { Module } from '@nestjs/common';
 export { IdentityPortsModule } from './identity-ports.module';
 
 export {
-  ADMIN_PERMISSIONS,
-  ALL_PERMISSIONS,
-  PERMISSION_NAMES,
+  ACTION,
+  hasPermission,
+  perm,
   PRIVILEGED_ROLE_NAMES,
   ROLE_NAMES,
-  USER_PERMISSIONS,
 } from '@repo/api-core';
 
 import { IdentityPortsModule } from './identity-ports.module';

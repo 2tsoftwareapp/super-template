@@ -10,26 +10,20 @@ import {
   ParseUUIDPipe,
   Post,
   Query,
-  Req,
-} from '@nestjs/common';
+  Req } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
-import {
-  ApiDataResponse,
-  ApiPaginatedResponse,
-} from '@repo/api-core';
+import { ACTION, ApiDataResponse, ApiPaginatedResponse, perm } from '@repo/api-core';
 import { CurrentUser } from '@repo/api-core';
 import { Authorize } from '@repo/api-core';
 import { Public } from '@repo/api-core';
-import { PERMISSION_NAMES } from '@repo/api-core';
 
 import { InvitationsService } from '../application/invitations.service';
 import {
   AcceptInvitationDto,
   CreateInvitationDto,
   InvitationDto,
-  InvitationsQueryDto,
-} from './invitations.dto';
+  InvitationsQueryDto } from './invitations.dto';
 
 @ApiTags('invitations')
 @ApiBearerAuth()
@@ -38,7 +32,7 @@ export class InvitationsController {
   constructor(private readonly invitationsService: InvitationsService) {}
 
   @Post()
-  @Authorize({ permissions: [PERMISSION_NAMES.INVITATIONS_CREATE] })
+  @Authorize({ permissions: [perm('invitations', ACTION.CREATE)] })
   @Throttle({ default: { limit: 5, ttl: 3_600_000 } })
   @ApiDataResponse(InvitationDto, 201)
   create(
@@ -52,14 +46,13 @@ export class InvitationsController {
         email: input.email,
         entityType: input.entityType,
         entityId: input.entityId,
-        ...(input.role !== undefined ? { role: input.role } : {}),
-      },
+        ...(input.role !== undefined ? { role: input.role } : {}) },
       request.requestContext,
     );
   }
 
   @Get()
-  @Authorize({ permissions: [PERMISSION_NAMES.INVITATIONS_READ] })
+  @Authorize({ permissions: [perm('invitations', ACTION.READ)] })
   @ApiPaginatedResponse(InvitationDto)
   async list(
     @CurrentUser() user: AuthenticatedRequestUser,
@@ -73,8 +66,7 @@ export class InvitationsController {
         ? { entityType: query.entityType }
         : {}),
       ...(query.entityId !== undefined ? { entityId: query.entityId } : {}),
-      ...(query.status !== undefined ? { status: query.status } : {}),
-    });
+      ...(query.status !== undefined ? { status: query.status } : {}) });
 
     return {
       data: result.rows,
@@ -82,9 +74,7 @@ export class InvitationsController {
         page: query.page,
         limit: query.limit,
         total: result.total,
-        totalPages: Math.ceil(result.total / query.limit),
-      },
-    };
+        totalPages: Math.ceil(result.total / query.limit) } };
   }
 
   @Post('accept')
@@ -100,7 +90,7 @@ export class InvitationsController {
   }
 
   @Delete(':id')
-  @Authorize({ permissions: [PERMISSION_NAMES.INVITATIONS_CREATE] })
+  @Authorize({ permissions: [perm('invitations', ACTION.CREATE)] })
   @Throttle({ default: { limit: 10, ttl: 3_600_000 } })
   @ApiDataResponse(InvitationDto)
   revoke(

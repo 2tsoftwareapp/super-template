@@ -1,15 +1,9 @@
 import type {
   AuthenticatedRequestUser,
-  ProjectLookup,
-} from '@repo/api-core';
+  ProjectLookup } from '@repo/api-core';
 
 import { HttpStatus } from '@nestjs/common';
-import {
-  AppError,
-  ERROR_CODES,
-  PERMISSION_NAMES,
-  requireOrganizationId,
-} from '@repo/api-core';
+import { ACTION, AppError, ERROR_CODES, perm, requireOrganizationId } from '@repo/api-core';
 
 export async function assertCanInvite(
   actor: AuthenticatedRequestUser,
@@ -17,7 +11,7 @@ export async function assertCanInvite(
   entityId: string,
   projectLookup: ProjectLookup,
 ): Promise<void> {
-  if (!actor.permissions.includes(PERMISSION_NAMES.INVITATIONS_CREATE)) {
+  if (!actor.permissions.includes(perm('invitations', ACTION.CREATE))) {
     throw new AppError(
       ERROR_CODES.AUTH_FORBIDDEN,
       'You do not have permission to create invitations',

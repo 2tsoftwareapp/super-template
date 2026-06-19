@@ -1,8 +1,7 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { ApiPaginatedResponse } from '@repo/api-core';
+import { ACTION, ApiPaginatedResponse, perm } from '@repo/api-core';
 import { Authorize } from '@repo/api-core';
-import { PERMISSION_NAMES } from '@repo/api-core';
 
 import { ActivitiesService } from '../application/activities.service';
 import { ActivitiesQueryDto, ActivityDto } from './activities.dto';
@@ -14,7 +13,7 @@ export class ActivitiesController {
   constructor(private readonly activitiesService: ActivitiesService) {}
 
   @Get()
-  @Authorize({ permissions: [PERMISSION_NAMES.ACTIVITIES_READ] })
+  @Authorize({ permissions: [perm('activities', ACTION.READ)] })
   @ApiPaginatedResponse(ActivityDto)
   async list(@Query() query: ActivitiesQueryDto) {
     const result = await this.activitiesService.list({
@@ -24,8 +23,7 @@ export class ActivitiesController {
         ? { entityType: query.entityType }
         : {}),
       ...(query.entityId !== undefined ? { entityId: query.entityId } : {}),
-      ...(query.actorId !== undefined ? { actorId: query.actorId } : {}),
-    });
+      ...(query.actorId !== undefined ? { actorId: query.actorId } : {}) });
 
     return {
       data: result.rows,
@@ -33,8 +31,6 @@ export class ActivitiesController {
         page: query.page,
         limit: query.limit,
         total: result.total,
-        totalPages: Math.ceil(result.total / query.limit),
-      },
-    };
+        totalPages: Math.ceil(result.total / query.limit) } };
   }
 }

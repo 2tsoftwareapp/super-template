@@ -21,7 +21,7 @@ export { RequestContextMiddleware } from './common/middleware/request-context.mi
 export { RequestLoggerMiddleware } from './common/middleware/request-logger.middleware';
 export { ErrorReporterService } from './common/observability/error-reporter.service';
 export * from './common/pagination/pagination.dto';
-export * from './common/rbac/access-control.constants';
+export * from './common/rbac';
 export {
   adaptRedisClient,
   createRedisClient,

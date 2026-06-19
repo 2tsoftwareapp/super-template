@@ -3,13 +3,9 @@ import type { Request } from 'express';
 
 import { Body, Controller, Get, Param, Patch, Req } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import {
-  ApiArrayResponse,
-  ApiDataResponse,
-} from '@repo/api-core';
+import {  ACTION, ApiArrayResponse, ApiDataResponse, perm } from '@repo/api-core';
 import { CurrentUser } from '@repo/api-core';
 import { Authorize } from '@repo/api-core';
-import { PERMISSION_NAMES } from '@repo/api-core';
 
 import { SettingsService } from '../application/settings.service';
 import { ApplicationSettingDto, UpdateSettingDto } from './settings.dto';
@@ -21,19 +17,18 @@ export class AdminSettingsController {
   constructor(private readonly settingsService: SettingsService) {}
 
   @Get()
-  @Authorize({ permissions: [PERMISSION_NAMES.SETTINGS_READ] })
+  @Authorize({ permissions: [perm('settings', ACTION.READ)] })
   @ApiArrayResponse(ApplicationSettingDto)
   async listSettings() {
     const settings = await this.settingsService.listAll();
 
     return {
       data: settings,
-      meta: {},
-    };
+      meta: {} };
   }
 
   @Patch(':key')
-  @Authorize({ permissions: [PERMISSION_NAMES.SETTINGS_UPDATE] })
+  @Authorize({ permissions: [perm('settings', ACTION.UPDATE)] })
   @ApiDataResponse(ApplicationSettingDto)
   updateSetting(
     @CurrentUser() user: AuthenticatedRequestUser,

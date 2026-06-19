@@ -1,8 +1,7 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { ApiPaginatedResponse } from '@repo/api-core';
+import {  ACTION, ApiPaginatedResponse, perm } from '@repo/api-core';
 import { Authorize } from '@repo/api-core';
-import { PERMISSION_NAMES } from '@repo/api-core';
 
 import { AuditService } from '../application/audit.service';
 import { AuditLogDto, AuditLogsQueryDto } from './audit.dto';
@@ -14,7 +13,7 @@ export class AuditController {
   constructor(private readonly auditService: AuditService) {}
 
   @Get()
-  @Authorize({ permissions: [PERMISSION_NAMES.AUDIT_READ] })
+  @Authorize({ permissions: [perm('audit', ACTION.READ)] })
   @ApiPaginatedResponse(AuditLogDto)
   async listAuditLogs(@Query() query: AuditLogsQueryDto) {
     const result = await this.auditService.listAuditLogs({
@@ -30,8 +29,7 @@ export class AuditController {
         ? { resourceId: query.resourceId }
         : {}),
       ...(query.from !== undefined ? { from: query.from } : {}),
-      ...(query.to !== undefined ? { to: query.to } : {}),
-    });
+      ...(query.to !== undefined ? { to: query.to } : {}) });
 
     return {
       data: result.rows,
@@ -39,8 +37,6 @@ export class AuditController {
         page: query.page,
         limit: query.limit,
         total: result.total,
-        totalPages: Math.ceil(result.total / query.limit),
-      },
-    };
+        totalPages: Math.ceil(result.total / query.limit) } };
   }
 }
