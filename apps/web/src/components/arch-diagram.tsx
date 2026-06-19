@@ -2,7 +2,7 @@ export function ArchDiagram() {
   return (
     <div className="w-full overflow-x-auto rounded-2xl border border-border bg-muted/20 p-4 md:p-6">
       <svg
-        viewBox="0 0 880 408"
+        viewBox="0 0 880 430"
         className="w-full min-w-[560px]"
         role="img"
         aria-label="System architecture diagram"
@@ -38,21 +38,30 @@ export function ArchDiagram() {
           x1="114"
           y1="184"
           x2="114"
-          y2="212"
+          y2="220"
           stroke="var(--border)"
           strokeWidth="1.5"
           markerEnd="url(#arr)"
         />
 
-        {/* Admin → API (direct, dashed) */}
+        {/* Admin → BFF */}
         <line
           x1="440"
           y1="84"
           x2="440"
-          y2="212"
+          y2="120"
           stroke="var(--border)"
           strokeWidth="1.5"
-          strokeDasharray="5 4"
+          markerEnd="url(#arr)"
+        />
+        {/* Admin BFF → API */}
+        <line
+          x1="440"
+          y1="184"
+          x2="440"
+          y2="220"
+          stroke="var(--border)"
+          strokeWidth="1.5"
           markerEnd="url(#arr)"
         />
         {/* Mobile → API (direct, dashed) */}
@@ -60,7 +69,7 @@ export function ArchDiagram() {
           x1="766"
           y1="84"
           x2="766"
-          y2="212"
+          y2="220"
           stroke="var(--border)"
           strokeWidth="1.5"
           strokeDasharray="5 4"
@@ -70,36 +79,36 @@ export function ArchDiagram() {
         {/* API → Infra */}
         <line
           x1="116"
-          y1="308"
+          y1="316"
           x2="116"
-          y2="340"
+          y2="348"
           stroke="var(--border)"
           strokeWidth="1.5"
           markerEnd="url(#arr)"
         />
         <line
           x1="332"
-          y1="308"
+          y1="316"
           x2="332"
-          y2="340"
+          y2="348"
           stroke="var(--border)"
           strokeWidth="1.5"
           markerEnd="url(#arr)"
         />
         <line
           x1="548"
-          y1="308"
+          y1="316"
           x2="548"
-          y2="340"
+          y2="348"
           stroke="var(--border)"
           strokeWidth="1.5"
           markerEnd="url(#arr)"
         />
         <line
           x1="764"
-          y1="308"
+          y1="316"
           x2="764"
-          y2="340"
+          y2="348"
           stroke="var(--border)"
           strokeWidth="1.5"
           markerEnd="url(#arr)"
@@ -128,7 +137,7 @@ export function ArchDiagram() {
         </text>
         <text
           x="16"
-          y="205"
+          y="213"
           fill="var(--muted-foreground)"
           fontSize="8.5"
           fontWeight="700"
@@ -138,7 +147,7 @@ export function ArchDiagram() {
         </text>
         <text
           x="16"
-          y="333"
+          y="353"
           fill="var(--muted-foreground)"
           fontSize="8.5"
           fontWeight="700"
@@ -258,7 +267,7 @@ export function ArchDiagram() {
           fontSize="13"
           fontWeight="600"
         >
-          Next.js 16 BFF
+          Next.js 16 Web BFF
         </text>
         <text
           x="114"
@@ -270,37 +279,41 @@ export function ArchDiagram() {
           HttpOnly cookies · CSRF
         </text>
 
-        {/* ── Legend (right of BFF) ── */}
-        <line
-          x1="246"
-          y1="138"
-          x2="274"
-          y2="138"
-          stroke="var(--border)"
+        {/* ── Admin BFF box ── */}
+        <rect
+          x="342"
+          y="120"
+          width="196"
+          height="64"
+          rx="10"
+          fill="var(--card)"
+          stroke="var(--primary)"
           strokeWidth="1.5"
         />
-        <polygon points="269 135, 274 138, 269 141" fill="var(--border)" />
-        <text x="280" y="142" fill="var(--muted-foreground)" fontSize="10">
-          via BFF
+        <text
+          x="440"
+          y="146"
+          textAnchor="middle"
+          fill="var(--foreground)"
+          fontSize="13"
+          fontWeight="600"
+        >
+          Next.js 16 Admin BFF
         </text>
-        <line
-          x1="246"
-          y1="156"
-          x2="274"
-          y2="156"
-          stroke="var(--border)"
-          strokeWidth="1.5"
-          strokeDasharray="5 4"
-        />
-        <polygon points="269 153, 274 156, 269 159" fill="var(--border)" />
-        <text x="280" y="160" fill="var(--muted-foreground)" fontSize="10">
-          direct to API
+        <text
+          x="440"
+          y="165"
+          textAnchor="middle"
+          fill="var(--muted-foreground)"
+          fontSize="10.5"
+        >
+          HttpOnly cookies · CSRF
         </text>
 
         {/* ── API box ── */}
         <rect
           x="16"
-          y="212"
+          y="220"
           width="848"
           height="96"
           rx="10"
@@ -352,7 +365,7 @@ export function ArchDiagram() {
         {/* PostgreSQL */}
         <rect
           x="16"
-          y="340"
+          y="348"
           width="200"
           height="52"
           rx="10"
@@ -382,7 +395,7 @@ export function ArchDiagram() {
         {/* Mailpit / SMTP */}
         <rect
           x="232"
-          y="340"
+          y="348"
           width="200"
           height="52"
           rx="10"
@@ -412,7 +425,7 @@ export function ArchDiagram() {
         {/* AWS S3 */}
         <rect
           x="448"
-          y="340"
+          y="348"
           width="200"
           height="52"
           rx="10"
@@ -442,7 +455,7 @@ export function ArchDiagram() {
         {/* Firebase FCM */}
         <rect
           x="664"
-          y="340"
+          y="348"
           width="200"
           height="52"
           rx="10"

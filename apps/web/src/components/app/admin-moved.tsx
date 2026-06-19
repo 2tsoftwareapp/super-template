@@ -32,7 +32,8 @@ export function AdminMovedNotice({
         <CardHeader>
           <CardTitle className="text-xl">Use the admin app</CardTitle>
           <CardDescription>
-            The management UI now lives in the separate Next.js admin app.
+            The management UI now lives in the separate Next.js admin app and
+            shares the same `@repo/web-core` logic.
           </CardDescription>
         </CardHeader>
         <CardContent>

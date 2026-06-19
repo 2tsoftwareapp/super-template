@@ -42,7 +42,7 @@ const features = [
     label: "Admin",
     title: "Separate admin app",
     description:
-      "A dedicated Next.js admin workspace with full operational tooling — completely isolated from the user-facing product.",
+      "A dedicated Next.js admin workspace that reuses the shared web-core layer while keeping operational tooling isolated from the user-facing product.",
     items: [
       "User & role management",
       "Jobs, mail, imports",
@@ -70,7 +70,8 @@ const stackLayers = [
       {
         name: "Next.js",
         version: "16",
-        description: "App Router · SSR · Edge-ready routing and middleware",
+        description:
+          "App Router · same-origin BFF · product-facing routing and middleware",
       },
       {
         name: "shadcn/ui",
@@ -86,6 +87,17 @@ const stackLayers = [
         name: "Tailwind CSS",
         version: "4.x",
         description: "Utility-first styling with OKLCH perceptual color tokens",
+      },
+    ],
+  },
+  {
+    label: "Shared",
+    packages: [
+      {
+        name: "@repo/web-core",
+        version: "workspace:*",
+        description:
+          "Shared auth, session, HTTP, query, and utility logic used by web and admin",
       },
     ],
   },
@@ -114,10 +126,9 @@ const stackLayers = [
     label: "Admin",
     packages: [
       {
-        name: "Vite",
-        version: "7.x",
-        description:
-          "Sub-second HMR dev server · ESM-native production bundler",
+        name: "Next.js",
+        version: "16",
+        description: "App Router · same-origin BFF · admin-only routes",
       },
       {
         name: "TanStack Table",
@@ -271,9 +282,10 @@ export default function Home() {
               </span>
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-8 text-muted-foreground md:text-lg">
-              A complete monorepo with Next.js, NestJS, Flutter, and a Next.js
-              admin — wired together with a contract-driven API, seeded auth,
-              and production tooling from day one.
+              A complete monorepo with Next.js web and admin apps, NestJS,
+              Flutter, and shared @repo/web-core logic — wired together with a
+              contract-driven API, seeded auth, and production tooling from day
+              one.
             </p>
             <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
               <a
@@ -374,8 +386,8 @@ export default function Home() {
             </h2>
             <p className="mt-4 text-muted-foreground">
               The NestJS API serves all three frontends from a single Postgres
-              database. Web traffic flows through a Next.js BFF — admin and
-              mobile talk directly to the API.
+              database. Web and admin traffic flow through Next.js BFFs that
+              share @repo/web-core, while Flutter talks directly to the API.
             </p>
           </div>
           <ArchDiagram />

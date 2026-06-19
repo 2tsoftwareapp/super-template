@@ -22,14 +22,14 @@ export default function AdminRedirectPage() {
         </h1>
         <p className="max-w-2xl text-sm leading-7 text-muted-foreground">
           The Next.js web stays client-focused. Open the Next.js admin app for
-          management tools.
+          management tools that reuse shared `@repo/web-core` logic.
         </p>
       </div>
       <Card className="border-border">
         <CardHeader>
           <CardTitle className="text-xl">Use the admin app</CardTitle>
           <CardDescription>
-            Launch the Next.js admin app for admin work.
+            Launch the Next.js admin app for admin work and shared-core flows.
           </CardDescription>
         </CardHeader>
         <CardContent>
