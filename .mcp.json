@@ -10,6 +10,10 @@
     "postgres": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-postgres", "${DATABASE_URL}"]
+    },
+    "browser-extension": {
+      "type": "http",
+      "url": "http://localhost:${EXTENSION_MCP_PORT}/mcp"
     }
   }
 }

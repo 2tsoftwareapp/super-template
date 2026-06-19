@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import path from "node:path";
+
 import { changePasswordThroughUi, loginThroughUi, SEED_USER } from "./auth.helpers";
 
 const seedUserAuthState = path.join(__dirname, ".auth/seed-user.json");

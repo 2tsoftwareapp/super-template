@@ -40,6 +40,7 @@ super-template/
 │   ├── api-platform/
 │   ├── api-workspace/
 │   ├── eslint-config/
+│   ├── extension/
 │   └── tsconfig/
 ├── scripts/
 ├── docs/
@@ -178,9 +179,19 @@ This regenerates:
 
 - API: `pnpm --filter api test`
 - Web: `pnpm --filter web test`
+- Web e2e (Playwright): `pnpm --filter web test:e2e`
 - Mobile: `pnpm run mobile:test`
 
 `make verify` runs generation, lint, typecheck, tests, and builds. When Flutter/Dart are available it also runs Flutter format-check, analyze, and tests; otherwise it skips the mobile verification path with an explicit message.
+
+### Agent-driven browser control
+
+`packages/extension` vendors the open-source Playwright browser extension and
+wires it to a shared `@playwright/mcp --extension` server (`make
+extension-dev`), registered in `.mcp.json` as `browser-extension`. It lets any
+MCP-aware agent (including this one) drive your real, logged-in
+Chrome/Edge browser — alongside, not instead of, the Playwright e2e suite.
+See [`packages/extension/README.md`](packages/extension/README.md).
 
 ## Seeded Development Accounts
 

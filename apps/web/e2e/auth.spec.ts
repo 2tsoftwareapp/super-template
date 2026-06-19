@@ -339,7 +339,7 @@ test.describe("Auth — multiple sessions", () => {
     const sessionsResponse = await page1.request.get("/api/auth/sessions");
     if (sessionsResponse.ok()) {
       const sessionsBody = (await sessionsResponse.json()) as {
-        data: { sessions: Array<{ id: string }> };
+        data: { sessions: { id: string }[] };
       };
       expect(sessionsBody.data.sessions.length).toBeGreaterThanOrEqual(1);
     }

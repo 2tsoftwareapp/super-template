@@ -1,10 +1,36 @@
 import { Injectable } from '@nestjs/common';
+import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
+function resolveTemplatesDir(): string {
+  const marker = 'auth.verify-email.subject.txt';
+  const candidates = [
+    join(__dirname, 'templates'),
+    join(__dirname, 'infrastructure', 'templates'),
+    join(process.cwd(), 'dist', 'templates'),
+    join(
+      process.cwd(),
+      '../../packages/api-platform/src/modules/mail/infrastructure/templates',
+    ),
+    join(
+      process.cwd(),
+      'packages/api-platform/src/modules/mail/infrastructure/templates',
+    ),
+  ];
+
+  for (const dir of candidates) {
+    if (existsSync(join(dir, marker))) {
+      return dir;
+    }
+  }
+
+  return join(__dirname, 'templates');
+}
+
 @Injectable()
 export class TemplateRendererService {
-  private readonly templatesDir = join(__dirname, 'templates');
+  private readonly templatesDir = resolveTemplatesDir();
 
   async render(
     templateKey: string,

@@ -98,6 +98,11 @@
           "allow": ["layer:tsconfig"]
         }
       },
+      "layer:extension": {
+        "dependencies": {
+          "allow": ["layer:extension", "layer:tsconfig", "layer:eslint"]
+        }
+      },
       "layer:eslint": {
         "dependencies": {
           "allow": ["layer:eslint", "layer:tsconfig"]
@@ -148,7 +153,7 @@
     "dev": {
       "cache": false,
       "persistent": true,
-      "env": ["WEB_PORT", "ADMIN_PORT"]
+      "env": ["WEB_PORT", "ADMIN_PORT", "EXTENSION_MCP_PORT"]
     },
     "generate": {
       "dependsOn": ["^generate"],

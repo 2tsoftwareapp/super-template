@@ -12,6 +12,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
+    "test:e2e:auth": "playwright test e2e/auth.spec.ts --workers=1",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {

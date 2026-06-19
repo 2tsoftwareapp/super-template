@@ -1,4 +1,4 @@
-import { expect, type APIRequestContext, type Page } from "@playwright/test";
+import { type APIRequestContext, expect, type Page } from "@playwright/test";
 
 export const SEED_USER = {
   email: process.env.E2E_USER_EMAIL ?? "user@example.local",
@@ -63,9 +63,7 @@ export function uniqueEmail(prefix: string) {
 }
 
 function extractTokenFromMailBody(body: string, param: "token"): string | null {
-  const match = body.match(
-    new RegExp(`[?&]${param}=([A-Za-z0-9._-]+)`, "i"),
-  );
+  const match = new RegExp(`[?&]${param}=([A-Za-z0-9._-]+)`, "i").exec(body);
   return match?.[1] ?? null;
 }
 
@@ -78,7 +76,7 @@ async function listMailpitMessages(request: APIRequestContext) {
   }
 
   return (await response.json()) as {
-    messages: Array<{ ID: string; To: Array<{ Address: string }> }>;
+    messages: { ID: string; To: { Address: string }[] }[];
   };
 }
 

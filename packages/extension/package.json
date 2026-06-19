@@ -1,0 +1,32 @@
+{
+  "name": "@repo/extension",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "watch": "vite build --watch",
+    "dev": "node ../../scripts/run-with-port.mjs EXTENSION_MCP_PORT 9224 pnpm exec playwright-mcp --extension --shared-browser-context",
+    "start": "pnpm run dev",
+    "lint": "eslint .",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": {
+    "@playwright/mcp": "0.0.76",
+    "@repo/eslint-config": "workspace:*",
+    "@repo/tsconfig": "workspace:*",
+    "@types/chrome": "0.0.315",
+    "@types/react": "19.2.6",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "5.1.0",
+    "eslint": "9.39.1",
+    "globals": "17.6.0",
+    "typescript": "5.9.3",
+    "vite": "7.2.2",
+    "vite-plugin-static-copy": "3.1.4"
+  }
+}

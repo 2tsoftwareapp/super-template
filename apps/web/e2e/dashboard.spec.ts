@@ -3,8 +3,8 @@ import path from "node:path";
 
 import {
   loginThroughUi,
-  SEED_USER,
   SEED_ADMIN,
+  SEED_USER,
 } from "./auth.helpers";
 
 const seedUserAuthState = path.join(__dirname, ".auth/seed-user.json");

@@ -42,9 +42,8 @@ export default defineConfig({
       use: { ...devices["Desktop Chrome"] },
     },
   ],
-  webServer: process.env.PLAYWRIGHT_SKIP_WEBSERVER
-    ? undefined
-    : [
+  webServer: !process.env.PLAYWRIGHT_SKIP_WEBSERVER
+    ? [
         {
           command: "pnpm --filter api dev",
           cwd: resolve(__dirname, "../.."),
@@ -69,5 +68,6 @@ export default defineConfig({
             ...process.env,
           },
         },
-      ],
+      ]
+    : undefined,
 });

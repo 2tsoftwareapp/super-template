@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-.PHONY: help bootstrap dev dev-api dev-web dev-mobile infra-up infra-down db-generate db-migrate db-seed db-reset db-studio generate generate-check lint format test test-api test-web test-mobile build verify
+.PHONY: help bootstrap dev dev-api dev-web dev-mobile infra-up infra-down db-generate db-migrate db-seed db-reset db-studio generate generate-check lint format test test-api test-web test-mobile build verify extension-build extension-dev
 
 help:
 	@printf '%s\n' \
@@ -27,7 +27,9 @@ help:
 		'  test-web     Run Web tests' \
 		'  test-mobile  Run Flutter tests' \
 		'  build        Build all packages' \
-		'  verify       Full CI-style verify script'
+		'  verify       Full CI-style verify script' \
+		'  extension-build  Build the browser-control extension (packages/extension)' \
+		'  extension-dev    Start the shared Playwright MCP server in --extension mode'
 
 bootstrap:
 	./scripts/bootstrap.sh
@@ -100,3 +102,9 @@ build:
 
 verify:
 	./scripts/verify.sh
+
+extension-build:
+	pnpm --filter @repo/extension build
+
+extension-dev:
+	set -a; source .env; set +a; pnpm --filter @repo/extension dev

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { AuthShell } from "@/components/auth/auth-shell";
@@ -10,11 +10,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { webFetch } from "@/lib/http";
 
 export default function VerifyEmailPage() {
-  const [token] = useState(() =>
-    typeof window === "undefined"
-      ? ""
-      : (new URLSearchParams(window.location.search).get("token") ?? ""),
-  );
+  const [token, setToken] = useState("");
+
+  useEffect(() => {
+    setToken(new URLSearchParams(window.location.search).get("token") ?? "");
+  }, []);
 
   const mutation = useMutation({
     mutationFn: () =>
