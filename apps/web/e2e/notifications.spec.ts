@@ -108,12 +108,12 @@ test.describe("Notifications — error handling", () => {
 
   test("handles API errors gracefully", async ({ page, context }) => {
     await context.route("**/api/bff/notifications**", route => {
-      route.abort("failed");
+      void route.abort("failed");
     });
 
     await page.goto("/notifications");
 
     const heading = page.getByRole("heading");
-    await expect(heading).toBeVisible({ timeout: 5000 }).catch(() => {});
+    await expect(heading).toBeVisible({ timeout: 5000 }).catch(() => undefined);
   });
 });

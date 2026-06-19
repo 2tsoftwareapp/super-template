@@ -4,7 +4,6 @@ import path from "node:path";
 import {
   loginThroughUi,
   SEED_USER,
-  uniqueEmail,
 } from "./auth.helpers";
 
 const seedUserAuthState = path.join(__dirname, ".auth/seed-user.json");
@@ -291,7 +290,7 @@ test.describe("Projects — project cards display", () => {
 
     // Should show empty state
     const emptyTitle = page.getByText("No projects found");
-    const emptyDescription = page.getByText("Try a different filter or create the first record.");
+    const _emptyDescription = page.getByText("Try a different filter or create the first record.");
 
     const emptyVisible = await emptyTitle.isVisible({ timeout: 5000 }).catch(() => false);
     expect(emptyVisible).toBe(true);
@@ -304,14 +303,14 @@ test.describe("Projects — project cards display", () => {
     // Delay API response
     await context.route("**/api/bff/projects**", async (route) => {
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      await route.continue().catch(() => {});
+      await route.continue().catch(() => undefined);
     });
 
     await page.goto("/projects");
 
     // Should show spinner
     const spinner = page.locator("[class*='spinner']");
-    const spinnerVisible = await spinner.isVisible({ timeout: 2000 }).catch(() => false);
+    const _spinnerVisible = await spinner.isVisible({ timeout: 2000 }).catch(() => false);
 
     // Eventually should load
     await expect(page.getByRole("heading", { name: "Projects" })).toBeVisible({
@@ -361,7 +360,7 @@ test.describe("Projects — create new project", () => {
 
     // Should show validation error or disable submit
     const submitButton = page.getByRole("button", { name: /create|save|submit/i });
-    const isDisabled = await submitButton.isDisabled().catch(() => false);
+    const _isDisabled = await submitButton.isDisabled().catch(() => false);
 
     // Name should be focused initially
     await expect(nameInput).toBeFocused();
@@ -390,9 +389,9 @@ test.describe("Projects — create new project", () => {
     await statusSelect.click();
 
     // Check for status options
-    const draftOption = page.locator("[role='option']:has-text('DRAFT')");
-    const activeOption = page.locator("[role='option']:has-text('ACTIVE')");
-    const archivedOption = page.locator("[role='option']:has-text('ARCHIVED')");
+    const _draftOption = page.locator("[role='option']:has-text('DRAFT')");
+    const _activeOption = page.locator("[role='option']:has-text('ACTIVE')");
+    const _archivedOption = page.locator("[role='option']:has-text('ARCHIVED')");
 
     // At least some options should exist
     const optionCount = await page.locator("[role='option']").count();
@@ -555,7 +554,7 @@ test.describe("Projects — error handling", () => {
   test("handles API errors gracefully", async ({ page, context }) => {
     // Block projects API
     await context.route("**/api/bff/projects**", (route) => {
-      route.abort("failed");
+      void route.abort("failed");
     });
 
     await page.goto("/projects");
@@ -568,11 +567,11 @@ test.describe("Projects — error handling", () => {
     await page.goto("/projects/new");
 
     // Make create endpoint fail
-    await context.route("**/api/bff/projects", async (route) => {
+    await context.route("**/api/bff/projects", (route) => {
       if (route.request().method() === "POST") {
-        route.abort("failed");
+        void route.abort("failed");
       } else {
-        await route.continue();
+        void route.continue();
       }
     });
 

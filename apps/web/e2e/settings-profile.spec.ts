@@ -145,7 +145,7 @@ test.describe("Settings Profile — security", () => {
   test("can update password", async ({ page }) => {
     const newPassword = "NewSecurePass" + Date.now() + "!";
 
-    await changePasswordThroughUi(page, SEED_USER.password, newPassword).catch(() => {});
+    await changePasswordThroughUi(page, SEED_USER.password, newPassword).catch(() => undefined);
 
     // If successful, user should be able to re-login with new password
     // For now, just verify the function completed
@@ -181,9 +181,9 @@ test.describe("Settings Profile — error handling", () => {
   test("handles update errors gracefully", async ({ page, context }) => {
     await context.route("**/api/bff/users/**", route => {
       if (route.request().method() === "PATCH") {
-        route.abort("failed");
+        void route.abort("failed");
       } else {
-        route.continue();
+        void route.continue();
       }
     });
 

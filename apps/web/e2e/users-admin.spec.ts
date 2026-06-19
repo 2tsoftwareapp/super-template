@@ -318,14 +318,14 @@ test.describe("Users Admin — users table and display", () => {
     // Delay API response
     await context.route("**/api/bff/admin/users**", async (route) => {
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      await route.continue().catch(() => {});
+      await route.continue().catch(() => undefined);
     });
 
     await page.goto("/users");
 
     // Should show spinner
     const spinner = page.locator("[class*='spinner']");
-    const spinnerVisible = await spinner.isVisible({ timeout: 2000 }).catch(() => false);
+    const _spinnerVisible = await spinner.isVisible({ timeout: 2000 }).catch(() => false);
 
     // Spinner might be briefly visible
     // Eventually table should load
@@ -621,7 +621,7 @@ test.describe("Users Admin — API integration", () => {
     // Count API calls
     await context.route("**/api/bff/admin/users**", (route) => {
       requestCount++;
-      route.continue();
+      void route.continue();
     });
 
     await page.goto("/users");
@@ -656,7 +656,7 @@ test.describe("Users Admin — error handling", () => {
   test("handles API errors gracefully", async ({ page, context }) => {
     // Block users API
     await context.route("**/api/bff/admin/users**", (route) => {
-      route.abort("failed");
+      void route.abort("failed");
     });
 
     await page.goto("/users");
@@ -673,15 +673,15 @@ test.describe("Users Admin — error handling", () => {
 
     // Setup to fail on create
     let requestsAfterClick = 0;
-    await context.route("**/api/bff/admin/users", async (route) => {
+    await context.route("**/api/bff/admin/users", (route) => {
       if (requestsAfterClick > 0) {
         // Fail POST requests (create)
         if (route.request().method() === "POST") {
-          route.abort("failed");
+          void route.abort("failed");
           return;
         }
       }
-      await route.continue();
+      void route.continue();
     });
 
     const createButton = page.getByRole("button", { name: "Create user" });

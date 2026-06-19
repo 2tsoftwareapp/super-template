@@ -158,20 +158,20 @@ test.describe("Audit Logs — table display", () => {
     // Should have logs or empty state
     if (count === 0) {
       const emptyState = page.getByText("No audit logs found");
-      await expect(emptyState).toBeVisible({ timeout: 5000 }).catch(() => {});
+      await expect(emptyState).toBeVisible({ timeout: 5000 }).catch(() => undefined);
     }
   });
 
   test("shows loading spinner", async ({ page, context }) => {
     await context.route("**/api/bff/audit-logs**", async (route) => {
       await new Promise(resolve => setTimeout(resolve, 1000));
-      await route.continue().catch(() => {});
+      await route.continue().catch(() => undefined);
     });
 
     await page.goto("/audit-logs");
 
     const spinner = page.locator("[class*='spinner']");
-    const isVisible = await spinner.isVisible({ timeout: 2000 }).catch(() => false);
+    const _isVisible = await spinner.isVisible({ timeout: 2000 }).catch(() => false);
 
     await expect(page.getByRole("heading", { name: "Audit logs" })).toBeVisible({
       timeout: 10000
@@ -260,7 +260,7 @@ test.describe("Audit Logs — error handling", () => {
 
   test("handles API failure", async ({ page, context }) => {
     await context.route("**/api/bff/audit-logs**", route => {
-      route.abort("failed");
+      void route.abort("failed");
     });
 
     await page.goto("/audit-logs");
@@ -271,7 +271,7 @@ test.describe("Audit Logs — error handling", () => {
   test("handles slow responses", async ({ page, context }) => {
     await context.route("**/api/bff/audit-logs**", async (route) => {
       await new Promise(resolve => setTimeout(resolve, 2000));
-      await route.continue().catch(() => {});
+      await route.continue().catch(() => undefined);
     });
 
     await page.goto("/audit-logs");

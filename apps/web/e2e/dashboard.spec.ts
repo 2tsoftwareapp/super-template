@@ -230,7 +230,7 @@ test.describe("Dashboard — recent projects section", () => {
       await expect(emptyDescription).toBeVisible();
 
       // Should have FolderKanban icon
-      const emptyIcon = page.locator("[data-lucide-icon='folder-kanban']").or(
+      const _emptyIcon = page.locator("[data-lucide-icon='folder-kanban']").or(
         page.locator("svg").filter({ has: page.locator("path[d*='folder']") })
       );
       // Icon presence is harder to test, but empty state should exist
@@ -376,7 +376,7 @@ test.describe("Dashboard — publish rhythm info section", () => {
     await page.goto("/dashboard");
 
     // Should have Workflow icon
-    const workflowIcon = page.locator("[data-lucide-icon='workflow']").or(
+    const _workflowIcon = page.locator("[data-lucide-icon='workflow']").or(
       page.locator("svg").filter({ has: page.locator("path[d*='workflow']") })
     );
     // Note: Icon detection is tricky in tests, but we verify the info boxes exist
@@ -491,7 +491,7 @@ test.describe("Dashboard — error handling and resilience", () => {
   }) => {
     // Block projects API
     await context.route("**/api/bff/projects**", (route) => {
-      route.abort("failed");
+      void route.abort("failed");
     });
 
     await page.goto("/dashboard");
@@ -511,7 +511,7 @@ test.describe("Dashboard — error handling and resilience", () => {
   }) => {
     // Block notifications API
     await context.route("**/api/bff/notifications**", (route) => {
-      route.abort("failed");
+      void route.abort("failed");
     });
 
     await page.goto("/dashboard");
@@ -530,7 +530,7 @@ test.describe("Dashboard — error handling and resilience", () => {
     // Delay API responses by 2 seconds
     await context.route("**/api/bff/**", async (route) => {
       await new Promise((resolve) => setTimeout(resolve, 2000));
-      await route.continue().catch(() => {});
+      await route.continue().catch(() => undefined);
     });
 
     await page.goto("/dashboard");
