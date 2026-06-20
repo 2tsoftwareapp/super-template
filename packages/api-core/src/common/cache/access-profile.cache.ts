@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { z } from 'zod';
 
 import { EnvironmentService } from '../../config/environment.service';
@@ -16,7 +16,7 @@ const AccessProfileSnapshotSchema = z.object({
 
 interface RedisCacheClient {
   connect: () => Promise<void>;
-  del: (key: string) => Promise<number>;
+  del: (key: string | string[]) => Promise<number>;
   get: (key: string) => Promise<string | null>;
   on: (event: 'error', listener: (error: Error) => void) => void;
   quit: () => Promise<void>;
@@ -39,6 +39,10 @@ function cacheKey(userId: string): string {
   return `${CACHE_KEY_PREFIX}${userId}`;
 }
 
+function errorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
+
 function parseAccessProfileSnapshot(
   cached: string,
 ): AccessProfileSnapshot | null {
@@ -53,6 +57,7 @@ function parseAccessProfileSnapshot(
 
 @Injectable()
 export class AccessProfileCache {
+  private readonly logger = new Logger(AccessProfileCache.name);
   private readonly localEntries = new Map<string, LocalCacheEntry>();
   private redisClient: RedisCacheClient | null = null;
   private redisReady: Promise<void> | null = null;
@@ -63,20 +68,29 @@ export class AccessProfileCache {
     const redis = await this.ensureRedis();
 
     if (redis) {
-      const cached = await redis.get(cacheKey(userId));
+      try {
+        const cached = await redis.get(cacheKey(userId));
 
-      if (!cached) {
+        if (!cached) {
+          return null;
+        }
+
+        const profile = parseAccessProfileSnapshot(cached);
+
+        if (!profile) {
+          await redis.del(cacheKey(userId));
+          return null;
+        }
+
+        return profile;
+      } catch (error) {
+        // A transient Redis failure must not break authorization; treat it as a
+        // cache miss so the caller recomputes the profile from the source of truth.
+        this.logger.warn(
+          `Redis get failed for access profile; treating as cache miss: ${errorMessage(error)}`,
+        );
         return null;
       }
-
-      const profile = parseAccessProfileSnapshot(cached);
-
-      if (!profile) {
-        await redis.del(cacheKey(userId));
-        return null;
-      }
-
-      return profile;
     }
 
     const entry = this.localEntries.get(userId);
@@ -98,9 +112,15 @@ export class AccessProfileCache {
     const ttlSeconds = this.resolveTtlSeconds();
 
     if (redis) {
-      await redis.set(cacheKey(userId), JSON.stringify(profile), {
-        EX: ttlSeconds,
-      });
+      try {
+        await redis.set(cacheKey(userId), JSON.stringify(profile), {
+          EX: ttlSeconds,
+        });
+      } catch (error) {
+        this.logger.warn(
+          `Redis set failed for access profile: ${errorMessage(error)}`,
+        );
+      }
       return;
     }
 
@@ -114,7 +134,13 @@ export class AccessProfileCache {
     const redis = await this.ensureRedis();
 
     if (redis) {
-      await redis.del(cacheKey(userId));
+      try {
+        await redis.del(cacheKey(userId));
+      } catch (error) {
+        this.logger.warn(
+          `Redis invalidate failed for access profile: ${errorMessage(error)}`,
+        );
+      }
       return;
     }
 
@@ -122,11 +148,31 @@ export class AccessProfileCache {
   }
 
   async invalidateUsers(userIds: string[]): Promise<void> {
-    await Promise.all(userIds.map((userId) => this.invalidateUser(userId)));
+    if (userIds.length === 0) {
+      return;
+    }
+
+    const redis = await this.ensureRedis();
+
+    if (redis) {
+      try {
+        // Single round-trip instead of one DEL per user.
+        await redis.del(userIds.map(cacheKey));
+      } catch (error) {
+        this.logger.warn(
+          `Redis batch invalidate failed for access profiles: ${errorMessage(error)}`,
+        );
+      }
+      return;
+    }
+
+    for (const userId of userIds) {
+      this.localEntries.delete(userId);
+    }
   }
 
   private resolveTtlSeconds(): number {
-    const configured = this.environmentService.values.ACCESS_PROFILE_CACHE_TTL_SECONDS;
+    const configured = this.environmentService.accessProfileCacheTtlSeconds;
 
     if (!Number.isFinite(configured) || configured <= 0) {
       return DEFAULT_TTL_SECONDS;
@@ -141,7 +187,7 @@ export class AccessProfileCache {
       return this.redisClient;
     }
 
-    const redisUrl = this.environmentService.values.REDIS_URL;
+    const redisUrl = this.environmentService.redisUrl;
 
     if (!redisUrl) {
       this.redisReady = Promise.resolve();
@@ -153,15 +199,26 @@ export class AccessProfileCache {
         createRedisClient(redisUrl),
       );
 
-      client.on('error', () => {
-        this.redisClient = null;
+      client.on('error', (error) => {
+        // node-redis reconnects internally, so log the blip rather than discarding
+        // a self-healing client (which previously stranded the instance on the
+        // local cache forever and silently broke cross-instance invalidation).
+        this.logger.warn(
+          `Redis client error for access-profile cache: ${error.message}`,
+        );
       });
 
       try {
         await client.connect();
         this.redisClient = client;
-      } catch {
+      } catch (error) {
+        // Clear redisReady so the next access retries the connection instead of
+        // being stuck on the in-process fallback until the process restarts.
+        this.logger.warn(
+          `Redis connect failed for access-profile cache; using in-process fallback: ${errorMessage(error)}`,
+        );
         this.redisClient = null;
+        this.redisReady = null;
       }
     })();
 

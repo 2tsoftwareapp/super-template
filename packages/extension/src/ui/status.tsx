@@ -72,7 +72,7 @@ const StatusApp: React.FC = () => {
           </div>
         ) : (
           <div className='status-banner'>
-            No clients are currently connected. You can connect from the Playwright CLI or MCP server by passing the --extension flag.
+            No clients are currently connected. You can connect from the Browser Control MCP server or CLI by running the extension mode.
           </div>
         )}
         <AuthTokenSection />

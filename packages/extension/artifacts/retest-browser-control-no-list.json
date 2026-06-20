@@ -1,0 +1,40 @@
+{
+  "cleanup": "created-tabs",
+  "steps": [
+    {
+      "tool": "browser_navigate",
+      "args": {
+        "url": "http://localhost:3005/"
+      }
+    },
+    {
+      "tool": "browser_wait_for",
+      "args": {
+        "time": 1
+      }
+    },
+    {
+      "tool": "browser_console_messages",
+      "args": {
+        "level": "info",
+        "all": true,
+        "filename": "artifacts/retest-browser-control-console.log"
+      }
+    },
+    {
+      "tool": "browser_snapshot",
+      "args": {
+        "depth": 4,
+        "filename": "artifacts/retest-browser-control-snapshot.md"
+      }
+    },
+    {
+      "tool": "browser_take_screenshot",
+      "args": {
+        "type": "png",
+        "filename": "artifacts/retest-browser-control.png",
+        "fullPage": true
+      }
+    }
+  ]
+}

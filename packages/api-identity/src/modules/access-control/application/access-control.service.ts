@@ -12,11 +12,11 @@ import {
   assertCanAssignRoles,
   assertCanManagePrivilegedAccount,
 } from '../domain/role-assignment.policy';
-import { AccessProfileUseCase } from './access-profile.use-case';
-import { ReplaceUserRolesUseCase } from './replace-user-roles.use-case';
-import { RoleManagementUseCase } from './role-management.use-case';
-import { RoleQueryUseCase } from './role-query.use-case';
-import { SeedAccessControlUseCase } from './seed-access-control.use-case';
+import { AccessProfileUseCase } from './use-cases/access-profile.use-case';
+import { ReplaceUserRolesUseCase } from './use-cases/replace-user-roles.use-case';
+import { RoleManagementUseCase } from './use-cases/role-management.use-case';
+import { RoleQueryUseCase } from './use-cases/role-query.use-case';
+import { SeedAccessControlUseCase } from './use-cases/seed-access-control.use-case';
 
 export type { AccessProfileView, RoleView as RoleDto } from './access-control.types';
 

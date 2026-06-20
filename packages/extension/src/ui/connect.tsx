@@ -16,8 +16,6 @@
 
 import React, { useCallback, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { Button, TabItem } from './tabItem';
-import { AuthTokenSection, getOrCreateAuthToken } from './authToken';
 
 type Status =
   | { type: 'connecting'; message: string }
@@ -28,13 +26,10 @@ type Status =
 const SUPPORTED_PROTOCOL_VERSION = 2;
 
 const ConnectApp: React.FC = () => {
-  const [tabs, setTabs] = useState<chrome.tabs.Tab[]>([]);
   const [status, setStatus] = useState<Status | null>(null);
-  const [showTabList, setShowTabList] = useState(true);
   const [clientInfo, setClientInfo] = useState('unknown');
 
   const setError = useCallback((message: string) => {
-    setShowTabList(false);
     setStatus({ type: 'error', message });
   }, []);
 
@@ -51,7 +46,7 @@ const ConnectApp: React.FC = () => {
       try {
         const host = new URL(relayUrl).hostname;
         if (host !== '127.0.0.1' && host !== '[::1]') {
-          setError(`Playwright extension only allows loopback connections (127.0.0.1 or [::1]). Received host: ${host}`);
+          setError(`Browser Control only allows loopback connections (127.0.0.1 or [::1]). Received host: ${host}`);
           return;
         }
       } catch (e) {
@@ -65,7 +60,7 @@ const ConnectApp: React.FC = () => {
         setClientInfo(info);
         setStatus({
           type: 'connecting',
-          message: `"${info}" is trying to connect to the Playwright Extension.`
+          message: `"${info}" is trying to connect to Browser Control.`
         });
       } catch (e) {
         setStatus({ type: 'error', message: 'Failed to parse client version.' });
@@ -76,7 +71,6 @@ const ConnectApp: React.FC = () => {
       const requestedVersion = isNaN(parsedVersion) ? 1 : parsedVersion;
       if (requestedVersion > SUPPORTED_PROTOCOL_VERSION) {
         const extensionVersion = chrome.runtime.getManifest().version;
-        setShowTabList(false);
         setStatus({
           type: 'error',
           versionMismatch: {
@@ -85,31 +79,28 @@ const ConnectApp: React.FC = () => {
         });
         return;
       }
+
+      const currentTab = await chrome.tabs.getCurrent();
+      const selectorTabId = currentTab?.id;
+      if (selectorTabId === undefined) {
+        setError('Unable to determine the current browser tab.');
+        return;
+      }
       // The background decides per protocolVersion: v1 opens the relay WS
       // immediately (the daemon expects a prompt connection); v2 just records
       // the descriptor and defers the WS until the user clicks Allow.
-      const response = await chrome.runtime.sendMessage({ type: 'connectionRequested', mcpRelayUrl: relayUrl, protocolVersion: requestedVersion });
+      const response = await chrome.runtime.sendMessage({
+        type: 'connectionRequested',
+        mcpRelayUrl: relayUrl,
+        protocolVersion: requestedVersion,
+        selectorTabId,
+      });
       if (!response.success) {
         setError(response.error);
         return;
       }
 
-      const expectedToken = getOrCreateAuthToken();
-      const token = params.get('token');
-      if (token === expectedToken) {
-        await handleConnectToTab();
-        return;
-      }
-      if (token) {
-        setError('Invalid token provided.');
-        return;
-      }
-
-      // If this is a browser_navigate command, hide the tab list and show simple allow/reject
-      if (params.get('newTab') === 'true')
-        setShowTabList(false);
-      else
-        await loadTabs();
+      await handleConnectToTab(selectorTabId);
     };
     void runAsync();
     // Ping the background every 20s so the MV3 service worker (which owns the
@@ -120,22 +111,13 @@ const ConnectApp: React.FC = () => {
     return () => clearInterval(keepalive);
   }, []);
 
-  const loadTabs = useCallback(async () => {
-    const response = await chrome.runtime.sendMessage({ type: 'getTabs' });
-    if (response.success)
-      setTabs(response.tabs);
-    else
-      setStatus({ type: 'error', message: 'Failed to load tabs: ' + response.error });
-  }, []);
-
-  const handleConnectToTab = useCallback(async (tab?: chrome.tabs.Tab) => {
-    setShowTabList(false);
-
+  const handleConnectToTab = useCallback(async (selectorTabId: number, tab?: chrome.tabs.Tab) => {
     try {
       const response = await chrome.runtime.sendMessage({
         type: 'connectToTab',
         tab,
         clientName: clientInfo,
+        selectorTabId,
       });
 
       if (response?.success) {
@@ -149,7 +131,7 @@ const ConnectApp: React.FC = () => {
     } catch (e) {
       setStatus({
         type: 'error',
-        message: `"${clientInfo}" failed to connect: ${e}`
+      message: `"${clientInfo}" failed to connect: ${e}`
       });
     }
   }, [clientInfo]);
@@ -158,7 +140,7 @@ const ConnectApp: React.FC = () => {
     const listener = (message: any) => {
       if (message.type === 'pendingConnectionClosed') {
         setError('Pending client connection closed.');
-        document.title = 'Playwright Extension';
+        document.title = 'Browser Control';
       }
     };
     chrome.runtime.onMessage.addListener(listener);
@@ -175,41 +157,6 @@ const ConnectApp: React.FC = () => {
             <StatusBanner status={status} />
           </div>
         )}
-
-        {status?.type === 'connecting' && (
-          <div className='warning-banner'>
-            <strong>⚠️ Warning:</strong> Allowing this connection exposes the entire browser to the client,
-            including any signed-in sessions, cookies, and content in other tabs and windows.
-            Once approved, the client may also be able to reconnect later without showing this dialog again,
-            unless you regenerate the token below and then restart the browser.
-          </div>
-        )}
-
-        {status?.type === 'connecting' && (
-          <AuthTokenSection />
-        )}
-
-        {showTabList && (
-          <div>
-            <div className='tab-section-title'>
-              You can drag tabs into the Playwright group later to make them accessible to the client.
-              Optionally, select a tab to allow and immediately switch to it:
-            </div>
-            <div>
-              {tabs.map(tab => (
-                <TabItem
-                  key={tab.id}
-                  tab={tab}
-                  button={
-                    <Button variant='primary' onClick={() => handleConnectToTab(tab)}>
-                      Allow &amp; select
-                    </Button>
-                  }
-                />
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
@@ -220,8 +167,8 @@ const VersionMismatchError: React.FC<{ extensionVersion: string }> = ({ extensio
   const chromeWebStoreUrl = 'https://chromewebstore.google.com/detail/playwright-extension/mmlmfjhmonkocbjadbfplnigmagldckm';
   return (
     <div>
-      Playwright client trying to connect requires newer extension version (current version: {extensionVersion}).{' '}
-      Update <a href={chromeWebStoreUrl} target='_blank' rel='noopener noreferrer'>Playwright Extension</a> from the Chrome Web Store to the latest version.{' '}
+      Browser Control client trying to connect requires newer extension version (current version: {extensionVersion}).{' '}
+      Update <a href={chromeWebStoreUrl} target='_blank' rel='noopener noreferrer'>Browser Control</a> from the Chrome Web Store to the latest version.{' '}
       See <a href={readmeUrl} target='_blank' rel='noopener noreferrer'>installation instructions</a> for more details.
     </div>
   );

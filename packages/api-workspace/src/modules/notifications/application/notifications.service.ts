@@ -19,11 +19,11 @@ import type {
   SendNotificationRequestCommand,
 } from './notifications.types';
 
-import { NotificationDeliveryUseCase } from './notification-delivery.use-case';
-import { NotificationDeviceUseCase } from './notification-device.use-case';
-import { NotificationDispatchService } from './notification-dispatch.service';
-import { NotificationInboxUseCase } from './notification-inbox.use-case';
-import { SendNotificationUseCase } from './send-notification.use-case';
+import { NotificationDispatchService } from './services/notification-dispatch.service';
+import { NotificationDeliveryUseCase } from './use-cases/notification-delivery.use-case';
+import { NotificationDeviceUseCase } from './use-cases/notification-device.use-case';
+import { NotificationInboxUseCase } from './use-cases/notification-inbox.use-case';
+import { SendNotificationUseCase } from './use-cases/send-notification.use-case';
 
 export type {
   NotificationView as NotificationDto,

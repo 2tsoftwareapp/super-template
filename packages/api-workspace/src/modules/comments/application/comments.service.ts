@@ -1,34 +1,29 @@
-import type {
-  AuthenticatedRequestUser,
-  RequestContext } from '@repo/api-core';
+import type { AuthenticatedRequestUser, RequestContext } from '@repo/api-core';
 
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { ACTION, AppError, AUDIT_WRITER, type AuditWriter, ERROR_CODES, perm, requireOrganizationId } from '@repo/api-core';
+import { Injectable } from '@nestjs/common';
 
 import type {
   CreateCommentCommand,
   ListCommentsQuery,
-  UpdateCommentCommand } from './comments.types';
+  UpdateCommentCommand,
+} from './comments.types';
 
-import { CommentsRepository } from '../infrastructure/comments.repository';
+import { CreateCommentUseCase } from './use-cases/create-comment.use-case';
+import { DeleteCommentUseCase } from './use-cases/delete-comment.use-case';
+import { ListCommentsUseCase } from './use-cases/list-comments.use-case';
+import { UpdateCommentUseCase } from './use-cases/update-comment.use-case';
 
 @Injectable()
 export class CommentsService {
   constructor(
-    private readonly commentsRepository: CommentsRepository,
-    @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
+    private readonly listCommentsUseCase: ListCommentsUseCase,
+    private readonly createCommentUseCase: CreateCommentUseCase,
+    private readonly updateCommentUseCase: UpdateCommentUseCase,
+    private readonly deleteCommentUseCase: DeleteCommentUseCase,
   ) {}
 
   async list(query: ListCommentsQuery) {
-    const result = await this.commentsRepository.listByEntity({
-      page: query.page,
-      limit: query.limit,
-      entityType: query.entityType,
-      entityId: query.entityId });
-
-    return {
-      rows: result.rows.map((row) => this.toDto(row)),
-      total: result.total };
+    return this.listCommentsUseCase.execute(query);
   }
 
   async create(
@@ -36,35 +31,7 @@ export class CommentsService {
     input: CreateCommentCommand,
     requestContext?: RequestContext,
   ) {
-    if (!actor.permissions.includes(perm('comments', ACTION.CREATE))) {
-      throw new AppError(
-        ERROR_CODES.AUTH_FORBIDDEN,
-        'You do not have permission to create comments',
-        HttpStatus.FORBIDDEN,
-      );
-    }
-
-    const comment = await this.commentsRepository.create({
-      organizationId: requireOrganizationId(actor),
-      entityType: input.entityType,
-      entityId: input.entityId,
-      parentId: input.parentId ?? null,
-      authorId: actor.userId,
-      content: input.content });
-
-    if (!comment) {
-      throw new Error('Comment insert returned no rows');
-    }
-
-    await this.auditWriter.log({
-      actorId: actor.userId,
-      action: 'comment.created',
-      entityType: input.entityType,
-      entityId: input.entityId,
-      metadata: { commentId: comment.id },
-      requestContext });
-
-    return this.toDto(comment);
+    return this.createCommentUseCase.execute(actor, input, requestContext);
   }
 
   async update(
@@ -73,40 +40,12 @@ export class CommentsService {
     input: UpdateCommentCommand,
     requestContext?: RequestContext,
   ) {
-    const comment = await this.commentsRepository.findById(commentId);
-
-    if (!comment) {
-      throw new AppError(
-        ERROR_CODES.COMMENT_NOT_FOUND,
-        'Comment not found',
-        HttpStatus.NOT_FOUND,
-      );
-    }
-
-    const canModerate = actor.permissions.includes(
-      perm('comments', ACTION.UPDATE),
+    return this.updateCommentUseCase.execute(
+      actor,
+      commentId,
+      input,
+      requestContext,
     );
-
-    if (comment.authorId !== actor.userId && !canModerate) {
-      throw new AppError(
-        ERROR_CODES.AUTH_FORBIDDEN,
-        'You cannot update this comment',
-        HttpStatus.FORBIDDEN,
-      );
-    }
-
-    const updated = await this.commentsRepository.update(commentId, {
-      content: input.content });
-
-    await this.auditWriter.log({
-      actorId: actor.userId,
-      action: 'comment.updated',
-      entityType: comment.entityType,
-      entityId: comment.entityId,
-      metadata: { commentId },
-      requestContext });
-
-    return this.toDto(updated ?? comment);
   }
 
   async delete(
@@ -114,50 +53,6 @@ export class CommentsService {
     commentId: string,
     requestContext?: RequestContext,
   ) {
-    const comment = await this.commentsRepository.findById(commentId);
-
-    if (!comment) {
-      throw new AppError(
-        ERROR_CODES.COMMENT_NOT_FOUND,
-        'Comment not found',
-        HttpStatus.NOT_FOUND,
-      );
-    }
-
-    const canDeleteOthers = actor.permissions.includes(
-      perm('comments', ACTION.DELETE),
-    );
-
-    if (comment.authorId !== actor.userId && !canDeleteOthers) {
-      throw new AppError(
-        ERROR_CODES.AUTH_FORBIDDEN,
-        'You cannot delete this comment',
-        HttpStatus.FORBIDDEN,
-      );
-    }
-
-    await this.commentsRepository.softDelete(commentId);
-
-    await this.auditWriter.log({
-      actorId: actor.userId,
-      action: 'comment.deleted',
-      entityType: comment.entityType,
-      entityId: comment.entityId,
-      metadata: { commentId },
-      requestContext });
-  }
-
-  private toDto(
-    comment: NonNullable<Awaited<ReturnType<CommentsRepository['findById']>>>,
-  ) {
-    return {
-      id: comment.id,
-      entityType: comment.entityType,
-      entityId: comment.entityId,
-      parentId: comment.parentId ?? null,
-      authorId: comment.authorId,
-      content: comment.content,
-      createdAt: comment.createdAt.toISOString(),
-      updatedAt: comment.updatedAt.toISOString() };
+    return this.deleteCommentUseCase.execute(actor, commentId, requestContext);
   }
 }

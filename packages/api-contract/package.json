@@ -12,6 +12,9 @@
     "lint": "eslint .",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
+  "dependencies": {
+    "@repo/api-sort": "workspace:*"
+  },
   "devDependencies": {
     "@repo/tsconfig": "workspace:*",
     "typescript": "5.9.3",

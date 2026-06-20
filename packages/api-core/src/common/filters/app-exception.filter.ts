@@ -43,6 +43,40 @@ function toLogDetails(value: unknown): JsonValue | null {
   }
 }
 
+interface ExceptionContextBase {
+  errorCode: ErrorCode;
+  method: string;
+  path: string;
+  requestId?: string;
+  stack?: string;
+  statusCode: number;
+  userId: string | null;
+}
+
+function buildExceptionContextBase(input: {
+  code: ErrorCode;
+  environmentService: EnvironmentService;
+  exception: unknown;
+  request: Request;
+  statusCode: number;
+}): ExceptionContextBase {
+  const { code, environmentService, exception, request, statusCode } = input;
+
+  return {
+    requestId: request.requestId,
+    method: request.method,
+    path: request.originalUrl,
+    statusCode,
+    userId: request.user?.userId ?? null,
+    errorCode: code,
+    ...(!environmentService.isProduction &&
+    exception instanceof Error &&
+    exception.stack
+      ? { stack: exception.stack }
+      : {}),
+  };
+}
+
 @Injectable()
 @Catch()
 export class AppExceptionFilter implements ExceptionFilter {
@@ -92,34 +126,22 @@ export class AppExceptionFilter implements ExceptionFilter {
     // Persist the resolved code for downstream logging/middleware that runs after the exception handler.
     response.locals.errorCode = code;
 
-    const reportContext: ErrorReportContext = {
-      requestId: request.requestId,
-      method: request.method,
-      path: request.originalUrl,
+    const contextBase = buildExceptionContextBase({
+      code,
+      environmentService: this.environmentService,
+      exception,
+      request,
       statusCode,
-      userId: request.user?.userId ?? null,
-      errorCode: code,
+    });
+
+    const reportContext: ErrorReportContext = {
+      ...contextBase,
       details,
-      ...( !this.environmentService.isProduction &&
-      exception instanceof Error &&
-      exception.stack
-        ? { stack: exception.stack }
-        : {}),
     };
 
     const logContext: JsonObject = {
-      requestId: request.requestId,
-      method: request.method,
-      path: request.originalUrl,
-      statusCode,
-      userId: request.user?.userId ?? null,
-      errorCode: code,
+      ...contextBase,
       details: toLogDetails(details),
-      ...( !this.environmentService.isProduction &&
-      exception instanceof Error &&
-      exception.stack
-        ? { stack: exception.stack }
-        : {}),
     };
 
     if (statusCode >= HttpStatus.INTERNAL_SERVER_ERROR) {
@@ -131,6 +153,13 @@ export class AppExceptionFilter implements ExceptionFilter {
       }
     } else {
       this.logger.warn('Handled request exception', logContext);
+    }
+
+    // A streamed response (e.g. SSE) may have already flushed headers; writing a
+    // JSON body here would throw ERR_HTTP_HEADERS_SENT. The error is already logged
+    // and reported above, so just stop.
+    if (response.headersSent) {
+      return;
     }
 
     response.status(statusCode).json({

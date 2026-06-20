@@ -1,0 +1,37 @@
+{
+  "cleanup": "created-tabs",
+  "steps": [
+    {
+      "tool": "browser_tabs",
+      "args": {
+        "action": "list"
+      }
+    },
+    {
+      "tool": "browser_navigate",
+      "args": {
+        "url": "http://localhost:3005/"
+      }
+    },
+    {
+      "tool": "browser_wait_for",
+      "args": {
+        "time": 1
+      }
+    },
+    {
+      "tool": "browser_tabs",
+      "args": {
+        "action": "list"
+      }
+    },
+    {
+      "tool": "browser_console_messages",
+      "args": {
+        "level": "info",
+        "all": true,
+        "filename": "artifacts/retest-browser-control-console.log"
+      }
+    }
+  ]
+}

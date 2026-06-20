@@ -1,12 +1,12 @@
 {
   "name": "@repo/extension",
-  "version": "1.0.0",
+  "version": "1.0.4",
   "private": true,
   "type": "module",
   "scripts": {
     "build": "vite build",
     "watch": "vite build --watch",
-    "dev": "node ../../scripts/run-with-port.mjs EXTENSION_MCP_PORT 9224 pnpm exec playwright-mcp --extension --shared-browser-context",
+    "dev": "node ./scripts/browser-control-server.mjs",
     "start": "pnpm run dev",
     "lint": "eslint .",
     "typecheck": "tsc -p tsconfig.json --noEmit"
@@ -16,6 +16,7 @@
     "react-dom": "19.2.4"
   },
   "devDependencies": {
+    "@modelcontextprotocol/sdk": "1.29.0",
     "@playwright/mcp": "0.0.76",
     "@repo/eslint-config": "workspace:*",
     "@repo/tsconfig": "workspace:*",

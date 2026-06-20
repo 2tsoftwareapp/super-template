@@ -1,0 +1,155 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - img [ref=e7]
+          - generic [ref=e9]: Super Template
+        - navigation [ref=e10]:
+          - link "Features" [ref=e11] [cursor=pointer]:
+            - /url: "#features"
+          - link "Architecture" [ref=e12] [cursor=pointer]:
+            - /url: "#architecture"
+          - link "Stack" [ref=e13] [cursor=pointer]:
+            - /url: "#stack"
+          - link "Get started" [ref=e14] [cursor=pointer]:
+            - /url: "#get-started"
+        - button "GitHub" [ref=e16] [cursor=pointer]:
+          - img
+          - text: GitHub
+    - generic [ref=e19]:
+      - generic [ref=e20]: Production-ready · pnpm monorepo · MIT licensed
+      - heading "Ship your product. Not your boilerplate." [level=1] [ref=e21]
+      - paragraph [ref=e22]: A complete monorepo with Next.js web and admin apps, NestJS, Flutter, and shared @repo/web-core logic — wired together with a contract-driven API, seeded auth, and production tooling from day one.
+      - generic [ref=e23]:
+        - button "See what's included" [ref=e24] [cursor=pointer]
+        - button "Get started" [ref=e25] [cursor=pointer]
+      - generic [ref=e26]:
+        - generic [ref=e27]:
+          - img [ref=e28]
+          - text: Contract-driven API
+        - generic [ref=e31]:
+          - img [ref=e32]
+          - text: Seeded admin account
+        - generic [ref=e35]:
+          - img [ref=e36]
+          - text: One-command bootstrap
+        - generic [ref=e39]:
+          - img [ref=e40]
+          - text: Full CI pipeline
+    - generic [ref=e44]:
+      - generic [ref=e45]:
+        - generic [ref=e46]: What's inside
+        - heading "Everything connected, nothing missing" [level=2] [ref=e47]
+        - paragraph [ref=e48]: Four apps sharing one database schema and one API contract. Change the schema, regenerate — all clients update automatically.
+      - generic [ref=e49]:
+        - generic [ref=e51]:
+          - img [ref=e53]
+          - generic [ref=e57]
+        - generic [ref=e70]:
+          - img [ref=e72]
+          - generic [ref=e74]
+        - generic [ref=e87]:
+          - img [ref=e89]
+          - generic [ref=e91]
+        - generic [ref=e104]:
+          - img [ref=e106]
+          - generic [ref=e108]
+    - generic [ref=e121]:
+      - generic [ref=e122]:
+        - generic [ref=e123]: Architecture
+        - heading "Three surfaces, one backend" [level=2] [ref=e124]
+        - paragraph [ref=e125]: The NestJS API serves all three frontends from a single Postgres database. Web and admin traffic flow through Next.js BFFs that share @repo/web-core, while Flutter talks directly to the API.
+      - img "System architecture diagram" [ref=e127]:
+        - generic [ref=e128]: CLIENTS
+        - generic [ref=e129]: BFF
+        - generic [ref=e130]: API
+        - generic [ref=e131]: INFRA
+        - generic [ref=e133]: Web Browser
+        - generic [ref=e134]: Next.js App Router
+        - generic [ref=e136]: Admin Browser
+        - generic [ref=e137]: Next.js Admin
+        - generic [ref=e139]: Flutter App
+        - generic [ref=e140]: iOS · Android
+        - generic [ref=e142]: Next.js 16 Web BFF
+        - generic [ref=e143]: HttpOnly cookies · CSRF
+        - generic [ref=e145]: Next.js 16 Admin BFF
+        - generic [ref=e146]: HttpOnly cookies · CSRF
+        - generic [ref=e148]: NestJS 11 API
+        - generic [ref=e149]: auth · users · access-control · audit · notifications · projects
+        - generic [ref=e150]: storage · mail · jobs · invitations · imports/exports · comments
+        - generic [ref=e151]: Drizzle ORM · Argon2 · JWT access + refresh rotation · OpenAPI schema auto-generated
+        - generic [ref=e153]: PostgreSQL
+        - generic [ref=e154]: Primary datastore
+        - generic [ref=e156]: Mailpit / SMTP
+        - generic [ref=e157]: Email delivery
+        - generic [ref=e159]: AWS S3
+        - generic [ref=e160]: Object storage
+        - generic [ref=e162]: Firebase FCM
+        - generic [ref=e163]: Mobile push
+    - generic [ref=e165]:
+      - generic [ref=e166]:
+        - generic [ref=e167]:
+          - paragraph [ref=e168]: Tech stack
+          - heading "Every dependency chosen for production, not demos." [level=2] [ref=e169]
+        - paragraph [ref=e170]: 16 packages across 6 layers. Every version pinned. Every choice documented.
+      - generic [ref=e171]:
+        - generic [ref=e172]:
+          - generic [ref=e174]: Web
+          - generic [ref=e176]
+          - generic [ref=e180]
+          - generic [ref=e184]
+          - generic [ref=e188]
+        - generic [ref=e192]:
+          - generic [ref=e194]: Shared
+          - generic [ref=e196]
+        - generic [ref=e200]:
+          - generic [ref=e202]: API
+          - generic [ref=e204]
+          - generic [ref=e208]
+          - generic [ref=e212]
+        - generic [ref=e216]:
+          - generic [ref=e218]: Admin
+          - generic [ref=e220]
+          - generic [ref=e224]
+        - generic [ref=e228]:
+          - generic [ref=e230]: Mobile
+          - generic [ref=e232]
+          - generic [ref=e236]
+        - generic [ref=e240]:
+          - generic [ref=e242]: Tooling
+          - generic [ref=e244]
+          - generic [ref=e248]
+          - generic [ref=e252]
+          - generic [ref=e256]
+    - generic [ref=e261]:
+      - generic [ref=e262]:
+        - generic [ref=e263]: Get started
+        - heading "Running in under 5 minutes" [level=2] [ref=e264]
+        - paragraph [ref=e265]: Docker, pnpm, and the Flutter SDK are all you need.
+      - generic [ref=e266]:
+        - generic [ref=e267]:
+          - paragraph [ref=e268]: "01"
+          - heading "Clone the repo" [level=3] [ref=e269]
+          - paragraph [ref=e270]: One git clone to get the full monorepo — web, API, admin, and Flutter mobile.
+          - code [ref=e272]: $ git clone https://github.com/truongnat/super-template
+        - generic [ref=e273]:
+          - paragraph [ref=e274]: "02"
+          - heading "Bootstrap" [level=3] [ref=e275]
+          - paragraph [ref=e276]: Installs deps, starts Postgres, migrates, seeds demo accounts, and generates all API contracts.
+          - code [ref=e278]: $ make bootstrap
+        - generic [ref=e279]:
+          - paragraph [ref=e280]: "03"
+          - heading "Start building" [level=3] [ref=e281]
+          - paragraph [ref=e282]: All apps start in parallel. Replace the placeholder content with your product.
+          - code [ref=e284]: $ make dev
+    - contentinfo [ref=e285]:
+      - generic [ref=e287]:
+        - generic [ref=e288]:
+          - img [ref=e290]
+          - generic [ref=e292]: Super Template
+        - paragraph [ref=e293]: Production-ready fullstack starter. MIT licensed.
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e299] [cursor=pointer]:
+    - img [ref=e300]
+  - alert [ref=e303]

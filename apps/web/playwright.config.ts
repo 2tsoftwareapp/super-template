@@ -1,4 +1,4 @@
-import { defineConfig, devices } from "@playwright/test";
+import { defineConfig, devices, type PlaywrightTestConfig } from "@playwright/test";
 import { config as loadEnv } from "dotenv";
 import { resolve } from "node:path";
 
@@ -21,10 +21,40 @@ const apiHealthUrl =
   process.env.PLAYWRIGHT_API_HEALTH_URL ??
   `http://localhost:${apiPort}/api/v1/health`;
 
+const toStringEnv = (env: NodeJS.ProcessEnv): Record<string, string> =>
+  Object.fromEntries(Object.entries(env).filter((entry): entry is [string, string] => entry[1] !== undefined));
+
 // Create clean environment for API without test-specific database URLs
 const apiEnv = { ...process.env };
 delete apiEnv.DATABASE_URL_TEST;
 delete apiEnv.DATABASE_URL_TEST_ADMIN;
+
+const webServer: PlaywrightTestConfig["webServer"] = process.env.PLAYWRIGHT_SKIP_WEBSERVER
+  ? undefined
+  : [
+      {
+        command: "pnpm --filter api dev",
+        cwd: resolve(__dirname, "../.."),
+        url: apiHealthUrl,
+        reuseExistingServer: !process.env.CI,
+        timeout: 180_000,
+        env: {
+          ...toStringEnv(apiEnv),
+          APP_ENV: "development",
+          DATABASE_URL: databaseUrl,
+          DATABASE_MIGRATE_URL: migrateUrl,
+          NODE_ENV: "development",
+        },
+      },
+      {
+        command: "pnpm --filter web dev",
+        cwd: resolve(__dirname, "../.."),
+        url: baseURL,
+        reuseExistingServer: !process.env.CI,
+        timeout: 180_000,
+        env: toStringEnv(process.env),
+      },
+    ];
 
 export default defineConfig({
   testDir: "./e2e",
@@ -42,32 +72,5 @@ export default defineConfig({
       use: { ...devices["Desktop Chrome"] },
     },
   ],
-  webServer: !process.env.PLAYWRIGHT_SKIP_WEBSERVER
-    ? [
-        {
-          command: "pnpm --filter api dev",
-          cwd: resolve(__dirname, "../.."),
-          url: apiHealthUrl,
-          reuseExistingServer: !process.env.CI,
-          timeout: 180_000,
-          env: {
-            ...apiEnv,
-            APP_ENV: "development",
-            DATABASE_URL: databaseUrl,
-            DATABASE_MIGRATE_URL: migrateUrl,
-            NODE_ENV: "development",
-          },
-        },
-        {
-          command: "pnpm --filter web dev",
-          cwd: resolve(__dirname, "../.."),
-          url: baseURL,
-          reuseExistingServer: !process.env.CI,
-          timeout: 180_000,
-          env: {
-            ...process.env,
-          },
-        },
-      ]
-    : undefined,
+  ...(webServer ? { webServer } : {}),
 });

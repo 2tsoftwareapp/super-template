@@ -1,5 +1,6 @@
 {
   "name": "@repo/api-bootstrap",
+  "description": "Composition-root bootstrap and seeding helpers for local and test setup.",
   "version": "1.0.0",
   "private": true,
   "type": "commonjs",

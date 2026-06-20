@@ -1,6 +1,8 @@
 import { Test } from '@nestjs/testing';
 import { ImportExportAdapterRegistry } from '@repo/api-core';
 import { ExportsService } from '@repo/api-platform/modules/exports/application/exports.service';
+import { CreateExportUseCase } from '@repo/api-platform/modules/exports/application/use-cases/create-export.use-case';
+import { GetExportUseCase } from '@repo/api-platform/modules/exports/application/use-cases/get-export.use-case';
 import { ExportJobsRepository } from '@repo/api-platform/modules/exports/infrastructure/export-jobs.repository';
 import { AuditService } from '@repo/api-platform/modules/audit/application/audit.service';
 import { FilesRepository } from '@repo/api-platform/modules/files/infrastructure/files.repository';
@@ -46,6 +48,8 @@ describe('ExportsService idempotency', () => {
     const moduleRef = await Test.createTestingModule({
       providers: [
         ExportsService,
+        CreateExportUseCase,
+        GetExportUseCase,
         { provide: ExportJobsRepository, useValue: exportJobsRepository },
         { provide: FilesRepository, useValue: {} },
         {

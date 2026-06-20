@@ -189,10 +189,7 @@ test.describe("Auth — password reset", () => {
 });
 
 test.describe("Auth — email verification", () => {
-  test("user cannot log in with unverified email", async ({
-    page,
-    _request,
-  }) => {
+  test("user cannot log in with unverified email", async ({ page }) => {
     const email = uniqueEmail("playwright-unverified");
 
     await page.goto("/register");
@@ -310,10 +307,7 @@ test.describe("Auth — authenticated settings", () => {
 });
 
 test.describe("Auth — multiple sessions", () => {
-  test("user can open multiple concurrent sessions", async ({
-    browser,
-    _request,
-  }) => {
+  test("user can open multiple concurrent sessions", async ({ browser }) => {
     const credentials = {
       email: SEED_USER.email,
       password: SEED_USER.password,

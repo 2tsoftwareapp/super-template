@@ -10,62 +10,67 @@ import { getTenantContext } from './tenant-context.service';
 export const DATABASE_POOL = Symbol('DATABASE_POOL');
 export const DATABASE = Symbol('DATABASE');
 
-const createTenantAwarePool = (config: PoolConfig): Pool => {
-  // Every pool checkout must re-apply tenant GUCs; bypassing this pool with a raw
-  // DATABASE_POOL client would leak or drop tenant context across requests.
-  const pool = new Pool(config);
-  const originalConnect = pool.connect.bind(pool);
+type PoolRelease = (err?: Error) => void;
+type PoolConnectCallback = (
+  err: Error | undefined,
+  client: PoolClient | undefined,
+  release: PoolRelease,
+) => void;
+type PoolQueryCallback<TResult = unknown> = (
+  err: Error | undefined,
+  result: TResult | undefined,
+) => void;
 
-  const applyTenantContext = async (client: PoolClient): Promise<void> => {
-    await setTenantContextOnPgClient(client, getTenantContext());
-  };
+function invokeConnectCallback(
+  callback: PoolConnectCallback,
+  err: Error | undefined,
+  client: PoolClient | undefined,
+  release: PoolRelease,
+): void {
+  callback(err, client, release);
+}
 
-  const withTenantContextClient = async <T>(
-    operation: (client: PoolClient) => Promise<T>,
-  ): Promise<T> => {
-    const client = await originalConnect();
+async function executeClientQuery<TResult>(
+  client: PoolClient,
+  args: readonly unknown[],
+): Promise<TResult> {
+  return (client.query as (...input: readonly unknown[]) => Promise<TResult>)(
+    ...args,
+  );
+}
 
-    try {
-      await applyTenantContext(client);
-      return await operation(client);
-    } finally {
-      client.release();
-    }
-  };
+export async function withTenantContextClient<T>(
+  checkoutClient: () => Promise<PoolClient>,
+  applyTenantContext: (client: PoolClient) => Promise<void>,
+  operation: (client: PoolClient) => Promise<T>,
+): Promise<T> {
+  const client = await checkoutClient();
 
-  pool.connect = ((callback?: unknown) => {
+  try {
+    await applyTenantContext(client);
+    return await operation(client);
+  } finally {
+    client.release();
+  }
+}
+
+export function createTenantAwareConnect(
+  originalConnect: Pool['connect'],
+  applyTenantContext: (client: PoolClient) => Promise<void>,
+): Pool['connect'] {
+  return ((callback?: PoolConnectCallback) => {
     if (typeof callback === 'function') {
       originalConnect((err, client, release) => {
         if (err || !client) {
-          (
-            callback as (
-              err: Error | undefined,
-              client: PoolClient,
-              release: (err?: Error) => void,
-            ) => void
-          )(err, client!, release);
+          invokeConnectCallback(callback, err, client, release);
           return;
         }
 
         void applyTenantContext(client)
-          .then(() =>
-            (
-              callback as (
-                err: Error | undefined,
-                client: PoolClient,
-                release: (err?: Error) => void,
-              ) => void
-            )(undefined, client, release),
-          )
+          .then(() => invokeConnectCallback(callback, undefined, client, release))
           .catch((error: Error) => {
             release(error);
-            (
-              callback as (
-                err: Error | undefined,
-                client: PoolClient,
-                release: (err?: Error) => void,
-              ) => void
-            )(error, client, release);
+            invokeConnectCallback(callback, error, client, release);
           });
       });
       return;
@@ -75,35 +80,50 @@ const createTenantAwarePool = (config: PoolConfig): Pool => {
       await applyTenantContext(client);
       return client;
     });
-  }) as typeof pool.connect;
+  }) as typeof originalConnect;
+}
 
-  pool.query = ((...args: unknown[]) => {
+export function createTenantAwareQuery(
+  checkoutClient: () => Promise<PoolClient>,
+  applyTenantContext: (client: PoolClient) => Promise<void>,
+): Pool['query'] {
+  return ((...args: unknown[]) => {
     const maybeCallback = args.at(-1);
 
     if (typeof maybeCallback === 'function') {
-      const callback = maybeCallback as (
-        err: Error | undefined,
-        result: unknown,
-      ) => void;
-      const queryArgs = args.slice(0, -1) as Parameters<PoolClient['query']>;
+      const callback = maybeCallback as PoolQueryCallback;
+      const queryArgs = args.slice(0, -1);
 
       void withTenantContextClient(
-        (client) =>
-          (client.query as (...input: unknown[]) => Promise<unknown>)(
-            ...queryArgs,
-          ),
+        checkoutClient,
+        applyTenantContext,
+        (client) => executeClientQuery(client, queryArgs),
       )
         .then((result) => callback(undefined, result))
         .catch((error: Error) => callback(error, undefined));
       return;
     }
 
-    return withTenantContextClient((client) =>
-      (client.query as (...input: unknown[]) => Promise<unknown>)(
-        ...(args as Parameters<PoolClient['query']>),
-      ),
+    return withTenantContextClient(
+      checkoutClient,
+      applyTenantContext,
+      (client) => executeClientQuery(client, args),
     );
-  }) as typeof pool.query;
+  }) as Pool['query'];
+}
+
+export const createTenantAwarePool = (config: PoolConfig): Pool => {
+  // Every pool checkout must re-apply tenant GUCs; bypassing this pool with a raw
+  // DATABASE_POOL client would leak or drop tenant context across requests.
+  const pool = new Pool(config);
+  const originalConnect = pool.connect.bind(pool);
+
+  const applyTenantContext = async (client: PoolClient): Promise<void> => {
+    await setTenantContextOnPgClient(client, getTenantContext());
+  };
+
+  pool.connect = createTenantAwareConnect(originalConnect, applyTenantContext);
+  pool.query = createTenantAwareQuery(originalConnect, applyTenantContext);
 
   return pool;
 };
@@ -112,12 +132,19 @@ export const databaseProviders: Provider[] = [
   {
     provide: DATABASE_POOL,
     inject: [EnvironmentService],
-    useFactory: (environmentService: EnvironmentService) =>
-      createTenantAwarePool({
-        connectionString: environmentService.isTest
-          ? environmentService.values.DATABASE_URL_TEST
-          : environmentService.values.DATABASE_URL,
-      }),
+    useFactory: (environmentService: EnvironmentService) => {
+      const connectionString = environmentService.isTest
+        ? environmentService.databaseUrlTest
+        : environmentService.databaseUrl;
+
+      if (!connectionString) {
+        throw new Error(
+          'DATABASE_URL_TEST is required when APP_ENV=test but was not provided',
+        );
+      }
+
+      return createTenantAwarePool({ connectionString });
+    },
   },
   {
     provide: DATABASE,

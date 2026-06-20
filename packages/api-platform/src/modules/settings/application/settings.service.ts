@@ -4,42 +4,28 @@ import type {
 } from '@repo/api-core';
 import type { DatabaseExecutor } from '@repo/api-database';
 
-import { HttpStatus, Injectable } from '@nestjs/common';
-import { ERROR_CODES } from '@repo/api-core';
-import { AppError } from '@repo/api-core';
+import { Injectable } from '@nestjs/common';
 
 import type { UpdateSettingCommand } from './settings.types';
 
-import { AuditService } from '../../audit/application/audit.service';
-import { SettingsRepository } from '../infrastructure/settings.repository';
+import { EnsureSettingsSeedDataUseCase } from './use-cases/ensure-settings-seed-data.use-case';
+import { ListSettingsUseCase } from './use-cases/list-settings.use-case';
+import { UpdateSettingUseCase } from './use-cases/update-setting.use-case';
 
 @Injectable()
 export class SettingsService {
   constructor(
-    private readonly settingsRepository: SettingsRepository,
-    private readonly auditService: AuditService,
+    private readonly ensureSettingsSeedDataUseCase: EnsureSettingsSeedDataUseCase,
+    private readonly listSettingsUseCase: ListSettingsUseCase,
+    private readonly updateSettingUseCase: UpdateSettingUseCase,
   ) {}
 
   async ensureSeedData(executor?: DatabaseExecutor) {
-    await this.settingsRepository.ensureDefaults(
-      [
-        {
-          key: 'registration_enabled',
-          value: { enabled: true },
-        },
-        {
-          key: 'maintenance_mode',
-          value: { enabled: false, message: null },
-        },
-      ],
-      executor,
-    );
+    return this.ensureSettingsSeedDataUseCase.execute(executor);
   }
 
   async listAll() {
-    const settings = await this.settingsRepository.findAll();
-
-    return settings.map((setting) => this.toDto(setting));
+    return this.listSettingsUseCase.execute();
   }
 
   async updateByKey(
@@ -48,45 +34,11 @@ export class SettingsService {
     input: UpdateSettingCommand,
     requestContext?: RequestContext,
   ) {
-    const updated = await this.settingsRepository.upsert(
+    return this.updateSettingUseCase.execute(
+      actor,
       key,
-      input.value,
-      actor.userId,
-    );
-
-    if (!updated) {
-      throw new AppError(
-        ERROR_CODES.SETTINGS_NOT_FOUND,
-        'Setting could not be updated',
-        HttpStatus.NOT_FOUND,
-      );
-    }
-
-    await this.auditService.log({
-      actorId: actor.userId,
-      action: 'settings.updated',
-      entityType: 'application_setting',
-      entityId: key,
-      metadata: { key },
+      input,
       requestContext,
-    });
-
-    return this.toDto(updated);
-  }
-
-  private toDto(
-    setting: Awaited<
-      ReturnType<SettingsRepository['findByKey']>
-    > extends infer T
-      ? Exclude<T, null>
-      : never,
-  ) {
-    return {
-      key: setting.key,
-      value: setting.value,
-      updatedById: setting.updatedById ?? null,
-      createdAt: setting.createdAt.toISOString(),
-      updatedAt: setting.updatedAt.toISOString(),
-    };
+    );
   }
 }

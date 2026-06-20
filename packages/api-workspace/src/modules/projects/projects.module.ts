@@ -1,16 +1,17 @@
 import { Module } from '@nestjs/common';
 import { PROJECT_LOOKUP } from '@repo/api-core';
 
-import { CreateProjectUseCase } from './application/create-project.use-case';
-import { GetProjectUseCase } from './application/get-project.use-case';
-import { ListProjectAttachmentsUseCase } from './application/list-project-attachments.use-case';
-import { ListProjectsUseCase } from './application/list-projects.use-case';
-import { ProjectLifecycleUseCase } from './application/project-lifecycle.use-case';
-import { ProjectsImportExportAdapter } from './application/projects-import-export.adapter';
 import { ProjectsMapper } from './application/projects.mapper';
 import { PROJECTS_REPOSITORY } from './application/projects.repository.port';
 import { ProjectsService } from './application/projects.service';
-import { UpdateProjectUseCase } from './application/update-project.use-case';
+import { ProjectsImportExportAdapter } from './application/services/projects-import-export.adapter';
+import { ArchiveProjectUseCase } from './application/use-cases/archive-project.use-case';
+import { CreateProjectUseCase } from './application/use-cases/create-project.use-case';
+import { GetProjectUseCase } from './application/use-cases/get-project.use-case';
+import { ListProjectAttachmentsUseCase } from './application/use-cases/list-project-attachments.use-case';
+import { ListProjectsUseCase } from './application/use-cases/list-projects.use-case';
+import { RestoreProjectUseCase } from './application/use-cases/restore-project.use-case';
+import { UpdateProjectUseCase } from './application/use-cases/update-project.use-case';
 import { ProjectsRepository } from './infrastructure/projects.repository';
 import { ProjectsController } from './presentation/projects.controller';
 
@@ -23,7 +24,8 @@ import { ProjectsController } from './presentation/projects.controller';
     GetProjectUseCase,
     CreateProjectUseCase,
     UpdateProjectUseCase,
-    ProjectLifecycleUseCase,
+    ArchiveProjectUseCase,
+    RestoreProjectUseCase,
     ListProjectAttachmentsUseCase,
     ProjectsService,
     ProjectsImportExportAdapter,

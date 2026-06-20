@@ -19,6 +19,12 @@
       "skillPath": ".claude/skills/design-system/SKILL.md",
       "computedHash": "0206bc1d866ba6a93c6683d28b801314979fd164939d53830a7592ce0fb7a8a2"
     },
+    "clean-architecture": {
+      "source": "mindrally/skills",
+      "sourceType": "github",
+      "skillPath": "clean-architecture/SKILL.md",
+      "computedHash": "c5b03a3910c3e63eb9ae08bb782e9d67408212d989255def392944a03041b7ab"
+    },
     "embedded-captions": {
       "source": "heygen-com/hyperframes",
       "sourceType": "github",

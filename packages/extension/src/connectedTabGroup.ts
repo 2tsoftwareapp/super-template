@@ -16,19 +16,23 @@
 
 import { RelayConnection, debugLog } from './relayConnection';
 
-const PLAYWRIGHT_GROUP_TITLE = 'Playwright';
-const PLAYWRIGHT_GROUP_COLOR = 'green';
-const NON_DEBUGGABLE_SCHEMES = ['chrome:', 'edge:', 'devtools:'];
-const CONNECTED_BADGE = { text: '✓', color: '#4CAF50', title: 'Connected to Playwright client' };
+const CURRENT_GROUP_TITLE = 'Browser Control';
+const LEGACY_GROUP_TITLES = ['Playwright'];
+const GROUP_COLOR = 'green';
+const NON_DEBUGGABLE_SCHEMES = ['chrome:', 'chrome-extension:', 'edge:', 'devtools:'];
+const CONNECTED_BADGE = { text: '✓', color: '#4CAF50', title: 'Connected to Browser Control client' };
 
 export function isNonDebuggableUrl(url: string | undefined): boolean {
   return !!url && NON_DEBUGGABLE_SCHEMES.some(s => url.startsWith(s));
 }
 
-// Ungroups any Playwright-titled groups left behind by a prior service worker.
-export async function cleanupStalePlaywrightGroups(): Promise<void> {
+// Ungroups any Browser Control or legacy Playwright-titled groups left behind
+// by a prior service worker.
+export async function cleanupStaleBrowserControlGroups(): Promise<void> {
   try {
-    const groups = await chrome.tabGroups.query({ title: PLAYWRIGHT_GROUP_TITLE });
+    const titles = [CURRENT_GROUP_TITLE, ...LEGACY_GROUP_TITLES];
+    const groupsByTitle = await Promise.all(titles.map(title => chrome.tabGroups.query({ title })));
+    const groups = groupsByTitle.flat();
     const tabsPerGroup = await Promise.all(groups.map(g => chrome.tabs.query({ groupId: g.id })));
     const tabIds = tabsPerGroup.flat().map(t => t.id).filter((id): id is number => id !== undefined);
     if (tabIds.length)
@@ -38,7 +42,7 @@ export async function cleanupStalePlaywrightGroups(): Promise<void> {
   }
 }
 
-// The Playwright tab group for an active RelayConnection. The Chrome tab group
+// The Browser Control tab group for an active RelayConnection. The Chrome tab group
 // is the single source of truth for which tabs the client targets:
 //  - User drags a tab in/out → `_onTabGroupChanged` attaches/detaches.
 //  - Relay attaches on its own (initial tab, popup, Target.createTarget) →
@@ -65,7 +69,7 @@ export class ConnectedTabGroup {
     chrome.tabs.onUpdated.addListener(this._onTabUpdatedListener);
     chrome.tabs.onRemoved.addListener(this._onTabRemovedListener);
     // Seed the relay with the user-selected tab, then close out the initial
-    // handshake. The relay holds Playwright-side CDP traffic until
+    // handshake. The relay holds engine-side CDP traffic until
     // `didInitialize` arrives, so it sees a fully populated tab model by the
     // time it handles `Target.setAutoAttach`.
     this._connection.attachTab(selectedTab);
@@ -164,7 +168,7 @@ export class ConnectedTabGroup {
       await this._retryOnDrag(async () => {
         if (this._groupId === null) {
           this._groupId = await chrome.tabs.group({ tabIds: [tabId] });
-          await chrome.tabGroups.update(this._groupId, { color: PLAYWRIGHT_GROUP_COLOR, title: PLAYWRIGHT_GROUP_TITLE });
+          await chrome.tabGroups.update(this._groupId, { color: GROUP_COLOR, title: CURRENT_GROUP_TITLE });
         } else {
           await chrome.tabs.group({ groupId: this._groupId, tabIds: [tabId] });
         }

@@ -1,0 +1,47 @@
+{
+  "cleanup": "created-tabs",
+  "steps": [
+    {
+      "tool": "browser_navigate",
+      "args": {
+        "url": "http://localhost:3005/#architecture"
+      }
+    },
+    {
+      "tool": "browser_wait_for",
+      "args": {
+        "time": 1
+      }
+    },
+    {
+      "tool": "browser_console_messages",
+      "args": {
+        "level": "info",
+        "all": true,
+        "filename": "artifacts/landing-architecture-console.log"
+      }
+    },
+    {
+      "tool": "browser_snapshot",
+      "args": {
+        "depth": 5,
+        "filename": "artifacts/landing-architecture-snapshot.yml"
+      }
+    },
+    {
+      "tool": "browser_take_screenshot",
+      "args": {
+        "type": "png",
+        "filename": "artifacts/landing-architecture-after-fix.png"
+      }
+    },
+    {
+      "tool": "browser_take_screenshot",
+      "args": {
+        "type": "png",
+        "filename": "artifacts/landing-full-after-fix.png",
+        "fullPage": true
+      }
+    }
+  ]
+}

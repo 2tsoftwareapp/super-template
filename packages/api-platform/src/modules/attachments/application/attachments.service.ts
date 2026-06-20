@@ -3,25 +3,23 @@ import type {
   RequestContext,
 } from '@repo/api-core';
 
-import { HttpStatus, Injectable } from '@nestjs/common';
-import { ERROR_CODES } from '@repo/api-core';
-import { AppError } from '@repo/api-core';
+import { Injectable } from '@nestjs/common';
 
 import type {
   AttachEntityCommand,
   ListAttachmentsQuery,
 } from './attachments.types';
 
-import { AuditService } from '../../audit/application/audit.service';
-import { FilesRepository } from '../../files/infrastructure/files.repository';
-import { AttachmentsRepository } from '../infrastructure/attachments.repository';
+import { AttachFileUseCase } from './use-cases/attach-file.use-case';
+import { DeleteAttachmentUseCase } from './use-cases/delete-attachment.use-case';
+import { ListAttachmentsUseCase } from './use-cases/list-attachments.use-case';
 
 @Injectable()
 export class AttachmentsService {
   constructor(
-    private readonly attachmentsRepository: AttachmentsRepository,
-    private readonly filesRepository: FilesRepository,
-    private readonly auditService: AuditService,
+    private readonly attachFileUseCase: AttachFileUseCase,
+    private readonly listAttachmentsUseCase: ListAttachmentsUseCase,
+    private readonly deleteAttachmentUseCase: DeleteAttachmentUseCase,
   ) {}
 
   async attach(
@@ -29,48 +27,11 @@ export class AttachmentsService {
     input: AttachEntityCommand,
     requestContext?: RequestContext,
   ) {
-    const file = await this.filesRepository.findById(input.fileId);
-
-    if (!file) {
-      throw new AppError(
-        ERROR_CODES.FILE_NOT_FOUND,
-        'File not found',
-        HttpStatus.NOT_FOUND,
-      );
-    }
-
-    const attachment = await this.attachmentsRepository.create({
-      organizationId: file.organizationId,
-      fileId: input.fileId,
-      entityType: input.entityType,
-      entityId: input.entityId,
-      label: input.label ?? null,
-      createdById: actor.userId,
-    });
-
-    if (!attachment) {
-      throw new Error('Attachment insert returned no rows');
-    }
-
-    await this.auditService.log({
-      actorId: actor.userId,
-      action: 'attachment.created',
-      entityType: input.entityType,
-      entityId: input.entityId,
-      metadata: { attachmentId: attachment.id, fileId: input.fileId },
-      requestContext,
-    });
-
-    return this.toAttachmentDto(attachment);
+    return this.attachFileUseCase.execute(actor, input, requestContext);
   }
 
   async list(query: ListAttachmentsQuery) {
-    const rows = await this.attachmentsRepository.listByEntity(
-      query.entityType,
-      query.entityId,
-    );
-
-    return rows.map((row) => this.toAttachmentDto(row));
+    return this.listAttachmentsUseCase.execute(query);
   }
 
   async delete(
@@ -78,42 +39,10 @@ export class AttachmentsService {
     attachmentId: string,
     requestContext?: RequestContext,
   ) {
-    const attachment = await this.attachmentsRepository.findById(attachmentId);
-
-    if (!attachment) {
-      throw new AppError(
-        ERROR_CODES.ATTACHMENT_NOT_FOUND,
-        'Attachment not found',
-        HttpStatus.NOT_FOUND,
-      );
-    }
-
-    await this.attachmentsRepository.softDelete(attachmentId);
-
-    await this.auditService.log({
-      actorId: actor.userId,
-      action: 'attachment.deleted',
-      entityType: attachment.entityType,
-      entityId: attachment.entityId,
-      metadata: { attachmentId },
+    return this.deleteAttachmentUseCase.execute(
+      actor,
+      attachmentId,
       requestContext,
-    });
-  }
-
-  private toAttachmentDto(
-    attachment: NonNullable<
-      Awaited<ReturnType<AttachmentsRepository['findById']>>
-    >,
-  ) {
-    return {
-      id: attachment.id,
-      fileId: attachment.fileId,
-      entityType: attachment.entityType,
-      entityId: attachment.entityId,
-      label: attachment.label,
-      createdById: attachment.createdById,
-      createdAt: attachment.createdAt.toISOString(),
-      updatedAt: attachment.updatedAt.toISOString(),
-    };
+    );
   }
 }

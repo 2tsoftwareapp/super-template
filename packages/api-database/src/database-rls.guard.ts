@@ -26,7 +26,7 @@ export class DatabaseRlsGuard implements OnModuleInit {
   ) {}
 
   async onModuleInit(): Promise<void> {
-    if (this.environmentService.values.DATABASE_SKIP_RLS_CHECK) {
+    if (this.environmentService.databaseSkipRlsCheck) {
       this.logger.warn(
         'DATABASE_SKIP_RLS_CHECK is enabled; skipping database RLS capability check',
       );

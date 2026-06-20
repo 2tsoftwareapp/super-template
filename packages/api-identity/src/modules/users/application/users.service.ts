@@ -14,13 +14,15 @@ import type {
   UserStatus,
 } from './users.types';
 
-import { AdminUserManagementUseCase } from './admin-user-management.use-case';
-import { ChangePasswordUseCase } from './change-password.use-case';
-import { CreateAdminUserUseCase } from './create-admin-user.use-case';
-import { GetUserUseCase } from './get-user.use-case';
-import { ListUsersUseCase } from './list-users.use-case';
-import { ReplaceUserRolesUseCase } from './replace-user-roles.use-case';
-import { UpdateProfileUseCase } from './update-profile.use-case';
+import { ChangePasswordUseCase } from './use-cases/change-password.use-case';
+import { CreateAdminUserUseCase } from './use-cases/create-admin-user.use-case';
+import { DeleteUserUseCase } from './use-cases/delete-user.use-case';
+import { GetUserUseCase } from './use-cases/get-user.use-case';
+import { ListUsersUseCase } from './use-cases/list-users.use-case';
+import { ReplaceUserRolesUseCase } from './use-cases/replace-user-roles.use-case';
+import { UpdateAdminUserUseCase } from './use-cases/update-admin-user.use-case';
+import { UpdateProfileUseCase } from './use-cases/update-profile.use-case';
+import { UpdateUserStatusUseCase } from './use-cases/update-user-status.use-case';
 
 export type { UserView as UserDto } from './users.types';
 
@@ -32,7 +34,9 @@ export class UsersService {
     private readonly changePasswordUseCase: ChangePasswordUseCase,
     private readonly listUsersUseCase: ListUsersUseCase,
     private readonly createAdminUserUseCase: CreateAdminUserUseCase,
-    private readonly adminUserManagementUseCase: AdminUserManagementUseCase,
+    private readonly updateAdminUserUseCase: UpdateAdminUserUseCase,
+    private readonly deleteUserUseCase: DeleteUserUseCase,
+    private readonly updateUserStatusUseCase: UpdateUserStatusUseCase,
     private readonly replaceUserRolesUseCase: ReplaceUserRolesUseCase,
   ) {}
 
@@ -84,7 +88,7 @@ export class UsersService {
     input: UpdateAdminUserCommand,
     requestContext?: RequestContext,
   ) {
-    return this.adminUserManagementUseCase.update(
+    return this.updateAdminUserUseCase.execute(
       actor,
       userId,
       input,
@@ -97,11 +101,7 @@ export class UsersService {
     userId: string,
     requestContext?: RequestContext,
   ) {
-    return this.adminUserManagementUseCase.delete(
-      actor,
-      userId,
-      requestContext,
-    );
+    return this.deleteUserUseCase.execute(actor, userId, requestContext);
   }
 
   updateUserStatus(
@@ -110,7 +110,7 @@ export class UsersService {
     status: UserStatus,
     requestContext?: RequestContext,
   ) {
-    return this.adminUserManagementUseCase.updateStatus(
+    return this.updateUserStatusUseCase.execute(
       actor,
       userId,
       status,

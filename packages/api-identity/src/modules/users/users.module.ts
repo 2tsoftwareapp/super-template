@@ -4,13 +4,15 @@ import { USER_LOOKUP } from '@repo/api-core';
 import { AccessControlModule } from '../access-control/access-control.module';
 import { AuthDataModule } from '../auth/auth-data.module';
 import { OrganizationsModule } from '../organizations/organizations.module';
-import { AdminUserManagementUseCase } from './application/admin-user-management.use-case';
-import { ChangePasswordUseCase } from './application/change-password.use-case';
-import { CreateAdminUserUseCase } from './application/create-admin-user.use-case';
-import { GetUserUseCase } from './application/get-user.use-case';
-import { ListUsersUseCase } from './application/list-users.use-case';
-import { ReplaceUserRolesUseCase } from './application/replace-user-roles.use-case';
-import { UpdateProfileUseCase } from './application/update-profile.use-case';
+import { ChangePasswordUseCase } from './application/use-cases/change-password.use-case';
+import { CreateAdminUserUseCase } from './application/use-cases/create-admin-user.use-case';
+import { DeleteUserUseCase } from './application/use-cases/delete-user.use-case';
+import { GetUserUseCase } from './application/use-cases/get-user.use-case';
+import { ListUsersUseCase } from './application/use-cases/list-users.use-case';
+import { ReplaceUserRolesUseCase } from './application/use-cases/replace-user-roles.use-case';
+import { UpdateAdminUserUseCase } from './application/use-cases/update-admin-user.use-case';
+import { UpdateProfileUseCase } from './application/use-cases/update-profile.use-case';
+import { UpdateUserStatusUseCase } from './application/use-cases/update-user-status.use-case';
 import { UsersMapper } from './application/users.mapper';
 import { USERS_REPOSITORY } from './application/users.repository.port';
 import { UsersService } from './application/users.service';
@@ -29,7 +31,9 @@ import { UsersController } from './presentation/users.controller';
     ChangePasswordUseCase,
     ListUsersUseCase,
     CreateAdminUserUseCase,
-    AdminUserManagementUseCase,
+    UpdateAdminUserUseCase,
+    DeleteUserUseCase,
+    UpdateUserStatusUseCase,
     ReplaceUserRolesUseCase,
     UsersService,
     {

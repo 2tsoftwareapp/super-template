@@ -35,7 +35,7 @@ async function bootstrap() {
   );
 
   if (
-    environmentService.values.API_DOCS_ENABLED &&
+    environmentService.apiDocsEnabled &&
     !environmentService.isProduction
   ) {
     const config = new DocumentBuilder()
@@ -56,7 +56,7 @@ async function bootstrap() {
       );
   }
 
-  await app.listen(environmentService.values.API_PORT);
+  await app.listen(environmentService.apiPort);
 }
 
 void bootstrap();

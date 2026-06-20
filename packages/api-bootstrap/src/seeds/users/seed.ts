@@ -88,16 +88,16 @@ export async function seedUsers(
 
   const { userId: adminUserId, organizationId: adminOrganizationId } =
     await ensureUser({
-      email: params.environmentService.values.SEED_ADMIN_EMAIL,
+      email: params.environmentService.seedAdminEmail,
       displayName: 'Seed Admin',
-      password: params.environmentService.values.SEED_ADMIN_PASSWORD,
+      password: params.environmentService.seedAdminPassword,
       roleName: ROLE_NAMES.SUPER_ADMIN,
     });
   const { userId: regularUserId, organizationId: regularOrganizationId } =
     await ensureUser({
-      email: params.environmentService.values.SEED_USER_EMAIL,
+      email: params.environmentService.seedUserEmail,
       displayName: 'Seed User',
-      password: params.environmentService.values.SEED_USER_PASSWORD,
+      password: params.environmentService.seedUserPassword,
       roleName: ROLE_NAMES.USER,
     });
 

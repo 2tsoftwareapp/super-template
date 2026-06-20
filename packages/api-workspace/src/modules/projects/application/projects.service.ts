@@ -11,12 +11,13 @@ import type {
   UpdateProjectCommand,
 } from './projects.types';
 
-import { CreateProjectUseCase } from './create-project.use-case';
-import { GetProjectUseCase } from './get-project.use-case';
-import { ListProjectAttachmentsUseCase } from './list-project-attachments.use-case';
-import { ListProjectsUseCase } from './list-projects.use-case';
-import { ProjectLifecycleUseCase } from './project-lifecycle.use-case';
-import { UpdateProjectUseCase } from './update-project.use-case';
+import { ArchiveProjectUseCase } from './use-cases/archive-project.use-case';
+import { CreateProjectUseCase } from './use-cases/create-project.use-case';
+import { GetProjectUseCase } from './use-cases/get-project.use-case';
+import { ListProjectAttachmentsUseCase } from './use-cases/list-project-attachments.use-case';
+import { ListProjectsUseCase } from './use-cases/list-projects.use-case';
+import { RestoreProjectUseCase } from './use-cases/restore-project.use-case';
+import { UpdateProjectUseCase } from './use-cases/update-project.use-case';
 
 export type { ProjectView as ProjectDto } from './projects.types';
 
@@ -27,7 +28,8 @@ export class ProjectsService {
     private readonly getProjectUseCase: GetProjectUseCase,
     private readonly createProjectUseCase: CreateProjectUseCase,
     private readonly updateProjectUseCase: UpdateProjectUseCase,
-    private readonly projectLifecycleUseCase: ProjectLifecycleUseCase,
+    private readonly archiveProjectUseCase: ArchiveProjectUseCase,
+    private readonly restoreProjectUseCase: RestoreProjectUseCase,
     private readonly listProjectAttachmentsUseCase: ListProjectAttachmentsUseCase,
   ) {}
 
@@ -66,7 +68,7 @@ export class ProjectsService {
     projectId: string,
     requestContext?: RequestContext,
   ) {
-    return this.projectLifecycleUseCase.remove(user, projectId, requestContext);
+    return this.archiveProjectUseCase.execute(user, projectId, requestContext);
   }
 
   restore(
@@ -74,7 +76,7 @@ export class ProjectsService {
     projectId: string,
     requestContext?: RequestContext,
   ) {
-    return this.projectLifecycleUseCase.restore(
+    return this.restoreProjectUseCase.execute(
       user,
       projectId,
       requestContext,

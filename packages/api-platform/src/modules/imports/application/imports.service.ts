@@ -7,9 +7,9 @@ import { Injectable } from '@nestjs/common';
 
 import type { CreateImportCommand } from './imports.types';
 
-import { ConfirmImportUseCase } from './confirm-import.use-case';
-import { CreateImportUseCase } from './create-import.use-case';
-import { GetImportUseCase } from './get-import.use-case';
+import { ConfirmImportUseCase } from './use-cases/confirm-import.use-case';
+import { CreateImportUseCase } from './use-cases/create-import.use-case';
+import { GetImportUseCase } from './use-cases/get-import.use-case';
 
 export type { ImportJobView as ImportJobDto } from './imports.types';
 

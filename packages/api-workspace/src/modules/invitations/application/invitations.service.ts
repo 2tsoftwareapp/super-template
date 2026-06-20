@@ -11,10 +11,10 @@ import type {
   ListInvitationsQuery,
 } from './invitations.types';
 
-import { AcceptInvitationUseCase } from './accept-invitation.use-case';
-import { CreateInvitationUseCase } from './create-invitation.use-case';
-import { ListInvitationsUseCase } from './list-invitations.use-case';
-import { RevokeInvitationUseCase } from './revoke-invitation.use-case';
+import { AcceptInvitationUseCase } from './use-cases/accept-invitation.use-case';
+import { CreateInvitationUseCase } from './use-cases/create-invitation.use-case';
+import { ListInvitationsUseCase } from './use-cases/list-invitations.use-case';
+import { RevokeInvitationUseCase } from './use-cases/revoke-invitation.use-case';
 
 export type { InvitationView as InvitationDto } from './invitations.types';
 

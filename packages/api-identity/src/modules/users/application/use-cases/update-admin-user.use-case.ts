@@ -1,0 +1,99 @@
+import type {
+  AuthenticatedRequestUser,
+  RequestContext,
+} from '@repo/api-core';
+
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import {
+  AppError,
+  AUDIT_WRITER,
+  type AuditWriter,
+  ERROR_CODES,
+  normalizeEmail,
+} from '@repo/api-core';
+
+import type { UpdateAdminUserCommand, UserView } from '../users.types';
+
+import { AccessControlService } from '../../../access-control/application/access-control.service';
+import { hashPassword } from '../../../auth/application/auth.helpers';
+import { assertUserBelongsToOrganization } from '../../domain/user-org-scope.policy';
+import {
+  USERS_REPOSITORY,
+  type UsersRepositoryPort,
+} from '../users.repository.port';
+import { GetUserUseCase } from './get-user.use-case';
+
+@Injectable()
+export class UpdateAdminUserUseCase {
+  constructor(
+    @Inject(USERS_REPOSITORY)
+    private readonly usersRepository: UsersRepositoryPort,
+    private readonly accessControlService: AccessControlService,
+    @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
+    private readonly getUserUseCase: GetUserUseCase,
+  ) {}
+
+  async execute(
+    actor: AuthenticatedRequestUser,
+    userId: string,
+    input: UpdateAdminUserCommand,
+    requestContext?: RequestContext,
+  ): Promise<UserView> {
+    await assertUserBelongsToOrganization(
+      (targetUserId, organizationId) =>
+        this.usersRepository.isUserInOrganization(targetUserId, organizationId),
+      actor,
+      userId,
+    );
+
+    const user = await this.usersRepository.findById(userId);
+
+    if (!user) {
+      throw new AppError(
+        ERROR_CODES.USER_NOT_FOUND,
+        'User not found',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const targetProfile =
+      await this.accessControlService.getAccessProfile(userId);
+    this.accessControlService.assertCanManageUserAccount(
+      actor,
+      targetProfile.roles,
+    );
+
+    if (input.email) {
+      await this.usersRepository.assertEmailAvailable(
+        normalizeEmail(input.email),
+        undefined,
+        userId,
+      );
+    }
+
+    const updated = await this.usersRepository.update(userId, {
+      email: input.email ? normalizeEmail(input.email) : user.email,
+      displayName: input.displayName ?? user.displayName,
+      avatarUrl:
+        input.avatarUrl === undefined ? user.avatarUrl : input.avatarUrl,
+      status: input.status ?? user.status,
+      passwordHash: input.password
+        ? await hashPassword(input.password)
+        : user.passwordHash,
+      emailVerifiedAt:
+        input.status === 'PENDING'
+          ? null
+          : (user.emailVerifiedAt ?? new Date()),
+    });
+
+    await this.auditWriter.log({
+      actorId: actor.userId,
+      action: 'admin.user.updated',
+      entityType: 'user',
+      entityId: userId,
+      requestContext,
+    });
+
+    return this.getUserUseCase.execute(updated?.id ?? userId, actor);
+  }
+}

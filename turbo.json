@@ -4,22 +4,22 @@
     "tags": {
       "layer:core": {
         "dependencies": {
-          "allow": ["layer:core", "layer:tsconfig", "layer:eslint"]
+          "allow": ["layer:core", "layer:sort", "layer:tsconfig", "layer:eslint"]
         }
       },
       "layer:database": {
         "dependencies": {
-          "allow": ["layer:core", "layer:database", "layer:tsconfig", "layer:eslint"]
+          "allow": ["layer:core", "layer:database", "layer:sort", "layer:tsconfig", "layer:eslint"]
         }
       },
       "layer:contract": {
         "dependencies": {
-          "allow": ["layer:contract", "layer:tsconfig", "layer:eslint"]
+          "allow": ["layer:contract", "layer:sort", "layer:tsconfig", "layer:eslint"]
         }
       },
       "layer:health": {
         "dependencies": {
-          "allow": ["layer:core", "layer:database", "layer:health", "layer:tsconfig", "layer:eslint"]
+          "allow": ["layer:core", "layer:database", "layer:health", "layer:sort", "layer:tsconfig", "layer:eslint"]
         }
       },
       "layer:identity": {
@@ -28,6 +28,7 @@
             "layer:core",
             "layer:database",
             "layer:identity",
+            "layer:sort",
             "layer:tsconfig",
             "layer:eslint"
           ]
@@ -40,6 +41,7 @@
             "layer:database",
             "layer:identity",
             "layer:platform",
+            "layer:sort",
             "layer:tsconfig",
             "layer:eslint"
           ]
@@ -53,6 +55,7 @@
             "layer:identity",
             "layer:platform",
             "layer:workspace",
+            "layer:sort",
             "layer:tsconfig",
             "layer:eslint"
           ]
@@ -68,6 +71,7 @@
             "layer:workspace",
             "layer:bootstrap",
             "layer:health",
+            "layer:sort",
             "layer:tsconfig",
             "layer:eslint"
           ]
@@ -88,6 +92,7 @@
             "layer:frontend-ui",
             "layer:frontend-test",
             "layer:app",
+            "layer:sort",
             "layer:tsconfig",
             "layer:eslint"
           ]
@@ -110,7 +115,7 @@
       },
       "layer:frontend-core": {
         "dependencies": {
-          "allow": ["layer:frontend-core", "layer:contract", "layer:tsconfig", "layer:eslint"]
+          "allow": ["layer:frontend-core", "layer:contract", "layer:sort", "layer:tsconfig", "layer:eslint"]
         }
       },
       "layer:frontend-ui": {
@@ -119,6 +124,7 @@
             "layer:frontend-core",
             "layer:frontend-ui",
             "layer:contract",
+            "layer:sort",
             "layer:tsconfig",
             "layer:eslint"
           ]
@@ -131,6 +137,7 @@
             "layer:frontend-ui",
             "layer:frontend-test",
             "layer:contract",
+            "layer:sort",
             "layer:tsconfig",
             "layer:eslint"
           ]

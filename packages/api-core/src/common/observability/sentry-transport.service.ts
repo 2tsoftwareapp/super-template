@@ -12,7 +12,7 @@ export class SentryTransportService {
   constructor(private readonly environmentService: EnvironmentService) {}
 
   captureException(error: Error, context: ErrorReportContext): void {
-    const dsn = this.environmentService.values.SENTRY_DSN;
+    const dsn = this.environmentService.sentryDsn;
 
     if (!dsn) {
       return;
@@ -27,7 +27,7 @@ export class SentryTransportService {
   }
 
   captureMessage(message: string, context: ErrorReportContext): void {
-    const dsn = this.environmentService.values.SENTRY_DSN;
+    const dsn = this.environmentService.sentryDsn;
 
     if (!dsn) {
       return;
@@ -58,7 +58,7 @@ export class SentryTransportService {
 
     Sentry.init({
       dsn: SENTRY_DSN,
-      environment: SENTRY_ENVIRONMENT ?? this.environmentService.values.APP_ENV,
+      environment: SENTRY_ENVIRONMENT ?? this.environmentService.appEnv,
       release: SENTRY_RELEASE ?? undefined,
       tracesSampleRate: 0,
     });

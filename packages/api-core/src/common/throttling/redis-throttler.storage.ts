@@ -139,7 +139,7 @@ export class RedisThrottlerStorage implements ThrottlerStorage {
       return this.redisClient;
     }
 
-    const redisUrl = this.environmentService.values.REDIS_URL;
+    const redisUrl = this.environmentService.redisUrl;
 
     if (!redisUrl) {
       this.redisReady = Promise.resolve();

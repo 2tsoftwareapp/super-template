@@ -79,7 +79,7 @@ export class RelayConnection {
 
   // Signals the end of the initial-tab handshake — call after the initial
   // round of `attachTab` invocations. For v2 this sends `extension.initialized`
-  // so the relay can unblock Playwright CDP traffic; v1 has no handshake.
+  // so the relay can unblock engine CDP traffic; v1 has no handshake.
   didInitialize(): void {
     this._handler.didInitialize();
   }
@@ -91,7 +91,7 @@ export class RelayConnection {
     this._onClose();
   }
 
-  // Called when the UI adds a tab to the Playwright group. The handler asks
+  // Called when the UI adds a tab to the Browser Control group. The handler asks
   // the relay to attach; the normal command path fires ontabattached.
   attachTab(tab: chrome.tabs.Tab): void {
     if (this._closed || this._attachedTabs.has(tab.id!))
@@ -99,7 +99,7 @@ export class RelayConnection {
     this._handler.onUserAttachRequest(tab);
   }
 
-  // Called when the UI removes a tab from the Playwright group. We detach the
+  // Called when the UI removes a tab from the Browser Control group. We detach the
   // debugger and update bookkeeping; the handler emits the wire-level detach
   // notification for protocols that have one.
   detachTab(tabId: number): void {

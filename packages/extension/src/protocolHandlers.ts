@@ -37,7 +37,7 @@ export interface ProtocolHandler {
   // Forwards an already-filtered chrome.* event (concerning a currently-attached
   // tab) to the relay. Shape is protocol-specific.
   forwardChromeEvent(fullMethod: string, args: any[]): void;
-  // The UI added a tab to the Playwright group, whether as the initial pick
+  // The UI added a tab to the Browser Control group, whether as the initial pick
   // from the connect page or from a later drag-in. Handler tells the relay
   // the tab is now available; the relay attaches via the usual command path.
   onUserAttachRequest(tab: chrome.tabs.Tab): void;
@@ -47,7 +47,7 @@ export interface ProtocolHandler {
   onUserDetachRequest(tabId: number): void;
   // Signals that the initial set of `onUserAttachRequest` calls is complete.
   // For v2 this sends `extension.initialized` so the relay can unblock CDP
-  // traffic from Playwright; v1 has no handshake and ignores it.
+  // traffic from the underlying engine; v1 has no handshake and ignores it.
   didInitialize(): void;
 }
 
@@ -75,7 +75,7 @@ export class ProtocolV1Handler implements ProtocolHandler {
     if (message.method === 'forwardCDPCommand') {
       const { sessionId, method, params } = message.params;
       if (method === 'Target.createTarget')
-        throw new Error('Tab creation is not supported yet. Update Playwright MCP or CLI to the latest version.');
+        throw new Error('Tab creation is not supported yet. Update the Browser Control bridge dependencies to the latest version.');
       const tabId = [...this._context.attachedTabs][0];
       if (tabId === undefined)
         throw new Error('No tab is connected');
@@ -162,7 +162,7 @@ export class ProtocolV2Handler implements ProtocolHandler {
 
   didInitialize(): void {
     // Signals the end of the initial-tab handshake. The relay holds CDP
-    // traffic from Playwright until it sees this event, so that
+    // traffic from the underlying engine until it sees this event, so that
     // `Target.setAutoAttach` is answered from a populated tab model.
     this._context.sendMessage({ method: 'extension.initialized', params: [] });
   }

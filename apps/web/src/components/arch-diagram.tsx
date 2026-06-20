@@ -1,9 +1,102 @@
 export function ArchDiagram() {
   return (
-    <div className="w-full overflow-x-auto rounded-2xl border border-border bg-muted/20 p-4 md:p-6">
+    <div className="w-full overflow-hidden rounded-2xl border border-border/80 bg-card/70 p-4 shadow-sm md:p-6">
+      <div className="space-y-4 md:hidden">
+        <div className="space-y-2">
+          <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-foreground/70">
+            Clients
+          </p>
+          <div className="grid gap-3">
+            <div className="rounded-xl border border-border bg-card px-3 py-3">
+              <p className="text-sm font-semibold text-foreground">Web Browser</p>
+              <p className="text-xs text-foreground/70">Next.js App Router</p>
+            </div>
+            <div className="rounded-xl border border-border bg-card px-3 py-3">
+              <p className="text-sm font-semibold text-foreground">
+                Admin Browser
+              </p>
+              <p className="text-xs text-foreground/70">Next.js Admin</p>
+            </div>
+            <div className="rounded-xl border border-border bg-card px-3 py-3">
+              <p className="text-sm font-semibold text-foreground">Flutter App</p>
+              <p className="text-xs text-foreground/70">iOS · Android</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex justify-center text-lg text-primary">↓</div>
+
+        <div className="space-y-2">
+          <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-foreground/70">
+            BFF
+          </p>
+          <div className="grid gap-3">
+            <div className="rounded-xl border-[1.5px] border-primary bg-card px-3 py-3">
+              <p className="text-sm font-semibold text-foreground">
+                Next.js 16 Web BFF
+              </p>
+              <p className="text-xs text-foreground/70">HttpOnly cookies · CSRF</p>
+            </div>
+            <div className="rounded-xl border-[1.5px] border-primary bg-card px-3 py-3">
+              <p className="text-sm font-semibold text-foreground">
+                Next.js 16 Admin BFF
+              </p>
+              <p className="text-xs text-foreground/70">HttpOnly cookies · CSRF</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex justify-center text-lg text-primary">↓</div>
+
+        <div className="space-y-2">
+          <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-foreground/70">
+            API
+          </p>
+          <div className="rounded-2xl border-[1.5px] border-primary bg-card px-4 py-4">
+            <p className="text-base font-semibold text-foreground">NestJS 11 API</p>
+            <p className="mt-2 text-xs leading-5 text-foreground/74">
+              auth · users · access-control · audit · notifications · projects
+            </p>
+            <p className="text-xs leading-5 text-foreground/74">
+              storage · mail · jobs · invitations · imports/exports · comments
+            </p>
+            <p className="mt-2 text-[11px] leading-5 text-foreground/68">
+              Drizzle ORM · Argon2 · JWT access + refresh rotation · OpenAPI
+              schema auto-generated
+            </p>
+          </div>
+        </div>
+
+        <div className="flex justify-center text-lg text-primary">↓</div>
+
+        <div className="space-y-2">
+          <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-foreground/70">
+            Infra
+          </p>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="rounded-xl border border-border bg-card px-3 py-3">
+              <p className="text-sm font-semibold text-foreground">PostgreSQL</p>
+              <p className="text-xs text-foreground/70">Primary datastore</p>
+            </div>
+            <div className="rounded-xl border border-border bg-card px-3 py-3">
+              <p className="text-sm font-semibold text-foreground">Mailpit / SMTP</p>
+              <p className="text-xs text-foreground/70">Email delivery</p>
+            </div>
+            <div className="rounded-xl border border-border bg-card px-3 py-3">
+              <p className="text-sm font-semibold text-foreground">AWS S3</p>
+              <p className="text-xs text-foreground/70">Object storage</p>
+            </div>
+            <div className="rounded-xl border border-border bg-card px-3 py-3">
+              <p className="text-sm font-semibold text-foreground">Firebase FCM</p>
+              <p className="text-xs text-foreground/70">Mobile push</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <svg
         viewBox="0 0 880 430"
-        className="w-full min-w-[560px]"
+        className="hidden h-auto w-full md:block"
         role="img"
         aria-label="System architecture diagram"
         style={{ fontFamily: "inherit" }}
@@ -17,7 +110,7 @@ export function ArchDiagram() {
             refY="2.5"
             orient="auto"
           >
-            <polygon points="0 0, 7 2.5, 0 5" fill="var(--border)" />
+            <polygon points="0 0, 7 2.5, 0 5" fill="var(--primary)" />
           </marker>
         </defs>
 
@@ -29,8 +122,9 @@ export function ArchDiagram() {
           y1="84"
           x2="114"
           y2="120"
-          stroke="var(--border)"
-          strokeWidth="1.5"
+          stroke="var(--primary)"
+          strokeOpacity="0.9"
+          strokeWidth="1.8"
           markerEnd="url(#arr)"
         />
         {/* BFF → API */}
@@ -39,8 +133,9 @@ export function ArchDiagram() {
           y1="184"
           x2="114"
           y2="220"
-          stroke="var(--border)"
-          strokeWidth="1.5"
+          stroke="var(--primary)"
+          strokeOpacity="0.9"
+          strokeWidth="1.8"
           markerEnd="url(#arr)"
         />
 
@@ -50,8 +145,9 @@ export function ArchDiagram() {
           y1="84"
           x2="440"
           y2="120"
-          stroke="var(--border)"
-          strokeWidth="1.5"
+          stroke="var(--primary)"
+          strokeOpacity="0.9"
+          strokeWidth="1.8"
           markerEnd="url(#arr)"
         />
         {/* Admin BFF → API */}
@@ -60,8 +156,9 @@ export function ArchDiagram() {
           y1="184"
           x2="440"
           y2="220"
-          stroke="var(--border)"
-          strokeWidth="1.5"
+          stroke="var(--primary)"
+          strokeOpacity="0.9"
+          strokeWidth="1.8"
           markerEnd="url(#arr)"
         />
         {/* Mobile → API (direct, dashed) */}
@@ -70,8 +167,9 @@ export function ArchDiagram() {
           y1="84"
           x2="766"
           y2="220"
-          stroke="var(--border)"
-          strokeWidth="1.5"
+          stroke="var(--primary)"
+          strokeOpacity="0.75"
+          strokeWidth="1.8"
           strokeDasharray="5 4"
           markerEnd="url(#arr)"
         />
@@ -82,8 +180,9 @@ export function ArchDiagram() {
           y1="316"
           x2="116"
           y2="348"
-          stroke="var(--border)"
-          strokeWidth="1.5"
+          stroke="var(--primary)"
+          strokeOpacity="0.9"
+          strokeWidth="1.8"
           markerEnd="url(#arr)"
         />
         <line
@@ -91,8 +190,9 @@ export function ArchDiagram() {
           y1="316"
           x2="332"
           y2="348"
-          stroke="var(--border)"
-          strokeWidth="1.5"
+          stroke="var(--primary)"
+          strokeOpacity="0.9"
+          strokeWidth="1.8"
           markerEnd="url(#arr)"
         />
         <line
@@ -100,8 +200,9 @@ export function ArchDiagram() {
           y1="316"
           x2="548"
           y2="348"
-          stroke="var(--border)"
-          strokeWidth="1.5"
+          stroke="var(--primary)"
+          strokeOpacity="0.9"
+          strokeWidth="1.8"
           markerEnd="url(#arr)"
         />
         <line
@@ -109,8 +210,9 @@ export function ArchDiagram() {
           y1="316"
           x2="764"
           y2="348"
-          stroke="var(--border)"
-          strokeWidth="1.5"
+          stroke="var(--primary)"
+          strokeOpacity="0.9"
+          strokeWidth="1.8"
           markerEnd="url(#arr)"
         />
 
@@ -118,8 +220,9 @@ export function ArchDiagram() {
         <text
           x="16"
           y="11"
-          fill="var(--muted-foreground)"
-          fontSize="8.5"
+          fill="var(--foreground)"
+          fillOpacity="0.72"
+          fontSize="9.5"
           fontWeight="700"
           letterSpacing="1.4"
         >
@@ -128,8 +231,9 @@ export function ArchDiagram() {
         <text
           x="16"
           y="112"
-          fill="var(--muted-foreground)"
-          fontSize="8.5"
+          fill="var(--foreground)"
+          fillOpacity="0.72"
+          fontSize="9.5"
           fontWeight="700"
           letterSpacing="1.4"
         >
@@ -138,8 +242,9 @@ export function ArchDiagram() {
         <text
           x="16"
           y="213"
-          fill="var(--muted-foreground)"
-          fontSize="8.5"
+          fill="var(--foreground)"
+          fillOpacity="0.72"
+          fontSize="9.5"
           fontWeight="700"
           letterSpacing="1.4"
         >
@@ -147,9 +252,10 @@ export function ArchDiagram() {
         </text>
         <text
           x="16"
-          y="353"
-          fill="var(--muted-foreground)"
-          fontSize="8.5"
+          y="338"
+          fill="var(--foreground)"
+          fillOpacity="0.72"
+          fontSize="9.5"
           fontWeight="700"
           letterSpacing="1.4"
         >
@@ -167,6 +273,7 @@ export function ArchDiagram() {
           rx="10"
           fill="var(--card)"
           stroke="var(--border)"
+          strokeWidth="1.25"
         />
         <text
           x="114"
@@ -182,8 +289,9 @@ export function ArchDiagram() {
           x="114"
           y="64"
           textAnchor="middle"
-          fill="var(--muted-foreground)"
-          fontSize="10.5"
+          fill="var(--foreground)"
+          fillOpacity="0.72"
+          fontSize="11"
         >
           Next.js App Router
         </text>
@@ -197,6 +305,7 @@ export function ArchDiagram() {
           rx="10"
           fill="var(--card)"
           stroke="var(--border)"
+          strokeWidth="1.25"
         />
         <text
           x="440"
@@ -212,8 +321,9 @@ export function ArchDiagram() {
           x="440"
           y="64"
           textAnchor="middle"
-          fill="var(--muted-foreground)"
-          fontSize="10.5"
+          fill="var(--foreground)"
+          fillOpacity="0.72"
+          fontSize="11"
         >
           Next.js Admin
         </text>
@@ -227,6 +337,7 @@ export function ArchDiagram() {
           rx="10"
           fill="var(--card)"
           stroke="var(--border)"
+          strokeWidth="1.25"
         />
         <text
           x="766"
@@ -242,8 +353,9 @@ export function ArchDiagram() {
           x="766"
           y="64"
           textAnchor="middle"
-          fill="var(--muted-foreground)"
-          fontSize="10.5"
+          fill="var(--foreground)"
+          fillOpacity="0.72"
+          fontSize="11"
         >
           iOS · Android
         </text>
@@ -257,7 +369,7 @@ export function ArchDiagram() {
           rx="10"
           fill="var(--card)"
           stroke="var(--primary)"
-          strokeWidth="1.5"
+          strokeWidth="1.8"
         />
         <text
           x="114"
@@ -273,8 +385,9 @@ export function ArchDiagram() {
           x="114"
           y="165"
           textAnchor="middle"
-          fill="var(--muted-foreground)"
-          fontSize="10.5"
+          fill="var(--foreground)"
+          fillOpacity="0.72"
+          fontSize="11"
         >
           HttpOnly cookies · CSRF
         </text>
@@ -288,7 +401,7 @@ export function ArchDiagram() {
           rx="10"
           fill="var(--card)"
           stroke="var(--primary)"
-          strokeWidth="1.5"
+          strokeWidth="1.8"
         />
         <text
           x="440"
@@ -304,8 +417,9 @@ export function ArchDiagram() {
           x="440"
           y="165"
           textAnchor="middle"
-          fill="var(--muted-foreground)"
-          fontSize="10.5"
+          fill="var(--foreground)"
+          fillOpacity="0.72"
+          fontSize="11"
         >
           HttpOnly cookies · CSRF
         </text>
@@ -319,7 +433,7 @@ export function ArchDiagram() {
           rx="10"
           fill="var(--card)"
           stroke="var(--primary)"
-          strokeWidth="1.5"
+          strokeWidth="1.8"
         />
         <text
           x="440"
@@ -335,8 +449,9 @@ export function ArchDiagram() {
           x="440"
           y="254"
           textAnchor="middle"
-          fill="var(--muted-foreground)"
-          fontSize="10.5"
+          fill="var(--foreground)"
+          fillOpacity="0.74"
+          fontSize="11"
         >
           auth · users · access-control · audit · notifications · projects
         </text>
@@ -344,8 +459,9 @@ export function ArchDiagram() {
           x="440"
           y="273"
           textAnchor="middle"
-          fill="var(--muted-foreground)"
-          fontSize="10.5"
+          fill="var(--foreground)"
+          fillOpacity="0.74"
+          fontSize="11"
         >
           storage · mail · jobs · invitations · imports/exports · comments
         </text>
@@ -353,8 +469,9 @@ export function ArchDiagram() {
           x="440"
           y="296"
           textAnchor="middle"
-          fill="var(--muted-foreground)"
-          fontSize="10"
+          fill="var(--foreground)"
+          fillOpacity="0.68"
+          fontSize="10.5"
         >
           Drizzle ORM · Argon2 · JWT access + refresh rotation · OpenAPI schema
           auto-generated
@@ -371,6 +488,7 @@ export function ArchDiagram() {
           rx="10"
           fill="var(--card)"
           stroke="var(--border)"
+          strokeWidth="1.25"
         />
         <text
           x="116"
@@ -386,8 +504,9 @@ export function ArchDiagram() {
           x="116"
           y="380"
           textAnchor="middle"
-          fill="var(--muted-foreground)"
-          fontSize="10"
+          fill="var(--foreground)"
+          fillOpacity="0.72"
+          fontSize="10.5"
         >
           Primary datastore
         </text>
@@ -401,6 +520,7 @@ export function ArchDiagram() {
           rx="10"
           fill="var(--card)"
           stroke="var(--border)"
+          strokeWidth="1.25"
         />
         <text
           x="332"
@@ -416,8 +536,9 @@ export function ArchDiagram() {
           x="332"
           y="380"
           textAnchor="middle"
-          fill="var(--muted-foreground)"
-          fontSize="10"
+          fill="var(--foreground)"
+          fillOpacity="0.72"
+          fontSize="10.5"
         >
           Email delivery
         </text>
@@ -431,6 +552,7 @@ export function ArchDiagram() {
           rx="10"
           fill="var(--card)"
           stroke="var(--border)"
+          strokeWidth="1.25"
         />
         <text
           x="548"
@@ -446,8 +568,9 @@ export function ArchDiagram() {
           x="548"
           y="380"
           textAnchor="middle"
-          fill="var(--muted-foreground)"
-          fontSize="10"
+          fill="var(--foreground)"
+          fillOpacity="0.72"
+          fontSize="10.5"
         >
           Object storage
         </text>
@@ -461,6 +584,7 @@ export function ArchDiagram() {
           rx="10"
           fill="var(--card)"
           stroke="var(--border)"
+          strokeWidth="1.25"
         />
         <text
           x="764"
@@ -476,8 +600,9 @@ export function ArchDiagram() {
           x="764"
           y="380"
           textAnchor="middle"
-          fill="var(--muted-foreground)"
-          fontSize="10"
+          fill="var(--foreground)"
+          fillOpacity="0.72"
+          fontSize="10.5"
         >
           Mobile push
         </text>

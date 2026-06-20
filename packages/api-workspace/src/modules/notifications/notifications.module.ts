@@ -1,17 +1,17 @@
 import { Module } from '@nestjs/common';
 import { USER_NOTIFICATION_SENDER } from '@repo/api-core';
 
-import { NotificationDeliveryUseCase } from './application/notification-delivery.use-case';
-import { NotificationDeviceUseCase } from './application/notification-device.use-case';
-import { NotificationDispatchService } from './application/notification-dispatch.service';
-import { NotificationInboxUseCase } from './application/notification-inbox.use-case';
-import { NotificationJobsProcessor } from './application/notification-jobs.processor';
 import { NOTIFICATION_JOBS_REPOSITORY } from './application/notification-jobs.repository.port';
 import { NotificationsMapper } from './application/notifications.mapper';
 import { NOTIFICATIONS_REPOSITORY } from './application/notifications.repository.port';
 import { NotificationsService } from './application/notifications.service';
 import { PUSH_NOTIFIER } from './application/push.interface';
-import { SendNotificationUseCase } from './application/send-notification.use-case';
+import { NotificationDispatchService } from './application/services/notification-dispatch.service';
+import { NotificationJobsProcessor } from './application/services/notification-jobs.processor';
+import { NotificationDeliveryUseCase } from './application/use-cases/notification-delivery.use-case';
+import { NotificationDeviceUseCase } from './application/use-cases/notification-device.use-case';
+import { NotificationInboxUseCase } from './application/use-cases/notification-inbox.use-case';
+import { SendNotificationUseCase } from './application/use-cases/send-notification.use-case';
 import { DeviceTokensRepository } from './infrastructure/device-tokens.repository';
 import { FcmPushService } from './infrastructure/fcm-push.service';
 import { NotificationJobsRepository } from './infrastructure/notification-jobs.repository';

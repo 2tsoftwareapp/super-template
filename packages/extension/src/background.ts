@@ -16,12 +16,13 @@
 
 import { debugLog } from './relayConnection';
 import { PendingConnections } from './pendingConnection';
-import { ConnectedTabGroup, cleanupStalePlaywrightGroups, isNonDebuggableUrl } from './connectedTabGroup';
+import { ConnectedTabGroup, cleanupStaleBrowserControlGroups, isNonDebuggableUrl } from './connectedTabGroup';
 
 type PageMessage = {
   type: 'connectionRequested';
   mcpRelayUrl: string;
   protocolVersion: number;
+  selectorTabId?: number;
 } | {
   type: 'getTabs';
 } | {
@@ -30,6 +31,7 @@ type PageMessage = {
   // selection happens.
   tab?: chrome.tabs.Tab;
   clientName?: string;
+  selectorTabId?: number;
 } | {
   type: 'getConnectionStatus';
 } | {
@@ -38,27 +40,33 @@ type PageMessage = {
   type: 'keepalive';
 };
 
-class PlaywrightExtension {
+class BrowserControlExtension {
   private _activeGroup: ConnectedTabGroup | undefined;
   private _activeClientName: string | undefined;
   private _pendingConnections = new PendingConnections();
   // Service worker restarts lose all connection state, so any existing
-  // Playwright groups are stale. Connections wait on this before reconciling.
+  // Existing Browser Control groups are stale after a service worker restart.
+  // Connections wait on this before reconciling.
   private _cleanupPromise: Promise<void>;
 
   constructor() {
     chrome.runtime.onMessage.addListener(this._onMessage.bind(this));
     chrome.action.onClicked.addListener(this._onActionClicked.bind(this));
-    this._cleanupPromise = cleanupStalePlaywrightGroups();
+    this._cleanupPromise = cleanupStaleBrowserControlGroups();
   }
 
   // Promise-based message handling is not supported in Chrome: https://issues.chromium.org/issues/40753031
   private _onMessage(message: PageMessage, sender: chrome.runtime.MessageSender, sendResponse: (response: any) => void) {
     switch (message.type) {
       case 'connectionRequested':
-        this._pendingConnections.create(sender.tab!.id!, message.mcpRelayUrl, message.protocolVersion).then(
+        if (message.selectorTabId === undefined)
+          throw new Error('Missing selectorTabId for connection request');
+        {
+          const selectorTabId = message.selectorTabId;
+          this._pendingConnections.create(selectorTabId, message.mcpRelayUrl, message.protocolVersion).then(
             () => sendResponse({ success: true }),
             (error: any) => sendResponse({ success: false, error: error.message }));
+        }
         return true;
       case 'getTabs':
         this._getTabs().then(
@@ -66,12 +74,12 @@ class PlaywrightExtension {
             (error: any) => sendResponse({ success: false, error: error.message }));
         return true;
       case 'connectToTab': {
-        // Token-bypass (no specific pick) falls back to the connect page itself
-        // so `ConnectedTabGroup` always has a concrete tab to start from. Both
-        // sender.tab and UI-supplied tabs come from chrome.tabs.query / runtime
-        // message sender, where `id` is always defined.
-        const selectedTab = (message.tab ?? sender.tab!) as chrome.tabs.Tab & { id: number };
-        this._connectTab(sender.tab!.id!, selectedTab, message.clientName).then(
+        if (message.selectorTabId === undefined)
+          throw new Error('Missing selectorTabId for tab connection');
+        const selectorTabId = message.selectorTabId;
+        this._resolveTargetTab(selectorTabId, message.tab).then(selectedTab =>
+          this._connectTab(selectorTabId, selectedTab, message.clientName)
+        ).then(
             () => sendResponse({ success: true }),
             (error: any) => sendResponse({ success: false, error: error.message }));
         return true; // Return true to indicate that the response will be sent asynchronously
@@ -134,6 +142,29 @@ class PlaywrightExtension {
     return tabs.filter(tab => !isNonDebuggableUrl(tab.url));
   }
 
+  private async _resolveTargetTab(
+      selectorTabId: number,
+      preferredTab?: chrome.tabs.Tab,
+  ): Promise<chrome.tabs.Tab & { id: number }> {
+    if (preferredTab?.id && !isNonDebuggableUrl(preferredTab.url))
+      return preferredTab as chrome.tabs.Tab & { id: number };
+
+    const queries = [
+      { active: true, lastFocusedWindow: true },
+      { lastFocusedWindow: true },
+      {},
+    ] as const;
+
+    for (const query of queries) {
+      const tabs = await chrome.tabs.query(query);
+      const candidate = tabs.find(tab => tab.id !== selectorTabId && tab.id !== undefined && !isNonDebuggableUrl(tab.url));
+      if (candidate)
+        return candidate as chrome.tabs.Tab & { id: number };
+    }
+
+    throw new Error('No debuggable browser tab is available. Open a normal web page first.');
+  }
+
   private async _onActionClicked(): Promise<void> {
     await chrome.tabs.create({
       url: chrome.runtime.getURL('status.html'),
@@ -150,4 +181,4 @@ class PlaywrightExtension {
   }
 }
 
-new PlaywrightExtension();
+new BrowserControlExtension();

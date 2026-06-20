@@ -5,11 +5,11 @@ import { Injectable } from '@nestjs/common';
 
 import type { EnqueueJobCommand, JobHandler, ListJobsQuery } from './jobs.types';
 
-import { CancelJobUseCase } from './cancel-job.use-case';
-import { EnqueueJobUseCase } from './enqueue-job.use-case';
-import { JobHandlersRegistry } from './job-handlers.registry';
-import { ListJobsUseCase } from './list-jobs.use-case';
-import { ProcessJobsUseCase } from './process-jobs.use-case';
+import { JobHandlersRegistry } from './services/job-handlers.registry';
+import { CancelJobUseCase } from './use-cases/cancel-job.use-case';
+import { EnqueueJobUseCase } from './use-cases/enqueue-job.use-case';
+import { ListJobsUseCase } from './use-cases/list-jobs.use-case';
+import { ProcessJobsUseCase } from './use-cases/process-jobs.use-case';
 
 export type { JobHandler } from './jobs.types';
 

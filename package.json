@@ -9,7 +9,8 @@
   "scripts": {
     "lint:policy": "sh scripts/check-source-policy.sh && sh scripts/check-package-cycles.sh && pnpm exec turbo boundaries",
     "build": "turbo run build",
-    "dev": "turbo run dev",
+    "dev": "./scripts/dev.sh",
+    "dev:turbo": "turbo run dev",
     "lint": "pnpm run lint:policy && turbo run lint",
     "mobile:doctor": "sh scripts/mobile.sh doctor",
     "mobile:setup": "sh scripts/mobile.sh setup",
@@ -23,7 +24,11 @@
     "typecheck": "turbo run typecheck",
     "generate": "turbo run generate",
     "generate:check": "sh ./scripts/generate-check.sh",
-    "verify": "sh ./scripts/verify.sh"
+    "verify": "sh ./scripts/verify.sh",
+    "extension:plan": "node .agents/skills/playwright-extension-live-browser/scripts/run-plan.mjs",
+    "extension:session:reset": "node .agents/skills/playwright-extension-live-browser/scripts/reset-session.mjs",
+    "browser-control:plan": "node .agents/skills/playwright-extension-live-browser/scripts/run-plan.mjs",
+    "browser-control:session:reset": "node .agents/skills/playwright-extension-live-browser/scripts/reset-session.mjs"
   },
   "devDependencies": {
     "@eslint/js": "9.39.1",
@@ -32,6 +37,7 @@
     "eslint-plugin-perfectionist": "5.9.0",
     "globals": "17.6.0",
     "prettier": "3.6.2",
+    "vitest": "4.1.9",
     "typescript-eslint": "8.61.0",
     "turbo": "2.6.0"
   }

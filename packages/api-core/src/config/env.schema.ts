@@ -23,6 +23,34 @@ const emptyStringToUndefined = z.preprocess(
   z.string().optional(),
 );
 
+const isHttpUrl = (value: string): boolean => {
+  try {
+    new URL(value);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+// Accepts one origin or a comma-separated list, validating each entry as a URL.
+const commaSeparatedOrigins = z
+  .string()
+  .min(1)
+  .refine(
+    (value) =>
+      value
+        .split(',')
+        .map((origin) => origin.trim())
+        .filter(Boolean)
+        .every(isHttpUrl),
+    { message: 'must be a comma-separated list of valid origin URLs' },
+  );
+
+// Matches the format accepted by durationToMilliseconds (e.g. "15m", "7d").
+const durationString = z
+  .string()
+  .regex(/^\d+[smhdw]$/, 'must be a duration like "15m" or "7d"');
+
 export const envSchema = z.object({
   // Environment and process metadata.
   APP_ENV: z
@@ -37,12 +65,14 @@ export const envSchema = z.object({
   DATABASE_URL: z.url(),
   DATABASE_MIGRATE_URL: emptyStringToUndefined,
   DATABASE_SKIP_RLS_CHECK: booleanFromString.default(false),
-  DATABASE_URL_TEST: z.url(),
+  // Only required when APP_ENV=test (enforced by the superRefine below); production
+  // and dev boots (e.g. the Playwright API server) must not need a test database URL.
+  DATABASE_URL_TEST: z.url().optional(),
   DATABASE_URL_TEST_ADMIN: emptyStringToUndefined,
   // Public and internal HTTP endpoints.
   API_PORT: z.coerce.number().int().positive().default(3001),
   WEB_PORT: z.coerce.number().int().positive(),
-  WEB_ORIGIN: z.string().min(1),
+  WEB_ORIGIN: commaSeparatedOrigins,
   API_INTERNAL_URL: z.url(),
   NEXT_PUBLIC_WEB_URL: z.url(),
   NEXT_PUBLIC_API_BASE_PATH: z.string().min(1).default('/api'),
@@ -68,8 +98,8 @@ export const envSchema = z.object({
   // Token signing secrets and TTLs.
   JWT_ACCESS_SECRET: z.string().min(24),
   JWT_REFRESH_SECRET: z.string().min(24),
-  JWT_ACCESS_TTL: z.string().min(2),
-  JWT_REFRESH_TTL: z.string().min(2),
+  JWT_ACCESS_TTL: durationString,
+  JWT_REFRESH_TTL: durationString,
   // Mail transport and local Mailpit access.
   MAIL_HOST: z.string().min(1),
   MAIL_PORT: z.coerce.number().int().positive(),
@@ -98,6 +128,14 @@ export const envSchema = z.object({
   S3_ACCESS_KEY_ID: emptyStringToUndefined,
   S3_SECRET_ACCESS_KEY: emptyStringToUndefined,
   S3_ENDPOINT: emptyStringToUndefined,
+}).superRefine((env, ctx) => {
+  if (env.APP_ENV === 'test' && !env.DATABASE_URL_TEST) {
+    ctx.addIssue({
+      code: 'custom',
+      path: ['DATABASE_URL_TEST'],
+      message: 'DATABASE_URL_TEST is required when APP_ENV=test',
+    });
+  }
 });
 
 export type AppEnvironment = z.infer<typeof envSchema>;

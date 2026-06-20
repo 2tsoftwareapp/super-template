@@ -1,0 +1,239 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - img [ref=e7]
+          - generic [ref=e9]: Super Template
+        - navigation [ref=e10]:
+          - link "Features" [ref=e11] [cursor=pointer]:
+            - /url: "#features"
+          - link "Architecture" [ref=e12] [cursor=pointer]:
+            - /url: "#architecture"
+          - link "Stack" [ref=e13] [cursor=pointer]:
+            - /url: "#stack"
+          - link "Get started" [ref=e14] [cursor=pointer]:
+            - /url: "#get-started"
+        - link "GitHub" [ref=e16] [cursor=pointer]:
+          - /url: https://github.com/truongnat/super-template
+          - img [ref=e17]
+          - text: GitHub
+    - generic [ref=e22]:
+      - generic [ref=e23]: Production-ready · pnpm monorepo · MIT licensed
+      - heading "Ship your product. Not your boilerplate." [level=1] [ref=e24]
+      - paragraph [ref=e25]: A complete monorepo with Next.js web and admin apps, NestJS, Flutter, and shared @repo/web-core logic — wired together with a contract-driven API, seeded auth, and production tooling from day one.
+      - generic [ref=e26]:
+        - link "See what's included" [ref=e27] [cursor=pointer]:
+          - /url: "#features"
+        - link "Get started" [ref=e28] [cursor=pointer]:
+          - /url: "#get-started"
+      - generic [ref=e29]:
+        - generic [ref=e30]:
+          - img [ref=e31]
+          - text: Contract-driven API
+        - generic [ref=e34]:
+          - img [ref=e35]
+          - text: Seeded admin account
+        - generic [ref=e38]:
+          - img [ref=e39]
+          - text: One-command bootstrap
+        - generic [ref=e42]:
+          - img [ref=e43]
+          - text: Full CI pipeline
+    - generic [ref=e47]:
+      - generic [ref=e48]:
+        - generic [ref=e49]: What's inside
+        - heading "Everything connected, nothing missing" [level=2] [ref=e50]
+        - paragraph [ref=e51]: Four apps sharing one database schema and one API contract. Change the schema, regenerate — all clients update automatically.
+      - generic [ref=e52]:
+        - generic [ref=e54]:
+          - img [ref=e56]
+          - generic [ref=e60]:
+            - generic [ref=e61]:
+              - paragraph [ref=e62]: API
+              - heading "Contract-first API" [level=3] [ref=e63]
+              - paragraph [ref=e64]: OpenAPI schema auto-generated from NestJS decorators. TypeScript and Dart clients regenerate on every change — no manual sync.
+            - list [ref=e65]:
+              - listitem [ref=e66]: "@nestjs/swagger decorators"
+              - listitem [ref=e68]: openapi-typescript client
+              - listitem [ref=e70]: Dart codegen for Flutter
+        - generic [ref=e73]:
+          - img [ref=e75]
+          - generic [ref=e77]:
+            - generic [ref=e78]:
+              - paragraph [ref=e79]: Auth
+              - heading "Multi-tenant auth" [level=3] [ref=e80]
+              - paragraph [ref=e81]: JWT access + refresh tokens in secure HttpOnly cookies. Workspace isolation, CSRF protection, and role-based access built in.
+            - list [ref=e82]:
+              - listitem [ref=e83]: Argon2 password hashing
+              - listitem [ref=e85]: Refresh token rotation
+              - listitem [ref=e87]: CSRF protection
+        - generic [ref=e90]:
+          - img [ref=e92]
+          - generic [ref=e94]:
+            - generic [ref=e95]:
+              - paragraph [ref=e96]: Admin
+              - heading "Separate admin app" [level=3] [ref=e97]
+              - paragraph [ref=e98]: A dedicated Next.js admin workspace that reuses the shared web-core layer while keeping operational tooling isolated from the user-facing product.
+            - list [ref=e99]:
+              - listitem [ref=e100]: User & role management
+              - listitem [ref=e102]: Jobs, mail, imports
+              - listitem [ref=e104]: Audit logs & notifications
+        - generic [ref=e107]:
+          - img [ref=e109]
+          - generic [ref=e111]:
+            - generic [ref=e112]:
+              - paragraph [ref=e113]: Mobile
+              - heading "Flutter mobile" [level=3] [ref=e114]
+              - paragraph [ref=e115]: Production-oriented Flutter starter with an auto-generated API client from the OpenAPI schema and FCM push support.
+            - list [ref=e116]:
+              - listitem [ref=e117]: Riverpod state management
+              - listitem [ref=e119]: go_router navigation
+              - listitem [ref=e121]: FCM push notifications
+    - generic [ref=e124]:
+      - generic [ref=e125]:
+        - generic [ref=e126]: Architecture
+        - heading "Three surfaces, one backend" [level=2] [ref=e127]
+        - paragraph [ref=e128]: The NestJS API serves all three frontends from a single Postgres database. Web and admin traffic flow through Next.js BFFs that share @repo/web-core, while Flutter talks directly to the API.
+      - img "System architecture diagram" [ref=e130]:
+        - generic [ref=e131]: CLIENTS
+        - generic [ref=e132]: BFF
+        - generic [ref=e133]: API
+        - generic [ref=e134]: INFRA
+        - generic [ref=e136]: Web Browser
+        - generic [ref=e137]: Next.js App Router
+        - generic [ref=e139]: Admin Browser
+        - generic [ref=e140]: Next.js Admin
+        - generic [ref=e142]: Flutter App
+        - generic [ref=e143]: iOS · Android
+        - generic [ref=e145]: Next.js 16 Web BFF
+        - generic [ref=e146]: HttpOnly cookies · CSRF
+        - generic [ref=e148]: Next.js 16 Admin BFF
+        - generic [ref=e149]: HttpOnly cookies · CSRF
+        - generic [ref=e151]: NestJS 11 API
+        - generic [ref=e152]: auth · users · access-control · audit · notifications · projects
+        - generic [ref=e153]: storage · mail · jobs · invitations · imports/exports · comments
+        - generic [ref=e154]: Drizzle ORM · Argon2 · JWT access + refresh rotation · OpenAPI schema auto-generated
+        - generic [ref=e156]: PostgreSQL
+        - generic [ref=e157]: Primary datastore
+        - generic [ref=e159]: Mailpit / SMTP
+        - generic [ref=e160]: Email delivery
+        - generic [ref=e162]: AWS S3
+        - generic [ref=e163]: Object storage
+        - generic [ref=e165]: Firebase FCM
+        - generic [ref=e166]: Mobile push
+    - generic [ref=e168]:
+      - generic [ref=e169]:
+        - generic [ref=e170]:
+          - paragraph [ref=e171]: Tech stack
+          - heading "Every dependency chosen for production, not demos." [level=2] [ref=e172]:
+            - text: Every dependency chosen
+            - text: for production, not demos.
+        - paragraph [ref=e173]: 16 packages across 6 layers. Every version pinned. Every choice documented.
+      - generic [ref=e174]:
+        - generic [ref=e175]:
+          - generic [ref=e177]: Web
+          - generic [ref=e179]:
+            - generic [ref=e180]: Next.js
+            - generic [ref=e181]: "16"
+            - generic [ref=e182]: App Router · same-origin BFF · product-facing routing and middleware
+          - generic [ref=e183]:
+            - generic [ref=e184]: shadcn/ui
+            - generic [ref=e185]: 4.x
+            - generic [ref=e186]: Unstyled component system built on Base UI primitives
+          - generic [ref=e187]:
+            - generic [ref=e188]: TanStack Query
+            - generic [ref=e189]: 5.x
+            - generic [ref=e190]: Server state synchronization, mutations, and caching
+          - generic [ref=e191]:
+            - generic [ref=e192]: Tailwind CSS
+            - generic [ref=e193]: 4.x
+            - generic [ref=e194]: Utility-first styling with OKLCH perceptual color tokens
+        - generic [ref=e195]:
+          - generic [ref=e197]: Shared
+          - generic [ref=e199]:
+            - generic [ref=e200]: "@repo/web-core"
+            - generic [ref=e201]: workspace:*
+            - generic [ref=e202]: Shared auth, session, HTTP, query, and utility logic used by web and admin
+        - generic [ref=e203]:
+          - generic [ref=e205]: API
+          - generic [ref=e207]:
+            - generic [ref=e208]: NestJS
+            - generic [ref=e209]: "11"
+            - generic [ref=e210]: Modular Node.js framework with dependency injection
+          - generic [ref=e211]:
+            - generic [ref=e212]: Drizzle ORM
+            - generic [ref=e213]: "0.45"
+            - generic [ref=e214]: Type-safe SQL with zero runtime overhead — no magic
+          - generic [ref=e215]:
+            - generic [ref=e216]: PostgreSQL
+            - generic [ref=e217]: "18"
+            - generic [ref=e218]: Primary relational store with multi-tenant workspace isolation
+        - generic [ref=e219]:
+          - generic [ref=e221]: Admin
+          - generic [ref=e223]:
+            - generic [ref=e224]: Next.js
+            - generic [ref=e225]: "16"
+            - generic [ref=e226]: App Router · same-origin BFF · admin-only routes
+          - generic [ref=e227]:
+            - generic [ref=e228]: TanStack Table
+            - generic [ref=e229]: 8.x
+            - generic [ref=e230]: Headless table with sorting, filtering, and pagination hooks
+        - generic [ref=e231]:
+          - generic [ref=e233]: Mobile
+          - generic [ref=e235]:
+            - generic [ref=e236]: Flutter
+            - generic [ref=e237]: 3.x
+            - generic [ref=e238]: Cross-platform iOS and Android from a single codebase
+          - generic [ref=e239]:
+            - generic [ref=e240]: Riverpod
+            - generic [ref=e241]: 2.x
+            - generic [ref=e242]: Compile-safe reactive state management for Flutter
+        - generic [ref=e243]:
+          - generic [ref=e245]: Tooling
+          - generic [ref=e247]:
+            - generic [ref=e248]: Turborepo
+            - generic [ref=e249]: 2.x
+            - generic [ref=e250]: Monorepo task orchestration with remote caching
+          - generic [ref=e251]:
+            - generic [ref=e252]: pnpm
+            - generic [ref=e253]: "11"
+            - generic [ref=e254]: Content-addressable, disk-efficient package manager
+          - generic [ref=e255]:
+            - generic [ref=e256]: Vitest
+            - generic [ref=e257]: 4.x
+            - generic [ref=e258]: Vite-native test runner · compatible with Jest APIs
+          - generic [ref=e259]:
+            - generic [ref=e260]: Playwright
+            - generic [ref=e261]: "1.61"
+            - generic [ref=e262]: End-to-end browser testing across Chromium, Firefox, WebKit
+    - generic [ref=e264]:
+      - generic [ref=e265]:
+        - generic [ref=e266]: Get started
+        - heading "Running in under 5 minutes" [level=2] [ref=e267]
+        - paragraph [ref=e268]: Docker, pnpm, and the Flutter SDK are all you need.
+      - generic [ref=e269]:
+        - generic [ref=e270]:
+          - paragraph [ref=e271]: "01"
+          - heading "Clone the repo" [level=3] [ref=e272]
+          - paragraph [ref=e273]: One git clone to get the full monorepo — web, API, admin, and Flutter mobile.
+          - code [ref=e275]: $ git clone https://github.com/truongnat/super-template
+        - generic [ref=e276]:
+          - paragraph [ref=e277]: "02"
+          - heading "Bootstrap" [level=3] [ref=e278]
+          - paragraph [ref=e279]: Installs deps, starts Postgres, migrates, seeds demo accounts, and generates all API contracts.
+          - code [ref=e281]: $ make bootstrap
+        - generic [ref=e282]:
+          - paragraph [ref=e283]: "03"
+          - heading "Start building" [level=3] [ref=e284]
+          - paragraph [ref=e285]: All apps start in parallel. Replace the placeholder content with your product.
+          - code [ref=e287]: $ make dev
+    - contentinfo [ref=e288]:
+      - generic [ref=e290]:
+        - generic [ref=e291]:
+          - img [ref=e293]
+          - generic [ref=e295]: Super Template
+        - paragraph [ref=e296]: Production-ready fullstack starter. MIT licensed.
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e302] [cursor=pointer]:
+    - img [ref=e303]

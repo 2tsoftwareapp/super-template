@@ -10,7 +10,7 @@ import {
 
 import { ArchDiagram } from "@/components/arch-diagram";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 const features = [
   {
@@ -187,7 +187,7 @@ const steps = [
     title: "Clone the repo",
     description:
       "One git clone to get the full monorepo — web, API, admin, and Flutter mobile.",
-    code: "git clone https://github.com/your-org/super-template",
+    code: "git clone https://github.com/truongnat/super-template",
   },
   {
     step: "02",
@@ -253,15 +253,21 @@ export default function Home() {
             </a>
           </nav>
           <div className="flex items-center justify-end">
-            <a
-              href="https://github.com/your-org/super-template"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-md bg-foreground px-3 py-1.5 text-sm font-medium text-background transition-colors hover:bg-foreground/90"
+            <Button
+              size="sm"
+              className="bg-foreground text-background hover:bg-foreground/90 hover:text-background"
+              nativeButton={false}
+              render={
+                <a
+                  href="https://github.com/truongnat/super-template"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                />
+              }
             >
               <Github className="size-4" />
               GitHub
-            </a>
+            </Button>
           </div>
         </div>
       </header>
@@ -288,22 +294,17 @@ export default function Home() {
               one.
             </p>
             <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
-              <a
-                href="#features"
-                className={cn(
-                  "inline-flex items-center justify-center rounded-md border border-input bg-background px-6 py-2.5 text-sm font-medium shadow-xs transition-colors hover:bg-accent hover:text-accent-foreground",
-                )}
+              <Button
+                variant="outline"
+                size="lg"
+                nativeButton={false}
+                render={<a href="#features" />}
               >
                 See what&apos;s included
-              </a>
-              <a
-                href="#get-started"
-                className={cn(
-                  "inline-flex items-center justify-center rounded-md bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground shadow-xs transition-colors hover:bg-primary/90",
-                )}
-              >
+              </Button>
+              <Button size="lg" nativeButton={false} render={<a href="#get-started" />}>
                 Get started
-              </a>
+              </Button>
             </div>
             <div className="mt-12 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-muted-foreground">
               {highlights.map((item) => (

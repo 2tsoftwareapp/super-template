@@ -1,6 +1,0 @@
-- generic [active] [ref=e1]:
-  - generic [ref=e4]:
-    - status "Loading" [ref=e5]
-    - generic [ref=e7]: Restoring your session
-    - generic [ref=e8]: Loading workspace state and permissions.
-  - region "Notifications alt+T"

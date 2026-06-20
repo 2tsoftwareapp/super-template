@@ -30,6 +30,8 @@ export const tenantContextForJob = (job: {
   bypassRls: false,
 });
 
+// Transaction-scoped path: is_local=true so the GUCs auto-reset when the
+// surrounding transaction ends. Used inside runInTransaction/withTenantContext.
 export const setTenantContextOnExecutor = async (
   executor: DatabaseExecutor,
   context: TenantContext,
@@ -45,6 +47,11 @@ export const setTenantContextOnExecutor = async (
   );
 };
 
+// Pooled-connection path: is_local=false (session-level) so the context survives
+// across the multiple implicit transactions a checked-out client may run. This is
+// safe because createTenantAwarePool re-applies the context on every checkout, so a
+// connection never leaks the previous request's tenant. Do NOT switch this to
+// is_local=true: a non-transactional query on the same client would lose the context.
 export const setTenantContextOnPgClient = async (
   client: PoolClient,
   context?: TenantContext,

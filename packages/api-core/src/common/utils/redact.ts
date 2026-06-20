@@ -3,30 +3,42 @@ const REDACT_KEYS = new Set([
   'cookie',
   'cookies',
   'password',
-  'passwordHash',
-  'accessToken',
-  'refreshToken',
+  'passwordhash',
+  'accesstoken',
+  'refreshtoken',
   'token',
-  'resetToken',
-  'verificationToken',
+  'resettoken',
+  'verificationtoken',
 ]);
 
-export const redactSensitive = (value: unknown): unknown => {
+export const redactSensitive = (value: unknown): unknown =>
+  redactInternal(value, new WeakSet<object>());
+
+const redactInternal = (value: unknown, seen: WeakSet<object>): unknown => {
   if (Array.isArray(value)) {
-    return value.map(redactSensitive);
+    if (seen.has(value)) {
+      return '[Circular]';
+    }
+    seen.add(value);
+    return value.map((item) => redactInternal(item, seen));
   }
 
   if (!value || typeof value !== 'object') {
     return value;
   }
 
+  if (seen.has(value)) {
+    return '[Circular]';
+  }
+  seen.add(value);
+
   return Object.fromEntries(
     Object.entries(value).map(([key, nestedValue]) => {
-      if (REDACT_KEYS.has(key)) {
+      if (REDACT_KEYS.has(key.toLowerCase())) {
         return [key, '[REDACTED]'];
       }
 
-      return [key, redactSensitive(nestedValue)];
+      return [key, redactInternal(nestedValue, seen)];
     }),
   );
 };

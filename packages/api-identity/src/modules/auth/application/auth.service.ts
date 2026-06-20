@@ -15,13 +15,20 @@ import type {
   VerifyEmailCommand,
 } from './auth.types';
 
-import { AuthenticateAccessTokenUseCase } from './authenticate-access-token.use-case';
-import { EmailVerificationUseCase } from './email-verification.use-case';
-import { LoginUseCase } from './login.use-case';
-import { PasswordResetUseCase } from './password-reset.use-case';
-import { RefreshSessionUseCase } from './refresh-session.use-case';
-import { RegisterUseCase } from './register.use-case';
-import { SessionManagementUseCase } from './session-management.use-case';
+import { AuthenticateAccessTokenUseCase } from './use-cases/authenticate-access-token.use-case';
+import { ForgotPasswordUseCase } from './use-cases/forgot-password.use-case';
+import { GetMeUseCase } from './use-cases/get-me.use-case';
+import { GetSessionsUseCase } from './use-cases/get-sessions.use-case';
+import { LoginUseCase } from './use-cases/login.use-case';
+import { LogoutAllUseCase } from './use-cases/logout-all.use-case';
+import { LogoutUseCase } from './use-cases/logout.use-case';
+import { RefreshSessionUseCase } from './use-cases/refresh-session.use-case';
+import { RegisterUseCase } from './use-cases/register.use-case';
+import { ResendVerificationUseCase } from './use-cases/resend-verification.use-case';
+import { ResetPasswordUseCase } from './use-cases/reset-password.use-case';
+import { RevokeSessionUseCase } from './use-cases/revoke-session.use-case';
+import { SwitchOrganizationUseCase } from './use-cases/switch-organization.use-case';
+import { VerifyEmailUseCase } from './use-cases/verify-email.use-case';
 
 @Injectable()
 export class AuthService {
@@ -29,9 +36,16 @@ export class AuthService {
     private readonly registerUseCase: RegisterUseCase,
     private readonly loginUseCase: LoginUseCase,
     private readonly refreshSessionUseCase: RefreshSessionUseCase,
-    private readonly sessionManagementUseCase: SessionManagementUseCase,
-    private readonly passwordResetUseCase: PasswordResetUseCase,
-    private readonly emailVerificationUseCase: EmailVerificationUseCase,
+    private readonly switchOrganizationUseCase: SwitchOrganizationUseCase,
+    private readonly logoutUseCase: LogoutUseCase,
+    private readonly logoutAllUseCase: LogoutAllUseCase,
+    private readonly getMeUseCase: GetMeUseCase,
+    private readonly getSessionsUseCase: GetSessionsUseCase,
+    private readonly revokeSessionUseCase: RevokeSessionUseCase,
+    private readonly forgotPasswordUseCase: ForgotPasswordUseCase,
+    private readonly resetPasswordUseCase: ResetPasswordUseCase,
+    private readonly verifyEmailUseCase: VerifyEmailUseCase,
+    private readonly resendVerificationUseCase: ResendVerificationUseCase,
     private readonly authenticateAccessTokenUseCase: AuthenticateAccessTokenUseCase,
   ) {}
 
@@ -52,7 +66,7 @@ export class AuthService {
     organizationId: string,
     requestContext?: RequestContext,
   ) {
-    return this.sessionManagementUseCase.switchOrganization(
+    return this.switchOrganizationUseCase.execute(
       user,
       organizationId,
       requestContext,
@@ -60,19 +74,19 @@ export class AuthService {
   }
 
   logout(user: AuthenticatedRequestUser, requestContext?: RequestContext) {
-    return this.sessionManagementUseCase.logout(user, requestContext);
+    return this.logoutUseCase.execute(user, requestContext);
   }
 
   logoutAll(user: AuthenticatedRequestUser, requestContext?: RequestContext) {
-    return this.sessionManagementUseCase.logoutAll(user, requestContext);
+    return this.logoutAllUseCase.execute(user, requestContext);
   }
 
   getMe(user: AuthenticatedRequestUser) {
-    return this.sessionManagementUseCase.getMe(user);
+    return this.getMeUseCase.execute(user);
   }
 
   getSessions(user: AuthenticatedRequestUser) {
-    return this.sessionManagementUseCase.getSessions(user);
+    return this.getSessionsUseCase.execute(user);
   }
 
   revokeSession(
@@ -80,7 +94,7 @@ export class AuthService {
     sessionId: string,
     requestContext?: RequestContext,
   ) {
-    return this.sessionManagementUseCase.revokeSession(
+    return this.revokeSessionUseCase.execute(
       user,
       sessionId,
       requestContext,
@@ -88,19 +102,19 @@ export class AuthService {
   }
 
   forgotPassword(input: ForgotPasswordCommand) {
-    return this.passwordResetUseCase.forgotPassword(input);
+    return this.forgotPasswordUseCase.execute(input);
   }
 
   resetPassword(input: ResetPasswordCommand, requestContext?: RequestContext) {
-    return this.passwordResetUseCase.resetPassword(input, requestContext);
+    return this.resetPasswordUseCase.execute(input, requestContext);
   }
 
   verifyEmail(input: VerifyEmailCommand, requestContext?: RequestContext) {
-    return this.emailVerificationUseCase.verifyEmail(input, requestContext);
+    return this.verifyEmailUseCase.execute(input, requestContext);
   }
 
   resendVerification(input: ResendVerificationCommand) {
-    return this.emailVerificationUseCase.resendVerification(input);
+    return this.resendVerificationUseCase.execute(input);
   }
 
   authenticateAccessToken(token: string) {

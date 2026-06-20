@@ -3,13 +3,13 @@ import { Module } from '@nestjs/common';
 import { AuditModule } from '../audit/audit.module';
 import { FilesModule } from '../files/files.module';
 import { StorageModule } from '../storage/storage.module';
-import { ConfirmImportUseCase } from './application/confirm-import.use-case';
-import { CreateImportUseCase } from './application/create-import.use-case';
-import { GetImportUseCase } from './application/get-import.use-case';
-import { ImportFileParserService } from './application/import-file-parser.service';
 import { ImportsMapper } from './application/imports.mapper';
 import { IMPORT_JOBS_REPOSITORY } from './application/imports.repository.port';
 import { ImportsService } from './application/imports.service';
+import { ImportFileParserService } from './application/services/import-file-parser.service';
+import { ConfirmImportUseCase } from './application/use-cases/confirm-import.use-case';
+import { CreateImportUseCase } from './application/use-cases/create-import.use-case';
+import { GetImportUseCase } from './application/use-cases/get-import.use-case';
 import { ImportJobsRepository } from './infrastructure/import-jobs.repository';
 import { ImportsController } from './presentation/imports.controller';
 

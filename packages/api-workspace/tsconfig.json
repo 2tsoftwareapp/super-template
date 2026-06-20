@@ -3,7 +3,10 @@
   "compilerOptions": {
     "outDir": "dist",
     "baseUrl": ".",
-    "strictPropertyInitialization": false
+    "strictPropertyInitialization": false,
+    "paths": {
+      "@workspace/*": ["./src/*"]
+    }
   },
   "include": ["src/**/*.ts", "../api-core/src/common/types/express.d.ts"],
   "exclude": ["src/**/*.spec.ts"]
