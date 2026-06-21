@@ -33,7 +33,10 @@ export function HomeAuthActions() {
 
   const signOut = useMutation({
     mutationFn: () => webFetch("/api/auth/logout", { method: "POST" }),
-    onSuccess: async () => {
+    onSettled: async () => {
+      // Run on success AND failure: the logout route always clears cookies even
+      // when the backend revoke call fails (e.g. an already-expired access
+      // token), so the client must still treat this as a completed sign-out.
       await queryClient.invalidateQueries({ queryKey: ["session"] });
       router.refresh();
     },

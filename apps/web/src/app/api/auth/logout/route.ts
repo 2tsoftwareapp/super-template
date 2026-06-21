@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
 
-import type { ApiEnvelope } from "@/lib/api-types";
-
 import { clearAuthCookies, readAuthCookies } from "@/lib/auth/cookies";
 import { callBackend } from "@/lib/server/backend";
 
@@ -9,20 +7,16 @@ export async function POST() {
   const { accessToken } = await readAuthCookies();
 
   if (accessToken) {
-    const response = await callBackend({
+    // Best-effort: revoke the session server-side, but an already-invalid or
+    // expired access token (auth/* calls deliberately skip the silent-refresh
+    // retry in proxyWithRefresh) must not block the client from logging out.
+    // Clearing cookies below is what actually ends the session for this client.
+    await callBackend({
       path: "auth/logout",
       method: "POST",
       headers: new Headers(),
       accessToken,
-    });
-    const payload = (await response.json()) as ApiEnvelope<{
-      success: boolean;
-    }>;
-    const nextResponse = NextResponse.json(payload, {
-      status: response.status,
-    });
-    clearAuthCookies(nextResponse);
-    return nextResponse;
+    }).catch(() => undefined);
   }
 
   const nextResponse = NextResponse.json({

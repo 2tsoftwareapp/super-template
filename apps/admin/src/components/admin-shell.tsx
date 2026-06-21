@@ -81,8 +81,11 @@ export function AdminShell({ children }: { children: ReactNode }) {
   }, [router, session.isError]);
 
   const onSignOut = async () => {
-    await webFetch("/api/auth/logout", { method: "POST" });
-    router.replace("/login");
+    try {
+      await webFetch("/api/auth/logout", { method: "POST" });
+    } finally {
+      router.replace("/login");
+    }
   };
 
   const user = session.data?.data.user;

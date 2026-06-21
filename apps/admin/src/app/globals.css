@@ -2,6 +2,12 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+/* Tailwind only scans this app's own source by default; @repo/web-core is
+   consumed as raw .ts/.tsx source from a sibling package, so its utility
+   classes must be scanned explicitly or they're silently dropped from the
+   compiled CSS. */
+@source "../../../../packages/web-core/src";
+
 @custom-variant dark (&:is(.dark *));
 
 :root {

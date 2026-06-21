@@ -113,8 +113,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   className="mt-4 w-full"
                   variant="outline"
                   onClick={async () => {
-                    await webFetch("/api/auth/logout", { method: "POST" });
-                    router.replace("/login");
+                    try {
+                      await webFetch("/api/auth/logout", { method: "POST" });
+                    } finally {
+                      router.replace("/login");
+                    }
                   }}
                 >
                   <LogOut className="mr-2 h-4 w-4" />

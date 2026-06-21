@@ -1,0 +1,296 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e19]:
+    - complementary [ref=e20]:
+      - generic [ref=e21]:
+        - generic [ref=e22]:
+          - img [ref=e24]
+          - generic [ref=e26]:
+            - paragraph [ref=e27]: Super Admin
+            - paragraph [ref=e28]: Resource console
+        - button "Collapse sidebar" [ref=e29]:
+          - img [ref=e30]
+      - navigation [ref=e32]:
+        - generic [ref=e33]:
+          - paragraph [ref=e34]: Overview
+          - link "Dashboard" [ref=e36] [cursor=pointer]:
+            - /url: /
+            - img [ref=e37]
+            - generic [ref=e42]: Dashboard
+        - generic [ref=e43]:
+          - paragraph [ref=e44]: People
+          - generic [ref=e45]:
+            - link "Users" [ref=e46] [cursor=pointer]:
+              - /url: /users
+              - img [ref=e47]
+              - generic [ref=e52]: Users
+            - link "Roles" [ref=e53] [cursor=pointer]:
+              - /url: /roles
+              - img [ref=e54]
+              - generic [ref=e56]: Roles
+        - generic [ref=e57]:
+          - paragraph [ref=e58]: Operations
+          - generic [ref=e59]:
+            - link "Projects" [ref=e60] [cursor=pointer]:
+              - /url: /projects
+              - img [ref=e61]
+              - generic [ref=e63]: Projects
+            - link "Audit logs" [ref=e64] [cursor=pointer]:
+              - /url: /audit-logs
+              - img [ref=e65]
+              - generic [ref=e67]: Audit logs
+            - link "Notifications" [ref=e68] [cursor=pointer]:
+              - /url: /notifications
+              - img [ref=e69]
+              - generic [ref=e72]: Notifications
+            - link "Jobs" [ref=e73] [cursor=pointer]:
+              - /url: /jobs
+              - img [ref=e74]
+              - generic [ref=e78]: Jobs
+            - link "Mail" [ref=e79] [cursor=pointer]:
+              - /url: /mail
+              - img [ref=e80]
+              - generic [ref=e83]: Mail
+            - link "Imports" [ref=e84] [cursor=pointer]:
+              - /url: /imports
+              - img [ref=e85]
+              - generic [ref=e87]: Imports
+        - generic [ref=e88]:
+          - paragraph [ref=e89]: System
+          - link "Settings" [ref=e91] [cursor=pointer]:
+            - /url: /settings
+            - img [ref=e92]
+            - generic [ref=e95]: Settings
+      - separator
+      - button "Seed Admin Seed Admin SUPER_ADMIN / ADMIN" [ref=e99]:
+        - generic "Seed Admin" [ref=e100]: SA
+        - generic [ref=e101]:
+          - paragraph [ref=e102]: Seed Admin
+          - paragraph [ref=e103]: SUPER_ADMIN / ADMIN
+    - generic [ref=e104]:
+      - banner [ref=e105]:
+        - generic [ref=e107]:
+          - img [ref=e108]
+          - generic [ref=e113]: Dashboard
+        - generic [ref=e114]:
+          - button "Dashboard actions" [ref=e117]:
+            - img [ref=e118]
+          - generic [ref=e120]:
+            - button "Seed Admin" [ref=e122]:
+              - generic "Seed Admin" [ref=e123]: SA
+            - generic [ref=e392]:
+              - button "Seed Admin Seed Admin" [ref=e393]:
+                - generic "Seed Admin" [ref=e394]: SA
+                - text: Seed Admin
+              - button "Settings" [ref=e395]:
+                - img [ref=e396]
+                - text: Settings
+              - button "Sign out" [ref=e399]:
+                - img [ref=e400]
+                - text: Sign out
+      - main [ref=e124]:
+        - generic [ref=e125]:
+          - generic [ref=e126]:
+            - generic [ref=e127]:
+              - generic "Seed Admin" [ref=e128]: SA
+              - generic [ref=e129]:
+                - heading "Good evening, Seed Admin" [level=1] [ref=e130]
+                - paragraph [ref=e131]: Saturday, June 20
+            - generic [ref=e132]:
+              - generic [ref=e137]: All systems go
+              - button "Refresh" [ref=e138]:
+                - img [ref=e139]
+                - text: Refresh
+          - generic [ref=e144]:
+            - generic [ref=e147]:
+              - generic [ref=e148]:
+                - paragraph [ref=e149]: Total users
+                - paragraph [ref=e150]: "2"
+                - generic [ref=e151]:
+                  - paragraph [ref=e152]: registered accounts
+                  - link "View" [ref=e153] [cursor=pointer]:
+                    - /url: /users
+                    - text: View
+                    - img [ref=e154]
+              - img [ref=e158]
+            - generic [ref=e165]:
+              - generic [ref=e166]:
+                - paragraph [ref=e167]: Projects
+                - paragraph [ref=e168]: "1"
+                - generic [ref=e169]:
+                  - paragraph [ref=e170]: active workspaces
+                  - link "View" [ref=e171] [cursor=pointer]:
+                    - /url: /projects
+                    - text: View
+                    - img [ref=e172]
+              - img [ref=e176]
+            - generic [ref=e180]:
+              - generic [ref=e181]:
+                - paragraph [ref=e182]: Jobs active
+                - paragraph [ref=e183]: "0"
+                - generic [ref=e184]:
+                  - paragraph [ref=e185]: 0 pending · none failed
+                  - link "View" [ref=e186] [cursor=pointer]:
+                    - /url: /jobs
+                    - text: View
+                    - img [ref=e187]
+              - img [ref=e191]
+            - generic [ref=e197]:
+              - generic [ref=e198]:
+                - paragraph [ref=e199]: Permissions
+                - paragraph [ref=e200]: "42"
+                - paragraph [ref=e202]: granted to your role
+              - img [ref=e204]
+          - generic [ref=e207]:
+            - generic [ref=e208]:
+              - generic [ref=e209]:
+                - generic [ref=e210]:
+                  - generic [ref=e211]:
+                    - generic [ref=e212]: Recent users
+                    - generic [ref=e213]: Latest registered accounts
+                  - link "View all" [ref=e214] [cursor=pointer]:
+                    - /url: /users
+                    - text: View all
+                    - img [ref=e215]
+                - table [ref=e220]:
+                  - rowgroup [ref=e221]:
+                    - row "User Roles Status Joined" [ref=e222]:
+                      - columnheader "User" [ref=e223]
+                      - columnheader "Roles" [ref=e224]
+                      - columnheader "Status" [ref=e225]
+                      - columnheader "Joined" [ref=e226]
+                  - rowgroup [ref=e227]:
+                    - row "Seed Admin Seed Admin admin@example.local SUPER_ADMIN ADMIN active 19h ago" [ref=e228] [cursor=pointer]:
+                      - cell "Seed Admin Seed Admin admin@example.local" [ref=e229]:
+                        - generic [ref=e230]:
+                          - generic "Seed Admin" [ref=e231]: SA
+                          - generic [ref=e232]:
+                            - link "Seed Admin" [ref=e233]:
+                              - /url: /users/fd961e77-6489-40de-aff7-b0faefa45a3e
+                            - paragraph [ref=e234]: admin@example.local
+                      - cell "SUPER_ADMIN ADMIN" [ref=e235]:
+                        - generic [ref=e236]:
+                          - generic [ref=e237]: SUPER_ADMIN
+                          - generic [ref=e238]: ADMIN
+                      - cell "active" [ref=e239]:
+                        - generic [ref=e240]: active
+                      - cell "19h ago" [ref=e241]
+                    - row "Seed User Seed User user@example.local USER ADMIN active 19h ago" [ref=e242] [cursor=pointer]:
+                      - cell "Seed User Seed User user@example.local" [ref=e243]:
+                        - generic [ref=e244]:
+                          - generic "Seed User" [ref=e245]: SU
+                          - generic [ref=e246]:
+                            - link "Seed User" [ref=e247]:
+                              - /url: /users/f5e36ea9-b069-4927-acec-49ee5a8bab69
+                            - paragraph [ref=e248]: user@example.local
+                      - cell "USER ADMIN" [ref=e249]:
+                        - generic [ref=e250]:
+                          - generic [ref=e251]: USER
+                          - generic [ref=e252]: ADMIN
+                      - cell "active" [ref=e253]:
+                        - generic [ref=e254]: active
+                      - cell "19h ago" [ref=e255]
+              - generic [ref=e256]:
+                - generic [ref=e257]:
+                  - generic [ref=e258]:
+                    - generic [ref=e259]: Recent projects
+                    - generic [ref=e260]: Latest workspace activity
+                  - link "View all" [ref=e261] [cursor=pointer]:
+                    - /url: /projects
+                    - text: View all
+                    - img [ref=e262]
+                - table [ref=e267]:
+                  - rowgroup [ref=e268]:
+                    - row "Project Status Updated" [ref=e269]:
+                      - columnheader "Project" [ref=e270]
+                      - columnheader "Status" [ref=e271]
+                      - columnheader "Updated" [ref=e272]
+                      - columnheader [ref=e273]
+                  - rowgroup [ref=e274]:
+                    - row "Starter Admin Project Reference admin-owned project active 19h ago Open" [ref=e275]:
+                      - cell "Starter Admin Project Reference admin-owned project" [ref=e276]:
+                        - paragraph [ref=e277]: Starter Admin Project
+                        - paragraph [ref=e278]: Reference admin-owned project
+                      - cell "active" [ref=e279]:
+                        - generic [ref=e280]: active
+                      - cell "19h ago" [ref=e281]
+                      - cell "Open" [ref=e282]:
+                        - link "Open" [ref=e283] [cursor=pointer]:
+                          - /url: /projects/6b00793b-1e32-4402-8fb3-2780f2273347
+            - generic [ref=e284]:
+              - generic [ref=e285]:
+                - generic [ref=e287]: System health
+                - generic [ref=e288]:
+                  - generic [ref=e289]:
+                    - generic [ref=e290]: API
+                    - generic [ref=e292]: Healthy
+                  - generic [ref=e296]:
+                    - generic [ref=e297]: Database
+                    - generic [ref=e299]: Healthy
+                  - generic [ref=e303]:
+                    - generic [ref=e304]: Job queue
+                    - generic [ref=e305]:
+                      - generic [ref=e306]: 0 pending
+                      - generic [ref=e307]: Healthy
+              - generic [ref=e311]:
+                - generic [ref=e312]:
+                  - generic [ref=e313]: Recent activity
+                  - link "All logs" [ref=e314] [cursor=pointer]:
+                    - /url: /audit-logs
+                - generic [ref=e316]:
+                  - generic [ref=e317]:
+                    - img [ref=e319]
+                    - generic [ref=e322]:
+                      - paragraph [ref=e323]: Auth · Login · Succeeded
+                      - paragraph [ref=e324]: user · fd961e77
+                    - generic [ref=e325]: 13m ago
+                  - generic [ref=e326]:
+                    - img [ref=e328]
+                    - generic [ref=e331]:
+                      - paragraph [ref=e332]: Auth · Login · Succeeded
+                      - paragraph [ref=e333]: user · fd961e77
+                    - generic [ref=e334]: 1h ago
+                  - generic [ref=e335]:
+                    - img [ref=e337]
+                    - generic [ref=e340]:
+                      - paragraph [ref=e341]: Auth · Login · Succeeded
+                      - paragraph [ref=e342]: user · fd961e77
+                    - generic [ref=e343]: 16h ago
+              - generic [ref=e344]:
+                - generic [ref=e345]:
+                  - generic [ref=e346]: Quick actions
+                  - generic [ref=e347]: Navigate to common pages
+                - generic [ref=e348]:
+                  - link "Users Manage accounts" [ref=e349] [cursor=pointer]:
+                    - /url: /users
+                    - img [ref=e351]
+                    - generic [ref=e356]: Users
+                    - generic [ref=e357]: Manage accounts
+                  - link "Projects View workspaces" [ref=e358] [cursor=pointer]:
+                    - /url: /projects
+                    - img [ref=e360]
+                    - generic [ref=e362]: Projects
+                    - generic [ref=e363]: View workspaces
+                  - link "Jobs Monitor queue" [ref=e364] [cursor=pointer]:
+                    - /url: /jobs
+                    - img [ref=e366]
+                    - generic [ref=e370]: Jobs
+                    - generic [ref=e371]: Monitor queue
+                  - link "Mail Check deliveries" [ref=e372] [cursor=pointer]:
+                    - /url: /mail
+                    - img [ref=e374]
+                    - generic [ref=e377]: Mail
+                    - generic [ref=e378]: Check deliveries
+                  - link "Notifications Send alerts" [ref=e379] [cursor=pointer]:
+                    - /url: /notifications
+                    - img [ref=e381]
+                    - generic [ref=e384]: Notifications
+                    - generic [ref=e385]: Send alerts
+                  - link "Audit logs Review events" [ref=e386] [cursor=pointer]:
+                    - /url: /audit-logs
+                    - img [ref=e388]
+                    - generic [ref=e390]: Audit logs
+                    - generic [ref=e391]: Review events
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e14] [cursor=pointer]:
+    - img [ref=e15]
+  - alert [ref=e18]
