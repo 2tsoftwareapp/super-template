@@ -48,7 +48,7 @@ function mailStatusProps(status: string): {
 }
 
 export function MailView() {
-  const [templateKey, setTemplateKey] = useState("welcome");
+  const [templateKey, setTemplateKey] = useState("auth.welcome");
 
   const deliveries = useQuery({
     queryKey: ["admin-mail-deliveries"],
@@ -89,7 +89,7 @@ export function MailView() {
                 className="flex-1"
                 value={templateKey}
                 onChange={(e) => setTemplateKey(e.target.value)}
-                placeholder="Template key (e.g. welcome)"
+                placeholder="Template key (e.g. auth.welcome)"
               />
               <Button
                 variant="outline"
@@ -109,6 +109,17 @@ export function MailView() {
               {preview.isLoading ? (
                 <div className="flex justify-center py-4">
                   <Spinner className="size-4" />
+                </div>
+              ) : preview.isError ? (
+                <div className="space-y-2 py-2 text-sm">
+                  <p className="font-medium text-destructive">
+                    Preview unavailable.
+                  </p>
+                  <p className="text-muted-foreground">
+                    {preview.error instanceof Error
+                      ? preview.error.message
+                      : "The template key is invalid or the preview endpoint is unavailable."}
+                  </p>
                 </div>
               ) : preview.data?.data ? (
                 <>

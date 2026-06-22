@@ -1,5 +1,6 @@
 import type { NextRequest } from "next/server";
 
+import { normalizeBffListPath } from "@/lib/search-params";
 import { enforceCsrf, proxyWithRefresh } from "@/lib/server/backend";
 
 const normalizePath = (segments: string[]) => segments.join("/");
@@ -9,7 +10,10 @@ async function handleRequest(
   context: { params: Promise<{ path: string[] }> },
 ) {
   const { path } = await context.params;
-  const normalizedPath = normalizePath(path);
+  const normalizedPath = normalizeBffListPath(
+    normalizePath(path),
+    request.nextUrl.searchParams,
+  );
 
   if (
     normalizedPath.includes("..") ||

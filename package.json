@@ -7,7 +7,7 @@
     "pnpm": ">=11.7.0"
   },
   "scripts": {
-    "lint:policy": "sh scripts/check-source-policy.sh && sh scripts/check-package-cycles.sh && pnpm exec turbo boundaries",
+    "lint:policy": "sh scripts/check-source-policy.sh && sh scripts/check-package-cycles.sh && sh scripts/clean-policy-artifacts.sh && pnpm exec turbo boundaries",
     "build": "turbo run build",
     "dev": "./scripts/dev.sh",
     "dev:turbo": "turbo run dev",

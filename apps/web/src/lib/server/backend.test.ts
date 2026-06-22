@@ -26,10 +26,17 @@ vi.mock("@/lib/env", () => ({
   isSecureCookie: false,
 }));
 
-vi.mock("@/lib/auth/cookies", () => ({
+vi.mock("@repo/web-core/auth/cookies", () => ({
   readAuthCookies: readAuthCookiesMock,
   setAuthCookies: setAuthCookiesMock,
   clearAuthCookies: clearAuthCookiesMock,
+  createAuthCookieHelpers: () => ({
+    readAuthCookies: readAuthCookiesMock,
+    setAuthCookies: setAuthCookiesMock,
+    clearAuthCookies: clearAuthCookiesMock,
+    createCsrfToken: vi.fn(),
+    isValidCsrfToken: vi.fn().mockReturnValue(true),
+  }),
 }));
 
 describe("proxyWithRefresh", () => {
@@ -156,7 +163,7 @@ describe("proxyWithRefresh", () => {
     expect(setAuthCookiesMock).not.toHaveBeenCalled();
   });
 
-  it("normalizes list-route query params before proxying to the backend", async () => {
+  it("forwards a normalized list-route query string to the backend", async () => {
     fetchMock.mockResolvedValueOnce(
       new Response(
         JSON.stringify({
@@ -180,7 +187,10 @@ describe("proxyWithRefresh", () => {
       },
     );
 
-    const response = await proxyWithRefresh(request, "projects");
+    const response = await proxyWithRefresh(
+      request,
+      "projects?page=2&limit=5&status=ACTIVE&sortField=name&sortOrder=asc",
+    );
 
     expect(response.status).toBe(200);
     expect(fetchMock).toHaveBeenCalledTimes(1);

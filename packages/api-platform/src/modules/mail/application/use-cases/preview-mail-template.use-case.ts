@@ -9,7 +9,7 @@ export class PreviewMailTemplateUseCase {
 
   async execute(templateKey: string, variables?: Record<string, string>) {
     try {
-      return this.templateRenderer.preview(templateKey, variables);
+      return await this.templateRenderer.preview(templateKey, variables);
     } catch {
       throw new AppError(
         ERROR_CODES.VALIDATION_FAILED,
