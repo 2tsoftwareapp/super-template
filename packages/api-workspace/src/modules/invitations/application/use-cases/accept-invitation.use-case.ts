@@ -1,9 +1,6 @@
-import type {
-  AuthenticatedRequestUser,
-  RequestContext,
-} from '@repo/api-core';
+import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-core";
 
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import {
   AppError,
   AUDIT_WRITER,
@@ -11,15 +8,22 @@ import {
   ERROR_CODES,
   hashOpaqueToken,
   normalizeEmail,
-} from '@repo/api-core';
+} from "@repo/api-core";
 
-import type { AcceptInvitationCommand, InvitationView } from '../invitations.types';
+import { INVITATION_STATUS } from "@repo/api-core/src/common/constants/invitation-status";
+import { ORGANIZATION_ROLE } from "@repo/api-core/src/common/constants/organization-role";
 
-import { InvitationsMapper } from '../invitations.mapper';
+import type {
+  AcceptInvitationCommand,
+  InvitationView,
+} from "../invitations.types";
+
+import { InvitationsMapper } from "../invitations.mapper";
 import {
   INVITATIONS_REPOSITORY,
   type InvitationsRepositoryPort,
-} from '../invitations.repository.port';
+} from "../invitations.repository.port";
+import { OrganizationsRepository } from "@repo/api-identity/infrastructure/organizations.repository";
 
 @Injectable()
 export class AcceptInvitationUseCase {
@@ -29,6 +33,7 @@ export class AcceptInvitationUseCase {
     @Inject(INVITATIONS_REPOSITORY)
     private readonly invitationsRepository: InvitationsRepositoryPort,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
+    private readonly organizationsRepository: OrganizationsRepository,
   ) {}
 
   async execute(
@@ -40,21 +45,21 @@ export class AcceptInvitationUseCase {
     const invitation =
       await this.invitationsRepository.findByTokenHash(tokenHash);
 
-    if (invitation?.status !== 'PENDING') {
+    if (invitation?.status !== INVITATION_STATUS.PENDING) {
       throw new AppError(
         ERROR_CODES.INVITATION_NOT_FOUND,
-        'Invitation is invalid or no longer available',
+        "Invitation is invalid or no longer available",
         HttpStatus.NOT_FOUND,
       );
     }
 
     if (invitation.expiresAt <= new Date()) {
       await this.invitationsRepository.update(invitation.id, {
-        status: 'EXPIRED',
+        status: INVITATION_STATUS.EXPIRED,
       });
       throw new AppError(
         ERROR_CODES.INVITATION_NOT_FOUND,
-        'Invitation has expired',
+        "Invitation has expired",
         HttpStatus.GONE,
       );
     }
@@ -67,21 +72,29 @@ export class AcceptInvitationUseCase {
       if (actorEmail !== invitation.email) {
         throw new AppError(
           ERROR_CODES.AUTH_FORBIDDEN,
-          'Invitation email does not match your account',
+          "Invitation email does not match your account",
           HttpStatus.FORBIDDEN,
         );
       }
     }
 
     const updated = await this.invitationsRepository.update(invitation.id, {
-      status: 'ACCEPTED',
+      status: INVITATION_STATUS.ACCEPTED,
       acceptedAt: new Date(),
       acceptedById,
     });
 
+    if (invitation.entityType === "organization") {
+      await this.organizationsRepository.addMember({
+        organizationId: invitation.entityId,
+        userId: acceptedById,
+        role: ORGANIZATION_ROLE.MEMBER,
+      });
+    }
+
     await this.auditWriter.log({
       actorId: acceptedById,
-      action: 'invitation.accepted',
+      action: "invitation.accepted",
       entityType: invitation.entityType,
       entityId: invitation.entityId,
       metadata: { invitationId: invitation.id },
