@@ -122,6 +122,10 @@ export interface UserRow {
   createdAt?: string;
 }
 
+export type FileDto = components["schemas"]["FileDto"];
+export type FileVersionDto = components["schemas"]["FileVersionDto"];
+export type FileHistoryEventDto = components["schemas"]["FileHistoryEventDto"];
+export type FileUrlDto = components["schemas"]["FileUrlDto"];
 export interface ListResponse<T> {
   data: T[];
   meta?: {

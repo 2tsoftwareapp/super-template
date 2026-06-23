@@ -20,7 +20,7 @@ import {
   type ProjectLookup,
 } from '@repo/api-core';
 import { ROLE_NAMES } from '@repo/api-core';
-import { OrganizationsRepository } from '@repo/api-identity/modules/organizations/infrastructure/organizations.repository';
+import { OrganizationsRepository } from '@repo/api-identity';
 
 import type { CreateInvitationCommand, InvitationView } from '../invitations.types';
 

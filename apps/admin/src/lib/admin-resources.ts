@@ -1,4 +1,5 @@
 import {
+  File,
   FolderKanban,
   LayoutDashboard,
   type LucideIcon,
@@ -102,6 +103,16 @@ export const adminResources: AdminResourceConfig[] = [
     features: ["list", "show"],
     permissions: ["mail.read"],
     queryKey: "admin-mail",
+  },
+  {
+    id: "files",
+    label: "Files",
+    group: "Operations",
+    path: "/files",
+    icon: File,
+    features: ["list", "show", "create"],
+    permissions: ["files.read"],
+    queryKey: "admin-files",
   },
   {
     id: "imports",

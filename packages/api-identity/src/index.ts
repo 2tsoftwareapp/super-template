@@ -2,6 +2,9 @@ import { Module } from '@nestjs/common';
 
 export { IdentityPortsModule } from './identity-ports.module';
 
+export { AccessControlService } from './modules/access-control/application/access-control.service';
+export { OrganizationsRepository } from './modules/organizations/infrastructure/organizations.repository';
+
 export {
   ACTION,
   hasPermission,

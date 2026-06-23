@@ -19,6 +19,7 @@ describe("admin resource registry", () => {
       "notifications",
       "jobs",
       "mail",
+      "files",
       "imports",
       "settings",
     ]);

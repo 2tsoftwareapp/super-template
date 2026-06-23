@@ -17,8 +17,7 @@ import {
   runInTransaction,
   TenantContextService,
 } from '@repo/api-database';
-import { AccessControlService } from '@repo/api-identity/modules/access-control/application/access-control.service';
-import { OrganizationsRepository } from '@repo/api-identity/modules/organizations/infrastructure/organizations.repository';
+import { AccessControlService, OrganizationsRepository } from '@repo/api-identity';
 
 import type {
   AcceptInvitationCommand,

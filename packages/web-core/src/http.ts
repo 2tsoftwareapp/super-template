@@ -18,7 +18,7 @@ export async function webFetch<T>(
   const headers = new Headers(init.headers);
   const method = init.method?.toUpperCase() ?? "GET";
 
-  if (init.body && !headers.has("content-type")) {
+  if (init.body && !(init.body instanceof FormData) && !headers.has("content-type")) {
     headers.set("content-type", "application/json");
   }
 
