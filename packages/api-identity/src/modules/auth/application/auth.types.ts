@@ -29,3 +29,8 @@ export interface VerifyEmailCommand {
 export interface ResendVerificationCommand {
   email: string;
 }
+
+export interface VerifyMfaChallengeCommand {
+  mfaToken: string;
+  code: string;
+}

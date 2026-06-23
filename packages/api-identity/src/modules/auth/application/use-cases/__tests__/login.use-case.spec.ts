@@ -10,7 +10,6 @@ describe('LoginUseCase', () => {
       {
         findByEmail: vi.fn(async () => null),
       } as never,
-      {} as never,
       auditWriter as never,
       {} as never,
       {} as never,

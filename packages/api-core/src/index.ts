@@ -33,6 +33,7 @@ export { RedisThrottlerStorage } from "./common/throttling/redis-throttler.stora
 export * from "./common/types/json-value";
 export * from "./common/types/request-context";
 export * from "./common/types/transaction-executor";
+export * from "./common/utils/csv";
 export * from "./common/utils/duration";
 export * from "./common/utils/normalize-email";
 export * from "./common/utils/opaque-token";
@@ -42,6 +43,7 @@ export { APP_ENVIRONMENT } from "./config/config.constants";
 export type { AppEnvironment } from "./config/env.schema";
 export { validateEnvironment } from "./config/env.schema";
 export { EnvironmentService } from "./config/environment.service";
+export { loadEnvFiles } from "./config/load-env-files";
 export {
   AUDIT_WRITER,
   type AuditLogInput,
@@ -73,6 +75,11 @@ export {
   type ImportValidationError,
 } from "./ports/import-export-adapter.port";
 export {
+  isMandatoryMailTemplate,
+  MANDATORY_MAIL_TEMPLATE_KEYS,
+  type MandatoryMailTemplateKey,
+} from "./common/constants/mandatory-mail-templates";
+export {
   MAIL_TEMPLATE_SENDER,
   type MailTemplateSender,
   type MailTemplateSendInput,
@@ -91,6 +98,11 @@ export {
   type UserLookup,
   type UserSummary,
 } from "./ports/user-lookup.port";
+export {
+  USER_PREFERENCES_LOOKUP,
+  type NotificationChannelPreferences,
+  type UserPreferencesLookup,
+} from "./ports/user-preferences-lookup.port";
 export {
   type NotificationMessage,
   type SendUserNotificationInput,

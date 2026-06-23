@@ -118,6 +118,30 @@ export class InvitationsRepository {
     return invitation ?? null;
   }
 
+  async acceptPending(
+    invitationId: string,
+    acceptedById: string,
+    executor: DatabaseExecutor = this.database,
+  ) {
+    const [invitation] = await executor
+      .update(invitations)
+      .set({
+        status: 'ACCEPTED',
+        acceptedAt: new Date(),
+        acceptedById,
+        updatedAt: new Date(),
+      })
+      .where(
+        and(
+          eq(invitations.id, invitationId),
+          eq(invitations.status, 'PENDING'),
+        ),
+      )
+      .returning();
+
+    return invitation ?? null;
+  }
+
   async revokePendingForEntity(
     entityType: string,
     entityId: string,

@@ -8,6 +8,8 @@ import { DATABASE } from '@repo/api-database';
 import { userPreferences } from '@repo/api-database';
 import { eq } from 'drizzle-orm';
 
+import { DEFAULT_USER_PREFERENCES } from '../application/preferences.constants';
+
 @Injectable()
 export class PreferencesRepository {
   constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
@@ -37,11 +39,14 @@ export class PreferencesRepository {
         .insert(userPreferences)
         .values({
           userId,
-          theme: values.theme ?? 'system',
-          language: values.language ?? 'en',
-          timezone: values.timezone ?? 'UTC',
-          notificationPreferences: values.notificationPreferences ?? {},
-          emailPreferences: values.emailPreferences ?? {},
+          theme: values.theme ?? DEFAULT_USER_PREFERENCES.theme,
+          language: values.language ?? DEFAULT_USER_PREFERENCES.language,
+          timezone: values.timezone ?? DEFAULT_USER_PREFERENCES.timezone,
+          notificationPreferences:
+            values.notificationPreferences ??
+            DEFAULT_USER_PREFERENCES.notificationPreferences,
+          emailPreferences:
+            values.emailPreferences ?? DEFAULT_USER_PREFERENCES.emailPreferences,
         })
         .returning();
 
@@ -58,5 +63,23 @@ export class PreferencesRepository {
       .returning();
 
     return updated ?? null;
+  }
+
+  async reset(
+    userId: string,
+    executor: DatabaseExecutor = this.database,
+  ) {
+    return this.upsert(
+      userId,
+      {
+        theme: DEFAULT_USER_PREFERENCES.theme,
+        language: DEFAULT_USER_PREFERENCES.language,
+        timezone: DEFAULT_USER_PREFERENCES.timezone,
+        notificationPreferences:
+          DEFAULT_USER_PREFERENCES.notificationPreferences,
+        emailPreferences: DEFAULT_USER_PREFERENCES.emailPreferences,
+      },
+      executor,
+    );
   }
 }

@@ -31,6 +31,7 @@ export default defineConfig({
       '../../packages/api-identity/src/**/*.{test,spec}.ts',
       '../../packages/api-health/src/**/*.{test,spec}.ts',
       '../../packages/api-workspace/src/**/*.{test,spec}.ts',
+      '../../packages/api-platform/src/**/*.{test,spec}.ts',
     ],
   },
   resolve: {

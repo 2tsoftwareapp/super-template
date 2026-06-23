@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import {
   AUTH_TOKEN_CLEANUP,
   type AuthTokenCleanup,
@@ -46,6 +46,7 @@ export class JobHandlersRegistry {
   private readonly handlers = new Map<string, JobHandler>();
 
   constructor(
+    @Inject(forwardRef(() => MailService))
     private readonly mailService: MailService,
     @Inject(AUTH_TOKEN_CLEANUP)
     private readonly authTokenCleanup: AuthTokenCleanup,

@@ -1,7 +1,7 @@
 import type { INestApplication } from '@nestjs/common';
 import { ERROR_CODES } from '@repo/api-core';
-import { auditLogs, DATABASE, type DatabaseClient } from '@repo/api-database';
 import { ROLE_NAMES } from '@repo/api-core';
+import { auditLogs, DATABASE, type DatabaseClient } from '@repo/api-database';
 import { AccessControlService } from '@repo/api-identity/modules/access-control/application/access-control.service';
 import { eq } from 'drizzle-orm';
 import request from 'supertest';
@@ -397,12 +397,17 @@ describe('Auth, Projects, and Notifications (e2e)', () => {
       'ChangeMe123!',
     );
 
-    const forbiddenAdminList = await request(app.getHttpServer())
+    // Every user is auto-provisioned as ADMIN of their own personal
+    // organization (see EnsurePersonalOrganizationUseCase), so a non-platform
+    // user does see /admin/users — but strictly scoped to their own org,
+    // not the platform-wide list a SUPER_ADMIN sees below.
+    const scopedAdminList = await request(app.getHttpServer())
       .get('/api/v1/admin/users')
       .set(bearer(userSession.accessToken))
-      .expect(403);
+      .expect(200);
 
-    expect(forbiddenAdminList.body.error.code).toBe(ERROR_CODES.AUTH_FORBIDDEN);
+    expect(scopedAdminList.body.data).toHaveLength(1);
+    expect(scopedAdminList.body.data[0].email).toBe('user@example.local');
 
     const userList = await request(app.getHttpServer())
       .get('/api/v1/admin/users')
@@ -560,10 +565,19 @@ describe('Auth, Projects, and Notifications (e2e)', () => {
           candidate.id === outsiderResponse.body.data.id,
       ),
     ).toBe(false);
+    // regularTargetResponse was already deleted above, so it must not
+    // reappear in the list; privilegedTargetResponse is still active in the
+    // same organization and must be visible.
     expect(
       managerUserList.body.data.some(
         (candidate: { id: string }) =>
           candidate.id === regularTargetResponse.body.data.id,
+      ),
+    ).toBe(false);
+    expect(
+      managerUserList.body.data.some(
+        (candidate: { id: string }) =>
+          candidate.id === privilegedTargetResponse.body.data.id,
       ),
     ).toBe(true);
   });
@@ -615,5 +629,176 @@ describe('Auth, Projects, and Notifications (e2e)', () => {
       .expect(200);
 
     expect(rolesResponse.body.data.length).toBeGreaterThan(0);
+  });
+
+  it('accepts organization invitations for the invited account and creates usable membership', async () => {
+    const adminSession = await loginAs(
+      app,
+      'admin@example.local',
+      'ChangeMe123!',
+    );
+    // Use a freshly created account rather than the shared seeded
+    // 'user@example.local' fixture: an earlier test in this suite blocks
+    // that account, which would otherwise make login here fail with 403.
+    await request(app.getHttpServer())
+      .post('/api/v1/admin/users')
+      .set(bearer(adminSession.accessToken))
+      .send({
+        email: 'org-unrelated@example.local',
+        password: 'UnrelatedPass123!',
+        displayName: 'Unrelated User',
+        status: 'ACTIVE',
+        role: 'USER',
+      })
+      .expect(201);
+    const unrelatedSession = await loginAs(
+      app,
+      'org-unrelated@example.local',
+      'UnrelatedPass123!',
+    );
+
+    const createInviteeResponse = await request(app.getHttpServer())
+      .post('/api/v1/admin/users')
+      .set(bearer(adminSession.accessToken))
+      .send({
+        email: 'org-invitee@example.local',
+        password: 'InviteePass123!',
+        displayName: 'Organization Invitee',
+        status: 'ACTIVE',
+        role: 'USER',
+      })
+      .expect(201);
+
+    const inviteeUserId = createInviteeResponse.body.data.id as string;
+    const inviteeSession = await loginAs(
+      app,
+      'org-invitee@example.local',
+      'InviteePass123!',
+    );
+
+    const createOrganizationResponse = await request(app.getHttpServer())
+      .post('/api/v1/organizations')
+      .set(bearer(adminSession.accessToken))
+      .send({ name: 'Invited Organization' })
+      .expect(201);
+
+    const organizationId = createOrganizationResponse.body.data.id as string;
+
+    const inviteResponse = await request(app.getHttpServer())
+      .post('/api/v1/invitations')
+      .set(bearer(adminSession.accessToken))
+      .send({
+        email: 'org-invitee@example.local',
+        entityType: 'organization',
+        entityId: organizationId,
+        role: 'ADMIN',
+      })
+      .expect(201);
+
+    const invitationId = inviteResponse.body.data.id as string;
+    // Query through the admin API (the same path every other assertion in
+    // this file uses) rather than poking the jobs table directly: this
+    // request runs under the admin's own tenant context, so it sees the row
+    // without needing to fight RLS from an ad-hoc, context-less DB query.
+    const jobsListResponse = await request(app.getHttpServer())
+      .get('/api/v1/admin/jobs')
+      .query({ type: 'mail.send', limit: 100 })
+      .set(bearer(adminSession.accessToken))
+      .expect(200);
+
+    const invitationJob = (
+      jobsListResponse.body.data as {
+        payload: {
+          metadata?: { invitationId?: string };
+          variables?: { webUrl?: string };
+        };
+      }[]
+    ).find((job) => job.payload.metadata?.invitationId === invitationId);
+
+    expect(invitationJob).toBeDefined();
+
+    if (!invitationJob) {
+      throw new Error('Invitation job was not created');
+    }
+
+    const webUrl = invitationJob.payload.variables?.webUrl;
+
+    expect(webUrl).toBeDefined();
+
+    if (!webUrl) {
+      throw new Error('Invitation accept URL was not generated');
+    }
+
+    const token = new URL(webUrl).searchParams.get('token');
+
+    expect(token).toBeTruthy();
+
+    const wrongUserAccept = await request(app.getHttpServer())
+      .post('/api/v1/invitations/accept')
+      .set(bearer(unrelatedSession.accessToken))
+      .send({ token })
+      .expect(403);
+
+    expect(wrongUserAccept.body.error.code).toBe(ERROR_CODES.AUTH_FORBIDDEN);
+
+    const acceptResponse = await request(app.getHttpServer())
+      .post('/api/v1/invitations/accept')
+      .set(bearer(inviteeSession.accessToken))
+      .send({ token })
+      .expect(201);
+
+    expect(acceptResponse.body.data).toMatchObject({
+      id: invitationId,
+      status: 'ACCEPTED',
+      acceptedById: inviteeUserId,
+    });
+
+    const membersResponse = await request(app.getHttpServer())
+      .get(`/api/v1/organizations/${organizationId}/members`)
+      .set(bearer(adminSession.accessToken))
+      .expect(200);
+
+    expect(membersResponse.body.data).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          userId: inviteeUserId,
+          role: 'ADMIN',
+        }),
+      ]),
+    );
+
+    const organizationsResponse = await request(app.getHttpServer())
+      .get('/api/v1/organizations')
+      .set(bearer(inviteeSession.accessToken))
+      .expect(200);
+
+    expect(organizationsResponse.body.data).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: organizationId,
+          role: 'ADMIN',
+        }),
+      ]),
+    );
+
+    const switchOrganizationResponse = await request(app.getHttpServer())
+      .post('/api/v1/auth/switch-organization')
+      .set(bearer(inviteeSession.accessToken))
+      .send({ organizationId })
+      .expect(201);
+
+    expect(switchOrganizationResponse.body.data.organizationId).toBe(
+      organizationId,
+    );
+
+    const replayResponse = await request(app.getHttpServer())
+      .post('/api/v1/invitations/accept')
+      .set(bearer(inviteeSession.accessToken))
+      .send({ token })
+      .expect(404);
+
+    expect(replayResponse.body.error.code).toBe(
+      ERROR_CODES.INVITATION_NOT_FOUND,
+    );
   });
 });

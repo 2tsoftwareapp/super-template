@@ -34,7 +34,7 @@ export const DEFAULT_ROLE_GRANTS: Record<RoleName, RoleGrantSpec> = {
     { resource: 'exports', actions: READ_CREATE },
     { resource: 'comments', actions: CRUD },
     { resource: 'activities', actions: [ACTION.READ] },
-    { resource: 'mail', actions: [ACTION.READ] },
+    { resource: 'mail', actions: [ACTION.READ, ACTION.CREATE] },
   ],
   [ROLE_NAMES.USER]: [
     { resource: 'projects', actions: CRUD },

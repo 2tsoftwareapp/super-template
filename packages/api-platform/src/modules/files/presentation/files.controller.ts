@@ -3,6 +3,7 @@ import type { Request } from 'express';
 import type { Response } from 'express';
 
 import {
+  Body,
   Controller,
   Delete,
   Get,
@@ -16,19 +17,75 @@ import {
   UploadedFile,
   UseInterceptors } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiProduces, ApiTags } from '@nestjs/swagger';
-import {  ACTION, ApiDataResponse, perm, SuccessFlagDto } from '@repo/api-core';
+import {  ACTION, ApiArrayResponse, ApiDataResponse, ApiPaginatedResponse, perm, SuccessFlagDto } from '@repo/api-core';
 import { CurrentUser } from '@repo/api-core';
 import { Authorize } from '@repo/api-core';
+import { SkipEnvelope } from '@repo/api-core';
 
 import { FilesService } from '../application/files.service';
 import { UploadFileInterceptor } from './files-upload.interceptor';
-import { FileDto, FileUrlDto } from './files.dto';
+import {
+  BatchDeleteFilesDto,
+  BatchDeleteResultDto,
+  FileDto,
+  FileHistoryEventDto,
+  FilesQueryDto,
+  FileUrlDto,
+  FileVersionDto } from './files.dto';
 
 @ApiTags('files')
 @ApiBearerAuth()
 @Controller('files')
 export class FilesController {
   constructor(private readonly filesService: FilesService) {}
+
+  @Get()
+  @Authorize({ permissions: [perm('files', ACTION.READ)] })
+  @ApiPaginatedResponse(FileDto)
+  async list(
+    @CurrentUser() user: AuthenticatedRequestUser,
+    @Query() query: FilesQueryDto,
+  ) {
+    const result = await this.filesService.list(user, {
+      page: query.page,
+      limit: query.limit,
+      sortField: query.sortField,
+      sortOrder: query.sortOrder,
+      ...(query.search !== undefined ? { search: query.search } : {}),
+      ...(query.mimeType !== undefined ? { mimeType: query.mimeType } : {}),
+      ...(query.uploadedById !== undefined
+        ? { uploadedById: query.uploadedById }
+        : {}),
+      ...(query.from !== undefined ? { from: query.from } : {}),
+      ...(query.to !== undefined ? { to: query.to } : {}),
+    });
+
+    return {
+      data: result.rows,
+      meta: {
+        page: query.page,
+        limit: query.limit,
+        total: result.total,
+        totalPages: Math.ceil(result.total / query.limit) } };
+  }
+
+  @Post('batch-delete')
+  @Authorize({ permissions: [perm('files', ACTION.DELETE)] })
+  @ApiDataResponse(BatchDeleteResultDto, 201)
+  async batchDelete(
+    @CurrentUser() user: AuthenticatedRequestUser,
+    @Body() input: BatchDeleteFilesDto,
+    @Req() request: Request,
+  ) {
+    const results = await this.filesService.batchDelete(
+      user,
+      input.fileIds,
+      input.idempotencyKey,
+      request.requestContext,
+    );
+
+    return { data: { results } };
+  }
 
   @Post()
   @Authorize({ permissions: [perm('files', ACTION.CREATE)] })
@@ -75,6 +132,7 @@ export class FilesController {
 
   @Get(':id/download')
   @Authorize({ permissions: [perm('files', ACTION.READ)] })
+  @SkipEnvelope()
   @ApiProduces('application/octet-stream')
   async download(
     @CurrentUser() user: AuthenticatedRequestUser,
@@ -98,6 +156,55 @@ export class FilesController {
     response.setHeader('X-Content-Type-Options', 'nosniff');
 
     return new StreamableFile(content);
+  }
+
+  @Post(':id/versions')
+  @Authorize({ permissions: [perm('files', ACTION.CREATE)] })
+  @UseInterceptors(UploadFileInterceptor)
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: { type: 'string', format: 'binary' } } } })
+  @ApiDataResponse(FileDto, 201)
+  async uploadVersion(
+    @CurrentUser() user: AuthenticatedRequestUser,
+    @Param('id', new ParseUUIDPipe()) fileId: string,
+    @UploadedFile() file: {
+      buffer: Buffer;
+      mimetype: string;
+      originalname: string;
+      size: number;
+    },
+    @Req() request: Request,
+  ) {
+    return this.filesService.createVersion(
+      user,
+      fileId,
+      file,
+      request.requestContext,
+    );
+  }
+
+  @Get(':id/versions')
+  @Authorize({ permissions: [perm('files', ACTION.READ)] })
+  @ApiArrayResponse(FileVersionDto)
+  async listVersions(
+    @CurrentUser() user: AuthenticatedRequestUser,
+    @Param('id', new ParseUUIDPipe()) fileId: string,
+  ) {
+    return { data: await this.filesService.listVersions(user, fileId) };
+  }
+
+  @Get(':id/history')
+  @Authorize({ permissions: [perm('files', ACTION.READ)] })
+  @ApiArrayResponse(FileHistoryEventDto)
+  async getHistory(
+    @CurrentUser() user: AuthenticatedRequestUser,
+    @Param('id', new ParseUUIDPipe()) fileId: string,
+  ) {
+    return { data: await this.filesService.getHistory(user, fileId) };
   }
 
   @Delete(':id')

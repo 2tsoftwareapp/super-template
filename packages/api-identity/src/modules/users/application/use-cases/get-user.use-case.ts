@@ -6,6 +6,7 @@ import { AppError, ERROR_CODES } from '@repo/api-core';
 import type { UserView } from '../users.types';
 
 import { AccessControlService } from '../../../access-control/application/access-control.service';
+import { OrganizationsRepository } from '../../../organizations/infrastructure/organizations.repository';
 import { assertUserBelongsToOrganization } from '../../domain/user-org-scope.policy';
 import { UsersMapper } from '../users.mapper';
 import {
@@ -21,6 +22,7 @@ export class GetUserUseCase {
     @Inject(USERS_REPOSITORY)
     private readonly usersRepository: UsersRepositoryPort,
     private readonly accessControlService: AccessControlService,
+    private readonly organizationsRepository: OrganizationsRepository,
   ) {}
 
   async execute(
@@ -49,8 +51,17 @@ export class GetUserUseCase {
       );
     }
 
+    // The target's own primary organization, not the actor's — this is a
+    // "view" operation and must show the target's real roles (including
+    // org-scoped ones like ADMIN) regardless of who is asking.
+    const primaryOrganizationId =
+      await this.organizationsRepository.findPrimaryOrganizationId(userId);
+
     const [accessProfile, roleIds] = await Promise.all([
-      this.accessControlService.getAccessProfile(userId),
+      this.accessControlService.getAccessProfile(
+        userId,
+        primaryOrganizationId,
+      ),
       this.accessControlService.getRoleIdsForUser(userId),
     ]);
 

@@ -9,6 +9,8 @@ import {
   MaxLength,
 } from 'class-validator';
 
+const invitationEntityTypes = ['organization', 'project'] as const;
+
 export class InvitationDto {
   @ApiProperty()
   id: string;
@@ -54,10 +56,9 @@ export class CreateInvitationDto {
   @IsEmail()
   email: string;
 
-  @ApiProperty()
-  @IsString()
-  @MaxLength(64)
-  entityType: string;
+  @ApiProperty({ enum: invitationEntityTypes })
+  @IsEnum(invitationEntityTypes)
+  entityType: 'organization' | 'project';
 
   @ApiProperty()
   @IsUUID()
@@ -82,10 +83,10 @@ export class InvitationsQueryDto extends PaginationQueryDto {
   @IsEmail()
   email?: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ enum: invitationEntityTypes })
   @IsOptional()
-  @IsString()
-  entityType?: string;
+  @IsEnum(invitationEntityTypes)
+  entityType?: 'organization' | 'project';
 
   @ApiPropertyOptional()
   @IsOptional()

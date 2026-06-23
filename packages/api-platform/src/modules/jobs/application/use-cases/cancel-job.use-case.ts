@@ -5,6 +5,7 @@ import { AppError, ERROR_CODES } from '@repo/api-core';
 
 import type { JobView } from '../jobs.types';
 
+import { JobObservabilityRepository } from '../../infrastructure/job-observability.repository';
 import { JobsMapper } from '../jobs.mapper';
 import {
   JOBS_REPOSITORY,
@@ -17,10 +18,11 @@ export class CancelJobUseCase {
 
   constructor(
     @Inject(JOBS_REPOSITORY) private readonly jobsRepository: JobsRepositoryPort,
+    private readonly jobObservabilityRepository: JobObservabilityRepository,
   ) {}
 
   async execute(
-    _actor: AuthenticatedRequestUser,
+    actor: AuthenticatedRequestUser,
     jobId: string,
   ): Promise<JobView> {
     const cancelled = await this.jobsRepository.markCancelled(jobId);
@@ -42,6 +44,13 @@ export class CancelJobUseCase {
         HttpStatus.CONFLICT,
       );
     }
+
+    await this.jobObservabilityRepository.recordEvent({
+      jobId: cancelled.id,
+      organizationId: cancelled.organizationId ?? null,
+      type: 'cancelled',
+      message: `Cancelled by user ${actor.userId}`,
+    });
 
     return this.jobsMapper.toJobView(cancelled);
   }

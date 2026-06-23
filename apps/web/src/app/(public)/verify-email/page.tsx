@@ -1,18 +1,17 @@
 "use client";
 
 import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
 import { toast } from "sonner";
 
 import { AuthShell } from "@/components/auth/auth-shell";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { webFetch } from "@/lib/http";
+import { useSearchParams } from "next/navigation";
 
 export default function VerifyEmailPage() {
-  const [token] = useState(() =>
-    typeof window === "undefined" ? "" : new URLSearchParams(window.location.search).get("token") ?? "",
-  );
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token") ?? "";
 
   const mutation = useMutation({
     mutationFn: () =>
@@ -37,7 +36,7 @@ export default function VerifyEmailPage() {
             onClick={() => mutation.mutate()}
             disabled={!token}
           >
-            Verify email
+            {mutation.isPending ? "Verifying email..." : "Verify email"}
           </Button>
         </CardContent>
       </Card>

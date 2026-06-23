@@ -9,16 +9,13 @@ import 'package:super_template_api/super_template_api.dart';
 
 final attachmentsRepositoryProvider = Provider<AttachmentsRepository>(
   (ref) => AttachmentsRepository(
-    client: ref.watch(apiClientProvider),
-    filesRepository: ref.watch(filesRepositoryProvider),
+    ref.watch(apiClientProvider),
+    ref.watch(filesRepositoryProvider),
   ),
 );
 
 class AttachmentsRepository {
-  AttachmentsRepository({
-    required this._client,
-    required this._filesRepository,
-  });
+  AttachmentsRepository(this._client, this._filesRepository);
 
   final SuperTemplateApi _client;
   final FilesRepository _filesRepository;

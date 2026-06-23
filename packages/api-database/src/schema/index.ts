@@ -19,6 +19,12 @@ export {
   organizations,
 } from './identity/organizations';
 export { userPreferences } from './identity/preferences';
+export { externalIdentities, ssoLoginStates } from './identity/sso';
+export {
+  mfaChallenges,
+  userRecoveryCodes,
+  userTwoFactorSecrets,
+} from './identity/two-factor';
 export { users } from './identity/users';
 
 export { attachments } from './platform/attachments';
@@ -29,8 +35,13 @@ export {
   jobStatusEnum,
   mailDeliveryStatusEnum,
 } from './platform/enums';
+export { fileBatchOperations } from './platform/file-batch-operations';
+export { fileVersions } from './platform/file-versions';
 export { files } from './platform/files';
 export { exportJobs, importJobs } from './platform/import-export';
+export { jobAttempts } from './platform/job-attempts';
+export { jobDependencies } from './platform/job-dependencies';
+export { jobEvents } from './platform/job-events';
 export { jobs } from './platform/jobs';
 export { mailDeliveries } from './platform/mail';
 export { applicationSettings } from './platform/settings';
@@ -70,11 +81,22 @@ import {
   organizations,
 } from './identity/organizations';
 import { userPreferences } from './identity/preferences';
+import { externalIdentities, ssoLoginStates } from './identity/sso';
+import {
+  mfaChallenges,
+  userRecoveryCodes,
+  userTwoFactorSecrets,
+} from './identity/two-factor';
 import { users } from './identity/users';
 import { attachments } from './platform/attachments';
 import { auditLogs } from './platform/audit';
+import { fileBatchOperations } from './platform/file-batch-operations';
+import { fileVersions } from './platform/file-versions';
 import { files } from './platform/files';
 import { exportJobs, importJobs } from './platform/import-export';
+import { jobAttempts } from './platform/job-attempts';
+import { jobDependencies } from './platform/job-dependencies';
+import { jobEvents } from './platform/job-events';
 import { jobs } from './platform/jobs';
 import { mailDeliveries } from './platform/mail';
 import { applicationSettings } from './platform/settings';
@@ -97,9 +119,15 @@ export const schema = {
   comments,
   emailVerificationTokens,
   exportJobs,
+  externalIdentities,
+  fileBatchOperations,
+  fileVersions,
   files,
   importJobs,
   invitations,
+  jobAttempts,
+  jobDependencies,
+  jobEvents,
   jobs,
   mailDeliveries,
   notificationDeviceTokens,
@@ -112,7 +140,11 @@ export const schema = {
   projects,
   rolePermissions,
   roles,
+  mfaChallenges,
+  ssoLoginStates,
   userPreferences,
+  userRecoveryCodes,
   userRoles,
   users,
+  userTwoFactorSecrets,
 };

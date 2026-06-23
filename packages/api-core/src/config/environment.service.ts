@@ -36,6 +36,10 @@ export class EnvironmentService {
     return this.env.API_PORT;
   }
 
+  get apiBodyLimit(): string {
+    return this.env.API_BODY_LIMIT;
+  }
+
   get corsOrigins(): string[] {
     return this.env.WEB_ORIGIN.split(',')
       .map((origin) => origin.trim())

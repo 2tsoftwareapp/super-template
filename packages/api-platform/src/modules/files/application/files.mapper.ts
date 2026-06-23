@@ -12,6 +12,8 @@ export class FilesMapper {
       originalName: file.originalName,
       mimeType: file.mimeType,
       sizeBytes: file.sizeBytes,
+      checksum: file.checksum,
+      latestVersion: file.latestVersion,
       uploadedById: file.uploadedById,
       createdAt: file.createdAt.toISOString(),
       updatedAt: file.updatedAt.toISOString(),

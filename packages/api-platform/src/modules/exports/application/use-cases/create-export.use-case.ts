@@ -4,7 +4,7 @@ import type {
 } from '@repo/api-core';
 
 import { Inject, Injectable } from '@nestjs/common';
-import { ImportExportAdapterRegistry, requireOrganizationId } from '@repo/api-core';
+import { ImportExportAdapterRegistry, requireOrganizationId, toCsv } from '@repo/api-core';
 import { randomUUID } from 'node:crypto';
 
 import type { CreateExportCommand } from '../exports.types';
@@ -102,18 +102,9 @@ export class CreateExportUseCase {
       ownerId: actor.userId,
     });
 
-    const lines = [
-      adapter.csvHeader.join(','),
-      ...rows.map((row) =>
-        adapter
-          .toCsvRow(row)
-          .map((value) => this.escapeCsv(value))
-          .join(','),
-      ),
-    ];
-
+    const csv = toCsv(adapter.csvHeader, rows.map((row) => adapter.toCsvRow(row)));
     const storageKey = `exports/${actor.userId}/${randomUUID()}.csv`;
-    const body = Buffer.from(lines.join('\n'), 'utf8');
+    const body = Buffer.from(csv, 'utf8');
 
     await this.objectStorage.upload({
       key: storageKey,
@@ -140,20 +131,5 @@ export class CreateExportUseCase {
       await this.objectStorage.delete(storageKey).catch(() => undefined);
       throw error;
     }
-  }
-
-  private escapeCsv(value: string) {
-    // Neutralize formula injection: spreadsheet apps execute cells starting with these characters.
-    const sanitized = /^[=+\-@\t\r]/.test(value) ? `'${value}` : value;
-
-    if (
-      sanitized.includes(',') ||
-      sanitized.includes('"') ||
-      sanitized.includes('\n')
-    ) {
-      return `"${sanitized.replace(/"/g, '""')}"`;
-    }
-
-    return sanitized;
   }
 }

@@ -5,6 +5,11 @@ import type {
 import { HttpStatus } from '@nestjs/common';
 import { ACTION, AppError, ERROR_CODES, perm, requireOrganizationId } from '@repo/api-core';
 
+export const INVITATION_ENTITY = {
+  ORGANIZATION: 'organization',
+  PROJECT: 'project',
+} as const;
+
 export async function assertCanInvite(
   actor: AuthenticatedRequestUser,
   entityType: string,
@@ -19,7 +24,18 @@ export async function assertCanInvite(
     );
   }
 
-  if (entityType === 'project') {
+  if (
+    entityType !== INVITATION_ENTITY.ORGANIZATION &&
+    entityType !== INVITATION_ENTITY.PROJECT
+  ) {
+    throw new AppError(
+      ERROR_CODES.VALIDATION_FAILED,
+      'Unsupported invitation entity type',
+      HttpStatus.BAD_REQUEST,
+    );
+  }
+
+  if (entityType === INVITATION_ENTITY.PROJECT) {
     const project = await projectLookup.findById(entityId);
 
     if (!project) {
@@ -50,7 +66,7 @@ export async function resolveInvitationOrganizationId(
   entityId: string,
   projectLookup: ProjectLookup,
 ): Promise<string> {
-  if (entityType === 'project') {
+  if (entityType === INVITATION_ENTITY.PROJECT) {
     const project = await projectLookup.findById(entityId);
 
     if (!project) {
@@ -62,6 +78,10 @@ export async function resolveInvitationOrganizationId(
     }
 
     return project.organizationId;
+  }
+
+  if (entityType === INVITATION_ENTITY.ORGANIZATION) {
+    return entityId;
   }
 
   return requireOrganizationId(actor);

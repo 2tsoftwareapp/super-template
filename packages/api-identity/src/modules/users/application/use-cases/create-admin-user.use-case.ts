@@ -54,9 +54,20 @@ export class CreateAdminUserUseCase {
     await this.usersRepository.assertEmailAvailable(email);
 
     const actorIsSuperAdmin = actor.roles.includes(ROLE_NAMES.SUPER_ADMIN);
-    const roleName = actorIsSuperAdmin
-      ? (input.role ?? ROLE_NAMES.USER)
-      : ROLE_NAMES.USER;
+    // Resolve the requested role as-is (not silently downgraded) so that a
+    // non-SUPER_ADMIN requesting ADMIN is rejected explicitly with 403 by
+    // assertRoleScopeCanBeAssigned below, instead of getting a confusing 201
+    // for a USER account they never asked for.
+    const roleName = input.role ?? ROLE_NAMES.USER;
+
+    if (roleName === ROLE_NAMES.ADMIN && !actorIsSuperAdmin) {
+      throw new AppError(
+        ERROR_CODES.AUTH_FORBIDDEN,
+        'Only SUPER_ADMIN can assign the ADMIN role',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
     const organizationId = actorIsSuperAdmin
       ? (input.organizationId ?? null)
       : (actor.organizationId ?? null);
@@ -69,6 +80,8 @@ export class CreateAdminUserUseCase {
       );
     }
 
+    const status = input.status ?? 'ACTIVE';
+
     const createdUserId = await runInTransaction(
       this.database,
       async (transaction) => {
@@ -78,8 +91,11 @@ export class CreateAdminUserUseCase {
             passwordHash: await hashPassword(input.password),
             displayName: input.displayName,
             avatarUrl: input.avatarUrl ?? null,
-            status: input.status ?? 'ACTIVE',
-            emailVerifiedAt: null,
+            status,
+            // An admin explicitly setting ACTIVE is vouching for the account, so it
+            // must be usable immediately instead of being stuck behind the email
+            // verification gate in LoginUseCase.
+            emailVerifiedAt: status === 'ACTIVE' ? new Date() : null,
           },
           transaction,
         );

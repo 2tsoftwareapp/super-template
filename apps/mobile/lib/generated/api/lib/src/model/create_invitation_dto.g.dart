@@ -8,11 +8,79 @@ part of 'create_invitation_dto.dart';
 // BuiltValueGenerator
 // **************************************************************************
 
+const CreateInvitationDtoEntityTypeEnum
+    _$createInvitationDtoEntityTypeEnum_organization =
+    const CreateInvitationDtoEntityTypeEnum._('organization');
+const CreateInvitationDtoEntityTypeEnum
+    _$createInvitationDtoEntityTypeEnum_project =
+    const CreateInvitationDtoEntityTypeEnum._('project');
+
+CreateInvitationDtoEntityTypeEnum _$createInvitationDtoEntityTypeEnumValueOf(
+  String name,
+) {
+  switch (name) {
+    case 'organization':
+      return _$createInvitationDtoEntityTypeEnum_organization;
+    case 'project':
+      return _$createInvitationDtoEntityTypeEnum_project;
+    default:
+      throw ArgumentError(name);
+  }
+}
+
+final BuiltSet<CreateInvitationDtoEntityTypeEnum>
+    _$createInvitationDtoEntityTypeEnumValues =
+    BuiltSet<CreateInvitationDtoEntityTypeEnum>(
+  const <CreateInvitationDtoEntityTypeEnum>[
+    _$createInvitationDtoEntityTypeEnum_organization,
+    _$createInvitationDtoEntityTypeEnum_project,
+  ],
+);
+
+Serializer<CreateInvitationDtoEntityTypeEnum>
+    _$createInvitationDtoEntityTypeEnumSerializer =
+    _$CreateInvitationDtoEntityTypeEnumSerializer();
+
+class _$CreateInvitationDtoEntityTypeEnumSerializer
+    implements PrimitiveSerializer<CreateInvitationDtoEntityTypeEnum> {
+  static const Map<String, Object> _toWire = const <String, Object>{
+    'organization': 'organization',
+    'project': 'project',
+  };
+  static const Map<Object, String> _fromWire = const <Object, String>{
+    'organization': 'organization',
+    'project': 'project',
+  };
+
+  @override
+  final Iterable<Type> types = const <Type>[CreateInvitationDtoEntityTypeEnum];
+  @override
+  final String wireName = 'CreateInvitationDtoEntityTypeEnum';
+
+  @override
+  Object serialize(
+    Serializers serializers,
+    CreateInvitationDtoEntityTypeEnum object, {
+    FullType specifiedType = FullType.unspecified,
+  }) =>
+      _toWire[object.name] ?? object.name;
+
+  @override
+  CreateInvitationDtoEntityTypeEnum deserialize(
+    Serializers serializers,
+    Object serialized, {
+    FullType specifiedType = FullType.unspecified,
+  }) =>
+      CreateInvitationDtoEntityTypeEnum.valueOf(
+        _fromWire[serialized] ?? (serialized is String ? serialized : ''),
+      );
+}
+
 class _$CreateInvitationDto extends CreateInvitationDto {
   @override
   final String email;
   @override
-  final String entityType;
+  final CreateInvitationDtoEntityTypeEnum entityType;
   @override
   final String entityId;
   @override
@@ -79,9 +147,10 @@ class CreateInvitationDtoBuilder
   String? get email => _$this._email;
   set email(String? email) => _$this._email = email;
 
-  String? _entityType;
-  String? get entityType => _$this._entityType;
-  set entityType(String? entityType) => _$this._entityType = entityType;
+  CreateInvitationDtoEntityTypeEnum? _entityType;
+  CreateInvitationDtoEntityTypeEnum? get entityType => _$this._entityType;
+  set entityType(CreateInvitationDtoEntityTypeEnum? entityType) =>
+      _$this._entityType = entityType;
 
   String? _entityId;
   String? get entityId => _$this._entityId;

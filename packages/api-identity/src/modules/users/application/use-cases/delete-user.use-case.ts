@@ -13,6 +13,7 @@ import {
 } from '@repo/api-core';
 import { DATABASE, runInTransaction } from '@repo/api-database';
 
+import { ROLE_NAMES } from '../../../access-control/access-control.constants';
 import { AccessControlService } from '../../../access-control/application/access-control.service';
 import { AuthRepository } from '../../../auth/infrastructure/auth.repository';
 import { assertUserBelongsToOrganization } from '../../domain/user-org-scope.policy';
@@ -62,8 +63,15 @@ export class DeleteUserUseCase {
       );
     }
 
-    const targetProfile =
-      await this.accessControlService.getAccessProfile(userId);
+    // Org-scoped roles (e.g. an organization ADMIN) are invisible to
+    // getAccessProfile unless the relevant organizationId is passed, so the
+    // privileged-account check below would otherwise silently miss them.
+    const targetProfile = await this.accessControlService.getAccessProfile(
+      userId,
+      actor.roles.includes(ROLE_NAMES.SUPER_ADMIN)
+        ? null
+        : (actor.organizationId ?? null),
+    );
     this.accessControlService.assertCanManageUserAccount(
       actor,
       targetProfile.roles,

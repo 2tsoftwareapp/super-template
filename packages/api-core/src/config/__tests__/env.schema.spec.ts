@@ -20,6 +20,7 @@ const baseEnv: Record<string, unknown> = {
   JWT_REFRESH_SECRET: 'b'.repeat(24),
   JWT_ACCESS_TTL: '15m',
   JWT_REFRESH_TTL: '7d',
+  MFA_ENCRYPTION_KEY: 'a'.repeat(64),
   MAIL_HOST: 'localhost',
   MAIL_PORT: '1025',
   MAIL_FROM: 'noreply@example.com',

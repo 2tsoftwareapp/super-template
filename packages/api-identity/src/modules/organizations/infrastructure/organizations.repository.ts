@@ -8,8 +8,11 @@ import { DATABASE } from '@repo/api-database';
 import {
   organizationMembers,
   organizations,
+  users,
 } from '@repo/api-database';
-import { and, asc, eq, isNull } from 'drizzle-orm';
+import { and, asc, count, eq, isNull, ne } from 'drizzle-orm';
+
+export type OrganizationMemberRole = 'OWNER' | 'ADMIN' | 'MEMBER';
 
 @Injectable()
 export class OrganizationsRepository {
@@ -38,6 +41,28 @@ export class OrganizationsRepository {
       .insert(organizationMembers)
       .values(values)
       .returning();
+    return member ?? null;
+  }
+
+  async upsertMember(
+    values: typeof organizationMembers.$inferInsert,
+    executor: DatabaseExecutor = this.database,
+  ) {
+    const [member] = await executor
+      .insert(organizationMembers)
+      .values(values)
+      .onConflictDoUpdate({
+        target: [
+          organizationMembers.organizationId,
+          organizationMembers.userId,
+        ],
+        set: {
+          role: values.role,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+
     return member ?? null;
   }
 
@@ -110,6 +135,127 @@ export class OrganizationsRepository {
         ),
       )
       .orderBy(asc(organizations.name));
+  }
+
+  async updateOrganization(
+    organizationId: string,
+    values: Partial<Pick<typeof organizations.$inferInsert, 'name'>>,
+    executor: DatabaseExecutor = this.database,
+  ) {
+    const [organization] = await executor
+      .update(organizations)
+      .set({ ...values, updatedAt: new Date() })
+      .where(
+        and(
+          eq(organizations.id, organizationId),
+          isNull(organizations.deletedAt),
+        ),
+      )
+      .returning();
+    return organization ?? null;
+  }
+
+  async softDeleteOrganization(
+    organizationId: string,
+    executor: DatabaseExecutor = this.database,
+  ) {
+    const [organization] = await executor
+      .update(organizations)
+      .set({ deletedAt: new Date(), updatedAt: new Date() })
+      .where(
+        and(
+          eq(organizations.id, organizationId),
+          isNull(organizations.deletedAt),
+        ),
+      )
+      .returning();
+    return organization ?? null;
+  }
+
+  async listMembers(
+    organizationId: string,
+    executor: DatabaseExecutor = this.database,
+  ) {
+    return executor
+      .select({
+        userId: organizationMembers.userId,
+        role: organizationMembers.role,
+        email: users.email,
+        displayName: users.displayName,
+        createdAt: organizationMembers.createdAt,
+        updatedAt: organizationMembers.updatedAt,
+      })
+      .from(organizationMembers)
+      .innerJoin(users, eq(organizationMembers.userId, users.id))
+      .where(eq(organizationMembers.organizationId, organizationId))
+      .orderBy(asc(organizationMembers.createdAt));
+  }
+
+  async countOwners(
+    organizationId: string,
+    options: { excludingUserId?: string; executor?: DatabaseExecutor } = {},
+  ) {
+    const executor = options.executor ?? this.database;
+    const [result] = await executor
+      .select({ value: count() })
+      .from(organizationMembers)
+      .where(
+        and(
+          eq(organizationMembers.organizationId, organizationId),
+          eq(organizationMembers.role, 'OWNER'),
+          options.excludingUserId
+            ? ne(organizationMembers.userId, options.excludingUserId)
+            : undefined,
+        ),
+      );
+    return result?.value ?? 0;
+  }
+
+  async countMembers(
+    organizationId: string,
+    executor: DatabaseExecutor = this.database,
+  ) {
+    const [result] = await executor
+      .select({ value: count() })
+      .from(organizationMembers)
+      .where(eq(organizationMembers.organizationId, organizationId));
+    return result?.value ?? 0;
+  }
+
+  async updateMemberRole(
+    organizationId: string,
+    userId: string,
+    role: OrganizationMemberRole,
+    executor: DatabaseExecutor = this.database,
+  ) {
+    const [member] = await executor
+      .update(organizationMembers)
+      .set({ role, updatedAt: new Date() })
+      .where(
+        and(
+          eq(organizationMembers.organizationId, organizationId),
+          eq(organizationMembers.userId, userId),
+        ),
+      )
+      .returning();
+    return member ?? null;
+  }
+
+  async removeMember(
+    organizationId: string,
+    userId: string,
+    executor: DatabaseExecutor = this.database,
+  ) {
+    const [member] = await executor
+      .delete(organizationMembers)
+      .where(
+        and(
+          eq(organizationMembers.organizationId, organizationId),
+          eq(organizationMembers.userId, userId),
+        ),
+      )
+      .returning();
+    return member ?? null;
   }
 
   async findPrimaryOrganizationId(

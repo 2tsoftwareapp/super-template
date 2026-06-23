@@ -27,9 +27,11 @@ import 'package:super_template_api/src/api/files_api.dart';
 import 'package:super_template_api/src/api/health_api.dart';
 import 'package:super_template_api/src/api/imports_api.dart';
 import 'package:super_template_api/src/api/invitations_api.dart';
+import 'package:super_template_api/src/api/mfa_api.dart';
 import 'package:super_template_api/src/api/notifications_api.dart';
 import 'package:super_template_api/src/api/organizations_api.dart';
 import 'package:super_template_api/src/api/projects_api.dart';
+import 'package:super_template_api/src/api/sso_api.dart';
 import 'package:super_template_api/src/api/users_api.dart';
 
 class SuperTemplateApi {
@@ -196,6 +198,12 @@ class SuperTemplateApi {
     return InvitationsApi(dio, serializers);
   }
 
+  /// Get MfaApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  MfaApi getMfaApi() {
+    return MfaApi(dio, serializers);
+  }
+
   /// Get NotificationsApi instance, base route and serializer can be overridden by a given but be careful,
   /// by doing that all interceptors will not be executed
   NotificationsApi getNotificationsApi() {
@@ -212,6 +220,12 @@ class SuperTemplateApi {
   /// by doing that all interceptors will not be executed
   ProjectsApi getProjectsApi() {
     return ProjectsApi(dio, serializers);
+  }
+
+  /// Get SsoApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  SsoApi getSsoApi() {
+    return SsoApi(dio, serializers);
   }
 
   /// Get UsersApi instance, base route and serializer can be overridden by a given but be careful,

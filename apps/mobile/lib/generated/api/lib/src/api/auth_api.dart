@@ -16,6 +16,7 @@ import 'package:super_template_api/src/model/auth_controller_get_me200_response.
 import 'package:super_template_api/src/model/auth_controller_get_sessions200_response.dart';
 import 'package:super_template_api/src/model/auth_controller_login201_response.dart';
 import 'package:super_template_api/src/model/auth_controller_register201_response.dart';
+import 'package:super_template_api/src/model/auth_controller_verify_mfa_challenge201_response.dart';
 import 'package:super_template_api/src/model/forgot_password_dto.dart';
 import 'package:super_template_api/src/model/login_dto.dart';
 import 'package:super_template_api/src/model/refresh_token_dto.dart';
@@ -24,6 +25,7 @@ import 'package:super_template_api/src/model/resend_verification_dto.dart';
 import 'package:super_template_api/src/model/reset_password_dto.dart';
 import 'package:super_template_api/src/model/switch_organization_dto.dart';
 import 'package:super_template_api/src/model/verify_email_dto.dart';
+import 'package:super_template_api/src/model/verify_mfa_challenge_dto.dart';
 
 class AuthApi {
   final Dio _dio;
@@ -539,9 +541,10 @@ class AuthApi {
   /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
   /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
   ///
-  /// Returns a [Future] containing a [Response] with a [AuthControllerLogin201Response] as data
+  /// Returns a [Future] containing a [Response] with a [AuthControllerVerifyMfaChallenge201Response] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<AuthControllerLogin201Response>> authControllerRefresh({
+  Future<Response<AuthControllerVerifyMfaChallenge201Response>>
+      authControllerRefresh({
     required RefreshTokenDto refreshTokenDto,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
@@ -587,7 +590,7 @@ class AuthApi {
       onReceiveProgress: onReceiveProgress,
     );
 
-    AuthControllerLogin201Response? _responseData;
+    AuthControllerVerifyMfaChallenge201Response? _responseData;
 
     try {
       final rawResponse = _response.data;
@@ -595,8 +598,10 @@ class AuthApi {
           ? null
           : _serializers.deserialize(
               rawResponse,
-              specifiedType: const FullType(AuthControllerLogin201Response),
-            ) as AuthControllerLogin201Response;
+              specifiedType: const FullType(
+                AuthControllerVerifyMfaChallenge201Response,
+              ),
+            ) as AuthControllerVerifyMfaChallenge201Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -607,7 +612,7 @@ class AuthApi {
       );
     }
 
-    return Response<AuthControllerLogin201Response>(
+    return Response<AuthControllerVerifyMfaChallenge201Response>(
       data: _responseData,
       headers: _response.headers,
       isRedirect: _response.isRedirect,
@@ -1179,6 +1184,104 @@ class AuthApi {
     }
 
     return Response<AdminRolesControllerDeleteRole200Response>(
+      data: _responseData,
+      headers: _response.headers,
+      isRedirect: _response.isRedirect,
+      requestOptions: _response.requestOptions,
+      redirects: _response.redirects,
+      statusCode: _response.statusCode,
+      statusMessage: _response.statusMessage,
+      extra: _response.extra,
+    );
+  }
+
+  /// authControllerVerifyMfaChallenge
+  ///
+  ///
+  /// Parameters:
+  /// * [verifyMfaChallengeDto]
+  /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
+  /// * [headers] - Can be used to add additional headers to the request
+  /// * [extras] - Can be used to add flags to the request
+  /// * [validateStatus] - A [ValidateStatus] callback that can be used to determine request success based on the HTTP status of the response
+  /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
+  /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
+  ///
+  /// Returns a [Future] containing a [Response] with a [AuthControllerVerifyMfaChallenge201Response] as data
+  /// Throws [DioException] if API call or serialization fails
+  Future<Response<AuthControllerVerifyMfaChallenge201Response>>
+      authControllerVerifyMfaChallenge({
+    required VerifyMfaChallengeDto verifyMfaChallengeDto,
+    CancelToken? cancelToken,
+    Map<String, dynamic>? headers,
+    Map<String, dynamic>? extra,
+    ValidateStatus? validateStatus,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+  }) async {
+    final _path = r'/api/v1/auth/mfa/verify-challenge';
+    final _options = Options(
+      method: r'POST',
+      headers: <String, dynamic>{...?headers},
+      extra: <String, dynamic>{
+        'secure': <Map<String, String>>[
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
+        ],
+        ...?extra,
+      },
+      contentType: 'application/json',
+      validateStatus: validateStatus,
+    );
+
+    dynamic _bodyData;
+
+    try {
+      const _type = FullType(VerifyMfaChallengeDto);
+      _bodyData = _serializers.serialize(
+        verifyMfaChallengeDto,
+        specifiedType: _type,
+      );
+    } catch (error, stackTrace) {
+      throw DioException(
+        requestOptions: _options.compose(_dio.options, _path),
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    final _response = await _dio.request<Object>(
+      _path,
+      data: _bodyData,
+      options: _options,
+      cancelToken: cancelToken,
+      onSendProgress: onSendProgress,
+      onReceiveProgress: onReceiveProgress,
+    );
+
+    AuthControllerVerifyMfaChallenge201Response? _responseData;
+
+    try {
+      final rawResponse = _response.data;
+      _responseData = rawResponse == null
+          ? null
+          : _serializers.deserialize(
+              rawResponse,
+              specifiedType: const FullType(
+                AuthControllerVerifyMfaChallenge201Response,
+              ),
+            ) as AuthControllerVerifyMfaChallenge201Response;
+    } catch (error, stackTrace) {
+      throw DioException(
+        requestOptions: _response.requestOptions,
+        response: _response,
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    return Response<AuthControllerVerifyMfaChallenge201Response>(
       data: _responseData,
       headers: _response.headers,
       isRedirect: _response.isRedirect,

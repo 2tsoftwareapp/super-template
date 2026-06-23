@@ -34,7 +34,7 @@ describe('WORKER_DISPATCH_CONTEXT', () => {
 });
 
 describe('setTenantContextOnExecutor', () => {
-  it('issues set_config for tenant id, user id, and bypass flag', async () => {
+  it('issues a single set_config round trip for tenant id, user id, and bypass flag', async () => {
     const execute = vi.fn().mockResolvedValue(undefined);
     const executor = { execute } as unknown as DatabaseExecutor;
 
@@ -44,12 +44,12 @@ describe('setTenantContextOnExecutor', () => {
       bypassRls: true,
     });
 
-    expect(execute).toHaveBeenCalledTimes(3);
+    expect(execute).toHaveBeenCalledTimes(1);
   });
 });
 
 describe('setTenantContextOnPgClient', () => {
-  it('sets all three GUCs with parameterized queries', async () => {
+  it('sets all three GUCs in a single parameterized query', async () => {
     const query = vi.fn().mockResolvedValue(undefined);
     const client = { query } as never;
 
@@ -59,16 +59,11 @@ describe('setTenantContextOnPgClient', () => {
       bypassRls: false,
     });
 
-    expect(query).toHaveBeenCalledTimes(3);
+    expect(query).toHaveBeenCalledTimes(1);
     expect(query).toHaveBeenNthCalledWith(
       1,
-      "select set_config('app.tenant_id', $1, false)",
-      ['org-1'],
-    );
-    expect(query).toHaveBeenNthCalledWith(
-      3,
-      "select set_config('app.bypass_rls', $1, false)",
-      ['false'],
+      expect.stringContaining("set_config('app.tenant_id', $1, false)"),
+      ['org-1', 'user-1', 'false'],
     );
   });
 
@@ -80,8 +75,8 @@ describe('setTenantContextOnPgClient', () => {
 
     expect(query).toHaveBeenNthCalledWith(
       1,
-      "select set_config('app.tenant_id', $1, false)",
-      [''],
+      expect.stringContaining("set_config('app.tenant_id', $1, false)"),
+      ['', '', 'false'],
     );
   });
 });

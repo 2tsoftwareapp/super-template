@@ -10,7 +10,7 @@ part of 'auth_controller_login201_response.dart';
 
 class _$AuthControllerLogin201Response extends AuthControllerLogin201Response {
   @override
-  final AuthResponseDto data;
+  final LoginResponseDto data;
   @override
   final RequestMetaDto meta;
 
@@ -63,9 +63,10 @@ class AuthControllerLogin201ResponseBuilder
             AuthControllerLogin201ResponseBuilder> {
   _$AuthControllerLogin201Response? _$v;
 
-  AuthResponseDtoBuilder? _data;
-  AuthResponseDtoBuilder get data => _$this._data ??= AuthResponseDtoBuilder();
-  set data(AuthResponseDtoBuilder? data) => _$this._data = data;
+  LoginResponseDtoBuilder? _data;
+  LoginResponseDtoBuilder get data =>
+      _$this._data ??= LoginResponseDtoBuilder();
+  set data(LoginResponseDtoBuilder? data) => _$this._data = data;
 
   RequestMetaDtoBuilder? _meta;
   RequestMetaDtoBuilder get meta => _$this._meta ??= RequestMetaDtoBuilder();

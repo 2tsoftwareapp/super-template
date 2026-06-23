@@ -24,10 +24,12 @@ part 'update_preferences_dto.g.dart';
 abstract class UpdatePreferencesDto
     implements Built<UpdatePreferencesDto, UpdatePreferencesDtoBuilder> {
   @BuiltValueField(wireName: r'theme')
-  String? get theme;
+  UpdatePreferencesDtoThemeEnum? get theme;
+  // enum themeEnum {  system,  light,  dark,  };
 
   @BuiltValueField(wireName: r'language')
-  String? get language;
+  UpdatePreferencesDtoLanguageEnum? get language;
+  // enum languageEnum {  en,  vi,  };
 
   @BuiltValueField(wireName: r'timezone')
   String? get timezone;
@@ -71,14 +73,14 @@ class _$UpdatePreferencesDtoSerializer
       yield r'theme';
       yield serializers.serialize(
         object.theme,
-        specifiedType: const FullType(String),
+        specifiedType: const FullType(UpdatePreferencesDtoThemeEnum),
       );
     }
     if (object.language != null) {
       yield r'language';
       yield serializers.serialize(
         object.language,
-        specifiedType: const FullType(String),
+        specifiedType: const FullType(UpdatePreferencesDtoLanguageEnum),
       );
     }
     if (object.timezone != null) {
@@ -138,15 +140,19 @@ class _$UpdatePreferencesDtoSerializer
         case r'theme':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(String),
-          ) as String;
+            specifiedType: const FullType(
+              UpdatePreferencesDtoThemeEnum,
+            ),
+          ) as UpdatePreferencesDtoThemeEnum;
           result.theme = valueDes;
           break;
         case r'language':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(String),
-          ) as String;
+            specifiedType: const FullType(
+              UpdatePreferencesDtoLanguageEnum,
+            ),
+          ) as UpdatePreferencesDtoLanguageEnum;
           result.language = valueDes;
           break;
         case r'timezone':
@@ -203,4 +209,45 @@ class _$UpdatePreferencesDtoSerializer
     );
     return result.build();
   }
+}
+
+class UpdatePreferencesDtoThemeEnum extends EnumClass {
+  @BuiltValueEnumConst(wireName: r'system')
+  static const UpdatePreferencesDtoThemeEnum system =
+      _$updatePreferencesDtoThemeEnum_system;
+  @BuiltValueEnumConst(wireName: r'light')
+  static const UpdatePreferencesDtoThemeEnum light =
+      _$updatePreferencesDtoThemeEnum_light;
+  @BuiltValueEnumConst(wireName: r'dark')
+  static const UpdatePreferencesDtoThemeEnum dark =
+      _$updatePreferencesDtoThemeEnum_dark;
+
+  static Serializer<UpdatePreferencesDtoThemeEnum> get serializer =>
+      _$updatePreferencesDtoThemeEnumSerializer;
+
+  const UpdatePreferencesDtoThemeEnum._(String name) : super(name);
+
+  static BuiltSet<UpdatePreferencesDtoThemeEnum> get values =>
+      _$updatePreferencesDtoThemeEnumValues;
+  static UpdatePreferencesDtoThemeEnum valueOf(String name) =>
+      _$updatePreferencesDtoThemeEnumValueOf(name);
+}
+
+class UpdatePreferencesDtoLanguageEnum extends EnumClass {
+  @BuiltValueEnumConst(wireName: r'en')
+  static const UpdatePreferencesDtoLanguageEnum en =
+      _$updatePreferencesDtoLanguageEnum_en;
+  @BuiltValueEnumConst(wireName: r'vi')
+  static const UpdatePreferencesDtoLanguageEnum vi =
+      _$updatePreferencesDtoLanguageEnum_vi;
+
+  static Serializer<UpdatePreferencesDtoLanguageEnum> get serializer =>
+      _$updatePreferencesDtoLanguageEnumSerializer;
+
+  const UpdatePreferencesDtoLanguageEnum._(String name) : super(name);
+
+  static BuiltSet<UpdatePreferencesDtoLanguageEnum> get values =>
+      _$updatePreferencesDtoLanguageEnumValues;
+  static UpdatePreferencesDtoLanguageEnum valueOf(String name) =>
+      _$updatePreferencesDtoLanguageEnumValueOf(name);
 }

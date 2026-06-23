@@ -55,6 +55,7 @@ filter_unknown_allowlist() {
     /app-error\.ts:/ { next }
     /observability\.types\.ts:/ { next }
     /transaction-executor\.ts:/ { next }
+    /batch-delete-files\.use-case\.ts:/ { next }
     { print }
   '
 }

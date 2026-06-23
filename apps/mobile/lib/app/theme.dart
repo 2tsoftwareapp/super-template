@@ -15,6 +15,16 @@ class ThemeModeController extends StateNotifier<ThemeMode> {
     state = state == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
     await _store.write(state);
   }
+
+  Future<void> setTheme(String theme) async {
+    final mode = switch (theme) {
+      'light' => ThemeMode.light,
+      'dark' => ThemeMode.dark,
+      _ => ThemeMode.system,
+    };
+    state = mode;
+    await _store.write(mode);
+  }
 }
 
 ThemeData buildLightTheme() {

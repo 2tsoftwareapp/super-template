@@ -19,6 +19,8 @@ part 'file_dto.g.dart';
 /// * [originalName]
 /// * [mimeType]
 /// * [sizeBytes]
+/// * [checksum]
+/// * [latestVersion]
 /// * [uploadedById]
 /// * [createdAt]
 /// * [updatedAt]
@@ -38,6 +40,12 @@ abstract class FileDto implements Built<FileDto, FileDtoBuilder> {
 
   @BuiltValueField(wireName: r'sizeBytes')
   num get sizeBytes;
+
+  @BuiltValueField(wireName: r'checksum')
+  JsonObject? get checksum;
+
+  @BuiltValueField(wireName: r'latestVersion')
+  num get latestVersion;
 
   @BuiltValueField(wireName: r'uploadedById')
   JsonObject? get uploadedById;
@@ -94,6 +102,18 @@ class _$FileDtoSerializer implements PrimitiveSerializer<FileDto> {
     yield r'sizeBytes';
     yield serializers.serialize(
       object.sizeBytes,
+      specifiedType: const FullType(num),
+    );
+    if (object.checksum != null) {
+      yield r'checksum';
+      yield serializers.serialize(
+        object.checksum,
+        specifiedType: const FullType.nullable(JsonObject),
+      );
+    }
+    yield r'latestVersion';
+    yield serializers.serialize(
+      object.latestVersion,
       specifiedType: const FullType(num),
     );
     yield r'uploadedById';
@@ -172,6 +192,19 @@ class _$FileDtoSerializer implements PrimitiveSerializer<FileDto> {
           final valueDes = serializers.deserialize(value,
               specifiedType: const FullType(num)) as num;
           result.sizeBytes = valueDes;
+          break;
+        case r'checksum':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType.nullable(JsonObject),
+          ) as JsonObject?;
+          if (valueDes == null) continue;
+          result.checksum = valueDes;
+          break;
+        case r'latestVersion':
+          final valueDes = serializers.deserialize(value,
+              specifiedType: const FullType(num)) as num;
+          result.latestVersion = valueDes;
           break;
         case r'uploadedById':
           final valueDes = serializers.deserialize(

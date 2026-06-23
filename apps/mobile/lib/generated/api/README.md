@@ -71,11 +71,20 @@ All URIs are relative to *http://localhost*
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
 [*ActivitiesApi*](doc/ActivitiesApi.md) | [**activitiesControllerList**](doc/ActivitiesApi.md#activitiescontrollerlist) | **GET** /api/v1/activities | 
+[*AdminAuditApi*](doc/AdminAuditApi.md) | [**auditControllerExportAuditLogs**](doc/AdminAuditApi.md#auditcontrollerexportauditlogs) | **POST** /api/v1/admin/audit-logs/export | 
+[*AdminAuditApi*](doc/AdminAuditApi.md) | [**auditControllerGetAuditLog**](doc/AdminAuditApi.md#auditcontrollergetauditlog) | **GET** /api/v1/admin/audit-logs/{id} | 
 [*AdminAuditApi*](doc/AdminAuditApi.md) | [**auditControllerListAuditLogs**](doc/AdminAuditApi.md#auditcontrollerlistauditlogs) | **GET** /api/v1/admin/audit-logs | 
+[*AdminJobsApi*](doc/AdminJobsApi.md) | [**adminJobsControllerAddDependency**](doc/AdminJobsApi.md#adminjobscontrolleradddependency) | **POST** /api/v1/admin/jobs/{id}/dependencies | 
 [*AdminJobsApi*](doc/AdminJobsApi.md) | [**adminJobsControllerCancelJob**](doc/AdminJobsApi.md#adminjobscontrollercanceljob) | **DELETE** /api/v1/admin/jobs/{id} | 
+[*AdminJobsApi*](doc/AdminJobsApi.md) | [**adminJobsControllerGetJob**](doc/AdminJobsApi.md#adminjobscontrollergetjob) | **GET** /api/v1/admin/jobs/{id} | 
+[*AdminJobsApi*](doc/AdminJobsApi.md) | [**adminJobsControllerGetJobLogs**](doc/AdminJobsApi.md#adminjobscontrollergetjoblogs) | **GET** /api/v1/admin/jobs/{id}/logs | 
+[*AdminJobsApi*](doc/AdminJobsApi.md) | [**adminJobsControllerGetMetrics**](doc/AdminJobsApi.md#adminjobscontrollergetmetrics) | **GET** /api/v1/admin/jobs/metrics | 
+[*AdminJobsApi*](doc/AdminJobsApi.md) | [**adminJobsControllerListDependencies**](doc/AdminJobsApi.md#adminjobscontrollerlistdependencies) | **GET** /api/v1/admin/jobs/{id}/dependencies | 
 [*AdminJobsApi*](doc/AdminJobsApi.md) | [**adminJobsControllerListJobs**](doc/AdminJobsApi.md#adminjobscontrollerlistjobs) | **GET** /api/v1/admin/jobs | 
 [*AdminMailApi*](doc/AdminMailApi.md) | [**adminMailControllerListDeliveries**](doc/AdminMailApi.md#adminmailcontrollerlistdeliveries) | **GET** /api/v1/admin/mail/deliveries | 
+[*AdminMailApi*](doc/AdminMailApi.md) | [**adminMailControllerListTemplates**](doc/AdminMailApi.md#adminmailcontrollerlisttemplates) | **GET** /api/v1/admin/mail/templates | 
 [*AdminMailApi*](doc/AdminMailApi.md) | [**adminMailControllerPreview**](doc/AdminMailApi.md#adminmailcontrollerpreview) | **GET** /api/v1/admin/mail/preview/{templateKey} | 
+[*AdminMailApi*](doc/AdminMailApi.md) | [**adminMailControllerSend**](doc/AdminMailApi.md#adminmailcontrollersend) | **POST** /api/v1/admin/mail/send | 
 [*AdminNotificationsApi*](doc/AdminNotificationsApi.md) | [**adminNotificationsControllerCancelJob**](doc/AdminNotificationsApi.md#adminnotificationscontrollercanceljob) | **DELETE** /api/v1/admin/notifications/jobs/{id} | 
 [*AdminNotificationsApi*](doc/AdminNotificationsApi.md) | [**adminNotificationsControllerGetJob**](doc/AdminNotificationsApi.md#adminnotificationscontrollergetjob) | **GET** /api/v1/admin/notifications/jobs/{id} | 
 [*AdminNotificationsApi*](doc/AdminNotificationsApi.md) | [**adminNotificationsControllerListJobs**](doc/AdminNotificationsApi.md#adminnotificationscontrollerlistjobs) | **GET** /api/v1/admin/notifications/jobs | 
@@ -111,17 +120,23 @@ Class | Method | HTTP request | Description
 [*AuthApi*](doc/AuthApi.md) | [**authControllerRevokeSession**](doc/AuthApi.md#authcontrollerrevokesession) | **DELETE** /api/v1/auth/sessions/{sessionId} | 
 [*AuthApi*](doc/AuthApi.md) | [**authControllerSwitchOrganization**](doc/AuthApi.md#authcontrollerswitchorganization) | **POST** /api/v1/auth/switch-organization | 
 [*AuthApi*](doc/AuthApi.md) | [**authControllerVerifyEmail**](doc/AuthApi.md#authcontrollerverifyemail) | **POST** /api/v1/auth/verify-email | 
+[*AuthApi*](doc/AuthApi.md) | [**authControllerVerifyMfaChallenge**](doc/AuthApi.md#authcontrollerverifymfachallenge) | **POST** /api/v1/auth/mfa/verify-challenge | 
 [*CommentsApi*](doc/CommentsApi.md) | [**commentsControllerCreate**](doc/CommentsApi.md#commentscontrollercreate) | **POST** /api/v1/comments | 
 [*CommentsApi*](doc/CommentsApi.md) | [**commentsControllerDelete**](doc/CommentsApi.md#commentscontrollerdelete) | **DELETE** /api/v1/comments/{id} | 
 [*CommentsApi*](doc/CommentsApi.md) | [**commentsControllerList**](doc/CommentsApi.md#commentscontrollerlist) | **GET** /api/v1/comments | 
 [*CommentsApi*](doc/CommentsApi.md) | [**commentsControllerUpdate**](doc/CommentsApi.md#commentscontrollerupdate) | **PATCH** /api/v1/comments/{id} | 
 [*ExportsApi*](doc/ExportsApi.md) | [**exportsControllerCreate**](doc/ExportsApi.md#exportscontrollercreate) | **POST** /api/v1/exports | 
 [*ExportsApi*](doc/ExportsApi.md) | [**exportsControllerGetById**](doc/ExportsApi.md#exportscontrollergetbyid) | **GET** /api/v1/exports/{id} | 
+[*FilesApi*](doc/FilesApi.md) | [**filesControllerBatchDelete**](doc/FilesApi.md#filescontrollerbatchdelete) | **POST** /api/v1/files/batch-delete | 
 [*FilesApi*](doc/FilesApi.md) | [**filesControllerDelete**](doc/FilesApi.md#filescontrollerdelete) | **DELETE** /api/v1/files/{id} | 
 [*FilesApi*](doc/FilesApi.md) | [**filesControllerDownload**](doc/FilesApi.md#filescontrollerdownload) | **GET** /api/v1/files/{id}/download | 
 [*FilesApi*](doc/FilesApi.md) | [**filesControllerGetById**](doc/FilesApi.md#filescontrollergetbyid) | **GET** /api/v1/files/{id} | 
+[*FilesApi*](doc/FilesApi.md) | [**filesControllerGetHistory**](doc/FilesApi.md#filescontrollergethistory) | **GET** /api/v1/files/{id}/history | 
 [*FilesApi*](doc/FilesApi.md) | [**filesControllerGetUrl**](doc/FilesApi.md#filescontrollergeturl) | **GET** /api/v1/files/{id}/url | 
+[*FilesApi*](doc/FilesApi.md) | [**filesControllerList**](doc/FilesApi.md#filescontrollerlist) | **GET** /api/v1/files | 
+[*FilesApi*](doc/FilesApi.md) | [**filesControllerListVersions**](doc/FilesApi.md#filescontrollerlistversions) | **GET** /api/v1/files/{id}/versions | 
 [*FilesApi*](doc/FilesApi.md) | [**filesControllerUpload**](doc/FilesApi.md#filescontrollerupload) | **POST** /api/v1/files | 
+[*FilesApi*](doc/FilesApi.md) | [**filesControllerUploadVersion**](doc/FilesApi.md#filescontrolleruploadversion) | **POST** /api/v1/files/{id}/versions | 
 [*HealthApi*](doc/HealthApi.md) | [**healthControllerGetHealth**](doc/HealthApi.md#healthcontrollergethealth) | **GET** /api/v1/health | 
 [*HealthApi*](doc/HealthApi.md) | [**healthControllerGetReady**](doc/HealthApi.md#healthcontrollergetready) | **GET** /api/v1/health/ready | 
 [*ImportsApi*](doc/ImportsApi.md) | [**importsControllerConfirm**](doc/ImportsApi.md#importscontrollerconfirm) | **POST** /api/v1/imports/{id}/confirm | 
@@ -131,6 +146,11 @@ Class | Method | HTTP request | Description
 [*InvitationsApi*](doc/InvitationsApi.md) | [**invitationsControllerCreate**](doc/InvitationsApi.md#invitationscontrollercreate) | **POST** /api/v1/invitations | 
 [*InvitationsApi*](doc/InvitationsApi.md) | [**invitationsControllerList**](doc/InvitationsApi.md#invitationscontrollerlist) | **GET** /api/v1/invitations | 
 [*InvitationsApi*](doc/InvitationsApi.md) | [**invitationsControllerRevoke**](doc/InvitationsApi.md#invitationscontrollerrevoke) | **DELETE** /api/v1/invitations/{id} | 
+[*MfaApi*](doc/MfaApi.md) | [**mfaControllerConfirm**](doc/MfaApi.md#mfacontrollerconfirm) | **POST** /api/v1/auth/mfa/confirm | 
+[*MfaApi*](doc/MfaApi.md) | [**mfaControllerDisable**](doc/MfaApi.md#mfacontrollerdisable) | **POST** /api/v1/auth/mfa/disable | 
+[*MfaApi*](doc/MfaApi.md) | [**mfaControllerGetStatus**](doc/MfaApi.md#mfacontrollergetstatus) | **GET** /api/v1/auth/mfa/status | 
+[*MfaApi*](doc/MfaApi.md) | [**mfaControllerRegenerateRecoveryCodes**](doc/MfaApi.md#mfacontrollerregeneraterecoverycodes) | **POST** /api/v1/auth/mfa/recovery-codes/regenerate | 
+[*MfaApi*](doc/MfaApi.md) | [**mfaControllerSetup**](doc/MfaApi.md#mfacontrollersetup) | **POST** /api/v1/auth/mfa/setup | 
 [*NotificationsApi*](doc/NotificationsApi.md) | [**notificationsControllerDelete**](doc/NotificationsApi.md#notificationscontrollerdelete) | **DELETE** /api/v1/notifications/{id} | 
 [*NotificationsApi*](doc/NotificationsApi.md) | [**notificationsControllerList**](doc/NotificationsApi.md#notificationscontrollerlist) | **GET** /api/v1/notifications | 
 [*NotificationsApi*](doc/NotificationsApi.md) | [**notificationsControllerMarkAllRead**](doc/NotificationsApi.md#notificationscontrollermarkallread) | **PATCH** /api/v1/notifications/read-all | 
@@ -140,7 +160,14 @@ Class | Method | HTTP request | Description
 [*NotificationsApi*](doc/NotificationsApi.md) | [**notificationsControllerUnreadCount**](doc/NotificationsApi.md#notificationscontrollerunreadcount) | **GET** /api/v1/notifications/unread-count | 
 [*NotificationsApi*](doc/NotificationsApi.md) | [**notificationsControllerUnregisterDevice**](doc/NotificationsApi.md#notificationscontrollerunregisterdevice) | **DELETE** /api/v1/notifications/devices/{token} | 
 [*OrganizationsApi*](doc/OrganizationsApi.md) | [**organizationsControllerCreate**](doc/OrganizationsApi.md#organizationscontrollercreate) | **POST** /api/v1/organizations | 
+[*OrganizationsApi*](doc/OrganizationsApi.md) | [**organizationsControllerGetOne**](doc/OrganizationsApi.md#organizationscontrollergetone) | **GET** /api/v1/organizations/{id} | 
+[*OrganizationsApi*](doc/OrganizationsApi.md) | [**organizationsControllerLeave**](doc/OrganizationsApi.md#organizationscontrollerleave) | **POST** /api/v1/organizations/{id}/leave | 
 [*OrganizationsApi*](doc/OrganizationsApi.md) | [**organizationsControllerList**](doc/OrganizationsApi.md#organizationscontrollerlist) | **GET** /api/v1/organizations | 
+[*OrganizationsApi*](doc/OrganizationsApi.md) | [**organizationsControllerListMembers**](doc/OrganizationsApi.md#organizationscontrollerlistmembers) | **GET** /api/v1/organizations/{id}/members | 
+[*OrganizationsApi*](doc/OrganizationsApi.md) | [**organizationsControllerRemove**](doc/OrganizationsApi.md#organizationscontrollerremove) | **DELETE** /api/v1/organizations/{id} | 
+[*OrganizationsApi*](doc/OrganizationsApi.md) | [**organizationsControllerRemoveMember**](doc/OrganizationsApi.md#organizationscontrollerremovemember) | **DELETE** /api/v1/organizations/{id}/members/{userId} | 
+[*OrganizationsApi*](doc/OrganizationsApi.md) | [**organizationsControllerUpdate**](doc/OrganizationsApi.md#organizationscontrollerupdate) | **PATCH** /api/v1/organizations/{id} | 
+[*OrganizationsApi*](doc/OrganizationsApi.md) | [**organizationsControllerUpdateMemberRole**](doc/OrganizationsApi.md#organizationscontrollerupdatememberrole) | **PATCH** /api/v1/organizations/{id}/members/{userId} | 
 [*ProjectsApi*](doc/ProjectsApi.md) | [**projectsControllerCreate**](doc/ProjectsApi.md#projectscontrollercreate) | **POST** /api/v1/projects | 
 [*ProjectsApi*](doc/ProjectsApi.md) | [**projectsControllerGetById**](doc/ProjectsApi.md#projectscontrollergetbyid) | **GET** /api/v1/projects/{id} | 
 [*ProjectsApi*](doc/ProjectsApi.md) | [**projectsControllerList**](doc/ProjectsApi.md#projectscontrollerlist) | **GET** /api/v1/projects | 
@@ -148,7 +175,11 @@ Class | Method | HTTP request | Description
 [*ProjectsApi*](doc/ProjectsApi.md) | [**projectsControllerRemove**](doc/ProjectsApi.md#projectscontrollerremove) | **DELETE** /api/v1/projects/{id} | 
 [*ProjectsApi*](doc/ProjectsApi.md) | [**projectsControllerRestore**](doc/ProjectsApi.md#projectscontrollerrestore) | **POST** /api/v1/projects/{id}/restore | 
 [*ProjectsApi*](doc/ProjectsApi.md) | [**projectsControllerUpdate**](doc/ProjectsApi.md#projectscontrollerupdate) | **PATCH** /api/v1/projects/{id} | 
+[*SsoApi*](doc/SsoApi.md) | [**ssoControllerHandleCallbackGet**](doc/SsoApi.md#ssocontrollerhandlecallbackget) | **GET** /api/v1/auth/sso/{provider}/callback | 
+[*SsoApi*](doc/SsoApi.md) | [**ssoControllerHandleCallbackPost**](doc/SsoApi.md#ssocontrollerhandlecallbackpost) | **POST** /api/v1/auth/sso/{provider}/callback | 
+[*SsoApi*](doc/SsoApi.md) | [**ssoControllerStartLogin**](doc/SsoApi.md#ssocontrollerstartlogin) | **GET** /api/v1/auth/sso/{provider}/start | 
 [*UsersApi*](doc/UsersApi.md) | [**preferencesControllerGetMyPreferences**](doc/UsersApi.md#preferencescontrollergetmypreferences) | **GET** /api/v1/users/me/preferences | 
+[*UsersApi*](doc/UsersApi.md) | [**preferencesControllerResetMyPreferences**](doc/UsersApi.md#preferencescontrollerresetmypreferences) | **DELETE** /api/v1/users/me/preferences | 
 [*UsersApi*](doc/UsersApi.md) | [**preferencesControllerUpdateMyPreferences**](doc/UsersApi.md#preferencescontrollerupdatemypreferences) | **PATCH** /api/v1/users/me/preferences | 
 [*UsersApi*](doc/UsersApi.md) | [**usersControllerChangePassword**](doc/UsersApi.md#userscontrollerchangepassword) | **PATCH** /api/v1/users/me/password | 
 [*UsersApi*](doc/UsersApi.md) | [**usersControllerGetMe**](doc/UsersApi.md#userscontrollergetme) | **GET** /api/v1/users/me | 
@@ -160,10 +191,17 @@ Class | Method | HTTP request | Description
  - [AcceptInvitationDto](doc/AcceptInvitationDto.md)
  - [ActivitiesControllerList200Response](doc/ActivitiesControllerList200Response.md)
  - [ActivityDto](doc/ActivityDto.md)
- - [AdminJobsControllerCancelJob200Response](doc/AdminJobsControllerCancelJob200Response.md)
+ - [AddJobDependencyDto](doc/AddJobDependencyDto.md)
+ - [AdminJobsControllerAddDependency201Response](doc/AdminJobsControllerAddDependency201Response.md)
+ - [AdminJobsControllerGetJob200Response](doc/AdminJobsControllerGetJob200Response.md)
+ - [AdminJobsControllerGetJobLogs200Response](doc/AdminJobsControllerGetJobLogs200Response.md)
+ - [AdminJobsControllerGetMetrics200Response](doc/AdminJobsControllerGetMetrics200Response.md)
+ - [AdminJobsControllerListDependencies200Response](doc/AdminJobsControllerListDependencies200Response.md)
  - [AdminJobsControllerListJobs200Response](doc/AdminJobsControllerListJobs200Response.md)
  - [AdminMailControllerListDeliveries200Response](doc/AdminMailControllerListDeliveries200Response.md)
+ - [AdminMailControllerListTemplates200Response](doc/AdminMailControllerListTemplates200Response.md)
  - [AdminMailControllerPreview200Response](doc/AdminMailControllerPreview200Response.md)
+ - [AdminMailControllerSend201Response](doc/AdminMailControllerSend201Response.md)
  - [AdminNotificationsControllerListJobs200Response](doc/AdminNotificationsControllerListJobs200Response.md)
  - [AdminNotificationsControllerSend201Response](doc/AdminNotificationsControllerSend201Response.md)
  - [AdminRolesControllerCreateRole201Response](doc/AdminRolesControllerCreateRole201Response.md)
@@ -179,15 +217,22 @@ Class | Method | HTTP request | Description
  - [AttachmentDto](doc/AttachmentDto.md)
  - [AttachmentsControllerAttach201Response](doc/AttachmentsControllerAttach201Response.md)
  - [AttachmentsControllerList200Response](doc/AttachmentsControllerList200Response.md)
+ - [AuditControllerExportAuditLogs201Response](doc/AuditControllerExportAuditLogs201Response.md)
+ - [AuditControllerGetAuditLog200Response](doc/AuditControllerGetAuditLog200Response.md)
  - [AuditControllerListAuditLogs200Response](doc/AuditControllerListAuditLogs200Response.md)
+ - [AuditExportResultDto](doc/AuditExportResultDto.md)
  - [AuditLogDto](doc/AuditLogDto.md)
  - [AuthControllerGetMe200Response](doc/AuthControllerGetMe200Response.md)
  - [AuthControllerGetSessions200Response](doc/AuthControllerGetSessions200Response.md)
  - [AuthControllerLogin201Response](doc/AuthControllerLogin201Response.md)
  - [AuthControllerRegister201Response](doc/AuthControllerRegister201Response.md)
+ - [AuthControllerVerifyMfaChallenge201Response](doc/AuthControllerVerifyMfaChallenge201Response.md)
  - [AuthMeDto](doc/AuthMeDto.md)
  - [AuthResponseDto](doc/AuthResponseDto.md)
  - [AuthSessionDto](doc/AuthSessionDto.md)
+ - [BatchDeleteFilesDto](doc/BatchDeleteFilesDto.md)
+ - [BatchDeleteResultDto](doc/BatchDeleteResultDto.md)
+ - [BatchDeleteResultItemDto](doc/BatchDeleteResultItemDto.md)
  - [ChangePasswordDto](doc/ChangePasswordDto.md)
  - [CommentDto](doc/CommentDto.md)
  - [CommentsControllerCreate201Response](doc/CommentsControllerCreate201Response.md)
@@ -202,11 +247,18 @@ Class | Method | HTTP request | Description
  - [CreateProjectDto](doc/CreateProjectDto.md)
  - [CreateRoleDto](doc/CreateRoleDto.md)
  - [DeviceTokenDto](doc/DeviceTokenDto.md)
+ - [ExportAuditLogsQueryDto](doc/ExportAuditLogsQueryDto.md)
  - [ExportJobDto](doc/ExportJobDto.md)
  - [ExportsControllerCreate201Response](doc/ExportsControllerCreate201Response.md)
  - [FileDto](doc/FileDto.md)
+ - [FileHistoryEventDto](doc/FileHistoryEventDto.md)
  - [FileUrlDto](doc/FileUrlDto.md)
+ - [FileVersionDto](doc/FileVersionDto.md)
+ - [FilesControllerBatchDelete201Response](doc/FilesControllerBatchDelete201Response.md)
+ - [FilesControllerGetHistory200Response](doc/FilesControllerGetHistory200Response.md)
  - [FilesControllerGetUrl200Response](doc/FilesControllerGetUrl200Response.md)
+ - [FilesControllerList200Response](doc/FilesControllerList200Response.md)
+ - [FilesControllerListVersions200Response](doc/FilesControllerListVersions200Response.md)
  - [FilesControllerUpload201Response](doc/FilesControllerUpload201Response.md)
  - [ForgotPasswordDto](doc/ForgotPasswordDto.md)
  - [HealthControllerGetHealth200Response](doc/HealthControllerGetHealth200Response.md)
@@ -216,19 +268,38 @@ Class | Method | HTTP request | Description
  - [InvitationDto](doc/InvitationDto.md)
  - [InvitationsControllerCreate201Response](doc/InvitationsControllerCreate201Response.md)
  - [InvitationsControllerList200Response](doc/InvitationsControllerList200Response.md)
+ - [JobDependencyDto](doc/JobDependencyDto.md)
  - [JobDto](doc/JobDto.md)
+ - [JobEventDto](doc/JobEventDto.md)
+ - [JobMetricsDto](doc/JobMetricsDto.md)
+ - [JobStatusCountDto](doc/JobStatusCountDto.md)
+ - [JobTypeCountDto](doc/JobTypeCountDto.md)
  - [LoginDto](doc/LoginDto.md)
+ - [LoginResponseDto](doc/LoginResponseDto.md)
  - [MailDeliveryDto](doc/MailDeliveryDto.md)
  - [MailPreviewDto](doc/MailPreviewDto.md)
+ - [MailTemplateDto](doc/MailTemplateDto.md)
+ - [MfaCodeDto](doc/MfaCodeDto.md)
+ - [MfaControllerConfirm201Response](doc/MfaControllerConfirm201Response.md)
+ - [MfaControllerGetStatus200Response](doc/MfaControllerGetStatus200Response.md)
+ - [MfaControllerSetup201Response](doc/MfaControllerSetup201Response.md)
+ - [MfaRecoveryCodesResponseDto](doc/MfaRecoveryCodesResponseDto.md)
+ - [MfaSetupResponseDto](doc/MfaSetupResponseDto.md)
+ - [MfaStatusDto](doc/MfaStatusDto.md)
  - [NotificationDto](doc/NotificationDto.md)
  - [NotificationJobDto](doc/NotificationJobDto.md)
  - [NotificationsControllerList200Response](doc/NotificationsControllerList200Response.md)
  - [NotificationsControllerMarkRead200Response](doc/NotificationsControllerMarkRead200Response.md)
  - [NotificationsControllerRegisterDevice201Response](doc/NotificationsControllerRegisterDevice201Response.md)
  - [NotificationsControllerUnreadCount200Response](doc/NotificationsControllerUnreadCount200Response.md)
+ - [OrganizationDetailDto](doc/OrganizationDetailDto.md)
  - [OrganizationDto](doc/OrganizationDto.md)
+ - [OrganizationMemberDto](doc/OrganizationMemberDto.md)
  - [OrganizationsControllerCreate200Response](doc/OrganizationsControllerCreate200Response.md)
+ - [OrganizationsControllerGetOne200Response](doc/OrganizationsControllerGetOne200Response.md)
  - [OrganizationsControllerList200Response](doc/OrganizationsControllerList200Response.md)
+ - [OrganizationsControllerListMembers200Response](doc/OrganizationsControllerListMembers200Response.md)
+ - [OrganizationsControllerUpdateMemberRole200Response](doc/OrganizationsControllerUpdateMemberRole200Response.md)
  - [PaginationMetaDto](doc/PaginationMetaDto.md)
  - [PermissionDto](doc/PermissionDto.md)
  - [PreferencesControllerGetMyPreferences200Response](doc/PreferencesControllerGetMyPreferences200Response.md)
@@ -246,12 +317,19 @@ Class | Method | HTTP request | Description
  - [ResendVerificationDto](doc/ResendVerificationDto.md)
  - [ResetPasswordDto](doc/ResetPasswordDto.md)
  - [RoleDto](doc/RoleDto.md)
+ - [SendAdminMailDto](doc/SendAdminMailDto.md)
+ - [SendAdminMailResultDto](doc/SendAdminMailResultDto.md)
  - [SendNotificationRequestDto](doc/SendNotificationRequestDto.md)
+ - [SsoCallbackQueryDto](doc/SsoCallbackQueryDto.md)
+ - [SsoControllerStartLogin200Response](doc/SsoControllerStartLogin200Response.md)
+ - [StartSsoLoginResponseDto](doc/StartSsoLoginResponseDto.md)
  - [SuccessFlagDto](doc/SuccessFlagDto.md)
  - [SuccessMessageDto](doc/SuccessMessageDto.md)
  - [SwitchOrganizationDto](doc/SwitchOrganizationDto.md)
  - [UpdateAdminUserDto](doc/UpdateAdminUserDto.md)
  - [UpdateCommentDto](doc/UpdateCommentDto.md)
+ - [UpdateMemberRoleDto](doc/UpdateMemberRoleDto.md)
+ - [UpdateOrganizationDto](doc/UpdateOrganizationDto.md)
  - [UpdatePreferencesDto](doc/UpdatePreferencesDto.md)
  - [UpdateProfileDto](doc/UpdateProfileDto.md)
  - [UpdateProjectDto](doc/UpdateProjectDto.md)
@@ -261,6 +339,7 @@ Class | Method | HTTP request | Description
  - [UserDto](doc/UserDto.md)
  - [UserPreferencesDto](doc/UserPreferencesDto.md)
  - [VerifyEmailDto](doc/VerifyEmailDto.md)
+ - [VerifyMfaChallengeDto](doc/VerifyMfaChallengeDto.md)
 
 
 ## Documentation For Authorization

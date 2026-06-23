@@ -22,6 +22,7 @@ import 'package:mobile_app/features/home/presentation/home_screen.dart';
 import 'package:mobile_app/features/imports/presentation/imports_screen.dart';
 import 'package:mobile_app/features/notifications/presentation/notifications_screen.dart';
 import 'package:mobile_app/features/invitations/presentation/accept_invitation_screen.dart';
+import 'package:mobile_app/features/organizations/presentation/organization_detail_screen.dart';
 import 'package:mobile_app/features/organizations/presentation/organizations_screen.dart';
 import 'package:mobile_app/features/profile/presentation/preferences_screen.dart';
 import 'package:mobile_app/features/profile/presentation/profile_screen.dart';
@@ -130,6 +131,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/organizations',
         builder: (_, _) => const OrganizationsScreen(),
+      ),
+      GoRoute(
+        path: '/organizations/:id',
+        builder: (_, state) => OrganizationDetailScreen(
+          organizationId: state.pathParameters['id']!,
+        ),
       ),
       GoRoute(path: '/imports', builder: (_, _) => const ImportsScreen()),
       GoRoute(path: '/exports', builder: (_, _) => const ExportsScreen()),

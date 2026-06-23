@@ -116,6 +116,86 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/organizations/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["OrganizationsController_getOne"];
+        put?: never;
+        post?: never;
+        delete: operations["OrganizationsController_remove"];
+        options?: never;
+        head?: never;
+        patch: operations["OrganizationsController_update"];
+        trace?: never;
+    };
+    "/api/v1/organizations/{id}/leave": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["OrganizationsController_leave"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizations/{id}/members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["OrganizationsController_listMembers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organizations/{id}/members/{userId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["OrganizationsController_removeMember"];
+        options?: never;
+        head?: never;
+        patch: operations["OrganizationsController_updateMemberRole"];
+        trace?: never;
+    };
+    "/api/v1/users/me/preferences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["PreferencesController_getMyPreferences"];
+        put?: never;
+        post?: never;
+        delete: operations["PreferencesController_resetMyPreferences"];
+        options?: never;
+        head?: never;
+        patch: operations["PreferencesController_updateMyPreferences"];
+        trace?: never;
+    };
     "/api/v1/admin/users": {
         parameters: {
             query?: never;
@@ -212,22 +292,6 @@ export interface paths {
         patch: operations["UsersController_changePassword"];
         trace?: never;
     };
-    "/api/v1/users/me/preferences": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["PreferencesController_getMyPreferences"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch: operations["PreferencesController_updateMyPreferences"];
-        trace?: never;
-    };
     "/api/v1/auth/register": {
         parameters: {
             query?: never;
@@ -254,6 +318,22 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["AuthController_login"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/mfa/verify-challenge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["AuthController_verifyMfaChallenge"];
         delete?: never;
         options?: never;
         head?: never;
@@ -436,6 +516,118 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/auth/mfa/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["MfaController_getStatus"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/mfa/setup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["MfaController_setup"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/mfa/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["MfaController_confirm"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/mfa/disable": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["MfaController_disable"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/mfa/recovery-codes/regenerate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["MfaController_regenerateRecoveryCodes"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/sso/{provider}/start": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["SsoController_startLogin"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/sso/{provider}/callback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["SsoController_handleCallbackGet"];
+        put?: never;
+        post: operations["SsoController_handleCallbackPost"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/audit-logs": {
         parameters: {
             query?: never;
@@ -444,6 +636,54 @@ export interface paths {
             cookie?: never;
         };
         get: operations["AuditController_listAuditLogs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/audit-logs/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["AuditController_exportAuditLogs"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/audit-logs/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AuditController_getAuditLog"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mail/templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AdminMailController_listTemplates"];
         put?: never;
         post?: never;
         delete?: never;
@@ -484,7 +724,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/files": {
+    "/api/v1/admin/mail/send": {
         parameters: {
             query?: never;
             header?: never;
@@ -493,7 +733,119 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        post: operations["AdminMailController_send"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/jobs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AdminJobsController_listJobs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/jobs/metrics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AdminJobsController_getMetrics"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/jobs/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AdminJobsController_getJob"];
+        put?: never;
+        post?: never;
+        delete: operations["AdminJobsController_cancelJob"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/jobs/{id}/logs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AdminJobsController_getJobLogs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/jobs/{id}/dependencies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AdminJobsController_listDependencies"];
+        put?: never;
+        post: operations["AdminJobsController_addDependency"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/files": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["FilesController_list"];
+        put?: never;
         post: operations["FilesController_upload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/files/batch-delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["FilesController_batchDelete"];
         delete?: never;
         options?: never;
         head?: never;
@@ -548,6 +900,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/files/{id}/versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["FilesController_listVersions"];
+        put?: never;
+        post: operations["FilesController_uploadVersion"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/files/{id}/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["FilesController_getHistory"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/attachments": {
         parameters: {
             query?: never;
@@ -575,38 +959,6 @@ export interface paths {
         put?: never;
         post?: never;
         delete: operations["AttachmentsController_delete"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/jobs": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["AdminJobsController_listJobs"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/jobs/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete: operations["AdminJobsController_cancelJob"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1118,6 +1470,62 @@ export interface components {
             /** @example Acme Corp */
             name: string;
         };
+        OrganizationDetailDto: {
+            id: string;
+            name: string;
+            slug: string;
+            /** @enum {string} */
+            role: "OWNER" | "ADMIN" | "MEMBER";
+            memberCount: number;
+            createdAt: string;
+            updatedAt: string;
+        };
+        UpdateOrganizationDto: {
+            /** @example Acme Corp */
+            name: string;
+        };
+        OrganizationMemberDto: {
+            userId: string;
+            email: string;
+            displayName: string;
+            /** @enum {string} */
+            role: "OWNER" | "ADMIN" | "MEMBER";
+            createdAt: string;
+            updatedAt: string;
+        };
+        UpdateMemberRoleDto: {
+            /** @enum {string} */
+            role: "OWNER" | "ADMIN" | "MEMBER";
+        };
+        UserPreferencesDto: {
+            userId: string;
+            /** @enum {string} */
+            theme: "system" | "light" | "dark";
+            /** @enum {string} */
+            language: "en" | "vi";
+            timezone: string;
+            notificationPreferences: {
+                [key: string]: unknown;
+            };
+            emailPreferences: {
+                [key: string]: unknown;
+            };
+            createdAt: string;
+            updatedAt: string;
+        };
+        UpdatePreferencesDto: {
+            /** @enum {string} */
+            theme?: "system" | "light" | "dark";
+            /** @enum {string} */
+            language?: "en" | "vi";
+            timezone?: string;
+            notificationPreferences?: {
+                [key: string]: unknown;
+            };
+            emailPreferences?: {
+                [key: string]: unknown;
+            };
+        };
         PaginationMetaDto: {
             requestId: string;
             page: number;
@@ -1178,31 +1586,6 @@ export interface components {
             currentPassword: string;
             newPassword: string;
         };
-        UserPreferencesDto: {
-            userId: string;
-            theme: string;
-            language: string;
-            timezone: string;
-            notificationPreferences: {
-                [key: string]: unknown;
-            };
-            emailPreferences: {
-                [key: string]: unknown;
-            };
-            createdAt: string;
-            updatedAt: string;
-        };
-        UpdatePreferencesDto: {
-            theme?: string;
-            language?: string;
-            timezone?: string;
-            notificationPreferences?: {
-                [key: string]: unknown;
-            };
-            emailPreferences?: {
-                [key: string]: unknown;
-            };
-        };
         SuccessMessageDto: {
             success: boolean;
             message: string;
@@ -1224,6 +1607,20 @@ export interface components {
             updatedAt: string;
             current: boolean;
         };
+        LoginResponseDto: {
+            mfaRequired: boolean;
+            mfaToken?: string;
+            accessToken?: string;
+            refreshToken?: string;
+            user?: components["schemas"]["UserDto"];
+            permissions?: string[];
+            session?: components["schemas"]["AuthSessionDto"];
+            organizationId?: Record<string, never> | null;
+        };
+        LoginDto: {
+            email: string;
+            password: string;
+        };
         AuthResponseDto: {
             accessToken: string;
             refreshToken: string;
@@ -1232,9 +1629,9 @@ export interface components {
             session: components["schemas"]["AuthSessionDto"];
             organizationId: Record<string, never> | null;
         };
-        LoginDto: {
-            email: string;
-            password: string;
+        VerifyMfaChallengeDto: {
+            mfaToken: string;
+            code: string;
         };
         RefreshTokenDto: {
             refreshToken: string;
@@ -1261,6 +1658,26 @@ export interface components {
         SwitchOrganizationDto: {
             organizationId: string;
         };
+        MfaStatusDto: {
+            enabled: boolean;
+        };
+        MfaSetupResponseDto: {
+            secret: string;
+            otpauthUrl: string;
+        };
+        MfaRecoveryCodesResponseDto: {
+            recoveryCodes: string[];
+        };
+        MfaCodeDto: {
+            code: string;
+        };
+        StartSsoLoginResponseDto: {
+            authorizationUrl: string;
+        };
+        SsoCallbackQueryDto: {
+            code: string;
+            state: string;
+        };
         AuditLogDto: {
             id: string;
             actorId?: string | null;
@@ -1274,6 +1691,26 @@ export interface components {
             userAgent?: string | null;
             requestId?: string | null;
             createdAt: string;
+        };
+        AuditExportResultDto: {
+            fileId: string;
+            rowCount: number;
+        };
+        ExportAuditLogsQueryDto: {
+            actorId?: string;
+            action?: string;
+            resourceType?: string;
+            resourceId?: string;
+            from?: string;
+            to?: string;
+            q?: string;
+        };
+        MailTemplateDto: {
+            key: string;
+            mandatory: boolean;
+            /** @description Whether this template can be sent ad hoc via POST /admin/mail/send. */
+            sendable: boolean;
+            variables: string[];
         };
         MailDeliveryDto: {
             id: string;
@@ -1293,37 +1730,23 @@ export interface components {
             subject: string;
             text: string;
             html: string;
+            /** @description Template variables with no supplied or default value. */
+            missingVariables: string[];
         };
-        FileDto: {
-            id: string;
-            storageKey: string;
-            originalName: string;
-            mimeType: string;
-            sizeBytes: number;
-            uploadedById: Record<string, never> | null;
-            createdAt: string;
-            updatedAt: string;
+        SendAdminMailResultDto: {
+            jobId: string;
+            /** @enum {string} */
+            status: "PENDING" | "PROCESSING" | "COMPLETED" | "CANCELLED" | "FAILED";
         };
-        FileUrlDto: {
-            id: string;
-            url: string;
-            expiresInSeconds: number;
-        };
-        AttachmentDto: {
-            id: string;
-            fileId: string;
-            entityType: string;
-            entityId: string;
-            label?: Record<string, never> | null;
-            createdById?: Record<string, never> | null;
-            createdAt: string;
-            updatedAt: string;
-        };
-        AttachEntityDto: {
-            fileId: string;
-            entityType: string;
-            entityId: string;
-            label?: string;
+        SendAdminMailDto: {
+            /** @description Non-mandatory template key (security templates cannot be sent ad hoc). */
+            templateKey: string;
+            to: string;
+            variables?: {
+                [key: string]: string;
+            };
+            /** @description Replaying the same key returns the original job instead of sending again. */
+            idempotencyKey?: string;
         };
         JobDto: {
             id: string;
@@ -1344,6 +1767,112 @@ export interface components {
             createdById?: string | null;
             createdAt: string;
             updatedAt: string;
+        };
+        JobStatusCountDto: {
+            status: string;
+            total: number;
+        };
+        JobTypeCountDto: {
+            type: string;
+            total: number;
+        };
+        JobMetricsDto: {
+            byStatus: components["schemas"]["JobStatusCountDto"][];
+            byType: components["schemas"]["JobTypeCountDto"][];
+            averageDurationMs?: number | null;
+            retryRate: number;
+            failureRate: number;
+            totalCompleted: number;
+            totalFailed: number;
+        };
+        JobEventDto: {
+            id: string;
+            jobId: string;
+            attemptId?: string | null;
+            /** @enum {string} */
+            type: "claimed" | "completed" | "failed" | "retry_scheduled" | "cancelled" | "no_handler";
+            message?: string | null;
+            metadata?: {
+                [key: string]: unknown;
+            } | null;
+            createdAt: string;
+        };
+        JobDependencyDto: {
+            id: string;
+            dependsOnJobId: string;
+            /** @enum {string} */
+            dependsOnJobStatus: "PENDING" | "PROCESSING" | "COMPLETED" | "CANCELLED" | "FAILED";
+            createdAt: string;
+        };
+        AddJobDependencyDto: {
+            dependsOnJobId: string;
+        };
+        FileDto: {
+            id: string;
+            storageKey: string;
+            originalName: string;
+            mimeType: string;
+            sizeBytes: number;
+            checksum?: Record<string, never> | null;
+            latestVersion: number;
+            uploadedById: Record<string, never> | null;
+            createdAt: string;
+            updatedAt: string;
+        };
+        BatchDeleteResultItemDto: {
+            fileId: string;
+            success: boolean;
+            error?: Record<string, never> | null;
+        };
+        BatchDeleteResultDto: {
+            results: components["schemas"]["BatchDeleteResultItemDto"][];
+        };
+        BatchDeleteFilesDto: {
+            fileIds: string[];
+            /** @description Replaying the same key returns the original result instead of re-running the batch. */
+            idempotencyKey?: string;
+        };
+        FileUrlDto: {
+            id: string;
+            url: string;
+            expiresInSeconds: number;
+        };
+        FileVersionDto: {
+            id: string;
+            fileId: string;
+            versionNumber: number;
+            storageKey: string;
+            mimeType: string;
+            sizeBytes: number;
+            checksum: string;
+            createdById?: Record<string, never> | null;
+            createdAt: string;
+        };
+        FileHistoryEventDto: {
+            /** @enum {string} */
+            type: "version" | "audit";
+            action: string;
+            actorId?: Record<string, never> | null;
+            metadata?: {
+                [key: string]: unknown;
+            };
+            createdAt: string;
+        };
+        AttachmentDto: {
+            id: string;
+            fileId: string;
+            entityType: string;
+            entityId: string;
+            label?: Record<string, never> | null;
+            createdById?: Record<string, never> | null;
+            createdAt: string;
+            updatedAt: string;
+        };
+        AttachEntityDto: {
+            fileId: string;
+            entityType: string;
+            entityId: string;
+            label?: string;
         };
         ApplicationSettingDto: {
             key: string;
@@ -1554,7 +2083,8 @@ export interface components {
         };
         CreateInvitationDto: {
             email: string;
-            entityType: string;
+            /** @enum {string} */
+            entityType: "organization" | "project";
             entityId: string;
             role?: string;
         };
@@ -1806,6 +2336,254 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: components["schemas"]["OrganizationDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    OrganizationsController_getOne: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["OrganizationDetailDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    OrganizationsController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SuccessFlagDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    OrganizationsController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateOrganizationDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["OrganizationDetailDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    OrganizationsController_leave: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SuccessFlagDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    OrganizationsController_listMembers: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["OrganizationMemberDto"][];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    OrganizationsController_removeMember: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SuccessFlagDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    OrganizationsController_updateMemberRole: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateMemberRoleDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["OrganizationMemberDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    PreferencesController_getMyPreferences: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["UserPreferencesDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    PreferencesController_resetMyPreferences: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["UserPreferencesDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    PreferencesController_updateMyPreferences: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdatePreferencesDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["UserPreferencesDto"];
                         meta: components["schemas"]["RequestMetaDto"];
                     };
                 };
@@ -2076,54 +2854,6 @@ export interface operations {
             };
         };
     };
-    PreferencesController_getMyPreferences: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["UserPreferencesDto"];
-                        meta: components["schemas"]["RequestMetaDto"];
-                    };
-                };
-            };
-        };
-    };
-    PreferencesController_updateMyPreferences: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdatePreferencesDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["UserPreferencesDto"];
-                        meta: components["schemas"]["RequestMetaDto"];
-                    };
-                };
-            };
-        };
-    };
     AuthController_register: {
         parameters: {
             query?: never;
@@ -2160,6 +2890,32 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["LoginDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["LoginResponseDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    AuthController_verifyMfaChallenge: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VerifyMfaChallengeDto"];
             };
         };
         responses: {
@@ -2444,6 +3200,201 @@ export interface operations {
             };
         };
     };
+    MfaController_getStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["MfaStatusDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    MfaController_setup: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["MfaSetupResponseDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    MfaController_confirm: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MfaCodeDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["MfaRecoveryCodesResponseDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    MfaController_disable: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MfaCodeDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SuccessFlagDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    MfaController_regenerateRecoveryCodes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MfaCodeDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["MfaRecoveryCodesResponseDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    SsoController_startLogin: {
+        parameters: {
+            query: {
+                redirectUri: string;
+                /** @description Only honored by the "fake" provider (dev/test); seeds the mock identity email. */
+                testEmail?: string;
+            };
+            header?: never;
+            path: {
+                provider: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["StartSsoLoginResponseDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    SsoController_handleCallbackGet: {
+        parameters: {
+            query: {
+                code: string;
+                state: string;
+            };
+            header?: never;
+            path: {
+                provider: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SsoController_handleCallbackPost: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                provider: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SsoCallbackQueryDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     AuditController_listAuditLogs: {
         parameters: {
             query?: {
@@ -2456,6 +3407,8 @@ export interface operations {
                 resourceId?: string;
                 from?: string;
                 to?: string;
+                /** @description Free-text match against action, entity type, and request ID. */
+                q?: string;
             };
             header?: never;
             path?: never;
@@ -2471,6 +3424,78 @@ export interface operations {
                     "application/json": {
                         data: components["schemas"]["AuditLogDto"][];
                         meta: components["schemas"]["PaginationMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    AuditController_exportAuditLogs: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExportAuditLogsQueryDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["AuditExportResultDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    AuditController_getAuditLog: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["AuditLogDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    AdminMailController_listTemplates: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["MailTemplateDto"][];
+                        meta: components["schemas"]["RequestMetaDto"];
                     };
                 };
             };
@@ -2506,7 +3531,10 @@ export interface operations {
     };
     AdminMailController_preview: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Template variables encoded as a JSON object string, e.g. {"displayName":"Jane"}. */
+                variables?: string;
+            };
             header?: never;
             path: {
                 templateKey: string;
@@ -2523,6 +3551,246 @@ export interface operations {
                     "application/json": {
                         data: components["schemas"]["MailPreviewDto"];
                         meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    AdminMailController_send: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SendAdminMailDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SendAdminMailResultDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    AdminJobsController_listJobs: {
+        parameters: {
+            query?: {
+                page?: number;
+                limit?: number;
+                sortOrder?: "asc" | "desc";
+                status?: "PENDING" | "PROCESSING" | "COMPLETED" | "CANCELLED" | "FAILED";
+                type?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["JobDto"][];
+                        meta: components["schemas"]["PaginationMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    AdminJobsController_getMetrics: {
+        parameters: {
+            query?: {
+                from?: string;
+                to?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["JobMetricsDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    AdminJobsController_getJob: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["JobDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    AdminJobsController_cancelJob: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["JobDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    AdminJobsController_getJobLogs: {
+        parameters: {
+            query?: {
+                page?: number;
+                limit?: number;
+                sortOrder?: "asc" | "desc";
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["JobEventDto"][];
+                        meta: components["schemas"]["PaginationMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    AdminJobsController_listDependencies: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["JobDependencyDto"][];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    AdminJobsController_addDependency: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddJobDependencyDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["JobDependencyDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    FilesController_list: {
+        parameters: {
+            query?: {
+                page?: number;
+                limit?: number;
+                sortOrder?: "asc" | "desc";
+                /** @description Match against the original file name. */
+                search?: string;
+                mimeType?: string;
+                uploadedById?: string;
+                from?: string;
+                to?: string;
+                sortField?: "createdAt" | "originalName" | "sizeBytes";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["FileDto"][];
+                        meta: components["schemas"]["PaginationMetaDto"];
                     };
                 };
             };
@@ -2551,6 +3819,32 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: components["schemas"]["FileDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    FilesController_batchDelete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BatchDeleteFilesDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["BatchDeleteResultDto"];
                         meta: components["schemas"]["RequestMetaDto"];
                     };
                 };
@@ -2648,6 +3942,85 @@ export interface operations {
             };
         };
     };
+    FilesController_listVersions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["FileVersionDto"][];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    FilesController_uploadVersion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file?: string;
+                };
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["FileDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    FilesController_getHistory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["FileHistoryEventDto"][];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
     AttachmentsController_list: {
         parameters: {
             query: {
@@ -2717,58 +4090,6 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: components["schemas"]["SuccessFlagDto"];
-                        meta: components["schemas"]["RequestMetaDto"];
-                    };
-                };
-            };
-        };
-    };
-    AdminJobsController_listJobs: {
-        parameters: {
-            query?: {
-                page?: number;
-                limit?: number;
-                sortOrder?: "asc" | "desc";
-                status?: "PENDING" | "PROCESSING" | "COMPLETED" | "CANCELLED" | "FAILED";
-                type?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["JobDto"][];
-                        meta: components["schemas"]["PaginationMetaDto"];
-                    };
-                };
-            };
-        };
-    };
-    AdminJobsController_cancelJob: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["JobDto"];
                         meta: components["schemas"]["RequestMetaDto"];
                     };
                 };
@@ -3558,7 +4879,7 @@ export interface operations {
                 limit?: number;
                 sortOrder?: "asc" | "desc";
                 email?: string;
-                entityType?: string;
+                entityType?: "organization" | "project";
                 entityId?: string;
                 status?: "PENDING" | "ACCEPTED" | "EXPIRED" | "REVOKED";
             };

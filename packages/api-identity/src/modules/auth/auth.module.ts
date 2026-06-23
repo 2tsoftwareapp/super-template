@@ -2,15 +2,18 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 
 import { AccessControlModule } from '../access-control/access-control.module';
+import { MfaModule } from '../mfa/mfa.module';
 import { OrganizationsModule } from '../organizations/organizations.module';
 import { UsersModule } from '../users/users.module';
 import { AuthService } from './application/auth.service';
 import { AuthMailService } from './application/services/auth-mail.service';
 import { SessionTokenService } from './application/services/session-token.service';
 import { AuthenticateAccessTokenUseCase } from './application/use-cases/authenticate-access-token.use-case';
+import { CompleteMfaLoginUseCase } from './application/use-cases/complete-mfa-login.use-case';
 import { ForgotPasswordUseCase } from './application/use-cases/forgot-password.use-case';
 import { GetMeUseCase } from './application/use-cases/get-me.use-case';
 import { GetSessionsUseCase } from './application/use-cases/get-sessions.use-case';
+import { IssueSessionUseCase } from './application/use-cases/issue-session.use-case';
 import { LoginUseCase } from './application/use-cases/login.use-case';
 import { LogoutAllUseCase } from './application/use-cases/logout-all.use-case';
 import { LogoutUseCase } from './application/use-cases/logout.use-case';
@@ -29,6 +32,7 @@ import { AuthController } from './presentation/auth.controller';
     JwtModule.register({}),
     AccessControlModule,
     AuthDataModule,
+    MfaModule,
     OrganizationsModule,
     UsersModule,
   ],
@@ -37,6 +41,8 @@ import { AuthController } from './presentation/auth.controller';
     AuthService,
     AuthMailService,
     SessionTokenService,
+    IssueSessionUseCase,
+    CompleteMfaLoginUseCase,
     RegisterUseCase,
     LoginUseCase,
     RefreshSessionUseCase,
@@ -52,6 +58,6 @@ import { AuthController } from './presentation/auth.controller';
     ResendVerificationUseCase,
     AuthenticateAccessTokenUseCase,
   ],
-  exports: [AuthService],
+  exports: [AuthService, IssueSessionUseCase],
 })
 export class AuthModule {}

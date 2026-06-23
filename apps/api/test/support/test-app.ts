@@ -5,23 +5,21 @@ import { NestFactory } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { seedDatabase } from '@repo/api-bootstrap';
+import { loadEnvFiles } from '@repo/api-core/config/load-env-files';
 import {
   DATABASE,
   type DatabaseClient,
   type TenantContext,
   TenantContextService,
 } from '@repo/api-database';
-import { config as loadEnv } from 'dotenv';
 import { sql } from 'drizzle-orm';
-import { resolve } from 'node:path';
 import { Pool } from 'pg';
 import request from 'supertest';
 
 import { AppModule } from '../../src/app.module';
 import { applySqlMigrations } from '../../src/cli/migrations';
 
-loadEnv({ path: resolve(process.cwd(), '.env'), quiet: true });
-loadEnv({ path: resolve(process.cwd(), '../../.env'), quiet: true });
+loadEnvFiles();
 
 const TEST_APP_ROLE_NAME = 'fullstack_starter_app';
 const TEST_APP_ROLE_PASSWORD = 'fullstack_starter_app';
@@ -63,12 +61,12 @@ export const configureTestDatabaseUrls = (): void => {
     process.env.DATABASE_URL_TEST = appTestUrl;
   }
 
-  if (
-    !process.env.DATABASE_URL_TEST_ADMIN ||
-    process.env.DATABASE_URL_TEST_ADMIN === process.env.DATABASE_URL_TEST
-  ) {
-    process.env.DATABASE_URL_TEST_ADMIN = adminTestUrl;
-  }
+  // Always derive the admin URL from POSTGRES_HOST/PORT instead of trusting whatever
+  // is already in process.env: loadEnvFiles() falls back to .env.example for keys
+  // .env doesn't set, and .env.example's DATABASE_URL_TEST_ADMIN hardcodes the
+  // placeholder port 5432, which silently points migrations/reset at the wrong
+  // Postgres instance whenever the real .env uses a different POSTGRES_PORT.
+  process.env.DATABASE_URL_TEST_ADMIN = adminTestUrl;
 };
 
 configureTestDatabaseUrls();
@@ -197,6 +195,7 @@ export const resetTestDatabase = async (): Promise<void> => {
 
   const context = await NestFactory.createApplicationContext(AppModule, {
     logger: false,
+    abortOnError: false,
   });
 
   try {
@@ -216,7 +215,7 @@ export const createTestApp = async (): Promise<INestApplication> => {
     })
     .compile();
 
-  const app = moduleRef.createNestApplication();
+  const app = moduleRef.createNestApplication({ abortOnError: false });
   app.setGlobalPrefix('api/v1');
   app.useGlobalPipes(
     new ValidationPipe({

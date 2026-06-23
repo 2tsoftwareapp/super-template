@@ -8,13 +8,147 @@ part of 'user_preferences_dto.dart';
 // BuiltValueGenerator
 // **************************************************************************
 
+const UserPreferencesDtoThemeEnum _$userPreferencesDtoThemeEnum_system =
+    const UserPreferencesDtoThemeEnum._('system');
+const UserPreferencesDtoThemeEnum _$userPreferencesDtoThemeEnum_light =
+    const UserPreferencesDtoThemeEnum._('light');
+const UserPreferencesDtoThemeEnum _$userPreferencesDtoThemeEnum_dark =
+    const UserPreferencesDtoThemeEnum._('dark');
+
+UserPreferencesDtoThemeEnum _$userPreferencesDtoThemeEnumValueOf(String name) {
+  switch (name) {
+    case 'system':
+      return _$userPreferencesDtoThemeEnum_system;
+    case 'light':
+      return _$userPreferencesDtoThemeEnum_light;
+    case 'dark':
+      return _$userPreferencesDtoThemeEnum_dark;
+    default:
+      throw ArgumentError(name);
+  }
+}
+
+final BuiltSet<UserPreferencesDtoThemeEnum>
+    _$userPreferencesDtoThemeEnumValues =
+    BuiltSet<UserPreferencesDtoThemeEnum>(const <UserPreferencesDtoThemeEnum>[
+  _$userPreferencesDtoThemeEnum_system,
+  _$userPreferencesDtoThemeEnum_light,
+  _$userPreferencesDtoThemeEnum_dark,
+]);
+
+const UserPreferencesDtoLanguageEnum _$userPreferencesDtoLanguageEnum_en =
+    const UserPreferencesDtoLanguageEnum._('en');
+const UserPreferencesDtoLanguageEnum _$userPreferencesDtoLanguageEnum_vi =
+    const UserPreferencesDtoLanguageEnum._('vi');
+
+UserPreferencesDtoLanguageEnum _$userPreferencesDtoLanguageEnumValueOf(
+  String name,
+) {
+  switch (name) {
+    case 'en':
+      return _$userPreferencesDtoLanguageEnum_en;
+    case 'vi':
+      return _$userPreferencesDtoLanguageEnum_vi;
+    default:
+      throw ArgumentError(name);
+  }
+}
+
+final BuiltSet<UserPreferencesDtoLanguageEnum>
+    _$userPreferencesDtoLanguageEnumValues =
+    BuiltSet<UserPreferencesDtoLanguageEnum>(
+  const <UserPreferencesDtoLanguageEnum>[
+    _$userPreferencesDtoLanguageEnum_en,
+    _$userPreferencesDtoLanguageEnum_vi,
+  ],
+);
+
+Serializer<UserPreferencesDtoThemeEnum>
+    _$userPreferencesDtoThemeEnumSerializer =
+    _$UserPreferencesDtoThemeEnumSerializer();
+Serializer<UserPreferencesDtoLanguageEnum>
+    _$userPreferencesDtoLanguageEnumSerializer =
+    _$UserPreferencesDtoLanguageEnumSerializer();
+
+class _$UserPreferencesDtoThemeEnumSerializer
+    implements PrimitiveSerializer<UserPreferencesDtoThemeEnum> {
+  static const Map<String, Object> _toWire = const <String, Object>{
+    'system': 'system',
+    'light': 'light',
+    'dark': 'dark',
+  };
+  static const Map<Object, String> _fromWire = const <Object, String>{
+    'system': 'system',
+    'light': 'light',
+    'dark': 'dark',
+  };
+
+  @override
+  final Iterable<Type> types = const <Type>[UserPreferencesDtoThemeEnum];
+  @override
+  final String wireName = 'UserPreferencesDtoThemeEnum';
+
+  @override
+  Object serialize(
+    Serializers serializers,
+    UserPreferencesDtoThemeEnum object, {
+    FullType specifiedType = FullType.unspecified,
+  }) =>
+      _toWire[object.name] ?? object.name;
+
+  @override
+  UserPreferencesDtoThemeEnum deserialize(
+    Serializers serializers,
+    Object serialized, {
+    FullType specifiedType = FullType.unspecified,
+  }) =>
+      UserPreferencesDtoThemeEnum.valueOf(
+        _fromWire[serialized] ?? (serialized is String ? serialized : ''),
+      );
+}
+
+class _$UserPreferencesDtoLanguageEnumSerializer
+    implements PrimitiveSerializer<UserPreferencesDtoLanguageEnum> {
+  static const Map<String, Object> _toWire = const <String, Object>{
+    'en': 'en',
+    'vi': 'vi',
+  };
+  static const Map<Object, String> _fromWire = const <Object, String>{
+    'en': 'en',
+    'vi': 'vi',
+  };
+
+  @override
+  final Iterable<Type> types = const <Type>[UserPreferencesDtoLanguageEnum];
+  @override
+  final String wireName = 'UserPreferencesDtoLanguageEnum';
+
+  @override
+  Object serialize(
+    Serializers serializers,
+    UserPreferencesDtoLanguageEnum object, {
+    FullType specifiedType = FullType.unspecified,
+  }) =>
+      _toWire[object.name] ?? object.name;
+
+  @override
+  UserPreferencesDtoLanguageEnum deserialize(
+    Serializers serializers,
+    Object serialized, {
+    FullType specifiedType = FullType.unspecified,
+  }) =>
+      UserPreferencesDtoLanguageEnum.valueOf(
+        _fromWire[serialized] ?? (serialized is String ? serialized : ''),
+      );
+}
+
 class _$UserPreferencesDto extends UserPreferencesDto {
   @override
   final String userId;
   @override
-  final String theme;
+  final UserPreferencesDtoThemeEnum theme;
   @override
-  final String language;
+  final UserPreferencesDtoLanguageEnum language;
   @override
   final String timezone;
   @override
@@ -103,13 +237,14 @@ class UserPreferencesDtoBuilder
   String? get userId => _$this._userId;
   set userId(String? userId) => _$this._userId = userId;
 
-  String? _theme;
-  String? get theme => _$this._theme;
-  set theme(String? theme) => _$this._theme = theme;
+  UserPreferencesDtoThemeEnum? _theme;
+  UserPreferencesDtoThemeEnum? get theme => _$this._theme;
+  set theme(UserPreferencesDtoThemeEnum? theme) => _$this._theme = theme;
 
-  String? _language;
-  String? get language => _$this._language;
-  set language(String? language) => _$this._language = language;
+  UserPreferencesDtoLanguageEnum? _language;
+  UserPreferencesDtoLanguageEnum? get language => _$this._language;
+  set language(UserPreferencesDtoLanguageEnum? language) =>
+      _$this._language = language;
 
   String? _timezone;
   String? get timezone => _$this._timezone;

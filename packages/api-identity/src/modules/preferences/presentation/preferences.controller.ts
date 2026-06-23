@@ -1,7 +1,7 @@
 import type { AuthenticatedRequestUser } from '@repo/api-core';
 import type { Request } from 'express';
 
-import { Body, Controller, Get, Patch, Req } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Patch, Req } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ApiDataResponse } from '@repo/api-core';
 import { CurrentUser } from '@repo/api-core';
@@ -41,6 +41,18 @@ export class PreferencesController {
           ? { emailPreferences: input.emailPreferences }
           : {}),
       },
+      request.requestContext,
+    );
+  }
+
+  @Delete()
+  @ApiDataResponse(UserPreferencesDto)
+  resetMyPreferences(
+    @CurrentUser() user: AuthenticatedRequestUser,
+    @Req() request: Request,
+  ) {
+    return this.preferencesService.resetForUser(
+      user.userId,
       request.requestContext,
     );
   }

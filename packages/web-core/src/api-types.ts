@@ -66,12 +66,23 @@ export type AuditLogsListResponse =
 export type UserDto = components["schemas"]["UserDto"];
 export type AdminUserDto = components["schemas"]["UserDto"];
 export type RoleDto = components["schemas"]["RoleDto"];
+export type OrganizationDto = components["schemas"]["OrganizationDto"];
+export type OrganizationDetailDto = components["schemas"]["OrganizationDetailDto"];
+export type OrganizationMemberDto = components["schemas"]["OrganizationMemberDto"];
+export type CreateOrganizationInput = components["schemas"]["CreateOrganizationDto"];
+export type UpdateOrganizationInput = components["schemas"]["UpdateOrganizationDto"];
+export type UpdateMemberRoleInput = components["schemas"]["UpdateMemberRoleDto"];
 export type AuditLogDto = components["schemas"]["AuditLogDto"];
 export type JobDto = components["schemas"]["JobDto"];
 export type NotificationDto = components["schemas"]["NotificationDto"];
 export type NotificationJobDto = components["schemas"]["NotificationJobDto"];
 export type MailDeliveryDto = components["schemas"]["MailDeliveryDto"];
 export type MailPreviewDto = components["schemas"]["MailPreviewDto"];
+export type MailTemplateDto = components["schemas"]["MailTemplateDto"];
+export type JobMetricsDto = components["schemas"]["JobMetricsDto"];
+export type JobEventDto = components["schemas"]["JobEventDto"];
+export type SendAdminMailResultDto =
+  components["schemas"]["SendAdminMailResultDto"];
 export type ApplicationSettingDto =
   components["schemas"]["ApplicationSettingDto"];
 export type ImportJobDto = components["schemas"]["ImportJobDto"];

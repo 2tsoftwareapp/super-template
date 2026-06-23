@@ -5,6 +5,7 @@
 // ignore_for_file: unused_element
 // @dart=3.0
 
+import 'package:built_collection/built_collection.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
@@ -24,7 +25,8 @@ abstract class CreateInvitationDto
   String get email;
 
   @BuiltValueField(wireName: r'entityType')
-  String get entityType;
+  CreateInvitationDtoEntityTypeEnum get entityType;
+  // enum entityTypeEnum {  organization,  project,  };
 
   @BuiltValueField(wireName: r'entityId')
   String get entityId;
@@ -69,7 +71,7 @@ class _$CreateInvitationDtoSerializer
     yield r'entityType';
     yield serializers.serialize(
       object.entityType,
-      specifiedType: const FullType(String),
+      specifiedType: const FullType(CreateInvitationDtoEntityTypeEnum),
     );
     yield r'entityId';
     yield serializers.serialize(
@@ -120,8 +122,10 @@ class _$CreateInvitationDtoSerializer
         case r'entityType':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(String),
-          ) as String;
+            specifiedType: const FullType(
+              CreateInvitationDtoEntityTypeEnum,
+            ),
+          ) as CreateInvitationDtoEntityTypeEnum;
           result.entityType = valueDes;
           break;
         case r'entityId':
@@ -165,4 +169,23 @@ class _$CreateInvitationDtoSerializer
     );
     return result.build();
   }
+}
+
+class CreateInvitationDtoEntityTypeEnum extends EnumClass {
+  @BuiltValueEnumConst(wireName: r'organization')
+  static const CreateInvitationDtoEntityTypeEnum organization =
+      _$createInvitationDtoEntityTypeEnum_organization;
+  @BuiltValueEnumConst(wireName: r'project')
+  static const CreateInvitationDtoEntityTypeEnum project =
+      _$createInvitationDtoEntityTypeEnum_project;
+
+  static Serializer<CreateInvitationDtoEntityTypeEnum> get serializer =>
+      _$createInvitationDtoEntityTypeEnumSerializer;
+
+  const CreateInvitationDtoEntityTypeEnum._(String name) : super(name);
+
+  static BuiltSet<CreateInvitationDtoEntityTypeEnum> get values =>
+      _$createInvitationDtoEntityTypeEnumValues;
+  static CreateInvitationDtoEntityTypeEnum valueOf(String name) =>
+      _$createInvitationDtoEntityTypeEnumValueOf(name);
 }

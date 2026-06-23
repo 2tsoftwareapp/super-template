@@ -23,6 +23,17 @@ class AuthController extends AsyncNotifier<AuthSession?> {
     );
   }
 
+  Future<AuthSession> verifyMfaChallenge({
+    required String mfaToken,
+    required String code,
+  }) async {
+    final session = await ref
+        .read(authRepositoryProvider)
+        .verifyMfaChallenge(mfaToken: mfaToken, code: code);
+    state = AsyncData(session);
+    return session;
+  }
+
   Future<void> register(
     String email,
     String password,

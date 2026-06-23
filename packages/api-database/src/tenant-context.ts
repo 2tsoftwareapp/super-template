@@ -32,19 +32,17 @@ export const tenantContextForJob = (job: {
 
 // Transaction-scoped path: is_local=true so the GUCs auto-reset when the
 // surrounding transaction ends. Used inside runInTransaction/withTenantContext.
+// All three GUCs are set in a single round trip to avoid 3x latency per checkout.
 export const setTenantContextOnExecutor = async (
   executor: DatabaseExecutor,
   context: TenantContext,
 ): Promise<void> => {
-  await executor.execute(
-    sql`select set_config('app.tenant_id', ${context.tenantId}, true)`,
-  );
-  await executor.execute(
-    sql`select set_config('app.user_id', ${context.userId}, true)`,
-  );
-  await executor.execute(
-    sql`select set_config('app.bypass_rls', ${context.bypassRls ? 'true' : 'false'}, true)`,
-  );
+  await executor.execute(sql`
+    select
+      set_config('app.tenant_id', ${context.tenantId}, true),
+      set_config('app.user_id', ${context.userId}, true),
+      set_config('app.bypass_rls', ${context.bypassRls ? 'true' : 'false'}, true)
+  `);
 };
 
 // Pooled-connection path: is_local=false (session-level) so the context survives
@@ -56,15 +54,17 @@ export const setTenantContextOnPgClient = async (
   client: PoolClient,
   context?: TenantContext,
 ): Promise<void> => {
-  await client.query("select set_config('app.tenant_id', $1, false)", [
-    context?.tenantId ?? '',
-  ]);
-  await client.query("select set_config('app.user_id', $1, false)", [
-    context?.userId ?? '',
-  ]);
-  await client.query("select set_config('app.bypass_rls', $1, false)", [
-    context?.bypassRls ? 'true' : 'false',
-  ]);
+  await client.query(
+    `select
+      set_config('app.tenant_id', $1, false),
+      set_config('app.user_id', $2, false),
+      set_config('app.bypass_rls', $3, false)`,
+    [
+      context?.tenantId ?? '',
+      context?.userId ?? '',
+      context?.bypassRls ? 'true' : 'false',
+    ],
+  );
 };
 
 export const withTenantContext = async <T>(

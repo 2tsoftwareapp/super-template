@@ -135,11 +135,34 @@ export class JobsRepository {
         FROM jobs
         WHERE status = 'PENDING'
           AND scheduled_at <= now()
+          AND NOT EXISTS (
+            SELECT 1
+            FROM job_dependencies jd
+            INNER JOIN jobs dep ON dep.id = jd.depends_on_job_id
+            WHERE jd.job_id = jobs.id AND dep.status <> 'COMPLETED'
+          )
         ORDER BY priority DESC, scheduled_at ASC
         LIMIT ${limit}
         FOR UPDATE SKIP LOCKED
       )
-      RETURNING *
+      RETURNING
+        id,
+        organization_id AS "organizationId",
+        type,
+        payload,
+        status,
+        scheduled_at AS "scheduledAt",
+        priority,
+        attempts,
+        max_attempts AS "maxAttempts",
+        started_at AS "startedAt",
+        completed_at AS "completedAt",
+        cancelled_at AS "cancelledAt",
+        error_message AS "errorMessage",
+        created_by_id AS "createdById",
+        idempotency_key AS "idempotencyKey",
+        created_at AS "createdAt",
+        updated_at AS "updatedAt"
     `);
 
     return result.rows;

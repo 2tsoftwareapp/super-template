@@ -1,16 +1,29 @@
 import type { JsonObject } from '@repo/api-core';
 
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsObject, IsOptional, IsString, MaxLength } from 'class-validator';
+import {
+  IsEnum,
+  IsObject,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from 'class-validator';
+
+import {
+  PREFERENCE_LANGUAGES,
+  PREFERENCE_THEMES,
+  type PreferenceLanguage,
+  type PreferenceTheme,
+} from '../application/preferences.constants';
 
 export class UserPreferencesDto {
   @ApiProperty()
   userId: string;
 
-  @ApiProperty()
+  @ApiProperty({ enum: PREFERENCE_THEMES })
   theme: string;
 
-  @ApiProperty()
+  @ApiProperty({ enum: PREFERENCE_LANGUAGES })
   language: string;
 
   @ApiProperty()
@@ -30,17 +43,15 @@ export class UserPreferencesDto {
 }
 
 export class UpdatePreferencesDto {
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ enum: PREFERENCE_THEMES })
   @IsOptional()
-  @IsString()
-  @MaxLength(32)
-  theme?: string;
+  @IsEnum(PREFERENCE_THEMES)
+  theme?: PreferenceTheme;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ enum: PREFERENCE_LANGUAGES })
   @IsOptional()
-  @IsString()
-  @MaxLength(16)
-  language?: string;
+  @IsEnum(PREFERENCE_LANGUAGES)
+  language?: PreferenceLanguage;
 
   @ApiPropertyOptional()
   @IsOptional()

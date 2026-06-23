@@ -16,7 +16,6 @@ import { Throttle } from '@nestjs/throttler';
 import { ACTION, ApiDataResponse, ApiPaginatedResponse, perm } from '@repo/api-core';
 import { CurrentUser } from '@repo/api-core';
 import { Authorize } from '@repo/api-core';
-import { Public } from '@repo/api-core';
 
 import { InvitationsService } from '../application/invitations.service';
 import {
@@ -78,13 +77,16 @@ export class InvitationsController {
   }
 
   @Post('accept')
-  @Public()
   @Throttle({ default: { limit: 10, ttl: 3_600_000 } })
   @ApiDataResponse(InvitationDto)
-  accept(@Body() input: AcceptInvitationDto, @Req() request: Request) {
+  accept(
+    @CurrentUser() user: AuthenticatedRequestUser,
+    @Body() input: AcceptInvitationDto,
+    @Req() request: Request,
+  ) {
     return this.invitationsService.accept(
       { token: input.token },
-      undefined,
+      user,
       request.requestContext,
     );
   }

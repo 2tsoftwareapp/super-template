@@ -15,6 +15,10 @@ export const files = pgTable(
     originalName: text('original_name').notNull(),
     mimeType: text('mime_type').notNull(),
     sizeBytes: integer('size_bytes').notNull(),
+    /** SHA-256 hex digest of the current (latest) version's content. */
+    checksum: text('checksum'),
+    /** Mirrors the highest `file_versions.version_number` for this file. */
+    latestVersion: integer('latest_version').notNull().default(1),
     uploadedById: uuid('uploaded_by_id').references(() => users.id, {
       onDelete: 'set null',
     }),
@@ -25,5 +29,7 @@ export const files = pgTable(
     index('files_organization_id_idx').on(table.organizationId),
     index('files_uploaded_by_id_idx').on(table.uploadedById),
     index('files_storage_key_idx').on(table.storageKey),
+    index('files_mime_type_idx').on(table.mimeType),
+    index('files_created_at_idx').on(table.createdAt),
   ],
 );

@@ -8,4 +8,15 @@ export interface ListAuditLogsQuery {
   resourceId?: string;
   from?: string;
   to?: string;
+  q?: string;
+}
+
+export interface ExportAuditLogsQuery {
+  actorId?: string;
+  action?: string;
+  resourceType?: string;
+  resourceId?: string;
+  from?: string;
+  to?: string;
+  q?: string;
 }

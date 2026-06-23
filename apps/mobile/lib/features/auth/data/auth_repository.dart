@@ -17,24 +17,27 @@ final authRepositoryProvider = Provider<AuthRepository>(
 );
 
 class AuthRepository {
-  AuthRepository._({
-    required this._publicAuthApi,
-    required this._authApi,
-    required this._storage,
-  });
+  AuthRepository._(
+    this._publicAuthApi,
+    this._authApi,
+    this._ssoApi,
+    this._storage,
+  );
 
   factory AuthRepository({
     required SuperTemplateApi publicClient,
     required SuperTemplateApi authenticatedClient,
     required TokenStorage storage,
   }) => AuthRepository._(
-    publicAuthApi: publicClient.getAuthApi(),
-    authApi: authenticatedClient.getAuthApi(),
-    storage: storage,
+    publicClient.getAuthApi(),
+    authenticatedClient.getAuthApi(),
+    publicClient.getSsoApi(),
+    storage,
   );
 
   final AuthApi _publicAuthApi;
   final AuthApi _authApi;
+  final SsoApi _ssoApi;
   final TokenStorage _storage;
 
   Future<AuthSession?> restoreSession() async {
@@ -58,6 +61,36 @@ class AuthRepository {
           (b) => b
             ..email = email
             ..password = password,
+        ),
+      );
+      final data = response.data!.data;
+      if (data.mfaRequired) {
+        throw MfaRequiredException(
+          mfaToken: data.mfaToken!,
+        );
+      }
+      await _storage.write(
+        TokenBundle(
+          accessToken: data.accessToken!,
+          refreshToken: data.refreshToken!,
+        ),
+      );
+      return _toSessionFromLogin(data);
+    } on DioException catch (error) {
+      throw AppException.fromDio(error);
+    }
+  }
+
+  Future<AuthSession> verifyMfaChallenge({
+    required String mfaToken,
+    required String code,
+  }) async {
+    try {
+      final response = await _publicAuthApi.authControllerVerifyMfaChallenge(
+        verifyMfaChallengeDto: VerifyMfaChallengeDto(
+          (b) => b
+            ..mfaToken = mfaToken
+            ..code = code,
         ),
       );
       final data = response.data!.data;
@@ -201,6 +234,18 @@ class AuthRepository {
     }
   }
 
+  Future<String> startSso(String provider) async {
+    try {
+      final response = await _ssoApi.ssoControllerStartLogin(
+        provider: provider,
+        redirectUri: 'myapp://sso/callback',
+      );
+      return response.data!.data.authorizationUrl;
+    } on DioException catch (error) {
+      throw AppException.fromDio(error);
+    }
+  }
+
   Future<void> switchOrganization(String organizationId) async {
     try {
       await _authApi.authControllerSwitchOrganization(
@@ -221,6 +266,17 @@ class AuthRepository {
       roles: data.user.roles.toList(),
       permissions: data.permissions.toList(),
       sessionId: data.session.id,
+    );
+  }
+
+  AuthSession _toSessionFromLogin(LoginResponseDto data) {
+    return AuthSession(
+      userId: data.user!.id,
+      email: data.user!.email,
+      displayName: data.user!.displayName,
+      roles: data.user!.roles.toList(),
+      permissions: data.permissions!.toList(),
+      sessionId: data.session!.id,
     );
   }
 

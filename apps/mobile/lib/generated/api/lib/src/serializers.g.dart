@@ -13,10 +13,17 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(ActivitiesControllerList200Response.serializer)
       ..add(ActivityDto.serializer)
       ..add(ActivityDtoVisibilityEnum.serializer)
-      ..add(AdminJobsControllerCancelJob200Response.serializer)
+      ..add(AddJobDependencyDto.serializer)
+      ..add(AdminJobsControllerAddDependency201Response.serializer)
+      ..add(AdminJobsControllerGetJob200Response.serializer)
+      ..add(AdminJobsControllerGetJobLogs200Response.serializer)
+      ..add(AdminJobsControllerGetMetrics200Response.serializer)
+      ..add(AdminJobsControllerListDependencies200Response.serializer)
       ..add(AdminJobsControllerListJobs200Response.serializer)
       ..add(AdminMailControllerListDeliveries200Response.serializer)
+      ..add(AdminMailControllerListTemplates200Response.serializer)
       ..add(AdminMailControllerPreview200Response.serializer)
+      ..add(AdminMailControllerSend201Response.serializer)
       ..add(AdminNotificationsControllerListJobs200Response.serializer)
       ..add(AdminNotificationsControllerSend201Response.serializer)
       ..add(AdminRolesControllerCreateRole201Response.serializer)
@@ -32,15 +39,22 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(AttachmentDto.serializer)
       ..add(AttachmentsControllerAttach201Response.serializer)
       ..add(AttachmentsControllerList200Response.serializer)
+      ..add(AuditControllerExportAuditLogs201Response.serializer)
+      ..add(AuditControllerGetAuditLog200Response.serializer)
       ..add(AuditControllerListAuditLogs200Response.serializer)
+      ..add(AuditExportResultDto.serializer)
       ..add(AuditLogDto.serializer)
       ..add(AuthControllerGetMe200Response.serializer)
       ..add(AuthControllerGetSessions200Response.serializer)
       ..add(AuthControllerLogin201Response.serializer)
       ..add(AuthControllerRegister201Response.serializer)
+      ..add(AuthControllerVerifyMfaChallenge201Response.serializer)
       ..add(AuthMeDto.serializer)
       ..add(AuthResponseDto.serializer)
       ..add(AuthSessionDto.serializer)
+      ..add(BatchDeleteFilesDto.serializer)
+      ..add(BatchDeleteResultDto.serializer)
+      ..add(BatchDeleteResultItemDto.serializer)
       ..add(ChangePasswordDto.serializer)
       ..add(CommentDto.serializer)
       ..add(CommentsControllerCreate201Response.serializer)
@@ -53,18 +67,27 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(CreateExportDto.serializer)
       ..add(CreateImportDto.serializer)
       ..add(CreateInvitationDto.serializer)
+      ..add(CreateInvitationDtoEntityTypeEnum.serializer)
       ..add(CreateOrganizationDto.serializer)
       ..add(CreateProjectDto.serializer)
       ..add(CreateProjectDtoStatusEnum.serializer)
       ..add(CreateRoleDto.serializer)
       ..add(DeviceTokenDto.serializer)
       ..add(DeviceTokenDtoPlatformEnum.serializer)
+      ..add(ExportAuditLogsQueryDto.serializer)
       ..add(ExportJobDto.serializer)
       ..add(ExportJobDtoStatusEnum.serializer)
       ..add(ExportsControllerCreate201Response.serializer)
       ..add(FileDto.serializer)
+      ..add(FileHistoryEventDto.serializer)
+      ..add(FileHistoryEventDtoTypeEnum.serializer)
       ..add(FileUrlDto.serializer)
+      ..add(FileVersionDto.serializer)
+      ..add(FilesControllerBatchDelete201Response.serializer)
+      ..add(FilesControllerGetHistory200Response.serializer)
       ..add(FilesControllerGetUrl200Response.serializer)
+      ..add(FilesControllerList200Response.serializer)
+      ..add(FilesControllerListVersions200Response.serializer)
       ..add(FilesControllerUpload201Response.serializer)
       ..add(ForgotPasswordDto.serializer)
       ..add(HealthControllerGetHealth200Response.serializer)
@@ -77,12 +100,28 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(InvitationDtoStatusEnum.serializer)
       ..add(InvitationsControllerCreate201Response.serializer)
       ..add(InvitationsControllerList200Response.serializer)
+      ..add(JobDependencyDto.serializer)
+      ..add(JobDependencyDtoDependsOnJobStatusEnum.serializer)
       ..add(JobDto.serializer)
       ..add(JobDtoStatusEnum.serializer)
+      ..add(JobEventDto.serializer)
+      ..add(JobEventDtoTypeEnum.serializer)
+      ..add(JobMetricsDto.serializer)
+      ..add(JobStatusCountDto.serializer)
+      ..add(JobTypeCountDto.serializer)
       ..add(LoginDto.serializer)
+      ..add(LoginResponseDto.serializer)
       ..add(MailDeliveryDto.serializer)
       ..add(MailDeliveryDtoStatusEnum.serializer)
       ..add(MailPreviewDto.serializer)
+      ..add(MailTemplateDto.serializer)
+      ..add(MfaCodeDto.serializer)
+      ..add(MfaControllerConfirm201Response.serializer)
+      ..add(MfaControllerGetStatus200Response.serializer)
+      ..add(MfaControllerSetup201Response.serializer)
+      ..add(MfaRecoveryCodesResponseDto.serializer)
+      ..add(MfaSetupResponseDto.serializer)
+      ..add(MfaStatusDto.serializer)
       ..add(NotificationDto.serializer)
       ..add(NotificationJobDto.serializer)
       ..add(NotificationJobDtoAudienceEnum.serializer)
@@ -91,10 +130,17 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(NotificationsControllerMarkRead200Response.serializer)
       ..add(NotificationsControllerRegisterDevice201Response.serializer)
       ..add(NotificationsControllerUnreadCount200Response.serializer)
+      ..add(OrganizationDetailDto.serializer)
+      ..add(OrganizationDetailDtoRoleEnum.serializer)
       ..add(OrganizationDto.serializer)
       ..add(OrganizationDtoRoleEnum.serializer)
+      ..add(OrganizationMemberDto.serializer)
+      ..add(OrganizationMemberDtoRoleEnum.serializer)
       ..add(OrganizationsControllerCreate200Response.serializer)
+      ..add(OrganizationsControllerGetOne200Response.serializer)
       ..add(OrganizationsControllerList200Response.serializer)
+      ..add(OrganizationsControllerListMembers200Response.serializer)
+      ..add(OrganizationsControllerUpdateMemberRole200Response.serializer)
       ..add(PaginationMetaDto.serializer)
       ..add(PermissionDto.serializer)
       ..add(PreferencesControllerGetMyPreferences200Response.serializer)
@@ -116,15 +162,26 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(ResetPasswordDto.serializer)
       ..add(RoleDto.serializer)
       ..add(RoleDtoScopeEnum.serializer)
+      ..add(SendAdminMailDto.serializer)
+      ..add(SendAdminMailResultDto.serializer)
+      ..add(SendAdminMailResultDtoStatusEnum.serializer)
       ..add(SendNotificationRequestDto.serializer)
       ..add(SendNotificationRequestDtoAudienceEnum.serializer)
+      ..add(SsoCallbackQueryDto.serializer)
+      ..add(SsoControllerStartLogin200Response.serializer)
+      ..add(StartSsoLoginResponseDto.serializer)
       ..add(SuccessFlagDto.serializer)
       ..add(SuccessMessageDto.serializer)
       ..add(SwitchOrganizationDto.serializer)
       ..add(UpdateAdminUserDto.serializer)
       ..add(UpdateAdminUserDtoStatusEnum.serializer)
       ..add(UpdateCommentDto.serializer)
+      ..add(UpdateMemberRoleDto.serializer)
+      ..add(UpdateMemberRoleDtoRoleEnum.serializer)
+      ..add(UpdateOrganizationDto.serializer)
       ..add(UpdatePreferencesDto.serializer)
+      ..add(UpdatePreferencesDtoLanguageEnum.serializer)
+      ..add(UpdatePreferencesDtoThemeEnum.serializer)
       ..add(UpdateProfileDto.serializer)
       ..add(UpdateProjectDto.serializer)
       ..add(UpdateProjectDtoStatusEnum.serializer)
@@ -135,7 +192,10 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(UserDto.serializer)
       ..add(UserDtoStatusEnum.serializer)
       ..add(UserPreferencesDto.serializer)
+      ..add(UserPreferencesDtoLanguageEnum.serializer)
+      ..add(UserPreferencesDtoThemeEnum.serializer)
       ..add(VerifyEmailDto.serializer)
+      ..add(VerifyMfaChallengeDto.serializer)
       ..addBuilderFactory(
         const FullType(BuiltList, const [const FullType(ActivityDto)]),
         () => ListBuilder<ActivityDto>(),
@@ -159,16 +219,54 @@ Serializers _$serializers = (Serializers().toBuilder()
         () => ListBuilder<AuthSessionDto>(),
       )
       ..addBuilderFactory(
+        const FullType(BuiltList, const [
+          const FullType(BatchDeleteResultItemDto),
+        ]),
+        () => ListBuilder<BatchDeleteResultItemDto>(),
+      )
+      ..addBuilderFactory(
         const FullType(BuiltList, const [const FullType(CommentDto)]),
         () => ListBuilder<CommentDto>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, const [const FullType(FileDto)]),
+        () => ListBuilder<FileDto>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, const [
+          const FullType(FileHistoryEventDto),
+        ]),
+        () => ListBuilder<FileHistoryEventDto>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, const [const FullType(FileVersionDto)]),
+        () => ListBuilder<FileVersionDto>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltList, const [const FullType(InvitationDto)]),
         () => ListBuilder<InvitationDto>(),
       )
       ..addBuilderFactory(
+        const FullType(BuiltList, const [const FullType(JobDependencyDto)]),
+        () => ListBuilder<JobDependencyDto>(),
+      )
+      ..addBuilderFactory(
         const FullType(BuiltList, const [const FullType(JobDto)]),
         () => ListBuilder<JobDto>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, const [const FullType(JobEventDto)]),
+        () => ListBuilder<JobEventDto>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, const [
+          const FullType(JobStatusCountDto),
+        ]),
+        () => ListBuilder<JobStatusCountDto>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, const [const FullType(JobTypeCountDto)]),
+        () => ListBuilder<JobTypeCountDto>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltList, const [const FullType(JsonObject)]),
@@ -177,6 +275,10 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..addBuilderFactory(
         const FullType(BuiltList, const [const FullType(MailDeliveryDto)]),
         () => ListBuilder<MailDeliveryDto>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, const [const FullType(MailTemplateDto)]),
+        () => ListBuilder<MailTemplateDto>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltList, const [const FullType(NotificationDto)]),
@@ -191,6 +293,12 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..addBuilderFactory(
         const FullType(BuiltList, const [const FullType(OrganizationDto)]),
         () => ListBuilder<OrganizationDto>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, const [
+          const FullType(OrganizationMemberDto),
+        ]),
+        () => ListBuilder<OrganizationMemberDto>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltList, const [const FullType(PermissionDto)]),
@@ -247,6 +355,26 @@ Serializers _$serializers = (Serializers().toBuilder()
         () => ListBuilder<String>(),
       )
       ..addBuilderFactory(
+        const FullType(BuiltList, const [const FullType(String)]),
+        () => ListBuilder<String>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, const [const FullType(String)]),
+        () => ListBuilder<String>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, const [const FullType(String)]),
+        () => ListBuilder<String>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, const [const FullType(String)]),
+        () => ListBuilder<String>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, const [const FullType(String)]),
+        () => ListBuilder<String>(),
+      )
+      ..addBuilderFactory(
         const FullType(BuiltMap, const [
           const FullType(String),
           const FullType.nullable(JsonObject),
@@ -267,6 +395,27 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..addBuilderFactory(
         const FullType(BuiltList, const [const FullType(UserDto)]),
         () => ListBuilder<UserDto>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltMap, const [
+          const FullType(String),
+          const FullType(String),
+        ]),
+        () => MapBuilder<String, String>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltMap, const [
+          const FullType(String),
+          const FullType.nullable(JsonObject),
+        ]),
+        () => MapBuilder<String, JsonObject?>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltMap, const [
+          const FullType(String),
+          const FullType.nullable(JsonObject),
+        ]),
+        () => MapBuilder<String, JsonObject?>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltMap, const [

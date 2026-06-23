@@ -6,8 +6,8 @@ import 'package:super_template_api/super_template_api.dart';
 
 final filesRepositoryProvider = Provider<FilesRepository>(
   (ref) => FilesRepository(
-    client: ref.watch(apiClientProvider),
-    dio: ref.watch(dioProvider),
+    ref.watch(apiClientProvider),
+    ref.watch(dioProvider),
   ),
 );
 
@@ -26,7 +26,7 @@ class FileSummary {
 }
 
 class FilesRepository {
-  FilesRepository({required this._client, required this._dio});
+  FilesRepository(this._client, this._dio);
 
   final SuperTemplateApi _client;
   final Dio _dio;

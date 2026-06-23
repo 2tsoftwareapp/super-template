@@ -26,6 +26,7 @@ export class ListAuditLogsUseCase {
         : {}),
       ...(query.from !== undefined ? { from: query.from } : {}),
       ...(query.to !== undefined ? { to: query.to } : {}),
+      ...(query.q !== undefined ? { q: query.q } : {}),
     });
 
     return {

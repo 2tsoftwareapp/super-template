@@ -6,7 +6,7 @@
 // @dart=3.0
 
 import 'package:super_template_api/src/model/request_meta_dto.dart';
-import 'package:super_template_api/src/model/auth_response_dto.dart';
+import 'package:super_template_api/src/model/login_response_dto.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
@@ -23,7 +23,7 @@ abstract class AuthControllerLogin201Response
         Built<AuthControllerLogin201Response,
             AuthControllerLogin201ResponseBuilder> {
   @BuiltValueField(wireName: r'data')
-  AuthResponseDto get data;
+  LoginResponseDto get data;
 
   @BuiltValueField(wireName: r'meta')
   RequestMetaDto get meta;
@@ -61,7 +61,7 @@ class _$AuthControllerLogin201ResponseSerializer
     yield r'data';
     yield serializers.serialize(
       object.data,
-      specifiedType: const FullType(AuthResponseDto),
+      specifiedType: const FullType(LoginResponseDto),
     );
     yield r'meta';
     yield serializers.serialize(
@@ -98,8 +98,8 @@ class _$AuthControllerLogin201ResponseSerializer
         case r'data':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(AuthResponseDto),
-          ) as AuthResponseDto;
+            specifiedType: const FullType(LoginResponseDto),
+          ) as LoginResponseDto;
           result.data.replace(valueDes);
           break;
         case r'meta':

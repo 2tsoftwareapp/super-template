@@ -34,6 +34,11 @@ export interface InvitationsRepositoryPort {
     values: Parameters<InvitationsRepository['update']>[1],
     executor?: DatabaseExecutor,
   ): Promise<InvitationRecord | null>;
+  acceptPending(
+    invitationId: string,
+    acceptedById: string,
+    executor?: DatabaseExecutor,
+  ): Promise<InvitationRecord | null>;
   revokePendingForEntity(
     entityType: string,
     entityId: string,

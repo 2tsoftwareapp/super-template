@@ -15,6 +15,7 @@ import { AccessControlModule } from './modules/access-control/access-control.mod
 import { AuthModule } from './modules/auth/auth.module';
 import { OrganizationsModule } from './modules/organizations/organizations.module';
 import { PreferencesModule } from './modules/preferences/preferences.module';
+import { SsoModule } from './modules/sso/sso.module';
 import { UsersModule } from './modules/users/users.module';
 
 @Module({
@@ -25,6 +26,7 @@ import { UsersModule } from './modules/users/users.module';
     PreferencesModule,
     UsersModule,
     AuthModule,
+    SsoModule,
   ],
   exports: [
     IdentityPortsModule,
@@ -33,6 +35,7 @@ import { UsersModule } from './modules/users/users.module';
     PreferencesModule,
     UsersModule,
     AuthModule,
+    SsoModule,
   ],
 })
 export class IdentityModule {}

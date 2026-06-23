@@ -3,25 +3,30 @@ import type {
   RequestContext,
 } from '@repo/api-core';
 
-import { Inject, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import {
+  AppError,
   AUDIT_WRITER,
   type AuditWriter,
   BACKGROUND_JOB_ENQUEUER,
   type BackgroundJobEnqueuer,
   durationToMilliseconds,
   EnvironmentService,
+  ERROR_CODES,
   generateOpaqueToken,
   hashOpaqueToken,
   normalizeEmail,
   PROJECT_LOOKUP,
   type ProjectLookup,
 } from '@repo/api-core';
+import { ROLE_NAMES } from '@repo/api-core';
+import { OrganizationsRepository } from '@repo/api-identity/modules/organizations/infrastructure/organizations.repository';
 
 import type { CreateInvitationCommand, InvitationView } from '../invitations.types';
 
 import {
   assertCanInvite,
+  INVITATION_ENTITY,
   resolveInvitationOrganizationId,
 } from '../../domain/invitation-access.policy';
 import { InvitationsMapper } from '../invitations.mapper';
@@ -42,6 +47,7 @@ export class CreateInvitationUseCase {
     @Inject(BACKGROUND_JOB_ENQUEUER)
     private readonly jobEnqueuer: BackgroundJobEnqueuer,
     private readonly environmentService: EnvironmentService,
+    private readonly organizationsRepository: OrganizationsRepository,
   ) {}
 
   async execute(
@@ -56,6 +62,47 @@ export class CreateInvitationUseCase {
       input.entityId,
       this.projectLookup,
     );
+
+    if (input.entityType === INVITATION_ENTITY.ORGANIZATION) {
+      const organization = await this.organizationsRepository.findById(
+        input.entityId,
+      );
+
+      if (!organization) {
+        throw new AppError(
+          ERROR_CODES.RESOURCE_CONFLICT,
+          'Organization is no longer available',
+          HttpStatus.CONFLICT,
+        );
+      }
+
+      if (!actor.roles.includes(ROLE_NAMES.SUPER_ADMIN)) {
+        const membership = await this.organizationsRepository.findMembership(
+          input.entityId,
+          actor.userId,
+        );
+
+        if (!membership) {
+          throw new AppError(
+            ERROR_CODES.AUTH_FORBIDDEN,
+            'You cannot invite users to an organization you do not belong to',
+            HttpStatus.FORBIDDEN,
+          );
+        }
+      }
+
+      if (
+        input.role &&
+        input.role !== 'ADMIN' &&
+        input.role !== 'MEMBER'
+      ) {
+        throw new AppError(
+          ERROR_CODES.VALIDATION_FAILED,
+          'Organization invitations only support ADMIN or MEMBER roles',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    }
 
     await this.invitationsRepository.revokePendingForEntity(
       input.entityType,

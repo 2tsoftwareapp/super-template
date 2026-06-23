@@ -26,3 +26,12 @@ class AppException implements Exception {
   @override
   String toString() => message;
 }
+
+class MfaRequiredException implements Exception {
+  const MfaRequiredException({required this.mfaToken});
+
+  final String mfaToken;
+
+  @override
+  String toString() => 'MFA verification required';
+}

@@ -1,6 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
 
-import { HttpLogTransportService } from './http-log-transport.service';
 import {
   type AppLogger,
   type LogContext,
@@ -11,8 +10,6 @@ import {
 @Injectable()
 export class ConsoleAppLogger implements AppLogger {
   private readonly logger = new Logger('App');
-
-  constructor(private readonly httpLogTransport: HttpLogTransportService) {}
 
   info(message: string, context?: LogContext): void {
     this.write('info', message, context);
@@ -50,7 +47,5 @@ export class ConsoleAppLogger implements AppLogger {
     } else {
       this.logger.log(serialized);
     }
-
-    void this.httpLogTransport.send(payload);
   }
 }

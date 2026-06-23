@@ -1,5 +1,12 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { AppError, ERROR_CODES, type JsonObject } from '@repo/api-core';
+import {
+  AppError,
+  ERROR_CODES,
+  isMandatoryMailTemplate,
+  type JsonObject,
+  USER_PREFERENCES_LOOKUP,
+  type UserPreferencesLookup,
+} from '@repo/api-core';
 
 import { MailDeliveriesRepository } from '../../infrastructure/mail-deliveries.repository';
 import { TemplateRendererService } from '../../infrastructure/template-renderer.service';
@@ -18,9 +25,22 @@ export class SendMailTemplateUseCase {
     @Inject(MAILER) private readonly mailer: Mailer,
     private readonly templateRenderer: TemplateRendererService,
     private readonly mailDeliveriesRepository: MailDeliveriesRepository,
+    @Inject(USER_PREFERENCES_LOOKUP)
+    private readonly userPreferencesLookup: UserPreferencesLookup,
   ) {}
 
   async execute(input: SendTemplateInput): Promise<void> {
+    if (!isMandatoryMailTemplate(input.templateKey)) {
+      const preferences =
+        await this.userPreferencesLookup.findNotificationPreferencesByEmail(
+          input.to,
+        );
+
+      if (preferences && !preferences.email) {
+        return;
+      }
+    }
+
     let rendered: { subject: string; text: string; html: string };
 
     try {

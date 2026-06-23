@@ -20,6 +20,10 @@ class _$FileDto extends FileDto {
   @override
   final num sizeBytes;
   @override
+  final JsonObject? checksum;
+  @override
+  final num latestVersion;
+  @override
   final JsonObject? uploadedById;
   @override
   final String createdAt;
@@ -35,6 +39,8 @@ class _$FileDto extends FileDto {
     required this.originalName,
     required this.mimeType,
     required this.sizeBytes,
+    this.checksum,
+    required this.latestVersion,
     this.uploadedById,
     required this.createdAt,
     required this.updatedAt,
@@ -55,6 +61,8 @@ class _$FileDto extends FileDto {
         originalName == other.originalName &&
         mimeType == other.mimeType &&
         sizeBytes == other.sizeBytes &&
+        checksum == other.checksum &&
+        latestVersion == other.latestVersion &&
         uploadedById == other.uploadedById &&
         createdAt == other.createdAt &&
         updatedAt == other.updatedAt;
@@ -68,6 +76,8 @@ class _$FileDto extends FileDto {
     _$hash = $jc(_$hash, originalName.hashCode);
     _$hash = $jc(_$hash, mimeType.hashCode);
     _$hash = $jc(_$hash, sizeBytes.hashCode);
+    _$hash = $jc(_$hash, checksum.hashCode);
+    _$hash = $jc(_$hash, latestVersion.hashCode);
     _$hash = $jc(_$hash, uploadedById.hashCode);
     _$hash = $jc(_$hash, createdAt.hashCode);
     _$hash = $jc(_$hash, updatedAt.hashCode);
@@ -83,6 +93,8 @@ class _$FileDto extends FileDto {
           ..add('originalName', originalName)
           ..add('mimeType', mimeType)
           ..add('sizeBytes', sizeBytes)
+          ..add('checksum', checksum)
+          ..add('latestVersion', latestVersion)
           ..add('uploadedById', uploadedById)
           ..add('createdAt', createdAt)
           ..add('updatedAt', updatedAt))
@@ -113,6 +125,15 @@ class FileDtoBuilder implements Builder<FileDto, FileDtoBuilder> {
   num? get sizeBytes => _$this._sizeBytes;
   set sizeBytes(num? sizeBytes) => _$this._sizeBytes = sizeBytes;
 
+  JsonObject? _checksum;
+  JsonObject? get checksum => _$this._checksum;
+  set checksum(JsonObject? checksum) => _$this._checksum = checksum;
+
+  num? _latestVersion;
+  num? get latestVersion => _$this._latestVersion;
+  set latestVersion(num? latestVersion) =>
+      _$this._latestVersion = latestVersion;
+
   JsonObject? _uploadedById;
   JsonObject? get uploadedById => _$this._uploadedById;
   set uploadedById(JsonObject? uploadedById) =>
@@ -138,6 +159,8 @@ class FileDtoBuilder implements Builder<FileDto, FileDtoBuilder> {
       _originalName = $v.originalName;
       _mimeType = $v.mimeType;
       _sizeBytes = $v.sizeBytes;
+      _checksum = $v.checksum;
+      _latestVersion = $v.latestVersion;
       _uploadedById = $v.uploadedById;
       _createdAt = $v.createdAt;
       _updatedAt = $v.updatedAt;
@@ -182,6 +205,12 @@ class FileDtoBuilder implements Builder<FileDto, FileDtoBuilder> {
             sizeBytes,
             r'FileDto',
             'sizeBytes',
+          ),
+          checksum: checksum,
+          latestVersion: BuiltValueNullFieldError.checkNotNull(
+            latestVersion,
+            r'FileDto',
+            'latestVersion',
           ),
           uploadedById: uploadedById,
           createdAt: BuiltValueNullFieldError.checkNotNull(

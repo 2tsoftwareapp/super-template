@@ -12,6 +12,11 @@ import type { UpdatePreferencesCommand } from '../preferences.types';
 
 import { PreferencesRepository } from '../../infrastructure/preferences.repository';
 import { PreferencesMapper } from '../preferences.mapper';
+import {
+  assertValidPreferenceLanguage,
+  assertValidPreferenceTheme,
+  assertValidTimezone,
+} from '../preferences.validation';
 
 @Injectable()
 export class UpdatePreferencesUseCase {
@@ -27,6 +32,18 @@ export class UpdatePreferencesUseCase {
     input: UpdatePreferencesCommand,
     requestContext?: RequestContext,
   ) {
+    if (input.theme !== undefined) {
+      assertValidPreferenceTheme(input.theme);
+    }
+
+    if (input.language !== undefined) {
+      assertValidPreferenceLanguage(input.language);
+    }
+
+    if (input.timezone !== undefined) {
+      assertValidTimezone(input.timezone);
+    }
+
     const updated = await this.preferencesRepository.upsert(userId, {
       ...(input.theme !== undefined ? { theme: input.theme } : {}),
       ...(input.language !== undefined ? { language: input.language } : {}),

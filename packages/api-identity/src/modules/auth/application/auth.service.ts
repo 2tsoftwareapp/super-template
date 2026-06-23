@@ -13,9 +13,11 @@ import type {
   ResendVerificationCommand,
   ResetPasswordCommand,
   VerifyEmailCommand,
+  VerifyMfaChallengeCommand,
 } from './auth.types';
 
 import { AuthenticateAccessTokenUseCase } from './use-cases/authenticate-access-token.use-case';
+import { CompleteMfaLoginUseCase } from './use-cases/complete-mfa-login.use-case';
 import { ForgotPasswordUseCase } from './use-cases/forgot-password.use-case';
 import { GetMeUseCase } from './use-cases/get-me.use-case';
 import { GetSessionsUseCase } from './use-cases/get-sessions.use-case';
@@ -47,6 +49,7 @@ export class AuthService {
     private readonly verifyEmailUseCase: VerifyEmailUseCase,
     private readonly resendVerificationUseCase: ResendVerificationUseCase,
     private readonly authenticateAccessTokenUseCase: AuthenticateAccessTokenUseCase,
+    private readonly completeMfaLoginUseCase: CompleteMfaLoginUseCase,
   ) {}
 
   register(input: RegisterCommand, requestContext?: RequestContext) {
@@ -119,5 +122,12 @@ export class AuthService {
 
   authenticateAccessToken(token: string) {
     return this.authenticateAccessTokenUseCase.execute(token);
+  }
+
+  verifyMfaChallenge(
+    input: VerifyMfaChallengeCommand,
+    requestContext?: RequestContext,
+  ) {
+    return this.completeMfaLoginUseCase.execute(input, requestContext);
   }
 }

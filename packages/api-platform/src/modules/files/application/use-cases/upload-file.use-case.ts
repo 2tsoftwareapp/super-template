@@ -5,7 +5,7 @@ import type {
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { AppError, ERROR_CODES, requireOrganizationId } from '@repo/api-core';
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 
 import { AuditService } from '../../../audit/application/audit.service';
 import {
@@ -71,6 +71,7 @@ export class UploadFileUseCase {
     }
 
     const storageKey = `uploads/${actor.userId}/${randomUUID()}${extension}`;
+    const checksum = createHash('sha256').update(file.buffer).digest('hex');
     await this.objectStorage.upload({
       key: storageKey,
       body: file.buffer,
@@ -78,18 +79,32 @@ export class UploadFileUseCase {
     });
 
     try {
+      const organizationId = requireOrganizationId(actor);
       const record = await this.filesRepository.create({
-        organizationId: requireOrganizationId(actor),
+        organizationId,
         storageKey,
         originalName: file.originalname,
         mimeType: detectedMimeType,
         sizeBytes: file.size,
+        checksum,
+        latestVersion: 1,
         uploadedById: actor.userId,
       });
 
       if (!record) {
         throw new Error('File insert returned no rows');
       }
+
+      await this.filesRepository.createVersion({
+        fileId: record.id,
+        organizationId,
+        versionNumber: 1,
+        storageKey,
+        mimeType: detectedMimeType,
+        sizeBytes: file.size,
+        checksum,
+        createdById: actor.userId,
+      });
 
       await this.auditService.log({
         actorId: actor.userId,

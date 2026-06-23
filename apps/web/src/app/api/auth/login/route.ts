@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
   const payload = (await response.json()) as AuthLoginResponse;
   const nextResponse = NextResponse.json(payload, { status: response.status });
 
-  if (response.ok) {
+  if (response.ok && payload.data.accessToken && payload.data.refreshToken) {
     setAuthCookies(nextResponse, {
       accessToken: payload.data.accessToken,
       refreshToken: payload.data.refreshToken,

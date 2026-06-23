@@ -1,0 +1,53 @@
+import { HttpStatus } from '@nestjs/common';
+import { AppError, ERROR_CODES } from '@repo/api-core';
+
+export type OrganizationMemberRole = 'OWNER' | 'ADMIN' | 'MEMBER';
+
+export interface OrganizationMembership {
+  userId: string;
+  role: OrganizationMemberRole;
+}
+
+export function assertOrganizationRole(
+  membership: OrganizationMembership,
+  allowedRoles: readonly OrganizationMemberRole[],
+): void {
+  if (!allowedRoles.includes(membership.role)) {
+    throw new AppError(
+      ERROR_CODES.AUTH_FORBIDDEN,
+      'Your role in this organization does not allow this action',
+      HttpStatus.FORBIDDEN,
+    );
+  }
+}
+
+/** ADMIN may only manage MEMBER targets. OWNER may manage ADMIN, MEMBER, and other OWNERs. */
+export function assertCanManageTargetRole(
+  actorRole: OrganizationMemberRole,
+  targetRole: OrganizationMemberRole,
+): void {
+  if (actorRole === 'OWNER') {
+    return;
+  }
+
+  if (targetRole !== 'MEMBER') {
+    throw new AppError(
+      ERROR_CODES.AUTH_FORBIDDEN,
+      'Only an owner can manage admins or other owners',
+      HttpStatus.FORBIDDEN,
+    );
+  }
+}
+
+export function assertNotLastOwner(
+  membership: OrganizationMembership,
+  remainingOwnerCount: number,
+): void {
+  if (membership.role === 'OWNER' && remainingOwnerCount === 0) {
+    throw new AppError(
+      ERROR_CODES.ORGANIZATION_LAST_OWNER,
+      'Transfer ownership to another member before removing the last owner',
+      HttpStatus.CONFLICT,
+    );
+  }
+}

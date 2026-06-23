@@ -1,0 +1,252 @@
+import type { RequestContext } from '@repo/api-core';
+import type { DatabaseClient } from '@repo/api-database';
+
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import {
+  AppError,
+  AUDIT_WRITER,
+  type AuditWriter,
+  ERROR_CODES,
+  generateOpaqueToken,
+  hashOpaqueToken,
+  normalizeEmail,
+} from '@repo/api-core';
+import { DATABASE, runInTransaction } from '@repo/api-database';
+
+import type { HandleSsoCallbackCommand } from '../sso.types';
+
+import { AccessControlService } from '../../../access-control/application/access-control.service';
+import { hashPassword } from '../../../auth/application/auth.helpers';
+import { IssueSessionUseCase } from '../../../auth/application/use-cases/issue-session.use-case';
+import { OrganizationsService } from '../../../organizations/application/organizations.service';
+import { UsersRepository } from '../../../users/infrastructure/users.repository';
+import { decideAccountLinking } from '../../domain/account-linking.policy';
+import { SsoRepository } from '../../infrastructure/sso.repository';
+import {
+  SSO_PROVIDER_REGISTRY,
+  type SsoProviderRegistry,
+} from '../../ports/sso-provider.port';
+
+@Injectable()
+export class HandleSsoCallbackUseCase {
+  constructor(
+    @Inject(SSO_PROVIDER_REGISTRY)
+    private readonly providers: SsoProviderRegistry,
+    @Inject(DATABASE) private readonly database: DatabaseClient,
+    private readonly ssoRepository: SsoRepository,
+    private readonly usersRepository: UsersRepository,
+    private readonly accessControlService: AccessControlService,
+    private readonly organizationsService: OrganizationsService,
+    private readonly issueSessionUseCase: IssueSessionUseCase,
+    @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
+  ) {}
+
+  async execute(
+    input: HandleSsoCallbackCommand,
+    requestContext?: RequestContext,
+  ) {
+    const provider = this.providers.get(input.provider);
+
+    if (!provider) {
+      throw new AppError(
+        ERROR_CODES.SSO_PROVIDER_UNAVAILABLE,
+        `SSO provider "${input.provider}" is not available`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const loginState = await this.ssoRepository.findValidLoginStateByStateHash(
+      hashOpaqueToken(input.state),
+    );
+
+    if (loginState?.provider !== input.provider) {
+      throw new AppError(
+        ERROR_CODES.SSO_STATE_INVALID,
+        'SSO login state is invalid or expired',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    await this.ssoRepository.consumeLoginState(loginState.id);
+
+    let identity: Awaited<ReturnType<typeof provider.verifyIdToken>>;
+
+    try {
+      const tokenSet = await provider.exchangeCode({
+        code: input.code,
+        codeVerifier: loginState.codeVerifier,
+      });
+      identity = await provider.verifyIdToken(
+        tokenSet.idToken,
+        loginState.nonce,
+      );
+    } catch (error) {
+      await this.auditWriter.log({
+        action: 'auth.sso.failed',
+        entityType: 'user',
+        metadata: {
+          provider: input.provider,
+          reason: error instanceof Error ? error.message : 'unknown error',
+        },
+        requestContext,
+      });
+
+      throw new AppError(
+        ERROR_CODES.SSO_TOKEN_INVALID,
+        'Failed to verify SSO identity',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    if (!identity.email) {
+      throw new AppError(
+        ERROR_CODES.SSO_TOKEN_INVALID,
+        'Provider did not return an email address',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    const email = normalizeEmail(identity.email);
+
+    const user = await runInTransaction(this.database, async (transaction) => {
+      const existingIdentity = await this.ssoRepository.findIdentity(
+        input.provider,
+        identity.subject,
+        transaction,
+      );
+
+      if (existingIdentity) {
+        const linkedUser = await this.usersRepository.findById(
+          existingIdentity.userId,
+          transaction,
+        );
+
+        if (!linkedUser) {
+          throw new AppError(
+            ERROR_CODES.USER_NOT_FOUND,
+            'Linked user not found',
+            HttpStatus.UNAUTHORIZED,
+          );
+        }
+
+        return linkedUser;
+      }
+
+      const existingUserByEmail = await this.usersRepository.findByEmail(
+        email,
+        transaction,
+      );
+      const decision = decideAccountLinking({
+        existingUserByEmail: existingUserByEmail
+          ? {
+              id: existingUserByEmail.id,
+              emailVerifiedAt: existingUserByEmail.emailVerifiedAt,
+            }
+          : null,
+      });
+
+      if (decision.kind === 'conflict') {
+        throw new AppError(
+          ERROR_CODES.SSO_EMAIL_CONFLICT,
+          'An account with this email already exists. Verify your email or sign in with a password first.',
+          HttpStatus.CONFLICT,
+        );
+      }
+
+      if (decision.kind === 'create_new' && !identity.emailVerified) {
+        throw new AppError(
+          ERROR_CODES.SSO_TOKEN_INVALID,
+          'Provider did not verify the email address',
+          HttpStatus.UNAUTHORIZED,
+        );
+      }
+
+      let targetUser;
+
+      if (decision.kind === 'link_existing') {
+        targetUser = existingUserByEmail!;
+      } else {
+        targetUser = await this.usersRepository.create(
+          {
+            email,
+            passwordHash: await hashPassword(generateOpaqueToken()),
+            displayName: email.split('@')[0] ?? email,
+            status: 'ACTIVE',
+            emailVerifiedAt: new Date(),
+          },
+          transaction,
+        );
+
+        const userRole = await this.accessControlService.getRoleByName(
+          'USER',
+          null,
+          transaction,
+        );
+
+        if (!userRole) {
+          throw new AppError(
+            ERROR_CODES.INTERNAL_ERROR,
+            'Default USER role is missing',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          );
+        }
+
+        await this.accessControlService.replaceUserRoles(
+          targetUser.id,
+          [userRole.id],
+          undefined,
+          transaction,
+        );
+
+        await this.organizationsService.ensurePersonalOrganization(
+          targetUser.id,
+          targetUser.displayName,
+          transaction,
+        );
+      }
+
+      await this.ssoRepository.createIdentity(
+        {
+          userId: targetUser.id,
+          provider: input.provider,
+          providerSubject: identity.subject,
+          email,
+        },
+        transaction,
+      );
+
+      await this.auditWriter.log(
+        {
+          actorId: targetUser.id,
+          action:
+            decision.kind === 'create_new'
+              ? 'auth.sso.signup'
+              : 'auth.sso.linked',
+          entityType: 'user',
+          entityId: targetUser.id,
+          metadata: { provider: input.provider },
+          requestContext,
+        },
+        transaction,
+      );
+
+      return targetUser;
+    });
+
+    const session = await this.issueSessionUseCase.execute(
+      user,
+      requestContext,
+    );
+
+    await this.auditWriter.log({
+      actorId: user.id,
+      action: 'auth.sso.login_succeeded',
+      entityType: 'user',
+      entityId: user.id,
+      metadata: { provider: input.provider },
+      requestContext,
+    });
+
+    return { session, redirectUri: loginState.redirectUri };
+  }
+}

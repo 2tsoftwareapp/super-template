@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { type JsonObject, PaginationQueryDto } from '@repo/api-core';
-import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsDateString, IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class JobDto {
   @ApiProperty()
@@ -63,4 +63,111 @@ export class JobsQueryDto extends PaginationQueryDto {
   @IsOptional()
   @IsString()
   type?: string;
+}
+
+export class JobEventDto {
+  @ApiProperty()
+  id: string;
+
+  @ApiProperty()
+  jobId: string;
+
+  @ApiPropertyOptional({ type: String, nullable: true })
+  attemptId: string | null;
+
+  @ApiProperty({
+    enum: [
+      'claimed',
+      'completed',
+      'failed',
+      'retry_scheduled',
+      'cancelled',
+      'no_handler',
+    ],
+  })
+  type: string;
+
+  @ApiPropertyOptional({ type: String, nullable: true })
+  message: string | null;
+
+  @ApiPropertyOptional({ type: 'object', additionalProperties: true, nullable: true })
+  metadata: JsonObject | null;
+
+  @ApiProperty()
+  createdAt: string;
+}
+
+export class JobLogsQueryDto extends PaginationQueryDto {}
+
+export class JobDependencyDto {
+  @ApiProperty()
+  id: string;
+
+  @ApiProperty()
+  dependsOnJobId: string;
+
+  @ApiProperty({
+    enum: ['PENDING', 'PROCESSING', 'COMPLETED', 'CANCELLED', 'FAILED'],
+  })
+  dependsOnJobStatus: string;
+
+  @ApiProperty()
+  createdAt: string;
+}
+
+export class AddJobDependencyDto {
+  @ApiProperty()
+  @IsUUID()
+  dependsOnJobId: string;
+}
+
+export class JobMetricsQueryDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsDateString()
+  from?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsDateString()
+  to?: string;
+}
+
+export class JobStatusCountDto {
+  @ApiProperty()
+  status: string;
+
+  @ApiProperty()
+  total: number;
+}
+
+export class JobTypeCountDto {
+  @ApiProperty()
+  type: string;
+
+  @ApiProperty()
+  total: number;
+}
+
+export class JobMetricsDto {
+  @ApiProperty({ type: [JobStatusCountDto] })
+  byStatus: JobStatusCountDto[];
+
+  @ApiProperty({ type: [JobTypeCountDto] })
+  byType: JobTypeCountDto[];
+
+  @ApiPropertyOptional({ type: Number, nullable: true })
+  averageDurationMs: number | null;
+
+  @ApiProperty()
+  retryRate: number;
+
+  @ApiProperty()
+  failureRate: number;
+
+  @ApiProperty()
+  totalCompleted: number;
+
+  @ApiProperty()
+  totalFailed: number;
 }

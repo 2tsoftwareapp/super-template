@@ -11,23 +11,18 @@ import {
 
 import type { LoginCommand } from '../auth.types';
 
-import { AccessControlService } from '../../../access-control/application/access-control.service';
-import { OrganizationsService } from '../../../organizations/application/organizations.service';
+import { MfaService } from '../../../mfa/application/mfa.service';
 import { UsersRepository } from '../../../users/infrastructure/users.repository';
 import { verifyPasswordWithTimingPadding } from '../auth.helpers';
-import { AuthMapper } from '../auth.mapper';
-import { SessionTokenService } from '../services/session-token.service';
+import { IssueSessionUseCase } from './issue-session.use-case';
 
 @Injectable()
 export class LoginUseCase {
-  private readonly authMapper = new AuthMapper();
-
   constructor(
     private readonly usersRepository: UsersRepository,
-    private readonly accessControlService: AccessControlService,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
-    private readonly organizationsService: OrganizationsService,
-    private readonly sessionTokenService: SessionTokenService,
+    private readonly issueSessionUseCase: IssueSessionUseCase,
+    private readonly mfaService: MfaService,
   ) {}
 
   async execute(input: LoginCommand, requestContext?: RequestContext) {
@@ -69,18 +64,29 @@ export class LoginUseCase {
       );
     }
 
-    const accessProfile = await this.accessControlService.getAccessProfile(
-      user.id,
-    );
-    const organizationId =
-      await this.organizationsService.resolveOrganizationIdForUser(user.id);
-    const sessionPayload = await this.sessionTokenService.createSessionTokens(
-      user.id,
-      organizationId,
-      {
+    if (await this.mfaService.isEnabled(user.id)) {
+      const mfaToken = await this.mfaService.createLoginChallenge(user.id, {
         ipAddress: requestContext?.ipAddress ?? null,
         userAgent: requestContext?.userAgent ?? null,
-      },
+      });
+
+      await this.auditWriter.log({
+        actorId: user.id,
+        action: 'auth.login.mfa_challenge_issued',
+        entityType: 'user',
+        entityId: user.id,
+        requestContext,
+      });
+
+      return {
+        mfaRequired: true as const,
+        mfaToken,
+      };
+    }
+
+    const session = await this.issueSessionUseCase.execute(
+      user,
+      requestContext,
     );
 
     await this.auditWriter.log({
@@ -91,16 +97,6 @@ export class LoginUseCase {
       requestContext,
     });
 
-    return {
-      accessToken: sessionPayload.accessToken,
-      refreshToken: sessionPayload.refreshToken,
-      user: this.authMapper.toUserView(user, accessProfile.roles),
-      permissions: accessProfile.permissions,
-      organizationId,
-      session: this.authMapper.toSessionDto(
-        sessionPayload.session,
-        sessionPayload.session.id,
-      ),
-    };
+    return { mfaRequired: false as const, ...session };
   }
 }

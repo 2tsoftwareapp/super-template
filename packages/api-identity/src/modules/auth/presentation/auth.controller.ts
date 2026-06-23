@@ -29,12 +29,14 @@ import {
   AuthSessionDto,
   ForgotPasswordDto,
   LoginDto,
+  LoginResponseDto,
   RefreshTokenDto,
   RegisterDto,
   ResendVerificationDto,
   ResetPasswordDto,
   SwitchOrganizationDto,
   VerifyEmailDto,
+  VerifyMfaChallengeDto,
 } from './auth.dto';
 
 @ApiTags('auth')
@@ -61,12 +63,29 @@ export class AuthController {
   @Public()
   @Post('login')
   @Throttle({ default: { limit: 5, ttl: 60_000 } })
-  @ApiDataResponse(AuthResponseDto, 201)
+  @ApiDataResponse(LoginResponseDto, 201)
   login(@Body() input: LoginDto, @Req() request: Request) {
     return this.authService.login(
       {
         email: input.email,
         password: input.password,
+      },
+      request.requestContext,
+    );
+  }
+
+  @Public()
+  @Post('mfa/verify-challenge')
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
+  @ApiDataResponse(AuthResponseDto, 201)
+  verifyMfaChallenge(
+    @Body() input: VerifyMfaChallengeDto,
+    @Req() request: Request,
+  ) {
+    return this.authService.verifyMfaChallenge(
+      {
+        mfaToken: input.mfaToken,
+        code: input.code,
       },
       request.requestContext,
     );

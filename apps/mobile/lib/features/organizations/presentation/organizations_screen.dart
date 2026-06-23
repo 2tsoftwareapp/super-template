@@ -6,10 +6,6 @@ import 'package:mobile_app/core/widgets/state_views.dart';
 import 'package:mobile_app/features/auth/presentation/auth_controller.dart';
 import 'package:mobile_app/features/organizations/data/organizations_repository.dart';
 
-final organizationsListProvider = FutureProvider(
-  (ref) => ref.watch(organizationsRepositoryProvider).list(),
-);
-
 class OrganizationsScreen extends ConsumerStatefulWidget {
   const OrganizationsScreen({super.key});
 
@@ -79,6 +75,7 @@ class _OrganizationsScreenState extends ConsumerState<OrganizationsScreen> {
                           },
                           child: const Text('Switch'),
                         ),
+                  onTap: () => context.go('/organizations/${org.id}'),
                 ),
               ),
             ),

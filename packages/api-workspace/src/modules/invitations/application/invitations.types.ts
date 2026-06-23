@@ -1,4 +1,5 @@
 export type InvitationStatus = 'PENDING' | 'ACCEPTED' | 'EXPIRED' | 'REVOKED';
+export type InvitationEntityType = 'organization' | 'project';
 
 export interface InvitationView {
   id: string;
@@ -17,7 +18,7 @@ export interface InvitationView {
 
 export interface CreateInvitationCommand {
   email: string;
-  entityType: string;
+  entityType: InvitationEntityType;
   entityId: string;
   role?: string;
 }
@@ -30,7 +31,7 @@ export interface ListInvitationsQuery {
   page: number;
   limit: number;
   email?: string;
-  entityType?: string;
+  entityType?: InvitationEntityType;
   entityId?: string;
   status?: InvitationStatus;
 }

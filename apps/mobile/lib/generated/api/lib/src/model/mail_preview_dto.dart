@@ -5,6 +5,7 @@
 // ignore_for_file: unused_element
 // @dart=3.0
 
+import 'package:built_collection/built_collection.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
@@ -16,6 +17,7 @@ part 'mail_preview_dto.g.dart';
 /// * [subject]
 /// * [text]
 /// * [html]
+/// * [missingVariables] - Template variables with no supplied or default value.
 @BuiltValue()
 abstract class MailPreviewDto
     implements Built<MailPreviewDto, MailPreviewDtoBuilder> {
@@ -27,6 +29,10 @@ abstract class MailPreviewDto
 
   @BuiltValueField(wireName: r'html')
   String get html;
+
+  /// Template variables with no supplied or default value.
+  @BuiltValueField(wireName: r'missingVariables')
+  BuiltList<String> get missingVariables;
 
   MailPreviewDto._();
 
@@ -68,6 +74,11 @@ class _$MailPreviewDtoSerializer
     yield serializers.serialize(
       object.html,
       specifiedType: const FullType(String),
+    );
+    yield r'missingVariables';
+    yield serializers.serialize(
+      object.missingVariables,
+      specifiedType: const FullType(BuiltList, [FullType(String)]),
     );
   }
 
@@ -116,6 +127,15 @@ class _$MailPreviewDtoSerializer
             specifiedType: const FullType(String),
           ) as String;
           result.html = valueDes;
+          break;
+        case r'missingVariables':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(BuiltList, [
+              FullType(String),
+            ]),
+          ) as BuiltList<String>;
+          result.missingVariables.replace(valueDes);
           break;
         default:
           unhandled.add(key);

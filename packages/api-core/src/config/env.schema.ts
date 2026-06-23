@@ -71,6 +71,11 @@ export const envSchema = z.object({
   DATABASE_URL_TEST_ADMIN: emptyStringToUndefined,
   // Public and internal HTTP endpoints.
   API_PORT: z.coerce.number().int().positive().default(3001),
+  // Max JSON/urlencoded request body size accepted by Express (e.g. "1mb", "500kb").
+  API_BODY_LIMIT: z
+    .string()
+    .regex(/^\d+(b|kb|mb|gb)$/i, 'must be a size like "1mb" or "500kb"')
+    .default('1mb'),
   WEB_PORT: z.coerce.number().int().positive(),
   WEB_ORIGIN: commaSeparatedOrigins,
   API_INTERNAL_URL: z.url(),
@@ -84,10 +89,6 @@ export const envSchema = z.object({
     .int()
     .positive()
     .default(60),
-  // Optional HTTP log export sink. Leave empty in local dev to keep logs console-only.
-  LOGGING_HTTP_ENDPOINT: emptyStringToUndefined,
-  LOGGING_HTTP_AUTH_TOKEN: emptyStringToUndefined,
-  LOGGING_HTTP_TIMEOUT_MS: z.coerce.number().int().positive().default(2000),
   // Optional error-reporting sinks. Sentry stores structured exceptions; Telegram sends human alerts.
   SENTRY_DSN: emptyStringToUndefined,
   SENTRY_ENVIRONMENT: emptyStringToUndefined,
@@ -100,6 +101,25 @@ export const envSchema = z.object({
   JWT_REFRESH_SECRET: z.string().min(24),
   JWT_ACCESS_TTL: durationString,
   JWT_REFRESH_TTL: durationString,
+  // Symmetric key (32 bytes, hex-encoded) used to encrypt TOTP secrets at rest with AES-256-GCM.
+  MFA_ENCRYPTION_KEY: z
+    .string()
+    .regex(/^[0-9a-fA-F]{64}$/, 'must be a 64-character hex string (32 bytes)'),
+  // Days to retain audit_logs rows before the daily purge job deletes them. 0 disables purging.
+  AUDIT_RETENTION_DAYS: z.coerce.number().int().min(0).default(0),
+  // SSO providers (OIDC Authorization Code + PKCE). Leave a provider's client id unset to
+  // disable it; the redirect URI defaults to API_INTERNAL_URL + the provider callback path.
+  GOOGLE_CLIENT_ID: emptyStringToUndefined,
+  GOOGLE_CLIENT_SECRET: emptyStringToUndefined,
+  GOOGLE_REDIRECT_URI: emptyStringToUndefined,
+  APPLE_CLIENT_ID: emptyStringToUndefined,
+  APPLE_TEAM_ID: emptyStringToUndefined,
+  APPLE_KEY_ID: emptyStringToUndefined,
+  APPLE_PRIVATE_KEY: emptyStringToUndefined,
+  APPLE_REDIRECT_URI: emptyStringToUndefined,
+  // Registers an in-memory mock SSO provider (provider key "fake") for local/dev/test use
+  // without real OAuth credentials. Refused outside of development/test at startup.
+  SSO_FAKE_PROVIDER_ENABLED: booleanFromString.default(false),
   // Mail transport and local Mailpit access.
   MAIL_HOST: z.string().min(1),
   MAIL_PORT: z.coerce.number().int().positive(),
@@ -134,6 +154,14 @@ export const envSchema = z.object({
       code: 'custom',
       path: ['DATABASE_URL_TEST'],
       message: 'DATABASE_URL_TEST is required when APP_ENV=test',
+    });
+  }
+
+  if (env.APP_ENV === 'production' && env.SSO_FAKE_PROVIDER_ENABLED) {
+    ctx.addIssue({
+      code: 'custom',
+      path: ['SSO_FAKE_PROVIDER_ENABLED'],
+      message: 'SSO_FAKE_PROVIDER_ENABLED must not be enabled in production',
     });
   }
 });

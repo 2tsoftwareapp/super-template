@@ -1,6 +1,6 @@
 import type { ComponentType } from "react";
 
-import { Bell, FolderKanban, LayoutDashboard, Settings } from "lucide-react";
+import { Bell, Building2, FolderKanban, LayoutDashboard, Settings } from "lucide-react";
 
 export interface NavItem {
   href: string;
@@ -22,6 +22,11 @@ export const clientNavItems: NavItem[] = [
     label: "Notifications",
     icon: Bell,
     permission: "notifications.read",
+  },
+  {
+    href: "/organizations",
+    label: "Organizations",
+    icon: Building2,
   },
   { href: "/settings/profile", label: "Settings", icon: Settings },
 ];

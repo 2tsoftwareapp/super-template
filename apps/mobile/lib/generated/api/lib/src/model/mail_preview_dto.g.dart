@@ -15,6 +15,8 @@ class _$MailPreviewDto extends MailPreviewDto {
   final String text;
   @override
   final String html;
+  @override
+  final BuiltList<String> missingVariables;
 
   factory _$MailPreviewDto([void Function(MailPreviewDtoBuilder)? updates]) =>
       (MailPreviewDtoBuilder()..update(updates))._build();
@@ -23,6 +25,7 @@ class _$MailPreviewDto extends MailPreviewDto {
     required this.subject,
     required this.text,
     required this.html,
+    required this.missingVariables,
   }) : super._();
   @override
   MailPreviewDto rebuild(void Function(MailPreviewDtoBuilder) updates) =>
@@ -37,7 +40,8 @@ class _$MailPreviewDto extends MailPreviewDto {
     return other is MailPreviewDto &&
         subject == other.subject &&
         text == other.text &&
-        html == other.html;
+        html == other.html &&
+        missingVariables == other.missingVariables;
   }
 
   @override
@@ -46,6 +50,7 @@ class _$MailPreviewDto extends MailPreviewDto {
     _$hash = $jc(_$hash, subject.hashCode);
     _$hash = $jc(_$hash, text.hashCode);
     _$hash = $jc(_$hash, html.hashCode);
+    _$hash = $jc(_$hash, missingVariables.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -55,7 +60,8 @@ class _$MailPreviewDto extends MailPreviewDto {
     return (newBuiltValueToStringHelper(r'MailPreviewDto')
           ..add('subject', subject)
           ..add('text', text)
-          ..add('html', html))
+          ..add('html', html)
+          ..add('missingVariables', missingVariables))
         .toString();
   }
 }
@@ -76,6 +82,12 @@ class MailPreviewDtoBuilder
   String? get html => _$this._html;
   set html(String? html) => _$this._html = html;
 
+  ListBuilder<String>? _missingVariables;
+  ListBuilder<String> get missingVariables =>
+      _$this._missingVariables ??= ListBuilder<String>();
+  set missingVariables(ListBuilder<String>? missingVariables) =>
+      _$this._missingVariables = missingVariables;
+
   MailPreviewDtoBuilder() {
     MailPreviewDto._defaults(this);
   }
@@ -86,6 +98,7 @@ class MailPreviewDtoBuilder
       _subject = $v.subject;
       _text = $v.text;
       _html = $v.html;
+      _missingVariables = $v.missingVariables.toBuilder();
       _$v = null;
     }
     return this;
@@ -105,24 +118,41 @@ class MailPreviewDtoBuilder
   MailPreviewDto build() => _build();
 
   _$MailPreviewDto _build() {
-    final _$result = _$v ??
-        _$MailPreviewDto._(
-          subject: BuiltValueNullFieldError.checkNotNull(
-            subject,
-            r'MailPreviewDto',
-            'subject',
-          ),
-          text: BuiltValueNullFieldError.checkNotNull(
-            text,
-            r'MailPreviewDto',
-            'text',
-          ),
-          html: BuiltValueNullFieldError.checkNotNull(
-            html,
-            r'MailPreviewDto',
-            'html',
-          ),
+    _$MailPreviewDto _$result;
+    try {
+      _$result = _$v ??
+          _$MailPreviewDto._(
+            subject: BuiltValueNullFieldError.checkNotNull(
+              subject,
+              r'MailPreviewDto',
+              'subject',
+            ),
+            text: BuiltValueNullFieldError.checkNotNull(
+              text,
+              r'MailPreviewDto',
+              'text',
+            ),
+            html: BuiltValueNullFieldError.checkNotNull(
+              html,
+              r'MailPreviewDto',
+              'html',
+            ),
+            missingVariables: missingVariables.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'missingVariables';
+        missingVariables.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+          r'MailPreviewDto',
+          _$failedField,
+          e.toString(),
         );
+      }
+      rethrow;
+    }
     replace(_$result);
     return _$result;
   }
