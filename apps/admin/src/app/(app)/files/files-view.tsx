@@ -189,7 +189,7 @@ export function FilesView() {
                   setMimeFilter(e.target.value);
                   setPage(1);
                 }}
-                className="flex h-9 w-[140px] rounded-md border border-border bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                className="flex h-9 w-[140px] rounded-md border border-border bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 {mimeOptions.map((opt) => (
                   <option key={opt.value} value={opt.value}>
@@ -320,7 +320,7 @@ export function FilesView() {
                         className="text-destructive"
                         onClick={(e: React.MouseEvent) => {
                           e.stopPropagation();
-                          if (confirm(`Delete "${file.originalName}"?`)) {
+                          if (window.confirm(`Delete "${file.originalName}"?`)) {
                             deleteFile.mutate(file.id);
                           }
                         }}
@@ -333,32 +333,33 @@ export function FilesView() {
               )}
             </TableBody>
           </Table>
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between border-t border-border px-4 py-3 text-sm">
+              <p className="text-xs text-muted-foreground">
+                Page {page} of {totalPages}
+              </p>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={page <= 1}
+                  onClick={() => setPage(page - 1)}
+                >
+                  Previous
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={page >= totalPages}
+                  onClick={() => setPage(page + 1)}
+                >
+                  Next
+                </Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
-
-      <div className="flex items-center justify-between text-sm text-muted-foreground">
-        <p>
-          Page {page} of {totalPages}
-        </p>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={page <= 1}
-            onClick={() => setPage(page - 1)}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={page >= totalPages}
-            onClick={() => setPage(page + 1)}
-          >
-            Next
-          </Button>
-        </div>
-      </div>
 
       <ResourceDrawer
         open={!!selectedFile}

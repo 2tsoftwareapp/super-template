@@ -8,18 +8,20 @@ import {
   type Updater,
   useReactTable,
 } from "@tanstack/react-table";
-import { UserPlus } from "lucide-react";
+import { AlertTriangle, RefreshCw, UserPlus, Users } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
 
 import { BulkActionBar } from "@/components/bulk-action-bar";
-import { ResourcePageShell } from "@/components/resource-page-shell";
 import { ResourceTable } from "@/components/resource-table";
 import { ResourceToolbar } from "@/components/resource-toolbar";
+import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { Spinner } from "@/components/ui/spinner";
 import { useSession } from "@/hooks/use-session";
-import { adminResources } from "@/lib/admin-resources";
+import { cn } from "@/lib/utils";
 
 import type { UsersListParams, UserStatusFilter } from "./types";
 
@@ -31,7 +33,6 @@ import {
   usersSortChanged,
 } from "./sorting";
 import {
-  useAdminRolesQuery,
   useUpdateUsersStatusMutation,
   useUsersListQuery,
 } from "./use-users-queries";
@@ -41,10 +42,6 @@ import {
   serializeUsersListSearchParams,
 } from "./users-search-params";
 import { createUsersTableColumns } from "./users-table-columns";
-
-const usersResource = adminResources.find(
-  (resource) => resource.id === "users",
-)!;
 
 export function UsersView() {
   const router = useRouter();
@@ -59,8 +56,15 @@ export function UsersView() {
   const [searchInput, setSearchInput] = useState(listParams.search);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [showCreate, setShowCreate] = useState(false);
+  const [pendingAction, setPendingAction] = useState<"activate" | "block" | null>(null);
+  const [confirmBlock, setConfirmBlock] = useState<{
+    userIds: string[];
+    label: string;
+    count: number;
+  } | null>(null);
+  const [, startTransition] = useTransition();
 
-  const debouncedSearch = useDebouncedValue(searchInput);
+  const debouncedSearch = useDebouncedValue(searchInput, 500);
 
   useEffect(() => {
     setSearchInput(listParams.search);
@@ -75,7 +79,9 @@ export function UsersView() {
         return;
       }
 
-      router.replace(serialized ? `${pathname}?${serialized}` : pathname);
+      startTransition(() => {
+        router.replace(serialized ? `${pathname}?${serialized}` : pathname);
+      });
     },
     [listParams, pathname, router, searchParams],
   );
@@ -96,7 +102,6 @@ export function UsersView() {
     [listParams, debouncedSearch],
   );
 
-  const roles = useAdminRolesQuery({ enabled: showCreate });
   const users = useUsersListQuery(queryParams);
   const updateUserStatus = useUpdateUsersStatusMutation();
 
@@ -110,7 +115,36 @@ export function UsersView() {
   const totalPages = users.data?.meta?.totalPages ?? 1;
   const currentPage = users.data?.meta?.page ?? queryParams.page;
 
-  const columns = useMemo(() => createUsersTableColumns(), []);
+  const handleActivate = useCallback(
+    async (userId: string) => {
+      setPendingAction("activate");
+      try {
+        await updateUserStatus.mutateAsync({ userIds: [userId], status: "ACTIVE" });
+      } finally {
+        setPendingAction(null);
+      }
+    },
+    [updateUserStatus],
+  );
+
+  const handleBlock = useCallback(
+    (userId: string) => {
+      setConfirmBlock({ userIds: [userId], label: "this user", count: 1 });
+    },
+    [],
+  );
+
+  const columns = useMemo(
+    () =>
+      createUsersTableColumns({
+        canUpdate,
+        onActivate: handleActivate,
+        onBlock: handleBlock,
+        isDisabled: updateUserStatus.isPending,
+      }),
+    [canUpdate, handleActivate, handleBlock, updateUserStatus.isPending],
+  );
+
   const sorting = useMemo(
     () => sortingStateFromParams(queryParams),
     [queryParams],
@@ -160,11 +194,23 @@ export function UsersView() {
     .rows.map((row) => row.original.id);
   const hasFilters = Boolean(searchInput || queryParams.status !== "all");
 
-  const resultLabel = users.isLoading
-    ? "Loading users"
-    : total === 0
-      ? "No users found"
-      : `${total} users total · page ${currentPage} of ${Math.max(totalPages, 1)} · ${queryParams.limit} per page · shift+click headers to sort by multiple columns`;
+  if (session.isLoading) {
+    return <div className="flex min-h-64 items-center justify-center"><Spinner className="size-5" /></div>;
+  }
+
+  if (session.isError) {
+    return (
+      <div className="flex min-h-64 items-center justify-center">
+        <Alert variant="error" className="max-w-md">
+          <div className="flex items-center gap-2 font-semibold">
+            <AlertTriangle className="size-4" />
+            Session error
+          </div>
+          <p className="text-sm">Could not load your session. Try refreshing the page.</p>
+        </Alert>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -176,33 +222,83 @@ export function UsersView() {
         />
       ) : null}
 
-      <ResourcePageShell
-        resource={usersResource}
-        description="Manage accounts, roles, status, and operational access from one resource view."
-        isRefreshing={users.isFetching || (showCreate && roles.isFetching)}
-        onRefresh={() => {
-          void users.refetch();
-          if (showCreate) {
-            void roles.refetch();
-          }
-        }}
-        actions={
-          canCreate ? (
-            <Button onClick={() => setShowCreate(true)}>
-              <UserPlus data-icon="inline-start" />
-              New user
+      {confirmBlock ? (
+        <ConfirmDialog
+          open
+          title="Block user"
+          message={`Block ${confirmBlock.label}? Their active sessions will be revoked.`}
+          confirmLabel="Block"
+          destructive
+          loading={pendingAction === "block"}
+          onCancel={() => setConfirmBlock(null)}
+          onConfirm={async () => {
+            setPendingAction("block");
+            try {
+              await updateUserStatus.mutateAsync({ userIds: confirmBlock.userIds, status: "BLOCKED" });
+            } finally {
+              setPendingAction(null);
+              setConfirmBlock(null);
+              if (confirmBlock.count > 1) setRowSelection({});
+            }
+          }}
+        />
+      ) : null}
+
+      <div className="flex flex-col gap-5">
+        {/* Header */}
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-border bg-card">
+              <Users className="size-4 text-muted-foreground" />
+            </div>
+            <div className="min-w-0">
+              <h1 className="text-xl font-semibold tracking-tight">Users</h1>
+              <p className="truncate text-sm text-muted-foreground">
+                {users.isLoading
+                  ? "Loading…"
+                  : total === 0
+                    ? "No users yet"
+                    : `${total} user${total > 1 ? "s" : ""}`}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => void users.refetch()}
+              disabled={users.isFetching}
+            >
+              <RefreshCw className={cn("size-3", users.isFetching && "animate-spin")} />
+              Refresh
             </Button>
-          ) : null
-        }
-      >
+            {canCreate ? (
+              <Button size="sm" onClick={() => setShowCreate(true)}>
+                <UserPlus data-icon="inline-start" />
+                New user
+              </Button>
+            ) : null}
+          </div>
+        </div>
+
         <Card>
+          {users.isError ? (
+            <Alert variant="error" className="m-4 mb-0">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 font-semibold">
+                  <AlertTriangle className="size-4" />
+                  Failed to load users
+                </div>
+                <Button variant="outline" size="sm" onClick={() => void users.refetch()}>
+                  Retry
+                </Button>
+              </div>
+            </Alert>
+          ) : null}
           <ResourceToolbar
             search={searchInput}
             onSearchChange={(value) => {
               setSearchInput(value);
-              if (value === "") {
-                patchListParams({ search: "", page: 1 });
-              }
               setRowSelection({});
             }}
             searchPlaceholder="Search name or email"
@@ -229,7 +325,6 @@ export function UsersView() {
                 ))}
               </div>
             }
-            resultLabel={resultLabel}
           />
           <BulkActionBar
             selectedCount={selectedIds.length}
@@ -241,26 +336,32 @@ export function UsersView() {
                     variant="outline"
                     size="sm"
                     disabled={updateUserStatus.isPending}
-                    onClick={() =>
-                      updateUserStatus.mutate(
-                        { userIds: selectedIds, status: "ACTIVE" },
-                        { onSuccess: () => setRowSelection({}) },
-                      )
-                    }
+                    onClick={async () => {
+                      setPendingAction("activate");
+                      try {
+                        await updateUserStatus.mutateAsync({ userIds: selectedIds, status: "ACTIVE" });
+                      } finally {
+                        setPendingAction(null);
+                        setRowSelection({});
+                      }
+                    }}
                   >
+                    {pendingAction === "activate" ? <Spinner className="size-3.5" /> : null}
                     Activate
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
                     disabled={updateUserStatus.isPending}
-                    onClick={() =>
-                      updateUserStatus.mutate(
-                        { userIds: selectedIds, status: "BLOCKED" },
-                        { onSuccess: () => setRowSelection({}) },
-                      )
-                    }
+                    onClick={() => {
+                      setConfirmBlock({
+                        userIds: selectedIds,
+                        label: `${selectedIds.length} user${selectedIds.length > 1 ? "s" : ""}`,
+                        count: selectedIds.length,
+                      });
+                    }}
                   >
+                    {pendingAction === "block" ? <Spinner className="size-3.5" /> : null}
                     Block
                   </Button>
                 </>
@@ -307,7 +408,7 @@ export function UsersView() {
             />
           </CardContent>
         </Card>
-      </ResourcePageShell>
+      </div>
     </>
   );
 }

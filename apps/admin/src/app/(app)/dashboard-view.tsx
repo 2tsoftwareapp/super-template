@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Activity,
   AlertTriangle,
-  ArrowUpRight,
+  ArrowRight,
   FolderKanban,
   LogIn,
   Mail,
@@ -26,15 +26,11 @@ import type {
   UserRow,
 } from "@/lib/api-types";
 
-import { Alert } from "@/components/ui/alert";
-import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { buttonVariants } from "@/components/ui/button-variants";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -51,25 +47,16 @@ import { useSession } from "@/hooks/use-session";
 import { webFetch } from "@/lib/http";
 import { cn } from "@/lib/utils";
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
 function timeAgo(dateStr: string | undefined | null): string {
   if (!dateStr) return "—";
   const diff = Date.now() - new Date(dateStr).getTime();
   const s = Math.floor(diff / 1000);
-  if (s < 60) return "just now";
+  if (s < 60) return "now";
   const m = Math.floor(s / 60);
-  if (m < 60) return `${m}m ago`;
+  if (m < 60) return `${m}m`;
   const h = Math.floor(m / 60);
-  if (h < 24) return `${h}h ago`;
-  return `${Math.floor(h / 24)}d ago`;
-}
-
-function greeting(): string {
-  const h = new Date().getHours();
-  if (h < 12) return "Good morning";
-  if (h < 17) return "Good afternoon";
-  return "Good evening";
+  if (h < 24) return `${h}h`;
+  return `${Math.floor(h / 24)}d`;
 }
 
 function formatAction(action: string): string {
@@ -82,210 +69,66 @@ function formatAction(action: string): string {
 function statusVariant(status: string): "default" | "secondary" | "outline" {
   const s = status.toLowerCase();
   if (s === "active" || s === "completed") return "default";
-  if (s === "pending" || s === "processing" || s === "running")
-    return "secondary";
+  if (s === "pending" || s === "processing" || s === "running") return "secondary";
   return "outline";
 }
 
-// ── Audit icon config ─────────────────────────────────────────────────────────
-
-function auditIconConfig(action: string): {
-  icon: ReactNode;
-  bg: string;
-  fg: string;
-} {
+function auditIcon(action: string) {
   if (action.startsWith("user"))
-    return {
-      icon: <Users className="size-3.5" />,
-      bg: "bg-blue-500/10",
-      fg: "text-blue-600 dark:text-blue-400",
-    };
-  if (
-    action.startsWith("auth") ||
-    action.startsWith("login") ||
-    action.startsWith("session")
-  )
-    return {
-      icon: <LogIn className="size-3.5" />,
-      bg: "bg-emerald-500/10",
-      fg: "text-emerald-600 dark:text-emerald-400",
-    };
+    return { icon: <Users className="size-3" />, c: "text-blue-600 dark:text-blue-400" };
+  if (action.startsWith("auth") || action.startsWith("login"))
+    return { icon: <LogIn className="size-3" />, c: "text-emerald-600 dark:text-emerald-400" };
   if (action.startsWith("project"))
-    return {
-      icon: <FolderKanban className="size-3.5" />,
-      bg: "bg-violet-500/10",
-      fg: "text-violet-600 dark:text-violet-400",
-    };
+    return { icon: <FolderKanban className="size-3" />, c: "text-violet-600 dark:text-violet-400" };
   if (action.startsWith("job"))
-    return {
-      icon: <Workflow className="size-3.5" />,
-      bg: "bg-amber-500/10",
-      fg: "text-amber-600 dark:text-amber-400",
-    };
+    return { icon: <Workflow className="size-3" />, c: "text-amber-600 dark:text-amber-400" };
   if (action.startsWith("mail"))
-    return {
-      icon: <Mail className="size-3.5" />,
-      bg: "bg-sky-500/10",
-      fg: "text-sky-600 dark:text-sky-400",
-    };
-  return {
-    icon: <Activity className="size-3.5" />,
-    bg: "bg-muted",
-    fg: "text-muted-foreground",
-  };
+    return { icon: <Mail className="size-3" />, c: "text-sky-600 dark:text-sky-400" };
+  return { icon: <Activity className="size-3" />, c: "text-muted-foreground" };
 }
 
-// ── Sub-components ────────────────────────────────────────────────────────────
+const QUICK_ACTIONS = [
+  { href: "/users", label: "Users", icon: Users, c: "text-blue-600 dark:text-blue-400" },
+  { href: "/projects", label: "Projects", icon: FolderKanban, c: "text-emerald-600 dark:text-emerald-400" },
+  { href: "/jobs", label: "Jobs", icon: Workflow, c: "text-amber-600 dark:text-amber-400" },
+  { href: "/mail", label: "Mail", icon: Mail, c: "text-sky-600 dark:text-sky-400" },
+  { href: "/notifications", label: "Notify", icon: Megaphone, c: "text-rose-600 dark:text-rose-400" },
+  { href: "/audit-logs", label: "Audit", icon: Shield, c: "text-violet-600 dark:text-violet-400" },
+];
 
-function KpiCard({
-  title,
-  value,
-  sub,
-  icon,
-  iconBg,
-  loading,
-  href,
-}: {
-  title: string;
-  value: string | number;
-  sub: string | ReactNode;
-  icon: ReactNode;
-  iconBg?: string;
-  loading?: boolean;
-  href?: string;
+function MiniStat({ label, value, sub, icon, loading, href, c }: {
+  label: string; value: string | number; sub: string; icon: ReactNode; c: string;
+  loading?: boolean; href?: string;
 }) {
   return (
-    <Card className="group overflow-hidden">
-      <CardContent className="pt-5 pb-4">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0 flex-1 space-y-1.5">
-            <p className="text-xs font-medium text-muted-foreground">{title}</p>
+    <Card className="group relative overflow-hidden">
+      <CardContent className="p-4">
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0 space-y-0.5">
+            <p className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">{label}</p>
             {loading ? (
-              <div className="h-8 w-14 animate-pulse rounded bg-muted" />
+              <div className="h-7 w-14 animate-pulse rounded bg-muted" />
             ) : (
-              <p className="text-3xl font-bold tracking-tight tabular-nums">
-                {value}
-              </p>
+              <p className="text-2xl font-bold tracking-tight tabular-nums">{value}</p>
             )}
-            <div className="flex items-center justify-between gap-2">
-              <p className="text-xs text-muted-foreground">{sub}</p>
-              {href && (
-                <Link
-                  href={href}
-                  className="flex shrink-0 items-center gap-0.5 text-xs text-muted-foreground underline-offset-4 opacity-0 transition-opacity hover:underline group-hover:opacity-100"
-                >
-                  View <ArrowUpRight className="size-3" />
-                </Link>
-              )}
-            </div>
+            <p className="text-[11px] text-muted-foreground">{sub}</p>
           </div>
-          <div
-            className={cn(
-              "flex size-10 shrink-0 items-center justify-center rounded-xl",
-              iconBg ?? "bg-muted",
-            )}
-          >
+          <div className={cn("flex size-9 shrink-0 items-center justify-center rounded-lg", c.replace("text-", "bg-").replace("dark:", "dark:bg-").replace("-600", "-500/10").replace("-400", "-400/15"))}>
             {icon}
           </div>
         </div>
+        {href && (
+          <Link
+            href={href}
+            className="absolute inset-0 rounded-lg ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <span className="sr-only">View {label}</span>
+          </Link>
+        )}
       </CardContent>
     </Card>
   );
 }
-
-function HealthRow({
-  label,
-  ok,
-  loading,
-  detail,
-}: {
-  label: string;
-  ok: boolean;
-  loading?: boolean;
-  detail?: string;
-}) {
-  return (
-    <div className="flex items-center justify-between py-2.5">
-      <span className="text-sm">{label}</span>
-      <div className="flex items-center gap-2">
-        {detail && (
-          <span className="text-xs text-muted-foreground">{detail}</span>
-        )}
-        {loading ? (
-          <Spinner className="size-3" />
-        ) : ok ? (
-          <span className="flex items-center gap-1.5 text-xs font-medium text-emerald-600 dark:text-emerald-400">
-            <span className="relative flex size-1.5">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
-            </span>
-            Healthy
-          </span>
-        ) : (
-          <span className="flex items-center gap-1.5 text-xs font-medium text-destructive">
-            <span className="size-1.5 rounded-full bg-destructive" />
-            Issue
-          </span>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// ── Quick action items ────────────────────────────────────────────────────────
-
-const QUICK_ACTIONS = [
-  {
-    href: "/users",
-    label: "Users",
-    desc: "Manage accounts",
-    icon: Users,
-    iconBg: "bg-blue-500/10",
-    iconFg: "text-blue-600 dark:text-blue-400",
-  },
-  {
-    href: "/projects",
-    label: "Projects",
-    desc: "View workspaces",
-    icon: FolderKanban,
-    iconBg: "bg-emerald-500/10",
-    iconFg: "text-emerald-600 dark:text-emerald-400",
-  },
-  {
-    href: "/jobs",
-    label: "Jobs",
-    desc: "Monitor queue",
-    icon: Workflow,
-    iconBg: "bg-amber-500/10",
-    iconFg: "text-amber-600 dark:text-amber-400",
-  },
-  {
-    href: "/mail",
-    label: "Mail",
-    desc: "Check deliveries",
-    icon: Mail,
-    iconBg: "bg-sky-500/10",
-    iconFg: "text-sky-600 dark:text-sky-400",
-  },
-  {
-    href: "/notifications",
-    label: "Notifications",
-    desc: "Send alerts",
-    icon: Megaphone,
-    iconBg: "bg-rose-500/10",
-    iconFg: "text-rose-600 dark:text-rose-400",
-  },
-  {
-    href: "/audit-logs",
-    label: "Audit logs",
-    desc: "Review events",
-    icon: Shield,
-    iconBg: "bg-violet-500/10",
-    iconFg: "text-violet-600 dark:text-violet-400",
-  },
-] as const;
-
-// ── Page ──────────────────────────────────────────────────────────────────────
 
 export function DashboardView() {
   const session = useSession();
@@ -293,37 +136,28 @@ export function DashboardView() {
 
   const users = useQuery({
     queryKey: ["admin-users-overview"],
-    queryFn: () =>
-      webFetch<ListResponse<UserRow>>("/api/bff/admin/users?limit=8"),
+    queryFn: () => webFetch<ListResponse<UserRow>>("/api/bff/admin/users?limit=5"),
     staleTime: 30_000,
   });
-
   const projects = useQuery({
     queryKey: ["admin-projects-overview"],
-    queryFn: () =>
-      webFetch<ListResponse<ProjectRow>>("/api/bff/projects?limit=6"),
+    queryFn: () => webFetch<ListResponse<ProjectRow>>("/api/bff/projects?limit=5"),
     staleTime: 30_000,
   });
-
   const jobs = useQuery({
     queryKey: ["admin-jobs-summary"],
-    queryFn: () =>
-      webFetch<ListResponse<JobDto>>("/api/bff/admin/jobs?limit=100"),
+    queryFn: () => webFetch<ListResponse<JobDto>>("/api/bff/admin/jobs?limit=100"),
     staleTime: 15_000,
   });
-
   const auditLogs = useQuery({
     queryKey: ["admin-audit-summary"],
-    queryFn: () =>
-      webFetch<ListResponse<AuditLogDto>>("/api/bff/admin/audit-logs?limit=10"),
+    queryFn: () => webFetch<ListResponse<AuditLogDto>>("/api/bff/admin/audit-logs?limit=6"),
     staleTime: 15_000,
   });
-
   const health = useQuery({
     queryKey: ["admin-health"],
     queryFn: () => webFetch<{ data: { status: string } }>("/api/bff/health"),
-    staleTime: 10_000,
-    retry: 1,
+    staleTime: 10_000, retry: 1,
   });
 
   const jobStats = useMemo(() => {
@@ -335,272 +169,119 @@ export function DashboardView() {
     };
   }, [jobs.data]);
 
-  const isRefreshing =
-    users.isFetching ||
-    projects.isFetching ||
-    jobs.isFetching ||
-    auditLogs.isFetching ||
-    health.isFetching;
-
+  const isRefreshing = users.isFetching || projects.isFetching || jobs.isFetching || auditLogs.isFetching || health.isFetching;
   const refreshAll = () => void queryClient.invalidateQueries();
 
   if (session.isLoading) {
-    return (
-      <div className="flex min-h-64 items-center justify-center">
-        <Spinner className="size-5" />
-      </div>
-    );
+    return <div className="flex min-h-64 items-center justify-center"><Spinner className="size-5" /></div>;
   }
 
   const userName = session.data?.data.user.displayName ?? "Admin";
   const permissionCount = session.data?.data.permissions.length ?? 0;
   const totalUsers = users.data?.meta?.total ?? users.data?.data.length ?? 0;
-  const totalProjects =
-    projects.data?.meta?.total ?? projects.data?.data.length ?? 0;
+  const totalProjects = projects.data?.meta?.total ?? projects.data?.data.length ?? 0;
   const isHealthy = !health.isError && health.data?.data?.status === "ok";
   const activeJobs = jobStats.pending + jobStats.running;
-  const today = new Date().toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-  });
 
   return (
-    <div className="space-y-6">
-      {/* ── Header ── */}
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <Avatar name={userName} size="lg" />
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight">
-              {greeting()}, {userName}
-            </h1>
-            <p className="mt-0.5 text-sm text-muted-foreground">{today}</p>
-          </div>
+    <div className="space-y-5">
+      {/* Header */}
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <h1 className="text-xl font-semibold tracking-tight">Dashboard</h1>
+          <p className="text-sm text-muted-foreground">
+            Welcome back, <span className="font-medium text-foreground">{userName}</span>
+          </p>
         </div>
         <div className="flex items-center gap-2">
-          <div
-            className={cn(
-              "flex items-center gap-2 rounded-lg border px-3 py-1.5",
-              health.isFetching
-                ? "border-border bg-card"
-                : isHealthy
-                  ? "border-emerald-200 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-950/30"
-                  : "border-destructive/30 bg-destructive/5",
-            )}
-          >
+          <span className={cn(
+            "inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-[11px] font-medium",
+            health.isFetching ? "border-border" : isHealthy
+              ? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-400"
+              : "border-destructive/30 bg-destructive/5 text-destructive",
+          )}>
             {health.isFetching ? (
-              <Spinner className="size-3" />
-            ) : isHealthy ? (
-              <span className="relative flex size-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
-                <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
-              </span>
+              <Spinner className="size-2.5" />
             ) : (
-              <span className="size-2 rounded-full bg-destructive" />
+              <span className={cn("size-1.5 rounded-full", isHealthy ? "bg-emerald-500" : "bg-destructive")} />
             )}
-            <span
-              className={cn(
-                "text-xs font-medium",
-                !health.isFetching &&
-                  isHealthy &&
-                  "text-emerald-700 dark:text-emerald-400",
-                !health.isFetching && !isHealthy && "text-destructive",
-              )}
-            >
-              {health.isFetching
-                ? "Checking…"
-                : isHealthy
-                  ? "All systems go"
-                  : "API unreachable"}
-            </span>
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={refreshAll}
-            disabled={isRefreshing}
-          >
-            <RefreshCw
-              className={cn("size-3.5", isRefreshing && "animate-spin")}
-            />
-            {isRefreshing ? "Refreshing…" : "Refresh"}
+            {health.isFetching ? "Checking…" : isHealthy ? "All healthy" : "Degraded"}
+          </span>
+          <Button variant="outline" size="sm" onClick={refreshAll} disabled={isRefreshing}>
+            <RefreshCw className={cn("size-3", isRefreshing && "animate-spin")} />
+            {isRefreshing ? "" : "Refresh"}
           </Button>
         </div>
       </div>
 
-      {/* ── Failed jobs alert ── */}
+      {/* Failed jobs */}
       {!jobs.isLoading && jobStats.failed > 0 && (
-        <Alert variant="warning">
-          <div className="flex items-center gap-2">
-            <AlertTriangle className="size-4 shrink-0" />
-            <span>
-              <strong>
-                {jobStats.failed} job{jobStats.failed > 1 ? "s" : ""} failed.
-              </strong>{" "}
-              <Link
-                href="/jobs"
-                className="underline underline-offset-4 hover:no-underline"
-              >
-                Review in Jobs →
-              </Link>
-            </span>
-          </div>
-        </Alert>
+        <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3.5 py-2.5 text-sm dark:border-amber-900 dark:bg-amber-950/20">
+          <AlertTriangle className="size-4 shrink-0 text-amber-600 dark:text-amber-400" />
+          <span className="text-amber-800 dark:text-amber-300">
+            <strong>{jobStats.failed} job{jobStats.failed > 1 ? "s" : ""} failed.</strong>{" "}
+            <Link href="/jobs" className="underline underline-offset-4 hover:no-underline">Review in Jobs →</Link>
+          </span>
+        </div>
       )}
 
-      {/* ── KPI row ── */}
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <KpiCard
-          title="Total users"
-          value={totalUsers}
-          sub="registered accounts"
-          icon={<Users className="size-4 text-blue-600 dark:text-blue-400" />}
-          iconBg="bg-blue-500/10"
-          href="/users"
-          loading={users.isLoading}
-        />
-        <KpiCard
-          title="Projects"
-          value={totalProjects}
-          sub="active workspaces"
-          icon={
-            <FolderKanban className="size-4 text-emerald-600 dark:text-emerald-400" />
-          }
-          iconBg="bg-emerald-500/10"
-          href="/projects"
-          loading={projects.isLoading}
-        />
-        <KpiCard
-          title="Jobs active"
-          value={activeJobs}
-          sub={
-            jobStats.failed > 0
-              ? `${jobStats.failed} failed · ${jobStats.pending} pending`
-              : `${jobStats.pending} pending · none failed`
-          }
-          icon={
-            <Workflow
-              className={cn(
-                "size-4",
-                jobStats.failed > 0
-                  ? "text-destructive"
-                  : "text-amber-600 dark:text-amber-400",
-              )}
-            />
-          }
-          iconBg={jobStats.failed > 0 ? "bg-destructive/10" : "bg-amber-500/10"}
-          href="/jobs"
-          loading={jobs.isLoading}
-        />
-        <KpiCard
-          title="Permissions"
-          value={permissionCount}
-          sub="granted to your role"
-          icon={
-            <ShieldCheck className="size-4 text-violet-600 dark:text-violet-400" />
-          }
-          iconBg="bg-violet-500/10"
-        />
+      {/* KPI row */}
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <MiniStat label="Users" value={totalUsers} sub="Registered accounts" icon={<Users className="size-4 text-blue-600 dark:text-blue-400" />} c="text-blue-600 dark:text-blue-400" href="/users" loading={users.isLoading} />
+        <MiniStat label="Projects" value={totalProjects} sub="Active workspaces" icon={<FolderKanban className="size-4 text-emerald-600 dark:text-emerald-400" />} c="text-emerald-600 dark:text-emerald-400" href="/projects" loading={projects.isLoading} />
+        <MiniStat label="Jobs active" value={activeJobs} sub={jobStats.failed > 0 ? `${jobStats.failed} failed · ${jobStats.pending} pending` : `${jobStats.pending} pending`} icon={<Workflow className={cn("size-4", jobStats.failed > 0 ? "text-destructive" : "text-amber-600 dark:text-amber-400")} />} c={jobStats.failed > 0 ? "text-destructive" : "text-amber-600 dark:text-amber-400"} href="/jobs" loading={jobs.isLoading} />
+        <MiniStat label="Permissions" value={permissionCount} sub="Granted to your role" icon={<ShieldCheck className="size-4 text-violet-600 dark:text-violet-400" />} c="text-violet-600 dark:text-violet-400" />
       </div>
 
-      {/* ── Main grid ── */}
-      <div className="grid gap-6 xl:grid-cols-[1fr_340px]">
-        {/* ── Left column ── */}
-        <div className="space-y-6">
-          {/* Recent users */}
+      {/* Main grid */}
+      <div className="grid gap-5 xl:grid-cols-[1fr_320px]">
+        {/* Left */}
+        <div className="space-y-5">
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-              <div>
-                <CardTitle className="text-base">Recent users</CardTitle>
-                <CardDescription className="text-xs">
-                  Latest registered accounts
-                </CardDescription>
-              </div>
-              <Link
-                href="/users"
-                className={cn(
-                  buttonVariants({ variant: "outline", size: "sm" }),
-                  "text-xs",
-                )}
-              >
-                View all
-                <ArrowUpRight className="size-3" />
-              </Link>
+            <CardHeader className="flex flex-row items-center justify-between px-4 py-3">
+              <CardTitle className="text-sm font-semibold">Recent users</CardTitle>
+              <Link href="/users" className="text-xs text-muted-foreground hover:text-foreground transition-colors">View all <ArrowRight className="inline size-3" /></Link>
             </CardHeader>
-            <CardContent className="p-0 pb-1">
+            <CardContent className="p-0">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>User</TableHead>
-                    <TableHead className="hidden sm:table-cell">
-                      Roles
-                    </TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="hidden md:table-cell">
-                      Joined
-                    </TableHead>
+                    <TableHead className="h-8 px-3 text-[11px] font-medium">User</TableHead>
+                    <TableHead className="h-8 px-3 text-[11px] font-medium hidden sm:table-cell">Roles</TableHead>
+                    <TableHead className="h-8 px-3 text-[11px] font-medium">Status</TableHead>
+                    <TableHead className="h-8 px-3 text-[11px] font-medium hidden md:table-cell">Joined</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {users.isLoading ? (
-                    <TableRow>
-                      <TableCell colSpan={4} className="py-10 text-center">
-                        <Spinner className="mx-auto size-4" />
-                      </TableCell>
-                    </TableRow>
+                    <TableRow><TableCell colSpan={4} className="py-8 text-center"><Spinner className="mx-auto size-4" /></TableCell></TableRow>
                   ) : (users.data?.data ?? []).length === 0 ? (
-                    <TableRow>
-                      <TableCell
-                        colSpan={4}
-                        className="py-10 text-center text-sm text-muted-foreground"
-                      >
-                        No users yet
-                      </TableCell>
-                    </TableRow>
+                    <TableRow><TableCell colSpan={4} className="py-8 text-center text-xs text-muted-foreground">No users yet</TableCell></TableRow>
                   ) : (
                     (users.data?.data ?? []).map((user) => (
                       <TableRow key={user.id} className="cursor-pointer">
-                        <TableCell>
-                          <div className="flex items-center gap-2.5">
-                            <Avatar name={user.displayName} size="sm" />
-                            <div className="min-w-0">
-                              <Link
-                                href={`/users/${user.id}`}
-                                className="block truncate text-sm font-medium hover:underline"
-                              >
-                                {user.displayName}
-                              </Link>
-                              <p className="truncate text-xs text-muted-foreground">
-                                {user.email}
-                              </p>
+                        <TableCell className="px-3 py-2.5">
+                          <Link href={`/users/${user.id}`} className="flex items-center gap-2.5">
+                            <div className="flex size-7 items-center justify-center rounded-full bg-muted text-[11px] font-medium text-muted-foreground">
+                              {user.displayName.charAt(0).toUpperCase()}
                             </div>
-                          </div>
+                            <div className="min-w-0">
+                              <p className="truncate text-sm font-medium leading-tight">{user.displayName}</p>
+                              <p className="truncate text-[11px] text-muted-foreground leading-tight">{user.email}</p>
+                            </div>
+                          </Link>
                         </TableCell>
-                        <TableCell className="hidden sm:table-cell">
+                        <TableCell className="px-3 py-2.5 hidden sm:table-cell">
                           <div className="flex flex-wrap gap-1">
                             {(user.roles ?? []).slice(0, 2).map((role) => (
-                              <Badge
-                                key={role}
-                                variant="secondary"
-                                className="text-xs capitalize"
-                              >
-                                {role}
-                              </Badge>
+                              <Badge key={role} variant="secondary" className="text-[10px] px-1.5 py-0">{role}</Badge>
                             ))}
                           </div>
                         </TableCell>
-                        <TableCell>
-                          <Badge
-                            variant={statusVariant(user.status)}
-                            className="capitalize text-xs"
-                          >
-                            {user.status.toLowerCase()}
-                          </Badge>
+                        <TableCell className="px-3 py-2.5">
+                          <Badge variant={statusVariant(user.status)} className="text-[10px] px-1.5 py-0 capitalize">{user.status.toLowerCase()}</Badge>
                         </TableCell>
-                        <TableCell className="hidden md:table-cell text-xs text-muted-foreground">
-                          {timeAgo(user.createdAt)}
-                        </TableCell>
+                        <TableCell className="px-3 py-2.5 text-[11px] text-muted-foreground hidden md:table-cell">{timeAgo(user.createdAt)}</TableCell>
                       </TableRow>
                     ))
                   )}
@@ -609,83 +290,41 @@ export function DashboardView() {
             </CardContent>
           </Card>
 
-          {/* Recent projects */}
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-              <div>
-                <CardTitle className="text-base">Recent projects</CardTitle>
-                <CardDescription className="text-xs">
-                  Latest workspace activity
-                </CardDescription>
-              </div>
-              <Link
-                href="/projects"
-                className={cn(
-                  buttonVariants({ variant: "outline", size: "sm" }),
-                  "text-xs",
-                )}
-              >
-                View all
-                <ArrowUpRight className="size-3" />
-              </Link>
+            <CardHeader className="flex flex-row items-center justify-between px-4 py-3">
+              <CardTitle className="text-sm font-semibold">Recent projects</CardTitle>
+              <Link href="/projects" className="text-xs text-muted-foreground hover:text-foreground transition-colors">View all <ArrowRight className="inline size-3" /></Link>
             </CardHeader>
-            <CardContent className="p-0 pb-1">
+            <CardContent className="p-0">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Project</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="hidden sm:table-cell">
-                      Updated
-                    </TableHead>
-                    <TableHead />
+                    <TableHead className="h-8 px-3 text-[11px] font-medium">Project</TableHead>
+                    <TableHead className="h-8 px-3 text-[11px] font-medium">Status</TableHead>
+                    <TableHead className="h-8 px-3 text-[11px] font-medium hidden sm:table-cell">Updated</TableHead>
+                    <TableHead className="h-8 px-3 text-[11px] font-medium" />
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {projects.isLoading ? (
-                    <TableRow>
-                      <TableCell colSpan={4} className="py-10 text-center">
-                        <Spinner className="mx-auto size-4" />
-                      </TableCell>
-                    </TableRow>
+                    <TableRow><TableCell colSpan={4} className="py-8 text-center"><Spinner className="mx-auto size-4" /></TableCell></TableRow>
                   ) : (projects.data?.data ?? []).length === 0 ? (
-                    <TableRow>
-                      <TableCell
-                        colSpan={4}
-                        className="py-10 text-center text-sm text-muted-foreground"
-                      >
-                        No projects yet
-                      </TableCell>
-                    </TableRow>
+                    <TableRow><TableCell colSpan={4} className="py-8 text-center text-xs text-muted-foreground">No projects yet</TableCell></TableRow>
                   ) : (
                     (projects.data?.data ?? []).map((project) => (
                       <TableRow key={project.id}>
-                        <TableCell>
-                          <p className="text-sm font-medium">{project.name}</p>
+                        <TableCell className="px-3 py-2.5">
+                          <p className="text-sm font-medium leading-tight">{project.name}</p>
                           {project.description ? (
-                            <p className="max-w-[220px] truncate text-xs text-muted-foreground">
-                              {String(project.description)}
-                            </p>
+                            <p className="max-w-[200px] truncate text-[11px] text-muted-foreground leading-tight">{String(project.description)}</p>
                           ) : null}
                         </TableCell>
-                        <TableCell>
-                          <Badge
-                            variant={statusVariant(project.status)}
-                            className="capitalize text-xs"
-                          >
-                            {project.status.toLowerCase()}
-                          </Badge>
+                        <TableCell className="px-3 py-2.5">
+                          <Badge variant={statusVariant(project.status)} className="text-[10px] px-1.5 py-0 capitalize">{project.status.toLowerCase()}</Badge>
                         </TableCell>
-                        <TableCell className="hidden sm:table-cell text-xs text-muted-foreground">
-                          {timeAgo(project.updatedAt)}
-                        </TableCell>
-                        <TableCell>
-                          <Link
-                            href={`/projects/${project.id}`}
-                            className="text-xs text-muted-foreground underline-offset-4 hover:underline"
-                          >
-                            Open
-                          </Link>
+                        <TableCell className="px-3 py-2.5 text-[11px] text-muted-foreground hidden sm:table-cell">{timeAgo(project.updatedAt)}</TableCell>
+                        <TableCell className="px-3 py-2.5">
+                          <Link href={`/projects/${project.id}`} className="text-[11px] text-muted-foreground hover:text-foreground transition-colors">Open</Link>
                         </TableCell>
                       </TableRow>
                     ))
@@ -696,133 +335,84 @@ export function DashboardView() {
           </Card>
         </div>
 
-        {/* ── Right column ── */}
+        {/* Right column */}
         <div className="space-y-4">
-          {/* System health */}
+          {/* Quick actions */}
           <Card>
-            <CardHeader className="pb-1">
-              <CardTitle className="text-base">System health</CardTitle>
+            <CardHeader className="px-4 py-3">
+              <CardTitle className="text-sm font-semibold">Quick access</CardTitle>
             </CardHeader>
-            <CardContent className="divide-y divide-border px-5 pb-2">
-              <HealthRow
-                label="API"
-                ok={isHealthy}
-                loading={health.isLoading}
-              />
-              <HealthRow
-                label="Database"
-                ok={isHealthy}
-                loading={health.isLoading}
-              />
-              <HealthRow
-                label="Job queue"
-                ok={jobStats.failed === 0}
-                loading={jobs.isLoading}
-                detail={
-                  jobStats.failed > 0
-                    ? `${jobStats.failed} failed`
-                    : `${jobStats.pending} pending`
-                }
-              />
+            <CardContent className="grid grid-cols-3 gap-2 px-4 pb-4">
+              {QUICK_ACTIONS.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link key={item.href} href={item.href}
+                    className="flex flex-col items-center gap-1 rounded-lg border border-border p-2.5 text-center transition-colors hover:bg-muted"
+                  >
+                    <Icon className={cn("size-4", item.c)} />
+                    <span className="text-[11px] font-medium leading-tight">{item.label}</span>
+                  </Link>
+                );
+              })}
             </CardContent>
           </Card>
 
-          {/* Live audit feed */}
+          {/* System health */}
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-base">Recent activity</CardTitle>
-              <Link
-                href="/audit-logs"
-                className="text-xs text-muted-foreground underline-offset-4 hover:underline"
-              >
-                All logs
-              </Link>
+            <CardHeader className="px-4 py-3">
+              <CardTitle className="text-sm font-semibold">System health</CardTitle>
             </CardHeader>
-            <CardContent className="px-4 pb-2">
-              {auditLogs.isLoading ? (
-                <div className="flex justify-center py-6">
-                  <Spinner className="size-4" />
+            <CardContent className="space-y-0 px-4 pb-3">
+              {[
+                { label: "API", ok: isHealthy },
+                { label: "Database", ok: isHealthy },
+                { label: "Job queue", ok: jobStats.failed === 0, detail: jobStats.failed > 0 ? `${jobStats.failed} failed` : `${jobStats.pending} pending` },
+              ].map((item) => (
+                <div key={item.label} className="flex items-center justify-between py-1.5 text-sm">
+                  <span className="text-muted-foreground">{item.label}</span>
+                  <div className="flex items-center gap-2">
+                    {item.detail && <span className="text-[11px] text-muted-foreground">{item.detail}</span>}
+                    <span className={cn(
+                      "inline-flex items-center gap-1 text-[11px] font-medium",
+                      item.ok ? "text-emerald-600 dark:text-emerald-400" : "text-destructive",
+                    )}>
+                      <span className={cn("size-1.5 rounded-full", item.ok ? "bg-emerald-500" : "bg-destructive")} />
+                      {item.ok ? "OK" : "Issue"}
+                    </span>
+                  </div>
                 </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          {/* Recent activity */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between px-4 py-3">
+              <CardTitle className="text-sm font-semibold">Activity</CardTitle>
+              <Link href="/audit-logs" className="text-xs text-muted-foreground hover:text-foreground transition-colors">All</Link>
+            </CardHeader>
+            <CardContent className="px-4 pb-3">
+              {auditLogs.isLoading ? (
+                <div className="flex justify-center py-4"><Spinner className="size-4" /></div>
               ) : (auditLogs.data?.data ?? []).length === 0 ? (
-                <p className="py-6 text-center text-xs text-muted-foreground">
-                  No recent activity
-                </p>
+                <p className="py-4 text-center text-xs text-muted-foreground">No recent activity</p>
               ) : (
                 <div className="divide-y divide-border">
                   {(auditLogs.data?.data ?? []).map((entry) => {
-                    const { icon, bg, fg } = auditIconConfig(entry.action);
-                    const actorId =
-                      typeof entry.actorId === "string" && entry.actorId
-                        ? entry.actorId
-                        : null;
+                    const { icon, c } = auditIcon(entry.action);
                     return (
-                      <div
-                        key={entry.id}
-                        className="flex items-start gap-2.5 py-2.5"
-                      >
-                        <div
-                          className={cn(
-                            "mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full",
-                            bg,
-                            fg,
-                          )}
-                        >
-                          {icon}
+                      <div key={entry.id} className="flex items-start gap-2 py-2">
+                        <span className={cn("mt-0.5", c)}>{icon}</span>
+                        <div className="min-w-0 flex-1 leading-tight">
+                          <p className="text-[11px] font-medium">{formatAction(entry.action)}</p>
+                          <p className="text-[11px] text-muted-foreground">{entry.entityType}</p>
                         </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-xs font-medium leading-snug">
-                            {formatAction(entry.action)}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {entry.entityType}
-                            {actorId ? ` · ${actorId.slice(0, 8)}` : ""}
-                          </p>
-                        </div>
-                        <span className="shrink-0 whitespace-nowrap text-xs text-muted-foreground">
-                          {timeAgo(entry.createdAt)}
-                        </span>
+                        <span className="shrink-0 text-[11px] text-muted-foreground">{timeAgo(entry.createdAt)}</span>
                       </div>
                     );
                   })}
                 </div>
               )}
-            </CardContent>
-          </Card>
-
-          {/* Quick actions */}
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base">Quick actions</CardTitle>
-              <CardDescription className="text-xs">
-                Navigate to common pages
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="grid grid-cols-3 gap-2 pb-4">
-              {QUICK_ACTIONS.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className="group flex flex-col items-center gap-1.5 rounded-xl border border-border p-3 text-center transition-colors hover:bg-muted"
-                  >
-                    <div
-                      className={cn(
-                        "flex size-8 items-center justify-center rounded-lg transition-transform group-hover:scale-110",
-                        item.iconBg,
-                      )}
-                    >
-                      <Icon className={cn("size-4", item.iconFg)} />
-                    </div>
-                    <span className="text-xs font-medium leading-tight">
-                      {item.label}
-                    </span>
-                    <span className="text-[10px] leading-tight text-muted-foreground">
-                      {item.desc}
-                    </span>
-                  </Link>
-                );
-              })}
             </CardContent>
           </Card>
         </div>

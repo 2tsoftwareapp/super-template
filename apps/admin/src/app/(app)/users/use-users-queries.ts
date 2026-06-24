@@ -6,25 +6,17 @@ import { toast } from "sonner";
 import type {
   AdminUserDto,
   ListResponse,
-  RoleDto,
   UpdateUserStatusInput,
 } from "@/lib/api-types";
 
+import { ApiClientError } from "@/lib/http";
 import { webFetch } from "@/lib/http";
 
 import type { UsersListParams } from "./types";
 
 import { buildUsersListPath } from "./api";
-import { ROLES_QUERY_KEY, USERS_QUERY_KEY } from "./constants";
+import { USERS_QUERY_KEY } from "./constants";
 import { usersSortKey } from "./sorting";
-
-export function useAdminRolesQuery(options?: { enabled?: boolean }) {
-  return useQuery({
-    queryKey: [ROLES_QUERY_KEY],
-    queryFn: () => webFetch<ListResponse<RoleDto>>("/api/bff/admin/roles"),
-    enabled: options?.enabled ?? true,
-  });
-}
 
 export function useUsersListQuery(params: UsersListParams) {
   const listPath = buildUsersListPath(params);
@@ -40,14 +32,14 @@ export function useUpdateUsersStatusMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
+    mutationFn: async ({
       userIds,
       status,
     }: {
       userIds: string[];
       status: UpdateUserStatusInput["status"];
-    }) =>
-      Promise.all(
+    }) => {
+      const results = await Promise.allSettled(
         userIds.map((userId) =>
           webFetch<{ data: AdminUserDto }>(
             `/api/bff/admin/users/${userId}/status`,
@@ -57,10 +49,36 @@ export function useUpdateUsersStatusMutation() {
             },
           ),
         ),
-      ),
-    onSuccess: async (_result, variables) => {
+      );
+
+      const succeeded = results.filter(
+        (r) => r.status === "fulfilled",
+      ).length;
+      const failed = results.filter((r) => r.status === "rejected").length;
+
+      if (failed > 0 && succeeded === 0) {
+        const first = results.find(
+          (r) => r.status === "rejected",
+        )!;
+        throw first.reason;
+      }
+
+      return { succeeded, failed, total: userIds.length };
+    },
+    onSuccess: async ({ succeeded, failed, total }) => {
       await queryClient.invalidateQueries({ queryKey: [USERS_QUERY_KEY] });
-      toast.success(`${variables.userIds.length} users updated`);
+      if (failed > 0) {
+        toast.error(`${failed} of ${total} failed`);
+      } else {
+        toast.success(`${succeeded} user${succeeded > 1 ? "s" : ""} updated`);
+      }
+    },
+    onError: (error) => {
+      const message =
+        error instanceof ApiClientError
+          ? error.message
+          : "Could not update user status";
+      toast.error(message);
     },
   });
 }

@@ -111,6 +111,7 @@ export function AuditLogsView() {
       isRefreshing={auditLogs.isFetching}
       onRefresh={() => void auditLogs.refetch()}
     >
+      {/* Events table */}
       <Card>
         <ResourceToolbar
           search={actorId}
@@ -122,60 +123,66 @@ export function AuditLogsView() {
           hasFilters={hasFilters}
           onClearFilters={clearFilters}
           filters={
-            <div className="flex flex-wrap gap-2">
+            <div className="grid min-w-0 grid-cols-2 gap-2 md:flex md:flex-wrap">
               <Input
-                placeholder="Action, e.g. user.created"
+                aria-label="Filter by action"
+                placeholder="Action"
                 value={action}
                 onChange={(event) => {
                   setAction(event.target.value);
                   setPage(1);
                 }}
-                className="md:max-w-sm"
+                className="md:max-w-[180px]"
               />
               <Input
-                placeholder="Resource type"
+                aria-label="Filter by resource type"
+                placeholder="Resource"
                 value={resourceType}
                 onChange={(event) => {
                   setResourceType(event.target.value);
                   setPage(1);
                 }}
-                className="md:max-w-[140px]"
+                className="md:max-w-[120px]"
               />
               <Input
-                placeholder="Resource ID"
+                aria-label="Filter by resource ID"
+                placeholder="Res ID"
                 value={resourceId}
                 onChange={(event) => {
                   setResourceId(event.target.value);
                   setPage(1);
                 }}
-                className="md:max-w-[140px]"
+                className="md:max-w-[120px]"
               />
               <Input
                 type="date"
+                aria-label="Filter from date"
                 value={from}
                 onChange={(event) => {
                   setFrom(event.target.value);
                   setPage(1);
                 }}
-                className="md:max-w-[150px]"
+                className="md:max-w-[140px]"
               />
               <Input
                 type="date"
+                aria-label="Filter to date"
                 value={to}
                 onChange={(event) => {
                   setTo(event.target.value);
                   setPage(1);
                 }}
-                className="md:max-w-[150px]"
+                className="md:max-w-[140px]"
               />
               <Input
-                placeholder="Free-text search"
+                aria-label="Free-text search"
+                placeholder="Search"
                 value={q}
                 onChange={(event) => {
                   setQ(event.target.value);
                   setPage(1);
                 }}
-                className="md:max-w-[160px]"
+                className="md:max-w-[140px]"
               />
             </div>
           }
@@ -199,10 +206,6 @@ export function AuditLogsView() {
               : "Latest logs returned by the API."
           }
         />
-      </Card>
-
-      {/* Events table */}
-      <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-base">Events</CardTitle>
           <CardDescription className="text-xs">

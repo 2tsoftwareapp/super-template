@@ -3,7 +3,7 @@ import {
   type Table as ReactTable,
   type Row,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowUpDown } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -54,11 +54,15 @@ export function ResourceTable<T>({
               return (
                 <TableHead
                   key={header.id}
-                  className={cn(canSort && "cursor-pointer select-none")}
+                  className={cn(
+                    canSort && "cursor-pointer select-none",
+                    sorted && "text-foreground",
+                    (header.column.columnDef.meta as { className?: string } | undefined)?.className,
+                  )}
                   onClick={header.column.getToggleSortingHandler()}
                 >
                   {header.isPlaceholder ? null : (
-                    <span className="inline-flex items-center gap-1">
+                    <span className="inline-flex items-center gap-1.5">
                       {flexRender(
                         header.column.columnDef.header,
                         header.getContext(),
@@ -69,13 +73,22 @@ export function ResourceTable<T>({
                         </span>
                       ) : null}
                       {canSort ? (
-                        sorted === "asc" ? (
-                          <ChevronUp />
-                        ) : sorted === "desc" ? (
-                          <ChevronDown />
-                        ) : binarySort ? null : (
-                          <ArrowUpDown className="opacity-40" />
-                        )
+                        <span
+                          className={cn(
+                            "inline-flex transition-colors",
+                            sorted
+                              ? "text-muted-foreground"
+                              : "text-muted-foreground/25",
+                          )}
+                        >
+                          <ArrowUpDown
+                            className={cn(
+                              "size-3 transition-transform",
+                              sorted === "asc" && "-rotate-180",
+                              sorted === "desc" && "rotate-0",
+                            )}
+                          />
+                        </span>
                       ) : null}
                     </span>
                   )}
@@ -89,9 +102,16 @@ export function ResourceTable<T>({
         {isLoading ? (
           Array.from({ length: 6 }).map((_, index) => (
             <TableRow key={index}>
-              <TableCell colSpan={columnCount} className="px-4 py-3">
-                <Skeleton className="h-8 w-full" />
-              </TableCell>
+              {table.getAllLeafColumns().map((col) => {
+                const width = col.getSize();
+                const isCheckbox = col.id === "select";
+                const isNarrow = col.id === "status" || col.id === "actions" || width < 100;
+                return (
+                  <TableCell key={col.id} className="px-4 py-3" style={{ width: col.getSize() ? `${col.getSize()}px` : undefined }}>
+                    <Skeleton className={isCheckbox ? "size-4" : isNarrow ? "h-5 w-16" : "h-5 w-full max-w-[240px]"} />
+                  </TableCell>
+                );
+              })}
             </TableRow>
           ))
         ) : table.getRowModel().rows.length === 0 ? (
@@ -110,11 +130,14 @@ export function ResourceTable<T>({
               className={cn(onRowClick && "cursor-pointer")}
               onClick={() => onRowClick?.(row)}
             >
-              {row.getVisibleCells().map((cell) => (
-                <TableCell key={cell.id}>
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </TableCell>
-              ))}
+              {row.getVisibleCells().map((cell) => {
+                const meta = cell.column.columnDef.meta as { className?: string } | undefined;
+                return (
+                  <TableCell key={cell.id} className={meta?.className}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                );
+              })}
             </TableRow>
           ))
         )}

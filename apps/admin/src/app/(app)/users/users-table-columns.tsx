@@ -7,13 +7,23 @@ import type { AdminUserDto } from "@/lib/api-types";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { formatDateTime, statusProps, timeAgo, truncateId } from "@/lib/format";
+import { Tooltip } from "@/components/ui/tooltip";
+import { formatDateTime, statusProps, timeAgo } from "@/lib/format";
 import { formatRoleName } from "@/lib/roles";
 import { cn } from "@/lib/utils";
 
+import { ActionsDropdown } from "./actions-dropdown";
+
 const columnHelper = createColumnHelper<AdminUserDto>();
 
-export function createUsersTableColumns() {
+export function createUsersTableColumns(options?: {
+  canUpdate?: boolean;
+  onActivate?: (userId: string) => void | Promise<void>;
+  onBlock?: (userId: string) => void | Promise<void>;
+  isDisabled?: boolean;
+}) {
+  const { canUpdate, onActivate, onBlock, isDisabled } = options ?? {};
+
   return [
     columnHelper.display({
       id: "select",
@@ -40,14 +50,14 @@ export function createUsersTableColumns() {
       header: "User",
       enableSorting: true,
       cell: ({ row }) => (
-        <div className="flex items-center gap-3 py-0.5">
+        <div className="flex items-center gap-2.5 py-0.5">
           <Avatar name={row.original.displayName} size="sm" />
           <div className="min-w-0">
-            <p className="truncate text-sm font-medium">
+            <p className="truncate text-sm font-medium leading-tight">
               {row.original.displayName}
             </p>
-            <p className="truncate font-mono text-xs text-muted-foreground">
-              {truncateId(row.original.id)}
+            <p className="truncate text-[11px] text-muted-foreground leading-tight">
+              {row.original.email}
             </p>
           </div>
         </div>
@@ -56,6 +66,7 @@ export function createUsersTableColumns() {
     columnHelper.accessor("email", {
       header: "Email",
       enableSorting: true,
+      meta: { className: "hidden md:table-cell" } as const,
       cell: ({ getValue }) => (
         <span className="text-sm text-foreground">{getValue()}</span>
       ),
@@ -67,49 +78,33 @@ export function createUsersTableColumns() {
         const status = getValue();
         const { variant, className } = statusProps(status);
         return (
-          <Badge variant={variant} className={cn("capitalize", className)}>
+          <Badge variant={variant} className={cn("capitalize text-[11px] px-1.5 py-0", className)}>
             {status.toLowerCase()}
           </Badge>
-        );
-      },
-    }),
-    columnHelper.accessor("emailVerifiedAt", {
-      id: "verified",
-      header: "Email verified",
-      enableSorting: false,
-      cell: ({ getValue }) => {
-        const verifiedAt = getValue();
-        if (!verifiedAt || typeof verifiedAt !== "string") {
-          return <span className="text-xs text-muted-foreground">No</span>;
-        }
-
-        return (
-          <div className="min-w-0">
-            <Badge variant="outline" className="text-xs">
-              Yes
-            </Badge>
-            <p className="mt-1 text-xs text-muted-foreground">
-              {timeAgo(verifiedAt)}
-            </p>
-          </div>
         );
       },
     }),
     columnHelper.accessor("roles", {
       header: "Roles",
       enableSorting: false,
+      meta: { className: "hidden md:table-cell" } as const,
       cell: ({ getValue }) => {
         const roleNames = [...new Set(getValue())];
         if (!roleNames.length) {
-          return <span className="text-xs text-muted-foreground">None</span>;
+          return <span className="text-xs text-muted-foreground">—</span>;
         }
+        const visible = roleNames.slice(0, 2);
+        const overflow = roleNames.length - 2;
         return (
           <div className="flex flex-wrap gap-1">
-            {roleNames.map((role) => (
-              <Badge key={role} variant="secondary" className="text-xs">
+            {visible.map((role) => (
+              <Badge key={role} variant="secondary" className="text-[11px] px-1.5 py-0">
                 {formatRoleName(role)}
               </Badge>
             ))}
+            {overflow > 0 ? (
+              <span className="text-[11px] text-muted-foreground">+{overflow}</span>
+            ) : null}
           </div>
         );
       },
@@ -117,26 +112,44 @@ export function createUsersTableColumns() {
     columnHelper.accessor("createdAt", {
       header: "Joined",
       enableSorting: true,
+      meta: { className: "hidden md:table-cell" } as const,
       cell: ({ getValue }) => (
-        <div className="min-w-0">
-          <p className="text-xs text-foreground">{timeAgo(getValue())}</p>
-          <p className="text-xs text-muted-foreground">
-            {formatDateTime(getValue())}
-          </p>
-        </div>
+        <Tooltip content={formatDateTime(getValue())}>
+          <span className="text-sm text-foreground">{timeAgo(getValue())}</span>
+        </Tooltip>
       ),
     }),
-    columnHelper.accessor("updatedAt", {
-      header: "Updated",
+    columnHelper.display({
+      id: "actions",
       enableSorting: false,
-      cell: ({ getValue }) => (
-        <div className="min-w-0">
-          <p className="text-xs text-foreground">{timeAgo(getValue())}</p>
-          <p className="text-xs text-muted-foreground">
-            {formatDateTime(getValue())}
-          </p>
-        </div>
-      ),
+      meta: { className: "w-10" } as const,
+      header: () => <span className="sr-only">Actions</span>,
+      cell: ({ row }) => {
+        const status = row.original.status;
+        const items: { label: string; destructive?: boolean; onClick: () => void }[] = [];
+
+        if (canUpdate && status !== "ACTIVE") {
+          items.push({
+            label: "Activate",
+            onClick: () => { void onActivate?.(row.original.id); },
+          });
+        }
+        if (canUpdate && status !== "BLOCKED") {
+          items.push({
+            label: "Block",
+            destructive: true,
+            onClick: () => { void onBlock?.(row.original.id); },
+          });
+        }
+
+        if (items.length === 0) return null;
+
+        return (
+          <div onClick={(e) => e.stopPropagation()}>
+            <ActionsDropdown items={items} disabled={isDisabled ?? false} />
+          </div>
+        );
+      },
     }),
   ];
 }

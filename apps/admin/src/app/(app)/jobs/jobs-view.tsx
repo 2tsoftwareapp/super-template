@@ -9,8 +9,8 @@ import type {
   ListResponse,
 } from "@/lib/api-types";
 
-import { PageHeader } from "@/components/page-header";
 import { ResourceDrawer } from "@/components/resource-drawer";
+import { ResourcePageShell } from "@/components/resource-page-shell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -34,6 +34,7 @@ import {
 import { formatDateTime, timeAgo } from "@/lib/format";
 import { webFetch } from "@/lib/http";
 import { cn } from "@/lib/utils";
+import { adminResources } from "@/lib/admin-resources";
 
 // ── Status helpers ────────────────────────────────────────────────────────────
 
@@ -103,6 +104,8 @@ function StatChip({
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
+const jobsResource = adminResources.find((r) => r.id === "jobs")!;
+
 export function JobsView() {
   const queryClient = useQueryClient();
   const [status, setStatus] = useState("");
@@ -170,12 +173,10 @@ export function JobsView() {
   const selectedLogs = jobLogs.data?.data ?? [];
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        label="Jobs"
-        title="Background jobs"
-        description="Inspect queued jobs and cancel stalled work."
-      />
+    <ResourcePageShell
+      resource={jobsResource}
+      description="Inspect queued jobs and cancel stalled work."
+    >
 
       {/* Metrics */}
       {metrics.data?.data && (
@@ -571,6 +572,6 @@ export function JobsView() {
           </div>
         )}
       </ResourceDrawer>
-    </div>
+    </ResourcePageShell>
   );
 }

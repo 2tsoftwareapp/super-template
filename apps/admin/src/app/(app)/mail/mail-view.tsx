@@ -10,8 +10,8 @@ import type {
   SendAdminMailResultDto,
 } from "@/lib/api-types";
 
-import { PageHeader } from "@/components/page-header";
 import { ResourceDrawer } from "@/components/resource-drawer";
+import { ResourcePageShell } from "@/components/resource-page-shell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -36,6 +36,7 @@ import {
 import { formatDateTime, timeAgo } from "@/lib/format";
 import { webFetch } from "@/lib/http";
 import { cn } from "@/lib/utils";
+import { adminResources } from "@/lib/admin-resources";
 
 function mailStatusProps(status: string): {
   variant: "default" | "secondary" | "outline";
@@ -58,6 +59,8 @@ function mailStatusProps(status: string): {
     };
   return { variant: "secondary" };
 }
+
+const mailResource = adminResources.find((r) => r.id === "mail")!;
 
 export function MailView() {
   const queryClient = useQueryClient();
@@ -134,12 +137,11 @@ export function MailView() {
   });
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        label="Mail"
-        title="Mail workspace"
-        description="Review delivery history, browse templates, and send test emails."
-      />
+    <ResourcePageShell
+      resource={mailResource}
+      description="Review delivery history, browse templates, and send test emails."
+    >
+      <div className="flex-1 space-y-4">
       <div className="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
         {/* Template preview */}
         <Card>
@@ -358,6 +360,7 @@ export function MailView() {
                 Variables (JSON)
               </Label>
               <textarea
+                aria-label="Template variables as JSON"
                 className="h-20 w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 placeholder='{"displayName": "Jane"}'
                 value={sendVariables}
@@ -592,5 +595,6 @@ export function MailView() {
         )}
       </ResourceDrawer>
     </div>
+    </ResourcePageShell>
   );
 }

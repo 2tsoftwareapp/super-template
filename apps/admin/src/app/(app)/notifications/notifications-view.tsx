@@ -10,7 +10,7 @@ import type {
   SendNotificationInput,
 } from "@/lib/api-types";
 
-import { PageHeader } from "@/components/page-header";
+import { ResourcePageShell } from "@/components/resource-page-shell";
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -35,6 +35,7 @@ import {
 import { timeAgo } from "@/lib/format";
 import { webFetch } from "@/lib/http";
 import { cn } from "@/lib/utils";
+import { adminResources } from "@/lib/admin-resources";
 
 // ── Status helper (shared with jobs page concept) ─────────────────────────────
 
@@ -57,6 +58,10 @@ function jobStatusProps(status: string): {
     };
   return { variant: "outline" };
 }
+
+const notificationsResource = adminResources.find(
+  (r) => r.id === "notifications",
+)!;
 
 export function NotificationsView() {
   const queryClient = useQueryClient();
@@ -90,7 +95,7 @@ export function NotificationsView() {
       }),
     onSuccess: async () => {
       setSent(true);
-      setTimeout(() => setSent(false), 4000);
+      setTimeout(() => setSent(false), 8000);
       await queryClient.invalidateQueries({
         queryKey: ["admin-notification-jobs"],
       });
@@ -98,12 +103,10 @@ export function NotificationsView() {
   });
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        label="Notifications"
-        title="Notification center"
-        description="Send admin notifications and inspect the delivery queue."
-      />
+    <ResourcePageShell
+      resource={notificationsResource}
+      description="Send admin notifications and inspect the delivery queue."
+    >
       <div className="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
         {/* Compose panel */}
         <Card>
@@ -299,6 +302,6 @@ export function NotificationsView() {
           </Card>
         </div>
       </div>
-    </div>
+    </ResourcePageShell>
   );
 }

@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 
 import { X } from "lucide-react";
 
@@ -23,14 +23,35 @@ export function ResourceDrawer({
   onClose: () => void;
   className?: string;
 }) {
-  if (!open) return null;
+  const [visible, setVisible] = useState(false);
+  const [animate, setAnimate] = useState(false);
+  const prevOpen = useRef(open);
+
+  useEffect(() => {
+    if (open && !prevOpen.current) {
+      setVisible(true);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setAnimate(true));
+      });
+    } else if (!open && prevOpen.current) {
+      setAnimate(false);
+      const timer = setTimeout(() => setVisible(false), 200);
+      return () => clearTimeout(timer);
+    }
+    prevOpen.current = open;
+  }, [open]);
+
+  if (!visible) return null;
 
   return (
     <>
       <button
         type="button"
         aria-label="Close panel"
-        className="fixed inset-0 z-40 bg-foreground/35 backdrop-blur-[2px]"
+        className={cn(
+          "fixed inset-0 z-40 transition-opacity duration-200",
+          animate ? "bg-foreground/35 backdrop-blur-[2px]" : "bg-foreground/0 backdrop-blur-0",
+        )}
         onClick={onClose}
       />
       <section
@@ -38,7 +59,8 @@ export function ResourceDrawer({
         role="dialog"
         aria-labelledby="resource-drawer-title"
         className={cn(
-          "fixed right-0 top-0 z-50 flex h-dvh w-full max-w-[440px] flex-col border-l border-border bg-card shadow-2xl",
+          "fixed right-0 top-0 z-50 flex h-dvh w-full max-w-[440px] flex-col border-l border-border bg-card shadow-2xl transition-transform duration-200",
+          animate ? "translate-x-0" : "translate-x-full",
           className,
         )}
       >

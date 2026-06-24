@@ -5,7 +5,7 @@ import { useState } from "react";
 
 import type { ApplicationSettingDto, ListResponse } from "@/lib/api-types";
 
-import { PageHeader } from "@/components/page-header";
+import { ResourcePageShell } from "@/components/resource-page-shell";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -19,12 +19,15 @@ import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { webFetch } from "@/lib/http";
 import { parseJsonValue } from "@/lib/json";
+import { adminResources } from "@/lib/admin-resources";
 
 function displayValue(value: ApplicationSettingDto["value"]): string {
   if (value == null) return "—";
   if (typeof value === "string") return value;
   return JSON.stringify(value, null, 2);
 }
+
+const settingsResource = adminResources.find((r) => r.id === "settings")!;
 
 export function SettingsView() {
   const queryClient = useQueryClient();
@@ -56,12 +59,10 @@ export function SettingsView() {
   });
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        label="Settings"
-        title="System settings"
-        description="Update application settings directly from the admin workspace."
-      />
+    <ResourcePageShell
+      resource={settingsResource}
+      description="Update application settings directly from the admin workspace."
+    >
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-base">Configuration</CardTitle>
@@ -140,11 +141,8 @@ export function SettingsView() {
                           }}
                           disabled={updateSetting.isPending}
                         >
-                          {updateSetting.isPending ? (
-                            <Spinner className="size-3.5" />
-                          ) : (
-                            "Save"
-                          )}
+                          {updateSetting.isPending ? <Spinner className="size-3.5" /> : null}
+                          Save
                         </Button>
                       </div>
                     </div>
@@ -155,6 +153,6 @@ export function SettingsView() {
           )}
         </CardContent>
       </Card>
-    </div>
+    </ResourcePageShell>
   );
 }

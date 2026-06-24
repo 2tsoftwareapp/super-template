@@ -385,7 +385,7 @@ export function ProjectsView() {
         isRefreshing={projects.isFetching}
         onRefresh={() => void projects.refetch()}
         actions={
-          <Button onClick={() => setShowCreate(true)}>
+          <Button size="sm" onClick={() => setShowCreate(true)}>
             <FolderPlus data-icon="inline-start" />
             New project
           </Button>
@@ -449,6 +449,7 @@ export function ProjectsView() {
                     })
                   }
                 >
+                  {updateProjectStatus.isPending ? <Spinner className="size-3.5" /> : null}
                   Activate
                 </Button>
                 <Button
@@ -462,6 +463,7 @@ export function ProjectsView() {
                     })
                   }
                 >
+                  {updateProjectStatus.isPending ? <Spinner className="size-3.5" /> : null}
                   Archive
                 </Button>
               </>

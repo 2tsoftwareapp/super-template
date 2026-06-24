@@ -1,0 +1,79 @@
+{
+  "cleanup": "created-tabs",
+  "steps": [
+    { "tool": "browser_tabs", "args": { "action": "list" } },
+    { "tool": "browser_navigate", "args": { "url": "http://localhost:3002" } },
+    { "tool": "browser_console_messages", "args": { "level": "info", "all": true } },
+    { "tool": "browser_snapshot", "args": { "depth": 4 } },
+    { "tool": "browser_take_screenshot", "args": { "type": "png", "filename": "01-login.png", "fullPage": false } },
+    { "tool": "browser_fill_form", "args": { "selector": "input[id=\"email\"]", "value": "admin@example.local" } },
+    { "tool": "browser_fill_form", "args": { "selector": "input[id=\"password\"]", "value": "ChangeMe123!" } },
+    { "tool": "browser_click", "args": { "selector": "button[type=\"submit\"]" } },
+    { "tool": "browser_wait_for", "args": { "selector": "body" } },
+    { "tool": "browser_console_messages", "args": { "level": "info", "all": true } },
+    { "tool": "browser_take_screenshot", "args": { "type": "png", "filename": "02-dashboard.png", "fullPage": false } },
+    { "tool": "browser_snapshot", "args": { "depth": 4 } },
+
+    { "tool": "browser_navigate", "args": { "url": "http://localhost:3002/users" } },
+    { "tool": "browser_wait_for", "args": { "selector": "body" } },
+    { "tool": "browser_console_messages", "args": { "level": "info", "all": true } },
+    { "tool": "browser_take_screenshot", "args": { "type": "png", "filename": "03-users.png", "fullPage": false } },
+    { "tool": "browser_snapshot", "args": { "depth": 4 } },
+
+    { "tool": "browser_navigate", "args": { "url": "http://localhost:3002/roles" } },
+    { "tool": "browser_wait_for", "args": { "selector": "body" } },
+    { "tool": "browser_console_messages", "args": { "level": "info", "all": true } },
+    { "tool": "browser_take_screenshot", "args": { "type": "png", "filename": "04-roles.png", "fullPage": false } },
+    { "tool": "browser_snapshot", "args": { "depth": 4 } },
+
+    { "tool": "browser_navigate", "args": { "url": "http://localhost:3002/projects" } },
+    { "tool": "browser_wait_for", "args": { "selector": "body" } },
+    { "tool": "browser_console_messages", "args": { "level": "info", "all": true } },
+    { "tool": "browser_take_screenshot", "args": { "type": "png", "filename": "05-projects.png", "fullPage": false } },
+    { "tool": "browser_snapshot", "args": { "depth": 4 } },
+
+    { "tool": "browser_navigate", "args": { "url": "http://localhost:3002/audit-logs" } },
+    { "tool": "browser_wait_for", "args": { "selector": "body" } },
+    { "tool": "browser_console_messages", "args": { "level": "info", "all": true } },
+    { "tool": "browser_take_screenshot", "args": { "type": "png", "filename": "06-audit-logs.png", "fullPage": false } },
+    { "tool": "browser_snapshot", "args": { "depth": 4 } },
+
+    { "tool": "browser_navigate", "args": { "url": "http://localhost:3002/jobs" } },
+    { "tool": "browser_wait_for", "args": { "selector": "body" } },
+    { "tool": "browser_console_messages", "args": { "level": "info", "all": true } },
+    { "tool": "browser_take_screenshot", "args": { "type": "png", "filename": "07-jobs.png", "fullPage": false } },
+    { "tool": "browser_snapshot", "args": { "depth": 4 } },
+
+    { "tool": "browser_navigate", "args": { "url": "http://localhost:3002/files" } },
+    { "tool": "browser_wait_for", "args": { "selector": "body" } },
+    { "tool": "browser_console_messages", "args": { "level": "info", "all": true } },
+    { "tool": "browser_take_screenshot", "args": { "type": "png", "filename": "08-files.png", "fullPage": false } },
+    { "tool": "browser_snapshot", "args": { "depth": 4 } },
+
+    { "tool": "browser_navigate", "args": { "url": "http://localhost:3002/notifications" } },
+    { "tool": "browser_wait_for", "args": { "selector": "body" } },
+    { "tool": "browser_console_messages", "args": { "level": "info", "all": true } },
+    { "tool": "browser_take_screenshot", "args": { "type": "png", "filename": "09-notifications.png", "fullPage": false } },
+    { "tool": "browser_snapshot", "args": { "depth": 4 } },
+
+    { "tool": "browser_navigate", "args": { "url": "http://localhost:3002/mail" } },
+    { "tool": "browser_wait_for", "args": { "selector": "body" } },
+    { "tool": "browser_console_messages", "args": { "level": "info", "all": true } },
+    { "tool": "browser_take_screenshot", "args": { "type": "png", "filename": "10-mail.png", "fullPage": false } },
+    { "tool": "browser_snapshot", "args": { "depth": 4 } },
+
+    { "tool": "browser_navigate", "args": { "url": "http://localhost:3002/settings" } },
+    { "tool": "browser_wait_for", "args": { "selector": "body" } },
+    { "tool": "browser_console_messages", "args": { "level": "info", "all": true } },
+    { "tool": "browser_take_screenshot", "args": { "type": "png", "filename": "11-settings.png", "fullPage": false } },
+    { "tool": "browser_snapshot", "args": { "depth": 4 } },
+
+    { "tool": "browser_navigate", "args": { "url": "http://localhost:3002/imports" } },
+    { "tool": "browser_wait_for", "args": { "selector": "body" } },
+    { "tool": "browser_console_messages", "args": { "level": "info", "all": true } },
+    { "tool": "browser_take_screenshot", "args": { "type": "png", "filename": "12-imports.png", "fullPage": false } },
+    { "tool": "browser_snapshot", "args": { "depth": 4 } },
+
+    { "tool": "browser_tabs", "args": { "action": "list" } }
+  ]
+}

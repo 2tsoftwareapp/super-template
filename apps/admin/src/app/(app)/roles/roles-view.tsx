@@ -282,7 +282,16 @@ export function RolesView() {
                               variant="ghost"
                               aria-label={`Delete ${role.name}`}
                               disabled={deleteRole.isPending}
-                              onClick={() => deleteRole.mutate(role.id)}
+                              onClick={() => {
+                                if (
+                                  window.confirm(
+                                    `Delete "${formatRoleName(role.name)}"? This cannot be undone.`,
+                                  )
+                                ) {
+                                  deleteRole.mutate(role.id);
+                                }
+                              }}
+                              className="hover:text-destructive"
                             >
                               <Trash2 className="size-4" />
                             </Button>
