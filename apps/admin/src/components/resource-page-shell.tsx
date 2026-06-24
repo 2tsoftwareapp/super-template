@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { ReactNode } from "react";
 
 import type { AdminResourceConfig } from "@/lib/admin-resources";
@@ -11,6 +12,7 @@ export function ResourcePageShell({
   title,
   description,
   actions,
+  backHref,
   meta,
   isRefreshing,
   onRefresh,
@@ -20,6 +22,7 @@ export function ResourcePageShell({
   title?: string;
   description: string;
   actions?: ReactNode;
+  backHref?: string;
   meta?: ReactNode;
   isRefreshing?: boolean;
   onRefresh?: () => void;
@@ -31,9 +34,20 @@ export function ResourcePageShell({
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div className="flex min-w-0 flex-col gap-3">
-          <Badge variant="outline" className="w-fit">
-            {resource.group}
-          </Badge>
+          {backHref ? (
+            <Link
+              href={backHref}
+              className="inline-flex w-fit items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="size-3.5"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
+              Back
+            </Link>
+          ) : null}
+          {!backHref ? (
+            <Badge variant="outline" className="w-fit">
+              {resource.group}
+            </Badge>
+          ) : null}
           <div className="flex items-start gap-3">
             <div className="hidden size-10 shrink-0 items-center justify-center rounded-lg border border-border bg-card sm:flex">
               <Icon className="size-5 text-muted-foreground" />
