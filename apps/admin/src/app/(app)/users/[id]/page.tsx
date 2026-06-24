@@ -1,5 +1,11 @@
+import { Suspense } from "react";
+
 import { UserDetailView } from "./user-detail-view";
 
 export default function Page() {
-  return <UserDetailView />;
+  return (
+    <Suspense>
+      <UserDetailView />
+    </Suspense>
+  );
 }

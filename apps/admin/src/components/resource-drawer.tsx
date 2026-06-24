@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import { X } from "lucide-react";
 
@@ -25,20 +25,18 @@ export function ResourceDrawer({
 }) {
   const [visible, setVisible] = useState(false);
   const [animate, setAnimate] = useState(false);
-  const prevOpen = useRef(open);
 
   useEffect(() => {
-    if (open && !prevOpen.current) {
+    if (open) {
       setVisible(true);
       requestAnimationFrame(() => {
         requestAnimationFrame(() => setAnimate(true));
       });
-    } else if (!open && prevOpen.current) {
+    } else {
       setAnimate(false);
       const timer = setTimeout(() => setVisible(false), 200);
       return () => clearTimeout(timer);
     }
-    prevOpen.current = open;
   }, [open]);
 
   if (!visible) return null;

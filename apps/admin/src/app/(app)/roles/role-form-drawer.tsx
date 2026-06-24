@@ -2,16 +2,16 @@
 
 import { standardSchemaResolver as zodResolver } from "@hookform/resolvers/standard-schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
 import { ResourceDrawer } from "@/components/resource-drawer";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PermissionMultiSelect } from "@/components/ui/permission-multi-select";
 import { Spinner } from "@/components/ui/spinner";
 import { webFetch } from "@/lib/http";
 
@@ -41,10 +41,6 @@ const roleSchema = z.object({
 
 type RoleForm = z.infer<typeof roleSchema>;
 
-function permissionDomain(permissionName: string) {
-  return permissionName.split(".")[0] ?? "system";
-}
-
 export function RoleFormDrawer({
   open,
   onClose,
@@ -58,17 +54,6 @@ export function RoleFormDrawer({
 }) {
   const queryClient = useQueryClient();
   const isEditing = role !== null;
-
-  const permissionGroups = useMemo(() => {
-    const grouped = new Map<string, PermissionDto[]>();
-    for (const permission of permissions) {
-      const domain = permissionDomain(permission.name);
-      const existing = grouped.get(domain) ?? [];
-      existing.push(permission);
-      grouped.set(domain, existing);
-    }
-    return Array.from(grouped.entries()).sort(([a], [b]) => a.localeCompare(b));
-  }, [permissions]);
 
   const form = useForm<RoleForm>({
     resolver: zodResolver(roleSchema),
@@ -129,17 +114,6 @@ export function RoleFormDrawer({
     name: "permissionIds",
   });
 
-  const togglePermission = (permissionId: string, checked: boolean) => {
-    const current = form.getValues("permissionIds");
-    form.setValue(
-      "permissionIds",
-      checked
-        ? [...current, permissionId]
-        : current.filter((id) => id !== permissionId),
-      { shouldValidate: true },
-    );
-  };
-
   return (
     <ResourceDrawer
       open={open}
@@ -178,53 +152,16 @@ export function RoleFormDrawer({
           <Input id="role-description" {...form.register("description")} />
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-2">
           <Label>Permissions</Label>
-          {form.formState.errors.permissionIds ? (
-            <p className="text-xs text-destructive">
-              {form.formState.errors.permissionIds.message}
-            </p>
-          ) : null}
-          <div className="max-h-96 space-y-4 overflow-y-auto rounded-lg border border-border p-3">
-            {permissionGroups.map(([domain, items]) => (
-              <div key={domain} className="space-y-2">
-                <h3 className="text-sm font-medium capitalize">{domain}</h3>
-                <div className="space-y-2">
-                  {items.map((permission) => {
-                    const checked = selectedPermissionIds.includes(
-                      permission.id,
-                    );
-                    return (
-                      <label
-                        key={permission.id}
-                        className="flex items-start gap-3 rounded-md border border-border/60 p-2"
-                      >
-                        <Checkbox
-                          checked={checked}
-                          onChange={(event) =>
-                            togglePermission(
-                              permission.id,
-                              event.target.checked,
-                            )
-                          }
-                        />
-                        <span className="min-w-0">
-                          <span className="block font-mono text-xs">
-                            {permission.name}
-                          </span>
-                          {permission.description ? (
-                            <span className="mt-1 block text-xs text-muted-foreground">
-                              {permission.description}
-                            </span>
-                          ) : null}
-                        </span>
-                      </label>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
-          </div>
+          <PermissionMultiSelect
+            permissions={permissions}
+            selected={selectedPermissionIds}
+            onChange={(ids) => {
+              form.setValue("permissionIds", ids, { shouldValidate: true });
+            }}
+            error={form.formState.errors.permissionIds?.message}
+          />
         </div>
       </form>
     </ResourceDrawer>

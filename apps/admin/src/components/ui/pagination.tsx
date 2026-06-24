@@ -1,31 +1,32 @@
-"use client";
-
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
+import { Button } from "./button";
+import { Label } from "./label";
 import { cn } from "@/lib/utils";
 
-import { USERS_PAGE_SIZE_OPTIONS, type UsersPageSize } from "./types";
+export const DEFAULT_PAGE_SIZES = [10, 20, 50, 100] as const;
+export type PageSize = (typeof DEFAULT_PAGE_SIZES)[number];
 
-export function UsersPagination({
+export function Pagination({
   page,
-  limit,
+  pageSize,
   totalPages,
   total,
+  pageSizeOptions = DEFAULT_PAGE_SIZES,
   onPageChange,
-  onLimitChange,
+  onPageSizeChange,
   isLoading,
 }: {
   page: number;
-  limit: UsersPageSize;
+  pageSize: number;
   totalPages: number;
   total: number;
+  pageSizeOptions?: readonly number[];
   onPageChange: (page: number) => void;
-  onLimitChange: (limit: UsersPageSize) => void;
+  onPageSizeChange?: (pageSize: number) => void;
   isLoading?: boolean;
 }) {
   const safeTotalPages = Math.max(totalPages, 1);
-  const rangeStart = total === 0 ? 0 : (page - 1) * limit + 1;
-  const rangeEnd = total === 0 ? 0 : Math.min(page * limit, total);
+  const rangeStart = total === 0 ? 0 : (page - 1) * pageSize + 1;
+  const rangeEnd = total === 0 ? 0 : Math.min(page * pageSize, total);
 
   const pageNumbers: (number | "dots")[] = [];
   if (safeTotalPages <= 7) {
@@ -45,41 +46,38 @@ export function UsersPagination({
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
         <p className="text-xs">
           {total === 0
-            ? "No users"
+            ? "No results"
             : `${rangeStart}–${rangeEnd} of ${total}`}
         </p>
-        <div className="flex items-center gap-2">
-          <Label
-            htmlFor="users-page-size"
-            className="text-xs text-muted-foreground"
-          >
-            Rows
-          </Label>
-          <select
-            id="users-page-size"
-            value={limit}
-            disabled={isLoading}
-            onChange={(event) =>
-              onLimitChange(Number(event.target.value) as UsersPageSize)
-            }
-            className={cn(
-              "h-7 rounded-md border border-input bg-background px-2 text-xs text-foreground",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-            )}
-          >
-            {USERS_PAGE_SIZE_OPTIONS.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-        </div>
+        {onPageSizeChange && (
+          <div className="flex items-center gap-2">
+            <Label htmlFor="pagination-page-size" className="text-xs text-muted-foreground">
+              Rows
+            </Label>
+            <select
+              id="pagination-page-size"
+              value={pageSize}
+              disabled={isLoading}
+              onChange={(e) => onPageSizeChange(Number(e.target.value))}
+              className={cn(
+                "h-7 rounded-md border border-input bg-background px-2 text-xs text-foreground",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+              )}
+            >
+              {pageSizeOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
       </div>
       <div className="flex items-center gap-1.5">
         <Button
           variant="outline"
           size="sm"
-          disabled={(isLoading ?? false) || page <= 1}
+          disabled={isLoading || page <= 1}
           onClick={() => onPageChange(page - 1)}
           className="h-7 px-2 text-xs"
         >
@@ -104,7 +102,7 @@ export function UsersPagination({
         <Button
           variant="outline"
           size="sm"
-          disabled={(isLoading ?? false) || page >= safeTotalPages}
+          disabled={isLoading || page >= safeTotalPages}
           onClick={() => onPageChange(page + 1)}
           className="h-7 px-2 text-xs"
         >

@@ -10,7 +10,7 @@ import {
 } from "@tanstack/react-table";
 import { AlertTriangle, RefreshCw, UserPlus, Users } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { BulkActionBar } from "@/components/bulk-action-bar";
 import { ResourceTable } from "@/components/resource-table";
@@ -22,8 +22,8 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Spinner } from "@/components/ui/spinner";
 import { useSession } from "@/hooks/use-session";
 import { cn } from "@/lib/utils";
-
-import type { UsersListParams, UserStatusFilter } from "./types";
+import { Pagination } from "@/components/ui/pagination";
+import { webFetch } from "@/lib/http";
 
 import { STATUS_FILTERS } from "./constants";
 import { CreateUserDrawer } from "./create-user-drawer";
@@ -32,11 +32,10 @@ import {
   sortingStateFromParams,
   usersSortChanged,
 } from "./sorting";
-import {
-  useUpdateUsersStatusMutation,
-  useUsersListQuery,
-} from "./use-users-queries";
-import { UsersPagination } from "./users-pagination";
+import { useBulkMutation } from "@/hooks/use-bulk-mutation";
+
+import { useUsersListQuery } from "./use-users-queries";
+import { USERS_PAGE_SIZE_OPTIONS, type UsersListParams, type UsersPageSize, type UserStatusFilter } from "./types";
 import {
   parseUsersListSearchParams,
   serializeUsersListSearchParams,
@@ -62,7 +61,6 @@ export function UsersView() {
     label: string;
     count: number;
   } | null>(null);
-  const [, startTransition] = useTransition();
 
   const debouncedSearch = useDebouncedValue(searchInput, 500);
 
@@ -79,9 +77,7 @@ export function UsersView() {
         return;
       }
 
-      startTransition(() => {
-        router.replace(serialized ? `${pathname}?${serialized}` : pathname);
-      });
+      router.replace(serialized ? `${pathname}?${serialized}` : pathname);
     },
     [listParams, pathname, router, searchParams],
   );
@@ -103,7 +99,24 @@ export function UsersView() {
   );
 
   const users = useUsersListQuery(queryParams);
-  const updateUserStatus = useUpdateUsersStatusMutation();
+  const activateUsers = useBulkMutation({
+    mutationFn: (userId) =>
+      webFetch(`/api/bff/admin/users/${userId}/status`, {
+        method: "PATCH",
+        body: JSON.stringify({ status: "ACTIVE" }),
+      }),
+    queryKey: ["admin-users"],
+    successMessage: "activated",
+  });
+  const blockUsers = useBulkMutation({
+    mutationFn: (userId) =>
+      webFetch(`/api/bff/admin/users/${userId}/status`, {
+        method: "PATCH",
+        body: JSON.stringify({ status: "BLOCKED" }),
+      }),
+    queryKey: ["admin-users"],
+    successMessage: "blocked",
+  });
 
   const actorRoles = session.data?.data.user.roles ?? [];
   const permissions = session.data?.data.permissions ?? [];
@@ -119,12 +132,12 @@ export function UsersView() {
     async (userId: string) => {
       setPendingAction("activate");
       try {
-        await updateUserStatus.mutateAsync({ userIds: [userId], status: "ACTIVE" });
+        await activateUsers.mutateAsync([userId]);
       } finally {
         setPendingAction(null);
       }
     },
-    [updateUserStatus],
+    [activateUsers],
   );
 
   const handleBlock = useCallback(
@@ -140,9 +153,9 @@ export function UsersView() {
         canUpdate,
         onActivate: handleActivate,
         onBlock: handleBlock,
-        isDisabled: updateUserStatus.isPending,
+        isDisabled: activateUsers.isPending || blockUsers.isPending,
       }),
-    [canUpdate, handleActivate, handleBlock, updateUserStatus.isPending],
+    [canUpdate, handleActivate, handleBlock, activateUsers.isPending, blockUsers.isPending],
   );
 
   const sorting = useMemo(
@@ -234,7 +247,7 @@ export function UsersView() {
           onConfirm={async () => {
             setPendingAction("block");
             try {
-              await updateUserStatus.mutateAsync({ userIds: confirmBlock.userIds, status: "BLOCKED" });
+              await blockUsers.mutateAsync(confirmBlock.userIds);
             } finally {
               setPendingAction(null);
               setConfirmBlock(null);
@@ -335,24 +348,19 @@ export function UsersView() {
                   <Button
                     variant="outline"
                     size="sm"
-                    disabled={updateUserStatus.isPending}
+                    disabled={activateUsers.isPending || blockUsers.isPending}
                     onClick={async () => {
-                      setPendingAction("activate");
-                      try {
-                        await updateUserStatus.mutateAsync({ userIds: selectedIds, status: "ACTIVE" });
-                      } finally {
-                        setPendingAction(null);
-                        setRowSelection({});
-                      }
+                      await activateUsers.mutateAsync(selectedIds);
+                      setRowSelection({});
                     }}
                   >
-                    {pendingAction === "activate" ? <Spinner className="size-3.5" /> : null}
+                    {activateUsers.isPending ? <Spinner className="size-3.5" /> : null}
                     Activate
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
-                    disabled={updateUserStatus.isPending}
+                    disabled={activateUsers.isPending || blockUsers.isPending}
                     onClick={() => {
                       setConfirmBlock({
                         userIds: selectedIds,
@@ -391,18 +399,19 @@ export function UsersView() {
                 void router.push(`/users/${row.original.id}${suffix}`);
               }}
             />
-            <UsersPagination
+            <Pagination
               page={currentPage}
-              limit={queryParams.limit}
+              pageSize={queryParams.limit}
               totalPages={totalPages}
               total={total}
+              pageSizeOptions={USERS_PAGE_SIZE_OPTIONS}
               isLoading={users.isFetching}
               onPageChange={(page) => {
                 patchListParams({ page });
                 setRowSelection({});
               }}
-              onLimitChange={(limit) => {
-                patchListParams({ limit, page: 1 });
+              onPageSizeChange={(limit) => {
+                patchListParams({ limit: limit as UsersPageSize, page: 1 });
                 setRowSelection({});
               }}
             />

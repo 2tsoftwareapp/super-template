@@ -1,5 +1,11 @@
+import { Suspense } from "react";
+
 import { ProjectsView } from "./projects-view";
 
 export default function Page() {
-  return <ProjectsView />;
+  return (
+    <Suspense>
+      <ProjectsView />
+    </Suspense>
+  );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { standardSchemaResolver as zodResolver } from "@hookform/resolvers/standard-schema";
+import { useDebouncedValue } from "@repo/web-core/hooks";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   createColumnHelper,
@@ -8,12 +8,13 @@ import {
   getSortedRowModel,
   type RowSelectionState,
   type SortingState,
+  type Updater,
   useReactTable,
 } from "@tanstack/react-table";
-import { FolderPlus } from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { standardSchemaResolver as zodResolver } from "@hookform/resolvers/standard-schema";
+import { AlertTriangle, ChevronRight, FolderPlus, Search, X } from "lucide-react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -29,18 +30,18 @@ import { BulkActionBar } from "@/components/bulk-action-bar";
 import { ResourceDrawer } from "@/components/resource-drawer";
 import { ResourcePageShell } from "@/components/resource-page-shell";
 import { ResourceTable } from "@/components/resource-table";
-import { ResourceToolbar } from "@/components/resource-toolbar";
+import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Pagination } from "@/components/ui/pagination";
 import { Spinner } from "@/components/ui/spinner";
+import { useBulkMutation } from "@/hooks/use-bulk-mutation";
 import { adminResources } from "@/lib/admin-resources";
-import { timeAgo } from "@/lib/format";
 import { webFetch } from "@/lib/http";
-import { cn } from "@/lib/utils";
 
 const projectsResource = adminResources.find(
   (resource) => resource.id === "projects",
@@ -55,13 +56,42 @@ function projectStatusVariant(
   return "outline";
 }
 
+const STATUS_FILTERS = [
+  { value: "all", label: "All" },
+  { value: "ACTIVE", label: "Active" },
+  { value: "DRAFT", label: "Draft" },
+  { value: "ARCHIVED", label: "Archived" },
+] as const;
+
+const PAGE_SIZE_OPTIONS = [10, 20, 50, 100] as const;
+type PageSize = (typeof PAGE_SIZE_OPTIONS)[number];
+
+function parseSearchParams(sp: URLSearchParams) {
+  return {
+    page: Math.max(1, Number(sp.get("page")) || 1),
+    limit: (PAGE_SIZE_OPTIONS.includes(Number(sp.get("limit")) as PageSize)
+      ? Number(sp.get("limit"))
+      : 20) as PageSize,
+    search: sp.get("search") ?? "",
+    status: sp.get("status") ?? "all",
+  };
+}
+
+function serializeParams(p: { page: number; limit: PageSize; search: string; status: string }) {
+  const sp = new URLSearchParams();
+  if (p.page > 1) sp.set("page", String(p.page));
+  if (p.limit !== 20) sp.set("limit", String(p.limit));
+  if (p.search) sp.set("search", p.search);
+  if (p.status && p.status !== "all") sp.set("status", p.status);
+  return sp.toString();
+}
+
 const createSchema = z.object({
   name: z.string().min(2),
   description: z.string().optional(),
   status: z.enum(["DRAFT", "ACTIVE", "ARCHIVED"]).optional(),
   ownerId: z.string().optional(),
 });
-
 type ProjectForm = z.infer<typeof createSchema>;
 
 function CreateProjectDrawer({
@@ -152,10 +182,6 @@ function CreateProjectDrawer({
             <option value="ARCHIVED">Archived</option>
           </select>
         </div>
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="project-owner">Owner ID</Label>
-          <Input id="project-owner" {...form.register("ownerId")} />
-        </div>
         {createProject.isError ? (
           <p className="text-sm text-destructive">
             Failed to create project. Check inputs and try again.
@@ -166,105 +192,83 @@ function CreateProjectDrawer({
   );
 }
 
-function StatChip({
-  label,
-  count,
-  active,
-}: {
-  label: string;
-  count: number;
-  active?: boolean;
-}) {
-  return (
-    <div
-      className={cn(
-        "rounded-lg border border-border px-4 py-3",
-        active && "border-primary/30 bg-primary/5",
-      )}
-    >
-      <p className="text-2xl font-semibold tabular-nums">{count}</p>
-      <p className="mt-0.5 text-xs text-muted-foreground">{label}</p>
-    </div>
-  );
-}
-
-const STATUS_TABS = [
-  { value: "all", label: "All" },
-  { value: "ACTIVE", label: "Active" },
-  { value: "DRAFT", label: "Draft" },
-  { value: "ARCHIVED", label: "Archived" },
-];
-
 export function ProjectsView() {
   const router = useRouter();
-  const queryClient = useQueryClient();
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const listParams = useMemo(
+    () => parseSearchParams(searchParams),
+    [searchParams],
+  );
+  const [searchInput, setSearchInput] = useState(listParams.search);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [showCreate, setShowCreate] = useState(false);
 
-  const projects = useQuery({
-    queryKey: ["admin-projects"],
-    queryFn: () =>
-      webFetch<ListResponse<ProjectDto>>("/api/bff/projects?limit=100"),
-  });
+  const debouncedSearch = useDebouncedValue(searchInput, 500);
 
-  const updateProjectStatus = useMutation({
-    mutationFn: ({
-      projectIds,
-      status,
-    }: {
-      projectIds: string[];
-      status: NonNullable<UpdateProjectInput["status"]>;
-    }) =>
-      Promise.all(
-        projectIds.map((projectId) =>
-          webFetch<{ data: ProjectDto }>(`/api/bff/projects/${projectId}`, {
-            method: "PATCH",
-            body: JSON.stringify({ status } satisfies UpdateProjectInput),
-          }),
-        ),
-      ),
-    onSuccess: async (_result, variables) => {
-      await queryClient.invalidateQueries({ queryKey: ["admin-projects"] });
-      setRowSelection({});
-      toast.success(`${variables.projectIds.length} projects updated`);
+  useEffect(() => {
+    setSearchInput(listParams.search);
+  }, [listParams.search]);
+
+  const patchParams = useCallback(
+    (patch: Partial<{ page: number; limit: PageSize; search: string; status: string }>) => {
+      const next = { ...listParams, ...patch };
+      const serialized = serializeParams(next);
+      const current = searchParams.toString();
+      if (serialized === current) return;
+      router.replace(serialized ? `${pathname}?${serialized}` : pathname);
     },
+    [listParams, pathname, router, searchParams],
+  );
+
+  useEffect(() => {
+    if (debouncedSearch === listParams.search) return;
+    patchParams({ search: debouncedSearch, page: 1 });
+  }, [debouncedSearch, listParams.search, patchParams]);
+
+  // ── Query ──
+  const queryString = useMemo(() => {
+    const sp = new URLSearchParams();
+    sp.set("page", String(listParams.page));
+    sp.set("limit", String(listParams.limit));
+    if (listParams.search) sp.set("search", listParams.search);
+    if (listParams.status !== "all") sp.set("status", listParams.status);
+    return sp.toString();
+  }, [listParams]);
+
+  const projects = useQuery({
+    queryKey: ["admin-projects", queryString],
+    queryFn: () =>
+      webFetch<ListResponse<ProjectDto>>(`/api/bff/projects?${queryString}`),
+    placeholderData: (prev: ListResponse<ProjectDto> | undefined) => prev,
   });
 
-  const allProjects = useMemo(
-    () => projects.data?.data ?? [],
-    [projects.data?.data],
-  );
+  const activateProjects = useBulkMutation({
+    mutationFn: (id) =>
+      webFetch<{ data: ProjectDto }>(`/api/bff/projects/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ status: "ACTIVE" } satisfies UpdateProjectInput),
+      }),
+    queryKey: ["admin-projects"],
+    successMessage: "activated",
+  });
 
-  const stats = useMemo(
-    () => ({
-      total: allProjects.length,
-      active: allProjects.filter((project) => project.status === "ACTIVE")
-        .length,
-      draft: allProjects.filter((project) => project.status === "DRAFT").length,
-      archived: allProjects.filter((project) => project.status === "ARCHIVED")
-        .length,
-    }),
-    [allProjects],
-  );
+  const archiveProjects = useBulkMutation({
+    mutationFn: (id) =>
+      webFetch<{ data: ProjectDto }>(`/api/bff/projects/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ status: "ARCHIVED" } satisfies UpdateProjectInput),
+      }),
+    queryKey: ["admin-projects"],
+    successMessage: "archived",
+  });
 
-  const filteredData = useMemo(() => {
-    let data = allProjects;
-    if (search) {
-      const q = search.toLowerCase();
-      data = data.filter(
-        (project) =>
-          project.name.toLowerCase().includes(q) ||
-          (project.description ?? "").toLowerCase().includes(q),
-      );
-    }
-    if (statusFilter !== "all") {
-      data = data.filter((project) => project.status === statusFilter);
-    }
-    return data;
-  }, [allProjects, search, statusFilter]);
+  const items = projects.data?.data ?? [];
+  const meta = projects.data?.meta;
+  const total = meta?.total ?? 0;
+  const totalPages = meta?.totalPages ?? 1;
+  const hasFilters = Boolean(listParams.search || listParams.status !== "all");
 
   const columns = useMemo(
     () => [
@@ -319,36 +323,12 @@ export function ProjectsView() {
           );
         },
       }),
-      columnHelper.accessor("updatedAt", {
-        header: "Updated",
-        enableSorting: true,
-        cell: ({ getValue }) => (
-          <span className="text-xs text-muted-foreground">
-            {timeAgo(getValue())}
-          </span>
-        ),
-      }),
       columnHelper.display({
-        id: "actions",
+        id: "chevron",
         header: "",
-        cell: ({ row }) => (
-          <div
-            className="flex items-center gap-3"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <Link
-              href={`/projects/${row.original.id}`}
-              className="text-xs text-muted-foreground underline-offset-4 hover:underline"
-            >
-              View
-            </Link>
-            <Link
-              href={`/projects/${row.original.id}/edit`}
-              className="text-xs text-muted-foreground underline-offset-4 hover:underline"
-            >
-              Edit
-            </Link>
-          </div>
+        enableSorting: false,
+        cell: () => (
+          <ChevronRight className="size-4 text-muted-foreground/40" />
         ),
       }),
     ],
@@ -357,7 +337,7 @@ export function ProjectsView() {
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
-    data: filteredData,
+    data: items,
     columns,
     getRowId: (row) => row.id,
     getCoreRowModel: getCoreRowModel(),
@@ -370,7 +350,6 @@ export function ProjectsView() {
   const selectedIds = table
     .getSelectedRowModel()
     .rows.map((row) => row.original.id);
-  const hasFilters = Boolean(search || statusFilter !== "all");
 
   return (
     <>
@@ -381,7 +360,7 @@ export function ProjectsView() {
 
       <ResourcePageShell
         resource={projectsResource}
-        description="Manage project records, operational state, and ownership from a resource list."
+        description="Manage project records, operational state, and ownership."
         isRefreshing={projects.isFetching}
         onRefresh={() => void projects.refetch()}
         actions={
@@ -391,48 +370,64 @@ export function ProjectsView() {
           </Button>
         }
       >
-        {!projects.isLoading ? (
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <StatChip label="Total" count={stats.total} />
-            <StatChip label="Active" count={stats.active} active />
-            <StatChip label="Draft" count={stats.draft} />
-            <StatChip label="Archived" count={stats.archived} />
-          </div>
-        ) : null}
-
         <Card>
-          <ResourceToolbar
-            search={search}
-            onSearchChange={setSearch}
-            searchPlaceholder="Search name or description"
-            hasFilters={hasFilters}
-            onClearFilters={() => {
-              setSearch("");
-              setStatusFilter("all");
-            }}
-            filters={
-              <div className="flex flex-wrap items-center gap-1 rounded-lg border border-border p-1">
-                {STATUS_TABS.map((tab) => (
-                  <Button
-                    key={tab.value}
-                    type="button"
-                    variant={statusFilter === tab.value ? "default" : "ghost"}
-                    size="sm"
-                    onClick={() => setStatusFilter(tab.value)}
-                  >
-                    {tab.label}
-                  </Button>
-                ))}
+          {projects.isError ? (
+            <Alert variant="error" className="m-4 mb-0">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 font-semibold">
+                  <AlertTriangle className="size-4" />
+                  Failed to load projects
+                </div>
+                <Button variant="outline" size="sm" onClick={() => void projects.refetch()}>
+                  Retry
+                </Button>
               </div>
-            }
-            resultLabel={
-              projects.isLoading
-                ? "Loading projects"
-                : filteredData.length === allProjects.length
-                  ? `${allProjects.length} projects`
-                  : `${filteredData.length} of ${allProjects.length} projects`
-            }
-          />
+            </Alert>
+          ) : null}
+          <div className="flex items-center gap-3 border-b border-border px-4 py-3">
+            <div className="relative flex-1">
+              <Search className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Search name or description"
+                className="h-9 pl-9 text-sm"
+                value={searchInput}
+                onChange={(e) => {
+                  setSearchInput(e.target.value);
+                  setRowSelection({});
+                }}
+              />
+            </div>
+            <div className="flex shrink-0 items-center gap-1 rounded-lg border border-border p-1">
+              {STATUS_FILTERS.map((tab) => (
+                <Button
+                  key={tab.value}
+                  type="button"
+                  variant={listParams.status === tab.value ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => {
+                    patchParams({ status: tab.value, page: 1 });
+                    setRowSelection({});
+                  }}
+                >
+                  {tab.label}
+                </Button>
+              ))}
+            </div>
+            {hasFilters && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  patchParams({ search: "", status: "all", page: 1 });
+                  setSearchInput("");
+                  setRowSelection({});
+                }}
+              >
+                <X className="size-4" />
+              </Button>
+            )}
+          </div>
+
           <BulkActionBar
             selectedCount={selectedIds.length}
             onClear={() => setRowSelection({})}
@@ -441,29 +436,25 @@ export function ProjectsView() {
                 <Button
                   variant="outline"
                   size="sm"
-                  disabled={updateProjectStatus.isPending}
-                  onClick={() =>
-                    updateProjectStatus.mutate({
-                      projectIds: selectedIds,
-                      status: "ACTIVE",
-                    })
-                  }
+                  disabled={activateProjects.isPending || archiveProjects.isPending}
+                  onClick={async () => {
+                    await activateProjects.mutateAsync(selectedIds);
+                    setRowSelection({});
+                  }}
                 >
-                  {updateProjectStatus.isPending ? <Spinner className="size-3.5" /> : null}
+                  {activateProjects.isPending ? <Spinner className="size-3.5" /> : null}
                   Activate
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
-                  disabled={updateProjectStatus.isPending}
-                  onClick={() =>
-                    updateProjectStatus.mutate({
-                      projectIds: selectedIds,
-                      status: "ARCHIVED",
-                    })
-                  }
+                  disabled={activateProjects.isPending || archiveProjects.isPending}
+                  onClick={async () => {
+                    await archiveProjects.mutateAsync(selectedIds);
+                    setRowSelection({});
+                  }}
                 >
-                  {updateProjectStatus.isPending ? <Spinner className="size-3.5" /> : null}
+                  {archiveProjects.isPending ? <Spinner className="size-3.5" /> : null}
                   Archive
                 </Button>
               </>
@@ -486,6 +477,21 @@ export function ProjectsView() {
               onRowClick={(row) =>
                 void router.push(`/projects/${row.original.id}`)
               }
+            />
+            <Pagination
+              page={listParams.page}
+              pageSize={listParams.limit}
+              totalPages={totalPages}
+              total={total}
+              isLoading={projects.isFetching}
+              onPageChange={(p) => {
+                patchParams({ page: p });
+                setRowSelection({});
+              }}
+              onPageSizeChange={(s) => {
+                patchParams({ limit: s as PageSize, page: 1 });
+                setRowSelection({});
+              }}
             />
           </CardContent>
         </Card>

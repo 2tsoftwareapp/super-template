@@ -1,25 +1,25 @@
 "use client";
 
+import { useDebouncedValue } from "@repo/web-core/hooks";
 import { useQuery } from "@tanstack/react-query";
-import { RefreshCw } from "lucide-react";
+import { Search, X } from "lucide-react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 import type { AuditLogDto, ListResponse } from "@/lib/api-types";
 
+import { DatePicker } from "@/components/ui/date-picker";
 import { ResourceDrawer } from "@/components/resource-drawer";
 import { ResourcePageShell } from "@/components/resource-page-shell";
-import { ResourceToolbar } from "@/components/resource-toolbar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Pagination } from "@/components/ui/pagination";
 import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
 import {
@@ -34,7 +34,6 @@ import { Tooltip } from "@/components/ui/tooltip";
 import { adminResources } from "@/lib/admin-resources";
 import { formatDateTime, timeAgo } from "@/lib/format";
 import { webFetch } from "@/lib/http";
-import { cn } from "@/lib/utils";
 
 function formatAction(action: string): string {
   return action
@@ -43,44 +42,62 @@ function formatAction(action: string): string {
     .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
+interface Filters {
+  from: string;
+  to: string;
+  q: string;
+  page: number;
+}
+
+function parseFilters(sp: URLSearchParams): Filters {
+  return {
+    from: sp.get("from") ?? "",
+    to: sp.get("to") ?? "",
+    q: sp.get("q") ?? "",
+    page: Math.max(1, Number(sp.get("page")) || 1),
+  };
+}
+
 export function AuditLogsView() {
-  const auditResource = adminResources.find(
-    (resource) => resource.id === "audit-logs",
-  )!;
-  const [actorId, setActorId] = useState("");
-  const [action, setAction] = useState("");
-  const [resourceType, setResourceType] = useState("");
-  const [resourceId, setResourceId] = useState("");
-  const [from, setFrom] = useState("");
-  const [to, setTo] = useState("");
-  const [q, setQ] = useState("");
-  const [page, setPage] = useState(1);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const [filters, setFilters] = useState<Filters>(() =>
+    parseFilters(new URLSearchParams(searchParams.toString())),
+  );
   const [selectedEntry, setSelectedEntry] = useState<AuditLogDto | null>(null);
 
-  const hasFilters = Boolean(
-    actorId || action || resourceType || resourceId || from || to || q,
-  );
+  const updateFilter = (key: keyof Filters, value: string | number) => {
+    const next = { ...filters, [key]: value };
+    if (key !== "page") next.page = 1;
+    setFilters(next);
+
+    const sp = new URLSearchParams();
+    if (next.from) sp.set("from", next.from);
+    if (next.to) sp.set("to", next.to);
+    if (next.q) sp.set("q", next.q);
+    if (next.page > 1) sp.set("page", String(next.page));
+    const qs = sp.toString();
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+  };
+
+  const hasFilters = Boolean(filters.from || filters.to || filters.q);
+
+  const clearFilters = () => {
+    const reset: Filters = { from: "", to: "", q: "", page: 1 };
+    setFilters(reset);
+    router.replace(pathname, { scroll: false });
+  };
+
+  const q = useDebouncedValue(filters.q, 400);
 
   const auditLogs = useQuery({
-    queryKey: [
-      "admin-audit-logs",
-      actorId,
-      action,
-      resourceType,
-      resourceId,
-      from,
-      to,
-      q,
-      page,
-    ],
+    queryKey: ["admin-audit-logs", q, filters.from, filters.to, filters.page],
     queryFn: () => {
-      const params = new URLSearchParams({ limit: "50", page: String(page) });
-      if (actorId) params.set("actorId", actorId);
-      if (action) params.set("action", action);
-      if (resourceType) params.set("resourceType", resourceType);
-      if (resourceId) params.set("resourceId", resourceId);
-      if (from) params.set("from", from);
-      if (to) params.set("to", to);
+      const params = new URLSearchParams({ limit: "50", page: String(filters.page) });
+      if (filters.from) params.set("from", filters.from);
+      if (filters.to) params.set("to", filters.to);
       if (q) params.set("q", q);
       return webFetch<ListResponse<AuditLogDto>>(
         `/api/bff/admin/audit-logs?${params.toString()}`,
@@ -90,139 +107,74 @@ export function AuditLogsView() {
 
   const totalPages = auditLogs.data?.meta?.totalPages ?? 1;
   const total = auditLogs.data?.meta?.total ?? 0;
-
-  const clearFilters = () => {
-    setActorId("");
-    setAction("");
-    setResourceType("");
-    setResourceId("");
-    setFrom("");
-    setTo("");
-    setQ("");
-    setPage(1);
-  };
-
   const entries = auditLogs.data?.data ?? [];
 
   return (
     <ResourcePageShell
-      resource={auditResource}
-      description="Track admin actions and quickly inspect who changed what."
+      resource={adminResources.find((r) => r.id === "audit-logs")!}
+      description="Who changed what, and when."
       isRefreshing={auditLogs.isFetching}
       onRefresh={() => void auditLogs.refetch()}
     >
-      {/* Events table */}
       <Card>
-        <ResourceToolbar
-          search={actorId}
-          onSearchChange={(v) => {
-            setActorId(v);
-            setPage(1);
-          }}
-          searchPlaceholder="Actor ID"
-          hasFilters={hasFilters}
-          onClearFilters={clearFilters}
-          filters={
-            <div className="grid min-w-0 grid-cols-2 gap-2 md:flex md:flex-wrap">
+        {/* ── Filters ── */}
+        <div className="flex flex-wrap items-center gap-2 border-b border-border px-4 pb-4">
+          <div className="relative flex-1 basis-[200px]">
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Search events…"
+              value={filters.q}
+              onChange={(e) => updateFilter("q", e.target.value)}
+              className="h-7 pl-7 text-xs"
+            />
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <DatePicker
+              value={filters.from}
+              onChange={(v) => updateFilter("from", v)}
+              placeholder="From"
+              className="h-7 text-xs"
+            />
+            <DatePicker
+              value={filters.to}
+              onChange={(v) => updateFilter("to", v)}
+              placeholder="To"
+              className="h-7 text-xs"
+            />
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-2 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
               <Input
-                aria-label="Filter by action"
-                placeholder="Action"
-                value={action}
-                onChange={(event) => {
-                  setAction(event.target.value);
-                  setPage(1);
-                }}
-                className="md:max-w-[180px]"
-              />
-              <Input
-                aria-label="Filter by resource type"
-                placeholder="Resource"
-                value={resourceType}
-                onChange={(event) => {
-                  setResourceType(event.target.value);
-                  setPage(1);
-                }}
-                className="md:max-w-[120px]"
-              />
-              <Input
-                aria-label="Filter by resource ID"
-                placeholder="Res ID"
-                value={resourceId}
-                onChange={(event) => {
-                  setResourceId(event.target.value);
-                  setPage(1);
-                }}
-                className="md:max-w-[120px]"
-              />
-              <Input
-                type="date"
-                aria-label="Filter from date"
-                value={from}
-                onChange={(event) => {
-                  setFrom(event.target.value);
-                  setPage(1);
-                }}
-                className="md:max-w-[140px]"
-              />
-              <Input
-                type="date"
-                aria-label="Filter to date"
-                value={to}
-                onChange={(event) => {
-                  setTo(event.target.value);
-                  setPage(1);
-                }}
-                className="md:max-w-[140px]"
-              />
-              <Input
-                aria-label="Free-text search"
-                placeholder="Search"
-                value={q}
-                onChange={(event) => {
-                  setQ(event.target.value);
-                  setPage(1);
-                }}
-                className="md:max-w-[140px]"
+                placeholder="Search events…"
+                value={filters.q}
+                onChange={(e) => updateFilter("q", e.target.value)}
+                className="h-7 w-[180px] pl-7 text-xs"
               />
             </div>
-          }
-          actions={
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => void auditLogs.refetch()}
-              disabled={auditLogs.isFetching}
-            >
-              <RefreshCw
-                data-icon="inline-start"
-                className={cn(auditLogs.isFetching && "animate-spin")}
-              />
-              Refresh
-            </Button>
-          }
-          resultLabel={
-            auditLogs.data
-              ? `${entries.length} events returned${total ? ` (${total} total)` : ""}`
-              : "Latest logs returned by the API."
-          }
-        />
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base">Events</CardTitle>
-          <CardDescription className="text-xs">
-            {auditLogs.data
-              ? `${entries.length} events returned`
-              : "Latest logs returned by the API."}
-          </CardDescription>
-        </CardHeader>
+            {hasFilters && (
+              <Button variant="ghost" size="sm" onClick={clearFilters} className="h-7 px-2 text-xs">
+                <X className="size-3.5" />
+                Clear
+              </Button>
+            )}
+          </div>
+        </div>
+
+        {/* ── Table ── */}
         <CardContent className="p-0 pb-1">
+          {total > 0 && (
+            <div className="px-4 pt-3 pb-1 text-xs text-muted-foreground">
+              {total} event{total !== 1 ? "s" : ""}
+            </div>
+          )}
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-[130px]">Time</TableHead>
                 <TableHead>Action</TableHead>
                 <TableHead>Entity</TableHead>
                 <TableHead>Actor</TableHead>
-                <TableHead>When</TableHead>
-                <TableHead />
+                <TableHead className="w-16" />
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -234,13 +186,10 @@ export function AuditLogsView() {
                 </TableRow>
               ) : entries.length === 0 ? (
                 <TableRow>
-                  <TableCell
-                    colSpan={5}
-                    className="py-16 text-center text-sm text-muted-foreground"
-                  >
+                  <TableCell colSpan={5} className="py-16 text-center text-sm text-muted-foreground">
                     {hasFilters
                       ? "No events match your filters."
-                      : "No events found."}
+                      : "No events recorded yet."}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -250,21 +199,21 @@ export function AuditLogsView() {
                     className="cursor-pointer"
                     onClick={() => setSelectedEntry(entry)}
                   >
-                    <TableCell className="font-medium text-sm">
+                    <TableCell className="whitespace-nowrap font-mono text-xs text-muted-foreground">
+                      <Tooltip content={formatDateTime(entry.createdAt)} side="top">
+                        <span>{timeAgo(entry.createdAt)}</span>
+                      </Tooltip>
+                    </TableCell>
+                    <TableCell className="text-sm font-medium">
                       {formatAction(entry.action)}
                     </TableCell>
                     <TableCell>
                       {entry.entityType ? (
-                        <Badge
-                          variant="secondary"
-                          className="text-xs capitalize"
-                        >
+                        <Badge variant="secondary" className="text-xs capitalize">
                           {entry.entityType.toLowerCase()}
                         </Badge>
                       ) : (
-                        <span className="text-xs text-muted-foreground">
-                          —
-                        </span>
+                        <span className="text-xs text-muted-foreground">—</span>
                       )}
                     </TableCell>
                     <TableCell>
@@ -275,13 +224,8 @@ export function AuditLogsView() {
                           </span>
                         </Tooltip>
                       ) : (
-                        <span className="text-xs text-muted-foreground">
-                          System
-                        </span>
+                        <span className="text-xs text-muted-foreground">System</span>
                       )}
-                    </TableCell>
-                    <TableCell className="text-xs text-muted-foreground">
-                      {timeAgo(entry.createdAt)}
                     </TableCell>
                     <TableCell>
                       <Button
@@ -302,40 +246,22 @@ export function AuditLogsView() {
             </TableBody>
           </Table>
 
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-between border-t border-border px-4 py-3">
-              <p className="text-xs text-muted-foreground">
-                Page {page} of {totalPages}
-              </p>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={page <= 1}
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                >
-                  Previous
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={page >= totalPages}
-                  onClick={() => setPage((p) => p + 1)}
-                >
-                  Next
-                </Button>
-              </div>
-            </div>
-          )}
+          <Pagination
+            page={filters.page}
+            pageSize={50}
+            totalPages={totalPages}
+            total={total}
+            isLoading={auditLogs.isFetching}
+            onPageChange={(p) => updateFilter("page", p)}
+          />
         </CardContent>
       </Card>
 
-      {/* Detail drawer */}
+      {/* ── Detail drawer ── */}
       <ResourceDrawer
         open={!!selectedEntry}
-        title="Audit log detail"
-        description="Full details for the selected event."
+        title="Event details"
+        description="Full details for the selected audit log entry."
         onClose={() => setSelectedEntry(null)}
       >
         {selectedEntry && (
@@ -347,39 +273,29 @@ export function AuditLogsView() {
             <Separator />
             <div>
               <Label className="text-xs text-muted-foreground">Action</Label>
-              <p className="mt-0.5 font-medium">
-                {formatAction(selectedEntry.action)}
-              </p>
+              <p className="mt-0.5 font-medium">{formatAction(selectedEntry.action)}</p>
             </div>
             <Separator />
             <div>
-              <Label className="text-xs text-muted-foreground">
-                Entity type
-              </Label>
+              <Label className="text-xs text-muted-foreground">Entity type</Label>
               <p className="mt-0.5">{selectedEntry.entityType ?? "—"}</p>
             </div>
             <Separator />
             <div>
               <Label className="text-xs text-muted-foreground">Entity ID</Label>
-              <p className="mt-0.5 font-mono text-xs">
-                {selectedEntry.entityId ?? "—"}
-              </p>
+              <p className="mt-0.5 font-mono text-xs">{selectedEntry.entityId ?? "—"}</p>
             </div>
             <Separator />
             <div>
               <Label className="text-xs text-muted-foreground">Actor ID</Label>
-              <p className="mt-0.5 font-mono text-xs">
-                {selectedEntry.actorId ?? "System"}
-              </p>
+              <p className="mt-0.5 font-mono text-xs">{selectedEntry.actorId ?? "System"}</p>
             </div>
             <Separator />
             {selectedEntry.metadata && (
               <>
                 <div>
-                  <Label className="text-xs text-muted-foreground">
-                    Metadata
-                  </Label>
-                  <pre className="mt-0.5 whitespace-pre-wrap rounded-lg bg-muted p-3 font-mono text-xs leading-relaxed">
+                  <Label className="text-xs text-muted-foreground">Metadata</Label>
+                  <pre className="mt-0.5 max-h-48 overflow-auto whitespace-pre-wrap rounded-lg bg-muted p-3 font-mono text-xs leading-relaxed">
                     {JSON.stringify(selectedEntry.metadata, null, 2)}
                   </pre>
                 </div>
@@ -387,33 +303,23 @@ export function AuditLogsView() {
               </>
             )}
             <div>
-              <Label className="text-xs text-muted-foreground">
-                Request ID
-              </Label>
-              <p className="mt-0.5 font-mono text-xs">
-                {selectedEntry.requestId ?? "—"}
-              </p>
+              <Label className="text-xs text-muted-foreground">Request ID</Label>
+              <p className="mt-0.5 font-mono text-xs">{selectedEntry.requestId ?? "—"}</p>
             </div>
             <Separator />
             <div>
               <Label className="text-xs text-muted-foreground">IP address</Label>
-              <p className="mt-0.5 font-mono text-xs">
-                {selectedEntry.ipAddress ?? "—"}
-              </p>
+              <p className="mt-0.5 font-mono text-xs">{selectedEntry.ipAddress ?? "—"}</p>
             </div>
             <Separator />
             <div>
               <Label className="text-xs text-muted-foreground">User agent</Label>
-              <p className="mt-0.5 break-all text-xs text-muted-foreground">
-                {selectedEntry.userAgent ?? "—"}
-              </p>
+              <p className="mt-0.5 break-all text-xs text-muted-foreground">{selectedEntry.userAgent ?? "—"}</p>
             </div>
             <Separator />
             <div>
               <Label className="text-xs text-muted-foreground">Created at</Label>
-              <p className="mt-0.5">
-                {formatDateTime(selectedEntry.createdAt)}
-              </p>
+              <p className="mt-0.5">{formatDateTime(selectedEntry.createdAt)}</p>
             </div>
           </div>
         )}
