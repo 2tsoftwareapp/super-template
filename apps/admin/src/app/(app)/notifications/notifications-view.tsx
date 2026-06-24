@@ -1,7 +1,9 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { AlertCircle, CheckCircle2, Clock, RefreshCcw, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 import type {
   ListResponse,
@@ -32,39 +34,51 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { timeAgo } from "@/lib/format";
+import { Textarea } from "@/components/ui/textarea";
+import { Tooltip } from "@/components/ui/tooltip";
+import { adminResources } from "@/lib/admin-resources";
+import { formatDateTime, timeAgo } from "@/lib/format";
 import { webFetch } from "@/lib/http";
 import { cn } from "@/lib/utils";
-import { adminResources } from "@/lib/admin-resources";
-
-// ── Status helper (shared with jobs page concept) ─────────────────────────────
-
-function jobStatusProps(status: string): {
-  variant: "default" | "secondary" | "outline";
-  className?: string;
-} {
-  if (status === "COMPLETED") return { variant: "default" };
-  if (status === "PENDING") return { variant: "secondary" };
-  if (status === "PROCESSING")
-    return {
-      variant: "secondary",
-      className:
-        "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30",
-    };
-  if (status === "FAILED")
-    return {
-      variant: "outline",
-      className: "text-destructive border-destructive/40",
-    };
-  return { variant: "outline" };
-}
 
 const notificationsResource = adminResources.find(
   (r) => r.id === "notifications",
 )!;
 
+function jobStatus(s: unknown): string {
+  if (typeof s === "string") return s;
+  return "UNKNOWN";
+}
+
+function statusBadge(status: string) {
+  switch (status) {
+    case "COMPLETED":
+      return { variant: "default" as const, icon: CheckCircle2 };
+    case "PENDING":
+      return { variant: "secondary" as const, icon: Clock };
+    case "PROCESSING":
+      return {
+        variant: "secondary" as const,
+        icon: RefreshCcw,
+        className: "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30",
+      };
+    case "FAILED":
+    case "CANCELLED":
+      return {
+        variant: "outline" as const,
+        icon: status === "FAILED" ? AlertCircle : Clock,
+        className: status === "FAILED"
+          ? "text-destructive border-destructive/40"
+          : undefined,
+      };
+    default:
+      return { variant: "outline" as const, icon: Clock };
+  }
+}
+
 export function NotificationsView() {
   const queryClient = useQueryClient();
+
   const jobs = useQuery({
     queryKey: ["admin-notification-jobs"],
     queryFn: () =>
@@ -72,6 +86,7 @@ export function NotificationsView() {
         "/api/bff/admin/notifications/jobs?limit=50",
       ),
   });
+
   const recentNotifications = useQuery({
     queryKey: ["admin-notifications"],
     queryFn: () =>
@@ -81,11 +96,11 @@ export function NotificationsView() {
   });
 
   const [audience, setAudience] = useState("ALL");
-  const [type, setType] = useState("SYSTEM");
-  const [title, setTitle] = useState("Template update");
-  const [body, setBody] = useState("The template is ready for review.");
   const [userId, setUserId] = useState("");
-  const [sent, setSent] = useState(false);
+  const [userIds, setUserIds] = useState("");
+  const [type, setType] = useState("SYSTEM");
+  const [title, setTitle] = useState("");
+  const [body, setBody] = useState("");
 
   const send = useMutation({
     mutationFn: (input: SendNotificationInput) =>
@@ -93,124 +108,176 @@ export function NotificationsView() {
         method: "POST",
         body: JSON.stringify(input),
       }),
-    onSuccess: async () => {
-      setSent(true);
-      setTimeout(() => setSent(false), 8000);
-      await queryClient.invalidateQueries({
-        queryKey: ["admin-notification-jobs"],
-      });
+    onSuccess: (result) => {
+      toast.success("Notification job queued");
+      setTitle("");
+      setBody("");
+      setType("SYSTEM");
+      setUserId("");
+      setUserIds("");
+      setAudience("ALL");
+      queryClient.invalidateQueries({ queryKey: ["admin-notification-jobs"] });
+    },
+    onError: () => {
+      toast.error("Failed to queue notification");
     },
   });
+
+  const cancelJob = useMutation({
+    mutationFn: (jobId: string) =>
+      webFetch(`/api/bff/admin/notifications/jobs/${jobId}`, {
+        method: "DELETE",
+      }),
+    onSuccess: () => {
+      toast.success("Job cancelled");
+      queryClient.invalidateQueries({ queryKey: ["admin-notification-jobs"] });
+    },
+  });
+
+  const handleSend = () => {
+    const input: SendNotificationInput = {
+      audience: audience as SendNotificationInput["audience"],
+      type,
+      title: title || "Test notification",
+      body: body || "This is a test notification sent from the admin panel.",
+    };
+    if (audience === "USER") input.userId = userId;
+    if (audience === "USERS")
+      input.userIds = userIds
+        .split(/[\n,]+/)
+        .map((s) => s.trim())
+        .filter(Boolean);
+    send.mutate(input);
+  };
+
+  const invalidateAll = () => {
+    jobs.refetch();
+    recentNotifications.refetch();
+  };
 
   return (
     <ResourcePageShell
       resource={notificationsResource}
-      description="Send admin notifications and inspect the delivery queue."
+      description="Send test notifications and manage delivery jobs."
+      isRefreshing={jobs.isFetching || recentNotifications.isFetching}
+      onRefresh={invalidateAll}
     >
       <div className="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
-        {/* Compose panel */}
+        {/* ── Compose ── */}
         <Card>
           <CardHeader className="pb-4">
-            <CardTitle className="text-base">Compose</CardTitle>
+            <CardTitle className="text-base">Send test notification</CardTitle>
             <CardDescription className="text-xs">
-              Queue a notification job through the admin API.
+              Queue a notification immediately through the admin API.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {sent && (
-              <Alert variant="info">
-                Notification job queued successfully.
-              </Alert>
-            )}
             {send.isError && (
               <Alert variant="error">
-                Failed to send notification. Please try again.
+                Failed to queue notification. Check the API and try again.
               </Alert>
             )}
 
             <div className="space-y-1.5">
-              <Label htmlFor="notification-audience">Audience</Label>
+              <Label htmlFor="notif-audience">Audience</Label>
               <select
-                id="notification-audience"
-                className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                id="notif-audience"
+                className="flex h-9 w-full rounded-lg border border-input bg-background px-3 text-sm shadow-xs outline-hidden transition-colors focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
                 value={audience}
                 onChange={(e) => setAudience(e.target.value)}
               >
                 <option value="ALL">All users</option>
-                <option value="USER">Specific user</option>
+                <option value="USER">Single user</option>
                 <option value="USERS">Multiple users</option>
               </select>
             </div>
 
-            {audience !== "ALL" && (
+            {audience === "USER" && (
               <div className="space-y-1.5">
-                <Label htmlFor="notification-user-id">User ID</Label>
+                <Label htmlFor="notif-user-id">User ID</Label>
                 <Input
-                  id="notification-user-id"
-                  placeholder="Enter user ID"
+                  id="notif-user-id"
+                  placeholder="uuid of the target user"
                   value={userId}
                   onChange={(e) => setUserId(e.target.value)}
                 />
               </div>
             )}
 
+            {audience === "USERS" && (
+              <div className="space-y-1.5">
+                <Label htmlFor="notif-user-ids">User IDs</Label>
+                <Textarea
+                  id="notif-user-ids"
+                  placeholder="One UUID per line, or comma-separated"
+                  value={userIds}
+                  onChange={(e) => setUserIds(e.target.value)}
+                  className="min-h-[60px]"
+                />
+              </div>
+            )}
+
             <div className="space-y-1.5">
-              <Label htmlFor="notification-type">Type</Label>
+              <Label htmlFor="notif-type">Type</Label>
               <Input
-                id="notification-type"
+                id="notif-type"
                 value={type}
                 onChange={(e) => setType(e.target.value)}
               />
             </div>
+
             <div className="space-y-1.5">
-              <Label htmlFor="notification-title">Title</Label>
+              <Label htmlFor="notif-title">Title</Label>
               <Input
-                id="notification-title"
+                id="notif-title"
+                placeholder="Test notification"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
               />
             </div>
+
             <div className="space-y-1.5">
-              <Label htmlFor="notification-body">Body</Label>
-              <Input
-                id="notification-body"
+              <Label htmlFor="notif-body">Body</Label>
+              <Textarea
+                id="notif-body"
+                placeholder="This is a test notification sent from the admin panel."
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
+                className="min-h-[80px]"
               />
             </div>
 
             <Button
               className="w-full"
-              onClick={() =>
-                void send.mutateAsync({
-                  audience: audience as SendNotificationInput["audience"],
-                  type,
-                  title,
-                  body,
-                  ...(audience === "ALL" ? {} : { userId }),
-                })
-              }
+              onClick={handleSend}
               disabled={send.isPending}
             >
               {send.isPending ? (
                 <>
-                  <Spinner className="size-4" /> Sending…
+                  <Spinner className="size-4" /> Queuing…
                 </>
               ) : (
-                "Send notification"
+                "Send test notification"
               )}
             </Button>
           </CardContent>
         </Card>
 
-        {/* Jobs + recent notifications */}
+        {/* ── Jobs + Recent ── */}
         <div className="space-y-4">
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-base">Jobs</CardTitle>
-              <CardDescription className="text-xs">
-                Recent notification jobs and delivery state.
-              </CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-base">Delivery jobs</CardTitle>
+                  <CardDescription className="text-xs">
+                    Recent notification jobs and their status.
+                  </CardDescription>
+                </div>
+                <Button variant="ghost" size="sm" onClick={() => jobs.refetch()}>
+                  <RefreshCcw className="size-3.5" />
+                </Button>
+              </div>
             </CardHeader>
             <CardContent className="p-0 pb-1">
               <Table>
@@ -219,20 +286,22 @@ export function NotificationsView() {
                     <TableHead>Type</TableHead>
                     <TableHead>Audience</TableHead>
                     <TableHead>Status</TableHead>
+                    <TableHead>Recipients</TableHead>
                     <TableHead>Scheduled</TableHead>
+                    <TableHead className="w-10" />
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {jobs.isLoading ? (
                     <TableRow>
-                      <TableCell colSpan={4} className="py-10 text-center">
+                      <TableCell colSpan={6} className="py-10 text-center">
                         <Spinner className="mx-auto size-4" />
                       </TableCell>
                     </TableRow>
                   ) : (jobs.data?.data ?? []).length === 0 ? (
                     <TableRow>
                       <TableCell
-                        colSpan={4}
+                        colSpan={6}
                         className="py-10 text-center text-sm text-muted-foreground"
                       >
                         No notification jobs yet.
@@ -240,30 +309,67 @@ export function NotificationsView() {
                     </TableRow>
                   ) : (
                     (jobs.data?.data ?? []).map((job) => {
-                      const { variant, className } = jobStatusProps(job.status);
+                      const s = jobStatus(job.status);
+                      const sb = statusBadge(s);
+                      const Icon = sb.icon;
                       return (
                         <TableRow key={job.id}>
                           <TableCell className="font-mono text-xs">
                             {job.type}
                           </TableCell>
                           <TableCell>
-                            <Badge
-                              variant="outline"
-                              className="text-xs capitalize"
-                            >
+                            <Badge variant="outline" className="text-xs capitalize">
                               {job.audience?.toLowerCase() ?? "—"}
                             </Badge>
                           </TableCell>
                           <TableCell>
-                            <Badge
-                              variant={variant}
-                              className={cn("text-xs capitalize", className)}
+                            <Tooltip
+                              content={
+                                s === "FAILED" && job.errorMessage
+                                  ? String(job.errorMessage)
+                                  : s
+                              }
+                              side="top"
                             >
-                              {job.status.toLowerCase()}
-                            </Badge>
+                              <Badge
+                                variant={sb.variant}
+                                className={cn(
+                                  "gap-1 text-xs capitalize",
+                                  sb.className,
+                                )}
+                              >
+                                <Icon className="size-3" />
+                                {s.toLowerCase()}
+                              </Badge>
+                            </Tooltip>
                           </TableCell>
                           <TableCell className="text-xs text-muted-foreground">
-                            {timeAgo(job.scheduledAt)}
+                            {job.recipientCount != null ? String(job.recipientCount) : "—"}
+                          </TableCell>
+                          <TableCell className="text-xs text-muted-foreground">
+                            <Tooltip
+                              content={
+                                job.processedAt
+                                  ? `Processed ${formatDateTime(String(job.processedAt))}`
+                                  : formatDateTime(String(job.scheduledAt))
+                              }
+                              side="top"
+                            >
+                              <span>{timeAgo(String(job.scheduledAt))}</span>
+                            </Tooltip>
+                          </TableCell>
+                          <TableCell>
+                            {s === "PENDING" && (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="size-7 text-muted-foreground hover:text-destructive"
+                                disabled={cancelJob.isPending}
+                                onClick={() => cancelJob.mutate(job.id)}
+                              >
+                                <Trash2 className="size-3.5" />
+                              </Button>
+                            )}
                           </TableCell>
                         </TableRow>
                       );
@@ -278,7 +384,7 @@ export function NotificationsView() {
             <CardHeader className="pb-3">
               <CardTitle className="text-base">Recent notifications</CardTitle>
               <CardDescription className="text-xs">
-                Last delivered to users.
+                Last 10 notifications delivered to users.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-2 pb-4">
@@ -292,9 +398,30 @@ export function NotificationsView() {
                 </p>
               ) : (
                 (recentNotifications.data?.data ?? []).map((item) => (
-                  <div key={item.id} className="rounded-xl bg-muted/40 p-3">
-                    <p className="text-sm font-medium">{item.title}</p>
-                    <p className="text-xs text-muted-foreground">{item.body}</p>
+                  <div
+                    key={item.id}
+                    className={cn(
+                      "rounded-xl p-3",
+                      item.readAt
+                        ? "bg-muted/30"
+                        : "border border-border bg-card",
+                    )}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium">{item.title}</p>
+                        <p className="mt-0.5 text-xs text-muted-foreground">
+                          {item.body}
+                        </p>
+                      </div>
+                      <Badge variant="secondary" className="shrink-0 text-[10px]">
+                        {item.type}
+                      </Badge>
+                    </div>
+                    <div className="mt-1.5 flex items-center gap-2 text-[10px] text-muted-foreground">
+                      <span>{timeAgo(String(item.createdAt))}</span>
+                      {item.readAt && <span>· Read {timeAgo(String(item.readAt))}</span>}
+                    </div>
                   </div>
                 ))
               )}
