@@ -2,7 +2,9 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { RefreshCw } from "lucide-react";
-import { useMemo, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
 
 import type {
   JobDto,
@@ -21,6 +23,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { Pagination } from "@/components/ui/pagination";
 import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
 import {
@@ -31,12 +34,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { adminResources } from "@/lib/admin-resources";
 import { formatDateTime, timeAgo } from "@/lib/format";
 import { webFetch } from "@/lib/http";
 import { cn } from "@/lib/utils";
-import { adminResources } from "@/lib/admin-resources";
-
-// ── Status helpers ────────────────────────────────────────────────────────────
 
 function jobStatusProps(status: string): {
   variant: "default" | "secondary" | "outline";
@@ -63,27 +64,17 @@ function jobStatusProps(status: string): {
   return { variant: "outline" };
 }
 
-function eventTypeProps(type: string): {
-  label: string;
-  color: string;
-} {
-  switch (type) {
-    case "claimed":
-      return { label: "Claimed", color: "bg-amber-500/15 text-amber-700 dark:text-amber-400" };
-    case "completed":
-      return { label: "Completed", color: "bg-green-500/15 text-green-700 dark:text-green-400" };
-    case "failed":
-      return { label: "Failed", color: "bg-destructive/15 text-destructive" };
-    case "retry_scheduled":
-      return { label: "Retry scheduled", color: "bg-blue-500/15 text-blue-700 dark:text-blue-400" };
-    case "cancelled":
-      return { label: "Cancelled", color: "bg-muted text-muted-foreground" };
-    default:
-      return { label: type, color: "bg-muted text-muted-foreground" };
-  }
-}
+const EVENT_STYLES: Record<string, { label: string; dot: string; text: string }> = {
+  claimed: { label: "Claimed", dot: "bg-amber-500", text: "text-amber-700 dark:text-amber-400" },
+  completed: { label: "Completed", dot: "bg-green-500", text: "text-green-700 dark:text-green-400" },
+  failed: { label: "Failed", dot: "bg-destructive", text: "text-destructive" },
+  retry_scheduled: { label: "Retry scheduled", dot: "bg-blue-500", text: "text-blue-700 dark:text-blue-400" },
+  cancelled: { label: "Cancelled", dot: "bg-muted-foreground", text: "text-muted-foreground" },
+};
 
-// ── Stat chip ─────────────────────────────────────────────────────────────────
+function eventTypeProps(type: string) {
+  return EVENT_STYLES[type] ?? { label: type, dot: "bg-muted-foreground", text: "text-muted-foreground" };
+}
 
 function StatChip({
   label,
@@ -102,23 +93,62 @@ function StatChip({
   );
 }
 
-// ── Page ──────────────────────────────────────────────────────────────────────
+const STATUS_OPTIONS = [
+  { value: "", label: "All statuses" },
+  { value: "PENDING", label: "Pending" },
+  { value: "PROCESSING", label: "Processing" },
+  { value: "COMPLETED", label: "Completed" },
+  { value: "FAILED", label: "Failed" },
+  { value: "CANCELLED", label: "Cancelled" },
+];
+
+interface Filters {
+  status: string;
+  type: string;
+  page: number;
+}
+
+function parseFilters(sp: URLSearchParams): Filters {
+  return {
+    status: sp.get("status") ?? "",
+    type: sp.get("type") ?? "",
+    page: Math.max(1, Number(sp.get("page")) || 1),
+  };
+}
 
 const jobsResource = adminResources.find((r) => r.id === "jobs")!;
 
 export function JobsView() {
-  const queryClient = useQueryClient();
-  const [status, setStatus] = useState("");
-  const [type, setType] = useState("");
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const [filters, setFilters] = useState<Filters>(() =>
+    parseFilters(new URLSearchParams(searchParams.toString())),
+  );
   const [confirmCancel, setConfirmCancel] = useState<string | null>(null);
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
 
+  const updateFilter = (key: keyof Filters, value: string | number) => {
+    const next = { ...filters, [key]: value };
+    if (key !== "page") next.page = 1;
+    setFilters(next);
+    const sp = new URLSearchParams();
+    if (next.status) sp.set("status", next.status);
+    if (next.type) sp.set("type", next.type);
+    if (next.page > 1) sp.set("page", String(next.page));
+    const qs = sp.toString();
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+  };
+
+  const queryClient = useQueryClient();
+
   const jobs = useQuery({
-    queryKey: ["admin-jobs", status, type],
+    queryKey: ["admin-jobs", filters.status, filters.type, filters.page],
     queryFn: () => {
-      const params = new URLSearchParams({ limit: "50" });
-      if (status) params.set("status", status);
-      if (type) params.set("type", type);
+      const params = new URLSearchParams({ limit: "50", page: String(filters.page) });
+      if (filters.status) params.set("status", filters.status);
+      if (filters.type) params.set("type", filters.type);
       return webFetch<ListResponse<JobDto>>(
         `/api/bff/admin/jobs?${params.toString()}`,
       );
@@ -152,32 +182,31 @@ export function JobsView() {
       webFetch<JobDto>(`/api/bff/admin/jobs/${id}`, { method: "DELETE" }),
     onSuccess: async () => {
       setConfirmCancel(null);
+      toast.success("Job cancelled");
       await queryClient.invalidateQueries({ queryKey: ["admin-jobs"] });
       await queryClient.invalidateQueries({ queryKey: ["admin-jobs-metrics"] });
     },
+    onError: () => {
+      toast.error("Failed to cancel job");
+    },
   });
 
-  const allJobs = useMemo(() => jobs.data?.data ?? [], [jobs.data?.data]);
-
-  const stats = useMemo(
-    () => ({
-      pending: allJobs.filter((j) => j.status === "PENDING").length,
-      processing: allJobs.filter((j) => j.status === "PROCESSING").length,
-      failed: allJobs.filter((j) => j.status === "FAILED").length,
-      completed: allJobs.filter((j) => j.status === "COMPLETED").length,
-    }),
-    [allJobs],
-  );
-
+  const allJobs = jobs.data?.data ?? [];
+  const totalPages = jobs.data?.meta?.totalPages ?? 1;
+  const total = jobs.data?.meta?.total ?? 0;
   const selectedJob = jobDetail.data?.data;
   const selectedLogs = jobLogs.data?.data ?? [];
 
   return (
     <ResourcePageShell
       resource={jobsResource}
-      description="Inspect queued jobs and cancel stalled work."
+      description="Inspect queued background jobs and cancel stalled work."
+      isRefreshing={jobs.isFetching || metrics.isFetching}
+      onRefresh={() => {
+        jobs.refetch();
+        metrics.refetch();
+      }}
     >
-
       {/* Metrics */}
       {metrics.data?.data && (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -207,31 +236,39 @@ export function JobsView() {
         </div>
       )}
 
-      {/* Stats */}
-      {!jobs.isLoading && (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <StatChip label="Pending" count={stats.pending} />
-          <StatChip
-            label="Processing"
-            count={stats.processing}
-            {...(stats.processing > 0
-              ? { className: "border-amber-500/30 bg-amber-500/5" }
-              : {})}
-          />
-          <StatChip
-            label="Failed"
-            count={stats.failed}
-            {...(stats.failed > 0
-              ? { className: "border-destructive/30 bg-destructive/5" }
-              : {})}
-          />
-          <StatChip
-            label="Completed"
-            count={stats.completed}
-            className="border-primary/30 bg-primary/5"
-          />
-        </div>
-      )}
+      {/* Stats from metrics (not client-side) */}
+      {metrics.data?.data && (() => {
+        const byStatus = metrics.data.data.byStatus ?? [];
+        const getCount = (s: string) => byStatus.find((b) => b.status === s)?.total ?? 0;
+        const totalPending = getCount("PENDING");
+        const totalProcessing = getCount("PROCESSING");
+        const totalFailed = metrics.data.data.totalFailed;
+        const totalCompleted = metrics.data.data.totalCompleted;
+        return (
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <StatChip label="Pending" count={totalPending} />
+            <StatChip
+              label="Processing"
+              count={totalProcessing}
+              {...(totalProcessing > 0
+                ? { className: "border-amber-500/30 bg-amber-500/5" }
+                : {})}
+            />
+            <StatChip
+              label="Failed"
+              count={totalFailed}
+              {...(totalFailed > 0
+                ? { className: "border-destructive/30 bg-destructive/5" }
+                : {})}
+            />
+            <StatChip
+              label="Completed"
+              count={totalCompleted}
+              className="border-primary/30 bg-primary/5"
+            />
+          </div>
+        );
+      })()}
 
       {/* Filters */}
       <Card>
@@ -241,7 +278,7 @@ export function JobsView() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => void jobs.refetch()}
+              onClick={() => jobs.refetch()}
               disabled={jobs.isFetching}
             >
               <RefreshCw
@@ -257,16 +294,15 @@ export function JobsView() {
               Status
             </label>
             <select
-              className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
+              className="flex h-9 w-full rounded-lg border border-input bg-background px-3 text-sm shadow-xs outline-hidden transition-colors focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+              value={filters.status}
+              onChange={(e) => updateFilter("status", e.target.value)}
             >
-              <option value="">All statuses</option>
-              <option value="PENDING">Pending</option>
-              <option value="PROCESSING">Processing</option>
-              <option value="COMPLETED">Completed</option>
-              <option value="FAILED">Failed</option>
-              <option value="CANCELLED">Cancelled</option>
+              {STATUS_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
             </select>
           </div>
           <div className="space-y-1.5">
@@ -274,10 +310,10 @@ export function JobsView() {
               Type
             </label>
             <input
-              className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="flex h-9 w-full rounded-lg border border-input bg-background px-3 text-sm shadow-xs outline-hidden transition-colors focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
               placeholder="e.g. SEND_NOTIFICATION"
-              value={type}
-              onChange={(e) => setType(e.target.value)}
+              value={filters.type}
+              onChange={(e) => updateFilter("type", e.target.value)}
             />
           </div>
         </CardContent>
@@ -288,8 +324,8 @@ export function JobsView() {
         <CardHeader className="pb-3">
           <CardTitle className="text-base">Queue</CardTitle>
           <CardDescription className="text-xs">
-            {jobs.data
-              ? `${allJobs.length} jobs returned`
+            {total > 0
+              ? `${total} job${total !== 1 ? "s" : ""}`
               : "Manage scheduled and running jobs."}
           </CardDescription>
         </CardHeader>
@@ -317,16 +353,16 @@ export function JobsView() {
                     colSpan={5}
                     className="py-16 text-center text-sm text-muted-foreground"
                   >
-                    {status || type
+                    {filters.status || filters.type
                       ? "No jobs match your filters."
                       : "No jobs found."}
                   </TableCell>
                 </TableRow>
               ) : (
                 allJobs.map((job) => {
-                  const { variant, className } = jobStatusProps(job.status);
-                  // Backend only allows cancelling PENDING jobs
-                  const canCancel = job.status === "PENDING";
+                  const s = job.status ?? "";
+                  const { variant, className } = jobStatusProps(s);
+                  const canCancel = s === "PENDING";
                   const isConfirming = confirmCancel === job.id;
                   return (
                     <TableRow key={job.id}>
@@ -338,7 +374,7 @@ export function JobsView() {
                           variant={variant}
                           className={cn("text-xs capitalize", className)}
                         >
-                          {job.status.toLowerCase()}
+                          {s.toLowerCase()}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-xs text-muted-foreground">
@@ -366,7 +402,7 @@ export function JobsView() {
                                   className="h-7 text-xs text-destructive border-destructive/40 hover:bg-destructive/5"
                                   disabled={cancelJob.isPending}
                                   onClick={() =>
-                                    void cancelJob.mutateAsync(job.id)
+                                    cancelJob.mutate(job.id)
                                   }
                                 >
                                   {cancelJob.isPending ? (
@@ -402,6 +438,15 @@ export function JobsView() {
               )}
             </TableBody>
           </Table>
+
+          <Pagination
+            page={filters.page}
+            pageSize={50}
+            totalPages={totalPages}
+            total={total}
+            isLoading={jobs.isFetching}
+            onPageChange={(p) => updateFilter("page", p)}
+          />
         </CardContent>
       </Card>
 
@@ -410,9 +455,7 @@ export function JobsView() {
         open={!!selectedJobId}
         title="Job detail"
         description={selectedJob ? `Type: ${selectedJob.type}` : "Loading…"}
-        onClose={() => {
-          setSelectedJobId(null);
-        }}
+        onClose={() => setSelectedJobId(null)}
       >
         {selectedJob ? (
           <div className="space-y-4 text-sm">
@@ -430,13 +473,13 @@ export function JobsView() {
               <Label className="text-xs text-muted-foreground">Status</Label>
               <div className="mt-0.5">
                 <Badge
-                  variant={jobStatusProps(selectedJob.status).variant}
+                  variant={jobStatusProps(selectedJob.status ?? "").variant}
                   className={cn(
                     "text-xs capitalize",
-                    jobStatusProps(selectedJob.status).className,
+                    jobStatusProps(selectedJob.status ?? "").className,
                   )}
                 >
-                  {selectedJob.status.toLowerCase()}
+                  {String(selectedJob.status).toLowerCase()}
                 </Badge>
               </div>
             </div>
@@ -493,7 +536,7 @@ export function JobsView() {
                     Started at
                   </Label>
                   <p className="mt-0.5">
-                    {formatDateTime(selectedJob.startedAt != null ? String(selectedJob.startedAt) : null)}
+                    {formatDateTime(String(selectedJob.startedAt))}
                   </p>
                 </div>
               )}
@@ -503,7 +546,7 @@ export function JobsView() {
                     Completed at
                   </Label>
                   <p className="mt-0.5">
-                    {formatDateTime(selectedJob.completedAt != null ? String(selectedJob.completedAt) : null)}
+                    {formatDateTime(String(selectedJob.completedAt))}
                   </p>
                 </div>
               )}
@@ -519,7 +562,7 @@ export function JobsView() {
             {/* Job logs timeline */}
             {selectedJobId && (
               <>
-                <Separator className="my-4" />
+                <Separator />
                 <div>
                   <Label className="text-xs text-muted-foreground">
                     Event timeline
@@ -534,25 +577,28 @@ export function JobsView() {
                     ) : (
                       <div className="relative space-y-0">
                         {selectedLogs.map((event, idx) => {
-                          const evProps = eventTypeProps(event.type);
+                          const evProps = eventTypeProps(String(event.type));
                           return (
-                            <div key={event.id} className="flex gap-3 pb-4 pl-4 relative">
+                            <div
+                              key={`${String(event.createdAt)}-${String(event.type)}-${idx}`}
+                              className="flex gap-3 pb-4 pl-4 relative"
+                            >
                               {idx < selectedLogs.length - 1 && (
                                 <div className="absolute left-[7px] top-4 bottom-0 w-px bg-border" />
                               )}
-                              <div className={cn("mt-1 size-3 shrink-0 rounded-full", evProps.color.replace('text', 'bg'))} />
+                              <div className={cn("mt-1 size-3 shrink-0 rounded-full", evProps.dot)} />
                               <div className="min-w-0 flex-1">
                                 <div className="flex items-center gap-2">
-                                  <span className={cn("text-xs font-medium", evProps.color)}>
+                                  <span className={cn("text-xs font-medium", evProps.text)}>
                                     {evProps.label}
                                   </span>
                                   <span className="text-[10px] text-muted-foreground">
-                                    {timeAgo(event.createdAt)}
+                                    {timeAgo(String(event.createdAt))}
                                   </span>
                                 </div>
                                 {event.message && (
                                   <p className="mt-0.5 text-xs text-muted-foreground">
-                                    {event.message}
+                                    {String(event.message)}
                                   </p>
                                 )}
                               </div>

@@ -1,12 +1,23 @@
 "use client";
 
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { RefreshCw } from "lucide-react";
+import {
+  AlertCircle,
+  CheckCircle2,
+  Clock,
+  RefreshCw,
+  Search,
+} from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
-import type { CreateImportInput, ImportJobDto } from "@/lib/api-types";
+import type {
+  CreateImportInput,
+  ImportJobDto,
+} from "@/lib/api-types";
 
 import { ResourcePageShell } from "@/components/resource-page-shell";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -15,19 +26,53 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
-import { webFetch } from "@/lib/http";
 import { adminResources } from "@/lib/admin-resources";
+import { formatDateTime, timeAgo } from "@/lib/format";
+import { webFetch } from "@/lib/http";
 import { cn } from "@/lib/utils";
 
 const importsResource = adminResources.find((r) => r.id === "imports")!;
+
+const IMPORT_TYPES = [
+  { value: "users", label: "Users" },
+  { value: "projects", label: "Projects" },
+];
+
+function statusBadge(status: string) {
+  switch (status) {
+    case "COMPLETED":
+      return { variant: "default" as const, icon: CheckCircle2 };
+    case "PENDING":
+      return { variant: "secondary" as const, icon: Clock };
+    case "PROCESSING":
+      return {
+        variant: "secondary" as const,
+        icon: RefreshCw,
+        className: "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30",
+      };
+    case "FAILED":
+      return {
+        variant: "outline" as const,
+        icon: AlertCircle,
+        className: "text-destructive border-destructive/40",
+      };
+    case "CANCELLED":
+      return { variant: "outline" as const, icon: Clock };
+    default:
+      return { variant: "outline" as const, icon: Clock };
+  }
+}
 
 export function ImportsView() {
   const [fileId, setFileId] = useState("");
   const [type, setType] = useState("users");
   const [jobId, setJobId] = useState("");
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const createImport = useMutation({
     mutationFn: (input: CreateImportInput) =>
@@ -35,31 +80,54 @@ export function ImportsView() {
         method: "POST",
         body: JSON.stringify(input),
       }),
+    onSuccess: (result) => {
+      toast.success("Import job created");
+      setJobId(result.data.id);
+      setFileId("");
+    },
+    onError: () => {
+      toast.error("Failed to create import");
+    },
   });
+
   const job = useQuery({
     queryKey: ["admin-import-job", jobId],
     queryFn: () =>
       webFetch<{ data: ImportJobDto }>(`/api/bff/imports/${jobId}`),
     enabled: Boolean(jobId),
   });
+
   const confirm = useMutation({
     mutationFn: (id: string) =>
       webFetch<{ data: ImportJobDto }>(`/api/bff/imports/${id}/confirm`, {
         method: "POST",
       }),
+    onSuccess: () => {
+      toast.success("Import confirmed");
+      job.refetch();
+    },
+    onError: () => {
+      toast.error("Failed to confirm import");
+    },
   });
+
+  const jobData = job.data?.data;
+  const s = typeof jobData?.status === "string" ? jobData.status : "";
+  const sb = s ? statusBadge(s) : null;
+  const Icon = sb?.icon;
 
   return (
     <ResourcePageShell
       resource={importsResource}
-      description="Create imports, inspect jobs by id, and confirm them when ready."
+      description="Create import jobs from uploaded files, inspect progress, and confirm when ready."
     >
       <div className="grid gap-4 xl:grid-cols-[0.95fr_1.05fr]">
+        {/* ── Create ── */}
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Create import</CardTitle>
             <CardDescription>
-              Provide the file id and import payload.
+              Queue a new import job referencing an uploaded file.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -67,94 +135,201 @@ export function ImportsView() {
               <Label htmlFor="import-file-id">File ID</Label>
               <Input
                 id="import-file-id"
+                placeholder="UUID of the uploaded file"
                 value={fileId}
-                onChange={(event) => setFileId(event.target.value)}
+                onChange={(e) => setFileId(e.target.value)}
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="import-type">Type</Label>
-              <Input
+              <select
                 id="import-type"
+                className="flex h-9 w-full rounded-lg border border-input bg-background px-3 text-sm shadow-xs outline-hidden transition-colors focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
                 value={type}
-                onChange={(event) => setType(event.target.value)}
-              />
+                onChange={(e) => setType(e.target.value)}
+              >
+                {IMPORT_TYPES.map((t) => (
+                  <option key={t.value} value={t.value}>
+                    {t.label}
+                  </option>
+                ))}
+              </select>
             </div>
             <Button
               className="w-full"
               onClick={() =>
-                void createImport.mutateAsync({
-                  fileId,
-                  type,
-                })
+                createImport.mutate({ fileId, type })
               }
-              disabled={createImport.isPending}
+              disabled={createImport.isPending || !fileId || !type}
             >
-              {createImport.isPending ? "Creating..." : "Create import"}
+              {createImport.isPending ? (
+                <><Spinner className="size-4" /> Queuing…</>
+              ) : (
+                "Create import"
+              )}
             </Button>
           </CardContent>
         </Card>
+
+        {/* ── Lookup ── */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Lookup job</CardTitle>
+            <CardTitle className="text-base">Job detail</CardTitle>
             <CardDescription>
-              Inspect an import by id and confirm it when ready.
+              Look up an import job by ID to inspect and confirm.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="import-job-id">Import ID</Label>
-              <Input
-                id="import-job-id"
-                value={jobId}
-                onChange={(event) => setJobId(event.target.value)}
-              />
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <Search className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  placeholder="Import job ID"
+                  value={jobId}
+                  onChange={(e) => setJobId(e.target.value)}
+                  className="pl-8"
+                />
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => job.refetch()}
+                disabled={job.isFetching || !jobId}
+              >
+                <RefreshCw
+                  className={cn("size-3.5", job.isFetching && "animate-spin")}
+                />
+              </Button>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => void job.refetch()}
-              disabled={job.isFetching}
-            >
-              <RefreshCw
-                data-icon="inline-start"
-                className={cn(job.isFetching && "animate-spin")}
-              />
-              Refresh
-            </Button>
-            <div className="rounded-xl border border-border p-4 text-sm text-muted-foreground">
-              {job.isLoading ? (
-                <div className="flex justify-center py-4">
-                  <Spinner className="size-4" />
+
+            {jobId && job.isLoading ? (
+              <div className="flex justify-center py-8">
+                <Spinner className="size-5" />
+              </div>
+            ) : job.isError ? (
+              <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
+                Could not load job. Check the ID and try again.
+              </div>
+            ) : !jobData ? (
+              <div className="rounded-xl border border-border p-6 text-center text-sm text-muted-foreground">
+                {jobId ? "No data returned" : "Enter a job ID and click refresh"}
+              </div>
+            ) : (
+              <div className="space-y-4 rounded-xl border border-border p-4">
+                <div className="flex items-center justify-between">
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium">{jobData.type}</p>
+                    <p className="mt-0.5 font-mono text-[10px] text-muted-foreground">
+                      {jobData.id}
+                    </p>
+                  </div>
+                  {Icon && (
+                    <Badge
+                      variant={sb!.variant}
+                      className={cn("gap-1 capitalize", sb?.className)}
+                    >
+                      <Icon className="size-3" />
+                      {s.toLowerCase()}
+                    </Badge>
+                  )}
                 </div>
-              ) : (
-                <>
-                  <p className="font-medium text-foreground">
-                    {job.data?.data.type ?? "No job loaded"}
-                  </p>
-                  <p>Status: {job.data?.data.status ?? "-"}</p>
-                  <p>File: {job.data?.data.fileId ?? "-"}</p>
-                  <p>
-                    Rows:{" "}
-                    {job.data?.data.rowCount
-                      ? JSON.stringify(job.data.data.rowCount)
-                      : "-"}
-                  </p>
-                  <pre className="mt-3 whitespace-pre-wrap text-xs">
-                    {job.data?.data ? JSON.stringify(job.data.data, null, 2) : ""}
-                  </pre>
-                </>
-              )}
-            </div>
-            <Button
-              variant="outline"
-              onClick={() => void confirm.mutateAsync(jobId)}
-              disabled={!jobId || job.isLoading || !job.data?.data || confirm.isPending}
-            >
-              {confirm.isPending ? "Confirming..." : "Confirm import"}
-            </Button>
+
+                <Separator />
+
+                <div className="grid grid-cols-3 gap-3 text-xs">
+                  <div>
+                    <span className="text-muted-foreground">Rows</span>
+                    <p className="mt-0.5 font-medium">
+                      {jobData.rowCount != null ? String(jobData.rowCount) : "—"}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Success</span>
+                    <p className="mt-0.5 font-medium text-emerald-600">
+                      {jobData.successCount != null ? String(jobData.successCount) : "—"}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Errors</span>
+                    <p className="mt-0.5 font-medium text-destructive">
+                      {jobData.errorCount != null ? String(jobData.errorCount) : "—"}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-1 text-xs">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">File</span>
+                    <span className="font-mono">{jobData.fileId.slice(0, 8)}…</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Created</span>
+                    <span>{timeAgo(jobData.createdAt)}</span>
+                  </div>
+                  {jobData.completedAt && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Completed</span>
+                      <span>{timeAgo(String(jobData.completedAt))}</span>
+                    </div>
+                  )}
+                  {jobData.confirmedAt && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Confirmed</span>
+                      <span>{timeAgo(String(jobData.confirmedAt))}</span>
+                    </div>
+                  )}
+                </div>
+
+                {Array.isArray(jobData.errors) && jobData.errors.length > 0 && (
+                  <>
+                    <Separator />
+                    <div className="space-y-1">
+                      <p className="text-xs font-medium text-destructive">
+                        Validation errors ({jobData.errors.length})
+                      </p>
+                      <div className="max-h-32 overflow-y-auto space-y-1">
+                        {jobData.errors.map((err, i) => (
+                          <p key={i} className="text-[10px] text-muted-foreground">
+                            Row {String(err.row ?? "?")}: {String(err.message ?? "")}
+                          </p>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {(s === "PENDING" || s === "PROCESSING") && (
+                  <Button
+                    className="w-full"
+                    variant="outline"
+                    onClick={() => setConfirmOpen(true)}
+                    disabled={confirm.isPending}
+                  >
+                    {confirm.isPending ? (
+                      <><Spinner className="size-4" /> Confirming…</>
+                    ) : (
+                      "Confirm import"
+                    )}
+                  </Button>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
+
+      <ConfirmDialog
+        open={confirmOpen}
+        title="Confirm import"
+        message="This will apply the imported data. This action cannot be undone."
+        confirmLabel="Confirm"
+        loading={confirm.isPending}
+        onCancel={() => setConfirmOpen(false)}
+        onConfirm={() => {
+          confirm.mutate(jobId);
+          setConfirmOpen(false);
+        }}
+      />
     </ResourcePageShell>
   );
 }

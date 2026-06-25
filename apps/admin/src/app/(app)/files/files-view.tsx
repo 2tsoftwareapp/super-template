@@ -24,6 +24,7 @@ import { ResourcePageShell } from "@/components/resource-page-shell";
 import { ResourceToolbar } from "@/components/resource-toolbar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import {
   Card,
   CardContent,
@@ -81,6 +82,7 @@ export function FilesView() {
   const [page, setPage] = useState(1);
   const [selectedFile, setSelectedFile] = useState<FileDto | null>(null);
   const [detailTab, setDetailTab] = useState<"versions" | "history">("versions");
+  const [deleteTarget, setDeleteTarget] = useState<FileDto | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const versionInputRef = useRef<HTMLInputElement>(null);
 
@@ -157,10 +159,11 @@ export function FilesView() {
   const totalPages = files.data?.meta?.totalPages ?? 1;
   const total = files.data?.meta?.total ?? 0;
 
-  const hasFilters = Boolean(mimeFilter);
+  const hasFilters = Boolean(mimeFilter || search);
 
   const clearFilters = () => {
     setMimeFilter("");
+    setSearch("");
     setPage(1);
   };
 
@@ -320,9 +323,7 @@ export function FilesView() {
                         className="text-destructive"
                         onClick={(e: React.MouseEvent) => {
                           e.stopPropagation();
-                          if (window.confirm(`Delete "${file.originalName}"?`)) {
-                            deleteFile.mutate(file.id);
-                          }
+                          setDeleteTarget(file);
                         }}
                       >
                         <Trash2 className="size-4" />
@@ -412,11 +413,7 @@ export function FilesView() {
                 size="sm"
                 variant="outline"
                 className="text-destructive"
-                onClick={() => {
-                  if (confirm("Delete this file?")) {
-                    deleteFile.mutate(selectedFile.id);
-                  }
-                }}
+                onClick={() => setDeleteTarget(selectedFile)}
               >
                 <Trash2 data-icon="inline-start" />
                 Delete
@@ -509,7 +506,7 @@ export function FilesView() {
                 ) : history.data?.data.length ? (
                   history.data.data.map((event: FileHistoryEventDto, i: number) => (
                     <div
-                      key={i}
+                      key={`${event.createdAt}-${event.action}-${i}`}
                       className="rounded-lg border border-border p-3 text-sm"
                     >
                       <div className="flex items-center justify-between">
@@ -539,6 +536,22 @@ export function FilesView() {
           </div>
         )}
       </ResourceDrawer>
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title={deleteTarget ? `Delete "${deleteTarget.originalName}"?` : ""}
+        message="This action cannot be undone. The file and all its versions will be permanently removed."
+        confirmLabel="Delete"
+        destructive
+        loading={deleteFile.isPending}
+        onCancel={() => setDeleteTarget(null)}
+        onConfirm={() => {
+          if (deleteTarget) {
+            deleteFile.mutate(deleteTarget.id);
+            setDeleteTarget(null);
+          }
+        }}
+      />
     </ResourcePageShell>
   );
 }

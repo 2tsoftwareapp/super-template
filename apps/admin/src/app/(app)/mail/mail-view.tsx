@@ -1,7 +1,10 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { RefreshCw } from "lucide-react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 import type {
   ListResponse,
@@ -23,6 +26,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Pagination } from "@/components/ui/pagination";
 import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
 import {
@@ -47,11 +51,6 @@ function mailStatusProps(status: string): {
       variant: "default",
       className: "bg-green-500/15 text-green-700 dark:text-green-400 border-green-500/30",
     };
-  if (status === "PENDING")
-    return {
-      variant: "secondary",
-      className: "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30",
-    };
   if (status === "FAILED")
     return {
       variant: "outline",
@@ -60,20 +59,53 @@ function mailStatusProps(status: string): {
   return { variant: "secondary" };
 }
 
+interface Filters {
+  status: string;
+  templateKey: string;
+  page: number;
+}
+
+function parseFilters(sp: URLSearchParams): Filters {
+  return {
+    status: sp.get("status") ?? "",
+    templateKey: sp.get("templateKey") ?? "",
+    page: Math.max(1, Number(sp.get("page")) || 1),
+  };
+}
+
 const mailResource = adminResources.find((r) => r.id === "mail")!;
 
+const DELIVERY_PAGE_SIZE = 20;
+
 export function MailView() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const [filters, setFilters] = useState<Filters>(() =>
+    parseFilters(new URLSearchParams(searchParams.toString())),
+  );
+
+  const updateFilter = (key: keyof Filters, value: string | number) => {
+    const next = { ...filters, [key]: value };
+    if (key !== "page") next.page = 1;
+    setFilters(next);
+    const sp = new URLSearchParams();
+    if (next.status) sp.set("status", next.status);
+    if (next.templateKey) sp.set("templateKey", next.templateKey);
+    if (next.page > 1) sp.set("page", String(next.page));
+    const qs = sp.toString();
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+  };
+
   const queryClient = useQueryClient();
   const [templateKey, setTemplateKey] = useState("auth.welcome");
-  const [selectedDelivery, setSelectedDelivery] =
-    useState<MailDeliveryDto | null>(null);
-  const [deliveryTemplateKey, setDeliveryTemplateKey] = useState("");
-  const [deliveryStatus, setDeliveryStatus] = useState("");
+  const [selectedDelivery, setSelectedDelivery] = useState<MailDeliveryDto | null>(null);
 
   // Send form state
   const [sendTemplateKey, setSendTemplateKey] = useState("");
   const [sendRecipient, setSendRecipient] = useState("");
-  const [sendVariables, setSendVariables] = useState("{}");
+  const [variableValues, setVariableValues] = useState<Record<string, string>>({});
   const [sendIdempotencyKey, setSendIdempotencyKey] = useState("");
 
   const templates = useQuery({
@@ -84,17 +116,33 @@ export function MailView() {
       ),
   });
 
+  const selectedTemplate = sendTemplateKey
+    ? (templates.data?.data ?? []).find((t) => t.key === sendTemplateKey)
+    : undefined;
+
+  const handleTemplateChange = (key: string) => {
+    setSendTemplateKey(key);
+    const tmpl = (templates.data?.data ?? []).find((t) => t.key === key);
+    setVariableValues(Object.fromEntries((tmpl?.variables ?? []).map((v) => [v, ""])));
+  };
+
   const deliveries = useQuery({
-    queryKey: ["admin-mail-deliveries", deliveryTemplateKey, deliveryStatus],
+    queryKey: ["admin-mail-deliveries", filters.templateKey, filters.status, filters.page],
     queryFn: () => {
-      const params = new URLSearchParams({ limit: "50" });
-      if (deliveryTemplateKey) params.set("templateKey", deliveryTemplateKey);
-      if (deliveryStatus) params.set("status", deliveryStatus);
+      const params = new URLSearchParams({
+        limit: String(DELIVERY_PAGE_SIZE),
+        page: String(filters.page),
+      });
+      if (filters.templateKey) params.set("templateKey", filters.templateKey);
+      if (filters.status) params.set("status", filters.status);
       return webFetch<ListResponse<MailDeliveryDto>>(
         `/api/bff/admin/mail/deliveries?${params.toString()}`,
       );
     },
   });
+
+  const total = deliveries.data?.meta?.total ?? 0;
+  const totalPages = deliveries.data?.meta?.totalPages ?? 1;
 
   const preview = useQuery({
     queryKey: ["admin-mail-preview", templateKey],
@@ -107,32 +155,28 @@ export function MailView() {
 
   const sendMail = useMutation({
     mutationFn: () => {
-      let variables: Record<string, string> = {};
-      try {
-        variables = JSON.parse(sendVariables);
-      } catch {
-        // Use empty object if malformed
-      }
       return webFetch<{ data: SendAdminMailResultDto }>("/api/bff/admin/mail/send", {
         method: "POST",
         body: JSON.stringify({
           templateKey: sendTemplateKey,
           to: sendRecipient,
-          variables,
+          variables: variableValues,
           ...(sendIdempotencyKey
             ? { idempotencyKey: sendIdempotencyKey }
             : {}),
         }),
       });
     },
-    onSuccess: async () => {
+    onSuccess: async (result) => {
+      toast.success(`Mail queued (job: ${result?.data?.jobId ?? "—"})`);
       setSendTemplateKey("");
       setSendRecipient("");
-      setSendVariables("{}");
+      setVariableValues({});
       setSendIdempotencyKey("");
-      await queryClient.invalidateQueries({
-        queryKey: ["admin-mail-deliveries"],
-      });
+      await queryClient.invalidateQueries({ queryKey: ["admin-mail-deliveries"] });
+    },
+    onError: (err) => {
+      toast.error(err instanceof Error ? err.message : "Failed to send mail");
     },
   });
 
@@ -140,8 +184,12 @@ export function MailView() {
     <ResourcePageShell
       resource={mailResource}
       description="Review delivery history, browse templates, and send test emails."
+      isRefreshing={templates.isFetching || deliveries.isFetching}
+      onRefresh={() => {
+        templates.refetch();
+        deliveries.refetch();
+      }}
     >
-      <div className="flex-1 space-y-4">
       <div className="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
         {/* Template preview */}
         <Card>
@@ -332,7 +380,7 @@ export function MailView() {
               <select
                 className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 value={sendTemplateKey}
-                onChange={(e) => setSendTemplateKey(e.target.value)}
+                onChange={(e) => handleTemplateChange(e.target.value)}
               >
                 <option value="">Select a template</option>
                 {(templates.data?.data ?? [])
@@ -355,18 +403,32 @@ export function MailView() {
                 onChange={(e) => setSendRecipient(e.target.value)}
               />
             </div>
-            <div className="space-y-1.5 sm:col-span-2">
-              <Label className="text-xs text-muted-foreground">
-                Variables (JSON)
-              </Label>
-              <textarea
-                aria-label="Template variables as JSON"
-                className="h-20 w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                placeholder='{"displayName": "Jane"}'
-                value={sendVariables}
-                onChange={(e) => setSendVariables(e.target.value)}
-              />
-            </div>
+            {selectedTemplate?.variables && selectedTemplate.variables.length > 0 && (
+              <div className="space-y-3 sm:col-span-2">
+                <Label className="text-xs text-muted-foreground">
+                  Variables
+                </Label>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {selectedTemplate.variables.map((varName) => (
+                    <div key={varName} className="space-y-1">
+                      <Label className="text-[11px] text-muted-foreground font-mono">
+                        {varName}
+                      </Label>
+                      <Input
+                        placeholder={`Value for ${varName}`}
+                        value={variableValues[varName] ?? ""}
+                        onChange={(e) =>
+                          setVariableValues((prev) => ({
+                            ...prev,
+                            [varName]: e.target.value,
+                          }))
+                        }
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
             <div className="space-y-1.5">
               <Label className="text-xs text-muted-foreground">
                 Idempotency key (optional)
@@ -378,26 +440,20 @@ export function MailView() {
               />
             </div>
           </div>
-          {sendMail.isError && (
-            <p className="mt-2 text-xs text-destructive">
-              {sendMail.error instanceof Error
-                ? sendMail.error.message
-                : "Failed to send mail."}
-            </p>
-          )}
-          {sendMail.isSuccess && (
-            <p className="mt-2 text-xs text-green-600 dark:text-green-400">
-              Mail queued successfully (job ID:{" "}
-              {sendMail.data?.data?.jobId ?? "—"}).
-            </p>
-          )}
           <div className="mt-4 flex justify-end">
             <Button
               size="sm"
-              onClick={() => void sendMail.mutateAsync()}
+              onClick={() => sendMail.mutate()}
               disabled={sendMail.isPending || !sendTemplateKey || !sendRecipient}
             >
-              {sendMail.isPending ? "Sending…" : "Send mail"}
+              {sendMail.isPending ? (
+                <>
+                  <Spinner className="mr-1.5 size-3.5" />
+                  Sending…
+                </>
+              ) : (
+                "Send mail"
+              )}
             </Button>
           </div>
         </CardContent>
@@ -406,31 +462,44 @@ export function MailView() {
       {/* Deliveries */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base">Deliveries</CardTitle>
-          <CardDescription className="text-xs">
-            {deliveries.data
-              ? `${deliveries.data.data.length} recent deliveries`
-              : "History from the mail delivery endpoint."}
-          </CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-base">Deliveries</CardTitle>
+              <CardDescription className="text-xs">
+                {total > 0
+                  ? `${total} deliver${total !== 1 ? "ies" : "y"}`
+                  : "History from the mail delivery endpoint."}
+              </CardDescription>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => deliveries.refetch()}
+              disabled={deliveries.isFetching}
+            >
+              <RefreshCw
+                className={cn("size-3.5", deliveries.isFetching && "animate-spin")}
+              />
+              Refresh
+            </Button>
+          </div>
         </CardHeader>
         <CardContent className="p-0 pb-1">
-          {/* Delivery filters */}
           <div className="flex gap-2 border-b border-border px-4 py-3">
             <Input
               placeholder="Template key"
-              value={deliveryTemplateKey}
-              onChange={(e) => setDeliveryTemplateKey(e.target.value)}
+              value={filters.templateKey}
+              onChange={(e) => updateFilter("templateKey", e.target.value)}
               className="max-w-[180px]"
             />
             <select
               className="h-9 rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              value={deliveryStatus}
-              onChange={(e) => setDeliveryStatus(e.target.value)}
+              value={filters.status}
+              onChange={(e) => updateFilter("status", e.target.value)}
             >
               <option value="">All statuses</option>
               <option value="SENT">Sent</option>
               <option value="FAILED">Failed</option>
-              <option value="PENDING">Pending</option>
             </select>
           </div>
           <Table>
@@ -456,13 +525,15 @@ export function MailView() {
                     colSpan={5}
                     className="py-16 text-center text-sm text-muted-foreground"
                   >
-                    No deliveries recorded.
+                    {filters.templateKey || filters.status
+                      ? "No deliveries match your filters."
+                      : "No deliveries recorded."}
                   </TableCell>
                 </TableRow>
               ) : (
                 (deliveries.data?.data ?? []).map((delivery) => {
                   const { variant, className } = mailStatusProps(
-                    delivery.status,
+                    String(delivery.status),
                   );
                   return (
                     <TableRow key={delivery.id}>
@@ -477,7 +548,7 @@ export function MailView() {
                           variant={variant}
                           className={cn("text-xs capitalize", className)}
                         >
-                          {delivery.status.toLowerCase()}
+                          {String(delivery.status).toLowerCase()}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-xs text-muted-foreground">
@@ -499,6 +570,15 @@ export function MailView() {
               )}
             </TableBody>
           </Table>
+
+          <Pagination
+            page={filters.page}
+            pageSize={DELIVERY_PAGE_SIZE}
+            totalPages={totalPages}
+            total={total}
+            isLoading={deliveries.isFetching}
+            onPageChange={(p) => updateFilter("page", p)}
+          />
         </CardContent>
       </Card>
 
@@ -547,13 +627,13 @@ export function MailView() {
               <Label className="text-xs text-muted-foreground">Status</Label>
               <div className="mt-0.5">
                 <Badge
-                  variant={mailStatusProps(selectedDelivery.status).variant}
+                  variant={mailStatusProps(String(selectedDelivery.status)).variant}
                   className={cn(
                     "text-xs capitalize",
-                    mailStatusProps(selectedDelivery.status).className,
+                    mailStatusProps(String(selectedDelivery.status)).className,
                   )}
                 >
-                  {selectedDelivery.status.toLowerCase()}
+                  {String(selectedDelivery.status).toLowerCase()}
                 </Badge>
               </div>
             </div>
@@ -594,7 +674,6 @@ export function MailView() {
           </div>
         )}
       </ResourceDrawer>
-    </div>
     </ResourcePageShell>
   );
 }
