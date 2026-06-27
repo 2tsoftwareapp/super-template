@@ -1,5 +1,6 @@
 import type { NextRequest } from "next/server";
 
+import { stripTokensFromAuthEnvelope } from "@repo/web-core/auth/sanitize-response";
 import { NextResponse } from "next/server";
 
 import type { AuthLoginResponse } from "@/lib/api-types";
@@ -23,22 +24,16 @@ export async function GET(
   });
 
   const payload = (await response.json().catch(() => ({}))) as AuthLoginResponse;
-  const nextResponse = NextResponse.json(payload, { status: response.status });
-
-  // Forward set-cookie headers from backend (SSO callback sets auth cookies)
-  const setCookie = response.headers.get("set-cookie");
-  if (setCookie) {
-    nextResponse.headers.set("set-cookie", setCookie);
-  }
+  const nextResponse = NextResponse.json(
+    stripTokensFromAuthEnvelope(payload) ?? payload,
+    { status: response.status },
+  );
 
   if (response.ok && payload.data?.accessToken && payload.data?.refreshToken) {
     setAuthCookies(nextResponse, {
       accessToken: payload.data.accessToken,
       refreshToken: payload.data.refreshToken,
     });
-  } else if (response.ok && !payload.data?.accessToken) {
-    // Try to extract tokens from set-cookie headers
-    // Backend may set cookies directly without response body
   } else {
     clearAuthCookies(nextResponse);
   }

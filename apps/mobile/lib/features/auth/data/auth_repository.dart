@@ -21,6 +21,7 @@ class AuthRepository {
     this._publicAuthApi,
     this._authApi,
     this._ssoApi,
+    this._authenticatedDio,
     this._storage,
   );
 
@@ -32,12 +33,14 @@ class AuthRepository {
     publicClient.getAuthApi(),
     authenticatedClient.getAuthApi(),
     publicClient.getSsoApi(),
+    authenticatedClient.dio,
     storage,
   );
 
   final AuthApi _publicAuthApi;
   final AuthApi _authApi;
   final SsoApi _ssoApi;
+  final Dio _authenticatedDio;
   final TokenStorage _storage;
 
   Future<AuthSession?> restoreSession() async {
@@ -261,11 +264,23 @@ class AuthRepository {
 
   Future<void> switchOrganization(String organizationId) async {
     try {
-      await _authApi.authControllerSwitchOrganization(
-        switchOrganizationDto: SwitchOrganizationDto(
-          (b) => b..organizationId = organizationId,
-        ),
+      final response = await _authenticatedDio.post<Map<String, dynamic>>(
+        '/api/v1/auth/switch-organization',
+        data: {'organizationId': organizationId},
       );
+      final accessToken =
+          response.data?['data']?['accessToken'] as String?;
+      if (accessToken != null) {
+        final current = await _storage.read();
+        if (current != null) {
+          await _storage.write(
+            TokenBundle(
+              accessToken: accessToken,
+              refreshToken: current.refreshToken,
+            ),
+          );
+        }
+      }
     } on DioException catch (error) {
       throw AppException.fromDio(error);
     }

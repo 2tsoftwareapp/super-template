@@ -4,8 +4,14 @@ import { ERROR_CODES, EnvironmentService } from '@repo/api-core';
 
 import { StartSsoLoginUseCase } from '../start-sso-login.use-case';
 
-const buildEnvironmentService = (corsOrigins: string[]) =>
-  ({ corsOrigins }) as unknown as EnvironmentService;
+const buildEnvironmentService = (
+  ssoRedirectOrigins: string[],
+  ssoRedirectUris: string[] = [],
+) =>
+  ({
+    ssoRedirectOrigins,
+    ssoRedirectUris,
+  }) as unknown as EnvironmentService;
 
 describe('StartSsoLoginUseCase', () => {
   it('rejects an unknown provider', async () => {
@@ -72,6 +78,30 @@ describe('StartSsoLoginUseCase', () => {
     );
     expect(provider.buildAuthorizationUrl).toHaveBeenCalledWith(
       expect.objectContaining({ testEmail: 'someone@example.com' }),
+    );
+  });
+
+  it('allows an exact native redirect URI from SSO_REDIRECT_URIS', async () => {
+    const provider = {
+      provider: 'fake',
+      buildAuthorizationUrl: vi.fn(() => 'https://provider.example.com/authorize'),
+    };
+    const ssoRepository = { createLoginState: vi.fn(async () => undefined) };
+    const useCase = new StartSsoLoginUseCase(
+      new Map([['fake', provider as never]]),
+      ssoRepository as never,
+      buildEnvironmentService([], ['myapp://sso/callback']),
+    );
+
+    await useCase.execute({
+      provider: 'fake',
+      redirectUri: 'myapp://sso/callback',
+    });
+
+    expect(ssoRepository.createLoginState).toHaveBeenCalledWith(
+      expect.objectContaining({
+        redirectUri: 'myapp://sso/callback',
+      }),
     );
   });
 });

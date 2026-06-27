@@ -9,6 +9,14 @@ import { AuthShell } from "@/components/auth/auth-shell";
 import { webFetch } from "@/lib/http";
 import { getPostLoginPath } from "@/lib/navigation";
 
+function readHashParams(): URLSearchParams {
+  if (typeof window === "undefined") {
+    return new URLSearchParams();
+  }
+
+  return new URLSearchParams(window.location.hash.replace(/^#/, ""));
+}
+
 export function SsoCallbackView() {
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -16,19 +24,25 @@ export function SsoCallbackView() {
   const [error, setError] = useState<string | null>(null);
 
   const handleCallback = useCallback(async () => {
-    const code = searchParams.get("code");
-    const state = searchParams.get("state");
-    const provider = searchParams.get("provider") ?? "google";
+    if (searchParams.get("error") === "sso_failed") {
+      setError("SSO sign-in failed.");
+      return;
+    }
 
-    if (!code || !state) {
-      setError("Missing OAuth parameters.");
+    const hashParams = readHashParams();
+    const accessToken = hashParams.get("accessToken");
+    const refreshToken = hashParams.get("refreshToken");
+
+    if (!accessToken || !refreshToken) {
+      setError("Missing SSO session tokens.");
       return;
     }
 
     try {
-      await webFetch(
-        `/api/auth/sso/${provider}/callback?code=${encodeURIComponent(code)}&state=${encodeURIComponent(state)}`,
-      );
+      await webFetch("/api/auth/sso/establish-session", {
+        method: "POST",
+        body: JSON.stringify({ accessToken, refreshToken }),
+      });
 
       await queryClient.invalidateQueries({ queryKey: ["session"] });
       toast.success("Signed in successfully.");

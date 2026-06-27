@@ -35,6 +35,7 @@ import {
   ResendVerificationDto,
   ResetPasswordDto,
   SwitchOrganizationDto,
+  SwitchOrganizationResponseDto,
   VerifyEmailDto,
   VerifyMfaChallengeDto,
 } from './auth.dto';
@@ -180,7 +181,7 @@ export class AuthController {
   }
 
   @Post('switch-organization')
-  @ApiDataResponse(SuccessFlagDto, 201)
+  @ApiDataResponse(SwitchOrganizationResponseDto, 201)
   switchOrganization(
     @CurrentUser() user: AuthenticatedRequestUser,
     @Body() input: SwitchOrganizationDto,

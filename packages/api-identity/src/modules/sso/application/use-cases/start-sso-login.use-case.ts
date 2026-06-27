@@ -44,7 +44,8 @@ export class StartSsoLoginUseCase {
 
     assertAllowedRedirectUri(
       input.redirectUri,
-      this.environmentService.corsOrigins,
+      this.environmentService.ssoRedirectOrigins,
+      this.environmentService.ssoRedirectUris,
     );
 
     const state = generateOpaqueToken();

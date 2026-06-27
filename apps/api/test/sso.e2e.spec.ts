@@ -6,7 +6,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { bearer, createTestApp, loginAs, resetTestDatabase } from './support/test-app';
 
-const REDIRECT_URI = 'http://localhost:3005/sso/callback';
+const REDIRECT_URI = 'http://localhost:3000/sso/callback';
 
 const requireLocation = (location: string | undefined): string => {
   if (!location) {
@@ -20,6 +20,7 @@ describe('SSO (e2e, fake provider)', () => {
   let app: INestApplication;
 
   beforeAll(async () => {
+    process.env.SSO_FAKE_PROVIDER_ENABLED = 'true';
     await resetTestDatabase();
     app = await createTestApp();
   });
@@ -105,6 +106,20 @@ describe('SSO (e2e, fake provider)', () => {
       .set(bearer(secondAccessToken))
       .expect(200);
     expect(secondMeResponse.body.data.user.id).toBe(firstUserId);
+  });
+
+  it('returns JSON when Accept is application/json', async () => {
+    const { code, state } = await startLogin('sso-json@example.test');
+
+    const callback = await request(app.getHttpServer())
+      .get('/api/v1/auth/sso/fake/callback')
+      .set('Accept', 'application/json')
+      .query({ code, state })
+      .expect(200);
+
+    expect(callback.body.data.accessToken).toBeTruthy();
+    expect(callback.body.data.refreshToken).toBeTruthy();
+    expect(callback.headers.location).toBeUndefined();
   });
 
   it('rejects replaying a consumed state/code pair', async () => {

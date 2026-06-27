@@ -1,3 +1,4 @@
+import { stripTokensFromAuthEnvelope } from "@repo/web-core/auth/sanitize-response";
 import { NextResponse } from "next/server";
 
 import {
@@ -44,7 +45,9 @@ export async function POST() {
     return response;
   }
 
-  const response = NextResponse.json(refreshed);
+  const response = NextResponse.json(
+    stripTokensFromAuthEnvelope(refreshed) ?? refreshed,
+  );
   setAuthCookies(response, refreshed.data, csrfToken ?? undefined);
   return response;
 }

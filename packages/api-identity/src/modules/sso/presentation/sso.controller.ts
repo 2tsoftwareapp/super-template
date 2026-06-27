@@ -14,6 +14,7 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { ApiDataResponse, Public } from '@repo/api-core';
+import { randomUUID } from 'node:crypto';
 
 import { SsoService } from '../application/sso.service';
 import {
@@ -80,6 +81,11 @@ export class SsoController {
     );
   }
 
+  private wantsJsonResponse(request: Request): boolean {
+    const accept = request.headers.accept ?? '';
+    return accept.includes('application/json');
+  }
+
   private async handleCallback(
     provider: string,
     code: string,
@@ -91,6 +97,16 @@ export class SsoController {
       { provider, code, state },
       request.requestContext,
     );
+
+    if (this.wantsJsonResponse(request)) {
+      response.status(200).json({
+        data: session,
+        meta: {
+          requestId: request.requestContext?.requestId ?? randomUUID(),
+        },
+      });
+      return;
+    }
 
     const target = new URL(redirectUri);
     target.hash = new URLSearchParams({

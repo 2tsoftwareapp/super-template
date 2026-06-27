@@ -41,6 +41,27 @@ describe('EnvironmentService', () => {
     ]);
   });
 
+  it('merges web and admin origins for SSO redirects', () => {
+    const service = makeService({
+      WEB_ORIGIN: 'http://localhost:3000',
+      ADMIN_ORIGIN: 'http://localhost:3002',
+    });
+    expect(service.ssoRedirectOrigins).toEqual([
+      'http://localhost:3000',
+      'http://localhost:3002',
+    ]);
+  });
+
+  it('exposes native SSO redirect URIs', () => {
+    const service = makeService({
+      SSO_REDIRECT_URIS: 'myapp://sso/callback, super-template://sso/callback',
+    });
+    expect(service.ssoRedirectUris).toEqual([
+      'myapp://sso/callback',
+      'super-template://sso/callback',
+    ]);
+  });
+
   it('exposes typed getters for selected values', () => {
     const service = makeService({
       DATABASE_URL: 'postgres://primary/app',

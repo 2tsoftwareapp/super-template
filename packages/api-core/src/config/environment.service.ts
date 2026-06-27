@@ -59,6 +59,28 @@ export class EnvironmentService {
       .filter(Boolean);
   }
 
+  /** HTTP(S) origins allowed for SSO post-login redirects (web + admin). */
+  get ssoRedirectOrigins(): string[] {
+    const adminOrigins = this.env.ADMIN_ORIGIN
+      ? this.env.ADMIN_ORIGIN.split(',')
+          .map((origin) => origin.trim())
+          .filter(Boolean)
+      : [];
+
+    return [...new Set([...this.corsOrigins, ...adminOrigins])];
+  }
+
+  /** Exact redirect URIs (including custom URL schemes) for native SSO clients. */
+  get ssoRedirectUris(): string[] {
+    if (!this.env.SSO_REDIRECT_URIS) {
+      return [];
+    }
+
+    return this.env.SSO_REDIRECT_URIS.split(',')
+      .map((uri) => uri.trim())
+      .filter(Boolean);
+  }
+
   get databaseSkipRlsCheck(): boolean {
     return this.env.DATABASE_SKIP_RLS_CHECK;
   }

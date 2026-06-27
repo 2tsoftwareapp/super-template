@@ -94,6 +94,16 @@ export const envSchema = z.object({
     .default('1mb'),
   WEB_PORT: z.coerce.number().int().positive(),
   WEB_ORIGIN: commaSeparatedOrigins,
+  // Admin app origin(s) for SSO post-login redirects and CORS-adjacent allowlists.
+  ADMIN_ORIGIN: z.preprocess(
+    (value) => (value === '' ? undefined : value),
+    commaSeparatedOrigins.optional(),
+  ),
+  // Exact redirect URIs for native deep links (e.g. myapp://sso/callback).
+  SSO_REDIRECT_URIS: z.preprocess(
+    (value) => (value === '' ? undefined : value),
+    z.string().optional(),
+  ),
   API_INTERNAL_URL: z.url(),
   NEXT_PUBLIC_WEB_URL: z.url(),
   NEXT_PUBLIC_API_BASE_PATH: z.string().min(1).default('/api'),

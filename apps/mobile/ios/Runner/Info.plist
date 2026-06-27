@@ -66,5 +66,17 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.example.mobileApp</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>myapp</string>
+				<string>super-template</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

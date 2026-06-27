@@ -1,5 +1,6 @@
 import type { NextRequest } from "next/server";
 
+import { stripTokensFromAuthEnvelope } from "@repo/web-core/auth/sanitize-response";
 import { NextResponse } from "next/server";
 
 import { clearAuthCookies, setAuthCookies } from "@/lib/auth/cookies";
@@ -17,6 +18,7 @@ export async function GET(
   const response = await callBackend({
     path: `auth/sso/${provider}/callback?code=${code}&state=${state}`,
     method: "GET",
+    headers: new Headers({ accept: "application/json" }),
   });
 
   let responseData: Record<string, unknown> | null = null;
@@ -31,7 +33,7 @@ export async function GET(
   } | null;
 
   const nextResponse = NextResponse.json(
-    payload ?? { success: response.ok },
+    stripTokensFromAuthEnvelope(payload) ?? { success: response.ok },
     { status: response.ok ? 200 : response.status },
   );
 
@@ -40,11 +42,6 @@ export async function GET(
       accessToken: payload.data.accessToken,
       refreshToken: payload.data.refreshToken,
     });
-  } else if (response.ok) {
-    const cookies = response.headers.getSetCookie();
-    for (const cookie of cookies) {
-      nextResponse.headers.append("set-cookie", cookie);
-    }
   } else {
     clearAuthCookies(nextResponse);
   }

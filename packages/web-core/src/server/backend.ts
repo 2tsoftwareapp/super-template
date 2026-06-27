@@ -219,7 +219,11 @@ export function createBackendHelpers({
       refreshToken: string;
     } | null = null;
 
-    if (response.status === 401 && refreshToken && !path.startsWith("auth/")) {
+    if (
+      response.status === 401 &&
+      refreshToken &&
+      (!path.startsWith("auth/") || path === "auth/me")
+    ) {
       const refreshed = await refreshSession(refreshToken);
 
       if (refreshed) {

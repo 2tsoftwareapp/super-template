@@ -46,12 +46,34 @@ class _DeepLinkListenerState extends ConsumerState<DeepLinkListener> {
     router.go(path);
   }
 
-  Future<bool> _handleSsoCallback(Uri uri) async {
-    if (uri.pathSegments.length < 2) return false;
-    if (uri.pathSegments[0] != 'sso') return false;
+  Map<String, String> _readSsoTokenParams(Uri uri) {
+    if (uri.fragment.isNotEmpty) {
+      return Uri.splitQueryString(uri.fragment);
+    }
 
-    final accessToken = uri.queryParameters['accessToken'];
-    final refreshToken = uri.queryParameters['refreshToken'];
+    return uri.queryParameters;
+  }
+
+  bool _isSsoCallback(Uri uri) {
+    if (uri.scheme != 'super-template' && uri.scheme != 'myapp') {
+      return false;
+    }
+
+    if (uri.host == 'sso' && uri.path == '/callback') {
+      return true;
+    }
+
+    return uri.pathSegments.length >= 2 &&
+        uri.pathSegments[0] == 'sso' &&
+        uri.pathSegments[1] == 'callback';
+  }
+
+  Future<bool> _handleSsoCallback(Uri uri) async {
+    if (!_isSsoCallback(uri)) return false;
+
+    final params = _readSsoTokenParams(uri);
+    final accessToken = params['accessToken'];
+    final refreshToken = params['refreshToken'];
 
     if (accessToken != null && refreshToken != null) {
       final storage = ref.read(tokenStorageProvider);

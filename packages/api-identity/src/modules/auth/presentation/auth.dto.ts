@@ -63,6 +63,14 @@ export class SwitchOrganizationDto {
   organizationId: string;
 }
 
+export class SwitchOrganizationResponseDto {
+  @ApiProperty()
+  accessToken: string;
+
+  @ApiProperty()
+  organizationId: string;
+}
+
 export class ResendVerificationDto {
   @ApiProperty()
   @IsEmail()

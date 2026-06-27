@@ -178,6 +178,37 @@ describe('HandleSsoCallbackUseCase', () => {
     ).rejects.toMatchObject({ code: ERROR_CODES.SSO_EMAIL_CONFLICT });
   });
 
+  it('rejects linking when the provider did not verify the email', async () => {
+    const ssoRepository = {
+      findValidLoginStateByStateHash: vi.fn(async () => buildLoginState()),
+      consumeLoginState: vi.fn(async () => undefined),
+      findIdentity: vi.fn(async () => null),
+    };
+    const provider = {
+      exchangeCode: vi.fn(async () => ({ idToken: 'idtok' })),
+      verifyIdToken: vi.fn(async () => ({
+        subject: 'sub-1',
+        email: 'verified@example.com',
+        emailVerified: false,
+      })),
+    };
+    const usersRepository = {
+      findByEmail: vi.fn(async () => ({
+        id: 'existing-user',
+        emailVerifiedAt: new Date(),
+      })),
+    };
+    const useCase = buildUseCase({
+      providers: new Map([['fake', provider]]),
+      ssoRepository,
+      usersRepository,
+    });
+
+    await expect(
+      useCase.execute({ provider: 'fake', code: 'c', state: 's' }),
+    ).rejects.toMatchObject({ code: ERROR_CODES.SSO_TOKEN_INVALID });
+  });
+
   it('links to a verified existing account and issues a session', async () => {
     const ssoRepository = {
       findValidLoginStateByStateHash: vi.fn(async () => buildLoginState()),

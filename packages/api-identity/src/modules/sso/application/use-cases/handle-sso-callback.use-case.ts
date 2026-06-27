@@ -153,7 +153,7 @@ export class HandleSsoCallbackUseCase {
         );
       }
 
-      if (decision.kind === 'create_new' && !identity.emailVerified) {
+      if (!identity.emailVerified) {
         throw new AppError(
           ERROR_CODES.SSO_TOKEN_INVALID,
           'Provider did not verify the email address',

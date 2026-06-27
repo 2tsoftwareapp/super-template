@@ -1,5 +1,6 @@
 import type { NextRequest } from "next/server";
 
+import { stripTokensFromAuthEnvelope } from "@repo/web-core/auth/sanitize-response";
 import { NextResponse } from "next/server";
 
 import type { AuthLoginResponse, LoginInput } from "@/lib/api-types";
@@ -17,7 +18,10 @@ export async function POST(request: NextRequest) {
   });
 
   const payload = (await response.json()) as AuthLoginResponse;
-  const nextResponse = NextResponse.json(payload, { status: response.status });
+  const nextResponse = NextResponse.json(
+    stripTokensFromAuthEnvelope(payload) ?? payload,
+    { status: response.status },
+  );
 
   if (response.ok && payload.data.accessToken && payload.data.refreshToken) {
     setAuthCookies(nextResponse, {

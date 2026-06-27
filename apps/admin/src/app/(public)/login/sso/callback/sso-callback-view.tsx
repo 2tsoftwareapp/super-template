@@ -7,35 +7,45 @@ import { useEffect, useRef } from "react";
 import { sessionQueryKey } from "@/hooks/use-session";
 import { webFetch } from "@/lib/http";
 
+function readHashParams(): URLSearchParams {
+  if (typeof window === "undefined") {
+    return new URLSearchParams();
+  }
+
+  return new URLSearchParams(window.location.hash.replace(/^#/, ""));
+}
+
 export function SsoCallbackView() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const queryClient = useQueryClient();
   const called = useRef(false);
 
-  const code = searchParams.get("code");
-  const state = searchParams.get("state");
-  const provider =
-    searchParams.get("provider") ??
-    (typeof window !== "undefined"
-      ? sessionStorage.getItem("sso_provider")
-      : null) ??
-    "google";
-
   useEffect(() => {
     if (called.current) return;
     called.current = true;
 
-    if (!code) {
+    if (searchParams.get("error") === "sso_failed") {
       router.replace("/login?error=sso_failed");
       return;
     }
 
     async function handleCallback() {
+      const hashParams = readHashParams();
+      const accessToken = hashParams.get("accessToken");
+      const refreshToken = hashParams.get("refreshToken");
+
+      if (!accessToken || !refreshToken) {
+        router.replace("/login?error=sso_failed");
+        return;
+      }
+
       try {
-        await webFetch(
-          `/api/auth/sso/${provider}/callback?code=${encodeURIComponent(code!)}&state=${encodeURIComponent(state ?? "")}`,
-        );
+        await webFetch("/api/auth/sso/establish-session", {
+          method: "POST",
+          body: JSON.stringify({ accessToken, refreshToken }),
+        });
+
         sessionStorage.removeItem("sso_provider");
         await queryClient.invalidateQueries({ queryKey: sessionQueryKey });
         router.replace("/");
@@ -46,7 +56,7 @@ export function SsoCallbackView() {
     }
 
     void handleCallback();
-  }, [code, state, provider, router, queryClient]);
+  }, [searchParams, router, queryClient]);
 
   return (
     <div className="flex min-h-screen items-center justify-center">
