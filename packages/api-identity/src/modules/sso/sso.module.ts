@@ -7,6 +7,10 @@ import { OrganizationsModule } from '../organizations/organizations.module';
 import { UsersModule } from '../users/users.module';
 import { SsoService } from './application/sso.service';
 import { HandleSsoCallbackUseCase } from './application/use-cases/handle-sso-callback.use-case';
+import {
+  CreateSsoSessionExchangeUseCase,
+  ExchangeSsoSessionUseCase,
+} from './application/use-cases/sso-session-exchange.use-case';
 import { StartSsoLoginUseCase } from './application/use-cases/start-sso-login.use-case';
 import { JwksCacheService } from './infrastructure/jwks-cache.service';
 import { SsoRepository } from './infrastructure/sso.repository';
@@ -33,6 +37,8 @@ import { GoogleSsoProvider } from './providers/google-sso.provider';
     SsoService,
     StartSsoLoginUseCase,
     HandleSsoCallbackUseCase,
+    CreateSsoSessionExchangeUseCase,
+    ExchangeSsoSessionUseCase,
     {
       provide: SSO_PROVIDER_REGISTRY,
       inject: [

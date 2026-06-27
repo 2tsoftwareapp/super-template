@@ -175,6 +175,7 @@ Class | Method | HTTP request | Description
 [*ProjectsApi*](doc/ProjectsApi.md) | [**projectsControllerRemove**](doc/ProjectsApi.md#projectscontrollerremove) | **DELETE** /api/v1/projects/{id} | 
 [*ProjectsApi*](doc/ProjectsApi.md) | [**projectsControllerRestore**](doc/ProjectsApi.md#projectscontrollerrestore) | **POST** /api/v1/projects/{id}/restore | 
 [*ProjectsApi*](doc/ProjectsApi.md) | [**projectsControllerUpdate**](doc/ProjectsApi.md#projectscontrollerupdate) | **PATCH** /api/v1/projects/{id} | 
+[*SsoApi*](doc/SsoApi.md) | [**ssoControllerExchangeSession**](doc/SsoApi.md#ssocontrollerexchangesession) | **POST** /api/v1/auth/sso/exchange | 
 [*SsoApi*](doc/SsoApi.md) | [**ssoControllerHandleCallbackGet**](doc/SsoApi.md#ssocontrollerhandlecallbackget) | **GET** /api/v1/auth/sso/{provider}/callback | 
 [*SsoApi*](doc/SsoApi.md) | [**ssoControllerHandleCallbackPost**](doc/SsoApi.md#ssocontrollerhandlecallbackpost) | **POST** /api/v1/auth/sso/{provider}/callback | 
 [*SsoApi*](doc/SsoApi.md) | [**ssoControllerStartLogin**](doc/SsoApi.md#ssocontrollerstartlogin) | **GET** /api/v1/auth/sso/{provider}/start | 
@@ -226,6 +227,7 @@ Class | Method | HTTP request | Description
  - [AuthControllerGetSessions200Response](doc/AuthControllerGetSessions200Response.md)
  - [AuthControllerLogin201Response](doc/AuthControllerLogin201Response.md)
  - [AuthControllerRegister201Response](doc/AuthControllerRegister201Response.md)
+ - [AuthControllerSwitchOrganization201Response](doc/AuthControllerSwitchOrganization201Response.md)
  - [AuthControllerVerifyMfaChallenge201Response](doc/AuthControllerVerifyMfaChallenge201Response.md)
  - [AuthMeDto](doc/AuthMeDto.md)
  - [AuthResponseDto](doc/AuthResponseDto.md)
@@ -247,6 +249,7 @@ Class | Method | HTTP request | Description
  - [CreateProjectDto](doc/CreateProjectDto.md)
  - [CreateRoleDto](doc/CreateRoleDto.md)
  - [DeviceTokenDto](doc/DeviceTokenDto.md)
+ - [ExchangeSsoSessionDto](doc/ExchangeSsoSessionDto.md)
  - [ExportAuditLogsQueryDto](doc/ExportAuditLogsQueryDto.md)
  - [ExportJobDto](doc/ExportJobDto.md)
  - [ExportsControllerCreate201Response](doc/ExportsControllerCreate201Response.md)
@@ -326,6 +329,7 @@ Class | Method | HTTP request | Description
  - [SuccessFlagDto](doc/SuccessFlagDto.md)
  - [SuccessMessageDto](doc/SuccessMessageDto.md)
  - [SwitchOrganizationDto](doc/SwitchOrganizationDto.md)
+ - [SwitchOrganizationResponseDto](doc/SwitchOrganizationResponseDto.md)
  - [UpdateAdminUserDto](doc/UpdateAdminUserDto.md)
  - [UpdateCommentDto](doc/UpdateCommentDto.md)
  - [UpdateMemberRoleDto](doc/UpdateMemberRoleDto.md)

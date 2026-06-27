@@ -54,6 +54,7 @@ import 'package:super_template_api/src/model/auth_controller_get_me200_response.
 import 'package:super_template_api/src/model/auth_controller_get_sessions200_response.dart';
 import 'package:super_template_api/src/model/auth_controller_login201_response.dart';
 import 'package:super_template_api/src/model/auth_controller_register201_response.dart';
+import 'package:super_template_api/src/model/auth_controller_switch_organization201_response.dart';
 import 'package:super_template_api/src/model/auth_controller_verify_mfa_challenge201_response.dart';
 import 'package:super_template_api/src/model/auth_me_dto.dart';
 import 'package:super_template_api/src/model/auth_response_dto.dart';
@@ -75,6 +76,7 @@ import 'package:super_template_api/src/model/create_organization_dto.dart';
 import 'package:super_template_api/src/model/create_project_dto.dart';
 import 'package:super_template_api/src/model/create_role_dto.dart';
 import 'package:super_template_api/src/model/device_token_dto.dart';
+import 'package:super_template_api/src/model/exchange_sso_session_dto.dart';
 import 'package:super_template_api/src/model/export_audit_logs_query_dto.dart';
 import 'package:super_template_api/src/model/export_job_dto.dart';
 import 'package:super_template_api/src/model/exports_controller_create201_response.dart';
@@ -154,6 +156,7 @@ import 'package:super_template_api/src/model/start_sso_login_response_dto.dart';
 import 'package:super_template_api/src/model/success_flag_dto.dart';
 import 'package:super_template_api/src/model/success_message_dto.dart';
 import 'package:super_template_api/src/model/switch_organization_dto.dart';
+import 'package:super_template_api/src/model/switch_organization_response_dto.dart';
 import 'package:super_template_api/src/model/update_admin_user_dto.dart';
 import 'package:super_template_api/src/model/update_comment_dto.dart';
 import 'package:super_template_api/src/model/update_member_role_dto.dart';
@@ -210,6 +213,7 @@ part 'serializers.g.dart';
   AuthControllerGetSessions200Response,
   AuthControllerLogin201Response,
   AuthControllerRegister201Response,
+  AuthControllerSwitchOrganization201Response,
   AuthControllerVerifyMfaChallenge201Response,
   AuthMeDto,
   AuthResponseDto,
@@ -231,6 +235,7 @@ part 'serializers.g.dart';
   CreateProjectDto,
   CreateRoleDto,
   DeviceTokenDto,
+  ExchangeSsoSessionDto,
   ExportAuditLogsQueryDto,
   ExportJobDto,
   ExportsControllerCreate201Response,
@@ -310,6 +315,7 @@ part 'serializers.g.dart';
   SuccessFlagDto,
   SuccessMessageDto,
   SwitchOrganizationDto,
+  SwitchOrganizationResponseDto,
   UpdateAdminUserDto,
   UpdateCommentDto,
   UpdateMemberRoleDto,

@@ -7,14 +7,6 @@ import { useEffect, useRef } from "react";
 import { sessionQueryKey } from "@/hooks/use-session";
 import { webFetch } from "@/lib/http";
 
-function readHashParams(): URLSearchParams {
-  if (typeof window === "undefined") {
-    return new URLSearchParams();
-  }
-
-  return new URLSearchParams(window.location.hash.replace(/^#/, ""));
-}
-
 export function SsoCallbackView() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -31,11 +23,8 @@ export function SsoCallbackView() {
     }
 
     async function handleCallback() {
-      const hashParams = readHashParams();
-      const accessToken = hashParams.get("accessToken");
-      const refreshToken = hashParams.get("refreshToken");
-
-      if (!accessToken || !refreshToken) {
+      const exchangeCode = searchParams.get("exchange");
+      if (!exchangeCode) {
         router.replace("/login?error=sso_failed");
         return;
       }
@@ -43,7 +32,7 @@ export function SsoCallbackView() {
       try {
         await webFetch("/api/auth/sso/establish-session", {
           method: "POST",
-          body: JSON.stringify({ accessToken, refreshToken }),
+          body: JSON.stringify({ exchangeCode }),
         });
 
         sessionStorage.removeItem("sso_provider");

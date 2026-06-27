@@ -612,6 +612,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/auth/sso/exchange": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["SsoController_exchangeSession"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/auth/sso/{provider}/callback": {
         parameters: {
             query?: never;
@@ -1655,6 +1671,10 @@ export interface components {
             sessionId: string;
             organizationId: Record<string, never> | null;
         };
+        SwitchOrganizationResponseDto: {
+            accessToken: string;
+            organizationId: string;
+        };
         SwitchOrganizationDto: {
             organizationId: string;
         };
@@ -1673,6 +1693,9 @@ export interface components {
         };
         StartSsoLoginResponseDto: {
             authorizationUrl: string;
+        };
+        ExchangeSsoSessionDto: {
+            code: string;
         };
         SsoCallbackQueryDto: {
             code: string;
@@ -3147,7 +3170,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        data: components["schemas"]["SuccessFlagDto"];
+                        data: components["schemas"]["SwitchOrganizationResponseDto"];
                         meta: components["schemas"]["RequestMetaDto"];
                     };
                 };
@@ -3347,6 +3370,27 @@ export interface operations {
                         meta: components["schemas"]["RequestMetaDto"];
                     };
                 };
+            };
+        };
+    };
+    SsoController_exchangeSession: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExchangeSsoSessionDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

@@ -53,3 +53,24 @@ export const ssoLoginStates = pgTable(
     uniqueIndex('sso_login_states_state_hash_unique').on(table.stateHash),
   ],
 );
+
+// One-time, short-lived code handed to the client after SSO callback so tokens
+// never travel in URL fragments. Consumed by POST /auth/sso/exchange.
+export const ssoSessionExchanges = pgTable(
+  'sso_session_exchanges',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    codeHash: text('code_hash').notNull(),
+    accessToken: text('access_token').notNull(),
+    refreshToken: text('refresh_token').notNull(),
+    organizationId: text('organization_id'),
+    expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+    consumedAt: timestamp('consumed_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    uniqueIndex('sso_session_exchanges_code_hash_unique').on(table.codeHash),
+  ],
+);

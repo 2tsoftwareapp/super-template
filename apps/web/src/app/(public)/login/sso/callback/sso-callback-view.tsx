@@ -9,14 +9,6 @@ import { AuthShell } from "@/components/auth/auth-shell";
 import { webFetch } from "@/lib/http";
 import { getPostLoginPath } from "@/lib/navigation";
 
-function readHashParams(): URLSearchParams {
-  if (typeof window === "undefined") {
-    return new URLSearchParams();
-  }
-
-  return new URLSearchParams(window.location.hash.replace(/^#/, ""));
-}
-
 export function SsoCallbackView() {
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -29,19 +21,16 @@ export function SsoCallbackView() {
       return;
     }
 
-    const hashParams = readHashParams();
-    const accessToken = hashParams.get("accessToken");
-    const refreshToken = hashParams.get("refreshToken");
-
-    if (!accessToken || !refreshToken) {
-      setError("Missing SSO session tokens.");
+    const exchangeCode = searchParams.get("exchange");
+    if (!exchangeCode) {
+      setError("Missing SSO exchange code.");
       return;
     }
 
     try {
       await webFetch("/api/auth/sso/establish-session", {
         method: "POST",
-        body: JSON.stringify({ accessToken, refreshToken }),
+        body: JSON.stringify({ exchangeCode }),
       });
 
       await queryClient.invalidateQueries({ queryKey: ["session"] });

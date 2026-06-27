@@ -9,19 +9,18 @@ import { clearAuthCookies, setAuthCookies } from "@/lib/auth/cookies";
 import { callBackend } from "@/lib/server/backend";
 
 type EstablishSessionInput = {
-  accessToken?: string;
-  refreshToken?: string;
+  exchangeCode?: string;
 };
 
 export async function POST(request: NextRequest) {
   const body = (await request.json()) as EstablishSessionInput;
 
-  if (!body.accessToken || !body.refreshToken) {
+  if (!body.exchangeCode) {
     return NextResponse.json(
       {
         error: {
           code: "VALIDATION_ERROR",
-          message: "accessToken and refreshToken are required",
+          message: "exchangeCode is required",
           details: null,
         },
         meta: { requestId: crypto.randomUUID() },
@@ -30,10 +29,41 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const exchangeResponse = await callBackend({
+    path: "auth/sso/exchange",
+    method: "POST",
+    headers: new Headers({ "content-type": "application/json" }),
+    body: JSON.stringify({ code: body.exchangeCode }),
+  });
+
+  const exchangePayload = (await exchangeResponse.json().catch(() => null)) as ApiEnvelope<{
+    accessToken?: string;
+    refreshToken?: string;
+  }> | null;
+
+  const accessToken = exchangePayload?.data?.accessToken;
+  const refreshToken = exchangePayload?.data?.refreshToken;
+
+  if (!exchangeResponse.ok || !accessToken || !refreshToken) {
+    const response = NextResponse.json(
+      exchangePayload ?? {
+        error: {
+          code: "SSO_EXCHANGE_INVALID",
+          message: "Unable to exchange SSO session",
+          details: null,
+        },
+        meta: { requestId: crypto.randomUUID() },
+      },
+      { status: exchangeResponse.ok ? 401 : exchangeResponse.status },
+    );
+    clearAuthCookies(response);
+    return response;
+  }
+
   const meResponse = await callBackend({
     path: "auth/me",
     method: "GET",
-    accessToken: body.accessToken,
+    accessToken,
   });
 
   const mePayload = (await meResponse.json().catch(() => null)) as ApiEnvelope<{
@@ -56,10 +86,7 @@ export async function POST(request: NextRequest) {
   );
 
   if (meResponse.ok) {
-    setAuthCookies(nextResponse, {
-      accessToken: body.accessToken,
-      refreshToken: body.refreshToken,
-    });
+    setAuthCookies(nextResponse, { accessToken, refreshToken });
   } else {
     clearAuthCookies(nextResponse);
   }

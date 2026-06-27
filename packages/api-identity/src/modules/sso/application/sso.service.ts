@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common';
 
 import type { HandleSsoCallbackCommand, StartSsoLoginCommand } from './sso.types';
 
+import { CreateSsoSessionExchangeUseCase, ExchangeSsoSessionUseCase } from './use-cases/sso-session-exchange.use-case';
 import { HandleSsoCallbackUseCase } from './use-cases/handle-sso-callback.use-case';
 import { StartSsoLoginUseCase } from './use-cases/start-sso-login.use-case';
 
@@ -12,6 +13,8 @@ export class SsoService {
   constructor(
     private readonly startSsoLoginUseCase: StartSsoLoginUseCase,
     private readonly handleSsoCallbackUseCase: HandleSsoCallbackUseCase,
+    private readonly createSsoSessionExchangeUseCase: CreateSsoSessionExchangeUseCase,
+    private readonly exchangeSsoSessionUseCase: ExchangeSsoSessionUseCase,
   ) {}
 
   startLogin(input: StartSsoLoginCommand) {
@@ -23,5 +26,17 @@ export class SsoService {
     requestContext?: RequestContext,
   ) {
     return this.handleSsoCallbackUseCase.execute(input, requestContext);
+  }
+
+  createSessionExchange(session: {
+    accessToken: string;
+    refreshToken: string;
+    organizationId?: string | null;
+  }) {
+    return this.createSsoSessionExchangeUseCase.execute(session);
+  }
+
+  exchangeSession(code: string) {
+    return this.exchangeSsoSessionUseCase.execute(code);
   }
 }

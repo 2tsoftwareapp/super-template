@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_app/app/router.dart';
-import 'package:mobile_app/core/auth/token_bundle.dart';
-import 'package:mobile_app/core/auth/token_storage.dart';
+import 'package:mobile_app/features/auth/data/auth_repository.dart';
 
 class DeepLinkListener extends ConsumerStatefulWidget {
   const DeepLinkListener({required this.child, super.key});
@@ -46,14 +45,6 @@ class _DeepLinkListenerState extends ConsumerState<DeepLinkListener> {
     router.go(path);
   }
 
-  Map<String, String> _readSsoTokenParams(Uri uri) {
-    if (uri.fragment.isNotEmpty) {
-      return Uri.splitQueryString(uri.fragment);
-    }
-
-    return uri.queryParameters;
-  }
-
   bool _isSsoCallback(Uri uri) {
     if (uri.scheme != 'super-template' && uri.scheme != 'myapp') {
       return false;
@@ -71,21 +62,16 @@ class _DeepLinkListenerState extends ConsumerState<DeepLinkListener> {
   Future<bool> _handleSsoCallback(Uri uri) async {
     if (!_isSsoCallback(uri)) return false;
 
-    final params = _readSsoTokenParams(uri);
-    final accessToken = params['accessToken'];
-    final refreshToken = params['refreshToken'];
-
-    if (accessToken != null && refreshToken != null) {
-      final storage = ref.read(tokenStorageProvider);
-      await storage.write(
-        TokenBundle(accessToken: accessToken, refreshToken: refreshToken),
-      );
-      if (mounted) {
-        context.go('/home');
-      }
-      return true;
+    final exchangeCode = uri.queryParameters['exchange'];
+    if (exchangeCode == null || exchangeCode.isEmpty) {
+      return false;
     }
-    return false;
+
+    await ref.read(authRepositoryProvider).completeSsoExchange(exchangeCode);
+    if (mounted) {
+      context.go('/home');
+    }
+    return true;
   }
 
   String? _mapUriToPath(Uri uri) {

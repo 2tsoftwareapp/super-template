@@ -16,6 +16,18 @@ const requireLocation = (location: string | undefined): string => {
   return location;
 };
 
+const exchangeSession = async (app: INestApplication, code: string) => {
+  const response = await request(app.getHttpServer())
+    .post('/api/v1/auth/sso/exchange')
+    .send({ code })
+    .expect(201);
+
+  return {
+    accessToken: response.body.data.accessToken as string,
+    refreshToken: response.body.data.refreshToken as string,
+  };
+};
+
 describe('SSO (e2e, fake provider)', () => {
   let app: INestApplication;
 
@@ -78,9 +90,13 @@ describe('SSO (e2e, fake provider)', () => {
 
     const firstLocation = new URL(requireLocation(firstCallback.headers.location));
     expect(firstLocation.origin + firstLocation.pathname).toBe(REDIRECT_URI);
-    const firstParams = new URLSearchParams(firstLocation.hash.slice(1));
-    const firstAccessToken = firstParams.get('accessToken')!;
-    expect(firstAccessToken).toBeTruthy();
+    const firstExchangeCode = firstLocation.searchParams.get('exchange')!;
+    expect(firstExchangeCode).toBeTruthy();
+
+    const { accessToken: firstAccessToken } = await exchangeSession(
+      app,
+      firstExchangeCode,
+    );
 
     const meResponse = await request(app.getHttpServer())
       .get('/api/v1/auth/me')
@@ -89,17 +105,18 @@ describe('SSO (e2e, fake provider)', () => {
     expect(meResponse.body.data.user.email).toBe(email);
     const firstUserId = meResponse.body.data.user.id as string;
 
-    // A second SSO login with the same email (different provider subject, since the
-    // fake provider mints a fresh one each time) must link onto the same account.
     const second = await startLogin(email);
     const secondCallback = await request(app.getHttpServer())
       .get('/api/v1/auth/sso/fake/callback')
       .query({ code: second.code, state: second.state })
       .expect(302);
-    const secondParams = new URLSearchParams(
-      new URL(requireLocation(secondCallback.headers.location)).hash.slice(1),
+    const secondExchangeCode = new URL(
+      requireLocation(secondCallback.headers.location),
+    ).searchParams.get('exchange')!;
+    const { accessToken: secondAccessToken } = await exchangeSession(
+      app,
+      secondExchangeCode,
     );
-    const secondAccessToken = secondParams.get('accessToken')!;
 
     const secondMeResponse = await request(app.getHttpServer())
       .get('/api/v1/auth/me')
@@ -108,7 +125,7 @@ describe('SSO (e2e, fake provider)', () => {
     expect(secondMeResponse.body.data.user.id).toBe(firstUserId);
   });
 
-  it('returns JSON when Accept is application/json', async () => {
+  it('returns an exchange code when Accept is application/json', async () => {
     const { code, state } = await startLogin('sso-json@example.test');
 
     const callback = await request(app.getHttpServer())
@@ -117,9 +134,32 @@ describe('SSO (e2e, fake provider)', () => {
       .query({ code, state })
       .expect(200);
 
-    expect(callback.body.data.accessToken).toBeTruthy();
-    expect(callback.body.data.refreshToken).toBeTruthy();
+    expect(callback.body.data.exchangeCode).toBeTruthy();
+    expect(callback.body.data.redirectUri).toBe(REDIRECT_URI);
     expect(callback.headers.location).toBeUndefined();
+  });
+
+  it('rejects replaying a consumed exchange code', async () => {
+    const { code, state } = await startLogin('sso-replay-exchange@example.test');
+
+    const callback = await request(app.getHttpServer())
+      .get('/api/v1/auth/sso/fake/callback')
+      .query({ code, state })
+      .expect(302);
+
+    const exchangeCode = new URL(
+      requireLocation(callback.headers.location),
+    ).searchParams.get('exchange')!;
+
+    await exchangeSession(app, exchangeCode);
+
+    await request(app.getHttpServer())
+      .post('/api/v1/auth/sso/exchange')
+      .send({ code: exchangeCode })
+      .expect(401)
+      .expect((res) => {
+        expect(res.body.error.code).toBe(ERROR_CODES.SSO_EXCHANGE_INVALID);
+      });
   });
 
   it('rejects replaying a consumed state/code pair', async () => {
@@ -143,7 +183,6 @@ describe('SSO (e2e, fake provider)', () => {
     const admin = await loginAs(app, 'admin@example.local', 'ChangeMe123!');
     const conflictEmail = 'sso-conflict@example.test';
 
-    // PENDING status leaves emailVerifiedAt unset, which is what makes this a conflict.
     await request(app.getHttpServer())
       .post('/api/v1/admin/users')
       .set(bearer(admin.accessToken))

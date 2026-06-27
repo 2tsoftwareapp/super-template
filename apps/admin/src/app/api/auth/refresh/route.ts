@@ -1,4 +1,5 @@
 import { stripTokensFromAuthEnvelope } from "@repo/web-core/auth/sanitize-response";
+import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 import {
@@ -6,9 +7,14 @@ import {
   readAuthCookies,
   setAuthCookies,
 } from "@/lib/auth/cookies";
-import { refreshSession } from "@/lib/server/backend";
+import { enforceCsrf, refreshSession } from "@/lib/server/backend";
 
-export async function POST() {
+export async function POST(request: NextRequest) {
+  const csrfFailure = await enforceCsrf(request);
+  if (csrfFailure) {
+    return csrfFailure;
+  }
+
   const { refreshToken, csrfToken } = await readAuthCookies();
 
   if (!refreshToken) {

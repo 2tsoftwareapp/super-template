@@ -21,6 +21,7 @@ class AuthRepository {
     this._publicAuthApi,
     this._authApi,
     this._ssoApi,
+    this._publicDio,
     this._authenticatedDio,
     this._storage,
   );
@@ -33,6 +34,7 @@ class AuthRepository {
     publicClient.getAuthApi(),
     authenticatedClient.getAuthApi(),
     publicClient.getSsoApi(),
+    publicClient.dio,
     authenticatedClient.dio,
     storage,
   );
@@ -40,6 +42,7 @@ class AuthRepository {
   final AuthApi _publicAuthApi;
   final AuthApi _authApi;
   final SsoApi _ssoApi;
+  final Dio _publicDio;
   final Dio _authenticatedDio;
   final TokenStorage _storage;
 
@@ -257,6 +260,27 @@ class AuthRepository {
         redirectUri: 'myapp://sso/callback',
       );
       return response.data!.data.authorizationUrl;
+    } on DioException catch (error) {
+      throw AppException.fromDio(error);
+    }
+  }
+
+  Future<void> completeSsoExchange(String exchangeCode) async {
+    try {
+      final response = await _publicDio.post<Map<String, dynamic>>(
+        '/api/v1/auth/sso/exchange',
+        data: {'code': exchangeCode},
+      );
+      final accessToken =
+          response.data?['data']?['accessToken'] as String?;
+      final refreshToken =
+          response.data?['data']?['refreshToken'] as String?;
+      if (accessToken == null || refreshToken == null) {
+        throw AppException('Invalid SSO exchange response');
+      }
+      await _storage.write(
+        TokenBundle(accessToken: accessToken, refreshToken: refreshToken),
+      );
     } on DioException catch (error) {
       throw AppException.fromDio(error);
     }

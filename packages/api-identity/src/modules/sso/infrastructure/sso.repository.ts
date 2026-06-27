@@ -5,6 +5,7 @@ import {
   DATABASE,
   externalIdentities,
   ssoLoginStates,
+  ssoSessionExchanges,
 } from '@repo/api-database';
 import { and, eq, gt, isNull } from 'drizzle-orm';
 
@@ -51,6 +52,47 @@ export class SsoRepository {
       .update(ssoLoginStates)
       .set({ consumedAt: new Date() })
       .where(eq(ssoLoginStates.id, id));
+  }
+
+  async createSessionExchange(
+    values: typeof ssoSessionExchanges.$inferInsert,
+    executor: DatabaseExecutor = this.database,
+  ) {
+    const [exchange] = await executor
+      .insert(ssoSessionExchanges)
+      .values(values)
+      .returning();
+
+    return exchange ?? null;
+  }
+
+  async findValidSessionExchangeByCodeHash(
+    codeHash: string,
+    executor: DatabaseExecutor = this.database,
+  ) {
+    const [exchange] = await executor
+      .select()
+      .from(ssoSessionExchanges)
+      .where(
+        and(
+          eq(ssoSessionExchanges.codeHash, codeHash),
+          isNull(ssoSessionExchanges.consumedAt),
+          gt(ssoSessionExchanges.expiresAt, new Date()),
+        ),
+      )
+      .limit(1);
+
+    return exchange ?? null;
+  }
+
+  async consumeSessionExchange(
+    id: string,
+    executor: DatabaseExecutor = this.database,
+  ) {
+    await executor
+      .update(ssoSessionExchanges)
+      .set({ consumedAt: new Date() })
+      .where(eq(ssoSessionExchanges.id, id));
   }
 
   async findIdentity(

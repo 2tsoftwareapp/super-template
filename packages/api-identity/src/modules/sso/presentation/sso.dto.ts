@@ -29,3 +29,9 @@ export class SsoCallbackQueryDto {
   @IsString()
   state: string;
 }
+
+export class ExchangeSsoSessionDto {
+  @ApiProperty()
+  @IsString()
+  code: string;
+}

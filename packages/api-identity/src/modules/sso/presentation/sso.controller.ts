@@ -18,6 +18,7 @@ import { randomUUID } from 'node:crypto';
 
 import { SsoService } from '../application/sso.service';
 import {
+  ExchangeSsoSessionDto,
   SsoCallbackQueryDto,
   StartSsoLoginQueryDto,
   StartSsoLoginResponseDto,
@@ -41,6 +42,13 @@ export class SsoController {
       redirectUri: query.redirectUri,
       ...(query.testEmail !== undefined ? { testEmail: query.testEmail } : {}),
     });
+  }
+
+  @Public()
+  @Post('exchange')
+  @Throttle({ default: { limit: 20, ttl: 60_000 } })
+  exchangeSession(@Body() body: ExchangeSsoSessionDto) {
+    return this.ssoService.exchangeSession(body.code);
   }
 
   @Public()
@@ -98,9 +106,18 @@ export class SsoController {
       request.requestContext,
     );
 
+    const { exchangeCode } = await this.ssoService.createSessionExchange({
+      accessToken: session.accessToken,
+      refreshToken: session.refreshToken,
+      organizationId: session.organizationId,
+    });
+
     if (this.wantsJsonResponse(request)) {
       response.status(200).json({
-        data: session,
+        data: {
+          exchangeCode,
+          redirectUri,
+        },
         meta: {
           requestId: request.requestContext?.requestId ?? randomUUID(),
         },
@@ -109,12 +126,7 @@ export class SsoController {
     }
 
     const target = new URL(redirectUri);
-    target.hash = new URLSearchParams({
-      accessToken: session.accessToken,
-      refreshToken: session.refreshToken,
-      organizationId: session.organizationId ?? '',
-    }).toString();
-
+    target.searchParams.set('exchange', exchangeCode);
     response.redirect(302, target.toString());
   }
 }

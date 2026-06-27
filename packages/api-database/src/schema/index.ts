@@ -19,7 +19,7 @@ export {
   organizations,
 } from './identity/organizations';
 export { userPreferences } from './identity/preferences';
-export { externalIdentities, ssoLoginStates } from './identity/sso';
+export { externalIdentities, ssoLoginStates, ssoSessionExchanges } from './identity/sso';
 export {
   mfaChallenges,
   userRecoveryCodes,
@@ -81,7 +81,7 @@ import {
   organizations,
 } from './identity/organizations';
 import { userPreferences } from './identity/preferences';
-import { externalIdentities, ssoLoginStates } from './identity/sso';
+import { externalIdentities, ssoLoginStates, ssoSessionExchanges } from './identity/sso';
 import {
   mfaChallenges,
   userRecoveryCodes,
@@ -142,6 +142,7 @@ export const schema = {
   roles,
   mfaChallenges,
   ssoLoginStates,
+  ssoSessionExchanges,
   userPreferences,
   userRecoveryCodes,
   userRoles,

@@ -3,8 +3,6 @@ import type { NextRequest } from "next/server";
 import { stripTokensFromAuthEnvelope } from "@repo/web-core/auth/sanitize-response";
 import { NextResponse } from "next/server";
 
-import type { AuthLoginResponse } from "@/lib/api-types";
-
 import { clearAuthCookies, setAuthCookies } from "@/lib/auth/cookies";
 import { callBackend } from "@/lib/server/backend";
 
@@ -23,16 +21,42 @@ export async function GET(
     headers: new Headers({ accept: "application/json" }),
   });
 
-  const payload = (await response.json().catch(() => ({}))) as AuthLoginResponse;
+  const payload = (await response.json().catch(() => null)) as {
+    data?: { exchangeCode?: string };
+  } | null;
+
+  if (!response.ok || !payload?.data?.exchangeCode) {
+    const nextResponse = NextResponse.json(payload ?? { success: false }, {
+      status: response.status,
+    });
+    clearAuthCookies(nextResponse);
+    return nextResponse;
+  }
+
+  const exchangeResponse = await callBackend({
+    path: "auth/sso/exchange",
+    method: "POST",
+    headers: new Headers({ "content-type": "application/json" }),
+    body: JSON.stringify({ code: payload.data.exchangeCode }),
+  });
+
+  const exchangePayload = (await exchangeResponse.json().catch(() => null)) as {
+    data?: { accessToken?: string; refreshToken?: string };
+  } | null;
+
   const nextResponse = NextResponse.json(
-    stripTokensFromAuthEnvelope(payload) ?? payload,
-    { status: response.status },
+    stripTokensFromAuthEnvelope(exchangePayload) ?? { success: exchangeResponse.ok },
+    { status: exchangeResponse.ok ? 200 : exchangeResponse.status },
   );
 
-  if (response.ok && payload.data?.accessToken && payload.data?.refreshToken) {
+  if (
+    exchangeResponse.ok &&
+    exchangePayload?.data?.accessToken &&
+    exchangePayload?.data?.refreshToken
+  ) {
     setAuthCookies(nextResponse, {
-      accessToken: payload.data.accessToken,
-      refreshToken: payload.data.refreshToken,
+      accessToken: exchangePayload.data.accessToken,
+      refreshToken: exchangePayload.data.refreshToken,
     });
   } else {
     clearAuthCookies(nextResponse);
