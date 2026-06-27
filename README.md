@@ -17,6 +17,8 @@
   &nbsp;·&nbsp;
   <a href="#architecture"><strong>Architecture</strong></a>
   &nbsp;·&nbsp;
+  <a href="docs/onboarding.md"><strong>Onboarding</strong></a>
+  &nbsp;·&nbsp;
   <a href="docs/environments.md"><strong>Environments</strong></a>
   &nbsp;·&nbsp;
   <a href="#documentation"><strong>Docs</strong></a>
@@ -24,21 +26,22 @@
 
 <br />
 
-One PostgreSQL schema. One OpenAPI contract. Four clients — authentication, RBAC, admin tooling, and environment layering included. Clone it, run `make bootstrap`, and start building your product instead of rebuilding boilerplate.
+One PostgreSQL schema. One OpenAPI contract. Four clients — authentication, RBAC, admin tooling, and environment layering included. Clone it, run `make bootstrap` (or `pnpm bootstrap`), and start building your product instead of rebuilding boilerplate.
 
 <br />
 
 ## Quick start
 
-**Prerequisites:** Node 24 · pnpm 11 · Docker · Flutter (mobile only)
+**Prerequisites:** Node **24.14+** (see `.nvmrc`) · pnpm **11.7+** · Docker · Flutter (mobile only)
 
-Works out of the box with committed `.env.development` defaults. Put personal secrets in `.env.local` (gitignored).
+Works out of the box with committed `.env.development` + `.env.example` defaults. Put personal overrides and secrets in `.env.local` (gitignored).
 
 ```bash
 git clone https://github.com/truongnat/super-template.git && cd super-template
-make bootstrap    # deps · infra · migrate · seed · codegen
+make bootstrap    # or: pnpm bootstrap
+pnpm run env:doctor
 make dev          # API :3001 · Web :3000 · Admin :3002
-make dev-mobile   # Flutter (separate terminal)
+make dev-mobile   # Flutter — separate terminal
 ```
 
 <table>
@@ -54,6 +57,9 @@ make dev-mobile   # Flutter (separate terminal)
 <summary><strong>Windows / PowerShell</strong></summary>
 
 ```powershell
+pnpm bootstrap
+pnpm run env:doctor
+pnpm dev
 pnpm run mobile:doctor
 pnpm run mobile:setup
 pnpm run mobile:dev
@@ -83,6 +89,11 @@ pnpm run mobile:dev
                ┌─────────────────────┐
                │     PostgreSQL      │
                │  Drizzle · RLS role │
+               └──────────┬──────────┘
+                          │
+               ┌──────────┴──────────┐
+               │  Redis (optional)   │
+               │  Mailpit (dev SMTP) │
                └─────────────────────┘
 </pre>
 
@@ -93,11 +104,11 @@ Shared packages: `@repo/web-core` · `@repo/env-loader` · `@repo/api-contract`
 ## Features
 
 - [x] **Contract-first API** — OpenAPI from NestJS; TypeScript + Dart clients via `make generate`
-- [x] **Authentication** — JWT rotation, Argon2id, CSRF, RBAC, TOTP MFA, GitHub / Google / Apple SSO
+- [x] **Authentication** — JWT rotation, Argon2id, CSRF, RBAC, TOTP MFA, OIDC SSO backend (Google / Apple / GitHub; configure credentials + UI)
 - [x] **Admin dashboard** — users, roles, projects, jobs, mail, imports/exports, audit logs, SSE notifications
 - [x] **Flutter mobile** — Material 3 design system, 20+ widgets, in-app UI Kit gallery, optional FCM push
 - [x] **Environment layering** — `development` · `staging` · `production` across API, web, admin, and mobile
-- [x] **CI pipeline** — `make verify` runs generate-check, lint, typecheck, tests, and builds
+- [x] **CI pipeline** — `pnpm run generate:check`, lint, typecheck, tests, build, and Flutter checks (see `.github/workflows/ci.yml`)
 
 <br />
 
@@ -105,6 +116,7 @@ Shared packages: `@repo/web-core` · `@repo/env-loader` · `@repo/api-contract`
 
 | | |
 |---|---|
+| [Onboarding](docs/onboarding.md) | Day 1 setup — terminals, ports, accounts |
 | [Environments](docs/environments.md) | Dev / staging / prod config layering |
 | [Architecture](docs/architecture.md) | System design and module boundaries |
 | [Authentication](docs/authentication.md) | Sessions, cookies, SSO, MFA |
@@ -144,14 +156,16 @@ super-template/
 
 | Command | Description |
 |---------|-------------|
-| `make bootstrap` | First-time setup |
-| `make dev` | API + Web + Admin |
+| `make bootstrap` / `pnpm bootstrap` | First-time setup (cross-platform) |
+| `pnpm run env:doctor` | Validate toolchain + env layering |
+| `make dev` / `pnpm dev` | API + Web + Admin |
 | `make dev-api` / `dev-web` / `dev-admin` | Single surface |
 | `make dev-mobile` | Flutter (dev env) |
 | `make dev-mobile-staging` | Flutter (staging env) |
 | `make db-migrate` / `db-seed` / `db-generate` | Database |
 | `make generate` | Regenerate OpenAPI + clients |
-| `make verify` | Full CI pipeline |
+| `make generate-check` / `pnpm run generate:check` | Verify generated output is committed |
+| `make verify` / `pnpm verify` | Local CI-style verify |
 | `make test-mobile` | Flutter tests |
 
 </details>
@@ -182,7 +196,7 @@ make dev-mobile-staging
 | Admin | `admin@example.local` |
 | User | `user@example.local` |
 
-Passwords: `SEED_ADMIN_PASSWORD` and `SEED_USER_PASSWORD` in `.env.local`.
+Passwords: `SEED_ADMIN_PASSWORD` and `SEED_USER_PASSWORD` in `.env.example` (override in `.env.local` if needed).
 
 Sign in at Web `/login` or Admin `/login`.
 
@@ -194,11 +208,13 @@ Sign in at Web `/login` or Admin `/login`.
 | Issue | Fix |
 |-------|-----|
 | Postgres not ready | `docker compose -f infra/docker-compose.yml ps` |
+| Port 5432 / 6379 conflict | Override `POSTGRES_EXPOSED_PORT` or `REDIS_PORT` in `.env.local` |
 | Auth / cookies fail | Check `WEB_ORIGIN`, `ADMIN_ORIGIN`, `API_INTERNAL_URL` |
+| Env / toolchain sanity | `pnpm run env:doctor` |
 | Flutter missing | `pnpm run mobile:doctor` |
-| Android can't reach API | Use `10.0.2.2:3001` in `apps/mobile/env/dev.json` |
-| Stale codegen | `make generate` |
-| Port conflict | Override `*_PORT` in `.env.local` |
+| Android can't reach API | Ensure API is running; `AppConfig` rewrites `localhost` → `10.0.2.2` on Android |
+| Stale codegen | `make generate` then `make generate-check` |
+| Port conflict (apps) | Override `*_PORT` in `.env.local` |
 
 </details>
 
@@ -209,7 +225,7 @@ Sign in at Web `/login` or Admin `/login`.
 - Set `APP_ENV=production`, `COOKIE_SECURE=true`, HTTPS origins
 - Disable or protect Swagger in production
 - Inject secrets from your orchestrator — never commit them
-- Keep generated clients in sync (`make generate-check` in CI)
+- Keep generated clients in sync (`pnpm run generate:check` in CI)
 
 </details>
 

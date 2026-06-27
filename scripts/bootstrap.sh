@@ -43,5 +43,6 @@ Admin: http://localhost:${ADMIN_PORT:-3002}
 API: http://localhost:${API_PORT:-3001}/api/v1
 Swagger: http://localhost:${API_PORT:-3001}/api/docs
 Mailpit: http://localhost:${MAILPIT_HTTP_PORT:-8025}
-Run Flutter separately with: make dev-mobile
+Run Flutter separately with: make dev-mobile (or pnpm run mobile:dev)
+Cross-platform bootstrap: pnpm bootstrap
 EOF

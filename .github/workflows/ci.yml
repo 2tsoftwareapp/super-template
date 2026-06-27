@@ -75,6 +75,9 @@ jobs:
       - name: Install Node dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Verify generated contracts are up to date
+        run: pnpm run generate:check
+
       - name: Wait for PostgreSQL
         run: ./scripts/wait-for-postgres.sh
 

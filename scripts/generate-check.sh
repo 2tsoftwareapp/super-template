@@ -27,7 +27,7 @@ sh "$ROOT_DIR/scripts/generate-contracts.sh"
 
 printf '[generate:check] Checking for drift in generated output\n'
 if ! git diff --exit-code -- $GENERATED_PATHS; then
-  printf '[generate:check] Generated output is out of date. Run `pnpm run generate` and commit the result.\n' >&2
+  printf '[generate:check] Generated output is out of date. Run `make generate` (or `pnpm run generate:contracts`) and commit the result.\n' >&2
   exit 1
 fi
 

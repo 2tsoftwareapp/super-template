@@ -33,9 +33,9 @@ If Flutter is not installed yet, `mobile:doctor` fails early with the expected n
 
 ## Networking
 
-- iOS simulator: `http://localhost:3001/api/v1`
-- Android emulator: `http://10.0.2.2:3001/api/v1`
-- physical device: use the host machine LAN IP
+- iOS simulator: `http://localhost:3001` (base URL; generated client adds `/api/v1`)
+- Android emulator: `AppConfig` rewrites `localhost` / `127.0.0.1` to `10.0.2.2` automatically
+- physical device: use the host machine LAN IP in `apps/mobile/env/dev.json`
 
 ## Generated Client
 

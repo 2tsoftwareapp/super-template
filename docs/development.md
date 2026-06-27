@@ -1,49 +1,57 @@
 # Development
 
+See [onboarding.md](./onboarding.md) for a first-day walkthrough.
+
 ## Common Commands
 
-- `make bootstrap`
-- `make dev`
-- `make generate`
-- `make verify`
-- `make test-api`
-- `make test-web`
-- `make test-mobile`
-- `pnpm run mobile:doctor`
-- `pnpm run mobile:setup`
-- `pnpm run mobile:dev`
-- `pnpm run mobile:test`
-- `pnpm run mobile:format-check`
+| Goal | macOS / Linux | Cross-platform |
+| --- | --- | --- |
+| First-time setup | `make bootstrap` | `pnpm bootstrap` |
+| Validate toolchain + env | — | `pnpm run env:doctor` |
+| Start API + Web + Admin | `make dev` | `pnpm dev` |
+| Regenerate contracts | `make generate` | `pnpm run generate:contracts` |
+| CI-style verify | `make verify` | `pnpm verify` |
+| Mobile doctor | `pnpm run mobile:doctor` | same |
 
 ## Running Individual Apps
 
 - API: `make dev-api`
-- Web: `make dev-web`
-- Admin: `make dev-admin`
-- Mobile: `make dev-mobile`
+- Web: `make dev-web` (needs API in another terminal unless using `make dev`)
+- Admin: `make dev-admin` (needs API in another terminal unless using `make dev`)
+- Mobile: `make dev-mobile` or `pnpm run mobile:dev`
 
-`make dev` starts PostgreSQL, Mailpit, NestJS, Next.js web, and the Next.js admin app. Flutter still runs separately on a selected device or simulator.
+`make dev` / `pnpm dev` starts Docker (Postgres, Redis, Mailpit), migrates the database, then runs NestJS + both Next.js apps in one terminal. Flutter always runs separately.
 
-On Windows/PowerShell, prefer the Node-based mobile commands over shell-specific `make` targets:
+## Windows / PowerShell
+
+Use pnpm scripts instead of Make when bash is unavailable:
 
 ```powershell
+pnpm bootstrap
+pnpm run env:doctor
+pnpm dev
 pnpm run mobile:doctor
 pnpm run mobile:setup
 pnpm run mobile:dev
 ```
 
-`mobile:doctor` validates `flutter` and `dart` on `PATH` and then runs `flutter doctor`. `mobile:setup` runs `flutter pub get` inside `apps/mobile`.
-`mobile:format-check` runs `dart format --set-exit-if-changed .` inside `apps/mobile`.
+Full bootstrap: `powershell -ExecutionPolicy Bypass -File scripts/bootstrap.ps1`
+
+## Local infrastructure (Docker Compose)
+
+| Service | Default port | Required? |
+| --- | --- | --- |
+| PostgreSQL | 5432 (`POSTGRES_EXPOSED_PORT`) | Yes |
+| Redis | 6379 (`REDIS_PORT`) | Optional — improves throttling/SSE fan-out when `REDIS_URL` is set |
+| Mailpit | 8025 UI / 1025 SMTP | Yes for email flows in dev |
+
+Override conflicting ports in `.env.local`.
 
 ## Emulator Networking
 
-- iOS simulator: `http://localhost:3001/api/v1`
-- Android emulator: `http://10.0.2.2:3001/api/v1`
-- physical device: use the host machine LAN IP
-
-Adjust `apps/mobile/env/*.json` or pass a different `--dart-define-from-file`.
-
-Example:
+- iOS simulator: `http://localhost:3001` (base URL; generated client adds `/api/v1`)
+- Android emulator: `AppConfig` rewrites `localhost` / `127.0.0.1` to `10.0.2.2`
+- Physical device: set `API_BASE_URL` in `apps/mobile/env/dev.json` to your host LAN IP
 
 ```powershell
 sh scripts/mobile.sh dev --env env/staging.json
@@ -53,9 +61,10 @@ sh scripts/mobile.sh dev --env env/staging.json
 
 ```bash
 make generate
+make generate-check   # non-mutating; used in CI
 ```
 
-This regenerates the API OpenAPI document, the TypeScript contract package, and the Dart client used by Flutter.
+Regenerates OpenAPI, the TypeScript contract package, and (when Docker + Dart are available) the Flutter Dio client.
 
 ## Adding a NestJS Module
 

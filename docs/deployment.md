@@ -32,9 +32,9 @@
 
 ## Out of Scope for v1
 
-- Redis-backed queues (PostgreSQL jobs are used instead)
+- Redis-backed **job queues** (PostgreSQL jobs are used instead)
 - WebSocket notifications
-- social login
+- **Pre-built social login UI** on web/mobile (OIDC backend + fake provider for tests exist — configure `GOOGLE_*` / `APPLE_*` / `GITHUB_*` and add UI)
 - multi-tenancy
 - Kubernetes or Terraform
 

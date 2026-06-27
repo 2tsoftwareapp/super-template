@@ -34,12 +34,12 @@ if [ "${SKIP_FLUTTER_GENERATION:-}" = "1" ] || [ "${CI:-}" = "true" ]; then
 fi
 
 if ! docker info >/dev/null 2>&1; then
-  printf '[generate] Docker unavailable; keeping existing Dart client at apps/mobile/lib/generated/api\n' >&2
+  printf '[generate] warning: Docker unavailable; keeping committed Dart client at apps/mobile/lib/generated/api (run again with Docker to regenerate)\n' >&2
   exit 0
 fi
 
 if ! has_command dart; then
-  printf '[generate] Dart unavailable; keeping existing Dart client at apps/mobile/lib/generated/api\n' >&2
+  printf '[generate] warning: Dart unavailable; keeping committed Dart client at apps/mobile/lib/generated/api (install Dart to regenerate)\n' >&2
   exit 0
 fi
 

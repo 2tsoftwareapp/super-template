@@ -7,6 +7,8 @@
     "pnpm": ">=11.7.0"
   },
   "scripts": {
+    "bootstrap": "node scripts/bootstrap.mjs",
+    "env:doctor": "node scripts/env-doctor.mjs",
     "lint:policy": "sh scripts/check-source-policy.sh && sh scripts/check-package-cycles.sh && sh scripts/clean-policy-artifacts.sh && pnpm exec turbo boundaries",
     "build": "turbo run build",
     "dev": "./scripts/dev.sh",
@@ -22,7 +24,8 @@
     "format": "turbo run format",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck",
-    "generate": "turbo run generate",
+    "generate:contracts": "sh ./scripts/generate-contracts.sh",
+    "generate": "sh ./scripts/generate-contracts.sh",
     "generate:check": "sh ./scripts/generate-check.sh",
     "verify": "sh ./scripts/verify.sh",
     "extension:plan": "node .agents/skills/playwright-extension-live-browser/scripts/run-plan.mjs",
