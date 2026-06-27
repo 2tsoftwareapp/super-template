@@ -78,6 +78,21 @@ export interface CreateBackendHelpersOptions {
   auth: AuthCookieHelpers;
 }
 
+const csrfForbiddenResponse = () =>
+  NextResponse.json(
+    {
+      error: {
+        code: "AUTH_FORBIDDEN",
+        message: "CSRF validation failed",
+        details: null,
+      },
+      meta: {
+        requestId: crypto.randomUUID(),
+      },
+    },
+    { status: 403 },
+  );
+
 export function createBackendHelpers({
   apiInternalUrl,
   allowedOrigins,
@@ -85,6 +100,24 @@ export function createBackendHelpers({
 }: CreateBackendHelpersOptions) {
   const backendUrl = (path: string) =>
     new URL(`/api/v1/${path.replace(/^\/+/, "")}`, apiInternalUrl);
+
+  const resolveRequestOrigin = (request: NextRequest): string | null => {
+    const origin = request.headers.get("origin");
+    if (origin) {
+      return origin;
+    }
+
+    const referer = request.headers.get("referer");
+    if (!referer) {
+      return null;
+    }
+
+    try {
+      return new URL(referer).origin;
+    } catch {
+      return null;
+    }
+  };
 
   const callBackend = async ({
     accessToken,
@@ -158,6 +191,16 @@ export function createBackendHelpers({
     return payload;
   };
 
+  const enforceOrigin = (request: NextRequest) => {
+    const requestOrigin = resolveRequestOrigin(request);
+
+    if (!requestOrigin || !allowedOrigins.includes(requestOrigin)) {
+      return csrfForbiddenResponse();
+    }
+
+    return null;
+  };
+
   const enforceCsrf = async (request: NextRequest) => {
     const { accessToken, refreshToken, csrfToken } = await auth.readAuthCookies();
 
@@ -165,29 +208,45 @@ export function createBackendHelpers({
       return null;
     }
 
-    const origin = request.headers.get("origin");
+    const originFailure = enforceOrigin(request);
+    if (originFailure) {
+      return originFailure;
+    }
+
     const requestCsrfToken = request.headers.get("x-csrf-token");
 
     if (
-      !origin ||
-      !allowedOrigins.includes(origin) ||
       !csrfToken ||
       requestCsrfToken !== csrfToken ||
       !auth.isValidCsrfToken(csrfToken)
     ) {
-      return NextResponse.json(
-        {
-          error: {
-            code: "AUTH_FORBIDDEN",
-            message: "CSRF validation failed",
-            details: null,
-          },
-          meta: {
-            requestId: crypto.randomUUID(),
-          },
-        },
-        { status: 403 },
-      );
+      return csrfForbiddenResponse();
+    }
+
+    return null;
+  };
+
+  /** Origin + CSRF for auth mutations (pre-session and authenticated). */
+  const enforceMutationGuard = async (request: NextRequest) => {
+    const originFailure = enforceOrigin(request);
+    if (originFailure) {
+      return originFailure;
+    }
+
+    const { accessToken, refreshToken, csrfToken } = await auth.readAuthCookies();
+    const requestCsrfToken = request.headers.get("x-csrf-token");
+
+    if (
+      !csrfToken ||
+      !requestCsrfToken ||
+      requestCsrfToken !== csrfToken ||
+      !auth.isValidCsrfToken(csrfToken)
+    ) {
+      return csrfForbiddenResponse();
+    }
+
+    if (accessToken || refreshToken) {
+      return null;
     }
 
     return null;
@@ -253,7 +312,9 @@ export function createBackendHelpers({
   return {
     callBackend,
     refreshSession,
+    enforceOrigin,
     enforceCsrf,
+    enforceMutationGuard,
     proxyWithRefresh,
   };
 }

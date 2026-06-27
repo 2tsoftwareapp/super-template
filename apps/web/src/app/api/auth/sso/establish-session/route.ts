@@ -6,13 +6,18 @@ import { NextResponse } from "next/server";
 import type { ApiEnvelope } from "@/lib/api-types";
 
 import { clearAuthCookies, setAuthCookies } from "@/lib/auth/cookies";
-import { callBackend } from "@/lib/server/backend";
+import { callBackend, enforceOrigin } from "@/lib/server/backend";
 
 type EstablishSessionInput = {
   exchangeCode?: string;
 };
 
 export async function POST(request: NextRequest) {
+  const originFailure = enforceOrigin(request);
+  if (originFailure) {
+    return originFailure;
+  }
+
   const body = (await request.json()) as EstablishSessionInput;
 
   if (!body.exchangeCode) {

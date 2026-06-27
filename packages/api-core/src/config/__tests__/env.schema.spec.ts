@@ -40,6 +40,15 @@ const secureProdOverrides: Record<string, unknown> = {
   API_INTERNAL_URL: 'https://api.internal.example.com',
 };
 
+const secureStagingOverrides: Record<string, unknown> = {
+  APP_ENV: 'staging',
+  COOKIE_SECURE: 'true',
+  WEB_ORIGIN: 'https://staging.example.com',
+  NEXT_PUBLIC_WEB_URL: 'https://staging.example.com',
+  API_INTERNAL_URL: 'https://api.staging.internal.example.com',
+  ADMIN_ORIGIN: 'https://admin.staging.example.com',
+};
+
 describe('validateEnvironment', () => {
   it('parses a valid environment and applies defaults', () => {
     const env = validateEnvironment({ ...baseEnv });
@@ -135,6 +144,16 @@ describe('validateEnvironment', () => {
     ).toThrow(/COOKIE_SECURE/);
   });
 
+  it('rejects insecure cookies in staging', () => {
+    expect(() =>
+      validateEnvironment({
+        ...baseEnv,
+        ...secureStagingOverrides,
+        COOKIE_SECURE: 'false',
+      }),
+    ).toThrow(/COOKIE_SECURE/);
+  });
+
   it('rejects a non-https WEB_ORIGIN in production', () => {
     expect(() =>
       validateEnvironment({
@@ -143,6 +162,32 @@ describe('validateEnvironment', () => {
         WEB_ORIGIN: 'http://app.example.com',
       }),
     ).toThrow(/https/);
+  });
+
+  it('rejects a non-https WEB_ORIGIN in staging', () => {
+    expect(() =>
+      validateEnvironment({
+        ...baseEnv,
+        ...secureStagingOverrides,
+        WEB_ORIGIN: 'http://staging.example.com',
+      }),
+    ).toThrow(/https/);
+  });
+
+  it('rejects a non-https ADMIN_ORIGIN in staging when set', () => {
+    expect(() =>
+      validateEnvironment({
+        ...baseEnv,
+        ...secureStagingOverrides,
+        ADMIN_ORIGIN: 'http://admin.staging.example.com',
+      }),
+    ).toThrow(/ADMIN_ORIGIN/);
+  });
+
+  it('accepts a fully configured staging environment', () => {
+    const env = validateEnvironment({ ...baseEnv, ...secureStagingOverrides });
+    expect(env.APP_ENV).toBe('staging');
+    expect(env.COOKIE_SECURE).toBe(true);
   });
 
   it('rejects reusing the dev placeholder JWT secret in production', () => {

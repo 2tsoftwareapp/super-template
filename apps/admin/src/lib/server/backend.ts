@@ -1,6 +1,11 @@
 import { createAuthCookieHelpers } from "@repo/web-core/auth/cookies";
 import { createBackendHelpers } from "@repo/web-core/server";
 
+import {
+  ACCESS_TOKEN_COOKIE,
+  CSRF_TOKEN_COOKIE,
+  REFRESH_TOKEN_COOKIE,
+} from "@/lib/auth/cookies";
 import { env, isSecureCookie } from "@/lib/env";
 
 const auth = createAuthCookieHelpers({
@@ -8,6 +13,13 @@ const auth = createAuthCookieHelpers({
   cookieSameSite: env.COOKIE_SAMESITE,
   cookieSecure: isSecureCookie,
   csrfSecret: env.CSRF_SECRET ?? null,
+  cookieNames: {
+    accessToken: ACCESS_TOKEN_COOKIE,
+    refreshToken: REFRESH_TOKEN_COOKIE,
+    csrf: CSRF_TOKEN_COOKIE,
+  },
+  requireSignedCsrf:
+    env.APP_ENV === "staging" || env.APP_ENV === "production",
 });
 
 const backend = createBackendHelpers({
@@ -16,5 +28,11 @@ const backend = createBackendHelpers({
   auth,
 });
 
-export const { callBackend, refreshSession, enforceCsrf, proxyWithRefresh } =
-  backend;
+export const {
+  callBackend,
+  refreshSession,
+  enforceOrigin,
+  enforceCsrf,
+  enforceMutationGuard,
+  proxyWithRefresh,
+} = backend;

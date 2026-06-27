@@ -4,9 +4,14 @@ import { NextResponse } from "next/server";
 
 import type { RegisterInput } from "@/lib/api-types";
 
-import { callBackend } from "@/lib/server/backend";
+import { callBackend, enforceMutationGuard } from "@/lib/server/backend";
 
 export async function POST(request: NextRequest) {
+  const guardFailure = await enforceMutationGuard(request);
+  if (guardFailure) {
+    return guardFailure;
+  }
+
   const body = (await request.json()) as RegisterInput;
   const response = await callBackend({
     path: "auth/register",

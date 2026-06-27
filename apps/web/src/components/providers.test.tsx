@@ -35,6 +35,10 @@ vi.mock("@/lib/http", () => ({
 
 describe("Providers", () => {
   it("syncs the preferred theme after preferences load", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(new Response(JSON.stringify({ data: { ok: true } }))),
+    );
     webFetchMock.mockResolvedValue({
       data: {
         theme: "dark",

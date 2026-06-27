@@ -3,6 +3,7 @@ import type { Request } from 'express';
 
 import { Body, Controller, Get, Post, Req } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { ApiDataResponse, CurrentUser, SuccessFlagDto } from '@repo/api-core';
 
 import { MfaService } from '../application/mfa.service';
@@ -26,12 +27,14 @@ export class MfaController {
   }
 
   @Post('setup')
+  @Throttle({ default: { limit: 5, ttl: 60_000 } })
   @ApiDataResponse(MfaSetupResponseDto, 201)
   setup(@CurrentUser() user: AuthenticatedRequestUser) {
     return this.mfaService.setup(user.userId, user.email);
   }
 
   @Post('confirm')
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
   @ApiDataResponse(MfaRecoveryCodesResponseDto, 201)
   confirm(
     @CurrentUser() user: AuthenticatedRequestUser,
@@ -45,6 +48,7 @@ export class MfaController {
   }
 
   @Post('disable')
+  @Throttle({ default: { limit: 5, ttl: 60_000 } })
   @ApiDataResponse(SuccessFlagDto, 201)
   async disable(
     @CurrentUser() user: AuthenticatedRequestUser,
@@ -64,6 +68,7 @@ export class MfaController {
   }
 
   @Post('recovery-codes/regenerate')
+  @Throttle({ default: { limit: 3, ttl: 3_600_000 } })
   @ApiDataResponse(MfaRecoveryCodesResponseDto, 201)
   regenerateRecoveryCodes(
     @CurrentUser() user: AuthenticatedRequestUser,

@@ -3,18 +3,27 @@ import type { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createHmac, randomUUID, timingSafeEqual } from "node:crypto";
 
-export const ACCESS_TOKEN_COOKIE = "st_access_token";
-export const REFRESH_TOKEN_COOKIE = "st_refresh_token";
-export const CSRF_TOKEN_COOKIE = "csrf_token";
+export const DEFAULT_ACCESS_TOKEN_COOKIE = "st_access_token";
+export const DEFAULT_REFRESH_TOKEN_COOKIE = "st_refresh_token";
+export const DEFAULT_CSRF_TOKEN_COOKIE = "csrf_token";
 
 const CSRF_SEPARATOR = ".";
 const CSRF_HMAC_ALGORITHM = "sha256";
+
+export interface AuthCookieNameOptions {
+  accessToken?: string;
+  refreshToken?: string;
+  csrf?: string;
+}
 
 export interface AuthCookieOptions {
   cookieDomain?: string | undefined;
   cookieSameSite?: "lax" | "strict" | "none";
   cookieSecure?: boolean;
   csrfSecret?: string | null;
+  cookieNames?: AuthCookieNameOptions;
+  /** When true, unsigned CSRF tokens are rejected (staging/production). */
+  requireSignedCsrf?: boolean;
 }
 
 export interface AuthTokenPayload {
@@ -23,6 +32,9 @@ export interface AuthTokenPayload {
 }
 
 export interface AuthCookieHelpers {
+  accessTokenCookie: string;
+  refreshTokenCookie: string;
+  csrfTokenCookie: string;
   createCsrfToken: () => string;
   isValidCsrfToken: (value: string) => boolean;
   readAuthCookies: () => Promise<{
@@ -30,6 +42,7 @@ export interface AuthCookieHelpers {
     refreshToken: string | null;
     csrfToken: string | null;
   }>;
+  setCsrfCookie: (response: NextResponse, csrfToken?: string) => string;
   setAuthCookies: (
     response: NextResponse,
     payload: AuthTokenPayload,
@@ -43,7 +56,15 @@ export const createAuthCookieHelpers = ({
   cookieSameSite = "lax",
   cookieSecure = false,
   csrfSecret,
+  cookieNames,
+  requireSignedCsrf = false,
 }: AuthCookieOptions): AuthCookieHelpers => {
+  const accessTokenCookie =
+    cookieNames?.accessToken ?? DEFAULT_ACCESS_TOKEN_COOKIE;
+  const refreshTokenCookie =
+    cookieNames?.refreshToken ?? DEFAULT_REFRESH_TOKEN_COOKIE;
+  const csrfTokenCookie = cookieNames?.csrf ?? DEFAULT_CSRF_TOKEN_COOKIE;
+
   const baseCookieOptions = {
     httpOnly: true,
     domain: cookieDomain,
@@ -67,6 +88,14 @@ export const createAuthCookieHelpers = ({
   const createCsrfToken = () => signCsrfNonce(randomUUID());
 
   const isValidCsrfToken = (value: string) => {
+    if (!value) {
+      return false;
+    }
+
+    if (requireSignedCsrf && !csrfSecret) {
+      return false;
+    }
+
     if (!csrfSecret) {
       return value.length > 0;
     }
@@ -95,10 +124,22 @@ export const createAuthCookieHelpers = ({
     const store = await cookies();
 
     return {
-      accessToken: store.get(ACCESS_TOKEN_COOKIE)?.value ?? null,
-      refreshToken: store.get(REFRESH_TOKEN_COOKIE)?.value ?? null,
-      csrfToken: store.get(CSRF_TOKEN_COOKIE)?.value ?? null,
+      accessToken: store.get(accessTokenCookie)?.value ?? null,
+      refreshToken: store.get(refreshTokenCookie)?.value ?? null,
+      csrfToken: store.get(csrfTokenCookie)?.value ?? null,
     };
+  };
+
+  const setCsrfCookie = (response: NextResponse, csrfToken?: string) => {
+    const resolvedCsrfToken =
+      csrfToken && isValidCsrfToken(csrfToken) ? csrfToken : createCsrfToken();
+
+    response.cookies.set(csrfTokenCookie, resolvedCsrfToken, {
+      ...baseCookieOptions,
+      httpOnly: false,
+    });
+
+    return resolvedCsrfToken;
   };
 
   const setAuthCookies = (
@@ -106,35 +147,25 @@ export const createAuthCookieHelpers = ({
     payload: AuthTokenPayload,
     csrfToken?: string,
   ) => {
-    const resolvedCsrfToken =
-      csrfToken && isValidCsrfToken(csrfToken) ? csrfToken : createCsrfToken();
-
+    setCsrfCookie(response, csrfToken);
+    response.cookies.set(accessTokenCookie, payload.accessToken, baseCookieOptions);
     response.cookies.set(
-      ACCESS_TOKEN_COOKIE,
-      payload.accessToken,
-      baseCookieOptions,
-    );
-    response.cookies.set(
-      REFRESH_TOKEN_COOKIE,
+      refreshTokenCookie,
       payload.refreshToken,
       baseCookieOptions,
     );
-    response.cookies.set(CSRF_TOKEN_COOKIE, resolvedCsrfToken, {
-      ...baseCookieOptions,
-      httpOnly: false,
-    });
   };
 
   const clearAuthCookies = (response: NextResponse) => {
-    response.cookies.set(ACCESS_TOKEN_COOKIE, "", {
+    response.cookies.set(accessTokenCookie, "", {
       ...baseCookieOptions,
       maxAge: 0,
     });
-    response.cookies.set(REFRESH_TOKEN_COOKIE, "", {
+    response.cookies.set(refreshTokenCookie, "", {
       ...baseCookieOptions,
       maxAge: 0,
     });
-    response.cookies.set(CSRF_TOKEN_COOKIE, "", {
+    response.cookies.set(csrfTokenCookie, "", {
       ...baseCookieOptions,
       httpOnly: false,
       maxAge: 0,
@@ -142,9 +173,13 @@ export const createAuthCookieHelpers = ({
   };
 
   return {
+    accessTokenCookie,
+    refreshTokenCookie,
+    csrfTokenCookie,
     createCsrfToken,
     isValidCsrfToken,
     readAuthCookies,
+    setCsrfCookie,
     setAuthCookies,
     clearAuthCookies,
   };

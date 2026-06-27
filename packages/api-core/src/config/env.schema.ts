@@ -225,27 +225,34 @@ export const envSchema = z.object({
     }
   }
 
-  // Production must serve over HTTPS with secure cookies.
-  if (env.APP_ENV === 'production') {
+  // Deployed environments must serve over HTTPS with secure cookies.
+  if (isDeployed) {
     if (!env.COOKIE_SECURE) {
       ctx.addIssue({
         code: 'custom',
         path: ['COOKIE_SECURE'],
-        message: 'must be true in production',
+        message: 'must be true in staging/production',
       });
     }
     if (!everyOriginIsHttps(env.WEB_ORIGIN)) {
       ctx.addIssue({
         code: 'custom',
         path: ['WEB_ORIGIN'],
-        message: 'must use https in production',
+        message: 'must use https in staging/production',
       });
     }
     if (!env.NEXT_PUBLIC_WEB_URL.startsWith('https://')) {
       ctx.addIssue({
         code: 'custom',
         path: ['NEXT_PUBLIC_WEB_URL'],
-        message: 'must use https in production',
+        message: 'must use https in staging/production',
+      });
+    }
+    if (env.ADMIN_ORIGIN && !everyOriginIsHttps(env.ADMIN_ORIGIN)) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['ADMIN_ORIGIN'],
+        message: 'must use https in staging/production when set',
       });
     }
   }
