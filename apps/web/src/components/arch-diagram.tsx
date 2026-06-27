@@ -9,7 +9,7 @@ export function ArchDiagram() {
           <div className="grid gap-3">
             <div className="rounded-xl border border-border bg-card px-3 py-3">
               <p className="text-sm font-semibold text-foreground">Web Browser</p>
-              <p className="text-xs text-foreground/70">Next.js App Router</p>
+              <p className="text-xs text-foreground/70">Next.js · landing + auth</p>
             </div>
             <div className="rounded-xl border border-border bg-card px-3 py-3">
               <p className="text-sm font-semibold text-foreground">
@@ -146,7 +146,7 @@ export function ArchDiagram() {
         {/* Web Browser */}
         <rect x="16" y="20" width="196" height="64" rx="10" fill="var(--card)" stroke="var(--border)" strokeWidth="1.25" />
         <text x="114" y="46" textAnchor="middle" fill="var(--foreground)" fontSize="13" fontWeight="600">Web Browser</text>
-        <text x="114" y="64" textAnchor="middle" fill="var(--foreground)" fillOpacity="0.72" fontSize="11">Next.js App Router</text>
+        <text x="114" y="64" textAnchor="middle" fill="var(--foreground)" fillOpacity="0.72" fontSize="11">Next.js · landing + auth</text>
 
         {/* Admin Browser */}
         <rect x="342" y="20" width="196" height="64" rx="10" fill="var(--card)" stroke="var(--border)" strokeWidth="1.25" />

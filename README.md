@@ -1,75 +1,57 @@
-# Super Template
+<h1 align="center">Super Template</h1>
 
-Production-oriented reusable full-stack starter with:
+<p align="center">
+  <strong>Production-ready full-stack monorepo for web, admin, mobile, and API.</strong>
+  <br /><br />
+  <a href="https://github.com/truongnat/super-template/actions/workflows/ci.yml"><img src="https://github.com/truongnat/super-template/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
+  <a href="#license"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="MIT License" /></a>
+  <img src="https://img.shields.io/badge/Node.js-24+-339933?logo=node.js&logoColor=white" alt="Node.js 24+" />
+  <img src="https://img.shields.io/badge/pnpm-11-F69220?logo=pnpm&logoColor=white" alt="pnpm 11" />
+  <img src="https://img.shields.io/badge/Turborepo-2-EF4444?logo=turborepo&logoColor=white" alt="Turborepo" />
+</p>
 
-- NestJS API
-- Next.js App Router client web with a backend-for-frontend layer
-- Next.js App Router admin app with shadcn UI and TanStack
-- Flutter mobile client
-- PostgreSQL
-- Drizzle ORM with `pg`
-- OpenAPI contract generation
-- Docker Compose for local infrastructure
+<p align="center">
+  <a href="#quick-start"><strong>Quick Start</strong></a>
+  &nbsp;·&nbsp;
+  <a href="#features"><strong>Features</strong></a>
+  &nbsp;·&nbsp;
+  <a href="#architecture"><strong>Architecture</strong></a>
+  &nbsp;·&nbsp;
+  <a href="docs/environments.md"><strong>Environments</strong></a>
+  &nbsp;·&nbsp;
+  <a href="#documentation"><strong>Docs</strong></a>
+</p>
 
-## Stack
+<br />
 
-- Backend: NestJS 11, Swagger, JWT, Argon2id, Drizzle ORM, PostgreSQL
-- Web: Next.js 16, React 19, Tailwind CSS, TanStack Query, React Hook Form, Zod
-- Admin: Next.js 16, React 19, Tailwind CSS, TanStack Query/Table
-- Mobile: Flutter stable, Riverpod, Go Router, Dio, secure storage
-- Tooling: pnpm workspaces, Turborepo, Biome for backend, ESLint for web, Makefile
+One PostgreSQL schema. One OpenAPI contract. Four clients — authentication, RBAC, admin tooling, and environment layering included. Clone it, run `make bootstrap`, and start building your product instead of rebuilding boilerplate.
 
-## Repository Layout
+<br />
 
-```text
-super-template/
-├── apps/
-│   ├── api/
-│   ├── admin/
-│   ├── mobile/
-│   └── web/
-├── infra/
-│   └── docker-compose.yml
-├── packages/
-│   ├── api-bootstrap/
-│   ├── api-contract/
-│   ├── api-core/
-│   ├── api-database/
-│   ├── api-health/
-│   ├── api-identity/
-│   ├── api-platform/
-│   ├── api-workspace/
-│   ├── eslint-config/
-│   ├── extension/
-│   └── tsconfig/
-├── scripts/
-├── docs/
-└── .github/workflows/
-```
+## Quick start
 
-## Prerequisites
+**Prerequisites:** Node 24 · pnpm 11 · Docker · Flutter (mobile only)
 
-- Node.js 24.x
-- pnpm 11.x via Corepack
-- Flutter stable
-- Docker
-- PostgreSQL client tools (`psql`)
-
-## Quick Start
+Works out of the box with committed `.env.development` defaults. Put personal secrets in `.env.local` (gitignored).
 
 ```bash
-cp .env.example .env
-make bootstrap
-make dev
+git clone https://github.com/truongnat/super-template.git && cd super-template
+make bootstrap    # deps · infra · migrate · seed · codegen
+make dev          # API :3001 · Web :3000 · Admin :3002
+make dev-mobile   # Flutter (separate terminal)
 ```
 
-Run Flutter separately because it needs a selected simulator or device:
+<table>
+  <tr>
+    <td align="center"><strong>Web</strong><br /><a href="http://localhost:3000">localhost:3000</a><br /><sub>landing + auth</sub></td>
+    <td align="center"><strong>Admin</strong><br /><a href="http://localhost:3002">localhost:3002</a><br /><sub>operations</sub></td>
+    <td align="center"><strong>API</strong><br /><a href="http://localhost:3001/api/docs">localhost:3001</a><br /><sub>REST + Swagger</sub></td>
+    <td align="center"><strong>Mailpit</strong><br /><a href="http://localhost:8025">localhost:8025</a><br /><sub>dev email</sub></td>
+  </tr>
+</table>
 
-```bash
-make dev-mobile
-```
-
-On Windows/PowerShell, use the cross-platform mobile scripts instead of relying on `make`:
+<details>
+<summary><strong>Windows / PowerShell</strong></summary>
 
 ```powershell
 pnpm run mobile:doctor
@@ -77,152 +59,184 @@ pnpm run mobile:setup
 pnpm run mobile:dev
 ```
 
-## Local URLs
+</details>
 
-- Web: `http://localhost:3000`
-- Admin: `http://localhost:3002`
-- API: `http://localhost:3001/api/v1`
-- Swagger UI: `http://localhost:3001/api/docs`
-- Swagger JSON: `http://localhost:3001/api/docs-json`
-- Mailpit: `http://localhost:8025`
+<br />
 
-If port `3000` is already occupied locally, override `WEB_PORT`, `WEB_ORIGIN`, and `NEXT_PUBLIC_WEB_URL` in `.env`.
-If port `3002` is already occupied locally, override `ADMIN_PORT` in `.env`.
+## Architecture
 
-## Environment
+<pre>
+┌──────────────┐   ┌──────────────┐   ┌──────────────┐
+│     Web      │   │    Admin     │   │    Mobile    │
+│  Next.js BFF │   │  Next.js BFF │   │    Flutter   │
+│   :3000      │   │   :3002      │   │  iOS/Android │
+└──────┬───────┘   └──────┬───────┘   └──────┬───────┘
+       │                  │                  │
+       └──────────────────┼──────────────────┘
+                          ▼
+               ┌─────────────────────┐
+               │     NestJS API      │
+               │  OpenAPI · JWT · RBAC│
+               │       :3001         │
+               └──────────┬──────────┘
+                          ▼
+               ┌─────────────────────┐
+               │     PostgreSQL      │
+               │  Drizzle · RLS role │
+               └─────────────────────┘
+</pre>
 
-Copy `.env.example` to `.env` and adjust as needed.
+Shared packages: `@repo/web-core` · `@repo/env-loader` · `@repo/api-contract`
 
-Key variables:
+<br />
 
-- `DATABASE_URL` (restricted application role — RLS enforced at runtime)
-- `DATABASE_MIGRATE_URL` (privileged role for `db:migrate` / `db:reset`)
-- `DATABASE_URL_TEST`
-- `WEB_ORIGIN`
-- `API_INTERNAL_URL`
-- `JWT_ACCESS_SECRET`
-- `JWT_REFRESH_SECRET`
-- `SEED_ADMIN_EMAIL`
-- `SEED_ADMIN_PASSWORD`
-- `SEED_USER_EMAIL`
-- `SEED_USER_PASSWORD`
-- `FCM_PROJECT_ID`, `FCM_CLIENT_EMAIL`, `FCM_PRIVATE_KEY` (optional — mobile push via Firebase)
+## Features
 
-The API validates environment variables at startup and fails fast on invalid or missing values.
+- [x] **Contract-first API** — OpenAPI from NestJS; TypeScript + Dart clients via `make generate`
+- [x] **Authentication** — JWT rotation, Argon2id, CSRF, RBAC, TOTP MFA, GitHub / Google / Apple SSO
+- [x] **Admin dashboard** — users, roles, projects, jobs, mail, imports/exports, audit logs, SSE notifications
+- [x] **Flutter mobile** — Material 3 design system, 20+ widgets, in-app UI Kit gallery, optional FCM push
+- [x] **Environment layering** — `development` · `staging` · `production` across API, web, admin, and mobile
+- [x] **CI pipeline** — `make verify` runs generate-check, lint, typecheck, tests, and builds
 
-## Firebase / FCM (mobile push — optional)
+<br />
 
-Web notifications use **SSE**, not Firebase. Firebase is for **mobile FCM push** only.
+## Documentation
 
-Setup: place `google-services.json` (and optionally `GoogleService-Info.plist`) in the Flutter app, then add `FCM_PROJECT_ID`, `FCM_CLIENT_EMAIL`, and `FCM_PRIVATE_KEY` to the root `.env`.
+| | |
+|---|---|
+| [Environments](docs/environments.md) | Dev / staging / prod config layering |
+| [Architecture](docs/architecture.md) | System design and module boundaries |
+| [Authentication](docs/authentication.md) | Sessions, cookies, SSO, MFA |
+| [Database](docs/database.md) | Drizzle, migrations, RLS |
+| [Development](docs/development.md) | Local workflow and conventions |
+| [Deployment](docs/deployment.md) | Production deployment guide |
+| [Mobile design system](apps/mobile/design-system/MASTER.md) | Flutter tokens and components |
 
-See [apps/mobile/README.md](apps/mobile/README.md#push-notifications-fcm) for step-by-step instructions.
+<br />
 
-## Commands
+<details>
+<summary><strong>Repository layout</strong></summary>
 
-- `make bootstrap`
-- `make dev`
-- `make dev-api`
-- `make dev-web`
-- `make dev-admin`
-- `make dev-mobile`
-- `pnpm run mobile:doctor`
-- `pnpm run mobile:setup`
-- `pnpm run mobile:dev`
-- `pnpm run mobile:test`
-- `pnpm run mobile:format-check`
-- `make infra-up`
-- `make infra-down`
-- `make db-generate`
-- `make db-migrate`
-- `make db-seed`
-- `make db-reset`
-- `make db-studio`
-- `make generate`
-- `make lint`
-- `make format`
-- `make test`
-- `make test-api`
-- `make test-web`
-- `make test-mobile`
-- `make build`
-- `make verify`
-
-## Database Workflow
-
-```bash
-make infra-up
-make db-migrate
-make db-seed
+```text
+super-template/
+├── apps/
+│   ├── api/              NestJS REST API
+│   ├── admin/            Next.js operations dashboard
+│   ├── web/              Next.js landing + auth BFF
+│   └── mobile/           Flutter + design-system/
+├── packages/
+│   ├── api-core/         Config, env schema, ports
+│   ├── api-identity/     Auth, users, SSO, MFA
+│   ├── api-workspace/    Projects, orgs, notifications
+│   ├── api-contract/     Generated OpenAPI client
+│   ├── env-loader/       Layered .env loading
+│   └── web-core/         Shared auth + HTTP layer
+├── infra/                Docker Compose
+├── scripts/              bootstrap · dev · verify
+└── docs/
 ```
 
-Generate a new SQL migration after schema changes:
+</details>
+
+<details>
+<summary><strong>Commands</strong></summary>
+
+| Command | Description |
+|---------|-------------|
+| `make bootstrap` | First-time setup |
+| `make dev` | API + Web + Admin |
+| `make dev-api` / `dev-web` / `dev-admin` | Single surface |
+| `make dev-mobile` | Flutter (dev env) |
+| `make dev-mobile-staging` | Flutter (staging env) |
+| `make db-migrate` / `db-seed` / `db-generate` | Database |
+| `make generate` | Regenerate OpenAPI + clients |
+| `make verify` | Full CI pipeline |
+| `make test-mobile` | Flutter tests |
+
+</details>
+
+<details>
+<summary><strong>Environments</strong></summary>
+
+All surfaces use **`APP_ENV`**: `development` (default) · `staging` · `production`.
+
+Node apps load env via `@repo/env-loader` (process env → `.env.<env>.local` → `.env.local` → `.env.<env>` → `.env.example`).
+
+Mobile uses `apps/mobile/env/{dev,staging,prod}.json`.
 
 ```bash
-make db-generate
-make db-migrate
+make dev-api APP_ENV=staging
+make dev-mobile-staging
 ```
 
-## Contract Generation
+→ [docs/environments.md](docs/environments.md)
 
-```bash
-make generate
-```
+</details>
 
-This regenerates:
+<details>
+<summary><strong>Seeded accounts</strong></summary>
 
-- `apps/api/openapi.json`
-- `packages/api-contract/src/generated/`
-- `apps/mobile/lib/generated/api/`
+| Role | Email |
+|------|-------|
+| Admin | `admin@example.local` |
+| User | `user@example.local` |
 
-## Testing
+Passwords: `SEED_ADMIN_PASSWORD` and `SEED_USER_PASSWORD` in `.env.local`.
 
-- API: `pnpm --filter api test`
-- Web: `pnpm --filter web test`
-- Web e2e (Playwright): `pnpm --filter web test:e2e`
-- Mobile: `pnpm run mobile:test`
+Sign in at Web `/login` or Admin `/login`.
 
-`make verify` runs generation, lint, typecheck, tests, and builds. When Flutter/Dart are available it also runs Flutter format-check, analyze, and tests; otherwise it skips the mobile verification path with an explicit message.
+</details>
 
-### Agent-driven browser control
+<details>
+<summary><strong>Troubleshooting</strong></summary>
 
-`packages/extension` vendors the open-source Playwright browser extension and
-wires it to a shared `@playwright/mcp --extension` server (`make
-extension-dev`), registered in `.mcp.json` as `browser-extension`. It lets any
-MCP-aware agent (including this one) drive your real, logged-in
-Chrome/Edge browser — alongside, not instead of, the Playwright e2e suite.
-See [`packages/extension/README.md`](packages/extension/README.md).
+| Issue | Fix |
+|-------|-----|
+| Postgres not ready | `docker compose -f infra/docker-compose.yml ps` |
+| Auth / cookies fail | Check `WEB_ORIGIN`, `ADMIN_ORIGIN`, `API_INTERNAL_URL` |
+| Flutter missing | `pnpm run mobile:doctor` |
+| Android can't reach API | Use `10.0.2.2:3001` in `apps/mobile/env/dev.json` |
+| Stale codegen | `make generate` |
+| Port conflict | Override `*_PORT` in `.env.local` |
 
-## Seeded Development Accounts
+</details>
 
-- Admin: `admin@example.local`
-- User: `user@example.local`
+<details>
+<summary><strong>Production checklist</strong></summary>
 
-Passwords come from `.env`:
+- Replace JWT secrets, seed credentials, MFA encryption key
+- Set `APP_ENV=production`, `COOKIE_SECURE=true`, HTTPS origins
+- Disable or protect Swagger in production
+- Inject secrets from your orchestrator — never commit them
+- Keep generated clients in sync (`make generate-check` in CI)
 
-- `SEED_ADMIN_PASSWORD`
-- `SEED_USER_PASSWORD`
+</details>
 
-## Troubleshooting
+<details>
+<summary><strong>Firebase push (optional)</strong></summary>
 
-- If `make bootstrap` fails waiting for PostgreSQL, inspect `docker compose -f infra/docker-compose.yml ps` and container logs.
-- If the web app cannot authenticate, verify `WEB_ORIGIN`, `API_INTERNAL_URL`, and cookie settings.
-- If Flutter is not installed on this machine yet, start with `pnpm run mobile:doctor`; it prints the expected next step instead of failing deep inside Make/bash.
-- If Flutter cannot reach the backend on emulator or device, use the environment guidance in [Development](docs/development.md).
-- If generated client files drift, rerun `make generate`.
+Firebase is for **mobile FCM only**. Without it, inbox still works.
 
-## Production Notes
+Add `FCM_PROJECT_ID`, `FCM_CLIENT_EMAIL`, `FCM_PRIVATE_KEY` to `.env.local` and platform config in the Flutter app.
 
-- Keep Swagger disabled or protected in production.
-- Replace development JWT secrets, cookie settings, and seed credentials.
-- Use HTTPS so secure cookies can be enabled.
-- Keep generated OpenAPI clients under source control and fail CI on stale output.
+→ [apps/mobile/README.md](apps/mobile/README.md)
 
-See the detailed documents:
+</details>
 
-- [Architecture](docs/architecture.md)
-- [Authentication](docs/authentication.md)
-- [Database](docs/database.md)
-- [Development](docs/development.md)
-- [Deployment](docs/deployment.md)
-- [ERD](docs/erd.md)
+<details>
+<summary><strong>Agent browser control</strong></summary>
+
+`packages/extension` connects Playwright MCP to a real browser for agent-driven testing (`make extension-dev`).
+
+→ [packages/extension/README.md](packages/extension/README.md)
+
+</details>
+
+<br />
+
+<p align="center">
+  <sub>MIT License · Built with NestJS, Next.js, Flutter, and Turborepo</sub>
+</p>
+
+<a id="license"></a>

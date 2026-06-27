@@ -9,9 +9,9 @@ import { ThemeProvider } from "@/lib/theme";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Super Template",
+  title: "Super Template — Full-stack monorepo starter",
   description:
-    "Landing page for a full-stack starter with shadcn UI and companion apps",
+    "Production-ready monorepo with NestJS API, Next.js web and admin, Flutter mobile, contract-driven clients, and dev/staging/prod environment layering.",
 };
 
 export default function RootLayout({

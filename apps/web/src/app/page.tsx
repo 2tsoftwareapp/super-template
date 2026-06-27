@@ -1,9 +1,13 @@
 import {
   CheckCircle2,
   Code2,
+  ExternalLink,
   Github,
+  Layers,
+  LayoutDashboard,
   LogIn,
   Monitor,
+  Palette,
   Shield,
   Smartphone,
   UserPlus,
@@ -15,6 +19,43 @@ import { ScrollToTop } from "@/components/app/scroll-to-top";
 import { ArchDiagram } from "@/components/arch-diagram";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+
+const ADMIN_URL =
+  process.env.NEXT_PUBLIC_ADMIN_URL ?? "http://localhost:3002";
+const API_DOCS_URL =
+  process.env.NEXT_PUBLIC_API_DOCS_URL ??
+  "http://localhost:3001/api/docs";
+
+const surfaces = [
+  {
+    label: "Web",
+    title: "Landing + auth",
+    description: "Marketing site and authentication flows with a same-origin BFF.",
+    href: "/",
+    external: false,
+  },
+  {
+    label: "Admin",
+    title: "Operations dashboard",
+    description: "Users, roles, projects, jobs, mail, imports, and audit logs.",
+    href: ADMIN_URL,
+    external: true,
+  },
+  {
+    label: "API",
+    title: "NestJS backend",
+    description: "REST API with OpenAPI docs and generated clients.",
+    href: API_DOCS_URL,
+    external: true,
+  },
+  {
+    label: "Mobile",
+    title: "Flutter client",
+    description: "iOS & Android app with design system and UI Kit gallery.",
+    href: "https://github.com/truongnat/super-template#quick-start",
+    external: true,
+  },
+];
 
 const features = [
   {
@@ -37,8 +78,20 @@ const features = [
       "JWT access + refresh tokens in secure HttpOnly cookies. Workspace isolation, CSRF protection, and role-based access built in.",
     items: [
       "Argon2 password hashing",
-      "Refresh token rotation",
-      "CSRF protection",
+      "GitHub, Google & Apple SSO",
+      "TOTP MFA + session revocation",
+    ],
+  },
+  {
+    icon: Layers,
+    label: "Environments",
+    title: "Dev · staging · prod",
+    description:
+      "Shared @repo/env-loader layers .env files across API, web, and admin. Flutter reads dart-define JSON per environment.",
+    items: [
+      "Committed .env.development defaults",
+      "Production guard rails at API boot",
+      "make dev-mobile-staging / prod",
     ],
   },
   {
@@ -46,23 +99,35 @@ const features = [
     label: "Admin",
     title: "Separate admin app",
     description:
-      "A dedicated Next.js admin workspace that reuses the shared web-core layer while keeping operational tooling isolated from the user-facing product.",
+      "A dedicated Next.js workspace for operational tooling — isolated from the public web surface while sharing @repo/web-core.",
     items: [
       "User & role management",
-      "Jobs, mail, imports",
-      "Audit logs & notifications",
+      "Jobs, mail, imports/exports",
+      "Audit logs & SSE notifications",
     ],
   },
   {
     icon: Smartphone,
     label: "Mobile",
-    title: "Flutter mobile",
+    title: "Flutter + design system",
     description:
-      "Production-oriented Flutter starter with an auto-generated API client from the OpenAPI schema and FCM push support.",
+      "Material 3 tokens, 20+ shared widgets, and an in-app UI Kit tab for visual QA. Auto-generated API client from OpenAPI.",
     items: [
-      "Riverpod state management",
-      "go_router navigation",
-      "FCM push notifications",
+      "Riverpod + go_router",
+      "Design tokens & UI Kit gallery",
+      "FCM push (optional)",
+    ],
+  },
+  {
+    icon: Palette,
+    label: "Web",
+    title: "Marketing + auth BFF",
+    description:
+      "Public landing page and auth flows (login, register, SSO, password reset). Product operations live in Admin and Mobile.",
+    items: [
+      "Same-origin cookie session",
+      "shadcn/ui + Tailwind CSS 4",
+      "Dark mode + system preference",
     ],
   },
 ];
@@ -102,6 +167,12 @@ const stackLayers = [
         version: "workspace:*",
         description:
           "Shared auth, session, HTTP, query, and utility logic used by web and admin",
+      },
+      {
+        name: "@repo/env-loader",
+        version: "workspace:*",
+        description:
+          "Layered .env loading for development, staging, and production",
       },
     ],
   },
@@ -190,30 +261,30 @@ const steps = [
     step: "01",
     title: "Clone the repo",
     description:
-      "One git clone to get the full monorepo — web, API, admin, and Flutter mobile.",
+      "One git clone to get the full monorepo — API, web, admin, and Flutter mobile.",
     code: "git clone https://github.com/truongnat/super-template",
   },
   {
     step: "02",
     title: "Bootstrap",
     description:
-      "Installs deps, starts Postgres, migrates, seeds demo accounts, and generates all API contracts.",
+      "Installs deps, starts Postgres, migrates, seeds demo accounts, and generates all API contracts. Uses .env.development by default.",
     code: "make bootstrap",
   },
   {
     step: "03",
     title: "Start building",
     description:
-      "All apps start in parallel. Replace the placeholder content with your product.",
+      "API, web, and admin start together. Run Flutter separately with make dev-mobile.",
     code: "make dev",
   },
 ];
 
 const highlights = [
-  "Contract-driven API",
-  "Seeded admin account",
-  "One-command bootstrap",
-  "Full CI pipeline",
+  "Four-app monorepo",
+  "Dev / staging / prod envs",
+  "Mobile design system",
+  "Full CI via make verify",
 ];
 
 export default function Home() {
@@ -231,6 +302,12 @@ export default function Home() {
             </span>
           </div>
           <nav className="hidden items-center gap-6 text-sm text-muted-foreground md:flex">
+            <a
+              href="#surfaces"
+              className="transition-colors hover:text-foreground"
+            >
+              Surfaces
+            </a>
             <a
               href="#features"
               className="transition-colors hover:text-foreground"
@@ -255,6 +332,14 @@ export default function Home() {
             >
               Get started
             </a>
+            <a
+              href={ADMIN_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="transition-colors hover:text-foreground"
+            >
+              Admin
+            </a>
           </nav>
           <div className="flex items-center justify-end gap-2">
             <HomeAuthActions />
@@ -269,7 +354,7 @@ export default function Home() {
         <div className="relative mx-auto max-w-7xl px-4 py-28 md:px-6 md:py-40">
           <div className="flex flex-col items-center text-center">
             <Badge variant="outline" className="mb-6 text-xs">
-              Production-ready · pnpm monorepo · MIT licensed
+              Production-ready · 4 surfaces · MIT licensed
             </Badge>
             <h1 className="max-w-4xl text-5xl font-bold leading-[1.1] tracking-tight md:text-7xl">
               Ship your product.{" "}
@@ -278,12 +363,33 @@ export default function Home() {
               </span>
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-8 text-muted-foreground md:text-lg">
-              A complete monorepo with Next.js web and admin apps, NestJS,
-              Flutter, and shared @repo/web-core logic — wired together with a
-              contract-driven API, seeded auth, and production tooling from day
-              one.
+              A complete monorepo with a NestJS API, Next.js web and admin apps,
+              and a Flutter mobile client — wired with contract-driven clients,
+              layered environments, and production tooling from day one.
             </p>
             <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+              <Button
+                size="lg"
+                nativeButton={false}
+                render={<a href="#get-started" />}
+              >
+                Get started
+              </Button>
+              <Button
+                variant="outline"
+                size="lg"
+                nativeButton={false}
+                render={
+                  <a
+                    href={ADMIN_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  />
+                }
+              >
+                <LayoutDashboard className="size-4" />
+                Open admin
+              </Button>
               <Button
                 variant="outline"
                 size="lg"
@@ -297,7 +403,7 @@ export default function Home() {
                 }
               >
                 <Github className="size-4" />
-                View on GitHub
+                GitHub
               </Button>
             </div>
             <div className="mt-12 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-muted-foreground">
@@ -308,6 +414,50 @@ export default function Home() {
                 </span>
               ))}
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Surfaces ── */}
+      <section id="surfaces" className="border-b border-border py-24">
+        <div className="mx-auto max-w-7xl px-4 md:px-6">
+          <div className="mx-auto mb-16 max-w-2xl text-center">
+            <Badge variant="outline" className="mb-4">
+              Four surfaces
+            </Badge>
+            <h2 className="text-4xl font-bold tracking-tight">
+              One backend, clear separation
+            </h2>
+            <p className="mt-4 text-muted-foreground">
+              Web handles marketing and auth. Admin runs operations. Mobile ships
+              the native experience. All three talk to the same NestJS API.
+            </p>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {surfaces.map((surface) => (
+              <a
+                key={surface.label}
+                href={surface.href}
+                target={surface.external ? "_blank" : undefined}
+                rel={surface.external ? "noopener noreferrer" : undefined}
+                className="group flex flex-col gap-3 rounded-2xl border border-border bg-card p-5 transition-all hover:border-border/80 hover:shadow-sm"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                    {surface.label}
+                  </p>
+                  {surface.external ? (
+                    <ExternalLink className="size-3.5 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+                  ) : null}
+                </div>
+                <div>
+                  <p className="font-semibold">{surface.title}</p>
+                  <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                    {surface.description}
+                  </p>
+                </div>
+              </a>
+            ))}
           </div>
         </div>
       </section>
@@ -323,11 +473,12 @@ export default function Home() {
               Everything connected, nothing missing
             </h2>
             <p className="mt-4 text-muted-foreground">
-              Four apps sharing one database schema and one API contract. Change
-              the schema, regenerate — all clients update automatically.
+              Four apps sharing one database schema and one API contract. Web
+              exposes auth via a BFF; admin and mobile consume the same REST
+              surface — change the schema, regenerate, all clients update.
             </p>
           </div>
-          <div className="grid gap-5 md:grid-cols-2">
+          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             {features.map((feat) => {
               const Icon = feat.icon;
               return (
@@ -377,12 +528,12 @@ export default function Home() {
               Architecture
             </Badge>
             <h2 className="text-4xl font-bold tracking-tight">
-              Three surfaces, one backend
+              Three clients, one backend
             </h2>
             <p className="mt-4 text-muted-foreground">
-              The NestJS API serves all three frontends from a single Postgres
-              database. Web and admin traffic flow through Next.js BFFs that
-              share @repo/web-core, while Flutter talks directly to the API.
+              The NestJS API serves web, admin, and mobile from a single
+              Postgres database. Web and admin traffic flow through Next.js BFFs
+              that share @repo/web-core; Flutter talks directly to the API.
             </p>
           </div>
           <ArchDiagram />
@@ -582,7 +733,22 @@ export default function Home() {
             <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
               <a href="/login" className="hover:text-foreground">Sign in</a>
               <a href="/register" className="hover:text-foreground">Register</a>
-              <a href="/forgot-password" className="hover:text-foreground">Forgot password</a>
+              <a
+                href={ADMIN_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-foreground"
+              >
+                Admin
+              </a>
+              <a
+                href={API_DOCS_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-foreground"
+              >
+                API docs
+              </a>
               <a
                 href="https://github.com/truongnat/super-template"
                 target="_blank"
