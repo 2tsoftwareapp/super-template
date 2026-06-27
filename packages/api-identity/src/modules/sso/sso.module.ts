@@ -17,6 +17,7 @@ import {
 import { SsoController } from './presentation/sso.controller';
 import { AppleSsoProvider } from './providers/apple-sso.provider';
 import { FakeSsoProvider } from './providers/fake-sso.provider';
+import { GithubSsoProvider } from './providers/github-sso.provider';
 import { GoogleSsoProvider } from './providers/google-sso.provider';
 
 @Module({
@@ -27,6 +28,7 @@ import { GoogleSsoProvider } from './providers/google-sso.provider';
     JwksCacheService,
     GoogleSsoProvider,
     AppleSsoProvider,
+    GithubSsoProvider,
     FakeSsoProvider,
     SsoService,
     StartSsoLoginUseCase,
@@ -37,17 +39,23 @@ import { GoogleSsoProvider } from './providers/google-sso.provider';
         EnvironmentService,
         GoogleSsoProvider,
         AppleSsoProvider,
+        GithubSsoProvider,
         FakeSsoProvider,
       ],
       useFactory: (
         environmentService: EnvironmentService,
         googleSsoProvider: GoogleSsoProvider,
         appleSsoProvider: AppleSsoProvider,
+        githubSsoProvider: GithubSsoProvider,
         fakeSsoProvider: FakeSsoProvider,
       ) => {
         const registry = new Map<string, SsoProviderAdapter>();
-        const { GOOGLE_CLIENT_ID, APPLE_CLIENT_ID, SSO_FAKE_PROVIDER_ENABLED } =
-          environmentService.values;
+        const {
+          GOOGLE_CLIENT_ID,
+          APPLE_CLIENT_ID,
+          GITHUB_CLIENT_ID,
+          SSO_FAKE_PROVIDER_ENABLED,
+        } = environmentService.values;
 
         if (GOOGLE_CLIENT_ID) {
           registry.set(googleSsoProvider.provider, googleSsoProvider);
@@ -55,6 +63,10 @@ import { GoogleSsoProvider } from './providers/google-sso.provider';
 
         if (APPLE_CLIENT_ID) {
           registry.set(appleSsoProvider.provider, appleSsoProvider);
+        }
+
+        if (GITHUB_CLIENT_ID) {
+          registry.set(githubSsoProvider.provider, githubSsoProvider);
         }
 
         if (SSO_FAKE_PROVIDER_ENABLED && !environmentService.isProduction) {

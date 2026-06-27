@@ -49,8 +49,18 @@ class AuthRepository {
       final response = await _authApi.authControllerGetMe();
       return _toSession(response.data!.data);
     } on DioException catch (error) {
-      await _storage.clear();
-      throw AppException.fromDio(error);
+      final statusCode = error.response?.statusCode;
+
+      if (statusCode == 401) {
+        // Server explicitly rejected the token — clear and go to login.
+        await _storage.clear();
+        return null;
+      }
+
+      // Network error / timeout / 5xx: keep tokens so the user can retry
+      // after connectivity is restored. Return null to skip straight to login
+      // UI without an error dialog.
+      return null;
     }
   }
 
@@ -65,9 +75,7 @@ class AuthRepository {
       );
       final data = response.data!.data;
       if (data.mfaRequired) {
-        throw MfaRequiredException(
-          mfaToken: data.mfaToken!,
-        );
+        throw MfaRequiredException(mfaToken: data.mfaToken!);
       }
       await _storage.write(
         TokenBundle(
@@ -155,7 +163,12 @@ class AuthRepository {
       await _storage.write(refreshed);
       return refreshed;
     } on DioException catch (error) {
-      await _storage.clear();
+      if (error.response?.statusCode == 401) {
+        // Refresh token rejected — must log in again.
+        await _storage.clear();
+      }
+      // Re-throw so the auth interceptor knows refresh failed and can decide
+      // what to do (it will clear tokens and invalidate auth on AppException).
       throw AppException.fromDio(error);
     }
   }

@@ -3,18 +3,18 @@
 import { useQuery } from "@tanstack/react-query";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { ThemeProvider, useTheme } from "next-themes";
 import { Toaster } from "sonner";
 
-import { useSession } from "@/hooks/use-session";
 import type { ApiEnvelope } from "@/lib/api-types";
-import { I18nProvider } from "@/lib/i18n/context";
-import type { AppLocale } from "@/lib/i18n/messages";
-import { webFetch } from "@/lib/http";
 import type {
   PreferenceLanguage,
   PreferenceTheme,
 } from "@/lib/preferences";
+
+import { useSession } from "@/hooks/use-session";
+import { webFetch } from "@/lib/http";
+import { I18nProvider } from "@/lib/i18n/context";
+import { useTheme } from "@/lib/theme";
 import { UserPreferencesProvider } from "@/lib/user-preferences-context";
 
 interface LoadedPreferences {
@@ -73,7 +73,7 @@ function AuthenticatedPreferenceSync({
       language={resolved.language}
       timezone={resolved.timezone}
     >
-      <I18nProvider locale={resolved.language as AppLocale}>
+      <I18nProvider locale={resolved.language}>
         <PreferenceThemeSync theme={resolved.theme} />
         {children}
       </I18nProvider>
@@ -95,11 +95,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <QueryClientProvider client={queryClient}>
-        <AuthenticatedPreferenceSync>{children}</AuthenticatedPreferenceSync>
-        <Toaster richColors position="top-right" />
-      </QueryClientProvider>
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthenticatedPreferenceSync>{children}</AuthenticatedPreferenceSync>
+      <Toaster richColors position="top-right" />
+    </QueryClientProvider>
   );
 }

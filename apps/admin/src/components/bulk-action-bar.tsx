@@ -1,7 +1,8 @@
 import { type ReactNode, useEffect, useState } from "react";
 
-import { Button } from "./ui/button";
 import { cn } from "@/lib/utils";
+
+import { Button } from "./ui/button";
 
 export function BulkActionBar({
   selectedCount,
@@ -17,6 +18,7 @@ export function BulkActionBar({
 
   useEffect(() => {
     if (selectedCount > 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- mount animation on selection
       setVisible(true);
       requestAnimationFrame(() => {
         requestAnimationFrame(() => setAnimate(true));

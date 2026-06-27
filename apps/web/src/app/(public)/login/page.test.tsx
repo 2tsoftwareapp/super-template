@@ -1,7 +1,7 @@
 import type { AnchorHTMLAttributes } from "react";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
@@ -52,13 +52,8 @@ describe("LoginPage", () => {
       </QueryClientProvider>,
     );
 
-    const email = screen.getByDisplayValue("admin@example.local");
-    const password = screen.getByDisplayValue("ChangeMe123!");
-
-    await user.clear(email);
-    await user.type(email, "not-an-email");
-    await user.clear(password);
-    await user.type(password, "short");
+    await user.type(screen.getByLabelText("Email"), "not-an-email");
+    await user.type(screen.getByLabelText("Password"), "short");
     await user.click(screen.getByRole("button", { name: "Sign in" }));
 
     expect(webFetchMock).not.toHaveBeenCalled();
@@ -75,6 +70,7 @@ describe("LoginPage", () => {
           displayName: "Template User",
           roles: ["USER"],
         },
+        mfaRequired: false,
       },
     });
 
@@ -84,8 +80,12 @@ describe("LoginPage", () => {
       </QueryClientProvider>,
     );
 
+    await user.type(screen.getByLabelText("Email"), "user@example.com");
+    await user.type(screen.getByLabelText("Password"), "password123");
     await user.click(screen.getByRole("button", { name: "Sign in" }));
 
-    expect(replaceMock).toHaveBeenCalledWith("/");
+    await waitFor(() => {
+      expect(replaceMock).toHaveBeenCalledWith("/");
+    });
   });
 });

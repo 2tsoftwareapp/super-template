@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_app/app/theme.dart';
+import 'package:mobile_app/core/design/app_colors.dart';
+import 'package:mobile_app/core/design/app_radius.dart';
+import 'package:mobile_app/core/design/app_spacing.dart';
+import 'package:mobile_app/core/widgets/widgets.dart';
 import 'package:mobile_app/features/auth/presentation/auth_controller.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -9,99 +13,124 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(authControllerProvider).valueOrNull;
+    final auth = ref.watch(authControllerProvider).valueOrNull;
+    final tt = Theme.of(context).textTheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final name = auth?.displayName ?? 'User';
+    final email = auth?.email ?? '';
+    final perms = auth?.permissions ?? const [];
+
     return Scaffold(
+      backgroundColor: isDark
+          ? AppColors.backgroundDark
+          : AppColors.backgroundLight,
       appBar: AppBar(
-        title: const Text('Super Template'),
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        backgroundColor: isDark
+            ? AppColors.backgroundDark
+            : AppColors.backgroundLight,
+        title: Text(
+          'Super Template',
+          style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+        ),
         actions: [
           IconButton(
             onPressed: () => ref.read(themeModeProvider.notifier).toggle(),
-            icon: const Icon(Icons.contrast),
+            icon: Icon(
+              isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+            ),
+            tooltip: 'Toggle theme',
           ),
-          IconButton(
-            onPressed: () async {
-              await ref.read(authControllerProvider.notifier).logout();
-              if (context.mounted) {
-                context.go('/login');
-              }
-            },
-            icon: const Icon(Icons.logout),
-          ),
+          const SizedBox(width: 4),
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(AppSpacing.base),
         children: [
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    authState?.displayName ?? 'Guest',
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(authState?.email ?? ''),
-                ],
-              ),
-            ),
+          // ── Profile card ────────────────────────────────────────────────
+          _ProfileCard(
+            name: name,
+            email: email,
+            onLogout: () async {
+              await ref.read(authControllerProvider.notifier).logout();
+              if (context.mounted) context.go('/login');
+            },
           ),
-          const SizedBox(height: 16),
-          _NavTile(
-            title: 'Projects',
-            icon: Icons.folder_open,
-            onTap: () => context.go('/projects'),
-          ),
-          _NavTile(
-            title: 'Notifications',
-            icon: Icons.notifications,
-            onTap: () => context.go('/notifications'),
-          ),
-          _NavTile(
-            title: 'Profile',
-            icon: Icons.person,
-            onTap: () => context.go('/profile'),
-          ),
-          _NavTile(
-            title: 'Preferences',
-            icon: Icons.tune,
-            onTap: () => context.go('/preferences'),
-          ),
-          _NavTile(
-            title: 'Security',
-            icon: Icons.lock,
-            onTap: () => context.go('/security'),
-          ),
-          _NavTile(
-            title: 'Sessions',
-            icon: Icons.devices,
-            onTap: () => context.go('/sessions'),
-          ),
-          _NavTile(
+
+          // ── Account cluster ──────────────────────────────────────────────
+          const SizedBox(height: AppSpacing.xl),
+          AppListTile(
+            icon: Icons.business_rounded,
+            iconColor: AppColors.cardOrganizations,
             title: 'Organizations',
-            icon: Icons.business,
-            onTap: () => context.go('/organizations'),
+            subtitle: 'Switch or manage teams',
+            onTap: () => context.push('/organizations'),
           ),
-          if (authState?.permissions.contains('imports.read') ?? false)
-            _NavTile(
-              title: 'Imports',
-              icon: Icons.upload,
-              onTap: () => context.go('/imports'),
+          const SizedBox(height: AppSpacing.sm),
+          AppListTile(
+            icon: Icons.tune_rounded,
+            iconColor: AppColors.cardPreferences,
+            title: 'Preferences',
+            subtitle: 'Theme, language, timezone',
+            onTap: () => context.push('/preferences'),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          AppListTile(
+            icon: Icons.lock_rounded,
+            iconColor: AppColors.cardSecurity,
+            title: 'Security',
+            subtitle: 'Password & 2FA',
+            onTap: () => context.push('/security'),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          AppListTile(
+            icon: Icons.devices_rounded,
+            iconColor: AppColors.cardSessions,
+            title: 'Sessions',
+            subtitle: 'Active devices',
+            onTap: () => context.push('/sessions'),
+          ),
+
+          // ── Tools (permission-gated) ─────────────────────────────────────
+          if (perms.contains('imports.read') ||
+              perms.contains('exports.read')) ...[
+            const SizedBox(height: AppSpacing.xl),
+            _GroupLabel('TOOLS'),
+            if (perms.contains('imports.read')) ...[
+              AppListTile(
+                icon: Icons.upload_rounded,
+                iconColor: AppColors.cardImports,
+                title: 'Imports',
+                subtitle: 'Upload data',
+                onTap: () => context.push('/imports'),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+            ],
+            if (perms.contains('exports.read'))
+              AppListTile(
+                icon: Icons.download_rounded,
+                iconColor: AppColors.cardExports,
+                title: 'Exports',
+                subtitle: 'Download data',
+                onTap: () => context.push('/exports'),
+              ),
+          ],
+
+          // ── Admin (permission-gated) ─────────────────────────────────────
+          if (_hasAdminAccess(perms)) ...[
+            const SizedBox(height: AppSpacing.xl),
+            _GroupLabel('ADMINISTRATION'),
+            AppListTile(
+              icon: Icons.admin_panel_settings_rounded,
+              iconColor: AppColors.cardAdmin,
+              title: 'Admin Hub',
+              subtitle: 'Manage the platform',
+              onTap: () => context.push('/admin'),
             ),
-          if (authState?.permissions.contains('exports.read') ?? false)
-            _NavTile(
-              title: 'Exports',
-              icon: Icons.download,
-              onTap: () => context.go('/exports'),
-            ),
-          if (_hasAdminAccess(authState?.permissions ?? const []))
-            _NavTile(
-              title: 'Admin',
-              icon: Icons.admin_panel_settings,
-              onTap: () => context.go('/admin'),
-            ),
+          ],
+
+          const SizedBox(height: AppSpacing.massive),
         ],
       ),
     );
@@ -121,25 +150,106 @@ bool _hasAdminAccess(List<String> permissions) {
   return permissions.any(adminPermissions.contains);
 }
 
-class _NavTile extends StatelessWidget {
-  const _NavTile({
-    required this.title,
-    required this.icon,
-    required this.onTap,
-  });
+// ─────────────────────────────────────────────────────────────────────────────
+// Group label
+// ─────────────────────────────────────────────────────────────────────────────
 
-  final String title;
-  final IconData icon;
-  final VoidCallback onTap;
+class _GroupLabel extends StatelessWidget {
+  const _GroupLabel(this.text);
+
+  final String text;
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: ListTile(
-        leading: Icon(icon),
-        title: Text(title),
-        trailing: const Icon(Icons.chevron_right),
-        onTap: onTap,
+    final tt = Theme.of(context).textTheme;
+    final cs = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.only(left: 4, bottom: AppSpacing.sm),
+      child: Text(
+        text,
+        style: tt.labelSmall?.copyWith(
+          color: cs.onSurfaceVariant,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 1.2,
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Profile card (gradient hero)
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _ProfileCard extends StatelessWidget {
+  const _ProfileCard({
+    required this.name,
+    required this.email,
+    required this.onLogout,
+  });
+
+  final String name;
+  final String email;
+  final VoidCallback onLogout;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.base),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isDark
+              ? [
+                  cs.primary.withValues(alpha: 0.2),
+                  cs.primary.withValues(alpha: 0.05),
+                ]
+              : [
+                  cs.primaryContainer,
+                  cs.primaryContainer.withValues(alpha: 0.4),
+                ],
+        ),
+        borderRadius: AppRadius.xlR,
+        border: Border.all(
+          color: cs.primary.withValues(alpha: isDark ? 0.2 : 0.15),
+        ),
+      ),
+      child: Row(
+        children: [
+          AppAvatar(name: name, size: 52),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                  style: tt.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  email,
+                  style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            onPressed: onLogout,
+            icon: const Icon(Icons.logout_rounded),
+            tooltip: 'Sign out',
+            style: IconButton.styleFrom(foregroundColor: cs.onSurfaceVariant),
+          ),
+        ],
       ),
     );
   }

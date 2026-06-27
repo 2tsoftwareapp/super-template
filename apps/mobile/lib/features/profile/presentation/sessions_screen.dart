@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:built_value/json_object.dart';
+import 'package:mobile_app/core/widgets/widgets.dart';
 import 'package:mobile_app/features/auth/data/auth_repository.dart';
 import 'package:mobile_app/features/auth/presentation/auth_controller.dart';
 import 'package:go_router/go_router.dart';
@@ -47,10 +48,14 @@ class SessionsScreen extends ConsumerWidget {
                     ? const Text('Current')
                     : TextButton(
                         onPressed: () async {
-                          await ref
-                              .read(authRepositoryProvider)
-                              .revokeSession(session.id);
-                          ref.invalidate(sessionsProvider);
+                          try {
+                            await ref
+                                .read(authRepositoryProvider)
+                                .revokeSession(session.id);
+                            ref.invalidate(sessionsProvider);
+                          } catch (e) {
+                            if (context.mounted) showErrorSnackBar(context, e);
+                          }
                         },
                         child: const Text('Revoke'),
                       ),

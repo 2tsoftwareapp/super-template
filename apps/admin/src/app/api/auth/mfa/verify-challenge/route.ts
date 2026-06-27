@@ -8,7 +8,7 @@ import { clearAuthCookies, setAuthCookies } from "@/lib/auth/cookies";
 import { callBackend } from "@/lib/server/backend";
 
 export async function POST(request: NextRequest) {
-  const body = await request.json();
+  const body: unknown = await request.json();
   const response = await callBackend({
     path: "auth/mfa/verify-challenge",
     method: "POST",

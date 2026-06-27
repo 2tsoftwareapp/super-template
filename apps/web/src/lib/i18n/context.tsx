@@ -2,12 +2,12 @@
 
 import {
   createContext,
+  type ReactNode,
   useContext,
   useMemo,
-  type ReactNode,
 } from "react";
 
-import { messages, type AppLocale } from "./messages";
+import { type AppLocale, messages } from "./messages";
 
 type MessageTree = (typeof messages)[AppLocale];
 

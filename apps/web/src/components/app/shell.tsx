@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 
+import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,7 +17,6 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
-import { useNotificationStream } from "@/hooks/use-notification-stream";
 import { useSession } from "@/hooks/use-session";
 import { webFetch } from "@/lib/http";
 import { clientNavItems } from "@/lib/navigation";
@@ -26,7 +26,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const session = useSession();
-  useNotificationStream(Boolean(session.data));
 
   useEffect(() => {
     if (session.isError) {
@@ -54,26 +53,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     return null;
   }
 
-  const allowedClientItems = clientNavItems.filter(
-    (item) =>
-      !item.permission ||
-      session.data.data.permissions.includes(item.permission),
-  );
-
   return (
     <div className="min-h-screen px-4 py-4 md:px-6 lg:px-8">
       <div className="mx-auto grid min-h-[calc(100vh-2rem)] max-w-7xl gap-4 lg:grid-cols-[280px_minmax(0,1fr)]">
         <aside className="lg:sticky lg:top-4 lg:h-[calc(100vh-2rem)]">
-          <Card className="h-full border-border bg-card ">
+          <Card className="h-full border-border bg-card">
             <CardHeader className="space-y-4">
               <div className="flex items-start justify-between gap-4">
                 <div className="space-y-2">
                   <Badge variant="outline" className="w-fit">
-                    Client workspace
+                    Workspace
                   </Badge>
                   <CardTitle className="text-2xl">Super Template</CardTitle>
                   <CardDescription>
-                    The Next.js app is reserved for client-facing work.
+                    Manage your account and settings.
                   </CardDescription>
                 </div>
                 <Shield className="size-5 text-primary" />
@@ -82,7 +75,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <CardContent className="flex h-full flex-col gap-4">
               <Separator />
               <nav className="space-y-1">
-                {allowedClientItems.map((item) => {
+                {clientNavItems.map((item) => {
                   const Icon = item.icon;
                   return (
                     <Link
@@ -103,14 +96,25 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </nav>
               <Separator />
               <div className="mt-auto rounded-2xl border border-border bg-muted/50 p-4">
-                <p className="text-sm font-medium">
-                  {session.data.data.user.displayName}
-                </p>
-                <p className="mt-1 text-xs uppercase tracking-[0.22em] text-muted-foreground">
+                <div className="flex items-center gap-3">
+                  <Avatar
+                    name={session.data.data.user.displayName}
+                    size="md"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium">
+                      {session.data.data.user.displayName}
+                    </p>
+                    <p className="truncate text-xs text-muted-foreground">
+                      {session.data.data.user.email}
+                    </p>
+                  </div>
+                </div>
+                <p className="mt-3 text-xs uppercase tracking-[0.22em] text-muted-foreground">
                   {session.data.data.user.roles.join(" / ")}
                 </p>
                 <Button
-                  className="mt-4 w-full"
+                  className="mt-3 w-full"
                   variant="outline"
                   onClick={async () => {
                     try {
@@ -128,7 +132,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </Card>
         </aside>
         <main className="min-w-0">
-          <Card className="min-h-full border-border bg-card ">
+          <Card className="min-h-full border-border bg-card">
             <CardContent className="p-4 md:p-6">{children}</CardContent>
           </Card>
         </main>

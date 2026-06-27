@@ -16,11 +16,12 @@ import {
   generateOpaqueToken,
   hashOpaqueToken,
   normalizeEmail,
+  ORGANIZATION_LOOKUP,
+  type OrganizationLookup,
   PROJECT_LOOKUP,
   type ProjectLookup,
 } from '@repo/api-core';
 import { ROLE_NAMES } from '@repo/api-core';
-import { OrganizationsRepository } from '@repo/api-identity';
 
 import type { CreateInvitationCommand, InvitationView } from '../invitations.types';
 
@@ -47,7 +48,8 @@ export class CreateInvitationUseCase {
     @Inject(BACKGROUND_JOB_ENQUEUER)
     private readonly jobEnqueuer: BackgroundJobEnqueuer,
     private readonly environmentService: EnvironmentService,
-    private readonly organizationsRepository: OrganizationsRepository,
+    @Inject(ORGANIZATION_LOOKUP)
+    private readonly organizationLookup: OrganizationLookup,
   ) {}
 
   async execute(
@@ -64,7 +66,7 @@ export class CreateInvitationUseCase {
     );
 
     if (input.entityType === INVITATION_ENTITY.ORGANIZATION) {
-      const organization = await this.organizationsRepository.findById(
+      const organization = await this.organizationLookup.findById(
         input.entityId,
       );
 
@@ -77,7 +79,7 @@ export class CreateInvitationUseCase {
       }
 
       if (!actor.roles.includes(ROLE_NAMES.SUPER_ADMIN)) {
-        const membership = await this.organizationsRepository.findMembership(
+        const membership = await this.organizationLookup.findMembership(
           input.entityId,
           actor.userId,
         );

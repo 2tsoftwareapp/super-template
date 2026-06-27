@@ -14,6 +14,7 @@ const sessionState = {
     data: {
       user: {
         displayName: "Admin User",
+        email: "admin@example.local",
         roles: ["ADMIN"],
       },
       permissions: ["projects.read"],
@@ -51,18 +52,16 @@ describe("AppShell", () => {
     render(
       <QueryClientProvider client={queryClient}>
         <AppShell>
-          <div>Workspace</div>
+          <div>Page content</div>
         </AppShell>
       </QueryClientProvider>,
     );
 
-    expect(screen.getByText("Client workspace")).toBeInTheDocument();
-    expect(screen.getByText("Dashboard")).toBeInTheDocument();
-    expect(screen.getByText("Projects")).toBeInTheDocument();
-    expect(screen.getByText("Settings")).toBeInTheDocument();
-    expect(screen.queryByText("Users")).not.toBeInTheDocument();
-    expect(screen.queryByText("Notifications")).not.toBeInTheDocument();
     expect(screen.getByText("Workspace")).toBeInTheDocument();
+    expect(screen.getByText("Super Template")).toBeInTheDocument();
+    expect(screen.getByText("Settings")).toBeInTheDocument();
+    expect(screen.getByText("Admin User")).toBeInTheDocument();
+    expect(screen.getByText("Page content")).toBeInTheDocument();
   });
 
   it("redirects to login when the session query fails", () => {

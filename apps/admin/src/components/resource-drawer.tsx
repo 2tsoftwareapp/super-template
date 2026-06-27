@@ -1,6 +1,5 @@
-import { useEffect, useState, type ReactNode } from "react";
-
 import { X } from "lucide-react";
+import { type ReactNode, useEffect, useState } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -28,6 +27,7 @@ export function ResourceDrawer({
 
   useEffect(() => {
     if (open) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- mount animation on open
       setVisible(true);
       requestAnimationFrame(() => {
         requestAnimationFrame(() => setAnimate(true));

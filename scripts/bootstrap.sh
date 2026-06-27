@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
-required_tools=(node pnpm docker psql)
+required_tools=(node pnpm docker)
 missing_tools=()
 
 for tool in "${required_tools[@]}"; do
@@ -18,13 +18,11 @@ if [[ ${#missing_tools[@]} -gt 0 ]]; then
   exit 1
 fi
 
-if [[ ! -f .env ]]; then
-  cp .env.example .env
-fi
-
-set -a
-source .env
-set +a
+# Load layered env files into this shell (.env.example provides safe dev defaults,
+# so bootstrap works with zero setup; create .env.local for personal overrides).
+export APP_ENV="${APP_ENV:-development}"
+# shellcheck disable=SC1091
+. ./scripts/load-env.sh
 
 pnpm install
 if sh scripts/mobile.sh doctor >/dev/null 2>&1; then
@@ -32,7 +30,7 @@ if sh scripts/mobile.sh doctor >/dev/null 2>&1; then
 else
   printf '%s\n' 'Flutter unavailable; skipping apps/mobile dependency bootstrap on this machine.'
 fi
-docker compose -f infra/docker-compose.yml --env-file .env up -d
+docker compose -f infra/docker-compose.yml up -d
 ./scripts/wait-for-postgres.sh
 pnpm --filter api db:migrate
 pnpm --filter api db:seed

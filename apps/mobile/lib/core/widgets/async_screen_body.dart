@@ -24,13 +24,17 @@ class AsyncScreenBody<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     return value.when(
       loading: () =>
-          loading ?? const Center(child: CircularProgressIndicator()),
+          loading ?? const Center(child: CircularProgressIndicator.adaptive()),
       error: (err, stack) =>
-          error?.call(err, stack) ??
-          CenterMessage(title: 'Something went wrong', body: err.toString()),
+          error?.call(err, stack) ?? AppErrorView(error: err),
       data: (item) {
         if (isEmpty?.call(item) ?? false) {
-          return empty ?? const CenterMessage(title: 'Nothing here yet');
+          return empty ??
+              const CenterMessage(
+                icon: Icons.inbox_outlined,
+                title: 'Nothing here yet',
+                body: 'Items will appear here once available.',
+              );
         }
         return data(item);
       },

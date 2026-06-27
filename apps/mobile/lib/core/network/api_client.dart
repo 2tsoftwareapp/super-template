@@ -8,16 +8,25 @@ final appConfigProvider = Provider<AppConfig>(
   (_) => AppConfig.fromEnvironment(),
 );
 
+const _kConnectTimeout = Duration(seconds: 10);
+const _kReceiveTimeout = Duration(seconds: 15);
+
+BaseOptions _baseOptions(String baseUrl) => BaseOptions(
+  baseUrl: baseUrl,
+  connectTimeout: _kConnectTimeout,
+  receiveTimeout: _kReceiveTimeout,
+);
+
 /// Dio without auth interceptor — for login, register, token refresh, etc.
 final publicDioProvider = Provider<Dio>((ref) {
   final config = ref.watch(appConfigProvider);
-  return Dio(BaseOptions(baseUrl: config.apiBaseUrl));
+  return Dio(_baseOptions(config.apiBaseUrl));
 });
 
 /// Dio with auth interceptor — for all protected API calls.
 final dioProvider = Provider<Dio>((ref) {
   final config = ref.watch(appConfigProvider);
-  final dio = Dio(BaseOptions(baseUrl: config.apiBaseUrl));
+  final dio = Dio(_baseOptions(config.apiBaseUrl));
   dio.interceptors.add(ref.watch(authInterceptorProvider));
   return dio;
 });

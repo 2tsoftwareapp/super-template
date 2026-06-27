@@ -2,6 +2,8 @@ import type { NextRequest } from "next/server";
 
 import { NextResponse } from "next/server";
 
+import type { ApiEnvelope } from "@/lib/api-types";
+
 import { clearAuthCookies, setAuthCookies } from "@/lib/auth/cookies";
 import { callBackend } from "@/lib/server/backend";
 
@@ -14,7 +16,10 @@ export async function POST(request: NextRequest) {
     body,
   });
 
-  const payload = await response.json();
+  const payload = (await response.json()) as ApiEnvelope<{
+    accessToken?: string;
+    refreshToken?: string;
+  }>;
   const nextResponse = NextResponse.json(payload, { status: response.status });
 
   if (

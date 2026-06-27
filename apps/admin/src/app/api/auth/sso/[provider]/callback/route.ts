@@ -2,6 +2,8 @@ import type { NextRequest } from "next/server";
 
 import { NextResponse } from "next/server";
 
+import type { AuthLoginResponse } from "@/lib/api-types";
+
 import { clearAuthCookies, setAuthCookies } from "@/lib/auth/cookies";
 import { callBackend } from "@/lib/server/backend";
 
@@ -20,7 +22,7 @@ export async function GET(
     headers: new Headers({ accept: "application/json" }),
   });
 
-  const payload = await response.json().catch(() => ({}));
+  const payload = (await response.json().catch(() => ({}))) as AuthLoginResponse;
   const nextResponse = NextResponse.json(payload, { status: response.status });
 
   // Forward set-cookie headers from backend (SSO callback sets auth cookies)

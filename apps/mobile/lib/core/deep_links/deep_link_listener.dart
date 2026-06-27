@@ -55,11 +55,10 @@ class _DeepLinkListenerState extends ConsumerState<DeepLinkListener> {
 
     if (accessToken != null && refreshToken != null) {
       final storage = ref.read(tokenStorageProvider);
-      await storage.write(TokenBundle(
-        accessToken: accessToken,
-        refreshToken: refreshToken,
-      ));
-      if (context.mounted) {
+      await storage.write(
+        TokenBundle(accessToken: accessToken, refreshToken: refreshToken),
+      );
+      if (mounted) {
         context.go('/home');
       }
       return true;

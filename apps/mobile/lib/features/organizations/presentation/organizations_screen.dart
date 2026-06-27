@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mobile_app/core/widgets/async_screen_body.dart';
-import 'package:mobile_app/core/widgets/state_views.dart';
+import 'package:mobile_app/core/design/app_colors.dart';
+import 'package:mobile_app/core/design/app_spacing.dart';
+import 'package:mobile_app/core/widgets/widgets.dart';
 import 'package:mobile_app/features/auth/presentation/auth_controller.dart';
 import 'package:mobile_app/features/organizations/data/organizations_repository.dart';
 
@@ -16,6 +17,7 @@ class OrganizationsScreen extends ConsumerStatefulWidget {
 
 class _OrganizationsScreenState extends ConsumerState<OrganizationsScreen> {
   final _nameController = TextEditingController();
+  bool _creating = false;
 
   @override
   void dispose() {
@@ -23,11 +25,36 @@ class _OrganizationsScreenState extends ConsumerState<OrganizationsScreen> {
     super.dispose();
   }
 
+  Future<void> _switchOrg(String id, String name) async {
+    try {
+      await ref.read(authControllerProvider.notifier).switchOrganization(id);
+      ref.invalidate(organizationsListProvider);
+      if (mounted) showSuccessSnackBar(context, 'Switched to $name');
+    } catch (e) {
+      if (mounted) showErrorSnackBar(context, e);
+    }
+  }
+
+  Future<void> _create() async {
+    final name = _nameController.text.trim();
+    if (name.isEmpty) return;
+    setState(() => _creating = true);
+    try {
+      await ref.read(organizationsRepositoryProvider).create(name: name);
+      _nameController.clear();
+      ref.invalidate(organizationsListProvider);
+      if (mounted) showSuccessSnackBar(context, 'Organization created');
+    } catch (e) {
+      if (mounted) showErrorSnackBar(context, e);
+    } finally {
+      if (mounted) setState(() => _creating = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final orgs = ref.watch(organizationsListProvider);
     final auth = ref.watch(authControllerProvider).valueOrNull;
-    final repository = ref.read(organizationsRepositoryProvider);
 
     if (auth == null) {
       return Scaffold(
@@ -35,9 +62,10 @@ class _OrganizationsScreenState extends ConsumerState<OrganizationsScreen> {
         body: CenterMessage(
           title: 'Sign in required',
           body: 'Switch organizations after signing in.',
-          action: FilledButton(
+          action: AppButton(
+            label: 'Sign in',
+            fullWidth: false,
             onPressed: () => context.go('/login'),
-            child: const Text('Sign in'),
           ),
         ),
       );
@@ -48,50 +76,50 @@ class _OrganizationsScreenState extends ConsumerState<OrganizationsScreen> {
       body: AsyncScreenBody(
         value: orgs,
         isEmpty: (rows) => rows.isEmpty,
-        empty: const CenterMessage(title: 'No organizations yet'),
+        empty: const CenterMessage(
+          icon: Icons.business_rounded,
+          title: 'No organizations yet',
+          body: 'Create your first organization below.',
+        ),
         data: (rows) => ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppSpacing.base),
           children: [
             ...rows.map(
-              (org) => Card(
-                child: ListTile(
-                  title: Text(org.name),
-                  subtitle: Text('${org.slug} · ${org.role}'),
+              (org) => Padding(
+                padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                child: AppListTile(
+                  icon: Icons.business_rounded,
+                  iconColor: AppColors.cardOrganizations,
+                  title: org.name,
+                  subtitle: '${org.slug} · ${org.role}',
                   trailing: org.isCurrent
-                      ? const Chip(label: Text('Current'))
+                      ? const AppBadge(
+                          label: 'CURRENT',
+                          tone: AppBadgeTone.success,
+                        )
                       : TextButton(
-                          onPressed: () async {
-                            await ref
-                                .read(authControllerProvider.notifier)
-                                .switchOrganization(org.id);
-                            ref.invalidate(organizationsListProvider);
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Switched to ${org.name}'),
-                                ),
-                              );
-                            }
-                          },
+                          onPressed: () => _switchOrg(org.id, org.name),
                           child: const Text('Switch'),
                         ),
-                  onTap: () => context.go('/organizations/${org.id}'),
+                  onTap: () => context.push('/organizations/${org.id}'),
                 ),
               ),
             ),
-            const SizedBox(height: 24),
-            TextField(
+            const SizedBox(height: AppSpacing.xl),
+            AppTextField(
               controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Organization name'),
+              label: 'New organization',
+              hint: 'Organization name',
+              prefixIcon: Icons.add_business_rounded,
+              textInputAction: TextInputAction.done,
+              onSubmitted: (_) => _create(),
             ),
-            const SizedBox(height: 16),
-            FilledButton(
-              onPressed: () async {
-                await repository.create(name: _nameController.text.trim());
-                _nameController.clear();
-                ref.invalidate(organizationsListProvider);
-              },
-              child: const Text('Create organization'),
+            const SizedBox(height: AppSpacing.base),
+            AppButton(
+              label: 'Create organization',
+              icon: Icons.add_rounded,
+              loading: _creating,
+              onPressed: _create,
             ),
           ],
         ),

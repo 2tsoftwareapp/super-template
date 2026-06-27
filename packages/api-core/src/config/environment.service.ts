@@ -16,8 +16,21 @@ export class EnvironmentService {
     return this.env.APP_ENV === 'production';
   }
 
+  get isStaging(): boolean {
+    return this.env.APP_ENV === 'staging';
+  }
+
+  get isDevelopment(): boolean {
+    return this.env.APP_ENV === 'development';
+  }
+
   get isTest(): boolean {
     return this.env.APP_ENV === 'test';
+  }
+
+  /** True for deployed, internet-facing environments (staging + production). */
+  get isProductionLike(): boolean {
+    return this.env.APP_ENV === 'production' || this.env.APP_ENV === 'staging';
   }
 
   get appEnv(): AppEnvironment['APP_ENV'] {

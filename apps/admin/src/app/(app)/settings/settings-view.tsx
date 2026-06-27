@@ -22,8 +22,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { adminResources } from "@/lib/admin-resources";
-import { parseJsonValue } from "@/lib/json";
 import { webFetch } from "@/lib/http";
+import { parseJsonValue } from "@/lib/json";
 
 function displayValue(value: ApplicationSettingDto["value"]): string {
   if (value == null) return "—";
@@ -139,7 +139,7 @@ export function SettingsView() {
 
     let next: ApplicationSettingDto["value"];
     if (isObject && draftObjectValues[savingKey]) {
-      next = draftObjectValues[savingKey] as unknown as ApplicationSettingDto["value"];
+      next = draftObjectValues[savingKey];
     } else {
       const raw = draftValues[savingKey] ?? initDraft(setting?.value ?? null as never);
       next = parseJsonValue(raw) as ApplicationSettingDto["value"];
@@ -266,7 +266,7 @@ export function SettingsView() {
                                 }
                                 onChange={(val) =>
                                   setDraftObjectValues((prev) => {
-                                    const base = prev[setting.key] ?? {} as Record<string, string | boolean>;
+                                    const base = prev[setting.key] ?? {};
                                     for (const [bk, bv] of Object.entries(objValue)) {
                                       if (!(bk in base)) {
                                         base[bk] = typeof bv === "boolean" ? bv : String(bv ?? "");

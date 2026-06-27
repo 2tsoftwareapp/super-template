@@ -10,6 +10,7 @@ import type {
   ListResponse,
   MailDeliveryDto,
   MailPreviewDto,
+  MailTemplateDto,
   SendAdminMailResultDto,
 } from "@/lib/api-types";
 
@@ -37,10 +38,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatDateTime, timeAgo } from "@/lib/format";
+import { adminResources } from "@/lib/admin-resources";
+import { formatDateTime, formatUnknownDateTime, scalarString, timeAgo } from "@/lib/format";
 import { webFetch } from "@/lib/http";
 import { cn } from "@/lib/utils";
-import { adminResources } from "@/lib/admin-resources";
 
 function mailStatusProps(status: string): {
   variant: "default" | "secondary" | "outline";
@@ -111,7 +112,7 @@ export function MailView() {
   const templates = useQuery({
     queryKey: ["admin-mail-templates"],
     queryFn: () =>
-      webFetch<{ data: import("@/lib/api-types").MailTemplateDto[] }>(
+      webFetch<{ data: MailTemplateDto[] }>(
         "/api/bff/admin/mail/templates",
       ),
   });
@@ -186,8 +187,8 @@ export function MailView() {
       description="Review delivery history, browse templates, and send test emails."
       isRefreshing={templates.isFetching || deliveries.isFetching}
       onRefresh={() => {
-        templates.refetch();
-        deliveries.refetch();
+        void templates.refetch();
+        void deliveries.refetch();
       }}
     >
       <div className="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
@@ -645,7 +646,7 @@ export function MailView() {
                     Error
                   </Label>
                   <p className="mt-0.5 text-destructive">
-                    {String(selectedDelivery.errorMessage)}
+                    {scalarString(selectedDelivery.errorMessage)}
                   </p>
                 </div>
               </>
@@ -666,7 +667,7 @@ export function MailView() {
                     Sent at
                   </Label>
                   <p className="mt-0.5">
-                    {formatDateTime(selectedDelivery.sentAt != null ? String(selectedDelivery.sentAt) : null)}
+                    {formatUnknownDateTime(selectedDelivery.sentAt)}
                   </p>
                 </div>
               )}

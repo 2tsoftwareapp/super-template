@@ -41,7 +41,14 @@ class AuditLogsScreen extends ConsumerWidget {
                 subtitle: Text(
                   '${log.entityType} · ${log.createdAt.toLocal()}',
                 ),
-                trailing: Text(log.actorId?.substring(0, 8) ?? 'system'),
+                trailing: Text(
+                  log.actorId != null
+                      ? log.actorId!.substring(
+                          0,
+                          log.actorId!.length < 8 ? log.actorId!.length : 8,
+                        )
+                      : 'system',
+                ),
               );
             },
           );

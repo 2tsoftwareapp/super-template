@@ -50,7 +50,7 @@ class InvitationsRepository {
         createInvitationDto: CreateInvitationDto(
           (b) => b
             ..email = email
-            ..entityType = entityType
+            ..entityType = CreateInvitationDtoEntityTypeEnum.valueOf(entityType)
             ..entityId = entityId
             ..role = role,
         ),

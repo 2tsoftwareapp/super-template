@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mobile_app/core/widgets/async_screen_body.dart';
-import 'package:mobile_app/core/widgets/state_views.dart';
+import 'package:mobile_app/core/widgets/widgets.dart';
 import 'package:mobile_app/features/notifications/data/notifications_repository.dart';
 
 final notificationsListProvider = FutureProvider(
@@ -29,17 +28,18 @@ class NotificationsScreen extends ConsumerWidget {
             data: (count) => count > 0
                 ? TextButton(
                     onPressed: () async {
-                      await repository.markAllRead();
-                      ref
-                        ..invalidate(notificationsListProvider)
-                        ..invalidate(unreadNotificationsProvider);
+                      try {
+                        await repository.markAllRead();
+                        ref
+                          ..invalidate(notificationsListProvider)
+                          ..invalidate(unreadNotificationsProvider);
+                      } catch (e) {
+                        if (context.mounted) showErrorSnackBar(context, e);
+                      }
                     },
-                    child: const Text('Mark all'),
+                    child: Text('Mark all ($count)'),
                   )
-                : Padding(
-                    padding: const EdgeInsets.only(right: 16),
-                    child: Center(child: Text('Unread $count')),
-                  ),
+                : const SizedBox.shrink(),
             error: (_, _) => const SizedBox.shrink(),
             loading: () => const Padding(
               padding: EdgeInsets.all(16),
@@ -70,10 +70,14 @@ class NotificationsScreen extends ConsumerWidget {
                 child: const Icon(Icons.delete, color: Colors.white),
               ),
               onDismissed: (_) async {
-                await repository.delete(item.id);
-                ref
-                  ..invalidate(notificationsListProvider)
-                  ..invalidate(unreadNotificationsProvider);
+                try {
+                  await repository.delete(item.id);
+                  ref
+                    ..invalidate(notificationsListProvider)
+                    ..invalidate(unreadNotificationsProvider);
+                } catch (e) {
+                  if (context.mounted) showErrorSnackBar(context, e);
+                }
               },
               child: Card(
                 child: ListTile(

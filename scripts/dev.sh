@@ -4,15 +4,15 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
-if [[ ! -f .env ]]; then
-  cp .env.example .env
-fi
+# Load layered env files (.env.example -> .env.<APP_ENV> -> .env -> *.local) into
+# this shell so child processes and docker compose substitution see them.
+export APP_ENV="${APP_ENV:-development}"
+# shellcheck disable=SC1091
+. ./scripts/load-env.sh
 
-set -a
-source .env
-set +a
-
-docker compose -f infra/docker-compose.yml --env-file .env up -d
+docker compose -f infra/docker-compose.yml up -d
+./scripts/wait-for-postgres.sh
+pnpm --filter api db:migrate
 
 is_port_listening() {
   local port="$1"

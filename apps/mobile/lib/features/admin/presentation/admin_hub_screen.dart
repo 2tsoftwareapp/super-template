@@ -77,7 +77,7 @@ class AdminHubScreen extends ConsumerWidget {
                     leading: Icon(tile.icon),
                     title: Text(tile.title),
                     trailing: const Icon(Icons.chevron_right),
-                    onTap: () => context.go(tile.route),
+                    onTap: () => context.push(tile.route),
                   ),
                 );
               },

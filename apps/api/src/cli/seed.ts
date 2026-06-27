@@ -18,7 +18,9 @@ const main = async (): Promise<void> => {
   }
 };
 
-void main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+void main()
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });

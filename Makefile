@@ -1,6 +1,9 @@
 SHELL := /bin/bash
 
-.PHONY: help bootstrap dev dev-api dev-web dev-mobile infra-up infra-down db-generate db-migrate db-seed db-reset db-studio generate generate-check lint format test test-api test-web test-mobile build verify extension-build extension-dev
+# Active environment. Override per invocation, e.g. `make dev-api APP_ENV=staging`.
+APP_ENV ?= development
+
+.PHONY: help bootstrap dev dev-api dev-web dev-admin dev-mobile dev-mobile-staging dev-mobile-prod infra-up infra-down db-generate db-migrate db-seed db-reset db-studio generate generate-check lint format test test-api test-web test-mobile build verify extension-build extension-dev
 
 help:
 	@printf '%s\n' \
@@ -10,7 +13,9 @@ help:
 		'  dev-api      Start API only' \
 		'  dev-web      Start Web only' \
 		'  dev-admin    Start Admin only' \
-		'  dev-mobile   Run Flutter app' \
+		'  dev-mobile   Run Flutter app (env/dev.json)' \
+		'  dev-mobile-staging Run Flutter app against env/staging.json' \
+		'  dev-mobile-prod    Run Flutter app (release) against env/prod.json' \
 		'  infra-up     Start Postgres + Mailpit' \
 		'  infra-down   Stop docker infra' \
 		'  db-generate  Drizzle generate migration' \
@@ -38,18 +43,24 @@ dev:
 	./scripts/dev.sh
 
 dev-api:
-	set -a; source .env; set +a; pnpm --filter api dev
+	APP_ENV=$(APP_ENV) . ./scripts/load-env.sh && pnpm --filter api dev
 
 dev-web:
 	@printf '%s\n' 'Note: Web proxies to API at $${API_INTERNAL_URL:-http://localhost:3001}. Run `make dev-api` in another terminal if login fails.'
-	set -a; source .env; set +a; pnpm --filter web dev
+	APP_ENV=$(APP_ENV) . ./scripts/load-env.sh && pnpm --filter web dev
 
 dev-admin:
 	@printf '%s\n' 'Note: Admin proxies to API at $${API_INTERNAL_URL:-http://localhost:3001}. Run `make dev-api` in another terminal if login fails.'
-	set -a; source .env; set +a; pnpm --filter admin dev
+	APP_ENV=$(APP_ENV) . ./scripts/load-env.sh && pnpm --filter admin dev
 
 dev-mobile:
 	sh scripts/mobile.sh dev
+
+dev-mobile-staging:
+	sh scripts/mobile.sh staging
+
+dev-mobile-prod:
+	sh scripts/mobile.sh prod
 
 infra-up:
 	docker compose -f infra/docker-compose.yml up -d
@@ -107,4 +118,4 @@ extension-build:
 	pnpm --filter @repo/extension build
 
 extension-dev:
-	set -a; source .env; set +a; pnpm --filter @repo/extension dev
+	APP_ENV=$(APP_ENV) . ./scripts/load-env.sh && pnpm --filter @repo/extension dev

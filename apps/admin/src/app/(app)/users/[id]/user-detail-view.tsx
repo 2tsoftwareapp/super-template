@@ -2,10 +2,10 @@
 
 import { standardSchemaResolver as zodResolver } from "@hookform/resolvers/standard-schema";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AlertTriangle, CheckCircle2, ShieldAlert, Trash2 } from "lucide-react";
+import { CheckCircle2, ShieldAlert, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -86,8 +86,9 @@ export function UserDetailView() {
     (r) => r === "SUPER_ADMIN" || r === "ADMIN",
   ) || isActorSuperAdmin;
 
-  useMemo(() => {
+  useEffect(() => {
     if (currentUser) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- sync editable fields when user loads
       setSelectedStatus(currentUser.status);
       setSelectedRole(currentUser.roles.includes("ADMIN") ? "ADMIN" : "USER");
     }

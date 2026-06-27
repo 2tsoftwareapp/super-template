@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["127.0.0.1"],
-  transpilePackages: ["@repo/web-core"],
+  transpilePackages: ["@repo/web-core", "@repo/env-loader"],
 };
 
 export default nextConfig;

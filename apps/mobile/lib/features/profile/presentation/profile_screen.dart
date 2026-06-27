@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mobile_app/core/design/app_spacing.dart';
+import 'package:mobile_app/core/widgets/widgets.dart';
 import 'package:mobile_app/features/auth/presentation/auth_controller.dart';
 import 'package:mobile_app/features/profile/data/profile_repository.dart';
 
@@ -12,14 +14,17 @@ class ProfileScreen extends ConsumerStatefulWidget {
 
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   late final TextEditingController _displayNameController;
-  final _avatarController = TextEditingController();
+  late final TextEditingController _avatarController;
+  bool _saving = false;
 
   @override
   void initState() {
     super.initState();
-    final displayName =
-        ref.read(authControllerProvider).valueOrNull?.displayName ?? '';
-    _displayNameController = TextEditingController(text: displayName);
+    final session = ref.read(authControllerProvider).valueOrNull;
+    _displayNameController = TextEditingController(
+      text: session?.displayName ?? '',
+    );
+    _avatarController = TextEditingController();
   }
 
   @override
@@ -29,43 +34,52 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     super.dispose();
   }
 
+  Future<void> _save() async {
+    setState(() => _saving = true);
+    try {
+      await ref
+          .read(profileRepositoryProvider)
+          .updateProfile(
+            displayName: _displayNameController.text.trim(),
+            avatarUrl: _avatarController.text.trim().isEmpty
+                ? null
+                : _avatarController.text.trim(),
+          );
+      await ref.read(authControllerProvider.notifier).refreshSession();
+      if (mounted) showSuccessSnackBar(context, 'Profile updated');
+    } catch (e) {
+      if (mounted) showErrorSnackBar(context, e);
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Profile')),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          children: [
-            TextField(
-              controller: _displayNameController,
-              decoration: const InputDecoration(labelText: 'Display name'),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _avatarController,
-              decoration: const InputDecoration(labelText: 'Avatar URL'),
-            ),
-            const SizedBox(height: 24),
-            FilledButton(
-              onPressed: () async {
-                final messenger = ScaffoldMessenger.of(context);
-                await ref
-                    .read(profileRepositoryProvider)
-                    .updateProfile(
-                      displayName: _displayNameController.text.trim(),
-                      avatarUrl: _avatarController.text.trim().isEmpty
-                          ? null
-                          : _avatarController.text.trim(),
-                    );
-                messenger.showSnackBar(
-                  const SnackBar(content: Text('Profile updated')),
-                );
-              },
-              child: const Text('Save profile'),
-            ),
-          ],
-        ),
+      body: ListView(
+        padding: const EdgeInsets.all(AppSpacing.xl),
+        children: [
+          AppTextField(
+            controller: _displayNameController,
+            label: 'Display name',
+            prefixIcon: Icons.person_outline_rounded,
+            textInputAction: TextInputAction.next,
+          ),
+          const SizedBox(height: AppSpacing.base),
+          AppTextField(
+            controller: _avatarController,
+            label: 'Avatar URL',
+            hint: 'https://…',
+            prefixIcon: Icons.image_outlined,
+            keyboardType: TextInputType.url,
+            textInputAction: TextInputAction.done,
+            onSubmitted: (_) => _save(),
+          ),
+          const SizedBox(height: AppSpacing.xl),
+          AppButton(label: 'Save profile', loading: _saving, onPressed: _save),
+        ],
       ),
     );
   }

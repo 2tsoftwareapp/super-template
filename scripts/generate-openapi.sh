@@ -32,13 +32,17 @@ cd "$ROOT_DIR"
 API_PORT="$OPENAPI_PORT" pnpm --filter api exec nest start >"$LOG_FILE" 2>&1 &
 API_PID=$!
 
+printf '[openapi] Waiting for API on port %s' "$OPENAPI_PORT"
 for _ in $(seq 1 90); do
-  if curl -fsS "http://127.0.0.1:${OPENAPI_PORT}/api/docs-json" >"$JSON_FILE"; then
+  if curl -fsS "http://127.0.0.1:${OPENAPI_PORT}/api/docs-json" >"$JSON_FILE" 2>/dev/null; then
+    printf ' ready\n'
     mv "$JSON_FILE" "$API_DIR/openapi.json"
     exit 0
   fi
+  printf '.'
   sleep 1
 done
+printf ' timed out\n'
 
 cat "$LOG_FILE"
 exit 1

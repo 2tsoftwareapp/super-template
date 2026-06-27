@@ -16,6 +16,7 @@
     "@base-ui/react": "^1.5.0",
     "@hookform/resolvers": "5.4.0",
     "@repo/api-contract": "workspace:*",
+    "@repo/env-loader": "workspace:*",
     "@repo/web-core": "workspace:*",
     "@repo/web-test": "workspace:*",
     "@tanstack/react-query": "5.101.0",

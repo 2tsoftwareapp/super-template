@@ -51,6 +51,22 @@ const durationString = z
   .string()
   .regex(/^\d+[smhdw]$/, 'must be a duration like "15m" or "7d"');
 
+// Placeholder secrets shipped in .env.example / .env.development. They are fine for
+// local development but MUST be replaced with real secrets in staging/production.
+const DEV_PLACEHOLDER_SECRETS = new Set([
+  'replace-with-a-long-random-development-secret',
+  'replace-with-another-long-random-development-secret',
+]);
+const DEV_PLACEHOLDER_MFA_KEY =
+  '0861abb090792515d50d973600fced671ad99f2edd463d5da88887d90d594f99';
+
+const everyOriginIsHttps = (value: string): boolean =>
+  value
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean)
+    .every((origin) => origin.startsWith('https://'));
+
 export const envSchema = z.object({
   // Environment and process metadata.
   APP_ENV: z
@@ -117,6 +133,10 @@ export const envSchema = z.object({
   APPLE_KEY_ID: emptyStringToUndefined,
   APPLE_PRIVATE_KEY: emptyStringToUndefined,
   APPLE_REDIRECT_URI: emptyStringToUndefined,
+  // GitHub OAuth2 (Authorization Code + PKCE). Set GITHUB_CLIENT_ID to enable.
+  GITHUB_CLIENT_ID: emptyStringToUndefined,
+  GITHUB_CLIENT_SECRET: emptyStringToUndefined,
+  GITHUB_REDIRECT_URI: emptyStringToUndefined,
   // Registers an in-memory mock SSO provider (provider key "fake") for local/dev/test use
   // without real OAuth credentials. Refused outside of development/test at startup.
   SSO_FAKE_PROVIDER_ENABLED: booleanFromString.default(false),
@@ -163,6 +183,61 @@ export const envSchema = z.object({
       path: ['SSO_FAKE_PROVIDER_ENABLED'],
       message: 'SSO_FAKE_PROVIDER_ENABLED must not be enabled in production',
     });
+  }
+
+  // Deployed environments (staging + production) must not reuse the development
+  // placeholder secrets that ship with the template.
+  const isDeployed = env.APP_ENV === 'staging' || env.APP_ENV === 'production';
+  if (isDeployed) {
+    if (DEV_PLACEHOLDER_SECRETS.has(env.JWT_ACCESS_SECRET)) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['JWT_ACCESS_SECRET'],
+        message:
+          'must not reuse the development placeholder secret in staging/production',
+      });
+    }
+    if (DEV_PLACEHOLDER_SECRETS.has(env.JWT_REFRESH_SECRET)) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['JWT_REFRESH_SECRET'],
+        message:
+          'must not reuse the development placeholder secret in staging/production',
+      });
+    }
+    if (env.MFA_ENCRYPTION_KEY === DEV_PLACEHOLDER_MFA_KEY) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['MFA_ENCRYPTION_KEY'],
+        message:
+          'must not reuse the development placeholder key in staging/production',
+      });
+    }
+  }
+
+  // Production must serve over HTTPS with secure cookies.
+  if (env.APP_ENV === 'production') {
+    if (!env.COOKIE_SECURE) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['COOKIE_SECURE'],
+        message: 'must be true in production',
+      });
+    }
+    if (!everyOriginIsHttps(env.WEB_ORIGIN)) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['WEB_ORIGIN'],
+        message: 'must use https in production',
+      });
+    }
+    if (!env.NEXT_PUBLIC_WEB_URL.startsWith('https://')) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['NEXT_PUBLIC_WEB_URL'],
+        message: 'must use https in production',
+      });
+    }
   }
 });
 

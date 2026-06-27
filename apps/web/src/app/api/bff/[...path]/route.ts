@@ -1,24 +1,29 @@
 import type { NextRequest } from "next/server";
 
-import { normalizeBffListPath } from "@/lib/search-params";
 import { enforceCsrf, proxyWithRefresh } from "@/lib/server/backend";
 
 const normalizePath = (segments: string[]) => segments.join("/");
+
+/** Forward query string as-is — no list-param normalization needed. */
+const buildProxyPath = (path: string, searchParams: URLSearchParams) => {
+  const qs = searchParams.toString();
+  return qs ? `${path}?${qs}` : path;
+};
 
 async function handleRequest(
   request: NextRequest,
   context: { params: Promise<{ path: string[] }> },
 ) {
   const { path } = await context.params;
-  const normalizedPath = normalizeBffListPath(
+  const proxyPath = buildProxyPath(
     normalizePath(path),
     request.nextUrl.searchParams,
   );
 
   if (
-    normalizedPath.includes("..") ||
-    normalizedPath.startsWith("http://") ||
-    normalizedPath.startsWith("https://")
+    proxyPath.includes("..") ||
+    proxyPath.startsWith("http://") ||
+    proxyPath.startsWith("https://")
   ) {
     return Response.json(
       {
@@ -40,7 +45,7 @@ async function handleRequest(
     }
   }
 
-  return proxyWithRefresh(request, normalizedPath);
+  return proxyWithRefresh(request, proxyPath);
 }
 
 export const GET = handleRequest;

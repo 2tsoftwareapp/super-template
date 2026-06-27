@@ -129,6 +129,56 @@ case "${1:-help}" in
     env_file=$(resolve_env_file "$@")
     run_mobile_cmd "$flutter_cmd" run "--dart-define-from-file=$env_file"
     ;;
+  staging)
+    shift || true
+    flutter_cmd=$(resolve_flutter || true)
+
+    if [ -z "${flutter_cmd:-}" ]; then
+      print_install_hint
+      exit 1
+    fi
+
+    run_mobile_cmd "$flutter_cmd" run "--dart-define-from-file=env/staging.json" "$@"
+    ;;
+  prod)
+    shift || true
+    flutter_cmd=$(resolve_flutter || true)
+
+    if [ -z "${flutter_cmd:-}" ]; then
+      print_install_hint
+      exit 1
+    fi
+
+    run_mobile_cmd "$flutter_cmd" run --release "--dart-define-from-file=env/prod.json" "$@"
+    ;;
+  build)
+    shift || true
+    flutter_cmd=$(resolve_flutter || true)
+
+    if [ -z "${flutter_cmd:-}" ]; then
+      print_install_hint
+      exit 1
+    fi
+
+    target=${1:-apk}
+    shift || true
+
+    env_file=env/prod.json
+    while [ "$#" -gt 0 ]; do
+      if [ "$1" = "--env" ]; then
+        if [ "$#" -lt 2 ]; then
+          printf '%s\n' 'Missing value for --env' >&2
+          exit 1
+        fi
+        env_file=$2
+        shift 2
+        continue
+      fi
+      shift
+    done
+
+    run_mobile_cmd "$flutter_cmd" build "$target" --release "--dart-define-from-file=$env_file"
+    ;;
   test)
     shift || true
     flutter_cmd=$(resolve_flutter || true)
@@ -160,7 +210,7 @@ case "${1:-help}" in
       exit 1
     fi
 
-    run_mobile_cmd "$dart_cmd" format . "$@"
+    run_mobile_cmd "$dart_cmd" format lib test "$@"
     ;;
   format-check)
     shift || true
@@ -171,26 +221,31 @@ case "${1:-help}" in
       exit 1
     fi
 
-    run_mobile_cmd "$dart_cmd" format --set-exit-if-changed . "$@"
+    run_mobile_cmd "$dart_cmd" format --set-exit-if-changed lib test "$@"
     ;;
   help|-h|--help)
     cat <<'EOF'
 Usage: scripts/mobile.sh <command> [options]
 
 Commands:
-  doctor                Check Flutter/Dart availability and run flutter doctor
-  setup                 Run flutter pub get in apps/mobile
-  dev [--env <file>]    Run flutter app with --dart-define-from-file
-  test                  Run flutter test
-  analyze               Run flutter analyze
-  format                Run dart format and rewrite files in place
-  format-check          Run dart format --set-exit-if-changed .
-  help                  Show this help
+  doctor                     Check Flutter/Dart availability and run flutter doctor
+  setup                      Run flutter pub get in apps/mobile
+  dev [--env <file>]         Run app against env/dev.json (or a custom --env file)
+  staging                    Run app against env/staging.json
+  prod                       Run app (release) against env/prod.json
+  build <target> [--env <f>] Build a release artifact (apk|appbundle|ipa), defaults to env/prod.json
+  test                       Run flutter test
+  analyze                    Run flutter analyze
+  format                     Run dart format on lib/ and test/
+  format-check               Run dart format --set-exit-if-changed on lib/ and test/
+  help                       Show this help
 
 Examples:
   pnpm run mobile:doctor
   pnpm run mobile:setup
   pnpm run mobile:dev
+  sh scripts/mobile.sh staging
+  sh scripts/mobile.sh build appbundle
   pnpm run mobile:test
 EOF
     ;;

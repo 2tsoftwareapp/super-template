@@ -5,10 +5,8 @@ import 'package:mobile_app/core/network/api_client.dart';
 import 'package:super_template_api/super_template_api.dart';
 
 final filesRepositoryProvider = Provider<FilesRepository>(
-  (ref) => FilesRepository(
-    ref.watch(apiClientProvider),
-    ref.watch(dioProvider),
-  ),
+  (ref) =>
+      FilesRepository(ref.watch(apiClientProvider), ref.watch(dioProvider)),
 );
 
 class FileSummary {

@@ -150,8 +150,9 @@ class OrganizationsRepository {
 
   Future<List<OrganizationMember>> listMembers(String organizationId) async {
     try {
-      final response =
-          await _api.organizationsControllerListMembers(id: organizationId);
+      final response = await _api.organizationsControllerListMembers(
+        id: organizationId,
+      );
       return response.data!.data
           .map(
             (m) => OrganizationMember(

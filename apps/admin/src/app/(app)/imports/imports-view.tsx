@@ -32,7 +32,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
 import { adminResources } from "@/lib/admin-resources";
-import { formatDateTime, timeAgo } from "@/lib/format";
+import { scalarString, timeAgo } from "@/lib/format";
 import { webFetch } from "@/lib/http";
 import { cn } from "@/lib/utils";
 
@@ -104,7 +104,7 @@ export function ImportsView() {
       }),
     onSuccess: () => {
       toast.success("Import confirmed");
-      job.refetch();
+      void job.refetch();
     },
     onError: () => {
       toast.error("Failed to confirm import");
@@ -225,7 +225,7 @@ export function ImportsView() {
                   </div>
                   {Icon && (
                     <Badge
-                      variant={sb!.variant}
+                      variant={sb.variant}
                       className={cn("gap-1 capitalize", sb?.className)}
                     >
                       <Icon className="size-3" />
@@ -240,19 +240,19 @@ export function ImportsView() {
                   <div>
                     <span className="text-muted-foreground">Rows</span>
                     <p className="mt-0.5 font-medium">
-                      {jobData.rowCount != null ? String(jobData.rowCount) : "—"}
+                      {scalarString(jobData.rowCount)}
                     </p>
                   </div>
                   <div>
                     <span className="text-muted-foreground">Success</span>
                     <p className="mt-0.5 font-medium text-emerald-600">
-                      {jobData.successCount != null ? String(jobData.successCount) : "—"}
+                      {scalarString(jobData.successCount)}
                     </p>
                   </div>
                   <div>
                     <span className="text-muted-foreground">Errors</span>
                     <p className="mt-0.5 font-medium text-destructive">
-                      {jobData.errorCount != null ? String(jobData.errorCount) : "—"}
+                      {scalarString(jobData.errorCount)}
                     </p>
                   </div>
                 </div>
@@ -269,13 +269,13 @@ export function ImportsView() {
                   {jobData.completedAt && (
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Completed</span>
-                      <span>{timeAgo(String(jobData.completedAt))}</span>
+                      <span>{timeAgo(scalarString(jobData.completedAt, ""))}</span>
                     </div>
                   )}
                   {jobData.confirmedAt && (
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Confirmed</span>
-                      <span>{timeAgo(String(jobData.confirmedAt))}</span>
+                      <span>{timeAgo(scalarString(jobData.confirmedAt, ""))}</span>
                     </div>
                   )}
                 </div>

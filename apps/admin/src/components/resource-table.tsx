@@ -24,7 +24,7 @@ export function ResourceTable<T>({
   emptyTitle,
   emptyDescription,
   onRowClick,
-  binarySort = false,
+  binarySort: _binarySort = false,
   multiSort = false,
 }: {
   table: ReactTable<T>;

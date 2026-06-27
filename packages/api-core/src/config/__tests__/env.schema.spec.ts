@@ -30,6 +30,16 @@ const baseEnv: Record<string, unknown> = {
   SEED_USER_PASSWORD: 'password123',
 };
 
+// Overrides that turn baseEnv into a valid production configuration: real (non
+// placeholder) secrets from baseEnv, secure cookies, and https public URLs.
+const secureProdOverrides: Record<string, unknown> = {
+  APP_ENV: 'production',
+  COOKIE_SECURE: 'true',
+  WEB_ORIGIN: 'https://app.example.com',
+  NEXT_PUBLIC_WEB_URL: 'https://app.example.com',
+  API_INTERNAL_URL: 'https://api.internal.example.com',
+};
+
 describe('validateEnvironment', () => {
   it('parses a valid environment and applies defaults', () => {
     const env = validateEnvironment({ ...baseEnv });
@@ -103,9 +113,9 @@ describe('validateEnvironment', () => {
   it('requires DATABASE_URL_TEST only when APP_ENV=test', () => {
     const { DATABASE_URL_TEST: _testUrl, ...withoutTestUrl } = baseEnv;
 
-    // Production boots fine without a test database URL.
+    // Production boots fine without a test database URL (given secure prod config).
     expect(
-      validateEnvironment({ ...withoutTestUrl, APP_ENV: 'production' })
+      validateEnvironment({ ...withoutTestUrl, ...secureProdOverrides })
         .DATABASE_URL_TEST,
     ).toBeUndefined();
 
@@ -113,5 +123,52 @@ describe('validateEnvironment', () => {
     expect(() =>
       validateEnvironment({ ...withoutTestUrl, APP_ENV: 'test' }),
     ).toThrow(/DATABASE_URL_TEST is required/);
+  });
+
+  it('rejects insecure cookies in production', () => {
+    expect(() =>
+      validateEnvironment({
+        ...baseEnv,
+        ...secureProdOverrides,
+        COOKIE_SECURE: 'false',
+      }),
+    ).toThrow(/COOKIE_SECURE/);
+  });
+
+  it('rejects a non-https WEB_ORIGIN in production', () => {
+    expect(() =>
+      validateEnvironment({
+        ...baseEnv,
+        ...secureProdOverrides,
+        WEB_ORIGIN: 'http://app.example.com',
+      }),
+    ).toThrow(/https/);
+  });
+
+  it('rejects reusing the dev placeholder JWT secret in production', () => {
+    expect(() =>
+      validateEnvironment({
+        ...baseEnv,
+        ...secureProdOverrides,
+        JWT_ACCESS_SECRET: 'replace-with-a-long-random-development-secret',
+      }),
+    ).toThrow(/placeholder/);
+  });
+
+  it('rejects reusing the dev placeholder secrets in staging', () => {
+    expect(() =>
+      validateEnvironment({
+        ...baseEnv,
+        APP_ENV: 'staging',
+        JWT_REFRESH_SECRET:
+          'replace-with-another-long-random-development-secret',
+      }),
+    ).toThrow(/placeholder/);
+  });
+
+  it('accepts a fully configured production environment', () => {
+    const env = validateEnvironment({ ...baseEnv, ...secureProdOverrides });
+    expect(env.APP_ENV).toBe('production');
+    expect(env.COOKIE_SECURE).toBe(true);
   });
 });

@@ -4,12 +4,17 @@
     "tags": {
       "layer:core": {
         "dependencies": {
-          "allow": ["layer:core", "layer:sort", "layer:tsconfig", "layer:eslint"]
+          "allow": ["layer:core", "layer:env", "layer:sort", "layer:tsconfig", "layer:eslint"]
+        }
+      },
+      "layer:env": {
+        "dependencies": {
+          "allow": ["layer:env", "layer:tsconfig", "layer:eslint"]
         }
       },
       "layer:database": {
         "dependencies": {
-          "allow": ["layer:core", "layer:database", "layer:sort", "layer:tsconfig", "layer:eslint"]
+          "allow": ["layer:core", "layer:env", "layer:database", "layer:sort", "layer:tsconfig", "layer:eslint"]
         }
       },
       "layer:contract": {
@@ -19,13 +24,14 @@
       },
       "layer:health": {
         "dependencies": {
-          "allow": ["layer:core", "layer:database", "layer:health", "layer:sort", "layer:tsconfig", "layer:eslint"]
+          "allow": ["layer:core", "layer:env", "layer:database", "layer:health", "layer:sort", "layer:tsconfig", "layer:eslint"]
         }
       },
       "layer:identity": {
         "dependencies": {
           "allow": [
             "layer:core",
+            "layer:env",
             "layer:database",
             "layer:identity",
             "layer:sort",
@@ -38,6 +44,7 @@
         "dependencies": {
           "allow": [
             "layer:core",
+            "layer:env",
             "layer:database",
             "layer:identity",
             "layer:platform",
@@ -51,6 +58,7 @@
         "dependencies": {
           "allow": [
             "layer:core",
+            "layer:env",
             "layer:database",
             "layer:identity",
             "layer:platform",
@@ -65,6 +73,7 @@
         "dependencies": {
           "allow": [
             "layer:core",
+            "layer:env",
             "layer:database",
             "layer:identity",
             "layer:platform",
@@ -81,6 +90,7 @@
         "dependencies": {
           "allow": [
             "layer:core",
+            "layer:env",
             "layer:database",
             "layer:identity",
             "layer:platform",
@@ -150,6 +160,8 @@
       "dependsOn": ["^build"],
       "outputs": ["dist/**", ".next/**", "!.next/cache/**"],
       "env": [
+        "APP_ENV",
+        "NEXT_PUBLIC_APP_ENV",
         "API_INTERNAL_URL",
         "WEB_ORIGIN",
         "ADMIN_ORIGIN",

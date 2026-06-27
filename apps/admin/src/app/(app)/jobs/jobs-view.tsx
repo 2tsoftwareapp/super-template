@@ -8,6 +8,8 @@ import { toast } from "sonner";
 
 import type {
   JobDto,
+  JobEventDto,
+  JobMetricsDto,
   ListResponse,
 } from "@/lib/api-types";
 
@@ -35,7 +37,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { adminResources } from "@/lib/admin-resources";
-import { formatDateTime, timeAgo } from "@/lib/format";
+import { formatDateTime, formatUnknownDateTime, scalarString, timeAgo } from "@/lib/format";
 import { webFetch } from "@/lib/http";
 import { cn } from "@/lib/utils";
 
@@ -158,7 +160,7 @@ export function JobsView() {
   const metrics = useQuery({
     queryKey: ["admin-jobs-metrics"],
     queryFn: () =>
-      webFetch<{ data: import("@/lib/api-types").JobMetricsDto }>("/api/bff/admin/jobs/metrics"),
+      webFetch<{ data: JobMetricsDto }>("/api/bff/admin/jobs/metrics"),
   });
 
   const jobDetail = useQuery({
@@ -171,7 +173,7 @@ export function JobsView() {
   const jobLogs = useQuery({
     queryKey: ["admin-job-logs", selectedJobId],
     queryFn: () =>
-      webFetch<{ data: import("@/lib/api-types").JobEventDto[] }>(
+      webFetch<{ data: JobEventDto[] }>(
         `/api/bff/admin/jobs/${selectedJobId}/logs`,
       ),
     enabled: !!selectedJobId,
@@ -203,8 +205,8 @@ export function JobsView() {
       description="Inspect queued background jobs and cancel stalled work."
       isRefreshing={jobs.isFetching || metrics.isFetching}
       onRefresh={() => {
-        jobs.refetch();
-        metrics.refetch();
+        void jobs.refetch();
+        void metrics.refetch();
       }}
     >
       {/* Metrics */}
@@ -500,7 +502,7 @@ export function JobsView() {
                     Error
                   </Label>
                   <p className="mt-0.5 text-destructive">
-                    {String(selectedJob.errorMessage)}
+                    {scalarString(selectedJob.errorMessage)}
                   </p>
                 </div>
               </>
@@ -536,7 +538,7 @@ export function JobsView() {
                     Started at
                   </Label>
                   <p className="mt-0.5">
-                    {formatDateTime(String(selectedJob.startedAt))}
+                    {formatUnknownDateTime(selectedJob.startedAt)}
                   </p>
                 </div>
               )}
@@ -546,7 +548,7 @@ export function JobsView() {
                     Completed at
                   </Label>
                   <p className="mt-0.5">
-                    {formatDateTime(String(selectedJob.completedAt))}
+                    {formatUnknownDateTime(selectedJob.completedAt)}
                   </p>
                 </div>
               )}

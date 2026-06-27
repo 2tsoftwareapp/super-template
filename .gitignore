@@ -20,10 +20,17 @@ android/app/release
 .idea
 .vscode
 .DS_Store
+# Env files: commit .env.example, .env.development, and .env.*.example only.
+# Everything below is local/secret and must stay out of git.
 .env
 .env.local
 .env.test
+.env.staging
 .env.production
+.env.*.local
+!.env.development
+!.env.staging.example
+!.env.production.example
 apps/api/drizzle/meta
 apps/api/storage/uploads/
 *.tsbuildinfo

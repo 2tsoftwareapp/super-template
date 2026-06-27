@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mobile_app/core/widgets/async_screen_body.dart';
-import 'package:mobile_app/core/widgets/state_views.dart';
+import 'package:mobile_app/core/widgets/widgets.dart';
 import 'package:mobile_app/features/auth/presentation/auth_controller.dart';
 import 'package:mobile_app/features/organizations/data/organizations_repository.dart';
 
 final organizationDetailProvider =
     FutureProvider.family<OrganizationDetail, String>(
-  (ref, id) => ref.watch(organizationsRepositoryProvider).getDetail(id),
-);
+      (ref, id) => ref.watch(organizationsRepositoryProvider).getDetail(id),
+    );
 
 final organizationMembersProvider =
     FutureProvider.family<List<OrganizationMember>, String>(
-  (ref, id) => ref.watch(organizationsRepositoryProvider).listMembers(id),
-);
+      (ref, id) => ref.watch(organizationsRepositoryProvider).listMembers(id),
+    );
 
 class OrganizationDetailScreen extends ConsumerStatefulWidget {
   const OrganizationDetailScreen({required this.organizationId, super.key});
@@ -60,79 +59,67 @@ class _OrganizationDetailScreenState
       ),
     );
     if (name != null && name.isNotEmpty && name != detail.name) {
-      await ref.read(organizationsRepositoryProvider).update(
-            id: widget.organizationId,
-            name: name,
-          );
-      ref.invalidate(organizationDetailProvider(widget.organizationId));
-      ref.invalidate(organizationsListProvider);
+      try {
+        await ref
+            .read(organizationsRepositoryProvider)
+            .update(id: widget.organizationId, name: name);
+        ref.invalidate(organizationDetailProvider(widget.organizationId));
+        ref.invalidate(organizationsListProvider);
+        if (mounted) showSuccessSnackBar(context, 'Organization updated');
+      } catch (e) {
+        if (mounted) showErrorSnackBar(context, e);
+      }
     }
   }
 
   Future<void> _leave() async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Leave organization'),
-        content:
-            const Text('Are you sure you want to leave this organization?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Leave'),
-          ),
-        ],
-      ),
+    final confirmed = await showConfirmDialog(
+      context,
+      title: 'Leave organization',
+      message: 'Are you sure you want to leave this organization?',
+      confirmLabel: 'Leave',
+      destructive: true,
     );
-    if (confirmed == true) {
-      await ref.read(organizationsRepositoryProvider).leave(
-            widget.organizationId,
-          );
+    if (!confirmed) return;
+    try {
+      await ref
+          .read(organizationsRepositoryProvider)
+          .leave(widget.organizationId);
       ref.invalidate(organizationsListProvider);
-      if (context.mounted) context.go('/organizations');
+      if (mounted) context.pop();
+    } catch (e) {
+      if (mounted) showErrorSnackBar(context, e);
     }
   }
 
   Future<void> _delete() async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Delete organization'),
-        content: const Text(
-          'This action cannot be undone. All data will be lost.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: Theme.of(ctx).colorScheme.error,
-            ),
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
+    final confirmed = await showConfirmDialog(
+      context,
+      title: 'Delete organization',
+      message: 'This action cannot be undone. All data will be lost.',
+      confirmLabel: 'Delete',
+      destructive: true,
     );
-    if (confirmed == true) {
-      await ref.read(organizationsRepositoryProvider).delete(
-            widget.organizationId,
-          );
+    if (!confirmed) return;
+    try {
+      await ref
+          .read(organizationsRepositoryProvider)
+          .delete(widget.organizationId);
       ref.invalidate(organizationsListProvider);
-      if (context.mounted) context.go('/organizations');
+      if (mounted) context.pop();
+    } catch (e) {
+      if (mounted) showErrorSnackBar(context, e);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final detailAsync = ref.watch(organizationDetailProvider(widget.organizationId));
-    final membersAsync = ref.watch(organizationMembersProvider(widget.organizationId));
+    final detailAsync = ref.watch(
+      organizationDetailProvider(widget.organizationId),
+    );
+    final membersAsync = ref.watch(
+      organizationMembersProvider(widget.organizationId),
+    );
     final auth = ref.watch(authControllerProvider).valueOrNull;
     final repo = ref.read(organizationsRepositoryProvider);
 
@@ -159,8 +146,7 @@ class _OrganizationDetailScreenState
                           Expanded(
                             child: Text(
                               detail.name,
-                              style:
-                                  Theme.of(context).textTheme.headlineSmall,
+                              style: Theme.of(context).textTheme.headlineSmall,
                             ),
                           ),
                           if (isAdmin)
@@ -171,8 +157,10 @@ class _OrganizationDetailScreenState
                         ],
                       ),
                       const SizedBox(height: 8),
-                      Text(detail.slug,
-                          style: Theme.of(context).textTheme.bodyMedium),
+                      Text(
+                        detail.slug,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
                       const SizedBox(height: 4),
                       Text('Role: ${detail.role}'),
                       Text('Members: ${detail.memberCount}'),
@@ -181,8 +169,7 @@ class _OrganizationDetailScreenState
                 ),
               ),
               const SizedBox(height: 16),
-              Text('Members',
-                  style: Theme.of(context).textTheme.titleMedium),
+              Text('Members', style: Theme.of(context).textTheme.titleMedium),
               const SizedBox(height: 8),
               AsyncScreenBody(
                 value: membersAsync,
@@ -203,7 +190,10 @@ class _OrganizationDetailScreenState
                               role: role,
                             );
                             ref.invalidate(
-                                organizationMembersProvider(widget.organizationId));
+                              organizationMembersProvider(
+                                widget.organizationId,
+                              ),
+                            );
                           },
                           onRemove: () async {
                             await repo.removeMember(
@@ -211,7 +201,10 @@ class _OrganizationDetailScreenState
                               userId: m.userId,
                             );
                             ref.invalidate(
-                                organizationMembersProvider(widget.organizationId));
+                              organizationMembersProvider(
+                                widget.organizationId,
+                              ),
+                            );
                           },
                         ),
                       )
@@ -267,7 +260,8 @@ class _MemberTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final isSelf = member.userId == currentUserId;
     final canChangeRole = isOwner || (isAdmin && member.role != 'OWNER');
-    final canRemove = !isSelf && (isOwner || (isAdmin && member.role != 'OWNER'));
+    final canRemove =
+        !isSelf && (isOwner || (isAdmin && member.role != 'OWNER'));
 
     return Card(
       child: ListTile(
@@ -301,26 +295,15 @@ class _MemberTile extends StatelessWidget {
               IconButton(
                 icon: const Icon(Icons.remove_circle_outline),
                 onPressed: () async {
-                  final confirmed = await showDialog<bool>(
-                    context: context,
-                    builder: (ctx) => AlertDialog(
-                      title: const Text('Remove member'),
-                      content: Text(
+                  final confirmed = await showConfirmDialog(
+                    context,
+                    title: 'Remove member',
+                    message:
                         'Remove ${member.displayName} from this organization?',
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.of(ctx).pop(false),
-                          child: const Text('Cancel'),
-                        ),
-                        FilledButton(
-                          onPressed: () => Navigator.of(ctx).pop(true),
-                          child: const Text('Remove'),
-                        ),
-                      ],
-                    ),
+                    confirmLabel: 'Remove',
+                    destructive: true,
                   );
-                  if (confirmed == true) onRemove();
+                  if (confirmed) onRemove();
                 },
               ),
           ],

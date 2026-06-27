@@ -58,13 +58,13 @@ class _PreferencesScreenState extends ConsumerState<PreferencesScreen> {
       await ref.read(preferencesRepositoryProvider).updatePreferences(_prefs);
       ref.read(themeModeProvider.notifier).setTheme(_prefs.theme);
       ref.invalidate(preferencesProvider);
-      if (context.mounted) {
+      if (mounted) {
         ScaffoldMessenger.of(context)
           ..clearSnackBars()
           ..showSnackBar(const SnackBar(content: Text('Preferences saved')));
       }
     } catch (e) {
-      if (context.mounted) {
+      if (mounted) {
         ScaffoldMessenger.of(context)
           ..clearSnackBars()
           ..showSnackBar(SnackBar(content: Text('Error: $e')));
@@ -81,13 +81,13 @@ class _PreferencesScreenState extends ConsumerState<PreferencesScreen> {
       await ref.read(preferencesRepositoryProvider).updatePreferences(defaults);
       ref.read(themeModeProvider.notifier).setTheme(defaults.theme);
       ref.invalidate(preferencesProvider);
-      if (context.mounted) {
+      if (mounted) {
         ScaffoldMessenger.of(context)
           ..clearSnackBars()
           ..showSnackBar(const SnackBar(content: Text('Reset to defaults')));
       }
     } catch (e) {
-      if (context.mounted) {
+      if (mounted) {
         ScaffoldMessenger.of(context)
           ..clearSnackBars()
           ..showSnackBar(SnackBar(content: Text('Error: $e')));
@@ -110,50 +110,58 @@ class _PreferencesScreenState extends ConsumerState<PreferencesScreen> {
             padding: const EdgeInsets.all(20),
             children: [
               DropdownButtonFormField<String>(
-                value: _prefs.theme,
+                initialValue: _prefs.theme,
                 decoration: const InputDecoration(labelText: 'Theme'),
                 items: const [
                   DropdownMenuItem(value: 'system', child: Text('System')),
                   DropdownMenuItem(value: 'light', child: Text('Light')),
                   DropdownMenuItem(value: 'dark', child: Text('Dark')),
                 ],
-                onChanged: (v) => setState(() => _prefs = _prefs.copyWith(theme: v)),
+                onChanged: (v) =>
+                    setState(() => _prefs = _prefs.copyWith(theme: v)),
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
-                value: _prefs.language,
+                initialValue: _prefs.language,
                 decoration: const InputDecoration(labelText: 'Language'),
                 items: const [
                   DropdownMenuItem(value: 'en', child: Text('English')),
                   DropdownMenuItem(value: 'vi', child: Text('Vietnamese')),
                 ],
-                onChanged: (v) => setState(() => _prefs = _prefs.copyWith(language: v)),
+                onChanged: (v) =>
+                    setState(() => _prefs = _prefs.copyWith(language: v)),
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
-                value: _timezones.contains(_prefs.timezone)
+                initialValue: _timezones.contains(_prefs.timezone)
                     ? _prefs.timezone
                     : 'UTC',
                 decoration: const InputDecoration(labelText: 'Timezone'),
                 items: _timezones
                     .map((tz) => DropdownMenuItem(value: tz, child: Text(tz)))
                     .toList(),
-                onChanged: (v) => setState(() => _prefs = _prefs.copyWith(timezone: v)),
+                onChanged: (v) =>
+                    setState(() => _prefs = _prefs.copyWith(timezone: v)),
               ),
               const SizedBox(height: 24),
-              Text('Notifications', style: Theme.of(context).textTheme.titleMedium),
+              Text(
+                'Notifications',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
               const SizedBox(height: 8),
               SwitchListTile(
                 title: const Text('Email notifications'),
                 value: _prefs.notificationEmail,
-                onChanged: (v) =>
-                    setState(() => _prefs = _prefs.copyWith(notificationEmail: v)),
+                onChanged: (v) => setState(
+                  () => _prefs = _prefs.copyWith(notificationEmail: v),
+                ),
               ),
               SwitchListTile(
                 title: const Text('Push notifications'),
                 value: _prefs.notificationPush,
-                onChanged: (v) =>
-                    setState(() => _prefs = _prefs.copyWith(notificationPush: v)),
+                onChanged: (v) => setState(
+                  () => _prefs = _prefs.copyWith(notificationPush: v),
+                ),
               ),
               const SizedBox(height: 24),
               FilledButton(

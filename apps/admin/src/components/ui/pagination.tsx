@@ -1,6 +1,7 @@
+import { cn } from "@/lib/utils";
+
 import { Button } from "./button";
 import { Label } from "./label";
-import { cn } from "@/lib/utils";
 
 export const DEFAULT_PAGE_SIZES = [10, 20, 50, 100] as const;
 export type PageSize = (typeof DEFAULT_PAGE_SIZES)[number];
@@ -77,7 +78,7 @@ export function Pagination({
         <Button
           variant="outline"
           size="sm"
-          disabled={isLoading || page <= 1}
+          disabled={(isLoading ?? false) || page <= 1}
           onClick={() => onPageChange(page - 1)}
           className="h-7 px-2 text-xs"
         >
@@ -102,7 +103,7 @@ export function Pagination({
         <Button
           variant="outline"
           size="sm"
-          disabled={isLoading || page >= safeTotalPages}
+          disabled={(isLoading ?? false) || page >= safeTotalPages}
           onClick={() => onPageChange(page + 1)}
           className="h-7 px-2 text-xs"
         >

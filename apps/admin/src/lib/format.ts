@@ -37,3 +37,21 @@ export function truncateId(id: string, length = 8): string {
   if (id.length <= length) return id;
   return `${id.slice(0, length)}…`;
 }
+
+/** Safely stringify API scalar values without `[object Object]`. */
+export function scalarString(value: unknown, fallback = "—"): string {
+  if (value === null || value === undefined) return fallback;
+  if (typeof value === "string") return value;
+  if (
+    typeof value === "number" ||
+    typeof value === "boolean" ||
+    typeof value === "bigint"
+  ) {
+    return String(value);
+  }
+  return fallback;
+}
+
+export function formatUnknownDateTime(value: unknown): string {
+  return typeof value === "string" ? formatDateTime(value) : "—";
+}

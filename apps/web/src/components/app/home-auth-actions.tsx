@@ -1,20 +1,22 @@
 "use client";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, LogOut } from "lucide-react";
+import { LogIn, UserPlus } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
 import type { AuthSessionResponse } from "@/lib/api-types";
 
+import { Avatar } from "@/components/ui/avatar";
 import { buttonVariants } from "@/components/ui/button-variants";
 import { ApiClientError, webFetch } from "@/lib/http";
-import { cn } from "@/lib/utils";
 
-export function HomeAuthActions() {
-  const router = useRouter();
-  const queryClient = useQueryClient();
+type Size = "sm" | "default" | "lg";
+
+interface HomeAuthActionsProps {
+  size?: Size;
+}
+
+export function HomeAuthActions({ size = "sm" }: HomeAuthActionsProps) {
   const session = useQuery({
     queryKey: ["session"],
     queryFn: async () => {
@@ -24,52 +26,36 @@ export function HomeAuthActions() {
         if (error instanceof ApiClientError && error.status === 401) {
           return null;
         }
-
         throw error;
       }
     },
     retry: false,
   });
 
-  const signOut = useMutation({
-    mutationFn: () => webFetch("/api/auth/logout", { method: "POST" }),
-    onSettled: async () => {
-      // Run on success AND failure: the logout route always clears cookies even
-      // when the backend revoke call fails (e.g. an already-expired access
-      // token), so the client must still treat this as a completed sign-out.
-      await queryClient.invalidateQueries({ queryKey: ["session"] });
-      router.refresh();
-    },
-  });
-
   if (session.isSuccess && session.data) {
+    const user = session.data.data.user;
     return (
-      <>
-        <Link href="/dashboard" className={buttonVariants()}>
-          Open workspace
-          <ArrowRight className="ml-2 size-4" />
-        </Link>
-        <button
-          type="button"
-          className={cn(buttonVariants({ variant: "outline" }))}
-          onClick={() => signOut.mutate()}
-          disabled={signOut.isPending}
-        >
-          <LogOut className="mr-2 size-4" />
-          {signOut.isPending ? "Signing out..." : "Sign out"}
-        </button>
-      </>
+      <div className="flex items-center gap-2 rounded-full border border-border bg-muted/50 py-1 pl-1 pr-3 text-sm">
+        <Avatar name={user.displayName} size="sm" />
+        <span className="max-w-[140px] truncate font-medium">
+          {user.displayName}
+        </span>
+      </div>
     );
   }
 
   return (
     <>
-      <Link href="/login" className={buttonVariants({ variant: "outline" })}>
+      <Link
+        href="/login"
+        className={buttonVariants({ variant: "ghost", size })}
+      >
+        <LogIn className="size-4" />
         Sign in
       </Link>
-      <Link href="#features" className={buttonVariants()}>
-        Explore features
-        <ArrowRight className="ml-2 size-4" />
+      <Link href="/register" className={buttonVariants({ size })}>
+        <UserPlus className="size-4" />
+        Get started
       </Link>
     </>
   );

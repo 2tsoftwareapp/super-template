@@ -67,7 +67,7 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
                   title: Text(user.displayName),
                   subtitle: Text('${user.email} · ${user.status}'),
                   trailing: const Icon(Icons.chevron_right),
-                  onTap: () => context.go('/admin/users/${user.id}'),
+                  onTap: () => context.push('/admin/users/${user.id}'),
                 ),
               );
             },

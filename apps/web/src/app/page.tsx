@@ -2,12 +2,16 @@ import {
   CheckCircle2,
   Code2,
   Github,
+  LogIn,
   Monitor,
   Shield,
   Smartphone,
+  UserPlus,
   Zap,
 } from "lucide-react";
 
+import { HomeAuthActions } from "@/components/app/home-auth-actions";
+import { ScrollToTop } from "@/components/app/scroll-to-top";
 import { ArchDiagram } from "@/components/arch-diagram";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -252,22 +256,8 @@ export default function Home() {
               Get started
             </a>
           </nav>
-          <div className="flex items-center justify-end">
-            <Button
-              size="sm"
-              className="bg-foreground text-background hover:bg-foreground/90 hover:text-background"
-              nativeButton={false}
-              render={
-                <a
-                  href="https://github.com/truongnat/super-template"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                />
-              }
-            >
-              <Github className="size-4" />
-              GitHub
-            </Button>
+          <div className="flex items-center justify-end gap-2">
+            <HomeAuthActions />
           </div>
         </div>
       </header>
@@ -298,12 +288,16 @@ export default function Home() {
                 variant="outline"
                 size="lg"
                 nativeButton={false}
-                render={<a href="#features" />}
+                render={
+                  <a
+                    href="https://github.com/truongnat/super-template"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  />
+                }
               >
-                See what&apos;s included
-              </Button>
-              <Button size="lg" nativeButton={false} render={<a href="#get-started" />}>
-                Get started
+                <Github className="size-4" />
+                View on GitHub
               </Button>
             </div>
             <div className="mt-12 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-muted-foreground">
@@ -376,7 +370,7 @@ export default function Home() {
       </section>
 
       {/* ── Architecture ── */}
-      <section id="architecture" className="border-b border-border py-24">
+      <section id="architecture" className="border-b border-border py-32">
         <div className="mx-auto max-w-7xl px-4 md:px-6">
           <div className="mx-auto mb-16 max-w-2xl text-center">
             <Badge variant="outline" className="mb-4">
@@ -490,18 +484,116 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── Auth CTA ── */}
+      <section className="border-b border-border py-24">
+        <div className="mx-auto max-w-7xl px-4 md:px-6">
+          <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
+            <div className="space-y-6">
+              <Badge variant="outline">Authentication</Badge>
+              <h2 className="text-4xl font-bold tracking-tight">
+                Ready-to-use auth flows
+              </h2>
+              <p className="text-muted-foreground">
+                Every common authentication pattern ships out of the box — JWT
+                session management, multi-factor, social login, and secure
+                password recovery.
+              </p>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                {[
+                  "Email + password with Argon2 hashing",
+                  "GitHub, Google & Apple SSO (OAuth2 / OIDC)",
+                  "TOTP two-factor authentication",
+                  "Secure refresh token rotation",
+                  "Password reset via email",
+                  "Email verification flow",
+                  "Session management & revocation",
+                ].map((item) => (
+                  <li key={item} className="flex items-center gap-2">
+                    <CheckCircle2 className="size-4 shrink-0 text-primary" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              {[
+                {
+                  href: "/login",
+                  label: "Sign in",
+                  description: "Email + password or social login",
+                  icon: LogIn,
+                },
+                {
+                  href: "/register",
+                  label: "Create account",
+                  description: "Register with email and password",
+                  icon: UserPlus,
+                },
+                {
+                  href: "/forgot-password",
+                  label: "Forgot password",
+                  description: "Send a password reset email",
+                  icon: Shield,
+                },
+                {
+                  href: "/verify-email",
+                  label: "Verify email",
+                  description: "Confirm your email address",
+                  icon: CheckCircle2,
+                },
+              ].map((item) => {
+                const Icon = item.icon;
+                return (
+                  <a
+                    key={item.href}
+                    href={item.href}
+                    className="group flex flex-col gap-3 rounded-2xl border border-border bg-card p-5 transition-all hover:border-border/80 hover:shadow-sm"
+                  >
+                    <div className="flex size-9 items-center justify-center rounded-lg border border-border bg-muted transition-colors group-hover:bg-muted/70">
+                      <Icon className="size-4" />
+                    </div>
+                    <div>
+                      <p className="font-semibold">{item.label}</p>
+                      <p className="mt-0.5 text-sm text-muted-foreground">
+                        {item.description}
+                      </p>
+                    </div>
+                  </a>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <ScrollToTop />
+
       {/* ── Footer ── */}
       <footer className="py-12">
         <div className="mx-auto max-w-7xl px-4 md:px-6">
-          <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
+          <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
             <div className="flex items-center gap-2.5">
               <div className="flex size-6 items-center justify-center rounded-md bg-foreground">
                 <Zap className="size-3 text-background" />
               </div>
               <span className="text-sm font-semibold">Super Template</span>
             </div>
+            <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
+              <a href="/login" className="hover:text-foreground">Sign in</a>
+              <a href="/register" className="hover:text-foreground">Register</a>
+              <a href="/forgot-password" className="hover:text-foreground">Forgot password</a>
+              <a
+                href="https://github.com/truongnat/super-template"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-foreground"
+              >
+                GitHub
+              </a>
+            </nav>
             <p className="text-center text-sm text-muted-foreground">
-              Production-ready fullstack starter. MIT licensed.
+              MIT licensed.
             </p>
           </div>
         </div>

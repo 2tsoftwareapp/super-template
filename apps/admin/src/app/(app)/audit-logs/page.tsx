@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+
 import { Spinner } from "@/components/ui/spinner";
 
 import { AuditLogsView } from "./audit-logs-view";

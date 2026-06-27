@@ -40,15 +40,14 @@ class UserPreferences {
     bool? notificationEmail,
     bool? notificationPush,
     String? emailFrequency,
-  }) =>
-      UserPreferences(
-        theme: theme ?? this.theme,
-        language: language ?? this.language,
-        timezone: timezone ?? this.timezone,
-        notificationEmail: notificationEmail ?? this.notificationEmail,
-        notificationPush: notificationPush ?? this.notificationPush,
-        emailFrequency: emailFrequency ?? this.emailFrequency,
-      );
+  }) => UserPreferences(
+    theme: theme ?? this.theme,
+    language: language ?? this.language,
+    timezone: timezone ?? this.timezone,
+    notificationEmail: notificationEmail ?? this.notificationEmail,
+    notificationPush: notificationPush ?? this.notificationPush,
+    emailFrequency: emailFrequency ?? this.emailFrequency,
+  );
 }
 
 class PreferencesRepository {
@@ -82,7 +81,9 @@ class PreferencesRepository {
         updatePreferencesDto: UpdatePreferencesDto(
           (b) => b
             ..theme = UpdatePreferencesDtoThemeEnum.valueOf(prefs.theme)
-            ..language = UpdatePreferencesDtoLanguageEnum.valueOf(prefs.language)
+            ..language = UpdatePreferencesDtoLanguageEnum.valueOf(
+              prefs.language,
+            )
             ..timezone = prefs.timezone
             ..notificationPreferences = BuiltMap<String, JsonObject?>({
               'email': JsonObject(prefs.notificationEmail),

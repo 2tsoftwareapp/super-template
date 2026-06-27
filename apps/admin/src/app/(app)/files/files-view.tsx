@@ -24,7 +24,6 @@ import { ResourcePageShell } from "@/components/resource-page-shell";
 import { ResourceToolbar } from "@/components/resource-toolbar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import {
   Card,
   CardContent,
@@ -32,7 +31,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
@@ -45,7 +44,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { adminResources } from "@/lib/admin-resources";
-import { formatDateTime, timeAgo, truncateId } from "@/lib/format";
+import { formatDateTime, scalarString, timeAgo, truncateId } from "@/lib/format";
 import { webFetch } from "@/lib/http";
 import { cn } from "@/lib/utils";
 
@@ -431,7 +430,7 @@ export function FilesView() {
               </div>
               <div>
                 <Label className="text-xs text-muted-foreground">Uploaded by</Label>
-                <p className="text-sm">{String(selectedFile.uploadedById ?? "\u2014")}</p>
+                <p className="text-sm">{scalarString(selectedFile.uploadedById)}</p>
               </div>
               <div>
                 <Label className="text-xs text-muted-foreground">Created</Label>

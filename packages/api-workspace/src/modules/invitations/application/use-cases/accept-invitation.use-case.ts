@@ -9,7 +9,9 @@ import {
   hashOpaqueToken,
   INVITATION_STATUS,
   normalizeEmail,
+  ORGANIZATION_LOOKUP,
   ORGANIZATION_ROLE,
+  type OrganizationLookup,
 } from '@repo/api-core';
 import {
   DATABASE,
@@ -17,7 +19,7 @@ import {
   runInTransaction,
   TenantContextService,
 } from '@repo/api-database';
-import { AccessControlService, OrganizationsRepository } from '@repo/api-identity';
+import { AccessControlService } from '@repo/api-identity';
 
 import type {
   AcceptInvitationCommand,
@@ -40,7 +42,8 @@ export class AcceptInvitationUseCase {
     @Inject(INVITATIONS_REPOSITORY)
     private readonly invitationsRepository: InvitationsRepositoryPort,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
-    private readonly organizationsRepository: OrganizationsRepository,
+    @Inject(ORGANIZATION_LOOKUP)
+    private readonly organizationLookup: OrganizationLookup,
     private readonly accessControlService: AccessControlService,
     private readonly tenantContextService: TenantContextService,
   ) {}
@@ -109,7 +112,7 @@ export class AcceptInvitationUseCase {
           }
 
           if (invitation.entityType === INVITATION_ENTITY.ORGANIZATION) {
-            const organization = await this.organizationsRepository.findById(
+            const organization = await this.organizationLookup.findById(
               invitation.entityId,
               transaction,
             );
@@ -127,7 +130,7 @@ export class AcceptInvitationUseCase {
                 ? ORGANIZATION_ROLE.ADMIN
                 : ORGANIZATION_ROLE.MEMBER;
 
-            await this.organizationsRepository.upsertMember(
+            await this.organizationLookup.upsertMember(
               {
                 organizationId: invitation.entityId,
                 userId: acceptedById,

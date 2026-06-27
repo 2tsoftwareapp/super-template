@@ -37,7 +37,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Tooltip } from "@/components/ui/tooltip";
 import { adminResources } from "@/lib/admin-resources";
-import { formatDateTime, timeAgo } from "@/lib/format";
+import { formatUnknownDateTime, scalarString, timeAgo } from "@/lib/format";
 import { webFetch } from "@/lib/http";
 import { cn } from "@/lib/utils";
 
@@ -108,7 +108,7 @@ export function NotificationsView() {
         method: "POST",
         body: JSON.stringify(input),
       }),
-    onSuccess: (result) => {
+    onSuccess: (_result) => {
       toast.success("Notification job queued");
       setTitle("");
       setBody("");
@@ -116,7 +116,7 @@ export function NotificationsView() {
       setUserId("");
       setUserIds("");
       setAudience("ALL");
-      queryClient.invalidateQueries({ queryKey: ["admin-notification-jobs"] });
+      void queryClient.invalidateQueries({ queryKey: ["admin-notification-jobs"] });
     },
     onError: () => {
       toast.error("Failed to queue notification");
@@ -130,7 +130,7 @@ export function NotificationsView() {
       }),
     onSuccess: () => {
       toast.success("Job cancelled");
-      queryClient.invalidateQueries({ queryKey: ["admin-notification-jobs"] });
+      void queryClient.invalidateQueries({ queryKey: ["admin-notification-jobs"] });
     },
   });
 
@@ -151,8 +151,8 @@ export function NotificationsView() {
   };
 
   const invalidateAll = () => {
-    jobs.refetch();
-    recentNotifications.refetch();
+    void jobs.refetch();
+    void recentNotifications.refetch();
   };
 
   return (
@@ -326,7 +326,7 @@ export function NotificationsView() {
                             <Tooltip
                               content={
                                 s === "FAILED" && job.errorMessage
-                                  ? String(job.errorMessage)
+                                  ? scalarString(job.errorMessage)
                                   : s
                               }
                               side="top"
@@ -344,18 +344,18 @@ export function NotificationsView() {
                             </Tooltip>
                           </TableCell>
                           <TableCell className="text-xs text-muted-foreground">
-                            {job.recipientCount != null ? String(job.recipientCount) : "—"}
+                            {scalarString(job.recipientCount)}
                           </TableCell>
                           <TableCell className="text-xs text-muted-foreground">
                             <Tooltip
                               content={
                                 job.processedAt
-                                  ? `Processed ${formatDateTime(String(job.processedAt))}`
-                                  : formatDateTime(String(job.scheduledAt))
+                                  ? `Processed ${formatUnknownDateTime(job.processedAt)}`
+                                  : formatUnknownDateTime(job.scheduledAt)
                               }
                               side="top"
                             >
-                              <span>{timeAgo(String(job.scheduledAt))}</span>
+                              <span>{timeAgo(scalarString(job.scheduledAt, ""))}</span>
                             </Tooltip>
                           </TableCell>
                           <TableCell>
@@ -420,7 +420,9 @@ export function NotificationsView() {
                     </div>
                     <div className="mt-1.5 flex items-center gap-2 text-[10px] text-muted-foreground">
                       <span>{timeAgo(String(item.createdAt))}</span>
-                      {item.readAt && <span>· Read {timeAgo(String(item.readAt))}</span>}
+                      {item.readAt && (
+                        <span>· Read {timeAgo(scalarString(item.readAt, ""))}</span>
+                      )}
                     </div>
                   </div>
                 ))

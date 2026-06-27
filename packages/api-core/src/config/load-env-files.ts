@@ -1,24 +1,11 @@
-import { config as loadEnv } from 'dotenv';
-import { resolve } from 'node:path';
-
-// Candidate roots cover both ways this process gets started: cwd at the monorepo
-// root, or cwd at apps/api (pnpm --filter api / Nest CLI / drizzle-kit / jest).
-const candidateRoots = [
-  process.cwd(),
-  resolve(process.cwd(), '../..'),
-  resolve(__dirname, '../../../..'),
-  resolve(__dirname, '../../../../../..'),
-];
+import { loadEnvFiles as loadLayeredEnvFiles } from '@repo/env-loader';
 
 /**
- * Single source of truth for loading repo env files into process.env. dotenv never
- * overrides a key that's already set, so .env always wins over .env.example, and
- * whichever candidate root resolves first wins over the rest.
+ * Loads the repo's layered env files into process.env. Thin wrapper around the
+ * shared {@link @repo/env-loader} so both the API and the Next apps resolve env
+ * the exact same way. dotenv never overrides an already-set key, so real process
+ * env always wins (see the shared loader for the full precedence order).
  */
 export const loadEnvFiles = (): void => {
-  for (const filename of ['.env', '.env.example']) {
-    for (const root of candidateRoots) {
-      loadEnv({ path: resolve(root, filename), quiet: true });
-    }
-  }
+  loadLayeredEnvFiles();
 };

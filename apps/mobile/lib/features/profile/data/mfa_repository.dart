@@ -9,10 +9,7 @@ final mfaRepositoryProvider = Provider<MfaRepository>(
 );
 
 class MfaSetupInfo {
-  const MfaSetupInfo({
-    required this.secret,
-    required this.otpauthUrl,
-  });
+  const MfaSetupInfo({required this.secret, required this.otpauthUrl});
 
   final String secret;
   final String otpauthUrl;

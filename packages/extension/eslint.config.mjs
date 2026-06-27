@@ -48,5 +48,5 @@ export default defineConfig([
       ],
     },
   },
-  globalIgnores(["dist/**", "eslint.config.mjs", "scripts/**/*.mjs", "vite.config.mts"]),
+  globalIgnores(["dist/**", "eslint.config.mjs", "scripts/**/*.mjs", "vite.config.mts", "**/*.cjs"]),
 ]);

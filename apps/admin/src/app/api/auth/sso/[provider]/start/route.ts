@@ -2,6 +2,8 @@ import type { NextRequest } from "next/server";
 
 import { NextResponse } from "next/server";
 
+import type { ApiEnvelope } from "@/lib/api-types";
+
 import { callBackend } from "@/lib/server/backend";
 
 export async function GET(
@@ -18,6 +20,6 @@ export async function GET(
     headers: new Headers({ accept: "application/json" }),
   });
 
-  const payload = await response.json();
+  const payload = (await response.json()) as ApiEnvelope<unknown>;
   return NextResponse.json(payload, { status: response.status });
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mobile_app/core/widgets/widgets.dart';
 import 'package:mobile_app/features/profile/data/mfa_repository.dart';
 import 'package:mobile_app/features/profile/data/profile_repository.dart';
 
@@ -52,11 +53,15 @@ class _SecurityScreenState extends ConsumerState<SecurityScreen> {
                   'Scan the QR code in your authenticator app, or manually enter the secret key below.',
                 ),
                 const SizedBox(height: 16),
-                const Text('Secret key:',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
+                const Text(
+                  'Secret key:',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
                 const SizedBox(height: 4),
-                SelectableText(setupInfo.secret,
-                    style: const TextStyle(fontFamily: 'monospace')),
+                SelectableText(
+                  setupInfo.secret,
+                  style: const TextStyle(fontFamily: 'monospace'),
+                ),
                 const SizedBox(height: 16),
                 TextField(
                   controller: _mfaCodeController,
@@ -92,11 +97,7 @@ class _SecurityScreenState extends ConsumerState<SecurityScreen> {
         if (mounted) _showRecoveryCodes(recoveryCodes);
       }
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context)
-          ..clearSnackBars()
-          ..showSnackBar(SnackBar(content: Text('MFA setup error: $e')));
-      }
+      if (mounted) showErrorSnackBar(context, e);
     }
   }
 
@@ -122,8 +123,10 @@ class _SecurityScreenState extends ConsumerState<SecurityScreen> {
                   children: [
                     const Icon(Icons.fiber_manual_record, size: 8),
                     const SizedBox(width: 8),
-                    SelectableText(c,
-                        style: const TextStyle(fontFamily: 'monospace')),
+                    SelectableText(
+                      c,
+                      style: const TextStyle(fontFamily: 'monospace'),
+                    ),
                   ],
                 ),
               ),
@@ -173,17 +176,9 @@ class _SecurityScreenState extends ConsumerState<SecurityScreen> {
       try {
         await ref.read(mfaRepositoryProvider).disable(code);
         ref.invalidate(mfaStatusProvider);
-        if (mounted) {
-          ScaffoldMessenger.of(context)
-            ..clearSnackBars()
-            ..showSnackBar(const SnackBar(content: Text('MFA disabled')));
-        }
+        if (mounted) showSuccessSnackBar(context, 'MFA disabled');
       } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context)
-            ..clearSnackBars()
-            ..showSnackBar(SnackBar(content: Text('Error: $e')));
-        }
+        if (mounted) showErrorSnackBar(context, e);
       }
     }
   }
@@ -219,16 +214,29 @@ class _SecurityScreenState extends ConsumerState<SecurityScreen> {
     );
     if (code != null && code.length == 6) {
       try {
-        final codes =
-            await ref.read(mfaRepositoryProvider).regenerateRecoveryCodes(code);
+        final codes = await ref
+            .read(mfaRepositoryProvider)
+            .regenerateRecoveryCodes(code);
         if (mounted) _showRecoveryCodes(codes);
       } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context)
-            ..clearSnackBars()
-            ..showSnackBar(SnackBar(content: Text('Error: $e')));
-        }
+        if (mounted) showErrorSnackBar(context, e);
       }
+    }
+  }
+
+  Future<void> _changePassword() async {
+    try {
+      await ref
+          .read(profileRepositoryProvider)
+          .changePassword(
+            currentPassword: _currentController.text,
+            newPassword: _nextController.text,
+          );
+      _currentController.clear();
+      _nextController.clear();
+      if (mounted) showSuccessSnackBar(context, 'Password updated');
+    } catch (e) {
+      if (mounted) showErrorSnackBar(context, e);
     }
   }
 
@@ -243,41 +251,29 @@ class _SecurityScreenState extends ConsumerState<SecurityScreen> {
         children: [
           Text('Password', style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 12),
-          TextField(
+          AppTextField(
             controller: _currentController,
-            decoration:
-                const InputDecoration(labelText: 'Current password'),
-            obscureText: true,
+            label: 'Current password',
+            obscure: true,
+            prefixIcon: Icons.lock_outline_rounded,
           ),
           const SizedBox(height: 16),
-          TextField(
+          AppTextField(
             controller: _nextController,
-            decoration: const InputDecoration(labelText: 'New password'),
-            obscureText: true,
+            label: 'New password',
+            obscure: true,
+            prefixIcon: Icons.lock_reset_rounded,
           ),
           const SizedBox(height: 16),
-          FilledButton(
-            onPressed: () async {
-              final messenger = ScaffoldMessenger.of(context);
-              await ref
-                  .read(profileRepositoryProvider)
-                  .changePassword(
-                    currentPassword: _currentController.text,
-                    newPassword: _nextController.text,
-                  );
-              messenger.showSnackBar(
-                const SnackBar(content: Text('Password updated')),
-              );
-            },
-            child: const Text('Update password'),
-          ),
+          AppButton(label: 'Update password', onPressed: _changePassword),
           const SizedBox(height: 32),
-          Text('Two-factor authentication',
-              style: Theme.of(context).textTheme.titleMedium),
+          Text(
+            'Two-factor authentication',
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
           const SizedBox(height: 12),
           mfaStatus.when(
-            loading: () =>
-                const Center(child: CircularProgressIndicator()),
+            loading: () => const Center(child: CircularProgressIndicator()),
             error: (e, _) => Text('Error: $e'),
             data: (enabled) {
               if (enabled) {
@@ -292,14 +288,16 @@ class _SecurityScreenState extends ConsumerState<SecurityScreen> {
                       ],
                     ),
                     const SizedBox(height: 12),
-                    OutlinedButton(
+                    AppButton(
+                      label: 'Disable MFA',
+                      variant: AppButtonVariant.outline,
                       onPressed: _disableMfa,
-                      child: const Text('Disable MFA'),
                     ),
                     const SizedBox(height: 8),
-                    OutlinedButton(
+                    AppButton(
+                      label: 'Regenerate recovery codes',
+                      variant: AppButtonVariant.outline,
                       onPressed: _regenerateCodes,
-                      child: const Text('Regenerate recovery codes'),
                     ),
                   ],
                 );
@@ -309,10 +307,7 @@ class _SecurityScreenState extends ConsumerState<SecurityScreen> {
                 children: [
                   const Text('MFA is not enabled.'),
                   const SizedBox(height: 12),
-                  FilledButton(
-                    onPressed: _setupMfa,
-                    child: const Text('Enable MFA'),
-                  ),
+                  AppButton(label: 'Enable MFA', onPressed: _setupMfa),
                 ],
               );
             },

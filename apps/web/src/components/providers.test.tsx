@@ -8,18 +8,14 @@ const { setThemeMock, webFetchMock } = vi.hoisted(() => ({
   webFetchMock: vi.fn(),
 }));
 
-vi.mock("next-themes", async () => {
-  const actual = await vi.importActual<typeof import("next-themes")>(
-    "next-themes",
-  );
-
-  return {
-    ...actual,
-    useTheme: () => ({
-      setTheme: setThemeMock,
-    }),
-  };
-});
+vi.mock("@/lib/theme", () => ({
+  ThemeProvider: ({ children }: { children: React.ReactNode }) => children,
+  useTheme: () => ({
+    theme: "system",
+    resolvedTheme: "light",
+    setTheme: setThemeMock,
+  }),
+}));
 
 vi.mock("@/hooks/use-session", () => ({
   useSession: () => ({

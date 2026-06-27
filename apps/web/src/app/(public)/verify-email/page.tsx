@@ -1,45 +1,29 @@
-"use client";
-
-import { useMutation } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { Suspense } from "react";
 
 import { AuthShell } from "@/components/auth/auth-shell";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { webFetch } from "@/lib/http";
-import { useSearchParams } from "next/navigation";
+import { Skeleton } from "@/components/ui/skeleton";
 
-export default function VerifyEmailPage() {
-  const searchParams = useSearchParams();
-  const token = searchParams.get("token") ?? "";
+import { VerifyEmailView } from "./verify-email-view";
 
-  const mutation = useMutation({
-    mutationFn: () =>
-      webFetch("/api/bff/auth/verify-email", {
-        method: "POST",
-        body: JSON.stringify({ token }),
-      }),
-    onSuccess: () => toast.success("Email verified"),
-    onError: (error: Error) => toast.error(error.message),
-  });
-
+function VerifyEmailFallback() {
   return (
     <AuthShell
       eyebrow="Email verification"
-      title="Verify email"
-      body="Complete verification using the token from Mailpit."
+      title="Verify your email"
+      body="Loading verification details…"
+      footer={
+        <Skeleton className="mx-auto h-4 w-40" aria-hidden="true" />
+      }
     >
-      <Card className="border-0 bg-transparent shadow-none">
-        <CardContent className="p-6">
-          <Button
-            className="w-full"
-            onClick={() => mutation.mutate()}
-            disabled={!token}
-          >
-            {mutation.isPending ? "Verifying email..." : "Verify email"}
-          </Button>
-        </CardContent>
-      </Card>
+      <Skeleton className="h-10 w-full" aria-hidden="true" />
     </AuthShell>
+  );
+}
+
+export default function VerifyEmailPage() {
+  return (
+    <Suspense fallback={<VerifyEmailFallback />}>
+      <VerifyEmailView />
+    </Suspense>
   );
 }
