@@ -33,6 +33,7 @@ android/app/release
 !.env.production.example
 apps/api/drizzle/meta
 apps/api/storage/uploads/
+apps/api/storage/exports/
 *.tsbuildinfo
 
 # Firebase — copy from *.example after creating your Firebase project
