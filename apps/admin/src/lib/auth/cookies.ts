@@ -1,10 +1,17 @@
 import { createAuthCookieHelpers } from "@repo/web-core/auth/cookies";
 
+import {
+  ACCESS_TOKEN_COOKIE,
+  CSRF_TOKEN_COOKIE,
+  REFRESH_TOKEN_COOKIE,
+} from "@/lib/auth/cookie-names";
 import { env, isSecureCookie } from "@/lib/env";
 
-export const ACCESS_TOKEN_COOKIE = "st_admin_access_token";
-export const REFRESH_TOKEN_COOKIE = "st_admin_refresh_token";
-export const CSRF_TOKEN_COOKIE = "st_admin_csrf";
+export {
+  ACCESS_TOKEN_COOKIE,
+  CSRF_TOKEN_COOKIE,
+  REFRESH_TOKEN_COOKIE,
+} from "@/lib/auth/cookie-names";
 
 const auth = createAuthCookieHelpers({
   cookieDomain: env.COOKIE_DOMAIN,
