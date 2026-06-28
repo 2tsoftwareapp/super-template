@@ -19,7 +19,7 @@
 
 ## Backend Boundaries
 
-API features live in bounded-context packages (`api-identity`, `api-platform`, `api-workspace`) using the layered module shape documented in [clean-architecture-plan.md](./clean-architecture-plan.md): `presentation/` → `application/` → `infrastructure/`, with cross-context communication via `api-core` port tokens and global `*PortsModule` wiring at the composition root.
+API features live in bounded-context packages (`api-identity`, `api-platform`, `api-workspace`) using a layered module shape — `presentation/` → `application/` → `infrastructure/`, with cross-context communication via `api-core` port tokens and global `*PortsModule` wiring at the composition root.
 
 ### Core (default)
 

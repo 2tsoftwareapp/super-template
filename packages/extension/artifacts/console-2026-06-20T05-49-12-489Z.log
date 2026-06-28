@@ -1,7 +1,0 @@
-[     485ms] [LOG] [GOOGLE:AD] Ad Settings: {post_id: full-stack, page_type: roadmap, category: Array(2)} @ https://roadmap.sh/assets/root-DNRwXlCC.js:13
-[    1170ms] [WARNING] [GPT] PubAdsService.disableInitialLoad is deprecated, use googletag.setConfig({disableInitialLoad: ...}) instead.
-https://goo.gle/gpt-message#170 @ https://securepubads.g.doubleclick.net/pagead/managed/js/gpt/m202606150101/pubads_impl.js:18
-[    1172ms] [WARNING] [GPT] Invalid value encountered when calling: googletag.setConfig.targeting: {"b_totalvisittimeonch":[5232]}
-https://goo.gle/gpt-message#159 @ https://securepubads.g.doubleclick.net/pagead/managed/js/gpt/m202606150101/pubads_impl.js:18
-[    2235ms] [WARNING] [GPT] Invalid value encountered when calling: googletag.setConfig.targeting: {"b_totalvisittimeonch":[5232]}
-https://goo.gle/gpt-message#159 @ https://securepubads.g.doubleclick.net/pagead/managed/js/gpt/m202606150101/pubads_impl.js:18
