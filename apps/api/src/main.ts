@@ -21,6 +21,9 @@ const pipeConfigs: ValidationPipeOptions = {
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     bufferLogs: true,
+    // Surface DI/module init failures (e.g. circular dependencies) with a real
+    // error instead of a silent process.abort(). Mirrors the e2e test harness.
+    abortOnError: false,
   });
 
   const environmentService = app.get(EnvironmentService);
