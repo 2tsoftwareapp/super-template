@@ -1,3 +1,0 @@
-id,actorId,action,entityType,entityId,metadata,ipAddress,requestId,createdAt
-83ed390c-205a-4e01-ad9f-43d2463b0f29,6bf553af-7e32-40c0-9a22-582cfdd7fc16,admin.user.created,user,5b482b49-6ee8-4b75-83ea-5ee3cdc07395,"{""role"":""USER"",""email"":""audit-export-1782147202733@example.test"",""status"":""ACTIVE"",""organizationId"":null}",::ffff:127.0.0.1,918815e6-5bb8-46ac-8c5c-96e5166bacad,2026-06-22T16:53:22.738Z
-94b7d80f-02d5-4a81-8a06-c3b88553cf3e,6bf553af-7e32-40c0-9a22-582cfdd7fc16,admin.user.created,user,c8ceef08-3632-4018-8044-8dc944fc7078,"{""role"":""USER"",""email"":""audit-search-1782147202527@example.test"",""status"":""ACTIVE"",""organizationId"":null}",::ffff:127.0.0.1,3bb3fda9-aff3-427a-9916-eebacd55fe80,2026-06-22T16:53:22.538Z
