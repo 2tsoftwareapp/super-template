@@ -18,7 +18,7 @@
     "db:reset": "ts-node -r tsconfig-paths/register --files --project tsconfig.json src/cli/reset.ts",
     "db:studio": "drizzle-kit studio --config drizzle.config.ts",
     "start": "node dist/main",
-    "test": "vitest run test/unit ../../packages/api-core/src ../../packages/api-identity/src ../../packages/api-workspace/src ../../packages/api-platform/src",
+    "test": "vitest run test/unit ../../packages/api-core/src ../../packages/api-identity/src ../../packages/api-workspace/src ../../packages/api-platform/src ../../packages/env-loader/src",
     "test:watch": "vitest",
     "test:cov": "vitest run --coverage",
     "test:e2e": "vitest run test/*.e2e.spec.ts --maxWorkers=1",
