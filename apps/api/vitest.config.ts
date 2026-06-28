@@ -32,6 +32,7 @@ export default defineConfig({
       '../../packages/api-health/src/**/*.{test,spec}.ts',
       '../../packages/api-workspace/src/**/*.{test,spec}.ts',
       '../../packages/api-platform/src/**/*.{test,spec}.ts',
+      '../../packages/env-loader/src/**/*.{test,spec}.ts',
     ],
   },
   resolve: {
