@@ -1,0 +1,537 @@
+# Instincts generated from https://github.com/truongnat/super-template
+# Generated: 2026-06-28T10:25:42.770Z
+# Version: 2.0
+# NOTE: This file supplements (does not replace) any existing curated instincts.
+# High-confidence manually curated instincts should be preserved alongside these.
+
+---
+id: super-template-commit-conventional
+trigger: "when writing a commit message"
+confidence: 0.85
+domain: git
+source: repo-analysis
+source_repo: https://github.com/truongnat/super-template
+---
+
+# Super Template Commit Conventional
+
+## Action
+
+Use conventional commit format with prefixes: fix, chore, test, docs, feat
+
+## Evidence
+
+- 18 commits analyzed
+- Detected conventional commit pattern
+- Examples: chore: remove agent tooling and scratch files from template, docs: add license, community health files, and CLAUDE.md
+
+---
+id: super-template-commit-length
+trigger: "when writing a commit message"
+confidence: 0.6
+domain: git
+source: repo-analysis
+source_repo: https://github.com/truongnat/super-template
+---
+
+# Super Template Commit Length
+
+## Action
+
+Write moderate-length commit messages (~54 characters)
+
+## Evidence
+
+- Average commit message length: 54 chars
+- Based on 18 commits
+
+---
+id: super-template-naming-files
+trigger: "when creating a new file"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/truongnat/super-template
+---
+
+# Super Template Naming Files
+
+## Action
+
+Use kebab-case naming convention
+
+## Evidence
+
+- Analyzed file naming patterns in repository
+- Dominant pattern: kebab-case
+
+---
+id: super-template-import-alias
+trigger: "when importing modules"
+confidence: 0.85
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/truongnat/super-template
+---
+
+# Super Template Import Alias
+
+## Action
+
+Use path aliases (@/, ~/) instead of relative imports
+
+## Evidence
+
+- Import analysis shows alias pattern
+- Example: import { x } from '@/lib/x'
+
+---
+id: super-template-export-style
+trigger: "when exporting from a module"
+confidence: 0.7
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/truongnat/super-template
+---
+
+# Super Template Export Style
+
+## Action
+
+Prefer named exports
+
+## Evidence
+
+- Export pattern analysis
+- Dominant style: named
+
+---
+id: super-template-arch-feature-based
+trigger: "when adding a new feature"
+confidence: 0.85
+domain: architecture
+source: repo-analysis
+source_repo: https://github.com/truongnat/super-template
+---
+
+# Super Template Arch Feature Based
+
+## Action
+
+Create a new folder in src/features/ with all related code colocated
+
+## Evidence
+
+- Feature-based module organization detected
+- Structure: src/features/[feature-name]/
+
+---
+id: super-template-test-framework
+trigger: "when writing tests"
+confidence: 0.9
+domain: testing
+source: repo-analysis
+source_repo: https://github.com/truongnat/super-template
+---
+
+# Super Template Test Framework
+
+## Action
+
+Use vitest as the test framework
+
+## Evidence
+
+- Test framework detected: vitest
+- File pattern: *.spec.ts
+
+---
+id: super-template-test-naming
+trigger: "when creating a test file"
+confidence: 0.85
+domain: testing
+source: repo-analysis
+source_repo: https://github.com/truongnat/super-template
+---
+
+# Super Template Test Naming
+
+## Action
+
+Name test files using the pattern: *.spec.ts
+
+## Evidence
+
+- File pattern: *.spec.ts
+- Consistent across test files
+
+---
+id: super-template-test-types
+trigger: "when planning tests for a feature"
+confidence: 0.7
+domain: testing
+source: repo-analysis
+source_repo: https://github.com/truongnat/super-template
+---
+
+# Super Template Test Types
+
+## Action
+
+Write unit, integration, e2e tests to match project standards
+
+## Evidence
+
+- Test types detected: unit, integration, e2e
+- Coverage config: no
+
+---
+id: super-template-workflow-remove-generated-or-artifact-files
+trigger: "when doing remove generated or artifact files"
+confidence: 0.6
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/truongnat/super-template
+---
+
+# Super Template Workflow Remove Generated Or Artifact Files
+
+## Action
+
+Follow the remove-generated-or-artifact-files workflow:
+1. Identify and delete generated or artifact files from the repository (e.g., logs, CSV exports, scratch files, extension artifacts).
+2. Update .gitignore to include the relevant directories or file patterns.
+3. Optionally, update documentation if references to these files exist.
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~2x per month
+- Files: .gitignore, packages/extension/artifacts/*, apps/api/storage/exports/*
+
+---
+id: super-template-workflow-add-or-update-tests-for-core-modules
+trigger: "when doing add or update tests for core modules"
+confidence: 0.6
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/truongnat/super-template
+---
+
+# Super Template Workflow Add Or Update Tests For Core Modules
+
+## Action
+
+Follow the add-or-update-tests-for-core-modules workflow:
+1. Identify core modules/packages lacking tests or with uncovered logic.
+2. Create new test files (e.g., .spec.ts) or update existing ones.
+3. Update test runner configuration (e.g., vitest config, package.json test scripts) to include new test paths.
+4. Verify that tests are picked up and run in CI or local scripts.
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~2x per month
+- Files: packages/*/src/**/*.spec.ts, apps/api/vitest.config.ts, apps/api/package.json
+
+---
+id: super-template-workflow-fix-lint-or-type-errors-monorepo-wide
+trigger: "when doing fix lint or type errors monorepo wide"
+confidence: 0.6
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/truongnat/super-template
+---
+
+# Super Template Workflow Fix Lint Or Type Errors Monorepo Wide
+
+## Action
+
+Follow the fix-lint-or-type-errors-monorepo-wide workflow:
+1. Identify lint/type errors via CI or local scripts.
+2. Update source files to fix lint/type issues (e.g., type/interface changes, import ordering, export maps).
+3. Update or add eslint/vitest config as needed to ignore or include files.
+4. Run lint/verify scripts to confirm all errors are resolved.
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~2x per month
+- Files: eslint.config.mjs, packages/*/src/**/*.ts, apps/*/src/**/*.ts
+
+---
+id: super-template-instinct-file-naming
+trigger: "When creating or renaming a file in the repository"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: truongnat/super-template
+---
+
+# Super Template Instinct File Naming
+
+## Action
+
+Use kebab-case for file names
+
+## Evidence
+
+- Pattern in namingConventions.files
+- Seen in packages/web-core/package.json
+
+---
+id: super-template-instinct-function-naming
+trigger: "When defining a function"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: truongnat/super-template
+---
+
+# Super Template Instinct Function Naming
+
+## Action
+
+Use camelCase for function names
+
+## Evidence
+
+- Pattern in namingConventions.functions
+
+---
+id: super-template-instinct-class-naming
+trigger: "When defining a class"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: truongnat/super-template
+---
+
+# Super Template Instinct Class Naming
+
+## Action
+
+Use PascalCase for class names
+
+## Evidence
+
+- Pattern in namingConventions.classes
+
+---
+id: super-template-instinct-constant-naming
+trigger: "When defining a constant"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: truongnat/super-template
+---
+
+# Super Template Instinct Constant Naming
+
+## Action
+
+Use SCREAMING_SNAKE_CASE for constant names
+
+## Evidence
+
+- Pattern in namingConventions.constants
+
+---
+id: super-template-instinct-import-alias
+trigger: "When importing modules"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: truongnat/super-template
+---
+
+# Super Template Instinct Import Alias
+
+## Action
+
+Use alias import style
+
+## Evidence
+
+- Pattern in importStyle
+
+---
+id: super-template-instinct-named-exports
+trigger: "When exporting from a module"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: truongnat/super-template
+---
+
+# Super Template Instinct Named Exports
+
+## Action
+
+Use named exports
+
+## Evidence
+
+- Pattern in exportStyle
+
+---
+id: super-template-instinct-test-file-pattern
+trigger: "When creating a test file"
+confidence: 0.9
+domain: testing
+source: repo-analysis
+source_repo: truongnat/super-template
+---
+
+# Super Template Instinct Test File Pattern
+
+## Action
+
+Name the file with a .spec.ts suffix
+
+## Evidence
+
+- Pattern in testing.filePattern
+- Seen in packages/*/src/**/*.spec.ts
+
+---
+id: super-template-instinct-test-framework
+trigger: "When writing or configuring tests"
+confidence: 0.9
+domain: testing
+source: repo-analysis
+source_repo: truongnat/super-template
+---
+
+# Super Template Instinct Test Framework
+
+## Action
+
+Use Vitest as the test framework
+
+## Evidence
+
+- Pattern in testing.framework
+- Seen in apps/api/vitest.config.ts
+
+---
+id: super-template-instinct-test-types
+trigger: "When planning tests for a module"
+confidence: 0.8
+domain: testing
+source: repo-analysis
+source_repo: truongnat/super-template
+---
+
+# Super Template Instinct Test Types
+
+## Action
+
+Include unit, integration, and e2e tests as appropriate
+
+## Evidence
+
+- Pattern in testing.testTypes
+
+---
+id: super-template-instinct-conventional-commits
+trigger: "When writing a commit message"
+confidence: 0.9
+domain: git
+source: repo-analysis
+source_repo: truongnat/super-template
+---
+
+# Super Template Instinct Conventional Commits
+
+## Action
+
+Use conventional commit prefixes: fix, chore, test, docs, feat, style
+
+## Evidence
+
+- Pattern in commits.prefixes
+- Seen in commit: 'fix: resolve pre-existing web-core lint errors blocking verify'
+- Seen in commit: 'docs: add license, community health files, and CLAUDE.md'
+
+---
+id: super-template-instinct-commit-length
+trigger: "When composing a commit message"
+confidence: 0.7
+domain: git
+source: repo-analysis
+source_repo: truongnat/super-template
+---
+
+# Super Template Instinct Commit Length
+
+## Action
+
+Keep commit message length around 54 characters on average
+
+## Evidence
+
+- Pattern in commits.averageLength
+
+---
+id: super-template-instinct-remove-artifacts
+trigger: "When cleaning up the repository of generated or artifact files"
+confidence: 0.95
+domain: workflow
+source: repo-analysis
+source_repo: truongnat/super-template
+---
+
+# Super Template Instinct Remove Artifacts
+
+## Action
+
+Delete generated/artifact files and update .gitignore to prevent future commits
+
+## Evidence
+
+- Workflow: remove-generated-or-artifact-files
+- Seen in commit: 'chore: remove agent tooling and scratch files from template'
+- Pattern in files: .gitignore, packages/extension/artifacts/*
+
+---
+id: super-template-instinct-add-or-update-tests
+trigger: "When improving test coverage or adding tests for new features"
+confidence: 0.9
+domain: workflow
+source: repo-analysis
+source_repo: truongnat/super-template
+---
+
+# Super Template Instinct Add Or Update Tests
+
+## Action
+
+Add or update .spec.ts files and ensure test configs include them
+
+## Evidence
+
+- Workflow: add-or-update-tests-for-core-modules
+- Pattern in files: packages/*/src/**/*.spec.ts, apps/api/vitest.config.ts
+
+---
+id: super-template-instinct-fix-lint-type-errors
+trigger: "When lint or type errors are detected in the monorepo"
+confidence: 0.9
+domain: workflow
+source: repo-analysis
+source_repo: truongnat/super-template
+---
+
+# Super Template Instinct Fix Lint Type Errors
+
+## Action
+
+Fix source files and update configs to resolve all lint/type errors
+
+## Evidence
+
+- Workflow: fix-lint-or-type-errors-monorepo-wide
+- Seen in commit: 'fix: resolve remaining lint errors so pnpm lint passes monorepo-wide'
+- Pattern in files: eslint.config.mjs, packages/*/src/**/*.ts
+
