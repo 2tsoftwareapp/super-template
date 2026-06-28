@@ -1,7 +1,7 @@
-type AuthTokenFields = {
+interface AuthTokenFields {
   accessToken?: string;
   refreshToken?: string;
-};
+}
 
 export function stripTokensFromAuthData<T extends AuthTokenFields>(
   data: T | null | undefined,
