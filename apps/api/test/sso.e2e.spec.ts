@@ -33,6 +33,9 @@ describe('SSO (e2e, fake provider)', () => {
 
   beforeAll(async () => {
     process.env.SSO_FAKE_PROVIDER_ENABLED = 'true';
+    // Allow this test's redirect origin regardless of the developer's local
+    // WEB_ORIGIN (e.g. a custom dev port), so the suite is self-contained.
+    process.env.WEB_ORIGIN = new URL(REDIRECT_URI).origin;
     await resetTestDatabase();
     app = await createTestApp();
   });

@@ -8,6 +8,7 @@
     "./api-types": "./src/api-types.ts",
     "./auth": "./src/auth/index.ts",
     "./auth/cookies": "./src/auth/cookies.ts",
+    "./auth/sanitize-response": "./src/auth/sanitize-response.ts",
     "./components": "./src/components/index.ts",
     "./components/alert": "./src/components/alert.tsx",
     "./components/avatar": "./src/components/avatar.tsx",

@@ -271,10 +271,8 @@ class AuthRepository {
         '/api/v1/auth/sso/exchange',
         data: {'code': exchangeCode},
       );
-      final accessToken =
-          response.data?['data']?['accessToken'] as String?;
-      final refreshToken =
-          response.data?['data']?['refreshToken'] as String?;
+      final accessToken = response.data?['data']?['accessToken'] as String?;
+      final refreshToken = response.data?['data']?['refreshToken'] as String?;
       if (accessToken == null || refreshToken == null) {
         throw AppException('Invalid SSO exchange response');
       }
@@ -292,8 +290,7 @@ class AuthRepository {
         '/api/v1/auth/switch-organization',
         data: {'organizationId': organizationId},
       );
-      final accessToken =
-          response.data?['data']?['accessToken'] as String?;
+      final accessToken = response.data?['data']?['accessToken'] as String?;
       if (accessToken != null) {
         final current = await _storage.read();
         if (current != null) {

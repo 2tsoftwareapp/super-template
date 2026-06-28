@@ -11,11 +11,11 @@ import { SsoRepository } from '../../infrastructure/sso.repository';
 
 const EXCHANGE_TTL = '2m';
 
-type SessionPayload = {
+interface SessionPayload {
   accessToken: string;
   refreshToken: string;
   organizationId?: string | null;
-};
+}
 
 @Injectable()
 export class CreateSsoSessionExchangeUseCase {

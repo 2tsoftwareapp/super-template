@@ -69,6 +69,22 @@ pnpm run mobile:dev
 
 <br />
 
+## Make it yours
+
+After clicking **Use this template** (or cloning), rebrand everything in one step:
+
+```bash
+node scripts/rename.mjs "Your Project Name" --author your-github-handle
+```
+
+This rewrites every casing of the template name (`super-template`, `super_template`,
+`SuperTemplate`, `Super Template`) and the original repo owner across all tracked
+files — package names, the Dart client, docker services, UI strings, and URLs. Add
+`--dry-run` to preview without writing. Afterward, update the `LICENSE` copyright
+holder, then run `pnpm install && pnpm generate` and `pnpm lint && pnpm typecheck`.
+
+<br />
+
 ## Architecture
 
 <pre>

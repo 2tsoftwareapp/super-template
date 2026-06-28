@@ -1,6 +1,6 @@
 import { configureHttpClient } from "@repo/web-core/http-config";
 
-import { CSRF_TOKEN_COOKIE } from "@/lib/auth/cookies";
+import { CSRF_TOKEN_COOKIE } from "@/lib/auth/cookie-names";
 
 configureHttpClient({ csrfCookieName: CSRF_TOKEN_COOKIE });
 

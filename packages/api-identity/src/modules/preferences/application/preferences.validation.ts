@@ -8,10 +8,18 @@ import {
   type PreferenceTheme,
 } from './preferences.constants';
 
-const supportedTimezones =
-  typeof Intl.supportedValuesOf === 'function'
-    ? new Set(Intl.supportedValuesOf('timeZone'))
-    : new Set(['UTC']);
+const isSupportedTimezone = (timezone: string): boolean => {
+  // Intl.supportedValuesOf('timeZone') only lists ICU's canonical zones and omits
+  // valid IANA aliases (e.g. Asia/Ho_Chi_Minh is missing on ICU >= 78, which lists
+  // Asia/Saigon instead), and the canonical set drifts between Node/ICU versions.
+  // Constructing a formatter accepts any zone IANA recognizes and throws otherwise.
+  try {
+    new Intl.DateTimeFormat('en-US', { timeZone: timezone });
+    return true;
+  } catch {
+    return false;
+  }
+};
 
 export function assertValidPreferenceTheme(
   theme: string,
@@ -38,7 +46,7 @@ export function assertValidPreferenceLanguage(
 }
 
 export function assertValidTimezone(timezone: string): void {
-  if (!supportedTimezones.has(timezone)) {
+  if (!isSupportedTimezone(timezone)) {
     throw new AppError(
       ERROR_CODES.VALIDATION_FAILED,
       'Unsupported timezone preference',
