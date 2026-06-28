@@ -8,9 +8,9 @@ import type { ApiEnvelope } from "@/lib/api-types";
 import { clearAuthCookies, setAuthCookies } from "@/lib/auth/cookies";
 import { callBackend, enforceOrigin } from "@/lib/server/backend";
 
-type EstablishSessionInput = {
+interface EstablishSessionInput {
   exchangeCode?: string;
-};
+}
 
 export async function POST(request: NextRequest) {
   const originFailure = enforceOrigin(request);

@@ -1,8 +1,8 @@
 "use client";
 
+import { CsrfBootstrap } from "@repo/web-core/components/csrf-bootstrap";
 import { useQuery } from "@tanstack/react-query";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { CsrfBootstrap } from "@repo/web-core/components/csrf-bootstrap";
 import { useEffect, useState } from "react";
 import { Toaster } from "sonner";
 

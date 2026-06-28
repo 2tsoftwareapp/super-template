@@ -1,5 +1,6 @@
-import { stripTokensFromAuthEnvelope } from "@repo/web-core/auth/sanitize-response";
 import type { NextRequest } from "next/server";
+
+import { stripTokensFromAuthEnvelope } from "@repo/web-core/auth/sanitize-response";
 import { NextResponse } from "next/server";
 
 import {

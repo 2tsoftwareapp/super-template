@@ -4,8 +4,8 @@ import { Injectable } from '@nestjs/common';
 
 import type { HandleSsoCallbackCommand, StartSsoLoginCommand } from './sso.types';
 
-import { CreateSsoSessionExchangeUseCase, ExchangeSsoSessionUseCase } from './use-cases/sso-session-exchange.use-case';
 import { HandleSsoCallbackUseCase } from './use-cases/handle-sso-callback.use-case';
+import { CreateSsoSessionExchangeUseCase, ExchangeSsoSessionUseCase } from './use-cases/sso-session-exchange.use-case';
 import { StartSsoLoginUseCase } from './use-cases/start-sso-login.use-case';
 
 @Injectable()
