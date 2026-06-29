@@ -10,19 +10,53 @@
 - explicit indexes and unique constraints
 - soft deletion only where business recovery matters
 
-## Main Tables
+## Tables (37 total)
 
-- `users`
-- `auth_sessions`
-- `roles`
-- `permissions`
-- `user_roles`
-- `role_permissions`
-- `email_verification_tokens`
-- `password_reset_tokens`
-- `projects`
-- `notifications`
-- `audit_logs`
+### Identity (17)
+
+- `users` — core user accounts with email, password hash, avatar, status
+- `auth_sessions` — refresh-token-backed login sessions
+- `email_verification_tokens` — single-use email verification
+- `password_reset_tokens` — single-use password reset
+- `organizations` — multi-tenant organization root
+- `organization_members` — membership bridge between users and orgs
+- `roles` — named role templates (scoped to org or platform)
+- `permissions` — named permission definitions
+- `user_roles` — role assignments (with optional org scope)
+- `role_permissions` — permission grants on roles
+- `user_two_factor_secrets` — encrypted TOTP secrets
+- `user_recovery_codes` — one-time recovery codes for 2FA
+- `mfa_challenges` — MFA challenge tracking (attempts, expiry)
+- `external_identities` — SSO/OIDC provider links (Google, Apple, GitHub, etc.)
+- `sso_login_states` — short-lived PKCE state records for SSO flows
+- `sso_session_exchanges` — one-time code exchange records for SSO callback
+- `user_preferences` — per-user theme, language, timezone, notification prefs
+
+### Platform (13)
+
+- `audit_logs` — append-only action log
+- `files` — file/object storage metadata
+- `file_versions` — version history for files
+- `file_batch_operations` — bulk file operation tracking
+- `attachments` — polymorphic file attachments to any entity
+- `jobs` — PostgreSQL-backed background job queue
+- `job_attempts` — per-attempt tracking for retries
+- `job_events` — event log for job lifecycle
+- `job_dependencies` — directed dependency edges between jobs
+- `import_jobs` — CSV/data import jobs
+- `export_jobs` — CSV/data export jobs
+- `mail_deliveries` — transactional email delivery log
+- `application_settings` — key/value app-wide settings
+
+### Workspace (7)
+
+- `projects` — reference domain CRUD with ownership and audit
+- `notifications` — in-app notification inbox
+- `notification_device_tokens` — FCM push notification tokens
+- `notification_jobs` — scheduled/sent notification jobs
+- `invitations` — polymorphic invitation flows (org, project, etc.)
+- `comments` — polymorphic entity comments with threading
+- `activities` — human-readable activity feed entries
 
 ## Migration Workflow
 
@@ -64,7 +98,10 @@ Production must create an equivalent non-superuser role, rotate its password, an
 
 - `users.deleted_at` supports safe uniqueness and future recovery workflows
 - `projects.deleted_at` supports restore behavior
-- auth and token tables do not use soft delete
+- `organizations.deleted_at` supports slug reclamation and restore
+- `files.deleted_at` and `attachments.deleted_at` support soft-remove before hard cleanup
+- `comments.deleted_at` supports content moderation
+- Auth, token, and queue tables do not use soft delete
 
 ## Indexing Strategy
 
@@ -72,3 +109,6 @@ Production must create an equivalent non-superuser role, rotate its password, an
 - list-heavy filters have dedicated indexes
 - active email uniqueness is enforced through a partial unique index
 - project uniqueness is scoped to owner and active rows
+- organization slug uniqueness is enforced through a partial unique index
+- role names are unique per-organization (and globally for platform-level roles)
+- composite unique indexes on junction tables prevent duplicate relationships
