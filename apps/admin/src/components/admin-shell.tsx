@@ -7,6 +7,7 @@ import {
   LogOut,
   Menu,
   Settings,
+  Shield,
   Zap,
 } from "lucide-react";
 import Link from "next/link";
@@ -429,6 +430,8 @@ function UserMenu({
   roles: string;
   onSignOut: () => void;
 }) {
+  const router = useRouter();
+
   return (
     <div className={cn("p-2", collapsed && "flex justify-center")}>
       <Dropdown
@@ -466,6 +469,12 @@ function UserMenu({
           } satisfies DropdownItem,
           { separator: true } satisfies DropdownItem,
           {
+            label: "Account security",
+            icon: <Shield />,
+            onClick: () => router.push("/security"),
+          } satisfies DropdownItem,
+          { separator: true } satisfies DropdownItem,
+          {
             label: "Sign out",
             icon: <LogOut />,
             onClick: () => void onSignOut(),
@@ -487,6 +496,7 @@ function TopHeader({
   onOpenMobileMenu: () => void;
 }) {
   const { collapsed, setCollapsed } = useSidebar();
+  const router = useRouter();
 
   return (
     <header className="sticky top-0 z-20 flex min-h-14 shrink-0 items-center justify-between border-b border-border bg-card px-3 md:px-6">
@@ -549,6 +559,12 @@ function TopHeader({
             {
               label: "Settings",
               icon: <Settings />,
+              onClick: () => router.push("/settings"),
+            } satisfies DropdownItem,
+            {
+              label: "Account security",
+              icon: <Shield />,
+              onClick: () => router.push("/security"),
             } satisfies DropdownItem,
             { separator: true } satisfies DropdownItem,
             {
