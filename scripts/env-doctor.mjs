@@ -5,6 +5,11 @@
 import { connect } from 'node:net';
 import { execSync } from 'node:child_process';
 import { mergeEnvFiles, repoRoot } from './merge-env.mjs';
+import {
+  buildPostgresPreflightRows,
+  checkPostgresUrlPortSync,
+  formatPortStateLabel,
+} from './port-preflight.mjs';
 
 const root = repoRoot;
 const appEnv = process.env.APP_ENV?.trim() || 'development';
@@ -105,6 +110,38 @@ const isComposeInfraRunning = () => {
     return false;
   }
 };
+
+const postgresSync = checkPostgresUrlPortSync(merged);
+for (const message of postgresSync.warnings) {
+  warnings.push(message);
+}
+for (const message of postgresSync.errors) {
+  errors.push(message);
+}
+
+const postgresPreflight = await buildPostgresPreflightRows(merged, root);
+console.log(
+  `[env:doctor] Postgres migrate target ${postgresPreflight.host}:${postgresPreflight.migratePort} → ${formatPortStateLabel(postgresPreflight.migrateState)}`,
+);
+if (postgresPreflight.migratePort !== postgresPreflight.exposedPort) {
+  console.log(
+    `[env:doctor] POSTGRES_EXPOSED_PORT ${postgresPreflight.host}:${postgresPreflight.exposedPort} → ${formatPortStateLabel(postgresPreflight.exposedState)}`,
+  );
+}
+if (postgresPreflight.action) {
+  const action =
+    postgresPreflight.migrateState === 'free' &&
+    postgresPreflight.exposedState === 'ours' &&
+    postgresPreflight.migratePort !== postgresPreflight.exposedPort
+      ? `sync DATABASE_* URLs to port ${postgresPreflight.exposedPort} (Postgres is already running there)`
+      : postgresPreflight.action;
+  console.log(`[env:doctor] Suggested action: ${action}`);
+}
+if (postgresPreflight.exposedAction) {
+  console.log(
+    `[env:doctor] Exposed port action: ${postgresPreflight.exposedAction}`,
+  );
+}
 
 const portInUse = (port) =>
   new Promise((resolvePort) => {

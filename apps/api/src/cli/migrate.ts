@@ -1,8 +1,32 @@
+import { spawnSync } from 'node:child_process';
+import { resolve } from 'node:path';
+
 import { Pool } from 'pg';
 
 import { loadCliEnv } from './load-cli-env';
 import { applySqlMigrations } from './migrations';
 import { resolveMigrateDatabaseUrl } from './resolve-migrate-database-url';
+
+const printPostgresConnectionHint = (databaseUrl: string): void => {
+  const hintScript = resolve(
+    __dirname,
+    '../../../../scripts/postgres-connection-hint.mjs',
+  );
+  spawnSync(process.execPath, [hintScript, databaseUrl], {
+    env: process.env,
+    stdio: 'inherit',
+  });
+};
+
+const isConnectionRefused = (error: unknown): boolean => {
+  if (!(error instanceof AggregateError)) {
+    return false;
+  }
+
+  return error.errors.some(
+    (cause) => cause instanceof Error && cause.message.includes('ECONNREFUSED'),
+  );
+};
 
 loadCliEnv();
 
@@ -17,23 +41,10 @@ const main = async (): Promise<void> => {
     await applySqlMigrations(pool);
     console.log('Database migrations complete.');
   } catch (error) {
-    if (
-      error instanceof AggregateError &&
-      error.errors.some(
-        (cause) =>
-          cause instanceof Error && cause.message.includes('ECONNREFUSED'),
-      )
-    ) {
-      const url = new URL(databaseUrl);
-      console.error(
-        `Could not connect to Postgres at ${url.hostname}:${url.port || '5432'}.`,
-      );
-      console.error(
-        'If you use docker compose, start infra with the repo .env so POSTGRES_EXPOSED_PORT matches DATABASE_URL:',
-      );
-      console.error(
-        '  docker compose -f infra/docker-compose.yml --env-file .env up -d postgres',
-      );
+    if (isConnectionRefused(error)) {
+      printPostgresConnectionHint(databaseUrl);
+      process.exitCode = 1;
+      return;
     }
 
     throw error;
@@ -43,6 +54,10 @@ const main = async (): Promise<void> => {
 };
 
 void main().catch((error) => {
+  if (process.exitCode === 1) {
+    return;
+  }
+
   console.error(error);
   process.exitCode = 1;
 });
