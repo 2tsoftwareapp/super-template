@@ -90,7 +90,7 @@ export function MfaManagement() {
       setView("recovery-codes");
       setSetupData(null);
       setOtpCode("");
-      queryClient.invalidateQueries({ queryKey: MFA_STATUS_KEY });
+      void queryClient.invalidateQueries({ queryKey: MFA_STATUS_KEY });
       toast.success("Two-factor authentication enabled");
     },
     onError: () => {
@@ -104,9 +104,9 @@ export function MfaManagement() {
       webFetch<MfaDisableResponse>("/api/auth/mfa/disable", {
         method: "POST",
         body: JSON.stringify({ code }),
-      }),
+    }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: MFA_STATUS_KEY });
+      void queryClient.invalidateQueries({ queryKey: MFA_STATUS_KEY });
       setOtpCode("");
       toast.success("Two-factor authentication disabled");
     },
@@ -135,8 +135,10 @@ export function MfaManagement() {
   });
 
   const copyRecoveryCodes = useCallback(() => {
-    navigator.clipboard.writeText(recoveryCodes.join("\n"));
-    toast.success("Recovery codes copied to clipboard");
+    void navigator.clipboard
+      .writeText(recoveryCodes.join("\n"))
+      .then(() => toast.success("Recovery codes copied to clipboard"))
+      .catch(() => toast.error("Could not copy recovery codes"));
   }, [recoveryCodes]);
 
   if (status.isLoading) {
@@ -235,7 +237,7 @@ export function MfaManagement() {
               maxLength={6}
               value={otpCode}
               onChange={setOtpCode}
-              onComplete={(code) => confirmMutation.mutate(code)}
+              onComplete={(code: string) => confirmMutation.mutate(code)}
             >
               <InputOTPGroup>
                 <InputOTPSlot index={0} />

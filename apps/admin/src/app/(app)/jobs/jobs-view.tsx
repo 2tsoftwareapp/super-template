@@ -50,8 +50,7 @@ function jobStatusProps(status: string): {
   if (status === "PROCESSING")
     return {
       variant: "secondary",
-      className:
-        "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30",
+      className: "bg-accent text-accent-foreground border-border",
     };
   if (status === "FAILED")
     return {
@@ -67,10 +66,10 @@ function jobStatusProps(status: string): {
 }
 
 const EVENT_STYLES: Record<string, { label: string; dot: string; text: string }> = {
-  claimed: { label: "Claimed", dot: "bg-amber-500", text: "text-amber-700 dark:text-amber-400" },
-  completed: { label: "Completed", dot: "bg-green-500", text: "text-green-700 dark:text-green-400" },
+  claimed: { label: "Claimed", dot: "bg-chart-5", text: "text-muted-foreground" },
+  completed: { label: "Completed", dot: "bg-primary", text: "text-primary" },
   failed: { label: "Failed", dot: "bg-destructive", text: "text-destructive" },
-  retry_scheduled: { label: "Retry scheduled", dot: "bg-blue-500", text: "text-blue-700 dark:text-blue-400" },
+  retry_scheduled: { label: "Retry scheduled", dot: "bg-chart-2", text: "text-chart-2" },
   cancelled: { label: "Cancelled", dot: "bg-muted-foreground", text: "text-muted-foreground" },
 };
 
@@ -253,7 +252,7 @@ export function JobsView() {
               label="Processing"
               count={totalProcessing}
               {...(totalProcessing > 0
-                ? { className: "border-amber-500/30 bg-amber-500/5" }
+                ? { className: "border-border bg-accent" }
                 : {})}
             />
             <StatChip

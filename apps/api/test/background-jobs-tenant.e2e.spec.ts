@@ -1,8 +1,8 @@
 import type { INestApplication } from '@nestjs/common';
 import { JobsRepository } from '@repo/api-platform/modules/jobs/infrastructure/jobs.repository';
 import { JobsService } from '@repo/api-platform/modules/jobs/application/jobs.service';
-import { NotificationJobsRepository } from '@repo/api-workspace/modules/notifications/infrastructure/notification-jobs.repository';
-import { NotificationsService } from '@repo/api-workspace/modules/notifications/application/notifications.service';
+import { NotificationJobsRepository } from '@repo/api-platform/modules/notifications/infrastructure/notification-jobs.repository';
+import { NotificationsService } from '@repo/api-platform/modules/notifications/application/notifications.service';
 import request from 'supertest';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {

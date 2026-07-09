@@ -1,6 +1,5 @@
 import {
   File,
-  FolderKanban,
   LayoutDashboard,
   type LucideIcon,
   Mail,
@@ -53,16 +52,6 @@ export const adminResources: AdminResourceConfig[] = [
     features: ["list"],
     permissions: ["roles.read"],
     queryKey: "admin-roles",
-  },
-  {
-    id: "projects",
-    label: "Projects",
-    group: "Operations",
-    path: "/projects",
-    icon: FolderKanban,
-    features: ["list", "create", "show", "edit"],
-    permissions: ["projects.read"],
-    queryKey: "admin-projects",
   },
   {
     id: "audit-logs",

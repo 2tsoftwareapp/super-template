@@ -8,8 +8,7 @@
     "paths": {
       "src/*": ["src/*"],
       "@identity/*": ["../../packages/api-identity/src/*"],
-      "@platform/*": ["../../packages/api-platform/src/*"],
-      "@workspace/*": ["../../packages/api-workspace/src/*"]
+      "@platform/*": ["../../packages/api-platform/src/*"]
     }
   },
   "include": [

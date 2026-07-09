@@ -15,8 +15,8 @@ describe('default role grants matrix', () => {
 
   it('expands a role grant spec into resource.action names', () => {
     const names = permissionNamesForRole(ROLE_NAMES.USER);
-    expect(names).toContain('projects.read');
-    expect(names).toContain('projects.delete');
+    expect(names).toContain('files.read');
+    expect(names).toContain('files.delete');
     expect(names).toContain('notifications.read');
     // USER has read-only notifications
     expect(names).not.toContain('notifications.delete');

@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 
 export { PlatformPortsModule } from './platform-ports.module';
 
+import { ActivitiesModule } from './modules/activities/activities.module';
 import { AttachmentsModule } from './modules/attachments/attachments.module';
 import { AuditModule } from './modules/audit/audit.module';
 import { ExportsModule } from './modules/exports/exports.module';
@@ -9,6 +10,7 @@ import { FilesModule } from './modules/files/files.module';
 import { ImportsModule } from './modules/imports/imports.module';
 import { JobsModule } from './modules/jobs/jobs.module';
 import { MailModule } from './modules/mail/mail.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 import { SettingsModule } from './modules/settings/settings.module';
 import { StorageModule } from './modules/storage/storage.module';
 import { PlatformPortsModule } from './platform-ports.module';
@@ -25,6 +27,8 @@ import { PlatformPortsModule } from './platform-ports.module';
     JobsModule,
     ImportsModule,
     ExportsModule,
+    NotificationsModule,
+    ActivitiesModule,
   ],
   exports: [
     PlatformPortsModule,
@@ -37,6 +41,8 @@ import { PlatformPortsModule } from './platform-ports.module';
     JobsModule,
     ImportsModule,
     ExportsModule,
+    NotificationsModule,
+    ActivitiesModule,
   ],
 })
 export class PlatformModule {}

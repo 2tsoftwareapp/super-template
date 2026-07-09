@@ -32,7 +32,6 @@ import { HealthModule } from '@repo/api-health';
 import { IdentityModule } from '@repo/api-identity';
 import { AuthService } from '@repo/api-identity/modules/auth/application/auth.service';
 import { PlatformModule } from '@repo/api-platform';
-import { WorkspaceModule } from '@repo/api-workspace';
 
 import { AuthGuard } from './shell/auth.guard';
 import { TenantContextInterceptor } from './shell/tenant-context.interceptor';
@@ -60,7 +59,6 @@ import { TenantContextInterceptor } from './shell/tenant-context.interceptor';
     HealthModule,
     IdentityModule,
     PlatformModule,
-    WorkspaceModule,
   ],
   providers: [
     RequestLoggerMiddleware,

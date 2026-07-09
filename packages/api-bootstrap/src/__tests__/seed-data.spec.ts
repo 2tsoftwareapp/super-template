@@ -3,7 +3,6 @@ import { describe, expect, it, vi } from 'vitest';
 const seedAccessControl = vi.fn();
 const seedSettings = vi.fn();
 const seedUsers = vi.fn();
-const seedProjects = vi.fn();
 const seedNotifications = vi.fn();
 
 vi.mock('../seeds/access-control/seed', () => ({
@@ -14,9 +13,6 @@ vi.mock('../seeds/settings/seed', () => ({
 }));
 vi.mock('../seeds/users/seed', () => ({
   seedUsers,
-}));
-vi.mock('../seeds/projects/seed', () => ({
-  seedProjects,
 }));
 vi.mock('../seeds/notifications/seed', () => ({
   seedNotifications,
@@ -41,9 +37,6 @@ describe('seedDatabase', () => {
       calls.push('users');
       return seededUsers;
     });
-    seedProjects.mockImplementation(async () => {
-      calls.push('projects');
-    });
     seedNotifications.mockImplementation(async () => {
       calls.push('notifications');
     });
@@ -53,12 +46,11 @@ describe('seedDatabase', () => {
         calls.push(`revoke:${userId}`);
       }),
     };
-    const projectsRepository = {
-      client: {
-        transaction: vi.fn((callback: (value: unknown) => Promise<unknown>) =>
-          callback(transaction),
-        ),
-      },
+    const usersRepository = { id: 'users-repository' };
+    const database = {
+      transaction: vi.fn((callback: (value: unknown) => Promise<unknown>) =>
+        callback(transaction),
+      ),
     };
     const tenantContextService = {
       runAsync: vi.fn((context: unknown, callback: () => Promise<unknown>) =>
@@ -72,9 +64,9 @@ describe('seedDatabase', () => {
         .mockReturnValueOnce(authRepository)
         .mockReturnValueOnce({ id: 'notifications-repository' })
         .mockReturnValueOnce({ id: 'organizations-service' })
-        .mockReturnValueOnce(projectsRepository)
         .mockReturnValueOnce({ id: 'settings-service' })
-        .mockReturnValueOnce({ id: 'users-repository' })
+        .mockReturnValueOnce(usersRepository)
+        .mockReturnValueOnce(database)
         .mockReturnValueOnce({ id: 'environment-service' })
         .mockReturnValueOnce(tenantContextService),
     };
@@ -84,7 +76,7 @@ describe('seedDatabase', () => {
     await seedDatabase(app as never);
 
     expect(tenantContextService.runAsync).toHaveBeenCalledTimes(1);
-    expect(projectsRepository.client.transaction).toHaveBeenCalledTimes(1);
+    expect(database.transaction).toHaveBeenCalledTimes(1);
     expect(seedAccessControl).toHaveBeenCalledWith(
       { id: 'access-control-service' },
       transaction,
@@ -98,13 +90,8 @@ describe('seedDatabase', () => {
         accessControlService: { id: 'access-control-service' },
         environmentService: { id: 'environment-service' },
         organizationsService: { id: 'organizations-service' },
-        usersRepository: { id: 'users-repository' },
+        usersRepository,
       },
-      transaction,
-    );
-    expect(seedProjects).toHaveBeenCalledWith(
-      projectsRepository,
-      seededUsers,
       transaction,
     );
     expect(seedNotifications).toHaveBeenCalledWith(
@@ -126,7 +113,6 @@ describe('seedDatabase', () => {
       'access-control',
       'settings',
       'users',
-      'projects',
       'notifications',
       'revoke:admin-user',
       'revoke:regular-user',

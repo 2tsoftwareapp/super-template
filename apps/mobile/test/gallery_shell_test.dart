@@ -7,12 +7,10 @@ import 'package:mobile_app/features/gallery/presentation/gallery_screen.dart';
 import 'package:mobile_app/features/home/presentation/home_screen.dart';
 import 'package:mobile_app/features/notifications/presentation/notifications_screen.dart';
 import 'package:mobile_app/features/profile/presentation/profile_screen.dart';
-import 'package:mobile_app/features/projects/presentation/projects_screen.dart';
 
 void main() {
   testWidgets('UI Kit tab shows gallery content', (tester) async {
     final homeKey = GlobalKey<NavigatorState>(debugLabel: 'home');
-    final projectsKey = GlobalKey<NavigatorState>(debugLabel: 'projects');
     final notifKey = GlobalKey<NavigatorState>(debugLabel: 'notif');
     final galleryKey = GlobalKey<NavigatorState>(debugLabel: 'gallery');
     final profileKey = GlobalKey<NavigatorState>(debugLabel: 'profile');
@@ -28,15 +26,6 @@ void main() {
               navigatorKey: homeKey,
               routes: [
                 GoRoute(path: '/home', builder: (_, _) => const HomeScreen()),
-              ],
-            ),
-            StatefulShellBranch(
-              navigatorKey: projectsKey,
-              routes: [
-                GoRoute(
-                  path: '/projects',
-                  builder: (_, _) => const ProjectsScreen(),
-                ),
               ],
             ),
             StatefulShellBranch(

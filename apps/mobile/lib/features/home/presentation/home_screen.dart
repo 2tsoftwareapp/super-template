@@ -117,37 +117,11 @@ class HomeScreen extends ConsumerWidget {
               ),
           ],
 
-          // ── Admin (permission-gated) ─────────────────────────────────────
-          if (_hasAdminAccess(perms)) ...[
-            const SizedBox(height: AppSpacing.xl),
-            _GroupLabel('ADMINISTRATION'),
-            AppListTile(
-              icon: Icons.admin_panel_settings_rounded,
-              iconColor: AppColors.cardAdmin,
-              title: 'Admin Hub',
-              subtitle: 'Manage the platform',
-              onTap: () => context.push('/admin'),
-            ),
-          ],
-
           const SizedBox(height: AppSpacing.massive),
         ],
       ),
     );
   }
-}
-
-bool _hasAdminAccess(List<String> permissions) {
-  const adminPermissions = {
-    'users.read',
-    'roles.read',
-    'jobs.read',
-    'mail.read',
-    'settings.read',
-    'notifications.read',
-    'audit.read',
-  };
-  return permissions.any(adminPermissions.contains);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

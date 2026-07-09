@@ -54,21 +54,6 @@
           ]
         }
       },
-      "layer:workspace": {
-        "dependencies": {
-          "allow": [
-            "layer:core",
-            "layer:env",
-            "layer:database",
-            "layer:identity",
-            "layer:platform",
-            "layer:workspace",
-            "layer:sort",
-            "layer:tsconfig",
-            "layer:eslint"
-          ]
-        }
-      },
       "layer:bootstrap": {
         "dependencies": {
           "allow": [
@@ -77,7 +62,6 @@
             "layer:database",
             "layer:identity",
             "layer:platform",
-            "layer:workspace",
             "layer:bootstrap",
             "layer:health",
             "layer:sort",
@@ -94,7 +78,6 @@
             "layer:database",
             "layer:identity",
             "layer:platform",
-            "layer:workspace",
             "layer:bootstrap",
             "layer:health",
             "layer:contract",
@@ -111,11 +94,6 @@
       "layer:tsconfig": {
         "dependencies": {
           "allow": ["layer:tsconfig"]
-        }
-      },
-      "layer:extension": {
-        "dependencies": {
-          "allow": ["layer:extension", "layer:tsconfig", "layer:eslint"]
         }
       },
       "layer:eslint": {

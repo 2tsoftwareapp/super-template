@@ -19,9 +19,6 @@
     { "path": "./packages/api-identity/tsconfig.spec.json" },
     { "path": "./packages/api-platform/tsconfig.json" },
     { "path": "./packages/api-sort/tsconfig.json" },
-    { "path": "./packages/api-workspace/tsconfig.json" },
-    { "path": "./packages/api-workspace/tsconfig.spec.json" },
-    { "path": "./packages/extension/tsconfig.json" },
     { "path": "./packages/web-core/tsconfig.json" },
     { "path": "./packages/web-test/tsconfig.json" }
   ]

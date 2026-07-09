@@ -1,4 +1,4 @@
-import type { NotificationsRepository } from '@repo/api-workspace/modules/notifications/infrastructure/notifications.repository';
+import type { NotificationsRepository } from '@repo/api-platform/modules/notifications/infrastructure/notifications.repository';
 
 import { type DatabaseExecutor } from '@repo/api-database';
 

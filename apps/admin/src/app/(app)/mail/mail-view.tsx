@@ -50,7 +50,7 @@ function mailStatusProps(status: string): {
   if (status === "SENT")
     return {
       variant: "default",
-      className: "bg-green-500/15 text-green-700 dark:text-green-400 border-green-500/30",
+      className: "bg-primary/15 text-primary border-primary/30",
     };
   if (status === "FAILED")
     return {
@@ -256,7 +256,7 @@ export function MailView() {
                   {preview.data.data.missingVariables?.length > 0 && (
                     <>
                       <Separator className="my-3" />
-                      <p className="text-xs font-medium uppercase tracking-wide text-amber-600 dark:text-amber-400">
+                      <p className="text-xs font-medium uppercase tracking-wide text-accent-foreground">
                         Missing variables
                       </p>
                       <p className="mt-1 text-xs text-muted-foreground">
@@ -326,7 +326,7 @@ export function MailView() {
                         {tmpl.mandatory ? (
                           <Badge
                             variant="outline"
-                            className="text-xs text-amber-600 border-amber-500/40"
+                            className="text-xs text-accent-foreground border-border"
                           >
                             Yes
                           </Badge>
@@ -340,7 +340,7 @@ export function MailView() {
                         {tmpl.sendable ? (
                           <Badge
                             variant="default"
-                            className="text-xs bg-green-500/15 text-green-700 dark:text-green-400"
+                            className="text-xs bg-primary/15 text-primary"
                           >
                             Yes
                           </Badge>

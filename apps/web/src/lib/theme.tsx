@@ -17,7 +17,7 @@ interface ThemeContextValue {
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
-  theme: "system",
+  theme: "light",
   resolvedTheme: "light",
   setTheme: () => undefined,
 });
@@ -25,11 +25,13 @@ const ThemeContext = createContext<ThemeContextValue>({
 const STORAGE_KEY = "theme";
 
 function getStoredTheme(): Theme {
-  if (typeof window === "undefined") return "system";
+  if (typeof window === "undefined") return "light";
   try {
-    return (localStorage.getItem(STORAGE_KEY) as Theme) ?? "system";
+    const stored = localStorage.getItem(STORAGE_KEY) as Theme | null;
+    if (stored === "light" || stored === "dark") return stored;
+    return "light";
   } catch {
-    return "system";
+    return "light";
   }
 }
 
@@ -52,7 +54,7 @@ function applyTheme(resolved: "light" | "dark") {
 
 export function ThemeProvider({
   children,
-  defaultTheme = "system",
+  defaultTheme = "light",
 }: {
   children: React.ReactNode;
   defaultTheme?: Theme;

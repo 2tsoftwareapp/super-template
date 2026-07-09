@@ -9,7 +9,6 @@ part of 'serializers.dart';
 // **************************************************************************
 
 Serializers _$serializers = (Serializers().toBuilder()
-      ..add(AcceptInvitationDto.serializer)
       ..add(ActivitiesControllerList200Response.serializer)
       ..add(ActivityDto.serializer)
       ..add(ActivityDtoVisibilityEnum.serializer)
@@ -57,21 +56,13 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(BatchDeleteResultDto.serializer)
       ..add(BatchDeleteResultItemDto.serializer)
       ..add(ChangePasswordDto.serializer)
-      ..add(CommentDto.serializer)
-      ..add(CommentsControllerCreate201Response.serializer)
-      ..add(CommentsControllerList200Response.serializer)
       ..add(CountDto.serializer)
       ..add(CreateAdminUserDto.serializer)
       ..add(CreateAdminUserDtoRoleEnum.serializer)
       ..add(CreateAdminUserDtoStatusEnum.serializer)
-      ..add(CreateCommentDto.serializer)
       ..add(CreateExportDto.serializer)
       ..add(CreateImportDto.serializer)
-      ..add(CreateInvitationDto.serializer)
-      ..add(CreateInvitationDtoEntityTypeEnum.serializer)
       ..add(CreateOrganizationDto.serializer)
-      ..add(CreateProjectDto.serializer)
-      ..add(CreateProjectDtoStatusEnum.serializer)
       ..add(CreateRoleDto.serializer)
       ..add(DeviceTokenDto.serializer)
       ..add(DeviceTokenDtoPlatformEnum.serializer)
@@ -98,10 +89,6 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(ImportJobDto.serializer)
       ..add(ImportJobDtoStatusEnum.serializer)
       ..add(ImportsControllerCreate201Response.serializer)
-      ..add(InvitationDto.serializer)
-      ..add(InvitationDtoStatusEnum.serializer)
-      ..add(InvitationsControllerCreate201Response.serializer)
-      ..add(InvitationsControllerList200Response.serializer)
       ..add(JobDependencyDto.serializer)
       ..add(JobDependencyDtoDependsOnJobStatusEnum.serializer)
       ..add(JobDto.serializer)
@@ -146,12 +133,6 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(PaginationMetaDto.serializer)
       ..add(PermissionDto.serializer)
       ..add(PreferencesControllerGetMyPreferences200Response.serializer)
-      ..add(ProjectAttachmentDto.serializer)
-      ..add(ProjectDto.serializer)
-      ..add(ProjectDtoStatusEnum.serializer)
-      ..add(ProjectsControllerCreate201Response.serializer)
-      ..add(ProjectsControllerList200Response.serializer)
-      ..add(ProjectsControllerListAttachments200Response.serializer)
       ..add(RefreshTokenDto.serializer)
       ..add(RegisterDeviceDto.serializer)
       ..add(RegisterDeviceDtoPlatformEnum.serializer)
@@ -178,7 +159,6 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(SwitchOrganizationResponseDto.serializer)
       ..add(UpdateAdminUserDto.serializer)
       ..add(UpdateAdminUserDtoStatusEnum.serializer)
-      ..add(UpdateCommentDto.serializer)
       ..add(UpdateMemberRoleDto.serializer)
       ..add(UpdateMemberRoleDtoRoleEnum.serializer)
       ..add(UpdateOrganizationDto.serializer)
@@ -186,8 +166,6 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(UpdatePreferencesDtoLanguageEnum.serializer)
       ..add(UpdatePreferencesDtoThemeEnum.serializer)
       ..add(UpdateProfileDto.serializer)
-      ..add(UpdateProjectDto.serializer)
-      ..add(UpdateProjectDtoStatusEnum.serializer)
       ..add(UpdateRoleDto.serializer)
       ..add(UpdateSettingDto.serializer)
       ..add(UpdateUserStatusDto.serializer)
@@ -228,10 +206,6 @@ Serializers _$serializers = (Serializers().toBuilder()
         () => ListBuilder<BatchDeleteResultItemDto>(),
       )
       ..addBuilderFactory(
-        const FullType(BuiltList, const [const FullType(CommentDto)]),
-        () => ListBuilder<CommentDto>(),
-      )
-      ..addBuilderFactory(
         const FullType(BuiltList, const [const FullType(FileDto)]),
         () => ListBuilder<FileDto>(),
       )
@@ -244,10 +218,6 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..addBuilderFactory(
         const FullType(BuiltList, const [const FullType(FileVersionDto)]),
         () => ListBuilder<FileVersionDto>(),
-      )
-      ..addBuilderFactory(
-        const FullType(BuiltList, const [const FullType(InvitationDto)]),
-        () => ListBuilder<InvitationDto>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltList, const [const FullType(JobDependencyDto)]),
@@ -310,16 +280,6 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..addBuilderFactory(
         const FullType(BuiltList, const [const FullType(PermissionDto)]),
         () => ListBuilder<PermissionDto>(),
-      )
-      ..addBuilderFactory(
-        const FullType(BuiltList, const [
-          const FullType(ProjectAttachmentDto),
-        ]),
-        () => ListBuilder<ProjectAttachmentDto>(),
-      )
-      ..addBuilderFactory(
-        const FullType(BuiltList, const [const FullType(ProjectDto)]),
-        () => ListBuilder<ProjectDto>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltList, const [const FullType(RoleDto)]),

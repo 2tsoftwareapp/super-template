@@ -5,20 +5,25 @@ import {
   Github,
   Layers,
   LayoutDashboard,
-  LogIn,
   Monitor,
   Palette,
   Shield,
   Smartphone,
-  UserPlus,
   Zap,
 } from "lucide-react";
 
-import { HomeAuthActions } from "@/components/app/home-auth-actions";
 import { ScrollToTop } from "@/components/app/scroll-to-top";
 import { ArchDiagram } from "@/components/arch-diagram";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
 const ADMIN_URL =
   process.env.NEXT_PUBLIC_ADMIN_URL ?? "http://localhost:3002";
@@ -29,15 +34,15 @@ const API_DOCS_URL =
 const surfaces = [
   {
     label: "Web",
-    title: "Landing + auth",
-    description: "Marketing site and authentication flows with a same-origin BFF.",
+    title: "SEO landing",
+    description: "Public marketing site — lightweight, indexable, no auth surface.",
     href: "/",
     external: false,
   },
   {
     label: "Admin",
-    title: "Operations dashboard",
-    description: "Users, roles, projects, jobs, mail, imports, and audit logs.",
+    title: "Primary app + auth BFF",
+    description: "Operations dashboard with login, SSO, MFA, and same-origin session.",
     href: ADMIN_URL,
     external: true,
   },
@@ -97,13 +102,13 @@ const features = [
   {
     icon: Monitor,
     label: "Admin",
-    title: "Separate admin app",
+    title: "Primary app + auth BFF",
     description:
-      "A dedicated Next.js workspace for operational tooling — isolated from the public web surface while sharing @repo/web-core.",
+      "The main product surface — operational tooling and all authentication flows via a same-origin Next.js BFF.",
     items: [
+      "Login, SSO, MFA & session management",
       "User & role management",
       "Jobs, mail, imports/exports",
-      "Audit logs & SSE notifications",
     ],
   },
   {
@@ -121,13 +126,13 @@ const features = [
   {
     icon: Palette,
     label: "Web",
-    title: "Marketing + auth BFF",
+    title: "SEO landing only",
     description:
-      "Public landing page and auth flows (login, register, SSO, password reset). Product operations live in Admin and Mobile.",
+      "Minimal public marketing page — fast, indexable, and free of auth routes. Sign-in and product flows live in Admin.",
     items: [
-      "Same-origin cookie session",
+      "Server-rendered marketing content",
       "shadcn/ui + Tailwind CSS 4",
-      "Dark mode + system preference",
+      "Light Green theme + optional dark mode",
     ],
   },
 ];
@@ -140,7 +145,7 @@ const stackLayers = [
         name: "Next.js",
         version: "16",
         description:
-          "App Router · same-origin BFF · product-facing routing and middleware",
+          "App Router · SEO landing · lightweight public marketing surface",
       },
       {
         name: "shadcn/ui",
@@ -166,7 +171,7 @@ const stackLayers = [
         name: "@repo/web-core",
         version: "workspace:*",
         description:
-          "Shared auth, session, HTTP, query, and utility logic used by web and admin",
+          "Shared session, HTTP, query, and utility logic — auth BFF lives in admin",
       },
       {
         name: "@repo/env-loader",
@@ -203,7 +208,8 @@ const stackLayers = [
       {
         name: "Next.js",
         version: "16",
-        description: "App Router · same-origin BFF · admin-only routes",
+        description:
+          "App Router · same-origin auth BFF · primary product surface",
       },
       {
         name: "TanStack Table",
@@ -289,17 +295,22 @@ const highlights = [
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-dvh bg-muted/30 text-foreground">
       {/* ── Navigation ── */}
-      <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-md">
-        <div className="mx-auto grid h-14 max-w-7xl grid-cols-[1fr_auto_1fr] items-center px-4 md:px-6">
+      <header className="sticky top-0 z-50 flex min-h-14 shrink-0 items-center border-b border-border bg-card">
+        <div className="mx-auto grid h-14 w-full max-w-7xl grid-cols-[1fr_auto_1fr] items-center px-3 md:px-6">
           <div className="flex items-center gap-2.5">
-            <div className="flex size-7 items-center justify-center rounded-lg bg-foreground">
-              <Zap className="size-3.5 text-background" />
+            <div className="flex size-8 items-center justify-center rounded-lg bg-foreground">
+              <Zap className="size-4 text-background" />
             </div>
-            <span className="text-sm font-semibold tracking-tight">
-              Super Template
-            </span>
+            <div className="min-w-0">
+              <span className="text-sm font-semibold tracking-tight">
+                Super Template
+              </span>
+              <p className="truncate text-[11px] text-muted-foreground">
+                Full-stack monorepo starter
+              </p>
+            </div>
           </div>
           <nav className="hidden items-center gap-6 text-sm text-muted-foreground md:flex">
             <a
@@ -341,17 +352,13 @@ export default function Home() {
               Admin
             </a>
           </nav>
-          <div className="flex items-center justify-end gap-2">
-            <HomeAuthActions />
-          </div>
+          <div className="hidden md:block" />
         </div>
       </header>
 
       {/* ── Hero ── */}
-      <section className="relative overflow-hidden border-b border-border">
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
-        <div className="pointer-events-none absolute left-1/2 top-0 h-[500px] w-[800px] -translate-x-1/2 rounded-full bg-primary/4 blur-3xl" />
-        <div className="relative mx-auto max-w-7xl px-4 py-28 md:px-6 md:py-40">
+      <section className="border-b border-border">
+        <div className="mx-auto max-w-7xl px-3 py-28 md:px-6 md:py-40">
           <div className="flex flex-col items-center text-center">
             <Badge variant="outline" className="mb-6 text-xs">
               Production-ready · 4 surfaces · MIT licensed
@@ -363,9 +370,9 @@ export default function Home() {
               </span>
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-8 text-muted-foreground md:text-lg">
-              A complete monorepo with a NestJS API, Next.js web and admin apps,
-              and a Flutter mobile client — wired with contract-driven clients,
-              layered environments, and production tooling from day one.
+              A complete monorepo with a NestJS API, a public SEO landing page,
+              an admin app with auth BFF, and a Flutter mobile client — wired
+              with contract-driven clients and production tooling from day one.
             </p>
             <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
               <Button
@@ -420,7 +427,7 @@ export default function Home() {
 
       {/* ── Surfaces ── */}
       <section id="surfaces" className="border-b border-border py-24">
-        <div className="mx-auto max-w-7xl px-4 md:px-6">
+        <div className="mx-auto max-w-7xl px-3 md:px-6">
           <div className="mx-auto mb-16 max-w-2xl text-center">
             <Badge variant="outline" className="mb-4">
               Four surfaces
@@ -429,8 +436,9 @@ export default function Home() {
               One backend, clear separation
             </h2>
             <p className="mt-4 text-muted-foreground">
-              Web handles marketing and auth. Admin runs operations. Mobile ships
-              the native experience. All three talk to the same NestJS API.
+              Web is a lean SEO landing page. Admin is the primary app with auth
+              and operations. Mobile ships the native experience. All three talk
+              to the same NestJS API.
             </p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -440,22 +448,26 @@ export default function Home() {
                 href={surface.href}
                 target={surface.external ? "_blank" : undefined}
                 rel={surface.external ? "noopener noreferrer" : undefined}
-                className="group flex flex-col gap-3 rounded-2xl border border-border bg-card p-5 transition-all hover:border-border/80 hover:shadow-sm"
+                className="group block h-full"
               >
-                <div className="flex items-center justify-between gap-2">
-                  <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                    {surface.label}
-                  </p>
-                  {surface.external ? (
-                    <ExternalLink className="size-3.5 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
-                  ) : null}
-                </div>
-                <div>
-                  <p className="font-semibold">{surface.title}</p>
-                  <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                    {surface.description}
-                  </p>
-                </div>
+                <Card className="h-full transition-shadow hover:shadow-md">
+                  <CardHeader>
+                    <div className="flex items-center justify-between gap-2">
+                      <CardDescription className="text-xs font-semibold uppercase tracking-widest">
+                        {surface.label}
+                      </CardDescription>
+                      {surface.external ? (
+                        <ExternalLink className="size-3.5 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+                      ) : null}
+                    </div>
+                    <CardTitle>{surface.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm leading-6 text-muted-foreground">
+                      {surface.description}
+                    </p>
+                  </CardContent>
+                </Card>
               </a>
             ))}
           </div>
@@ -464,7 +476,7 @@ export default function Home() {
 
       {/* ── Features ── */}
       <section id="features" className="border-b border-border py-24">
-        <div className="mx-auto max-w-7xl px-4 md:px-6">
+        <div className="mx-auto max-w-7xl px-3 md:px-6">
           <div className="mx-auto mb-16 max-w-2xl text-center">
             <Badge variant="outline" className="mb-4">
               What&apos;s inside
@@ -473,47 +485,46 @@ export default function Home() {
               Everything connected, nothing missing
             </h2>
             <p className="mt-4 text-muted-foreground">
-              Four apps sharing one database schema and one API contract. Web
-              exposes auth via a BFF; admin and mobile consume the same REST
-              surface — change the schema, regenerate, all clients update.
+              Four apps sharing one database schema and one API contract. Admin
+              hosts auth via a BFF; web stays marketing-only — change the
+              schema, regenerate, all clients update.
             </p>
           </div>
           <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             {features.map((feat) => {
               const Icon = feat.icon;
               return (
-                <div
-                  key={feat.title}
-                  className="group rounded-2xl border border-border bg-card p-6 transition-all hover:border-border/80 hover:shadow-sm"
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-border bg-muted transition-colors group-hover:bg-muted/70">
-                      <Icon className="size-5" />
-                    </div>
-                    <div className="min-w-0 flex-1 space-y-3">
-                      <div>
-                        <p className="mb-0.5 text-xs uppercase tracking-widest text-muted-foreground">
-                          {feat.label}
-                        </p>
-                        <h3 className="font-semibold">{feat.title}</h3>
-                        <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                          {feat.description}
-                        </p>
+                <Card key={feat.title} className="transition-shadow hover:shadow-md">
+                  <CardHeader>
+                    <div className="flex items-start gap-4">
+                      <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-muted">
+                        <Icon className="size-5 text-primary" />
                       </div>
-                      <ul className="space-y-1.5">
-                        {feat.items.map((item) => (
-                          <li
-                            key={item}
-                            className="flex items-center gap-2 text-sm text-muted-foreground"
-                          >
-                            <span className="size-1.5 shrink-0 rounded-full bg-primary" />
-                            {item}
-                          </li>
-                        ))}
-                      </ul>
+                      <div className="min-w-0 space-y-1">
+                        <CardDescription className="text-xs uppercase tracking-widest">
+                          {feat.label}
+                        </CardDescription>
+                        <CardTitle>{feat.title}</CardTitle>
+                        <CardDescription className="text-sm leading-6">
+                          {feat.description}
+                        </CardDescription>
+                      </div>
                     </div>
-                  </div>
-                </div>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-1.5">
+                      {feat.items.map((item) => (
+                        <li
+                          key={item}
+                          className="flex items-center gap-2 text-sm text-muted-foreground"
+                        >
+                          <span className="size-1.5 shrink-0 rounded-full bg-primary" />
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
               );
             })}
           </div>
@@ -522,7 +533,7 @@ export default function Home() {
 
       {/* ── Architecture ── */}
       <section id="architecture" className="border-b border-border py-32">
-        <div className="mx-auto max-w-7xl px-4 md:px-6">
+        <div className="mx-auto max-w-7xl px-3 md:px-6">
           <div className="mx-auto mb-16 max-w-2xl text-center">
             <Badge variant="outline" className="mb-4">
               Architecture
@@ -532,8 +543,9 @@ export default function Home() {
             </h2>
             <p className="mt-4 text-muted-foreground">
               The NestJS API serves web, admin, and mobile from a single
-              Postgres database. Web and admin traffic flow through Next.js BFFs
-              that share @repo/web-core; Flutter talks directly to the API.
+              Postgres database. Admin traffic flows through a Next.js BFF
+              with @repo/web-core; web is static marketing; Flutter talks
+              directly to the API.
             </p>
           </div>
           <ArchDiagram />
@@ -542,13 +554,13 @@ export default function Home() {
 
       {/* ── Stack ── */}
       <section id="stack" className="border-b border-border py-24">
-        <div className="mx-auto max-w-7xl px-4 md:px-6">
+        <div className="mx-auto max-w-7xl px-3 md:px-6">
           {/* Header — left-aligned, editorial */}
           <div className="mb-16 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+              <Badge variant="outline" className="mb-3">
                 Tech stack
-              </p>
+              </Badge>
               <h2 className="text-4xl font-bold tracking-tight lg:text-5xl">
                 Every dependency chosen
                 <br className="hidden lg:block" /> for production, not demos.
@@ -561,44 +573,47 @@ export default function Home() {
             </p>
           </div>
 
-          {/* Manifest */}
-          <div>
-            {stackLayers.map((layer) => (
-              <div key={layer.label}>
-                {/* Layer rule */}
-                <div className="flex items-center gap-5 pb-1 pt-6">
-                  <span className="shrink-0 text-[9px] font-bold uppercase tracking-[0.28em] text-muted-foreground/50">
-                    {layer.label}
-                  </span>
-                  <div className="h-px flex-1 bg-border" />
-                </div>
-
-                {/* Package rows */}
-                {layer.packages.map((pkg) => (
-                  <div
-                    key={pkg.name}
-                    className="grid grid-cols-[1fr] gap-1 border-b border-border/40 py-3.5 last:border-0 sm:grid-cols-[160px_56px_1fr] sm:items-baseline sm:gap-6"
-                  >
-                    <span className="font-semibold text-foreground">
-                      {pkg.name}
+          <Card>
+            <CardContent className="px-0">
+              {stackLayers.map((layer, layerIndex) => (
+                <div key={layer.label}>
+                  <div className="flex items-center gap-5 px-6 pb-1 pt-6">
+                    <span className="shrink-0 text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                      {layer.label}
                     </span>
-                    <span className="font-mono text-xs text-muted-foreground/60 sm:text-center">
-                      {pkg.version}
-                    </span>
-                    <span className="text-sm leading-6 text-muted-foreground">
-                      {pkg.description}
-                    </span>
+                    <Separator className="flex-1" />
                   </div>
-                ))}
-              </div>
-            ))}
-          </div>
+                  {layer.packages.map((pkg, pkgIndex) => (
+                    <div key={pkg.name}>
+                      <div className="grid grid-cols-1 gap-1 px-6 py-3.5 sm:grid-cols-[160px_56px_1fr] sm:items-baseline sm:gap-6">
+                        <span className="font-semibold text-foreground">
+                          {pkg.name}
+                        </span>
+                        <span className="font-mono text-xs text-muted-foreground sm:text-center">
+                          {pkg.version}
+                        </span>
+                        <span className="text-sm leading-6 text-muted-foreground">
+                          {pkg.description}
+                        </span>
+                      </div>
+                      {pkgIndex < layer.packages.length - 1 ? (
+                        <Separator className="mx-6" />
+                      ) : null}
+                    </div>
+                  ))}
+                  {layerIndex < stackLayers.length - 1 ? (
+                    <Separator className="mt-2" />
+                  ) : null}
+                </div>
+              ))}
+            </CardContent>
+          </Card>
         </div>
       </section>
 
       {/* ── Get Started ── */}
       <section id="get-started" className="border-b border-border py-24">
-        <div className="mx-auto max-w-7xl px-4 md:px-6">
+        <div className="mx-auto max-w-7xl px-3 md:px-6">
           <div className="mx-auto mb-16 max-w-2xl text-center">
             <Badge variant="outline" className="mb-4">
               Get started
@@ -612,108 +627,24 @@ export default function Home() {
           </div>
           <div className="grid gap-5 md:grid-cols-3">
             {steps.map((step) => (
-              <div
-                key={step.step}
-                className="rounded-2xl border border-border bg-card p-6"
-              >
-                <p className="mb-3 font-mono text-4xl font-bold text-muted-foreground/20">
-                  {step.step}
-                </p>
-                <h3 className="mb-2 font-semibold">{step.title}</h3>
-                <p className="mb-4 text-sm text-muted-foreground">
-                  {step.description}
-                </p>
-                <div className="rounded-lg bg-muted px-3 py-2">
-                  <code className="font-mono text-xs">
-                    <span className="text-muted-foreground">$ </span>
-                    {step.code}
-                  </code>
-                </div>
-              </div>
+              <Card key={step.step}>
+                <CardHeader>
+                  <CardDescription className="font-mono text-4xl font-bold text-muted-foreground">
+                    {step.step}
+                  </CardDescription>
+                  <CardTitle>{step.title}</CardTitle>
+                  <CardDescription>{step.description}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="rounded-lg bg-muted px-3 py-2">
+                    <code className="font-mono text-xs text-foreground">
+                      <span className="text-muted-foreground">$ </span>
+                      {step.code}
+                    </code>
+                  </div>
+                </CardContent>
+              </Card>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Auth CTA ── */}
-      <section className="border-b border-border py-24">
-        <div className="mx-auto max-w-7xl px-4 md:px-6">
-          <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
-            <div className="space-y-6">
-              <Badge variant="outline">Authentication</Badge>
-              <h2 className="text-4xl font-bold tracking-tight">
-                Ready-to-use auth flows
-              </h2>
-              <p className="text-muted-foreground">
-                Every common authentication pattern ships out of the box — JWT
-                session management, multi-factor, social login, and secure
-                password recovery.
-              </p>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                {[
-                  "Email + password with Argon2 hashing",
-                  "GitHub, Google & Apple SSO (OAuth2 / OIDC)",
-                  "TOTP two-factor authentication",
-                  "Secure refresh token rotation",
-                  "Password reset via email",
-                  "Email verification flow",
-                  "Session management & revocation",
-                ].map((item) => (
-                  <li key={item} className="flex items-center gap-2">
-                    <CheckCircle2 className="size-4 shrink-0 text-primary" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="grid gap-3 sm:grid-cols-2">
-              {[
-                {
-                  href: "/login",
-                  label: "Sign in",
-                  description: "Email + password or social login",
-                  icon: LogIn,
-                },
-                {
-                  href: "/register",
-                  label: "Create account",
-                  description: "Register with email and password",
-                  icon: UserPlus,
-                },
-                {
-                  href: "/forgot-password",
-                  label: "Forgot password",
-                  description: "Send a password reset email",
-                  icon: Shield,
-                },
-                {
-                  href: "/verify-email",
-                  label: "Verify email",
-                  description: "Confirm your email address",
-                  icon: CheckCircle2,
-                },
-              ].map((item) => {
-                const Icon = item.icon;
-                return (
-                  <a
-                    key={item.href}
-                    href={item.href}
-                    className="group flex flex-col gap-3 rounded-2xl border border-border bg-card p-5 transition-all hover:border-border/80 hover:shadow-sm"
-                  >
-                    <div className="flex size-9 items-center justify-center rounded-lg border border-border bg-muted transition-colors group-hover:bg-muted/70">
-                      <Icon className="size-4" />
-                    </div>
-                    <div>
-                      <p className="font-semibold">{item.label}</p>
-                      <p className="mt-0.5 text-sm text-muted-foreground">
-                        {item.description}
-                      </p>
-                    </div>
-                  </a>
-                );
-              })}
-            </div>
           </div>
         </div>
       </section>
@@ -722,17 +653,15 @@ export default function Home() {
 
       {/* ── Footer ── */}
       <footer className="py-12">
-        <div className="mx-auto max-w-7xl px-4 md:px-6">
+        <div className="mx-auto max-w-7xl px-3 md:px-6">
           <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
             <div className="flex items-center gap-2.5">
-              <div className="flex size-6 items-center justify-center rounded-md bg-foreground">
-                <Zap className="size-3 text-background" />
+              <div className="flex size-8 items-center justify-center rounded-lg bg-foreground">
+                <Zap className="size-4 text-background" />
               </div>
               <span className="text-sm font-semibold">Super Template</span>
             </div>
             <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
-              <a href="/login" className="hover:text-foreground">Sign in</a>
-              <a href="/register" className="hover:text-foreground">Register</a>
               <a
                 href={ADMIN_URL}
                 target="_blank"

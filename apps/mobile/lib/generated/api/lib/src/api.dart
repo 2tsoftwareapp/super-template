@@ -21,16 +21,13 @@ import 'package:super_template_api/src/api/admin_settings_api.dart';
 import 'package:super_template_api/src/api/admin_users_api.dart';
 import 'package:super_template_api/src/api/attachments_api.dart';
 import 'package:super_template_api/src/api/auth_api.dart';
-import 'package:super_template_api/src/api/comments_api.dart';
 import 'package:super_template_api/src/api/exports_api.dart';
 import 'package:super_template_api/src/api/files_api.dart';
 import 'package:super_template_api/src/api/health_api.dart';
 import 'package:super_template_api/src/api/imports_api.dart';
-import 'package:super_template_api/src/api/invitations_api.dart';
 import 'package:super_template_api/src/api/mfa_api.dart';
 import 'package:super_template_api/src/api/notifications_api.dart';
 import 'package:super_template_api/src/api/organizations_api.dart';
-import 'package:super_template_api/src/api/projects_api.dart';
 import 'package:super_template_api/src/api/sso_api.dart';
 import 'package:super_template_api/src/api/users_api.dart';
 
@@ -162,12 +159,6 @@ class SuperTemplateApi {
     return AuthApi(dio, serializers);
   }
 
-  /// Get CommentsApi instance, base route and serializer can be overridden by a given but be careful,
-  /// by doing that all interceptors will not be executed
-  CommentsApi getCommentsApi() {
-    return CommentsApi(dio, serializers);
-  }
-
   /// Get ExportsApi instance, base route and serializer can be overridden by a given but be careful,
   /// by doing that all interceptors will not be executed
   ExportsApi getExportsApi() {
@@ -192,12 +183,6 @@ class SuperTemplateApi {
     return ImportsApi(dio, serializers);
   }
 
-  /// Get InvitationsApi instance, base route and serializer can be overridden by a given but be careful,
-  /// by doing that all interceptors will not be executed
-  InvitationsApi getInvitationsApi() {
-    return InvitationsApi(dio, serializers);
-  }
-
   /// Get MfaApi instance, base route and serializer can be overridden by a given but be careful,
   /// by doing that all interceptors will not be executed
   MfaApi getMfaApi() {
@@ -214,12 +199,6 @@ class SuperTemplateApi {
   /// by doing that all interceptors will not be executed
   OrganizationsApi getOrganizationsApi() {
     return OrganizationsApi(dio, serializers);
-  }
-
-  /// Get ProjectsApi instance, base route and serializer can be overridden by a given but be careful,
-  /// by doing that all interceptors will not be executed
-  ProjectsApi getProjectsApi() {
-    return ProjectsApi(dio, serializers);
   }
 
   /// Get SsoApi instance, base route and serializer can be overridden by a given but be careful,

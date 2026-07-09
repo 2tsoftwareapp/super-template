@@ -18,6 +18,6 @@ export async function PATCH(request: NextRequest) {
     body,
   });
 
-  const payload = await response.json();
+  const payload: unknown = await response.json();
   return NextResponse.json(payload, { status: response.status });
 }

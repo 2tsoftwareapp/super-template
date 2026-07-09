@@ -14,11 +14,6 @@ class ShellScaffold extends StatelessWidget {
       activeIcon: Icons.home_rounded,
     ),
     _TabItem(
-      label: 'Projects',
-      icon: Icons.folder_outlined,
-      activeIcon: Icons.folder_rounded,
-    ),
-    _TabItem(
       label: 'Notifications',
       icon: Icons.notifications_outlined,
       activeIcon: Icons.notifications_rounded,
@@ -57,8 +52,6 @@ class ShellScaffold extends StatelessWidget {
   }
 
   void _onTap(BuildContext context, int index) {
-    // Defer navigation to the next frame so NavigationBar semantics/layout
-    // can settle first (avoids parentDataDirty assertions on tab switch).
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!context.mounted) return;
 

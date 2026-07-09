@@ -16,6 +16,6 @@ export async function POST(request: NextRequest) {
     headers: new Headers({ "content-type": "application/json" }),
   });
 
-  const payload = await response.json();
+  const payload: unknown = await response.json();
   return NextResponse.json(payload, { status: response.status });
 }

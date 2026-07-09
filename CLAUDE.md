@@ -23,7 +23,6 @@ packages/
   @repo/api-health       health checks
   @repo/api-identity     auth, RBAC, MFA (bounded context)
   @repo/api-platform     platform features (bounded context)
-  @repo/api-workspace    workspace/org features (bounded context)
   @repo/api-sort         sorting/query helpers
   @repo/env-loader       layered env resolution
   @repo/web-core         shared web UI + logic (consumed by web & admin)

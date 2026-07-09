@@ -109,7 +109,8 @@ export const envSchema = z.object({
   NEXT_PUBLIC_API_BASE_PATH: z.string().min(1).default('/api'),
   // Optional Redis endpoint for shared throttling, cache, and fan-out. Leave empty to keep single-instance behavior.
   REDIS_URL: emptyStringToUndefined,
-  // Access-profile cache TTL in seconds. Uses in-process memory when REDIS_URL is unset.
+  // Required in production for distributed rate limiting and shared access-profile cache.
+  // Uses in-process memory when REDIS_URL is unset (development/test only).
   ACCESS_PROFILE_CACHE_TTL_SECONDS: z.coerce
     .number()
     .int()

@@ -14,7 +14,6 @@ describe("admin resource registry", () => {
       "dashboard",
       "users",
       "roles",
-      "projects",
       "audit-logs",
       "notifications",
       "jobs",
@@ -27,7 +26,7 @@ describe("admin resource registry", () => {
 
   it("matches nested paths to their parent resource", () => {
     expect(getResourceForPath("/users/123")?.id).toBe("users");
-    expect(getResourceForPath("/projects/123/edit")?.id).toBe("projects");
+    expect(getResourceForPath("/notifications")?.id).toBe("notifications");
     expect(getResourceForPath("/unknown")?.id).toBe("dashboard");
   });
 
@@ -40,7 +39,7 @@ describe("admin resource registry", () => {
     expect(users).toBeDefined();
     expect(dashboard).toBeDefined();
     expect(canAccessResource(users!, ["users.read"])).toBe(true);
-    expect(canAccessResource(users!, ["projects.read"])).toBe(false);
+    expect(canAccessResource(users!, ["files.read"])).toBe(false);
     expect(canAccessResource(dashboard!, [])).toBe(true);
   });
 
@@ -57,7 +56,7 @@ describe("admin resource registry", () => {
   });
 
   it("returns the first accessible route for a permission set", () => {
-    expect(getFirstAccessibleResourcePath(["projects.read"])).toBe("/projects");
+    expect(getFirstAccessibleResourcePath(["files.read"])).toBe("/files");
     expect(getFirstAccessibleResourcePath(["users.read"])).toBe("/users");
     expect(getFirstAccessibleResourcePath([])).toBe("/");
   });

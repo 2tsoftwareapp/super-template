@@ -248,7 +248,7 @@ export function UserDetailView() {
                   {updateProfile.isPending ? <><Spinner className="size-4" /> Saving…</> : "Save profile"}
                 </Button>
                 {updateProfile.isSuccess && (
-                  <span className="flex items-center gap-1 text-xs text-emerald-600"><CheckCircle2 className="size-3" /> Saved</span>
+                  <span className="flex items-center gap-1 text-xs text-primary"><CheckCircle2 className="size-3" /> Saved</span>
                 )}
                 {updateProfile.isError && (
                   <span className="text-xs text-destructive">Save failed.</span>
@@ -291,7 +291,7 @@ export function UserDetailView() {
                 {updateStatus.isPending ? <><Spinner className="size-3.5" /> Updating…</> : "Apply status"}
               </Button>
               {updateStatus.isSuccess && (
-                <span className="flex items-center gap-1 text-xs text-emerald-600"><CheckCircle2 className="size-3" /> Updated</span>
+                <span className="flex items-center gap-1 text-xs text-primary"><CheckCircle2 className="size-3" /> Updated</span>
               )}
               {updateStatus.isError && (
                 <span className="text-xs text-destructive">
@@ -351,7 +351,7 @@ export function UserDetailView() {
                 {replaceRoles.isPending ? <><Spinner className="size-3.5" /> Saving…</> : "Save roles"}
               </Button>
               {replaceRoles.isSuccess && (
-                <span className="flex items-center gap-1 text-xs text-emerald-600"><CheckCircle2 className="size-3" /> Saved</span>
+                <span className="flex items-center gap-1 text-xs text-primary"><CheckCircle2 className="size-3" /> Saved</span>
               )}
               {replaceRoles.isError && (
                 <span className="text-xs text-destructive">

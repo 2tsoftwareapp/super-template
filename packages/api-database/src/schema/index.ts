@@ -27,13 +27,18 @@ export {
 } from './identity/two-factor';
 export { users } from './identity/users';
 
+export { activities } from './platform/activities';
 export { attachments } from './platform/attachments';
 export { auditLogs } from './platform/audit';
 // Platform
 export {
+  activityVisibilityEnum,
   importExportJobStatusEnum,
   jobStatusEnum,
   mailDeliveryStatusEnum,
+  notificationAudienceEnum,
+  notificationDevicePlatformEnum,
+  notificationJobStatusEnum,
 } from './platform/enums';
 export { fileBatchOperations } from './platform/file-batch-operations';
 export { fileVersions } from './platform/file-versions';
@@ -44,26 +49,12 @@ export { jobDependencies } from './platform/job-dependencies';
 export { jobEvents } from './platform/job-events';
 export { jobs } from './platform/jobs';
 export { mailDeliveries } from './platform/mail';
-export { applicationSettings } from './platform/settings';
-
-export { activities } from './workspace/activities';
-export { comments } from './workspace/comments';
-// Workspace
-export {
-  activityVisibilityEnum,
-  invitationStatusEnum,
-  notificationAudienceEnum,
-  notificationDevicePlatformEnum,
-  notificationJobStatusEnum,
-  projectStatusEnum,
-} from './workspace/enums';
-export { invitations } from './workspace/invitations';
 export {
   notificationDeviceTokens,
   notificationJobs,
   notifications,
-} from './workspace/notifications';
-export { projects } from './workspace/projects';
+} from './platform/notifications';
+export { applicationSettings } from './platform/settings';
 
 import {
   permissions,
@@ -88,6 +79,7 @@ import {
   userTwoFactorSecrets,
 } from './identity/two-factor';
 import { users } from './identity/users';
+import { activities } from './platform/activities';
 import { attachments } from './platform/attachments';
 import { auditLogs } from './platform/audit';
 import { fileBatchOperations } from './platform/file-batch-operations';
@@ -99,16 +91,12 @@ import { jobDependencies } from './platform/job-dependencies';
 import { jobEvents } from './platform/job-events';
 import { jobs } from './platform/jobs';
 import { mailDeliveries } from './platform/mail';
-import { applicationSettings } from './platform/settings';
-import { activities } from './workspace/activities';
-import { comments } from './workspace/comments';
-import { invitations } from './workspace/invitations';
 import {
   notificationDeviceTokens,
   notificationJobs,
   notifications,
-} from './workspace/notifications';
-import { projects } from './workspace/projects';
+} from './platform/notifications';
+import { applicationSettings } from './platform/settings';
 
 export const schema = {
   activities,
@@ -116,7 +104,6 @@ export const schema = {
   attachments,
   authSessions,
   auditLogs,
-  comments,
   emailVerificationTokens,
   exportJobs,
   externalIdentities,
@@ -124,7 +111,6 @@ export const schema = {
   fileVersions,
   files,
   importJobs,
-  invitations,
   jobAttempts,
   jobDependencies,
   jobEvents,
@@ -137,7 +123,6 @@ export const schema = {
   organizations,
   passwordResetTokens,
   permissions,
-  projects,
   rolePermissions,
   roles,
   mfaChallenges,

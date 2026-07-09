@@ -44,6 +44,7 @@
     "./search-params": "./src/search-params.ts",
     "./server": "./src/server/index.ts",
     "./session": "./src/session.ts",
+    "./theme/tweakcn-fonts": "./src/theme/tweakcn-fonts.ts",
     "./utils": "./src/utils.ts"
   },
   "scripts": {

@@ -1,6 +1,5 @@
 import { spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
-
 import { Pool } from 'pg';
 
 import { loadCliEnv } from './load-cli-env';

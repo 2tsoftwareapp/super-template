@@ -46,8 +46,8 @@ make dev-mobile   # Flutter — separate terminal
 
 <table>
   <tr>
-    <td align="center"><strong>Web</strong><br /><a href="http://localhost:3000">localhost:3000</a><br /><sub>landing + auth</sub></td>
-    <td align="center"><strong>Admin</strong><br /><a href="http://localhost:3002">localhost:3002</a><br /><sub>operations</sub></td>
+    <td align="center"><strong>Web</strong><br /><a href="http://localhost:3000">localhost:3000</a><br /><sub>SEO landing</sub></td>
+    <td align="center"><strong>Admin</strong><br /><a href="http://localhost:3002">localhost:3002</a><br /><sub>primary app + auth BFF</sub></td>
     <td align="center"><strong>API</strong><br /><a href="http://localhost:3001/api/docs">localhost:3001</a><br /><sub>REST + Swagger</sub></td>
     <td align="center"><strong>Mailpit</strong><br /><a href="http://localhost:8025">localhost:8025</a><br /><sub>dev email</sub></td>
   </tr>
@@ -156,7 +156,7 @@ super-template/
 ├── packages/
 │   ├── api-core/         Config, env schema, ports
 │   ├── api-identity/     Auth, users, SSO, MFA
-│   ├── api-workspace/    Projects, orgs, notifications
+│   ├── api-platform/     Mail, files, jobs, notifications, audit
 │   ├── api-contract/     Generated OpenAPI client
 │   ├── env-loader/       Layered .env loading
 │   └── web-core/         Shared auth + HTTP layer

@@ -19,7 +19,6 @@
     "@repo/api-database": "workspace:*",
     "@repo/api-identity": "workspace:*",
     "@repo/api-platform": "workspace:*",
-    "@repo/api-workspace": "workspace:*",
     "drizzle-orm": "0.45.2"
   },
   "devDependencies": {

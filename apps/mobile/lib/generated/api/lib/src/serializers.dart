@@ -16,7 +16,6 @@ import 'package:built_value/iso_8601_date_time_serializer.dart';
 import 'package:super_template_api/src/date_serializer.dart';
 import 'package:super_template_api/src/model/date.dart';
 
-import 'package:super_template_api/src/model/accept_invitation_dto.dart';
 import 'package:super_template_api/src/model/activities_controller_list200_response.dart';
 import 'package:super_template_api/src/model/activity_dto.dart';
 import 'package:super_template_api/src/model/add_job_dependency_dto.dart';
@@ -63,17 +62,11 @@ import 'package:super_template_api/src/model/batch_delete_files_dto.dart';
 import 'package:super_template_api/src/model/batch_delete_result_dto.dart';
 import 'package:super_template_api/src/model/batch_delete_result_item_dto.dart';
 import 'package:super_template_api/src/model/change_password_dto.dart';
-import 'package:super_template_api/src/model/comment_dto.dart';
-import 'package:super_template_api/src/model/comments_controller_create201_response.dart';
-import 'package:super_template_api/src/model/comments_controller_list200_response.dart';
 import 'package:super_template_api/src/model/count_dto.dart';
 import 'package:super_template_api/src/model/create_admin_user_dto.dart';
-import 'package:super_template_api/src/model/create_comment_dto.dart';
 import 'package:super_template_api/src/model/create_export_dto.dart';
 import 'package:super_template_api/src/model/create_import_dto.dart';
-import 'package:super_template_api/src/model/create_invitation_dto.dart';
 import 'package:super_template_api/src/model/create_organization_dto.dart';
-import 'package:super_template_api/src/model/create_project_dto.dart';
 import 'package:super_template_api/src/model/create_role_dto.dart';
 import 'package:super_template_api/src/model/device_token_dto.dart';
 import 'package:super_template_api/src/model/exchange_sso_session_dto.dart';
@@ -95,9 +88,6 @@ import 'package:super_template_api/src/model/health_controller_get_health200_res
 import 'package:super_template_api/src/model/health_status_dto.dart';
 import 'package:super_template_api/src/model/import_job_dto.dart';
 import 'package:super_template_api/src/model/imports_controller_create201_response.dart';
-import 'package:super_template_api/src/model/invitation_dto.dart';
-import 'package:super_template_api/src/model/invitations_controller_create201_response.dart';
-import 'package:super_template_api/src/model/invitations_controller_list200_response.dart';
 import 'package:super_template_api/src/model/job_dependency_dto.dart';
 import 'package:super_template_api/src/model/job_dto.dart';
 import 'package:super_template_api/src/model/job_event_dto.dart';
@@ -133,11 +123,6 @@ import 'package:super_template_api/src/model/organizations_controller_update_mem
 import 'package:super_template_api/src/model/pagination_meta_dto.dart';
 import 'package:super_template_api/src/model/permission_dto.dart';
 import 'package:super_template_api/src/model/preferences_controller_get_my_preferences200_response.dart';
-import 'package:super_template_api/src/model/project_attachment_dto.dart';
-import 'package:super_template_api/src/model/project_dto.dart';
-import 'package:super_template_api/src/model/projects_controller_create201_response.dart';
-import 'package:super_template_api/src/model/projects_controller_list200_response.dart';
-import 'package:super_template_api/src/model/projects_controller_list_attachments200_response.dart';
 import 'package:super_template_api/src/model/refresh_token_dto.dart';
 import 'package:super_template_api/src/model/register_device_dto.dart';
 import 'package:super_template_api/src/model/register_dto.dart';
@@ -158,12 +143,10 @@ import 'package:super_template_api/src/model/success_message_dto.dart';
 import 'package:super_template_api/src/model/switch_organization_dto.dart';
 import 'package:super_template_api/src/model/switch_organization_response_dto.dart';
 import 'package:super_template_api/src/model/update_admin_user_dto.dart';
-import 'package:super_template_api/src/model/update_comment_dto.dart';
 import 'package:super_template_api/src/model/update_member_role_dto.dart';
 import 'package:super_template_api/src/model/update_organization_dto.dart';
 import 'package:super_template_api/src/model/update_preferences_dto.dart';
 import 'package:super_template_api/src/model/update_profile_dto.dart';
-import 'package:super_template_api/src/model/update_project_dto.dart';
 import 'package:super_template_api/src/model/update_role_dto.dart';
 import 'package:super_template_api/src/model/update_setting_dto.dart';
 import 'package:super_template_api/src/model/update_user_status_dto.dart';
@@ -175,7 +158,6 @@ import 'package:super_template_api/src/model/verify_mfa_challenge_dto.dart';
 part 'serializers.g.dart';
 
 @SerializersFor([
-  AcceptInvitationDto,
   ActivitiesControllerList200Response,
   ActivityDto,
   AddJobDependencyDto,
@@ -222,17 +204,11 @@ part 'serializers.g.dart';
   BatchDeleteResultDto,
   BatchDeleteResultItemDto,
   ChangePasswordDto,
-  CommentDto,
-  CommentsControllerCreate201Response,
-  CommentsControllerList200Response,
   CountDto,
   CreateAdminUserDto,
-  CreateCommentDto,
   CreateExportDto,
   CreateImportDto,
-  CreateInvitationDto,
   CreateOrganizationDto,
-  CreateProjectDto,
   CreateRoleDto,
   DeviceTokenDto,
   ExchangeSsoSessionDto,
@@ -254,9 +230,6 @@ part 'serializers.g.dart';
   HealthStatusDto,
   ImportJobDto,
   ImportsControllerCreate201Response,
-  InvitationDto,
-  InvitationsControllerCreate201Response,
-  InvitationsControllerList200Response,
   JobDependencyDto,
   JobDto,
   JobEventDto,
@@ -292,11 +265,6 @@ part 'serializers.g.dart';
   PaginationMetaDto,
   PermissionDto,
   PreferencesControllerGetMyPreferences200Response,
-  ProjectAttachmentDto,
-  ProjectDto,
-  ProjectsControllerCreate201Response,
-  ProjectsControllerList200Response,
-  ProjectsControllerListAttachments200Response,
   RefreshTokenDto,
   RegisterDeviceDto,
   RegisterDto,
@@ -317,12 +285,10 @@ part 'serializers.g.dart';
   SwitchOrganizationDto,
   SwitchOrganizationResponseDto,
   UpdateAdminUserDto,
-  UpdateCommentDto,
   UpdateMemberRoleDto,
   UpdateOrganizationDto,
   UpdatePreferencesDto,
   UpdateProfileDto,
-  UpdateProjectDto,
   UpdateRoleDto,
   UpdateSettingDto,
   UpdateUserStatusDto,

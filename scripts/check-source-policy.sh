@@ -16,7 +16,6 @@ packages/api-core/src
 packages/api-database/src
 packages/api-identity/src
 packages/api-platform/src
-packages/api-workspace/src
 "
 
 search_matches() {
@@ -67,7 +66,7 @@ search_unknown_targets() {
     rg -n "$pattern" \
       packages/api-identity/src/modules \
       packages/api-platform/src/modules \
-      packages/api-workspace/src/modules \
+      packages/api-platform/src/modules \
       apps/admin/src \
       apps/web/src \
       --glob '**/application/**' \
@@ -131,7 +130,7 @@ search_index_exports() {
       packages/api-database/src/index.ts \
       packages/api-identity/src/index.ts \
       packages/api-platform/src/index.ts \
-      packages/api-workspace/src/index.ts \
+      packages/api-platform/src/index.ts \
       packages/api-bootstrap/src/index.ts \
       packages/api-health/src/index.ts
     return
@@ -142,7 +141,7 @@ search_index_exports() {
     packages/api-database/src/index.ts \
     packages/api-identity/src/index.ts \
     packages/api-platform/src/index.ts \
-    packages/api-workspace/src/index.ts \
+    packages/api-platform/src/index.ts \
     packages/api-bootstrap/src/index.ts \
     packages/api-health/src/index.ts \
     2>/dev/null || true
@@ -170,13 +169,13 @@ search_presentation_imports() {
     rg -n "$pattern" \
       packages/api-identity/src/modules \
       packages/api-platform/src/modules \
-      packages/api-workspace/src/modules \
+      packages/api-platform/src/modules \
       --glob '**/presentation/**/*.ts' \
       --glob '!**/*.spec.ts'
     return
   fi
 
-  find packages/api-identity/src/modules packages/api-platform/src/modules packages/api-workspace/src/modules \
+  find packages/api-identity/src/modules packages/api-platform/src/modules packages/api-platform/src/modules \
     -path '*/presentation/*' -name '*.ts' ! -name '*.spec.ts' -print |
     xargs grep -nE "$pattern" 2>/dev/null || true
 }
@@ -218,13 +217,13 @@ search_application_imports() {
     rg -n "$pattern" \
       packages/api-identity/src/modules \
       packages/api-platform/src/modules \
-      packages/api-workspace/src/modules \
+      packages/api-platform/src/modules \
       --glob '**/application/**/*.ts' \
       --glob '!**/*.spec.ts'
     return
   fi
 
-  find packages/api-identity/src/modules packages/api-platform/src/modules packages/api-workspace/src/modules \
+  find packages/api-identity/src/modules packages/api-platform/src/modules packages/api-platform/src/modules \
     -path '*/application/*' -name '*.ts' ! -name '*.spec.ts' -print |
     xargs grep -nE "$pattern" 2>/dev/null || true
 }
@@ -275,7 +274,7 @@ check_application_policy \
 
 warn_large_application_services() {
   if command -v rg >/dev/null 2>&1; then
-  files=$(find packages/api-identity/src/modules packages/api-platform/src/modules packages/api-workspace/src/modules \
+  files=$(find packages/api-identity/src/modules packages/api-platform/src/modules packages/api-platform/src/modules \
     -path '*/application/*.service.ts' ! -name '*.spec.ts' 2>/dev/null || true)
   for file in $files; do
     lines=$(wc -l <"$file" | tr -d ' ')

@@ -40,69 +40,39 @@ record_violation() {
 }
 
 record_violation \
-  'identity must not import platform/workspace application services' \
-  'Depend on api-core ports instead of concrete platform/workspace services.' \
+  'identity must not import platform application services' \
+  'Depend on api-core ports instead of concrete platform services.' \
   "from '@repo/api-platform/modules/.+/application/" \
   packages/api-identity/src
 
 record_violation \
-  'identity must not import platform/workspace infrastructure' \
-  'Depend on api-core ports instead of concrete platform/workspace repositories.' \
+  'identity must not import platform infrastructure' \
+  'Depend on api-core ports instead of concrete platform repositories.' \
   "from '@repo/api-platform/modules/.+/infrastructure/" \
   packages/api-identity/src
 
 record_violation \
-  'identity must not import workspace services' \
-  'Depend on api-core ports instead of concrete workspace services.' \
-  "from '@repo/api-workspace/" \
-  packages/api-identity/src
-
-record_violation \
-  'platform must not import workspace services' \
-  'Depend on api-core ports instead of concrete workspace services.' \
-  "from '@repo/api-workspace/modules/.+/application/" \
+  'platform must not import identity application services' \
+  'Depend on api-core ports instead of concrete identity services.' \
+  "from '@repo/api-identity/modules/.+/application/" \
   packages/api-platform/src
 
 record_violation \
-  'workspace must not import identity/platform application services' \
-  'Depend on api-core ports instead of concrete identity/platform services.' \
-  "from '@repo/api-identity/modules/.+/application/" \
-  packages/api-workspace/src
-
-record_violation \
-  'workspace must not import identity/platform infrastructure' \
-  'Depend on api-core ports instead of concrete identity/platform repositories.' \
+  'platform must not import identity infrastructure' \
+  'Depend on api-core ports instead of concrete identity repositories.' \
   "from '@repo/api-identity/modules/.+/infrastructure/" \
-  packages/api-workspace/src
-
-record_violation \
-  'workspace must not import platform application services' \
-  'Depend on api-core ports instead of concrete platform services.' \
-  "from '@repo/api-platform/modules/.+/application/" \
-  packages/api-workspace/src
-
-record_violation \
-  'workspace must not import platform infrastructure' \
-  'Depend on api-core ports instead of concrete platform repositories.' \
-  "from '@repo/api-platform/modules/.+/infrastructure/" \
-  packages/api-workspace/src
+  packages/api-platform/src
 
 record_violation \
   'identity must not import cross-context Nest modules' \
   'Register providers via global *PortsModule and depend on api-core port tokens.' \
-  "from '@repo/api-(platform|workspace)/modules/.+\\.module'" \
+  "from '@repo/api-platform/modules/.+\\.module'" \
   packages/api-identity/src
 
 record_violation \
   'platform must not import cross-context Nest modules' \
   'Register providers via global *PortsModule and depend on api-core port tokens.' \
-  "from '@repo/api-(identity|workspace)/modules/.+\\.module'" \
+  "from '@repo/api-identity/modules/.+\\.module'" \
   packages/api-platform/src
-
-record_violation \
-  'workspace must not import cross-context Nest modules' \
-  'Register providers via global *PortsModule and depend on api-core port tokens.' \
-  "from '@repo/api-(identity|platform)/modules/.+\\.module'" \
-  packages/api-workspace/src
 
 exit "$failed"

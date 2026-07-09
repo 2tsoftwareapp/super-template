@@ -121,10 +121,6 @@ Class | Method | HTTP request | Description
 [*AuthApi*](doc/AuthApi.md) | [**authControllerSwitchOrganization**](doc/AuthApi.md#authcontrollerswitchorganization) | **POST** /api/v1/auth/switch-organization | 
 [*AuthApi*](doc/AuthApi.md) | [**authControllerVerifyEmail**](doc/AuthApi.md#authcontrollerverifyemail) | **POST** /api/v1/auth/verify-email | 
 [*AuthApi*](doc/AuthApi.md) | [**authControllerVerifyMfaChallenge**](doc/AuthApi.md#authcontrollerverifymfachallenge) | **POST** /api/v1/auth/mfa/verify-challenge | 
-[*CommentsApi*](doc/CommentsApi.md) | [**commentsControllerCreate**](doc/CommentsApi.md#commentscontrollercreate) | **POST** /api/v1/comments | 
-[*CommentsApi*](doc/CommentsApi.md) | [**commentsControllerDelete**](doc/CommentsApi.md#commentscontrollerdelete) | **DELETE** /api/v1/comments/{id} | 
-[*CommentsApi*](doc/CommentsApi.md) | [**commentsControllerList**](doc/CommentsApi.md#commentscontrollerlist) | **GET** /api/v1/comments | 
-[*CommentsApi*](doc/CommentsApi.md) | [**commentsControllerUpdate**](doc/CommentsApi.md#commentscontrollerupdate) | **PATCH** /api/v1/comments/{id} | 
 [*ExportsApi*](doc/ExportsApi.md) | [**exportsControllerCreate**](doc/ExportsApi.md#exportscontrollercreate) | **POST** /api/v1/exports | 
 [*ExportsApi*](doc/ExportsApi.md) | [**exportsControllerGetById**](doc/ExportsApi.md#exportscontrollergetbyid) | **GET** /api/v1/exports/{id} | 
 [*FilesApi*](doc/FilesApi.md) | [**filesControllerBatchDelete**](doc/FilesApi.md#filescontrollerbatchdelete) | **POST** /api/v1/files/batch-delete | 
@@ -142,10 +138,6 @@ Class | Method | HTTP request | Description
 [*ImportsApi*](doc/ImportsApi.md) | [**importsControllerConfirm**](doc/ImportsApi.md#importscontrollerconfirm) | **POST** /api/v1/imports/{id}/confirm | 
 [*ImportsApi*](doc/ImportsApi.md) | [**importsControllerCreate**](doc/ImportsApi.md#importscontrollercreate) | **POST** /api/v1/imports | 
 [*ImportsApi*](doc/ImportsApi.md) | [**importsControllerGetById**](doc/ImportsApi.md#importscontrollergetbyid) | **GET** /api/v1/imports/{id} | 
-[*InvitationsApi*](doc/InvitationsApi.md) | [**invitationsControllerAccept**](doc/InvitationsApi.md#invitationscontrolleraccept) | **POST** /api/v1/invitations/accept | 
-[*InvitationsApi*](doc/InvitationsApi.md) | [**invitationsControllerCreate**](doc/InvitationsApi.md#invitationscontrollercreate) | **POST** /api/v1/invitations | 
-[*InvitationsApi*](doc/InvitationsApi.md) | [**invitationsControllerList**](doc/InvitationsApi.md#invitationscontrollerlist) | **GET** /api/v1/invitations | 
-[*InvitationsApi*](doc/InvitationsApi.md) | [**invitationsControllerRevoke**](doc/InvitationsApi.md#invitationscontrollerrevoke) | **DELETE** /api/v1/invitations/{id} | 
 [*MfaApi*](doc/MfaApi.md) | [**mfaControllerConfirm**](doc/MfaApi.md#mfacontrollerconfirm) | **POST** /api/v1/auth/mfa/confirm | 
 [*MfaApi*](doc/MfaApi.md) | [**mfaControllerDisable**](doc/MfaApi.md#mfacontrollerdisable) | **POST** /api/v1/auth/mfa/disable | 
 [*MfaApi*](doc/MfaApi.md) | [**mfaControllerGetStatus**](doc/MfaApi.md#mfacontrollergetstatus) | **GET** /api/v1/auth/mfa/status | 
@@ -168,13 +160,6 @@ Class | Method | HTTP request | Description
 [*OrganizationsApi*](doc/OrganizationsApi.md) | [**organizationsControllerRemoveMember**](doc/OrganizationsApi.md#organizationscontrollerremovemember) | **DELETE** /api/v1/organizations/{id}/members/{userId} | 
 [*OrganizationsApi*](doc/OrganizationsApi.md) | [**organizationsControllerUpdate**](doc/OrganizationsApi.md#organizationscontrollerupdate) | **PATCH** /api/v1/organizations/{id} | 
 [*OrganizationsApi*](doc/OrganizationsApi.md) | [**organizationsControllerUpdateMemberRole**](doc/OrganizationsApi.md#organizationscontrollerupdatememberrole) | **PATCH** /api/v1/organizations/{id}/members/{userId} | 
-[*ProjectsApi*](doc/ProjectsApi.md) | [**projectsControllerCreate**](doc/ProjectsApi.md#projectscontrollercreate) | **POST** /api/v1/projects | 
-[*ProjectsApi*](doc/ProjectsApi.md) | [**projectsControllerGetById**](doc/ProjectsApi.md#projectscontrollergetbyid) | **GET** /api/v1/projects/{id} | 
-[*ProjectsApi*](doc/ProjectsApi.md) | [**projectsControllerList**](doc/ProjectsApi.md#projectscontrollerlist) | **GET** /api/v1/projects | 
-[*ProjectsApi*](doc/ProjectsApi.md) | [**projectsControllerListAttachments**](doc/ProjectsApi.md#projectscontrollerlistattachments) | **GET** /api/v1/projects/{id}/attachments | 
-[*ProjectsApi*](doc/ProjectsApi.md) | [**projectsControllerRemove**](doc/ProjectsApi.md#projectscontrollerremove) | **DELETE** /api/v1/projects/{id} | 
-[*ProjectsApi*](doc/ProjectsApi.md) | [**projectsControllerRestore**](doc/ProjectsApi.md#projectscontrollerrestore) | **POST** /api/v1/projects/{id}/restore | 
-[*ProjectsApi*](doc/ProjectsApi.md) | [**projectsControllerUpdate**](doc/ProjectsApi.md#projectscontrollerupdate) | **PATCH** /api/v1/projects/{id} | 
 [*SsoApi*](doc/SsoApi.md) | [**ssoControllerExchangeSession**](doc/SsoApi.md#ssocontrollerexchangesession) | **POST** /api/v1/auth/sso/exchange | 
 [*SsoApi*](doc/SsoApi.md) | [**ssoControllerHandleCallbackGet**](doc/SsoApi.md#ssocontrollerhandlecallbackget) | **GET** /api/v1/auth/sso/{provider}/callback | 
 [*SsoApi*](doc/SsoApi.md) | [**ssoControllerHandleCallbackPost**](doc/SsoApi.md#ssocontrollerhandlecallbackpost) | **POST** /api/v1/auth/sso/{provider}/callback | 
@@ -189,7 +174,6 @@ Class | Method | HTTP request | Description
 
 ## Documentation For Models
 
- - [AcceptInvitationDto](doc/AcceptInvitationDto.md)
  - [ActivitiesControllerList200Response](doc/ActivitiesControllerList200Response.md)
  - [ActivityDto](doc/ActivityDto.md)
  - [AddJobDependencyDto](doc/AddJobDependencyDto.md)
@@ -236,17 +220,11 @@ Class | Method | HTTP request | Description
  - [BatchDeleteResultDto](doc/BatchDeleteResultDto.md)
  - [BatchDeleteResultItemDto](doc/BatchDeleteResultItemDto.md)
  - [ChangePasswordDto](doc/ChangePasswordDto.md)
- - [CommentDto](doc/CommentDto.md)
- - [CommentsControllerCreate201Response](doc/CommentsControllerCreate201Response.md)
- - [CommentsControllerList200Response](doc/CommentsControllerList200Response.md)
  - [CountDto](doc/CountDto.md)
  - [CreateAdminUserDto](doc/CreateAdminUserDto.md)
- - [CreateCommentDto](doc/CreateCommentDto.md)
  - [CreateExportDto](doc/CreateExportDto.md)
  - [CreateImportDto](doc/CreateImportDto.md)
- - [CreateInvitationDto](doc/CreateInvitationDto.md)
  - [CreateOrganizationDto](doc/CreateOrganizationDto.md)
- - [CreateProjectDto](doc/CreateProjectDto.md)
  - [CreateRoleDto](doc/CreateRoleDto.md)
  - [DeviceTokenDto](doc/DeviceTokenDto.md)
  - [ExchangeSsoSessionDto](doc/ExchangeSsoSessionDto.md)
@@ -268,9 +246,6 @@ Class | Method | HTTP request | Description
  - [HealthStatusDto](doc/HealthStatusDto.md)
  - [ImportJobDto](doc/ImportJobDto.md)
  - [ImportsControllerCreate201Response](doc/ImportsControllerCreate201Response.md)
- - [InvitationDto](doc/InvitationDto.md)
- - [InvitationsControllerCreate201Response](doc/InvitationsControllerCreate201Response.md)
- - [InvitationsControllerList200Response](doc/InvitationsControllerList200Response.md)
  - [JobDependencyDto](doc/JobDependencyDto.md)
  - [JobDto](doc/JobDto.md)
  - [JobEventDto](doc/JobEventDto.md)
@@ -306,11 +281,6 @@ Class | Method | HTTP request | Description
  - [PaginationMetaDto](doc/PaginationMetaDto.md)
  - [PermissionDto](doc/PermissionDto.md)
  - [PreferencesControllerGetMyPreferences200Response](doc/PreferencesControllerGetMyPreferences200Response.md)
- - [ProjectAttachmentDto](doc/ProjectAttachmentDto.md)
- - [ProjectDto](doc/ProjectDto.md)
- - [ProjectsControllerCreate201Response](doc/ProjectsControllerCreate201Response.md)
- - [ProjectsControllerList200Response](doc/ProjectsControllerList200Response.md)
- - [ProjectsControllerListAttachments200Response](doc/ProjectsControllerListAttachments200Response.md)
  - [RefreshTokenDto](doc/RefreshTokenDto.md)
  - [RegisterDeviceDto](doc/RegisterDeviceDto.md)
  - [RegisterDto](doc/RegisterDto.md)
@@ -331,12 +301,10 @@ Class | Method | HTTP request | Description
  - [SwitchOrganizationDto](doc/SwitchOrganizationDto.md)
  - [SwitchOrganizationResponseDto](doc/SwitchOrganizationResponseDto.md)
  - [UpdateAdminUserDto](doc/UpdateAdminUserDto.md)
- - [UpdateCommentDto](doc/UpdateCommentDto.md)
  - [UpdateMemberRoleDto](doc/UpdateMemberRoleDto.md)
  - [UpdateOrganizationDto](doc/UpdateOrganizationDto.md)
  - [UpdatePreferencesDto](doc/UpdatePreferencesDto.md)
  - [UpdateProfileDto](doc/UpdateProfileDto.md)
- - [UpdateProjectDto](doc/UpdateProjectDto.md)
  - [UpdateRoleDto](doc/UpdateRoleDto.md)
  - [UpdateSettingDto](doc/UpdateSettingDto.md)
  - [UpdateUserStatusDto](doc/UpdateUserStatusDto.md)

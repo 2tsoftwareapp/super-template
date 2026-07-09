@@ -60,7 +60,7 @@ function statusBadge(status: string) {
       return {
         variant: "secondary" as const,
         icon: RefreshCcw,
-        className: "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30",
+        className: "bg-accent text-accent-foreground border-border",
       };
     case "FAILED":
     case "CANCELLED":

@@ -53,7 +53,7 @@ function statusBadge(status: string) {
       return {
         variant: "secondary" as const,
         icon: RefreshCw,
-        className: "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30",
+        className: "bg-accent text-accent-foreground border-border",
       };
     case "FAILED":
       return {
@@ -245,7 +245,7 @@ export function ImportsView() {
                   </div>
                   <div>
                     <span className="text-muted-foreground">Success</span>
-                    <p className="mt-0.5 font-medium text-emerald-600">
+                    <p className="mt-0.5 font-medium text-primary">
                       {scalarString(jobData.successCount)}
                     </p>
                   </div>

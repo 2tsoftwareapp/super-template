@@ -15,19 +15,14 @@ String? resolveRedirect({
     '/reset-password',
   };
   final isPublic = publicRoutes.contains(location);
-  final isInvite = location.startsWith('/invite/');
 
   if (isLoading) {
     return location == '/splash' ? null : '/splash';
   }
 
   if (!isAuthenticated) {
-    if (isPublic && location != '/splash') {
-      return null;
-    }
-    if (isInvite) {
-      return '/login';
-    }
+    if (location == '/splash') return '/login';
+    if (isPublic) return null;
     return '/login';
   }
 
@@ -141,29 +136,7 @@ void main() {
       );
     });
 
-    test('/invite/:token redirects to /login', () {
-      expect(
-        resolveRedirect(
-          isAuthenticated: false,
-          isLoading: false,
-          location: '/invite/abc123',
-        ),
-        '/login',
-      );
-    });
-
     test('protected route redirects to /login', () {
-      expect(
-        resolveRedirect(
-          isAuthenticated: false,
-          isLoading: false,
-          location: '/projects',
-        ),
-        '/login',
-      );
-    });
-
-    test('/home redirects to /login when unauthenticated', () {
       expect(
         resolveRedirect(
           isAuthenticated: false,
@@ -242,23 +215,12 @@ void main() {
       );
     });
 
-    test('protected route renders without redirect', () {
+    test('/notifications renders without redirect', () {
       expect(
         resolveRedirect(
           isAuthenticated: true,
           isLoading: false,
-          location: '/projects',
-        ),
-        null,
-      );
-    });
-
-    test('/admin renders without redirect', () {
-      expect(
-        resolveRedirect(
-          isAuthenticated: true,
-          isLoading: false,
-          location: '/admin',
+          location: '/notifications',
         ),
         null,
       );

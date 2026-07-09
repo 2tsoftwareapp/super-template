@@ -20,3 +20,28 @@ export const importExportJobStatusEnum = pgEnum('import_export_job_status', [
   'FAILED',
   'CANCELLED',
 ]);
+
+export const notificationDevicePlatformEnum = pgEnum(
+  'notification_device_platform',
+  ['IOS', 'ANDROID'],
+);
+
+export const notificationAudienceEnum = pgEnum('notification_audience', [
+  'USER',
+  'USERS',
+  'ALL',
+]);
+
+export const notificationJobStatusEnum = pgEnum('notification_job_status', [
+  'PENDING',
+  'PROCESSING',
+  'COMPLETED',
+  'CANCELLED',
+  'FAILED',
+]);
+
+export const activityVisibilityEnum = pgEnum('activity_visibility', [
+  'PUBLIC',
+  'PRIVATE',
+  'INTERNAL',
+]);
