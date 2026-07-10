@@ -5,7 +5,11 @@ import { NextResponse } from "next/server";
 
 import type { AuthLoginResponse, LoginInput } from "@/lib/api-types";
 
-import { clearAuthCookies, setAuthCookies } from "@/lib/auth/cookies";
+import {
+  clearSessionCookies,
+  readAuthCookies,
+  setAuthCookies,
+} from "@/lib/auth/cookies";
 import { callBackend, enforceMutationGuard } from "@/lib/server/backend";
 
 export async function POST(request: NextRequest) {
@@ -15,6 +19,7 @@ export async function POST(request: NextRequest) {
   }
 
   const body = (await request.json()) as LoginInput;
+  const { csrfToken } = await readAuthCookies();
   const response = await callBackend({
     path: "auth/login",
     method: "POST",
@@ -28,13 +33,20 @@ export async function POST(request: NextRequest) {
     { status: response.status },
   );
 
-  if (response.ok && payload.data.accessToken && payload.data.refreshToken) {
-    setAuthCookies(nextResponse, {
-      accessToken: payload.data.accessToken,
-      refreshToken: payload.data.refreshToken,
-    });
-  } else {
-    clearAuthCookies(nextResponse);
+  if (!response.ok) {
+    clearSessionCookies(nextResponse);
+    return nextResponse;
+  }
+
+  if (payload.data.accessToken && payload.data.refreshToken) {
+    setAuthCookies(
+      nextResponse,
+      {
+        accessToken: payload.data.accessToken,
+        refreshToken: payload.data.refreshToken,
+      },
+      csrfToken ?? undefined,
+    );
   }
 
   return nextResponse;

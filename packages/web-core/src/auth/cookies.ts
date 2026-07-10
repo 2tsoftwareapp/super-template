@@ -48,6 +48,7 @@ export interface AuthCookieHelpers {
     payload: AuthTokenPayload,
     csrfToken?: string,
   ) => void;
+  clearSessionCookies: (response: NextResponse) => void;
   clearAuthCookies: (response: NextResponse) => void;
 }
 
@@ -156,7 +157,7 @@ export const createAuthCookieHelpers = ({
     );
   };
 
-  const clearAuthCookies = (response: NextResponse) => {
+  const clearSessionCookies = (response: NextResponse) => {
     response.cookies.set(accessTokenCookie, "", {
       ...baseCookieOptions,
       maxAge: 0,
@@ -165,6 +166,10 @@ export const createAuthCookieHelpers = ({
       ...baseCookieOptions,
       maxAge: 0,
     });
+  };
+
+  const clearAuthCookies = (response: NextResponse) => {
+    clearSessionCookies(response);
     response.cookies.set(csrfTokenCookie, "", {
       ...baseCookieOptions,
       httpOnly: false,
@@ -181,6 +186,7 @@ export const createAuthCookieHelpers = ({
     readAuthCookies,
     setCsrfCookie,
     setAuthCookies,
+    clearSessionCookies,
     clearAuthCookies,
   };
 };

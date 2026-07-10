@@ -31,8 +31,6 @@ export type ResetPasswordInput = components["schemas"]["ResetPasswordDto"];
 export type VerifyEmailInput = components["schemas"]["VerifyEmailDto"];
 export type UpdateProfileInput = components["schemas"]["UpdateProfileDto"];
 export type ChangePasswordInput = components["schemas"]["ChangePasswordDto"];
-export type CreateProjectInput = components["schemas"]["CreateProjectDto"];
-export type UpdateProjectInput = components["schemas"]["UpdateProjectDto"];
 export type CreateAdminUserInput = components["schemas"]["CreateAdminUserDto"];
 export type UpdateAdminUserInput = components["schemas"]["UpdateAdminUserDto"];
 export type UpdateUserStatusInput =
@@ -52,10 +50,6 @@ export type AuthSessionsResponse =
   operations["AuthController_getSessions"]["responses"][200]["content"]["application/json"];
 export type UsersListResponse =
   operations["AdminUsersController_listUsers"]["responses"][200]["content"]["application/json"];
-export type ProjectsListResponse =
-  operations["ProjectsController_list"]["responses"][200]["content"]["application/json"];
-export type ProjectResponse =
-  operations["ProjectsController_getById"]["responses"][200]["content"]["application/json"];
 export type NotificationsListResponse =
   operations["NotificationsController_list"]["responses"][200]["content"]["application/json"];
 export type NotificationsUnreadResponse =
@@ -67,11 +61,16 @@ export type UserDto = components["schemas"]["UserDto"];
 export type AdminUserDto = components["schemas"]["UserDto"];
 export type RoleDto = components["schemas"]["RoleDto"];
 export type OrganizationDto = components["schemas"]["OrganizationDto"];
-export type OrganizationDetailDto = components["schemas"]["OrganizationDetailDto"];
-export type OrganizationMemberDto = components["schemas"]["OrganizationMemberDto"];
-export type CreateOrganizationInput = components["schemas"]["CreateOrganizationDto"];
-export type UpdateOrganizationInput = components["schemas"]["UpdateOrganizationDto"];
-export type UpdateMemberRoleInput = components["schemas"]["UpdateMemberRoleDto"];
+export type OrganizationDetailDto =
+  components["schemas"]["OrganizationDetailDto"];
+export type OrganizationMemberDto =
+  components["schemas"]["OrganizationMemberDto"];
+export type CreateOrganizationInput =
+  components["schemas"]["CreateOrganizationDto"];
+export type UpdateOrganizationInput =
+  components["schemas"]["UpdateOrganizationDto"];
+export type UpdateMemberRoleInput =
+  components["schemas"]["UpdateMemberRoleDto"];
 export type AuditLogDto = components["schemas"]["AuditLogDto"];
 export type JobDto = components["schemas"]["JobDto"];
 export type NotificationDto = components["schemas"]["NotificationDto"];
@@ -86,9 +85,6 @@ export type SendAdminMailResultDto =
 export type ApplicationSettingDto =
   components["schemas"]["ApplicationSettingDto"];
 export type ImportJobDto = components["schemas"]["ImportJobDto"];
-export type ProjectDto = components["schemas"]["ProjectDto"];
-export type ProjectAttachmentDto =
-  components["schemas"]["ProjectAttachmentDto"];
 
 export interface SessionUser {
   id: string;

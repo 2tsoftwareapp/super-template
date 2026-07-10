@@ -1,5 +1,6 @@
 import type { ApiErrorEnvelope } from "./api-types";
 
+import { getCsrfBootstrapPath, getCsrfCookieName } from "./http-config";
 import { getCsrfTokenFromDocument } from "./utils";
 
 export class ApiClientError extends Error {
@@ -9,6 +10,30 @@ export class ApiClientError extends Error {
   ) {
     super(payload?.error.message ?? `Request failed with status ${status}`);
   }
+}
+
+let csrfFetchPromise: Promise<void> | null = null;
+
+async function ensureCsrfToken(): Promise<void> {
+  if (typeof document === "undefined") {
+    return;
+  }
+
+  if (getCsrfTokenFromDocument()) {
+    return;
+  }
+
+  if (!csrfFetchPromise) {
+    const url = `${window.location.origin}${getCsrfBootstrapPath()}`;
+    csrfFetchPromise = fetch(url, { credentials: "same-origin" })
+      .then(() => undefined)
+      .catch(() => undefined)
+      .finally(() => {
+        csrfFetchPromise = null;
+      });
+  }
+
+  await csrfFetchPromise;
 }
 
 export async function webFetch<T>(
@@ -23,6 +48,7 @@ export async function webFetch<T>(
   }
 
   if (!["GET", "HEAD", "OPTIONS"].includes(method)) {
+    await ensureCsrfToken();
     const csrfToken = getCsrfTokenFromDocument();
     if (csrfToken) {
       headers.set("x-csrf-token", csrfToken);
@@ -49,3 +75,6 @@ export async function webFetch<T>(
 
   return (await response.json()) as T;
 }
+
+// Re-export for tests and callers that need the configured cookie name.
+export { getCsrfCookieName };

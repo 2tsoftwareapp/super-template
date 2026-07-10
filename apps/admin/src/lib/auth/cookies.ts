@@ -33,5 +33,6 @@ export const {
   readAuthCookies,
   setAuthCookies,
   setCsrfCookie,
+  clearSessionCookies,
   clearAuthCookies,
 } = auth;

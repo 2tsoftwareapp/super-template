@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   createContext,
   type ReactNode,
@@ -22,6 +23,7 @@ import {
 } from "react";
 
 import { useSession } from "@/hooks/use-session";
+import { signOutAdmin } from "@/features/auth/auth-service";
 import {
   adminResourceGroups,
   adminResources,
@@ -30,7 +32,6 @@ import {
   getResourceForPath,
   hasAdminAppAccess,
 } from "@/lib/admin-resources";
-import { webFetch } from "@/lib/http";
 import { cn } from "@/lib/utils";
 
 import { Avatar } from "./ui/avatar";
@@ -57,6 +58,7 @@ export function useSidebar() {
 
 export function AdminShell({ children }: { children: ReactNode }) {
   const session = useSession();
+  const queryClient = useQueryClient();
   const pathname = usePathname();
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -83,7 +85,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
 
   const onSignOut = async () => {
     try {
-      await webFetch("/api/auth/logout", { method: "POST" });
+      await signOutAdmin(queryClient);
     } finally {
       router.replace("/login");
     }
@@ -113,9 +115,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
     }
 
     if (!canUseAdminApp) {
-      void webFetch("/api/auth/logout", { method: "POST" }).finally(() =>
-        router.replace("/login"),
-      );
+      void signOutAdmin(queryClient).finally(() => router.replace("/login"));
       return;
     }
 
@@ -127,6 +127,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
     canUseAdminApp,
     pathname,
     permissions,
+    queryClient,
     router,
     session.data,
   ]);

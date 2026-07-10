@@ -2,7 +2,11 @@ import type { NextRequest } from "next/server";
 
 import { NextResponse } from "next/server";
 
-import { clearAuthCookies, readAuthCookies } from "@/lib/auth/cookies";
+import {
+  clearSessionCookies,
+  readAuthCookies,
+  setCsrfCookie,
+} from "@/lib/auth/cookies";
 import { callBackend, enforceCsrf } from "@/lib/server/backend";
 
 export async function POST(request: NextRequest) {
@@ -26,6 +30,10 @@ export async function POST(request: NextRequest) {
     data: { success: true },
     meta: { requestId: crypto.randomUUID() },
   });
-  clearAuthCookies(nextResponse);
+
+  // End the authenticated session but keep a fresh CSRF token for the login form.
+  clearSessionCookies(nextResponse);
+  setCsrfCookie(nextResponse);
+
   return nextResponse;
 }
