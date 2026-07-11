@@ -1,10 +1,24 @@
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import * as cp from 'node:child_process';
 
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { loadEnvFiles, resolveAppEnv } from './index';
+
+vi.mock('node:child_process', async (importOriginal) => {
+  const actual = await importOriginal<typeof cp>();
+  return {
+    ...actual,
+    execSync: vi.fn().mockImplementation((cmd, options) => {
+      if ((globalThis as any).__mockExecSync) {
+        return (globalThis as any).__mockExecSync(cmd, options);
+      }
+      return actual.execSync(cmd, options);
+    }),
+  };
+});
 
 describe('resolveAppEnv', () => {
   afterEach(() => {
@@ -29,7 +43,7 @@ describe('resolveAppEnv', () => {
 });
 
 describe('loadEnvFiles precedence', () => {
-  const keys = ['ENVLOADER_SPEC_FOO', 'ENVLOADER_SPEC_BAR', 'ENVLOADER_SPEC_BAZ'];
+  const keys = ['ENVLOADER_SPEC_FOO', 'ENVLOADER_SPEC_BAR', 'ENVLOADER_SPEC_BAZ', 'REDIS_PORT', 'REDIS_URL', 'POSTGRES_EXPOSED_PORT', 'POSTGRES_PORT', 'DATABASE_URL', 'DATABASE_MIGRATE_URL', 'DATABASE_URL_TEST', 'DATABASE_URL_TEST_ADMIN', 'MAIL_PORT', 'MAILPIT_HTTP_PORT'];
   let dir: string | undefined;
 
   afterEach(() => {
@@ -63,5 +77,67 @@ describe('loadEnvFiles precedence', () => {
     expect(process.env.ENVLOADER_SPEC_BAR).toBe('from_env');
     // only defined in .env.example
     expect(process.env.ENVLOADER_SPEC_BAZ).toBe('from_example');
+  });
+
+  it('dynamically increments REDIS_PORT when the port is in use', () => {
+    dir = mkdtempSync(join(tmpdir(), 'envloader-redis-'));
+    writeFileSync(join(dir, 'pnpm-workspace.yaml'), "packages: []\n");
+    writeFileSync(join(dir, '.env'), 'REDIS_PORT=6379\nREDIS_URL=redis://127.0.0.1:6379\n');
+
+    (globalThis as any).__mockExecSync = (cmd: any) => {
+      const cmdStr = String(cmd);
+      if (cmdStr.includes('ps --services')) {
+        return ''; // docker compose redis not running
+      }
+      if (cmdStr.includes('listen(6379')) {
+        throw new Error('Port 6379 in use');
+      }
+      if (cmdStr.includes('listen(6380')) {
+        return Buffer.from(''); // Port 6380 free
+      }
+      return Buffer.from('');
+    };
+
+    try {
+      loadEnvFiles({ cwd: dir, appEnv: 'development' });
+      expect(process.env.REDIS_PORT).toBe('6380');
+      expect(process.env.REDIS_URL).toBe('redis://127.0.0.1:6380');
+    } finally {
+      delete (globalThis as any).__mockExecSync;
+    }
+  });
+
+  it('dynamically increments POSTGRES_EXPOSED_PORT and updates DATABASE_URL variants', () => {
+    dir = mkdtempSync(join(tmpdir(), 'envloader-postgres-'));
+    writeFileSync(join(dir, 'pnpm-workspace.yaml'), "packages: []\n");
+    writeFileSync(
+      join(dir, '.env'),
+      'POSTGRES_EXPOSED_PORT=5432\n' +
+      'DATABASE_URL=postgresql://user:pass@localhost:5432/db\n' +
+      'DATABASE_MIGRATE_URL=postgresql://user:pass@localhost:5432/db_migrate\n'
+    );
+
+    (globalThis as any).__mockExecSync = (cmd: any) => {
+      const cmdStr = String(cmd);
+      if (cmdStr.includes('ps --services')) {
+        return ''; // docker compose postgres not running
+      }
+      if (cmdStr.includes('listen(5432')) {
+        throw new Error('Port 5432 in use');
+      }
+      if (cmdStr.includes('listen(5433')) {
+        return Buffer.from(''); // Port 5433 free
+      }
+      return Buffer.from('');
+    };
+
+    try {
+      loadEnvFiles({ cwd: dir, appEnv: 'development' });
+      expect(process.env.POSTGRES_EXPOSED_PORT).toBe('5433');
+      expect(process.env.DATABASE_URL).toBe('postgresql://user:pass@localhost:5433/db');
+      expect(process.env.DATABASE_MIGRATE_URL).toBe('postgresql://user:pass@localhost:5433/db_migrate');
+    } finally {
+      delete (globalThis as any).__mockExecSync;
+    }
   });
 });

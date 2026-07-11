@@ -6,7 +6,6 @@ import { MfaModule } from '../mfa/mfa.module';
 import { OrganizationsModule } from '../organizations/organizations.module';
 import { UsersModule } from '../users/users.module';
 import { AuthService } from './application/auth.service';
-import { AuthMailService } from './application/services/auth-mail.service';
 import { SessionTokenService } from './application/services/session-token.service';
 import { AuthenticateAccessTokenUseCase } from './application/use-cases/authenticate-access-token.use-case';
 import { CompleteMfaLoginUseCase } from './application/use-cases/complete-mfa-login.use-case';
@@ -39,7 +38,6 @@ import { AuthController } from './presentation/auth.controller';
   controllers: [AuthController],
   providers: [
     AuthService,
-    AuthMailService,
     SessionTokenService,
     IssueSessionUseCase,
     CompleteMfaLoginUseCase,

@@ -58,6 +58,13 @@ Mailpit UI: http://localhost:8025 · Swagger: http://localhost:3001/api/docs
   `application/` → `infrastructure/`) rather than introducing new structure.
 - **Env files**: commit `.env.example`, `.env.development`, and `.env.*.example` only.
   Put personal secrets in `.env.local` (gitignored).
+- **Admin App Restructuring**: Route files in `apps/admin/src/app/(app)/**` must only contain route entry components (`page.tsx`, `layout.tsx`, Suspense page wrappers) and metadata/SEO exports. All actual view pages, drawers, forms, table columns, and other UI component files must reside under `apps/admin/src/features/<resource>/components/`. No file under the app router directory may contain business logic.
+- **Modular Admin Architecture Layers**:
+  - *Network Layer*: HTTP endpoints wrapped cleanly in services (e.g., `roles-service.ts`) using the unified fetch handler.
+  - *Business & Data Layer*: Dedicated react-query queries and mutations (e.g., `use-roles-queries.ts`) managing caching, invalidation logic, and operation states.
+  - *State & Serialization Layer*: Parameter parsing/stringifying helpers (e.g., `users-search-params.ts`) managing list states.
+  - *Mapping & Validation Layer*: Explicit DTO types and zod schema configurations (e.g., `roles-schemas.ts`).
+  - *Atom Component Design*: Keep page views layout-centric, splitting complex interfaces into atomic presentational sub-components (like table cells, specific card atoms, drawer components) and keeping logic out of UI markup.
 
 ## Known hazards
 

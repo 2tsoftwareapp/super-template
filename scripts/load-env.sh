@@ -29,3 +29,8 @@ fi
 _load_env_file ".env.$APP_ENV.local"
 
 export APP_ENV
+
+# Dynamically resolve REDIS_PORT and REDIS_URL if Redis port is already in use
+if command -v node >/dev/null 2>&1; then
+  eval "$(node scripts/resolve-ports.mjs)"
+fi

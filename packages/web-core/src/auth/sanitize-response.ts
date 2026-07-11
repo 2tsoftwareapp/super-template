@@ -10,16 +10,14 @@ export function stripTokensFromAuthData<T extends object>(
     return null;
   }
 
-  const {
-    accessToken: _accessToken,
-    refreshToken: _refreshToken,
-    ...rest
-  } = data as T & AuthTokenFields;
+  const { accessToken: _accessToken, refreshToken: _refreshToken, ...rest } =
+    data as T & AuthTokenFields;
   return rest;
 }
 
 export function stripTokensFromAuthEnvelope<
-  TEnvelope extends { data?: object | null; error?: unknown; meta?: unknown },
+  T extends object,
+  TEnvelope extends { data?: T | null; error?: unknown; meta?: unknown },
 >(payload: TEnvelope | null | undefined): TEnvelope | null | undefined {
   if (!payload?.data) {
     return payload;

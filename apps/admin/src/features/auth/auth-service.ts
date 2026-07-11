@@ -1,7 +1,7 @@
+import type { QueryClient } from "@tanstack/react-query";
+
 import type { SsoProvider } from "@/lib/api-paths";
 import type { AuthLoginResponse } from "@/lib/api-types";
-
-import type { QueryClient } from "@tanstack/react-query";
 
 import { sessionQueryKey } from "@/hooks/use-session";
 import { hasAdminAppAccess } from "@/lib/admin-resources";
@@ -118,7 +118,7 @@ export async function signOutAdmin(queryClient: QueryClient) {
   try {
     await logoutAdmin();
   } finally {
-    await queryClient.removeQueries({ queryKey: sessionQueryKey });
+    queryClient.removeQueries({ queryKey: sessionQueryKey });
   }
 }
 

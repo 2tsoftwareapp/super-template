@@ -5,7 +5,7 @@ import {
   ACCESS_TOKEN_COOKIE,
   CSRF_TOKEN_COOKIE,
   REFRESH_TOKEN_COOKIE,
-} from "@/lib/auth/cookies";
+} from "@/lib/auth/cookie-names";
 import { env, isSecureCookie } from "@/lib/env";
 
 const auth = createAuthCookieHelpers({

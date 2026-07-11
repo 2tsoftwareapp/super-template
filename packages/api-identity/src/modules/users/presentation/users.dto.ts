@@ -26,7 +26,7 @@ export class UserDto {
   @ApiProperty({ enum: ['PENDING', 'ACTIVE', 'BLOCKED'] })
   status: 'PENDING' | 'ACTIVE' | 'BLOCKED';
 
-  @ApiPropertyOptional()
+  @ApiProperty({ type: String, nullable: true })
   emailVerifiedAt: string | null;
 
   @ApiProperty({ type: [String] })

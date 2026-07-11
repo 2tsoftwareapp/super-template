@@ -221,7 +221,7 @@ case "${1:-help}" in
       exit 1
     fi
 
-    run_mobile_cmd "$dart_cmd" format --set-exit-if-changed lib test "$@"
+    run_mobile_cmd "$dart_cmd" format --output=none --set-exit-if-changed lib test "$@"
     ;;
   help|-h|--help)
     cat <<'EOF'
@@ -237,7 +237,7 @@ Commands:
   test                       Run flutter test
   analyze                    Run flutter analyze
   format                     Run dart format on lib/ and test/
-  format-check               Run dart format --set-exit-if-changed on lib/ and test/
+  format-check               Check Dart format on lib/ and test/ without writing files
   help                       Show this help
 
 Examples:

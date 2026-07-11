@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
+import { tweakcnFontClassName } from "@repo/web-core/theme/tweakcn-fonts";
 import Script from "next/script";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
-import { tweakcnFontClassName } from "@repo/web-core/theme/tweakcn-fonts";
 
 import { Providers } from "@/components/providers";
 import { ThemeProvider } from "@/lib/theme";

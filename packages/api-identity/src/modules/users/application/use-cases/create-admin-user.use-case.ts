@@ -9,6 +9,7 @@ import {
   AppError,
   AUDIT_WRITER,
   type AuditWriter,
+  durationToMilliseconds,
   ERROR_CODES,
   normalizeEmail,
 } from '@repo/api-core';
@@ -22,7 +23,13 @@ import {
   assertCanAssignRoleTargets,
   assertRoleScopeCanBeAssigned,
 } from '../../../access-control/domain/role-assignment.policy';
-import { hashPassword } from '../../../auth/application/auth.helpers';
+import {
+  generateOpaqueToken,
+  hashOpaqueToken,
+  hashPassword,
+} from '../../../auth/application/auth.helpers';
+import { AuthMailService } from '../../../auth/application/services/auth-mail.service';
+import { AuthRepository } from '../../../auth/infrastructure/auth.repository';
 import { OrganizationsService } from '../../../organizations/application/organizations.service';
 import { OrganizationsRepository } from '../../../organizations/infrastructure/organizations.repository';
 import { resolveAssignableRole } from '../../domain/assignable-role.resolver';
@@ -42,6 +49,8 @@ export class CreateAdminUserUseCase {
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
     private readonly organizationsService: OrganizationsService,
     private readonly organizationsRepository: OrganizationsRepository,
+    private readonly authRepository: AuthRepository,
+    private readonly authMailService: AuthMailService,
     private readonly getUserUseCase: GetUserUseCase,
   ) {}
 
@@ -82,7 +91,7 @@ export class CreateAdminUserUseCase {
 
     const status = input.status ?? 'ACTIVE';
 
-    const createdUserId = await runInTransaction(
+    const result = await runInTransaction(
       this.database,
       async (transaction) => {
         const user = await this.usersRepository.create(
@@ -155,6 +164,21 @@ export class CreateAdminUserUseCase {
           }
         }
 
+        let verificationToken: string | undefined;
+        if (status === 'PENDING') {
+          verificationToken = generateOpaqueToken();
+          await this.authRepository.storeEmailVerificationToken(
+            {
+              userId: user.id,
+              tokenHash: hashOpaqueToken(verificationToken),
+              expiresAt: new Date(
+                Date.now() + durationToMilliseconds('1d'),
+              ),
+            },
+            transaction,
+          );
+        }
+
         await this.auditWriter.log(
           {
             actorId: actor.userId,
@@ -172,10 +196,22 @@ export class CreateAdminUserUseCase {
           transaction,
         );
 
-        return user.id;
+        return {
+          userId: user.id,
+          email: user.email,
+          displayName: user.displayName,
+          verificationToken,
+        };
       },
     );
 
-    return this.getUserUseCase.execute(createdUserId, actor);
+    if (result.verificationToken) {
+      await this.authMailService.sendVerificationEmail(
+        result.email,
+        result.verificationToken,
+      );
+    }
+
+    return this.getUserUseCase.execute(result.userId, actor);
   }
 }
