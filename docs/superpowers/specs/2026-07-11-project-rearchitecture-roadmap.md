@@ -1,6 +1,6 @@
 # Roadmap tái kiến trúc toàn dự án — Clean Architecture, incremental trên main
 
-Trạng thái: draft — chờ user review
+Trạng thái: HOÀN THÀNH 2026-07-12 — cả 9 phases (P0–P8) đã triển khai và verify
 Phạm vi: toàn bộ monorepo (web, admin, web-core, API packages, apps/api, mobile, tooling)
 Chiến lược: **incremental trên main** — mỗi phase là một chu trình spec → plan → implement → verify độc lập, app luôn chạy được sau mỗi phase. Không rewrite, không branch dài hạn.
 

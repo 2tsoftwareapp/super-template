@@ -58,7 +58,7 @@ Mailpit UI: http://localhost:8025 · Swagger: http://localhost:3001/api/docs
   `application/` → `infrastructure/`) rather than introducing new structure.
 - **Env files**: commit `.env.example`, `.env.development`, and `.env.*.example` only.
   Put personal secrets in `.env.local` (gitignored).
-- **Admin App Restructuring**: Route files in `apps/admin/src/app/(app)/**` must only contain route entry components (`page.tsx`, `layout.tsx`, Suspense page wrappers) and metadata/SEO exports. All actual view pages, drawers, forms, table columns, and other UI component files must reside under `apps/admin/src/features/<resource>/components/`. No file under the app router directory may contain business logic.
+- **App Router layering (web + admin)**: Route files in `src/app/[locale]/**` must only contain route entry components (`page.tsx`, `layout.tsx`, Suspense page wrappers) and metadata/SEO exports. Views, drawers, forms, table columns, and other UI components live under `src/features/<resource>/components/`. No file under the app router directory may contain business logic — ESLint boundary rules enforce that `app/**` never imports `@tanstack/react-query` or `@/lib/http`. UI primitives come only from `@repo/web-core/components/*` (never local copies). Full conventions: `apps/admin/AGENTS.md`; i18n is next-intl with an always-prefixed `[locale]` segment and internal navigation via `@/i18n/navigation`.
 - **Modular Admin Architecture Layers**:
   - *Network Layer*: HTTP endpoints wrapped cleanly in services (e.g., `roles-service.ts`) using the unified fetch handler.
   - *Business & Data Layer*: Dedicated react-query queries and mutations (e.g., `use-roles-queries.ts`) managing caching, invalidation logic, and operation states.

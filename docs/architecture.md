@@ -60,6 +60,36 @@ Authorization uses three layers:
 
 Browser requests to the Nest API from admin go through Next.js route handlers. Access and refresh tokens stay in `HttpOnly` cookies with server-side refresh on eligible `401` responses.
 
+### Frontend architecture (both Next.js apps)
+
+Established by the 2026-07 re-architecture (roadmap:
+`docs/superpowers/specs/2026-07-11-project-rearchitecture-roadmap.md`):
+
+- **Design system**: `@repo/web-core/components/*` is the single source of UI
+  primitives; apps never keep local copies. Full convention set in
+  `apps/admin/AGENTS.md`.
+- **Layering**: `app/[locale]/**` holds route entries only; business logic
+  (services, react-query hooks, zod schemas, feature views) lives under
+  `src/features/<resource>/`. ESLint boundary rules enforce that `app/**`
+  never imports `@tanstack/react-query` or `@/lib/http`, and `features/**`
+  never imports from `app/**`.
+- **i18n**: next-intl with an always-prefixed `[locale]` segment (`/en/...`,
+  `/vi/...`). Internal navigation goes through `@/i18n/navigation` so the
+  locale survives every redirect.
+- **Auth gate (admin)**: `src/proxy.ts` (Next 16 proxy) composes a
+  cookie-presence pre-filter with next-intl locale negotiation. The
+  authoritative session + RBAC state machine is the pure
+  `resolveAdminGuard()` consumed by `useAdminGuard()`/`<AdminGuard>`;
+  `AdminShell` is purely presentational and reads the validated session —
+  including the active `organizationId` — via `useAdminSession()`.
+
+### Backend domain layer
+
+Modules that own real business rules keep them in a framework-free
+`modules/<x>/domain/` directory (jobs lifecycle, files upload policy,
+identity policies). Criteria: `docs/adr/0001-domain-layer-criteria.md`;
+purity is enforced by `scripts/check-source-policy.sh`.
+
 ## Redis
 
 `REDIS_URL` is optional in development/test (in-memory fallbacks). In production it is required for distributed rate limiting and shared access-profile cache.

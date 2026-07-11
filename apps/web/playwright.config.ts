@@ -17,6 +17,9 @@ const migrateUrl =
   `postgresql://postgres:postgres@localhost:${postgresPort}/fullstack_starter`;
 
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? `http://localhost:${webPort}`;
+const adminPort = process.env.ADMIN_PORT ?? "3002";
+const adminURL =
+  process.env.PLAYWRIGHT_ADMIN_URL ?? `http://localhost:${adminPort}`;
 const apiHealthUrl =
   process.env.PLAYWRIGHT_API_HEALTH_URL ??
   `http://localhost:${apiPort}/api/v1/health`;
@@ -50,6 +53,14 @@ const webServer: PlaywrightTestConfig["webServer"] = process.env.PLAYWRIGHT_SKIP
         command: "pnpm --filter web dev",
         cwd: resolve(__dirname, "../.."),
         url: baseURL,
+        reuseExistingServer: !process.env.CI,
+        timeout: 180_000,
+        env: toStringEnv(process.env),
+      },
+      {
+        command: "pnpm --filter admin dev",
+        cwd: resolve(__dirname, "../.."),
+        url: adminURL,
         reuseExistingServer: !process.env.CI,
         timeout: 180_000,
         env: toStringEnv(process.env),

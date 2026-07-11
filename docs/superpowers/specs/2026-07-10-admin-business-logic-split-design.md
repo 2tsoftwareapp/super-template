@@ -1,6 +1,6 @@
 # Admin app restructuring — Phase 1: split business logic from UI
 
-Status: draft — pending user review
+Status: implemented (2026-07-11, as part of the re-architecture roadmap P0-P8)
 Owner: admin app (`apps/admin`)
 
 ## Context
