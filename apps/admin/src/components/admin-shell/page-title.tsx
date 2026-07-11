@@ -1,7 +1,6 @@
 "use client";
 
-import { usePathname } from "next/navigation";
-
+import { usePathname } from "@/i18n/navigation";
 import { getResourceForPath } from "@/lib/admin-resources";
 import { useI18n } from "@/lib/i18n";
 

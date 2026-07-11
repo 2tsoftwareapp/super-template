@@ -1,13 +1,13 @@
 "use client";
 
 import { AlertTriangle } from "lucide-react";
-import Link from "next/link";
 
 import {
   useDashboardOverviewQueries,
   useRefreshDashboard,
 } from "@/features/dashboard/use-dashboard-queries";
 import { useSession } from "@/hooks/use-session";
+import { Link } from "@/i18n/navigation";
 
 import { DashboardActivity } from "./dashboard-activity";
 import { DashboardHeader } from "./dashboard-header";

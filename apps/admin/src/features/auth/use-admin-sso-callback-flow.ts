@@ -1,10 +1,11 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
 
 import { sessionQueryKey } from "@/hooks/use-session";
+import { useRouter } from "@/i18n/navigation";
 
 import {
   ADMIN_AUTH_ROUTES,

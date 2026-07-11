@@ -1,10 +1,10 @@
 "use client";
 
 import { safeLocalStorage } from "@repo/web-core";
-import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 import { useAdminSession } from "@/components/admin-guard";
+import { usePathname } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
 import {

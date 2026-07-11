@@ -12,7 +12,9 @@ overrides:
   "@nestjs/throttler": "6.5.0"
 allowBuilds:
   '@firebase/util': true
+  '@parcel/watcher': true
   '@scarf/scarf': true
+  '@swc/core': true
   argon2: true
   esbuild: true
   msw: true

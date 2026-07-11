@@ -14,7 +14,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { AlertTriangle } from "lucide-react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { BulkActionBar } from "@/components/bulk-action-bar";
@@ -43,6 +43,7 @@ import {
   serializeUsersListSearchParams,
 } from "@/features/users/users-search-params";
 import { useSession } from "@/hooks/use-session";
+import { usePathname, useRouter } from "@/i18n/navigation";
 
 import { CreateUserDrawer } from "./create-user-drawer";
 import { UsersConfirmBlockDialog } from "./users-confirm-block-dialog";

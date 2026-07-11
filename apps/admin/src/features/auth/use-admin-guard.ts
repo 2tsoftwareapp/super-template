@@ -1,10 +1,10 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 import { useSession } from "@/hooks/use-session";
+import { usePathname, useRouter } from "@/i18n/navigation";
 
 import {
   type AdminGuardDecision,

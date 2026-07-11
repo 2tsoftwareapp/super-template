@@ -8,7 +8,8 @@ import {
 } from "@repo/web-core/components/card";
 import { SectionLoading } from "@repo/web-core/components/loading";
 import { ArrowRight } from "lucide-react";
-import Link from "next/link";
+
+import { Link } from "@/i18n/navigation";
 
 interface User {
   id: string;

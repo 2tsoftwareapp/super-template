@@ -18,8 +18,7 @@ import { Separator } from "@repo/web-core/components/separator";
 import { Skeleton } from "@repo/web-core/components/skeleton";
 import { Spinner } from "@repo/web-core/components/spinner";
 import { BadgeCheck, CheckCircle2, ShieldAlert, Trash2, XCircle } from "lucide-react";
-import Link from "next/link";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -39,6 +38,8 @@ import {
   profileSchema,
 } from "@/features/users/users-schemas";
 import { useSession } from "@/hooks/use-session";
+import { Link } from "@/i18n/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { adminResources } from "@/lib/admin-resources";
 import { statusProps, timeAgo, truncateId } from "@/lib/format";
 import { cn } from "@/lib/utils";

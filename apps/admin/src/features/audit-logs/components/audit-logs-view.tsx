@@ -23,7 +23,7 @@ import {
 import { Tooltip } from "@repo/web-core/components/tooltip";
 import { useDebouncedValue } from "@repo/web-core/hooks";
 import { Search, X } from "lucide-react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 import type { AuditLogDto } from "@/lib/api-types";
@@ -31,6 +31,7 @@ import type { AuditLogDto } from "@/lib/api-types";
 import { ResourceDrawer } from "@/components/resource-drawer";
 import { ResourcePageShell } from "@/components/resource-page-shell";
 import { useAuditLogsQuery } from "@/features/audit-logs/use-audit-logs-queries";
+import { usePathname, useRouter } from "@/i18n/navigation";
 import { adminResources } from "@/lib/admin-resources";
 import { formatDateTime, timeAgo } from "@/lib/format";
 

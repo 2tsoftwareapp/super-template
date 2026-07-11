@@ -1,8 +1,8 @@
 "use client";
 
 import { Tooltip } from "@repo/web-core/components/tooltip";
-import Link from "next/link";
 
+import { Link } from "@/i18n/navigation";
 import {
   adminResourceGroups,
   adminResources,

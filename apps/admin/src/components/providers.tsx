@@ -6,8 +6,6 @@ import { ThemeProvider } from "next-themes";
 import { useState } from "react";
 import { Toaster } from "sonner";
 
-import { I18nProvider } from "@/lib/i18n";
-
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
     () =>
@@ -23,13 +21,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
-      <I18nProvider>
-        <QueryClientProvider client={queryClient}>
-          <CsrfBootstrap />
-          {children}
-          <Toaster richColors position="top-right" />
-        </QueryClientProvider>
-      </I18nProvider>
+      <QueryClientProvider client={queryClient}>
+        <CsrfBootstrap />
+        {children}
+        <Toaster richColors position="top-right" />
+      </QueryClientProvider>
     </ThemeProvider>
   );
 }

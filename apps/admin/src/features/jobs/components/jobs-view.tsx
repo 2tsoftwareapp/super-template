@@ -22,7 +22,7 @@ import {
   TableRow,
 } from "@repo/web-core/components/table";
 import { RefreshCw } from "lucide-react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 import { ResourceDrawer } from "@/components/resource-drawer";
@@ -34,6 +34,7 @@ import {
   useJobMetricsQuery,
   useJobsQuery,
 } from "@/features/jobs/use-jobs-queries";
+import { usePathname, useRouter } from "@/i18n/navigation";
 import { adminResources } from "@/lib/admin-resources";
 import { formatDateTime, formatUnknownDateTime, scalarString, timeAgo } from "@/lib/format";
 import { cn } from "@/lib/utils";
