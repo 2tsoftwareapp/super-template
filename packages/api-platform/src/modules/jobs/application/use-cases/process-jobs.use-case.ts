@@ -7,6 +7,7 @@ import {
   WORKER_DISPATCH_CONTEXT,
 } from '@repo/api-database';
 
+import { resolveFailureOutcome } from '../../domain/job-lifecycle';
 import { JobObservabilityRepository } from '../../infrastructure/job-observability.repository';
 import {
   type JobRecord,
@@ -133,10 +134,15 @@ export class ProcessJobsUseCase {
             transaction,
           );
 
-          if (job.attempts < job.maxAttempts) {
+          const outcome = resolveFailureOutcome({
+            attempts: job.attempts,
+            maxAttempts: job.maxAttempts,
+          });
+
+          if (outcome.action === 'retry') {
             await this.jobsRepository.requeueForRetry(
               job.id,
-              new Date(Date.now() + 60_000),
+              outcome.retryAt,
               message,
               transaction,
             );

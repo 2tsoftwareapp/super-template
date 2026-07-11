@@ -1,6 +1,5 @@
 import type { DatabaseExecutor } from '@repo/api-database';
 
-import { HttpStatus } from '@nestjs/common';
 import { AppError, ERROR_CODES } from '@repo/api-core';
 
 import type { AccessControlService } from '../../access-control/application/access-control.service';
@@ -26,7 +25,7 @@ export async function resolveAssignableRole(
       throw new AppError(
         ERROR_CODES.INTERNAL_ERROR,
         'USER role is missing',
-        HttpStatus.INTERNAL_SERVER_ERROR,
+        500,
       );
     }
 
@@ -44,7 +43,7 @@ export async function resolveAssignableRole(
     throw new AppError(
       ERROR_CODES.VALIDATION_FAILED,
       'organizationId is required when assigning ADMIN',
-      HttpStatus.BAD_REQUEST,
+      400,
     );
   }
 
@@ -58,7 +57,7 @@ export async function resolveAssignableRole(
     throw new AppError(
       ERROR_CODES.INTERNAL_ERROR,
       'Organization ADMIN role is missing',
-      HttpStatus.INTERNAL_SERVER_ERROR,
+      500,
     );
   }
 

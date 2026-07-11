@@ -12,12 +12,12 @@ import {
   OBJECT_STORAGE,
   type ObjectStorage,
 } from '../../../storage/application/object-storage.interface';
-import { FilesRepository } from '../../infrastructure/files.repository';
 import {
   getUploadExtension,
   MAX_FILE_SIZE_BYTES,
   resolveUploadedFileMimeType,
-} from '../files-upload.policy';
+} from '../../domain/upload-policy';
+import { FilesRepository } from '../../infrastructure/files.repository';
 import { FilesMapper } from '../files.mapper';
 import { FileAccessService } from '../services/file-access.service';
 

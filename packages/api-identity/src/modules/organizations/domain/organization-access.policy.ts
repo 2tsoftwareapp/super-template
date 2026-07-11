@@ -1,4 +1,3 @@
-import { HttpStatus } from '@nestjs/common';
 import { AppError, ERROR_CODES } from '@repo/api-core';
 
 export type OrganizationMemberRole = 'OWNER' | 'ADMIN' | 'MEMBER';
@@ -16,7 +15,7 @@ export function assertOrganizationRole(
     throw new AppError(
       ERROR_CODES.AUTH_FORBIDDEN,
       'Your role in this organization does not allow this action',
-      HttpStatus.FORBIDDEN,
+      403,
     );
   }
 }
@@ -34,7 +33,7 @@ export function assertCanManageTargetRole(
     throw new AppError(
       ERROR_CODES.AUTH_FORBIDDEN,
       'Only an owner can manage admins or other owners',
-      HttpStatus.FORBIDDEN,
+      403,
     );
   }
 }
@@ -47,7 +46,7 @@ export function assertNotLastOwner(
     throw new AppError(
       ERROR_CODES.ORGANIZATION_LAST_OWNER,
       'Transfer ownership to another member before removing the last owner',
-      HttpStatus.CONFLICT,
+      409,
     );
   }
 }

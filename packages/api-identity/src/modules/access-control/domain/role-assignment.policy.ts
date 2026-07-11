@@ -1,6 +1,5 @@
 import type { AuthenticatedRequestUser } from '@repo/api-core';
 
-import { HttpStatus } from '@nestjs/common';
 import { ACTION, AppError, ERROR_CODES, hasPermission, isPrivilegedRoleName, perm, ROLE_NAMES } from '@repo/api-core';
 
 export interface RolePolicyTarget {
@@ -19,7 +18,7 @@ export function assertCanManagePrivilegedAccount(
     throw new AppError(
       ERROR_CODES.AUTH_FORBIDDEN,
       'Only SUPER_ADMIN can manage privileged user accounts',
-      HttpStatus.FORBIDDEN,
+      403,
     );
   }
 }
@@ -37,7 +36,7 @@ export function assertCanAssignRoles(
     throw new AppError(
       ERROR_CODES.AUTH_FORBIDDEN,
       'Only SUPER_ADMIN can manage privileged accounts or roles',
-      HttpStatus.FORBIDDEN,
+      403,
     );
   }
 
@@ -50,7 +49,7 @@ export function assertCanAssignRoles(
       throw new AppError(
         ERROR_CODES.AUTH_FORBIDDEN,
         'Admins can only assign the USER role',
-        HttpStatus.FORBIDDEN,
+        403,
       );
     }
   }
@@ -62,7 +61,7 @@ export function assertCanAssignRoles(
     throw new AppError(
       ERROR_CODES.AUTH_FORBIDDEN,
       'This role cannot be assigned through the API',
-      HttpStatus.FORBIDDEN,
+      403,
     );
   }
 
@@ -73,7 +72,7 @@ export function assertCanAssignRoles(
     throw new AppError(
       ERROR_CODES.AUTH_FORBIDDEN,
       'You do not have permission to manage roles',
-      HttpStatus.FORBIDDEN,
+      403,
     );
   }
 }
@@ -92,7 +91,7 @@ export function assertCanAssignRoleTargets(
     throw new AppError(
       ERROR_CODES.AUTH_FORBIDDEN,
       'An organization context is required to assign roles',
-      HttpStatus.FORBIDDEN,
+      403,
     );
   }
 
@@ -116,7 +115,7 @@ export function assertCanAssignRoleTargets(
     throw new AppError(
       ERROR_CODES.AUTH_FORBIDDEN,
       'Admins can only assign the USER role or organization custom roles',
-      HttpStatus.FORBIDDEN,
+      403,
     );
   }
 }
@@ -137,7 +136,7 @@ export function assertCanManageCustomRoleCatalog(
     throw new AppError(
       ERROR_CODES.AUTH_FORBIDDEN,
       'You do not have permission to manage roles',
-      HttpStatus.FORBIDDEN,
+      403,
     );
   }
 }
@@ -156,7 +155,7 @@ export function assertCanCreateCustomRole(
     throw new AppError(
       ERROR_CODES.AUTH_FORBIDDEN,
       'Custom roles can only be created within your organization',
-      HttpStatus.FORBIDDEN,
+      403,
     );
   }
 }
@@ -169,7 +168,7 @@ export function assertCanModifyCustomRole(
     throw new AppError(
       ERROR_CODES.AUTH_FORBIDDEN,
       'System roles cannot be modified',
-      HttpStatus.FORBIDDEN,
+      403,
     );
   }
 
@@ -183,7 +182,7 @@ export function assertCanModifyCustomRole(
     throw new AppError(
       ERROR_CODES.AUTH_FORBIDDEN,
       'You can only manage custom roles in your organization',
-      HttpStatus.FORBIDDEN,
+      403,
     );
   }
 }
@@ -197,7 +196,7 @@ export function assertRoleScopeCanBeAssigned(
       throw new AppError(
         ERROR_CODES.AUTH_FORBIDDEN,
         'Only SUPER_ADMIN can assign the ADMIN role',
-        HttpStatus.FORBIDDEN,
+        403,
       );
     }
 
@@ -205,7 +204,7 @@ export function assertRoleScopeCanBeAssigned(
       throw new AppError(
         ERROR_CODES.AUTH_FORBIDDEN,
         'ADMIN must be assigned as an organization-scoped role',
-        HttpStatus.FORBIDDEN,
+        403,
       );
     }
 
@@ -216,7 +215,7 @@ export function assertRoleScopeCanBeAssigned(
     throw new AppError(
       ERROR_CODES.AUTH_FORBIDDEN,
       'SUPER_ADMIN can only be assigned during system initialization',
-      HttpStatus.FORBIDDEN,
+      403,
     );
   }
 }

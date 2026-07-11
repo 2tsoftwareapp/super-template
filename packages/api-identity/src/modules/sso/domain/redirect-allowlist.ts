@@ -1,4 +1,3 @@
-import { HttpStatus } from '@nestjs/common';
 import { AppError, ERROR_CODES } from '@repo/api-core';
 
 const normalizeRedirectUri = (redirectUri: string): string => {
@@ -24,7 +23,7 @@ export const assertAllowedRedirectUri = (
     throw new AppError(
       ERROR_CODES.SSO_INVALID_REDIRECT,
       'redirectUri must be an absolute URL',
-      HttpStatus.BAD_REQUEST,
+      400,
     );
   }
 
@@ -42,7 +41,7 @@ export const assertAllowedRedirectUri = (
     throw new AppError(
       ERROR_CODES.SSO_INVALID_REDIRECT,
       'redirectUri is not an allowed origin',
-      HttpStatus.BAD_REQUEST,
+      400,
     );
   }
 
@@ -58,7 +57,7 @@ export const assertAllowedRedirectUri = (
     throw new AppError(
       ERROR_CODES.SSO_INVALID_REDIRECT,
       'redirectUri is not an allowed origin',
-      HttpStatus.BAD_REQUEST,
+      400,
     );
   }
 };

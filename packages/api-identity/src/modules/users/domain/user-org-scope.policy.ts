@@ -1,6 +1,5 @@
 import type { AuthenticatedRequestUser } from '@repo/api-core';
 
-import { HttpStatus } from '@nestjs/common';
 import { AppError, ERROR_CODES } from '@repo/api-core';
 
 import { ROLE_NAMES } from '../../access-control/access-control.constants';
@@ -16,7 +15,7 @@ export function resolveUsersListOrganizationId(
     throw new AppError(
       ERROR_CODES.AUTH_FORBIDDEN,
       'An organization context is required to list users',
-      HttpStatus.FORBIDDEN,
+      403,
     );
   }
 
@@ -30,7 +29,7 @@ export function assertActorHasOrganizationContext(
     throw new AppError(
       ERROR_CODES.INTERNAL_ERROR,
       'Organization context assertion called for SUPER_ADMIN',
-      HttpStatus.INTERNAL_SERVER_ERROR,
+      500,
     );
   }
 
@@ -38,7 +37,7 @@ export function assertActorHasOrganizationContext(
     throw new AppError(
       ERROR_CODES.AUTH_FORBIDDEN,
       'An organization context is required',
-      HttpStatus.FORBIDDEN,
+      403,
     );
   }
 
@@ -61,7 +60,7 @@ export async function assertUserBelongsToOrganization(
     throw new AppError(
       ERROR_CODES.AUTH_FORBIDDEN,
       'You can only manage users in your organization',
-      HttpStatus.FORBIDDEN,
+      403,
     );
   }
 }

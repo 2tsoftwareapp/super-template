@@ -272,6 +272,37 @@ check_application_policy \
   "from 'express'" \
   'Application layer must not import express; keep HTTP concerns in presentation.'
 
+# Domain purity: modules/*/domain/ holds framework-free business rules.
+# It must never import NestJS, Drizzle, express, or the database package.
+check_domain_policy() {
+  name=$1
+  pattern=$2
+  message=$3
+
+  output=""
+  if command -v rg >/dev/null 2>&1; then
+    # Type-only imports are allowed: they carry no runtime coupling.
+    output=$(rg -n "$pattern" \
+      packages/api-identity/src/modules \
+      packages/api-platform/src/modules \
+      --glob '**/domain/**' \
+      --glob '!**/*.spec.ts' \
+      --glob '!**/*.test.ts' 2>/dev/null | grep -v 'import type' || true)
+  fi
+
+  if [ -n "$output" ]; then
+    failed=1
+    printf 'Policy violation: %s\n' "$name" >&2
+    printf '%s\n' "$output" >&2
+    printf '%s\n' "$message" >&2
+  fi
+}
+
+check_domain_policy \
+  'domain imports a framework' \
+  "from '@nestjs/|from 'drizzle-orm'|from 'express'|from '@repo/api-database'" \
+  'modules/*/domain must stay framework-free: pure functions and types only.'
+
 warn_large_application_services() {
   if command -v rg >/dev/null 2>&1; then
   files=$(find packages/api-identity/src/modules packages/api-platform/src/modules packages/api-platform/src/modules \
