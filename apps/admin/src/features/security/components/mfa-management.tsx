@@ -1,5 +1,23 @@
 "use client";
 
+import { Alert } from "@repo/web-core/components/alert";
+import { Badge } from "@repo/web-core/components/badge";
+import { Button } from "@repo/web-core/components/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@repo/web-core/components/card";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@repo/web-core/components/input-otp";
+import { Label } from "@repo/web-core/components/label";
+import { Separator } from "@repo/web-core/components/separator";
+import { Spinner } from "@repo/web-core/components/spinner";
 import {
   CheckCircle2,
   Copy,
@@ -13,24 +31,6 @@ import { toast } from "sonner";
 
 import type { MfaSetupResponse } from "@/features/security/security-schemas";
 
-import { Alert } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-} from "@/components/ui/input-otp";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { Spinner } from "@/components/ui/spinner";
 import {
   useConfirmMfaMutation,
   useDisableMfaMutation,

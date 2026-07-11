@@ -1,4 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@repo/web-core/components/card";
+
 import { cn } from "@/lib/utils";
 
 interface DashboardHealthProps {

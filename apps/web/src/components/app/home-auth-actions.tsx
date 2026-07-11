@@ -1,13 +1,13 @@
 "use client";
 
+import { Avatar } from "@repo/web-core/components/avatar";
+import { buttonVariants } from "@repo/web-core/components/button-variants";
 import { useQuery } from "@tanstack/react-query";
 import { LogIn, UserPlus } from "lucide-react";
 import Link from "next/link";
 
 import type { AuthSessionResponse } from "@/lib/api-types";
 
-import { Avatar } from "@/components/ui/avatar";
-import { buttonVariants } from "@/components/ui/button-variants";
 import { ApiClientError, webFetch } from "@/lib/http";
 
 type Size = "sm" | "default" | "lg";

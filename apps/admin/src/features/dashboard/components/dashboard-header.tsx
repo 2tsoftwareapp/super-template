@@ -1,7 +1,7 @@
+import { Button } from "@repo/web-core/components/button";
+import { Spinner } from "@repo/web-core/components/spinner";
 import { RefreshCw } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
 
 interface DashboardHeaderProps {

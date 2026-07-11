@@ -1,15 +1,15 @@
 "use client";
 
 import { standardSchemaResolver as zodResolver } from "@hookform/resolvers/standard-schema";
+import { Button } from "@repo/web-core/components/button";
+import { Input } from "@repo/web-core/components/input";
+import { Label } from "@repo/web-core/components/label";
+import { PasswordInput } from "@repo/web-core/components/password-input";
+import { Spinner } from "@repo/web-core/components/spinner";
 import { useEffect, useMemo } from "react";
 import { useForm, useWatch } from "react-hook-form";
 
 import { ResourceDrawer } from "@/components/resource-drawer";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { PasswordInput } from "@/components/ui/password-input";
-import { Spinner } from "@/components/ui/spinner";
 import { useCreateUser } from "@/features/users/use-users-mutations";
 import {
   ASSIGNABLE_ROLES,

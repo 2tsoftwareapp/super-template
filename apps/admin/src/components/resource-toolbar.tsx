@@ -1,11 +1,10 @@
 import type { ReactNode } from "react";
 
+import { Button } from "@repo/web-core/components/button";
+import { Input } from "@repo/web-core/components/input";
 import { Search, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
 
 export function ResourceToolbar({
   search,

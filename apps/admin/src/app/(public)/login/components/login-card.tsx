@@ -2,22 +2,23 @@
 
 import type { UseFormReturn } from "react-hook-form";
 
-import type { AdminLoginInput } from "@/features/auth/auth-schemas";
-import type { SsoProvider } from "@/lib/api-paths";
-
-import { Alert } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
+import { Alert } from "@repo/web-core/components/alert";
+import { Button } from "@repo/web-core/components/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { PasswordInput } from "@/components/ui/password-input";
-import { Separator } from "@/components/ui/separator";
+} from "@repo/web-core/components/card";
+import { Input } from "@repo/web-core/components/input";
+import { Label } from "@repo/web-core/components/label";
+import { PasswordInput } from "@repo/web-core/components/password-input";
+import { Separator } from "@repo/web-core/components/separator";
+
+import type { AdminLoginInput } from "@/features/auth/auth-schemas";
+import type { SsoProvider } from "@/lib/api-paths";
+
 import {
   AUTH_FORM_AUTOCOMPLETE_VALUES,
   AUTH_FORM_FIELD_NAMES,

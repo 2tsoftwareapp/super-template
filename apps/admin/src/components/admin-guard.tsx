@@ -1,10 +1,10 @@
 "use client";
 
+import { FullScreenLoading } from "@repo/web-core/components/loading";
 import { createContext, type ReactNode, useContext } from "react";
 
 import type { SessionUser } from "@/lib/api-types";
 
-import { FullScreenLoading } from "@/components/ui/loading";
 import { useAdminGuard } from "@/features/auth/use-admin-guard";
 
 export interface AdminSession {

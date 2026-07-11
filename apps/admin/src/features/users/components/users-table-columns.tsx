@@ -1,14 +1,14 @@
 "use client";
 
+import { Avatar } from "@repo/web-core/components/avatar";
+import { Badge } from "@repo/web-core/components/badge";
+import { Checkbox } from "@repo/web-core/components/checkbox";
+import { Tooltip } from "@repo/web-core/components/tooltip";
 import { createColumnHelper } from "@tanstack/react-table";
 import { BadgeCheck, XCircle } from "lucide-react";
 
 import type { AdminUserDto } from "@/lib/api-types";
 
-import { Avatar } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Tooltip } from "@/components/ui/tooltip";
 import { formatDateTime, statusProps, timeAgo } from "@/lib/format";
 import { formatRoleName } from "@/lib/roles";
 import { cn } from "@/lib/utils";

@@ -1,4 +1,5 @@
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@repo/web-core/components/badge";
+
 import { LOGIN_FORM_COPY } from "@/features/auth/auth-constants";
 
 interface LoginHeroProps {

@@ -1,16 +1,16 @@
 "use client";
 
-import { Check, Globe, Laptop, Moon, Sun } from "lucide-react";
-import { useTheme } from "next-themes";
-
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
+} from "@repo/web-core/components/card";
+import { Label } from "@repo/web-core/components/label";
+import { Check, Globe, Laptop, Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
+
 import { type Locale, useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 

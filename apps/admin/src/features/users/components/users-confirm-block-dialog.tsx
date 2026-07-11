@@ -1,4 +1,4 @@
-import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { ConfirmDialog } from "@repo/web-core/components/confirm-dialog";
 
 interface UsersConfirmBlockDialogProps {
   open: boolean;

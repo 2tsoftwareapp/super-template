@@ -1,6 +1,6 @@
+import { Button } from "@repo/web-core/components/button";
 import { RefreshCw, UserPlus, Users } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface UsersHeaderProps {

@@ -1,10 +1,10 @@
 "use client";
 
+import { Avatar } from "@repo/web-core/components/avatar";
+import { Button } from "@repo/web-core/components/button";
+import { Dropdown, type DropdownItem } from "@repo/web-core/components/dropdown";
 import { ChevronRight, LogOut, Menu, Settings, Shield } from "lucide-react";
 
-import { Avatar } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Dropdown, type DropdownItem } from "@/components/ui/dropdown";
 import { useI18n } from "@/lib/i18n";
 
 import { LanguageSwitcher } from "./language-switcher";

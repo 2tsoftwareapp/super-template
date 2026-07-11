@@ -1,5 +1,15 @@
 "use client";
 
+import { Badge } from "@repo/web-core/components/badge";
+import { Button } from "@repo/web-core/components/button";
+import {
+  Card,
+  CardContent,
+} from "@repo/web-core/components/card";
+import { ConfirmDialog } from "@repo/web-core/components/confirm-dialog";
+import { Empty } from "@repo/web-core/components/empty";
+import { Input } from "@repo/web-core/components/input";
+import { Spinner } from "@repo/web-core/components/spinner";
 import {
   ChevronDown,
   ChevronRight,
@@ -14,16 +24,6 @@ import {
 import { useMemo, useState } from "react";
 
 import { ResourcePageShell } from "@/components/resource-page-shell";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-} from "@/components/ui/card";
-import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { Empty } from "@/components/ui/empty";
-import { Input } from "@/components/ui/input";
-import { Spinner } from "@/components/ui/spinner";
 import {
   type EditableRole,
   type ManagedRoleDto,

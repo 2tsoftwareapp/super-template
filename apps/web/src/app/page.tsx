@@ -1,3 +1,13 @@
+import { Badge } from "@repo/web-core/components/badge";
+import { Button } from "@repo/web-core/components/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@repo/web-core/components/card";
+import { Separator } from "@repo/web-core/components/separator";
 import {
   CheckCircle2,
   Code2,
@@ -14,16 +24,6 @@ import {
 
 import { ScrollToTop } from "@/components/app/scroll-to-top";
 import { ArchDiagram } from "@/components/arch-diagram";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 
 const ADMIN_URL =
   process.env.NEXT_PUBLIC_ADMIN_URL ?? "http://localhost:3002";

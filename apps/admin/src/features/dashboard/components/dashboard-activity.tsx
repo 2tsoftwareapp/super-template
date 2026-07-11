@@ -1,4 +1,12 @@
 import {
+  Card,
+  CardAction,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@repo/web-core/components/card";
+import { SectionLoading } from "@repo/web-core/components/loading";
+import {
   Activity,
   ArrowRight,
   LogIn,
@@ -8,14 +16,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { SectionLoading } from "@/components/ui/loading";
 import { cn } from "@/lib/utils";
 
 interface AuditLog {

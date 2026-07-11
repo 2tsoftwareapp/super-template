@@ -1,19 +1,19 @@
 "use client";
 
 import { standardSchemaResolver as zodResolver } from "@hookform/resolvers/standard-schema";
-import { useForm } from "react-hook-form";
-
-import { Button } from "@/components/ui/button";
+import { Button } from "@repo/web-core/components/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { PasswordInput } from "@/components/ui/password-input";
-import { Spinner } from "@/components/ui/spinner";
+} from "@repo/web-core/components/card";
+import { Label } from "@repo/web-core/components/label";
+import { PasswordInput } from "@repo/web-core/components/password-input";
+import { Spinner } from "@repo/web-core/components/spinner";
+import { useForm } from "react-hook-form";
+
 import {
   type ChangePasswordFormValues,
   changePasswordSchema,

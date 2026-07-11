@@ -1,5 +1,18 @@
 "use client";
 
+import { Button } from "@repo/web-core/components/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@repo/web-core/components/card";
+import { Checkbox } from "@repo/web-core/components/checkbox";
+import { ConfirmDialog } from "@repo/web-core/components/confirm-dialog";
+import { Input } from "@repo/web-core/components/input";
+import { Label } from "@repo/web-core/components/label";
+import { Spinner } from "@repo/web-core/components/spinner";
 import { RotateCcw, Search, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -7,19 +20,6 @@ import { toast } from "sonner";
 import type { ApplicationSettingDto } from "@/lib/api-types";
 
 import { ResourcePageShell } from "@/components/resource-page-shell";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Spinner } from "@/components/ui/spinner";
 import { useUpdateSettingMutation } from "@/features/settings/use-settings-mutations";
 import { useSettingsQuery } from "@/features/settings/use-settings-queries";
 import { adminResources } from "@/lib/admin-resources";

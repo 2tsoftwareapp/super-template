@@ -1,8 +1,7 @@
+import { Button } from "@repo/web-core/components/button";
+import { Card, CardContent } from "@repo/web-core/components/card";
 import { Mail, Megaphone, Shield, Users, Workflow } from "lucide-react";
 import Link from "next/link";
-
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 
 const QUICK_ACTIONS = [
   { href: "/users", label: "Users", icon: Users },

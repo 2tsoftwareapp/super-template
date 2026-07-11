@@ -1,15 +1,15 @@
 "use client";
 
 import { standardSchemaResolver as zodResolver } from "@hookform/resolvers/standard-schema";
+import { Button } from "@repo/web-core/components/button";
+import { Input } from "@repo/web-core/components/input";
+import { Label } from "@repo/web-core/components/label";
+import { Spinner } from "@repo/web-core/components/spinner";
 import { useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 
+import { PermissionMultiSelect } from "@/components/permission-multi-select";
 import { ResourceDrawer } from "@/components/resource-drawer";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { PermissionMultiSelect } from "@/components/ui/permission-multi-select";
-import { Spinner } from "@/components/ui/spinner";
 import {
   type EditableRole,
   type PermissionDto,

@@ -1,5 +1,10 @@
 "use client";
 
+import { Alert } from "@repo/web-core/components/alert";
+import { Button } from "@repo/web-core/components/button";
+import { Card, CardContent } from "@repo/web-core/components/card";
+import { Pagination } from "@repo/web-core/components/pagination";
+import { Spinner } from "@repo/web-core/components/spinner";
 import { useDebouncedValue } from "@repo/web-core/hooks";
 import {
   getCoreRowModel,
@@ -15,11 +20,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { BulkActionBar } from "@/components/bulk-action-bar";
 import { ResourceTable } from "@/components/resource-table";
 import { ResourceToolbar } from "@/components/resource-toolbar";
-import { Alert } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Pagination } from "@/components/ui/pagination";
-import { Spinner } from "@/components/ui/spinner";
 import { STATUS_FILTERS } from "@/features/users/constants";
 import {
   paramsFromSortingState,

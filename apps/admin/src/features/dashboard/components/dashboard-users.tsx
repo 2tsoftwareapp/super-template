@@ -1,15 +1,14 @@
-import { ArrowRight } from "lucide-react";
-import Link from "next/link";
-
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@repo/web-core/components/badge";
 import {
   Card,
   CardAction,
   CardContent,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { SectionLoading } from "@/components/ui/loading";
+} from "@repo/web-core/components/card";
+import { SectionLoading } from "@repo/web-core/components/loading";
+import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 interface User {
   id: string;

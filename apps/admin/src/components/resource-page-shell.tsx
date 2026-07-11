@@ -1,11 +1,10 @@
 import type { ReactNode } from "react";
 
+import { Button } from "@repo/web-core/components/button";
+import { Spinner } from "@repo/web-core/components/spinner";
 import Link from "next/link";
 
 import type { AdminResourceConfig } from "@/lib/admin-resources";
-
-import { Button } from "./ui/button";
-import { Spinner } from "./ui/spinner";
 
 export function ResourcePageShell({
   resource,

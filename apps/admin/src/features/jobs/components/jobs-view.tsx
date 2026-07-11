@@ -1,24 +1,18 @@
 "use client";
 
-import { RefreshCw } from "lucide-react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
-
-import { ResourceDrawer } from "@/components/resource-drawer";
-import { ResourcePageShell } from "@/components/resource-page-shell";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Badge } from "@repo/web-core/components/badge";
+import { Button } from "@repo/web-core/components/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Pagination } from "@/components/ui/pagination";
-import { Separator } from "@/components/ui/separator";
-import { Spinner } from "@/components/ui/spinner";
+} from "@repo/web-core/components/card";
+import { Label } from "@repo/web-core/components/label";
+import { Pagination } from "@repo/web-core/components/pagination";
+import { Separator } from "@repo/web-core/components/separator";
+import { Spinner } from "@repo/web-core/components/spinner";
 import {
   Table,
   TableBody,
@@ -26,7 +20,13 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@repo/web-core/components/table";
+import { RefreshCw } from "lucide-react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
+
+import { ResourceDrawer } from "@/components/resource-drawer";
+import { ResourcePageShell } from "@/components/resource-page-shell";
 import { useCancelJobMutation } from "@/features/jobs/use-jobs-mutations";
 import {
   useJobDetailQuery,

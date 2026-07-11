@@ -1,5 +1,27 @@
 "use client";
 
+import { Badge } from "@repo/web-core/components/badge";
+import { Button } from "@repo/web-core/components/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@repo/web-core/components/card";
+import { Input } from "@repo/web-core/components/input";
+import { Label } from "@repo/web-core/components/label";
+import { Pagination } from "@repo/web-core/components/pagination";
+import { Separator } from "@repo/web-core/components/separator";
+import { Spinner } from "@repo/web-core/components/spinner";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@repo/web-core/components/table";
 import { RefreshCw } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
@@ -10,28 +32,6 @@ import type {
 
 import { ResourceDrawer } from "@/components/resource-drawer";
 import { ResourcePageShell } from "@/components/resource-page-shell";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Pagination } from "@/components/ui/pagination";
-import { Separator } from "@/components/ui/separator";
-import { Spinner } from "@/components/ui/spinner";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { useSendMailMutation } from "@/features/mail/use-mail-mutations";
 import {
   useMailDeliveriesQuery,

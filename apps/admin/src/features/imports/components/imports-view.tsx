@@ -1,5 +1,19 @@
 "use client";
 
+import { Badge } from "@repo/web-core/components/badge";
+import { Button } from "@repo/web-core/components/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@repo/web-core/components/card";
+import { ConfirmDialog } from "@repo/web-core/components/confirm-dialog";
+import { Input } from "@repo/web-core/components/input";
+import { Label } from "@repo/web-core/components/label";
+import { Separator } from "@repo/web-core/components/separator";
+import { Spinner } from "@repo/web-core/components/spinner";
 import {
   AlertCircle,
   CheckCircle2,
@@ -10,20 +24,6 @@ import {
 import { useState } from "react";
 
 import { ResourcePageShell } from "@/components/resource-page-shell";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { Spinner } from "@/components/ui/spinner";
 import {
   useConfirmImportMutation,
   useCreateImportMutation,

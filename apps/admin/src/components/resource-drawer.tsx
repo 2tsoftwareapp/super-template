@@ -1,9 +1,8 @@
+import { Button } from "@repo/web-core/components/button";
 import { X } from "lucide-react";
 import { type ReactNode, useEffect, useState } from "react";
 
 import { cn } from "@/lib/utils";
-
-import { Button } from "./ui/button";
 
 export function ResourceDrawer({
   open,

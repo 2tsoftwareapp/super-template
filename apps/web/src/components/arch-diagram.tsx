@@ -1,4 +1,4 @@
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@repo/web-core/components/card";
 
 export function ArchDiagram() {
   return (

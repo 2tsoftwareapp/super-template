@@ -1,6 +1,6 @@
 "use client";
 
-import { Separator } from "@/components/ui/separator";
+import { Separator } from "@repo/web-core/components/separator";
 
 import { ChangePasswordForm } from "./change-password-form";
 import { MfaManagement } from "./mfa-management";

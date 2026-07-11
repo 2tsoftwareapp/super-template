@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
+import { Spinner } from "@repo/web-core/components/spinner";
 import { Suspense } from "react";
 
-import { Spinner } from "@/components/ui/spinner";
 import { MailView } from "@/features/mail/components/mail-view";
 
 export const metadata: Metadata = {

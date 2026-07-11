@@ -1,3 +1,13 @@
+import { Empty } from "@repo/web-core/components/empty";
+import { Skeleton } from "@repo/web-core/components/skeleton";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@repo/web-core/components/table";
 import {
   flexRender,
   type Table as ReactTable,
@@ -6,17 +16,6 @@ import {
 import { ArrowUpDown } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-
-import { Empty } from "./ui/empty";
-import { Skeleton } from "./ui/skeleton";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "./ui/table";
 
 export function ResourceTable<T>({
   table,

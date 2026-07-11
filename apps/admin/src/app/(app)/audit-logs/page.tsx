@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
+import { Spinner } from "@repo/web-core/components/spinner";
 import { Suspense } from "react";
 
-import { Spinner } from "@/components/ui/spinner";
 import { AuditLogsView } from "@/features/audit-logs/components/audit-logs-view";
 
 export const metadata: Metadata = {

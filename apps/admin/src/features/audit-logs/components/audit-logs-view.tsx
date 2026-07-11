@@ -1,5 +1,26 @@
 "use client";
 
+import { Badge } from "@repo/web-core/components/badge";
+import { Button } from "@repo/web-core/components/button";
+import {
+  Card,
+  CardContent,
+} from "@repo/web-core/components/card";
+import { DatePicker } from "@repo/web-core/components/date-picker";
+import { Input } from "@repo/web-core/components/input";
+import { Label } from "@repo/web-core/components/label";
+import { Pagination } from "@repo/web-core/components/pagination";
+import { Separator } from "@repo/web-core/components/separator";
+import { Spinner } from "@repo/web-core/components/spinner";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@repo/web-core/components/table";
+import { Tooltip } from "@repo/web-core/components/tooltip";
 import { useDebouncedValue } from "@repo/web-core/hooks";
 import { Search, X } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -9,27 +30,6 @@ import type { AuditLogDto } from "@/lib/api-types";
 
 import { ResourceDrawer } from "@/components/resource-drawer";
 import { ResourcePageShell } from "@/components/resource-page-shell";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-} from "@/components/ui/card";
-import { DatePicker } from "@/components/ui/date-picker";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Pagination } from "@/components/ui/pagination";
-import { Separator } from "@/components/ui/separator";
-import { Spinner } from "@/components/ui/spinner";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Tooltip } from "@/components/ui/tooltip";
 import { useAuditLogsQuery } from "@/features/audit-logs/use-audit-logs-queries";
 import { adminResources } from "@/lib/admin-resources";
 import { formatDateTime, timeAgo } from "@/lib/format";

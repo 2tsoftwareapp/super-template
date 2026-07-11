@@ -1,9 +1,9 @@
 "use client";
 
+import { Button } from "@repo/web-core/components/button";
+import { Dropdown } from "@repo/web-core/components/dropdown";
 import { Check, Languages } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import { Dropdown } from "@/components/ui/dropdown";
 import { useI18n } from "@/lib/i18n";
 
 export function LanguageSwitcher() {

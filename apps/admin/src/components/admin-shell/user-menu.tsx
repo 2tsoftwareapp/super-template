@@ -1,11 +1,11 @@
 "use client";
 
+import { Avatar } from "@repo/web-core/components/avatar";
+import { Dropdown, type DropdownItem } from "@repo/web-core/components/dropdown";
+import { Tooltip } from "@repo/web-core/components/tooltip";
 import { LogOut, Shield } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-import { Avatar } from "@/components/ui/avatar";
-import { Dropdown, type DropdownItem } from "@/components/ui/dropdown";
-import { Tooltip } from "@/components/ui/tooltip";
 import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 

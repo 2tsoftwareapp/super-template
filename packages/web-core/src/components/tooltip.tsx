@@ -1,6 +1,7 @@
 "use client";
 
 import { Tooltip as TooltipPrimitive } from "@base-ui/react/tooltip";
+import * as React from "react";
 
 import { cn } from "../utils";
 
@@ -17,8 +18,37 @@ function TooltipProvider({
   );
 }
 
-function Tooltip({ ...props }: TooltipPrimitive.Root.Props) {
+function TooltipRoot({ ...props }: TooltipPrimitive.Root.Props) {
   return <TooltipPrimitive.Root data-slot="tooltip" {...props} />;
+}
+
+interface TooltipProps {
+  children: React.ReactNode;
+  content?: React.ReactNode;
+  side?: "top" | "bottom" | "left" | "right";
+}
+
+// Convenience API used across the apps: <Tooltip content="...">trigger</Tooltip>.
+// Falls back to the raw root when no content is given.
+function Tooltip({ children, content, side = "top" }: TooltipProps) {
+  if (content === undefined) {
+    return <TooltipRoot>{children}</TooltipRoot>;
+  }
+
+  const trigger = React.isValidElement(children) ? (
+    children
+  ) : (
+    <span>{children}</span>
+  );
+
+  return (
+    <TooltipProvider>
+      <TooltipRoot>
+        <TooltipTrigger render={trigger} />
+        <TooltipContent side={side}>{content}</TooltipContent>
+      </TooltipRoot>
+    </TooltipProvider>
+  );
 }
 
 function TooltipTrigger({ ...props }: TooltipPrimitive.Trigger.Props) {
@@ -63,4 +93,4 @@ function TooltipContent({
   );
 }
 
-export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger };
+export { Tooltip, TooltipContent, TooltipProvider, TooltipRoot, TooltipTrigger };

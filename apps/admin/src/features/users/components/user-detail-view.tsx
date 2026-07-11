@@ -1,6 +1,22 @@
 "use client";
 
 import { standardSchemaResolver as zodResolver } from "@hookform/resolvers/standard-schema";
+import { Alert } from "@repo/web-core/components/alert";
+import { Badge } from "@repo/web-core/components/badge";
+import { Button } from "@repo/web-core/components/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@repo/web-core/components/card";
+import { ConfirmDialog } from "@repo/web-core/components/confirm-dialog";
+import { Input } from "@repo/web-core/components/input";
+import { Label } from "@repo/web-core/components/label";
+import { Separator } from "@repo/web-core/components/separator";
+import { Skeleton } from "@repo/web-core/components/skeleton";
+import { Spinner } from "@repo/web-core/components/spinner";
 import { BadgeCheck, CheckCircle2, ShieldAlert, Trash2, XCircle } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
@@ -8,22 +24,6 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { ResourcePageShell } from "@/components/resource-page-shell";
-import { Alert } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { ConfirmDialog } from "@/components/ui/confirm-dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Spinner } from "@/components/ui/spinner";
 import {
   useDeleteUserMutation,
   useReplaceRolesMutation,

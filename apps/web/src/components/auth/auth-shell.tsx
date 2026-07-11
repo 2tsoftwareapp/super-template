@@ -1,18 +1,17 @@
 "use client";
 
-import { ArrowLeft, ShieldCheck } from "lucide-react";
-import Link from "next/link";
-
-import { Badge } from "@/components/ui/badge";
-import { buttonVariants } from "@/components/ui/button-variants";
+import { Badge } from "@repo/web-core/components/badge";
+import { buttonVariants } from "@repo/web-core/components/button-variants";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+} from "@repo/web-core/components/card";
+import { Separator } from "@repo/web-core/components/separator";
+import { ArrowLeft, ShieldCheck } from "lucide-react";
+import Link from "next/link";
 
 export function AuthShell({
   eyebrow,
