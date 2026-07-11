@@ -1,4 +1,4 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { durationToMilliseconds, normalizeEmail } from '@repo/api-core';
 
 import type { ResendVerificationCommand } from '../auth.types';

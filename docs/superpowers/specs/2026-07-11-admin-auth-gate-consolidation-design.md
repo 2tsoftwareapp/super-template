@@ -1,6 +1,6 @@
 # Admin auth/session gate consolidation + server middleware
 
-Status: draft — pending user review
+Status: implemented (see implementation note at bottom)
 Owner: admin app (`apps/admin`)
 
 ## Context
@@ -202,3 +202,14 @@ in the layout.
 - **Double redirect** — middleware and client guard can both decide to
   redirect to `/login` on an expired session; this is harmless (idempotent
   `replace` to the same URL) but worth confirming it doesn't flash.
+
+## Implementation note (post-implementation, 2026-07-11)
+
+Next.js 16.2.9 renamed the `middleware` file convention to `proxy`. The
+implementation therefore lives at `apps/admin/src/proxy.ts` with an exported
+`proxy()` function, and the pure decision helper is
+`apps/admin/src/lib/auth/proxy-auth.ts` (`resolveAdminProxy`). Everywhere this
+spec says "middleware", read "proxy". `AdminGuard` provides the validated
+session via `AdminSessionContext` (+ `useAdminSession()`) instead of a
+render-prop — a function child cannot cross the RSC boundary from the server
+layout. Status: implemented; all tests green.
