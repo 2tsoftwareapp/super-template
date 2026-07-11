@@ -37,3 +37,24 @@ export async function POST(request: NextRequest) {
 
   return nextResponse;
 }
+
+export async function GET(request: NextRequest) {
+  // Browser link: clear session and redirect to login.
+  const { accessToken } = await readAuthCookies();
+
+  if (accessToken) {
+    await callBackend({
+      path: "auth/logout",
+      method: "POST",
+      headers: new Headers(),
+      accessToken,
+    }).catch(() => undefined);
+  }
+
+  const loginUrl = new URL("/login", request.url);
+  const nextResponse = NextResponse.redirect(loginUrl);
+  clearSessionCookies(nextResponse);
+  setCsrfCookie(nextResponse);
+
+  return nextResponse;
+}

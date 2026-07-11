@@ -28,7 +28,7 @@ function VerifyEmailInner() {
         setStatus("success");
         setMessage("Email verified successfully! Your account is now active.");
         setTimeout(() => {
-          router.push(process.env.NEXT_PUBLIC_ADMIN_URL ?? "/");
+          router.push(process.env.NEXT_PUBLIC_ADMIN_URL ?? "http://localhost:3002");
         }, 3000);
       } else {
         setStatus("error");
