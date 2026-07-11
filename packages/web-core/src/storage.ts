@@ -20,13 +20,12 @@ export const safeLocalStorage = {
    */
   getItem<T>(key: string): T | null {
     if (!this.isAvailable()) return null;
+    const value = window.localStorage.getItem(key);
+    if (value === null) return null;
     try {
-      const value = window.localStorage.getItem(key);
-      if (value === null) return null;
       return JSON.parse(value) as T;
-    } catch (e) {
-      console.warn(`Error reading localStorage key "${key}":`, e);
-      return null;
+    } catch {
+      return value as unknown as T;
     }
   },
 

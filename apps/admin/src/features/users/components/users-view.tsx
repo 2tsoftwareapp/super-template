@@ -35,6 +35,7 @@ import {
 import {
   useActivateUsers,
   useBlockUsers,
+  useResendVerification,
 } from "@/features/users/use-users-mutations";
 import { useUsersListQuery } from "@/features/users/use-users-queries";
 import {
@@ -109,6 +110,7 @@ export function UsersView() {
   const users = useUsersListQuery(queryParams);
   const activateUsers = useActivateUsers();
   const blockUsers = useBlockUsers();
+  const resendVerification = useResendVerification();
 
   const actorRoles = session.data?.data.user.roles ?? [];
   const permissions = session.data?.data.permissions ?? [];
@@ -138,12 +140,20 @@ export function UsersView() {
     setConfirmBlock({ userIds: [userId], label: "this user", count: 1 });
   }, []);
 
+  const handleResendVerification = useCallback(
+    (email: string) => {
+      resendVerification.mutate(email);
+    },
+    [resendVerification],
+  );
+
   const columns = useMemo(
     () =>
       createUsersTableColumns({
         canUpdate,
         onActivate: handleActivate,
         onBlock: handleBlock,
+        onResendVerification: handleResendVerification,
         isDisabled: activateUsers.isPending || blockUsers.isPending,
       }),
     [

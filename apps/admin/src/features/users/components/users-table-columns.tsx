@@ -21,9 +21,10 @@ export function createUsersTableColumns(options?: {
   canUpdate?: boolean;
   onActivate?: (userId: string) => void | Promise<void>;
   onBlock?: (userId: string) => void | Promise<void>;
+  onResendVerification?: (email: string) => void | Promise<void>;
   isDisabled?: boolean;
 }) {
-  const { canUpdate, onActivate, onBlock, isDisabled } = options ?? {};
+  const { canUpdate, onActivate, onBlock, onResendVerification, isDisabled } = options ?? {};
 
   return [
     columnHelper.display({
@@ -157,6 +158,12 @@ export function createUsersTableColumns(options?: {
           items.push({
             label: "Activate",
             onClick: () => { void onActivate?.(row.original.id); },
+          });
+        }
+        if (status === "PENDING") {
+          items.push({
+            label: "Resend verification",
+            onClick: () => { void onResendVerification?.(row.original.email); },
           });
         }
         if (canUpdate && status !== "BLOCKED") {

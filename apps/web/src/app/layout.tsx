@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
 
 import { tweakcnFontClassName } from "@repo/web-core/theme/tweakcn-fonts";
-import Script from "next/script";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 import { Providers } from "@/components/providers";
 import { ThemeProvider } from "@/lib/theme";
 
 import "./globals.css";
+
+const themeInitScript = `(function(){try{var t=localStorage.getItem('theme');var d=t==='dark';document.documentElement.classList.toggle('dark',d);document.documentElement.style.colorScheme=d?'dark':'light'}catch(e){}})()`;
+const swCleanupScript = `if('serviceWorker'in navigator){navigator.serviceWorker.getRegistrations().then(function(regs){regs.forEach(function(r){r.unregister();});})}`;
 
 export const metadata: Metadata = {
   title: "Super Template — Full-stack monorepo starter",
@@ -27,25 +29,15 @@ export default function RootLayout({
       className={`scroll-smooth ${tweakcnFontClassName}`}
     >
       <body>
-        {/*
-          beforeInteractive: Next.js injects these into raw HTML outside React's
-          rendering pipeline, so React 19 never sees them as <script> elements.
-        */}
-        {/* Prevent FOUC: apply saved theme before hydration */}
-        <Script
+        <script
           id="theme-init"
-          strategy="beforeInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('theme');var d=t==='dark';document.documentElement.classList.toggle('dark',d);document.documentElement.style.colorScheme=d?'dark':'light'}catch(e){}})()`,
-          }}
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{ __html: themeInitScript }}
         />
-        {/* Unregister any stale service workers so old cached chunks are cleared */}
-        <Script
+        <script
           id="sw-cleanup"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `if('serviceWorker'in navigator){navigator.serviceWorker.getRegistrations().then(function(regs){regs.forEach(function(r){r.unregister();});})}`,
-          }}
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{ __html: swCleanupScript }}
         />
         <ThemeProvider defaultTheme="light">
           <NuqsAdapter>

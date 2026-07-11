@@ -13,13 +13,17 @@ export class AuthMailService {
     private readonly mailSender: MailTemplateSender,
   ) {}
 
-  async sendVerificationEmail(email: string, token: string) {
+  async sendVerificationEmail(
+    email: string,
+    token: string,
+    displayName?: string,
+  ) {
     const verifyUrl = `${this.environmentService.values.NEXT_PUBLIC_WEB_URL}/verify-email?token=${token}`;
     await this.mailSender.sendTemplate({
       templateKey: 'auth.verify-email',
       to: email,
       variables: {
-        displayName: email,
+        displayName: displayName ?? email,
         verifyUrl,
       },
     });

@@ -1,16 +1,10 @@
 "use client";
 
 import { safeLocalStorage } from "@repo/web-core";
-import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
 
-import { useSession } from "@/hooks/use-session";
-import {
-  canAccessResource,
-  getFirstAccessibleResourcePath,
-  getResourceForPath,
-  hasAdminAppAccess,
-} from "@/lib/admin-resources";
+import { useAdminSession } from "@/components/admin-guard";
 import { cn } from "@/lib/utils";
 
 import {
@@ -19,11 +13,12 @@ import {
   SidebarContext,
   TopHeader,
 } from "./admin-shell/index";
-import { FullScreenLoading } from "./ui/loading";
 
+// Presentational shell. Auth + RBAC gating lives in AdminGuard/useAdminGuard;
+// by the time this renders, `user` and `permissions` are validated and read
+// from context.
 export function AdminShell({ children }: { children: React.ReactNode }) {
-  const session = useSession();
-  const router = useRouter();
+  const { user, permissions } = useAdminSession();
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(() => {
     return (
@@ -37,63 +32,6 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     setCollapsed(val);
     safeLocalStorage.setItem("admin-sidebar-collapsed", val);
   };
-
-  const user = session.data?.data.user;
-  const permissions = session.data?.data.permissions;
-  const canUseAdminApp = hasAdminAppAccess({
-    roles: user?.roles ?? [],
-    permissions: permissions ?? [],
-  });
-
-  const matchedResource = getResourceForPath(pathname);
-  const canAccessCurrentRoute = canAccessResource(
-    matchedResource,
-    permissions ?? [],
-  );
-
-  useEffect(() => {
-    if (!session.isLoading && !session.data) {
-      router.replace("/login");
-      return;
-    }
-    if (!session.isLoading && session.data) {
-      if (!canUseAdminApp) {
-        router.replace("/");
-        return;
-      }
-      if (!canAccessCurrentRoute) {
-        const fallback = getFirstAccessibleResourcePath(permissions ?? []);
-        router.replace(fallback);
-      }
-    }
-  }, [
-    session.isLoading,
-    session.data,
-    canUseAdminApp,
-    canAccessCurrentRoute,
-    permissions,
-    router,
-  ]);
-
-  if (session.isLoading) {
-    return (
-      <FullScreenLoading
-        title="Restoring admin session"
-        description="Loading permissions and workspace state."
-      />
-    );
-  }
-
-  if (!session.data || !user) return null;
-
-  if (!canUseAdminApp || !canAccessCurrentRoute) {
-    return (
-      <FullScreenLoading
-        title="Checking admin access"
-        description="Redirecting to a permitted workspace."
-      />
-    );
-  }
 
   const displayName = user.displayName ?? "Admin User";
   const roles = user.roles?.join(", ") ?? "Operator";
@@ -115,7 +53,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           collapsed={collapsed}
           displayName={displayName}
           roles={roles}
-          permissions={permissions ?? []}
+          permissions={permissions}
           pathname={pathname}
           onCollapseChange={toggleCollapsed}
           onSignOut={onSignOut}
@@ -138,7 +76,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           <MobileSidebar
             displayName={displayName}
             roles={roles}
-            permissions={permissions ?? []}
+            permissions={permissions}
             pathname={pathname}
             onNavigate={() => setMobileMenuOpen(false)}
             onSignOut={onSignOut}

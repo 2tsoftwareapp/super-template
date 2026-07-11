@@ -1,7 +1,7 @@
 Hi {{displayName}},
 
-Please verify your email by visiting the link below:
+An admin has created an account for you. Verify your email address to activate your account and sign in.
 
 {{verifyUrl}}
 
-If you did not create an account, you can ignore this message.
+This link expires in 24 hours. If you did not expect this invitation, you can ignore this message.

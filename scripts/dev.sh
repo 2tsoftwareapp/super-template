@@ -29,30 +29,25 @@ Mailpit: http://localhost:${MAILPIT_HTTP_PORT:-8025}
 Run Flutter separately with: make dev-mobile
 EOF
 
-API_PID=""
-WEB_PID=""
-ADMIN_PID=""
+# Kill any existing processes on target ports so stale code isn't reused.
+for kv in "API_PORT:${API_PORT:-3001}" "WEB_PORT:${WEB_PORT:-3000}" "ADMIN_PORT:${ADMIN_PORT:-3002}"; do
+  port="${kv#*:}"
+  if is_port_listening "$port"; then
+    printf '%s\n' "Killing existing process on port ${port}..."
+    lsof -tiTCP:"$port" -sTCP:LISTEN | xargs kill 2>/dev/null || true
+    # Give the process time to release the port.
+    while is_port_listening "$port"; do sleep 0.5; done
+  fi
+done
 
-if is_port_listening "${API_PORT:-3001}"; then
-  printf '%s\n' "API already running on port ${API_PORT:-3001}; reusing existing process."
-else
-  pnpm --filter api dev &
-  API_PID=$!
-fi
+pnpm --filter api dev &
+API_PID=$!
 
-if is_port_listening "${WEB_PORT:-3000}"; then
-  printf '%s\n' "Web already running on port ${WEB_PORT:-3000}; reusing existing process."
-else
-  pnpm --filter web dev &
-  WEB_PID=$!
-fi
+pnpm --filter web dev &
+WEB_PID=$!
 
-if is_port_listening "${ADMIN_PORT:-3002}"; then
-  printf '%s\n' "Admin already running on port ${ADMIN_PORT:-3002}; reusing existing process."
-else
-  pnpm --filter admin dev &
-  ADMIN_PID=$!
-fi
+pnpm --filter admin dev &
+ADMIN_PID=$!
 
 cleanup() {
   [[ -n "$API_PID" ]] && kill "$API_PID" 2>/dev/null || true

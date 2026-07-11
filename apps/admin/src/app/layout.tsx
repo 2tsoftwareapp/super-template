@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 
 import { tweakcnFontClassName } from "@repo/web-core/theme/tweakcn-fonts";
-import Script from "next/script";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 import { Providers } from "@/components/providers";
 
 import "./globals.css";
+
+const themeInitScript = `(function(){try{var t=localStorage.getItem('theme');var d=t==='dark';document.documentElement.classList.toggle('dark',d);document.documentElement.style.colorScheme=d?'dark':'light'}catch(e){}})()`;
 
 export const metadata: Metadata = {
   title: "Super Admin",
@@ -21,12 +22,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className={tweakcnFontClassName}>
       <body>
-        <Script
+        <script
           id="theme-init"
-          strategy="beforeInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('theme');var d=t==='dark';document.documentElement.classList.toggle('dark',d);document.documentElement.style.colorScheme=d?'dark':'light'}catch(e){}})()`,
-          }}
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{ __html: themeInitScript }}
         />
         <NuqsAdapter>
           <Providers>{children}</Providers>

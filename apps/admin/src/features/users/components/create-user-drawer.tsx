@@ -76,8 +76,8 @@ export function CreateUserDrawer({
   return (
     <ResourceDrawer
       open={open}
-      title="New user"
-      description="Create an account and assign a fixed platform role."
+      title="Invite user"
+      description="Create an account and send an invite email to set up access."
       onClose={onClose}
       footer={
         <Button
@@ -87,7 +87,7 @@ export function CreateUserDrawer({
           disabled={createUser.isPending}
         >
           {createUser.isPending ? <Spinner data-icon="inline-start" /> : null}
-          Create user
+          Send invite
         </Button>
       }
     >
@@ -100,6 +100,7 @@ export function CreateUserDrawer({
             password: values.password,
             displayName: values.displayName,
             role: values.role,
+            status: "PENDING",
           });
         })}
       >
@@ -131,12 +132,16 @@ export function CreateUserDrawer({
           ) : null}
         </div>
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="password">Password</Label>
+          <Label htmlFor="password">Temporary password</Label>
           <PasswordInput
             id="password"
             aria-invalid={Boolean(form.formState.errors.password)}
             {...form.register("password")}
           />
+          <p className="text-xs text-muted-foreground">
+            The user will be asked to set a new password after verifying their
+            email.
+          </p>
           {form.formState.errors.password ? (
             <p className="text-xs text-destructive">
               {form.formState.errors.password.message}
@@ -170,6 +175,13 @@ export function CreateUserDrawer({
               {form.formState.errors.role.message}
             </p>
           ) : null}
+        </div>
+
+        <div className="rounded-md border border-border bg-muted/50 px-3 py-2">
+          <p className="text-xs text-muted-foreground">
+            An invite email with a verification link will be sent to the user.
+            They must verify their email before signing in.
+          </p>
         </div>
 
         {createUser.isError ? (

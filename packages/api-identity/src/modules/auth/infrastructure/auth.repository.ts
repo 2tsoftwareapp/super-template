@@ -10,7 +10,7 @@ import {
   emailVerificationTokens,
   passwordResetTokens,
 } from '@repo/api-database';
-import { and, eq, gt, isNull, sql } from 'drizzle-orm';
+import { and, desc, eq, gt, isNull, sql } from 'drizzle-orm';
 
 @Injectable()
 export class AuthRepository {
@@ -132,6 +132,19 @@ export class AuthRepository {
       .where(
         and(eq(authSessions.userId, userId), isNull(authSessions.revokedAt)),
       );
+  }
+
+  async findLatestEmailVerificationToken(
+    userId: string,
+    executor: DatabaseExecutor = this.database,
+  ) {
+    const [token] = await executor
+      .select()
+      .from(emailVerificationTokens)
+      .where(eq(emailVerificationTokens.userId, userId))
+      .orderBy(desc(emailVerificationTokens.createdAt))
+      .limit(1);
+    return token ?? null;
   }
 
   async storeEmailVerificationToken(

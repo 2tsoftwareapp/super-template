@@ -209,6 +209,7 @@ export class CreateAdminUserUseCase {
       await this.authMailService.sendVerificationEmail(
         result.email,
         result.verificationToken,
+        result.displayName,
       );
     }
 
