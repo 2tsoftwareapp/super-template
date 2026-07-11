@@ -98,6 +98,9 @@ export interface SessionResponse {
   data: {
     user: SessionUser;
     permissions: string[];
+    sessionId?: string;
+    /** Active tenant. Null for users outside any organization. */
+    organizationId?: string | null;
   };
 }
 

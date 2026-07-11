@@ -10,6 +10,7 @@ import { useAdminGuard } from "@/features/auth/use-admin-guard";
 export interface AdminSession {
   user: SessionUser;
   permissions: string[];
+  organizationId: string | null;
 }
 
 const AdminSessionContext = createContext<AdminSession | null>(null);
@@ -43,7 +44,11 @@ export function AdminGuard({ children }: { children: ReactNode }) {
 
   return (
     <AdminSessionContext.Provider
-      value={{ user: decision.user, permissions: decision.permissions }}
+      value={{
+        user: decision.user,
+        permissions: decision.permissions,
+        organizationId: decision.organizationId,
+      }}
     >
       {children}
     </AdminSessionContext.Provider>

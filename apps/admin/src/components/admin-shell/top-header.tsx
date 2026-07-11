@@ -5,6 +5,8 @@ import { Button } from "@repo/web-core/components/button";
 import { Dropdown, type DropdownItem } from "@repo/web-core/components/dropdown";
 import { ChevronRight, LogOut, Menu, Settings, Shield } from "lucide-react";
 
+import { OrganizationSwitcher } from "@/features/organizations/components/organization-switcher";
+import { useRouter } from "@/i18n/navigation";
 import { useI18n } from "@/lib/i18n";
 
 import { LanguageSwitcher } from "./language-switcher";
@@ -25,6 +27,7 @@ export function TopHeader({
 }: TopHeaderProps) {
   const { collapsed, setCollapsed } = useSidebar();
   const { t } = useI18n();
+  const router = useRouter();
 
   return (
     <header className="sticky top-0 z-20 flex min-h-14 shrink-0 items-center justify-between border-b border-border/40 bg-background/50 backdrop-blur-md px-3 md:px-6">
@@ -53,6 +56,7 @@ export function TopHeader({
       </div>
 
       <div className="flex items-center gap-1.5">
+        <OrganizationSwitcher />
         <LanguageSwitcher />
         <ThemeToggle />
         <Dropdown
@@ -79,16 +83,12 @@ export function TopHeader({
             {
               label: t("shell.settings"),
               icon: <Settings className="size-3.5" />,
-              onClick: () => {
-                window.location.href = "/settings";
-              },
+              onClick: () => router.push("/settings"),
             } satisfies DropdownItem,
             {
               label: t("shell.security"),
               icon: <Shield className="size-3.5" />,
-              onClick: () => {
-                window.location.href = "/security";
-              },
+              onClick: () => router.push("/security"),
             } satisfies DropdownItem,
             { separator: true } satisfies DropdownItem,
             {

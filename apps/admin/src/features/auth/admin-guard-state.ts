@@ -15,12 +15,18 @@ export type AdminGuardDecision =
   | { status: "redirect-login" }
   | { status: "sign-out" }
   | { status: "redirect-resource"; path: string }
-  | { status: "ready"; user: SessionUser; permissions: string[] };
+  | {
+      status: "ready";
+      user: SessionUser;
+      permissions: string[];
+      organizationId: string | null;
+    };
 
 export function resolveAdminGuard(input: {
   isLoading: boolean;
   user: SessionUser | undefined;
   permissions: string[] | undefined;
+  organizationId: string | null | undefined;
   pathname: string;
 }): AdminGuardDecision {
   if (input.isLoading) {
@@ -46,5 +52,10 @@ export function resolveAdminGuard(input: {
     };
   }
 
-  return { status: "ready", user, permissions };
+  return {
+    status: "ready",
+    user,
+    permissions,
+    organizationId: input.organizationId ?? null,
+  };
 }

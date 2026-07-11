@@ -25,6 +25,7 @@ describe("resolveAdminGuard", () => {
         isLoading: true,
         user: undefined,
         permissions: undefined,
+        organizationId: "org-1",
         pathname: "/",
       }),
     ).toEqual({ status: "loading" });
@@ -36,6 +37,7 @@ describe("resolveAdminGuard", () => {
         isLoading: false,
         user: undefined,
         permissions: undefined,
+        organizationId: "org-1",
         pathname: "/",
       }),
     ).toEqual({ status: "redirect-login" });
@@ -47,6 +49,7 @@ describe("resolveAdminGuard", () => {
         isLoading: false,
         user: outsiderUser,
         permissions: [],
+        organizationId: "org-1",
         pathname: "/",
       }),
     ).toEqual({ status: "sign-out" });
@@ -58,6 +61,7 @@ describe("resolveAdminGuard", () => {
         isLoading: false,
         user: adminUser,
         permissions: ["users.read"],
+        organizationId: "org-1",
         pathname: "/roles",
       }),
     ).toEqual({ status: "redirect-resource", path: "/users" });
@@ -68,6 +72,7 @@ describe("resolveAdminGuard", () => {
       isLoading: false,
       user: adminUser,
       permissions: ["users.read"],
+      organizationId: "org-1",
       pathname: "/users",
     });
 
@@ -75,6 +80,7 @@ describe("resolveAdminGuard", () => {
       status: "ready",
       user: adminUser,
       permissions: ["users.read"],
+      organizationId: "org-1",
     });
   });
 
@@ -83,6 +89,7 @@ describe("resolveAdminGuard", () => {
       isLoading: false,
       user: adminUser,
       permissions: ["users.read"],
+      organizationId: "org-1",
       pathname: "/",
     });
 

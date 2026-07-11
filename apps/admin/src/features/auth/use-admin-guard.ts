@@ -26,6 +26,7 @@ export function useAdminGuard(): AdminGuardDecision {
     isLoading: session.isLoading,
     user: session.data?.data.user,
     permissions: session.data?.data.permissions,
+    organizationId: session.data?.data.organizationId,
     pathname,
   });
 
