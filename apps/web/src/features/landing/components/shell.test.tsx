@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import { AppShell } from "@/components/app/shell";
+import { AppShell } from "./shell";
 
 const replaceMock = vi.fn();
 const sessionState = {
