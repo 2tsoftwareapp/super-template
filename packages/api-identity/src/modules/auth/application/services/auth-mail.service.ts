@@ -47,7 +47,7 @@ export class AuthMailService {
       to: email,
       variables: {
         displayName,
-        webUrl: `${this.environmentService.values.NEXT_PUBLIC_WEB_URL}/login`,
+        adminUrl: `${this.environmentService.values.ADMIN_ORIGIN}/login`,
       },
     });
   }

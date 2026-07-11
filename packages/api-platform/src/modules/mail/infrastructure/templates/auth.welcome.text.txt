@@ -1,5 +1,7 @@
 Hi {{displayName}},
 
-Welcome! Your email has been verified and your account is ready.
+Your email has been verified and your account is ready.
 
-Sign in at {{webUrl}}
+You can now sign in to the admin console:
+
+{{adminUrl}}
