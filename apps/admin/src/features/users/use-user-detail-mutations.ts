@@ -7,6 +7,7 @@ import type { AdminUserDto, UpdateAdminUserInput } from "@/lib/api-types";
 import { webFetch } from "@/lib/http";
 
 import { USERS_QUERY_KEY } from "./constants";
+import { USER_DETAIL_QUERY_KEY } from "./use-user-detail-queries";
 
 export function useUpdateProfileMutation(
   userId: string,
@@ -21,7 +22,7 @@ export function useUpdateProfileMutation(
         body: JSON.stringify(input),
       }),
     onSuccess: async (data) => {
-      await queryClient.invalidateQueries({ queryKey: ["admin-user", userId] });
+      await queryClient.invalidateQueries({ queryKey: [USER_DETAIL_QUERY_KEY, userId] });
       options?.onSuccess?.(data);
     },
   });
@@ -40,7 +41,7 @@ export function useUpdateStatusMutation(
         { method: "PATCH", body: JSON.stringify({ status }) },
       ),
     onSuccess: async (data) => {
-      await queryClient.invalidateQueries({ queryKey: ["admin-user", userId] });
+      await queryClient.invalidateQueries({ queryKey: [USER_DETAIL_QUERY_KEY, userId] });
       options?.onSuccess?.(data);
     },
   });
@@ -59,7 +60,7 @@ export function useReplaceRolesMutation(
         { method: "PUT", body: JSON.stringify({ role }) },
       ),
     onSuccess: async (data) => {
-      await queryClient.invalidateQueries({ queryKey: ["admin-user", userId] });
+      await queryClient.invalidateQueries({ queryKey: [USER_DETAIL_QUERY_KEY, userId] });
       options?.onSuccess?.(data);
     },
   });

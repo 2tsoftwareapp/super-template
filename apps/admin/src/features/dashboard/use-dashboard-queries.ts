@@ -9,26 +9,38 @@ import {
   fetchOverviewUsers,
 } from "./dashboard-service";
 
+export const DASHBOARD_USERS_QUERY_KEY = "admin-users-overview" as const;
+export const DASHBOARD_JOBS_QUERY_KEY = "admin-jobs-summary" as const;
+export const DASHBOARD_AUDIT_QUERY_KEY = "admin-audit-summary" as const;
+export const DASHBOARD_HEALTH_QUERY_KEY = "admin-health" as const;
+
+const DASHBOARD_QUERY_KEYS = [
+  DASHBOARD_USERS_QUERY_KEY,
+  DASHBOARD_JOBS_QUERY_KEY,
+  DASHBOARD_AUDIT_QUERY_KEY,
+  DASHBOARD_HEALTH_QUERY_KEY,
+] as const;
+
 export function useDashboardOverviewQueries() {
   return useQueries({
     queries: [
       {
-        queryKey: ["admin-users-overview"],
+        queryKey: [DASHBOARD_USERS_QUERY_KEY],
         queryFn: fetchOverviewUsers,
         staleTime: 30_000,
       },
       {
-        queryKey: ["admin-jobs-summary"],
+        queryKey: [DASHBOARD_JOBS_QUERY_KEY],
         queryFn: fetchJobsSummary,
         staleTime: 15_000,
       },
       {
-        queryKey: ["admin-audit-summary"],
+        queryKey: [DASHBOARD_AUDIT_QUERY_KEY],
         queryFn: fetchAuditSummary,
         staleTime: 15_000,
       },
       {
-        queryKey: ["admin-health"],
+        queryKey: [DASHBOARD_HEALTH_QUERY_KEY],
         queryFn: fetchHealthStatus,
         staleTime: 10_000,
         retry: 1,
@@ -40,9 +52,8 @@ export function useDashboardOverviewQueries() {
 export function useRefreshDashboard() {
   const queryClient = useQueryClient();
   return () => {
-    void queryClient.invalidateQueries({ queryKey: ["admin-users-overview"] });
-    void queryClient.invalidateQueries({ queryKey: ["admin-jobs-summary"] });
-    void queryClient.invalidateQueries({ queryKey: ["admin-audit-summary"] });
-    void queryClient.invalidateQueries({ queryKey: ["admin-health"] });
+    for (const key of DASHBOARD_QUERY_KEYS) {
+      void queryClient.invalidateQueries({ queryKey: [key] });
+    }
   };
 }
