@@ -160,6 +160,7 @@ export function UsersView() {
       canUpdate,
       handleActivate,
       handleBlock,
+      handleResendVerification,
       activateUsers.isPending,
       blockUsers.isPending,
     ],
