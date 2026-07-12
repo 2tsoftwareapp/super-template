@@ -5,8 +5,8 @@ import { toast } from "sonner";
 
 import type { SendAdminMailResultDto } from "@/lib/api-types";
 
-import { sendMail, type SendMailInput } from "./mail-service";
-import { MAIL_DELIVERIES_QUERY_KEY } from "./use-mail-queries";
+import { sendMail, type SendMailInput } from "./api/mail-api";
+import { MAIL_DELIVERIES_QUERY_KEY } from "./mail-query-keys";
 
 export function useSendMailMutation(options?: {
   onSuccess?: (data: { data: SendAdminMailResultDto }) => void;

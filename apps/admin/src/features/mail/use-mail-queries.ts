@@ -7,11 +7,8 @@ import {
   fetchMailPreview,
   fetchMailTemplates,
   type MailDeliveriesParams,
-} from "./mail-service";
-
-export const MAIL_TEMPLATES_QUERY_KEY = "admin-mail-templates" as const;
-export const MAIL_DELIVERIES_QUERY_KEY = "admin-mail-deliveries" as const;
-export const MAIL_PREVIEW_QUERY_KEY = "admin-mail-preview" as const;
+} from "./api/mail-api";
+import { MAIL_DELIVERIES_QUERY_KEY, MAIL_PREVIEW_QUERY_KEY, MAIL_TEMPLATES_QUERY_KEY } from "./mail-query-keys";
 
 export function useMailTemplatesQuery() {
   return useQuery({
