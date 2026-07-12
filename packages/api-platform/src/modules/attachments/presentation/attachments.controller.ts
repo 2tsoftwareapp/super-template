@@ -16,7 +16,9 @@ import {  ACTION, ApiArrayResponse, ApiDataResponse, perm, SuccessFlagDto } from
 import { CurrentUser } from '@repo/api-core';
 import { Authorize } from '@repo/api-core';
 
-import { AttachmentsService } from '../application/attachments.service';
+import { AttachFileUseCase } from '../application/use-cases/attach-file.use-case';
+import { DeleteAttachmentUseCase } from '../application/use-cases/delete-attachment.use-case';
+import { ListAttachmentsUseCase } from '../application/use-cases/list-attachments.use-case';
 import {
   AttachEntityDto,
   AttachmentDto,
@@ -26,7 +28,11 @@ import {
 @ApiBearerAuth()
 @Controller('attachments')
 export class AttachmentsController {
-  constructor(private readonly attachmentsService: AttachmentsService) {}
+  constructor(
+    private readonly attachFile: AttachFileUseCase,
+    private readonly listAttachments: ListAttachmentsUseCase,
+    private readonly deleteAttachment: DeleteAttachmentUseCase,
+  ) {}
 
   @Post()
   @Authorize({ permissions: [perm('attachments', ACTION.CREATE)] })
@@ -36,7 +42,7 @@ export class AttachmentsController {
     @Body() input: AttachEntityDto,
     @Req() request: Request,
   ) {
-    return this.attachmentsService.attach(
+    return this.attachFile.execute(
       user,
       {
         fileId: input.fileId,
@@ -51,7 +57,7 @@ export class AttachmentsController {
   @Authorize({ permissions: [perm('attachments', ACTION.READ)] })
   @ApiArrayResponse(AttachmentDto)
   list(@Query() query: AttachmentsQueryDto) {
-    return this.attachmentsService.list({
+    return this.listAttachments.execute({
       entityType: query.entityType,
       entityId: query.entityId });
   }
@@ -64,7 +70,7 @@ export class AttachmentsController {
     @Param('id', new ParseUUIDPipe()) attachmentId: string,
     @Req() request: Request,
   ) {
-    await this.attachmentsService.delete(
+    await this.deleteAttachment.execute(
       user,
       attachmentId,
       request.requestContext,
