@@ -9,10 +9,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@repo/web-core/components/card";
+import { ErrorState } from "@repo/web-core/components/error-state";
 import { Input } from "@repo/web-core/components/input";
 import { Label } from "@repo/web-core/components/label";
+import { SectionLoading } from "@repo/web-core/components/loading";
+import { LoadingButton } from "@repo/web-core/components/loading-button";
 import { Pagination } from "@repo/web-core/components/pagination";
 import { Separator } from "@repo/web-core/components/separator";
+import { Show } from "@repo/web-core/components/show";
 import { Spinner } from "@repo/web-core/components/spinner";
 import {
   Table,
@@ -183,22 +187,17 @@ export function MailView() {
             </div>
 
             <div className="rounded-xl border border-border p-4 text-sm">
-              {preview.isLoading ? (
-                <div className="flex justify-center py-4">
-                  <Spinner className="size-4" />
-                </div>
-              ) : preview.isError ? (
-                <div className="space-y-2 py-2 text-sm">
-                  <p className="font-medium text-destructive">
-                    Preview unavailable.
-                  </p>
-                  <p className="text-muted-foreground">
-                    {preview.error instanceof Error
-                      ? preview.error.message
-                      : "The template key is invalid or the preview endpoint is unavailable."}
-                  </p>
-                </div>
-              ) : preview.data?.data ? (
+              <Show when={preview.isLoading}>
+                <SectionLoading />
+              </Show>
+              <Show when={preview.isError}>
+                <ErrorState
+                  variant="inline"
+                  title="Preview unavailable."
+                  description={preview.error instanceof Error ? preview.error.message : "The template key is invalid or the preview endpoint is unavailable."}
+                />
+              </Show>
+              {!preview.isLoading && !preview.isError && preview.data?.data ? (
                 <>
                   <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                     Subject
@@ -225,13 +224,13 @@ export function MailView() {
                     </>
                   )}
                 </>
-              ) : (
+              ) : !preview.isLoading && !preview.isError ? (
                 <p className="py-2 text-center text-xs text-muted-foreground">
                   {templateKey
                     ? "Template not found."
                     : "Enter a template key above."}
                 </p>
-              )}
+              ) : null}
             </div>
           </CardContent>
         </Card>
@@ -257,13 +256,14 @@ export function MailView() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {templates.isLoading ? (
+                <Show when={templates.isLoading}>
                   <TableRow>
                     <TableCell colSpan={4} className="py-16 text-center">
-                      <Spinner className="mx-auto size-5" />
+                      <SectionLoading />
                     </TableCell>
                   </TableRow>
-                ) : (templates.data?.data ?? []).length === 0 ? (
+                </Show>
+                {!templates.isLoading && (templates.data?.data ?? []).length === 0 ? (
                   <TableRow>
                     <TableCell
                       colSpan={4}
@@ -402,7 +402,7 @@ export function MailView() {
             </div>
           </div>
           <div className="mt-4 flex justify-end">
-            <Button
+            <LoadingButton
               size="sm"
               onClick={() =>
                 sendMail.mutate({
@@ -414,17 +414,11 @@ export function MailView() {
                     : {}),
                 })
               }
-              disabled={sendMail.isPending || !sendTemplateKey || !sendRecipient}
+              disabled={!sendTemplateKey || !sendRecipient}
+              loading={sendMail.isPending}
             >
-              {sendMail.isPending ? (
-                <>
-                  <Spinner className="mr-1.5 size-3.5" />
-                  Sending…
-                </>
-              ) : (
-                "Send mail"
-              )}
-            </Button>
+              Send mail
+            </LoadingButton>
           </div>
         </CardContent>
       </Card>
@@ -483,13 +477,14 @@ export function MailView() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {deliveries.isLoading ? (
+              <Show when={deliveries.isLoading}>
                 <TableRow>
                   <TableCell colSpan={5} className="py-16 text-center">
-                    <Spinner className="mx-auto size-5" />
+                    <SectionLoading />
                   </TableCell>
                 </TableRow>
-              ) : (deliveries.data?.data ?? []).length === 0 ? (
+              </Show>
+              {!deliveries.isLoading && (deliveries.data?.data ?? []).length === 0 ? (
                 <TableRow>
                   <TableCell
                     colSpan={5}

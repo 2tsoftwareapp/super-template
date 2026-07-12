@@ -11,7 +11,10 @@ import {
 } from "@repo/web-core/components/card";
 import { ConfirmDialog } from "@repo/web-core/components/confirm-dialog";
 import { Label } from "@repo/web-core/components/label";
+import { SectionLoading } from "@repo/web-core/components/loading";
+import { LoadingButton } from "@repo/web-core/components/loading-button";
 import { Separator } from "@repo/web-core/components/separator";
+import { Show } from "@repo/web-core/components/show";
 import { Spinner } from "@repo/web-core/components/spinner";
 import {
   Table,
@@ -182,18 +185,14 @@ export function FilesView() {
                   if (f) uploadFile.mutate(f);
                 }}
               />
-              <Button
+              <LoadingButton
                 size="sm"
-                disabled={uploadFile.isPending}
                 onClick={() => fileInputRef.current?.click()}
+                loading={uploadFile.isPending}
               >
-                {uploadFile.isPending ? (
-                  <Spinner data-icon="inline-start" />
-                ) : (
-                  <Upload data-icon="inline-start" />
-                )}
+                <Upload data-icon="inline-start" />
                 Upload
-              </Button>
+              </LoadingButton>
               <Button
                 variant="outline"
                 size="sm"
@@ -236,13 +235,14 @@ export function FilesView() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {files.isLoading ? (
+              <Show when={files.isLoading}>
                 <TableRow>
                   <TableCell colSpan={6} className="py-16 text-center">
-                    <Spinner className="mx-auto size-5" />
+                    <SectionLoading />
                   </TableCell>
                 </TableRow>
-              ) : entries.length === 0 ? (
+              </Show>
+              {!files.isLoading && entries.length === 0 ? (
                 <TableRow>
                   <TableCell
                     colSpan={6}
@@ -368,19 +368,15 @@ export function FilesView() {
                   }
                 }}
               />
-              <Button
+              <LoadingButton
                 size="sm"
                 variant="outline"
-                disabled={uploadVersion.isPending}
                 onClick={() => versionInputRef.current?.click()}
+                loading={uploadVersion.isPending}
               >
-                {uploadVersion.isPending ? (
-                  <Spinner data-icon="inline-start" />
-                ) : (
-                  <Upload data-icon="inline-start" />
-                )}
+                <Upload data-icon="inline-start" />
                 New version
-              </Button>
+              </LoadingButton>
               <Button
                 size="sm"
                 variant="outline"
@@ -443,9 +439,10 @@ export function FilesView() {
             {/* Versions tab */}
             {detailTab === "versions" && (
               <div className="space-y-2">
-                {versions.isLoading ? (
+                <Show when={versions.isLoading}>
                   <Spinner className="size-4" />
-                ) : versions.data?.data.length ? (
+                </Show>
+                {!versions.isLoading && versions.data?.data.length ? (
                   versions.data.data.map((v: FileVersionDto) => (
                     <div
                       key={v.id}
@@ -462,20 +459,21 @@ export function FilesView() {
                       </Badge>
                     </div>
                   ))
-                ) : (
+                ) : !versions.isLoading ? (
                   <p className="text-sm text-muted-foreground">
                     No version history.
                   </p>
-                )}
+                ) : null}
               </div>
             )}
 
             {/* History tab */}
             {detailTab === "history" && (
               <div className="space-y-2">
-                {history.isLoading ? (
+                <Show when={history.isLoading}>
                   <Spinner className="size-4" />
-                ) : history.data?.data.length ? (
+                </Show>
+                {!history.isLoading && history.data?.data.length ? (
                   history.data.data.map((event: FileHistoryEventDto, i: number) => (
                     <div
                       key={`${event.createdAt}-${event.action}-${i}`}
@@ -498,11 +496,11 @@ export function FilesView() {
                         )}
                     </div>
                   ))
-                ) : (
+                ) : !history.isLoading ? (
                   <p className="text-sm text-muted-foreground">
                     No history events.
                   </p>
-                )}
+                ) : null}
               </div>
             )}
           </div>

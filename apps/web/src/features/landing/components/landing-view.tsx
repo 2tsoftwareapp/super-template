@@ -8,6 +8,7 @@ import {
   CardTitle,
 } from "@repo/web-core/components/card";
 import { Separator } from "@repo/web-core/components/separator";
+import { Show } from "@repo/web-core/components/show";
 import {
   CheckCircle2,
   Code2,
@@ -456,9 +457,9 @@ export function LandingView() {
                       <CardDescription className="text-xs font-semibold uppercase tracking-widest">
                         {surface.label}
                       </CardDescription>
-                      {surface.external ? (
+                      <Show when={surface.external}>
                         <ExternalLink className="size-3.5 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
-                      ) : null}
+                      </Show>
                     </div>
                     <CardTitle>{surface.title}</CardTitle>
                   </CardHeader>
@@ -596,14 +597,14 @@ export function LandingView() {
                           {pkg.description}
                         </span>
                       </div>
-                      {pkgIndex < layer.packages.length - 1 ? (
+                      <Show when={pkgIndex < layer.packages.length - 1}>
                         <Separator className="mx-6" />
-                      ) : null}
+                      </Show>
                     </div>
                   ))}
-                  {layerIndex < stackLayers.length - 1 ? (
+                  <Show when={layerIndex < stackLayers.length - 1}>
                     <Separator className="mt-2" />
-                  ) : null}
+                  </Show>
                 </div>
               ))}
             </CardContent>

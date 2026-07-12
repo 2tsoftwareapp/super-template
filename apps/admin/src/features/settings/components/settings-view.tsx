@@ -12,6 +12,7 @@ import { Checkbox } from "@repo/web-core/components/checkbox";
 import { ConfirmDialog } from "@repo/web-core/components/confirm-dialog";
 import { Input } from "@repo/web-core/components/input";
 import { Label } from "@repo/web-core/components/label";
+import { LoadingButton } from "@repo/web-core/components/loading-button";
 import { Spinner } from "@repo/web-core/components/spinner";
 import { RotateCcw, Search, X } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -295,7 +296,7 @@ export function SettingsView() {
 
                         {hasChanges && (
                           <div className="flex gap-1.5">
-                            <Button
+                            <LoadingButton
                               variant="outline"
                               size="sm"
                               className="flex-1"
@@ -303,14 +304,10 @@ export function SettingsView() {
                                 setSavingKey(setting.key);
                                 setConfirmOpen(true);
                               }}
-                              disabled={updateSetting.isPending}
+                              loading={updateSetting.isPending && savingKey === setting.key}
                             >
-                              {updateSetting.isPending &&
-                              savingKey === setting.key ? (
-                                <Spinner className="size-3.5" />
-                              ) : null}
                               Save
-                            </Button>
+                            </LoadingButton>
                             {isObject && (
                               <Button
                                 variant="ghost"

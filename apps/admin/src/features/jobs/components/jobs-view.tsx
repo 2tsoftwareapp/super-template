@@ -10,8 +10,11 @@ import {
   CardTitle,
 } from "@repo/web-core/components/card";
 import { Label } from "@repo/web-core/components/label";
+import { SectionLoading } from "@repo/web-core/components/loading";
+import { LoadingButton } from "@repo/web-core/components/loading-button";
 import { Pagination } from "@repo/web-core/components/pagination";
 import { Separator } from "@repo/web-core/components/separator";
+import { Show } from "@repo/web-core/components/show";
 import { Spinner } from "@repo/web-core/components/spinner";
 import {
   Table,
@@ -308,13 +311,14 @@ export function JobsView() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {jobs.isLoading ? (
+              <Show when={jobs.isLoading}>
                 <TableRow>
                   <TableCell colSpan={5} className="py-16 text-center">
-                    <Spinner className="mx-auto size-5" />
+                    <SectionLoading />
                   </TableCell>
                 </TableRow>
-              ) : allJobs.length === 0 ? (
+              </Show>
+              {!jobs.isLoading && allJobs.length === 0 ? (
                 <TableRow>
                   <TableCell
                     colSpan={5}
@@ -363,21 +367,17 @@ export function JobsView() {
                           {canCancel &&
                             (isConfirming ? (
                               <div className="flex items-center gap-2">
-                                <Button
+                                <LoadingButton
                                   variant="outline"
                                   size="sm"
                                   className="h-7 text-xs text-destructive border-destructive/40 hover:bg-destructive/5"
-                                  disabled={cancelJob.isPending}
                                   onClick={() =>
                                     cancelJob.mutate(job.id)
                                   }
+                                  loading={cancelJob.isPending}
                                 >
-                                  {cancelJob.isPending ? (
-                                    <Spinner className="size-3" />
-                                  ) : (
-                                    "Confirm"
-                                  )}
-                                </Button>
+                                  Confirm
+                                </LoadingButton>
                                 <Button
                                   variant="ghost"
                                   size="sm"
@@ -535,9 +535,10 @@ export function JobsView() {
                     Event timeline
                   </Label>
                   <div className="mt-2 space-y-3">
-                    {jobLogs.isLoading ? (
+                    <Show when={jobLogs.isLoading}>
                       <Spinner className="mx-auto size-4" />
-                    ) : selectedLogs.length === 0 ? (
+                    </Show>
+                    {!jobLogs.isLoading && selectedLogs.length === 0 ? (
                       <p className="text-xs text-muted-foreground">
                         No events recorded.
                       </p>
@@ -580,9 +581,7 @@ export function JobsView() {
             )}
           </div>
         ) : (
-          <div className="flex justify-center py-8">
-            <Spinner className="size-5" />
-          </div>
+          <SectionLoading />
         )}
       </ResourceDrawer>
     </ResourcePageShell>

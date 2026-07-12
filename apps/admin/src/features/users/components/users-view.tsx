@@ -1,9 +1,10 @@
 "use client";
 
-import { Alert } from "@repo/web-core/components/alert";
 import { Button } from "@repo/web-core/components/button";
 import { Card, CardContent } from "@repo/web-core/components/card";
+import { ErrorState } from "@repo/web-core/components/error-state";
 import { Pagination } from "@repo/web-core/components/pagination";
+import { Show } from "@repo/web-core/components/show";
 import { Spinner } from "@repo/web-core/components/spinner";
 import { useDebouncedValue } from "@repo/web-core/hooks";
 import {
@@ -13,7 +14,6 @@ import {
   type Updater,
   useReactTable,
 } from "@tanstack/react-table";
-import { AlertTriangle } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -196,7 +196,6 @@ export function UsersView() {
     setRowSelection({});
   };
 
-  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data: pageUsers,
     columns,
@@ -226,29 +225,22 @@ export function UsersView() {
 
   if (session.isError) {
     return (
-      <div className="flex min-h-64 items-center justify-center">
-        <Alert variant="error" className="max-w-md">
-          <div className="flex items-center gap-2 font-semibold">
-            <AlertTriangle className="size-4" />
-            Session error
-          </div>
-          <p className="text-sm">
-            Could not load your session. Try refreshing the page.
-          </p>
-        </Alert>
-      </div>
+      <ErrorState
+        title="Session error"
+        description="Could not load your session. Try refreshing the page."
+      />
     );
   }
 
   return (
     <>
-      {showCreate ? (
+      <Show when={showCreate}>
         <CreateUserDrawer
           open={showCreate}
           onClose={() => setShowCreate(false)}
           actorRoles={actorRoles}
         />
-      ) : null}
+      </Show>
 
       {confirmBlock ? (
         <UsersConfirmBlockDialog
@@ -280,23 +272,13 @@ export function UsersView() {
         />
 
         <Card>
-          {users.isError ? (
-            <Alert variant="error" className="m-4 mb-0">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 font-semibold">
-                  <AlertTriangle className="size-4" />
-                  Failed to load users
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => void users.refetch()}
-                >
-                  Retry
-                </Button>
-              </div>
-            </Alert>
-          ) : null}
+          <Show when={users.isError}>
+            <ErrorState
+              variant="inline"
+              title="Failed to load users"
+              action={{ label: "Retry", onClick: () => void users.refetch() }}
+            />
+          </Show>
           <ResourceToolbar
             search={searchInput}
             onSearchChange={(value) => {
@@ -332,47 +314,45 @@ export function UsersView() {
             selectedCount={selectedIds.length}
             onClear={() => setRowSelection({})}
             actions={
-              canUpdate ? (
-                <>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={
-                      activateUsers.isPending || blockUsers.isPending
-                    }
-                    onClick={async () => {
-                      await activateUsers.mutateAsync(selectedIds);
-                      setRowSelection({});
-                    }}
-                  >
-                    {activateUsers.isPending ? (
-                      <Spinner className="size-3.5" />
-                    ) : null}
-                    Activate
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={
-                      activateUsers.isPending || blockUsers.isPending
-                    }
-                    onClick={() => {
-                      setConfirmBlock({
-                        userIds: selectedIds,
-                        label: `${selectedIds.length} user${
-                          selectedIds.length > 1 ? "s" : ""
-                        }`,
-                        count: selectedIds.length,
-                      });
-                    }}
-                  >
-                    {pendingAction === "block" ? (
-                      <Spinner className="size-3.5" />
-                    ) : null}
-                    Block
-                  </Button>
-                </>
-              ) : null
+              <Show when={canUpdate}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={
+                    activateUsers.isPending || blockUsers.isPending
+                  }
+                  onClick={async () => {
+                    await activateUsers.mutateAsync(selectedIds);
+                    setRowSelection({});
+                  }}
+                >
+                  <Show when={activateUsers.isPending}>
+                    <Spinner className="size-3.5" />
+                  </Show>
+                  Activate
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={
+                    activateUsers.isPending || blockUsers.isPending
+                  }
+                  onClick={() => {
+                    setConfirmBlock({
+                      userIds: selectedIds,
+                      label: `${selectedIds.length} user${
+                        selectedIds.length > 1 ? "s" : ""
+                      }`,
+                      count: selectedIds.length,
+                    });
+                  }}
+                >
+                  <Show when={pendingAction === "block"}>
+                    <Spinner className="size-3.5" />
+                  </Show>
+                  Block
+                </Button>
+              </Show>
             }
           />
           <CardContent className="p-0 pb-1">

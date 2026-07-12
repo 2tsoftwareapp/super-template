@@ -14,7 +14,9 @@ import {
 import { ConfirmDialog } from "@repo/web-core/components/confirm-dialog";
 import { Input } from "@repo/web-core/components/input";
 import { Label } from "@repo/web-core/components/label";
+import { LoadingButton } from "@repo/web-core/components/loading-button";
 import { Separator } from "@repo/web-core/components/separator";
+import { Show } from "@repo/web-core/components/show";
 import { Skeleton } from "@repo/web-core/components/skeleton";
 import { Spinner } from "@repo/web-core/components/spinner";
 import { BadgeCheck, CheckCircle2, ShieldAlert, Trash2, XCircle } from "lucide-react";
@@ -213,15 +215,15 @@ export function UserDetailView() {
                 )}
               </div>
               <div className="flex items-center gap-3 sm:col-span-2">
-                <Button type="submit" disabled={updateProfile.isPending || !canEdit || (!profileForm.formState.isDirty && !updateProfile.isError)}>
-                  {updateProfile.isPending ? <><Spinner className="size-4" /> Saving…</> : "Save profile"}
-                </Button>
+                <LoadingButton type="submit" loading={updateProfile.isPending} disabled={!canEdit || (!profileForm.formState.isDirty && !updateProfile.isError)}>
+                  Save profile
+                </LoadingButton>
                 {updateProfile.isSuccess && (
                   <span className="flex items-center gap-1 text-xs text-primary"><CheckCircle2 className="size-3" /> Saved</span>
                 )}
-                {updateProfile.isError && (
+                <Show when={updateProfile.isError}>
                   <span className="text-xs text-destructive">Save failed.</span>
-                )}
+                </Show>
               </div>
             </form>
           </div>
@@ -251,22 +253,23 @@ export function UserDetailView() {
               ))}
             </div>
             <div className="mt-3 flex items-center gap-3">
-              <Button
+              <LoadingButton
                 variant="outline"
                 size="sm"
                 disabled={statusDisabled || selectedStatus === currentUser.status}
                 onClick={() => void updateStatus.mutateAsync(selectedStatus)}
+                loading={updateStatus.isPending}
               >
-                {updateStatus.isPending ? <><Spinner className="size-3.5" /> Updating…</> : "Apply status"}
-              </Button>
+                Apply status
+              </LoadingButton>
               {updateStatus.isSuccess && (
                 <span className="flex items-center gap-1 text-xs text-primary"><CheckCircle2 className="size-3" /> Updated</span>
               )}
-              {updateStatus.isError && (
+              <Show when={updateStatus.isError}>
                 <span className="text-xs text-destructive">
                   Failed. <button type="button" className="underline" onClick={() => void updateStatus.mutateAsync(selectedStatus)}>Retry</button>
                 </span>
-              )}
+              </Show>
             </div>
           </div>
 
@@ -311,22 +314,23 @@ export function UserDetailView() {
               </div>
             )}
             <div className="mt-3 flex items-center gap-3">
-              <Button
+              <LoadingButton
                 variant="outline"
                 size="sm"
                 disabled={roleDisabled || selectedRole === primaryRole}
                 onClick={() => void replaceRoles.mutateAsync(selectedRole)}
+                loading={replaceRoles.isPending}
               >
-                {replaceRoles.isPending ? <><Spinner className="size-3.5" /> Saving…</> : "Save roles"}
-              </Button>
+                Save roles
+              </LoadingButton>
               {replaceRoles.isSuccess && (
                 <span className="flex items-center gap-1 text-xs text-primary"><CheckCircle2 className="size-3" /> Saved</span>
               )}
-              {replaceRoles.isError && (
+              <Show when={replaceRoles.isError}>
                 <span className="text-xs text-destructive">
                   Failed. <button type="button" className="underline" onClick={() => void replaceRoles.mutateAsync(selectedRole)}>Retry</button>
                 </span>
-              )}
+              </Show>
             </div>
           </div>
 
@@ -370,11 +374,11 @@ export function UserDetailView() {
                       <Trash2 className="size-3.5" />
                       Delete user
                     </Button>
-                    {deleteUser.isError && (
+                    <Show when={deleteUser.isError}>
                       <p className="mt-2 text-xs text-destructive">
                         Delete failed. <button type="button" className="underline" onClick={() => void deleteUser.mutateAsync()}>Retry</button>
                       </p>
-                    )}
+                    </Show>
                   </>
                 )}
               </div>

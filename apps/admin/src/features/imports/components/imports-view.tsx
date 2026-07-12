@@ -10,10 +10,13 @@ import {
   CardTitle,
 } from "@repo/web-core/components/card";
 import { ConfirmDialog } from "@repo/web-core/components/confirm-dialog";
+import { ErrorState } from "@repo/web-core/components/error-state";
 import { Input } from "@repo/web-core/components/input";
 import { Label } from "@repo/web-core/components/label";
+import { SectionLoading } from "@repo/web-core/components/loading";
+import { LoadingButton } from "@repo/web-core/components/loading-button";
 import { Separator } from "@repo/web-core/components/separator";
-import { Spinner } from "@repo/web-core/components/spinner";
+import { Show } from "@repo/web-core/components/show";
 import {
   AlertCircle,
   CheckCircle2,
@@ -130,19 +133,16 @@ export function ImportsView() {
                 ))}
               </select>
             </div>
-            <Button
+            <LoadingButton
               className="w-full"
               onClick={() =>
                 createImport.mutate({ fileId, type })
               }
-              disabled={createImport.isPending || !fileId || !type}
+              disabled={!fileId || !type}
+              loading={createImport.isPending}
             >
-              {createImport.isPending ? (
-                <><Spinner className="size-4" /> Queuing…</>
-              ) : (
-                "Create import"
-              )}
-            </Button>
+              Create import
+            </LoadingButton>
           </CardContent>
         </Card>
 
@@ -177,19 +177,17 @@ export function ImportsView() {
               </Button>
             </div>
 
-            {jobId && job.isLoading ? (
-              <div className="flex justify-center py-8">
-                <Spinner className="size-5" />
-              </div>
-            ) : job.isError ? (
-              <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
-                Could not load job. Check the ID and try again.
-              </div>
-            ) : !jobData ? (
+            <Show when={!!jobId && job.isLoading}>
+              <SectionLoading />
+            </Show>
+            <Show when={job.isError}>
+              <ErrorState variant="inline" title="Could not load job. Check the ID and try again." />
+            </Show>
+            {!job.isLoading && !job.isError && !jobData ? (
               <div className="rounded-xl border border-border p-6 text-center text-sm text-muted-foreground">
                 {jobId ? "No data returned" : "Enter a job ID and click refresh"}
               </div>
-            ) : (
+            ) : !job.isLoading && !job.isError && jobData ? (
               <div className="space-y-4 rounded-xl border border-border p-4">
                 <div className="flex items-center justify-between">
                   <div className="min-w-0">
@@ -274,21 +272,17 @@ export function ImportsView() {
                 )}
 
                 {(s === "PENDING" || s === "PROCESSING") && (
-                  <Button
+                  <LoadingButton
                     className="w-full"
                     variant="outline"
                     onClick={() => setConfirmOpen(true)}
-                    disabled={confirm.isPending}
+                    loading={confirm.isPending}
                   >
-                    {confirm.isPending ? (
-                      <><Spinner className="size-4" /> Confirming…</>
-                    ) : (
-                      "Confirm import"
-                    )}
-                  </Button>
+                    Confirm import
+                  </LoadingButton>
                 )}
               </div>
-            )}
+            ) : null}
           </CardContent>
         </Card>
       </div>

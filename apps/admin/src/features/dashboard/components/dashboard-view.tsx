@@ -1,5 +1,6 @@
 "use client";
 
+import { Show } from "@repo/web-core/components/show";
 import { AlertTriangle } from "lucide-react";
 
 import {
@@ -64,7 +65,7 @@ export function DashboardView() {
         onRefresh={refresh}
       />
 
-      {!jobs.isLoading && failed > 0 ? (
+      <Show when={!jobs.isLoading && failed > 0}>
         <div className="flex shrink-0 items-center gap-2 rounded-md border border-border bg-accent px-2.5 py-1.5 text-xs">
           <AlertTriangle className="size-3.5 shrink-0 text-accent-foreground" />
           <span className="text-foreground">
@@ -80,7 +81,7 @@ export function DashboardView() {
             </Link>
           </span>
         </div>
-      ) : null}
+      </Show>
 
       <DashboardStats
         firstLoad={firstLoad}

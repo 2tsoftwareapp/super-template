@@ -1,6 +1,5 @@
 "use client";
 
-import { Alert } from "@repo/web-core/components/alert";
 import { Badge } from "@repo/web-core/components/badge";
 import { Button } from "@repo/web-core/components/button";
 import {
@@ -10,9 +9,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@repo/web-core/components/card";
+import { ErrorState } from "@repo/web-core/components/error-state";
 import { Input } from "@repo/web-core/components/input";
 import { Label } from "@repo/web-core/components/label";
-import { Spinner } from "@repo/web-core/components/spinner";
+import { SectionLoading } from "@repo/web-core/components/loading";
+import { LoadingButton } from "@repo/web-core/components/loading-button";
+import { Show } from "@repo/web-core/components/show";
 import {
   Table,
   TableBody,
@@ -140,11 +142,9 @@ export function NotificationsView() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {send.isError && (
-              <Alert variant="error">
-                Failed to queue notification. Check the API and try again.
-              </Alert>
-            )}
+            <Show when={send.isError}>
+              <ErrorState variant="inline" title="Failed to queue notification. Check the API and try again." />
+            </Show>
 
             <div className="space-y-1.5">
               <Label htmlFor="notif-audience">Audience</Label>
@@ -215,19 +215,13 @@ export function NotificationsView() {
               />
             </div>
 
-            <Button
+            <LoadingButton
               className="w-full"
               onClick={handleSend}
-              disabled={send.isPending}
+              loading={send.isPending}
             >
-              {send.isPending ? (
-                <>
-                  <Spinner className="size-4" /> Queuing…
-                </>
-              ) : (
-                "Send test notification"
-              )}
-            </Button>
+              Send test notification
+            </LoadingButton>
           </CardContent>
         </Card>
 
@@ -260,13 +254,14 @@ export function NotificationsView() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {jobs.isLoading ? (
+                  <Show when={jobs.isLoading}>
                     <TableRow>
                       <TableCell colSpan={6} className="py-10 text-center">
-                        <Spinner className="mx-auto size-4" />
+                        <SectionLoading />
                       </TableCell>
                     </TableRow>
-                  ) : (jobs.data?.data ?? []).length === 0 ? (
+                  </Show>
+                  {!jobs.isLoading && (jobs.data?.data ?? []).length === 0 ? (
                     <TableRow>
                       <TableCell
                         colSpan={6}
@@ -356,11 +351,10 @@ export function NotificationsView() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-2 pb-4">
-              {recentNotifications.isLoading ? (
-                <div className="flex justify-center py-6">
-                  <Spinner className="size-4" />
-                </div>
-              ) : (recentNotifications.data?.data ?? []).length === 0 ? (
+              <Show when={recentNotifications.isLoading}>
+                <SectionLoading />
+              </Show>
+              {!recentNotifications.isLoading && (recentNotifications.data?.data ?? []).length === 0 ? (
                 <p className="py-4 text-center text-sm text-muted-foreground">
                   No recent notifications.
                 </p>

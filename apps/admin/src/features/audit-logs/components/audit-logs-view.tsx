@@ -9,9 +9,10 @@ import {
 import { DatePicker } from "@repo/web-core/components/date-picker";
 import { Input } from "@repo/web-core/components/input";
 import { Label } from "@repo/web-core/components/label";
+import { SectionLoading } from "@repo/web-core/components/loading";
 import { Pagination } from "@repo/web-core/components/pagination";
 import { Separator } from "@repo/web-core/components/separator";
-import { Spinner } from "@repo/web-core/components/spinner";
+import { Show } from "@repo/web-core/components/show";
 import {
   Table,
   TableBody,
@@ -172,13 +173,14 @@ export function AuditLogsView() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {auditLogs.isLoading ? (
+              <Show when={auditLogs.isLoading}>
                 <TableRow>
                   <TableCell colSpan={5} className="py-16 text-center">
-                    <Spinner className="mx-auto size-5" />
+                    <SectionLoading />
                   </TableCell>
                 </TableRow>
-              ) : entries.length === 0 ? (
+              </Show>
+              {!auditLogs.isLoading && entries.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={5} className="py-16 text-center text-sm text-muted-foreground">
                     {hasFilters

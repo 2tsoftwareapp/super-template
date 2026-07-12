@@ -9,7 +9,8 @@ import {
 import { ConfirmDialog } from "@repo/web-core/components/confirm-dialog";
 import { Empty } from "@repo/web-core/components/empty";
 import { Input } from "@repo/web-core/components/input";
-import { Spinner } from "@repo/web-core/components/spinner";
+import { SectionLoading } from "@repo/web-core/components/loading";
+import { Show } from "@repo/web-core/components/show";
 import {
   ChevronDown,
   ChevronRight,
@@ -256,12 +257,12 @@ export function RolesView() {
         void permissionCatalog.refetch();
       }}
       actions={
-        canCreate ? (
+        <Show when={canCreate}>
           <Button size="sm" onClick={openCreateDrawer}>
             <Plus data-icon="inline-start" />
             New role
           </Button>
-        ) : null
+        </Show>
       }
     >
       <Card>
@@ -283,16 +284,15 @@ export function RolesView() {
             )}
           </div>
 
-          {isLoading ? (
-            <div className="flex min-h-48 items-center justify-center">
-              <Spinner className="size-5" />
-            </div>
-          ) : noResults ? (
+          <Show when={isLoading}>
+            <SectionLoading />
+          </Show>
+          {!isLoading && noResults ? (
             <Empty
               title="No roles match your search"
               description="Try different keywords."
             />
-          ) : !anyRoles && !search ? (
+          ) : !isLoading && !anyRoles && !search ? (
             <Empty
               title="No roles yet"
               description="Roles are provisioned during bootstrap. Custom roles can be created below."

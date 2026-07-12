@@ -18,13 +18,22 @@ import { Checkbox } from "./checkbox";
 import { ConfirmDialog } from "./confirm-dialog";
 import { DatePicker } from "./date-picker";
 import { Empty } from "./empty";
+import { ErrorState } from "./error-state";
 import { Input } from "./input";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "./input-otp";
 import { Label } from "./label";
-import { FullScreenLoading, SectionLoading } from "./loading";
+import {
+  FullScreenLoading,
+  LoadingOverlay,
+  PageLoading,
+  SectionLoading,
+  TableSkeleton,
+} from "./loading";
+import { LoadingButton } from "./loading-button";
 import { Pagination } from "./pagination";
 import { PasswordInput } from "./password-input";
 import { Separator } from "./separator";
+import { Show } from "./show";
 import { Skeleton } from "./skeleton";
 import { Spinner } from "./spinner";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./table";
@@ -122,10 +131,73 @@ describe("web-core UI primitives smoke", () => {
     expect(screen.getByText("A label")).toBeInTheDocument();
   });
 
+  it("renders ErrorState full-page", () => {
+    render(
+      <ErrorState
+        title="Session error"
+        description="Could not load your session."
+      />,
+    );
+    expect(screen.getByText("Session error")).toBeInTheDocument();
+    expect(screen.getByText("Could not load your session.")).toBeInTheDocument();
+  });
+
+  it("renders ErrorState inline with action", () => {
+    const onClick = vi.fn();
+    render(
+      <ErrorState
+        title="Failed to load"
+        variant="inline"
+        action={{ label: "Retry", onClick }}
+      />,
+    );
+    expect(screen.getByText("Failed to load")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Retry" })).toBeInTheDocument();
+  });
+
   it("renders FullScreenLoading and SectionLoading", () => {
     render(<FullScreenLoading title="Loading things" description="wait" />);
     expect(screen.getByText("Loading things")).toBeInTheDocument();
     render(<SectionLoading />);
+  });
+
+  it("renders PageLoading", () => {
+    const { container } = render(<PageLoading />);
+    expect(container.firstChild).not.toBeNull();
+  });
+
+  it("renders LoadingOverlay", () => {
+    const { container } = render(
+      <LoadingOverlay loading>
+        <div>content</div>
+      </LoadingOverlay>,
+    );
+    expect(container.firstChild).not.toBeNull();
+  });
+
+  it("renders LoadingOverlay without overlay when not loading", () => {
+    render(
+      <LoadingOverlay loading={false}>
+        <div>visible content</div>
+      </LoadingOverlay>,
+    );
+    expect(screen.getByText("visible content")).toBeInTheDocument();
+  });
+
+  it("renders TableSkeleton", () => {
+    const { container } = render(<TableSkeleton rows={3} columns={4} />);
+    expect(container.firstChild).not.toBeNull();
+  });
+
+  it("renders LoadingButton", () => {
+    render(<LoadingButton>Save</LoadingButton>);
+    expect(screen.getByRole("button", { name: "Save" })).toBeInTheDocument();
+  });
+
+  it("renders LoadingButton with loading state", () => {
+    render(<LoadingButton loading>Save</LoadingButton>);
+    const button = screen.getByRole("button");
+    expect(button).toBeDisabled();
   });
 
   it("renders Pagination", () => {
@@ -149,6 +221,22 @@ describe("web-core UI primitives smoke", () => {
   it("renders Separator", () => {
     const { container } = render(<Separator />);
     expect(container.firstChild).not.toBeNull();
+  });
+
+  it("renders Show when true", () => {
+    render(<Show when>content</Show>);
+    expect(screen.getByText("content")).toBeInTheDocument();
+  });
+
+  it("renders Show fallback when false", () => {
+    render(<Show when={false} fallback={<span>fallback</span>}>content</Show>);
+    expect(screen.getByText("fallback")).toBeInTheDocument();
+    expect(screen.queryByText("content")).not.toBeInTheDocument();
+  });
+
+  it("renders nothing when false without fallback", () => {
+    const { container } = render(<Show when={false}>content</Show>);
+    expect(container.firstChild).toBeNull();
   });
 
   it("renders Skeleton", () => {
