@@ -102,6 +102,7 @@ export class RedisThrottlerStorage implements ThrottlerStorage {
   ): ThrottlerStorageRecord {
     const bucketKey = this.buildBucketKey(throttlerName, key);
     const now = Date.now();
+    this.evictExpiredLocalBuckets(now);
     const existing = this.localBuckets.get(bucketKey);
 
     if (existing?.blockedUntil && existing.blockedUntil > now) {
@@ -131,6 +132,25 @@ export class RedisThrottlerStorage implements ThrottlerStorage {
       isBlocked,
       timeToBlockExpire: isBlocked ? blockDuration : 0,
     };
+  }
+
+  // Without eviction the fallback Map grows one entry per unique caller key
+  // forever (a slow leak when Redis is absent). Sweep opportunistically on
+  // increments; buckets are tiny so a full pass stays cheap.
+  private lastEvictionAt = 0;
+
+  private evictExpiredLocalBuckets(now: number): void {
+    if (now - this.lastEvictionAt < 30_000) {
+      return;
+    }
+    this.lastEvictionAt = now;
+
+    for (const [key, bucket] of this.localBuckets) {
+      const blockExpired = !bucket.blockedUntil || bucket.blockedUntil <= now;
+      if (bucket.expiresAt <= now && blockExpired) {
+        this.localBuckets.delete(key);
+      }
+    }
   }
 
   private async ensureRedis() {
