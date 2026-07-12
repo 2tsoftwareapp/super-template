@@ -22,7 +22,16 @@ import { CurrentUser } from '@repo/api-core';
 import { Authorize } from '@repo/api-core';
 import { SkipEnvelope } from '@repo/api-core';
 
-import { FilesService } from '../application/files.service';
+import { BatchDeleteFilesUseCase } from '../application/use-cases/batch-delete-files.use-case';
+import { CreateFileVersionUseCase } from '../application/use-cases/create-file-version.use-case';
+import { DeleteFileUseCase } from '../application/use-cases/delete-file.use-case';
+import { DownloadFileUseCase } from '../application/use-cases/download-file.use-case';
+import { GetFileHistoryUseCase } from '../application/use-cases/get-file-history.use-case';
+import { GetFileSignedUrlUseCase } from '../application/use-cases/get-file-signed-url.use-case';
+import { GetFileUseCase } from '../application/use-cases/get-file.use-case';
+import { ListFileVersionsUseCase } from '../application/use-cases/list-file-versions.use-case';
+import { ListFilesUseCase } from '../application/use-cases/list-files.use-case';
+import { UploadFileUseCase } from '../application/use-cases/upload-file.use-case';
 import { UploadFileInterceptor } from './files-upload.interceptor';
 import {
   BatchDeleteFilesDto,
@@ -37,7 +46,18 @@ import {
 @ApiBearerAuth()
 @Controller('files')
 export class FilesController {
-  constructor(private readonly filesService: FilesService) {}
+  constructor(
+    private readonly uploadFile: UploadFileUseCase,
+    private readonly getFile: GetFileUseCase,
+    private readonly getFileSignedUrl: GetFileSignedUrlUseCase,
+    private readonly downloadFile: DownloadFileUseCase,
+    private readonly deleteFile: DeleteFileUseCase,
+    private readonly listFiles: ListFilesUseCase,
+    private readonly createFileVersion: CreateFileVersionUseCase,
+    private readonly listFileVersions: ListFileVersionsUseCase,
+    private readonly getFileHistory: GetFileHistoryUseCase,
+    private readonly batchDeleteFiles: BatchDeleteFilesUseCase,
+  ) {}
 
   @Get()
   @Authorize({ permissions: [perm('files', ACTION.READ)] })
@@ -46,7 +66,7 @@ export class FilesController {
     @CurrentUser() user: AuthenticatedRequestUser,
     @Query() query: FilesQueryDto,
   ) {
-    const result = await this.filesService.list(user, {
+    const result = await this.listFiles.execute(user, {
       page: query.page,
       limit: query.limit,
       sortField: query.sortField,
@@ -77,7 +97,7 @@ export class FilesController {
     @Body() input: BatchDeleteFilesDto,
     @Req() request: Request,
   ) {
-    const results = await this.filesService.batchDelete(
+    const results = await this.batchDeleteFiles.execute(
       user,
       input.fileIds,
       input.idempotencyKey,
@@ -107,7 +127,7 @@ export class FilesController {
     },
     @Req() request: Request,
   ) {
-    return this.filesService.upload(user, file, request.requestContext);
+    return this.uploadFile.execute(user, file, request.requestContext);
   }
 
   @Get(':id')
@@ -117,7 +137,7 @@ export class FilesController {
     @CurrentUser() user: AuthenticatedRequestUser,
     @Param('id', new ParseUUIDPipe()) fileId: string,
   ) {
-    return this.filesService.getById(user, fileId);
+    return this.getFile.execute(user, fileId);
   }
 
   @Get(':id/url')
@@ -127,7 +147,7 @@ export class FilesController {
     @CurrentUser() user: AuthenticatedRequestUser,
     @Param('id', new ParseUUIDPipe()) fileId: string,
   ) {
-    return this.filesService.getSignedUrl(user, fileId);
+    return this.getFileSignedUrl.execute(user, fileId);
   }
 
   @Get(':id/download')
@@ -140,7 +160,7 @@ export class FilesController {
     @Query('token') token: string | undefined,
     @Res({ passthrough: true }) response: Response,
   ) {
-    const { content, file } = await this.filesService.download(
+    const { content, file } = await this.downloadFile.execute(
       user,
       fileId,
       token,
@@ -179,7 +199,7 @@ export class FilesController {
     },
     @Req() request: Request,
   ) {
-    return this.filesService.createVersion(
+    return this.createFileVersion.execute(
       user,
       fileId,
       file,
@@ -194,7 +214,7 @@ export class FilesController {
     @CurrentUser() user: AuthenticatedRequestUser,
     @Param('id', new ParseUUIDPipe()) fileId: string,
   ) {
-    return { data: await this.filesService.listVersions(user, fileId) };
+    return { data: await this.listFileVersions.execute(user, fileId) };
   }
 
   @Get(':id/history')
@@ -204,7 +224,7 @@ export class FilesController {
     @CurrentUser() user: AuthenticatedRequestUser,
     @Param('id', new ParseUUIDPipe()) fileId: string,
   ) {
-    return { data: await this.filesService.getHistory(user, fileId) };
+    return { data: await this.getFileHistory.execute(user, fileId) };
   }
 
   @Delete(':id')
@@ -215,7 +235,7 @@ export class FilesController {
     @Param('id', new ParseUUIDPipe()) fileId: string,
     @Req() request: Request,
   ) {
-    await this.filesService.delete(user, fileId, request.requestContext);
+    await this.deleteFile.execute(user, fileId, request.requestContext);
 
     return {
       data: { success: true } };
