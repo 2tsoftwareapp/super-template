@@ -22,7 +22,8 @@ import {
   SuccessFlagDto,
 } from '@repo/api-core';
 
-import { AccessControlService } from '../application/access-control.service';
+import { RoleManagementUseCase } from '../application/use-cases/role-management.use-case';
+import { RoleQueryUseCase } from '../application/use-cases/role-query.use-case';
 import {
   CreateRoleDto,
   PermissionDto,
@@ -35,13 +36,16 @@ import {
 @ApiBearerAuth()
 @Controller('admin/roles')
 export class AdminRolesController {
-  constructor(private readonly accessControlService: AccessControlService) {}
+  constructor(
+    private readonly roleQuery: RoleQueryUseCase,
+    private readonly roleManagement: RoleManagementUseCase,
+  ) {}
 
   @Get()
   @Authorize({ permissions: [perm('roles', ACTION.READ)] })
   @ApiArrayResponse(RoleDto)
   async listRoles(@CurrentUser() actor: AuthenticatedRequestUser) {
-    const roles = await this.accessControlService.listRoles(actor);
+    const roles = await this.roleQuery.listRoles(actor);
 
     return {
       data: roles,
@@ -52,7 +56,7 @@ export class AdminRolesController {
   @Authorize({ permissions: [perm('roles', ACTION.READ)] })
   @ApiArrayResponse(PermissionDto)
   async listPermissions() {
-    const permissions = await this.accessControlService.listPermissions();
+    const permissions = await this.roleQuery.listPermissions();
 
     return {
       data: permissions,
@@ -66,7 +70,7 @@ export class AdminRolesController {
     @CurrentUser() actor: AuthenticatedRequestUser,
     @Body() input: CreateRoleDto,
   ) {
-    const role = await this.accessControlService.createCustomRole(actor, input);
+    const role = await this.roleManagement.createCustomRole(actor, input);
 
     return {
       data: role,
@@ -81,7 +85,7 @@ export class AdminRolesController {
     @Param('id', ParseUUIDPipe) roleId: string,
     @Body() input: UpdateRoleDto,
   ) {
-    const role = await this.accessControlService.updateCustomRole(
+    const role = await this.roleManagement.updateCustomRole(
       actor,
       roleId,
       input,
@@ -100,7 +104,7 @@ export class AdminRolesController {
     @Param('id', ParseUUIDPipe) roleId: string,
     @Body() input: ReplaceRolePermissionsDto,
   ) {
-    const role = await this.accessControlService.replaceCustomRolePermissions(
+    const role = await this.roleManagement.replaceCustomRolePermissions(
       actor,
       roleId,
       input.permissionIds,
@@ -118,7 +122,7 @@ export class AdminRolesController {
     @CurrentUser() actor: AuthenticatedRequestUser,
     @Param('id', ParseUUIDPipe) roleId: string,
   ) {
-    await this.accessControlService.deleteCustomRole(actor, roleId);
+    await this.roleManagement.deleteCustomRole(actor, roleId);
 
     return {
       data: { success: true },

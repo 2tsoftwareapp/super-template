@@ -3,11 +3,6 @@ import type { DatabaseExecutor } from '@repo/api-database';
 
 import { Injectable } from '@nestjs/common';
 
-import type {
-  CreateRoleCommand,
-  UpdateRoleCommand,
-} from './access-control.types';
-
 import {
   assertCanAssignRoles,
   assertCanManagePrivilegedAccount,
@@ -89,14 +84,6 @@ export class AccessControlService {
     return this.roleQueryUseCase.getRoleByName(name, organizationId, executor);
   }
 
-  listRoles(actor?: AuthenticatedRequestUser) {
-    return this.roleQueryUseCase.listRoles(actor);
-  }
-
-  listPermissions() {
-    return this.roleQueryUseCase.listPermissions();
-  }
-
   ensureOrganizationAdminRole(
     organizationId: string,
     userId: string,
@@ -121,53 +108,5 @@ export class AccessControlService {
       organizationId,
       executor,
     );
-  }
-
-  createCustomRole(
-    actor: AuthenticatedRequestUser,
-    command: CreateRoleCommand,
-    executor?: DatabaseExecutor,
-  ) {
-    return this.roleManagementUseCase.createCustomRole(
-      actor,
-      command,
-      executor,
-    );
-  }
-
-  updateCustomRole(
-    actor: AuthenticatedRequestUser,
-    roleId: string,
-    command: UpdateRoleCommand,
-    executor?: DatabaseExecutor,
-  ) {
-    return this.roleManagementUseCase.updateCustomRole(
-      actor,
-      roleId,
-      command,
-      executor,
-    );
-  }
-
-  replaceCustomRolePermissions(
-    actor: AuthenticatedRequestUser,
-    roleId: string,
-    permissionIds: string[],
-    executor?: DatabaseExecutor,
-  ) {
-    return this.roleManagementUseCase.replaceCustomRolePermissions(
-      actor,
-      roleId,
-      permissionIds,
-      executor,
-    );
-  }
-
-  deleteCustomRole(
-    actor: AuthenticatedRequestUser,
-    roleId: string,
-    executor?: DatabaseExecutor,
-  ) {
-    return this.roleManagementUseCase.deleteCustomRole(actor, roleId, executor);
   }
 }
