@@ -1,6 +1,6 @@
 # Review nghiêm ngặt core packages — đánh giá & đề xuất tái cấu trúc
 
-Trạng thái: findings đã xác minh bằng chứng — chờ quyết định triển khai
+Trạng thái: ĐÃ TRIỂN KHAI TOÀN BỘ R1–R6 (2026-07-12, commits bbeceba..ad75892)
 Phạm vi: 11 core packages (`api-core`, `api-database`, `api-bootstrap`, `api-contract`, `api-health`, `api-sort`, `env-loader`, `web-core`, `web-test`, `eslint-config`, `tsconfig`) — không gồm 2 bounded-context packages (identity/platform) trừ khi cần đối chứng.
 Chuẩn so sánh: template chuyên nghiệp cỡ lớn (Turborepo official examples, NestJS enterprise starters, T3): mỗi package có mục đích rõ + README, API surface chủ đích, server/client tách bạch, test cho code an ninh, versioning/packaging hygiene.
 
