@@ -6,7 +6,9 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import {  ACTION, ApiDataResponse, ApiPaginatedResponse, perm } from '@repo/api-core';
 import { Authorize, CurrentUser } from '@repo/api-core';
 
-import { AuditService } from '../application/audit.service';
+import { ExportAuditLogsUseCase } from '../application/use-cases/export-audit-logs.use-case';
+import { GetAuditLogUseCase } from '../application/use-cases/get-audit-log.use-case';
+import { ListAuditLogsUseCase } from '../application/use-cases/list-audit-logs.use-case';
 import {
   AuditExportResultDto,
   AuditLogDto,
@@ -18,13 +20,17 @@ import {
 @ApiBearerAuth()
 @Controller('admin/audit-logs')
 export class AuditController {
-  constructor(private readonly auditService: AuditService) {}
+  constructor(
+    private readonly listAuditLogsUseCase: ListAuditLogsUseCase,
+    private readonly exportAuditLogsUseCase: ExportAuditLogsUseCase,
+    private readonly getAuditLogUseCase: GetAuditLogUseCase,
+  ) {}
 
   @Get()
   @Authorize({ permissions: [perm('audit', ACTION.READ)] })
   @ApiPaginatedResponse(AuditLogDto)
   async listAuditLogs(@Query() query: AuditLogsQueryDto) {
-    const result = await this.auditService.listAuditLogs({
+    const result = await this.listAuditLogsUseCase.execute({
       page: query.page,
       limit: query.limit,
       sortOrder: query.sortOrder,
@@ -57,7 +63,7 @@ export class AuditController {
     @Body() input: ExportAuditLogsQueryDto,
     @Req() request: Request,
   ) {
-    const result = await this.auditService.exportAuditLogs(
+    const result = await this.exportAuditLogsUseCase.execute(
       user,
       {
         ...(input.actorId !== undefined ? { actorId: input.actorId } : {}),
@@ -82,6 +88,6 @@ export class AuditController {
   @Authorize({ permissions: [perm('audit', ACTION.READ)] })
   @ApiDataResponse(AuditLogDto)
   async getAuditLog(@Param('id', new ParseUUIDPipe()) id: string) {
-    return { data: await this.auditService.getAuditLog(id) };
+    return { data: await this.getAuditLogUseCase.execute(id) };
   }
 }
