@@ -5,7 +5,6 @@ import { AccessControlModule } from '../access-control/access-control.module';
 import { AuthModule } from '../auth/auth.module';
 import { OrganizationsModule } from '../organizations/organizations.module';
 import { UsersModule } from '../users/users.module';
-import { SsoService } from './application/sso.service';
 import { HandleSsoCallbackUseCase } from './application/use-cases/handle-sso-callback.use-case';
 import {
   CreateSsoSessionExchangeUseCase,
@@ -34,7 +33,6 @@ import { GoogleSsoProvider } from './providers/google-sso.provider';
     AppleSsoProvider,
     GithubSsoProvider,
     FakeSsoProvider,
-    SsoService,
     StartSsoLoginUseCase,
     HandleSsoCallbackUseCase,
     CreateSsoSessionExchangeUseCase,
@@ -83,6 +81,5 @@ import { GoogleSsoProvider } from './providers/google-sso.provider';
       },
     },
   ],
-  exports: [SsoService],
 })
 export class SsoModule {}

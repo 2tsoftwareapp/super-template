@@ -16,7 +16,12 @@ import { Throttle } from '@nestjs/throttler';
 import { ApiDataResponse, Public } from '@repo/api-core';
 import { randomUUID } from 'node:crypto';
 
-import { SsoService } from '../application/sso.service';
+import { HandleSsoCallbackUseCase } from '../application/use-cases/handle-sso-callback.use-case';
+import {
+  CreateSsoSessionExchangeUseCase,
+  ExchangeSsoSessionUseCase,
+} from '../application/use-cases/sso-session-exchange.use-case';
+import { StartSsoLoginUseCase } from '../application/use-cases/start-sso-login.use-case';
 import {
   ExchangeSsoSessionDto,
   SsoCallbackQueryDto,
@@ -27,7 +32,12 @@ import {
 @ApiTags('sso')
 @Controller('auth/sso')
 export class SsoController {
-  constructor(private readonly ssoService: SsoService) {}
+  constructor(
+    private readonly startSsoLogin: StartSsoLoginUseCase,
+    private readonly handleSsoCallback: HandleSsoCallbackUseCase,
+    private readonly createSsoSessionExchange: CreateSsoSessionExchangeUseCase,
+    private readonly exchangeSsoSession: ExchangeSsoSessionUseCase,
+  ) {}
 
   @Public()
   @Get(':provider/start')
@@ -37,7 +47,7 @@ export class SsoController {
     @Param('provider') provider: string,
     @Query() query: StartSsoLoginQueryDto,
   ) {
-    return this.ssoService.startLogin({
+    return this.startSsoLogin.execute({
       provider,
       redirectUri: query.redirectUri,
       ...(query.testEmail !== undefined ? { testEmail: query.testEmail } : {}),
@@ -48,7 +58,7 @@ export class SsoController {
   @Post('exchange')
   @Throttle({ default: { limit: 20, ttl: 60_000 } })
   exchangeSession(@Body() body: ExchangeSsoSessionDto) {
-    return this.ssoService.exchangeSession(body.code);
+    return this.exchangeSsoSession.execute(body.code);
   }
 
   @Public()
@@ -101,12 +111,12 @@ export class SsoController {
     request: Request,
     response: Response,
   ): Promise<void> {
-    const { session, redirectUri } = await this.ssoService.handleCallback(
+    const { session, redirectUri } = await this.handleSsoCallback.execute(
       { provider, code, state },
       request.requestContext,
     );
 
-    const { exchangeCode } = await this.ssoService.createSessionExchange({
+    const { exchangeCode } = await this.createSsoSessionExchange.execute({
       accessToken: session.accessToken,
       refreshToken: session.refreshToken,
       organizationId: session.organizationId,
