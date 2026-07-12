@@ -14,7 +14,13 @@ import {  ACTION, ApiArrayResponse, ApiDataResponse, ApiPaginatedResponse, perm 
 import { CurrentUser } from '@repo/api-core';
 import { Authorize } from '@repo/api-core';
 
-import { JobsService } from '../application/jobs.service';
+import { AddJobDependencyUseCase } from '../application/use-cases/add-job-dependency.use-case';
+import { CancelJobUseCase } from '../application/use-cases/cancel-job.use-case';
+import { GetJobLogsUseCase } from '../application/use-cases/get-job-logs.use-case';
+import { GetJobMetricsUseCase } from '../application/use-cases/get-job-metrics.use-case';
+import { GetJobUseCase } from '../application/use-cases/get-job.use-case';
+import { ListJobDependenciesUseCase } from '../application/use-cases/list-job-dependencies.use-case';
+import { ListJobsUseCase } from '../application/use-cases/list-jobs.use-case';
 import {
   AddJobDependencyDto,
   JobDependencyDto,
@@ -29,13 +35,21 @@ import {
 @ApiBearerAuth()
 @Controller('admin/jobs')
 export class AdminJobsController {
-  constructor(private readonly jobsService: JobsService) {}
+  constructor(
+    private readonly listJobsUseCase: ListJobsUseCase,
+    private readonly getJobMetricsUseCase: GetJobMetricsUseCase,
+    private readonly getJobUseCase: GetJobUseCase,
+    private readonly getJobLogsUseCase: GetJobLogsUseCase,
+    private readonly listJobDependenciesUseCase: ListJobDependenciesUseCase,
+    private readonly addJobDependencyUseCase: AddJobDependencyUseCase,
+    private readonly cancelJobUseCase: CancelJobUseCase,
+  ) {}
 
   @Get()
   @Authorize({ permissions: [perm('jobs', ACTION.READ)] })
   @ApiPaginatedResponse(JobDto)
   async listJobs(@Query() query: JobsQueryDto) {
-    const result = await this.jobsService.listJobs(query);
+    const result = await this.listJobsUseCase.execute(query);
 
     return {
       data: result.rows,
@@ -50,14 +64,14 @@ export class AdminJobsController {
   @Authorize({ permissions: [perm('jobs', ACTION.READ)] })
   @ApiDataResponse(JobMetricsDto)
   async getMetrics(@Query() query: JobMetricsQueryDto) {
-    return { data: await this.jobsService.getJobMetrics(query) };
+    return { data: await this.getJobMetricsUseCase.execute(query) };
   }
 
   @Get(':id')
   @Authorize({ permissions: [perm('jobs', ACTION.READ)] })
   @ApiDataResponse(JobDto)
   async getJob(@Param('id', new ParseUUIDPipe()) jobId: string) {
-    return { data: await this.jobsService.getJob(jobId) };
+    return { data: await this.getJobUseCase.execute(jobId) };
   }
 
   @Get(':id/logs')
@@ -67,7 +81,7 @@ export class AdminJobsController {
     @Param('id', new ParseUUIDPipe()) jobId: string,
     @Query() query: JobLogsQueryDto,
   ) {
-    const result = await this.jobsService.getJobLogs(jobId, query);
+    const result = await this.getJobLogsUseCase.execute(jobId, query);
 
     return {
       data: result.rows,
@@ -82,7 +96,7 @@ export class AdminJobsController {
   @Authorize({ permissions: [perm('jobs', ACTION.READ)] })
   @ApiArrayResponse(JobDependencyDto)
   async listDependencies(@Param('id', new ParseUUIDPipe()) jobId: string) {
-    return { data: await this.jobsService.listJobDependencies(jobId) };
+    return { data: await this.listJobDependenciesUseCase.execute(jobId) };
   }
 
   @Post(':id/dependencies')
@@ -93,10 +107,7 @@ export class AdminJobsController {
     @Body() input: AddJobDependencyDto,
   ) {
     return {
-      data: await this.jobsService.addJobDependency(
-        jobId,
-        input.dependsOnJobId,
-      ),
+      data: await this.addJobDependencyUseCase.execute(jobId, input.dependsOnJobId),
     };
   }
 
@@ -107,6 +118,6 @@ export class AdminJobsController {
     @CurrentUser() user: AuthenticatedRequestUser,
     @Param('id', new ParseUUIDPipe()) jobId: string,
   ) {
-    return this.jobsService.cancelJob(user, jobId);
+    return this.cancelJobUseCase.execute(user, jobId);
   }
 }
