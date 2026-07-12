@@ -7,20 +7,24 @@ import {  ACTION, ApiArrayResponse, ApiDataResponse, perm } from '@repo/api-core
 import { CurrentUser } from '@repo/api-core';
 import { Authorize } from '@repo/api-core';
 
-import { SettingsService } from '../application/settings.service';
+import { ListSettingsUseCase } from '../application/use-cases/list-settings.use-case';
+import { UpdateSettingUseCase } from '../application/use-cases/update-setting.use-case';
 import { ApplicationSettingDto, UpdateSettingDto } from './settings.dto';
 
 @ApiTags('admin-settings')
 @ApiBearerAuth()
 @Controller('admin/settings')
 export class AdminSettingsController {
-  constructor(private readonly settingsService: SettingsService) {}
+  constructor(
+    private readonly listSettingsUseCase: ListSettingsUseCase,
+    private readonly updateSettingUseCase: UpdateSettingUseCase,
+  ) {}
 
   @Get()
   @Authorize({ permissions: [perm('settings', ACTION.READ)] })
   @ApiArrayResponse(ApplicationSettingDto)
   async listSettings() {
-    const settings = await this.settingsService.listAll();
+    const settings = await this.listSettingsUseCase.execute();
 
     return {
       data: settings,
@@ -36,7 +40,7 @@ export class AdminSettingsController {
     @Body() input: UpdateSettingDto,
     @Req() request: Request,
   ) {
-    return this.settingsService.updateByKey(
+    return this.updateSettingUseCase.execute(
       user,
       key,
       { value: input.value },

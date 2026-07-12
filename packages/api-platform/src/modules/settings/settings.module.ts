@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 
 import { AuditModule } from '../audit/audit.module';
-import { SettingsService } from './application/settings.service';
 import { EnsureSettingsSeedDataUseCase } from './application/use-cases/ensure-settings-seed-data.use-case';
 import { ListSettingsUseCase } from './application/use-cases/list-settings.use-case';
 import { UpdateSettingUseCase } from './application/use-cases/update-setting.use-case';
@@ -16,8 +15,7 @@ import { AdminSettingsController } from './presentation/admin-settings.controlle
     EnsureSettingsSeedDataUseCase,
     ListSettingsUseCase,
     UpdateSettingUseCase,
-    SettingsService,
   ],
-  exports: [SettingsRepository, SettingsService],
+  exports: [SettingsRepository, EnsureSettingsSeedDataUseCase],
 })
 export class SettingsModule {}

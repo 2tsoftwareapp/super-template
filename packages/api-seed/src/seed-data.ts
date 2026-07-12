@@ -8,7 +8,7 @@ import { AuthRepository } from '@repo/api-identity/modules/auth/infrastructure/a
 import { OrganizationsService } from '@repo/api-identity/modules/organizations/application/organizations.service';
 import { UsersRepository } from '@repo/api-identity/modules/users/infrastructure/users.repository';
 import { NotificationsRepository } from '@repo/api-platform/modules/notifications/infrastructure/notifications.repository';
-import { SettingsService } from '@repo/api-platform/modules/settings/application/settings.service';
+import { EnsureSettingsSeedDataUseCase } from '@repo/api-platform/modules/settings/application/use-cases/ensure-settings-seed-data.use-case';
 
 import { seedAccessControl } from './seeds/access-control/seed';
 import { seedNotifications } from './seeds/notifications/seed';
@@ -22,7 +22,7 @@ export const seedDatabase = async (
   const authRepository = app.get(AuthRepository);
   const notificationsRepository = app.get(NotificationsRepository);
   const organizationsService = app.get(OrganizationsService);
-  const settingsService = app.get(SettingsService);
+  const ensureSettingsSeedData = app.get(EnsureSettingsSeedDataUseCase);
   const usersRepository = app.get(UsersRepository);
   const database = app.get<DatabaseClient>(DATABASE);
   const environmentService = app.get(EnvironmentService);
@@ -31,7 +31,7 @@ export const seedDatabase = async (
   await tenantContextService.runAsync(WORKER_DISPATCH_CONTEXT, () =>
     database.transaction(async (transaction) => {
       await seedAccessControl(accessControlService, transaction);
-      await seedSettings(settingsService, transaction);
+      await seedSettings(ensureSettingsSeedData, transaction);
 
       const seededUsers = await seedUsers(
         {
