@@ -6,19 +6,25 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ApiDataResponse } from '@repo/api-core';
 import { CurrentUser } from '@repo/api-core';
 
-import { PreferencesService } from '../application/preferences.service';
+import { GetPreferencesUseCase } from '../application/use-cases/get-preferences.use-case';
+import { ResetPreferencesUseCase } from '../application/use-cases/reset-preferences.use-case';
+import { UpdatePreferencesUseCase } from '../application/use-cases/update-preferences.use-case';
 import { UpdatePreferencesDto, UserPreferencesDto } from './preferences.dto';
 
 @ApiTags('users')
 @ApiBearerAuth()
 @Controller('users/me/preferences')
 export class PreferencesController {
-  constructor(private readonly preferencesService: PreferencesService) {}
+  constructor(
+    private readonly getPreferences: GetPreferencesUseCase,
+    private readonly updatePreferences: UpdatePreferencesUseCase,
+    private readonly resetPreferences: ResetPreferencesUseCase,
+  ) {}
 
   @Get()
   @ApiDataResponse(UserPreferencesDto)
   getMyPreferences(@CurrentUser() user: AuthenticatedRequestUser) {
-    return this.preferencesService.getForUser(user.userId);
+    return this.getPreferences.execute(user.userId);
   }
 
   @Patch()
@@ -28,7 +34,7 @@ export class PreferencesController {
     @Body() input: UpdatePreferencesDto,
     @Req() request: Request,
   ) {
-    return this.preferencesService.updateForUser(
+    return this.updatePreferences.execute(
       user.userId,
       {
         ...(input.theme !== undefined ? { theme: input.theme } : {}),
@@ -51,9 +57,6 @@ export class PreferencesController {
     @CurrentUser() user: AuthenticatedRequestUser,
     @Req() request: Request,
   ) {
-    return this.preferencesService.resetForUser(
-      user.userId,
-      request.requestContext,
-    );
+    return this.resetPreferences.execute(user.userId, request.requestContext);
   }
 }

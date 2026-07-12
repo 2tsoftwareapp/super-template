@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { USER_PREFERENCES_LOOKUP } from '@repo/api-core';
 
 import { UsersModule } from '../users/users.module';
-import { PreferencesService } from './application/preferences.service';
 import { GetPreferencesUseCase } from './application/use-cases/get-preferences.use-case';
 import { ResetPreferencesUseCase } from './application/use-cases/reset-preferences.use-case';
 import { UpdatePreferencesUseCase } from './application/use-cases/update-preferences.use-case';
@@ -19,7 +18,6 @@ import { PreferencesController } from './presentation/preferences.controller';
     GetPreferencesUseCase,
     UpdatePreferencesUseCase,
     ResetPreferencesUseCase,
-    PreferencesService,
     {
       provide: USER_PREFERENCES_LOOKUP,
       useExisting: PreferencesLookupAdapter,
@@ -27,7 +25,6 @@ import { PreferencesController } from './presentation/preferences.controller';
   ],
   exports: [
     PreferencesRepository,
-    PreferencesService,
     USER_PREFERENCES_LOOKUP,
   ],
 })
