@@ -5,8 +5,8 @@ import { toast } from "sonner";
 
 import type { NotificationJobDto, SendNotificationInput } from "@/lib/api-types";
 
-import { cancelNotificationJob, sendNotification } from "./notifications-service";
-import { NOTIFICATION_JOBS_QUERY_KEY } from "./use-notifications-queries";
+import { cancelNotificationJob, sendNotification } from "./api/notifications-api";
+import { NOTIFICATION_JOBS_QUERY_KEY } from "./model/notifications-query-keys";
 
 export function useSendNotificationMutation(options?: {
   onSuccess?: (data: { data: NotificationJobDto }) => void;

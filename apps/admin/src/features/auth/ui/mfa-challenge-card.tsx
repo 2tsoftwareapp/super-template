@@ -14,12 +14,12 @@ import {
 import { Input } from "@repo/web-core/components/input";
 import { Label } from "@repo/web-core/components/label";
 
-import type { MfaChallengeInput } from "@/features/auth/auth-schemas";
+import type { MfaChallengeInput } from "@/features/auth/model/auth-schemas";
 
 import {
   AUTH_FORM_FIELD_NAMES,
   LOGIN_FORM_COPY,
-} from "@/features/auth/auth-constants";
+} from "@/features/auth/model/auth-constants";
 
 interface MfaChallengeCardProps {
   errorMessage: string | null;

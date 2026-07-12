@@ -9,7 +9,7 @@ import {
   confirmImportJob,
   type CreateImportInput,
   createImportJob,
-} from "./imports-service";
+} from "./api/imports-api";
 
 export function useCreateImportMutation(options?: {
   onSuccess?: (data: { data: ImportJobDto }) => void;

@@ -2,10 +2,8 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import { fetchPermissions, fetchRoles } from "./roles-service";
-
-export const ROLES_QUERY_KEY = ["admin-roles"] as const;
-export const PERMISSION_CATALOG_QUERY_KEY = ["admin-permissions"] as const;
+import { fetchPermissions, fetchRoles } from "./api/roles-api";
+import { PERMISSION_CATALOG_QUERY_KEY, ROLES_QUERY_KEY } from "./model/roles-query-keys";
 
 export function useRolesQuery() {
   return useQuery({

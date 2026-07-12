@@ -7,7 +7,7 @@ import type {
   ManagedRoleDto,
   PermissionDto,
   RoleForm,
-} from "./roles-schemas";
+} from "../model/roles-schemas";
 
 interface RoleSaveResult { data: EditableRole & { permissions: PermissionDto[] } }
 

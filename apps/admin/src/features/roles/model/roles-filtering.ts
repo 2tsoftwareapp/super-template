@@ -1,4 +1,4 @@
-import type { ManagedRoleDto } from "@/features/roles/roles-schemas";
+import type { ManagedRoleDto } from "@/features/roles/model/roles-schemas";
 
 export type MergedRole = ManagedRoleDto & { scopes: string[] };
 

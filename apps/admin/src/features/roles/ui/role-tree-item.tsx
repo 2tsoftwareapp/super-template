@@ -12,9 +12,9 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
-import type { ManagedRoleDto } from "@/features/roles/roles-schemas";
+import type { ManagedRoleDto } from "@/features/roles/model/roles-schemas";
 
-import { type MergedRole, optionalText } from "@/features/roles/roles-filtering";
+import { type MergedRole, optionalText } from "@/features/roles/model/roles-filtering";
 import { formatRoleName } from "@/lib/roles";
 import { cn } from "@/lib/utils";
 

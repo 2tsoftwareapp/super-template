@@ -5,10 +5,8 @@ import { useQuery } from "@tanstack/react-query";
 import {
   fetchNotificationJobs,
   fetchRecentNotifications,
-} from "./notifications-service";
-
-export const NOTIFICATION_JOBS_QUERY_KEY = "admin-notification-jobs" as const;
-export const RECENT_NOTIFICATIONS_QUERY_KEY = "admin-notifications" as const;
+} from "./api/notifications-api";
+import { NOTIFICATION_JOBS_QUERY_KEY, RECENT_NOTIFICATIONS_QUERY_KEY } from "./model/notifications-query-keys";
 
 export function useNotificationJobsQuery() {
   return useQuery({

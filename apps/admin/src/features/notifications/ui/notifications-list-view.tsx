@@ -33,7 +33,7 @@ import {
   Trash2,
 } from "lucide-react";
 
-import type { NotificationsViewModel } from "@/features/notifications/use-notifications-controller";
+import type { NotificationsViewModel } from "@/features/notifications/controllers/use-notifications-controller";
 
 import { ResourcePageShell } from "@/components/resource-page-shell";
 import { adminResources } from "@/lib/admin-resources";

@@ -29,7 +29,7 @@ import {
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 
-import type { MfaSetupResponse } from "@/features/security/security-schemas";
+import type { MfaSetupResponse } from "@/features/security/model/security-schemas";
 
 import {
   useConfirmMfaMutation,

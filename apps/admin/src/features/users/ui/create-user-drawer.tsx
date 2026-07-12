@@ -10,12 +10,12 @@ import { useEffect, useMemo } from "react";
 import { useForm, useWatch } from "react-hook-form";
 
 import { ResourceDrawer } from "@/components/resource-drawer";
-import { useCreateUser } from "@/features/users/use-users-mutations";
 import {
   ASSIGNABLE_ROLES,
   type CreateUserForm,
   createUserSchema,
-} from "@/features/users/users-schemas";
+} from "@/features/users/model/users-schemas";
+import { useCreateUser } from "@/features/users/use-users-mutations";
 import { canAssignRole, formatRoleName } from "@/lib/roles";
 
 export function CreateUserDrawer({

@@ -3,9 +3,9 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import type { ChangePasswordFormValues } from "./security-schemas";
+import type { ChangePasswordFormValues } from "./model/security-schemas";
 
-import { changePassword } from "./security-service";
+import { changePassword } from "./api/security-api";
 
 export function useChangePasswordMutation(options?: { onSuccess?: () => void }) {
   return useMutation({

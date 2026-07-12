@@ -2,9 +2,8 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import { fetchSettings } from "./settings-service";
-
-export const SETTINGS_QUERY_KEY = "admin-settings" as const;
+import { fetchSettings } from "./api/settings-api";
+import { SETTINGS_QUERY_KEY } from "./model/settings-query-keys";
 
 export function useSettingsQuery() {
   return useQuery({

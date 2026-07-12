@@ -9,7 +9,7 @@ import { SectionLoading } from "@repo/web-core/components/loading";
 import { Show } from "@repo/web-core/components/show";
 import { LockKeyhole, Plus, Search, ShieldCheck, X } from "lucide-react";
 
-import type { RolesViewModel } from "@/features/roles/use-roles-controller";
+import type { RolesViewModel } from "@/features/roles/controllers/use-roles-controller";
 
 import { ResourcePageShell } from "@/components/resource-page-shell";
 import { adminResources } from "@/lib/admin-resources";

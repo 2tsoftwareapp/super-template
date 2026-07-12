@@ -3,7 +3,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import { switchOrganization } from "./organizations-service";
+import { switchOrganization } from "./api/organizations-api";
 
 export function useSwitchOrganizationMutation() {
   const queryClient = useQueryClient();

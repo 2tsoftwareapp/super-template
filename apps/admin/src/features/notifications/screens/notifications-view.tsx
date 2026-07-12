@@ -1,8 +1,8 @@
 "use client";
 
-import { useNotificationsController } from "@/features/notifications/use-notifications-controller";
+import { useNotificationsController } from "@/features/notifications/controllers/use-notifications-controller";
 
-import { NotificationsListView } from "./notifications-list-view";
+import { NotificationsListView } from "../ui/notifications-list-view";
 
 /**
  * Notifications screen: connects the notifications controller to the

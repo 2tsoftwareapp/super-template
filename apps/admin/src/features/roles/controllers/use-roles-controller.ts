@@ -7,13 +7,13 @@ import {
   type MergedRole,
   mergeRoles,
   optionalText,
-} from "@/features/roles/roles-filtering";
-import { selectRoleManagementPermissions } from "@/features/roles/roles-permissions";
+} from "@/features/roles/model/roles-filtering";
+import { selectRoleManagementPermissions } from "@/features/roles/model/roles-permissions";
 import {
   type EditableRole,
   type ManagedRoleDto,
   type PermissionDto,
-} from "@/features/roles/roles-schemas";
+} from "@/features/roles/model/roles-schemas";
 import { useDeleteRoleMutation } from "@/features/roles/use-roles-mutations";
 import {
   usePermissionCatalogQuery,

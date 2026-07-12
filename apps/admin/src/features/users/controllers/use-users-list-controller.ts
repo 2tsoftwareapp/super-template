@@ -18,27 +18,27 @@ import {
   paramsFromSortingState,
   sortingStateFromParams,
   usersSortChanged,
-} from "@/features/users/sorting";
+} from "@/features/users/model/sorting";
 import {
   type UsersListParams,
   type UsersPageSize,
   type UserStatusFilter,
-} from "@/features/users/types";
+} from "@/features/users/model/types";
+import { selectUserManagementPermissions } from "@/features/users/model/users-permissions";
+import {
+  parseUsersListSearchParams,
+  serializeUsersListSearchParams,
+} from "@/features/users/model/users-search-params";
 import {
   useActivateUsers,
   useBlockUsers,
   useResendVerification,
 } from "@/features/users/use-users-mutations";
 import { useUsersListQuery } from "@/features/users/use-users-queries";
-import { selectUserManagementPermissions } from "@/features/users/users-permissions";
-import {
-  parseUsersListSearchParams,
-  serializeUsersListSearchParams,
-} from "@/features/users/users-search-params";
 import { useSession } from "@/hooks/use-session";
 import { usePathname, useRouter } from "@/i18n/navigation";
 
-import { createUsersTableColumns } from "./components/users-table-columns";
+import { createUsersTableColumns } from "../ui/users-table-columns";
 
 interface ConfirmBlockState {
   userIds: string[];

@@ -7,13 +7,13 @@ import { Pagination } from "@repo/web-core/components/pagination";
 import { Show } from "@repo/web-core/components/show";
 import { Spinner } from "@repo/web-core/components/spinner";
 
-import type { UsersListViewModel } from "@/features/users/use-users-list-controller";
+import type { UsersListViewModel } from "@/features/users/controllers/use-users-list-controller";
 
 import { BulkActionBar } from "@/components/bulk-action-bar";
 import { ResourceTable } from "@/components/resource-table";
 import { ResourceToolbar } from "@/components/resource-toolbar";
-import { STATUS_FILTERS } from "@/features/users/constants";
-import { USERS_PAGE_SIZE_OPTIONS } from "@/features/users/types";
+import { STATUS_FILTERS } from "@/features/users/model/constants";
+import { USERS_PAGE_SIZE_OPTIONS } from "@/features/users/model/types";
 
 import { CreateUserDrawer } from "./create-user-drawer";
 import { UsersConfirmBlockDialog } from "./users-confirm-block-dialog";

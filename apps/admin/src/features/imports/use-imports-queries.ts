@@ -2,9 +2,8 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import { fetchImportJob } from "./imports-service";
-
-export const IMPORT_JOB_QUERY_KEY = "admin-import-job" as const;
+import { fetchImportJob } from "./api/imports-api";
+import { IMPORT_JOB_QUERY_KEY } from "./model/imports-query-keys";
 
 export function useImportJobQuery(jobId: string) {
   return useQuery({

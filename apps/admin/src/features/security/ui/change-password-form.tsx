@@ -17,7 +17,7 @@ import { useForm } from "react-hook-form";
 import {
   type ChangePasswordFormValues,
   changePasswordSchema,
-} from "@/features/security/security-schemas";
+} from "@/features/security/model/security-schemas";
 import { useChangePasswordMutation } from "@/features/security/use-security-mutations";
 
 export function ChangePasswordForm() {

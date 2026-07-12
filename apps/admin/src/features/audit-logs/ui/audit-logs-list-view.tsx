@@ -21,11 +21,11 @@ import {
 import { Tooltip } from "@repo/web-core/components/tooltip";
 import { Search, X } from "lucide-react";
 
-import type { AuditLogsViewModel } from "@/features/audit-logs/use-audit-logs-controller";
+import type { AuditLogsViewModel } from "@/features/audit-logs/controllers/use-audit-logs-controller";
 
 import { ResourceDrawer } from "@/components/resource-drawer";
 import { ResourcePageShell } from "@/components/resource-page-shell";
-import { formatAuditAction } from "@/features/audit-logs/audit-logs-filters";
+import { formatAuditAction } from "@/features/audit-logs/model/audit-logs-filters";
 import { adminResources } from "@/lib/admin-resources";
 import { formatDateTime, timeAgo } from "@/lib/format";
 

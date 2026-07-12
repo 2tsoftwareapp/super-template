@@ -3,11 +3,11 @@
 import { Skeleton } from "@repo/web-core/components/skeleton";
 
 import { ResourcePageShell } from "@/components/resource-page-shell";
-import { useUserDetailController } from "@/features/users/use-user-detail-controller";
+import { useUserDetailController } from "@/features/users/controllers/use-user-detail-controller";
 import { Link } from "@/i18n/navigation";
 import { adminResources } from "@/lib/admin-resources";
 
-import { UserDetailContent } from "./user-detail-content";
+import { UserDetailContent } from "../ui/user-detail-content";
 
 const usersResource = adminResources.find((r) => r.id === "users")!;
 

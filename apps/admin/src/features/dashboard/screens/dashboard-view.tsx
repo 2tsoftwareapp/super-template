@@ -1,8 +1,8 @@
 "use client";
 
-import { useDashboardController } from "@/features/dashboard/use-dashboard-controller";
+import { useDashboardController } from "@/features/dashboard/controllers/use-dashboard-controller";
 
-import { DashboardOverview } from "./dashboard-overview";
+import { DashboardOverview } from "../ui/dashboard-overview";
 
 /**
  * Dashboard screen: connects the dashboard controller to the presentational

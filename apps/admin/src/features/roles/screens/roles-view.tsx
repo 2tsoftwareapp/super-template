@@ -1,8 +1,8 @@
 "use client";
 
-import { useRolesController } from "@/features/roles/use-roles-controller";
+import { useRolesController } from "@/features/roles/controllers/use-roles-controller";
 
-import { RolesListView } from "./roles-list-view";
+import { RolesListView } from "../ui/roles-list-view";
 
 /**
  * Roles screen: connects the roles controller to the presentational view.

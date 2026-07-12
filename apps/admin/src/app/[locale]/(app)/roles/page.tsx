@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { RolesView } from "@/features/roles/components/roles-view";
+import { RolesView } from "@/features/roles/screens/roles-view";
 
 export const metadata: Metadata = {
   title: "Roles & Permissions | Super Admin",

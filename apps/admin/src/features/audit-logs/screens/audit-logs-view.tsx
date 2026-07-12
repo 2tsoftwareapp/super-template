@@ -1,8 +1,8 @@
 "use client";
 
-import { useAuditLogsController } from "@/features/audit-logs/use-audit-logs-controller";
+import { useAuditLogsController } from "@/features/audit-logs/controllers/use-audit-logs-controller";
 
-import { AuditLogsListView } from "./audit-logs-list-view";
+import { AuditLogsListView } from "../ui/audit-logs-list-view";
 
 /**
  * Audit-logs screen: connects the audit-logs controller to the presentational

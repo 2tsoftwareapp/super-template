@@ -15,7 +15,7 @@ import {
   type PermissionDto,
   type RoleForm,
   roleSchema,
-} from "@/features/roles/roles-schemas";
+} from "@/features/roles/model/roles-schemas";
 import { useSaveRoleMutation } from "@/features/roles/use-roles-mutations";
 
 export function RoleFormDrawer({

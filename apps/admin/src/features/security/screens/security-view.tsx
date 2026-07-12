@@ -2,9 +2,9 @@
 
 import { Separator } from "@repo/web-core/components/separator";
 
-import { ChangePasswordForm } from "./change-password-form";
-import { MfaManagement } from "./mfa-management";
-import { UserPreferences } from "./user-preferences";
+import { ChangePasswordForm } from "../ui/change-password-form";
+import { MfaManagement } from "../ui/mfa-management";
+import { UserPreferences } from "../ui/user-preferences";
 
 export function SecurityView() {
   return (

@@ -1,6 +1,6 @@
 import { webFetch } from "@/lib/http";
 
-import type { MfaConfirmResponse, MfaDisableResponse, MfaSetupResponse, MfaStatus } from "./security-schemas";
+import type { MfaConfirmResponse, MfaDisableResponse, MfaSetupResponse, MfaStatus } from "../model/security-schemas";
 
 export async function changePassword(input: {
   currentPassword: string;

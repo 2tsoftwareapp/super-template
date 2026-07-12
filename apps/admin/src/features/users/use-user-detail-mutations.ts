@@ -6,8 +6,7 @@ import type { AdminUserDto, UpdateAdminUserInput } from "@/lib/api-types";
 
 import { webFetch } from "@/lib/http";
 
-import { USERS_QUERY_KEY } from "./constants";
-import { USER_DETAIL_QUERY_KEY } from "./use-user-detail-queries";
+import { USER_DETAIL_QUERY_KEY, USERS_QUERY_KEY } from "./model/users-query-keys";
 
 export function useUpdateProfileMutation(
   userId: string,

@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { Spinner } from "@repo/web-core/components/spinner";
 import { Suspense } from "react";
 
-import { AuditLogsView } from "@/features/audit-logs/components/audit-logs-view";
+import { AuditLogsView } from "@/features/audit-logs/screens/audit-logs-view";
 
 export const metadata: Metadata = {
   title: "Audit Logs | Super Admin",

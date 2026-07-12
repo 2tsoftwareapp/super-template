@@ -1,6 +1,6 @@
 "use client";
 
-import { AUTH_MESSAGES } from "@/features/auth/auth-constants";
+import { AUTH_MESSAGES } from "@/features/auth/model/auth-constants";
 
 export function LoginStatus() {
   return (

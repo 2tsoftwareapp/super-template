@@ -2,9 +2,8 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import { type AuditLogsParams, fetchAuditLogs } from "./audit-logs-service";
-
-export const AUDIT_LOGS_QUERY_KEY = "admin-audit-logs" as const;
+import { type AuditLogsParams, fetchAuditLogs } from "./api/audit-logs-api";
+import { AUDIT_LOGS_QUERY_KEY } from "./model/audit-logs-query-keys";
 
 export function useAuditLogsQuery(params: AuditLogsParams) {
   return useQuery({

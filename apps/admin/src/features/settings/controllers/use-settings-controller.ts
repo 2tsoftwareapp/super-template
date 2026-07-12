@@ -9,7 +9,7 @@ import {
   initDraft,
   isObjectValue,
   objectDraftChanged,
-} from "@/features/settings/settings-drafts";
+} from "@/features/settings/model/settings-drafts";
 import { useUpdateSettingMutation } from "@/features/settings/use-settings-mutations";
 import { useSettingsQuery } from "@/features/settings/use-settings-queries";
 import { parseJsonValue } from "@/lib/json";

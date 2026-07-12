@@ -4,10 +4,10 @@ import { useQuery } from "@tanstack/react-query";
 
 import type { AdminUserDto, ListResponse, RoleDto } from "@/lib/api-types";
 
-import { ROLES_QUERY_KEY } from "@/features/roles/use-roles-queries";
+import { ROLES_QUERY_KEY } from "@/features/roles/model/roles-query-keys";
 import { webFetch } from "@/lib/http";
 
-export const USER_DETAIL_QUERY_KEY = "admin-user" as const;
+import { USER_DETAIL_QUERY_KEY } from "./model/users-query-keys";
 
 export function useAdminUserQuery(userId: string) {
   return useQuery({

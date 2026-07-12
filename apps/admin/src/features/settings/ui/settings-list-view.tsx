@@ -18,10 +18,10 @@ import { RotateCcw, Search, X } from "lucide-react";
 import type {
   SettingRow,
   SettingsViewModel,
-} from "@/features/settings/use-settings-controller";
+} from "@/features/settings/controllers/use-settings-controller";
 
 import { ResourcePageShell } from "@/components/resource-page-shell";
-import { displayValue } from "@/features/settings/settings-drafts";
+import { displayValue } from "@/features/settings/model/settings-drafts";
 import { adminResources } from "@/lib/admin-resources";
 
 import { SettingField } from "./setting-field";

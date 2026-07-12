@@ -7,13 +7,13 @@ import { useEffect, useRef } from "react";
 import { sessionQueryKey } from "@/hooks/use-session";
 import { useRouter } from "@/i18n/navigation";
 
+import { establishAdminSsoSession } from "../api/auth-api";
 import {
   ADMIN_AUTH_ROUTES,
   AUTH_ERROR_QUERY_VALUES,
   AUTH_SEARCH_PARAMS,
   AUTH_STORAGE_KEYS,
-} from "./auth-constants";
-import { establishAdminSsoSession } from "./auth-service";
+} from "../model/auth-constants";
 
 const ssoFailedLoginPath = `${ADMIN_AUTH_ROUTES.login}?${AUTH_SEARCH_PARAMS.error}=${AUTH_ERROR_QUERY_VALUES.ssoFailed}`;
 

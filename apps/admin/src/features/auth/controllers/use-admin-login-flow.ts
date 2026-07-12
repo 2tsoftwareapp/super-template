@@ -13,6 +13,11 @@ import { useRouter } from "@/i18n/navigation";
 import { apiPaths } from "@/lib/api-paths";
 
 import {
+  loginToAdmin,
+  startSso,
+  verifyAdminMfaChallenge,
+} from "../api/auth-api";
+import {
   ADMIN_AUTH_ROUTES,
   ADMIN_LOGIN_DEFAULT_VALUES,
   AUTH_ERROR_QUERY_VALUES,
@@ -21,19 +26,14 @@ import {
   AUTH_SEARCH_PARAMS,
   AUTH_STORAGE_KEYS,
   LOGIN_CONTENT,
-} from "./auth-constants";
-import { getLoginErrorMessage, getMfaErrorMessage } from "./auth-errors";
+} from "../model/auth-constants";
+import { getLoginErrorMessage, getMfaErrorMessage } from "../model/auth-errors";
 import {
   type AdminLoginInput,
   adminLoginSchema,
   type MfaChallengeInput,
   mfaChallengeSchema,
-} from "./auth-schemas";
-import {
-  loginToAdmin,
-  startSso,
-  verifyAdminMfaChallenge,
-} from "./auth-service";
+} from "../model/auth-schemas";
 
 export function useAdminLoginFlow() {
   const router = useRouter();

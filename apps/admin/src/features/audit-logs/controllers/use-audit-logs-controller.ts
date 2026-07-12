@@ -10,7 +10,7 @@ import {
   type AuditLogsFilters,
   parseAuditLogsFilters,
   serializeAuditLogsFilters,
-} from "@/features/audit-logs/audit-logs-filters";
+} from "@/features/audit-logs/model/audit-logs-filters";
 import { useAuditLogsQuery } from "@/features/audit-logs/use-audit-logs-queries";
 import { usePathname, useRouter } from "@/i18n/navigation";
 

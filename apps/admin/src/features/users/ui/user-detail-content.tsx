@@ -25,7 +25,7 @@ import {
   XCircle,
 } from "lucide-react";
 
-import type { UserDetailViewModel } from "@/features/users/use-user-detail-controller";
+import type { UserDetailViewModel } from "@/features/users/controllers/use-user-detail-controller";
 import type { AdminUserDto } from "@/lib/api-types";
 
 import { ResourcePageShell } from "@/components/resource-page-shell";

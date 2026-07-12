@@ -9,11 +9,11 @@ import type {
 
 import { webFetch } from "@/lib/http";
 
-import type { UsersListParams } from "./types";
+import type { UsersListParams } from "./model/types";
 
-import { USERS_QUERY_KEY } from "./constants";
-import { usersSortKey } from "./sorting";
-import { buildUsersListPath } from "./users-service";
+import { buildUsersListPath } from "./api/users-api";
+import { usersSortKey } from "./model/sorting";
+import { USERS_QUERY_KEY } from "./model/users-query-keys";
 
 export function useUsersListQuery(params: UsersListParams) {
   const listPath = buildUsersListPath(params);

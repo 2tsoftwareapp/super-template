@@ -3,9 +3,9 @@
 import { ErrorState } from "@repo/web-core/components/error-state";
 import { Spinner } from "@repo/web-core/components/spinner";
 
-import { useUsersListController } from "@/features/users/use-users-list-controller";
+import { useUsersListController } from "@/features/users/controllers/use-users-list-controller";
 
-import { UsersListView } from "./users-list-view";
+import { UsersListView } from "../ui/users-list-view";
 
 /**
  * Users list screen: connects the users list controller to the presentational

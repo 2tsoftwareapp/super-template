@@ -4,8 +4,6 @@ export { USERS_PAGE_SIZE_OPTIONS, type UsersPageSize } from "./types";
 
 export const USERS_PAGE_SIZE = 20 satisfies UsersPageSize;
 
-export const USERS_QUERY_KEY = "admin-users" as const;
-
 export const STATUS_FILTERS: { value: UserStatusFilter; label: string }[] = [
   { value: "all", label: "All" },
   { value: "ACTIVE", label: "Active" },

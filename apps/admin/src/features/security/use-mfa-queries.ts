@@ -2,11 +2,10 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import type { MfaStatus } from "./security-schemas";
+import type { MfaStatus } from "./model/security-schemas";
 
-import { fetchMfaStatus } from "./security-service";
-
-export const MFA_STATUS_KEY = ["mfa-status"] as const;
+import { fetchMfaStatus } from "./api/security-api";
+import { MFA_STATUS_KEY } from "./model/security-query-keys";
 
 export function useMfaStatusQuery() {
   return useQuery<MfaStatus>({

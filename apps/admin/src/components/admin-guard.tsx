@@ -5,7 +5,7 @@ import { createContext, type ReactNode, useContext } from "react";
 
 import type { SessionUser } from "@/lib/api-types";
 
-import { useAdminGuard } from "@/features/auth/use-admin-guard";
+import { useAdminGuard } from "@/features/auth/controllers/use-admin-guard";
 
 export interface AdminSession {
   user: SessionUser;

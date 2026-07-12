@@ -3,10 +3,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import type { MfaConfirmResponse, MfaSetupResponse } from "./security-schemas";
+import type { MfaConfirmResponse, MfaSetupResponse } from "./model/security-schemas";
 
-import { confirmMfa, disableMfa, regenerateMfaCodes, setupMfa } from "./security-service";
-import { MFA_STATUS_KEY } from "./use-mfa-queries";
+import { confirmMfa, disableMfa, regenerateMfaCodes, setupMfa } from "./api/security-api";
+import { MFA_STATUS_KEY } from "./model/security-query-keys";
 
 export function useSetupMfaMutation(options?: { onSuccess?: (data: MfaSetupResponse) => void }) {
   return useMutation({

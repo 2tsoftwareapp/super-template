@@ -3,7 +3,7 @@
 import { Show } from "@repo/web-core/components/show";
 import { AlertTriangle } from "lucide-react";
 
-import type { DashboardViewModel } from "@/features/dashboard/use-dashboard-controller";
+import type { DashboardViewModel } from "@/features/dashboard/controllers/use-dashboard-controller";
 
 import { Link } from "@/i18n/navigation";
 

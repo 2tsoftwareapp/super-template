@@ -2,9 +2,8 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import { fetchMyOrganizations } from "./organizations-service";
-
-export const MY_ORGANIZATIONS_QUERY_KEY = "admin-my-organizations" as const;
+import { fetchMyOrganizations } from "./api/organizations-api";
+import { MY_ORGANIZATIONS_QUERY_KEY } from "./model/organizations-query-keys";
 
 export function useMyOrganizationsQuery() {
   return useQuery({

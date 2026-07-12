@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { buildUsersListPath } from "./users-service";
+import { buildUsersListPath } from "../api/users-api";
 
 describe("buildUsersListPath", () => {
   it("builds a paginated users list request with defaults", () => {

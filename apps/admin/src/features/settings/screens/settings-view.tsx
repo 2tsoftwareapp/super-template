@@ -1,8 +1,8 @@
 "use client";
 
-import { useSettingsController } from "@/features/settings/use-settings-controller";
+import { useSettingsController } from "@/features/settings/controllers/use-settings-controller";
 
-import { SettingsListView } from "./settings-list-view";
+import { SettingsListView } from "../ui/settings-list-view";
 
 /**
  * Settings screen: connects the settings controller to the presentational view.

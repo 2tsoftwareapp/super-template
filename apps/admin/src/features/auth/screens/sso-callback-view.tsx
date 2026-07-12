@@ -1,7 +1,7 @@
 "use client";
 
-import { AUTH_MESSAGES } from "@/features/auth/auth-constants";
-import { useAdminSsoCallbackFlow } from "@/features/auth/use-admin-sso-callback-flow";
+import { useAdminSsoCallbackFlow } from "@/features/auth/controllers/use-admin-sso-callback-flow";
+import { AUTH_MESSAGES } from "@/features/auth/model/auth-constants";
 
 export function SsoCallbackView() {
   useAdminSsoCallbackFlow();

@@ -25,7 +25,7 @@ import {
   Search,
 } from "lucide-react";
 
-import type { ImportsViewModel } from "@/features/imports/use-imports-controller";
+import type { ImportsViewModel } from "@/features/imports/controllers/use-imports-controller";
 
 import { ResourcePageShell } from "@/components/resource-page-shell";
 import { adminResources } from "@/lib/admin-resources";

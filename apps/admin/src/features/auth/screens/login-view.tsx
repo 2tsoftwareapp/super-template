@@ -2,12 +2,12 @@
 
 import type { ReactNode } from "react";
 
-import { useAdminLoginFlow } from "@/features/auth/use-admin-login-flow";
+import { useAdminLoginFlow } from "@/features/auth/controllers/use-admin-login-flow";
 
-import { LoginCard } from "./login-card";
-import { LoginHero } from "./login-hero";
-import { LoginStatus } from "./login-status";
-import { MfaChallengeCard } from "./mfa-challenge-card";
+import { LoginCard } from "../ui/login-card";
+import { LoginHero } from "../ui/login-hero";
+import { LoginStatus } from "../ui/login-status";
+import { MfaChallengeCard } from "../ui/mfa-challenge-card";
 
 export function LoginView() {
   const login = useAdminLoginFlow();

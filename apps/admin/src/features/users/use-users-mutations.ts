@@ -8,7 +8,7 @@ import type { AdminUserDto, CreateAdminUserInput } from "@/lib/api-types";
 import { useBulkMutation } from "@/hooks/use-bulk-mutation";
 import { ApiClientError, webFetch } from "@/lib/http";
 
-import { USERS_QUERY_KEY } from "./constants";
+import { USERS_QUERY_KEY } from "./model/users-query-keys";
 
 export function useActivateUsers() {
   return useBulkMutation({

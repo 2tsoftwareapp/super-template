@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { SettingsView } from "@/features/settings/components/settings-view";
+import { SettingsView } from "@/features/settings/screens/settings-view";
 
 export const metadata: Metadata = {
   title: "System Settings | Super Admin",

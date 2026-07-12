@@ -16,7 +16,7 @@ import { Label } from "@repo/web-core/components/label";
 import { PasswordInput } from "@repo/web-core/components/password-input";
 import { Separator } from "@repo/web-core/components/separator";
 
-import type { AdminLoginInput } from "@/features/auth/auth-schemas";
+import type { AdminLoginInput } from "@/features/auth/model/auth-schemas";
 import type { SsoProvider } from "@/lib/api-paths";
 
 import {
@@ -25,7 +25,7 @@ import {
   AUTH_MESSAGES,
   LOGIN_FORM_COPY,
   SSO_PROVIDER_OPTIONS,
-} from "@/features/auth/auth-constants";
+} from "@/features/auth/model/auth-constants";
 
 import { ProviderIcon } from "./provider-icon";
 

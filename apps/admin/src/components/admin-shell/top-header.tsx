@@ -5,7 +5,7 @@ import { Button } from "@repo/web-core/components/button";
 import { Dropdown, type DropdownItem } from "@repo/web-core/components/dropdown";
 import { ChevronRight, LogOut, Menu, Settings, Shield } from "lucide-react";
 
-import { OrganizationSwitcher } from "@/features/organizations/components/organization-switcher";
+import { OrganizationSwitcher } from "@/features/organizations/ui/organization-switcher";
 import { useRouter } from "@/i18n/navigation";
 import { useI18n } from "@/lib/i18n";
 

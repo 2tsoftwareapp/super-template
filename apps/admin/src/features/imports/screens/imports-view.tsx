@@ -1,8 +1,8 @@
 "use client";
 
-import { useImportsController } from "@/features/imports/use-imports-controller";
+import { useImportsController } from "@/features/imports/controllers/use-imports-controller";
 
-import { ImportsListView } from "./imports-list-view";
+import { ImportsListView } from "../ui/imports-list-view";
 
 /**
  * Imports screen: connects the imports controller to the presentational view.

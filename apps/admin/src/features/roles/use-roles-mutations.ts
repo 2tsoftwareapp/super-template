@@ -3,10 +3,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import type { RoleForm } from "./roles-schemas";
+import type { RoleForm } from "./model/roles-schemas";
 
-import { createRole, deleteRole, updateRole } from "./roles-service";
-import { ROLES_QUERY_KEY } from "./use-roles-queries";
+import { createRole, deleteRole, updateRole } from "./api/roles-api";
+import { ROLES_QUERY_KEY } from "./model/roles-query-keys";
 
 export function useDeleteRoleMutation() {
   const queryClient = useQueryClient();

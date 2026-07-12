@@ -8,15 +8,15 @@ import { hasAdminAppAccess } from "@/lib/admin-resources";
 import { apiPaths } from "@/lib/api-paths";
 import { webFetch } from "@/lib/http";
 
-import type { AdminLoginInput, MfaChallengeInput } from "./auth-schemas";
+import type { AdminLoginInput, MfaChallengeInput } from "../model/auth-schemas";
 
 import {
   AUTH_FLOW_ERROR_CODES,
   AUTH_FLOW_RESULTS,
   HTTP_CREDENTIALS,
   HTTP_METHODS,
-} from "./auth-constants";
-import { AuthFlowError } from "./auth-errors";
+} from "../model/auth-constants";
+import { AuthFlowError } from "../model/auth-errors";
 
 type SsoStartResponse = AuthLoginResponse & {
   data?: { authorizationUrl?: string };

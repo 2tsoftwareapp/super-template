@@ -7,12 +7,13 @@ import {
   fetchHealthStatus,
   fetchJobsSummary,
   fetchOverviewUsers,
-} from "./dashboard-service";
-
-export const DASHBOARD_USERS_QUERY_KEY = "admin-users-overview" as const;
-export const DASHBOARD_JOBS_QUERY_KEY = "admin-jobs-summary" as const;
-export const DASHBOARD_AUDIT_QUERY_KEY = "admin-audit-summary" as const;
-export const DASHBOARD_HEALTH_QUERY_KEY = "admin-health" as const;
+} from "./api/dashboard-api";
+import {
+  DASHBOARD_AUDIT_QUERY_KEY,
+  DASHBOARD_HEALTH_QUERY_KEY,
+  DASHBOARD_JOBS_QUERY_KEY,
+  DASHBOARD_USERS_QUERY_KEY,
+} from "./model/dashboard-query-keys";
 
 const DASHBOARD_QUERY_KEYS = [
   DASHBOARD_USERS_QUERY_KEY,
