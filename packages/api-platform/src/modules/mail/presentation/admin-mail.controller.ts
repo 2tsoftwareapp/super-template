@@ -6,7 +6,10 @@ import { Throttle } from '@nestjs/throttler';
 import {  ACTION, ApiArrayResponse, ApiDataResponse, ApiPaginatedResponse, perm } from '@repo/api-core';
 import { Authorize, CurrentUser } from '@repo/api-core';
 
-import { MailService } from '../application/mail.service';
+import { ListMailDeliveriesUseCase } from '../application/use-cases/list-mail-deliveries.use-case';
+import { ListMailTemplatesUseCase } from '../application/use-cases/list-mail-templates.use-case';
+import { PreviewMailTemplateUseCase } from '../application/use-cases/preview-mail-template.use-case';
+import { SendAdminMailUseCase } from '../application/use-cases/send-admin-mail.use-case';
 import {
   MailDeliveriesQueryDto,
   MailDeliveryDto,
@@ -20,20 +23,25 @@ import {
 @ApiBearerAuth()
 @Controller('admin/mail')
 export class AdminMailController {
-  constructor(private readonly mailService: MailService) {}
+  constructor(
+    private readonly listMailTemplates: ListMailTemplatesUseCase,
+    private readonly listMailDeliveries: ListMailDeliveriesUseCase,
+    private readonly previewMailTemplate: PreviewMailTemplateUseCase,
+    private readonly sendAdminMail: SendAdminMailUseCase,
+  ) {}
 
   @Get('templates')
   @Authorize({ permissions: [perm('mail', ACTION.READ)] })
   @ApiArrayResponse(MailTemplateDto)
   async listTemplates() {
-    return { data: await this.mailService.listTemplates() };
+    return { data: await this.listMailTemplates.execute() };
   }
 
   @Get('deliveries')
   @Authorize({ permissions: [perm('mail', ACTION.READ)] })
   @ApiPaginatedResponse(MailDeliveryDto)
   async listDeliveries(@Query() query: MailDeliveriesQueryDto) {
-    const result = await this.mailService.listDeliveries(query);
+    const result = await this.listMailDeliveries.execute(query);
 
     return {
       data: result.rows,
@@ -51,7 +59,7 @@ export class AdminMailController {
     @Param('templateKey') templateKey: string,
     @Query() query: MailPreviewQueryDto,
   ) {
-    return this.mailService.previewTemplate(templateKey, query.variables);
+    return this.previewMailTemplate.execute(templateKey, query.variables);
   }
 
   @Post('send')
@@ -62,7 +70,7 @@ export class AdminMailController {
     @CurrentUser() user: AuthenticatedRequestUser,
     @Body() input: SendAdminMailDto,
   ) {
-    return this.mailService.sendAdminMail(user, {
+    return this.sendAdminMail.execute(user, {
       templateKey: input.templateKey,
       to: input.to,
       ...(input.variables !== undefined ? { variables: input.variables } : {}),
