@@ -131,7 +131,7 @@ search_index_exports() {
       packages/api-identity/src/index.ts \
       packages/api-platform/src/index.ts \
       packages/api-platform/src/index.ts \
-      packages/api-bootstrap/src/index.ts \
+      packages/api-seed/src/index.ts \
       packages/api-health/src/index.ts
     return
   fi
@@ -142,7 +142,7 @@ search_index_exports() {
     packages/api-identity/src/index.ts \
     packages/api-platform/src/index.ts \
     packages/api-platform/src/index.ts \
-    packages/api-bootstrap/src/index.ts \
+    packages/api-seed/src/index.ts \
     packages/api-health/src/index.ts \
     2>/dev/null || true
 }

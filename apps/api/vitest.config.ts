@@ -24,7 +24,7 @@ export default defineConfig({
     include: [
       'test/**/*.{test,spec}.ts',
       '../../packages/api-contract/src/**/*.{test,spec}.ts',
-      '../../packages/api-bootstrap/src/**/*.{test,spec}.ts',
+      '../../packages/api-seed/src/**/*.{test,spec}.ts',
       '../../packages/api-core/src/**/*.{test,spec}.ts',
       '../../packages/api-sort/src/**/*.{test,spec}.ts',
       '../../packages/api-database/src/**/*.{test,spec}.ts',

@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
-import { seedDatabase } from '@repo/api-bootstrap';
 import { createDatabaseClient } from '@repo/api-database';
+import { seedDatabase } from '@repo/api-seed';
 import { Pool } from 'pg';
 
 import { AppModule } from '../app.module';

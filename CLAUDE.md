@@ -16,7 +16,7 @@ apps/
   admin    Next.js BFF — operations console (:3002)
   mobile   Flutter app (iOS/Android)
 packages/
-  @repo/api-bootstrap   app composition / boot
+  @repo/api-seed        development/demo data seeding
   @repo/api-contract    OpenAPI contract source of truth
   @repo/api-core        shared ports, config, cross-context tokens
   @repo/api-database     Drizzle schema + migrations

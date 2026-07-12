@@ -4,7 +4,6 @@ import { type INestApplication, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
 import { ThrottlerGuard } from '@nestjs/throttler';
-import { seedDatabase } from '@repo/api-bootstrap';
 import { loadEnvFiles } from '@repo/api-core/config/load-env-files';
 import {
   DATABASE,
@@ -12,6 +11,7 @@ import {
   type TenantContext,
   TenantContextService,
 } from '@repo/api-database';
+import { seedDatabase } from '@repo/api-seed';
 import { sql } from 'drizzle-orm';
 import { Pool } from 'pg';
 import request from 'supertest';

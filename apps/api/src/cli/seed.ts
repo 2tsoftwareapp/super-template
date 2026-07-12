@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { seedDatabase } from '@repo/api-bootstrap';
+import { seedDatabase } from '@repo/api-seed';
 
 import { AppModule } from '../app.module';
 import { loadCliEnv } from './load-cli-env';

@@ -7,7 +7,7 @@
 - `apps/admin`: Next.js primary app with same-origin BFF for auth and operations
 - `apps/mobile`: Flutter app using generated Dart API client (auth + profile shell)
 - `packages/api-contract`: generated TypeScript OpenAPI types
-- `packages/api-bootstrap`: API bootstrap and shared startup helpers
+- `packages/api-seed`: development/demo data seeding (idempotent seeds per module)
 - `packages/api-health`: health-check module
 - `packages/api-database`: Drizzle schema and migrations
 - `packages/api-core`: shared backend primitives, RBAC, ports
