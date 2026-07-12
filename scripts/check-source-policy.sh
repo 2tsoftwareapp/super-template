@@ -303,6 +303,25 @@ check_domain_policy \
   "from '@nestjs/|from 'drizzle-orm'|from 'express'|from '@repo/api-database'" \
   'modules/*/domain must stay framework-free: pure functions and types only.'
 
+# App Router purity: app/ may only contain route entries (page/layout/route
+# handlers). Views, drawers, cards, and other components belong to features/.
+check_app_router_purity() {
+  output=$(find "apps/admin/src/app" "apps/web/src/app" \
+    -type f \( -name '*.tsx' -o -name '*.ts' \) \
+    ! -name 'page.tsx' ! -name 'layout.tsx' ! -name 'route.ts' \
+    ! -name 'loading.tsx' ! -name 'error.tsx' ! -name 'not-found.tsx' \
+    ! -name 'template.tsx' ! -name 'default.tsx' 2>/dev/null || true)
+
+  if [ -n "$output" ]; then
+    failed=1
+    printf 'Policy violation: app router contains non-route files\n' >&2
+    printf '%s\n' "$output" >&2
+    printf 'Move views/components to src/features/<resource>/components/.\n' >&2
+  fi
+}
+
+check_app_router_purity
+
 warn_large_application_services() {
   if command -v rg >/dev/null 2>&1; then
   files=$(find packages/api-identity/src/modules packages/api-platform/src/modules packages/api-platform/src/modules \

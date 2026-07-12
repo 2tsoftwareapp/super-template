@@ -1,7 +1,7 @@
 import { Skeleton } from "@repo/web-core/components/skeleton";
 import { Suspense } from "react";
 
-import { LoginView } from "./login-view";
+import { LoginView } from "@/features/auth/components/login-view";
 
 function LoginFallback() {
   return (
