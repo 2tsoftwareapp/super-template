@@ -14,14 +14,18 @@ import {  ACTION, ApiDataResponse, perm } from '@repo/api-core';
 import { CurrentUser } from '@repo/api-core';
 import { Authorize } from '@repo/api-core';
 
-import { ExportsService } from '../application/exports.service';
+import { CreateExportUseCase } from '../application/use-cases/create-export.use-case';
+import { GetExportUseCase } from '../application/use-cases/get-export.use-case';
 import { CreateExportDto, ExportJobDto } from './exports.dto';
 
 @ApiTags('exports')
 @ApiBearerAuth()
 @Controller('exports')
 export class ExportsController {
-  constructor(private readonly exportsService: ExportsService) {}
+  constructor(
+    private readonly createExport: CreateExportUseCase,
+    private readonly getExport: GetExportUseCase,
+  ) {}
 
   @Post()
   @Authorize({ permissions: [perm('exports', ACTION.CREATE)] })
@@ -31,7 +35,7 @@ export class ExportsController {
     @Body() input: CreateExportDto,
     @Req() request: Request,
   ) {
-    return this.exportsService.create(
+    return this.createExport.execute(
       user,
       {
         type: input.type,
@@ -50,6 +54,6 @@ export class ExportsController {
     @CurrentUser() user: AuthenticatedRequestUser,
     @Param('id', new ParseUUIDPipe()) jobId: string,
   ) {
-    return this.exportsService.getById(user, jobId);
+    return this.getExport.execute(user, jobId);
   }
 }

@@ -1,6 +1,5 @@
 import { Test } from '@nestjs/testing';
 import { ImportExportAdapterRegistry } from '@repo/api-core';
-import { ExportsService } from '@repo/api-platform/modules/exports/application/exports.service';
 import { CreateExportUseCase } from '@repo/api-platform/modules/exports/application/use-cases/create-export.use-case';
 import { GetExportUseCase } from '@repo/api-platform/modules/exports/application/use-cases/get-export.use-case';
 import { ExportJobsRepository } from '@repo/api-platform/modules/exports/infrastructure/export-jobs.repository';
@@ -34,7 +33,7 @@ const existingJob = {
   updatedAt: new Date('2026-06-17T10:00:00.000Z'),
 };
 
-describe('ExportsService idempotency', () => {
+describe('CreateExportUseCase idempotency', () => {
   it('returns an existing export job when the idempotency key matches', async () => {
     const exportJobsRepository = {
       createIdempotent: vi.fn().mockResolvedValue({
@@ -47,7 +46,6 @@ describe('ExportsService idempotency', () => {
 
     const moduleRef = await Test.createTestingModule({
       providers: [
-        ExportsService,
         CreateExportUseCase,
         GetExportUseCase,
         { provide: ExportJobsRepository, useValue: exportJobsRepository },
@@ -67,8 +65,8 @@ describe('ExportsService idempotency', () => {
       ],
     }).compile();
 
-    const service = moduleRef.get(ExportsService);
-    const result = await service.create(actor, {
+    const createExport = moduleRef.get(CreateExportUseCase);
+    const result = await createExport.execute(actor, {
       type: 'projects',
       idempotencyKey: 'export-attempt-1',
     });
