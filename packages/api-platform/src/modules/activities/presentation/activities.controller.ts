@@ -3,20 +3,20 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ACTION, ApiPaginatedResponse, perm } from '@repo/api-core';
 import { Authorize } from '@repo/api-core';
 
-import { ActivitiesService } from '../application/activities.service';
+import { ListActivitiesUseCase } from '../application/use-cases/list-activities.use-case';
 import { ActivitiesQueryDto, ActivityDto } from './activities.dto';
 
 @ApiTags('activities')
 @ApiBearerAuth()
 @Controller('activities')
 export class ActivitiesController {
-  constructor(private readonly activitiesService: ActivitiesService) {}
+  constructor(private readonly listActivities: ListActivitiesUseCase) {}
 
   @Get()
   @Authorize({ permissions: [perm('activities', ACTION.READ)] })
   @ApiPaginatedResponse(ActivityDto)
   async list(@Query() query: ActivitiesQueryDto) {
-    const result = await this.activitiesService.list({
+    const result = await this.listActivities.execute({
       page: query.page,
       limit: query.limit,
       ...(query.entityType !== undefined

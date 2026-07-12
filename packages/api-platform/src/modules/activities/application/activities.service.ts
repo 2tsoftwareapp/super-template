@@ -1,35 +1,26 @@
-import type { JsonObject } from '@repo/api-core';
 import type { DatabaseExecutor } from '@repo/api-database';
 
 import { Injectable } from '@nestjs/common';
 
-import type { ListActivitiesQuery } from './activities.types';
+import type {
+  ActivityEmitInput,
+  ActivityEmitter,
+} from './activity-emitter.port';
 
 import { EmitActivityUseCase } from './use-cases/emit-activity.use-case';
-import { ListActivitiesUseCase } from './use-cases/list-activities.use-case';
 
-interface EmitActivityInput {
-  organizationId: string;
-  summary: string;
-  entityType: string;
-  entityId: string;
-  actorId?: string | null;
-  visibility?: 'PUBLIC' | 'PRIVATE' | 'INTERNAL';
-  metadata?: JsonObject | null;
-}
-
+/**
+ * Adapter implementing the ACTIVITY_EMITTER port for cross-module activity
+ * emission. Read paths (list) use ListActivitiesUseCase directly.
+ */
 @Injectable()
-export class ActivitiesService {
-  constructor(
-    private readonly emitActivityUseCase: EmitActivityUseCase,
-    private readonly listActivitiesUseCase: ListActivitiesUseCase,
-  ) {}
+export class ActivitiesService implements ActivityEmitter {
+  constructor(private readonly emitActivityUseCase: EmitActivityUseCase) {}
 
-  async emit(input: EmitActivityInput, executor?: DatabaseExecutor) {
-    return this.emitActivityUseCase.execute(input, executor);
-  }
-
-  async list(query: ListActivitiesQuery) {
-    return this.listActivitiesUseCase.execute(query);
+  async emit(
+    input: ActivityEmitInput,
+    executor?: DatabaseExecutor,
+  ): Promise<void> {
+    await this.emitActivityUseCase.execute(input, executor);
   }
 }
