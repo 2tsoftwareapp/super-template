@@ -5,7 +5,6 @@ import { FilesModule } from '../files/files.module';
 import { StorageModule } from '../storage/storage.module';
 import { ImportsMapper } from './application/imports.mapper';
 import { IMPORT_JOBS_REPOSITORY } from './application/imports.repository.port';
-import { ImportsService } from './application/imports.service';
 import { ImportFileParserService } from './application/services/import-file-parser.service';
 import { ConfirmImportUseCase } from './application/use-cases/confirm-import.use-case';
 import { CreateImportUseCase } from './application/use-cases/create-import.use-case';
@@ -23,12 +22,11 @@ import { ImportsController } from './presentation/imports.controller';
     GetImportUseCase,
     CreateImportUseCase,
     ConfirmImportUseCase,
-    ImportsService,
     {
       provide: IMPORT_JOBS_REPOSITORY,
       useExisting: ImportJobsRepository,
     },
   ],
-  exports: [ImportJobsRepository, ImportsService, IMPORT_JOBS_REPOSITORY],
+  exports: [ImportJobsRepository, IMPORT_JOBS_REPOSITORY],
 })
 export class ImportsModule {}

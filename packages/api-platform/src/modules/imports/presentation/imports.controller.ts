@@ -14,14 +14,20 @@ import {  ACTION, ApiDataResponse, perm } from '@repo/api-core';
 import { CurrentUser } from '@repo/api-core';
 import { Authorize } from '@repo/api-core';
 
-import { ImportsService } from '../application/imports.service';
+import { ConfirmImportUseCase } from '../application/use-cases/confirm-import.use-case';
+import { CreateImportUseCase } from '../application/use-cases/create-import.use-case';
+import { GetImportUseCase } from '../application/use-cases/get-import.use-case';
 import { CreateImportDto, ImportJobDto } from './imports.dto';
 
 @ApiTags('imports')
 @ApiBearerAuth()
 @Controller('imports')
 export class ImportsController {
-  constructor(private readonly importsService: ImportsService) {}
+  constructor(
+    private readonly createImport: CreateImportUseCase,
+    private readonly getImport: GetImportUseCase,
+    private readonly confirmImport: ConfirmImportUseCase,
+  ) {}
 
   @Post()
   @Authorize({ permissions: [perm('imports', ACTION.CREATE)] })
@@ -31,7 +37,7 @@ export class ImportsController {
     @Body() input: CreateImportDto,
     @Req() request: Request,
   ) {
-    return this.importsService.create(
+    return this.createImport.execute(
       user,
       {
         type: input.type,
@@ -50,7 +56,7 @@ export class ImportsController {
     @CurrentUser() user: AuthenticatedRequestUser,
     @Param('id', new ParseUUIDPipe()) jobId: string,
   ) {
-    return this.importsService.getById(user, jobId);
+    return this.getImport.execute(user, jobId);
   }
 
   @Post(':id/confirm')
@@ -61,6 +67,6 @@ export class ImportsController {
     @Param('id', new ParseUUIDPipe()) jobId: string,
     @Req() request: Request,
   ) {
-    return this.importsService.confirm(user, jobId, request.requestContext);
+    return this.confirmImport.execute(user, jobId, request.requestContext);
   }
 }
