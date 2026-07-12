@@ -58,7 +58,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "lint": "eslint .",
-    "test": "vitest run",
+    "test": "vitest run --coverage",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
@@ -81,12 +81,14 @@
   },
   "devDependencies": {
     "@repo/tsconfig": "workspace:*",
+    "@repo/web-test": "workspace:*",
     "@testing-library/jest-dom": "6.9.1",
     "@testing-library/react": "16.3.2",
     "@types/node": "24.10.1",
     "@types/react": "19.2.6",
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "^5.0.0",
+    "@vitest/coverage-v8": "4.1.9",
     "jsdom": "29.1.1",
     "typescript": "5.9.3",
     "vitest": "4.1.9"

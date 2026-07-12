@@ -53,6 +53,51 @@ describe('loadEnvFiles precedence', () => {
     dir = undefined;
   });
 
+  it('skips .env.local when APP_ENV=test to keep tests hermetic', () => {
+    dir = mkdtempSync(join(tmpdir(), 'envloader-'));
+    writeFileSync(join(dir, 'pnpm-workspace.yaml'), "packages: []\n");
+    writeFileSync(join(dir, '.env.local'), 'ENVLOADER_SPEC_FOO=from_local\n');
+    writeFileSync(join(dir, '.env.example'), 'ENVLOADER_SPEC_FOO=from_example\n');
+
+    loadEnvFiles({ cwd: dir, appEnv: 'test' });
+
+    expect(process.env.ENVLOADER_SPEC_FOO).toBe('from_example');
+  });
+
+  it('applies .env.local outside of test and lets it beat committed defaults', () => {
+    dir = mkdtempSync(join(tmpdir(), 'envloader-'));
+    writeFileSync(join(dir, 'pnpm-workspace.yaml'), "packages: []\n");
+    writeFileSync(join(dir, '.env.local'), 'ENVLOADER_SPEC_FOO=from_local\n');
+    writeFileSync(join(dir, '.env.development'), 'ENVLOADER_SPEC_FOO=from_dev\n');
+
+    loadEnvFiles({ cwd: dir, appEnv: 'development' });
+
+    expect(process.env.ENVLOADER_SPEC_FOO).toBe('from_local');
+  });
+
+  it('never overrides values already present in process.env', () => {
+    dir = mkdtempSync(join(tmpdir(), 'envloader-'));
+    writeFileSync(join(dir, 'pnpm-workspace.yaml'), "packages: []\n");
+    writeFileSync(join(dir, '.env.development'), 'ENVLOADER_SPEC_FOO=from_file\n');
+    process.env.ENVLOADER_SPEC_FOO = 'from_real_env';
+
+    loadEnvFiles({ cwd: dir, appEnv: 'development' });
+
+    expect(process.env.ENVLOADER_SPEC_FOO).toBe('from_real_env');
+  });
+
+  it('prefers per-env personal overrides (.env.<env>.local) over everything on disk', () => {
+    dir = mkdtempSync(join(tmpdir(), 'envloader-'));
+    writeFileSync(join(dir, 'pnpm-workspace.yaml'), "packages: []\n");
+    writeFileSync(join(dir, '.env.development.local'), 'ENVLOADER_SPEC_FOO=from_env_local\n');
+    writeFileSync(join(dir, '.env.local'), 'ENVLOADER_SPEC_FOO=from_local\n');
+    writeFileSync(join(dir, '.env.development'), 'ENVLOADER_SPEC_FOO=from_dev\n');
+
+    loadEnvFiles({ cwd: dir, appEnv: 'development' });
+
+    expect(process.env.ENVLOADER_SPEC_FOO).toBe('from_env_local');
+  });
+
   it('applies files highest-to-lowest, first definition wins', () => {
     dir = mkdtempSync(join(tmpdir(), 'envloader-'));
     // Marks the dir as the repo root so the loader does not walk upward.

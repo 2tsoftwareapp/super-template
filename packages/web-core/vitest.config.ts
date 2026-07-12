@@ -12,5 +12,24 @@ export default defineConfig({
   test: {
     environment: "node",
     setupFiles: ["./src/test/setup.ts"],
+    coverage: {
+      provider: "v8",
+      include: ["src/**"],
+      exclude: [
+        "src/**/*.test.*",
+        "src/test/**",
+        "src/api-types.ts",
+        "src/types.ts",
+        "src/**/index.ts",
+      ],
+      // Regression gate, not a target: set just below measured coverage so
+      // new untested code fails CI. Raise as coverage improves.
+      thresholds: {
+        statements: 30,
+        branches: 25,
+        functions: 26,
+        lines: 31,
+      },
+    },
   },
 });
