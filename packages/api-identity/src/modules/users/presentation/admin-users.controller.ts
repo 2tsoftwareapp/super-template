@@ -18,8 +18,14 @@ import {  ACTION, ApiDataResponse, ApiPaginatedResponse, perm, SuccessFlagDto } 
 import { CurrentUser } from '@repo/api-core';
 import { Authorize } from '@repo/api-core';
 
+import { CreateAdminUserUseCase } from '../application/use-cases/create-admin-user.use-case';
+import { DeleteUserUseCase } from '../application/use-cases/delete-user.use-case';
+import { GetUserUseCase } from '../application/use-cases/get-user.use-case';
+import { ListUsersUseCase } from '../application/use-cases/list-users.use-case';
+import { ReplaceUserRolesUseCase } from '../application/use-cases/replace-user-roles.use-case';
+import { UpdateAdminUserUseCase } from '../application/use-cases/update-admin-user.use-case';
+import { UpdateUserStatusUseCase } from '../application/use-cases/update-user-status.use-case';
 import { userSortsFromQuery } from '../application/user-sort';
-import { UsersService } from '../application/users.service';
 import {
   AdminUsersQueryDto,
   CreateAdminUserDto,
@@ -32,7 +38,15 @@ import {
 @ApiBearerAuth()
 @Controller('admin/users')
 export class AdminUsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly listUsersUseCase: ListUsersUseCase,
+    private readonly createAdminUser: CreateAdminUserUseCase,
+    private readonly getUserUseCase: GetUserUseCase,
+    private readonly updateAdminUser: UpdateAdminUserUseCase,
+    private readonly deleteUserUseCase: DeleteUserUseCase,
+    private readonly updateUserStatusUseCase: UpdateUserStatusUseCase,
+    private readonly replaceUserRolesUseCase: ReplaceUserRolesUseCase,
+  ) {}
 
   @Get()
   @Authorize({ permissions: [perm('users', ACTION.READ)] })
@@ -46,7 +60,7 @@ export class AdminUsersController {
       sortField: query.sortField,
       sortOrder: query.sortOrder });
 
-    const result = await this.usersService.listUsers(actor, {
+    const result = await this.listUsersUseCase.execute(actor, {
       page: query.page,
       limit: query.limit,
       sort,
@@ -71,7 +85,7 @@ export class AdminUsersController {
     @Body() input: CreateAdminUserDto,
     @Req() request: Request,
   ) {
-    return this.usersService.createAdminUser(
+    return this.createAdminUser.execute(
       actor,
       {
         email: input.email,
@@ -94,7 +108,7 @@ export class AdminUsersController {
     @CurrentUser() actor: AuthenticatedRequestUser,
     @Param('id', new ParseUUIDPipe()) userId: string,
   ) {
-    return this.usersService.getUserById(actor, userId);
+    return this.getUserUseCase.execute(userId, actor);
   }
 
   @Patch(':id')
@@ -106,7 +120,7 @@ export class AdminUsersController {
     @Body() input: UpdateAdminUserDto,
     @Req() request: Request,
   ) {
-    return this.usersService.updateAdminUser(
+    return this.updateAdminUser.execute(
       actor,
       userId,
       {
@@ -129,7 +143,7 @@ export class AdminUsersController {
     @Param('id', new ParseUUIDPipe()) userId: string,
     @Req() request: Request,
   ) {
-    await this.usersService.deleteUser(actor, userId, request.requestContext);
+    await this.deleteUserUseCase.execute(actor, userId, request.requestContext);
 
     return {
       data: {
@@ -145,7 +159,7 @@ export class AdminUsersController {
     @Body() input: UpdateUserStatusDto,
     @Req() request: Request,
   ) {
-    return this.usersService.updateUserStatus(
+    return this.updateUserStatusUseCase.execute(
       actor,
       userId,
       input.status,
@@ -162,7 +176,7 @@ export class AdminUsersController {
     @Body() input: ReplaceUserRolesDto,
     @Req() request: Request,
   ) {
-    return this.usersService.replaceUserRoles(
+    return this.replaceUserRolesUseCase.execute(
       actor,
       userId,
       input.role,

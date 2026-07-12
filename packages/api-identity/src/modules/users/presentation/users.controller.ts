@@ -9,19 +9,25 @@ import {
 } from '@repo/api-core';
 import { CurrentUser } from '@repo/api-core';
 
-import { UsersService } from '../application/users.service';
+import { ChangePasswordUseCase } from '../application/use-cases/change-password.use-case';
+import { GetUserUseCase } from '../application/use-cases/get-user.use-case';
+import { UpdateProfileUseCase } from '../application/use-cases/update-profile.use-case';
 import { ChangePasswordDto, UpdateProfileDto, UserDto } from './users.dto';
 
 @ApiTags('users')
 @ApiBearerAuth()
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly getUser: GetUserUseCase,
+    private readonly updateProfile: UpdateProfileUseCase,
+    private readonly changePasswordUseCase: ChangePasswordUseCase,
+  ) {}
 
   @Get('me')
   @ApiDataResponse(UserDto)
   getMe(@CurrentUser() user: AuthenticatedRequestUser) {
-    return this.usersService.getProfile(user.userId);
+    return this.getUser.execute(user.userId);
   }
 
   @Patch('me')
@@ -31,7 +37,7 @@ export class UsersController {
     @Body() input: UpdateProfileDto,
     @Req() request: Request,
   ) {
-    return this.usersService.updateProfile(
+    return this.updateProfile.execute(
       user.userId,
       {
         ...(input.displayName !== undefined
@@ -53,7 +59,7 @@ export class UsersController {
     @Body() input: ChangePasswordDto,
     @Req() request: Request,
   ) {
-    await this.usersService.changePassword(
+    await this.changePasswordUseCase.execute(
       user,
       input.currentPassword,
       input.newPassword,

@@ -15,7 +15,6 @@ import { UpdateProfileUseCase } from './application/use-cases/update-profile.use
 import { UpdateUserStatusUseCase } from './application/use-cases/update-user-status.use-case';
 import { UsersMapper } from './application/users.mapper';
 import { USERS_REPOSITORY } from './application/users.repository.port';
-import { UsersService } from './application/users.service';
 import { UsersRepository } from './infrastructure/users.repository';
 import { AdminUsersController } from './presentation/admin-users.controller';
 import { UsersController } from './presentation/users.controller';
@@ -35,7 +34,6 @@ import { UsersController } from './presentation/users.controller';
     DeleteUserUseCase,
     UpdateUserStatusUseCase,
     ReplaceUserRolesUseCase,
-    UsersService,
     {
       provide: USERS_REPOSITORY,
       useExisting: UsersRepository,
@@ -47,7 +45,6 @@ import { UsersController } from './presentation/users.controller';
   ],
   exports: [
     UsersRepository,
-    UsersService,
     USER_LOOKUP,
     USERS_REPOSITORY,
   ],
