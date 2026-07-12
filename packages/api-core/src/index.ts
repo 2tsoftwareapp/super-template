@@ -1,3 +1,8 @@
+// Global Express.Request augmentation (requestId/user/requestContext) must
+// travel with any import of @repo/api-core. A runtime `import` of a .d.ts
+// breaks esbuild/vitest, so the type-only reference form is required here.
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
+/// <reference path="./common/types/express.d.ts" />
 export {
   AccessProfileCache,
   type AccessProfileSnapshot,

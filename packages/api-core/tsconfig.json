@@ -3,9 +3,13 @@
   "compilerOptions": {
     "outDir": "dist",
     "rootDir": "src",
-    "baseUrl": "./src",
     "strictPropertyInitialization": false
   },
-  "include": ["src/**/*.ts", "src/common/types/express.d.ts"],
-  "exclude": ["src/**/*.spec.ts"]
+  "include": [
+    "src/**/*.ts",
+    "src/common/types/express.d.ts"
+  ],
+  "exclude": [
+    "src/**/*.spec.ts"
+  ]
 }

@@ -8,9 +8,9 @@
     "./sort/multi-sort": "./src/sort/multi-sort.ts"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "node ../../tools/tsc7/node_modules/typescript7/bin/tsc -p tsconfig.json",
     "lint": "eslint .",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "node ../../tools/tsc7/node_modules/typescript7/bin/tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
     "@repo/api-sort": "workspace:*"

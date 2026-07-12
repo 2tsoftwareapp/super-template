@@ -2,12 +2,17 @@
   "extends": "@repo/tsconfig/nest.json",
   "compilerOptions": {
     "outDir": "dist",
-    "baseUrl": ".",
     "strictPropertyInitialization": false,
     "paths": {
-      "@identity/*": ["./src/*"]
+      "@identity/*": [
+        "./src/*"
+      ]
     }
   },
-  "include": ["src/**/*.ts", "../api-core/src/common/types/express.d.ts"],
-  "exclude": ["src/**/*.spec.ts"]
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "src/**/*.spec.ts"
+  ]
 }

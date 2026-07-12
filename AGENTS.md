@@ -68,6 +68,12 @@ Mailpit UI: http://localhost:8025 · Swagger: http://localhost:3001/api/docs
 
 ## Known hazards
 
+- **TypeScript 7 dual toolchain**: type-checking + package emit use TS7 (native) via
+  `tools/tsc7` (`typescript7` alias); the `typescript@5.9.3` in every package is a
+  library shim for tools that still need the old JS compiler API (typescript-eslint,
+  ts-node, Next checker). Don't "upgrade" the 5.9.3 pin independently, and never add
+  a bare `typescript` dep resolving to 7.x at the root — auto-install-peers will
+  silently break typed linting. Details: packages/tsconfig/README.md.
 - **OpenAPI boot step in `generate-contracts.sh` can be flaky.** If it fails to boot,
   regeneration may need a retry; a regen can also surface latent type bugs in web/admin.
 - **Generated Dart files need `// @dart=3.0`** or `flutter test` fails on CFE part files.

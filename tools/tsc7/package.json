@@ -1,0 +1,9 @@
+{
+  "name": "@repo/tsc7-holder",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Isolates the typescript7 alias so the TS7 binary is hoisted for scripts without entering any package's peer-resolution context (typescript-eslint etc. must keep seeing TS 5.9.3).",
+  "devDependencies": {
+    "typescript7": "npm:typescript@7.0.2"
+  }
+}
