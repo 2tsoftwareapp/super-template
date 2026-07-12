@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { JobsView } from "@/features/jobs/components/jobs-view";
+import { JobsView } from "@/features/jobs/screens/jobs-view";
 
 export const metadata: Metadata = {
   title: "Job Queue | Super Admin",

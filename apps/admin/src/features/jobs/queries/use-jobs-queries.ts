@@ -8,12 +8,8 @@ import {
   fetchJobMetrics,
   fetchJobs,
   type JobsParams,
-} from "./jobs-service";
-
-export const JOBS_BASE_QUERY_KEY = "admin-jobs" as const;
-export const JOB_METRICS_BASE_QUERY_KEY = "admin-jobs-metrics" as const;
-export const JOB_DETAIL_BASE_QUERY_KEY = "admin-job-detail" as const;
-export const JOB_LOGS_BASE_QUERY_KEY = "admin-job-logs" as const;
+} from "../api/jobs-api";
+import { JOB_DETAIL_BASE_QUERY_KEY, JOB_LOGS_BASE_QUERY_KEY, JOB_METRICS_BASE_QUERY_KEY, JOBS_BASE_QUERY_KEY } from "../jobs-query-keys";
 
 export function useJobsQuery(params: JobsParams) {
   return useQuery({

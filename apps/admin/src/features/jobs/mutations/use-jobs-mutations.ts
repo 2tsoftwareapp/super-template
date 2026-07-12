@@ -3,11 +3,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import { cancelJob } from "./jobs-service";
-import {
-  JOB_METRICS_BASE_QUERY_KEY,
-  JOBS_BASE_QUERY_KEY,
-} from "./use-jobs-queries";
+import { cancelJob } from "../api/jobs-api";
+import { JOB_METRICS_BASE_QUERY_KEY, JOBS_BASE_QUERY_KEY } from "../jobs-query-keys";
 
 export function useCancelJobMutation(options?: { onSuccess?: () => void }) {
   const queryClient = useQueryClient();
