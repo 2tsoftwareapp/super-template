@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { FilesView } from "@/features/files/components/files-view";
+import { FilesView } from "@/features/files/screens/files-view";
 
 export const metadata: Metadata = {
   title: "Files & Storage | Super Admin",

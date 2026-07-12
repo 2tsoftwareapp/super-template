@@ -2,7 +2,7 @@
 
 import { useMutation } from "@tanstack/react-query";
 
-import { deleteFile, uploadFile, uploadVersion } from "./files-service";
+import { deleteFile, uploadFile, uploadVersion } from "../api/files-api";
 
 export function useDeleteFileMutation(options?: { onSuccess?: () => void }) {
   return useMutation({

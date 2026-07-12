@@ -7,11 +7,8 @@ import {
   fetchFiles,
   fetchFileVersions,
   type FilesParams,
-} from "./files-service";
-
-export const FILES_QUERY_KEY = "admin-files" as const;
-export const FILE_VERSIONS_QUERY_KEY = "admin-file-versions" as const;
-export const FILE_HISTORY_QUERY_KEY = "admin-file-history" as const;
+} from "../api/files-api";
+import { FILE_HISTORY_QUERY_KEY, FILE_VERSIONS_QUERY_KEY, FILES_QUERY_KEY } from "../files-query-keys";
 
 export function useFilesQuery(params: FilesParams) {
   return useQuery({
