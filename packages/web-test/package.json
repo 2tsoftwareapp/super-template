@@ -27,5 +27,8 @@
     "jsdom": "29.1.1",
     "typescript": "5.9.3",
     "vitest": "4.1.9"
-  }
+  },
+  "sideEffects": [
+    "./src/setup.ts"
+  ]
 }
