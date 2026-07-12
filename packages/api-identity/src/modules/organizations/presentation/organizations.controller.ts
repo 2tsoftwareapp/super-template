@@ -20,7 +20,15 @@ import {
 } from '@repo/api-core';
 import { CurrentUser } from '@repo/api-core';
 
-import { OrganizationsService } from '../application/organizations.service';
+import { CreateOrganizationUseCase } from '../application/use-cases/create-organization.use-case';
+import { DeleteOrganizationUseCase } from '../application/use-cases/delete-organization.use-case';
+import { GetOrganizationUseCase } from '../application/use-cases/get-organization.use-case';
+import { LeaveOrganizationUseCase } from '../application/use-cases/leave-organization.use-case';
+import { ListOrganizationMembersUseCase } from '../application/use-cases/list-organization-members.use-case';
+import { ListOrganizationsForUserUseCase } from '../application/use-cases/list-organizations-for-user.use-case';
+import { RemoveOrganizationMemberUseCase } from '../application/use-cases/remove-organization-member.use-case';
+import { UpdateMemberRoleUseCase } from '../application/use-cases/update-member-role.use-case';
+import { UpdateOrganizationUseCase } from '../application/use-cases/update-organization.use-case';
 import {
   CreateOrganizationDto,
   OrganizationDetailDto,
@@ -34,12 +42,22 @@ import {
 @ApiBearerAuth()
 @Controller('organizations')
 export class OrganizationsController {
-  constructor(private readonly organizationsService: OrganizationsService) {}
+  constructor(
+    private readonly listOrganizationsForUser: ListOrganizationsForUserUseCase,
+    private readonly createOrganization: CreateOrganizationUseCase,
+    private readonly getOrganization: GetOrganizationUseCase,
+    private readonly updateOrganization: UpdateOrganizationUseCase,
+    private readonly deleteOrganization: DeleteOrganizationUseCase,
+    private readonly leaveOrganization: LeaveOrganizationUseCase,
+    private readonly listOrganizationMembers: ListOrganizationMembersUseCase,
+    private readonly updateMemberRoleUseCase: UpdateMemberRoleUseCase,
+    private readonly removeOrganizationMember: RemoveOrganizationMemberUseCase,
+  ) {}
 
   @Get()
   @ApiArrayResponse(OrganizationDto)
   list(@CurrentUser() user: AuthenticatedRequestUser) {
-    return this.organizationsService.listForUser(user);
+    return this.listOrganizationsForUser.execute(user);
   }
 
   @Post()
@@ -48,7 +66,7 @@ export class OrganizationsController {
     @CurrentUser() user: AuthenticatedRequestUser,
     @Body() input: CreateOrganizationDto,
   ) {
-    return this.organizationsService.create(user, { name: input.name });
+    return this.createOrganization.execute(user, { name: input.name });
   }
 
   @Get(':id')
@@ -57,7 +75,7 @@ export class OrganizationsController {
     @CurrentUser() user: AuthenticatedRequestUser,
     @Param('id', new ParseUUIDPipe()) organizationId: string,
   ) {
-    return this.organizationsService.getOrganization(
+    return this.getOrganization.execute(
       organizationId,
       user.userId,
     );
@@ -71,7 +89,7 @@ export class OrganizationsController {
     @Body() input: UpdateOrganizationDto,
     @Req() request: Request,
   ) {
-    return this.organizationsService.updateOrganization(
+    return this.updateOrganization.execute(
       organizationId,
       user.userId,
       { name: input.name },
@@ -86,7 +104,7 @@ export class OrganizationsController {
     @Param('id', new ParseUUIDPipe()) organizationId: string,
     @Req() request: Request,
   ) {
-    await this.organizationsService.deleteOrganization(
+    await this.deleteOrganization.execute(
       organizationId,
       user.userId,
       request.requestContext,
@@ -102,7 +120,7 @@ export class OrganizationsController {
     @Param('id', new ParseUUIDPipe()) organizationId: string,
     @Req() request: Request,
   ) {
-    await this.organizationsService.leave(
+    await this.leaveOrganization.execute(
       organizationId,
       user.userId,
       request.requestContext,
@@ -117,7 +135,7 @@ export class OrganizationsController {
     @CurrentUser() user: AuthenticatedRequestUser,
     @Param('id', new ParseUUIDPipe()) organizationId: string,
   ) {
-    return this.organizationsService.listMembers(organizationId, user.userId);
+    return this.listOrganizationMembers.execute(organizationId, user.userId);
   }
 
   @Patch(':id/members/:userId')
@@ -129,7 +147,7 @@ export class OrganizationsController {
     @Body() input: UpdateMemberRoleDto,
     @Req() request: Request,
   ) {
-    return this.organizationsService.updateMemberRole(
+    return this.updateMemberRoleUseCase.execute(
       organizationId,
       user.userId,
       targetUserId,
@@ -146,7 +164,7 @@ export class OrganizationsController {
     @Param('userId', new ParseUUIDPipe()) targetUserId: string,
     @Req() request: Request,
   ) {
-    await this.organizationsService.removeMember(
+    await this.removeOrganizationMember.execute(
       organizationId,
       user.userId,
       targetUserId,
