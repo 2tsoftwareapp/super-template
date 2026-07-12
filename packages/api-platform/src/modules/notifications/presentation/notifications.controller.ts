@@ -21,7 +21,10 @@ import { CurrentUser } from '@repo/api-core';
 import { Authorize } from '@repo/api-core';
 import { SkipEnvelope } from '@repo/api-core';
 
-import { NotificationsService } from '../application/notifications.service';
+import { NotificationDispatchService } from '../application/services/notification-dispatch.service';
+import { NotificationDeliveryUseCase } from '../application/use-cases/notification-delivery.use-case';
+import { NotificationDeviceUseCase } from '../application/use-cases/notification-device.use-case';
+import { NotificationInboxUseCase } from '../application/use-cases/notification-inbox.use-case';
 import {
   DeviceTokenDto,
   NotificationDto,
@@ -35,7 +38,11 @@ import {
 @ApiBearerAuth()
 @Controller('notifications')
 export class NotificationsController {
-  constructor(private readonly notificationsService: NotificationsService) {}
+  constructor(
+    private readonly inbox: NotificationInboxUseCase,
+    private readonly device: NotificationDeviceUseCase,
+    private readonly dispatch: NotificationDispatchService,
+  ) {}
 
   @Get()
   @ApiPaginatedResponse(NotificationDto)
@@ -43,7 +50,7 @@ export class NotificationsController {
     @CurrentUser() user: AuthenticatedRequestUser,
     @Query() query: NotificationsQueryDto,
   ) {
-    const result = await this.notificationsService.listForUser(user, {
+    const result = await this.inbox.listForUser(user, {
       page: query.page,
       limit: query.limit,
       ...(query.unread !== undefined ? { unread: query.unread } : {}),
@@ -63,7 +70,7 @@ export class NotificationsController {
   stream(
     @CurrentUser() user: AuthenticatedRequestUser,
   ): Observable<MessageEvent> {
-    return this.notificationsService.streamForUser(user.userId);
+    return this.dispatch.streamForUser(user.userId);
   }
 
   @Get('unread-count')
@@ -71,7 +78,7 @@ export class NotificationsController {
   async unreadCount(@CurrentUser() user: AuthenticatedRequestUser) {
     return {
       data: {
-        count: await this.notificationsService.unreadCount(user) } };
+        count: await this.inbox.unreadCount(user) } };
   }
 
   @Post('devices')
@@ -81,7 +88,7 @@ export class NotificationsController {
     @Body() input: RegisterDeviceDto,
   ) {
     return {
-      data: await this.notificationsService.registerDevice(user, {
+      data: await this.device.registerDevice(user, {
         token: input.token,
         platform: input.platform }) };
   }
@@ -92,7 +99,7 @@ export class NotificationsController {
     @CurrentUser() user: AuthenticatedRequestUser,
     @Param('token') token: string,
   ) {
-    await this.notificationsService.unregisterDevice(user, token);
+    await this.device.unregisterDevice(user, token);
 
     return {
       data: {
@@ -105,13 +112,13 @@ export class NotificationsController {
     @CurrentUser() user: AuthenticatedRequestUser,
     @Param('id', new ParseUUIDPipe()) notificationId: string,
   ) {
-    return this.notificationsService.markRead(user, notificationId);
+    return this.inbox.markRead(user, notificationId);
   }
 
   @Patch('read-all')
   @ApiDataResponse(SuccessFlagDto)
   async markAllRead(@CurrentUser() user: AuthenticatedRequestUser) {
-    await this.notificationsService.markAllRead(user);
+    await this.inbox.markAllRead(user);
 
     return {
       data: {
@@ -124,7 +131,7 @@ export class NotificationsController {
     @CurrentUser() user: AuthenticatedRequestUser,
     @Param('id', new ParseUUIDPipe()) notificationId: string,
   ) {
-    await this.notificationsService.delete(user, notificationId);
+    await this.inbox.delete(user, notificationId);
 
     return {
       data: {
@@ -136,7 +143,7 @@ export class NotificationsController {
 @ApiBearerAuth()
 @Controller('admin/notifications')
 export class AdminNotificationsController {
-  constructor(private readonly notificationsService: NotificationsService) {}
+  constructor(private readonly delivery: NotificationDeliveryUseCase) {}
 
   @Post()
   @Authorize({ permissions: [perm('notifications', ACTION.CREATE)] })
@@ -146,7 +153,7 @@ export class AdminNotificationsController {
     @Body() input: SendNotificationRequestDto,
     @Req() request: Request,
   ) {
-    return this.notificationsService.createDeliveryJob(
+    return this.delivery.createDeliveryJob(
       actor,
       {
         audience: input.audience,
@@ -170,7 +177,7 @@ export class AdminNotificationsController {
   @Authorize({ permissions: [perm('notifications', ACTION.CREATE)] })
   @ApiPaginatedResponse(NotificationJobDto)
   async listJobs(@Query() query: NotificationJobsQueryDto) {
-    const result = await this.notificationsService.listJobs({
+    const result = await this.delivery.listJobs({
       page: query.page,
       limit: query.limit,
       ...(query.status !== undefined ? { status: query.status } : {}) });
@@ -189,7 +196,7 @@ export class AdminNotificationsController {
   @ApiDataResponse(NotificationJobDto)
   async getJob(@Param('id', new ParseUUIDPipe()) jobId: string) {
     return {
-      data: await this.notificationsService.getJob(jobId) };
+      data: await this.delivery.getJob(jobId) };
   }
 
   @Delete('jobs/:id')
@@ -200,6 +207,6 @@ export class AdminNotificationsController {
     @Param('id', new ParseUUIDPipe()) jobId: string,
   ) {
     return {
-      data: await this.notificationsService.cancelJob(actor, jobId) };
+      data: await this.delivery.cancelJob(actor, jobId) };
   }
 }
