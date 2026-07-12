@@ -67,6 +67,43 @@ export class SessionTokenService {
     organizationId: string,
     metadata: { ipAddress: string | null; userAgent: string | null },
   ) {
+    const rotated = await this.tryRotateSessionTokens(
+      sessionId,
+      refreshTokenHash,
+      userId,
+      organizationId,
+      metadata,
+      // Strict rotation starts a fresh grace window anchored on the token
+      // being replaced.
+      { startGraceWindow: true },
+    );
+
+    if (!rotated) {
+      await this.authRepository.revokeSession(sessionId);
+      throw new AppError(
+        ERROR_CODES.AUTH_REFRESH_TOKEN_REUSED,
+        'Refresh token reuse detected',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    return rotated;
+  }
+
+  /**
+   * CAS rotation that returns null on a hash mismatch instead of revoking.
+   * Grace-path callers (previous token inside the rotation-grace window) use
+   * this to retry against a re-read session; they must NOT restart the grace
+   * window, so the original pre-race token keeps working for later racers.
+   */
+  async tryRotateSessionTokens(
+    sessionId: string,
+    refreshTokenHash: string,
+    userId: string,
+    organizationId: string,
+    metadata: { ipAddress: string | null; userAgent: string | null },
+    options?: { startGraceWindow?: boolean },
+  ) {
     const {
       accessToken,
       refreshToken,
@@ -77,6 +114,12 @@ export class SessionTokenService {
       refreshTokenHash,
       {
         refreshTokenHash: nextRefreshTokenHash,
+        ...(options?.startGraceWindow
+          ? {
+              previousRefreshTokenHash: refreshTokenHash,
+              previousRotatedAt: new Date(),
+            }
+          : {}),
         expiresAt: new Date(
           Date.now() +
             durationToMilliseconds(
@@ -90,12 +133,7 @@ export class SessionTokenService {
     );
 
     if (!session) {
-      await this.authRepository.revokeSession(sessionId);
-      throw new AppError(
-        ERROR_CODES.AUTH_REFRESH_TOKEN_REUSED,
-        'Refresh token reuse detected',
-        HttpStatus.UNAUTHORIZED,
-      );
+      return null;
     }
 
     return {

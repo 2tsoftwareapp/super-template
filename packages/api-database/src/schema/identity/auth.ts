@@ -19,6 +19,10 @@ export const authSessions = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
     refreshTokenHash: text('refresh_token_hash').notNull(),
+    // Rotation grace: the previous hash stays valid for a short window so
+    // concurrent refreshes (parallel tabs/requests) don't trip reuse detection.
+    previousRefreshTokenHash: text('previous_refresh_token_hash'),
+    previousRotatedAt: timestamp('previous_rotated_at', { withTimezone: true }),
     expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
     revokedAt: timestamp('revoked_at', { withTimezone: true }),
     lastUsedAt: timestamp('last_used_at', { withTimezone: true }),

@@ -157,7 +157,7 @@ export function createBackendHelpers({
     }
   };
 
-  const refreshSession = async (
+  const doRefreshSession = async (
     refreshToken: string,
   ): Promise<RefreshSessionPayload | null> => {
     let response: Response;
@@ -189,6 +189,29 @@ export function createBackendHelpers({
       return null;
     }
     return payload;
+  };
+
+  // Single-flight per refresh token: N concurrent 401s (parallel queries from
+  // one browser) share one refresh call instead of racing the API's rotation
+  // CAS, which would trip reuse detection and revoke the session.
+  const inflightRefreshes = new Map<
+    string,
+    Promise<RefreshSessionPayload | null>
+  >();
+
+  const refreshSession = (
+    refreshToken: string,
+  ): Promise<RefreshSessionPayload | null> => {
+    const existing = inflightRefreshes.get(refreshToken);
+    if (existing) {
+      return existing;
+    }
+
+    const inflight = doRefreshSession(refreshToken).finally(() => {
+      inflightRefreshes.delete(refreshToken);
+    });
+    inflightRefreshes.set(refreshToken, inflight);
+    return inflight;
   };
 
   const enforceOrigin = (request: NextRequest) => {
@@ -233,7 +256,7 @@ export function createBackendHelpers({
       return originFailure;
     }
 
-    const { accessToken, refreshToken, csrfToken } = await auth.readAuthCookies();
+    const { csrfToken } = await auth.readAuthCookies();
     const requestCsrfToken = request.headers.get("x-csrf-token");
 
     if (
@@ -243,10 +266,6 @@ export function createBackendHelpers({
       !auth.isValidCsrfToken(csrfToken)
     ) {
       return csrfForbiddenResponse();
-    }
-
-    if (accessToken || refreshToken) {
-      return null;
     }
 
     return null;
