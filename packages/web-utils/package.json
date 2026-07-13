@@ -1,0 +1,37 @@
+{
+  "name": "@repo/web-utils",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./api-types": "./src/api-types.ts",
+    "./http": "./src/http.ts",
+    "./http-config": "./src/http-config.ts",
+    "./json": "./src/json.ts",
+    "./search-params": "./src/search-params.ts",
+    "./session": "./src/session.ts",
+    "./theme/tweakcn-fonts": "./src/tweakcn-fonts.ts",
+    "./storage": "./src/storage.ts",
+    "./utils": "./src/utils.ts"
+  },
+  "scripts": {
+    "build": "node ../../tools/tsc7/node_modules/typescript7/bin/tsc -p tsconfig.json",
+    "lint": "eslint .",
+    "typecheck": "node ../../tools/tsc7/node_modules/typescript7/bin/tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@repo/api-contract": "workspace:*",
+    "@repo/utils": "workspace:*",
+    "@tanstack/react-query": "5.101.0",
+    "clsx": "2.1.1",
+    "next": "16.2.9",
+    "nuqs": "2.8.9",
+    "tailwind-merge": "3.6.0"
+  },
+  "devDependencies": {
+    "@repo/tsconfig": "workspace:*",
+    "typescript": "5.9.3"
+  },
+  "sideEffects": false
+}

@@ -1,8 +1,8 @@
 "use client";
 
-import { Avatar } from "@repo/web-core/components/avatar";
-import { Dropdown, type DropdownItem } from "@repo/web-core/components/dropdown";
-import { Tooltip } from "@repo/web-core/components/tooltip";
+import { Avatar } from "@repo/web-ui/avatar";
+import { Dropdown, type DropdownItem } from "@repo/web-ui/dropdown";
+import { Tooltip } from "@repo/web-ui/tooltip";
 import { LogOut, Shield } from "lucide-react";
 
 import { useRouter } from "@/i18n/navigation";

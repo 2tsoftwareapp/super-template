@@ -1,7 +1,7 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/web-core/components/card";
-import { Show } from "@repo/web-core/components/show";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/web-ui/card";
+import { Show } from "@repo/web-ui/show";
 
 import type { JobsViewModel } from "@/features/jobs/controllers/use-jobs-controller";
 

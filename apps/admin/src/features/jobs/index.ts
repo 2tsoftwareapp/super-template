@@ -1,5 +1,5 @@
+export { useCancelJobMutation } from "./api/jobs.mutations";
+export { useJobDetailQuery, useJobLogsQuery, useJobMetricsQuery, useJobsQuery } from "./api/jobs.queries";
+export { jobsKeys } from "./api/jobs.query-keys";
 export { useJobsController } from "./controllers/use-jobs-controller";
-export { jobsKeys } from "./jobs-query-keys";
-export { useCancelJobMutation } from "./mutations/use-jobs-mutations";
-export { useJobDetailQuery, useJobLogsQuery, useJobMetricsQuery, useJobsQuery } from "./queries/use-jobs-queries";
 export { JobsView } from "./screens/jobs-view";

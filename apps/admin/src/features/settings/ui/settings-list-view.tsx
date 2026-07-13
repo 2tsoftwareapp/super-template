@@ -6,10 +6,10 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@repo/web-core/components/card";
-import { ConfirmDialog } from "@repo/web-core/components/confirm-dialog";
-import { Input } from "@repo/web-core/components/input";
-import { Spinner } from "@repo/web-core/components/spinner";
+} from "@repo/web-ui/card";
+import { ConfirmDialog } from "@repo/web-ui/confirm-dialog";
+import { Input } from "@repo/web-ui/input";
+import { Spinner } from "@repo/web-ui/spinner";
 import { Search, X } from "lucide-react";
 
 import type { SettingsViewModel } from "@/features/settings/controllers/settings-view-model";

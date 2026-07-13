@@ -1,1 +1,1 @@
-export { cn, getCsrfTokenFromDocument } from "@repo/web-core";
+export { cn, getCsrfTokenFromDocument } from "@repo/web-utils";

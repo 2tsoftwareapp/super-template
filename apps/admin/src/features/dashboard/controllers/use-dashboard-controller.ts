@@ -3,7 +3,7 @@
 import {
   useDashboardOverviewQueries,
   useRefreshDashboard,
-} from "@/features/dashboard/use-dashboard-queries";
+} from "@/features/dashboard/api/dashboard.queries";
 import { useSession } from "@/hooks/use-session";
 
 type DashboardQueries = ReturnType<typeof useDashboardOverviewQueries>;

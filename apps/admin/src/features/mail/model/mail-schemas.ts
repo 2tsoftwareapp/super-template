@@ -1,4 +1,6 @@
-export const DELIVERY_PAGE_SIZE = 20;
+import { DEFAULT_PAGE_SIZE } from "@repo/config";
+
+export const DELIVERY_PAGE_SIZE = DEFAULT_PAGE_SIZE;
 
 export interface Filters {
   status: string;

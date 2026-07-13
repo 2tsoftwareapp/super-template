@@ -1,10 +1,10 @@
-import { configureHttpClient } from "@repo/web-core/http-config";
+import { configureHttpClient } from "@repo/web-utils/http-config";
 
 import { CSRF_TOKEN_COOKIE } from "@/lib/auth/cookie-names";
 
 configureHttpClient({ csrfCookieName: CSRF_TOKEN_COOKIE });
 
-export { ApiClientError, webFetch } from "@repo/web-core/http";
+export { ApiClientError, webFetch } from "@repo/web-utils/http";
 
 export function buildPath(
   path: string,

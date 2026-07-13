@@ -1,11 +1,11 @@
 "use client";
 
-import { Badge } from "@repo/web-core/components/badge";
-import { Button } from "@repo/web-core/components/button";
-import { SectionLoading } from "@repo/web-core/components/loading";
-import { LoadingButton } from "@repo/web-core/components/loading-button";
-import { Pagination } from "@repo/web-core/components/pagination";
-import { Show } from "@repo/web-core/components/show";
+import { Badge } from "@repo/web-ui/badge";
+import { Button } from "@repo/web-ui/button";
+import { SectionLoading } from "@repo/web-ui/loading";
+import { LoadingButton } from "@repo/web-ui/loading-button";
+import { Pagination } from "@repo/web-ui/pagination";
+import { Show } from "@repo/web-ui/show";
 import {
   Table,
   TableBody,
@@ -13,7 +13,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@repo/web-core/components/table";
+} from "@repo/web-ui/table";
 
 import type { JobDto } from "@/lib/api-types";
 

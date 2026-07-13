@@ -1,6 +1,6 @@
 "use client";
 
-import { FullScreenLoading } from "@repo/web-core/components/loading";
+import { FullScreenLoading } from "@repo/web-ui/loading";
 import { createContext, type ReactNode, useContext } from "react";
 
 import type { SessionUser } from "@/lib/api-types";

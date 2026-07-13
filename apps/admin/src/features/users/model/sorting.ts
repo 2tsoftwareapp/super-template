@@ -1,7 +1,7 @@
 import {
   formatSortParam,
   sortCriteriaEqual,
-} from "@repo/api-contract/sort/multi-sort";
+} from "@repo/api-sort";
 
 import { createTableSortBridge } from "@/lib/table-sort";
 

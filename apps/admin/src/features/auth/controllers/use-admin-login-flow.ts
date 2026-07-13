@@ -16,7 +16,7 @@ import {
   loginToAdmin,
   startSso,
   verifyAdminMfaChallenge,
-} from "../api/auth-api";
+} from "../api/auth.api";
 import {
   ADMIN_AUTH_ROUTES,
   ADMIN_LOGIN_DEFAULT_VALUES,
@@ -26,14 +26,14 @@ import {
   AUTH_SEARCH_PARAMS,
   AUTH_STORAGE_KEYS,
   LOGIN_CONTENT,
-} from "../model/auth-constants";
-import { getLoginErrorMessage, getMfaErrorMessage } from "../model/auth-errors";
+} from "../model/auth.constants";
 import {
   type AdminLoginInput,
   adminLoginSchema,
   type MfaChallengeInput,
   mfaChallengeSchema,
-} from "../model/auth-schemas";
+} from "../model/auth.schemas";
+import { getLoginErrorMessage, getMfaErrorMessage } from "./auth-login-errors";
 
 export function useAdminLoginFlow() {
   const router = useRouter();

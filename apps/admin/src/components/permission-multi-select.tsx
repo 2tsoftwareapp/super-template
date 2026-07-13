@@ -4,7 +4,7 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@repo/web-core/components/popover";
+} from "@repo/web-ui/popover";
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 

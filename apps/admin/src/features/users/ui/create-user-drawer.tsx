@@ -1,21 +1,21 @@
 "use client";
 
 import { standardSchemaResolver as zodResolver } from "@hookform/resolvers/standard-schema";
-import { Button } from "@repo/web-core/components/button";
-import { Input } from "@repo/web-core/components/input";
-import { Label } from "@repo/web-core/components/label";
-import { PasswordInput } from "@repo/web-core/components/password-input";
-import { Spinner } from "@repo/web-core/components/spinner";
+import { Button } from "@repo/web-ui/button";
+import { Input } from "@repo/web-ui/input";
+import { Label } from "@repo/web-ui/label";
+import { PasswordInput } from "@repo/web-ui/password-input";
+import { Spinner } from "@repo/web-ui/spinner";
 import { useEffect, useMemo } from "react";
 import { useForm, useWatch } from "react-hook-form";
 
 import { ResourceDrawer } from "@/components/resource-drawer";
+import { useCreateUser } from "@/features/users/api/users.mutations";
 import {
   ASSIGNABLE_ROLES,
   type CreateUserForm,
   createUserSchema,
-} from "@/features/users/model/users-schemas";
-import { useCreateUser } from "@/features/users/use-users-mutations";
+} from "@/features/users/model/users.schemas";
 import { canAssignRole, formatRoleName } from "@/lib/roles";
 
 export function CreateUserDrawer({

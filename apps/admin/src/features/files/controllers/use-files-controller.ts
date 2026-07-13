@@ -4,17 +4,17 @@ import { useState } from "react";
 
 import type { FileDto } from "@/lib/api-types";
 
-import { getFileDownloadUrl } from "@/features/files/api/files-api";
+import { getFileDownloadUrl } from "@/features/files/api/files.api";
 import {
   useDeleteFileMutation,
   useUploadFileMutation,
   useUploadVersionMutation,
-} from "@/features/files/mutations/use-files-mutations";
+} from "@/features/files/api/files.mutations";
 import {
   useFileHistoryQuery,
   useFilesQuery,
   useFileVersionsQuery,
-} from "@/features/files/queries/use-files-queries";
+} from "@/features/files/api/files.queries";
 
 import type { FilesViewModel } from "./files-view-model";
 

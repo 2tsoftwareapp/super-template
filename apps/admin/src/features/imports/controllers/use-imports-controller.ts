@@ -5,8 +5,8 @@ import { useState } from "react";
 import {
   useConfirmImportMutation,
   useCreateImportMutation,
-} from "@/features/imports/use-imports-mutations";
-import { useImportJobQuery } from "@/features/imports/use-imports-queries";
+} from "@/features/imports/api/imports.mutations";
+import { useImportJobQuery } from "@/features/imports/api/imports.queries";
 
 type ImportJob = NonNullable<
   ReturnType<typeof useImportJobQuery>["data"]

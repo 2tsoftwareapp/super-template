@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import type { SessionUser } from "@/lib/api-types";
 
-import { resolveAdminGuard } from "./admin-guard-state";
+import { resolveAdminGuard } from "./admin-guard.state";
 
 const adminUser: SessionUser = {
   id: "u1",

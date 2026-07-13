@@ -1,6 +1,6 @@
 "use client";
 
-import { Show } from "@repo/web-core/components/show";
+import { Show } from "@repo/web-ui/show";
 import { AlertTriangle } from "lucide-react";
 
 import type { DashboardViewModel } from "@/features/dashboard/controllers/use-dashboard-controller";

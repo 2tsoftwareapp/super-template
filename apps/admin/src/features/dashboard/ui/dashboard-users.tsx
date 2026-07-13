@@ -1,12 +1,12 @@
-import { Badge } from "@repo/web-core/components/badge";
+import { Badge } from "@repo/web-ui/badge";
 import {
   Card,
   CardAction,
   CardContent,
   CardHeader,
   CardTitle,
-} from "@repo/web-core/components/card";
-import { SectionLoading } from "@repo/web-core/components/loading";
+} from "@repo/web-ui/card";
+import { SectionLoading } from "@repo/web-ui/loading";
 import { ArrowRight } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";

@@ -1,12 +1,12 @@
 "use client";
 
-import { Button } from "@repo/web-core/components/button";
+import { Button } from "@repo/web-ui/button";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "@repo/web-core/components/card";
+} from "@repo/web-ui/card";
 import { RefreshCw } from "lucide-react";
 
 import { STATUS_OPTIONS } from "@/features/jobs/model/constants";

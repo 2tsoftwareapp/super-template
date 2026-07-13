@@ -12,7 +12,7 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
       "server-only": path.resolve(
         __dirname,
-        "../../packages/web-core/src/test/server-only-stub.ts",
+        "../../packages/web-server/src/__tests__/server-only-stub.ts",
       ),
     },
   },

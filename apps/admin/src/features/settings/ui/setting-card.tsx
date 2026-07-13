@@ -1,9 +1,9 @@
 "use client";
 
-import { Button } from "@repo/web-core/components/button";
-import { Input } from "@repo/web-core/components/input";
-import { Label } from "@repo/web-core/components/label";
-import { LoadingButton } from "@repo/web-core/components/loading-button";
+import { Button } from "@repo/web-ui/button";
+import { Input } from "@repo/web-ui/input";
+import { Label } from "@repo/web-ui/label";
+import { LoadingButton } from "@repo/web-ui/loading-button";
 import { RotateCcw } from "lucide-react";
 
 import type { SettingRow } from "@/features/settings/controllers/settings-view-model";

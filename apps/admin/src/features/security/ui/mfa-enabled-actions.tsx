@@ -1,13 +1,13 @@
 "use client";
 
-import { Button } from "@repo/web-core/components/button";
+import { Button } from "@repo/web-ui/button";
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSlot,
-} from "@repo/web-core/components/input-otp";
-import { Label } from "@repo/web-core/components/label";
-import { Spinner } from "@repo/web-core/components/spinner";
+} from "@repo/web-ui/input-otp";
+import { Label } from "@repo/web-ui/label";
+import { Spinner } from "@repo/web-ui/spinner";
 import { RefreshCw, ShieldOff } from "lucide-react";
 import { useState } from "react";
 

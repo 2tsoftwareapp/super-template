@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { Card, CardDescription, CardHeader, CardTitle } from "@repo/web-core/components/card";
+import { Card, CardDescription, CardHeader, CardTitle } from "@repo/web-ui/card";
 
 export function StatChip({
   label,

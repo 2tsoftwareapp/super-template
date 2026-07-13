@@ -1,7 +1,7 @@
 import type {
   SortCriterion,
   SortOrder,
-} from "@repo/api-contract/sort/multi-sort";
+} from "@repo/api-sort";
 import type { SortingState } from "@tanstack/react-table";
 
 export function createTableSortBridge<TField extends string>(config: {

@@ -1,1 +1,1 @@
-export * from "@repo/web-core/search-params";
+export * from "@repo/web-utils/search-params";

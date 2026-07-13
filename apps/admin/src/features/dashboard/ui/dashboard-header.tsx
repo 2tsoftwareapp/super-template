@@ -1,5 +1,5 @@
-import { Button } from "@repo/web-core/components/button";
-import { Spinner } from "@repo/web-core/components/spinner";
+import { Button } from "@repo/web-ui/button";
+import { Spinner } from "@repo/web-ui/spinner";
 import { RefreshCw } from "lucide-react";
 
 import { cn } from "@/lib/utils";

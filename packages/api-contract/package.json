@@ -4,16 +4,12 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts",
-    "./sort/multi-sort": "./src/sort/multi-sort.ts"
+    ".": "./src/index.ts"
   },
   "scripts": {
     "build": "node ../../tools/tsc7/node_modules/typescript7/bin/tsc -p tsconfig.json",
     "lint": "eslint .",
     "typecheck": "node ../../tools/tsc7/node_modules/typescript7/bin/tsc -p tsconfig.json --noEmit"
-  },
-  "dependencies": {
-    "@repo/api-sort": "workspace:*"
   },
   "devDependencies": {
     "@repo/tsconfig": "workspace:*",

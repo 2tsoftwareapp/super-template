@@ -1,4 +1,4 @@
-import { Skeleton } from "@repo/web-core/components/skeleton";
+import { Skeleton } from "@repo/web-ui/skeleton";
 import { Suspense } from "react";
 
 import { SsoCallbackView } from "@/features/auth/screens/sso-callback-view";

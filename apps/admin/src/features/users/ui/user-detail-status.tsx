@@ -1,5 +1,5 @@
-import { LoadingButton } from "@repo/web-core/components/loading-button";
-import { Show } from "@repo/web-core/components/show";
+import { LoadingButton } from "@repo/web-ui/loading-button";
+import { Show } from "@repo/web-ui/show";
 import { CheckCircle2 } from "lucide-react";
 
 import type { UserDetailViewModel } from "@/features/users/controllers/use-user-detail-controller";

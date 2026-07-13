@@ -1,24 +1,24 @@
 "use client";
 
-import { Button } from "@repo/web-core/components/button";
+import { Button } from "@repo/web-ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@repo/web-core/components/card";
+} from "@repo/web-ui/card";
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSlot,
-} from "@repo/web-core/components/input-otp";
-import { Label } from "@repo/web-core/components/label";
-import { Separator } from "@repo/web-core/components/separator";
-import { Spinner } from "@repo/web-core/components/spinner";
+} from "@repo/web-ui/input-otp";
+import { Label } from "@repo/web-ui/label";
+import { Separator } from "@repo/web-ui/separator";
+import { Spinner } from "@repo/web-ui/spinner";
 import { Shield } from "lucide-react";
 
-import type { MfaSetupResponse } from "@/features/security/model/security-schemas";
+import type { MfaSetupResponse } from "@/features/security/model/security.schemas";
 
 interface MfaSetupFlowProps {
   setupData: MfaSetupResponse["data"];

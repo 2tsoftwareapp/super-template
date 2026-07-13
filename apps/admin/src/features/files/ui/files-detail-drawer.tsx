@@ -1,5 +1,5 @@
-import { Button } from "@repo/web-core/components/button";
-import { LoadingButton } from "@repo/web-core/components/loading-button";
+import { Button } from "@repo/web-ui/button";
+import { LoadingButton } from "@repo/web-ui/loading-button";
 import { Download, History, Layers, Trash2, Upload } from "lucide-react";
 
 import type {

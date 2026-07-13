@@ -1,8 +1,10 @@
+import { DEFAULT_PAGE_SIZE } from "@repo/config";
+
 import type { UsersListParams, UsersPageSize, UserStatusFilter } from "./types";
 
 export { USERS_PAGE_SIZE_OPTIONS, type UsersPageSize } from "./types";
 
-export const USERS_PAGE_SIZE = 20 satisfies UsersPageSize;
+export const USERS_PAGE_SIZE = DEFAULT_PAGE_SIZE satisfies UsersPageSize;
 
 export const STATUS_FILTERS: { value: UserStatusFilter; label: string }[] = [
   { value: "all", label: "All" },

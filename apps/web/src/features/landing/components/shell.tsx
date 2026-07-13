@@ -1,17 +1,17 @@
 "use client";
 
-import { Avatar } from "@repo/web-core/components/avatar";
-import { Badge } from "@repo/web-core/components/badge";
-import { Button } from "@repo/web-core/components/button";
+import { Avatar } from "@repo/web-ui/avatar";
+import { Badge } from "@repo/web-ui/badge";
+import { Button } from "@repo/web-ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@repo/web-core/components/card";
-import { Separator } from "@repo/web-core/components/separator";
-import { Spinner } from "@repo/web-core/components/spinner";
+} from "@repo/web-ui/card";
+import { Separator } from "@repo/web-ui/separator";
+import { Spinner } from "@repo/web-ui/spinner";
 import { LogOut, Shield } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";

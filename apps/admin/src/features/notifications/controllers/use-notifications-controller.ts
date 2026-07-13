@@ -7,11 +7,11 @@ import type { SendNotificationInput } from "@/lib/api-types";
 import {
   useCancelNotificationJobMutation,
   useSendNotificationMutation,
-} from "@/features/notifications/use-notifications-mutations";
+} from "@/features/notifications/api/notifications.mutations";
 import {
   useNotificationJobsQuery,
   useRecentNotificationsQuery,
-} from "@/features/notifications/use-notifications-queries";
+} from "@/features/notifications/api/notifications.queries";
 
 type NotificationJob = NonNullable<
   ReturnType<typeof useNotificationJobsQuery>["data"]

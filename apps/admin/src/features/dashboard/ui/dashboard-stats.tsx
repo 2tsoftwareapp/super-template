@@ -1,4 +1,4 @@
-import { Card, CardContent } from "@repo/web-core/components/card";
+import { Card, CardContent } from "@repo/web-ui/card";
 import { Activity, ShieldCheck, Users, Workflow } from "lucide-react";
 import { type ReactNode } from "react";
 

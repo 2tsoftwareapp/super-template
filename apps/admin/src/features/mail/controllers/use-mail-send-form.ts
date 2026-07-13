@@ -4,7 +4,7 @@ import { useCallback, useMemo, useState } from "react";
 
 import type { MailTemplateDto } from "@/lib/api-types";
 
-import { useSendMailMutation } from "@/features/mail/use-mail-mutations";
+import { useSendMailMutation } from "@/features/mail/api/mail.mutations";
 
 export function useMailSendForm(templates: MailTemplateDto[] | undefined) {
   const [sendTemplateKey, setSendTemplateKey] = useState("");

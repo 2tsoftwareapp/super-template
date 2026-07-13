@@ -4,8 +4,8 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-} from "@repo/web-core/components/card";
-import { SectionLoading } from "@repo/web-core/components/loading";
+} from "@repo/web-ui/card";
+import { SectionLoading } from "@repo/web-ui/loading";
 import {
   Activity,
   ArrowRight,

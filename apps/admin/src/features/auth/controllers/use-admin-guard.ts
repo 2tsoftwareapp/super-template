@@ -6,12 +6,12 @@ import { useEffect } from "react";
 import { useSession } from "@/hooks/use-session";
 import { usePathname, useRouter } from "@/i18n/navigation";
 
-import { signOutAdmin } from "../api/auth-api";
+import { signOutAdmin } from "../api/auth.api";
 import {
   type AdminGuardDecision,
   resolveAdminGuard,
-} from "../model/admin-guard-state";
-import { ADMIN_AUTH_ROUTES } from "../model/auth-constants";
+} from "../model/admin-guard.state";
+import { ADMIN_AUTH_ROUTES } from "../model/auth.constants";
 
 // Single authoritative client gate: computes the guard decision from the
 // session + current path, and performs the matching navigation side effect.

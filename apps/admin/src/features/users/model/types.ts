@@ -1,13 +1,14 @@
 import type {
   SortCriterion,
   SortOrder,
-} from "@repo/api-contract/sort/multi-sort";
+} from "@repo/api-sort";
+import { PAGE_SIZE_OPTIONS, type PageSize } from "@repo/config";
 
 export type UserStatusFilter = "all" | "PENDING" | "ACTIVE" | "BLOCKED";
 
-export const USERS_PAGE_SIZE_OPTIONS = [10, 20, 30, 50, 100] as const;
+export const USERS_PAGE_SIZE_OPTIONS = PAGE_SIZE_OPTIONS;
 
-export type UsersPageSize = (typeof USERS_PAGE_SIZE_OPTIONS)[number];
+export type UsersPageSize = PageSize;
 
 export type UsersSortField = "createdAt" | "displayName" | "email" | "status";
 

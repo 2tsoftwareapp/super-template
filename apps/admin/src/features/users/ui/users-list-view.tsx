@@ -1,11 +1,11 @@
 "use client";
 
-import { Button } from "@repo/web-core/components/button";
-import { Card, CardContent } from "@repo/web-core/components/card";
-import { ErrorState } from "@repo/web-core/components/error-state";
-import { Pagination } from "@repo/web-core/components/pagination";
-import { Show } from "@repo/web-core/components/show";
-import { Spinner } from "@repo/web-core/components/spinner";
+import { Button } from "@repo/web-ui/button";
+import { Card, CardContent } from "@repo/web-ui/card";
+import { ErrorState } from "@repo/web-ui/error-state";
+import { Pagination } from "@repo/web-ui/pagination";
+import { Show } from "@repo/web-ui/show";
+import { Spinner } from "@repo/web-ui/spinner";
 
 import type { UsersListViewModel } from "@/features/users/controllers/use-users-list-controller";
 

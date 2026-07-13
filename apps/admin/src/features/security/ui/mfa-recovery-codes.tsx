@@ -1,14 +1,14 @@
 "use client";
 
-import { Alert } from "@repo/web-core/components/alert";
-import { Button } from "@repo/web-core/components/button";
+import { Alert } from "@repo/web-ui/alert";
+import { Button } from "@repo/web-ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@repo/web-core/components/card";
+} from "@repo/web-ui/card";
 import { Copy, KeyRound } from "lucide-react";
 import { useCallback } from "react";
 import { toast } from "sonner";

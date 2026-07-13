@@ -26,7 +26,7 @@ vi.mock("@/lib/env", () => ({
   isSecureCookie: false,
 }));
 
-vi.mock("@repo/web-core/auth/cookies", () => ({
+vi.mock("@repo/web-server/auth/cookies", () => ({
   readAuthCookies: readAuthCookiesMock,
   setAuthCookies: setAuthCookiesMock,
   clearAuthCookies: clearAuthCookiesMock,

@@ -6,10 +6,10 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@repo/web-core/components/card";
-import { Input } from "@repo/web-core/components/input";
-import { Label } from "@repo/web-core/components/label";
-import { LoadingButton } from "@repo/web-core/components/loading-button";
+} from "@repo/web-ui/card";
+import { Input } from "@repo/web-ui/input";
+import { Label } from "@repo/web-ui/label";
+import { LoadingButton } from "@repo/web-ui/loading-button";
 
 import { ResourcePageShell } from "@/components/resource-page-shell";
 

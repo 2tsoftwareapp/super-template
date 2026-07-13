@@ -1,14 +1,14 @@
-import { Badge } from "@repo/web-core/components/badge";
-import { Button } from "@repo/web-core/components/button";
+import { Badge } from "@repo/web-ui/badge";
+import { Button } from "@repo/web-ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@repo/web-core/components/card";
-import { Separator } from "@repo/web-core/components/separator";
-import { Show } from "@repo/web-core/components/show";
+} from "@repo/web-ui/card";
+import { Separator } from "@repo/web-ui/separator";
+import { Show } from "@repo/web-ui/show";
 import {
   CheckCircle2,
   Code2,
@@ -169,10 +169,10 @@ const stackLayers = [
     label: "Shared",
     packages: [
       {
-        name: "@repo/web-core",
+        name: "@repo/web-ui",
         version: "workspace:*",
         description:
-          "Shared session, HTTP, query, and utility logic — auth BFF lives in admin",
+          "Shared UI primitives (components + hooks)",
       },
       {
         name: "@repo/env-loader",
@@ -545,7 +545,7 @@ export function LandingView() {
             <p className="mt-4 text-muted-foreground">
               The NestJS API serves web, admin, and mobile from a single
               Postgres database. Admin traffic flows through a Next.js BFF
-              with @repo/web-core; web is static marketing; Flutter talks
+               with @repo/web-server; web is static marketing; Flutter talks
               directly to the API.
             </p>
           </div>

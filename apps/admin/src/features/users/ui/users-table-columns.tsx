@@ -1,9 +1,9 @@
 "use client";
 
-import { Avatar } from "@repo/web-core/components/avatar";
-import { Badge } from "@repo/web-core/components/badge";
-import { Checkbox } from "@repo/web-core/components/checkbox";
-import { Tooltip } from "@repo/web-core/components/tooltip";
+import { Avatar } from "@repo/web-ui/avatar";
+import { Badge } from "@repo/web-ui/badge";
+import { Checkbox } from "@repo/web-ui/checkbox";
+import { Tooltip } from "@repo/web-ui/tooltip";
 import { createColumnHelper } from "@tanstack/react-table";
 import { BadgeCheck, XCircle } from "lucide-react";
 
@@ -123,7 +123,7 @@ export function createUsersTableColumns(options?: {
         const overflow = roleNames.length - 2;
         return (
           <div className="flex flex-wrap gap-1">
-            {visible.map((role) => (
+            {visible.map((role: string) => (
               <Badge key={role} variant="secondary" className="text-[11px] px-1.5 py-0">
                 {formatRoleName(role)}
               </Badge>

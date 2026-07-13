@@ -1,4 +1,4 @@
-import { Skeleton } from "@repo/web-core/components/skeleton";
+import { Skeleton } from "@repo/web-ui/skeleton";
 import { Suspense } from "react";
 
 import { LoginView } from "@/features/auth/screens/login-view";

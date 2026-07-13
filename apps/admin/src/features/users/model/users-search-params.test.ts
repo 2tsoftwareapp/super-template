@@ -5,7 +5,7 @@ import {
   parseUsersListSearchParams,
   serializeUsersListSearchParams,
   usersListParamsEqual,
-} from "./users-search-params";
+} from "./users.search-params";
 
 describe("users search params", () => {
   it("uses defaults for an empty query string", () => {

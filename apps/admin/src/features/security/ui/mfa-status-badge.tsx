@@ -1,4 +1,4 @@
-import { Badge } from "@repo/web-core/components/badge";
+import { Badge } from "@repo/web-ui/badge";
 import { CheckCircle2 } from "lucide-react";
 
 interface MfaStatusBadgeProps {

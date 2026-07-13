@@ -1,6 +1,6 @@
 "use client";
 
-import { createUseSession } from "@repo/web-core/session";
+import { createUseSession } from "@repo/web-utils/session";
 
 export const sessionQueryKey = ["admin-session"] as const;
 

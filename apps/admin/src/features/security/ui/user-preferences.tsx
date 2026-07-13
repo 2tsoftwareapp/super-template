@@ -6,8 +6,8 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@repo/web-core/components/card";
-import { Label } from "@repo/web-core/components/label";
+} from "@repo/web-ui/card";
+import { Label } from "@repo/web-ui/label";
 import { Check, Globe, Laptop, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 

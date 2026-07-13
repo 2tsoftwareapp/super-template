@@ -1,5 +1,5 @@
-import { createAuthCookieHelpers } from "@repo/web-core/auth/cookies";
-import { createBackendHelpers } from "@repo/web-core/server";
+import { createAuthCookieHelpers } from "@repo/web-server/auth/cookies";
+import { createBackendHelpers } from "@repo/web-server/server";
 
 import {
   ACCESS_TOKEN_COOKIE,

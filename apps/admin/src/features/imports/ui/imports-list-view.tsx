@@ -1,22 +1,22 @@
 "use client";
 
-import { Badge } from "@repo/web-core/components/badge";
-import { Button } from "@repo/web-core/components/button";
+import { Badge } from "@repo/web-ui/badge";
+import { Button } from "@repo/web-ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@repo/web-core/components/card";
-import { ConfirmDialog } from "@repo/web-core/components/confirm-dialog";
-import { ErrorState } from "@repo/web-core/components/error-state";
-import { Input } from "@repo/web-core/components/input";
-import { Label } from "@repo/web-core/components/label";
-import { SectionLoading } from "@repo/web-core/components/loading";
-import { LoadingButton } from "@repo/web-core/components/loading-button";
-import { Separator } from "@repo/web-core/components/separator";
-import { Show } from "@repo/web-core/components/show";
+} from "@repo/web-ui/card";
+import { ConfirmDialog } from "@repo/web-ui/confirm-dialog";
+import { ErrorState } from "@repo/web-ui/error-state";
+import { Input } from "@repo/web-ui/input";
+import { Label } from "@repo/web-ui/label";
+import { SectionLoading } from "@repo/web-ui/loading";
+import { LoadingButton } from "@repo/web-ui/loading-button";
+import { Separator } from "@repo/web-ui/separator";
+import { Show } from "@repo/web-ui/show";
 import {
   AlertCircle,
   CheckCircle2,

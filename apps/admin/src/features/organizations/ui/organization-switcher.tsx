@@ -1,14 +1,14 @@
 "use client";
 
-import { Badge } from "@repo/web-core/components/badge";
-import { Dropdown, type DropdownItem } from "@repo/web-core/components/dropdown";
-import { Spinner } from "@repo/web-core/components/spinner";
+import { Badge } from "@repo/web-ui/badge";
+import { Dropdown, type DropdownItem } from "@repo/web-ui/dropdown";
+import { Spinner } from "@repo/web-ui/spinner";
 import { Building2, Check, ChevronDown } from "lucide-react";
 
 import { useAdminSession } from "@/components/admin-guard";
 
-import { useSwitchOrganizationMutation } from "../use-organizations-mutations";
-import { useMyOrganizationsQuery } from "../use-organizations-queries";
+import { useSwitchOrganizationMutation } from "../api/organizations.mutations";
+import { useMyOrganizationsQuery } from "../api/organizations.queries";
 
 // Shows the active tenant in the shell header. Read-only badge for
 // single-org users; a switcher dropdown when the user belongs to several.

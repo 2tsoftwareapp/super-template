@@ -1,6 +1,6 @@
 "use client";
 
-import { useDebouncedValue } from "@repo/web-core/hooks";
+import { useDebouncedValue } from "@repo/web-hooks/use-debounced-value";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -10,17 +10,17 @@ import type {
   UserStatusFilter,
 } from "@/features/users/model/types";
 
-import { selectUserManagementPermissions } from "@/features/users/model/users-permissions";
-import {
-  parseUsersListSearchParams,
-  serializeUsersListSearchParams,
-} from "@/features/users/model/users-search-params";
 import {
   useActivateUsers,
   useBlockUsers,
   useResendVerification,
-} from "@/features/users/use-users-mutations";
-import { useUsersListQuery } from "@/features/users/use-users-queries";
+} from "@/features/users/api/users.mutations";
+import { useUsersListQuery } from "@/features/users/api/users.queries";
+import { selectUserManagementPermissions } from "@/features/users/model/users.permissions";
+import {
+  parseUsersListSearchParams,
+  serializeUsersListSearchParams,
+} from "@/features/users/model/users.search-params";
 import { useSession } from "@/hooks/use-session";
 import { usePathname, useRouter } from "@/i18n/navigation";
 

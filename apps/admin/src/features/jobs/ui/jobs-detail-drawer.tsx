@@ -1,10 +1,10 @@
 "use client";
 
-import { Badge } from "@repo/web-core/components/badge";
-import { Label } from "@repo/web-core/components/label";
-import { SectionLoading } from "@repo/web-core/components/loading";
-import { Separator } from "@repo/web-core/components/separator";
-import { Show } from "@repo/web-core/components/show";
+import { Badge } from "@repo/web-ui/badge";
+import { Label } from "@repo/web-ui/label";
+import { SectionLoading } from "@repo/web-ui/loading";
+import { Separator } from "@repo/web-ui/separator";
+import { Show } from "@repo/web-ui/show";
 
 import type { JobDto, JobEventDto } from "@/lib/api-types";
 

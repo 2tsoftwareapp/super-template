@@ -1,0 +1,19 @@
+{
+  "name": "@repo/utils",
+  "version": "1.0.0",
+  "private": true,
+  "exports": {
+    ".": "./src/index.ts",
+    "./json": "./src/json.ts"
+  },
+  "scripts": {
+    "build": "node ../../tools/tsc7/node_modules/typescript7/bin/tsc -p tsconfig.json",
+    "lint": "eslint .",
+    "typecheck": "node ../../tools/tsc7/node_modules/typescript7/bin/tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "@repo/tsconfig": "workspace:*",
+    "typescript": "5.9.3"
+  },
+  "sideEffects": false
+}

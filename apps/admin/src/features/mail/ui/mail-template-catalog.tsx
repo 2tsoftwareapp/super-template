@@ -1,15 +1,15 @@
 "use client";
 
-import { Badge } from "@repo/web-core/components/badge";
+import { Badge } from "@repo/web-ui/badge";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@repo/web-core/components/card";
-import { SectionLoading } from "@repo/web-core/components/loading";
-import { Show } from "@repo/web-core/components/show";
+} from "@repo/web-ui/card";
+import { SectionLoading } from "@repo/web-ui/loading";
+import { Show } from "@repo/web-ui/show";
 import {
   Table,
   TableBody,
@@ -17,7 +17,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@repo/web-core/components/table";
+} from "@repo/web-ui/table";
 
 import type { MailTemplateDto } from "@/lib/api-types";
 

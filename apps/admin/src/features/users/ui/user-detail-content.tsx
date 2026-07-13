@@ -1,14 +1,14 @@
 "use client";
 
-import { Alert } from "@repo/web-core/components/alert";
+import { Alert } from "@repo/web-ui/alert";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@repo/web-core/components/card";
-import { Separator } from "@repo/web-core/components/separator";
+} from "@repo/web-ui/card";
+import { Separator } from "@repo/web-ui/separator";
 import { ShieldAlert } from "lucide-react";
 
 import type { UserDetailViewModel } from "@/features/users/controllers/use-user-detail-controller";

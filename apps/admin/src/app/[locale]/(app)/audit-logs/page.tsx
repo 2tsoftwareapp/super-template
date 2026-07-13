@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { Spinner } from "@repo/web-core/components/spinner";
+import { Spinner } from "@repo/web-ui/spinner";
 import { Suspense } from "react";
 
 import { AuditLogsView } from "@/features/audit-logs/screens/audit-logs-view";

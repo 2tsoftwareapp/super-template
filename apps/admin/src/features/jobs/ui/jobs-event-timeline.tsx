@@ -1,7 +1,7 @@
 "use client";
 
-import { Show } from "@repo/web-core/components/show";
-import { Spinner } from "@repo/web-core/components/spinner";
+import { Show } from "@repo/web-ui/show";
+import { Spinner } from "@repo/web-ui/spinner";
 
 import type { JobEventDto } from "@/lib/api-types";
 

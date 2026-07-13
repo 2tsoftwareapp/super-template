@@ -1,20 +1,20 @@
 "use client";
 
-import { Badge } from "@repo/web-core/components/badge";
-import { Button } from "@repo/web-core/components/button";
+import { Badge } from "@repo/web-ui/badge";
+import { Button } from "@repo/web-ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@repo/web-core/components/card";
-import { ErrorState } from "@repo/web-core/components/error-state";
-import { Input } from "@repo/web-core/components/input";
-import { Label } from "@repo/web-core/components/label";
-import { SectionLoading } from "@repo/web-core/components/loading";
-import { LoadingButton } from "@repo/web-core/components/loading-button";
-import { Show } from "@repo/web-core/components/show";
+} from "@repo/web-ui/card";
+import { ErrorState } from "@repo/web-ui/error-state";
+import { Input } from "@repo/web-ui/input";
+import { Label } from "@repo/web-ui/label";
+import { SectionLoading } from "@repo/web-ui/loading";
+import { LoadingButton } from "@repo/web-ui/loading-button";
+import { Show } from "@repo/web-ui/show";
 import {
   Table,
   TableBody,
@@ -22,9 +22,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@repo/web-core/components/table";
-import { Textarea } from "@repo/web-core/components/textarea";
-import { Tooltip } from "@repo/web-core/components/tooltip";
+} from "@repo/web-ui/table";
+import { Textarea } from "@repo/web-ui/textarea";
+import { Tooltip } from "@repo/web-ui/tooltip";
 import {
   AlertCircle,
   CheckCircle2,

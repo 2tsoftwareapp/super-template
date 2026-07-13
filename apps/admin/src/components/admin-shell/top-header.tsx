@@ -1,8 +1,8 @@
 "use client";
 
-import { Avatar } from "@repo/web-core/components/avatar";
-import { Button } from "@repo/web-core/components/button";
-import { Dropdown, type DropdownItem } from "@repo/web-core/components/dropdown";
+import { Avatar } from "@repo/web-ui/avatar";
+import { Button } from "@repo/web-ui/button";
+import { Dropdown, type DropdownItem } from "@repo/web-ui/dropdown";
 import { ChevronRight, LogOut, Menu, Settings, Shield } from "lucide-react";
 
 import { OrganizationSwitcher } from "@/features/organizations/ui/organization-switcher";

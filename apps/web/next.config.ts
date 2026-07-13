@@ -6,7 +6,7 @@ const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["127.0.0.1"],
-  transpilePackages: ["@repo/web-core", "@repo/env-loader"],
+  transpilePackages: ["@repo/web-ui", "@repo/env-loader"],
 };
 
 export default withNextIntl(nextConfig);

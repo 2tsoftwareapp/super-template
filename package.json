@@ -26,6 +26,7 @@
     "test": "turbo run test",
     "typecheck": "turbo run typecheck",
     "generate:contracts": "sh ./scripts/generate-contracts.sh",
+    "generate:config": "pnpm --filter @repo/config generate",
     "generate": "sh ./scripts/generate-contracts.sh",
     "generate:check": "sh ./scripts/generate-check.sh",
     "verify": "sh ./scripts/verify.sh",

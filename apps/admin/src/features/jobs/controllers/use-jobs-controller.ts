@@ -5,14 +5,14 @@ import { useCallback, useState } from "react";
 
 import type { JobDto, JobEventDto, JobMetricsDto } from "@/lib/api-types";
 
-import { type JobsFilters, parseJobsFilters } from "@/features/jobs/model/constants";
-import { useCancelJobMutation } from "@/features/jobs/mutations/use-jobs-mutations";
+import { useCancelJobMutation } from "@/features/jobs/api/jobs.mutations";
 import {
   useJobDetailQuery,
   useJobLogsQuery,
   useJobMetricsQuery,
   useJobsQuery,
-} from "@/features/jobs/queries/use-jobs-queries";
+} from "@/features/jobs/api/jobs.queries";
+import { type JobsFilters, parseJobsFilters } from "@/features/jobs/model/constants";
 import { usePathname, useRouter } from "@/i18n/navigation";
 
 export interface JobsViewModel {

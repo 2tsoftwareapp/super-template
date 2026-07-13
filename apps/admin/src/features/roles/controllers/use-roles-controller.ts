@@ -2,23 +2,23 @@
 
 import { useMemo, useState } from "react";
 
+import { useDeleteRoleMutation } from "@/features/roles/api/roles.mutations";
+import {
+  usePermissionCatalogQuery,
+  useRolesQuery,
+} from "@/features/roles/api/roles.queries";
 import {
   filterRolesBySearch,
   type MergedRole,
   mergeRoles,
   optionalText,
-} from "@/features/roles/model/roles-filtering";
-import { selectRoleManagementPermissions } from "@/features/roles/model/roles-permissions";
+} from "@/features/roles/model/roles.filtering";
+import { selectRoleManagementPermissions } from "@/features/roles/model/roles.permissions";
 import {
   type EditableRole,
   type ManagedRoleDto,
   type PermissionDto,
-} from "@/features/roles/model/roles-schemas";
-import { useDeleteRoleMutation } from "@/features/roles/use-roles-mutations";
-import {
-  usePermissionCatalogQuery,
-  useRolesQuery,
-} from "@/features/roles/use-roles-queries";
+} from "@/features/roles/model/roles.schemas";
 import { useSession } from "@/hooks/use-session";
 
 export interface RolesViewModel {

@@ -1,7 +1,7 @@
 "use client";
 
-import { Badge } from "@repo/web-core/components/badge";
-import { Button } from "@repo/web-core/components/button";
+import { Badge } from "@repo/web-ui/badge";
+import { Button } from "@repo/web-ui/button";
 import {
   ChevronDown,
   ChevronRight,
@@ -12,9 +12,9 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
-import type { ManagedRoleDto } from "@/features/roles/model/roles-schemas";
+import type { ManagedRoleDto } from "@/features/roles/model/roles.schemas";
 
-import { type MergedRole, optionalText } from "@/features/roles/model/roles-filtering";
+import { type MergedRole, optionalText } from "@/features/roles/model/roles.filtering";
 import { formatRoleName } from "@/lib/roles";
 import { cn } from "@/lib/utils";
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { Tooltip } from "@repo/web-core/components/tooltip";
+import { Tooltip } from "@repo/web-ui/tooltip";
 
 import { Link } from "@/i18n/navigation";
 import {

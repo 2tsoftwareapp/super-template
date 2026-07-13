@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { Spinner } from "@repo/web-core/components/spinner";
+import { Spinner } from "@repo/web-ui/spinner";
 import { Suspense } from "react";
 
 import { MailView } from "@/features/mail/screens/mail-view";

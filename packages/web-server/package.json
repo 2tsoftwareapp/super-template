@@ -1,0 +1,33 @@
+{
+  "name": "@repo/web-server",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./server": "./src/server/index.ts",
+    "./auth/cookies": "./src/auth/cookies.ts",
+    "./auth/sanitize-response": "./src/auth/sanitize-response.ts"
+  },
+  "scripts": {
+    "build": "node ../../tools/tsc7/node_modules/typescript7/bin/tsc -p tsconfig.json",
+    "lint": "eslint .",
+    "typecheck": "node ../../tools/tsc7/node_modules/typescript7/bin/tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@repo/api-contract": "workspace:*",
+    "@repo/web-utils": "workspace:*",
+    "next": "16.2.9",
+    "server-only": "^0.0.1"
+  },
+  "devDependencies": {
+    "@repo/tsconfig": "workspace:*",
+    "@repo/web-test": "workspace:*",
+    "@testing-library/jest-dom": "6.9.1",
+    "@types/node": "24.10.1",
+    "jsdom": "29.1.1",
+    "typescript": "5.9.3",
+    "vitest": "4.1.9"
+  },
+  "sideEffects": false
+}

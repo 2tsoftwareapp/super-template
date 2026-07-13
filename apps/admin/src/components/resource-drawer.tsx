@@ -1,4 +1,4 @@
-import { Button } from "@repo/web-core/components/button";
+import { Button } from "@repo/web-ui/button";
 import { X } from "lucide-react";
 import { type ReactNode, useEffect, useState } from "react";
 

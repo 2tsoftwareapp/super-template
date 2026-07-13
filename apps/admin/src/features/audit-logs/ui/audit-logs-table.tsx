@@ -1,10 +1,10 @@
 "use client";
 
-import { Badge } from "@repo/web-core/components/badge";
-import { Button } from "@repo/web-core/components/button";
-import { SectionLoading } from "@repo/web-core/components/loading";
-import { Pagination } from "@repo/web-core/components/pagination";
-import { Show } from "@repo/web-core/components/show";
+import { Badge } from "@repo/web-ui/badge";
+import { Button } from "@repo/web-ui/button";
+import { SectionLoading } from "@repo/web-ui/loading";
+import { Pagination } from "@repo/web-ui/pagination";
+import { Show } from "@repo/web-ui/show";
 import {
   Table,
   TableBody,
@@ -12,12 +12,12 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@repo/web-core/components/table";
-import { Tooltip } from "@repo/web-core/components/tooltip";
+} from "@repo/web-ui/table";
+import { Tooltip } from "@repo/web-ui/tooltip";
 
 import type { AuditLogsViewModel } from "@/features/audit-logs/controllers/use-audit-logs-controller";
 
-import { formatAuditAction } from "@/features/audit-logs/model/audit-logs-filters";
+import { formatAuditAction } from "@/features/audit-logs/model/audit-logs.filters";
 import { formatDateTime, timeAgo } from "@/lib/format";
 
 interface AuditLogsTableProps {

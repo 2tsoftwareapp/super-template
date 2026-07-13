@@ -1,8 +1,8 @@
 "use client";
 
-import { Badge } from "@repo/web-core/components/badge";
-import { Label } from "@repo/web-core/components/label";
-import { Separator } from "@repo/web-core/components/separator";
+import { Badge } from "@repo/web-ui/badge";
+import { Label } from "@repo/web-ui/label";
+import { Separator } from "@repo/web-ui/separator";
 
 import type { MailDeliveryDto } from "@/lib/api-types";
 

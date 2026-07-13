@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@repo/web-core/components/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@repo/web-ui/card";
 
 import { cn } from "@/lib/utils";
 

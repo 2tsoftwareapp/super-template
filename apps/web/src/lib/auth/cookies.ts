@@ -1,4 +1,4 @@
-import { createAuthCookieHelpers } from "@repo/web-core/auth/cookies";
+import { createAuthCookieHelpers } from "@repo/web-server/auth/cookies";
 
 import {
   ACCESS_TOKEN_COOKIE,

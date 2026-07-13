@@ -1,1 +1,1 @@
-export * from "@repo/web-core/api-types";
+export * from "@repo/web-utils/api-types";

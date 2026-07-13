@@ -1,8 +1,8 @@
 "use client";
 
-import { Checkbox } from "@repo/web-core/components/checkbox";
-import { Input } from "@repo/web-core/components/input";
-import { Label } from "@repo/web-core/components/label";
+import { Checkbox } from "@repo/web-ui/checkbox";
+import { Input } from "@repo/web-ui/input";
+import { Label } from "@repo/web-ui/label";
 
 interface SettingFieldProps {
   label: string;

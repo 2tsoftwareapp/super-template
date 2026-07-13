@@ -1,0 +1,25 @@
+{
+  "name": "@repo/web-hooks",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./use-debounced-value": "./src/use-debounced-value.ts",
+    "./use-is-mobile": "./src/use-is-mobile.ts"
+  },
+  "scripts": {
+    "build": "node ../../tools/tsc7/node_modules/typescript7/bin/tsc -p tsconfig.json",
+    "lint": "eslint .",
+    "typecheck": "node ../../tools/tsc7/node_modules/typescript7/bin/tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "react": "19.2.4"
+  },
+  "devDependencies": {
+    "@repo/tsconfig": "workspace:*",
+    "@types/react": "19.2.6",
+    "typescript": "5.9.3"
+  },
+  "sideEffects": false
+}

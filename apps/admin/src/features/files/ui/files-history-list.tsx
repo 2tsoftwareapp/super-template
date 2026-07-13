@@ -1,6 +1,6 @@
-import { Badge } from "@repo/web-core/components/badge";
-import { Show } from "@repo/web-core/components/show";
-import { Spinner } from "@repo/web-core/components/spinner";
+import { Badge } from "@repo/web-ui/badge";
+import { Show } from "@repo/web-ui/show";
+import { Spinner } from "@repo/web-ui/spinner";
 
 import type { FileHistoryEventDto } from "@/lib/api-types";
 

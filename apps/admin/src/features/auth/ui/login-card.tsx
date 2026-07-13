@@ -2,21 +2,21 @@
 
 import type { UseFormReturn } from "react-hook-form";
 
-import { Alert } from "@repo/web-core/components/alert";
-import { Button } from "@repo/web-core/components/button";
+import { Alert } from "@repo/web-ui/alert";
+import { Button } from "@repo/web-ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@repo/web-core/components/card";
-import { Input } from "@repo/web-core/components/input";
-import { Label } from "@repo/web-core/components/label";
-import { PasswordInput } from "@repo/web-core/components/password-input";
-import { Separator } from "@repo/web-core/components/separator";
+} from "@repo/web-ui/card";
+import { Input } from "@repo/web-ui/input";
+import { Label } from "@repo/web-ui/label";
+import { PasswordInput } from "@repo/web-ui/password-input";
+import { Separator } from "@repo/web-ui/separator";
 
-import type { AdminLoginInput } from "@/features/auth/model/auth-schemas";
+import type { AdminLoginInput } from "@/features/auth/model/auth.schemas";
 import type { SsoProvider } from "@/lib/api-paths";
 
 import {
@@ -25,7 +25,7 @@ import {
   AUTH_MESSAGES,
   LOGIN_FORM_COPY,
   SSO_PROVIDER_OPTIONS,
-} from "@/features/auth/model/auth-constants";
+} from "@/features/auth/model/auth.constants";
 
 import { ProviderIcon } from "./provider-icon";
 

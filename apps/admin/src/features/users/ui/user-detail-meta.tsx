@@ -1,4 +1,4 @@
-import { Badge } from "@repo/web-core/components/badge";
+import { Badge } from "@repo/web-ui/badge";
 import { BadgeCheck, XCircle } from "lucide-react";
 
 import type { AdminUserDto } from "@/lib/api-types";

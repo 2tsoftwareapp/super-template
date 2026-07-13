@@ -1,6 +1,6 @@
-import { Button } from "@repo/web-core/components/button";
-import { ConfirmDialog } from "@repo/web-core/components/confirm-dialog";
-import { Show } from "@repo/web-core/components/show";
+import { Button } from "@repo/web-ui/button";
+import { ConfirmDialog } from "@repo/web-ui/confirm-dialog";
+import { Show } from "@repo/web-ui/show";
 import { Trash2 } from "lucide-react";
 
 import type { UserDetailViewModel } from "@/features/users/controllers/use-user-detail-controller";

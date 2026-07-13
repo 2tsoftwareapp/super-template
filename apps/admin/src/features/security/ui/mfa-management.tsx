@@ -1,26 +1,26 @@
 "use client";
 
-import { Button } from "@repo/web-core/components/button";
+import { Button } from "@repo/web-ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@repo/web-core/components/card";
-import { Spinner } from "@repo/web-core/components/spinner";
+} from "@repo/web-ui/card";
+import { Spinner } from "@repo/web-ui/spinner";
 import { Shield } from "lucide-react";
 import { useState } from "react";
 
-import type { MfaSetupResponse } from "@/features/security/model/security-schemas";
+import type { MfaSetupResponse } from "@/features/security/model/security.schemas";
 
 import {
   useConfirmMfaMutation,
   useDisableMfaMutation,
   useRegenerateMfaCodesMutation,
   useSetupMfaMutation,
-} from "@/features/security/use-mfa-mutations";
-import { useMfaStatusQuery } from "@/features/security/use-mfa-queries";
+} from "@/features/security/api/security.mutations";
+import { useMfaStatusQuery } from "@/features/security/api/security.queries";
 
 import { MfaEnabledActions } from "./mfa-enabled-actions";
 import { MfaRecoveryCodes } from "./mfa-recovery-codes";

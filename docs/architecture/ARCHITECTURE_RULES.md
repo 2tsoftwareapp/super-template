@@ -50,9 +50,42 @@ packages/
   api-seed/       seed data
   api-sort/       shared sorting contract/helpers
   env-loader/     environment resolution
-  web-core/       shared frontend primitives and reusable web logic
+  config/         cross-runtime non-API config, single source of truth
+  utils/          runtime-agnostic pure-TS shared by backend AND web
+  web-ui/         shared frontend UI components (no hooks, no logic)
+  web-hooks/      shared frontend React hooks
+  web-utils/      web-only non-hook logic (http, session, storage, cn)
+  web-server/     server-only web logic (auth, cookies, BFF backend)
   web-test/       shared frontend test utilities
 ```
+
+### 2.1 Shared-package layering
+
+Package placement is governed by **which runtimes** may import the code:
+
+| Package | May import | Never contains |
+| --- | --- | --- |
+| `@repo/utils` | backend + web + app-via-codegen | `react`, `next`, `@nestjs/*`, DOM or Node-only APIs |
+| `@repo/config` | backend + web + app-via-JSON/Dart | framework code; API-shaped config (that is the contract's job) |
+| `@repo/web-ui` | web only | hooks, data-fetching, business logic |
+| `@repo/web-hooks` | web only | non-hook logic, UI markup |
+| `@repo/web-utils` | web only | React components, React hooks |
+| `@repo/web-server` | web server only | client-only (`"use client"`) code |
+
+Rules:
+
+- **`@repo/utils` must stay runtime-agnostic.** It is the only package importable by
+  both the NestJS API and the Next.js BFFs. It must not import any framework, DOM,
+  or Node-only API. Duplicated pure-TS logic (e.g. the JSON value model) lives here;
+  `@repo/api-core` and `@repo/web-utils` re-export from it rather than redefining.
+- **API-shaped config is NOT shared config.** Enums, DTOs, and endpoints are synced
+  across runtimes by the generated OpenAPI contract (`@repo/api-contract` → TS + Dart).
+  Only non-API constants (pagination defaults, cookie names, feature flags) belong in
+  `@repo/config`.
+- **`@repo/config` is a generated source of truth.** `src/app-config.ts` is authored in
+  TypeScript; `pnpm generate` serializes it to `generated/config.json` and a Dart
+  artifact under `apps/mobile/lib/generated/config/`. Do not hand-edit the generated
+  files. Backend and web import the TS directly; the app consumes the generated Dart.
 
 ## 3. Composition roots
 
@@ -930,8 +963,12 @@ Do not store shareable list state only in component state.
 UI primitives come from:
 
 ```text
-@repo/web-core/components/*
+@repo/web-ui/*
 ```
+
+Shared React hooks come from `@repo/web-hooks/*`. Non-hook web logic (http,
+session, storage, `cn`) comes from `@repo/web-utils/*`. Do not put hooks in
+`@repo/web-ui` or components in `@repo/web-hooks`.
 
 Do not create local duplicates of:
 
@@ -1268,7 +1305,7 @@ The repository should enforce at least:
 - `model/**` cannot import React, React Query, router, or HTTP;
 - only `*.api.ts` and shared HTTP infrastructure may call `webFetch`;
 - features cannot deep-import another feature;
-- UI primitives must come from `web-core`.
+- UI primitives must come from `web-ui`.
 
 Use ESLint, source-policy scripts, Turborepo boundaries, architecture tests, and CI grep guards.
 
@@ -1433,7 +1470,7 @@ Ask in order:
 7. Is it rendering?
    - `ui/`
 8. Is it reusable across multiple features?
-   - shared app component or `web-core`, depending on ownership
+   - shared app component or `web-ui`/`web-hooks`/`web-utils`, depending on ownership
 
 ---
 

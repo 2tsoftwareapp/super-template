@@ -1,0 +1,22 @@
+{
+  "name": "@repo/config",
+  "version": "1.0.0",
+  "private": true,
+  "exports": {
+    ".": "./src/index.ts",
+    "./pagination": "./src/pagination.ts"
+  },
+  "scripts": {
+    "build": "node ../../tools/tsc7/node_modules/typescript7/bin/tsc -p tsconfig.json",
+    "generate": "tsx scripts/generate.ts",
+    "lint": "eslint .",
+    "typecheck": "node ../../tools/tsc7/node_modules/typescript7/bin/tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "@repo/tsconfig": "workspace:*",
+    "@types/node": "24.10.1",
+    "tsx": "4.22.4",
+    "typescript": "5.9.3"
+  },
+  "sideEffects": false
+}

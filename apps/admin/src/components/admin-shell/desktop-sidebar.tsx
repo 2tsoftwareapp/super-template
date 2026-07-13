@@ -1,7 +1,7 @@
 "use client";
 
-import { Button } from "@repo/web-core/components/button";
-import { Separator } from "@repo/web-core/components/separator";
+import { Button } from "@repo/web-ui/button";
+import { Separator } from "@repo/web-ui/separator";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import { cn } from "@/lib/utils";

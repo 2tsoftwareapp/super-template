@@ -1,12 +1,12 @@
 "use client";
 
-import { Button } from "@repo/web-core/components/button";
-import { Card, CardContent } from "@repo/web-core/components/card";
-import { ConfirmDialog } from "@repo/web-core/components/confirm-dialog";
-import { Empty } from "@repo/web-core/components/empty";
-import { Input } from "@repo/web-core/components/input";
-import { SectionLoading } from "@repo/web-core/components/loading";
-import { Show } from "@repo/web-core/components/show";
+import { Button } from "@repo/web-ui/button";
+import { Card, CardContent } from "@repo/web-ui/card";
+import { ConfirmDialog } from "@repo/web-ui/confirm-dialog";
+import { Empty } from "@repo/web-ui/empty";
+import { Input } from "@repo/web-ui/input";
+import { SectionLoading } from "@repo/web-ui/loading";
+import { Show } from "@repo/web-ui/show";
 import { LockKeyhole, Plus, Search, ShieldCheck, X } from "lucide-react";
 
 import type { RolesViewModel } from "@/features/roles/controllers/use-roles-controller";

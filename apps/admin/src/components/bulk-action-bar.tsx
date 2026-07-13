@@ -1,4 +1,4 @@
-import { Button } from "@repo/web-core/components/button";
+import { Button } from "@repo/web-ui/button";
 import { type ReactNode, useEffect, useState } from "react";
 
 import { cn } from "@/lib/utils";

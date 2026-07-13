@@ -1,11 +1,11 @@
 "use client";
 
-import { Label } from "@repo/web-core/components/label";
-import { Separator } from "@repo/web-core/components/separator";
+import { Label } from "@repo/web-ui/label";
+import { Separator } from "@repo/web-ui/separator";
 
 import type { AuditLogDto } from "@/lib/api-types";
 
-import { formatAuditAction } from "@/features/audit-logs/model/audit-logs-filters";
+import { formatAuditAction } from "@/features/audit-logs/model/audit-logs.filters";
 import { formatDateTime } from "@/lib/format";
 
 interface AuditLogsEventDetailProps {

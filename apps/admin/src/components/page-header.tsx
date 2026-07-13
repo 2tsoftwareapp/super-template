@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { Badge } from "@repo/web-core/components/badge";
+import { Badge } from "@repo/web-ui/badge";
 
 export function PageHeader({
   label,

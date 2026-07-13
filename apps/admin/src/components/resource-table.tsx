@@ -1,5 +1,5 @@
-import { Empty } from "@repo/web-core/components/empty";
-import { Skeleton } from "@repo/web-core/components/skeleton";
+import { Empty } from "@repo/web-ui/empty";
+import { Skeleton } from "@repo/web-ui/skeleton";
 import {
   Table,
   TableBody,
@@ -7,7 +7,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@repo/web-core/components/table";
+} from "@repo/web-ui/table";
 import {
   flexRender,
   type Table as ReactTable,

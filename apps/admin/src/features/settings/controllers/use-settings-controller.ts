@@ -5,13 +5,13 @@ import { toast } from "sonner";
 
 import type { ApplicationSettingDto } from "@/lib/api-types";
 
+import { useUpdateSettingMutation } from "@/features/settings/api/settings.mutations";
+import { useSettingsQuery } from "@/features/settings/api/settings.queries";
 import {
   initDraft,
   isObjectValue,
   objectDraftChanged,
 } from "@/features/settings/model/settings-drafts";
-import { useUpdateSettingMutation } from "@/features/settings/use-settings-mutations";
-import { useSettingsQuery } from "@/features/settings/use-settings-queries";
 import { parseJsonValue } from "@/lib/json";
 
 import type { SettingRow, SettingsViewModel } from "./settings-view-model";

@@ -1,6 +1,6 @@
 "use client";
 
-import { safeLocalStorage } from "@repo/web-core";
+import { safeLocalStorage } from "@repo/web-utils";
 import { useState } from "react";
 
 import { useAdminSession } from "@/components/admin-guard";

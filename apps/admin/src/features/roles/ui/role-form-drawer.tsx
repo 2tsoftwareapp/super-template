@@ -1,22 +1,22 @@
 "use client";
 
 import { standardSchemaResolver as zodResolver } from "@hookform/resolvers/standard-schema";
-import { Button } from "@repo/web-core/components/button";
-import { Input } from "@repo/web-core/components/input";
-import { Label } from "@repo/web-core/components/label";
-import { Spinner } from "@repo/web-core/components/spinner";
+import { Button } from "@repo/web-ui/button";
+import { Input } from "@repo/web-ui/input";
+import { Label } from "@repo/web-ui/label";
+import { Spinner } from "@repo/web-ui/spinner";
 import { useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 
 import { PermissionMultiSelect } from "@/components/permission-multi-select";
 import { ResourceDrawer } from "@/components/resource-drawer";
+import { useSaveRoleMutation } from "@/features/roles/api/roles.mutations";
 import {
   type EditableRole,
   type PermissionDto,
   type RoleForm,
   roleSchema,
-} from "@/features/roles/model/roles-schemas";
-import { useSaveRoleMutation } from "@/features/roles/use-roles-mutations";
+} from "@/features/roles/model/roles.schemas";
 
 export function RoleFormDrawer({
   open,

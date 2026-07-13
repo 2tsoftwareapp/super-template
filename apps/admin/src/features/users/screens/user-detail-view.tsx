@@ -1,6 +1,6 @@
 "use client";
 
-import { Skeleton } from "@repo/web-core/components/skeleton";
+import { Skeleton } from "@repo/web-ui/skeleton";
 
 import { ResourcePageShell } from "@/components/resource-page-shell";
 import { useUserDetailController } from "@/features/users/controllers/use-user-detail-controller";

@@ -1,7 +1,7 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/web-core/components/card";
-import { ConfirmDialog } from "@repo/web-core/components/confirm-dialog";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/web-ui/card";
+import { ConfirmDialog } from "@repo/web-ui/confirm-dialog";
 import { useRef } from "react";
 
 import type { FilesViewModel } from "@/features/files/controllers/files-view-model";

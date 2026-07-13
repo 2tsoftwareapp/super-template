@@ -1,7 +1,7 @@
-import { Input } from "@repo/web-core/components/input";
-import { Label } from "@repo/web-core/components/label";
-import { LoadingButton } from "@repo/web-core/components/loading-button";
-import { Show } from "@repo/web-core/components/show";
+import { Input } from "@repo/web-ui/input";
+import { Label } from "@repo/web-ui/label";
+import { LoadingButton } from "@repo/web-ui/loading-button";
+import { Show } from "@repo/web-ui/show";
 import { CheckCircle2 } from "lucide-react";
 
 import type { UserDetailViewModel } from "@/features/users/controllers/use-user-detail-controller";

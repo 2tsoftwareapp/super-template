@@ -1,19 +1,19 @@
 "use client";
 
-import { Button } from "@repo/web-core/components/button";
+import { Button } from "@repo/web-ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@repo/web-core/components/card";
-import { ErrorState } from "@repo/web-core/components/error-state";
-import { Input } from "@repo/web-core/components/input";
-import { SectionLoading } from "@repo/web-core/components/loading";
-import { Separator } from "@repo/web-core/components/separator";
-import { Show } from "@repo/web-core/components/show";
-import { Spinner } from "@repo/web-core/components/spinner";
+} from "@repo/web-ui/card";
+import { ErrorState } from "@repo/web-ui/error-state";
+import { Input } from "@repo/web-ui/input";
+import { SectionLoading } from "@repo/web-ui/loading";
+import { Separator } from "@repo/web-ui/separator";
+import { Show } from "@repo/web-ui/show";
+import { Spinner } from "@repo/web-ui/spinner";
 
 import type { MailPreviewDto } from "@/lib/api-types";
 

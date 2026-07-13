@@ -1,10 +1,9 @@
-export type JsonPrimitive = string | number | boolean | null;
-export interface JsonObject {
-  [key: string]: JsonValue;
-}
-export type JsonArray = JsonValue[];
-export type JsonValue = JsonPrimitive | JsonObject | JsonArray;
-
-export function isJsonObject(value: unknown): value is JsonObject {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
+// Re-exported from the runtime-agnostic shared package so the NestJS API and the
+// web BFF share a single JSON value model. See @repo/utils/json.
+export type {
+  JsonArray,
+  JsonObject,
+  JsonPrimitive,
+  JsonValue,
+} from '@repo/utils/json';
+export { isJsonObject, isJsonValue, parseJsonValue } from '@repo/utils/json';

@@ -8,19 +8,19 @@ import { useForm, type UseFormReturn } from "react-hook-form";
 import type { AdminUserDto } from "@/lib/api-types";
 
 import {
-  type ProfileForm,
-  profileSchema,
-} from "@/features/users/model/users-schemas";
-import {
   useDeleteUserMutation,
   useReplaceRolesMutation,
   useUpdateProfileMutation,
   useUpdateStatusMutation,
-} from "@/features/users/use-user-detail-mutations";
+} from "@/features/users/api/users.mutations";
 import {
   useAdminRolesQuery,
   useAdminUserQuery,
-} from "@/features/users/use-user-detail-queries";
+} from "@/features/users/api/users.queries";
+import {
+  type ProfileForm,
+  profileSchema,
+} from "@/features/users/model/users.schemas";
 import { useSession } from "@/hooks/use-session";
 import { useRouter } from "@/i18n/navigation";
 

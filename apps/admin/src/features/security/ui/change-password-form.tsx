@@ -1,24 +1,24 @@
 "use client";
 
 import { standardSchemaResolver as zodResolver } from "@hookform/resolvers/standard-schema";
-import { Button } from "@repo/web-core/components/button";
+import { Button } from "@repo/web-ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@repo/web-core/components/card";
-import { Label } from "@repo/web-core/components/label";
-import { PasswordInput } from "@repo/web-core/components/password-input";
-import { Spinner } from "@repo/web-core/components/spinner";
+} from "@repo/web-ui/card";
+import { Label } from "@repo/web-ui/label";
+import { PasswordInput } from "@repo/web-ui/password-input";
+import { Spinner } from "@repo/web-ui/spinner";
 import { useForm } from "react-hook-form";
 
+import { useChangePasswordMutation } from "@/features/security/api/security.mutations";
 import {
   type ChangePasswordFormValues,
   changePasswordSchema,
-} from "@/features/security/model/security-schemas";
-import { useChangePasswordMutation } from "@/features/security/use-security-mutations";
+} from "@/features/security/model/security.schemas";
 
 export function ChangePasswordForm() {
   const {

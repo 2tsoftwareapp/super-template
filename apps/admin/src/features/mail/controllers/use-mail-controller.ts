@@ -12,7 +12,7 @@ import {
   useMailDeliveriesQuery,
   useMailPreviewQuery,
   useMailTemplatesQuery,
-} from "@/features/mail/use-mail-queries";
+} from "@/features/mail/api/mail.queries";
 import { adminResources } from "@/lib/admin-resources";
 
 import type { Filters } from "../model/mail-schemas";

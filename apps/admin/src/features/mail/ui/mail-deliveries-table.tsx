@@ -1,18 +1,18 @@
 "use client";
 
-import { Badge } from "@repo/web-core/components/badge";
-import { Button } from "@repo/web-core/components/button";
+import { Badge } from "@repo/web-ui/badge";
+import { Button } from "@repo/web-ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@repo/web-core/components/card";
-import { Input } from "@repo/web-core/components/input";
-import { SectionLoading } from "@repo/web-core/components/loading";
-import { Pagination } from "@repo/web-core/components/pagination";
-import { Show } from "@repo/web-core/components/show";
+} from "@repo/web-ui/card";
+import { Input } from "@repo/web-ui/input";
+import { SectionLoading } from "@repo/web-ui/loading";
+import { Pagination } from "@repo/web-ui/pagination";
+import { Show } from "@repo/web-ui/show";
 import {
   Table,
   TableBody,
@@ -20,7 +20,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@repo/web-core/components/table";
+} from "@repo/web-ui/table";
 import { RefreshCw } from "lucide-react";
 
 import type { MailDeliveryDto } from "@/lib/api-types";

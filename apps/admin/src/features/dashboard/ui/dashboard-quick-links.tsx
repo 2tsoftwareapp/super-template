@@ -1,5 +1,5 @@
-import { Button } from "@repo/web-core/components/button";
-import { Card, CardContent } from "@repo/web-core/components/card";
+import { Button } from "@repo/web-ui/button";
+import { Card, CardContent } from "@repo/web-ui/card";
 import { Mail, Megaphone, Shield, Users, Workflow } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";

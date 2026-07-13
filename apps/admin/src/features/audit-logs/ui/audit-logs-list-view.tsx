@@ -1,9 +1,9 @@
 "use client";
 
-import { Button } from "@repo/web-core/components/button";
-import { Card, CardContent } from "@repo/web-core/components/card";
-import { DatePicker } from "@repo/web-core/components/date-picker";
-import { Input } from "@repo/web-core/components/input";
+import { Button } from "@repo/web-ui/button";
+import { Card, CardContent } from "@repo/web-ui/card";
+import { DatePicker } from "@repo/web-ui/date-picker";
+import { Input } from "@repo/web-ui/input";
 import { Search, X } from "lucide-react";
 
 import type { AuditLogsViewModel } from "@/features/audit-logs/controllers/use-audit-logs-controller";

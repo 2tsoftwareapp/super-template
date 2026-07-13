@@ -25,6 +25,8 @@ run_step() {
   rm -f "$log_file"
 }
 
+run_step "Generate shared config artifacts" pnpm --filter @repo/config generate
+
 pnpm --filter api openapi:generate
 pnpm --filter api contract:generate
 

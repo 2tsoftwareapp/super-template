@@ -1,17 +1,17 @@
 "use client";
 
-import { useDebouncedValue } from "@repo/web-core/hooks";
+import { useDebouncedValue } from "@repo/web-hooks/use-debounced-value";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 import type { AuditLogDto } from "@/lib/api-types";
 
+import { useAuditLogsQuery } from "@/features/audit-logs/api/audit-logs.queries";
 import {
   type AuditLogsFilters,
   parseAuditLogsFilters,
   serializeAuditLogsFilters,
-} from "@/features/audit-logs/model/audit-logs-filters";
-import { useAuditLogsQuery } from "@/features/audit-logs/use-audit-logs-queries";
+} from "@/features/audit-logs/model/audit-logs.filters";
 import { usePathname, useRouter } from "@/i18n/navigation";
 
 export interface AuditLogsViewModel {

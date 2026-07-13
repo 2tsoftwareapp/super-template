@@ -1,5 +1,5 @@
-import { Label } from "@repo/web-core/components/label";
-import { Separator } from "@repo/web-core/components/separator";
+import { Label } from "@repo/web-ui/label";
+import { Separator } from "@repo/web-ui/separator";
 
 import type { FileDto } from "@/lib/api-types";
 
