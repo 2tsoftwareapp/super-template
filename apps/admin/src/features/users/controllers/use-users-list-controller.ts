@@ -1,29 +1,15 @@
 "use client";
 
 import { useDebouncedValue } from "@repo/web-core/hooks";
-import {
-  getCoreRowModel,
-  type RowSelectionState,
-  type SortingState,
-  type Table,
-  type Updater,
-  useReactTable,
-} from "@tanstack/react-table";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import type { AdminUserDto } from "@/lib/api-types";
-
-import {
-  paramsFromSortingState,
-  sortingStateFromParams,
-  usersSortChanged,
-} from "@/features/users/model/sorting";
-import {
-  type UsersListParams,
-  type UsersPageSize,
-  type UserStatusFilter,
+import type {
+  UsersListParams,
+  UsersPageSize,
+  UserStatusFilter,
 } from "@/features/users/model/types";
+
 import { selectUserManagementPermissions } from "@/features/users/model/users-permissions";
 import {
   parseUsersListSearchParams,
@@ -38,7 +24,7 @@ import { useUsersListQuery } from "@/features/users/use-users-queries";
 import { useSession } from "@/hooks/use-session";
 import { usePathname, useRouter } from "@/i18n/navigation";
 
-import { createUsersTableColumns } from "../ui/users-table-columns";
+import { useUsersTableConfig } from "./use-users-table-config";
 
 interface ConfirmBlockState {
   userIds: string[];
@@ -60,7 +46,7 @@ export interface UsersListViewModel {
     isError: boolean;
     isLoading: boolean;
     onRetry: () => void;
-    table: Table<AdminUserDto>;
+    table: ReturnType<typeof useUsersTableConfig>["table"];
     hasFilters: boolean;
     emptyTitle: string;
     emptyDescription: string;
@@ -105,12 +91,6 @@ export interface UsersListViewModel {
   };
 }
 
-/**
- * Orchestration hook for the users list screen: URL/search-param state,
- * debounced search, server queries + mutations, permission selection, table /
- * sort / selection state, dialog state and event handlers. Returns a view model
- * consumed by the presentational UsersListView.
- */
 export function useUsersListController(): UsersListViewModel {
   const router = useRouter();
   const pathname = usePathname();
@@ -122,7 +102,6 @@ export function useUsersListController(): UsersListViewModel {
     [searchParams],
   );
   const [searchInput, setSearchInput] = useState(listParams.search);
-  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [showCreate, setShowCreate] = useState(false);
   const [pendingAction, setPendingAction] = useState<
     "activate" | "block" | null
@@ -134,6 +113,7 @@ export function useUsersListController(): UsersListViewModel {
   const debouncedSearch = useDebouncedValue(searchInput, 500);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- sync the search input when the URL param changes (e.g. back/forward, clear filters)
     setSearchInput(listParams.search);
   }, [listParams.search]);
 
@@ -207,74 +187,28 @@ export function useUsersListController(): UsersListViewModel {
     [resendVerification],
   );
 
-  const columns = useMemo(
-    () =>
-      createUsersTableColumns({
-        canUpdate,
-        onActivate: handleActivate,
-        onBlock: handleBlock,
-        onResendVerification: handleResendVerification,
-        isDisabled: activateUsers.isPending || blockUsers.isPending,
-      }),
-    [
+  const handleSortChange = useCallback(
+    (nextSort: UsersListParams["sort"]) => {
+      patchListParams({ sort: nextSort, page: 1 });
+    },
+    [patchListParams],
+  );
+
+  const isMutating = activateUsers.isPending || blockUsers.isPending;
+
+  const { table, selectedIds, clearSelection, setRowSelection } =
+    useUsersTableConfig({
+      pageUsers,
       canUpdate,
+      isMutating,
+      listParams,
       handleActivate,
       handleBlock,
       handleResendVerification,
-      activateUsers.isPending,
-      blockUsers.isPending,
-    ],
-  );
+      onSortChange: handleSortChange,
+    });
 
-  const sorting = useMemo(
-    () => sortingStateFromParams(queryParams),
-    [queryParams],
-  );
-
-  const handleStatusFilter = (status: UserStatusFilter) => {
-    patchListParams({ status, page: 1 });
-    setRowSelection({});
-  };
-
-  const handleSortingChange = (updater: Updater<SortingState>) => {
-    const currentSorting = sortingStateFromParams(listParams);
-    const nextSorting =
-      typeof updater === "function" ? updater(currentSorting) : updater;
-    const resolvedSorting =
-      nextSorting.length > 0 ? nextSorting : currentSorting;
-    const { sort: nextSort } = paramsFromSortingState(
-      resolvedSorting,
-      listParams,
-    );
-
-    if (!usersSortChanged(listParams.sort, nextSort)) {
-      return;
-    }
-
-    patchListParams({ sort: nextSort, page: 1 });
-    setRowSelection({});
-  };
-
-  const table = useReactTable({
-    data: pageUsers,
-    columns,
-    getRowId: (row) => row.id,
-    getCoreRowModel: getCoreRowModel(),
-    manualSorting: true,
-    enableMultiSort: true,
-    maxMultiSortColCount: 4,
-    enableSortingRemoval: false,
-    onSortingChange: handleSortingChange,
-    onRowSelectionChange: setRowSelection,
-    state: { sorting, rowSelection },
-  });
-
-  const selectedIds = table
-    .getSelectedRowModel()
-    .rows.map((row) => row.original.id);
   const hasFilters = Boolean(searchInput || queryParams.status !== "all");
-
-  const clearSelection = () => setRowSelection({});
 
   const handleRowClick = (id: string) => {
     const returnTo = serializeUsersListSearchParams(queryParams).toString();
@@ -315,7 +249,31 @@ export function useUsersListController(): UsersListViewModel {
     }
   };
 
-  const isMutating = activateUsers.isPending || blockUsers.isPending;
+  const handleStatusFilter = (status: UserStatusFilter) => {
+    patchListParams({ status, page: 1 });
+    setRowSelection({});
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearchInput(value);
+    setRowSelection({});
+  };
+
+  const handleClearFilters = () => {
+    setSearchInput("");
+    patchListParams({ status: "all", search: "", page: 1 });
+    setRowSelection({});
+  };
+
+  const handlePageChange = (page: number) => {
+    patchListParams({ page });
+    setRowSelection({});
+  };
+
+  const handlePageSizeChange = (limit: number) => {
+    patchListParams({ limit: limit as UsersPageSize, page: 1 });
+    setRowSelection({});
+  };
 
   return {
     session: { isLoading: session.isLoading, isError: session.isError },
@@ -341,15 +299,8 @@ export function useUsersListController(): UsersListViewModel {
     },
     toolbar: {
       search: searchInput,
-      onSearchChange: (value: string) => {
-        setSearchInput(value);
-        setRowSelection({});
-      },
-      onClearFilters: () => {
-        setSearchInput("");
-        patchListParams({ status: "all", search: "", page: 1 });
-        setRowSelection({});
-      },
+      onSearchChange: handleSearchChange,
+      onClearFilters: handleClearFilters,
       currentStatus: queryParams.status,
       onStatusFilter: handleStatusFilter,
     },
@@ -369,14 +320,8 @@ export function useUsersListController(): UsersListViewModel {
       totalPages,
       total,
       isFetching: users.isFetching,
-      onPageChange: (page: number) => {
-        patchListParams({ page });
-        setRowSelection({});
-      },
-      onPageSizeChange: (limit: number) => {
-        patchListParams({ limit: limit as UsersPageSize, page: 1 });
-        setRowSelection({});
-      },
+      onPageChange: handlePageChange,
+      onPageSizeChange: handlePageSizeChange,
     },
     createDrawer: {
       open: showCreate,

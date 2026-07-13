@@ -2,25 +2,18 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import type {
-  AdminUserDto,
-  ListResponse,
-} from "@/lib/api-types";
-
-import { webFetch } from "@/lib/http";
-
 import type { UsersListParams } from "./model/types";
 
-import { buildUsersListPath } from "./api/users-api";
+import { buildUsersListPath, usersApi } from "./api/users-api";
 import { usersSortKey } from "./model/sorting";
-import { USERS_QUERY_KEY } from "./model/users-query-keys";
+import { usersKeys } from "./model/users-query-keys";
 
 export function useUsersListQuery(params: UsersListParams) {
   const listPath = buildUsersListPath(params);
 
   return useQuery({
-    queryKey: [USERS_QUERY_KEY, listPath, usersSortKey(params.sort)],
-    queryFn: () => webFetch<ListResponse<AdminUserDto>>(listPath),
+    queryKey: usersKeys.list({ listPath, sortKey: usersSortKey(params.sort) }),
+    queryFn: () => usersApi.list(params),
     placeholderData: (previous) => previous,
   });
 }

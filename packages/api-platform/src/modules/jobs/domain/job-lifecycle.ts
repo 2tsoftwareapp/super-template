@@ -1,7 +1,7 @@
 // Pure domain rules for the job lifecycle. No NestJS, no Drizzle — this layer
 // must stay framework-free (enforced by scripts/check-source-policy.sh).
 
-import type { JobStatus } from '../application/jobs.types';
+import type { JobStatus } from './job-status';
 
 /** Statuses a job can never leave. */
 const TERMINAL_STATUSES: ReadonlySet<JobStatus> = new Set([

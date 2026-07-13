@@ -32,7 +32,7 @@ import { AuthMailService } from '../../../auth/application/services/auth-mail.se
 import { AuthRepository } from '../../../auth/infrastructure/auth.repository';
 import { OrganizationsService } from '../../../organizations/application/organizations.service';
 import { OrganizationsRepository } from '../../../organizations/infrastructure/organizations.repository';
-import { resolveAssignableRole } from '../../domain/assignable-role.resolver';
+import { resolveAssignableRole } from '../assignable-role.resolver';
 import {
   USERS_REPOSITORY,
   type UsersRepositoryPort,

@@ -18,9 +18,10 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 import { useSession } from "@/hooks/use-session";
-import { webFetch } from "@/lib/http";
 import { clientNavItems } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
+
+import { sessionApi } from "../api/session-api";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -118,7 +119,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   variant="outline"
                   onClick={async () => {
                     try {
-                      await webFetch("/api/auth/logout", { method: "POST" });
+                      await sessionApi.logout();
                     } finally {
                       router.replace("/login");
                     }

@@ -4,9 +4,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import type { AdminUserDto, UpdateAdminUserInput } from "@/lib/api-types";
 
-import { webFetch } from "@/lib/http";
-
-import { USER_DETAIL_QUERY_KEY, USERS_QUERY_KEY } from "./model/users-query-keys";
+import { usersApi } from "./api/users-api";
+import { usersKeys } from "./model/users-query-keys";
 
 export function useUpdateProfileMutation(
   userId: string,
@@ -16,12 +15,9 @@ export function useUpdateProfileMutation(
 
   return useMutation({
     mutationFn: (input: UpdateAdminUserInput) =>
-      webFetch<{ data: AdminUserDto }>(`/api/bff/admin/users/${userId}`, {
-        method: "PATCH",
-        body: JSON.stringify(input),
-      }),
+      usersApi.updateProfile(userId, input),
     onSuccess: async (data) => {
-      await queryClient.invalidateQueries({ queryKey: [USER_DETAIL_QUERY_KEY, userId] });
+      await queryClient.invalidateQueries({ queryKey: usersKeys.detail(userId) });
       options?.onSuccess?.(data);
     },
   });
@@ -35,12 +31,9 @@ export function useUpdateStatusMutation(
 
   return useMutation({
     mutationFn: (status: string) =>
-      webFetch<{ data: AdminUserDto }>(
-        `/api/bff/admin/users/${userId}/status`,
-        { method: "PATCH", body: JSON.stringify({ status }) },
-      ),
+      usersApi.updateStatus(userId, status),
     onSuccess: async (data) => {
-      await queryClient.invalidateQueries({ queryKey: [USER_DETAIL_QUERY_KEY, userId] });
+      await queryClient.invalidateQueries({ queryKey: usersKeys.detail(userId) });
       options?.onSuccess?.(data);
     },
   });
@@ -54,12 +47,9 @@ export function useReplaceRolesMutation(
 
   return useMutation({
     mutationFn: (role: "ADMIN" | "USER") =>
-      webFetch<{ data: AdminUserDto }>(
-        `/api/bff/admin/users/${userId}/roles`,
-        { method: "PUT", body: JSON.stringify({ role }) },
-      ),
+      usersApi.replaceRoles(userId, role),
     onSuccess: async (data) => {
-      await queryClient.invalidateQueries({ queryKey: [USER_DETAIL_QUERY_KEY, userId] });
+      await queryClient.invalidateQueries({ queryKey: usersKeys.detail(userId) });
       options?.onSuccess?.(data);
     },
   });
@@ -73,9 +63,9 @@ export function useDeleteUserMutation(
 
   return useMutation({
     mutationFn: () =>
-      webFetch(`/api/bff/admin/users/${userId}`, { method: "DELETE" }),
+      usersApi.delete(userId),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: [USERS_QUERY_KEY] });
+      await queryClient.invalidateQueries({ queryKey: usersKeys.all });
       await options?.onSuccess?.();
     },
   });

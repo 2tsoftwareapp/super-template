@@ -1,10 +1,8 @@
 import type { JsonObject } from '@repo/api-core';
-export type JobStatus =
-  | 'PENDING'
-  | 'PROCESSING'
-  | 'COMPLETED'
-  | 'CANCELLED'
-  | 'FAILED';
+
+import type { JobStatus } from '../domain/job-status';
+
+export type { JobStatus };
 
 export interface JobView {
   id: string;

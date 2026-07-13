@@ -21,8 +21,8 @@ import {
   assertCanAssignRoleTargets,
   assertRoleScopeCanBeAssigned,
 } from '../../../access-control/domain/role-assignment.policy';
-import { resolveAssignableRole } from '../../domain/assignable-role.resolver';
 import { assertUserBelongsToOrganization } from '../../domain/user-org-scope.policy';
+import { resolveAssignableRole } from '../assignable-role.resolver';
 import {
   USERS_REPOSITORY,
   type UsersRepositoryPort,
