@@ -64,7 +64,7 @@ describe('loadEnvFiles precedence', () => {
     expect(process.env.ENVLOADER_SPEC_FOO).toBe('from_example');
   });
 
-  it('applies .env.local outside of test and lets it beat committed defaults', () => {
+  it('applies .env.local in development and lets it beat committed defaults', () => {
     dir = mkdtempSync(join(tmpdir(), 'envloader-'));
     writeFileSync(join(dir, 'pnpm-workspace.yaml'), "packages: []\n");
     writeFileSync(join(dir, '.env.local'), 'ENVLOADER_SPEC_FOO=from_local\n');
@@ -73,6 +73,17 @@ describe('loadEnvFiles precedence', () => {
     loadEnvFiles({ cwd: dir, appEnv: 'development' });
 
     expect(process.env.ENVLOADER_SPEC_FOO).toBe('from_local');
+  });
+
+  it('skips .env.local in production to prevent accidental overrides', () => {
+    dir = mkdtempSync(join(tmpdir(), 'envloader-'));
+    writeFileSync(join(dir, 'pnpm-workspace.yaml'), "packages: []\n");
+    writeFileSync(join(dir, '.env.local'), 'ENVLOADER_SPEC_FOO=from_local\n');
+    writeFileSync(join(dir, '.env.production'), 'ENVLOADER_SPEC_FOO=from_prod\n');
+
+    loadEnvFiles({ cwd: dir, appEnv: 'production' });
+
+    expect(process.env.ENVLOADER_SPEC_FOO).toBe('from_prod');
   });
 
   it('never overrides values already present in process.env', () => {

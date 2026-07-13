@@ -187,7 +187,7 @@ export const resolveAppEnv = (explicit?: string): string => {
  *
  *   1. real process env (already set — always wins)
  *   2. .env.<APP_ENV>.local   personal per-env overrides       [gitignored]
- *   3. .env.local             personal overrides (all envs)    [gitignored, skipped when APP_ENV=test]
+  *   3. .env.local             personal overrides (dev only)    [gitignored, skipped outside APP_ENV=development]
  *   4. .env.<APP_ENV>         committed non-secret defaults
  *   5. .env                   legacy local catch-all           [gitignored]
  *   6. .env.example           documented fallback
@@ -204,7 +204,7 @@ export const loadEnvFiles = (options: LoadEnvOptions = {}): string => {
 
   const files = [
     `.env.${appEnv}.local`,
-    appEnv === 'test' ? null : '.env.local',
+    appEnv === 'development' ? '.env.local' : null,
     `.env.${appEnv}`,
     '.env',
     '.env.example',
