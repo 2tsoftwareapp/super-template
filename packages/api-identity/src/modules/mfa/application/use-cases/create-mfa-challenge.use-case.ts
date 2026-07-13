@@ -1,15 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { durationToMilliseconds, generateOpaqueToken, hashOpaqueToken } from '@repo/api-core';
 
 import type { MfaCreateChallengeCommand } from '../mfa.types';
 
-import { MfaRepository } from '../../infrastructure/mfa.repository';
+import { MFA_REPOSITORY, type MfaRepositoryPort } from '../ports/mfa.repository.port';
 
 const CHALLENGE_TTL = '5m';
 
 @Injectable()
 export class CreateMfaChallengeUseCase {
-  constructor(private readonly mfaRepository: MfaRepository) {}
+  constructor(@Inject(MFA_REPOSITORY) private readonly mfaRepository: MfaRepositoryPort) {}
 
   async execute(input: MfaCreateChallengeCommand): Promise<string> {
     const token = generateOpaqueToken();

@@ -1,8 +1,4 @@
-import type { AttachmentsRepository } from '../infrastructure/attachments.repository';
-
-type AttachmentRecord = NonNullable<
-  Awaited<ReturnType<AttachmentsRepository['findById']>>
->;
+import type { AttachmentRecord } from './ports/attachments.repository.port';
 
 export class AttachmentsMapper {
   static toAttachmentDto(attachment: AttachmentRecord) {

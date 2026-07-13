@@ -1,10 +1,10 @@
 import type { AuthenticatedRequestUser } from '@repo/api-core';
 
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { requireOrganizationId } from '@repo/api-core';
 
-import { FilesRepository } from '../../infrastructure/files.repository';
 import { FilesMapper } from '../files.mapper';
+import { FILES_REPOSITORY, type FilesRepositoryPort } from '../ports/files.repository.port';
 
 export interface ListFilesQuery {
   page: number;
@@ -20,7 +20,9 @@ export interface ListFilesQuery {
 
 @Injectable()
 export class ListFilesUseCase {
-  constructor(private readonly filesRepository: FilesRepository) {}
+  constructor(
+    @Inject(FILES_REPOSITORY) private readonly filesRepository: FilesRepositoryPort,
+  ) {}
 
   async execute(actor: AuthenticatedRequestUser, query: ListFilesQuery) {
     const organizationId = requireOrganizationId(actor);

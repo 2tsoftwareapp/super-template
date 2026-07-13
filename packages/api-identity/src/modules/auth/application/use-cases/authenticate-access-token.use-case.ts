@@ -1,29 +1,41 @@
 import type { AuthenticatedRequestUser } from '@repo/api-core';
 
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { AppError, ERROR_CODES } from '@repo/api-core';
 
 import { AccessControlService } from '../../../access-control/application/access-control.service';
 import { OrganizationsService } from '../../../organizations/application/organizations.service';
-import { UsersRepository } from '../../../users/infrastructure/users.repository';
-import { AuthRepository } from '../../infrastructure/auth.repository';
+import {
+  USERS_REPOSITORY,
+  type UsersRepositoryPort,
+} from '../../../users/application/users.repository.port';
 import { assertSessionUsable } from '../auth.helpers';
-import { SessionTokenService } from '../services/session-token.service';
+import {
+  AUTH_SESSION_REPOSITORY,
+  type AuthSessionRepositoryPort,
+} from '../ports/auth-session.repository.port';
+import {
+  AUTH_TOKEN_PROVIDER,
+  type AuthTokenProviderPort,
+} from '../ports/auth-token.provider.port';
 
 @Injectable()
 export class AuthenticateAccessTokenUseCase {
   constructor(
-    private readonly authRepository: AuthRepository,
-    private readonly usersRepository: UsersRepository,
+    @Inject(AUTH_SESSION_REPOSITORY)
+    private readonly authSessionRepository: AuthSessionRepositoryPort,
+    @Inject(USERS_REPOSITORY)
+    private readonly usersRepository: UsersRepositoryPort,
     private readonly accessControlService: AccessControlService,
     private readonly organizationsService: OrganizationsService,
-    private readonly sessionTokenService: SessionTokenService,
+    @Inject(AUTH_TOKEN_PROVIDER)
+    private readonly tokenProvider: AuthTokenProviderPort,
   ) {}
 
   async execute(token: string): Promise<AuthenticatedRequestUser> {
-    const payload = await this.sessionTokenService.verifyToken(token, 'access');
+    const payload = await this.tokenProvider.verifyToken(token, 'access');
     const [session, user] = await Promise.all([
-      this.authRepository.findSessionForUser(payload.sid, payload.sub),
+      this.authSessionRepository.findSessionForUser(payload.sid, payload.sub),
       this.usersRepository.findById(payload.sub),
     ]);
 

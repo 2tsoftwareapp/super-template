@@ -28,10 +28,10 @@ import {
   hashOpaqueToken,
   hashPassword,
 } from '../../../auth/application/auth.helpers';
+import { AUTH_SESSION_REPOSITORY, type AuthSessionRepositoryPort } from '../../../auth/application/ports/auth-session.repository.port';
 import { AuthMailService } from '../../../auth/application/services/auth-mail.service';
-import { AuthRepository } from '../../../auth/infrastructure/auth.repository';
 import { OrganizationsService } from '../../../organizations/application/organizations.service';
-import { OrganizationsRepository } from '../../../organizations/infrastructure/organizations.repository';
+import { ORGANIZATIONS_REPOSITORY, type OrganizationsRepositoryPort } from '../../../organizations/application/ports/organizations.repository.port';
 import { resolveAssignableRole } from '../assignable-role.resolver';
 import {
   USERS_REPOSITORY,
@@ -48,8 +48,8 @@ export class CreateAdminUserUseCase {
     private readonly accessControlService: AccessControlService,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
     private readonly organizationsService: OrganizationsService,
-    private readonly organizationsRepository: OrganizationsRepository,
-    private readonly authRepository: AuthRepository,
+    @Inject(ORGANIZATIONS_REPOSITORY) private readonly organizationsRepository: OrganizationsRepositoryPort,
+    @Inject(AUTH_SESSION_REPOSITORY) private readonly authRepository: AuthSessionRepositoryPort,
     private readonly authMailService: AuthMailService,
     private readonly getUserUseCase: GetUserUseCase,
   ) {}

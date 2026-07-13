@@ -5,7 +5,7 @@ import { AppError, ERROR_CODES, isMandatoryMailTemplate } from '@repo/api-core';
 
 import { AuditService } from '../../../audit/application/audit.service';
 import { JobsService } from '../../../jobs/application/jobs.service';
-import { TemplateRendererService } from '../../infrastructure/template-renderer.service';
+import { TEMPLATE_RENDERER_SERVICE, type TemplateRendererServicePort } from '../ports/template-renderer.service.port';
 
 export interface SendAdminMailCommand {
   templateKey: string;
@@ -17,7 +17,7 @@ export interface SendAdminMailCommand {
 @Injectable()
 export class SendAdminMailUseCase {
   constructor(
-    private readonly templateRenderer: TemplateRendererService,
+    @Inject(TEMPLATE_RENDERER_SERVICE) private readonly templateRenderer: TemplateRendererServicePort,
     @Inject(forwardRef(() => JobsService))
     private readonly jobsService: JobsService,
     private readonly auditService: AuditService,

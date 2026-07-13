@@ -1,16 +1,16 @@
 import type { AuthenticatedRequestUser } from '@repo/api-core';
 
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { AppError, ERROR_CODES } from '@repo/api-core';
 
 import type { RegisterDeviceCommand } from '../notifications.types';
 
-import { DeviceTokensRepository } from '../../infrastructure/device-tokens.repository';
+import { DEVICE_TOKENS_REPOSITORY, type DeviceTokensRepositoryPort } from '../ports/device-tokens.repository.port';
 
 @Injectable()
 export class NotificationDeviceUseCase {
   constructor(
-    private readonly deviceTokensRepository: DeviceTokensRepository,
+    @Inject(DEVICE_TOKENS_REPOSITORY) private readonly deviceTokensRepository: DeviceTokensRepositoryPort,
   ) {}
 
   async registerDevice(

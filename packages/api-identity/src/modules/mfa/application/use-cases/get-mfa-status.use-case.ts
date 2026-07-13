@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 
-import { MfaRepository } from '../../infrastructure/mfa.repository';
+import { MFA_REPOSITORY, type MfaRepositoryPort } from '../ports/mfa.repository.port';
 
 @Injectable()
 export class GetMfaStatusUseCase {
-  constructor(private readonly mfaRepository: MfaRepository) {}
+  constructor(@Inject(MFA_REPOSITORY) private readonly mfaRepository: MfaRepositoryPort) {}
 
   async execute(userId: string): Promise<{ enabled: boolean }> {
     const secretRow = await this.mfaRepository.findSecretByUserId(userId);

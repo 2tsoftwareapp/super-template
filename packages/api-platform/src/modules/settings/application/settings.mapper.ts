@@ -1,10 +1,4 @@
-import type { SettingsRepository } from '../infrastructure/settings.repository';
-
-type SettingRecord = Awaited<
-  ReturnType<SettingsRepository['findByKey']>
-> extends infer T
-  ? Exclude<T, null>
-  : never;
+import type { SettingRecord } from './ports/settings.repository.port';
 
 export class SettingsMapper {
   static toDto(setting: SettingRecord) {

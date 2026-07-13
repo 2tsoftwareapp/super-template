@@ -4,13 +4,13 @@ import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { AppError, ERROR_CODES } from '@repo/api-core';
 import { DATABASE } from '@repo/api-database';
 
-import { OrganizationsRepository } from '../../infrastructure/organizations.repository';
+import { ORGANIZATIONS_REPOSITORY, type OrganizationsRepositoryPort } from '../ports/organizations.repository.port';
 
 @Injectable()
 export class AssertOrganizationMembershipUseCase {
   constructor(
     @Inject(DATABASE) private readonly database: DatabaseClient,
-    private readonly organizationsRepository: OrganizationsRepository,
+    @Inject(ORGANIZATIONS_REPOSITORY) private readonly organizationsRepository: OrganizationsRepositoryPort,
   ) {}
 
   async execute(

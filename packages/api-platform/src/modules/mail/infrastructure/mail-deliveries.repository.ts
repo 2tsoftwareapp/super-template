@@ -8,6 +8,8 @@ import { DATABASE } from '@repo/api-database';
 import { mailDeliveries } from '@repo/api-database';
 import { and, count, desc, eq } from 'drizzle-orm';
 
+import type { MailDeliveriesRepositoryPort } from '../application/ports/mail-deliveries.repository.port';
+
 interface ListDeliveriesParams {
   page: number;
   limit: number;
@@ -16,7 +18,7 @@ interface ListDeliveriesParams {
 }
 
 @Injectable()
-export class MailDeliveriesRepository {
+export class MailDeliveriesRepository implements MailDeliveriesRepositoryPort {
   constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
 
   async create(

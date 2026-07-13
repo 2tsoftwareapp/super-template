@@ -19,19 +19,11 @@ import {
   lte,
 } from 'drizzle-orm';
 
-interface ListFilesParams {
-  organizationId: string;
-  page: number;
-  limit: number;
-  search?: string;
-  mimeType?: string;
-  uploadedById?: string;
-  from?: string;
-  to?: string;
-  includeDeleted?: boolean;
-  sortField: 'createdAt' | 'originalName' | 'sizeBytes';
-  sortOrder: 'asc' | 'desc';
-}
+import type {
+  FileListResult,
+  FilesRepositoryPort,
+  ListFilesQuery,
+} from '../application/ports/files.repository.port';
 
 const FILE_SORT_FIELDS = {
   createdAt: files.createdAt,
@@ -40,7 +32,7 @@ const FILE_SORT_FIELDS = {
 } as const;
 
 @Injectable()
-export class FilesRepository {
+export class FilesRepository implements FilesRepositoryPort {
   constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
 
   async create(
@@ -84,7 +76,7 @@ export class FilesRepository {
   }
 
   async list(
-    params: ListFilesParams,
+    params: ListFilesQuery,
     executor: DatabaseExecutor = this.database,
   ) {
     const filters = [eq(files.organizationId, params.organizationId)];
@@ -133,7 +125,7 @@ export class FilesRepository {
     return {
       rows,
       total: Number(totals[0]?.total ?? 0),
-    };
+    } satisfies FileListResult;
   }
 
   async setCurrentVersion(

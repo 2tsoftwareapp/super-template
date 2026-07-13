@@ -12,17 +12,25 @@ import { DATABASE, runInTransaction } from '@repo/api-database';
 
 import type { VerifyEmailCommand } from '../auth.types';
 
-import { UsersRepository } from '../../../users/infrastructure/users.repository';
-import { AuthRepository } from '../../infrastructure/auth.repository';
+import {
+  USERS_REPOSITORY,
+  type UsersRepositoryPort,
+} from '../../../users/application/users.repository.port';
 import { hashOpaqueToken } from '../auth.helpers';
+import {
+  AUTH_SESSION_REPOSITORY,
+  type AuthSessionRepositoryPort,
+} from '../ports/auth-session.repository.port';
 import { AuthMailService } from '../services/auth-mail.service';
 
 @Injectable()
 export class VerifyEmailUseCase {
   constructor(
     @Inject(DATABASE) private readonly database: DatabaseClient,
-    private readonly usersRepository: UsersRepository,
-    private readonly authRepository: AuthRepository,
+    @Inject(USERS_REPOSITORY)
+    private readonly usersRepository: UsersRepositoryPort,
+    @Inject(AUTH_SESSION_REPOSITORY)
+    private readonly authSessionRepository: AuthSessionRepositoryPort,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
     private readonly authMailService: AuthMailService,
   ) {}
@@ -30,7 +38,7 @@ export class VerifyEmailUseCase {
   async execute(input: VerifyEmailCommand, requestContext?: RequestContext) {
     const tokenHash = hashOpaqueToken(input.token);
     const token =
-      await this.authRepository.findValidEmailVerificationToken(tokenHash);
+      await this.authSessionRepository.findValidEmailVerificationToken(tokenHash);
 
     if (!token) {
       throw new AppError(
@@ -49,7 +57,7 @@ export class VerifyEmailUseCase {
         },
         transaction,
       );
-      await this.authRepository.consumeEmailVerificationToken(
+      await this.authSessionRepository.consumeEmailVerificationToken(
         token.id,
         transaction,
       );
@@ -71,10 +79,6 @@ export class VerifyEmailUseCase {
       await this.authMailService.sendWelcomeEmail(user.email, user.displayName);
     }
 
-    return {
-      data: {
-        success: true,
-      },
-    };
+    return { success: true };
   }
 }

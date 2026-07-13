@@ -1,9 +1,9 @@
 import type { JsonObject } from '@repo/api-core';
 import type { DatabaseExecutor } from '@repo/api-database';
 
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 
-import { ActivitiesRepository } from '../../infrastructure/activities.repository';
+import { ACTIVITIES_REPOSITORY, type ActivitiesRepositoryPort } from '../ports/activities.repository.port';
 
 export interface EmitActivityInput {
   organizationId: string;
@@ -17,7 +17,9 @@ export interface EmitActivityInput {
 
 @Injectable()
 export class EmitActivityUseCase {
-  constructor(private readonly activitiesRepository: ActivitiesRepository) {}
+  constructor(
+    @Inject(ACTIVITIES_REPOSITORY) private readonly activitiesRepository: ActivitiesRepositoryPort,
+  ) {}
 
   async execute(input: EmitActivityInput, executor?: DatabaseExecutor) {
     return this.activitiesRepository.create(

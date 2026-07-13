@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 
-import { MailDeliveriesRepository } from '../../infrastructure/mail-deliveries.repository';
+import { MAIL_DELIVERIES_REPOSITORY, type MailDeliveriesRepositoryPort } from '../ports/mail-deliveries.repository.port';
 
 export interface ListMailDeliveriesQuery {
   page: number;
@@ -12,7 +12,7 @@ export interface ListMailDeliveriesQuery {
 @Injectable()
 export class ListMailDeliveriesUseCase {
   constructor(
-    private readonly mailDeliveriesRepository: MailDeliveriesRepository,
+    @Inject(MAIL_DELIVERIES_REPOSITORY) private readonly mailDeliveriesRepository: MailDeliveriesRepositoryPort,
   ) {}
 
   async execute(query: ListMailDeliveriesQuery) {

@@ -1,13 +1,13 @@
 import type { AuthenticatedRequestUser } from '@repo/api-core';
 
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 
-import { OrganizationsRepository } from '../../infrastructure/organizations.repository';
+import { ORGANIZATIONS_REPOSITORY, type OrganizationsRepositoryPort } from '../ports/organizations.repository.port';
 
 @Injectable()
 export class ListOrganizationsForUserUseCase {
   constructor(
-    private readonly organizationsRepository: OrganizationsRepository,
+    @Inject(ORGANIZATIONS_REPOSITORY) private readonly organizationsRepository: OrganizationsRepositoryPort,
   ) {}
 
   async execute(user: AuthenticatedRequestUser) {

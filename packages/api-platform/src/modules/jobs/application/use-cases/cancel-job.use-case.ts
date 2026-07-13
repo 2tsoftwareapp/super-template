@@ -5,12 +5,12 @@ import { AppError, ERROR_CODES } from '@repo/api-core';
 
 import type { JobView } from '../jobs.types';
 
-import { JobObservabilityRepository } from '../../infrastructure/job-observability.repository';
 import { JobsMapper } from '../jobs.mapper';
 import {
   JOBS_REPOSITORY,
   type JobsRepositoryPort,
 } from '../jobs.repository.port';
+import { JOB_OBSERVABILITY_REPOSITORY, type JobObservabilityRepositoryPort } from '../ports/job-observability.repository.port';
 
 @Injectable()
 export class CancelJobUseCase {
@@ -18,7 +18,7 @@ export class CancelJobUseCase {
 
   constructor(
     @Inject(JOBS_REPOSITORY) private readonly jobsRepository: JobsRepositoryPort,
-    private readonly jobObservabilityRepository: JobObservabilityRepository,
+    @Inject(JOB_OBSERVABILITY_REPOSITORY) private readonly jobObservabilityRepository: JobObservabilityRepositoryPort,
   ) {}
 
   async execute(

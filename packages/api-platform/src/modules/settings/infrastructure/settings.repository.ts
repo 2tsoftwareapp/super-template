@@ -9,8 +9,10 @@ import { DATABASE } from '@repo/api-database';
 import { applicationSettings } from '@repo/api-database';
 import { eq } from 'drizzle-orm';
 
+import type { SettingsRepositoryPort } from '../application/ports/settings.repository.port';
+
 @Injectable()
-export class SettingsRepository {
+export class SettingsRepository implements SettingsRepositoryPort {
   constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
 
   async findAll(executor: DatabaseExecutor = this.database) {

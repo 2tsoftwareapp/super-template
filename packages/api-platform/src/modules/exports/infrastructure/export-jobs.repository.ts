@@ -8,8 +8,10 @@ import { DATABASE, runIdempotentInsert } from '@repo/api-database';
 import { exportJobs } from '@repo/api-database';
 import { and, eq } from 'drizzle-orm';
 
+import type { ExportJobsRepositoryPort } from '../application/ports/export-jobs.repository.port';
+
 @Injectable()
-export class ExportJobsRepository {
+export class ExportJobsRepository implements ExportJobsRepositoryPort {
   constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
 
   async create(

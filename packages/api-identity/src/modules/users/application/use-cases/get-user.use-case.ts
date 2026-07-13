@@ -6,7 +6,7 @@ import { AppError, ERROR_CODES } from '@repo/api-core';
 import type { UserView } from '../users.types';
 
 import { AccessControlService } from '../../../access-control/application/access-control.service';
-import { OrganizationsRepository } from '../../../organizations/infrastructure/organizations.repository';
+import { ORGANIZATIONS_REPOSITORY, type OrganizationsRepositoryPort } from '../../../organizations/application/ports/organizations.repository.port';
 import { assertUserBelongsToOrganization } from '../../domain/user-org-scope.policy';
 import { UsersMapper } from '../users.mapper';
 import {
@@ -22,7 +22,7 @@ export class GetUserUseCase {
     @Inject(USERS_REPOSITORY)
     private readonly usersRepository: UsersRepositoryPort,
     private readonly accessControlService: AccessControlService,
-    private readonly organizationsRepository: OrganizationsRepository,
+    @Inject(ORGANIZATIONS_REPOSITORY) private readonly organizationsRepository: OrganizationsRepositoryPort,
   ) {}
 
   async execute(

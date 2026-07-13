@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 
-import { SettingsRepository } from '../../infrastructure/settings.repository';
+import { SETTINGS_REPOSITORY, type SettingsRepositoryPort } from '../ports/settings.repository.port';
 import { SettingsMapper } from '../settings.mapper';
 
 @Injectable()
 export class ListSettingsUseCase {
-  constructor(private readonly settingsRepository: SettingsRepository) {}
+  constructor(@Inject(SETTINGS_REPOSITORY) private readonly settingsRepository: SettingsRepositoryPort) {}
 
   async execute() {
     const settings = await this.settingsRepository.findAll();

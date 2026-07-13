@@ -1,5 +1,5 @@
 import type { JobRecord } from './jobs.repository.port';
-import type { JobView } from './jobs.types';
+import type { JobStatus, JobView } from './jobs.types';
 
 export class JobsMapper {
   toJobView(job: JobRecord): JobView {
@@ -7,7 +7,7 @@ export class JobsMapper {
       id: job.id,
       type: job.type,
       payload: job.payload,
-      status: job.status,
+      status: job.status as JobStatus,
       scheduledAt: job.scheduledAt.toISOString(),
       priority: job.priority,
       attempts: job.attempts,

@@ -1,8 +1,4 @@
-import type { AuditRepository } from '../infrastructure/audit.repository';
-
-type AuditLogRecord = Awaited<
-  ReturnType<AuditRepository['list']>
->['rows'][number];
+import type { AuditLogRecord } from './ports/audit.repository.port';
 
 export class AuditMapper {
   toAuditLogDto(row: AuditLogRecord) {

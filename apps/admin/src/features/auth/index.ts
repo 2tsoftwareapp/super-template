@@ -1,4 +1,4 @@
-export { establishAdminSsoSession, loginToAdmin, signOutAdmin, startSso, verifyAdminMfaChallenge } from "./api/auth.api";
+export { establishAdminSsoSession, loginToAdmin, startSso, verifyAdminMfaChallenge } from "./api/auth.api";
 export { useAdminGuard } from "./controllers/use-admin-guard";
 export { useAdminLoginFlow } from "./controllers/use-admin-login-flow";
 export { useAdminSsoCallbackFlow } from "./controllers/use-admin-sso-callback-flow";

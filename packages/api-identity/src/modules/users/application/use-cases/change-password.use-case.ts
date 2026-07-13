@@ -17,7 +17,7 @@ import {
   hashPassword,
   verifyPassword,
 } from '../../../auth/application/auth.helpers';
-import { AuthRepository } from '../../../auth/infrastructure/auth.repository';
+import { AUTH_SESSION_REPOSITORY, type AuthSessionRepositoryPort } from '../../../auth/application/ports/auth-session.repository.port';
 import {
   USERS_REPOSITORY,
   type UsersRepositoryPort,
@@ -29,7 +29,7 @@ export class ChangePasswordUseCase {
     @Inject(DATABASE) private readonly database: DatabaseClient,
     @Inject(USERS_REPOSITORY)
     private readonly usersRepository: UsersRepositoryPort,
-    private readonly authRepository: AuthRepository,
+    @Inject(AUTH_SESSION_REPOSITORY) private readonly authRepository: AuthSessionRepositoryPort,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
   ) {}
 

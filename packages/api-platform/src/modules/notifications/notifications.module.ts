@@ -5,6 +5,8 @@ import { NOTIFICATION_JOBS_REPOSITORY } from './application/notification-jobs.re
 import { NotificationsMapper } from './application/notifications.mapper';
 import { NOTIFICATIONS_REPOSITORY } from './application/notifications.repository.port';
 import { NotificationsService } from './application/notifications.service';
+import { DEVICE_TOKENS_REPOSITORY } from './application/ports/device-tokens.repository.port';
+import { NOTIFICATION_STREAM_SERVICE } from './application/ports/notification-stream.service.port';
 import { PUSH_NOTIFIER } from './application/push.interface';
 import { NotificationDispatchService } from './application/services/notification-dispatch.service';
 import { NotificationJobsProcessor } from './application/services/notification-jobs.processor';
@@ -51,6 +53,14 @@ import {
       useExisting: NotificationJobsRepository,
     },
     {
+      provide: DEVICE_TOKENS_REPOSITORY,
+      useExisting: DeviceTokensRepository,
+    },
+    {
+      provide: NOTIFICATION_STREAM_SERVICE,
+      useExisting: NotificationStreamService,
+    },
+    {
       provide: USER_NOTIFICATION_SENDER,
       useExisting: NotificationsService,
     },
@@ -61,6 +71,8 @@ import {
     USER_NOTIFICATION_SENDER,
     NOTIFICATIONS_REPOSITORY,
     NOTIFICATION_JOBS_REPOSITORY,
+    DEVICE_TOKENS_REPOSITORY,
+    NOTIFICATION_STREAM_SERVICE,
   ],
 })
 export class NotificationsModule {}

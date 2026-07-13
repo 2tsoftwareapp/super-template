@@ -5,6 +5,7 @@ import { AccessControlModule } from '../access-control/access-control.module';
 import { AuthModule } from '../auth/auth.module';
 import { OrganizationsModule } from '../organizations/organizations.module';
 import { UsersModule } from '../users/users.module';
+import { SSO_REPOSITORY } from './application/ports/sso.repository.port';
 import { HandleSsoCallbackUseCase } from './application/use-cases/handle-sso-callback.use-case';
 import {
   CreateSsoSessionExchangeUseCase,
@@ -28,6 +29,10 @@ import { GoogleSsoProvider } from './providers/google-sso.provider';
   controllers: [SsoController],
   providers: [
     SsoRepository,
+    {
+      provide: SSO_REPOSITORY,
+      useExisting: SsoRepository,
+    },
     JwksCacheService,
     GoogleSsoProvider,
     AppleSsoProvider,

@@ -12,14 +12,14 @@ import { DATABASE, runInTransaction } from '@repo/api-database';
 
 import type { MfaDisableCommand } from '../mfa.types';
 
-import { MfaRepository } from '../../infrastructure/mfa.repository';
+import { MFA_REPOSITORY, type MfaRepositoryPort } from '../ports/mfa.repository.port';
 import { MfaCodeVerifierService } from '../services/mfa-code-verifier.service';
 
 @Injectable()
 export class DisableMfaUseCase {
   constructor(
     @Inject(DATABASE) private readonly database: DatabaseClient,
-    private readonly mfaRepository: MfaRepository,
+    @Inject(MFA_REPOSITORY) private readonly mfaRepository: MfaRepositoryPort,
     private readonly mfaCodeVerifierService: MfaCodeVerifierService,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
   ) {}

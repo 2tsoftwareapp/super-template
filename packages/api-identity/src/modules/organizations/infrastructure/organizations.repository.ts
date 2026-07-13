@@ -1,10 +1,7 @@
-import type {
-  DatabaseClient,
-  DatabaseExecutor,
-} from '@repo/api-database';
+import type { DatabaseExecutor } from '@repo/api-database';
 
 import { Inject, Injectable } from '@nestjs/common';
-import { DATABASE } from '@repo/api-database';
+import { DATABASE, type DatabaseClient } from '@repo/api-database';
 import {
   organizationMembers,
   organizations,
@@ -12,10 +9,12 @@ import {
 } from '@repo/api-database';
 import { and, asc, count, eq, isNull, ne } from 'drizzle-orm';
 
+import type { OrganizationsRepositoryPort } from '../application/ports/organizations.repository.port';
+
 export type OrganizationMemberRole = 'OWNER' | 'ADMIN' | 'MEMBER';
 
 @Injectable()
-export class OrganizationsRepository {
+export class OrganizationsRepository implements OrganizationsRepositoryPort {
   constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
 
   get client(): DatabaseClient {

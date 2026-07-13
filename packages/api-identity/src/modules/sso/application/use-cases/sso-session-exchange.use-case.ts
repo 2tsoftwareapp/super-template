@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import {
   AppError,
   durationToMilliseconds,
@@ -7,7 +7,7 @@ import {
   hashOpaqueToken,
 } from '@repo/api-core';
 
-import { SsoRepository } from '../../infrastructure/sso.repository';
+import { SSO_REPOSITORY, type SsoRepositoryPort } from '../ports/sso.repository.port';
 
 const EXCHANGE_TTL = '2m';
 
@@ -19,7 +19,7 @@ interface SessionPayload {
 
 @Injectable()
 export class CreateSsoSessionExchangeUseCase {
-  constructor(private readonly ssoRepository: SsoRepository) {}
+  constructor(@Inject(SSO_REPOSITORY) private readonly ssoRepository: SsoRepositoryPort) {}
 
   async execute(session: SessionPayload): Promise<{ exchangeCode: string }> {
     const exchangeCode = generateOpaqueToken();
@@ -38,7 +38,7 @@ export class CreateSsoSessionExchangeUseCase {
 
 @Injectable()
 export class ExchangeSsoSessionUseCase {
-  constructor(private readonly ssoRepository: SsoRepository) {}
+  constructor(@Inject(SSO_REPOSITORY) private readonly ssoRepository: SsoRepositoryPort) {}
 
   async execute(code: string) {
     const exchange = await this.ssoRepository.findValidSessionExchangeByCodeHash(

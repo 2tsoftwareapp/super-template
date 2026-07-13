@@ -3,19 +3,19 @@ import type {
   RequestContext,
 } from '@repo/api-core';
 
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { AppError, ERROR_CODES } from '@repo/api-core';
 
 import type { UpdateSettingCommand } from '../settings.types';
 
 import { AuditService } from '../../../audit/application/audit.service';
-import { SettingsRepository } from '../../infrastructure/settings.repository';
+import { SETTINGS_REPOSITORY, type SettingsRepositoryPort } from '../ports/settings.repository.port';
 import { SettingsMapper } from '../settings.mapper';
 
 @Injectable()
 export class UpdateSettingUseCase {
   constructor(
-    private readonly settingsRepository: SettingsRepository,
+    @Inject(SETTINGS_REPOSITORY) private readonly settingsRepository: SettingsRepositoryPort,
     private readonly auditService: AuditService,
   ) {}
 

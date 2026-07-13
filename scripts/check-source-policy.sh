@@ -55,6 +55,8 @@ filter_unknown_allowlist() {
     /observability\.types\.ts:/ { next }
     /transaction-executor\.ts:/ { next }
     /batch-delete-files\.use-case\.ts:/ { next }
+    /\.repository\.port\.ts:/ { next }
+    /\.mapper\.ts:.*import type/ { next }
     { print }
   '
 }
@@ -219,12 +221,14 @@ search_application_imports() {
       packages/api-platform/src/modules \
       packages/api-platform/src/modules \
       --glob '**/application/**/*.ts' \
-      --glob '!**/*.spec.ts'
+      --glob '!**/*.spec.ts' \
+      --glob '!**/*.repository.port.ts' \
+      --glob '!**/*.mapper.ts'
     return
   fi
 
   find packages/api-identity/src/modules packages/api-platform/src/modules packages/api-platform/src/modules \
-    -path '*/application/*' -name '*.ts' ! -name '*.spec.ts' -print |
+    -path '*/application/*' -name '*.ts' ! -name '*.spec.ts' ! -name '*.repository.port.ts' ! -name '*.mapper.ts' -print |
     xargs grep -nE "$pattern" 2>/dev/null || true
 }
 
@@ -271,6 +275,11 @@ check_application_policy \
   'application imports express' \
   "from 'express'" \
   'Application layer must not import express; keep HTTP concerns in presentation.'
+
+check_application_policy \
+  'application imports infrastructure' \
+  "from ['\"]\.\./.*infrastructure/" \
+  'Application layer must not import infrastructure via relative paths; inject through application ports instead.'
 
 # Domain purity: modules/*/domain/ holds framework-free business rules.
 # It must never import NestJS, Drizzle, express, or the database package.

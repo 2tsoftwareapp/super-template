@@ -8,8 +8,10 @@ import { DATABASE } from '@repo/api-database';
 import { attachments } from '@repo/api-database';
 import { and, count, desc, eq, isNull } from 'drizzle-orm';
 
+import type { AttachmentsRepositoryPort } from '../application/ports/attachments.repository.port';
+
 @Injectable()
-export class AttachmentsRepository {
+export class AttachmentsRepository implements AttachmentsRepositoryPort {
   constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
 
   async create(

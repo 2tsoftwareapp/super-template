@@ -8,6 +8,8 @@ import { DATABASE, runIdempotentInsert } from '@repo/api-database';
 import { notificationJobs } from '@repo/api-database';
 import { and, asc, count, desc, eq, lte, sql } from 'drizzle-orm';
 
+import type { NotificationJobsRepositoryPort } from '../application/notification-jobs.repository.port';
+
 interface ListJobsParams {
   page: number;
   limit: number;
@@ -15,7 +17,7 @@ interface ListJobsParams {
 }
 
 @Injectable()
-export class NotificationJobsRepository {
+export class NotificationJobsRepository implements NotificationJobsRepositoryPort {
   constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
 
   async create(

@@ -8,12 +8,12 @@ import {
 } from '@repo/api-database';
 
 import { resolveFailureOutcome } from '../../domain/job-lifecycle';
-import { JobObservabilityRepository } from '../../infrastructure/job-observability.repository';
 import {
   type JobRecord,
   JOBS_REPOSITORY,
   type JobsRepositoryPort,
 } from '../jobs.repository.port';
+import { JOB_OBSERVABILITY_REPOSITORY, type JobObservabilityRepositoryPort } from '../ports/job-observability.repository.port';
 import { JobHandlersRegistry } from '../services/job-handlers.registry';
 
 @Injectable()
@@ -22,7 +22,7 @@ export class ProcessJobsUseCase {
     @Inject(JOBS_REPOSITORY) private readonly jobsRepository: JobsRepositoryPort,
     private readonly tenantContextService: TenantContextService,
     private readonly jobHandlersRegistry: JobHandlersRegistry,
-    private readonly jobObservabilityRepository: JobObservabilityRepository,
+    @Inject(JOB_OBSERVABILITY_REPOSITORY) private readonly jobObservabilityRepository: JobObservabilityRepositoryPort,
   ) {}
 
   async execute(): Promise<void> {

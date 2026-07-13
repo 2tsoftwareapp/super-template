@@ -2,18 +2,14 @@ import { HttpStatus } from '@nestjs/common';
 import { AppError, ERROR_CODES, generateOpaqueToken, hashOpaqueToken } from '@repo/api-core';
 import * as argon2 from 'argon2';
 
-import type { AuthRepository } from '../infrastructure/auth.repository';
+import type { AuthSessionModel } from './models/auth-session';
 
 const DUMMY_PASSWORD_HASH =
   '$argon2id$v=19$m=65536,t=3,p=4$EnMqZqWbztDZjMH5GrNZJQ$jEXMP23MqS+/Dp20m83Kwq7wktQ3jyT+BEfr7UqSFZo';
 
-type AuthSession = NonNullable<
-  Awaited<ReturnType<AuthRepository['findSessionById']>>
->;
-
 export function assertSessionUsable(
-  session: AuthSession | null,
-): asserts session is AuthSession {
+  session: AuthSessionModel | null,
+): asserts session is AuthSessionModel {
   if (!session) {
     throw new AppError(
       ERROR_CODES.AUTH_SESSION_REVOKED,

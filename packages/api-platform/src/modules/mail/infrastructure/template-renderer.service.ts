@@ -3,6 +3,8 @@ import { existsSync, readdirSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
+import type { TemplateRendererServicePort } from '../application/ports/template-renderer.service.port';
+
 function resolveTemplatesDir(): string {
   const marker = 'auth.verify-email.subject.txt';
   const candidates = [
@@ -36,7 +38,7 @@ const PREVIEW_DEFAULT_VARIABLES: Record<string, string> = {
 };
 
 @Injectable()
-export class TemplateRendererService {
+export class TemplateRendererService implements TemplateRendererServicePort {
   private readonly templatesDir = resolveTemplatesDir();
 
   async render(

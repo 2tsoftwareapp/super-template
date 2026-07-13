@@ -12,14 +12,18 @@ import {
 import type { LoginCommand } from '../auth.types';
 
 import { MfaService } from '../../../mfa/application/mfa.service';
-import { UsersRepository } from '../../../users/infrastructure/users.repository';
+import {
+  USERS_REPOSITORY,
+  type UsersRepositoryPort,
+} from '../../../users/application/users.repository.port';
 import { verifyPasswordWithTimingPadding } from '../auth.helpers';
 import { IssueSessionUseCase } from './issue-session.use-case';
 
 @Injectable()
 export class LoginUseCase {
   constructor(
-    private readonly usersRepository: UsersRepository,
+    @Inject(USERS_REPOSITORY)
+    private readonly usersRepository: UsersRepositoryPort,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
     private readonly issueSessionUseCase: IssueSessionUseCase,
     private readonly mfaService: MfaService,

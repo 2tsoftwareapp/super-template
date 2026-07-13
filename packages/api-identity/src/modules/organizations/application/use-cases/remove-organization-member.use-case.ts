@@ -13,12 +13,12 @@ import {
   assertNotLastOwner,
   assertOrganizationRole,
 } from '../../domain/organization-access.policy';
-import { OrganizationsRepository } from '../../infrastructure/organizations.repository';
+import { ORGANIZATIONS_REPOSITORY, type OrganizationsRepositoryPort } from '../ports/organizations.repository.port';
 
 @Injectable()
 export class RemoveOrganizationMemberUseCase {
   constructor(
-    private readonly organizationsRepository: OrganizationsRepository,
+    @Inject(ORGANIZATIONS_REPOSITORY) private readonly organizationsRepository: OrganizationsRepositoryPort,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
   ) {}
 

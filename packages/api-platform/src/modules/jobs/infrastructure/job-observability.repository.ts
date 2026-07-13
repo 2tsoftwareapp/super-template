@@ -9,6 +9,8 @@ import { DATABASE } from '@repo/api-database';
 import { jobAttempts, jobDependencies, jobEvents, jobs } from '@repo/api-database';
 import { and, count, desc, eq, gte, inArray, lte, sql } from 'drizzle-orm';
 
+import type { JobObservabilityRepositoryPort } from '../application/ports/job-observability.repository.port';
+
 type JobAttemptStatus = 'PROCESSING' | 'COMPLETED' | 'FAILED';
 type JobEventType =
   | 'claimed'
@@ -19,7 +21,7 @@ type JobEventType =
   | 'no_handler';
 
 @Injectable()
-export class JobObservabilityRepository {
+export class JobObservabilityRepository implements JobObservabilityRepositoryPort {
   constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
 
   async startAttempt(

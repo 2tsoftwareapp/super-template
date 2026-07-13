@@ -1,10 +1,10 @@
 import type { JsonObject, RequestContext } from '@repo/api-core';
 import type { DatabaseExecutor } from '@repo/api-database';
 
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { isJsonObject, redactSensitive } from '@repo/api-core';
 
-import { AuditRepository } from '../../infrastructure/audit.repository';
+import { AUDIT_REPOSITORY, type AuditRepositoryPort } from '../ports/audit.repository.port';
 
 export interface AuditInput {
   actorId?: string | null;
@@ -17,7 +17,9 @@ export interface AuditInput {
 
 @Injectable()
 export class RecordAuditLogUseCase {
-  constructor(private readonly auditRepository: AuditRepository) {}
+  constructor(
+    @Inject(AUDIT_REPOSITORY) private readonly auditRepository: AuditRepositoryPort,
+  ) {}
 
   async execute(
     {

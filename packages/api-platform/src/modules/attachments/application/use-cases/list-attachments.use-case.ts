@@ -1,14 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 
 import type { ListAttachmentsQuery } from '../attachments.types';
 
-import { AttachmentsRepository } from '../../infrastructure/attachments.repository';
 import { AttachmentsMapper } from '../attachments.mapper';
+import { ATTACHMENTS_REPOSITORY, type AttachmentsRepositoryPort } from '../ports/attachments.repository.port';
 
 @Injectable()
 export class ListAttachmentsUseCase {
   constructor(
-    private readonly attachmentsRepository: AttachmentsRepository,
+    @Inject(ATTACHMENTS_REPOSITORY) private readonly attachmentsRepository: AttachmentsRepositoryPort,
   ) {}
 
   async execute(query: ListAttachmentsQuery) {

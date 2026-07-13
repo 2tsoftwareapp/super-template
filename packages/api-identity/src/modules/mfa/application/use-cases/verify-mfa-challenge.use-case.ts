@@ -11,7 +11,7 @@ import {
 
 import type { MfaVerifyChallengeCommand } from '../mfa.types';
 
-import { MfaRepository } from '../../infrastructure/mfa.repository';
+import { MFA_REPOSITORY, type MfaRepositoryPort } from '../ports/mfa.repository.port';
 import { MfaCodeVerifierService } from '../services/mfa-code-verifier.service';
 
 const MAX_CHALLENGE_ATTEMPTS = 5;
@@ -19,7 +19,7 @@ const MAX_CHALLENGE_ATTEMPTS = 5;
 @Injectable()
 export class VerifyMfaChallengeUseCase {
   constructor(
-    private readonly mfaRepository: MfaRepository,
+    @Inject(MFA_REPOSITORY) private readonly mfaRepository: MfaRepositoryPort,
     private readonly mfaCodeVerifierService: MfaCodeVerifierService,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
   ) {}

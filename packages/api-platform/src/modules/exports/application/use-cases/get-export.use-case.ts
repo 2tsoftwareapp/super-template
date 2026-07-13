@@ -1,14 +1,14 @@
 import type { AuthenticatedRequestUser } from '@repo/api-core';
 
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { AppError, ERROR_CODES } from '@repo/api-core';
 
-import { ExportJobsRepository } from '../../infrastructure/export-jobs.repository';
 import { ExportsMapper } from '../exports.mapper';
+import { EXPORT_JOBS_REPOSITORY, type ExportJobsRepositoryPort } from '../ports/export-jobs.repository.port';
 
 @Injectable()
 export class GetExportUseCase {
-  constructor(private readonly exportJobsRepository: ExportJobsRepository) {}
+  constructor(@Inject(EXPORT_JOBS_REPOSITORY) private readonly exportJobsRepository: ExportJobsRepositoryPort) {}
 
   async execute(actor: AuthenticatedRequestUser, jobId: string) {
     const job = await this.exportJobsRepository.findById(jobId);

@@ -4,6 +4,8 @@ import { MAIL_TEMPLATE_SENDER } from '@repo/api-core';
 import { JobsModule } from '../jobs/jobs.module';
 import { MailService } from './application/mail.service';
 import { MAILER } from './application/mailer.interface';
+import { MAIL_DELIVERIES_REPOSITORY } from './application/ports/mail-deliveries.repository.port';
+import { TEMPLATE_RENDERER_SERVICE } from './application/ports/template-renderer.service.port';
 import { ListMailDeliveriesUseCase } from './application/use-cases/list-mail-deliveries.use-case';
 import { ListMailTemplatesUseCase } from './application/use-cases/list-mail-templates.use-case';
 import { PreviewMailTemplateUseCase } from './application/use-cases/preview-mail-template.use-case';
@@ -21,6 +23,14 @@ import { AdminMailController } from './presentation/admin-mail.controller';
     SmtpMailerService,
     TemplateRendererService,
     MailDeliveriesRepository,
+    {
+      provide: MAIL_DELIVERIES_REPOSITORY,
+      useExisting: MailDeliveriesRepository,
+    },
+    {
+      provide: TEMPLATE_RENDERER_SERVICE,
+      useExisting: TemplateRendererService,
+    },
     SendMailTemplateUseCase,
     PreviewMailTemplateUseCase,
     ListMailDeliveriesUseCase,
@@ -36,6 +46,6 @@ import { AdminMailController } from './presentation/admin-mail.controller';
       useExisting: MailService,
     },
   ],
-  exports: [MAILER, MAIL_TEMPLATE_SENDER, SmtpMailerService, MailService],
+  exports: [MAILER, MAIL_TEMPLATE_SENDER, MAIL_DELIVERIES_REPOSITORY, TEMPLATE_RENDERER_SERVICE, SmtpMailerService, MailService],
 })
 export class MailModule {}

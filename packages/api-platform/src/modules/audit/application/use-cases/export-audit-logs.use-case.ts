@@ -9,12 +9,12 @@ import { randomUUID } from 'node:crypto';
 
 import type { ExportAuditLogsQuery } from '../audit.types';
 
-import { FilesRepository } from '../../../files/infrastructure/files.repository';
+import { FILES_REPOSITORY, type FilesRepositoryPort } from '../../../files/application/ports/files.repository.port';
 import {
   OBJECT_STORAGE,
   type ObjectStorage,
 } from '../../../storage/application/object-storage.interface';
-import { AuditRepository } from '../../infrastructure/audit.repository';
+import { AUDIT_REPOSITORY, type AuditRepositoryPort } from '../ports/audit.repository.port';
 import { RecordAuditLogUseCase } from './record-audit-log.use-case';
 
 const CSV_HEADER = [
@@ -36,8 +36,8 @@ const MAX_EXPORT_ROWS = 5000;
 @Injectable()
 export class ExportAuditLogsUseCase {
   constructor(
-    private readonly auditRepository: AuditRepository,
-    private readonly filesRepository: FilesRepository,
+    @Inject(AUDIT_REPOSITORY) private readonly auditRepository: AuditRepositoryPort,
+    @Inject(FILES_REPOSITORY) private readonly filesRepository: FilesRepositoryPort,
     @Inject(OBJECT_STORAGE) private readonly objectStorage: ObjectStorage,
     private readonly recordAuditLogUseCase: RecordAuditLogUseCase,
   ) {}

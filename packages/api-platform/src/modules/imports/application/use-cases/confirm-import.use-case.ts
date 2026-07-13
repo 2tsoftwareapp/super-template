@@ -14,7 +14,7 @@ import {
 import type { ImportJobView } from '../imports.types';
 
 import { AuditService } from '../../../audit/application/audit.service';
-import { FilesRepository } from '../../../files/infrastructure/files.repository';
+import { FILES_REPOSITORY, type FilesRepositoryPort } from '../../../files/application/ports/files.repository.port';
 import { ImportsMapper } from '../imports.mapper';
 import {
   IMPORT_JOBS_REPOSITORY,
@@ -29,7 +29,7 @@ export class ConfirmImportUseCase {
   constructor(
     @Inject(IMPORT_JOBS_REPOSITORY)
     private readonly importJobsRepository: ImportJobsRepositoryPort,
-    private readonly filesRepository: FilesRepository,
+    @Inject(FILES_REPOSITORY) private readonly filesRepository: FilesRepositoryPort,
     private readonly importExportAdapters: ImportExportAdapterRegistry,
     private readonly importFileParser: ImportFileParserService,
     private readonly auditService: AuditService,

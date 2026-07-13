@@ -1,17 +1,16 @@
 import type { RequestContext } from '@repo/api-core';
 
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 
-import type { UsersRepository } from '../../../users/infrastructure/users.repository';
+import type { AuthUserModel } from '../models/auth-user';
 
 import { AccessControlService } from '../../../access-control/application/access-control.service';
 import { OrganizationsService } from '../../../organizations/application/organizations.service';
 import { AuthMapper } from '../auth.mapper';
-import { SessionTokenService } from '../services/session-token.service';
-
-type AuthUser = NonNullable<
-  Awaited<ReturnType<UsersRepository['findById']>>
->;
+import {
+  AUTH_TOKEN_PROVIDER,
+  type AuthTokenProviderPort,
+} from '../ports/auth-token.provider.port';
 
 /** Shared tail of login and post-MFA-challenge flows: builds the full session response for an already-verified user. */
 @Injectable()
@@ -21,10 +20,11 @@ export class IssueSessionUseCase {
   constructor(
     private readonly accessControlService: AccessControlService,
     private readonly organizationsService: OrganizationsService,
-    private readonly sessionTokenService: SessionTokenService,
+    @Inject(AUTH_TOKEN_PROVIDER)
+    private readonly tokenProvider: AuthTokenProviderPort,
   ) {}
 
-  async execute(user: AuthUser, requestContext?: RequestContext) {
+  async execute(user: AuthUserModel, requestContext?: RequestContext) {
     const organizationId =
       await this.organizationsService.resolveOrganizationIdForUser(user.id);
 
@@ -33,7 +33,7 @@ export class IssueSessionUseCase {
       organizationId,
     );
 
-    const sessionPayload = await this.sessionTokenService.createSessionTokens(
+    const sessionPayload = await this.tokenProvider.createSessionTokens(
       user.id,
       organizationId,
       {

@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { EnvironmentService } from '@repo/api-core';
 
-import { AuditRepository } from '../../infrastructure/audit.repository';
+import { AUDIT_REPOSITORY, type AuditRepositoryPort } from '../ports/audit.repository.port';
 import { RecordAuditLogUseCase } from './record-audit-log.use-case';
 
 const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
@@ -9,7 +9,7 @@ const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
 @Injectable()
 export class PurgeExpiredAuditLogsUseCase {
   constructor(
-    private readonly auditRepository: AuditRepository,
+    @Inject(AUDIT_REPOSITORY) private readonly auditRepository: AuditRepositoryPort,
     private readonly recordAuditLogUseCase: RecordAuditLogUseCase,
     private readonly environmentService: EnvironmentService,
   ) {}

@@ -1,14 +1,16 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { AppError, ERROR_CODES } from '@repo/api-core';
 
-import { AuditRepository } from '../../infrastructure/audit.repository';
 import { AuditMapper } from '../audit.mapper';
+import { AUDIT_REPOSITORY, type AuditRepositoryPort } from '../ports/audit.repository.port';
 
 @Injectable()
 export class GetAuditLogUseCase {
   private readonly auditMapper = new AuditMapper();
 
-  constructor(private readonly auditRepository: AuditRepository) {}
+  constructor(
+    @Inject(AUDIT_REPOSITORY) private readonly auditRepository: AuditRepositoryPort,
+  ) {}
 
   async execute(id: string) {
     const row = await this.auditRepository.findById(id);

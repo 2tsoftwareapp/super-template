@@ -8,6 +8,8 @@ import { DATABASE } from '@repo/api-database';
 import { auditLogs } from '@repo/api-database';
 import { and, count, desc, eq, gte, ilike, lte, or, type SQL } from 'drizzle-orm';
 
+import type { AuditRepositoryPort } from '../application/ports/audit.repository.port';
+
 interface ListAuditLogsParams {
   page: number;
   limit: number;
@@ -71,7 +73,7 @@ const buildAuditLogFilters = (params: AuditLogSearchParams): SQL[] => {
 };
 
 @Injectable()
-export class AuditRepository {
+export class AuditRepository implements AuditRepositoryPort {
   constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
 
   async list(

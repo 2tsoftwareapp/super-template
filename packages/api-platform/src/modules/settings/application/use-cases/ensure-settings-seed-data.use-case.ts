@@ -1,12 +1,12 @@
 import type { DatabaseExecutor } from '@repo/api-database';
 
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 
-import { SettingsRepository } from '../../infrastructure/settings.repository';
+import { SETTINGS_REPOSITORY, type SettingsRepositoryPort } from '../ports/settings.repository.port';
 
 @Injectable()
 export class EnsureSettingsSeedDataUseCase {
-  constructor(private readonly settingsRepository: SettingsRepository) {}
+  constructor(@Inject(SETTINGS_REPOSITORY) private readonly settingsRepository: SettingsRepositoryPort) {}
 
   async execute(executor?: DatabaseExecutor) {
     await this.settingsRepository.ensureDefaults(

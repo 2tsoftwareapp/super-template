@@ -1,11 +1,7 @@
-import type { PreferencesRepository } from '../infrastructure/preferences.repository';
+import type { UserPreferencesRecord } from './ports/preferences.repository.port';
 
 export class PreferencesMapper {
-  toDto(
-    preferences: NonNullable<
-      Awaited<ReturnType<PreferencesRepository['findByUserId']>>
-    >,
-  ) {
+  toDto(preferences: UserPreferencesRecord) {
     return {
       userId: preferences.userId,
       theme: preferences.theme,

@@ -12,11 +12,11 @@ import type { StartSsoLoginCommand } from '../sso.types';
 
 import { computeCodeChallenge, generateCodeVerifier } from '../../domain/pkce';
 import { assertAllowedRedirectUri } from '../../domain/redirect-allowlist';
-import { SsoRepository } from '../../infrastructure/sso.repository';
 import {
   SSO_PROVIDER_REGISTRY,
   type SsoProviderRegistry,
 } from '../../ports/sso-provider.port';
+import { SSO_REPOSITORY, type SsoRepositoryPort } from '../ports/sso.repository.port';
 
 const STATE_TTL = '10m';
 
@@ -25,7 +25,7 @@ export class StartSsoLoginUseCase {
   constructor(
     @Inject(SSO_PROVIDER_REGISTRY)
     private readonly providers: SsoProviderRegistry,
-    private readonly ssoRepository: SsoRepository,
+    @Inject(SSO_REPOSITORY) private readonly ssoRepository: SsoRepositoryPort,
     private readonly environmentService: EnvironmentService,
   ) {}
 

@@ -14,14 +14,14 @@ import type { MfaRegenerateRecoveryCodesCommand } from '../mfa.types';
 
 import { hashRecoveryCode } from '../../domain/hash-recovery-code';
 import { generateRecoveryCodes } from '../../domain/recovery-codes';
-import { MfaRepository } from '../../infrastructure/mfa.repository';
+import { MFA_REPOSITORY, type MfaRepositoryPort } from '../ports/mfa.repository.port';
 import { MfaCodeVerifierService } from '../services/mfa-code-verifier.service';
 
 @Injectable()
 export class RegenerateRecoveryCodesUseCase {
   constructor(
     @Inject(DATABASE) private readonly database: DatabaseClient,
-    private readonly mfaRepository: MfaRepository,
+    @Inject(MFA_REPOSITORY) private readonly mfaRepository: MfaRepositoryPort,
     private readonly mfaCodeVerifierService: MfaCodeVerifierService,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
   ) {}

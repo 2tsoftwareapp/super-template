@@ -10,19 +10,19 @@ import { randomUUID } from 'node:crypto';
 import type { CreateExportCommand } from '../exports.types';
 
 import { AuditService } from '../../../audit/application/audit.service';
-import { FilesRepository } from '../../../files/infrastructure/files.repository';
+import { FILES_REPOSITORY, type FilesRepositoryPort } from '../../../files/application/ports/files.repository.port';
 import {
   OBJECT_STORAGE,
   type ObjectStorage,
 } from '../../../storage/application/object-storage.interface';
-import { ExportJobsRepository } from '../../infrastructure/export-jobs.repository';
 import { ExportsMapper } from '../exports.mapper';
+import { EXPORT_JOBS_REPOSITORY, type ExportJobsRepositoryPort } from '../ports/export-jobs.repository.port';
 
 @Injectable()
 export class CreateExportUseCase {
   constructor(
-    private readonly exportJobsRepository: ExportJobsRepository,
-    private readonly filesRepository: FilesRepository,
+    @Inject(EXPORT_JOBS_REPOSITORY) private readonly exportJobsRepository: ExportJobsRepositoryPort,
+    @Inject(FILES_REPOSITORY) private readonly filesRepository: FilesRepositoryPort,
     private readonly importExportAdapters: ImportExportAdapterRegistry,
     @Inject(OBJECT_STORAGE) private readonly objectStorage: ObjectStorage,
     private readonly auditService: AuditService,

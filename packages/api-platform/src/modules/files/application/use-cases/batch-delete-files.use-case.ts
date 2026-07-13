@@ -4,10 +4,10 @@ import type {
   RequestContext,
 } from '@repo/api-core';
 
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { requireOrganizationId } from '@repo/api-core';
 
-import { FilesRepository } from '../../infrastructure/files.repository';
+import { FILES_REPOSITORY, type FilesRepositoryPort } from '../ports/files.repository.port';
 import { DeleteFileUseCase } from './delete-file.use-case';
 
 export interface BatchDeleteResultItem {
@@ -19,7 +19,7 @@ export interface BatchDeleteResultItem {
 @Injectable()
 export class BatchDeleteFilesUseCase {
   constructor(
-    private readonly filesRepository: FilesRepository,
+    @Inject(FILES_REPOSITORY) private readonly filesRepository: FilesRepositoryPort,
     private readonly deleteFileUseCase: DeleteFileUseCase,
   ) {}
 

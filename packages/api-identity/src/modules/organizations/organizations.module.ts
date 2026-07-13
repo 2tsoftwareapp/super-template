@@ -3,6 +3,7 @@ import { ORGANIZATION_LOOKUP } from '@repo/api-core';
 
 import { AccessControlModule } from '../access-control/access-control.module';
 import { OrganizationsService } from './application/organizations.service';
+import { ORGANIZATIONS_REPOSITORY } from './application/ports/organizations.repository.port';
 import { AssertOrganizationMembershipUseCase } from './application/use-cases/assert-organization-membership.use-case';
 import { CreateOrganizationUseCase } from './application/use-cases/create-organization.use-case';
 import { DeleteOrganizationUseCase } from './application/use-cases/delete-organization.use-case';
@@ -23,6 +24,10 @@ import { OrganizationsController } from './presentation/organizations.controller
   controllers: [OrganizationsController],
   providers: [
     OrganizationsRepository,
+    {
+      provide: ORGANIZATIONS_REPOSITORY,
+      useExisting: OrganizationsRepository,
+    },
     OrganizationsService,
     ListOrganizationsForUserUseCase,
     CreateOrganizationUseCase,
@@ -44,6 +49,7 @@ import { OrganizationsController } from './presentation/organizations.controller
   exports: [
     OrganizationsRepository,
     OrganizationsService,
+    ORGANIZATIONS_REPOSITORY,
     ORGANIZATION_LOOKUP,
   ],
 })

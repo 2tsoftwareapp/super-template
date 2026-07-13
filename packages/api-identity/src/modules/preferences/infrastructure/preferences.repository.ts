@@ -1,17 +1,16 @@
-import type {
-  DatabaseClient,
-  DatabaseExecutor,
-} from '@repo/api-database';
+import type { DatabaseExecutor } from '@repo/api-database';
 
 import { Inject, Injectable } from '@nestjs/common';
-import { DATABASE } from '@repo/api-database';
+import { DATABASE, type DatabaseClient } from '@repo/api-database';
 import { userPreferences } from '@repo/api-database';
 import { eq } from 'drizzle-orm';
+
+import type { PreferencesRepositoryPort } from '../application/ports/preferences.repository.port';
 
 import { DEFAULT_USER_PREFERENCES } from '../application/preferences.constants';
 
 @Injectable()
-export class PreferencesRepository {
+export class PreferencesRepository implements PreferencesRepositoryPort {
   constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
 
   async findByUserId(

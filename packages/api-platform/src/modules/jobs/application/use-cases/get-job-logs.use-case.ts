@@ -1,11 +1,11 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { AppError, ERROR_CODES } from '@repo/api-core';
 
-import { JobObservabilityRepository } from '../../infrastructure/job-observability.repository';
 import {
   JOBS_REPOSITORY,
   type JobsRepositoryPort,
 } from '../jobs.repository.port';
+import { JOB_OBSERVABILITY_REPOSITORY, type JobObservabilityRepositoryPort } from '../ports/job-observability.repository.port';
 
 export interface ListJobLogsQuery {
   page: number;
@@ -16,7 +16,7 @@ export interface ListJobLogsQuery {
 export class GetJobLogsUseCase {
   constructor(
     @Inject(JOBS_REPOSITORY) private readonly jobsRepository: JobsRepositoryPort,
-    private readonly jobObservabilityRepository: JobObservabilityRepository,
+    @Inject(JOB_OBSERVABILITY_REPOSITORY) private readonly jobObservabilityRepository: JobObservabilityRepositoryPort,
   ) {}
 
   async execute(jobId: string, query: ListJobLogsQuery) {

@@ -1,19 +1,73 @@
+import type { JsonObject } from '@repo/api-core';
 import type { DatabaseClient, DatabaseExecutor } from '@repo/api-database';
 
-import type { JobsRepository } from '../infrastructure/jobs.repository';
+export interface JobRecord {
+  id: string;
+  organizationId: string | null;
+  type: string;
+  payload: JsonObject;
+  status: string;
+  scheduledAt: Date;
+  priority: number;
+  attempts: number;
+  maxAttempts: number;
+  startedAt: Date | null;
+  completedAt: Date | null;
+  cancelledAt: Date | null;
+  errorMessage: string | null;
+  createdById: string | null;
+  idempotencyKey: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
-export type JobRecord = NonNullable<
-  Awaited<ReturnType<JobsRepository['findById']>>
->;
+interface ListJobsParams {
+  page: number;
+  limit: number;
+  status?: string;
+  type?: string;
+}
 
 export interface JobsRepositoryPort {
   readonly client: DatabaseClient;
   create(
-    values: Parameters<JobsRepository['create']>[0],
+    values: {
+      id?: string;
+      type: string;
+      payload: JsonObject;
+      status?: string;
+      scheduledAt?: Date;
+      priority?: number;
+      attempts?: number;
+      maxAttempts?: number;
+      startedAt?: Date | null;
+      completedAt?: Date | null;
+      cancelledAt?: Date | null;
+      errorMessage?: string | null;
+      organizationId?: string | null;
+      createdById?: string | null;
+      idempotencyKey?: string | null;
+    },
     executor?: DatabaseExecutor,
   ): Promise<JobRecord | null>;
   createIdempotent(
-    values: Parameters<JobsRepository['createIdempotent']>[0],
+    values: {
+      id?: string;
+      type: string;
+      payload: JsonObject;
+      status?: string;
+      scheduledAt?: Date;
+      priority?: number;
+      attempts?: number;
+      maxAttempts?: number;
+      startedAt?: Date | null;
+      completedAt?: Date | null;
+      cancelledAt?: Date | null;
+      errorMessage?: string | null;
+      organizationId?: string | null;
+      createdById: string;
+      idempotencyKey: string;
+    },
     executor?: DatabaseExecutor,
   ): Promise<JobRecord | null>;
   findById(
@@ -21,9 +75,9 @@ export interface JobsRepositoryPort {
     executor?: DatabaseExecutor,
   ): Promise<JobRecord | null>;
   list(
-    params: Parameters<JobsRepository['list']>[0],
+    params: ListJobsParams,
     executor?: DatabaseExecutor,
-  ): ReturnType<JobsRepository['list']>;
+  ): Promise<{ rows: JobRecord[]; total: number }>;
   markCancelled(
     jobId: string,
     executor?: DatabaseExecutor,
@@ -31,7 +85,7 @@ export interface JobsRepositoryPort {
   claimDueJobs(
     limit: number,
     executor?: DatabaseExecutor,
-  ): ReturnType<JobsRepository['claimDueJobs']>;
+  ): Promise<JobRecord[]>;
   markCompleted(
     jobId: string,
     executor?: DatabaseExecutor,

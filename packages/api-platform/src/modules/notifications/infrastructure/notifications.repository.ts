@@ -8,6 +8,8 @@ import { DATABASE } from '@repo/api-database';
 import { notifications } from '@repo/api-database';
 import { and, count, desc, eq, isNull } from 'drizzle-orm';
 
+import type { NotificationsRepositoryPort } from '../application/notifications.repository.port';
+
 interface ListNotificationsParams {
   page: number;
   limit: number;
@@ -16,7 +18,7 @@ interface ListNotificationsParams {
 }
 
 @Injectable()
-export class NotificationsRepository {
+export class NotificationsRepository implements NotificationsRepositoryPort {
   constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
 
   async create(

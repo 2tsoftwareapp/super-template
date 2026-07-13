@@ -5,7 +5,7 @@ import { AppError, ERROR_CODES } from '@repo/api-core';
 import { DATABASE } from '@repo/api-database';
 
 import { AccessControlService } from '../../../access-control/application/access-control.service';
-import { OrganizationsRepository } from '../../infrastructure/organizations.repository';
+import { ORGANIZATIONS_REPOSITORY, type OrganizationsRepositoryPort } from '../ports/organizations.repository.port';
 
 const slugify = (value: string) =>
   value
@@ -19,7 +19,7 @@ const slugify = (value: string) =>
 export class EnsurePersonalOrganizationUseCase {
   constructor(
     @Inject(DATABASE) private readonly database: DatabaseClient,
-    private readonly organizationsRepository: OrganizationsRepository,
+    @Inject(ORGANIZATIONS_REPOSITORY) private readonly organizationsRepository: OrganizationsRepositoryPort,
     private readonly accessControlService: AccessControlService,
   ) {}
 

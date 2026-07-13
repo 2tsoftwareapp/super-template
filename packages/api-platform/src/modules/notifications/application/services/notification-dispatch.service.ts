@@ -6,13 +6,13 @@ import {
 
 import type { NotificationView } from '../notifications.types';
 
-import { NotificationStreamService } from '../../infrastructure/notification-stream.service';
+import { NOTIFICATION_STREAM_SERVICE, type NotificationStreamServicePort } from '../ports/notification-stream.service.port';
 import { PUSH_NOTIFIER, type PushNotifier } from '../push.interface';
 
 @Injectable()
 export class NotificationDispatchService {
   constructor(
-    private readonly notificationStreamService: NotificationStreamService,
+    @Inject(NOTIFICATION_STREAM_SERVICE) private readonly notificationStreamService: NotificationStreamServicePort,
     @Inject(PUSH_NOTIFIER) private readonly pushNotifier: PushNotifier,
     @Inject(USER_PREFERENCES_LOOKUP)
     private readonly userPreferencesLookup: UserPreferencesLookup,

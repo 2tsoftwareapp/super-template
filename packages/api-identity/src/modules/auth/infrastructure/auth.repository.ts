@@ -12,8 +12,10 @@ import {
 } from '@repo/api-database';
 import { and, desc, eq, gt, isNull, sql } from 'drizzle-orm';
 
+import type { AuthSessionRepositoryPort } from '../application/ports/auth-session.repository.port';
+
 @Injectable()
-export class AuthRepository {
+export class AuthRepository implements AuthSessionRepositoryPort {
   constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
 
   async createSession(

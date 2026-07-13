@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 
-import { JobObservabilityRepository } from '../../infrastructure/job-observability.repository';
+import { JOB_OBSERVABILITY_REPOSITORY, type JobObservabilityRepositoryPort } from '../ports/job-observability.repository.port';
 
 export interface JobMetricsQuery {
   from?: string;
@@ -10,7 +10,7 @@ export interface JobMetricsQuery {
 @Injectable()
 export class GetJobMetricsUseCase {
   constructor(
-    private readonly jobObservabilityRepository: JobObservabilityRepository,
+    @Inject(JOB_OBSERVABILITY_REPOSITORY) private readonly jobObservabilityRepository: JobObservabilityRepositoryPort,
   ) {}
 
   async execute(query: JobMetricsQuery) {

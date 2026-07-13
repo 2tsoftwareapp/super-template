@@ -1,11 +1,67 @@
+import type { JsonObject } from '@repo/api-core';
 import type { DatabaseExecutor } from '@repo/api-database';
 
-import type { NotificationJobsRepository } from '../infrastructure/notification-jobs.repository';
 import type { ListNotificationJobsQuery } from './notifications.types';
 
-export type NotificationJobRecord = NonNullable<
-  Awaited<ReturnType<NotificationJobsRepository['findById']>>
->;
+export type NotificationJobAudience = 'ALL' | 'USER' | 'USERS';
+export type NotificationJobStatusType = 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'CANCELLED' | 'FAILED';
+
+export interface NotificationJobRecord {
+  id: string;
+  organizationId: string | null;
+  actorId: string | null;
+  audience: NotificationJobAudience;
+  targetUserId: string | null;
+  userIds: string[] | null;
+  type: string;
+  title: string;
+  body: string;
+  data: JsonObject | null;
+  scheduledAt: Date;
+  status: NotificationJobStatusType;
+  recipientCount: number | null;
+  processedAt: Date | null;
+  errorMessage: string | null;
+  idempotencyKey: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface CreateNotificationJobInput {
+  organizationId?: string | null;
+  actorId?: string | null;
+  audience: NotificationJobAudience;
+  targetUserId?: string | null;
+  userIds?: string[] | null;
+  type: string;
+  title: string;
+  body: string;
+  data?: JsonObject | null;
+  scheduledAt: Date;
+  status?: NotificationJobStatusType;
+  recipientCount?: number | null;
+  processedAt?: Date | null;
+  errorMessage?: string | null;
+  idempotencyKey?: string | null;
+}
+
+export interface CreateIdempotentNotificationJobInput {
+  organizationId?: string | null;
+  actorId: string;
+  audience: NotificationJobAudience;
+  targetUserId?: string | null;
+  userIds?: string[] | null;
+  type: string;
+  title: string;
+  body: string;
+  data?: JsonObject | null;
+  scheduledAt: Date;
+  status?: NotificationJobStatusType;
+  recipientCount?: number | null;
+  processedAt?: Date | null;
+  errorMessage?: string | null;
+  idempotencyKey: string;
+}
 
 export interface NotificationJobsListResult {
   rows: NotificationJobRecord[];
@@ -14,13 +70,13 @@ export interface NotificationJobsListResult {
 
 export interface NotificationJobsRepositoryPort {
   create(
-    values: Parameters<NotificationJobsRepository['create']>[0],
+    values: CreateNotificationJobInput,
     executor?: DatabaseExecutor,
   ): Promise<NotificationJobRecord | null>;
   createIdempotent(
-    values: Parameters<NotificationJobsRepository['createIdempotent']>[0],
+    values: CreateIdempotentNotificationJobInput,
     executor?: DatabaseExecutor,
-  ): ReturnType<NotificationJobsRepository['createIdempotent']>;
+  ): Promise<{ value: NotificationJobRecord; created: boolean } | null>;
   findById(
     jobId: string,
     executor?: DatabaseExecutor,

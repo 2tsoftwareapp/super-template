@@ -9,23 +9,22 @@ import {
 import { callBackend, enforceMutationGuard } from "@/lib/server/backend";
 
 interface SwitchOrganizationPayload {
-  data?: { accessToken?: string; organizationId?: string };
+  data?: { accessToken?: string; refreshToken?: string; organizationId?: string };
   error?: unknown;
   meta?: unknown;
 }
 
-// Switching tenant re-issues the access token (new org claim); the refresh
-// token is unchanged. Set the new access cookie and never expose the raw
-// token to the client.
+// Switching tenant re-issues both access and refresh tokens (new org claim).
+// Set both cookies and never expose the raw tokens to the client.
 export async function POST(request: NextRequest) {
   const guardFailure = await enforceMutationGuard(request);
   if (guardFailure) {
     return guardFailure;
   }
 
-  const { accessToken, refreshToken, csrfToken } = await readAuthCookies();
+  const { accessToken, csrfToken } = await readAuthCookies();
 
-  if (!accessToken || !refreshToken) {
+  if (!accessToken) {
     return NextResponse.json(
       {
         error: {
@@ -50,7 +49,7 @@ export async function POST(request: NextRequest) {
 
   const payload = (await response.json()) as SwitchOrganizationPayload;
 
-  if (!response.ok || !payload.data?.accessToken) {
+  if (!response.ok || !payload.data?.accessToken || !payload.data?.refreshToken) {
     return NextResponse.json(payload, { status: response.status });
   }
 
@@ -64,7 +63,10 @@ export async function POST(request: NextRequest) {
 
   setAuthCookies(
     nextResponse,
-    { accessToken: payload.data.accessToken, refreshToken },
+    {
+      accessToken: payload.data.accessToken,
+      refreshToken: payload.data.refreshToken,
+    },
     csrfToken ?? undefined,
   );
 

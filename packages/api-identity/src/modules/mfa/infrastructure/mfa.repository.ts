@@ -1,16 +1,19 @@
-import type { DatabaseClient, DatabaseExecutor } from '@repo/api-database';
+import type { DatabaseExecutor } from '@repo/api-database';
 
 import { Inject, Injectable } from '@nestjs/common';
 import {
   DATABASE,
+  type DatabaseClient,
   mfaChallenges,
   userRecoveryCodes,
   userTwoFactorSecrets,
 } from '@repo/api-database';
 import { and, eq, gt, isNull, sql } from 'drizzle-orm';
 
+import type { MfaRepositoryPort } from '../application/ports/mfa.repository.port';
+
 @Injectable()
-export class MfaRepository {
+export class MfaRepository implements MfaRepositoryPort {
   constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
 
   async findSecretByUserId(

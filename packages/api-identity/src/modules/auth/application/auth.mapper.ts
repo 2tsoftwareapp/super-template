@@ -1,8 +1,4 @@
-import type { AuthRepository } from '../infrastructure/auth.repository';
-
-type AuthSession = NonNullable<
-  Awaited<ReturnType<AuthRepository['findSessionById']>>
->;
+import type { AuthSessionModel } from './models/auth-session';
 
 export interface AuthUserView {
   id: string;
@@ -17,7 +13,7 @@ export interface AuthUserView {
 }
 
 export class AuthMapper {
-  toSessionDto(session: AuthSession, currentSessionId: string) {
+  toSessionDto(session: AuthSessionModel, currentSessionId: string) {
     return {
       id: session.id,
       userId: session.userId,

@@ -3,6 +3,7 @@ import { FILE_LOOKUP } from '@repo/api-core';
 
 import { AuditModule } from '../audit/audit.module';
 import { StorageModule } from '../storage/storage.module';
+import { FILES_REPOSITORY } from './application/ports/files.repository.port';
 import { FileAccessService } from './application/services/file-access.service';
 import { LocalFileDownloadUrlService } from './application/services/local-file-download-url.service';
 import { BatchDeleteFilesUseCase } from './application/use-cases/batch-delete-files.use-case';
@@ -39,7 +40,11 @@ import { FilesController } from './presentation/files.controller';
       provide: FILE_LOOKUP,
       useExisting: FilesRepository,
     },
+    {
+      provide: FILES_REPOSITORY,
+      useExisting: FilesRepository,
+    },
   ],
-  exports: [FilesRepository, FILE_LOOKUP],
+  exports: [FilesRepository, FILES_REPOSITORY, FILE_LOOKUP],
 })
 export class FilesModule {}

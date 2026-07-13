@@ -1,16 +1,19 @@
-import type { DatabaseClient, DatabaseExecutor } from '@repo/api-database';
+import type { DatabaseExecutor } from '@repo/api-database';
 
 import { Inject, Injectable } from '@nestjs/common';
 import {
   DATABASE,
+  type DatabaseClient,
   externalIdentities,
   ssoLoginStates,
   ssoSessionExchanges,
 } from '@repo/api-database';
 import { and, eq, gt, isNull } from 'drizzle-orm';
 
+import type { SsoRepositoryPort } from '../application/ports/sso.repository.port';
+
 @Injectable()
-export class SsoRepository {
+export class SsoRepository implements SsoRepositoryPort {
   constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
 
   async createLoginState(

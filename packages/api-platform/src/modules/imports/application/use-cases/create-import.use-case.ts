@@ -9,7 +9,7 @@ import { AppError, ERROR_CODES } from '@repo/api-core';
 import type { CreateImportCommand, ImportJobView } from '../imports.types';
 
 import { AuditService } from '../../../audit/application/audit.service';
-import { FilesRepository } from '../../../files/infrastructure/files.repository';
+import { FILES_REPOSITORY, type FilesRepositoryPort } from '../../../files/application/ports/files.repository.port';
 import {
   IMPORT_JOBS_REPOSITORY,
   type ImportJobsRepositoryPort,
@@ -22,7 +22,7 @@ export class CreateImportUseCase {
   constructor(
     @Inject(IMPORT_JOBS_REPOSITORY)
     private readonly importJobsRepository: ImportJobsRepositoryPort,
-    private readonly filesRepository: FilesRepository,
+    @Inject(FILES_REPOSITORY) private readonly filesRepository: FilesRepositoryPort,
     private readonly importFileParser: ImportFileParserService,
     private readonly auditService: AuditService,
     private readonly getImportUseCase: GetImportUseCase,

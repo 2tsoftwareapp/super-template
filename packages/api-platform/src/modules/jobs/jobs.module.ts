@@ -6,6 +6,7 @@ import { JobsMapper } from './application/jobs.mapper';
 import { JobsProcessor } from './application/jobs.processor';
 import { JOBS_REPOSITORY } from './application/jobs.repository.port';
 import { JobsService } from './application/jobs.service';
+import { JOB_OBSERVABILITY_REPOSITORY } from './application/ports/job-observability.repository.port';
 import { JobHandlersRegistry } from './application/services/job-handlers.registry';
 import { AddJobDependencyUseCase } from './application/use-cases/add-job-dependency.use-case';
 import { CancelJobUseCase } from './application/use-cases/cancel-job.use-case';
@@ -26,6 +27,10 @@ import { AdminJobsController } from './presentation/admin-jobs.controller';
   providers: [
     JobsRepository,
     JobObservabilityRepository,
+    {
+      provide: JOB_OBSERVABILITY_REPOSITORY,
+      useExisting: JobObservabilityRepository,
+    },
     JobsMapper,
     JobHandlersRegistry,
     EnqueueJobUseCase,
@@ -48,6 +53,6 @@ import { AdminJobsController } from './presentation/admin-jobs.controller';
       useExisting: JobsService,
     },
   ],
-  exports: [JobsRepository, JobsService, BACKGROUND_JOB_ENQUEUER, JOBS_REPOSITORY],
+  exports: [JobsRepository, JobsService, BACKGROUND_JOB_ENQUEUER, JOBS_REPOSITORY, JOB_OBSERVABILITY_REPOSITORY],
 })
 export class JobsModule {}

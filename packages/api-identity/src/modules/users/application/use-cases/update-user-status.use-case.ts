@@ -17,7 +17,7 @@ import type { UserStatus, UserView } from '../users.types';
 
 import { ROLE_NAMES } from '../../../access-control/access-control.constants';
 import { AccessControlService } from '../../../access-control/application/access-control.service';
-import { AuthRepository } from '../../../auth/infrastructure/auth.repository';
+import { AUTH_SESSION_REPOSITORY, type AuthSessionRepositoryPort } from '../../../auth/application/ports/auth-session.repository.port';
 import { assertUserBelongsToOrganization } from '../../domain/user-org-scope.policy';
 import {
   USERS_REPOSITORY,
@@ -33,7 +33,7 @@ export class UpdateUserStatusUseCase {
     private readonly usersRepository: UsersRepositoryPort,
     private readonly accessControlService: AccessControlService,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
-    private readonly authRepository: AuthRepository,
+    @Inject(AUTH_SESSION_REPOSITORY) private readonly authRepository: AuthSessionRepositoryPort,
     private readonly getUserUseCase: GetUserUseCase,
   ) {}
 

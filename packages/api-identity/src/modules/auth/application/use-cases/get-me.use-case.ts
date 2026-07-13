@@ -1,16 +1,22 @@
 import type { AuthenticatedRequestUser } from '@repo/api-core';
 
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { AppError, ERROR_CODES } from '@repo/api-core';
 
-import { UsersRepository } from '../../../users/infrastructure/users.repository';
+import {
+  USERS_REPOSITORY,
+  type UsersRepositoryPort,
+} from '../../../users/application/users.repository.port';
 import { AuthMapper } from '../auth.mapper';
 
 @Injectable()
 export class GetMeUseCase {
   private readonly authMapper = new AuthMapper();
 
-  constructor(private readonly usersRepository: UsersRepository) {}
+  constructor(
+    @Inject(USERS_REPOSITORY)
+    private readonly usersRepository: UsersRepositoryPort,
+  ) {}
 
   async execute(user: AuthenticatedRequestUser) {
     const dbUser = await this.usersRepository.findById(user.userId);

@@ -1,18 +1,24 @@
 import type { AuthenticatedRequestUser } from '@repo/api-core';
 
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 
-import { AuthRepository } from '../../infrastructure/auth.repository';
 import { AuthMapper } from '../auth.mapper';
+import {
+  AUTH_SESSION_REPOSITORY,
+  type AuthSessionRepositoryPort,
+} from '../ports/auth-session.repository.port';
 
 @Injectable()
 export class GetSessionsUseCase {
   private readonly authMapper = new AuthMapper();
 
-  constructor(private readonly authRepository: AuthRepository) {}
+  constructor(
+    @Inject(AUTH_SESSION_REPOSITORY)
+    private readonly authSessionRepository: AuthSessionRepositoryPort,
+  ) {}
 
   async execute(user: AuthenticatedRequestUser) {
-    const sessions = await this.authRepository.listSessionsForUser(
+    const sessions = await this.authSessionRepository.listSessionsForUser(
       user.userId,
     );
     return sessions.map((session) =>

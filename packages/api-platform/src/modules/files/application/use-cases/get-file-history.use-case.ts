@@ -1,9 +1,9 @@
 import type { AuthenticatedRequestUser, JsonObject } from '@repo/api-core';
 
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 
 import { AuditService } from '../../../audit/application/audit.service';
-import { FilesRepository } from '../../infrastructure/files.repository';
+import { FILES_REPOSITORY, type FilesRepositoryPort } from '../ports/files.repository.port';
 import { FileAccessService } from '../services/file-access.service';
 
 export interface FileHistoryEvent {
@@ -20,7 +20,7 @@ const AUDIT_HISTORY_LIMIT = 100;
 export class GetFileHistoryUseCase {
   constructor(
     private readonly fileAccessService: FileAccessService,
-    private readonly filesRepository: FilesRepository,
+    @Inject(FILES_REPOSITORY) private readonly filesRepository: FilesRepositoryPort,
     private readonly auditService: AuditService,
   ) {}
 

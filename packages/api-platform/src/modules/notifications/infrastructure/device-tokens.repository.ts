@@ -8,10 +8,12 @@ import { DATABASE } from '@repo/api-database';
 import { notificationDeviceTokens } from '@repo/api-database';
 import { and, eq } from 'drizzle-orm';
 
+import type { DeviceTokensRepositoryPort } from '../application/ports/device-tokens.repository.port';
+
 export type NotificationDevicePlatform = 'IOS' | 'ANDROID';
 
 @Injectable()
-export class DeviceTokensRepository {
+export class DeviceTokensRepository implements DeviceTokensRepositoryPort {
   constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
 
   async upsert(

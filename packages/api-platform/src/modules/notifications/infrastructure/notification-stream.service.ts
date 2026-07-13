@@ -14,6 +14,8 @@ import {
 import { Observable, Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
 
+import type { NotificationStreamServicePort } from '../application/ports/notification-stream.service.port';
+
 export interface NotificationStreamEvent {
   id: string;
   userId: string;
@@ -38,7 +40,7 @@ interface RedisStreamClient {
 }
 
 @Injectable()
-export class NotificationStreamService implements OnModuleInit, OnModuleDestroy {
+export class NotificationStreamService implements OnModuleInit, OnModuleDestroy, NotificationStreamServicePort {
   private readonly subjects = new Map<
     string,
     Subject<NotificationStreamEvent>

@@ -1,15 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 
 import type { ListAuditLogsQuery } from '../audit.types';
 
-import { AuditRepository } from '../../infrastructure/audit.repository';
 import { AuditMapper } from '../audit.mapper';
+import { AUDIT_REPOSITORY, type AuditRepositoryPort } from '../ports/audit.repository.port';
 
 @Injectable()
 export class ListAuditLogsUseCase {
   private readonly auditMapper = new AuditMapper();
 
-  constructor(private readonly auditRepository: AuditRepository) {}
+  constructor(
+    @Inject(AUDIT_REPOSITORY) private readonly auditRepository: AuditRepositoryPort,
+  ) {}
 
   async execute(query: ListAuditLogsQuery) {
     const result = await this.auditRepository.list({

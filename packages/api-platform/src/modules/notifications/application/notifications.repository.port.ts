@@ -1,11 +1,29 @@
+import type { JsonObject } from '@repo/api-core';
 import type { DatabaseExecutor } from '@repo/api-database';
 
-import type { NotificationsRepository } from '../infrastructure/notifications.repository';
 import type { ListNotificationsQuery } from './notifications.types';
 
-export type NotificationRecord = NonNullable<
-  Awaited<ReturnType<NotificationsRepository['findById']>>
->;
+export interface NotificationRecord {
+  id: string;
+  userId: string;
+  type: string;
+  title: string;
+  body: string;
+  data: JsonObject | null;
+  readAt: Date | null;
+  organizationId: string | null;
+  createdAt: Date;
+}
+
+export interface CreateNotificationInput {
+  userId: string;
+  type: string;
+  title: string;
+  body: string;
+  data?: JsonObject | null | undefined;
+  readAt?: Date | null;
+  organizationId: string;
+}
 
 export interface NotificationsListResult {
   rows: NotificationRecord[];
@@ -14,11 +32,11 @@ export interface NotificationsListResult {
 
 export interface NotificationsRepositoryPort {
   create(
-    values: Parameters<NotificationsRepository['create']>[0],
+    values: CreateNotificationInput,
     executor?: DatabaseExecutor,
   ): Promise<NotificationRecord | null>;
   createMany(
-    values: Parameters<NotificationsRepository['createMany']>[0],
+    values: CreateNotificationInput[],
     executor?: DatabaseExecutor,
   ): Promise<NotificationRecord[]>;
   findById(

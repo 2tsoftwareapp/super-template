@@ -1,8 +1,4 @@
-import type { ExportJobsRepository } from '../infrastructure/export-jobs.repository';
-
-type ExportJobRecord = NonNullable<
-  Awaited<ReturnType<ExportJobsRepository['findById']>>
->;
+import type { ExportJobRecord } from './ports/export-jobs.repository.port';
 
 export class ExportsMapper {
   static toDto(job: ExportJobRecord) {

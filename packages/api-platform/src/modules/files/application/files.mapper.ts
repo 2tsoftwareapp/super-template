@@ -1,8 +1,4 @@
-import type { FilesRepository } from '../infrastructure/files.repository';
-
-type FileRecord = NonNullable<
-  Awaited<ReturnType<FilesRepository['findById']>>
->;
+import type { FileRecord } from './ports/files.repository.port';
 
 export class FilesMapper {
   static toFileDto(file: FileRecord) {

@@ -8,9 +8,9 @@ import {
   type UserPreferencesLookup,
 } from '@repo/api-core';
 
-import { MailDeliveriesRepository } from '../../infrastructure/mail-deliveries.repository';
-import { TemplateRendererService } from '../../infrastructure/template-renderer.service';
 import { MAILER, type Mailer } from '../mailer.interface';
+import { MAIL_DELIVERIES_REPOSITORY, type MailDeliveriesRepositoryPort } from '../ports/mail-deliveries.repository.port';
+import { TEMPLATE_RENDERER_SERVICE, type TemplateRendererServicePort } from '../ports/template-renderer.service.port';
 
 export interface SendTemplateInput {
   templateKey: string;
@@ -23,8 +23,8 @@ export interface SendTemplateInput {
 export class SendMailTemplateUseCase {
   constructor(
     @Inject(MAILER) private readonly mailer: Mailer,
-    private readonly templateRenderer: TemplateRendererService,
-    private readonly mailDeliveriesRepository: MailDeliveriesRepository,
+    @Inject(TEMPLATE_RENDERER_SERVICE) private readonly templateRenderer: TemplateRendererServicePort,
+    @Inject(MAIL_DELIVERIES_REPOSITORY) private readonly mailDeliveriesRepository: MailDeliveriesRepositoryPort,
     @Inject(USER_PREFERENCES_LOOKUP)
     private readonly userPreferencesLookup: UserPreferencesLookup,
   ) {}

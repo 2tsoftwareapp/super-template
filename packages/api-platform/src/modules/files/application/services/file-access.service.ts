@@ -1,13 +1,15 @@
 import type { AuthenticatedRequestUser } from '@repo/api-core';
 
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { AppError, ERROR_CODES } from '@repo/api-core';
 
-import { FilesRepository } from '../../infrastructure/files.repository';
+import { FILES_REPOSITORY, type FilesRepositoryPort } from '../ports/files.repository.port';
 
 @Injectable()
 export class FileAccessService {
-  constructor(private readonly filesRepository: FilesRepository) {}
+  constructor(
+    @Inject(FILES_REPOSITORY) private readonly filesRepository: FilesRepositoryPort,
+  ) {}
 
   async findAccessibleFile(actor: AuthenticatedRequestUser, fileId: string) {
     const file = await this.filesRepository.findById(fileId);

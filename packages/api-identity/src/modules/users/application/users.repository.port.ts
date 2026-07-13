@@ -1,11 +1,33 @@
 import type { DatabaseExecutor } from '@repo/api-database';
 
-import type { UsersRepository } from '../infrastructure/users.repository';
 import type { ListUsersQuery } from './users.types';
 
-export type UserRecord = NonNullable<
-  Awaited<ReturnType<UsersRepository['findById']>>
->;
+export interface UserRecord {
+  id: string;
+  email: string;
+  passwordHash: string;
+  displayName: string;
+  avatarUrl: string | null;
+  avatarFileId: string | null;
+  status: 'PENDING' | 'ACTIVE' | 'BLOCKED';
+  emailVerifiedAt: Date | null;
+  deletedAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface CreateUserInput {
+  email: string;
+  passwordHash: string;
+  displayName: string;
+  avatarUrl?: string | null;
+  avatarFileId?: string | null;
+  status?: 'PENDING' | 'ACTIVE' | 'BLOCKED';
+  emailVerifiedAt?: Date | null;
+  deletedAt?: Date | null;
+}
+
+export type UpdateUserInput = Partial<CreateUserInput>;
 
 export interface UsersListResult {
   rows: UserRecord[];
@@ -14,22 +36,26 @@ export interface UsersListResult {
 
 export interface UsersRepositoryPort {
   create(
-    values: Parameters<UsersRepository['create']>[0],
+    values: CreateUserInput,
     executor?: DatabaseExecutor,
-  ): ReturnType<UsersRepository['create']>;
+  ): Promise<UserRecord>;
   findById(
     userId: string,
     executor?: DatabaseExecutor,
   ): Promise<UserRecord | null>;
+  findByEmail(
+    email: string,
+    executor?: DatabaseExecutor,
+  ): Promise<UserRecord | null>;
   update(
     userId: string,
-    values: Parameters<UsersRepository['update']>[1],
+    values: UpdateUserInput,
     executor?: DatabaseExecutor,
-  ): ReturnType<UsersRepository['update']>;
+  ): Promise<UserRecord | null>;
   softDelete(
     userId: string,
     executor?: DatabaseExecutor,
-  ): ReturnType<UsersRepository['softDelete']>;
+  ): Promise<UserRecord | null>;
   list(
     params: ListUsersQuery,
     executor?: DatabaseExecutor,

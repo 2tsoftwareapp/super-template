@@ -1,12 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 
 import type { ListActivitiesQuery } from '../activities.types';
 
-import { ActivitiesRepository } from '../../infrastructure/activities.repository';
+import { ACTIVITIES_REPOSITORY, type ActivitiesRepositoryPort } from '../ports/activities.repository.port';
 
 @Injectable()
 export class ListActivitiesUseCase {
-  constructor(private readonly activitiesRepository: ActivitiesRepository) {}
+  constructor(
+    @Inject(ACTIVITIES_REPOSITORY) private readonly activitiesRepository: ActivitiesRepositoryPort,
+  ) {}
 
   async execute(query: ListActivitiesQuery) {
     const result = await this.activitiesRepository.list({

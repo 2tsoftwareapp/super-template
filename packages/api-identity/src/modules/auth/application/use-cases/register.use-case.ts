@@ -17,23 +17,31 @@ import type { RegisterCommand } from '../auth.types';
 
 import { AccessControlService } from '../../../access-control/application/access-control.service';
 import { OrganizationsService } from '../../../organizations/application/organizations.service';
-import { UsersRepository } from '../../../users/infrastructure/users.repository';
-import { AuthRepository } from '../../infrastructure/auth.repository';
+import {
+  USERS_REPOSITORY,
+  type UsersRepositoryPort,
+} from '../../../users/application/users.repository.port';
 import {
   generateOpaqueToken,
   hashOpaqueToken,
   hashPassword,
 } from '../auth.helpers';
+import {
+  AUTH_SESSION_REPOSITORY,
+  type AuthSessionRepositoryPort,
+} from '../ports/auth-session.repository.port';
 import { AuthMailService } from '../services/auth-mail.service';
 
 @Injectable()
 export class RegisterUseCase {
   constructor(
     @Inject(DATABASE) private readonly database: DatabaseClient,
-    private readonly usersRepository: UsersRepository,
+    @Inject(USERS_REPOSITORY)
+    private readonly usersRepository: UsersRepositoryPort,
     private readonly accessControlService: AccessControlService,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
-    private readonly authRepository: AuthRepository,
+    @Inject(AUTH_SESSION_REPOSITORY)
+    private readonly authSessionRepository: AuthSessionRepositoryPort,
     private readonly organizationsService: OrganizationsService,
     private readonly authMailService: AuthMailService,
   ) {}
@@ -83,7 +91,7 @@ export class RegisterUseCase {
         );
 
         const verificationToken = generateOpaqueToken();
-        await this.authRepository.storeEmailVerificationToken(
+        await this.authSessionRepository.storeEmailVerificationToken(
           {
             userId: user.id,
             tokenHash: hashOpaqueToken(verificationToken),
@@ -116,10 +124,8 @@ export class RegisterUseCase {
     );
 
     return {
-      data: {
-        success: true,
-        message: 'Registration successful. Verify your email to continue.',
-      },
+      success: true,
+      message: 'Registration successful. Verify your email to continue.',
     };
   }
 }

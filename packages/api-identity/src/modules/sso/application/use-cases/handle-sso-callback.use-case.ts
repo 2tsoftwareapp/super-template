@@ -19,13 +19,13 @@ import { AccessControlService } from '../../../access-control/application/access
 import { hashPassword } from '../../../auth/application/auth.helpers';
 import { IssueSessionUseCase } from '../../../auth/application/use-cases/issue-session.use-case';
 import { OrganizationsService } from '../../../organizations/application/organizations.service';
-import { UsersRepository } from '../../../users/infrastructure/users.repository';
+import { USERS_REPOSITORY, type UsersRepositoryPort } from '../../../users/application/users.repository.port';
 import { decideAccountLinking } from '../../domain/account-linking.policy';
-import { SsoRepository } from '../../infrastructure/sso.repository';
 import {
   SSO_PROVIDER_REGISTRY,
   type SsoProviderRegistry,
 } from '../../ports/sso-provider.port';
+import { SSO_REPOSITORY, type SsoRepositoryPort } from '../ports/sso.repository.port';
 
 @Injectable()
 export class HandleSsoCallbackUseCase {
@@ -33,8 +33,8 @@ export class HandleSsoCallbackUseCase {
     @Inject(SSO_PROVIDER_REGISTRY)
     private readonly providers: SsoProviderRegistry,
     @Inject(DATABASE) private readonly database: DatabaseClient,
-    private readonly ssoRepository: SsoRepository,
-    private readonly usersRepository: UsersRepository,
+    @Inject(SSO_REPOSITORY) private readonly ssoRepository: SsoRepositoryPort,
+    @Inject(USERS_REPOSITORY) private readonly usersRepository: UsersRepositoryPort,
     private readonly accessControlService: AccessControlService,
     private readonly organizationsService: OrganizationsService,
     private readonly issueSessionUseCase: IssueSessionUseCase,

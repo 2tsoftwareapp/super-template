@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import {
   AppError,
@@ -8,23 +8,26 @@ import {
 } from '@repo/api-core';
 import { randomUUID } from 'node:crypto';
 
-import { AuthRepository } from '../../infrastructure/auth.repository';
-import { hashRefreshToken } from '../auth.helpers';
+import type {
+  AuthTokenProviderPort,
+  TokenPayload,
+} from '../ports/auth-token.provider.port';
 
-export interface TokenPayload {
-  sub: string;
-  sid: string;
-  jti: string;
-  typ: 'access' | 'refresh';
-  oid?: string;
-}
+import { hashRefreshToken } from '../auth.helpers';
+import {
+  AUTH_SESSION_REPOSITORY,
+  type AuthSessionRepositoryPort,
+} from '../ports/auth-session.repository.port';
+
+export { type TokenPayload };
 
 @Injectable()
-export class SessionTokenService {
+export class SessionTokenService implements AuthTokenProviderPort {
   constructor(
     private readonly environmentService: EnvironmentService,
     private readonly jwtService: JwtService,
-    private readonly authRepository: AuthRepository,
+    @Inject(AUTH_SESSION_REPOSITORY)
+    private readonly authSessionRepository: AuthSessionRepositoryPort,
   ) {}
 
   async createSessionTokens(
@@ -39,7 +42,7 @@ export class SessionTokenService {
     );
     const { accessToken, refreshToken, refreshTokenHash } =
       await this.issueTokenPair(userId, sessionId, organizationId);
-    const session = await this.authRepository.createSession({
+    const session = await this.authSessionRepository.createSession({
       id: sessionId,
       userId,
       refreshTokenHash,
@@ -60,41 +63,16 @@ export class SessionTokenService {
     };
   }
 
-  async rotateSessionTokens(
-    sessionId: string,
-    refreshTokenHash: string,
-    userId: string,
-    organizationId: string,
-    metadata: { ipAddress: string | null; userAgent: string | null },
-  ) {
-    const rotated = await this.tryRotateSessionTokens(
-      sessionId,
-      refreshTokenHash,
-      userId,
-      organizationId,
-      metadata,
-      // Strict rotation starts a fresh grace window anchored on the token
-      // being replaced.
-      { startGraceWindow: true },
-    );
-
-    if (!rotated) {
-      await this.authRepository.revokeSession(sessionId);
-      throw new AppError(
-        ERROR_CODES.AUTH_REFRESH_TOKEN_REUSED,
-        'Refresh token reuse detected',
-        HttpStatus.UNAUTHORIZED,
-      );
-    }
-
-    return rotated;
-  }
-
   /**
    * CAS rotation that returns null on a hash mismatch instead of revoking.
-   * Grace-path callers (previous token inside the rotation-grace window) use
-   * this to retry against a re-read session; they must NOT restart the grace
-   * window, so the original pre-race token keeps working for later racers.
+   * The use case re-reads the session and re-classifies on CAS miss; only the
+   * use case may decide to revoke.
+   *
+   * When `startGraceWindow` is true (strict-rotate path) the session's
+   * previous-hash fields are set so that racers whose token was the old
+   * current-hash can still rotate inside the grace window.  Grace-path
+   * callers must NOT restart the window, so the original pre-race token
+   * keeps working for later racers.
    */
   async tryRotateSessionTokens(
     sessionId: string,
@@ -109,7 +87,7 @@ export class SessionTokenService {
       refreshToken,
       refreshTokenHash: nextRefreshTokenHash,
     } = await this.issueTokenPair(userId, sessionId, organizationId);
-    const session = await this.authRepository.updateSessionIfMatches(
+    const session = await this.authSessionRepository.updateSessionIfMatches(
       sessionId,
       refreshTokenHash,
       {

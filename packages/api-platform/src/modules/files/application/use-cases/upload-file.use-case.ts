@@ -17,8 +17,8 @@ import {
   MAX_FILE_SIZE_BYTES,
   resolveUploadedFileMimeType,
 } from '../../domain/upload-policy';
-import { FilesRepository } from '../../infrastructure/files.repository';
 import { FilesMapper } from '../files.mapper';
+import { FILES_REPOSITORY, type FilesRepositoryPort } from '../ports/files.repository.port';
 
 interface UploadedFile {
   buffer: Buffer;
@@ -30,7 +30,7 @@ interface UploadedFile {
 @Injectable()
 export class UploadFileUseCase {
   constructor(
-    private readonly filesRepository: FilesRepository,
+    @Inject(FILES_REPOSITORY) private readonly filesRepository: FilesRepositoryPort,
     @Inject(OBJECT_STORAGE) private readonly objectStorage: ObjectStorage,
     private readonly auditService: AuditService,
   ) {}

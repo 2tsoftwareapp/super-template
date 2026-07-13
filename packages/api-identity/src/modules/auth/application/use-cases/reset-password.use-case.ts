@@ -12,16 +12,24 @@ import { DATABASE, runInTransaction } from '@repo/api-database';
 
 import type { ResetPasswordCommand } from '../auth.types';
 
-import { UsersRepository } from '../../../users/infrastructure/users.repository';
-import { AuthRepository } from '../../infrastructure/auth.repository';
+import {
+  USERS_REPOSITORY,
+  type UsersRepositoryPort,
+} from '../../../users/application/users.repository.port';
 import { hashOpaqueToken, hashPassword } from '../auth.helpers';
+import {
+  AUTH_SESSION_REPOSITORY,
+  type AuthSessionRepositoryPort,
+} from '../ports/auth-session.repository.port';
 
 @Injectable()
 export class ResetPasswordUseCase {
   constructor(
     @Inject(DATABASE) private readonly database: DatabaseClient,
-    private readonly usersRepository: UsersRepository,
-    private readonly authRepository: AuthRepository,
+    @Inject(USERS_REPOSITORY)
+    private readonly usersRepository: UsersRepositoryPort,
+    @Inject(AUTH_SESSION_REPOSITORY)
+    private readonly authSessionRepository: AuthSessionRepositoryPort,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
   ) {}
 
@@ -31,7 +39,7 @@ export class ResetPasswordUseCase {
   ) {
     const tokenHash = hashOpaqueToken(input.token);
     const token =
-      await this.authRepository.findValidPasswordResetToken(tokenHash);
+      await this.authSessionRepository.findValidPasswordResetToken(tokenHash);
 
     if (!token) {
       throw new AppError(
@@ -49,11 +57,11 @@ export class ResetPasswordUseCase {
         },
         transaction,
       );
-      await this.authRepository.consumePasswordResetToken(
+      await this.authSessionRepository.consumePasswordResetToken(
         token.id,
         transaction,
       );
-      await this.authRepository.revokeAllSessionsForUser(
+      await this.authSessionRepository.revokeAllSessionsForUser(
         token.userId,
         transaction,
       );
@@ -69,10 +77,6 @@ export class ResetPasswordUseCase {
       );
     });
 
-    return {
-      data: {
-        success: true,
-      },
-    };
+    return { success: true };
   }
 }

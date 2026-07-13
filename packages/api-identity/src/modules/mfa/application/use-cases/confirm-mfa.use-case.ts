@@ -17,13 +17,13 @@ import { hashRecoveryCode } from '../../domain/hash-recovery-code';
 import { generateRecoveryCodes } from '../../domain/recovery-codes';
 import { verifyTotpCode } from '../../domain/totp';
 import { decryptTotpSecret } from '../../domain/totp-encryption';
-import { MfaRepository } from '../../infrastructure/mfa.repository';
+import { MFA_REPOSITORY, type MfaRepositoryPort } from '../ports/mfa.repository.port';
 
 @Injectable()
 export class ConfirmMfaUseCase {
   constructor(
     @Inject(DATABASE) private readonly database: DatabaseClient,
-    private readonly mfaRepository: MfaRepository,
+    @Inject(MFA_REPOSITORY) private readonly mfaRepository: MfaRepositoryPort,
     private readonly environmentService: EnvironmentService,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
   ) {}

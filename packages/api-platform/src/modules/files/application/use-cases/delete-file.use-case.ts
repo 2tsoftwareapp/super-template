@@ -11,14 +11,14 @@ import {
   OBJECT_STORAGE,
   type ObjectStorage,
 } from '../../../storage/application/object-storage.interface';
-import { FilesRepository } from '../../infrastructure/files.repository';
+import { FILES_REPOSITORY, type FilesRepositoryPort } from '../ports/files.repository.port';
 import { FileAccessService } from '../services/file-access.service';
 
 @Injectable()
 export class DeleteFileUseCase {
   constructor(
     private readonly fileAccessService: FileAccessService,
-    private readonly filesRepository: FilesRepository,
+    @Inject(FILES_REPOSITORY) private readonly filesRepository: FilesRepositoryPort,
     @Inject(OBJECT_STORAGE) private readonly objectStorage: ObjectStorage,
     private readonly auditService: AuditService,
   ) {}

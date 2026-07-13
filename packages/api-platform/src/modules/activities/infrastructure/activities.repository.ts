@@ -8,16 +8,11 @@ import { DATABASE } from '@repo/api-database';
 import { activities } from '@repo/api-database';
 import { and, count, desc, eq } from 'drizzle-orm';
 
-interface ListActivitiesParams {
-  page: number;
-  limit: number;
-  entityType?: string;
-  entityId?: string;
-  actorId?: string;
-}
+import type { ActivitiesRepositoryPort, ListActivitiesQuery } from '../application/ports/activities.repository.port';
+
 
 @Injectable()
-export class ActivitiesRepository {
+export class ActivitiesRepository implements ActivitiesRepositoryPort {
   constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
 
   async create(
@@ -33,7 +28,7 @@ export class ActivitiesRepository {
   }
 
   async list(
-    params: ListActivitiesParams,
+    params: ListActivitiesQuery,
     executor: DatabaseExecutor = this.database,
   ) {
     const filters = [];

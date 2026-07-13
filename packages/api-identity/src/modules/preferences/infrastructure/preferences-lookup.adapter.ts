@@ -3,9 +3,9 @@ import type {
   UserPreferencesLookup,
 } from '@repo/api-core';
 
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 
-import { UsersRepository } from '../../users/infrastructure/users.repository';
+import { USERS_REPOSITORY, type UsersRepositoryPort } from '../../users/application/users.repository.port';
 import { DEFAULT_USER_PREFERENCES } from '../application/preferences.constants';
 import { PreferencesRepository } from './preferences.repository';
 
@@ -22,7 +22,7 @@ function resolveNotificationPreferences(
 export class PreferencesLookupAdapter implements UserPreferencesLookup {
   constructor(
     private readonly preferencesRepository: PreferencesRepository,
-    private readonly usersRepository: UsersRepository,
+    @Inject(USERS_REPOSITORY) private readonly usersRepository: UsersRepositoryPort,
   ) {}
 
   async findNotificationPreferencesByUserId(

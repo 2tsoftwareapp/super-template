@@ -11,12 +11,16 @@ import {
   ERROR_CODES,
 } from '@repo/api-core';
 
-import { AuthRepository } from '../../infrastructure/auth.repository';
+import {
+  AUTH_SESSION_REPOSITORY,
+  type AuthSessionRepositoryPort,
+} from '../ports/auth-session.repository.port';
 
 @Injectable()
 export class RevokeSessionUseCase {
   constructor(
-    private readonly authRepository: AuthRepository,
+    @Inject(AUTH_SESSION_REPOSITORY)
+    private readonly authSessionRepository: AuthSessionRepositoryPort,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
   ) {}
 
@@ -25,7 +29,7 @@ export class RevokeSessionUseCase {
     sessionId: string,
     requestContext?: RequestContext,
   ) {
-    const session = await this.authRepository.findSessionForUser(
+    const session = await this.authSessionRepository.findSessionForUser(
       sessionId,
       user.userId,
     );
@@ -38,7 +42,7 @@ export class RevokeSessionUseCase {
       );
     }
 
-    await this.authRepository.revokeSession(sessionId);
+    await this.authSessionRepository.revokeSession(sessionId);
     await this.auditWriter.log({
       actorId: user.userId,
       action: 'auth.session.revoked',

@@ -1,11 +1,17 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { durationToMilliseconds, normalizeEmail } from '@repo/api-core';
 
 import type { ResendVerificationCommand } from '../auth.types';
 
-import { UsersRepository } from '../../../users/infrastructure/users.repository';
-import { AuthRepository } from '../../infrastructure/auth.repository';
+import {
+  USERS_REPOSITORY,
+  type UsersRepositoryPort,
+} from '../../../users/application/users.repository.port';
 import { generateOpaqueToken, hashOpaqueToken } from '../auth.helpers';
+import {
+  AUTH_SESSION_REPOSITORY,
+  type AuthSessionRepositoryPort,
+} from '../ports/auth-session.repository.port';
 import { AuthMailService } from '../services/auth-mail.service';
 
 const RESEND_COOLDOWN_MS = 60_000;
@@ -13,8 +19,10 @@ const RESEND_COOLDOWN_MS = 60_000;
 @Injectable()
 export class ResendVerificationUseCase {
   constructor(
-    private readonly usersRepository: UsersRepository,
-    private readonly authRepository: AuthRepository,
+    @Inject(USERS_REPOSITORY)
+    private readonly usersRepository: UsersRepositoryPort,
+    @Inject(AUTH_SESSION_REPOSITORY)
+    private readonly authSessionRepository: AuthSessionRepositoryPort,
     private readonly authMailService: AuthMailService,
   ) {}
 
@@ -23,7 +31,7 @@ export class ResendVerificationUseCase {
     const user = await this.usersRepository.findByEmail(email);
 
     if (user?.status === 'PENDING') {
-      const latest = await this.authRepository.findLatestEmailVerificationToken(user.id);
+      const latest = await this.authSessionRepository.findLatestEmailVerificationToken(user.id);
       if (latest && !latest.usedAt) {
         const elapsed = Date.now() - latest.createdAt.getTime();
         if (elapsed < RESEND_COOLDOWN_MS) {
@@ -40,7 +48,7 @@ export class ResendVerificationUseCase {
       }
 
       const token = generateOpaqueToken();
-      await this.authRepository.storeEmailVerificationToken({
+      await this.authSessionRepository.storeEmailVerificationToken({
         userId: user.id,
         tokenHash: hashOpaqueToken(token),
         expiresAt: new Date(Date.now() + durationToMilliseconds('1d')),
@@ -49,10 +57,8 @@ export class ResendVerificationUseCase {
     }
 
     return {
-      data: {
-        success: true,
-        message: 'If the account exists, a verification email has been sent.',
-      },
+      success: true,
+      message: 'If the account exists, a verification email has been sent.',
     };
   }
 }

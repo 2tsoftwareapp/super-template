@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { AppError, EnvironmentService, ERROR_CODES } from '@repo/api-core';
 
 import type { MfaSetupResult } from '../mfa.types';
@@ -9,14 +9,14 @@ import {
   generateTotpSecret,
 } from '../../domain/totp';
 import { encryptTotpSecret } from '../../domain/totp-encryption';
-import { MfaRepository } from '../../infrastructure/mfa.repository';
+import { MFA_REPOSITORY, type MfaRepositoryPort } from '../ports/mfa.repository.port';
 
 const OTPAUTH_ISSUER = 'SuperTemplate';
 
 @Injectable()
 export class SetupMfaUseCase {
   constructor(
-    private readonly mfaRepository: MfaRepository,
+    @Inject(MFA_REPOSITORY) private readonly mfaRepository: MfaRepositoryPort,
     private readonly environmentService: EnvironmentService,
   ) {}
 

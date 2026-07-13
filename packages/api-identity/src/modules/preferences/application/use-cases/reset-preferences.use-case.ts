@@ -8,7 +8,7 @@ import {
   ERROR_CODES,
 } from '@repo/api-core';
 
-import { PreferencesRepository } from '../../infrastructure/preferences.repository';
+import { PREFERENCES_REPOSITORY, type PreferencesRepositoryPort } from '../ports/preferences.repository.port';
 import { PreferencesMapper } from '../preferences.mapper';
 
 @Injectable()
@@ -16,7 +16,7 @@ export class ResetPreferencesUseCase {
   private readonly preferencesMapper = new PreferencesMapper();
 
   constructor(
-    private readonly preferencesRepository: PreferencesRepository,
+    @Inject(PREFERENCES_REPOSITORY) private readonly preferencesRepository: PreferencesRepositoryPort,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
   ) {}
 

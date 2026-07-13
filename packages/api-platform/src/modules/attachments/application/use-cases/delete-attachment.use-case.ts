@@ -3,16 +3,16 @@ import type {
   RequestContext,
 } from '@repo/api-core';
 
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { AppError, ERROR_CODES } from '@repo/api-core';
 
 import { AuditService } from '../../../audit/application/audit.service';
-import { AttachmentsRepository } from '../../infrastructure/attachments.repository';
+import { ATTACHMENTS_REPOSITORY, type AttachmentsRepositoryPort } from '../ports/attachments.repository.port';
 
 @Injectable()
 export class DeleteAttachmentUseCase {
   constructor(
-    private readonly attachmentsRepository: AttachmentsRepository,
+    @Inject(ATTACHMENTS_REPOSITORY) private readonly attachmentsRepository: AttachmentsRepositoryPort,
     private readonly auditService: AuditService,
   ) {}
 

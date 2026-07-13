@@ -1,20 +1,20 @@
 import type { DatabaseExecutor } from '@repo/api-database';
 
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { EnvironmentService } from '@repo/api-core';
 
 import { hashRecoveryCode } from '../../domain/hash-recovery-code';
 import { normalizeRecoveryCode } from '../../domain/recovery-codes';
 import { verifyTotpCode } from '../../domain/totp';
 import { decryptTotpSecret } from '../../domain/totp-encryption';
-import { MfaRepository } from '../../infrastructure/mfa.repository';
+import { MFA_REPOSITORY, type MfaRepositoryPort } from '../ports/mfa.repository.port';
 
 const RECOVERY_CODE_LENGTH = 8;
 
 @Injectable()
 export class MfaCodeVerifierService {
   constructor(
-    private readonly mfaRepository: MfaRepository,
+    @Inject(MFA_REPOSITORY) private readonly mfaRepository: MfaRepositoryPort,
     private readonly environmentService: EnvironmentService,
   ) {}
 

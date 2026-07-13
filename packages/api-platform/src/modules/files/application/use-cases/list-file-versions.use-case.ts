@@ -1,15 +1,15 @@
 import type { AuthenticatedRequestUser } from '@repo/api-core';
 
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 
-import { FilesRepository } from '../../infrastructure/files.repository';
+import { FILES_REPOSITORY, type FilesRepositoryPort } from '../ports/files.repository.port';
 import { FileAccessService } from '../services/file-access.service';
 
 @Injectable()
 export class ListFileVersionsUseCase {
   constructor(
     private readonly fileAccessService: FileAccessService,
-    private readonly filesRepository: FilesRepository,
+    @Inject(FILES_REPOSITORY) private readonly filesRepository: FilesRepositoryPort,
   ) {}
 
   async execute(actor: AuthenticatedRequestUser, fileId: string) {

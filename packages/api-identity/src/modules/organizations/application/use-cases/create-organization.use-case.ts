@@ -8,7 +8,7 @@ import { DATABASE, runInTransaction } from '@repo/api-database';
 import type { CreateOrganizationCommand } from '../organizations.types';
 
 import { AccessControlService } from '../../../access-control/application/access-control.service';
-import { OrganizationsRepository } from '../../infrastructure/organizations.repository';
+import { ORGANIZATIONS_REPOSITORY, type OrganizationsRepositoryPort } from '../ports/organizations.repository.port';
 
 const slugify = (value: string) =>
   value
@@ -22,7 +22,7 @@ const slugify = (value: string) =>
 export class CreateOrganizationUseCase {
   constructor(
     @Inject(DATABASE) private readonly database: DatabaseClient,
-    private readonly organizationsRepository: OrganizationsRepository,
+    @Inject(ORGANIZATIONS_REPOSITORY) private readonly organizationsRepository: OrganizationsRepositoryPort,
     private readonly accessControlService: AccessControlService,
   ) {}
 
