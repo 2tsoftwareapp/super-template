@@ -1,1 +1,3 @@
-export const SETTINGS_QUERY_KEY = "admin-settings" as const;
+export const settingsKeys = {
+  all: ["admin-settings"] as const,
+};

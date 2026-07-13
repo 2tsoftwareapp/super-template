@@ -11,7 +11,7 @@ export function useBulkMutation({
   successMessage,
 }: {
   mutationFn: (id: string) => Promise<unknown>;
-  queryKey: string[];
+  queryKey: readonly string[];
   successMessage?: string;
 }) {
   const queryClient = useQueryClient();

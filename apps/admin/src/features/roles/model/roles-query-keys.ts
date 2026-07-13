@@ -1,2 +1,4 @@
-export const ROLES_QUERY_KEY = ["admin-roles"] as const;
-export const PERMISSION_CATALOG_QUERY_KEY = ["admin-permissions"] as const;
+export const rolesKeys = {
+  all: ["admin-roles"] as const,
+  permissionCatalog: ["admin-permissions"] as const,
+};

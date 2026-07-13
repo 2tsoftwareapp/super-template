@@ -1,2 +1,4 @@
-export const NOTIFICATION_JOBS_QUERY_KEY = "admin-notification-jobs" as const;
-export const RECENT_NOTIFICATIONS_QUERY_KEY = "admin-notifications" as const;
+export const notificationsKeys = {
+  jobs: ["admin-notification-jobs"] as const,
+  recent: ["admin-notifications"] as const,
+};

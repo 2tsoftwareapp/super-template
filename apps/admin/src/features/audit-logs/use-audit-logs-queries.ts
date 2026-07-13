@@ -3,17 +3,16 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { type AuditLogsParams, fetchAuditLogs } from "./api/audit-logs-api";
-import { AUDIT_LOGS_QUERY_KEY } from "./model/audit-logs-query-keys";
+import { auditLogsKeys } from "./model/audit-logs-query-keys";
 
 export function useAuditLogsQuery(params: AuditLogsParams) {
   return useQuery({
-    queryKey: [
-      AUDIT_LOGS_QUERY_KEY,
-      params.q,
-      params.from,
-      params.to,
-      params.page,
-    ],
+    queryKey: auditLogsKeys.list({
+      q: params.q,
+      from: params.from,
+      to: params.to,
+      page: params.page,
+    }),
     queryFn: () => fetchAuditLogs(params),
   });
 }

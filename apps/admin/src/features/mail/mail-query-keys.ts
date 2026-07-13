@@ -1,3 +1,5 @@
-export const MAIL_TEMPLATES_QUERY_KEY = "admin-mail-templates" as const;
-export const MAIL_DELIVERIES_QUERY_KEY = "admin-mail-deliveries" as const;
-export const MAIL_PREVIEW_QUERY_KEY = "admin-mail-preview" as const;
+export const mailKeys = {
+  templates: ["admin-mail-templates"] as const,
+  deliveries: (params: Record<string, unknown>) => ["admin-mail-deliveries", "list", params] as const,
+  preview: (key: string) => ["admin-mail-preview", key] as const,
+};

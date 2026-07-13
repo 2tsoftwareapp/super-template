@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import type { NotificationJobDto, SendNotificationInput } from "@/lib/api-types";
 
 import { cancelNotificationJob, sendNotification } from "./api/notifications-api";
-import { NOTIFICATION_JOBS_QUERY_KEY } from "./model/notifications-query-keys";
+import { notificationsKeys } from "./model/notifications-query-keys";
 
 export function useSendNotificationMutation(options?: {
   onSuccess?: (data: { data: NotificationJobDto }) => void;
@@ -18,7 +18,7 @@ export function useSendNotificationMutation(options?: {
     onSuccess: (result) => {
       toast.success("Notification job queued");
       void queryClient.invalidateQueries({
-        queryKey: [NOTIFICATION_JOBS_QUERY_KEY],
+        queryKey: notificationsKeys.jobs,
       });
       options?.onSuccess?.(result);
     },
@@ -38,7 +38,7 @@ export function useCancelNotificationJobMutation(options?: {
     onSuccess: () => {
       toast.success("Job cancelled");
       void queryClient.invalidateQueries({
-        queryKey: [NOTIFICATION_JOBS_QUERY_KEY],
+        queryKey: notificationsKeys.jobs,
       });
       options?.onSuccess?.();
     },

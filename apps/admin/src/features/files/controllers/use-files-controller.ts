@@ -2,11 +2,7 @@
 
 import { useState } from "react";
 
-import type {
-  FileDto,
-  FileHistoryEventDto,
-  FileVersionDto,
-} from "@/lib/api-types";
+import type { FileDto } from "@/lib/api-types";
 
 import { getFileDownloadUrl } from "@/features/files/api/files-api";
 import {
@@ -20,71 +16,22 @@ import {
   useFileVersionsQuery,
 } from "@/features/files/queries/use-files-queries";
 
-export interface FilesViewModel {
-  header: {
-    isFetching: boolean;
-    total: number;
-    onRefresh: () => void;
-  };
-  toolbar: {
-    search: string;
-    onSearchChange: (value: string) => void;
-    hasFilters: boolean;
-    onClearFilters: () => void;
-    mimeFilter: string;
-    onMimeFilterChange: (value: string) => void;
-  };
-  list: {
-    isLoading: boolean;
-    files: FileDto[];
-    page: number;
-    totalPages: number;
-    total: number;
-    onPageChange: (page: number) => void;
-    resultLabel: string;
-    onRowClick: (file: FileDto) => void;
-    onDeleteClick: (file: FileDto) => void;
-    hasFilters: boolean;
-  };
-  upload: {
-    isPending: boolean;
-    onUpload: (file: File) => void;
-  };
-  detail: {
-    file: FileDto | null;
-    description: string;
-    onClose: () => void;
-    onDownload: () => void;
-    onDelete: () => void;
-  };
-  versions: {
-    data: FileVersionDto[] | undefined;
-    isLoading: boolean;
-  };
-  history: {
-    data: FileHistoryEventDto[] | undefined;
-    isLoading: boolean;
-  };
-  detailTabs: {
-    activeTab: "versions" | "history";
-    onTabChange: (tab: "versions" | "history") => void;
-    uploadVersion: {
-      isPending: boolean;
-      onUpload: (file: File) => void;
-    };
-  };
-  confirmDelete: {
-    target: FileDto | null;
-    isPending: boolean;
-    onCancel: () => void;
-    onConfirm: () => void;
-  };
-}
+import type { FilesViewModel } from "./files-view-model";
+
+import { useFilePagination } from "./use-file-pagination";
 
 export function useFilesController(): FilesViewModel {
-  const [search, setSearch] = useState("");
-  const [mimeFilter, setMimeFilter] = useState("");
-  const [page, setPage] = useState(1);
+  const {
+    search,
+    mimeFilter,
+    page,
+    hasFilters,
+    onSearchChange,
+    onMimeFilterChange,
+    onClearFilters,
+    onPageChange,
+  } = useFilePagination();
+
   const [selectedFile, setSelectedFile] = useState<FileDto | null>(null);
   const [detailTab, setDetailTab] = useState<"versions" | "history">(
     "versions",
@@ -124,23 +71,6 @@ export function useFilesController(): FilesViewModel {
   const entries = files.data?.data ?? [];
   const totalPages = files.data?.meta?.totalPages ?? 1;
   const total = files.data?.meta?.total ?? 0;
-  const hasFilters = Boolean(mimeFilter || search);
-
-  const handleSearchChange = (value: string) => {
-    setSearch(value);
-    setPage(1);
-  };
-
-  const handleMimeFilterChange = (value: string) => {
-    setMimeFilter(value);
-    setPage(1);
-  };
-
-  const clearFilters = () => {
-    setMimeFilter("");
-    setSearch("");
-    setPage(1);
-  };
 
   const handleRowClick = (file: FileDto) => {
     setSelectedFile(file);
@@ -161,11 +91,11 @@ export function useFilesController(): FilesViewModel {
     },
     toolbar: {
       search,
-      onSearchChange: handleSearchChange,
+      onSearchChange,
       hasFilters,
-      onClearFilters: clearFilters,
+      onClearFilters,
       mimeFilter,
-      onMimeFilterChange: handleMimeFilterChange,
+      onMimeFilterChange,
     },
     list: {
       isLoading: files.isLoading,
@@ -173,7 +103,7 @@ export function useFilesController(): FilesViewModel {
       page,
       totalPages,
       total,
-      onPageChange: setPage,
+      onPageChange,
       resultLabel: `${entries.length} files${total ? ` (${total} total)` : ""}`,
       onRowClick: handleRowClick,
       onDeleteClick: (file) => setDeleteTarget(file),

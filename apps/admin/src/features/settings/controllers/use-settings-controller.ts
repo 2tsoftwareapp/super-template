@@ -14,42 +14,85 @@ import { useUpdateSettingMutation } from "@/features/settings/use-settings-mutat
 import { useSettingsQuery } from "@/features/settings/use-settings-queries";
 import { parseJsonValue } from "@/lib/json";
 
+import type { SettingRow, SettingsViewModel } from "./settings-view-model";
+
 type SettingValue = ApplicationSettingDto["value"];
 
-export interface SettingObjectField {
-  key: string;
-  value: string | boolean | number | null;
-  onChange: (value: string | boolean) => void;
-}
+function buildSettingRow(
+  setting: ApplicationSettingDto,
+  draftValues: Record<string, string>,
+  draftObjectValues: Record<string, Record<string, string | boolean>>,
+  updateSettingIsPending: boolean,
+  savingKey: string | null,
+  onSetDraftValues: (
+    updater: (prev: Record<string, string>) => Record<string, string>,
+  ) => void,
+  onSetDraftObjectValues: (
+    updater: (
+      prev: Record<string, Record<string, string | boolean>>,
+    ) => Record<string, Record<string, string | boolean>>,
+  ) => void,
+  onRequestSave: () => void,
+): SettingRow {
+  const isObject = isObjectValue(setting.value);
+  const objValue = isObject
+    ? (setting.value as Record<string, string | boolean | number | null>)
+    : null;
 
-export interface SettingRow {
-  setting: ApplicationSettingDto;
-  isObject: boolean;
-  hasChanges: boolean;
-  isSaving: boolean;
-  scalar: {
-    value: string;
-    onChange: (value: string) => void;
-    onReset: () => void;
-  };
-  object: { fields: SettingObjectField[]; onReset: () => void } | null;
-  onRequestSave: () => void;
-}
+  const hasObjectDraft = draftObjectValues[setting.key] !== undefined;
+  const hasChanges = isObject
+    ? objectDraftChanged(setting.value, draftObjectValues[setting.key])
+    : draftValues[setting.key] !== undefined &&
+      draftValues[setting.key] !== initDraft(setting.value);
 
-export interface SettingsViewModel {
-  search: string;
-  onSearchChange: (value: string) => void;
-  isLoading: boolean;
-  isRefreshing: boolean;
-  onRefresh: () => void;
-  totalCount: number | null;
-  filtered: ApplicationSettingDto[];
-  getRow: (setting: ApplicationSettingDto) => SettingRow;
-  confirm: {
-    open: boolean;
-    isSaving: boolean;
-    onCancel: () => void;
-    onConfirm: () => void;
+  return {
+    setting,
+    isObject,
+    hasChanges,
+    isSaving: updateSettingIsPending && savingKey === setting.key,
+    scalar: {
+      value: draftValues[setting.key] ?? initDraft(setting.value),
+      onChange: (value) =>
+        onSetDraftValues((prev) => ({ ...prev, [setting.key]: value })),
+      onReset: () =>
+        onSetDraftValues((prev) => {
+          const next = { ...prev };
+          delete next[setting.key];
+          return next;
+        }),
+    },
+    object:
+      isObject && objValue
+        ? {
+            fields: Object.entries(objValue).map(([k, v]) => ({
+              key: k,
+              value: hasObjectDraft
+                ? (draftObjectValues[setting.key]?.[k] ?? v)
+                : v,
+              onChange: (val) =>
+                onSetDraftObjectValues((prev) => {
+                  const base = prev[setting.key] ?? {};
+                  for (const [bk, bv] of Object.entries(objValue)) {
+                    if (!(bk in base)) {
+                      base[bk] =
+                        typeof bv === "boolean" ? bv : String(bv ?? "");
+                    }
+                  }
+                  return {
+                    ...prev,
+                    [setting.key]: { ...base, [k]: val },
+                  };
+                }),
+            })),
+            onReset: () =>
+              onSetDraftObjectValues((prev) => {
+                const next = { ...prev };
+                delete next[setting.key];
+                return next;
+              }),
+          }
+        : null,
+    onRequestSave,
   };
 }
 
@@ -118,69 +161,19 @@ export function useSettingsController(): SettingsViewModel {
   };
 
   const getRow = (setting: ApplicationSettingDto): SettingRow => {
-    const isObject = isObjectValue(setting.value);
-    const objValue = isObject
-      ? (setting.value as Record<string, string | boolean | number | null>)
-      : null;
-
-    const hasObjectDraft = draftObjectValues[setting.key] !== undefined;
-    const hasChanges = isObject
-      ? objectDraftChanged(setting.value, draftObjectValues[setting.key])
-      : draftValues[setting.key] !== undefined &&
-        draftValues[setting.key] !== initDraft(setting.value);
-
-    return {
+    return buildSettingRow(
       setting,
-      isObject,
-      hasChanges,
-      isSaving: updateSetting.isPending && savingKey === setting.key,
-      scalar: {
-        value: draftValues[setting.key] ?? initDraft(setting.value),
-        onChange: (value) =>
-          setDraftValues((prev) => ({ ...prev, [setting.key]: value })),
-        onReset: () =>
-          setDraftValues((prev) => {
-            const next = { ...prev };
-            delete next[setting.key];
-            return next;
-          }),
-      },
-      object:
-        isObject && objValue
-          ? {
-              fields: Object.entries(objValue).map(([k, v]) => ({
-                key: k,
-                value: hasObjectDraft
-                  ? (draftObjectValues[setting.key]?.[k] ?? v)
-                  : v,
-                onChange: (val) =>
-                  setDraftObjectValues((prev) => {
-                    const base = prev[setting.key] ?? {};
-                    for (const [bk, bv] of Object.entries(objValue)) {
-                      if (!(bk in base)) {
-                        base[bk] =
-                          typeof bv === "boolean" ? bv : String(bv ?? "");
-                      }
-                    }
-                    return {
-                      ...prev,
-                      [setting.key]: { ...base, [k]: val },
-                    };
-                  }),
-              })),
-              onReset: () =>
-                setDraftObjectValues((prev) => {
-                  const next = { ...prev };
-                  delete next[setting.key];
-                  return next;
-                }),
-            }
-          : null,
-      onRequestSave: () => {
+      draftValues,
+      draftObjectValues,
+      updateSetting.isPending,
+      savingKey,
+      setDraftValues,
+      setDraftObjectValues,
+      () => {
         setSavingKey(setting.key);
         setConfirmOpen(true);
       },
-    };
+    );
   };
 
   return {

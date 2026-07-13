@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo
 import { ConfirmDialog } from "@repo/web-core/components/confirm-dialog";
 import { useRef } from "react";
 
-import type { FilesViewModel } from "@/features/files/controllers/use-files-controller";
+import type { FilesViewModel } from "@/features/files/controllers/files-view-model";
 
 import { ResourcePageShell } from "@/components/resource-page-shell";
 import { adminResources } from "@/lib/admin-resources";

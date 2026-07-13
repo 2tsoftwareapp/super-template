@@ -8,18 +8,18 @@ import {
   fetchFileVersions,
   type FilesParams,
 } from "../api/files-api";
-import { FILE_HISTORY_QUERY_KEY, FILE_VERSIONS_QUERY_KEY, FILES_QUERY_KEY } from "../files-query-keys";
+import { filesKeys } from "../files-query-keys";
 
 export function useFilesQuery(params: FilesParams) {
   return useQuery({
-    queryKey: [FILES_QUERY_KEY, params.search, params.mimeFilter, params.page],
+    queryKey: filesKeys.list({ search: params.search, mimeFilter: params.mimeFilter, page: params.page }),
     queryFn: () => fetchFiles(params),
   });
 }
 
 export function useFileVersionsQuery(fileId: string | undefined) {
   return useQuery({
-    queryKey: [FILE_VERSIONS_QUERY_KEY, fileId],
+    queryKey: filesKeys.versions(fileId ?? ""),
     queryFn: () => fetchFileVersions(fileId!),
     enabled: !!fileId,
   });
@@ -27,7 +27,7 @@ export function useFileVersionsQuery(fileId: string | undefined) {
 
 export function useFileHistoryQuery(fileId: string | undefined) {
   return useQuery({
-    queryKey: [FILE_HISTORY_QUERY_KEY, fileId],
+    queryKey: filesKeys.history(fileId ?? ""),
     queryFn: () => fetchFileHistory(fileId!),
     enabled: !!fileId,
   });

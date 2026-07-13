@@ -1,7 +1,6 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 
 import type {
   MailDeliveryDto,
@@ -9,18 +8,18 @@ import type {
   MailTemplateDto,
 } from "@/lib/api-types";
 
-import { useSendMailMutation } from "@/features/mail/use-mail-mutations";
 import {
   useMailDeliveriesQuery,
   useMailPreviewQuery,
   useMailTemplatesQuery,
 } from "@/features/mail/use-mail-queries";
-import { usePathname, useRouter } from "@/i18n/navigation";
 import { adminResources } from "@/lib/admin-resources";
 
 import type { Filters } from "../model/mail-schemas";
 
-import { DELIVERY_PAGE_SIZE, parseFilters } from "../model/mail-schemas";
+import { DELIVERY_PAGE_SIZE } from "../model/mail-schemas";
+import { useMailFilters } from "./use-mail-filters";
+import { useMailSendForm } from "./use-mail-send-form";
 
 const mailResource = adminResources.find((r) => r.id === "mail")!;
 
@@ -85,63 +84,13 @@ export interface MailViewModel {
 }
 
 export function useMailController(): MailViewModel {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const pathname = usePathname();
-
-  const [filters, setFilters] = useState<Filters>(() =>
-    parseFilters(new URLSearchParams(searchParams.toString())),
-  );
-
-  const updateFilter = useCallback(
-    (key: keyof Filters, value: string | number) => {
-      setFilters((prev) => {
-        const next = { ...prev, [key]: value };
-        if (key !== "page") next.page = 1;
-        const sp = new URLSearchParams();
-        if (next.status) sp.set("status", next.status);
-        if (next.templateKey) sp.set("templateKey", next.templateKey);
-        if (next.page > 1) sp.set("page", String(next.page));
-        const qs = sp.toString();
-        router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
-        return next;
-      });
-    },
-    [pathname, router],
-  );
+  const { filters, updateFilter } = useMailFilters();
 
   const [templateKey, setTemplateKey] = useState("auth.welcome");
   const [selectedDelivery, setSelectedDelivery] =
     useState<MailDeliveryDto | null>(null);
 
-  // Send form state
-  const [sendTemplateKey, setSendTemplateKey] = useState("");
-  const [sendRecipient, setSendRecipient] = useState("");
-  const [variableValues, setVariableValues] = useState<
-    Record<string, string>
-  >({});
-  const [sendIdempotencyKey, setSendIdempotencyKey] = useState("");
-
   const templates = useMailTemplatesQuery();
-
-  const selectedTemplate = useMemo(
-    () =>
-      sendTemplateKey
-        ? (templates.data?.data ?? []).find((t) => t.key === sendTemplateKey)
-        : undefined,
-    [sendTemplateKey, templates.data?.data],
-  );
-
-  const handleTemplateChange = useCallback(
-    (key: string) => {
-      setSendTemplateKey(key);
-      const tmpl = (templates.data?.data ?? []).find((t) => t.key === key);
-      setVariableValues(
-        Object.fromEntries((tmpl?.variables ?? []).map((v) => [v, ""])),
-      );
-    },
-    [templates.data?.data],
-  );
 
   const deliveries = useMailDeliveriesQuery({
     templateKey: filters.templateKey || undefined,
@@ -155,32 +104,12 @@ export function useMailController(): MailViewModel {
 
   const preview = useMailPreviewQuery(templateKey);
 
-  const resetForm = useCallback(() => {
-    setSendTemplateKey("");
-    setSendRecipient("");
-    setVariableValues({});
-    setSendIdempotencyKey("");
-  }, []);
-
-  const sendMail = useSendMailMutation({
-    onSuccess: resetForm,
-  });
+  const sendForm = useMailSendForm(templates.data?.data);
 
   const handleRefresh = useCallback(() => {
     void templates.refetch();
     void deliveries.refetch();
   }, [templates, deliveries]);
-
-  const handleSend = useCallback(() => {
-    sendMail.mutate({
-      templateKey: sendTemplateKey,
-      to: sendRecipient,
-      variables: variableValues,
-      ...(sendIdempotencyKey
-        ? { idempotencyKey: sendIdempotencyKey }
-        : {}),
-    });
-  }, [sendMail, sendTemplateKey, sendRecipient, variableValues, sendIdempotencyKey]);
 
   return {
     header: {
@@ -206,23 +135,19 @@ export function useMailController(): MailViewModel {
       onSelect: setTemplateKey,
     },
     sendForm: {
-      selectedTemplateKey: sendTemplateKey,
-      recipient: sendRecipient,
-      variableValues,
-      idempotencyKey: sendIdempotencyKey,
-      sendableTemplates: (templates.data?.data ?? []).filter(
-        (t) => t.sendable,
-      ),
-      selectedTemplate,
-      onChangeTemplate: handleTemplateChange,
-      onChangeRecipient: setSendRecipient,
-      onVariableChange: (name, value) => {
-        setVariableValues((prev) => ({ ...prev, [name]: value }));
-      },
-      onChangeIdempotencyKey: setSendIdempotencyKey,
-      onSend: handleSend,
-      isPending: sendMail.isPending,
-      canSend: Boolean(sendTemplateKey && sendRecipient),
+      selectedTemplateKey: sendForm.selectedTemplateKey,
+      recipient: sendForm.recipient,
+      variableValues: sendForm.variableValues,
+      idempotencyKey: sendForm.idempotencyKey,
+      sendableTemplates: sendForm.sendableTemplates,
+      selectedTemplate: sendForm.selectedTemplate,
+      onChangeTemplate: sendForm.onChangeTemplate,
+      onChangeRecipient: sendForm.onChangeRecipient,
+      onVariableChange: sendForm.onVariableChange,
+      onChangeIdempotencyKey: sendForm.onChangeIdempotencyKey,
+      onSend: sendForm.onSend,
+      isPending: sendForm.isPending,
+      canSend: sendForm.canSend,
     },
     deliveries: {
       items: deliveries.data?.data ?? [],

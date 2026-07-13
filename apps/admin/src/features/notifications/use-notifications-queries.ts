@@ -6,18 +6,18 @@ import {
   fetchNotificationJobs,
   fetchRecentNotifications,
 } from "./api/notifications-api";
-import { NOTIFICATION_JOBS_QUERY_KEY, RECENT_NOTIFICATIONS_QUERY_KEY } from "./model/notifications-query-keys";
+import { notificationsKeys } from "./model/notifications-query-keys";
 
 export function useNotificationJobsQuery() {
   return useQuery({
-    queryKey: [NOTIFICATION_JOBS_QUERY_KEY],
+    queryKey: notificationsKeys.jobs,
     queryFn: fetchNotificationJobs,
   });
 }
 
 export function useRecentNotificationsQuery() {
   return useQuery({
-    queryKey: [RECENT_NOTIFICATIONS_QUERY_KEY],
+    queryKey: notificationsKeys.recent,
     queryFn: fetchRecentNotifications,
   });
 }

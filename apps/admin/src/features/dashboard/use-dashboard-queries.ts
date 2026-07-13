@@ -8,40 +8,35 @@ import {
   fetchJobsSummary,
   fetchOverviewUsers,
 } from "./api/dashboard-api";
-import {
-  DASHBOARD_AUDIT_QUERY_KEY,
-  DASHBOARD_HEALTH_QUERY_KEY,
-  DASHBOARD_JOBS_QUERY_KEY,
-  DASHBOARD_USERS_QUERY_KEY,
-} from "./model/dashboard-query-keys";
+import { dashboardKeys } from "./model/dashboard-query-keys";
 
 const DASHBOARD_QUERY_KEYS = [
-  DASHBOARD_USERS_QUERY_KEY,
-  DASHBOARD_JOBS_QUERY_KEY,
-  DASHBOARD_AUDIT_QUERY_KEY,
-  DASHBOARD_HEALTH_QUERY_KEY,
+  ...dashboardKeys.users,
+  ...dashboardKeys.jobs,
+  ...dashboardKeys.audit,
+  ...dashboardKeys.health,
 ] as const;
 
 export function useDashboardOverviewQueries() {
   return useQueries({
     queries: [
       {
-        queryKey: [DASHBOARD_USERS_QUERY_KEY],
+        queryKey: dashboardKeys.users,
         queryFn: fetchOverviewUsers,
         staleTime: 30_000,
       },
       {
-        queryKey: [DASHBOARD_JOBS_QUERY_KEY],
+        queryKey: dashboardKeys.jobs,
         queryFn: fetchJobsSummary,
         staleTime: 15_000,
       },
       {
-        queryKey: [DASHBOARD_AUDIT_QUERY_KEY],
+        queryKey: dashboardKeys.audit,
         queryFn: fetchAuditSummary,
         staleTime: 15_000,
       },
       {
-        queryKey: [DASHBOARD_HEALTH_QUERY_KEY],
+        queryKey: dashboardKeys.health,
         queryFn: fetchHealthStatus,
         staleTime: 10_000,
         retry: 1,

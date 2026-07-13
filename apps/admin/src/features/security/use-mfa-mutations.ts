@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import type { MfaConfirmResponse, MfaSetupResponse } from "./model/security-schemas";
 
 import { confirmMfa, disableMfa, regenerateMfaCodes, setupMfa } from "./api/security-api";
-import { MFA_STATUS_KEY } from "./model/security-query-keys";
+import { securityKeys } from "./model/security-query-keys";
 
 export function useSetupMfaMutation(options?: { onSuccess?: (data: MfaSetupResponse) => void }) {
   return useMutation({
@@ -24,7 +24,7 @@ export function useConfirmMfaMutation(options?: { onSuccess?: (data: MfaConfirmR
   return useMutation({
     mutationFn: confirmMfa,
     onSuccess: (data) => {
-      void queryClient.invalidateQueries({ queryKey: MFA_STATUS_KEY });
+      void queryClient.invalidateQueries({ queryKey: securityKeys.mfaStatus });
       toast.success("Two-factor authentication enabled");
       options?.onSuccess?.(data);
     },
@@ -41,7 +41,7 @@ export function useDisableMfaMutation(options?: { onSuccess?: () => void; onErro
   return useMutation({
     mutationFn: disableMfa,
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: MFA_STATUS_KEY });
+      void queryClient.invalidateQueries({ queryKey: securityKeys.mfaStatus });
       toast.success("Two-factor authentication disabled");
       options?.onSuccess?.();
     },

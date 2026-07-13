@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import type { RoleForm } from "./model/roles-schemas";
 
 import { createRole, deleteRole, updateRole } from "./api/roles-api";
-import { ROLES_QUERY_KEY } from "./model/roles-query-keys";
+import { rolesKeys } from "./model/roles-query-keys";
 
 export function useDeleteRoleMutation() {
   const queryClient = useQueryClient();
@@ -14,7 +14,7 @@ export function useDeleteRoleMutation() {
   return useMutation({
     mutationFn: deleteRole,
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ROLES_QUERY_KEY });
+      await queryClient.invalidateQueries({ queryKey: rolesKeys.all });
       toast.success("Role deleted");
     },
     onError: () => {
@@ -41,7 +41,7 @@ export function useSaveRoleMutation(options?: { onSuccess?: () => void }) {
     },
     onSuccess: async (data, variables) => {
       const isEditing = !!variables.roleId;
-      await queryClient.invalidateQueries({ queryKey: ROLES_QUERY_KEY });
+      await queryClient.invalidateQueries({ queryKey: rolesKeys.all });
       toast.success(isEditing ? "Role updated" : "Role created");
       options?.onSuccess?.();
     },
