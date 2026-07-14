@@ -103,14 +103,16 @@
       },
       "layer:frontend-core": {
         "dependencies": {
-          "allow": ["layer:frontend-core", "layer:contract", "layer:sort", "layer:tsconfig", "layer:eslint", "layer:frontend-test"]
+          "allow": ["layer:core", "layer:frontend-core", "layer:contract", "layer:sort", "layer:tsconfig", "layer:eslint", "layer:frontend-test"]
         }
       },
       "layer:frontend-ui": {
         "dependencies": {
           "allow": [
+            "layer:core",
             "layer:frontend-core",
             "layer:frontend-ui",
+            "layer:frontend-test",
             "layer:contract",
             "layer:sort",
             "layer:tsconfig",
