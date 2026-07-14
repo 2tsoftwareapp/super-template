@@ -37,16 +37,16 @@ export class AccessControlService {
     return this.accessProfileUseCase.invalidateAccessProfile(userId);
   }
 
-  getRoleNamesForUsers(userIds: string[]) {
-    return this.roleQueryUseCase.getRoleNamesForUsers(userIds);
+  getRoleNamesForUsers(userIds: string[], organizationId?: string | null) {
+    return this.roleQueryUseCase.getRoleNamesForUsers(userIds, organizationId);
   }
 
-  getRoleIdsForUser(userId: string) {
-    return this.roleQueryUseCase.getRoleIdsForUser(userId);
+  getRoleIdsForUser(userId: string, organizationId?: string | null) {
+    return this.roleQueryUseCase.getRoleIdsForUser(userId, organizationId);
   }
 
-  getRoleIdsForUsers(userIds: string[]) {
-    return this.roleQueryUseCase.getRoleIdsForUsers(userIds);
+  getRoleIdsForUsers(userIds: string[], organizationId?: string | null) {
+    return this.roleQueryUseCase.getRoleIdsForUsers(userIds, organizationId);
   }
 
   validateRoleIds(roleIds: string[]) {
@@ -99,7 +99,7 @@ export class AccessControlService {
   replaceUserRoles(
     userId: string,
     roleIds: string[],
-    organizationId?: string | null,
+    organizationId: string | null,
     executor?: TransactionExecutor,
   ) {
     return this.replaceUserRolesUseCase.execute(

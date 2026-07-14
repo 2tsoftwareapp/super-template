@@ -16,7 +16,6 @@ import type { UpdateAdminUserCommand, UserView } from '../users.types';
 
 import { ROLE_NAMES } from '../../../access-control/access-control.constants';
 import { AccessControlService } from '../../../access-control/application/access-control.service';
-import { hashPassword } from '../../../auth/application/auth.helpers';
 import { assertUserBelongsToOrganization } from '../../domain/user-org-scope.policy';
 import {
   USERS_REPOSITORY,
@@ -84,14 +83,6 @@ export class UpdateAdminUserUseCase {
       displayName: input.displayName ?? user.displayName,
       avatarUrl:
         input.avatarUrl === undefined ? user.avatarUrl : input.avatarUrl,
-      status: input.status ?? user.status,
-      passwordHash: input.password
-        ? await hashPassword(input.password)
-        : user.passwordHash,
-      emailVerifiedAt:
-        input.status === 'PENDING'
-          ? null
-          : (user.emailVerifiedAt ?? new Date()),
     });
 
     await this.auditWriter.log({

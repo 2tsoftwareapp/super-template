@@ -281,12 +281,12 @@ export class AccessControlRepository {
   async replaceUserRoles(
     userId: string,
     roleIds: string[],
-    organizationId?: string | null,
+    organizationId: string | null,
     executor: DatabaseExecutor = this.database,
   ): Promise<void> {
-    if (organizationId === undefined) {
-      await executor.delete(userRoles).where(eq(userRoles.userId, userId));
-    } else if (organizationId === null) {
+    // Scoped replace: delete roles only within the given organization scope
+    // and insert the new ones. Never delete roles from other orgs.
+    if (organizationId === null) {
       await executor
         .delete(userRoles)
         .where(and(eq(userRoles.userId, userId), isNull(userRoles.organizationId)));
@@ -302,16 +302,14 @@ export class AccessControlRepository {
     }
 
     if (roleIds.length > 0) {
-      const assignedRoles =
-        organizationId === undefined
-          ? await this.findRolesByIds(roleIds, executor)
-          : await this.findRolesByIds(roleIds, executor).then((roles) =>
-              roles.filter(
-                (role) =>
-                  role.organizationId === null ||
-                  role.organizationId === organizationId,
-              ),
-            );
+      const assignedRoles = await this.findRolesByIds(roleIds, executor).then(
+        (roles) =>
+          roles.filter(
+            (role) =>
+              role.organizationId === null ||
+              role.organizationId === organizationId,
+          ),
+      );
 
       await executor.insert(userRoles).values(
         assignedRoles.map((role) => ({
@@ -391,10 +389,18 @@ export class AccessControlRepository {
 
   async findRoleNamesForUsers(
     userIds: string[],
+    organizationId?: string | null,
     executor: DatabaseExecutor = this.database,
   ) {
     if (userIds.length === 0) {
       return [];
+    }
+
+    const filters = [inArray(userRoles.userId, userIds)];
+    if (organizationId === null) {
+      filters.push(isNull(userRoles.organizationId));
+    } else if (organizationId !== undefined) {
+      filters.push(eq(userRoles.organizationId, organizationId));
     }
 
     return executor
@@ -404,30 +410,46 @@ export class AccessControlRepository {
       })
       .from(userRoles)
       .innerJoin(roles, eq(userRoles.roleId, roles.id))
-      .where(inArray(userRoles.userId, userIds));
+      .where(and(...filters));
   }
 
   async findRoleIdsForUser(
     userId: string,
+    organizationId?: string | null,
     executor: DatabaseExecutor = this.database,
   ): Promise<string[]> {
+    const filters = [eq(userRoles.userId, userId)];
+    if (organizationId === null) {
+      filters.push(isNull(userRoles.organizationId));
+    } else if (organizationId !== undefined) {
+      filters.push(eq(userRoles.organizationId, organizationId));
+    }
+
     const rows = await executor
       .select({
         roleId: roles.id,
       })
       .from(userRoles)
       .innerJoin(roles, eq(userRoles.roleId, roles.id))
-      .where(eq(userRoles.userId, userId));
+      .where(and(...filters));
 
     return rows.map((row) => row.roleId);
   }
 
   async findRoleIdsForUsers(
     userIds: string[],
+    organizationId?: string | null,
     executor: DatabaseExecutor = this.database,
   ) {
     if (userIds.length === 0) {
       return [];
+    }
+
+    const filters = [inArray(userRoles.userId, userIds)];
+    if (organizationId === null) {
+      filters.push(isNull(userRoles.organizationId));
+    } else if (organizationId !== undefined) {
+      filters.push(eq(userRoles.organizationId, organizationId));
     }
 
     return executor
@@ -437,7 +459,7 @@ export class AccessControlRepository {
       })
       .from(userRoles)
       .innerJoin(roles, eq(userRoles.roleId, roles.id))
-      .where(inArray(userRoles.userId, userIds));
+      .where(and(...filters));
   }
 
   async findRoleByName(

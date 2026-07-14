@@ -28,12 +28,16 @@ export class ListUsersUseCase {
       ...query,
       ...(organizationId ? { organizationId } : {}),
     });
+    // Scope role data to the same organization so that roles from other orgs
+    // are never leaked to users who shouldn't see them.
     const [rolesByUserId, roleIdsByUserId] = await Promise.all([
       this.accessControlService.getRoleNamesForUsers(
         result.rows.map((row) => row.id),
+        organizationId,
       ),
       this.accessControlService.getRoleIdsForUsers(
         result.rows.map((row) => row.id),
+        organizationId,
       ),
     ]);
 

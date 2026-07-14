@@ -141,7 +141,7 @@ export class CreateAdminUserUseCase {
           await this.accessControlService.replaceUserRoles(
             user.id,
             [resolvedRole.id],
-            actorIsSuperAdmin ? undefined : actor.organizationId,
+            actorIsSuperAdmin ? null : (actor.organizationId ?? null),
             transaction,
           );
 

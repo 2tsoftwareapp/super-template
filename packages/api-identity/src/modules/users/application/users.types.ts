@@ -47,8 +47,6 @@ export interface CreateAdminUserCommand {
 
 export interface UpdateAdminUserCommand {
   email?: string;
-  password?: string;
   displayName?: string;
   avatarUrl?: string | null;
-  status?: UserStatus;
 }

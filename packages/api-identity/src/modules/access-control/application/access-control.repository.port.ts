@@ -102,14 +102,17 @@ export interface AccessControlRepositoryPort {
   ): Promise<string[]>;
   findRoleNamesForUsers(
     userIds: string[],
+    organizationId?: string | null,
     executor?: TransactionExecutor,
   ): Promise<{ userId: string; roleName: string }[]>;
   findRoleIdsForUser(
     userId: string,
+    organizationId?: string | null,
     executor?: TransactionExecutor,
   ): Promise<string[]>;
   findRoleIdsForUsers(
     userIds: string[],
+    organizationId?: string | null,
     executor?: TransactionExecutor,
   ): Promise<{ userId: string; roleId: string }[]>;
   findRolesByIds(
@@ -174,7 +177,7 @@ export interface AccessControlRepositoryPort {
   replaceUserRoles(
     userId: string,
     roleIds: string[],
-    organizationId?: string | null,
+    organizationId: string | null,
     executor?: TransactionExecutor,
   ): Promise<void>;
 }

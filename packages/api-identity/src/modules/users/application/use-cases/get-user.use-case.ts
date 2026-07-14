@@ -1,7 +1,14 @@
-import type { AuthenticatedRequestUser } from '@repo/api-core';
-
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { AppError, ERROR_CODES } from '@repo/api-core';
+import {
+  HttpStatus,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
+import {
+  AppError,
+  type AuthenticatedRequestUser,
+  ERROR_CODES,
+  ROLE_NAMES,
+} from '@repo/api-core';
 
 import type { UserView } from '../users.types';
 
@@ -51,18 +58,20 @@ export class GetUserUseCase {
       );
     }
 
-    // The target's own primary organization, not the actor's — this is a
-    // "view" operation and must show the target's real roles (including
-    // org-scoped ones like ADMIN) regardless of who is asking.
-    const primaryOrganizationId =
-      await this.organizationsRepository.findPrimaryOrganizationId(userId);
+    // Use the actor's organization context — not the target user's primary
+    // org — so that an ORG_ADMIN only sees roles scoped to their org.
+    // SUPER_ADMIN passes null to see platform-level roles (org-scoped roles
+    // are resolved at query level via the organisation filter).
+    const organizationId = actor
+      ? (actor.roles.includes(ROLE_NAMES.SUPER_ADMIN) ? null : actor.organizationId ?? null)
+      : null;
 
     const [accessProfile, roleIds] = await Promise.all([
       this.accessControlService.getAccessProfile(
         userId,
-        primaryOrganizationId,
+        organizationId,
       ),
-      this.accessControlService.getRoleIdsForUser(userId),
+      this.accessControlService.getRoleIdsForUser(userId, organizationId),
     ]);
 
     return this.usersMapper.toUserView(user, accessProfile.roles, roleIds);

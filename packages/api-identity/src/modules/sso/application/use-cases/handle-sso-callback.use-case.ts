@@ -194,7 +194,7 @@ export class HandleSsoCallbackUseCase {
         await this.accessControlService.replaceUserRoles(
           targetUser.id,
           [userRole.id],
-          undefined,
+          null,
           transaction,
         );
 

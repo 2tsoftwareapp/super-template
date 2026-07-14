@@ -70,6 +70,7 @@ export function useUpdateProfileMutation(
       usersApi.updateProfile(userId, input),
     onSuccess: async (data) => {
       await queryClient.invalidateQueries({ queryKey: usersKeys.detail(userId) });
+      await queryClient.invalidateQueries({ queryKey: usersKeys.all });
       options?.onSuccess?.(data);
     },
   });
@@ -86,6 +87,7 @@ export function useUpdateStatusMutation(
       usersApi.updateStatus(userId, status),
     onSuccess: async (data) => {
       await queryClient.invalidateQueries({ queryKey: usersKeys.detail(userId) });
+      await queryClient.invalidateQueries({ queryKey: usersKeys.all });
       options?.onSuccess?.(data);
     },
   });
@@ -98,10 +100,11 @@ export function useReplaceRolesMutation(
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (role: "ADMIN" | "USER") =>
-      usersApi.replaceRoles(userId, role),
+    mutationFn: ({ role, organizationId }: { role: "ADMIN" | "USER"; organizationId?: string }) =>
+      usersApi.replaceRoles(userId, role, organizationId),
     onSuccess: async (data) => {
       await queryClient.invalidateQueries({ queryKey: usersKeys.detail(userId) });
+      await queryClient.invalidateQueries({ queryKey: usersKeys.all });
       options?.onSuccess?.(data);
     },
   });

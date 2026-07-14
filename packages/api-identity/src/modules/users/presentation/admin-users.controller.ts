@@ -125,12 +125,11 @@ export class AdminUsersController {
       userId,
       {
         ...(input.email !== undefined ? { email: input.email } : {}),
-        ...(input.password !== undefined ? { password: input.password } : {}),
         ...(input.displayName !== undefined
           ? { displayName: input.displayName }
           : {}),
         ...(input.avatarUrl !== undefined ? { avatarUrl: input.avatarUrl } : {}),
-        ...(input.status !== undefined ? { status: input.status } : {}) },
+      },
       request.requestContext,
     );
   }
@@ -180,7 +179,7 @@ export class AdminUsersController {
       actor,
       userId,
       input.role,
-      input.organizationId,
+      input.organizationId ?? null,
       request.requestContext,
     );
   }

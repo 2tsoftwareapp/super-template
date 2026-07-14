@@ -19,7 +19,7 @@ export class ReplaceUserRolesUseCase {
   async execute(
     userId: string,
     roleIds: string[],
-    organizationId?: string | null,
+    organizationId: string | null,
     executor?: TransactionExecutor,
   ): Promise<void> {
     await this.accessControlRepository.replaceUserRoles(

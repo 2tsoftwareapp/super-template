@@ -21,9 +21,9 @@ export class RoleQueryUseCase {
     private readonly accessControlMapper: AccessControlMapper,
   ) {}
 
-  async getRoleNamesForUsers(userIds: string[]) {
+  async getRoleNamesForUsers(userIds: string[], organizationId?: string | null) {
     const rows =
-      await this.accessControlRepository.findRoleNamesForUsers(userIds);
+      await this.accessControlRepository.findRoleNamesForUsers(userIds, organizationId);
     const grouped = new Map<string, string[]>();
 
     for (const row of rows) {
@@ -37,13 +37,13 @@ export class RoleQueryUseCase {
     return grouped;
   }
 
-  getRoleIdsForUser(userId: string) {
-    return this.accessControlRepository.findRoleIdsForUser(userId);
+  getRoleIdsForUser(userId: string, organizationId?: string | null) {
+    return this.accessControlRepository.findRoleIdsForUser(userId, organizationId);
   }
 
-  async getRoleIdsForUsers(userIds: string[]) {
+  async getRoleIdsForUsers(userIds: string[], organizationId?: string | null) {
     const rows =
-      await this.accessControlRepository.findRoleIdsForUsers(userIds);
+      await this.accessControlRepository.findRoleIdsForUsers(userIds, organizationId);
     const grouped = new Map<string, string[]>();
 
     for (const row of rows) {

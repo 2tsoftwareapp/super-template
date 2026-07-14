@@ -103,6 +103,7 @@ export function useUserDetailController(): UserDetailViewModel {
 
   const actorId = session.data?.data.user.id;
   const actorRoles = session.data?.data.user.roles ?? EMPTY_ROLES;
+  const actorOrganizationId = session.data?.data.organizationId;
   const isActorSuperAdmin = actorRoles.includes("SUPER_ADMIN");
   const isSelf = actorId === currentUser?.id;
   const isTargetPrivileged = Boolean(
@@ -179,7 +180,13 @@ export function useUserDetailController(): UserDetailViewModel {
       onSelect: setSelectedRole,
       disabled: roleDisabled,
       canSave: !roleDisabled && selectedRole !== primaryRole,
-      onSave: () => void replaceRoles.mutateAsync(selectedRole),
+      onSave: () => {
+        const args: { role: "ADMIN" | "USER"; organizationId?: string } = { role: selectedRole };
+        if (!isActorSuperAdmin && actorOrganizationId) {
+          args.organizationId = actorOrganizationId;
+        }
+        void replaceRoles.mutateAsync(args);
+      },
       state: {
         isPending: replaceRoles.isPending,
         isSuccess: replaceRoles.isSuccess,

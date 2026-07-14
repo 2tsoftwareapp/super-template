@@ -44,7 +44,7 @@ export class ReplaceUserRolesUseCase {
     actor: AuthenticatedRequestUser,
     userId: string,
     role: AssignableRoleName,
-    organizationId: string | undefined,
+    organizationId: string | null,
     requestContext?: RequestContext,
   ): Promise<UserView> {
     const user = await this.usersRepository.findById(userId);
@@ -116,7 +116,7 @@ export class ReplaceUserRolesUseCase {
         await this.accessControlService.replaceUserRoles(
           userId,
           [resolvedRole.id],
-          actorIsSuperAdmin ? undefined : actor.organizationId,
+          actorIsSuperAdmin ? null : (actor.organizationId ?? null),
           transaction,
         );
       }

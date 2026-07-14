@@ -43,6 +43,7 @@ export function CreateUserDrawer({
       password: "",
       displayName: "",
       role: "USER",
+      organizationId: "",
     },
   });
 
@@ -53,6 +54,7 @@ export function CreateUserDrawer({
       password: "",
       displayName: "",
       role: assignableRoles[0] ?? "USER",
+      organizationId: "",
     });
   }, [open, assignableRoles, form]);
 
@@ -101,6 +103,9 @@ export function CreateUserDrawer({
             displayName: values.displayName,
             role: values.role,
             status: "PENDING",
+            ...(values.role === "ADMIN" && values.organizationId
+              ? { organizationId: values.organizationId }
+              : {}),
           });
         })}
       >
@@ -176,6 +181,23 @@ export function CreateUserDrawer({
             </p>
           ) : null}
         </div>
+
+        {selectedRole === "ADMIN" ? (
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="orgId">Organization ID</Label>
+            <Input
+              id="orgId"
+              placeholder="e.g. 550e8400-e29b-41d4-a716-446655440000"
+              aria-invalid={Boolean(form.formState.errors.organizationId)}
+              {...form.register("organizationId")}
+            />
+            {form.formState.errors.organizationId ? (
+              <p className="text-xs text-destructive">
+                {form.formState.errors.organizationId.message}
+              </p>
+            ) : null}
+          </div>
+        ) : null}
 
         <div className="rounded-md border border-border bg-muted/50 px-3 py-2">
           <p className="text-xs text-muted-foreground">

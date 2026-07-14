@@ -110,7 +110,7 @@ export class CreateAdminUserDto {
 }
 
 export class UpdateAdminUserDto extends PartialType(
-  OmitType(CreateAdminUserDto, ['role', 'organizationId'] as const),
+  OmitType(CreateAdminUserDto, ['role', 'organizationId', 'password', 'status'] as const),
 ) {}
 
 export class UpdateUserStatusDto {

@@ -9,16 +9,26 @@ export function createUserSchema(actorRoles: string[]) {
     canAssignRole(actorRoles, role),
   );
 
-  return z.object({
-    displayName: z
-      .string()
-      .trim()
-      .min(2, "Display name must be at least 2 characters")
-      .max(120, "Display name must be at most 120 characters"),
-    email: z.email("Enter a valid email address"),
-    password: z.string().min(8, "Password must be at least 8 characters"),
-    role: z.enum(allowedRoles.length > 0 ? allowedRoles : ["USER"]),
-  });
+  const isAdminAllowed = allowedRoles.includes("ADMIN");
+
+  return z
+    .object({
+      displayName: z
+        .string()
+        .trim()
+        .min(2, "Display name must be at least 2 characters")
+        .max(120, "Display name must be at most 120 characters"),
+      email: z.email("Enter a valid email address"),
+      password: z.string().min(8, "Password must be at least 8 characters"),
+      role: z.enum(allowedRoles.length > 0 ? allowedRoles : ["USER"]),
+      organizationId: isAdminAllowed
+        ? z.string().uuid("Must be a valid organization UUID")
+        : z.string().uuid().optional(),
+    })
+    .refine(
+      (data) => data.role !== "ADMIN" || Boolean(data.organizationId),
+      { message: "Organization is required when assigning ADMIN", path: ["organizationId"] },
+    );
 }
 
 export type CreateUserForm = z.infer<ReturnType<typeof createUserSchema>>;
