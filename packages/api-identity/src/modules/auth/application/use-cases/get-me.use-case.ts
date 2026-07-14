@@ -6,7 +6,7 @@ import { AppError, ERROR_CODES } from '@repo/api-core';
 import {
   USERS_REPOSITORY,
   type UsersRepositoryPort,
-} from '../../../users/application/users.repository.port';
+} from '../../../users/application/ports/users.repository.port';
 import { AuthMapper } from '../auth.mapper';
 
 @Injectable()

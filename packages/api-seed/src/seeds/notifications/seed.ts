@@ -1,11 +1,11 @@
-import type { NotificationsRepository } from '@repo/api-platform/modules/notifications/infrastructure/notifications.repository';
+import type { NotificationsRepositoryPort } from '@repo/api-platform/modules/notifications/application/ports/notifications.repository.port';
 
 import { type DatabaseExecutor } from '@repo/api-database';
 
 import { type SeededUsersContext } from '../types';
 
 export async function seedNotifications(
-  notificationsRepository: NotificationsRepository,
+  notificationsRepository: NotificationsRepositoryPort,
   context: SeededUsersContext,
   executor: DatabaseExecutor,
 ): Promise<void> {

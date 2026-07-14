@@ -1,5 +1,5 @@
-import type { JobRecord } from './jobs.repository.port';
 import type { JobStatus, JobView } from './jobs.types';
+import type { JobRecord } from './ports/jobs.repository.port';
 
 export class JobsMapper {
   toJobView(job: JobRecord): JobView {

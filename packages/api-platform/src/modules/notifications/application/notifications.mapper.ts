@@ -1,6 +1,6 @@
-import type { NotificationJobRecord } from './notification-jobs.repository.port';
-import type { NotificationRecord } from './notifications.repository.port';
 import type { NotificationJobView, NotificationView } from './notifications.types';
+import type { NotificationJobRecord } from './ports/notification-jobs.repository.port';
+import type { NotificationRecord } from './ports/notifications.repository.port';
 
 export class NotificationsMapper {
   toNotificationView(notification: NotificationRecord): NotificationView {

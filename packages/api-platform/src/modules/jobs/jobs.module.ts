@@ -4,9 +4,9 @@ import { BACKGROUND_JOB_ENQUEUER } from '@repo/api-core';
 import { MailModule } from '../mail/mail.module';
 import { JobsMapper } from './application/jobs.mapper';
 import { JobsProcessor } from './application/jobs.processor';
-import { JOBS_REPOSITORY } from './application/jobs.repository.port';
 import { JobsService } from './application/jobs.service';
 import { JOB_OBSERVABILITY_REPOSITORY } from './application/ports/job-observability.repository.port';
+import { JOBS_REPOSITORY } from './application/ports/jobs.repository.port';
 import { JobHandlersRegistry } from './application/services/job-handlers.registry';
 import { AddJobDependencyUseCase } from './application/use-cases/add-job-dependency.use-case';
 import { CancelJobUseCase } from './application/use-cases/cancel-job.use-case';
@@ -53,6 +53,6 @@ import { AdminJobsController } from './presentation/admin-jobs.controller';
       useExisting: JobsService,
     },
   ],
-  exports: [JobsRepository, JobsService, BACKGROUND_JOB_ENQUEUER, JOBS_REPOSITORY, JOB_OBSERVABILITY_REPOSITORY],
+  exports: [JobsService, BACKGROUND_JOB_ENQUEUER, JOBS_REPOSITORY, JOB_OBSERVABILITY_REPOSITORY],
 })
 export class JobsModule {}

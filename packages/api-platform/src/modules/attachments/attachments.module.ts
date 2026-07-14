@@ -28,7 +28,6 @@ import { AttachmentsController } from './presentation/attachments.controller';
     },
   ],
   exports: [
-    AttachmentsRepository,
     ATTACHMENTS_REPOSITORY,
     ENTITY_ATTACHMENT_LISTING,
   ],

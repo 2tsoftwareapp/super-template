@@ -9,7 +9,7 @@ import { MfaService } from '../../../mfa/application/mfa.service';
 import {
   USERS_REPOSITORY,
   type UsersRepositoryPort,
-} from '../../../users/application/users.repository.port';
+} from '../../../users/application/ports/users.repository.port';
 import { IssueSessionUseCase } from './issue-session.use-case';
 
 @Injectable()

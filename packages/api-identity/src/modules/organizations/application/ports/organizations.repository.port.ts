@@ -1,4 +1,4 @@
-import type { DatabaseClient, DatabaseExecutor } from '@repo/api-database';
+import type { DatabaseExecutor } from '@repo/api-database';
 
 export interface OrganizationRecord {
   id: string;
@@ -36,8 +36,6 @@ export interface UserOrganizationRecord {
 }
 
 export interface OrganizationsRepositoryPort {
-  get client(): DatabaseClient;
-
   createOrganization(
     values: { name: string; slug: string },
     executor?: DatabaseExecutor,

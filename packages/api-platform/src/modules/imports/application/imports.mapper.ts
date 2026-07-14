@@ -1,7 +1,7 @@
 import type { ImportValidationError } from '@repo/api-core';
 
-import type { ImportJobRecord } from './imports.repository.port';
 import type { ImportJobStatus, ImportJobView } from './imports.types';
+import type { ImportJobRecord } from './ports/imports.repository.port';
 
 export class ImportsMapper {
   toImportJobView(job: ImportJobRecord): ImportJobView {

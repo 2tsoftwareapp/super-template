@@ -6,11 +6,11 @@ import { AppError, ERROR_CODES } from '@repo/api-core';
 import type { JobView } from '../jobs.types';
 
 import { JobsMapper } from '../jobs.mapper';
+import { JOB_OBSERVABILITY_REPOSITORY, type JobObservabilityRepositoryPort } from '../ports/job-observability.repository.port';
 import {
   JOBS_REPOSITORY,
   type JobsRepositoryPort,
-} from '../jobs.repository.port';
-import { JOB_OBSERVABILITY_REPOSITORY, type JobObservabilityRepositoryPort } from '../ports/job-observability.repository.port';
+} from '../ports/jobs.repository.port';
 
 @Injectable()
 export class CancelJobUseCase {

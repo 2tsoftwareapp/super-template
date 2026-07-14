@@ -21,7 +21,7 @@ import { AUTH_SESSION_REPOSITORY, type AuthSessionRepositoryPort } from '../../.
 import {
   USERS_REPOSITORY,
   type UsersRepositoryPort,
-} from '../users.repository.port';
+} from '../ports/users.repository.port';
 
 @Injectable()
 export class ChangePasswordUseCase {

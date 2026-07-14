@@ -17,10 +17,6 @@ export type OrganizationMemberRole = 'OWNER' | 'ADMIN' | 'MEMBER';
 export class OrganizationsRepository implements OrganizationsRepositoryPort {
   constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
 
-  get client(): DatabaseClient {
-    return this.database;
-  }
-
   async createOrganization(
     values: typeof organizations.$inferInsert,
     executor: DatabaseExecutor = this.database,

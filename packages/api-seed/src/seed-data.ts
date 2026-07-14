@@ -4,10 +4,10 @@ import type { DatabaseClient } from '@repo/api-database';
 import { EnvironmentService } from '@repo/api-core';
 import { DATABASE, TenantContextService, WORKER_DISPATCH_CONTEXT } from '@repo/api-database';
 import { AccessControlService } from '@repo/api-identity/modules/access-control/application/access-control.service';
-import { AuthRepository } from '@repo/api-identity/modules/auth/infrastructure/auth.repository';
+import { AUTH_SESSION_REPOSITORY, type AuthSessionRepositoryPort } from '@repo/api-identity/modules/auth/application/ports/auth-session.repository.port';
 import { OrganizationsService } from '@repo/api-identity/modules/organizations/application/organizations.service';
-import { UsersRepository } from '@repo/api-identity/modules/users/infrastructure/users.repository';
-import { NotificationsRepository } from '@repo/api-platform/modules/notifications/infrastructure/notifications.repository';
+import { USERS_REPOSITORY, type UsersRepositoryPort } from '@repo/api-identity/modules/users/application/ports/users.repository.port';
+import { NOTIFICATIONS_REPOSITORY, type NotificationsRepositoryPort } from '@repo/api-platform/modules/notifications/application/ports/notifications.repository.port';
 import { EnsureSettingsSeedDataUseCase } from '@repo/api-platform/modules/settings/application/use-cases/ensure-settings-seed-data.use-case';
 
 import { seedAccessControl } from './seeds/access-control/seed';
@@ -19,11 +19,11 @@ export const seedDatabase = async (
   app: INestApplicationContext,
 ): Promise<void> => {
   const accessControlService = app.get(AccessControlService);
-  const authRepository = app.get(AuthRepository);
-  const notificationsRepository = app.get(NotificationsRepository);
+  const authRepository = app.get<AuthSessionRepositoryPort>(AUTH_SESSION_REPOSITORY);
+  const notificationsRepository = app.get<NotificationsRepositoryPort>(NOTIFICATIONS_REPOSITORY);
   const organizationsService = app.get(OrganizationsService);
   const ensureSettingsSeedData = app.get(EnsureSettingsSeedDataUseCase);
-  const usersRepository = app.get(UsersRepository);
+  const usersRepository = app.get<UsersRepositoryPort>(USERS_REPOSITORY);
   const database = app.get<DatabaseClient>(DATABASE);
   const environmentService = app.get(EnvironmentService);
   const tenantContextService = app.get(TenantContextService);

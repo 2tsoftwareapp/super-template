@@ -103,9 +103,9 @@ export function useAdminLoginFlow() {
     resetMfaChallenge,
     loginContent: LOGIN_CONTENT.login,
     mfaContent: LOGIN_CONTENT.mfa,
-    ssoError: loginMutation.isError
-      ? true
-      : searchParams.get(AUTH_SEARCH_PARAMS.error) ===
-          AUTH_ERROR_QUERY_VALUES.ssoFailed,
+    ssoError:
+      ssoStartMutation.isError ||
+      searchParams.get(AUTH_SEARCH_PARAMS.error) ===
+        AUTH_ERROR_QUERY_VALUES.ssoFailed,
   };
 }

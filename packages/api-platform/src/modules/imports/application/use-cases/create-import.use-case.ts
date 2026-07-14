@@ -13,7 +13,7 @@ import { FILES_REPOSITORY, type FilesRepositoryPort } from '../../../files/appli
 import {
   IMPORT_JOBS_REPOSITORY,
   type ImportJobsRepositoryPort,
-} from '../imports.repository.port';
+} from '../ports/imports.repository.port';
 import { ImportFileParserService } from '../services/import-file-parser.service';
 import { GetImportUseCase } from './get-import.use-case';
 

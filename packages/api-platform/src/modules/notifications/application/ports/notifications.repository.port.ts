@@ -1,7 +1,7 @@
 import type { JsonObject } from '@repo/api-core';
 import type { DatabaseExecutor } from '@repo/api-database';
 
-import type { ListNotificationsQuery } from './notifications.types';
+import type { ListNotificationsQuery } from '../notifications.types';
 
 export interface NotificationRecord {
   id: string;

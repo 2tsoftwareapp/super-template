@@ -15,7 +15,7 @@ import type { UpdateProfileCommand, UserView } from '../users.types';
 import {
   USERS_REPOSITORY,
   type UsersRepositoryPort,
-} from '../users.repository.port';
+} from '../ports/users.repository.port';
 import { GetUserUseCase } from './get-user.use-case';
 
 @Injectable()

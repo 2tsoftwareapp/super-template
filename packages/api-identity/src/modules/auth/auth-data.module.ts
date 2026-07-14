@@ -18,6 +18,6 @@ import { AuthRepository } from './infrastructure/auth.repository';
       useExisting: AuthRepository,
     },
   ],
-  exports: [AuthRepository, AuthMailService, AUTH_TOKEN_CLEANUP, AUTH_SESSION_REPOSITORY],
+  exports: [AuthMailService, AUTH_TOKEN_CLEANUP, AUTH_SESSION_REPOSITORY],
 })
 export class AuthDataModule {}

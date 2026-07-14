@@ -1,4 +1,4 @@
-import type { UserRecord } from './users.repository.port';
+import type { UserRecord } from './ports/users.repository.port';
 import type { UserView } from './users.types';
 
 export class UsersMapper {

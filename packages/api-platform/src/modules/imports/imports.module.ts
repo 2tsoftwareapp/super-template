@@ -4,7 +4,7 @@ import { AuditModule } from '../audit/audit.module';
 import { FilesModule } from '../files/files.module';
 import { StorageModule } from '../storage/storage.module';
 import { ImportsMapper } from './application/imports.mapper';
-import { IMPORT_JOBS_REPOSITORY } from './application/imports.repository.port';
+import { IMPORT_JOBS_REPOSITORY } from './application/ports/imports.repository.port';
 import { ImportFileParserService } from './application/services/import-file-parser.service';
 import { ConfirmImportUseCase } from './application/use-cases/confirm-import.use-case';
 import { CreateImportUseCase } from './application/use-cases/create-import.use-case';
@@ -27,6 +27,6 @@ import { ImportsController } from './presentation/imports.controller';
       useExisting: ImportJobsRepository,
     },
   ],
-  exports: [ImportJobsRepository, IMPORT_JOBS_REPOSITORY],
+  exports: [IMPORT_JOBS_REPOSITORY],
 })
 export class ImportsModule {}

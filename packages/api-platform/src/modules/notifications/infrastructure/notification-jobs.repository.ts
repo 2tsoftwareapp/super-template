@@ -8,7 +8,7 @@ import { DATABASE, runIdempotentInsert } from '@repo/api-database';
 import { notificationJobs } from '@repo/api-database';
 import { and, asc, count, desc, eq, lte, sql } from 'drizzle-orm';
 
-import type { NotificationJobsRepositoryPort } from '../application/notification-jobs.repository.port';
+import type { NotificationJobsRepositoryPort } from '../application/ports/notification-jobs.repository.port';
 
 interface ListJobsParams {
   page: number;

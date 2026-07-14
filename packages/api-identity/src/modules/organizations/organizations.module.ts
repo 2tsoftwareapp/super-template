@@ -47,7 +47,6 @@ import { OrganizationsController } from './presentation/organizations.controller
     },
   ],
   exports: [
-    OrganizationsRepository,
     OrganizationsService,
     ORGANIZATIONS_REPOSITORY,
     ORGANIZATION_LOOKUP,

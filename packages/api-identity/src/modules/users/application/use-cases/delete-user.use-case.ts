@@ -20,7 +20,7 @@ import { assertUserBelongsToOrganization } from '../../domain/user-org-scope.pol
 import {
   USERS_REPOSITORY,
   type UsersRepositoryPort,
-} from '../users.repository.port';
+} from '../ports/users.repository.port';
 
 @Injectable()
 export class DeleteUserUseCase {

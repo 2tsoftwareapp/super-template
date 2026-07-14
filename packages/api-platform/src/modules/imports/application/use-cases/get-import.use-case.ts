@@ -9,7 +9,7 @@ import { ImportsMapper } from '../imports.mapper';
 import {
   IMPORT_JOBS_REPOSITORY,
   type ImportJobsRepositoryPort,
-} from '../imports.repository.port';
+} from '../ports/imports.repository.port';
 
 @Injectable()
 export class GetImportUseCase {

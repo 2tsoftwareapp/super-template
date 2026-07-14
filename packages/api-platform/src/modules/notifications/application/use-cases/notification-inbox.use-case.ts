@@ -12,7 +12,7 @@ import { NotificationsMapper } from '../notifications.mapper';
 import {
   NOTIFICATIONS_REPOSITORY,
   type NotificationsRepositoryPort,
-} from '../notifications.repository.port';
+} from '../ports/notifications.repository.port';
 
 @Injectable()
 export class NotificationInboxUseCase {

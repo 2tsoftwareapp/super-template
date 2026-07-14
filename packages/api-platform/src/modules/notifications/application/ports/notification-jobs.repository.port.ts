@@ -1,7 +1,7 @@
 import type { JsonObject } from '@repo/api-core';
 import type { DatabaseExecutor } from '@repo/api-database';
 
-import type { ListNotificationJobsQuery } from './notifications.types';
+import type { ListNotificationJobsQuery } from '../notifications.types';
 
 export type NotificationJobAudience = 'ALL' | 'USER' | 'USERS';
 export type NotificationJobStatusType = 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'CANCELLED' | 'FAILED';

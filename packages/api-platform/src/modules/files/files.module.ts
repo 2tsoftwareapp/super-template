@@ -45,6 +45,6 @@ import { FilesController } from './presentation/files.controller';
       useExisting: FilesRepository,
     },
   ],
-  exports: [FilesRepository, FILES_REPOSITORY, FILE_LOOKUP],
+  exports: [FILES_REPOSITORY, FILE_LOOKUP],
 })
 export class FilesModule {}

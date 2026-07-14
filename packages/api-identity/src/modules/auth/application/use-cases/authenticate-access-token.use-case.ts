@@ -8,7 +8,7 @@ import { OrganizationsService } from '../../../organizations/application/organiz
 import {
   USERS_REPOSITORY,
   type UsersRepositoryPort,
-} from '../../../users/application/users.repository.port';
+} from '../../../users/application/ports/users.repository.port';
 import { assertSessionUsable } from '../auth.helpers';
 import {
   AUTH_SESSION_REPOSITORY,

@@ -8,7 +8,7 @@ import { DATABASE } from '@repo/api-database';
 import { notifications } from '@repo/api-database';
 import { and, count, desc, eq, isNull } from 'drizzle-orm';
 
-import type { NotificationsRepositoryPort } from '../application/notifications.repository.port';
+import type { NotificationsRepositoryPort } from '../application/ports/notifications.repository.port';
 
 interface ListNotificationsParams {
   page: number;

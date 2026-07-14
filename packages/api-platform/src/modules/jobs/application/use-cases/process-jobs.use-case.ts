@@ -8,12 +8,12 @@ import {
 } from '@repo/api-database';
 
 import { resolveFailureOutcome } from '../../domain/job-lifecycle';
+import { JOB_OBSERVABILITY_REPOSITORY, type JobObservabilityRepositoryPort } from '../ports/job-observability.repository.port';
 import {
   type JobRecord,
   JOBS_REPOSITORY,
   type JobsRepositoryPort,
-} from '../jobs.repository.port';
-import { JOB_OBSERVABILITY_REPOSITORY, type JobObservabilityRepositoryPort } from '../ports/job-observability.repository.port';
+} from '../ports/jobs.repository.port';
 import { JobHandlersRegistry } from '../services/job-handlers.registry';
 
 @Injectable()

@@ -24,6 +24,6 @@ import { ActivitiesController } from './presentation/activities.controller';
       useExisting: ActivitiesRepository,
     },
   ],
-  exports: [ActivitiesRepository, ActivitiesService, ACTIVITY_EMITTER, ACTIVITIES_REPOSITORY],
+  exports: [ActivitiesService, ACTIVITY_EMITTER, ACTIVITIES_REPOSITORY],
 })
 export class ActivitiesModule {}

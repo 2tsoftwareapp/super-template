@@ -43,6 +43,6 @@ import { AuditController } from './presentation/audit.controller';
       useExisting: AuditService,
     },
   ],
-  exports: [AuditRepository, AuditService, AUDIT_REPOSITORY, AUDIT_WRITER],
+  exports: [AuditService, AUDIT_REPOSITORY, AUDIT_WRITER],
 })
 export class AuditModule {}

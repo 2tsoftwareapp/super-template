@@ -21,6 +21,6 @@ import { AdminSettingsController } from './presentation/admin-settings.controlle
       useExisting: SettingsRepository,
     },
   ],
-  exports: [SettingsRepository, SETTINGS_REPOSITORY, EnsureSettingsSeedDataUseCase],
+  exports: [SETTINGS_REPOSITORY, EnsureSettingsSeedDataUseCase],
 })
 export class SettingsModule {}

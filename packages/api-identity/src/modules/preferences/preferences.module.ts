@@ -29,7 +29,6 @@ import { PreferencesController } from './presentation/preferences.controller';
     },
   ],
   exports: [
-    PreferencesRepository,
     USER_PREFERENCES_LOOKUP,
   ],
 })

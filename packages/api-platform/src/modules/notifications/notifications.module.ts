@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { USER_NOTIFICATION_SENDER } from '@repo/api-core';
 
-import { NOTIFICATION_JOBS_REPOSITORY } from './application/notification-jobs.repository.port';
 import { NotificationsMapper } from './application/notifications.mapper';
-import { NOTIFICATIONS_REPOSITORY } from './application/notifications.repository.port';
 import { NotificationsService } from './application/notifications.service';
 import { DEVICE_TOKENS_REPOSITORY } from './application/ports/device-tokens.repository.port';
+import { NOTIFICATION_JOBS_REPOSITORY } from './application/ports/notification-jobs.repository.port';
 import { NOTIFICATION_STREAM_SERVICE } from './application/ports/notification-stream.service.port';
+import { NOTIFICATIONS_REPOSITORY } from './application/ports/notifications.repository.port';
 import { PUSH_NOTIFIER } from './application/push.interface';
 import { NotificationDispatchService } from './application/services/notification-dispatch.service';
 import { NotificationJobsProcessor } from './application/services/notification-jobs.processor';
@@ -66,7 +66,6 @@ import {
     },
   ],
   exports: [
-    NotificationsRepository,
     NotificationsService,
     USER_NOTIFICATION_SENDER,
     NOTIFICATIONS_REPOSITORY,

@@ -7,7 +7,6 @@ import { OrganizationsModule } from '../organizations/organizations.module';
 import { UsersModule } from '../users/users.module';
 import { AuthService } from './application/auth.service';
 import { AUTH_TOKEN_PROVIDER } from './application/ports/auth-token.provider.port';
-import { SessionTokenService } from './application/services/session-token.service';
 import { AuthenticateAccessTokenUseCase } from './application/use-cases/authenticate-access-token.use-case';
 import { CompleteMfaLoginUseCase } from './application/use-cases/complete-mfa-login.use-case';
 import { ForgotPasswordUseCase } from './application/use-cases/forgot-password.use-case';
@@ -25,6 +24,7 @@ import { RevokeSessionUseCase } from './application/use-cases/revoke-session.use
 import { SwitchOrganizationUseCase } from './application/use-cases/switch-organization.use-case';
 import { VerifyEmailUseCase } from './application/use-cases/verify-email.use-case';
 import { AuthDataModule } from './auth-data.module';
+import { SessionTokenService } from './infrastructure/session-token.service';
 import { AuthLoginController } from './presentation/auth-login.controller';
 import { AuthRecoveryController } from './presentation/auth-recovery.controller';
 import { AuthRegistrationController } from './presentation/auth-registration.controller';

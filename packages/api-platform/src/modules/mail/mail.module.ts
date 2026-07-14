@@ -46,6 +46,6 @@ import { AdminMailController } from './presentation/admin-mail.controller';
       useExisting: MailService,
     },
   ],
-  exports: [MAILER, MAIL_TEMPLATE_SENDER, MAIL_DELIVERIES_REPOSITORY, TEMPLATE_RENDERER_SERVICE, SmtpMailerService, MailService],
+  exports: [MAILER, MAIL_TEMPLATE_SENDER, MAIL_DELIVERIES_REPOSITORY, TEMPLATE_RENDERER_SERVICE, MailService],
 })
 export class MailModule {}

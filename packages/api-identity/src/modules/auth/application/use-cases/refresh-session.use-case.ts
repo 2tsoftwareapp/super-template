@@ -10,7 +10,7 @@ import { OrganizationsService } from '../../../organizations/application/organiz
 import {
   USERS_REPOSITORY,
   type UsersRepositoryPort,
-} from '../../../users/application/users.repository.port';
+} from '../../../users/application/ports/users.repository.port';
 import { resolveRefreshAttempt } from '../../domain/refresh-rotation.policy';
 import { assertSessionUsable, verifyRefreshTokenHash } from '../auth.helpers';
 import { AuthMapper } from '../auth.mapper';
@@ -84,14 +84,16 @@ export class RefreshSessionUseCase {
       );
     }
 
-    const accessProfile = await this.accessControlService.getAccessProfile(
-      user.id,
-    );
     const organizationId =
       await this.organizationsService.resolveOrganizationIdForUser(
         user.id,
         payload.oid,
       );
+
+    const accessProfile = await this.accessControlService.getAccessProfile(
+      user.id,
+      organizationId,
+    );
     const metadata = {
       ipAddress: requestContext?.ipAddress ?? null,
       userAgent: requestContext?.userAgent ?? null,

@@ -6,7 +6,7 @@ import type { ForgotPasswordCommand } from '../auth.types';
 import {
   USERS_REPOSITORY,
   type UsersRepositoryPort,
-} from '../../../users/application/users.repository.port';
+} from '../../../users/application/ports/users.repository.port';
 import { generateOpaqueToken, hashOpaqueToken } from '../auth.helpers';
 import {
   AUTH_SESSION_REPOSITORY,

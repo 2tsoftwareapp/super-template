@@ -21,22 +21,22 @@ import {
   WORKER_DISPATCH_CONTEXT,
 } from '@repo/api-database';
 
-import type { NotificationJobRecord } from '../notification-jobs.repository.port';
 import type {
   ListNotificationJobsQuery,
   NotificationJobView,
   SendNotificationRequestCommand,
 } from '../notifications.types';
+import type { NotificationJobRecord } from '../ports/notification-jobs.repository.port';
 
+import { NotificationsMapper } from '../notifications.mapper';
 import {
   NOTIFICATION_JOBS_REPOSITORY,
   type NotificationJobsRepositoryPort,
-} from '../notification-jobs.repository.port';
-import { NotificationsMapper } from '../notifications.mapper';
+} from '../ports/notification-jobs.repository.port';
 import {
   NOTIFICATIONS_REPOSITORY,
   type NotificationsRepositoryPort,
-} from '../notifications.repository.port';
+} from '../ports/notifications.repository.port';
 import { NotificationDispatchService } from '../services/notification-dispatch.service';
 
 const DUE_JOB_BATCH_SIZE = 20;

@@ -12,7 +12,6 @@ import {
 } from '@repo/api-core';
 
 import { OrganizationsService } from '../../../organizations/application/organizations.service';
-import { hashRefreshToken } from '../auth.helpers';
 import {
   AUTH_SESSION_REPOSITORY,
   type AuthSessionRepositoryPort,
@@ -56,24 +55,18 @@ export class SwitchOrganizationUseCase {
       );
     }
 
-    const newAccessToken = await this.tokenProvider.signToken(
-      user.userId,
-      user.sessionId,
-      'access',
-      organizationId,
-    );
-    const newRefreshToken = await this.tokenProvider.signToken(
-      user.userId,
-      user.sessionId,
-      'refresh',
-      organizationId,
-    );
-    const newRefreshTokenHash = await hashRefreshToken(newRefreshToken);
+    const metadata = {
+      ipAddress: requestContext?.ipAddress ?? null,
+      userAgent: requestContext?.userAgent ?? null,
+    };
 
-    const rotated = await this.authSessionRepository.updateSessionIfMatches(
+    const rotated = await this.tokenProvider.tryRotateSessionTokens(
       user.sessionId,
       session.refreshTokenHash,
-      { refreshTokenHash: newRefreshTokenHash },
+      user.userId,
+      organizationId,
+      metadata,
+      { startGraceWindow: true },
     );
 
     if (!rotated) {
@@ -93,8 +86,8 @@ export class SwitchOrganizationUseCase {
     });
 
     return {
-      accessToken: newAccessToken,
-      refreshToken: newRefreshToken,
+      accessToken: rotated.accessToken,
+      refreshToken: rotated.refreshToken,
       organizationId,
     };
   }

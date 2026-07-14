@@ -21,6 +21,6 @@ import { ExportsController } from './presentation/exports.controller';
       useExisting: ExportJobsRepository,
     },
   ],
-  exports: [ExportJobsRepository, EXPORT_JOBS_REPOSITORY],
+  exports: [EXPORT_JOBS_REPOSITORY],
 })
 export class ExportsModule {}

@@ -23,7 +23,7 @@ import { NotificationsMapper } from '../notifications.mapper';
 import {
   NOTIFICATIONS_REPOSITORY,
   type NotificationsRepositoryPort,
-} from '../notifications.repository.port';
+} from '../ports/notifications.repository.port';
 import { NotificationDispatchService } from '../services/notification-dispatch.service';
 
 @Injectable()

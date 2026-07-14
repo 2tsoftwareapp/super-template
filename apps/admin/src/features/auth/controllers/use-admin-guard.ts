@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import { useEffect } from "react";
 
 import { useSession } from "@/hooks/use-session";
@@ -16,7 +17,8 @@ export function useAdminGuard(): AdminGuardDecision {
   const session = useSession();
   const router = useRouter();
   const pathname = usePathname();
-  const logoutMutation = useLogoutMutation();
+  const { mutate: logout, isPending: isLoggingOut } = useLogoutMutation();
+  const triggeredRef = useRef(false);
 
   const decision = resolveAdminGuard({
     isLoading: session.isLoading,
@@ -32,21 +34,22 @@ export function useAdminGuard(): AdminGuardDecision {
 
   useEffect(() => {
     switch (status) {
+      case "sign-out":
+        if (!isLoggingOut && !triggeredRef.current) {
+          triggeredRef.current = true;
+          logout();
+        }
+        break;
       case "redirect-login":
         router.replace(ADMIN_AUTH_ROUTES.login);
-        break;
-      case "sign-out":
-        logoutMutation.mutate();
         break;
       case "redirect-resource":
         if (redirectPath) {
           router.replace(redirectPath);
         }
         break;
-      default:
-        break;
     }
-  }, [status, redirectPath, logoutMutation, router]);
+  }, [status, redirectPath, isLoggingOut, logout, router]);
 
   return decision;
 }

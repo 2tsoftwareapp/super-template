@@ -6,11 +6,11 @@ import type { ListUsersQuery } from '../users.types';
 
 import { AccessControlService } from '../../../access-control/application/access-control.service';
 import { resolveUsersListOrganizationId } from '../../domain/user-org-scope.policy';
-import { UsersMapper } from '../users.mapper';
 import {
   USERS_REPOSITORY,
   type UsersRepositoryPort,
-} from '../users.repository.port';
+} from '../ports/users.repository.port';
+import { UsersMapper } from '../users.mapper';
 
 @Injectable()
 export class ListUsersUseCase {

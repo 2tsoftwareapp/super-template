@@ -8,11 +8,11 @@ import type { UserView } from '../users.types';
 import { AccessControlService } from '../../../access-control/application/access-control.service';
 import { ORGANIZATIONS_REPOSITORY, type OrganizationsRepositoryPort } from '../../../organizations/application/ports/organizations.repository.port';
 import { assertUserBelongsToOrganization } from '../../domain/user-org-scope.policy';
-import { UsersMapper } from '../users.mapper';
 import {
   USERS_REPOSITORY,
   type UsersRepositoryPort,
-} from '../users.repository.port';
+} from '../ports/users.repository.port';
+import { UsersMapper } from '../users.mapper';
 
 @Injectable()
 export class GetUserUseCase {

@@ -11,13 +11,13 @@ import { randomUUID } from 'node:crypto';
 import type {
   AuthTokenProviderPort,
   TokenPayload,
-} from '../ports/auth-token.provider.port';
+} from '../application/ports/auth-token.provider.port';
 
-import { hashRefreshToken } from '../auth.helpers';
+import { hashRefreshToken } from '../application/auth.helpers';
 import {
   AUTH_SESSION_REPOSITORY,
   type AuthSessionRepositoryPort,
-} from '../ports/auth-session.repository.port';
+} from '../application/ports/auth-session.repository.port';
 
 export { type TokenPayload };
 

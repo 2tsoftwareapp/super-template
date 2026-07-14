@@ -7,7 +7,7 @@ import { JobsMapper } from '../jobs.mapper';
 import {
   JOBS_REPOSITORY,
   type JobsRepositoryPort,
-} from '../jobs.repository.port';
+} from '../ports/jobs.repository.port';
 
 @Injectable()
 export class GetJobUseCase {

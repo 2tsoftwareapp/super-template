@@ -1,6 +1,6 @@
 import type { DatabaseExecutor } from '@repo/api-database';
 
-import type { ListUsersQuery } from './users.types';
+import type { ListUsersQuery } from '../users.types';
 
 export interface UserRecord {
   id: string;

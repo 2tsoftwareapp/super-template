@@ -281,6 +281,11 @@ check_application_policy \
   "from ['\"]\.\./.*infrastructure/" \
   'Application layer must not import infrastructure via relative paths; inject through application ports instead.'
 
+warn_application_policy \
+  'application imports api-database' \
+  "from '@repo/api-database'" \
+  'Application layer should not import @repo/api-database directly. Inject database abstractions through application ports (P1.8).'
+
 # Domain purity: modules/*/domain/ holds framework-free business rules.
 # It must never import NestJS, Drizzle, express, or the database package.
 check_domain_policy() {
