@@ -24,13 +24,9 @@ import {
 import { useSession } from "@/hooks/use-session";
 import { usePathname, useRouter } from "@/i18n/navigation";
 
+import { useUsersBulkActions } from "./use-users-bulk-actions";
+import { useUsersConfirmBlock } from "./use-users-confirm-block";
 import { useUsersTableConfig } from "./use-users-table-config";
-
-interface ConfirmBlockState {
-  userIds: string[];
-  label: string;
-  count: number;
-}
 
 export interface UsersListViewModel {
   session: { isLoading: boolean; isError: boolean };
@@ -84,7 +80,7 @@ export interface UsersListViewModel {
     onClose: () => void;
   };
   confirmBlock: {
-    state: ConfirmBlockState | null;
+    state: { userIds: string[]; label: string; count: number } | null;
     isLoading: boolean;
     onCancel: () => void;
     onConfirm: () => Promise<void>;
@@ -103,12 +99,6 @@ export function useUsersListController(): UsersListViewModel {
   );
   const [searchInput, setSearchInput] = useState(listParams.search);
   const [showCreate, setShowCreate] = useState(false);
-  const [pendingAction, setPendingAction] = useState<
-    "activate" | "block" | null
-  >(null);
-  const [confirmBlock, setConfirmBlock] = useState<ConfirmBlockState | null>(
-    null,
-  );
 
   const debouncedSearch = useDebouncedValue(searchInput, 500);
 
@@ -132,18 +122,13 @@ export function useUsersListController(): UsersListViewModel {
   );
 
   useEffect(() => {
-    if (debouncedSearch === listParams.search) {
-      return;
+    if (debouncedSearch !== listParams.search) {
+      patchListParams({ search: debouncedSearch, page: 1 });
     }
-
-    patchListParams({ search: debouncedSearch, page: 1 });
   }, [debouncedSearch, listParams.search, patchListParams]);
 
   const queryParams = useMemo(
-    () => ({
-      ...listParams,
-      search: debouncedSearch,
-    }),
+    () => ({ ...listParams, search: debouncedSearch }),
     [listParams, debouncedSearch],
   );
 
@@ -151,6 +136,13 @@ export function useUsersListController(): UsersListViewModel {
   const activateUsers = useActivateUsers();
   const blockUsers = useBlockUsers();
   const resendVerification = useResendVerification();
+
+  const { confirmBlock, requestBlock, cancelBlock } = useUsersConfirmBlock();
+  const { isMutating, handleBulkActivate, handleBulkBlock } = useUsersBulkActions(
+    activateUsers,
+    blockUsers,
+    requestBlock,
+  );
 
   const actorRoles = session.data?.data.user.roles ?? [];
   const { canCreate, canUpdate } = selectUserManagementPermissions(
@@ -164,21 +156,17 @@ export function useUsersListController(): UsersListViewModel {
 
   const handleActivate = useCallback(
     async (userId: string) => {
-      setPendingAction("activate");
-      try {
-        await activateUsers.mutateAsync([userId]);
-      } catch {
-        // Ignored
-      } finally {
-        setPendingAction(null);
-      }
+      await activateUsers.mutateAsync([userId]);
     },
     [activateUsers],
   );
 
-  const handleBlock = useCallback((userId: string) => {
-    setConfirmBlock({ userIds: [userId], label: "this user", count: 1 });
-  }, []);
+  const handleBlock = useCallback(
+    (userId: string) => {
+      requestBlock([userId], "this user", 1);
+    },
+    [requestBlock],
+  );
 
   const handleResendVerification = useCallback(
     (email: string) => {
@@ -193,8 +181,6 @@ export function useUsersListController(): UsersListViewModel {
     },
     [patchListParams],
   );
-
-  const isMutating = activateUsers.isPending || blockUsers.isPending;
 
   const { table, selectedIds, clearSelection, setRowSelection } =
     useUsersTableConfig({
@@ -218,35 +204,15 @@ export function useUsersListController(): UsersListViewModel {
     void router.push(`/users/${id}${suffix}`);
   };
 
-  const handleBulkActivate = async () => {
-    await activateUsers.mutateAsync(selectedIds);
-    setRowSelection({});
-  };
-
-  const handleBulkBlock = () => {
-    setConfirmBlock({
-      userIds: selectedIds,
-      label: `${selectedIds.length} user${selectedIds.length > 1 ? "s" : ""}`,
-      count: selectedIds.length,
-    });
+  const handleBulkActivateAction = async () => {
+    await handleBulkActivate(selectedIds, clearSelection);
   };
 
   const handleConfirmBlock = async () => {
-    if (!confirmBlock) {
-      return;
-    }
-
-    setPendingAction("block");
-    try {
-      await blockUsers.mutateAsync(confirmBlock.userIds);
-    } finally {
-      setPendingAction(null);
-      const shouldClearSelection = confirmBlock.count > 1;
-      setConfirmBlock(null);
-      if (shouldClearSelection) {
-        setRowSelection({});
-      }
-    }
+    if (!confirmBlock) return;
+    setRowSelection({});
+    await blockUsers.mutateAsync(confirmBlock.userIds);
+    cancelBlock();
   };
 
   const handleStatusFilter = (status: UserStatusFilter) => {
@@ -309,10 +275,10 @@ export function useUsersListController(): UsersListViewModel {
       selectedIds,
       isMutating,
       isActivating: activateUsers.isPending,
-      isBlocking: pendingAction === "block",
+      isBlocking: Boolean(confirmBlock && blockUsers.isPending),
       onClearSelection: clearSelection,
-      onBulkActivate: handleBulkActivate,
-      onBulkBlock: handleBulkBlock,
+      onBulkActivate: handleBulkActivateAction,
+      onBulkBlock: () => handleBulkBlock(selectedIds),
     },
     pagination: {
       page: currentPage,
@@ -330,8 +296,8 @@ export function useUsersListController(): UsersListViewModel {
     },
     confirmBlock: {
       state: confirmBlock,
-      isLoading: pendingAction === "block",
-      onCancel: () => setConfirmBlock(null),
+      isLoading: Boolean(confirmBlock && blockUsers.isPending),
+      onCancel: cancelBlock,
       onConfirm: handleConfirmBlock,
     },
   };

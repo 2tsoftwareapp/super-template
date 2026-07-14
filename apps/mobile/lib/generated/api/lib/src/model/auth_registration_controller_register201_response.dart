@@ -6,62 +6,67 @@
 // @dart=3.0
 
 import 'package:super_template_api/src/model/request_meta_dto.dart';
-import 'package:super_template_api/src/model/login_response_dto.dart';
+import 'package:super_template_api/src/model/success_message_dto.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
-part 'auth_controller_login201_response.g.dart';
+part 'auth_registration_controller_register201_response.g.dart';
 
-/// AuthControllerLogin201Response
+/// AuthRegistrationControllerRegister201Response
 ///
 /// Properties:
 /// * [data]
 /// * [meta]
 @BuiltValue()
-abstract class AuthControllerLogin201Response
+abstract class AuthRegistrationControllerRegister201Response
     implements
-        Built<AuthControllerLogin201Response,
-            AuthControllerLogin201ResponseBuilder> {
+        Built<AuthRegistrationControllerRegister201Response,
+            AuthRegistrationControllerRegister201ResponseBuilder> {
   @BuiltValueField(wireName: r'data')
-  LoginResponseDto get data;
+  SuccessMessageDto get data;
 
   @BuiltValueField(wireName: r'meta')
   RequestMetaDto get meta;
 
-  AuthControllerLogin201Response._();
+  AuthRegistrationControllerRegister201Response._();
 
-  factory AuthControllerLogin201Response([
-    void updates(AuthControllerLogin201ResponseBuilder b),
-  ]) = _$AuthControllerLogin201Response;
+  factory AuthRegistrationControllerRegister201Response([
+    void updates(AuthRegistrationControllerRegister201ResponseBuilder b),
+  ]) = _$AuthRegistrationControllerRegister201Response;
 
   @BuiltValueHook(initializeBuilder: true)
-  static void _defaults(AuthControllerLogin201ResponseBuilder b) => b;
+  static void _defaults(
+    AuthRegistrationControllerRegister201ResponseBuilder b,
+  ) =>
+      b;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<AuthControllerLogin201Response> get serializer =>
-      _$AuthControllerLogin201ResponseSerializer();
+  static Serializer<AuthRegistrationControllerRegister201Response>
+      get serializer =>
+          _$AuthRegistrationControllerRegister201ResponseSerializer();
 }
 
-class _$AuthControllerLogin201ResponseSerializer
-    implements PrimitiveSerializer<AuthControllerLogin201Response> {
+class _$AuthRegistrationControllerRegister201ResponseSerializer
+    implements
+        PrimitiveSerializer<AuthRegistrationControllerRegister201Response> {
   @override
   final Iterable<Type> types = const [
-    AuthControllerLogin201Response,
-    _$AuthControllerLogin201Response,
+    AuthRegistrationControllerRegister201Response,
+    _$AuthRegistrationControllerRegister201Response,
   ];
 
   @override
-  final String wireName = r'AuthControllerLogin201Response';
+  final String wireName = r'AuthRegistrationControllerRegister201Response';
 
   Iterable<Object?> _serializeProperties(
     Serializers serializers,
-    AuthControllerLogin201Response object, {
+    AuthRegistrationControllerRegister201Response object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
     yield r'data';
     yield serializers.serialize(
       object.data,
-      specifiedType: const FullType(LoginResponseDto),
+      specifiedType: const FullType(SuccessMessageDto),
     );
     yield r'meta';
     yield serializers.serialize(
@@ -73,7 +78,7 @@ class _$AuthControllerLogin201ResponseSerializer
   @override
   Object serialize(
     Serializers serializers,
-    AuthControllerLogin201Response object, {
+    AuthRegistrationControllerRegister201Response object, {
     FullType specifiedType = FullType.unspecified,
   }) {
     return _serializeProperties(
@@ -88,7 +93,7 @@ class _$AuthControllerLogin201ResponseSerializer
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
     required List<Object?> serializedList,
-    required AuthControllerLogin201ResponseBuilder result,
+    required AuthRegistrationControllerRegister201ResponseBuilder result,
     required List<Object?> unhandled,
   }) {
     for (var i = 0; i < serializedList.length; i += 2) {
@@ -98,8 +103,8 @@ class _$AuthControllerLogin201ResponseSerializer
         case r'data':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(LoginResponseDto),
-          ) as LoginResponseDto;
+            specifiedType: const FullType(SuccessMessageDto),
+          ) as SuccessMessageDto;
           result.data.replace(valueDes);
           break;
         case r'meta':
@@ -118,12 +123,12 @@ class _$AuthControllerLogin201ResponseSerializer
   }
 
   @override
-  AuthControllerLogin201Response deserialize(
+  AuthRegistrationControllerRegister201Response deserialize(
     Serializers serializers,
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    final result = AuthControllerLogin201ResponseBuilder();
+    final result = AuthRegistrationControllerRegister201ResponseBuilder();
     final serializedList = (serialized as Iterable<Object?>).toList();
     final unhandled = <Object?>[];
     _deserializeProperties(

@@ -33,6 +33,12 @@ export function useLoginMutation() {
       }
 
       await queryClient.invalidateQueries({ queryKey: sessionQueryKey });
+
+      if (result.status === AUTH_FLOW_RESULTS.mustChangePassword) {
+        router.replace("/security");
+        return;
+      }
+
       router.replace(ADMIN_AUTH_ROUTES.postLogin);
     },
     onError: () => undefined,

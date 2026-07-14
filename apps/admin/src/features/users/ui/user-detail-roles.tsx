@@ -5,6 +5,7 @@ import { CheckCircle2 } from "lucide-react";
 
 import type { UserDetailViewModel } from "@/features/users/controllers/use-user-detail-controller";
 
+import { formatRoleName } from "@/lib/roles";
 import { cn } from "@/lib/utils";
 
 interface UserDetailRolesProps {
@@ -19,14 +20,14 @@ export function UserDetailRoles({ roles }: UserDetailRolesProps) {
         <Spinner className="size-4" />
       ) : (
         <div className="space-y-1.5">
-          {(["ADMIN", "USER"] as const).map((roleName) => {
-            const checked = roles.selected === roleName;
+          {roles.options.map((role) => {
+            const checked = roles.selected === role.name;
             return (
               <button
-                key={roleName}
+                key={role.name}
                 type="button"
                 disabled={roles.disabled}
-                onClick={() => roles.onSelect(roleName)}
+                onClick={() => roles.onSelect(role.name)}
                 className={cn(
                   "flex w-full items-center gap-3 rounded-lg border px-3 py-2.5 text-left transition-colors",
                   "disabled:cursor-not-allowed disabled:opacity-40",
@@ -49,13 +50,13 @@ export function UserDetailRoles({ roles }: UserDetailRolesProps) {
                 </span>
                 <div className="min-w-0">
                   <p className="text-sm font-medium">
-                    {roleName.toLowerCase()}
+                    {formatRoleName(role.name)}
                   </p>
-                  <p className="text-xs text-muted-foreground">
-                    {roleName === "ADMIN"
-                      ? "Full access to all admin features."
-                      : "Limited access based on assigned permissions."}
-                  </p>
+                  {typeof role.description === "string" && (
+                    <p className="text-xs text-muted-foreground">
+                      {role.description}
+                    </p>
+                  )}
                 </div>
               </button>
             );

@@ -22,6 +22,10 @@ export type AdminLoginFlowResult =
   | {
       status: typeof AUTH_FLOW_RESULTS.mfaRequired;
       mfaToken: string;
+    }
+  | {
+      status: typeof AUTH_FLOW_RESULTS.mustChangePassword;
+      response: AuthLoginResponse;
     };
 
 export async function loginToAdmin(values: AdminLoginInput) {
@@ -52,6 +56,13 @@ export async function loginToAdmin(values: AdminLoginInput) {
   if (!hasAccess) {
     await logoutAdmin();
     throw new AuthFlowError(AUTH_FLOW_ERROR_CODES.notAdmin);
+  }
+
+  if (response.data.mustChangePassword) {
+    return {
+      status: AUTH_FLOW_RESULTS.mustChangePassword,
+      response,
+    };
   }
 
   return {

@@ -7,11 +7,15 @@ export interface AuthUserView {
   avatarUrl: string | null;
   status: string;
   emailVerifiedAt: string | null;
+  mustChangePassword: boolean;
   roles: string[];
   createdAt: string;
   updatedAt: string;
 }
 
+import { Injectable } from '@nestjs/common';
+
+@Injectable()
 export class AuthMapper {
   toSessionDto(session: AuthSessionModel, currentSessionId: string) {
     return {
@@ -36,6 +40,7 @@ export class AuthMapper {
       avatarUrl: string | null;
       status: string;
       emailVerifiedAt: Date | null;
+      mustChangePassword: boolean;
       createdAt: Date;
       updatedAt: Date;
     },
@@ -48,6 +53,7 @@ export class AuthMapper {
       avatarUrl: user.avatarUrl ?? null,
       status: user.status,
       emailVerifiedAt: user.emailVerifiedAt?.toISOString() ?? null,
+      mustChangePassword: user.mustChangePassword,
       roles,
       createdAt: user.createdAt.toISOString(),
       updatedAt: user.updatedAt.toISOString(),

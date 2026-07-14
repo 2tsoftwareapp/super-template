@@ -5,7 +5,6 @@
 // ignore_for_file: unused_element
 // @dart=3.0
 
-import 'package:built_collection/built_collection.dart';
 import 'package:built_value/json_object.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
@@ -16,28 +15,19 @@ part 'update_admin_user_dto.g.dart';
 ///
 /// Properties:
 /// * [email]
-/// * [password]
 /// * [displayName]
 /// * [avatarUrl]
-/// * [status]
 @BuiltValue()
 abstract class UpdateAdminUserDto
     implements Built<UpdateAdminUserDto, UpdateAdminUserDtoBuilder> {
   @BuiltValueField(wireName: r'email')
   String? get email;
 
-  @BuiltValueField(wireName: r'password')
-  String? get password;
-
   @BuiltValueField(wireName: r'displayName')
   String? get displayName;
 
   @BuiltValueField(wireName: r'avatarUrl')
   JsonObject? get avatarUrl;
-
-  @BuiltValueField(wireName: r'status')
-  UpdateAdminUserDtoStatusEnum? get status;
-  // enum statusEnum {  PENDING,  ACTIVE,  BLOCKED,  };
 
   UpdateAdminUserDto._();
 
@@ -72,13 +62,6 @@ class _$UpdateAdminUserDtoSerializer
         specifiedType: const FullType(String),
       );
     }
-    if (object.password != null) {
-      yield r'password';
-      yield serializers.serialize(
-        object.password,
-        specifiedType: const FullType(String),
-      );
-    }
     if (object.displayName != null) {
       yield r'displayName';
       yield serializers.serialize(
@@ -91,13 +74,6 @@ class _$UpdateAdminUserDtoSerializer
       yield serializers.serialize(
         object.avatarUrl,
         specifiedType: const FullType(JsonObject),
-      );
-    }
-    if (object.status != null) {
-      yield r'status';
-      yield serializers.serialize(
-        object.status,
-        specifiedType: const FullType(UpdateAdminUserDtoStatusEnum),
       );
     }
   }
@@ -134,13 +110,6 @@ class _$UpdateAdminUserDtoSerializer
           ) as String;
           result.email = valueDes;
           break;
-        case r'password':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.password = valueDes;
-          break;
         case r'displayName':
           final valueDes = serializers.deserialize(
             value,
@@ -154,13 +123,6 @@ class _$UpdateAdminUserDtoSerializer
             specifiedType: const FullType(JsonObject),
           ) as JsonObject;
           result.avatarUrl = valueDes;
-          break;
-        case r'status':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(UpdateAdminUserDtoStatusEnum),
-          ) as UpdateAdminUserDtoStatusEnum;
-          result.status = valueDes;
           break;
         default:
           unhandled.add(key);
@@ -189,26 +151,4 @@ class _$UpdateAdminUserDtoSerializer
     );
     return result.build();
   }
-}
-
-class UpdateAdminUserDtoStatusEnum extends EnumClass {
-  @BuiltValueEnumConst(wireName: r'PENDING')
-  static const UpdateAdminUserDtoStatusEnum PENDING =
-      _$updateAdminUserDtoStatusEnum_PENDING;
-  @BuiltValueEnumConst(wireName: r'ACTIVE')
-  static const UpdateAdminUserDtoStatusEnum ACTIVE =
-      _$updateAdminUserDtoStatusEnum_ACTIVE;
-  @BuiltValueEnumConst(wireName: r'BLOCKED')
-  static const UpdateAdminUserDtoStatusEnum BLOCKED =
-      _$updateAdminUserDtoStatusEnum_BLOCKED;
-
-  static Serializer<UpdateAdminUserDtoStatusEnum> get serializer =>
-      _$updateAdminUserDtoStatusEnumSerializer;
-
-  const UpdateAdminUserDtoStatusEnum._(String name) : super(name);
-
-  static BuiltSet<UpdateAdminUserDtoStatusEnum> get values =>
-      _$updateAdminUserDtoStatusEnumValues;
-  static UpdateAdminUserDtoStatusEnum valueOf(String name) =>
-      _$updateAdminUserDtoStatusEnumValueOf(name);
 }

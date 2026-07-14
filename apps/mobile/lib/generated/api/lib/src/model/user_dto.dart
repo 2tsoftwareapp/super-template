@@ -44,7 +44,7 @@ abstract class UserDto implements Built<UserDto, UserDtoBuilder> {
   // enum statusEnum {  PENDING,  ACTIVE,  BLOCKED,  };
 
   @BuiltValueField(wireName: r'emailVerifiedAt')
-  JsonObject? get emailVerifiedAt;
+  String? get emailVerifiedAt;
 
   @BuiltValueField(wireName: r'roles')
   BuiltList<String> get roles;
@@ -108,13 +108,13 @@ class _$UserDtoSerializer implements PrimitiveSerializer<UserDto> {
       object.status,
       specifiedType: const FullType(UserDtoStatusEnum),
     );
-    if (object.emailVerifiedAt != null) {
-      yield r'emailVerifiedAt';
-      yield serializers.serialize(
-        object.emailVerifiedAt,
-        specifiedType: const FullType(JsonObject),
-      );
-    }
+    yield r'emailVerifiedAt';
+    yield object.emailVerifiedAt == null
+        ? null
+        : serializers.serialize(
+            object.emailVerifiedAt,
+            specifiedType: const FullType.nullable(String),
+          );
     yield r'roles';
     yield serializers.serialize(
       object.roles,
@@ -200,8 +200,9 @@ class _$UserDtoSerializer implements PrimitiveSerializer<UserDto> {
         case r'emailVerifiedAt':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(JsonObject),
-          ) as JsonObject;
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
+          if (valueDes == null) continue;
           result.emailVerifiedAt = valueDes;
           break;
         case r'roles':

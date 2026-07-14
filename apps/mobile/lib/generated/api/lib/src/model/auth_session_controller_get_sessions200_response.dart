@@ -6,65 +6,66 @@
 // @dart=3.0
 
 import 'package:super_template_api/src/model/request_meta_dto.dart';
-import 'package:super_template_api/src/model/auth_response_dto.dart';
+import 'package:built_collection/built_collection.dart';
+import 'package:super_template_api/src/model/auth_session_dto.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
-part 'auth_controller_verify_mfa_challenge201_response.g.dart';
+part 'auth_session_controller_get_sessions200_response.g.dart';
 
-/// AuthControllerVerifyMfaChallenge201Response
+/// AuthSessionControllerGetSessions200Response
 ///
 /// Properties:
 /// * [data]
 /// * [meta]
 @BuiltValue()
-abstract class AuthControllerVerifyMfaChallenge201Response
+abstract class AuthSessionControllerGetSessions200Response
     implements
-        Built<AuthControllerVerifyMfaChallenge201Response,
-            AuthControllerVerifyMfaChallenge201ResponseBuilder> {
+        Built<AuthSessionControllerGetSessions200Response,
+            AuthSessionControllerGetSessions200ResponseBuilder> {
   @BuiltValueField(wireName: r'data')
-  AuthResponseDto get data;
+  BuiltList<AuthSessionDto> get data;
 
   @BuiltValueField(wireName: r'meta')
   RequestMetaDto get meta;
 
-  AuthControllerVerifyMfaChallenge201Response._();
+  AuthSessionControllerGetSessions200Response._();
 
-  factory AuthControllerVerifyMfaChallenge201Response([
-    void updates(AuthControllerVerifyMfaChallenge201ResponseBuilder b),
-  ]) = _$AuthControllerVerifyMfaChallenge201Response;
+  factory AuthSessionControllerGetSessions200Response([
+    void updates(AuthSessionControllerGetSessions200ResponseBuilder b),
+  ]) = _$AuthSessionControllerGetSessions200Response;
 
   @BuiltValueHook(initializeBuilder: true)
-  static void _defaults(AuthControllerVerifyMfaChallenge201ResponseBuilder b) =>
+  static void _defaults(AuthSessionControllerGetSessions200ResponseBuilder b) =>
       b;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<AuthControllerVerifyMfaChallenge201Response>
+  static Serializer<AuthSessionControllerGetSessions200Response>
       get serializer =>
-          _$AuthControllerVerifyMfaChallenge201ResponseSerializer();
+          _$AuthSessionControllerGetSessions200ResponseSerializer();
 }
 
-class _$AuthControllerVerifyMfaChallenge201ResponseSerializer
+class _$AuthSessionControllerGetSessions200ResponseSerializer
     implements
-        PrimitiveSerializer<AuthControllerVerifyMfaChallenge201Response> {
+        PrimitiveSerializer<AuthSessionControllerGetSessions200Response> {
   @override
   final Iterable<Type> types = const [
-    AuthControllerVerifyMfaChallenge201Response,
-    _$AuthControllerVerifyMfaChallenge201Response,
+    AuthSessionControllerGetSessions200Response,
+    _$AuthSessionControllerGetSessions200Response,
   ];
 
   @override
-  final String wireName = r'AuthControllerVerifyMfaChallenge201Response';
+  final String wireName = r'AuthSessionControllerGetSessions200Response';
 
   Iterable<Object?> _serializeProperties(
     Serializers serializers,
-    AuthControllerVerifyMfaChallenge201Response object, {
+    AuthSessionControllerGetSessions200Response object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
     yield r'data';
     yield serializers.serialize(
       object.data,
-      specifiedType: const FullType(AuthResponseDto),
+      specifiedType: const FullType(BuiltList, [FullType(AuthSessionDto)]),
     );
     yield r'meta';
     yield serializers.serialize(
@@ -76,7 +77,7 @@ class _$AuthControllerVerifyMfaChallenge201ResponseSerializer
   @override
   Object serialize(
     Serializers serializers,
-    AuthControllerVerifyMfaChallenge201Response object, {
+    AuthSessionControllerGetSessions200Response object, {
     FullType specifiedType = FullType.unspecified,
   }) {
     return _serializeProperties(
@@ -91,7 +92,7 @@ class _$AuthControllerVerifyMfaChallenge201ResponseSerializer
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
     required List<Object?> serializedList,
-    required AuthControllerVerifyMfaChallenge201ResponseBuilder result,
+    required AuthSessionControllerGetSessions200ResponseBuilder result,
     required List<Object?> unhandled,
   }) {
     for (var i = 0; i < serializedList.length; i += 2) {
@@ -101,8 +102,10 @@ class _$AuthControllerVerifyMfaChallenge201ResponseSerializer
         case r'data':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(AuthResponseDto),
-          ) as AuthResponseDto;
+            specifiedType: const FullType(BuiltList, [
+              FullType(AuthSessionDto),
+            ]),
+          ) as BuiltList<AuthSessionDto>;
           result.data.replace(valueDes);
           break;
         case r'meta':
@@ -121,12 +124,12 @@ class _$AuthControllerVerifyMfaChallenge201ResponseSerializer
   }
 
   @override
-  AuthControllerVerifyMfaChallenge201Response deserialize(
+  AuthSessionControllerGetSessions200Response deserialize(
     Serializers serializers,
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    final result = AuthControllerVerifyMfaChallenge201ResponseBuilder();
+    final result = AuthSessionControllerGetSessions200ResponseBuilder();
     final serializedList = (serialized as Iterable<Object?>).toList();
     final unhandled = <Object?>[];
     _deserializeProperties(

@@ -23,13 +23,12 @@ import { UsersMapper } from '../users.mapper';
 
 @Injectable()
 export class GetUserUseCase {
-  private readonly usersMapper = new UsersMapper();
-
   constructor(
     @Inject(USERS_REPOSITORY)
     private readonly usersRepository: UsersRepositoryPort,
     private readonly accessControlService: AccessControlService,
     @Inject(ORGANIZATIONS_REPOSITORY) private readonly organizationsRepository: OrganizationsRepositoryPort,
+    private readonly usersMapper: UsersMapper,
   ) {}
 
   async execute(

@@ -17,6 +17,8 @@ class _$AuthMeDto extends AuthMeDto {
   final String sessionId;
   @override
   final JsonObject? organizationId;
+  @override
+  final bool? mustChangePassword;
 
   factory _$AuthMeDto([void Function(AuthMeDtoBuilder)? updates]) =>
       (AuthMeDtoBuilder()..update(updates))._build();
@@ -26,6 +28,7 @@ class _$AuthMeDto extends AuthMeDto {
     required this.permissions,
     required this.sessionId,
     this.organizationId,
+    this.mustChangePassword,
   }) : super._();
   @override
   AuthMeDto rebuild(void Function(AuthMeDtoBuilder) updates) =>
@@ -41,7 +44,8 @@ class _$AuthMeDto extends AuthMeDto {
         user == other.user &&
         permissions == other.permissions &&
         sessionId == other.sessionId &&
-        organizationId == other.organizationId;
+        organizationId == other.organizationId &&
+        mustChangePassword == other.mustChangePassword;
   }
 
   @override
@@ -51,6 +55,7 @@ class _$AuthMeDto extends AuthMeDto {
     _$hash = $jc(_$hash, permissions.hashCode);
     _$hash = $jc(_$hash, sessionId.hashCode);
     _$hash = $jc(_$hash, organizationId.hashCode);
+    _$hash = $jc(_$hash, mustChangePassword.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -61,7 +66,8 @@ class _$AuthMeDto extends AuthMeDto {
           ..add('user', user)
           ..add('permissions', permissions)
           ..add('sessionId', sessionId)
-          ..add('organizationId', organizationId))
+          ..add('organizationId', organizationId)
+          ..add('mustChangePassword', mustChangePassword))
         .toString();
   }
 }
@@ -88,6 +94,11 @@ class AuthMeDtoBuilder implements Builder<AuthMeDto, AuthMeDtoBuilder> {
   set organizationId(JsonObject? organizationId) =>
       _$this._organizationId = organizationId;
 
+  bool? _mustChangePassword;
+  bool? get mustChangePassword => _$this._mustChangePassword;
+  set mustChangePassword(bool? mustChangePassword) =>
+      _$this._mustChangePassword = mustChangePassword;
+
   AuthMeDtoBuilder() {
     AuthMeDto._defaults(this);
   }
@@ -99,6 +110,7 @@ class AuthMeDtoBuilder implements Builder<AuthMeDto, AuthMeDtoBuilder> {
       _permissions = $v.permissions.toBuilder();
       _sessionId = $v.sessionId;
       _organizationId = $v.organizationId;
+      _mustChangePassword = $v.mustChangePassword;
       _$v = null;
     }
     return this;
@@ -130,6 +142,7 @@ class AuthMeDtoBuilder implements Builder<AuthMeDto, AuthMeDtoBuilder> {
               'sessionId',
             ),
             organizationId: organizationId,
+            mustChangePassword: mustChangePassword,
           );
     } catch (_) {
       late String _$failedField;

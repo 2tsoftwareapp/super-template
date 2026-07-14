@@ -10,11 +10,10 @@ import {
 
 @Injectable()
 export class GetSessionsUseCase {
-  private readonly authMapper = new AuthMapper();
-
   constructor(
     @Inject(AUTH_SESSION_REPOSITORY)
     private readonly authSessionRepository: AuthSessionRepositoryPort,
+    private readonly authMapper: AuthMapper,
   ) {}
 
   async execute(user: AuthenticatedRequestUser) {

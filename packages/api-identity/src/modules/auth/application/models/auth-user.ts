@@ -6,6 +6,7 @@ export interface AuthUserModel {
   passwordHash: string;
   status: string;
   emailVerifiedAt: Date | null;
+  mustChangePassword: boolean;
   createdAt: Date;
   updatedAt: Date;
 }

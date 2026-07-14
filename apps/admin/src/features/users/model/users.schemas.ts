@@ -2,10 +2,8 @@ import { z } from "zod";
 
 import { canAssignRole } from "@/lib/roles";
 
-export const ASSIGNABLE_ROLES = ["USER", "ADMIN"] as const;
-
-export function createUserSchema(actorRoles: string[]) {
-  const allowedRoles = ASSIGNABLE_ROLES.filter((role) =>
+export function createUserSchema(actorRoles: string[], availableRoleNames: string[]) {
+  const allowedRoles = availableRoleNames.filter((role) =>
     canAssignRole(actorRoles, role),
   );
 

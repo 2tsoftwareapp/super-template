@@ -11,11 +11,10 @@ import { AuthMapper } from '../auth.mapper';
 
 @Injectable()
 export class GetMeUseCase {
-  private readonly authMapper = new AuthMapper();
-
   constructor(
     @Inject(USERS_REPOSITORY)
     private readonly usersRepository: UsersRepositoryPort,
+    private readonly authMapper: AuthMapper,
   ) {}
 
   async execute(user: AuthenticatedRequestUser) {
@@ -34,6 +33,7 @@ export class GetMeUseCase {
       permissions: user.permissions,
       sessionId: user.sessionId,
       organizationId: user.organizationId,
+      mustChangePassword: dbUser.mustChangePassword,
     };
   }
 }

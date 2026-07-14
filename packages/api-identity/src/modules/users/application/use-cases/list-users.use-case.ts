@@ -14,12 +14,11 @@ import { UsersMapper } from '../users.mapper';
 
 @Injectable()
 export class ListUsersUseCase {
-  private readonly usersMapper = new UsersMapper();
-
   constructor(
     @Inject(USERS_REPOSITORY)
     private readonly usersRepository: UsersRepositoryPort,
     private readonly accessControlService: AccessControlService,
+    private readonly usersMapper: UsersMapper,
   ) {}
 
   async execute(actor: AuthenticatedRequestUser, query: ListUsersQuery) {

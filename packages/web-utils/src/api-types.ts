@@ -43,11 +43,11 @@ export type SendNotificationInput =
   components["schemas"]["SendNotificationRequestDto"];
 
 export type AuthLoginResponse =
-  operations["AuthController_login"]["responses"][201]["content"]["application/json"];
+  operations["AuthLoginController_login"]["responses"][201]["content"]["application/json"];
 export type AuthSessionResponse =
-  operations["AuthController_getMe"]["responses"][200]["content"]["application/json"];
+  operations["AuthSessionController_getMe"]["responses"][200]["content"]["application/json"];
 export type AuthSessionsResponse =
-  operations["AuthController_getSessions"]["responses"][200]["content"]["application/json"];
+  operations["AuthSessionController_getSessions"]["responses"][200]["content"]["application/json"];
 export type UsersListResponse =
   operations["AdminUsersController_listUsers"]["responses"][200]["content"]["application/json"];
 export type NotificationsListResponse =
@@ -101,6 +101,8 @@ export interface SessionResponse {
     sessionId?: string;
     /** Active tenant. Null for users outside any organization. */
     organizationId?: string | null;
+    /** Whether the user must change their password before accessing the app. */
+    mustChangePassword?: boolean;
   };
 }
 

@@ -67,6 +67,7 @@ export class ChangePasswordUseCase {
         actor.userId,
         {
           passwordHash: await hashPassword(newPassword),
+          mustChangePassword: false,
         },
         transaction,
       );

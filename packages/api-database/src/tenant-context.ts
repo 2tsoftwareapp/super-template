@@ -1,8 +1,8 @@
+import type { TenantContext } from '@repo/api-core';
 import type { PoolClient } from 'pg';
 
 import { sql } from 'drizzle-orm';
 
-import type { TenantContext } from '@repo/api-core';
 import type {
   DatabaseClient,
   DatabaseExecutor,

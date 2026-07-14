@@ -29,7 +29,7 @@ import {
   hashPassword,
 } from '../../../auth/application/auth.helpers';
 import { AUTH_SESSION_REPOSITORY, type AuthSessionRepositoryPort } from '../../../auth/application/ports/auth-session.repository.port';
-import { AuthMailService } from '../../../auth/application/services/auth-mail.service';
+import { OUTBOX_REPOSITORY, type OutboxRepositoryPort } from '../../../auth/application/ports/outbox.repository.port';
 import { OrganizationsService } from '../../../organizations/application/organizations.service';
 import { ORGANIZATIONS_REPOSITORY, type OrganizationsRepositoryPort } from '../../../organizations/application/ports/organizations.repository.port';
 import { resolveAssignableRole } from '../assignable-role.resolver';
@@ -47,10 +47,10 @@ export class CreateAdminUserUseCase {
     private readonly usersRepository: UsersRepositoryPort,
     private readonly accessControlService: AccessControlService,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
+    @Inject(OUTBOX_REPOSITORY) private readonly outboxRepository: OutboxRepositoryPort,
     private readonly organizationsService: OrganizationsService,
     @Inject(ORGANIZATIONS_REPOSITORY) private readonly organizationsRepository: OrganizationsRepositoryPort,
     @Inject(AUTH_SESSION_REPOSITORY) private readonly authRepository: AuthSessionRepositoryPort,
-    private readonly authMailService: AuthMailService,
     private readonly getUserUseCase: GetUserUseCase,
   ) {}
 
@@ -91,7 +91,7 @@ export class CreateAdminUserUseCase {
 
     const status = input.status ?? 'ACTIVE';
 
-    const result = await this.transactionPort.run(
+    const { userId } = await this.transactionPort.run(
       async (transaction) => {
         const user = await this.usersRepository.create(
           {
@@ -104,6 +104,9 @@ export class CreateAdminUserUseCase {
             // must be usable immediately instead of being stuck behind the email
             // verification gate in LoginUseCase.
             emailVerifiedAt: status === 'ACTIVE' ? new Date() : null,
+            // Force the user to change their password on first login since
+            // the admin chose it, not the user.
+            mustChangePassword: true,
           },
           transaction,
         );
@@ -163,9 +166,8 @@ export class CreateAdminUserUseCase {
           }
         }
 
-        let verificationToken: string | undefined;
         if (status === 'PENDING') {
-          verificationToken = generateOpaqueToken();
+          const verificationToken = generateOpaqueToken();
           await this.authRepository.storeEmailVerificationToken(
             {
               userId: user.id,
@@ -173,6 +175,14 @@ export class CreateAdminUserUseCase {
               expiresAt: new Date(
                 Date.now() + durationToMilliseconds('1d'),
               ),
+            },
+            transaction,
+          );
+
+          await this.outboxRepository.create(
+            {
+              topic: 'auth.send-verification-email',
+              payload: { email: user.email, token: verificationToken, displayName: user.displayName },
             },
             transaction,
           );
@@ -195,23 +205,10 @@ export class CreateAdminUserUseCase {
           transaction,
         );
 
-        return {
-          userId: user.id,
-          email: user.email,
-          displayName: user.displayName,
-          verificationToken,
-        };
+        return { userId: user.id };
       },
     );
 
-    if (result.verificationToken) {
-      await this.authMailService.sendVerificationEmail(
-        result.email,
-        result.verificationToken,
-        result.displayName,
-      );
-    }
-
-    return this.getUserUseCase.execute(result.userId, actor);
+    return this.getUserUseCase.execute(userId, actor);
   }
 }

@@ -2,39 +2,42 @@
 
 // @dart=3.0
 
-part of 'auth_controller_login201_response.dart';
+part of 'auth_login_controller_login201_response.dart';
 
 // **************************************************************************
 // BuiltValueGenerator
 // **************************************************************************
 
-class _$AuthControllerLogin201Response extends AuthControllerLogin201Response {
+class _$AuthLoginControllerLogin201Response
+    extends AuthLoginControllerLogin201Response {
   @override
   final LoginResponseDto data;
   @override
   final RequestMetaDto meta;
 
-  factory _$AuthControllerLogin201Response([
-    void Function(AuthControllerLogin201ResponseBuilder)? updates,
+  factory _$AuthLoginControllerLogin201Response([
+    void Function(AuthLoginControllerLogin201ResponseBuilder)? updates,
   ]) =>
-      (AuthControllerLogin201ResponseBuilder()..update(updates))._build();
+      (AuthLoginControllerLogin201ResponseBuilder()..update(updates))._build();
 
-  _$AuthControllerLogin201Response._({required this.data, required this.meta})
-      : super._();
+  _$AuthLoginControllerLogin201Response._({
+    required this.data,
+    required this.meta,
+  }) : super._();
   @override
-  AuthControllerLogin201Response rebuild(
-    void Function(AuthControllerLogin201ResponseBuilder) updates,
+  AuthLoginControllerLogin201Response rebuild(
+    void Function(AuthLoginControllerLogin201ResponseBuilder) updates,
   ) =>
       (toBuilder()..update(updates)).build();
 
   @override
-  AuthControllerLogin201ResponseBuilder toBuilder() =>
-      AuthControllerLogin201ResponseBuilder()..replace(this);
+  AuthLoginControllerLogin201ResponseBuilder toBuilder() =>
+      AuthLoginControllerLogin201ResponseBuilder()..replace(this);
 
   @override
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
-    return other is AuthControllerLogin201Response &&
+    return other is AuthLoginControllerLogin201Response &&
         data == other.data &&
         meta == other.meta;
   }
@@ -50,18 +53,18 @@ class _$AuthControllerLogin201Response extends AuthControllerLogin201Response {
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper(r'AuthControllerLogin201Response')
+    return (newBuiltValueToStringHelper(r'AuthLoginControllerLogin201Response')
           ..add('data', data)
           ..add('meta', meta))
         .toString();
   }
 }
 
-class AuthControllerLogin201ResponseBuilder
+class AuthLoginControllerLogin201ResponseBuilder
     implements
-        Builder<AuthControllerLogin201Response,
-            AuthControllerLogin201ResponseBuilder> {
-  _$AuthControllerLogin201Response? _$v;
+        Builder<AuthLoginControllerLogin201Response,
+            AuthLoginControllerLogin201ResponseBuilder> {
+  _$AuthLoginControllerLogin201Response? _$v;
 
   LoginResponseDtoBuilder? _data;
   LoginResponseDtoBuilder get data =>
@@ -72,11 +75,11 @@ class AuthControllerLogin201ResponseBuilder
   RequestMetaDtoBuilder get meta => _$this._meta ??= RequestMetaDtoBuilder();
   set meta(RequestMetaDtoBuilder? meta) => _$this._meta = meta;
 
-  AuthControllerLogin201ResponseBuilder() {
-    AuthControllerLogin201Response._defaults(this);
+  AuthLoginControllerLogin201ResponseBuilder() {
+    AuthLoginControllerLogin201Response._defaults(this);
   }
 
-  AuthControllerLogin201ResponseBuilder get _$this {
+  AuthLoginControllerLogin201ResponseBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
       _data = $v.data.toBuilder();
@@ -87,23 +90,25 @@ class AuthControllerLogin201ResponseBuilder
   }
 
   @override
-  void replace(AuthControllerLogin201Response other) {
-    _$v = other as _$AuthControllerLogin201Response;
+  void replace(AuthLoginControllerLogin201Response other) {
+    _$v = other as _$AuthLoginControllerLogin201Response;
   }
 
   @override
-  void update(void Function(AuthControllerLogin201ResponseBuilder)? updates) {
+  void update(
+    void Function(AuthLoginControllerLogin201ResponseBuilder)? updates,
+  ) {
     if (updates != null) updates(this);
   }
 
   @override
-  AuthControllerLogin201Response build() => _build();
+  AuthLoginControllerLogin201Response build() => _build();
 
-  _$AuthControllerLogin201Response _build() {
-    _$AuthControllerLogin201Response _$result;
+  _$AuthLoginControllerLogin201Response _build() {
+    _$AuthLoginControllerLogin201Response _$result;
     try {
       _$result = _$v ??
-          _$AuthControllerLogin201Response._(
+          _$AuthLoginControllerLogin201Response._(
             data: data.build(),
             meta: meta.build(),
           );
@@ -116,7 +121,7 @@ class AuthControllerLogin201ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-          r'AuthControllerLogin201Response',
+          r'AuthLoginControllerLogin201Response',
           _$failedField,
           e.toString(),
         );

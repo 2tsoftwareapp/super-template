@@ -2,39 +2,43 @@
 
 // @dart=3.0
 
-part of 'auth_controller_get_me200_response.dart';
+part of 'auth_session_controller_get_me200_response.dart';
 
 // **************************************************************************
 // BuiltValueGenerator
 // **************************************************************************
 
-class _$AuthControllerGetMe200Response extends AuthControllerGetMe200Response {
+class _$AuthSessionControllerGetMe200Response
+    extends AuthSessionControllerGetMe200Response {
   @override
   final AuthMeDto data;
   @override
   final RequestMetaDto meta;
 
-  factory _$AuthControllerGetMe200Response([
-    void Function(AuthControllerGetMe200ResponseBuilder)? updates,
+  factory _$AuthSessionControllerGetMe200Response([
+    void Function(AuthSessionControllerGetMe200ResponseBuilder)? updates,
   ]) =>
-      (AuthControllerGetMe200ResponseBuilder()..update(updates))._build();
+      (AuthSessionControllerGetMe200ResponseBuilder()..update(updates))
+          ._build();
 
-  _$AuthControllerGetMe200Response._({required this.data, required this.meta})
-      : super._();
+  _$AuthSessionControllerGetMe200Response._({
+    required this.data,
+    required this.meta,
+  }) : super._();
   @override
-  AuthControllerGetMe200Response rebuild(
-    void Function(AuthControllerGetMe200ResponseBuilder) updates,
+  AuthSessionControllerGetMe200Response rebuild(
+    void Function(AuthSessionControllerGetMe200ResponseBuilder) updates,
   ) =>
       (toBuilder()..update(updates)).build();
 
   @override
-  AuthControllerGetMe200ResponseBuilder toBuilder() =>
-      AuthControllerGetMe200ResponseBuilder()..replace(this);
+  AuthSessionControllerGetMe200ResponseBuilder toBuilder() =>
+      AuthSessionControllerGetMe200ResponseBuilder()..replace(this);
 
   @override
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
-    return other is AuthControllerGetMe200Response &&
+    return other is AuthSessionControllerGetMe200Response &&
         data == other.data &&
         meta == other.meta;
   }
@@ -50,18 +54,20 @@ class _$AuthControllerGetMe200Response extends AuthControllerGetMe200Response {
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper(r'AuthControllerGetMe200Response')
+    return (newBuiltValueToStringHelper(
+      r'AuthSessionControllerGetMe200Response',
+    )
           ..add('data', data)
           ..add('meta', meta))
         .toString();
   }
 }
 
-class AuthControllerGetMe200ResponseBuilder
+class AuthSessionControllerGetMe200ResponseBuilder
     implements
-        Builder<AuthControllerGetMe200Response,
-            AuthControllerGetMe200ResponseBuilder> {
-  _$AuthControllerGetMe200Response? _$v;
+        Builder<AuthSessionControllerGetMe200Response,
+            AuthSessionControllerGetMe200ResponseBuilder> {
+  _$AuthSessionControllerGetMe200Response? _$v;
 
   AuthMeDtoBuilder? _data;
   AuthMeDtoBuilder get data => _$this._data ??= AuthMeDtoBuilder();
@@ -71,11 +77,11 @@ class AuthControllerGetMe200ResponseBuilder
   RequestMetaDtoBuilder get meta => _$this._meta ??= RequestMetaDtoBuilder();
   set meta(RequestMetaDtoBuilder? meta) => _$this._meta = meta;
 
-  AuthControllerGetMe200ResponseBuilder() {
-    AuthControllerGetMe200Response._defaults(this);
+  AuthSessionControllerGetMe200ResponseBuilder() {
+    AuthSessionControllerGetMe200Response._defaults(this);
   }
 
-  AuthControllerGetMe200ResponseBuilder get _$this {
+  AuthSessionControllerGetMe200ResponseBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
       _data = $v.data.toBuilder();
@@ -86,23 +92,25 @@ class AuthControllerGetMe200ResponseBuilder
   }
 
   @override
-  void replace(AuthControllerGetMe200Response other) {
-    _$v = other as _$AuthControllerGetMe200Response;
+  void replace(AuthSessionControllerGetMe200Response other) {
+    _$v = other as _$AuthSessionControllerGetMe200Response;
   }
 
   @override
-  void update(void Function(AuthControllerGetMe200ResponseBuilder)? updates) {
+  void update(
+    void Function(AuthSessionControllerGetMe200ResponseBuilder)? updates,
+  ) {
     if (updates != null) updates(this);
   }
 
   @override
-  AuthControllerGetMe200Response build() => _build();
+  AuthSessionControllerGetMe200Response build() => _build();
 
-  _$AuthControllerGetMe200Response _build() {
-    _$AuthControllerGetMe200Response _$result;
+  _$AuthSessionControllerGetMe200Response _build() {
+    _$AuthSessionControllerGetMe200Response _$result;
     try {
       _$result = _$v ??
-          _$AuthControllerGetMe200Response._(
+          _$AuthSessionControllerGetMe200Response._(
             data: data.build(),
             meta: meta.build(),
           );
@@ -115,7 +123,7 @@ class AuthControllerGetMe200ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-          r'AuthControllerGetMe200Response',
+          r'AuthSessionControllerGetMe200Response',
           _$failedField,
           e.toString(),
         );

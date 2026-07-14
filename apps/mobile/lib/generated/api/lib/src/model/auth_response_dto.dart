@@ -23,6 +23,7 @@ part 'auth_response_dto.g.dart';
 /// * [permissions]
 /// * [session]
 /// * [organizationId]
+/// * [mustChangePassword]
 @BuiltValue()
 abstract class AuthResponseDto
     implements Built<AuthResponseDto, AuthResponseDtoBuilder> {
@@ -43,6 +44,9 @@ abstract class AuthResponseDto
 
   @BuiltValueField(wireName: r'organizationId')
   JsonObject? get organizationId;
+
+  @BuiltValueField(wireName: r'mustChangePassword')
+  bool? get mustChangePassword;
 
   AuthResponseDto._();
 
@@ -102,6 +106,13 @@ class _$AuthResponseDtoSerializer
             object.organizationId,
             specifiedType: const FullType.nullable(JsonObject),
           );
+    if (object.mustChangePassword != null) {
+      yield r'mustChangePassword';
+      yield serializers.serialize(
+        object.mustChangePassword,
+        specifiedType: const FullType(bool),
+      );
+    }
   }
 
   @override
@@ -173,6 +184,13 @@ class _$AuthResponseDtoSerializer
           ) as JsonObject?;
           if (valueDes == null) continue;
           result.organizationId = valueDes;
+          break;
+        case r'mustChangePassword':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(bool),
+          ) as bool;
+          result.mustChangePassword = valueDes;
           break;
         default:
           unhandled.add(key);

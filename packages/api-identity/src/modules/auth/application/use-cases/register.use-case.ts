@@ -29,7 +29,10 @@ import {
   AUTH_SESSION_REPOSITORY,
   type AuthSessionRepositoryPort,
 } from '../ports/auth-session.repository.port';
-import { AuthMailService } from '../services/auth-mail.service';
+import {
+  OUTBOX_REPOSITORY,
+  type OutboxRepositoryPort,
+} from '../ports/outbox.repository.port';
 
 @Injectable()
 export class RegisterUseCase {
@@ -41,15 +44,15 @@ export class RegisterUseCase {
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
     @Inject(AUTH_SESSION_REPOSITORY)
     private readonly authSessionRepository: AuthSessionRepositoryPort,
+    @Inject(OUTBOX_REPOSITORY) private readonly outboxRepository: OutboxRepositoryPort,
     private readonly organizationsService: OrganizationsService,
-    private readonly authMailService: AuthMailService,
   ) {}
 
   async execute(input: RegisterCommand, requestContext?: RequestContext) {
     const email = normalizeEmail(input.email);
     await this.usersRepository.assertEmailAvailable(email);
 
-    const result = await this.transactionPort.run(
+    await this.transactionPort.run(
       async (transaction) => {
         const user = await this.usersRepository.create(
           {
@@ -98,6 +101,14 @@ export class RegisterUseCase {
           transaction,
         );
 
+        await this.outboxRepository.create(
+          {
+            topic: 'auth.send-verification-email',
+            payload: { email: user.email, token: verificationToken },
+          },
+          transaction,
+        );
+
         await this.auditWriter.log(
           {
             actorId: user.id,
@@ -108,17 +119,7 @@ export class RegisterUseCase {
           },
           transaction,
         );
-
-        return {
-          user,
-          verificationToken,
-        };
       },
-    );
-
-    await this.authMailService.sendVerificationEmail(
-      result.user.email,
-      result.verificationToken,
     );
 
     return {

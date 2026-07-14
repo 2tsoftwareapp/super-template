@@ -107,20 +107,20 @@ Class | Method | HTTP request | Description
 [*AttachmentsApi*](doc/AttachmentsApi.md) | [**attachmentsControllerAttach**](doc/AttachmentsApi.md#attachmentscontrollerattach) | **POST** /api/v1/attachments | 
 [*AttachmentsApi*](doc/AttachmentsApi.md) | [**attachmentsControllerDelete**](doc/AttachmentsApi.md#attachmentscontrollerdelete) | **DELETE** /api/v1/attachments/{id} | 
 [*AttachmentsApi*](doc/AttachmentsApi.md) | [**attachmentsControllerList**](doc/AttachmentsApi.md#attachmentscontrollerlist) | **GET** /api/v1/attachments | 
-[*AuthApi*](doc/AuthApi.md) | [**authControllerForgotPassword**](doc/AuthApi.md#authcontrollerforgotpassword) | **POST** /api/v1/auth/forgot-password | 
-[*AuthApi*](doc/AuthApi.md) | [**authControllerGetMe**](doc/AuthApi.md#authcontrollergetme) | **GET** /api/v1/auth/me | 
-[*AuthApi*](doc/AuthApi.md) | [**authControllerGetSessions**](doc/AuthApi.md#authcontrollergetsessions) | **GET** /api/v1/auth/sessions | 
-[*AuthApi*](doc/AuthApi.md) | [**authControllerLogin**](doc/AuthApi.md#authcontrollerlogin) | **POST** /api/v1/auth/login | 
-[*AuthApi*](doc/AuthApi.md) | [**authControllerLogout**](doc/AuthApi.md#authcontrollerlogout) | **POST** /api/v1/auth/logout | 
-[*AuthApi*](doc/AuthApi.md) | [**authControllerLogoutAll**](doc/AuthApi.md#authcontrollerlogoutall) | **POST** /api/v1/auth/logout-all | 
-[*AuthApi*](doc/AuthApi.md) | [**authControllerRefresh**](doc/AuthApi.md#authcontrollerrefresh) | **POST** /api/v1/auth/refresh | 
-[*AuthApi*](doc/AuthApi.md) | [**authControllerRegister**](doc/AuthApi.md#authcontrollerregister) | **POST** /api/v1/auth/register | 
-[*AuthApi*](doc/AuthApi.md) | [**authControllerResendVerification**](doc/AuthApi.md#authcontrollerresendverification) | **POST** /api/v1/auth/resend-verification | 
-[*AuthApi*](doc/AuthApi.md) | [**authControllerResetPassword**](doc/AuthApi.md#authcontrollerresetpassword) | **POST** /api/v1/auth/reset-password | 
-[*AuthApi*](doc/AuthApi.md) | [**authControllerRevokeSession**](doc/AuthApi.md#authcontrollerrevokesession) | **DELETE** /api/v1/auth/sessions/{sessionId} | 
-[*AuthApi*](doc/AuthApi.md) | [**authControllerSwitchOrganization**](doc/AuthApi.md#authcontrollerswitchorganization) | **POST** /api/v1/auth/switch-organization | 
-[*AuthApi*](doc/AuthApi.md) | [**authControllerVerifyEmail**](doc/AuthApi.md#authcontrollerverifyemail) | **POST** /api/v1/auth/verify-email | 
-[*AuthApi*](doc/AuthApi.md) | [**authControllerVerifyMfaChallenge**](doc/AuthApi.md#authcontrollerverifymfachallenge) | **POST** /api/v1/auth/mfa/verify-challenge | 
+[*AuthApi*](doc/AuthApi.md) | [**authLoginControllerLogin**](doc/AuthApi.md#authlogincontrollerlogin) | **POST** /api/v1/auth/login | 
+[*AuthApi*](doc/AuthApi.md) | [**authLoginControllerRefresh**](doc/AuthApi.md#authlogincontrollerrefresh) | **POST** /api/v1/auth/refresh | 
+[*AuthApi*](doc/AuthApi.md) | [**authLoginControllerVerifyMfaChallenge**](doc/AuthApi.md#authlogincontrollerverifymfachallenge) | **POST** /api/v1/auth/mfa/verify-challenge | 
+[*AuthApi*](doc/AuthApi.md) | [**authRecoveryControllerForgotPassword**](doc/AuthApi.md#authrecoverycontrollerforgotpassword) | **POST** /api/v1/auth/forgot-password | 
+[*AuthApi*](doc/AuthApi.md) | [**authRecoveryControllerResetPassword**](doc/AuthApi.md#authrecoverycontrollerresetpassword) | **POST** /api/v1/auth/reset-password | 
+[*AuthApi*](doc/AuthApi.md) | [**authRegistrationControllerRegister**](doc/AuthApi.md#authregistrationcontrollerregister) | **POST** /api/v1/auth/register | 
+[*AuthApi*](doc/AuthApi.md) | [**authRegistrationControllerResendVerification**](doc/AuthApi.md#authregistrationcontrollerresendverification) | **POST** /api/v1/auth/resend-verification | 
+[*AuthApi*](doc/AuthApi.md) | [**authRegistrationControllerVerifyEmail**](doc/AuthApi.md#authregistrationcontrollerverifyemail) | **POST** /api/v1/auth/verify-email | 
+[*AuthApi*](doc/AuthApi.md) | [**authSessionControllerGetMe**](doc/AuthApi.md#authsessioncontrollergetme) | **GET** /api/v1/auth/me | 
+[*AuthApi*](doc/AuthApi.md) | [**authSessionControllerGetSessions**](doc/AuthApi.md#authsessioncontrollergetsessions) | **GET** /api/v1/auth/sessions | 
+[*AuthApi*](doc/AuthApi.md) | [**authSessionControllerLogout**](doc/AuthApi.md#authsessioncontrollerlogout) | **POST** /api/v1/auth/logout | 
+[*AuthApi*](doc/AuthApi.md) | [**authSessionControllerLogoutAll**](doc/AuthApi.md#authsessioncontrollerlogoutall) | **POST** /api/v1/auth/logout-all | 
+[*AuthApi*](doc/AuthApi.md) | [**authSessionControllerRevokeSession**](doc/AuthApi.md#authsessioncontrollerrevokesession) | **DELETE** /api/v1/auth/sessions/{sessionId} | 
+[*AuthApi*](doc/AuthApi.md) | [**authSessionControllerSwitchOrganization**](doc/AuthApi.md#authsessioncontrollerswitchorganization) | **POST** /api/v1/auth/switch-organization | 
 [*ExportsApi*](doc/ExportsApi.md) | [**exportsControllerCreate**](doc/ExportsApi.md#exportscontrollercreate) | **POST** /api/v1/exports | 
 [*ExportsApi*](doc/ExportsApi.md) | [**exportsControllerGetById**](doc/ExportsApi.md#exportscontrollergetbyid) | **GET** /api/v1/exports/{id} | 
 [*FilesApi*](doc/FilesApi.md) | [**filesControllerBatchDelete**](doc/FilesApi.md#filescontrollerbatchdelete) | **POST** /api/v1/files/batch-delete | 
@@ -207,14 +207,14 @@ Class | Method | HTTP request | Description
  - [AuditControllerListAuditLogs200Response](doc/AuditControllerListAuditLogs200Response.md)
  - [AuditExportResultDto](doc/AuditExportResultDto.md)
  - [AuditLogDto](doc/AuditLogDto.md)
- - [AuthControllerGetMe200Response](doc/AuthControllerGetMe200Response.md)
- - [AuthControllerGetSessions200Response](doc/AuthControllerGetSessions200Response.md)
- - [AuthControllerLogin201Response](doc/AuthControllerLogin201Response.md)
- - [AuthControllerRegister201Response](doc/AuthControllerRegister201Response.md)
- - [AuthControllerSwitchOrganization201Response](doc/AuthControllerSwitchOrganization201Response.md)
- - [AuthControllerVerifyMfaChallenge201Response](doc/AuthControllerVerifyMfaChallenge201Response.md)
+ - [AuthLoginControllerLogin201Response](doc/AuthLoginControllerLogin201Response.md)
+ - [AuthLoginControllerVerifyMfaChallenge201Response](doc/AuthLoginControllerVerifyMfaChallenge201Response.md)
  - [AuthMeDto](doc/AuthMeDto.md)
+ - [AuthRegistrationControllerRegister201Response](doc/AuthRegistrationControllerRegister201Response.md)
  - [AuthResponseDto](doc/AuthResponseDto.md)
+ - [AuthSessionControllerGetMe200Response](doc/AuthSessionControllerGetMe200Response.md)
+ - [AuthSessionControllerGetSessions200Response](doc/AuthSessionControllerGetSessions200Response.md)
+ - [AuthSessionControllerSwitchOrganization201Response](doc/AuthSessionControllerSwitchOrganization201Response.md)
  - [AuthSessionDto](doc/AuthSessionDto.md)
  - [BatchDeleteFilesDto](doc/BatchDeleteFilesDto.md)
  - [BatchDeleteResultDto](doc/BatchDeleteResultDto.md)

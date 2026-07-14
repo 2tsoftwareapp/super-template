@@ -73,7 +73,7 @@ export const usersApi = {
     );
   },
 
-  replaceRoles(userId: string, role: "ADMIN" | "USER", organizationId?: string) {
+  replaceRoles(userId: string, role: string, organizationId?: string) {
     return webFetch<{ data: AdminUserDto }>(
       `/api/bff/admin/users/${userId}/roles`,
       { method: "PUT", body: JSON.stringify({ role, organizationId }) },

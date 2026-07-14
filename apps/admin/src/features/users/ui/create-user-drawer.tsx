@@ -11,8 +11,8 @@ import { useForm, useWatch } from "react-hook-form";
 
 import { ResourceDrawer } from "@/components/resource-drawer";
 import { useCreateUser } from "@/features/users/api/users.mutations";
+import { useAdminRolesQuery } from "@/features/users/api/users.queries";
 import {
-  ASSIGNABLE_ROLES,
   type CreateUserForm,
   createUserSchema,
 } from "@/features/users/model/users.schemas";
@@ -27,13 +27,18 @@ export function CreateUserDrawer({
   onClose: () => void;
   actorRoles: string[];
 }) {
+  const allRoles = useAdminRolesQuery();
+  const availableRoleNames = useMemo(
+    () => (allRoles.data?.data ?? []).map((r) => r.name),
+    [allRoles.data],
+  );
   const assignableRoles = useMemo(
-    () => ASSIGNABLE_ROLES.filter((role) => canAssignRole(actorRoles, role)),
-    [actorRoles],
+    () => availableRoleNames.filter((role) => canAssignRole(actorRoles, role)),
+    [actorRoles, availableRoleNames],
   );
   const createSchema = useMemo(
-    () => createUserSchema(actorRoles),
-    [actorRoles],
+    () => createUserSchema(actorRoles, availableRoleNames),
+    [actorRoles, availableRoleNames],
   );
 
   const form = useForm<CreateUserForm>({
@@ -101,7 +106,7 @@ export function CreateUserDrawer({
             email: values.email,
             password: values.password,
             displayName: values.displayName,
-            role: values.role,
+            role: values.role as "ADMIN" | "USER",
             status: "PENDING",
             ...(values.role === "ADMIN" && values.organizationId
               ? { organizationId: values.organizationId }

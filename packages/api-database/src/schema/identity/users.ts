@@ -1,5 +1,5 @@
 import { sql } from 'drizzle-orm';
-import { pgTable, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
+import { boolean, pgTable, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
 
 import { timestamps } from '../shared/timestamps';
 import { userStatusEnum } from './enums';
@@ -15,6 +15,7 @@ export const users = pgTable(
     avatarFileId: uuid('avatar_file_id'),
     status: userStatusEnum('status').notNull().default('PENDING'),
     emailVerifiedAt: timestamp('email_verified_at', { withTimezone: true }),
+    mustChangePassword: boolean('must_change_password').notNull().default(false),
     deletedAt: timestamp('deleted_at', { withTimezone: true }),
     ...timestamps,
   },

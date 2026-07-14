@@ -21,6 +21,8 @@ class _$AuthResponseDto extends AuthResponseDto {
   final AuthSessionDto session;
   @override
   final JsonObject? organizationId;
+  @override
+  final bool? mustChangePassword;
 
   factory _$AuthResponseDto([void Function(AuthResponseDtoBuilder)? updates]) =>
       (AuthResponseDtoBuilder()..update(updates))._build();
@@ -32,6 +34,7 @@ class _$AuthResponseDto extends AuthResponseDto {
     required this.permissions,
     required this.session,
     this.organizationId,
+    this.mustChangePassword,
   }) : super._();
   @override
   AuthResponseDto rebuild(void Function(AuthResponseDtoBuilder) updates) =>
@@ -49,7 +52,8 @@ class _$AuthResponseDto extends AuthResponseDto {
         user == other.user &&
         permissions == other.permissions &&
         session == other.session &&
-        organizationId == other.organizationId;
+        organizationId == other.organizationId &&
+        mustChangePassword == other.mustChangePassword;
   }
 
   @override
@@ -61,6 +65,7 @@ class _$AuthResponseDto extends AuthResponseDto {
     _$hash = $jc(_$hash, permissions.hashCode);
     _$hash = $jc(_$hash, session.hashCode);
     _$hash = $jc(_$hash, organizationId.hashCode);
+    _$hash = $jc(_$hash, mustChangePassword.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -73,7 +78,8 @@ class _$AuthResponseDto extends AuthResponseDto {
           ..add('user', user)
           ..add('permissions', permissions)
           ..add('session', session)
-          ..add('organizationId', organizationId))
+          ..add('organizationId', organizationId)
+          ..add('mustChangePassword', mustChangePassword))
         .toString();
   }
 }
@@ -110,6 +116,11 @@ class AuthResponseDtoBuilder
   set organizationId(JsonObject? organizationId) =>
       _$this._organizationId = organizationId;
 
+  bool? _mustChangePassword;
+  bool? get mustChangePassword => _$this._mustChangePassword;
+  set mustChangePassword(bool? mustChangePassword) =>
+      _$this._mustChangePassword = mustChangePassword;
+
   AuthResponseDtoBuilder() {
     AuthResponseDto._defaults(this);
   }
@@ -123,6 +134,7 @@ class AuthResponseDtoBuilder
       _permissions = $v.permissions.toBuilder();
       _session = $v.session.toBuilder();
       _organizationId = $v.organizationId;
+      _mustChangePassword = $v.mustChangePassword;
       _$v = null;
     }
     return this;
@@ -160,6 +172,7 @@ class AuthResponseDtoBuilder
             permissions: permissions.build(),
             session: session.build(),
             organizationId: organizationId,
+            mustChangePassword: mustChangePassword,
           );
     } catch (_) {
       late String _$failedField;

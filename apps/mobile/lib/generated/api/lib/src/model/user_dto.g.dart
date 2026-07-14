@@ -90,7 +90,7 @@ class _$UserDto extends UserDto {
   @override
   final UserDtoStatusEnum status;
   @override
-  final JsonObject? emailVerifiedAt;
+  final String? emailVerifiedAt;
   @override
   final BuiltList<String> roles;
   @override
@@ -195,9 +195,9 @@ class UserDtoBuilder implements Builder<UserDto, UserDtoBuilder> {
   UserDtoStatusEnum? get status => _$this._status;
   set status(UserDtoStatusEnum? status) => _$this._status = status;
 
-  JsonObject? _emailVerifiedAt;
-  JsonObject? get emailVerifiedAt => _$this._emailVerifiedAt;
-  set emailVerifiedAt(JsonObject? emailVerifiedAt) =>
+  String? _emailVerifiedAt;
+  String? get emailVerifiedAt => _$this._emailVerifiedAt;
+  set emailVerifiedAt(String? emailVerifiedAt) =>
       _$this._emailVerifiedAt = emailVerifiedAt;
 
   ListBuilder<String>? _roles;

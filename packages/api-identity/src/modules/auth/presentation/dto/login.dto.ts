@@ -56,4 +56,7 @@ export class LoginResponseDto {
 
   @ApiPropertyOptional({ nullable: true })
   organizationId?: string | null;
+
+  @ApiPropertyOptional()
+  mustChangePassword?: boolean;
 }

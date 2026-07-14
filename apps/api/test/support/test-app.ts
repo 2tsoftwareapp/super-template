@@ -1,12 +1,12 @@
+import type { TenantContext } from '@repo/api-core';
 import type { Server } from 'node:http';
 
 import { type INestApplication, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
 import { ThrottlerGuard } from '@nestjs/throttler';
-import { loadEnvFiles } from '@repo/api-core/config/load-env-files';
-import type { TenantContext } from '@repo/api-core';
 import { TenantContextService } from '@repo/api-core';
+import { loadEnvFiles } from '@repo/api-core/config/load-env-files';
 import {
   DATABASE,
   type DatabaseClient,

@@ -5,8 +5,10 @@ import { AccessControlModule } from '../access-control/access-control.module';
 import { MfaModule } from '../mfa/mfa.module';
 import { OrganizationsModule } from '../organizations/organizations.module';
 import { UsersModule } from '../users/users.module';
+import { AuthMapper } from './application/auth.mapper';
 import { AuthService } from './application/auth.service';
 import { AUTH_TOKEN_PROVIDER } from './application/ports/auth-token.provider.port';
+import { OutboxProcessor } from './application/services/outbox-processor.service';
 import { AuthenticateAccessTokenUseCase } from './application/use-cases/authenticate-access-token.use-case';
 import { CompleteMfaLoginUseCase } from './application/use-cases/complete-mfa-login.use-case';
 import { ForgotPasswordUseCase } from './application/use-cases/forgot-password.use-case';
@@ -47,6 +49,7 @@ import { AuthSessionController } from './presentation/auth-session.controller';
   ],
   providers: [
     AuthService,
+    AuthMapper,
     SessionTokenService,
     {
       provide: AUTH_TOKEN_PROVIDER,
@@ -68,6 +71,7 @@ import { AuthSessionController } from './presentation/auth-session.controller';
     VerifyEmailUseCase,
     ResendVerificationUseCase,
     AuthenticateAccessTokenUseCase,
+    OutboxProcessor,
   ],
   exports: [AuthService, IssueSessionUseCase],
 })

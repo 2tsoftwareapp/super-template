@@ -20,6 +20,7 @@ part 'auth_me_dto.g.dart';
 /// * [permissions]
 /// * [sessionId]
 /// * [organizationId]
+/// * [mustChangePassword]
 @BuiltValue()
 abstract class AuthMeDto implements Built<AuthMeDto, AuthMeDtoBuilder> {
   @BuiltValueField(wireName: r'user')
@@ -33,6 +34,9 @@ abstract class AuthMeDto implements Built<AuthMeDto, AuthMeDtoBuilder> {
 
   @BuiltValueField(wireName: r'organizationId')
   JsonObject? get organizationId;
+
+  @BuiltValueField(wireName: r'mustChangePassword')
+  bool? get mustChangePassword;
 
   AuthMeDto._();
 
@@ -79,6 +83,13 @@ class _$AuthMeDtoSerializer implements PrimitiveSerializer<AuthMeDto> {
             object.organizationId,
             specifiedType: const FullType.nullable(JsonObject),
           );
+    if (object.mustChangePassword != null) {
+      yield r'mustChangePassword';
+      yield serializers.serialize(
+        object.mustChangePassword,
+        specifiedType: const FullType(bool),
+      );
+    }
   }
 
   @override
@@ -136,6 +147,13 @@ class _$AuthMeDtoSerializer implements PrimitiveSerializer<AuthMeDto> {
           ) as JsonObject?;
           if (valueDes == null) continue;
           result.organizationId = valueDes;
+          break;
+        case r'mustChangePassword':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(bool),
+          ) as bool;
+          result.mustChangePassword = valueDes;
           break;
         default:
           unhandled.add(key);

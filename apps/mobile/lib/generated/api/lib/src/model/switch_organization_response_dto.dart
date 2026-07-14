@@ -14,6 +14,7 @@ part 'switch_organization_response_dto.g.dart';
 ///
 /// Properties:
 /// * [accessToken]
+/// * [refreshToken]
 /// * [organizationId]
 @BuiltValue()
 abstract class SwitchOrganizationResponseDto
@@ -22,6 +23,9 @@ abstract class SwitchOrganizationResponseDto
             SwitchOrganizationResponseDtoBuilder> {
   @BuiltValueField(wireName: r'accessToken')
   String get accessToken;
+
+  @BuiltValueField(wireName: r'refreshToken')
+  String get refreshToken;
 
   @BuiltValueField(wireName: r'organizationId')
   String get organizationId;
@@ -59,6 +63,11 @@ class _$SwitchOrganizationResponseDtoSerializer
     yield r'accessToken';
     yield serializers.serialize(
       object.accessToken,
+      specifiedType: const FullType(String),
+    );
+    yield r'refreshToken';
+    yield serializers.serialize(
+      object.refreshToken,
       specifiedType: const FullType(String),
     );
     yield r'organizationId';
@@ -99,6 +108,13 @@ class _$SwitchOrganizationResponseDtoSerializer
             specifiedType: const FullType(String),
           ) as String;
           result.accessToken = valueDes;
+          break;
+        case r'refreshToken':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.refreshToken = valueDes;
           break;
         case r'organizationId':
           final valueDes = serializers.deserialize(

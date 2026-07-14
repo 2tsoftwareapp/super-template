@@ -11,6 +11,7 @@ export interface UserRecord {
   avatarFileId: string | null;
   status: 'PENDING' | 'ACTIVE' | 'BLOCKED';
   emailVerifiedAt: Date | null;
+  mustChangePassword: boolean;
   deletedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
@@ -24,6 +25,7 @@ export interface CreateUserInput {
   avatarFileId?: string | null;
   status?: 'PENDING' | 'ACTIVE' | 'BLOCKED';
   emailVerifiedAt?: Date | null;
+  mustChangePassword?: boolean;
   deletedAt?: Date | null;
 }
 

@@ -27,7 +27,6 @@ export { ImportExportModule } from "./common/import-export/import-export.module"
 export * from "./common/interceptors/response-envelope.interceptor";
 export { ConsoleAppLogger } from "./common/logging/console-logger.service";
 export * from "./common/logging/logger.interface";
-export { getTenantContext, TenantContextService } from "./common/services/tenant-context.service";
 export { LoggingModule } from "./common/logging/logging.module";
 export { RequestContextMiddleware } from "./common/middleware/request-context.middleware";
 export { RequestLoggerMiddleware } from "./common/middleware/request-logger.middleware";
@@ -38,6 +37,7 @@ export {
   adaptRedisClient,
   createRedisClient,
 } from "./common/redis/redis-client.adapter";
+export { getTenantContext, TenantContextService } from "./common/services/tenant-context.service";
 export * from "./common/sort/multi-sort";
 export { RedisThrottlerStorage } from "./common/throttling/redis-throttler.storage";
 export * from "./common/types/json-value";
@@ -94,14 +94,14 @@ export {
   type OrganizationLookup,
 } from "./ports/organization-lookup.port";
 export {
+  type TenantContext,
+  tenantContextForJob,
+  WORKER_DISPATCH_CONTEXT,
+} from "./ports/tenant-context.port";
+export {
   TRANSACTION_PORT,
   type TransactionPort,
 } from "./ports/transaction.port";
-export {
-  tenantContextForJob,
-  type TenantContext,
-  WORKER_DISPATCH_CONTEXT,
-} from "./ports/tenant-context.port";
 export {
   USER_LOOKUP,
   type UserLookup,

@@ -2,43 +2,47 @@
 
 // @dart=3.0
 
-part of 'auth_controller_switch_organization201_response.dart';
+part of 'auth_session_controller_switch_organization201_response.dart';
 
 // **************************************************************************
 // BuiltValueGenerator
 // **************************************************************************
 
-class _$AuthControllerSwitchOrganization201Response
-    extends AuthControllerSwitchOrganization201Response {
+class _$AuthSessionControllerSwitchOrganization201Response
+    extends AuthSessionControllerSwitchOrganization201Response {
   @override
   final SwitchOrganizationResponseDto data;
   @override
   final RequestMetaDto meta;
 
-  factory _$AuthControllerSwitchOrganization201Response([
-    void Function(AuthControllerSwitchOrganization201ResponseBuilder)? updates,
+  factory _$AuthSessionControllerSwitchOrganization201Response([
+    void Function(AuthSessionControllerSwitchOrganization201ResponseBuilder)?
+        updates,
   ]) =>
-      (AuthControllerSwitchOrganization201ResponseBuilder()..update(updates))
+      (AuthSessionControllerSwitchOrganization201ResponseBuilder()
+            ..update(updates))
           ._build();
 
-  _$AuthControllerSwitchOrganization201Response._({
+  _$AuthSessionControllerSwitchOrganization201Response._({
     required this.data,
     required this.meta,
   }) : super._();
   @override
-  AuthControllerSwitchOrganization201Response rebuild(
-    void Function(AuthControllerSwitchOrganization201ResponseBuilder) updates,
+  AuthSessionControllerSwitchOrganization201Response rebuild(
+    void Function(AuthSessionControllerSwitchOrganization201ResponseBuilder)
+        updates,
   ) =>
       (toBuilder()..update(updates)).build();
 
   @override
-  AuthControllerSwitchOrganization201ResponseBuilder toBuilder() =>
-      AuthControllerSwitchOrganization201ResponseBuilder()..replace(this);
+  AuthSessionControllerSwitchOrganization201ResponseBuilder toBuilder() =>
+      AuthSessionControllerSwitchOrganization201ResponseBuilder()
+        ..replace(this);
 
   @override
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
-    return other is AuthControllerSwitchOrganization201Response &&
+    return other is AuthSessionControllerSwitchOrganization201Response &&
         data == other.data &&
         meta == other.meta;
   }
@@ -55,7 +59,7 @@ class _$AuthControllerSwitchOrganization201Response
   @override
   String toString() {
     return (newBuiltValueToStringHelper(
-      r'AuthControllerSwitchOrganization201Response',
+      r'AuthSessionControllerSwitchOrganization201Response',
     )
           ..add('data', data)
           ..add('meta', meta))
@@ -63,11 +67,11 @@ class _$AuthControllerSwitchOrganization201Response
   }
 }
 
-class AuthControllerSwitchOrganization201ResponseBuilder
+class AuthSessionControllerSwitchOrganization201ResponseBuilder
     implements
-        Builder<AuthControllerSwitchOrganization201Response,
-            AuthControllerSwitchOrganization201ResponseBuilder> {
-  _$AuthControllerSwitchOrganization201Response? _$v;
+        Builder<AuthSessionControllerSwitchOrganization201Response,
+            AuthSessionControllerSwitchOrganization201ResponseBuilder> {
+  _$AuthSessionControllerSwitchOrganization201Response? _$v;
 
   SwitchOrganizationResponseDtoBuilder? _data;
   SwitchOrganizationResponseDtoBuilder get data =>
@@ -78,11 +82,11 @@ class AuthControllerSwitchOrganization201ResponseBuilder
   RequestMetaDtoBuilder get meta => _$this._meta ??= RequestMetaDtoBuilder();
   set meta(RequestMetaDtoBuilder? meta) => _$this._meta = meta;
 
-  AuthControllerSwitchOrganization201ResponseBuilder() {
-    AuthControllerSwitchOrganization201Response._defaults(this);
+  AuthSessionControllerSwitchOrganization201ResponseBuilder() {
+    AuthSessionControllerSwitchOrganization201Response._defaults(this);
   }
 
-  AuthControllerSwitchOrganization201ResponseBuilder get _$this {
+  AuthSessionControllerSwitchOrganization201ResponseBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
       _data = $v.data.toBuilder();
@@ -93,25 +97,26 @@ class AuthControllerSwitchOrganization201ResponseBuilder
   }
 
   @override
-  void replace(AuthControllerSwitchOrganization201Response other) {
-    _$v = other as _$AuthControllerSwitchOrganization201Response;
+  void replace(AuthSessionControllerSwitchOrganization201Response other) {
+    _$v = other as _$AuthSessionControllerSwitchOrganization201Response;
   }
 
   @override
   void update(
-    void Function(AuthControllerSwitchOrganization201ResponseBuilder)? updates,
+    void Function(AuthSessionControllerSwitchOrganization201ResponseBuilder)?
+        updates,
   ) {
     if (updates != null) updates(this);
   }
 
   @override
-  AuthControllerSwitchOrganization201Response build() => _build();
+  AuthSessionControllerSwitchOrganization201Response build() => _build();
 
-  _$AuthControllerSwitchOrganization201Response _build() {
-    _$AuthControllerSwitchOrganization201Response _$result;
+  _$AuthSessionControllerSwitchOrganization201Response _build() {
+    _$AuthSessionControllerSwitchOrganization201Response _$result;
     try {
       _$result = _$v ??
-          _$AuthControllerSwitchOrganization201Response._(
+          _$AuthSessionControllerSwitchOrganization201Response._(
             data: data.build(),
             meta: meta.build(),
           );
@@ -124,7 +129,7 @@ class AuthControllerSwitchOrganization201ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-          r'AuthControllerSwitchOrganization201Response',
+          r'AuthSessionControllerSwitchOrganization201Response',
           _$failedField,
           e.toString(),
         );

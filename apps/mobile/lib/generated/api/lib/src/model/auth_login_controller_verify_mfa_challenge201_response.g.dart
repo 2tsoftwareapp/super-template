@@ -2,43 +2,46 @@
 
 // @dart=3.0
 
-part of 'auth_controller_verify_mfa_challenge201_response.dart';
+part of 'auth_login_controller_verify_mfa_challenge201_response.dart';
 
 // **************************************************************************
 // BuiltValueGenerator
 // **************************************************************************
 
-class _$AuthControllerVerifyMfaChallenge201Response
-    extends AuthControllerVerifyMfaChallenge201Response {
+class _$AuthLoginControllerVerifyMfaChallenge201Response
+    extends AuthLoginControllerVerifyMfaChallenge201Response {
   @override
   final AuthResponseDto data;
   @override
   final RequestMetaDto meta;
 
-  factory _$AuthControllerVerifyMfaChallenge201Response([
-    void Function(AuthControllerVerifyMfaChallenge201ResponseBuilder)? updates,
+  factory _$AuthLoginControllerVerifyMfaChallenge201Response([
+    void Function(AuthLoginControllerVerifyMfaChallenge201ResponseBuilder)?
+        updates,
   ]) =>
-      (AuthControllerVerifyMfaChallenge201ResponseBuilder()..update(updates))
+      (AuthLoginControllerVerifyMfaChallenge201ResponseBuilder()
+            ..update(updates))
           ._build();
 
-  _$AuthControllerVerifyMfaChallenge201Response._({
+  _$AuthLoginControllerVerifyMfaChallenge201Response._({
     required this.data,
     required this.meta,
   }) : super._();
   @override
-  AuthControllerVerifyMfaChallenge201Response rebuild(
-    void Function(AuthControllerVerifyMfaChallenge201ResponseBuilder) updates,
+  AuthLoginControllerVerifyMfaChallenge201Response rebuild(
+    void Function(AuthLoginControllerVerifyMfaChallenge201ResponseBuilder)
+        updates,
   ) =>
       (toBuilder()..update(updates)).build();
 
   @override
-  AuthControllerVerifyMfaChallenge201ResponseBuilder toBuilder() =>
-      AuthControllerVerifyMfaChallenge201ResponseBuilder()..replace(this);
+  AuthLoginControllerVerifyMfaChallenge201ResponseBuilder toBuilder() =>
+      AuthLoginControllerVerifyMfaChallenge201ResponseBuilder()..replace(this);
 
   @override
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
-    return other is AuthControllerVerifyMfaChallenge201Response &&
+    return other is AuthLoginControllerVerifyMfaChallenge201Response &&
         data == other.data &&
         meta == other.meta;
   }
@@ -55,7 +58,7 @@ class _$AuthControllerVerifyMfaChallenge201Response
   @override
   String toString() {
     return (newBuiltValueToStringHelper(
-      r'AuthControllerVerifyMfaChallenge201Response',
+      r'AuthLoginControllerVerifyMfaChallenge201Response',
     )
           ..add('data', data)
           ..add('meta', meta))
@@ -63,11 +66,11 @@ class _$AuthControllerVerifyMfaChallenge201Response
   }
 }
 
-class AuthControllerVerifyMfaChallenge201ResponseBuilder
+class AuthLoginControllerVerifyMfaChallenge201ResponseBuilder
     implements
-        Builder<AuthControllerVerifyMfaChallenge201Response,
-            AuthControllerVerifyMfaChallenge201ResponseBuilder> {
-  _$AuthControllerVerifyMfaChallenge201Response? _$v;
+        Builder<AuthLoginControllerVerifyMfaChallenge201Response,
+            AuthLoginControllerVerifyMfaChallenge201ResponseBuilder> {
+  _$AuthLoginControllerVerifyMfaChallenge201Response? _$v;
 
   AuthResponseDtoBuilder? _data;
   AuthResponseDtoBuilder get data => _$this._data ??= AuthResponseDtoBuilder();
@@ -77,11 +80,11 @@ class AuthControllerVerifyMfaChallenge201ResponseBuilder
   RequestMetaDtoBuilder get meta => _$this._meta ??= RequestMetaDtoBuilder();
   set meta(RequestMetaDtoBuilder? meta) => _$this._meta = meta;
 
-  AuthControllerVerifyMfaChallenge201ResponseBuilder() {
-    AuthControllerVerifyMfaChallenge201Response._defaults(this);
+  AuthLoginControllerVerifyMfaChallenge201ResponseBuilder() {
+    AuthLoginControllerVerifyMfaChallenge201Response._defaults(this);
   }
 
-  AuthControllerVerifyMfaChallenge201ResponseBuilder get _$this {
+  AuthLoginControllerVerifyMfaChallenge201ResponseBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
       _data = $v.data.toBuilder();
@@ -92,25 +95,26 @@ class AuthControllerVerifyMfaChallenge201ResponseBuilder
   }
 
   @override
-  void replace(AuthControllerVerifyMfaChallenge201Response other) {
-    _$v = other as _$AuthControllerVerifyMfaChallenge201Response;
+  void replace(AuthLoginControllerVerifyMfaChallenge201Response other) {
+    _$v = other as _$AuthLoginControllerVerifyMfaChallenge201Response;
   }
 
   @override
   void update(
-    void Function(AuthControllerVerifyMfaChallenge201ResponseBuilder)? updates,
+    void Function(AuthLoginControllerVerifyMfaChallenge201ResponseBuilder)?
+        updates,
   ) {
     if (updates != null) updates(this);
   }
 
   @override
-  AuthControllerVerifyMfaChallenge201Response build() => _build();
+  AuthLoginControllerVerifyMfaChallenge201Response build() => _build();
 
-  _$AuthControllerVerifyMfaChallenge201Response _build() {
-    _$AuthControllerVerifyMfaChallenge201Response _$result;
+  _$AuthLoginControllerVerifyMfaChallenge201Response _build() {
+    _$AuthLoginControllerVerifyMfaChallenge201Response _$result;
     try {
       _$result = _$v ??
-          _$AuthControllerVerifyMfaChallenge201Response._(
+          _$AuthLoginControllerVerifyMfaChallenge201Response._(
             data: data.build(),
             meta: meta.build(),
           );
@@ -123,7 +127,7 @@ class AuthControllerVerifyMfaChallenge201ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-          r'AuthControllerVerifyMfaChallenge201Response',
+          r'AuthLoginControllerVerifyMfaChallenge201Response',
           _$failedField,
           e.toString(),
         );

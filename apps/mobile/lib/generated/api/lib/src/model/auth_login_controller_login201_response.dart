@@ -5,66 +5,63 @@
 // ignore_for_file: unused_element
 // @dart=3.0
 
-import 'package:super_template_api/src/model/switch_organization_response_dto.dart';
 import 'package:super_template_api/src/model/request_meta_dto.dart';
+import 'package:super_template_api/src/model/login_response_dto.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
-part 'auth_controller_switch_organization201_response.g.dart';
+part 'auth_login_controller_login201_response.g.dart';
 
-/// AuthControllerSwitchOrganization201Response
+/// AuthLoginControllerLogin201Response
 ///
 /// Properties:
 /// * [data]
 /// * [meta]
 @BuiltValue()
-abstract class AuthControllerSwitchOrganization201Response
+abstract class AuthLoginControllerLogin201Response
     implements
-        Built<AuthControllerSwitchOrganization201Response,
-            AuthControllerSwitchOrganization201ResponseBuilder> {
+        Built<AuthLoginControllerLogin201Response,
+            AuthLoginControllerLogin201ResponseBuilder> {
   @BuiltValueField(wireName: r'data')
-  SwitchOrganizationResponseDto get data;
+  LoginResponseDto get data;
 
   @BuiltValueField(wireName: r'meta')
   RequestMetaDto get meta;
 
-  AuthControllerSwitchOrganization201Response._();
+  AuthLoginControllerLogin201Response._();
 
-  factory AuthControllerSwitchOrganization201Response([
-    void updates(AuthControllerSwitchOrganization201ResponseBuilder b),
-  ]) = _$AuthControllerSwitchOrganization201Response;
+  factory AuthLoginControllerLogin201Response([
+    void updates(AuthLoginControllerLogin201ResponseBuilder b),
+  ]) = _$AuthLoginControllerLogin201Response;
 
   @BuiltValueHook(initializeBuilder: true)
-  static void _defaults(AuthControllerSwitchOrganization201ResponseBuilder b) =>
-      b;
+  static void _defaults(AuthLoginControllerLogin201ResponseBuilder b) => b;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<AuthControllerSwitchOrganization201Response>
-      get serializer =>
-          _$AuthControllerSwitchOrganization201ResponseSerializer();
+  static Serializer<AuthLoginControllerLogin201Response> get serializer =>
+      _$AuthLoginControllerLogin201ResponseSerializer();
 }
 
-class _$AuthControllerSwitchOrganization201ResponseSerializer
-    implements
-        PrimitiveSerializer<AuthControllerSwitchOrganization201Response> {
+class _$AuthLoginControllerLogin201ResponseSerializer
+    implements PrimitiveSerializer<AuthLoginControllerLogin201Response> {
   @override
   final Iterable<Type> types = const [
-    AuthControllerSwitchOrganization201Response,
-    _$AuthControllerSwitchOrganization201Response,
+    AuthLoginControllerLogin201Response,
+    _$AuthLoginControllerLogin201Response,
   ];
 
   @override
-  final String wireName = r'AuthControllerSwitchOrganization201Response';
+  final String wireName = r'AuthLoginControllerLogin201Response';
 
   Iterable<Object?> _serializeProperties(
     Serializers serializers,
-    AuthControllerSwitchOrganization201Response object, {
+    AuthLoginControllerLogin201Response object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
     yield r'data';
     yield serializers.serialize(
       object.data,
-      specifiedType: const FullType(SwitchOrganizationResponseDto),
+      specifiedType: const FullType(LoginResponseDto),
     );
     yield r'meta';
     yield serializers.serialize(
@@ -76,7 +73,7 @@ class _$AuthControllerSwitchOrganization201ResponseSerializer
   @override
   Object serialize(
     Serializers serializers,
-    AuthControllerSwitchOrganization201Response object, {
+    AuthLoginControllerLogin201Response object, {
     FullType specifiedType = FullType.unspecified,
   }) {
     return _serializeProperties(
@@ -91,7 +88,7 @@ class _$AuthControllerSwitchOrganization201ResponseSerializer
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
     required List<Object?> serializedList,
-    required AuthControllerSwitchOrganization201ResponseBuilder result,
+    required AuthLoginControllerLogin201ResponseBuilder result,
     required List<Object?> unhandled,
   }) {
     for (var i = 0; i < serializedList.length; i += 2) {
@@ -101,10 +98,8 @@ class _$AuthControllerSwitchOrganization201ResponseSerializer
         case r'data':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(
-              SwitchOrganizationResponseDto,
-            ),
-          ) as SwitchOrganizationResponseDto;
+            specifiedType: const FullType(LoginResponseDto),
+          ) as LoginResponseDto;
           result.data.replace(valueDes);
           break;
         case r'meta':
@@ -123,12 +118,12 @@ class _$AuthControllerSwitchOrganization201ResponseSerializer
   }
 
   @override
-  AuthControllerSwitchOrganization201Response deserialize(
+  AuthLoginControllerLogin201Response deserialize(
     Serializers serializers,
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    final result = AuthControllerSwitchOrganization201ResponseBuilder();
+    final result = AuthLoginControllerLogin201ResponseBuilder();
     final serializedList = (serialized as Iterable<Object?>).toList();
     final unhandled = <Object?>[];
     _deserializeProperties(

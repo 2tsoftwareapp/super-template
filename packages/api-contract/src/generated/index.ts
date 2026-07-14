@@ -292,22 +292,6 @@ export interface paths {
         patch: operations["UsersController_changePassword"];
         trace?: never;
     };
-    "/api/v1/auth/register": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["AuthController_register"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/auth/login": {
         parameters: {
             query?: never;
@@ -317,7 +301,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["AuthController_login"];
+        post: operations["AuthLoginController_login"];
         delete?: never;
         options?: never;
         head?: never;
@@ -333,7 +317,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["AuthController_verifyMfaChallenge"];
+        post: operations["AuthLoginController_verifyMfaChallenge"];
         delete?: never;
         options?: never;
         head?: never;
@@ -349,14 +333,14 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["AuthController_refresh"];
+        post: operations["AuthLoginController_refresh"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/auth/logout": {
+    "/api/v1/auth/register": {
         parameters: {
             query?: never;
             header?: never;
@@ -365,55 +349,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["AuthController_logout"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/auth/logout-all": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["AuthController_logoutAll"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/auth/forgot-password": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["AuthController_forgotPassword"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/auth/reset-password": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["AuthController_resetPassword"];
+        post: operations["AuthRegistrationController_register"];
         delete?: never;
         options?: never;
         head?: never;
@@ -429,7 +365,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["AuthController_verifyEmail"];
+        post: operations["AuthRegistrationController_verifyEmail"];
         delete?: never;
         options?: never;
         head?: never;
@@ -445,7 +381,39 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["AuthController_resendVerification"];
+        post: operations["AuthRegistrationController_resendVerification"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/forgot-password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["AuthRecoveryController_forgotPassword"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/reset-password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["AuthRecoveryController_resetPassword"];
         delete?: never;
         options?: never;
         head?: never;
@@ -459,7 +427,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["AuthController_getMe"];
+        get: operations["AuthSessionController_getMe"];
         put?: never;
         post?: never;
         delete?: never;
@@ -477,7 +445,39 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["AuthController_switchOrganization"];
+        post: operations["AuthSessionController_switchOrganization"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["AuthSessionController_logout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/logout-all": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["AuthSessionController_logoutAll"];
         delete?: never;
         options?: never;
         head?: never;
@@ -491,7 +491,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["AuthController_getSessions"];
+        get: operations["AuthSessionController_getSessions"];
         put?: never;
         post?: never;
         delete?: never;
@@ -510,7 +510,7 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        delete: operations["AuthController_revokeSession"];
+        delete: operations["AuthSessionController_revokeSession"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1412,7 +1412,7 @@ export interface components {
             avatarUrl?: Record<string, never>;
             /** @enum {string} */
             status: "PENDING" | "ACTIVE" | "BLOCKED";
-            emailVerifiedAt?: Record<string, never>;
+            emailVerifiedAt: string | null;
             roles: string[];
             roleIds: string[];
             createdAt: string;
@@ -1434,11 +1434,8 @@ export interface components {
         };
         UpdateAdminUserDto: {
             email?: string;
-            password?: string;
             displayName?: string;
             avatarUrl?: Record<string, never>;
-            /** @enum {string} */
-            status?: "PENDING" | "ACTIVE" | "BLOCKED";
         };
         UpdateUserStatusDto: {
             /** @enum {string} */
@@ -1457,15 +1454,6 @@ export interface components {
         ChangePasswordDto: {
             currentPassword: string;
             newPassword: string;
-        };
-        SuccessMessageDto: {
-            success: boolean;
-            message: string;
-        };
-        RegisterDto: {
-            email: string;
-            password: string;
-            displayName: string;
         };
         AuthSessionDto: {
             id: string;
@@ -1488,6 +1476,7 @@ export interface components {
             permissions?: string[];
             session?: components["schemas"]["AuthSessionDto"];
             organizationId?: Record<string, never> | null;
+            mustChangePassword?: boolean;
         };
         LoginDto: {
             email: string;
@@ -1500,6 +1489,7 @@ export interface components {
             permissions: string[];
             session: components["schemas"]["AuthSessionDto"];
             organizationId: Record<string, never> | null;
+            mustChangePassword?: boolean;
         };
         VerifyMfaChallengeDto: {
             mfaToken: string;
@@ -1508,12 +1498,14 @@ export interface components {
         RefreshTokenDto: {
             refreshToken: string;
         };
-        ForgotPasswordDto: {
-            email: string;
+        SuccessMessageDto: {
+            success: boolean;
+            message: string;
         };
-        ResetPasswordDto: {
-            token: string;
-            newPassword: string;
+        RegisterDto: {
+            email: string;
+            password: string;
+            displayName: string;
         };
         VerifyEmailDto: {
             token: string;
@@ -1521,14 +1513,23 @@ export interface components {
         ResendVerificationDto: {
             email: string;
         };
+        ForgotPasswordDto: {
+            email: string;
+        };
+        ResetPasswordDto: {
+            token: string;
+            newPassword: string;
+        };
         AuthMeDto: {
             user: components["schemas"]["UserDto"];
             permissions: string[];
             sessionId: string;
             organizationId: Record<string, never> | null;
+            mustChangePassword?: boolean;
         };
         SwitchOrganizationResponseDto: {
             accessToken: string;
+            refreshToken: string;
             organizationId: string;
         };
         SwitchOrganizationDto: {
@@ -2652,33 +2653,7 @@ export interface operations {
             };
         };
     };
-    AuthController_register: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["RegisterDto"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["SuccessMessageDto"];
-                        meta: components["schemas"]["RequestMetaDto"];
-                    };
-                };
-            };
-        };
-    };
-    AuthController_login: {
+    AuthLoginController_login: {
         parameters: {
             query?: never;
             header?: never;
@@ -2704,7 +2679,7 @@ export interface operations {
             };
         };
     };
-    AuthController_verifyMfaChallenge: {
+    AuthLoginController_verifyMfaChallenge: {
         parameters: {
             query?: never;
             header?: never;
@@ -2730,7 +2705,7 @@ export interface operations {
             };
         };
     };
-    AuthController_refresh: {
+    AuthLoginController_refresh: {
         parameters: {
             query?: never;
             header?: never;
@@ -2756,51 +2731,7 @@ export interface operations {
             };
         };
     };
-    AuthController_logout: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["SuccessFlagDto"];
-                        meta: components["schemas"]["RequestMetaDto"];
-                    };
-                };
-            };
-        };
-    };
-    AuthController_logoutAll: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["SuccessFlagDto"];
-                        meta: components["schemas"]["RequestMetaDto"];
-                    };
-                };
-            };
-        };
-    };
-    AuthController_forgotPassword: {
+    AuthRegistrationController_register: {
         parameters: {
             query?: never;
             header?: never;
@@ -2809,7 +2740,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["ForgotPasswordDto"];
+                "application/json": components["schemas"]["RegisterDto"];
             };
         };
         responses: {
@@ -2826,33 +2757,7 @@ export interface operations {
             };
         };
     };
-    AuthController_resetPassword: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ResetPasswordDto"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        data: components["schemas"]["SuccessFlagDto"];
-                        meta: components["schemas"]["RequestMetaDto"];
-                    };
-                };
-            };
-        };
-    };
-    AuthController_verifyEmail: {
+    AuthRegistrationController_verifyEmail: {
         parameters: {
             query?: never;
             header?: never;
@@ -2878,7 +2783,7 @@ export interface operations {
             };
         };
     };
-    AuthController_resendVerification: {
+    AuthRegistrationController_resendVerification: {
         parameters: {
             query?: never;
             header?: never;
@@ -2904,7 +2809,59 @@ export interface operations {
             };
         };
     };
-    AuthController_getMe: {
+    AuthRecoveryController_forgotPassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ForgotPasswordDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SuccessMessageDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    AuthRecoveryController_resetPassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResetPasswordDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SuccessFlagDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    AuthSessionController_getMe: {
         parameters: {
             query?: never;
             header?: never;
@@ -2926,7 +2883,7 @@ export interface operations {
             };
         };
     };
-    AuthController_switchOrganization: {
+    AuthSessionController_switchOrganization: {
         parameters: {
             query?: never;
             header?: never;
@@ -2952,7 +2909,51 @@ export interface operations {
             };
         };
     };
-    AuthController_getSessions: {
+    AuthSessionController_logout: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SuccessFlagDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    AuthSessionController_logoutAll: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["SuccessFlagDto"];
+                        meta: components["schemas"]["RequestMetaDto"];
+                    };
+                };
+            };
+        };
+    };
+    AuthSessionController_getSessions: {
         parameters: {
             query?: never;
             header?: never;
@@ -2974,7 +2975,7 @@ export interface operations {
             };
         };
     };
-    AuthController_revokeSession: {
+    AuthSessionController_revokeSession: {
         parameters: {
             query?: never;
             header?: never;

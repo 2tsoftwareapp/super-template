@@ -18,6 +18,7 @@ export {
   organizationMembers,
   organizations,
 } from './identity/organizations';
+export { outboxMessages } from './identity/outbox-messages';
 export { userPreferences } from './identity/preferences';
 export { externalIdentities, ssoLoginStates, ssoSessionExchanges } from './identity/sso';
 export {
@@ -71,6 +72,7 @@ import {
   organizationMembers,
   organizations,
 } from './identity/organizations';
+import { outboxMessages } from './identity/outbox-messages';
 import { userPreferences } from './identity/preferences';
 import { externalIdentities, ssoLoginStates, ssoSessionExchanges } from './identity/sso';
 import {
@@ -131,6 +133,7 @@ export const schema = {
   userPreferences,
   userRecoveryCodes,
   userRoles,
+  outboxMessages,
   users,
   userTwoFactorSecrets,
 };

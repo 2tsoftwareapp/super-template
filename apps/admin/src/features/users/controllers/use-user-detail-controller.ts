@@ -2,7 +2,7 @@
 
 import { standardSchemaResolver as zodResolver } from "@hookform/resolvers/standard-schema";
 import { useParams, useSearchParams } from "next/navigation";
-import { type FormEvent, useEffect, useState } from "react";
+import { type FormEvent, useState } from "react";
 import { useForm, type UseFormReturn } from "react-hook-form";
 
 import type { AdminUserDto } from "@/lib/api-types";
@@ -23,10 +23,10 @@ import {
 } from "@/features/users/model/users.schemas";
 import { useSession } from "@/hooks/use-session";
 import { useRouter } from "@/i18n/navigation";
+import { getAssignableRoles } from "@/lib/roles";
 
-const STATUS_OPTIONS = ["PENDING", "ACTIVE", "BLOCKED"] as const;
-export type UserStatus = (typeof STATUS_OPTIONS)[number];
-const EMPTY_ROLES: string[] = [];
+import { useUserRoles } from "./use-user-roles";
+import { useUserStatus } from "./use-user-status";
 
 interface MutationState {
   isPending: boolean;
@@ -51,24 +51,8 @@ export interface UserDetailViewModel {
     onSubmit: (event: FormEvent<HTMLFormElement>) => void;
     state: MutationState;
   };
-  status: {
-    options: readonly UserStatus[];
-    selected: UserStatus;
-    onSelect: (status: UserStatus) => void;
-    disabled: boolean;
-    canApply: boolean;
-    onApply: () => void;
-    state: MutationState;
-  };
-  roles: {
-    isLoading: boolean;
-    selected: "ADMIN" | "USER";
-    onSelect: (role: "ADMIN" | "USER") => void;
-    disabled: boolean;
-    canSave: boolean;
-    onSave: () => void;
-    state: MutationState;
-  };
+  status: ReturnType<typeof useUserStatus>;
+  roles: ReturnType<typeof useUserRoles>;
   danger: {
     confirmOpen: boolean;
     onOpen: () => void;
@@ -79,12 +63,6 @@ export interface UserDetailViewModel {
   };
 }
 
-/**
- * Orchestration hook for the user detail screen: route params, session, user +
- * roles queries, profile form, status/role selection, and the profile/status/
- * role/delete mutations with their derived permissions. Returns a view model
- * consumed by the presentational UserDetailContent.
- */
 export function useUserDetailController(): UserDetailViewModel {
   const params = useParams<{ id: string }>();
   const userId = params.id;
@@ -93,40 +71,26 @@ export function useUserDetailController(): UserDetailViewModel {
   const searchParams = useSearchParams();
 
   const backHref = searchParams.get("returnTo") ?? "/users";
-  const [selectedStatus, setSelectedStatus] = useState<UserStatus>("PENDING");
-  const [selectedRole, setSelectedRole] = useState<"ADMIN" | "USER">("USER");
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   const user = useAdminUserQuery(userId);
   const roles = useAdminRolesQuery();
   const currentUser = user.data?.data ?? null;
 
-  const actorId = session.data?.data.user.id;
-  const actorRoles = session.data?.data.user.roles ?? EMPTY_ROLES;
+  const actorRoles = session.data?.data.user.roles ?? [];
   const actorOrganizationId = session.data?.data.organizationId;
   const isActorSuperAdmin = actorRoles.includes("SUPER_ADMIN");
-  const isSelf = actorId === currentUser?.id;
+  const isSelf = session.data?.data.user.id === currentUser?.id;
   const isTargetPrivileged = Boolean(
     currentUser?.roles?.some((r) => r === "SUPER_ADMIN" || r === "ADMIN"),
   );
-  const canEdit =
-    isActorSuperAdmin || !isTargetPrivileged || isActorSuperAdmin;
-
-  useEffect(() => {
-    if (currentUser) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- sync editable fields when user loads
-      setSelectedStatus(currentUser.status);
-      setSelectedRole(currentUser.roles.includes("ADMIN") ? "ADMIN" : "USER");
-    }
-  }, [currentUser]);
+  const canEdit = isActorSuperAdmin || !isTargetPrivileged;
 
   const updateProfile = useUpdateProfileMutation(userId);
   const updateStatus = useUpdateStatusMutation(userId);
   const replaceRoles = useReplaceRolesMutation(userId);
   const deleteUser = useDeleteUserMutation(userId, {
-    onSuccess: () => {
-      router.replace("/users");
-    },
+    onSuccess: () => router.replace("/users"),
   });
 
   const form = useForm<ProfileForm>({
@@ -137,9 +101,29 @@ export function useUserDetailController(): UserDetailViewModel {
     },
   });
 
+  const assignableRoles = getAssignableRoles(
+    actorRoles,
+    roles.data?.data ?? [],
+  ).map((r) => ({ name: r.name, description: r.description }));
   const primaryRole = currentUser?.roles.includes("ADMIN") ? "ADMIN" : "USER";
   const statusDisabled = isSelf || !canEdit || updateStatus.isPending;
   const roleDisabled = isSelf || !canEdit || replaceRoles.isPending;
+
+  const status = useUserStatus(
+    currentUser?.status,
+    updateStatus,
+    statusDisabled,
+  );
+
+  const userRoles = useUserRoles(
+    primaryRole,
+    replaceRoles,
+    isActorSuperAdmin,
+    actorOrganizationId,
+    roleDisabled,
+    roles.isLoading,
+    assignableRoles,
+  );
 
   return {
     isLoading: user.isLoading,
@@ -161,38 +145,8 @@ export function useUserDetailController(): UserDetailViewModel {
         isError: updateProfile.isError,
       },
     },
-    status: {
-      options: STATUS_OPTIONS,
-      selected: selectedStatus,
-      onSelect: setSelectedStatus,
-      disabled: statusDisabled,
-      canApply: !statusDisabled && selectedStatus !== currentUser?.status,
-      onApply: () => void updateStatus.mutateAsync(selectedStatus),
-      state: {
-        isPending: updateStatus.isPending,
-        isSuccess: updateStatus.isSuccess,
-        isError: updateStatus.isError,
-      },
-    },
-    roles: {
-      isLoading: roles.isLoading,
-      selected: selectedRole,
-      onSelect: setSelectedRole,
-      disabled: roleDisabled,
-      canSave: !roleDisabled && selectedRole !== primaryRole,
-      onSave: () => {
-        const args: { role: "ADMIN" | "USER"; organizationId?: string } = { role: selectedRole };
-        if (!isActorSuperAdmin && actorOrganizationId) {
-          args.organizationId = actorOrganizationId;
-        }
-        void replaceRoles.mutateAsync(args);
-      },
-      state: {
-        isPending: replaceRoles.isPending,
-        isSuccess: replaceRoles.isSuccess,
-        isError: replaceRoles.isError,
-      },
-    },
+    status,
+    roles: userRoles,
     danger: {
       confirmOpen: confirmDelete,
       onOpen: () => setConfirmDelete(true),

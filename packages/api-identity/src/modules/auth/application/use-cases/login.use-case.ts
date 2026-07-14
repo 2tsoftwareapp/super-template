@@ -68,6 +68,24 @@ export class LoginUseCase {
       );
     }
 
+    if (user.mustChangePassword) {
+      const session = await this.issueSessionUseCase.execute(
+        user,
+        requestContext,
+        { mustChangePassword: true },
+      );
+
+      await this.auditWriter.log({
+        actorId: user.id,
+        action: 'auth.login.must_change_password',
+        entityType: 'user',
+        entityId: user.id,
+        requestContext,
+      });
+
+      return { mfaRequired: false as const, ...session };
+    }
+
     if (await this.mfaService.isEnabled(user.id)) {
       const mfaToken = await this.mfaService.createLoginChallenge(user.id, {
         ipAddress: requestContext?.ipAddress ?? null,

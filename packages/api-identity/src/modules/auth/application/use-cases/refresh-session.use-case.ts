@@ -28,8 +28,6 @@ const GRACE_ROTATION_MAX_ATTEMPTS = 3;
 
 @Injectable()
 export class RefreshSessionUseCase {
-  private readonly authMapper = new AuthMapper();
-
   constructor(
     @Inject(AUTH_SESSION_REPOSITORY)
     private readonly authSessionRepository: AuthSessionRepositoryPort,
@@ -39,6 +37,7 @@ export class RefreshSessionUseCase {
     private readonly organizationsService: OrganizationsService,
     @Inject(AUTH_TOKEN_PROVIDER)
     private readonly tokenProvider: AuthTokenProviderPort,
+    private readonly authMapper: AuthMapper,
   ) {}
 
   async execute(input: RefreshSessionCommand, requestContext?: RequestContext) {

@@ -28,6 +28,7 @@ export type AuthFlowErrorCode =
 export const AUTH_FLOW_RESULTS = {
   authenticated: "authenticated",
   mfaRequired: "mfa-required",
+  mustChangePassword: "must-change-password",
 } as const;
 
 export type AuthFlowResult =

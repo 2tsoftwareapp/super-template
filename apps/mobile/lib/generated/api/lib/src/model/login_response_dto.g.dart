@@ -25,6 +25,8 @@ class _$LoginResponseDto extends LoginResponseDto {
   final AuthSessionDto? session;
   @override
   final JsonObject? organizationId;
+  @override
+  final bool? mustChangePassword;
 
   factory _$LoginResponseDto([
     void Function(LoginResponseDtoBuilder)? updates,
@@ -40,6 +42,7 @@ class _$LoginResponseDto extends LoginResponseDto {
     this.permissions,
     this.session,
     this.organizationId,
+    this.mustChangePassword,
   }) : super._();
   @override
   LoginResponseDto rebuild(void Function(LoginResponseDtoBuilder) updates) =>
@@ -60,7 +63,8 @@ class _$LoginResponseDto extends LoginResponseDto {
         user == other.user &&
         permissions == other.permissions &&
         session == other.session &&
-        organizationId == other.organizationId;
+        organizationId == other.organizationId &&
+        mustChangePassword == other.mustChangePassword;
   }
 
   @override
@@ -74,6 +78,7 @@ class _$LoginResponseDto extends LoginResponseDto {
     _$hash = $jc(_$hash, permissions.hashCode);
     _$hash = $jc(_$hash, session.hashCode);
     _$hash = $jc(_$hash, organizationId.hashCode);
+    _$hash = $jc(_$hash, mustChangePassword.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -88,7 +93,8 @@ class _$LoginResponseDto extends LoginResponseDto {
           ..add('user', user)
           ..add('permissions', permissions)
           ..add('session', session)
-          ..add('organizationId', organizationId))
+          ..add('organizationId', organizationId)
+          ..add('mustChangePassword', mustChangePassword))
         .toString();
   }
 }
@@ -133,6 +139,11 @@ class LoginResponseDtoBuilder
   set organizationId(JsonObject? organizationId) =>
       _$this._organizationId = organizationId;
 
+  bool? _mustChangePassword;
+  bool? get mustChangePassword => _$this._mustChangePassword;
+  set mustChangePassword(bool? mustChangePassword) =>
+      _$this._mustChangePassword = mustChangePassword;
+
   LoginResponseDtoBuilder() {
     LoginResponseDto._defaults(this);
   }
@@ -148,6 +159,7 @@ class LoginResponseDtoBuilder
       _permissions = $v.permissions?.toBuilder();
       _session = $v.session?.toBuilder();
       _organizationId = $v.organizationId;
+      _mustChangePassword = $v.mustChangePassword;
       _$v = null;
     }
     return this;
@@ -183,6 +195,7 @@ class LoginResponseDtoBuilder
             permissions: _permissions?.build(),
             session: _session?.build(),
             organizationId: organizationId,
+            mustChangePassword: mustChangePassword,
           );
     } catch (_) {
       late String _$failedField;

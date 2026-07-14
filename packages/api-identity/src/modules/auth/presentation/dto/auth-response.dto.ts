@@ -52,6 +52,9 @@ export class AuthResponseDto {
 
   @ApiProperty({ nullable: true })
   organizationId: string | null;
+
+  @ApiPropertyOptional()
+  mustChangePassword?: boolean;
 }
 
 export class AuthMeDto {
@@ -66,6 +69,9 @@ export class AuthMeDto {
 
   @ApiProperty({ nullable: true })
   organizationId: string | null;
+
+  @ApiPropertyOptional()
+  mustChangePassword?: boolean;
 }
 
 export class SwitchOrganizationResponseDto {

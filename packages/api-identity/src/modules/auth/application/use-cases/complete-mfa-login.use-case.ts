@@ -45,6 +45,8 @@ export class CompleteMfaLoginUseCase {
       );
     }
 
-    return this.issueSessionUseCase.execute(user, requestContext);
+    return this.issueSessionUseCase.execute(user, requestContext, {
+      mustChangePassword: user.mustChangePassword,
+    });
   }
 }
