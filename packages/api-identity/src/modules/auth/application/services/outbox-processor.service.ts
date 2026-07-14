@@ -25,6 +25,7 @@ export class OutboxProcessor {
     this.processing = true;
 
     try {
+      await this.outboxRepository.recoverStaleProcessing();
       const messages = await this.outboxRepository.claimPending(10);
 
       for (const message of messages) {
@@ -40,9 +41,11 @@ export class OutboxProcessor {
         } catch (error) {
           const errorMessage =
             error instanceof Error ? error.message : String(error);
-          this.logger.error('Outbox message failed', {
+          this.logger.warn('Outbox message failed, will retry', {
             messageId: message.id,
             topic: message.topic,
+            attempts: message.attempts,
+            maxAttempts: message.maxAttempts,
             error: errorMessage,
           });
           await this.outboxRepository.markFailed(message.id, errorMessage);

@@ -4,6 +4,7 @@ import type { Request } from 'express';
 import { Body, Controller, Get, Patch, Req } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import {
+  AllowMustChangePassword,
   ApiDataResponse,
   SuccessFlagDto,
 } from '@repo/api-core';
@@ -53,6 +54,7 @@ export class UsersController {
   }
 
   @Patch('me/password')
+  @AllowMustChangePassword()
   @ApiDataResponse(SuccessFlagDto)
   async changePassword(
     @CurrentUser() user: AuthenticatedRequestUser,

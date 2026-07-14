@@ -12,7 +12,7 @@ import {
   Req,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { ApiArrayResponse, ApiDataResponse, SuccessFlagDto } from '@repo/api-core';
+import { AllowMustChangePassword, ApiArrayResponse, ApiDataResponse, SuccessFlagDto } from '@repo/api-core';
 import { CurrentUser } from '@repo/api-core';
 
 import { GetMeUseCase } from '../application/use-cases/get-me.use-case';
@@ -39,6 +39,7 @@ export class AuthSessionController {
   ) {}
 
   @Get('me')
+  @AllowMustChangePassword()
   @ApiDataResponse(AuthMeDto)
   getMe(@CurrentUser() user: AuthenticatedRequestUser) {
     return this.getMeUseCase.execute(user);
@@ -61,6 +62,7 @@ export class AuthSessionController {
   }
 
   @Post('logout')
+  @AllowMustChangePassword()
   @ApiDataResponse(SuccessFlagDto, 201)
   async logout(
     @CurrentUser() user: AuthenticatedRequestUser,

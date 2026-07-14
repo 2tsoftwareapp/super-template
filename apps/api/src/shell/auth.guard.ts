@@ -7,7 +7,12 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { AppError, ERROR_CODES, IS_PUBLIC_KEY } from '@repo/api-core';
+import {
+  ALLOW_MUST_CHANGE_PASSWORD_KEY,
+  AppError,
+  ERROR_CODES,
+  IS_PUBLIC_KEY,
+} from '@repo/api-core';
 import { AuthService } from '@repo/api-identity/modules/auth/application/auth.service';
 
 @Injectable()
@@ -40,6 +45,20 @@ export class AuthGuard implements CanActivate {
 
     const token = authorization.slice('Bearer '.length);
     request.user = await this.authService.authenticateAccessToken(token);
+
+    const allowMustChangePassword = this.reflector.getAllAndOverride<boolean>(
+      ALLOW_MUST_CHANGE_PASSWORD_KEY,
+      [context.getHandler(), context.getClass()],
+    );
+
+    if (!allowMustChangePassword && request.user?.mustChangePassword) {
+      throw new AppError(
+        ERROR_CODES.AUTH_FORBIDDEN,
+        'You must change your password before accessing this resource',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
     return true;
   }
 }

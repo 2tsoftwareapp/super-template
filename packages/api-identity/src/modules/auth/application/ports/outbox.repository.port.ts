@@ -28,6 +28,7 @@ export interface OutboxRepositoryPort {
   claimPending(limit: number): Promise<OutboxRecord[]>;
   markSent(id: string): Promise<void>;
   markFailed(id: string, errorMessage: string): Promise<void>;
+  recoverStaleProcessing(): Promise<void>;
 }
 
 export const OUTBOX_REPOSITORY = Symbol('OUTBOX_REPOSITORY');

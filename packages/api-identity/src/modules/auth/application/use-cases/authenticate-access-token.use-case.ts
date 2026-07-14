@@ -84,6 +84,7 @@ export class AuthenticateAccessTokenUseCase {
       roles: accessProfile.roles,
       permissions: accessProfile.permissions,
       organizationId,
+      mustChangePassword: user.mustChangePassword ?? false,
     };
   }
 }

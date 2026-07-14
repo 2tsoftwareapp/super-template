@@ -12,7 +12,7 @@ import {
   roles,
   userRoles,
 } from '@repo/api-database';
-import { and, eq, inArray, isNull, or } from 'drizzle-orm';
+import { and, eq, inArray, isNull, or, type SQL } from 'drizzle-orm';
 
 @Injectable()
 export class AccessControlRepository {
@@ -323,9 +323,21 @@ export class AccessControlRepository {
 
   async findRoleNamesForUser(
     userId: string,
-    organizationId: string | null = null,
+    organizationId?: string | null,
     executor: DatabaseExecutor = this.database,
   ): Promise<string[]> {
+    const filters: SQL[] = [];
+
+    if (organizationId !== undefined) {
+      if (organizationId === null) {
+        filters.push(isNull(userRoles.organizationId));
+        filters.push(isNull(roles.organizationId));
+      } else {
+        filters.push(or(isNull(userRoles.organizationId), eq(userRoles.organizationId, organizationId))!);
+        filters.push(or(isNull(roles.organizationId), eq(roles.organizationId, organizationId))!);
+      }
+    }
+
     const rows = await executor
       .select({
         roleName: roles.name,
@@ -335,18 +347,7 @@ export class AccessControlRepository {
       .where(
         and(
           eq(userRoles.userId, userId),
-          organizationId
-            ? or(
-                isNull(userRoles.organizationId),
-                eq(userRoles.organizationId, organizationId),
-              )
-            : isNull(userRoles.organizationId),
-          organizationId
-            ? or(
-                isNull(roles.organizationId),
-                eq(roles.organizationId, organizationId),
-              )
-            : isNull(roles.organizationId),
+          ...filters,
         ),
       );
 
@@ -355,9 +356,21 @@ export class AccessControlRepository {
 
   async findPermissionNamesForUser(
     userId: string,
-    organizationId: string | null = null,
+    organizationId?: string | null,
     executor: DatabaseExecutor = this.database,
   ): Promise<string[]> {
+    const filters: SQL[] = [];
+
+    if (organizationId !== undefined) {
+      if (organizationId === null) {
+        filters.push(isNull(userRoles.organizationId));
+        filters.push(isNull(roles.organizationId));
+      } else {
+        filters.push(or(isNull(userRoles.organizationId), eq(userRoles.organizationId, organizationId))!);
+        filters.push(or(isNull(roles.organizationId), eq(roles.organizationId, organizationId))!);
+      }
+    }
+
     const rows = await executor
       .select({
         permissionName: permissions.name,
@@ -369,18 +382,7 @@ export class AccessControlRepository {
       .where(
         and(
           eq(userRoles.userId, userId),
-          organizationId
-            ? or(
-                isNull(userRoles.organizationId),
-                eq(userRoles.organizationId, organizationId),
-              )
-            : isNull(userRoles.organizationId),
-          organizationId
-            ? or(
-                isNull(roles.organizationId),
-                eq(roles.organizationId, organizationId),
-              )
-            : isNull(roles.organizationId),
+          ...filters,
         ),
       );
 
@@ -400,7 +402,7 @@ export class AccessControlRepository {
     if (organizationId === null) {
       filters.push(isNull(userRoles.organizationId));
     } else if (organizationId !== undefined) {
-      filters.push(eq(userRoles.organizationId, organizationId));
+      filters.push(or(isNull(userRoles.organizationId), eq(userRoles.organizationId, organizationId))!);
     }
 
     return executor
@@ -422,7 +424,7 @@ export class AccessControlRepository {
     if (organizationId === null) {
       filters.push(isNull(userRoles.organizationId));
     } else if (organizationId !== undefined) {
-      filters.push(eq(userRoles.organizationId, organizationId));
+      filters.push(or(isNull(userRoles.organizationId), eq(userRoles.organizationId, organizationId))!);
     }
 
     const rows = await executor
@@ -449,7 +451,7 @@ export class AccessControlRepository {
     if (organizationId === null) {
       filters.push(isNull(userRoles.organizationId));
     } else if (organizationId !== undefined) {
-      filters.push(eq(userRoles.organizationId, organizationId));
+      filters.push(or(isNull(userRoles.organizationId), eq(userRoles.organizationId, organizationId))!);
     }
 
     return executor

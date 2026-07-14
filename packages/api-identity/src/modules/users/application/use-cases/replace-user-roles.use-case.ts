@@ -113,10 +113,14 @@ export class ReplaceUserRolesUseCase {
           transaction,
         );
       } else {
+        // Use resolvedOrganizationId when available (e.g. SUPER_ADMIN demoting
+        // ADMIN→USER in a specific org) so the org-scoped ADMIN role is removed.
+        // Fall back to actor org or null for platform-only scope.
+        const replaceOrgId = resolvedOrganizationId ?? (actorIsSuperAdmin ? null : (actor.organizationId ?? null));
         await this.accessControlService.replaceUserRoles(
           userId,
           [resolvedRole.id],
-          actorIsSuperAdmin ? null : (actor.organizationId ?? null),
+          replaceOrgId,
           transaction,
         );
       }

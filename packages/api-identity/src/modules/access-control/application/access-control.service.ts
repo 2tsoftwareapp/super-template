@@ -29,7 +29,7 @@ export class AccessControlService {
     return this.seedAccessControlUseCase.execute(executor);
   }
 
-  getAccessProfile(userId: string, organizationId: string | null = null) {
+  getAccessProfile(userId: string, organizationId?: string | null) {
     return this.accessProfileUseCase.getAccessProfile(userId, organizationId);
   }
 

@@ -20,11 +20,11 @@ export class AccessProfileUseCase {
 
   async getAccessProfile(
     userId: string,
-    organizationId: string | null = null,
+    organizationId?: string | null,
   ): Promise<AccessProfileView> {
-    const cached = organizationId
-      ? null
-      : await this.accessProfileCache.get(userId);
+    const cached = organizationId === null
+      ? await this.accessProfileCache.get(userId)
+      : null;
 
     if (cached) {
       return cached;
@@ -43,7 +43,7 @@ export class AccessProfileUseCase {
       permissions,
     };
 
-    if (!organizationId) {
+    if (organizationId === null) {
       await this.accessProfileCache.set(userId, profile);
     }
 

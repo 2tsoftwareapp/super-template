@@ -3,6 +3,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
+import { useRouter } from "@/i18n/navigation";
+
 import type { ChangePasswordFormValues, MfaConfirmResponse, MfaSetupResponse } from "../model/security.schemas";
 
 import { changePassword, confirmMfa, disableMfa, regenerateMfaCodes, setupMfa } from "./security.api";
@@ -66,7 +68,9 @@ export function useRegenerateMfaCodesMutation(options?: { onSuccess?: (data: Mfa
   });
 }
 
-export function useChangePasswordMutation(options?: { onSuccess?: () => void }) {
+export function useChangePasswordMutation() {
+  const router = useRouter();
+
   return useMutation({
     mutationFn: (input: ChangePasswordFormValues) =>
       changePassword({
@@ -74,8 +78,8 @@ export function useChangePasswordMutation(options?: { onSuccess?: () => void }) 
         newPassword: input.newPassword,
       }),
     onSuccess: () => {
-      toast.success("Password updated successfully");
-      options?.onSuccess?.();
+      toast.success("Password updated. Sign in with your new password.");
+      router.replace("/login");
     },
     onError: () => {
       toast.error("Failed to change password. Check your current password.");

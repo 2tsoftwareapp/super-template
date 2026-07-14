@@ -57,12 +57,10 @@ export class GetUserUseCase {
       );
     }
 
-    // Use the actor's organization context — not the target user's primary
-    // org — so that an ORG_ADMIN only sees roles scoped to their org.
-    // SUPER_ADMIN passes null to see platform-level roles (org-scoped roles
-    // are resolved at query level via the organisation filter).
+    // SUPER_ADMIN sees all roles (no org filter). ORG_ADMIN only sees
+    // roles scoped to their org (including platform-level roles).
     const organizationId = actor
-      ? (actor.roles.includes(ROLE_NAMES.SUPER_ADMIN) ? null : actor.organizationId ?? null)
+      ? (actor.roles.includes(ROLE_NAMES.SUPER_ADMIN) ? undefined : actor.organizationId ?? null)
       : null;
 
     const [accessProfile, roleIds] = await Promise.all([

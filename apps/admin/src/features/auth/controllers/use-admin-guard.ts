@@ -8,6 +8,7 @@ import { usePathname, useRouter } from "@/i18n/navigation";
 
 import { useLogoutMutation } from "../api/auth.mutations";
 import {
+  ADMIN_PASSWORD_CHANGE_PATH,
   type AdminGuardDecision,
   resolveAdminGuard,
 } from "../model/admin-guard.state";
@@ -25,6 +26,7 @@ export function useAdminGuard(): AdminGuardDecision {
     user: session.data?.data.user,
     permissions: session.data?.data.permissions,
     organizationId: session.data?.data.organizationId,
+    mustChangePassword: session.data?.data.mustChangePassword,
     pathname,
   });
 
@@ -42,6 +44,9 @@ export function useAdminGuard(): AdminGuardDecision {
         break;
       case "redirect-login":
         router.replace(ADMIN_AUTH_ROUTES.login);
+        break;
+      case "redirect-password-change":
+        router.replace(ADMIN_PASSWORD_CHANGE_PATH);
         break;
       case "redirect-resource":
         if (redirectPath) {

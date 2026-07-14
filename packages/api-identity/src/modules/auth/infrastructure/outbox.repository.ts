@@ -79,14 +79,37 @@ export class OutboxRepository implements OutboxRepositoryPort {
   }
 
   async markFailed(id: string, errorMessage: string): Promise<void> {
-    await this.database
-      .update(outboxMessages)
-      .set({
-        status: 'FAILED',
-        errorMessage,
-        processedAt: new Date(),
-        updatedAt: new Date(),
-      })
-      .where(eq(outboxMessages.id, id));
+    await this.database.execute(
+      sql`
+        UPDATE outbox_messages
+        SET
+          status = CASE
+            WHEN attempts < max_attempts THEN 'PENDING'
+            ELSE 'FAILED'
+          END,
+          error_message = ${errorMessage},
+          scheduled_at = CASE
+            WHEN attempts < max_attempts
+              THEN now() + interval '1 minute' * power(2, attempts)
+            ELSE scheduled_at
+          END,
+          processed_at = now(),
+          updated_at = now()
+        WHERE id = ${id}
+      `,
+    );
+  }
+
+  async recoverStaleProcessing(): Promise<void> {
+    await this.database.execute(
+      sql`
+        UPDATE outbox_messages
+        SET
+          status = 'PENDING',
+          updated_at = now()
+        WHERE status = 'PROCESSING'
+          AND updated_at < now() - interval '5 minutes'
+      `,
+    );
   }
 }

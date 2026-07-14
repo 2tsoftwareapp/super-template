@@ -7,6 +7,7 @@ export interface AuthenticatedRequestUser {
   roles: string[];
   permissions: string[];
   organizationId: string | null;
+  mustChangePassword?: boolean;
 }
 
 export interface RequestContext {

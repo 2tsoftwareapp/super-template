@@ -24,18 +24,13 @@ export function ChangePasswordForm() {
   const {
     register,
     handleSubmit,
-    reset,
     formState: { errors },
   } = useForm<ChangePasswordFormValues>({
     resolver: zodResolver(changePasswordSchema),
     defaultValues: { currentPassword: "", newPassword: "", confirmPassword: "" },
   });
 
-  const mutation = useChangePasswordMutation({
-    onSuccess: () => {
-      reset();
-    },
-  });
+  const mutation = useChangePasswordMutation();
 
   const onSubmit = (values: ChangePasswordFormValues) => {
     mutation.mutate({
