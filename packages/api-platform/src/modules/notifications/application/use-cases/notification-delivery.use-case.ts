@@ -19,7 +19,7 @@ import {
   tenantContextForJob,
   TenantContextService,
   WORKER_DISPATCH_CONTEXT,
-} from '@repo/api-database';
+} from '@repo/api-core';
 
 import type {
   ListNotificationJobsQuery,

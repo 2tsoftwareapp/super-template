@@ -19,10 +19,6 @@ interface ListJobsParams {
 export class JobsRepository {
   constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
 
-  get client(): DatabaseClient {
-    return this.database;
-  }
-
   async create(
     values: typeof jobs.$inferInsert,
     executor: DatabaseExecutor = this.database,

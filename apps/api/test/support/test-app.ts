@@ -5,11 +5,11 @@ import { NestFactory } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { loadEnvFiles } from '@repo/api-core/config/load-env-files';
+import type { TenantContext } from '@repo/api-core';
+import { TenantContextService } from '@repo/api-core';
 import {
   DATABASE,
   type DatabaseClient,
-  type TenantContext,
-  TenantContextService,
 } from '@repo/api-database';
 import { seedDatabase } from '@repo/api-seed';
 import { sql } from 'drizzle-orm';

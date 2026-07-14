@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import type { TenantContext } from '../tenant-context';
+import type { TenantContext } from '@repo/api-core';
 
-import { getTenantContext, TenantContextService } from '../tenant-context.service';
+import { getTenantContext, TenantContextService } from '@repo/api-core';
 
 const context: TenantContext = {
   tenantId: 'org-1',

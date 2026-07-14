@@ -1,6 +1,4 @@
-import type { JsonObject } from '@repo/api-core';
-import type { TransactionExecutor } from '@repo/api-core';
-import type { DatabaseClient } from '@repo/api-database';
+import type { JsonObject, TransactionExecutor } from '@repo/api-core';
 
 export interface JobRecord {
   id: string;
@@ -30,7 +28,6 @@ interface ListJobsParams {
 }
 
 export interface JobsRepositoryPort {
-  readonly client: DatabaseClient;
   create(
     values: {
       id?: string;

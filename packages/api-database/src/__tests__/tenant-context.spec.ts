@@ -1,12 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
 
+import { tenantContextForJob, WORKER_DISPATCH_CONTEXT } from '@repo/api-core';
 import type { DatabaseExecutor } from '../database.types';
 
 import {
   setTenantContextOnExecutor,
   setTenantContextOnPgClient,
-  tenantContextForJob,
-  WORKER_DISPATCH_CONTEXT,
 } from '../tenant-context';
 
 describe('tenantContextForJob', () => {

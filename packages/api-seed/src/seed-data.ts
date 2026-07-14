@@ -2,7 +2,8 @@ import type { INestApplicationContext } from '@nestjs/common';
 import type { DatabaseClient } from '@repo/api-database';
 
 import { EnvironmentService } from '@repo/api-core';
-import { DATABASE, TenantContextService, WORKER_DISPATCH_CONTEXT } from '@repo/api-database';
+import { TenantContextService, WORKER_DISPATCH_CONTEXT } from '@repo/api-core';
+import { DATABASE } from '@repo/api-database';
 import { AccessControlService } from '@repo/api-identity/modules/access-control/application/access-control.service';
 import { AUTH_SESSION_REPOSITORY, type AuthSessionRepositoryPort } from '@repo/api-identity/modules/auth/application/ports/auth-session.repository.port';
 import { OrganizationsService } from '@repo/api-identity/modules/organizations/application/organizations.service';

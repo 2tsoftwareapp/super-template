@@ -27,7 +27,8 @@ import {
   ResponseEnvelopeInterceptor,
 } from '@repo/api-core';
 import { AppConfigModule } from '@repo/api-core/config/app-config.module';
-import { DatabaseModule, TenantContextService } from '@repo/api-database';
+import { DatabaseModule } from '@repo/api-database';
+import { TenantContextService } from '@repo/api-core';
 import { HealthModule } from '@repo/api-health';
 import { IdentityModule } from '@repo/api-identity';
 import { AuthService } from '@repo/api-identity/modules/auth/application/auth.service';

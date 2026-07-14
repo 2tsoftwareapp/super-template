@@ -6,12 +6,11 @@ import {
   Module,
   type OnApplicationShutdown,
 } from '@nestjs/common';
-import { TRANSACTION_PORT } from '@repo/api-core';
+import { TenantContextService, TRANSACTION_PORT } from '@repo/api-core';
 
 import { DatabaseRlsGuard } from './database-rls.guard';
 import { DATABASE_POOL, databaseProviders } from './database.provider';
 import { DrizzleTransactionService } from './drizzle-transaction.service';
-import { TenantContextService } from './tenant-context.service';
 
 @Global()
 @Module({

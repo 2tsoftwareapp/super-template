@@ -1,11 +1,16 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { isJsonObject, redactSensitive } from '@repo/api-core';
 import {
+  Inject,
+  Injectable,
+} from '@nestjs/common';
+import {
+  isJsonObject,
+  redactSensitive,
   tenantContextForJob,
   TenantContextService,
-  withTenantContext,
+  TRANSACTION_PORT,
+  type TransactionPort,
   WORKER_DISPATCH_CONTEXT,
-} from '@repo/api-database';
+} from '@repo/api-core';
 
 import { resolveFailureOutcome } from '../../domain/job-lifecycle';
 import { JOB_OBSERVABILITY_REPOSITORY, type JobObservabilityRepositoryPort } from '../ports/job-observability.repository.port';
@@ -23,6 +28,7 @@ export class ProcessJobsUseCase {
     private readonly tenantContextService: TenantContextService,
     private readonly jobHandlersRegistry: JobHandlersRegistry,
     @Inject(JOB_OBSERVABILITY_REPOSITORY) private readonly jobObservabilityRepository: JobObservabilityRepositoryPort,
+    @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
   ) {}
 
   async execute(): Promise<void> {
@@ -44,8 +50,7 @@ export class ProcessJobsUseCase {
 
   private async processJob(job: JobRecord) {
     const organizationId = job.organizationId ?? null;
-    const attempt = await withTenantContext(
-      this.jobsRepository.client,
+    const attempt = await this.transactionPort.withTenant(
       WORKER_DISPATCH_CONTEXT,
       (transaction) =>
         this.jobObservabilityRepository.startAttempt(
@@ -53,8 +58,7 @@ export class ProcessJobsUseCase {
           transaction,
         ),
     );
-    await withTenantContext(
-      this.jobsRepository.client,
+    await this.transactionPort.withTenant(
       WORKER_DISPATCH_CONTEXT,
       (transaction) =>
         this.jobObservabilityRepository.recordEvent(
@@ -68,8 +72,7 @@ export class ProcessJobsUseCase {
     if (!handler) {
       const message = `No handler registered for job type "${job.type}"`;
 
-      await withTenantContext(
-        this.jobsRepository.client,
+      await this.transactionPort.withTenant(
         WORKER_DISPATCH_CONTEXT,
         async (transaction) => {
           await this.jobsRepository.markFailed(job.id, message, transaction);
@@ -100,8 +103,7 @@ export class ProcessJobsUseCase {
         organizationId,
         createdById: job.createdById ?? null,
       });
-      await withTenantContext(
-        this.jobsRepository.client,
+      await this.transactionPort.withTenant(
         WORKER_DISPATCH_CONTEXT,
         async (transaction) => {
           await this.jobsRepository.markCompleted(job.id, transaction);
@@ -124,8 +126,7 @@ export class ProcessJobsUseCase {
         ? { payload: redactedPayload }
         : null;
 
-      await withTenantContext(
-        this.jobsRepository.client,
+      await this.transactionPort.withTenant(
         WORKER_DISPATCH_CONTEXT,
         async (transaction) => {
           await this.jobObservabilityRepository.finishAttempt(

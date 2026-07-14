@@ -1,11 +1,10 @@
 import type { Provider } from '@nestjs/common';
 
-import { EnvironmentService } from '@repo/api-core';
+import { EnvironmentService, getTenantContext } from '@repo/api-core';
 import { Pool, type PoolClient, type PoolConfig } from 'pg';
 
 import { createDatabaseClient } from './database.types';
 import { setTenantContextOnPgClient } from './tenant-context';
-import { getTenantContext } from './tenant-context.service';
 
 export const DATABASE_POOL = Symbol('DATABASE_POOL');
 export const DATABASE = Symbol('DATABASE');

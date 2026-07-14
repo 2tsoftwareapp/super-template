@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY, ROLE_NAMES } from '@repo/api-core';
-import { TenantContextService } from '@repo/api-database';
+import { TenantContextService } from '@repo/api-core';
 import { Observable } from 'rxjs';
 
 @Injectable()

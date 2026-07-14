@@ -10,6 +10,5 @@ export {
 export { isPostgresUniqueViolation } from './postgres-errors';
 export * from './schema';
 export { schema } from './schema';
-export * from './tenant-context';
-export { TenantContextService } from './tenant-context.service';
+export { setTenantContextOnExecutor, setTenantContextOnPgClient, withTenantContext } from './tenant-context';
 export { runInTransaction } from './transaction';
