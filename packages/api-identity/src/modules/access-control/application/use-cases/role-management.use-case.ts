@@ -125,7 +125,7 @@ export class RoleManagementUseCase {
     const role = await this.accessControlRepository.createRole(
       {
         name: command.name,
-        description: command.description ?? null,
+        description: command.description ?? '',
         organizationId,
         isSystem: false,
       },

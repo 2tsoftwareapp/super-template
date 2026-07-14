@@ -1,137 +1,182 @@
 import type { TransactionExecutor } from '@repo/api-core';
 
-import type { AccessControlRepository } from '../infrastructure/access-control.repository';
+export interface RoleRecord {
+  id: string;
+  organizationId: string | null;
+  name: string;
+  description: string | null;
+  isSystem: boolean;
+}
 
-export type RoleRecord = NonNullable<
-  Awaited<ReturnType<AccessControlRepository['findRoleByName']>>
->;
+export interface PermissionRecord {
+  id: string;
+  name: string;
+  description: string | null;
+  isSystem: boolean;
+}
+
+export interface RolePermissionRecord extends PermissionRecord {
+  roleId: string;
+}
+
+export interface CreateRoleValues {
+  name: string;
+  description: string;
+  organizationId?: string | null;
+  isSystem?: boolean;
+}
+
+export interface UpdateRoleValues {
+  name?: string;
+  description?: string | null;
+}
+
+export interface CreatePermissionValues {
+  name: string;
+  description: string;
+  isSystem?: boolean;
+}
+
+export interface UpdatePermissionValues {
+  name?: string;
+  description?: string | null;
+}
 
 export interface AccessControlRepositoryPort {
   ensureRoles(
-    roleValues: Parameters<AccessControlRepository['ensureRoles']>[0],
+    roleValues: {
+      name: string;
+      description: string;
+      organizationId?: string | null;
+      isSystem?: boolean;
+    }[],
     executor?: TransactionExecutor,
-  ): ReturnType<AccessControlRepository['ensureRoles']>;
+  ): Promise<RoleRecord[]>;
   ensurePermissions(
-    permissionValues: Parameters<AccessControlRepository['ensurePermissions']>[0],
+    permissionValues: {
+      name: string;
+      description: string;
+      isSystem?: boolean;
+    }[],
     executor?: TransactionExecutor,
-  ): ReturnType<AccessControlRepository['ensurePermissions']>;
+  ): Promise<PermissionRecord[]>;
   replaceRolePermissions(
     roleId: string,
     permissionIds: string[],
     executor?: TransactionExecutor,
-  ): ReturnType<AccessControlRepository['replaceRolePermissions']>;
+  ): Promise<void>;
   createRole(
-    values: Parameters<AccessControlRepository['createRole']>[0],
+    values: CreateRoleValues,
     executor?: TransactionExecutor,
-  ): ReturnType<AccessControlRepository['createRole']>;
+  ): Promise<RoleRecord | null>;
   updateRole(
     roleId: string,
-    values: Parameters<AccessControlRepository['updateRole']>[1],
+    values: UpdateRoleValues,
     executor?: TransactionExecutor,
-  ): ReturnType<AccessControlRepository['updateRole']>;
+  ): Promise<RoleRecord | null>;
   deleteRole(
     roleId: string,
     executor?: TransactionExecutor,
-  ): ReturnType<AccessControlRepository['deleteRole']>;
+  ): Promise<void>;
   findRoleById(
     roleId: string,
     executor?: TransactionExecutor,
-  ): ReturnType<AccessControlRepository['findRoleById']>;
+  ): Promise<RoleRecord | null>;
   findUserIdsForRole(
     roleId: string,
     executor?: TransactionExecutor,
-  ): ReturnType<AccessControlRepository['findUserIdsForRole']>;
+  ): Promise<string[]>;
   findUserIdsForPermission(
     permissionId: string,
     executor?: TransactionExecutor,
-  ): ReturnType<AccessControlRepository['findUserIdsForPermission']>;
+  ): Promise<string[]>;
   findRoleNamesForUser(
     userId: string,
     organizationId?: string | null,
     executor?: TransactionExecutor,
-  ): ReturnType<AccessControlRepository['findRoleNamesForUser']>;
+  ): Promise<string[]>;
   findPermissionNamesForUser(
     userId: string,
     organizationId?: string | null,
     executor?: TransactionExecutor,
-  ): ReturnType<AccessControlRepository['findPermissionNamesForUser']>;
+  ): Promise<string[]>;
   findRoleNamesForUsers(
     userIds: string[],
     executor?: TransactionExecutor,
-  ): ReturnType<AccessControlRepository['findRoleNamesForUsers']>;
+  ): Promise<{ userId: string; roleName: string }[]>;
   findRoleIdsForUser(
     userId: string,
     executor?: TransactionExecutor,
-  ): ReturnType<AccessControlRepository['findRoleIdsForUser']>;
+  ): Promise<string[]>;
   findRoleIdsForUsers(
     userIds: string[],
     executor?: TransactionExecutor,
-  ): ReturnType<AccessControlRepository['findRoleIdsForUsers']>;
+  ): Promise<{ userId: string; roleId: string }[]>;
   findRolesByIds(
     roleIds: string[],
     executor?: TransactionExecutor,
-  ): ReturnType<AccessControlRepository['findRolesByIds']>;
+  ): Promise<RoleRecord[]>;
   findPermissionsByIds(
     permissionIds: string[],
     executor?: TransactionExecutor,
-  ): ReturnType<AccessControlRepository['findPermissionsByIds']>;
+  ): Promise<PermissionRecord[]>;
   findPermissionsByNames(
     permissionNames: string[],
     executor?: TransactionExecutor,
-  ): ReturnType<AccessControlRepository['findPermissionsByNames']>;
+  ): Promise<PermissionRecord[]>;
   findAllPermissions(
     executor?: TransactionExecutor,
-  ): ReturnType<AccessControlRepository['findAllPermissions']>;
+  ): Promise<PermissionRecord[]>;
   findPermissionIdsForRole(
     roleId: string,
     executor?: TransactionExecutor,
-  ): ReturnType<AccessControlRepository['findPermissionIdsForRole']>;
+  ): Promise<string[]>;
   findPermissionsForRoleIds(
     roleIds: string[],
     executor?: TransactionExecutor,
-  ): ReturnType<AccessControlRepository['findPermissionsForRoleIds']>;
+  ): Promise<RolePermissionRecord[]>;
   findPermissionById(
     permissionId: string,
     executor?: TransactionExecutor,
-  ): ReturnType<AccessControlRepository['findPermissionById']>;
+  ): Promise<PermissionRecord | null>;
   createPermission(
-    values: Parameters<AccessControlRepository['createPermission']>[0],
+    values: CreatePermissionValues,
     executor?: TransactionExecutor,
-  ): ReturnType<AccessControlRepository['createPermission']>;
+  ): Promise<PermissionRecord | null>;
   updatePermission(
     permissionId: string,
-    values: Parameters<AccessControlRepository['updatePermission']>[1],
+    values: UpdatePermissionValues,
     executor?: TransactionExecutor,
-  ): ReturnType<AccessControlRepository['updatePermission']>;
+  ): Promise<PermissionRecord | null>;
   deletePermission(
     permissionId: string,
     executor?: TransactionExecutor,
-  ): ReturnType<AccessControlRepository['deletePermission']>;
+  ): Promise<void>;
   findRoleByName(
     name: string,
     organizationId?: string | null,
     executor?: TransactionExecutor,
-  ): ReturnType<AccessControlRepository['findRoleByName']>;
+  ): Promise<RoleRecord | null>;
   assignUserRole(
     userId: string,
     roleId: string,
     organizationId: string | null,
     executor?: TransactionExecutor,
-  ): ReturnType<AccessControlRepository['assignUserRole']>;
+  ): Promise<void>;
   findAllRoles(
     executor?: TransactionExecutor,
-  ): ReturnType<AccessControlRepository['findAllRoles']>;
+  ): Promise<RoleRecord[]>;
   findManageableRolesForActor(
     organizationId: string | null,
     includePlatformRoles: boolean,
     executor?: TransactionExecutor,
-  ): ReturnType<AccessControlRepository['findManageableRolesForActor']>;
+  ): Promise<RoleRecord[]>;
   replaceUserRoles(
     userId: string,
     roleIds: string[],
     organizationId?: string | null,
     executor?: TransactionExecutor,
-  ): ReturnType<AccessControlRepository['replaceUserRoles']>;
+  ): Promise<void>;
 }
 
 export const ACCESS_CONTROL_REPOSITORY = Symbol('ACCESS_CONTROL_REPOSITORY');
