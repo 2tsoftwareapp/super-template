@@ -1,4 +1,4 @@
-import type { DatabaseExecutor } from '@repo/api-database';
+import type { TransactionExecutor } from '@repo/api-core';
 
 export interface SettingRecord {
   key: string;
@@ -9,20 +9,20 @@ export interface SettingRecord {
 }
 
 export interface SettingsRepositoryPort {
-  findAll(executor?: DatabaseExecutor): Promise<SettingRecord[]>;
+  findAll(executor?: TransactionExecutor): Promise<SettingRecord[]>;
 
-  findByKey(key: string, executor?: DatabaseExecutor): Promise<SettingRecord | null>;
+  findByKey(key: string, executor?: TransactionExecutor): Promise<SettingRecord | null>;
 
   upsert(
     key: string,
     value: Record<string, unknown>,
     updatedById: string | null,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<SettingRecord | null>;
 
   ensureDefaults(
     defaults: { key: string; value: Record<string, unknown> }[],
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<void>;
 }
 

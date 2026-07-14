@@ -1,5 +1,5 @@
 import type { JsonObject } from '@repo/api-core';
-import type { DatabaseExecutor } from '@repo/api-database';
+import type { TransactionExecutor } from '@repo/api-core';
 
 export interface UserPreferencesRecord {
   userId: string;
@@ -15,7 +15,7 @@ export interface UserPreferencesRecord {
 export interface PreferencesRepositoryPort {
   findByUserId(
     userId: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<UserPreferencesRecord | null>;
 
   upsert(
@@ -27,12 +27,12 @@ export interface PreferencesRepositoryPort {
       notificationPreferences: JsonObject;
       emailPreferences: JsonObject;
     }>,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<UserPreferencesRecord | null>;
 
   reset(
     userId: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<UserPreferencesRecord | null>;
 }
 

@@ -1,5 +1,5 @@
 import type { JsonObject } from '@repo/api-core';
-import type { DatabaseExecutor } from '@repo/api-database';
+import type { TransactionExecutor } from '@repo/api-core';
 
 import type { ListNotificationJobsQuery } from '../notifications.types';
 
@@ -71,41 +71,41 @@ export interface NotificationJobsListResult {
 export interface NotificationJobsRepositoryPort {
   create(
     values: CreateNotificationJobInput,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<NotificationJobRecord | null>;
   createIdempotent(
     values: CreateIdempotentNotificationJobInput,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<{ value: NotificationJobRecord; created: boolean } | null>;
   findById(
     jobId: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<NotificationJobRecord | null>;
   list(
     params: ListNotificationJobsQuery,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<NotificationJobsListResult>;
   listDue(
     limit: number,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<NotificationJobRecord[]>;
   markProcessing(
     jobId: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<NotificationJobRecord | null>;
   markCompleted(
     jobId: string,
     recipientCount: number,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<NotificationJobRecord | null>;
   markFailed(
     jobId: string,
     errorMessage: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<NotificationJobRecord | null>;
   markCancelled(
     jobId: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<NotificationJobRecord | null>;
 }
 

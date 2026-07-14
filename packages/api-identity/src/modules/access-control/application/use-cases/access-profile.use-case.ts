@@ -1,4 +1,4 @@
-import type { DatabaseExecutor } from '@repo/api-database';
+import type { TransactionExecutor } from '@repo/api-core';
 
 import { Inject, Injectable } from '@nestjs/common';
 import { AccessProfileCache } from '@repo/api-core';
@@ -56,7 +56,7 @@ export class AccessProfileUseCase {
 
   async invalidateUsersForRole(
     roleId: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<void> {
     const userIds = await this.accessControlRepository.findUserIdsForRole(
       roleId,
@@ -68,7 +68,7 @@ export class AccessProfileUseCase {
 
   async invalidateUsersForPermission(
     permissionId: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<void> {
     const userIds = await this.accessControlRepository.findUserIdsForPermission(
       permissionId,

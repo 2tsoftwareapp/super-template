@@ -1,4 +1,4 @@
-import type { DatabaseExecutor } from '@repo/api-database';
+import type { TransactionExecutor } from '@repo/api-core';
 
 export interface AttachmentRecord {
   id: string;
@@ -23,11 +23,11 @@ export interface CreateAttachmentInput {
 }
 
 export interface AttachmentsRepositoryPort {
-  create(values: CreateAttachmentInput, executor?: DatabaseExecutor): Promise<AttachmentRecord | null>;
-  findById(attachmentId: string, executor?: DatabaseExecutor): Promise<AttachmentRecord | null>;
-  listByEntity(entityType: string, entityId: string, executor?: DatabaseExecutor): Promise<AttachmentRecord[]>;
-  softDelete(attachmentId: string, executor?: DatabaseExecutor): Promise<AttachmentRecord | null>;
-  countByEntity(entityType: string, entityId: string, executor?: DatabaseExecutor): Promise<number>;
+  create(values: CreateAttachmentInput, executor?: TransactionExecutor): Promise<AttachmentRecord | null>;
+  findById(attachmentId: string, executor?: TransactionExecutor): Promise<AttachmentRecord | null>;
+  listByEntity(entityType: string, entityId: string, executor?: TransactionExecutor): Promise<AttachmentRecord[]>;
+  softDelete(attachmentId: string, executor?: TransactionExecutor): Promise<AttachmentRecord | null>;
+  countByEntity(entityType: string, entityId: string, executor?: TransactionExecutor): Promise<number>;
 }
 
 export const ATTACHMENTS_REPOSITORY = Symbol('ATTACHMENTS_REPOSITORY');

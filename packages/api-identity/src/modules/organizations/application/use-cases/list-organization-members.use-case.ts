@@ -25,15 +25,13 @@ export class ListOrganizationMembersUseCase {
 
     const members = await this.organizationsRepository.listMembers(organizationId);
 
-    return {
-      data: members.map((member) => ({
-        userId: member.userId,
-        email: member.email,
-        displayName: member.displayName,
-        role: member.role,
-        createdAt: member.createdAt.toISOString(),
-        updatedAt: member.updatedAt.toISOString(),
-      })),
-    };
+    return members.map((member) => ({
+      userId: member.userId,
+      email: member.email,
+      displayName: member.displayName,
+      role: member.role,
+      createdAt: member.createdAt.toISOString(),
+      updatedAt: member.updatedAt.toISOString(),
+    }));
   }
 }

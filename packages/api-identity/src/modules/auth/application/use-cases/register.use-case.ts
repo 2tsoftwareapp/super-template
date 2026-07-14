@@ -1,5 +1,5 @@
 import type { RequestContext } from '@repo/api-core';
-import type { DatabaseClient } from '@repo/api-database';
+import type { TransactionPort } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import {
@@ -9,9 +9,8 @@ import {
   durationToMilliseconds,
   ERROR_CODES,
   normalizeEmail,
+  TRANSACTION_PORT,
 } from '@repo/api-core';
-import { DATABASE } from '@repo/api-database';
-import { runInTransaction } from '@repo/api-database';
 
 import type { RegisterCommand } from '../auth.types';
 
@@ -35,7 +34,7 @@ import { AuthMailService } from '../services/auth-mail.service';
 @Injectable()
 export class RegisterUseCase {
   constructor(
-    @Inject(DATABASE) private readonly database: DatabaseClient,
+    @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
     @Inject(USERS_REPOSITORY)
     private readonly usersRepository: UsersRepositoryPort,
     private readonly accessControlService: AccessControlService,
@@ -50,8 +49,7 @@ export class RegisterUseCase {
     const email = normalizeEmail(input.email);
     await this.usersRepository.assertEmailAvailable(email);
 
-    const result = await runInTransaction(
-      this.database,
+    const result = await this.transactionPort.run(
       async (transaction) => {
         const user = await this.usersRepository.create(
           {

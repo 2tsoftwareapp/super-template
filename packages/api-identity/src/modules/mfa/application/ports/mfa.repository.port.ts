@@ -1,4 +1,4 @@
-import type { DatabaseExecutor } from '@repo/api-database';
+import type { TransactionExecutor } from '@repo/api-core';
 
 export interface TwoFactorSecretRecord {
   userId: string;
@@ -34,7 +34,7 @@ export interface MfaChallengeRecord {
 export interface MfaRepositoryPort {
   findSecretByUserId(
     userId: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<TwoFactorSecretRecord | null>;
 
   upsertPendingSecret(
@@ -44,34 +44,34 @@ export interface MfaRepositoryPort {
       secretIv: string;
       secretAuthTag: string;
     },
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<TwoFactorSecretRecord | null>;
 
   confirmSecret(
     userId: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<TwoFactorSecretRecord | null>;
 
   deleteSecret(
     userId: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<void>;
 
   replaceRecoveryCodes(
     userId: string,
     codeHashes: string[],
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<void>;
 
   findUnusedRecoveryCodeByHash(
     userId: string,
     codeHash: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<RecoveryCodeRecord | null>;
 
   consumeRecoveryCode(
     id: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<void>;
 
   createChallenge(
@@ -82,22 +82,22 @@ export interface MfaRepositoryPort {
       ipAddress: string | null;
       userAgent: string | null;
     },
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<MfaChallengeRecord | null>;
 
   findValidChallengeByTokenHash(
     tokenHash: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<MfaChallengeRecord | null>;
 
   incrementChallengeAttempts(
     id: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<MfaChallengeRecord | null>;
 
   consumeChallenge(
     id: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<MfaChallengeRecord | null>;
 }
 

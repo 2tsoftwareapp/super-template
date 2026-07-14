@@ -1,5 +1,5 @@
 import type { JsonObject, RequestContext } from '@repo/api-core';
-import type { DatabaseExecutor } from '@repo/api-database';
+import type { TransactionExecutor } from '@repo/api-core';
 
 import { Inject, Injectable } from '@nestjs/common';
 import { isJsonObject, redactSensitive } from '@repo/api-core';
@@ -30,7 +30,7 @@ export class RecordAuditLogUseCase {
       metadata,
       requestContext,
     }: AuditInput,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ) {
     return this.auditRepository.create(
       {

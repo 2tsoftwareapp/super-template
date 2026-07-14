@@ -1,4 +1,4 @@
-import type { DatabaseExecutor } from '@repo/api-database';
+import type { TransactionExecutor } from '@repo/api-core';
 
 export interface OrganizationRecord {
   id: string;
@@ -38,82 +38,82 @@ export interface UserOrganizationRecord {
 export interface OrganizationsRepositoryPort {
   createOrganization(
     values: { name: string; slug: string },
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<OrganizationRecord | null>;
 
   addMember(
     values: { organizationId: string; userId: string; role: 'OWNER' | 'ADMIN' | 'MEMBER' },
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<OrganizationMemberRecord | null>;
 
   upsertMember(
     values: { organizationId: string; userId: string; role: 'OWNER' | 'ADMIN' | 'MEMBER' },
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<OrganizationMemberRecord | null>;
 
   findBySlug(
     slug: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<OrganizationRecord | null>;
 
   findById(
     organizationId: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<OrganizationRecord | null>;
 
   findMembership(
     organizationId: string,
     userId: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<OrganizationMemberRecord | null>;
 
   listForUser(
     userId: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<UserOrganizationRecord[]>;
 
   updateOrganization(
     organizationId: string,
     values: { name: string },
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<OrganizationRecord | null>;
 
   softDeleteOrganization(
     organizationId: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<OrganizationRecord | null>;
 
   listMembers(
     organizationId: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<OrganizationMemberWithUserRecord[]>;
 
   countOwners(
     organizationId: string,
-    options?: { excludingUserId?: string; executor?: DatabaseExecutor },
+    options?: { excludingUserId?: string; executor?: TransactionExecutor },
   ): Promise<number>;
 
   countMembers(
     organizationId: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<number>;
 
   updateMemberRole(
     organizationId: string,
     userId: string,
     role: 'OWNER' | 'ADMIN' | 'MEMBER',
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<OrganizationMemberRecord | null>;
 
   removeMember(
     organizationId: string,
     userId: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<OrganizationMemberRecord | null>;
 
   findPrimaryOrganizationId(
     userId: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<string | null>;
 }
 

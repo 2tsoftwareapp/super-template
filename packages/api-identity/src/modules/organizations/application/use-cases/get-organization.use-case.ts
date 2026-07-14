@@ -38,15 +38,13 @@ export class GetOrganizationUseCase {
       await this.organizationsRepository.countMembers(organizationId);
 
     return {
-      data: {
-        id: organization.id,
-        name: organization.name,
-        slug: organization.slug,
-        role: membership.role,
-        memberCount,
-        createdAt: organization.createdAt.toISOString(),
-        updatedAt: organization.updatedAt.toISOString(),
-      },
+      id: organization.id,
+      name: organization.name,
+      slug: organization.slug,
+      role: membership.role,
+      memberCount,
+      createdAt: organization.createdAt.toISOString(),
+      updatedAt: organization.updatedAt.toISOString(),
     };
   }
 }

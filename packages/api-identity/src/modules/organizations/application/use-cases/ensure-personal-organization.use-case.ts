@@ -1,8 +1,7 @@
-import type { DatabaseClient, DatabaseExecutor } from '@repo/api-database';
+import type { TransactionExecutor } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { AppError, ERROR_CODES } from '@repo/api-core';
-import { DATABASE } from '@repo/api-database';
 
 import { AccessControlService } from '../../../access-control/application/access-control.service';
 import { ORGANIZATIONS_REPOSITORY, type OrganizationsRepositoryPort } from '../ports/organizations.repository.port';
@@ -18,7 +17,6 @@ const slugify = (value: string) =>
 @Injectable()
 export class EnsurePersonalOrganizationUseCase {
   constructor(
-    @Inject(DATABASE) private readonly database: DatabaseClient,
     @Inject(ORGANIZATIONS_REPOSITORY) private readonly organizationsRepository: OrganizationsRepositoryPort,
     private readonly accessControlService: AccessControlService,
   ) {}
@@ -26,7 +24,7 @@ export class EnsurePersonalOrganizationUseCase {
   async execute(
     userId: string,
     displayName: string,
-    executor: DatabaseExecutor = this.database,
+    executor?: TransactionExecutor,
   ) {
     const existing =
       await this.organizationsRepository.findPrimaryOrganizationId(

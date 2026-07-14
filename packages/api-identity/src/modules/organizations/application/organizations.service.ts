@@ -1,4 +1,4 @@
-import type { DatabaseExecutor } from '@repo/api-database';
+import type { TransactionExecutor } from '@repo/api-core';
 
 import { Injectable } from '@nestjs/common';
 
@@ -23,7 +23,7 @@ export class OrganizationsService {
   async ensurePersonalOrganization(
     userId: string,
     displayName: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ) {
     return this.ensurePersonalOrganizationUseCase.execute(
       userId,
@@ -35,7 +35,7 @@ export class OrganizationsService {
   async assertMembership(
     organizationId: string,
     userId: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ) {
     return this.assertOrganizationMembershipUseCase.execute(
       organizationId,
@@ -47,7 +47,7 @@ export class OrganizationsService {
   async resolveOrganizationIdForUser(
     userId: string,
     organizationId?: string | null,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ) {
     return this.resolveOrganizationIdForUserUseCase.execute(
       userId,

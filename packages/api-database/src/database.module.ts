@@ -6,15 +6,23 @@ import {
   Module,
   type OnApplicationShutdown,
 } from '@nestjs/common';
+import { TRANSACTION_PORT } from '@repo/api-core';
 
 import { DatabaseRlsGuard } from './database-rls.guard';
 import { DATABASE_POOL, databaseProviders } from './database.provider';
+import { DrizzleTransactionService } from './drizzle-transaction.service';
 import { TenantContextService } from './tenant-context.service';
 
 @Global()
 @Module({
-  providers: [...databaseProviders, TenantContextService, DatabaseRlsGuard],
-  exports: [...databaseProviders, TenantContextService],
+  providers: [
+    ...databaseProviders,
+    TenantContextService,
+    DatabaseRlsGuard,
+    DrizzleTransactionService,
+    { provide: TRANSACTION_PORT, useExisting: DrizzleTransactionService },
+  ],
+  exports: [...databaseProviders, TenantContextService, DrizzleTransactionService, TRANSACTION_PORT],
 })
 export class DatabaseModule implements OnApplicationShutdown {
   constructor(@Inject(DATABASE_POOL) private readonly pool: Pool) {}

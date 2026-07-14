@@ -1,5 +1,5 @@
 import type { JsonObject } from '@repo/api-core';
-import type { DatabaseExecutor } from '@repo/api-database';
+import type { TransactionExecutor } from '@repo/api-core';
 
 export interface ActivityEmitInput {
   organizationId: string;
@@ -14,7 +14,7 @@ export interface ActivityEmitInput {
 export interface ActivityEmitter {
   emit(
     input: ActivityEmitInput,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<void>;
 }
 

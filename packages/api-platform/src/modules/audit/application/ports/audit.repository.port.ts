@@ -1,5 +1,5 @@
 import type { JsonObject } from '@repo/api-core';
-import type { DatabaseExecutor } from '@repo/api-database';
+import type { TransactionExecutor } from '@repo/api-core';
 
 export interface AuditLogRecord {
   id: string;
@@ -49,11 +49,11 @@ export interface AuditLogListResult {
 }
 
 export interface AuditRepositoryPort {
-  list(params: ListAuditLogsParams, executor?: DatabaseExecutor): Promise<AuditLogListResult>;
-  listForExport(params: AuditLogSearchParams & { limit: number }, executor?: DatabaseExecutor): Promise<AuditLogRecord[]>;
-  deleteOlderThan(cutoff: Date, executor?: DatabaseExecutor): Promise<number>;
-  findById(id: string, executor?: DatabaseExecutor): Promise<AuditLogRecord | null>;
-  create(values: CreateAuditLogInput, executor?: DatabaseExecutor): Promise<AuditLogRecord>;
+  list(params: ListAuditLogsParams, executor?: TransactionExecutor): Promise<AuditLogListResult>;
+  listForExport(params: AuditLogSearchParams & { limit: number }, executor?: TransactionExecutor): Promise<AuditLogRecord[]>;
+  deleteOlderThan(cutoff: Date, executor?: TransactionExecutor): Promise<number>;
+  findById(id: string, executor?: TransactionExecutor): Promise<AuditLogRecord | null>;
+  create(values: CreateAuditLogInput, executor?: TransactionExecutor): Promise<AuditLogRecord>;
 }
 
 export const AUDIT_REPOSITORY = Symbol('AUDIT_REPOSITORY');

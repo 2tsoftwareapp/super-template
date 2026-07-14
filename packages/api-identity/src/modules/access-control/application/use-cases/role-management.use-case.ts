@@ -1,5 +1,5 @@
 import type { AuthenticatedRequestUser } from '@repo/api-core';
-import type { DatabaseClient, DatabaseExecutor } from '@repo/api-database';
+import type { TransactionExecutor } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import {
@@ -9,7 +9,6 @@ import {
   permissionNamesForRole,
   ROLE_NAMES,
 } from '@repo/api-core';
-import { DATABASE } from '@repo/api-database';
 
 import type {
   CreateRoleCommand,
@@ -31,7 +30,6 @@ import { AccessProfileUseCase } from './access-profile.use-case';
 @Injectable()
 export class RoleManagementUseCase {
   constructor(
-    @Inject(DATABASE) private readonly database: DatabaseClient,
     @Inject(ACCESS_CONTROL_REPOSITORY)
     private readonly accessControlRepository: AccessControlRepositoryPort,
     private readonly accessProfileUseCase: AccessProfileUseCase,
@@ -41,7 +39,7 @@ export class RoleManagementUseCase {
   async ensureOrganizationAdminRole(
     organizationId: string,
     userId: string,
-    executor: DatabaseExecutor = this.database,
+    executor?: TransactionExecutor,
   ): Promise<void> {
     const permissions =
       await this.accessControlRepository.findPermissionsByNames(
@@ -89,7 +87,7 @@ export class RoleManagementUseCase {
   async createCustomRole(
     actor: AuthenticatedRequestUser,
     command: CreateRoleCommand,
-    executor: DatabaseExecutor = this.database,
+    executor?: TransactionExecutor,
   ): Promise<RoleView> {
     const organizationId = actor.roles.includes(ROLE_NAMES.SUPER_ADMIN)
       ? (command.organizationId ?? actor.organizationId ?? null)
@@ -160,7 +158,7 @@ export class RoleManagementUseCase {
     actor: AuthenticatedRequestUser,
     roleId: string,
     command: UpdateRoleCommand,
-    executor: DatabaseExecutor = this.database,
+    executor?: TransactionExecutor,
   ): Promise<RoleView> {
     const role = await this.accessControlRepository.findRoleById(roleId, executor);
 
@@ -245,7 +243,7 @@ export class RoleManagementUseCase {
     actor: AuthenticatedRequestUser,
     roleId: string,
     permissionIds: string[],
-    executor: DatabaseExecutor = this.database,
+    executor?: TransactionExecutor,
   ): Promise<RoleView> {
     return this.updateCustomRole(
       actor,
@@ -258,7 +256,7 @@ export class RoleManagementUseCase {
   async deleteCustomRole(
     actor: AuthenticatedRequestUser,
     roleId: string,
-    executor: DatabaseExecutor = this.database,
+    executor?: TransactionExecutor,
   ): Promise<void> {
     const role = await this.accessControlRepository.findRoleById(roleId, executor);
 
@@ -288,7 +286,7 @@ export class RoleManagementUseCase {
 
   private async resolveCatalogPermissions(
     permissionIds: string[],
-    executor: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ) {
     const permissions = await this.accessControlRepository.findPermissionsByIds(
       permissionIds,
@@ -318,7 +316,7 @@ export class RoleManagementUseCase {
 
   private async loadPermissionsForRole(
     roleId: string,
-    executor: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ) {
     const permissionIds =
       await this.accessControlRepository.findPermissionIdsForRole(

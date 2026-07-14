@@ -1,4 +1,4 @@
-import type { DatabaseExecutor } from '@repo/api-database';
+import type { TransactionExecutor } from '@repo/api-core';
 
 import { Injectable } from '@nestjs/common';
 
@@ -20,7 +20,7 @@ export class AuditService {
     private readonly listAuditLogsUseCase: ListAuditLogsUseCase,
   ) {}
 
-  async log(input: AuditInput, executor?: DatabaseExecutor) {
+  async log(input: AuditInput, executor?: TransactionExecutor) {
     return this.recordAuditLogUseCase.execute(input, executor);
   }
 

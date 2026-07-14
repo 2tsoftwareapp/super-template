@@ -1,5 +1,5 @@
 import type { JsonObject } from '@repo/api-core';
-import type { DatabaseExecutor } from '@repo/api-database';
+import type { TransactionExecutor } from '@repo/api-core';
 
 export interface ActivityRecord {
   id: string;
@@ -37,8 +37,8 @@ export interface ActivityListResult {
 }
 
 export interface ActivitiesRepositoryPort {
-  create(values: CreateActivityInput, executor?: DatabaseExecutor): Promise<ActivityRecord | null>;
-  list(params: ListActivitiesQuery, executor?: DatabaseExecutor): Promise<ActivityListResult>;
+  create(values: CreateActivityInput, executor?: TransactionExecutor): Promise<ActivityRecord | null>;
+  list(params: ListActivitiesQuery, executor?: TransactionExecutor): Promise<ActivityListResult>;
 }
 
 export const ACTIVITIES_REPOSITORY = Symbol('ACTIVITIES_REPOSITORY');

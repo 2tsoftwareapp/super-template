@@ -93,6 +93,10 @@ export {
   type OrganizationLookup,
 } from "./ports/organization-lookup.port";
 export {
+  TRANSACTION_PORT,
+  type TransactionPort,
+} from "./ports/transaction.port";
+export {
   USER_LOOKUP,
   type UserLookup,
   type UserSummary,

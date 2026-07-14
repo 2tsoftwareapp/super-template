@@ -1,4 +1,4 @@
-import type { DatabaseExecutor } from '@repo/api-database';
+import type { TransactionExecutor } from '@repo/api-core';
 
 import { AppError, ERROR_CODES } from '@repo/api-core';
 
@@ -12,7 +12,7 @@ export async function resolveAssignableRole(
   accessControlService: AccessControlService,
   roleName: AssignableRoleName,
   organizationId: string | null,
-  executor?: DatabaseExecutor,
+  executor?: TransactionExecutor,
 ): Promise<{ id: string; target: RolePolicyTarget }> {
   if (roleName === ROLE_NAMES.USER) {
     const role = await accessControlService.getRoleByName(

@@ -1,56 +1,56 @@
-import type { DatabaseExecutor } from '@repo/api-database';
+import type { TransactionExecutor } from '@repo/api-core';
 
 import type { AuthSessionModel, CreateSessionInput } from '../models/auth-session';
 
 export interface AuthSessionRepositoryPort {
   createSession(
     values: CreateSessionInput,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<AuthSessionModel | null>;
 
   findSessionById(
     sessionId: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<AuthSessionModel | null>;
 
   findSessionForUser(
     sessionId: string,
     userId: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<AuthSessionModel | null>;
 
   updateSession(
     sessionId: string,
     values: Partial<CreateSessionInput>,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<AuthSessionModel | null>;
 
   updateSessionIfMatches(
     sessionId: string,
     refreshTokenHash: string,
     values: Partial<CreateSessionInput>,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<AuthSessionModel | null>;
 
   listSessionsForUser(
     userId: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<AuthSessionModel[]>;
 
   revokeSession(
     sessionId: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<AuthSessionModel | null>;
 
   revokeAllSessionsForUser(
     userId: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<void>;
 
   // Email verification tokens
   findLatestEmailVerificationToken(
     userId: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<{ id: string; createdAt: Date; usedAt: Date | null } | null>;
 
   storeEmailVerificationToken(
@@ -59,17 +59,17 @@ export interface AuthSessionRepositoryPort {
       tokenHash: string;
       expiresAt: Date;
     },
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<{ id: string } | null>;
 
   findValidEmailVerificationToken(
     tokenHash: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<{ id: string; userId: string } | null>;
 
   consumeEmailVerificationToken(
     tokenId: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<{ id: string } | null>;
 
   // Password reset tokens
@@ -79,20 +79,20 @@ export interface AuthSessionRepositoryPort {
       tokenHash: string;
       expiresAt: Date;
     },
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<{ id: string } | null>;
 
   findValidPasswordResetToken(
     tokenHash: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<{ id: string; userId: string } | null>;
 
   consumePasswordResetToken(
     tokenId: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<{ id: string } | null>;
 
-  cleanupExpiredTokens(executor?: DatabaseExecutor): Promise<void>;
+  cleanupExpiredTokens(executor?: TransactionExecutor): Promise<void>;
 }
 
 export const AUTH_SESSION_REPOSITORY = Symbol('AUTH_SESSION_REPOSITORY');

@@ -1,5 +1,5 @@
 import type { AuthenticatedRequestUser } from '@repo/api-core';
-import type { DatabaseExecutor } from '@repo/api-database';
+import type { TransactionExecutor } from '@repo/api-core';
 
 import { Injectable } from '@nestjs/common';
 
@@ -25,7 +25,7 @@ export class AccessControlService {
     private readonly replaceUserRolesUseCase: ReplaceUserRolesUseCase,
   ) {}
 
-  ensureSeedData(executor?: DatabaseExecutor) {
+  ensureSeedData(executor?: TransactionExecutor) {
     return this.seedAccessControlUseCase.execute(executor);
   }
 
@@ -71,7 +71,7 @@ export class AccessControlService {
   getRoleByName(
     name: string,
     organizationId?: string | null,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ) {
     return this.roleQueryUseCase.getRoleByName(name, organizationId ?? null, executor);
   }
@@ -79,7 +79,7 @@ export class AccessControlService {
   getOrganizationRoleByName(
     name: string,
     organizationId: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ) {
     return this.roleQueryUseCase.getRoleByName(name, organizationId, executor);
   }
@@ -87,7 +87,7 @@ export class AccessControlService {
   ensureOrganizationAdminRole(
     organizationId: string,
     userId: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ) {
     return this.roleManagementUseCase.ensureOrganizationAdminRole(
       organizationId,
@@ -100,7 +100,7 @@ export class AccessControlService {
     userId: string,
     roleIds: string[],
     organizationId?: string | null,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ) {
     return this.replaceUserRolesUseCase.execute(
       userId,

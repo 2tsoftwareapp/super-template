@@ -1,4 +1,4 @@
-import type { DatabaseExecutor } from '@repo/api-database';
+import type { TransactionExecutor } from '@repo/api-core';
 
 import type { ListUsersQuery } from '../users.types';
 
@@ -37,37 +37,37 @@ export interface UsersListResult {
 export interface UsersRepositoryPort {
   create(
     values: CreateUserInput,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<UserRecord>;
   findById(
     userId: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<UserRecord | null>;
   findByEmail(
     email: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<UserRecord | null>;
   update(
     userId: string,
     values: UpdateUserInput,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<UserRecord | null>;
   softDelete(
     userId: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<UserRecord | null>;
   list(
     params: ListUsersQuery,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<UsersListResult>;
   isUserInOrganization(
     userId: string,
     organizationId: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<boolean>;
   assertEmailAvailable(
     email: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
     currentUserId?: string,
   ): Promise<void>;
 }

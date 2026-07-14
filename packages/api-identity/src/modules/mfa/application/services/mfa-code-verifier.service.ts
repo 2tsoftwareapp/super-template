@@ -1,4 +1,4 @@
-import type { DatabaseExecutor } from '@repo/api-database';
+import type { TransactionExecutor } from '@repo/api-core';
 
 import { Inject, Injectable } from '@nestjs/common';
 import { EnvironmentService } from '@repo/api-core';
@@ -22,7 +22,7 @@ export class MfaCodeVerifierService {
   async verifyCode(
     userId: string,
     code: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<boolean> {
     const secretRow = await this.mfaRepository.findSecretByUserId(
       userId,

@@ -2,7 +2,7 @@ import type {
   AuthenticatedRequestUser,
   RequestContext,
 } from '@repo/api-core';
-import type { DatabaseClient } from '@repo/api-database';
+import type { TransactionPort } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import {
@@ -13,7 +13,7 @@ import {
   ERROR_CODES,
   normalizeEmail,
 } from '@repo/api-core';
-import { DATABASE, runInTransaction } from '@repo/api-database';
+import { TRANSACTION_PORT } from '@repo/api-core';
 
 import type { CreateAdminUserCommand, UserView } from '../users.types';
 
@@ -42,7 +42,7 @@ import { GetUserUseCase } from './get-user.use-case';
 @Injectable()
 export class CreateAdminUserUseCase {
   constructor(
-    @Inject(DATABASE) private readonly database: DatabaseClient,
+    @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
     @Inject(USERS_REPOSITORY)
     private readonly usersRepository: UsersRepositoryPort,
     private readonly accessControlService: AccessControlService,
@@ -91,8 +91,7 @@ export class CreateAdminUserUseCase {
 
     const status = input.status ?? 'ACTIVE';
 
-    const result = await runInTransaction(
-      this.database,
+    const result = await this.transactionPort.run(
       async (transaction) => {
         const user = await this.usersRepository.create(
           {

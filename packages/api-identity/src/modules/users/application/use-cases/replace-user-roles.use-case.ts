@@ -2,7 +2,7 @@ import type {
   AuthenticatedRequestUser,
   RequestContext,
 } from '@repo/api-core';
-import type { DatabaseClient } from '@repo/api-database';
+import type { TransactionPort } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import {
@@ -11,7 +11,7 @@ import {
   type AuditWriter,
   ERROR_CODES,
 } from '@repo/api-core';
-import { DATABASE, runInTransaction } from '@repo/api-database';
+import { TRANSACTION_PORT } from '@repo/api-core';
 
 import type { AssignableRoleName, UserView } from '../users.types';
 
@@ -32,7 +32,7 @@ import { GetUserUseCase } from './get-user.use-case';
 @Injectable()
 export class ReplaceUserRolesUseCase {
   constructor(
-    @Inject(DATABASE) private readonly database: DatabaseClient,
+    @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
     @Inject(USERS_REPOSITORY)
     private readonly usersRepository: UsersRepositoryPort,
     private readonly accessControlService: AccessControlService,
@@ -105,7 +105,7 @@ export class ReplaceUserRolesUseCase {
     assertCanAssignRoleTargets(actor, [resolvedRole.target]);
     assertRoleScopeCanBeAssigned(resolvedRole.target, actor);
 
-    await runInTransaction(this.database, async (transaction) => {
+    await this.transactionPort.run( async (transaction) => {
       if (role === ROLE_NAMES.ADMIN && resolvedOrganizationId) {
         await this.accessControlService.ensureOrganizationAdminRole(
           resolvedOrganizationId,

@@ -2,7 +2,7 @@ import type {
   AuthenticatedRequestUser,
   RequestContext,
 } from '@repo/api-core';
-import type { DatabaseExecutor } from '@repo/api-database';
+import type { TransactionExecutor } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import {
@@ -43,7 +43,7 @@ export class SendNotificationUseCase {
     actor: AuthenticatedRequestUser | null,
     input: SendNotificationCommand,
     requestContext?: RequestContext,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
     options?: { deferDispatch?: boolean },
   ): Promise<NotificationView> {
     const recipientOrganizationId = input.userId

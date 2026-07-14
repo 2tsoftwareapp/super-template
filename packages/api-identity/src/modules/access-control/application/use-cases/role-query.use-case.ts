@@ -1,5 +1,5 @@
 import type { AuthenticatedRequestUser } from '@repo/api-core';
-import type { DatabaseExecutor } from '@repo/api-database';
+import type { TransactionExecutor } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { AppError, ERROR_CODES } from '@repo/api-core';
@@ -73,7 +73,7 @@ export class RoleQueryUseCase {
   getRoleByName(
     name: string,
     organizationId: string | null = null,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ) {
     return this.accessControlRepository.findRoleByName(
       name,

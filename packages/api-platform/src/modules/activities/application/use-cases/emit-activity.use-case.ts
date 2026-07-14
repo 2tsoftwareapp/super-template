@@ -1,5 +1,5 @@
 import type { JsonObject } from '@repo/api-core';
-import type { DatabaseExecutor } from '@repo/api-database';
+import type { TransactionExecutor } from '@repo/api-core';
 
 import { Inject, Injectable } from '@nestjs/common';
 
@@ -21,7 +21,7 @@ export class EmitActivityUseCase {
     @Inject(ACTIVITIES_REPOSITORY) private readonly activitiesRepository: ActivitiesRepositoryPort,
   ) {}
 
-  async execute(input: EmitActivityInput, executor?: DatabaseExecutor) {
+  async execute(input: EmitActivityInput, executor?: TransactionExecutor) {
     return this.activitiesRepository.create(
       {
         organizationId: input.organizationId,

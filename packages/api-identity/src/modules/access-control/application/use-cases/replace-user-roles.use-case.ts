@@ -1,4 +1,4 @@
-import type { DatabaseExecutor } from '@repo/api-database';
+import type { TransactionExecutor } from '@repo/api-core';
 
 import { Inject, Injectable } from '@nestjs/common';
 
@@ -20,7 +20,7 @@ export class ReplaceUserRolesUseCase {
     userId: string,
     roleIds: string[],
     organizationId?: string | null,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<void> {
     await this.accessControlRepository.replaceUserRoles(
       userId,

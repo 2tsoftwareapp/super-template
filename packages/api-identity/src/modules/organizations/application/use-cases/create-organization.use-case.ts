@@ -1,9 +1,9 @@
 import type { AuthenticatedRequestUser } from '@repo/api-core';
-import type { DatabaseClient } from '@repo/api-database';
+import type { TransactionPort } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { AppError, ERROR_CODES } from '@repo/api-core';
-import { DATABASE, runInTransaction } from '@repo/api-database';
+import { TRANSACTION_PORT } from '@repo/api-core';
 
 import type { CreateOrganizationCommand } from '../organizations.types';
 
@@ -21,7 +21,7 @@ const slugify = (value: string) =>
 @Injectable()
 export class CreateOrganizationUseCase {
   constructor(
-    @Inject(DATABASE) private readonly database: DatabaseClient,
+    @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
     @Inject(ORGANIZATIONS_REPOSITORY) private readonly organizationsRepository: OrganizationsRepositoryPort,
     private readonly accessControlService: AccessControlService,
   ) {}
@@ -31,8 +31,7 @@ export class CreateOrganizationUseCase {
     input: CreateOrganizationCommand,
   ) {
     const baseSlug = slugify(input.name);
-    const organization = await runInTransaction(
-      this.database,
+    const organization = await this.transactionPort.run(
       async (transaction) => {
         let slug = baseSlug;
         let attempt = 0;
@@ -84,15 +83,13 @@ export class CreateOrganizationUseCase {
     );
 
     return {
-      data: {
-        id: organization.id,
-        name: organization.name,
-        slug: organization.slug,
-        role: 'OWNER' as const,
-        createdAt: organization.createdAt.toISOString(),
-        updatedAt: organization.updatedAt.toISOString(),
-        current: false,
-      },
+      id: organization.id,
+      name: organization.name,
+      slug: organization.slug,
+      role: 'OWNER' as const,
+      createdAt: organization.createdAt.toISOString(),
+      updatedAt: organization.updatedAt.toISOString(),
+      current: false,
     };
   }
 }

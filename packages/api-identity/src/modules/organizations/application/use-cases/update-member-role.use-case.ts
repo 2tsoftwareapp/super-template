@@ -97,11 +97,9 @@ export class UpdateMemberRoleUseCase {
     });
 
     return {
-      data: {
-        userId: updated.userId,
-        role: updated.role,
-        updatedAt: updated.updatedAt.toISOString(),
-      },
+      userId: updated.userId,
+      role: updated.role,
+      updatedAt: updated.updatedAt.toISOString(),
     };
   }
 }

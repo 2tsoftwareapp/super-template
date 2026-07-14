@@ -1,4 +1,4 @@
-import type { DatabaseExecutor } from '@repo/api-database';
+import type { TransactionExecutor } from '@repo/api-core';
 
 export interface IdempotentInsertResult<T> {
   value: T;
@@ -22,26 +22,26 @@ export interface ExportJobRecord {
 export interface ExportJobsRepositoryPort {
   create(
     values: Record<string, unknown>,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<ExportJobRecord | null>;
 
   createIdempotent(
     values: Record<string, unknown> & { createdById: string; idempotencyKey: string },
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<IdempotentInsertResult<ExportJobRecord> | null>;
 
-  findById(jobId: string, executor?: DatabaseExecutor): Promise<ExportJobRecord | null>;
+  findById(jobId: string, executor?: TransactionExecutor): Promise<ExportJobRecord | null>;
 
   findByIdempotencyKey(
     createdById: string,
     idempotencyKey: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<ExportJobRecord | null>;
 
   update(
     jobId: string,
     values: Partial<Record<string, unknown>>,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<ExportJobRecord | null>;
 }
 

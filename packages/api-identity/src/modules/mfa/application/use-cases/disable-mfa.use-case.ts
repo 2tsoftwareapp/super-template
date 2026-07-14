@@ -1,5 +1,5 @@
 import type { RequestContext } from '@repo/api-core';
-import type { DatabaseClient } from '@repo/api-database';
+import type { TransactionPort } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import {
@@ -8,7 +8,7 @@ import {
   type AuditWriter,
   ERROR_CODES,
 } from '@repo/api-core';
-import { DATABASE, runInTransaction } from '@repo/api-database';
+import { TRANSACTION_PORT } from '@repo/api-core';
 
 import type { MfaDisableCommand } from '../mfa.types';
 
@@ -18,7 +18,7 @@ import { MfaCodeVerifierService } from '../services/mfa-code-verifier.service';
 @Injectable()
 export class DisableMfaUseCase {
   constructor(
-    @Inject(DATABASE) private readonly database: DatabaseClient,
+    @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
     @Inject(MFA_REPOSITORY) private readonly mfaRepository: MfaRepositoryPort,
     private readonly mfaCodeVerifierService: MfaCodeVerifierService,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
@@ -53,7 +53,7 @@ export class DisableMfaUseCase {
       );
     }
 
-    await runInTransaction(this.database, async (transaction) => {
+    await this.transactionPort.run( async (transaction) => {
       await this.mfaRepository.deleteSecret(input.userId, transaction);
       await this.mfaRepository.replaceRecoveryCodes(
         input.userId,

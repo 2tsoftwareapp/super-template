@@ -62,14 +62,12 @@ export class UpdateOrganizationUseCase {
     });
 
     return {
-      data: {
-        id: organization.id,
-        name: organization.name,
-        slug: organization.slug,
-        role: membership.role,
-        createdAt: organization.createdAt.toISOString(),
-        updatedAt: organization.updatedAt.toISOString(),
-      },
+      id: organization.id,
+      name: organization.name,
+      slug: organization.slug,
+      role: membership.role,
+      createdAt: organization.createdAt.toISOString(),
+      updatedAt: organization.updatedAt.toISOString(),
     };
   }
 }

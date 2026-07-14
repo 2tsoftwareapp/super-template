@@ -1,4 +1,4 @@
-import type { DatabaseExecutor } from '@repo/api-database';
+import type { TransactionExecutor } from '@repo/api-core';
 
 import { Injectable } from '@nestjs/common';
 
@@ -19,7 +19,7 @@ export class ActivitiesService implements ActivityEmitter {
 
   async emit(
     input: ActivityEmitInput,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<void> {
     await this.emitActivityUseCase.execute(input, executor);
   }

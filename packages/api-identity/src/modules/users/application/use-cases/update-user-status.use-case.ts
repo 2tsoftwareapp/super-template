@@ -2,7 +2,7 @@ import type {
   AuthenticatedRequestUser,
   RequestContext,
 } from '@repo/api-core';
-import type { DatabaseClient } from '@repo/api-database';
+import type { TransactionPort } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import {
@@ -11,7 +11,7 @@ import {
   type AuditWriter,
   ERROR_CODES,
 } from '@repo/api-core';
-import { DATABASE, runInTransaction } from '@repo/api-database';
+import { TRANSACTION_PORT } from '@repo/api-core';
 
 import type { UserStatus, UserView } from '../users.types';
 
@@ -28,7 +28,7 @@ import { GetUserUseCase } from './get-user.use-case';
 @Injectable()
 export class UpdateUserStatusUseCase {
   constructor(
-    @Inject(DATABASE) private readonly database: DatabaseClient,
+    @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
     @Inject(USERS_REPOSITORY)
     private readonly usersRepository: UsersRepositoryPort,
     private readonly accessControlService: AccessControlService,
@@ -82,7 +82,7 @@ export class UpdateUserStatusUseCase {
       targetProfile.roles,
     );
 
-    await runInTransaction(this.database, async (transaction) => {
+    await this.transactionPort.run( async (transaction) => {
       await this.usersRepository.update(
         userId,
         {

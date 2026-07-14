@@ -1,5 +1,5 @@
 import type { RequestContext } from '@repo/api-core';
-import type { DatabaseClient } from '@repo/api-database';
+import type { TransactionPort } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import {
@@ -9,7 +9,7 @@ import {
   EnvironmentService,
   ERROR_CODES,
 } from '@repo/api-core';
-import { DATABASE, runInTransaction } from '@repo/api-database';
+import { TRANSACTION_PORT } from '@repo/api-core';
 
 import type { MfaConfirmCommand } from '../mfa.types';
 
@@ -22,7 +22,7 @@ import { MFA_REPOSITORY, type MfaRepositoryPort } from '../ports/mfa.repository.
 @Injectable()
 export class ConfirmMfaUseCase {
   constructor(
-    @Inject(DATABASE) private readonly database: DatabaseClient,
+    @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
     @Inject(MFA_REPOSITORY) private readonly mfaRepository: MfaRepositoryPort,
     private readonly environmentService: EnvironmentService,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
@@ -71,7 +71,7 @@ export class ConfirmMfaUseCase {
 
     const recoveryCodes = generateRecoveryCodes();
 
-    await runInTransaction(this.database, async (transaction) => {
+    await this.transactionPort.run( async (transaction) => {
       await this.mfaRepository.confirmSecret(input.userId, transaction);
       await this.mfaRepository.replaceRecoveryCodes(
         input.userId,

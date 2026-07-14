@@ -1,4 +1,4 @@
-import type { DatabaseExecutor } from '@repo/api-database';
+import type { TransactionExecutor } from '@repo/api-core';
 
 export interface SsoLoginStateRecord {
   id: string;
@@ -42,17 +42,17 @@ export interface SsoRepositoryPort {
       redirectUri: string;
       expiresAt: Date;
     },
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<SsoLoginStateRecord | null>;
 
   findValidLoginStateByStateHash(
     stateHash: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<SsoLoginStateRecord | null>;
 
   consumeLoginState(
     id: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<void>;
 
   createSessionExchange(
@@ -63,23 +63,23 @@ export interface SsoRepositoryPort {
       organizationId: string | null;
       expiresAt: Date;
     },
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<SsoSessionExchangeRecord | null>;
 
   findValidSessionExchangeByCodeHash(
     codeHash: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<SsoSessionExchangeRecord | null>;
 
   consumeSessionExchange(
     id: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<void>;
 
   findIdentity(
     provider: string,
     providerSubject: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<ExternalIdentityRecord | null>;
 
   createIdentity(
@@ -89,7 +89,7 @@ export interface SsoRepositoryPort {
       providerSubject: string;
       email: string;
     },
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<ExternalIdentityRecord | null>;
 }
 

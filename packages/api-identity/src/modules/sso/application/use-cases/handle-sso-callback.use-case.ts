@@ -1,5 +1,5 @@
 import type { RequestContext } from '@repo/api-core';
-import type { DatabaseClient } from '@repo/api-database';
+import type { TransactionPort } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import {
@@ -11,7 +11,7 @@ import {
   hashOpaqueToken,
   normalizeEmail,
 } from '@repo/api-core';
-import { DATABASE, runInTransaction } from '@repo/api-database';
+import { TRANSACTION_PORT } from '@repo/api-core';
 
 import type { HandleSsoCallbackCommand } from '../sso.types';
 
@@ -32,7 +32,7 @@ export class HandleSsoCallbackUseCase {
   constructor(
     @Inject(SSO_PROVIDER_REGISTRY)
     private readonly providers: SsoProviderRegistry,
-    @Inject(DATABASE) private readonly database: DatabaseClient,
+    @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
     @Inject(SSO_REPOSITORY) private readonly ssoRepository: SsoRepositoryPort,
     @Inject(USERS_REPOSITORY) private readonly usersRepository: UsersRepositoryPort,
     private readonly accessControlService: AccessControlService,
@@ -108,7 +108,7 @@ export class HandleSsoCallbackUseCase {
 
     const email = normalizeEmail(identity.email);
 
-    const user = await runInTransaction(this.database, async (transaction) => {
+    const user = await this.transactionPort.run( async (transaction) => {
       const existingIdentity = await this.ssoRepository.findIdentity(
         input.provider,
         identity.subject,

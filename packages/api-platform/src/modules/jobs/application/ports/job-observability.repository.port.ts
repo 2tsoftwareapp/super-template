@@ -1,5 +1,5 @@
 import type { JsonObject } from '@repo/api-core';
-import type { DatabaseExecutor } from '@repo/api-database';
+import type { TransactionExecutor } from '@repo/api-core';
 
 export interface JobObservabilityRepositoryPort {
   startAttempt(
@@ -8,13 +8,13 @@ export interface JobObservabilityRepositoryPort {
       organizationId: string | null;
       attemptNumber: number;
     },
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<{ id: string; jobId: string; organizationId: string | null; attemptNumber: number; status: 'PROCESSING' | 'COMPLETED' | 'FAILED'; startedAt: Date; finishedAt: Date | null; durationMs: number | null; errorMessage: string | null }>;
 
   finishAttempt(
     attemptId: string,
     values: { status: 'PROCESSING' | 'COMPLETED' | 'FAILED'; errorMessage?: string | null },
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<{ id: string; jobId: string; organizationId: string | null; attemptNumber: number; status: 'PROCESSING' | 'COMPLETED' | 'FAILED'; startedAt: Date; finishedAt: Date | null; durationMs: number | null; errorMessage: string | null } | null>;
 
   recordEvent(
@@ -26,12 +26,12 @@ export interface JobObservabilityRepositoryPort {
       message?: string | null;
       metadata?: JsonObject | null;
     },
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<{ id: string; jobId: string; organizationId: string | null; attemptId: string | null; type: string; message: string | null; metadata: JsonObject | null; createdAt: Date }>;
 
   listEvents(
     params: { jobId: string; page: number; limit: number },
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<{ rows: { id: string; jobId: string; organizationId: string | null; attemptId: string | null; type: string; message: string | null; metadata: JsonObject | null; createdAt: Date }[]; total: number }>;
 
   addDependency(
@@ -40,36 +40,36 @@ export interface JobObservabilityRepositoryPort {
       organizationId: string | null;
       dependsOnJobId: string;
     },
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<{ id: string; jobId: string; organizationId: string | null; dependsOnJobId: string; createdAt: Date }>;
 
   listDependencies(
     jobId: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<{ id: string; dependsOnJobId: string; dependsOnJobStatus: string | null; createdAt: Date }[]>;
 
-  wouldCreateCycle(jobId: string, depJobId: string, executor?: DatabaseExecutor): Promise<boolean>;
+  wouldCreateCycle(jobId: string, depJobId: string, executor?: TransactionExecutor): Promise<boolean>;
 
-  hasIncompleteDependencies(jobId: string, executor?: DatabaseExecutor): Promise<boolean>;
+  hasIncompleteDependencies(jobId: string, executor?: TransactionExecutor): Promise<boolean>;
 
   getStatusCounts(
     filters: { from?: string; to?: string },
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<{ status: string; total: string | number }[]>;
 
   getTypeCounts(
     filters: { from?: string; to?: string },
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<{ type: string; total: string | number }[]>;
 
   getRetryCounts(
     filters: { from?: string; to?: string },
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<{ retried: number; terminal: number }>;
 
   getAverageDurationMs(
     filters: { from?: string; to?: string },
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<number | null>;
 }
 

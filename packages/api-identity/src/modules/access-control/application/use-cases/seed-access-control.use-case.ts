@@ -1,4 +1,4 @@
-import type { DatabaseExecutor } from '@repo/api-database';
+import type { TransactionExecutor } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import {
@@ -26,7 +26,7 @@ export class SeedAccessControlUseCase {
     private readonly accessProfileUseCase: AccessProfileUseCase,
   ) {}
 
-  async execute(executor?: DatabaseExecutor): Promise<void> {
+  async execute(executor?: TransactionExecutor): Promise<void> {
     const roles = await this.accessControlRepository.ensureRoles(
       ROLE_SEED_ENTRIES,
       executor,

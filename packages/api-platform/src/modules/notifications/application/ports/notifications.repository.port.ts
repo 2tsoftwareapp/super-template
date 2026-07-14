@@ -1,5 +1,5 @@
 import type { JsonObject } from '@repo/api-core';
-import type { DatabaseExecutor } from '@repo/api-database';
+import type { TransactionExecutor } from '@repo/api-core';
 
 import type { ListNotificationsQuery } from '../notifications.types';
 
@@ -33,30 +33,30 @@ export interface NotificationsListResult {
 export interface NotificationsRepositoryPort {
   create(
     values: CreateNotificationInput,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<NotificationRecord | null>;
   createMany(
     values: CreateNotificationInput[],
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<NotificationRecord[]>;
   findById(
     notificationId: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<NotificationRecord | null>;
   listForUser(
     userId: string,
     params: ListNotificationsQuery,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<NotificationsListResult>;
-  getUnreadCount(userId: string, executor?: DatabaseExecutor): Promise<number>;
+  getUnreadCount(userId: string, executor?: TransactionExecutor): Promise<number>;
   markRead(
     notificationId: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<NotificationRecord | null>;
-  markAllRead(userId: string, executor?: DatabaseExecutor): Promise<void>;
+  markAllRead(userId: string, executor?: TransactionExecutor): Promise<void>;
   delete(
     notificationId: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<NotificationRecord | null>;
 }
 

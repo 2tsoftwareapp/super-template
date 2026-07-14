@@ -1,5 +1,6 @@
 import type { JsonObject } from '@repo/api-core';
-import type { DatabaseClient, DatabaseExecutor } from '@repo/api-database';
+import type { TransactionExecutor } from '@repo/api-core';
+import type { DatabaseClient } from '@repo/api-database';
 
 export interface JobRecord {
   id: string;
@@ -48,7 +49,7 @@ export interface JobsRepositoryPort {
       createdById?: string | null;
       idempotencyKey?: string | null;
     },
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<JobRecord | null>;
   createIdempotent(
     values: {
@@ -68,38 +69,38 @@ export interface JobsRepositoryPort {
       createdById: string;
       idempotencyKey: string;
     },
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<JobRecord | null>;
   findById(
     jobId: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<JobRecord | null>;
   list(
     params: ListJobsParams,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<{ rows: JobRecord[]; total: number }>;
   markCancelled(
     jobId: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<JobRecord | null>;
   claimDueJobs(
     limit: number,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<JobRecord[]>;
   markCompleted(
     jobId: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<JobRecord | null>;
   markFailed(
     jobId: string,
     message: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<JobRecord | null>;
   requeueForRetry(
     jobId: string,
     scheduledAt: Date,
     message: string,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<JobRecord | null>;
 }
 

@@ -5,7 +5,7 @@ import type {
   SendUserNotificationInput,
   UserNotificationSender,
 } from '@repo/api-core';
-import type { DatabaseExecutor } from '@repo/api-database';
+import type { TransactionExecutor } from '@repo/api-core';
 
 import { Injectable } from '@nestjs/common';
 
@@ -38,7 +38,7 @@ export class NotificationsService implements UserNotificationSender {
     actor: AuthenticatedRequestUser | null,
     input: SendUserNotificationInput,
     requestContext?: RequestContext,
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
     options?: { deferDispatch?: boolean },
   ): Promise<NotificationMessage> {
     return this.sendNotificationUseCase.execute(

@@ -1,5 +1,5 @@
 import type { JsonObject } from '@repo/api-core';
-import type { DatabaseExecutor } from '@repo/api-database';
+import type { TransactionExecutor } from '@repo/api-core';
 
 export interface MailDeliveriesRepositoryPort {
   create(
@@ -12,7 +12,7 @@ export interface MailDeliveriesRepositoryPort {
       metadata?: JsonObject | null;
       sentAt?: Date | null;
     },
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<{
     id: string;
     templateKey: string;
@@ -32,7 +32,7 @@ export interface MailDeliveriesRepositoryPort {
       templateKey?: string;
       status?: 'SENT' | 'FAILED';
     },
-    executor?: DatabaseExecutor,
+    executor?: TransactionExecutor,
   ): Promise<{
     rows: {
       id: string;
