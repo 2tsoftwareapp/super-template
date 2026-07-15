@@ -28,10 +28,10 @@ export function UserDetailRoles({ roles }: UserDetailRolesProps) {
       ) : (
         <div className="space-y-1.5">
           {roles.options.map((role) => {
-            const checked = roles.selected === role.name;
+            const checked = roles.selectedRoleName === role.name;
             return (
               <button
-                key={role.name}
+                key={role.id}
                 type="button"
                 disabled={roles.disabled}
                 onClick={() => roles.onSelect(role.name)}

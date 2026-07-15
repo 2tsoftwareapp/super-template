@@ -40,6 +40,7 @@ export function UsersListView({
           open={createDrawer.open}
           onClose={createDrawer.onClose}
           actorRoles={createDrawer.actorRoles}
+          actorOrganizationId={createDrawer.actorOrganizationId}
         />
       </Show>
 

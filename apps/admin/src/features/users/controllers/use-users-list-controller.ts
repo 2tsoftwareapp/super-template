@@ -77,6 +77,7 @@ export interface UsersListViewModel {
   createDrawer: {
     open: boolean;
     actorRoles: string[];
+    actorOrganizationId: string | null | undefined;
     onClose: () => void;
   };
   confirmBlock: {
@@ -145,6 +146,7 @@ export function useUsersListController(): UsersListViewModel {
   );
 
   const actorRoles = session.data?.data.user.roles ?? [];
+  const actorOrganizationId = session.data?.data.organizationId;
   const { canCreate, canUpdate } = selectUserManagementPermissions(
     session.data?.data.permissions,
   );
@@ -292,6 +294,7 @@ export function useUsersListController(): UsersListViewModel {
     createDrawer: {
       open: showCreate,
       actorRoles,
+      actorOrganizationId,
       onClose: () => setShowCreate(false),
     },
     confirmBlock: {

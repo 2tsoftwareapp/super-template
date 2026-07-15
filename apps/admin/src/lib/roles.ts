@@ -44,8 +44,14 @@ export function getAssignableRoles(
   actorRoles: string[],
   roles: RoleDto[],
 ): RoleDto[] {
+  const seen = new Set<string>();
   return roles
-    .filter((role) => canAssignRole(actorRoles, role.name))
+    .filter((role) => {
+      if (!canAssignRole(actorRoles, role.name)) return false;
+      if (seen.has(role.name)) return false;
+      seen.add(role.name);
+      return true;
+    })
     .sort((a, b) => a.name.localeCompare(b.name));
 }
 

@@ -21,6 +21,7 @@ import {
   assertCanAssignRoleTargets,
   assertRoleScopeCanBeAssigned,
 } from '../../../access-control/domain/role-assignment.policy';
+import { ORGANIZATIONS_REPOSITORY, type OrganizationsRepositoryPort } from '../../../organizations/application/ports/organizations.repository.port';
 import { assertUserBelongsToOrganization } from '../../domain/user-org-scope.policy';
 import { resolveAssignableRole } from '../assignable-role.resolver';
 import {
@@ -37,6 +38,8 @@ export class ReplaceUserRolesUseCase {
     private readonly usersRepository: UsersRepositoryPort,
     private readonly accessControlService: AccessControlService,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
+    @Inject(ORGANIZATIONS_REPOSITORY)
+    private readonly organizationsRepository: OrganizationsRepositoryPort,
     private readonly getUserUseCase: GetUserUseCase,
   ) {}
 
@@ -107,6 +110,25 @@ export class ReplaceUserRolesUseCase {
 
     await this.transactionPort.run( async (transaction) => {
       const roleScope = resolvedRole.target.organizationId ?? resolvedOrganizationId;
+
+      if (roleScope) {
+        const membership = await this.organizationsRepository.findMembership(
+          roleScope,
+          userId,
+          transaction,
+        );
+
+        if (!membership) {
+          await this.organizationsRepository.addMember(
+            {
+              organizationId: roleScope,
+              userId,
+              role: 'MEMBER',
+            },
+            transaction,
+          );
+        }
+      }
 
       if (role === ROLE_NAMES.ADMIN && roleScope) {
         await this.accessControlService.ensureOrganizationAdminRole(

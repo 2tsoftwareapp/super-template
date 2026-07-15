@@ -1,6 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+
+import type { AdminUserDto } from "@/lib/api-types";
 
 export interface RoleOption {
   id: string;
@@ -16,7 +18,8 @@ export interface OrganizationOption {
 }
 
 export function useUserRoles(
-  primaryRole: string | undefined,
+  userId: string | undefined,
+  currentUser: AdminUserDto | null,
   replaceRoles: {
     isPending: boolean;
     isSuccess: boolean;
@@ -32,54 +35,78 @@ export function useUserRoles(
   organizationsLoading: boolean,
   initialOrganizationId?: string | null,
 ) {
-  const [selectedRole, setSelectedRole] = useState<string>("USER");
   const [selectedOrganizationId, setSelectedOrganizationId] =
     useState<string>("");
+  const [selectedRoleName, setSelectedRoleName] = useState<string>("USER");
 
   useEffect(() => {
-    if (primaryRole) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setSelectedRole(primaryRole);
-    }
-  }, [primaryRole]);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSelectedOrganizationId(initialOrganizationId ?? "");
+    const current = currentUser?.roleAssignments?.find(
+      (a) => a.organizationId === (initialOrganizationId ?? null),
+    );
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSelectedRoleName(current?.roleName ?? "USER");
+  }, [userId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (initialOrganizationId) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setSelectedOrganizationId(initialOrganizationId);
-    }
-  }, [initialOrganizationId]);
+    const current = currentUser?.roleAssignments?.find(
+      (a) => a.organizationId === selectedOrganizationId,
+    );
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSelectedRoleName(current?.roleName ?? "USER");
+  }, [selectedOrganizationId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const originalAssignment = useMemo(
+    () => currentUser?.roleAssignments?.find(
+      (a) => a.organizationId === selectedOrganizationId,
+    ),
+    [currentUser, selectedOrganizationId],
+  );
+
+  const originalRoleName = originalAssignment?.roleName ?? "USER";
 
   const isOrgScopedRole = (role: string) =>
     role === "ADMIN" || (role !== "USER" && role !== "SUPER_ADMIN");
 
-  const isCurrentRoleOrgScoped = isOrgScopedRole(selectedRole);
-  const isPrimaryRoleOrgScoped = primaryRole !== undefined && isOrgScopedRole(primaryRole);
+  const isCurrentRoleOrgScoped = isOrgScopedRole(selectedRoleName);
   const needsOrganization = isCurrentRoleOrgScoped;
 
   const effectiveOrganizationId =
     isActorSuperAdmin ? selectedOrganizationId : (actorOrganizationId ?? "");
 
-  const orgRequired = isCurrentRoleOrgScoped || isPrimaryRoleOrgScoped;
+  const orgRequired = isCurrentRoleOrgScoped;
+
+  const filteredOptions = useMemo(() => {
+    if (!isActorSuperAdmin) {
+      return options;
+    }
+    return selectedOrganizationId
+      ? options.filter(
+          (o) => o.organizationId === null || (o.organizationId as unknown as string) === selectedOrganizationId,
+        )
+      : options.filter((o) => o.organizationId === null);
+  }, [options, selectedOrganizationId, isActorSuperAdmin]);
 
   const canSave =
     !disabled &&
-    selectedRole !== primaryRole &&
+    selectedRoleName !== originalRoleName &&
     (!orgRequired || Boolean(effectiveOrganizationId));
 
   const handleSave = useCallback(() => {
-    const args: { role: string; organizationId?: string } = { role: selectedRole };
+    const args: { role: string; organizationId?: string } = { role: selectedRoleName };
     if (effectiveOrganizationId) {
       args.organizationId = effectiveOrganizationId;
     }
     void replaceRoles.mutateAsync(args);
-  }, [selectedRole, effectiveOrganizationId, replaceRoles]);
+  }, [selectedRoleName, effectiveOrganizationId, replaceRoles]);
 
   return {
     isLoading: rolesLoading,
-    options,
-    selected: selectedRole,
-    onSelect: setSelectedRole,
+    options: filteredOptions,
+    selectedRoleName,
+    selectedRoleId: originalAssignment?.roleId ?? "",
+    onSelect: setSelectedRoleName,
     disabled,
     canSave,
     onSave: handleSave,
