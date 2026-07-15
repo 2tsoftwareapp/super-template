@@ -74,6 +74,10 @@ export class RoleQueryUseCase {
     return foundRoles;
   }
 
+  getRoleById(roleId: string, executor?: TransactionExecutor) {
+    return this.accessControlRepository.findRoleById(roleId, executor);
+  }
+
   getRoleByName(
     name: string,
     organizationId: string | null = null,

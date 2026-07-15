@@ -24,7 +24,7 @@ export function useUserRoles(
     isPending: boolean;
     isSuccess: boolean;
     isError: boolean;
-    mutateAsync: (args: { role: string; organizationId?: string }) => Promise<unknown>;
+    mutateAsync: (args: { roleId: string; organizationId?: string }) => Promise<unknown>;
   },
   isActorSuperAdmin: boolean,
   actorOrganizationId: string | null | undefined,
@@ -93,19 +93,24 @@ export function useUserRoles(
     selectedRoleName !== originalRoleName &&
     (!orgRequired || Boolean(effectiveOrganizationId));
 
+  const selectedRoleId = originalAssignment?.roleId ?? "";
+
   const handleSave = useCallback(() => {
-    const args: { role: string; organizationId?: string } = { role: selectedRoleName };
+    const roleOption = options.find((o) => o.name === selectedRoleName);
+    const id = roleOption?.id;
+    if (!id) return;
+    const args: { roleId: string; organizationId?: string } = { roleId: id };
     if (effectiveOrganizationId) {
       args.organizationId = effectiveOrganizationId;
     }
     void replaceRoles.mutateAsync(args);
-  }, [selectedRoleName, effectiveOrganizationId, replaceRoles]);
+  }, [selectedRoleName, effectiveOrganizationId, options, replaceRoles]);
 
   return {
     isLoading: rolesLoading,
     options: filteredOptions,
     selectedRoleName,
-    selectedRoleId: originalAssignment?.roleId ?? "",
+    selectedRoleId,
     onSelect: setSelectedRoleName,
     disabled,
     canSave,

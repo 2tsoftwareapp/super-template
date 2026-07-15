@@ -32,7 +32,7 @@ import { AUTH_SESSION_REPOSITORY, type AuthSessionRepositoryPort } from '../../.
 import { OUTBOX_REPOSITORY, type OutboxRepositoryPort } from '../../../auth/application/ports/outbox.repository.port';
 import { OrganizationsService } from '../../../organizations/application/organizations.service';
 import { ORGANIZATIONS_REPOSITORY, type OrganizationsRepositoryPort } from '../../../organizations/application/ports/organizations.repository.port';
-import { resolveAssignableRole } from '../assignable-role.resolver';
+import { resolveRoleById } from '../assignable-role.resolver';
 import {
   USERS_REPOSITORY,
   type UsersRepositoryPort,
@@ -63,31 +63,10 @@ export class CreateAdminUserUseCase {
     await this.usersRepository.assertEmailAvailable(email);
 
     const actorIsSuperAdmin = actor.roles.includes(ROLE_NAMES.SUPER_ADMIN);
-    // Resolve the requested role as-is (not silently downgraded) so that a
-    // non-SUPER_ADMIN requesting ADMIN is rejected explicitly with 403 by
-    // assertRoleScopeCanBeAssigned below, instead of getting a confusing 201
-    // for a USER account they never asked for.
-    const roleName = input.role ?? ROLE_NAMES.USER;
-
-    if (roleName === ROLE_NAMES.ADMIN && !actorIsSuperAdmin) {
-      throw new AppError(
-        ERROR_CODES.AUTH_FORBIDDEN,
-        'Only SUPER_ADMIN can assign the ADMIN role',
-        HttpStatus.FORBIDDEN,
-      );
-    }
 
     const organizationId = actorIsSuperAdmin
       ? (input.organizationId ?? null)
       : (actor.organizationId ?? null);
-
-    if (roleName === ROLE_NAMES.ADMIN && !organizationId) {
-      throw new AppError(
-        ERROR_CODES.VALIDATION_FAILED,
-        'organizationId is required when creating an ADMIN user',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
 
     const status = input.status ?? 'ACTIVE';
 
@@ -111,22 +90,36 @@ export class CreateAdminUserUseCase {
           transaction,
         );
 
-        const resolvedRole = await resolveAssignableRole(
-          this.accessControlService,
-          roleName,
-          organizationId,
-          transaction,
-        );
+        const roleId = input.roleId
+          ?? (await this.accessControlService.getRoleByName(ROLE_NAMES.USER, null, transaction))?.id;
+        if (!roleId) {
+          throw new AppError(ERROR_CODES.INTERNAL_ERROR, 'USER role is missing', 500);
+        }
+        const resolvedRole = await resolveRoleById(this.accessControlService, roleId, transaction);
 
-        assertRoleScopeCanBeAssigned(resolvedRole.target, actor);
-        assertCanAssignRoleTargets(actor, [resolvedRole.target]);
+        assertRoleScopeCanBeAssigned(
+          { name: resolvedRole.name, organizationId: resolvedRole.organizationId, isSystem: resolvedRole.isSystem },
+          actor,
+        );
+        assertCanAssignRoleTargets(
+          actor,
+          [{ name: resolvedRole.name, organizationId: resolvedRole.organizationId, isSystem: resolvedRole.isSystem }],
+        );
         this.accessControlService.assertCanAssignUserRoles(
           actor,
           [],
-          [resolvedRole.target.name],
+          [resolvedRole.name],
         );
 
-        if (roleName === ROLE_NAMES.ADMIN && organizationId) {
+        if (resolvedRole.name === ROLE_NAMES.ADMIN && !actorIsSuperAdmin) {
+          throw new AppError(
+            ERROR_CODES.AUTH_FORBIDDEN,
+            'Only SUPER_ADMIN can assign the ADMIN role',
+            HttpStatus.FORBIDDEN,
+          );
+        }
+
+        if (resolvedRole.name === ROLE_NAMES.ADMIN && organizationId) {
           await this.organizationsRepository.addMember(
             {
               organizationId,
@@ -141,7 +134,7 @@ export class CreateAdminUserUseCase {
             transaction,
           );
         } else {
-          const roleScope = resolvedRole.target.organizationId;
+          const roleScope = resolvedRole.organizationId;
 
           await this.accessControlService.replaceUserRoles(
             user.id,
@@ -150,7 +143,7 @@ export class CreateAdminUserUseCase {
             transaction,
           );
 
-          if (actorIsSuperAdmin && !organizationId) {
+          if (actorIsSuperAdmin && roleScope === null) {
             await this.organizationsService.ensurePersonalOrganization(
               user.id,
               user.displayName,
@@ -199,7 +192,8 @@ export class CreateAdminUserUseCase {
             metadata: {
               email,
               status: user.status,
-              role: roleName,
+              roleId: resolvedRole.id,
+              roleName: resolvedRole.name,
               organizationId,
             },
             requestContext,

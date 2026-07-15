@@ -93,7 +93,7 @@ export class AdminUsersController {
         displayName: input.displayName,
         ...(input.avatarUrl !== undefined ? { avatarUrl: input.avatarUrl } : {}),
         ...(input.status !== undefined ? { status: input.status } : {}),
-        ...(input.role !== undefined ? { role: input.role } : {}),
+        ...(input.roleId !== undefined ? { roleId: input.roleId } : {}),
         ...(input.organizationId !== undefined
           ? { organizationId: input.organizationId }
           : {}) },
@@ -178,7 +178,7 @@ export class AdminUsersController {
     return this.replaceUserRolesUseCase.execute(
       actor,
       userId,
-      input.role,
+      input.roleId,
       input.organizationId ?? null,
       request.requestContext,
     );

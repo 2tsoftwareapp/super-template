@@ -72,6 +72,10 @@ export class AccessControlService {
     assertCanAssignRoles(actor, targetRoleNames, desiredRoleNames);
   }
 
+  getRoleById(roleId: string, executor?: TransactionExecutor) {
+    return this.roleQueryUseCase.getRoleById(roleId, executor);
+  }
+
   getRoleByName(
     name: string,
     organizationId?: string | null,

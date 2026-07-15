@@ -78,3 +78,26 @@ export async function resolveAssignableRole(
     400,
   );
 }
+
+export async function resolveRoleById(
+  accessControlService: AccessControlService,
+  roleId: string,
+  executor?: TransactionExecutor,
+): Promise<{ id: string; name: string; organizationId: string | null; isSystem: boolean }> {
+  const role = await accessControlService.getRoleById(roleId, executor);
+
+  if (!role) {
+    throw new AppError(
+      ERROR_CODES.VALIDATION_FAILED,
+      `Role not found: ${roleId}`,
+      400,
+    );
+  }
+
+  return {
+    id: role.id,
+    name: role.name,
+    organizationId: role.organizationId,
+    isSystem: role.isSystem,
+  };
+}

@@ -112,10 +112,10 @@ export class CreateAdminUserDto {
   @IsEnum(['PENDING', 'ACTIVE', 'BLOCKED'])
   status?: 'PENDING' | 'ACTIVE' | 'BLOCKED';
 
-  @ApiPropertyOptional({ default: 'USER' })
+  @ApiPropertyOptional()
   @IsOptional()
-  @IsString()
-  role?: string;
+  @IsUUID()
+  roleId?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
@@ -124,7 +124,7 @@ export class CreateAdminUserDto {
 }
 
 export class UpdateAdminUserDto extends PartialType(
-  OmitType(CreateAdminUserDto, ['role', 'organizationId', 'password', 'status'] as const),
+  OmitType(CreateAdminUserDto, ['roleId', 'organizationId', 'password', 'status'] as const),
 ) {}
 
 export class UpdateUserStatusDto {
@@ -135,8 +135,8 @@ export class UpdateUserStatusDto {
 
 export class ReplaceUserRolesDto {
   @ApiProperty()
-  @IsString()
-  role: string;
+  @IsUUID()
+  roleId: string;
 
   @ApiPropertyOptional()
   @IsOptional()

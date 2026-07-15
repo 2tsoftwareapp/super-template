@@ -1431,9 +1431,9 @@ export interface components {
             avatarUrl?: Record<string, never>;
             /** @enum {string} */
             status?: "PENDING" | "ACTIVE" | "BLOCKED";
-            /** @default USER */
-            role: string;
             organizationId?: string;
+            /** Format: uuid */
+            roleId?: string;
         };
         UpdateAdminUserDto: {
             email?: string;
@@ -1445,8 +1445,9 @@ export interface components {
             status: "PENDING" | "ACTIVE" | "BLOCKED";
         };
         ReplaceUserRolesDto: {
-            role: string;
             organizationId?: string;
+            /** Format: uuid */
+            roleId: string;
         };
         UpdateProfileDto: {
             displayName?: string;

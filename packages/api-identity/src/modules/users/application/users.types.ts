@@ -48,7 +48,7 @@ export interface CreateAdminUserCommand {
   displayName: string;
   avatarUrl?: string | null;
   status?: UserStatus;
-  role?: AssignableRoleName;
+  roleId?: string;
   organizationId?: string;
 }
 

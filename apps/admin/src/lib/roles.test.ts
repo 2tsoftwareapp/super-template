@@ -7,6 +7,7 @@ import {
   canAssignRole,
   formatRoleName,
   getAssignableRoles,
+  isOrganizationRole,
   isPrivilegedRoleName,
 } from "./roles";
 
@@ -77,6 +78,68 @@ describe("getAssignableRoles", () => {
         (r) => r.id,
       ),
     ).toEqual(["2", "5"]);
+  });
+});
+
+describe("isOrganizationRole", () => {
+  it("returns true for organization-scoped roles", () => {
+    expect(isOrganizationRole("ADMIN")).toBe(true);
+    expect(isOrganizationRole("ACCOUNTANT")).toBe(true);
+    expect(isOrganizationRole("MANAGER")).toBe(true);
+  });
+
+  it("returns false for platform roles", () => {
+    expect(isOrganizationRole("USER")).toBe(false);
+    expect(isOrganizationRole("SUPER_ADMIN")).toBe(false);
+  });
+});
+
+describe("multi-org scenarios", () => {
+  const multiOrgRoles: RoleDto[] = [
+    { id: "r1", name: "USER", scope: "platform" } as RoleDto,
+    { id: "r2", name: "ADMIN", scope: "organization" } as RoleDto,
+    { id: "r3", name: "ACCOUNTANT", scope: "organization" } as RoleDto,
+    { id: "r4", name: "ACCOUNTANT", scope: "organization" } as RoleDto,
+    { id: "r5", name: "MANAGER", scope: "organization" } as RoleDto,
+    { id: "r6", name: "USER", scope: "platform" } as RoleDto,
+  ];
+
+  it("deduplicates by name for SUPER_ADMIN across all orgs", () => {
+    const result = getAssignableRoles(["SUPER_ADMIN"], multiOrgRoles);
+    expect(result.map((r) => r.name)).toEqual([
+      "ACCOUNTANT",
+      "ADMIN",
+      "MANAGER",
+      "USER",
+    ]);
+  });
+
+  it("returns USER and org-scoped custom roles for org ADMIN", () => {
+    const result = getAssignableRoles(["ADMIN"], multiOrgRoles);
+    expect(result.map((r) => r.name)).toEqual([
+      "ACCOUNTANT",
+      "MANAGER",
+      "USER",
+    ]);
+  });
+
+  it("returns org-specific custom roles plus USER for org ADMIN", () => {
+    const orgRoles: RoleDto[] = [
+      { id: "r1", name: "USER", scope: "platform" } as RoleDto,
+      { id: "r2", name: "ACCOUNTANT", scope: "organization" } as RoleDto,
+    ];
+    const result = getAssignableRoles(["ADMIN"], orgRoles);
+    expect(result.map((r) => r.name)).toEqual(["ACCOUNTANT", "USER"]);
+  });
+
+  it("prevents SUPER_ADMIN from being in assignable list", () => {
+    const allRoles: RoleDto[] = [
+      { id: "r1", name: "SUPER_ADMIN", scope: "platform" } as RoleDto,
+      { id: "r2", name: "USER", scope: "platform" } as RoleDto,
+    ];
+    const result = getAssignableRoles(["SUPER_ADMIN"], allRoles);
+    expect(result.map((r) => r.name)).not.toContain("SUPER_ADMIN");
+    expect(result.map((r) => r.name)).toEqual(["USER"]);
   });
 });
 

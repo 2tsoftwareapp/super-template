@@ -150,11 +150,12 @@ export function CreateUserDrawer({
           const orgId = isActorSuperAdmin
             ? values.organizationId
             : actorOrganizationId;
+          const selectedRole = allAssignable.find((r) => r.name === values.role);
           void createUser.mutateAsync({
             email: values.email,
             password: values.password,
             displayName: values.displayName,
-            role: values.role,
+            ...(selectedRole?.id ? { roleId: selectedRole.id } : {}),
             status: "PENDING",
             ...(isOrganizationRole(values.role) && orgId
               ? { organizationId: orgId }

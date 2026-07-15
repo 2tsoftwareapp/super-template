@@ -13,7 +13,7 @@ import {
 } from '@repo/api-core';
 import { TRANSACTION_PORT } from '@repo/api-core';
 
-import type { AssignableRoleName, UserView } from '../users.types';
+import type { UserView } from '../users.types';
 
 import { ROLE_NAMES } from '../../../access-control/access-control.constants';
 import { AccessControlService } from '../../../access-control/application/access-control.service';
@@ -23,7 +23,7 @@ import {
 } from '../../../access-control/domain/role-assignment.policy';
 import { ORGANIZATIONS_REPOSITORY, type OrganizationsRepositoryPort } from '../../../organizations/application/ports/organizations.repository.port';
 import { assertUserBelongsToOrganization } from '../../domain/user-org-scope.policy';
-import { resolveAssignableRole } from '../assignable-role.resolver';
+import { resolveRoleById } from '../assignable-role.resolver';
 import {
   USERS_REPOSITORY,
   type UsersRepositoryPort,
@@ -46,7 +46,7 @@ export class ReplaceUserRolesUseCase {
   async execute(
     actor: AuthenticatedRequestUser,
     userId: string,
-    role: AssignableRoleName,
+    roleId: string,
     organizationId: string | null,
     requestContext?: RequestContext,
   ): Promise<UserView> {
@@ -80,36 +80,33 @@ export class ReplaceUserRolesUseCase {
       ? (organizationId ?? null)
       : (actor.organizationId ?? null);
 
-    if (role === ROLE_NAMES.ADMIN && !resolvedOrganizationId) {
-      throw new AppError(
-        ERROR_CODES.VALIDATION_FAILED,
-        'organizationId is required when assigning ADMIN',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
     const [currentAccess, resolvedRole] = await Promise.all([
       this.accessControlService.getAccessProfile(
         userId,
         actorIsSuperAdmin ? null : actor.organizationId,
       ),
-      resolveAssignableRole(
+      resolveRoleById(
         this.accessControlService,
-        role,
-        resolvedOrganizationId,
+        roleId,
       ),
     ]);
+
+    const rolePolicyTarget = {
+      name: resolvedRole.name,
+      organizationId: resolvedRole.organizationId,
+      isSystem: resolvedRole.isSystem,
+    };
 
     this.accessControlService.assertCanAssignUserRoles(
       actor,
       currentAccess.roles,
-      [resolvedRole.target.name],
+      [resolvedRole.name],
     );
-    assertCanAssignRoleTargets(actor, [resolvedRole.target]);
-    assertRoleScopeCanBeAssigned(resolvedRole.target, actor);
+    assertCanAssignRoleTargets(actor, [rolePolicyTarget]);
+    assertRoleScopeCanBeAssigned(rolePolicyTarget, actor);
 
     await this.transactionPort.run( async (transaction) => {
-      const roleScope = resolvedRole.target.organizationId ?? resolvedOrganizationId;
+      const roleScope = resolvedRole.organizationId ?? resolvedOrganizationId;
 
       if (roleScope) {
         const membership = await this.organizationsRepository.findMembership(
@@ -130,7 +127,7 @@ export class ReplaceUserRolesUseCase {
         }
       }
 
-      if (role === ROLE_NAMES.ADMIN && roleScope) {
+      if (resolvedRole.name === ROLE_NAMES.ADMIN && roleScope) {
         await this.accessControlService.ensureOrganizationAdminRole(
           roleScope,
           userId,
@@ -159,7 +156,8 @@ export class ReplaceUserRolesUseCase {
           entityType: 'user',
           entityId: userId,
           metadata: {
-            role,
+            roleId,
+            roleName: resolvedRole.name,
             organizationId: resolvedOrganizationId,
           },
           requestContext,

@@ -100,8 +100,8 @@ export function useReplaceRolesMutation(
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ role, organizationId }: { role: string; organizationId?: string }) =>
-      usersApi.replaceRoles(userId, role, organizationId),
+    mutationFn: ({ roleId, organizationId }: { roleId: string; organizationId?: string }) =>
+      usersApi.replaceRoles(userId, roleId, organizationId),
     onSuccess: async (data) => {
       await queryClient.invalidateQueries({ queryKey: usersKeys.detail(userId) });
       await queryClient.invalidateQueries({ queryKey: usersKeys.all });
