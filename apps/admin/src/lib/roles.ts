@@ -90,6 +90,15 @@ export function filterRolesForOrganization<T extends RoleWithOrg>(
   });
 }
 
+export function findPlatformUserRoleId<T extends RoleWithOrg>(roles: T[]) {
+  return (
+    roles.find((role) => role.name === "USER" && role.organizationId == null)
+      ?.id ??
+    roles[0]?.id ??
+    ""
+  );
+}
+
 export function buildRoleLookup(roles: RoleDto[]) {
   return new Map(roles.map((role) => [role.id, role] as const));
 }

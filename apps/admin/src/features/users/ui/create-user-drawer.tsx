@@ -14,7 +14,7 @@ import {
 } from "@repo/web-ui/select";
 import { Spinner } from "@repo/web-ui/spinner";
 import { Building2 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 
 import { ResourceDrawer } from "@/components/resource-drawer";
@@ -27,6 +27,7 @@ import {
 } from "@/features/users/model/users.schemas";
 import {
   filterRolesForOrganization,
+  findPlatformUserRoleId,
   formatRoleName,
   getAssignableRoles,
 } from "@/lib/roles";
@@ -83,24 +84,52 @@ export function CreateUserDrawer({
     },
   });
 
+  const initialisedRef = useRef(false);
+
   useEffect(() => {
-    if (!open) return;
-    let orgId: string;
+    if (!open) {
+      initialisedRef.current = false;
+      return;
+    }
+
+    // Guard: wait for queries to resolve before setting defaults.
+    if (allAssignable.length === 0) return;
+    if (isActorSuperAdmin && !organizations.data) return;
+    if (!isActorSuperAdmin && !actorOrganizationId) return;
+
+    // Prevent re-initialising after the user has made selections.
+    if (initialisedRef.current) return;
     if (isActorSuperAdmin) {
       const firstOrg = organizations.data?.data?.[0];
-      orgId = firstOrg?.id ?? "";
+      if (!firstOrg) return;
+      initialisedRef.current = true;
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setSelectedOrgId(orgId);
-      form.setValue("organizationId", orgId, { shouldValidate: false });
+      setSelectedOrgId(firstOrg.id);
+      form.setValue("organizationId", firstOrg.id, { shouldValidate: false });
+      const roles = filterRolesForOrganization(allAssignable, firstOrg.id);
+      form.setValue("roleId", findPlatformUserRoleId(roles), {
+        shouldValidate: false,
+      });
     } else {
-      orgId = actorOrganizationId ?? "";
+      initialisedRef.current = true;
       setSelectedOrgId("");
       form.setValue("organizationId", "", { shouldValidate: false });
+      const roles = filterRolesForOrganization(
+        allAssignable,
+        actorOrganizationId ?? "",
+      );
+      form.setValue("roleId", findPlatformUserRoleId(roles), {
+        shouldValidate: false,
+      });
     }
-    const firstRole = filterRolesForOrganization(allAssignable, orgId)[0];
-    form.setValue("roleId", firstRole?.id ?? "", { shouldValidate: false });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, isActorSuperAdmin]);
+  }, [
+    open,
+    isActorSuperAdmin,
+    actorOrganizationId,
+    allAssignable,
+    organizations.data,
+    form,
+  ]);
 
   const createUser = useCreateUser({
     onSuccess: () => {
@@ -212,13 +241,19 @@ export function CreateUserDrawer({
               onValueChange={(value) => {
                 if (!value) return;
                 setSelectedOrgId(value);
-                form.setValue("organizationId", value, { shouldValidate: false });
-                const nextRoles = filterRolesForOrganization(allAssignable, value);
+                form.setValue("organizationId", value, {
+                  shouldValidate: false,
+                });
+                const nextRoles = filterRolesForOrganization(
+                  allAssignable,
+                  value,
+                );
                 const currentRoleId = form.getValues("roleId");
                 const roleInOrg = nextRoles.find((r) => r.id === currentRoleId);
                 if (!roleInOrg) {
-                  const firstRole = nextRoles[0];
-                  form.setValue("roleId", firstRole?.id ?? "", { shouldValidate: true });
+                  form.setValue("roleId", findPlatformUserRoleId(nextRoles), {
+                    shouldValidate: true,
+                  });
                 }
               }}
               disabled={organizations.isLoading}

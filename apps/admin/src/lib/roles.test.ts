@@ -6,6 +6,7 @@ import {
   buildRoleLookup,
   canAssignRole,
   filterRolesForOrganization,
+  findPlatformUserRoleId,
   formatRoleName,
   getAssignableRoles,
   isOrganizationRole,
@@ -107,7 +108,14 @@ describe("multi-org scenarios", () => {
     const result = getAssignableRoles(["SUPER_ADMIN"], multiOrgRoles);
     // SUPER_ADMIN can assign all org roles + USER (but not SUPER_ADMIN which isn't in list)
     // Sorted by name: ACCOUNTANT(r3), ACCOUNTANT(r4), ADMIN(r2), MANAGER(r5), USER(r1), USER(r6)
-    expect(result.map((r) => r.id)).toEqual(["r3", "r4", "r2", "r5", "r1", "r6"]);
+    expect(result.map((r) => r.id)).toEqual([
+      "r3",
+      "r4",
+      "r2",
+      "r5",
+      "r1",
+      "r6",
+    ]);
   });
 
   it("returns USER and org-scoped custom roles for org ADMIN sorted", () => {
@@ -141,9 +149,24 @@ describe("filterRolesForOrganization", () => {
   const roles: RoleDto[] = [
     { id: "p1", name: "USER", scope: "platform" } as RoleDto,
     { id: "p2", name: "USER", scope: "platform" } as RoleDto,
-    { id: "o1", name: "ACCOUNTANT", scope: "organization", organizationId: "org-a" as unknown as Record<string, never> | null } as unknown as RoleDto,
-    { id: "o2", name: "ACCOUNTANT", scope: "organization", organizationId: "org-b" as unknown as Record<string, never> | null } as unknown as RoleDto,
-    { id: "o3", name: "MANAGER", scope: "organization", organizationId: "org-a" as unknown as Record<string, never> | null } as unknown as RoleDto,
+    {
+      id: "o1",
+      name: "ACCOUNTANT",
+      scope: "organization",
+      organizationId: "org-a" as unknown as Record<string, never> | null,
+    } as unknown as RoleDto,
+    {
+      id: "o2",
+      name: "ACCOUNTANT",
+      scope: "organization",
+      organizationId: "org-b" as unknown as Record<string, never> | null,
+    } as unknown as RoleDto,
+    {
+      id: "o3",
+      name: "MANAGER",
+      scope: "organization",
+      organizationId: "org-a" as unknown as Record<string, never> | null,
+    } as unknown as RoleDto,
   ];
 
   it("shows only platform roles when no org is selected", () => {
@@ -162,6 +185,40 @@ describe("filterRolesForOrganization", () => {
     const resultB = filterRolesForOrganization(roles, "org-b");
     expect(resultA.find((r) => r.name === "ACCOUNTANT")?.id).toBe("o1");
     expect(resultB.find((r) => r.name === "ACCOUNTANT")?.id).toBe("o2");
+  });
+});
+
+describe("findPlatformUserRoleId", () => {
+  it("prefers the platform USER role over the first organization role", () => {
+    const result = findPlatformUserRoleId([
+      {
+        id: "accountant",
+        name: "ACCOUNTANT",
+        scope: "organization",
+        organizationId: "org-a",
+      } as unknown as RoleDto,
+      {
+        id: "user",
+        name: "USER",
+        scope: "platform",
+        organizationId: null,
+      } as unknown as RoleDto,
+    ]);
+
+    expect(result).toBe("user");
+  });
+
+  it("falls back to the first role only when platform USER is unavailable", () => {
+    const result = findPlatformUserRoleId([
+      {
+        id: "accountant",
+        name: "ACCOUNTANT",
+        scope: "organization",
+        organizationId: "org-a",
+      } as unknown as RoleDto,
+    ]);
+
+    expect(result).toBe("accountant");
   });
 });
 
