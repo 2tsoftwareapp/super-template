@@ -19,6 +19,12 @@ export interface OrganizationOption {
   name: string;
 }
 
+function findPlatformUserRoleId(options: RoleOption[]): string {
+  return options.find(
+    (r) => r.name === "USER" && r.organizationId == null,
+  )?.id ?? options[0]?.id ?? "";
+}
+
 export function useUserRoles(
   userId: string | undefined,
   currentUser: AdminUserDto | null,
@@ -41,14 +47,19 @@ export function useUserRoles(
     useState<string>("");
   const [selectedRoleId, setSelectedRoleId] = useState<string>("");
 
+  const effectiveOrgId = isActorSuperAdmin
+    ? selectedOrganizationId
+    : (actorOrganizationId ?? "");
+
   const filteredOptions = useMemo(
-    () => filterRolesForOrganization(options, selectedOrganizationId),
-    [options, selectedOrganizationId],
+    () => filterRolesForOrganization(options, effectiveOrgId),
+    [options, effectiveOrgId],
   );
 
   useEffect(() => {
+    const initialId = initialOrganizationId ?? "";
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setSelectedOrganizationId(initialOrganizationId ?? "");
+    setSelectedOrganizationId(initialId);
   }, [userId]);
 
   const currentAssignment = useMemo(
@@ -58,7 +69,10 @@ export function useUserRoles(
     [currentUser, selectedOrganizationId],
   );
 
-  const membershipExists = currentAssignment !== undefined;
+  const memberOrganizationIds = currentUser?.memberOrganizationIds ?? [];
+  const membershipExists = memberOrganizationIds.includes(
+    selectedOrganizationId,
+  ) || currentAssignment !== undefined;
   const currentRoleId = currentAssignment?.roleId ?? null;
 
   useEffect(() => {
@@ -66,10 +80,10 @@ export function useUserRoles(
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedRoleId(currentRoleId);
     } else {
-      // No membership yet — default to first available role
-      const firstId = filteredOptions[0]?.id ?? "";
+      // No org-scoped role assignment — default to platform USER
+      // This ensures demote-to-USER shows USER, not a leftover custom role
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setSelectedRoleId(firstId);
+      setSelectedRoleId(findPlatformUserRoleId(filteredOptions));
     }
   }, [currentRoleId, filteredOptions]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -83,26 +97,23 @@ export function useUserRoles(
   const isCurrentRoleOrgScoped = isOrgScopedRole(selectedRoleName);
   const needsOrganization = isCurrentRoleOrgScoped;
 
-  const effectiveOrganizationId =
-    isActorSuperAdmin ? selectedOrganizationId : (actorOrganizationId ?? "");
-
   const orgRequired = isCurrentRoleOrgScoped;
 
   const canSave =
     !disabled &&
     (membershipExists
       ? selectedRoleId !== currentRoleId
-      : Boolean(effectiveOrganizationId) || !orgRequired);
+      : Boolean(effectiveOrgId) || !orgRequired);
 
   const handleSave = useCallback(() => {
     const args: { roleId: string; organizationId?: string } = {
       roleId: selectedRoleId,
     };
-    if (effectiveOrganizationId) {
-      args.organizationId = effectiveOrganizationId;
+    if (effectiveOrgId) {
+      args.organizationId = effectiveOrgId;
     }
     void replaceRoles.mutateAsync(args);
-  }, [selectedRoleId, effectiveOrganizationId, replaceRoles]);
+  }, [selectedRoleId, effectiveOrgId, replaceRoles]);
 
   return {
     isLoading: rolesLoading,

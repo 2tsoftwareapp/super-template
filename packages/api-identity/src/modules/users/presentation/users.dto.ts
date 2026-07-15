@@ -49,6 +49,9 @@ export class UserDto {
   @ApiProperty({ type: [RoleAssignmentDto] })
   roleAssignments: RoleAssignmentDto[];
 
+  @ApiProperty({ type: [String] })
+  memberOrganizationIds: string[];
+
   @ApiProperty()
   createdAt: string;
 

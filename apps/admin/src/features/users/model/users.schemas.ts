@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export function createUserSchema(actorRoles: string[], availableRoleIds: string[]) {
+export function createUserSchema(availableRoleIds: string[]) {
   return z
     .object({
       displayName: z

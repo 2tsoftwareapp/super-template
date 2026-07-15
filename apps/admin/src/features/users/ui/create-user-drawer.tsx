@@ -53,9 +53,13 @@ export function CreateUserDrawer({
 
   const [selectedOrgId, setSelectedOrgId] = useState<string>("");
 
+  const effectiveOrgId = isActorSuperAdmin
+    ? selectedOrgId
+    : (actorOrganizationId ?? "");
+
   const rolesForOrg = useMemo(
-    () => filterRolesForOrganization(allAssignable, selectedOrgId),
-    [allAssignable, selectedOrgId],
+    () => filterRolesForOrganization(allAssignable, effectiveOrgId),
+    [allAssignable, effectiveOrgId],
   );
 
   const roleIdsForOrg = useMemo(
@@ -64,8 +68,8 @@ export function CreateUserDrawer({
   );
 
   const createSchema = useMemo(
-    () => createUserSchema(actorRoles, roleIdsForOrg),
-    [actorRoles, roleIdsForOrg],
+    () => createUserSchema(roleIdsForOrg),
+    [roleIdsForOrg],
   );
 
   const form = useForm<CreateUserForm>({
@@ -81,20 +85,20 @@ export function CreateUserDrawer({
 
   useEffect(() => {
     if (!open) return;
+    let orgId: string;
     if (isActorSuperAdmin) {
       const firstOrg = organizations.data?.data?.[0];
-      const initialOrg = firstOrg?.id ?? "";
+      orgId = firstOrg?.id ?? "";
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setSelectedOrgId(initialOrg);
-      form.setValue("organizationId", initialOrg, { shouldValidate: false });
-      const firstRole = rolesForOrg[0];
-      form.setValue("roleId", firstRole?.id ?? "", { shouldValidate: false });
+      setSelectedOrgId(orgId);
+      form.setValue("organizationId", orgId, { shouldValidate: false });
     } else {
+      orgId = actorOrganizationId ?? "";
       setSelectedOrgId("");
       form.setValue("organizationId", "", { shouldValidate: false });
-      const firstRole = rolesForOrg[0];
-      form.setValue("roleId", firstRole?.id ?? "", { shouldValidate: false });
     }
+    const firstRole = filterRolesForOrganization(allAssignable, orgId)[0];
+    form.setValue("roleId", firstRole?.id ?? "", { shouldValidate: false });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, isActorSuperAdmin]);
 
@@ -209,10 +213,11 @@ export function CreateUserDrawer({
                 if (!value) return;
                 setSelectedOrgId(value);
                 form.setValue("organizationId", value, { shouldValidate: false });
+                const nextRoles = filterRolesForOrganization(allAssignable, value);
                 const currentRoleId = form.getValues("roleId");
-                const roleInOrg = rolesForOrg.find((r) => r.id === currentRoleId);
+                const roleInOrg = nextRoles.find((r) => r.id === currentRoleId);
                 if (!roleInOrg) {
-                  const firstRole = rolesForOrg[0];
+                  const firstRole = nextRoles[0];
                   form.setValue("roleId", firstRole?.id ?? "", { shouldValidate: true });
                 }
               }}

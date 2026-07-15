@@ -117,6 +117,9 @@ export function useUserDetailController(): UserDetailViewModel {
     (a) => a.organizationId !== null,
   ) ?? [];
   const primaryOrgAssignment = orgScopedAssignments[0];
+  const initialOrgId = isActorSuperAdmin
+    ? primaryOrgAssignment?.organizationId
+    : (actorOrganizationId ?? null);
   const statusDisabled = isSelf || !canEdit || updateStatus.isPending;
   const roleDisabled = isSelf || !canEdit || replaceRoles.isPending;
 
@@ -137,7 +140,7 @@ export function useUserDetailController(): UserDetailViewModel {
     assignableRoles,
     organizations.data?.data ?? [],
     organizations.isLoading,
-    primaryOrgAssignment?.organizationId,
+    initialOrgId,
   );
 
   return {

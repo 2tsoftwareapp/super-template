@@ -1421,6 +1421,7 @@ export interface components {
             roles: string[];
             roleIds: string[];
             roleAssignments: components["schemas"]["RoleAssignmentDto"][];
+            memberOrganizationIds: string[];
             createdAt: string;
             updatedAt: string;
         };
@@ -1431,9 +1432,8 @@ export interface components {
             avatarUrl?: Record<string, never>;
             /** @enum {string} */
             status?: "PENDING" | "ACTIVE" | "BLOCKED";
-            organizationId?: string;
-            /** Format: uuid */
             roleId?: string;
+            organizationId?: string;
         };
         UpdateAdminUserDto: {
             email?: string;
@@ -1445,9 +1445,8 @@ export interface components {
             status: "PENDING" | "ACTIVE" | "BLOCKED";
         };
         ReplaceUserRolesDto: {
-            organizationId?: string;
-            /** Format: uuid */
             roleId: string;
+            organizationId?: string;
         };
         UpdateProfileDto: {
             displayName?: string;

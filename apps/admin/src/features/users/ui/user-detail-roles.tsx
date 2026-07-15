@@ -23,6 +23,37 @@ export function UserDetailRoles({ roles }: UserDetailRolesProps) {
   return (
     <div>
       <h4 className="mb-3 text-sm font-medium">Roles</h4>
+
+      <Show when={roles.organizations.length > 0}>
+        <div className="mb-4 space-y-1.5">
+          <label className="text-sm font-medium">Organization</label>
+          <Select
+            value={roles.selectedOrganizationId}
+            onValueChange={(value) => {
+              if (value) roles.onOrganizationSelect(value);
+            }}
+            disabled={roles.organizationsLoading}
+          >
+            <SelectTrigger className="w-full">
+              <Building2 className="size-3.5 shrink-0 text-muted-foreground" />
+              <SelectValue placeholder="Select an organization..." />
+            </SelectTrigger>
+            <SelectContent>
+              {roles.organizations.map((org) => (
+                <SelectItem key={org.id} value={org.id}>
+                  {org.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {roles.orgRequired && !roles.selectedOrganizationId && (
+            <p className="text-xs text-destructive">
+              Organization is required for this role
+            </p>
+          )}
+        </div>
+      </Show>
+
       {roles.isLoading ? (
         <Spinner className="size-4" />
       ) : (
@@ -70,36 +101,6 @@ export function UserDetailRoles({ roles }: UserDetailRolesProps) {
           })}
         </div>
       )}
-
-      <Show when={roles.organizations.length > 0}>
-        <div className="mt-4 space-y-1.5">
-          <label className="text-sm font-medium">Organization</label>
-          <Select
-            value={roles.selectedOrganizationId}
-            onValueChange={(value) => {
-              if (value) roles.onOrganizationSelect(value);
-            }}
-            disabled={roles.organizationsLoading}
-          >
-            <SelectTrigger className="w-full">
-              <Building2 className="size-3.5 shrink-0 text-muted-foreground" />
-              <SelectValue placeholder="Select an organization..." />
-            </SelectTrigger>
-            <SelectContent>
-              {roles.organizations.map((org) => (
-                <SelectItem key={org.id} value={org.id}>
-                  {org.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {roles.orgRequired && !roles.selectedOrganizationId && (
-            <p className="text-xs text-destructive">
-              Organization is required for this role
-            </p>
-          )}
-        </div>
-      </Show>
 
       <div className="mt-3 flex items-center gap-3">
         <LoadingButton

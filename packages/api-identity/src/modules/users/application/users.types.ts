@@ -20,6 +20,7 @@ export interface UserView {
   roles: string[];
   roleIds: string[];
   roleAssignments: RoleAssignment[];
+  memberOrganizationIds: string[];
   createdAt: string;
   updatedAt: string;
 }

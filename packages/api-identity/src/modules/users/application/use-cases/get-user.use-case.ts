@@ -63,15 +63,22 @@ export class GetUserUseCase {
       ? (actor.roles.includes(ROLE_NAMES.SUPER_ADMIN) ? undefined : actor.organizationId ?? null)
       : null;
 
-    const [accessProfile, roleIds, roleAssignments] = await Promise.all([
+    const [accessProfile, roleIds, roleAssignments, userOrgs] = await Promise.all([
       this.accessControlService.getAccessProfile(
         userId,
         organizationId,
       ),
       this.accessControlService.getRoleIdsForUser(userId, organizationId),
       this.accessControlService.getRoleAssignmentsForUser(userId, organizationId),
+      this.organizationsRepository.listForUser(userId),
     ]);
 
-    return this.usersMapper.toUserView(user, accessProfile.roles, roleIds, roleAssignments);
+    return this.usersMapper.toUserView(
+      user,
+      accessProfile.roles,
+      roleIds,
+      roleAssignments,
+      userOrgs.map((org) => org.id),
+    );
   }
 }

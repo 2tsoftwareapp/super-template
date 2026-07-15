@@ -7,6 +7,7 @@ export class UsersMapper {
     roles: string[],
     roleIds: string[],
     roleAssignments?: RoleAssignment[],
+    memberOrganizationIds?: string[],
   ): UserView {
     return {
       id: user.id,
@@ -22,6 +23,7 @@ export class UsersMapper {
         roleId: roleIds[i] ?? '',
         organizationId: null,
       })),
+      memberOrganizationIds: memberOrganizationIds ?? [],
       createdAt: user.createdAt.toISOString(),
       updatedAt: user.updatedAt.toISOString(),
     };
