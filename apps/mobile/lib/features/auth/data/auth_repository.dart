@@ -52,7 +52,7 @@ class AuthRepository {
       return null;
     }
     try {
-      final response = await _authApi.authControllerGetMe();
+      final response = await _authApi.authSessionControllerGetMe();
       return _toSession(response.data!.data);
     } on DioException catch (error) {
       final statusCode = error.response?.statusCode;
@@ -72,7 +72,7 @@ class AuthRepository {
 
   Future<AuthSession> login(String email, String password) async {
     try {
-      final response = await _publicAuthApi.authControllerLogin(
+      final response = await _publicAuthApi.authLoginControllerLogin(
         loginDto: LoginDto(
           (b) => b
             ..email = email
@@ -100,7 +100,7 @@ class AuthRepository {
     required String code,
   }) async {
     try {
-      final response = await _publicAuthApi.authControllerVerifyMfaChallenge(
+      final response = await _publicAuthApi.authLoginControllerVerifyMfaChallenge(
         verifyMfaChallengeDto: VerifyMfaChallengeDto(
           (b) => b
             ..mfaToken = mfaToken
@@ -126,7 +126,7 @@ class AuthRepository {
     required String displayName,
   }) async {
     try {
-      await _publicAuthApi.authControllerRegister(
+      await _publicAuthApi.authRegistrationControllerRegister(
         registerDto: RegisterDto(
           (b) => b
             ..email = email
@@ -141,7 +141,7 @@ class AuthRepository {
 
   Future<void> forgotPassword(String email) async {
     try {
-      await _publicAuthApi.authControllerForgotPassword(
+      await _publicAuthApi.authRecoveryControllerForgotPassword(
         forgotPasswordDto: ForgotPasswordDto((b) => b..email = email),
       );
     } on DioException catch (error) {
@@ -157,7 +157,7 @@ class AuthRepository {
       return null;
     }
     try {
-      final response = await _publicAuthApi.authControllerRefresh(
+      final response = await _publicAuthApi.authLoginControllerRefresh(
         refreshTokenDto: RefreshTokenDto(
           (b) => b..refreshToken = tokens.refreshToken,
         ),
@@ -181,7 +181,7 @@ class AuthRepository {
 
   Future<void> logout() async {
     try {
-      await _authApi.authControllerLogout();
+      await _authApi.authSessionControllerLogout();
     } on DioException {
       // Local logout must still clear the secure store even if the API is unavailable.
     } finally {
@@ -191,7 +191,7 @@ class AuthRepository {
 
   Future<BuiltList<AuthSessionDto>> sessions() async {
     try {
-      final response = await _authApi.authControllerGetSessions();
+      final response = await _authApi.authSessionControllerGetSessions();
       return response.data!.data;
     } on DioException catch (error) {
       throw AppException.fromDio(error);
@@ -200,7 +200,7 @@ class AuthRepository {
 
   Future<void> revokeSession(String sessionId) async {
     try {
-      await _authApi.authControllerRevokeSession(sessionId: sessionId);
+      await _authApi.authSessionControllerRevokeSession(sessionId: sessionId);
     } on DioException catch (error) {
       throw AppException.fromDio(error);
     }
@@ -208,7 +208,7 @@ class AuthRepository {
 
   Future<void> verifyEmail(String token) async {
     try {
-      await _publicAuthApi.authControllerVerifyEmail(
+      await _publicAuthApi.authRegistrationControllerVerifyEmail(
         verifyEmailDto: VerifyEmailDto((b) => b..token = token),
       );
     } on DioException catch (error) {
@@ -218,7 +218,7 @@ class AuthRepository {
 
   Future<void> resendVerification(String email) async {
     try {
-      await _publicAuthApi.authControllerResendVerification(
+      await _publicAuthApi.authRegistrationControllerResendVerification(
         resendVerificationDto: ResendVerificationDto((b) => b..email = email),
       );
     } on DioException catch (error) {
@@ -231,7 +231,7 @@ class AuthRepository {
     required String newPassword,
   }) async {
     try {
-      await _publicAuthApi.authControllerResetPassword(
+      await _publicAuthApi.authRecoveryControllerResetPassword(
         resetPasswordDto: ResetPasswordDto(
           (b) => b
             ..token = token
@@ -245,7 +245,7 @@ class AuthRepository {
 
   Future<void> logoutAll() async {
     try {
-      await _authApi.authControllerLogoutAll();
+      await _authApi.authSessionControllerLogoutAll();
     } on DioException {
       // Local logout must still clear the secure store even if the API is unavailable.
     } finally {

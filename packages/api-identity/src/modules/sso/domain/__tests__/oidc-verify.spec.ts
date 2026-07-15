@@ -14,7 +14,7 @@ const base64UrlEncode = (input: Buffer | string): string =>
 const { publicKey, privateKey } = generateKeyPairSync('rsa', {
   modulusLength: 2048,
 });
-const jwk: Jwk = { ...publicKey.export({ format: 'jwk' }), kid: 'key-1' };
+const jwk: Jwk = { ...publicKey.export({ format: 'jwk' }), kid: 'key-1' } as Jwk;
 
 const signIdToken = (payload: Record<string, unknown>): string => {
   const header = { alg: 'RS256', kid: 'key-1' };

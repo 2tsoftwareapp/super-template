@@ -2,9 +2,9 @@ import { Test } from '@nestjs/testing';
 import { ImportExportAdapterRegistry } from '@repo/api-core';
 import { CreateExportUseCase } from '@repo/api-platform/modules/exports/application/use-cases/create-export.use-case';
 import { GetExportUseCase } from '@repo/api-platform/modules/exports/application/use-cases/get-export.use-case';
-import { ExportJobsRepository } from '@repo/api-platform/modules/exports/infrastructure/export-jobs.repository';
+import { EXPORT_JOBS_REPOSITORY } from '@repo/api-platform/modules/exports/application/ports/export-jobs.repository.port';
 import { AuditService } from '@repo/api-platform/modules/audit/application/audit.service';
-import { FilesRepository } from '@repo/api-platform/modules/files/infrastructure/files.repository';
+import { FILES_REPOSITORY } from '@repo/api-platform/modules/files/application/ports/files.repository.port';
 import { OBJECT_STORAGE } from '@repo/api-platform/modules/storage/application/object-storage.interface';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -48,8 +48,8 @@ describe('CreateExportUseCase idempotency', () => {
       providers: [
         CreateExportUseCase,
         GetExportUseCase,
-        { provide: ExportJobsRepository, useValue: exportJobsRepository },
-        { provide: FilesRepository, useValue: {} },
+        { provide: EXPORT_JOBS_REPOSITORY, useValue: exportJobsRepository },
+        { provide: FILES_REPOSITORY, useValue: {} },
         {
           provide: ImportExportAdapterRegistry,
           useValue: { resolve: vi.fn() },

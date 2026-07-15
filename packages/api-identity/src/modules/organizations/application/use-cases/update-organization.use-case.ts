@@ -1,4 +1,4 @@
-import type { RequestContext } from '@repo/api-core';
+import type { RequestContext, AuthenticatedRequestUser } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import {
@@ -20,24 +20,31 @@ export class UpdateOrganizationUseCase {
 
   async execute(
     organizationId: string,
-    userId: string,
+    actor: string | AuthenticatedRequestUser,
     input: { name: string },
     requestContext?: RequestContext,
   ) {
-    const membership = await this.organizationsRepository.findMembership(
-      organizationId,
-      userId,
-    );
+    const { userId: actorUserId, isSuperAdmin } = typeof actor === 'string'
+      ? { userId: actor, isSuperAdmin: false }
+      : { userId: actor.userId, isSuperAdmin: actor.roles?.includes('SUPER_ADMIN') ?? false };
 
-    if (!membership) {
-      throw new AppError(
-        ERROR_CODES.AUTH_FORBIDDEN,
-        'You are not a member of this organization',
-        HttpStatus.FORBIDDEN,
+    let membership = null;
+    if (!isSuperAdmin) {
+      membership = await this.organizationsRepository.findMembership(
+        organizationId,
+        actorUserId,
       );
-    }
 
-    assertOrganizationRole(membership, ['OWNER', 'ADMIN']);
+      if (!membership) {
+        throw new AppError(
+          ERROR_CODES.AUTH_FORBIDDEN,
+          'You are not a member of this organization',
+          HttpStatus.FORBIDDEN,
+        );
+      }
+
+      assertOrganizationRole(membership, ['OWNER', 'ADMIN']);
+    }
 
     const organization = await this.organizationsRepository.updateOrganization(
       organizationId,
@@ -53,7 +60,7 @@ export class UpdateOrganizationUseCase {
     }
 
     await this.auditWriter.log({
-      actorId: userId,
+      actorId: actorUserId,
       action: 'organization.update',
       entityType: 'organization',
       entityId: organizationId,
@@ -65,7 +72,7 @@ export class UpdateOrganizationUseCase {
       id: organization.id,
       name: organization.name,
       slug: organization.slug,
-      role: membership.role,
+      role: isSuperAdmin ? ('ADMIN' as const) : membership!.role,
       createdAt: organization.createdAt.toISOString(),
       updatedAt: organization.updatedAt.toISOString(),
     };

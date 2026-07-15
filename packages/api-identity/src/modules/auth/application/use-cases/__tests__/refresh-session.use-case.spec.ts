@@ -4,6 +4,7 @@ import { ERROR_CODES } from '@repo/api-core';
 
 import { REFRESH_ROTATION_GRACE_MS } from '../../../domain/refresh-rotation.policy';
 import { hashRefreshToken } from '../../auth.helpers';
+import { AuthMapper } from '../../auth.mapper';
 import { RefreshSessionUseCase } from '../refresh-session.use-case';
 
 const CURRENT_TOKEN = 'current-refresh-token';
@@ -68,6 +69,7 @@ function createHarness(sessionRow: Awaited<ReturnType<typeof createSessionRow>>)
     rotateSessionTokens: vi.fn(async () => rotatedResult),
     tryRotateSessionTokens: vi.fn(async () => rotatedResult),
   };
+  const authMapper = new AuthMapper();
 
   const useCase = new RefreshSessionUseCase(
     authRepository as never,
@@ -75,6 +77,7 @@ function createHarness(sessionRow: Awaited<ReturnType<typeof createSessionRow>>)
     accessControlService as never,
     organizationsService as never,
     sessionTokenService as never,
+    authMapper,
   );
 
   return {
@@ -94,8 +97,7 @@ describe('RefreshSessionUseCase rotation grace', () => {
     const result = await useCase.execute({ refreshToken: CURRENT_TOKEN });
 
     expect(result.accessToken).toBe('new-access');
-    expect(sessionTokenService.rotateSessionTokens).toHaveBeenCalledTimes(1);
-    expect(sessionTokenService.tryRotateSessionTokens).not.toHaveBeenCalled();
+    expect(sessionTokenService.tryRotateSessionTokens).toHaveBeenCalledTimes(1);
     expect(authRepository.revokeSession).not.toHaveBeenCalled();
   });
 
@@ -111,7 +113,6 @@ describe('RefreshSessionUseCase rotation grace', () => {
 
     expect(result.accessToken).toBe('new-access');
     expect(sessionTokenService.tryRotateSessionTokens).toHaveBeenCalledTimes(1);
-    expect(sessionTokenService.rotateSessionTokens).not.toHaveBeenCalled();
     expect(authRepository.revokeSession).not.toHaveBeenCalled();
   });
 
@@ -147,7 +148,6 @@ describe('RefreshSessionUseCase rotation grace', () => {
       useCase.execute({ refreshToken: PREVIOUS_TOKEN }),
     ).rejects.toMatchObject({ code: ERROR_CODES.AUTH_REFRESH_TOKEN_REUSED });
     expect(authRepository.revokeSession).toHaveBeenCalledWith('session-1');
-    expect(sessionTokenService.rotateSessionTokens).not.toHaveBeenCalled();
     expect(sessionTokenService.tryRotateSessionTokens).not.toHaveBeenCalled();
   });
 

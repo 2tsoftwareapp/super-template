@@ -7,6 +7,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { FIXED_ROLE_NAMES, ROLE_NAMES } from '@repo/api-core';
 import { DATABASE } from '@repo/api-database';
 import {
+  organizations,
   permissions,
   rolePermissions,
   roles,
@@ -344,10 +345,12 @@ export class AccessControlRepository {
       })
       .from(userRoles)
       .innerJoin(roles, eq(userRoles.roleId, roles.id))
+      .leftJoin(organizations, eq(organizations.id, userRoles.organizationId))
       .where(
         and(
           eq(userRoles.userId, userId),
           ...filters,
+          or(isNull(userRoles.organizationId), isNull(organizations.deletedAt)),
         ),
       );
 
@@ -379,10 +382,12 @@ export class AccessControlRepository {
       .innerJoin(roles, eq(userRoles.roleId, roles.id))
       .innerJoin(rolePermissions, eq(rolePermissions.roleId, roles.id))
       .innerJoin(permissions, eq(rolePermissions.permissionId, permissions.id))
+      .leftJoin(organizations, eq(organizations.id, userRoles.organizationId))
       .where(
         and(
           eq(userRoles.userId, userId),
           ...filters,
+          or(isNull(userRoles.organizationId), isNull(organizations.deletedAt)),
         ),
       );
 

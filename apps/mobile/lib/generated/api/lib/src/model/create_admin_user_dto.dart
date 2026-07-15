@@ -20,7 +20,7 @@ part 'create_admin_user_dto.g.dart';
 /// * [displayName]
 /// * [avatarUrl]
 /// * [status]
-/// * [role]
+/// * [roleId]
 /// * [organizationId]
 @BuiltValue()
 abstract class CreateAdminUserDto
@@ -41,8 +41,8 @@ abstract class CreateAdminUserDto
   CreateAdminUserDtoStatusEnum? get status;
   // enum statusEnum {  PENDING,  ACTIVE,  BLOCKED,  };
 
-  @BuiltValueField(wireName: r'role')
-  String? get role;
+  @BuiltValueField(wireName: r'roleId')
+  String? get roleId;
 
   @BuiltValueField(wireName: r'organizationId')
   String? get organizationId;
@@ -53,8 +53,7 @@ abstract class CreateAdminUserDto
       _$CreateAdminUserDto;
 
   @BuiltValueHook(initializeBuilder: true)
-  static void _defaults(CreateAdminUserDtoBuilder b) =>
-      b..role = CreateAdminUserDtoRoleEnum.USER;
+  static void _defaults(CreateAdminUserDtoBuilder b) => b;
 
   @BuiltValueSerializer(custom: true)
   static Serializer<CreateAdminUserDto> get serializer =>
@@ -103,10 +102,10 @@ class _$CreateAdminUserDtoSerializer
         specifiedType: const FullType(CreateAdminUserDtoStatusEnum),
       );
     }
-    if (object.role != null) {
-      yield r'role';
+    if (object.roleId != null) {
+      yield r'roleId';
       yield serializers.serialize(
-        object.role,
+        object.roleId,
         specifiedType: const FullType(String),
       );
     }
@@ -179,12 +178,12 @@ class _$CreateAdminUserDtoSerializer
           ) as CreateAdminUserDtoStatusEnum;
           result.status = valueDes;
           break;
-        case r'role':
+        case r'roleId':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
-          result.role = valueDes;
+          result.roleId = valueDes;
           break;
         case r'organizationId':
           final valueDes = serializers.deserialize(

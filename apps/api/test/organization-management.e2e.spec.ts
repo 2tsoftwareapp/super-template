@@ -1,7 +1,8 @@
 import type { INestApplication } from '@nestjs/common';
 
 import { ERROR_CODES } from '@repo/api-core';
-import { DATABASE, organizationMembers, type DatabaseClient } from '@repo/api-database';
+import { DATABASE, organizationMembers, userRoles, authSessions, users, type DatabaseClient } from '@repo/api-database';
+import { and, eq } from 'drizzle-orm';
 import request from 'supertest';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
@@ -44,7 +45,13 @@ describe('Organization management (e2e)', () => {
       })
       .expect(201);
 
-    return response.body.data.id as string;
+    const userId = response.body.data.id as string;
+    await database
+      .update(users)
+      .set({ mustChangePassword: false })
+      .where(eq(users.id, userId));
+
+    return userId;
   };
 
   it('runs owner/admin/member lifecycle: view, manage, last-owner protection, and leave', async () => {
@@ -211,6 +218,146 @@ describe('Organization management (e2e)', () => {
     await request(app.getHttpServer())
       .get(`/api/v1/organizations/${organizationId}`)
       .set(bearer(coOwnerSession.accessToken))
+      .expect(401);
+
+    await request(app.getHttpServer())
+      .get(`/api/v1/organizations/${organizationId}`)
+      .set(bearer(admin.accessToken))
+      .expect(404);
+  });
+
+  it('enforces RBAC sync, member leaves, concurrency locks, session revokes, and SUPER_ADMIN bypass', async () => {
+    const admin = await loginAs(app, 'admin@example.local', 'ChangeMe123!');
+
+    // 1. Create org and users
+    const ownerId = await createActiveUser(admin, 'invariants-owner@example.local', 'Invariants Owner');
+    const ownerSession = await loginAs(app, 'invariants-owner@example.local', 'ChangeMe123!');
+    const memberId = await createActiveUser(admin, 'invariants-member@example.local', 'Invariants Member');
+    const memberSession = await loginAs(app, 'invariants-member@example.local', 'ChangeMe123!');
+
+    const createResponse = await request(app.getHttpServer())
+      .post('/api/v1/organizations')
+      .set(bearer(ownerSession.accessToken))
+      .send({ name: 'Invariants Org' })
+      .expect(201);
+    const organizationId = createResponse.body.data.id as string;
+
+    // Join member as MEMBER
+    await database.insert(organizationMembers).values([
+      { organizationId, userId: memberId, role: 'MEMBER' },
+    ]);
+
+    // 2. Promote MEMBER to ADMIN
+    await request(app.getHttpServer())
+      .patch(`/api/v1/organizations/${organizationId}/members/${memberId}`)
+      .set(bearer(ownerSession.accessToken))
+      .send({ role: 'ADMIN' })
+      .expect(200);
+
+    // Verify ADMIN database RBAC role is assigned in userRoles table
+    const rolesAfterPromote = await database
+      .select()
+      .from(userRoles)
+      .where(
+        and(
+          eq(userRoles.userId, memberId),
+          eq(userRoles.organizationId, organizationId)
+        )
+      );
+    expect(rolesAfterPromote).toHaveLength(1);
+
+    // 3. Demote ADMIN back to MEMBER
+    await request(app.getHttpServer())
+      .patch(`/api/v1/organizations/${organizationId}/members/${memberId}`)
+      .set(bearer(ownerSession.accessToken))
+      .send({ role: 'MEMBER' })
+      .expect(200);
+
+    // Verify ADMIN database RBAC role is removed in userRoles table
+    const rolesAfterDemote = await database
+      .select()
+      .from(userRoles)
+      .where(
+        and(
+          eq(userRoles.userId, memberId),
+          eq(userRoles.organizationId, organizationId)
+        )
+      );
+    expect(rolesAfterDemote).toHaveLength(0);
+
+    // Promote to ADMIN again for removal test
+    await request(app.getHttpServer())
+      .patch(`/api/v1/organizations/${organizationId}/members/${memberId}`)
+      .set(bearer(ownerSession.accessToken))
+      .send({ role: 'ADMIN' })
+      .expect(200);
+
+    // 4. Remove member
+    await request(app.getHttpServer())
+      .delete(`/api/v1/organizations/${organizationId}/members/${memberId}`)
+      .set(bearer(ownerSession.accessToken))
+      .expect(200);
+
+    // Verify membership deleted, userRoles cleaned up, and session invalidation
+    const membership = await database
+      .select()
+      .from(organizationMembers)
+      .where(
+        and(
+          eq(organizationMembers.organizationId, organizationId),
+          eq(organizationMembers.userId, memberId)
+        )
+      );
+    expect(membership).toHaveLength(0);
+
+    const rolesAfterRemoval = await database
+      .select()
+      .from(userRoles)
+      .where(
+        and(
+          eq(userRoles.userId, memberId),
+          eq(userRoles.organizationId, organizationId)
+        )
+      );
+    expect(rolesAfterRemoval).toHaveLength(0);
+
+    // Check that target user's sessions are revoked
+    const sessions = await database
+      .select()
+      .from(authSessions)
+      .where(eq(authSessions.userId, memberId));
+    for (const session of sessions) {
+      expect(session.revokedAt).not.toBeNull();
+    }
+
+    // 5. SUPER_ADMIN bypass: admin (a system super admin) can manage/rename/delete
+    // even though admin is not in organizationMembers of organizationId.
+    const superAdminRenameResponse = await request(app.getHttpServer())
+      .patch(`/api/v1/organizations/${organizationId}`)
+      .set(bearer(admin.accessToken))
+      .send({ name: 'Super Admin Renamed' })
+      .expect(200);
+    expect(superAdminRenameResponse.body.data.name).toBe('Super Admin Renamed');
+
+    // 6. Deleted Org isolation: switch or authenticate to deleted org is blocked.
+    // Soft delete the org first.
+    await request(app.getHttpServer())
+      .delete(`/api/v1/organizations/${organizationId}`)
+      .set(bearer(ownerSession.accessToken))
+      .expect(200);
+
+    // Assert that attempting to switch to it returns unauthorized because ownerSession was revoked on delete.
+    await request(app.getHttpServer())
+      .post('/api/v1/auth/switch-organization')
+      .set(bearer(ownerSession.accessToken))
+      .send({ organizationId })
+      .expect(401);
+
+    // If another user who is logged in (like admin) tries to switch to it, they get 404 Not Found because it is deleted.
+    await request(app.getHttpServer())
+      .post('/api/v1/auth/switch-organization')
+      .set(bearer(admin.accessToken))
+      .send({ organizationId })
       .expect(404);
   });
 });

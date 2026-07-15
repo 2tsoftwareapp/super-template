@@ -13,8 +13,8 @@ const buildEnvironmentService = () =>
     values: { MFA_ENCRYPTION_KEY: ENCRYPTION_KEY },
   }) as unknown as EnvironmentService;
 
-const buildDatabase = () => ({
-  transaction: vi.fn(async (fn: (tx: string) => unknown) => fn('tx')),
+const buildTransactionPort = () => ({
+  run: vi.fn().mockImplementation(async (fn: any) => fn('tx')),
 });
 
 describe('ConfirmMfaUseCase', () => {
@@ -23,7 +23,7 @@ describe('ConfirmMfaUseCase', () => {
       findSecretByUserId: vi.fn(async () => null),
     };
     const useCase = new ConfirmMfaUseCase(
-      buildDatabase() as never,
+      buildTransactionPort() as never,
       mfaRepository as never,
       buildEnvironmentService(),
       { log: vi.fn() } as never,
@@ -39,7 +39,7 @@ describe('ConfirmMfaUseCase', () => {
       findSecretByUserId: vi.fn(async () => ({ enabled: true })),
     };
     const useCase = new ConfirmMfaUseCase(
-      buildDatabase() as never,
+      buildTransactionPort() as never,
       mfaRepository as never,
       buildEnvironmentService(),
       { log: vi.fn() } as never,
@@ -62,7 +62,7 @@ describe('ConfirmMfaUseCase', () => {
       })),
     };
     const useCase = new ConfirmMfaUseCase(
-      buildDatabase() as never,
+      buildTransactionPort() as never,
       mfaRepository as never,
       buildEnvironmentService(),
       { log: vi.fn() } as never,
@@ -89,7 +89,7 @@ describe('ConfirmMfaUseCase', () => {
     };
     const auditWriter = { log: vi.fn(async () => undefined) };
     const useCase = new ConfirmMfaUseCase(
-      buildDatabase() as never,
+      buildTransactionPort() as never,
       mfaRepository as never,
       buildEnvironmentService(),
       auditWriter as never,

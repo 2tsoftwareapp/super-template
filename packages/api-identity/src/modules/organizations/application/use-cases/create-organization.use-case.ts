@@ -31,56 +31,86 @@ export class CreateOrganizationUseCase {
     input: CreateOrganizationCommand,
   ) {
     const baseSlug = slugify(input.name);
-    const organization = await this.transactionPort.run(
-      async (transaction) => {
-        let slug = baseSlug;
-        let attempt = 0;
+    let organization = null;
+    let attempt = 0;
+    let slug = baseSlug;
 
-        while (attempt < 5) {
+    while (attempt < 10) {
+      try {
+        organization = await this.transactionPort.run(async (transaction) => {
+          if (attempt > 0) {
+            const randomSuffix = Math.random().toString(36).substring(2, 6);
+            slug = `${baseSlug}-${randomSuffix}`;
+          }
+
           const existing = await this.organizationsRepository.findBySlug(
             slug,
             transaction,
           );
-          if (!existing) {
-            break;
+          if (existing) {
+            throw new AppError(
+              ERROR_CODES.RESOURCE_CONFLICT,
+              'Slug already exists',
+              HttpStatus.CONFLICT,
+            );
           }
-          attempt += 1;
-          slug = `${baseSlug}-${attempt}`;
-        }
 
-        const created = await this.organizationsRepository.createOrganization(
-          {
-            name: input.name.trim(),
-            slug,
-          },
-          transaction,
-        );
-
-        if (!created) {
-          throw new AppError(
-            ERROR_CODES.INTERNAL_ERROR,
-            'Organization could not be created',
-            HttpStatus.INTERNAL_SERVER_ERROR,
+          const created = await this.organizationsRepository.createOrganization(
+            {
+              name: input.name.trim(),
+              slug,
+            },
+            transaction,
           );
+
+          if (!created) {
+            throw new AppError(
+              ERROR_CODES.INTERNAL_ERROR,
+              'Organization could not be created',
+              HttpStatus.INTERNAL_SERVER_ERROR,
+            );
+          }
+
+          await this.organizationsRepository.addMember(
+            {
+              organizationId: created.id,
+              userId: user.userId,
+              role: 'OWNER',
+            },
+            transaction,
+          );
+          await this.accessControlService.ensureOrganizationAdminRole(
+            created.id,
+            user.userId,
+            transaction,
+          );
+
+          return created;
+        });
+
+        break;
+      } catch (error: any) {
+        const isUniqueViolation =
+          error.code === '23505' ||
+          error.message?.includes('unique') ||
+          error.errorCode === ERROR_CODES.RESOURCE_CONFLICT ||
+          error.message?.includes('Slug already exists');
+
+        if (isUniqueViolation && attempt < 9) {
+          attempt += 1;
+          continue;
         }
+        throw error;
+      }
+    }
 
-        await this.organizationsRepository.addMember(
-          {
-            organizationId: created.id,
-            userId: user.userId,
-            role: 'OWNER',
-          },
-          transaction,
-        );
-        await this.accessControlService.ensureOrganizationAdminRole(
-          created.id,
-          user.userId,
-          transaction,
-        );
-
-        return created;
-      },
-    );
+    if (!organization) {
+      throw new AppError(
+        ERROR_CODES.INTERNAL_ERROR,
+        'Organization could not be created after retries',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
 
     return {
       id: organization.id,

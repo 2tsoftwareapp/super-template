@@ -19,12 +19,16 @@ export class ResolveOrganizationIdForUserUseCase {
     executor?: TransactionExecutor,
   ) {
     if (organizationId) {
-      await this.assertOrganizationMembershipUseCase.execute(
-        organizationId,
-        userId,
-        executor,
-      );
-      return organizationId;
+      try {
+        await this.assertOrganizationMembershipUseCase.execute(
+          organizationId,
+          userId,
+          executor,
+        );
+        return organizationId;
+      } catch (err) {
+        // Fall back to primary organization if the specified one is invalid/deleted/non-member
+      }
     }
 
     const primary =

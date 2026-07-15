@@ -14,7 +14,7 @@ describe('RoleAssignmentPolicy', () => {
     sessionId: 's1',
     email: 'super@test.com',
     displayName: 'Super',
-    status: 'ACTIVE',
+    status: 'ACTIVE' as const,
     roles: [ROLE_NAMES.SUPER_ADMIN],
     permissions: [],
     organizationId: 'org-1',

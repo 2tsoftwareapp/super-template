@@ -6,6 +6,8 @@ import {
   organizationMembers,
   organizations,
   users,
+  userRoles,
+  roles,
 } from '@repo/api-database';
 import { and, asc, count, eq, isNull, ne } from 'drizzle-orm';
 
@@ -196,9 +198,25 @@ export class OrganizationsRepository implements OrganizationsRepositoryPort {
 
   async countOwners(
     organizationId: string,
-    options: { excludingUserId?: string; executor?: DatabaseExecutor } = {},
+    options: { excludingUserId?: string; executor?: DatabaseExecutor; lock?: boolean } = {},
   ) {
     const executor = options.executor ?? this.database;
+    if (options.lock) {
+      const owners = await executor
+        .select({ userId: organizationMembers.userId })
+        .from(organizationMembers)
+        .where(
+          and(
+            eq(organizationMembers.organizationId, organizationId),
+            eq(organizationMembers.role, 'OWNER'),
+          ),
+        )
+        .for('update');
+      const filtered = options.excludingUserId
+        ? owners.filter((o) => o.userId !== options.excludingUserId)
+        : owners;
+      return filtered.length;
+    }
     const [result] = await executor
       .select({ value: count() })
       .from(organizationMembers)
@@ -282,5 +300,20 @@ export class OrganizationsRepository implements OrganizationsRepositoryPort {
       .limit(1);
 
     return member?.organizationId ?? null;
+  }
+
+  async deleteOrganizationMembershipsAndRoles(
+    organizationId: string,
+    executor: DatabaseExecutor = this.database,
+  ): Promise<void> {
+    await executor
+      .delete(userRoles)
+      .where(eq(userRoles.organizationId, organizationId));
+    await executor
+      .delete(roles)
+      .where(eq(roles.organizationId, organizationId));
+    await executor
+      .delete(organizationMembers)
+      .where(eq(organizationMembers.organizationId, organizationId));
   }
 }

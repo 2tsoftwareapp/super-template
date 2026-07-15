@@ -98,6 +98,8 @@ class _$UserDto extends UserDto {
   @override
   final BuiltList<RoleAssignmentDto> roleAssignments;
   @override
+  final BuiltList<String> memberOrganizationIds;
+  @override
   final String createdAt;
   @override
   final String updatedAt;
@@ -115,6 +117,7 @@ class _$UserDto extends UserDto {
     required this.roles,
     required this.roleIds,
     required this.roleAssignments,
+    required this.memberOrganizationIds,
     required this.createdAt,
     required this.updatedAt,
   }) : super._();
@@ -138,6 +141,7 @@ class _$UserDto extends UserDto {
         roles == other.roles &&
         roleIds == other.roleIds &&
         roleAssignments == other.roleAssignments &&
+        memberOrganizationIds == other.memberOrganizationIds &&
         createdAt == other.createdAt &&
         updatedAt == other.updatedAt;
   }
@@ -154,6 +158,7 @@ class _$UserDto extends UserDto {
     _$hash = $jc(_$hash, roles.hashCode);
     _$hash = $jc(_$hash, roleIds.hashCode);
     _$hash = $jc(_$hash, roleAssignments.hashCode);
+    _$hash = $jc(_$hash, memberOrganizationIds.hashCode);
     _$hash = $jc(_$hash, createdAt.hashCode);
     _$hash = $jc(_$hash, updatedAt.hashCode);
     _$hash = $jf(_$hash);
@@ -172,6 +177,7 @@ class _$UserDto extends UserDto {
           ..add('roles', roles)
           ..add('roleIds', roleIds)
           ..add('roleAssignments', roleAssignments)
+          ..add('memberOrganizationIds', memberOrganizationIds)
           ..add('createdAt', createdAt)
           ..add('updatedAt', updatedAt))
         .toString();
@@ -220,6 +226,12 @@ class UserDtoBuilder implements Builder<UserDto, UserDtoBuilder> {
   set roleAssignments(ListBuilder<RoleAssignmentDto>? roleAssignments) =>
       _$this._roleAssignments = roleAssignments;
 
+  ListBuilder<String>? _memberOrganizationIds;
+  ListBuilder<String> get memberOrganizationIds =>
+      _$this._memberOrganizationIds ??= ListBuilder<String>();
+  set memberOrganizationIds(ListBuilder<String>? memberOrganizationIds) =>
+      _$this._memberOrganizationIds = memberOrganizationIds;
+
   String? _createdAt;
   String? get createdAt => _$this._createdAt;
   set createdAt(String? createdAt) => _$this._createdAt = createdAt;
@@ -244,6 +256,7 @@ class UserDtoBuilder implements Builder<UserDto, UserDtoBuilder> {
       _roles = $v.roles.toBuilder();
       _roleIds = $v.roleIds.toBuilder();
       _roleAssignments = $v.roleAssignments.toBuilder();
+      _memberOrganizationIds = $v.memberOrganizationIds.toBuilder();
       _createdAt = $v.createdAt;
       _updatedAt = $v.updatedAt;
       _$v = null;
@@ -290,6 +303,7 @@ class UserDtoBuilder implements Builder<UserDto, UserDtoBuilder> {
             roles: roles.build(),
             roleIds: roleIds.build(),
             roleAssignments: roleAssignments.build(),
+            memberOrganizationIds: memberOrganizationIds.build(),
             createdAt: BuiltValueNullFieldError.checkNotNull(
               createdAt,
               r'UserDto',
@@ -310,6 +324,8 @@ class UserDtoBuilder implements Builder<UserDto, UserDtoBuilder> {
         roleIds.build();
         _$failedField = 'roleAssignments';
         roleAssignments.build();
+        _$failedField = 'memberOrganizationIds';
+        memberOrganizationIds.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
           r'UserDto',

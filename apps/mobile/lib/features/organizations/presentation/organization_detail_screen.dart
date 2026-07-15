@@ -184,27 +184,35 @@ class _OrganizationDetailScreenState
                           isOwner: isOwner,
                           isAdmin: isAdmin,
                           onRoleChanged: (role) async {
-                            await repo.updateMemberRole(
-                              organizationId: widget.organizationId,
-                              userId: m.userId,
-                              role: role,
-                            );
-                            ref.invalidate(
-                              organizationMembersProvider(
-                                widget.organizationId,
-                              ),
-                            );
+                            try {
+                              await repo.updateMemberRole(
+                                organizationId: widget.organizationId,
+                                userId: m.userId,
+                                role: role,
+                              );
+                              ref.invalidate(
+                                organizationMembersProvider(
+                                  widget.organizationId,
+                                ),
+                              );
+                            } catch (e) {
+                              if (context.mounted) showErrorSnackBar(context, e);
+                            }
                           },
                           onRemove: () async {
-                            await repo.removeMember(
-                              organizationId: widget.organizationId,
-                              userId: m.userId,
-                            );
-                            ref.invalidate(
-                              organizationMembersProvider(
-                                widget.organizationId,
-                              ),
-                            );
+                            try {
+                              await repo.removeMember(
+                                organizationId: widget.organizationId,
+                                userId: m.userId,
+                              );
+                              ref.invalidate(
+                                organizationMembersProvider(
+                                  widget.organizationId,
+                                ),
+                              );
+                            } catch (e) {
+                              if (context.mounted) showErrorSnackBar(context, e);
+                            }
                           },
                         ),
                       )
@@ -259,9 +267,9 @@ class _MemberTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isSelf = member.userId == currentUserId;
-    final canChangeRole = isOwner || (isAdmin && member.role != 'OWNER');
-    final canRemove =
-        !isSelf && (isOwner || (isAdmin && member.role != 'OWNER'));
+    final canManage = !isSelf && (isOwner || (isAdmin && member.role == 'MEMBER'));
+    final canChangeRole = canManage;
+    final canRemove = canManage;
 
     return Card(
       child: ListTile(

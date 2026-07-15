@@ -4,6 +4,19 @@ import { ERROR_CODES } from '@repo/api-core';
 
 import { LeaveOrganizationUseCase } from '../leave-organization.use-case';
 
+const transactionPort = {
+  run: vi.fn().mockImplementation(async (fn: any) => fn(null)),
+};
+
+const accessControlService = {
+  replaceUserRoles: vi.fn(async () => undefined),
+  invalidateAccessProfile: vi.fn(async () => undefined),
+};
+
+const authSessionRepository = {
+  revokeAllSessionsForUser: vi.fn(async () => undefined),
+};
+
 describe('LeaveOrganizationUseCase', () => {
   it('blocks the last owner from leaving', async () => {
     const repository = {
@@ -13,8 +26,11 @@ describe('LeaveOrganizationUseCase', () => {
     };
     const auditWriter = { log: vi.fn(async () => undefined) };
     const useCase = new LeaveOrganizationUseCase(
+      transactionPort as any,
       repository as never,
       auditWriter as never,
+      accessControlService as any,
+      authSessionRepository as any,
     );
 
     await expect(useCase.execute('org-1', 'u1')).rejects.toMatchObject({
@@ -31,13 +47,16 @@ describe('LeaveOrganizationUseCase', () => {
     };
     const auditWriter = { log: vi.fn(async () => undefined) };
     const useCase = new LeaveOrganizationUseCase(
+      transactionPort as any,
       repository as never,
       auditWriter as never,
+      accessControlService as any,
+      authSessionRepository as any,
     );
 
     await useCase.execute('org-1', 'u1');
 
-    expect(repository.removeMember).toHaveBeenCalledWith('org-1', 'u1');
+    expect(repository.removeMember).toHaveBeenCalledWith('org-1', 'u1', null);
     expect(auditWriter.log).toHaveBeenCalled();
   });
 
@@ -49,14 +68,17 @@ describe('LeaveOrganizationUseCase', () => {
     };
     const auditWriter = { log: vi.fn(async () => undefined) };
     const useCase = new LeaveOrganizationUseCase(
+      transactionPort as any,
       repository as never,
       auditWriter as never,
+      accessControlService as any,
+      authSessionRepository as any,
     );
 
     await useCase.execute('org-1', 'u2');
 
     expect(repository.countOwners).not.toHaveBeenCalled();
-    expect(repository.removeMember).toHaveBeenCalledWith('org-1', 'u2');
+    expect(repository.removeMember).toHaveBeenCalledWith('org-1', 'u2', null);
   });
 
   it('rejects when the caller is not a member', async () => {
@@ -67,8 +89,11 @@ describe('LeaveOrganizationUseCase', () => {
     };
     const auditWriter = { log: vi.fn() };
     const useCase = new LeaveOrganizationUseCase(
+      transactionPort as any,
       repository as never,
       auditWriter as never,
+      accessControlService as any,
+      authSessionRepository as any,
     );
 
     await expect(useCase.execute('org-1', 'stranger')).rejects.toMatchObject({

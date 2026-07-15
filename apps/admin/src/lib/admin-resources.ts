@@ -1,4 +1,5 @@
 import {
+  Building,
   File,
   LayoutDashboard,
   type LucideIcon,
@@ -32,6 +33,15 @@ export const adminResources: AdminResourceConfig[] = [
     icon: LayoutDashboard,
     features: ["list"],
     queryKey: "admin-dashboard",
+  },
+  {
+    id: "organizations",
+    label: "Organizations",
+    group: "People",
+    path: "/organizations",
+    icon: Building,
+    features: ["list", "create", "show", "edit"],
+    queryKey: "admin-organizations",
   },
   {
     id: "users",

@@ -25,6 +25,7 @@ part 'user_dto.g.dart';
 /// * [roles]
 /// * [roleIds]
 /// * [roleAssignments]
+/// * [memberOrganizationIds]
 /// * [createdAt]
 /// * [updatedAt]
 @BuiltValue()
@@ -56,6 +57,9 @@ abstract class UserDto implements Built<UserDto, UserDtoBuilder> {
 
   @BuiltValueField(wireName: r'roleAssignments')
   BuiltList<RoleAssignmentDto> get roleAssignments;
+
+  @BuiltValueField(wireName: r'memberOrganizationIds')
+  BuiltList<String> get memberOrganizationIds;
 
   @BuiltValueField(wireName: r'createdAt')
   String get createdAt;
@@ -134,6 +138,11 @@ class _$UserDtoSerializer implements PrimitiveSerializer<UserDto> {
     yield serializers.serialize(
       object.roleAssignments,
       specifiedType: const FullType(BuiltList, [FullType(RoleAssignmentDto)]),
+    );
+    yield r'memberOrganizationIds';
+    yield serializers.serialize(
+      object.memberOrganizationIds,
+      specifiedType: const FullType(BuiltList, [FullType(String)]),
     );
     yield r'createdAt';
     yield serializers.serialize(
@@ -241,6 +250,15 @@ class _$UserDtoSerializer implements PrimitiveSerializer<UserDto> {
             ]),
           ) as BuiltList<RoleAssignmentDto>;
           result.roleAssignments.replace(valueDes);
+          break;
+        case r'memberOrganizationIds':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(BuiltList, [
+              FullType(String),
+            ]),
+          ) as BuiltList<String>;
+          result.memberOrganizationIds.replace(valueDes);
           break;
         case r'createdAt':
           final valueDes = serializers.deserialize(

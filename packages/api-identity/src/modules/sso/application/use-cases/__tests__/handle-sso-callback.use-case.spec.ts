@@ -4,8 +4,8 @@ import { ERROR_CODES } from '@repo/api-core';
 
 import { HandleSsoCallbackUseCase } from '../handle-sso-callback.use-case';
 
-const buildDatabase = () => ({
-  transaction: vi.fn(async (fn: (tx: string) => unknown) => fn('tx')),
+const buildTransactionPort = () => ({
+  run: vi.fn().mockImplementation(async (fn: any) => fn('tx')),
 });
 
 const buildLoginState = (overrides: Partial<Record<string, unknown>> = {}) => ({
@@ -36,7 +36,7 @@ const buildOrganizationsService = () => ({
 
 interface BuildArgsOverrides {
   providers?: Map<string, unknown>;
-  database?: unknown;
+  transactionPort?: unknown;
   ssoRepository?: unknown;
   usersRepository?: unknown;
   accessControlService?: unknown;
@@ -48,7 +48,7 @@ interface BuildArgsOverrides {
 const buildUseCase = (overrides: BuildArgsOverrides = {}) =>
   new HandleSsoCallbackUseCase(
     (overrides.providers ?? new Map()) as never,
-    (overrides.database ?? buildDatabase()) as never,
+    (overrides.transactionPort ?? buildTransactionPort()) as never,
     (overrides.ssoRepository ?? {}) as never,
     (overrides.usersRepository ?? {}) as never,
     (overrides.accessControlService ?? buildAccessControlService()) as never,
@@ -317,7 +317,7 @@ describe('HandleSsoCallbackUseCase', () => {
     expect(accessControlService.replaceUserRoles).toHaveBeenCalledWith(
       'new-user',
       ['role-user'],
-      undefined,
+      null,
       'tx',
     );
     expect(

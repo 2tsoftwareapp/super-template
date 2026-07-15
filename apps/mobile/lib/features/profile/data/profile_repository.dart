@@ -54,7 +54,7 @@ class ProfileRepository {
 
   Future<BuiltList<AuthSessionDto>> sessions() async {
     try {
-      final response = await _authApi.authControllerGetSessions();
+      final response = await _authApi.authSessionControllerGetSessions();
       return response.data!.data;
     } on DioException catch (error) {
       throw AppException.fromDio(error);

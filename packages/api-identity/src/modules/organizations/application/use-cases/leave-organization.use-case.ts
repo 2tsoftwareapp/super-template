@@ -1,4 +1,5 @@
-import type { RequestContext } from '@repo/api-core';
+import type { RequestContext, AuthenticatedRequestUser } from '@repo/api-core';
+import type { TransactionPort } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import {
@@ -6,67 +7,97 @@ import {
   AUDIT_WRITER,
   type AuditWriter,
   ERROR_CODES,
+  TRANSACTION_PORT,
 } from '@repo/api-core';
 
 import { assertNotLastOwner } from '../../domain/organization-access.policy';
 import { ORGANIZATIONS_REPOSITORY, type OrganizationsRepositoryPort } from '../ports/organizations.repository.port';
+import { AccessControlService } from '../../../access-control/application/access-control.service';
+import {
+  AUTH_SESSION_REPOSITORY,
+  type AuthSessionRepositoryPort,
+} from '../../../auth/application/ports/auth-session.repository.port';
 
 @Injectable()
 export class LeaveOrganizationUseCase {
   constructor(
+    @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
     @Inject(ORGANIZATIONS_REPOSITORY) private readonly organizationsRepository: OrganizationsRepositoryPort,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
+    private readonly accessControlService: AccessControlService,
+    @Inject(AUTH_SESSION_REPOSITORY)
+    private readonly authSessionRepository: AuthSessionRepositoryPort,
   ) {}
 
   async execute(
     organizationId: string,
-    userId: string,
+    actor: string | AuthenticatedRequestUser,
     requestContext?: RequestContext,
   ): Promise<void> {
-    const membership = await this.organizationsRepository.findMembership(
-      organizationId,
-      userId,
-    );
+    const userId = typeof actor === 'string' ? actor : actor.userId;
 
-    if (!membership) {
-      throw new AppError(
-        ERROR_CODES.AUTH_FORBIDDEN,
-        'You are not a member of this organization',
-        HttpStatus.FORBIDDEN,
-      );
-    }
-
-    if (membership.role === 'OWNER') {
-      const remainingOwners = await this.organizationsRepository.countOwners(
+    await this.transactionPort.run(async (transaction) => {
+      const membership = await this.organizationsRepository.findMembership(
         organizationId,
-        { excludingUserId: userId },
+        userId,
+        transaction,
       );
-      assertNotLastOwner(
-        { userId, role: membership.role },
-        remainingOwners,
+
+      if (!membership) {
+        throw new AppError(
+          ERROR_CODES.AUTH_FORBIDDEN,
+          'You are not a member of this organization',
+          HttpStatus.FORBIDDEN,
+        );
+      }
+
+      if (membership.role === 'OWNER') {
+        const remainingOwners = await this.organizationsRepository.countOwners(
+          organizationId,
+          { excludingUserId: userId, executor: transaction, lock: true },
+        );
+        assertNotLastOwner(
+          { userId, role: membership.role },
+          remainingOwners,
+        );
+      }
+
+      const removed = await this.organizationsRepository.removeMember(
+        organizationId,
+        userId,
+        transaction,
       );
-    }
 
-    const removed = await this.organizationsRepository.removeMember(
-      organizationId,
-      userId,
-    );
+      if (!removed) {
+        throw new AppError(
+          ERROR_CODES.ORGANIZATION_MEMBER_NOT_FOUND,
+          'You are not a member of this organization',
+          HttpStatus.NOT_FOUND,
+        );
+      }
 
-    if (!removed) {
-      throw new AppError(
-        ERROR_CODES.ORGANIZATION_MEMBER_NOT_FOUND,
-        'You are not a member of this organization',
-        HttpStatus.NOT_FOUND,
+      // Cleanup user roles scoped to organization
+      await this.accessControlService.replaceUserRoles(
+        userId,
+        [],
+        organizationId,
+        transaction,
       );
-    }
 
-    await this.auditWriter.log({
-      actorId: userId,
-      action: 'organization.leave',
-      entityType: 'organization_member',
-      entityId: userId,
-      metadata: { organizationId },
-      requestContext,
+      // Invalidate access profile cache
+      await this.accessControlService.invalidateAccessProfile(userId);
+
+      // Revoke user sessions
+      await this.authSessionRepository.revokeAllSessionsForUser(userId, transaction);
+
+      await this.auditWriter.log({
+        actorId: userId,
+        action: 'organization.leave',
+        entityType: 'organization_member',
+        entityId: userId,
+        metadata: { organizationId },
+        requestContext,
+      });
     });
   }
 }

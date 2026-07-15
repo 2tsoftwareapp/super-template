@@ -77,7 +77,7 @@ export class OrganizationsController {
   ) {
     return this.getOrganization.execute(
       organizationId,
-      user.userId,
+      user,
     );
   }
 
@@ -91,7 +91,7 @@ export class OrganizationsController {
   ) {
     return this.updateOrganization.execute(
       organizationId,
-      user.userId,
+      user,
       { name: input.name },
       request.requestContext,
     );
@@ -106,7 +106,7 @@ export class OrganizationsController {
   ) {
     await this.deleteOrganization.execute(
       organizationId,
-      user.userId,
+      user,
       request.requestContext,
     );
 
@@ -122,7 +122,7 @@ export class OrganizationsController {
   ) {
     await this.leaveOrganization.execute(
       organizationId,
-      user.userId,
+      user,
       request.requestContext,
     );
 
@@ -135,7 +135,7 @@ export class OrganizationsController {
     @CurrentUser() user: AuthenticatedRequestUser,
     @Param('id', new ParseUUIDPipe()) organizationId: string,
   ) {
-    return this.listOrganizationMembers.execute(organizationId, user.userId);
+    return this.listOrganizationMembers.execute(organizationId, user);
   }
 
   @Patch(':id/members/:userId')
@@ -149,7 +149,7 @@ export class OrganizationsController {
   ) {
     return this.updateMemberRoleUseCase.execute(
       organizationId,
-      user.userId,
+      user,
       targetUserId,
       input.role,
       request.requestContext,
@@ -166,7 +166,7 @@ export class OrganizationsController {
   ) {
     await this.removeOrganizationMember.execute(
       organizationId,
-      user.userId,
+      user,
       targetUserId,
       request.requestContext,
     );

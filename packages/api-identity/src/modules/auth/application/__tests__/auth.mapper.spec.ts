@@ -18,7 +18,7 @@ describe('AuthMapper', () => {
       updatedAt: new Date('2026-01-01T00:00:00.000Z'),
     };
 
-    expect(mapper.toSessionDto(session, 'session-1').current).toBe(true);
-    expect(mapper.toSessionDto(session, 'other-session').current).toBe(false);
+    expect(mapper.toSessionDto(session as any, 'session-1').current).toBe(true);
+    expect(mapper.toSessionDto(session as any, 'other-session').current).toBe(false);
   });
 });

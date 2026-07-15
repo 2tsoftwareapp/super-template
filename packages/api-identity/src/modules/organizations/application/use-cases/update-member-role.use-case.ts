@@ -1,4 +1,5 @@
-import type { RequestContext } from '@repo/api-core';
+import type { RequestContext, AuthenticatedRequestUser } from '@repo/api-core';
+import type { TransactionPort } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import {
@@ -6,6 +7,7 @@ import {
   AUDIT_WRITER,
   type AuditWriter,
   ERROR_CODES,
+  TRANSACTION_PORT,
 } from '@repo/api-core';
 
 import type { OrganizationMemberRole } from '../../domain/organization-access.policy';
@@ -16,90 +18,136 @@ import {
   assertOrganizationRole,
 } from '../../domain/organization-access.policy';
 import { ORGANIZATIONS_REPOSITORY, type OrganizationsRepositoryPort } from '../ports/organizations.repository.port';
+import { AccessControlService } from '../../../access-control/application/access-control.service';
 
 @Injectable()
 export class UpdateMemberRoleUseCase {
   constructor(
+    @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
     @Inject(ORGANIZATIONS_REPOSITORY) private readonly organizationsRepository: OrganizationsRepositoryPort,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
+    private readonly accessControlService: AccessControlService,
   ) {}
 
   async execute(
     organizationId: string,
-    actorUserId: string,
+    actor: string | AuthenticatedRequestUser,
     targetUserId: string,
     role: OrganizationMemberRole,
     requestContext?: RequestContext,
   ) {
-    const actorMembership = await this.organizationsRepository.findMembership(
-      organizationId,
-      actorUserId,
-    );
+    const { userId: actorUserId, isSuperAdmin } = typeof actor === 'string'
+      ? { userId: actor, isSuperAdmin: false }
+      : { userId: actor.userId, isSuperAdmin: actor.roles?.includes('SUPER_ADMIN') ?? false };
 
-    if (!actorMembership) {
-      throw new AppError(
-        ERROR_CODES.AUTH_FORBIDDEN,
-        'You are not a member of this organization',
-        HttpStatus.FORBIDDEN,
-      );
-    }
+    return this.transactionPort.run(async (transaction) => {
+      if (!isSuperAdmin) {
+        const actorMembership = await this.organizationsRepository.findMembership(
+          organizationId,
+          actorUserId,
+          transaction,
+        );
 
-    assertOrganizationRole(actorMembership, ['OWNER', 'ADMIN']);
+        if (!actorMembership) {
+          throw new AppError(
+            ERROR_CODES.AUTH_FORBIDDEN,
+            'You are not a member of this organization',
+            HttpStatus.FORBIDDEN,
+          );
+        }
 
-    const targetMembership = await this.organizationsRepository.findMembership(
-      organizationId,
-      targetUserId,
-    );
+        assertOrganizationRole(actorMembership, ['OWNER', 'ADMIN']);
 
-    if (!targetMembership) {
-      throw new AppError(
-        ERROR_CODES.ORGANIZATION_MEMBER_NOT_FOUND,
-        'This user is not a member of the organization',
-        HttpStatus.NOT_FOUND,
-      );
-    }
+        const targetMembership = await this.organizationsRepository.findMembership(
+          organizationId,
+          targetUserId,
+          transaction,
+        );
 
-    assertCanManageTargetRole(actorMembership.role, targetMembership.role);
-    assertCanManageTargetRole(actorMembership.role, role);
+        if (!targetMembership) {
+          throw new AppError(
+            ERROR_CODES.ORGANIZATION_MEMBER_NOT_FOUND,
+            'This user is not a member of the organization',
+            HttpStatus.NOT_FOUND,
+          );
+        }
 
-    if (targetMembership.role === 'OWNER' && role !== 'OWNER') {
-      const remainingOwners = await this.organizationsRepository.countOwners(
+        assertCanManageTargetRole(actorMembership.role, targetMembership.role);
+        assertCanManageTargetRole(actorMembership.role, role);
+      }
+
+      const targetMembership = await this.organizationsRepository.findMembership(
         organizationId,
-        { excludingUserId: targetUserId },
+        targetUserId,
+        transaction,
       );
-      assertNotLastOwner(
-        { userId: targetUserId, role: targetMembership.role },
-        remainingOwners,
+
+      if (!targetMembership) {
+        throw new AppError(
+          ERROR_CODES.ORGANIZATION_MEMBER_NOT_FOUND,
+          'This user is not a member of the organization',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      if (targetMembership.role === 'OWNER' && role !== 'OWNER') {
+        const remainingOwners = await this.organizationsRepository.countOwners(
+          organizationId,
+          { excludingUserId: targetUserId, executor: transaction, lock: true },
+        );
+        assertNotLastOwner(
+          { userId: targetUserId, role: targetMembership.role },
+          remainingOwners,
+        );
+      }
+
+      const updated = await this.organizationsRepository.updateMemberRole(
+        organizationId,
+        targetUserId,
+        role,
+        transaction,
       );
-    }
 
-    const updated = await this.organizationsRepository.updateMemberRole(
-      organizationId,
-      targetUserId,
-      role,
-    );
+      if (!updated) {
+        throw new AppError(
+          ERROR_CODES.ORGANIZATION_MEMBER_NOT_FOUND,
+          'This user is not a member of the organization',
+          HttpStatus.NOT_FOUND,
+        );
+      }
 
-    if (!updated) {
-      throw new AppError(
-        ERROR_CODES.ORGANIZATION_MEMBER_NOT_FOUND,
-        'This user is not a member of the organization',
-        HttpStatus.NOT_FOUND,
-      );
-    }
+      // Synchronize RBAC roles
+      if (role === 'MEMBER') {
+        await this.accessControlService.replaceUserRoles(
+          targetUserId,
+          [],
+          organizationId,
+          transaction,
+        );
+      } else if (role === 'ADMIN' || role === 'OWNER') {
+        await this.accessControlService.ensureOrganizationAdminRole(
+          organizationId,
+          targetUserId,
+          transaction,
+        );
+      }
 
-    await this.auditWriter.log({
-      actorId: actorUserId,
-      action: 'organization.member.role-update',
-      entityType: 'organization_member',
-      entityId: targetUserId,
-      metadata: { organizationId, role },
-      requestContext,
+      await this.accessControlService.invalidateAccessProfile(targetUserId);
+
+      await this.auditWriter.log({
+        actorId: actorUserId,
+        action: 'organization.member.role-update',
+        entityType: 'organization_member',
+        entityId: targetUserId,
+        metadata: { organizationId, role },
+        requestContext,
+      });
+
+      return {
+        userId: updated.userId,
+        role: updated.role,
+        updatedAt: updated.updatedAt.toISOString(),
+      };
     });
-
-    return {
-      userId: updated.userId,
-      role: updated.role,
-      updatedAt: updated.updatedAt.toISOString(),
-    };
   }
 }

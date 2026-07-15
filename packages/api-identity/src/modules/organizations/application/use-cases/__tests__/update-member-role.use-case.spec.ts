@@ -4,6 +4,16 @@ import { ERROR_CODES } from '@repo/api-core';
 
 import { UpdateMemberRoleUseCase } from '../update-member-role.use-case';
 
+const transactionPort = {
+  run: vi.fn().mockImplementation(async (fn: any) => fn(null)),
+};
+
+const accessControlService = {
+  replaceUserRoles: vi.fn(async () => undefined),
+  ensureOrganizationAdminRole: vi.fn(async () => undefined),
+  invalidateAccessProfile: vi.fn(async () => undefined),
+};
+
 function buildRepository(
   overrides: Partial<{
     actorRole: 'OWNER' | 'ADMIN' | 'MEMBER';
@@ -41,8 +51,10 @@ describe('UpdateMemberRoleUseCase', () => {
     const repository = buildRepository({ actorRole: 'OWNER', targetRole: 'MEMBER' });
     const auditWriter = { log: vi.fn(async () => undefined) };
     const useCase = new UpdateMemberRoleUseCase(
+      transactionPort as any,
       repository as never,
       auditWriter as never,
+      accessControlService as any,
     );
 
     const result = await useCase.execute('org-1', 'actor', 'target', 'ADMIN');
@@ -51,16 +63,19 @@ describe('UpdateMemberRoleUseCase', () => {
       'org-1',
       'target',
       'ADMIN',
+      null,
     );
-    expect(result.data.role).toBe('ADMIN');
+    expect(result.role).toBe('ADMIN');
   });
 
   it('blocks an admin from promoting a member to admin', async () => {
     const repository = buildRepository({ actorRole: 'ADMIN', targetRole: 'MEMBER' });
     const auditWriter = { log: vi.fn() };
     const useCase = new UpdateMemberRoleUseCase(
+      transactionPort as any,
       repository as never,
       auditWriter as never,
+      accessControlService as any,
     );
 
     await expect(
@@ -73,8 +88,10 @@ describe('UpdateMemberRoleUseCase', () => {
     const repository = buildRepository({ actorRole: 'ADMIN', targetRole: 'ADMIN' });
     const auditWriter = { log: vi.fn() };
     const useCase = new UpdateMemberRoleUseCase(
+      transactionPort as any,
       repository as never,
       auditWriter as never,
+      accessControlService as any,
     );
 
     await expect(
@@ -90,8 +107,10 @@ describe('UpdateMemberRoleUseCase', () => {
     });
     const auditWriter = { log: vi.fn() };
     const useCase = new UpdateMemberRoleUseCase(
+      transactionPort as any,
       repository as never,
       auditWriter as never,
+      accessControlService as any,
     );
 
     await expect(
@@ -107,21 +126,25 @@ describe('UpdateMemberRoleUseCase', () => {
     });
     const auditWriter = { log: vi.fn(async () => undefined) };
     const useCase = new UpdateMemberRoleUseCase(
+      transactionPort as any,
       repository as never,
       auditWriter as never,
+      accessControlService as any,
     );
 
     const result = await useCase.execute('org-1', 'actor', 'target', 'ADMIN');
 
-    expect(result.data.role).toBe('ADMIN');
+    expect(result.role).toBe('ADMIN');
   });
 
   it('rejects when the target is not a member', async () => {
     const repository = buildRepository();
     const auditWriter = { log: vi.fn() };
     const useCase = new UpdateMemberRoleUseCase(
+      transactionPort as any,
       repository as never,
       auditWriter as never,
+      accessControlService as any,
     );
 
     await expect(

@@ -4,6 +4,7 @@ export const vi: AdminMessages = {
   nav: {
     dashboard: "Bảng điều khiển",
     users: "Người dùng",
+    organizations: "Tổ chức",
     roles: "Vai trò",
     "audit-logs": "Nhật ký hệ thống",
     notifications: "Thông báo",

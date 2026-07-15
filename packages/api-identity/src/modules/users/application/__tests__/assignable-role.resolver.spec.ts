@@ -8,7 +8,7 @@ function mockService(overrides: Record<string, unknown> = {}) {
     getRoleByName: vi.fn(),
     getOrganizationRoleByName: vi.fn(),
     ...overrides,
-  } as never;
+  } as any;
 }
 
 describe('resolveAssignableRole', () => {

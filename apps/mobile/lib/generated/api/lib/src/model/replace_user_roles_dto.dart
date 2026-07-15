@@ -13,13 +13,13 @@ part 'replace_user_roles_dto.g.dart';
 /// ReplaceUserRolesDto
 ///
 /// Properties:
-/// * [role]
+/// * [roleId]
 /// * [organizationId]
 @BuiltValue()
 abstract class ReplaceUserRolesDto
     implements Built<ReplaceUserRolesDto, ReplaceUserRolesDtoBuilder> {
-  @BuiltValueField(wireName: r'role')
-  String get role;
+  @BuiltValueField(wireName: r'roleId')
+  String get roleId;
 
   @BuiltValueField(wireName: r'organizationId')
   String? get organizationId;
@@ -53,9 +53,9 @@ class _$ReplaceUserRolesDtoSerializer
     ReplaceUserRolesDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'role';
+    yield r'roleId';
     yield serializers.serialize(
-      object.role,
+      object.roleId,
       specifiedType: const FullType(String),
     );
     if (object.organizationId != null) {
@@ -92,12 +92,12 @@ class _$ReplaceUserRolesDtoSerializer
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'role':
+        case r'roleId':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
-          result.role = valueDes;
+          result.roleId = valueDes;
           break;
         case r'organizationId':
           final valueDes = serializers.deserialize(

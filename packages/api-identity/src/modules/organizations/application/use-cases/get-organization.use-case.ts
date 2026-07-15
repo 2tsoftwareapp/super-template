@@ -1,3 +1,4 @@
+import type { AuthenticatedRequestUser } from '@repo/api-core';
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { AppError, ERROR_CODES } from '@repo/api-core';
 
@@ -9,18 +10,25 @@ export class GetOrganizationUseCase {
     @Inject(ORGANIZATIONS_REPOSITORY) private readonly organizationsRepository: OrganizationsRepositoryPort,
   ) {}
 
-  async execute(organizationId: string, userId: string) {
-    const membership = await this.organizationsRepository.findMembership(
-      organizationId,
-      userId,
-    );
+  async execute(organizationId: string, actor: string | AuthenticatedRequestUser) {
+    const { userId: actorUserId, isSuperAdmin } = typeof actor === 'string'
+      ? { userId: actor, isSuperAdmin: false }
+      : { userId: actor.userId, isSuperAdmin: actor.roles?.includes('SUPER_ADMIN') ?? false };
 
-    if (!membership) {
-      throw new AppError(
-        ERROR_CODES.AUTH_FORBIDDEN,
-        'You are not a member of this organization',
-        HttpStatus.FORBIDDEN,
+    let membership = null;
+    if (!isSuperAdmin) {
+      membership = await this.organizationsRepository.findMembership(
+        organizationId,
+        actorUserId,
       );
+
+      if (!membership) {
+        throw new AppError(
+          ERROR_CODES.AUTH_FORBIDDEN,
+          'You are not a member of this organization',
+          HttpStatus.FORBIDDEN,
+        );
+      }
     }
 
     const organization =
@@ -41,7 +49,7 @@ export class GetOrganizationUseCase {
       id: organization.id,
       name: organization.name,
       slug: organization.slug,
-      role: membership.role,
+      role: isSuperAdmin ? ('ADMIN' as const) : membership!.role,
       memberCount,
       createdAt: organization.createdAt.toISOString(),
       updatedAt: organization.updatedAt.toISOString(),

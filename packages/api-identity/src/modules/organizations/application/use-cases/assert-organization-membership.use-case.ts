@@ -16,6 +16,19 @@ export class AssertOrganizationMembershipUseCase {
     userId: string,
     executor?: TransactionExecutor,
   ) {
+    const organization = await this.organizationsRepository.findById(
+      organizationId,
+      executor,
+    );
+
+    if (!organization) {
+      throw new AppError(
+        ERROR_CODES.ORGANIZATION_NOT_FOUND,
+        'Organization not found or has been deleted',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
     const membership = await this.organizationsRepository.findMembership(
       organizationId,
       userId,

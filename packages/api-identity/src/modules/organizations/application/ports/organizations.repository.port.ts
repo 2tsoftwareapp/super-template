@@ -94,7 +94,7 @@ export interface OrganizationsRepositoryPort {
 
   countOwners(
     organizationId: string,
-    options?: { excludingUserId?: string; executor?: TransactionExecutor },
+    options?: { excludingUserId?: string; executor?: TransactionExecutor; lock?: boolean },
   ): Promise<number>;
 
   countMembers(
@@ -119,6 +119,11 @@ export interface OrganizationsRepositoryPort {
     userId: string,
     executor?: TransactionExecutor,
   ): Promise<string | null>;
+
+  deleteOrganizationMembershipsAndRoles(
+    organizationId: string,
+    executor?: TransactionExecutor,
+  ): Promise<void>;
 }
 
 export const ORGANIZATIONS_REPOSITORY = Symbol('ORGANIZATIONS_REPOSITORY');

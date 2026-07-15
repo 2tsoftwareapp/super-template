@@ -21,6 +21,7 @@ const intraPackageAlias = (alias: string, packageName: string) => ({
 export default defineConfig({
   test: {
     maxWorkers: 1,
+    oxc: false,
     include: [
       'test/**/*.{test,spec}.ts',
       '../../packages/api-contract/src/**/*.{test,spec}.ts',

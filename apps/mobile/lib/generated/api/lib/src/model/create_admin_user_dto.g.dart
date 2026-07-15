@@ -91,7 +91,7 @@ class _$CreateAdminUserDto extends CreateAdminUserDto {
   @override
   final CreateAdminUserDtoStatusEnum? status;
   @override
-  final String? role;
+  final String? roleId;
   @override
   final String? organizationId;
 
@@ -106,7 +106,7 @@ class _$CreateAdminUserDto extends CreateAdminUserDto {
     required this.displayName,
     this.avatarUrl,
     this.status,
-    this.role,
+    this.roleId,
     this.organizationId,
   }) : super._();
   @override
@@ -128,7 +128,7 @@ class _$CreateAdminUserDto extends CreateAdminUserDto {
         displayName == other.displayName &&
         avatarUrl == other.avatarUrl &&
         status == other.status &&
-        role == other.role &&
+        roleId == other.roleId &&
         organizationId == other.organizationId;
   }
 
@@ -140,7 +140,7 @@ class _$CreateAdminUserDto extends CreateAdminUserDto {
     _$hash = $jc(_$hash, displayName.hashCode);
     _$hash = $jc(_$hash, avatarUrl.hashCode);
     _$hash = $jc(_$hash, status.hashCode);
-    _$hash = $jc(_$hash, role.hashCode);
+    _$hash = $jc(_$hash, roleId.hashCode);
     _$hash = $jc(_$hash, organizationId.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
@@ -154,7 +154,7 @@ class _$CreateAdminUserDto extends CreateAdminUserDto {
           ..add('displayName', displayName)
           ..add('avatarUrl', avatarUrl)
           ..add('status', status)
-          ..add('role', role)
+          ..add('roleId', roleId)
           ..add('organizationId', organizationId))
         .toString();
   }
@@ -184,9 +184,9 @@ class CreateAdminUserDtoBuilder
   CreateAdminUserDtoStatusEnum? get status => _$this._status;
   set status(CreateAdminUserDtoStatusEnum? status) => _$this._status = status;
 
-  String? _role;
-  String? get role => _$this._role;
-  set role(String? role) => _$this._role = role;
+  String? _roleId;
+  String? get roleId => _$this._roleId;
+  set roleId(String? roleId) => _$this._roleId = roleId;
 
   String? _organizationId;
   String? get organizationId => _$this._organizationId;
@@ -205,7 +205,7 @@ class CreateAdminUserDtoBuilder
       _displayName = $v.displayName;
       _avatarUrl = $v.avatarUrl;
       _status = $v.status;
-      _role = $v.role;
+      _roleId = $v.roleId;
       _organizationId = $v.organizationId;
       _$v = null;
     }
@@ -245,7 +245,7 @@ class CreateAdminUserDtoBuilder
           ),
           avatarUrl: avatarUrl,
           status: status,
-          role: role,
+          roleId: roleId,
           organizationId: organizationId,
         );
     replace(_$result);

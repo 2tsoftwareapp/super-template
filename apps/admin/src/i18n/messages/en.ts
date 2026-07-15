@@ -2,6 +2,7 @@ export const en = {
   nav: {
     dashboard: "Dashboard",
     users: "Users",
+    organizations: "Organizations",
     roles: "Roles",
     "audit-logs": "Audit logs",
     notifications: "Notifications",
