@@ -1405,6 +1405,11 @@ export interface components {
             total: number;
             totalPages: number;
         };
+        RoleAssignmentDto: {
+            roleName: string;
+            roleId: string;
+            organizationId: string | null;
+        };
         UserDto: {
             id: string;
             email: string;
@@ -1415,6 +1420,7 @@ export interface components {
             emailVerifiedAt: string | null;
             roles: string[];
             roleIds: string[];
+            roleAssignments: components["schemas"]["RoleAssignmentDto"][];
             createdAt: string;
             updatedAt: string;
         };
@@ -1425,11 +1431,8 @@ export interface components {
             avatarUrl?: Record<string, never>;
             /** @enum {string} */
             status?: "PENDING" | "ACTIVE" | "BLOCKED";
-            /**
-             * @default USER
-             * @enum {string}
-             */
-            role: "ADMIN" | "USER";
+            /** @default USER */
+            role: string;
             organizationId?: string;
         };
         UpdateAdminUserDto: {
@@ -1442,8 +1445,7 @@ export interface components {
             status: "PENDING" | "ACTIVE" | "BLOCKED";
         };
         ReplaceUserRolesDto: {
-            /** @enum {string} */
-            role: "ADMIN" | "USER";
+            role: string;
             organizationId?: string;
         };
         UpdateProfileDto: {

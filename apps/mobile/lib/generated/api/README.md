@@ -289,6 +289,7 @@ Class | Method | HTTP request | Description
  - [RequestMetaDto](doc/RequestMetaDto.md)
  - [ResendVerificationDto](doc/ResendVerificationDto.md)
  - [ResetPasswordDto](doc/ResetPasswordDto.md)
+ - [RoleAssignmentDto](doc/RoleAssignmentDto.md)
  - [RoleDto](doc/RoleDto.md)
  - [SendAdminMailDto](doc/SendAdminMailDto.md)
  - [SendAdminMailResultDto](doc/SendAdminMailResultDto.md)

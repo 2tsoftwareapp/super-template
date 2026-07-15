@@ -108,6 +108,9 @@ export function useUserDetailController(): UserDetailViewModel {
     roles.data?.data ?? [],
   ).map((r) => ({ name: r.name, description: r.description }));
   const primaryRole = currentUser?.roles.includes("ADMIN") ? "ADMIN" : "USER";
+  const primaryRoleAssignment = currentUser?.roleAssignments?.find(
+    (a) => a.roleName === primaryRole && a.organizationId !== null,
+  );
   const statusDisabled = isSelf || !canEdit || updateStatus.isPending;
   const roleDisabled = isSelf || !canEdit || replaceRoles.isPending;
 
@@ -127,6 +130,7 @@ export function useUserDetailController(): UserDetailViewModel {
     assignableRoles,
     organizations.data?.data ?? [],
     organizations.isLoading,
+    primaryRoleAssignment?.organizationId,
   );
 
   return {

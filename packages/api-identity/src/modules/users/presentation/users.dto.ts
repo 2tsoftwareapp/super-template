@@ -10,6 +10,17 @@ import {
   MinLength,
 } from 'class-validator';
 
+export class RoleAssignmentDto {
+  @ApiProperty()
+  roleName: string;
+
+  @ApiProperty()
+  roleId: string;
+
+  @ApiProperty({ type: String, nullable: true })
+  organizationId: string | null;
+}
+
 export class UserDto {
   @ApiProperty()
   id: string;
@@ -34,6 +45,9 @@ export class UserDto {
 
   @ApiProperty({ type: [String] })
   roleIds: string[];
+
+  @ApiProperty({ type: [RoleAssignmentDto] })
+  roleAssignments: RoleAssignmentDto[];
 
   @ApiProperty()
   createdAt: string;

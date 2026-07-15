@@ -6,6 +6,7 @@
 // @dart=3.0
 
 import 'package:built_collection/built_collection.dart';
+import 'package:super_template_api/src/model/role_assignment_dto.dart';
 import 'package:built_value/json_object.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
@@ -23,6 +24,7 @@ part 'user_dto.g.dart';
 /// * [emailVerifiedAt]
 /// * [roles]
 /// * [roleIds]
+/// * [roleAssignments]
 /// * [createdAt]
 /// * [updatedAt]
 @BuiltValue()
@@ -51,6 +53,9 @@ abstract class UserDto implements Built<UserDto, UserDtoBuilder> {
 
   @BuiltValueField(wireName: r'roleIds')
   BuiltList<String> get roleIds;
+
+  @BuiltValueField(wireName: r'roleAssignments')
+  BuiltList<RoleAssignmentDto> get roleAssignments;
 
   @BuiltValueField(wireName: r'createdAt')
   String get createdAt;
@@ -124,6 +129,11 @@ class _$UserDtoSerializer implements PrimitiveSerializer<UserDto> {
     yield serializers.serialize(
       object.roleIds,
       specifiedType: const FullType(BuiltList, [FullType(String)]),
+    );
+    yield r'roleAssignments';
+    yield serializers.serialize(
+      object.roleAssignments,
+      specifiedType: const FullType(BuiltList, [FullType(RoleAssignmentDto)]),
     );
     yield r'createdAt';
     yield serializers.serialize(
@@ -222,6 +232,15 @@ class _$UserDtoSerializer implements PrimitiveSerializer<UserDto> {
             ]),
           ) as BuiltList<String>;
           result.roleIds.replace(valueDes);
+          break;
+        case r'roleAssignments':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(BuiltList, [
+              FullType(RoleAssignmentDto),
+            ]),
+          ) as BuiltList<RoleAssignmentDto>;
+          result.roleAssignments.replace(valueDes);
           break;
         case r'createdAt':
           final valueDes = serializers.deserialize(

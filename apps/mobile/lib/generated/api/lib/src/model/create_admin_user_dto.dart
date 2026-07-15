@@ -42,8 +42,7 @@ abstract class CreateAdminUserDto
   // enum statusEnum {  PENDING,  ACTIVE,  BLOCKED,  };
 
   @BuiltValueField(wireName: r'role')
-  CreateAdminUserDtoRoleEnum? get role;
-  // enum roleEnum {  ADMIN,  USER,  };
+  String? get role;
 
   @BuiltValueField(wireName: r'organizationId')
   String? get organizationId;
@@ -108,7 +107,7 @@ class _$CreateAdminUserDtoSerializer
       yield r'role';
       yield serializers.serialize(
         object.role,
-        specifiedType: const FullType(CreateAdminUserDtoRoleEnum),
+        specifiedType: const FullType(String),
       );
     }
     if (object.organizationId != null) {
@@ -183,8 +182,8 @@ class _$CreateAdminUserDtoSerializer
         case r'role':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(CreateAdminUserDtoRoleEnum),
-          ) as CreateAdminUserDtoRoleEnum;
+            specifiedType: const FullType(String),
+          ) as String;
           result.role = valueDes;
           break;
         case r'organizationId':
@@ -243,23 +242,4 @@ class CreateAdminUserDtoStatusEnum extends EnumClass {
       _$createAdminUserDtoStatusEnumValues;
   static CreateAdminUserDtoStatusEnum valueOf(String name) =>
       _$createAdminUserDtoStatusEnumValueOf(name);
-}
-
-class CreateAdminUserDtoRoleEnum extends EnumClass {
-  @BuiltValueEnumConst(wireName: r'ADMIN')
-  static const CreateAdminUserDtoRoleEnum ADMIN =
-      _$createAdminUserDtoRoleEnum_ADMIN;
-  @BuiltValueEnumConst(wireName: r'USER')
-  static const CreateAdminUserDtoRoleEnum USER =
-      _$createAdminUserDtoRoleEnum_USER;
-
-  static Serializer<CreateAdminUserDtoRoleEnum> get serializer =>
-      _$createAdminUserDtoRoleEnumSerializer;
-
-  const CreateAdminUserDtoRoleEnum._(String name) : super(name);
-
-  static BuiltSet<CreateAdminUserDtoRoleEnum> get values =>
-      _$createAdminUserDtoRoleEnumValues;
-  static CreateAdminUserDtoRoleEnum valueOf(String name) =>
-      _$createAdminUserDtoRoleEnumValueOf(name);
 }

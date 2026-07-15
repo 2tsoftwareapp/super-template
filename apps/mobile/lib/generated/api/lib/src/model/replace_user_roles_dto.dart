@@ -5,7 +5,6 @@
 // ignore_for_file: unused_element
 // @dart=3.0
 
-import 'package:built_collection/built_collection.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
@@ -20,8 +19,7 @@ part 'replace_user_roles_dto.g.dart';
 abstract class ReplaceUserRolesDto
     implements Built<ReplaceUserRolesDto, ReplaceUserRolesDtoBuilder> {
   @BuiltValueField(wireName: r'role')
-  ReplaceUserRolesDtoRoleEnum get role;
-  // enum roleEnum {  ADMIN,  USER,  };
+  String get role;
 
   @BuiltValueField(wireName: r'organizationId')
   String? get organizationId;
@@ -58,7 +56,7 @@ class _$ReplaceUserRolesDtoSerializer
     yield r'role';
     yield serializers.serialize(
       object.role,
-      specifiedType: const FullType(ReplaceUserRolesDtoRoleEnum),
+      specifiedType: const FullType(String),
     );
     if (object.organizationId != null) {
       yield r'organizationId';
@@ -97,8 +95,8 @@ class _$ReplaceUserRolesDtoSerializer
         case r'role':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(ReplaceUserRolesDtoRoleEnum),
-          ) as ReplaceUserRolesDtoRoleEnum;
+            specifiedType: const FullType(String),
+          ) as String;
           result.role = valueDes;
           break;
         case r'organizationId':
@@ -135,23 +133,4 @@ class _$ReplaceUserRolesDtoSerializer
     );
     return result.build();
   }
-}
-
-class ReplaceUserRolesDtoRoleEnum extends EnumClass {
-  @BuiltValueEnumConst(wireName: r'ADMIN')
-  static const ReplaceUserRolesDtoRoleEnum ADMIN =
-      _$replaceUserRolesDtoRoleEnum_ADMIN;
-  @BuiltValueEnumConst(wireName: r'USER')
-  static const ReplaceUserRolesDtoRoleEnum USER =
-      _$replaceUserRolesDtoRoleEnum_USER;
-
-  static Serializer<ReplaceUserRolesDtoRoleEnum> get serializer =>
-      _$replaceUserRolesDtoRoleEnumSerializer;
-
-  const ReplaceUserRolesDtoRoleEnum._(String name) : super(name);
-
-  static BuiltSet<ReplaceUserRolesDtoRoleEnum> get values =>
-      _$replaceUserRolesDtoRoleEnumValues;
-  static ReplaceUserRolesDtoRoleEnum valueOf(String name) =>
-      _$replaceUserRolesDtoRoleEnumValueOf(name);
 }

@@ -27,6 +27,7 @@ export function useUserRoles(
   options: RoleOption[],
   organizations: OrganizationOption[],
   organizationsLoading: boolean,
+  initialOrganizationId?: string | null,
 ) {
   const [selectedRole, setSelectedRole] = useState<string>(
     primaryRole ?? "USER",
@@ -34,8 +35,8 @@ export function useUserRoles(
 
   const defaultOrgId = useMemo(
     () =>
-      organizations.length === 1 ? (organizations[0]?.id ?? "") : "",
-    [organizations],
+      initialOrganizationId ?? (organizations.length === 1 ? (organizations[0]?.id ?? "") : ""),
+    [initialOrganizationId, organizations],
   );
   const [selectedOrganizationId, setSelectedOrganizationId] =
     useState<string>(defaultOrgId);

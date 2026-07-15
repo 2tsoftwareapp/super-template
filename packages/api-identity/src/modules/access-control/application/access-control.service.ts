@@ -45,6 +45,10 @@ export class AccessControlService {
     return this.roleQueryUseCase.getRoleIdsForUser(userId, organizationId);
   }
 
+  getRoleAssignmentsForUser(userId: string, organizationId?: string | null) {
+    return this.roleQueryUseCase.getRoleAssignmentsForUser(userId, organizationId);
+  }
+
   getRoleIdsForUsers(userIds: string[], organizationId?: string | null) {
     return this.roleQueryUseCase.getRoleIdsForUsers(userIds, organizationId);
   }

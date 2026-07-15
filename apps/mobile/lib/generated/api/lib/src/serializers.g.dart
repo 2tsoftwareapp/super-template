@@ -58,7 +58,6 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(ChangePasswordDto.serializer)
       ..add(CountDto.serializer)
       ..add(CreateAdminUserDto.serializer)
-      ..add(CreateAdminUserDtoRoleEnum.serializer)
       ..add(CreateAdminUserDtoStatusEnum.serializer)
       ..add(CreateExportDto.serializer)
       ..add(CreateImportDto.serializer)
@@ -139,10 +138,10 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(RegisterDto.serializer)
       ..add(ReplaceRolePermissionsDto.serializer)
       ..add(ReplaceUserRolesDto.serializer)
-      ..add(ReplaceUserRolesDtoRoleEnum.serializer)
       ..add(RequestMetaDto.serializer)
       ..add(ResendVerificationDto.serializer)
       ..add(ResetPasswordDto.serializer)
+      ..add(RoleAssignmentDto.serializer)
       ..add(RoleDto.serializer)
       ..add(RoleDtoScopeEnum.serializer)
       ..add(SendAdminMailDto.serializer)
@@ -331,6 +330,12 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..addBuilderFactory(
         const FullType(BuiltList, const [const FullType(String)]),
         () => ListBuilder<String>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, const [
+          const FullType(RoleAssignmentDto),
+        ]),
+        () => ListBuilder<RoleAssignmentDto>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltList, const [const FullType(String)]),

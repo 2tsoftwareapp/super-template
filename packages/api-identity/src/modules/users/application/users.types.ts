@@ -4,6 +4,12 @@ export type UserStatus = 'PENDING' | 'ACTIVE' | 'BLOCKED';
 
 export type UserSortField = 'createdAt' | 'displayName' | 'email' | 'status';
 
+export interface RoleAssignment {
+  roleName: string;
+  roleId: string;
+  organizationId: string | null;
+}
+
 export interface UserView {
   id: string;
   email: string;
@@ -13,6 +19,7 @@ export interface UserView {
   emailVerifiedAt: string | null;
   roles: string[];
   roleIds: string[];
+  roleAssignments: RoleAssignment[];
   createdAt: string;
   updatedAt: string;
 }

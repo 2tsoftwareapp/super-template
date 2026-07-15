@@ -120,7 +120,7 @@ export function CreateUserDrawer({
             email: values.email,
             password: values.password,
             displayName: values.displayName,
-            role: values.role as "ADMIN" | "USER",
+            role: values.role,
             status: "PENDING",
             ...(values.role === "ADMIN" && values.organizationId
               ? { organizationId: values.organizationId }

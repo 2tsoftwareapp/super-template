@@ -96,6 +96,8 @@ class _$UserDto extends UserDto {
   @override
   final BuiltList<String> roleIds;
   @override
+  final BuiltList<RoleAssignmentDto> roleAssignments;
+  @override
   final String createdAt;
   @override
   final String updatedAt;
@@ -112,6 +114,7 @@ class _$UserDto extends UserDto {
     this.emailVerifiedAt,
     required this.roles,
     required this.roleIds,
+    required this.roleAssignments,
     required this.createdAt,
     required this.updatedAt,
   }) : super._();
@@ -134,6 +137,7 @@ class _$UserDto extends UserDto {
         emailVerifiedAt == other.emailVerifiedAt &&
         roles == other.roles &&
         roleIds == other.roleIds &&
+        roleAssignments == other.roleAssignments &&
         createdAt == other.createdAt &&
         updatedAt == other.updatedAt;
   }
@@ -149,6 +153,7 @@ class _$UserDto extends UserDto {
     _$hash = $jc(_$hash, emailVerifiedAt.hashCode);
     _$hash = $jc(_$hash, roles.hashCode);
     _$hash = $jc(_$hash, roleIds.hashCode);
+    _$hash = $jc(_$hash, roleAssignments.hashCode);
     _$hash = $jc(_$hash, createdAt.hashCode);
     _$hash = $jc(_$hash, updatedAt.hashCode);
     _$hash = $jf(_$hash);
@@ -166,6 +171,7 @@ class _$UserDto extends UserDto {
           ..add('emailVerifiedAt', emailVerifiedAt)
           ..add('roles', roles)
           ..add('roleIds', roleIds)
+          ..add('roleAssignments', roleAssignments)
           ..add('createdAt', createdAt)
           ..add('updatedAt', updatedAt))
         .toString();
@@ -208,6 +214,12 @@ class UserDtoBuilder implements Builder<UserDto, UserDtoBuilder> {
   ListBuilder<String> get roleIds => _$this._roleIds ??= ListBuilder<String>();
   set roleIds(ListBuilder<String>? roleIds) => _$this._roleIds = roleIds;
 
+  ListBuilder<RoleAssignmentDto>? _roleAssignments;
+  ListBuilder<RoleAssignmentDto> get roleAssignments =>
+      _$this._roleAssignments ??= ListBuilder<RoleAssignmentDto>();
+  set roleAssignments(ListBuilder<RoleAssignmentDto>? roleAssignments) =>
+      _$this._roleAssignments = roleAssignments;
+
   String? _createdAt;
   String? get createdAt => _$this._createdAt;
   set createdAt(String? createdAt) => _$this._createdAt = createdAt;
@@ -231,6 +243,7 @@ class UserDtoBuilder implements Builder<UserDto, UserDtoBuilder> {
       _emailVerifiedAt = $v.emailVerifiedAt;
       _roles = $v.roles.toBuilder();
       _roleIds = $v.roleIds.toBuilder();
+      _roleAssignments = $v.roleAssignments.toBuilder();
       _createdAt = $v.createdAt;
       _updatedAt = $v.updatedAt;
       _$v = null;
@@ -276,6 +289,7 @@ class UserDtoBuilder implements Builder<UserDto, UserDtoBuilder> {
             emailVerifiedAt: emailVerifiedAt,
             roles: roles.build(),
             roleIds: roleIds.build(),
+            roleAssignments: roleAssignments.build(),
             createdAt: BuiltValueNullFieldError.checkNotNull(
               createdAt,
               r'UserDto',
@@ -294,6 +308,8 @@ class UserDtoBuilder implements Builder<UserDto, UserDtoBuilder> {
         roles.build();
         _$failedField = 'roleIds';
         roleIds.build();
+        _$failedField = 'roleAssignments';
+        roleAssignments.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
           r'UserDto',

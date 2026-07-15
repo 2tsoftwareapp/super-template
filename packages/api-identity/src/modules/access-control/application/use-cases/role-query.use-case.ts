@@ -41,6 +41,10 @@ export class RoleQueryUseCase {
     return this.accessControlRepository.findRoleIdsForUser(userId, organizationId);
   }
 
+  getRoleAssignmentsForUser(userId: string, organizationId?: string | null) {
+    return this.accessControlRepository.findRoleAssignmentsForUser(userId, organizationId);
+  }
+
   async getRoleIdsForUsers(userIds: string[], organizationId?: string | null) {
     const rows =
       await this.accessControlRepository.findRoleIdsForUsers(userIds, organizationId);

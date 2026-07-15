@@ -438,6 +438,35 @@ export class AccessControlRepository {
     return rows.map((row) => row.roleId);
   }
 
+  async findRoleAssignmentsForUser(
+    userId: string,
+    organizationId?: string | null,
+    executor: DatabaseExecutor = this.database,
+  ): Promise<{ roleName: string; roleId: string; organizationId: string | null }[]> {
+    const filters = [eq(userRoles.userId, userId)];
+    if (organizationId === null) {
+      filters.push(isNull(userRoles.organizationId));
+    } else if (organizationId !== undefined) {
+      filters.push(or(isNull(userRoles.organizationId), eq(userRoles.organizationId, organizationId))!);
+    }
+
+    const rows = await executor
+      .select({
+        roleName: roles.name,
+        roleId: roles.id,
+        organizationId: roles.organizationId,
+      })
+      .from(userRoles)
+      .innerJoin(roles, eq(userRoles.roleId, roles.id))
+      .where(and(...filters));
+
+    return rows.map((row) => ({
+      roleName: row.roleName,
+      roleId: row.roleId,
+      organizationId: row.organizationId,
+    }));
+  }
+
   async findRoleIdsForUsers(
     userIds: string[],
     organizationId?: string | null,

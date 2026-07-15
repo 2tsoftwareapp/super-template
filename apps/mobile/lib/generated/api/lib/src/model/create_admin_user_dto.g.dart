@@ -38,33 +38,9 @@ final BuiltSet<CreateAdminUserDtoStatusEnum>
   _$createAdminUserDtoStatusEnum_BLOCKED,
 ]);
 
-const CreateAdminUserDtoRoleEnum _$createAdminUserDtoRoleEnum_ADMIN =
-    const CreateAdminUserDtoRoleEnum._('ADMIN');
-const CreateAdminUserDtoRoleEnum _$createAdminUserDtoRoleEnum_USER =
-    const CreateAdminUserDtoRoleEnum._('USER');
-
-CreateAdminUserDtoRoleEnum _$createAdminUserDtoRoleEnumValueOf(String name) {
-  switch (name) {
-    case 'ADMIN':
-      return _$createAdminUserDtoRoleEnum_ADMIN;
-    case 'USER':
-      return _$createAdminUserDtoRoleEnum_USER;
-    default:
-      throw ArgumentError(name);
-  }
-}
-
-final BuiltSet<CreateAdminUserDtoRoleEnum> _$createAdminUserDtoRoleEnumValues =
-    BuiltSet<CreateAdminUserDtoRoleEnum>(const <CreateAdminUserDtoRoleEnum>[
-  _$createAdminUserDtoRoleEnum_ADMIN,
-  _$createAdminUserDtoRoleEnum_USER,
-]);
-
 Serializer<CreateAdminUserDtoStatusEnum>
     _$createAdminUserDtoStatusEnumSerializer =
     _$CreateAdminUserDtoStatusEnumSerializer();
-Serializer<CreateAdminUserDtoRoleEnum> _$createAdminUserDtoRoleEnumSerializer =
-    _$CreateAdminUserDtoRoleEnumSerializer();
 
 class _$CreateAdminUserDtoStatusEnumSerializer
     implements PrimitiveSerializer<CreateAdminUserDtoStatusEnum> {
@@ -103,41 +79,6 @@ class _$CreateAdminUserDtoStatusEnumSerializer
       );
 }
 
-class _$CreateAdminUserDtoRoleEnumSerializer
-    implements PrimitiveSerializer<CreateAdminUserDtoRoleEnum> {
-  static const Map<String, Object> _toWire = const <String, Object>{
-    'ADMIN': 'ADMIN',
-    'USER': 'USER',
-  };
-  static const Map<Object, String> _fromWire = const <Object, String>{
-    'ADMIN': 'ADMIN',
-    'USER': 'USER',
-  };
-
-  @override
-  final Iterable<Type> types = const <Type>[CreateAdminUserDtoRoleEnum];
-  @override
-  final String wireName = 'CreateAdminUserDtoRoleEnum';
-
-  @override
-  Object serialize(
-    Serializers serializers,
-    CreateAdminUserDtoRoleEnum object, {
-    FullType specifiedType = FullType.unspecified,
-  }) =>
-      _toWire[object.name] ?? object.name;
-
-  @override
-  CreateAdminUserDtoRoleEnum deserialize(
-    Serializers serializers,
-    Object serialized, {
-    FullType specifiedType = FullType.unspecified,
-  }) =>
-      CreateAdminUserDtoRoleEnum.valueOf(
-        _fromWire[serialized] ?? (serialized is String ? serialized : ''),
-      );
-}
-
 class _$CreateAdminUserDto extends CreateAdminUserDto {
   @override
   final String email;
@@ -150,7 +91,7 @@ class _$CreateAdminUserDto extends CreateAdminUserDto {
   @override
   final CreateAdminUserDtoStatusEnum? status;
   @override
-  final CreateAdminUserDtoRoleEnum? role;
+  final String? role;
   @override
   final String? organizationId;
 
@@ -243,9 +184,9 @@ class CreateAdminUserDtoBuilder
   CreateAdminUserDtoStatusEnum? get status => _$this._status;
   set status(CreateAdminUserDtoStatusEnum? status) => _$this._status = status;
 
-  CreateAdminUserDtoRoleEnum? _role;
-  CreateAdminUserDtoRoleEnum? get role => _$this._role;
-  set role(CreateAdminUserDtoRoleEnum? role) => _$this._role = role;
+  String? _role;
+  String? get role => _$this._role;
+  set role(String? role) => _$this._role = role;
 
   String? _organizationId;
   String? get organizationId => _$this._organizationId;

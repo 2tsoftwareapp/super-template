@@ -110,6 +110,11 @@ export interface AccessControlRepositoryPort {
     organizationId?: string | null,
     executor?: TransactionExecutor,
   ): Promise<string[]>;
+  findRoleAssignmentsForUser(
+    userId: string,
+    organizationId?: string | null,
+    executor?: TransactionExecutor,
+  ): Promise<{ roleName: string; roleId: string; organizationId: string | null }[]>;
   findRoleIdsForUsers(
     userIds: string[],
     organizationId?: string | null,

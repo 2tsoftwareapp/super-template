@@ -147,6 +147,7 @@ export 'package:super_template_api/src/model/replace_user_roles_dto.dart';
 export 'package:super_template_api/src/model/request_meta_dto.dart';
 export 'package:super_template_api/src/model/resend_verification_dto.dart';
 export 'package:super_template_api/src/model/reset_password_dto.dart';
+export 'package:super_template_api/src/model/role_assignment_dto.dart';
 export 'package:super_template_api/src/model/role_dto.dart';
 export 'package:super_template_api/src/model/send_admin_mail_dto.dart';
 export 'package:super_template_api/src/model/send_admin_mail_result_dto.dart';
