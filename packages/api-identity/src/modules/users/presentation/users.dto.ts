@@ -98,10 +98,10 @@ export class CreateAdminUserDto {
   @IsEnum(['PENDING', 'ACTIVE', 'BLOCKED'])
   status?: 'PENDING' | 'ACTIVE' | 'BLOCKED';
 
-  @ApiPropertyOptional({ enum: ['ADMIN', 'USER'], default: 'USER' })
+  @ApiPropertyOptional({ default: 'USER' })
   @IsOptional()
-  @IsEnum(['ADMIN', 'USER'])
-  role?: 'ADMIN' | 'USER';
+  @IsString()
+  role?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
@@ -120,9 +120,9 @@ export class UpdateUserStatusDto {
 }
 
 export class ReplaceUserRolesDto {
-  @ApiProperty({ enum: ['ADMIN', 'USER'] })
-  @IsEnum(['ADMIN', 'USER'])
-  role: 'ADMIN' | 'USER';
+  @ApiProperty()
+  @IsString()
+  role: string;
 
   @ApiPropertyOptional()
   @IsOptional()

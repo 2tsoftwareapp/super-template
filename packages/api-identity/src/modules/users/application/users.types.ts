@@ -33,7 +33,7 @@ export interface ListUsersQuery {
   sort: UserSortCriterion[];
 }
 
-export type AssignableRoleName = 'ADMIN' | 'USER';
+export type AssignableRoleName = string;
 
 export interface CreateAdminUserCommand {
   email: string;

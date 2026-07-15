@@ -3,9 +3,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import { useRouter } from "@/i18n/navigation";
-
 import { sessionQueryKey } from "@/hooks/use-session";
+import { useRouter } from "@/i18n/navigation";
 
 import type { ChangePasswordFormValues, MfaConfirmResponse, MfaSetupResponse } from "../model/security.schemas";
 

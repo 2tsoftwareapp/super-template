@@ -40,9 +40,10 @@ export function useUserRoles(
   const [selectedOrganizationId, setSelectedOrganizationId] =
     useState<string>(defaultOrgId);
 
-  const editingOrgScopedRole = selectedRole === "ADMIN";
-  const needsOrganization = isActorSuperAdmin || editingOrgScopedRole;
-  const orgRequired = isActorSuperAdmin && editingOrgScopedRole;
+  const isUserRole = selectedRole === "USER";
+  const editingOrgScopedRole = !isUserRole;
+  const needsOrganization = editingOrgScopedRole;
+  const orgRequired = editingOrgScopedRole;
 
   const canSave =
     !disabled &&
@@ -53,11 +54,11 @@ export function useUserRoles(
     const args: { role: string; organizationId?: string } = { role: selectedRole };
     if (selectedOrganizationId) {
       args.organizationId = selectedOrganizationId;
-    } else if (!isActorSuperAdmin && actorOrganizationId) {
+    } else if (actorOrganizationId) {
       args.organizationId = actorOrganizationId;
     }
     void replaceRoles.mutateAsync(args);
-  }, [selectedRole, selectedOrganizationId, isActorSuperAdmin, actorOrganizationId, replaceRoles]);
+  }, [selectedRole, selectedOrganizationId, actorOrganizationId, replaceRoles]);
 
   return {
     isLoading: rolesLoading,

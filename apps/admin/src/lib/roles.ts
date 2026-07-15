@@ -18,7 +18,7 @@ export function canAssignRole(actorRoles: string[], roleName: string) {
   }
 
   if (actorRoles.includes("SUPER_ADMIN")) {
-    return roleName === "ADMIN" || roleName === "USER";
+    return true;
   }
 
   return roleName === "USER";

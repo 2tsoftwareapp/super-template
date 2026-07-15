@@ -7,7 +7,7 @@ export function createUserSchema(actorRoles: string[], availableRoleNames: strin
     canAssignRole(actorRoles, role),
   );
 
-  const isAdminAllowed = allowedRoles.includes("ADMIN");
+  const hasOrgScopedRoles = allowedRoles.some((r) => r === "ADMIN" || r !== "USER");
 
   return z
     .object({
@@ -18,14 +18,22 @@ export function createUserSchema(actorRoles: string[], availableRoleNames: strin
         .max(120, "Display name must be at most 120 characters"),
       email: z.email("Enter a valid email address"),
       password: z.string().min(8, "Password must be at least 8 characters"),
-      role: z.enum(allowedRoles.length > 0 ? allowedRoles : ["USER"]),
-      organizationId: isAdminAllowed
+      role: z
+        .string()
+        .refine((val) => allowedRoles.includes(val), {
+          message: `Must be one of: ${allowedRoles.join(", ")}`,
+        }),
+      organizationId: hasOrgScopedRoles
         ? z.string().uuid("Must be a valid organization UUID")
         : z.string().uuid().optional(),
     })
     .refine(
-      (data) => data.role !== "ADMIN" || Boolean(data.organizationId),
-      { message: "Organization is required when assigning ADMIN", path: ["organizationId"] },
+      (data) => {
+        if (!hasOrgScopedRoles) return true;
+        const needsOrg = data.role === "ADMIN" || (data.role !== "USER" && allowedRoles.includes(data.role));
+        return !needsOrg || Boolean(data.organizationId);
+      },
+      { message: "Organization is required for this role", path: ["organizationId"] },
     );
 }
 

@@ -95,7 +95,7 @@ export function UserDetailRoles({ roles }: UserDetailRolesProps) {
           </Select>
           {roles.orgRequired && !roles.selectedOrganizationId && (
             <p className="text-xs text-destructive">
-              Organization is required when assigning ADMIN
+              Organization is required for this role
             </p>
           )}
         </div>

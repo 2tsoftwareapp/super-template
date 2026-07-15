@@ -5,11 +5,20 @@ import { Button } from "@repo/web-ui/button";
 import { Input } from "@repo/web-ui/input";
 import { Label } from "@repo/web-ui/label";
 import { PasswordInput } from "@repo/web-ui/password-input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@repo/web-ui/select";
 import { Spinner } from "@repo/web-ui/spinner";
+import { Building2 } from "lucide-react";
 import { useEffect, useMemo } from "react";
 import { useForm, useWatch } from "react-hook-form";
 
 import { ResourceDrawer } from "@/components/resource-drawer";
+import { useMyOrganizationsQuery } from "@/features/organizations/api/organizations.queries";
 import { useCreateUser } from "@/features/users/api/users.mutations";
 import { useAdminRolesQuery } from "@/features/users/api/users.queries";
 import {
@@ -28,6 +37,7 @@ export function CreateUserDrawer({
   actorRoles: string[];
 }) {
   const allRoles = useAdminRolesQuery();
+  const organizations = useMyOrganizationsQuery();
   const availableRoleNames = useMemo(
     () => (allRoles.data?.data ?? []).map((r) => r.name),
     [allRoles.data],
@@ -78,6 +88,10 @@ export function CreateUserDrawer({
   const selectedRole = useWatch<CreateUserForm, "role">({
     control: form.control,
     name: "role",
+  });
+  const selectedOrgId = useWatch<CreateUserForm, "organizationId">({
+    control: form.control,
+    name: "organizationId",
   });
 
   return (
@@ -189,13 +203,26 @@ export function CreateUserDrawer({
 
         {selectedRole === "ADMIN" ? (
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="orgId">Organization ID</Label>
-            <Input
-              id="orgId"
-              placeholder="e.g. 550e8400-e29b-41d4-a716-446655440000"
-              aria-invalid={Boolean(form.formState.errors.organizationId)}
-              {...form.register("organizationId")}
-            />
+            <Label>Organization</Label>
+            <Select
+              value={selectedOrgId ?? ""}
+              onValueChange={(value) => {
+                if (value) form.setValue("organizationId", value, { shouldValidate: true });
+              }}
+              disabled={organizations.isLoading}
+            >
+              <SelectTrigger>
+                <Building2 className="size-3.5 shrink-0 text-muted-foreground" />
+                <SelectValue placeholder="Search organization..." />
+              </SelectTrigger>
+              <SelectContent>
+                {(organizations.data?.data ?? []).map((org) => (
+                  <SelectItem key={org.id} value={org.id}>
+                    {org.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             {form.formState.errors.organizationId ? (
               <p className="text-xs text-destructive">
                 {form.formState.errors.organizationId.message}

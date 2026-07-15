@@ -14,6 +14,8 @@ export async function resolveAssignableRole(
   organizationId: string | null,
   executor?: TransactionExecutor,
 ): Promise<{ id: string; target: RolePolicyTarget }> {
+  const isSystemRole = roleName === ROLE_NAMES.USER || roleName === ROLE_NAMES.ADMIN;
+
   if (roleName === ROLE_NAMES.USER) {
     const role = await accessControlService.getRoleByName(
       ROLE_NAMES.USER,
@@ -39,34 +41,40 @@ export async function resolveAssignableRole(
     };
   }
 
-  if (!organizationId) {
-    throw new AppError(
-      ERROR_CODES.VALIDATION_FAILED,
-      'organizationId is required when assigning ADMIN',
-      400,
-    );
+  if (roleName === ROLE_NAMES.ADMIN || !isSystemRole) {
+    if (!organizationId) {
+      throw new AppError(
+        ERROR_CODES.VALIDATION_FAILED,
+        `organizationId is required when assigning ${roleName}`,
+        400,
+      );
+    }
+
+    const role = isSystemRole
+      ? await accessControlService.getOrganizationRoleByName(ROLE_NAMES.ADMIN, organizationId, executor)
+      : await accessControlService.getRoleByName(roleName, organizationId, executor);
+
+    if (!role) {
+      throw new AppError(
+        ERROR_CODES.INTERNAL_ERROR,
+        `Role ${roleName} not found for organization ${organizationId}`,
+        500,
+      );
+    }
+
+    return {
+      id: role.id,
+      target: {
+        name: role.name,
+        organizationId: role.organizationId,
+        isSystem: role.isSystem,
+      },
+    };
   }
 
-  const role = await accessControlService.getOrganizationRoleByName(
-    ROLE_NAMES.ADMIN,
-    organizationId,
-    executor,
+  throw new AppError(
+    ERROR_CODES.VALIDATION_FAILED,
+    `Unknown role: ${roleName}`,
+    400,
   );
-
-  if (!role) {
-    throw new AppError(
-      ERROR_CODES.INTERNAL_ERROR,
-      'Organization ADMIN role is missing',
-      500,
-    );
-  }
-
-  return {
-    id: role.id,
-    target: {
-      name: role.name,
-      organizationId: role.organizationId,
-      isSystem: role.isSystem,
-    },
-  };
 }
