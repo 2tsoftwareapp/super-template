@@ -13,10 +13,6 @@ const accessControlService = {
   invalidateAccessProfile: vi.fn(async () => undefined),
 };
 
-const authSessionRepository = {
-  revokeAllSessionsForUser: vi.fn(async () => undefined),
-};
-
 describe('LeaveOrganizationUseCase', () => {
   it('blocks the last owner from leaving', async () => {
     const repository = {
@@ -30,7 +26,6 @@ describe('LeaveOrganizationUseCase', () => {
       repository as never,
       auditWriter as never,
       accessControlService as any,
-      authSessionRepository as any,
     );
 
     await expect(useCase.execute('org-1', 'u1')).rejects.toMatchObject({
@@ -51,7 +46,6 @@ describe('LeaveOrganizationUseCase', () => {
       repository as never,
       auditWriter as never,
       accessControlService as any,
-      authSessionRepository as any,
     );
 
     await useCase.execute('org-1', 'u1');
@@ -72,7 +66,6 @@ describe('LeaveOrganizationUseCase', () => {
       repository as never,
       auditWriter as never,
       accessControlService as any,
-      authSessionRepository as any,
     );
 
     await useCase.execute('org-1', 'u2');
@@ -93,7 +86,6 @@ describe('LeaveOrganizationUseCase', () => {
       repository as never,
       auditWriter as never,
       accessControlService as any,
-      authSessionRepository as any,
     );
 
     await expect(useCase.execute('org-1', 'stranger')).rejects.toMatchObject({

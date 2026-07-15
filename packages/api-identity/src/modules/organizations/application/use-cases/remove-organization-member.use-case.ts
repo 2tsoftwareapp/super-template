@@ -17,10 +17,6 @@ import {
 } from '../../domain/organization-access.policy';
 import { ORGANIZATIONS_REPOSITORY, type OrganizationsRepositoryPort } from '../ports/organizations.repository.port';
 import { AccessControlService } from '../../../access-control/application/access-control.service';
-import {
-  AUTH_SESSION_REPOSITORY,
-  type AuthSessionRepositoryPort,
-} from '../../../auth/application/ports/auth-session.repository.port';
 
 @Injectable()
 export class RemoveOrganizationMemberUseCase {
@@ -29,8 +25,6 @@ export class RemoveOrganizationMemberUseCase {
     @Inject(ORGANIZATIONS_REPOSITORY) private readonly organizationsRepository: OrganizationsRepositoryPort,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
     private readonly accessControlService: AccessControlService,
-    @Inject(AUTH_SESSION_REPOSITORY)
-    private readonly authSessionRepository: AuthSessionRepositoryPort,
   ) {}
 
   async execute(
@@ -127,9 +121,6 @@ export class RemoveOrganizationMemberUseCase {
 
       // Invalidate access profile cache
       await this.accessControlService.invalidateAccessProfile(targetUserId);
-
-      // Revoke user sessions
-      await this.authSessionRepository.revokeAllSessionsForUser(targetUserId, transaction);
 
       await this.auditWriter.log({
         actorId: actorUserId,

@@ -9,8 +9,8 @@ export class ListOrganizationsForUserUseCase {
     @Inject(ORGANIZATIONS_REPOSITORY) private readonly organizationsRepository: OrganizationsRepositoryPort,
   ) {}
 
-  async execute(user: AuthenticatedRequestUser) {
-    if (user.roles.includes(ROLE_NAMES.SUPER_ADMIN)) {
+  async execute(user: AuthenticatedRequestUser, memberOnly = false) {
+    if (user.roles.includes(ROLE_NAMES.SUPER_ADMIN) && !memberOnly) {
       const allOrgs = await this.organizationsRepository.listAll();
       return allOrgs.map((org) => ({
         id: org.id,

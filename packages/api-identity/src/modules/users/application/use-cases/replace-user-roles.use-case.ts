@@ -116,7 +116,7 @@ export class ReplaceUserRolesUseCase {
     assertCanAssignRoleTargets(actor, [rolePolicyTarget]);
     assertRoleScopeCanBeAssigned(rolePolicyTarget, actor);
 
-    await this.transactionPort.run( async (transaction) => {
+    await this.transactionPort.run(async (transaction) => {
       const roleScope = resolvedRole.organizationId ?? resolvedOrganizationId;
 
       if (roleScope) {
@@ -126,13 +126,31 @@ export class ReplaceUserRolesUseCase {
           transaction,
         );
 
+        if (membership && membership.role === 'OWNER') {
+          throw new AppError(
+            ERROR_CODES.AUTH_FORBIDDEN,
+            'Cannot modify the roles of an organization owner',
+            HttpStatus.FORBIDDEN,
+          );
+        }
+
+        const targetMembershipRole =
+          resolvedRole.name === ROLE_NAMES.ADMIN ? 'ADMIN' : 'MEMBER';
+
         if (!membership) {
           await this.organizationsRepository.addMember(
             {
               organizationId: roleScope,
               userId,
-              role: 'MEMBER',
+              role: targetMembershipRole,
             },
+            transaction,
+          );
+        } else if (membership.role !== targetMembershipRole) {
+          await this.organizationsRepository.updateMemberRole(
+            roleScope,
+            userId,
+            targetMembershipRole,
             transaction,
           );
         }

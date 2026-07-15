@@ -13,10 +13,6 @@ import {
 import { assertNotLastOwner } from '../../domain/organization-access.policy';
 import { ORGANIZATIONS_REPOSITORY, type OrganizationsRepositoryPort } from '../ports/organizations.repository.port';
 import { AccessControlService } from '../../../access-control/application/access-control.service';
-import {
-  AUTH_SESSION_REPOSITORY,
-  type AuthSessionRepositoryPort,
-} from '../../../auth/application/ports/auth-session.repository.port';
 
 @Injectable()
 export class LeaveOrganizationUseCase {
@@ -25,8 +21,6 @@ export class LeaveOrganizationUseCase {
     @Inject(ORGANIZATIONS_REPOSITORY) private readonly organizationsRepository: OrganizationsRepositoryPort,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
     private readonly accessControlService: AccessControlService,
-    @Inject(AUTH_SESSION_REPOSITORY)
-    private readonly authSessionRepository: AuthSessionRepositoryPort,
   ) {}
 
   async execute(
@@ -86,9 +80,6 @@ export class LeaveOrganizationUseCase {
 
       // Invalidate access profile cache
       await this.accessControlService.invalidateAccessProfile(userId);
-
-      // Revoke user sessions
-      await this.authSessionRepository.revokeAllSessionsForUser(userId, transaction);
 
       await this.auditWriter.log({
         actorId: userId,

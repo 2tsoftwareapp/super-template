@@ -12,6 +12,7 @@ describe("admin resource registry", () => {
   it("defines stable resource ids and paths", () => {
     expect(adminResources.map((resource) => resource.id)).toEqual([
       "dashboard",
+      "organizations",
       "users",
       "roles",
       "audit-logs",

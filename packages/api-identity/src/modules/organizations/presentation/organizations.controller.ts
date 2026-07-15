@@ -10,6 +10,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
   Req,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
@@ -56,8 +57,11 @@ export class OrganizationsController {
 
   @Get()
   @ApiArrayResponse(OrganizationDto)
-  list(@CurrentUser() user: AuthenticatedRequestUser) {
-    return this.listOrganizationsForUser.execute(user);
+  list(
+    @CurrentUser() user: AuthenticatedRequestUser,
+    @Query('memberOnly') memberOnly?: string,
+  ) {
+    return this.listOrganizationsForUser.execute(user, memberOnly === 'true');
   }
 
   @Post()

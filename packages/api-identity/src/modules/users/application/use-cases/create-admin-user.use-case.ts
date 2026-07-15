@@ -135,7 +135,7 @@ export class CreateAdminUserUseCase {
             {
               organizationId,
               userId: user.id,
-              role: 'MEMBER',
+              role: 'ADMIN',
             },
             transaction,
           );

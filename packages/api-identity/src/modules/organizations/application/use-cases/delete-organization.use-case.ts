@@ -13,10 +13,6 @@ import {
 import { assertOrganizationRole } from '../../domain/organization-access.policy';
 import { ORGANIZATIONS_REPOSITORY, type OrganizationsRepositoryPort } from '../ports/organizations.repository.port';
 import { AccessControlService } from '../../../access-control/application/access-control.service';
-import {
-  AUTH_SESSION_REPOSITORY,
-  type AuthSessionRepositoryPort,
-} from '../../../auth/application/ports/auth-session.repository.port';
 
 @Injectable()
 export class DeleteOrganizationUseCase {
@@ -25,8 +21,6 @@ export class DeleteOrganizationUseCase {
     @Inject(ORGANIZATIONS_REPOSITORY) private readonly organizationsRepository: OrganizationsRepositoryPort,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
     private readonly accessControlService: AccessControlService,
-    @Inject(AUTH_SESSION_REPOSITORY)
-    private readonly authSessionRepository: AuthSessionRepositoryPort,
   ) {}
 
   async execute(
@@ -92,9 +86,8 @@ export class DeleteOrganizationUseCase {
         transaction,
       );
 
-      // Clean up each member's cache and active sessions
+      // Clean up each member's cache
       for (const member of members) {
-        await this.authSessionRepository.revokeAllSessionsForUser(member.userId, transaction);
         await this.accessControlService.invalidateAccessProfile(member.userId);
       }
 

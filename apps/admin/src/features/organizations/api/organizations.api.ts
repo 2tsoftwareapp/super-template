@@ -10,7 +10,7 @@ import type {
 import { webFetch } from "@/lib/http";
 
 export async function fetchMyOrganizations() {
-  return webFetch<ListResponse<OrganizationDto>>("/api/bff/organizations");
+  return webFetch<ListResponse<OrganizationDto>>("/api/bff/organizations?memberOnly=true");
 }
 
 export async function switchOrganization(organizationId: string) {
