@@ -29,6 +29,10 @@ export function canAssignRole(actorRoles: string[], roleName: string) {
     return true;
   }
 
+  if (roleName === "ADMIN") {
+    return false;
+  }
+
   if (isOrganizationRole(roleName)) {
     return actorRoles.includes("ADMIN");
   }

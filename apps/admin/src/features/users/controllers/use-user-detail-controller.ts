@@ -106,7 +106,13 @@ export function useUserDetailController(): UserDetailViewModel {
   const assignableRoles = getAssignableRoles(
     actorRoles,
     roles.data?.data ?? [],
-  ).map((r) => ({ name: r.name, description: r.description }));
+  ).map((r) => ({
+    id: r.id,
+    name: r.name,
+    description: r.description,
+    organizationId: r.organizationId,
+    scope: r.scope,
+  }));
   const orgScopedAssignment = currentUser?.roleAssignments?.find(
     (a) => a.organizationId !== null,
   );

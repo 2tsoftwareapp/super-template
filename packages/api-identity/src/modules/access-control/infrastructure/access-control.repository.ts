@@ -317,7 +317,7 @@ export class AccessControlRepository {
           roleId: role.id,
           organizationId: role.organizationId,
         })),
-      );
+      ).onConflictDoNothing();
     }
   }
 

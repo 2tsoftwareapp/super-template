@@ -1,10 +1,13 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export interface RoleOption {
+  id: string;
   name: string;
   description: string | Record<string, never> | null;
+  organizationId: string | Record<string, never> | null;
+  scope: string;
 }
 
 export interface OrganizationOption {
@@ -29,33 +32,48 @@ export function useUserRoles(
   organizationsLoading: boolean,
   initialOrganizationId?: string | null,
 ) {
-  const [selectedRole, setSelectedRole] = useState<string>(
-    primaryRole ?? "USER",
-  );
+  const [selectedRole, setSelectedRole] = useState<string>("USER");
   const [selectedOrganizationId, setSelectedOrganizationId] =
-    useState<string>(initialOrganizationId ?? "");
+    useState<string>("");
 
-  const isCurrentRoleOrgScoped =
-    selectedRole === "ADMIN" || (selectedRole !== "USER" && selectedRole !== "SUPER_ADMIN");
-  const isPrimaryRoleOrgScoped =
-    primaryRole === "ADMIN" || (primaryRole !== undefined && primaryRole !== "USER" && primaryRole !== "SUPER_ADMIN");
+  useEffect(() => {
+    if (primaryRole) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSelectedRole(primaryRole);
+    }
+  }, [primaryRole]);
+
+  useEffect(() => {
+    if (initialOrganizationId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSelectedOrganizationId(initialOrganizationId);
+    }
+  }, [initialOrganizationId]);
+
+  const isOrgScopedRole = (role: string) =>
+    role === "ADMIN" || (role !== "USER" && role !== "SUPER_ADMIN");
+
+  const isCurrentRoleOrgScoped = isOrgScopedRole(selectedRole);
+  const isPrimaryRoleOrgScoped = primaryRole !== undefined && isOrgScopedRole(primaryRole);
   const needsOrganization = isCurrentRoleOrgScoped;
+
+  const effectiveOrganizationId =
+    isActorSuperAdmin ? selectedOrganizationId : (actorOrganizationId ?? "");
+
   const orgRequired = isCurrentRoleOrgScoped || isPrimaryRoleOrgScoped;
 
   const canSave =
     !disabled &&
     selectedRole !== primaryRole &&
-    (!orgRequired || selectedOrganizationId.length > 0);
+    (!orgRequired || Boolean(effectiveOrganizationId));
 
   const handleSave = useCallback(() => {
     const args: { role: string; organizationId?: string } = { role: selectedRole };
-    if (selectedOrganizationId) {
-      args.organizationId = selectedOrganizationId;
-    } else if (actorOrganizationId) {
-      args.organizationId = actorOrganizationId;
+    if (effectiveOrganizationId) {
+      args.organizationId = effectiveOrganizationId;
     }
     void replaceRoles.mutateAsync(args);
-  }, [selectedRole, selectedOrganizationId, actorOrganizationId, replaceRoles]);
+  }, [selectedRole, effectiveOrganizationId, replaceRoles]);
 
   return {
     isLoading: rolesLoading,

@@ -21,7 +21,7 @@ export function createUserSchema(actorRoles: string[], availableRoleNames: strin
         .refine((val) => allowedRoles.includes(val), {
           message: `Must be one of: ${allowedRoles.join(", ")}`,
         }),
-      organizationId: z.string().uuid().optional(),
+      organizationId: z.string().uuid().optional().or(z.literal("")),
     })
     .refine(
       (data) => {

@@ -40,6 +40,10 @@ export function UserDetailView() {
   }
 
   return (
-    <UserDetailContent vm={controller} user={controller.currentUser} />
+    <UserDetailContent
+      key={controller.currentUser.id}
+      vm={controller}
+      user={controller.currentUser}
+    />
   );
 }
