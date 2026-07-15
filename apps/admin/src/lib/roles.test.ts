@@ -5,6 +5,7 @@ import type { RoleDto } from "./api-types";
 import {
   buildRoleLookup,
   canAssignRole,
+  filterRolesForOrganization,
   formatRoleName,
   getAssignableRoles,
   isOrganizationRole,
@@ -64,8 +65,8 @@ describe("getAssignableRoles", () => {
     ).toEqual(["ADMIN", "USER"]);
   });
 
-  it("deduplicates by name and prefers platform roles in the picker", () => {
-    const rolesWithOrgScopedDuplicates: RoleDto[] = [
+  it("does not deduplicate — dedup is handled by filterRolesForOrganization", () => {
+    const rolesWithDuplicates: RoleDto[] = [
       { id: "1", name: "SUPER_ADMIN", scope: "platform" } as RoleDto,
       { id: "2", name: "ADMIN", scope: "platform" } as RoleDto,
       { id: "3", name: "ADMIN", scope: "organization" } as RoleDto,
@@ -74,10 +75,8 @@ describe("getAssignableRoles", () => {
     ];
 
     expect(
-      getAssignableRoles(["SUPER_ADMIN"], rolesWithOrgScopedDuplicates).map(
-        (r) => r.id,
-      ),
-    ).toEqual(["2", "5"]);
+      getAssignableRoles(["SUPER_ADMIN"], rolesWithDuplicates).length,
+    ).toBe(4);
   });
 });
 
@@ -104,23 +103,18 @@ describe("multi-org scenarios", () => {
     { id: "r6", name: "USER", scope: "platform" } as RoleDto,
   ];
 
-  it("deduplicates by name for SUPER_ADMIN across all orgs", () => {
+  it("getAssignableRoles returns all roles sorted alphabetically (no dedup) for SUPER_ADMIN", () => {
     const result = getAssignableRoles(["SUPER_ADMIN"], multiOrgRoles);
-    expect(result.map((r) => r.name)).toEqual([
-      "ACCOUNTANT",
-      "ADMIN",
-      "MANAGER",
-      "USER",
-    ]);
+    // SUPER_ADMIN can assign all org roles + USER (but not SUPER_ADMIN which isn't in list)
+    // Sorted by name: ACCOUNTANT(r3), ACCOUNTANT(r4), ADMIN(r2), MANAGER(r5), USER(r1), USER(r6)
+    expect(result.map((r) => r.id)).toEqual(["r3", "r4", "r2", "r5", "r1", "r6"]);
   });
 
-  it("returns USER and org-scoped custom roles for org ADMIN", () => {
+  it("returns USER and org-scoped custom roles for org ADMIN sorted", () => {
     const result = getAssignableRoles(["ADMIN"], multiOrgRoles);
-    expect(result.map((r) => r.name)).toEqual([
-      "ACCOUNTANT",
-      "MANAGER",
-      "USER",
-    ]);
+    // ADMIN cannot assign ADMIN role (r2), but can assign USER + custom
+    // Sorted by name: ACCOUNTANT(r3), ACCOUNTANT(r4), MANAGER(r5), USER(r1), USER(r6)
+    expect(result.map((r) => r.id)).toEqual(["r3", "r4", "r5", "r1", "r6"]);
   });
 
   it("returns org-specific custom roles plus USER for org ADMIN", () => {
@@ -140,6 +134,34 @@ describe("multi-org scenarios", () => {
     const result = getAssignableRoles(["SUPER_ADMIN"], allRoles);
     expect(result.map((r) => r.name)).not.toContain("SUPER_ADMIN");
     expect(result.map((r) => r.name)).toEqual(["USER"]);
+  });
+});
+
+describe("filterRolesForOrganization", () => {
+  const roles: RoleDto[] = [
+    { id: "p1", name: "USER", scope: "platform" } as RoleDto,
+    { id: "p2", name: "USER", scope: "platform" } as RoleDto,
+    { id: "o1", name: "ACCOUNTANT", scope: "organization", organizationId: "org-a" as unknown as Record<string, never> | null } as unknown as RoleDto,
+    { id: "o2", name: "ACCOUNTANT", scope: "organization", organizationId: "org-b" as unknown as Record<string, never> | null } as unknown as RoleDto,
+    { id: "o3", name: "MANAGER", scope: "organization", organizationId: "org-a" as unknown as Record<string, never> | null } as unknown as RoleDto,
+  ];
+
+  it("shows only platform roles when no org is selected", () => {
+    const result = filterRolesForOrganization(roles, null);
+    expect(result.map((r) => r.id)).toEqual(["p1"]);
+    // USER deduped to one entry
+  });
+
+  it("filters org-scoped roles by organization and dedupes names", () => {
+    const result = filterRolesForOrganization(roles, "org-a");
+    expect(result.map((r) => r.id)).toEqual(["p1", "o1", "o3"]);
+  });
+
+  it("shows same-named roles from different orgs", () => {
+    const resultA = filterRolesForOrganization(roles, "org-a");
+    const resultB = filterRolesForOrganization(roles, "org-b");
+    expect(resultA.find((r) => r.name === "ACCOUNTANT")?.id).toBe("o1");
+    expect(resultB.find((r) => r.name === "ACCOUNTANT")?.id).toBe("o2");
   });
 });
 

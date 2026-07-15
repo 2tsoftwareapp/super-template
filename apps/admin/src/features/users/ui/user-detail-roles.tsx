@@ -28,13 +28,13 @@ export function UserDetailRoles({ roles }: UserDetailRolesProps) {
       ) : (
         <div className="space-y-1.5">
           {roles.options.map((role) => {
-            const checked = roles.selectedRoleName === role.name;
+            const checked = roles.selectedRoleId === role.id;
             return (
               <button
                 key={role.id}
                 type="button"
                 disabled={roles.disabled}
-                onClick={() => roles.onSelect(role.name)}
+                onClick={() => roles.onSelect(role.id)}
                 className={cn(
                   "flex w-full items-center gap-3 rounded-lg border px-3 py-2.5 text-left transition-colors",
                   "disabled:cursor-not-allowed disabled:opacity-40",
@@ -71,7 +71,7 @@ export function UserDetailRoles({ roles }: UserDetailRolesProps) {
         </div>
       )}
 
-      <Show when={roles.needsOrganization && roles.organizations.length > 0}>
+      <Show when={roles.organizations.length > 0}>
         <div className="mt-4 space-y-1.5">
           <label className="text-sm font-medium">Organization</label>
           <Select

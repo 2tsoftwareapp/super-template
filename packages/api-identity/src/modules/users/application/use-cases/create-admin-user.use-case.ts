@@ -97,6 +97,17 @@ export class CreateAdminUserUseCase {
         }
         const resolvedRole = await resolveRoleById(this.accessControlService, roleId, transaction);
 
+        if (
+          resolvedRole.organizationId !== null &&
+          resolvedRole.organizationId !== organizationId
+        ) {
+          throw new AppError(
+            ERROR_CODES.VALIDATION_FAILED,
+            'Role does not belong to the selected organization',
+            400,
+          );
+        }
+
         assertRoleScopeCanBeAssigned(
           { name: resolvedRole.name, organizationId: resolvedRole.organizationId, isSystem: resolvedRole.isSystem },
           actor,
@@ -143,19 +154,26 @@ export class CreateAdminUserUseCase {
             transaction,
           );
 
-          if (actorIsSuperAdmin && roleScope === null) {
+          if (organizationId) {
+            const membership = await this.organizationsRepository.findMembership(
+              organizationId,
+              user.id,
+              transaction,
+            );
+            if (!membership) {
+              await this.organizationsRepository.addMember(
+                {
+                  organizationId,
+                  userId: user.id,
+                  role: 'MEMBER',
+                },
+                transaction,
+              );
+            }
+          } else if (actorIsSuperAdmin && resolvedRole.organizationId === null) {
             await this.organizationsService.ensurePersonalOrganization(
               user.id,
               user.displayName,
-              transaction,
-            );
-          } else if (organizationId) {
-            await this.organizationsRepository.addMember(
-              {
-                organizationId,
-                userId: user.id,
-                role: 'MEMBER',
-              },
               transaction,
             );
           }

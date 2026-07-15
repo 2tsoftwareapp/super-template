@@ -91,6 +91,17 @@ export class ReplaceUserRolesUseCase {
       ),
     ]);
 
+    if (
+      resolvedRole.organizationId !== null &&
+      resolvedRole.organizationId !== resolvedOrganizationId
+    ) {
+      throw new AppError(
+        ERROR_CODES.VALIDATION_FAILED,
+        'Role does not belong to the selected organization',
+        400,
+      );
+    }
+
     const rolePolicyTarget = {
       name: resolvedRole.name,
       organizationId: resolvedRole.organizationId,

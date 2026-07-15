@@ -4,6 +4,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { AdminUserDto } from "@/lib/api-types";
 
+import { filterRolesForOrganization } from "@/lib/roles";
+
 export interface RoleOption {
   id: string;
   name: string;
@@ -37,37 +39,46 @@ export function useUserRoles(
 ) {
   const [selectedOrganizationId, setSelectedOrganizationId] =
     useState<string>("");
-  const [selectedRoleName, setSelectedRoleName] = useState<string>("USER");
+  const [selectedRoleId, setSelectedRoleId] = useState<string>("");
+
+  const filteredOptions = useMemo(
+    () => filterRolesForOrganization(options, selectedOrganizationId),
+    [options, selectedOrganizationId],
+  );
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setSelectedOrganizationId(initialOrganizationId ?? "");
-    const current = currentUser?.roleAssignments?.find(
-      (a) => a.organizationId === (initialOrganizationId ?? null),
-    );
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setSelectedRoleName(current?.roleName ?? "USER");
-  }, [userId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [userId]);
 
-  useEffect(() => {
-    const current = currentUser?.roleAssignments?.find(
-      (a) => a.organizationId === selectedOrganizationId,
-    );
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setSelectedRoleName(current?.roleName ?? "USER");
-  }, [selectedOrganizationId]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const originalAssignment = useMemo(
+  const currentAssignment = useMemo(
     () => currentUser?.roleAssignments?.find(
       (a) => a.organizationId === selectedOrganizationId,
     ),
     [currentUser, selectedOrganizationId],
   );
 
-  const originalRoleName = originalAssignment?.roleName ?? "USER";
+  const membershipExists = currentAssignment !== undefined;
+  const currentRoleId = currentAssignment?.roleId ?? null;
+
+  useEffect(() => {
+    if (currentRoleId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSelectedRoleId(currentRoleId);
+    } else {
+      // No membership yet — default to first available role
+      const firstId = filteredOptions[0]?.id ?? "";
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSelectedRoleId(firstId);
+    }
+  }, [currentRoleId, filteredOptions]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const isOrgScopedRole = (role: string) =>
     role === "ADMIN" || (role !== "USER" && role !== "SUPER_ADMIN");
+
+  const selectedRoleName = filteredOptions.find(
+    (r) => r.id === selectedRoleId,
+  )?.name ?? "USER";
 
   const isCurrentRoleOrgScoped = isOrgScopedRole(selectedRoleName);
   const needsOrganization = isCurrentRoleOrgScoped;
@@ -77,41 +88,28 @@ export function useUserRoles(
 
   const orgRequired = isCurrentRoleOrgScoped;
 
-  const filteredOptions = useMemo(() => {
-    if (!isActorSuperAdmin) {
-      return options;
-    }
-    return selectedOrganizationId
-      ? options.filter(
-          (o) => o.organizationId === null || (o.organizationId as unknown as string) === selectedOrganizationId,
-        )
-      : options.filter((o) => o.organizationId === null);
-  }, [options, selectedOrganizationId, isActorSuperAdmin]);
-
   const canSave =
     !disabled &&
-    selectedRoleName !== originalRoleName &&
-    (!orgRequired || Boolean(effectiveOrganizationId));
-
-  const selectedRoleId = originalAssignment?.roleId ?? "";
+    (membershipExists
+      ? selectedRoleId !== currentRoleId
+      : Boolean(effectiveOrganizationId) || !orgRequired);
 
   const handleSave = useCallback(() => {
-    const roleOption = options.find((o) => o.name === selectedRoleName);
-    const id = roleOption?.id;
-    if (!id) return;
-    const args: { roleId: string; organizationId?: string } = { roleId: id };
+    const args: { roleId: string; organizationId?: string } = {
+      roleId: selectedRoleId,
+    };
     if (effectiveOrganizationId) {
       args.organizationId = effectiveOrganizationId;
     }
     void replaceRoles.mutateAsync(args);
-  }, [selectedRoleName, effectiveOrganizationId, options, replaceRoles]);
+  }, [selectedRoleId, effectiveOrganizationId, replaceRoles]);
 
   return {
     isLoading: rolesLoading,
     options: filteredOptions,
     selectedRoleName,
     selectedRoleId,
-    onSelect: setSelectedRoleName,
+    onSelect: setSelectedRoleId,
     disabled,
     canSave,
     onSave: handleSave,
@@ -126,5 +124,6 @@ export function useUserRoles(
     onOrganizationSelect: setSelectedOrganizationId,
     needsOrganization,
     orgRequired,
+    membershipExists,
   };
 }

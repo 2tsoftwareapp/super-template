@@ -1,12 +1,6 @@
 import { z } from "zod";
 
-import { canAssignRole, isOrganizationRole } from "@/lib/roles";
-
-export function createUserSchema(actorRoles: string[], availableRoleNames: string[]) {
-  const allowedRoles = availableRoleNames.filter((role) =>
-    canAssignRole(actorRoles, role),
-  );
-
+export function createUserSchema(actorRoles: string[], availableRoleIds: string[]) {
   return z
     .object({
       displayName: z
@@ -16,19 +10,20 @@ export function createUserSchema(actorRoles: string[], availableRoleNames: strin
         .max(120, "Display name must be at most 120 characters"),
       email: z.email("Enter a valid email address"),
       password: z.string().min(8, "Password must be at least 8 characters"),
-      role: z
+      roleId: z
         .string()
-        .refine((val) => allowedRoles.includes(val), {
-          message: `Must be one of: ${allowedRoles.join(", ")}`,
+        .min(1, "Role is required")
+        .refine((val) => availableRoleIds.includes(val), {
+          message: "Selected role is not available",
         }),
       organizationId: z.string().uuid().optional().or(z.literal("")),
     })
     .refine(
       (data) => {
-        if (!isOrganizationRole(data.role)) return true;
-        return Boolean(data.organizationId);
+        if (!data.organizationId) return true;
+        return Boolean(data.roleId);
       },
-      { message: "Organization is required for this role", path: ["organizationId"] },
+      { message: "Role is required", path: ["roleId"] },
     );
 }
 

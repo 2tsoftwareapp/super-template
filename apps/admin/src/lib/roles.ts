@@ -44,15 +44,50 @@ export function getAssignableRoles(
   actorRoles: string[],
   roles: RoleDto[],
 ): RoleDto[] {
-  const seen = new Set<string>();
   return roles
     .filter((role) => {
       if (!canAssignRole(actorRoles, role.name)) return false;
-      if (seen.has(role.name)) return false;
-      seen.add(role.name);
       return true;
     })
     .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+interface RoleWithOrg {
+  id: string;
+  name: string;
+  organizationId: Record<string, never> | string | null;
+}
+
+export function filterRolesForOrganization<T extends RoleWithOrg>(
+  roles: T[],
+  organizationId: string | null | undefined,
+): T[] {
+  if (!organizationId) {
+    // No org selected — only show platform roles (deduped)
+    const seen = new Set<string>();
+    return roles.filter((role) => {
+      if (role.organizationId != null) return false;
+      if (seen.has(role.name)) return false;
+      seen.add(role.name);
+      return true;
+    });
+  }
+
+  const seen = new Set<string>();
+  return roles.filter((role) => {
+    // Platform roles: always visible
+    if (role.organizationId == null) {
+      if (seen.has(role.name)) return false;
+      seen.add(role.name);
+      return true;
+    }
+    // Org-scoped roles: filter by organization
+    if (typeof role.organizationId !== "string") return false;
+    if (role.organizationId !== organizationId) return false;
+    if (seen.has(role.name)) return false;
+    seen.add(role.name);
+    return true;
+  });
 }
 
 export function buildRoleLookup(roles: RoleDto[]) {
