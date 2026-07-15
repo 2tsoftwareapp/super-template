@@ -72,6 +72,10 @@ export interface OrganizationsRepositoryPort {
     executor?: TransactionExecutor,
   ): Promise<UserOrganizationRecord[]>;
 
+  listAll(
+    executor?: TransactionExecutor,
+  ): Promise<OrganizationRecord[]>;
+
   updateOrganization(
     organizationId: string,
     values: { name: string },

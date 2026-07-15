@@ -64,17 +64,21 @@ const schemaAlreadyInitialized = async (pool: Pool): Promise<boolean> => {
 };
 
 /**
- * Max migration index that was known at the time tracking was introduced.
- *
- * Migrations at or before this index are eligible for auto-backfill (mark
- * as "already applied" without re-execution). Migrations AFTER this index
- * are never backfilled — they go through the normal apply loop so their
+ * Highest migration numeric index that was known at the time tracking was
+ * introduced. Migrations at or before this index are eligible for auto-backfill
+ * (mark as "already applied" without re-execution). Migrations AFTER this
+ * index are never backfilled — they go through the normal apply loop so their
  * DDL actually runs.
  *
  * When adding a new migration, first deploy and verify it applies correctly
  * on every environment, *then* bump this constant.
  */
-const BASELINE_MIGRATION = '0016_refresh_rotation_grace';
+const BASELINE_MIGRATION_INDEX = 16;
+
+const parseMigrationIndex = (filename: string): number => {
+  const match = /^(\d{4})/.exec(filename);
+  return match ? Number.parseInt(match[1]!, 10) : 0;
+};
 
 /** Backfill ledger for DBs migrated before tracking existed. */
 const backfillMigrationsLedger = async (
@@ -93,7 +97,7 @@ const backfillMigrationsLedger = async (
   for (const migrationFile of migrationFiles) {
     /* Only backfill migrations up to the known baseline. Migrations past
      * the baseline go through the normal apply loop so their DDL runs. */
-    if (migrationFile.localeCompare(BASELINE_MIGRATION) > 0) {
+    if (parseMigrationIndex(migrationFile) > BASELINE_MIGRATION_INDEX) {
       break;
     }
 

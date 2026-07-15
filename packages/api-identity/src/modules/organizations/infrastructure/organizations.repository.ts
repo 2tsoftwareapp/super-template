@@ -132,6 +132,14 @@ export class OrganizationsRepository implements OrganizationsRepositoryPort {
       .orderBy(asc(organizations.name));
   }
 
+  async listAll(executor: DatabaseExecutor = this.database) {
+    return executor
+      .select()
+      .from(organizations)
+      .where(isNull(organizations.deletedAt))
+      .orderBy(asc(organizations.name));
+  }
+
   async updateOrganization(
     organizationId: string,
     values: Partial<Pick<typeof organizations.$inferInsert, 'name'>>,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 export interface RoleOption {
   name: string;
@@ -29,22 +29,29 @@ export function useUserRoles(
   organizationsLoading: boolean,
   initialOrganizationId?: string | null,
 ) {
-  const [selectedRole, setSelectedRole] = useState<string>(
-    primaryRole ?? "USER",
-  );
+  const [selectedRole, setSelectedRole] = useState<string>("USER");
 
-  const defaultOrgId = useMemo(
-    () =>
-      initialOrganizationId ?? (organizations.length === 1 ? (organizations[0]?.id ?? "") : ""),
-    [initialOrganizationId, organizations],
-  );
+  useEffect(() => {
+    if (primaryRole) {
+      setSelectedRole(primaryRole);
+    }
+  }, [primaryRole]);
+
+  useEffect(() => {
+    if (initialOrganizationId) {
+      setSelectedOrganizationId(initialOrganizationId);
+    }
+  }, [initialOrganizationId]);
+
   const [selectedOrganizationId, setSelectedOrganizationId] =
-    useState<string>(defaultOrgId);
+    useState<string>("");
 
-  const isUserRole = selectedRole === "USER";
-  const editingOrgScopedRole = !isUserRole;
-  const needsOrganization = editingOrgScopedRole;
-  const orgRequired = editingOrgScopedRole;
+  const isCurrentRoleOrgScoped =
+    selectedRole === "ADMIN" || (selectedRole !== "USER" && selectedRole !== "SUPER_ADMIN");
+  const isPrimaryRoleOrgScoped =
+    primaryRole === "ADMIN" || (primaryRole !== undefined && primaryRole !== "USER" && primaryRole !== "SUPER_ADMIN");
+  const needsOrganization = isCurrentRoleOrgScoped;
+  const orgRequired = isCurrentRoleOrgScoped || isPrimaryRoleOrgScoped;
 
   const canSave =
     !disabled &&

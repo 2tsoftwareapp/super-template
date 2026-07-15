@@ -1,4 +1,5 @@
 import type { AuthenticatedRequestUser } from '@repo/api-core';
+import { ROLE_NAMES } from '@repo/api-core';
 
 import { Inject, Injectable } from '@nestjs/common';
 
@@ -11,6 +12,19 @@ export class ListOrganizationsForUserUseCase {
   ) {}
 
   async execute(user: AuthenticatedRequestUser) {
+    if (user.roles.includes(ROLE_NAMES.SUPER_ADMIN)) {
+      const allOrgs = await this.organizationsRepository.listAll();
+      return allOrgs.map((org) => ({
+        id: org.id,
+        name: org.name,
+        slug: org.slug,
+        role: 'ADMIN' as const,
+        createdAt: org.createdAt.toISOString(),
+        updatedAt: org.updatedAt.toISOString(),
+        current: org.id === user.organizationId,
+      }));
+    }
+
     const rows = await this.organizationsRepository.listForUser(user.userId);
     return rows.map((row) => ({
       id: row.id,
