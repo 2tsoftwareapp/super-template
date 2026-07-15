@@ -1,7 +1,14 @@
 import { LoadingButton } from "@repo/web-ui/loading-button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@repo/web-ui/select";
 import { Show } from "@repo/web-ui/show";
 import { Spinner } from "@repo/web-ui/spinner";
-import { CheckCircle2 } from "lucide-react";
+import { Building2, CheckCircle2 } from "lucide-react";
 
 import type { UserDetailViewModel } from "@/features/users/controllers/use-user-detail-controller";
 
@@ -63,6 +70,37 @@ export function UserDetailRoles({ roles }: UserDetailRolesProps) {
           })}
         </div>
       )}
+
+      <Show when={roles.needsOrganization && roles.organizations.length > 0}>
+        <div className="mt-4 space-y-1.5">
+          <label className="text-sm font-medium">Organization</label>
+          <Select
+            value={roles.selectedOrganizationId}
+            onValueChange={(value) => {
+              if (value) roles.onOrganizationSelect(value);
+            }}
+            disabled={roles.organizationsLoading}
+          >
+            <SelectTrigger className="w-full">
+              <Building2 className="size-3.5 shrink-0 text-muted-foreground" />
+              <SelectValue placeholder="Select an organization..." />
+            </SelectTrigger>
+            <SelectContent>
+              {roles.organizations.map((org) => (
+                <SelectItem key={org.id} value={org.id}>
+                  {org.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {roles.orgRequired && !roles.selectedOrganizationId && (
+            <p className="text-xs text-destructive">
+              Organization is required when assigning ADMIN
+            </p>
+          )}
+        </div>
+      </Show>
+
       <div className="mt-3 flex items-center gap-3">
         <LoadingButton
           variant="outline"

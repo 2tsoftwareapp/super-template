@@ -5,6 +5,8 @@ import { toast } from "sonner";
 
 import { useRouter } from "@/i18n/navigation";
 
+import { sessionQueryKey } from "@/hooks/use-session";
+
 import type { ChangePasswordFormValues, MfaConfirmResponse, MfaSetupResponse } from "../model/security.schemas";
 
 import { changePassword, confirmMfa, disableMfa, regenerateMfaCodes, setupMfa } from "./security.api";
@@ -70,6 +72,7 @@ export function useRegenerateMfaCodesMutation(options?: { onSuccess?: (data: Mfa
 
 export function useChangePasswordMutation() {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (input: ChangePasswordFormValues) =>
@@ -78,6 +81,7 @@ export function useChangePasswordMutation() {
         newPassword: input.newPassword,
       }),
     onSuccess: () => {
+      queryClient.removeQueries({ queryKey: sessionQueryKey });
       toast.success("Password updated. Sign in with your new password.");
       router.replace("/login");
     },

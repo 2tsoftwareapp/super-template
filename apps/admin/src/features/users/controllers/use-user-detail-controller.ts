@@ -7,6 +7,7 @@ import { useForm, type UseFormReturn } from "react-hook-form";
 
 import type { AdminUserDto } from "@/lib/api-types";
 
+import { useMyOrganizationsQuery } from "@/features/organizations/api/organizations.queries";
 import {
   useDeleteUserMutation,
   useReplaceRolesMutation,
@@ -75,6 +76,7 @@ export function useUserDetailController(): UserDetailViewModel {
 
   const user = useAdminUserQuery(userId);
   const roles = useAdminRolesQuery();
+  const organizations = useMyOrganizationsQuery();
   const currentUser = user.data?.data ?? null;
 
   const actorRoles = session.data?.data.user.roles ?? [];
@@ -123,6 +125,8 @@ export function useUserDetailController(): UserDetailViewModel {
     roleDisabled,
     roles.isLoading,
     assignableRoles,
+    organizations.data?.data ?? [],
+    organizations.isLoading,
   );
 
   return {

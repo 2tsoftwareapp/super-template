@@ -8,7 +8,7 @@ import { ERROR_CODES } from '@repo/api-core';
 import { AppError } from '@repo/api-core';
 import { DATABASE } from '@repo/api-database';
 import { organizationMembers, roles, userRoles, users } from '@repo/api-database';
-import { and, asc, count, desc, eq, inArray, isNull, sql } from 'drizzle-orm';
+import { and, asc, count, desc, eq, inArray, isNull, or, sql } from 'drizzle-orm';
 
 import type { UserSortCriterion } from '../application/user-sort';
 
@@ -111,15 +111,25 @@ export class UsersRepository {
     }
 
     if (params.role) {
-      const roleUserIds = executor
+      const roleSubQuery = executor
         .select({
           userId: userRoles.userId,
         })
         .from(userRoles)
-        .innerJoin(roles, eq(userRoles.roleId, roles.id))
-        .where(eq(roles.name, params.role));
+        .innerJoin(roles, eq(userRoles.roleId, roles.id));
 
-      filters.push(inArray(users.id, roleUserIds));
+      const roleFilters: ReturnType<typeof isNull>[] = [eq(roles.name, params.role)];
+      if (params.organizationId) {
+        roleFilters.push(
+          or(
+            isNull(userRoles.organizationId),
+            eq(userRoles.organizationId, params.organizationId),
+          )!,
+        );
+      }
+
+      roleSubQuery.where(and(...roleFilters));
+      filters.push(inArray(users.id, roleSubQuery));
     }
 
     if (params.organizationId) {

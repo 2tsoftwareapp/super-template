@@ -63,6 +63,19 @@ const schemaAlreadyInitialized = async (pool: Pool): Promise<boolean> => {
   return result.rows[0]?.exists ?? false;
 };
 
+/**
+ * Max migration index that was known at the time tracking was introduced.
+ *
+ * Migrations at or before this index are eligible for auto-backfill (mark
+ * as "already applied" without re-execution). Migrations AFTER this index
+ * are never backfilled — they go through the normal apply loop so their
+ * DDL actually runs.
+ *
+ * When adding a new migration, first deploy and verify it applies correctly
+ * on every environment, *then* bump this constant.
+ */
+const BASELINE_MIGRATION = '0016_refresh_rotation_grace';
+
 /** Backfill ledger for DBs migrated before tracking existed. */
 const backfillMigrationsLedger = async (
   pool: Pool,
@@ -78,6 +91,12 @@ const backfillMigrationsLedger = async (
   }
 
   for (const migrationFile of migrationFiles) {
+    /* Only backfill migrations up to the known baseline. Migrations past
+     * the baseline go through the normal apply loop so their DDL runs. */
+    if (migrationFile.localeCompare(BASELINE_MIGRATION) > 0) {
+      break;
+    }
+
     await pool.query(
       `INSERT INTO ${MIGRATIONS_TABLE} (filename) VALUES ($1) ON CONFLICT (filename) DO NOTHING`,
       [migrationFile],
