@@ -106,17 +106,22 @@ export class ReplaceUserRolesUseCase {
     assertRoleScopeCanBeAssigned(resolvedRole.target, actor);
 
     await this.transactionPort.run( async (transaction) => {
-      if (role === ROLE_NAMES.ADMIN && resolvedOrganizationId) {
+      const roleScope = resolvedRole.target.organizationId ?? resolvedOrganizationId;
+
+      if (role === ROLE_NAMES.ADMIN && roleScope) {
         await this.accessControlService.ensureOrganizationAdminRole(
-          resolvedOrganizationId,
+          roleScope,
           userId,
           transaction,
         );
+        await this.accessControlService.replaceUserRoles(
+          userId,
+          [resolvedRole.id],
+          roleScope,
+          transaction,
+        );
       } else {
-        // Use resolvedOrganizationId when available (e.g. SUPER_ADMIN demoting
-        // ADMIN→USER in a specific org) so the org-scoped ADMIN role is removed.
-        // Fall back to actor org or null for platform-only scope.
-        const replaceOrgId = resolvedOrganizationId ?? (actorIsSuperAdmin ? null : (actor.organizationId ?? null));
+        const replaceOrgId = roleScope ?? (actorIsSuperAdmin ? null : (actor.organizationId ?? null));
         await this.accessControlService.replaceUserRoles(
           userId,
           [resolvedRole.id],

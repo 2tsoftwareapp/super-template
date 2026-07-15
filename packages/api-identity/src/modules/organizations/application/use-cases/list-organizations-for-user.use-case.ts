@@ -1,7 +1,5 @@
-import type { AuthenticatedRequestUser } from '@repo/api-core';
-import { ROLE_NAMES } from '@repo/api-core';
-
 import { Inject, Injectable } from '@nestjs/common';
+import { type AuthenticatedRequestUser, ROLE_NAMES } from '@repo/api-core';
 
 import { ORGANIZATIONS_REPOSITORY, type OrganizationsRepositoryPort } from '../ports/organizations.repository.port';
 

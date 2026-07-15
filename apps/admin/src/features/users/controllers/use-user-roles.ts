@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 
 export interface RoleOption {
   name: string;
@@ -29,22 +29,11 @@ export function useUserRoles(
   organizationsLoading: boolean,
   initialOrganizationId?: string | null,
 ) {
-  const [selectedRole, setSelectedRole] = useState<string>("USER");
-
-  useEffect(() => {
-    if (primaryRole) {
-      setSelectedRole(primaryRole);
-    }
-  }, [primaryRole]);
-
-  useEffect(() => {
-    if (initialOrganizationId) {
-      setSelectedOrganizationId(initialOrganizationId);
-    }
-  }, [initialOrganizationId]);
-
+  const [selectedRole, setSelectedRole] = useState<string>(
+    primaryRole ?? "USER",
+  );
   const [selectedOrganizationId, setSelectedOrganizationId] =
-    useState<string>("");
+    useState<string>(initialOrganizationId ?? "");
 
   const isCurrentRoleOrgScoped =
     selectedRole === "ADMIN" || (selectedRole !== "USER" && selectedRole !== "SUPER_ADMIN");

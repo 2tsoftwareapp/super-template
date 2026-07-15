@@ -41,14 +41,12 @@ export function assertCanAssignRoles(
   }
 
   if (!actorIsSuperAdmin) {
-    const invalidRole = desiredRoleNames.find(
-      (roleName) => roleName !== ROLE_NAMES.USER,
-    );
+    const privilegedRole = desiredRoleNames.find(isPrivilegedRoleName);
 
-    if (invalidRole) {
+    if (privilegedRole) {
       throw new AppError(
         ERROR_CODES.AUTH_FORBIDDEN,
-        'Admins can only assign the USER role',
+        'Admins can only assign the USER role or custom roles',
         403,
       );
     }

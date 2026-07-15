@@ -12,6 +12,10 @@ export function isPrivilegedRoleName(name: string) {
   );
 }
 
+export function isOrganizationRole(role: string) {
+  return role !== "USER" && role !== "SUPER_ADMIN";
+}
+
 export function canAssignRole(actorRoles: string[], roleName: string) {
   if (roleName === "SUPER_ADMIN") {
     return false;
@@ -21,28 +25,24 @@ export function canAssignRole(actorRoles: string[], roleName: string) {
     return true;
   }
 
-  return roleName === "USER";
+  if (roleName === "USER") {
+    return true;
+  }
+
+  if (isOrganizationRole(roleName)) {
+    return actorRoles.includes("ADMIN");
+  }
+
+  return false;
 }
 
 export function getAssignableRoles(
   actorRoles: string[],
   roles: RoleDto[],
 ): RoleDto[] {
-  const assignable = roles.filter((role) =>
-    canAssignRole(actorRoles, role.name),
-  );
-  const byName = new Map<string, RoleDto>();
-
-  for (const role of assignable) {
-    const existing = byName.get(role.name);
-    if (!existing || role.scope === "platform") {
-      byName.set(role.name, role);
-    }
-  }
-
-  return Array.from(byName.values()).sort((a, b) =>
-    a.name.localeCompare(b.name),
-  );
+  return roles
+    .filter((role) => canAssignRole(actorRoles, role.name))
+    .sort((a, b) => a.name.localeCompare(b.name));
 }
 
 export function buildRoleLookup(roles: RoleDto[]) {

@@ -1,13 +1,11 @@
 import { z } from "zod";
 
-import { canAssignRole } from "@/lib/roles";
+import { canAssignRole, isOrganizationRole } from "@/lib/roles";
 
 export function createUserSchema(actorRoles: string[], availableRoleNames: string[]) {
   const allowedRoles = availableRoleNames.filter((role) =>
     canAssignRole(actorRoles, role),
   );
-
-  const hasOrgScopedRoles = allowedRoles.some((r) => r === "ADMIN" || r !== "USER");
 
   return z
     .object({
@@ -23,15 +21,12 @@ export function createUserSchema(actorRoles: string[], availableRoleNames: strin
         .refine((val) => allowedRoles.includes(val), {
           message: `Must be one of: ${allowedRoles.join(", ")}`,
         }),
-      organizationId: hasOrgScopedRoles
-        ? z.string().uuid("Must be a valid organization UUID")
-        : z.string().uuid().optional(),
+      organizationId: z.string().uuid().optional(),
     })
     .refine(
       (data) => {
-        if (!hasOrgScopedRoles) return true;
-        const needsOrg = data.role === "ADMIN" || (data.role !== "USER" && allowedRoles.includes(data.role));
-        return !needsOrg || Boolean(data.organizationId);
+        if (!isOrganizationRole(data.role)) return true;
+        return Boolean(data.organizationId);
       },
       { message: "Organization is required for this role", path: ["organizationId"] },
     );

@@ -25,7 +25,7 @@ import {
   type CreateUserForm,
   createUserSchema,
 } from "@/features/users/model/users.schemas";
-import { canAssignRole, formatRoleName } from "@/lib/roles";
+import { canAssignRole, formatRoleName, isOrganizationRole } from "@/lib/roles";
 
 export function CreateUserDrawer({
   open,
@@ -122,7 +122,7 @@ export function CreateUserDrawer({
             displayName: values.displayName,
             role: values.role,
             status: "PENDING",
-            ...(values.role === "ADMIN" && values.organizationId
+            ...(isOrganizationRole(values.role) && values.organizationId
               ? { organizationId: values.organizationId }
               : {}),
           });
@@ -201,7 +201,7 @@ export function CreateUserDrawer({
           ) : null}
         </div>
 
-        {selectedRole === "ADMIN" ? (
+        {selectedRole && isOrganizationRole(selectedRole) ? (
           <div className="flex flex-col gap-1.5">
             <Label>Organization</Label>
             <Select

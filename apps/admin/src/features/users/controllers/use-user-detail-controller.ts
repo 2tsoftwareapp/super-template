@@ -107,10 +107,12 @@ export function useUserDetailController(): UserDetailViewModel {
     actorRoles,
     roles.data?.data ?? [],
   ).map((r) => ({ name: r.name, description: r.description }));
-  const primaryRole = currentUser?.roles.includes("ADMIN") ? "ADMIN" : "USER";
-  const primaryRoleAssignment = currentUser?.roleAssignments?.find(
-    (a) => a.roleName === primaryRole && a.organizationId !== null,
+  const orgScopedAssignment = currentUser?.roleAssignments?.find(
+    (a) => a.organizationId !== null,
   );
+  const primaryRole = orgScopedAssignment?.roleName
+    ?? (currentUser?.roles.includes("ADMIN") ? "ADMIN" : "USER");
+  const primaryRoleAssignment = orgScopedAssignment;
   const statusDisabled = isSelf || !canEdit || updateStatus.isPending;
   const roleDisabled = isSelf || !canEdit || replaceRoles.isPending;
 

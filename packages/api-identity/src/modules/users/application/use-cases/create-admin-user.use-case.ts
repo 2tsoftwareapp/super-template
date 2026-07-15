@@ -141,10 +141,12 @@ export class CreateAdminUserUseCase {
             transaction,
           );
         } else {
+          const roleScope = resolvedRole.target.organizationId;
+
           await this.accessControlService.replaceUserRoles(
             user.id,
             [resolvedRole.id],
-            actorIsSuperAdmin ? null : (actor.organizationId ?? null),
+            roleScope,
             transaction,
           );
 
