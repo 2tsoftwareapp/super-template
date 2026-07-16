@@ -26,7 +26,6 @@ export const DEFAULT_ROLE_GRANTS: Record<RoleName, RoleGrantSpec> = {
     { resource: 'audit', actions: [ACTION.READ] },
     { resource: 'files', actions: CRUD },
     { resource: 'attachments', actions: CRUD },
-    { resource: 'settings', actions: READ_UPDATE },
     { resource: 'jobs', actions: [ACTION.READ, ACTION.UPDATE, ACTION.DELETE] },
     { resource: 'imports', actions: READ_CREATE_UPDATE },
     { resource: 'exports', actions: READ_CREATE },

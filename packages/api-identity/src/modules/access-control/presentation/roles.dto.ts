@@ -1,5 +1,8 @@
+import { Transform, Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
+  ArrayMinSize,
+  ArrayUnique,
   IsArray,
   IsOptional,
   IsString,
@@ -20,6 +23,9 @@ export class PermissionDto {
 
   @ApiProperty()
   isSystem: boolean;
+
+  @ApiProperty({ enum: ['platform', 'organization'] })
+  scope: 'platform' | 'organization';
 }
 
 export class RoleDto {
@@ -47,6 +53,9 @@ export class RoleDto {
 
 export class CreateRoleDto {
   @ApiProperty()
+  @Transform(({ value }: { value: string }): string =>
+    typeof value === 'string' ? value.trim() : value,
+  )
   @IsString()
   @MinLength(2)
   @MaxLength(80)
@@ -65,6 +74,8 @@ export class CreateRoleDto {
 
   @ApiProperty({ type: [String] })
   @IsArray()
+  @ArrayMinSize(1)
+  @ArrayUnique()
   @IsUUID('4', { each: true })
   permissionIds: string[];
 }
@@ -72,6 +83,9 @@ export class CreateRoleDto {
 export class UpdateRoleDto {
   @ApiPropertyOptional()
   @IsOptional()
+  @Transform(({ value }: { value: string }): string =>
+    typeof value === 'string' ? value.trim() : value,
+  )
   @IsString()
   @MinLength(2)
   @MaxLength(80)
@@ -86,6 +100,7 @@ export class UpdateRoleDto {
   @ApiPropertyOptional({ type: [String] })
   @IsOptional()
   @IsArray()
+  @ArrayUnique()
   @IsUUID('4', { each: true })
   permissionIds?: string[];
 }
@@ -93,6 +108,8 @@ export class UpdateRoleDto {
 export class ReplaceRolePermissionsDto {
   @ApiProperty({ type: [String] })
   @IsArray()
+  @ArrayMinSize(1)
+  @ArrayUnique()
   @IsUUID('4', { each: true })
   permissionIds: string[];
 }

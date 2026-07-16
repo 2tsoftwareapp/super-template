@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 
+import { useOrganizationsQuery } from "@/features/organizations";
 import { useDeleteRoleMutation } from "@/features/roles/api/roles.mutations";
 import {
   usePermissionCatalogQuery,
@@ -9,8 +10,9 @@ import {
 } from "@/features/roles/api/roles.queries";
 import {
   filterRolesBySearch,
+  mergeCustomRoles,
   type MergedRole,
-  mergeRoles,
+  mergeSystemRoles,
   optionalText,
 } from "@/features/roles/model/roles.filtering";
 import { selectRoleManagementPermissions } from "@/features/roles/model/roles.permissions";
@@ -25,10 +27,12 @@ export interface RolesViewModel {
   canCreate: boolean;
   canUpdate: boolean;
   canDelete: boolean;
+  isSuperAdmin: boolean;
   search: string;
   onSearchChange: (value: string) => void;
   isLoading: boolean;
   isRefreshing: boolean;
+  hasError: boolean;
   onRefresh: () => void;
   systemRoles: MergedRole[];
   customRoles: MergedRole[];
@@ -42,6 +46,7 @@ export interface RolesViewModel {
     open: boolean;
     editingRole: EditableRole | null;
     permissions: PermissionDto[];
+    permissionsError: boolean;
     onCreate: () => void;
     onClose: () => void;
   };
@@ -50,34 +55,42 @@ export interface RolesViewModel {
     onCancel: () => void;
     onConfirm: () => Promise<void>;
   };
+  organizations: {
+    items: { id: string; name: string }[];
+    loading: boolean;
+    selectedId: string;
+    onSelect: (id: string) => void;
+  };
 }
 
-/**
- * Orchestration hook for the roles screen: session/permissions, role +
- * permission-catalog queries, search filtering, drawer and delete-dialog state,
- * and event handlers. Returns a view model consumed by the presentational
- * RolesListView.
- */
 export function useRolesController(): RolesViewModel {
   const session = useSession();
-  const { canCreate, canUpdate, canDelete } = selectRoleManagementPermissions(
-    session.data?.data.permissions,
-  );
+  const sessionData = session.data?.data;
+  const permissions = sessionData?.permissions ?? [];
+  const userRoles = sessionData?.user?.roles ?? [];
+  const isSuperAdmin = userRoles.includes("SUPER_ADMIN");
+
+  const { canCreate, canUpdate, canDelete } =
+    selectRoleManagementPermissions(permissions);
 
   const [search, setSearch] = useState("");
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingRole, setEditingRole] = useState<EditableRole | null>(null);
   const [deletingRole, setDeletingRole] = useState<ManagedRoleDto | null>(null);
+  const [selectedOrganizationId, setSelectedOrganizationId] = useState("");
 
   const roles = useRolesQuery();
   const permissionCatalog = usePermissionCatalogQuery();
   const deleteRole = useDeleteRoleMutation();
+  const organizations = useOrganizationsQuery({
+    enabled: isSuperAdmin,
+  });
 
   const { systemRoles, customRoles } = useMemo(() => {
     const all = roles.data?.data ?? [];
     return {
-      systemRoles: mergeRoles(all.filter((role) => role.isSystem)),
-      customRoles: mergeRoles(all.filter((role) => !role.isSystem)),
+      systemRoles: mergeSystemRoles(all.filter((role) => role.isSystem)),
+      customRoles: mergeCustomRoles(all.filter((role) => !role.isSystem)),
     };
   }, [roles.data?.data]);
 
@@ -103,6 +116,9 @@ export function useRolesController(): RolesViewModel {
 
   const openCreateDrawer = () => {
     setEditingRole(null);
+    if (isSuperAdmin) {
+      setSelectedOrganizationId("");
+    }
     setDrawerOpen(true);
   };
 
@@ -112,6 +128,7 @@ export function useRolesController(): RolesViewModel {
       name: role.name,
       description: optionalText(role.description) || null,
       permissions: role.permissions,
+      organizationId: role.organizationId,
     });
     setDrawerOpen(true);
   };
@@ -122,14 +139,18 @@ export function useRolesController(): RolesViewModel {
     filteredSystem.length === 0 &&
     filteredCustom.length === 0;
 
+  const hasError = roles.isError || permissionCatalog.isError;
+
   return {
     canCreate,
     canUpdate,
     canDelete,
+    isSuperAdmin,
     search,
     onSearchChange: setSearch,
     isLoading: roles.isLoading,
     isRefreshing: roles.isFetching || permissionCatalog.isFetching,
+    hasError,
     onRefresh: () => {
       void roles.refetch();
       void permissionCatalog.refetch();
@@ -146,6 +167,7 @@ export function useRolesController(): RolesViewModel {
       open: drawerOpen,
       editingRole,
       permissions: permissionCatalog.data?.data ?? [],
+      permissionsError: permissionCatalog.isError,
       onCreate: openCreateDrawer,
       onClose: () => setDrawerOpen(false),
     },
@@ -153,6 +175,12 @@ export function useRolesController(): RolesViewModel {
       role: deletingRole,
       onCancel: () => setDeletingRole(null),
       onConfirm: handleDeleteConfirm,
+    },
+    organizations: {
+      items: organizations.data?.data ?? [],
+      loading: organizations.isLoading,
+      selectedId: selectedOrganizationId,
+      onSelect: setSelectedOrganizationId,
     },
   };
 }

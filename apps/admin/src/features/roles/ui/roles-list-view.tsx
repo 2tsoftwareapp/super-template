@@ -3,11 +3,11 @@
 import { Button } from "@repo/web-ui/button";
 import { Card, CardContent } from "@repo/web-ui/card";
 import { ConfirmDialog } from "@repo/web-ui/confirm-dialog";
-import { Empty } from "@repo/web-ui/empty";
+import { Empty, EmptyMedia } from "@repo/web-ui/empty";
 import { Input } from "@repo/web-ui/input";
 import { SectionLoading } from "@repo/web-ui/loading";
 import { Show } from "@repo/web-ui/show";
-import { LockKeyhole, Plus, Search, ShieldCheck, X } from "lucide-react";
+import { AlertTriangle, LockKeyhole, Plus, RefreshCcw, Search, ShieldCheck, X } from "lucide-react";
 
 import type { RolesViewModel } from "@/features/roles/controllers/use-roles-controller";
 
@@ -30,10 +30,12 @@ export function RolesListView(vm: RolesViewModel) {
     canCreate,
     canUpdate,
     canDelete,
+    isSuperAdmin,
     search,
     onSearchChange,
     isLoading,
     isRefreshing,
+    hasError,
     onRefresh,
     systemRoles,
     customRoles,
@@ -45,6 +47,7 @@ export function RolesListView(vm: RolesViewModel) {
     onRequestDelete,
     drawer,
     confirmDelete,
+    organizations,
   } = vm;
 
   return (
@@ -54,12 +57,20 @@ export function RolesListView(vm: RolesViewModel) {
       isRefreshing={isRefreshing}
       onRefresh={onRefresh}
       actions={
-        <Show when={canCreate}>
-          <Button size="sm" onClick={drawer.onCreate}>
-            <Plus data-icon="inline-start" />
-            New role
-          </Button>
-        </Show>
+        <>
+          {hasError ? (
+            <Button size="sm" variant="outline" onClick={onRefresh}>
+              <RefreshCcw data-icon="inline-start" />
+              Retry
+            </Button>
+          ) : null}
+          <Show when={canCreate}>
+            <Button size="sm" onClick={drawer.onCreate}>
+              <Plus data-icon="inline-start" />
+              New role
+            </Button>
+          </Show>
+        </>
       }
     >
       <Card>
@@ -84,17 +95,33 @@ export function RolesListView(vm: RolesViewModel) {
           <Show when={isLoading}>
             <SectionLoading />
           </Show>
-          {!isLoading && noResults ? (
+
+          {!isLoading && hasError ? (
+            <Empty
+              title="Failed to load roles"
+              description="There was an error fetching roles and permissions. Try refreshing."
+            >
+              <EmptyMedia>
+                <AlertTriangle className="size-4" />
+              </EmptyMedia>
+            </Empty>
+          ) : null}
+
+          {!isLoading && !hasError && noResults ? (
             <Empty
               title="No roles match your search"
               description="Try different keywords."
             />
-          ) : !isLoading && !anyRoles && !search ? (
+          ) : null}
+
+          {!isLoading && !hasError && !anyRoles && !search ? (
             <Empty
               title="No roles yet"
               description="Roles are provisioned during bootstrap. Custom roles can be created below."
             />
-          ) : (
+          ) : null}
+
+          {!isLoading && !hasError && (
             <div>
               {systemRoles.length > 0 && (
                 <div>
@@ -156,6 +183,11 @@ export function RolesListView(vm: RolesViewModel) {
         onClose={drawer.onClose}
         role={drawer.editingRole}
         permissions={drawer.permissions}
+        permissionsError={drawer.permissionsError}
+        isSuperAdmin={isSuperAdmin}
+        organizations={organizations.items}
+        selectedOrganizationId={organizations.selectedId}
+        onOrganizationSelect={organizations.onSelect}
       />
 
       {confirmDelete.role && (

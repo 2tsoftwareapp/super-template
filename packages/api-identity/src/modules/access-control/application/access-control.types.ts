@@ -5,6 +5,7 @@ export interface PermissionView {
   name: string;
   description: string | null;
   isSystem: boolean;
+  scope: 'platform' | 'organization';
 }
 
 export interface RoleView {

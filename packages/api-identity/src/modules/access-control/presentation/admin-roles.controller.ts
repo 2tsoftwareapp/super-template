@@ -55,8 +55,8 @@ export class AdminRolesController {
   @Get('permissions')
   @Authorize({ permissions: [perm('roles', ACTION.READ)] })
   @ApiArrayResponse(PermissionDto)
-  async listPermissions() {
-    const permissions = await this.roleQuery.listPermissions();
+  async listPermissions(@CurrentUser() actor: AuthenticatedRequestUser) {
+    const permissions = await this.roleQuery.listPermissions(actor);
 
     return {
       data: permissions,

@@ -16,6 +16,7 @@ function buildRolePayload(input: RoleForm) {
     name: input.name,
     description: input.description ?? null,
     permissionIds: input.permissionIds,
+    ...(input.organizationId ? { organizationId: input.organizationId } : {}),
   };
 }
 

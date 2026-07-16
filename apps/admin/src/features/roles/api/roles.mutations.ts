@@ -8,6 +8,16 @@ import type { RoleForm } from "../model/roles.schemas";
 import { createRole, deleteRole, updateRole } from "./roles.api";
 import { rolesKeys } from "./roles.query-keys";
 
+interface ApiError {
+  error?: { message?: string };
+  message?: string;
+}
+
+function extractErrorMessage(err: unknown): string | null {
+  const apiErr = err as ApiError;
+  return apiErr?.error?.message ?? apiErr?.message ?? null;
+}
+
 export function useDeleteRoleMutation() {
   const queryClient = useQueryClient();
 
@@ -17,8 +27,9 @@ export function useDeleteRoleMutation() {
       await queryClient.invalidateQueries({ queryKey: rolesKeys.all });
       toast.success("Role deleted");
     },
-    onError: () => {
-      toast.error("Could not delete role");
+    onError: (err) => {
+      const msg = extractErrorMessage(err);
+      toast.error(msg ?? "Could not delete role");
     },
   });
 }
@@ -47,8 +58,9 @@ export function useSaveRoleMutation(options?: { onSuccess?: () => void }) {
     },
     onError: (err, variables) => {
       const isEditing = !!variables.roleId;
+      const msg = extractErrorMessage(err);
       toast.error(
-        isEditing ? "Could not update role" : "Could not create role",
+        msg ?? (isEditing ? "Could not update role" : "Could not create role"),
       );
     },
   });

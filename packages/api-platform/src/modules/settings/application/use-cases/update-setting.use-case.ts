@@ -4,7 +4,7 @@ import type {
 } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { AppError, ERROR_CODES } from '@repo/api-core';
+import { AppError, ERROR_CODES, ROLE_NAMES } from '@repo/api-core';
 
 import type { UpdateSettingCommand } from '../settings.types';
 
@@ -25,6 +25,14 @@ export class UpdateSettingUseCase {
     input: UpdateSettingCommand,
     requestContext?: RequestContext,
   ) {
+    if (!actor.roles.includes(ROLE_NAMES.SUPER_ADMIN)) {
+      throw new AppError(
+        ERROR_CODES.AUTH_FORBIDDEN,
+        'Only SUPER_ADMIN can update application settings',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
     const updated = await this.settingsRepository.upsert(
       key,
       input.value,

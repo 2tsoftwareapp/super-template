@@ -3,7 +3,7 @@ import type { Request } from 'express';
 
 import { Body, Controller, Get, Param, Patch, Req } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import {  ACTION, ApiArrayResponse, ApiDataResponse, perm } from '@repo/api-core';
+import {  ACTION, ApiArrayResponse, ApiDataResponse, perm, ROLE_NAMES } from '@repo/api-core';
 import { CurrentUser } from '@repo/api-core';
 import { Authorize } from '@repo/api-core';
 
@@ -21,10 +21,10 @@ export class AdminSettingsController {
   ) {}
 
   @Get()
-  @Authorize({ permissions: [perm('settings', ACTION.READ)] })
+  @Authorize({ roles: [ROLE_NAMES.SUPER_ADMIN], permissions: [perm('settings', ACTION.READ)] })
   @ApiArrayResponse(ApplicationSettingDto)
-  async listSettings() {
-    const settings = await this.listSettingsUseCase.execute();
+  async listSettings(@CurrentUser() user: AuthenticatedRequestUser) {
+    const settings = await this.listSettingsUseCase.execute(user);
 
     return {
       data: settings,
@@ -32,7 +32,7 @@ export class AdminSettingsController {
   }
 
   @Patch(':key')
-  @Authorize({ permissions: [perm('settings', ACTION.UPDATE)] })
+  @Authorize({ roles: [ROLE_NAMES.SUPER_ADMIN], permissions: [perm('settings', ACTION.UPDATE)] })
   @ApiDataResponse(ApplicationSettingDto)
   updateSetting(
     @CurrentUser() user: AuthenticatedRequestUser,

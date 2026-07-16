@@ -4,7 +4,15 @@ import { standardSchemaResolver as zodResolver } from "@hookform/resolvers/stand
 import { Button } from "@repo/web-ui/button";
 import { Input } from "@repo/web-ui/input";
 import { Label } from "@repo/web-ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@repo/web-ui/select";
 import { Spinner } from "@repo/web-ui/spinner";
+import { Building2 } from "lucide-react";
 import { useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 
@@ -23,11 +31,21 @@ export function RoleFormDrawer({
   onClose,
   role,
   permissions,
+  permissionsError,
+  isSuperAdmin,
+  organizations,
+  selectedOrganizationId,
+  onOrganizationSelect,
 }: {
   open: boolean;
   onClose: () => void;
   role: EditableRole | null;
   permissions: PermissionDto[];
+  permissionsError: boolean;
+  isSuperAdmin: boolean;
+  organizations: { id: string; name: string }[];
+  selectedOrganizationId: string;
+  onOrganizationSelect: (id: string) => void;
 }) {
   const isEditing = role !== null;
 
@@ -37,6 +55,7 @@ export function RoleFormDrawer({
       name: "",
       description: "",
       permissionIds: [],
+      organizationId: "",
     },
   });
 
@@ -46,6 +65,7 @@ export function RoleFormDrawer({
       name: role?.name ?? "",
       description: role?.description ?? "",
       permissionIds: role?.permissions.map((permission) => permission.id) ?? [],
+      organizationId: role?.organizationId ?? "",
     });
   }, [open, role, form]);
 
@@ -58,6 +78,24 @@ export function RoleFormDrawer({
   const selectedPermissionIds = useWatch<RoleForm, "permissionIds">({
     control: form.control,
     name: "permissionIds",
+  });
+
+  const orgPermissions = isSuperAdmin
+    ? permissions
+    : permissions.filter((p) => p.scope === "organization");
+
+  const handleSubmit = form.handleSubmit((values) => {
+    const payload: RoleForm = {
+      name: values.name,
+      description: values.description,
+      permissionIds: values.permissionIds,
+    };
+
+    if (isSuperAdmin && selectedOrganizationId) {
+      payload.organizationId = selectedOrganizationId;
+    }
+
+    saveRole.mutate({ roleId: role?.id, input: payload });
   });
 
   return (
@@ -78,13 +116,34 @@ export function RoleFormDrawer({
         </Button>
       }
     >
-      <form
-        id="role-form"
-        className="space-y-6"
-        onSubmit={form.handleSubmit((values) =>
-          saveRole.mutate({ roleId: role?.id, input: values }),
+      <form id="role-form" className="space-y-6" onSubmit={handleSubmit}>
+        {isSuperAdmin && !isEditing && (
+          <div className="space-y-2">
+            <Label htmlFor="role-org">Organization</Label>
+            <Select
+              value={selectedOrganizationId}
+              onValueChange={(value) => {
+                if (value) {
+                  onOrganizationSelect(value);
+                  form.setValue("organizationId", value);
+                }
+              }}
+            >
+              <SelectTrigger id="role-org" className="w-full">
+                <Building2 className="size-3.5 shrink-0 text-muted-foreground" />
+                <SelectValue placeholder="Select an organization..." />
+              </SelectTrigger>
+              <SelectContent>
+                {organizations.map((org) => (
+                  <SelectItem key={org.id} value={org.id}>
+                    {org.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         )}
-      >
+
         <div className="space-y-2">
           <Label htmlFor="role-name">Name</Label>
           <Input id="role-name" {...form.register("name")} />
@@ -102,14 +161,20 @@ export function RoleFormDrawer({
 
         <div className="space-y-2">
           <Label>Permissions</Label>
-          <PermissionMultiSelect
-            permissions={permissions}
-            selected={selectedPermissionIds}
-            onChange={(ids) => {
-              form.setValue("permissionIds", ids, { shouldValidate: true });
-            }}
-            error={form.formState.errors.permissionIds?.message}
-          />
+          {permissionsError ? (
+            <p className="text-xs text-destructive">
+              Failed to load permissions. Please refresh and try again.
+            </p>
+          ) : (
+            <PermissionMultiSelect
+              permissions={orgPermissions}
+              selected={selectedPermissionIds}
+              onChange={(ids) => {
+                form.setValue("permissionIds", ids, { shouldValidate: true });
+              }}
+              error={form.formState.errors.permissionIds?.message}
+            />
+          )}
         </div>
       </form>
     </ResourceDrawer>

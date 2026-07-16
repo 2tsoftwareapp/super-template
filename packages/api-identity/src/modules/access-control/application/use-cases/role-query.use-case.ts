@@ -2,7 +2,7 @@ import type { AuthenticatedRequestUser } from '@repo/api-core';
 import type { TransactionExecutor } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { AppError, ERROR_CODES } from '@repo/api-core';
+import { AppError, ERROR_CODES, isPlatformPermission } from '@repo/api-core';
 
 import type { PermissionView, RoleView } from '../access-control.types';
 
@@ -112,6 +112,7 @@ export class RoleQueryUseCase {
         name: row.name,
         description: row.description,
         isSystem: row.isSystem,
+        scope: isPlatformPermission(row.name) ? 'platform' : 'organization',
       });
       permissionsByRoleId.set(row.roleId, existing);
     }
@@ -124,11 +125,19 @@ export class RoleQueryUseCase {
     );
   }
 
-  async listPermissions(): Promise<PermissionView[]> {
+  async listPermissions(
+    actor?: AuthenticatedRequestUser,
+  ): Promise<PermissionView[]> {
     const permissions = await this.accessControlRepository.findAllPermissions();
+    const isSuperAdmin = actor?.roles.includes(ROLE_NAMES.SUPER_ADMIN) ?? false;
 
-    return permissions.map((permission) =>
-      this.accessControlMapper.toPermissionView(permission),
-    );
+    return permissions
+      .map((permission) =>
+        this.accessControlMapper.toPermissionView(permission as PermissionView),
+      )
+      .filter(
+        (permission) =>
+          isSuperAdmin || permission.scope === 'organization',
+      );
   }
 }

@@ -6,8 +6,12 @@ export function optionalText(value: string | null | undefined | object): string 
   return typeof value === "string" ? value : "";
 }
 
-/** Merge same-named roles (e.g. ADMIN platform + ADMIN org) into one node. */
-export function mergeRoles(roles: ManagedRoleDto[]): MergedRole[] {
+/**
+ * Merge system roles with the same name (e.g. platform ADMIN + org ADMIN)
+ * into a single node showing multiple scopes. System roles are seeded with
+ * identical permission sets across scopes, so we keep the first encounter.
+ */
+export function mergeSystemRoles(roles: ManagedRoleDto[]): MergedRole[] {
   const map = new Map<string, MergedRole>();
 
   for (const role of roles) {
@@ -17,11 +21,30 @@ export function mergeRoles(roles: ManagedRoleDto[]): MergedRole[] {
       if (!existing.scopes.includes(role.scope)) {
         existing.scopes.push(role.scope);
       }
-      if (role.permissions.length > existing.permissions.length) {
-        existing.permissions = role.permissions;
-      }
     } else {
       map.set(role.name, { ...role, scopes: [role.scope] });
+    }
+  }
+
+  return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
+}
+
+/**
+ * Custom roles must NOT be merged by name — each one is a unique record
+ * with its own organization, ID, and permission set. Key by role.id.
+ */
+export function mergeCustomRoles(roles: ManagedRoleDto[]): MergedRole[] {
+  const map = new Map<string, MergedRole>();
+
+  for (const role of roles) {
+    const existing = map.get(role.id);
+
+    if (existing) {
+      if (!existing.scopes.includes(role.scope)) {
+        existing.scopes.push(role.scope);
+      }
+    } else {
+      map.set(role.id, { ...role, scopes: [role.scope] });
     }
   }
 
