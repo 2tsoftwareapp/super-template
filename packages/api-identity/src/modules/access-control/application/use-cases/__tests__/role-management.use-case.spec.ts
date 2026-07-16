@@ -19,6 +19,7 @@ describe('RoleManagementUseCase', () => {
     createRole: vi.fn(),
     replaceRolePermissions: vi.fn(),
     findRoleById: vi.fn(),
+    findRoleByIdWithLock: vi.fn(),
     updateRole: vi.fn(),
     findUserIdsForRole: vi.fn(),
     deleteRole: vi.fn(),
@@ -386,7 +387,7 @@ describe('RoleManagementUseCase', () => {
     it('deletes a custom role with no assigned users', async () => {
       const { useCase, repo, audit } = buildUseCase();
 
-      repo.findRoleById.mockResolvedValue({
+      repo.findRoleByIdWithLock.mockResolvedValue({
         id: 'role-1',
         name: 'TEST_ROLE',
         organizationId: 'org-1',
@@ -406,7 +407,7 @@ describe('RoleManagementUseCase', () => {
     it('rejects deletion when role has assigned users', async () => {
       const { useCase, repo } = buildUseCase();
 
-      repo.findRoleById.mockResolvedValue({
+      repo.findRoleByIdWithLock.mockResolvedValue({
         id: 'role-1',
         name: 'TEST_ROLE',
         organizationId: 'org-1',
@@ -424,7 +425,7 @@ describe('RoleManagementUseCase', () => {
     it('rejects deletion of system roles', async () => {
       const { useCase, repo } = buildUseCase();
 
-      repo.findRoleById.mockResolvedValue({
+      repo.findRoleByIdWithLock.mockResolvedValue({
         id: 'role-admin',
         name: 'ADMIN',
         organizationId: null,
@@ -441,7 +442,7 @@ describe('RoleManagementUseCase', () => {
     it('runs deletion inside transaction', async () => {
       const { useCase, repo, txPort } = buildUseCase();
 
-      repo.findRoleById.mockResolvedValue({
+      repo.findRoleByIdWithLock.mockResolvedValue({
         id: 'role-1',
         name: 'TEST_ROLE',
         organizationId: 'org-1',

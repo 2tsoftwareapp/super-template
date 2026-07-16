@@ -80,6 +80,19 @@ export class AccessControlRepository {
     return role ?? null;
   }
 
+  async findRoleByIdWithLock(
+    roleId: string,
+    executor: DatabaseExecutor,
+  ) {
+    const [role] = await executor
+      .select()
+      .from(roles)
+      .where(eq(roles.id, roleId))
+      .for('update')
+      .limit(1);
+    return role ?? null;
+  }
+
   async findPermissionIdsForRole(
     roleId: string,
     executor: DatabaseExecutor = this.database,

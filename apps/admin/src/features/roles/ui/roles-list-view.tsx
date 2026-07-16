@@ -49,6 +49,7 @@ export function RolesListView(vm: RolesViewModel) {
     confirmDelete,
     organizations,
     organizationNames,
+    actorPermissions,
   } = vm;
 
   return (
@@ -189,6 +190,7 @@ export function RolesListView(vm: RolesViewModel) {
         permissions={drawer.permissions}
         permissionsError={drawer.permissionsError}
         isSuperAdmin={isSuperAdmin}
+        actorPermissions={actorPermissions}
         organizations={organizations.items}
         selectedOrganizationId={organizations.selectedId}
         onOrganizationSelect={organizations.onSelect}

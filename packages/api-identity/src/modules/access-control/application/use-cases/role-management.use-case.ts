@@ -336,7 +336,11 @@ export class RoleManagementUseCase {
     _executor?: TransactionExecutor,
   ): Promise<void> {
     return this.transactionPort.run(async (tx) => {
-      const role = await this.accessControlRepository.findRoleById(roleId, tx);
+      const role =
+        await this.accessControlRepository.findRoleByIdWithLock(
+          roleId,
+          tx,
+        );
 
       if (!role) {
         throw new AppError(

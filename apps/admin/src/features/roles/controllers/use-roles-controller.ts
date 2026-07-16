@@ -62,6 +62,7 @@ export interface RolesViewModel {
     onSelect: (id: string) => void;
   };
   organizationNames: Record<string, string>;
+  actorPermissions: string[];
 }
 
 export function useRolesController(): RolesViewModel {
@@ -187,5 +188,6 @@ export function useRolesController(): RolesViewModel {
     organizationNames: Object.fromEntries(
       (organizations.data?.data ?? []).map((org) => [org.id, org.name]),
     ),
+    actorPermissions: permissions,
   };
 }

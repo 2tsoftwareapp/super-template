@@ -1,7 +1,18 @@
--- Cleanup: remove platform-scoped permissions from all existing org-scoped roles.
--- These permissions (settings, audit, mail, jobs) should only exist on platform-level
--- roles (organization_id IS NULL). The application layer now enforces this rule for
--- new roles; this migration remediates legacy data.
+-- The migration runner wraps the entire file in a single transaction
+-- (BEGIN/COMMIT). Dropping the index first is safe: if any later step fails
+-- the transaction rolls back and the old index is restored.
+
+--> statement-breakpoint
+
+-- 1. Drop the old case-sensitive unique index so name normalization below
+--    does not throw duplicate-key violations.
+
+DROP INDEX IF EXISTS "roles_organization_name_unique";
+
+--> statement-breakpoint
+
+-- 2. Remove platform-scoped permissions from all existing org-scoped roles.
+--    New roles are already protected by application-layer rules.
 
 DELETE FROM role_permissions rp
 USING roles r, permissions p
@@ -13,44 +24,44 @@ WHERE rp.role_id = r.id
 
 --> statement-breakpoint
 
--- Normalize existing custom role names: trim whitespace and uppercase.
--- This brings legacy names in line with the normalizeRoleName() function in
--- RoleManagementUseCase.
+-- 3. Normalize custom role names (trim + uppercase) and resolve conflicts
+--    in a single deterministic CTE.  The first role (by created_at, then id)
+--    keeps the canonical name; duplicates get suffixed with the first 8 chars
+--    of their UUID.
 
-UPDATE roles
-SET name = UPPER(TRIM(name))
-WHERE is_system = false
-  AND (name != UPPER(TRIM(name)));
-
---> statement-breakpoint
-
--- Resolve case-insensitive conflicts after normalization: when two custom roles
--- in the same organization normalize to the same name, keep the oldest (by PK)
--- and suffix duplicates.
-
+WITH ranked AS (
+  SELECT
+    id,
+    UPPER(TRIM(name)) AS canonical_name,
+    ROW_NUMBER() OVER (
+      PARTITION BY organization_id, UPPER(TRIM(name))
+      ORDER BY created_at, id
+    ) AS duplicate_number
+  FROM roles
+  WHERE is_system = false
+    AND (name IS DISTINCT FROM UPPER(TRIM(name))
+         OR EXISTS (
+           SELECT 1 FROM roles r2
+           WHERE r2.id != roles.id
+             AND r2.organization_id IS NOT DISTINCT FROM roles.organization_id
+             AND r2.is_system = false
+             AND UPPER(TRIM(r2.name)) = UPPER(TRIM(roles.name))
+         ))
+)
 UPDATE roles r
-SET name = r.name || '_' || SUBSTRING(r.id::text, 1, 8)
-WHERE is_system = false
-  AND EXISTS (
-    SELECT 1 FROM roles r2
-    WHERE r2.id != r.id
-      AND r2.organization_id IS NOT DISTINCT FROM r.organization_id
-      AND LOWER(r2.name) = LOWER(r.name)
-      AND r2.is_system = false
-      AND r2.id < r.id
-  );
+SET name = CASE
+  WHEN ranked.duplicate_number = 1
+    THEN ranked.canonical_name
+  ELSE ranked.canonical_name || '_' || LEFT(r.id::text, 8)
+END
+FROM ranked
+WHERE ranked.id = r.id;
 
 --> statement-breakpoint
 
--- Drop the old case-sensitive unique index on (organization_id, name).
-
-DROP INDEX IF EXISTS "roles_organization_name_unique";
-
---> statement-breakpoint
-
--- Add a case-insensitive unique index on (organization_id, LOWER(name)).
--- The WHERE clause ensures custom roles (is_system = false) are covered;
--- platform system roles use roles_platform_name_unique instead.
+-- 4. Add a case-insensitive unique index on (organization_id, LOWER(name)).
+--    The WHERE clause restricts to custom roles (is_system = false);
+--    platform-level system roles are covered by roles_platform_name_unique.
 
 CREATE UNIQUE INDEX "roles_organization_name_lower_unique"
   ON "roles" (organization_id, LOWER(name))

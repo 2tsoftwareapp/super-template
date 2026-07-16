@@ -71,6 +71,11 @@ export function RoleTreeItem({
               {s}
             </Badge>
           ))}
+          {organizationName && (
+            <span className="truncate text-[10px] text-muted-foreground">
+              {organizationName}
+            </span>
+          )}
         </div>
         <div className="flex shrink-0 items-center gap-1">
           {isEditable && (

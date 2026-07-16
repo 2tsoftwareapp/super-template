@@ -82,6 +82,10 @@ export interface AccessControlRepositoryPort {
     roleId: string,
     executor?: TransactionExecutor,
   ): Promise<RoleRecord | null>;
+  findRoleByIdWithLock(
+    roleId: string,
+    executor: TransactionExecutor,
+  ): Promise<RoleRecord | null>;
   findUserIdsForRole(
     roleId: string,
     executor?: TransactionExecutor,

@@ -34,6 +34,7 @@ export function RoleFormDrawer({
   permissions,
   permissionsError,
   isSuperAdmin,
+  actorPermissions,
   organizations,
   selectedOrganizationId,
   onOrganizationSelect,
@@ -44,6 +45,7 @@ export function RoleFormDrawer({
   permissions: PermissionDto[];
   permissionsError: boolean;
   isSuperAdmin: boolean;
+  actorPermissions: string[];
   organizations: { id: string; name: string }[];
   selectedOrganizationId: string;
   onOrganizationSelect: (id: string) => void;
@@ -87,9 +89,12 @@ export function RoleFormDrawer({
     name: "permissionIds",
   });
 
+  const actorPermissionSet = new Set(actorPermissions);
   const orgPermissions = isSuperAdmin
     ? permissions
-    : permissions.filter((p) => p.scope === "organization");
+    : permissions.filter(
+        (p) => p.scope === "organization" && actorPermissionSet.has(p.name),
+      );
 
   const handleSubmit = form.handleSubmit((values) => {
     const payload: RoleForm = {
@@ -132,7 +137,9 @@ export function RoleFormDrawer({
               onValueChange={(value) => {
                 if (value) {
                   onOrganizationSelect(value);
-                  form.setValue("organizationId", value);
+                  form.setValue("organizationId", value, {
+                    shouldValidate: true,
+                  });
                 }
               }}
             >
@@ -148,6 +155,11 @@ export function RoleFormDrawer({
                 ))}
               </SelectContent>
             </Select>
+            {form.formState.errors.organizationId && (
+              <p className="text-xs text-destructive">
+                {form.formState.errors.organizationId.message}
+              </p>
+            )}
           </div>
         )}
 
