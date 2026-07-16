@@ -30,10 +30,9 @@ export const roles = pgTable(
     uniqueIndex('roles_platform_name_unique')
       .on(table.name)
       .where(sql`${table.organizationId} is null`),
-    uniqueIndex('roles_organization_name_unique').on(
-      table.organizationId,
-      table.name,
-    ),
+    uniqueIndex('roles_organization_name_lower_unique')
+      .on(table.organizationId, sql`LOWER(${table.name})`)
+      .where(sql`${table.isSystem} = false`),
     index('roles_organization_id_idx').on(table.organizationId),
   ],
 );

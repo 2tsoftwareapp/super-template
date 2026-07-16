@@ -24,38 +24,53 @@ WHERE rp.role_id = r.id
 
 --> statement-breakpoint
 
--- 3. Normalize custom role names (trim + uppercase) and resolve conflicts
---    in a single deterministic CTE.  The first role (by created_at, then id)
---    keeps the canonical name; duplicates get suffixed with the first 8 chars
---    of their UUID.
+-- 3. Normalize custom role names (trim + uppercase) and resolve all
+--    conflicts in a single deterministic CTE:
+--
+--      a) Duplicate custom names        → keep earliest, suffix rest
+--      b) Names matching system roles
+--         (SUPER_ADMIN, ADMIN, USER)    → rename to CUSTOM_ROLE_<uuid_prefix>
+--      c) Names matching system roles
+--         in the same organization      → rename to CUSTOM_ROLE_<uuid_prefix>
+--      d) Whitespace-only / too short   → rename to CUSTOM_ROLE_<uuid_prefix>
 
-WITH ranked AS (
+WITH normalized AS (
   SELECT
     id,
+    organization_id,
     UPPER(TRIM(name)) AS canonical_name,
-    ROW_NUMBER() OVER (
-      PARTITION BY organization_id, UPPER(TRIM(name))
-      ORDER BY created_at, id
-    ) AS duplicate_number
+    EXISTS (
+      SELECT 1 FROM roles system_role
+      WHERE system_role.is_system = true
+        AND system_role.organization_id
+            IS NOT DISTINCT FROM roles.organization_id
+        AND UPPER(system_role.name) = UPPER(TRIM(roles.name))
+    ) AS conflicts_with_system
   FROM roles
   WHERE is_system = false
-    AND (name IS DISTINCT FROM UPPER(TRIM(name))
-         OR EXISTS (
-           SELECT 1 FROM roles r2
-           WHERE r2.id != roles.id
-             AND r2.organization_id IS NOT DISTINCT FROM roles.organization_id
-             AND r2.is_system = false
-             AND UPPER(TRIM(r2.name)) = UPPER(TRIM(roles.name))
-         ))
+),
+ranked AS (
+  SELECT
+    *,
+    ROW_NUMBER() OVER (
+      PARTITION BY organization_id, canonical_name
+      ORDER BY created_at, id
+    ) AS duplicate_number
+  FROM normalized
 )
 UPDATE roles r
 SET name = CASE
+  WHEN ranked.canonical_name IN ('SUPER_ADMIN', 'ADMIN', 'USER')
+    OR ranked.conflicts_with_system
+    OR LENGTH(ranked.canonical_name) < 2
+  THEN 'CUSTOM_ROLE_' || LEFT(r.id::text, 8)
   WHEN ranked.duplicate_number = 1
     THEN ranked.canonical_name
   ELSE ranked.canonical_name || '_' || LEFT(r.id::text, 8)
 END
 FROM ranked
 WHERE ranked.id = r.id;
+
 
 --> statement-breakpoint
 

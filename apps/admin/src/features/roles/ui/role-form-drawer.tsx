@@ -90,11 +90,11 @@ export function RoleFormDrawer({
   });
 
   const actorPermissionSet = new Set(actorPermissions);
-  const orgPermissions = isSuperAdmin
-    ? permissions
-    : permissions.filter(
-        (p) => p.scope === "organization" && actorPermissionSet.has(p.name),
-      );
+  const orgPermissions = permissions.filter(
+    (p) =>
+      p.scope === "organization" &&
+      (isSuperAdmin || actorPermissionSet.has(p.name)),
+  );
 
   const handleSubmit = form.handleSubmit((values) => {
     const payload: RoleForm = {
