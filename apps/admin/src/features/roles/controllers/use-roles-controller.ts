@@ -61,6 +61,7 @@ export interface RolesViewModel {
     selectedId: string;
     onSelect: (id: string) => void;
   };
+  organizationNames: Record<string, string>;
 }
 
 export function useRolesController(): RolesViewModel {
@@ -130,6 +131,7 @@ export function useRolesController(): RolesViewModel {
       permissions: role.permissions,
       organizationId: role.organizationId,
     });
+    setSelectedOrganizationId("");
     setDrawerOpen(true);
   };
 
@@ -182,5 +184,8 @@ export function useRolesController(): RolesViewModel {
       selectedId: selectedOrganizationId,
       onSelect: setSelectedOrganizationId,
     },
+    organizationNames: Object.fromEntries(
+      (organizations.data?.data ?? []).map((org) => [org.id, org.name]),
+    ),
   };
 }

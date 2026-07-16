@@ -24,6 +24,7 @@ interface RoleTreeItemProps {
   canDelete: boolean;
   isDeleting: boolean;
   deletingRoleId: string | null;
+  organizationName?: string;
   onEdit: (role: ManagedRoleDto) => void;
   onDelete: (role: ManagedRoleDto) => void;
 }
@@ -34,6 +35,7 @@ export function RoleTreeItem({
   canDelete,
   isDeleting,
   deletingRoleId,
+  organizationName,
   onEdit,
   onDelete,
 }: RoleTreeItemProps) {
@@ -115,6 +117,11 @@ export function RoleTreeItem({
       </button>
       {expanded && (
         <div className="space-y-2 px-4 pb-3 pt-0">
+          {organizationName && (
+            <p className="text-xs text-muted-foreground">
+              Organization: <span className="font-medium text-foreground">{organizationName}</span>
+            </p>
+          )}
           <p className="text-xs leading-relaxed text-muted-foreground">
             {optionalText(role.description) || "No description"}
           </p>

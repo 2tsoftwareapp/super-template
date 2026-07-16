@@ -48,6 +48,7 @@ export function RolesListView(vm: RolesViewModel) {
     drawer,
     confirmDelete,
     organizations,
+    organizationNames,
   } = vm;
 
   return (
@@ -167,6 +168,9 @@ export function RolesListView(vm: RolesViewModel) {
                       canDelete={canDelete}
                       isDeleting={isDeleting}
                       deletingRoleId={deletingRoleId}
+                      {...(role.organizationId && organizationNames[role.organizationId]
+                        ? { organizationName: organizationNames[role.organizationId] }
+                        : {})}
                       onEdit={onEditRole}
                       onDelete={onRequestDelete}
                     />

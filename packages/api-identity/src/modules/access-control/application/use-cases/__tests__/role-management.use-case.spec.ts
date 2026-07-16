@@ -107,7 +107,7 @@ describe('RoleManagementUseCase', () => {
 
       const result = await useCase.createCustomRole(
         buildActor(),
-        { name: '  finance_manager  ', permissionIds: ['perm-1'] },
+        { name: '  finance_manager  ', permissionIds: ['perm-1'], organizationId: 'org-1' },
       );
 
       expect(repo.createRole).toHaveBeenCalledWith(
@@ -128,7 +128,7 @@ describe('RoleManagementUseCase', () => {
       repo.findRoleByName.mockResolvedValue(null);
 
       await expect(
-        useCase.createCustomRole(buildActor(), { name: '  admin  ', permissionIds: ['perm-1'] }),
+        useCase.createCustomRole(buildActor(), { name: '  admin  ', permissionIds: ['perm-1'], organizationId: 'org-1' }),
       ).rejects.toMatchObject({ code: ERROR_CODES.VALIDATION_FAILED });
 
       expect(repo.createRole).not.toHaveBeenCalled();
@@ -144,7 +144,7 @@ describe('RoleManagementUseCase', () => {
       });
 
       await expect(
-        useCase.createCustomRole(buildActor(), { name: 'Finance Manager', permissionIds: ['perm-1'] }),
+        useCase.createCustomRole(buildActor(), { name: 'Finance Manager', permissionIds: ['perm-1'], organizationId: 'org-1' }),
       ).rejects.toMatchObject({ code: ERROR_CODES.RESOURCE_CONFLICT });
 
       expect(repo.createRole).not.toHaveBeenCalled();
@@ -157,7 +157,7 @@ describe('RoleManagementUseCase', () => {
       repo.findPermissionsByIds.mockResolvedValue([]);
 
       await expect(
-        useCase.createCustomRole(buildActor(), { name: 'Test Role', permissionIds: ['missing'] }),
+        useCase.createCustomRole(buildActor(), { name: 'Test Role', permissionIds: ['missing'], organizationId: 'org-1' }),
       ).rejects.toMatchObject({ code: ERROR_CODES.VALIDATION_FAILED });
     });
 
@@ -176,7 +176,7 @@ describe('RoleManagementUseCase', () => {
       repo.replaceRolePermissions.mockRejectedValue(new Error('DB failure'));
 
       await expect(
-        useCase.createCustomRole(buildActor(), { name: 'Test Role', permissionIds: ['perm-1'] }),
+        useCase.createCustomRole(buildActor(), { name: 'Test Role', permissionIds: ['perm-1'], organizationId: 'org-1' }),
       ).rejects.toThrow('DB failure');
 
       expect(txPort.run).toHaveBeenCalled();
@@ -222,7 +222,7 @@ describe('RoleManagementUseCase', () => {
         isSystem: false,
       });
 
-      await useCase.createCustomRole(buildActor(), { name: 'Test Role', permissionIds: ['perm-1'] });
+      await useCase.createCustomRole(buildActor(), { name: 'Test Role', permissionIds: ['perm-1'], organizationId: 'org-1' });
 
       expect(audit.log).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -241,7 +241,7 @@ describe('RoleManagementUseCase', () => {
       repo.findPermissionsByIds.mockResolvedValue([]);
 
       await expect(
-        useCase.createCustomRole(buildActor(), { name: 'X', permissionIds: ['missing'] }),
+        useCase.createCustomRole(buildActor(), { name: 'X', permissionIds: ['missing'], organizationId: 'org-1' }),
       ).rejects.toThrow();
 
       expect(audit.log).not.toHaveBeenCalled();

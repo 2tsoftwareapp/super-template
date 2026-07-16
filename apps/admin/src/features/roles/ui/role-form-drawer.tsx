@@ -14,6 +14,7 @@ import {
 import { Spinner } from "@repo/web-ui/spinner";
 import { Building2 } from "lucide-react";
 import { useEffect } from "react";
+import { z } from "zod";
 import { useForm, useWatch } from "react-hook-form";
 
 import { PermissionMultiSelect } from "@/components/permission-multi-select";
@@ -49,8 +50,14 @@ export function RoleFormDrawer({
 }) {
   const isEditing = role !== null;
 
+  const schema = isSuperAdmin && !isEditing
+    ? roleSchema.extend({
+        organizationId: z.string().uuid("Select an organization"),
+      })
+    : roleSchema;
+
   const form = useForm<RoleForm>({
-    resolver: zodResolver(roleSchema),
+    resolver: zodResolver(schema),
     defaultValues: {
       name: "",
       description: "",
@@ -91,7 +98,7 @@ export function RoleFormDrawer({
       permissionIds: values.permissionIds,
     };
 
-    if (isSuperAdmin && selectedOrganizationId) {
+    if (!isEditing && isSuperAdmin && selectedOrganizationId) {
       payload.organizationId = selectedOrganizationId;
     }
 

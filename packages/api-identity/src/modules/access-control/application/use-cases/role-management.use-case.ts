@@ -104,9 +104,19 @@ export class RoleManagementUseCase {
     command: CreateRoleCommand,
     _executor?: TransactionExecutor,
   ): Promise<RoleView> {
-    const organizationId = actor.roles.includes(ROLE_NAMES.SUPER_ADMIN)
-      ? (command.organizationId ?? actor.organizationId ?? null)
+    const isSuperAdmin = actor.roles.includes(ROLE_NAMES.SUPER_ADMIN);
+
+    const organizationId: string | null = isSuperAdmin
+      ? (command.organizationId ?? null)
       : (actor.organizationId ?? null);
+
+    if (isSuperAdmin && !organizationId) {
+      throw new AppError(
+        ERROR_CODES.VALIDATION_FAILED,
+        'Organization ID is required when creating a role',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
 
     assertCanCreateCustomRole(actor, organizationId);
 

@@ -100,6 +100,7 @@ export class UpdateRoleDto {
   @ApiPropertyOptional({ type: [String] })
   @IsOptional()
   @IsArray()
+  @ArrayMinSize(1)
   @ArrayUnique()
   @IsUUID('4', { each: true })
   permissionIds?: string[];
