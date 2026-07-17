@@ -1,0 +1,61 @@
+# Project-level agent settings. Edit and keep this file in your project.
+# Agents MUST read this at the start of every task.
+
+# Language for agent communication AND the prose written into saved artifacts.
+# Supported values:
+#   en  English (default)
+#   vi  Vietnamese
+# Code, identifiers, file paths, CLI commands, and template section keys stay
+# unchanged regardless of this value.
+language: en
+
+# Generated/maintained by the init skill from confirmed project evidence.
+# Descriptive project facts belong in PRJ_REFERENCE.md, not here.
+project:
+  reference: .agents/PRJ_REFERENCE.md
+
+rules:
+  decisions:
+    # Applies to brainstorming, business-analysis, and planning.
+    # Step files remain authoritative; these values make the shared policy
+    # explicit for hosts and tooling.
+    stop_on:
+      - critical-unresolved
+      - blocking-unknown
+      - feasibility-fail-or-unknown
+      - correctness-fail-or-unknown
+      - blocking-capability-gap
+    require_sequential_step_ledger: true
+    require_spec_quality_before_downstream_work: true
+    max_blocking_questions_per_round: 3
+  visuals:
+    triage: required
+    html: ask-before-create
+    prefer_diagram_for_flows: true
+  branch:
+    base: ""
+    naming: ""
+  commit:
+    convention: ""
+    format: ""
+  pull_request:
+    title_format: ""
+    description_sections: []
+    required_checks: []
+  reports:
+    # User-facing lifecycle artifact format.
+    # Supported: markdown (default) | html
+    # HTML uses one enterprise theme (Tailwind CDN) — see DESIGN_SYSTEM.md
+    output_format: markdown
+    style: 80-20
+    context: 5w1h-when-useful
+    executive_summary_max_items: 5
+    overview: required
+    charts: mermaid-when-useful
+    session_overview: required
+    custom_sections: []
+  code:
+    comments:
+      non_obvious_flow: required
+      rationale_and_constraints: required
+      obvious_code_narration: avoid
