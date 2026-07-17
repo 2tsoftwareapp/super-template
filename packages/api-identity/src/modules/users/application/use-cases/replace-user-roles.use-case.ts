@@ -184,6 +184,7 @@ export class ReplaceUserRolesUseCase {
           action: 'user.roles.replaced',
           entityType: 'user',
           entityId: userId,
+          organizationId: resolvedOrganizationId,
           metadata: {
             roleId,
             roleName: resolvedRole.name,

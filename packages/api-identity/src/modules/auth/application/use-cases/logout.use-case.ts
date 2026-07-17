@@ -29,6 +29,7 @@ export class LogoutUseCase {
       action: 'auth.logout',
       entityType: 'session',
       entityId: user.sessionId,
+      organizationId: user.organizationId,
       requestContext,
     });
   }

@@ -4,6 +4,7 @@ export class AuditMapper {
   toAuditLogDto(row: AuditLogRecord) {
     return {
       id: row.id,
+      organizationId: row.organizationId,
       actorId: row.actorId,
       action: row.action,
       entityType: row.entityType,

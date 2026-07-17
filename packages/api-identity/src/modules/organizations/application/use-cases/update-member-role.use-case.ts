@@ -139,6 +139,7 @@ export class UpdateMemberRoleUseCase {
         action: 'organization.member.role-update',
         entityType: 'organization_member',
         entityId: targetUserId,
+        organizationId,
         metadata: { organizationId, role },
         requestContext,
       });

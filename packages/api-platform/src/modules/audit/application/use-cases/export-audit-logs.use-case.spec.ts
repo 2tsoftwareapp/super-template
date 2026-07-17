@@ -32,6 +32,7 @@ describe('ExportAuditLogsUseCase', () => {
   it('exports matching rows to CSV, uploads them, and records the export', async () => {
     const auditRepository = {
       listForExport: vi.fn(async () => [auditRow]),
+      count: vi.fn(async () => 1),
     };
     const filesRepository = {
       create: vi.fn(async () => ({ id: 'file-1' })),
@@ -54,6 +55,11 @@ describe('ExportAuditLogsUseCase', () => {
     expect(auditRepository.listForExport).toHaveBeenCalledWith({
       action: 'project.created',
       limit: 5000,
+      organizationId: 'org-1',
+    });
+    expect(auditRepository.count).toHaveBeenCalledWith({
+      action: 'project.created',
+      organizationId: 'org-1',
     });
     expect(objectStorage.upload).toHaveBeenCalledWith(
       expect.objectContaining({ mimeType: 'text/csv' }),
@@ -69,14 +75,15 @@ describe('ExportAuditLogsUseCase', () => {
       expect.objectContaining({
         action: 'audit.exported',
         actorId: 'user-1',
+        organizationId: 'org-1',
         metadata: expect.objectContaining({ rowCount: 1, fileId: 'file-1' }),
       }),
     );
-    expect(result).toEqual({ fileId: 'file-1', rowCount: 1 });
+    expect(result).toEqual({ fileId: 'file-1', rowCount: 1, totalMatching: 1, truncated: false });
   });
 
   it('rejects when the actor has no active organization', async () => {
-    const auditRepository = { listForExport: vi.fn() };
+    const auditRepository = { listForExport: vi.fn(), count: vi.fn() };
     const filesRepository = { create: vi.fn() };
     const objectStorage = { upload: vi.fn(), delete: vi.fn() };
     const recordAuditLogUseCase = { execute: vi.fn() };
@@ -100,6 +107,7 @@ describe('ExportAuditLogsUseCase', () => {
   it('deletes the uploaded object and rethrows if the file record fails to persist', async () => {
     const auditRepository = {
       listForExport: vi.fn(async () => [auditRow]),
+      count: vi.fn(async () => 1),
     };
     const filesRepository = {
       create: vi.fn(async () => {

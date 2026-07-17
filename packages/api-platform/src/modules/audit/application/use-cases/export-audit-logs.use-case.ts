@@ -46,12 +46,25 @@ export class ExportAuditLogsUseCase {
     actor: AuthenticatedRequestUser,
     query: ExportAuditLogsQuery,
     requestContext?: RequestContext,
-  ): Promise<{ fileId: string; rowCount: number }> {
+  ): Promise<{ fileId: string; rowCount: number; totalMatching: number; truncated: boolean }> {
     const organizationId = requireOrganizationId(actor);
-    const rows = await this.auditRepository.listForExport({
+    const isSuperAdmin = actor.roles.includes('SUPER_ADMIN');
+
+    const fullQuery = {
       ...query,
-      limit: MAX_EXPORT_ROWS,
-    });
+      ...(isSuperAdmin ? {} : { organizationId }),
+    };
+
+    const [rows, totalResult] = await Promise.all([
+      this.auditRepository.listForExport({
+        ...fullQuery,
+        limit: MAX_EXPORT_ROWS,
+      }),
+      this.auditRepository.count(fullQuery),
+    ]);
+
+    const totalMatching = totalResult;
+    const truncated = totalMatching > MAX_EXPORT_ROWS;
 
     const csv = toCsv(
       CSV_HEADER,
@@ -103,10 +116,11 @@ export class ExportAuditLogsUseCase {
       actorId: actor.userId,
       action: 'audit.exported',
       entityType: 'audit_log',
+      organizationId,
       metadata: { rowCount: rows.length, fileId, filters: { ...query } },
       requestContext,
     });
 
-    return { fileId, rowCount: rows.length };
+    return { fileId, rowCount: rows.length, totalMatching, truncated };
   }
 }

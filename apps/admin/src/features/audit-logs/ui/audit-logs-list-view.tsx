@@ -4,7 +4,8 @@ import { Button } from "@repo/web-ui/button";
 import { Card, CardContent } from "@repo/web-ui/card";
 import { DatePicker } from "@repo/web-ui/date-picker";
 import { Input } from "@repo/web-ui/input";
-import { Search, X } from "lucide-react";
+import { Spinner } from "@repo/web-ui/spinner";
+import { Download, Search, X } from "lucide-react";
 
 import type { AuditLogsViewModel } from "@/features/audit-logs/controllers/use-audit-logs-controller";
 
@@ -29,12 +30,15 @@ export function AuditLogsListView({
   onClearFilters,
   isLoading,
   isRefreshing,
+  hasError,
   onRefresh,
   entries,
   total,
   totalPages,
   selectedEntry,
   onSelectEntry,
+  onExport,
+  isExporting,
 }: AuditLogsViewModel) {
   return (
     <ResourcePageShell
@@ -68,15 +72,6 @@ export function AuditLogsListView({
               placeholder="To"
               className="h-7 text-xs"
             />
-            <div className="relative">
-              <Search className="pointer-events-none absolute left-2 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Search events…"
-                value={filters.q}
-                onChange={(e) => onFilterChange("q", e.target.value)}
-                className="h-7 w-[180px] pl-7 text-xs"
-              />
-            </div>
             {hasFilters && (
               <Button
                 variant="ghost"
@@ -88,21 +83,48 @@ export function AuditLogsListView({
                 Clear
               </Button>
             )}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onExport}
+              disabled={isExporting}
+              className="h-7 px-2 text-xs"
+            >
+              {isExporting ? (
+                <Spinner className="size-3.5" />
+              ) : (
+                <Download className="size-3.5" />
+              )}
+              Export
+            </Button>
           </div>
         </div>
 
         <CardContent className="p-0 pb-1">
-          <AuditLogsTable
-            entries={entries}
-            isLoading={isLoading}
-            hasFilters={hasFilters}
-            total={total}
-            totalPages={totalPages}
-            page={filters.page}
-            isRefreshing={isRefreshing}
-            onSelectEntry={onSelectEntry}
-            onPageChange={(p) => onFilterChange("page", p)}
-          />
+          {hasError ? (
+            <p className="p-4 text-center text-xs text-destructive">
+              Failed to load audit logs.{" "}
+              <button
+                type="button"
+                onClick={onRefresh}
+                className="underline underline-offset-2"
+              >
+                Try again
+              </button>
+            </p>
+          ) : (
+            <AuditLogsTable
+              entries={entries}
+              isLoading={isLoading}
+              hasFilters={hasFilters}
+              total={total}
+              totalPages={totalPages}
+              page={filters.page}
+              isRefreshing={isRefreshing}
+              onSelectEntry={onSelectEntry}
+              onPageChange={(p) => onFilterChange("page", p)}
+            />
+          )}
         </CardContent>
       </Card>
 

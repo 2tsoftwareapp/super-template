@@ -90,6 +90,7 @@ export class UpdateAdminUserUseCase {
       action: 'admin.user.updated',
       entityType: 'user',
       entityId: userId,
+      organizationId: actor.organizationId,
       requestContext,
     });
 

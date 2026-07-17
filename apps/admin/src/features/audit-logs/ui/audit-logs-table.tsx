@@ -56,6 +56,7 @@ export function AuditLogsTable({
             <TableHead className="w-[130px]">Time</TableHead>
             <TableHead>Action</TableHead>
             <TableHead>Entity</TableHead>
+            <TableHead>Organization</TableHead>
             <TableHead>Actor</TableHead>
             <TableHead className="w-16" />
           </TableRow>
@@ -63,7 +64,7 @@ export function AuditLogsTable({
         <TableBody>
           <Show when={isLoading}>
             <TableRow>
-              <TableCell colSpan={5} className="py-16 text-center">
+              <TableCell colSpan={6} className="py-16 text-center">
                 <SectionLoading />
               </TableCell>
             </TableRow>
@@ -71,7 +72,7 @@ export function AuditLogsTable({
           {!isLoading && entries.length === 0 ? (
             <TableRow>
               <TableCell
-                colSpan={5}
+                colSpan={6}
                 className="py-16 text-center text-sm text-muted-foreground"
               >
                 {hasFilters
@@ -105,6 +106,15 @@ export function AuditLogsTable({
                     >
                       {entry.entityType.toLowerCase()}
                     </Badge>
+                  ) : (
+                    <span className="text-xs text-muted-foreground">—</span>
+                  )}
+                </TableCell>
+                <TableCell>
+                  {entry.organizationId ? (
+                    <span className="font-mono text-xs text-muted-foreground">
+                      {entry.organizationId.slice(0, 8)}…
+                    </span>
                   ) : (
                     <span className="text-xs text-muted-foreground">—</span>
                   )}

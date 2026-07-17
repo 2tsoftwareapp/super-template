@@ -21,12 +21,15 @@ export interface AuditLogsViewModel {
   onClearFilters: () => void;
   isLoading: boolean;
   isRefreshing: boolean;
+  hasError: boolean;
   onRefresh: () => void;
   entries: AuditLogDto[];
   total: number;
   totalPages: number;
   selectedEntry: AuditLogDto | null;
   onSelectEntry: (entry: AuditLogDto | null) => void;
+  onExport: () => void;
+  isExporting: boolean;
 }
 
 /**
@@ -73,6 +76,43 @@ export function useAuditLogsController(): AuditLogsViewModel {
     q,
   });
 
+  const [isExporting, setIsExporting] = useState(false);
+
+  const onExport = async () => {
+    setIsExporting(true);
+    try {
+      const exportResponse = await fetch("/api/bff/admin/audit-logs/export", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          from: filters.from || undefined,
+          to: filters.to || undefined,
+          q: q || undefined,
+        }),
+      });
+      if (!exportResponse.ok) throw new Error("Export failed");
+      const { data } = (await exportResponse.json()) as {
+        data: { fileId: string };
+      };
+
+      const downloadResponse = await fetch(
+        `/api/bff/admin/audit-logs/exports/${data.fileId}/download`,
+      );
+      if (!downloadResponse.ok) throw new Error("Download failed");
+      const blob = await downloadResponse.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `audit-logs-export-${Date.now()}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      // Export errors are silently handled; the button state resets.
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return {
     filters,
     hasFilters,
@@ -80,11 +120,14 @@ export function useAuditLogsController(): AuditLogsViewModel {
     onClearFilters,
     isLoading: auditLogs.isLoading,
     isRefreshing: auditLogs.isFetching,
+    hasError: auditLogs.isError,
     onRefresh: () => void auditLogs.refetch(),
     entries: auditLogs.data?.data ?? [],
     total: auditLogs.data?.meta?.total ?? 0,
     totalPages: auditLogs.data?.meta?.totalPages ?? 1,
     selectedEntry,
     onSelectEntry: setSelectedEntry,
+    onExport,
+    isExporting,
   };
 }

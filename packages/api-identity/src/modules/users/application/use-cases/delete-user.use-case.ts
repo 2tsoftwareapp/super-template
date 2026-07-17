@@ -86,6 +86,7 @@ export class DeleteUserUseCase {
           action: 'admin.user.deleted',
           entityType: 'user',
           entityId: userId,
+          organizationId: actor.organizationId,
           requestContext,
         },
         transaction,

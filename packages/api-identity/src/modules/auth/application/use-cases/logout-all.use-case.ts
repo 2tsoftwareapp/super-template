@@ -29,6 +29,7 @@ export class LogoutAllUseCase {
       action: 'auth.logout_all',
       entityType: 'user',
       entityId: user.userId,
+      organizationId: user.organizationId,
       requestContext,
     });
   }

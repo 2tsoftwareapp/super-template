@@ -105,6 +105,7 @@ export class UpdateUserStatusUseCase {
           action: status === 'BLOCKED' ? 'user.blocked' : 'user.unblocked',
           entityType: 'user',
           entityId: userId,
+          organizationId: actor.organizationId,
           metadata: { status },
           requestContext,
         },

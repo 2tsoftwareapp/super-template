@@ -96,6 +96,7 @@ export class DeleteOrganizationUseCase {
         action: 'organization.delete',
         entityType: 'organization',
         entityId: organizationId,
+        organizationId,
         requestContext,
       });
     });

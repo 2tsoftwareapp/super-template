@@ -89,6 +89,7 @@ export class SendNotificationUseCase {
           action: 'notification.sent',
           entityType: 'notification',
           entityId: notification.id,
+          organizationId: resolvedOrganizationId,
           metadata: {
             userId: input.userId,
             type: input.type,

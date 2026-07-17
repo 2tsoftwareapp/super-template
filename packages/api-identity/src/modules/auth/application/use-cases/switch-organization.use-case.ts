@@ -82,6 +82,7 @@ export class SwitchOrganizationUseCase {
       action: 'auth.organization.switched',
       entityType: 'organization',
       entityId: organizationId,
+      organizationId,
       requestContext,
     });
 

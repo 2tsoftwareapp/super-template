@@ -86,6 +86,7 @@ export class LeaveOrganizationUseCase {
         action: 'organization.leave',
         entityType: 'organization_member',
         entityId: userId,
+        organizationId,
         metadata: { organizationId },
         requestContext,
       });

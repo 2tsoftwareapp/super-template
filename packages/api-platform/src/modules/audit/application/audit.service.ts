@@ -1,4 +1,4 @@
-import type { TransactionExecutor } from '@repo/api-core';
+import type { AuthenticatedRequestUser, TransactionExecutor } from '@repo/api-core';
 
 import { Injectable } from '@nestjs/common';
 
@@ -24,7 +24,7 @@ export class AuditService {
     return this.recordAuditLogUseCase.execute(input, executor);
   }
 
-  async listAuditLogs(query: ListAuditLogsQuery) {
-    return this.listAuditLogsUseCase.execute(query);
+  async listAuditLogs(actor: AuthenticatedRequestUser, query: ListAuditLogsQuery) {
+    return this.listAuditLogsUseCase.execute(actor, query);
   }
 }

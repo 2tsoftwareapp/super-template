@@ -11,6 +11,7 @@ export interface AuditInput {
   action: string;
   entityType: string;
   entityId?: string | null;
+  organizationId?: string | null;
   metadata?: JsonObject | null;
   requestContext?: RequestContext | undefined;
 }
@@ -27,6 +28,7 @@ export class RecordAuditLogUseCase {
       action,
       entityType,
       entityId,
+      organizationId,
       metadata,
       requestContext,
     }: AuditInput,
@@ -38,6 +40,7 @@ export class RecordAuditLogUseCase {
         action,
         entityType,
         entityId: entityId ?? null,
+        organizationId: organizationId ?? null,
         metadata: metadata
           ? (() => {
               const redacted = redactSensitive(metadata);

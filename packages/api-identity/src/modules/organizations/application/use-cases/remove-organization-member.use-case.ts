@@ -127,6 +127,7 @@ export class RemoveOrganizationMemberUseCase {
         action: 'organization.member.remove',
         entityType: 'organization_member',
         entityId: targetUserId,
+        organizationId,
         metadata: { organizationId },
         requestContext,
       });

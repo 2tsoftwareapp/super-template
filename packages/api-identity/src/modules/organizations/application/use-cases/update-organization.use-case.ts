@@ -64,6 +64,7 @@ export class UpdateOrganizationUseCase {
       action: 'organization.update',
       entityType: 'organization',
       entityId: organizationId,
+      organizationId,
       metadata: { name: organization.name },
       requestContext,
     });

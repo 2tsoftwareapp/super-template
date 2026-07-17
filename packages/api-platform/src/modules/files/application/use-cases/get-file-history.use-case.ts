@@ -35,7 +35,7 @@ export class GetFileHistoryUseCase {
 
     const [versions, auditResult] = await Promise.all([
       this.filesRepository.listVersions(file.id),
-      this.auditService.listAuditLogs({
+      this.auditService.listAuditLogs(actor, {
         page: 1,
         limit: AUDIT_HISTORY_LIMIT,
         sortOrder: 'desc',

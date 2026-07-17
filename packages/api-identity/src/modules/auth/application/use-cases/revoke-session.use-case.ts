@@ -48,6 +48,7 @@ export class RevokeSessionUseCase {
       action: 'auth.session.revoked',
       entityType: 'session',
       entityId: sessionId,
+      organizationId: user.organizationId,
       requestContext,
     });
   }

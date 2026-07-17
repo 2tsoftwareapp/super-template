@@ -3,6 +3,7 @@ import type { TransactionExecutor } from '@repo/api-core';
 
 export interface AuditLogRecord {
   id: string;
+  organizationId: string | null;
   actorId: string | null;
   action: string;
   entityType: string;
@@ -19,6 +20,7 @@ export interface CreateAuditLogInput {
   action: string;
   entityType: string;
   entityId: string | null;
+  organizationId: string | null;
   metadata?: JsonObject | null;
   ipAddress: string | null;
   userAgent: string | null;
@@ -28,6 +30,7 @@ export interface CreateAuditLogInput {
 export interface ListAuditLogsParams {
   page: number;
   limit: number;
+  organizationId?: string;
   actorId?: string;
   action?: string;
   resourceType?: string;
@@ -51,6 +54,7 @@ export interface AuditLogListResult {
 export interface AuditRepositoryPort {
   list(params: ListAuditLogsParams, executor?: TransactionExecutor): Promise<AuditLogListResult>;
   listForExport(params: AuditLogSearchParams & { limit: number }, executor?: TransactionExecutor): Promise<AuditLogRecord[]>;
+  count(params: AuditLogSearchParams, executor?: TransactionExecutor): Promise<number>;
   deleteOlderThan(cutoff: Date, executor?: TransactionExecutor): Promise<number>;
   findById(id: string, executor?: TransactionExecutor): Promise<AuditLogRecord | null>;
   create(values: CreateAuditLogInput, executor?: TransactionExecutor): Promise<AuditLogRecord>;

@@ -7,6 +7,7 @@ export interface AuditLogInput {
   action: string;
   entityType: string;
   entityId?: string | null;
+  organizationId?: string | null;
   metadata?: JsonObject | null;
   requestContext?: RequestContext | undefined;
 }

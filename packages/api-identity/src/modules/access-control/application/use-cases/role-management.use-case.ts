@@ -182,6 +182,7 @@ export class RoleManagementUseCase {
           action: 'role.created',
           entityType: 'role',
           entityId: role.id,
+          organizationId,
           metadata: {
             name: normalizedName,
             organizationId,
@@ -302,6 +303,7 @@ export class RoleManagementUseCase {
           action: 'role.updated',
           entityType: 'role',
           entityId: roleId,
+          organizationId: role.organizationId,
           metadata: updateMeta,
         },
         tx,
@@ -371,6 +373,7 @@ export class RoleManagementUseCase {
           action: 'role.deleted',
           entityType: 'role',
           entityId: roleId,
+          organizationId: role.organizationId,
           metadata: {
             name: role.name,
             organizationId: role.organizationId,

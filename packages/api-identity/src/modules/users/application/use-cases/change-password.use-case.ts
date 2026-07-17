@@ -81,6 +81,7 @@ export class ChangePasswordUseCase {
           action: 'user.password.changed',
           entityType: 'user',
           entityId: actor.userId,
+          organizationId: actor.organizationId,
           requestContext,
         },
         transaction,

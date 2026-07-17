@@ -7,6 +7,7 @@ import { StorageModule } from '../storage/storage.module';
 import { AuditRetentionService } from './application/audit-retention.service';
 import { AuditService } from './application/audit.service';
 import { AUDIT_REPOSITORY } from './application/ports/audit.repository.port';
+import { DownloadAuditExportUseCase } from './application/use-cases/download-audit-export.use-case';
 import { ExportAuditLogsUseCase } from './application/use-cases/export-audit-logs.use-case';
 import { GetAuditLogUseCase } from './application/use-cases/get-audit-log.use-case';
 import { ListAuditLogsUseCase } from './application/use-cases/list-audit-logs.use-case';
@@ -35,6 +36,7 @@ import { AuditController } from './presentation/audit.controller';
     ListAuditLogsUseCase,
     GetAuditLogUseCase,
     ExportAuditLogsUseCase,
+    DownloadAuditExportUseCase,
     PurgeExpiredAuditLogsUseCase,
     AuditRetentionService,
     AuditService,

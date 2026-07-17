@@ -6,13 +6,14 @@ import type {
 import { Inject, Injectable } from '@nestjs/common';
 import { DATABASE } from '@repo/api-database';
 import { auditLogs } from '@repo/api-database';
-import { and, count, desc, eq, gte, ilike, lte, or, type SQL } from 'drizzle-orm';
+import { and, count, desc, eq, gte, ilike, lt, lte, or, type SQL } from 'drizzle-orm';
 
 import type { AuditRepositoryPort } from '../application/ports/audit.repository.port';
 
 interface ListAuditLogsParams {
   page: number;
   limit: number;
+  organizationId?: string;
   actorId?: string;
   action?: string;
   resourceType?: string;
@@ -26,11 +27,15 @@ interface ListAuditLogsParams {
 
 type AuditLogSearchParams = Pick<
   ListAuditLogsParams,
-  'actorId' | 'action' | 'resourceType' | 'resourceId' | 'from' | 'to' | 'q'
+  'organizationId' | 'actorId' | 'action' | 'resourceType' | 'resourceId' | 'from' | 'to' | 'q'
 >;
 
 const buildAuditLogFilters = (params: AuditLogSearchParams): SQL[] => {
   const filters: SQL[] = [];
+
+  if (params.organizationId) {
+    filters.push(eq(auditLogs.organizationId, params.organizationId));
+  }
 
   if (params.actorId) {
     filters.push(eq(auditLogs.actorId, params.actorId));
@@ -49,11 +54,16 @@ const buildAuditLogFilters = (params: AuditLogSearchParams): SQL[] => {
   }
 
   if (params.from) {
-    filters.push(gte(auditLogs.createdAt, new Date(params.from)));
+    const fromDate = new Date(params.from);
+    fromDate.setUTCHours(0, 0, 0, 0);
+    filters.push(gte(auditLogs.createdAt, fromDate));
   }
 
   if (params.to) {
-    filters.push(lte(auditLogs.createdAt, new Date(params.to)));
+    const toDate = new Date(params.to);
+    toDate.setUTCHours(0, 0, 0, 0);
+    toDate.setUTCDate(toDate.getUTCDate() + 1);
+    filters.push(lt(auditLogs.createdAt, toDate));
   }
 
   if (params.q) {
@@ -119,6 +129,19 @@ export class AuditRepository implements AuditRepositoryPort {
       .where(whereClause)
       .orderBy(desc(auditLogs.createdAt))
       .limit(params.limit);
+  }
+
+  async count(
+    params: AuditLogSearchParams,
+    executor: DatabaseExecutor = this.database,
+  ): Promise<number> {
+    const filters = buildAuditLogFilters(params);
+    const whereClause = filters.length ? and(...filters) : undefined;
+    const [result] = await executor
+      .select({ total: count() })
+      .from(auditLogs)
+      .where(whereClause);
+    return Number(result?.total ?? 0);
   }
 
   /** Permanently deletes audit entries older than the cutoff; returns the count removed. */

@@ -116,6 +116,7 @@ export class NotificationDeliveryUseCase {
       action: 'notification.job.created',
       entityType: 'notification_job',
       entityId: job.id,
+      organizationId: actor.organizationId,
       metadata: {
         audience: input.audience,
         scheduledAt: scheduledAt.toISOString(),
@@ -191,6 +192,7 @@ export class NotificationDeliveryUseCase {
       action: 'notification.job.cancelled',
       entityType: 'notification_job',
       entityId: jobId,
+      organizationId: actor.organizationId,
     });
 
     return this.notificationsMapper.toNotificationJobView(cancelled);

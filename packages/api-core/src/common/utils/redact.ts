@@ -1,14 +1,32 @@
-const REDACT_KEYS = new Set([
+const normalizeKey = (key: string): string =>
+  key.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+const REDACT_KEY_NORMALIZED = new Set([
   'authorization',
   'cookie',
   'cookies',
   'password',
   'passwordhash',
+  'newpassword',
+  'oldpassword',
+  'passwordconfirmation',
   'accesstoken',
   'refreshtoken',
   'token',
   'resettoken',
   'verificationtoken',
+  'apikey',
+  'clientsecret',
+  'privatekey',
+  'secretaccesskey',
+  'secretkey',
+  'secret',
+  'mfastatus',
+  'mfasecret',
+  'otp',
+  'otpsecret',
+  'recoverycodes',
+  'recoverycode',
 ]);
 
 export const redactSensitive = (value: unknown): unknown =>
@@ -34,7 +52,7 @@ const redactInternal = (value: unknown, seen: WeakSet<object>): unknown => {
 
   return Object.fromEntries(
     Object.entries(value).map(([key, nestedValue]) => {
-      if (REDACT_KEYS.has(key.toLowerCase())) {
+      if (REDACT_KEY_NORMALIZED.has(normalizeKey(key))) {
         return [key, '[REDACTED]'];
       }
 

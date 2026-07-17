@@ -7,6 +7,9 @@ export class AuditLogDto {
   id: string;
 
   @ApiPropertyOptional({ type: String, nullable: true })
+  organizationId: string | null;
+
+  @ApiPropertyOptional({ type: String, nullable: true })
   actorId: string | null;
 
   @ApiProperty()
@@ -118,4 +121,10 @@ export class AuditExportResultDto {
 
   @ApiProperty()
   rowCount: number;
+
+  @ApiProperty()
+  totalMatching: number;
+
+  @ApiProperty()
+  truncated: boolean;
 }

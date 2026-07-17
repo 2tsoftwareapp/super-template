@@ -1562,6 +1562,7 @@ export interface components {
         };
         AuditLogDto: {
             id: string;
+            organizationId?: string | null;
             actorId?: string | null;
             action: string;
             entityType: string;
@@ -1577,6 +1578,8 @@ export interface components {
         AuditExportResultDto: {
             fileId: string;
             rowCount: number;
+            totalMatching: number;
+            truncated: boolean;
         };
         ExportAuditLogsQueryDto: {
             actorId?: string;

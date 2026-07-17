@@ -1,11 +1,12 @@
 import type { AuthenticatedRequestUser } from '@repo/api-core';
-import type { Request } from 'express';
+import type { Request, Response } from 'express';
 
-import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Query, Req } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Query, Req, Res, StreamableFile } from '@nestjs/common';
+import { ApiBearerAuth, ApiProduces, ApiTags } from '@nestjs/swagger';
 import {  ACTION, ApiDataResponse, ApiPaginatedResponse, perm } from '@repo/api-core';
-import { Authorize, CurrentUser } from '@repo/api-core';
+import { Authorize, CurrentUser, SkipEnvelope } from '@repo/api-core';
 
+import { DownloadAuditExportUseCase } from '../application/use-cases/download-audit-export.use-case';
 import { ExportAuditLogsUseCase } from '../application/use-cases/export-audit-logs.use-case';
 import { GetAuditLogUseCase } from '../application/use-cases/get-audit-log.use-case';
 import { ListAuditLogsUseCase } from '../application/use-cases/list-audit-logs.use-case';
@@ -24,13 +25,17 @@ export class AuditController {
     private readonly listAuditLogsUseCase: ListAuditLogsUseCase,
     private readonly exportAuditLogsUseCase: ExportAuditLogsUseCase,
     private readonly getAuditLogUseCase: GetAuditLogUseCase,
+    private readonly downloadAuditExportUseCase: DownloadAuditExportUseCase,
   ) {}
 
   @Get()
   @Authorize({ permissions: [perm('audit', ACTION.READ)] })
   @ApiPaginatedResponse(AuditLogDto)
-  async listAuditLogs(@Query() query: AuditLogsQueryDto) {
-    const result = await this.listAuditLogsUseCase.execute({
+  async listAuditLogs(
+    @CurrentUser() user: AuthenticatedRequestUser,
+    @Query() query: AuditLogsQueryDto,
+  ) {
+    const result = await this.listAuditLogsUseCase.execute(user, {
       page: query.page,
       limit: query.limit,
       sortOrder: query.sortOrder,
@@ -84,10 +89,37 @@ export class AuditController {
     return { data: result };
   }
 
+  @Get('exports/:fileId/download')
+  @Authorize({ permissions: [perm('audit', ACTION.READ)] })
+  @SkipEnvelope()
+  @ApiProduces('text/csv')
+  async downloadExport(
+    @CurrentUser() user: AuthenticatedRequestUser,
+    @Param('fileId', new ParseUUIDPipe()) fileId: string,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const { content, originalName } =
+      await this.downloadAuditExportUseCase.execute(user, fileId);
+
+    const safeFilename = originalName.replace(/["\\\r\n]/g, '_');
+    response.setHeader('Content-Type', 'text/csv');
+    response.setHeader(
+      'Content-Disposition',
+      `attachment; filename="${safeFilename}"; filename*=UTF-8''${encodeURIComponent(originalName)}`,
+    );
+    response.setHeader('Content-Length', content.length.toString());
+    response.setHeader('X-Content-Type-Options', 'nosniff');
+
+    return new StreamableFile(content);
+  }
+
   @Get(':id')
   @Authorize({ permissions: [perm('audit', ACTION.READ)] })
   @ApiDataResponse(AuditLogDto)
-  async getAuditLog(@Param('id', new ParseUUIDPipe()) id: string) {
-    return { data: await this.getAuditLogUseCase.execute(id) };
+  async getAuditLog(
+    @CurrentUser() user: AuthenticatedRequestUser,
+    @Param('id', new ParseUUIDPipe()) id: string,
+  ) {
+    return { data: await this.getAuditLogUseCase.execute(user, id) };
   }
 }
