@@ -98,7 +98,7 @@ export class DeleteOrganizationUseCase {
         entityId: organizationId,
         organizationId,
         requestContext,
-      });
+      }, transaction);
     });
   }
 }

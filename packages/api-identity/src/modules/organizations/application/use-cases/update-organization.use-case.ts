@@ -1,4 +1,5 @@
 import type { RequestContext, AuthenticatedRequestUser } from '@repo/api-core';
+import type { TransactionPort } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import {
@@ -6,6 +7,7 @@ import {
   AUDIT_WRITER,
   type AuditWriter,
   ERROR_CODES,
+  TRANSACTION_PORT,
 } from '@repo/api-core';
 
 import { assertOrganizationRole } from '../../domain/organization-access.policy';
@@ -14,6 +16,7 @@ import { ORGANIZATIONS_REPOSITORY, type OrganizationsRepositoryPort } from '../p
 @Injectable()
 export class UpdateOrganizationUseCase {
   constructor(
+    @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
     @Inject(ORGANIZATIONS_REPOSITORY) private readonly organizationsRepository: OrganizationsRepositoryPort,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
   ) {}
@@ -46,36 +49,41 @@ export class UpdateOrganizationUseCase {
       assertOrganizationRole(membership, ['OWNER', 'ADMIN']);
     }
 
-    const organization = await this.organizationsRepository.updateOrganization(
-      organizationId,
-      { name: input.name.trim() },
-    );
-
-    if (!organization) {
-      throw new AppError(
-        ERROR_CODES.ORGANIZATION_NOT_FOUND,
-        'Organization not found',
-        HttpStatus.NOT_FOUND,
+    const result = await this.transactionPort.run(async (transaction) => {
+      const organization = await this.organizationsRepository.updateOrganization(
+        organizationId,
+        { name: input.name.trim() },
+        transaction,
       );
-    }
 
-    await this.auditWriter.log({
-      actorId: actorUserId,
-      action: 'organization.update',
-      entityType: 'organization',
-      entityId: organizationId,
-      organizationId,
-      metadata: { name: organization.name },
-      requestContext,
+      if (!organization) {
+        throw new AppError(
+          ERROR_CODES.ORGANIZATION_NOT_FOUND,
+          'Organization not found',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      await this.auditWriter.log({
+        actorId: actorUserId,
+        action: 'organization.update',
+        entityType: 'organization',
+        entityId: organizationId,
+        organizationId,
+        metadata: { name: organization.name },
+        requestContext,
+      }, transaction);
+
+      return organization;
     });
 
     return {
-      id: organization.id,
-      name: organization.name,
-      slug: organization.slug,
+      id: result.id,
+      name: result.name,
+      slug: result.slug,
       role: isSuperAdmin ? ('ADMIN' as const) : membership!.role,
-      createdAt: organization.createdAt.toISOString(),
-      updatedAt: organization.updatedAt.toISOString(),
+      createdAt: result.createdAt.toISOString(),
+      updatedAt: result.updatedAt.toISOString(),
     };
   }
 }

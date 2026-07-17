@@ -5,6 +5,8 @@ import { AUDIT_REPOSITORY, type AuditRepositoryPort } from '../ports/audit.repos
 import { RecordAuditLogUseCase } from './record-audit-log.use-case';
 
 const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
+const PURGE_LOCK_ID = 42_001;
+const BATCH_SIZE = 5000;
 
 @Injectable()
 export class PurgeExpiredAuditLogsUseCase {
@@ -22,10 +24,22 @@ export class PurgeExpiredAuditLogsUseCase {
     }
 
     const cutoff = new Date(Date.now() - retentionDays * MILLISECONDS_PER_DAY);
-    const deletedCount = await this.auditRepository.deleteOlderThan(cutoff);
 
-    // The purge action itself is recorded after the delete, so it is never
-    // among the rows it just removed — keeping the audit trail of the purge intact.
+    // Acquire a distributed advisory lock so only one replica runs the purge.
+    const acquired = await this.auditRepository.tryAdvisoryLock(PURGE_LOCK_ID);
+    if (!acquired) {
+      return null;
+    }
+
+    // Delete in batches to keep each transaction short; the lock lives until
+    // the session ends (released implicitly on connection close or explicit
+    // pg_advisory_unlock).  PostgreSQL does not release advisory locks on
+    // transaction end by default.
+    const deletedCount = await this.auditRepository.deleteOlderThanBatched(
+      cutoff,
+      BATCH_SIZE,
+    );
+
     if (deletedCount > 0) {
       await this.recordAuditLogUseCase.execute({
         action: 'audit.retention_purged',

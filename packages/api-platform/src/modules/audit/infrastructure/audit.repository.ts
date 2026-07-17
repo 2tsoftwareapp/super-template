@@ -6,7 +6,7 @@ import type {
 import { Inject, Injectable } from '@nestjs/common';
 import { DATABASE } from '@repo/api-database';
 import { auditLogs } from '@repo/api-database';
-import { and, count, desc, eq, gte, ilike, lt, lte, or, type SQL } from 'drizzle-orm';
+import { and, count, desc, eq, gte, ilike, lt, lte, or, sql, type SQL } from 'drizzle-orm';
 
 import type { AuditRepositoryPort } from '../application/ports/audit.repository.port';
 
@@ -155,6 +155,45 @@ export class AuditRepository implements AuditRepositoryPort {
       .returning({ id: auditLogs.id });
 
     return deleted.length;
+  }
+
+  async deleteOlderThanBatched(
+    cutoff: Date,
+    batchSize: number,
+    executor: DatabaseExecutor = this.database,
+  ): Promise<number> {
+    let totalDeleted = 0;
+
+    for (;;) {
+      const result = await executor.execute(
+        sql`
+          DELETE FROM audit_logs
+          WHERE id IN (
+            SELECT id FROM audit_logs
+            WHERE created_at <= ${cutoff}
+            ORDER BY created_at
+            LIMIT ${batchSize}
+          )
+        `,
+      );
+
+      const deletedCount = result.rowCount ?? 0;
+      if (deletedCount === 0) break;
+      totalDeleted += deletedCount;
+    }
+
+    return totalDeleted;
+  }
+
+  async tryAdvisoryLock(
+    lockId: number,
+    executor: DatabaseExecutor = this.database,
+  ): Promise<boolean> {
+    const result = await executor.execute(
+      sql`SELECT pg_try_advisory_lock(${lockId}) AS acquired`,
+    );
+    const row = result.rows?.[0] as { acquired: boolean } | undefined;
+    return row?.acquired === true;
   }
 
   async findById(

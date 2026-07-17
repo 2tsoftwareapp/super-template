@@ -56,6 +56,8 @@ export interface AuditRepositoryPort {
   listForExport(params: AuditLogSearchParams & { limit: number }, executor?: TransactionExecutor): Promise<AuditLogRecord[]>;
   count(params: AuditLogSearchParams, executor?: TransactionExecutor): Promise<number>;
   deleteOlderThan(cutoff: Date, executor?: TransactionExecutor): Promise<number>;
+  deleteOlderThanBatched(cutoff: Date, batchSize: number, executor?: TransactionExecutor): Promise<number>;
+  tryAdvisoryLock(lockId: number, executor?: TransactionExecutor): Promise<boolean>;
   findById(id: string, executor?: TransactionExecutor): Promise<AuditLogRecord | null>;
   create(values: CreateAuditLogInput, executor?: TransactionExecutor): Promise<AuditLogRecord>;
 }
