@@ -12,6 +12,7 @@ export async function seedNotifications(
   // Only seed the welcome notification once so repeated resets keep the same visible inbox shape.
   const existingSeedNotifications = await notificationsRepository.listForUser(
     context.regularUserId,
+    context.regularOrganizationId,
     {
       page: 1,
       limit: 1,

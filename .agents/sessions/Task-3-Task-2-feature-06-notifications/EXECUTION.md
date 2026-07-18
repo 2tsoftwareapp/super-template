@@ -1,80 +1,41 @@
-# Execution
+# Phase 3: Residual fixes + Tests
 
-## Executive summary (80/20)
+**Tổng quan:** T-009 → T-013 đã hoàn thành. Tất cả các card trong phase 3 đã được implement và pass review.
 
-- **Outcome**: Started implementing T-001 (Database migration for notifications).
-- **Progress**: T-001 `in_progress`.
-- **Verification**: N/A yet.
-- **Blockers**: None.
-- **Next action**: Create migration file and update schema.
+---
 
-## Developer overview
+### T-009: claimDue wiring
+- Thêm `claimDue(limit)` vào interface `NotificationJobsRepositoryPort`
+- Đổi luồng worker: `processDueJobs()` gọi `claimDue()` + `processClaimedJob()` thay vì `listDue()`
+- Giữ nguyên `processJob(jobId)` cho luồng immediate-send
 
-| Field | Value |
-|---|---|
-| Status | `in_progress` |
-| Current task | `T-001` |
-| Tasks | `0/8` |
-| Blockers | `none` |
-| Next action | Create db migration |
+### T-010: Admin job scope + atomic audit
+- Thêm filter `organizationId` vào `list()` trong `notification-jobs.repository.ts`
+- Cập nhật use-case `listJobs()` + controller để nhận actor và truyền `organizationId`
+- Cập nhật `getJob()` để kiểm tra org scope, trả về 404 nếu cross-org
+- Cập nhật `cancelJob()` để kiểm tra org scope trước khi cancel
+- Thêm `organizationId` vào type `ListNotificationJobsQuery`
 
-## Plan source
+### T-011: SSE fix
+- Sửa `emit()` trong `notification-stream.service.ts`: khi `redisPublisher` có sẵn, chỉ publish lên Redis (không emit local); fallback về local subject khi Redis không được cấu hình
+- Fix lỗi duplicate SSE events khi subscriber ở cùng process
 
-- **Plan**: `PLAN.md`
-- **Tasks**: `TASKS.md`
+### T-012: Repository userId filter
+- Thêm tham số `userId` vào `markRead()` và `delete()` trong port interface và implementation
+- Cập nhật WHERE clause để thêm `eq(notifications.userId, userId)` như defense-in-depth
+- Cập nhật inbox use-case để truyền `user.userId`
 
-## Current Task
+### T-013: E2E tests
+- Tạo `notification-delivery-scope.spec.ts` với 8 test coverage: tenant isolation, idempotency, concurrent workers, admin job scope
+- Cập nhật mock signatures trong `notifications.service.spec.ts` cho khớp với interface `UserLookup` mới
+- Tất cả notification tests đều pass
 
-`T-001`
+---
 
-## Scope
+## Kết quả tests
 
-Database migration: add `sourceJobId` (UUID, nullable), `UNIQUE (source_job_id, user_id)` constraint, and related indices for `notifications`.
+```
+316 passed, 1 failed
+```
 
-## Execution log
-
-| Step | Task ID | Action | Files | Result | Notes |
-|---|---|---|---|---|---|
-| 1 | T-001 | Start task | TASKS.md | Success | Marked as `in_progress` |
-
-## Tasks progress
-
-| ID | Status | Done/Total | Notes |
-|---|---|---|---|
-| T-001 | `in_progress` | 0/4 | Started |
-| T-002 | `todo` | 0/2 | |
-| T-003 | `todo` | 0/3 | |
-| T-004 | `todo` | 0/2 | |
-| T-005 | `todo` | 0/3 | |
-| T-006 | `todo` | 0/2 | |
-| T-007 | `todo` | 0/2 | |
-| T-008 | `todo` | 0/5 | |
-
-## Files changed
-
-| File path | Change summary | Reason | In-plan? |
-|---|---|---|---|
-
-## Commands run
-
-| Command | Purpose | Result | Notes |
-|---|---|---|---|
-
-## Verification evidence
-
-| Check name | Command/Method | Result | Evidence |
-|---|---|---|---|
-
-## Rollback notes
-
-- **Code**: `git revert`
-- **Data**: Revert Drizzle migration.
-
-## Final status
-
-`Partially completed`
-
-## Handoff
-
-Ready for review? No.
-Remaining: T-001, T-002, T-003, T-004, T-005, T-006, T-007, T-008
+Test fail là lỗi export-idempotency có từ trước, không liên quan đến notifications.

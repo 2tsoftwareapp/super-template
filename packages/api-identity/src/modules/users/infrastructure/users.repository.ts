@@ -232,4 +232,70 @@ export class UsersRepository {
 
     return rows.map((row) => row.id);
   }
+
+  async findActiveUserInOrganization(
+    userId: string,
+    organizationId: string,
+    executor: DatabaseExecutor = this.database,
+  ) {
+    const [row] = await executor
+      .select({ id: users.id, email: users.email, displayName: users.displayName, status: users.status })
+      .from(users)
+      .innerJoin(organizationMembers, eq(users.id, organizationMembers.userId))
+      .where(
+        and(
+          eq(users.id, userId),
+          eq(organizationMembers.organizationId, organizationId),
+          isNull(users.deletedAt),
+          eq(users.status, 'ACTIVE'),
+        ),
+      )
+      .limit(1);
+
+    return row ?? null;
+  }
+
+  async filterActiveUserIdsInOrganization(
+    userIds: string[],
+    organizationId: string,
+    executor: DatabaseExecutor = this.database,
+  ) {
+    if (userIds.length === 0) {
+      return [];
+    }
+
+    const rows = await executor
+      .select({ id: users.id })
+      .from(users)
+      .innerJoin(organizationMembers, eq(users.id, organizationMembers.userId))
+      .where(
+        and(
+          inArray(users.id, userIds),
+          eq(organizationMembers.organizationId, organizationId),
+          isNull(users.deletedAt),
+          eq(users.status, 'ACTIVE'),
+        ),
+      );
+
+    return rows.map((row) => row.id);
+  }
+
+  async listDeliverableUserIdsInOrganization(
+    organizationId: string,
+    executor: DatabaseExecutor = this.database,
+  ) {
+    const rows = await executor
+      .select({ id: users.id })
+      .from(users)
+      .innerJoin(organizationMembers, eq(users.id, organizationMembers.userId))
+      .where(
+        and(
+          eq(organizationMembers.organizationId, organizationId),
+          isNull(users.deletedAt),
+          eq(users.status, 'ACTIVE'),
+        ),
+      );
+
+    return rows.map((row) => row.id);
+  }
 }

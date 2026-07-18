@@ -38,6 +38,7 @@ export {
   jobStatusEnum,
   mailDeliveryStatusEnum,
   notificationAudienceEnum,
+  notificationDeliveryStatusEnum,
   notificationDevicePlatformEnum,
   notificationJobStatusEnum,
 } from './platform/enums';
@@ -51,6 +52,7 @@ export { jobEvents } from './platform/job-events';
 export { jobs } from './platform/jobs';
 export { mailDeliveries } from './platform/mail';
 export {
+  notificationDeliveries,
   notificationDeviceTokens,
   notificationJobs,
   notifications,

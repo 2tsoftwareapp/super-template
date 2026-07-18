@@ -3,6 +3,7 @@ import { USER_NOTIFICATION_SENDER } from '@repo/api-core';
 
 import { NotificationsMapper } from './application/notifications.mapper';
 import { NotificationsService } from './application/notifications.service';
+import { DELIVERIES_REPOSITORY } from './application/ports/deliveries.repository.port';
 import { DEVICE_TOKENS_REPOSITORY } from './application/ports/device-tokens.repository.port';
 import { NOTIFICATION_JOBS_REPOSITORY } from './application/ports/notification-jobs.repository.port';
 import { NOTIFICATION_STREAM_SERVICE } from './application/ports/notification-stream.service.port';
@@ -14,6 +15,7 @@ import { NotificationDeliveryUseCase } from './application/use-cases/notificatio
 import { NotificationDeviceUseCase } from './application/use-cases/notification-device.use-case';
 import { NotificationInboxUseCase } from './application/use-cases/notification-inbox.use-case';
 import { SendNotificationUseCase } from './application/use-cases/send-notification.use-case';
+import { DeliveriesRepository } from './infrastructure/deliveries.repository';
 import { DeviceTokensRepository } from './infrastructure/device-tokens.repository';
 import { FcmPushService } from './infrastructure/fcm-push.service';
 import { NotificationJobsRepository } from './infrastructure/notification-jobs.repository';
@@ -30,6 +32,7 @@ import {
     NotificationsRepository,
     NotificationJobsRepository,
     DeviceTokensRepository,
+    DeliveriesRepository,
     NotificationStreamService,
     FcmPushService,
     NotificationsMapper,
@@ -55,6 +58,10 @@ import {
     {
       provide: DEVICE_TOKENS_REPOSITORY,
       useExisting: DeviceTokensRepository,
+    },
+    {
+      provide: DELIVERIES_REPOSITORY,
+      useExisting: DeliveriesRepository,
     },
     {
       provide: NOTIFICATION_STREAM_SERVICE,

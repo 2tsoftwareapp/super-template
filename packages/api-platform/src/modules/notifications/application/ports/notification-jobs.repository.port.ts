@@ -69,6 +69,10 @@ export interface NotificationJobsListResult {
 }
 
 export interface NotificationJobsRepositoryPort {
+  claimDue(
+    limit: number,
+    executor?: TransactionExecutor,
+  ): Promise<NotificationJobRecord[]>;
   create(
     values: CreateNotificationJobInput,
     executor?: TransactionExecutor,

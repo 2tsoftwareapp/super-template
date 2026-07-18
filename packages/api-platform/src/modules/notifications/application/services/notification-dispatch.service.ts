@@ -6,14 +6,16 @@ import {
 
 import type { NotificationView } from '../notifications.types';
 
+import { DELIVERIES_REPOSITORY, type DeliveriesRepositoryPort } from '../ports/deliveries.repository.port';
+import { DEVICE_TOKENS_REPOSITORY, type DeviceTokensRepositoryPort } from '../ports/device-tokens.repository.port';
 import { NOTIFICATION_STREAM_SERVICE, type NotificationStreamServicePort } from '../ports/notification-stream.service.port';
-import { PUSH_NOTIFIER, type PushNotifier } from '../push.interface';
 
 @Injectable()
 export class NotificationDispatchService {
   constructor(
     @Inject(NOTIFICATION_STREAM_SERVICE) private readonly notificationStreamService: NotificationStreamServicePort,
-    @Inject(PUSH_NOTIFIER) private readonly pushNotifier: PushNotifier,
+    @Inject(DELIVERIES_REPOSITORY) private readonly deliveriesRepository: DeliveriesRepositoryPort,
+    @Inject(DEVICE_TOKENS_REPOSITORY) private readonly deviceTokensRepository: DeviceTokensRepositoryPort,
     @Inject(USER_PREFERENCES_LOOKUP)
     private readonly userPreferencesLookup: UserPreferencesLookup,
   ) {}
@@ -21,27 +23,39 @@ export class NotificationDispatchService {
   dispatch(notification: NotificationView, organizationId: string) {
     this.notificationStreamService.emit(notification.userId, organizationId, notification);
 
-    void this.userPreferencesLookup
-      .findNotificationPreferencesByUserId(notification.userId)
-      .then((preferences) => {
-        if (!preferences.push) {
-          return;
-        }
+    // Upsert delivery rows for push — best-effort; inbox state remains the source of truth
+    void this.upsertDeliveries(notification);
+  }
 
-        return this.pushNotifier.sendToUser(notification.userId, {
+  private async upsertDeliveries(notification: NotificationView) {
+    try {
+      const preferences = await this.userPreferencesLookup
+        .findNotificationPreferencesByUserId(notification.userId);
+
+      if (!preferences.push) {
+        return;
+      }
+
+      const tokens = await this.deviceTokensRepository.listByUserId(notification.userId);
+
+      if (tokens.length === 0) {
+        return;
+      }
+
+      await this.deliveriesRepository.upsertBatch(
+        tokens.map((token) => ({
           notificationId: notification.id,
-          type: notification.type,
-          title: notification.title,
-          body: notification.body,
-          data: notification.data,
-        });
-      })
-      .catch(() => {
-        // Push delivery is best-effort; inbox state remains the source of truth.
-      });
+          deviceTokenId: token.id,
+          channel: 'fcm',
+        })),
+      );
+    } catch {
+      // Delivery row upsert is best-effort
+    }
   }
 
   streamForUser(userId: string, organizationId: string) {
     return this.notificationStreamService.stream(userId, organizationId);
   }
 }
+

@@ -64,8 +64,12 @@ export class NotificationStreamService implements OnModuleInit, OnModuleDestroy,
   }
 
   emit(userId: string, organizationId: string, event: NotificationStreamEvent): void {
-    // Channel key scoped per user+org — prevents cross-tenant SSE leaks (T-007)
-    this.getSubject(this.channelKey(userId, organizationId)).next(event);
+    if (!this.redisPublisher) {
+      // Fallback: no Redis configured, emit locally
+      this.getSubject(this.channelKey(userId, organizationId)).next(event);
+      return;
+    }
+
     void this.publish(organizationId, event);
   }
 

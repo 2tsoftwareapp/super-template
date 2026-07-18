@@ -17,6 +17,7 @@ import { users } from '../identity/users';
 import { timestamps } from '../shared/timestamps';
 import {
   notificationAudienceEnum,
+  notificationDeliveryStatusEnum,
   notificationDevicePlatformEnum,
   notificationJobStatusEnum,
 } from './enums';
@@ -80,6 +81,40 @@ export const notificationDeviceTokens = pgTable(
   (table) => [
     uniqueIndex('notification_device_tokens_token_unique').on(table.token),
     index('notification_device_tokens_user_id_idx').on(table.userId),
+  ],
+);
+
+export const notificationDeliveries = pgTable(
+  'notification_deliveries',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    notificationId: uuid('notification_id')
+      .notNull()
+      .references(() => notifications.id, { onDelete: 'cascade' }),
+    deviceTokenId: uuid('device_token_id')
+      .notNull()
+      .references(() => notificationDeviceTokens.id, { onDelete: 'cascade' }),
+    channel: text('channel').notNull().default('fcm'),
+    status: notificationDeliveryStatusEnum('status').notNull().default('PENDING'),
+    attempts: integer('attempts').notNull().default(0),
+    providerMessageId: text('provider_message_id'),
+    nextAttemptAt: timestamp('next_attempt_at', { withTimezone: true }),
+    sentAt: timestamp('sent_at', { withTimezone: true }),
+    lastError: text('last_error'),
+    ...timestamps,
+  },
+  (table) => [
+    uniqueIndex('notification_deliveries_unique').on(
+      table.notificationId,
+      table.deviceTokenId,
+      table.channel,
+    ),
+    index('notification_deliveries_status_next_attempt_idx').on(
+      table.status,
+      table.nextAttemptAt,
+    ),
+    index('notification_deliveries_notification_id_idx').on(table.notificationId),
+    index('notification_deliveries_device_token_id_idx').on(table.deviceTokenId),
   ],
 );
 

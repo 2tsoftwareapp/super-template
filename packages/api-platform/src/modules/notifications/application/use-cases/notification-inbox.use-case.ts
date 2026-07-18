@@ -66,7 +66,7 @@ export class NotificationInboxUseCase {
       );
     }
 
-    const updated = await this.notificationsRepository.markRead(notificationId, organizationId);
+    const updated = await this.notificationsRepository.markRead(notificationId, user.userId, organizationId);
     return this.notificationsMapper.toNotificationView(
       updated ?? notification,
     );
@@ -92,6 +92,6 @@ export class NotificationInboxUseCase {
       );
     }
 
-    await this.notificationsRepository.delete(notificationId, organizationId);
+    await this.notificationsRepository.delete(notificationId, user.userId, organizationId);
   }
 }

@@ -73,6 +73,7 @@ export interface ListNotificationJobsQuery {
   page: number;
   limit: number;
   status?: NotificationJobStatus;
+  organizationId?: string;
 }
 
 export interface RegisterDeviceCommand {

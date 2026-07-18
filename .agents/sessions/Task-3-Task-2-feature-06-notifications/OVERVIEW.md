@@ -7,18 +7,18 @@
 
 | Field | Value |
 |---|---|
-| Status | `todo` / `in_progress` / `blocked` / `needs_info` / `done` |
-| Goal | _(one sentence)_ |
-| Progress | `0/N` cards done · `0` blocked · `0` needs info |
-| Top risk / blocker | _(or none)_ |
-| Next action | _(skill + concrete command/question)_ |
-| Owner | _(if known)_ |
+| Status | `done` |
+| Goal | Fix 4 P0 + 3 P1 + 2 P2 issues từ Feature 06 Notifications Review Round 1 |
+| Progress | `13/13` cards done · `0` blocked · `0` needs info |
+| Top risk / blocker | (none) |
+| Next action | Merge PR → deploy migration → deploy worker |
+| Owner | _(not assigned)_ |
 
 ## Progress chart
 
 ```mermaid
 pie title Task status
-  "done" : 0
+  "done" : 13
   "in_progress" : 0
   "todo" : 0
   "blocked" : 0
@@ -37,24 +37,27 @@ flowchart LR
 
 | ID | Severity | Blocking? | Visual? | Question / decision | Status |
 |---|---|---|---|---|---|
-| _(none or ISS-001)_ | | | | | |
+| INV-001→INV-008 | All resolved | No | none | Xem PLAN.md §Pre-planning decision gate | Resolved |
 
 ## Artifact map
 
 | Artifact | Purpose | Freshness |
 |---|---|---|
-| `DISCUSSION.md` | Direction / options | missing / current / stale |
-| `BUSINESS_ANALYSIS.md` | Requirements | missing / current / stale |
-| `BASIC_DESIGN.md` / `DETAIL_DESIGN.md` | Design | missing / current / stale |
-| `PLAN.md` / `TASKS.md` | Strategy + work | missing / current / stale |
-| `SYNC.md` | Readiness | missing / current / stale |
-| `EXECUTION.md` | Implementation log | missing / current / stale |
-| `REVIEW.md` / `REVIEW_PR.md` | Quality gate | missing / current / stale |
-| `TESTCASES.md` | Verification design | missing / current / stale |
-| `DONE.md` | Handoff | missing / current / stale |
+| `DISCUSSION.md` | Direction / options | current |
+| `INVESTIGATE.md` | Root cause analysis | current |
+| `PLAN.md` / `TASKS.md` | Strategy + work | current |
+| `SYNC.md` | Readiness | missing |
+| `EXECUTION.md` | Implementation log | stale (old round) |
+| `REVIEW.md` | Quality gate | current — verdict: Ready |
+| `DONE.md` | Handoff | current |
 
 ## Developer notes
 
 - Commands to run next:
+  - `pnpm run test:e2e` — verify E2E
+  - `pnpm run typecheck` — verify types
 - Files/paths to inspect first:
-- What not to touch:
+  - `packages/api-platform/src/modules/notifications/`
+  - `packages/api-core/src/ports/user-lookup.port.ts`
+  - `packages/api-database/src/schema/platform/notifications.ts`
+- What not to touch: migration files from 0021 (already applied)

@@ -45,7 +45,9 @@ export class NotificationsRepository implements NotificationsRepositoryPort {
     return executor
       .insert(notifications)
       .values(values)
-      .onConflictDoNothing()
+      .onConflictDoNothing({
+        target: [notifications.sourceJobId, notifications.userId],
+      })
       .returning();
   }
 
@@ -118,6 +120,7 @@ export class NotificationsRepository implements NotificationsRepositoryPort {
 
   async markRead(
     notificationId: string,
+    userId: string,
     organizationId: string,
     executor: DatabaseExecutor = this.database,
   ) {
@@ -126,7 +129,7 @@ export class NotificationsRepository implements NotificationsRepositoryPort {
       .set({
         readAt: new Date(),
       })
-      .where(and(eq(notifications.id, notificationId), eq(notifications.organizationId, organizationId)))
+      .where(and(eq(notifications.id, notificationId), eq(notifications.userId, userId), eq(notifications.organizationId, organizationId)))
       .returning();
 
     return notification ?? null;
@@ -149,12 +152,13 @@ export class NotificationsRepository implements NotificationsRepositoryPort {
 
   async delete(
     notificationId: string,
+    userId: string,
     organizationId: string,
     executor: DatabaseExecutor = this.database,
   ) {
     const [notification] = await executor
       .delete(notifications)
-      .where(and(eq(notifications.id, notificationId), eq(notifications.organizationId, organizationId)))
+      .where(and(eq(notifications.id, notificationId), eq(notifications.userId, userId), eq(notifications.organizationId, organizationId)))
       .returning();
 
     return notification ?? null;

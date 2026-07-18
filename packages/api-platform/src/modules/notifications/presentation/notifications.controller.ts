@@ -178,8 +178,11 @@ export class AdminNotificationsController {
   @Get('jobs')
   @Authorize({ permissions: [perm('notifications', ACTION.CREATE)] })
   @ApiPaginatedResponse(NotificationJobDto)
-  async listJobs(@Query() query: NotificationJobsQueryDto) {
-    const result = await this.delivery.listJobs({
+  async listJobs(
+    @CurrentUser() actor: AuthenticatedRequestUser,
+    @Query() query: NotificationJobsQueryDto,
+  ) {
+    const result = await this.delivery.listJobs(actor, {
       page: query.page,
       limit: query.limit,
       ...(query.status !== undefined ? { status: query.status } : {}) });
@@ -196,9 +199,12 @@ export class AdminNotificationsController {
   @Get('jobs/:id')
   @Authorize({ permissions: [perm('notifications', ACTION.CREATE)] })
   @ApiDataResponse(NotificationJobDto)
-  async getJob(@Param('id', new ParseUUIDPipe()) jobId: string) {
+  async getJob(
+    @CurrentUser() actor: AuthenticatedRequestUser,
+    @Param('id', new ParseUUIDPipe()) jobId: string,
+  ) {
     return {
-      data: await this.delivery.getJob(jobId) };
+      data: await this.delivery.getJob(actor, jobId) };
   }
 
   @Delete('jobs/:id')

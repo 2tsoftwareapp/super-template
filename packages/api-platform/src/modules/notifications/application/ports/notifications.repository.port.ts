@@ -23,6 +23,7 @@ export interface CreateNotificationInput {
   data?: JsonObject | null | undefined;
   readAt?: Date | null;
   organizationId: string;
+  sourceJobId?: string | null;
 }
 
 export interface NotificationsListResult {
@@ -53,12 +54,14 @@ export interface NotificationsRepositoryPort {
   getUnreadCount(userId: string, organizationId: string, executor?: TransactionExecutor): Promise<number>;
   markRead(
     notificationId: string,
+    userId: string,
     organizationId: string,
     executor?: TransactionExecutor,
   ): Promise<NotificationRecord | null>;
   markAllRead(userId: string, organizationId: string, executor?: TransactionExecutor): Promise<void>;
   delete(
     notificationId: string,
+    userId: string,
     organizationId: string,
     executor?: TransactionExecutor,
   ): Promise<NotificationRecord | null>;

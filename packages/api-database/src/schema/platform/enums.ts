@@ -40,6 +40,13 @@ export const notificationJobStatusEnum = pgEnum('notification_job_status', [
   'FAILED',
 ]);
 
+export const notificationDeliveryStatusEnum = pgEnum('notification_delivery_status', [
+  'PENDING',
+  'PROCESSING',
+  'SENT',
+  'FAILED',
+]);
+
 export const activityVisibilityEnum = pgEnum('activity_visibility', [
   'PUBLIC',
   'PRIVATE',

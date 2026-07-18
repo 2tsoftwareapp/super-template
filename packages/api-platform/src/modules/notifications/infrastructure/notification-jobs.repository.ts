@@ -14,6 +14,7 @@ interface ListJobsParams {
   page: number;
   limit: number;
   status?: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'CANCELLED' | 'FAILED';
+  organizationId?: string;
 }
 
 @Injectable()
@@ -94,6 +95,10 @@ export class NotificationJobsRepository implements NotificationJobsRepositoryPor
 
     if (params.status) {
       filters.push(eq(notificationJobs.status, params.status));
+    }
+
+    if (params.organizationId) {
+      filters.push(eq(notificationJobs.organizationId, params.organizationId));
     }
 
     const whereClause = filters.length > 0 ? and(...filters) : undefined;
