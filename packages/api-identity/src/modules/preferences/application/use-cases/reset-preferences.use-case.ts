@@ -1,11 +1,12 @@
 import type { RequestContext } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import {
+import { 
   AppError,
   AUDIT_WRITER,
   type AuditWriter,
   ERROR_CODES,
+  SYSTEM_SCOPE,
 } from '@repo/api-core';
 
 import { PREFERENCES_REPOSITORY, type PreferencesRepositoryPort } from '../ports/preferences.repository.port';
@@ -37,6 +38,7 @@ export class ResetPreferencesUseCase {
       entityType: 'user_preferences',
       entityId: userId,
       requestContext,
+        scope: SYSTEM_SCOPE.PLATFORM
     });
 
     return this.preferencesMapper.toDto(reset);

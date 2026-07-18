@@ -476,7 +476,7 @@ describe('Organization management (e2e)', () => {
         )
       );
     expect(adminMembership).toHaveLength(1);
-    expect(adminMembership[0].role).toBe('ADMIN');
+    expect(adminMembership[0]!.role).toBe('ADMIN');
 
     // 3. Create another User as USER -> membership should be MEMBER
     const memberUserEmail = 'sync-member-user@example.local';
@@ -504,7 +504,7 @@ describe('Organization management (e2e)', () => {
         )
       );
     expect(memberMembership).toHaveLength(1);
-    expect(memberMembership[0].role).toBe('MEMBER');
+    expect(memberMembership[0]!.role).toBe('MEMBER');
 
     // 4. Update member to ADMIN via Users API -> membership should become ADMIN
     await request(app.getHttpServer())
@@ -525,7 +525,7 @@ describe('Organization management (e2e)', () => {
           eq(organizationMembers.userId, memberUserId)
         )
       );
-    expect(updatedMembershipToAdmin[0].role).toBe('ADMIN');
+    expect(updatedMembershipToAdmin[0]!.role).toBe('ADMIN');
 
     // 5. Update admin back to USER via Users API -> membership should become MEMBER
     await request(app.getHttpServer())
@@ -546,14 +546,14 @@ describe('Organization management (e2e)', () => {
           eq(organizationMembers.userId, memberUserId)
         )
       );
-    expect(updatedMembershipToMember[0].role).toBe('MEMBER');
+    expect(updatedMembershipToMember[0]!.role).toBe('MEMBER');
 
     // 6. Attempt to modify roles of the OWNER (creator) -> should be blocked with 403
     const creatorUser = await database
       .select()
       .from(users)
       .where(eq(users.email, creatorEmail));
-    const creatorId = creatorUser[0].id;
+    const creatorId = creatorUser[0]!.id;
 
     await request(app.getHttpServer())
       .put(`/api/v1/admin/users/${creatorId}/roles`)

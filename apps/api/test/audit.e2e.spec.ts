@@ -134,4 +134,29 @@ describe('Audit logs (e2e)', () => {
 
     expect(exportResponse.body.data.rowCount).toBe(0);
   });
+
+  it('prevents non-authorized users from bypassing export ACL using generic file downloads', async () => {
+    const admin = await loginAs(app, 'admin@example.local', 'ChangeMe123!');
+    const marker = `audit-export-acl-${Date.now()}@example.test`;
+    await createActiveUser(admin, marker);
+
+    const exportResponse = await request(app.getHttpServer())
+      .post('/api/v1/admin/audit-logs/export')
+      .set(bearer(admin.accessToken))
+      .send({ q: marker })
+      .expect(201);
+
+    const fileId = exportResponse.body.data.fileId;
+
+    // Create a regular user who does not have audit.read permissions
+    const regularEmail = `regular-${Date.now()}@example.test`;
+    await createActiveUser(admin, regularEmail);
+    const regularUserLogin = await loginAs(app, regularEmail, 'ChangeMe123!');
+
+    // They should not be able to get a download token for this audit export
+    await request(app.getHttpServer())
+      .get(`/api/v1/files/${fileId}/url`)
+      .set(bearer(regularUserLogin.accessToken))
+      .expect(403);
+  });
 });

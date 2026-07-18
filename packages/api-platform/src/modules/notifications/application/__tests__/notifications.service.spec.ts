@@ -7,7 +7,7 @@ describe('NotificationDeliveryUseCase', () => {
     const userLookup = {
       findById: vi.fn(async (userId: string) =>
         userId === 'active-user'
-          ? { id: 'active-user', status: 'ACTIVE' }
+          ? { id: 'active-user', status: 'ACTIVE', email: 'test@example.com', displayName: 'Test User' }
           : null,
       ),
       filterExistingUserIds: vi.fn(async (userIds: string[]) =>

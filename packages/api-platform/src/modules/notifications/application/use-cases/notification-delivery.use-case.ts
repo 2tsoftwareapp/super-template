@@ -4,7 +4,7 @@ import type {
 } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import {
+import { 
   AppError,
   AUDIT_WRITER,
   type AuditWriter,
@@ -14,6 +14,7 @@ import {
   requireOrganizationId,
   USER_LOOKUP,
   type UserLookup,
+  SYSTEM_SCOPE,
 } from '@repo/api-core';
 import {
   tenantContextForJob,
@@ -116,12 +117,12 @@ export class NotificationDeliveryUseCase {
       action: 'notification.job.created',
       entityType: 'notification_job',
       entityId: job.id,
-      organizationId: actor.organizationId,
       metadata: {
         audience: input.audience,
         scheduledAt: scheduledAt.toISOString(),
       },
       requestContext,
+        ...(actor.organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: actor.organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
     });
 
     const jobView = this.notificationsMapper.toNotificationJobView(job);
@@ -192,7 +193,7 @@ export class NotificationDeliveryUseCase {
       action: 'notification.job.cancelled',
       entityType: 'notification_job',
       entityId: jobId,
-      organizationId: actor.organizationId,
+        ...(actor.organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: actor.organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
     });
 
     return this.notificationsMapper.toNotificationJobView(cancelled);

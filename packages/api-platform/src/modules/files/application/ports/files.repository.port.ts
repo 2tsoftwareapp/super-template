@@ -3,13 +3,15 @@ import type { TransactionExecutor } from '@repo/api-core';
 
 export interface FileRecord {
   id: string;
-  organizationId: string;
+  organizationId: string | null;
   storageKey: string;
   originalName: string;
   mimeType: string;
   sizeBytes: number;
   checksum: string | null;
   latestVersion: number;
+  kind: string;
+  visibility: string;
   uploadedById: string | null;
   deletedAt: Date | null;
   createdAt: Date;
@@ -17,13 +19,15 @@ export interface FileRecord {
 }
 
 export interface CreateFileInput {
-  organizationId: string;
+  organizationId?: string | null;
   storageKey: string;
   originalName: string;
   mimeType: string;
   sizeBytes: number;
   checksum?: string | null;
   latestVersion?: number;
+  kind?: string;
+  visibility?: string;
   uploadedById: string | null;
 }
 
@@ -78,7 +82,7 @@ export interface CreateFileBatchOperationInput {
 }
 
 export interface ListFilesQuery {
-  organizationId: string;
+  organizationId?: string | null;
   page: number;
   limit: number;
   search?: string;

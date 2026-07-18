@@ -1,5 +1,6 @@
 import type { JsonObject } from '@repo/api-core';
 import type { TransactionExecutor } from '@repo/api-core';
+import { SYSTEM_SCOPE } from '@repo/api-core';
 
 export interface AuditLogRecord {
   id: string;
@@ -15,17 +16,28 @@ export interface AuditLogRecord {
   createdAt: Date;
 }
 
-export interface CreateAuditLogInput {
+export interface CreateAuditLogBaseInput {
   actorId: string | null;
   action: string;
   entityType: string;
   entityId: string | null;
-  organizationId: string | null;
   metadata?: JsonObject | null;
   ipAddress: string | null;
   userAgent: string | null;
   requestId: string | null;
 }
+
+export type CreateAuditLogInput = CreateAuditLogBaseInput &
+  (
+    | {
+        scope: typeof SYSTEM_SCOPE.ORGANIZATION;
+        organizationId: string;
+      }
+    | {
+        scope: typeof SYSTEM_SCOPE.PLATFORM;
+        organizationId?: never;
+      }
+  );
 
 export interface ListAuditLogsParams {
   page: number;
@@ -58,6 +70,7 @@ export interface AuditRepositoryPort {
   deleteOlderThan(cutoff: Date, executor?: TransactionExecutor): Promise<number>;
   deleteOlderThanBatched(cutoff: Date, batchSize: number, executor?: TransactionExecutor): Promise<number>;
   tryAdvisoryLock(lockId: number, executor?: TransactionExecutor): Promise<boolean>;
+  unlockAdvisoryLock(lockId: number, executor?: TransactionExecutor): Promise<boolean>;
   findById(id: string, executor?: TransactionExecutor): Promise<AuditLogRecord | null>;
   create(values: CreateAuditLogInput, executor?: TransactionExecutor): Promise<AuditLogRecord>;
 }

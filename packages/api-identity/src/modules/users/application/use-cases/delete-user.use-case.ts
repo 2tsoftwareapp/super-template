@@ -5,11 +5,12 @@ import type {
 import type { TransactionPort } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import {
+import { 
   AppError,
   AUDIT_WRITER,
   type AuditWriter,
   ERROR_CODES,
+  SYSTEM_SCOPE,
 } from '@repo/api-core';
 import { TRANSACTION_PORT } from '@repo/api-core';
 
@@ -86,8 +87,8 @@ export class DeleteUserUseCase {
           action: 'admin.user.deleted',
           entityType: 'user',
           entityId: userId,
-          organizationId: actor.organizationId,
           requestContext,
+            ...(actor.organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: actor.organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
         },
         transaction,
       );

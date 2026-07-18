@@ -4,11 +4,12 @@ import type {
 } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import {
+import { 
   AppError,
   AUDIT_WRITER,
   type AuditWriter,
   ERROR_CODES,
+  SYSTEM_SCOPE,
 } from '@repo/api-core';
 
 import {
@@ -48,8 +49,8 @@ export class RevokeSessionUseCase {
       action: 'auth.session.revoked',
       entityType: 'session',
       entityId: sessionId,
-      organizationId: user.organizationId,
       requestContext,
+        ...(user.organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: user.organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
     });
   }
 }

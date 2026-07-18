@@ -5,6 +5,22 @@ description: "Turn an approved DISCUSSION.md direction into system-level design 
 
 # Basic Design
 
+## Language (do this first)
+
+**Re-read `.agents/settings.yaml` now** — do not reuse a `language` value cached
+earlier in this session. Write every saved artifact and reply in that `language`
+(`en` or `vi`); keep code, identifiers, paths, commands, and template section
+keys unchanged. If the user just edited settings, the freshly read value wins. A
+direct instruction in the current user request overrides the file.
+
+## Memory (read first)
+
+Before framing, researching, or deciding, read `.agents/memory/INDEX.md` and
+open the entries whose hook matches this task. Reuse prior decisions, gotchas,
+and conventions instead of re-deriving them; if memory conflicts with current
+evidence, trust current evidence and note the drift. If none apply, continue.
+(Memory is written by `done` — the 80/20 vital few.)
+
 ## Purpose
 
 Turn an approved direction into a system-level design: what is being built, where boundaries sit, and which parts own which data.
@@ -47,7 +63,6 @@ This skill is a **hard contract**. Obey it before any other action. Do NOT treat
 - **executive_summary** (required, array): Maximum five bullets with direction, key boundaries, top risk, and next action.
 - **developer_overview** (required, object): Status, key components/boundaries, open questions, next action.
 - **charts** (required, array): At least one Mermaid architecture/boundary/flow diagram, or N/A with reason when a diagram adds no value.
-- **context_5w1h** (optional, object): What, Why, Who, When, Where, How when useful; use Unknown/N/A explicitly.
 - **goal** (required, string): One sentence aligned with DISCUSSION recommendation.
 - **context** (required, string): Chosen direction and scope summary from DISCUSSION (and BA if present).
 - **architecture_overview** (required, string): Short overview of system shape; optional mermaid for boundaries.

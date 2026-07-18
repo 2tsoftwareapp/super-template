@@ -5,6 +5,14 @@ description: "Review changes after execution: bugs, regression, missing tests, s
 
 # Review
 
+## Language (do this first)
+
+**Re-read `.agents/settings.yaml` now** — do not reuse a `language` value cached
+earlier in this session. Write every saved artifact and reply in that `language`
+(`en` or `vi`); keep code, identifiers, paths, commands, and template section
+keys unchanged. If the user just edited settings, the freshly read value wins. A
+direct instruction in the current user request overrides the file.
+
 ## Purpose
 
 Evaluate changes after execution before marking done, creating a PR, or handing off.
@@ -28,7 +36,6 @@ This skill is a **hard contract**. Obey it before any other action. Do NOT treat
 - **executive_summary** (required, array): Maximum five bullets with recommendation, top findings/risks, verification status, and next action.
 - **developer_overview** (required, object): Recommendation, finding counts by severity, verification gaps, next action.
 - **charts** (optional, array): Mermaid finding-severity or coverage chart when useful; otherwise N/A.
-- **context_5w1h** (optional, object): What, Why, Who, When, Where, How when useful; use Unknown/N/A explicitly.
 - **scope_reviewed** (required, string): What changes were reviewed.
 - **inputs** (required, array): What was read: PLAN.md, TASKS.md, EXECUTION.md, diff, test results.
 - **findings** (optional, array): Finding ID, severity, category, location, evidence, impact, recommendation, confidence.

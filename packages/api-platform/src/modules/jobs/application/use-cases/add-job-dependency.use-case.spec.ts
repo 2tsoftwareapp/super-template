@@ -24,9 +24,7 @@ describe('AddJobDependencyUseCase', () => {
       jobObservabilityRepository as never,
     );
 
-    await expect(useCase.execute('job-1', 'job-1')).rejects.toMatchObject<
-      Partial<AppError>
-    >({ code: ERROR_CODES.JOB_DEPENDENCY_CYCLE });
+    await expect(useCase.execute('job-1', 'job-1')).rejects.toMatchObject({ code: ERROR_CODES.JOB_DEPENDENCY_CYCLE });
 
     expect(jobsRepository.findById).not.toHaveBeenCalled();
     expect(jobObservabilityRepository.wouldCreateCycle).not.toHaveBeenCalled();
@@ -46,9 +44,7 @@ describe('AddJobDependencyUseCase', () => {
       jobObservabilityRepository as never,
     );
 
-    await expect(useCase.execute('job-1', 'job-missing')).rejects.toMatchObject<
-      Partial<AppError>
-    >({ code: ERROR_CODES.JOB_NOT_FOUND });
+    await expect(useCase.execute('job-1', 'job-missing')).rejects.toMatchObject({ code: ERROR_CODES.JOB_NOT_FOUND });
   });
 
   it('rejects when the new edge would create a cycle', async () => {
@@ -65,9 +61,7 @@ describe('AddJobDependencyUseCase', () => {
       jobObservabilityRepository as never,
     );
 
-    await expect(useCase.execute('job-1', 'job-2')).rejects.toMatchObject<
-      Partial<AppError>
-    >({ code: ERROR_CODES.JOB_DEPENDENCY_CYCLE });
+    await expect(useCase.execute('job-1', 'job-2')).rejects.toMatchObject({ code: ERROR_CODES.JOB_DEPENDENCY_CYCLE });
     expect(jobObservabilityRepository.addDependency).not.toHaveBeenCalled();
   });
 

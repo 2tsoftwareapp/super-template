@@ -105,7 +105,7 @@ describe('CreateFileVersionUseCase', () => {
         'file-1',
         buildFile({ size: 11 * 1024 * 1024 }),
       ),
-    ).rejects.toMatchObject<Partial<AppError>>({
+    ).rejects.toMatchObject({
       code: ERROR_CODES.VALIDATION_FAILED,
     });
 

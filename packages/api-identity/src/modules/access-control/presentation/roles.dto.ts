@@ -1,5 +1,6 @@
 import { Transform, Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { SYSTEM_SCOPE } from '@repo/api-core';
 import {
   ArrayMinSize,
   ArrayUnique,
@@ -25,7 +26,7 @@ export class PermissionDto {
   isSystem: boolean;
 
   @ApiProperty({ enum: ['platform', 'organization'] })
-  scope: 'platform' | 'organization';
+  scope: typeof SYSTEM_SCOPE.PLATFORM | 'organization';
 }
 
 export class RoleDto {
@@ -42,7 +43,7 @@ export class RoleDto {
   description: string | null;
 
   @ApiProperty({ enum: ['platform', 'organization'] })
-  scope: 'platform' | 'organization';
+  scope: typeof SYSTEM_SCOPE.PLATFORM | 'organization';
 
   @ApiProperty()
   isSystem: boolean;

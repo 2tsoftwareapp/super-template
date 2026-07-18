@@ -23,8 +23,7 @@ vi.mock('../../redis/redis-client.adapter', () => ({
   }),
 }));
 
-// Import after the mock is registered.
-const { AccessProfileCache } = await import('../access-profile.cache');
+import { AccessProfileCache } from '../access-profile.cache';
 
 function redisEnv(): EnvironmentService {
   return {

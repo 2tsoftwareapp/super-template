@@ -5,6 +5,14 @@ description: "Review pull requests, merge requests, or branch diffs as a respons
 
 # Review PR
 
+## Language (do this first)
+
+**Re-read `.agents/settings.yaml` now** — do not reuse a `language` value cached
+earlier in this session. Write every saved artifact and reply in that `language`
+(`en` or `vi`); keep code, identifiers, paths, commands, and template section
+keys unchanged. If the user just edited settings, the freshly read value wins. A
+direct instruction in the current user request overrides the file.
+
 ## Purpose
 
 Review a PR/MR or branch diff as a quality-responsible reviewer before merge.
@@ -26,7 +34,6 @@ This skill is a **hard contract**. Obey it before any other action. Do NOT treat
 - **executive_summary** (required, array): Maximum five bullets with merge recommendation, top findings/risks, verification status, and next action.
 - **developer_overview** (required, object): Merge recommendation, finding counts, verification status, next action.
 - **charts** (optional, array): Mermaid finding/coverage chart when useful; otherwise N/A.
-- **context_5w1h** (optional, object): What, Why, Who, When, Where, How when useful; use Unknown/N/A explicitly.
 - **review_mode** (required, string): remote-diff / worktree / current-branch.
 - **base** (required, string): Base branch or commit (e.g. `origin/develop`).
 - **head** (required, string): Head branch or commit being reviewed (e.g. `origin/A`).

@@ -5,11 +5,12 @@ import type {
 import type { TransactionPort } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import {
+import { 
   AppError,
   AUDIT_WRITER,
   type AuditWriter,
   ERROR_CODES,
+  SYSTEM_SCOPE,
 } from '@repo/api-core';
 import { TRANSACTION_PORT } from '@repo/api-core';
 
@@ -184,13 +185,13 @@ export class ReplaceUserRolesUseCase {
           action: 'user.roles.replaced',
           entityType: 'user',
           entityId: userId,
-          organizationId: resolvedOrganizationId,
           metadata: {
             roleId,
             roleName: resolvedRole.name,
             organizationId: resolvedOrganizationId,
           },
           requestContext,
+            ...(resolvedOrganizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: resolvedOrganizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
         },
         transaction,
       );

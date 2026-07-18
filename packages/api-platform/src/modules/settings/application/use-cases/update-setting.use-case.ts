@@ -4,7 +4,7 @@ import type {
 } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { AppError, ERROR_CODES, ROLE_NAMES } from '@repo/api-core';
+import {  AppError, ERROR_CODES, ROLE_NAMES , SYSTEM_SCOPE } from '@repo/api-core';
 
 import type { UpdateSettingCommand } from '../settings.types';
 
@@ -54,6 +54,7 @@ export class UpdateSettingUseCase {
       entityId: key,
       metadata: { key },
       requestContext,
+        scope: SYSTEM_SCOPE.PLATFORM
     });
 
     return SettingsMapper.toDto(updated);

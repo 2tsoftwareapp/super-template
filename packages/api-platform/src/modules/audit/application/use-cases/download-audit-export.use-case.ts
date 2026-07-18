@@ -1,5 +1,5 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { AppError, ERROR_CODES } from '@repo/api-core';
+import {  AppError, ERROR_CODES , ROLE_NAMES } from '@repo/api-core';
 import type { AuthenticatedRequestUser } from '@repo/api-core';
 
 import { FILES_REPOSITORY, type FilesRepositoryPort } from '../../../files/application/ports/files.repository.port';
@@ -26,7 +26,7 @@ export class DownloadAuditExportUseCase {
       );
     }
 
-    const isSuperAdmin = actor.roles.includes('SUPER_ADMIN');
+    const isSuperAdmin = actor.roles.includes(ROLE_NAMES.SUPER_ADMIN);
     if (
       !isSuperAdmin &&
       file.organizationId !== actor.organizationId

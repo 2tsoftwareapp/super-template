@@ -4,11 +4,12 @@ import type {
 } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import {
+import { 
   AppError,
   ERROR_CODES,
   ImportExportAdapterRegistry,
   type ImportValidationError,
+  SYSTEM_SCOPE,
 } from '@repo/api-core';
 
 import type { ImportJobView } from '../imports.types';
@@ -76,6 +77,14 @@ export class ConfirmImportUseCase {
       );
     }
 
+    if (!file.organizationId) {
+      throw new AppError(
+        ERROR_CODES.VALIDATION_FAILED,
+        'Global files cannot be imported into a tenant',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     const parsed = await this.importFileParser.parseImportFile(
       job.type,
       file.storageKey,
@@ -117,6 +126,7 @@ export class ConfirmImportUseCase {
       entityId: job.id,
       metadata: { successCount, errorCount: errors.length },
       requestContext,
+        scope: SYSTEM_SCOPE.PLATFORM
     });
 
     return this.importsMapper.toImportJobView(updated ?? job);

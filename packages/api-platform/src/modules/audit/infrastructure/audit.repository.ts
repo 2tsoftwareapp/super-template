@@ -196,6 +196,17 @@ export class AuditRepository implements AuditRepositoryPort {
     return row?.acquired === true;
   }
 
+  async unlockAdvisoryLock(
+    lockId: number,
+    executor: DatabaseExecutor = this.database,
+  ): Promise<boolean> {
+    const result = await executor.execute(
+      sql`SELECT pg_advisory_unlock(${lockId}) AS released`,
+    );
+    const row = result.rows?.[0] as { released: boolean } | undefined;
+    return row?.released === true;
+  }
+
   async findById(
     id: string,
     executor: DatabaseExecutor = this.database,

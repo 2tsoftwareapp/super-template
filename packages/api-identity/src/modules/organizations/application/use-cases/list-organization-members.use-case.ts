@@ -1,6 +1,6 @@
 import type { AuthenticatedRequestUser } from '@repo/api-core';
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { AppError, ERROR_CODES } from '@repo/api-core';
+import {  AppError, ERROR_CODES , ROLE_NAMES } from '@repo/api-core';
 
 import { ORGANIZATIONS_REPOSITORY, type OrganizationsRepositoryPort } from '../ports/organizations.repository.port';
 
@@ -13,7 +13,7 @@ export class ListOrganizationMembersUseCase {
   async execute(organizationId: string, actor: string | AuthenticatedRequestUser) {
     const { userId: actorUserId, isSuperAdmin } = typeof actor === 'string'
       ? { userId: actor, isSuperAdmin: false }
-      : { userId: actor.userId, isSuperAdmin: actor.roles?.includes('SUPER_ADMIN') ?? false };
+      : { userId: actor.userId, isSuperAdmin: actor.roles?.includes(ROLE_NAMES.SUPER_ADMIN) ?? false };
 
     if (!isSuperAdmin) {
       const membership = await this.organizationsRepository.findMembership(

@@ -2,7 +2,7 @@ import type { AuthenticatedRequestUser, JsonValue } from '@repo/api-core';
 import type { AuditWriter, TransactionExecutor, TransactionPort } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import {
+import { 
   AppError,
   AUDIT_WRITER,
   ERROR_CODES,
@@ -11,6 +11,7 @@ import {
   permissionNamesForRole,
   ROLE_NAMES,
   TRANSACTION_PORT,
+  SYSTEM_SCOPE,
 } from '@repo/api-core';
 
 import type {
@@ -182,12 +183,12 @@ export class RoleManagementUseCase {
           action: 'role.created',
           entityType: 'role',
           entityId: role.id,
-          organizationId,
           metadata: {
             name: normalizedName,
             organizationId,
             permissionIds: command.permissionIds,
           },
+            ...(organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
         },
         tx,
       );
@@ -303,8 +304,8 @@ export class RoleManagementUseCase {
           action: 'role.updated',
           entityType: 'role',
           entityId: roleId,
-          organizationId: role.organizationId,
           metadata: updateMeta,
+            ...(role.organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: role.organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
         },
         tx,
       );
@@ -373,11 +374,11 @@ export class RoleManagementUseCase {
           action: 'role.deleted',
           entityType: 'role',
           entityId: roleId,
-          organizationId: role.organizationId,
           metadata: {
             name: role.name,
             organizationId: role.organizationId,
           },
+            ...(role.organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: role.organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
         },
         tx,
       );

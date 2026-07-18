@@ -4,7 +4,7 @@ import type {
 } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { AppError, ERROR_CODES, requireOrganizationId } from '@repo/api-core';
+import {  AppError, ERROR_CODES, requireOrganizationId , SYSTEM_SCOPE } from '@repo/api-core';
 import { createHash, randomUUID } from 'node:crypto';
 
 import { AuditService } from '../../../audit/application/audit.service';
@@ -112,7 +112,8 @@ export class UploadFileUseCase {
         entityType: 'file',
         entityId: record.id,
         requestContext,
-      });
+          scope: SYSTEM_SCOPE.PLATFORM
+    });
 
       return FilesMapper.toFileDto(record);
     } catch (error) {

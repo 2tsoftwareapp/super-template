@@ -1,3 +1,4 @@
+import { SYSTEM_SCOPE } from '@repo/api-core';
 export type RoleScope = 'platform' | 'organization';
 
 export interface PermissionView {
@@ -5,7 +6,7 @@ export interface PermissionView {
   name: string;
   description: string | null;
   isSystem: boolean;
-  scope: 'platform' | 'organization';
+  scope: typeof SYSTEM_SCOPE.PLATFORM | 'organization';
 }
 
 export interface RoleView {

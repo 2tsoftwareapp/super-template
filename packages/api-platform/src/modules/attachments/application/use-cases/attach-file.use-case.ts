@@ -4,7 +4,7 @@ import type {
 } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { AppError, ERROR_CODES } from '@repo/api-core';
+import {  AppError, ERROR_CODES , SYSTEM_SCOPE } from '@repo/api-core';
 
 import type { AttachEntityCommand } from '../attachments.types';
 
@@ -36,6 +36,14 @@ export class AttachFileUseCase {
       );
     }
 
+    if (!file.organizationId) {
+      throw new AppError(
+        ERROR_CODES.VALIDATION_FAILED,
+        'Cannot attach a global file to an entity',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     const attachment = await this.attachmentsRepository.create({
       organizationId: file.organizationId,
       fileId: input.fileId,
@@ -56,6 +64,7 @@ export class AttachFileUseCase {
       entityId: input.entityId,
       metadata: { attachmentId: attachment.id, fileId: input.fileId },
       requestContext,
+        scope: SYSTEM_SCOPE.PLATFORM
     });
 
     return AttachmentsMapper.toAttachmentDto(attachment);

@@ -2,7 +2,7 @@ import type { RequestContext } from '@repo/api-core';
 import type { TransactionPort } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import {
+import { 
   AppError,
   AUDIT_WRITER,
   type AuditWriter,
@@ -10,6 +10,7 @@ import {
   generateOpaqueToken,
   hashOpaqueToken,
   normalizeEmail,
+  SYSTEM_SCOPE,
 } from '@repo/api-core';
 import { TRANSACTION_PORT } from '@repo/api-core';
 
@@ -89,7 +90,8 @@ export class HandleSsoCallbackUseCase {
           reason: error instanceof Error ? error.message : 'unknown error',
         },
         requestContext,
-      });
+          scope: SYSTEM_SCOPE.PLATFORM
+    });
 
       throw new AppError(
         ERROR_CODES.SSO_TOKEN_INVALID,
@@ -226,6 +228,7 @@ export class HandleSsoCallbackUseCase {
           entityId: targetUser.id,
           metadata: { provider: input.provider },
           requestContext,
+            scope: SYSTEM_SCOPE.PLATFORM
         },
         transaction,
       );
@@ -245,6 +248,7 @@ export class HandleSsoCallbackUseCase {
       entityId: user.id,
       metadata: { provider: input.provider },
       requestContext,
+        scope: SYSTEM_SCOPE.PLATFORM
     });
 
     return { session, redirectUri: loginState.redirectUri };

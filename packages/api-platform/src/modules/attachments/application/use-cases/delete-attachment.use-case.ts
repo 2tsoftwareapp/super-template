@@ -4,7 +4,7 @@ import type {
 } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { AppError, ERROR_CODES } from '@repo/api-core';
+import {  AppError, ERROR_CODES , SYSTEM_SCOPE } from '@repo/api-core';
 
 import { AuditService } from '../../../audit/application/audit.service';
 import { ATTACHMENTS_REPOSITORY, type AttachmentsRepositoryPort } from '../ports/attachments.repository.port';
@@ -41,6 +41,7 @@ export class DeleteAttachmentUseCase {
       entityId: attachment.entityId,
       metadata: { attachmentId },
       requestContext,
+        scope: SYSTEM_SCOPE.PLATFORM
     });
   }
 }

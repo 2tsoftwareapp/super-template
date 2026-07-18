@@ -1,12 +1,13 @@
 import type { RequestContext } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import {
+import { 
   AppError,
   AUDIT_WRITER,
   type AuditWriter,
   ERROR_CODES,
   normalizeEmail,
+  SYSTEM_SCOPE,
 } from '@repo/api-core';
 
 import type { LoginCommand } from '../auth.types';
@@ -44,7 +45,8 @@ export class LoginUseCase {
         entityType: 'user',
         metadata: { email },
         requestContext,
-      });
+          scope: SYSTEM_SCOPE.PLATFORM
+    });
       throw new AppError(
         ERROR_CODES.AUTH_INVALID_CREDENTIALS,
         'Invalid email or password',
@@ -81,7 +83,8 @@ export class LoginUseCase {
         entityType: 'user',
         entityId: user.id,
         requestContext,
-      });
+          scope: SYSTEM_SCOPE.PLATFORM
+    });
 
       return { mfaRequired: false as const, ...session };
     }
@@ -98,7 +101,8 @@ export class LoginUseCase {
         entityType: 'user',
         entityId: user.id,
         requestContext,
-      });
+          scope: SYSTEM_SCOPE.PLATFORM
+    });
 
       return {
         mfaRequired: true as const,
@@ -117,6 +121,7 @@ export class LoginUseCase {
       entityType: 'user',
       entityId: user.id,
       requestContext,
+        scope: SYSTEM_SCOPE.PLATFORM
     });
 
     return { mfaRequired: false as const, ...session };

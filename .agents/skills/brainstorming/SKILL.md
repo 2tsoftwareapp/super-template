@@ -8,6 +8,22 @@ description: >-
 
 # Brainstorming
 
+## Language (do this first)
+
+**Re-read `.agents/settings.yaml` now** — do not reuse a `language` value cached
+earlier in this session. Write every saved artifact and reply in that `language`
+(`en` or `vi`); keep code, identifiers, paths, commands, and template section
+keys unchanged. If the user just edited settings, the freshly read value wins. A
+direct instruction in the current user request overrides the file.
+
+## Memory (read first)
+
+Before framing, researching, or deciding, read `.agents/memory/INDEX.md` and
+open the entries whose hook matches this task. Reuse prior decisions, gotchas,
+and conventions instead of re-deriving them; if memory conflicts with current
+evidence, trust current evidence and note the drift. If none apply, continue.
+(Memory is written by `done` — the 80/20 vital few.)
+
 ## Purpose
 
 Turn an initial request into a clear direction via a **forced step sequence**:
@@ -63,7 +79,7 @@ This skill is a **hard contract**. Obey it before any other action.
 
 #### `DISCUSSION.md` (from template)
 executive_summary, developer_overview, charts (Mermaid when useful),
-context_5w1h (when useful), goal, desired_outcome,
+goal, desired_outcome,
 confirmed_facts, constraints, assumptions, unknowns, issue_triage,
 clarification_checkpoint, spec_quality_review (feasibility, correctness,
 capability_recommendations), visual_triage, scope_in, scope_out, non_goals,

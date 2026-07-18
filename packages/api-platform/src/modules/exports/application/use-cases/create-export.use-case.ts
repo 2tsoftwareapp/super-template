@@ -4,7 +4,7 @@ import type {
 } from '@repo/api-core';
 
 import { Inject, Injectable } from '@nestjs/common';
-import { ImportExportAdapterRegistry, requireOrganizationId, toCsv } from '@repo/api-core';
+import {  ImportExportAdapterRegistry, requireOrganizationId, toCsv , SYSTEM_SCOPE } from '@repo/api-core';
 import { randomUUID } from 'node:crypto';
 
 import type { CreateExportCommand } from '../exports.types';
@@ -78,7 +78,8 @@ export class CreateExportUseCase {
         entityId: job.id,
         metadata: { type: input.type, fileId },
         requestContext,
-      });
+          scope: SYSTEM_SCOPE.PLATFORM
+    });
 
       return ExportsMapper.toDto(updated ?? job);
     } catch (error) {

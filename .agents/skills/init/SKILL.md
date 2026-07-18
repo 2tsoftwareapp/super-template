@@ -8,6 +8,14 @@ description: >-
 
 # Project Init
 
+## Language (do this first)
+
+**Re-read `.agents/settings.yaml` now** — do not reuse a `language` value cached
+earlier in this session. Write every saved artifact and reply in that `language`
+(`en` or `vi`); keep code, identifiers, paths, commands, and template section
+keys unchanged. If the user just edited settings, the freshly read value wins. A
+direct instruction in the current user request overrides the file.
+
 ## Purpose
 
 Build a reliable project reference before other lifecycle skills run. Collect
@@ -20,7 +28,7 @@ project-specific behavior without inventing conventions.
 |---|---|
 | Inputs | Repository root, existing `.agents/settings.yaml` and `.agents/PRJ_REFERENCE.md` when present, source/config/docs/tests, git metadata, user-confirmed project rules. |
 | Outputs | `.agents/PRJ_REFERENCE.md` and a merged `.agents/settings.yaml`. |
-| Safety | Read-only discovery. Never read or record secret values. Never execute project code, install dependencies, or mutate source files. Preserve existing user settings unless explicitly replaced. Mark uncertain facts; do not invent business or workflow rules. |
+| Safety | Read-only discovery. Never read or record secret values. Never execute **project** code, install dependencies, or mutate source files. Running the bundled read-only `scripts/scan_workspaces.sh` (filesystem sweep only) is allowed. Preserve existing user settings unless explicitly replaced. Mark uncertain facts; do not invent business or workflow rules. |
 
 ### Required artifacts
 
@@ -28,9 +36,13 @@ project-specific behavior without inventing conventions.
 
 - Required: yes.
 - **executive_summary**: The most useful 20% of project context.
-- **context_5w1h**: What, Why, Who, When, Where, How.
 - **project_identity**: Purpose, users, domain, lifecycle status.
-- **tech_stack**: Languages, frameworks, runtime, package/build tools.
+- **workspaces**: For a monorepo, one row per app/package/service with its
+  path, type, and its **own** stack, entry point, and commands. Never collapse
+  a multi-stack monorepo into a single root stack.
+- **tech_stack**: Languages, frameworks, runtime, package/build tools. In a
+  monorepo, record the stack **per workspace** (see `workspaces`), not only the
+  root manifest.
 - **architecture**: Components, boundaries, entry points, data flows.
 - **business_rules**: Rule, source, affected area, confidence.
 - **key_constraints**: Technical, business, compliance, compatibility.
@@ -66,21 +78,59 @@ project-specific behavior without inventing conventions.
    - manifests, lockfiles, build/test/lint configs, CI, containers, migrations;
    - source layout, entry points, public interfaces, tests, documentation;
    - business rules and constraints evidenced by docs, tests, schemas, or code.
-4. Classify every important statement:
+4. **Deep workspace scan (mandatory — do not scan only the root, and do not
+   enumerate from the workspace config).** The scan has two responsibilities,
+   split so that no stack is ever missed:
+
+   **a. Coverage (deterministic) — run the bundled candidate surfacer.** It
+   sweeps the **filesystem** (not the workspace config) and prints every
+   plausible project-root directory, pruned of build/generated/platform noise:
+
+   ```bash
+   bash .agents/skills/init/scripts/scan_workspaces.sh
+   ```
+
+   Each row is `DIR<TAB>MARKER_HINTS`. The hints (e.g. `pubspec.yaml`,
+   `package.json`, or `-` for none) are only clues; the script deliberately does
+   **not** classify the stack.
+
+   **b. Classification (yours) — you decide each stack.** For **every** row,
+   open the directory and identify its stack from its actual manifest/tooling
+   using your own knowledge — **any** ecosystem counts (Node/TS, Flutter/Dart,
+   Go, Rust, Python, JVM, Kotlin, Swift, .NET, PHP, Ruby, Elixir, Deno, Zig, …).
+   Do not limit yourself to a fixed list; a directory whose hint is `-` still
+   gets inspected and classified.
+   - **Record every candidate** in the `workspaces` table and give each its own
+     `tech_stack`, entry point, and per-app commands. A directory of a different
+     ecosystem is a distinct stack that MUST appear.
+   - **Why the config is not enough:** a `pnpm-workspace.yaml` / `turbo.json` /
+     root `package.json "workspaces"` lists only JS/TS members. A Flutter/Dart,
+     Go, Rust, or Python app under `apps/` is typically **not** listed there, so
+     enumerating from the config silently drops whole stacks. Filesystem
+     coverage is the source of truth; the config is only supporting evidence.
+   - The surfacer's hint list is best-effort, not exhaustive. If you know of a
+     project directory it did not surface (unusual layout or ecosystem), add it
+     — never treat the script's rows as the complete universe of stacks.
+   - If the script cannot run (e.g. no Bash), fall back to a manual recursive
+     directory sweep that prunes `node_modules`, build/generated, and native
+     platform dirs, and classify every project root yourself — never bound the
+     sweep by the workspace config.
+6. Classify every important statement:
    - `confirmed`: direct source or user confirmation;
    - `inferred`: evidence exists but is indirect;
    - `unknown`: unresolved or conflicting.
-5. Seed from `templates/PRJ_REFERENCE.template.md`, fill all applicable
+7. Seed from `templates/PRJ_REFERENCE.template.md`, fill all applicable
    sections, and keep source references close to each fact.
-6. Merge confirmed project conventions into `.agents/settings.yaml`.
+8. Merge confirmed project conventions into `.agents/settings.yaml`.
    Preserve `language`, security hard rules, and custom user values.
-7. Validate:
+9. Validate:
    - no secret values or sensitive file contents;
    - executive summary appears first and is decision-oriented;
-   - 5W1H is complete or explicitly `Unknown`/`N/A`;
    - commands are sourced, not guessed;
+   - every workspace member with its own manifest has its own stack recorded
+     (no multi-stack monorepo collapsed to a single root stack);
    - unknowns and conflicts are visible.
-8. Report created/updated files and the highest-priority unknowns.
+10. Report created/updated files and the highest-priority unknowns.
 
 ## Discovery boundaries
 

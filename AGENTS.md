@@ -16,6 +16,11 @@ and conventions.
     explanations, summaries, findings, and commit/PR messages.
 - Keep code, identifiers, file paths, CLI commands, and template section keys
   unchanged regardless of `language`.
+- **Re-read `.agents/settings.yaml` at the start of every task and every skill
+  invocation. Never reuse a `language` (or other settings) value cached earlier
+  in the session.** If the user edits `.agents/settings.yaml` mid-session and
+  asks to re-run a skill, re-read the file first and apply the new value — do
+  not answer from the previously loaded value.
 - If `.agents/settings.yaml` is missing or the value is unknown, default to
   `en`. A direct instruction in the current user request overrides the file.
 - `rules.reports.output_format`: `markdown` (default) or `html`. Controls the
@@ -36,7 +41,10 @@ and conventions.
 - `.agents/settings.yaml`: Project-level agent settings (language, etc.). Read first.
 - `.agents/PRJ_REFERENCE.md`: Generated project context shared by all skills.
 - `.agents/tools/`: Local utilities copied on install (for example the HTML
-  decision server that logs user choices).
+  decision server that logs user choices, and `session/session.sh`).
+- `.agents/memory/`: Cross-task, durable knowledge base. `INDEX.md` is the
+  80/20 map; each entry holds the vital few from a finished task. `done` writes
+  it; any skill may read it.
 - `.agents/DESIGN_SYSTEM.md`: Compact enterprise HTML recipe (semantic +
   short `.ss-*` classes; beauty in CSS, not utility soup).
 - `.agents/THIRD_PARTY_SKILLS.md`: Sources, revisions, and licenses for vendored skills.
@@ -197,6 +205,53 @@ The agent MUST obey the Contract strictly — it is not advisory. If the contrac
 
 Base folder for runtime artifacts: `.agents/sessions/<Task-N-short-description>/` (repo root).
 
+### Session discipline (mandatory)
+
+- **One active session, resolved deterministically.** The active session dir is
+  recorded in `.agents/sessions/.current`. Resolve it at the **start of every
+  lifecycle skill** — do not guess or re-derive the folder name:
+
+  ```bash
+  bash .agents/tools/session/session.sh current
+  ```
+
+  The first skill of a task creates it with `session.sh new <slug>`; every later
+  skill **reuses** the path that `session.sh current` returns. Never invent a
+  second `<Task-N-…>` folder for the same task.
+- **Artifacts live ONLY in the active session.** Write DISCUSSION, PLAN, TASKS,
+  EXECUTION, REVIEW, OVERVIEW, and every other runtime artifact **inside** that
+  dir. **Never** write them to an OS temp dir, a scratchpad, a `cache/` folder,
+  or anywhere outside `.agents/`. Redoing an artifact (e.g. re-writing `PLAN.md`
+  during review) overwrites it **in the same active session** — not a new
+  folder, not a side/cache copy.
+- **Progress is computed, never hand-written.** Refresh OVERVIEW/TASKS progress
+  from the real card states instead of typing counts:
+
+  ```bash
+  bash .agents/tools/session/session.sh status
+  ```
+
+  Paste its mermaid pie into `OVERVIEW.md` and `TASKS.md` and copy its counts
+  verbatim. A task/session is `done` **only** when the tool prints
+  `COMPLETE: yes` **and** the review verdict passed. Never show `100%`, a full
+  "done" pie, or Status `done` while any card is `todo`/`in_progress`/`blocked`/
+  `review` — the tool reports those as `COMPLETE: no`.
+
+### Project memory (`.agents/memory/`)
+
+- **Durable, cross-task knowledge** (survives across sessions). `done` distills
+  each finished task into `.agents/memory/<Task-N-slug>.md` — the **vital few**
+  (80/20): non-obvious decisions + why, gotchas, reusable conventions, and
+  pointers. It is not a changelog.
+- **Read before deciding/analyzing.** At the start of any step that frames,
+  researches, investigates, designs, or plans (`brainstorming`, `research`,
+  `investigate`, `business-analysis`, `basic-design`, `detail-design`,
+  `planning`, …), read `.agents/memory/INDEX.md` first and open the entries
+  whose hook matches the task. Any step may read memory whenever it helps.
+- Prefer prior lessons over re-deriving them; if memory conflicts with current
+  evidence, trust current evidence and note the drift so `done` can update the
+  entry.
+
 ### Project initialization
 
 Run `init` first when entering a project or when `.agents/PRJ_REFERENCE.md` is
@@ -304,9 +359,13 @@ traceability, test data, or verification evidence.
 - Immediately after the summary, include a **Developer overview** panel:
   status, progress, blockers, next action, and owner. A developer must
   understand the state in under 30 seconds without reading the full report.
-- Add a **5W1H context** block (What, Why, Who, When, Where, How) when it
-  materially clarifies scope or ownership. Use `N/A`/`Unknown` instead of
-  padding or inventing details.
+- **5W1H is a diagnostic method, not a default section.** Never stamp a 5W1H
+  block into reports by default. Apply 5W1H (What, Why, Who, When, Where, How)
+  only as a clarification technique when a problem is genuinely hard or
+  ambiguous, or a feature is unclear, incorrect, or underspecified — during
+  framing, Spec-quality review, or investigation — to surface unknowns and
+  drive a decision. Capture the answers inline where they matter; do not add
+  an empty or `N/A`-filled 5W1H table to satisfy a template.
 - Add **Charts/diagrams** when they improve scanability:
   - Mermaid flowcharts for architecture, options, and process flows;
   - Mermaid sequence diagrams for request/response or error paths;

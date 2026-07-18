@@ -3,6 +3,7 @@
 import { useDebouncedValue } from "@repo/web-hooks/use-debounced-value";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 import type { AuditLogDto } from "@/lib/api-types";
 
@@ -92,8 +93,14 @@ export function useAuditLogsController(): AuditLogsViewModel {
       });
       if (!exportResponse.ok) throw new Error("Export failed");
       const { data } = (await exportResponse.json()) as {
-        data: { fileId: string };
+        data: { fileId: string; isTruncated?: boolean };
       };
+
+      if (data.isTruncated) {
+        toast.warning(
+          "The export exceeds 10,000 rows and was truncated. Please use narrower filters."
+        );
+      }
 
       const downloadResponse = await fetch(
         `/api/bff/admin/audit-logs/exports/${data.fileId}/download`,

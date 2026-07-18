@@ -1,7 +1,7 @@
 import type { AuthenticatedRequestUser } from '@repo/api-core';
 
 import { forwardRef, HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { AppError, ERROR_CODES, isMandatoryMailTemplate } from '@repo/api-core';
+import {  AppError, ERROR_CODES, isMandatoryMailTemplate , SYSTEM_SCOPE } from '@repo/api-core';
 
 import { AuditService } from '../../../audit/application/audit.service';
 import { JobsService } from '../../../jobs/application/jobs.service';
@@ -78,6 +78,7 @@ export class SendAdminMailUseCase {
       entityType: 'mail_template',
       entityId: job.id,
       metadata: { templateKey: command.templateKey, to: command.to },
+        scope: SYSTEM_SCOPE.PLATFORM
     });
 
     return { jobId: job.id, status: job.status };

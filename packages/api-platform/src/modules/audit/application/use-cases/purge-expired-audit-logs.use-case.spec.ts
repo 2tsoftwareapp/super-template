@@ -8,7 +8,7 @@ const buildEnvironmentService = (retentionDays: number) => ({
 
 describe('PurgeExpiredAuditLogsUseCase', () => {
   it('no-ops when retention is disabled', async () => {
-    const auditRepository = { tryAdvisoryLock: vi.fn(), deleteOlderThanBatched: vi.fn() };
+    const auditRepository = { tryAdvisoryLock: vi.fn(), deleteOlderThanBatched: vi.fn(), unlockAdvisoryLock: vi.fn() };
     const recordAuditLogUseCase = { execute: vi.fn() };
 
     const useCase = new PurgeExpiredAuditLogsUseCase(
@@ -29,6 +29,7 @@ describe('PurgeExpiredAuditLogsUseCase', () => {
     const auditRepository = {
       tryAdvisoryLock: vi.fn(async () => true),
       deleteOlderThanBatched: vi.fn(async () => 3),
+      unlockAdvisoryLock: vi.fn(async () => true),
     };
     const recordAuditLogUseCase = { execute: vi.fn(async () => undefined) };
 
@@ -59,6 +60,7 @@ describe('PurgeExpiredAuditLogsUseCase', () => {
     const auditRepository = {
       tryAdvisoryLock: vi.fn(async () => true),
       deleteOlderThanBatched: vi.fn(async () => 0),
+      unlockAdvisoryLock: vi.fn(async () => true),
     };
     const recordAuditLogUseCase = { execute: vi.fn(async () => undefined) };
 
@@ -78,6 +80,7 @@ describe('PurgeExpiredAuditLogsUseCase', () => {
     const auditRepository = {
       tryAdvisoryLock: vi.fn(async () => false),
       deleteOlderThanBatched: vi.fn(),
+      unlockAdvisoryLock: vi.fn(),
     };
     const recordAuditLogUseCase = { execute: vi.fn() };
 

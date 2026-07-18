@@ -6,6 +6,7 @@ import type { ListAuditLogsQuery } from '../audit.types';
 
 import { AuditMapper } from '../audit.mapper';
 import { AUDIT_REPOSITORY, type AuditRepositoryPort } from '../ports/audit.repository.port';
+import { ROLE_NAMES } from '@repo/api-core';
 
 @Injectable()
 export class ListAuditLogsUseCase {
@@ -16,7 +17,7 @@ export class ListAuditLogsUseCase {
   ) {}
 
   async execute(actor: AuthenticatedRequestUser, query: ListAuditLogsQuery) {
-    const isSuperAdmin = actor.roles.includes('SUPER_ADMIN');
+    const isSuperAdmin = actor.roles.includes(ROLE_NAMES.SUPER_ADMIN);
 
     const result = await this.auditRepository.list({
       page: query.page,

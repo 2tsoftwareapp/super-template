@@ -5,6 +5,14 @@ description: "Support tester/QA in the agent lifecycle: analyze acceptance crite
 
 # Tester
 
+## Language (do this first)
+
+**Re-read `.agents/settings.yaml` now** — do not reuse a `language` value cached
+earlier in this session. Write every saved artifact and reply in that `language`
+(`en` or `vi`); keep code, identifiers, paths, commands, and template section
+keys unchanged. If the user just edited settings, the freshly read value wins. A
+direct instruction in the current user request overrides the file.
+
 ## Purpose
 
 Act as a tester/QA in the agent workflow to ensure requirements, plans, or changes have clear verification methods.
@@ -28,7 +36,6 @@ This skill is a **hard contract**. Obey it before any other action. Do NOT treat
 - **executive_summary** (required, array): Maximum five bullets with scope, highest-risk coverage, critical gaps, and next action.
 - **developer_overview** (required, object): Test scope status, P0 coverage, critical gaps, next action.
 - **charts** (optional, array): Mermaid coverage/priority chart when useful; otherwise N/A.
-- **context_5w1h** (optional, object): What, Why, Who, When, Where, How when useful; use Unknown/N/A explicitly.
 - **session_timestamp** (required, string): ISO 8601 with timezone.
 - **test_scope** (required, string): In scope, out of scope, assumptions.
 - **applicable_groups** (required, string): Which test groups apply (A/B/C/D) and which are skipped with reasons.

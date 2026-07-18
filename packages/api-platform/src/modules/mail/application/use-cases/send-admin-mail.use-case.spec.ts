@@ -35,7 +35,7 @@ describe('SendAdminMailUseCase', () => {
         templateKey: 'auth.reset-password',
         to: 'user@example.test',
       }),
-    ).rejects.toMatchObject<Partial<AppError>>({
+    ).rejects.toMatchObject({
       code: ERROR_CODES.VALIDATION_FAILED,
     });
 
@@ -62,7 +62,7 @@ describe('SendAdminMailUseCase', () => {
         templateKey: 'does.not-exist',
         to: 'user@example.test',
       }),
-    ).rejects.toMatchObject<Partial<AppError>>({
+    ).rejects.toMatchObject({
       code: ERROR_CODES.VALIDATION_FAILED,
     });
   });
@@ -86,7 +86,7 @@ describe('SendAdminMailUseCase', () => {
         templateKey: 'auth.welcome',
         to: 'user@example.test',
       }),
-    ).rejects.toMatchObject<Partial<AppError>>({
+    ).rejects.toMatchObject({
       code: ERROR_CODES.VALIDATION_FAILED,
     });
     expect(jobsService.enqueue).not.toHaveBeenCalled();

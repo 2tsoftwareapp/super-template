@@ -4,7 +4,7 @@ import type {
 } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { AppError, ERROR_CODES } from '@repo/api-core';
+import {  AppError, ERROR_CODES , SYSTEM_SCOPE } from '@repo/api-core';
 
 import { AuditService } from '../../../audit/application/audit.service';
 import {
@@ -51,6 +51,7 @@ export class DeleteFileUseCase {
       entityType: 'file',
       entityId: file.id,
       requestContext,
+        scope: SYSTEM_SCOPE.PLATFORM
     });
   }
 }

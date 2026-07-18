@@ -4,11 +4,12 @@ import type {
 } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import {
+import { 
   AppError,
   AUDIT_WRITER,
   type AuditWriter,
   ERROR_CODES,
+  SYSTEM_SCOPE,
 } from '@repo/api-core';
 
 import { OrganizationsService } from '../../../organizations/application/organizations.service';
@@ -82,8 +83,8 @@ export class SwitchOrganizationUseCase {
       action: 'auth.organization.switched',
       entityType: 'organization',
       entityId: organizationId,
-      organizationId,
       requestContext,
+        ...(organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
     });
 
     return {

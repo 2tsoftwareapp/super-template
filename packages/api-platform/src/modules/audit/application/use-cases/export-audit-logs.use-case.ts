@@ -4,7 +4,7 @@ import type {
 } from '@repo/api-core';
 
 import { Inject, Injectable } from '@nestjs/common';
-import { requireOrganizationId, toCsv } from '@repo/api-core';
+import {     requireOrganizationId, toCsv , SYSTEM_SCOPE , FILE_KIND , FILE_VISIBILITY , ROLE_NAMES } from '@repo/api-core';
 import { randomUUID } from 'node:crypto';
 
 import type { ExportAuditLogsQuery } from '../audit.types';
@@ -47,12 +47,17 @@ export class ExportAuditLogsUseCase {
     query: ExportAuditLogsQuery,
     requestContext?: RequestContext,
   ): Promise<{ fileId: string; rowCount: number; totalMatching: number; truncated: boolean }> {
-    const organizationId = requireOrganizationId(actor);
-    const isSuperAdmin = actor.roles.includes('SUPER_ADMIN');
+    const isSuperAdmin = actor.roles.includes(ROLE_NAMES.SUPER_ADMIN);
+    
+    // Nếu không phải SUPER_ADMIN hoặc SUPER_ADMIN đang view as tenant, yêu cầu organizationId
+    // Global export thì organizationId sẽ là undefined/null.
+    const organizationId = isSuperAdmin && !actor.organizationId 
+      ? null 
+      : requireOrganizationId(actor);
 
     const fullQuery = {
       ...query,
-      ...(isSuperAdmin ? {} : { organizationId }),
+      ...(isSuperAdmin && !actor.organizationId ? {} : { organizationId }),
     };
 
     const [rows, totalResult] = await Promise.all([
@@ -100,6 +105,8 @@ export class ExportAuditLogsUseCase {
         mimeType: 'text/csv',
         sizeBytes: body.length,
         uploadedById: actor.userId,
+        kind: FILE_KIND.AUDIT_EXPORT,
+        visibility: FILE_VISIBILITY.RESTRICTED,
       });
 
       if (!file) {
@@ -113,10 +120,10 @@ export class ExportAuditLogsUseCase {
     }
 
     await this.recordAuditLogUseCase.execute({
+      ...(organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId } : { scope: SYSTEM_SCOPE.PLATFORM }),
       actorId: actor.userId,
       action: 'audit.exported',
       entityType: 'audit_log',
-      organizationId,
       metadata: { rowCount: rows.length, fileId, filters: { ...query } },
       requestContext,
     });

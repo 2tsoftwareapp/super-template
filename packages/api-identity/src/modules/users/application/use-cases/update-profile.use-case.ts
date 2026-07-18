@@ -1,13 +1,14 @@
 import type { RequestContext } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import {
+import { 
   AppError,
   AUDIT_WRITER,
   type AuditWriter,
   ERROR_CODES,
   FILE_LOOKUP,
   type FileLookup,
+  SYSTEM_SCOPE,
 } from '@repo/api-core';
 
 import type { UpdateProfileCommand, UserView } from '../users.types';
@@ -71,6 +72,7 @@ export class UpdateProfileUseCase {
       entityType: 'user',
       entityId: userId,
       requestContext,
+        scope: SYSTEM_SCOPE.PLATFORM
     });
 
     return this.getUserUseCase.execute(userId);

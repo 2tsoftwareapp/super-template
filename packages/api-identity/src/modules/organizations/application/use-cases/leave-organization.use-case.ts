@@ -2,12 +2,13 @@ import type { RequestContext, AuthenticatedRequestUser } from '@repo/api-core';
 import type { TransactionPort } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import {
+import { 
   AppError,
   AUDIT_WRITER,
   type AuditWriter,
   ERROR_CODES,
   TRANSACTION_PORT,
+  SYSTEM_SCOPE,
 } from '@repo/api-core';
 
 import { assertNotLastOwner } from '../../domain/organization-access.policy';
@@ -86,10 +87,10 @@ export class LeaveOrganizationUseCase {
         action: 'organization.leave',
         entityType: 'organization_member',
         entityId: userId,
-        organizationId,
         metadata: { organizationId },
         requestContext,
-      });
+          ...(organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
+    });
     });
   }
 }

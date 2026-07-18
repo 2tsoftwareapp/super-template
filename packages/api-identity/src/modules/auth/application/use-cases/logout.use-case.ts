@@ -4,7 +4,7 @@ import type {
 } from '@repo/api-core';
 
 import { Inject, Injectable } from '@nestjs/common';
-import { AUDIT_WRITER, type AuditWriter } from '@repo/api-core';
+import {  AUDIT_WRITER, type AuditWriter , SYSTEM_SCOPE } from '@repo/api-core';
 
 import {
   AUTH_SESSION_REPOSITORY,
@@ -29,8 +29,8 @@ export class LogoutUseCase {
       action: 'auth.logout',
       entityType: 'session',
       entityId: user.sessionId,
-      organizationId: user.organizationId,
       requestContext,
+        ...(user.organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: user.organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
     });
   }
 }

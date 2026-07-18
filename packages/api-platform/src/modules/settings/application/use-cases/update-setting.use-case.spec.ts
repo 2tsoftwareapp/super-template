@@ -54,7 +54,7 @@ describe('UpdateSettingUseCase', () => {
     );
 
     await expect(
-      useCase.execute(actor, 'missing.key', { value: 'x' }),
+      useCase.execute(actor, 'missing.key', { value: { x: 'y' } }),
     ).rejects.toMatchObject({ code: ERROR_CODES.SETTINGS_NOT_FOUND });
     expect(auditService.log).not.toHaveBeenCalled();
   });

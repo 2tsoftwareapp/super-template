@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { AppError, ERROR_CODES } from '@repo/api-core';
+import {   AppError, ERROR_CODES , FILE_KIND , FILE_VISIBILITY } from '@repo/api-core';
 
 import { ExportAuditLogsUseCase } from './export-audit-logs.use-case';
 
@@ -69,6 +69,8 @@ describe('ExportAuditLogsUseCase', () => {
         organizationId: 'org-1',
         uploadedById: 'user-1',
         mimeType: 'text/csv',
+        kind: FILE_KIND.AUDIT_EXPORT,
+        visibility: FILE_VISIBILITY.RESTRICTED,
       }),
     );
     expect(recordAuditLogUseCase.execute).toHaveBeenCalledWith(
@@ -97,11 +99,46 @@ describe('ExportAuditLogsUseCase', () => {
 
     await expect(
       useCase.execute({ ...actor, organizationId: null }, {}),
-    ).rejects.toMatchObject<Partial<AppError>>({
+    ).rejects.toMatchObject({
       code: ERROR_CODES.AUTH_FORBIDDEN,
     });
 
     expect(auditRepository.listForExport).not.toHaveBeenCalled();
+  });
+
+  it('allows SUPER_ADMIN to export globally without organizationId', async () => {
+    const auditRepository = {
+      listForExport: vi.fn(async () => [auditRow]),
+      count: vi.fn(async () => 1),
+    };
+    const filesRepository = {
+      create: vi.fn(async () => ({ id: 'file-1' })),
+    };
+    const objectStorage = {
+      upload: vi.fn(async () => ({ key: 'exports/audit/global.csv' })),
+      delete: vi.fn(),
+    };
+    const recordAuditLogUseCase = { execute: vi.fn() };
+
+    const useCase = new ExportAuditLogsUseCase(
+      auditRepository as never,
+      filesRepository as never,
+      objectStorage as never,
+      recordAuditLogUseCase as never,
+    );
+
+    const superAdminActor = { ...actor, organizationId: null, roles: ['SUPER_ADMIN'] };
+    await useCase.execute(superAdminActor, {});
+
+    expect(auditRepository.listForExport).toHaveBeenCalledWith({ limit: 5000 });
+    expect(filesRepository.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        organizationId: null,
+        uploadedById: 'user-1',
+        kind: FILE_KIND.AUDIT_EXPORT,
+        visibility: FILE_VISIBILITY.RESTRICTED,
+      }),
+    );
   });
 
   it('deletes the uploaded object and rethrows if the file record fails to persist', async () => {

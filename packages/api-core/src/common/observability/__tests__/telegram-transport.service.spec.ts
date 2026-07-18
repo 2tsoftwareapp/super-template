@@ -49,7 +49,7 @@ describe('TelegramTransportService', () => {
     }).send('Something broke', context);
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
-    const [url, init] = fetchMock.mock.calls[0];
+    const [url, init] = fetchMock.mock.calls[0]! as [string, RequestInit];
     expect(url).toBe('https://api.telegram.org/botbot-token/sendMessage');
 
     const body = JSON.parse((init as RequestInit).body as string);

@@ -8,6 +8,22 @@ description: >-
 
 # Planning
 
+## Language (do this first)
+
+**Re-read `.agents/settings.yaml` now** — do not reuse a `language` value cached
+earlier in this session. Write every saved artifact and reply in that `language`
+(`en` or `vi`); keep code, identifiers, paths, commands, and template section
+keys unchanged. If the user just edited settings, the freshly read value wins. A
+direct instruction in the current user request overrides the file.
+
+## Memory (read first)
+
+Before framing, researching, or deciding, read `.agents/memory/INDEX.md` and
+open the entries whose hook matches this task. Reuse prior decisions, gotchas,
+and conventions instead of re-deriving them; if memory conflicts with current
+evidence, trust current evidence and note the drift. If none apply, continue.
+(Memory is written by `done` — the 80/20 vital few.)
+
 ## Purpose
 
 Produce **two session files on disk** via a **forced step sequence** (BMAD-style micro-file):
@@ -64,7 +80,7 @@ This skill is a **hard contract**. Obey it before any other action.
 
 #### `PLAN.md` (from template)
 Strategy only: executive_summary, developer_overview, charts (Mermaid when
-useful), context_5w1h (when useful), pre_planning_decision_gate,
+useful), pre_planning_decision_gate,
 clarification_questions, visual_triage, spec_quality_review (feasibility,
 correctness, capability_recommendations), goal, scope, non_goals, assumptions,
 approach, affected_areas, test_strategy (optional), verification_strategy,

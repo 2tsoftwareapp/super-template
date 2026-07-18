@@ -9,6 +9,22 @@ description: >-
 
 # Business Analysis
 
+## Language (do this first)
+
+**Re-read `.agents/settings.yaml` now** — do not reuse a `language` value cached
+earlier in this session. Write every saved artifact and reply in that `language`
+(`en` or `vi`); keep code, identifiers, paths, commands, and template section
+keys unchanged. If the user just edited settings, the freshly read value wins. A
+direct instruction in the current user request overrides the file.
+
+## Memory (read first)
+
+Before framing, researching, or deciding, read `.agents/memory/INDEX.md` and
+open the entries whose hook matches this task. Reuse prior decisions, gotchas,
+and conventions instead of re-deriving them; if memory conflicts with current
+evidence, trust current evidence and note the drift. If none apply, continue.
+(Memory is written by `done` — the 80/20 vital few.)
+
 ## Purpose
 
 Clarify business requirements before basic design, planning, implementation, or testing via a **forced step sequence**:
@@ -58,7 +74,6 @@ This skill is a **hard contract**. Obey it before any other action. Do NOT treat
 - **executive_summary** (required, array): Maximum five bullets with the problem, key rule/decision, top Spec quality finding, top risk, and next action.
 - **developer_overview** (required, object): Status, Spec quality summary, open questions, next action.
 - **charts** (optional, array): Mermaid process/actor flow when useful; otherwise N/A.
-- **context_5w1h** (optional, object): What, Why, Who, When, Where, How when useful; use Unknown/N/A explicitly.
 - **problem_statement** (required, string): One-sentence business problem.
 - **stakeholders** (required, array): Actor, goal, pain point, authority.
 - **scope** (required, object): In scope, out of scope, non-goals.

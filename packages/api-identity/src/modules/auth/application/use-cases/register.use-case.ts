@@ -2,7 +2,7 @@ import type { RequestContext } from '@repo/api-core';
 import type { TransactionPort } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import {
+import { 
   AppError,
   AUDIT_WRITER,
   type AuditWriter,
@@ -10,6 +10,7 @@ import {
   ERROR_CODES,
   normalizeEmail,
   TRANSACTION_PORT,
+  SYSTEM_SCOPE,
 } from '@repo/api-core';
 
 import type { RegisterCommand } from '../auth.types';
@@ -116,7 +117,8 @@ export class RegisterUseCase {
             entityType: 'user',
             entityId: user.id,
             requestContext,
-          },
+              scope: SYSTEM_SCOPE.PLATFORM
+        },
           transaction,
         );
       },

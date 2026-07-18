@@ -2,19 +2,13 @@ import type { JsonObject, RequestContext } from '@repo/api-core';
 import type { TransactionExecutor } from '@repo/api-core';
 
 import { Inject, Injectable } from '@nestjs/common';
-import { isJsonObject, redactSensitive } from '@repo/api-core';
+import {  isJsonObject, redactSensitive , SYSTEM_SCOPE } from '@repo/api-core';
 
 import { AUDIT_REPOSITORY, type AuditRepositoryPort } from '../ports/audit.repository.port';
 
-export interface AuditInput {
-  actorId?: string | null;
-  action: string;
-  entityType: string;
-  entityId?: string | null;
-  organizationId?: string | null;
-  metadata?: JsonObject | null;
-  requestContext?: RequestContext | undefined;
-}
+import type { AuditLogInput } from '@repo/api-core';
+
+export type AuditInput = AuditLogInput;
 
 @Injectable()
 export class RecordAuditLogUseCase {
@@ -23,33 +17,42 @@ export class RecordAuditLogUseCase {
   ) {}
 
   async execute(
-    {
-      actorId,
-      action,
-      entityType,
-      entityId,
-      organizationId,
-      metadata,
-      requestContext,
-    }: AuditInput,
+    input: AuditInput,
     executor?: TransactionExecutor,
   ) {
+    const { actorId, action, entityType, entityId, metadata, requestContext } = input;
+    
+    const basePayload = {
+      actorId: actorId ?? null,
+      action,
+      entityType,
+      entityId: entityId ?? null,
+      metadata: metadata
+        ? (() => {
+            const redacted = redactSensitive(metadata);
+            return isJsonObject(redacted) ? redacted : null;
+          })()
+        : null,
+      ipAddress: requestContext?.ipAddress ?? null,
+      userAgent: requestContext?.userAgent ?? null,
+      requestId: requestContext?.requestId ?? null,
+    };
+
+    if (input.scope === 'organization') {
+      return this.auditRepository.create(
+        {
+          ...basePayload,
+          scope: SYSTEM_SCOPE.ORGANIZATION,
+          organizationId: input.organizationId,
+        },
+        executor,
+      );
+    }
+
     return this.auditRepository.create(
       {
-        actorId: actorId ?? null,
-        action,
-        entityType,
-        entityId: entityId ?? null,
-        organizationId: organizationId ?? null,
-        metadata: metadata
-          ? (() => {
-              const redacted = redactSensitive(metadata);
-              return isJsonObject(redacted) ? redacted : null;
-            })()
-          : null,
-        ipAddress: requestContext?.ipAddress ?? null,
-        userAgent: requestContext?.userAgent ?? null,
-        requestId: requestContext?.requestId ?? null,
+        ...basePayload,
+        scope: SYSTEM_SCOPE.PLATFORM,
       },
       executor,
     );

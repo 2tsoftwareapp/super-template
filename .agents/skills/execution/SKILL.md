@@ -5,6 +5,14 @@ description: "Execute TASKS.md guided by PLAN.md: modify files, mark task/step p
 
 # Execution
 
+## Language (do this first)
+
+**Re-read `.agents/settings.yaml` now** — do not reuse a `language` value cached
+earlier in this session. Write every saved artifact and reply in that `language`
+(`en` or `vi`); keep code, identifiers, paths, commands, and template section
+keys unchanged. If the user just edited settings, the freshly read value wins. A
+direct instruction in the current user request overrides the file.
+
 ## Purpose
 
 Execute locked work from TASKS.md (fine-grained micro-tasks + order), guided by PLAN.md strategy/DoD/rollback, in a controlled and verifiable way. Follow `execution_order`: implement feature tasks before automated test tasks for the same surface.
@@ -37,7 +45,6 @@ This skill is a **hard contract**. Obey it before any other action. Do NOT treat
 - **executive_summary** (required, array): Maximum five bullets with outcome, progress, verification, blocker/risk, and next action.
 - **developer_overview** (required, object): Status, current task, done/total, blockers, next action.
 - **charts** (optional, array): Mermaid progress/flow chart when useful; otherwise N/A.
-- **context_5w1h** (optional, object): What, Why, Who, When, Where, How when useful; use Unknown/N/A explicitly.
 - **plan_source** (required, string): Reference to PLAN.md and TASKS.md (or clear scope source).
 - **current_task** (required, string): Task ID from TASKS.md currently being executed.
 - **scope** (required, string): Scope this execution covers.
@@ -69,7 +76,12 @@ On every task card in `execution_order`:
 3. **Finish card:** run card Verify; if pass → Status=`done`, Progress board Done=`[x]`; if blocked → Status=`blocked` and note reason (leave unfinished Work items as `[ ]`).
 4. **Stop mid-run / user stop:** leave accurate Status (`in_progress` or `blocked`); do not mark Done; handoff lists remaining IDs.
 5. **Never** mark Status=`done` if Verify failed or was skipped without documenting risk + Status=`blocked`/`skipped`.
-6. **Refresh OVERVIEW.md** At a glance + progress chart so a developer can skim status without opening EXECUTION.md.
+6. **Refresh OVERVIEW.md** At a glance + progress chart. Do not type the
+   counts — run `bash .agents/tools/session/session.sh status` and paste its
+   pie + `Progress`/`PERCENT_DONE` verbatim into `OVERVIEW.md` and `TASKS.md`.
+   Status may read `done` only when it prints `COMPLETE: yes`; while any card is
+   `in_progress`/`blocked`/`review`/`todo` it prints `COMPLETE: no`, so keep
+   Status `in_progress` and never show a full/100% pie.
 
 ```markdown
 // WRONG — code done but TASKS still all todo

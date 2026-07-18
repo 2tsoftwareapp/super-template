@@ -2,13 +2,12 @@ import type { RequestContext, AuthenticatedRequestUser } from '@repo/api-core';
 import type { TransactionPort } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import {
+import {  
   AppError,
   AUDIT_WRITER,
   type AuditWriter,
   ERROR_CODES,
-  TRANSACTION_PORT,
-} from '@repo/api-core';
+  TRANSACTION_PORT, SYSTEM_SCOPE , ROLE_NAMES } from '@repo/api-core';
 
 import { assertOrganizationRole } from '../../domain/organization-access.policy';
 import { ORGANIZATIONS_REPOSITORY, type OrganizationsRepositoryPort } from '../ports/organizations.repository.port';
@@ -29,7 +28,7 @@ export class UpdateOrganizationUseCase {
   ) {
     const { userId: actorUserId, isSuperAdmin } = typeof actor === 'string'
       ? { userId: actor, isSuperAdmin: false }
-      : { userId: actor.userId, isSuperAdmin: actor.roles?.includes('SUPER_ADMIN') ?? false };
+      : { userId: actor.userId, isSuperAdmin: actor.roles?.includes(ROLE_NAMES.SUPER_ADMIN) ?? false };
 
     let membership = null;
     if (!isSuperAdmin) {
@@ -69,10 +68,10 @@ export class UpdateOrganizationUseCase {
         action: 'organization.update',
         entityType: 'organization',
         entityId: organizationId,
-        organizationId,
         metadata: { name: organization.name },
         requestContext,
-      }, transaction);
+          ...(organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
+    }, transaction);
 
       return organization;
     });

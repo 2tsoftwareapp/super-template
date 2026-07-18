@@ -1,5 +1,5 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { AppError, ERROR_CODES } from '@repo/api-core';
+import {  AppError, ERROR_CODES , ROLE_NAMES } from '@repo/api-core';
 import type { AuthenticatedRequestUser } from '@repo/api-core';
 
 import { AuditMapper } from '../audit.mapper';
@@ -24,7 +24,7 @@ export class GetAuditLogUseCase {
       );
     }
 
-    const isSuperAdmin = actor.roles.includes('SUPER_ADMIN');
+    const isSuperAdmin = actor.roles.includes(ROLE_NAMES.SUPER_ADMIN);
     if (
       !isSuperAdmin &&
       row.organizationId &&

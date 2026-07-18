@@ -79,7 +79,12 @@ export class FilesRepository implements FilesRepositoryPort {
     params: ListFilesQuery,
     executor: DatabaseExecutor = this.database,
   ) {
-    const filters = [eq(files.organizationId, params.organizationId)];
+    const filters = [];
+    if (params.organizationId) {
+      filters.push(eq(files.organizationId, params.organizationId));
+    } else {
+      filters.push(isNull(files.organizationId));
+    }
 
     if (!params.includeDeleted) {
       filters.push(isNull(files.deletedAt));

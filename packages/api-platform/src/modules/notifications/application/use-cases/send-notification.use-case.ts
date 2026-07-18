@@ -5,13 +5,14 @@ import type {
 import type { TransactionExecutor } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import {
+import { 
   AppError,
   AUDIT_WRITER,
   type AuditWriter,
   ERROR_CODES,
   ORGANIZATION_LOOKUP,
   type OrganizationLookup,
+  SYSTEM_SCOPE,
 } from '@repo/api-core';
 
 import type {
@@ -89,12 +90,12 @@ export class SendNotificationUseCase {
           action: 'notification.sent',
           entityType: 'notification',
           entityId: notification.id,
-          organizationId: resolvedOrganizationId,
           metadata: {
             userId: input.userId,
             type: input.type,
           },
           requestContext,
+            ...(resolvedOrganizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: resolvedOrganizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
         },
         executor,
       );

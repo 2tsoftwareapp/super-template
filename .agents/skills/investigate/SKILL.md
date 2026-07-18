@@ -5,6 +5,22 @@ description: "Investigate codebase, bugs, system behavior, or technical question
 
 # Investigate
 
+## Language (do this first)
+
+**Re-read `.agents/settings.yaml` now** — do not reuse a `language` value cached
+earlier in this session. Write every saved artifact and reply in that `language`
+(`en` or `vi`); keep code, identifiers, paths, commands, and template section
+keys unchanged. If the user just edited settings, the freshly read value wins. A
+direct instruction in the current user request overrides the file.
+
+## Memory (read first)
+
+Before framing, researching, or deciding, read `.agents/memory/INDEX.md` and
+open the entries whose hook matches this task. Reuse prior decisions, gotchas,
+and conventions instead of re-deriving them; if memory conflicts with current
+evidence, trust current evidence and note the drift. If none apply, continue.
+(Memory is written by `done` — the 80/20 vital few.)
+
 ## Purpose
 
 Find technical truth before deciding to fix, plan, or implement.
@@ -26,7 +42,6 @@ This skill is a **hard contract**. Obey it before any other action. Do NOT treat
 - **executive_summary** (required, array): Maximum five bullets with status, likely/confirmed cause, strongest evidence, impact, and next action.
 - **developer_overview** (required, object): Investigation status, strongest hypothesis, evidence gap, next action.
 - **charts** (optional, array): Mermaid cause/flow chart when useful; otherwise N/A.
-- **context_5w1h** (optional, object): What, Why, Who, When, Where, How when useful; use Unknown/N/A explicitly.
 - **question** (required, string): The investigation question.
 - **status** (required, string): Root Cause Confirmed / Likely Root Cause / Hypotheses Identified / Needs More Evidence / Blocked.
 - **context** (optional, string): Environment, version, related setup.

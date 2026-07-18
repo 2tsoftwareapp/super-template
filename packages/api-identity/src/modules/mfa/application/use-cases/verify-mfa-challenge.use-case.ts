@@ -1,12 +1,13 @@
 import type { RequestContext } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import {
+import { 
   AppError,
   AUDIT_WRITER,
   type AuditWriter,
   ERROR_CODES,
   hashOpaqueToken,
+  SYSTEM_SCOPE,
 } from '@repo/api-core';
 
 import type { MfaVerifyChallengeCommand } from '../mfa.types';
@@ -61,7 +62,8 @@ export class VerifyMfaChallengeUseCase {
         entityType: 'user',
         entityId: challenge.userId,
         requestContext,
-      });
+          scope: SYSTEM_SCOPE.PLATFORM
+    });
 
       throw new AppError(
         ERROR_CODES.MFA_INVALID_CODE,
@@ -77,6 +79,7 @@ export class VerifyMfaChallengeUseCase {
       entityType: 'user',
       entityId: challenge.userId,
       requestContext,
+        scope: SYSTEM_SCOPE.PLATFORM
     });
 
     return { userId: challenge.userId };

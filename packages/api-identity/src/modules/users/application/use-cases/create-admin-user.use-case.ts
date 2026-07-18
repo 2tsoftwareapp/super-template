@@ -5,13 +5,14 @@ import type {
 import type { TransactionPort } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import {
+import { 
   AppError,
   AUDIT_WRITER,
   type AuditWriter,
   durationToMilliseconds,
   ERROR_CODES,
   normalizeEmail,
+  SYSTEM_SCOPE,
 } from '@repo/api-core';
 import { TRANSACTION_PORT } from '@repo/api-core';
 
@@ -207,7 +208,6 @@ export class CreateAdminUserUseCase {
             action: 'admin.user.created',
           entityType: 'user',
           entityId: user.id,
-          organizationId,
           metadata: {
             email,
             status: user.status,
@@ -216,7 +216,8 @@ export class CreateAdminUserUseCase {
             organizationId,
           },
             requestContext,
-          },
+              ...(organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
+        },
           transaction,
         );
 

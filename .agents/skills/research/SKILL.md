@@ -5,6 +5,22 @@ description: "Research internal or external sources before making technical/prod
 
 # Research
 
+## Language (do this first)
+
+**Re-read `.agents/settings.yaml` now** — do not reuse a `language` value cached
+earlier in this session. Write every saved artifact and reply in that `language`
+(`en` or `vi`); keep code, identifiers, paths, commands, and template section
+keys unchanged. If the user just edited settings, the freshly read value wins. A
+direct instruction in the current user request overrides the file.
+
+## Memory (read first)
+
+Before framing, researching, or deciding, read `.agents/memory/INDEX.md` and
+open the entries whose hook matches this task. Reuse prior decisions, gotchas,
+and conventions instead of re-deriving them; if memory conflicts with current
+evidence, trust current evidence and note the drift. If none apply, continue.
+(Memory is written by `done` — the 80/20 vital few.)
+
 ## Purpose
 
 Collect, verify, and synthesize evidence to support technical, product, or operational decisions.
@@ -26,7 +42,6 @@ This skill is a **hard contract**. Obey it before any other action. Do NOT treat
 - **executive_summary** (required, array): Maximum five bullets with answer, strongest evidence, caveat/risk, recommendation, and next action.
 - **developer_overview** (required, object): Research status, answer confidence, top caveat, next action.
 - **charts** (optional, array): Mermaid comparison chart when useful; otherwise N/A.
-- **context_5w1h** (optional, object): What, Why, Who, When, Where, How when useful; use Unknown/N/A explicitly.
 - **question** (required, string): Research question.
 - **decision_context** (required, string): What decision this research supports.
 - **status** (required, string): Complete / Complete with caveats / Partial / Blocked.

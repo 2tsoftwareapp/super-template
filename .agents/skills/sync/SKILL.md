@@ -5,6 +5,14 @@ description: "Read-only sync of session artifacts, codebase context, git state, 
 
 # Sync
 
+## Language (do this first)
+
+**Re-read `.agents/settings.yaml` now** — do not reuse a `language` value cached
+earlier in this session. Write every saved artifact and reply in that `language`
+(`en` or `vi`); keep code, identifiers, paths, commands, and template section
+keys unchanged. If the user just edited settings, the freshly read value wins. A
+direct instruction in the current user request overrides the file.
+
 ## Purpose
 
 Ensure the agent has the latest, reliable, and safe state before execution.
@@ -45,7 +53,6 @@ This skill is a **hard contract**. Obey it before any other action. Do NOT treat
 - **executive_summary** (required, array): Maximum five bullets with readiness, drift, blockers, and next action.
 - **developer_overview** (required, object): Status, resume task IDs, blocker count, next action.
 - **charts** (optional, array): Mermaid readiness/drift chart when useful; otherwise N/A.
-- **context_5w1h** (optional, object): What, Why, Who, When, Where, How when useful; use Unknown/N/A explicitly.
 - **scope** (required, string): What was synced (artifacts, workspace, git, dependencies).
 - **observed_facts** (required, array): List of observed facts with source for each.
 - **inferred_context** (optional, array): Inferences with basis and confidence level.

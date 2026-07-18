@@ -11,7 +11,7 @@ function createHost() {
   const json = vi.fn();
   const status = vi.fn(() => ({ json }));
   const response = {
-    locals: {},
+    locals: {} as Record<string, unknown>,
     status,
   };
   const request = {
@@ -55,7 +55,7 @@ describe('AppExceptionFilter', () => {
     const { filter, logger, errorReporter } = createFilter();
     const { host, json, response, status } = createHost();
     const exception = new AppError(
-      ERROR_CODES.FORBIDDEN,
+      ERROR_CODES.AUTH_FORBIDDEN,
       'Forbidden',
       HttpStatus.FORBIDDEN,
       { missing: 'users.update' },
@@ -63,12 +63,12 @@ describe('AppExceptionFilter', () => {
 
     filter.catch(exception, host);
 
-    expect(response.locals.errorCode).toBe(ERROR_CODES.FORBIDDEN);
+    expect(response.locals.errorCode).toBe(ERROR_CODES.AUTH_FORBIDDEN);
     expect(logger.warn).toHaveBeenCalledWith(
       'Handled request exception',
       expect.objectContaining({
         details: { missing: 'users.update' },
-        errorCode: ERROR_CODES.FORBIDDEN,
+        errorCode: ERROR_CODES.AUTH_FORBIDDEN,
         method: 'POST',
         path: '/api/v1/users',
         requestId: 'req-1',
@@ -82,7 +82,7 @@ describe('AppExceptionFilter', () => {
     expect(status).toHaveBeenCalledWith(HttpStatus.FORBIDDEN);
     expect(json).toHaveBeenCalledWith({
       error: {
-        code: ERROR_CODES.FORBIDDEN,
+        code: ERROR_CODES.AUTH_FORBIDDEN,
         message: 'Forbidden',
         details: { missing: 'users.update' },
       },

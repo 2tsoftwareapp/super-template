@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { EnvironmentService } from '@repo/api-core';
+import {  EnvironmentService , SYSTEM_SCOPE } from '@repo/api-core';
 
 import { AUDIT_REPOSITORY, type AuditRepositoryPort } from '../ports/audit.repository.port';
 import { RecordAuditLogUseCase } from './record-audit-log.use-case';
@@ -31,27 +31,32 @@ export class PurgeExpiredAuditLogsUseCase {
       return null;
     }
 
-    // Delete in batches to keep each transaction short; the lock lives until
-    // the session ends (released implicitly on connection close or explicit
-    // pg_advisory_unlock).  PostgreSQL does not release advisory locks on
-    // transaction end by default.
-    const deletedCount = await this.auditRepository.deleteOlderThanBatched(
-      cutoff,
-      BATCH_SIZE,
-    );
+    try {
+      // Delete in batches to keep each transaction short; the lock lives until
+      // the session ends (released implicitly on connection close or explicit
+      // pg_advisory_unlock).  PostgreSQL does not release advisory locks on
+      // transaction end by default.
+      const deletedCount = await this.auditRepository.deleteOlderThanBatched(
+        cutoff,
+        BATCH_SIZE,
+      );
 
-    if (deletedCount > 0) {
-      await this.recordAuditLogUseCase.execute({
-        action: 'audit.retention_purged',
-        entityType: 'audit_log',
-        metadata: {
-          deletedCount,
-          cutoff: cutoff.toISOString(),
-          retentionDays,
-        },
-      });
+      if (deletedCount > 0) {
+        await this.recordAuditLogUseCase.execute({
+          scope: SYSTEM_SCOPE.PLATFORM,
+          action: 'audit.retention_purged',
+          entityType: 'audit_log',
+          metadata: {
+            deletedCount,
+            cutoff: cutoff.toISOString(),
+            retentionDays,
+          },
+        });
+      }
+
+      return { deletedCount, cutoff };
+    } finally {
+      await this.auditRepository.unlockAdvisoryLock(PURGE_LOCK_ID);
     }
-
-    return { deletedCount, cutoff };
   }
 }
