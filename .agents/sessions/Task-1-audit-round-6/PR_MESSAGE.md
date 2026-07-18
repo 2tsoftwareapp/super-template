@@ -1,1 +1,1 @@
-fix(audit): support savepoints in import and app error mapping
+fix(audit): resolve RLS scopes, purge atomicity, and storage leaks in multi-tenant audit

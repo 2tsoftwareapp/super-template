@@ -1,18 +1,14 @@
 ## Summary
-
-Fixes and finalizes Feature 05 Audit Logs implementation by resolving integration issues with global E2E testing context, stabilizing Export job states, supporting partial transactions for data bulk imports, standardizing Domain AppErrors, and cleaning up compiled python artifacts.
+Hoàn thiện toàn bộ Feature 05 Audit Logs dựa trên Review Round 6. Cập nhật sửa chữa các edge case lớn liên quan đến RLS bypassing cho System Tasks, tránh trạng thái treo cho Export Jobs, tối ưu Atomicity khi ghi log, và cung cấp giải pháp Abstract Savepoint để đảm bảo code logic UseCase an toàn và trong sáng (clean code).
 
 ## Changes
-
-- **E2E Test Auth Bypass:** Nullifies `organizationId` in token if header `x-organization-id` is empty to support global (Platform) e2e testing.
-- **Export Jobs:** Moves `listForExport` into the standard try-catch block inside `create-export.use-case.ts` to reliably mark job as FAILED on error instead of indefinitely keeping it at PROCESSING.
-- **Import Savepoints:** Embeds each parsed row `importRow()` call in a raw SQL `SAVEPOINT` + `ROLLBACK TO SAVEPOINT` transaction scope using Drizzle, securing successful rows even if other rows fail.
-- **Audit Domain Error:** Converts the generic `throw new Error(...)` to `throw new AppError(ERROR_CODES.AUTH_FORBIDDEN, ...)` inside `ListAuditLogsUseCase`.
-- **Orphan File Handling:** Logs storage deletion errors if an explicit `catch(err)` is hit due to missing background workers (deferring the complete Outbox structure).
-- **Repo Hygiene:** Adds `.gitignore` rules for python caching and removes committed `.pyc` files under `.agents/skills/`.
+- **api-core / api-database:** Cung cấp cơ chế `withSavepoint` vào `TransactionPort` cho phép application loop qua nhiều batch mà không vỡ transaction, không lộ raw SQL, và luôn `RELEASE SAVEPOINT` kể cả khi có lỗi (chống bloat).
+- **api-platform (Export Job):** Fixed lỗi treo state `PROCESSING` ở file upload khi database commit failed.
+- **api-platform (Import Job):** Xóa bỏ Drizzle dependencies khỏi domain logic, thay bằng abstraction Savepoint port.
+- **api-platform (Audit Log):** Hoàn thiện các test context E2E, mock Header để giả lập chính xác Global / Organization scope cho role SUPER_ADMIN.
+- **api-seed:** Fix module resolution lỗi `.js`.
 
 ## Verification
-
 - `bun run build` verifies type safety for platform API logic changes.
 - `vitest` / Unit test suite successfully passed on modified files.
 - Manual verification of Savepoint queries compatibility in Drizzle.
