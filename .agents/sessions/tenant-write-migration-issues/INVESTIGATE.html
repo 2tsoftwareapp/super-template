@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="vi" data-ss-theme="enterprise">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>INVESTIGATE - Audit Logs Re-review Round 5</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../../tools/decision-server/tailwind-theme.js"></script>
+  <link rel="stylesheet" href="../../tools/decision-server/styles.css">
+  <script src="/tailwind-theme.js"></script>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body class="ss-page">
+  <a class="ss-skip" href="#main">Skip to content</a>
+  <header class="ss-header"><div class="ss-header-inner">
+    <p class="ss-eyebrow">Task-05 Audit Logs</p>
+    <h1>INVESTIGATE: Khắc phục các khiếm khuyết vòng 5</h1>
+    <p class="ss-prose">Investigation report về atomicity, scope và e2e của hệ thống Audit.</p>
+  </div></header>
+  
+  <main id="main" class="ss-main">
+    <section class="ss-card" aria-labelledby="s1">
+      <h2 id="s1" class="ss-h2">Executive summary (80/20)</h2>
+      <ul class="ss-prose">
+        <li><strong>Status</strong>: Root Cause Confirmed</li>
+        <li><strong>Likely/confirmed cause</strong>: Thiết kế luồng mutation-audit bị thiếu sót ở một số use-case phụ, thiếu block catch xoá object, scope policy không đồng nhất và token injection E2E chưa chính xác.</li>
+        <li><strong>Strongest evidence</strong>: Kết quả review vòng 5 chỉ ra trực tiếp flow hiện tại của DeleteFile, ConfirmImport, PurgeExpiredAuditLogs và mismatch field truncated trên code frontend/backend.</li>
+        <li><strong>Impact</strong>: Data integrity (nguy cơ lưu file orphan, mất audit trail khi DB lỗi); UI (không hiển thị warning truncated); Testing (E2E không phản ánh đúng SUPER_ADMIN context no-org).</li>
+        <li><strong>Next action</strong>: Reopen task, cập nhật PLAN và bắt đầu tiến hành execution cho 5 nhóm vấn đề đã được xác định.</li>
+      </ul>
+    </section>
+
+    <section class="ss-card" aria-labelledby="s2">
+      <h2 id="s2" class="ss-h2">Developer overview</h2>
+      <ul class="ss-prose">
+        <li><strong>Investigation status</strong>: Root Cause Confirmed</li>
+        <li><strong>Strongest hypothesis</strong>: Nguyên nhân hoàn toàn xuất phát từ việc áp dụng transaction / RLS context chưa triệt để trên toàn bộ các endpoint, cộng thêm khác biệt giữa FE/BE trong định nghĩa contract.</li>
+        <li><strong>Evidence gap</strong>: Đã được review đầy đủ, không có gap về bằng chứng.</li>
+        <li><strong>Next action</strong>: Cập nhật lại <code>TASKS.md</code>, chuyển session về <code>in_progress</code> và tiến hành xử lý các point được báo cáo.</li>
+      </ul>
+    </section>
+
+    <section class="ss-card" aria-labelledby="s3">
+      <h2 id="s3" class="ss-h2">Question</h2>
+      <p class="ss-prose">Làm thế nào để đảm bảo 100% data integrity giữa object storage, business data và audit logs trong mọi trường hợp failure? Làm sao để đồng bộ hóa hoàn toàn context scope của SUPER_ADMIN và E2E tests?</p>
+    </section>
+
+    <section class="ss-card" aria-labelledby="s4">
+      <h2 id="s4" class="ss-h2">Status</h2>
+      <p class="ss-prose ss-ok">Root Cause Confirmed</p>
+    </section>
+
+    <section class="ss-card" aria-labelledby="s5">
+      <h2 id="s5" class="ss-h2">Evidence & Observed Facts</h2>
+      <div class="ss-table-wrap">
+        <table class="ss-table">
+          <thead>
+            <tr><th>Fact / Observation</th><th>Source</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>DeleteFile / DeleteAttachment xoá object trước khi DB commit, thiếu tx chung</td><td>Codebase (DeleteFileUseCase, ConfirmImport, etc.)</td></tr>
+            <tr><td>ExportAuditLogs upload CSV xong không cleanup nếu DB lỗi</td><td>Codebase (ExportAuditLogsUseCase)</td></tr>
+            <tr><td>Frontend check `data.truncated`, backend trả `isTruncated`</td><td>Review Feedback & Frontend codebase</td></tr>
+            <tr><td>SUPER_ADMIN list trả toàn platform, nhưng export chỉ trả current org</td><td>Codebase (ListAuditLogsUseCase vs ExportAuditLogsUseCase)</td></tr>
+            <tr><td>Purge loop đang chạy trong 1 platform transaction duy nhất cho toàn bộ quá trình</td><td>Codebase (PurgeExpiredAuditLogsUseCase)</td></tr>
+            <tr><td>E2E test inject sai Token `app.get("DATABASE")` thay vì `DATABASE` Symbol</td><td>Codebase (audit.e2e.spec.ts)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="ss-card" aria-labelledby="s6">
+      <h2 id="s6" class="ss-h2">Impact</h2>
+      <ul class="ss-prose">
+        <li><strong>Data Integrity</strong>: <code>High</code>. Dễ sinh ra orphan object hoặc DB soft delete mà không có audit, không truy vết được.</li>
+        <li><strong>UX</strong>: <code>Medium</code>. Thiếu warning khi file bị cắt.</li>
+        <li><strong>Security / ACL</strong>: <code>High</code>. E2E test không phản ánh đúng behaviour của production. Scope list/export bị lệch.</li>
+      </ul>
+    </section>
+
+    <section class="ss-card" aria-labelledby="s7">
+      <h2 id="s7" class="ss-h2">Recommendation</h2>
+      <ul class="ss-prose">
+        <li><strong>Fix 1 (Atomicity)</strong>: Sửa <code>DeleteFile</code>, <code>DeleteAttachment</code>, <code>ConfirmImport</code>, <code>CreateExport</code>, <code>UpdateSetting</code> để sử dụng transaction port đúng chuẩn. Các lệnh xoá storage phải chuyển về sau khi commit (hoặc sử dụng outbox nếu có). Nếu không có outbox, thực hiện softDelete + audit trong 1 TX, sau đó mới xoá object.</li>
+        <li><strong>Fix 2 (Cleanup Export)</strong>: Đưa logic <code>upload</code> ra ngoài, sau đó dùng <code>try { ... runInTx(...) } catch (e) { storage.delete() }</code> để dọn dẹp CSV bị lỗi khi DB lỗi.</li>
+        <li><strong>Fix 3 (Truncated)</strong>: Đổi <code>isTruncated</code> ở backend về <code>truncated</code> để tương thích với FE.</li>
+        <li><strong>Fix 4 (Scope)</strong>: Bổ sung explicitly filter scope cho query builder để List và Export đồng bộ hành vi.</li>
+        <li><strong>Fix 5 (Purge loop)</strong>: Chuyển <code>PlatformTransactionPort.run</code> vào bên trong vòng lặp <code>while</code> của hàm purge để commit từng mảng 5000 rows.</li>
+        <li><strong>Fix 6 (E2E)</strong>: Sửa symbol <code>DATABASE</code> trong E2E và bổ sung context no-org cho interceptor test.</li>
+      </ul>
+    </section>
+
+    <section class="ss-card" aria-labelledby="s8">
+      <h2 id="s8" class="ss-h2">Handoff</h2>
+      <p class="ss-prose">Sẵn sàng cho <strong>execution</strong>. Chuyển task này về trạng thái reopened trong `DONE.html`/`OVERVIEW.html` và thêm các work items mới vào `TASKS.md`.</p>
+    </section>
+  </main>
+  
+  <footer class="ss-footer"><div class="ss-footer-inner"><p>Generated by AI Agent.</p></div></footer>
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.min.js"></script>
+  <script src="../../tools/decision-server/animate.js" defer></script>
+  <script src="/animate.js" defer></script>
+  <script src="../../tools/decision-server/client.js" defer></script>
+  <script src="/client.js" defer></script>
+</body>
+</html>

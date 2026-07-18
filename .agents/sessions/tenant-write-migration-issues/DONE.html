@@ -25,7 +25,7 @@
     <section class="ss-card" aria-labelledby="s1">
       <h2 id="s1" class="ss-h2">Executive summary (80/20)</h2>
       <ul class="ss-prose">
-        <li><strong>Status</strong>: Done with risks</li>
+        <li><strong>Status</strong>: Needs fix (Round 5 issues discovered)</li>
         <li><strong>Outcome</strong>: Đã vá toàn bộ các lỗ hổng P0/P1 liên quan đến Audit System bao gồm RLS leakage, ACL bypass và connection leak do Postgres advisory lock. Code chạy pass toàn bộ test typecheck/unit.</li>
         <li><strong>Verification</strong>: Code biên dịch thành công. Unit tests audit pass 100%. E2E tests security đã được sửa mock port đầy đủ nhưng <strong>skipped</strong> do lỗi network local (không connect được tới DB testcontainer).</li>
         <li><strong>Residual risk</strong>: Việc chạy E2E chưa xác nhận được hoàn toàn trên local, có nguy cơ security rules chạy khác thiết kế. Tuy nhiên logic port/transaction đã bọc đầy đủ và an toàn.</li>
@@ -36,7 +36,7 @@
     <section class="ss-card" aria-labelledby="s2">
       <h2 id="s2" class="ss-h2">Developer overview</h2>
       <ul class="ss-prose">
-        <li><strong>Status</strong>: Done with risks</li>
+        <li><strong>Status</strong>: Needs fix (Round 5 issues discovered)</li>
         <li><strong>Verification summary</strong>: Unit tests: Passed. TypeScript type check: Passed. E2E Tests: Skipped (blocked by env).</li>
         <li><strong>Residual risks</strong>: Không thể chạy test E2E cục bộ do lỗi config Postgres/testcontainers.</li>
         <li><strong>Next action</strong>: Push changes to main branch / create PR and verify via CI test pipeline.</li>
@@ -45,7 +45,7 @@
 
     <section class="ss-card" aria-labelledby="s3">
       <h2 id="s3" class="ss-h2">Status</h2>
-      <p class="ss-prose ss-warn">Done with risks</p>
+      <p class="ss-prose ss-warn">Needs fix</p>
     </section>
 
     <section class="ss-card" aria-labelledby="s4">
