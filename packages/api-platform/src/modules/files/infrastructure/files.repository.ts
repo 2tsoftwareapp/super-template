@@ -17,6 +17,7 @@ import {
   isNotNull,
   isNull,
   lte,
+  notInArray,
 } from 'drizzle-orm';
 
 import type {
@@ -108,6 +109,10 @@ export class FilesRepository implements FilesRepositoryPort {
 
     if (params.to) {
       filters.push(lte(files.createdAt, new Date(params.to)));
+    }
+
+    if (params.excludeKinds && params.excludeKinds.length > 0) {
+      filters.push(notInArray(files.kind, params.excludeKinds));
     }
 
     const whereClause = and(...filters);

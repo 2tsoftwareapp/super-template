@@ -1,0 +1,1550 @@
+{
+  "counts": {
+    "detected": 0,
+    "preserved": 253,
+    "skipped": 2,
+    "total": 255,
+    "transformed": 0,
+    "unsupported": 0
+  },
+  "coverage_ratio": 1.0,
+  "format": "docx",
+  "items": [
+    {
+      "detail": "docx package part",
+      "kind": "ooxml-part",
+      "path": "[Content_Types].xml",
+      "status": "preserved"
+    },
+    {
+      "detail": "docx package part",
+      "kind": "ooxml-part",
+      "path": "_rels/.rels",
+      "status": "preserved"
+    },
+    {
+      "detail": "docx package part",
+      "kind": "ooxml-part",
+      "path": "customXml/_rels/item1.xml.rels",
+      "status": "preserved"
+    },
+    {
+      "detail": "docx package part",
+      "kind": "ooxml-part",
+      "path": "customXml/item1.xml",
+      "status": "preserved"
+    },
+    {
+      "detail": "docx package part",
+      "kind": "ooxml-part",
+      "path": "customXml/itemProps1.xml",
+      "status": "preserved"
+    },
+    {
+      "detail": "docx package part",
+      "kind": "ooxml-part",
+      "path": "docProps/app.xml",
+      "status": "preserved"
+    },
+    {
+      "detail": "docx package part",
+      "kind": "ooxml-part",
+      "path": "docProps/core.xml",
+      "status": "preserved"
+    },
+    {
+      "detail": "docx package part",
+      "kind": "ooxml-part",
+      "path": "docProps/thumbnail.jpeg",
+      "status": "preserved"
+    },
+    {
+      "detail": "Super Template \u2014 Wiki",
+      "kind": "paragraph",
+      "path": "paragraph:0",
+      "status": "preserved"
+    },
+    {
+      "detail": "Ng\u00e0y t\u1ea1o: 2026-07-18 | Commit ngu\u1ed3n: 8411838",
+      "kind": "paragraph",
+      "path": "paragraph:1",
+      "status": "preserved"
+    },
+    {
+      "detail": "B\u1eaft \u0111\u1ea7u t\u1eeb \u0111\u00e2u: \u0110\u1ecdc Architecture tr\u01b0\u1edbc, sau \u0111\u00f3 xem workspace t\u01b0\u01a1ng \u1ee9ng.",
+      "kind": "paragraph",
+      "path": "paragraph:10",
+      "status": "preserved"
+    },
+    {
+      "detail": "Path: packages/api-sort. Layer: sort.",
+      "kind": "paragraph",
+      "path": "paragraph:100",
+      "status": "preserved"
+    },
+    {
+      "detail": "Backend import qua @repo/api-core. Frontend import qua @repo/api-contract/sort/multi-sort.",
+      "kind": "paragraph",
+      "path": "paragraph:101",
+      "status": "preserved"
+    },
+    {
+      "detail": "",
+      "kind": "paragraph",
+      "path": "paragraph:102",
+      "status": "preserved"
+    },
+    {
+      "detail": "Config",
+      "kind": "paragraph",
+      "path": "paragraph:103",
+      "status": "preserved"
+    },
+    {
+      "detail": "Vai tr\u00f2: Shared non-API application config \u2014 pagination defaults, page sizes.",
+      "kind": "paragraph",
+      "path": "paragraph:104",
+      "status": "preserved"
+    },
+    {
+      "detail": "Path: packages/config. Layer: core. Export JSON + Dart artifact qua pnpm generate.",
+      "kind": "paragraph",
+      "path": "paragraph:105",
+      "status": "preserved"
+    },
+    {
+      "detail": "",
+      "kind": "paragraph",
+      "path": "paragraph:106",
+      "status": "preserved"
+    },
+    {
+      "detail": "Env Loader",
+      "kind": "paragraph",
+      "path": "paragraph:107",
+      "status": "preserved"
+    },
+    {
+      "detail": "Vai tr\u00f2: Layered .env resolution \u2014 .env.example \u2192 .env.APP_ENV \u2192 .env \u2192 .env.local \u2192 real env vars.",
+      "kind": "paragraph",
+      "path": "paragraph:108",
+      "status": "preserved"
+    },
+    {
+      "detail": "Path: packages/env-loader. Layer: env. Validated by pnpm env:doctor.",
+      "kind": "paragraph",
+      "path": "paragraph:109",
+      "status": "preserved"
+    },
+    {
+      "detail": "",
+      "kind": "paragraph",
+      "path": "paragraph:11",
+      "status": "preserved"
+    },
+    {
+      "detail": "",
+      "kind": "paragraph",
+      "path": "paragraph:110",
+      "status": "preserved"
+    },
+    {
+      "detail": "ESLint Config",
+      "kind": "paragraph",
+      "path": "paragraph:111",
+      "status": "preserved"
+    },
+    {
+      "detail": "Vai tr\u00f2: Shared flat ESLint configurations \u2014 base.mjs, nest.mjs, next.mjs.",
+      "kind": "paragraph",
+      "path": "paragraph:112",
+      "status": "preserved"
+    },
+    {
+      "detail": "Path: packages/eslint-config. Layer: eslint.",
+      "kind": "paragraph",
+      "path": "paragraph:113",
+      "status": "preserved"
+    },
+    {
+      "detail": "",
+      "kind": "paragraph",
+      "path": "paragraph:114",
+      "status": "preserved"
+    },
+    {
+      "detail": "TSConfig",
+      "kind": "paragraph",
+      "path": "paragraph:115",
+      "status": "preserved"
+    },
+    {
+      "detail": "Vai tr\u00f2: Shared TypeScript configuration presets \u2014 base.json (strict), nest.json, next.json.",
+      "kind": "paragraph",
+      "path": "paragraph:116",
+      "status": "preserved"
+    },
+    {
+      "detail": "Path: packages/tsconfig. Layer: tsconfig.",
+      "kind": "paragraph",
+      "path": "paragraph:117",
+      "status": "preserved"
+    },
+    {
+      "detail": "Type-checking d\u00f9ng TypeScript 7 t\u1eeb tools/tsc7. typescript@5.9.3 l\u00e0 shim cho tools.",
+      "kind": "paragraph",
+      "path": "paragraph:118",
+      "status": "preserved"
+    },
+    {
+      "detail": "",
+      "kind": "paragraph",
+      "path": "paragraph:119",
+      "status": "preserved"
+    },
+    {
+      "detail": "Ki\u1ebfn tr\u00fac",
+      "kind": "paragraph",
+      "path": "paragraph:12",
+      "status": "preserved"
+    },
+    {
+      "detail": "Utils",
+      "kind": "paragraph",
+      "path": "paragraph:120",
+      "status": "preserved"
+    },
+    {
+      "detail": "Vai tr\u00f2: Shared pure TypeScript utilities \u2014 JsonValue, isJsonObject, parseJsonValue.",
+      "kind": "paragraph",
+      "path": "paragraph:121",
+      "status": "preserved"
+    },
+    {
+      "detail": "Path: packages/utils. Layer: core.",
+      "kind": "paragraph",
+      "path": "paragraph:122",
+      "status": "preserved"
+    },
+    {
+      "detail": "",
+      "kind": "paragraph",
+      "path": "paragraph:123",
+      "status": "preserved"
+    },
+    {
+      "detail": "Web Hooks",
+      "kind": "paragraph",
+      "path": "paragraph:124",
+      "status": "preserved"
+    },
+    {
+      "detail": "Vai tr\u00f2: Shared React hooks \u2014 useDebouncedValue, useIsMobile.",
+      "kind": "paragraph",
+      "path": "paragraph:125",
+      "status": "preserved"
+    },
+    {
+      "detail": "Path: packages/web-hooks. Layer: frontend-core.",
+      "kind": "paragraph",
+      "path": "paragraph:126",
+      "status": "preserved"
+    },
+    {
+      "detail": "",
+      "kind": "paragraph",
+      "path": "paragraph:127",
+      "status": "preserved"
+    },
+    {
+      "detail": "Web Server",
+      "kind": "paragraph",
+      "path": "paragraph:128",
+      "status": "preserved"
+    },
+    {
+      "detail": "Vai tr\u00f2: Server-only Next.js utilities \u2014 BFF helpers, auth cookie management, CSRF sanitization. D\u00f9ng server-only marker",
+      "kind": "paragraph",
+      "path": "paragraph:129",
+      "status": "preserved"
+    },
+    {
+      "detail": "Super Template l\u00e0 monorepo \u0111a t\u1ea7ng v\u1edbi backend NestJS, frontend Next.js, v\u00e0 mobile Flutter. Backend tu\u00e2n theo lu\u1ed3ng ph\u1ee5 ",
+      "kind": "paragraph",
+      "path": "paragraph:13",
+      "status": "preserved"
+    },
+    {
+      "detail": "Path: packages/web-server. Layer: frontend-core.",
+      "kind": "paragraph",
+      "path": "paragraph:130",
+      "status": "preserved"
+    },
+    {
+      "detail": "",
+      "kind": "paragraph",
+      "path": "paragraph:131",
+      "status": "preserved"
+    },
+    {
+      "detail": "Web Test",
+      "kind": "paragraph",
+      "path": "paragraph:132",
+      "status": "preserved"
+    },
+    {
+      "detail": "Vai tr\u00f2: Shared vitest test utilities \u2014 render helper + setup.ts v\u1edbi jsdom polyfills.",
+      "kind": "paragraph",
+      "path": "paragraph:133",
+      "status": "preserved"
+    },
+    {
+      "detail": "Path: packages/web-test. Layer: frontend-test.",
+      "kind": "paragraph",
+      "path": "paragraph:134",
+      "status": "preserved"
+    },
+    {
+      "detail": "",
+      "kind": "paragraph",
+      "path": "paragraph:135",
+      "status": "preserved"
+    },
+    {
+      "detail": "Web UI",
+      "kind": "paragraph",
+      "path": "paragraph:136",
+      "status": "preserved"
+    },
+    {
+      "detail": "Vai tr\u00f2: Shared UI component library \u2014 35+ presentational primitives. Design system single source of truth.",
+      "kind": "paragraph",
+      "path": "paragraph:137",
+      "status": "preserved"
+    },
+    {
+      "detail": "Path: packages/web-ui. Layer: frontend-ui.",
+      "kind": "paragraph",
+      "path": "paragraph:138",
+      "status": "preserved"
+    },
+    {
+      "detail": "Components: button, dialog, table, input, select, dropdown-menu, pagination, date-picker, calendar, combobox, command, p",
+      "kind": "paragraph",
+      "path": "paragraph:139",
+      "status": "preserved"
+    },
+    {
+      "detail": "",
+      "kind": "paragraph",
+      "path": "paragraph:14",
+      "status": "preserved"
+    },
+    {
+      "detail": "",
+      "kind": "paragraph",
+      "path": "paragraph:140",
+      "status": "preserved"
+    },
+    {
+      "detail": "Web Utils",
+      "kind": "paragraph",
+      "path": "paragraph:141",
+      "status": "preserved"
+    },
+    {
+      "detail": "Vai tr\u00f2: Shared frontend utilities \u2014 HTTP client (webFetch), API types, search params, session, storage.",
+      "kind": "paragraph",
+      "path": "paragraph:142",
+      "status": "preserved"
+    },
+    {
+      "detail": "Path: packages/web-utils. Layer: frontend-core.",
+      "kind": "paragraph",
+      "path": "paragraph:143",
+      "status": "preserved"
+    },
+    {
+      "detail": "Ch\u1ec9 features/*/api/*.api.ts v\u00e0 shared HTTP infrastructure \u0111\u01b0\u1ee3c import webFetch.",
+      "kind": "paragraph",
+      "path": "paragraph:144",
+      "status": "preserved"
+    },
+    {
+      "detail": "",
+      "kind": "paragraph",
+      "path": "paragraph:145",
+      "status": "preserved"
+    },
+    {
+      "detail": "TypeScript 7 Alias Isolator",
+      "kind": "paragraph",
+      "path": "paragraph:146",
+      "status": "preserved"
+    },
+    {
+      "detail": "Vai tr\u00f2: Hoists typescript7 (npm:typescript@7.0.2) ngo\u00e0i peer-resolution context \u0111\u1ec3 d\u00f9ng native/Go tsc cho typecheck.",
+      "kind": "paragraph",
+      "path": "paragraph:147",
+      "status": "preserved"
+    },
+    {
+      "detail": "Path: tools/tsc7. Layer: tool.",
+      "kind": "paragraph",
+      "path": "paragraph:148",
+      "status": "preserved"
+    },
+    {
+      "detail": "Usage: node ../../tools/tsc7/node_modules/typescript7/bin/tsc -p tsconfig.json",
+      "kind": "paragraph",
+      "path": "paragraph:149",
+      "status": "preserved"
+    },
+    {
+      "detail": "Backend Layers",
+      "kind": "paragraph",
+      "path": "paragraph:15",
+      "status": "preserved"
+    },
+    {
+      "detail": "",
+      "kind": "paragraph",
+      "path": "paragraph:150",
+      "status": "preserved"
+    },
+    {
+      "detail": "Appendix: Ngu\u1ed3n & Freshness",
+      "kind": "paragraph",
+      "path": "paragraph:151",
+      "status": "preserved"
+    },
+    {
+      "detail": "T\u1ed5ng quan (80/20): package.json (root), pnpm-workspace.yaml, DESIGN.md.",
+      "kind": "paragraph",
+      "path": "paragraph:152",
+      "status": "preserved"
+    },
+    {
+      "detail": "Ki\u1ebfn tr\u00fac: DESIGN.md, packages/api-core, packages/api-identity, packages/api-platform.",
+      "kind": "paragraph",
+      "path": "paragraph:153",
+      "status": "preserved"
+    },
+    {
+      "detail": "Workspaces: M\u1ed7i workspace \u0111\u01b0\u1ee3c document t\u1eeb package.json/pubspec.yaml v\u00e0 source code.",
+      "kind": "paragraph",
+      "path": "paragraph:154",
+      "status": "preserved"
+    },
+    {
+      "detail": "Last-synced commit: 8411838.",
+      "kind": "paragraph",
+      "path": "paragraph:155",
+      "status": "preserved"
+    },
+    {
+      "detail": "\u0110\u1ecbnh d\u1ea1ng: docx. C\u00e1c file markdown ngu\u1ed3n t\u1ea1i .agents/wiki/ l\u00e0 canonical source.",
+      "kind": "paragraph",
+      "path": "paragraph:156",
+      "status": "preserved"
+    },
+    {
+      "detail": "Presentation (Controller): X\u1eed l\u00fd HTTP, kh\u00f4ng g\u1ecdi Infrastructure tr\u1ef1c ti\u1ebfp.",
+      "kind": "paragraph",
+      "path": "paragraph:16",
+      "status": "preserved"
+    },
+    {
+      "detail": "Application (Use Case): Orchestration, transaction boundary, kh\u00f4ng nh\u1eadn Express Request.",
+      "kind": "paragraph",
+      "path": "paragraph:17",
+      "status": "preserved"
+    },
+    {
+      "detail": "Domain (Policy, Entity): Lu\u1eadt nghi\u1ec7p v\u1ee5, kh\u00f4ng ph\u1ee5 thu\u1ed9c framework.",
+      "kind": "paragraph",
+      "path": "paragraph:18",
+      "status": "preserved"
+    },
+    {
+      "detail": "App Ports (Repository Port): Interface giao ti\u1ebfp Database/External.",
+      "kind": "paragraph",
+      "path": "paragraph:19",
+      "status": "preserved"
+    },
+    {
+      "detail": "",
+      "kind": "paragraph",
+      "path": "paragraph:2",
+      "status": "preserved"
+    },
+    {
+      "detail": "Infrastructure (Drizzle Repository): Chi ti\u1ebft Database, S3, Email.",
+      "kind": "paragraph",
+      "path": "paragraph:20",
+      "status": "preserved"
+    },
+    {
+      "detail": "",
+      "kind": "paragraph",
+      "path": "paragraph:21",
+      "status": "preserved"
+    },
+    {
+      "detail": "Frontend Layers",
+      "kind": "paragraph",
+      "path": "paragraph:22",
+      "status": "preserved"
+    },
+    {
+      "detail": "Route (page.tsx) \u2192 Screen (*-screen.tsx) \u2192 Controller Hook (use-*) \u2192 UI View (*-view.tsx, *-table.tsx)",
+      "kind": "paragraph",
+      "path": "paragraph:23",
+      "status": "preserved"
+    },
+    {
+      "detail": "",
+      "kind": "paragraph",
+      "path": "paragraph:24",
+      "status": "preserved"
+    },
+    {
+      "detail": "Bounded Contexts",
+      "kind": "paragraph",
+      "path": "paragraph:25",
+      "status": "preserved"
+    },
+    {
+      "detail": "api-identity: Auth, users, organizations, RBAC, SSO, MFA.",
+      "kind": "paragraph",
+      "path": "paragraph:26",
+      "status": "preserved"
+    },
+    {
+      "detail": "api-platform: Jobs, files, notifications, audit, mail, imports/exports.",
+      "kind": "paragraph",
+      "path": "paragraph:27",
+      "status": "preserved"
+    },
+    {
+      "detail": "api-health: Health check endpoint.",
+      "kind": "paragraph",
+      "path": "paragraph:28",
+      "status": "preserved"
+    },
+    {
+      "detail": "api-seed: Dev/demo data seeding.",
+      "kind": "paragraph",
+      "path": "paragraph:29",
+      "status": "preserved"
+    },
+    {
+      "detail": "M\u1ee5c l\u1ee5c",
+      "kind": "paragraph",
+      "path": "paragraph:3",
+      "status": "preserved"
+    },
+    {
+      "detail": "",
+      "kind": "paragraph",
+      "path": "paragraph:30",
+      "status": "preserved"
+    },
+    {
+      "detail": "Multi-tenant",
+      "kind": "paragraph",
+      "path": "paragraph:31",
+      "status": "preserved"
+    },
+    {
+      "detail": "Tenant isolation qua PostgreSQL RLS. M\u1ed7i request mang organizationId \u0111\u1ec3 RLS ki\u1ec3m tra quy\u1ec1n. Global operations (SUPER_ADM",
+      "kind": "paragraph",
+      "path": "paragraph:32",
+      "status": "preserved"
+    },
+    {
+      "detail": "",
+      "kind": "paragraph",
+      "path": "paragraph:33",
+      "status": "preserved"
+    },
+    {
+      "detail": "Mobile Architecture",
+      "kind": "paragraph",
+      "path": "paragraph:34",
+      "status": "preserved"
+    },
+    {
+      "detail": "State management: Riverpod. Routing: go_router. API client: generated Dart t\u1eeb OpenAPI spec. Clean architecture: presenta",
+      "kind": "paragraph",
+      "path": "paragraph:35",
+      "status": "preserved"
+    },
+    {
+      "detail": "",
+      "kind": "paragraph",
+      "path": "paragraph:36",
+      "status": "preserved"
+    },
+    {
+      "detail": "Workspaces",
+      "kind": "paragraph",
+      "path": "paragraph:37",
+      "status": "preserved"
+    },
+    {
+      "detail": "Admin Dashboard",
+      "kind": "paragraph",
+      "path": "paragraph:38",
+      "status": "preserved"
+    },
+    {
+      "detail": "Vai tr\u00f2: Internal admin SPA \u2014 qu\u1ea3n l\u00fd users, roles, jobs, mail, notifications, audit logs, settings.",
+      "kind": "paragraph",
+      "path": "paragraph:39",
+      "status": "preserved"
+    },
+    {
+      "detail": "",
+      "kind": "paragraph",
+      "path": "paragraph:4",
+      "status": "preserved"
+    },
+    {
+      "detail": "Stack: Next.js 16, React 19, shadcn/ui, TanStack Query, Tailwind CSS 4. Port: 3002.",
+      "kind": "paragraph",
+      "path": "paragraph:40",
+      "status": "preserved"
+    },
+    {
+      "detail": "Scripts: build, dev, test (vitest), typecheck.",
+      "kind": "paragraph",
+      "path": "paragraph:41",
+      "status": "preserved"
+    },
+    {
+      "detail": "Path: apps/admin. Workspace deps: @repo/api-contract, @repo/api-sort, @repo/env-loader, @repo/config, @repo/web-hooks, @",
+      "kind": "paragraph",
+      "path": "paragraph:42",
+      "status": "preserved"
+    },
+    {
+      "detail": "",
+      "kind": "paragraph",
+      "path": "paragraph:43",
+      "status": "preserved"
+    },
+    {
+      "detail": "Backend API",
+      "kind": "paragraph",
+      "path": "paragraph:44",
+      "status": "preserved"
+    },
+    {
+      "detail": "Vai tr\u00f2: Backend composition root \u2014 bootstraps NestJS, imports bounded contexts, Swagger, CLI commands.",
+      "kind": "paragraph",
+      "path": "paragraph:45",
+      "status": "preserved"
+    },
+    {
+      "detail": "Stack: NestJS 11, Drizzle ORM, PostgreSQL. Port: 3001.",
+      "kind": "paragraph",
+      "path": "paragraph:46",
+      "status": "preserved"
+    },
+    {
+      "detail": "Scripts: build, dev, db:generate, db:migrate, db:push, db:seed, db:studio, openapi:generate, contract:generate, test, te",
+      "kind": "paragraph",
+      "path": "paragraph:47",
+      "status": "preserved"
+    },
+    {
+      "detail": "Path: apps/api. Workspace deps: @repo/api-core, @repo/api-database, @repo/api-health, @repo/api-identity, @repo/api-plat",
+      "kind": "paragraph",
+      "path": "paragraph:48",
+      "status": "preserved"
+    },
+    {
+      "detail": "Kh\u00f4ng ch\u1ee9a feature logic \u2014 feature logic n\u1eb1m trong bounded context packages.",
+      "kind": "paragraph",
+      "path": "paragraph:49",
+      "status": "preserved"
+    },
+    {
+      "detail": "T\u1ed5ng quan (80/20)",
+      "kind": "paragraph",
+      "path": "paragraph:5",
+      "status": "preserved"
+    },
+    {
+      "detail": "",
+      "kind": "paragraph",
+      "path": "paragraph:50",
+      "status": "preserved"
+    },
+    {
+      "detail": "Mobile App",
+      "kind": "paragraph",
+      "path": "paragraph:51",
+      "status": "preserved"
+    },
+    {
+      "detail": "Vai tr\u00f2: Mobile client iOS/Android \u2014 auth, projects, notifications, profile, organizations, admin panels.",
+      "kind": "paragraph",
+      "path": "paragraph:52",
+      "status": "preserved"
+    },
+    {
+      "detail": "Stack: Flutter, Dart SDK ^3.12.2, Riverpod, go_router, Dio.",
+      "kind": "paragraph",
+      "path": "paragraph:53",
+      "status": "preserved"
+    },
+    {
+      "detail": "Scripts (root-level): mobile:doctor, mobile:setup, mobile:dev, mobile:test, mobile:analyze, mobile:format.",
+      "kind": "paragraph",
+      "path": "paragraph:54",
+      "status": "preserved"
+    },
+    {
+      "detail": "Path: apps/mobile. Routes: /login, /register, /home, /projects, /notifications, /admin/*.",
+      "kind": "paragraph",
+      "path": "paragraph:55",
+      "status": "preserved"
+    },
+    {
+      "detail": "API client generated t\u1eeb OpenAPI spec t\u1ea1i lib/generated/api/.",
+      "kind": "paragraph",
+      "path": "paragraph:56",
+      "status": "preserved"
+    },
+    {
+      "detail": "",
+      "kind": "paragraph",
+      "path": "paragraph:57",
+      "status": "preserved"
+    },
+    {
+      "detail": "Public Website",
+      "kind": "paragraph",
+      "path": "paragraph:58",
+      "status": "preserved"
+    },
+    {
+      "detail": "Vai tr\u00f2: Public-facing website \u2014 App Router v\u1edbi [locale] prefix.",
+      "kind": "paragraph",
+      "path": "paragraph:59",
+      "status": "preserved"
+    },
+    {
+      "detail": "Monorepo template doanh nghi\u1ec7p cho full-stack \u1ee9ng d\u1ee5ng \u2014 Backend NestJS, Web Frontend Next.js/React, Mobile Flutter.",
+      "kind": "paragraph",
+      "path": "paragraph:6",
+      "status": "preserved"
+    },
+    {
+      "detail": "Stack: Next.js 16, React 19, TanStack Query, shadcn/ui, Tailwind CSS 4. Port: 3000.",
+      "kind": "paragraph",
+      "path": "paragraph:60",
+      "status": "preserved"
+    },
+    {
+      "detail": "Scripts: build, dev, test (vitest), test:e2e (Playwright), typecheck.",
+      "kind": "paragraph",
+      "path": "paragraph:61",
+      "status": "preserved"
+    },
+    {
+      "detail": "Path: apps/web. Workspace deps: @repo/api-contract, @repo/env-loader, @repo/web-server, @repo/web-test, @repo/web-ui, @r",
+      "kind": "paragraph",
+      "path": "paragraph:62",
+      "status": "preserved"
+    },
+    {
+      "detail": "",
+      "kind": "paragraph",
+      "path": "paragraph:63",
+      "status": "preserved"
+    },
+    {
+      "detail": "API Contract",
+      "kind": "paragraph",
+      "path": "paragraph:64",
+      "status": "preserved"
+    },
+    {
+      "detail": "Vai tr\u00f2: Generated OpenAPI contract types. Kh\u00f4ng edit tay.",
+      "kind": "paragraph",
+      "path": "paragraph:65",
+      "status": "preserved"
+    },
+    {
+      "detail": "Path: packages/api-contract. Layer: contract.",
+      "kind": "paragraph",
+      "path": "paragraph:66",
+      "status": "preserved"
+    },
+    {
+      "detail": "Lu\u1ed3ng generate: NestJS \u2192 OpenAPI JSON \u2192 openapi-typescript \u2192 src/generated/index.ts.",
+      "kind": "paragraph",
+      "path": "paragraph:67",
+      "status": "preserved"
+    },
+    {
+      "detail": "",
+      "kind": "paragraph",
+      "path": "paragraph:68",
+      "status": "preserved"
+    },
+    {
+      "detail": "API Core",
+      "kind": "paragraph",
+      "path": "paragraph:69",
+      "status": "preserved"
+    },
+    {
+      "detail": "Ki\u1ebfn tr\u00fac: Backend ph\u00e2n t\u1ea7ng Presentation \u2192 Application \u2192 Domain \u2192 App Ports \u2192 Infrastructure. Frontend ph\u00e2n t\u1ea7ng d\u1ecdc Ro",
+      "kind": "paragraph",
+      "path": "paragraph:7",
+      "status": "preserved"
+    },
+    {
+      "detail": "Vai tr\u00f2: Shared backend kernel \u2014 errors, guards, decorators, interceptors, RBAC, config, logging, ports.",
+      "kind": "paragraph",
+      "path": "paragraph:70",
+      "status": "preserved"
+    },
+    {
+      "detail": "Path: packages/api-core. Layer: core.",
+      "kind": "paragraph",
+      "path": "paragraph:71",
+      "status": "preserved"
+    },
+    {
+      "detail": "Modules: common/errors, common/filters, common/guards, common/decorators, common/interceptors, common/rbac, common/throt",
+      "kind": "paragraph",
+      "path": "paragraph:72",
+      "status": "preserved"
+    },
+    {
+      "detail": "",
+      "kind": "paragraph",
+      "path": "paragraph:73",
+      "status": "preserved"
+    },
+    {
+      "detail": "API Database",
+      "kind": "paragraph",
+      "path": "paragraph:74",
+      "status": "preserved"
+    },
+    {
+      "detail": "Vai tr\u00f2: Drizzle schema + multi-tenant DB runtime \u2014 table definitions, RLS, database provider.",
+      "kind": "paragraph",
+      "path": "paragraph:75",
+      "status": "preserved"
+    },
+    {
+      "detail": "Path: packages/api-database. Layer: database.",
+      "kind": "paragraph",
+      "path": "paragraph:76",
+      "status": "preserved"
+    },
+    {
+      "detail": "Ch\u1ec9 repository (infrastructure) \u0111\u01b0\u1ee3c import t\u1eeb \u0111\u00e2y. Application layers kh\u00f4ng touch Drizzle.",
+      "kind": "paragraph",
+      "path": "paragraph:77",
+      "status": "preserved"
+    },
+    {
+      "detail": "",
+      "kind": "paragraph",
+      "path": "paragraph:78",
+      "status": "preserved"
+    },
+    {
+      "detail": "API Health",
+      "kind": "paragraph",
+      "path": "paragraph:79",
+      "status": "preserved"
+    },
+    {
+      "detail": "Workflow ch\u00ednh: pnpm + Turborepo cho qu\u1ea3n l\u00fd monorepo. Ch\u1ea1y pnpm run dev:turbo \u0111\u1ec3 kh\u1edfi \u0111\u1ed9ng dev.",
+      "kind": "paragraph",
+      "path": "paragraph:8",
+      "status": "preserved"
+    },
+    {
+      "detail": "Vai tr\u00f2: Health check module \u2014 GET /api/v1/health v\u1edbi database + queue depth indicators.",
+      "kind": "paragraph",
+      "path": "paragraph:80",
+      "status": "preserved"
+    },
+    {
+      "detail": "Path: packages/api-health. Layer: health.",
+      "kind": "paragraph",
+      "path": "paragraph:81",
+      "status": "preserved"
+    },
+    {
+      "detail": "",
+      "kind": "paragraph",
+      "path": "paragraph:82",
+      "status": "preserved"
+    },
+    {
+      "detail": "API Identity",
+      "kind": "paragraph",
+      "path": "paragraph:83",
+      "status": "preserved"
+    },
+    {
+      "detail": "Vai tr\u00f2: Bounded context identity & access \u2014 auth, MFA, SSO, users, organizations, RBAC, preferences.",
+      "kind": "paragraph",
+      "path": "paragraph:84",
+      "status": "preserved"
+    },
+    {
+      "detail": "Path: packages/api-identity. Layer: identity. Package l\u1edbn nh\u1ea5t trong backend.",
+      "kind": "paragraph",
+      "path": "paragraph:85",
+      "status": "preserved"
+    },
+    {
+      "detail": "Modules: auth, mfa, sso, users, organizations, access-control, preferences. M\u1ed7i module theo architecture presentation/ \u2192",
+      "kind": "paragraph",
+      "path": "paragraph:86",
+      "status": "preserved"
+    },
+    {
+      "detail": "",
+      "kind": "paragraph",
+      "path": "paragraph:87",
+      "status": "preserved"
+    },
+    {
+      "detail": "API Platform",
+      "kind": "paragraph",
+      "path": "paragraph:88",
+      "status": "preserved"
+    },
+    {
+      "detail": "Vai tr\u00f2: Bounded context platform capabilities \u2014 jobs, files, notifications, audit, mail, imports/exports.",
+      "kind": "paragraph",
+      "path": "paragraph:89",
+      "status": "preserved"
+    },
+    {
+      "detail": "R\u00e0ng bu\u1ed9c l\u1edbn nh\u1ea5t: Kh\u00f4ng ph\u00e1 v\u1ee1 c\u1ea5u tr\u00fac layer \u2014 Presentation kh\u00f4ng \u0111\u01b0\u1ee3c g\u1ecdi Infrastructure tr\u1ef1c ti\u1ebfp.",
+      "kind": "paragraph",
+      "path": "paragraph:9",
+      "status": "preserved"
+    },
+    {
+      "detail": "Path: packages/api-platform. Layer: platform.",
+      "kind": "paragraph",
+      "path": "paragraph:90",
+      "status": "preserved"
+    },
+    {
+      "detail": "Hazard: Cross-module circular DI c\u00f3 th\u1ec3 abort e2e silently.",
+      "kind": "paragraph",
+      "path": "paragraph:91",
+      "status": "preserved"
+    },
+    {
+      "detail": "",
+      "kind": "paragraph",
+      "path": "paragraph:92",
+      "status": "preserved"
+    },
+    {
+      "detail": "API Seed",
+      "kind": "paragraph",
+      "path": "paragraph:93",
+      "status": "preserved"
+    },
+    {
+      "detail": "Vai tr\u00f2: Idempotent development/demo data seeding.",
+      "kind": "paragraph",
+      "path": "paragraph:94",
+      "status": "preserved"
+    },
+    {
+      "detail": "Path: packages/api-seed. Layer: bootstrap. Entry: seedDatabase() qua pnpm db:seed.",
+      "kind": "paragraph",
+      "path": "paragraph:95",
+      "status": "preserved"
+    },
+    {
+      "detail": "M\u1ecdi insert ph\u1ea3i idempotent (upsert ho\u1eb7c existence-check).",
+      "kind": "paragraph",
+      "path": "paragraph:96",
+      "status": "preserved"
+    },
+    {
+      "detail": "",
+      "kind": "paragraph",
+      "path": "paragraph:97",
+      "status": "preserved"
+    },
+    {
+      "detail": "API Sort",
+      "kind": "paragraph",
+      "path": "paragraph:98",
+      "status": "preserved"
+    },
+    {
+      "detail": "Vai tr\u00f2: Multi-column sort parsing \u2014 format sort=field:asc,other:desc v\u1edbi allow-list validation.",
+      "kind": "paragraph",
+      "path": "paragraph:99",
+      "status": "preserved"
+    },
+    {
+      "detail": "rows=26",
+      "kind": "table",
+      "path": "table:0",
+      "status": "preserved"
+    },
+    {
+      "detail": "Wiki unit",
+      "kind": "table-cell",
+      "path": "table:0/r0c0",
+      "status": "preserved"
+    },
+    {
+      "detail": "Kind",
+      "kind": "table-cell",
+      "path": "table:0/r0c1",
+      "status": "preserved"
+    },
+    {
+      "detail": "Source paths",
+      "kind": "table-cell",
+      "path": "table:0/r0c2",
+      "status": "preserved"
+    },
+    {
+      "detail": "Workspaces: API Health",
+      "kind": "table-cell",
+      "path": "table:0/r10c0",
+      "status": "preserved"
+    },
+    {
+      "detail": "section (H2)",
+      "kind": "table-cell",
+      "path": "table:0/r10c1",
+      "status": "preserved"
+    },
+    {
+      "detail": "packages/api-health",
+      "kind": "table-cell",
+      "path": "table:0/r10c2",
+      "status": "preserved"
+    },
+    {
+      "detail": "Workspaces: API Identity",
+      "kind": "table-cell",
+      "path": "table:0/r11c0",
+      "status": "preserved"
+    },
+    {
+      "detail": "section (H2)",
+      "kind": "table-cell",
+      "path": "table:0/r11c1",
+      "status": "preserved"
+    },
+    {
+      "detail": "packages/api-identity",
+      "kind": "table-cell",
+      "path": "table:0/r11c2",
+      "status": "preserved"
+    },
+    {
+      "detail": "Workspaces: API Platform",
+      "kind": "table-cell",
+      "path": "table:0/r12c0",
+      "status": "preserved"
+    },
+    {
+      "detail": "section (H2)",
+      "kind": "table-cell",
+      "path": "table:0/r12c1",
+      "status": "preserved"
+    },
+    {
+      "detail": "packages/api-platform",
+      "kind": "table-cell",
+      "path": "table:0/r12c2",
+      "status": "preserved"
+    },
+    {
+      "detail": "Workspaces: API Seed",
+      "kind": "table-cell",
+      "path": "table:0/r13c0",
+      "status": "preserved"
+    },
+    {
+      "detail": "section (H2)",
+      "kind": "table-cell",
+      "path": "table:0/r13c1",
+      "status": "preserved"
+    },
+    {
+      "detail": "packages/api-seed",
+      "kind": "table-cell",
+      "path": "table:0/r13c2",
+      "status": "preserved"
+    },
+    {
+      "detail": "Workspaces: API Sort",
+      "kind": "table-cell",
+      "path": "table:0/r14c0",
+      "status": "preserved"
+    },
+    {
+      "detail": "section (H2)",
+      "kind": "table-cell",
+      "path": "table:0/r14c1",
+      "status": "preserved"
+    },
+    {
+      "detail": "packages/api-sort",
+      "kind": "table-cell",
+      "path": "table:0/r14c2",
+      "status": "preserved"
+    },
+    {
+      "detail": "Workspaces: Config",
+      "kind": "table-cell",
+      "path": "table:0/r15c0",
+      "status": "preserved"
+    },
+    {
+      "detail": "section (H2)",
+      "kind": "table-cell",
+      "path": "table:0/r15c1",
+      "status": "preserved"
+    },
+    {
+      "detail": "packages/config",
+      "kind": "table-cell",
+      "path": "table:0/r15c2",
+      "status": "preserved"
+    },
+    {
+      "detail": "Workspaces: Env Loader",
+      "kind": "table-cell",
+      "path": "table:0/r16c0",
+      "status": "preserved"
+    },
+    {
+      "detail": "section (H2)",
+      "kind": "table-cell",
+      "path": "table:0/r16c1",
+      "status": "preserved"
+    },
+    {
+      "detail": "packages/env-loader",
+      "kind": "table-cell",
+      "path": "table:0/r16c2",
+      "status": "preserved"
+    },
+    {
+      "detail": "Workspaces: ESLint Config",
+      "kind": "table-cell",
+      "path": "table:0/r17c0",
+      "status": "preserved"
+    },
+    {
+      "detail": "section (H2)",
+      "kind": "table-cell",
+      "path": "table:0/r17c1",
+      "status": "preserved"
+    },
+    {
+      "detail": "packages/eslint-config",
+      "kind": "table-cell",
+      "path": "table:0/r17c2",
+      "status": "preserved"
+    },
+    {
+      "detail": "Workspaces: TSConfig",
+      "kind": "table-cell",
+      "path": "table:0/r18c0",
+      "status": "preserved"
+    },
+    {
+      "detail": "section (H2)",
+      "kind": "table-cell",
+      "path": "table:0/r18c1",
+      "status": "preserved"
+    },
+    {
+      "detail": "packages/tsconfig",
+      "kind": "table-cell",
+      "path": "table:0/r18c2",
+      "status": "preserved"
+    },
+    {
+      "detail": "Workspaces: Utils",
+      "kind": "table-cell",
+      "path": "table:0/r19c0",
+      "status": "preserved"
+    },
+    {
+      "detail": "section (H2)",
+      "kind": "table-cell",
+      "path": "table:0/r19c1",
+      "status": "preserved"
+    },
+    {
+      "detail": "packages/utils",
+      "kind": "table-cell",
+      "path": "table:0/r19c2",
+      "status": "preserved"
+    },
+    {
+      "detail": "Home",
+      "kind": "table-cell",
+      "path": "table:0/r1c0",
+      "status": "preserved"
+    },
+    {
+      "detail": "section (H1)",
+      "kind": "table-cell",
+      "path": "table:0/r1c1",
+      "status": "preserved"
+    },
+    {
+      "detail": "package.json, pnpm-workspace.yaml, DESIGN.md",
+      "kind": "table-cell",
+      "path": "table:0/r1c2",
+      "status": "preserved"
+    },
+    {
+      "detail": "Workspaces: Web Hooks",
+      "kind": "table-cell",
+      "path": "table:0/r20c0",
+      "status": "preserved"
+    },
+    {
+      "detail": "section (H2)",
+      "kind": "table-cell",
+      "path": "table:0/r20c1",
+      "status": "preserved"
+    },
+    {
+      "detail": "packages/web-hooks",
+      "kind": "table-cell",
+      "path": "table:0/r20c2",
+      "status": "preserved"
+    },
+    {
+      "detail": "Workspaces: Web Server",
+      "kind": "table-cell",
+      "path": "table:0/r21c0",
+      "status": "preserved"
+    },
+    {
+      "detail": "section (H2)",
+      "kind": "table-cell",
+      "path": "table:0/r21c1",
+      "status": "preserved"
+    },
+    {
+      "detail": "packages/web-server",
+      "kind": "table-cell",
+      "path": "table:0/r21c2",
+      "status": "preserved"
+    },
+    {
+      "detail": "Workspaces: Web Test",
+      "kind": "table-cell",
+      "path": "table:0/r22c0",
+      "status": "preserved"
+    },
+    {
+      "detail": "section (H2)",
+      "kind": "table-cell",
+      "path": "table:0/r22c1",
+      "status": "preserved"
+    },
+    {
+      "detail": "packages/web-test",
+      "kind": "table-cell",
+      "path": "table:0/r22c2",
+      "status": "preserved"
+    },
+    {
+      "detail": "Workspaces: Web UI",
+      "kind": "table-cell",
+      "path": "table:0/r23c0",
+      "status": "preserved"
+    },
+    {
+      "detail": "section (H2)",
+      "kind": "table-cell",
+      "path": "table:0/r23c1",
+      "status": "preserved"
+    },
+    {
+      "detail": "packages/web-ui",
+      "kind": "table-cell",
+      "path": "table:0/r23c2",
+      "status": "preserved"
+    },
+    {
+      "detail": "Workspaces: Web Utils",
+      "kind": "table-cell",
+      "path": "table:0/r24c0",
+      "status": "preserved"
+    },
+    {
+      "detail": "section (H2)",
+      "kind": "table-cell",
+      "path": "table:0/r24c1",
+      "status": "preserved"
+    },
+    {
+      "detail": "packages/web-utils",
+      "kind": "table-cell",
+      "path": "table:0/r24c2",
+      "status": "preserved"
+    },
+    {
+      "detail": "Workspaces: TSC7",
+      "kind": "table-cell",
+      "path": "table:0/r25c0",
+      "status": "preserved"
+    },
+    {
+      "detail": "section (H2)",
+      "kind": "table-cell",
+      "path": "table:0/r25c1",
+      "status": "preserved"
+    },
+    {
+      "detail": "tools/tsc7",
+      "kind": "table-cell",
+      "path": "table:0/r25c2",
+      "status": "preserved"
+    },
+    {
+      "detail": "Architecture",
+      "kind": "table-cell",
+      "path": "table:0/r2c0",
+      "status": "preserved"
+    },
+    {
+      "detail": "section (H1)",
+      "kind": "table-cell",
+      "path": "table:0/r2c1",
+      "status": "preserved"
+    },
+    {
+      "detail": "DESIGN.md, packages/api-core, packages/api-identity, packages/api-platform",
+      "kind": "table-cell",
+      "path": "table:0/r2c2",
+      "status": "preserved"
+    },
+    {
+      "detail": "Workspaces: Admin",
+      "kind": "table-cell",
+      "path": "table:0/r3c0",
+      "status": "preserved"
+    },
+    {
+      "detail": "section (H2)",
+      "kind": "table-cell",
+      "path": "table:0/r3c1",
+      "status": "preserved"
+    },
+    {
+      "detail": "apps/admin",
+      "kind": "table-cell",
+      "path": "table:0/r3c2",
+      "status": "preserved"
+    },
+    {
+      "detail": "Workspaces: API",
+      "kind": "table-cell",
+      "path": "table:0/r4c0",
+      "status": "preserved"
+    },
+    {
+      "detail": "section (H2)",
+      "kind": "table-cell",
+      "path": "table:0/r4c1",
+      "status": "preserved"
+    },
+    {
+      "detail": "apps/api",
+      "kind": "table-cell",
+      "path": "table:0/r4c2",
+      "status": "preserved"
+    },
+    {
+      "detail": "Workspaces: Mobile",
+      "kind": "table-cell",
+      "path": "table:0/r5c0",
+      "status": "preserved"
+    },
+    {
+      "detail": "section (H2)",
+      "kind": "table-cell",
+      "path": "table:0/r5c1",
+      "status": "preserved"
+    },
+    {
+      "detail": "apps/mobile",
+      "kind": "table-cell",
+      "path": "table:0/r5c2",
+      "status": "preserved"
+    },
+    {
+      "detail": "Workspaces: Web",
+      "kind": "table-cell",
+      "path": "table:0/r6c0",
+      "status": "preserved"
+    },
+    {
+      "detail": "section (H2)",
+      "kind": "table-cell",
+      "path": "table:0/r6c1",
+      "status": "preserved"
+    },
+    {
+      "detail": "apps/web",
+      "kind": "table-cell",
+      "path": "table:0/r6c2",
+      "status": "preserved"
+    },
+    {
+      "detail": "Workspaces: API Contract",
+      "kind": "table-cell",
+      "path": "table:0/r7c0",
+      "status": "preserved"
+    },
+    {
+      "detail": "section (H2)",
+      "kind": "table-cell",
+      "path": "table:0/r7c1",
+      "status": "preserved"
+    },
+    {
+      "detail": "packages/api-contract",
+      "kind": "table-cell",
+      "path": "table:0/r7c2",
+      "status": "preserved"
+    },
+    {
+      "detail": "Workspaces: API Core",
+      "kind": "table-cell",
+      "path": "table:0/r8c0",
+      "status": "preserved"
+    },
+    {
+      "detail": "section (H2)",
+      "kind": "table-cell",
+      "path": "table:0/r8c1",
+      "status": "preserved"
+    },
+    {
+      "detail": "packages/api-core",
+      "kind": "table-cell",
+      "path": "table:0/r8c2",
+      "status": "preserved"
+    },
+    {
+      "detail": "Workspaces: API Database",
+      "kind": "table-cell",
+      "path": "table:0/r9c0",
+      "status": "preserved"
+    },
+    {
+      "detail": "section (H2)",
+      "kind": "table-cell",
+      "path": "table:0/r9c1",
+      "status": "preserved"
+    },
+    {
+      "detail": "packages/api-database",
+      "kind": "table-cell",
+      "path": "table:0/r9c2",
+      "status": "preserved"
+    },
+    {
+      "detail": "Formula recalculation / optional conversion (not installed; check skipped)",
+      "kind": "optional-check",
+      "path": "tool:libreoffice",
+      "status": "skipped"
+    },
+    {
+      "detail": "PDF rasterization / text utilities (not installed; check skipped)",
+      "kind": "optional-check",
+      "path": "tool:poppler",
+      "status": "skipped"
+    },
+    {
+      "detail": "docx package part",
+      "kind": "ooxml-part",
+      "path": "word/_rels/document.xml.rels",
+      "status": "preserved"
+    },
+    {
+      "detail": "docx package part",
+      "kind": "ooxml-part",
+      "path": "word/document.xml",
+      "status": "preserved"
+    },
+    {
+      "detail": "docx package part",
+      "kind": "ooxml-part",
+      "path": "word/fontTable.xml",
+      "status": "preserved"
+    },
+    {
+      "detail": "docx package part",
+      "kind": "ooxml-part",
+      "path": "word/numbering.xml",
+      "status": "preserved"
+    },
+    {
+      "detail": "docx package part",
+      "kind": "ooxml-part",
+      "path": "word/settings.xml",
+      "status": "preserved"
+    },
+    {
+      "detail": "docx package part",
+      "kind": "ooxml-part",
+      "path": "word/styles.xml",
+      "status": "preserved"
+    },
+    {
+      "detail": "docx package part",
+      "kind": "ooxml-part",
+      "path": "word/stylesWithEffects.xml",
+      "status": "preserved"
+    },
+    {
+      "detail": "docx package part",
+      "kind": "ooxml-part",
+      "path": "word/theme/theme1.xml",
+      "status": "preserved"
+    },
+    {
+      "detail": "docx package part",
+      "kind": "ooxml-part",
+      "path": "word/webSettings.xml",
+      "status": "preserved"
+    }
+  ],
+  "notes": [
+    "semantic_fingerprint=61320a8a61e995c80033834b498bc680f4ea3990e8fad8afb62607bc76a24ae0"
+  ],
+  "operation": "create",
+  "output": ".agents/wiki/Super-Template-wiki.docx",
+  "source": null
+}

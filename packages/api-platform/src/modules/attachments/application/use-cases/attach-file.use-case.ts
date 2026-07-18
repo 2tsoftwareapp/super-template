@@ -4,7 +4,7 @@ import type {
 } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import {  AppError, ERROR_CODES , SYSTEM_SCOPE } from '@repo/api-core';
+import {  AppError, ERROR_CODES , SYSTEM_SCOPE, TRANSACTION_PORT, type TransactionPort } from '@repo/api-core';
 
 import type { AttachEntityCommand } from '../attachments.types';
 
@@ -18,6 +18,7 @@ export class AttachFileUseCase {
   constructor(
     @Inject(ATTACHMENTS_REPOSITORY) private readonly attachmentsRepository: AttachmentsRepositoryPort,
     @Inject(FILES_REPOSITORY) private readonly filesRepository: FilesRepositoryPort,
+    @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
     private readonly auditService: AuditService,
   ) {}
 
@@ -44,28 +45,36 @@ export class AttachFileUseCase {
       );
     }
 
-    const attachment = await this.attachmentsRepository.create({
-      organizationId: file.organizationId,
-      fileId: input.fileId,
-      entityType: input.entityType,
-      entityId: input.entityId,
-      label: input.label ?? null,
-      createdById: actor.userId,
-    });
+    const attachment = await this.transactionPort.withTenant(
+      { tenantId: file.organizationId, userId: actor.userId },
+      async (tx) => {
+        const attachRecord = await this.attachmentsRepository.create({
+          organizationId: file.organizationId!,
+          fileId: input.fileId,
+          entityType: input.entityType,
+          entityId: input.entityId,
+          label: input.label ?? null,
+          createdById: actor.userId,
+        }, tx);
 
-    if (!attachment) {
-      throw new Error('Attachment insert returned no rows');
-    }
+        if (!attachRecord) {
+          throw new Error('Attachment insert returned no rows');
+        }
 
-    await this.auditService.log({
-      actorId: actor.userId,
-      action: 'attachment.created',
-      entityType: input.entityType,
-      entityId: input.entityId,
-      metadata: { attachmentId: attachment.id, fileId: input.fileId },
-      requestContext,
-      ...(file.organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: file.organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
-    });
+        await this.auditService.log({
+          actorId: actor.userId,
+          action: 'attachment.created',
+          entityType: input.entityType,
+          entityId: input.entityId,
+          metadata: { attachmentId: attachRecord.id, fileId: input.fileId },
+          requestContext,
+          scope: SYSTEM_SCOPE.ORGANIZATION,
+          organizationId: file.organizationId!,
+        }, tx);
+
+        return attachRecord;
+      }
+    );
 
     return AttachmentsMapper.toAttachmentDto(attachment);
   }

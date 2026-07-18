@@ -4,7 +4,7 @@ import type {
 } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import {  AppError, ERROR_CODES, requireOrganizationId , SYSTEM_SCOPE } from '@repo/api-core';
+import {  AppError, ERROR_CODES, requireOrganizationId , SYSTEM_SCOPE, TRANSACTION_PORT, type TransactionPort } from '@repo/api-core';
 import { createHash, randomUUID } from 'node:crypto';
 
 import { AuditService } from '../../../audit/application/audit.service';
@@ -34,6 +34,7 @@ export class CreateFileVersionUseCase {
     private readonly fileAccessService: FileAccessService,
     @Inject(FILES_REPOSITORY) private readonly filesRepository: FilesRepositoryPort,
     @Inject(OBJECT_STORAGE) private readonly objectStorage: ObjectStorage,
+    @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
     private readonly auditService: AuditService,
   ) {}
 
@@ -90,41 +91,50 @@ export class CreateFileVersionUseCase {
     });
 
     try {
-      await this.filesRepository.createVersion({
-        fileId: existing.id,
-        organizationId,
-        versionNumber: nextVersion,
-        storageKey,
-        mimeType: detectedMimeType,
-        sizeBytes: file.size,
-        checksum,
-        createdById: actor.userId,
-      });
+      const updated = await this.transactionPort.withTenant(
+        { tenantId: organizationId, userId: actor.userId },
+        async (tx) => {
+          await this.filesRepository.createVersion({
+            fileId: existing.id,
+            organizationId,
+            versionNumber: nextVersion,
+            storageKey,
+            mimeType: detectedMimeType,
+            sizeBytes: file.size,
+            checksum,
+            createdById: actor.userId,
+          }, tx);
 
-      const updated = await this.filesRepository.setCurrentVersion(
-        existing.id,
-        {
-          storageKey,
-          mimeType: detectedMimeType,
-          sizeBytes: file.size,
-          checksum,
-          latestVersion: nextVersion,
-        },
+          const updatedRecord = await this.filesRepository.setCurrentVersion(
+            existing.id,
+            {
+              storageKey,
+              mimeType: detectedMimeType,
+              sizeBytes: file.size,
+              checksum,
+              latestVersion: nextVersion,
+            },
+            tx
+          );
+
+          if (!updatedRecord) {
+            throw new Error('File version update returned no rows');
+          }
+
+          await this.auditService.log({
+            actorId: actor.userId,
+            action: 'file.version_uploaded',
+            entityType: 'file',
+            entityId: existing.id,
+            metadata: { versionNumber: nextVersion },
+            requestContext,
+            scope: SYSTEM_SCOPE.ORGANIZATION,
+            organizationId,
+          }, tx);
+
+          return updatedRecord;
+        }
       );
-
-      if (!updated) {
-        throw new Error('File version update returned no rows');
-      }
-
-      await this.auditService.log({
-        actorId: actor.userId,
-        action: 'file.version_uploaded',
-        entityType: 'file',
-        entityId: existing.id,
-        metadata: { versionNumber: nextVersion },
-        requestContext,
-      ...(organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
-    });
 
       return FilesMapper.toFileDto(updated);
     } catch (error) {

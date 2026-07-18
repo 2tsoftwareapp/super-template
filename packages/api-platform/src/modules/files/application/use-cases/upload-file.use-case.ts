@@ -4,7 +4,7 @@ import type {
 } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import {  AppError, ERROR_CODES, requireOrganizationId , SYSTEM_SCOPE } from '@repo/api-core';
+import {  AppError, ERROR_CODES, requireOrganizationId , SYSTEM_SCOPE, TRANSACTION_PORT, type TransactionPort } from '@repo/api-core';
 import { createHash, randomUUID } from 'node:crypto';
 
 import { AuditService } from '../../../audit/application/audit.service';
@@ -32,6 +32,7 @@ export class UploadFileUseCase {
   constructor(
     @Inject(FILES_REPOSITORY) private readonly filesRepository: FilesRepositoryPort,
     @Inject(OBJECT_STORAGE) private readonly objectStorage: ObjectStorage,
+    @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
     private readonly auditService: AuditService,
   ) {}
 
@@ -80,40 +81,48 @@ export class UploadFileUseCase {
 
     try {
       const organizationId = requireOrganizationId(actor);
-      const record = await this.filesRepository.create({
-        organizationId,
-        storageKey,
-        originalName: file.originalname,
-        mimeType: detectedMimeType,
-        sizeBytes: file.size,
-        checksum,
-        latestVersion: 1,
-        uploadedById: actor.userId,
-      });
+      const record = await this.transactionPort.withTenant(
+        { tenantId: organizationId, userId: actor.userId },
+        async (tx) => {
+          const fileRecord = await this.filesRepository.create({
+            organizationId,
+            storageKey,
+            originalName: file.originalname,
+            mimeType: detectedMimeType,
+            sizeBytes: file.size,
+            checksum,
+            latestVersion: 1,
+            uploadedById: actor.userId,
+          }, tx);
 
-      if (!record) {
-        throw new Error('File insert returned no rows');
-      }
+          if (!fileRecord) {
+            throw new Error('File insert returned no rows');
+          }
 
-      await this.filesRepository.createVersion({
-        fileId: record.id,
-        organizationId,
-        versionNumber: 1,
-        storageKey,
-        mimeType: detectedMimeType,
-        sizeBytes: file.size,
-        checksum,
-        createdById: actor.userId,
-      });
+          await this.filesRepository.createVersion({
+            fileId: fileRecord.id,
+            organizationId,
+            versionNumber: 1,
+            storageKey,
+            mimeType: detectedMimeType,
+            sizeBytes: file.size,
+            checksum,
+            createdById: actor.userId,
+          }, tx);
 
-      await this.auditService.log({
-        actorId: actor.userId,
-        action: 'file.uploaded',
-        entityType: 'file',
-        entityId: record.id,
-        requestContext,
-      ...(organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
-    });
+          await this.auditService.log({
+            actorId: actor.userId,
+            action: 'file.uploaded',
+            entityType: 'file',
+            entityId: fileRecord.id,
+            requestContext,
+            scope: SYSTEM_SCOPE.ORGANIZATION,
+            organizationId,
+          }, tx);
+
+          return fileRecord;
+        }
+      );
 
       return FilesMapper.toFileDto(record);
     } catch (error) {

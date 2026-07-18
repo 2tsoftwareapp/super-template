@@ -91,6 +91,7 @@ export interface ListFilesQuery {
   from?: string;
   to?: string;
   includeDeleted?: boolean;
+  excludeKinds?: string[];
   sortField: 'createdAt' | 'originalName' | 'sizeBytes';
   sortOrder: 'asc' | 'desc';
 }

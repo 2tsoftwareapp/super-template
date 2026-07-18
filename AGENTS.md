@@ -54,6 +54,9 @@ and conventions.
 - `.agents/memory/`: Cross-task, durable knowledge base. `INDEX.md` is the
   80/20 map; each entry holds the vital few from a finished task. `done` writes
   it; any skill may read it.
+- `.agents/wiki/`: Human-facing project wiki maintained by the `docs` skill
+  (location/format/strategy from `rules.docs`). Distinct from `PRJ_REFERENCE.md`
+  (agent context).
 - `.agents/DESIGN_SYSTEM.md`: Compact enterprise HTML recipe (semantic +
   short `.ss-*` classes; beauty in CSS, not utility soup).
 - `.agents/THIRD_PARTY_SKILLS.md`: Sources, revisions, and licenses for vendored skills.
@@ -324,6 +327,29 @@ task is **not** done. Do not patch silently and do not open a new session.
 5. **Feed memory.** When `done` re-runs, record the defect as a **Gotcha** in the
    task's `.agents/memory/` entry (update it, don't duplicate) — this is exactly
    the 80/20 knowledge worth keeping.
+
+### Documentation wiki
+
+`docs` → standards-based doc set under `rules.docs.location` (default `.agents/wiki/`)
+
+- A **real enterprise documentation set**, not a skim: SRS (ISO/IEC/IEEE 29148),
+  Architecture (arc42 + C4 + 4+1 views), ADRs, High-Level Design, Low-Level
+  Design, Reference (API + data model), Operations (runbook), and Guides
+  (Diátaxis) — with a coverage matrix, stable IDs, and traceability. It reuses
+  session artifacts (SRS ← business-analysis/DISCUSSION, HLD ← BASIC_DESIGN,
+  LLD ← DETAIL_DESIGN, ADRs ← decision gates) and marks `Gap`/`Unknown` rather
+  than inventing.
+- Two modes: `full` (author the whole set, document by document) and `sync`
+  (update only the documents/sections a code change affects, via `.docmap.md`).
+- `rules.docs.format` picks the organization: `markdown` (doc tree — the
+  canonical source), `html` (linked pages + theme), `docx` (one controlled
+  document with TOC, via the `docx` skill), or `xlsx` (workbook of registers/
+  matrices, via the `xlsx` skill). html/docx/xlsx render from the markdown source.
+- `rules.docs.sync_strategy` controls how it stays in step with code:
+  - `main-only`: wiki is written **only** on the base/main branch; feature
+    branches never touch it.
+  - `with-commit`: `done` runs `docs sync` and includes the wiki in the **same
+    commit** as the task, so docs travel through the PR.
 
 ### Investigation
 

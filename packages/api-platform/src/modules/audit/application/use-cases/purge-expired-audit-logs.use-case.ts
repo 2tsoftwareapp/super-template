@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import {  EnvironmentService , SYSTEM_SCOPE } from '@repo/api-core';
-import { DATABASE_POOL } from '@repo/api-database';
+import { ADVISORY_LOCK_PORT, PLATFORM_TRANSACTION_PORT, type AdvisoryLockPort, type PlatformTransactionPort } from '@repo/api-core';
 
 import { AUDIT_REPOSITORY, type AuditRepositoryPort } from '../ports/audit.repository.port';
 import { RecordAuditLogUseCase } from './record-audit-log.use-case';
@@ -15,8 +15,8 @@ export class PurgeExpiredAuditLogsUseCase {
     @Inject(AUDIT_REPOSITORY) private readonly auditRepository: AuditRepositoryPort,
     private readonly recordAuditLogUseCase: RecordAuditLogUseCase,
     private readonly environmentService: EnvironmentService,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    @Inject(DATABASE_POOL) private readonly pool: any,
+    @Inject(ADVISORY_LOCK_PORT) private readonly advisoryLockPort: AdvisoryLockPort,
+    @Inject(PLATFORM_TRANSACTION_PORT) private readonly platformTransactionPort: PlatformTransactionPort,
   ) {}
 
   async execute(): Promise<{ deletedCount: number; cutoff: Date } | null> {
@@ -29,45 +29,33 @@ export class PurgeExpiredAuditLogsUseCase {
     const cutoff = new Date(Date.now() - retentionDays * MILLISECONDS_PER_DAY);
 
     // Acquire a distributed advisory lock so only one replica runs the purge.
-    const client = await this.pool.connect();
-    let acquired = false;
+    return this.advisoryLockPort.withAdvisoryLock(PURGE_LOCK_ID, async () => {
+      return this.platformTransactionPort.run(async (tx) => {
+        // Delete in batches to keep each transaction short; the lock lives until
+        // the session ends (released implicitly on connection close or explicit
+        // pg_advisory_unlock).  PostgreSQL does not release advisory locks on
+        // transaction end by default.
+        const deletedCount = await this.auditRepository.deleteOlderThanBatched(
+          cutoff,
+          BATCH_SIZE,
+          tx,
+        );
 
-    try {
-      const lockResult = await client.query('SELECT pg_try_advisory_lock($1) AS acquired', [PURGE_LOCK_ID]);
-      acquired = lockResult.rows[0]?.acquired === true;
-      
-      if (!acquired) {
-        return null;
-      }
+        if (deletedCount > 0) {
+          await this.recordAuditLogUseCase.execute({
+            scope: SYSTEM_SCOPE.PLATFORM,
+            action: 'audit.retention_purged',
+            entityType: 'audit_log',
+            metadata: {
+              deletedCount,
+              cutoff: cutoff.toISOString(),
+              retentionDays,
+            },
+          }, tx);
+        }
 
-      // Delete in batches to keep each transaction short; the lock lives until
-      // the session ends (released implicitly on connection close or explicit
-      // pg_advisory_unlock).  PostgreSQL does not release advisory locks on
-      // transaction end by default.
-      const deletedCount = await this.auditRepository.deleteOlderThanBatched(
-        cutoff,
-        BATCH_SIZE,
-      );
-
-      if (deletedCount > 0) {
-        await this.recordAuditLogUseCase.execute({
-          scope: SYSTEM_SCOPE.PLATFORM,
-          action: 'audit.retention_purged',
-          entityType: 'audit_log',
-          metadata: {
-            deletedCount,
-            cutoff: cutoff.toISOString(),
-            retentionDays,
-          },
-        });
-      }
-
-      return { deletedCount, cutoff };
-    } finally {
-      if (acquired) {
-        await client.query('SELECT pg_advisory_unlock($1)', [PURGE_LOCK_ID]);
-      }
-      client.release();
-    }
+        return { deletedCount, cutoff };
+      });
+    });
   }
 }

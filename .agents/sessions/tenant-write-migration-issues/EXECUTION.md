@@ -1,85 +1,69 @@
 # Execution
 
-## Tóm tắt nội dung chính (Executive summary)
+## Executive summary (80/20)
 
-- Đã hoàn thành toàn bộ 9 nhiệm vụ trong kế hoạch để sửa lỗi RLS/Audit cho hệ thống Multi-tenant và refactor mã nguồn.
-- Đã sửa lỗi bảo mật cho Export ACL bằng cách bổ sung metadata `kind` và `visibility` vào bảng `files`, và cấu hình `FileAccessService` để block người dùng không có quyền (T-004, T-005).
-- Đã khắc phục lỗi connection leak do advisory lock khi dọn dẹp audit log bằng cách triển khai `try/finally` và `unlockAdvisoryLock` (T-006).
-- Đã thêm thông báo UI Truncated Toast khi export kết quả vượt quá giới hạn (T-007).
-- Đã thêm E2E test cho bảo mật ngăn chặn bypass file download (T-008).
-- **Mới**: Thay thế toàn bộ hardcode strings (`'AUDIT_EXPORT'`, `'RESTRICTED'`, `'platform'`, `'organization'`, `'SUPER_ADMIN'`) bằng các constants (`SYSTEM_SCOPE`, `FILE_KIND`, `FILE_VISIBILITY`, `ROLE_NAMES`) trong toàn bộ `api-core`, `api-platform` và `api-identity` (T-009).
+- **Outcome**: Bắt đầu thực thi Re-review Round 4.
+- **Progress**: T-007 đang được thực hiện.
+- **Verification**: N/A
+- **Blocker/Risk**: Không có.
+- **Next action**: Thực thi T-007.
 
-## Tổng quan trạng thái (Developer overview)
+## Developer overview
 
-| Mục | Trạng thái |
-| --- | --- |
-| **Status** | 🟢 `done` |
-| **Current task** | Hoàn thành |
-| **Done / Total** | 9 / 9 |
-| **Blockers** | 0 |
-| **Next action** | Chuyển sang bước review và tạo PR. |
-| **Owner** | Agent |
+- **Status**: In progress
+- **Current task**: T-007
+- **Done / Total**: 0 / 5
+- **Blockers**: None
+- **Next action**: Tạo PlatformTransactionPort.
 
-## Nguồn tham chiếu (Plan source)
+## Plan source
 
-- Tham chiếu: `PLAN.md` và `TASKS.md` trong `.agents/sessions/tenant-write-migration-issues/`.
+- `PLAN.md` và `TASKS.md` (Round 4)
 
-## Nhiệm vụ hiện tại (Current task)
+## Current task
 
-- Đã hoàn thành (All tasks completed)
+T-007
 
-## Phạm vi (Scope)
+## Scope
 
-- `packages/api-core`
-- `packages/api-platform`
-- `packages/api-identity`
-- `apps/api`
-- `apps/admin`
+Tạo `PlatformTransactionPort` ở core và implement ở database.
 
-## Tiến độ nhiệm vụ (Tasks progress)
+## Execution log
 
-- **T-001**: `done` - Update Audit Interfaces (Discriminated Union)
-- **T-002**: `done` - Refactor api-identity Call Sites
-- **T-003**: `done` - Refactor api-platform Call Sites
-- **T-004**: `done` - Secure Export logs with AUDIT_EXPORT
-- **T-005**: `done` - Block unauthorized AUDIT_EXPORT download
-- **T-006**: `done` - Fix Advisory Lock in Audit Repository
-- **T-007**: `done` - Implement UI Truncated Toast
-- **T-008**: `done` - Write Security E2E Tests
-- **T-009**: `done` - Refactor Hardcoded Strings to Constants
+| Step | Task ID | Action | Files | Result | Notes |
+|---|---|---|---|---|---|
+| 1 | T-007 | Start | N/A | In progress | Khởi tạo execution cho T-007 |
 
-## Tệp đã thay đổi (Files changed)
+## Tasks progress
 
-| Tệp | Tóm tắt thay đổi | Lý do | Theo kế hoạch? |
-| --- | --- | --- | --- |
-| `packages/api-core/src/common/constants/...` | Tạo và export `system.constants.ts`, `file.constants.ts` | T-009: Refactor hardcode strings | Yes |
-| `packages/api-identity/...` | Thay thế các literal strings bằng constants tương ứng | T-009: Refactor hardcode strings | Yes |
-| `packages/api-platform/...` | Thay thế các literal strings bằng constants tương ứng | T-009: Refactor hardcode strings | Yes |
-| `packages/api-platform/src/modules/audit/application/use-cases/export-audit-logs.use-case.ts` | Bổ sung `organizationId` thành null cho platform/super admin, và set file kind thành `AUDIT_EXPORT` | Sửa Export ACL | Yes |
-| `packages/api-platform/src/modules/files/application/services/file-access.service.ts` | Thêm kiểm tra `AUDIT_EXPORT` và role/permission | Ngăn tải trái phép | Yes |
-| `packages/api-platform/src/modules/audit/application/ports/audit.repository.port.ts` | Thêm `unlockAdvisoryLock` | Fix connection leak | Yes |
-| `packages/api-platform/src/modules/audit/infrastructure/audit.repository.ts` | Triển khai `unlockAdvisoryLock` | Fix connection leak | Yes |
-| `packages/api-platform/src/modules/audit/application/use-cases/purge-expired-audit-logs.use-case.ts` | Thêm `try/finally` và `unlockAdvisoryLock` | Fix connection leak | Yes |
-| `apps/admin/src/features/audit-logs/controllers/use-audit-logs-controller.ts` | Đọc `isTruncated` và gọi `toast.warning` | Implement UI Truncated Toast | Yes |
-| `apps/api/test/audit.e2e.spec.ts` | Thêm E2E test cho `Export ACL bypass` qua generic file endpoint | Đảm bảo tính bảo mật của fix | Yes |
+| ID | Status | Work items | Notes |
+|---|---|---|---|
+| T-007 | in_progress | 0/4 | Bắt đầu tạo Port |
+| T-008 | todo | 0/3 | |
+| T-009 | todo | 0/2 | |
+| T-010 | todo | 0/3 | |
+| T-011 | todo | 0/3 | |
 
-## Bằng chứng xác minh (Verification evidence)
+## Files changed
 
-| Kiểm tra | Lệnh / Phương pháp | Kết quả | Bằng chứng |
-| --- | --- | --- | --- |
-| Typecheck api-core | `pnpm --filter api-core run typecheck` | passed | Mọi file core hợp lệ |
-| Typecheck api-identity | `pnpm --filter api-identity run typecheck` | passed | Mọi file identity hợp lệ |
-| Typecheck api-platform | `pnpm --filter api-platform run typecheck` | passed | Mọi file platform hợp lệ |
-| Typecheck apps/api | `pnpm --filter api run typecheck` | passed | Mọi file test E2E hợp lệ |
-| Audit tests | `npx vitest run src/modules/audit` | passed | Unit tests xanh |
-| Admin typecheck | `pnpm --filter admin run typecheck` | passed | TypeScript UI hợp lệ |
+(Chưa có)
 
-## Trạng thái cuối cùng (Final status)
+## Commands run
 
-- Completed.
+(Chưa có)
 
-## Chuyển giao (Handoff)
+## Verification evidence
 
-- Ready for review: Yes.
-- Focus area: Review ACL trong `FileAccessService` và việc sử dụng DB locks trong `PurgeExpiredAuditLogsUseCase`.
-- Remaining: Không.
+(Chưa có)
+
+## Rollback notes
+
+Dùng `git checkout .` hoặc `git reset --hard HEAD` nếu cần thiết.
+
+## Final status
+
+In progress
+
+## Handoff
+
+Tiếp tục với T-007. Lệnh tiếp theo là tạo file Port trong api-core.

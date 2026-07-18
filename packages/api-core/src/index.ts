@@ -44,6 +44,8 @@ export { getTenantContext, TenantContextService } from "./common/services/tenant
 export * from "./common/sort/multi-sort";
 export { RedisThrottlerStorage } from "./common/throttling/redis-throttler.storage";
 export * from "./common/types/json-value";
+export * from "./ports/advisory-lock.port";
+export * from "./ports/platform-transaction.port";
 export * from "./common/types/request-context";
 export * from "./common/types/transaction-executor";
 export * from "./common/utils/csv";

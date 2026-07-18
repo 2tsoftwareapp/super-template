@@ -1,25 +1,20 @@
-# Giải quyết các vấn đề Tenant Migration và Security ACL trong Audit System
-
 ## Summary
-PR này bao gồm toàn bộ các fixes cho Re-review Round 3 của hệ thống Audit liên quan đến RLS leakage, ACL bypass và connection leak. Đảm bảo tính minh bạch, chính xác của Audit events khi áp dụng vào các system tenant objects.
+Đã hoàn thành sửa các lỗi còn tồn đọng ở vòng re-review liên quan đến Audit System bao gồm RLS leakage, ACL bypass và connection leak. Các use case mutation tenant hiện tại đã sử dụng đúng scope `ORGANIZATION`. 
 
 ## Changes
-1. Sửa tất cả các `SYSTEM_SCOPE.PLATFORM` call-sites khi thao tác trên resources của tenant (File, Attachment, Import, Notification) thành `SYSTEM_SCOPE.ORGANIZATION` để tránh RLS bypass policy reject.
-2. Thêm policy vào generic `FileAccessService` để kiểm tra role `audit.read` thay vì check uploadedById cho file export audit. Chặn các request đọc file thường thông qua Audit Export endpoint (`404 Not Found`).
-3. Sửa `ExportAuditLogsUseCase` để tự bypass RLS nếu context là `organizationId === null` cho GLOBAL SUPER_ADMIN.
-4. Tái cấu trúc cơ chế Advisory Lock trong `PurgeExpiredAuditLogsUseCase` để giữ transaction/checkout lifecycle, ngăn connection leak.
-5. Cập nhật frontend `use-audit-logs-controller.ts` sửa typo `isTruncated` -> `truncated`.
-6. Bổ sung security unit/E2E test cover các case trên.
+- Thay thế scope `PLATFORM` thành `ORGANIZATION` trên các tenant resources (Upload, Version, Attach).
+- Sử dụng `PLATFORM_TRANSACTION_PORT` để bypass RLS trong export audit logs global.
+- Cập nhật biến `truncated` thành `isTruncated` để tương thích frontend.
+- Bọc toàn bộ các write process cho mutation và audit bằng `TransactionPort` để đảm bảo atomicity.
+- Khắc phục các mock transaction port bị sai để đảm bảo unit tests chạy thành công.
 
 ## Verification
-- Biên dịch thành công Typescript code (`bun run build`).
-- Audit unit tests chạy ổn định (`vitest run test/*.spec.ts`).
-- E2E tests security policy đã được cài đặt nhưng skipped do lỗi Postgres testcontainers `ECONNREFUSED`.
+- Unit Tests: Passed (`pnpm --filter api test`)
+- Typescript Check: Passed (`bun run build`)
+- E2E Tests: Cần xác nhận trên CI do môi trường local bị lỗi Testcontainers `ECONNREFUSED`.
 
 ## Review Notes
-Reviewer cần kiểm tra kĩ:
-- Logic mới trong `FileAccessService` tại hàm check ACL tải file.
-- Pipeline CI đảm bảo chạy thành công file E2E tests (audit.e2e.spec.ts).
+Reviewer chú ý kiểm tra lại E2E pipeline trên Github Actions và phần access control của `AUDIT_EXPORT` ở `FileAccessService` xem có khớp với role `audit.read` chưa.
 
 ## Risks & Follow-ups
-- Cần fix môi trường local cho các e2e tests (DB port 65432 down).
+- Môi trường test E2E cho local hiện đang bị gãy (Database setup local).

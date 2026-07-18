@@ -29,16 +29,23 @@ export class TenantContextInterceptor implements NestInterceptor {
     const request = context.switchToHttp().getRequest<Express.Request>();
     const user = request.user;
 
-    if (!user?.organizationId) {
+    if (!user) {
       return next.handle();
     }
 
-    const bypassRls = user.roles.includes(ROLE_NAMES.SUPER_ADMIN);
+    const isSuperAdmin = user.roles.includes(ROLE_NAMES.SUPER_ADMIN);
+
+    if (!user.organizationId && !isSuperAdmin) {
+      return next.handle();
+    }
+
+    const tenantId = user.organizationId ?? '';
+    const bypassRls = isSuperAdmin;
 
     return new Observable((subscriber) => {
       this.tenantContextService.run(
         {
-          tenantId: user.organizationId!,
+          tenantId,
           userId: user.userId,
           bypassRls,
         },
