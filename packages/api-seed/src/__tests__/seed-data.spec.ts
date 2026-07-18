@@ -71,7 +71,7 @@ describe('seedDatabase', () => {
         .mockReturnValueOnce(tenantContextService),
     };
 
-    const { seedDatabase } = await import('../seed-data');
+    const { seedDatabase } = await import('../seed-data.js');
 
     await seedDatabase(app as never);
 

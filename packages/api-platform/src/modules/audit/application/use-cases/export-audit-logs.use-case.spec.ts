@@ -87,7 +87,7 @@ describe('ExportAuditLogsUseCase', () => {
       }),
       expect.anything(),
     );
-    expect(result).toEqual({ fileId: 'file-1', rowCount: 1, totalMatching: 1, isTruncated: false });
+    expect(result).toEqual({ fileId: 'file-1', rowCount: 1, totalMatching: 1, truncated: false });
   });
 
   it('rejects when the actor has no active organization', async () => {

@@ -38,12 +38,14 @@ describe('UpdateSettingUseCase', () => {
       'feature.flag',
       { enabled: true },
       'user-1',
+      expect.anything(),
     );
     expect(auditService.log).toHaveBeenCalledWith(
       expect.objectContaining({
         action: 'settings.updated',
         entityId: 'feature.flag',
       }),
+      expect.anything(),
     );
     expect(result).toMatchObject({ key: 'feature.flag' });
   });
