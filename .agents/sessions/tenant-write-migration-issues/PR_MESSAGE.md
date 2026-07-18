@@ -1,1 +1,1 @@
-fix(audit): resolve RLS leaks, export bypass, and connection leaks in multi-tenant audit
+fix(audit): resolve compilation and unit test failures from RLS bypass implementation

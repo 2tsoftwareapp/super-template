@@ -7,20 +7,20 @@
 
 | Field | Value |
 |---|---|
-| Status | `ready_for_execution` |
+| Status | `done` |
 | Goal | Hoàn tất Re-review Round 3 để Audit system đạt yêu cầu bảo mật nghiêm ngặt (đúng scope, không rò rỉ ACL, không connection leak). |
-| Progress | `0/6` tasks done · `0` finding |
+| Progress | `6/6` tasks done · `0` finding |
 | Top risk / blocker | None |
-| Next action | Execution (T-001) |
-| Owner | Agent |
+| Next action | Handoff |
+| Owner | User |
 
 ## Progress chart
 
 ```mermaid
 pie title Task status
-  "done" : 0
+  "done" : 6
   "in_progress" : 0
-  "todo" : 6
+  "todo" : 0
   "blocked" : 0
 ```
 
@@ -65,4 +65,4 @@ flowchart LR
 
 ## Developer notes
 
-- Commands to run next: Đề xuất người dùng quay lại bước thực thi để thay đổi chuỗi hardcode (constants).
+- Commands to run next: Đề xuất người dùng review kết quả, tạo PR và kiểm tra trên CI. Đoạn mã E2E test có thể cần điều chỉnh config testcontainers/postgres.

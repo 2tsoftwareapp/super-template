@@ -1,22 +1,25 @@
+# Giải quyết các vấn đề Tenant Migration và Security ACL trong Audit System
+
 ## Summary
-This PR comprehensively resolves the cross-tenant data leak vulnerabilities in the Audit module, secures the Export file endpoint, patches a critical connection leak in the database purge cron job, and pays down significant technical debt by converting magic strings to system constants.
+PR này bao gồm toàn bộ các fixes cho Re-review Round 3 của hệ thống Audit liên quan đến RLS leakage, ACL bypass và connection leak. Đảm bảo tính minh bạch, chính xác của Audit events khi áp dụng vào các system tenant objects.
 
-## What changed
-- **Audit Interfaces**: Introduced discriminated unions based on `scope` to ensure `organizationId` is strictly typed and mandatory for organization-level actions, preventing multi-tenant data leaks.
-- **Export ACL**: Annotated generated export files with `kind: 'AUDIT_EXPORT'` and implemented a hard block in `FileAccessService` to reject unauthorized downloads.
-- **Advisory Locks**: Refactored the audit purge cron job to use `try/finally` wrapped around a raw connection and `unlockAdvisoryLock`, completely eliminating pool exhaustion issues.
-- **UX Improvements**: Added a truncated warning (`toast.warning`) in the frontend UI when query results exceed limits.
-- **Refactoring (T-009)**: Entirely stripped out hardcoded strings like `'platform'`, `'organization'`, `'AUDIT_EXPORT'`, and `'RESTRICTED'`, replacing them with standard enums across `api-core`, `api-platform`, and `api-identity`.
+## Changes
+1. Sửa tất cả các `SYSTEM_SCOPE.PLATFORM` call-sites khi thao tác trên resources của tenant (File, Attachment, Import, Notification) thành `SYSTEM_SCOPE.ORGANIZATION` để tránh RLS bypass policy reject.
+2. Thêm policy vào generic `FileAccessService` để kiểm tra role `audit.read` thay vì check uploadedById cho file export audit. Chặn các request đọc file thường thông qua Audit Export endpoint (`404 Not Found`).
+3. Sửa `ExportAuditLogsUseCase` để tự bypass RLS nếu context là `organizationId === null` cho GLOBAL SUPER_ADMIN.
+4. Tái cấu trúc cơ chế Advisory Lock trong `PurgeExpiredAuditLogsUseCase` để giữ transaction/checkout lifecycle, ngăn connection leak.
+5. Cập nhật frontend `use-audit-logs-controller.ts` sửa typo `isTruncated` -> `truncated`.
+6. Bổ sung security unit/E2E test cover các case trên.
 
-## How verified
-- **TypeScript**: `pnpm typecheck` runs successfully across all packages and apps, proving the type soundness of the new discriminated unions and constants.
-- **E2E Tests**: Added API tests to simulate unprivileged tenant users attempting to download audit exports directly, verifying that a `403 Forbidden` is correctly returned.
-- **Unit Tests**: Passes `vitest` run for the audit module.
+## Verification
+- Biên dịch thành công Typescript code (`bun run build`).
+- Audit unit tests chạy ổn định (`vitest run test/*.spec.ts`).
+- E2E tests security policy đã được cài đặt nhưng skipped do lỗi Postgres testcontainers `ECONNREFUSED`.
 
-## Reviewer focus
-Please review:
-1. `FileAccessService` logic regarding `AUDIT_EXPORT` validation.
-2. The manual unlock procedure using raw database connections in `PurgeExpiredAuditLogsUseCase`.
+## Review Notes
+Reviewer cần kiểm tra kĩ:
+- Logic mới trong `FileAccessService` tại hàm check ACL tải file.
+- Pipeline CI đảm bảo chạy thành công file E2E tests (audit.e2e.spec.ts).
 
-## Risks/Follow-ups
-No major risks. The connection leak fix resolves an existing high-severity risk. We should continue to monitor connection pool metrics on the database after deployment to confirm resolution.
+## Risks & Follow-ups
+- Cần fix môi trường local cho các e2e tests (DB port 65432 down).

@@ -2,89 +2,69 @@
 
 ## Executive summary (80/20)
 
-- **Kết quả cuối cùng**: Sửa triệt để lổ hổng bảo mật rò rỉ dữ liệu Audit giữa các tenant (RLS) và ngăn chặn tải lậu file Export thông qua generic API.
-- **Giá trị mang lại**: Cấu trúc lại mã nguồn, loại bỏ toàn bộ các chuỗi hardcode và thay thế bằng hằng số (Constants) giúp mã nguồn dễ bảo trì hơn. Hệ thống an toàn trước nguy cơ rò rỉ Export file và Connection Pool Exhaustion khi thực hiện purge log.
-- **Xác minh**: Toàn bộ hệ thống core và apps đã pass typecheck sau refactor. Bổ sung E2E tests mới đảm bảo an toàn truy cập file.
-- **Rủi ro còn lại**: Rủi ro rất thấp. Đã sử dụng TypeScript compiler để ép buộc cung cấp `organizationId` tại mọi vị trí thông qua discriminated union.
-- **Hành động tiếp theo**: Review PR và hợp nhất (merge) code.
+- **Status**: Done with risks
+- **Outcome**: Đã vá toàn bộ các lỗ hổng P0/P1 liên quan đến Audit System bao gồm RLS leakage, ACL bypass và connection leak do Postgres advisory lock.
+- **Verification**: Code đã biên dịch thành công (`bun run build`), unit test audit pass toàn bộ. E2E tests đã được thêm nhưng **skipped** trên môi trường hiện tại do lỗi infrastructure (`ECONNREFUSED` từ test DB).
+- **Residual risk**: Do test E2E không thể chạy được do lỗi môi trường, tính chính xác của E2E security rules cần được confirm qua CI.
+- **Next action**: Handoff cho User review, tạo PR và kiểm tra trên môi trường CI.
 
 ## Developer overview
 
-| Mục | Nội dung |
-|---|---|
-| **Final status** | 🟢 Done |
-| **Verification summary** | Unit test, E2E test, Typecheck (100% passed) |
-| **Residual risks** | Không phát hiện rủi ro nghiêm trọng (No critical risks) |
-| **Next action** | Review PR & Merge |
-| **Owner** | Agent |
-
-## Charts
-
-```mermaid
-pie title Delivery Status
-  "Done" : 9
-  "Open" : 0
-```
+- **Status**: Done with risks
+- **Verification summary**: Unit tests: Passed. TypeScript type check: Passed. E2E Tests: Skipped (blocked by env).
+- **Residual risks**: Không thể chạy test E2E cục bộ do lỗi config Postgres/testcontainers.
+- **Next action**: Push changes to main branch / create PR and verify via CI test pipeline.
 
 ## Status
-Done
+
+Done with risks
 
 ## Summary
-Hoàn thành 9/9 nhiệm vụ liên quan đến sửa lỗi rò rỉ bảo mật RLS Audit, block tải trái phép file Export, vá lỗi Connection Leak ở cron job Purge, cảnh báo quá tải cho người dùng, và refactor toàn bộ mã nguồn sử dụng biến hằng (constants) để tối ưu tính bảo trì.
+
+Đã cấu trúc lại toàn bộ cơ chế scope và file ACL cho module Audit: (1) Sửa tất cả các `PLATFORM` scope call-sites thành `ORGANIZATION` scope khi gắn liền với tenant resources. (2) Chặn tải xuống `AUDIT_EXPORT` từ endpoint file chung nếu không có quyền `audit.read`. (3) Chống rò rỉ file thông thường thông qua đường dẫn export audit. (4) Tái cơ cấu hàm `PurgeExpiredAuditLogsUseCase` để check-out và quản lý vòng đời Advisory Lock trên đúng 1 `PoolClient`, tránh connection leak.
 
 ## Scope completed
 
-| Scope Item | Status | Evidence |
-|---|---|---|
-| Cập nhật type discriminated union cho `AuditLogInput` | Done | Các compiler errors đã được fix. |
-| Ngăn truy cập trái phép Audit Export qua API file chung | Done | `FileAccessService` bắt buộc kiểm tra permission cho `AUDIT_EXPORT`. E2E Test trả về 403. |
-| Vá lỗi Advisory Lock connection leak | Done | `PurgeExpiredAuditLogsUseCase` gọi `unlockAdvisoryLock` ở block `try/finally`. |
-| Cảnh báo UI khi kết quả bị giới hạn | Done | Gắn `toast.warning` trên React client. |
-| Sửa lỗi Hardcode (Tech Debt H-001) | Done | Thêm `system.constants.ts` và `file.constants.ts`, áp dụng vào codebase. |
+- Fix Tenant Call-site Scope: Completed. (Tất cả attachment/files/... log đều dùng `SYSTEM_SCOPE.ORGANIZATION` và pass org ID hợp lệ).
+- Secure Audit Download ACL: Completed. (`FileAccessService` áp dụng strict ACL check đối với `AUDIT_EXPORT`).
+- Fix Global Export RLS: Completed. (Super Admin global export dùng `withTenantContext` với `bypassRls: true`).
+- Fix Purge Advisory Lock: Completed. (Sử dụng trực tiếp `DatabaseClient` và pool để mượn kết nối và thực hiện vòng đời lock-delete-unlock).
+- Fix Frontend Truncation: Completed. (Frontend dùng `truncated` thay vì `isTruncated`).
+- Write Security E2E Tests: Completed. (Đã add test cases vào `audit.e2e.spec.ts`).
 
 ## What changed
 
-| Area | Change Summary | Reason |
-|---|---|---|
-| `api-core` | Thêm Constants và đổi `AuditLogInput` thành Discriminated Union. | Type-safety, chặn rò rỉ dữ liệu và dễ bảo trì. |
-| `api-platform` | Sửa logic Export ACL và Fix Advisory Lock. | Bảo mật file Export, chống cạn kiệt Connection DB. |
-| `api-identity` | Sửa các chỗ gọi `this.auditWriter.log()` theo interface mới. | Tuân thủ Type Interface mới. |
-| `apps/admin` | Thêm popup warning nếu `isTruncated = true`. | Nâng cao trải nghiệm UX. |
-| `apps/api/test` | Thêm E2E Test cho tải File. | Bảo đảm chống hồi quy bảo mật. |
+- **Audit Core (Service & Controller)**: Thay thế scope `PLATFORM` thành `ORGANIZATION` trên các tenant objects. 
+- **Files & Security**: Áp dụng hard ACL (`audit.read` role) cho file `AUDIT_EXPORT` thay vì check ID của uploader. Fix global export bị vướng row level security.
+- **Infrastructure (Database / Lock)**: `PurgeExpiredAuditLogsUseCase` được cấu trúc để sử dụng session lock đúng cách với pg `PoolClient`.
+- **Frontend / UI**: Sửa typo property check báo truncate.
 
 ## Files changed
 
-| File path | Summary |
-|---|---|
-| `packages/api-core/src/ports/audit-writer.port.ts` | Discriminated Union cho input log. |
-| `packages/api-core/src/common/constants/system.constants.ts` | Khai báo `SYSTEM_SCOPE`. |
-| `packages/api-core/src/common/constants/file.constants.ts` | Khai báo `FILE_KIND`, `FILE_VISIBILITY`. |
-| `packages/api-platform/src/modules/audit/application/use-cases/export-audit-logs.use-case.ts` | Đánh dấu kind = `AUDIT_EXPORT` cho file DB. |
-| `packages/api-platform/src/modules/files/application/services/file-access.service.ts` | Block unauthorized downloads đối với file export. |
-| `packages/api-platform/src/modules/audit/infrastructure/audit.repository.ts` | Triển khai `unlockAdvisoryLock`. |
-| `packages/api-platform/src/modules/audit/application/use-cases/purge-expired-audit-logs.use-case.ts` | Áp dụng try/finally để giải phóng lock. |
-| `apps/admin/src/features/audit-logs/controllers/use-audit-logs-controller.ts` | Hiển thị cảnh báo kết quả bị cắt bớt (Truncated). |
-| `apps/api/test/audit.e2e.spec.ts` | E2E tests ngăn bypass file audit. |
+- `packages/api-platform/src/modules/audit/application/use-cases/export-audit-logs.use-case.ts`: Áp dụng bypass RLS với `null` org ID.
+- `packages/api-platform/src/modules/audit/application/use-cases/purge-expired-audit-logs.use-case.ts`: Wrap advisory lock trong cùng 1 pool connection.
+- `packages/api-platform/src/modules/files/application/services/file-access.service.ts`: Update RBAC authorization rule cho `AUDIT_EXPORT`.
+- `apps/admin/src/features/audit-logs/controllers/use-audit-logs-controller.ts`: Fix typo `isTruncated` -> `truncated`.
+- (Và các use-cases khác trong api-platform sửa hardcode/scope)
 
 ## Verification
 
-| Check | Command/Method | Result | Evidence |
-|---|---|---|---|
-| Typecheck api-core | `pnpm --filter api-core run typecheck` | passed | No TS errors |
-| Typecheck api-platform | `pnpm --filter api-platform run typecheck` | passed | No TS errors |
-| Typecheck api-identity | `pnpm --filter api-identity run typecheck` | passed | No TS errors |
-| Typecheck admin | `pnpm --filter admin run typecheck` | passed | No TS errors |
-| Unit tests | `npx vitest run src/modules/audit` | passed | All tests green |
-| E2E tests | `pnpm run test:e2e` | passed | Pass |
+- **TypeScript Compilation**: Chạy `bun run build` - Result: Passed. Evidence: No typecheck errors in `api-platform`.
+- **Unit Tests**: Chạy `vitest run` trên module audit - Result: Passed. Evidence: All audit unit tests passed.
+- **E2E Security Tests**: Chạy `vitest run` e2e - Result: Skipped. Evidence: Postgres database testcontainer refused connection `ECONNREFUSED 127.0.0.1:65432`.
 
 ## Review result
-No findings. (Review trước đó có finding H-001 về hardcoded strings, đã được sửa xong ở T-009).
 
-## Skipped or failed checks
-None.
+Reviewers đã kiểm tra và yêu cầu đổi các hardcode string thành các exported constants (`SYSTEM_SCOPE.ORGANIZATION`, `FILE_KIND.AUDIT_EXPORT`, v.v.). Đã hoàn tất sửa trong source và commit.
+
+## Skipped / failed checks
+
+- **E2E Security Test**: Skipped. Test database endpoint `127.0.0.1:65432` không khởi chạy được. Rủi ro: E2E security rules có thể hoạt động khác lý thuyết.
 
 ## Risks & follow-ups
-None.
+
+- **E2E Environment setup** (Risk): Tích hợp database docker cho e2e bị hỏng trên local, cần fix để có thể chạy test cục bộ. (Owner: DevOps / Developer).
 
 ## Handoff
-Reviewer chú ý kiểm tra file `FileAccessService` để bảo đảm chính sách truy cập `AUDIT_EXPORT` đủ an toàn. QA tập trung kiểm tra thử tính năng Export Audit Log trên UI admin và tải file thông qua endpoint chung để kiểm định lỗi 403.
+
+Thay đổi đã sẵn sàng để merge. Reviewer cần focus vào phần logic ở `FileAccessService` xem ACL đã đủ chặt chưa và kiểm tra lại Pipeline CI để chắc chắn các test E2E đã passed.
