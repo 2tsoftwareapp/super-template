@@ -86,4 +86,4 @@ Client → Next.js (BFF) → NestJS API → Drizzle ORM → PostgreSQL
 ---
 
 Nguồn: `DESIGN.md`, `packages/api-core/`, `packages/api-identity/`, `packages/api-platform/`
-Last-synced: `8411838`
+Last-synced: `0892778`

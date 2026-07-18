@@ -10,4 +10,5 @@ export interface PlatformTransactionPort {
    * (e.g. system background jobs, super-admin global exports, generic audit events).
    */
   run<T>(fn: (executor: TransactionExecutor) => Promise<T>): Promise<T>;
+  withSavepoint<T>(executor: TransactionExecutor, name: string, fn: () => Promise<T>): Promise<T>;
 }

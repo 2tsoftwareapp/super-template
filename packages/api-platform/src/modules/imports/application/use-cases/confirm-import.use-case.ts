@@ -4,7 +4,6 @@ import type {
 } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { sql } from 'drizzle-orm';
 import { 
   AppError,
   ERROR_CODES,
@@ -102,24 +101,15 @@ export class ConfirmImportUseCase {
       for (const [index, row] of parsed.rows.entries()) {
         const spName = `import_row_${index}`;
         try {
-          if (typeof (tx as any).execute === 'function') {
-            await (tx as any).execute(sql.raw(`SAVEPOINT ${spName}`));
-          }
-
-          await adapter.importRow(row, {
-            organizationId: file.organizationId!,
-            ownerId: actor.userId,
-            createdById: actor.userId,
-          }, tx);
-
-          if (typeof (tx as any).execute === 'function') {
-            await (tx as any).execute(sql.raw(`RELEASE SAVEPOINT ${spName}`));
-          }
+          await this.transactionPort.withSavepoint(tx, spName, async () => {
+            await adapter.importRow(row, {
+              organizationId: file.organizationId!,
+              ownerId: actor.userId,
+              createdById: actor.userId,
+            }, tx);
+          });
           successCount += 1;
         } catch (error) {
-          if (typeof (tx as any).execute === 'function') {
-            await (tx as any).execute(sql.raw(`ROLLBACK TO SAVEPOINT ${spName}`));
-          }
           errors.push({
             row: index + 1,
             message: error instanceof Error ? error.message : 'Import failed',

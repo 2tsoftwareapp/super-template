@@ -26,6 +26,7 @@ plan_ref: PLAN.md
 | I-04 | Convert ListAuditLogs error to AppError | INVESTIGATE | api |
 | I-05 | Add Error logging for Storage cleanup | INVESTIGATE | api |
 | I-06 | Clean up and ignore `.pyc` files | INVESTIGATE | repo |
+| I-07 | Encapsulate Savepoint in TransactionPort | INVESTIGATE | api |
 
 ## Progress board
 
@@ -37,6 +38,7 @@ plan_ref: PLAN.md
 | [x] | T-004 | ListAudit Error Mapping | done |
 | [x] | T-005 | Storage Cleanup Error Logging | done |
 | [x] | T-006 | Repo Hygiene | done |
+| [x] | T-007 | Savepoint Abstraction | done |
 
 ## Progress chart
 
@@ -132,3 +134,18 @@ T-001 → T-002 → T-003 → T-004 → T-005 → T-006
 - AC: Không còn `.pyc` trong track của git.
 - Verify: `git status`.
 - Files/scope: `.gitignore` and `__pycache__` directories.
+
+### T-007: Savepoint Abstraction
+
+- Status: done
+- Trace: INVESTIGATE
+- Depends: none
+- Work items:
+  - [x] 1. Thêm `withSavepoint` vào `TransactionPort` và `PlatformTransactionPort`.
+  - [x] 2. Implement `withSavepoint` trong `DrizzleTransactionService` và `DrizzlePlatformTransactionService` có rollback khi lỗi. Throw lỗi nếu không phải Drizzle tx.
+  - [x] 3. Sửa `ConfirmImportUseCase` để dùng `transactionPort.withSavepoint` thay vì tự parse và gọi raw query.
+  - [x] 4. Thêm unit test kiểm tra savepoint cho `ConfirmImportUseCase`.
+- Description: Đóng gói savepoint operation để tránh rò rỉ abstraction layer.
+- AC: Use case không còn gọi raw SQL savepoint, không silent ignore savepoint.
+- Verify: Unit test pass.
+- Files/scope: `api-core`, `api-database`, `confirm-import.use-case.ts`, `confirm-import.use-case.spec.ts`
