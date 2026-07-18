@@ -7,6 +7,7 @@ export class NotificationsMapper {
     return {
       id: notification.id,
       userId: notification.userId,
+      organizationId: notification.organizationId,
       type: notification.type,
       title: notification.title,
       body: notification.body,

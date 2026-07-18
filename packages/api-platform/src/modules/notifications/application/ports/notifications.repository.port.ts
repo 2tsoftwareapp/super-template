@@ -41,21 +41,25 @@ export interface NotificationsRepositoryPort {
   ): Promise<NotificationRecord[]>;
   findById(
     notificationId: string,
+    organizationId: string,
     executor?: TransactionExecutor,
   ): Promise<NotificationRecord | null>;
   listForUser(
     userId: string,
+    organizationId: string,
     params: ListNotificationsQuery,
     executor?: TransactionExecutor,
   ): Promise<NotificationsListResult>;
-  getUnreadCount(userId: string, executor?: TransactionExecutor): Promise<number>;
+  getUnreadCount(userId: string, organizationId: string, executor?: TransactionExecutor): Promise<number>;
   markRead(
     notificationId: string,
+    organizationId: string,
     executor?: TransactionExecutor,
   ): Promise<NotificationRecord | null>;
-  markAllRead(userId: string, executor?: TransactionExecutor): Promise<void>;
+  markAllRead(userId: string, organizationId: string, executor?: TransactionExecutor): Promise<void>;
   delete(
     notificationId: string,
+    organizationId: string,
     executor?: TransactionExecutor,
   ): Promise<NotificationRecord | null>;
 }

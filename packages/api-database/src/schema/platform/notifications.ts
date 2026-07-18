@@ -39,11 +39,27 @@ export const notifications = pgTable(
     createdAt: timestamp('created_at', { withTimezone: true })
       .notNull()
       .defaultNow(),
+    sourceJobId: uuid('source_job_id').references(() => notificationJobs.id, {
+      onDelete: 'set null',
+    }),
   },
   (table) => [
     index('notifications_organization_id_idx').on(table.organizationId),
     index('notifications_user_id_idx').on(table.userId),
     index('notifications_created_at_idx').on(table.createdAt),
+    index('notifications_org_user_created_idx').on(
+      table.organizationId,
+      table.userId,
+      table.createdAt,
+    ), // Note: Drizzle index ordering (DESC) is usually defined in specific dialect functions or we can omit it for basic indexing
+    index('notifications_org_user_unread_idx').on(
+      table.organizationId,
+      table.userId,
+      table.readAt,
+    ),
+    uniqueIndex('notifications_source_job_id_user_id_unique')
+      .on(table.sourceJobId, table.userId)
+      .where(sql`${table.sourceJobId} is not null`),
   ],
 );
 

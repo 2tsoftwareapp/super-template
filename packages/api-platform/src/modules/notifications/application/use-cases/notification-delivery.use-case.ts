@@ -263,6 +263,8 @@ export class NotificationDeliveryUseCase {
         for (const notification of notifications) {
           this.dispatchService.dispatch(
             this.notificationsMapper.toNotificationView(notification),
+            // Prefer the notification's own org; fall back to the job's org (both resolve to the same value)
+            notification.organizationId ?? organizationId,
           );
         }
 

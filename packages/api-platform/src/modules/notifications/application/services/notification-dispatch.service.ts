@@ -18,8 +18,8 @@ export class NotificationDispatchService {
     private readonly userPreferencesLookup: UserPreferencesLookup,
   ) {}
 
-  dispatch(notification: NotificationView) {
-    this.notificationStreamService.emit(notification.userId, notification);
+  dispatch(notification: NotificationView, organizationId: string) {
+    this.notificationStreamService.emit(notification.userId, organizationId, notification);
 
     void this.userPreferencesLookup
       .findNotificationPreferencesByUserId(notification.userId)
@@ -41,7 +41,7 @@ export class NotificationDispatchService {
       });
   }
 
-  streamForUser(userId: string) {
-    return this.notificationStreamService.stream(userId);
+  streamForUser(userId: string, organizationId: string) {
+    return this.notificationStreamService.stream(userId, organizationId);
   }
 }

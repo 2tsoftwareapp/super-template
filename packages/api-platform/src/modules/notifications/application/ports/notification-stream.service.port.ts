@@ -14,8 +14,8 @@ export interface NotificationStreamEvent {
 }
 
 export interface NotificationStreamServicePort {
-  emit(userId: string, event: NotificationStreamEvent): void;
-  stream(userId: string): Observable<MessageEvent>;
+  emit(userId: string, organizationId: string, event: NotificationStreamEvent): void;
+  stream(userId: string, organizationId: string): Observable<MessageEvent>;
 }
 
 export const NOTIFICATION_STREAM_SERVICE = Symbol('NOTIFICATION_STREAM_SERVICE');

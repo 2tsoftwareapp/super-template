@@ -14,6 +14,7 @@ export interface SendUserNotificationInput {
 export interface NotificationMessage {
   id: string;
   userId: string;
+  organizationId: string | null;
   type: string;
   title: string;
   body: string;
@@ -30,7 +31,7 @@ export interface UserNotificationSender {
     executor?: TransactionExecutor,
     options?: { deferDispatch?: boolean },
   ): Promise<NotificationMessage | null>;
-  dispatch(notification: NotificationMessage): Promise<void>;
+  dispatch(notification: NotificationMessage, organizationId: string): Promise<void>;
 }
 
 export const USER_NOTIFICATION_SENDER = Symbol('USER_NOTIFICATION_SENDER');

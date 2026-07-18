@@ -13,6 +13,7 @@ export type NotificationDevicePlatform = 'IOS' | 'ANDROID';
 export interface NotificationView {
   id: string;
   userId: string;
+  organizationId: string | null;
   type: string;
   title: string;
   body: string;

@@ -1,7 +1,7 @@
 import type { AuthenticatedRequestUser } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { AppError, ERROR_CODES } from '@repo/api-core';
+import { AppError, ERROR_CODES, requireOrganizationId } from '@repo/api-core';
 
 import type {
   ListNotificationsQuery,
@@ -27,8 +27,11 @@ export class NotificationInboxUseCase {
     user: AuthenticatedRequestUser,
     query: ListNotificationsQuery,
   ) {
+    // Scope inbox strictly to the active organization — tenant isolation (T-002/T-003)
+    const organizationId = requireOrganizationId(user);
     const result = await this.notificationsRepository.listForUser(
       user.userId,
+      organizationId,
       query,
     );
 
@@ -41,15 +44,19 @@ export class NotificationInboxUseCase {
   }
 
   async unreadCount(user: AuthenticatedRequestUser) {
-    return this.notificationsRepository.getUnreadCount(user.userId);
+    const organizationId = requireOrganizationId(user);
+    return this.notificationsRepository.getUnreadCount(user.userId, organizationId);
   }
 
   async markRead(
     user: AuthenticatedRequestUser,
     notificationId: string,
   ): Promise<NotificationView> {
+    const organizationId = requireOrganizationId(user);
+
+    // findById scoped to org+user — prevents cross-tenant read (T-003)
     const notification =
-      await this.notificationsRepository.findById(notificationId);
+      await this.notificationsRepository.findById(notificationId, organizationId);
 
     if (notification?.userId !== user.userId) {
       throw new AppError(
@@ -59,19 +66,23 @@ export class NotificationInboxUseCase {
       );
     }
 
-    const updated = await this.notificationsRepository.markRead(notificationId);
+    const updated = await this.notificationsRepository.markRead(notificationId, organizationId);
     return this.notificationsMapper.toNotificationView(
       updated ?? notification,
     );
   }
 
   async markAllRead(user: AuthenticatedRequestUser) {
-    await this.notificationsRepository.markAllRead(user.userId);
+    const organizationId = requireOrganizationId(user);
+    await this.notificationsRepository.markAllRead(user.userId, organizationId);
   }
 
   async delete(user: AuthenticatedRequestUser, notificationId: string) {
+    const organizationId = requireOrganizationId(user);
+
+    // findById scoped to org — prevents cross-tenant delete (T-003)
     const notification =
-      await this.notificationsRepository.findById(notificationId);
+      await this.notificationsRepository.findById(notificationId, organizationId);
 
     if (notification?.userId !== user.userId) {
       throw new AppError(
@@ -81,6 +92,6 @@ export class NotificationInboxUseCase {
       );
     }
 
-    await this.notificationsRepository.delete(notificationId);
+    await this.notificationsRepository.delete(notificationId, organizationId);
   }
 }

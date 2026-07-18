@@ -40,17 +40,24 @@ export class NotificationsRepository implements NotificationsRepositoryPort {
       return [];
     }
 
-    return executor.insert(notifications).values(values).returning();
+    // Use ON CONFLICT DO NOTHING so retry jobs don't create duplicate inbox items
+    // (idempotency guaranteed by unique constraint on source_job_id + user_id — T-004)
+    return executor
+      .insert(notifications)
+      .values(values)
+      .onConflictDoNothing()
+      .returning();
   }
 
   async findById(
     notificationId: string,
+    organizationId: string,
     executor: DatabaseExecutor = this.database,
   ) {
     const [notification] = await executor
       .select()
       .from(notifications)
-      .where(eq(notifications.id, notificationId))
+      .where(and(eq(notifications.id, notificationId), eq(notifications.organizationId, organizationId)))
       .limit(1);
 
     return notification ?? null;
@@ -58,10 +65,11 @@ export class NotificationsRepository implements NotificationsRepositoryPort {
 
   async listForUser(
     userId: string,
+    organizationId: string,
     params: ListNotificationsParams,
     executor: DatabaseExecutor = this.database,
   ) {
-    const filters = [eq(notifications.userId, userId)];
+    const filters = [eq(notifications.userId, userId), eq(notifications.organizationId, organizationId)];
 
     if (params.unread === true) {
       filters.push(isNull(notifications.readAt));
@@ -95,13 +103,14 @@ export class NotificationsRepository implements NotificationsRepositoryPort {
 
   async getUnreadCount(
     userId: string,
+    organizationId: string,
     executor: DatabaseExecutor = this.database,
   ) {
     const [row] = await executor
       .select({ total: count() })
       .from(notifications)
       .where(
-        and(eq(notifications.userId, userId), isNull(notifications.readAt)),
+        and(eq(notifications.userId, userId), eq(notifications.organizationId, organizationId), isNull(notifications.readAt)),
       );
 
     return Number(row?.total ?? 0);
@@ -109,6 +118,7 @@ export class NotificationsRepository implements NotificationsRepositoryPort {
 
   async markRead(
     notificationId: string,
+    organizationId: string,
     executor: DatabaseExecutor = this.database,
   ) {
     const [notification] = await executor
@@ -116,7 +126,7 @@ export class NotificationsRepository implements NotificationsRepositoryPort {
       .set({
         readAt: new Date(),
       })
-      .where(eq(notifications.id, notificationId))
+      .where(and(eq(notifications.id, notificationId), eq(notifications.organizationId, organizationId)))
       .returning();
 
     return notification ?? null;
@@ -124,6 +134,7 @@ export class NotificationsRepository implements NotificationsRepositoryPort {
 
   async markAllRead(
     userId: string,
+    organizationId: string,
     executor: DatabaseExecutor = this.database,
   ) {
     await executor
@@ -132,17 +143,18 @@ export class NotificationsRepository implements NotificationsRepositoryPort {
         readAt: new Date(),
       })
       .where(
-        and(eq(notifications.userId, userId), isNull(notifications.readAt)),
+        and(eq(notifications.userId, userId), eq(notifications.organizationId, organizationId), isNull(notifications.readAt)),
       );
   }
 
   async delete(
     notificationId: string,
+    organizationId: string,
     executor: DatabaseExecutor = this.database,
   ) {
     const [notification] = await executor
       .delete(notifications)
-      .where(eq(notifications.id, notificationId))
+      .where(and(eq(notifications.id, notificationId), eq(notifications.organizationId, organizationId)))
       .returning();
 
     return notification ?? null;

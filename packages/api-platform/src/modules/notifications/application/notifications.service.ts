@@ -50,8 +50,8 @@ export class NotificationsService implements UserNotificationSender {
     );
   }
 
-  dispatch(notification: NotificationView): Promise<void> {
-    this.dispatchService.dispatch(notification);
+  dispatch(notification: NotificationView, organizationId: string): Promise<void> {
+    this.dispatchService.dispatch(notification, organizationId);
     return Promise.resolve();
   }
 

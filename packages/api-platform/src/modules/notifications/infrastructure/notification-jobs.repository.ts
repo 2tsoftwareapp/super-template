@@ -133,6 +133,41 @@ export class NotificationJobsRepository implements NotificationJobsRepositoryPor
       .limit(limit);
   }
 
+  /**
+   * Atomically claim up to `limit` pending jobs that are due.
+   * Step 1: SELECT … FOR UPDATE SKIP LOCKED so concurrent workers each get distinct rows.
+   * Step 2: UPDATE those IDs to PROCESSING in the same transaction.
+   * Returns the claimed jobs ready for processing.
+   */
+  async claimDue(limit: number, executor: DatabaseExecutor = this.database) {
+    // Use raw SQL for FOR UPDATE SKIP LOCKED — Drizzle doesn't expose this via builder
+    const claimed = await executor.execute<{ id: string }>(
+      sql`
+        UPDATE notification_jobs
+        SET status = 'PROCESSING', updated_at = now()
+        WHERE id IN (
+          SELECT id FROM notification_jobs
+          WHERE status = 'PENDING' AND scheduled_at <= now()
+          ORDER BY scheduled_at ASC
+          LIMIT ${limit}
+          FOR UPDATE SKIP LOCKED
+        )
+        RETURNING id
+      `,
+    );
+
+    if (!claimed.rows || claimed.rows.length === 0) {
+      return [];
+    }
+
+    const ids = claimed.rows.map((r) => r.id);
+    return executor
+      .select()
+      .from(notificationJobs)
+      .where(sql`${notificationJobs.id} = ANY(${ids})`);
+  }
+
+
   async markProcessing(
     jobId: string,
     executor: DatabaseExecutor = this.database,

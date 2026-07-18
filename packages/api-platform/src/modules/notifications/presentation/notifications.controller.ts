@@ -16,7 +16,7 @@ import {
   Req,
   Sse } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { ACTION, ApiDataResponse, ApiPaginatedResponse, CountDto, perm, SuccessFlagDto } from '@repo/api-core';
+import { ACTION, ApiDataResponse, ApiPaginatedResponse, CountDto, perm, requireOrganizationId, SuccessFlagDto } from '@repo/api-core';
 import { CurrentUser } from '@repo/api-core';
 import { Authorize } from '@repo/api-core';
 import { SkipEnvelope } from '@repo/api-core';
@@ -70,7 +70,9 @@ export class NotificationsController {
   stream(
     @CurrentUser() user: AuthenticatedRequestUser,
   ): Observable<MessageEvent> {
-    return this.dispatch.streamForUser(user.userId);
+    // SSE channel is scoped per user+org — cross-org events are never forwarded (T-007)
+    const organizationId = requireOrganizationId(user);
+    return this.dispatch.streamForUser(user.userId, organizationId);
   }
 
   @Get('unread-count')

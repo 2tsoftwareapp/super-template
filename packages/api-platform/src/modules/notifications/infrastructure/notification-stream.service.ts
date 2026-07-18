@@ -19,6 +19,7 @@ import type { NotificationStreamServicePort } from '../application/ports/notific
 export interface NotificationStreamEvent {
   id: string;
   userId: string;
+  organizationId: string;
   type: string;
   title: string;
   body: string;
@@ -62,31 +63,38 @@ export class NotificationStreamService implements OnModuleInit, OnModuleDestroy,
     ]);
   }
 
-  emit(userId: string, event: NotificationStreamEvent): void {
-    this.getSubject(userId).next(event);
-    void this.publish(event);
+  emit(userId: string, organizationId: string, event: NotificationStreamEvent): void {
+    // Channel key scoped per user+org — prevents cross-tenant SSE leaks (T-007)
+    this.getSubject(this.channelKey(userId, organizationId)).next(event);
+    void this.publish(organizationId, event);
   }
 
-  stream(userId: string): Observable<MessageEvent> {
+  stream(userId: string, organizationId: string): Observable<MessageEvent> {
     void this.ensureRedis();
-    return this.getSubject(userId).pipe(
+    return this.getSubject(this.channelKey(userId, organizationId)).pipe(
       map((event) => ({
         data: event,
       })),
     );
   }
 
-  private getSubject(userId: string): Subject<NotificationStreamEvent> {
-    const existing = this.subjects.get(userId);
+  /** Channel key that scopes SSE events per user+organization. */
+  private channelKey(userId: string, organizationId: string): string {
+    return `${organizationId}:${userId}`;
+  }
+
+  private getSubject(channelKey: string): Subject<NotificationStreamEvent> {
+    const existing = this.subjects.get(channelKey);
 
     if (existing) {
       return existing;
     }
 
     const subject = new Subject<NotificationStreamEvent>();
-    this.subjects.set(userId, subject);
+    this.subjects.set(channelKey, subject);
     return subject;
   }
+
 
   private async ensureRedis() {
     if (this.redisReady) {
@@ -119,7 +127,9 @@ export class NotificationStreamService implements OnModuleInit, OnModuleDestroy,
           return;
         }
 
-        this.getSubject(parsed.userId).next(parsed);
+        // Route to the org-scoped channel; only subscribers on the correct org receive the event
+        const key = this.channelKey(parsed.userId, parsed.organizationId);
+        this.getSubject(key).next(parsed);
       });
 
       this.redisPublisher = publisher;
@@ -132,7 +142,7 @@ export class NotificationStreamService implements OnModuleInit, OnModuleDestroy,
     return this.redisReady;
   }
 
-  private async publish(event: NotificationStreamEvent) {
+  private async publish(organizationId: string, event: NotificationStreamEvent) {
     await this.ensureRedis();
 
     if (!this.redisPublisher) {
@@ -141,7 +151,7 @@ export class NotificationStreamService implements OnModuleInit, OnModuleDestroy,
 
     await this.redisPublisher.publish(
       'notifications.stream',
-      JSON.stringify(event),
+      JSON.stringify({ ...event, organizationId }),
     );
   }
 
@@ -156,6 +166,7 @@ export class NotificationStreamService implements OnModuleInit, OnModuleDestroy,
       if (
         typeof parsed.id === 'string' &&
         typeof parsed.userId === 'string' &&
+        typeof parsed.organizationId === 'string' &&
         typeof parsed.type === 'string' &&
         typeof parsed.title === 'string' &&
         typeof parsed.body === 'string' &&
@@ -164,6 +175,7 @@ export class NotificationStreamService implements OnModuleInit, OnModuleDestroy,
         return {
           id: parsed.id,
           userId: parsed.userId,
+          organizationId: parsed.organizationId,
           type: parsed.type,
           title: parsed.title,
           body: parsed.body,

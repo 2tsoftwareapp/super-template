@@ -104,7 +104,7 @@ export class SendNotificationUseCase {
     const view = this.notificationsMapper.toNotificationView(notification);
 
     if (!options?.deferDispatch) {
-      this.dispatchService.dispatch(view);
+      this.dispatchService.dispatch(view, resolvedOrganizationId);
     }
 
     return view;
