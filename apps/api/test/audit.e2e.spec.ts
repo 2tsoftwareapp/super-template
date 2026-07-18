@@ -162,8 +162,8 @@ describe('Audit logs (e2e)', () => {
     // Test T-006.2: Uploader lacking audit.read downloading their own audit file -> 403
     // We simulate this by changing the file's uploadedById to the regular user directly in the database
     // This simulates the case where a user had audit.read, created an export, and then lost audit.read
-    const db = app.get('DATABASE');
-    const { files } = require('@repo/api-database');
+    const { files, DATABASE } = require('@repo/api-database');
+    const db = app.get(DATABASE);
     const { eq } = require('drizzle-orm');
     await db.update(files).set({ uploadedById: regularUserId.id }).where(eq(files.id, fileId));
 
@@ -205,7 +205,7 @@ describe('Audit logs (e2e)', () => {
     const exportResponse = await request(app.getHttpServer())
       .post('/api/v1/admin/audit-logs/export')
       .set(bearer(admin.accessToken))
-      // Explicitly testing global export (assuming SUPER_ADMIN defaults to global context if configured so)
+      .set('x-organization-id', '') // Explicitly testing global export by clearing tenant context
       .send({ q: 'global-export-test' })
       .expect(201);
 

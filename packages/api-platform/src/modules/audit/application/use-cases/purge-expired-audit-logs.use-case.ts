@@ -30,32 +30,41 @@ export class PurgeExpiredAuditLogsUseCase {
 
     // Acquire a distributed advisory lock so only one replica runs the purge.
     return this.advisoryLockPort.withAdvisoryLock(PURGE_LOCK_ID, async () => {
-      return this.platformTransactionPort.run(async (tx) => {
-        // Delete in batches to keep each transaction short; the lock lives until
-        // the session ends (released implicitly on connection close or explicit
-        // pg_advisory_unlock).  PostgreSQL does not release advisory locks on
-        // transaction end by default.
-        const deletedCount = await this.auditRepository.deleteOlderThanBatched(
-          cutoff,
-          BATCH_SIZE,
-          tx,
-        );
+      let totalDeleted = 0;
 
-        if (deletedCount > 0) {
+      for (;;) {
+        const deletedInBatch = await this.platformTransactionPort.run(async (tx) => {
+          // Delete one batch per transaction to keep locks short
+          return this.auditRepository.deleteOlderThanBatched(
+            cutoff,
+            BATCH_SIZE,
+            tx,
+          );
+        });
+
+        if (deletedInBatch === 0) {
+          break;
+        }
+
+        totalDeleted += deletedInBatch;
+      }
+
+      if (totalDeleted > 0) {
+        await this.platformTransactionPort.run(async (tx) => {
           await this.recordAuditLogUseCase.execute({
             scope: SYSTEM_SCOPE.PLATFORM,
             action: 'audit.retention_purged',
             entityType: 'audit_log',
             metadata: {
-              deletedCount,
+              deletedCount: totalDeleted,
               cutoff: cutoff.toISOString(),
               retentionDays,
             },
           }, tx);
-        }
+        });
+      }
 
-        return { deletedCount, cutoff };
-      });
+      return { deletedCount: totalDeleted, cutoff };
     });
   }
 }

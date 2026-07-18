@@ -8,9 +8,9 @@
 | Field | Value |
 |---|---|
 | Status | `done` |
-| Goal | Hoàn tất Re-review Round 3 để Audit system đạt yêu cầu bảo mật nghiêm ngặt (đúng scope, không rò rỉ ACL, không connection leak). |
-| Progress | `6/6` tasks done · `0` finding |
-| Top risk / blocker | None |
+| Goal | Hoàn tất Re-review Round 4 & 5 để Audit system đạt yêu cầu bảo mật nghiêm ngặt (đúng scope, không rò rỉ ACL, không connection leak, data integrity). |
+| Progress | `7/7` tasks done · `0` finding |
+| Top risk / blocker | Lỗi connection từ E2E test với database |
 | Next action | Handoff |
 | Owner | User |
 
@@ -18,7 +18,7 @@
 
 ```mermaid
 pie title Task status
-  "done" : 6
+  "done" : 7
   "in_progress" : 0
   "todo" : 0
   "blocked" : 0

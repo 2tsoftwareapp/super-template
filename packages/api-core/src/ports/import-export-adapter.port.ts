@@ -1,4 +1,5 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
+import type { TransactionExecutor } from '@repo/api-core';
 
 import { ERROR_CODES } from '../common/constants/error-codes';
 import { AppError } from '../common/errors/app-error';
@@ -29,7 +30,7 @@ export interface ImportExportAdapter<TRow extends object> {
 
   validateRow(row: TRow): string | null;
 
-  importRow(row: TRow, context: ImportExportRowContext): Promise<void>;
+  importRow(row: TRow, context: ImportExportRowContext, executor?: TransactionExecutor): Promise<void>;
 }
 
 @Injectable()

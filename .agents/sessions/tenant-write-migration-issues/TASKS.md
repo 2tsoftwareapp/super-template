@@ -42,16 +42,16 @@ plan_ref: PLAN.md
 | [x] | T-009 | Fix Interceptor & Export RLS | done |
 | [x] | T-010 | Implement Atomicity & List filter | done |
 | [x] | T-011 | Fix E2E test DB & Mock bugs | done |
-| [ ] | T-012 | Fix Atomicity & Truncate Issues (Round 5) | todo |
-| [ ] | T-013 | Fix Export Scope, Purge Loop & E2E (Round 5) | todo |
+| [x] | T-012 | Fix Atomicity & Truncate Issues (Round 5) | done |
+| [x] | T-013 | Fix Export Scope, Purge Loop & E2E (Round 5) | done |
 
 ## Progress chart
 
 ```mermaid
 pie title Card status
-  "todo" : 2
+  "done" : 7
   "in_progress" : 0
-  "done" : 5
+  "todo" : 0
   "blocked" : 0
 ```
 
@@ -132,26 +132,22 @@ T-007 → T-008 → T-009 → T-010 → T-011 → T-012 → T-013
 
 ### T-012: Fix Atomicity & Truncate Issues (Round 5)
 
-- Status: todo
-- Trace: INVESTIGATE
-- Depends: T-011
-- Work items:
-  - [ ] 1. Sửa `DeleteFile`, `DeleteAttachment`, `ConfirmImport`, `CreateExport`, `UpdateSetting` sử dụng transaction. Đảm bảo xoá object chạy sau DB commit.
-  - [ ] 2. Sửa `ExportAuditLogsUseCase` để có block try/catch cleanup object nếu DB TX fail.
-  - [ ] 3. Đổi biến `isTruncated` về `truncated` trong backend DTO.
+- Status: done
+- [x] **T-012: Fix Audit-Export storage orphans & UseCase Transactions**
+  - [x] Sửa `DeleteFile`, `DeleteAttachment`, `ConfirmImport`, `CreateExport`, `UpdateSetting` sử dụng transaction. Đảm bảo xoá object chạy sau DB commit.
+  - [x] Sửa `ExportAuditLogsUseCase` để có block try/catch cleanup object nếu DB TX fail.
+  - [x] Đổi biến `isTruncated` về `truncated` trong backend DTO.
 - Description: Fix data integrity và UI sync.
 - AC: Các use-cases mutation đi qua transaction port chuẩn.
 - Verify: Biên dịch thành công.
 
 ### T-013: Fix Export Scope, Purge Loop & E2E (Round 5)
 
-- Status: todo
-- Trace: INVESTIGATE
-- Depends: T-012
-- Work items:
-  - [ ] 1. Thêm scope explicitly filter cho query của List/Export.
-  - [ ] 2. Sửa `PurgeExpiredAuditLogsUseCase`: mỗi 5.000 rows chạy trong một block TX riêng bên trong lock loop.
-  - [ ] 3. Sửa E2E sử dụng đúng `DATABASE` Symbol và thêm test context cho SUPER_ADMIN no-org.
+- Status: done
+- [x] **T-013: Fix Export Scope, Purge Loop & E2E (Round 5)**
+  - [x] Thêm scope explicitly filter cho query của List/Export.
+  - [x] Sửa `PurgeExpiredAuditLogsUseCase`: mỗi 5.000 rows chạy trong một block TX riêng bên trong lock loop.
+  - [x] Sửa E2E sử dụng đúng `DATABASE` Symbol và thêm test context cho SUPER_ADMIN no-org.
 - Description: Sửa logic purge memory leak và E2E correctness.
 - AC: Scope nhất quán, batch purge tối ưu và test E2E hoàn chỉnh.
 - Verify: Unit test, E2E test pass.

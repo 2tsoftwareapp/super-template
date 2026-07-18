@@ -1,10 +1,10 @@
-Đúng. Vấn đề của repo hiện tại **không phải thiếu layer**, mà là:
+Vấn đề của repo hiện tại **không phải thiếu layer**, mà là:
 
-> Có nhiều layer nhưng **chưa có một bộ luật kiến trúc duy nhất, đủ chi tiết và được máy enforce**.
+> Có nhiều layer nhưng **chưa có một bộ quy tắc kiến trúc duy nhất, đủ chi tiết và được kiểm tra tự động (enforce)**.
 
-Khi giao cho nhiều AI, mỗi AI tự diễn giải:
+Khi nhiều AI cùng làm việc, mỗi AI tự suy diễn:
 
-* “Service” là nơi chứa business logic hay chỉ là facade?
+* "Service" là nơi chứa business logic hay chỉ là lớp chuyển tiếp (facade)?
 * Có cần Use Case không?
 * Repository interface nằm ở đâu?
 * UI component có được gọi query không?
@@ -12,9 +12,9 @@ Khi giao cho nhiều AI, mỗi AI tự diễn giải:
 * Form state, URL state, permissions, toast đặt ở đâu?
 * Feature nhỏ có được bỏ layer không?
 
-Kết quả là tên folder có vẻ sạch, nhưng mở code ra vẫn khó đọc.
+Hậu quả là tên folder có vẻ sạch, nhưng mở code ra vẫn khó đọc.
 
-# 1. Những bất nhất đang có trong repo
+# 1. Những bất nhất hiện có trong repo
 
 ## Backend: tài liệu nói một kiểu, generator nói một kiểu
 
@@ -33,13 +33,13 @@ application/
   <feature>.repository.port.ts
 ```
 
-Trong đó mapper và repository port lại được ghi là optional. Skill này còn hướng frontend tới `apps/admin/src/pages/...`, trong khi repo đang dùng Next.js App Router.
+Trong đó mapper và repository port được ghi là optional. Skill này còn hướng frontend tới `apps/admin/src/pages/...`, trong khi repo đang dùng Next.js App Router.
 
-Tức là chính instruction dành cho AI đã stale. AI làm theo skill sẽ tạo kiến trúc khác code hiện tại.
+Nghĩa là chính instruction dành cho AI đã lỗi thời. AI làm theo skill sẽ tạo ra kiến trúc khác với code hiện tại.
 
-## Backend đang tồn tại layer facade gần như không có giá trị
+## Backend tồn tại layer facade gần như không có giá trị
 
-Ví dụ `AuthService` chứa rất nhiều method nhưng hầu hết chỉ gọi tiếp:
+Ví dụ `AuthService` chứa nhiều method nhưng hầu hết chỉ gọi tiếp:
 
 ```ts
 register(input, context) {
@@ -49,7 +49,7 @@ register(input, context) {
 
 `SettingsService` cũng có cấu trúc tương tự.
 
-Luồng thành:
+Luồng hiện tại:
 
 ```text
 Controller
@@ -58,7 +58,7 @@ Controller
       → Repository
 ```
 
-Trong khi `AuthService` không orchestration, không transaction, không policy và không mapping. Nó chỉ là một lớp chuyển tiếp.
+Trong khi `AuthService` không làm orchestration, không transaction, không policy và không mapping. Nó chỉ là một lớp chuyển tiếp.
 
 Điều này gây ra câu hỏi cho AI:
 
@@ -67,27 +67,27 @@ Trong khi `AuthService` không orchestration, không transaction, không policy 
 * Feature nhỏ có cần cả hai không?
 * Controller được inject use case trực tiếp không?
 
-Nếu không chốt, mỗi module sẽ một kiểu.
+Nếu không chốt rõ, mỗi module sẽ một kiểu.
 
-## Frontend nói “presentational”, nhưng thực tế view vẫn là controller lớn
+## Frontend: nhãn “presentational” nhưng thực tế view vẫn là controller lớn
 
-`UsersView` hiện trực tiếp xử lý:
+`UsersView` hiện đang trực tiếp xử lý:
 
-* Router và pathname.
-* URL search params.
-* Parse/serialize filter.
-* Debounce search.
-* React Query.
-* Mutation.
-* Permission checks.
-* Table state.
-* Sorting state.
-* Selection state.
-* Dialog state.
-* Callback orchestration.
-* JSX rendering.
+* Router và pathname
+* URL search params
+* Parse/serialize filter
+* Debounce search
+* React Query
+* Mutation
+* Permission checks
+* Table state
+* Sorting state
+* Selection state
+* Dialog state
+* Callback orchestration
+* JSX rendering
 
-Nó đã dài hơn 260 dòng và chưa kết thúc ở phần được đọc.
+File đã dài hơn 260 dòng và chưa kết thúc ở phần được đọc.
 
 Đây không phải presentational view. Đây là:
 
@@ -102,7 +102,7 @@ Page controller
 
 gộp trong một file.
 
-## Frontend documentation cũng từng thay đổi pattern
+## Frontend documentation đã từng thay đổi pattern
 
 Spec cũ nói:
 
@@ -111,7 +111,7 @@ features/<resource>/      business logic
 app/(app)/<resource>/     view, drawer, columns
 ```
 
-Nhưng convention hiện tại lại yêu cầu view, drawer, table columns nằm trong:
+Nhưng convention hiện tại yêu cầu view, drawer, table columns nằm trong:
 
 ```text
 features/<resource>/components/
@@ -121,9 +121,9 @@ Pattern mới hợp lý hơn, nhưng spec cũ vẫn tồn tại và được đ�
 
 ---
 
-# 2. Nguyên tắc cần chốt trước tiên
+# 2. Nguyên tắc cần chốt
 
-Tôi đề xuất dùng bốn nguyên tắc:
+Bốn nguyên tắc sau:
 
 ## Một luồng duy nhất
 
@@ -157,9 +157,9 @@ API functions
 
 UI nhận data và callback, không tự đi lấy data.
 
-## Mỗi folder phải trả lời được một câu hỏi
+## Mỗi folder phải trả lời một câu hỏi
 
-| Folder                 | Câu hỏi nó trả lời                         |
+| Folder                 | Câu hỏi                                |
 | ---------------------- | ------------------------------------------ |
 | `presentation`         | Hệ thống giao tiếp với bên ngoài thế nào?  |
 | `application`          | Use case của hệ thống làm gì?              |
@@ -174,11 +174,11 @@ UI nhận data và callback, không tự đi lấy data.
 
 Một class chỉ gọi class khác với cùng tham số và cùng kết quả thường không tạo thêm giá trị.
 
-## Convention phải được enforce
+## Convention phải được thực thi (enforce)
 
-Documentation không đủ. AI vẫn có thể bỏ qua hoặc hiểu khác.
+Documentation không đủ. AI vẫn có thể bỏ qua hoặc hiểu sai.
 
-Phải enforce bằng:
+Phải thực thi bằng:
 
 * ESLint.
 * Source policy scripts.
@@ -224,11 +224,11 @@ apps/api/
 * Swagger.
 * CLI migration/seed bootstrap.
 
-Điểm này repo hiện đã đi đúng hướng.
+Repo hiện đã đi đúng hướng ở điểm này.
 
 ---
 
-## 3.2 Cấu trúc một backend module chuẩn
+## 3.2 Cấu trúc backend module chuẩn
 
 ```text
 modules/users/
@@ -275,7 +275,7 @@ modules/users/
         └── s3-user-avatar.storage.ts
 ```
 
-Không phải module nào cũng bắt buộc có tất cả file, nhưng **vị trí của từng loại code là cố định**.
+Không phải module nào cũng bắt buộc có đủ tất cả file, nhưng **vị trí của từng loại code là cố định**.
 
 ---
 
@@ -285,23 +285,23 @@ Không phải module nào cũng bắt buộc có tất cả file, nhưng **vị 
 
 Chỉ xử lý giao thức HTTP:
 
-* Decorator.
-* Route.
-* Authentication context.
-* Parse path/query/body.
-* Gọi use case.
-* Map application result thành response DTO.
-* Chọn HTTP status.
+* Decorator
+* Route
+* Authentication context
+* Parse path/query/body
+* Gọi use case
+* Map application result thành response DTO
+* Chọn HTTP status
 
 Không được:
 
-* Import Drizzle.
-* Query database.
-* Chứa business condition.
-* Gọi repository.
-* Gửi mail trực tiếp.
-* Tạo transaction.
-* Import infrastructure.
+* Import Drizzle
+* Query database
+* Chứa business condition
+* Gọi repository
+* Gửi mail trực tiếp
+* Tạo transaction
+* Import infrastructure
 
 Ví dụ:
 
@@ -345,13 +345,13 @@ Application layer mô tả hành vi của hệ thống:
 
 Use case chịu trách nhiệm:
 
-* Orchestration.
-* Transaction boundary.
-* Gọi domain policies.
-* Gọi repository ports.
-* Gọi cross-context ports.
-* Audit side effects.
-* Trả application result.
+* Orchestration
+* Transaction boundary
+* Gọi domain policies
+* Gọi repository ports
+* Gọi cross-context ports
+* Audit side effects
+* Trả application result
 
 ```ts
 @Injectable()
@@ -391,13 +391,13 @@ export class BlockUserUseCase {
 
 Application không được import:
 
-* Controller DTO.
-* Express request.
-* `@nestjs/swagger`.
-* Drizzle table.
-* Concrete S3/Redis client.
+* Controller DTO
+* Express request
+* `@nestjs/swagger`
+* Drizzle table
+* Concrete S3/Redis client
 
-Nest `@Injectable()` có thể được chấp nhận vì repo dùng Nest làm DI framework, nhưng business rule thuần phải nằm trong domain.
+Nest `@Injectable()` được chấp nhận vì repo dùng Nest làm DI framework, nhưng business rule thuần phải nằm trong domain.
 
 ---
 
@@ -407,9 +407,9 @@ Repo đã có ADR khá hợp lý:
 
 > Chỉ tạo `domain/` khi module thực sự sở hữu state machine, validation policy hoặc authorization rule độc lập với framework.
 
-Nên giữ quyết định này.
+Nên giữ nguyên quyết định này.
 
-Ví dụ phù hợp với domain:
+Ví dụ phù hợp có domain:
 
 ```ts
 export function resolveJobFailure(
@@ -434,13 +434,14 @@ GET settings
 PATCH settings/:key
 ```
 
-Nhưng không có domain không đồng nghĩa được bỏ qua application/ports.
+Không có domain không đồng nghĩa được bỏ qua application/ports.
 
 ---
 
 ## Application ports
 
-Repository interface phải ở phía consumer, không nằm cạnh implementation:
+Repository interface phải nằm ở phía consumer, không nằm cạnh implementation:
+
 
 ```ts
 export const USER_REPOSITORY = Symbol("USER_REPOSITORY");
@@ -483,14 +484,14 @@ Binding chỉ xuất hiện trong module:
 
 Chỉ chứa chi tiết kỹ thuật:
 
-* Drizzle.
-* PostgreSQL.
-* Redis.
-* S3.
-* SMTP.
-* Firebase.
-* External HTTP provider.
-* Cryptographic provider implementation.
+* Drizzle
+* PostgreSQL
+* Redis
+* S3
+* SMTP
+* Firebase
+* External HTTP provider
+* Cryptographic provider implementation
 
 Không được chứa business rule kiểu:
 
@@ -504,7 +505,7 @@ Infrastructure chỉ thực hiện contract của port.
 
 # 5. Có giữ `<Feature>Service` hay không?
 
-Tôi đề xuất:
+Đề xuất:
 
 ## Xóa facade service chuyển tiếp
 
@@ -527,7 +528,7 @@ Controller
 
 ## Chỉ tạo facade khi có consumer ngoài module
 
-Ví dụ module khác cần một API ổn định từ Identity:
+Ví dụ: module khác cần một API ổn định từ Identity:
 
 ```ts
 export interface UserLookupPort {
@@ -548,10 +549,10 @@ export class IdentityFacade {
 
 Facade này có mục đích:
 
-* Là public API của bounded context.
-* Che giấu internal use cases.
-* Không phục vụ controller trong cùng module.
-* Chỉ export những operation context khác được phép dùng.
+* Là public API của bounded context
+* Che giấu internal use cases
+* Không phục vụ controller trong cùng module
+* Chỉ export những operation context khác được phép dùng
 
 Như vậy tên `Service` không còn mơ hồ.
 

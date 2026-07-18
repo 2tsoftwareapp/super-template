@@ -1,26 +1,13 @@
-# Tenant write migration issues (Re-review 3)
+# Tenant Write Migration Issues (Audit Logs Multi-Tenant RLS & Performance)
 
-## Outcome
+## Tóm tắt (The Vital Few - 80/20)
 
-Đã sửa lỗi multi-tenant data bleed/access controls trong hệ thống Audit.
-
-## Decisions
-
-- **Tenant scope enforcement**: Ép các event của tenant sử dụng `SYSTEM_SCOPE.ORGANIZATION` và pass kèm `organizationId` vào payload, thay vì để `PLATFORM` dẫn đến RLS (Row Level Security) từ chối ghi dữ liệu.
-- **Export ACL Isolation**: File sinh ra từ Audit Export không dùng `uploadedById` để cấp quyền như file thường, mà dựa vào rule `audit.read` role (hoặc SUPER_ADMIN).
-- **Atomicity giữa Mutation và Audit**: Dùng chung 1 transaction port (`TRANSACTION_PORT` hoặc `PLATFORM_TRANSACTION_PORT`) bao trọn cả logic business (tạo file, đính kèm, sửa đổi) và logic ghi audit. Không dùng pool check-out thủ công vì RLS sẽ không được kích hoạt đúng context.
+- **PlatformTransactionPort**: Khi cần bypass Row Level Security (RLS) để đọc/ghi các dữ liệu cấp hệ thống (platform events, super admin queries), luôn đóng gói logic vào bên trong `PlatformTransactionPort.run()`. Port này sẽ tự mở một transaction Postgres với role bypassRls. Không cố tình "try-catch" rải rác.
+- **Storage Cleanup Atomicity**: Khi UseCase có thay đổi database đồng thời với thao tác ghi/xoá Object Storage (ví dụ: upload audit export file, xoá file đính kèm), bắt buộc DB phải gọi `TRANSACTION_PORT.run()`. Thao tác storage phải có block `try-catch` để xoá object nếu `commit` DB xảy ra lỗi (hoặc upload ngoài transaction và revert nếu tx fail). Tránh rác (zombie objects) trên S3.
+- **Batched Deletion với Advisory Lock**: Dành cho các tác vụ cron job (ví dụ: xoá audit logs cũ). Không được dùng chung 1 connection/1 transaction cho vòng lặp xoá lớn (gây lock row kéo dài và rò rỉ connection). Hãy sử dụng `pg_try_advisory_lock` (thông qua `AdvisoryLockPort`) để đảm bảo chỉ có 1 worker chạy. Vòng lặp xoá bên trong phải mỗi bước lấy 1 transaction ngắn (ví dụ xoá 5000 rows).
+- **Phân định rõ ràng Scope & Tenant Context**: Dù user là SUPER_ADMIN, mọi query/list/export phải tuân thủ scope của organization nếu context đang mang `organizationId`. Để lấy dữ liệu toàn hệ thống, phải truyền explicit filter `organizationId: null` và `scope: PLATFORM`.
 
 ## Gotchas
 
-- **Advisory Lock Connection Leak**: PostgreSQL `pg_try_advisory_lock` (session mode) dính với process đang check out connection từ connection pool. Đừng gọi qua các proxy repository không trả lại đúng original executor, phải xin `PoolClient` trực tiếp từ dependency và release nó ở block `finally`.
-- **Global Export with RLS**: Audit export Global (SUPER_ADMIN) sinh ra file không thuộc tổ chức nào (org ID null). File repository có bật RLS, vì thế phải truyền bypass `withTenantContext({ tenantId: null as unknown as string, bypassRls: true, userId: actor.userId })` để lưu export file meta.
-
-## Conventions
-
-- API trả về biến là `isTruncated` (boolean) để frontend có thể cảnh báo user về giới hạn xuất export. Không dùng biến `truncated`.
-- Trong Vitest, E2E Database Tests nếu có inject TransactionPort, phải mock đầy đủ `expect.anything()` cho tham số `tx` được bọc bên trong port.
-
-## Pointers
-
-- **FileAccessService**: Nơi quản lý quyền tải file hỗn hợp (File thường vs Audit Export).
-- **PurgeExpiredAuditLogsUseCase**: Nơi minh hoạ rõ ràng cách dùng Postgres Session Advisory Lock trong NestJS.
+- Lỗi `Reflect.getMetadata` hoặc ECONNREFUSED khi chạy `bun test apps/api/test/*.e2e.spec.ts`: Môi trường giả lập Bun có thể không tương thích hoặc thiếu setup Postgres database trên cổng 65432. Bắt buộc test E2E cho repo bằng `vitest` (`pnpm run test:e2e`).
+- E2E Tests cho global logic: Với test dành cho context không có org (Global scope), cần fake context bằng cách sử dụng token Header `x-organization-id: ''`. Trang bị cấu hình giả lập chuẩn.

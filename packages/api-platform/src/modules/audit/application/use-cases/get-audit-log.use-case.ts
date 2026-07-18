@@ -25,10 +25,14 @@ export class GetAuditLogUseCase {
     }
 
     const isSuperAdmin = actor.roles.includes(ROLE_NAMES.SUPER_ADMIN);
+
+    const expectedOrganizationId = isSuperAdmin && !actor.organizationId 
+      ? null 
+      : actor.organizationId;
+
     if (
-      !isSuperAdmin &&
-      row.organizationId &&
-      row.organizationId !== actor.organizationId
+      expectedOrganizationId &&
+      row.organizationId !== expectedOrganizationId
     ) {
       throw new AppError(
         ERROR_CODES.AUDIT_LOG_NOT_FOUND,

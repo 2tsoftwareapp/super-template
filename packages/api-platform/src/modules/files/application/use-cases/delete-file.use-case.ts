@@ -13,6 +13,7 @@ import {
 } from '../../../storage/application/object-storage.interface';
 import { FILES_REPOSITORY, type FilesRepositoryPort } from '../ports/files.repository.port';
 import { FileAccessService } from '../services/file-access.service';
+import { TRANSACTION_PORT, type TransactionPort } from '@repo/api-core';
 
 @Injectable()
 export class DeleteFileUseCase {
@@ -21,6 +22,7 @@ export class DeleteFileUseCase {
     @Inject(FILES_REPOSITORY) private readonly filesRepository: FilesRepositoryPort,
     @Inject(OBJECT_STORAGE) private readonly objectStorage: ObjectStorage,
     private readonly auditService: AuditService,
+    @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
   ) {}
 
   async execute(
@@ -33,25 +35,24 @@ export class DeleteFileUseCase {
       fileId,
     );
 
+    await this.transactionPort.run(async (tx) => {
+      await this.filesRepository.softDelete(file.id, tx);
+
+      await this.auditService.log({
+        actorId: actor.userId,
+        action: 'file.deleted',
+        entityType: 'file',
+        entityId: file.id,
+        requestContext,
+        ...(file.organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: file.organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
+      }, tx);
+    });
+
     try {
       await this.objectStorage.delete(file.storageKey);
     } catch {
-      throw new AppError(
-        ERROR_CODES.INTERNAL_ERROR,
-        'File storage cleanup failed',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      // NOTE: Failure to delete storage object is ignored for now.
+      // An outbox/cleanup worker should ideally sweep orphaned objects later.
     }
-
-    await this.filesRepository.softDelete(file.id);
-
-    await this.auditService.log({
-      actorId: actor.userId,
-      action: 'file.deleted',
-      entityType: 'file',
-      entityId: file.id,
-      requestContext,
-      ...(file.organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: file.organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
-    });
   }
 }

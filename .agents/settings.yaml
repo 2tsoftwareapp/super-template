@@ -51,7 +51,7 @@ rules:
     # User-facing lifecycle artifact format.
     # Supported: markdown (default) | html
     # HTML uses one enterprise theme (Tailwind CDN) — see DESIGN_SYSTEM.md
-    output_format: html
+    output_format: markdown
     style: 80-20
     # 80/20 executive summary sits at the TOP of every report so readers get
     # the important 20% without reading the detail.
@@ -82,6 +82,16 @@ rules:
     sync_strategy: main-only
   code:
     comments:
+      # Full standard (per-language doc comments, flow docs, markers, examples):
+      standard: .agents/CODE_COMMENTS.md
+      # Doc comments on exported/public symbols: public-api | all | off
+      doc_comments: public-api
+      # Numbered flow blocks for logic: non-obvious | complex-only | off
+      flow_comments: non-obvious
       non_obvious_flow: required
       rationale_and_constraints: required
       obvious_code_narration: avoid
+      # Standardized, owned markers the reviewer enforces.
+      markers: [TODO, FIXME, NOTE, HACK, SECURITY, PERF]
+      # Optional per-language override, e.g. python: numpy | google
+      language_style: {}

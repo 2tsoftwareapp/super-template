@@ -162,27 +162,19 @@ export class AuditRepository implements AuditRepositoryPort {
     batchSize: number,
     executor: DatabaseExecutor = this.database,
   ): Promise<number> {
-    let totalDeleted = 0;
+    const result = await executor.execute(
+      sql`
+        DELETE FROM audit_logs
+        WHERE id IN (
+          SELECT id FROM audit_logs
+          WHERE created_at <= ${cutoff}
+          ORDER BY created_at
+          LIMIT ${batchSize}
+        )
+      `,
+    );
 
-    for (;;) {
-      const result = await executor.execute(
-        sql`
-          DELETE FROM audit_logs
-          WHERE id IN (
-            SELECT id FROM audit_logs
-            WHERE created_at <= ${cutoff}
-            ORDER BY created_at
-            LIMIT ${batchSize}
-          )
-        `,
-      );
-
-      const deletedCount = result.rowCount ?? 0;
-      if (deletedCount === 0) break;
-      totalDeleted += deletedCount;
-    }
-
-    return totalDeleted;
+    return result.rowCount ?? 0;
   }
 
   async tryAdvisoryLock(

@@ -4,7 +4,7 @@ import type {
 } from '@repo/api-core';
 
 import { Inject, Injectable } from '@nestjs/common';
-import {  ImportExportAdapterRegistry, requireOrganizationId, toCsv , SYSTEM_SCOPE } from '@repo/api-core';
+import {  ImportExportAdapterRegistry, requireOrganizationId, toCsv , SYSTEM_SCOPE, TRANSACTION_PORT, type TransactionPort } from '@repo/api-core';
 import { randomUUID } from 'node:crypto';
 
 import type { CreateExportCommand } from '../exports.types';
@@ -26,6 +26,7 @@ export class CreateExportUseCase {
     private readonly importExportAdapters: ImportExportAdapterRegistry,
     @Inject(OBJECT_STORAGE) private readonly objectStorage: ObjectStorage,
     private readonly auditService: AuditService,
+    @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
   ) {}
 
   async execute(
@@ -62,41 +63,6 @@ export class CreateExportUseCase {
       return ExportsMapper.toDto(job);
     }
 
-    try {
-      const fileId = await this.generateExportFile(actor, organizationId, input);
-
-      const updated = await this.exportJobsRepository.update(job.id, {
-        status: 'COMPLETED',
-        fileId,
-        completedAt: new Date(),
-      });
-
-      await this.auditService.log({
-        actorId: actor.userId,
-        action: 'export.created',
-        entityType: 'export_job',
-        entityId: job.id,
-        metadata: { type: input.type, fileId },
-        requestContext,
-        ...(organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
-    });
-
-      return ExportsMapper.toDto(updated ?? job);
-    } catch (error) {
-      await this.exportJobsRepository.update(job.id, {
-        status: 'FAILED',
-        completedAt: new Date(),
-      });
-
-      throw error;
-    }
-  }
-
-  private async generateExportFile(
-    actor: AuthenticatedRequestUser,
-    organizationId: string,
-    input: CreateExportCommand,
-  ) {
     const adapter = this.importExportAdapters.resolve(input.type);
     const rows = await adapter.listForExport({
       organizationId,
@@ -114,23 +80,48 @@ export class CreateExportUseCase {
     });
 
     try {
-      const file = await this.filesRepository.create({
-        organizationId,
-        storageKey,
-        originalName: `${input.type}-export-${Date.now()}.csv`,
-        mimeType: 'text/csv',
-        sizeBytes: body.length,
-        uploadedById: actor.userId,
+      const updatedJob = await this.transactionPort.run(async (tx) => {
+        const file = await this.filesRepository.create({
+          organizationId,
+          storageKey,
+          originalName: `${input.type}-export-${Date.now()}.csv`,
+          mimeType: 'text/csv',
+          sizeBytes: body.length,
+          uploadedById: actor.userId,
+        }, tx);
+
+        if (!file) throw new Error('Export file insert returned no rows');
+
+        const updated = await this.exportJobsRepository.update(job.id, {
+          status: 'COMPLETED',
+          fileId: file.id,
+          completedAt: new Date(),
+        }, tx);
+
+        await this.auditService.log({
+          actorId: actor.userId,
+          action: 'export.created',
+          entityType: 'export_job',
+          entityId: job.id,
+          metadata: { type: input.type, fileId: file.id },
+          requestContext,
+          ...(organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
+        }, tx);
+
+        return updated;
       });
 
-      if (!file) {
-        throw new Error('Export file insert returned no rows');
-      }
-
-      return file.id;
+      return ExportsMapper.toDto(updatedJob ?? job);
     } catch (error) {
       await this.objectStorage.delete(storageKey).catch(() => undefined);
+      await this.exportJobsRepository.update(job.id, {
+        status: 'FAILED',
+        completedAt: new Date(),
+      }).catch(() => undefined);
+
       throw error;
     }
   }
+
+
 }

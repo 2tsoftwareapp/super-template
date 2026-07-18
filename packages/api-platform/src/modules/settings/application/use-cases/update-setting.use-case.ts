@@ -11,12 +11,14 @@ import type { UpdateSettingCommand } from '../settings.types';
 import { AuditService } from '../../../audit/application/audit.service';
 import { SETTINGS_REPOSITORY, type SettingsRepositoryPort } from '../ports/settings.repository.port';
 import { SettingsMapper } from '../settings.mapper';
+import { PLATFORM_TRANSACTION_PORT, type PlatformTransactionPort } from '@repo/api-core';
 
 @Injectable()
 export class UpdateSettingUseCase {
   constructor(
     @Inject(SETTINGS_REPOSITORY) private readonly settingsRepository: SettingsRepositoryPort,
     private readonly auditService: AuditService,
+    @Inject(PLATFORM_TRANSACTION_PORT) private readonly platformTransactionPort: PlatformTransactionPort,
   ) {}
 
   async execute(
@@ -33,28 +35,33 @@ export class UpdateSettingUseCase {
       );
     }
 
-    const updated = await this.settingsRepository.upsert(
-      key,
-      input.value,
-      actor.userId,
-    );
-
-    if (!updated) {
-      throw new AppError(
-        ERROR_CODES.SETTINGS_NOT_FOUND,
-        'Setting could not be updated',
-        HttpStatus.NOT_FOUND,
+    const updated = await this.platformTransactionPort.run(async (tx) => {
+      const setting = await this.settingsRepository.upsert(
+        key,
+        input.value,
+        actor.userId,
+        tx,
       );
-    }
 
-    await this.auditService.log({
-      actorId: actor.userId,
-      action: 'settings.updated',
-      entityType: 'application_setting',
-      entityId: key,
-      metadata: { key },
-      requestContext,
+      if (!setting) {
+        throw new AppError(
+          ERROR_CODES.SETTINGS_NOT_FOUND,
+          'Setting could not be updated',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      await this.auditService.log({
+        actorId: actor.userId,
+        action: 'settings.updated',
+        entityType: 'application_setting',
+        entityId: key,
+        metadata: { key },
+        requestContext,
         scope: SYSTEM_SCOPE.PLATFORM
+      }, tx);
+
+      return setting;
     });
 
     return SettingsMapper.toDto(updated);

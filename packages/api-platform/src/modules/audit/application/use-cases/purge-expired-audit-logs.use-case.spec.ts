@@ -28,7 +28,7 @@ describe('PurgeExpiredAuditLogsUseCase', () => {
 
   it('deletes rows older than the retention cutoff and records the purge', async () => {
     const auditRepository = {
-      deleteOlderThanBatched: vi.fn(async () => 3),
+      deleteOlderThanBatched: vi.fn().mockResolvedValueOnce(3).mockResolvedValue(0),
     };
     const recordAuditLogUseCase = { execute: vi.fn(async () => undefined) };
     const advisoryLockPort = { withAdvisoryLock: vi.fn(async (_, cb) => cb()) };

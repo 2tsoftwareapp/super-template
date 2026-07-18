@@ -19,13 +19,19 @@ export class ListAuditLogsUseCase {
   async execute(actor: AuthenticatedRequestUser, query: ListAuditLogsQuery) {
     const isSuperAdmin = actor.roles.includes(ROLE_NAMES.SUPER_ADMIN);
 
+    const organizationId = isSuperAdmin && !actor.organizationId 
+      ? null 
+      : actor.organizationId;
+
+    if (!isSuperAdmin && !organizationId) {
+      throw new Error('Organization ID is required for non-super admin');
+    }
+
     const result = await this.auditRepository.list({
       page: query.page,
       limit: query.limit,
       sortOrder: query.sortOrder,
-      ...(!isSuperAdmin && actor.organizationId
-        ? { organizationId: actor.organizationId }
-        : {}),
+      ...(organizationId ? { organizationId } : {}),
       ...(query.actorId !== undefined ? { actorId: query.actorId } : {}),
       ...(query.action !== undefined ? { action: query.action } : {}),
       ...(query.resourceType !== undefined

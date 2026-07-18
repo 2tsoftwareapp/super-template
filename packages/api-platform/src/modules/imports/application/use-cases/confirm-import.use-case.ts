@@ -10,6 +10,8 @@ import {
   ImportExportAdapterRegistry,
   type ImportValidationError,
   SYSTEM_SCOPE,
+  TRANSACTION_PORT,
+  type TransactionPort,
 } from '@repo/api-core';
 
 import type { ImportJobView } from '../imports.types';
@@ -34,6 +36,7 @@ export class ConfirmImportUseCase {
     private readonly importExportAdapters: ImportExportAdapterRegistry,
     private readonly importFileParser: ImportFileParserService,
     private readonly auditService: AuditService,
+    @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
   ) {}
 
   async execute(
@@ -90,45 +93,50 @@ export class ConfirmImportUseCase {
       file.storageKey,
     );
     const adapter = this.importExportAdapters.resolve(job.type);
+
     let successCount = 0;
     const errors: ImportValidationError[] = [];
 
-    for (const [index, row] of parsed.rows.entries()) {
-      try {
-        await adapter.importRow(row, {
-          organizationId: file.organizationId,
-          ownerId: actor.userId,
-          createdById: actor.userId,
-        });
+    const updatedJob = await this.transactionPort.run(async (tx) => {
+      for (const [index, row] of parsed.rows.entries()) {
+        try {
+          await adapter.importRow(row, {
+            organizationId: file.organizationId!,
+            ownerId: actor.userId,
+            createdById: actor.userId,
+          }, tx);
 
-        successCount += 1;
-      } catch (error) {
-        errors.push({
-          row: index + 1,
-          message: error instanceof Error ? error.message : 'Import failed',
-        });
+          successCount += 1;
+        } catch (error) {
+          errors.push({
+            row: index + 1,
+            message: error instanceof Error ? error.message : 'Import failed',
+          });
+        }
       }
-    }
 
-    const updated = await this.importJobsRepository.update(job.id, {
-      status: errors.length > 0 ? 'FAILED' : 'COMPLETED',
-      confirmedAt: new Date(),
-      completedAt: new Date(),
-      successCount,
-      errorCount: errors.length,
-      errors: errors.length > 0 ? errors : null,
+      const updated = await this.importJobsRepository.update(job.id, {
+        status: errors.length > 0 ? 'FAILED' : 'COMPLETED',
+        confirmedAt: new Date(),
+        completedAt: new Date(),
+        successCount,
+        errorCount: errors.length,
+        errors: errors.length > 0 ? errors : null,
+      }, tx);
+
+      await this.auditService.log({
+        actorId: actor.userId,
+        action: 'import.confirmed',
+        entityType: 'import_job',
+        entityId: job.id,
+        metadata: { successCount, errorCount: errors.length },
+        requestContext,
+        ...(job.organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: job.organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
+      }, tx);
+
+      return updated;
     });
 
-    await this.auditService.log({
-      actorId: actor.userId,
-      action: 'import.confirmed',
-      entityType: 'import_job',
-      entityId: job.id,
-      metadata: { successCount, errorCount: errors.length },
-      requestContext,
-      ...(job.organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: job.organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
-    });
-
-    return this.importsMapper.toImportJobView(updated ?? job);
+    return this.importsMapper.toImportJobView(updatedJob ?? job);
   }
 }
