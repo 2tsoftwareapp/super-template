@@ -41,14 +41,16 @@ describe('ExportAuditLogsUseCase', () => {
       upload: vi.fn(async () => ({ key: 'exports/audit/some-key.csv' })),
       delete: vi.fn(async () => undefined),
     };
-    const database = { execute: vi.fn() };
+    const transactionPort = { withTenant: vi.fn(async (_, cb) => cb({} as any)) };
+    const platformTransactionPort = { run: vi.fn(async (cb) => cb({} as any)) };
     const recordAuditLogUseCase = { execute: vi.fn(async () => undefined) };
 
     const useCase = new ExportAuditLogsUseCase(
       auditRepository as never,
       filesRepository as never,
       objectStorage as never,
-      database as never,
+      transactionPort as never,
+      platformTransactionPort as never,
       recordAuditLogUseCase as never,
     );
 
@@ -58,11 +60,11 @@ describe('ExportAuditLogsUseCase', () => {
       action: 'project.created',
       limit: 5000,
       organizationId: 'org-1',
-    });
+    }, expect.anything());
     expect(auditRepository.count).toHaveBeenCalledWith({
       action: 'project.created',
       organizationId: 'org-1',
-    });
+    }, expect.anything());
     expect(objectStorage.upload).toHaveBeenCalledWith(
       expect.objectContaining({ mimeType: 'text/csv' }),
     );
@@ -74,6 +76,7 @@ describe('ExportAuditLogsUseCase', () => {
         kind: FILE_KIND.AUDIT_EXPORT,
         visibility: FILE_VISIBILITY.RESTRICTED,
       }),
+      expect.anything(),
     );
     expect(recordAuditLogUseCase.execute).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -82,22 +85,25 @@ describe('ExportAuditLogsUseCase', () => {
         organizationId: 'org-1',
         metadata: expect.objectContaining({ rowCount: 1, fileId: 'file-1' }),
       }),
+      expect.anything(),
     );
-    expect(result).toEqual({ fileId: 'file-1', rowCount: 1, totalMatching: 1, truncated: false });
+    expect(result).toEqual({ fileId: 'file-1', rowCount: 1, totalMatching: 1, isTruncated: false });
   });
 
   it('rejects when the actor has no active organization', async () => {
     const auditRepository = { listForExport: vi.fn(), count: vi.fn() };
     const filesRepository = { create: vi.fn() };
     const objectStorage = { upload: vi.fn(), delete: vi.fn() };
-    const database = { execute: vi.fn() };
+    const transactionPort = { withTenant: vi.fn(async (_, cb) => cb({} as any)) };
+    const platformTransactionPort = { run: vi.fn(async (cb) => cb({} as any)) };
     const recordAuditLogUseCase = { execute: vi.fn() };
 
     const useCase = new ExportAuditLogsUseCase(
       auditRepository as never,
       filesRepository as never,
       objectStorage as never,
-      database as never,
+      transactionPort as never,
+      platformTransactionPort as never,
       recordAuditLogUseCase as never,
     );
 
@@ -122,24 +128,23 @@ describe('ExportAuditLogsUseCase', () => {
       upload: vi.fn(async () => ({ key: 'exports/audit/global.csv' })),
       delete: vi.fn(async () => undefined),
     };
-    const database = { 
-      execute: vi.fn(), 
-      transaction: vi.fn(async (cb) => cb({ execute: vi.fn() })) 
-    };
+    const transactionPort = { withTenant: vi.fn(async (_, cb) => cb({} as any)) };
+    const platformTransactionPort = { run: vi.fn(async (cb) => cb({} as any)) };
     const recordAuditLogUseCase = { execute: vi.fn() };
 
     const useCase = new ExportAuditLogsUseCase(
       auditRepository as never,
       filesRepository as never,
       objectStorage as never,
-      database as never,
+      transactionPort as never,
+      platformTransactionPort as never,
       recordAuditLogUseCase as never,
     );
 
     const superAdminActor = { ...actor, organizationId: null, roles: ['SUPER_ADMIN'] };
     await useCase.execute(superAdminActor, {});
 
-    expect(auditRepository.listForExport).toHaveBeenCalledWith({ limit: 5000 });
+    expect(auditRepository.listForExport).toHaveBeenCalledWith({ limit: 5000 }, expect.anything());
     expect(filesRepository.create).toHaveBeenCalledWith(
       expect.objectContaining({
         organizationId: null,
@@ -165,14 +170,16 @@ describe('ExportAuditLogsUseCase', () => {
       upload: vi.fn(async () => ({ key: 'exports/audit/some-key.csv' })),
       delete: vi.fn(async () => undefined),
     };
-    const database = { execute: vi.fn() };
+    const transactionPort = { withTenant: vi.fn(async (_, cb) => cb({} as any)) };
+    const platformTransactionPort = { run: vi.fn(async (cb) => cb({} as any)) };
     const recordAuditLogUseCase = { execute: vi.fn(async () => undefined) };
 
     const useCase = new ExportAuditLogsUseCase(
       auditRepository as never,
       filesRepository as never,
       objectStorage as never,
-      database as never,
+      transactionPort as never,
+      platformTransactionPort as never,
       recordAuditLogUseCase as never,
     );
 

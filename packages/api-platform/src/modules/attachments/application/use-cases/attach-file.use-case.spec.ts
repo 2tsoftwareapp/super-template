@@ -22,9 +22,11 @@ describe('AttachFileUseCase', () => {
     const filesRepository = { findById: vi.fn(async () => null) };
     const attachmentsRepository = { create: vi.fn() };
     const auditService = { log: vi.fn() };
+    const transactionPort = { withTenant: vi.fn(async (_, cb) => cb({} as any)) };
     const useCase = new AttachFileUseCase(
       attachmentsRepository as never,
       filesRepository as never,
+      transactionPort as never,
       auditService as never,
     );
 
@@ -50,9 +52,11 @@ describe('AttachFileUseCase', () => {
     };
     const attachmentsRepository = { create: vi.fn(async () => attachment) };
     const auditService = { log: vi.fn(async () => undefined) };
+    const transactionPort = { withTenant: vi.fn(async (_, cb) => cb({} as any)) };
     const useCase = new AttachFileUseCase(
       attachmentsRepository as never,
       filesRepository as never,
+      transactionPort as never,
       auditService as never,
     );
 
@@ -64,9 +68,11 @@ describe('AttachFileUseCase', () => {
         fileId: 'file-1',
         createdById: 'user-1',
       }),
+      expect.anything(),
     );
     expect(auditService.log).toHaveBeenCalledWith(
       expect.objectContaining({ action: 'attachment.created' }),
+      expect.anything(),
     );
     expect(result).toMatchObject({ id: 'att-1', fileId: 'file-1' });
   });

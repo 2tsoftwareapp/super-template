@@ -9,6 +9,7 @@ import { UpdateSettingUseCase } from './update-setting.use-case';
 const actor = {
   userId: 'user-1',
   organizationId: 'org-1',
+  roles: ['SUPER_ADMIN'],
 } as unknown as AuthenticatedRequestUser;
 
 describe('UpdateSettingUseCase', () => {

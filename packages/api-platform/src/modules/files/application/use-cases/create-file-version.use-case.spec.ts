@@ -49,11 +49,13 @@ describe('CreateFileVersionUseCase', () => {
       delete: vi.fn(async () => undefined),
     };
     const auditService = { log: vi.fn(async () => undefined) };
+    const transactionPort = { withTenant: vi.fn(async (_, cb) => cb({} as any)) };
 
     const useCase = new CreateFileVersionUseCase(
       fileAccessService as never,
       filesRepository as never,
       objectStorage as never,
+      transactionPort as never,
       auditService as never,
     );
 
@@ -66,10 +68,12 @@ describe('CreateFileVersionUseCase', () => {
         versionNumber: 2,
         createdById: 'user-1',
       }),
+      expect.anything(),
     );
     expect(filesRepository.setCurrentVersion).toHaveBeenCalledWith(
       'file-1',
       expect.objectContaining({ latestVersion: 2 }),
+      expect.anything(),
     );
     expect(auditService.log).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -77,6 +81,7 @@ describe('CreateFileVersionUseCase', () => {
         entityId: 'file-1',
         metadata: { versionNumber: 2 },
       }),
+      expect.anything(),
     );
     expect(result).toMatchObject({ id: 'file-1', latestVersion: 2 });
   });
@@ -91,11 +96,13 @@ describe('CreateFileVersionUseCase', () => {
     const filesRepository = { createVersion: vi.fn(), setCurrentVersion: vi.fn() };
     const objectStorage = { upload: vi.fn(), delete: vi.fn() };
     const auditService = { log: vi.fn() };
+    const transactionPort = { withTenant: vi.fn(async (_, cb) => cb({} as any)) };
 
     const useCase = new CreateFileVersionUseCase(
       fileAccessService as never,
       filesRepository as never,
       objectStorage as never,
+      transactionPort as never,
       auditService as never,
     );
 
@@ -130,11 +137,13 @@ describe('CreateFileVersionUseCase', () => {
       delete: vi.fn(async () => undefined),
     };
     const auditService = { log: vi.fn() };
+    const transactionPort = { withTenant: vi.fn(async (_, cb) => cb({} as any)) };
 
     const useCase = new CreateFileVersionUseCase(
       fileAccessService as never,
       filesRepository as never,
       objectStorage as never,
+      transactionPort as never,
       auditService as never,
     );
 

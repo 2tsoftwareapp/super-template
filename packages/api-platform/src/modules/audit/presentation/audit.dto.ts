@@ -126,5 +126,5 @@ export class AuditExportResultDto {
   totalMatching: number;
 
   @ApiProperty()
-  truncated: boolean;
+  isTruncated: boolean;
 }

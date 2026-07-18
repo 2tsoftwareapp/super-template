@@ -16,6 +16,7 @@ describe('PurgeExpiredAuditLogsUseCase', () => {
       recordAuditLogUseCase as never,
       buildEnvironmentService(0) as never,
       {} as never,
+      {} as never,
     );
 
     const result = await useCase.execute();
@@ -30,32 +31,24 @@ describe('PurgeExpiredAuditLogsUseCase', () => {
       deleteOlderThanBatched: vi.fn(async () => 3),
     };
     const recordAuditLogUseCase = { execute: vi.fn(async () => undefined) };
-    
-    const clientMock = {
-      query: vi.fn(async (sql) => {
-        if (sql.includes('pg_try_advisory_lock')) return { rows: [{ acquired: true }] };
-        return { rows: [] };
-      }),
-      release: vi.fn(),
-    };
-    const poolMock = {
-      connect: vi.fn(async () => clientMock),
-    };
+    const advisoryLockPort = { withAdvisoryLock: vi.fn(async (_, cb) => cb()) };
+    const platformTransactionPort = { run: vi.fn(async (cb) => cb({} as any)) };
 
     const useCase = new PurgeExpiredAuditLogsUseCase(
       auditRepository as never,
       recordAuditLogUseCase as never,
       buildEnvironmentService(30) as never,
-      poolMock as never,
+      advisoryLockPort as never,
+      platformTransactionPort as never,
     );
 
     const result = await useCase.execute();
 
-    expect(poolMock.connect).toHaveBeenCalled();
-    expect(clientMock.query).toHaveBeenCalledWith('SELECT pg_try_advisory_lock($1) AS acquired', [42001]);
+    expect(result).toMatchObject({ deletedCount: 3 });
     expect(auditRepository.deleteOlderThanBatched).toHaveBeenCalledWith(
       expect.any(Date),
       5000,
+      expect.anything(),
     );
     expect(recordAuditLogUseCase.execute).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -63,6 +56,7 @@ describe('PurgeExpiredAuditLogsUseCase', () => {
         entityType: 'audit_log',
         metadata: expect.objectContaining({ deletedCount: 3, retentionDays: 30 }),
       }),
+      expect.anything(),
     );
     expect(result).toMatchObject({ deletedCount: 3 });
   });
@@ -72,23 +66,15 @@ describe('PurgeExpiredAuditLogsUseCase', () => {
       deleteOlderThanBatched: vi.fn(async () => 0),
     };
     const recordAuditLogUseCase = { execute: vi.fn(async () => undefined) };
-
-    const clientMock = {
-      query: vi.fn(async (sql) => {
-        if (sql.includes('pg_try_advisory_lock')) return { rows: [{ acquired: true }] };
-        return { rows: [] };
-      }),
-      release: vi.fn(),
-    };
-    const poolMock = {
-      connect: vi.fn(async () => clientMock),
-    };
+    const advisoryLockPort = { withAdvisoryLock: vi.fn(async (_, cb) => cb()) };
+    const platformTransactionPort = { run: vi.fn(async (cb) => cb({} as any)) };
 
     const useCase = new PurgeExpiredAuditLogsUseCase(
       auditRepository as never,
       recordAuditLogUseCase as never,
       buildEnvironmentService(30) as never,
-      poolMock as never,
+      advisoryLockPort as never,
+      platformTransactionPort as never,
     );
 
     const result = await useCase.execute();
@@ -102,29 +88,20 @@ describe('PurgeExpiredAuditLogsUseCase', () => {
       deleteOlderThanBatched: vi.fn(),
     };
     const recordAuditLogUseCase = { execute: vi.fn() };
-
-    const clientMock = {
-      query: vi.fn(async (sql) => {
-        if (sql.includes('pg_try_advisory_lock')) return { rows: [{ acquired: false }] };
-        return { rows: [] };
-      }),
-      release: vi.fn(),
-    };
-    const poolMock = {
-      connect: vi.fn(async () => clientMock),
-    };
+    const advisoryLockPort = { withAdvisoryLock: vi.fn(async () => null) };
+    const platformTransactionPort = { run: vi.fn() };
 
     const useCase = new PurgeExpiredAuditLogsUseCase(
       auditRepository as never,
       recordAuditLogUseCase as never,
       buildEnvironmentService(30) as never,
-      poolMock as never,
+      advisoryLockPort as never,
+      platformTransactionPort as never,
     );
 
     const result = await useCase.execute();
 
     expect(result).toBeNull();
-    expect(clientMock.release).toHaveBeenCalled();
     expect(auditRepository.deleteOlderThanBatched).not.toHaveBeenCalled();
     expect(recordAuditLogUseCase.execute).not.toHaveBeenCalled();
   });

@@ -2,7 +2,7 @@ import type {
   AuthenticatedRequestUser,
   RequestContext,
 } from '@repo/api-core';
-import { DATABASE, type DatabaseClient, withTenantContext } from '@repo/api-database';
+import { PLATFORM_TRANSACTION_PORT, TRANSACTION_PORT, type PlatformTransactionPort, type TransactionPort } from '@repo/api-core';
 
 import { Inject, Injectable } from '@nestjs/common';
 import {     requireOrganizationId, toCsv , SYSTEM_SCOPE , FILE_KIND , FILE_VISIBILITY , ROLE_NAMES } from '@repo/api-core';
@@ -40,7 +40,8 @@ export class ExportAuditLogsUseCase {
     @Inject(AUDIT_REPOSITORY) private readonly auditRepository: AuditRepositoryPort,
     @Inject(FILES_REPOSITORY) private readonly filesRepository: FilesRepositoryPort,
     @Inject(OBJECT_STORAGE) private readonly objectStorage: ObjectStorage,
-    @Inject(DATABASE) private readonly database: DatabaseClient,
+    @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
+    @Inject(PLATFORM_TRANSACTION_PORT) private readonly platformTransactionPort: PlatformTransactionPort,
     private readonly recordAuditLogUseCase: RecordAuditLogUseCase,
   ) {}
 
@@ -48,7 +49,7 @@ export class ExportAuditLogsUseCase {
     actor: AuthenticatedRequestUser,
     query: ExportAuditLogsQuery,
     requestContext?: RequestContext,
-  ): Promise<{ fileId: string; rowCount: number; totalMatching: number; truncated: boolean }> {
+  ): Promise<{ fileId: string; rowCount: number; totalMatching: number; isTruncated: boolean }> {
     const isSuperAdmin = actor.roles.includes(ROLE_NAMES.SUPER_ADMIN);
     
     // Nếu không phải SUPER_ADMIN hoặc SUPER_ADMIN đang view as tenant, yêu cầu organizationId
@@ -62,16 +63,27 @@ export class ExportAuditLogsUseCase {
       ...(isSuperAdmin && !actor.organizationId ? {} : { organizationId }),
     };
 
-    const [rows, totalResult] = await Promise.all([
-      this.auditRepository.listForExport({
-        ...fullQuery,
-        limit: MAX_EXPORT_ROWS,
-      }),
-      this.auditRepository.count(fullQuery),
-    ]);
+    const runInTx = <T>(fn: (tx: any) => Promise<T>) => {
+      if (organizationId === null) {
+        return this.platformTransactionPort.run(fn);
+      }
+      return this.transactionPort.withTenant(
+        { tenantId: organizationId, userId: actor.userId },
+        fn,
+      );
+    };
 
-    const totalMatching = totalResult;
-    const truncated = totalMatching > MAX_EXPORT_ROWS;
+    return runInTx(async (tx) => {
+      const [rows, totalResult] = await Promise.all([
+        this.auditRepository.listForExport({
+          ...fullQuery,
+          limit: MAX_EXPORT_ROWS,
+        }, tx),
+        this.auditRepository.count(fullQuery, tx),
+      ]);
+
+      const totalMatching = totalResult;
+      const truncated = totalMatching > MAX_EXPORT_ROWS;
 
     const csv = toCsv(
       CSV_HEADER,
@@ -97,53 +109,40 @@ export class ExportAuditLogsUseCase {
       mimeType: 'text/csv',
     });
 
-    let fileId!: string;
+      let fileId!: string;
 
-    try {
-      const createPayload = {
-        organizationId,
-        storageKey,
-        originalName: `audit-logs-export-${Date.now()}.csv`,
-        mimeType: 'text/csv',
-        sizeBytes: body.length,
-        uploadedById: actor.userId,
-        kind: FILE_KIND.AUDIT_EXPORT,
-        visibility: FILE_VISIBILITY.RESTRICTED,
-      };
+      try {
+        const createPayload = {
+          organizationId,
+          storageKey,
+          originalName: `audit-logs-export-${Date.now()}.csv`,
+          mimeType: 'text/csv',
+          sizeBytes: body.length,
+          uploadedById: actor.userId,
+          kind: FILE_KIND.AUDIT_EXPORT,
+          visibility: FILE_VISIBILITY.RESTRICTED,
+        };
 
-      if (organizationId === null) {
-        await withTenantContext(
-          this.database,
-          { tenantId: null as unknown as string, userId: actor.userId, bypassRls: true },
-          async (tx) => {
-            const file = await this.filesRepository.create(createPayload, tx);
-            if (!file) {
-              throw new Error('Audit export file insert returned no rows');
-            }
-            fileId = file.id;
-          }
-        );
-      } else {
-        const file = await this.filesRepository.create(createPayload);
+        const file = await this.filesRepository.create(createPayload, tx);
         if (!file) {
           throw new Error('Audit export file insert returned no rows');
         }
         fileId = file.id;
+      } catch (error) {
+        await this.objectStorage.delete(storageKey).catch(() => undefined);
+        throw error;
       }
-    } catch (error) {
-      await this.objectStorage.delete(storageKey).catch(() => undefined);
-      throw error;
-    }
 
-    await this.recordAuditLogUseCase.execute({
-      ...(organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId } : { scope: SYSTEM_SCOPE.PLATFORM }),
-      actorId: actor.userId,
-      action: 'audit.exported',
-      entityType: 'audit_log',
-      metadata: { rowCount: rows.length, fileId, filters: { ...query } },
-      requestContext,
+      await this.recordAuditLogUseCase.execute({
+        ...(organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId } : { scope: SYSTEM_SCOPE.PLATFORM }),
+        actorId: actor.userId,
+        action: 'audit.exported',
+        entityType: 'audit_log',
+        metadata: { rowCount: rows.length, fileId, filters: { ...query } },
+        requestContext,
+      }, tx);
+
+      return { fileId, rowCount: rows.length, totalMatching, isTruncated: truncated };
     });
-
-    return { fileId, rowCount: rows.length, totalMatching, truncated };
   }
 }
