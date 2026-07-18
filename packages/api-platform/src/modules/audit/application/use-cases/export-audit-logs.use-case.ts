@@ -141,7 +141,9 @@ export class ExportAuditLogsUseCase {
       });
       return result;
     } catch (error) {
-      await this.objectStorage.delete(storageKey).catch(() => undefined);
+      await this.objectStorage.delete(storageKey).catch((err) => {
+        console.error(`Failed to cleanup orphaned export object ${storageKey}:`, err);
+      });
       throw error;
     }
   }

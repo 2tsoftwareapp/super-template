@@ -63,27 +63,29 @@ export class CreateExportUseCase {
       return ExportsMapper.toDto(job);
     }
 
-    const adapter = this.importExportAdapters.resolve(input.type);
-    const rows = await adapter.listForExport({
-      organizationId,
-      ownerId: actor.userId,
-    });
-
-    const csv = toCsv(adapter.csvHeader, rows.map((row) => adapter.toCsvRow(row)));
-    const storageKey = `exports/${actor.userId}/${randomUUID()}.csv`;
-    const body = Buffer.from(csv, 'utf8');
-
-    await this.objectStorage.upload({
-      key: storageKey,
-      body,
-      mimeType: 'text/csv',
-    });
+    let storageKey: string | undefined;
 
     try {
+      const adapter = this.importExportAdapters.resolve(input.type);
+      const rows = await adapter.listForExport({
+        organizationId,
+        ownerId: actor.userId,
+      });
+
+      const csv = toCsv(adapter.csvHeader, rows.map((row) => adapter.toCsvRow(row)));
+      storageKey = `exports/${actor.userId}/${randomUUID()}.csv`;
+      const body = Buffer.from(csv, 'utf8');
+
+      await this.objectStorage.upload({
+        key: storageKey,
+        body,
+        mimeType: 'text/csv',
+      });
+
       const updatedJob = await this.transactionPort.run(async (tx) => {
         const file = await this.filesRepository.create({
           organizationId,
-          storageKey,
+          storageKey: storageKey!,
           originalName: `${input.type}-export-${Date.now()}.csv`,
           mimeType: 'text/csv',
           sizeBytes: body.length,
@@ -113,11 +115,18 @@ export class CreateExportUseCase {
 
       return ExportsMapper.toDto(updatedJob ?? job);
     } catch (error) {
-      await this.objectStorage.delete(storageKey).catch(() => undefined);
+      if (storageKey) {
+        await this.objectStorage.delete(storageKey).catch((err) => {
+          console.error(`Failed to cleanup orphaned export object ${storageKey}:`, err);
+        });
+      }
+      
       await this.exportJobsRepository.update(job.id, {
         status: 'FAILED',
         completedAt: new Date(),
-      }).catch(() => undefined);
+      }).catch((err) => {
+        console.error(`Failed to mark export job ${job.id} as FAILED:`, err);
+      });
 
       throw error;
     }

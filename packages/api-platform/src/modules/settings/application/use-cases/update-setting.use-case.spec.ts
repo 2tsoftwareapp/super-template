@@ -23,9 +23,11 @@ describe('UpdateSettingUseCase', () => {
     };
     const settingsRepository = { upsert: vi.fn(async () => updated) };
     const auditService = { log: vi.fn(async () => undefined) };
+    const platformTransactionPort = { run: vi.fn(async (cb) => cb({})) };
     const useCase = new UpdateSettingUseCase(
       settingsRepository as never,
       auditService as never,
+      platformTransactionPort as never,
     );
 
     const result = await useCase.execute(actor, 'feature.flag', {
@@ -49,9 +51,11 @@ describe('UpdateSettingUseCase', () => {
   it('throws SETTINGS_NOT_FOUND when the upsert returns nothing', async () => {
     const settingsRepository = { upsert: vi.fn(async () => null) };
     const auditService = { log: vi.fn() };
+    const platformTransactionPort = { run: vi.fn(async (cb) => cb({})) };
     const useCase = new UpdateSettingUseCase(
       settingsRepository as never,
       auditService as never,
+      platformTransactionPort as never,
     );
 
     await expect(

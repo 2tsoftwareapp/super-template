@@ -591,6 +591,7 @@ user-persistence.mapper.ts
 
 Không dùng DTO của controller làm input use case:
 
+
 ```ts
 // Presentation
 CreateUserDto
@@ -602,23 +603,23 @@ CreateUserResult
 
 Lý do:
 
-* HTTP DTO có decorator validation/Swagger.
-* Command là contract nội bộ.
-* Sau này use case có thể được gọi từ job, CLI hoặc event mà không phụ thuộc HTTP.
+* HTTP DTO có decorator validation/Swagger
+* Command là contract nội bộ
+* Use case sau này có thể được gọi từ job, CLI hoặc event mà không phụ thuộc HTTP
 
 ---
 
 # 7. Frontend architecture đề xuất
 
-Backend layer không thể bê nguyên sang frontend. Frontend có các vấn đề khác:
+Backend layer không thể áp dụng nguyên sang frontend. Frontend có các vấn đề khác:
 
-* Server state.
-* URL state.
-* Local UI state.
-* Form state.
-* Permission.
-* Navigation.
-* Rendering.
+* Server state
+* URL state
+* Local UI state
+* Form state
+* Permission
+* Navigation
+* Rendering
 
 Cấu trúc nên là vertical slice theo feature.
 
@@ -724,7 +725,8 @@ Không import:
 
 ## Screen
 
-Screen nối controller với UI:
+Screen kết nối controller với UI:
+
 
 ```tsx
 "use client";
@@ -736,13 +738,13 @@ export function UsersListScreen() {
 }
 ```
 
-Screen không chứa hàng trăm dòng JSX và callback.
+Screen không nên chứa hàng trăm dòng JSX và callback.
 
 ---
 
 ## Controller hook
 
-Đây là layer repo hiện đang thiếu rõ nhất.
+Đây là layer repo đang thiếu rõ nhất hiện nay.
 
 ```ts
 export function useUsersListController() {
@@ -777,20 +779,20 @@ export function useUsersListController() {
 
 Controller được phép:
 
-* Gọi React Query hooks.
-* Đọc router và search params.
-* Đọc session.
-* Điều phối mutations.
-* Quản lý local state.
-* Tạo callbacks.
-* Map server data sang view model.
+* Gọi React Query hooks
+* Đọc router và search params
+* Đọc session
+* Điều phối mutations
+* Quản lý local state
+* Tạo callbacks
+* Map server data sang view model
 
 Controller không nên:
 
-* Chứa JSX.
-* Tự gọi `webFetch`.
-* Định nghĩa Zod schema.
-* Chứa generic reusable UI logic.
+* Chứa JSX
+* Tự gọi `webFetch`
+* Định nghĩa Zod schema
+* Chứa generic reusable UI logic
 
 Nếu controller vượt khoảng 200 dòng, tách theo concern:
 
@@ -801,13 +803,14 @@ use-users-list-actions.ts
 use-users-list-controller.ts
 ```
 
-Controller chính chỉ compose các hook nhỏ.
+Controller chính chỉ tổ hợp (compose) các hook nhỏ.
 
 ---
 
 ## API functions
 
-Tên nên là `*.api.ts`, không gọi là `service`, để tránh nhầm với backend service.
+Tên file nên là `*.api.ts`, không gọi là `service`, để tránh nhầm với backend service.
+
 
 ```ts
 export const usersApi = {
@@ -828,11 +831,12 @@ export const usersApi = {
 
 Luật cứng:
 
-> Chỉ file trong `features/*/api/*.api.ts` và shared HTTP infrastructure được import `webFetch`.
+> Chỉ file trong `features/*/api/*.api.ts` và shared HTTP infrastructure mới được import `webFetch`.
 
 Hiện tại `use-users-queries.ts` gọi `webFetch` trực tiếp.
 
 Nên đổi thành:
+
 
 ```ts
 queryFn: () => usersApi.list(params)
@@ -840,16 +844,17 @@ queryFn: () => usersApi.list(params)
 
 Nhờ đó:
 
-* API URL nằm một chỗ.
-* Query hook chỉ quản lý cache.
-* API function test không cần React.
-* Có thể tái sử dụng API function ngoài React Query.
+* API URL nằm một chỗ
+* Query hook chỉ quản lý cache
+* API function test không cần React
+* Có thể tái sử dụng API function ngoài React Query
 
 ---
 
 ## Query keys
 
-Không nên dùng một constant đơn:
+Không nên dùng hằng số (constant) đơn lẻ:
+
 
 ```ts
 USERS_QUERY_KEY
@@ -889,11 +894,12 @@ queryClient.invalidateQueries({
 
 Queries chỉ chịu trách nhiệm:
 
-* Query key.
-* Query function.
-* Cache policy.
-* Placeholder data.
-* Enable condition.
+* Query key
+* Query function
+* Cache policy
+* Placeholder data
+* Enable condition
+
 
 ```ts
 export function useUsersListQuery(params: UsersListParams) {
@@ -907,11 +913,11 @@ export function useUsersListQuery(params: UsersListParams) {
 
 Mutations chịu trách nhiệm:
 
-* Mutation function.
-* Cache invalidation.
-* Optimistic update nếu có.
+* Mutation function
+* Cache invalidation
+* Optimistic update nếu có
 
-Không nên để toast message hard-code trong mutation hook nếu cùng mutation được dùng ở nhiều UX khác nhau.
+Không nên hard-code toast message trong mutation hook nếu cùng mutation được dùng ở nhiều UX khác nhau.
 
 Có thể trả error/success lên controller để controller quyết định toast phù hợp với màn hình.
 
@@ -919,17 +925,18 @@ Có thể trả error/success lên controller để controller quyết định t
 
 ## Model
 
-`model/` chỉ chứa code thuần:
+`model/` chỉ chứa code thuần (pure logic):
 
-* Types.
-* Zod schemas.
-* Search params.
-* Sort mapping.
-* Permission selectors.
-* Formatters đặc thù feature.
-* State reducers.
+* Types
+* Zod schemas
+* Search params
+* Sort mapping
+* Permission selectors
+* Formatters đặc thù feature
+* State reducers
 
 Không React Query, không JSX, không HTTP.
+
 
 Ví dụ:
 
@@ -978,26 +985,27 @@ export function UsersTable(props: UsersTableProps) {
 
 UI được phép:
 
-* Local visual state đơn giản như open/closed.
-* Render conditional.
-* Compose primitives.
-* Call callback.
+* Local visual state đơn giản (open/closed)
+* Render conditional
+* Compose primitives
+* Call callback
 
 UI không được:
 
-* Gọi API.
-* Gọi React Query.
-* Đọc session.
-* Đọc search params.
-* Tự kiểm tra permission strings.
-* Tự điều hướng business flow.
-* Invalidate query.
+* Gọi API
+* Gọi React Query
+* Đọc session
+* Đọc search params
+* Tự kiểm tra permission strings
+* Tự điều hướng business flow
+* Invalidate query
 
 ---
 
 # 9. Phân loại state frontend
 
-Để AI không nhét mọi state vào `useState`, phải chốt rõ:
+Để AI không nhồi nhét mọi state vào `useState`, cần chốt rõ:
+
 
 | Loại state                     | Nơi đặt                          |
 | ------------------------------ | -------------------------------- |
@@ -1008,7 +1016,7 @@ UI không được:
 | Drawer/dialog đang mở          | Local component/controller state |
 | Session                        | Auth/session provider            |
 | Permission-derived state       | Pure selector                    |
-| Cross-page client state        | Store, chỉ khi thật sự cần       |
+| Cross-page client state        | Store, chỉ khi thực sự cần       |
 | Theme/locale                   | Dedicated provider               |
 
 Ví dụ users page:
@@ -1029,7 +1037,8 @@ permissions  → derived from session
 
 # 10. Import boundary frontend
 
-Nên enforce:
+Cần enforce:
+
 
 ```text
 app
@@ -1049,11 +1058,12 @@ Cross-feature interaction chỉ qua:
 import { rolesKeys } from "@/features/roles";
 ```
 
-2. Shared abstraction.
+2. Shared abstraction
 
-3. App-level orchestration.
+3. App-level orchestration
 
-Không import sâu:
+Không import sâu (deep import):
+
 
 ```ts
 import { something } from "@/features/roles/api/internal-file";
@@ -1065,7 +1075,8 @@ Mỗi feature có `index.ts` với public exports có chủ đích.
 
 # 11. Giới hạn kích thước và độ phức tạp
 
-Không nên coi LOC là luật tuyệt đối, nhưng cần warning threshold để AI tự dừng.
+Không nên coi LOC (lines of code) là luật tuyệt đối, nhưng cần warning threshold để AI tự dừng lại.
+
 
 | Loại file                |     Warning |
 | ------------------------ | ----------: |
@@ -1077,15 +1088,16 @@ Không nên coi LOC là luật tuyệt đối, nhưng cần warning threshold đ
 | Constructor dependencies |          >7 |
 | Component props          |      >12–15 |
 
-Khi vượt ngưỡng, AI phải giải thích hoặc tách.
+Khi vượt ngưỡng, AI phải giải thích lý do hoặc tách nhỏ.
 
-Ví dụ `UsersView` hiện vi phạm ở đúng điểm này: quá nhiều responsibility trong một component.
+Ví dụ `UsersView` hiện vi phạm ở đúng điểm này — quá nhiều responsibility trong một component.
 
 ---
 
-# 12. Cách bắt tất cả AI code cùng một kiểu
+# 12. Làm sao để tất cả AI code cùng một kiểu
 
 ## Chỉ có một source of truth
+
 
 Tạo:
 
@@ -1102,7 +1114,8 @@ Root `AGENTS.md`, `CLAUDE.md`, `.agents/skills` chỉ link tới đây.
 
 Không copy convention thành nhiều bản.
 
-Hiện repo có ít nhất:
+Hiện repo có ít nhất các bản sao:
+
 
 * `AGENTS.md`
 * `apps/admin/AGENTS.md`
@@ -1112,15 +1125,16 @@ Hiện repo có ít nhất:
 
 Đây là nguồn gây drift.
 
-## Xóa hoặc archive instruction stale
+## Xóa hoặc archive instruction lỗi thời
 
-Đặc biệt skill `add-api-feature` phải được viết lại vì còn tạo Admin page theo `src/pages`, không phù hợp repo hiện tại.
+Đặc biệt skill `add-api-feature` phải được viết lại vì còn tạo Admin page theo `src/pages`, không phù hợp với repo hiện tại.
 
-## Tạo hai golden feature
+## Tạo hai golden feature (feature mẫu)
 
 ### Backend reference
 
-Chọn một feature vừa đủ phức tạp, ví dụ `users`, rồi viết chuẩn hoàn toàn:
+Chọn một feature vừa đủ phức tạp, ví dụ `users`, viết chuẩn hoàn chỉnh:
+
 
 ```text
 controller
@@ -1150,9 +1164,9 @@ Sau đó ghi rõ:
 
 > Mọi feature mới phải mirror `users`.
 
-AI không còn tự phát minh pattern.
+AI không còn tự phát minh pattern nữa.
 
-## Tạo generator
+## Tạo generator (scaffold)
 
 ```bash
 pnpm scaffold:api-feature invoices
@@ -1161,16 +1175,16 @@ pnpm scaffold:admin-feature invoices
 
 Generator sinh đúng:
 
-* Folder.
-* Naming.
-* Test files.
-* Query key factory.
-* API client.
-* Controller.
-* Use case.
-* Port.
-* Repository.
-* Module binding.
+* Folder
+* Naming
+* Test files
+* Query key factory
+* API client
+* Controller
+* Use case
+* Port
+* Repository
+* Module binding
 
 AI chủ yếu điền nghiệp vụ, không tự thiết kế structure.
 
@@ -1178,18 +1192,19 @@ AI chủ yếu điền nghiệp vụ, không tự thiết kế structure.
 
 Ví dụ:
 
-* `presentation/**` không import `infrastructure/**`.
-* `domain/**` không import Nest, Drizzle, Express.
-* `application/**` không import `presentation/**`.
-* `app/**` không import React Query hay HTTP.
-* `ui/**` không import React Query, router, HTTP, session.
-* `api/**` không import React.
-* `model/**` không import HTTP hoặc React.
-* `features/**` không deep-import feature khác.
+* `presentation/**` không import `infrastructure/**`
+* `domain/**` không import Nest, Drizzle, Express
+* `application/**` không import `presentation/**`
+* `app/**` không import React Query hay HTTP
+* `ui/**` không import React Query, router, HTTP, session
+* `api/**` không import React
+* `model/**` không import HTTP hoặc React
+* `features/**` không deep-import feature khác
 
 ## CI grep checks
 
 Có thể thêm các kiểm tra đơn giản nhưng hiệu quả:
+
 
 ```bash
 rg "webFetch" apps/admin/src \
@@ -1208,7 +1223,8 @@ rg "@repo/api-database|drizzle-orm" \
 
 ---
 
-# 13. Quyết định kiến trúc tôi đề xuất chốt
+# 13. Quyết định kiến trúc đề xuất
+
 
 ## Backend
 
@@ -1220,12 +1236,12 @@ Controller
       → Infrastructure implementation
 ```
 
-* Không generic facade service chuyển tiếp.
-* Có domain khi thật sự có rule.
-* DTO không đi vào application.
-* Repository interface luôn nằm trong application ports.
-* Database record không leak ra controller.
-* Cross-context chỉ qua port/facade public rõ ràng.
+* Không generic facade service chuyển tiếp
+* Có domain khi thực sự có rule
+* DTO không đi vào application
+* Repository interface luôn nằm trong application ports
+* Database record không leak ra controller
+* Cross-context chỉ qua port/facade public rõ ràng
 
 ## Frontend
 
@@ -1238,27 +1254,27 @@ Route
     → Presentational UI
 ```
 
-* Route cực mỏng.
-* API call chỉ nằm trong `api`.
-* React Query chỉ nằm trong query/mutation hooks.
-* Router, permissions và orchestration nằm trong controller.
-* UI nhận props và emit events.
-* Pure model không phụ thuộc React.
-* Shared primitive chỉ lấy từ `web-core`.
+* Route cực mỏng
+* API call chỉ nằm trong `api`
+* React Query chỉ nằm trong query/mutation hooks
+* Router, permissions và orchestration nằm trong controller
+* UI nhận props và emit events
+* Pure model không phụ thuộc React
+* Shared primitive chỉ lấy từ `web-core`
 
-# 14. Thứ tự nên xử lý repo
+# 14. Thứ tự xử lý repo
 
 Chưa cần refactor toàn bộ ngay. Làm theo thứ tự:
 
-1. Chốt backend convention.
-2. Chốt frontend convention.
-3. Viết tài liệu canonical.
-4. Sửa toàn bộ AI skills/instructions stale.
-5. Chọn `users` làm golden frontend feature.
-6. Chọn một backend module làm golden backend feature.
-7. Thêm lint/source-policy.
-8. Mọi feature mới phải theo chuẩn mới.
-9. Refactor feature cũ từng module, không big-bang.
-10. Sau cùng mới tiếp tục mở rộng toàn bộ feature set.
+1. Chốt backend convention
+2. Chốt frontend convention
+3. Viết tài liệu canonical
+4. Sửa toàn bộ AI skills/instructions lỗi thời
+5. Chọn `users` làm golden frontend feature
+6. Chọn một backend module làm golden backend feature
+7. Thêm lint/source-policy
+8. Mọi feature mới phải theo chuẩn mới
+9. Refactor feature cũ từng module, không big-bang
+10. Sau cùng mới tiếp tục mở rộng feature set
 
-Nhận xét thẳng: **kiến trúc nền của repo không tệ**, thậm chí dependency boundary và domain ADR đang khá tốt. Vấn đề là convention đang nằm rải rác, có bản cũ/bản mới và thiếu một frontend orchestration layer rõ ràng. Vì vậy AI vẫn tạo ra code “đúng từng file” nhưng toàn hệ thống không đồng nhất.
+**Kiến trúc nền của repo không tệ**, dependency boundary và domain ADR đang khá tốt. Vấn đề là convention nằm rải rác, có bản cũ lẫn bản mới, và thiếu một frontend orchestration layer rõ ràng. Vì vậy AI vẫn tạo ra code “đúng từng file” nhưng toàn hệ thống không đồng nhất.

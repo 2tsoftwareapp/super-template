@@ -50,7 +50,8 @@ export class DeleteFileUseCase {
 
     try {
       await this.objectStorage.delete(file.storageKey);
-    } catch {
+    } catch (err) {
+      console.error(`Failed to cleanup storage object ${file.storageKey} for deleted file ${file.id}:`, err);
       // NOTE: Failure to delete storage object is ignored for now.
       // An outbox/cleanup worker should ideally sweep orphaned objects later.
     }

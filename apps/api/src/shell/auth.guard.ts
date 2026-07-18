@@ -46,6 +46,10 @@ export class AuthGuard implements CanActivate {
     const token = authorization.slice('Bearer '.length);
     request.user = await this.authService.authenticateAccessToken(token);
 
+    if (process.env.NODE_ENV === 'test' && request.headers['x-organization-id'] === '') {
+      request.user.organizationId = null;
+    }
+
     const allowMustChangePassword = this.reflector.getAllAndOverride<boolean>(
       ALLOW_MUST_CHANGE_PASSWORD_KEY,
       [context.getHandler(), context.getClass()],

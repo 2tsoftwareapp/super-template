@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 
 import type { AuthenticatedRequestUser } from '@repo/api-core';
 
@@ -6,7 +6,7 @@ import type { ListAuditLogsQuery } from '../audit.types';
 
 import { AuditMapper } from '../audit.mapper';
 import { AUDIT_REPOSITORY, type AuditRepositoryPort } from '../ports/audit.repository.port';
-import { ROLE_NAMES } from '@repo/api-core';
+import { ROLE_NAMES, AppError, ERROR_CODES } from '@repo/api-core';
 
 @Injectable()
 export class ListAuditLogsUseCase {
@@ -24,7 +24,11 @@ export class ListAuditLogsUseCase {
       : actor.organizationId;
 
     if (!isSuperAdmin && !organizationId) {
-      throw new Error('Organization ID is required for non-super admin');
+      throw new AppError(
+        ERROR_CODES.AUTH_FORBIDDEN,
+        'Organization ID is required for non-super admin',
+        HttpStatus.FORBIDDEN,
+      );
     }
 
     const result = await this.auditRepository.list({
