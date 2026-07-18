@@ -112,7 +112,7 @@ export class UploadFileUseCase {
         entityType: 'file',
         entityId: record.id,
         requestContext,
-          scope: SYSTEM_SCOPE.PLATFORM
+      ...(organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
     });
 
       return FilesMapper.toFileDto(record);

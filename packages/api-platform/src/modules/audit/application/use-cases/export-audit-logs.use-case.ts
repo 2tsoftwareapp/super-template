@@ -2,6 +2,7 @@ import type {
   AuthenticatedRequestUser,
   RequestContext,
 } from '@repo/api-core';
+import { DATABASE, type DatabaseClient, withTenantContext } from '@repo/api-database';
 
 import { Inject, Injectable } from '@nestjs/common';
 import {     requireOrganizationId, toCsv , SYSTEM_SCOPE , FILE_KIND , FILE_VISIBILITY , ROLE_NAMES } from '@repo/api-core';
@@ -39,6 +40,7 @@ export class ExportAuditLogsUseCase {
     @Inject(AUDIT_REPOSITORY) private readonly auditRepository: AuditRepositoryPort,
     @Inject(FILES_REPOSITORY) private readonly filesRepository: FilesRepositoryPort,
     @Inject(OBJECT_STORAGE) private readonly objectStorage: ObjectStorage,
+    @Inject(DATABASE) private readonly database: DatabaseClient,
     private readonly recordAuditLogUseCase: RecordAuditLogUseCase,
   ) {}
 
@@ -95,10 +97,10 @@ export class ExportAuditLogsUseCase {
       mimeType: 'text/csv',
     });
 
-    let fileId: string;
+    let fileId!: string;
 
     try {
-      const file = await this.filesRepository.create({
+      const createPayload = {
         organizationId,
         storageKey,
         originalName: `audit-logs-export-${Date.now()}.csv`,
@@ -107,13 +109,27 @@ export class ExportAuditLogsUseCase {
         uploadedById: actor.userId,
         kind: FILE_KIND.AUDIT_EXPORT,
         visibility: FILE_VISIBILITY.RESTRICTED,
-      });
+      };
 
-      if (!file) {
-        throw new Error('Audit export file insert returned no rows');
+      if (organizationId === null) {
+        await withTenantContext(
+          this.database,
+          { tenantId: null as unknown as string, userId: actor.userId, bypassRls: true },
+          async (tx) => {
+            const file = await this.filesRepository.create(createPayload, tx);
+            if (!file) {
+              throw new Error('Audit export file insert returned no rows');
+            }
+            fileId = file.id;
+          }
+        );
+      } else {
+        const file = await this.filesRepository.create(createPayload);
+        if (!file) {
+          throw new Error('Audit export file insert returned no rows');
+        }
+        fileId = file.id;
       }
-
-      fileId = file.id;
     } catch (error) {
       await this.objectStorage.delete(storageKey).catch(() => undefined);
       throw error;

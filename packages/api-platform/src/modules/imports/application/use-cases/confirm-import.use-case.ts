@@ -126,7 +126,7 @@ export class ConfirmImportUseCase {
       entityId: job.id,
       metadata: { successCount, errorCount: errors.length },
       requestContext,
-        scope: SYSTEM_SCOPE.PLATFORM
+      ...(job.organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: job.organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
     });
 
     return this.importsMapper.toImportJobView(updated ?? job);

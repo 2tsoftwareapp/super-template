@@ -33,6 +33,11 @@ rules:
     html: ask-before-create
     prefer_diagram_for_flows: true
   branch:
+    # IMPORTANT — enforced branching policy. Agents MUST obey before any code change.
+    #   direct    Solo developer: work and commit directly on the base/main branch.
+    #   checkout  Feature-branch required: create/checkout a work branch off base
+    #             before editing any file; never commit code on the base branch.
+    mode: direct
     base: ""
     naming: ""
   commit:
@@ -46,7 +51,7 @@ rules:
     # User-facing lifecycle artifact format.
     # Supported: markdown (default) | html
     # HTML uses one enterprise theme (Tailwind CDN) — see DESIGN_SYSTEM.md
-    output_format: markdown
+    output_format: html
     style: 80-20
     # 80/20 executive summary sits at the TOP of every report so readers get
     # the important 20% without reading the detail.

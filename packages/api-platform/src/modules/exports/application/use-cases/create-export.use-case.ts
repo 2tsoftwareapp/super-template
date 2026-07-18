@@ -78,7 +78,7 @@ export class CreateExportUseCase {
         entityId: job.id,
         metadata: { type: input.type, fileId },
         requestContext,
-          scope: SYSTEM_SCOPE.PLATFORM
+        ...(organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
     });
 
       return ExportsMapper.toDto(updated ?? job);

@@ -1,5 +1,5 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import {  AppError, ERROR_CODES , ROLE_NAMES } from '@repo/api-core';
+import {  AppError, ERROR_CODES , ROLE_NAMES, FILE_KIND } from '@repo/api-core';
 import type { AuthenticatedRequestUser } from '@repo/api-core';
 
 import { FILES_REPOSITORY, type FilesRepositoryPort } from '../../../files/application/ports/files.repository.port';
@@ -18,7 +18,7 @@ export class DownloadAuditExportUseCase {
   ): Promise<{ content: Buffer; originalName: string }> {
     const file = await this.filesRepository.findById(fileId);
 
-    if (!file) {
+    if (!file || file.kind !== FILE_KIND.AUDIT_EXPORT) {
       throw new AppError(
         ERROR_CODES.FILE_NOT_FOUND,
         'File not found',

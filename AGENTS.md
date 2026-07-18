@@ -29,6 +29,15 @@ and conventions.
   enterprise theme via short `.ss-*` classes in `/styles.css` (see
   `.agents/DESIGN_SYSTEM.md`). Prefer those classes over long Tailwind stacks
   to keep agent tokens low.
+- **`rules.branch.mode` — IMPORTANT, enforced before any code change:**
+  - `direct`: solo-developer mode. Work and commit directly on the base/main
+    branch; do **not** create a feature branch.
+  - `checkout`: **before editing any file**, ensure you are on a dedicated work
+    branch off `rules.branch.base` (create/checkout one, following
+    `rules.branch.naming` when set). **Never** modify or commit code on the base
+    branch in this mode. If the working tree is on the base branch, branch first.
+  - If `mode` is unset, default to `checkout` (the safer policy). A direct user
+    instruction overrides the file for the current task only.
 - Project-specific branch, commit, PR, report, and code-comment rules live
   under `rules` in settings. Apply only populated values.
 - If `.agents/PRJ_REFERENCE.md` is missing or materially stale, run the `init`
@@ -290,6 +299,31 @@ current repository while preserving user settings.
    - Summarize, handoff, prepare PR/MR.
 
 Lite skip: small/clear tasks may skip business-analysis, basic-design, and detail-design when brainstorming hands off straight to planning or execution.
+
+### Post-done defect loop
+
+A defect found **after** `done` (a reviewer, QA, or a later PR review) means the
+task is **not** done. Do not patch silently and do not open a new session.
+
+1. **Reopen, don't hide.** In the **same** session (`session.sh current`): flip
+   `DONE.md` status to `Needs fix` (or `Partial`), and set the affected
+   `TASKS.md` card(s) back to `in_progress`/`blocked` (add a new fix card if the
+   defect is new scope). Reopening makes `session.sh status` report
+   `COMPLETE: no` again — as it should.
+2. **Pick the re-entry point by the nature of the defect:**
+   - Root cause unclear → `investigate` → `execution`.
+   - Clear bug within existing scope/plan → `execution` (fix the reopened card).
+   - Defect exposes a wrong/missing spec or design → back up to `planning` /
+     `detail-design` (or `business-analysis` / `brainstorming` if the direction
+     itself was wrong) → `execution`.
+3. **Always re-gate.** After the fix, run `review` again; only re-run `done`
+   when `review` passes **and** `session.sh status` prints `COMPLETE: yes`.
+4. **Same branch.** Fix on the current work branch per `rules.branch.mode`
+   (`direct` → base branch; `checkout` → the existing feature branch). Never
+   open a new branch just for the fix.
+5. **Feed memory.** When `done` re-runs, record the defect as a **Gotcha** in the
+   task's `.agents/memory/` entry (update it, don't duplicate) — this is exactly
+   the 80/20 knowledge worth keeping.
 
 ### Investigation
 

@@ -123,7 +123,7 @@ export class CreateFileVersionUseCase {
         entityId: existing.id,
         metadata: { versionNumber: nextVersion },
         requestContext,
-          scope: SYSTEM_SCOPE.PLATFORM
+      ...(organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
     });
 
       return FilesMapper.toFileDto(updated);

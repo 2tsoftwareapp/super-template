@@ -15,33 +15,44 @@ describe('PurgeExpiredAuditLogsUseCase', () => {
       auditRepository as never,
       recordAuditLogUseCase as never,
       buildEnvironmentService(0) as never,
+      {} as never,
     );
 
     const result = await useCase.execute();
 
     expect(result).toBeNull();
-    expect(auditRepository.tryAdvisoryLock).not.toHaveBeenCalled();
     expect(auditRepository.deleteOlderThanBatched).not.toHaveBeenCalled();
     expect(recordAuditLogUseCase.execute).not.toHaveBeenCalled();
   });
 
   it('deletes rows older than the retention cutoff and records the purge', async () => {
     const auditRepository = {
-      tryAdvisoryLock: vi.fn(async () => true),
       deleteOlderThanBatched: vi.fn(async () => 3),
-      unlockAdvisoryLock: vi.fn(async () => true),
     };
     const recordAuditLogUseCase = { execute: vi.fn(async () => undefined) };
+    
+    const clientMock = {
+      query: vi.fn(async (sql) => {
+        if (sql.includes('pg_try_advisory_lock')) return { rows: [{ acquired: true }] };
+        return { rows: [] };
+      }),
+      release: vi.fn(),
+    };
+    const poolMock = {
+      connect: vi.fn(async () => clientMock),
+    };
 
     const useCase = new PurgeExpiredAuditLogsUseCase(
       auditRepository as never,
       recordAuditLogUseCase as never,
       buildEnvironmentService(30) as never,
+      poolMock as never,
     );
 
     const result = await useCase.execute();
 
-    expect(auditRepository.tryAdvisoryLock).toHaveBeenCalledWith(42001);
+    expect(poolMock.connect).toHaveBeenCalled();
+    expect(clientMock.query).toHaveBeenCalledWith('SELECT pg_try_advisory_lock($1) AS acquired', [42001]);
     expect(auditRepository.deleteOlderThanBatched).toHaveBeenCalledWith(
       expect.any(Date),
       5000,
@@ -58,16 +69,26 @@ describe('PurgeExpiredAuditLogsUseCase', () => {
 
   it('does not record a purge entry when nothing was deleted', async () => {
     const auditRepository = {
-      tryAdvisoryLock: vi.fn(async () => true),
       deleteOlderThanBatched: vi.fn(async () => 0),
-      unlockAdvisoryLock: vi.fn(async () => true),
     };
     const recordAuditLogUseCase = { execute: vi.fn(async () => undefined) };
+
+    const clientMock = {
+      query: vi.fn(async (sql) => {
+        if (sql.includes('pg_try_advisory_lock')) return { rows: [{ acquired: true }] };
+        return { rows: [] };
+      }),
+      release: vi.fn(),
+    };
+    const poolMock = {
+      connect: vi.fn(async () => clientMock),
+    };
 
     const useCase = new PurgeExpiredAuditLogsUseCase(
       auditRepository as never,
       recordAuditLogUseCase as never,
       buildEnvironmentService(30) as never,
+      poolMock as never,
     );
 
     const result = await useCase.execute();
@@ -78,21 +99,32 @@ describe('PurgeExpiredAuditLogsUseCase', () => {
 
   it('skips purge when advisory lock is already held by another replica', async () => {
     const auditRepository = {
-      tryAdvisoryLock: vi.fn(async () => false),
       deleteOlderThanBatched: vi.fn(),
-      unlockAdvisoryLock: vi.fn(),
     };
     const recordAuditLogUseCase = { execute: vi.fn() };
+
+    const clientMock = {
+      query: vi.fn(async (sql) => {
+        if (sql.includes('pg_try_advisory_lock')) return { rows: [{ acquired: false }] };
+        return { rows: [] };
+      }),
+      release: vi.fn(),
+    };
+    const poolMock = {
+      connect: vi.fn(async () => clientMock),
+    };
 
     const useCase = new PurgeExpiredAuditLogsUseCase(
       auditRepository as never,
       recordAuditLogUseCase as never,
       buildEnvironmentService(30) as never,
+      poolMock as never,
     );
 
     const result = await useCase.execute();
 
     expect(result).toBeNull();
+    expect(clientMock.release).toHaveBeenCalled();
     expect(auditRepository.deleteOlderThanBatched).not.toHaveBeenCalled();
     expect(recordAuditLogUseCase.execute).not.toHaveBeenCalled();
   });

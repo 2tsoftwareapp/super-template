@@ -94,7 +94,7 @@ export class CreateImportUseCase {
       entityId: job.id,
       metadata: { type: input.type, fileId: input.fileId },
       requestContext,
-        scope: SYSTEM_SCOPE.PLATFORM
+      ...(file.organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: file.organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
     });
 
     return this.getImportUseCase.execute(actor, job.id);

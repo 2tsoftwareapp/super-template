@@ -7,21 +7,18 @@
 
 | Step | Name | Status | Evidence |
 |---|---|---|---|
-| 01 | Init templates | `done` | PLAN.md + TASKS.md exist |
-| 02 | Fill PLAN + Spec quality | `done` | Strategy fields filled, ready for tasks |
-| 03 | Fill TASKS inventory/cards | `done` | Work inventory + cards |
-| 04 | Self-check | `done` | Ready Yes with evidence |
-
-> **Hard rule:** Do not mark a later step `done` while an earlier step is still
-> `todo`/`blocked`. Do not fill TASKS before Spec quality review is done.
+| 01 | Init templates | `done` | PLAN.md + TASKS.md overwritten |
+| 02 | Fill PLAN + Spec quality | `done` | Feasibility/Correctness/Capability filled |
+| 03 | Fill TASKS inventory/cards | `todo` | Work inventory + cards |
+| 04 | Self-check | `todo` | Ready Yes/No with evidence |
 
 ## Executive summary (80/20)
 
-- **Mục tiêu**: Xử lý triệt để lỗi ghi Audit RLS (Tenant data leak), chặn xuất dữ liệu trái phép và vá lỗi rò rỉ kết nối (Advisory Lock).
-- **Cách tiếp cận**: Dùng `Discriminated Union` ép kiểu cho mọi call site, dán nhãn phân loại bảo mật (Security classification) cho File Export, và dùng kết nối rời (Dedicated connection) cho tiến trình dọn dẹp (Retention).
-- **Rủi ro lớn nhất**: Rất nhiều file backend bị hỏng (Broken compilation) khi đổi interface của `AuditLogInput`.
-- **Mức độ sẵn sàng**: Chưa (đang soạn tasks).
-- **Hành động tiếp theo**: Chuyển sang bước 3 (Lập danh sách đầu việc vào `TASKS.md`).
+- **Goal**: Hoàn tất Re-review Round 3 cho hệ thống Audit Multi-tenant. Sửa các lỗi gán sai scope PLATFORM cho tenant events, rò rỉ ACL trong export file download, và xử lý connection leak.
+- **Approach**: Chia tác vụ theo 5 nhóm vấn đề chính từ user feedback. Đảm bảo call sites truyền đúng source `organizationId`, siết chặt Export ACL, dùng platform executor cho global export, và gom logic lock purge vào 1 raw connection.
+- **Top Risk**: Tính đúng đắn của việc truyền scope ở những luồng sâu (như file upload, jobs).
+- **Readiness**: Sẵn sàng bắt tay vào `TASKS.md`.
+- **Next Action**: Tạo file `TASKS.md` chứa work items cụ thể.
 
 ## Developer overview
 
@@ -30,7 +27,7 @@
 | Status | `planning` |
 | Cards drafted | `0` |
 | Critical open decisions | `0` |
-| Next action | Khai triển công việc sang `TASKS.md` (Step 03) |
+| Next action | Fill tasks |
 
 ## Charts (when useful)
 
@@ -47,18 +44,18 @@ flowchart LR
 
 | Issue ID/source | Issue / decision | Severity | Clarity | Blocking? | Visual need/format | Resolution evidence | Status |
 |---|---|---|---|---|---|---|---|
-| ISS-001 | Bắt buộc truyền `organizationId` vào Audit call sites | Critical | Clear | No | text | Chọn Discriminated union | Resolved |
-| ISS-002 | Tách biệt Audit Export ACL và Global Export namespace | Critical | Clear | No | text | Chọn Security classification | Resolved |
-| ISS-003 | Fix Advisory Lock connection leak | High | Clear | No | text | Chọn Dedicated connection | Resolved |
+| Re-review P0 | Call sites gán sai scope `PLATFORM` thay vì `ORGANIZATION` | Critical | Clear | No | none | Thay bằng `file.organizationId`, v.v. | Resolved |
+| Re-review P0 | Generic Files endpoint có thể truy cập bằng ID file không phải Export | Critical | Clear | No | none | Bắt buộc kiểm tra `AUDIT_EXPORT` trước khi check org. | Resolved |
+| Re-review P0 | Global Export bypassRls thất bại do không có org | Critical | Clear | No | none | Dùng platform executor (bypassRls=true). | Resolved |
+| Re-review P1 | Export File download ACL bị uploader bypass | High | Clear | No | none | Cấm bypass theo uploadedById nếu là AUDIT_EXPORT. | Resolved |
+| Re-review P1 | Advisory Lock rò rỉ vì multi-connections | High | Clear | No | none | Checkout `PoolClient` và `try/finally` trên nó. | Resolved |
+| Re-review P1 | Truncated field sai tên trên frontend | Medium | Clear | No | none | Sửa `isTruncated` thành `truncated`. | Resolved |
 
 ### Questions requiring user input
 
 | Issue | Focused question | Why the plan changes | Answer |
 |---|---|---|---|
-| N/A | Không có câu hỏi nào bị chặn (Blocked) | N/A | N/A |
-
-> **STOP gate:** Strategy and TASKS stay unfilled while any Critical issue,
-> blocking unknown, or unconfirmed `html-recommended` item is open.
+| N/A | N/A | N/A | N/A |
 
 ## Spec quality review
 
@@ -66,80 +63,76 @@ flowchart LR
 
 | Finding | Evidence | Verdict |
 |---|---|---|
-| Việc sửa kiến trúc an toàn cho RLS là hoàn toàn khả thi bằng Typescript và Drizzle ORM hiện tại. | Các sửa đổi nằm ở interface, service, connection | Pass |
+| Sửa scope trên call site | Mã nguồn `attachments`, `files`, `imports` đều có lưu `organizationId`. Việc thay thế khả thi 100%. | Pass |
+| Sửa lock | Có thể inject raw executor trong `pg` hoặc Drizzle. | Pass |
 
 ### 2. Correctness (tính đúng đắn)
 
 | Finding | Evidence | Verdict |
 |---|---|---|
-| Domain rules của ứng dụng yêu cầu cách ly tenant 100%. Code cũ chưa đảm bảo, các giải pháp mới sẽ đáp ứng hoàn toàn. | Báo cáo lỗi RLS | Pass |
+| Generic Files ACL | Xác nhận uploader bypass có thể lọt qua file. Cần kiểm tra `AUDIT_EXPORT` cứng và trả 404/403. | Pass |
+| Field name | API trả `truncated`, UI dùng `isTruncated` -> Correctness error trên UI. Khắc phục được. | Pass |
 
 ### 3. Capability recommendations (khả năng feature / gaps)
 
 | Gap ID | Missing / weak capability | Suggested question / default | Blocking? | Status |
 |---|---|---|---|---|
-| CAP-001 | Xử lý file/object storage rác do lỗi RLS trước đó để lại trên S3 | Chờ tạo task riêng dọn dẹp sau khi PR này merge | No | Deferred |
+| CAP-001 | Security E2E | Cần verify global export, wrong ID fetch, revocation. Sẽ đưa vào testing. | No | Resolved |
 
 ## Goal
 
-Cấu trúc lại hợp đồng gọi Audit (Audit Contract), kiểm soát quyền truy cập tệp tin xuất (Export ACL) và làm sạch tiến trình khóa (Lock Purge) để đảm bảo an toàn tuyệt đối cho kiến trúc Multi-tenant RLS.
+Hoàn tất Re-review Round 3 để Audit system đạt yêu cầu bảo mật nghiêm ngặt (đúng scope, không rò rỉ ACL, không connection leak).
 
 ## Scope
 
-- Sửa đổi interface `AuditLogInput` và `CreateAuditLogInput` sang Discriminated Union (`scope: 'platform' | 'organization'`).
-- Cập nhật toàn bộ các call site gọi `auditWriter.log()` hoặc `auditService.log()` thuộc `api-identity` và `api-platform` (tất cả Use Cases).
-- Cập nhật logic `export-audit-logs.use-case.ts` để lưu file kèm `kind: AUDIT_EXPORT` và `visibility: RESTRICTED`.
-- Bổ sung logic chặn (block) truy cập tải file `AUDIT_EXPORT` thông qua API Files chung (buộc phải có quyền Audit).
-- Sửa repository `audit.repository.ts` để acquire/release `pg_try_advisory_lock` thông qua dedicated connection (thay vì default executor).
-- Bổ sung Frontend UI hiển thị Toast warning khi kết quả API bị `truncated`.
-- Cập nhật/Bổ sung E2E Tests.
+- Refactor `api-platform` tenant call sites.
+- Siết chặt ACL Download cho Export file.
+- Fix global export `bypassRls`.
+- Khắc phục lỗi Connection Leak do advisory lock trong repository.
+- Sửa frontend truncation field.
+- Viết bổ sung Security E2E tests.
 
 ## Non-goals
 
-- Không refactor bảng `Files` ra thành bảng riêng.
-- Không sửa giao diện thêm Actor name/email trong PR này (P2 deferred).
-- Không sửa core policy của database RLS.
+- Actor name/email trên UI (Đã bị Defer sang Round 4).
 
 ## Assumptions
 
 | Assumption | Risk | Confirmed |
 |------------|------|-----------|
-| Typescript compiler sẽ bắt được 100% các file bị hỏng do sửa interface AuditLogInput. | Low | Yes |
-| Drizzle ORM hỗ trợ checkout connection gốc (pg/postgres client) để chạy advisory lock. | Medium | Yes |
+| Mọi context truyền cho File/Import đều có thể lấy ra `organizationId`. | Medium | Yes |
 
 ## Approach
 
-1. **Phase 1: Core Type & Compilation (Backend)** - Sửa đổi interface Audit và fix toàn bộ các lỗi type trên các module gọi nó (`api-identity`, `api-platform`).
-2. **Phase 2: Security & Lock Lifecycle (Backend)** - Áp dụng nhãn bảo mật cho Export và viết lại phương thức xóa (Purge) sử dụng Dedicated Connection.
-3. **Phase 3: Client & Verification (Frontend & E2E)** - Xử lý thông báo `truncated` trên UI và viết E2E test cho các case ACL/Lock.
-4. **Phase 4: Refactor Code (Post-Review)** - Sửa lỗi Tech Debt H-001 bằng cách sử dụng các hằng số (constants) chung thay cho string hardcode.
+1. **Fix Tenant Event Scope**: Cập nhật call sites `attachments`, `files`, `imports`, v.v để dùng `ORGANIZATION` scope.
+2. **Secure Export API**: Thêm block logic trên generic file, đảm bảo explicit DB executor bypass RLS cho Global export.
+3. **Database Locks**: Viết transaction-level wrapper hoặc manual client checkout cho PurgeUseCase.
+4. **UI Fix**: Cập nhật field frontend.
+5. **Security E2E**: Chạy test kiểm chứng.
 
 ## Affected areas
 
 | Area / path | Expected change | Confidence |
 |-------------|-----------------|------------|
-| `packages/api-core` | `AuditLogInput` interface, bổ sung Constants | known |
-| `packages/api-platform` | Export use-case, Audit repository, File use-cases, Notifications, Mail | known |
-| `packages/api-identity` | ~20+ Use Cases (Auth, Role, SSO, Users...) | known |
-| `apps/web` | Hooks/UI xử lý cảnh báo | inferred |
-| `apps/api` | E2E tests | inferred |
+| `api-platform/src/modules/attachments` | Update audit call sites | known |
+| `api-platform/src/modules/files` | Update audit call sites & Fix ACL | known |
+| `api-platform/src/modules/imports` | Update audit call sites | known |
+| `api-platform/src/modules/audit` | Fix Global export & Advisory lock | known |
+| `apps/admin/src/features` | Fix UI truncate warning | known |
 
 ## Test strategy
 
-- Dựa hoàn toàn vào `pnpm typecheck` trên toàn bộ workspace để xác minh 100% call sites đã được update (không sót).
+- Security E2E: Viết test cho "Org ADMIN có files.read nhưng không audit.read", "Uploader bị thu hồi audit.read", "Audit endpoint với ordinary file ID", v.v.
 
 ## Verification strategy
 
-- **Automated**: E2E test đóng giả người dùng Tenant A cố gắng đọc file export của Tenant B; E2E test tạo hàng loạt log để trigger purge (lock).
-- **Manual**: Chạy trực tiếp `pnpm run db:push` và thao tác thử 1 flow export trên UI, kiểm tra tab Network.
+- Typecheck toàn bộ `api-platform`.
+- E2E tests xanh.
 
 ## Definition of done
 
-- [ ] Lệnh `pnpm run check` báo xanh (pass tất cả typecheck, lint, test).
-- [ ] Export file ID khi mang sang GET `/api/v1/files/:id` bị từ chối 403 (nếu người dùng không phải admin hợp lệ).
-- [ ] DB không bị rò rỉ transaction lock (`pg_locks` sạch).
-- [ ] Các chuỗi `'AUDIT_EXPORT'`, `'RESTRICTED'`, `'platform'`, `'organization'` được thay bằng Constants (T-009).
-- [ ] `TASKS.md` complete and matches Task index below.
+- [ ] PLAN.md hoàn chỉnh
+- [ ] TASKS.md complete and matches Task index below
 
 ## Rollback strategy
 
@@ -151,11 +144,11 @@ Cấu trúc lại hợp đồng gọi Audit (Audit Contract), kiểm soát quy�
 
 | Risk | Impact | Mitigation |
 |------|--------|------------|
-| Quá nhiều file cần sửa cùng lúc có thể gây nhầm lẫn biến số `organizationId`. | Medium | Rely heavily on Type Checker, chia task rõ ràng theo từng Domain module. |
+| Quên fix một module nào đó | Lọt event PLATFORM | Kiểm tra grep thủ công toàn bộ `SYSTEM_SCOPE.PLATFORM`. |
 
 ## Task index
 
-T-001 Update Audit Interfaces (Discriminated Union) → T-002 Refactor api-identity Call Sites → T-003 Refactor api-platform Call Sites → T-004 Secure Export logs with AUDIT_EXPORT → T-005 Block unauthorized AUDIT_EXPORT download → T-006 Fix Advisory Lock in Audit Repository → T-007 Implement UI Truncated Toast → T-008 Write Security E2E Tests → T-009 Refactor Hardcoded Strings to Constants (see TASKS.md)
+T-001 Fix Tenant Call-site Scope → T-002 Secure Audit Download ACL → T-003 Fix Global Export RLS → T-004 Fix Purge Advisory Lock → T-005 Fix Frontend Truncation → T-006 Write Security E2E Tests
 
 ## Handoff
 

@@ -51,7 +51,7 @@ export class DeleteFileUseCase {
       entityType: 'file',
       entityId: file.id,
       requestContext,
-        scope: SYSTEM_SCOPE.PLATFORM
+      ...(file.organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: file.organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
     });
   }
 }

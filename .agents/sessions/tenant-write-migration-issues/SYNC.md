@@ -1,49 +1,53 @@
-# Đồng bộ ngữ cảnh (SYNC)
+# Sync
 
-## Tóm tắt nội dung chính (Executive summary)
+## Executive summary (80/20)
 
-- 🟢 **Khởi động**: Sẵn sàng 100% để chuyển sang bước Execution.
-- 🟢 **Tài liệu**: `PLAN.md` và `TASKS.md` đã có mặt đầy đủ, `Handoff Ready = Yes` và Blockers = `none`.
-- 🟢 **Ngữ cảnh hiện tại**: Workspace hoàn toàn sạch sẽ (clean), không có file code nào bị bẩn ngoại trừ thư mục agent nội bộ.
-- 🎯 **Hành động tiếp theo**: Chuyển giao sang quá trình `execution` để thực thi thẻ `T-001`.
+- **Readiness**: Sẵn sàng bắt đầu execution. PLAN và TASKS đã được reset cho Round 3.
+- **Drift**: Không có codebase drift nào được phát hiện; commit HEAD là kết quả từ Round 2 và hoàn toàn khớp với ngữ cảnh của Round 3.
+- **Blockers**: `0`
+- **Next action**: Bắt đầu execution từ task `T-001`.
 
-## Tổng quan trạng thái (Developer overview)
+## Developer overview
 
-| Mục | Trạng thái |
-| --- | --- |
-| **Status** | 🟢 `ready` |
-| **Resume task ID** | T-001 |
-| **Blocker count** | 0 |
-| **Next action** | Bắt đầu viết code thực tế qua skill `execution` |
-| **Owner** | Agent |
+| Field | Value |
+|---|---|
+| Status | `ready_for_execution` |
+| Resume task IDs | `T-001` |
+| Blocker count | `0` |
+| Next action | Chạy skill `execution` |
 
-## Phạm vi (Scope)
+## Scope
 
-Đã kiểm tra (Synced):
-- Thư mục session: `.agents/sessions/tenant-write-migration-issues/`
-- Trạng thái kho chứa (Git status)
-- Kế hoạch: `PLAN.md` / `TASKS.md` (Đã được điền đầy đủ).
+- Artifacts: `PLAN.md`, `TASKS.md`, `OVERVIEW.md`
+- Workspace: Git working tree
+- Codebase: Các file liên quan trong `packages/api-platform/src/...`, `apps/admin/...`, `apps/api/test/...`.
 
-## Dữ kiện quan sát được (Observed facts)
+## Observed facts
 
-- **Source**: Tệp `PLAN.md` → **Fact**: Handoff báo `Ready for sync/execution? Yes`, không có Blockers.
-- **Source**: Tệp `TASKS.md` → **Fact**: Có đủ 8 thẻ (T-001 đến T-008) đang ở trạng thái `todo`.
-- **Source**: Lệnh `git status` → **Fact**: Mã nguồn dự án (`apps/`, `packages/`) sạch, không có thay đổi chưa lưu, không có xung đột (conflicts).
+- **Git State**: Git working tree clean đối với source code (chỉ có modified agent files trong `.agents/` và `AGENTS.md`) (Source: `git status --short`).
+- **Plan State**: PLAN.md `Ready for sync/execution? Yes` (Source: `PLAN.md`).
+- **Tasks State**: Tất cả 6 tasks đều đang ở trạng thái `todo` (Source: `TASKS.md`).
+- **Files**: Các file mục tiêu như `export-audit-logs.use-case.ts`, `file-access.service.ts`, `purge-expired-audit-logs.use-case.ts`, `use-audit-logs-controller.ts` đều tồn tại và có thể truy cập (Source: `ls -l`).
 
-## Trôi dạt ngữ cảnh (Drift detected)
+## Inferred context
 
-- N/A (Không có drift nào được phát hiện vì kế hoạch vừa mới được hoàn tất vài phút trước).
+- Các file được liệt kê trong TASKS.md đang ở phiên bản mã nguồn sau Round 2, vì vậy logic đã có sẵn discriminated union cho Scope, nhưng runtime chưa pass đúng orgId và ACL download bị hổng (Confidence: High, dựa trên user review verdict).
 
-## Thay đổi chưa được commit (Dirty changes)
+## Drift detected
 
-- `PRJ_REFERENCE.md`, `PLAN.md`, `TASKS.md`, v.v (untracked/modified) - In-scope (Hạ tầng Agent/Sessions).
-*Nhận định: Toàn bộ thay đổi bẩn đều là tài liệu agent nội bộ, mã nguồn source code an toàn.*
+- None. (Mã nguồn và artifacts đồng bộ hoàn toàn).
 
-## Rủi ro & Blockers (Risks & Blockers)
+## Dirty changes
 
-- Không có.
+- Chỉ bao gồm các thay đổi ngoài vùng source code (artifacts, settings). In-scope dirty changes = 0.
 
-## Khuyến nghị (Recommendation)
+## Risks & Blockers
 
-- **Quyết định (Decision)**: Sẵn sàng thực thi (**Ready for execution**).
-- Vui lòng chuyển sang tiến trình Code / Execution.
+| Risk/Blocker | Type | Impact | Next Action |
+|---|---|---|---|
+| Rủi ro khi update call-sites | Scope | Có thể bỏ sót một vài nơi gọi `this.auditService.log` | Grep kỹ toàn bộ `SYSTEM_SCOPE.PLATFORM` trong project `packages/api-platform` và `packages/api-identity` ở T-001. |
+
+## Recommendation
+
+**Ready for execution: Yes**.
+Đã xác nhận môi trường và kế hoạch hợp lệ. Bạn nên tiếp tục với lệnh `/execution`.

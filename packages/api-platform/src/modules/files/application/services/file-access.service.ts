@@ -1,7 +1,7 @@
 import type { AuthenticatedRequestUser } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import {   ACTION, AppError, ERROR_CODES, perm , FILE_KIND , ROLE_NAMES } from '@repo/api-core';
+import {   ACTION, AppError, ERROR_CODES, perm , FILE_KIND , ROLE_NAMES, FILE_VISIBILITY } from '@repo/api-core';
 
 import { FILES_REPOSITORY, type FilesRepositoryPort } from '../ports/files.repository.port';
 
@@ -22,19 +22,27 @@ export class FileAccessService {
       );
     }
 
-    if (file.kind === FILE_KIND.AUDIT_EXPORT) {
+    if (
+      file.organizationId !== actor.organizationId &&
+      !actor.roles.includes(ROLE_NAMES.SUPER_ADMIN)
+    ) {
+      throw new AppError(
+        ERROR_CODES.AUTH_FORBIDDEN,
+        'You do not have access to this file',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    if (file.kind === FILE_KIND.AUDIT_EXPORT || file.visibility === FILE_VISIBILITY.RESTRICTED) {
       const hasAuditPermission = actor.permissions.includes(perm('audit', ACTION.READ));
-      if (
-        file.uploadedById !== actor.userId &&
-        !hasAuditPermission &&
-        !actor.roles.includes(ROLE_NAMES.SUPER_ADMIN)
-      ) {
+      if (!hasAuditPermission && !actor.roles.includes(ROLE_NAMES.SUPER_ADMIN)) {
         throw new AppError(
           ERROR_CODES.AUTH_FORBIDDEN,
-          'You do not have permission to access audit exports',
+          'You do not have permission to access restricted files',
           HttpStatus.FORBIDDEN,
         );
       }
+      return file;
     }
 
     if (

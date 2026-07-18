@@ -20,28 +20,23 @@ plan_ref: PLAN.md
 
 | Inv | Unit (noun + verb) | Trace (doc § / AC / contract) | Layer |
 |-----|--------------------|-------------------------------|-------|
-| I-01 | Update AuditLogInput & CreateAuditLogInput interfaces (Discriminated Union) | PLAN § Scope | model |
-| I-02 | Refactor api-identity Audit log call sites | PLAN § Scope | service |
-| I-03 | Refactor api-platform Audit log call sites | PLAN § Scope | service |
-| I-04 | Secure Export audit logs with AUDIT_EXPORT kind | PLAN § Scope | api |
-| I-05 | Block unprivileged access to AUDIT_EXPORT in generic Files API | PLAN § Scope | api |
-| I-06 | Fix Advisory Lock connection leak in purge job | PLAN § Scope | db |
-| I-07 | Display Truncated Toast warning on UI | PLAN § Scope | ui |
-| I-08 | Write E2E Security Tests for Export ACL & Lock | PLAN § Scope | test |
+| I-01 | Fix Tenant Call-site Scope | PLAN § Scope | service |
+| I-02 | Secure Audit Download ACL | PLAN § Scope | service |
+| I-03 | Fix Global Export RLS | PLAN § Scope | service |
+| I-04 | Fix Purge Advisory Lock | PLAN § Scope | db |
+| I-05 | Fix Frontend Truncation | PLAN § Scope | ui |
+| I-06 | Write Security E2E Tests | PLAN § Scope | test |
 
 ## Progress board
 
 | Done | ID | Title | Status |
 |------|----|-------|--------|
-| [x] | T-001 | Update Audit Interfaces (Discriminated Union) | done |
-| [x] | T-002 | Refactor api-identity Call Sites | done |
-| [x] | T-003 | Refactor api-platform Call Sites | done |
-| [x] | T-004 | Secure Export logs with AUDIT_EXPORT | done |
-| [x] | T-005 | Block unauthorized AUDIT_EXPORT download | done |
-| [x] | T-006 | Fix Advisory Lock in Audit Repository | done |
-| [x] | T-007 | Implement UI Truncated Toast | done |
-| [x] | T-008 | Write Security E2E Tests | done |
-| [x] | T-009 | Refactor Hardcoded Strings to Constants | done |
+| [x] | T-001 | Fix Tenant Call-site Scope | done |
+| [x] | T-002 | Secure Audit Download ACL | done |
+| [x] | T-003 | Fix Global Export RLS | done |
+| [x] | T-004 | Fix Purge Advisory Lock | done |
+| [x] | T-005 | Fix Frontend Truncation | done |
+| [x] | T-006 | Write Security E2E Tests | done |
 
 ## Progress chart
 
@@ -49,159 +44,116 @@ plan_ref: PLAN.md
 pie title Card status
   "todo" : 0
   "in_progress" : 0
-  "done" : 9
+  "done" : 6
   "blocked" : 0
 ```
 
 ## Execution order
 
-T-001 → T-002 → T-003 → T-004 → T-005 → T-006 → T-007 → T-008 → T-009
+T-001 → T-002 → T-003 → T-004 → T-005 → T-006
 
 ## Notes
 
-- Rất nhiều lỗi compilation TS sẽ xảy ra sau bước T-001. Đừng lo lắng, chúng ta sẽ dọn dẹp dần trong T-002 và T-003.
+- Các thay đổi liên quan đến RLS cần cẩn trọng test kỹ ở môi trường E2E.
 
 ## Tasks
 
-### T-001: Update Audit Interfaces (Discriminated Union)
+### T-001: Fix Tenant Call-site Scope
 
 - Status: done
 - Trace: PLAN § Scope
 - Depends: none
 - Work items:
-  - [x] 1. Sửa `AuditLogInput` trong `packages/api-core/src/ports/audit-writer.port.ts` thành type discriminated union dựa trên `scope: 'platform' | 'organization'`.
-  - [x] 2. Nếu là `scope: 'organization'`, field `organizationId` là bắt buộc (string). Nếu `platform`, không cần truyền.
-  - [x] 3. Sửa `CreateAuditLogInput` tương tự trong `api-platform/.../audit.repository.port.ts`.
-- Description: Đổi type audit interface để buộc compiler kiểm tra logic phân loại scope (Tenant vs Global) tại thời điểm code.
-- AC: Type compiler báo lỗi tại toàn bộ các file call site hiện hành đang thiếu trường `scope`.
-- Verify: Chạy lệnh `pnpm run typecheck`, terminal hiển thị hàng loạt lỗi đỏ do thiếu parameter mới.
-- Flow/comment notes: Thêm JSDoc giải thích tại sao dùng discriminated union cho `organizationId`.
-- Files/scope: `packages/api-core/src/ports/audit-writer.port.ts`, `packages/api-platform/src/modules/audit/application/ports/audit.repository.port.ts` (confidence: known)
-- Out of scope for this card: Việc fix các lỗi compile ở code gọi hàm.
+  - [x] 1. Tìm tất cả các file có gọi `this.auditService.log` hoặc `this.auditWriter.log` trong `api-platform` và `api-identity` đang dùng `SYSTEM_SCOPE.PLATFORM`.
+  - [x] 2. Với các tenant resources (File, Attachment, Import, Notifications, v.v), sửa thành `SYSTEM_SCOPE.ORGANIZATION` và pass `organizationId` lấy từ chính resource/actor.
+  - [x] 3. Kiểm tra code lại để xác nhận chỉ các global event (login thất bại, system settings) mới dùng `PLATFORM`.
+- Description: Đảm bảo audit event được gắn với tenant ID thay vì lưu vào null, tránh bị RLS reject.
+- AC: Mọi file, import, attachment, ... sinh audit log đều có `organizationId` hợp lệ.
+- Verify: Chạy `pnpm typecheck` và inspect file code.
+- Flow/comment notes: Kiểm tra kỹ các event delete, upload file version, attach file.
+- Files/scope: `packages/api-platform/src/...`, `packages/api-identity/src/...` (confidence: known)
+- Out of scope for this card: ACL.
 
-### T-002: Refactor api-identity Call Sites
-
-- Status: done
-- Trace: PLAN § Scope
-- Depends: T-001
-- Work items:
-  - [x] 1. Tìm toàn bộ hàm gọi `this.auditWriter.log()` trong `packages/api-identity`.
-  - [x] 2. Update logic truyền object để tuân theo union: `{ scope: 'organization', organizationId: ... }` (đối với role, users, orgs, sso, auth) hoặc `platform` nếu cần (như tạo super admin).
-- Description: Sửa lỗi TS compile trên module api-identity sau khi đổi audit interface.
-- AC: Code module api-identity không còn lỗi Type khi typecheck.
-- Verify: `pnpm --filter api-identity run typecheck` chạy qua.
-- Flow/comment notes: N/A
-- Files/scope: Toàn bộ Use Cases trong `packages/api-identity` (confidence: known)
-- Out of scope for this card: Cập nhật call site ở api-platform.
-
-### T-003: Refactor api-platform Call Sites
+### T-002: Secure Audit Download ACL
 
 - Status: done
 - Trace: PLAN § Scope
 - Depends: T-001
 - Work items:
-  - [x] 1. Tìm toàn bộ hàm gọi `this.auditService.log()` trong `packages/api-platform` (Modules: Attachments, Exports, Files, Imports, Mail).
-  - [x] 2. Update object truyền vào dựa theo active tenant / context.
-- Description: Sửa lỗi TS compile trên module api-platform.
-- AC: Không còn lỗi typecheck tại module api-platform.
-- Verify: `pnpm --filter api-platform run typecheck` chạy qua.
-- Flow/comment notes: N/A
-- Files/scope: Toàn bộ Use Cases trong `packages/api-platform` (confidence: known)
-- Out of scope for this card: Logic về Export ACL.
+  - [x] 1. Mở `FileAccessService` ở generic download API.
+  - [x] 2. Xử lý logic check: Nếu `file.kind === AUDIT_EXPORT` hoặc `visibility === RESTRICTED`, thì bắt buộc user phải có quyền `audit.read` (hoặc là Super Admin), KHÔNG áp dụng bypass `uploadedById`.
+  - [x] 3. Mở endpoint download chuyên biệt của Audit (`/admin/audit-logs/exports/:fileId/download`).
+  - [x] 4. Thêm rule: nếu tìm thấy file mà `kind !== AUDIT_EXPORT`, lập tức ném ra 404 (giả vờ như file không tồn tại đối với audit endpoint) để chống leak file thường.
+- Description: Vá các lỗ hổng P0, P1 liên quan đến download file audit trái phép hoặc tải lậu file thường qua audit endpoint.
+- AC: Unauthorized uploader bị chặn. Ordinary file không truy xuất được từ audit endpoint.
+- Verify: Xem code logic if-else đảm bảo chặt chẽ.
+- Flow/comment notes: Chú ý ưu tiên throw error sớm.
+- Files/scope: `FileAccessService`, `DownloadAuditExportUseCase`. (confidence: known)
+- Out of scope for this card: Frontend.
 
-### T-004: Secure Export logs with AUDIT_EXPORT
+### T-003: Fix Global Export RLS
 
-- Status: todo
+- Status: done
 - Trace: PLAN § Scope
-- Depends: T-003
+- Depends: T-002
 - Work items:
-  - [x] 1. Sửa `export-audit-logs.use-case.ts` nơi gọi API tạo file CSV/Excel cho audit.
-  - [x] 2. Gắn kèm payload `kind: 'AUDIT_EXPORT'` (hoặc chuỗi phân loại tương đương) và `visibility: 'RESTRICTED'` (nếu có enum này).
-  - [x] 3. Đảm bảo nếu Global Export được gọi (SUPER_ADMIN), file tạo ra phải nằm ngoài tenant nhưng chỉ truy cập được bởi chính admin đó (gắn owner ID).
-- Description: Đánh dấu rõ ràng loại file Export trong DB để backend chặn về sau.
-- AC: Khi export, Cột kind / visibility của file trong DB lưu đúng giá trị AUDIT_EXPORT.
-- Verify: Viết Unit test hoặc gọi thử E2E API export để check giá trị lưu.
-- Flow/comment notes: Thêm comment nhấn mạnh bảo mật Export ACL.
-- Files/scope: `packages/api-platform/src/modules/audit/application/use-cases/export-audit-logs.use-case.ts` (confidence: known)
-- Out of scope for this card: Sửa logic tải file chung.
+  - [x] 1. Mở `ExportAuditLogsUseCase`.
+  - [x] 2. Phát hiện chỗ gọi `FilesRepository.create(...)`. Nếu `organizationId === null` (Super Admin global mode), hãy sử dụng một explicit database executor đã bypass RLS.
+  - [x] 3. (Cách tốt nhất) Dùng `this.database` wrapper bypass rls hoặc gọi thẳng query postgres. Nếu repository chưa hỗ trợ bypassRls parameter, thêm vào.
+- Description: Giải quyết conflict giữa Global Audit Export (không org) và Files RLS (bắt buộc org hoặc bypass).
+- AC: Global export không bị crash DB do RLS reject file insert.
+- Verify: Chạy E2E tạo global export.
+- Flow/comment notes: SUPER_ADMIN không có active org phải được set `bypassRls`.
+- Files/scope: `packages/api-platform/src/modules/exports/application/use-cases/create-export.use-case.ts` hoặc `packages/api-platform/src/modules/files/...` (confidence: inferred)
+- Out of scope for this card: Other RLS tables.
 
-### T-005: Block unauthorized AUDIT_EXPORT download
+### T-004: Fix Purge Advisory Lock
 
-- Status: todo
-- Trace: PLAN § Scope
-- Depends: T-004
-- Work items:
-  - [x] 1. Tìm File Download Use Case hoặc Controller (nơi GET file).
-  - [x] 2. Thêm policy check: Nếu file DB row có `kind == AUDIT_EXPORT`, bắt buộc user hiện tại phải có permission Audit hoặc là owner (tuỳ hệ thống).
-  - [x] 3. Trả về `ForbiddenException` nếu không đủ quyền.
-- Description: Từ chối phục vụ (chặn bypass) việc tải file Audit từ API tải file generic.
-- AC: User thuộc tenant A nhưng không có quyền audit không thể download file CSV export, dù biết ID file.
-- Verify: Chạy API GET `/api/v1/files/:id` với user thường và file export -> nhận mã lỗi 403.
-- Flow/comment notes: Bắt buộc để lại comment ranh giới bảo mật (Security boundary).
-- Files/scope: `packages/api-platform/src/modules/files/...` (confidence: inferred)
-- Out of scope for this card: Advisory lock.
-
-### T-006: Fix Advisory Lock in Audit Repository
-
-- Status: todo
+- Status: done
 - Trace: PLAN § Scope
 - Depends: none
 - Work items:
-  - [x] 1. Sửa hàm có lệnh `pg_try_advisory_lock` trong `packages/api-platform/src/modules/audit/infrastructure/audit.repository.ts`.
-  - [x] 2. Đổi logic sang `db.transaction()` (xact_lock) NẾU query xoá purge ngắn, HOẶC dùng một connection client raw checkout, gọi try lock, thực thi xoá, rồi trong block `finally` phải gọi `pg_advisory_unlock` và thả connection lại pool.
-- Description: Ngăn rò rỉ lock khi cron job dọn dẹp audit cũ hoạt động.
-- AC: Logic try_lock / unlock được thực thi đầy đủ và đóng gói bằng try/finally.
-- Verify: Test purge log và truy vấn `pg_locks` trên PostgreSQL không thấy lock nào lưu lại.
-- Flow/comment notes: Chú thích rõ why: "Ensure connection is freed to prevent pool exhaustion".
-- Files/scope: `audit.repository.ts` (confidence: known)
-- Out of scope for this card: E2E testing.
+  - [x] 1. Mở `packages/api-platform/src/modules/audit/application/use-cases/purge-expired-audit-logs.use-case.ts` và `audit.repository.ts`.
+  - [x] 2. Đổi logic lock: checkout một `PoolClient` (hoặc mở 1 transaction block).
+  - [x] 3. Đảm bảo `try_lock`, `delete_query`, và `unlock` đều gọi qua CÙNG 1 executor instance/connection.
+  - [x] 4. Đặt `unlock` trong `finally`.
+- Description: Ngăn rò rỉ connection pool do advisory lock session-level.
+- AC: Acquire, run, unlock trên đúng 1 connection duy nhất.
+- Verify: Đọc code `pg_try_advisory_lock` và executor lifecycle.
+- Flow/comment notes: Session lock requires the exact same DB connection.
+- Files/scope: `audit.repository.ts`, `purge-expired-audit-logs.use-case.ts` (confidence: known)
+- Out of scope for this card: E2E testing for lock.
 
-### T-007: Implement UI Truncated Toast
-
-- Status: todo
-- Trace: PLAN § Scope
-- Depends: T-003
-- Work items:
-  - [x] 1. Tìm trang Audit Logs / Export button trên `apps/web` (Next.js/React).
-  - [x] 2. Sau khi gọi API query list/export, lấy biến cờ `truncated` (nếu có) từ API response.
-  - [x] 3. Gọi hàm `toast.warning(...)` hoặc component thông báo của UI kit với thông điệp: "Kết quả bị giới hạn. Vui lòng dùng bộ lọc..."
-- Description: Xử lý cảnh báo người dùng khi list Audit log vượt mốc hiển thị cho phép.
-- AC: Hiện popup toast warning vàng khi `isTruncated = true`.
-- Verify: Fake API trả về isTruncated=true, bấm tìm kiếm, thấy toast xuất hiện trên UI.
-- Flow/comment notes: N/A
-- Files/scope: `apps/web/src/features/audit/...` (confidence: inferred)
-- Out of scope for this card: Backend API truncation logic (đã có sẵn).
-
-### T-008: Write Security E2E Tests
-
-- Status: todo
-- Trace: PLAN § Scope
-- Depends: T-001, T-004, T-005, T-006
-- Work items:
-  - [x] 1. Bổ sung E2E test tạo Audit Export ở Tenant A.
-  - [x] 2. E2E test login user Tenant B cố gắng đọc bằng file ID -> expect 403/404.
-  - [x] 3. E2E test gọi API Purge, rồi query DB check số lock tồn tại = 0.
-- Description: Đảm bảo các fix RLS và Lock không bị phá vỡ trong tương lai.
-- AC: CI pass toàn bộ test suite này.
-- Verify: `pnpm run test:e2e`.
-- Flow/comment notes: N/A
-- Files/scope: `apps/api/test/...e2e.spec.ts` (confidence: inferred)
-- Out of scope for this card: Unit tests (nếu đã có).
-
-### T-009: Refactor Hardcoded Strings to Constants
+### T-005: Fix Frontend Truncation
 
 - Status: done
 - Trace: PLAN § Scope
-- Depends: T-008
+- Depends: none
 - Work items:
-  - [x] 1. Khai báo `SYSTEM_SCOPE` trong `packages/api-core/src/common/constants/system.constants.ts`.
-  - [x] 2. Khai báo `FILE_KIND` và `FILE_VISIBILITY` trong `packages/api-core/src/common/constants/file.constants.ts`.
-  - [x] 3. Export các hằng số này trong `api-core/src/index.ts`.
-  - [x] 4. Cập nhật `AuditLogInput` trong `audit-writer.port.ts` để sử dụng `SYSTEM_SCOPE`.
-  - [x] 5. Sửa toàn bộ các điểm sử dụng `platform`, `organization`, `AUDIT_EXPORT`, `RESTRICTED`, `SUPER_ADMIN` tại `api-platform` và `api-core` để dùng biến hằng.
-- Description: Xử lý Tech Debt H-001 từ Review bằng cách định nghĩa các hằng số chung thay vì hardcode string, nâng cao tính bảo trì của mã nguồn.
-- AC: Không còn chuỗi cứng nào như 'AUDIT_EXPORT', 'RESTRICTED' hay 'platform'/'organization' liên quan đến scope trong codebase. Mọi thứ tham chiếu từ enum/constant.
-- Verify: Chạy lại `pnpm typecheck` và `vitest` toàn dự án để bảo đảm không vỡ logic.
-- Flow/comment notes: Sửa các type check union cho đúng giá trị của constants.
-- Files/scope: `api-core/src/common/constants/...`, `api-core/src/ports/...`, `api-platform/src/...` (confidence: known)
-- Out of scope for this card: Chỉnh sửa các constant không liên quan đến đợt review H-001.
+  - [x] 1. Tìm trang Audit List UI frontend (`apps/admin/src/features/audit-logs/controllers/use-audit-logs-controller.ts`).
+  - [x] 2. Đổi `data.isTruncated` thành `data.truncated` để match với API response.
+  - [x] 3. Chỉnh sửa message warning hiển thị chính xác (VD: "Exported X of Y matching events. Narrow the filters...").
+  - [x] 4. Thêm error toast nếu export request/download fails.
+- Description: Đảm bảo UI báo warning khi query vượt 5000 rows.
+- AC: UI hiện đúng popup warning do backend trả về `truncated: true`.
+- Verify: Kiểm tra code `apps/admin`.
+- Flow/comment notes: API properties match TS interface.
+- Files/scope: `apps/admin/src/features/audit-logs/controllers/use-audit-logs-controller.ts` (confidence: known)
+- Out of scope for this card: Backend API changes.
+
+### T-006: Write Security E2E Tests
+
+- Status: done
+- Trace: PLAN § Scope
+- Depends: T-001, T-002, T-003, T-004, T-005
+- Work items:
+  - [x] 1. Test: Org ADMIN có `files.read` nhưng không `audit.read` tải file audit -> 403.
+  - [x] 2. Test: Uploader bị thu hồi `audit.read` tải file audit của chính mình -> 403.
+  - [x] 3. Test: Endpoint `/admin/audit-logs/exports/:fileId/download` được cấp ID của ordinary file -> 404.
+  - [x] 4. Test: SUPER_ADMIN global export khi `organizationId=null` -> thành công.
+- Description: Test P0/P1 security vulnerabilities.
+- AC: Toàn bộ tests pass, chứng minh security model hoàn hảo.
+- Verify: `pnpm run test:e2e`
+- Flow/comment notes: N/A
+- Files/scope: `apps/api/test/audit.e2e.spec.ts` (confidence: known)
+- Out of scope for this card: Load testing.

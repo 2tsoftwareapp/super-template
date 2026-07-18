@@ -41,7 +41,7 @@ export class DeleteAttachmentUseCase {
       entityId: attachment.entityId,
       metadata: { attachmentId },
       requestContext,
-        scope: SYSTEM_SCOPE.PLATFORM
+      ...(attachment.organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: attachment.organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
     });
   }
 }

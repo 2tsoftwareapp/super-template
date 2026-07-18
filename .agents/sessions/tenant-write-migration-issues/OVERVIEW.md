@@ -7,20 +7,20 @@
 
 | Field | Value |
 |---|---|
-| Status | `done` |
-| Goal | Phân tích nguyên nhân gốc rễ và lập bản đồ sửa lỗi RLS/Audit cho hệ thống Multi-tenant. |
-| Progress | `9/9` tasks done · `0` finding |
+| Status | `ready_for_execution` |
+| Goal | Hoàn tất Re-review Round 3 để Audit system đạt yêu cầu bảo mật nghiêm ngặt (đúng scope, không rò rỉ ACL, không connection leak). |
+| Progress | `0/6` tasks done · `0` finding |
 | Top risk / blocker | None |
-| Next action | Review PR and merge. |
+| Next action | Execution (T-001) |
 | Owner | Agent |
 
 ## Progress chart
 
 ```mermaid
 pie title Task status
-  "done" : 9
+  "done" : 0
   "in_progress" : 0
-  "todo" : 0
+  "todo" : 6
   "blocked" : 0
 ```
 

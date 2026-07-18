@@ -41,12 +41,14 @@ describe('ExportAuditLogsUseCase', () => {
       upload: vi.fn(async () => ({ key: 'exports/audit/some-key.csv' })),
       delete: vi.fn(async () => undefined),
     };
+    const database = { execute: vi.fn() };
     const recordAuditLogUseCase = { execute: vi.fn(async () => undefined) };
 
     const useCase = new ExportAuditLogsUseCase(
       auditRepository as never,
       filesRepository as never,
       objectStorage as never,
+      database as never,
       recordAuditLogUseCase as never,
     );
 
@@ -88,12 +90,14 @@ describe('ExportAuditLogsUseCase', () => {
     const auditRepository = { listForExport: vi.fn(), count: vi.fn() };
     const filesRepository = { create: vi.fn() };
     const objectStorage = { upload: vi.fn(), delete: vi.fn() };
+    const database = { execute: vi.fn() };
     const recordAuditLogUseCase = { execute: vi.fn() };
 
     const useCase = new ExportAuditLogsUseCase(
       auditRepository as never,
       filesRepository as never,
       objectStorage as never,
+      database as never,
       recordAuditLogUseCase as never,
     );
 
@@ -116,7 +120,11 @@ describe('ExportAuditLogsUseCase', () => {
     };
     const objectStorage = {
       upload: vi.fn(async () => ({ key: 'exports/audit/global.csv' })),
-      delete: vi.fn(),
+      delete: vi.fn(async () => undefined),
+    };
+    const database = { 
+      execute: vi.fn(), 
+      transaction: vi.fn(async (cb) => cb({ execute: vi.fn() })) 
     };
     const recordAuditLogUseCase = { execute: vi.fn() };
 
@@ -124,6 +132,7 @@ describe('ExportAuditLogsUseCase', () => {
       auditRepository as never,
       filesRepository as never,
       objectStorage as never,
+      database as never,
       recordAuditLogUseCase as never,
     );
 
@@ -138,6 +147,7 @@ describe('ExportAuditLogsUseCase', () => {
         kind: FILE_KIND.AUDIT_EXPORT,
         visibility: FILE_VISIBILITY.RESTRICTED,
       }),
+      expect.anything(),
     );
   });
 
@@ -155,12 +165,14 @@ describe('ExportAuditLogsUseCase', () => {
       upload: vi.fn(async () => ({ key: 'exports/audit/some-key.csv' })),
       delete: vi.fn(async () => undefined),
     };
+    const database = { execute: vi.fn() };
     const recordAuditLogUseCase = { execute: vi.fn(async () => undefined) };
 
     const useCase = new ExportAuditLogsUseCase(
       auditRepository as never,
       filesRepository as never,
       objectStorage as never,
+      database as never,
       recordAuditLogUseCase as never,
     );
 

@@ -64,7 +64,7 @@ export class AttachFileUseCase {
       entityId: input.entityId,
       metadata: { attachmentId: attachment.id, fileId: input.fileId },
       requestContext,
-        scope: SYSTEM_SCOPE.PLATFORM
+      ...(file.organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: file.organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
     });
 
     return AttachmentsMapper.toAttachmentDto(attachment);

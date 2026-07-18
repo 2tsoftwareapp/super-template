@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import {  EnvironmentService , SYSTEM_SCOPE } from '@repo/api-core';
+import { DATABASE_POOL } from '@repo/api-database';
 
 import { AUDIT_REPOSITORY, type AuditRepositoryPort } from '../ports/audit.repository.port';
 import { RecordAuditLogUseCase } from './record-audit-log.use-case';
@@ -14,6 +15,8 @@ export class PurgeExpiredAuditLogsUseCase {
     @Inject(AUDIT_REPOSITORY) private readonly auditRepository: AuditRepositoryPort,
     private readonly recordAuditLogUseCase: RecordAuditLogUseCase,
     private readonly environmentService: EnvironmentService,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    @Inject(DATABASE_POOL) private readonly pool: any,
   ) {}
 
   async execute(): Promise<{ deletedCount: number; cutoff: Date } | null> {
@@ -26,12 +29,17 @@ export class PurgeExpiredAuditLogsUseCase {
     const cutoff = new Date(Date.now() - retentionDays * MILLISECONDS_PER_DAY);
 
     // Acquire a distributed advisory lock so only one replica runs the purge.
-    const acquired = await this.auditRepository.tryAdvisoryLock(PURGE_LOCK_ID);
-    if (!acquired) {
-      return null;
-    }
+    const client = await this.pool.connect();
+    let acquired = false;
 
     try {
+      const lockResult = await client.query('SELECT pg_try_advisory_lock($1) AS acquired', [PURGE_LOCK_ID]);
+      acquired = lockResult.rows[0]?.acquired === true;
+      
+      if (!acquired) {
+        return null;
+      }
+
       // Delete in batches to keep each transaction short; the lock lives until
       // the session ends (released implicitly on connection close or explicit
       // pg_advisory_unlock).  PostgreSQL does not release advisory locks on
@@ -56,7 +64,10 @@ export class PurgeExpiredAuditLogsUseCase {
 
       return { deletedCount, cutoff };
     } finally {
-      await this.auditRepository.unlockAdvisoryLock(PURGE_LOCK_ID);
+      if (acquired) {
+        await client.query('SELECT pg_advisory_unlock($1)', [PURGE_LOCK_ID]);
+      }
+      client.release();
     }
   }
 }

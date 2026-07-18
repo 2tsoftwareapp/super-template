@@ -93,12 +93,12 @@ export function useAuditLogsController(): AuditLogsViewModel {
       });
       if (!exportResponse.ok) throw new Error("Export failed");
       const { data } = (await exportResponse.json()) as {
-        data: { fileId: string; isTruncated?: boolean };
+        data: { fileId: string; truncated: boolean };
       };
 
-      if (data.isTruncated) {
+      if (data.truncated) {
         toast.warning(
-          "The export exceeds 10,000 rows and was truncated. Please use narrower filters."
+          "The export exceeds 5,000 rows and was truncated. Please use narrower filters."
         );
       }
 
