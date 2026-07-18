@@ -34,6 +34,7 @@ export class DrizzleTransactionService implements TransactionPort {
       return result;
     } catch (error) {
       await tx.execute(sql.raw(`ROLLBACK TO SAVEPOINT ${name}`));
+      await tx.execute(sql.raw(`RELEASE SAVEPOINT ${name}`));
       throw error;
     }
   }
