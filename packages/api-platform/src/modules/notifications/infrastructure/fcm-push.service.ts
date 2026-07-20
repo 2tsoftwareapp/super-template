@@ -3,7 +3,7 @@ import { EnvironmentService } from '@repo/api-core';
 import { type App, cert, getApps, initializeApp } from 'firebase-admin/app';
 import { getMessaging } from 'firebase-admin/messaging';
 
-import type { PushMessage, PushNotifier } from '../application/push.interface';
+import type { PushMessage, PushNotifier, PushSendResult } from '../application/push.interface';
 
 import { DeviceTokensRepository } from './device-tokens.repository';
 
@@ -75,6 +75,38 @@ export class FcmPushService implements PushNotifier {
       this.logger.warn(
         `Removed ${invalidTokens.length} invalid FCM token(s) for user ${userId}`,
       );
+    }
+  }
+
+  async sendToToken(token: string, message: PushMessage): Promise<PushSendResult> {
+    if (!this.app) {
+      return { success: false, providerMessageId: null, error: 'FCM not configured' };
+    }
+
+    try {
+      const response = await getMessaging(this.app).send({
+        token,
+        notification: {
+          title: message.title,
+          body: message.body,
+        },
+        data: this.toFcmData(message),
+      });
+
+      return { success: true, providerMessageId: response || null };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const isInvalidToken =
+        errorMessage.includes('registration-token-not-registered') ||
+        errorMessage.includes('invalid-argument') ||
+        errorMessage.includes('not-found') ||
+        errorMessage.includes('unregistered');
+
+      return {
+        success: false,
+        providerMessageId: null,
+        error: isInvalidToken ? 'INVALID_TOKEN' : errorMessage,
+      };
     }
   }
 

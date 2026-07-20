@@ -1,0 +1,12 @@
+#!/usr/bin/expect -f
+
+set timeout 30
+spawn bun run db:generate
+
+expect {
+    -re ".*\\?.*" {
+        send "\r"
+        exp_continue
+    }
+    eof
+}

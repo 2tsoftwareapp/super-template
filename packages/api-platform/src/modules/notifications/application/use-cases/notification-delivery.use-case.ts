@@ -10,6 +10,8 @@ import {
   type AuditWriter,
   ERROR_CODES,
   requireOrganizationId,
+  TRANSACTION_PORT,
+  type TransactionPort,
   USER_LOOKUP,
   type UserLookup,
   SYSTEM_SCOPE,
@@ -23,6 +25,7 @@ import {
 import type {
   ListNotificationJobsQuery,
   NotificationJobView,
+  NotificationView,
   SendNotificationRequestCommand,
 } from '../notifications.types';
 import type { NotificationJobRecord } from '../ports/notification-jobs.repository.port';
@@ -54,6 +57,8 @@ export class NotificationDeliveryUseCase {
     @Inject(USER_LOOKUP) private readonly userLookup: UserLookup,
     private readonly dispatchService: NotificationDispatchService,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
+    @Inject(TRANSACTION_PORT)
+    private readonly transactionPort: TransactionPort,
   ) {}
 
   async createDeliveryJob(
@@ -285,45 +290,67 @@ export class NotificationDeliveryUseCase {
         return;
       }
 
-      let deliveredCount = 0;
       const organizationId = locked.organizationId;
 
       if (!organizationId) {
         throw new Error('Notification job is missing organizationId');
       }
 
-      for (
-        let offset = 0;
-        offset < recipientIds.length;
-        offset += RECIPIENT_BATCH_SIZE
-      ) {
-        const batch = recipientIds.slice(offset, offset + RECIPIENT_BATCH_SIZE);
-        const notifications = await this.notificationsRepository.createMany(
-          batch.map((userId) => ({
-            organizationId,
-            userId,
-            type: locked.type,
-            title: locked.title,
-            body: locked.body,
-            data: locked.data ?? null,
-            sourceJobId: locked.id,
-          })),
-        );
+      // Collect all notifications for SSE emission after transaction commits
+      const allNotificationViews: Array<{ view: NotificationView; userId: string; organizationId: string }> = [];
 
-        for (const notification of notifications) {
-          this.dispatchService.dispatch(
-            this.notificationsMapper.toNotificationView(notification),
-            notification.organizationId ?? organizationId,
+      await this.transactionPort.run(async (tx) => {
+        let deliveredCount = 0;
+
+        for (
+          let offset = 0;
+          offset < recipientIds.length;
+          offset += RECIPIENT_BATCH_SIZE
+        ) {
+          const batch = recipientIds.slice(offset, offset + RECIPIENT_BATCH_SIZE);
+          const inserted = await this.notificationsRepository.createMany(
+            batch.map((userId) => ({
+              organizationId,
+              userId,
+              type: locked.type,
+              title: locked.title,
+              body: locked.body,
+              data: locked.data ?? null,
+              sourceJobId: locked.id,
+            })),
+            tx,
           );
+
+          // On retry, createMany returns only newly inserted rows (ON CONFLICT DO NOTHING).
+          // Load any existing rows to ensure delivery rows are created for all recipients.
+          const existing = inserted.length < batch.length
+            ? await this.notificationsRepository.findBySourceJobAndUsers(locked.id, batch, tx)
+            : [];
+
+          const allInBatch = [...inserted, ...existing];
+
+          for (const notification of allInBatch) {
+            await this.dispatchService.upsertDeliveriesForNotification(
+              this.notificationsMapper.toNotificationView(notification),
+              tx,
+            );
+            allNotificationViews.push({
+              view: this.notificationsMapper.toNotificationView(notification),
+              userId: notification.userId,
+              organizationId: notification.organizationId ?? organizationId,
+            });
+          }
+
+          deliveredCount += allInBatch.length;
         }
 
-        deliveredCount += notifications.length;
-      }
+        await this.notificationJobsRepository.markCompleted(locked.id, deliveredCount, tx);
+      });
 
-      await this.notificationJobsRepository.markCompleted(
-        locked.id,
-        deliveredCount,
-      );
+      // Emit SSE after transaction commits — best-effort, inbox state is the source of truth
+      for (const { view, organizationId: orgId } of allNotificationViews) {
+        this.dispatchService.emitSSE(view, orgId);
+      }
     } catch (error) {
       await this.notificationJobsRepository.markFailed(
         locked.id,

@@ -1,248 +1,252 @@
-# INVESTIGATE — Feature 06 Notifications
+# INVESTIGATE — Feature 06 Notifications · Review Round 2
 
 ## Executive summary
 
-- **P0 — `sourceJobId` không được truyền khi insert inbox**: Port `CreateNotificationInput` thiếu trường `sourceJobId`. Worker `processJob()` không set giá trị. Unique partial index `WHERE source_job_id IS NOT NULL` không bao giờ fire → retry tạo duplicate inbox.
-- **P0 — Recipient resolution không tenant-scoped**: `UserLookup.findById/filterExistingUserIds/listDeliverableUserIds` query `users` toàn hệ thống, không filter theo organization membership → USER/USERS/ALL có thể target user ngoài tenant.
-- **P0 — Notification organization attribution sai**: Worker gọi `findPrimaryOrganizationId(userId)` thay vì dùng `locked.organizationId` → notification gán sai tenant.
-- **P0 — Push delivery thiếu retry/dedup**: `dispatch()` fire-and-forget, error bị swallow. Không có `notification_deliveries` table → crash mất push vĩnh viễn.
-- **P1-P2 — `claimDue`, admin job scope, SSE duplicate, atomicity, subject leak**: Đều có evidence xác nhận.
+- **3 P0 blockers confirmed**: (1) `ON CONFLICT DO NOTHING` thiếu `where` predicate → không match partial unique index; (2) push pipeline gián đoạn — `claimPending`/`markSent` dead code, không worker nào gửi FCM; (3) inbox insert + delivery-row creation không atomic — retry mất push vĩnh viễn.
+- **2 P1 confirmed**: delivery retry state machine thiếu backoff; job mutation + audit không cùng transaction.
+- **1 P1 confirmed**: idempotency key unique constraint không scope organizationId.
+- **Test coverage gap**: tất cả là mock-level unit tests — không integration test DB constraints, không test delivery pipeline, không test atomicity.
+- **Kết luận**: Feature 06 chưa sẵn sàng merge. Cần 5 fix bắt buộc trước khi tiếp tục.
 
 ## Developer overview
 
 | Field | Value |
 |-------|-------|
-| Investigation status | **Root Cause Confirmed** — 4 P0, 3 P1, 2 P2 findings verified |
-| Strongest hypothesis | Worker `processJob()` tại `notification-delivery.use-case.ts:219` không wire `sourceJobId`, không tenant-scope recipient resolution, gán sai organization |
-| Evidence gap | Không có E2E test tenant isolation / idempotency / concurrency |
-| Next action | Viết PLAN cho fix round, ưu tiên 6 nhóm: sourceJobId wiring → recipient scope → org attribution → delivery table → claimDue → E2E |
+| Investigation status | **Root Cause Confirmed** — tất cả 7 claims từ Review Round 2 đều có evidence |
+| Strongest hypothesis | Partial unique index không match (P0) là lỗi dễ trigger nhất — job delivery crash ngay khi chạy thực tế |
+| Evidence gap | Không có CI workflow run cho HEAD commit; 1 test repo đang fail |
+| Next action | Sửa 5 blocking items → viết integration tests → chạy CI |
 
 ## Charts
 
 ```mermaid
 flowchart TD
-    subgraph Worker[Worker processJob]
-        A[claimDue/unused] -->|listDue| B[markProcessing]
-        B --> C[resolveRecipientIds]
-        C --> D[createMany inbox]
-        D --> E[dispatch]
+    subgraph P0_1[P0-1: ON CONFLICT mismatch]
+        A1[Migration: partial unique index\nWHERE source_job_id IS NOT NULL]
+        A2[Repository: onConflictDoNothing\n{ target: [sourceJobId, userId] }]
+        A3[Missing WHERE predicate →\nPostgreSQL can't match index]
+        A1 --> A3
+        A2 --> A3
+        A3 --> A4[Insert fails OR\nduplicates not prevented]
     end
 
-    subgraph Issues[Root Causes]
-        I1[sourceJobId missing from insert]
-        I2[recipients resolved system-wide]
-        I3[org = primaryOrg not job.org]
-        I4[dispatch fire-and-forget]
-        I5[claimDue dead code]
+    subgraph P0_2[P0-2: Push pipeline broken]
+        B1[dispatch() calls void upsertDeliveries]
+        B2[upsertDeliveries only writes\nnotification_deliveries rows]
+        B3[claimPending / markSent:\nzero production call sites]
+        B4[No delivery processor exists]
+        B1 --> B2 --> B3 --> B4
+        B4 --> B5[FCM push never sent]
     end
 
-    C --> I2
-    D --> I1
-    D --> I3
-    E --> I4
-    B --> I5
+    subgraph P0_3[P0-3: Not atomic]
+        C1[processClaimedJob:\ncreateMany]
+        C2[no DB transaction]
+        C3[void upsertDeliveries\nfire-and-forget]
+        C4[markCompleted\nseparate call]
+        C1 --> C2
+        C2 --> C3
+        C3 --> C4
+        C4 --> C5[Crash → inbox exists\nbut delivery missing]
+    end
+
+    P0_1 -->|blocks| D[Feature 06 NOT APPROVED]
+    P0_2 --> D
+    P0_3 --> D
 ```
 
 ## Question
 
-Feature 06 — Notifications review commit `a184c2b` identifies 10 issues (4 P0, 3 P1, 2 P2, 1 missing CI). Các claim có chính xác không?
+Các claim từ Review Round 2 (commit `1b6d4850a2a7ac5ca2a3739c64dbb1aeeb6eb1bb`) về partial unique index, push delivery, atomicity, retry state machine, audit atomicity, idempotency scope, và test coverage có chính xác không?
 
 ## Status
 
-**Root Cause Confirmed** — tất cả findings đều có evidence trong codebase.
+**Root Cause Confirmed** — 7/7 findings confirmed with code evidence.
 
 ## Context
 
-- **HEAD:** `a184c2b966ec178835be186f38761b3b2d161a76`
-- **Commit:** `feat(notifications): harden tenant isolation, idempotency and SSE scoping`
+- **HEAD:** `1b6d4850a2a7ac5ca2a3739c64dbb1aeeb6eb1bb`
+- **Commit:** `fix(notifications): tenant isolation, idempotency, push delivery tracking, admin job scope`
 - **Session:** `.agents/sessions/Task-3-Task-2-feature-06-notifications/`
-- **Review verdict:** 6.8/10 — NEEDS CHANGES
+- **Review verdict:** 7.8/10 — NEEDS CHANGES (Round 2)
 
 ## Evidence
 
-| ID | Source | Observation | Supports hypothesis? | Confidence |
-|----|--------|-------------|---------------------|------------|
-| E-001 | `notifications.repository.port.ts:18-26` | `CreateNotificationInput` không có trường `sourceJobId` | H-001 (sourceJobId missing) | **Cao** |
-| E-002 | `notification-delivery.use-case.ts:247-260` | `processJob()` batch insert không truyền `sourceJobId: locked.id` | H-001 | **Cao** |
-| E-003 | `notifications.repository.ts:44-49` | `createMany` gọi `onConflictDoNothing()` với comment tự nhận idempotency dựa trên unique constraint | H-001 | **Cao** |
-| E-004 | `notifications.ts:58-62` (schema) | Unique index `notifications_source_job_id_user_id_unique` có `WHERE source_job_id IS NOT NULL` | H-001 | **Cao** |
-| E-005 | `user-lookup.port.ts:8-12` | `UserLookup` interface không có tham số organizationId | H-002 (recipient not scoped) | **Cao** |
-| E-006 | `users.repository.ts:205-234` | `listDeliverableUserIds()` và `filterExistingUserIds()` query `users` toàn hệ thống, không join organization_members | H-002 | **Cao** |
-| E-007 | `notification-delivery.use-case.ts:249-253` | `processJob()` gọi `findPrimaryOrganizationId(userId)` thay vì dùng `locked.organizationId` | H-003 (org attribution sai) | **Cao** |
-| E-008 | `notification-dispatch.service.ts:21-42` | `dispatch()` fire-and-forget, `.catch(() => {})` swallow error | H-004 (push delivery) | **Cao** |
-| E-009 | `notification-jobs.repository.ts:142-168` | `claimDue()` implementation tồn tại nhưng không được gọi | H-005 (claimDue dead code) | **Cao** |
-| E-010 | `notification-delivery.use-case.ts:202-216` | `processDueJobs()` gọi `listDue()` chứ không gọi `claimDue()` | H-005 | **Cao** |
-| E-011 | `notification-jobs.repository.port.ts:71-110` | Port interface không khai báo `claimDue()` | H-005 | **Cao** |
-| E-012 | `notification-stream.service.ts:66-70` | `emit()` gọi `subject.next()` local + `publish()` Redis cho cùng event | H-006 (SSE duplicate) | **Cao** |
-| E-013 | `notification-stream.service.ts:123-133` | Redis subscriber nhận echo và gọi `subject.next()` lần nữa | H-006 | **Cao** |
-| E-014 | `notifications.controller.ts:178-213` | Admin list/get/cancel job không nhận actor organization context | H-007 (admin scope) | **Cao** |
-| E-015 | `notification-jobs.repository.ts:60-68` | `findById()` chỉ filter theo `id`, không filter `organizationId` | H-007 | **Cao** |
-| E-016 | `notification-jobs.repository.ts:89-120` | `list()` không có filter organizationId trong query | H-007 | **Cao** |
-| E-017 | Migration `0005_expand_organization_rls.sql:12` | RLS policy `notification_jobs_tenant_isolation` cho phép `organization_id IS NULL` | H-007 (SUPER_ADMIN bypass) | **Cao** |
-| E-018 | `notification-delivery.use-case.ts:96-128` | Audit log ghi sau `create()` job, không cùng transaction | H-008 (atomicity) | **Cao** |
-| E-019 | `notification-delivery.use-case.ts:170-196` | Audit log ghi sau `markCancelled()`, không cùng transaction | H-008 | **Cao** |
-| E-020 | `notification-stream.service.ts:86-96` | `getSubject()` luôn tạo subject mới, không cleanup khi subscriber disconnect | H-010 (subject leak) | **Cao** |
-| E-021 | `notification-stream.service.spec.ts:9-15` | Unit test dùng `REDIS_URL: undefined` → không phát hiện duplicate | H-006 (test gap) | **Cao** |
+| ID | Source | Observation | Supports | Confidence |
+|----|--------|-------------|----------|------------|
+| E-101 | `notifications.ts:61-63` (schema) | Unique index: `(source_job_id, user_id) WHERE source_job_id IS NOT NULL` | P0-1 partial index | **Cao** |
+| E-102 | `0021_notification_hardening.sql:5` | Migration SQL: `WHERE "notifications"."source_job_id" is not null` | P0-1 | **Cao** |
+| E-103 | `notifications.repository.ts:48-49` | `onConflictDoNothing({ target: [sourceJobId, userId] })` — thiếu `where` clause | P0-1 | **Cao** |
+| E-104 | `notification-dispatch.service.ts:23-28` | `dispatch()` emit SSE + `void this.upsertDeliveries()` — fire-and-forget | P0-2 push broken | **Cao** |
+| E-105 | `notification-dispatch.service.ts:30-54` | `upsertDeliveries()` chỉ upsert DB rows, không gọi `PUSH_NOTIFIER` | P0-2 | **Cao** |
+| E-106 | `deliveries.repository.ts:37-62` | `claimPending()` defined — **zero call sites** trong production | P0-2 | **Cao** |
+| E-107 | `deliveries.repository.ts:64-81` | `markSent()` defined — **zero call sites** trong production | P0-2 | **Cao** |
+| E-108 | `notification-delivery.use-case.ts:301-325` | `processClaimedJob`: `createMany()` → `dispatch()` → `markCompleted()` — không transaction | P0-3 không atomic | **Cao** |
+| E-109 | `notification-delivery.use-case.ts:327-332` | Catch block gọi `markFailed` riêng — job chuyển FAILED nếu insert lỗi | P0-3 | **Cao** |
+| E-110 | `deliveries.repository.ts:83-98` | `markFailed()` không set `nextAttemptAt` | P1 retry state machine | **Cao** |
+| E-111 | `deliveries.repository.ts:37-51` | `claimPending()` WHERE chỉ `status = 'PENDING'`, không kiểm tra `next_attempt_at <= now()` | P1 retry | **Cao** |
+| E-112 | `notification-delivery.use-case.ts:123-153` | `createDeliveryJob`: `create()`/`createIdempotent()` → `auditWriter.log()` — không transaction | P1 audit atomicity | **Cao** |
+| E-113 | `notification-delivery.use-case.ts:237-256` | `cancelJob`: `markCancelled()` → `auditWriter.log()` — không transaction | P1 audit atomicity | **Cao** |
+| E-114 | `notifications.ts:154-156` (schema) | Unique index: `notification_jobs_actor_idempotency_key_unique` on `(actorId, idempotencyKey)` — không có `organizationId` | P1 idempotency scope | **Cao** |
+| E-115 | `notification-jobs.repository.port.ts:71-88` | `findByIdempotencyKey` chỉ filter `actorId + idempotencyKey`, không `organizationId` | P1 scope | **Cao** |
+| E-116 | `notification-delivery-scope.spec.ts:92-114` | "Idempotency test": chỉ assert `createMany` called 1 lần, không test actual DB constraint | Test gap | **Cao** |
+| E-117 | `notification-delivery-scope.spec.ts:116-173` | "Concurrent worker test": chỉ assert `claimDue(20)` được gọi — không real concurrency | Test gap | **Cao** |
+| E-118 | `notifications.repository.ts:43-51` | Drizzle `onConflictDoNothing` có field `where?: SQL` — có thể thêm predicate | P0-1 fix available | **Cao** |
 
 ## Reproduction
 
-### P0-1: sourceJobId missing
+### P0-1: ON CONFLICT không match partial index
+
+Môi trường: PostgreSQL bất kỳ, Drizzle ORM.
 
 ```
-Step 1: Worker gọi processJob(jobId)
-Step 2: markProcessing(jobId) trả về job record với locked.id = <uuid>
-Step 3: createMany() nhận values array, mỗi value không có sourceJobId
-Step 4: Drizzle insert → source_job_id = NULL
-Step 5: Retry cùng job → insert row mới (unique index WHERE IS NOT NULL không fire)
-Expected: source_job_id = locked.id, retry bị ON CONFLICT DO NOTHING chặn
-Actual: source_job_id = NULL, retry tạo duplicate
+Step 1: Chạy migration 0021 → unique index với WHERE clause
+Step 2: Worker gọi createMany() với sourceJobId != null
+Step 3: onConflictDoNothing({ target: [sourceJobId, userId] })
+Step 4: PostgreSQL không tìm được matching unique arbiter
+Step 5: Insert lỗi → exception → processClaimedJob catch → job FAILED
+
+Expected: Conflict → DO NOTHING → skip duplicate, tiếp tục
+Actual: Lỗi SQL → job FAILED, không notification nào được tạo
 ```
 
-### P0-2: Recipient không tenant-scoped
+### P0-2: Push pipeline broken
 
 ```
-Step 1: Admin Org A tạo job với audience = 'ALL'
-Step 2: resolveRecipientIds() gọi listDeliverableUserIds()
-Step 3: Query trả về ALL active user trong hệ thống
-Expected: Chỉ member của Org A
-Actual: Tất cả user toàn platform
+Step 1: dispatch() gọi void upsertDeliveries(notification)
+Step 2: upsertDeliveries upsert notification_deliveries row (PENDING)
+Step 3: Job COMPLETED
+Step 4: Không worker nào claimPending + gửi FCM
+Step 5: notification_deliveries row stuck ở PENDING vĩnh viễn
+
+Expected: FCM push được gửi sau khi inbox created
+Actual: Push không bao giờ gửi
 ```
 
-### P0-3: Org attribution sai
+### P0-3: Inbox + delivery không atomic
 
 ```
-Step 1: User X có primary = Org A, secondary = Org B
-Step 2: Admin Org B tạo notification, job.organizationId = Org B
-Step 3: Worker gọi findPrimaryOrganizationId(X) → trả về Org A
-Step 4: Notification được insert với organization_id = Org A
-Expected: organization_id = Org B (nơi phát sinh)
-Actual: organization_id = Org A (primary)
-```
+Step 1: createMany() insert inbox rows thành công
+Step 2: void upsertDeliveries() crash (DB lỗi, connection drop, ...)
+Step 3: Error bị catch rỗng → silent swallow
+Step 4: markCompleted() chạy → job COMPLETED
+Step 5: Retry → sourceJobId conflict → DO NOTHING → dispatch không chạy
+Step 6: delivery row bị thiếu vĩnh viễn
 
-### P0-4: Push delivery
-
-```
-Step 1: Worker insert inbox, gọi dispatch()
-Step 2: dispatch() emits SSE, gọi FCM send (fire-and-forget Promise)
-Step 3: FCM throws, .catch(() => {}) swallow error
-Step 4: Job vẫn COMPLETED
-Expected: Push retry mechanism hoặc delivery tracking
-Actual: Push mất vĩnh viễn
+Expected: inbox + delivery trong cùng transaction, retry tạo delivery
+Actual: delivery mất vĩnh viễn
 ```
 
 ## Observed facts
 
 | Fact | Source |
 |------|--------|
-| `sourceJobId` column tồn tại trong DB schema (nullable FK) | `0021_notification_hardening.sql` |
-| Partial unique index `(source_job_id, user_id) WHERE source_job_id IS NOT NULL` tồn tại | `notifications.ts:58-62` |
-| `CreateNotificationInput` port không có trường `sourceJobId` | `notifications.repository.port.ts:18-26` |
-| Worker `processJob()` không set `sourceJobId` trong batch insert | `notification-delivery.use-case.ts:247-260` |
-| `UserLookup` interface không nhận organization param | `user-lookup.port.ts:8-12` |
-| `listDeliverableUserIds()` query users toàn bảng không filter org | `users.repository.ts:205-212` |
-| Worker dùng `findPrimaryOrganizationId(userId)` thay vì `locked.organizationId` | `notification-delivery.use-case.ts:249-253` |
-| `dispatch()` là fire-and-forget, error bị catch rỗng | `notification-dispatch.service.ts:21-42` |
-| `claimDue()` implementation tồn tại nhưng port không khai báo, worker không gọi | `notification-jobs.repository.ts:142-168`, `notification-jobs.repository.port.ts` |
-| SSE emit gửi cả local subject + Redis publish; subscriber nhận echo | `notification-stream.service.ts:66-70`, `123-133` |
-| Admin job list/get/cancel không filter organizationId | `notifications.controller.ts:178-213`, `notification-jobs.repository.ts:60-68` |
-| Audit log nằm ngoài transaction của job mutation | `notification-delivery.use-case.ts:96-128`, `170-196` |
-| in-memory Subject map không cleanup khi subscriber disconnect | `notification-stream.service.ts:86-96` |
+| Schema có partial unique index với WHERE clause | `notifications.ts:61-63` |
+| Migration tạo partial unique index với WHERE | `0021_notification_hardening.sql:5` |
+| Repository `onConflictDoNothing` chỉ có target, không where | `notifications.repository.ts:48-49` |
+| `dispatch()` không gọi FCM push — chỉ upsert DB rows | `notification-dispatch.service.ts:23-28` |
+| `claimPending()`, `markSent()` không có call site nào | `deliveries.repository.ts:37,64` |
+| `processClaimedJob` không dùng transaction | `notification-delivery.use-case.ts:301-325` |
+| `upsertDeliveries` fire-and-forget, error bị catch rỗng | `notification-dispatch.service.ts:27,52-54` |
+| `markFailed()` không set `nextAttemptAt` | `deliveries.repository.ts:83-98` |
+| `claimPending()` không filter `next_attempt_at <= now()` | `deliveries.repository.ts:44` |
+| Job create + audit không cùng transaction | `notification-delivery.use-case.ts:123-153` |
+| Job cancel + audit không cùng transaction | `notification-delivery.use-case.ts:237-256` |
+| Unique index idempotency key không có organizationId | `notifications.ts:154-156` |
+| `findByIdempotencyKey` không filter org | `notification-jobs.repository.port.ts:71-88` |
+| Test "idempotency" chỉ mock, không test real DB | `notification-delivery-scope.spec.ts:92-114` |
+| Test "concurrent worker" chỉ check claimDue limit | `notification-delivery-scope.spec.ts:116-173` |
+| `sourceJobId` đã được wired đúng (fix từ Round 1) | `notification-delivery.use-case.ts:309` |
+| Recipient resolution đã tenant-scoped (fix từ Round 1) | `notification-delivery.use-case.ts:349-369` |
+| Org attribution đã dùng `locked.organizationId` (fix Round 1) | `notification-delivery.use-case.ts:289-293` |
+| `claimDue()` đã wiring (fix từ Round 1) | `notification-delivery.use-case.ts:261-266` |
+| Admin job scope đã filter org (fix từ Round 1) | `notification-delivery.use-case.ts:186-210, 212-259` |
 
 ## Hypotheses
 
-| ID | Hypothesis | Supporting evidence | Counter evidence | Verification method | Confidence |
-|----|-----------|-------------------|------------------|-------------------|------------|
-| H-001 | `sourceJobId` không được wire vào insert → idempotency không hoạt động | E-001, E-002, E-003, E-004 | None | Review port + use-case code | **Cao** |
-| H-002 | Recipient resolution không giới hạn theo organization → cross-tenant delivery | E-005, E-006 | None | Review UserLookup implementation | **Cao** |
-| H-003 | Organization attribution dùng primaryOrg → notification gán sai tenant | E-007 | Worker có fallback về `locked.organizationId` nếu primary null | Review processJob logic | **Cao** |
-| H-004 | Push delivery thiếu retry/dedup → mất push khi fail | E-008 | Comment "best-effort" là intentional | Review dispatch service | **Cao** |
-| H-005 | `claimDue()` dead code → processDueJobs không atomic claim | E-009, E-010, E-011 | `markProcessing()` có conditional update PENDING→PROCESSING | Review job processor flow | **Cao** |
-| H-006 | SSE emit duplicate khi Redis bật | E-012, E-013, E-021 | Không có Redis trong CI/test, không reproduction evidence | Integration test with Redis | **Trung bình** |
-| H-007 | Admin job CRUD không enforce org → cross-tenant operation | E-014, E-015, E-016, E-017 | RLS giúp tenant ADMIN (không bypass) | Review controller + repository | **Cao** |
-| H-008 | Job mutation + audit không atomic → audit missing khi success | E-018, E-019 | `createIdempotent()` trong transaction 1 phần | Review use-case code | **Cao** |
-| H-009 | markRead/delete nên filter userId trong SQL | E-003 (repository markRead/delete filter orgId) | Ownership check tồn tại trong use-case | Review repository query | **Cao** |
-| H-010 | SSE subjects memory leak khi subscriber disconnect | E-020 | Chưa có production evidence về leak nghiêm trọng | Load test | **Trung bình** |
+| ID | Hypothesis | Supporting evidence | Counter evidence | Confidence |
+|----|-----------|--------------------|-----------------|------------|
+| H-101 | `onConflictDoNothing` thiếu `where` predicate → PostgreSQL không match partial unique index → insert error → job FAILED | E-101, E-102, E-103 | `CREATE UNIQUE INDEX` partial; `ON CONFLICT` target cần predicate matching. Nếu PostgreSQL fallback sang unique constraint khác (không có), hoặc nếu Drizzle tự động infer, có thể không lỗi. | **Cao** |
+| H-102 | Push pipeline broken: delivery rows được tạo nhưng không bao giờ được processor claim → gửi FCM | E-104, E-105, E-106, E-107 | FcmPushService vẫn registered, có thể có external cron đọc bảng trực tiếp | **Cao** |
+| H-103 | Inbox + delivery không atomic → crash mất push vĩnh viễn | E-108, E-109 | Nếu upsertDeliveries luôn success (không crash), vấn đề không xảy ra | **Cao** |
+| H-104 | Delivery retry state machine incomplete → transient error = permanent failure | E-110, E-111 | Nếu delivery processing ít transient error, impact thấp | **Cao** |
+| H-105 | Job mutation + audit không trong transaction → audit missing khi job success | E-112, E-113 | AuditWriter có thể internal retry | **Trung bình** |
+| H-106 | Idempotency key không scope organization → cross-org collision | E-114, E-115 | actorId là global user ID, collision chỉ xảy ra với system-level actor | **Trung bình** |
 
 ## Code path
 
 | Layer | File/Component | Role | Observation |
 |-------|---------------|------|-------------|
-| Controller | `notifications.controller.ts` | HTTP routing | Admin endpoints không pass org context; user endpoints dùng `requireOrganizationId` |
-| Use case | `notification-delivery.use-case.ts:219-284` | Worker processJob | sourceJobId missing, wrong org attribution, fire-and-forget dispatch |
-| Use case | `notification-delivery.use-case.ts:286-303` | Recipient resolution | System-wide UserLookup, không org filter |
-| Use case | `notification-delivery.use-case.ts:63-139` | Job creation | Audit ngoài transaction |
-| Use case | `notification-delivery.use-case.ts:166-200` | Job cancel | Audit ngoài transaction |
-| Use case | `notification-delivery.use-case.ts:202-216` | processDueJobs | Dùng listDue thay vì claimDue |
-| Port | `notifications.repository.port.ts:18-26` | CreateNotificationInput | Thiếu sourceJobId |
-| Port | `notification-jobs.repository.port.ts` | Job repository port | Không khai báo claimDue |
-| Port | `user-lookup.port.ts:8-12` | UserLookup | Không nhận org param |
-| Repository | `notifications.repository.ts:35-50` | createMany | onConflictDoNothing nhưng không có conflict vì sourceJobId null |
-| Repository | `notification-jobs.repository.ts:142-168` | claimDue implementation | Dead code — không wiring |
-| Repository | `notification-jobs.repository.ts:89-120` | list | Không filter organizationId |
-| Repository | `notification-jobs.repository.ts:60-68` | findById | Không filter organizationId |
-| Service | `notification-dispatch.service.ts:21-42` | dispatch | Fire-and-forget push, error swallow |
-| Service | `notification-stream.service.ts:66-70` | SSE emit | Local subject + Redis publish (cùng event 2 lần) |
-| Service | `notification-stream.service.ts:86-96` | Subject management | Không cleanup khi subscriber unsubscribe |
-| DB | `0021_notification_hardening.sql` | Migration | Unique index WHERE IS NOT NULL |
-| DB | `0005_expand_organization_rls.sql:12` | RLS policy | Cho phép organization_id IS NULL |
-| DB | `users.repository.ts:205-234` | User query | System-wide, không join org |
+| Schema | `packages/api-database/src/schema/platform/notifications.ts:61-63` | Notification table | Partial unique index `WHERE source_job_id IS NOT NULL` |
+| Repository | `packages/api-platform/src/modules/notifications/infrastructure/notifications.repository.ts:48-49` | createMany | `onConflictDoNothing` thiếu `where` predicate |
+| Repository | `packages/api-platform/src/modules/notifications/infrastructure/deliveries.repository.ts:37-62` | claimPending | Defined — zero production call sites |
+| Repository | `packages/api-platform/src/modules/notifications/infrastructure/deliveries.repository.ts:64-81` | markSent | Defined — zero production call sites |
+| Repository | `packages/api-platform/src/modules/notifications/infrastructure/deliveries.repository.ts:83-98` | markFailed | Không set `nextAttemptAt` |
+| Service | `packages/api-platform/src/modules/notifications/application/services/notification-dispatch.service.ts:23-28` | dispatch | Fire-and-forget, không gọi PUSH_NOTIFIER |
+| Service | `packages/api-platform/src/modules/notifications/application/services/notification-dispatch.service.ts:30-54` | upsertDeliveries | Chỉ upsert DB rows, error bị catch rỗng |
+| Use case | `packages/api-platform/src/modules/notifications/application/use-cases/notification-delivery.use-case.ts:279-333` | processClaimedJob | createMany + dispatch + markCompleted — không transaction |
+| Use case | `packages/api-platform/src/modules/notifications/application/use-cases/notification-delivery.use-case.ts:123-153` | createDeliveryJob | Job insert + audit — không transaction |
+| Use case | `packages/api-platform/src/modules/notifications/application/use-cases/notification-delivery.use-case.ts:237-256` | cancelJob | markCancelled + audit — không transaction |
+| Port | `packages/api-platform/src/modules/notifications/application/ports/notification-jobs.repository.port.ts:71-88` | findByIdempotencyKey | Không filter organizationId |
+| Tests | `packages/api-platform/src/modules/notifications/application/__tests__/notification-delivery-scope.spec.ts:92-114` | Idempotency test | Mock-only, không test real DB constraint |
+| Tests | `packages/api-platform/src/modules/notifications/application/__tests__/notification-delivery-scope.spec.ts:116-173` | Concurrent test | Mock-only, không real concurrency |
 
 ## Root cause
 
-4 root causes được xác nhận cho các P0:
+**3 P0 root causes confirmed:**
 
-1. **sourceJobId không wire** (`notifications.repository.port.ts:18-26` + `notification-delivery.use-case.ts:247-260`): Port interface thiếu trường `sourceJobId`. Worker insert không set giá trị. Partial unique index không bao giờ fire. Retry tạo duplicate inbox.
+1. **P0-1 — `ON CONFLICT` target mismatch**: `onConflictDoNothing({ target: [sourceJobId, userId] })` thiếu `where: sql\`${sourceJobId} is not null\``. PostgreSQL yêu cầu conflict target predicate phải match với partial unique index predicate. Không match → insert error → job FAILED.
 
-2. **Recipient resolution system-wide** (`user-lookup.port.ts:8-12` + `users.repository.ts:205-234`): `UserLookup` interface không tenant-aware. Implementation query `users` không filter organization membership. `ALL` audience = mọi user toàn platform.
+2. **P0-2 — Push pipeline gián đoạn**: Worker upsert `notification_deliveries` rows ở state `PENDING`, nhưng không có processor/consumer nào gọi `claimPending()` → `markSent()` để gửi FCM. `FcmPushService` registered nhưng không được inject vào production code path nào.
 
-3. **Sai organization attribution** (`notification-delivery.use-case.ts:249-253`): Worker gọi `findPrimaryOrganizationId(userId)` thay vì dùng `locked.organizationId`. Notification gán sai tenant.
-
-4. **Push delivery không có retry/dedup** (`notification-dispatch.service.ts:21-42`): Fire-and-forget với `.catch(() => {})`. Không có delivery tracking table. Crash → mất push vĩnh viễn.
+3. **P0-3 — Inbox + delivery không atomic**: `processClaimedJob` dùng 3 DB calls riêng rẽ (createMany, upsertDeliveries, markCompleted) không trong transaction. `void this.upsertDeliveries()` fire-and-forget, error bị catch rỗng. Retry không dispatch lại delivery rows vì `ON CONFLICT DO NOTHING` skip.
 
 ## Impact
 
 | Area affected | Impact | Confidence |
 |---------------|--------|------------|
-| Inbox idempotency | Retry notification job tạo duplicate inbox rows cho user | **Cao** |
-| Cross-tenant data leak | Notification gửi tới user ngoài tenant (USER/USERS/ALL) | **Cao** |
-| Notification attribution | Notification xuất hiện sai tenant inbox | **Cao** |
-| Push delivery reliability | Push notification mất khi FCM fail hoặc worker crash | **Cao** |
-| Job processing concurrency | `processDueJobs` không atomic → duplicate processing | **Cao** |
-| SSE duplicate | User nhận duplicate notification event khi Redis bật | **Trung bình** |
-| Admin cross-tenant operation | SUPER_ADMIN list/get/cancel job từ org khác | **Cao** |
-| Audit atomicity | Job tạo/cancel thành công nhưng audit có thể missing | **Cao** |
-| Memory leak | SSE subject không cleanup → memory tăng theo thời gian | **Thấp** |
-| TOCTOU mark/delete | Repository filter không gồm userId (chỉ orgId) | **Thấp** |
+| Inbox idempotency (P0-1) | Job delivery fail ngay khi chạy thực tế | **Cao** |
+| Push notification (P0-2) | FCM push không bao giờ gửi | **Cao** |
+| Delivery reliability (P0-3) | Crash mất push vĩnh viễn dù inbox đã tồn tại | **Cao** |
+| Delivery retry (P1) | Transient error → permanent failure | **Cao** |
+| Audit trail (P1) | Audit missing khi job success/fail | **Trung bình** |
+| Cross-org idempotency (P1) | SUPER_ADMIN cross-org collision | **Thấp** |
+| Test confidence | Không phát hiện DB-level bugs | **Cao** |
 
 ## Recommendation
 
-Fix bắt buộc (theo thứ tự ưu tiên):
+**5 fix bắt buộc (theo thứ tự ưu tiên):**
 
-1. **sourceJobId wiring**: Thêm `sourceJobId: string` vào `CreateNotificationInput`. Worker truyền `locked.id`. Chỉ rõ conflict target trong `onConflictDoNothing`.
-2. **Recipient tenant scope**: Thêm method tenant-aware vào `UserLookup` (hoặc tạo port mới). `ALL` = member của `locked.organizationId`. `USER/USERS` validate membership.
-3. **Org attribution**: Dùng `locked.organizationId` thay vì `findPrimaryOrganizationId()`. Bỏ gọi primary org trong worker.
-4. **Push delivery tracking**: Tạo `notification_deliveries` table với status machine. Worker upsert delivery rows, delivery worker retry + dedup.
-5. **claimDue wiring**: Chọn `claimDue()` (atomic) hoặc bỏ dead code. Thêm stale-job recovery cho PROCESSING timeout.
-6. **Admin job scope**: Thêm organizationId filter vào list/get/cancel. Resolve từ actor context.
-7. **Job + audit atomicity**: Audit log trong cùng transaction với job mutation.
-8. **SSE duplicate**: Chỉ publish Redis hoặc thêm originInstanceId filter.
-9. **Subject cleanup**: Finalize subject khi 0 subscriber.
-10. **E2E tests**: Tenant isolation, idempotency, concurrency.
+1. **P0-1: Sửa `onConflictDoNothing`** — thêm `where: sql\`${notifications.sourceJobId} is not null\`` vào conflict target. Hoặc drop partial predicate, tạo unique index full `(source_job_id, user_id)` (PostgreSQL coi NULL ≠ NULL).
+
+2. **P0-2: Implement `NotificationDeliveryProcessor`** — cron worker gọi `claimPending()` → load notification + device token → gửi FCM → `markSent()`/`markFailed()`. Cần `sendToToken()` API trên `FcmPushService`.
+
+3. **P0-3: Atomic inbox + delivery** — wrap `createMany` + upsert delivery rows trong một DB transaction. Dùng `findBySourceJobAndUsers()` để lấy cả rows vừa insert lẫn rows đã tồn tại từ retry.
+
+4. **P1: Delivery retry state machine** — `markFailed` set `nextAttemptAt` với exponential backoff; `claimPending` filter `next_attempt_at <= now()`; thêm `recoverStaleProcessing`.
+
+5. **P1: Integration/E2E tests** — PostgreSQL integration tests cho: partial unique index conflict, delivery pipeline, inbox+delivery atomicity, job+audit atomicity.
+
+**Non-blocking follow-ups:**
+- Thêm `organizationId` vào unique constraint của idempotency key (P1)
+- Job mutation + audit atomicity (P1)
+- SSE transient Redis failure fallback (P2)
+- Subject cleanup (P2)
 
 ## Open questions
 
 | Question | Owner | Blocking? |
 |----------|-------|-----------|
-| `ALL` audience nên reject user ngoài tenant hay silent skip? | Nhóm feature | **Có** — ảnh hưởng design decisions |
-| `PROCESSING` stale-job timeout bao nhiêu giây? | Nhóm feature | Không — có thể config |
-| Delivery worker nên là cron mới hay mở rộng processor hiện tại? | Nhóm feature | Không |
-| `USERS` audience: reject nếu có user ngoài tenant -> 400, hay chỉ giữ valid members -> log warning? | Nhóm feature | **Có** — ảnh hưởng UX |
-| Có cần `notification_deliveries` table ngay hay batch-first approach? | Nhóm feature | **Có** — ảnh hưởng scope |
+| Nên drop partial predicate hay thêm `where` vào conflict target? | DevOps/SRE | **Có** — ảnh hưởng migration script |
+| Delivery processor nên là cron mới hay mở rộng job processor hiện tại? | Nhóm feature | Không |
+| `sendToToken` hay `sendToUser` API cho FcmPushService? | Nhóm feature | **Có** — ảnh hưởng implementation |
+| Cần thêm `organization_id` cho `notification_deliveries` table? | Nhóm feature | Không — có thể defer |
 
 ## Handoff
 
 | Field | Value |
 |-------|-------|
-| Ready for planning? | **Có** — root causes confirmed, recommendations clear |
-| Ready for execution? | Chưa — cần plan chi tiết |
+| Ready for planning? | **Có** — tất cả 5 blocking items đã rõ, recommendations có sẵn |
+| Ready for execution? | Chưa — cần plan chi tiết và thống nhất approach cho delivery processor |
 | Suggested next skill | `planning` → `execution` → `review` |
+| Note | DONE.md cần flip sang "Needs fix" trước khi tiếp tục (post-done defect loop) |

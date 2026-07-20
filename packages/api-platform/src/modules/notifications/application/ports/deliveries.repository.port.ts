@@ -45,6 +45,17 @@ export interface DeliveriesRepositoryPort {
     error: string,
     executor?: TransactionExecutor,
   ): Promise<DeliveryRecord | null>;
+
+  markRetryable(
+    deliveryId: string,
+    nextAttemptAt: Date,
+    executor?: TransactionExecutor,
+  ): Promise<DeliveryRecord | null>;
+
+  recoverStaleProcessing(
+    timeoutMinutes: number,
+    executor?: TransactionExecutor,
+  ): Promise<DeliveryRecord[]>;
 }
 
 export const DELIVERIES_REPOSITORY = Symbol('DELIVERIES_REPOSITORY');

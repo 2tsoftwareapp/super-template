@@ -40,9 +40,14 @@ export interface NotificationsRepositoryPort {
     values: CreateNotificationInput[],
     executor?: TransactionExecutor,
   ): Promise<NotificationRecord[]>;
+  findBySourceJobAndUsers(
+    sourceJobId: string,
+    userIds: string[],
+    executor?: TransactionExecutor,
+  ): Promise<NotificationRecord[]>;
   findById(
     notificationId: string,
-    organizationId: string,
+    organizationId?: string,
     executor?: TransactionExecutor,
   ): Promise<NotificationRecord | null>;
   listForUser(

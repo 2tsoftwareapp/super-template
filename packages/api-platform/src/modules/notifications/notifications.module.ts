@@ -10,6 +10,7 @@ import { NOTIFICATION_STREAM_SERVICE } from './application/ports/notification-st
 import { NOTIFICATIONS_REPOSITORY } from './application/ports/notifications.repository.port';
 import { PUSH_NOTIFIER } from './application/push.interface';
 import { NotificationDispatchService } from './application/services/notification-dispatch.service';
+import { NotificationDeliveryProcessor } from './application/services/notification-delivery.processor';
 import { NotificationJobsProcessor } from './application/services/notification-jobs.processor';
 import { NotificationDeliveryUseCase } from './application/use-cases/notification-delivery.use-case';
 import { NotificationDeviceUseCase } from './application/use-cases/notification-device.use-case';
@@ -43,6 +44,7 @@ import {
     NotificationDeviceUseCase,
     NotificationsService,
     NotificationJobsProcessor,
+    NotificationDeliveryProcessor,
     {
       provide: PUSH_NOTIFIER,
       useExisting: FcmPushService,

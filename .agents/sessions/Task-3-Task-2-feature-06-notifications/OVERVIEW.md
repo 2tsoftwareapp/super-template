@@ -6,19 +6,19 @@
 ## At a glance (80/20)
 
 | Field | Value |
-|---|---|
-| Status | `done` |
-| Goal | Fix 4 P0 + 3 P1 + 2 P2 issues từ Feature 06 Notifications Review Round 1 |
-| Progress | `13/13` cards done · `0` blocked · `0` needs info |
-| Top risk / blocker | (none) |
-| Next action | Merge PR → deploy migration → deploy worker |
+|---|---|---|
+| Status | `done` ✅ |
+| Goal | Fix 5 Round 2 items: partial ON CONFLICT, delivery processor, atomic transaction, retry/backoff, integration tests |
+| Progress | `18/18` cards done · `0` pending · `0` needs info |
+| Top risk / blocker | None — e2e tests viết sẵn, cần Docker để chạy |
+| Next action | Commit → merge |
 | Owner | _(not assigned)_ |
 
 ## Progress chart
 
 ```mermaid
 pie title Task status
-  "done" : 13
+  "done" : 18
   "in_progress" : 0
   "todo" : 0
   "blocked" : 0
@@ -26,38 +26,44 @@ pie title Task status
 
 ```mermaid
 flowchart LR
-  A[Init / Discussion] --> B[Plan / Tasks]
+  A[Round 1 done] --> B[Round 2 Plan / Tasks]
   B --> C[Sync]
   C --> D[Execution]
   D --> E[Review]
-  E --> F[Done]
+  E --> F[Done ✅]
+  F --> G[Commit ✅]
 ```
 
 ## Open decisions
 
 | ID | Severity | Blocking? | Visual? | Question / decision | Status |
 |---|---|---|---|---|---|
-| INV-001→INV-008 | All resolved | No | none | Xem PLAN.md §Pre-planning decision gate | Resolved |
+| R2-001 | Critical | No | none | ON CONFLICT WHERE predicate: Option A (thêm where) — chọn | Closed — ✅ resolved |
+| R2-002a | High | No | none | FcmPushService.sendToToken() method mới | Closed — ✅ resolved |
 
 ## Artifact map
 
 | Artifact | Purpose | Freshness |
 |---|---|---|
-| `DISCUSSION.md` | Direction / options | current |
-| `INVESTIGATE.md` | Root cause analysis | current |
-| `PLAN.md` / `TASKS.md` | Strategy + work | current |
-| `SYNC.md` | Readiness | missing |
-| `EXECUTION.md` | Implementation log | stale (old round) |
-| `REVIEW.md` | Quality gate | current — verdict: Ready |
-| `DONE.md` | Handoff | current |
+| `INVESTIGATE.md` | R2 root cause analysis | current |
+| `PLAN.md` / `TASKS.md` | Strategy + work (Round 2) | current |
+| `SYNC.md` | Readiness | current |
+| `EXECUTION.md` | Implementation log | current |
+| `REVIEW.md` | Quality gate | current — review Round 2 |
+| `DONE.md` | Handoff | needs update — done with review |
 
 ## Developer notes
 
-- Commands to run next:
-  - `pnpm run test:e2e` — verify E2E
-  - `pnpm run typecheck` — verify types
-- Files/paths to inspect first:
-  - `packages/api-platform/src/modules/notifications/`
-  - `packages/api-core/src/ports/user-lookup.port.ts`
-  - `packages/api-database/src/schema/platform/notifications.ts`
-- What not to touch: migration files from 0021 (already applied)
+- Commands to run:
+  - `bash .agents/tools/session/session.sh status` — progress refresh
+  - `npm run typecheck -w packages/api-platform` — verify types
+  - `npm run test -w packages/api-platform` — unit tests
+  - `npm run test:e2e -w apps/api` — e2e tests (cần Docker+Postgres)
+- Key files changed:
+  - `packages/api-platform/src/modules/notifications/infrastructure/notifications.repository.ts` — ON CONFLICT WHERE + findBySourceJobAndUsers
+  - `packages/api-platform/src/modules/notifications/application/use-cases/notification-delivery.use-case.ts` — atomic transaction
+  - `packages/api-platform/src/modules/notifications/application/services/notification-delivery.processor.ts` — delivery processor (new)
+  - `packages/api-platform/src/modules/notifications/application/services/notification-dispatch.service.ts` — upsertDeliveriesForNotification
+  - `packages/api-platform/src/modules/notifications/infrastructure/deliveries.repository.ts` — retry/backoff + recoverStaleProcessing
+  - `packages/api-platform/src/modules/notifications/infrastructure/fcm-push.service.ts` — sendToToken
+  - `apps/api/test/notifications.e2e.spec.ts` — integration tests (new)

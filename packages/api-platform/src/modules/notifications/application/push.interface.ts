@@ -11,4 +11,11 @@ export const PUSH_NOTIFIER = Symbol('PUSH_NOTIFIER');
 
 export interface PushNotifier {
   sendToUser(userId: string, message: PushMessage): Promise<void>;
+  sendToToken(token: string, message: PushMessage): Promise<PushSendResult>;
+}
+
+export interface PushSendResult {
+  success: boolean;
+  providerMessageId: string | null;
+  error?: string;
 }

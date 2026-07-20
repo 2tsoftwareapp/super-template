@@ -1,1 +1,1 @@
-fix(notifications): tenant isolation, idempotency, push delivery tracking, admin job scope
+fix(notifications): round 2 fixes — ON CONFLICT WHERE, delivery processor, atomic tx, retry/backoff, e2e tests

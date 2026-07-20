@@ -42,6 +42,7 @@ export class DeliveriesRepository implements DeliveriesRepositoryPort {
         WHERE id IN (
           SELECT id FROM notification_deliveries
           WHERE status = 'PENDING'
+            AND (next_attempt_at IS NULL OR next_attempt_at <= now())
           ORDER BY next_attempt_at ASC NULLS FIRST
           LIMIT ${limit}
           FOR UPDATE SKIP LOCKED
@@ -96,5 +97,57 @@ export class DeliveriesRepository implements DeliveriesRepositoryPort {
       .returning();
 
     return delivery ?? null;
+  }
+
+  async markRetryable(
+    deliveryId: string,
+    nextAttemptAt: Date,
+    executor: DatabaseExecutor = this.database,
+  ) {
+    const [delivery] = await executor
+      .update(notificationDeliveries)
+      .set({
+        status: 'PENDING',
+        nextAttemptAt,
+        lastError: null,
+        updatedAt: new Date(),
+      })
+      .where(eq(notificationDeliveries.id, deliveryId))
+      .returning();
+
+    return delivery ?? null;
+  }
+
+  async recoverStaleProcessing(
+    timeoutMinutes: number,
+    executor: DatabaseExecutor = this.database,
+  ) {
+    const recovered = await executor.execute<{ id: string }>(
+      sql`
+        UPDATE notification_deliveries
+        SET status = 'PENDING',
+            next_attempt_at = now(),
+            last_error = 'Recovered from stale PROCESSING',
+            updated_at = now()
+        WHERE id IN (
+          SELECT id FROM notification_deliveries
+          WHERE status = 'PROCESSING'
+            AND updated_at < now() - make_interval(mins => ${timeoutMinutes})
+          LIMIT 100
+          FOR UPDATE SKIP LOCKED
+        )
+        RETURNING id
+      `,
+    );
+
+    if (!recovered.rows || recovered.rows.length === 0) {
+      return [];
+    }
+
+    const ids = recovered.rows.map((r) => r.id);
+    return executor
+      .select()
+      .from(notificationDeliveries)
+      .where(sql`${notificationDeliveries.id} = ANY(${ids})`);
   }
 }

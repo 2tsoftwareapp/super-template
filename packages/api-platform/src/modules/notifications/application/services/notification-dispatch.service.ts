@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
+import type { TransactionExecutor } from '@repo/api-core';
 import {
   USER_PREFERENCES_LOOKUP,
   type UserPreferencesLookup,
@@ -21,37 +22,58 @@ export class NotificationDispatchService {
   ) {}
 
   dispatch(notification: NotificationView, organizationId: string) {
-    this.notificationStreamService.emit(notification.userId, organizationId, notification);
-
-    // Upsert delivery rows for push — best-effort; inbox state remains the source of truth
+    this.emitSSE(notification, organizationId);
     void this.upsertDeliveries(notification);
+  }
+
+  /**
+   * Emit SSE event only, without upserting delivery rows.
+   * Used after transactional delivery upsert in processClaimedJob.
+   */
+  emitSSE(notification: NotificationView, organizationId: string) {
+    this.notificationStreamService.emit(notification.userId, organizationId, notification);
   }
 
   private async upsertDeliveries(notification: NotificationView) {
     try {
-      const preferences = await this.userPreferencesLookup
-        .findNotificationPreferencesByUserId(notification.userId);
-
-      if (!preferences.push) {
-        return;
-      }
-
-      const tokens = await this.deviceTokensRepository.listByUserId(notification.userId);
-
-      if (tokens.length === 0) {
-        return;
-      }
-
-      await this.deliveriesRepository.upsertBatch(
-        tokens.map((token) => ({
-          notificationId: notification.id,
-          deviceTokenId: token.id,
-          channel: 'fcm',
-        })),
-      );
+      await this.upsertDeliveriesForNotification(notification);
     } catch {
       // Delivery row upsert is best-effort
     }
+  }
+
+  /**
+   * Upsert delivery rows for a notification, inside the given transaction.
+   * Returns the notification to allow the caller to emit SSE after commit.
+   */
+  async upsertDeliveriesForNotification(
+    notification: NotificationView,
+    executor?: TransactionExecutor,
+  ): Promise<void> {
+    const preferences = await this.userPreferencesLookup
+      .findNotificationPreferencesByUserId(notification.userId);
+
+    if (!preferences.push) {
+      return;
+    }
+
+    const tokens = await this.deviceTokensRepository.listByUserId(
+      notification.userId,
+      executor,
+    );
+
+    if (tokens.length === 0) {
+      return;
+    }
+
+    await this.deliveriesRepository.upsertBatch(
+      tokens.map((token) => ({
+        notificationId: notification.id,
+        deviceTokenId: token.id,
+        channel: 'fcm',
+      })),
+      executor,
+    );
   }
 
   streamForUser(userId: string, organizationId: string) {

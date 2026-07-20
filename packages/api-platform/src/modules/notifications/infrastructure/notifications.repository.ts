@@ -6,7 +6,7 @@ import type {
 import { Inject, Injectable } from '@nestjs/common';
 import { DATABASE } from '@repo/api-database';
 import { notifications } from '@repo/api-database';
-import { and, count, desc, eq, isNull } from 'drizzle-orm';
+import { and, count, desc, eq, inArray, isNull, sql } from 'drizzle-orm';
 
 import type { NotificationsRepositoryPort } from '../application/ports/notifications.repository.port';
 
@@ -47,19 +47,45 @@ export class NotificationsRepository implements NotificationsRepositoryPort {
       .values(values)
       .onConflictDoNothing({
         target: [notifications.sourceJobId, notifications.userId],
+        where: sql`${notifications.sourceJobId} is not null`,
       })
       .returning();
   }
 
-  async findById(
-    notificationId: string,
-    organizationId: string,
+  async findBySourceJobAndUsers(
+    sourceJobId: string,
+    userIds: string[],
     executor: DatabaseExecutor = this.database,
   ) {
+    if (userIds.length === 0) {
+      return [];
+    }
+
+    return executor
+      .select()
+      .from(notifications)
+      .where(
+        and(
+          eq(notifications.sourceJobId, sourceJobId),
+          inArray(notifications.userId, userIds),
+        ),
+      );
+  }
+
+  async findById(
+    notificationId: string,
+    organizationId?: string,
+    executor: DatabaseExecutor = this.database,
+  ) {
+    const filters = [eq(notifications.id, notificationId)];
+    if (organizationId) {
+      filters.push(eq(notifications.organizationId, organizationId));
+    }
+
     const [notification] = await executor
       .select()
       .from(notifications)
-      .where(and(eq(notifications.id, notificationId), eq(notifications.organizationId, organizationId)))
+      .where(and(...filters))
       .limit(1);
 
     return notification ?? null;

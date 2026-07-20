@@ -21,6 +21,7 @@ export interface UpsertDeviceTokenInput {
 export interface DeviceTokensRepositoryPort {
   upsert(values: UpsertDeviceTokenInput, executor?: TransactionExecutor): Promise<DeviceTokenRecord | null>;
   listByUserId(userId: string, executor?: TransactionExecutor): Promise<DeviceTokenRecord[]>;
+  listByIds(ids: string[], executor?: TransactionExecutor): Promise<DeviceTokenRecord[]>;
   deleteByToken(userId: string, token: string, executor?: TransactionExecutor): Promise<DeviceTokenRecord | null>;
   deleteTokens(tokens: string[], executor?: TransactionExecutor): Promise<void>;
 }

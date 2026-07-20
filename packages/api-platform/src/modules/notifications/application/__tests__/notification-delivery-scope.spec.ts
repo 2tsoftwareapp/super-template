@@ -21,12 +21,19 @@ describe('NotificationDeliveryUseCase - scope & idempotency', () => {
     createIdempotent: vi.fn(),
   };
 
+  const mockTransactionPort = {
+    run: vi.fn(async <T>(fn: (tx: unknown) => Promise<T>) => fn('tx')),
+  };
+
   const mockNotificationsRepository = {
     createMany: vi.fn(),
+    findBySourceJobAndUsers: vi.fn(),
   };
 
   const mockDispatchService = {
     dispatch: vi.fn(),
+    emitSSE: vi.fn(),
+    upsertDeliveriesForNotification: vi.fn(),
   };
 
   const mockAuditWriter = { log: vi.fn() };
@@ -43,6 +50,7 @@ describe('NotificationDeliveryUseCase - scope & idempotency', () => {
       mockUserLookup as never,
       mockDispatchService as never,
       mockAuditWriter as never,
+      mockTransactionPort as never,
     );
   }
 

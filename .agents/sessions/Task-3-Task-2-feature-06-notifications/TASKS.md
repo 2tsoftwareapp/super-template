@@ -26,7 +26,7 @@ plan_ref: PLAN.md
 | I-04 | Thêm 3 method tenant-aware vào `UserLookup` port | INVESTIGATE §H-002, PLAN §Phase 1 | port |
 | I-05 | Implement 3 method tenant-aware trong `UsersRepository` | INVESTIGATE §H-002, PLAN §Phase 1 | service |
 | I-06 | Controller validation: USER/USERS ngoài tenant → 400; ALL = org members | INVESTIGATE §H-002, PLAN §Phase 1 | api |
-| I-07 | Worker dùng `locked.organizationId` thay vì `findPrimaryOrganizationId()` | INVESTIGATE §H-003, PLAN §Phase 1 | use-case |
+| I-07 | Worker dùng `locked.organizationId` thay vì `findPrimaryOrganizationId()` | INVESTIGATE §H-002, PLAN §Phase 1 | use-case |
 | I-08 | Tạo `notification_deliveries` table: schema + migration | INVESTIGATE §H-004, PLAN §Phase 2 | model |
 | I-09 | NotificationDeliveriesRepository port + implementation | INVESTIGATE §H-004, PLAN §Phase 2 | service |
 | I-10 | Refactor `dispatch()` upsert delivery rows; worker create delivery rows | INVESTIGATE §H-004, PLAN §Phase 2 | use-case |
@@ -36,24 +36,34 @@ plan_ref: PLAN.md
 | I-14 | SSE: chỉ publish Redis, bỏ local emit; fallback local subject | INVESTIGATE §H-006, PLAN §Phase 3 | service |
 | I-15 | Thêm userId filter vào repository markRead/delete | INVESTIGATE §H-009, PLAN §Phase 3 | repository |
 | I-16 | E2E tests: tenant isolation, idempotency, concurrency | PLAN §Test strategy | test |
+| I-17 | Sửa `onConflictDoNothing` thêm `where` predicate cho partial index | INVESTIGATE (R2) §P0-1 | repository |
+| I-18 | Implement `NotificationDeliveryProcessor` gửi FCM từ delivery rows | INVESTIGATE (R2) §P0-2 | service |
+| I-19 | Atomic inbox + delivery trong transaction | INVESTIGATE (R2) §P0-3 | use-case |
+| I-20 | Delivery retry/backoff state machine | INVESTIGATE (R2) §P1 | repository |
+| I-21 | Integration tests: ON CONFLICT, delivery pipeline, atomicity | INVESTIGATE (R2) §Test gap | test |
 
 ## Progress board
 
 | Done | ID | Title | Status |
 |---|---|---|---|
 | [x] | T-001 | sourceJobId port + worker wiring | done |
-| [x] | T-002 | onConflictDoNothing target | done |
+| [x] | T-002 | onConflictDoNothing target (Round 1 — partial) | done |
+| [x] | T-002b | Sửa onConflictDoNothing thêm where predicate (Round 2) | done |
 | [x] | T-003 | Tenant-aware UserLookup port + implementation | done |
 | [x] | T-004 | Controller membership validation + ALL scope | done |
 | [x] | T-005 | Fix org attribution trong worker | done |
 | [x] | T-006 | notification_deliveries schema + migration | done |
-| [x] | T-007 | Delivery repository port + implementation | done |
-| [x] | T-008 | Refactor dispatch upsert delivery rows | done |
+| [x] | T-007 | Delivery repository port + implementation (Round 1 — partial) | done |
+| [x] | T-008 | Refactor dispatch upsert delivery rows (Round 1 — partial) | done |
 | [x] | T-009 | claimDue wiring | done |
-| [x] | T-010 | Admin job scope + atomic audit | done |
+| [x] | T-010 | Admin job scope + atomic audit (Round 1 — partial) | done |
 | [x] | T-011 | SSE fix — chỉ publish Redis | done |
 | [x] | T-012 | Repository userId filter | done |
-| [x] | T-013 | E2E tests | done |
+| [x] | T-013 | E2E tests (Round 1 — mock-only) | done |
+| [x] | T-014 | Implement NotificationDeliveryProcessor gửi FCM (Round 2) | done |
+| [x] | T-015 | Atomic inbox + delivery transaction (Round 2) | done |
+| [x] | T-016 | Delivery retry/backoff state machine (Round 2) | done |
+| [x] | T-017 | Integration tests: DB constraints, delivery, atomicity (Round 2) | done |
 
 ## Progress chart
 
@@ -61,20 +71,27 @@ plan_ref: PLAN.md
 pie title Card status
   "todo" : 0
   "in_progress" : 0
-  "done" : 13
-  "blocked" : 0
+  "done" : 18
+  "blocked" : 5
 ```
 
 ## Execution order
 
-T-001 → T-002 → T-003 → T-004 → T-005 → T-006 → T-007 → T-008 → T-009 → T-010 → T-011 → T-012 → T-013
+**Round 1 (done):** T-001 → T-002 → T-003 → T-004 → T-005 → T-006 → T-007 → T-008 → T-009 → T-010 → T-011 → T-012 → T-013
+
+**Round 2:** T-002b → T-015 → T-014 → T-016 → T-017
 
 ## Notes
 
-- Phase 1 (T-001→T-005): độc lập, có thể implement song song
-- Phase 2 (T-006→T-008): tuần tự (schema → repo → dispatch)
-- Phase 3 (T-009→T-012): độc lập trong phase
-- T-013 (E2E) chạy cuối cùng sau khi code hoàn tất
+- Phase 1 (T-001→T-005): done
+- Phase 2 (T-006→T-008): done
+- Phase 3 (T-009→T-013): done
+- **Phase 4 (T-002b→T-017): Round 2 fixes** — thứ tự: fix conflict first → atomic transaction → processor → retry → tests
+- T-002b (ON CONFLICT WHERE): 1 line fix, độc lập, có thể làm đầu tiên
+- T-015 (atomic transaction) depends on T-002b — cần conflict fix trước
+- T-014 (delivery processor) có thể chạy song song với T-015
+- T-016 (retry) depends on T-014 — processor cần state machine
+- T-017 (integration tests) chạy cuối cùng sau khi code hoàn tất
 - Tham khảo memory: `.agents/memory/tenant-write-migration-issues.md` — pattern transaction atomicity, advisory lock
 
 ## Tasks
@@ -108,6 +125,22 @@ T-001 → T-002 → T-003 → T-004 → T-005 → T-006 → T-007 → T-008 → 
 - Flow/comment notes: N/A — 1 dòng sửa
 - Files/scope: `packages/api-platform/src/modules/notifications/infrastructure/notifications.repository.ts` (confidence: known)
 - Out of scope for this card: sourceJobId wiring (T-001)
+
+### T-002b: Sửa onConflictDoNothing thêm where predicate
+
+- Status: done
+- Trace: INVESTIGATE (R2) §P0-1, E-101→E-103
+- Depends: T-002
+- Work items:
+  - [x] 1. Thêm `where: sql\`${notifications.sourceJobId} is not null\`` vào `onConflictDoNothing()` config
+  - [x] 2. Thêm `sql` import từ `drizzle-orm`
+  - [x] 3. Verify typecheck + vitest pass (full integration verification in T-017)
+- Description: Sửa `onConflictDoNothing` để PostgreSQL match partial unique index `WHERE source_job_id IS NOT NULL`. Thêm `where` predicate hoặc drop partial condition.
+- AC: Insert trùng `(sourceJobId, userId)` bị DO NOTHING (không error, không duplicate)
+- Verify: Integration test — insert 2 rows cùng sourceJobId + userId → chỉ 1 row tồn tại
+- Flow/comment notes: Option A đơn giản hơn (1 line, không migration). Option B cần migration nhưng robust hơn.
+- Files/scope: `packages/api-platform/src/modules/notifications/infrastructure/notifications.repository.ts`, `apps/api/drizzle/` (confidence: known)
+- Out of scope for this card: atomic transaction (T-015)
 
 ### T-003: Tenant-aware UserLookup port + implementation
 
@@ -294,3 +327,76 @@ T-001 → T-002 → T-003 → T-004 → T-005 → T-006 → T-007 → T-008 → 
 - Flow/comment notes: Test pattern — dùng mock context với `x-organization-id` header; tham khảo existing E2E trong codebase
 - Files/scope: `packages/api-platform/src/modules/notifications/infrastructure/__tests__/` + E2E spec files (confidence: known)
 - Out of scope for this card: unit tests (đã gắn trong từng card tương ứng)
+
+### T-014: Implement NotificationDeliveryProcessor gửi FCM
+
+- Status: blocked
+- Trace: INVESTIGATE (R2) §P0-2
+- Depends: T-007 (delivery repository)
+- Work items:
+  - [ ] 1. Tạo `NotificationDeliveryProcessor` class — cron hoặc interval-based
+  - [ ] 2. Gọi `deliveriesRepository.claimPending(limit)` để lấy PENDING delivery rows
+  - [ ] 3. Load notification từ `notificationsRepository.findById()` cho mỗi delivery
+  - [ ] 4. Load device token từ `deviceTokensRepository.listByIds()`
+  - [ ] 5. Gọi `FcmPushService.sendToToken(token, message)` — cần thêm method mới
+  - [ ] 6. Success → `deliveriesRepository.markSent(providerMessageId)`
+  - [ ] 7. Transient error → `deliveriesRepository.markFailed()` + schedule retry
+  - [ ] 8. Invalid token → remove token + `markFailed()`
+  - [ ] 9. Register processor trong notifcations.module.ts (cron job)
+- Description: Worker đọc notification_deliveries rows PENDING, gửi FCM push thực tế, update status.
+- AC: PENDING delivery rows được gửi FCM; SENT/FAILED update đúng; retry không gửi push trùng.
+- Verify: Integration test — upsert delivery → processor gửi → status = SENT
+- Flow/comment notes: Cần thêm `sendToToken(token, message)` vào `PushNotifier` port. `FcmPushService.sendToUser()` hiện không dùng được vì processor xử lý theo token.
+- Files/scope: `packages/api-platform/src/modules/notifications/application/services/notification-delivery.processor.ts` (create), `packages/api-platform/src/modules/notifications/notifications.module.ts`, `packages/api-platform/src/modules/notifications/application/push.interface.ts` (confidence: new scope)
+
+### T-015: Atomic inbox + delivery transaction
+
+- Status: blocked
+- Trace: INVESTIGATE (R2) §P0-3
+- Depends: T-002b
+- Work items:
+  - [ ] 1. Sửa `processClaimedJob()` — wrap `createMany` + `upsertDeliveries` trong một DB transaction
+  - [ ] 2. Thêm repository method `findBySourceJobAndUsers(sourceJobId, userIds, executor)` — lấy cả rows vừa insert và rows từ retry (conflict DO NOTHING không return existing rows)
+  - [ ] 3. `dispatch()` nhận executor từ transaction context thay vì dùng default client
+  - [ ] 4. `upsertDeliveries` nhận executor, upsert delivery rows trong cùng transaction
+  - [ ] 5. Sau commit → emit SSE (outside transaction)
+- Description: Inbox insert và delivery-row creation trong cùng transaction. Retry không skip dispatch.
+- AC: Nếu delivery upsert fail, inbox insert cũng rollback; retry job tạo đủ delivery rows.
+- Verify: Integration test — insert + delivery trong transaction → rollback không để lại inbox row orphan
+- Flow/comment notes: Quan trọng: `createMany` với `ON CONFLICT DO NOTHING` RETURNING không trả rows đã tồn tại. Cần `findBySourceJobAndUsers()` để dispatch cho cả rows từ retry.
+- Files/scope: `packages/api-platform/src/modules/notifications/application/use-cases/notification-delivery.use-case.ts`, `packages/api-platform/src/modules/notifications/infrastructure/notifications.repository.ts`, `packages/api-platform/src/modules/notifications/application/services/notification-dispatch.service.ts` (confidence: new scope)
+
+### T-016: Delivery retry/backoff state machine
+
+- Status: blocked
+- Trace: INVESTIGATE (R2) §P1
+- Depends: T-014
+- Work items:
+  - [ ] 1. Sửa `markFailed()` — set `nextAttemptAt` với exponential backoff (e.g., `now + 2^attempts minutes`)
+  - [ ] 2. Sửa `claimPending()` — thêm điều kiện `AND next_attempt_at <= now()` hoặc `next_attempt_at IS NULL`
+  - [ ] 3. Thêm max attempts threshold — vượt quá → status = FAILED vĩnh viễn
+  - [ ] 4. Thêm `recoverStaleProcessing(timeoutMinutes)` — PROCESSING quá timeout → PENDING hoặc FAILED
+  - [ ] 5. Thêm `markRetryable(deliveryId, nextAttemptAt)` — cho transient errors
+- Description: Delivery retry với exponential backoff. Transient error ≠ permanent failure.
+- AC: Lần 1 fail → retry sau 2 phút; lần 2 fail → retry sau 4 phút; quá N lần → FAILED; stale PROCESSING được recover.
+- Verify: Integration test — fail delivery → claimPending không claim do next_attempt_at chưa đến
+- Files/scope: `packages/api-platform/src/modules/notifications/infrastructure/deliveries.repository.ts`, `packages/api-platform/src/modules/notifications/application/ports/deliveries.repository.port.ts` (confidence: new scope)
+
+### T-017: Integration tests — DB constraints, delivery, atomicity
+
+- Status: blocked
+- Trace: INVESTIGATE (R2) §Test gap
+- Depends: T-002b, T-014, T-015, T-016
+- Work items:
+  - [ ] 1. Test: partial unique index + ON CONFLICT WHERE predicate — insert trùng sourceJobId + userId → row không tạo duplicate
+  - [ ] 2. Test: delivery pipeline end-to-end — upsert → processor → markSent
+  - [ ] 3. Test: inbox + delivery atomicity — transaction rollback không để lại orphan
+  - [ ] 4. Test: delivery retry backoff — markFailed set nextAttemptAt → claimPending bỏ qua đến hạn
+  - [ ] 5. Test: stale recovery — PROCESSING quá timeout → recover thành PENDING
+  - [ ] 6. Test: cross-org API requests under restricted DB role
+  - [ ] 7. Test: job creation + audit atomicity — rollback audit khi job insert fail
+- Description: PostgreSQL integration tests cho các invariant không thể test bằng mock.
+- AC: 7 integration tests pass với real PostgreSQL
+- Verify: `pnpm run test:e2e` — kiểm tra specific test file
+- Flow/comment notes: Chạy với testcontainers hoặc test database. Tham khảo existing integration tests trong codebase.
+- Files/scope: `packages/api-platform/src/modules/notifications/infrastructure/__tests__/` (new test files) (confidence: new scope)

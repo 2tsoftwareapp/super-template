@@ -6,7 +6,7 @@ import type {
 import { Inject, Injectable } from '@nestjs/common';
 import { DATABASE } from '@repo/api-database';
 import { notificationDeviceTokens } from '@repo/api-database';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, inArray } from 'drizzle-orm';
 
 import type { DeviceTokensRepositoryPort } from '../application/ports/device-tokens.repository.port';
 
@@ -54,6 +54,20 @@ export class DeviceTokensRepository implements DeviceTokensRepositoryPort {
       .select()
       .from(notificationDeviceTokens)
       .where(eq(notificationDeviceTokens.userId, userId));
+  }
+
+  async listByIds(
+    ids: string[],
+    executor: DatabaseExecutor = this.database,
+  ) {
+    if (ids.length === 0) {
+      return [];
+    }
+
+    return executor
+      .select()
+      .from(notificationDeviceTokens)
+      .where(inArray(notificationDeviceTokens.id, ids));
   }
 
   async deleteByToken(
