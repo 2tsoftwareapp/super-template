@@ -6,9 +6,11 @@
   "exports": {
     ".": "./src/index.ts",
     "./api-types": "./src/api-types.ts",
+    "./errors": "./src/errors.ts",
     "./http": "./src/http.ts",
     "./http-config": "./src/http-config.ts",
     "./json": "./src/json.ts",
+    "./params": "./src/params.ts",
     "./search-params": "./src/search-params.ts",
     "./session": "./src/session.ts",
     "./theme/tweakcn-fonts": "./src/tweakcn-fonts.ts",
@@ -18,7 +20,8 @@
   "scripts": {
     "build": "node ../../tools/tsc7/node_modules/typescript7/bin/tsc -p tsconfig.json",
     "lint": "eslint .",
-    "typecheck": "node ../../tools/tsc7/node_modules/typescript7/bin/tsc -p tsconfig.json --noEmit"
+    "typecheck": "node ../../tools/tsc7/node_modules/typescript7/bin/tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
   },
   "dependencies": {
     "@repo/api-contract": "workspace:*",
@@ -27,11 +30,13 @@
     "clsx": "2.1.1",
     "next": "16.2.9",
     "nuqs": "2.8.9",
-    "tailwind-merge": "3.6.0"
+    "tailwind-merge": "3.6.0",
+    "zod": "4.4.3"
   },
   "devDependencies": {
     "@repo/tsconfig": "workspace:*",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "vitest": "4.1.9"
   },
   "sideEffects": false
 }

@@ -27,6 +27,9 @@
 16. [FE Shared Hook Composition Rules](#16-fe-shared-hook-composition-rules)
 17. [FE Handler Splitting & Flow Comments](#17-fe-handler-splitting--flow-comments)
 18. [FE Error Handling Strategy](#18-fe-error-handling-strategy)
+19. [FE Cache Rules](#19-fe-cache-rules)
+20. [FE Security Rules](#20-fe-security-rules)
+21. [FE Performance Rules](#21-fe-performance-rules)
 
 ---
 
@@ -1167,3 +1170,632 @@ export default [
 | Port | `<resource>.repository.port.ts` | Interface `<Resource>RepositoryPort` | `UsersRepositoryPort` |
 | Repository | `drizzle-<resource>.repository.ts` | `Drizzle<Resource>Repository` | `DrizzleUsersRepository` |
 | Adapter | `<service>.adapter.ts` | `<Service>Adapter` | `ResendEmailAdapter` |
+
+---
+
+## 15. FE Validation Rules
+
+### Trách nhiệm
+
+Mọi dữ liệu **đi vào** ứng dụng từ bên ngoài đều không đáng tin: form người dùng nhập, route params, search params, `localStorage`, `postMessage`, và response từ BFF. Validation là lớp biến dữ liệu không tin cậy thành dữ liệu có kiểu, **trước khi** nó chạm tới state hoặc query.
+
+> **Validation ở FE là UX, không phải bảo mật.** Người dùng có thể bỏ qua toàn bộ FE bằng `curl`. BE **luôn** phải validate lại (§11.1 R2). FE validate để báo lỗi sớm và để app không vỡ — không bao giờ để "chặn" kẻ tấn công.
+
+### Ba nhóm dữ liệu vào — ba cách xử lý khác nhau
+
+| Nhóm | Ví dụ | Khi giá trị sai | Lý do |
+|------|-------|-----------------|-------|
+| **Identity params** (route) | `/users/[id]`, `/orgs/[slug]` | **Không fallback** → `notFound()` | URL trỏ tới một resource cụ thể; sai nghĩa là không có gì để hiển thị |
+| **Presentation params** (search) | `?page=`, `?status=`, `?from=`, `?sort=`, `?search=` | **Luôn fallback theo từng key** | Params chỉ điều khiển cách hiển thị; một key hỏng không được làm trắng màn hình |
+| **Payload người dùng** | form create/update | Chặn submit + hiện lỗi theo field | Người dùng cần sửa được, không phải mất dữ liệu đã nhập |
+
+### Rules
+
+| # | Rule |
+|---|------|
+| R1 | Mọi dữ liệu ngoài (form, URL, storage, message) phải qua schema **trước khi** vào state, query key, hay request |
+| R2 | Schema khai báo ở `model/*.schemas.ts` (form) và `model/*.search-params.ts` (params). **Không** import `zod` trong `ui/`, `screens/`, `controllers/` — import schema đã khai báo (ESLint `warn`) |
+| R3 | Route params dùng `parseRouteParams()` → `ok: false` thì gọi `notFound()`, **không** đoán giá trị thay thế |
+| R4 | Search params dùng `parseSearchParams()` — **cấm** đọc thô `searchParams.get(...)` rồi ép kiểu (ESLint `warn`) |
+| R5 | Giá trị fallback là hằng số trong `model/constants.ts` (`DEFAULT_*`), không rải literal khắp nơi |
+| R6 | Response BFF: tin type sinh từ `@repo/api-contract`. Chỉ `zod.parse()` ở **biên rủi ro**: dữ liệu quyết định phân quyền, số tiền, hoặc nội dung sắp render dạng HTML |
+| R7 | Params dùng để điều hướng (`returnTo`, `redirect`, `next`) phải qua `internalPath()` — xem §20 |
+| R8 | Free-text param phải có giới hạn độ dài; enum param phải là whitelist đóng, không blacklist |
+
+### Param primitives dùng chung
+
+`@repo/web-utils/params` cung cấp sẵn các mảnh để ghép schema — đừng viết lại guard cho từng feature:
+
+| Helper | Dùng cho | Khi giá trị sai |
+|--------|----------|-----------------|
+| `pageParam` | `?page=` | → `1` |
+| `pageSizeParam([10,20,50], 20)` | `?limit=` | → default đã khai báo |
+| `enumParam(["ALL","ACTIVE"], "ALL")` | filter trạng thái | → fallback |
+| `searchTextParam(200)` | `?search=` | → `""` (và cắt độ dài) |
+| `dateParam` | `?from=`, `?to=` | → `undefined` |
+| `booleanParam` | `?archived=` | → `false` |
+| `sortOrderParam("desc")` | `?sortOrder=` | → default |
+| `uuidParam` / `numericIdParam` / `slugParam` | route id | → **không fallback**, `notFound()` |
+| `internalPath(value, "/users")` | `?returnTo=` | → path an toàn |
+
+### ✅ DO
+
+```ts
+// features/users/model/users.search-params.ts — schema đặt ở model, một chỗ duy nhất
+// (users hiện đang parse thủ công bằng whitelist — dạng dưới là đích migrate)
+import {
+  enumParam,
+  pageParam,
+  pageSizeParam,
+  parseSearchParams,
+  searchTextParam,
+  sortOrderParam,
+} from "@repo/web-utils/params";
+import { z } from "zod";
+
+import { DEFAULT_USERS_LIST_PARAMS, USERS_PAGE_SIZE } from "./constants";
+
+export const usersListParamsSchema = z.object({
+  page: pageParam,
+  limit: pageSizeParam([10, 20, 30, 50, 100], USERS_PAGE_SIZE),
+  search: searchTextParam(200),
+  status: enumParam(["all", "PENDING", "ACTIVE", "BLOCKED"], "all"),
+  sortField: enumParam(["createdAt", "displayName", "email", "status"], "createdAt"),
+  sortOrder: sortOrderParam("desc"),
+});
+
+export function parseUsersListSearchParams(searchParams: URLSearchParams) {
+  // Recovery theo từng key: `?page=xx&status=ACTIVE` vẫn giữ filter ACTIVE
+  // và chỉ đưa page về 1 — không reset cả màn hình.
+  return parseSearchParams(usersListParamsSchema, searchParams, DEFAULT_USERS_LIST_PARAMS);
+}
+```
+
+```tsx
+// Route param là identity — sai thì không có fallback nào hợp lý
+import { parseRouteParams, uuidParam } from "@repo/web-utils/params";
+import { notFound } from "next/navigation";
+import { z } from "zod";
+
+const paramsSchema = z.object({ id: uuidParam });
+
+export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+  const parsed = parseRouteParams(paramsSchema, await params);
+
+  // `/users/xx` → không gọi API với id rác, không hiện lỗi 500 mơ hồ.
+  // Lưu ý status code: gọi notFound() TRƯỚC mọi <Suspense>/await có thể
+  // suspend, nếu không response đã stream với 200 (xem §18.3).
+  if (!parsed.ok) {
+    notFound();
+  }
+
+  return <UserDetailView userId={parsed.data.id} />;
+}
+```
+
+```ts
+// Return param — không bao giờ tin thẳng
+// apps/admin/src/features/users/controllers/use-user-detail-controller.ts
+const backHref = internalPath(searchParams.get("returnTo"), "/users");
+```
+
+### ❌ DON'T
+
+```ts
+// WRONG 1: đọc thô rồi ép kiểu — `?page=xx` cho ra NaN và NaN đi thẳng vào query key
+const page = Number(searchParams.get("page"));          // ← vi phạm R4
+const limit = Number(searchParams.get("limit")) || 20;  // ← `?limit=99999` lọt qua
+
+// WRONG 2: coi cast là validate — TypeScript không kiểm tra lúc chạy
+const status = searchParams.get("status") as UserStatus; // ← vi phạm R1
+// `?status=DROP_TABLE` giờ là "UserStatus" hợp lệ với compiler
+
+// WRONG 3: một key hỏng làm hỏng cả màn hình
+const params = usersListParamsSchema.parse(raw); // ← throw → error boundary → mất filter
+// Dùng parseSearchParams() để recovery theo key (R4)
+
+// WRONG 4: khai báo schema ngay trong component
+export function CreateUserDrawer() {
+  const schema = z.object({ email: z.string() }); // ← vi phạm R2, tạo lại mỗi lần render
+}
+
+// WRONG 5: route param sai nhưng vẫn đoán bừa
+const id = params.id || "1"; // ← vi phạm R3 — hiển thị nhầm resource của người khác
+```
+
+---
+
+## 16. FE Shared Hook Composition Rules
+
+### Nguyên tắc
+
+Hook dùng chung phải **phẳng**. Một shared hook gọi shared hook khác sẽ giấu một nguồn dữ liệu bên trong một cái lá: người đọc màn hình không thấy được nó fetch cái gì, test phải mock lồng nhiều tầng, và cùng một dữ liệu bị lấy ở nhiều điểm với vòng đời khác nhau.
+
+### Rules
+
+| # | Rule |
+|---|------|
+| R1 | Hook trong `src/hooks/` **không** được import hook khác trong `src/hooks/` (ESLint `error`) |
+| R2 | Hook trong `src/hooks/` **không** được import từ `features/*` — nó là hạ tầng cross-feature (ESLint `error`) |
+| R3 | Shared hook (`useSession`, …) gọi **một lần ở root handler** của màn hình; sub-hook nhận dữ liệu qua **tham số**, không tự gọi lại |
+| R4 | Sub-hook trong `controllers/` nhận input là giá trị/hàm đã có sẵn — nó không được là nơi đầu tiên khám phá ra session, permission, hay params |
+| R5 | Nếu hai sub-hook cùng cần một dữ liệu → nâng lên root handler và truyền xuống, **không** cùng gọi shared hook |
+
+> **Ghi chú về React Query:** `useSession()` dùng chung `queryKey` nên gọi nhiều lần *không* tạo thêm request. Rule này không nhằm tiết kiệm request — nó nhằm giữ **một điểm đọc dữ liệu duy nhất cho mỗi màn hình**, để luồng đọc được từ trên xuống và test không phải mock ở ba tầng.
+
+### ✅ DO
+
+```ts
+// Root handler gọi shared hook một lần…
+export function useUsersListController(): UsersListViewModel {
+  const session = useSession();       // ← điểm đọc session duy nhất của màn hình
+  const searchParams = useSearchParams();
+
+  const { canCreate, canUpdate } = selectUserManagementPermissions(
+    session.data?.data.permissions,
+  );
+
+  // …rồi truyền kết quả xuống sub-hook
+  const { isMutating, handleBulkActivate } = useUsersBulkActions(
+    activateUsers,
+    blockUsers,
+    requestBlock,
+  );
+}
+```
+
+```ts
+// apps/admin/src/features/users/controllers/use-user-roles.ts
+// Sub-hook thuần: mọi thứ nó cần đều đến từ tham số — không gọi useSession,
+// không gọi query. Test được bằng cách truyền object thường.
+export function useUserRoles(
+  userId: string | undefined,
+  currentUser: AdminUserDto | null,
+  replaceRoles: { isPending: boolean; mutateAsync: (a: Args) => Promise<unknown> },
+  isActorSuperAdmin: boolean,
+  actorOrganizationId: string | null | undefined,
+  // …
+) { /* chỉ state cục bộ + tính toán dẫn xuất */ }
+```
+
+### ❌ DON'T
+
+```ts
+// WRONG 1: shared hook gọi shared hook — vi phạm R1
+// src/hooks/use-bulk-mutation.ts
+import { useSession } from "@/hooks/use-session"; // ← ESLint error
+export function useBulkMutation() {
+  const session = useSession(); // giấu một nguồn dữ liệu trong một tiện ích
+}
+
+// WRONG 2: sub-hook tự đi tìm session — vi phạm R3, R4
+// features/users/controllers/use-users-bulk-actions.ts
+export function useUsersBulkActions() {
+  const session = useSession();        // ← root handler đã có session rồi
+  const canUpdate = session.data?.data.permissions.includes("users.update");
+  // Giờ quyền được tính ở hai nơi và có thể lệch nhau
+}
+
+// WRONG 3: hai sub-hook cùng gọi một shared hook — vi phạm R5
+useUsersTableConfig();   // bên trong: useSession()
+useUsersConfirmBlock();  // bên trong: useSession()
+// → nâng lên root handler, truyền xuống
+
+// WRONG 4: shared hook biết về feature — vi phạm R2
+// src/hooks/use-session.ts
+import { usersKeys } from "@/features/users/api/users.query-keys"; // ← ESLint error
+```
+
+---
+
+## 17. FE Handler Splitting & Flow Comments
+
+### Khi nào phải tách
+
+Handler (`controllers/`) phình to là chuyện bình thường với feature lớn — vấn đề chỉ xuất hiện khi **một file gánh nhiều nhóm trách nhiệm**. Ngưỡng cụ thể:
+
+| Tín hiệu | Ngưỡng | Hành động |
+|----------|--------|-----------|
+| Số dòng file handler | > 250 | Tách sub-hook |
+| Số nhóm trong view model | > 6 nhóm | Tách theo nhóm |
+| Số `useState` trong một hook | > 5 | Gom state cùng vòng đời vào sub-hook |
+| Một nhóm hành vi có ≥ 2 handler + state riêng | — | Tách ngay, không cần đợi ngưỡng dòng |
+
+### Tách theo cái gì
+
+**Tách theo nhóm hành vi (behaviour), không theo kỹ thuật.** Sub-hook phải trả lời được câu "nó sở hữu chuyện gì". `use-users-bulk-actions` là tên tốt; `use-users-utils` hay `use-users-helpers` là tên xấu — chúng không có ranh giới, nên rồi thứ gì cũng rơi vào đó.
+
+Ví dụ thật trong repo — `use-users-list-controller.ts` (307 dòng) đã tách:
+
+```
+controllers/
+  use-users-list-controller.ts   # root: compose + trả UsersListViewModel
+  use-users-bulk-actions.ts      #   sở hữu: chọn nhiều + activate/block hàng loạt
+  use-users-confirm-block.ts     #   sở hữu: state dialog xác nhận block
+  use-users-table-config.ts      #   sở hữu: cấu hình TanStack Table + row selection
+```
+
+### Rules
+
+| # | Rule |
+|---|------|
+| R1 | Root handler chỉ **compose** sub-hook và trả về view model — không chứa logic của một nhóm cụ thể |
+| R2 | Sub-hook đặt cùng thư mục `controllers/`, tên `use-<feature>-<concern>.ts` — `<concern>` là danh từ nghiệp vụ |
+| R3 | Sub-hook nhận input qua tham số (§16 R4) và trả về đúng phần view model nó sở hữu |
+| R4 | Cấm sub-hook tên chung chung: `-utils`, `-helpers`, `-misc`, `-common` |
+| R5 | Root handler **bắt buộc** có flow comment ở đầu file (xem dưới) |
+| R6 | Mỗi sub-hook có một dòng comment nêu rõ nó **sở hữu** cái gì |
+| R7 | Sub-hook không import sub-hook khác cùng cấp — chỉ root mới compose (tránh chồng chéo như §16) |
+
+### Flow comment — bắt buộc ở root handler
+
+Người đọc phải nắm được luồng trong 10 giây mà không cần mở 4 file. Format:
+
+```ts
+/**
+ * Users list — root handler.
+ *
+ * Flow:
+ *  1. URL → parseUsersListSearchParams() → listParams đã validate (§15 R4)
+ *  2. Ô tìm kiếm debounce 500ms → patchListParams() → router.replace()
+ *  3. listParams → useUsersListQuery() → dữ liệu trang hiện tại
+ *  4. session → selectUserManagementPermissions() → canCreate / canUpdate
+ *  5. Compose: useUsersTableConfig (bảng) + useUsersBulkActions (hàng loạt)
+ *              + useUsersConfirmBlock (dialog xác nhận)
+ *  6. Trả UsersListViewModel — screen chỉ render, không tính toán
+ *
+ * Sở hữu bởi file này: đồng bộ URL ↔ state, phân trang, filter.
+ * KHÔNG sở hữu: cấu hình bảng, chọn hàng loạt, dialog xác nhận (xem sub-hook).
+ */
+export function useUsersListController(): UsersListViewModel {
+```
+
+Quy tắc viết flow comment:
+- Đánh **số bước** theo đúng thứ tự dữ liệu chảy, không phải thứ tự code.
+- Nêu rõ **sở hữu / không sở hữu** — đây là phần chống chồng chéo trách nhiệm.
+- Cập nhật comment **trong cùng commit** với thay đổi luồng. Comment sai còn tệ hơn không có.
+- Không mô tả cú pháp (`// gọi useState`) — chỉ mô tả luồng nghiệp vụ.
+
+### ❌ DON'T
+
+```ts
+// WRONG 1: tách theo kỹ thuật, không theo trách nhiệm
+use-users-utils.ts        // ← vi phạm R4 — rồi mọi thứ sẽ rơi vào đây
+use-users-state.ts        // ← "state" không phải một nhóm nghiệp vụ
+
+// WRONG 2: sub-hook gọi sub-hook — vi phạm R7
+export function useUsersBulkActions() {
+  const { table } = useUsersTableConfig(); // ← chồng chéo, root mất quyền kiểm soát
+}
+
+// WRONG 3: root handler vẫn ôm logic chi tiết
+export function useUsersListController() {
+  const [rowSelection, setRowSelection] = useState({});
+  const table = useReactTable({ /* 60 dòng cấu hình */ }); // ← vi phạm R1
+}
+
+// WRONG 4: flow comment kể lại cú pháp
+/**
+ * Hook này dùng useState và useEffect và gọi useQuery.  ← vô dụng
+ */
+```
+
+---
+
+## 18. FE Error Handling Strategy
+
+### 18.1 Ba tầng lỗi
+
+| Tầng | Bề mặt | Dùng khi | Ai kích hoạt |
+|------|--------|----------|--------------|
+| **Global** | `global-error.tsx`, `[locale]/error.tsx` | App shell vỡ, session hết hạn, mất quyền | React error boundary bắt lỗi render |
+| **Local** | `<ErrorState variant="full-page">` trong view model (`list.isError` + `onRetry`) | Một section/query hỏng nhưng phần còn lại của trang vẫn dùng được | Handler đọc `query.isError` |
+| **Inline** | `toast`, lỗi theo field trong form | Hành động của người dùng thất bại, ngữ cảnh nằm ngay tại control | Handler bắt lỗi mutation |
+
+Chọn tầng bằng `classifyError()` (`@repo/web-utils/errors`) thay vì tự đoán từ status:
+
+| `kind` | status | scope | retry |
+|--------|--------|-------|-------|
+| `auth` | 401 | global | ✗ |
+| `permission` | 403 | global | ✗ |
+| `not-found` | 404 | local | ✗ |
+| `validation` | 400/422 | inline | ✗ |
+| `conflict` | 409 | inline | ✓ |
+| `rate-limit` | 429 | inline | ✓ |
+| `server` | ≥500 | local | ✓ |
+| `network` | — | local | ✓ |
+
+### 18.2 Error boundary trong Next.js App Router
+
+```
+apps/admin/src/app/
+  global-error.tsx          # root layout vỡ → tự render <html>/<body>, không có provider
+  [locale]/error.tsx        # bắt mọi lỗi render của page + layout con
+  [locale]/not-found.tsx    # UI 404
+  [locale]/(app)/error.tsx  # (tuỳ chọn) giữ nguyên sidebar khi chỉ nội dung lỗi
+```
+
+| # | Rule |
+|---|------|
+| R1 | File error boundary **bắt buộc** `"use client"` |
+| R2 | `error.tsx` **không** bắt lỗi của `layout.tsx` cùng segment — lỗi đó bay lên boundary cha |
+| R3 | `global-error.tsx` thay thế root layout → phải tự khai báo `<html>`/`<body>`, không dùng được provider, i18n, theme |
+| R4 | Dùng prop **`unstable_retry`** (Next ≥ 16.2) để thử lại — nó re-fetch và re-render segment. `reset` chỉ dùng khi cố ý **không** muốn fetch lại |
+| R5 | Error boundary **không** bắt lỗi trong event handler và async code → phải `try/catch` thủ công rồi đưa vào state |
+| R6 | Luôn log `error.digest` — ở production, lỗi từ Server Component chỉ còn message chung, `digest` là móc nối duy nhất tới log server |
+
+```tsx
+// apps/admin/src/app/[locale]/error.tsx
+"use client";
+
+export default function LocaleError({
+  error,
+  unstable_retry,
+}: {
+  error: Error & { digest?: string };
+  unstable_retry: () => void;
+}) {
+  useEffect(() => {
+    console.error("[admin] unhandled render error", {
+      digest: error.digest,
+      message: error.message,
+    });
+  }, [error]);
+
+  return <ErrorFallback error={error} onRetry={unstable_retry} />;
+}
+```
+
+### 18.3 Status code: server-side vs client-side ⚠️
+
+Đây là chỗ hay hiểu sai nhất. **Status code chỉ tồn tại ở request HTML đầu tiên.** Điều hướng phía client (`<Link>`, `router.push`) không sinh ra status code nào cả — nó chỉ tải RSC payload, nên `notFound()` lúc đó chỉ đổi UI.
+
+| Tình huống | Status thực tế | Ghi chú |
+|------------|----------------|---------|
+| SSR, `notFound()` chạy **trước khi** body stream | `404` thật | Muốn có status này phải chặn sớm |
+| SSR, `notFound()` chạy **sau khi** đã stream | `200` + `<meta name="robots" content="noindex">` | "Soft 404" — header đã gửi, không sửa được nữa |
+| Lỗi render bắt bởi `error.tsx` khi SSR | `500` | Chỉ khi chưa stream |
+| Điều hướng client-side | **không có status** | Chỉ là fetch RSC payload |
+
+> **Ảnh hưởng trực tiếp tới repo này:** `page.tsx` đang bọc `<Suspense>` ngay tại route (ví dụ `users/page.tsx`), nên body bắt đầu stream rất sớm → mọi `notFound()` bên dưới đều là **soft 404 với HTTP 200**. Với `apps/admin` (sau đăng nhập, không cần index) thì chấp nhận được. Với `apps/web` (trang công khai, cần SEO) thì **không**: nếu cần 404 thật, quyết định trong `proxy.ts` — nơi chạy trước khi response body bắt đầu.
+
+| # | Rule |
+|---|------|
+| R7 | Cần **404 thật** (SEO/analytics/compliance) → kiểm tra tồn tại trong `proxy.ts`, hoặc gọi `notFound()` trước mọi `<Suspense>` và `await` có thể suspend |
+| R8 | Không dựa vào status code của trang để phát hiện lỗi ở client — dùng `classifyError()` trên response của `webFetch` |
+| R9 | Giữ kiểm tra trong `proxy.ts` **nhẹ** — không fetch nội dung đầy đủ ở đó |
+| R10 | Dev hiện message gốc, production chỉ hiện message chung + `digest` — **không** viết UI phụ thuộc `error.message` |
+
+### 18.4 Ai được phép thông báo lỗi
+
+| Layer | Được làm | Không được làm |
+|-------|----------|----------------|
+| `api/*.api.ts` | Ném `ApiClientError` | Bắt lỗi, toast |
+| `api/*.queries.ts` / `*.mutations.ts` | Trả `isError`, `error`; re-throw | Gọi `toast()` (ESLint `warn`) |
+| `controllers/` | `classifyError()`, `toast()`, set state lỗi, quyết định tầng | Nuốt lỗi im lặng |
+| `screens/` | Render `<ErrorState>` theo view model | Tự fetch để thử lại |
+| `ui/` | Nhận `isError`/`onRetry` qua props | Biết `ApiClientError` là gì |
+
+### ❌ DON'T
+
+```ts
+// WRONG 1: nuốt lỗi
+try {
+  await createUser(input);
+} catch {
+  // im lặng ← người dùng tưởng đã lưu thành công
+}
+
+// WRONG 2: đọc message thô của lỗi không rõ nguồn
+toast.error(error.message); // ← có thể lộ nội dung nội bộ; dùng getErrorMessage(error, fallback)
+
+// WRONG 3: tưởng error boundary bắt được lỗi click
+<button onClick={() => { throw new Error("boom"); }} /> // ← không boundary nào bắt (R5)
+
+// WRONG 4: dùng reset khi thật ra cần fetch lại
+<button onClick={reset}>Thử lại</button> // ← chỉ render lại dữ liệu hỏng cũ; dùng unstable_retry (R4)
+
+// WRONG 5: đoán tầng lỗi bằng status rải rác khắp component
+if (err.status === 403) router.push("/login"); // ← 403 là permission, không phải auth — dùng classifyError()
+```
+
+---
+
+## 19. FE Cache Rules
+
+### Cấu hình nền
+
+`QueryClient` đặt trong `components/providers.tsx`:
+
+```ts
+new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false, // console nội bộ: refetch mỗi lần focus gây nhiễu
+      staleTime: 30_000,
+    },
+  },
+});
+```
+
+### Rules
+
+| # | Rule |
+|---|------|
+| R1 | Query key **bắt buộc** đi qua factory `model`/`api/*.query-keys.ts` — cấm viết mảng key thủ công tại chỗ gọi |
+| R2 | Key phải chứa **mọi** biến ảnh hưởng tới kết quả (params, tenant/organization, locale). Thiếu một biến = hiển thị dữ liệu của ngữ cảnh khác |
+| R3 | `staleTime` đặt theo **tốc độ thay đổi của dữ liệu**, không đặt bừa (bảng dưới) |
+| R4 | Sau mutation: `invalidateQueries` với phạm vi **hẹp nhất** đúng đắn — không `invalidateQueries()` trần |
+| R5 | Danh sách có phân trang dùng `placeholderData: (previous) => previous` để không nháy trắng khi đổi trang |
+| R6 | **Xoá sạch cache khi đổi danh tính**: logout, đổi organization, refresh token thất bại → `queryClient.clear()` |
+| R7 | Không cache dữ liệu nhạy cảm lâu hơn mức cần (token, mã OTP, dữ liệu một lần) — `gcTime: 0` |
+| R8 | Cache là dữ liệu hiển thị, **không** phải nguồn sự thật cho quyết định phân quyền (§20 R1) |
+
+| Loại dữ liệu | `staleTime` gợi ý | Ví dụ trong repo |
+|--------------|-------------------|------------------|
+| Gần như tĩnh | 5 phút | danh sách organizations |
+| Dữ liệu vận hành | 30 giây (mặc định) | danh sách users, dashboard |
+| Đang biến động | 0 | job đang chạy, tiến trình import |
+| Nhạy cảm/một lần | 0 + `gcTime: 0` | MFA challenge |
+
+### ✅ DO
+
+```ts
+// Key factory — một nguồn duy nhất, invalidate theo tầng
+export const usersKeys = {
+  all: ["users"] as const,
+  lists: () => [...usersKeys.all, "list"] as const,
+  list: (params: { listPath: string; sortKey: string }) =>
+    [...usersKeys.lists(), params] as const,
+  detail: (id: string) => [...usersKeys.all, "detail", id] as const,
+};
+
+// Invalidate hẹp: sửa 1 user thì không cần đập cả cache app
+await queryClient.invalidateQueries({ queryKey: usersKeys.detail(userId) });
+await queryClient.invalidateQueries({ queryKey: usersKeys.lists() });
+```
+
+```ts
+// Đổi danh tính → cache cũ không còn hợp lệ
+export function useLogout() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: authApi.logout,
+    onSuccess: () => {
+      // Bắt buộc: nếu không, người đăng nhập tiếp theo trên cùng máy
+      // sẽ thấy dữ liệu của người trước trong khoảnh khắc đầu.
+      queryClient.clear();
+    },
+  });
+}
+```
+
+### ❌ DON'T
+
+```ts
+// WRONG 1: key thủ công — không invalidate được, dễ gõ sai
+useQuery({ queryKey: ["users", page], queryFn: ... }); // ← vi phạm R1
+
+// WRONG 2: thiếu biến trong key — dữ liệu tenant lẫn nhau
+queryKey: usersKeys.list({ page }), // ← thiếu organizationId (R2) — lỗi bảo mật, không chỉ là bug cache
+
+// WRONG 3: đập toàn bộ cache sau mỗi mutation
+await queryClient.invalidateQueries(); // ← vi phạm R4 — refetch cả những màn hình không liên quan
+
+// WRONG 4: giữ cache qua ranh giới đăng nhập
+onSuccess: () => router.push("/login"), // ← vi phạm R6 — cache của user cũ vẫn còn
+```
+
+---
+
+## 20. FE Security Rules
+
+> Chốt chặn bảo mật nằm ở BE. Mọi rule dưới đây nhằm **không mở thêm lỗ hổng ở FE** và không tạo cảm giác an toàn giả.
+
+| # | Rule |
+|---|------|
+| R1 | Permission ở FE chỉ để **ẩn/hiện UI**. Mỗi endpoint phải tự kiểm tra quyền ở BE (§11.1). Ẩn nút không phải là bảo vệ |
+| R2 | Kiểm tra quyền qua selector ở `model/*.permissions.ts` — không rải `permissions.includes("...")` khắp component |
+| R3 | Mọi request đi qua `webFetch` — nó tự gắn `x-csrf-token` và `credentials: "same-origin"`. **Cấm** gọi `fetch()` trần tới BFF |
+| R4 | Token/refresh token nằm trong cookie `httpOnly` do BFF quản lý. **Cấm** lưu token vào `localStorage`/`sessionStorage` |
+| R5 | Mọi param điều hướng (`returnTo`, `redirect`, `next`, `callbackUrl`) phải qua `internalPath()` — chống open redirect |
+| R6 | `dangerouslySetInnerHTML` chỉ dùng cho **hằng số build-time** (ví dụ theme init script). **Cấm tuyệt đối** với dữ liệu từ API hoặc URL |
+| R7 | Chỉ đặt vào `NEXT_PUBLIC_*` những gì chấp nhận công khai — biến này nằm trong bundle, ai cũng đọc được |
+| R8 | Không log token, cookie, PII ra `console` ở production. Lỗi hiển thị dùng `getErrorMessage()`, chi tiết dùng `digest` |
+| R9 | Kiểm tra ở `proxy.ts` là **pre-filter UX**, không phải chốt chặn — session/RBAC thật vẫn được xác thực lại ở BFF/BE |
+| R10 | Xoá cache khi đổi danh tính (§19 R6) — dữ liệu người dùng cũ không được rò sang phiên mới |
+
+### ✅ DO
+
+```ts
+// R5 — return param được kiểm tra trước khi thành href
+// apps/admin/src/features/users/controllers/use-user-detail-controller.ts
+const backHref = internalPath(searchParams.get("returnTo"), "/users");
+```
+
+```ts
+// R2 — quyền tập trung một chỗ, component chỉ nhận boolean
+export function selectUserManagementPermissions(permissions: readonly string[] | undefined) {
+  const granted = new Set(permissions ?? []);
+  return {
+    canCreate: granted.has("users.create"),
+    canUpdate: granted.has("users.update"),
+    canDelete: granted.has("users.delete"),
+  };
+}
+```
+
+### ❌ DON'T
+
+```ts
+// WRONG 1: open redirect — biến nút "quay lại" thành cửa dẫn ra ngoài
+const backHref = searchParams.get("returnTo") ?? "/users";
+// ?returnTo=https://evil.com  hoặc  ?returnTo=//evil.com  → vi phạm R5
+
+// WRONG 2: render HTML từ server
+<div dangerouslySetInnerHTML={{ __html: user.bio }} /> // ← vi phạm R6, XSS
+
+// WRONG 3: tự fetch, mất CSRF token
+await fetch("/api/bff/admin/users", { method: "POST", body }); // ← vi phạm R3
+
+// WRONG 4: coi việc ẩn nút là phân quyền
+{canDelete && <DeleteButton />}
+// ← đúng về UX, nhưng nếu BE không kiểm tra thì vẫn xoá được bằng curl (R1)
+
+// WRONG 5: secret lọt vào bundle
+NEXT_PUBLIC_API_SECRET=... // ← vi phạm R7
+```
+
+---
+
+## 21. FE Performance Rules
+
+| # | Rule |
+|---|------|
+| R1 | Server Component là mặc định. `"use client"` đẩy xuống **lá** gần nhất cần tương tác — không đặt ở layout/page rồi kéo cả cây sang client |
+| R2 | Bọc `<Suspense>` quanh phần chậm để phần còn lại hiển thị ngay — nhưng nhớ hệ quả status code ở §18.3 |
+| R3 | Ô tìm kiếm/lọc phải debounce trước khi vào query (repo dùng `useDebouncedValue(value, 500)`) |
+| R4 | Danh sách phân trang dùng `placeholderData: (previous) => previous` — giữ dữ liệu cũ thay vì skeleton nhấp nháy |
+| R5 | Repo đã bật **React Compiler** — **không** thêm `useMemo`/`useCallback` thủ công trừ khi đo được lợi ích, hoặc khi lint báo thư viện không memo hoá được (ví dụ `useReactTable`) |
+| R6 | Query độc lập chạy **song song**; cấm `await` tuần tự tạo waterfall |
+| R7 | Component nặng và ít dùng (drawer, dialog, editor, chart) → `next/dynamic` với `ssr: false` khi phù hợp |
+| R8 | Ảnh dùng `next/image`; không nhúng ảnh lớn dạng base64 vào bundle |
+| R9 | Không import cả barrel nặng chỉ để lấy một thứ — import đúng entry (`@repo/web-ui/button`, không phải `@repo/web-ui`) |
+| R10 | `select` của React Query để thu hẹp dữ liệu re-render, thay vì lọc lại trong component mỗi lần render |
+
+### ✅ DO
+
+```ts
+// R3 + R4 — gõ nhiều nhưng chỉ gọi API khi ngừng gõ, và không nháy trắng khi đổi trang
+const debouncedSearch = useDebouncedValue(searchInput, 500);
+const users = useUsersListQuery({ ...listParams, search: debouncedSearch });
+// useUsersListQuery: placeholderData: (previous) => previous
+```
+
+```ts
+// R6 — ba nguồn độc lập, chạy song song
+const user = useAdminUserQuery(userId);
+const roles = useAdminRolesQuery();
+const organizations = useMyOrganizationsQuery();
+```
+
+### ❌ DON'T
+
+```tsx
+// WRONG 1: "use client" ở đỉnh cây — kéo toàn bộ page sang client
+"use client";
+export default function Page() { /* ← vi phạm R1 */ }
+
+// WRONG 2: waterfall
+const user = await fetchUser(id);
+const roles = await fetchRoles();      // ← không phụ thuộc user, đáng lẽ chạy song song (R6)
+
+// WRONG 3: gọi API mỗi ký tự
+onChange={(e) => setSearch(e.target.value)} // rồi dùng thẳng search làm query key ← vi phạm R3
+
+// WRONG 4: memo hoá thủ công tràn lan khi đã có React Compiler
+const cols = useMemo(() => buildColumns(), []); // ← vi phạm R5, thêm nhiễu không đo được lợi ích
+
+// WRONG 5: import barrel nặng trong route
+import { Button } from "@repo/web-ui"; // ← vi phạm R9 — dùng "@repo/web-ui/button"
+```

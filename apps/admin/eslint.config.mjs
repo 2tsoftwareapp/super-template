@@ -145,4 +145,101 @@ export default defineConfig([
       ],
     },
   },
+  {
+    // Layering: toast/notification side effects belong to the handler layer.
+    // api/ hooks re-throw or expose state; they never talk to the user.
+    // See CODING_RULES.md §6 R3 and §18.4.
+    name: "admin/boundary-api-no-notifications",
+    files: ["src/features/*/api/**/*.{ts,tsx}"],
+    rules: {
+      // NOTE: severity is "warn" — 8 pre-existing *.mutations.ts files raise
+      // toasts from api/. Promote to "error" once they are migrated.
+      "no-restricted-imports": [
+        "warn",
+        {
+          paths: [
+            {
+              name: "sonner",
+              message:
+                "api/ must not raise toasts. Surface the error state and let the handler decide (see CODING_RULES.md §18.4).",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    // Shared hooks must stay flat: a hook in src/hooks/ may not call another
+    // shared hook or reach into a feature. Composition happens at the root
+    // handler, which passes results down. See CODING_RULES.md §16.
+    name: "admin/shared-hooks-flat",
+    files: ["src/hooks/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["@/hooks/*"],
+              message:
+                "A shared hook must not call another shared hook — that hides a second data source inside a leaf. Compose them in the root handler instead (see CODING_RULES.md §16 R2).",
+            },
+            {
+              group: ["@/features/*"],
+              message:
+                "src/hooks/ is cross-feature infrastructure and must not depend on a feature (see CODING_RULES.md §9.1).",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    // Validation lives in model/: schemas are declared once and reused by
+    // handlers, forms, and param parsers. See CODING_RULES.md §15 R2.
+    name: "admin/validation-in-model",
+    files: [
+      "src/features/*/controllers/**/*.{ts,tsx}",
+      "src/features/*/screens/**/*.{ts,tsx}",
+      "src/features/*/ui/**/*.{ts,tsx}",
+    ],
+    rules: {
+      "no-restricted-imports": [
+        "warn",
+        {
+          paths: [
+            {
+              name: "zod",
+              message:
+                "Declare schemas in features/<resource>/model/*.schemas.ts and import the schema, not zod (see CODING_RULES.md §15 R2).",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    // Raw search-param reads bypass validation entirely: `Number(sp.get("page"))`
+    // yields NaN for `?page=xx`. Parse through the feature's param schema.
+    // See CODING_RULES.md §15 R4.
+    name: "admin/params-must-be-parsed",
+    files: [
+      "src/features/*/controllers/**/*.{ts,tsx}",
+      "src/features/*/screens/**/*.{ts,tsx}",
+      "src/features/*/ui/**/*.{ts,tsx}",
+    ],
+    rules: {
+      "no-restricted-syntax": [
+        "warn",
+        {
+          // Flags a raw read; a read passed straight into a validator
+          // (internalPath(...), parseXSearchParams(...)) is fine.
+          selector:
+            ":not(CallExpression[callee.name=/^(internalPath|parse[A-Z])/]) > CallExpression[callee.type='MemberExpression'][callee.property.name='get'][callee.object.name='searchParams']",
+          message:
+            "Do not read search params directly. Parse them through the feature's schema in model/*.search-params.ts so invalid values fall back instead of reaching the query (see CODING_RULES.md §15 R4).",
+        },
+      ],
+    },
+  },
 ]);

@@ -1,6 +1,7 @@
 "use client";
 
 import { standardSchemaResolver as zodResolver } from "@hookform/resolvers/standard-schema";
+import { internalPath } from "@repo/web-utils/params";
 import { useParams, useSearchParams } from "next/navigation";
 import { type FormEvent, useState } from "react";
 import { useForm, type UseFormReturn } from "react-hook-form";
@@ -71,7 +72,9 @@ export function useUserDetailController(): UserDetailViewModel {
   const session = useSession();
   const searchParams = useSearchParams();
 
-  const backHref = searchParams.get("returnTo") ?? "/users";
+  // `returnTo` is caller-supplied: validate it as an internal path so it cannot
+  // be turned into an off-site redirect (see CODING_RULES.md §20).
+  const backHref = internalPath(searchParams.get("returnTo"), "/users");
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   const user = useAdminUserQuery(userId);

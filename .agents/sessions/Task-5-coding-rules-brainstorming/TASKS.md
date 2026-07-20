@@ -49,6 +49,13 @@ plan_ref: PLAN.md
 | [x] | T-008 | Viết BE rules (5 layers) | done |
 | [x] | T-009 | Viết DB/External Service rules | done |
 | [x] | T-010 | Cập nhật ESLint config + AGENTS.md ref | done |
+| [x] | T-011 | §15 Validation rules + `@repo/web-utils/params` | done |
+| [x] | T-012 | §16 Shared hook composition rules | done |
+| [x] | T-013 | §17 Handler splitting + flow comments | done |
+| [x] | T-014 | §18 Error handling + Next error boundaries | done |
+| [x] | T-015 | §19 Cache rules | done |
+| [x] | T-016 | §20 Security rules + vá open redirect | done |
+| [x] | T-017 | §21 Performance rules | done |
 
 ## Progress chart
 
@@ -59,13 +66,16 @@ plan_ref: PLAN.md
 pie title Card status
   "todo" : 0
   "in_progress" : 0
-  "done" : 10
+  "done" : 17
   "blocked" : 0
 ```
 
 ## Execution order
 
-T-001 → T-002 → T-003 → T-004 → T-005 → T-006 → T-007 → T-008 → T-009 → T-010
+T-001 → … → T-010 → T-011 → T-012 → T-013 → T-014 → T-015 → T-016 → T-017
+
+**Round 2 (round rà soát của user):** ToC đã liệt kê §15–§18 nhưng thân bài dừng ở §14 —
+bốn section chưa từng được viết. User bổ sung thêm §19 cache, §20 security, §21 performance.
 
 ## Notes
 
@@ -259,3 +269,98 @@ T-001 → T-002 → T-003 → T-004 → T-005 → T-006 → T-007 → T-008 → 
 - Verify: `grep CODING_RULES AGENTS.md` → line 54-55 ✅; `npx eslint src/features/users/ui/` → 0 errors, 9 warnings (pre-existing) ✅
 - Flow/comment notes: UI/Model boundary rules được set `warn` thay vì `error` vì có pre-existing violations. Cần nâng lên `error` sau khi migrate code cũ.
 - Files/scope: `apps/admin/eslint.config.mjs`, `apps/web/eslint.config.mjs`, `AGENTS.md`
+
+
+---
+
+### T-011: §15 FE Validation Rules + param helpers
+
+- Status: done
+- Trace: User feedback round 2 — "rules validate đâu? validate params đâu? fallback nếu fail đâu?"
+- Work items:
+  - [x] 1. Viết §15: 3 nhóm dữ liệu vào (identity / presentation / payload), R1–R8
+  - [x] 2. Tạo `packages/web-utils/src/params.ts` — primitives (page, pageSize, enum, text, date, boolean, sortOrder, uuid/numeric/slug) + `parseRouteParams` + `parseSearchParams`
+  - [x] 3. Recovery **theo từng key**: `?page=xx&status=ACTIVE` giữ filter, chỉ page về default
+  - [x] 4. Test 16 case
+- AC: §15 có ≥6 rules, bảng param primitives, DO/DON'T. Helpers có test. ✅ PASS
+- Verify: `pnpm --filter @repo/web-utils test` → 16 passed; `typecheck` clean
+- Notes: User chỉnh phạm vi — params **không phải chỉ là `id`**; helper được viết lại theo hướng tổng quát cho mọi loại param.
+
+---
+
+### T-012: §16 FE Shared Hook Composition Rules
+
+- Status: done
+- Trace: User feedback — "useSession lại đi gọi bên trong 1 hook khác, không được làm thế"
+- Work items:
+  - [x] 1. Viết §16 R1–R5 — shared hook phải phẳng
+  - [x] 2. ESLint `shared-hooks-flat`: `src/hooks/**` cấm import `@/hooks/*` và `@/features/*` (error)
+  - [x] 3. DO = `useUserRoles` (nhận mọi thứ qua tham số); DON'T = sub-hook tự gọi `useSession`
+- AC: §16 có rules + ESLint enforce. ✅ PASS
+- Verify: `npx eslint src/hooks` → 0 errors (hiện chưa file nào vi phạm)
+- Notes: Khảo sát thấy `useSession()` được gọi ở 8 nơi, **tất cả đều là root controller/screen** → chưa vi phạm; rule là để chặn hồi quy.
+
+---
+
+### T-013: §17 Handler Splitting & Flow Comments
+
+- Status: done
+- Trace: User feedback — "feature quá to thì file handlers rất dày, có cơ chế tách file và comment flow chưa?"
+- Work items:
+  - [x] 1. Bảng ngưỡng tách (>250 dòng, >6 nhóm view model, >5 useState)
+  - [x] 2. Nguyên tắc tách theo nhóm hành vi, cấm tên `-utils`/`-helpers`
+  - [x] 3. Format flow comment bắt buộc ở root handler (đánh số bước + sở hữu/không sở hữu)
+  - [x] 4. Ví dụ thật: `use-users-list-controller.ts` 307 dòng → 3 sub-hook
+- AC: §17 có ngưỡng cụ thể + format comment + DO/DON'T. ✅ PASS
+
+---
+
+### T-014: §18 FE Error Handling Strategy + error boundaries
+
+- Status: done
+- Trace: User feedback — "lỗi global, lỗi local, lỗi inline như nào"; và "chú ý status code server side vs client side, check docs cẩn thận"
+- Work items:
+  - [x] 1. §18.1 ba tầng + bảng `ErrorKind` → scope/retry
+  - [x] 2. `packages/web-utils/src/errors.ts` — `classifyError`, `getErrorMessage`, `shouldRetryQuery`
+  - [x] 3. §18.2 boundary Next: tạo `global-error.tsx` + `[locale]/error.tsx` + `[locale]/not-found.tsx` cho **cả admin và web** (trước đó repo **không có file nào**)
+  - [x] 4. `ErrorFallback` dùng chung trong `@repo/web-ui`
+  - [x] 5. §18.3 status code — tra docs Next 16.2
+  - [x] 6. §18.4 bảng phân tầng ai được toast + ESLint cấm `sonner` trong `api/`
+- AC: §18 có 3 tầng, boundary thật chạy được, bảng status code. ✅ PASS
+- Verify: `pnpm --filter admin typecheck` + `--filter web typecheck` clean
+- Notes: **Phát hiện qua docs** — Next 16.2 đổi prop `error.tsx` từ `reset` → `unstable_retry`; đã verify trong `next@16.2.9/dist/client/components/error-boundary.d.ts`. Docs cũng xác nhận: khi đã stream thì status luôn `200`, `notFound()` sau đó chỉ là soft 404 + `noindex`.
+
+---
+
+### T-015: §19 FE Cache Rules
+
+- Status: done
+- Trace: User feedback round 3 — "chưa thấy rules cho xử lý cache"
+- Work items:
+  - [x] 1. R1–R8: key factory bắt buộc, key phải đủ biến (tenant!), staleTime theo loại dữ liệu, invalidate hẹp, clear cache khi đổi danh tính
+  - [x] 2. Bảng staleTime gợi ý, đối chiếu cấu hình thật (30s, `refetchOnWindowFocus: false`)
+- AC: §19 có rules + bảng + DO/DON'T. ✅ PASS
+
+---
+
+### T-016: §20 FE Security Rules + vá open redirect
+
+- Status: done
+- Trace: User feedback round 3 — "và xử lý cho security"
+- Work items:
+  - [x] 1. R1–R10: permission FE chỉ là UX, CSRF qua `webFetch`, cấm token vào localStorage, `dangerouslySetInnerHTML`, `NEXT_PUBLIC_*`
+  - [x] 2. Thêm `internalPath()` chống open redirect + test 7 vector
+  - [x] 3. **Vá lỗ hổng thật**: `use-user-detail-controller.ts` nhận `?returnTo=` không kiểm tra rồi dùng làm `href`
+- AC: §20 có rules + lỗ hổng đã vá. ✅ PASS
+- Verify: test `internalPath` chặn `https://`, `//evil.com`, `/\evil.com`, `javascript:`, control char
+
+---
+
+### T-017: §21 FE Performance Rules
+
+- Status: done
+- Trace: User feedback round 3 — "cuối cùng là rules optimize performance"
+- Work items:
+  - [x] 1. R1–R10: RSC mặc định, Suspense, debounce, placeholderData, React Compiler, waterfall, dynamic import, barrel import
+  - [x] 2. Ví dụ lấy từ code thật (`useDebouncedValue` 500ms, 3 query song song trong user detail)
+- AC: §21 có rules + DO/DON'T. ✅ PASS

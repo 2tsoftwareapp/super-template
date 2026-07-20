@@ -11,6 +11,7 @@ export * from "./dialog";
 export * from "./dropdown";
 export * from "./dropdown-menu";
 export * from "./empty";
+export * from "./error-fallback";
 export * from "./error-state";
 export * from "./input";
 export * from "./input-group";
