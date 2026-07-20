@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import type { TransactionExecutor } from '@repo/api-core';
 import {
   USER_PREFERENCES_LOOKUP,
@@ -13,6 +13,8 @@ import { NOTIFICATION_STREAM_SERVICE, type NotificationStreamServicePort } from 
 
 @Injectable()
 export class NotificationDispatchService {
+  private readonly logger = new Logger(NotificationDispatchService.name);
+
   constructor(
     @Inject(NOTIFICATION_STREAM_SERVICE) private readonly notificationStreamService: NotificationStreamServicePort,
     @Inject(DELIVERIES_REPOSITORY) private readonly deliveriesRepository: DeliveriesRepositoryPort,
@@ -37,8 +39,10 @@ export class NotificationDispatchService {
   private async upsertDeliveries(notification: NotificationView) {
     try {
       await this.upsertDeliveriesForNotification(notification);
-    } catch {
-      // Delivery row upsert is best-effort
+    } catch (error) {
+      this.logger.error(
+        `Failed to upsert deliveries for notification ${notification.id}: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
   }
 

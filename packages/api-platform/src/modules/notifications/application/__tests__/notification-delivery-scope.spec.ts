@@ -175,8 +175,8 @@ describe('NotificationDeliveryUseCase - scope & idempotency', () => {
       await useCase.processDueJobs();
 
       const calls = mockJobsRepository.claimDue.mock.calls;
-      expect(calls[0][0]).toBe(20);
-      expect(calls[1][0]).toBe(20);
+      expect(calls[0]![0]).toBe(20);
+      expect(calls[1]![0]).toBe(20);
     });
   });
 

@@ -361,7 +361,11 @@ export class NotificationDeliveryUseCase {
 
       // Emit SSE after transaction commits — best-effort, inbox state is the source of truth
       for (const { view, organizationId: orgId } of allNotificationViews) {
-        this.dispatchService.emitSSE(view, orgId);
+        try {
+          this.dispatchService.emitSSE(view, orgId);
+        } catch {
+          // SSE is best-effort; inbox state is the source of truth
+        }
       }
     } catch (error) {
       await this.notificationJobsRepository.markFailed(

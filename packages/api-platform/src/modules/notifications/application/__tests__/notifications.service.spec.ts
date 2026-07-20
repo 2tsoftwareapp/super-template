@@ -18,6 +18,9 @@ describe('NotificationDeliveryUseCase', () => {
       listDeliverableUserIdsInOrganization: vi.fn(
         async (_organizationId: string) => ['user-a', 'user-b'],
       ),
+      findById: vi.fn(),
+      filterExistingUserIds: vi.fn(),
+      listDeliverableUserIds: vi.fn(),
     };
 
     const delivery = new NotificationDeliveryUseCase(
@@ -25,6 +28,7 @@ describe('NotificationDeliveryUseCase', () => {
       {} as never,
       {} as never,
       userLookup,
+      {} as never,
       {} as never,
       {} as never,
     );

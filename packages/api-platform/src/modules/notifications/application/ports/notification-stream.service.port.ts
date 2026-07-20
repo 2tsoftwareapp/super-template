@@ -5,6 +5,7 @@ import type { Observable } from 'rxjs';
 export interface NotificationStreamEvent {
   id: string;
   userId: string;
+  organizationId: string | null;
   type: string;
   title: string;
   body: string;

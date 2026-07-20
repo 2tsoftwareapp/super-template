@@ -110,11 +110,11 @@ export class NotificationsController {
 
   @Patch(':id/read')
   @ApiDataResponse(NotificationDto)
-  markRead(
+  async markRead(
     @CurrentUser() user: AuthenticatedRequestUser,
     @Param('id', new ParseUUIDPipe()) notificationId: string,
   ) {
-    return this.inbox.markRead(user, notificationId);
+    return { data: await this.inbox.markRead(user, notificationId) };
   }
 
   @Patch('read-all')

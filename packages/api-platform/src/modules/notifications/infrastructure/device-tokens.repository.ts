@@ -96,10 +96,8 @@ export class DeviceTokensRepository implements DeviceTokensRepositoryPort {
       return;
     }
 
-    for (const token of tokens) {
-      await executor
-        .delete(notificationDeviceTokens)
-        .where(eq(notificationDeviceTokens.token, token));
-    }
+    await executor
+      .delete(notificationDeviceTokens)
+      .where(inArray(notificationDeviceTokens.token, tokens));
   }
 }
