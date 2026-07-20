@@ -4,6 +4,8 @@ import {
   APP_LOGGER,
   type AppLogger,
   ErrorReporterService,
+  TenantContextService,
+  WORKER_DISPATCH_CONTEXT,
 } from '@repo/api-core';
 
 import type { PushMessage, PushNotifier } from '../push.interface';
@@ -33,6 +35,7 @@ export class NotificationDeliveryProcessor {
     private readonly pushNotifier: PushNotifier,
     @Inject(APP_LOGGER) private readonly logger: AppLogger,
     private readonly errorReporter: ErrorReporterService,
+    private readonly tenantContextService: TenantContextService,
   ) {}
 
   @Cron(CronExpression.EVERY_30_SECONDS)
@@ -44,105 +47,110 @@ export class NotificationDeliveryProcessor {
     this.processing = true;
 
     try {
-      // Periodically recover stale PROCESSING deliveries that may be stuck from a crash
-      this.tickCount++;
-      if (this.tickCount >= RECOVERY_INTERVAL) {
-        this.tickCount = 0;
-        try {
-          const recovered = await this.deliveriesRepository.recoverStaleProcessing(5);
-          if (recovered.length > 0) {
-            this.logger.warn(`Recovered ${recovered.length} stale delivery(ies) from PROCESSING`);
+      await this.tenantContextService.runAsync(
+        WORKER_DISPATCH_CONTEXT,
+        async () => {
+          // Periodically recover stale PROCESSING deliveries
+          this.tickCount++;
+          if (this.tickCount >= RECOVERY_INTERVAL) {
+            this.tickCount = 0;
+            try {
+              const recovered = await this.deliveriesRepository.recoverStaleProcessing(5);
+              if (recovered.length > 0) {
+                this.logger.warn(`Recovered ${recovered.length} stale delivery(ies) from PROCESSING`);
+              }
+            } catch (recoveryError) {
+              this.logger.error('Stale delivery recovery failed', {
+                error: recoveryError instanceof Error ? recoveryError.message : String(recoveryError),
+              });
+            }
           }
-        } catch (recoveryError) {
-          this.logger.error('Stale delivery recovery failed', {
-            error: recoveryError instanceof Error ? recoveryError.message : String(recoveryError),
-          });
-        }
-      }
 
-      const deliveries = await this.deliveriesRepository.claimPending(
-        DELIVERY_BATCH_SIZE,
+          const deliveries = await this.deliveriesRepository.claimPending(
+            DELIVERY_BATCH_SIZE,
+          );
+
+          if (deliveries.length === 0) {
+            return;
+          }
+
+          const notificationIds = [...new Set(deliveries.map((d) => d.notificationId))];
+          const tokenIds = [...new Set(deliveries.map((d) => d.deviceTokenId))];
+
+          const [notifications, tokens] = await Promise.all([
+            Promise.all(
+              notificationIds.map((id) => this.notificationsRepository.findById(id)),
+            ),
+            this.deviceTokensRepository.listByIds(tokenIds),
+          ]);
+
+          const notificationMap = new Map(
+            notifications.filter(Boolean).map((n) => [n!.id, n!]),
+          );
+          const tokenMap = new Map(
+            tokens.map((t) => [t.id, t]),
+          );
+
+          for (const delivery of deliveries) {
+            const notification = notificationMap.get(delivery.notificationId);
+            const deviceToken = tokenMap.get(delivery.deviceTokenId);
+
+            if (!notification || !deviceToken) {
+              await this.deliveriesRepository.markFailed(
+                delivery.id,
+                'Missing notification or device token',
+              );
+              continue;
+            }
+
+            const message: PushMessage = {
+              notificationId: notification.id,
+              type: notification.type,
+              title: notification.title,
+              body: notification.body,
+              data: notification.data,
+            };
+
+            const result = await this.pushNotifier.sendToToken(
+              deviceToken.token,
+              message,
+            );
+
+            if (result.success) {
+              await this.deliveriesRepository.markSent(
+                delivery.id,
+                result.providerMessageId,
+              );
+            } else if (result.error === 'INVALID_TOKEN') {
+              await this.deviceTokensRepository.deleteTokens([deviceToken.token]);
+              await this.deliveriesRepository.markFailed(
+                delivery.id,
+                'Invalid device token',
+              );
+              this.logger.warn(
+                `Removed invalid token ${deviceToken.token} for delivery ${delivery.id}`,
+              );
+            } else if (delivery.attempts >= MAX_RETRY_ATTEMPTS) {
+              await this.deliveriesRepository.markFailed(
+                delivery.id,
+                `Max retries exceeded: ${result.error}`,
+              );
+            } else {
+              const backoffMinutes = Math.pow(2, delivery.attempts - 1);
+              const nextAttemptAt = new Date(
+                Date.now() + backoffMinutes * 60 * 1000,
+              );
+              await this.deliveriesRepository.markRetryable(
+                delivery.id,
+                nextAttemptAt,
+              );
+              this.logger.warn(
+                `Delivery ${delivery.id} will retry in ${backoffMinutes}min (attempt ${delivery.attempts}/${MAX_RETRY_ATTEMPTS}): ${result.error}`,
+              );
+            }
+          }
+        },
       );
-
-      if (deliveries.length === 0) {
-        return;
-      }
-
-      const notificationIds = [...new Set(deliveries.map((d) => d.notificationId))];
-      const tokenIds = [...new Set(deliveries.map((d) => d.deviceTokenId))];
-
-      const [notifications, tokens] = await Promise.all([
-        Promise.all(
-          notificationIds.map((id) => this.notificationsRepository.findById(id)),
-        ),
-        this.deviceTokensRepository.listByIds(tokenIds),
-      ]);
-
-      const notificationMap = new Map(
-        notifications.filter(Boolean).map((n) => [n!.id, n!]),
-      );
-      const tokenMap = new Map(
-        tokens.map((t) => [t.id, t]),
-      );
-
-      for (const delivery of deliveries) {
-        const notification = notificationMap.get(delivery.notificationId);
-        const deviceToken = tokenMap.get(delivery.deviceTokenId);
-
-        if (!notification || !deviceToken) {
-          await this.deliveriesRepository.markFailed(
-            delivery.id,
-            'Missing notification or device token',
-          );
-          continue;
-        }
-
-        const message: PushMessage = {
-          notificationId: notification.id,
-          type: notification.type,
-          title: notification.title,
-          body: notification.body,
-          data: notification.data,
-        };
-
-        const result = await this.pushNotifier.sendToToken(
-          deviceToken.token,
-          message,
-        );
-
-        if (result.success) {
-          await this.deliveriesRepository.markSent(
-            delivery.id,
-            result.providerMessageId,
-          );
-        } else if (result.error === 'INVALID_TOKEN') {
-          await this.deviceTokensRepository.deleteTokens([deviceToken.token]);
-          await this.deliveriesRepository.markFailed(
-            delivery.id,
-            'Invalid device token',
-          );
-          this.logger.warn(
-            `Removed invalid token ${deviceToken.token} for delivery ${delivery.id}`,
-          );
-        } else if (delivery.attempts >= MAX_RETRY_ATTEMPTS) {
-          await this.deliveriesRepository.markFailed(
-            delivery.id,
-            `Max retries exceeded: ${result.error}`,
-          );
-        } else {
-          const backoffMinutes = Math.pow(2, delivery.attempts - 1);
-          const nextAttemptAt = new Date(
-            Date.now() + backoffMinutes * 60 * 1000,
-          );
-          await this.deliveriesRepository.markRetryable(
-            delivery.id,
-            nextAttemptAt,
-          );
-          this.logger.warn(
-            `Delivery ${delivery.id} will retry in ${backoffMinutes}min (attempt ${delivery.attempts}/${MAX_RETRY_ATTEMPTS}): ${result.error}`,
-          );
-        }
-      }
     } catch (error) {
       const logContext: Record<string, string> = {
         error: error instanceof Error ? error.message : String(error),

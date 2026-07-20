@@ -106,6 +106,11 @@ export class SendNotificationUseCase {
         );
       }
 
+      // Upsert delivery rows inside the same transaction so a crash after
+      // commit never leaves a notification with no delivery rows (T-002).
+      const view = this.notificationsMapper.toNotificationView(notification);
+      await this.dispatchService.upsertDeliveriesForNotification(view, tx);
+
       return notification;
     };
 
@@ -116,7 +121,7 @@ export class SendNotificationUseCase {
     const view = this.notificationsMapper.toNotificationView(notification);
 
     if (!options?.deferDispatch) {
-      this.dispatchService.dispatch(view, resolvedOrganizationId);
+      this.dispatchService.emitSSE(view, resolvedOrganizationId);
     }
 
     return view;

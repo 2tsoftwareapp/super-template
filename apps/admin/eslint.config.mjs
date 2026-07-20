@@ -14,7 +14,7 @@ export default defineConfig([
   ]),
   {
     // Architecture boundary: route files are entry points only. Data fetching,
-    // mutations, and HTTP live in features/** (see AGENTS.md).
+    // mutations, and HTTP live in features/** (see CODING_RULES.md §3).
     name: "admin/boundary-app-router",
     files: ["src/app/**/*.{ts,tsx}"],
     ignores: ["src/app/api/**"],
@@ -26,12 +26,19 @@ export default defineConfig([
             {
               name: "@tanstack/react-query",
               message:
-                "Route files must not use react-query directly. Move queries/mutations into features/<resource>/ and import the hook.",
+                "Route files must not use react-query directly. Move queries/mutations into features/<resource>/api/ (see CODING_RULES.md §3).",
             },
             {
               name: "@/lib/http",
               message:
-                "Route files must not fetch directly. Move the call into a features/<resource>/*-service.ts.",
+                "Route files must not fetch directly. Move the call into features/<resource>/api/*.api.ts (see CODING_RULES.md §3).",
+            },
+          ],
+          patterns: [
+            {
+              group: ["@/features/*/api/*", "@/features/*/controllers/*"],
+              message:
+                "Route files must not import from features sub-layers directly. Import a Screen component only (see CODING_RULES.md §3).",
             },
           ],
         },
@@ -40,7 +47,7 @@ export default defineConfig([
   },
   {
     // Architecture boundary: features are the inner layer — they must never
-    // depend on route files (app/**).
+    // depend on route files (app/**). See CODING_RULES.md §10 dependency matrix.
     name: "admin/boundary-features",
     files: ["src/features/**/*.{ts,tsx}"],
     rules: {
@@ -51,7 +58,87 @@ export default defineConfig([
             {
               group: ["@/app/*", "**/app/**"],
               message:
-                "features/** must not import from app/** — the dependency points the other way.",
+                "features/** must not import from app/** — the dependency points the other way (see CODING_RULES.md §10).",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    // Architecture boundary: UI components are pure presentational — must not
+    // fetch data or access the api/ or controllers/ layers directly.
+    // See CODING_RULES.md §8.
+    // NOTE: severity is "warn" (not "error") because pre-existing code has
+    // violations. New code must not add new violations; existing violations
+    // should be migrated gradually (promote to "error" once clean).
+    name: "admin/boundary-ui-layer",
+    files: ["src/features/*/ui/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "warn",
+        {
+          patterns: [
+            {
+              group: ["@tanstack/react-query", "swr"],
+              message:
+                "UI components must not fetch data. Move data fetching to features/<resource>/controllers/ (see CODING_RULES.md §8).",
+            },
+            {
+              group: ["@/features/*/api/*"],
+              message:
+                "UI components must not import from the api/ layer. Only screens/controllers import from api/ (see CODING_RULES.md §8 R3).",
+            },
+            {
+              group: ["@/features/*/controllers/*"],
+              message:
+                "UI components must not import handlers. Screens wire handlers → UI (see CODING_RULES.md §8 R3).",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    // Architecture boundary: model/ is the pure domain layer — no React, no
+    // API calls, no side effects. See CODING_RULES.md §7.
+    // NOTE: severity is "warn" — same migration strategy as boundary-ui-layer above.
+    name: "admin/boundary-model-layer",
+    files: ["src/features/*/model/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "warn",
+        {
+          patterns: [
+            {
+              group: ["react", "react-dom", "next/*"],
+              message:
+                "model/ files must not import React or Next.js (see CODING_RULES.md §7 R1).",
+            },
+            {
+              group: ["@/features/*/api/*", "@/features/*/controllers/*", "@/features/*/screens/*", "@/features/*/ui/*"],
+              message:
+                "model/ must not import from other feature sub-layers (see CODING_RULES.md §7 R4).",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    // Architecture boundary: lib/ is infrastructure — must not import from features/.
+    // See CODING_RULES.md §9.2.
+    name: "admin/boundary-lib",
+    files: ["src/lib/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["@/features/*"],
+              message:
+                "lib/ must not import from features/ — dependency points the other way (see CODING_RULES.md §9.2).",
             },
           ],
         },

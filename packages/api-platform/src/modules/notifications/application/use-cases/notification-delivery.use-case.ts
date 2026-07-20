@@ -339,7 +339,13 @@ export class NotificationDeliveryUseCase {
             ? await this.notificationsRepository.findBySourceJobAndUsers(locked.id, batch, tx)
             : [];
 
-          const allInBatch = [...inserted, ...existing];
+          // Dedupe by id: findBySourceJobAndUsers runs in the same transaction
+          // so it also returns rows that were just inserted by createMany above.
+          const allInBatch = [
+            ...new Map(
+              [...inserted, ...existing].map((row) => [row.id, row]),
+            ).values(),
+          ];
 
           for (const notification of allInBatch) {
             await this.dispatchService.upsertDeliveriesForNotification(

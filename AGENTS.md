@@ -51,6 +51,13 @@ and conventions.
 - If `.agents/PRJ_REFERENCE.md` is missing or materially stale, run the `init`
   skill before other lifecycle skills. Use `force` mode only when explicitly
   requested.
+- **`CODING_RULES.md` — architecture coding rules (mandatory for coding tasks):**
+  Read `CODING_RULES.md` (repo root) at the start of **any task that creates or
+  modifies code** in `apps/` or `packages/`. It defines the mandatory layer
+  structure, import boundaries, naming conventions, Do/Don't examples, and
+  anti-patterns for FE (6 layers), BE (Clean Arch 5 layers), and DB/External
+  services. Violations of these rules must be reported and corrected before
+  submitting changes.
 
 ## Architecture
 
