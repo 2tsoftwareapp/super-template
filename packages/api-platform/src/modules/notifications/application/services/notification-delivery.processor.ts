@@ -15,10 +15,12 @@ import { PUSH_NOTIFIER } from '../push.interface';
 
 const DELIVERY_BATCH_SIZE = 50;
 const MAX_RETRY_ATTEMPTS = 5;
+const RECOVERY_INTERVAL = 10; // Run stale recovery every Nth tick (~5min at 30s interval)
 
 @Injectable()
 export class NotificationDeliveryProcessor {
   private processing = false;
+  private tickCount = 0;
 
   constructor(
     @Inject(DELIVERIES_REPOSITORY)
@@ -42,6 +44,22 @@ export class NotificationDeliveryProcessor {
     this.processing = true;
 
     try {
+      // Periodically recover stale PROCESSING deliveries that may be stuck from a crash
+      this.tickCount++;
+      if (this.tickCount >= RECOVERY_INTERVAL) {
+        this.tickCount = 0;
+        try {
+          const recovered = await this.deliveriesRepository.recoverStaleProcessing(5);
+          if (recovered.length > 0) {
+            this.logger.warn(`Recovered ${recovered.length} stale delivery(ies) from PROCESSING`);
+          }
+        } catch (recoveryError) {
+          this.logger.error('Stale delivery recovery failed', {
+            error: recoveryError instanceof Error ? recoveryError.message : String(recoveryError),
+          });
+        }
+      }
+
       const deliveries = await this.deliveriesRepository.claimPending(
         DELIVERY_BATCH_SIZE,
       );

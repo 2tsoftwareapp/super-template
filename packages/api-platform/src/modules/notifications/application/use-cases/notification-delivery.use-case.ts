@@ -125,43 +125,51 @@ export class NotificationDeliveryUseCase {
       status: 'PENDING' as const,
     };
 
-    const idempotentResult = input.idempotencyKey
-      ? await this.notificationJobsRepository.createIdempotent({
-          ...jobValues,
-          idempotencyKey: input.idempotencyKey,
-        })
-      : null;
+    const result = await this.transactionPort.run(async (tx) => {
+      const idempotentResult = input.idempotencyKey
+        ? await this.notificationJobsRepository.createIdempotent({
+            ...jobValues,
+            idempotencyKey: input.idempotencyKey,
+          }, tx)
+        : null;
 
-    const job = idempotentResult
-      ? idempotentResult.value
-      : await this.notificationJobsRepository.create(jobValues);
+      const job = idempotentResult
+        ? idempotentResult.value
+        : await this.notificationJobsRepository.create(jobValues, tx);
 
-    if (!job) {
-      throw new Error('Notification job insert returned no rows');
-    }
+      if (!job) {
+        throw new Error('Notification job insert returned no rows');
+      }
 
-    if (idempotentResult && !idempotentResult.created) {
-      return this.notificationsMapper.toNotificationJobView(job);
-    }
+      if (idempotentResult && !idempotentResult.created) {
+        return { job, created: false };
+      }
 
-    await this.auditWriter.log({
-      actorId: actor.userId,
-      action: 'notification.job.created',
-      entityType: 'notification_job',
-      entityId: job.id,
-      metadata: {
-        audience: input.audience,
-        scheduledAt: scheduledAt.toISOString(),
-      },
-      requestContext,
-        ...(actor.organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: actor.organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
+      await this.auditWriter.log({
+        actorId: actor.userId,
+        action: 'notification.job.created',
+        entityType: 'notification_job',
+        entityId: job.id,
+        metadata: {
+          audience: input.audience,
+          scheduledAt: scheduledAt.toISOString(),
+        },
+        requestContext,
+          ...(actor.organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: actor.organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
+      }, tx);
+
+      return { job, created: true };
     });
 
-    const jobView = this.notificationsMapper.toNotificationJobView(job);
+    if (!result.created) {
+      return this.notificationsMapper.toNotificationJobView(result.job);
+    }
+
+    const jobView = this.notificationsMapper.toNotificationJobView(result.job);
 
     if (scheduledAt.getTime() <= Date.now()) {
-      await this.processJob(job.id);
-      const processed = await this.notificationJobsRepository.findById(job.id);
+      await this.processJob(result.job.id);
+      const processed = await this.notificationJobsRepository.findById(result.job.id);
       return processed
         ? this.notificationsMapper.toNotificationJobView(processed)
         : jobView;
@@ -239,25 +247,29 @@ export class NotificationDeliveryUseCase {
       );
     }
 
-    const cancelled =
-      await this.notificationJobsRepository.markCancelled(jobId);
+    const cancelled = await this.transactionPort.run(async (tx) => {
+      const result =
+        await this.notificationJobsRepository.markCancelled(jobId, tx);
 
-    if (!cancelled) {
-      throw new AppError(
-        ERROR_CODES.NOTIFICATION_JOB_NOT_CANCELLABLE,
-        'Only pending notification jobs can be cancelled',
-        HttpStatus.CONFLICT,
-      );
-    }
+      if (!result) {
+        throw new AppError(
+          ERROR_CODES.NOTIFICATION_JOB_NOT_CANCELLABLE,
+          'Only pending notification jobs can be cancelled',
+          HttpStatus.CONFLICT,
+        );
+      }
 
-    await this.auditWriter.log({
-      actorId: actor.userId,
-      action: 'notification.job.cancelled',
-      entityType: 'notification_job',
-      entityId: jobId,
-      ...(organizationId
-        ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId }
-        : { scope: SYSTEM_SCOPE.PLATFORM }),
+      await this.auditWriter.log({
+        actorId: actor.userId,
+        action: 'notification.job.cancelled',
+        entityType: 'notification_job',
+        entityId: jobId,
+        ...(organizationId
+          ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId }
+          : { scope: SYSTEM_SCOPE.PLATFORM }),
+      }, tx);
+
+      return result;
     });
 
     return this.notificationsMapper.toNotificationJobView(cancelled);

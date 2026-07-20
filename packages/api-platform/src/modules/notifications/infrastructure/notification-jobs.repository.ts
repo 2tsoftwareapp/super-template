@@ -51,6 +51,7 @@ export class NotificationJobsRepository implements NotificationJobsRepositoryPor
       },
       () =>
         this.findByIdempotencyKey(
+          values.organizationId!,
           values.actorId,
           values.idempotencyKey,
           executor,
@@ -69,6 +70,7 @@ export class NotificationJobsRepository implements NotificationJobsRepositoryPor
   }
 
   async findByIdempotencyKey(
+    organizationId: string,
     actorId: string,
     idempotencyKey: string,
     executor: DatabaseExecutor = this.database,
@@ -78,6 +80,7 @@ export class NotificationJobsRepository implements NotificationJobsRepositoryPor
       .from(notificationJobs)
       .where(
         and(
+          eq(notificationJobs.organizationId, organizationId),
           eq(notificationJobs.actorId, actorId),
           eq(notificationJobs.idempotencyKey, idempotencyKey),
         ),

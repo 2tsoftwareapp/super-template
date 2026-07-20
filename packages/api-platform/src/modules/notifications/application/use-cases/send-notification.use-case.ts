@@ -13,6 +13,8 @@ import {
   ORGANIZATION_LOOKUP,
   type OrganizationLookup,
   SYSTEM_SCOPE,
+  TRANSACTION_PORT,
+  type TransactionPort,
 } from '@repo/api-core';
 
 import type {
@@ -38,6 +40,8 @@ export class SendNotificationUseCase {
     private readonly organizationLookup: OrganizationLookup,
     private readonly dispatchService: NotificationDispatchService,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
+    @Inject(TRANSACTION_PORT)
+    private readonly transactionPort: TransactionPort,
   ) {}
 
   async execute(
@@ -67,39 +71,47 @@ export class SendNotificationUseCase {
       );
     }
 
-    const notification = await this.notificationsRepository.create(
-      {
-        organizationId: resolvedOrganizationId,
-        userId: input.userId,
-        type: input.type,
-        title: input.title,
-        body: input.body,
-        data: input.data ?? null,
-      },
-      executor,
-    );
-
-    if (!notification) {
-      throw new Error('Notification insert returned no rows');
-    }
-
-    if (actor) {
-      await this.auditWriter.log(
+    const persist = async (tx: TransactionExecutor) => {
+      const notification = await this.notificationsRepository.create(
         {
-          actorId: actor.userId,
-          action: 'notification.sent',
-          entityType: 'notification',
-          entityId: notification.id,
-          metadata: {
-            userId: input.userId,
-            type: input.type,
-          },
-          requestContext,
-            ...(resolvedOrganizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: resolvedOrganizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
+          organizationId: resolvedOrganizationId,
+          userId: input.userId,
+          type: input.type,
+          title: input.title,
+          body: input.body,
+          data: input.data ?? null,
         },
-        executor,
+        tx,
       );
-    }
+
+      if (!notification) {
+        throw new Error('Notification insert returned no rows');
+      }
+
+      if (actor) {
+        await this.auditWriter.log(
+          {
+            actorId: actor.userId,
+            action: 'notification.sent',
+            entityType: 'notification',
+            entityId: notification.id,
+            metadata: {
+              userId: input.userId,
+              type: input.type,
+            },
+            requestContext,
+              ...(resolvedOrganizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: resolvedOrganizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
+          },
+          tx,
+        );
+      }
+
+      return notification;
+    };
+
+    const notification = executor
+      ? await persist(executor)
+      : await this.transactionPort.run(persist);
 
     const view = this.notificationsMapper.toNotificationView(notification);
 

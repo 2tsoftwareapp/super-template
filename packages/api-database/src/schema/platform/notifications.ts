@@ -151,8 +151,8 @@ export const notificationJobs = pgTable(
       table.scheduledAt,
     ),
     index('notification_jobs_actor_id_idx').on(table.actorId),
-    uniqueIndex('notification_jobs_actor_idempotency_key_unique')
-      .on(table.actorId, table.idempotencyKey)
+    uniqueIndex('notification_jobs_org_actor_idempotency_key_unique')
+      .on(table.organizationId, table.actorId, table.idempotencyKey)
       .where(sql`${table.idempotencyKey} is not null`),
   ],
 );
