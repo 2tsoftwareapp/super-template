@@ -76,6 +76,8 @@ export const notificationDeviceTokens = pgTable(
     lastUsedAt: timestamp('last_used_at', { withTimezone: true })
       .notNull()
       .defaultNow(),
+    disabledAt: timestamp('disabled_at', { withTimezone: true }),
+    disabledReason: text('disabled_reason'),
     ...timestamps,
   },
   (table) => [

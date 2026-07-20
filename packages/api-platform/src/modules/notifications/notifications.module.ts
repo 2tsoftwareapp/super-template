@@ -76,11 +76,15 @@ import {
   ],
   exports: [
     NotificationsService,
+    NotificationDeliveryUseCase,
+    NotificationDeliveryProcessor,
     USER_NOTIFICATION_SENDER,
     NOTIFICATIONS_REPOSITORY,
     NOTIFICATION_JOBS_REPOSITORY,
     DEVICE_TOKENS_REPOSITORY,
+    DELIVERIES_REPOSITORY,
     NOTIFICATION_STREAM_SERVICE,
+    PUSH_NOTIFIER,
   ],
 })
 export class NotificationsModule {}

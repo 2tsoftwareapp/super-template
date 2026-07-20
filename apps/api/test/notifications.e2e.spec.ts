@@ -1,17 +1,32 @@
+import type { TenantContext } from '@repo/api-core';
 import type { INestApplication } from '@nestjs/common';
 
+import { TenantContextService, WORKER_DISPATCH_CONTEXT } from '@repo/api-core';
 import request from 'supertest';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
-import { eq } from 'drizzle-orm';
-import {
-  DATABASE,
-  notificationDeliveries,
-  notificationDeviceTokens,
-  notifications,
-} from '@repo/api-database';
+import { asc, eq } from 'drizzle-orm';
+import { type DatabaseClient, DATABASE, notificationDeliveries, notificationDeviceTokens, notifications } from '@repo/api-database';
 
-import { bearer, createTestApp, loginAs, resetTestDatabase } from './support/test-app';
+import {
+  DELIVERIES_REPOSITORY,
+  NotificationDeliveryProcessor,
+  NotificationDeliveryUseCase,
+  PUSH_NOTIFIER,
+} from '@repo/api-platform';
+
+import {
+  bearer,
+  createTestApp,
+  loginAs,
+  resetTestDatabase,
+} from './support/test-app';
+
+const dbQuery = async <T>(app: INestApplication, fn: (db: DatabaseClient) => Promise<T>): Promise<T> => {
+  const tenantContextService = app.get(TenantContextService);
+  const db = app.get(DATABASE);
+  return tenantContextService.runAsync(WORKER_DISPATCH_CONTEXT as TenantContext, () => fn(db));
+};
 
 describe('Notifications (e2e)', () => {
   let app: INestApplication;
@@ -62,13 +77,18 @@ describe('Notifications (e2e)', () => {
 
       const job = await sendNotification(admin);
 
-      const { NotificationDeliveryUseCase } = require('@repo/api-platform');
       const useCase = app.get(NotificationDeliveryUseCase);
       await useCase.processJob(job.id);
       await useCase.processJob(job.id);
 
       const db = app.get(DATABASE);
-      const rows = await db.select().from(notifications).where(eq(notifications.sourceJobId, job.id));
+      const rows = await dbQuery(app, (db) =>
+        db
+          .select()
+          .from(notifications)
+          .where(eq(notifications.sourceJobId, job.id))
+          .orderBy(asc(notifications.createdAt)),
+      );
       expect(rows.length).toBeGreaterThan(0);
       const uniqueUserIds = new Set(rows.map((r: { userId: string }) => r.userId));
       expect(uniqueUserIds.size).toBe(rows.length);
@@ -83,32 +103,48 @@ describe('Notifications (e2e)', () => {
 
       const job = await sendNotification(admin);
 
-      const { NotificationDeliveryUseCase, NotificationDeliveryProcessor, PUSH_NOTIFIER } = require('@repo/api-platform');
       const useCase = app.get(NotificationDeliveryUseCase);
       await useCase.processJob(job.id);
 
-      const db = app.get(DATABASE);
-      const notificationRows = await db.select().from(notifications).where(eq(notifications.sourceJobId, job.id));
+      const notificationRows = await dbQuery(app, (db) =>
+        db
+          .select()
+          .from(notifications)
+          .where(eq(notifications.sourceJobId, job.id))
+          .orderBy(asc(notifications.createdAt)),
+      );
       expect(notificationRows.length).toBeGreaterThan(0);
 
-      const notificationId = notificationRows[0].id;
-      const deliveries = await db.select().from(notificationDeliveries).where(eq(notificationDeliveries.notificationId, notificationId));
+      const notificationId = notificationRows.find(
+        (r: { userId: string }) => r.userId === admin.userId,
+      )!.id;
+      const deliveries = await dbQuery(app, (db) =>
+        db
+          .select()
+          .from(notificationDeliveries)
+          .where(eq(notificationDeliveries.notificationId, notificationId)),
+      );
       expect(deliveries.length).toBeGreaterThan(0);
-      expect(deliveries[0].status).toBe('PENDING');
-      expect(deliveries[0].deviceTokenId).toBe(device.id);
+      expect(deliveries[0]!.status).toBe('PENDING');
+      expect(deliveries[0]!.deviceTokenId).toBe(device.id);
 
       const processor = app.get(NotificationDeliveryProcessor);
-      const pushNotifier = app.get(PUSH_NOTIFIER);
+      const pushNotifier = app.get<{ sendToToken: Function }>(PUSH_NOTIFIER);
       pushNotifier.sendToToken = async () => ({ success: true, providerMessageId: 'mock-msg-id' });
 
       await processor.processDeliveries();
 
-      const updated = await db.select().from(notificationDeliveries).where(eq(notificationDeliveries.id, deliveries[0].id));
-      expect(updated[0].status).toBe('SENT');
-      expect(updated[0].providerMessageId).toBe('mock-msg-id');
+      const updated = await dbQuery(app, (db) =>
+        db
+          .select()
+          .from(notificationDeliveries)
+          .where(eq(notificationDeliveries.id, deliveries[0]!.id)),
+      );
+      expect(updated[0]!.status).toBe('SENT');
+      expect(updated[0]!.providerMessageId).toBe('mock-msg-id');
     });
 
-    it('removes invalid device tokens and marks delivery as FAILED', async () => {
+    it('disables invalid device tokens and marks delivery as FAILED', async () => {
       const admin = await loginAs(app, 'admin@example.local', 'ChangeMe123!');
 
       const tokenValue = `invalid-token-${Date.now()}`;
@@ -119,23 +155,28 @@ describe('Notifications (e2e)', () => {
         .expect(201);
 
       const job = await sendNotification(admin);
-      const { NotificationDeliveryUseCase, NotificationDeliveryProcessor, PUSH_NOTIFIER } = require('@repo/api-platform');
       const useCase = app.get(NotificationDeliveryUseCase);
       await useCase.processJob(job.id);
 
-      const pushNotifier = app.get(PUSH_NOTIFIER);
+      const pushNotifier = app.get<{ sendToToken: Function }>(PUSH_NOTIFIER);
       pushNotifier.sendToToken = async () => ({
         success: false,
         providerMessageId: null,
         error: 'INVALID_TOKEN',
       });
 
-      const db = app.get(DATABASE);
       const processor = app.get(NotificationDeliveryProcessor);
       await processor.processDeliveries();
 
-      const tokens = await db.select().from(notificationDeviceTokens).where(eq(notificationDeviceTokens.token, tokenValue));
-      expect(tokens).toHaveLength(0);
+      const tokens = await dbQuery(app, (db) =>
+        db
+          .select()
+          .from(notificationDeviceTokens)
+          .where(eq(notificationDeviceTokens.token, tokenValue)),
+      );
+      expect(tokens).toHaveLength(1);
+      expect(tokens[0]!.disabledAt).toBeTruthy();
+      expect(tokens[0]!.disabledReason).toBeTruthy();
     });
   });
 
@@ -146,15 +187,20 @@ describe('Notifications (e2e)', () => {
       const device = await registerDevice(admin);
       const job = await sendNotification(admin);
 
-      const { NotificationDeliveryUseCase, DELIVERIES_REPOSITORY } = require('@repo/api-platform');
       const useCase = app.get(NotificationDeliveryUseCase);
       await useCase.processJob(job.id);
 
-      const db = app.get(DATABASE);
-
-      const notificationRows = await db.select().from(notifications).where(eq(notifications.sourceJobId, job.id));
+      const notificationRows = await dbQuery(app, (db) =>
+        db
+          .select()
+          .from(notifications)
+          .where(eq(notifications.sourceJobId, job.id))
+          .orderBy(asc(notifications.createdAt)),
+      );
       expect(notificationRows.length).toBeGreaterThan(0);
-      const notificationId = notificationRows[0].id;
+      const notificationId = notificationRows.find(
+        (r: { userId: string }) => r.userId === admin.userId,
+      )!.id;
 
       const deliveriesRepo = app.get(DELIVERIES_REPOSITORY);
       const [delivery] = await deliveriesRepo.upsertBatch([
@@ -165,10 +211,15 @@ describe('Notifications (e2e)', () => {
       const nextAttemptAt = new Date(Date.now() + backoffMinutes * 60 * 1000);
       await deliveriesRepo.markRetryable(delivery.id, nextAttemptAt);
 
-      const afterRetry = await db.select().from(notificationDeliveries).where(eq(notificationDeliveries.id, delivery.id));
-      expect(afterRetry[0].status).toBe('PENDING');
-      expect(afterRetry[0].nextAttemptAt).toBeTruthy();
-      expect(new Date(afterRetry[0].nextAttemptAt!).getTime()).toBeGreaterThan(Date.now());
+      const afterRetry = await dbQuery(app, (db) =>
+        db
+          .select()
+          .from(notificationDeliveries)
+          .where(eq(notificationDeliveries.id, delivery.id)),
+      );
+      expect(afterRetry[0]!.status).toBe('PENDING');
+      expect(afterRetry[0]!.nextAttemptAt).toBeTruthy();
+      expect(new Date(afterRetry[0]!.nextAttemptAt!).getTime()).toBeGreaterThan(Date.now());
 
       const claimed = await deliveriesRepo.claimPending(100);
       expect(claimed.find((c: { id: string }) => c.id === delivery.id)).toBeFalsy();
@@ -182,35 +233,48 @@ describe('Notifications (e2e)', () => {
       const device = await registerDevice(admin);
       const job = await sendNotification(admin);
 
-      const { NotificationDeliveryUseCase, DELIVERIES_REPOSITORY } = require('@repo/api-platform');
       const useCase = app.get(NotificationDeliveryUseCase);
       await useCase.processJob(job.id);
 
-      const db = app.get(DATABASE);
-
-      const notificationRows = await db.select().from(notifications).where(eq(notifications.sourceJobId, job.id));
+      const notificationRows = await dbQuery(app, (db) =>
+        db
+          .select()
+          .from(notifications)
+          .where(eq(notifications.sourceJobId, job.id))
+          .orderBy(asc(notifications.createdAt)),
+      );
       expect(notificationRows.length).toBeGreaterThan(0);
-      const notificationId = notificationRows[0].id;
+      const notificationId = notificationRows.find(
+        (r: { userId: string }) => r.userId === admin.userId,
+      )!.id;
 
       const deliveriesRepo = app.get(DELIVERIES_REPOSITORY);
       const [delivery] = await deliveriesRepo.upsertBatch([
         { notificationId, deviceTokenId: device.id, channel: 'fcm' },
       ]);
 
-      await db.update(notificationDeliveries)
-        .set({
-          status: 'PROCESSING',
-          updatedAt: new Date(Date.now() - 5 * 60 * 1000),
-        })
-        .where(eq(notificationDeliveries.id, delivery.id));
+      await dbQuery(app, (db) =>
+        db
+          .update(notificationDeliveries)
+          .set({
+            status: 'PROCESSING',
+            updatedAt: new Date(Date.now() - 5 * 60 * 1000),
+          })
+          .where(eq(notificationDeliveries.id, delivery.id)),
+      );
 
       const recovered = await deliveriesRepo.recoverStaleProcessing(1);
 
       expect(recovered.length).toBeGreaterThan(0);
       expect(recovered.find((r: { id: string }) => r.id === delivery.id)).toBeTruthy();
 
-      const after = await db.select().from(notificationDeliveries).where(eq(notificationDeliveries.id, delivery.id));
-      expect(after[0].status).toBe('PENDING');
+      const after = await dbQuery(app, (db) =>
+        db
+          .select()
+          .from(notificationDeliveries)
+          .where(eq(notificationDeliveries.id, delivery.id)),
+      );
+      expect(after[0]!.status).toBe('PENDING');
     });
   });
 });

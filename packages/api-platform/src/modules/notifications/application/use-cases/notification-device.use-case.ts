@@ -36,9 +36,10 @@ export class NotificationDeviceUseCase {
   }
 
   async unregisterDevice(user: AuthenticatedRequestUser, token: string) {
-    const deviceToken = await this.deviceTokensRepository.deleteByToken(
+    const deviceToken = await this.deviceTokensRepository.disableByToken(
       user.userId,
       token,
+      'User unregistered device',
     );
 
     if (!deviceToken) {

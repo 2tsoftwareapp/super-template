@@ -103,6 +103,14 @@ export class NotificationDeliveryProcessor {
               continue;
             }
 
+            if (notification.userId !== deviceToken.userId) {
+              await this.deliveriesRepository.markFailed(
+                delivery.id,
+                'Notification owner does not match device token owner',
+              );
+              continue;
+            }
+
             const message: PushMessage = {
               notificationId: notification.id,
               type: notification.type,
@@ -122,13 +130,13 @@ export class NotificationDeliveryProcessor {
                 result.providerMessageId,
               );
             } else if (result.error === 'INVALID_TOKEN') {
-              await this.deviceTokensRepository.deleteTokens([deviceToken.token]);
+              await this.deviceTokensRepository.disableTokens([deviceToken.token], 'FCM returned INVALID_TOKEN');
               await this.deliveriesRepository.markFailed(
                 delivery.id,
                 'Invalid device token',
               );
               this.logger.warn(
-                `Removed invalid token ${deviceToken.token} for delivery ${delivery.id}`,
+                `Disabled invalid token ${deviceToken.token} for delivery ${delivery.id}`,
               );
             } else if (delivery.attempts >= MAX_RETRY_ATTEMPTS) {
               await this.deliveriesRepository.markFailed(

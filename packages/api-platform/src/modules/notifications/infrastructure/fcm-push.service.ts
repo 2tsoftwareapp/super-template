@@ -71,7 +71,7 @@ export class FcmPushService implements PushNotifier {
     });
 
     if (invalidTokens.length > 0) {
-      await this.deviceTokensRepository.deleteTokens(invalidTokens);
+      await this.deviceTokensRepository.disableTokens(invalidTokens, 'Invalid FCM token');
       this.logger.warn(
         `Removed ${invalidTokens.length} invalid FCM token(s) for user ${userId}`,
       );
@@ -95,13 +95,12 @@ export class FcmPushService implements PushNotifier {
 
       return { success: true, providerMessageId: response || null };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorCode = (error as { code?: string }).code ?? '';
       const isInvalidToken =
-        errorMessage.includes('registration-token-not-registered') ||
-        errorMessage.includes('invalid-argument') ||
-        errorMessage.includes('not-found') ||
-        errorMessage.includes('unregistered');
+        errorCode === 'messaging/registration-token-not-registered' ||
+        errorCode === 'messaging/invalid-registration-token';
 
+      const errorMessage = error instanceof Error ? error.message : String(error);
       return {
         success: false,
         providerMessageId: null,

@@ -1,6 +1,10 @@
 import { Module } from '@nestjs/common';
 
 export { PlatformPortsModule } from './platform-ports.module';
+export { NotificationDeliveryUseCase } from './modules/notifications/application/use-cases/notification-delivery.use-case';
+export { NotificationDeliveryProcessor } from './modules/notifications/application/services/notification-delivery.processor';
+export { DELIVERIES_REPOSITORY } from './modules/notifications/application/ports/deliveries.repository.port';
+export { PUSH_NOTIFIER } from './modules/notifications/application/push.interface';
 
 import { ActivitiesModule } from './modules/activities/activities.module';
 import { AttachmentsModule } from './modules/attachments/attachments.module';

@@ -6,7 +6,7 @@ import type {
 import { Inject, Injectable } from '@nestjs/common';
 import { DATABASE } from '@repo/api-database';
 import { notificationDeviceTokens } from '@repo/api-database';
-import { and, eq, inArray } from 'drizzle-orm';
+import { and, eq, inArray, isNull } from 'drizzle-orm';
 
 import type { DeviceTokensRepositoryPort } from '../application/ports/device-tokens.repository.port';
 
@@ -38,6 +38,8 @@ export class DeviceTokensRepository implements DeviceTokensRepositoryPort {
           userId: values.userId,
           platform: values.platform,
           lastUsedAt: new Date(),
+          disabledAt: null,
+          disabledReason: null,
           updatedAt: new Date(),
         },
       })
@@ -53,7 +55,12 @@ export class DeviceTokensRepository implements DeviceTokensRepositoryPort {
     return executor
       .select()
       .from(notificationDeviceTokens)
-      .where(eq(notificationDeviceTokens.userId, userId));
+      .where(
+        and(
+          eq(notificationDeviceTokens.userId, userId),
+          isNull(notificationDeviceTokens.disabledAt),
+        ),
+      );
   }
 
   async listByIds(
@@ -67,16 +74,45 @@ export class DeviceTokensRepository implements DeviceTokensRepositoryPort {
     return executor
       .select()
       .from(notificationDeviceTokens)
-      .where(inArray(notificationDeviceTokens.id, ids));
+      .where(
+        and(
+          inArray(notificationDeviceTokens.id, ids),
+          isNull(notificationDeviceTokens.disabledAt),
+        ),
+      );
   }
 
-  async deleteByToken(
-    userId: string,
+  async listActiveByToken(
     token: string,
     executor: DatabaseExecutor = this.database,
   ) {
     const [deviceToken] = await executor
-      .delete(notificationDeviceTokens)
+      .select()
+      .from(notificationDeviceTokens)
+      .where(
+        and(
+          eq(notificationDeviceTokens.token, token),
+          isNull(notificationDeviceTokens.disabledAt),
+        ),
+      )
+      .limit(1);
+
+    return deviceToken ?? null;
+  }
+
+  async disableByToken(
+    userId: string,
+    token: string,
+    reason: string,
+    executor: DatabaseExecutor = this.database,
+  ) {
+    const [deviceToken] = await executor
+      .update(notificationDeviceTokens)
+      .set({
+        disabledAt: new Date(),
+        disabledReason: reason,
+        updatedAt: new Date(),
+      })
       .where(
         and(
           eq(notificationDeviceTokens.userId, userId),
@@ -88,8 +124,9 @@ export class DeviceTokensRepository implements DeviceTokensRepositoryPort {
     return deviceToken ?? null;
   }
 
-  async deleteTokens(
+  async disableTokens(
     tokens: string[],
+    reason: string,
     executor: DatabaseExecutor = this.database,
   ) {
     if (tokens.length === 0) {
@@ -97,7 +134,12 @@ export class DeviceTokensRepository implements DeviceTokensRepositoryPort {
     }
 
     await executor
-      .delete(notificationDeviceTokens)
+      .update(notificationDeviceTokens)
+      .set({
+        disabledAt: new Date(),
+        disabledReason: reason,
+        updatedAt: new Date(),
+      })
       .where(inArray(notificationDeviceTokens.token, tokens));
   }
 }
