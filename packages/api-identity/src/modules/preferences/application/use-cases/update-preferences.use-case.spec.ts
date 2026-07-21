@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { ERROR_CODES } from '@repo/api-core';
 
+import { PreferencesMapper } from '../preferences.mapper';
 import { ResetPreferencesUseCase } from './reset-preferences.use-case';
 import { UpdatePreferencesUseCase } from './update-preferences.use-case';
 
@@ -14,6 +15,7 @@ describe('UpdatePreferencesUseCase', () => {
       {
         log: vi.fn(),
       } as never,
+      new PreferencesMapper(),
     );
 
     await expect(
@@ -49,6 +51,7 @@ describe('UpdatePreferencesUseCase', () => {
     const useCase = new ResetPreferencesUseCase(
       repository as never,
       auditWriter as never,
+      new PreferencesMapper(),
     );
 
     const result = await useCase.execute('user-1');
