@@ -7,11 +7,11 @@
 
 | Field | Value |
 |---|---|
-| Status | `execution complete` → next `review` |
+| Status | `review` → **Ready with risks** |
 | Goal | Fix CODING_RULES violations (§§15–21) + harden admin features |
 | Progress | **17/17** cards done · 0 blocked · `COMPLETE: yes` |
-| Top risk / blocker | None open for execution |
-| Next action | Chạy skill `review` → viết `REVIEW.md` |
+| Open findings | Medium 2 · Low 3 (see `REVIEW.md`) |
+| Next action | Skill `done` (hoặc chạy full `pnpm test` trước khi push) |
 
 ## Progress chart
 
@@ -44,12 +44,12 @@ flowchart LR
 |---|---|---|
 | `INVESTIGATE.md` | Root cause analysis | current |
 | `PLAN.md` | Strategy | current |
-| `TASKS.md` | Work | **synced 17/17 done** |
-| `EXECUTION.md` | Execution log | **current** |
-| `REVIEW.md` | Post-execution review | missing → next |
+| `TASKS.md` | Work | synced 17/17 done |
+| `EXECUTION.md` | Execution log | current |
+| `REVIEW.md` | Post-execution review | **current** |
 
 ## Developer notes
 
-- Branch: `main` (direct mode)
-- Related commits: `14a2509`, `c1afae6`, `4a14770` + upcoming execution commit
-- Verify: `pnpm --filter admin typecheck` · `pnpm --filter admin test`
+- Branch: `main` (direct) · ahead of origin
+- Latest: `30039a4` finish session tasks + verify
+- Recommendation: Ready with risks — xem `REVIEW.md` M-001/M-002
