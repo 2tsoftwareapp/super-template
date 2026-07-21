@@ -21,6 +21,7 @@ export function useMailDeliveriesQuery(params: MailDeliveriesParams) {
   return useQuery({
     queryKey: mailKeys.deliveries({ templateKey: params.templateKey, status: params.status, page: params.page }),
     queryFn: () => fetchMailDeliveries(params),
+    placeholderData: (previous) => previous,
   });
 }
 

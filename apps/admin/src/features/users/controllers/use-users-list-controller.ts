@@ -29,7 +29,7 @@ import {
 import { useSession } from "@/hooks/use-session";
 import { usePathname, useRouter } from "@/i18n/navigation";
 
-import { useCreateUserDrawerController } from "./use-create-user-drawer-controller";
+import { useCreateUserDrawer } from "./use-create-user-drawer";
 import { useUsersBulkActions } from "./use-users-bulk-actions";
 import { useUsersConfirmBlock } from "./use-users-confirm-block";
 
@@ -171,7 +171,7 @@ export function useUsersListController(): UsersListViewModel {
     session.data?.data.permissions,
   );
 
-  const drawerController = useCreateUserDrawerController({
+  const drawerController = useCreateUserDrawer({
     open: showCreate,
     actorRoles,
     actorOrganizationId,

@@ -21,7 +21,9 @@ export function useSwitchOrganizationMutation() {
     mutationFn: (organizationId: string) => switchOrganization(organizationId),
     onSuccess: async () => {
       // Every cached resource belongs to the previous tenant — drop it all.
-      await queryClient.invalidateQueries();
+      // queryClient.clear() prevents data from the old org leaking into the
+      // new context (§19 R6).
+      queryClient.clear();
           },
     onError: () => {},
   });

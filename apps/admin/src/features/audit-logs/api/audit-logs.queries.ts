@@ -14,5 +14,6 @@ export function useAuditLogsQuery(params: AuditLogsParams) {
       page: params.page,
     }),
     queryFn: () => fetchAuditLogs(params),
+    placeholderData: (previous) => previous,
   });
 }

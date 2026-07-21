@@ -7,19 +7,19 @@ import { useCreateUser } from "@/features/users/api/users.mutations";
 import { useAdminRolesQuery } from "@/features/users/api/users.queries";
 import { filterRolesForOrganization, getAssignableRoles } from "@/lib/roles";
 
-interface UseCreateUserDrawerControllerOptions {
+interface UseCreateUserDrawerOptions {
   open: boolean;
   actorRoles: string[];
   actorOrganizationId: string | null | undefined;
   onClose: () => void;
 }
 
-export function useCreateUserDrawerController({
+export function useCreateUserDrawer({
   open: _open,
   actorRoles,
   actorOrganizationId,
   onClose,
-}: UseCreateUserDrawerControllerOptions) {
+}: UseCreateUserDrawerOptions) {
   const rolesQuery = useAdminRolesQuery();
   const organizationsQuery = useMyOrganizationsQuery();
 

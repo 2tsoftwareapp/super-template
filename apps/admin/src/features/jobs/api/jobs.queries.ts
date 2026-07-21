@@ -15,6 +15,7 @@ export function useJobsQuery(params: JobsParams) {
   return useQuery({
     queryKey: jobsKeys.list({ status: params.status, type: params.type, page: params.page }),
     queryFn: () => fetchJobs(params),
+    placeholderData: (previous) => previous,
   });
 }
 

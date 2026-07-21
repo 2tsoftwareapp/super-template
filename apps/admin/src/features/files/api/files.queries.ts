@@ -14,6 +14,7 @@ export function useFilesQuery(params: FilesParams) {
   return useQuery({
     queryKey: filesKeys.list({ search: params.search, mimeFilter: params.mimeFilter, page: params.page }),
     queryFn: () => fetchFiles(params),
+    placeholderData: (previous) => previous,
   });
 }
 

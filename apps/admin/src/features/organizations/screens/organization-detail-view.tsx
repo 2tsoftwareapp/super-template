@@ -1,6 +1,8 @@
 "use client";
 
-import { useParams, useSearchParams } from "next/navigation";
+import { notFound, useParams, useSearchParams } from "next/navigation";
+import { internalPath, parseRouteParams, uuidParam } from "@repo/web-utils/params";
+import { z } from "zod";
 import { useState } from "react";
 import { Badge } from "@repo/web-ui/badge";
 import { Button } from "@repo/web-ui/button";
@@ -47,12 +49,16 @@ const organizationsResource = adminResources.find((r) => r.id === "organizations
 
 export function OrganizationDetailView() {
   const params = useParams<{ id: string }>();
-  const orgId = params.id;
+  const parsedId = parseRouteParams(z.object({ id: uuidParam }), params);
+  if (!parsedId.ok) {
+    notFound();
+  }
+  const orgId = parsedId.data.id;
   const router = useRouter();
   const session = useSession();
 
   const searchParams = useSearchParams();
-  const backHref = searchParams.get("returnTo") ?? "/organizations";
+  const backHref = internalPath(searchParams.get("returnTo"), "/organizations");
 
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);

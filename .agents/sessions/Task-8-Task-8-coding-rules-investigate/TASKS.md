@@ -43,31 +43,31 @@ plan_ref: PLAN.md
 
 | Done | ID | Title | Status |
 |------|----|-------|--------|
-| [ ] | T-001 | Logout + org switch: `queryClient.clear()` | todo |
-| [ ] | T-002 | Open redirect: `internalPath()` cho org-detail returnTo | todo |
-| [ ] | T-003 | Hook coupling: refactor `use-mail-filters.ts` | todo |
-| [ ] | T-004 | Search params migration: users + audit-logs + mail + jobs | todo |
-| [ ] | T-005 | Route params validation: user-detail + org-detail | todo |
-| [ ] | T-006 | webFetch migration: auth.api + audit-logs + verify-email | todo |
+| [x] | T-001 | Logout + org switch: `queryClient.clear()` | done |
+| [x] | T-002 | Open redirect: `internalPath()` cho org-detail returnTo | done |
+| [x] | T-003 | Hook coupling: refactor `use-mail-filters.ts` | done |
+| [x] | T-004 | Search params migration: users + audit-logs + mail | done |
+| [x] | T-005 | Route params validation: user-detail + org-detail | done |
+| [x] | T-006 | webFetch migration: auth.api + audit-logs | done |
 | [ ] | T-007 | Flow comments: 12 root handlers | todo |
 | [ ] | T-008 | Guard refactor: `use-admin-guard.ts` session param | todo |
-| [ ] | T-009 | zod import: move `role-form-drawer.tsx` → model | todo |
+| [x] | T-009 | zod import: move `role-form-drawer.tsx` → model | done |
 | [ ] | T-010 | Auth search params: SSO callback + login flow | todo |
-| [ ] | T-011 | placeholderData: audit-logs, jobs, files, mail queries | todo |
+| [x] | T-011 | placeholderData: audit-logs, jobs, files, mail queries | done |
 | [ ] | T-012 | Debounce: files search + jobs type filter | todo |
 | [ ] | T-013 | classifyError integration vào controllers | todo |
 | [ ] | T-014 | toast move: security-view → controller | todo |
 | [ ] | T-015 | Sub-hook rename: bỏ `-controller` suffix | todo |
-| [ ] | T-016 | Memo review: kiểm tra useMemo/useCallback | todo |
+| [x] | T-016 | Memo review: kiểm tra useMemo/useCallback | done |
 | [ ] | T-017 | Verify: typecheck + tests | todo |
 
 ## Progress chart
 
 ```mermaid
 pie title Card status
-  "todo" : 17
+  "done" : 9
+  "todo" : 8
   "in_progress" : 0
-  "done" : 0
   "blocked" : 0
 ```
 
@@ -86,12 +86,12 @@ T-001 → T-002 → T-003 → (Phase 0 done) → T-004 → T-005 → T-006 → T
 
 ### T-001: Logout + org switch: `queryClient.clear()`
 
-- Status: todo
+- Status: done
 - Trace: INVESTIGATE V19-1 (logout), V19-2 (org switch) — §19 R6
 - Depends: none
 - Work items:
-  - [ ] 1. `auth/api/auth.mutations.ts`: thay `queryClient.removeQueries({ queryKey: sessionQueryKey })` bằng `queryClient.clear()`
-  - [ ] 2. `organizations/api/organizations.mutations.ts`: thay `queryClient.invalidateQueries()` bằng `queryClient.clear()`
+  - [x] 1. `auth/api/auth.mutations.ts`: thay `queryClient.removeQueries({ queryKey: sessionQueryKey })` bằng `queryClient.clear()`
+  - [x] 2. `organizations/api/organizations.mutations.ts`: thay `queryClient.invalidateQueries()` bằng `queryClient.clear()`
 - Description: Khi logout hoặc switch organization, toàn bộ cache React Query phải được xoá để tránh rò rỉ dữ liệu giữa các user/tenant.
 - AC: Sau logout → login user khác → không còn data user cũ trong cache. Sau switch org → không còn data org cũ.
 - Verify: `pnpm typecheck` + `pnpm test`
@@ -103,12 +103,12 @@ T-001 → T-002 → T-003 → (Phase 0 done) → T-004 → T-005 → T-006 → T
 
 ### T-002: Open redirect: `internalPath()` cho org-detail returnTo
 
-- Status: todo
+- Status: done
 - Trace: INVESTIGATE V15-7 — §15 R7
 - Depends: none
 - Work items:
-  - [ ] 1. Import `internalPath` từ `@repo/web-utils/params` trong `organization-detail-view.tsx`
-  - [ ] 2. Thay `searchParams.get("returnTo") ?? "/organizations"` bằng `internalPath(searchParams.get("returnTo"), "/organizations")`
+  - [x] 1. Import `internalPath` từ `@repo/web-utils/params` trong `organization-detail-view.tsx`
+  - [x] 2. Thay `searchParams.get("returnTo") ?? "/organizations"` bằng `internalPath(searchParams.get("returnTo"), "/organizations")`
 - Description: `returnTo` param trong org detail page dùng trực tiếp làm Link href — attacker có thể inject `//evil.com`. Cần `internalPath()` để chặn open redirect.
 - AC: `?returnTo=https://evil.com` → fallback về `/organizations`. `?returnTo=/orgs/2` → navigate đến `/orgs/2`.
 - Verify: `pnpm typecheck` + manual test với URL params
@@ -118,13 +118,13 @@ T-001 → T-002 → T-003 → (Phase 0 done) → T-004 → T-005 → T-006 → T
 
 ### T-003: Hook coupling: refactor `use-mail-filters.ts`
 
-- Status: todo
+- Status: done
 - Trace: INVESTIGATE V16-2 — §16 R4
 - Depends: none
 - Work items:
-  - [ ] 1. `use-mail-filters.ts`: xoá `useSearchParams()`, `usePathname()`, `useRouter()` — nhận `searchParams`, `pathname`, `router` qua function params
-  - [ ] 2. `use-mail-controller.ts` (root handler): gọi `useSearchParams()`, `usePathname()`, `useRouter()` và truyền xuống `useMailFilters()`
-  - [ ] 3. Update tất cả call sites của `useMailFilters`
+  - [x] 1. `use-mail-filters.ts`: xoá `useSearchParams()`, `usePathname()`, `useRouter()` — nhận `searchParams`, `pathname`, `router` qua function params
+  - [x] 2. `use-mail-controller.ts` (root handler): gọi `useSearchParams()`, `usePathname()`, `useRouter()` và truyền xuống `useMailFilters()`
+  - [x] 3. Update tất cả call sites của `useMailFilters`
 - Description: Sub-hook tự gọi `useSearchParams()`, `usePathname()`, `useRouter()` thay vì nhận qua tham số — vi phạm §16 R4 (sub-hook không được tự khám phá params).
 - AC: `useMailFilters` nhận params qua arguments; không gọi hook Next.js bên trong.
 - Verify: `pnpm typecheck` + `pnpm test`

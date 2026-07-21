@@ -1,4 +1,11 @@
 import { DEFAULT_PAGE_SIZE } from "@repo/config";
+import {
+  enumParam,
+  pageParam,
+  parseSearchParams,
+  searchTextParam,
+} from "@repo/web-utils/params";
+import { z } from "zod";
 
 export const DELIVERY_PAGE_SIZE = DEFAULT_PAGE_SIZE;
 
@@ -8,11 +15,24 @@ export interface Filters {
   page: number;
 }
 
+const mailFiltersSchema = z.object({
+  status: searchTextParam(50),
+  templateKey: searchTextParam(100),
+  page: pageParam,
+});
+
+const MAIL_FILTERS_FALLBACK = {
+  status: "",
+  templateKey: "",
+  page: 1,
+} as const;
+
 export function parseFilters(sp: URLSearchParams): Filters {
+  const parsed = parseSearchParams(mailFiltersSchema, sp, MAIL_FILTERS_FALLBACK);
   return {
-    status: sp.get("status") ?? "",
-    templateKey: sp.get("templateKey") ?? "",
-    page: Math.max(1, Number(sp.get("page")) || 1),
+    status: parsed.data.status,
+    templateKey: parsed.data.templateKey,
+    page: parsed.data.page,
   };
 }
 

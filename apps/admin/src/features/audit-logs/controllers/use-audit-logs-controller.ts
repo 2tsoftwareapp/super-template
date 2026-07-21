@@ -7,6 +7,10 @@ import { toast } from "sonner";
 
 import type { AuditLogDto } from "@/lib/api-types";
 
+import {
+  exportAuditLogs,
+  downloadAuditLogExport,
+} from "@/features/audit-logs/api/audit-logs.api";
 import { useAuditLogsQuery } from "@/features/audit-logs/api/audit-logs.queries";
 import {
   type AuditLogsFilters,
@@ -82,19 +86,11 @@ export function useAuditLogsController(): AuditLogsViewModel {
   const onExport = async () => {
     setIsExporting(true);
     try {
-      const exportResponse = await fetch("/api/bff/admin/audit-logs/export", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          from: filters.from || undefined,
-          to: filters.to || undefined,
-          q: q || undefined,
-        }),
+      const { data } = await exportAuditLogs({
+        from: filters.from || undefined,
+        to: filters.to || undefined,
+        q: q || undefined,
       });
-      if (!exportResponse.ok) throw new Error("Export failed");
-      const { data } = (await exportResponse.json()) as {
-        data: { fileId: string; truncated: boolean };
-      };
 
       if (data.truncated) {
         toast.warning(
@@ -102,11 +98,7 @@ export function useAuditLogsController(): AuditLogsViewModel {
         );
       }
 
-      const downloadResponse = await fetch(
-        `/api/bff/admin/audit-logs/exports/${data.fileId}/download`,
-      );
-      if (!downloadResponse.ok) throw new Error("Download failed");
-      const blob = await downloadResponse.blob();
+      const blob = await downloadAuditLogExport(data.fileId);
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;

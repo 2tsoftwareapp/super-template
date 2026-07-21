@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
 
 import type { MfaSetupResponse } from "@/features/security/model/security.schemas";
 
@@ -89,6 +90,8 @@ export function useMfaController() {
       setView("idle");
       setRecoveryCodes([]);
     },
+    onCopyRecoveryCodes: () => toast.success("Recovery codes copied to clipboard"),
+    onCopyRecoveryCodesError: () => toast.error("Could not copy recovery codes"),
     isSettingUp: setupMutation.isPending,
     isVerifying: confirmMutation.isPending,
     isDisabling: disableMutation.isPending,

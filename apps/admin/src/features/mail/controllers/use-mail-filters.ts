@@ -1,19 +1,17 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import type { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useCallback, useState } from "react";
-
-import { usePathname, useRouter } from "@/i18n/navigation";
 
 import type { Filters } from "../model/mail-schemas";
 
 import { parseFilters } from "../model/mail-schemas";
 
-export function useMailFilters() {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const pathname = usePathname();
-
+export function useMailFilters(
+  searchParams: URLSearchParams,
+  pathname: string,
+  router: AppRouterInstance,
+) {
   const [filters, setFilters] = useState<Filters>(() =>
     parseFilters(new URLSearchParams(searchParams.toString())),
   );

@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import { useDebouncedValue } from "@repo/web-hooks/use-debounced-value";
+
 import type { FileDto } from "@/lib/api-types";
 
 import { getFileDownloadUrl } from "@/features/files/api/files.api";
@@ -38,8 +40,10 @@ export function useFilesController(): FilesViewModel {
   );
   const [deleteTarget, setDeleteTarget] = useState<FileDto | null>(null);
 
+  const debouncedSearch = useDebouncedValue(search, 400);
+
   const files = useFilesQuery({
-    search,
+    search: debouncedSearch,
     mimeFilter,
     page,
   });

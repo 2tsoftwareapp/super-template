@@ -1,3 +1,11 @@
+import {
+  dateParam,
+  pageParam,
+  parseSearchParams,
+  searchTextParam,
+} from "@repo/web-utils/params";
+import { z } from "zod";
+
 /**
  * Pure audit-logs list state: filter shape, URL parsing/serialization and
  * action formatting. Framework-free (no React / HTTP / router).
@@ -9,12 +17,32 @@ export interface AuditLogsFilters {
   page: number;
 }
 
+const auditLogsFiltersSchema = z.object({
+  from: dateParam,
+  to: dateParam,
+  q: searchTextParam(500),
+  page: pageParam,
+});
+
+const AUDIT_LOGS_FILTERS_FALLBACK = {
+  from: undefined,
+  to: undefined,
+  q: "",
+  page: 1,
+} as const;
+
 export function parseAuditLogsFilters(sp: URLSearchParams): AuditLogsFilters {
+  const parsed = parseSearchParams(
+    auditLogsFiltersSchema,
+    sp,
+    AUDIT_LOGS_FILTERS_FALLBACK,
+  );
+
   return {
-    from: sp.get("from") ?? "",
-    to: sp.get("to") ?? "",
-    q: sp.get("q") ?? "",
-    page: Math.max(1, Number(sp.get("page")) || 1),
+    from: parsed.data.from ?? "",
+    to: parsed.data.to ?? "",
+    q: parsed.data.q,
+    page: parsed.data.page,
   };
 }
 

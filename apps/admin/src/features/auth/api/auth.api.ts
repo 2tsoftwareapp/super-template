@@ -9,7 +9,6 @@ import type { AdminLoginInput, MfaChallengeInput } from "../model/auth.schemas";
 import {
   AUTH_FLOW_ERROR_CODES,
   AUTH_FLOW_RESULTS,
-  HTTP_CREDENTIALS,
   HTTP_METHODS,
 } from "../model/auth.constants";
 import { AuthFlowError } from "../model/auth.errors";
@@ -110,17 +109,10 @@ export async function logoutAdmin() {
 }
 
 export async function startSso(provider: SsoProvider, redirectUri: string) {
-  const response = await fetch(apiPaths.auth.ssoStart(provider, redirectUri), {
-    credentials: HTTP_CREDENTIALS.sameOrigin,
-  });
-
-  if (!response.ok) {
-    throw new AuthFlowError(AUTH_FLOW_ERROR_CODES.ssoStartFailed);
-  }
-
-  const payload = (await response.json()) as {
+  const payload = await webFetch<{
     data?: { authorizationUrl?: string };
-  };
+  }>(apiPaths.auth.ssoStart(provider, redirectUri));
+
   const authorizationUrl = payload.data?.authorizationUrl;
 
   if (!authorizationUrl) {

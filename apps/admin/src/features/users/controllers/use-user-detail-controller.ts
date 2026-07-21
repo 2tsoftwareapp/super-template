@@ -1,8 +1,9 @@
 "use client";
 
 import { standardSchemaResolver as zodResolver } from "@hookform/resolvers/standard-schema";
-import { internalPath } from "@repo/web-utils/params";
-import { useParams, useSearchParams } from "next/navigation";
+import { internalPath, parseRouteParams, uuidParam } from "@repo/web-utils/params";
+import { notFound, useParams, useSearchParams } from "next/navigation";
+import { z } from "zod";
 import { type FormEvent, useState } from "react";
 import { useForm, type UseFormReturn } from "react-hook-form";
 
@@ -67,7 +68,11 @@ export interface UserDetailViewModel {
 
 export function useUserDetailController(): UserDetailViewModel {
   const params = useParams<{ id: string }>();
-  const userId = params.id;
+  const parsedId = parseRouteParams(z.object({ id: uuidParam }), params);
+  if (!parsedId.ok) {
+    notFound();
+  }
+  const userId = parsedId.data.id;
   const router = useRouter();
   const session = useSession();
   const searchParams = useSearchParams();

@@ -19,3 +19,27 @@ export async function fetchAuditLogs(params: AuditLogsParams) {
   });
   return webFetch<ListResponse<AuditLogDto>>(path);
 }
+
+export interface ExportResponse {
+  fileId: string;
+  truncated: boolean;
+}
+
+export async function exportAuditLogs(body: {
+  from: string | undefined;
+  to: string | undefined;
+  q: string | undefined;
+}) {
+  return webFetch<{ data: ExportResponse }>("/api/bff/admin/audit-logs/export", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+}
+
+export async function downloadAuditLogExport(fileId: string) {
+  const response = await fetch(
+    `/api/bff/admin/audit-logs/exports/${fileId}/download`,
+  );
+  if (!response.ok) throw new Error("Download failed");
+  return response.blob();
+}

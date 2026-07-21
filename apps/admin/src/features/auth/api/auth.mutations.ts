@@ -76,7 +76,9 @@ export function useLogoutMutation() {
   return useMutation({
     mutationFn: logoutAdmin,
     onSettled: () => {
-      queryClient.removeQueries({ queryKey: sessionQueryKey });
+      // Cache of the previous user is no longer valid — clear everything
+      // to prevent data leaking across sessions (§19 R6).
+      queryClient.clear();
       router.replace(ADMIN_AUTH_ROUTES.login);
     },
   });

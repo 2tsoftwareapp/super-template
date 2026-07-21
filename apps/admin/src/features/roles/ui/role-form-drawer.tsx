@@ -13,13 +13,13 @@ import {
 } from "@repo/web-ui/select";
 import { Spinner } from "@repo/web-ui/spinner";
 import { Building2 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useForm, useWatch } from "react-hook-form";
-import { z } from "zod";
 
 import { PermissionMultiSelect } from "@/components/permission-multi-select";
 import { ResourceDrawer } from "@/components/resource-drawer";
 import {
+  createRoleFormSchema,
   type EditableRole,
   type PermissionDto,
   type RoleForm,
@@ -61,9 +61,7 @@ export function RoleFormDrawer({
   const isEditing = role !== null;
 
   const schema = isSuperAdmin && !isEditing
-    ? roleSchema.extend({
-        organizationId: z.string().uuid("Select an organization"),
-      })
+    ? createRoleFormSchema
     : roleSchema;
 
   const form = useForm<RoleForm>({
@@ -91,12 +89,14 @@ export function RoleFormDrawer({
     name: "permissionIds",
   });
 
-  const actorPermissionSet = new Set(actorPermissions);
-  const orgPermissions = permissions.filter(
-    (p) =>
-      p.scope === "organization" &&
-      (isSuperAdmin || actorPermissionSet.has(p.name)),
-  );
+  const orgPermissions = useMemo(() => {
+    const set = new Set(actorPermissions);
+    return permissions.filter(
+      (p) =>
+        p.scope === "organization" &&
+        (isSuperAdmin || set.has(p.name)),
+    );
+  }, [actorPermissions, permissions, isSuperAdmin]);
 
   const handleSubmit = form.handleSubmit((values) => {
     onSave({

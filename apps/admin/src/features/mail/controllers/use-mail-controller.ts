@@ -1,6 +1,9 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import { useCallback, useState } from "react";
+
+import { usePathname, useRouter } from "@/i18n/navigation";
 
 import type {
   MailDeliveryDto,
@@ -84,7 +87,10 @@ export interface MailViewModel {
 }
 
 export function useMailController(): MailViewModel {
-  const { filters, updateFilter } = useMailFilters();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  const { filters, updateFilter } = useMailFilters(searchParams, pathname, router);
 
   const [templateKey, setTemplateKey] = useState("auth.welcome");
   const [selectedDelivery, setSelectedDelivery] =

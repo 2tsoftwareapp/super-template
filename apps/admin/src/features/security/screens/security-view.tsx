@@ -1,7 +1,6 @@
 "use client";
 
 import { Separator } from "@repo/web-ui/separator";
-import { toast } from "sonner";
 
 import { useChangePasswordMutation } from "@/features/security/api/security.mutations";
 import { useMfaController } from "@/features/security/controllers/use-mfa-controller";
@@ -53,8 +52,8 @@ export function SecurityView() {
         isVerifying={mfa.isVerifying}
         isDisabling={mfa.isDisabling}
         isRegenerating={mfa.isRegenerating}
-        onCopyRecoveryCodes={() => toast.success("Recovery codes copied to clipboard")}
-        onCopyRecoveryCodesError={() => toast.error("Could not copy recovery codes")}
+        onCopyRecoveryCodes={mfa.onCopyRecoveryCodes}
+        onCopyRecoveryCodesError={mfa.onCopyRecoveryCodesError}
       />
     </div>
   );
