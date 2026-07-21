@@ -5,6 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@repo/web-ui/card";
+import { ErrorState } from "@repo/web-ui/error-state";
 import { SectionLoading } from "@repo/web-ui/loading";
 import {
   Activity,
@@ -27,11 +28,15 @@ interface AuditLog {
 
 interface DashboardActivityProps {
   isLoading: boolean;
+  isError: boolean;
+  onRetry: () => void;
   recentActivity: AuditLog[];
 }
 
 export function DashboardActivity({
   isLoading,
+  isError,
+  onRetry,
   recentActivity,
 }: DashboardActivityProps) {
   return (
@@ -50,6 +55,13 @@ export function DashboardActivity({
       <CardContent className="min-h-0 flex-1 overflow-y-auto py-0">
         {isLoading ? (
           <SectionLoading title="Loading activities..." className="min-h-32" />
+        ) : isError ? (
+          <ErrorState
+            variant="inline"
+            className="mx-0 mb-2 mt-2"
+            title="Could not load recent activity."
+            action={{ label: "Retry", onClick: onRetry }}
+          />
         ) : recentActivity.length === 0 ? (
           <p className="py-6 text-center text-xs text-muted-foreground">
             No recent activity

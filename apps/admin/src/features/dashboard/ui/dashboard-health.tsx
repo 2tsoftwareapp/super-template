@@ -3,13 +3,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@repo/web-ui/card";
 import { cn } from "@/lib/utils";
 
 interface DashboardHealthProps {
-  isHealthy: boolean;
+  apiHealthy: boolean;
+  dbHealthy: boolean;
   failedJobs: number;
   pendingJobs: number;
 }
 
 export function DashboardHealth({
-  isHealthy,
+  apiHealthy,
+  dbHealthy,
   failedJobs,
   pendingJobs,
 }: DashboardHealthProps) {
@@ -20,8 +22,8 @@ export function DashboardHealth({
       </CardHeader>
       <CardContent className="space-y-0 py-0">
         {[
-          { label: "API", ok: isHealthy },
-          { label: "Database", ok: isHealthy },
+          { label: "API", ok: apiHealthy },
+          { label: "Database", ok: dbHealthy },
           {
             label: "Job queue",
             ok: failedJobs === 0,

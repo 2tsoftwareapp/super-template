@@ -2,19 +2,15 @@
 
 import { useQueries, useQueryClient } from "@tanstack/react-query";
 
-import {
-  fetchAuditSummary,
-  fetchHealthStatus,
-  fetchJobsSummary,
-  fetchOverviewUsers,
-} from "./dashboard.api";
+import { dashboardApi } from "./dashboard.api";
 import { dashboardKeys } from "./dashboard.query-keys";
 
 const DASHBOARD_QUERY_KEYS = [
-  ...dashboardKeys.users,
-  ...dashboardKeys.jobs,
-  ...dashboardKeys.audit,
-  ...dashboardKeys.health,
+  dashboardKeys.users,
+  dashboardKeys.jobs,
+  dashboardKeys.audit,
+  dashboardKeys.health,
+  dashboardKeys.healthReady,
 ] as const;
 
 export function useDashboardOverviewQueries() {
@@ -22,22 +18,28 @@ export function useDashboardOverviewQueries() {
     queries: [
       {
         queryKey: dashboardKeys.users,
-        queryFn: fetchOverviewUsers,
+        queryFn: () => dashboardApi.overviewUsers(),
         staleTime: 30_000,
       },
       {
         queryKey: dashboardKeys.jobs,
-        queryFn: fetchJobsSummary,
+        queryFn: () => dashboardApi.jobMetrics(),
         staleTime: 15_000,
       },
       {
         queryKey: dashboardKeys.audit,
-        queryFn: fetchAuditSummary,
+        queryFn: () => dashboardApi.auditSummary(),
         staleTime: 15_000,
       },
       {
         queryKey: dashboardKeys.health,
-        queryFn: fetchHealthStatus,
+        queryFn: () => dashboardApi.health(),
+        staleTime: 10_000,
+        retry: 1,
+      },
+      {
+        queryKey: dashboardKeys.healthReady,
+        queryFn: () => dashboardApi.healthReady(),
         staleTime: 10_000,
         retry: 1,
       },
@@ -48,8 +50,8 @@ export function useDashboardOverviewQueries() {
 export function useRefreshDashboard() {
   const queryClient = useQueryClient();
   return () => {
-    for (const key of DASHBOARD_QUERY_KEYS) {
-      void queryClient.invalidateQueries({ queryKey: [key] });
+    for (const queryKey of DASHBOARD_QUERY_KEYS) {
+      void queryClient.invalidateQueries({ queryKey });
     }
   };
 }

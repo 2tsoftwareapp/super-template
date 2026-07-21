@@ -3,7 +3,7 @@
 import { Show } from "@repo/web-ui/show";
 import { AlertTriangle } from "lucide-react";
 
-import type { DashboardViewModel } from "@/features/dashboard/controllers/use-dashboard-controller";
+import type { DashboardViewModel } from "@/features/dashboard/model/dashboard.types";
 
 import { Link } from "@/i18n/navigation";
 
@@ -61,10 +61,14 @@ export function DashboardOverview({
         firstLoad={stats.firstLoad}
         totalUsers={stats.totalUsers}
         usersLoading={stats.usersLoading}
+        usersError={stats.usersError}
+        onRetryUsers={stats.onRetryUsers}
         activeJobs={stats.activeJobs}
         failedJobs={stats.failedJobs}
         pendingJobs={stats.pendingJobs}
         jobsLoading={stats.jobsLoading}
+        jobsError={stats.jobsError}
+        onRetryJobs={stats.onRetryJobs}
         permissionCount={stats.permissionCount}
         healthFetching={stats.healthFetching}
         isHealthy={stats.isHealthy}
@@ -73,18 +77,23 @@ export function DashboardOverview({
       <div className="grid min-h-0 flex-1 gap-2 lg:grid-cols-[minmax(0,1fr)_240px]">
         <DashboardActivity
           isLoading={activity.isLoading}
+          isError={activity.isError}
+          onRetry={activity.onRetry}
           recentActivity={activity.recentActivity}
         />
 
         <div className="flex min-h-0 flex-col gap-2">
           <DashboardHealth
-            isHealthy={health.isHealthy}
+            apiHealthy={health.apiHealthy}
+            dbHealthy={health.dbHealthy}
             failedJobs={health.failedJobs}
             pendingJobs={health.pendingJobs}
           />
 
           <DashboardUsers
             isLoading={users.isLoading}
+            isError={users.isError}
+            onRetry={users.onRetry}
             recentUsers={users.recentUsers}
           />
         </div>

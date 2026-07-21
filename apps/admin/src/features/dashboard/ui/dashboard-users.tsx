@@ -6,6 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@repo/web-ui/card";
+import { ErrorState } from "@repo/web-ui/error-state";
 import { SectionLoading } from "@repo/web-ui/loading";
 import { ArrowRight } from "lucide-react";
 
@@ -20,11 +21,15 @@ interface User {
 
 interface DashboardUsersProps {
   isLoading: boolean;
+  isError: boolean;
+  onRetry: () => void;
   recentUsers: User[];
 }
 
 export function DashboardUsers({
   isLoading,
+  isError,
+  onRetry,
   recentUsers,
 }: DashboardUsersProps) {
   return (
@@ -43,6 +48,13 @@ export function DashboardUsers({
       <CardContent className="min-h-0 flex-1 overflow-y-auto py-0">
         {isLoading ? (
           <SectionLoading title="Loading users..." className="min-h-24" />
+        ) : isError ? (
+          <ErrorState
+            variant="inline"
+            className="mx-0 mb-2 mt-2"
+            title="Could not load recent users."
+            action={{ label: "Retry", onClick: onRetry }}
+          />
         ) : recentUsers.length === 0 ? (
           <p className="py-4 text-center text-xs text-muted-foreground">
             No users yet

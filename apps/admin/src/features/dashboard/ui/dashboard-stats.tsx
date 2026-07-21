@@ -1,4 +1,5 @@
 import { Card, CardContent } from "@repo/web-ui/card";
+import { ErrorState } from "@repo/web-ui/error-state";
 import { Activity, ShieldCheck, Users, Workflow } from "lucide-react";
 import { type ReactNode } from "react";
 
@@ -9,10 +10,14 @@ interface DashboardStatsProps {
   firstLoad: boolean;
   totalUsers: number;
   usersLoading: boolean;
+  usersError: boolean;
+  onRetryUsers: () => void;
   activeJobs: number;
   failedJobs: number;
   pendingJobs: number;
   jobsLoading: boolean;
+  jobsError: boolean;
+  onRetryJobs: () => void;
   permissionCount: number;
   healthFetching: boolean;
   isHealthy: boolean;
@@ -22,10 +27,14 @@ export function DashboardStats({
   firstLoad,
   totalUsers,
   usersLoading,
+  usersError,
+  onRetryUsers,
   activeJobs,
   failedJobs,
   pendingJobs,
   jobsLoading,
+  jobsError,
+  onRetryJobs,
   permissionCount,
   healthFetching,
   isHealthy,
@@ -43,35 +52,46 @@ export function DashboardStats({
 
   return (
     <div className="grid shrink-0 gap-2 sm:grid-cols-2 xl:grid-cols-4">
-      <MiniStat
-        label="Users"
-        value={totalUsers}
-        sub="Registered"
-        icon={<Users className="size-3.5 text-chart-2" />}
-        iconBg="bg-muted"
-        href="/users"
-        loading={usersLoading}
-      />
-      <MiniStat
-        label="Jobs"
-        value={activeJobs}
-        sub={
-          failedJobs > 0
-            ? `${failedJobs} failed · ${pendingJobs} pending`
-            : `${pendingJobs} pending`
-        }
-        icon={
-          <Workflow
-            className={cn(
-              "size-3.5",
-              failedJobs > 0 ? "text-destructive" : "text-chart-5",
-            )}
-          />
-        }
-        iconBg={failedJobs > 0 ? "bg-destructive/10" : "bg-accent"}
-        href="/jobs"
-        loading={jobsLoading}
-      />
+      {usersError ? (
+        <StatErrorCard
+          label="Users"
+          onRetry={onRetryUsers}
+        />
+      ) : (
+        <MiniStat
+          label="Users"
+          value={totalUsers}
+          sub="Registered"
+          icon={<Users className="size-3.5 text-chart-2" />}
+          iconBg="bg-muted"
+          href="/users"
+          loading={usersLoading}
+        />
+      )}
+      {jobsError ? (
+        <StatErrorCard label="Jobs" onRetry={onRetryJobs} />
+      ) : (
+        <MiniStat
+          label="Jobs"
+          value={activeJobs}
+          sub={
+            failedJobs > 0
+              ? `${failedJobs} failed · ${pendingJobs} pending`
+              : `${pendingJobs} pending`
+          }
+          icon={
+            <Workflow
+              className={cn(
+                "size-3.5",
+                failedJobs > 0 ? "text-destructive" : "text-chart-5",
+              )}
+            />
+          }
+          iconBg={failedJobs > 0 ? "bg-destructive/10" : "bg-accent"}
+          href="/jobs"
+          loading={jobsLoading}
+        />
+      )}
       <MiniStat
         label="Permissions"
         value={permissionCount}
@@ -97,6 +117,27 @@ export function DashboardStats({
         loading={healthFetching}
       />
     </div>
+  );
+}
+
+function StatErrorCard({
+  label,
+  onRetry,
+}: {
+  label: string;
+  onRetry: () => void;
+}) {
+  return (
+    <Card size="sm">
+      <CardContent className="py-2">
+        <ErrorState
+          variant="inline"
+          className="m-0"
+          title={`Could not load ${label.toLowerCase()}.`}
+          action={{ label: "Retry", onClick: onRetry }}
+        />
+      </CardContent>
+    </Card>
   );
 }
 
