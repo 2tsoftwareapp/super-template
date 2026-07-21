@@ -1,35 +1,50 @@
 "use client";
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { deleteFile, uploadFile, uploadVersion } from "./files.api";
+import { filesApi } from "./files.api";
+import { filesKeys } from "./files.query-keys";
 
-export function useDeleteFileMutation(options?: { onSuccess?: () => void }) {
+function useInvalidateFiles() {
+  const queryClient = useQueryClient();
+  return () => {
+    void queryClient.invalidateQueries({ queryKey: filesKeys.all });
+  };
+}
+
+export function useDeleteFileMutation() {
+  const invalidate = useInvalidateFiles();
   return useMutation({
-    mutationFn: deleteFile,
+    mutationFn: (fileId: string) => filesApi.delete(fileId),
     onSuccess: () => {
-      options?.onSuccess?.();
+      invalidate();
     },
   });
 }
 
-export function useUploadFileMutation(options?: { onSuccess?: () => void }) {
+export function useUploadFileMutation() {
+  const invalidate = useInvalidateFiles();
   return useMutation({
-    mutationFn: uploadFile,
+    mutationFn: (file: File) => filesApi.upload(file),
     onSuccess: () => {
-      options?.onSuccess?.();
+      invalidate();
     },
   });
 }
 
-export function useUploadVersionMutation(
-  options?: { onSuccess?: () => void },
-) {
+export function useUploadVersionMutation() {
+  const invalidate = useInvalidateFiles();
   return useMutation({
     mutationFn: ({ fileId, file }: { fileId: string; file: File }) =>
-      uploadVersion(fileId, file),
+      filesApi.uploadVersion(fileId, file),
     onSuccess: () => {
-      options?.onSuccess?.();
+      invalidate();
     },
+  });
+}
+
+export function useGetFileDownloadUrlMutation() {
+  return useMutation({
+    mutationFn: (fileId: string) => filesApi.getDownloadUrl(fileId),
   });
 }

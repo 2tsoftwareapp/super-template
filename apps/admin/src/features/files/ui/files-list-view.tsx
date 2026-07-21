@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo
 import { ConfirmDialog } from "@repo/web-ui/confirm-dialog";
 import { useRef } from "react";
 
-import type { FilesViewModel } from "@/features/files/controllers/files-view-model";
+import type { FilesViewModel } from "@/features/files/model/files.types";
 
 import { ResourcePageShell } from "@/components/resource-page-shell";
 import { adminResources } from "@/lib/admin-resources";
@@ -39,6 +39,7 @@ export function FilesListView(viewModel: FilesViewModel) {
         onChange={(e) => {
           const f = e.target.files?.[0];
           if (f) upload.onUpload(f);
+          e.target.value = "";
         }}
       />
       <input
@@ -48,6 +49,7 @@ export function FilesListView(viewModel: FilesViewModel) {
         onChange={(e) => {
           const f = e.target.files?.[0];
           if (f) detailTabs.uploadVersion.onUpload(f);
+          e.target.value = "";
         }}
       />
       <ResourcePageShell
@@ -64,10 +66,12 @@ export function FilesListView(viewModel: FilesViewModel) {
             onClearFilters={toolbar.onClearFilters}
             mimeFilter={toolbar.mimeFilter}
             onMimeFilterChange={toolbar.onMimeFilterChange}
+            mimeOptions={toolbar.mimeOptions}
             isFetching={header.isFetching}
             onRefresh={header.onRefresh}
             isUploadPending={upload.isPending}
             onUploadClick={() => uploadFileRef.current?.click()}
+            canUpload={toolbar.canUpload}
             resultLabel={list.resultLabel}
           />
         </Card>
@@ -83,12 +87,17 @@ export function FilesListView(viewModel: FilesViewModel) {
             <FilesTable
               files={list.files}
               isLoading={list.isLoading}
+              isError={list.isError}
+              onRetry={list.onRetry}
               page={list.page}
               totalPages={list.totalPages}
               onPageChange={list.onPageChange}
               onRowClick={list.onRowClick}
               onDeleteClick={list.onDeleteClick}
               hasFilters={list.hasFilters}
+              canDelete={list.canDelete}
+              formatBytes={list.formatBytes}
+              formatMimeType={list.formatMimeType}
             />
           </CardContent>
         </Card>
@@ -99,14 +108,23 @@ export function FilesListView(viewModel: FilesViewModel) {
           onClose={detail.onClose}
           onDownload={detail.onDownload}
           onDelete={detail.onDelete}
+          canDelete={detail.canDelete}
+          isDownloading={detail.isDownloading}
           versionsData={versions.data}
           versionsLoading={versions.isLoading}
+          versionsError={versions.isError}
+          onRetryVersions={versions.onRetry}
           historyData={history.data}
           historyLoading={history.isLoading}
+          historyError={history.isError}
+          onRetryHistory={history.onRetry}
           activeTab={detailTabs.activeTab}
           onTabChange={detailTabs.onTabChange}
           onNewVersionClick={() => versionFileRef.current?.click()}
           isUploadingVersion={detailTabs.uploadVersion.isPending}
+          canUploadVersion={detailTabs.uploadVersion.canUpload}
+          formatBytes={list.formatBytes}
+          formatMimeType={list.formatMimeType}
         />
 
         <ConfirmDialog

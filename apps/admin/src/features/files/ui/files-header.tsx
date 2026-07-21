@@ -4,14 +4,10 @@ import { RefreshCw, Upload } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
-const mimeOptions = [
-  { value: "", label: "All types" },
-  { value: "image/", label: "Image" },
-  { value: "video/", label: "Video" },
-  { value: "audio/", label: "Audio" },
-  { value: "application/pdf", label: "PDF" },
-  { value: "text/", label: "Text" },
-] as const;
+interface MimeOption {
+  value: string;
+  label: string;
+}
 
 interface FilesHeaderProps {
   search: string;
@@ -20,10 +16,12 @@ interface FilesHeaderProps {
   onClearFilters: () => void;
   mimeFilter: string;
   onMimeFilterChange: (value: string) => void;
+  mimeOptions: readonly MimeOption[];
   isFetching: boolean;
   onRefresh: () => void;
   isUploadPending: boolean;
   onUploadClick: () => void;
+  canUpload: boolean;
   resultLabel: string;
   searchPlaceholder?: string;
 }
@@ -35,10 +33,12 @@ export function FilesHeader({
   onClearFilters,
   mimeFilter,
   onMimeFilterChange,
+  mimeOptions,
   isFetching,
   onRefresh,
   isUploadPending,
   onUploadClick,
+  canUpload,
   resultLabel,
   searchPlaceholder = "Search by file name",
 }: FilesHeaderProps) {
@@ -65,7 +65,7 @@ export function FilesHeader({
             className="flex h-9 w-[140px] rounded-md border border-border bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             {mimeOptions.map((opt) => (
-              <option key={opt.value} value={opt.value}>
+              <option key={opt.value || "all"} value={opt.value}>
                 {opt.label}
               </option>
             ))}
@@ -76,14 +76,16 @@ export function FilesHeader({
             </Button>
           )}
         </div>
-        <LoadingButton
-          size="sm"
-          onClick={onUploadClick}
-          loading={isUploadPending}
-        >
-          <Upload data-icon="inline-start" />
-          Upload
-        </LoadingButton>
+        {canUpload ? (
+          <LoadingButton
+            size="sm"
+            onClick={onUploadClick}
+            loading={isUploadPending}
+          >
+            <Upload data-icon="inline-start" />
+            Upload
+          </LoadingButton>
+        ) : null}
         <Button
           variant="outline"
           size="sm"

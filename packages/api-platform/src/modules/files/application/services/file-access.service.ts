@@ -1,8 +1,9 @@
 import type { AuthenticatedRequestUser } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import {   ACTION, AppError, ERROR_CODES, perm , FILE_KIND , ROLE_NAMES, FILE_VISIBILITY } from '@repo/api-core';
+import { AppError, ERROR_CODES } from '@repo/api-core';
 
+import { canAccessFile } from '../../domain/file-access.policy';
 import { FILES_REPOSITORY, type FilesRepositoryPort } from '../ports/files.repository.port';
 
 @Injectable()
@@ -23,32 +24,20 @@ export class FileAccessService {
     }
 
     if (
-      file.organizationId !== actor.organizationId &&
-      !actor.roles.includes(ROLE_NAMES.SUPER_ADMIN)
-    ) {
-      throw new AppError(
-        ERROR_CODES.AUTH_FORBIDDEN,
-        'You do not have access to this file',
-        HttpStatus.FORBIDDEN,
-      );
-    }
-
-    if (file.kind === FILE_KIND.AUDIT_EXPORT || file.visibility === FILE_VISIBILITY.RESTRICTED) {
-      const hasAuditPermission = actor.permissions.includes(perm('audit', ACTION.READ));
-      if (!hasAuditPermission && !actor.roles.includes(ROLE_NAMES.SUPER_ADMIN)) {
-        throw new AppError(
-          ERROR_CODES.AUTH_FORBIDDEN,
-          'You do not have permission to access restricted files',
-          HttpStatus.FORBIDDEN,
-        );
-      }
-      return file;
-    }
-
-    if (
-      file.uploadedById !== actor.userId &&
-      !actor.roles.includes('ADMIN') &&
-      !actor.roles.includes(ROLE_NAMES.SUPER_ADMIN)
+      !canAccessFile({
+        actor: {
+          userId: actor.userId,
+          organizationId: actor.organizationId,
+          roles: actor.roles,
+          permissions: actor.permissions,
+        },
+        file: {
+          organizationId: file.organizationId,
+          uploadedById: file.uploadedById,
+          kind: file.kind,
+          visibility: file.visibility,
+        },
+      })
     ) {
       throw new AppError(
         ERROR_CODES.AUTH_FORBIDDEN,

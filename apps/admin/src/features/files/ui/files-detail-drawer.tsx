@@ -26,14 +26,23 @@ interface FilesDetailDrawerProps {
   onClose: () => void;
   onDownload: () => void;
   onDelete: () => void;
+  canDelete: boolean;
+  isDownloading: boolean;
   versionsData: FileVersionDto[] | undefined;
   versionsLoading: boolean;
+  versionsError: boolean;
+  onRetryVersions: () => void;
   historyData: FileHistoryEventDto[] | undefined;
   historyLoading: boolean;
+  historyError: boolean;
+  onRetryHistory: () => void;
   activeTab: "versions" | "history";
   onTabChange: (tab: "versions" | "history") => void;
   onNewVersionClick: () => void;
   isUploadingVersion: boolean;
+  canUploadVersion: boolean;
+  formatBytes: (bytes: number) => string;
+  formatMimeType: (mime: string) => string;
 }
 
 function FilesDetailTabNav({
@@ -74,14 +83,23 @@ export function FilesDetailDrawer({
   onClose,
   onDownload,
   onDelete,
+  canDelete,
+  isDownloading,
   versionsData,
   versionsLoading,
+  versionsError,
+  onRetryVersions,
   historyData,
   historyLoading,
+  historyError,
+  onRetryHistory,
   activeTab,
   onTabChange,
   onNewVersionClick,
   isUploadingVersion,
+  canUploadVersion,
+  formatBytes,
+  formatMimeType,
 }: FilesDetailDrawerProps) {
   return (
     <ResourceDrawer
@@ -92,28 +110,37 @@ export function FilesDetailDrawer({
       footer={
         file ? (
           <div className="flex gap-2">
-            <Button size="sm" variant="outline" onClick={onDownload}>
-              <Download data-icon="inline-start" />
-              Download
-            </Button>
             <LoadingButton
               size="sm"
               variant="outline"
-              onClick={onNewVersionClick}
-              loading={isUploadingVersion}
+              onClick={onDownload}
+              loading={isDownloading}
             >
-              <Upload data-icon="inline-start" />
-              New version
+              <Download data-icon="inline-start" />
+              Download
             </LoadingButton>
-            <Button
-              size="sm"
-              variant="outline"
-              className="text-destructive"
-              onClick={onDelete}
-            >
-              <Trash2 data-icon="inline-start" />
-              Delete
-            </Button>
+            {canUploadVersion ? (
+              <LoadingButton
+                size="sm"
+                variant="outline"
+                onClick={onNewVersionClick}
+                loading={isUploadingVersion}
+              >
+                <Upload data-icon="inline-start" />
+                New version
+              </LoadingButton>
+            ) : null}
+            {canDelete ? (
+              <Button
+                size="sm"
+                variant="outline"
+                className="text-destructive"
+                onClick={onDelete}
+              >
+                <Trash2 data-icon="inline-start" />
+                Delete
+              </Button>
+            ) : null}
           </div>
         ) : undefined
       }
@@ -124,11 +151,23 @@ export function FilesDetailDrawer({
           <FilesDetailTabNav activeTab={activeTab} onTabChange={onTabChange} />
 
           {activeTab === "versions" && (
-            <FilesVersionList data={versionsData} isLoading={versionsLoading} />
+            <FilesVersionList
+              data={versionsData}
+              isLoading={versionsLoading}
+              isError={versionsError}
+              onRetry={onRetryVersions}
+              formatBytes={formatBytes}
+              formatMimeType={formatMimeType}
+            />
           )}
 
           {activeTab === "history" && (
-            <FilesHistoryList data={historyData} isLoading={historyLoading} />
+            <FilesHistoryList
+              data={historyData}
+              isLoading={historyLoading}
+              isError={historyError}
+              onRetry={onRetryHistory}
+            />
           )}
         </div>
       )}

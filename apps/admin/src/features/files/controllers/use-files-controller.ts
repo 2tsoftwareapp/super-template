@@ -1,14 +1,18 @@
 "use client";
 
-import { useState } from "react";
-
 import { useDebouncedValue } from "@repo/web-hooks/use-debounced-value";
+import { getErrorMessage } from "@repo/web-utils/errors";
+import { useQueryClient } from "@tanstack/react-query";
+import { useSearchParams } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
 
+import type { FilesViewModel } from "@/features/files/model/files.types";
 import type { FileDto } from "@/lib/api-types";
 
-import { getFileDownloadUrl } from "@/features/files/api/files.api";
 import {
   useDeleteFileMutation,
+  useGetFileDownloadUrlMutation,
   useUploadFileMutation,
   useUploadVersionMutation,
 } from "@/features/files/api/files.mutations";
@@ -17,105 +21,194 @@ import {
   useFilesQuery,
   useFileVersionsQuery,
 } from "@/features/files/api/files.queries";
+import { filesKeys } from "@/features/files/api/files.query-keys";
+import {
+  formatBytes,
+  formatMimeType,
+} from "@/features/files/model/files-formatting";
+import { FILE_MIME_OPTIONS } from "@/features/files/model/files.constants";
+import { selectFilePermissions } from "@/features/files/model/files.permissions";
+import {
+  type FilesFilters,
+  parseFilesFilters,
+  serializeFilesFilters,
+} from "@/features/files/model/files.search-params";
+import { useSession } from "@/hooks/use-session";
+import { usePathname, useRouter } from "@/i18n/navigation";
 
-import type { FilesViewModel } from "./files-view-model";
+export type { FilesViewModel };
 
-import { useFilePagination } from "./use-file-pagination";
-
+/**
+ * Orchestration hook for the files screen.
+ *
+ * Flow:
+ *   1. Parse URL filters (q/mime/page) into local state.
+ *   2. Debounce search → list query with placeholderData.
+ *   3. Detail drawer loads versions/history for the selected file.
+ *   4. Upload / version / delete invalidate `filesKeys.all`.
+ *   5. Download resolves a signed URL via mutation (toast on failure).
+ */
 export function useFilesController(): FilesViewModel {
-  const {
-    search,
-    mimeFilter,
-    page,
-    hasFilters,
-    onSearchChange,
-    onMimeFilterChange,
-    onClearFilters,
-    onPageChange,
-  } = useFilePagination();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  const queryClient = useQueryClient();
+  const session = useSession();
+  const permissions = selectFilePermissions(session.data?.data.permissions);
 
+  const [filters, setFilters] = useState<FilesFilters>(() =>
+    parseFilesFilters(new URLSearchParams(searchParams.toString())),
+  );
   const [selectedFile, setSelectedFile] = useState<FileDto | null>(null);
   const [detailTab, setDetailTab] = useState<"versions" | "history">(
     "versions",
   );
   const [deleteTarget, setDeleteTarget] = useState<FileDto | null>(null);
 
-  const debouncedSearch = useDebouncedValue(search, 400);
+  const onFilterChange = (
+    key: keyof FilesFilters,
+    value: string | number,
+  ) => {
+    const next = { ...filters, [key]: value };
+    if (key !== "page") {
+      next.page = 1;
+    }
+    setFilters(next);
+    const qs = serializeFilesFilters(next);
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+  };
+
+  const onClearFilters = () => {
+    setFilters({ q: "", mime: "", page: 1 });
+    router.replace(pathname, { scroll: false });
+  };
+
+  const hasFilters = Boolean(filters.q || filters.mime);
+  const debouncedSearch = useDebouncedValue(filters.q, 400);
 
   const files = useFilesQuery({
     search: debouncedSearch,
-    mimeFilter,
-    page,
+    mimeFilter: filters.mime || undefined,
+    page: filters.page,
   });
 
   const versions = useFileVersionsQuery(selectedFile?.id);
   const history = useFileHistoryQuery(selectedFile?.id);
 
-  const deleteFile = useDeleteFileMutation({
-    onSuccess: () => {
-      void files.refetch();
-      setSelectedFile(null);
-    },
-  });
-
-  const uploadFile = useUploadFileMutation({
-    onSuccess: () => {
-      void files.refetch();
-    },
-  });
-
-  const uploadVersion = useUploadVersionMutation({
-    onSuccess: () => {
-      void versions.refetch();
-      void history.refetch();
-      void files.refetch();
-    },
-  });
+  const deleteFile = useDeleteFileMutation();
+  const uploadFile = useUploadFileMutation();
+  const uploadVersion = useUploadVersionMutation();
+  const downloadUrl = useGetFileDownloadUrlMutation();
 
   const entries = files.data?.data ?? [];
   const totalPages = files.data?.meta?.totalPages ?? 1;
   const total = files.data?.meta?.total ?? 0;
+
+  const retryList = () => {
+    void queryClient.invalidateQueries({ queryKey: filesKeys.lists() });
+  };
+  const retryVersions = () => {
+    if (!selectedFile) return;
+    void queryClient.invalidateQueries({
+      queryKey: filesKeys.versions(selectedFile.id),
+    });
+  };
+  const retryHistory = () => {
+    if (!selectedFile) return;
+    void queryClient.invalidateQueries({
+      queryKey: filesKeys.history(selectedFile.id),
+    });
+  };
 
   const handleRowClick = (file: FileDto) => {
     setSelectedFile(file);
     setDetailTab("versions");
   };
 
-  const handleDownload = async () => {
+  const handleDownload = () => {
     if (!selectedFile) return;
-    const url = await getFileDownloadUrl(selectedFile.id);
-    window.open(url, "_blank");
+    downloadUrl.mutate(selectedFile.id, {
+      onSuccess: (url) => {
+        window.open(url, "_blank");
+      },
+      onError: (error) => {
+        toast.error(getErrorMessage(error));
+      },
+    });
+  };
+
+  const handleUpload = (file: File) => {
+    uploadFile.mutate(file, {
+      onError: (error) => {
+        toast.error(getErrorMessage(error));
+      },
+    });
+  };
+
+  const handleUploadVersion = (file: File) => {
+    if (!selectedFile) return;
+    uploadVersion.mutate(
+      { fileId: selectedFile.id, file },
+      {
+        onError: (error) => {
+          toast.error(getErrorMessage(error));
+        },
+      },
+    );
+  };
+
+  const handleConfirmDelete = () => {
+    if (!deleteTarget) return;
+    const targetId = deleteTarget.id;
+    deleteFile.mutate(targetId, {
+      onSuccess: () => {
+        setDeleteTarget(null);
+        if (selectedFile?.id === targetId) {
+          setSelectedFile(null);
+        }
+      },
+      onError: (error) => {
+        toast.error(getErrorMessage(error));
+      },
+    });
   };
 
   return {
     header: {
       isFetching: files.isFetching,
       total,
-      onRefresh: () => void files.refetch(),
+      onRefresh: retryList,
     },
     toolbar: {
-      search,
-      onSearchChange,
+      search: filters.q,
+      onSearchChange: (value) => onFilterChange("q", value),
       hasFilters,
       onClearFilters,
-      mimeFilter,
-      onMimeFilterChange,
+      mimeFilter: filters.mime,
+      onMimeFilterChange: (value) => onFilterChange("mime", value),
+      mimeOptions: FILE_MIME_OPTIONS,
+      canUpload: permissions.canCreate,
     },
     list: {
       isLoading: files.isLoading,
+      isError: files.isError,
+      onRetry: retryList,
       files: entries,
-      page,
+      page: filters.page,
       totalPages,
       total,
-      onPageChange,
+      onPageChange: (page) => onFilterChange("page", page),
       resultLabel: `${entries.length} files${total ? ` (${total} total)` : ""}`,
       onRowClick: handleRowClick,
       onDeleteClick: (file) => setDeleteTarget(file),
       hasFilters,
+      canDelete: permissions.canDelete,
+      formatBytes,
+      formatMimeType,
     },
     upload: {
       isPending: uploadFile.isPending,
-      onUpload: (file: File) => uploadFile.mutate(file),
+      onUpload: handleUpload,
     },
     detail: {
       file: selectedFile,
@@ -123,39 +216,39 @@ export function useFilesController(): FilesViewModel {
         ? `${selectedFile.sizeBytes} B · ${selectedFile.mimeType} · v${selectedFile.latestVersion}`
         : "",
       onClose: () => setSelectedFile(null),
-      onDownload: () => void handleDownload(),
+      onDownload: handleDownload,
       onDelete: () => {
         if (selectedFile) setDeleteTarget(selectedFile);
       },
+      canDelete: permissions.canDelete,
+      isDownloading: downloadUrl.isPending,
     },
     versions: {
       data: versions.data?.data,
       isLoading: versions.isLoading,
+      isError: versions.isError,
+      onRetry: retryVersions,
     },
     history: {
       data: history.data?.data,
       isLoading: history.isLoading,
+      isError: history.isError,
+      onRetry: retryHistory,
     },
     detailTabs: {
       activeTab: detailTab,
       onTabChange: setDetailTab,
       uploadVersion: {
         isPending: uploadVersion.isPending,
-        onUpload: (file: File) => {
-          if (selectedFile) uploadVersion.mutate({ fileId: selectedFile.id, file });
-        },
+        onUpload: handleUploadVersion,
+        canUpload: permissions.canCreate,
       },
     },
     confirmDelete: {
       target: deleteTarget,
       isPending: deleteFile.isPending,
       onCancel: () => setDeleteTarget(null),
-      onConfirm: () => {
-        if (deleteTarget) {
-          deleteFile.mutate(deleteTarget.id);
-          setDeleteTarget(null);
-        }
-      },
+      onConfirm: handleConfirmDelete,
     },
   };
 }

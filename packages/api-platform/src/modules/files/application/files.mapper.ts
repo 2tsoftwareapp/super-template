@@ -2,9 +2,9 @@ import type { FileRecord } from './ports/files.repository.port';
 
 export class FilesMapper {
   static toFileDto(file: FileRecord) {
+    // Omit storageKey from the public DTO — clients use signed/download URLs.
     return {
       id: file.id,
-      storageKey: file.storageKey,
       originalName: file.originalName,
       mimeType: file.mimeType,
       sizeBytes: file.sizeBytes,

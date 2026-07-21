@@ -1,4 +1,5 @@
 import { Badge } from "@repo/web-ui/badge";
+import { ErrorState } from "@repo/web-ui/error-state";
 import { Show } from "@repo/web-ui/show";
 import { Spinner } from "@repo/web-ui/spinner";
 
@@ -9,15 +10,30 @@ import { timeAgo } from "@/lib/format";
 interface FilesHistoryListProps {
   data: FileHistoryEventDto[] | undefined;
   isLoading: boolean;
+  isError: boolean;
+  onRetry: () => void;
 }
 
-export function FilesHistoryList({ data, isLoading }: FilesHistoryListProps) {
+export function FilesHistoryList({
+  data,
+  isLoading,
+  isError,
+  onRetry,
+}: FilesHistoryListProps) {
   return (
     <div className="space-y-2">
       <Show when={isLoading}>
         <Spinner className="size-4" />
       </Show>
-      {!isLoading && data?.length ? (
+      {!isLoading && isError ? (
+        <ErrorState
+          variant="inline"
+          className="m-0"
+          title="Could not load history."
+          action={{ label: "Retry", onClick: onRetry }}
+        />
+      ) : null}
+      {!isLoading && !isError && data?.length ? (
         data.map((event: FileHistoryEventDto, i: number) => (
           <div
             key={`${event.createdAt}-${event.action}-${i}`}
@@ -42,7 +58,7 @@ export function FilesHistoryList({ data, isLoading }: FilesHistoryListProps) {
               )}
           </div>
         ))
-      ) : !isLoading ? (
+      ) : !isLoading && !isError ? (
         <p className="text-sm text-muted-foreground">No history events.</p>
       ) : null}
     </div>

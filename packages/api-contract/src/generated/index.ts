@@ -1710,7 +1710,6 @@ export interface components {
         };
         FileDto: {
             id: string;
-            storageKey: string;
             originalName: string;
             mimeType: string;
             sizeBytes: number;
@@ -1742,7 +1741,6 @@ export interface components {
             id: string;
             fileId: string;
             versionNumber: number;
-            storageKey: string;
             mimeType: string;
             sizeBytes: number;
             checksum: string;

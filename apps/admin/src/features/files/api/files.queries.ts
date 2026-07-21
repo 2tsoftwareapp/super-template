@@ -2,18 +2,17 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import {
-  fetchFileHistory,
-  fetchFiles,
-  fetchFileVersions,
-  type FilesParams,
-} from "./files.api";
+import { filesApi, type FilesParams } from "./files.api";
 import { filesKeys } from "./files.query-keys";
 
 export function useFilesQuery(params: FilesParams) {
   return useQuery({
-    queryKey: filesKeys.list({ search: params.search, mimeFilter: params.mimeFilter, page: params.page }),
-    queryFn: () => fetchFiles(params),
+    queryKey: filesKeys.list({
+      search: params.search,
+      mimeFilter: params.mimeFilter,
+      page: params.page,
+    }),
+    queryFn: () => filesApi.list(params),
     placeholderData: (previous) => previous,
   });
 }
@@ -21,15 +20,17 @@ export function useFilesQuery(params: FilesParams) {
 export function useFileVersionsQuery(fileId: string | undefined) {
   return useQuery({
     queryKey: filesKeys.versions(fileId ?? ""),
-    queryFn: () => fetchFileVersions(fileId!),
+    queryFn: () => filesApi.versions(fileId!),
     enabled: !!fileId,
+    placeholderData: (previous) => previous,
   });
 }
 
 export function useFileHistoryQuery(fileId: string | undefined) {
   return useQuery({
     queryKey: filesKeys.history(fileId ?? ""),
-    queryFn: () => fetchFileHistory(fileId!),
+    queryFn: () => filesApi.history(fileId!),
     enabled: !!fileId,
+    placeholderData: (previous) => previous,
   });
 }

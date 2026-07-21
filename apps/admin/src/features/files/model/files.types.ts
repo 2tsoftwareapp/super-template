@@ -4,6 +4,8 @@ import type {
   FileVersionDto,
 } from "@/lib/api-types";
 
+import type { FILE_MIME_OPTIONS } from "./files.constants";
+
 export interface FilesViewModel {
   header: {
     isFetching: boolean;
@@ -17,9 +19,13 @@ export interface FilesViewModel {
     onClearFilters: () => void;
     mimeFilter: string;
     onMimeFilterChange: (value: string) => void;
+    mimeOptions: typeof FILE_MIME_OPTIONS;
+    canUpload: boolean;
   };
   list: {
     isLoading: boolean;
+    isError: boolean;
+    onRetry: () => void;
     files: FileDto[];
     page: number;
     totalPages: number;
@@ -29,6 +35,9 @@ export interface FilesViewModel {
     onRowClick: (file: FileDto) => void;
     onDeleteClick: (file: FileDto) => void;
     hasFilters: boolean;
+    canDelete: boolean;
+    formatBytes: (bytes: number) => string;
+    formatMimeType: (mime: string) => string;
   };
   upload: {
     isPending: boolean;
@@ -40,14 +49,20 @@ export interface FilesViewModel {
     onClose: () => void;
     onDownload: () => void;
     onDelete: () => void;
+    canDelete: boolean;
+    isDownloading: boolean;
   };
   versions: {
     data: FileVersionDto[] | undefined;
     isLoading: boolean;
+    isError: boolean;
+    onRetry: () => void;
   };
   history: {
     data: FileHistoryEventDto[] | undefined;
     isLoading: boolean;
+    isError: boolean;
+    onRetry: () => void;
   };
   detailTabs: {
     activeTab: "versions" | "history";
@@ -55,6 +70,7 @@ export interface FilesViewModel {
     uploadVersion: {
       isPending: boolean;
       onUpload: (file: File) => void;
+      canUpload: boolean;
     };
   };
   confirmDelete: {

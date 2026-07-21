@@ -96,7 +96,12 @@ export class FilesRepository implements FilesRepositoryPort {
     }
 
     if (params.mimeType) {
-      filters.push(eq(files.mimeType, params.mimeType));
+      // FE mime chips send prefixes (`image/`); exact MIME still uses equality.
+      if (params.mimeType.endsWith('/')) {
+        filters.push(ilike(files.mimeType, `${params.mimeType}%`));
+      } else {
+        filters.push(eq(files.mimeType, params.mimeType));
+      }
     }
 
     if (params.uploadedById) {
@@ -113,6 +118,10 @@ export class FilesRepository implements FilesRepositoryPort {
 
     if (params.excludeKinds && params.excludeKinds.length > 0) {
       filters.push(notInArray(files.kind, params.excludeKinds));
+    }
+
+    if (params.excludeVisibilities && params.excludeVisibilities.length > 0) {
+      filters.push(notInArray(files.visibility, params.excludeVisibilities));
     }
 
     const whereClause = and(...filters);

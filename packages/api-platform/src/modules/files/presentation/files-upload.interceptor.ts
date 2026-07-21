@@ -5,7 +5,7 @@ import {
   getUploadExtension,
   isAllowedUploadExtension,
   MAX_FILE_SIZE_BYTES,
-} from '../domain/upload-policy';
+} from '../application/upload-limits';
 
 export const UploadFileInterceptor = FileInterceptor('file', {
   limits: {

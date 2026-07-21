@@ -23,7 +23,6 @@ export class ListFileVersionsUseCase {
       id: version.id,
       fileId: version.fileId,
       versionNumber: version.versionNumber,
-      storageKey: version.storageKey,
       mimeType: version.mimeType,
       sizeBytes: version.sizeBytes,
       checksum: version.checksum,

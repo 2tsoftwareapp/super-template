@@ -1,8 +1,9 @@
 import type { AuthenticatedRequestUser } from '@repo/api-core';
 
 import { Inject, Injectable } from '@nestjs/common';
-import { requireOrganizationId, ROLE_NAMES, FILE_KIND } from '@repo/api-core';
+import { requireOrganizationId } from '@repo/api-core';
 
+import { listFilesAccessScope } from '../../domain/file-access.policy';
 import { FilesMapper } from '../files.mapper';
 import { FILES_REPOSITORY, type FilesRepositoryPort } from '../ports/files.repository.port';
 
@@ -26,12 +27,21 @@ export class ListFilesUseCase {
 
   async execute(actor: AuthenticatedRequestUser, query: ListFilesQuery) {
     const organizationId = requireOrganizationId(actor);
-    const isSuperAdmin = actor.roles.includes(ROLE_NAMES.SUPER_ADMIN);
+    const accessScope = listFilesAccessScope({
+      userId: actor.userId,
+      organizationId: actor.organizationId,
+      roles: actor.roles,
+      permissions: actor.permissions,
+    });
 
     const result = await this.filesRepository.list({
       ...query,
       organizationId,
-      ...(!isSuperAdmin ? { excludeKinds: [FILE_KIND.AUDIT_EXPORT] } : {}),
+      ...accessScope,
+      // Explicit uploadedById from the query wins only for privileged scopes.
+      ...(query.uploadedById !== undefined && !accessScope.uploadedById
+        ? { uploadedById: query.uploadedById }
+        : {}),
     });
 
     return {

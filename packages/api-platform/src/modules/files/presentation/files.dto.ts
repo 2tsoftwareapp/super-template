@@ -17,9 +17,6 @@ export class FileDto {
   id: string;
 
   @ApiProperty()
-  storageKey: string;
-
-  @ApiProperty()
   originalName: string;
 
   @ApiProperty()
@@ -100,9 +97,6 @@ export class FileVersionDto {
 
   @ApiProperty()
   versionNumber: number;
-
-  @ApiProperty()
-  storageKey: string;
 
   @ApiProperty()
   mimeType: string;
