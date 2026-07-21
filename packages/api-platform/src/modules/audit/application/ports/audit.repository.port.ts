@@ -55,7 +55,14 @@ export interface ListAuditLogsParams {
 
 export type AuditLogSearchParams = Pick<
   ListAuditLogsParams,
-  'actorId' | 'action' | 'resourceType' | 'resourceId' | 'from' | 'to' | 'q'
+  | 'organizationId'
+  | 'actorId'
+  | 'action'
+  | 'resourceType'
+  | 'resourceId'
+  | 'from'
+  | 'to'
+  | 'q'
 >;
 
 export interface AuditLogListResult {

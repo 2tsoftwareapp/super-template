@@ -60,7 +60,7 @@ export class ExportAuditLogsUseCase {
 
     const fullQuery = {
       ...query,
-      ...(isSuperAdmin && !actor.organizationId ? {} : { organizationId }),
+      ...(typeof organizationId === 'string' ? { organizationId } : {}),
     };
 
     const runInTx = <T>(fn: (tx: any) => Promise<T>) => {

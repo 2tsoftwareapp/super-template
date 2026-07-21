@@ -6,7 +6,7 @@ export {
   isRetryableError,
   shouldRetryQuery,
 } from "./errors";
-export { ApiClientError, getCsrfCookieName, webFetch } from "./http";
+export { ApiClientError, getCsrfCookieName, webFetch, webFetchBlob } from "./http";
 export type { RouteParamResult, SearchParamsResult } from "./params";
 export {
   booleanParam,

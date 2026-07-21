@@ -1,46 +1,29 @@
 "use client";
 
 import { useDebouncedValue } from "@repo/web-hooks/use-debounced-value";
+import { getErrorMessage } from "@repo/web-utils/errors";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import type { AuditLogsViewModel } from "@/features/audit-logs/model/audit-logs.types";
 import type { AuditLogDto } from "@/lib/api-types";
 
-import {
-  exportAuditLogs,
-  downloadAuditLogExport,
-} from "@/features/audit-logs/api/audit-logs.api";
+import { useExportAndDownloadAuditLogsMutation } from "@/features/audit-logs/api/audit-logs.mutations";
 import { useAuditLogsQuery } from "@/features/audit-logs/api/audit-logs.queries";
 import {
   type AuditLogsFilters,
+  formatAuditAction,
   parseAuditLogsFilters,
   serializeAuditLogsFilters,
-} from "@/features/audit-logs/model/audit-logs.filters";
+} from "@/features/audit-logs/model/audit-logs.search-params";
 import { usePathname, useRouter } from "@/i18n/navigation";
 
-export interface AuditLogsViewModel {
-  filters: AuditLogsFilters;
-  hasFilters: boolean;
-  onFilterChange: (key: keyof AuditLogsFilters, value: string | number) => void;
-  onClearFilters: () => void;
-  isLoading: boolean;
-  isRefreshing: boolean;
-  hasError: boolean;
-  onRefresh: () => void;
-  entries: AuditLogDto[];
-  total: number;
-  totalPages: number;
-  selectedEntry: AuditLogDto | null;
-  onSelectEntry: (entry: AuditLogDto | null) => void;
-  onExport: () => void;
-  isExporting: boolean;
-}
+export type { AuditLogsViewModel };
 
 /**
  * Orchestration hook for the audit-logs screen: URL-backed filter state,
- * debounced search, the audit query, and detail-drawer selection. Returns a
- * view model consumed by the presentational AuditLogsListView.
+ * debounced search, the audit query, export/download, and detail selection.
  */
 export function useAuditLogsController(): AuditLogsViewModel {
   const searchParams = useSearchParams();
@@ -81,36 +64,36 @@ export function useAuditLogsController(): AuditLogsViewModel {
     q,
   });
 
-  const [isExporting, setIsExporting] = useState(false);
+  const exportMutation = useExportAndDownloadAuditLogsMutation();
 
-  const onExport = async () => {
-    setIsExporting(true);
-    try {
-      const { data } = await exportAuditLogs({
+  function handleExport() {
+    exportMutation.mutate(
+      {
         from: filters.from || undefined,
         to: filters.to || undefined,
         q: q || undefined,
-      });
+      },
+      {
+        onSuccess: ({ blob, truncated }) => {
+          if (truncated) {
+            toast.warning(
+              "The export exceeds 5,000 rows and was truncated. Please use narrower filters.",
+            );
+          }
 
-      if (data.truncated) {
-        toast.warning(
-          "The export exceeds 5,000 rows and was truncated. Please use narrower filters."
-        );
-      }
-
-      const blob = await downloadAuditLogExport(data.fileId);
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `audit-logs-export-${Date.now()}.csv`;
-      a.click();
-      URL.revokeObjectURL(url);
-    } catch {
-      // Export errors are silently handled; the button state resets.
-    } finally {
-      setIsExporting(false);
-    }
-  };
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `audit-logs-export-${Date.now()}.csv`;
+          a.click();
+          URL.revokeObjectURL(url);
+        },
+        onError: (error) => {
+          toast.error(getErrorMessage(error, "Failed to export audit logs."));
+        },
+      },
+    );
+  }
 
   return {
     filters,
@@ -126,7 +109,8 @@ export function useAuditLogsController(): AuditLogsViewModel {
     totalPages: auditLogs.data?.meta?.totalPages ?? 1,
     selectedEntry,
     onSelectEntry: setSelectedEntry,
-    onExport,
-    isExporting,
+    onExport: handleExport,
+    isExporting: exportMutation.isPending,
+    formatAction: formatAuditAction,
   };
 }

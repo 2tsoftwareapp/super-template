@@ -2,8 +2,14 @@ import type { AuthenticatedRequestUser } from '@repo/api-core';
 import type { Request, Response } from 'express';
 
 import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Query, Req, Res, StreamableFile } from '@nestjs/common';
-import { ApiBearerAuth, ApiProduces, ApiTags } from '@nestjs/swagger';
-import {  ACTION, ApiDataResponse, ApiPaginatedResponse, perm } from '@repo/api-core';
+import {
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiParam,
+  ApiProduces,
+  ApiTags,
+} from '@nestjs/swagger';
+import { ACTION, ApiDataResponse, ApiPaginatedResponse, perm } from '@repo/api-core';
 import { Authorize, CurrentUser, SkipEnvelope } from '@repo/api-core';
 
 import { DownloadAuditExportUseCase } from '../application/use-cases/download-audit-export.use-case';
@@ -93,6 +99,11 @@ export class AuditController {
   @Authorize({ permissions: [perm('audit', ACTION.READ)] })
   @SkipEnvelope()
   @ApiProduces('text/csv')
+  @ApiParam({ name: 'fileId', format: 'uuid' })
+  @ApiOkResponse({
+    description: 'CSV audit-log export download',
+    schema: { type: 'string', format: 'binary' },
+  })
   async downloadExport(
     @CurrentUser() user: AuthenticatedRequestUser,
     @Param('fileId', new ParseUUIDPipe()) fileId: string,

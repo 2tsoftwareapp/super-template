@@ -7,7 +7,7 @@ import { Input } from "@repo/web-ui/input";
 import { Spinner } from "@repo/web-ui/spinner";
 import { Download, Search, X } from "lucide-react";
 
-import type { AuditLogsViewModel } from "@/features/audit-logs/controllers/use-audit-logs-controller";
+import type { AuditLogsViewModel } from "@/features/audit-logs/model/audit-logs.types";
 
 import { ResourceDrawer } from "@/components/resource-drawer";
 import { ResourcePageShell } from "@/components/resource-page-shell";
@@ -39,6 +39,7 @@ export function AuditLogsListView({
   onSelectEntry,
   onExport,
   isExporting,
+  formatAction,
 }: AuditLogsViewModel) {
   return (
     <ResourcePageShell
@@ -123,6 +124,7 @@ export function AuditLogsListView({
               isRefreshing={isRefreshing}
               onSelectEntry={onSelectEntry}
               onPageChange={(p) => onFilterChange("page", p)}
+              formatAction={formatAction}
             />
           )}
         </CardContent>
@@ -134,7 +136,12 @@ export function AuditLogsListView({
         description="Full details for the selected audit log entry."
         onClose={() => onSelectEntry(null)}
       >
-        {selectedEntry && <AuditLogsEventDetail entry={selectedEntry} />}
+        {selectedEntry && (
+          <AuditLogsEventDetail
+            entry={selectedEntry}
+            formatAction={formatAction}
+          />
+        )}
       </ResourceDrawer>
     </ResourcePageShell>
   );

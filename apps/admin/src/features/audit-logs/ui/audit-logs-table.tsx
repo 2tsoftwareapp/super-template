@@ -15,21 +15,21 @@ import {
 } from "@repo/web-ui/table";
 import { Tooltip } from "@repo/web-ui/tooltip";
 
-import type { AuditLogsViewModel } from "@/features/audit-logs/controllers/use-audit-logs-controller";
+import type { AuditLogDto } from "@/lib/api-types";
 
-import { formatAuditAction } from "@/features/audit-logs/model/audit-logs.filters";
 import { formatDateTime, timeAgo } from "@/lib/format";
 
 interface AuditLogsTableProps {
-  entries: AuditLogsViewModel["entries"];
+  entries: AuditLogDto[];
   isLoading: boolean;
   hasFilters: boolean;
   total: number;
   totalPages: number;
   page: number;
   isRefreshing: boolean;
-  onSelectEntry: AuditLogsViewModel["onSelectEntry"];
+  onSelectEntry: (entry: AuditLogDto | null) => void;
   onPageChange: (page: number) => void;
+  formatAction: (action: string) => string;
 }
 
 export function AuditLogsTable({
@@ -42,6 +42,7 @@ export function AuditLogsTable({
   isRefreshing,
   onSelectEntry,
   onPageChange,
+  formatAction,
 }: AuditLogsTableProps) {
   return (
     <>
@@ -96,7 +97,7 @@ export function AuditLogsTable({
                   </Tooltip>
                 </TableCell>
                 <TableCell className="text-sm font-medium">
-                  {formatAuditAction(entry.action)}
+                  {formatAction(entry.action)}
                 </TableCell>
                 <TableCell>
                   {entry.entityType ? (

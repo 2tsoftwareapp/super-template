@@ -5,14 +5,17 @@ import { Separator } from "@repo/web-ui/separator";
 
 import type { AuditLogDto } from "@/lib/api-types";
 
-import { formatAuditAction } from "@/features/audit-logs/model/audit-logs.filters";
 import { formatDateTime } from "@/lib/format";
 
 interface AuditLogsEventDetailProps {
   entry: AuditLogDto;
+  formatAction: (action: string) => string;
 }
 
-export function AuditLogsEventDetail({ entry }: AuditLogsEventDetailProps) {
+export function AuditLogsEventDetail({
+  entry,
+  formatAction,
+}: AuditLogsEventDetailProps) {
   return (
     <div className="space-y-4 text-sm">
       <div>
@@ -22,9 +25,7 @@ export function AuditLogsEventDetail({ entry }: AuditLogsEventDetailProps) {
       <Separator />
       <div>
         <Label className="text-xs text-muted-foreground">Action</Label>
-        <p className="mt-0.5 font-medium">
-          {formatAuditAction(entry.action)}
-        </p>
+        <p className="mt-0.5 font-medium">{formatAction(entry.action)}</p>
       </div>
       <Separator />
       <div>

@@ -55,6 +55,7 @@ export function serializeAuditLogsFilters(filters: AuditLogsFilters): string {
   return sp.toString();
 }
 
+/** Display helper for audit action keys — used by the handler, not UI. */
 export function formatAuditAction(action: string): string {
   return action
     .replace(/\./g, " · ")

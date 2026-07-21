@@ -1,6 +1,6 @@
 import type { AuditLogDto, ListResponse } from "@/lib/api-types";
 
-import { buildPath, webFetch } from "@/lib/http";
+import { buildPath, webFetch, webFetchBlob } from "@/lib/http";
 
 export interface AuditLogsParams {
   page: number;
@@ -36,10 +36,7 @@ export async function exportAuditLogs(body: {
   });
 }
 
+/** Download an audit CSV export through the authenticated BFF path. */
 export async function downloadAuditLogExport(fileId: string) {
-  const response = await fetch(
-    `/api/bff/admin/audit-logs/exports/${fileId}/download`,
-  );
-  if (!response.ok) throw new Error("Download failed");
-  return response.blob();
+  return webFetchBlob(`/api/bff/admin/audit-logs/exports/${fileId}/download`);
 }
