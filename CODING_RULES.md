@@ -30,6 +30,7 @@
 19. [FE Cache Rules](#19-fe-cache-rules)
 20. [FE Security Rules](#20-fe-security-rules)
 21. [FE Performance Rules](#21-fe-performance-rules)
+22. [API Contract & Client Generation](#22-api-contract--client-generation)
 
 ---
 
@@ -354,6 +355,7 @@ apps/admin/src/features/<feature-name>/api/
 | R5 | Error handling tại layer này: re-throw hoặc để React Query xử lý — không gọi `toast()` |
 | R6 | **Không** import từ `features/*/controllers/` hay `features/*/screens/` |
 | R7 | **Không** chứa UI transformation logic phức tạp |
+| R8 | Path/endpoint **không** hardcode string tự do — lấy từ OpenAPI qua `bffPath(...)` / types `@repo/api-contract` (xem §22) |
 
 ### Naming convention
 
@@ -387,17 +389,28 @@ export function useUsersListQuery(params: UsersListParams) {
 
 ```ts
 // apps/admin/src/features/users/api/users.api.ts
-import { http } from "@/lib/http";
-import type { UserListResponse, CreateUserInput } from "@repo/api-contract";
+import { bffPath } from "@repo/api-contract";
+import type { AdminUserDto, CreateAdminUserInput, ListResponse } from "@/lib/api-types";
+import { buildPath, webFetch } from "@/lib/http";
 
-// Fetch functions thuần — không có hooks, không có state
+// Path lấy từ OpenAPI key — không tự nghĩ "/api/bff/admin/users"
 export const usersApi = {
-  list: (params: UsersListParams): Promise<UserListResponse> =>
-    http.get("/users", { params }),
-  get: (id: string): Promise<User> =>
-    http.get(`/users/${id}`),
-  create: (data: CreateUserInput): Promise<User> =>
-    http.post("/users", data),
+  list(params: UsersListParams) {
+    return webFetch<ListResponse<AdminUserDto>>(
+      buildPath(bffPath("/api/v1/admin/users"), { page: params.page, limit: params.limit }),
+    );
+  },
+  get(id: string) {
+    return webFetch<{ data: AdminUserDto }>(
+      bffPath("/api/v1/admin/users/{id}", { id }),
+    );
+  },
+  create(data: CreateAdminUserInput) {
+    return webFetch<{ data: AdminUserDto }>(bffPath("/api/v1/admin/users"), {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  },
 };
 ```
 
@@ -424,6 +437,9 @@ export function useActiveUsersQuery() {
   const activeUsers = query.data?.items.filter(u => u.status === "ACTIVE"); // ← vi phạm R7
   return { ...query, data: activeUsers };
 }
+
+// WRONG 4: hardcode URL lệch OpenAPI (hoặc path "đoán" không có trong contract)
+webFetch("/api/bff/admin/files"); // ← vi phạm R8 / §22 — BE thật là /api/v1/files
 ```
 
 ---
@@ -1799,3 +1815,85 @@ const cols = useMemo(() => buildColumns(), []); // ← vi phạm R5, thêm nhi�
 // WRONG 5: import barrel nặng trong route
 import { Button } from "@repo/web-ui"; // ← vi phạm R9 — dùng "@repo/web-ui/button"
 ```
+
+---
+
+## 22. API Contract & Client Generation
+
+> **Một nguồn sự thật cho mọi client.** Endpoint, request/response shape, và enum sống trong OpenAPI — không copy tay sang admin / web / Flutter.
+
+### Pipeline (bắt buộc)
+
+```
+Nest controllers + DTOs + decorators
+  → apps/api/openapi.json                 # JSON contract (committed)
+  → pnpm generate
+       ├─ packages/api-contract           # TS types + paths (openapi-typescript)
+       └─ apps/mobile/lib/generated/api   # Dart Dio client (openapi-generator)
+```
+
+| Client | Dùng contract thế nào |
+|--------|------------------------|
+| **admin / web** | Types từ `@repo/api-contract` / `@/lib/api-types`; URL qua `bffPath("/api/v1/...")` |
+| **Flutter** | Client generate sẵn — **không** tự ghép URL string song song |
+
+### Rules
+
+| # | Rule |
+|---|------|
+| R1 | OpenAPI (`apps/api/openapi.json`) là **single source of truth** cho HTTP API. Không duy trì file JSON/YAML endpoint thứ hai |
+| R2 | Đổi controller/DTO/decorator → chạy `pnpm generate` và **commit** `openapi.json` + generated TS (+ Dart khi không skip). **Cấm** hand-edit `packages/api-contract/src/generated/` hay Dart generated như nguồn chính |
+| R3 | `*.api.ts` (web/admin): path lấy từ key OpenAPI qua `bffPath(...)` — **cấm** string URL tự nghĩ (`"/api/bff/admin/foo"`) khi path đã có trong contract |
+| R4 | Mapping BFF cố định: `/api/v1/<rest>` → `/api/bff/<rest>`. Không thêm prefix `admin/` ở FE nếu BE không khai báo trong OpenAPI |
+| R5 | Response/request types import từ contract (`components["schemas"][...]` qua `@/lib/api-types`) — không định nghĩa DTO trùng song song ở FE |
+| R6 | Flutter dùng generated client; không hardcode path/DTO lệch OpenAPI |
+| R7 | Nếu generate fail (DB/boot): **không** coi patch tay `openapi.json` là chuẩn lâu dài — unblock generate rồi regen. Patch tạm phải khớp Nest source và ghi rõ trong commit |
+| R8 | Endpoint mới cho admin **và** mobile phải xuất hiện trong OpenAPI trước khi FE/mobile gọi |
+
+### ✅ DO
+
+```ts
+import { bffPath } from "@repo/api-contract";
+import { buildPath, webFetch } from "@/lib/http";
+
+// Key phải là keyof paths — typo / path không tồn tại → lỗi typecheck
+export const filesApi = {
+  list(params: { page: number; search?: string }) {
+    return webFetch(
+      buildPath(bffPath("/api/v1/files"), {
+        page: params.page,
+        search: params.search,
+      }),
+    );
+  },
+  getDownloadUrl(fileId: string) {
+    return webFetch(bffPath("/api/v1/files/{id}/url", { id: fileId }));
+  },
+};
+```
+
+```bash
+# Sau khi sửa Nest presentation
+pnpm generate
+# commit: openapi.json + packages/api-contract + mobile generated (nếu có)
+```
+
+### ❌ DON'T
+
+```ts
+// WRONG 1: đoán path — lệch OpenAPI (files thật là /api/v1/files, không phải admin/files)
+webFetch("/api/bff/admin/files"); // ← vi phạm R3/R4
+
+// WRONG 2: DTO tự viết song song với contract
+interface FileDto { id: string; storageKey: string } // ← vi phạm R5; storageKey có thể đã bị ẩn khỏi public schema
+
+// WRONG 3: sửa tay generated rồi coi là xong
+// packages/api-contract/src/generated/index.ts  ← vi phạm R2
+
+// WRONG 4: Flutter gọi URL raw trong khi đã có generated client
+dio.get("/api/v1/files"); // ← vi phạm R6
+```
+
+### ⚠️ NOTE — Tech debt hiện tại
+
+Nhiều `features/*/api/*.api.ts` vẫn còn literal `"/api/bff/..."`. Đó là **nợ migrate** sang `bffPath` + contract keys — code mới / chỗ đang đụng phải chuyển; không mở rộng thêm string path tự do.

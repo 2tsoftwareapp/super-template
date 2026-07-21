@@ -1,3 +1,5 @@
+import { bffPath } from "@repo/api-contract";
+
 import type {
   FileDto,
   FileHistoryEventDto,
@@ -14,11 +16,11 @@ export interface FilesParams {
 }
 
 /**
- * Files transport layer. Paths match OpenAPI `/api/v1/files` via BFF.
+ * Files transport layer. Paths come from OpenAPI via `bffPath` (§22).
  */
 export const filesApi = {
   list(params: FilesParams) {
-    const path = buildPath("/api/bff/files", {
+    const path = buildPath(bffPath("/api/v1/files"), {
       limit: 50,
       page: params.page,
       search: params.search,
@@ -29,24 +31,26 @@ export const filesApi = {
 
   versions(fileId: string) {
     return webFetch<{ data: FileVersionDto[] }>(
-      `/api/bff/files/${fileId}/versions`,
+      bffPath("/api/v1/files/{id}/versions", { id: fileId }),
     );
   },
 
   history(fileId: string) {
     return webFetch<{ data: FileHistoryEventDto[] }>(
-      `/api/bff/files/${fileId}/history`,
+      bffPath("/api/v1/files/{id}/history", { id: fileId }),
     );
   },
 
   delete(fileId: string) {
-    return webFetch(`/api/bff/files/${fileId}`, { method: "DELETE" });
+    return webFetch(bffPath("/api/v1/files/{id}", { id: fileId }), {
+      method: "DELETE",
+    });
   },
 
   upload(file: File) {
     const formData = new FormData();
     formData.append("file", file);
-    return webFetch("/api/bff/files", {
+    return webFetch(bffPath("/api/v1/files"), {
       method: "POST",
       body: formData,
     });
@@ -55,7 +59,7 @@ export const filesApi = {
   uploadVersion(fileId: string, file: File) {
     const formData = new FormData();
     formData.append("file", file);
-    return webFetch(`/api/bff/files/${fileId}/versions`, {
+    return webFetch(bffPath("/api/v1/files/{id}/versions", { id: fileId }), {
       method: "POST",
       body: formData,
     });
@@ -63,7 +67,7 @@ export const filesApi = {
 
   getDownloadUrl(fileId: string) {
     return webFetch<{ data: { url: string } }>(
-      `/api/bff/files/${fileId}/url`,
+      bffPath("/api/v1/files/{id}/url", { id: fileId }),
     ).then((res) => res.data.url);
   },
 };
