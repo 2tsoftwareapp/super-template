@@ -11,20 +11,21 @@ import {
 } from "@repo/web-ui/card";
 import { Copy, KeyRound } from "lucide-react";
 import { useCallback } from "react";
-import { toast } from "sonner";
 
 interface MfaRecoveryCodesProps {
   codes: string[];
   onDone: () => void;
+  onCopy: () => void;
+  onCopyError: () => void;
 }
 
-export function MfaRecoveryCodes({ codes, onDone }: MfaRecoveryCodesProps) {
+export function MfaRecoveryCodes({ codes, onDone, onCopy, onCopyError }: MfaRecoveryCodesProps) {
   const copyCodes = useCallback(() => {
     void navigator.clipboard
       .writeText(codes.join("\n"))
-      .then(() => toast.success("Recovery codes copied to clipboard"))
-      .catch(() => toast.error("Could not copy recovery codes"));
-  }, [codes]);
+      .then(() => onCopy?.())
+      .catch(() => onCopyError?.());
+  }, [codes, onCopy, onCopyError]);
 
   return (
     <Card>

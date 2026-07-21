@@ -33,7 +33,16 @@ export class AuthenticateAccessTokenUseCase {
   ) {}
 
   async execute(token: string): Promise<AuthenticatedRequestUser> {
-    const payload = await this.tokenProvider.verifyToken(token, 'access');
+    let payload: import('../ports/auth-token.provider.port').TokenPayload;
+    try {
+      payload = await this.tokenProvider.verifyToken(token, 'access');
+    } catch {
+      throw new AppError(
+        ERROR_CODES.AUTH_UNAUTHORIZED,
+        'Token is invalid or expired',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
     const [session, user] = await Promise.all([
       this.authSessionRepository.findSessionForUser(payload.sid, payload.sub),
       this.usersRepository.findById(payload.sub),

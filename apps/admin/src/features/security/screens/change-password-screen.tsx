@@ -1,8 +1,12 @@
 "use client";
 
+import { useChangePasswordMutation } from "@/features/security/api/security.mutations";
+
 import { ChangePasswordForm } from "../ui/change-password-form";
 
 export function ChangePasswordScreen() {
+  const changePassword = useChangePasswordMutation();
+
   return (
     <div className="mx-auto max-w-md space-y-8 py-12">
       <div className="space-y-1">
@@ -14,7 +18,10 @@ export function ChangePasswordScreen() {
         </p>
       </div>
 
-      <ChangePasswordForm />
+      <ChangePasswordForm
+        onChangePassword={(values) => changePassword.mutate(values)}
+        isSaving={changePassword.isPending}
+      />
     </div>
   );
 }

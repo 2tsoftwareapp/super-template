@@ -1,7 +1,6 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
 
 import { sessionQueryKey } from "@/hooks/use-session";
 import { useRouter } from "@/i18n/navigation";
@@ -17,7 +16,6 @@ export function useSetupMfaMutation(options?: { onSuccess?: (data: MfaSetupRespo
     onSuccess: (data) => {
       options?.onSuccess?.(data);
     },
-    onError: () => toast.error("Failed to start MFA setup"),
   });
 }
 
@@ -28,11 +26,9 @@ export function useConfirmMfaMutation(options?: { onSuccess?: (data: MfaConfirmR
     mutationFn: confirmMfa,
     onSuccess: (data) => {
       void queryClient.invalidateQueries({ queryKey: securityKeys.mfaStatus });
-      toast.success("Two-factor authentication enabled");
       options?.onSuccess?.(data);
     },
     onError: () => {
-      toast.error("Invalid code. Please try again.");
       options?.onError?.();
     },
   });
@@ -45,11 +41,9 @@ export function useDisableMfaMutation(options?: { onSuccess?: () => void; onErro
     mutationFn: disableMfa,
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: securityKeys.mfaStatus });
-      toast.success("Two-factor authentication disabled");
       options?.onSuccess?.();
     },
     onError: () => {
-      toast.error("Invalid code. Please try again.");
       options?.onError?.();
     },
   });
@@ -59,11 +53,9 @@ export function useRegenerateMfaCodesMutation(options?: { onSuccess?: (data: Mfa
   return useMutation({
     mutationFn: regenerateMfaCodes,
     onSuccess: (data) => {
-      toast.success("Recovery codes regenerated");
       options?.onSuccess?.(data);
     },
     onError: () => {
-      toast.error("Invalid code. Please try again.");
       options?.onError?.();
     },
   });
@@ -81,11 +73,7 @@ export function useChangePasswordMutation() {
       }),
     onSuccess: () => {
       queryClient.removeQueries({ queryKey: sessionQueryKey });
-      toast.success("Password updated. Sign in with your new password.");
       router.replace("/login");
-    },
-    onError: () => {
-      toast.error("Failed to change password. Check your current password.");
     },
   });
 }

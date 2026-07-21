@@ -10,78 +10,58 @@ import {
 } from "@repo/web-ui/card";
 import { Spinner } from "@repo/web-ui/spinner";
 import { Shield } from "lucide-react";
-import { useState } from "react";
 
 import type { MfaSetupResponse } from "@/features/security/model/security.schemas";
-
-import {
-  useConfirmMfaMutation,
-  useDisableMfaMutation,
-  useRegenerateMfaCodesMutation,
-  useSetupMfaMutation,
-} from "@/features/security/api/security.mutations";
-import { useMfaStatusQuery } from "@/features/security/api/security.queries";
 
 import { MfaEnabledActions } from "./mfa-enabled-actions";
 import { MfaRecoveryCodes } from "./mfa-recovery-codes";
 import { MfaSetupFlow } from "./mfa-setup-flow";
 import { MfaStatusBadge } from "./mfa-status-badge";
 
-type MfaView = "idle" | "setup" | "recovery-codes";
+type MfaStatus = "loading" | "enabled" | "disabled";
 
-export function MfaManagement() {
-  const [view, setView] = useState<MfaView>("idle");
-  const [setupData, setSetupData] = useState<MfaSetupResponse["data"] | null>(
-    null,
-  );
-  const [recoveryCodes, setRecoveryCodes] = useState<string[]>([]);
-  const [otpCode, setOtpCode] = useState("");
+interface MfaManagementProps {
+  status: MfaStatus;
+  view: "idle" | "setup" | "recovery-codes";
+  setupData: MfaSetupResponse["data"] | null;
+  recoveryCodes: string[];
+  otpCode: string;
+  onOtpChange: (code: string) => void;
+  onStartSetup: () => void;
+  onVerifyOtp: (code: string) => void;
+  onDisable: (code: string) => void;
+  onRegenerate: (code: string) => void;
+  onCancelSetup: () => void;
+  onRecoveryCodesDone: () => void;
+  isSettingUp: boolean;
+  isVerifying: boolean;
+  isDisabling: boolean;
+  isRegenerating: boolean;
+  onCopyRecoveryCodes: () => void;
+  onCopyRecoveryCodesError: () => void;
+}
 
-  const status = useMfaStatusQuery();
-
-  const mfaEnabled = status.data?.data.enabled ?? false;
-
-  const setupMutation = useSetupMfaMutation({
-    onSuccess: (data) => {
-      setSetupData(data.data);
-      setView("setup");
-      setOtpCode("");
-    },
-  });
-
-  const confirmMutation = useConfirmMfaMutation({
-    onSuccess: (data) => {
-      setRecoveryCodes(data.data.recoveryCodes);
-      setView("recovery-codes");
-      setSetupData(null);
-      setOtpCode("");
-    },
-    onError: () => {
-      setOtpCode("");
-    },
-  });
-
-  const disableMutation = useDisableMfaMutation({
-    onSuccess: () => {
-      setOtpCode("");
-    },
-    onError: () => {
-      setOtpCode("");
-    },
-  });
-
-  const regenerateMutation = useRegenerateMfaCodesMutation({
-    onSuccess: (data) => {
-      setRecoveryCodes(data.data.recoveryCodes);
-      setView("recovery-codes");
-      setOtpCode("");
-    },
-    onError: () => {
-      setOtpCode("");
-    },
-  });
-
-  if (status.isLoading) {
+export function MfaManagement({
+  status,
+  view,
+  setupData,
+  recoveryCodes,
+  otpCode,
+  onOtpChange,
+  onStartSetup,
+  onVerifyOtp,
+  onDisable,
+  onRegenerate,
+  onCancelSetup,
+  onRecoveryCodesDone,
+  isSettingUp,
+  isVerifying,
+  isDisabling,
+  isRegenerating,
+  onCopyRecoveryCodes,
+  onCopyRecoveryCodesError,
+}: MfaManagementProps) {
+  if (status === "loading") {
     return (
       <Card>
         <CardContent className="flex justify-center py-12">
@@ -95,10 +75,9 @@ export function MfaManagement() {
     return (
       <MfaRecoveryCodes
         codes={recoveryCodes}
-        onDone={() => {
-          setView("idle");
-          setRecoveryCodes([]);
-        }}
+        onDone={onRecoveryCodesDone}
+        onCopy={onCopyRecoveryCodes}
+        onCopyError={onCopyRecoveryCodesError}
       />
     );
   }
@@ -108,17 +87,15 @@ export function MfaManagement() {
       <MfaSetupFlow
         setupData={setupData}
         otpCode={otpCode}
-        onOtpChange={setOtpCode}
-        onVerify={(code) => confirmMutation.mutate(code)}
-        onCancel={() => {
-          setView("idle");
-          setSetupData(null);
-          setOtpCode("");
-        }}
-        isVerifying={confirmMutation.isPending}
+        onOtpChange={onOtpChange}
+        onVerify={onVerifyOtp}
+        onCancel={onCancelSetup}
+        isVerifying={isVerifying}
       />
     );
   }
+
+  const mfaEnabled = status === "enabled";
 
   return (
     <Card>
@@ -141,15 +118,15 @@ export function MfaManagement() {
         {mfaEnabled ? (
           <MfaEnabledActions
             otpCode={otpCode}
-            onOtpChange={setOtpCode}
-            onDisable={(code) => disableMutation.mutate(code)}
-            onRegenerate={(code) => regenerateMutation.mutate(code)}
-            isDisabling={disableMutation.isPending}
-            isRegenerating={regenerateMutation.isPending}
+            onOtpChange={onOtpChange}
+            onDisable={onDisable}
+            onRegenerate={onRegenerate}
+            isDisabling={isDisabling}
+            isRegenerating={isRegenerating}
           />
         ) : (
-          <Button onClick={() => setupMutation.mutate()}>
-            {setupMutation.isPending && <Spinner className="mr-2 size-4" />}
+          <Button onClick={onStartSetup}>
+            {isSettingUp && <Spinner className="mr-2 size-4" />}
             Enable two-factor authentication
           </Button>
         )}

@@ -15,8 +15,10 @@ import {
 } from '@repo/api-database';
 import { and, eq, inArray, isNull, or, type SQL } from 'drizzle-orm';
 
+import type { AccessControlRepositoryPort } from '../application/access-control.repository.port';
+
 @Injectable()
-export class AccessControlRepository {
+export class AccessControlRepository implements AccessControlRepositoryPort {
   constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
 
   async findAllRoles(executor: DatabaseExecutor = this.database) {

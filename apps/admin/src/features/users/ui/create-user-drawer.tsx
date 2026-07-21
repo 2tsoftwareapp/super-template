@@ -17,40 +17,49 @@ import { Building2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 
+import type { CreateUserForm } from "@/features/users/model/users.schemas";
+import type { AdminUserDto, RoleDto } from "@/lib/api-types";
+
 import { ResourceDrawer } from "@/components/resource-drawer";
-import { useMyOrganizationsQuery } from "@/features/organizations/api/organizations.queries";
-import { useCreateUser } from "@/features/users/api/users.mutations";
-import { useAdminRolesQuery } from "@/features/users/api/users.queries";
 import {
-  type CreateUserForm,
   createUserSchema,
 } from "@/features/users/model/users.schemas";
 import {
   filterRolesForOrganization,
   findPlatformUserRoleId,
   formatRoleName,
-  getAssignableRoles,
 } from "@/lib/roles";
+
+interface CreateUserDrawerProps {
+  open: boolean;
+  onClose: () => void;
+  actorRoles: string[];
+  actorOrganizationId: string | null | undefined;
+  assignableRoles: RoleDto[];
+  organizations: { id: string; name: string }[];
+  isOrganizationsLoading: boolean;
+  isSaving: boolean;
+  onSubmit: (values: {
+    email: string;
+    password: string;
+    displayName: string;
+    roleId: string;
+    organizationId?: string | undefined;
+  }) => Promise<{ data: AdminUserDto }>;
+}
 
 export function CreateUserDrawer({
   open,
   onClose,
   actorRoles,
   actorOrganizationId,
-}: {
-  open: boolean;
-  onClose: () => void;
-  actorRoles: string[];
-  actorOrganizationId: string | null | undefined;
-}) {
-  const allRoles = useAdminRolesQuery();
-  const organizations = useMyOrganizationsQuery();
+  assignableRoles,
+  organizations,
+  isOrganizationsLoading,
+  isSaving,
+  onSubmit,
+}: CreateUserDrawerProps) {
   const isActorSuperAdmin = actorRoles.includes("SUPER_ADMIN");
-
-  const allAssignable = useMemo(
-    () => getAssignableRoles(actorRoles, allRoles.data?.data ?? []),
-    [actorRoles, allRoles.data],
-  );
 
   const [selectedOrgId, setSelectedOrgId] = useState<string>("");
 
@@ -59,8 +68,8 @@ export function CreateUserDrawer({
     : (actorOrganizationId ?? "");
 
   const rolesForOrg = useMemo(
-    () => filterRolesForOrganization(allAssignable, effectiveOrgId),
-    [allAssignable, effectiveOrgId],
+    () => filterRolesForOrganization(assignableRoles, effectiveOrgId),
+    [assignableRoles, effectiveOrgId],
   );
 
   const roleIdsForOrg = useMemo(
@@ -92,21 +101,19 @@ export function CreateUserDrawer({
       return;
     }
 
-    // Guard: wait for queries to resolve before setting defaults.
-    if (allAssignable.length === 0) return;
-    if (isActorSuperAdmin && !organizations.data) return;
+    if (assignableRoles.length === 0) return;
+    if (isActorSuperAdmin && organizations.length === 0) return;
     if (!isActorSuperAdmin && !actorOrganizationId) return;
 
-    // Prevent re-initialising after the user has made selections.
     if (initialisedRef.current) return;
     if (isActorSuperAdmin) {
-      const firstOrg = organizations.data?.data?.[0];
+      const firstOrg = organizations[0];
       if (!firstOrg) return;
       initialisedRef.current = true;
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedOrgId(firstOrg.id);
       form.setValue("organizationId", firstOrg.id, { shouldValidate: false });
-      const roles = filterRolesForOrganization(allAssignable, firstOrg.id);
+      const roles = filterRolesForOrganization(assignableRoles, firstOrg.id);
       form.setValue("roleId", findPlatformUserRoleId(roles), {
         shouldValidate: false,
       });
@@ -114,10 +121,7 @@ export function CreateUserDrawer({
       initialisedRef.current = true;
       setSelectedOrgId("");
       form.setValue("organizationId", "", { shouldValidate: false });
-      const roles = filterRolesForOrganization(
-        allAssignable,
-        actorOrganizationId ?? "",
-      );
+      const roles = filterRolesForOrganization(assignableRoles, actorOrganizationId ?? undefined);
       form.setValue("roleId", findPlatformUserRoleId(roles), {
         shouldValidate: false,
       });
@@ -126,30 +130,17 @@ export function CreateUserDrawer({
     open,
     isActorSuperAdmin,
     actorOrganizationId,
-    allAssignable,
-    organizations.data,
+    assignableRoles,
+    organizations,
     form,
   ]);
-
-  const createUser = useCreateUser({
-    onSuccess: () => {
-      form.reset({
-        email: "",
-        password: "",
-        displayName: "",
-        roleId: "",
-        organizationId: "",
-      });
-      onClose();
-    },
-  });
 
   const selectedRoleId = useWatch<CreateUserForm, "roleId">({
     control: form.control,
     name: "roleId",
   });
 
-  const actorOrg = organizations.data?.data?.find(
+  const actorOrg = organizations.find(
     (o) => o.id === actorOrganizationId,
   );
 
@@ -164,9 +155,9 @@ export function CreateUserDrawer({
           type="submit"
           form="create-user-form"
           className="w-full"
-          disabled={createUser.isPending}
+          disabled={isSaving}
         >
-          {createUser.isPending ? <Spinner data-icon="inline-start" /> : null}
+          {isSaving ? <Spinner data-icon="inline-start" /> : null}
           Send invite
         </Button>
       }
@@ -175,17 +166,7 @@ export function CreateUserDrawer({
         id="create-user-form"
         className="flex flex-col gap-4"
         onSubmit={form.handleSubmit((values) => {
-          const orgId = isActorSuperAdmin
-            ? values.organizationId
-            : actorOrganizationId;
-          void createUser.mutateAsync({
-            email: values.email,
-            password: values.password,
-            displayName: values.displayName,
-            roleId: values.roleId,
-            status: "PENDING",
-            ...(orgId ? { organizationId: orgId } : {}),
-          });
+          void onSubmit(values);
         })}
       >
         <div className="flex flex-col gap-1.5">
@@ -244,10 +225,7 @@ export function CreateUserDrawer({
                 form.setValue("organizationId", value, {
                   shouldValidate: false,
                 });
-                const nextRoles = filterRolesForOrganization(
-                  allAssignable,
-                  value,
-                );
+                const nextRoles = filterRolesForOrganization(assignableRoles, value);
                 const currentRoleId = form.getValues("roleId");
                 const roleInOrg = nextRoles.find((r) => r.id === currentRoleId);
                 if (!roleInOrg) {
@@ -256,14 +234,14 @@ export function CreateUserDrawer({
                   });
                 }
               }}
-              disabled={organizations.isLoading}
+              disabled={isOrganizationsLoading}
             >
               <SelectTrigger>
                 <Building2 className="size-3.5 shrink-0 text-muted-foreground" />
                 <SelectValue placeholder="Search organization..." />
               </SelectTrigger>
               <SelectContent>
-                {(organizations.data?.data ?? []).map((org) => (
+                {organizations.map((org) => (
                   <SelectItem key={org.id} value={org.id}>
                     {org.name}
                   </SelectItem>
@@ -315,12 +293,6 @@ export function CreateUserDrawer({
             They must verify their email before signing in.
           </p>
         </div>
-
-        {createUser.isError ? (
-          <p className="text-sm text-destructive">
-            Failed to create user. Check inputs and role permissions.
-          </p>
-        ) : null}
       </form>
     </ResourceDrawer>
   );

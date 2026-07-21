@@ -2,11 +2,14 @@ import type {
   DatabaseClient,
   DatabaseExecutor,
 } from '@repo/api-database';
+import type { JsonObject, TransactionExecutor } from '@repo/api-core';
 
 import { Inject, Injectable } from '@nestjs/common';
 import { DATABASE, runIdempotentInsert } from '@repo/api-database';
 import { jobs } from '@repo/api-database';
 import { and, count, desc, eq, sql } from 'drizzle-orm';
+
+import type { JobRecord, JobsRepositoryPort } from '../application/ports/jobs.repository.port';
 
 interface ListJobsParams {
   page: number;
@@ -16,30 +19,61 @@ interface ListJobsParams {
 }
 
 @Injectable()
-export class JobsRepository {
+export class JobsRepository implements JobsRepositoryPort {
   constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
 
   async create(
-    values: typeof jobs.$inferInsert,
-    executor: DatabaseExecutor = this.database,
-  ) {
-    const [job] = await executor.insert(jobs).values(values).returning();
+    values: {
+      id?: string;
+      type: string;
+      payload: JsonObject;
+      status?: string;
+      scheduledAt?: Date;
+      priority?: number;
+      attempts?: number;
+      maxAttempts?: number;
+      startedAt?: Date | null;
+      completedAt?: Date | null;
+      cancelledAt?: Date | null;
+      errorMessage?: string | null;
+      organizationId?: string | null;
+      createdById?: string | null;
+      idempotencyKey?: string | null;
+    },
+    executor?: TransactionExecutor,
+  ): Promise<JobRecord | null> {
+    const db = (executor ?? this.database) as DatabaseExecutor;
+    const [job] = await db.insert(jobs).values(values as typeof jobs.$inferInsert).returning();
 
-    return job ?? null;
+    return (job as JobRecord) ?? null;
   }
 
   async createIdempotent(
-    values: typeof jobs.$inferInsert & {
+    values: {
+      id?: string;
+      type: string;
+      payload: JsonObject;
+      status?: string;
+      scheduledAt?: Date;
+      priority?: number;
+      attempts?: number;
+      maxAttempts?: number;
+      startedAt?: Date | null;
+      completedAt?: Date | null;
+      cancelledAt?: Date | null;
+      errorMessage?: string | null;
+      organizationId?: string | null;
       createdById: string;
       idempotencyKey: string;
     },
-    executor: DatabaseExecutor = this.database,
-  ) {
+    executor?: TransactionExecutor,
+  ): Promise<JobRecord | null> {
+    const db = (executor ?? this.database) as DatabaseExecutor;
     const result = await runIdempotentInsert(
       async () => {
-        const [inserted] = await executor.insert(jobs).values(values).returning();
+        const [inserted] = await db.insert(jobs).values(values as typeof jobs.$inferInsert & { createdById: string; idempotencyKey: string }).returning();
 
-        return inserted ?? undefined;
+        return inserted as JobRecord | undefined;
       },
       () =>
         this.findByIdempotencyKey(
@@ -52,22 +86,27 @@ export class JobsRepository {
     return result?.value ?? null;
   }
 
-  async findById(jobId: string, executor: DatabaseExecutor = this.database) {
-    const [job] = await executor
+  async findById(
+    jobId: string,
+    executor?: TransactionExecutor,
+  ): Promise<JobRecord | null> {
+    const db = (executor ?? this.database) as DatabaseExecutor;
+    const [job] = await db
       .select()
       .from(jobs)
       .where(eq(jobs.id, jobId))
       .limit(1);
 
-    return job ?? null;
+    return (job as JobRecord) ?? null;
   }
 
   async findByIdempotencyKey(
     createdById: string,
     idempotencyKey: string,
-    executor: DatabaseExecutor = this.database,
-  ) {
-    const [job] = await executor
+    executor?: TransactionExecutor,
+  ): Promise<JobRecord | null> {
+    const db = (executor ?? this.database) as DatabaseExecutor;
+    const [job] = await db
       .select()
       .from(jobs)
       .where(
@@ -78,13 +117,14 @@ export class JobsRepository {
       )
       .limit(1);
 
-    return job ?? null;
+    return (job as JobRecord) ?? null;
   }
 
   async list(
     params: ListJobsParams,
-    executor: DatabaseExecutor = this.database,
-  ) {
+    executor?: TransactionExecutor,
+  ): Promise<{ rows: JobRecord[]; total: number }> {
+    const db = (executor ?? this.database) as DatabaseExecutor;
     const filters = [];
 
     if (params.status) {
@@ -99,27 +139,28 @@ export class JobsRepository {
     const offset = (params.page - 1) * params.limit;
 
     const [rows, totals] = await Promise.all([
-      executor
+      db
         .select()
         .from(jobs)
         .where(whereClause)
         .orderBy(desc(jobs.scheduledAt))
         .limit(params.limit)
         .offset(offset),
-      executor.select({ total: count() }).from(jobs).where(whereClause),
+      db.select({ total: count() }).from(jobs).where(whereClause),
     ]);
 
     return {
-      rows,
+      rows: rows as JobRecord[],
       total: Number(totals[0]?.total ?? 0),
     };
   }
 
   async claimDueJobs(
     limit: number,
-    executor: DatabaseExecutor = this.database,
-  ) {
-    const result = await executor.execute<typeof jobs.$inferSelect>(sql`
+    executor?: TransactionExecutor,
+  ): Promise<JobRecord[]> {
+    const db = (executor ?? this.database) as DatabaseExecutor;
+    const result = await db.execute<typeof jobs.$inferSelect>(sql`
       UPDATE jobs
       SET
         status = 'PROCESSING',
@@ -161,14 +202,15 @@ export class JobsRepository {
         updated_at AS "updatedAt"
     `);
 
-    return result.rows;
+    return result.rows as JobRecord[];
   }
 
   async markCompleted(
     jobId: string,
-    executor: DatabaseExecutor = this.database,
-  ) {
-    const [job] = await executor
+    executor?: TransactionExecutor,
+  ): Promise<JobRecord | null> {
+    const db = (executor ?? this.database) as DatabaseExecutor;
+    const [job] = await db
       .update(jobs)
       .set({
         status: 'COMPLETED',
@@ -178,33 +220,35 @@ export class JobsRepository {
       .where(eq(jobs.id, jobId))
       .returning();
 
-    return job ?? null;
+    return (job as JobRecord) ?? null;
   }
 
   async markFailed(
     jobId: string,
-    errorMessage: string,
-    executor: DatabaseExecutor = this.database,
-  ) {
-    const [job] = await executor
+    message: string,
+    executor?: TransactionExecutor,
+  ): Promise<JobRecord | null> {
+    const db = (executor ?? this.database) as DatabaseExecutor;
+    const [job] = await db
       .update(jobs)
       .set({
         status: 'FAILED',
-        errorMessage,
+        errorMessage: message,
         completedAt: new Date(),
         updatedAt: new Date(),
       })
       .where(eq(jobs.id, jobId))
       .returning();
 
-    return job ?? null;
+    return (job as JobRecord) ?? null;
   }
 
   async markCancelled(
     jobId: string,
-    executor: DatabaseExecutor = this.database,
-  ) {
-    const [job] = await executor
+    executor?: TransactionExecutor,
+  ): Promise<JobRecord | null> {
+    const db = (executor ?? this.database) as DatabaseExecutor;
+    const [job] = await db
       .update(jobs)
       .set({
         status: 'CANCELLED',
@@ -214,27 +258,28 @@ export class JobsRepository {
       .where(and(eq(jobs.id, jobId), eq(jobs.status, 'PENDING')))
       .returning();
 
-    return job ?? null;
+    return (job as JobRecord) ?? null;
   }
 
   async requeueForRetry(
     jobId: string,
     scheduledAt: Date,
-    errorMessage: string,
-    executor: DatabaseExecutor = this.database,
-  ) {
-    const [job] = await executor
+    message: string,
+    executor?: TransactionExecutor,
+  ): Promise<JobRecord | null> {
+    const db = (executor ?? this.database) as DatabaseExecutor;
+    const [job] = await db
       .update(jobs)
       .set({
         status: 'PENDING',
         scheduledAt,
-        errorMessage,
+        errorMessage: message,
         startedAt: null,
         updatedAt: new Date(),
       })
       .where(eq(jobs.id, jobId))
       .returning();
 
-    return job ?? null;
+    return (job as JobRecord) ?? null;
   }
 }

@@ -72,11 +72,14 @@ export class UpdateAdminUserUseCase {
     );
 
     if (input.email) {
-      await this.usersRepository.assertEmailAvailable(
-        normalizeEmail(input.email),
-        undefined,
-        userId,
-      );
+      const existingUser = await this.usersRepository.findByEmail(normalizeEmail(input.email));
+      if (existingUser && existingUser.id !== userId) {
+        throw new AppError(
+          ERROR_CODES.USER_EMAIL_ALREADY_EXISTS,
+          'A user with this email already exists',
+          HttpStatus.CONFLICT,
+        );
+      }
     }
 
     const updated = await this.usersRepository.update(userId, {

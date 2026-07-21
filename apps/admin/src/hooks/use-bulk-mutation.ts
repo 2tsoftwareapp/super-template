@@ -1,14 +1,10 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
-
-import { ApiClientError } from "@/lib/http";
 
 export function useBulkMutation({
   mutationFn,
   queryKey,
-  successMessage,
 }: {
   mutationFn: (id: string) => Promise<unknown>;
   queryKey: readonly string[];
@@ -30,24 +26,8 @@ export function useBulkMutation({
       }
       return { succeeded, failed, total: ids.length };
     },
-    onSuccess: async ({ succeeded, failed, total }) => {
+    onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey });
-      if (failed > 0) {
-        toast.error(`${failed} of ${total} failed`);
-      } else {
-        toast.success(
-          successMessage
-            ? `${succeeded} ${successMessage}`
-            : `${succeeded} updated`,
-        );
-      }
-    },
-    onError: (error) => {
-      const message =
-        error instanceof ApiClientError
-          ? error.message
-          : "Could not complete operation";
-      toast.error(message);
     },
   });
 }

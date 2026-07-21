@@ -1,10 +1,8 @@
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import {
-  AppError,
   durationToMilliseconds,
   EnvironmentService,
-  ERROR_CODES,
 } from '@repo/api-core';
 import { randomUUID } from 'node:crypto';
 
@@ -186,24 +184,16 @@ export class SessionTokenService implements AuthTokenProviderPort {
       });
 
       if (payload.typ !== expectedType) {
-        throw new AppError(
-          ERROR_CODES.AUTH_UNAUTHORIZED,
-          'Invalid token type',
-          HttpStatus.UNAUTHORIZED,
-        );
+        throw new Error('Invalid token type');
       }
 
       return payload;
     } catch (error) {
-      if (error instanceof AppError) {
+      if (error instanceof Error) {
         throw error;
       }
 
-      throw new AppError(
-        ERROR_CODES.AUTH_UNAUTHORIZED,
-        'Token is invalid or expired',
-        HttpStatus.UNAUTHORIZED,
-      );
+      throw new Error('Token is invalid or expired');
     }
   }
 }

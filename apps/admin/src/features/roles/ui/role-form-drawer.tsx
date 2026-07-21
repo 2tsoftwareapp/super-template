@@ -14,12 +14,11 @@ import {
 import { Spinner } from "@repo/web-ui/spinner";
 import { Building2 } from "lucide-react";
 import { useEffect } from "react";
-import { z } from "zod";
 import { useForm, useWatch } from "react-hook-form";
+import { z } from "zod";
 
 import { PermissionMultiSelect } from "@/components/permission-multi-select";
 import { ResourceDrawer } from "@/components/resource-drawer";
-import { useSaveRoleMutation } from "@/features/roles/api/roles.mutations";
 import {
   type EditableRole,
   type PermissionDto,
@@ -33,22 +32,31 @@ export function RoleFormDrawer({
   role,
   permissions,
   permissionsError,
+  isSaving,
   isSuperAdmin,
   actorPermissions,
   organizations,
   selectedOrganizationId,
   onOrganizationSelect,
+  onSave,
 }: {
   open: boolean;
   onClose: () => void;
   role: EditableRole | null;
   permissions: PermissionDto[];
   permissionsError: boolean;
+  isSaving: boolean;
   isSuperAdmin: boolean;
   actorPermissions: string[];
   organizations: { id: string; name: string }[];
   selectedOrganizationId: string;
   onOrganizationSelect: (id: string) => void;
+  onSave: (values: {
+    name: string;
+    description: string;
+    permissionIds: string[];
+    organizationId: string;
+  }) => void;
 }) {
   const isEditing = role !== null;
 
@@ -78,12 +86,6 @@ export function RoleFormDrawer({
     });
   }, [open, role, form]);
 
-  const saveRole = useSaveRoleMutation({
-    onSuccess: () => {
-      onClose();
-    },
-  });
-
   const selectedPermissionIds = useWatch<RoleForm, "permissionIds">({
     control: form.control,
     name: "permissionIds",
@@ -97,17 +99,12 @@ export function RoleFormDrawer({
   );
 
   const handleSubmit = form.handleSubmit((values) => {
-    const payload: RoleForm = {
+    onSave({
       name: values.name,
-      description: values.description,
+      description: values.description ?? "",
       permissionIds: values.permissionIds,
-    };
-
-    if (!isEditing && isSuperAdmin && selectedOrganizationId) {
-      payload.organizationId = selectedOrganizationId;
-    }
-
-    saveRole.mutate({ roleId: role?.id, input: payload });
+      organizationId: !isEditing && isSuperAdmin ? selectedOrganizationId : "",
+    });
   });
 
   return (
@@ -121,9 +118,9 @@ export function RoleFormDrawer({
           type="submit"
           form="role-form"
           className="w-full"
-          disabled={saveRole.isPending}
+          disabled={isSaving}
         >
-          {saveRole.isPending ? <Spinner data-icon="inline-start" /> : null}
+          {isSaving ? <Spinner data-icon="inline-start" /> : null}
           {isEditing ? "Save changes" : "Create role"}
         </Button>
       }

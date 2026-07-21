@@ -9,6 +9,11 @@ import type {
   UsersPageSize,
   UserStatusFilter,
 } from "@/features/users/model/types";
+import type {
+  AdminUserDto,
+  OrganizationDto,
+  RoleDto,
+} from "@/lib/api-types";
 
 import {
   useActivateUsers,
@@ -24,12 +29,22 @@ import {
 import { useSession } from "@/hooks/use-session";
 import { usePathname, useRouter } from "@/i18n/navigation";
 
+import { useCreateUserDrawerController } from "./use-create-user-drawer-controller";
 import { useUsersBulkActions } from "./use-users-bulk-actions";
 import { useUsersConfirmBlock } from "./use-users-confirm-block";
-import { useUsersTableConfig } from "./use-users-table-config";
 
 export interface UsersListViewModel {
   session: { isLoading: boolean; isError: boolean };
+  columnData: {
+    pageUsers: AdminUserDto[];
+    canUpdate: boolean;
+    isMutating: boolean;
+    handleActivate: (userId: string) => Promise<void>;
+    handleBlock: (userId: string) => void;
+    handleResendVerification: (email: string) => void;
+    listParams: UsersListParams;
+    onSortChange: (nextSort: UsersListParams["sort"]) => void;
+  };
   header: {
     isLoading: boolean;
     isFetching: boolean;
@@ -42,7 +57,6 @@ export interface UsersListViewModel {
     isError: boolean;
     isLoading: boolean;
     onRetry: () => void;
-    table: ReturnType<typeof useUsersTableConfig>["table"];
     hasFilters: boolean;
     emptyTitle: string;
     emptyDescription: string;
@@ -78,7 +92,12 @@ export interface UsersListViewModel {
     open: boolean;
     actorRoles: string[];
     actorOrganizationId: string | null | undefined;
+    assignableRoles: RoleDto[];
+    organizations: OrganizationDto[];
+    isOrganizationsLoading: boolean;
+    isSaving: boolean;
     onClose: () => void;
+    onSubmit: (values: { email: string; password: string; displayName: string; roleId: string; organizationId?: string | undefined }) => Promise<{ data: AdminUserDto }>;
   };
   confirmBlock: {
     state: { userIds: string[]; label: string; count: number } | null;
@@ -100,6 +119,7 @@ export function useUsersListController(): UsersListViewModel {
   );
   const [searchInput, setSearchInput] = useState(listParams.search);
   const [showCreate, setShowCreate] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   const debouncedSearch = useDebouncedValue(searchInput, 500);
 
@@ -151,6 +171,13 @@ export function useUsersListController(): UsersListViewModel {
     session.data?.data.permissions,
   );
 
+  const drawerController = useCreateUserDrawerController({
+    open: showCreate,
+    actorRoles,
+    actorOrganizationId,
+    onClose: () => setShowCreate(false),
+  });
+
   const pageUsers = users.data?.data ?? [];
   const total = users.data?.meta?.total ?? 0;
   const totalPages = users.data?.meta?.totalPages ?? 1;
@@ -177,24 +204,14 @@ export function useUsersListController(): UsersListViewModel {
     [resendVerification],
   );
 
+  const clearSelection = useCallback(() => setSelectedIds([]), []);
+
   const handleSortChange = useCallback(
     (nextSort: UsersListParams["sort"]) => {
       patchListParams({ sort: nextSort, page: 1 });
     },
     [patchListParams],
   );
-
-  const { table, selectedIds, clearSelection, setRowSelection } =
-    useUsersTableConfig({
-      pageUsers,
-      canUpdate,
-      isMutating,
-      listParams,
-      handleActivate,
-      handleBlock,
-      handleResendVerification,
-      onSortChange: handleSortChange,
-    });
 
   const hasFilters = Boolean(searchInput || queryParams.status !== "all");
 
@@ -212,39 +229,49 @@ export function useUsersListController(): UsersListViewModel {
 
   const handleConfirmBlock = async () => {
     if (!confirmBlock) return;
-    setRowSelection({});
+    clearSelection();
     await blockUsers.mutateAsync(confirmBlock.userIds);
     cancelBlock();
   };
 
   const handleStatusFilter = (status: UserStatusFilter) => {
     patchListParams({ status, page: 1 });
-    setRowSelection({});
+    clearSelection();
   };
 
   const handleSearchChange = (value: string) => {
     setSearchInput(value);
-    setRowSelection({});
+    clearSelection();
   };
 
   const handleClearFilters = () => {
     setSearchInput("");
     patchListParams({ status: "all", search: "", page: 1 });
-    setRowSelection({});
+    clearSelection();
   };
 
   const handlePageChange = (page: number) => {
     patchListParams({ page });
-    setRowSelection({});
+    clearSelection();
   };
 
   const handlePageSizeChange = (limit: number) => {
     patchListParams({ limit: limit as UsersPageSize, page: 1 });
-    setRowSelection({});
+    clearSelection();
   };
 
   return {
     session: { isLoading: session.isLoading, isError: session.isError },
+    columnData: {
+      pageUsers,
+      canUpdate,
+      isMutating,
+      handleActivate,
+      handleBlock,
+      handleResendVerification,
+      listParams,
+      onSortChange: handleSortChange,
+    },
     header: {
       isLoading: users.isLoading,
       isFetching: users.isFetching,
@@ -257,7 +284,6 @@ export function useUsersListController(): UsersListViewModel {
       isError: users.isError,
       isLoading: users.isLoading,
       onRetry: () => void users.refetch(),
-      table,
       hasFilters,
       emptyTitle: hasFilters ? "No users match your filters" : "No users yet",
       emptyDescription: hasFilters
@@ -295,7 +321,12 @@ export function useUsersListController(): UsersListViewModel {
       open: showCreate,
       actorRoles,
       actorOrganizationId,
+      assignableRoles: drawerController.allAssignable,
+      organizations: drawerController.organizations,
+      isOrganizationsLoading: drawerController.isOrganizationsLoading,
+      isSaving: drawerController.isSaving,
       onClose: () => setShowCreate(false),
+      onSubmit: drawerController.onSubmit,
     },
     confirmBlock: {
       state: confirmBlock,

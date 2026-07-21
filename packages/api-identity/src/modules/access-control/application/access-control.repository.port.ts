@@ -164,6 +164,10 @@ export interface AccessControlRepositoryPort {
     permissionId: string,
     executor?: TransactionExecutor,
   ): Promise<void>;
+  findRolesByNames(
+    roleNames: string[],
+    executor?: TransactionExecutor,
+  ): Promise<RoleRecord[]>;
   findRoleByName(
     name: string,
     organizationId?: string | null,

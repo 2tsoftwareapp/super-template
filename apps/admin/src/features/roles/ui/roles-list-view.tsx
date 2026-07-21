@@ -189,11 +189,13 @@ export function RolesListView(vm: RolesViewModel) {
         role={drawer.editingRole}
         permissions={drawer.permissions}
         permissionsError={drawer.permissionsError}
+        isSaving={drawer.isSaving}
         isSuperAdmin={isSuperAdmin}
         actorPermissions={actorPermissions}
         organizations={organizations.items}
         selectedOrganizationId={organizations.selectedId}
         onOrganizationSelect={organizations.onSelect}
+        onSave={drawer.onSave}
       />
 
       {confirmDelete.role && (

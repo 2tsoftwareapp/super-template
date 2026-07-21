@@ -1,7 +1,6 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
 
 import type { NotificationJobDto, SendNotificationInput } from "@/lib/api-types";
 
@@ -16,14 +15,10 @@ export function useSendNotificationMutation(options?: {
   return useMutation({
     mutationFn: (input: SendNotificationInput) => sendNotification(input),
     onSuccess: (result) => {
-      toast.success("Notification job queued");
       void queryClient.invalidateQueries({
         queryKey: notificationsKeys.jobs,
       });
       options?.onSuccess?.(result);
-    },
-    onError: () => {
-      toast.error("Failed to queue notification");
     },
   });
 }
@@ -36,7 +31,6 @@ export function useCancelNotificationJobMutation(options?: {
   return useMutation({
     mutationFn: cancelNotificationJob,
     onSuccess: () => {
-      toast.success("Job cancelled");
       void queryClient.invalidateQueries({
         queryKey: notificationsKeys.jobs,
       });

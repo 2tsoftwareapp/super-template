@@ -51,7 +51,14 @@ export class RegisterUseCase {
 
   async execute(input: RegisterCommand, requestContext?: RequestContext) {
     const email = normalizeEmail(input.email);
-    await this.usersRepository.assertEmailAvailable(email);
+    const existingUser = await this.usersRepository.findByEmail(email);
+    if (existingUser) {
+      throw new AppError(
+        ERROR_CODES.USER_EMAIL_ALREADY_EXISTS,
+        'A user with this email already exists',
+        HttpStatus.CONFLICT,
+      );
+    }
 
     await this.transactionPort.run(
       async (transaction) => {

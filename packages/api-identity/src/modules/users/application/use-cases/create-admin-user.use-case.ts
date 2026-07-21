@@ -61,7 +61,14 @@ export class CreateAdminUserUseCase {
     requestContext?: RequestContext,
   ): Promise<UserView> {
     const email = normalizeEmail(input.email);
-    await this.usersRepository.assertEmailAvailable(email);
+    const existingUser = await this.usersRepository.findByEmail(email);
+    if (existingUser) {
+      throw new AppError(
+        ERROR_CODES.USER_EMAIL_ALREADY_EXISTS,
+        'A user with this email already exists',
+        HttpStatus.CONFLICT,
+      );
+    }
 
     const actorIsSuperAdmin = actor.roles.includes(ROLE_NAMES.SUPER_ADMIN);
 

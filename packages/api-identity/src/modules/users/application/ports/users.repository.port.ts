@@ -67,11 +67,6 @@ export interface UsersRepositoryPort {
     organizationId: string,
     executor?: TransactionExecutor,
   ): Promise<boolean>;
-  assertEmailAvailable(
-    email: string,
-    executor?: TransactionExecutor,
-    currentUserId?: string,
-  ): Promise<void>;
 }
 
 export const USERS_REPOSITORY = Symbol('USERS_REPOSITORY');

@@ -3,14 +3,13 @@ import type {
   DatabaseExecutor,
 } from '@repo/api-database';
 
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { ERROR_CODES } from '@repo/api-core';
-import { AppError } from '@repo/api-core';
+import { Inject, Injectable } from '@nestjs/common';
 import { DATABASE } from '@repo/api-database';
 import { organizationMembers, roles, userRoles, users } from '@repo/api-database';
 import { and, asc, count, desc, eq, inArray, isNull, or, sql } from 'drizzle-orm';
 
 import type { UserSortCriterion } from '../application/user-sort';
+import type { UsersRepositoryPort } from '../application/ports/users.repository.port';
 
 interface ListUsersParams {
   page: number;
@@ -30,7 +29,7 @@ const USER_SORT_FIELDS = {
 } as const;
 
 @Injectable()
-export class UsersRepository {
+export class UsersRepository implements UsersRepositoryPort {
   constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
 
   async create(
@@ -184,22 +183,6 @@ export class UsersRepository {
       .limit(1);
 
     return Boolean(membership);
-  }
-
-  async assertEmailAvailable(
-    email: string,
-    executor: DatabaseExecutor = this.database,
-    currentUserId?: string,
-  ) {
-    const existing = await this.findByEmail(email, executor);
-
-    if (existing && existing.id !== currentUserId) {
-      throw new AppError(
-        ERROR_CODES.USER_EMAIL_ALREADY_EXISTS,
-        'A user with this email already exists',
-        HttpStatus.CONFLICT,
-      );
-    }
   }
 
   async listDeliverableUserIds(executor: DatabaseExecutor = this.database) {

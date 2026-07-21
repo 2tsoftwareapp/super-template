@@ -3,7 +3,10 @@
 import { useMemo, useState } from "react";
 
 import { useOrganizationsQuery } from "@/features/organizations";
-import { useDeleteRoleMutation } from "@/features/roles/api/roles.mutations";
+import {
+  useDeleteRoleMutation,
+  useSaveRoleMutation,
+} from "@/features/roles/api/roles.mutations";
 import {
   usePermissionCatalogQuery,
   useRolesQuery,
@@ -20,6 +23,7 @@ import {
   type EditableRole,
   type ManagedRoleDto,
   type PermissionDto,
+  type RoleForm,
 } from "@/features/roles/model/roles.schemas";
 import { useSession } from "@/hooks/use-session";
 
@@ -47,8 +51,15 @@ export interface RolesViewModel {
     editingRole: EditableRole | null;
     permissions: PermissionDto[];
     permissionsError: boolean;
+    isSaving: boolean;
     onCreate: () => void;
     onClose: () => void;
+    onSave: (values: {
+      name: string;
+      description: string;
+      permissionIds: string[];
+      organizationId: string;
+    }) => void;
   };
   confirmDelete: {
     role: ManagedRoleDto | null;
@@ -84,6 +95,11 @@ export function useRolesController(): RolesViewModel {
   const roles = useRolesQuery();
   const permissionCatalog = usePermissionCatalogQuery();
   const deleteRole = useDeleteRoleMutation();
+  const saveRole = useSaveRoleMutation({
+    onSuccess: () => {
+      setDrawerOpen(false);
+    },
+  });
   const organizations = useOrganizationsQuery({
     enabled: isSuperAdmin,
   });
@@ -104,6 +120,28 @@ export function useRolesController(): RolesViewModel {
     () => filterRolesBySearch(customRoles, search),
     [customRoles, search],
   );
+
+  const handleSaveRole = (values: {
+    name: string;
+    description: string;
+    permissionIds: string[];
+    organizationId: string;
+  }) => {
+    const input: RoleForm = {
+      name: values.name,
+      permissionIds: values.permissionIds,
+    };
+
+    if (values.description) {
+      input.description = values.description;
+    }
+
+    if (isSuperAdmin && !editingRole && values.organizationId) {
+      input.organizationId = values.organizationId;
+    }
+
+    saveRole.mutate({ roleId: editingRole?.id, input });
+  };
 
   const handleDeleteConfirm = async () => {
     if (!deletingRole) {
@@ -171,8 +209,10 @@ export function useRolesController(): RolesViewModel {
       editingRole,
       permissions: permissionCatalog.data?.data ?? [],
       permissionsError: permissionCatalog.isError,
+      isSaving: saveRole.isPending,
       onCreate: openCreateDrawer,
       onClose: () => setDrawerOpen(false),
+      onSave: handleSaveRole,
     },
     confirmDelete: {
       role: deletingRole,

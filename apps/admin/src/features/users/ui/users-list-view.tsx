@@ -1,5 +1,7 @@
 "use client";
 
+import type { Table } from "@tanstack/react-table";
+
 import { Button } from "@repo/web-ui/button";
 import { Card, CardContent } from "@repo/web-ui/card";
 import { ErrorState } from "@repo/web-ui/error-state";
@@ -8,6 +10,7 @@ import { Show } from "@repo/web-ui/show";
 import { Spinner } from "@repo/web-ui/spinner";
 
 import type { UsersListViewModel } from "@/features/users/controllers/use-users-list-controller";
+import type { AdminUserDto } from "@/lib/api-types";
 
 import { BulkActionBar } from "@/components/bulk-action-bar";
 import { ResourceTable } from "@/components/resource-table";
@@ -32,7 +35,8 @@ export function UsersListView({
   pagination,
   createDrawer,
   confirmBlock,
-}: UsersListViewModel) {
+  table,
+}: UsersListViewModel & { table: Table<AdminUserDto> }) {
   return (
     <>
       <Show when={createDrawer.open}>
@@ -41,6 +45,11 @@ export function UsersListView({
           onClose={createDrawer.onClose}
           actorRoles={createDrawer.actorRoles}
           actorOrganizationId={createDrawer.actorOrganizationId}
+          assignableRoles={createDrawer.assignableRoles}
+          organizations={createDrawer.organizations}
+          isOrganizationsLoading={createDrawer.isOrganizationsLoading}
+          isSaving={createDrawer.isSaving}
+          onSubmit={createDrawer.onSubmit}
         />
       </Show>
 
@@ -128,7 +137,7 @@ export function UsersListView({
           />
           <CardContent className="p-0 pb-1">
             <ResourceTable
-              table={list.table}
+              table={table}
               binarySort
               multiSort
               isLoading={list.isLoading}

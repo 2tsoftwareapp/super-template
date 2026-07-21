@@ -41,10 +41,20 @@ export class RefreshSessionUseCase {
   ) {}
 
   async execute(input: RefreshSessionCommand, requestContext?: RequestContext) {
-    const payload = await this.tokenProvider.verifyToken(
-      input.refreshToken,
-      'refresh',
-    );
+    let payload: import('../ports/auth-token.provider.port').TokenPayload;
+    try {
+      payload = await this.tokenProvider.verifyToken(
+        input.refreshToken,
+        'refresh',
+      );
+    } catch {
+      throw new AppError(
+        ERROR_CODES.AUTH_UNAUTHORIZED,
+        'Token is invalid or expired',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
     const session = await this.authSessionRepository.findSessionForUser(
       payload.sid,
       payload.sub,

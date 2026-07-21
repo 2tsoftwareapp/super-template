@@ -1,12 +1,10 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
 
 import type { AdminUserDto, CreateAdminUserInput, UpdateAdminUserInput } from "@/lib/api-types";
 
 import { useBulkMutation } from "@/hooks/use-bulk-mutation";
-import { ApiClientError } from "@/lib/http";
 
 import { usersApi } from "./users.api";
 import { usersKeys } from "./users.query-keys";
@@ -34,14 +32,6 @@ export function useResendVerification() {
     mutationFn: (email: string) => usersApi.resendVerification(email),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: usersKeys.all });
-      toast.success("Verification email sent");
-    },
-    onError: (error) => {
-      const message =
-        error instanceof ApiClientError
-          ? error.payload?.error?.message ?? error.message
-          : "Failed to resend verification email";
-      toast.error(message);
     },
   });
 }
@@ -53,7 +43,6 @@ export function useCreateUser({ onSuccess }: { onSuccess?: () => void } = {}) {
     mutationFn: (input: CreateAdminUserInput) => usersApi.create(input),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: usersKeys.all });
-      toast.success("Invite sent");
       onSuccess?.();
     },
   });

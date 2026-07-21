@@ -14,13 +14,18 @@ import { PasswordInput } from "@repo/web-ui/password-input";
 import { Spinner } from "@repo/web-ui/spinner";
 import { useForm } from "react-hook-form";
 
-import { useChangePasswordMutation } from "@/features/security/api/security.mutations";
 import {
   type ChangePasswordFormValues,
   changePasswordSchema,
 } from "@/features/security/model/security.schemas";
 
-export function ChangePasswordForm() {
+export function ChangePasswordForm({
+  onChangePassword,
+  isSaving,
+}: {
+  onChangePassword: (values: ChangePasswordFormValues) => void;
+  isSaving: boolean;
+}) {
   const {
     register,
     handleSubmit,
@@ -30,14 +35,8 @@ export function ChangePasswordForm() {
     defaultValues: { currentPassword: "", newPassword: "", confirmPassword: "" },
   });
 
-  const mutation = useChangePasswordMutation();
-
   const onSubmit = (values: ChangePasswordFormValues) => {
-    mutation.mutate({
-      currentPassword: values.currentPassword,
-      newPassword: values.newPassword,
-      confirmPassword: values.confirmPassword,
-    });
+    onChangePassword(values);
   };
 
   return (
@@ -92,8 +91,8 @@ export function ChangePasswordForm() {
             )}
           </div>
 
-          <Button type="submit" disabled={mutation.isPending}>
-            {mutation.isPending && <Spinner className="mr-2 size-4" />}
+          <Button type="submit" disabled={isSaving}>
+            {isSaving && <Spinner className="mr-2 size-4" />}
             Update password
           </Button>
         </form>
