@@ -1,19 +1,17 @@
 "use client";
 
 import { useDebouncedValue } from "@repo/web-hooks/use-debounced-value";
+import { getErrorMessage } from "@repo/web-utils/errors";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 
 import type {
   UsersListParams,
   UsersPageSize,
   UserStatusFilter,
 } from "@/features/users/model/types";
-import type {
-  AdminUserDto,
-  OrganizationDto,
-  RoleDto,
-} from "@/lib/api-types";
+import type { UsersListViewModel } from "@/features/users/model/users.types";
 
 import {
   useActivateUsers,
@@ -32,81 +30,19 @@ import { usePathname, useRouter } from "@/i18n/navigation";
 import { useCreateUserDrawer } from "./use-create-user-drawer";
 import { useUsersBulkActions } from "./use-users-bulk-actions";
 import { useUsersConfirmBlock } from "./use-users-confirm-block";
+import { useUsersTableConfig } from "./use-users-table-config";
 
-export interface UsersListViewModel {
-  session: { isLoading: boolean; isError: boolean };
-  columnData: {
-    pageUsers: AdminUserDto[];
-    canUpdate: boolean;
-    isMutating: boolean;
-    handleActivate: (userId: string) => Promise<void>;
-    handleBlock: (userId: string) => void;
-    handleResendVerification: (email: string) => void;
-    listParams: UsersListParams;
-    onSortChange: (nextSort: UsersListParams["sort"]) => void;
-  };
-  header: {
-    isLoading: boolean;
-    isFetching: boolean;
-    total: number;
-    canCreate: boolean;
-    onRefresh: () => void;
-    onCreateClick: () => void;
-  };
-  list: {
-    isError: boolean;
-    isLoading: boolean;
-    onRetry: () => void;
-    hasFilters: boolean;
-    emptyTitle: string;
-    emptyDescription: string;
-    onRowClick: (id: string) => void;
-  };
-  toolbar: {
-    search: string;
-    onSearchChange: (value: string) => void;
-    onClearFilters: () => void;
-    currentStatus: UserStatusFilter;
-    onStatusFilter: (status: UserStatusFilter) => void;
-  };
-  bulk: {
-    canUpdate: boolean;
-    selectedIds: string[];
-    isMutating: boolean;
-    isActivating: boolean;
-    isBlocking: boolean;
-    onClearSelection: () => void;
-    onBulkActivate: () => Promise<void>;
-    onBulkBlock: () => void;
-  };
-  pagination: {
-    page: number;
-    pageSize: number;
-    totalPages: number;
-    total: number;
-    isFetching: boolean;
-    onPageChange: (page: number) => void;
-    onPageSizeChange: (limit: number) => void;
-  };
-  createDrawer: {
-    open: boolean;
-    actorRoles: string[];
-    actorOrganizationId: string | null | undefined;
-    assignableRoles: RoleDto[];
-    organizations: OrganizationDto[];
-    isOrganizationsLoading: boolean;
-    isSaving: boolean;
-    onClose: () => void;
-    onSubmit: (values: { email: string; password: string; displayName: string; roleId: string; organizationId?: string | undefined }) => Promise<{ data: AdminUserDto }>;
-  };
-  confirmBlock: {
-    state: { userIds: string[]; label: string; count: number } | null;
-    isLoading: boolean;
-    onCancel: () => void;
-    onConfirm: () => Promise<void>;
-  };
-}
+export type { UsersListViewModel };
 
+/**
+ * Orchestration hook for the users list screen.
+ *
+ * Flow:
+ *   1. Parse URL list params; debounce search; sync toolbar input.
+ *   2. List query + session permissions; table config owns sort + row selection.
+ *   3. Row/bulk activate-block with confirm dialog; toast on mutation errors.
+ *   4. Create-user drawer (roles/orgs) when permitted.
+ */
 export function useUsersListController(): UsersListViewModel {
   const router = useRouter();
   const pathname = usePathname();
@@ -119,7 +55,6 @@ export function useUsersListController(): UsersListViewModel {
   );
   const [searchInput, setSearchInput] = useState(listParams.search);
   const [showCreate, setShowCreate] = useState(false);
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   const debouncedSearch = useDebouncedValue(searchInput, 500);
 
@@ -185,7 +120,11 @@ export function useUsersListController(): UsersListViewModel {
 
   const handleActivate = useCallback(
     async (userId: string) => {
-      await activateUsers.mutateAsync([userId]);
+      try {
+        await activateUsers.mutateAsync([userId]);
+      } catch (error) {
+        toast.error(getErrorMessage(error));
+      }
     },
     [activateUsers],
   );
@@ -199,12 +138,14 @@ export function useUsersListController(): UsersListViewModel {
 
   const handleResendVerification = useCallback(
     (email: string) => {
-      resendVerification.mutate(email);
+      resendVerification.mutate(email, {
+        onError: (error) => {
+          toast.error(getErrorMessage(error));
+        },
+      });
     },
     [resendVerification],
   );
-
-  const clearSelection = useCallback(() => setSelectedIds([]), []);
 
   const handleSortChange = useCallback(
     (nextSort: UsersListParams["sort"]) => {
@@ -212,6 +153,17 @@ export function useUsersListController(): UsersListViewModel {
     },
     [patchListParams],
   );
+
+  const { table, selectedIds, clearSelection } = useUsersTableConfig({
+    pageUsers,
+    listParams,
+    canUpdate,
+    isMutating,
+    handleActivate,
+    handleBlock,
+    handleResendVerification,
+    onSortChange: handleSortChange,
+  });
 
   const hasFilters = Boolean(searchInput || queryParams.status !== "all");
 
@@ -230,8 +182,12 @@ export function useUsersListController(): UsersListViewModel {
   const handleConfirmBlock = async () => {
     if (!confirmBlock) return;
     clearSelection();
-    await blockUsers.mutateAsync(confirmBlock.userIds);
-    cancelBlock();
+    try {
+      await blockUsers.mutateAsync(confirmBlock.userIds);
+      cancelBlock();
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+    }
   };
 
   const handleStatusFilter = (status: UserStatusFilter) => {
@@ -334,5 +290,6 @@ export function useUsersListController(): UsersListViewModel {
       onCancel: cancelBlock,
       onConfirm: handleConfirmBlock,
     },
+    table,
   };
 }

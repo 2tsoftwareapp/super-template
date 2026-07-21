@@ -8,17 +8,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@repo/web-ui/card";
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-} from "@repo/web-ui/input-otp";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@repo/web-ui/input-otp";
 import { Label } from "@repo/web-ui/label";
 import { Separator } from "@repo/web-ui/separator";
 import { Spinner } from "@repo/web-ui/spinner";
 import { Shield } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
 
-import type { MfaSetupResponse } from "@/features/security/model/security.schemas";
+import type { MfaSetupResponse } from "@/features/security/model/security.types";
 
 interface MfaSetupFlowProps {
   setupData: MfaSetupResponse["data"];
@@ -29,6 +26,7 @@ interface MfaSetupFlowProps {
   isVerifying: boolean;
 }
 
+/** Presents the in-memory MFA enrollment secret and verification controls. */
 export function MfaSetupFlow({
   setupData,
   otpCode,
@@ -52,12 +50,12 @@ export function MfaSetupFlow({
       <CardContent className="space-y-6">
         <div className="flex flex-col items-center gap-4">
           <div className="rounded-lg border border-border bg-white p-3">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(setupData.otpauthUrl)}`}
-              alt="QR Code for authenticator app"
-              width={200}
-              height={200}
+            {/* SECURITY: Generate locally so the TOTP secret never leaves this origin. */}
+            <QRCodeSVG
+              value={setupData.otpauthUrl}
+              title="QR code for authenticator app"
+              size={200}
+              level="M"
             />
           </div>
           <div className="text-center">
@@ -95,15 +93,10 @@ export function MfaSetupFlow({
               disabled={otpCode.length < 6 || isVerifying}
               onClick={() => onVerify(otpCode)}
             >
-              {isVerifying && (
-                <Spinner className="mr-2 size-4" />
-              )}
+              {isVerifying && <Spinner className="mr-2 size-4" />}
               Verify &amp; enable
             </Button>
-            <Button
-              variant="outline"
-              onClick={onCancel}
-            >
+            <Button variant="outline" onClick={onCancel}>
               Cancel
             </Button>
           </div>

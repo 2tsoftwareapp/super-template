@@ -1,12 +1,11 @@
 export { useDeleteUserMutation, useReplaceRolesMutation, useUpdateProfileMutation, useUpdateStatusMutation } from "./api/users.mutations";
 export { useActivateUsers, useBlockUsers, useCreateUser, useResendVerification } from "./api/users.mutations";
-export { useAdminRolesQuery, useAdminUserQuery, useUsersListQuery } from "./api/users.queries";
+export { useAdminUserQuery, useUsersListQuery } from "./api/users.queries";
 export { usersKeys } from "./api/users.query-keys";
 export { useUserDetailController } from "./controllers/use-user-detail-controller";
-export type { UserDetailViewModel } from "./controllers/use-user-detail-controller";
 export { useUsersListController } from "./controllers/use-users-list-controller";
-export type { UsersListViewModel } from "./controllers/use-users-list-controller";
 export type { UsersListParams, UsersPageSize, UserStatusFilter } from "./model/types";
 export type { UserManagementPermissions } from "./model/users.permissions";
+export type { UserDetailViewModel, UsersListViewModel } from "./model/users.types";
 export { UserDetailView } from "./screens/user-detail-view";
 export { UsersView } from "./screens/users-view";

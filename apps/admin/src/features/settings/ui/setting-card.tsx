@@ -4,16 +4,18 @@ import { Button } from "@repo/web-ui/button";
 import { Input } from "@repo/web-ui/input";
 import { Label } from "@repo/web-ui/label";
 import { LoadingButton } from "@repo/web-ui/loading-button";
+import { Show } from "@repo/web-ui/show";
 import { RotateCcw } from "lucide-react";
 
-import type { SettingRow } from "@/features/settings/controllers/settings-view-model";
+import type { SettingRow } from "@/features/settings/model/settings.types";
 
 import { displayValue } from "@/features/settings/model/settings-drafts";
 
 import { SettingField } from "./setting-field";
 
 export function SettingCard({ row }: { row: SettingRow }) {
-  const { setting, isObject, hasChanges, isSaving, scalar, object } = row;
+  const { setting, isObject, hasChanges, isSaving, canUpdate, scalar, object } =
+    row;
 
   return (
     <div className="rounded-xl border border-border p-4">
@@ -32,66 +34,68 @@ export function SettingCard({ row }: { row: SettingRow }) {
             </p>
           )}
         </div>
-        <div className="flex w-full shrink-0 flex-col gap-2 md:max-w-xs">
-          <Label htmlFor={`setting-${setting.key}`} className="text-xs">
-            Override value
-          </Label>
+        <Show when={canUpdate}>
+          <div className="flex w-full shrink-0 flex-col gap-2 md:max-w-xs">
+            <Label htmlFor={`setting-${setting.key}`} className="text-xs">
+              Override value
+            </Label>
 
-          {object ? (
-            <div className="space-y-2 rounded-lg border border-border p-3">
-              {object.fields.map((field) => (
-                <SettingField
-                  key={field.key}
-                  label={field.key}
-                  value={field.value}
-                  onChange={field.onChange}
+            {object ? (
+              <div className="space-y-2 rounded-lg border border-border p-3">
+                {object.fields.map((field) => (
+                  <SettingField
+                    key={field.key}
+                    label={field.key}
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="flex gap-1.5">
+                <Input
+                  id={`setting-${setting.key}`}
+                  value={scalar.value}
+                  onChange={(e) => scalar.onChange(e.target.value)}
                 />
-              ))}
-            </div>
-          ) : (
-            <div className="flex gap-1.5">
-              <Input
-                id={`setting-${setting.key}`}
-                value={scalar.value}
-                onChange={(e) => scalar.onChange(e.target.value)}
-              />
-              {hasChanges && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="size-8 shrink-0 text-muted-foreground hover:text-foreground"
-                  onClick={scalar.onReset}
-                >
-                  <RotateCcw className="size-3.5" />
-                </Button>
-              )}
-            </div>
-          )}
+                {hasChanges && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="size-8 shrink-0 text-muted-foreground hover:text-foreground"
+                    onClick={scalar.onReset}
+                  >
+                    <RotateCcw className="size-3.5" />
+                  </Button>
+                )}
+              </div>
+            )}
 
-          {hasChanges && (
-            <div className="flex gap-1.5">
-              <LoadingButton
-                variant="outline"
-                size="sm"
-                className="flex-1"
-                onClick={row.onRequestSave}
-                loading={isSaving}
-              >
-                Save
-              </LoadingButton>
-              {isObject && object && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="size-8 shrink-0 text-muted-foreground hover:text-foreground"
-                  onClick={object.onReset}
+            {hasChanges && (
+              <div className="flex gap-1.5">
+                <LoadingButton
+                  variant="outline"
+                  size="sm"
+                  className="flex-1"
+                  onClick={row.onRequestSave}
+                  loading={isSaving}
                 >
-                  <RotateCcw className="size-3.5" />
-                </Button>
-              )}
-            </div>
-          )}
-        </div>
+                  Save
+                </LoadingButton>
+                {isObject && object && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="size-8 shrink-0 text-muted-foreground hover:text-foreground"
+                    onClick={object.onReset}
+                  >
+                    <RotateCcw className="size-3.5" />
+                  </Button>
+                )}
+              </div>
+            )}
+          </div>
+        </Show>
       </div>
     </div>
   );

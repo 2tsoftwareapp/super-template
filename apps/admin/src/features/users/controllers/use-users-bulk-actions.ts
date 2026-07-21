@@ -1,6 +1,8 @@
 "use client";
 
+import { getErrorMessage } from "@repo/web-utils/errors";
 import { useCallback } from "react";
+import { toast } from "sonner";
 
 export function useUsersBulkActions(
   activateUsers: { isPending: boolean; mutateAsync: (ids: string[]) => Promise<unknown> },
@@ -9,8 +11,12 @@ export function useUsersBulkActions(
 ) {
   const handleBulkActivate = useCallback(
     async (selectedIds: string[], clearSelection: () => void) => {
-      await activateUsers.mutateAsync(selectedIds);
-      clearSelection();
+      try {
+        await activateUsers.mutateAsync(selectedIds);
+        clearSelection();
+      } catch (error) {
+        toast.error(getErrorMessage(error));
+      }
     },
     [activateUsers],
   );

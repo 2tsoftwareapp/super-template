@@ -1,7 +1,5 @@
 "use client";
 
-import type { Table } from "@tanstack/react-table";
-
 import { Button } from "@repo/web-ui/button";
 import { Card, CardContent } from "@repo/web-ui/card";
 import { ErrorState } from "@repo/web-ui/error-state";
@@ -9,8 +7,7 @@ import { Pagination } from "@repo/web-ui/pagination";
 import { Show } from "@repo/web-ui/show";
 import { Spinner } from "@repo/web-ui/spinner";
 
-import type { UsersListViewModel } from "@/features/users/controllers/use-users-list-controller";
-import type { AdminUserDto } from "@/lib/api-types";
+import type { UsersListViewModel } from "@/features/users/model/users.types";
 
 import { BulkActionBar } from "@/components/bulk-action-bar";
 import { ResourceTable } from "@/components/resource-table";
@@ -36,7 +33,7 @@ export function UsersListView({
   createDrawer,
   confirmBlock,
   table,
-}: UsersListViewModel & { table: Table<AdminUserDto> }) {
+}: UsersListViewModel) {
   return (
     <>
       <Show when={createDrawer.open}>

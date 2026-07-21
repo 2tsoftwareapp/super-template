@@ -1,25 +1,33 @@
 "use client";
 
+import { getErrorMessage } from "@repo/web-utils/errors";
+import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
+import type { SettingRow, SettingsViewModel } from "@/features/settings/model/settings.types";
 import type { ApplicationSettingDto } from "@/lib/api-types";
 
 import { useUpdateSettingMutation } from "@/features/settings/api/settings.mutations";
 import { useSettingsQuery } from "@/features/settings/api/settings.queries";
+import { settingsKeys } from "@/features/settings/api/settings.query-keys";
 import {
   initDraft,
   isObjectValue,
   objectDraftChanged,
 } from "@/features/settings/model/settings-drafts";
+import { selectSettingsPermissions } from "@/features/settings/model/settings.permissions";
+import { updateSettingInputSchema } from "@/features/settings/model/settings.schemas";
+import { useSession } from "@/hooks/use-session";
 import { parseJsonValue } from "@/lib/json";
 
-import type { SettingRow, SettingsViewModel } from "./settings-view-model";
+export type { SettingsViewModel };
 
 type SettingValue = ApplicationSettingDto["value"];
 
 function buildSettingRow(
   setting: ApplicationSettingDto,
+  canUpdate: boolean,
   draftValues: Record<string, string>,
   draftObjectValues: Record<string, Record<string, string | boolean>>,
   updateSettingIsPending: boolean,
@@ -50,6 +58,7 @@ function buildSettingRow(
     isObject,
     hasChanges,
     isSaving: updateSettingIsPending && savingKey === setting.key,
+    canUpdate,
     scalar: {
       value: draftValues[setting.key] ?? initDraft(setting.value),
       onChange: (value) =>
@@ -97,12 +106,21 @@ function buildSettingRow(
 }
 
 /**
- * Orchestration hook for the settings screen: settings query, search filter,
- * scalar + object draft state, per-setting change detection, save mutation and
- * confirm dialog. Exposes a getRow(setting) helper so the presentational view
- * stays render-only.
+ * Orchestration hook for the settings screen.
+ *
+ * Flow:
+ *   1. Session → settings read/update permission booleans.
+ *   2. Load settings list (staleTime 5 min); client-side search filter.
+ *   3. Track scalar + object draft state; detect per-setting changes.
+ *   4. Save: confirm dialog → light Zod validation → PATCH → toast on error.
  */
 export function useSettingsController(): SettingsViewModel {
+  const queryClient = useQueryClient();
+  const session = useSession();
+  const { canRead, canUpdate } = selectSettingsPermissions(
+    session.data?.data?.permissions,
+  );
+
   const settings = useSettingsQuery();
 
   const [search, setSearch] = useState("");
@@ -135,9 +153,9 @@ export function useSettingsController(): SettingsViewModel {
       setSavingKey(null);
       toast.success("Setting saved");
     },
-    onError: () => {
+    onError: (error) => {
       setSavingKey(null);
-      toast.error("Failed to save setting");
+      toast.error(getErrorMessage(error));
     },
   });
 
@@ -156,13 +174,30 @@ export function useSettingsController(): SettingsViewModel {
       next = parseJsonValue(raw) as SettingValue;
     }
 
-    updateSetting.mutate({ key: savingKey, value: next });
+    const parsed = updateSettingInputSchema.safeParse({
+      key: savingKey,
+      value: next,
+    });
+    if (!parsed.success) {
+      toast.error(parsed.error.issues[0]?.message ?? "Invalid setting value");
+      return;
+    }
+
+    updateSetting.mutate({
+      key: parsed.data.key,
+      value: parsed.data.value as SettingValue,
+    });
     setConfirmOpen(false);
+  };
+
+  const handleRetry = () => {
+    void queryClient.invalidateQueries({ queryKey: settingsKeys.all });
   };
 
   const getRow = (setting: ApplicationSettingDto): SettingRow => {
     return buildSettingRow(
       setting,
+      canUpdate,
       draftValues,
       draftObjectValues,
       updateSetting.isPending,
@@ -177,11 +212,15 @@ export function useSettingsController(): SettingsViewModel {
   };
 
   return {
+    canRead,
+    canUpdate,
     search,
     onSearchChange: setSearch,
     isLoading: settings.isLoading,
     isRefreshing: settings.isFetching,
-    onRefresh: () => void settings.refetch(),
+    isError: settings.isError,
+    onRetry: handleRetry,
+    onRefresh: handleRetry,
     totalCount: settings.data ? settings.data.data.length : null,
     filtered,
     getRow,

@@ -2,14 +2,17 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import type { MfaStatus } from "../model/security.schemas";
+import type { MfaStatusResponse } from "../model/security.types";
 
-import { fetchMfaStatus } from "./security.api";
+import { securityApi } from "./security.api";
 import { securityKeys } from "./security.query-keys";
 
+/** Reads MFA state without retaining sensitive status data in cache. */
 export function useMfaStatusQuery() {
-  return useQuery<MfaStatus>({
-    queryKey: securityKeys.mfaStatus,
-    queryFn: fetchMfaStatus,
+  return useQuery<MfaStatusResponse>({
+    queryKey: securityKeys.mfaStatus(),
+    queryFn: securityApi.fetchMfaStatus,
+    staleTime: 0,
+    gcTime: 0,
   });
 }

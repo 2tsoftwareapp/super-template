@@ -1,6 +1,8 @@
 "use client";
 
+import { getErrorMessage } from "@repo/web-utils/errors";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 
 import type { AdminUserDto } from "@/lib/api-types";
 
@@ -104,14 +106,18 @@ export function useUserRoles(
       ? selectedRoleId !== effectiveCurrentRoleId
       : Boolean(scopeOrganizationId) || !orgRequired);
 
-  const handleSave = useCallback(() => {
+  const handleSave = useCallback(async () => {
     const args: { roleId: string; organizationId?: string } = {
       roleId: selectedRoleId,
     };
     if (scopeOrganizationId) {
       args.organizationId = scopeOrganizationId;
     }
-    void replaceRoles.mutateAsync(args);
+    try {
+      await replaceRoles.mutateAsync(args);
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+    }
   }, [selectedRoleId, scopeOrganizationId, replaceRoles]);
 
   return {

@@ -11,6 +11,7 @@ export interface SettingRow {
   isObject: boolean;
   hasChanges: boolean;
   isSaving: boolean;
+  canUpdate: boolean;
   scalar: {
     value: string;
     onChange: (value: string) => void;
@@ -21,10 +22,14 @@ export interface SettingRow {
 }
 
 export interface SettingsViewModel {
+  canRead: boolean;
+  canUpdate: boolean;
   search: string;
   onSearchChange: (value: string) => void;
   isLoading: boolean;
   isRefreshing: boolean;
+  isError: boolean;
+  onRetry: () => void;
   onRefresh: () => void;
   totalCount: number | null;
   filtered: ApplicationSettingDto[];

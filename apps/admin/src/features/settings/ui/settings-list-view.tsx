@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@repo/web-ui/button";
 import {
   Card,
   CardContent,
@@ -8,11 +9,12 @@ import {
   CardTitle,
 } from "@repo/web-ui/card";
 import { ConfirmDialog } from "@repo/web-ui/confirm-dialog";
+import { ErrorState } from "@repo/web-ui/error-state";
 import { Input } from "@repo/web-ui/input";
 import { Spinner } from "@repo/web-ui/spinner";
-import { Search, X } from "lucide-react";
+import { RefreshCcw, Search, X } from "lucide-react";
 
-import type { SettingsViewModel } from "@/features/settings/controllers/settings-view-model";
+import type { SettingsViewModel } from "@/features/settings/model/settings.types";
 
 import { ResourcePageShell } from "@/components/resource-page-shell";
 import { adminResources } from "@/lib/admin-resources";
@@ -31,6 +33,8 @@ export function SettingsListView({
   onSearchChange,
   isLoading,
   isRefreshing,
+  isError,
+  onRetry,
   onRefresh,
   totalCount,
   filtered,
@@ -43,6 +47,14 @@ export function SettingsListView({
       description="View and update application settings."
       isRefreshing={isRefreshing}
       onRefresh={onRefresh}
+      actions={
+        isError ? (
+          <Button size="sm" variant="outline" onClick={onRetry}>
+            <RefreshCcw data-icon="inline-start" />
+            Retry
+          </Button>
+        ) : null
+      }
     >
       <Card>
         <CardHeader className="pb-3">
@@ -80,6 +92,12 @@ export function SettingsListView({
             <div className="flex justify-center py-12">
               <Spinner className="size-5" />
             </div>
+          ) : isError ? (
+            <ErrorState
+              variant="inline"
+              title="Could not load settings."
+              action={{ label: "Retry", onClick: onRetry }}
+            />
           ) : filtered.length === 0 ? (
             <p className="py-8 text-center text-sm text-muted-foreground">
               {search ? "No settings match your search." : "No settings found."}

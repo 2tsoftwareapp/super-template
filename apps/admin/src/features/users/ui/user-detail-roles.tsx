@@ -10,7 +10,7 @@ import { Show } from "@repo/web-ui/show";
 import { Spinner } from "@repo/web-ui/spinner";
 import { Building2, CheckCircle2 } from "lucide-react";
 
-import type { UserDetailViewModel } from "@/features/users/controllers/use-user-detail-controller";
+import type { UserDetailViewModel } from "@/features/users/model/users.types";
 
 import { formatRoleName } from "@/lib/roles";
 import { cn } from "@/lib/utils";

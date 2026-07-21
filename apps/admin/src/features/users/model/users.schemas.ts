@@ -1,4 +1,10 @@
+import { uuidParam } from "@repo/web-utils/params";
 import { z } from "zod";
+
+/** Route params for `/users/[id]` detail pages. */
+export const userRouteParamsSchema = z.object({
+  id: uuidParam,
+});
 
 export function createUserSchema(availableRoleIds: string[]) {
   return z

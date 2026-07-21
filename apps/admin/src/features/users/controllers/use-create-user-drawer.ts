@@ -1,10 +1,14 @@
 "use client";
 
+import { getErrorMessage } from "@repo/web-utils/errors";
 import { useCallback, useMemo, useState } from "react";
+import { toast } from "sonner";
 
-import { useMyOrganizationsQuery } from "@/features/organizations/api/organizations.queries";
+import type { RoleDto } from "@/lib/api-types";
+
+import { useMyOrganizationsQuery } from "@/features/organizations";
+import { useRolesQuery } from "@/features/roles";
 import { useCreateUser } from "@/features/users/api/users.mutations";
-import { useAdminRolesQuery } from "@/features/users/api/users.queries";
 import { filterRolesForOrganization, getAssignableRoles } from "@/lib/roles";
 
 interface UseCreateUserDrawerOptions {
@@ -20,7 +24,7 @@ export function useCreateUserDrawer({
   actorOrganizationId,
   onClose,
 }: UseCreateUserDrawerOptions) {
-  const rolesQuery = useAdminRolesQuery();
+  const rolesQuery = useRolesQuery();
   const organizationsQuery = useMyOrganizationsQuery();
 
   const createUser = useCreateUser({
@@ -32,7 +36,11 @@ export function useCreateUserDrawer({
   const isActorSuperAdmin = actorRoles.includes("SUPER_ADMIN");
 
   const allAssignable = useMemo(
-    () => getAssignableRoles(actorRoles, rolesQuery.data?.data ?? []),
+    () =>
+      getAssignableRoles(
+        actorRoles,
+        (rolesQuery.data?.data ?? []) as RoleDto[],
+      ),
     [actorRoles, rolesQuery.data],
   );
 
@@ -55,7 +63,7 @@ export function useCreateUserDrawer({
   );
 
   const handleSubmit = useCallback(
-    (values: {
+    async (values: {
       email: string;
       password: string;
       displayName: string;
@@ -64,14 +72,19 @@ export function useCreateUserDrawer({
       const orgId = isActorSuperAdmin
         ? selectedOrgId
         : actorOrganizationId;
-      return createUser.mutateAsync({
-        email: values.email,
-        password: values.password,
-        displayName: values.displayName,
-        roleId: values.roleId,
-        status: "PENDING",
-        ...(orgId ? { organizationId: orgId } : {}),
-      });
+      try {
+        return await createUser.mutateAsync({
+          email: values.email,
+          password: values.password,
+          displayName: values.displayName,
+          roleId: values.roleId,
+          status: "PENDING",
+          ...(orgId ? { organizationId: orgId } : {}),
+        });
+      } catch (error) {
+        toast.error(getErrorMessage(error));
+        throw error;
+      }
     },
     [createUser, isActorSuperAdmin, selectedOrgId, actorOrganizationId],
   );

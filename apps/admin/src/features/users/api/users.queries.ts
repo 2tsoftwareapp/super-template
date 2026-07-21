@@ -2,8 +2,6 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import { rolesKeys } from "@/features/roles";
-
 import type { UsersListParams } from "../model/types";
 
 import { usersSortKey } from "../model/sorting";
@@ -25,13 +23,5 @@ export function useAdminUserQuery(userId: string) {
     queryKey: usersKeys.detail(userId),
     queryFn: () => usersApi.get(userId),
     enabled: Boolean(userId),
-  });
-}
-
-export function useAdminRolesQuery() {
-  return useQuery({
-    queryKey: rolesKeys.list(),
-    queryFn: () => usersApi.listRoles(),
-    staleTime: 5 * 60_000,
   });
 }

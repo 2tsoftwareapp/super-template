@@ -1,11 +1,7 @@
 "use client";
 
 import { Button } from "@repo/web-ui/button";
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-} from "@repo/web-ui/input-otp";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@repo/web-ui/input-otp";
 import { Label } from "@repo/web-ui/label";
 import { Spinner } from "@repo/web-ui/spinner";
 import { RefreshCw, ShieldOff } from "lucide-react";

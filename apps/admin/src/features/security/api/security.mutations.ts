@@ -2,78 +2,67 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { sessionQueryKey } from "@/hooks/use-session";
-import { useRouter } from "@/i18n/navigation";
+import type { ChangePasswordFormValues } from "../model/security.schemas";
 
-import type { ChangePasswordFormValues, MfaConfirmResponse, MfaSetupResponse } from "../model/security.schemas";
-
-import { changePassword, confirmMfa, disableMfa, regenerateMfaCodes, setupMfa } from "./security.api";
+import { securityApi } from "./security.api";
 import { securityKeys } from "./security.query-keys";
 
-export function useSetupMfaMutation(options?: { onSuccess?: (data: MfaSetupResponse) => void }) {
+/** Starts an MFA enrollment and returns its one-time setup secret. */
+export function useSetupMfaMutation() {
   return useMutation({
-    mutationFn: setupMfa,
-    onSuccess: (data) => {
-      options?.onSuccess?.(data);
-    },
+    mutationFn: securityApi.setupMfa,
   });
 }
 
-export function useConfirmMfaMutation(options?: { onSuccess?: (data: MfaConfirmResponse) => void; onError?: () => void }) {
+/** Confirms an MFA enrollment and refreshes the sensitive status query. */
+export function useConfirmMfaMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: confirmMfa,
-    onSuccess: (data) => {
-      void queryClient.invalidateQueries({ queryKey: securityKeys.mfaStatus });
-      options?.onSuccess?.(data);
-    },
-    onError: () => {
-      options?.onError?.();
-    },
-  });
-}
-
-export function useDisableMfaMutation(options?: { onSuccess?: () => void; onError?: () => void }) {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: disableMfa,
+    mutationFn: securityApi.confirmMfa,
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: securityKeys.mfaStatus });
-      options?.onSuccess?.();
-    },
-    onError: () => {
-      options?.onError?.();
+      void queryClient.invalidateQueries({
+        queryKey: securityKeys.mfaStatus(),
+      });
     },
   });
 }
 
-export function useRegenerateMfaCodesMutation(options?: { onSuccess?: (data: MfaConfirmResponse) => void; onError?: () => void }) {
+/** Disables MFA and refreshes the sensitive status query. */
+export function useDisableMfaMutation() {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: regenerateMfaCodes,
-    onSuccess: (data) => {
-      options?.onSuccess?.(data);
-    },
-    onError: () => {
-      options?.onError?.();
+    mutationFn: securityApi.disableMfa,
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: securityKeys.mfaStatus(),
+      });
     },
   });
 }
 
+/** Regenerates the current user's one-time MFA recovery codes. */
+export function useRegenerateMfaCodesMutation() {
+  return useMutation({
+    mutationFn: securityApi.regenerateMfaCodes,
+  });
+}
+
+/** Changes the password and clears all identity-bound client cache. */
 export function useChangePasswordMutation() {
-  const router = useRouter();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (input: ChangePasswordFormValues) =>
-      changePassword({
+      securityApi.changePassword({
         currentPassword: input.currentPassword,
         newPassword: input.newPassword,
       }),
     onSuccess: () => {
-      queryClient.removeQueries({ queryKey: sessionQueryKey });
-      router.replace("/login");
+      // SECURITY: A password change invalidates the current identity context;
+      // no cached tenant or user data may survive into the next login.
+      queryClient.clear();
     },
   });
 }

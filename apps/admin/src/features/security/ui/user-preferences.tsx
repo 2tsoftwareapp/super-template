@@ -27,7 +27,9 @@ export function UserPreferences() {
       <CardContent className="space-y-6">
         {/* Theme Settings */}
         <div className="space-y-3">
-          <Label className="text-sm font-medium">{t("preferences.theme")}</Label>
+          <Label className="text-sm font-medium">
+            {t("preferences.theme")}
+          </Label>
           <div className="grid grid-cols-3 gap-2">
             {[
               { id: "light", label: t("preferences.themeLight"), icon: Sun },

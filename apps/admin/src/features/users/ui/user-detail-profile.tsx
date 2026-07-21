@@ -4,7 +4,7 @@ import { LoadingButton } from "@repo/web-ui/loading-button";
 import { Show } from "@repo/web-ui/show";
 import { CheckCircle2 } from "lucide-react";
 
-import type { UserDetailViewModel } from "@/features/users/controllers/use-user-detail-controller";
+import type { UserDetailViewModel } from "@/features/users/model/users.types";
 
 interface UserDetailProfileProps {
   profile: UserDetailViewModel["profile"];

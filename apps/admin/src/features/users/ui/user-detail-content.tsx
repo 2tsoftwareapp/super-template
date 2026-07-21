@@ -11,7 +11,7 @@ import {
 import { Separator } from "@repo/web-ui/separator";
 import { ShieldAlert } from "lucide-react";
 
-import type { UserDetailViewModel } from "@/features/users/controllers/use-user-detail-controller";
+import type { UserDetailViewModel } from "@/features/users/model/users.types";
 import type { AdminUserDto } from "@/lib/api-types";
 
 import { ResourcePageShell } from "@/components/resource-page-shell";

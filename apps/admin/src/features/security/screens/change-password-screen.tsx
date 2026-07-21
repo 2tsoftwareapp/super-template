@@ -1,11 +1,12 @@
 "use client";
 
-import { useChangePasswordMutation } from "@/features/security/api/security.mutations";
+import { useChangePasswordController } from "@/features/security/controllers/use-change-password-controller";
 
 import { ChangePasswordForm } from "../ui/change-password-form";
 
+/** Connects the forced password-change controller to its form. */
 export function ChangePasswordScreen() {
-  const changePassword = useChangePasswordMutation();
+  const password = useChangePasswordController();
 
   return (
     <div className="mx-auto max-w-md space-y-8 py-12">
@@ -19,8 +20,8 @@ export function ChangePasswordScreen() {
       </div>
 
       <ChangePasswordForm
-        onChangePassword={(values) => changePassword.mutate(values)}
-        isSaving={changePassword.isPending}
+        onChangePassword={password.handleChangePassword}
+        isSaving={password.isSaving}
       />
     </div>
   );

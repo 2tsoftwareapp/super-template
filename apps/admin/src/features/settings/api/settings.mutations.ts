@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import type { ApplicationSettingDto } from "@/lib/api-types";
 
-import { updateSetting } from "./settings.api";
+import { settingsApi } from "./settings.api";
 import { settingsKeys } from "./settings.query-keys";
 
 export function useUpdateSettingMutation(options?: {
@@ -20,7 +20,7 @@ export function useUpdateSettingMutation(options?: {
     }: {
       key: string;
       value: ApplicationSettingDto["value"];
-    }) => updateSetting(key, value),
+    }) => settingsApi.update(key, value),
     onSuccess: async (data) => {
       await queryClient.invalidateQueries({ queryKey: settingsKeys.all });
       options?.onSuccess?.(data);

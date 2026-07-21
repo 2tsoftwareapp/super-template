@@ -11,7 +11,7 @@ import {
 import { Spinner } from "@repo/web-ui/spinner";
 import { Shield } from "lucide-react";
 
-import type { MfaSetupResponse } from "@/features/security/model/security.schemas";
+import type { MfaSetupResponse } from "@/features/security/model/security.types";
 
 import { MfaEnabledActions } from "./mfa-enabled-actions";
 import { MfaRecoveryCodes } from "./mfa-recovery-codes";

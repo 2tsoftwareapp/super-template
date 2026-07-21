@@ -9,7 +9,7 @@ import {
 } from "@repo/web-utils/params";
 import { z } from "zod";
 
-import type { UsersListParams, UsersPageSize, UsersSortField } from "./types";
+import type { UsersListParams, UsersSortField } from "./types";
 
 import { DEFAULT_USERS_LIST_PARAMS, USERS_PAGE_SIZE } from "./constants";
 
@@ -24,13 +24,10 @@ const PAGE_SIZES = [10, 20, 30, 50, 100] as const;
 
 const usersListParamsSchema = z.object({
   page: pageParam,
-  limit: pageSizeParam([10, 20, 30, 50, 100], USERS_PAGE_SIZE),
+  limit: pageSizeParam([...PAGE_SIZES], USERS_PAGE_SIZE),
   search: searchTextParam(200),
   status: enumParam(["all", "PENDING", "ACTIVE", "BLOCKED"], "all"),
-  sortField: enumParam(
-    ["createdAt", "displayName", "email", "status"],
-    "createdAt",
-  ),
+  sortField: enumParam([...SORT_FIELDS], "createdAt"),
   sortOrder: sortOrderParam("desc"),
 });
 
@@ -54,7 +51,7 @@ export function parseUsersListSearchParams(
 
   return {
     page: parsed.data.page,
-    limit: parsed.data.limit as UsersPageSize,
+    limit: parsed.data.limit,
     search: parsed.data.search,
     status: parsed.data.status,
     sort: [

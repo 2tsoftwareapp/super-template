@@ -19,7 +19,12 @@ interface MfaRecoveryCodesProps {
   onCopyError: () => void;
 }
 
-export function MfaRecoveryCodes({ codes, onDone, onCopy, onCopyError }: MfaRecoveryCodesProps) {
+export function MfaRecoveryCodes({
+  codes,
+  onDone,
+  onCopy,
+  onCopyError,
+}: MfaRecoveryCodesProps) {
   const copyCodes = useCallback(() => {
     void navigator.clipboard
       .writeText(codes.join("\n"))

@@ -2,12 +2,15 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import { fetchSettings } from "./settings.api";
+import { settingsApi } from "./settings.api";
 import { settingsKeys } from "./settings.query-keys";
+
+const SETTINGS_STALE_TIME_MS = 5 * 60_000;
 
 export function useSettingsQuery() {
   return useQuery({
     queryKey: settingsKeys.all,
-    queryFn: fetchSettings,
+    queryFn: () => settingsApi.list(),
+    staleTime: SETTINGS_STALE_TIME_MS,
   });
 }

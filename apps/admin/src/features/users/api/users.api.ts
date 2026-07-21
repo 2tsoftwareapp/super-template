@@ -5,7 +5,6 @@ import type {
   AdminUserDto,
   CreateAdminUserInput,
   ListResponse,
-  RoleDto,
   UpdateAdminUserInput,
 } from "@/lib/api-types";
 
@@ -48,10 +47,6 @@ export const usersApi = {
     return webFetch<{ data: AdminUserDto }>(
       bffPath("/api/v1/admin/users/{id}", { id: userId }),
     );
-  },
-
-  listRoles() {
-    return webFetch<ListResponse<RoleDto>>(bffPath("/api/v1/admin/roles"));
   },
 
   create(input: CreateAdminUserInput) {

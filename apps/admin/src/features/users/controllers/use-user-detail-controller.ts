@@ -1,28 +1,29 @@
 "use client";
 
 import { standardSchemaResolver as zodResolver } from "@hookform/resolvers/standard-schema";
-import { internalPath, parseRouteParams, uuidParam } from "@repo/web-utils/params";
+import { getErrorMessage } from "@repo/web-utils/errors";
+import { internalPath, parseRouteParams } from "@repo/web-utils/params";
 import { notFound, useParams, useSearchParams } from "next/navigation";
-import { z } from "zod";
 import { type FormEvent, useState } from "react";
-import { useForm, type UseFormReturn } from "react-hook-form";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
-import type { AdminUserDto } from "@/lib/api-types";
+import type { UserDetailViewModel } from "@/features/users/model/users.types";
+import type { RoleDto } from "@/lib/api-types";
 
-import { useMyOrganizationsQuery } from "@/features/organizations/api/organizations.queries";
+import { useMyOrganizationsQuery } from "@/features/organizations";
+import { useRolesQuery } from "@/features/roles";
 import {
   useDeleteUserMutation,
   useReplaceRolesMutation,
   useUpdateProfileMutation,
   useUpdateStatusMutation,
 } from "@/features/users/api/users.mutations";
-import {
-  useAdminRolesQuery,
-  useAdminUserQuery,
-} from "@/features/users/api/users.queries";
+import { useAdminUserQuery } from "@/features/users/api/users.queries";
 import {
   type ProfileForm,
   profileSchema,
+  userRouteParamsSchema,
 } from "@/features/users/model/users.schemas";
 import { useSession } from "@/hooks/use-session";
 import { useRouter } from "@/i18n/navigation";
@@ -31,44 +32,19 @@ import { getAssignableRoles } from "@/lib/roles";
 import { useUserRoles } from "./use-user-roles";
 import { useUserStatus } from "./use-user-status";
 
-interface MutationState {
-  isPending: boolean;
-  isSuccess: boolean;
-  isError: boolean;
-}
+export type { UserDetailViewModel };
 
-export interface UserDetailViewModel {
-  isLoading: boolean;
-  currentUser: AdminUserDto | null;
-  backHref: string;
-  onRefresh: () => void;
-  isRefreshing: boolean;
-  flags: {
-    isSelf: boolean;
-    isActorSuperAdmin: boolean;
-    isTargetPrivileged: boolean;
-    canEdit: boolean;
-  };
-  profile: {
-    form: UseFormReturn<ProfileForm>;
-    onSubmit: (event: FormEvent<HTMLFormElement>) => void;
-    state: MutationState;
-  };
-  status: ReturnType<typeof useUserStatus>;
-  roles: ReturnType<typeof useUserRoles>;
-  danger: {
-    confirmOpen: boolean;
-    onOpen: () => void;
-    onCancel: () => void;
-    onConfirm: () => Promise<void>;
-    state: MutationState;
-    onRetry: () => void;
-  };
-}
-
+/**
+ * Orchestration hook for the user detail screen.
+ *
+ * Flow:
+ *   1. Parse route UUID; load user, roles catalog, and actor orgs in parallel.
+ *   2. Session + target roles → edit flags (self / privileged target guards).
+ *   3. Profile, status, role assignment, and delete mutations with toast on error.
+ */
 export function useUserDetailController(): UserDetailViewModel {
   const params = useParams<{ id: string }>();
-  const parsedId = parseRouteParams(z.object({ id: uuidParam }), params);
+  const parsedId = parseRouteParams(userRouteParamsSchema, params);
   if (!parsedId.ok) {
     notFound();
   }
@@ -83,7 +59,7 @@ export function useUserDetailController(): UserDetailViewModel {
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   const user = useAdminUserQuery(userId);
-  const roles = useAdminRolesQuery();
+  const roles = useRolesQuery();
   const organizations = useMyOrganizationsQuery();
   const currentUser = user.data?.data ?? null;
 
@@ -113,7 +89,7 @@ export function useUserDetailController(): UserDetailViewModel {
 
   const assignableRoles = getAssignableRoles(
     actorRoles,
-    roles.data?.data ?? [],
+    (roles.data?.data ?? []) as RoleDto[],
   ).map((r) => ({
     id: r.id,
     name: r.name,
@@ -160,9 +136,13 @@ export function useUserDetailController(): UserDetailViewModel {
     flags: { isSelf, isActorSuperAdmin, isTargetPrivileged, canEdit },
     profile: {
       form,
-      onSubmit: (event) => {
+      onSubmit: (event: FormEvent<HTMLFormElement>) => {
         void form.handleSubmit((values) => {
-          void updateProfile.mutateAsync(values);
+          updateProfile.mutate(values, {
+            onError: (error) => {
+              toast.error(getErrorMessage(error));
+            },
+          });
         })(event);
       },
       state: {
@@ -178,15 +158,25 @@ export function useUserDetailController(): UserDetailViewModel {
       onOpen: () => setConfirmDelete(true),
       onCancel: () => setConfirmDelete(false),
       onConfirm: async () => {
-        await deleteUser.mutateAsync();
-        setConfirmDelete(false);
+        try {
+          await deleteUser.mutateAsync();
+          setConfirmDelete(false);
+        } catch (error) {
+          toast.error(getErrorMessage(error));
+        }
       },
       state: {
         isPending: deleteUser.isPending,
         isSuccess: deleteUser.isSuccess,
         isError: deleteUser.isError,
       },
-      onRetry: () => void deleteUser.mutateAsync(),
+      onRetry: () => {
+        deleteUser.mutate(undefined, {
+          onError: (error) => {
+            toast.error(getErrorMessage(error));
+          },
+        });
+      },
     },
   };
 }

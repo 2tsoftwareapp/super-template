@@ -1,6 +1,8 @@
 "use client";
 
+import { getErrorMessage } from "@repo/web-utils/errors";
 import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
 
 const STATUS_OPTIONS = ["PENDING", "ACTIVE", "BLOCKED"] as const;
 export type UserStatus = (typeof STATUS_OPTIONS)[number];
@@ -21,8 +23,12 @@ export function useUserStatus(
 
   const canApply = !disabled && selectedStatus !== currentStatus;
 
-  const handleApply = useCallback(() => {
-    void updateStatus.mutateAsync(selectedStatus);
+  const handleApply = useCallback(async () => {
+    try {
+      await updateStatus.mutateAsync(selectedStatus);
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+    }
   }, [selectedStatus, updateStatus]);
 
   return {

@@ -3,7 +3,7 @@ import { ConfirmDialog } from "@repo/web-ui/confirm-dialog";
 import { Show } from "@repo/web-ui/show";
 import { Trash2 } from "lucide-react";
 
-import type { UserDetailViewModel } from "@/features/users/controllers/use-user-detail-controller";
+import type { UserDetailViewModel } from "@/features/users/model/users.types";
 
 interface UserDetailDangerZoneProps {
   danger: UserDetailViewModel["danger"];
