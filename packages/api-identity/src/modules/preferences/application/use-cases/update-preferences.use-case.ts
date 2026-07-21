@@ -21,11 +21,10 @@ import {
 
 @Injectable()
 export class UpdatePreferencesUseCase {
-  private readonly preferencesMapper = new PreferencesMapper();
-
   constructor(
     @Inject(PREFERENCES_REPOSITORY) private readonly preferencesRepository: PreferencesRepositoryPort,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
+    private readonly preferencesMapper: PreferencesMapper,
   ) {}
 
   async execute(

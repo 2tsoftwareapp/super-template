@@ -1,5 +1,8 @@
+import { Injectable } from '@nestjs/common';
+
 import type { AuditLogRecord } from './ports/audit.repository.port';
 
+@Injectable()
 export class AuditMapper {
   toAuditLogDto(row: AuditLogRecord) {
     return {

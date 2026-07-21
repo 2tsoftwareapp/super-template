@@ -1,5 +1,8 @@
+import { Injectable } from '@nestjs/common';
+
 import type { UserPreferencesRecord } from './ports/preferences.repository.port';
 
+@Injectable()
 export class PreferencesMapper {
   toDto(preferences: UserPreferencesRecord) {
     return {

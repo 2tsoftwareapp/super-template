@@ -14,11 +14,10 @@ import { PreferencesMapper } from '../preferences.mapper';
 
 @Injectable()
 export class ResetPreferencesUseCase {
-  private readonly preferencesMapper = new PreferencesMapper();
-
   constructor(
     @Inject(PREFERENCES_REPOSITORY) private readonly preferencesRepository: PreferencesRepositoryPort,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
+    private readonly preferencesMapper: PreferencesMapper,
   ) {}
 
   async execute(userId: string, requestContext?: RequestContext) {

@@ -10,10 +10,9 @@ import { ROLE_NAMES, AppError, ERROR_CODES } from '@repo/api-core';
 
 @Injectable()
 export class ListAuditLogsUseCase {
-  private readonly auditMapper = new AuditMapper();
-
   constructor(
     @Inject(AUDIT_REPOSITORY) private readonly auditRepository: AuditRepositoryPort,
+    private readonly auditMapper: AuditMapper,
   ) {}
 
   async execute(actor: AuthenticatedRequestUser, query: ListAuditLogsQuery) {

@@ -6,10 +6,9 @@ import { PreferencesMapper } from '../preferences.mapper';
 
 @Injectable()
 export class GetPreferencesUseCase {
-  private readonly preferencesMapper = new PreferencesMapper();
-
   constructor(
     @Inject(PREFERENCES_REPOSITORY) private readonly preferencesRepository: PreferencesRepositoryPort,
+    private readonly preferencesMapper: PreferencesMapper,
   ) {}
 
   async execute(userId: string) {

@@ -7,10 +7,9 @@ import { AUDIT_REPOSITORY, type AuditRepositoryPort } from '../ports/audit.repos
 
 @Injectable()
 export class GetAuditLogUseCase {
-  private readonly auditMapper = new AuditMapper();
-
   constructor(
     @Inject(AUDIT_REPOSITORY) private readonly auditRepository: AuditRepositoryPort,
+    private readonly auditMapper: AuditMapper,
   ) {}
 
   async execute(actor: AuthenticatedRequestUser, id: string) {

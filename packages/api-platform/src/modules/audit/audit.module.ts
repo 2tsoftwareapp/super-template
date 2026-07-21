@@ -5,6 +5,7 @@ import { FILES_REPOSITORY } from '../files/application/ports/files.repository.po
 import { FilesRepository } from '../files/infrastructure/files.repository';
 import { StorageModule } from '../storage/storage.module';
 import { AuditRetentionService } from './application/audit-retention.service';
+import { AuditMapper } from './application/audit.mapper';
 import { AuditService } from './application/audit.service';
 import { AUDIT_REPOSITORY } from './application/ports/audit.repository.port';
 import { DownloadAuditExportUseCase } from './application/use-cases/download-audit-export.use-case';
@@ -22,6 +23,7 @@ import { AuditController } from './presentation/audit.controller';
   imports: [StorageModule],
   controllers: [AuditController],
   providers: [
+    AuditMapper,
     AuditRepository,
     FilesRepository,
     {
