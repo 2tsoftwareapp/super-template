@@ -1,3 +1,7 @@
+import { getErrorMessage } from "@repo/web-utils/errors";
+
+import { webFetch } from "@/lib/http";
+
 export interface VerifyEmailResult {
   ok: boolean;
   message: string;
@@ -7,27 +11,23 @@ export async function verifyEmailToken(
   token: string,
 ): Promise<VerifyEmailResult> {
   try {
-    const res = await fetch("/api/auth/verify-email", {
+    await webFetch("/api/auth/verify-email", {
       method: "POST",
-      headers: { "content-type": "application/json" },
       body: JSON.stringify({ token }),
     });
-    const data = (await res.json()) as {
-      error?: { message?: string } | null;
-    };
 
-    if (res.ok) {
-      return {
-        ok: true,
-        message: "Email verified successfully! Your account is now active.",
-      };
+    return {
+      ok: true,
+      message: "Email verified successfully! Your account is now active.",
+    };
+  } catch (error) {
+    if (error instanceof TypeError) {
+      return { ok: false, message: "Network error. Please try again." };
     }
 
     return {
       ok: false,
-      message: data.error?.message ?? "Verification failed.",
+      message: getErrorMessage(error, "Verification failed."),
     };
-  } catch {
-    return { ok: false, message: "Network error. Please try again." };
   }
 }

@@ -5,11 +5,11 @@ import type {
   SsoIdentity,
   SsoProviderAdapter,
   SsoTokenSet,
-} from '../ports/sso-provider.port';
+} from '../application/ports/sso-provider.port';
 
 import { buildAppleClientSecret } from '../domain/apple-client-secret';
 import { verifyOidcIdToken } from '../domain/oidc-verify';
-import { JwksCacheService } from '../infrastructure/jwks-cache.service';
+import { JwksCacheService } from './jwks-cache.service';
 
 const AUTHORIZATION_ENDPOINT = 'https://appleid.apple.com/auth/authorize';
 const TOKEN_ENDPOINT = 'https://appleid.apple.com/auth/token';
@@ -17,7 +17,7 @@ const JWKS_URI = 'https://appleid.apple.com/auth/keys';
 const ISSUER = 'https://appleid.apple.com';
 
 @Injectable()
-export class AppleSsoProvider implements SsoProviderAdapter {
+export class AppleSsoAdapter implements SsoProviderAdapter {
   readonly provider = 'apple';
 
   constructor(

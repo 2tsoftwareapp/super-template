@@ -21,14 +21,25 @@ export interface AuthSessionRepositoryPort {
 
   updateSession(
     sessionId: string,
-    values: Partial<CreateSessionInput>,
+    values: Partial<
+      CreateSessionInput & {
+        previousRefreshTokenHash: string | null;
+        previousRotatedAt: Date | null;
+        revokedAt: Date | null;
+      }
+    >,
     executor?: TransactionExecutor,
   ): Promise<AuthSessionModel | null>;
 
   updateSessionIfMatches(
     sessionId: string,
     refreshTokenHash: string,
-    values: Partial<CreateSessionInput>,
+    values: Partial<
+      CreateSessionInput & {
+        previousRefreshTokenHash: string | null;
+        previousRotatedAt: Date | null;
+      }
+    >,
     executor?: TransactionExecutor,
   ): Promise<AuthSessionModel | null>;
 

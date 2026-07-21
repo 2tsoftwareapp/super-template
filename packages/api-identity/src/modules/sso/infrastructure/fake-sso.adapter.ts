@@ -5,7 +5,7 @@ import type {
   SsoIdentity,
   SsoProviderAdapter,
   SsoTokenSet,
-} from '../ports/sso-provider.port';
+} from '../application/ports/sso-provider.port';
 
 interface IssuedFakeCode {
   subject: string;
@@ -18,7 +18,7 @@ interface IssuedFakeCode {
 // flow can be exercised in dev/E2E without live Google/Apple credentials. Never registered
 // when APP_ENV=production (enforced at env-validation time and at module wiring).
 @Injectable()
-export class FakeSsoProvider implements SsoProviderAdapter {
+export class FakeSsoAdapter implements SsoProviderAdapter {
   readonly provider = 'fake';
 
   private readonly issuedCodes = new Map<string, IssuedFakeCode>();

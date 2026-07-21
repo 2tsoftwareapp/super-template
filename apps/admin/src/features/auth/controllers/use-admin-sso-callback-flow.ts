@@ -1,60 +1,59 @@
 "use client";
 
-import { useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
 
-import { sessionQueryKey } from "@/hooks/use-session";
 import { useRouter } from "@/i18n/navigation";
 
-import { establishAdminSsoSession } from "../api/auth.api";
+import { useEstablishSsoSessionMutation } from "../api/auth.mutations";
 import {
   ADMIN_AUTH_ROUTES,
   AUTH_ERROR_QUERY_VALUES,
+  AUTH_MESSAGES,
   AUTH_SEARCH_PARAMS,
-  AUTH_STORAGE_KEYS,
 } from "../model/auth.constants";
+import { parseSsoCallbackSearchParams } from "../model/auth.search-params";
 
 const ssoFailedLoginPath = `${ADMIN_AUTH_ROUTES.login}?${AUTH_SEARCH_PARAMS.error}=${AUTH_ERROR_QUERY_VALUES.ssoFailed}`;
 
+/**
+ * Complete the SSO redirect: exchange code → session → post-login route.
+ *
+ * Flow:
+ *   1. Fail closed on IdP error flag or missing exchange code.
+ *   2. Establish session via mutation (invalidates session query).
+ *   3. Enter the app, or bounce to login with sso_failed.
+ * Trace: CODING_RULES §5 R7 / §15 R4.
+ */
 export function useAdminSsoCallbackFlow() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const queryClient = useQueryClient();
   const called = useRef(false);
+  const { mutate: establishSession } = useEstablishSsoSessionMutation();
+  const params = parseSsoCallbackSearchParams(searchParams);
 
   useEffect(() => {
     if (called.current) return;
     called.current = true;
 
-    if (
-      searchParams.get(AUTH_SEARCH_PARAMS.error) ===
-      AUTH_ERROR_QUERY_VALUES.ssoFailed
-    ) {
+    // Step 1: reject known failure / missing code
+    if (params.error === AUTH_ERROR_QUERY_VALUES.ssoFailed || !params.exchange) {
       router.replace(ssoFailedLoginPath);
       return;
     }
 
-    async function handleCallback() {
-      const exchangeCode = searchParams.get(AUTH_SEARCH_PARAMS.exchange);
-      if (!exchangeCode) {
-        router.replace(ssoFailedLoginPath);
-        return;
-      }
-
-      try {
-        await establishAdminSsoSession(exchangeCode);
-
-        sessionStorage.removeItem(AUTH_STORAGE_KEYS.ssoProvider);
-        await queryClient.invalidateQueries({ queryKey: sessionQueryKey });
-
+    // Step 2–3: exchange then navigate
+    establishSession(params.exchange, {
+      onSuccess: () => {
         router.replace(ADMIN_AUTH_ROUTES.postLogin);
-      } catch {
-        sessionStorage.removeItem(AUTH_STORAGE_KEYS.ssoProvider);
+      },
+      onError: () => {
         router.replace(ssoFailedLoginPath);
-      }
-    }
+      },
+    });
+  }, [params.error, params.exchange, router, establishSession]);
 
-    void handleCallback();
-  }, [searchParams, router, queryClient]);
+  return {
+    statusMessage: AUTH_MESSAGES.completingSignIn,
+  };
 }

@@ -19,54 +19,61 @@ import { Separator } from "@repo/web-ui/separator";
 import type { AdminLoginInput } from "@/features/auth/model/auth.schemas";
 import type { SsoProvider } from "@/lib/api-paths";
 
-import {
-  AUTH_FORM_AUTOCOMPLETE_VALUES,
-  AUTH_FORM_FIELD_NAMES,
-  AUTH_MESSAGES,
-  LOGIN_FORM_COPY,
-  SSO_PROVIDER_OPTIONS,
-} from "@/features/auth/model/auth.constants";
-
 import { ProviderIcon } from "./provider-icon";
 
+export interface LoginCardCopy {
+  adminLoginTitle: string;
+  seededAccountDescription: string;
+  emailLabel: string;
+  passwordLabel: string;
+  signIn: string;
+  signingIn: string;
+  continueWith: string;
+}
+
+export interface LoginSsoProviderOption {
+  label: string;
+  provider: SsoProvider;
+}
+
 interface LoginCardProps {
+  copy: LoginCardCopy;
   errorMessage: string | null;
   form: UseFormReturn<AdminLoginInput>;
   isPending: boolean;
   onSsoStart: (provider: SsoProvider) => void;
   onSubmit: (values: AdminLoginInput) => void;
   ssoError: boolean;
+  ssoFailedMessage: string;
+  ssoProviders: readonly LoginSsoProviderOption[];
 }
 
 export function LoginCard({
+  copy,
   errorMessage,
   form,
   isPending,
   onSsoStart,
   onSubmit,
   ssoError,
+  ssoFailedMessage,
+  ssoProviders,
 }: LoginCardProps) {
   return (
     <Card className="border-border">
       <CardHeader>
-        <CardTitle className="text-2xl">
-          {LOGIN_FORM_COPY.adminLoginTitle}
-        </CardTitle>
-        <CardDescription>
-          {LOGIN_FORM_COPY.seededAccountDescription}
-        </CardDescription>
+        <CardTitle className="text-2xl">{copy.adminLoginTitle}</CardTitle>
+        <CardDescription>{copy.seededAccountDescription}</CardDescription>
       </CardHeader>
       <CardContent>
         <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
           <div className="space-y-2">
-            <Label htmlFor={AUTH_FORM_FIELD_NAMES.email}>
-              {LOGIN_FORM_COPY.emailLabel}
-            </Label>
+            <Label htmlFor="email">{copy.emailLabel}</Label>
             <Input
-              id={AUTH_FORM_FIELD_NAMES.email}
-              autoComplete={AUTH_FORM_AUTOCOMPLETE_VALUES.email}
+              id="email"
+              autoComplete="email"
               aria-invalid={Boolean(form.formState.errors.email)}
-              {...form.register(AUTH_FORM_FIELD_NAMES.email)}
+              {...form.register("email")}
             />
             {form.formState.errors.email?.message ? (
               <p className="text-xs text-destructive">
@@ -75,14 +82,12 @@ export function LoginCard({
             ) : null}
           </div>
           <div className="space-y-2">
-            <Label htmlFor={AUTH_FORM_FIELD_NAMES.password}>
-              {LOGIN_FORM_COPY.passwordLabel}
-            </Label>
+            <Label htmlFor="password">{copy.passwordLabel}</Label>
             <PasswordInput
-              id={AUTH_FORM_FIELD_NAMES.password}
-              autoComplete={AUTH_FORM_AUTOCOMPLETE_VALUES.currentPassword}
+              id="password"
+              autoComplete="current-password"
               aria-invalid={Boolean(form.formState.errors.password)}
-              {...form.register(AUTH_FORM_FIELD_NAMES.password)}
+              {...form.register("password")}
             />
             {form.formState.errors.password?.message ? (
               <p className="text-xs text-destructive">
@@ -92,19 +97,19 @@ export function LoginCard({
           </div>
           {errorMessage ? <Alert>{errorMessage}</Alert> : null}
           <Button className="w-full" type="submit" disabled={isPending}>
-            {isPending ? LOGIN_FORM_COPY.signingIn : LOGIN_FORM_COPY.signIn}
+            {isPending ? copy.signingIn : copy.signIn}
           </Button>
         </form>
 
         <div className="relative my-4">
           <Separator />
           <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-2 text-xs text-muted-foreground">
-            {LOGIN_FORM_COPY.continueWith}
+            {copy.continueWith}
           </span>
         </div>
 
         <div className="space-y-2">
-          {SSO_PROVIDER_OPTIONS.map((item) => (
+          {ssoProviders.map((item) => (
             <Button
               key={item.provider}
               variant="outline"
@@ -117,9 +122,7 @@ export function LoginCard({
           ))}
         </div>
 
-        {ssoError ? (
-          <Alert className="mt-4">{AUTH_MESSAGES.ssoFailed}</Alert>
-        ) : null}
+        {ssoError ? <Alert className="mt-4">{ssoFailedMessage}</Alert> : null}
       </CardContent>
     </Card>
   );

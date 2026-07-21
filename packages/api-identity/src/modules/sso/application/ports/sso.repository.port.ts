@@ -5,6 +5,7 @@ export interface SsoLoginStateRecord {
   provider: string;
   stateHash: string;
   nonce: string;
+  /** Plaintext PKCE verifier — decrypted by infrastructure on read. */
   codeVerifier: string;
   redirectUri: string;
   expiresAt: Date;
@@ -15,8 +16,7 @@ export interface SsoLoginStateRecord {
 export interface SsoSessionExchangeRecord {
   id: string;
   codeHash: string;
-  accessToken: string;
-  refreshToken: string;
+  sessionId: string;
   organizationId: string | null;
   expiresAt: Date;
   consumedAt: Date | null;
@@ -58,8 +58,7 @@ export interface SsoRepositoryPort {
   createSessionExchange(
     values: {
       codeHash: string;
-      accessToken: string;
-      refreshToken: string;
+      sessionId: string;
       organizationId: string | null;
       expiresAt: Date;
     },

@@ -1,18 +1,22 @@
 import { Badge } from "@repo/web-ui/badge";
 
-import { LOGIN_FORM_COPY } from "@/features/auth/model/auth.constants";
-
 interface LoginHeroProps {
+  badgeLabel: string;
   description: string;
   eyebrow: string;
   title: string;
 }
 
-export function LoginHero({ description, eyebrow, title }: LoginHeroProps) {
+export function LoginHero({
+  badgeLabel,
+  description,
+  eyebrow,
+  title,
+}: LoginHeroProps) {
   return (
     <section className="space-y-6 py-4 lg:py-10">
       <Badge variant="outline" className="w-fit">
-        {LOGIN_FORM_COPY.adminWorkspace}
+        {badgeLabel}
       </Badge>
       <div className="max-w-2xl space-y-4">
         <p className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground">

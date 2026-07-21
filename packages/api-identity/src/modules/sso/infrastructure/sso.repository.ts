@@ -8,30 +8,70 @@ import {
   ssoLoginStates,
   ssoSessionExchanges,
 } from '@repo/api-database';
+import { EnvironmentService } from '@repo/api-core';
 import { and, eq, gt, isNull } from 'drizzle-orm';
 
-import type { SsoRepositoryPort } from '../application/ports/sso.repository.port';
+import type {
+  SsoLoginStateRecord,
+  SsoRepositoryPort,
+  SsoSessionExchangeRecord,
+} from '../application/ports/sso.repository.port';
 
+import {
+  decryptTotpSecret,
+  encryptTotpSecret,
+} from '../../mfa/domain/totp-encryption';
+
+/**
+ * Drizzle SSO repository.
+ *
+ * SECURITY: encrypts PKCE code_verifier at rest with MFA_ENCRYPTION_KEY;
+ * session exchanges store session_id only (tokens re-issued on redeem).
+ */
 @Injectable()
 export class SsoRepository implements SsoRepositoryPort {
-  constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
+  constructor(
+    @Inject(DATABASE) private readonly database: DatabaseClient,
+    private readonly environmentService: EnvironmentService,
+  ) {}
 
   async createLoginState(
-    values: typeof ssoLoginStates.$inferInsert,
+    values: {
+      provider: string;
+      stateHash: string;
+      nonce: string;
+      codeVerifier: string;
+      redirectUri: string;
+      expiresAt: Date;
+    },
     executor: DatabaseExecutor = this.database,
-  ) {
+  ): Promise<SsoLoginStateRecord | null> {
+    const encrypted = encryptTotpSecret(
+      Buffer.from(values.codeVerifier, 'utf8'),
+      this.encryptionKey(),
+    );
+
     const [state] = await executor
       .insert(ssoLoginStates)
-      .values(values)
+      .values({
+        provider: values.provider,
+        stateHash: values.stateHash,
+        nonce: values.nonce,
+        codeVerifierCiphertext: encrypted.ciphertext,
+        codeVerifierIv: encrypted.iv,
+        codeVerifierAuthTag: encrypted.authTag,
+        redirectUri: values.redirectUri,
+        expiresAt: values.expiresAt,
+      })
       .returning();
 
-    return state ?? null;
+    return state ? this.toLoginStateRecord(state) : null;
   }
 
   async findValidLoginStateByStateHash(
     stateHash: string,
     executor: DatabaseExecutor = this.database,
-  ) {
+  ): Promise<SsoLoginStateRecord | null> {
     const [state] = await executor
       .select()
       .from(ssoLoginStates)
@@ -44,7 +84,7 @@ export class SsoRepository implements SsoRepositoryPort {
       )
       .limit(1);
 
-    return state ?? null;
+    return state ? this.toLoginStateRecord(state) : null;
   }
 
   async consumeLoginState(
@@ -58,9 +98,14 @@ export class SsoRepository implements SsoRepositoryPort {
   }
 
   async createSessionExchange(
-    values: typeof ssoSessionExchanges.$inferInsert,
+    values: {
+      codeHash: string;
+      sessionId: string;
+      organizationId: string | null;
+      expiresAt: Date;
+    },
     executor: DatabaseExecutor = this.database,
-  ) {
+  ): Promise<SsoSessionExchangeRecord | null> {
     const [exchange] = await executor
       .insert(ssoSessionExchanges)
       .values(values)
@@ -72,7 +117,7 @@ export class SsoRepository implements SsoRepositoryPort {
   async findValidSessionExchangeByCodeHash(
     codeHash: string,
     executor: DatabaseExecutor = this.database,
-  ) {
+  ): Promise<SsoSessionExchangeRecord | null> {
     const [exchange] = await executor
       .select()
       .from(ssoSessionExchanges)
@@ -127,5 +172,34 @@ export class SsoRepository implements SsoRepositoryPort {
       .returning();
 
     return identity ?? null;
+  }
+
+  private encryptionKey(): string {
+    return this.environmentService.values.MFA_ENCRYPTION_KEY;
+  }
+
+  private toLoginStateRecord(
+    state: typeof ssoLoginStates.$inferSelect,
+  ): SsoLoginStateRecord {
+    const codeVerifier = decryptTotpSecret(
+      {
+        ciphertext: state.codeVerifierCiphertext,
+        iv: state.codeVerifierIv,
+        authTag: state.codeVerifierAuthTag,
+      },
+      this.encryptionKey(),
+    ).toString('utf8');
+
+    return {
+      id: state.id,
+      provider: state.provider,
+      stateHash: state.stateHash,
+      nonce: state.nonce,
+      codeVerifier,
+      redirectUri: state.redirectUri,
+      expiresAt: state.expiresAt,
+      consumedAt: state.consumedAt,
+      createdAt: state.createdAt,
+    };
   }
 }

@@ -73,6 +73,11 @@ import { AuthSessionController } from './presentation/auth-session.controller';
     AuthenticateAccessTokenUseCase,
     OutboxProcessor,
   ],
-  exports: [AuthService, IssueSessionUseCase],
+  exports: [
+    AuthService,
+    IssueSessionUseCase,
+    AUTH_TOKEN_PROVIDER,
+    AuthDataModule,
+  ],
 })
 export class AuthModule {}

@@ -117,8 +117,7 @@ export class SsoController {
     );
 
     const { exchangeCode } = await this.createSsoSessionExchange.execute({
-      accessToken: session.accessToken,
-      refreshToken: session.refreshToken,
+      sessionId: session.session.id,
       organizationId: session.organizationId,
     });
 

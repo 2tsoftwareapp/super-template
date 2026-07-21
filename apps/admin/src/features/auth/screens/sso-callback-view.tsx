@@ -1,16 +1,16 @@
 "use client";
 
 import { useAdminSsoCallbackFlow } from "@/features/auth/controllers/use-admin-sso-callback-flow";
-import { AUTH_MESSAGES } from "@/features/auth/model/auth.constants";
 
+/**
+ * SSO callback screen: shows progress while the handler exchanges the code.
+ */
 export function SsoCallbackView() {
-  useAdminSsoCallbackFlow();
+  const { statusMessage } = useAdminSsoCallbackFlow();
 
   return (
     <div className="flex min-h-screen items-center justify-center">
-      <p className="text-sm text-muted-foreground">
-        {AUTH_MESSAGES.completingSignIn}
-      </p>
+      <p className="text-sm text-muted-foreground">{statusMessage}</p>
     </div>
   );
 }

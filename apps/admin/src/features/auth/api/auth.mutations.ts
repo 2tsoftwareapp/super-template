@@ -5,81 +5,72 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { SsoProvider } from "@/lib/api-paths";
 
 import { sessionQueryKey } from "@/hooks/use-session";
-import { useRouter } from "@/i18n/navigation";
 
 import type { MfaChallengeInput } from "../model/auth.schemas";
 
 import {
-  ADMIN_AUTH_ROUTES,
-  AUTH_FLOW_RESULTS,
-  AUTH_STORAGE_KEYS,
-} from "../model/auth.constants";
-import {
+  establishAdminSsoSession,
   loginToAdmin,
   logoutAdmin,
   startSso,
   verifyAdminMfaChallenge,
 } from "./auth.api";
 
+/** Thin password-login mutation — handler interprets the payload. */
 export function useLoginMutation() {
-  const queryClient = useQueryClient();
-  const router = useRouter();
-
   return useMutation({
     mutationFn: loginToAdmin,
-    onSuccess: async (result) => {
-      if (result.status === AUTH_FLOW_RESULTS.mfaRequired) {
-        return;
-      }
-
-      await queryClient.invalidateQueries({ queryKey: sessionQueryKey });
-
-      if (result.status === AUTH_FLOW_RESULTS.mustChangePassword) {
-        router.replace("/security");
-        return;
-      }
-
-      router.replace(ADMIN_AUTH_ROUTES.postLogin);
-    },
-    onError: () => undefined,
   });
 }
 
+/** Thin MFA mutation — handler asserts admin access. */
 export function useMfaMutation(mfaToken: string | null) {
-  const queryClient = useQueryClient();
-  const router = useRouter();
-
   return useMutation({
     mutationFn: (values: MfaChallengeInput) =>
       verifyAdminMfaChallenge({ ...values, mfaToken }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: sessionQueryKey });
-      router.replace(ADMIN_AUTH_ROUTES.postLogin);
-    },
   });
 }
 
+/** Fetch IdP authorization URL (handler performs the browser redirect). */
 export function useSsoStartMutation() {
   return useMutation({
-    mutationFn: async ({ provider, redirectUri }: { provider: SsoProvider; redirectUri: string }) => {
-      const authorizationUrl = await startSso(provider, redirectUri);
-      sessionStorage.setItem(AUTH_STORAGE_KEYS.ssoProvider, provider);
-      window.location.href = authorizationUrl;
+    mutationFn: async ({
+      provider,
+      redirectUri,
+    }: {
+      provider: SsoProvider;
+      redirectUri: string;
+    }) => startSso(provider, redirectUri),
+  });
+}
+
+/**
+ * Establish session from SSO exchange code and refresh the session query.
+ * Navigation stays in the SSO callback handler.
+ */
+export function useEstablishSsoSessionMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: establishAdminSsoSession,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: sessionQueryKey });
     },
   });
 }
 
+/**
+ * Logout and wipe the query cache so the next identity cannot see prior data.
+ * Trace: CODING_RULES §19 R6 / §20 R10.
+ * Navigation is owned by the caller (guard / login flow).
+ */
 export function useLogoutMutation() {
   const queryClient = useQueryClient();
-  const router = useRouter();
 
   return useMutation({
     mutationFn: logoutAdmin,
     onSettled: () => {
-      // Cache of the previous user is no longer valid — clear everything
-      // to prevent data leaking across sessions (§19 R6).
       queryClient.clear();
-      router.replace(ADMIN_AUTH_ROUTES.login);
     },
   });
 }

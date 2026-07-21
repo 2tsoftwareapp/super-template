@@ -119,6 +119,49 @@ export class SessionTokenService implements AuthTokenProviderPort {
     };
   }
 
+  /**
+   * Mint a fresh token pair for an existing session without presenting the
+   * prior refresh token. Used by SSO exchange so plaintext tokens never need
+   * to sit in `sso_session_exchanges`.
+   */
+  async reissueSessionTokens(
+    sessionId: string,
+    userId: string,
+    organizationId: string,
+    metadata: { ipAddress: string | null; userAgent: string | null },
+  ) {
+    const {
+      accessToken,
+      refreshToken,
+      refreshTokenHash: nextRefreshTokenHash,
+    } = await this.issueTokenPair(userId, sessionId, organizationId);
+
+    const session = await this.authSessionRepository.updateSession(sessionId, {
+      refreshTokenHash: nextRefreshTokenHash,
+      previousRefreshTokenHash: null,
+      previousRotatedAt: null,
+      expiresAt: new Date(
+        Date.now() +
+          durationToMilliseconds(
+            this.environmentService.values.JWT_REFRESH_TTL,
+          ),
+      ),
+      lastUsedAt: new Date(),
+      ipAddress: metadata.ipAddress,
+      userAgent: metadata.userAgent,
+    });
+
+    if (!session) {
+      throw new Error('Session update returned no rows');
+    }
+
+    return {
+      accessToken,
+      refreshToken,
+      session,
+    };
+  }
+
   private async issueTokenPair(
     userId: string,
     sessionId: string,

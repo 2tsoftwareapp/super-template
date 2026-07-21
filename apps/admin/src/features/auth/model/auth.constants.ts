@@ -6,9 +6,10 @@ export const ADMIN_AUTH_ROUTES = {
   ssoCallback: "/login/sso/callback",
 } as const;
 
+/** Empty defaults — seed credentials stay in UI copy, not prefilled secrets. */
 export const ADMIN_LOGIN_DEFAULT_VALUES = {
-  email: "admin@example.local",
-  password: "ChangeMe123!",
+  email: "",
+  password: "",
 } as const;
 
 export const AUTH_ERROR_QUERY_VALUES = {
@@ -40,11 +41,6 @@ export const AUTH_FORM_FIELD_NAMES = {
   password: "password",
 } as const;
 
-export const AUTH_FORM_AUTOCOMPLETE_VALUES = {
-  currentPassword: "current-password",
-  email: "email",
-} as const;
-
 export const AUTH_HTTP_STATUS = {
   forbidden: 403,
   unauthorized: 401,
@@ -74,16 +70,8 @@ export const AUTH_SEARCH_PARAMS = {
   exchange: "exchange",
 } as const;
 
-export const AUTH_STORAGE_KEYS = {
-  ssoProvider: "sso_provider",
-} as const;
-
 export const HTTP_METHODS = {
   post: "POST",
-} as const;
-
-export const HTTP_CREDENTIALS = {
-  sameOrigin: "same-origin",
 } as const;
 
 export const LOGIN_CONTENT = {

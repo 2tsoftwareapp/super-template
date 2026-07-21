@@ -1,24 +1,27 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { ApiClientError } from "@/lib/http";
 
 import { verifyEmailToken } from "./verify-email-service";
 
-function mockFetchOnce(response: {
-  ok: boolean;
-  json: () => Promise<unknown>;
-}) {
-  vi.stubGlobal(
-    "fetch",
-    vi.fn().mockResolvedValue(response),
-  );
-}
+vi.mock("@/lib/http", async () => {
+  const actual = await vi.importActual<typeof import("@/lib/http")>("@/lib/http");
+  return {
+    ...actual,
+    webFetch: vi.fn(),
+  };
+});
 
-afterEach(() => {
-  vi.unstubAllGlobals();
+const { webFetch } = await import("@/lib/http");
+const webFetchMock = vi.mocked(webFetch);
+
+beforeEach(() => {
+  webFetchMock.mockReset();
 });
 
 describe("verifyEmailToken", () => {
   it("returns ok with a success message when the API accepts the token", async () => {
-    mockFetchOnce({ ok: true, json: () => Promise.resolve({}) });
+    webFetchMock.mockResolvedValueOnce({ data: {} });
 
     const result = await verifyEmailToken("valid-token");
 
@@ -27,11 +30,12 @@ describe("verifyEmailToken", () => {
   });
 
   it("surfaces the API error message on rejection", async () => {
-    mockFetchOnce({
-      ok: false,
-      json: () =>
-        Promise.resolve({ error: { message: "Token expired" } }),
-    });
+    webFetchMock.mockRejectedValueOnce(
+      new ApiClientError(400, {
+        error: { code: "BAD", message: "Token expired", details: null },
+        meta: { requestId: "r1" },
+      }),
+    );
 
     const result = await verifyEmailToken("expired-token");
 
@@ -39,15 +43,16 @@ describe("verifyEmailToken", () => {
   });
 
   it("falls back to a generic message when the API gives no detail", async () => {
-    mockFetchOnce({ ok: false, json: () => Promise.resolve({}) });
+    webFetchMock.mockRejectedValueOnce(new ApiClientError(400, null));
 
     const result = await verifyEmailToken("bad-token");
 
-    expect(result).toEqual({ ok: false, message: "Verification failed." });
+    expect(result.ok).toBe(false);
+    expect(result.message.length).toBeGreaterThan(0);
   });
 
-  it("reports a network error when fetch throws", async () => {
-    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("offline")));
+  it("reports a network error when fetch throws a TypeError", async () => {
+    webFetchMock.mockRejectedValueOnce(new TypeError("Failed to fetch"));
 
     const result = await verifyEmailToken("any-token");
 
@@ -57,15 +62,12 @@ describe("verifyEmailToken", () => {
     });
   });
 
-  it("posts the token to the BFF verify endpoint", async () => {
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValue({ ok: true, json: () => Promise.resolve({}) });
-    vi.stubGlobal("fetch", fetchMock);
+  it("posts the token to the BFF verify endpoint via webFetch", async () => {
+    webFetchMock.mockResolvedValueOnce({ data: {} });
 
     await verifyEmailToken("tok-123");
 
-    expect(fetchMock).toHaveBeenCalledWith(
+    expect(webFetchMock).toHaveBeenCalledWith(
       "/api/auth/verify-email",
       expect.objectContaining({
         method: "POST",

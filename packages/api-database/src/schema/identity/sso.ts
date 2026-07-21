@@ -8,6 +8,7 @@ import {
 } from 'drizzle-orm/pg-core';
 
 import { timestamps } from '../shared/timestamps';
+import { authSessions } from './auth';
 import { users } from './users';
 
 export const externalIdentities = pgTable(
@@ -34,6 +35,7 @@ export const externalIdentities = pgTable(
 // Short-lived server-side record for one Authorization Code + PKCE round trip.
 // stateHash lets the callback look this up without trusting the raw state value
 // from the query string as anything more than an opaque lookup key.
+// SECURITY: code_verifier is AES-GCM encrypted at rest (never plaintext).
 export const ssoLoginStates = pgTable(
   'sso_login_states',
   {
@@ -41,7 +43,9 @@ export const ssoLoginStates = pgTable(
     provider: text('provider').notNull(),
     stateHash: text('state_hash').notNull(),
     nonce: text('nonce').notNull(),
-    codeVerifier: text('code_verifier').notNull(),
+    codeVerifierCiphertext: text('code_verifier_ciphertext').notNull(),
+    codeVerifierIv: text('code_verifier_iv').notNull(),
+    codeVerifierAuthTag: text('code_verifier_auth_tag').notNull(),
     redirectUri: text('redirect_uri').notNull(),
     expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
     consumedAt: timestamp('consumed_at', { withTimezone: true }),
@@ -56,13 +60,15 @@ export const ssoLoginStates = pgTable(
 
 // One-time, short-lived code handed to the client after SSO callback so tokens
 // never travel in URL fragments. Consumed by POST /auth/sso/exchange.
+// SECURITY: stores session_id only — tokens are re-issued on exchange.
 export const ssoSessionExchanges = pgTable(
   'sso_session_exchanges',
   {
     id: uuid('id').defaultRandom().primaryKey(),
     codeHash: text('code_hash').notNull(),
-    accessToken: text('access_token').notNull(),
-    refreshToken: text('refresh_token').notNull(),
+    sessionId: uuid('session_id')
+      .notNull()
+      .references(() => authSessions.id, { onDelete: 'cascade' }),
     organizationId: text('organization_id'),
     expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
     consumedAt: timestamp('consumed_at', { withTimezone: true }),
@@ -72,5 +78,6 @@ export const ssoSessionExchanges = pgTable(
   },
   (table) => [
     uniqueIndex('sso_session_exchanges_code_hash_unique').on(table.codeHash),
+    index('sso_session_exchanges_session_id_idx').on(table.sessionId),
   ],
 );

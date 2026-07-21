@@ -1,13 +1,13 @@
 "use client";
 
-import { AUTH_MESSAGES } from "@/features/auth/model/auth.constants";
+interface LoginStatusProps {
+  message: string;
+}
 
-export function LoginStatus() {
+export function LoginStatus({ message }: LoginStatusProps) {
   return (
     <div className="flex min-h-screen items-center justify-center">
-      <p className="text-sm text-muted-foreground">
-        {AUTH_MESSAGES.checkingSession}
-      </p>
+      <p className="text-sm text-muted-foreground">{message}</p>
     </div>
   );
 }

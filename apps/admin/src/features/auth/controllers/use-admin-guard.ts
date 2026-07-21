@@ -1,7 +1,6 @@
 "use client";
 
-import { useRef } from "react";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 import { useSession } from "@/hooks/use-session";
 import { usePathname, useRouter } from "@/i18n/navigation";
@@ -14,6 +13,9 @@ import {
 } from "../model/admin-guard.state";
 import { ADMIN_AUTH_ROUTES } from "../model/auth.constants";
 
+/**
+ * Wire the pure admin-guard state machine to session + navigation side effects.
+ */
 export function useAdminGuard(): AdminGuardDecision {
   const session = useSession();
   const router = useRouter();
@@ -39,7 +41,11 @@ export function useAdminGuard(): AdminGuardDecision {
       case "sign-out":
         if (!isLoggingOut && !triggeredRef.current) {
           triggeredRef.current = true;
-          logout();
+          logout(undefined, {
+            onSettled: () => {
+              router.replace(ADMIN_AUTH_ROUTES.login);
+            },
+          });
         }
         break;
       case "redirect-login":

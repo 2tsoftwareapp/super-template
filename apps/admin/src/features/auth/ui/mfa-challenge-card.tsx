@@ -16,12 +16,18 @@ import { Label } from "@repo/web-ui/label";
 
 import type { MfaChallengeInput } from "@/features/auth/model/auth.schemas";
 
-import {
-  AUTH_FORM_FIELD_NAMES,
-  LOGIN_FORM_COPY,
-} from "@/features/auth/model/auth.constants";
+export interface MfaChallengeCardCopy {
+  verifyIdentityTitle: string;
+  verificationDescription: string;
+  authCodeLabel: string;
+  mfaCodePlaceholder: string;
+  verify: string;
+  verifying: string;
+  backToLogin: string;
+}
 
 interface MfaChallengeCardProps {
+  copy: MfaChallengeCardCopy;
   errorMessage: string | null;
   form: UseFormReturn<MfaChallengeInput>;
   isPending: boolean;
@@ -30,36 +36,31 @@ interface MfaChallengeCardProps {
 }
 
 export function MfaChallengeCard({
+  copy,
   errorMessage,
   form,
   isPending,
   onBack,
   onSubmit,
 }: MfaChallengeCardProps) {
-  const codeError = form.formState.errors[AUTH_FORM_FIELD_NAMES.code]?.message;
+  const codeError = form.formState.errors.code?.message;
 
   return (
     <Card className="border-border">
       <CardHeader>
-        <CardTitle className="text-2xl">
-          {LOGIN_FORM_COPY.verifyIdentityTitle}
-        </CardTitle>
-        <CardDescription>
-          {LOGIN_FORM_COPY.verificationDescription}
-        </CardDescription>
+        <CardTitle className="text-2xl">{copy.verifyIdentityTitle}</CardTitle>
+        <CardDescription>{copy.verificationDescription}</CardDescription>
       </CardHeader>
       <CardContent>
         <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
           <div className="space-y-2">
-            <Label htmlFor={AUTH_FORM_FIELD_NAMES.code}>
-              {LOGIN_FORM_COPY.authCodeLabel}
-            </Label>
+            <Label htmlFor="code">{copy.authCodeLabel}</Label>
             <Input
-              id={AUTH_FORM_FIELD_NAMES.code}
-              placeholder={LOGIN_FORM_COPY.mfaCodePlaceholder}
+              id="code"
+              placeholder={copy.mfaCodePlaceholder}
               maxLength={6}
               className="text-center font-mono text-2xl tracking-[0.5em]"
-              {...form.register(AUTH_FORM_FIELD_NAMES.code)}
+              {...form.register("code")}
             />
             {codeError ? (
               <p className="text-xs text-destructive">{codeError}</p>
@@ -67,7 +68,7 @@ export function MfaChallengeCard({
           </div>
           {errorMessage && !codeError ? <Alert>{errorMessage}</Alert> : null}
           <Button className="w-full" type="submit" disabled={isPending}>
-            {isPending ? LOGIN_FORM_COPY.verifying : LOGIN_FORM_COPY.verify}
+            {isPending ? copy.verifying : copy.verify}
           </Button>
           <Button
             variant="ghost"
@@ -75,7 +76,7 @@ export function MfaChallengeCard({
             type="button"
             onClick={onBack}
           >
-            {LOGIN_FORM_COPY.backToLogin}
+            {copy.backToLogin}
           </Button>
         </form>
       </CardContent>

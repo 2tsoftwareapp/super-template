@@ -6,23 +6,23 @@ import { AuthModule } from '../auth/auth.module';
 import { OrganizationsModule } from '../organizations/organizations.module';
 import { UsersModule } from '../users/users.module';
 import { SSO_REPOSITORY } from './application/ports/sso.repository.port';
+import {
+  SSO_PROVIDER_REGISTRY,
+  type SsoProviderAdapter,
+} from './application/ports/sso-provider.port';
 import { HandleSsoCallbackUseCase } from './application/use-cases/handle-sso-callback.use-case';
 import {
   CreateSsoSessionExchangeUseCase,
   ExchangeSsoSessionUseCase,
 } from './application/use-cases/sso-session-exchange.use-case';
 import { StartSsoLoginUseCase } from './application/use-cases/start-sso-login.use-case';
+import { AppleSsoAdapter } from './infrastructure/apple-sso.adapter';
+import { FakeSsoAdapter } from './infrastructure/fake-sso.adapter';
+import { GithubSsoAdapter } from './infrastructure/github-sso.adapter';
+import { GoogleSsoAdapter } from './infrastructure/google-sso.adapter';
 import { JwksCacheService } from './infrastructure/jwks-cache.service';
 import { SsoRepository } from './infrastructure/sso.repository';
-import {
-  SSO_PROVIDER_REGISTRY,
-  type SsoProviderAdapter,
-} from './ports/sso-provider.port';
 import { SsoController } from './presentation/sso.controller';
-import { AppleSsoProvider } from './providers/apple-sso.provider';
-import { FakeSsoProvider } from './providers/fake-sso.provider';
-import { GithubSsoProvider } from './providers/github-sso.provider';
-import { GoogleSsoProvider } from './providers/google-sso.provider';
 
 @Module({
   imports: [AccessControlModule, AuthModule, OrganizationsModule, UsersModule],
@@ -34,10 +34,10 @@ import { GoogleSsoProvider } from './providers/google-sso.provider';
       useExisting: SsoRepository,
     },
     JwksCacheService,
-    GoogleSsoProvider,
-    AppleSsoProvider,
-    GithubSsoProvider,
-    FakeSsoProvider,
+    GoogleSsoAdapter,
+    AppleSsoAdapter,
+    GithubSsoAdapter,
+    FakeSsoAdapter,
     StartSsoLoginUseCase,
     HandleSsoCallbackUseCase,
     CreateSsoSessionExchangeUseCase,
@@ -46,17 +46,17 @@ import { GoogleSsoProvider } from './providers/google-sso.provider';
       provide: SSO_PROVIDER_REGISTRY,
       inject: [
         EnvironmentService,
-        GoogleSsoProvider,
-        AppleSsoProvider,
-        GithubSsoProvider,
-        FakeSsoProvider,
+        GoogleSsoAdapter,
+        AppleSsoAdapter,
+        GithubSsoAdapter,
+        FakeSsoAdapter,
       ],
       useFactory: (
         environmentService: EnvironmentService,
-        googleSsoProvider: GoogleSsoProvider,
-        appleSsoProvider: AppleSsoProvider,
-        githubSsoProvider: GithubSsoProvider,
-        fakeSsoProvider: FakeSsoProvider,
+        googleSsoAdapter: GoogleSsoAdapter,
+        appleSsoAdapter: AppleSsoAdapter,
+        githubSsoAdapter: GithubSsoAdapter,
+        fakeSsoAdapter: FakeSsoAdapter,
       ) => {
         const registry = new Map<string, SsoProviderAdapter>();
         const {
@@ -67,19 +67,19 @@ import { GoogleSsoProvider } from './providers/google-sso.provider';
         } = environmentService.values;
 
         if (GOOGLE_CLIENT_ID) {
-          registry.set(googleSsoProvider.provider, googleSsoProvider);
+          registry.set(googleSsoAdapter.provider, googleSsoAdapter);
         }
 
         if (APPLE_CLIENT_ID) {
-          registry.set(appleSsoProvider.provider, appleSsoProvider);
+          registry.set(appleSsoAdapter.provider, appleSsoAdapter);
         }
 
         if (GITHUB_CLIENT_ID) {
-          registry.set(githubSsoProvider.provider, githubSsoProvider);
+          registry.set(githubSsoAdapter.provider, githubSsoAdapter);
         }
 
         if (SSO_FAKE_PROVIDER_ENABLED && !environmentService.isProduction) {
-          registry.set(fakeSsoProvider.provider, fakeSsoProvider);
+          registry.set(fakeSsoAdapter.provider, fakeSsoAdapter);
         }
 
         return registry;

@@ -9,25 +9,30 @@ import { LoginHero } from "../ui/login-hero";
 import { LoginStatus } from "../ui/login-status";
 import { MfaChallengeCard } from "../ui/mfa-challenge-card";
 
+/**
+ * Admin login screen: wires the login handler to presentational cards.
+ */
 export function LoginView() {
   const login = useAdminLoginFlow();
 
   if (login.isCheckingExistingSession) {
-    return <LoginStatus />;
+    return <LoginStatus message={login.checkingSessionMessage} />;
   }
 
   if (login.isMfaChallenge) {
     return (
       <LoginScreen>
         <LoginHero
+          badgeLabel={login.formCopy.adminWorkspace}
           eyebrow={login.mfaContent.eyebrow}
           title={login.mfaContent.title}
           description={login.mfaContent.description}
         />
         <MfaChallengeCard
+          copy={login.formCopy}
           errorMessage={login.mfaErrorMessage}
           form={login.mfaForm}
-          isPending={login.mfaMutation.isPending}
+          isPending={login.isMfaPending}
           onBack={login.resetMfaChallenge}
           onSubmit={login.handleMfaSubmit}
         />
@@ -38,17 +43,21 @@ export function LoginView() {
   return (
     <LoginScreen>
       <LoginHero
+        badgeLabel={login.formCopy.adminWorkspace}
         eyebrow={login.loginContent.eyebrow}
         title={login.loginContent.title}
         description={login.loginContent.description}
       />
       <LoginCard
+        copy={login.formCopy}
         errorMessage={login.loginErrorMessage}
         form={login.loginForm}
-        isPending={login.loginMutation.isPending}
+        isPending={login.isLoginPending}
         onSsoStart={login.handleSsoStart}
         onSubmit={login.handleLoginSubmit}
         ssoError={login.ssoError}
+        ssoFailedMessage={login.ssoFailedMessage}
+        ssoProviders={login.ssoProviders}
       />
     </LoginScreen>
   );

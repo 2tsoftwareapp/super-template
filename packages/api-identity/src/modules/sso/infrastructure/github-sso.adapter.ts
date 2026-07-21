@@ -5,7 +5,7 @@ import type {
   SsoIdentity,
   SsoProviderAdapter,
   SsoTokenSet,
-} from '../ports/sso-provider.port';
+} from '../application/ports/sso-provider.port';
 
 const AUTHORIZATION_ENDPOINT = 'https://github.com/login/oauth/authorize';
 const TOKEN_ENDPOINT = 'https://github.com/login/oauth/access_token';
@@ -36,7 +36,7 @@ interface StoredIdentity {
 // and /user/emails APIs after the code exchange, then stored in process memory
 // for the duration of the callback round-trip (seconds).
 @Injectable()
-export class GithubSsoProvider implements SsoProviderAdapter {
+export class GithubSsoAdapter implements SsoProviderAdapter {
   readonly provider = 'github';
 
   private readonly pendingIdentities = new Map<string, StoredIdentity>();

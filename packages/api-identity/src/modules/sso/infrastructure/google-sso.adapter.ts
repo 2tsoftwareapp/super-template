@@ -5,10 +5,10 @@ import type {
   SsoIdentity,
   SsoProviderAdapter,
   SsoTokenSet,
-} from '../ports/sso-provider.port';
+} from '../application/ports/sso-provider.port';
 
 import { verifyOidcIdToken } from '../domain/oidc-verify';
-import { JwksCacheService } from '../infrastructure/jwks-cache.service';
+import { JwksCacheService } from './jwks-cache.service';
 
 const AUTHORIZATION_ENDPOINT = 'https://accounts.google.com/o/oauth2/v2/auth';
 const TOKEN_ENDPOINT = 'https://oauth2.googleapis.com/token';
@@ -17,7 +17,7 @@ const JWKS_URI = 'https://www.googleapis.com/oauth2/v3/certs';
 const ISSUERS = ['https://accounts.google.com', 'accounts.google.com'];
 
 @Injectable()
-export class GoogleSsoProvider implements SsoProviderAdapter {
+export class GoogleSsoAdapter implements SsoProviderAdapter {
   readonly provider = 'google';
 
   constructor(

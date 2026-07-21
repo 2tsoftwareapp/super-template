@@ -25,7 +25,7 @@ import { decideAccountLinking } from '../../domain/account-linking.policy';
 import {
   SSO_PROVIDER_REGISTRY,
   type SsoProviderRegistry,
-} from '../../ports/sso-provider.port';
+} from '../ports/sso-provider.port';
 import { SSO_REPOSITORY, type SsoRepositoryPort } from '../ports/sso.repository.port';
 
 @Injectable()

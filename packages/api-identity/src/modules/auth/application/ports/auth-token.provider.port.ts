@@ -45,6 +45,17 @@ export interface AuthTokenProviderPort {
     metadata: { ipAddress: string | null; userAgent: string | null },
     options?: { startGraceWindow?: boolean },
   ): Promise<RotateTokensResult | null>;
+
+  /**
+   * Unconditional token re-issue for an existing session (SSO exchange).
+   * Replaces the refresh hash so any tokens minted before the exchange are dead.
+   */
+  reissueSessionTokens(
+    sessionId: string,
+    userId: string,
+    organizationId: string,
+    metadata: { ipAddress: string | null; userAgent: string | null },
+  ): Promise<RotateTokensResult>;
 }
 
 export const AUTH_TOKEN_PROVIDER = Symbol('AUTH_TOKEN_PROVIDER');
