@@ -35,11 +35,14 @@ class ExportsRepository {
     required String idempotencyKey,
   }) async {
     try {
-      final response = await _client.dio.post<Map<String, dynamic>>(
-        '/api/v1/exports',
-        data: {'type': type, 'idempotencyKey': idempotencyKey},
+      final response = await _api.exportsControllerCreate(
+        createExportDto: CreateExportDto(
+          (builder) => builder
+            ..type = type
+            ..idempotencyKey = idempotencyKey,
+        ),
       );
-      return _parseJob(response.data!);
+      return _fromDto(response.data!.data);
     } on DioException catch (error) {
       throw AppException.fromDio(error);
     }
@@ -61,16 +64,6 @@ class ExportsRepository {
     } on DioException catch (error) {
       throw AppException.fromDio(error);
     }
-  }
-
-  ExportJobSummary _parseJob(Map<String, dynamic> body) {
-    final data = body['data'] as Map<String, dynamic>;
-    return ExportJobSummary(
-      id: data['id'] as String,
-      type: data['type'] as String,
-      status: data['status'] as String,
-      fileId: data['fileId'] as String?,
-    );
   }
 
   ExportJobSummary _fromDto(ExportJobDto job) {

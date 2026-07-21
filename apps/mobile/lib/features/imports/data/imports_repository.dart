@@ -54,16 +54,15 @@ class ImportsRepository {
     required String idempotencyKey,
   }) async {
     try {
-      final response = await _client.dio.post<Map<String, dynamic>>(
-        '/api/v1/imports',
-        data: {
-          'type': type,
-          'fileId': fileId,
-          'idempotencyKey': idempotencyKey,
-        },
+      final response = await _api.importsControllerCreate(
+        createImportDto: CreateImportDto(
+          (builder) => builder
+            ..type = type
+            ..fileId = fileId
+            ..idempotencyKey = idempotencyKey,
+        ),
       );
-      final job = _parseJob(response.data!);
-      return job;
+      return _fromDto(response.data!.data);
     } on DioException catch (error) {
       throw AppException.fromDio(error);
     }
@@ -85,19 +84,6 @@ class ImportsRepository {
     } on DioException catch (error) {
       throw AppException.fromDio(error);
     }
-  }
-
-  ImportJobSummary _parseJob(Map<String, dynamic> body) {
-    final data = body['data'] as Map<String, dynamic>;
-    return ImportJobSummary(
-      id: data['id'] as String,
-      type: data['type'] as String,
-      fileId: data['fileId'] as String,
-      status: data['status'] as String,
-      rowCount: data['rowCount'] as int?,
-      successCount: data['successCount'] as int?,
-      errorCount: data['errorCount'] as int?,
-    );
   }
 
   ImportJobSummary _fromDto(ImportJobDto job) {

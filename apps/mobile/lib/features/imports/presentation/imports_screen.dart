@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_app/features/auth/presentation/auth_controller.dart';
 import 'package:mobile_app/features/imports/data/imports_repository.dart';
+import 'package:mobile_app/features/imports/domain/import_permissions.dart';
 import 'package:uuid/uuid.dart';
 
 class ImportsScreen extends ConsumerStatefulWidget {
@@ -27,22 +28,11 @@ class _ImportsScreenState extends ConsumerState<ImportsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final canRead =
-        ref
-            .watch(authControllerProvider)
-            .valueOrNull
-            ?.permissions
-            .contains('imports.read') ??
-        false;
-    final canCreate =
-        ref
-            .watch(authControllerProvider)
-            .valueOrNull
-            ?.permissions
-            .contains('imports.create') ??
-        false;
+    final permissions = selectImportPermissions(
+      ref.watch(authControllerProvider).valueOrNull?.permissions ?? const [],
+    );
 
-    if (!canRead) {
+    if (!permissions.canRead) {
       return Scaffold(
         appBar: AppBar(title: const Text('Imports')),
         body: const Center(child: Text('Missing imports.read permission')),
@@ -57,7 +47,7 @@ class _ImportsScreenState extends ConsumerState<ImportsScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             FilledButton.icon(
-              onPressed: _working || !canCreate ? null : _startImport,
+              onPressed: _working || !permissions.canCreate ? null : _startImport,
               icon: const Icon(Icons.upload_file),
               label: const Text('Pick CSV and import projects'),
             ),

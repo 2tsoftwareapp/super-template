@@ -40,6 +40,11 @@ export default defineConfig([
               message:
                 "Route files must not import from features sub-layers directly. Import a Screen component only (see CODING_RULES.md §3).",
             },
+            {
+              group: ["@/features/*/components/*"],
+              message:
+                "Route files should import Screen components from features/<resource>/screens/ (see CODING_RULES.md §4).",
+            },
           ],
         },
       ],

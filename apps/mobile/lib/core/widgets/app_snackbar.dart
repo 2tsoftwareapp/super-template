@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_app/core/design/app_colors.dart';
 import 'package:mobile_app/core/design/app_radius.dart';
+import 'package:mobile_app/core/errors/user_facing_error.dart';
 
 enum _SnackTone { success, error, info }
 
@@ -9,7 +10,7 @@ void showSuccessSnackBar(BuildContext context, String message) =>
     _show(context, message, _SnackTone.success);
 
 void showErrorSnackBar(BuildContext context, Object error) =>
-    _show(context, error.toString(), _SnackTone.error);
+    _show(context, userFacingErrorMessage(error), _SnackTone.error);
 
 void showInfoSnackBar(BuildContext context, String message) =>
     _show(context, message, _SnackTone.info);

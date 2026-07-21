@@ -65,6 +65,8 @@ class FilesRepository {
 
   Future<List<int>> download(String id) async {
     try {
+      // NOTE(Trace: OpenAPI gap): filesControllerDownload is Response<void>;
+      // keep Dio byte handling until the contract exposes binary response typing.
       final response = await _dio.get<List<int>>(
         '/api/v1/files/$id/download',
         options: Options(responseType: ResponseType.bytes),

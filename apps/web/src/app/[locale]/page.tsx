@@ -1,4 +1,4 @@
-import { LandingView } from "@/features/landing/components/landing-view";
+import { LandingView } from "@/features/landing/screens/landing-view";
 
 export default function Home() {
   return <LandingView />;

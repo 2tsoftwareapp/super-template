@@ -22,7 +22,6 @@ class AuthRepository {
     this._authApi,
     this._ssoApi,
     this._publicDio,
-    this._authenticatedDio,
     this._storage,
   );
 
@@ -35,7 +34,6 @@ class AuthRepository {
     authenticatedClient.getAuthApi(),
     publicClient.getSsoApi(),
     publicClient.dio,
-    authenticatedClient.dio,
     storage,
   );
 
@@ -43,7 +41,6 @@ class AuthRepository {
   final AuthApi _authApi;
   final SsoApi _ssoApi;
   final Dio _publicDio;
-  final Dio _authenticatedDio;
   final TokenStorage _storage;
 
   Future<AuthSession?> restoreSession() async {
@@ -100,13 +97,14 @@ class AuthRepository {
     required String code,
   }) async {
     try {
-      final response = await _publicAuthApi.authLoginControllerVerifyMfaChallenge(
-        verifyMfaChallengeDto: VerifyMfaChallengeDto(
-          (b) => b
-            ..mfaToken = mfaToken
-            ..code = code,
-        ),
-      );
+      final response = await _publicAuthApi
+          .authLoginControllerVerifyMfaChallenge(
+            verifyMfaChallengeDto: VerifyMfaChallengeDto(
+              (b) => b
+                ..mfaToken = mfaToken
+                ..code = code,
+            ),
+          );
       final data = response.data!.data;
       await _storage.write(
         TokenBundle(
@@ -267,6 +265,8 @@ class AuthRepository {
 
   Future<void> completeSsoExchange(String exchangeCode) async {
     try {
+      // NOTE(Trace: OpenAPI gap): The generated SSO exchange method returns
+      // Response<void>, so the raw response is required until token typing is fixed.
       final response = await _publicDio.post<Map<String, dynamic>>(
         '/api/v1/auth/sso/exchange',
         data: {'code': exchangeCode},
@@ -286,22 +286,18 @@ class AuthRepository {
 
   Future<void> switchOrganization(String organizationId) async {
     try {
-      final response = await _authenticatedDio.post<Map<String, dynamic>>(
-        '/api/v1/auth/switch-organization',
-        data: {'organizationId': organizationId},
+      final response = await _authApi.authSessionControllerSwitchOrganization(
+        switchOrganizationDto: SwitchOrganizationDto(
+          (builder) => builder..organizationId = organizationId,
+        ),
       );
-      final accessToken = response.data?['data']?['accessToken'] as String?;
-      if (accessToken != null) {
-        final current = await _storage.read();
-        if (current != null) {
-          await _storage.write(
-            TokenBundle(
-              accessToken: accessToken,
-              refreshToken: current.refreshToken,
-            ),
-          );
-        }
-      }
+      final tokens = response.data!.data;
+      await _storage.write(
+        TokenBundle(
+          accessToken: tokens.accessToken,
+          refreshToken: tokens.refreshToken,
+        ),
+      );
     } on DioException catch (error) {
       throw AppException.fromDio(error);
     }

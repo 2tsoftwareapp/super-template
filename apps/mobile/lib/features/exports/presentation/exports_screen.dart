@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_app/features/auth/presentation/auth_controller.dart';
 import 'package:mobile_app/features/exports/data/exports_repository.dart';
+import 'package:mobile_app/features/exports/domain/export_permissions.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 
@@ -27,22 +28,11 @@ class _ExportsScreenState extends ConsumerState<ExportsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final canRead =
-        ref
-            .watch(authControllerProvider)
-            .valueOrNull
-            ?.permissions
-            .contains('exports.read') ??
-        false;
-    final canCreate =
-        ref
-            .watch(authControllerProvider)
-            .valueOrNull
-            ?.permissions
-            .contains('exports.create') ??
-        false;
+    final permissions = selectExportPermissions(
+      ref.watch(authControllerProvider).valueOrNull?.permissions ?? const [],
+    );
 
-    if (!canRead) {
+    if (!permissions.canRead) {
       return Scaffold(
         appBar: AppBar(title: const Text('Exports')),
         body: const Center(child: Text('Missing exports.read permission')),
@@ -57,7 +47,7 @@ class _ExportsScreenState extends ConsumerState<ExportsScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             FilledButton.icon(
-              onPressed: _working || !canCreate ? null : _startExport,
+              onPressed: _working || !permissions.canCreate ? null : _startExport,
               icon: const Icon(Icons.download),
               label: const Text('Export projects CSV'),
             ),

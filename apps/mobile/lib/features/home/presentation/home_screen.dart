@@ -7,6 +7,8 @@ import 'package:mobile_app/core/design/app_radius.dart';
 import 'package:mobile_app/core/design/app_spacing.dart';
 import 'package:mobile_app/core/widgets/widgets.dart';
 import 'package:mobile_app/features/auth/presentation/auth_controller.dart';
+import 'package:mobile_app/features/exports/domain/export_permissions.dart';
+import 'package:mobile_app/features/imports/domain/import_permissions.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -18,7 +20,12 @@ class HomeScreen extends ConsumerWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final name = auth?.displayName ?? 'User';
     final email = auth?.email ?? '';
-    final perms = auth?.permissions ?? const [];
+    final importPermissions = selectImportPermissions(
+      auth?.permissions ?? const [],
+    );
+    final exportPermissions = selectExportPermissions(
+      auth?.permissions ?? const [],
+    );
 
     return Scaffold(
       backgroundColor: isDark
@@ -93,11 +100,10 @@ class HomeScreen extends ConsumerWidget {
           ),
 
           // ── Tools (permission-gated) ─────────────────────────────────────
-          if (perms.contains('imports.read') ||
-              perms.contains('exports.read')) ...[
+          if (importPermissions.canRead || exportPermissions.canRead) ...[
             const SizedBox(height: AppSpacing.xl),
             _GroupLabel('TOOLS'),
-            if (perms.contains('imports.read')) ...[
+            if (importPermissions.canRead) ...[
               AppListTile(
                 icon: Icons.upload_rounded,
                 iconColor: AppColors.cardImports,
@@ -107,7 +113,7 @@ class HomeScreen extends ConsumerWidget {
               ),
               const SizedBox(height: AppSpacing.sm),
             ],
-            if (perms.contains('exports.read'))
+            if (exportPermissions.canRead)
               AppListTile(
                 icon: Icons.download_rounded,
                 iconColor: AppColors.cardExports,

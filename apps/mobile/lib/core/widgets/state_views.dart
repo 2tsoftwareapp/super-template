@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_app/core/design/app_radius.dart';
 import 'package:mobile_app/core/design/app_spacing.dart';
+import 'package:mobile_app/core/errors/user_facing_error.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // CenterMessage — empty / error / info states
@@ -81,13 +82,12 @@ class AppErrorView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final message = userFacingErrorMessage(error);
     return CenterMessage(
       icon: Icons.error_outline_rounded,
       iconColor: cs.error,
       title: 'Something went wrong',
-      body: error.toString().length > 120
-          ? '${error.toString().substring(0, 120)}…'
-          : error.toString(),
+      body: message.length > 120 ? '${message.substring(0, 120)}…' : message,
       action: onRetry != null
           ? OutlinedButton.icon(
               onPressed: onRetry,

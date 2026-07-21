@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -19,9 +20,12 @@ class LoginScreen extends ConsumerStatefulWidget {
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  // Pre-filled with seed credentials for local development convenience.
-  final _emailController = TextEditingController(text: 'user@example.local');
-  final _passwordController = TextEditingController(text: 'ChangeMe123!');
+  final _emailController = TextEditingController(
+    text: kDebugMode ? 'user@example.local' : '',
+  );
+  final _passwordController = TextEditingController(
+    text: kDebugMode ? 'ChangeMe123!' : '',
+  );
   final _mfaCodeController = TextEditingController();
 
   bool _obscurePassword = true;
