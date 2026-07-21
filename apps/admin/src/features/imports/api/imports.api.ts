@@ -1,3 +1,5 @@
+import { bffPath } from "@repo/api-contract";
+
 import type { ImportJobDto } from "@/lib/api-types";
 
 import { webFetch } from "@/lib/http";
@@ -8,23 +10,25 @@ export interface CreateImportInput {
 }
 
 /**
- * Imports transport layer. Paths match OpenAPI `/api/v1/imports` via BFF.
+ * Imports transport layer. Paths from OpenAPI via `bffPath` (§22).
  */
 export const importsApi = {
   create(input: CreateImportInput) {
-    return webFetch<{ data: ImportJobDto }>("/api/bff/imports", {
+    return webFetch<{ data: ImportJobDto }>(bffPath("/api/v1/imports"), {
       method: "POST",
       body: JSON.stringify(input),
     });
   },
 
   get(jobId: string) {
-    return webFetch<{ data: ImportJobDto }>(`/api/bff/imports/${jobId}`);
+    return webFetch<{ data: ImportJobDto }>(
+      bffPath("/api/v1/imports/{id}", { id: jobId }),
+    );
   },
 
   confirm(jobId: string) {
     return webFetch<{ data: ImportJobDto }>(
-      `/api/bff/imports/${jobId}/confirm`,
+      bffPath("/api/v1/imports/{id}/confirm", { id: jobId }),
       { method: "POST" },
     );
   },

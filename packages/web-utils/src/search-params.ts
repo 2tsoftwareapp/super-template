@@ -1,3 +1,4 @@
+import { bffPath } from "@repo/api-contract";
 import type {
   inferParserType
 } from "nuqs/server";
@@ -270,6 +271,7 @@ export const buildProjectsListPath = (
   overrides: Partial<ProjectsSearchState> = {},
 ) =>
   withQuery(
+    // Legacy helper — no `/projects` resource in current OpenAPI.
     "/api/bff/projects",
     serializeProjectsSearch(mergeProjectsSearch(overrides)),
   );
@@ -278,7 +280,7 @@ export const buildAdminUsersListPath = (
   overrides: Partial<UsersSearchState> = {},
 ) =>
   withQuery(
-    "/api/bff/admin/users",
+    bffPath("/api/v1/admin/users"),
     serializeUsersSearch(mergeUsersSearch(overrides)),
   );
 
@@ -286,7 +288,7 @@ export const buildNotificationsListPath = (
   overrides: Partial<NotificationsSearchState> = {},
 ) =>
   withQuery(
-    "/api/bff/notifications",
+    bffPath("/api/v1/notifications"),
     serializeNotificationsSearch(mergeNotificationsSearch(overrides)),
   );
 
@@ -294,7 +296,7 @@ export const buildAuditLogsListPath = (
   overrides: Partial<AuditLogsSearchState> = {},
 ) =>
   withQuery(
-    "/api/bff/admin/audit-logs",
+    bffPath("/api/v1/admin/audit-logs"),
     serializeAuditLogsSearch(mergeAuditLogsSearch(overrides)),
   );
 
@@ -302,7 +304,7 @@ export const buildSessionsListPath = (
   overrides: Partial<SessionsSearchState> = {},
 ) =>
   withQuery(
-    "/api/bff/auth/sessions",
+    bffPath("/api/v1/auth/sessions"),
     serializeSessionsSearch(mergeSessionsSearch(overrides)),
   );
 

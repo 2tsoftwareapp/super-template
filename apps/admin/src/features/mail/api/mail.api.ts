@@ -1,3 +1,5 @@
+import { bffPath } from "@repo/api-contract";
+
 import type {
   ListResponse,
   MailDeliveryDto,
@@ -15,28 +17,6 @@ export interface MailDeliveriesParams {
   limit: number;
 }
 
-export async function fetchMailTemplates() {
-  return webFetch<{ data: MailTemplateDto[] }>(
-    "/api/bff/admin/mail/templates",
-  );
-}
-
-export async function fetchMailDeliveries(params: MailDeliveriesParams) {
-  const path = buildPath("/api/bff/admin/mail/deliveries", {
-    limit: params.limit,
-    page: params.page,
-    templateKey: params.templateKey,
-    status: params.status,
-  });
-  return webFetch<ListResponse<MailDeliveryDto>>(path);
-}
-
-export async function fetchMailPreview(templateKey: string) {
-  return webFetch<{ data: MailPreviewDto }>(
-    `/api/bff/admin/mail/preview/${encodeURIComponent(templateKey)}`,
-  );
-}
-
 export interface SendMailInput {
   templateKey: string;
   to: string;
@@ -44,12 +24,44 @@ export interface SendMailInput {
   idempotencyKey?: string;
 }
 
-export async function sendMail(input: SendMailInput) {
-  return webFetch<{ data: SendAdminMailResultDto }>(
-    "/api/bff/admin/mail/send",
-    {
-      method: "POST",
-      body: JSON.stringify(input),
-    },
-  );
-}
+export const mailApi = {
+  templates() {
+    return webFetch<{ data: MailTemplateDto[] }>(
+      bffPath("/api/v1/admin/mail/templates"),
+    );
+  },
+
+  deliveries(params: MailDeliveriesParams) {
+    const path = buildPath(bffPath("/api/v1/admin/mail/deliveries"), {
+      limit: params.limit,
+      page: params.page,
+      templateKey: params.templateKey,
+      status: params.status,
+    });
+    return webFetch<ListResponse<MailDeliveryDto>>(path);
+  },
+
+  preview(templateKey: string) {
+    return webFetch<{ data: MailPreviewDto }>(
+      bffPath("/api/v1/admin/mail/preview/{templateKey}", { templateKey }),
+    );
+  },
+
+  send(input: SendMailInput) {
+    return webFetch<{ data: SendAdminMailResultDto }>(
+      bffPath("/api/v1/admin/mail/send"),
+      {
+        method: "POST",
+        body: JSON.stringify(input),
+      },
+    );
+  },
+};
+
+/** @deprecated Prefer `mailApi` */
+export const fetchMailTemplates = () => mailApi.templates();
+export const fetchMailDeliveries = (params: MailDeliveriesParams) =>
+  mailApi.deliveries(params);
+export const fetchMailPreview = (templateKey: string) =>
+  mailApi.preview(templateKey);
+export const sendMail = (input: SendMailInput) => mailApi.send(input);

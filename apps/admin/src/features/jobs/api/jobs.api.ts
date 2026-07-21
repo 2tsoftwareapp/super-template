@@ -1,3 +1,5 @@
+import { bffPath } from "@repo/api-contract";
+
 import type {
   JobDto,
   JobEventDto,
@@ -13,32 +15,49 @@ export interface JobsParams {
   page: number;
 }
 
-export async function fetchJobs(params: JobsParams) {
-  const path = buildPath("/api/bff/admin/jobs", {
-    limit: 50,
-    page: params.page,
-    status: params.status,
-    type: params.type,
-  });
-  return webFetch<ListResponse<JobDto>>(path);
-}
+/**
+ * Jobs transport layer. Paths from OpenAPI via `bffPath` (§22).
+ */
+export const jobsApi = {
+  list(params: JobsParams) {
+    const path = buildPath(bffPath("/api/v1/admin/jobs"), {
+      limit: 50,
+      page: params.page,
+      status: params.status,
+      type: params.type,
+    });
+    return webFetch<ListResponse<JobDto>>(path);
+  },
 
-export async function fetchJobMetrics() {
-  return webFetch<{ data: JobMetricsDto }>("/api/bff/admin/jobs/metrics");
-}
+  metrics() {
+    return webFetch<{ data: JobMetricsDto }>(
+      bffPath("/api/v1/admin/jobs/metrics"),
+    );
+  },
 
-export async function fetchJobDetail(jobId: string) {
-  return webFetch<{ data: JobDto }>(`/api/bff/admin/jobs/${jobId}`);
-}
+  get(jobId: string) {
+    return webFetch<{ data: JobDto }>(
+      bffPath("/api/v1/admin/jobs/{id}", { id: jobId }),
+    );
+  },
 
-export async function fetchJobLogs(jobId: string) {
-  return webFetch<{ data: JobEventDto[] }>(
-    `/api/bff/admin/jobs/${jobId}/logs`,
-  );
-}
+  logs(jobId: string) {
+    return webFetch<{ data: JobEventDto[] }>(
+      bffPath("/api/v1/admin/jobs/{id}/logs", { id: jobId }),
+    );
+  },
 
-export async function cancelJob(jobId: string) {
-  return webFetch<JobDto>(`/api/bff/admin/jobs/${jobId}`, {
-    method: "DELETE",
-  });
-}
+  cancel(jobId: string) {
+    return webFetch<{ data: JobDto }>(
+      bffPath("/api/v1/admin/jobs/{id}", { id: jobId }),
+      { method: "DELETE" },
+    );
+  },
+};
+
+/** @deprecated Prefer `jobsApi` */
+export const fetchJobs = (params: JobsParams) => jobsApi.list(params);
+export const fetchJobMetrics = () => jobsApi.metrics();
+export const fetchJobDetail = (jobId: string) => jobsApi.get(jobId);
+export const fetchJobLogs = (jobId: string) => jobsApi.logs(jobId);
+export const cancelJob = (jobId: string) => jobsApi.cancel(jobId);

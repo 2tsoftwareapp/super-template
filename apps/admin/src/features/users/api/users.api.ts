@@ -1,3 +1,4 @@
+import { bffPath } from "@repo/api-contract";
 import { formatSortParam } from "@repo/api-sort";
 
 import type {
@@ -36,8 +37,7 @@ export function buildUsersListPath(params: UsersListParams) {
 }
 
 /**
- * Users transport layer. The only place in the feature that talks HTTP; query
- * and mutation hooks call these functions instead of webFetch directly.
+ * Users transport layer. Paths from OpenAPI via `bffPath` (§22).
  */
 export const usersApi = {
   list(params: UsersListParams) {
@@ -45,47 +45,54 @@ export const usersApi = {
   },
 
   get(userId: string) {
-    return webFetch<{ data: AdminUserDto }>(`/api/bff/admin/users/${userId}`);
+    return webFetch<{ data: AdminUserDto }>(
+      bffPath("/api/v1/admin/users/{id}", { id: userId }),
+    );
   },
 
   listRoles() {
-    return webFetch<ListResponse<RoleDto>>("/api/bff/admin/roles");
+    return webFetch<ListResponse<RoleDto>>(bffPath("/api/v1/admin/roles"));
   },
 
   create(input: CreateAdminUserInput) {
-    return webFetch<{ data: AdminUserDto }>("/api/bff/admin/users", {
+    return webFetch<{ data: AdminUserDto }>(bffPath("/api/v1/admin/users"), {
       method: "POST",
       body: JSON.stringify(input),
     });
   },
 
   updateProfile(userId: string, input: UpdateAdminUserInput) {
-    return webFetch<{ data: AdminUserDto }>(`/api/bff/admin/users/${userId}`, {
-      method: "PATCH",
-      body: JSON.stringify(input),
-    });
+    return webFetch<{ data: AdminUserDto }>(
+      bffPath("/api/v1/admin/users/{id}", { id: userId }),
+      {
+        method: "PATCH",
+        body: JSON.stringify(input),
+      },
+    );
   },
 
   updateStatus(userId: string, status: string) {
     return webFetch<{ data: AdminUserDto }>(
-      `/api/bff/admin/users/${userId}/status`,
+      bffPath("/api/v1/admin/users/{id}/status", { id: userId }),
       { method: "PATCH", body: JSON.stringify({ status }) },
     );
   },
 
   replaceRoles(userId: string, roleId: string, organizationId?: string) {
     return webFetch<{ data: AdminUserDto }>(
-      `/api/bff/admin/users/${userId}/roles`,
+      bffPath("/api/v1/admin/users/{id}/roles", { id: userId }),
       { method: "PUT", body: JSON.stringify({ roleId, organizationId }) },
     );
   },
 
   delete(userId: string) {
-    return webFetch(`/api/bff/admin/users/${userId}`, { method: "DELETE" });
+    return webFetch(bffPath("/api/v1/admin/users/{id}", { id: userId }), {
+      method: "DELETE",
+    });
   },
 
   resendVerification(email: string) {
-    return webFetch("/api/bff/auth/resend-verification", {
+    return webFetch(bffPath("/api/v1/auth/resend-verification"), {
       method: "POST",
       body: JSON.stringify({ email }),
     });

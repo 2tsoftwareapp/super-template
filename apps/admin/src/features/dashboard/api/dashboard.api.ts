@@ -1,3 +1,5 @@
+import { bffPath } from "@repo/api-contract";
+
 import type {
   AuditLogDto,
   JobMetricsDto,
@@ -5,34 +7,39 @@ import type {
   UserRow,
 } from "@/lib/api-types";
 
-import { webFetch } from "@/lib/http";
+import { buildPath, webFetch } from "@/lib/http";
 
 /**
- * Dashboard transport layer. The only place in the feature that talks HTTP;
- * query hooks call these functions instead of webFetch directly.
+ * Dashboard transport layer. Paths from OpenAPI via `bffPath` (§22).
  */
 export const dashboardApi = {
   overviewUsers() {
-    return webFetch<ListResponse<UserRow>>("/api/bff/admin/users?limit=4");
+    return webFetch<ListResponse<UserRow>>(
+      buildPath(bffPath("/api/v1/admin/users"), { limit: 4 }),
+    );
   },
 
   jobMetrics() {
-    return webFetch<{ data: JobMetricsDto }>("/api/bff/admin/jobs/metrics");
+    return webFetch<{ data: JobMetricsDto }>(
+      bffPath("/api/v1/admin/jobs/metrics"),
+    );
   },
 
   auditSummary() {
     return webFetch<ListResponse<AuditLogDto>>(
-      "/api/bff/admin/audit-logs?limit=5",
+      buildPath(bffPath("/api/v1/admin/audit-logs"), { limit: 5 }),
     );
   },
 
   /** App liveness — does not include the database. */
   health() {
-    return webFetch<{ data: { status: string } }>("/api/bff/health");
+    return webFetch<{ data: { status: string } }>(bffPath("/api/v1/health"));
   },
 
   /** Readiness — app + database. */
   healthReady() {
-    return webFetch<{ data: { status: string } }>("/api/bff/health/ready");
+    return webFetch<{ data: { status: string } }>(
+      bffPath("/api/v1/health/ready"),
+    );
   },
 };

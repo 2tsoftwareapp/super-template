@@ -1,24 +1,49 @@
-import type { ListResponse, NotificationDto, NotificationJobDto, SendNotificationInput } from "@/lib/api-types";
+import { bffPath } from "@repo/api-contract";
 
-import { webFetch } from "@/lib/http";
+import type {
+  ListResponse,
+  NotificationDto,
+  NotificationJobDto,
+  SendNotificationInput,
+} from "@/lib/api-types";
 
-export async function fetchNotificationJobs() {
-  return webFetch<ListResponse<NotificationJobDto>>("/api/bff/admin/notifications/jobs?limit=50");
-}
+import { buildPath, webFetch } from "@/lib/http";
 
-export async function fetchRecentNotifications() {
-  return webFetch<ListResponse<NotificationDto>>("/api/bff/notifications?limit=10");
-}
+export const notificationsApi = {
+  jobs() {
+    return webFetch<ListResponse<NotificationJobDto>>(
+      buildPath(bffPath("/api/v1/admin/notifications/jobs"), { limit: 50 }),
+    );
+  },
 
-export async function sendNotification(input: SendNotificationInput) {
-  return webFetch<{ data: NotificationJobDto }>("/api/bff/admin/notifications", {
-    method: "POST",
-    body: JSON.stringify(input),
-  });
-}
+  recent() {
+    return webFetch<ListResponse<NotificationDto>>(
+      buildPath(bffPath("/api/v1/notifications"), { limit: 10 }),
+    );
+  },
 
-export async function cancelNotificationJob(jobId: string) {
-  return webFetch(`/api/bff/admin/notifications/jobs/${jobId}`, {
-    method: "DELETE",
-  });
-}
+  send(input: SendNotificationInput) {
+    return webFetch<{ data: NotificationJobDto }>(
+      bffPath("/api/v1/admin/notifications"),
+      {
+        method: "POST",
+        body: JSON.stringify(input),
+      },
+    );
+  },
+
+  cancelJob(jobId: string) {
+    return webFetch(
+      bffPath("/api/v1/admin/notifications/jobs/{id}", { id: jobId }),
+      { method: "DELETE" },
+    );
+  },
+};
+
+/** @deprecated Prefer `notificationsApi` */
+export const fetchNotificationJobs = () => notificationsApi.jobs();
+export const fetchRecentNotifications = () => notificationsApi.recent();
+export const sendNotification = (input: SendNotificationInput) =>
+  notificationsApi.send(input);
+export const cancelNotificationJob = (jobId: string) =>
+  notificationsApi.cancelJob(jobId);
