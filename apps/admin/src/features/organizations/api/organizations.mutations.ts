@@ -2,30 +2,26 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import {
-  switchOrganization,
-  createOrganizationApi,
-  updateOrganizationApi,
-  deleteOrganizationApi,
-  leaveOrganizationApi,
-  updateMemberRoleApi,
-  removeMemberApi,
-} from "./organizations.api";
+import type {
+  CreateOrganizationInput,
+  UpdateOrganizationInput,
+} from "@/lib/api-types";
+
+import { organizationsApi } from "./organizations.api";
 import { organizationsKeys } from "./organizations.query-keys";
-import type { CreateOrganizationInput, UpdateOrganizationInput } from "@/lib/api-types";
 
 export function useSwitchOrganizationMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (organizationId: string) => switchOrganization(organizationId),
-    onSuccess: async () => {
+    mutationFn: (organizationId: string) =>
+      organizationsApi.switch(organizationId),
+    onSuccess: () => {
       // Every cached resource belongs to the previous tenant — drop it all.
       // queryClient.clear() prevents data from the old org leaking into the
       // new context (§19 R6).
       queryClient.clear();
-          },
-    onError: () => {},
+    },
   });
 }
 
@@ -33,11 +29,11 @@ export function useCreateOrganizationMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (input: CreateOrganizationInput) => createOrganizationApi(input),
+    mutationFn: (input: CreateOrganizationInput) =>
+      organizationsApi.create(input),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: organizationsKeys.all });
-      queryClient.invalidateQueries({ queryKey: organizationsKeys.my });
-          },
+      void queryClient.invalidateQueries({ queryKey: organizationsKeys.all });
+    },
   });
 }
 
@@ -45,12 +41,11 @@ export function useUpdateOrganizationMutation(id: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (input: UpdateOrganizationInput) => updateOrganizationApi(id, input),
+    mutationFn: (input: UpdateOrganizationInput) =>
+      organizationsApi.update(id, input),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: organizationsKeys.all });
-      queryClient.invalidateQueries({ queryKey: organizationsKeys.detail(id) });
-      queryClient.invalidateQueries({ queryKey: organizationsKeys.my });
-          },
+      void queryClient.invalidateQueries({ queryKey: organizationsKeys.all });
+    },
   });
 }
 
@@ -58,11 +53,10 @@ export function useDeleteOrganizationMutation(id: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: () => deleteOrganizationApi(id),
+    mutationFn: () => organizationsApi.delete(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: organizationsKeys.all });
-      queryClient.invalidateQueries({ queryKey: organizationsKeys.my });
-          },
+      void queryClient.invalidateQueries({ queryKey: organizationsKeys.all });
+    },
   });
 }
 
@@ -70,11 +64,10 @@ export function useLeaveOrganizationMutation(id: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: () => leaveOrganizationApi(id),
+    mutationFn: () => organizationsApi.leave(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: organizationsKeys.all });
-      queryClient.invalidateQueries({ queryKey: organizationsKeys.my });
-          },
+      void queryClient.invalidateQueries({ queryKey: organizationsKeys.all });
+    },
   });
 }
 
@@ -82,11 +75,18 @@ export function useUpdateMemberRoleMutation(orgId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ userId, role }: { userId: string; role: string }) =>
-      updateMemberRoleApi(orgId, userId, role),
+    mutationFn: ({
+      userId,
+      role,
+    }: {
+      userId: string;
+      role: string;
+    }) => organizationsApi.updateMemberRole(orgId, userId, role),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: organizationsKeys.members(orgId) });
-          },
+      void queryClient.invalidateQueries({
+        queryKey: organizationsKeys.members(orgId),
+      });
+    },
   });
 }
 
@@ -94,10 +94,15 @@ export function useRemoveMemberMutation(orgId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (userId: string) => removeMemberApi(orgId, userId),
+    mutationFn: (userId: string) =>
+      organizationsApi.removeMember(orgId, userId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: organizationsKeys.members(orgId) });
-      queryClient.invalidateQueries({ queryKey: organizationsKeys.detail(orgId) });
-          },
+      void queryClient.invalidateQueries({
+        queryKey: organizationsKeys.members(orgId),
+      });
+      void queryClient.invalidateQueries({
+        queryKey: organizationsKeys.detail(orgId),
+      });
+    },
   });
 }

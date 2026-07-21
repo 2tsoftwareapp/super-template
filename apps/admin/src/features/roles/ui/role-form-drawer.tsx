@@ -18,6 +18,7 @@ import { useForm, useWatch } from "react-hook-form";
 
 import { PermissionMultiSelect } from "@/components/permission-multi-select";
 import { ResourceDrawer } from "@/components/resource-drawer";
+import { selectDelegatablePermissions } from "@/features/roles/model/roles.permissions";
 import {
   createRoleFormSchema,
   type EditableRole,
@@ -89,14 +90,15 @@ export function RoleFormDrawer({
     name: "permissionIds",
   });
 
-  const orgPermissions = useMemo(() => {
-    const set = new Set(actorPermissions);
-    return permissions.filter(
-      (p) =>
-        p.scope === "organization" &&
-        (isSuperAdmin || set.has(p.name)),
-    );
-  }, [actorPermissions, permissions, isSuperAdmin]);
+  const orgPermissions = useMemo(
+    () =>
+      selectDelegatablePermissions(
+        permissions,
+        actorPermissions,
+        isSuperAdmin,
+      ),
+    [actorPermissions, permissions, isSuperAdmin],
+  );
 
   const handleSubmit = form.handleSubmit((values) => {
     onSave({

@@ -1,6 +1,16 @@
 "use client";
 
+import { getErrorMessage } from "@repo/web-utils/errors";
+import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
+import { toast } from "sonner";
+
+import type {
+  EditableRole,
+  ManagedRoleDto,
+  RoleForm,
+} from "@/features/roles/model/roles.schemas";
+import type { RolesViewModel } from "@/features/roles/model/roles.types";
 
 import { useOrganizationsQuery } from "@/features/organizations";
 import {
@@ -11,80 +21,37 @@ import {
   usePermissionCatalogQuery,
   useRolesQuery,
 } from "@/features/roles/api/roles.queries";
+import { rolesKeys } from "@/features/roles/api/roles.query-keys";
 import {
   filterRolesBySearch,
   mergeCustomRoles,
-  type MergedRole,
   mergeSystemRoles,
   optionalText,
 } from "@/features/roles/model/roles.filtering";
 import { selectRoleManagementPermissions } from "@/features/roles/model/roles.permissions";
-import {
-  type EditableRole,
-  type ManagedRoleDto,
-  type PermissionDto,
-  type RoleForm,
-} from "@/features/roles/model/roles.schemas";
 import { useSession } from "@/hooks/use-session";
 
-export interface RolesViewModel {
-  canCreate: boolean;
-  canUpdate: boolean;
-  canDelete: boolean;
-  isSuperAdmin: boolean;
-  search: string;
-  onSearchChange: (value: string) => void;
-  isLoading: boolean;
-  isRefreshing: boolean;
-  hasError: boolean;
-  onRefresh: () => void;
-  systemRoles: MergedRole[];
-  customRoles: MergedRole[];
-  anyRoles: boolean;
-  noResults: boolean;
-  deletingRoleId: string | null;
-  isDeleting: boolean;
-  onEditRole: (role: ManagedRoleDto) => void;
-  onRequestDelete: (role: ManagedRoleDto) => void;
-  drawer: {
-    open: boolean;
-    editingRole: EditableRole | null;
-    permissions: PermissionDto[];
-    permissionsError: boolean;
-    isSaving: boolean;
-    onCreate: () => void;
-    onClose: () => void;
-    onSave: (values: {
-      name: string;
-      description: string;
-      permissionIds: string[];
-      organizationId: string;
-    }) => void;
-  };
-  confirmDelete: {
-    role: ManagedRoleDto | null;
-    onCancel: () => void;
-    onConfirm: () => Promise<void>;
-  };
-  organizations: {
-    items: { id: string; name: string }[];
-    loading: boolean;
-    selectedId: string;
-    onSelect: (id: string) => void;
-  };
-  organizationNames: Record<string, string>;
-  actorPermissions: string[];
-}
+export type { RolesViewModel };
 
+/**
+ * Orchestration hook for the roles management screen.
+ *
+ * Flow:
+ *   1. Session → role/permission booleans (incl. SUPER_ADMIN).
+ *   2. Parallel roles + permission catalog (+ orgs when super admin).
+ *   3. Client-side search filter over merged system/custom roles.
+ *   4. Drawer create/edit and delete confirm with toast on mutation errors.
+ */
 export function useRolesController(): RolesViewModel {
+  const queryClient = useQueryClient();
   const session = useSession();
   const sessionData = session.data?.data;
   const permissions = sessionData?.permissions ?? [];
-  const userRoles = sessionData?.user?.roles ?? [];
-  const isSuperAdmin = userRoles.includes("SUPER_ADMIN");
-
-  const { canCreate, canUpdate, canDelete } =
-    selectRoleManagementPermissions(permissions);
+  const { canCreate, canUpdate, canDelete, isSuperAdmin } =
+    selectRoleManagementPermissions(
+      permissions,
+      sessionData?.user?.roles,
+    );
 
   const [search, setSearch] = useState("");
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -140,7 +107,14 @@ export function useRolesController(): RolesViewModel {
       input.organizationId = values.organizationId;
     }
 
-    saveRole.mutate({ roleId: editingRole?.id, input });
+    saveRole.mutate(
+      { roleId: editingRole?.id, input },
+      {
+        onError: (error) => {
+          toast.error(getErrorMessage(error));
+        },
+      },
+    );
   };
 
   const handleDeleteConfirm = async () => {
@@ -149,8 +123,9 @@ export function useRolesController(): RolesViewModel {
     }
     try {
       await deleteRole.mutateAsync(deletingRole.id);
-    } finally {
       setDeletingRole(null);
+    } catch (error) {
+      toast.error(getErrorMessage(error));
     }
   };
 
@@ -180,7 +155,11 @@ export function useRolesController(): RolesViewModel {
     filteredSystem.length === 0 &&
     filteredCustom.length === 0;
 
-  const hasError = roles.isError || permissionCatalog.isError;
+  const isError = roles.isError || permissionCatalog.isError;
+
+  const handleRetry = () => {
+    void queryClient.invalidateQueries({ queryKey: rolesKeys.all });
+  };
 
   return {
     canCreate,
@@ -191,11 +170,9 @@ export function useRolesController(): RolesViewModel {
     onSearchChange: setSearch,
     isLoading: roles.isLoading,
     isRefreshing: roles.isFetching || permissionCatalog.isFetching,
-    hasError,
-    onRefresh: () => {
-      void roles.refetch();
-      void permissionCatalog.refetch();
-    },
+    isError,
+    onRetry: handleRetry,
+    onRefresh: handleRetry,
     systemRoles: filteredSystem,
     customRoles: filteredCustom,
     anyRoles,

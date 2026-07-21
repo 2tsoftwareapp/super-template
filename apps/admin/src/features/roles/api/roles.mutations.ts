@@ -4,14 +4,14 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import type { RoleForm } from "../model/roles.schemas";
 
-import { createRole, deleteRole, updateRole } from "./roles.api";
+import { rolesApi } from "./roles.api";
 import { rolesKeys } from "./roles.query-keys";
 
 export function useDeleteRoleMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: deleteRole,
+    mutationFn: (roleId: string) => rolesApi.delete(roleId),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: rolesKeys.all });
     },
@@ -30,11 +30,11 @@ export function useSaveRoleMutation(options?: { onSuccess?: () => void }) {
       input: RoleForm;
     }) => {
       if (roleId) {
-        return updateRole(roleId, input);
+        return rolesApi.update(roleId, input);
       }
-      return createRole(input);
+      return rolesApi.create(input);
     },
-    onSuccess: async (data, variables) => {
+    onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: rolesKeys.all });
       options?.onSuccess?.();
     },

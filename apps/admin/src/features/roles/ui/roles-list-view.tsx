@@ -3,13 +3,14 @@
 import { Button } from "@repo/web-ui/button";
 import { Card, CardContent } from "@repo/web-ui/card";
 import { ConfirmDialog } from "@repo/web-ui/confirm-dialog";
-import { Empty, EmptyMedia } from "@repo/web-ui/empty";
+import { Empty } from "@repo/web-ui/empty";
+import { ErrorState } from "@repo/web-ui/error-state";
 import { Input } from "@repo/web-ui/input";
 import { SectionLoading } from "@repo/web-ui/loading";
 import { Show } from "@repo/web-ui/show";
-import { AlertTriangle, LockKeyhole, Plus, RefreshCcw, Search, ShieldCheck, X } from "lucide-react";
+import { LockKeyhole, Plus, RefreshCcw, Search, ShieldCheck, X } from "lucide-react";
 
-import type { RolesViewModel } from "@/features/roles/controllers/use-roles-controller";
+import type { RolesViewModel } from "@/features/roles/model/roles.types";
 
 import { ResourcePageShell } from "@/components/resource-page-shell";
 import { adminResources } from "@/lib/admin-resources";
@@ -35,7 +36,8 @@ export function RolesListView(vm: RolesViewModel) {
     onSearchChange,
     isLoading,
     isRefreshing,
-    hasError,
+    isError,
+    onRetry,
     onRefresh,
     systemRoles,
     customRoles,
@@ -60,8 +62,8 @@ export function RolesListView(vm: RolesViewModel) {
       onRefresh={onRefresh}
       actions={
         <>
-          {hasError ? (
-            <Button size="sm" variant="outline" onClick={onRefresh}>
+          {isError ? (
+            <Button size="sm" variant="outline" onClick={onRetry}>
               <RefreshCcw data-icon="inline-start" />
               Retry
             </Button>
@@ -98,32 +100,30 @@ export function RolesListView(vm: RolesViewModel) {
             <SectionLoading />
           </Show>
 
-          {!isLoading && hasError ? (
-            <Empty
-              title="Failed to load roles"
-              description="There was an error fetching roles and permissions. Try refreshing."
-            >
-              <EmptyMedia>
-                <AlertTriangle className="size-4" />
-              </EmptyMedia>
-            </Empty>
+          {!isLoading && isError ? (
+            <ErrorState
+              variant="inline"
+              className="m-4"
+              title="Could not load roles."
+              action={{ label: "Retry", onClick: onRetry }}
+            />
           ) : null}
 
-          {!isLoading && !hasError && noResults ? (
+          {!isLoading && !isError && noResults ? (
             <Empty
               title="No roles match your search"
               description="Try different keywords."
             />
           ) : null}
 
-          {!isLoading && !hasError && !anyRoles && !search ? (
+          {!isLoading && !isError && !anyRoles && !search ? (
             <Empty
               title="No roles yet"
               description="Roles are provisioned during bootstrap. Custom roles can be created below."
             />
           ) : null}
 
-          {!isLoading && !hasError && (
+          {!isLoading && !isError && (
             <div>
               {systemRoles.length > 0 && (
                 <div>

@@ -1,4 +1,10 @@
+import { uuidParam } from "@repo/web-utils/params";
 import { z } from "zod";
+
+/** Route params for `/organizations/[id]` detail pages. */
+export const organizationRouteParamsSchema = z.object({
+  id: uuidParam,
+});
 
 export const createOrganizationSchema = z.object({
   name: z

@@ -30,7 +30,8 @@ export function useAdminUserQuery(userId: string) {
 
 export function useAdminRolesQuery() {
   return useQuery({
-    queryKey: rolesKeys.all,
+    queryKey: rolesKeys.list(),
     queryFn: () => usersApi.listRoles(),
+    staleTime: 5 * 60_000,
   });
 }

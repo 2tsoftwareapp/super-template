@@ -2,29 +2,36 @@
 
 import { standardSchemaResolver as zodResolver } from "@hookform/resolvers/standard-schema";
 import { Button } from "@repo/web-ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@repo/web-ui/dialog";
 import { Input } from "@repo/web-ui/input";
 import { Label } from "@repo/web-ui/label";
 import { Spinner } from "@repo/web-ui/spinner";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@repo/web-ui/dialog";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
-import { useUpdateOrganizationMutation } from "../api/organizations.mutations";
 import {
-  type UpdateOrganizationForm,
   createOrganizationSchema,
+  type UpdateOrganizationForm,
 } from "../model/organizations.schemas";
 
 export function EditOrganizationDialog({
   open,
   onClose,
-  organizationId,
   currentName,
+  onSubmit,
+  isSubmitting,
 }: {
   open: boolean;
   onClose: () => void;
-  organizationId: string;
   currentName: string;
+  onSubmit: (values: UpdateOrganizationForm) => void;
+  isSubmitting: boolean;
 }) {
   const form = useForm<UpdateOrganizationForm>({
     resolver: zodResolver(createOrganizationSchema),
@@ -39,15 +46,8 @@ export function EditOrganizationDialog({
     }
   }, [open, currentName, form]);
 
-  const updateOrg = useUpdateOrganizationMutation(organizationId);
-
-  const onSubmit = form.handleSubmit(async (values) => {
-    try {
-      await updateOrg.mutateAsync({ name: values.name });
-      onClose();
-    } catch {
-      // toast handled inside mutation
-    }
+  const handleSubmit = form.handleSubmit((values) => {
+    onSubmit(values);
   });
 
   return (
@@ -56,7 +56,7 @@ export function EditOrganizationDialog({
         <DialogHeader>
           <DialogTitle>Rename Organization</DialogTitle>
         </DialogHeader>
-        <form onSubmit={onSubmit} className="flex flex-col gap-4 py-2">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4 py-2">
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="edit-name">Organization Name</Label>
             <Input
@@ -72,11 +72,11 @@ export function EditOrganizationDialog({
             ) : null}
           </div>
           <DialogFooter className="mt-4 gap-2">
-            <Button type="button" variant="outline" onClick={onClose} disabled={updateOrg.isPending}>
+            <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
               Cancel
             </Button>
-            <Button type="submit" disabled={updateOrg.isPending}>
-              {updateOrg.isPending ? <Spinner data-icon="inline-start" /> : null}
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? <Spinner data-icon="inline-start" /> : null}
               Save Changes
             </Button>
           </DialogFooter>
