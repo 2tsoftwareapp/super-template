@@ -1,7 +1,9 @@
 import type { ImportValidationError } from '@repo/api-core';
 
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
+import { IsIn, IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
+
+import { SUPPORTED_IMPORT_TYPES } from '../domain/import-types';
 
 export class ImportJobDto {
   @ApiProperty()
@@ -47,8 +49,8 @@ export class ImportJobDto {
 }
 
 export class CreateImportDto {
-  @ApiProperty()
-  @IsString()
+  @ApiProperty({ enum: SUPPORTED_IMPORT_TYPES })
+  @IsIn([...SUPPORTED_IMPORT_TYPES])
   type: string;
 
   @ApiProperty()

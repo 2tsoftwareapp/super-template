@@ -4,12 +4,17 @@ import type {
 } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import {  AppError, ERROR_CODES , SYSTEM_SCOPE, TRANSACTION_PORT, type TransactionPort } from '@repo/api-core';
-
-import type { CreateImportCommand, ImportJobView } from '../imports.types';
+import {
+  AppError,
+  ERROR_CODES,
+  SYSTEM_SCOPE,
+  TRANSACTION_PORT,
+  type TransactionPort,
+} from '@repo/api-core';
 
 import { AuditService } from '../../../audit/application/audit.service';
-import { FILES_REPOSITORY, type FilesRepositoryPort } from '../../../files/application/ports/files.repository.port';
+import { FileAccessService } from '../../../files/application/services/file-access.service';
+import type { CreateImportCommand, ImportJobView } from '../imports.types';
 import {
   IMPORT_JOBS_REPOSITORY,
   type ImportJobsRepositoryPort,
@@ -22,7 +27,7 @@ export class CreateImportUseCase {
   constructor(
     @Inject(IMPORT_JOBS_REPOSITORY)
     private readonly importJobsRepository: ImportJobsRepositoryPort,
-    @Inject(FILES_REPOSITORY) private readonly filesRepository: FilesRepositoryPort,
+    private readonly fileAccessService: FileAccessService,
     private readonly importFileParser: ImportFileParserService,
     private readonly auditService: AuditService,
     private readonly getImportUseCase: GetImportUseCase,
@@ -34,15 +39,10 @@ export class CreateImportUseCase {
     input: CreateImportCommand,
     requestContext?: RequestContext,
   ): Promise<ImportJobView> {
-    const file = await this.filesRepository.findById(input.fileId);
-
-    if (!file) {
-      throw new AppError(
-        ERROR_CODES.FILE_NOT_FOUND,
-        'Import file not found',
-        HttpStatus.NOT_FOUND,
-      );
-    }
+    const file = await this.fileAccessService.findAccessibleFile(
+      actor,
+      input.fileId,
+    );
 
     if (!file.organizationId) {
       throw new AppError(
@@ -52,22 +52,26 @@ export class CreateImportUseCase {
       );
     }
 
+    const organizationId = file.organizationId;
     const jobValues = {
-      organizationId: file.organizationId,
+      organizationId,
       type: input.type,
       fileId: input.fileId,
       status: 'PENDING' as const,
       createdById: actor.userId,
     };
 
-    const { job, created } = (await this.transactionPort.withTenant(
-      { tenantId: file.organizationId, userId: actor.userId },
+    const { job, created } = await this.transactionPort.withTenant(
+      { tenantId: organizationId, userId: actor.userId },
       async (tx) => {
         const idempotentResult = input.idempotencyKey
-          ? await this.importJobsRepository.createIdempotent({
-              ...jobValues,
-              idempotencyKey: input.idempotencyKey,
-            }, tx)
+          ? await this.importJobsRepository.createIdempotent(
+              {
+                ...jobValues,
+                idempotencyKey: input.idempotencyKey,
+              },
+              tx,
+            )
           : null;
 
         const jobRecord = idempotentResult
@@ -81,21 +85,24 @@ export class CreateImportUseCase {
         const isCreated = idempotentResult ? idempotentResult.created : true;
 
         if (isCreated) {
-          await this.auditService.log({
-            actorId: actor.userId,
-            action: 'import.created',
-            entityType: 'import_job',
-            entityId: jobRecord.id,
-            metadata: { type: input.type, fileId: input.fileId },
-            requestContext,
-            scope: SYSTEM_SCOPE.ORGANIZATION,
-            organizationId: file.organizationId!,
-          }, tx);
+          await this.auditService.log(
+            {
+              actorId: actor.userId,
+              action: 'import.created',
+              entityType: 'import_job',
+              entityId: jobRecord.id,
+              metadata: { type: input.type, fileId: input.fileId },
+              requestContext,
+              scope: SYSTEM_SCOPE.ORGANIZATION,
+              organizationId,
+            },
+            tx,
+          );
         }
 
         return { job: jobRecord, created: isCreated };
-      }
-    )) as any;
+      },
+    );
 
     if (!created) {
       return this.getImportUseCase.execute(actor, job.id);
@@ -105,10 +112,7 @@ export class CreateImportUseCase {
       input.type,
       file.storageKey,
     );
-    const errors = this.importFileParser.validateRows(
-      input.type,
-      parsed.rows,
-    );
+    const errors = this.importFileParser.validateRows(input.type, parsed.rows);
 
     await this.importJobsRepository.update(job.id, {
       status: errors.length > 0 ? 'FAILED' : 'PROCESSING',

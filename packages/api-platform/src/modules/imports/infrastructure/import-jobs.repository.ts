@@ -10,8 +10,10 @@ import { importJobs } from '@repo/api-database';
 import { and, eq } from 'drizzle-orm';
 
 import type {
+  CreateImportJobValues,
   ImportJobRecord,
   ImportJobsRepositoryPort,
+  UpdateImportJobValues,
 } from '../application/ports/imports.repository.port';
 
 @Injectable()
@@ -19,26 +21,23 @@ export class ImportJobsRepository implements ImportJobsRepositoryPort {
   constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
 
   async create(
-    values: Record<string, unknown>,
+    values: CreateImportJobValues,
     executor?: TransactionExecutor,
   ): Promise<ImportJobRecord | null> {
     const db = (executor ?? this.database) as DatabaseExecutor;
-    const [job] = await db.insert(importJobs).values(values as typeof importJobs.$inferInsert).returning();
+    const [job] = await db.insert(importJobs).values(values).returning();
 
     return (job as ImportJobRecord) ?? null;
   }
 
   async createIdempotent(
-    values: Record<string, unknown> & { createdById: string; idempotencyKey: string },
+    values: CreateImportJobValues & { idempotencyKey: string },
     executor?: TransactionExecutor,
   ): Promise<{ value: ImportJobRecord | undefined; created: boolean }> {
     const db = (executor ?? this.database) as DatabaseExecutor;
     const result = await runIdempotentInsert(
       async () => {
-        const [inserted] = await db
-          .insert(importJobs)
-          .values(values as typeof importJobs.$inferInsert & { createdById: string; idempotencyKey: string })
-          .returning();
+        const [inserted] = await db.insert(importJobs).values(values).returning();
 
         return inserted as ImportJobRecord | undefined;
       },
@@ -89,14 +88,14 @@ export class ImportJobsRepository implements ImportJobsRepositoryPort {
 
   async update(
     jobId: string,
-    values: Record<string, unknown>,
+    values: UpdateImportJobValues,
     executor?: TransactionExecutor,
   ): Promise<ImportJobRecord | null> {
     const db = (executor ?? this.database) as DatabaseExecutor;
     const [job] = await db
       .update(importJobs)
       .set({
-        ...(values as Partial<typeof importJobs.$inferInsert>),
+        ...values,
         updatedAt: new Date(),
       })
       .where(eq(importJobs.id, jobId))

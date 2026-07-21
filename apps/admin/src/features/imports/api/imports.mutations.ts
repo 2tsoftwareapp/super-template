@@ -1,33 +1,31 @@
 "use client";
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import type { ImportJobDto } from "@/lib/api-types";
+import { type CreateImportInput, importsApi } from "./imports.api";
+import { importsKeys } from "./imports.query-keys";
 
-import {
-  confirmImportJob,
-  type CreateImportInput,
-  createImportJob,
-} from "./imports.api";
-
-export function useCreateImportMutation(options?: {
-  onSuccess?: (data: { data: ImportJobDto }) => void;
-}) {
+export function useCreateImportMutation() {
+  const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (input: CreateImportInput) => createImportJob(input),
+    mutationFn: (input: CreateImportInput) => importsApi.create(input),
     onSuccess: (result) => {
-      options?.onSuccess?.(result);
+      void queryClient.invalidateQueries({
+        queryKey: importsKeys.detail(result.data.id),
+      });
+      void queryClient.setQueryData(importsKeys.detail(result.data.id), result);
     },
   });
 }
 
-export function useConfirmImportMutation(options?: {
-  onSuccess?: (data: { data: ImportJobDto }) => void;
-}) {
+export function useConfirmImportMutation() {
+  const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (id: string) => confirmImportJob(id),
+    mutationFn: (id: string) => importsApi.confirm(id),
     onSuccess: (result) => {
-      options?.onSuccess?.(result);
+      void queryClient.invalidateQueries({
+        queryKey: importsKeys.detail(result.data.id),
+      });
     },
   });
 }

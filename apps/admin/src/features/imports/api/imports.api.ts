@@ -7,19 +7,25 @@ export interface CreateImportInput {
   type: string;
 }
 
-export async function createImportJob(input: CreateImportInput) {
-  return webFetch<{ data: ImportJobDto }>("/api/bff/imports", {
-    method: "POST",
-    body: JSON.stringify(input),
-  });
-}
+/**
+ * Imports transport layer. Paths match OpenAPI `/api/v1/imports` via BFF.
+ */
+export const importsApi = {
+  create(input: CreateImportInput) {
+    return webFetch<{ data: ImportJobDto }>("/api/bff/imports", {
+      method: "POST",
+      body: JSON.stringify(input),
+    });
+  },
 
-export async function fetchImportJob(jobId: string) {
-  return webFetch<{ data: ImportJobDto }>(`/api/bff/imports/${jobId}`);
-}
+  get(jobId: string) {
+    return webFetch<{ data: ImportJobDto }>(`/api/bff/imports/${jobId}`);
+  },
 
-export async function confirmImportJob(jobId: string) {
-  return webFetch<{ data: ImportJobDto }>(`/api/bff/imports/${jobId}/confirm`, {
-    method: "POST",
-  });
-}
+  confirm(jobId: string) {
+    return webFetch<{ data: ImportJobDto }>(
+      `/api/bff/imports/${jobId}/confirm`,
+      { method: "POST" },
+    );
+  },
+};

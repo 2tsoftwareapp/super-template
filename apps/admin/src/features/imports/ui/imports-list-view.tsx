@@ -25,7 +25,7 @@ import {
   Search,
 } from "lucide-react";
 
-import type { ImportsViewModel } from "@/features/imports/controllers/use-imports-controller";
+import type { ImportsViewModel } from "@/features/imports/model/imports.types";
 
 import { ResourcePageShell } from "@/components/resource-page-shell";
 import { adminResources } from "@/lib/admin-resources";
@@ -33,11 +33,6 @@ import { scalarString, timeAgo } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 const importsResource = adminResources.find((r) => r.id === "imports")!;
-
-const IMPORT_TYPES = [
-  { value: "users", label: "Users" },
-  { value: "projects", label: "Projects" },
-];
 
 function statusBadge(status: string) {
   switch (status) {
@@ -99,6 +94,7 @@ export function ImportsListView({
                 placeholder="UUID of the uploaded file"
                 value={form.fileId}
                 onChange={(e) => form.onFileIdChange(e.target.value)}
+                disabled={!form.canCreate}
               />
             </div>
             <div className="space-y-2">
@@ -108,22 +104,29 @@ export function ImportsListView({
                 className="flex h-9 w-full rounded-lg border border-input bg-background px-3 text-sm shadow-xs outline-hidden transition-colors focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
                 value={form.type}
                 onChange={(e) => form.onTypeChange(e.target.value)}
+                disabled={!form.canCreate}
               >
-                {IMPORT_TYPES.map((t) => (
+                {form.importTypes.map((t) => (
                   <option key={t.value} value={t.value}>
                     {t.label}
                   </option>
                 ))}
               </select>
             </div>
-            <LoadingButton
-              className="w-full"
-              onClick={form.onCreate}
-              disabled={!form.canSubmit}
-              loading={form.isCreating}
-            >
-              Create import
-            </LoadingButton>
+            {form.canCreate ? (
+              <LoadingButton
+                className="w-full"
+                onClick={form.onCreate}
+                disabled={!form.canSubmit}
+                loading={form.isCreating}
+              >
+                Create import
+              </LoadingButton>
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                You do not have permission to create imports.
+              </p>
+            )}
           </CardContent>
         </Card>
 
@@ -164,6 +167,7 @@ export function ImportsListView({
               <ErrorState
                 variant="inline"
                 title="Could not load job. Check the ID and try again."
+                action={{ label: "Retry", onClick: job.onRetry }}
               />
             </Show>
             {!job.isLoading && !job.isError && !jobData ? (

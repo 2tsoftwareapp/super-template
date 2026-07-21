@@ -1,8 +1,11 @@
 import type { ImportValidationError } from '@repo/api-core';
 
+import { Injectable } from '@nestjs/common';
+
 import type { ImportJobStatus, ImportJobView } from './imports.types';
 import type { ImportJobRecord } from './ports/imports.repository.port';
 
+@Injectable()
 export class ImportsMapper {
   toImportJobView(job: ImportJobRecord): ImportJobView {
     return {

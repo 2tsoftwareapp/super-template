@@ -1,7 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { AppError, ERROR_CODES } from '@repo/api-core';
-
 import { ConfirmImportUseCase } from './confirm-import.use-case';
 
 const actor = {
@@ -24,6 +22,12 @@ describe('ConfirmImportUseCase', () => {
       fileId: 'file-1',
       organizationId: 'org-1',
       status: 'PENDING',
+      confirmedAt: null,
+      completedAt: null,
+      rowCount: null,
+      successCount: null,
+      errorCount: null,
+      errors: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -46,15 +50,15 @@ describe('ConfirmImportUseCase', () => {
 
     const importJobsRepository = {
       findById: vi.fn(async () => importJob),
-      update: vi.fn(async (_, data) => ({ ...importJob, ...data })),
+      update: vi.fn(async (_id, data) => ({ ...importJob, ...data })),
     };
 
-    const filesRepository = {
-      findById: vi.fn(async () => file),
+    const fileAccessService = {
+      findAccessibleFile: vi.fn(async () => file),
     };
 
     const adapter = {
-      importRow: vi.fn(async (row) => {
+      importRow: vi.fn(async (row: { name: string }) => {
         if (row.name === 'Row 2 Error') {
           throw new Error('Constraint violation');
         }
@@ -73,42 +77,76 @@ describe('ConfirmImportUseCase', () => {
       log: vi.fn(async () => undefined),
     };
 
+    const importsMapper = {
+      toImportJobView: vi.fn((job: Record<string, unknown>) => ({
+        id: String(job.id),
+        type: String(job.type),
+        fileId: String(job.fileId),
+        status: String(job.status),
+        rowCount: (job.rowCount as number | null) ?? null,
+        successCount: (job.successCount as number | null) ?? null,
+        errorCount: (job.errorCount as number | null) ?? null,
+        errors: (job.errors as unknown[] | null) ?? null,
+        createdById: String(job.createdById),
+        confirmedAt:
+          job.confirmedAt instanceof Date
+            ? job.confirmedAt.toISOString()
+            : null,
+        completedAt:
+          job.completedAt instanceof Date
+            ? job.completedAt.toISOString()
+            : null,
+        createdAt:
+          job.createdAt instanceof Date
+            ? job.createdAt.toISOString()
+            : new Date().toISOString(),
+        updatedAt:
+          job.updatedAt instanceof Date
+            ? job.updatedAt.toISOString()
+            : new Date().toISOString(),
+      })),
+    };
+
     const transactionPort = {
-      run: vi.fn(async (cb) => cb({} as any)),
-      withSavepoint: vi.fn(async (_, __, cb) => cb()),
+      run: vi.fn(async (cb: (tx: unknown) => Promise<unknown>) => cb({})),
+      withSavepoint: vi.fn(
+        async (_tx: unknown, _name: string, cb: () => Promise<unknown>) =>
+          cb(),
+      ),
     };
 
     const useCase = new ConfirmImportUseCase(
       importJobsRepository as never,
-      filesRepository as never,
+      fileAccessService as never,
       importExportAdapters as never,
       importFileParser as never,
       auditService as never,
+      importsMapper as never,
       transactionPort as never,
     );
 
     const result = await useCase.execute(actor, 'job-1');
 
     expect(importJobsRepository.findById).toHaveBeenCalledWith('job-1');
-    expect(filesRepository.findById).toHaveBeenCalledWith('file-1');
-    expect(importFileParser.parseImportFile).toHaveBeenCalledWith('users', 'imports/file.csv');
-    
-    // Check that importRow was called 3 times
+    expect(fileAccessService.findAccessibleFile).toHaveBeenCalledWith(
+      actor,
+      'file-1',
+    );
+    expect(importFileParser.parseImportFile).toHaveBeenCalledWith(
+      'users',
+      'imports/file.csv',
+    );
+
     expect(adapter.importRow).toHaveBeenCalledTimes(3);
-    
-    // Check savepoints
     expect(transactionPort.withSavepoint).toHaveBeenCalledTimes(3);
 
-    // Check final job status
     expect(importJobsRepository.update).toHaveBeenCalledWith(
       'job-1',
       expect.objectContaining({
-        status: 'FAILED', // because at least one row failed
+        status: 'FAILED',
         successCount: 2,
         errorCount: 1,
-        errors: [
-          { row: 2, message: 'Constraint violation' },
-        ],
+        errors: [{ row: 2, message: 'Constraint violation' }],
       }),
       expect.anything(),
     );
@@ -120,7 +158,7 @@ describe('ConfirmImportUseCase', () => {
       }),
       expect.anything(),
     );
-    
+
     expect(result.status).toBe('FAILED');
     expect(result.successCount).toBe(2);
     expect(result.errorCount).toBe(1);

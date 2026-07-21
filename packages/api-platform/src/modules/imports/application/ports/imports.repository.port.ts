@@ -1,4 +1,4 @@
-import type { TransactionExecutor } from '@repo/api-core';
+import type { ImportValidationError, TransactionExecutor } from '@repo/api-core';
 
 export interface ImportJobRecord {
   id: string;
@@ -8,8 +8,8 @@ export interface ImportJobRecord {
   rowCount: number | null;
   successCount: number | null;
   errorCount: number | null;
-  errors: unknown[] | null;
-  organizationId: string | null;
+  errors: ImportValidationError[] | null;
+  organizationId: string;
   createdById: string;
   confirmedAt: Date | null;
   completedAt: Date | null;
@@ -17,13 +17,39 @@ export interface ImportJobRecord {
   updatedAt: Date;
 }
 
+export interface CreateImportJobValues {
+  organizationId: string;
+  type: string;
+  fileId: string;
+  status: 'PENDING';
+  createdById: string;
+  idempotencyKey?: string;
+}
+
+export type ImportJobStatusValue =
+  | 'PENDING'
+  | 'PROCESSING'
+  | 'COMPLETED'
+  | 'FAILED'
+  | 'CANCELLED';
+
+export interface UpdateImportJobValues {
+  status?: ImportJobStatusValue;
+  rowCount?: number | null;
+  successCount?: number | null;
+  errorCount?: number | null;
+  errors?: ImportValidationError[] | null;
+  confirmedAt?: Date | null;
+  completedAt?: Date | null;
+}
+
 export interface ImportJobsRepositoryPort {
   create(
-    values: Record<string, unknown>,
+    values: CreateImportJobValues,
     executor?: TransactionExecutor,
   ): Promise<ImportJobRecord | null>;
   createIdempotent(
-    values: Record<string, unknown> & { createdById: string; idempotencyKey: string },
+    values: CreateImportJobValues & { idempotencyKey: string },
     executor?: TransactionExecutor,
   ): Promise<{ value: ImportJobRecord | undefined; created: boolean }>;
   findById(
@@ -32,7 +58,7 @@ export interface ImportJobsRepositoryPort {
   ): Promise<ImportJobRecord | null>;
   update(
     jobId: string,
-    values: Record<string, unknown>,
+    values: UpdateImportJobValues,
     executor?: TransactionExecutor,
   ): Promise<ImportJobRecord | null>;
 }

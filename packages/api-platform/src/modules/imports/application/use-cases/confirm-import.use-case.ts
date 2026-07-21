@@ -4,7 +4,7 @@ import type {
 } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { 
+import {
   AppError,
   ERROR_CODES,
   ImportExportAdapterRegistry,
@@ -14,11 +14,11 @@ import {
   type TransactionPort,
 } from '@repo/api-core';
 
-import type { ImportJobView } from '../imports.types';
-
 import { AuditService } from '../../../audit/application/audit.service';
-import { FILES_REPOSITORY, type FilesRepositoryPort } from '../../../files/application/ports/files.repository.port';
+import { FileAccessService } from '../../../files/application/services/file-access.service';
+import { canAccessImportJob } from '../../domain/import-access.policy';
 import { ImportsMapper } from '../imports.mapper';
+import type { ImportJobView } from '../imports.types';
 import {
   IMPORT_JOBS_REPOSITORY,
   type ImportJobsRepositoryPort,
@@ -27,15 +27,14 @@ import { ImportFileParserService } from '../services/import-file-parser.service'
 
 @Injectable()
 export class ConfirmImportUseCase {
-  private readonly importsMapper = new ImportsMapper();
-
   constructor(
     @Inject(IMPORT_JOBS_REPOSITORY)
     private readonly importJobsRepository: ImportJobsRepositoryPort,
-    @Inject(FILES_REPOSITORY) private readonly filesRepository: FilesRepositoryPort,
+    private readonly fileAccessService: FileAccessService,
     private readonly importExportAdapters: ImportExportAdapterRegistry,
     private readonly importFileParser: ImportFileParserService,
     private readonly auditService: AuditService,
+    private readonly importsMapper: ImportsMapper,
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
   ) {}
 
@@ -46,7 +45,20 @@ export class ConfirmImportUseCase {
   ): Promise<ImportJobView> {
     const job = await this.importJobsRepository.findById(jobId);
 
-    if (job?.createdById !== actor.userId) {
+    if (
+      !job ||
+      !canAccessImportJob({
+        actor: {
+          userId: actor.userId,
+          organizationId: actor.organizationId,
+          roles: actor.roles,
+        },
+        job: {
+          createdById: job.createdById,
+          organizationId: job.organizationId,
+        },
+      })
+    ) {
       throw new AppError(
         ERROR_CODES.IMPORT_JOB_NOT_FOUND,
         'Import job not found',
@@ -70,15 +82,10 @@ export class ConfirmImportUseCase {
       );
     }
 
-    const file = await this.filesRepository.findById(job.fileId);
-
-    if (!file) {
-      throw new AppError(
-        ERROR_CODES.FILE_NOT_FOUND,
-        'Import file not found',
-        HttpStatus.NOT_FOUND,
-      );
-    }
+    const file = await this.fileAccessService.findAccessibleFile(
+      actor,
+      job.fileId,
+    );
 
     if (!file.organizationId) {
       throw new AppError(
@@ -88,6 +95,7 @@ export class ConfirmImportUseCase {
       );
     }
 
+    const organizationId = file.organizationId;
     const parsed = await this.importFileParser.parseImportFile(
       job.type,
       file.storageKey,
@@ -102,11 +110,15 @@ export class ConfirmImportUseCase {
         const spName = `import_row_${index}`;
         try {
           await this.transactionPort.withSavepoint(tx, spName, async () => {
-            await adapter.importRow(row, {
-              organizationId: file.organizationId!,
-              ownerId: actor.userId,
-              createdById: actor.userId,
-            }, tx);
+            await adapter.importRow(
+              row,
+              {
+                organizationId,
+                ownerId: actor.userId,
+                createdById: actor.userId,
+              },
+              tx,
+            );
           });
           successCount += 1;
         } catch (error) {
@@ -117,24 +129,32 @@ export class ConfirmImportUseCase {
         }
       }
 
-      const updated = await this.importJobsRepository.update(job.id, {
-        status: errors.length > 0 ? 'FAILED' : 'COMPLETED',
-        confirmedAt: new Date(),
-        completedAt: new Date(),
-        successCount,
-        errorCount: errors.length,
-        errors: errors.length > 0 ? errors : null,
-      }, tx);
+      const updated = await this.importJobsRepository.update(
+        job.id,
+        {
+          status: errors.length > 0 ? 'FAILED' : 'COMPLETED',
+          confirmedAt: new Date(),
+          completedAt: new Date(),
+          successCount,
+          errorCount: errors.length,
+          errors: errors.length > 0 ? errors : null,
+        },
+        tx,
+      );
 
-      await this.auditService.log({
-        actorId: actor.userId,
-        action: 'import.confirmed',
-        entityType: 'import_job',
-        entityId: job.id,
-        metadata: { successCount, errorCount: errors.length },
-        requestContext,
-        ...(job.organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: job.organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
-      }, tx);
+      await this.auditService.log(
+        {
+          actorId: actor.userId,
+          action: 'import.confirmed',
+          entityType: 'import_job',
+          entityId: job.id,
+          metadata: { successCount, errorCount: errors.length },
+          requestContext,
+          scope: SYSTEM_SCOPE.ORGANIZATION,
+          organizationId: job.organizationId,
+        },
+        tx,
+      );
 
       return updated;
     });

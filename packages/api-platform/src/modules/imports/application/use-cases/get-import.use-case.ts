@@ -3,9 +3,9 @@ import type { AuthenticatedRequestUser } from '@repo/api-core';
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { AppError, ERROR_CODES } from '@repo/api-core';
 
-import type { ImportJobView } from '../imports.types';
-
+import { canAccessImportJob } from '../../domain/import-access.policy';
 import { ImportsMapper } from '../imports.mapper';
+import type { ImportJobView } from '../imports.types';
 import {
   IMPORT_JOBS_REPOSITORY,
   type ImportJobsRepositoryPort,
@@ -13,11 +13,10 @@ import {
 
 @Injectable()
 export class GetImportUseCase {
-  private readonly importsMapper = new ImportsMapper();
-
   constructor(
     @Inject(IMPORT_JOBS_REPOSITORY)
     private readonly importJobsRepository: ImportJobsRepositoryPort,
+    private readonly importsMapper: ImportsMapper,
   ) {}
 
   async execute(
@@ -26,7 +25,20 @@ export class GetImportUseCase {
   ): Promise<ImportJobView> {
     const job = await this.importJobsRepository.findById(jobId);
 
-    if (job?.createdById !== actor.userId) {
+    if (
+      !job ||
+      !canAccessImportJob({
+        actor: {
+          userId: actor.userId,
+          organizationId: actor.organizationId,
+          roles: actor.roles,
+        },
+        job: {
+          createdById: job.createdById,
+          organizationId: job.organizationId,
+        },
+      })
+    ) {
       throw new AppError(
         ERROR_CODES.IMPORT_JOB_NOT_FOUND,
         'Import job not found',
