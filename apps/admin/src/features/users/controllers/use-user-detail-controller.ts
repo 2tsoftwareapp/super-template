@@ -41,6 +41,8 @@ export type { UserDetailViewModel };
  *   1. Parse route UUID; load user, roles catalog, and actor orgs in parallel.
  *   2. Session + target roles → edit flags (self / privileged target guards).
  *   3. Profile, status, role assignment, and delete mutations with toast on error.
+ * Owns: detail query, profile/roles/status/delete orchestration.
+ * Does not own: detail section presentational cards.
  */
 export function useUserDetailController(): UserDetailViewModel {
   const params = useParams<{ id: string }>();

@@ -6,6 +6,7 @@ import { createContext, type ReactNode, useContext } from "react";
 import type { SessionUser } from "@/lib/api-types";
 
 import { useAdminGuard } from "@/features/auth/controllers/use-admin-guard";
+import { useSession } from "@/hooks/use-session";
 
 export interface AdminSession {
   user: SessionUser;
@@ -31,7 +32,9 @@ export function useAdminSession(): AdminSession {
 // pending redirects), and exposes the validated session to its subtree via
 // context only once the user is authenticated and authorized for the route.
 export function AdminGuard({ children }: { children: ReactNode }) {
-  const decision = useAdminGuard();
+  // Single useSession() at the guard root; decision hook receives it as a param.
+  const session = useSession();
+  const decision = useAdminGuard(session);
 
   if (decision.status !== "ready") {
     return (

@@ -15,9 +15,14 @@ import { useSession } from "@/hooks/use-session";
 export type { DashboardViewModel };
 
 /**
- * Orchestration hook for the dashboard overview: session, overview queries and
- * the derived job/health/user summary state. Returns a view model consumed by
- * the presentational dashboard overview.
+ * Orchestration hook for the dashboard overview.
+ *
+ * Flow:
+ *   1. Read session display name for the header greeting.
+ *   2. Parallel overview queries (users, jobs metrics, audit, health).
+ *   3. Derive job/health summary; expose per-section retry invalidations.
+ * Owns: overview query composition, health summary, refresh/retry.
+ * Does not own: chart/table presentation (dashboard UI atoms).
  */
 export function useDashboardController(): DashboardViewModel {
   const session = useSession();

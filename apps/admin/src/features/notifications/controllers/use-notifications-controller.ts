@@ -30,6 +30,8 @@ export type { NotificationsViewModel };
  *   1. Load delivery jobs + recent inbox in parallel (staleTime 0).
  *   2. Gate compose/cancel on `notifications.create`.
  *   3. Send/cancel mutations toast errors and invalidate related keys.
+ * Owns: compose form, jobs/recent queries, send/cancel mutations.
+ * Does not own: notification job table presentation.
  */
 export function useNotificationsController(): NotificationsViewModel {
   const queryClient = useQueryClient();

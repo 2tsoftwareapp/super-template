@@ -47,6 +47,8 @@ export type { FilesViewModel };
  *   3. Detail drawer loads versions/history for the selected file.
  *   4. Upload / version / delete invalidate `filesKeys.all`.
  *   5. Download resolves a signed URL via mutation (toast on failure).
+ * Owns: URL filters, list/upload/delete orchestration, selection.
+ * Does not own: table column atoms or drawer markup.
  */
 export function useFilesController(): FilesViewModel {
   const searchParams = useSearchParams();

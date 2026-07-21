@@ -1,6 +1,6 @@
 "use client";
 
-import { getErrorMessage } from "@repo/web-utils/errors";
+import { classifyError, getErrorMessage } from "@repo/web-utils/errors";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -113,6 +113,8 @@ function buildSettingRow(
  *   2. Load settings list (staleTime 5 min); client-side search filter.
  *   3. Track scalar + object draft state; detect per-setting changes.
  *   4. Save: confirm dialog → light Zod validation → PATCH → toast on error.
+ * Owns: settings query, draft state, save mutation, permission gate.
+ * Does not own: setting-card presentation.
  */
 export function useSettingsController(): SettingsViewModel {
   const queryClient = useQueryClient();
@@ -155,7 +157,9 @@ export function useSettingsController(): SettingsViewModel {
     },
     onError: (error) => {
       setSavingKey(null);
-      toast.error(getErrorMessage(error));
+      // classifyError standardizes kind/scope; message stays user-safe (§18.1).
+      const classified = classifyError(error);
+      toast.error(getErrorMessage(error, classified.message));
     },
   });
 

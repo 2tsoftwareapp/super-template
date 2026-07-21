@@ -1,7 +1,7 @@
 "use client";
 
 import { useDebouncedValue } from "@repo/web-hooks/use-debounced-value";
-import { getErrorMessage } from "@repo/web-utils/errors";
+import { classifyError, getErrorMessage } from "@repo/web-utils/errors";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -22,8 +22,15 @@ import { usePathname, useRouter } from "@/i18n/navigation";
 export type { AuditLogsViewModel };
 
 /**
- * Orchestration hook for the audit-logs screen: URL-backed filter state,
- * debounced search, the audit query, export/download, and detail selection.
+ * Orchestration hook for the audit-logs screen.
+ *
+ * Flow:
+ *   1. Parse URL filters; debounce free-text search before the list query.
+ *   2. Load paginated audit entries (placeholderData keeps prior page).
+ *   3. Export CSV with toast on truncate/error; classifyError for export fails.
+ *   4. Detail selection is local UI state (no extra fetch).
+ * Owns: URL ↔ filter sync, list query, export, detail selection.
+ * Does not own: table column definitions (presentational UI).
  */
 export function useAuditLogsController(): AuditLogsViewModel {
   const searchParams = useSearchParams();
@@ -89,7 +96,10 @@ export function useAuditLogsController(): AuditLogsViewModel {
           URL.revokeObjectURL(url);
         },
         onError: (error) => {
-          toast.error(getErrorMessage(error, "Failed to export audit logs."));
+          const classified = classifyError(error);
+          toast.error(
+            getErrorMessage(error, classified.message || "Failed to export audit logs."),
+          );
         },
       },
     );

@@ -27,6 +27,8 @@ import { useMfaStatusQuery } from "@/features/security/api/security.queries";
  *   3. Confirm, disable, or regenerate through mutation hooks with safe errors.
  *   4. Clear setup secrets and recovery codes when each sensitive flow ends.
  * Trace: CODING_RULES §18 error handling, §19 sensitive cache, §20 security.
+ * Owns: MFA status/setup/confirm/disable mutations and recovery-code UX.
+ * Does not own: change-password flow or preferences.
  */
 export function useMfaController(): MfaSecurityViewModel {
   // Step 1: sensitive setup state is memory-only and scoped to this screen.

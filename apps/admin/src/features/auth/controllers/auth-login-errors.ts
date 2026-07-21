@@ -1,14 +1,21 @@
+import { classifyError } from "@repo/web-utils/errors";
+
 import { ApiClientError } from "@/lib/http";
 
 import {
   AUTH_HTTP_STATUS,
   AUTH_MESSAGES,
-  AUTH_NETWORK_ERROR_PATTERN,
 } from "../model/auth.constants";
 import { AuthFlowError } from "../model/auth.errors";
 
+/**
+ * Map login failures to safe copy. Uses `classifyError` for kind/retryability
+ * (§18.1) while preserving auth-specific messages for known statuses.
+ */
 export function getLoginErrorMessage(error: unknown) {
   if (error instanceof AuthFlowError) return error.message;
+
+  const classified = classifyError(error);
 
   if (error instanceof ApiClientError) {
     if (error.status === AUTH_HTTP_STATUS.unauthorized) {
@@ -25,10 +32,7 @@ export function getLoginErrorMessage(error: unknown) {
     return error.payload?.error.message ?? AUTH_MESSAGES.signInFailed;
   }
 
-  if (
-    error instanceof TypeError &&
-    AUTH_NETWORK_ERROR_PATTERN.test(error.message)
-  ) {
+  if (classified.kind === "network") {
     return AUTH_MESSAGES.apiUnavailable;
   }
 
@@ -37,9 +41,12 @@ export function getLoginErrorMessage(error: unknown) {
 
 export function getMfaErrorMessage(error: unknown) {
   if (error instanceof AuthFlowError) return error.message;
+
+  const classified = classifyError(error);
   if (
-    error instanceof ApiClientError &&
-    error.status === AUTH_HTTP_STATUS.unauthorized
+    classified.kind === "auth" ||
+    (error instanceof ApiClientError &&
+      error.status === AUTH_HTTP_STATUS.unauthorized)
   ) {
     return AUTH_MESSAGES.invalidMfaCode;
   }

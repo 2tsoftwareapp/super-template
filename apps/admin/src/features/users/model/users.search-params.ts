@@ -1,4 +1,8 @@
-import { formatSortParam, sortCriteriaEqual } from "@repo/api-sort";
+import {
+  formatSortParam,
+  parseSortParam,
+  sortCriteriaEqual,
+} from "@repo/api-sort";
 import {
   enumParam,
   pageParam,
@@ -29,6 +33,8 @@ const usersListParamsSchema = z.object({
   status: enumParam(["all", "PENDING", "ACTIVE", "BLOCKED"], "all"),
   sortField: enumParam([...SORT_FIELDS], "createdAt"),
   sortOrder: sortOrderParam("desc"),
+  /** Multi-column sort (`field:order,...`); empty means fall back to sortField/sortOrder. */
+  sort: z.string().optional().catch(""),
 });
 
 const USERS_LIST_PARAMS_FALLBACK = {
@@ -38,6 +44,7 @@ const USERS_LIST_PARAMS_FALLBACK = {
   status: "all",
   sortField: "createdAt",
   sortOrder: "desc",
+  sort: "",
 } as const;
 
 export function parseUsersListSearchParams(
@@ -49,17 +56,26 @@ export function parseUsersListSearchParams(
     USERS_LIST_PARAMS_FALLBACK,
   );
 
+  const defaultSort = DEFAULT_USERS_LIST_PARAMS.sort;
+  // Prefer compact multi-sort (`sort=field:order,...`) when present; otherwise
+  // fall back to the single-column sortField/sortOrder pair.
+  const rawMultiSort = searchParams.get("sort");
+  const sort =
+    rawMultiSort && rawMultiSort.trim()
+      ? parseSortParam(rawMultiSort, SORT_FIELDS, defaultSort)
+      : [
+          {
+            field: parsed.data.sortField,
+            order: parsed.data.sortOrder,
+          },
+        ];
+
   return {
     page: parsed.data.page,
     limit: parsed.data.limit,
     search: parsed.data.search,
     status: parsed.data.status,
-    sort: [
-      {
-        field: parsed.data.sortField,
-        order: parsed.data.sortOrder,
-      },
-    ],
+    sort,
   };
 }
 

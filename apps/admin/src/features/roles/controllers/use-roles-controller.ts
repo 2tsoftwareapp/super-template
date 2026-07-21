@@ -41,6 +41,8 @@ export type { RolesViewModel };
  *   2. Parallel roles + permission catalog (+ orgs when super admin).
  *   3. Client-side search filter over merged system/custom roles.
  *   4. Drawer create/edit and delete confirm with toast on mutation errors.
+ * Owns: roles/permissions queries, drawer save/delete, client search.
+ * Does not own: role tree / form drawer markup.
  */
 export function useRolesController(): RolesViewModel {
   const queryClient = useQueryClient();

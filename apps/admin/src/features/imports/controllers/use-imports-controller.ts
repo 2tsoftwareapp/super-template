@@ -31,6 +31,8 @@ export type { ImportsViewModel };
  *   2. On success, set lookup jobId and seed the detail query cache.
  *   3. Lookup/refetch job detail; live jobs use staleTime 0.
  *   4. Confirm dialog → confirm mutation; close only on success.
+ * Owns: import list filters, create/confirm mutations, detail selection.
+ * Does not own: import row presentation.
  */
 export function useImportsController(): ImportsViewModel {
   const session = useSession();

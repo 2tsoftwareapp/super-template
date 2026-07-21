@@ -2,7 +2,8 @@
 
 import { useEffect, useRef } from "react";
 
-import { useSession } from "@/hooks/use-session";
+import type { useSession } from "@/hooks/use-session";
+
 import { usePathname, useRouter } from "@/i18n/navigation";
 
 import { useLogoutMutation } from "../api/auth.mutations";
@@ -13,11 +14,15 @@ import {
 } from "../model/admin-guard.state";
 import { ADMIN_AUTH_ROUTES } from "../model/auth.constants";
 
+type AdminSessionQuery = ReturnType<typeof useSession>;
+
 /**
- * Wire the pure admin-guard state machine to session + navigation side effects.
+ * Wire the pure admin-guard state machine to navigation side effects.
+ *
+ * Session is read once in `<AdminGuard>` and passed in so this hook is not a
+ * second `useSession()` call site (§16 R3).
  */
-export function useAdminGuard(): AdminGuardDecision {
-  const session = useSession();
+export function useAdminGuard(session: AdminSessionQuery): AdminGuardDecision {
   const router = useRouter();
   const pathname = usePathname();
   const { mutate: logout, isPending: isLoggingOut } = useLogoutMutation();

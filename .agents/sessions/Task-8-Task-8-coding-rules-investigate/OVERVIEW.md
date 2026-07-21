@@ -7,19 +7,19 @@
 
 | Field | Value |
 |---|---|
-| Status | `planning` |
-| Goal | Fix 30 violations CODING_RULES.md §§15–21 theo 4 phases |
-| Progress | 0/17 cards done · 0 blocked · 0 needs info |
-| Top risk / blocker | `queryClient.clear()` có thể gây flash nếu không test kỹ |
-| Next action | Sync → Execution (T-001) |
+| Status | `execution complete` → next `review` |
+| Goal | Fix CODING_RULES violations (§§15–21) + harden admin features |
+| Progress | **17/17** cards done · 0 blocked · `COMPLETE: yes` |
+| Top risk / blocker | None open for execution |
+| Next action | Chạy skill `review` → viết `REVIEW.md` |
 
 ## Progress chart
 
 ```mermaid
 pie title Task status
-  "todo" : 17
+  "done" : 17
   "in_progress" : 0
-  "done" : 0
+  "todo" : 0
   "blocked" : 0
 ```
 
@@ -44,10 +44,12 @@ flowchart LR
 |---|---|---|
 | `INVESTIGATE.md` | Root cause analysis | current |
 | `PLAN.md` | Strategy | current |
-| `TASKS.md` | Work | current |
+| `TASKS.md` | Work | **synced 17/17 done** |
+| `EXECUTION.md` | Execution log | **current** |
+| `REVIEW.md` | Post-execution review | missing → next |
 
 ## Developer notes
 
-- Commands: `pnpm typecheck`, `pnpm test`
-- CRITICAL first: T-001 → T-002 → T-003
-- 17 cards total across 4 phases
+- Branch: `main` (direct mode)
+- Related commits: `14a2509`, `c1afae6`, `4a14770` + upcoming execution commit
+- Verify: `pnpm --filter admin typecheck` · `pnpm --filter admin test`

@@ -49,24 +49,24 @@ plan_ref: PLAN.md
 | [x] | T-004 | Search params migration: users + audit-logs + mail | done |
 | [x] | T-005 | Route params validation: user-detail + org-detail | done |
 | [x] | T-006 | webFetch migration: auth.api + audit-logs | done |
-| [ ] | T-007 | Flow comments: 12 root handlers | todo |
-| [ ] | T-008 | Guard refactor: `use-admin-guard.ts` session param | todo |
+| [x] | T-007 | Flow comments: 12 root handlers | done |
+| [x] | T-008 | Guard refactor: `use-admin-guard.ts` session param | done |
 | [x] | T-009 | zod import: move `role-form-drawer.tsx` → model | done |
-| [ ] | T-010 | Auth search params: SSO callback + login flow | todo |
+| [x] | T-010 | Auth search params: SSO callback + login flow | done |
 | [x] | T-011 | placeholderData: audit-logs, jobs, files, mail queries | done |
-| [ ] | T-012 | Debounce: files search + jobs type filter | todo |
-| [ ] | T-013 | classifyError integration vào controllers | todo |
-| [ ] | T-014 | toast move: security-view → controller | todo |
-| [ ] | T-015 | Sub-hook rename: bỏ `-controller` suffix | todo |
+| [x] | T-012 | Debounce: files search + jobs type filter | done |
+| [x] | T-013 | classifyError integration vào controllers | done |
+| [x] | T-014 | toast move: security-view → controller | done |
+| [x] | T-015 | Sub-hook rename: bỏ `-controller` suffix | done |
 | [x] | T-016 | Memo review: kiểm tra useMemo/useCallback | done |
-| [ ] | T-017 | Verify: typecheck + tests | todo |
+| [x] | T-017 | Verify: typecheck + tests | done |
 
 ## Progress chart
 
 ```mermaid
 pie title Card status
-  "done" : 9
-  "todo" : 8
+  "done" : 17
+  "todo" : 0
   "in_progress" : 0
   "blocked" : 0
 ```
@@ -136,16 +136,16 @@ T-001 → T-002 → T-003 → (Phase 0 done) → T-004 → T-005 → T-006 → T
 
 ### T-004: Search params migration: users + audit-logs + mail + jobs
 
-- Status: todo
+- Status: done
 - Trace: INVESTIGATE V15-5 (R4 systemic) — §15 R4
 - Depends: none
 - Work items:
-  - [ ] 1. `users/model/users.search-params.ts`: thay 7x `searchParams.get()` bằng `parseSearchParams(usersListParamsSchema, searchParams, DEFAULT_USERS_LIST_PARAMS)` — dùng schema + helpers từ `@repo/web-utils/params`
-  - [ ] 2. `audit-logs/model/audit-logs.filters.ts`: thay 4x `sp.get()` bằng `parseSearchParams()` với zod schema + DEFAULT_AUDIT_LOGS_PARAMS
-  - [ ] 3. `mail/model/mail-schemas.ts`: thay 3x `sp.get()` bằng `parseSearchParams()` với zod schema + DEFAULT_MAIL_PARAMS
-  - [ ] 4. `jobs/model/constants.ts`: thay 3x `sp.get()` bằng `parseSearchParams()` với zod schema + DEFAULT_JOBS_PARAMS
-  - [ ] 5. Thêm `DEFAULT_*` constants trong mỗi `model/constants.ts` nếu chưa có
-  - [ ] 6. Update các controller gọi hàm parse để dùng function mới (giữ nguyên return type)
+  - [x] 1. `users/model/users.search-params.ts`: thay 7x `searchParams.get()` bằng `parseSearchParams(usersListParamsSchema, searchParams, DEFAULT_USERS_LIST_PARAMS)` — dùng schema + helpers từ `@repo/web-utils/params`
+  - [x] 2. `audit-logs/model/audit-logs.filters.ts`: thay 4x `sp.get()` bằng `parseSearchParams()` với zod schema + DEFAULT_AUDIT_LOGS_PARAMS
+  - [x] 3. `mail/model/mail-schemas.ts`: thay 3x `sp.get()` bằng `parseSearchParams()` với zod schema + DEFAULT_MAIL_PARAMS
+  - [x] 4. `jobs/model/constants.ts`: thay 3x `sp.get()` bằng `parseSearchParams()` với zod schema + DEFAULT_JOBS_PARAMS
+  - [x] 5. Thêm `DEFAULT_*` constants trong mỗi `model/constants.ts` nếu chưa có
+  - [x] 6. Update các controller gọi hàm parse để dùng function mới (giữ nguyên return type)
 - Description: Systemic violation — 4 features dùng raw `searchParams.get()` thủ công. Migrate sang `parseSearchParams()` từ `@repo/web-utils/params` để có runtime validation + recovery theo key.
 - AC: Mỗi feature parse search params qua schema zod; một key hỏng không làm crash cả màn hình; tương thích ngược với URL format hiện tại.
 - Verify: `pnpm typecheck` + kiểm tra từng feature filter/search hoạt động
@@ -199,22 +199,22 @@ T-001 → T-002 → T-003 → (Phase 0 done) → T-004 → T-005 → T-006 → T
 
 ### T-007: Flow comments: 12 root handlers
 
-- Status: todo
+- Status: done
 - Trace: INVESTIGATE V17-1 — §17 R5
 - Depends: none
 - Work items:
-  - [ ] 1. Thêm flow comment cho `use-audit-logs-controller.ts` (Flow: + numbered steps + ownership)
-  - [ ] 2. Thêm flow comment cho `use-dashboard-controller.ts`
-  - [ ] 3. Thêm flow comment cho `use-files-controller.ts`
-  - [ ] 4. Thêm flow comment cho `use-imports-controller.ts`
-  - [ ] 5. Thêm flow comment cho `use-jobs-controller.ts`
-  - [ ] 6. Thêm flow comment cho `use-mail-controller.ts`
-  - [ ] 7. Thêm flow comment cho `use-mfa-controller.ts`
-  - [ ] 8. Thêm flow comment cho `use-notifications-controller.ts`
-  - [ ] 9. Thêm flow comment cho `use-roles-controller.ts`
-  - [ ] 10. Thêm flow comment cho `use-settings-controller.ts`
-  - [ ] 11. Thêm flow comment cho `use-user-detail-controller.ts`
-  - [ ] 12. Thêm flow comment cho `use-users-list-controller.ts`
+  - [x] 1. Thêm flow comment cho `use-audit-logs-controller.ts` (Flow: + numbered steps + ownership)
+  - [x] 2. Thêm flow comment cho `use-dashboard-controller.ts`
+  - [x] 3. Thêm flow comment cho `use-files-controller.ts`
+  - [x] 4. Thêm flow comment cho `use-imports-controller.ts`
+  - [x] 5. Thêm flow comment cho `use-jobs-controller.ts`
+  - [x] 6. Thêm flow comment cho `use-mail-controller.ts`
+  - [x] 7. Thêm flow comment cho `use-mfa-controller.ts`
+  - [x] 8. Thêm flow comment cho `use-notifications-controller.ts`
+  - [x] 9. Thêm flow comment cho `use-roles-controller.ts`
+  - [x] 10. Thêm flow comment cho `use-settings-controller.ts`
+  - [x] 11. Thêm flow comment cho `use-user-detail-controller.ts`
+  - [x] 12. Thêm flow comment cho `use-users-list-controller.ts`
 - Description: 12/12 root handlers thiếu flow comment — JSDoc với `Flow:` marker, numbered steps, và ownership declaration. Xem format mẫu ở CODING_RULES.md §17.
 - AC: Mỗi root handler có flow comment theo format: `Flow:` + numbered steps + `Sở hữu bởi file này:` / `KHÔNG sở hữu:`.
 - Verify: `pnpm typecheck` (comments không ảnh hưởng) + review format
@@ -224,12 +224,12 @@ T-001 → T-002 → T-003 → (Phase 0 done) → T-004 → T-005 → T-006 → T
 
 ### T-008: Guard refactor: `use-admin-guard.ts` session param
 
-- Status: todo
+- Status: done
 - Trace: INVESTIGATE V16-1 — §16 R3
 - Depends: none
 - Work items:
-  - [ ] 1. `use-admin-guard.ts`: thêm param `session: SessionData | null` vào function signature, xoá `useSession()` bên trong
-  - [ ] 2. Guard component (`admin-guard.tsx` hoặc nơi gọi `useAdminGuard`): gọi `useSession()` và truyền session xuống
+  - [x] 1. `use-admin-guard.ts`: thêm param `session: SessionData | null` vào function signature, xoá `useSession()` bên trong
+  - [x] 2. Guard component (`admin-guard.tsx` hoặc nơi gọi `useAdminGuard`): gọi `useSession()` và truyền session xuống
 - Description: Guard gọi `useSession()` trực tiếp thay vì nhận qua params — vi phạm §16 R3 (shared hook chỉ gọi ở root handler). Guard root là component, cần nhận session từ component cha và truyền xuống.
 - AC: `useAdminGuard` nhận session object qua params; không gọi `useSession()` bên trong.
 - Verify: `pnpm typecheck` + `pnpm test`
@@ -241,12 +241,12 @@ T-001 → T-002 → T-003 → (Phase 0 done) → T-004 → T-005 → T-006 → T
 
 ### T-009: zod import: move `role-form-drawer.tsx` → model
 
-- Status: todo
+- Status: done
 - Trace: INVESTIGATE V15-1 — §15 R2
 - Depends: none
 - Work items:
-  - [ ] 1. `roles/model/roles.schemas.ts`: thêm `organizationId` field vào schema hoặc tạo schema mới `createRoleFormSchema` nếu cần
-  - [ ] 2. `roles/ui/role-form-drawer.tsx`: xoá `import { z } from "zod"`, import schema từ model thay thế
+  - [x] 1. `roles/model/roles.schemas.ts`: thêm `organizationId` field vào schema hoặc tạo schema mới `createRoleFormSchema` nếu cần
+  - [x] 2. `roles/ui/role-form-drawer.tsx`: xoá `import { z } from "zod"`, import schema từ model thay thế
 - Description: `role-form-drawer.tsx` (UI layer) import `zod` trực tiếp và extend schema inline. Schema phải defined ở `model/` và import từ đó.
 - AC: UI layer không import `zod`. Schema extension `organizationId` được định nghĩa trong `model/roles.schemas.ts`.
 - Verify: `pnpm typecheck` + kiểm tra form drawer hoạt động
@@ -258,12 +258,12 @@ T-001 → T-002 → T-003 → (Phase 0 done) → T-004 → T-005 → T-006 → T
 
 ### T-010: Auth search params: SSO callback + login flow
 
-- Status: todo
+- Status: done
 - Trace: INVESTIGATE V15-5 (auth files) — §15 R4
 - Depends: T-004 (kiểu tương tự)
 - Work items:
-  - [ ] 1. `use-admin-sso-callback-flow.ts`: thay 2x `searchParams.get()` bằng `parseSearchParams()` với schema (error + exchange params)
-  - [ ] 2. `use-admin-login-flow.ts`: thay `searchParams.get(AUTH_SEARCH_PARAMS.error)` bằng `parseSearchParams()`
+  - [x] 1. `use-admin-sso-callback-flow.ts`: thay 2x `searchParams.get()` bằng `parseSearchParams()` với schema (error + exchange params)
+  - [x] 2. `use-admin-login-flow.ts`: thay `searchParams.get(AUTH_SEARCH_PARAMS.error)` bằng `parseSearchParams()`
 - Description: Auth controllers dùng raw `searchParams.get()`. Exchange code (SSO callback) là sensitive param cần validate.
 - AC: Auth search params đi qua `parseSearchParams()` với zod schema validation.
 - Verify: `pnpm typecheck` + SSO flow test
@@ -275,14 +275,14 @@ T-001 → T-002 → T-003 → (Phase 0 done) → T-004 → T-005 → T-006 → T
 
 ### T-011: placeholderData: audit-logs, jobs, files, mail queries
 
-- Status: todo
+- Status: done
 - Trace: INVESTIGATE V21-2 — §21 R4
 - Depends: none
 - Work items:
-  - [ ] 1. `audit-logs/api/audit-logs.queries.ts`: thêm `placeholderData: (previous) => previous` vào paginated query
-  - [ ] 2. `jobs/api/jobs.queries.ts`: thêm `placeholderData: (previous) => previous` vào paginated query
-  - [ ] 3. `files/api/files.queries.ts`: thêm `placeholderData: (previous) => previous` vào paginated query
-  - [ ] 4. `mail/api/mail.queries.ts`: thêm `placeholderData: (previous) => previous` vào paginated query
+  - [x] 1. `audit-logs/api/audit-logs.queries.ts`: thêm `placeholderData: (previous) => previous` vào paginated query
+  - [x] 2. `jobs/api/jobs.queries.ts`: thêm `placeholderData: (previous) => previous` vào paginated query
+  - [x] 3. `files/api/files.queries.ts`: thêm `placeholderData: (previous) => previous` vào paginated query
+  - [x] 4. `mail/api/mail.queries.ts`: thêm `placeholderData: (previous) => previous` vào paginated query
 - Description: 4 paginated queries thiếu `placeholderData` — nháy trắng khi đổi trang. Pattern có sẵn trong `users.queries.ts`.
 - AC: Khi đổi trang, UI giữ data trang cũ thay vì flash skeleton/loading.
 - Verify: `pnpm typecheck`
@@ -292,12 +292,12 @@ T-001 → T-002 → T-003 → (Phase 0 done) → T-004 → T-005 → T-006 → T
 
 ### T-012: Debounce: files search + jobs type filter
 
-- Status: todo
+- Status: done
 - Trace: INVESTIGATE V21-1 — §21 R3
 - Depends: none
 - Work items:
-  - [ ] 1. `use-file-pagination.ts`: dùng `useDebouncedValue(value, 500)` trước khi set search state gọi API
-  - [ ] 2. `use-jobs-controller.ts`: dùng `useDebouncedValue(value, 500)` cho type filter input trước khi gọi `router.replace()`
+  - [x] 1. `use-file-pagination.ts`: dùng `useDebouncedValue(value, 500)` trước khi set search state gọi API
+  - [x] 2. `use-jobs-controller.ts`: dùng `useDebouncedValue(value, 500)` cho type filter input trước khi gọi `router.replace()`
 - Description: Search/filter gọi API mỗi ký tự — không debounce. Dùng `useDebouncedValue` (đã có trong `@repo/web-hooks`).
 - AC: API chỉ được gọi sau 500ms user ngừng gõ.
 - Verify: `pnpm typecheck`
@@ -309,13 +309,13 @@ T-001 → T-002 → T-003 → (Phase 0 done) → T-004 → T-005 → T-006 → T
 
 ### T-013: classifyError integration vào controllers
 
-- Status: todo
+- Status: done
 - Trace: INVESTIGATE V18-2 — §18.1
 - Depends: none
 - Work items:
-  - [ ] 1. `auth/controllers/auth-login-errors.ts`: dùng `classifyError()` thay vì `instanceof ApiClientError` thủ công
-  - [ ] 2. `settings/controllers/use-settings-controller.ts`: dùng `classifyError()` trước `toast.error()`
-  - [ ] 3. `audit-logs/controllers/use-audit-logs-controller.ts`: dùng `classifyError()` cho export error
+  - [x] 1. `auth/controllers/auth-login-errors.ts`: dùng `classifyError()` thay vì `instanceof ApiClientError` thủ công
+  - [x] 2. `settings/controllers/use-settings-controller.ts`: dùng `classifyError()` trước `toast.error()`
+  - [x] 3. `audit-logs/controllers/use-audit-logs-controller.ts`: dùng `classifyError()` cho export error
 - Description: Controllers không dùng `classifyError()` — tự đoán error kind từ status. `classifyError()` từ `@repo/web-utils/errors` đã có sẵn.
 - AC: Các controller dùng `classifyError()` để xác định error kind, scope, retryability.
 - Verify: `pnpm typecheck` + `pnpm test`
@@ -328,12 +328,12 @@ T-001 → T-002 → T-003 → (Phase 0 done) → T-004 → T-005 → T-006 → T
 
 ### T-014: toast move: security-view → controller
 
-- Status: todo
+- Status: done
 - Trace: INVESTIGATE V18-1 — §18 layers
 - Depends: none
 - Work items:
-  - [ ] 1. `use-mfa-controller.ts`: thêm callback `handleCopyRecoveryCodes` + `handleCopyRecoveryCodesError` với `toast.success()/toast.error()`
-  - [ ] 2. `security-view.tsx`: xoá `toast.success()`/`toast.error()` — dùng controller callbacks thay thế
+  - [x] 1. `use-mfa-controller.ts`: thêm callback `handleCopyRecoveryCodes` + `handleCopyRecoveryCodesError` với `toast.success()/toast.error()`
+  - [x] 2. `security-view.tsx`: xoá `toast.success()`/`toast.error()` — dùng controller callbacks thay thế
 - Description: Screen (`security-view.tsx`) gọi `toast()` trực tiếp — vi phạm layer rule. Toast chỉ được gọi ở controller.
 - AC: Security screen không import `sonner` toast. Toast được gọi từ controller callback.
 - Verify: `pnpm typecheck`
@@ -345,12 +345,12 @@ T-001 → T-002 → T-003 → (Phase 0 done) → T-004 → T-005 → T-006 → T
 
 ### T-015: Sub-hook rename: bỏ `-controller` suffix
 
-- Status: todo
+- Status: done
 - Trace: INVESTIGATE V17-2 — §17 R2
 - Depends: none
 - Work items:
-  - [ ] 1. Rename `use-create-user-drawer-controller.ts` → `use-create-user-drawer.ts`
-  - [ ] 2. Update import trong `use-users-list-controller.ts`
+  - [x] 1. Rename `use-create-user-drawer-controller.ts` → `use-create-user-drawer.ts`
+  - [x] 2. Update import trong `use-users-list-controller.ts`
 - Description: Sub-hook tên chứa "controller" — technical layer term, không phải danh từ nghiệp vụ. CODING_RULES §17 R2 yêu cầu `<concern>` là danh từ nghiệp vụ.
 - AC: File tên `use-create-user-drawer.ts` (bỏ `-controller`). Import updated.
 - Verify: `pnpm typecheck`
@@ -362,12 +362,12 @@ T-001 → T-002 → T-003 → (Phase 0 done) → T-004 → T-005 → T-006 → T
 
 ### T-016: Memo review: kiểm tra useMemo/useCallback
 
-- Status: todo
+- Status: done
 - Trace: INVESTIGATE V21-3 — §21 R5
 - Depends: none
 - Work items:
-  - [ ] 1. Review ~30+ useMemo/useCallback usages — remove những cái không cần thiết (trivial function, empty deps, không đo được lợi ích)
-  - [ ] 2. Giữ useMemo/useCallback cho thư viện không memo hoá (useReactTable) và những nơi profiling cho thấy benefit
+  - [x] 1. Review ~30+ useMemo/useCallback usages — remove những cái không cần thiết (trivial function, empty deps, không đo được lợi ích)
+  - [x] 2. Giữ useMemo/useCallback cho thư viện không memo hoá (useReactTable) và những nơi profiling cho thấy benefit
 - Description: ~30+ useMemo/useCallback trong codebase. React Compiler đã bật — chỉ nên giữ khi thực sự cần hoặc lint báo.
 - AC: Số lượng useMemo/useCallback giảm; chỉ giữ những chỗ có lý do chính đáng.
 - Verify: `pnpm typecheck` + `pnpm test`
@@ -377,12 +377,12 @@ T-001 → T-002 → T-003 → (Phase 0 done) → T-004 → T-005 → T-006 → T
 
 ### T-017: Verify: typecheck + tests
 
-- Status: todo
+- Status: done
 - Trace: PLAN § Verification
 - Depends: T-001 → T-016
 - Work items:
-  - [ ] 1. `pnpm typecheck` — 0 errors
-  - [ ] 2. `pnpm test` — all unit tests pass
+  - [x] 1. `pnpm typecheck` — 0 errors
+  - [x] 2. `pnpm test` — all unit tests pass
 - Description: Verification step để confirm tất cả thay đổi không regression.
 - AC: typecheck 0 errors, unit tests pass.
 - Verify: `pnpm typecheck` && `pnpm test`

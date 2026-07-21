@@ -40,6 +40,8 @@ export type { JobsViewModel };
  *   2. Parallel list + metrics queries (staleTime 0 for live queue).
  *   3. Detail drawer loads job + logs when a row is opened.
  *   4. Cancel: confirm → mutation → invalidate `jobsKeys.all` + toast on error.
+ * Owns: URL filters, list/metrics/detail/logs queries, cancel confirm.
+ * Does not own: table/drawer presentational markup.
  */
 export function useJobsController(): JobsViewModel {
   const searchParams = useSearchParams();

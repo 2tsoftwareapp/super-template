@@ -39,6 +39,8 @@ export type { MailViewModel };
  *   2. Load templates + deliveries in parallel; preview by selected key.
  *   3. Send form gated by `mail.create`; mutations toast + invalidate lists.
  *   4. Detail drawer selects a delivery row (no extra fetch).
+ * Owns: URL filters, templates/deliveries/preview queries, send form gate.
+ * Does not own: template card / deliveries table markup.
  */
 export function useMailController(): MailViewModel {
   const searchParams = useSearchParams();
