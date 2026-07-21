@@ -1,6 +1,10 @@
 import { bffPath } from "@repo/api-contract";
 
 import type {
+  MailDeliveriesParams,
+  SendMailInput,
+} from "@/features/mail/model/mail.types";
+import type {
   ListResponse,
   MailDeliveryDto,
   MailPreviewDto,
@@ -10,20 +14,11 @@ import type {
 
 import { buildPath, webFetch } from "@/lib/http";
 
-export interface MailDeliveriesParams {
-  templateKey?: string | undefined;
-  status?: string | undefined;
-  page: number;
-  limit: number;
-}
+export type { MailDeliveriesParams, SendMailInput };
 
-export interface SendMailInput {
-  templateKey: string;
-  to: string;
-  variables: Record<string, string>;
-  idempotencyKey?: string;
-}
-
+/**
+ * Mail transport layer. Paths from OpenAPI via `bffPath` (§22).
+ */
 export const mailApi = {
   templates() {
     return webFetch<{ data: MailTemplateDto[] }>(
@@ -57,11 +52,3 @@ export const mailApi = {
     );
   },
 };
-
-/** @deprecated Prefer `mailApi` */
-export const fetchMailTemplates = () => mailApi.templates();
-export const fetchMailDeliveries = (params: MailDeliveriesParams) =>
-  mailApi.deliveries(params);
-export const fetchMailPreview = (templateKey: string) =>
-  mailApi.preview(templateKey);
-export const sendMail = (input: SendMailInput) => mailApi.send(input);

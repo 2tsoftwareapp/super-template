@@ -10,10 +10,9 @@ import {
 
 @Injectable()
 export class ListJobsUseCase {
-  private readonly jobsMapper = new JobsMapper();
-
   constructor(
     @Inject(JOBS_REPOSITORY) private readonly jobsRepository: JobsRepositoryPort,
+    private readonly jobsMapper: JobsMapper,
   ) {}
 
   async execute(query: ListJobsQuery): Promise<{ rows: JobView[]; total: number }> {

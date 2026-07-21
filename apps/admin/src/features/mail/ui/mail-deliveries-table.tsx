@@ -9,6 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@repo/web-ui/card";
+import { ErrorState } from "@repo/web-ui/error-state";
 import { Input } from "@repo/web-ui/input";
 import { SectionLoading } from "@repo/web-ui/loading";
 import { Pagination } from "@repo/web-ui/pagination";
@@ -23,45 +24,39 @@ import {
 } from "@repo/web-ui/table";
 import { RefreshCw } from "lucide-react";
 
+import type { MailViewModel } from "@/features/mail/model/mail.types";
 import type { MailDeliveryDto } from "@/lib/api-types";
 
 import { timeAgo } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
-import { type Filters, mailStatusProps } from "../model/mail-schemas";
-
 interface MailDeliveriesTableProps {
-  items: MailDeliveryDto[];
-  total: number;
-  totalPages: number;
-  page: number;
-  pageSize: number;
-  isFetching: boolean;
-  isLoading: boolean;
-  filters: {
-    templateKey: string;
-    status: string;
-  };
-  onFilterChange: (key: keyof Filters, value: string | number) => void;
-  onPageChange: (page: number) => void;
-  onRefresh: () => void;
+  deliveries: MailViewModel["deliveries"];
   onSelectDelivery: (delivery: MailDeliveryDto) => void;
 }
 
 export function MailDeliveriesTable({
-  items,
-  total,
-  totalPages,
-  page,
-  pageSize,
-  isFetching,
-  isLoading,
-  filters,
-  onFilterChange,
-  onPageChange,
-  onRefresh,
+  deliveries,
   onSelectDelivery,
 }: MailDeliveriesTableProps) {
+  const {
+    items,
+    total,
+    totalPages,
+    page,
+    pageSize,
+    isFetching,
+    isLoading,
+    isError,
+    onRetry,
+    filters,
+    statusOptions,
+    statusProps,
+    onFilterChange,
+    onPageChange,
+    onRefresh,
+  } = deliveries;
+
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -81,10 +76,7 @@ export function MailDeliveriesTable({
             disabled={isFetching}
           >
             <RefreshCw
-              className={cn(
-                "size-3.5",
-                isFetching && "animate-spin",
-              )}
+              className={cn("size-3.5", isFetching && "animate-spin")}
             />
             Refresh
           </Button>
@@ -95,9 +87,7 @@ export function MailDeliveriesTable({
           <Input
             placeholder="Template key"
             value={filters.templateKey}
-            onChange={(e) =>
-              onFilterChange("templateKey", e.target.value)
-            }
+            onChange={(e) => onFilterChange("templateKey", e.target.value)}
             className="max-w-[180px]"
           />
           <select
@@ -105,9 +95,11 @@ export function MailDeliveriesTable({
             value={filters.status}
             onChange={(e) => onFilterChange("status", e.target.value)}
           >
-            <option value="">All statuses</option>
-            <option value="SENT">Sent</option>
-            <option value="FAILED">Failed</option>
+            {statusOptions.map((opt) => (
+              <option key={opt.value || "all"} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
           </select>
         </div>
         <Table>
@@ -128,7 +120,19 @@ export function MailDeliveriesTable({
                 </TableCell>
               </TableRow>
             </Show>
-            {!isLoading && items.length === 0 ? (
+            {!isLoading && isError ? (
+              <TableRow>
+                <TableCell colSpan={5} className="py-8">
+                  <ErrorState
+                    variant="inline"
+                    className="m-0"
+                    title="Could not load deliveries."
+                    action={{ label: "Retry", onClick: onRetry }}
+                  />
+                </TableCell>
+              </TableRow>
+            ) : null}
+            {!isLoading && !isError && items.length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={5}
@@ -139,44 +143,45 @@ export function MailDeliveriesTable({
                     : "No deliveries recorded."}
                 </TableCell>
               </TableRow>
-            ) : (
-              items.map((delivery) => {
-                const { variant, className } = mailStatusProps(
-                  String(delivery.status),
-                );
-                return (
-                  <TableRow key={delivery.id}>
-                    <TableCell className="max-w-[160px] truncate text-sm font-medium">
-                      {delivery.subject}
-                    </TableCell>
-                    <TableCell className="text-xs text-muted-foreground">
-                      {delivery.recipient}
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={variant}
-                        className={cn("text-xs capitalize", className)}
-                      >
-                        {String(delivery.status).toLowerCase()}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-xs text-muted-foreground">
-                      {timeAgo(delivery.createdAt)}
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-7 text-xs"
-                        onClick={() => onSelectDelivery(delivery)}
-                      >
-                        Detail
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                );
-              })
-            )}
+            ) : null}
+            {!isLoading && !isError
+              ? items.map((delivery) => {
+                  const { variant, className } = statusProps(
+                    String(delivery.status),
+                  );
+                  return (
+                    <TableRow key={delivery.id}>
+                      <TableCell className="max-w-[160px] truncate text-sm font-medium">
+                        {delivery.subject}
+                      </TableCell>
+                      <TableCell className="text-xs text-muted-foreground">
+                        {delivery.recipient}
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={variant}
+                          className={cn("text-xs capitalize", className)}
+                        >
+                          {String(delivery.status).toLowerCase()}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-xs text-muted-foreground">
+                        {timeAgo(delivery.createdAt)}
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 text-xs"
+                          onClick={() => onSelectDelivery(delivery)}
+                        >
+                          Detail
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
+              : null}
           </TableBody>
         </Table>
 

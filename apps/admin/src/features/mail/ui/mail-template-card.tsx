@@ -15,19 +15,10 @@ import { Separator } from "@repo/web-ui/separator";
 import { Show } from "@repo/web-ui/show";
 import { Spinner } from "@repo/web-ui/spinner";
 
-import type { MailPreviewDto } from "@/lib/api-types";
+import type { MailViewModel } from "@/features/mail/model/mail.types";
 
 interface MailTemplateCardProps {
-  preview: {
-    templateKey: string;
-    onChange: (key: string) => void;
-    onPreview: () => void;
-    isFetching: boolean;
-    isLoading: boolean;
-    isError: boolean;
-    error: Error | null;
-    data: MailPreviewDto | undefined;
-  };
+  preview: MailViewModel["preview"];
 }
 
 export function MailTemplateCard({ preview }: MailTemplateCardProps) {
@@ -69,11 +60,8 @@ export function MailTemplateCard({ preview }: MailTemplateCardProps) {
             <ErrorState
               variant="inline"
               title="Preview unavailable."
-              description={
-                preview.error instanceof Error
-                  ? preview.error.message
-                  : "The template key is invalid or the preview endpoint is unavailable."
-              }
+              description={preview.errorMessage}
+              action={{ label: "Retry", onClick: preview.onPreview }}
             />
           </Show>
           {!preview.isLoading && !preview.isError && preview.data ? (
@@ -83,10 +71,10 @@ export function MailTemplateCard({ preview }: MailTemplateCardProps) {
               </p>
               <p className="mt-1 font-semibold">{preview.data.subject}</p>
               <Separator className="my-3" />
-              <p className="mt-1 whitespace-pre-wrap text-sm text-muted-foreground leading-relaxed">
+              <p className="mt-1 whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
                 {preview.data.text}
               </p>
-              {preview.data.missingVariables?.length > 0 && (
+              {preview.data.missingVariables?.length > 0 ? (
                 <>
                   <Separator className="my-3" />
                   <p className="text-xs font-medium uppercase tracking-wide text-accent-foreground">
@@ -96,7 +84,7 @@ export function MailTemplateCard({ preview }: MailTemplateCardProps) {
                     {preview.data.missingVariables.join(", ")}
                   </p>
                 </>
-              )}
+              ) : null}
             </>
           ) : !preview.isLoading && !preview.isError ? (
             <p className="py-2 text-center text-xs text-muted-foreground">

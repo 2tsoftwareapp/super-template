@@ -1,9 +1,10 @@
 "use client";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/web-ui/card";
+import { ErrorState } from "@repo/web-ui/error-state";
 import { Show } from "@repo/web-ui/show";
 
-import type { JobsViewModel } from "@/features/jobs/controllers/use-jobs-controller";
+import type { JobsViewModel } from "@/features/jobs/model/jobs.types";
 
 import { ResourcePageShell } from "@/components/resource-page-shell";
 import { JobsDetailDrawer } from "@/features/jobs/ui/jobs-detail-drawer";
@@ -30,27 +31,32 @@ export function JobsListView({
         isRefreshing={header.isFetching}
         onRefresh={header.onRefresh}
       >
-        {/* Metrics */}
+        <Show when={header.metricsError}>
+          <ErrorState
+            variant="inline"
+            title="Could not load job metrics."
+            action={{ label: "Retry", onClick: header.onRetryMetrics }}
+          />
+        </Show>
+
         <Show when={!!header.metrics}>
           <JobsMetricsRow metrics={header.metrics!} />
         </Show>
 
-        {/* Stats from metrics */}
         <Show when={!!header.metrics}>
           <JobsStatusRow metrics={header.metrics!} />
         </Show>
 
-        {/* Filters */}
         <JobsFilterBar
           status={filters.status}
           type={filters.type}
+          statusOptions={filters.statusOptions}
           onStatusChange={filters.onStatusChange}
           onTypeChange={filters.onTypeChange}
           onRefresh={filters.onRefresh}
           isFetching={filters.isFetching}
         />
 
-        {/* Queue table */}
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-base">Queue</CardTitle>
@@ -64,9 +70,13 @@ export function JobsListView({
             <JobsTable
               jobs={list.jobs}
               isLoading={list.isLoading}
+              isError={list.isError}
+              onRetry={list.onRetry}
               emptyMessage={list.emptyMessage}
               confirmId={cancel.confirmId}
               cancelPending={cancel.isPending}
+              canCancel={list.canCancel}
+              statusProps={list.statusProps}
               onDetail={detail.onOpen}
               onCancelRequest={cancel.onRequest}
               onCancelConfirm={cancel.onConfirm}
@@ -84,13 +94,18 @@ export function JobsListView({
         </Card>
       </ResourcePageShell>
 
-      {/* Job detail drawer */}
       <JobsDetailDrawer
         isOpen={detail.isOpen}
         selectedJob={detail.selectedJob}
+        detailLoading={detail.detailLoading}
+        detailError={detail.detailError}
+        onRetryDetail={detail.onRetryDetail}
         events={logs.events}
         eventsLoading={logs.isLoading}
+        eventsError={logs.isError}
+        onRetryEvents={logs.onRetry}
         onClose={detail.onClose}
+        statusProps={list.statusProps}
       />
     </>
   );

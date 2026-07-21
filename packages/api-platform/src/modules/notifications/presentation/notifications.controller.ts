@@ -150,29 +150,31 @@ export class AdminNotificationsController {
   @Post()
   @Authorize({ permissions: [perm('notifications', ACTION.CREATE)] })
   @ApiDataResponse(NotificationJobDto, 201)
-  send(
+  async send(
     @CurrentUser() actor: AuthenticatedRequestUser,
     @Body() input: SendNotificationRequestDto,
     @Req() request: Request,
   ) {
-    return this.delivery.createDeliveryJob(
-      actor,
-      {
-        audience: input.audience,
-        type: input.type,
-        title: input.title,
-        body: input.body,
-        ...(input.userId !== undefined ? { userId: input.userId } : {}),
-        ...(input.userIds !== undefined ? { userIds: input.userIds } : {}),
-        ...(input.data !== undefined ? { data: input.data } : {}),
-        ...(input.scheduledAt !== undefined
-          ? { scheduledAt: input.scheduledAt }
-          : {}),
-        ...(input.idempotencyKey !== undefined
-          ? { idempotencyKey: input.idempotencyKey }
-          : {}) },
-      request.requestContext,
-    );
+    return {
+      data: await this.delivery.createDeliveryJob(
+        actor,
+        {
+          audience: input.audience,
+          type: input.type,
+          title: input.title,
+          body: input.body,
+          ...(input.userId !== undefined ? { userId: input.userId } : {}),
+          ...(input.userIds !== undefined ? { userIds: input.userIds } : {}),
+          ...(input.data !== undefined ? { data: input.data } : {}),
+          ...(input.scheduledAt !== undefined
+            ? { scheduledAt: input.scheduledAt }
+            : {}),
+          ...(input.idempotencyKey !== undefined
+            ? { idempotencyKey: input.idempotencyKey }
+            : {}) },
+        request.requestContext,
+      ),
+    };
   }
 
   @Get('jobs')

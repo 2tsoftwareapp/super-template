@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@repo/web-ui/card";
+import { ErrorState } from "@repo/web-ui/error-state";
 import { SectionLoading } from "@repo/web-ui/loading";
 import { Show } from "@repo/web-ui/show";
 import {
@@ -19,19 +20,15 @@ import {
   TableRow,
 } from "@repo/web-ui/table";
 
-import type { MailTemplateDto } from "@/lib/api-types";
+import type { MailViewModel } from "@/features/mail/model/mail.types";
 
 interface MailTemplateCatalogProps {
-  isLoading: boolean;
-  items: MailTemplateDto[];
-  onSelect: (key: string) => void;
+  catalog: MailViewModel["templateCatalog"];
 }
 
-export function MailTemplateCatalog({
-  isLoading,
-  items,
-  onSelect,
-}: MailTemplateCatalogProps) {
+export function MailTemplateCatalog({ catalog }: MailTemplateCatalogProps) {
+  const { isLoading, isError, onRetry, items, onSelect } = catalog;
+
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -60,7 +57,19 @@ export function MailTemplateCatalog({
                 </TableCell>
               </TableRow>
             </Show>
-            {!isLoading && items.length === 0 ? (
+            {!isLoading && isError ? (
+              <TableRow>
+                <TableCell colSpan={4} className="py-8">
+                  <ErrorState
+                    variant="inline"
+                    className="m-0"
+                    title="Could not load templates."
+                    action={{ label: "Retry", onClick: onRetry }}
+                  />
+                </TableCell>
+              </TableRow>
+            ) : null}
+            {!isLoading && !isError && items.length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={4}
@@ -69,52 +78,53 @@ export function MailTemplateCatalog({
                   No templates found.
                 </TableCell>
               </TableRow>
-            ) : (
-              items.map((tmpl) => (
-                <TableRow
-                  key={tmpl.key}
-                  className="cursor-pointer"
-                  onClick={() => onSelect(tmpl.key)}
-                >
-                  <TableCell className="font-mono text-xs">
-                    {tmpl.key}
-                  </TableCell>
-                  <TableCell>
-                    {tmpl.mandatory ? (
-                      <Badge
-                        variant="outline"
-                        className="text-xs text-accent-foreground border-border"
-                      >
-                        Yes
-                      </Badge>
-                    ) : (
-                      <span className="text-xs text-muted-foreground">
-                        No
-                      </span>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {tmpl.sendable ? (
-                      <Badge
-                        variant="default"
-                        className="text-xs bg-primary/15 text-primary"
-                      >
-                        Yes
-                      </Badge>
-                    ) : (
-                      <span className="text-xs text-muted-foreground">
-                        No
-                      </span>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-xs text-muted-foreground">
-                    {tmpl.variables.length > 0
-                      ? tmpl.variables.join(", ")
-                      : "\u2014"}
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
+            ) : null}
+            {!isLoading && !isError
+              ? items.map((tmpl) => (
+                  <TableRow
+                    key={tmpl.key}
+                    className="cursor-pointer"
+                    onClick={() => onSelect(tmpl.key)}
+                  >
+                    <TableCell className="font-mono text-xs">
+                      {tmpl.key}
+                    </TableCell>
+                    <TableCell>
+                      {tmpl.mandatory ? (
+                        <Badge
+                          variant="outline"
+                          className="border-border text-xs text-accent-foreground"
+                        >
+                          Yes
+                        </Badge>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">
+                          No
+                        </span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {tmpl.sendable ? (
+                        <Badge
+                          variant="default"
+                          className="bg-primary/15 text-xs text-primary"
+                        >
+                          Yes
+                        </Badge>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">
+                          No
+                        </span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-xs text-muted-foreground">
+                      {tmpl.variables.length > 0
+                        ? tmpl.variables.join(", ")
+                        : "\u2014"}
+                    </TableCell>
+                  </TableRow>
+                ))
+              : null}
           </TableBody>
         </Table>
       </CardContent>

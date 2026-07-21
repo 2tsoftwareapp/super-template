@@ -7,10 +7,9 @@ import { Separator } from "@repo/web-ui/separator";
 import type { MailDeliveryDto } from "@/lib/api-types";
 
 import { ResourceDrawer } from "@/components/resource-drawer";
+import { mailStatusProps } from "@/features/mail/model/mail.constants";
 import { formatDateTime, formatUnknownDateTime, scalarString } from "@/lib/format";
 import { cn } from "@/lib/utils";
-
-import { mailStatusProps } from "../model/mail-schemas";
 
 interface MailDetailDrawerProps {
   selectedDelivery: MailDeliveryDto | null;

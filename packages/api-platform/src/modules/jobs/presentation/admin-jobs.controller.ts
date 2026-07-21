@@ -114,10 +114,10 @@ export class AdminJobsController {
   @Delete(':id')
   @Authorize({ permissions: [perm('jobs', ACTION.UPDATE)] })
   @ApiDataResponse(JobDto)
-  cancelJob(
+  async cancelJob(
     @CurrentUser() user: AuthenticatedRequestUser,
     @Param('id', new ParseUUIDPipe()) jobId: string,
   ) {
-    return this.cancelJobUseCase.execute(user, jobId);
+    return { data: await this.cancelJobUseCase.execute(user, jobId) };
   }
 }

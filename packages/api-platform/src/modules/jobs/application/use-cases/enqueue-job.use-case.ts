@@ -10,10 +10,9 @@ import {
 
 @Injectable()
 export class EnqueueJobUseCase {
-  private readonly jobsMapper = new JobsMapper();
-
   constructor(
     @Inject(JOBS_REPOSITORY) private readonly jobsRepository: JobsRepositoryPort,
+    private readonly jobsMapper: JobsMapper,
   ) {}
 
   async execute(input: EnqueueJobCommand): Promise<JobView> {

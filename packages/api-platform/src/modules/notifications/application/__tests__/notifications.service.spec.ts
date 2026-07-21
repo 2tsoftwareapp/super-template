@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
+import { NotificationsMapper } from '../notifications.mapper';
 import { NotificationDeliveryUseCase } from '../use-cases/notification-delivery.use-case';
 
 describe('NotificationDeliveryUseCase', () => {
@@ -29,6 +30,7 @@ describe('NotificationDeliveryUseCase', () => {
       {} as never,
       userLookup,
       {} as never,
+      new NotificationsMapper(),
       {} as never,
       {} as never,
     );

@@ -11,10 +11,9 @@ import {
 
 @Injectable()
 export class GetJobUseCase {
-  private readonly jobsMapper = new JobsMapper();
-
   constructor(
     @Inject(JOBS_REPOSITORY) private readonly jobsRepository: JobsRepositoryPort,
+    private readonly jobsMapper: JobsMapper,
   ) {}
 
   async execute(jobId: string): Promise<JobView> {

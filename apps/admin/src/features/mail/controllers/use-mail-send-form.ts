@@ -1,12 +1,17 @@
 "use client";
 
+import { getErrorMessage } from "@repo/web-utils/errors";
 import { useCallback, useMemo, useState } from "react";
+import { toast } from "sonner";
 
 import type { MailTemplateDto } from "@/lib/api-types";
 
 import { useSendMailMutation } from "@/features/mail/api/mail.mutations";
 
-export function useMailSendForm(templates: MailTemplateDto[] | undefined) {
+export function useMailSendForm(
+  templates: MailTemplateDto[] | undefined,
+  canAccess: boolean,
+) {
   const [sendTemplateKey, setSendTemplateKey] = useState("");
   const [sendRecipient, setSendRecipient] = useState("");
   const [variableValues, setVariableValues] = useState<
@@ -41,10 +46,19 @@ export function useMailSendForm(templates: MailTemplateDto[] | undefined) {
   }, []);
 
   const sendMail = useSendMailMutation({
-    onSuccess: resetForm,
+    onSuccess: () => {
+      toast.success("Test mail queued.");
+      resetForm();
+    },
+    onError: (error) => {
+      toast.error(getErrorMessage(error));
+    },
   });
 
+  const formReady = Boolean(sendTemplateKey && sendRecipient);
+
   const handleSend = useCallback(() => {
+    if (!canAccess || !formReady) return;
     sendMail.mutate({
       templateKey: sendTemplateKey,
       to: sendRecipient,
@@ -53,9 +67,18 @@ export function useMailSendForm(templates: MailTemplateDto[] | undefined) {
         ? { idempotencyKey: sendIdempotencyKey }
         : {}),
     });
-  }, [sendMail, sendTemplateKey, sendRecipient, variableValues, sendIdempotencyKey]);
+  }, [
+    canAccess,
+    formReady,
+    sendMail,
+    sendTemplateKey,
+    sendRecipient,
+    variableValues,
+    sendIdempotencyKey,
+  ]);
 
   return {
+    canAccess,
     selectedTemplateKey: sendTemplateKey,
     recipient: sendRecipient,
     variableValues,
@@ -70,6 +93,6 @@ export function useMailSendForm(templates: MailTemplateDto[] | undefined) {
     onChangeIdempotencyKey: setSendIdempotencyKey,
     onSend: handleSend,
     isPending: sendMail.isPending,
-    canSend: Boolean(sendTemplateKey && sendRecipient),
+    canSend: canAccess && formReady,
   };
 }

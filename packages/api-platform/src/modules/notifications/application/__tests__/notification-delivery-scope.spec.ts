@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { NotificationsMapper } from '../notifications.mapper';
 import { NotificationDeliveryUseCase } from '../use-cases/notification-delivery.use-case';
 
 describe('NotificationDeliveryUseCase - scope & idempotency', () => {
@@ -49,6 +50,7 @@ describe('NotificationDeliveryUseCase - scope & idempotency', () => {
       mockTenantContextService as never,
       mockUserLookup as never,
       mockDispatchService as never,
+      new NotificationsMapper(),
       mockAuditWriter as never,
       mockTransactionPort as never,
     );

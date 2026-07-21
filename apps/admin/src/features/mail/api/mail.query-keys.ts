@@ -1,5 +1,8 @@
 export const mailKeys = {
-  templates: ["admin-mail-templates"] as const,
-  deliveries: (params: Record<string, unknown>) => ["admin-mail-deliveries", "list", params] as const,
-  preview: (key: string) => ["admin-mail-preview", key] as const,
+  all: ["admin-mail"] as const,
+  templates: () => [...mailKeys.all, "templates"] as const,
+  lists: () => [...mailKeys.all, "deliveries"] as const,
+  list: (params: Record<string, unknown>) =>
+    [...mailKeys.lists(), params] as const,
+  preview: (key: string) => [...mailKeys.all, "preview", key] as const,
 };

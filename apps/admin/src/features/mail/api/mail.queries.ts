@@ -2,33 +2,36 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import {
-  fetchMailDeliveries,
-  fetchMailPreview,
-  fetchMailTemplates,
-  type MailDeliveriesParams,
-} from "./mail.api";
+import type { MailDeliveriesParams } from "@/features/mail/model/mail.types";
+
+import { mailApi } from "./mail.api";
 import { mailKeys } from "./mail.query-keys";
 
 export function useMailTemplatesQuery() {
   return useQuery({
-    queryKey: mailKeys.templates,
-    queryFn: fetchMailTemplates,
+    queryKey: mailKeys.templates(),
+    queryFn: () => mailApi.templates(),
   });
 }
 
 export function useMailDeliveriesQuery(params: MailDeliveriesParams) {
   return useQuery({
-    queryKey: mailKeys.deliveries({ templateKey: params.templateKey, status: params.status, page: params.page }),
-    queryFn: () => fetchMailDeliveries(params),
+    queryKey: mailKeys.list({
+      templateKey: params.templateKey,
+      status: params.status,
+      page: params.page,
+      limit: params.limit,
+    }),
+    queryFn: () => mailApi.deliveries(params),
     placeholderData: (previous) => previous,
+    staleTime: 0,
   });
 }
 
 export function useMailPreviewQuery(templateKey: string) {
   return useQuery({
     queryKey: mailKeys.preview(templateKey),
-    queryFn: () => fetchMailPreview(templateKey),
+    queryFn: () => mailApi.preview(templateKey),
     enabled: Boolean(templateKey),
   });
 }

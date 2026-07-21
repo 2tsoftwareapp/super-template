@@ -1,6 +1,7 @@
 "use client";
 
 import { Badge } from "@repo/web-ui/badge";
+import { ErrorState } from "@repo/web-ui/error-state";
 import { Label } from "@repo/web-ui/label";
 import { SectionLoading } from "@repo/web-ui/loading";
 import { Separator } from "@repo/web-ui/separator";
@@ -9,7 +10,6 @@ import { Show } from "@repo/web-ui/show";
 import type { JobDto, JobEventDto } from "@/lib/api-types";
 
 import { ResourceDrawer } from "@/components/resource-drawer";
-import { jobStatusProps } from "@/features/jobs/model/constants";
 import { JobsEventTimeline } from "@/features/jobs/ui/jobs-event-timeline";
 import { formatDateTime, formatUnknownDateTime, scalarString } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -17,17 +17,32 @@ import { cn } from "@/lib/utils";
 interface JobsDetailDrawerProps {
   isOpen: boolean;
   selectedJob: JobDto | null;
+  detailLoading: boolean;
+  detailError: boolean;
+  onRetryDetail: () => void;
   events: JobEventDto[];
   eventsLoading: boolean;
+  eventsError: boolean;
+  onRetryEvents: () => void;
   onClose: () => void;
+  statusProps: (status: string) => {
+    variant: "default" | "secondary" | "outline";
+    className?: string;
+  };
 }
 
 export function JobsDetailDrawer({
   isOpen,
   selectedJob,
+  detailLoading,
+  detailError,
+  onRetryDetail,
   events,
   eventsLoading,
+  eventsError,
+  onRetryEvents,
   onClose,
+  statusProps,
 }: JobsDetailDrawerProps) {
   return (
     <ResourceDrawer
@@ -36,6 +51,18 @@ export function JobsDetailDrawer({
       description={selectedJob ? `Type: ${selectedJob.type}` : "Loading\u2026"}
       onClose={onClose}
     >
+      <Show when={detailLoading && !selectedJob}>
+        <SectionLoading />
+      </Show>
+
+      <Show when={!detailLoading && detailError && !selectedJob}>
+        <ErrorState
+          variant="inline"
+          title="Could not load job detail."
+          action={{ label: "Retry", onClick: onRetryDetail }}
+        />
+      </Show>
+
       {selectedJob ? (
         <div className="space-y-4 text-sm">
           <div>
@@ -52,10 +79,10 @@ export function JobsDetailDrawer({
             <Label className="text-xs text-muted-foreground">Status</Label>
             <div className="mt-0.5">
               <Badge
-                variant={jobStatusProps(selectedJob.status ?? "").variant}
+                variant={statusProps(selectedJob.status ?? "").variant}
                 className={cn(
                   "text-xs capitalize",
-                  jobStatusProps(selectedJob.status ?? "").className,
+                  statusProps(selectedJob.status ?? "").className,
                 )}
               >
                 {String(selectedJob.status).toLowerCase()}
@@ -64,26 +91,22 @@ export function JobsDetailDrawer({
           </div>
           <Separator />
           <div>
-            <Label className="text-xs text-muted-foreground">
-              Attempts
-            </Label>
+            <Label className="text-xs text-muted-foreground">Attempts</Label>
             <p className="mt-0.5">
               {selectedJob.attempts} / {selectedJob.maxAttempts}
             </p>
           </div>
-          {selectedJob.errorMessage && (
+          {selectedJob.errorMessage ? (
             <>
               <Separator />
               <div>
-                <Label className="text-xs text-muted-foreground">
-                  Error
-                </Label>
+                <Label className="text-xs text-muted-foreground">Error</Label>
                 <p className="mt-0.5 text-destructive">
                   {scalarString(selectedJob.errorMessage)}
                 </p>
               </div>
             </>
-          )}
+          ) : null}
           <Separator />
           <div>
             <Label className="text-xs text-muted-foreground">Payload</Label>
@@ -94,22 +117,14 @@ export function JobsDetailDrawer({
           <Separator />
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label className="text-xs text-muted-foreground">
-                Created at
-              </Label>
-              <p className="mt-0.5">
-                {formatDateTime(selectedJob.createdAt)}
-              </p>
+              <Label className="text-xs text-muted-foreground">Created at</Label>
+              <p className="mt-0.5">{formatDateTime(selectedJob.createdAt)}</p>
             </div>
             <div>
-              <Label className="text-xs text-muted-foreground">
-                Updated at
-              </Label>
-              <p className="mt-0.5">
-                {formatDateTime(selectedJob.updatedAt)}
-              </p>
+              <Label className="text-xs text-muted-foreground">Updated at</Label>
+              <p className="mt-0.5">{formatDateTime(selectedJob.updatedAt)}</p>
             </div>
-            {selectedJob.startedAt && (
+            {selectedJob.startedAt ? (
               <div>
                 <Label className="text-xs text-muted-foreground">
                   Started at
@@ -118,8 +133,8 @@ export function JobsDetailDrawer({
                   {formatUnknownDateTime(selectedJob.startedAt)}
                 </p>
               </div>
-            )}
-            {selectedJob.completedAt && (
+            ) : null}
+            {selectedJob.completedAt ? (
               <div>
                 <Label className="text-xs text-muted-foreground">
                   Completed at
@@ -128,7 +143,7 @@ export function JobsDetailDrawer({
                   {formatUnknownDateTime(selectedJob.completedAt)}
                 </p>
               </div>
-            )}
+            ) : null}
           </div>
           <Separator />
           <div>
@@ -138,7 +153,6 @@ export function JobsDetailDrawer({
             </p>
           </div>
 
-          {/* Event timeline */}
           <Show when={isOpen}>
             <>
               <Separator />
@@ -146,14 +160,17 @@ export function JobsDetailDrawer({
                 <Label className="text-xs text-muted-foreground">
                   Event timeline
                 </Label>
-                <JobsEventTimeline events={events} isLoading={eventsLoading} />
+                <JobsEventTimeline
+                  events={events}
+                  isLoading={eventsLoading}
+                  isError={eventsError}
+                  onRetry={onRetryEvents}
+                />
               </div>
             </>
           </Show>
         </div>
-      ) : (
-        <SectionLoading />
-      )}
+      ) : null}
     </ResourceDrawer>
   );
 }

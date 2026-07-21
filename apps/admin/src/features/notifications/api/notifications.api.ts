@@ -9,6 +9,9 @@ import type {
 
 import { buildPath, webFetch } from "@/lib/http";
 
+/**
+ * Notifications transport layer. Paths from OpenAPI via `bffPath` (§22).
+ */
 export const notificationsApi = {
   jobs() {
     return webFetch<ListResponse<NotificationJobDto>>(
@@ -33,17 +36,9 @@ export const notificationsApi = {
   },
 
   cancelJob(jobId: string) {
-    return webFetch(
+    return webFetch<{ data: NotificationJobDto }>(
       bffPath("/api/v1/admin/notifications/jobs/{id}", { id: jobId }),
       { method: "DELETE" },
     );
   },
 };
-
-/** @deprecated Prefer `notificationsApi` */
-export const fetchNotificationJobs = () => notificationsApi.jobs();
-export const fetchRecentNotifications = () => notificationsApi.recent();
-export const sendNotification = (input: SendNotificationInput) =>
-  notificationsApi.send(input);
-export const cancelNotificationJob = (jobId: string) =>
-  notificationsApi.cancelJob(jobId);

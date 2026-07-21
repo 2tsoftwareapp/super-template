@@ -55,28 +55,32 @@ export class AdminMailController {
   @Get('preview/:templateKey')
   @Authorize({ permissions: [perm('mail', ACTION.READ)] })
   @ApiDataResponse(MailPreviewDto)
-  preview(
+  async preview(
     @Param('templateKey') templateKey: string,
     @Query() query: MailPreviewQueryDto,
   ) {
-    return this.previewMailTemplate.execute(templateKey, query.variables);
+    return {
+      data: await this.previewMailTemplate.execute(templateKey, query.variables),
+    };
   }
 
   @Post('send')
   @Authorize({ permissions: [perm('mail', ACTION.CREATE)] })
   @Throttle({ default: { limit: 10, ttl: 60_000 } })
   @ApiDataResponse(SendAdminMailResultDto, 201)
-  send(
+  async send(
     @CurrentUser() user: AuthenticatedRequestUser,
     @Body() input: SendAdminMailDto,
   ) {
-    return this.sendAdminMail.execute(user, {
-      templateKey: input.templateKey,
-      to: input.to,
-      ...(input.variables !== undefined ? { variables: input.variables } : {}),
-      ...(input.idempotencyKey !== undefined
-        ? { idempotencyKey: input.idempotencyKey }
-        : {}),
-    });
+    return {
+      data: await this.sendAdminMail.execute(user, {
+        templateKey: input.templateKey,
+        to: input.to,
+        ...(input.variables !== undefined ? { variables: input.variables } : {}),
+        ...(input.idempotencyKey !== undefined
+          ? { idempotencyKey: input.idempotencyKey }
+          : {}),
+      }),
+    };
   }
 }

@@ -16,11 +16,10 @@ import {
 
 @Injectable()
 export class NotificationInboxUseCase {
-  private readonly notificationsMapper = new NotificationsMapper();
-
   constructor(
     @Inject(NOTIFICATIONS_REPOSITORY)
     private readonly notificationsRepository: NotificationsRepositoryPort,
+    private readonly notificationsMapper: NotificationsMapper,
   ) {}
 
   async listForUser(

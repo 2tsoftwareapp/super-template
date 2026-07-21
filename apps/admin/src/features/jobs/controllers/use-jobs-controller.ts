@@ -1,9 +1,13 @@
 "use client";
 
+import { useDebouncedValue } from "@repo/web-hooks/use-debounced-value";
+import { getErrorMessage } from "@repo/web-utils/errors";
+import { useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useState } from "react";
+import { toast } from "sonner";
 
-import type { JobDto, JobEventDto, JobMetricsDto } from "@/lib/api-types";
+import type { JobsViewModel } from "@/features/jobs/model/jobs.types";
 
 import { useCancelJobMutation } from "@/features/jobs/api/jobs.mutations";
 import {
@@ -12,58 +16,38 @@ import {
   useJobMetricsQuery,
   useJobsQuery,
 } from "@/features/jobs/api/jobs.queries";
-import { type JobsFilters, parseJobsFilters } from "@/features/jobs/model/constants";
+import { jobsKeys } from "@/features/jobs/api/jobs.query-keys";
+import {
+  jobStatusProps,
+  STATUS_OPTIONS,
+} from "@/features/jobs/model/jobs.constants";
+import { selectJobPermissions } from "@/features/jobs/model/jobs.permissions";
+import {
+  type JobsFilters,
+  parseJobsFilters,
+  serializeJobsFilters,
+} from "@/features/jobs/model/jobs.search-params";
+import { useSession } from "@/hooks/use-session";
 import { usePathname, useRouter } from "@/i18n/navigation";
 
-export interface JobsViewModel {
-  header: {
-    metrics: JobMetricsDto | null;
-    metricsLoading: boolean;
-    isFetching: boolean;
-    onRefresh: () => void;
-  };
-  filters: {
-    status: string;
-    type: string;
-    onStatusChange: (value: string) => void;
-    onTypeChange: (value: string) => void;
-    onRefresh: () => void;
-    isFetching: boolean;
-  };
-  list: {
-    jobs: JobDto[];
-    total: number;
-    totalPages: number;
-    page: number;
-    isLoading: boolean;
-    isFetching: boolean;
-    emptyMessage: string;
-    onPageChange: (page: number) => void;
-  };
-  detail: {
-    selectedJob: JobDto | null;
-    isOpen: boolean;
-    detailLoading: boolean;
-    onOpen: (jobId: string) => void;
-    onClose: () => void;
-  };
-  logs: {
-    events: JobEventDto[];
-    isLoading: boolean;
-  };
-  cancel: {
-    confirmId: string | null;
-    isPending: boolean;
-    onRequest: (jobId: string) => void;
-    onConfirm: () => void;
-    onDismiss: () => void;
-  };
-}
+export type { JobsViewModel };
 
+/**
+ * Orchestration hook for the jobs queue screen.
+ *
+ * Flow:
+ *   1. Parse URL filters (status/type/page); debounce type search.
+ *   2. Parallel list + metrics queries (staleTime 0 for live queue).
+ *   3. Detail drawer loads job + logs when a row is opened.
+ *   4. Cancel: confirm → mutation → invalidate `jobsKeys.all` + toast on error.
+ */
 export function useJobsController(): JobsViewModel {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
+  const queryClient = useQueryClient();
+  const session = useSession();
+  const permissions = selectJobPermissions(session.data?.data.permissions);
 
   const [filters, setFilters] = useState<JobsFilters>(() =>
     parseJobsFilters(new URLSearchParams(searchParams.toString())),
@@ -71,38 +55,31 @@ export function useJobsController(): JobsViewModel {
   const [confirmCancel, setConfirmCancel] = useState<string | null>(null);
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
 
-  const updateFilter = useCallback(
-    (key: keyof JobsFilters, value: string | number) => {
-      const next = { ...filters, [key]: value };
-      if (key !== "page") next.page = 1;
-      setFilters(next);
-      const sp = new URLSearchParams();
-      if (next.status) sp.set("status", next.status);
-      if (next.type) sp.set("type", next.type);
-      if (next.page > 1) sp.set("page", String(next.page));
-      const qs = sp.toString();
-      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
-    },
-    [filters, pathname, router],
-  );
+  const debouncedType = useDebouncedValue(filters.type, 400);
+
+  const onFilterChange = (
+    key: keyof JobsFilters,
+    value: string | number,
+  ) => {
+    const next = { ...filters, [key]: value };
+    if (key !== "page") {
+      next.page = 1;
+    }
+    setFilters(next);
+    const qs = serializeJobsFilters(next);
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+  };
 
   const jobs = useJobsQuery({
     status: filters.status || undefined,
-    type: filters.type || undefined,
+    type: debouncedType || undefined,
     page: filters.page,
   });
 
   const metrics = useJobMetricsQuery();
-
   const jobDetail = useJobDetailQuery(selectedJobId ?? undefined);
-
   const jobLogs = useJobLogsQuery(selectedJobId ?? undefined);
-
-  const cancelJob = useCancelJobMutation({
-    onSuccess: () => {
-      setConfirmCancel(null);
-    },
-  });
+  const cancelJob = useCancelJobMutation();
 
   const allJobs = jobs.data?.data ?? [];
   const totalPages = jobs.data?.meta?.totalPages ?? 1;
@@ -115,22 +92,57 @@ export function useJobsController(): JobsViewModel {
     ? "No jobs match your filters."
     : "No jobs found.";
 
+  const retryList = () => {
+    void queryClient.invalidateQueries({ queryKey: jobsKeys.lists() });
+  };
+  const retryMetrics = () => {
+    void queryClient.invalidateQueries({ queryKey: jobsKeys.metrics });
+  };
+  const retryDetail = () => {
+    if (!selectedJobId) return;
+    void queryClient.invalidateQueries({
+      queryKey: jobsKeys.detail(selectedJobId),
+    });
+  };
+  const retryLogs = () => {
+    if (!selectedJobId) return;
+    void queryClient.invalidateQueries({
+      queryKey: jobsKeys.logs(selectedJobId),
+    });
+  };
+
+  const handleRefresh = () => {
+    void queryClient.invalidateQueries({ queryKey: jobsKeys.all });
+  };
+
+  const handleConfirmCancel = () => {
+    if (!confirmCancel) return;
+    cancelJob.mutate(confirmCancel, {
+      onSuccess: () => {
+        setConfirmCancel(null);
+      },
+      onError: (error) => {
+        toast.error(getErrorMessage(error));
+      },
+    });
+  };
+
   return {
     header: {
       metrics: metrics.data?.data ?? null,
       metricsLoading: metrics.isLoading,
+      metricsError: metrics.isError,
+      onRetryMetrics: retryMetrics,
       isFetching: jobs.isFetching || metrics.isFetching,
-      onRefresh: () => {
-        void jobs.refetch();
-        void metrics.refetch();
-      },
+      onRefresh: handleRefresh,
     },
     filters: {
       status: filters.status,
       type: filters.type,
-      onStatusChange: (value: string) => updateFilter("status", value),
-      onTypeChange: (value: string) => updateFilter("type", value),
-      onRefresh: () => void jobs.refetch(),
+      statusOptions: STATUS_OPTIONS,
+      onStatusChange: (value) => onFilterChange("status", value),
+      onTypeChange: (value) => onFilterChange("type", value),
+      onRefresh: retryList,
       isFetching: jobs.isFetching,
     },
     list: {
@@ -140,27 +152,33 @@ export function useJobsController(): JobsViewModel {
       page: filters.page,
       isLoading: jobs.isLoading,
       isFetching: jobs.isFetching,
+      isError: jobs.isError,
+      onRetry: retryList,
       emptyMessage,
-      onPageChange: (page: number) => updateFilter("page", page),
+      onPageChange: (page) => onFilterChange("page", page),
+      canCancel: permissions.canCancel,
+      statusProps: jobStatusProps,
     },
     detail: {
       selectedJob,
       isOpen: !!selectedJobId,
       detailLoading: jobDetail.isLoading,
-      onOpen: (jobId: string) => setSelectedJobId(jobId),
+      detailError: jobDetail.isError,
+      onRetryDetail: retryDetail,
+      onOpen: (jobId) => setSelectedJobId(jobId),
       onClose: () => setSelectedJobId(null),
     },
     logs: {
       events: selectedEvents,
       isLoading: jobLogs.isLoading,
+      isError: jobLogs.isError,
+      onRetry: retryLogs,
     },
     cancel: {
       confirmId: confirmCancel,
       isPending: cancelJob.isPending,
-      onRequest: (jobId: string) => setConfirmCancel(jobId),
-      onConfirm: () => {
-        if (confirmCancel) cancelJob.mutate(confirmCancel);
-      },
+      onRequest: (jobId) => setConfirmCancel(jobId),
+      onConfirm: handleConfirmCancel,
       onDismiss: () => setConfirmCancel(null),
     },
   };

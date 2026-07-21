@@ -2,22 +2,16 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { cancelJob } from "./jobs.api";
+import { jobsApi } from "./jobs.api";
 import { jobsKeys } from "./jobs.query-keys";
 
-export function useCancelJobMutation(options?: { onSuccess?: () => void }) {
+export function useCancelJobMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: cancelJob,
+    mutationFn: (jobId: string) => jobsApi.cancel(jobId),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: jobsKeys.all,
-      });
-      await queryClient.invalidateQueries({
-        queryKey: jobsKeys.metrics,
-      });
-      options?.onSuccess?.();
+      await queryClient.invalidateQueries({ queryKey: jobsKeys.all });
     },
   });
 }

@@ -14,11 +14,10 @@ import {
 
 @Injectable()
 export class CancelJobUseCase {
-  private readonly jobsMapper = new JobsMapper();
-
   constructor(
     @Inject(JOBS_REPOSITORY) private readonly jobsRepository: JobsRepositoryPort,
     @Inject(JOB_OBSERVABILITY_REPOSITORY) private readonly jobObservabilityRepository: JobObservabilityRepositoryPort,
+    private readonly jobsMapper: JobsMapper,
   ) {}
 
   async execute(

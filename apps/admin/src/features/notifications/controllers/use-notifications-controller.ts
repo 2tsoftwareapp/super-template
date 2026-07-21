@@ -1,7 +1,11 @@
 "use client";
 
+import { getErrorMessage } from "@repo/web-utils/errors";
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { toast } from "sonner";
 
+import type { NotificationsViewModel } from "@/features/notifications/model/notifications.types";
 import type { SendNotificationInput } from "@/lib/api-types";
 
 import {
@@ -12,53 +16,28 @@ import {
   useNotificationJobsQuery,
   useRecentNotificationsQuery,
 } from "@/features/notifications/api/notifications.queries";
+import { notificationsKeys } from "@/features/notifications/api/notifications.query-keys";
+import { notificationJobStatusProps } from "@/features/notifications/model/notifications.constants";
+import { selectNotificationPermissions } from "@/features/notifications/model/notifications.permissions";
+import { useSession } from "@/hooks/use-session";
 
-type NotificationJob = NonNullable<
-  ReturnType<typeof useNotificationJobsQuery>["data"]
->["data"][number];
-type RecentNotification = NonNullable<
-  ReturnType<typeof useRecentNotificationsQuery>["data"]
->["data"][number];
-
-export interface NotificationsViewModel {
-  isRefreshing: boolean;
-  onRefresh: () => void;
-  compose: {
-    audience: string;
-    userId: string;
-    userIds: string;
-    type: string;
-    title: string;
-    body: string;
-    onAudienceChange: (value: string) => void;
-    onUserIdChange: (value: string) => void;
-    onUserIdsChange: (value: string) => void;
-    onTypeChange: (value: string) => void;
-    onTitleChange: (value: string) => void;
-    onBodyChange: (value: string) => void;
-    isSending: boolean;
-    isError: boolean;
-    onSend: () => void;
-  };
-  jobs: {
-    isLoading: boolean;
-    data: NotificationJob[];
-    onRefresh: () => void;
-    isCancelling: boolean;
-    onCancel: (jobId: string) => void;
-  };
-  recent: {
-    isLoading: boolean;
-    data: RecentNotification[];
-  };
-}
+export type { NotificationsViewModel };
 
 /**
- * Orchestration hook for the notifications screen: compose-form state, send +
- * cancel mutations, delivery-jobs and recent-notifications queries. Returns a
- * view model consumed by the presentational NotificationsView.
+ * Orchestration hook for the notifications screen.
+ *
+ * Flow:
+ *   1. Load delivery jobs + recent inbox in parallel (staleTime 0).
+ *   2. Gate compose/cancel on `notifications.create`.
+ *   3. Send/cancel mutations toast errors and invalidate related keys.
  */
 export function useNotificationsController(): NotificationsViewModel {
+  const queryClient = useQueryClient();
+  const session = useSession();
+  const permissions = selectNotificationPermissions(
+    session.data?.data.permissions,
+  );
+
   const jobs = useNotificationJobsQuery();
   const recentNotifications = useRecentNotificationsQuery();
 
@@ -69,20 +48,7 @@ export function useNotificationsController(): NotificationsViewModel {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
 
-  const send = useSendNotificationMutation({
-    onSuccess: () => {
-      setTitle("");
-      setBody("");
-      setType("SYSTEM");
-      setUserId("");
-      setUserIds("");
-      setAudience("ALL");
-    },
-  });
-
-  const cancelJob = useCancelNotificationJobMutation();
-
-  const handleSend = () => {
+  const buildInput = (): SendNotificationInput => {
     const input: SendNotificationInput = {
       audience: audience as SendNotificationInput["audience"],
       type,
@@ -95,18 +61,56 @@ export function useNotificationsController(): NotificationsViewModel {
         .split(/[\n,]+/)
         .map((s) => s.trim())
         .filter(Boolean);
-    send.mutate(input);
+    return input;
   };
 
-  const invalidateAll = () => {
-    void jobs.refetch();
-    void recentNotifications.refetch();
+  const send = useSendNotificationMutation({
+    onSuccess: () => {
+      toast.success("Notification queued.");
+      setTitle("");
+      setBody("");
+      setType("SYSTEM");
+      setUserId("");
+      setUserIds("");
+      setAudience("ALL");
+    },
+    onError: (error) => {
+      toast.error(getErrorMessage(error));
+    },
+  });
+
+  const cancelJob = useCancelNotificationJobMutation({
+    onError: (error) => {
+      toast.error(getErrorMessage(error));
+    },
+  });
+
+  const handleSend = () => {
+    if (!permissions.canSend) return;
+    send.mutate(buildInput());
+  };
+
+  const retryJobs = () => {
+    void queryClient.invalidateQueries({
+      queryKey: notificationsKeys.jobs(),
+    });
+  };
+  const retryRecent = () => {
+    void queryClient.invalidateQueries({
+      queryKey: notificationsKeys.recent(),
+    });
+  };
+  const handleRefresh = () => {
+    void queryClient.invalidateQueries({
+      queryKey: notificationsKeys.all,
+    });
   };
 
   return {
     isRefreshing: jobs.isFetching || recentNotifications.isFetching,
-    onRefresh: invalidateAll,
+    onRefresh: handleRefresh,
     compose: {
+      canAccess: permissions.canSend,
       audience,
       userId,
       userIds,
@@ -121,17 +125,24 @@ export function useNotificationsController(): NotificationsViewModel {
       onBodyChange: setBody,
       isSending: send.isPending,
       isError: send.isError,
+      onRetrySend: handleSend,
       onSend: handleSend,
     },
     jobs: {
       isLoading: jobs.isLoading,
+      isError: jobs.isError,
+      onRetry: retryJobs,
       data: jobs.data?.data ?? [],
-      onRefresh: () => void jobs.refetch(),
+      onRefresh: retryJobs,
+      canCancel: permissions.canCancel,
       isCancelling: cancelJob.isPending,
       onCancel: (jobId) => cancelJob.mutate(jobId),
+      statusProps: notificationJobStatusProps,
     },
     recent: {
       isLoading: recentNotifications.isLoading,
+      isError: recentNotifications.isError,
+      onRetry: retryRecent,
       data: recentNotifications.data?.data ?? [],
     },
   };

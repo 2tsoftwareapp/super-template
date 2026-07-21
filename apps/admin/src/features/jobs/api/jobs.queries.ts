@@ -2,42 +2,44 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import {
-  fetchJobDetail,
-  fetchJobLogs,
-  fetchJobMetrics,
-  fetchJobs,
-  type JobsParams,
-} from "./jobs.api";
+import { jobsApi, type JobsParams } from "./jobs.api";
 import { jobsKeys } from "./jobs.query-keys";
 
 export function useJobsQuery(params: JobsParams) {
   return useQuery({
-    queryKey: jobsKeys.list({ status: params.status, type: params.type, page: params.page }),
-    queryFn: () => fetchJobs(params),
+    queryKey: jobsKeys.list({
+      status: params.status,
+      type: params.type,
+      page: params.page,
+    }),
+    queryFn: () => jobsApi.list(params),
     placeholderData: (previous) => previous,
+    staleTime: 0,
   });
 }
 
 export function useJobMetricsQuery() {
   return useQuery({
     queryKey: jobsKeys.metrics,
-    queryFn: fetchJobMetrics,
+    queryFn: () => jobsApi.metrics(),
+    staleTime: 0,
   });
 }
 
 export function useJobDetailQuery(jobId: string | undefined) {
   return useQuery({
     queryKey: jobsKeys.detail(jobId ?? ""),
-    queryFn: () => fetchJobDetail(jobId!),
+    queryFn: () => jobsApi.get(jobId!),
     enabled: !!jobId,
+    staleTime: 0,
   });
 }
 
 export function useJobLogsQuery(jobId: string | undefined) {
   return useQuery({
     queryKey: jobsKeys.logs(jobId ?? ""),
-    queryFn: () => fetchJobLogs(jobId!),
+    queryFn: () => jobsApi.logs(jobId!),
     enabled: !!jobId,
+    staleTime: 0,
   });
 }

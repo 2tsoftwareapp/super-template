@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 
+import { MailMapper } from '../mail.mapper';
 import { MAIL_DELIVERIES_REPOSITORY, type MailDeliveriesRepositoryPort } from '../ports/mail-deliveries.repository.port';
 
 export interface ListMailDeliveriesQuery {
@@ -13,6 +14,7 @@ export interface ListMailDeliveriesQuery {
 export class ListMailDeliveriesUseCase {
   constructor(
     @Inject(MAIL_DELIVERIES_REPOSITORY) private readonly mailDeliveriesRepository: MailDeliveriesRepositoryPort,
+    private readonly mailMapper: MailMapper,
   ) {}
 
   async execute(query: ListMailDeliveriesQuery) {
@@ -26,17 +28,7 @@ export class ListMailDeliveriesUseCase {
     });
 
     return {
-      rows: result.rows.map((row) => ({
-        id: row.id,
-        templateKey: row.templateKey,
-        recipient: row.recipient,
-        subject: row.subject,
-        status: row.status,
-        errorMessage: row.errorMessage ?? null,
-        metadata: row.metadata ?? null,
-        sentAt: row.sentAt?.toISOString() ?? null,
-        createdAt: row.createdAt.toISOString(),
-      })),
+      rows: result.rows.map((row) => this.mailMapper.toDeliveryView(row)),
       total: result.total,
     };
   }

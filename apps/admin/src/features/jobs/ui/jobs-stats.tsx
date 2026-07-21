@@ -2,7 +2,7 @@
 
 import type { JobMetricsDto } from "@/lib/api-types";
 
-import { getStatusCount } from "@/features/jobs/model/constants";
+import { getStatusCount } from "@/features/jobs/model/jobs.metrics";
 import { cn } from "@/lib/utils";
 
 function StatChip({

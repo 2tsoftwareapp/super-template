@@ -46,8 +46,6 @@ const RECIPIENT_BATCH_SIZE = 100;
 
 @Injectable()
 export class NotificationDeliveryUseCase {
-  private readonly notificationsMapper = new NotificationsMapper();
-
   constructor(
     @Inject(NOTIFICATION_JOBS_REPOSITORY)
     private readonly notificationJobsRepository: NotificationJobsRepositoryPort,
@@ -56,6 +54,7 @@ export class NotificationDeliveryUseCase {
     private readonly tenantContextService: TenantContextService,
     @Inject(USER_LOOKUP) private readonly userLookup: UserLookup,
     private readonly dispatchService: NotificationDispatchService,
+    private readonly notificationsMapper: NotificationsMapper,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
     @Inject(TRANSACTION_PORT)
     private readonly transactionPort: TransactionPort,

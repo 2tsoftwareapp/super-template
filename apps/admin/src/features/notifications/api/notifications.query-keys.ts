@@ -1,4 +1,5 @@
 export const notificationsKeys = {
-  jobs: ["admin-notification-jobs"] as const,
-  recent: ["admin-notifications"] as const,
+  all: ["admin-notifications"] as const,
+  jobs: () => [...notificationsKeys.all, "jobs"] as const,
+  recent: () => [...notificationsKeys.all, "recent"] as const,
 };

@@ -2,6 +2,7 @@ import { forwardRef, Module } from '@nestjs/common';
 import { MAIL_TEMPLATE_SENDER } from '@repo/api-core';
 
 import { JobsModule } from '../jobs/jobs.module';
+import { MailMapper } from './application/mail.mapper';
 import { MailService } from './application/mail.service';
 import { MAILER } from './application/mailer.interface';
 import { MAIL_DELIVERIES_REPOSITORY } from './application/ports/mail-deliveries.repository.port';
@@ -22,6 +23,7 @@ import { AdminMailController } from './presentation/admin-mail.controller';
   providers: [
     SmtpMailerService,
     TemplateRendererService,
+    MailMapper,
     MailDeliveriesRepository,
     {
       provide: MAIL_DELIVERIES_REPOSITORY,

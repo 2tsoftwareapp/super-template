@@ -31,8 +31,6 @@ import { NotificationDispatchService } from '../services/notification-dispatch.s
 
 @Injectable()
 export class SendNotificationUseCase {
-  private readonly notificationsMapper = new NotificationsMapper();
-
   constructor(
     @Inject(NOTIFICATIONS_REPOSITORY)
     private readonly notificationsRepository: NotificationsRepositoryPort,
@@ -42,6 +40,7 @@ export class SendNotificationUseCase {
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
     @Inject(TRANSACTION_PORT)
     private readonly transactionPort: TransactionPort,
+    private readonly notificationsMapper: NotificationsMapper,
   ) {}
 
   async execute(

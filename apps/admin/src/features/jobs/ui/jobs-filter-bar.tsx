@@ -9,12 +9,17 @@ import {
 } from "@repo/web-ui/card";
 import { RefreshCw } from "lucide-react";
 
-import { STATUS_OPTIONS } from "@/features/jobs/model/constants";
 import { cn } from "@/lib/utils";
+
+interface StatusOption {
+  value: string;
+  label: string;
+}
 
 interface JobsFilterBarProps {
   status: string;
   type: string;
+  statusOptions: readonly StatusOption[];
   onStatusChange: (value: string) => void;
   onTypeChange: (value: string) => void;
   onRefresh: () => void;
@@ -24,6 +29,7 @@ interface JobsFilterBarProps {
 export function JobsFilterBar({
   status,
   type,
+  statusOptions,
   onStatusChange,
   onTypeChange,
   onRefresh,
@@ -57,8 +63,8 @@ export function JobsFilterBar({
             value={status}
             onChange={(e) => onStatusChange(e.target.value)}
           >
-            {STATUS_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
+            {statusOptions.map((opt) => (
+              <option key={opt.value || "all"} value={opt.value}>
                 {opt.label}
               </option>
             ))}

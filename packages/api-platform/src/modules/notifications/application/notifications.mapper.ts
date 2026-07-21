@@ -1,7 +1,10 @@
+import { Injectable } from '@nestjs/common';
+
 import type { NotificationJobView, NotificationView } from './notifications.types';
 import type { NotificationJobRecord } from './ports/notification-jobs.repository.port';
 import type { NotificationRecord } from './ports/notifications.repository.port';
 
+@Injectable()
 export class NotificationsMapper {
   toNotificationView(notification: NotificationRecord): NotificationView {
     return {
