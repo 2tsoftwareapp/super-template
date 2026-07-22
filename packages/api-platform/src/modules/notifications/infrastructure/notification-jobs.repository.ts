@@ -144,7 +144,7 @@ export class NotificationJobsRepository implements NotificationJobsRepositoryPor
   /**
    * Atomically claim up to `limit` pending jobs that are due.
    * Step 1: SELECT … FOR UPDATE SKIP LOCKED so concurrent workers each get distinct rows.
-   * Step 2: UPDATE those IDs to PROCESSING in the same transaction.
+   * Step 2: UPDATE those IDs to PROCESSING and increment attempts in the same transaction.
    * Returns the claimed jobs ready for processing.
    */
   async claimDue(limit: number, executor: DatabaseExecutor = this.database) {
@@ -152,7 +152,7 @@ export class NotificationJobsRepository implements NotificationJobsRepositoryPor
     const claimed = await executor.execute<{ id: string }>(
       sql`
         UPDATE notification_jobs
-        SET status = 'PROCESSING', updated_at = now()
+        SET status = 'PROCESSING', attempts = attempts + 1, updated_at = now()
         WHERE id IN (
           SELECT id FROM notification_jobs
           WHERE status = 'PENDING' AND scheduled_at <= now()
@@ -254,5 +254,67 @@ export class NotificationJobsRepository implements NotificationJobsRepositoryPor
       .returning();
 
     return job ?? null;
+  }
+
+  /**
+   * Recover jobs stuck in PROCESSING beyond `timeoutMinutes`.
+   *
+   * Flow:
+   *   - attempts < maxAttempts → reset to PENDING (will be retried by claimDue).
+   *   - attempts >= maxAttempts → mark FAILED (no more retries).
+   *
+   * Uses FOR UPDATE SKIP LOCKED so concurrent cron workers don't double-recover.
+   */
+  async recoverStaleProcessing(
+    timeoutMinutes: number,
+    maxAttempts: number,
+    executor: DatabaseExecutor = this.database,
+  ) {
+    const staleIds = await executor.execute<{ id: string }>(
+      sql`
+        SELECT id FROM notification_jobs
+        WHERE status = 'PROCESSING'
+          AND updated_at < now() - make_interval(mins => ${timeoutMinutes})
+        LIMIT 100
+        FOR UPDATE SKIP LOCKED
+      `,
+    );
+
+    if (!staleIds.rows || staleIds.rows.length === 0) {
+      return { recovered: [], failed: [] };
+    }
+
+    const ids = staleIds.rows.map((r) => r.id);
+
+    // Split into retry vs exhaust buckets
+    const [retryRows, failRows] = await Promise.all([
+      executor
+        .update(notificationJobs)
+        .set({ status: 'PENDING', updatedAt: new Date() })
+        .where(
+          and(
+            sql`${notificationJobs.id} = ANY(${ids})`,
+            sql`${notificationJobs.attempts} < ${maxAttempts}`,
+          ),
+        )
+        .returning(),
+      executor
+        .update(notificationJobs)
+        .set({
+          status: 'FAILED',
+          errorMessage: 'Max attempts exceeded during stale recovery',
+          processedAt: new Date(),
+          updatedAt: new Date(),
+        })
+        .where(
+          and(
+            sql`${notificationJobs.id} = ANY(${ids})`,
+            sql`${notificationJobs.attempts} >= ${maxAttempts}`,
+          ),
+        )
+        .returning(),
+    ]);
+
+    return { recovered: retryRows, failed: failRows };
   }
 }

@@ -17,15 +17,13 @@ export class NotificationDeviceUseCase {
     user: AuthenticatedRequestUser,
     input: RegisterDeviceCommand,
   ) {
-    const deviceToken = await this.deviceTokensRepository.upsert({
+    const result = await this.deviceTokensRepository.registerOrTransfer({
       userId: user.userId,
       token: input.token,
       platform: input.platform,
     });
 
-    if (!deviceToken) {
-      throw new Error('Device token upsert returned no rows');
-    }
+    const deviceToken = result.token;
 
     return {
       id: deviceToken.id,

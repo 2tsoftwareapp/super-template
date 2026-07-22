@@ -178,7 +178,7 @@ export class AdminNotificationsController {
   }
 
   @Get('jobs')
-  @Authorize({ permissions: [perm('notifications', ACTION.CREATE)] })
+  @Authorize({ permissions: [perm('notifications', ACTION.READ)] })
   @ApiPaginatedResponse(NotificationJobDto)
   async listJobs(
     @CurrentUser() actor: AuthenticatedRequestUser,
@@ -199,7 +199,7 @@ export class AdminNotificationsController {
   }
 
   @Get('jobs/:id')
-  @Authorize({ permissions: [perm('notifications', ACTION.CREATE)] })
+  @Authorize({ permissions: [perm('notifications', ACTION.READ)] })
   @ApiDataResponse(NotificationJobDto)
   async getJob(
     @CurrentUser() actor: AuthenticatedRequestUser,

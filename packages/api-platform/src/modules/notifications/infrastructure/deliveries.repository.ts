@@ -118,33 +118,68 @@ export class DeliveriesRepository implements DeliveriesRepositoryPort {
     return delivery ?? null;
   }
 
+  /**
+   * Recover PROCESSING deliveries stuck beyond `timeoutMinutes`.
+   *
+   * - attempts < MAX_RETRY_ATTEMPTS → reset to PENDING for retry.
+   * - attempts >= MAX_RETRY_ATTEMPTS → mark FAILED so they don't loop forever.
+   *
+   * Uses FOR UPDATE SKIP LOCKED so concurrent workers don't double-recover.
+   */
   async recoverStaleProcessing(
     timeoutMinutes: number,
     executor: DatabaseExecutor = this.database,
   ) {
-    const recovered = await executor.execute<{ id: string }>(
+    const MAX_RETRY_ATTEMPTS = 5;
+
+    const staleIds = await executor.execute<{ id: string }>(
       sql`
-        UPDATE notification_deliveries
-        SET status = 'PENDING',
-            next_attempt_at = now(),
-            last_error = 'Recovered from stale PROCESSING',
-            updated_at = now()
-        WHERE id IN (
-          SELECT id FROM notification_deliveries
-          WHERE status = 'PROCESSING'
-            AND updated_at < now() - make_interval(mins => ${timeoutMinutes})
-          LIMIT 100
-          FOR UPDATE SKIP LOCKED
-        )
-        RETURNING id
+        SELECT id FROM notification_deliveries
+        WHERE status = 'PROCESSING'
+          AND updated_at < now() - make_interval(mins => ${timeoutMinutes})
+        LIMIT 100
+        FOR UPDATE SKIP LOCKED
       `,
     );
 
-    if (!recovered.rows || recovered.rows.length === 0) {
+    if (!staleIds.rows || staleIds.rows.length === 0) {
       return [];
     }
 
-    const ids = recovered.rows.map((r) => r.id);
+    const ids = staleIds.rows.map((r) => r.id);
+
+    // Rows under the attempt cap → retry; at/above cap → fail permanently.
+    await Promise.all([
+      executor
+        .update(notificationDeliveries)
+        .set({
+          status: 'PENDING',
+          nextAttemptAt: new Date(),
+          lastError: 'Recovered from stale PROCESSING',
+          updatedAt: new Date(),
+        })
+        .where(
+          and(
+            sql`${notificationDeliveries.id} = ANY(${ids})`,
+            sql`${notificationDeliveries.attempts} < ${MAX_RETRY_ATTEMPTS}`,
+          ),
+        ),
+      executor
+        .update(notificationDeliveries)
+        .set({
+          status: 'FAILED',
+          lastError: 'Max retry attempts exceeded during stale recovery',
+          updatedAt: new Date(),
+        })
+        .where(
+          and(
+            sql`${notificationDeliveries.id} = ANY(${ids})`,
+            sql`${notificationDeliveries.attempts} >= ${MAX_RETRY_ATTEMPTS}`,
+          ),
+        ),
+    ]);
+
+    // Return all affected rows (both buckets) for logging
     return executor
       .select()
       .from(notificationDeliveries)

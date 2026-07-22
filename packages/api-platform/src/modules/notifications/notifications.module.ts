@@ -35,6 +35,10 @@ import {
     DeviceTokensRepository,
     DeliveriesRepository,
     NotificationStreamService,
+    {
+      provide: DEVICE_TOKENS_REPOSITORY,
+      useExisting: DeviceTokensRepository,
+    },
     FcmPushService,
     NotificationsMapper,
     NotificationDispatchService,
@@ -56,10 +60,6 @@ import {
     {
       provide: NOTIFICATION_JOBS_REPOSITORY,
       useExisting: NotificationJobsRepository,
-    },
-    {
-      provide: DEVICE_TOKENS_REPOSITORY,
-      useExisting: DeviceTokensRepository,
     },
     {
       provide: DELIVERIES_REPOSITORY,

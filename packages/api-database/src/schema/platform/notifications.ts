@@ -141,6 +141,7 @@ export const notificationJobs = pgTable(
     data: jsonb('data').$type<JsonObject | null>(),
     scheduledAt: timestamp('scheduled_at', { withTimezone: true }).notNull(),
     status: notificationJobStatusEnum('status').notNull().default('PENDING'),
+    attempts: integer('attempts').notNull().default(0),
     recipientCount: integer('recipient_count'),
     processedAt: timestamp('processed_at', { withTimezone: true }),
     errorMessage: text('error_message'),

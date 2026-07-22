@@ -80,7 +80,7 @@ export const adminResources: AdminResourceConfig[] = [
     path: "/notifications",
     icon: Megaphone,
     features: ["list", "create"],
-    permissions: ["notifications.read"],
+    permissions: ["notifications.create"],
     queryKey: "admin-notifications",
   },
   {

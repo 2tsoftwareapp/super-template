@@ -5,11 +5,12 @@ import { useQuery } from "@tanstack/react-query";
 import { notificationsApi } from "./notifications.api";
 import { notificationsKeys } from "./notifications.query-keys";
 
-export function useNotificationJobsQuery() {
+export function useNotificationJobsQuery(enabled = true) {
   return useQuery({
     queryKey: notificationsKeys.jobs(),
     queryFn: () => notificationsApi.jobs(),
     staleTime: 0,
+    enabled,
   });
 }
 

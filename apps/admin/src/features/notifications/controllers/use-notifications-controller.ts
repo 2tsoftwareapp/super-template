@@ -40,7 +40,7 @@ export function useNotificationsController(): NotificationsViewModel {
     session.data?.data.permissions,
   );
 
-  const jobs = useNotificationJobsQuery();
+  const jobs = useNotificationJobsQuery(permissions.canRead);
   const recentNotifications = useRecentNotificationsQuery();
 
   const [audience, setAudience] = useState("ALL");

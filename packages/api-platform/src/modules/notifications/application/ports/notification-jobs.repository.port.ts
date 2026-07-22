@@ -19,6 +19,7 @@ export interface NotificationJobRecord {
   data: JsonObject | null;
   scheduledAt: Date;
   status: NotificationJobStatusType;
+  attempts: number;
   recipientCount: number | null;
   processedAt: Date | null;
   errorMessage: string | null;
@@ -111,6 +112,19 @@ export interface NotificationJobsRepositoryPort {
     jobId: string,
     executor?: TransactionExecutor,
   ): Promise<NotificationJobRecord | null>;
+  /**
+   * Recover PROCESSING jobs that have been stuck longer than `timeoutMinutes`.
+   * Jobs under the attempt cap are reset to PENDING so they can be retried.
+   * Jobs at or above the cap are moved to FAILED so they don't loop forever.
+   *
+   * Called by NotificationJobsProcessor on each cron tick so a crash between
+   * claimDue() and markCompleted/markFailed never leaves a job stranded.
+   */
+  recoverStaleProcessing(
+    timeoutMinutes: number,
+    maxAttempts: number,
+    executor?: TransactionExecutor,
+  ): Promise<{ recovered: NotificationJobRecord[]; failed: NotificationJobRecord[] }>;
 }
 
 export const NOTIFICATION_JOBS_REPOSITORY = Symbol(

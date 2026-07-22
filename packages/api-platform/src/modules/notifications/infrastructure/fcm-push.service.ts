@@ -1,11 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { Inject } from '@nestjs/common';
 import { EnvironmentService } from '@repo/api-core';
 import { type App, cert, getApps, initializeApp } from 'firebase-admin/app';
 import { getMessaging } from 'firebase-admin/messaging';
 
 import type { PushMessage, PushNotifier, PushSendResult } from '../application/push.interface';
 
-import { DeviceTokensRepository } from './device-tokens.repository';
+import { DEVICE_TOKENS_REPOSITORY, type DeviceTokensRepositoryPort } from '../application/ports/device-tokens.repository.port';
 
 @Injectable()
 export class FcmPushService implements PushNotifier {
@@ -14,7 +15,8 @@ export class FcmPushService implements PushNotifier {
 
   constructor(
     private readonly environmentService: EnvironmentService,
-    private readonly deviceTokensRepository: DeviceTokensRepository,
+    @Inject(DEVICE_TOKENS_REPOSITORY)
+    private readonly deviceTokensRepository: DeviceTokensRepositoryPort,
   ) {
     const { FCM_PROJECT_ID, FCM_CLIENT_EMAIL, FCM_PRIVATE_KEY } =
       this.environmentService.values;
