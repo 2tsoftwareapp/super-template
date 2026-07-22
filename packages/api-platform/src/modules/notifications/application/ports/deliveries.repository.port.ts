@@ -40,6 +40,18 @@ export interface DeliveriesRepositoryPort {
     executor?: TransactionExecutor,
   ): Promise<DeliveryRecord | null>;
 
+  /**
+   * Conditionally mark a delivery as SENT only when it is still in PROCESSING
+   * state. Returns null if the row was already invalidated (FAILED/CANCELLED)
+   * by a concurrent token transfer — the caller must treat null as "do not
+   * retry; delivery was superseded".
+   */
+  markSentIfProcessing(
+    deliveryId: string,
+    providerMessageId: string | null,
+    executor?: TransactionExecutor,
+  ): Promise<DeliveryRecord | null>;
+
   markFailed(
     deliveryId: string,
     error: string,

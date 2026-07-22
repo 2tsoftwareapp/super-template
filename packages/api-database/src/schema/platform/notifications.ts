@@ -1,6 +1,6 @@
 import type { JsonObject } from '@repo/api-core';
 
-import { sql } from 'drizzle-orm';
+import { isNull, sql } from 'drizzle-orm';
 import {
   index,
   integer,
@@ -81,7 +81,9 @@ export const notificationDeviceTokens = pgTable(
     ...timestamps,
   },
   (table) => [
-    uniqueIndex('notification_device_tokens_token_unique').on(table.token),
+    uniqueIndex('notification_device_tokens_active_token_unique')
+      .on(table.token)
+      .where(isNull(table.disabledAt)),
     index('notification_device_tokens_user_id_idx').on(table.userId),
   ],
 );

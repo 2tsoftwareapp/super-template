@@ -1,6 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import {
+  ADVISORY_LOCK_PORT,
+  type AdvisoryLockPort,
   APP_LOGGER,
   type AppLogger,
   ErrorReporterService,
@@ -19,6 +21,22 @@ const DELIVERY_BATCH_SIZE = 50;
 const MAX_RETRY_ATTEMPTS = 5;
 const RECOVERY_INTERVAL = 10; // Run stale recovery every Nth tick (~5min at 30s interval)
 
+/**
+ * Derive a stable 32-bit integer lock ID from a token string.
+ * Advisory locks are per-session so two different tokens map to different
+ * numeric IDs with overwhelming probability (birthday bound ~2^16 collisions
+ * in 2^32 space, acceptable for per-token serialization).
+ */
+function tokenLockId(token: string): number {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < token.length; i++) {
+    h ^= token.charCodeAt(i);
+    h = (Math.imul(h, 0x01000193) >>> 0);
+  }
+  // pg_try_advisory_lock takes a signed int4; keep positive by masking top bit
+  return h & 0x7fffffff;
+}
+
 @Injectable()
 export class NotificationDeliveryProcessor {
   private processing = false;
@@ -33,6 +51,8 @@ export class NotificationDeliveryProcessor {
     private readonly deviceTokensRepository: DeviceTokensRepositoryPort,
     @Inject(PUSH_NOTIFIER)
     private readonly pushNotifier: PushNotifier,
+    @Inject(ADVISORY_LOCK_PORT)
+    private readonly advisoryLock: AdvisoryLockPort,
     @Inject(APP_LOGGER) private readonly logger: AppLogger,
     private readonly errorReporter: ErrorReporterService,
     private readonly tenantContextService: TenantContextService,
@@ -77,7 +97,7 @@ export class NotificationDeliveryProcessor {
           const notificationIds = [...new Set(deliveries.map((d) => d.notificationId))];
           const tokenIds = [...new Set(deliveries.map((d) => d.deviceTokenId))];
 
-          const [notifications, tokens] = await Promise.all([
+          const [notificationResults, tokens] = await Promise.all([
             Promise.all(
               notificationIds.map((id) => this.notificationsRepository.findById(id)),
             ),
@@ -85,77 +105,14 @@ export class NotificationDeliveryProcessor {
           ]);
 
           const notificationMap = new Map(
-            notifications.filter(Boolean).map((n) => [n!.id, n!]),
+            notificationResults.filter(Boolean).map((n) => [n!.id, n!]),
           );
           const tokenMap = new Map(
             tokens.map((t) => [t.id, t]),
           );
 
           for (const delivery of deliveries) {
-            const notification = notificationMap.get(delivery.notificationId);
-            const deviceToken = tokenMap.get(delivery.deviceTokenId);
-
-            if (!notification || !deviceToken) {
-              await this.deliveriesRepository.markFailed(
-                delivery.id,
-                'Missing notification or device token',
-              );
-              continue;
-            }
-
-            if (notification.userId !== deviceToken.userId) {
-              await this.deliveriesRepository.markFailed(
-                delivery.id,
-                'Notification owner does not match device token owner',
-              );
-              continue;
-            }
-
-            const message: PushMessage = {
-              notificationId: notification.id,
-              type: notification.type,
-              title: notification.title,
-              body: notification.body,
-              data: notification.data,
-            };
-
-            const result = await this.pushNotifier.sendToToken(
-              deviceToken.token,
-              message,
-            );
-
-            if (result.success) {
-              await this.deliveriesRepository.markSent(
-                delivery.id,
-                result.providerMessageId,
-              );
-            } else if (result.error === 'INVALID_TOKEN') {
-              await this.deviceTokensRepository.disableTokens([deviceToken.token], 'FCM returned INVALID_TOKEN');
-              await this.deliveriesRepository.markFailed(
-                delivery.id,
-                'Invalid device token',
-              );
-              this.logger.warn(
-                `Disabled invalid token ${deviceToken.token} for delivery ${delivery.id}`,
-              );
-            } else if (delivery.attempts >= MAX_RETRY_ATTEMPTS) {
-              await this.deliveriesRepository.markFailed(
-                delivery.id,
-                `Max retries exceeded: ${result.error}`,
-              );
-            } else {
-              const backoffMinutes = Math.pow(2, delivery.attempts - 1);
-              const nextAttemptAt = new Date(
-                Date.now() + backoffMinutes * 60 * 1000,
-              );
-              await this.deliveriesRepository.markRetryable(
-                delivery.id,
-                nextAttemptAt,
-              );
-              this.logger.warn(
-                `Delivery ${delivery.id} will retry in ${backoffMinutes}min (attempt ${delivery.attempts}/${MAX_RETRY_ATTEMPTS}): ${result.error}`,
-              );
-            }
+            await this.processOneDelivery(delivery, notificationMap, tokenMap);
           }
         },
       );
@@ -183,6 +140,141 @@ export class NotificationDeliveryProcessor {
       }
     } finally {
       this.processing = false;
+    }
+  }
+
+  /**
+   * Process a single delivery with per-token advisory locking to eliminate the
+   * TOCTOU race between the processor's owner-check + FCM send and a concurrent
+   * registerOrTransfer() call on the same token.
+   *
+   * Serialization contract (shared with DeviceTokensRepository.registerOrTransfer):
+   *   Both paths acquire pg_try_advisory_lock(tokenLockId(token)) before
+   *   mutating ownership or sending FCM. If the lock cannot be acquired
+   *   immediately the delivery is left in PROCESSING and will be recovered
+   *   by the stale-recovery cron.
+   *
+   * Flow:
+   *   1. Look up notification and the device-token row by the IDs captured at
+   *      claim time — if either is gone, fail the delivery.
+   *   2. Acquire per-token advisory lock. If unavailable (transfer in progress),
+   *      skip and let stale recovery retry the delivery later.
+   *   3. Re-read the active token from DB inside the lock to get the latest
+   *      ownership state (the pre-claim tokenMap is stale after a transfer).
+   *   4. Verify notification.userId === freshToken.userId; fail if mismatch.
+   *   5. Send to FCM.
+   *   6. markSentIfProcessing — conditional so a racing transfer that already
+   *      set the row to FAILED cannot be overwritten.
+   *   7. Release lock.
+   */
+  private async processOneDelivery(
+    delivery: { id: string; notificationId: string; deviceTokenId: string; attempts: number },
+    notificationMap: Map<string, { id: string; userId: string; type: string; title: string; body: string; data: unknown }>,
+    tokenMap: Map<string, { id: string; userId: string; token: string }>,
+  ) {
+    const notification = notificationMap.get(delivery.notificationId);
+    const preClaimToken = tokenMap.get(delivery.deviceTokenId);
+
+    if (!notification || !preClaimToken) {
+      await this.deliveriesRepository.markFailed(
+        delivery.id,
+        'Missing notification or device token',
+      );
+      return;
+    }
+
+    // Acquire the per-token lock. Returns null immediately if another session
+    // holds it (i.e. registerOrTransfer is running concurrently for this token).
+    const lockResult = await this.advisoryLock.withAdvisoryLock(
+      tokenLockId(preClaimToken.token),
+      async () => {
+        // Step 3: Re-read the active token inside the lock — ownership may have
+        // changed between claimPending and now.
+        const freshToken = await this.deviceTokensRepository.listActiveByToken(
+          preClaimToken.token,
+        );
+
+        // Token was disabled (e.g. transferred) before we acquired the lock.
+        if (!freshToken) {
+          await this.deliveriesRepository.markFailed(
+            delivery.id,
+            'Device token was deactivated before send',
+          );
+          return 'skipped';
+        }
+
+        // Step 4: Re-verify ownership with the fresh row.
+        if (notification.userId !== freshToken.userId) {
+          await this.deliveriesRepository.markFailed(
+            delivery.id,
+            'Notification owner does not match device token owner after re-check',
+          );
+          return 'skipped';
+        }
+
+        const message: PushMessage = {
+          notificationId: notification.id,
+          type: notification.type,
+          title: notification.title,
+          body: notification.body,
+          data: notification.data as Record<string, unknown> | null,
+        };
+
+        // Step 5: Send to FCM while holding the lock.
+        const result = await this.pushNotifier.sendToToken(
+          freshToken.token,
+          message,
+        );
+
+        if (result.success) {
+          // Step 6: Conditional update — no-op if transfer already invalidated the row.
+          const sent = await this.deliveriesRepository.markSentIfProcessing(
+            delivery.id,
+            result.providerMessageId,
+          );
+          if (!sent) {
+            this.logger.warn(
+              `Delivery ${delivery.id} was superseded by token transfer; FCM send discarded`,
+            );
+          }
+        } else if (result.error === 'INVALID_TOKEN') {
+          await this.deviceTokensRepository.disableTokens(
+            [freshToken.token],
+            'FCM returned INVALID_TOKEN',
+          );
+          await this.deliveriesRepository.markFailed(
+            delivery.id,
+            'Invalid device token',
+          );
+          this.logger.warn(
+            `Disabled invalid token for delivery ${delivery.id}`,
+          );
+        } else if (delivery.attempts >= MAX_RETRY_ATTEMPTS) {
+          await this.deliveriesRepository.markFailed(
+            delivery.id,
+            `Max retries exceeded: ${result.error}`,
+          );
+        } else {
+          const backoffMinutes = Math.pow(2, delivery.attempts - 1);
+          const nextAttemptAt = new Date(
+            Date.now() + backoffMinutes * 60 * 1000,
+          );
+          await this.deliveriesRepository.markRetryable(delivery.id, nextAttemptAt);
+          this.logger.warn(
+            `Delivery ${delivery.id} will retry in ${backoffMinutes}min (attempt ${delivery.attempts}/${MAX_RETRY_ATTEMPTS}): ${result.error}`,
+          );
+        }
+
+        return 'processed';
+      },
+    );
+
+    // lockResult === null means lock was not acquired — leave delivery in PROCESSING
+    // so the stale-recovery cron resets it to PENDING on the next cycle.
+    if (lockResult === null) {
+      this.logger.warn(
+        `Could not acquire token lock for delivery ${delivery.id}; will be recovered by stale-recovery`,
+      );
     }
   }
 }

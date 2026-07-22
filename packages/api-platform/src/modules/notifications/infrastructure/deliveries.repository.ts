@@ -81,6 +81,39 @@ export class DeliveriesRepository implements DeliveriesRepositoryPort {
     return delivery ?? null;
   }
 
+  /**
+   * Mark SENT only when the delivery is still PROCESSING.
+   * Returns null when the row was already set to FAILED/CANCELLED by a
+   * concurrent token-ownership transfer — caller treats null as "superseded,
+   * no further action needed".
+   */
+  async markSentIfProcessing(
+    deliveryId: string,
+    providerMessageId: string | null,
+    executor: DatabaseExecutor = this.database,
+  ) {
+    const [delivery] = await executor
+      .update(notificationDeliveries)
+      .set({
+        status: 'SENT',
+        providerMessageId,
+        sentAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(
+        and(
+          eq(notificationDeliveries.id, deliveryId),
+          eq(notificationDeliveries.status, 'PROCESSING'),
+        ),
+      )
+      .returning();
+
+    return delivery ?? null;
+  }
+
+    return delivery ?? null;
+  }
+
   async markFailed(
     deliveryId: string,
     error: string,

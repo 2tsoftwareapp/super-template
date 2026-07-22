@@ -5,6 +5,12 @@ import type {
 } from '@repo/api-database';
 
 import { Inject, Injectable } from '@nestjs/common';
+import {
+  ADVISORY_LOCK_PORT,
+  type AdvisoryLockPort,
+  AppError,
+  ERROR_CODES,
+} from '@repo/api-core';
 import { DATABASE, runInTransaction } from '@repo/api-database';
 import { notificationDeliveries, notificationDeviceTokens } from '@repo/api-database';
 import { and, eq, inArray, isNull } from 'drizzle-orm';
@@ -17,23 +23,42 @@ import type {
 
 export type NotificationDevicePlatform = 'IOS' | 'ANDROID';
 
+/**
+ * Derive the same 32-bit advisory lock ID used by the delivery processor for
+ * a given FCM token string. Both paths must use identical hashing so they
+ * serialize against each other.
+ */
+function tokenLockId(token: string): number {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < token.length; i++) {
+    h ^= token.charCodeAt(i);
+    h = (Math.imul(h, 0x01000193) >>> 0);
+  }
+  return h & 0x7fffffff;
+}
+
 @Injectable()
 export class DeviceTokensRepository implements DeviceTokensRepositoryPort {
-  constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
+  constructor(
+    @Inject(DATABASE) private readonly database: DatabaseClient,
+    @Inject(ADVISORY_LOCK_PORT) private readonly advisoryLock: AdvisoryLockPort,
+  ) {}
 
   /**
    * Register or safely transfer a device token.
    *
-   * Flow:
+   * Acquires a per-token advisory lock before opening the write transaction so
+   * the delivery processor — which holds the same lock while it sends FCM —
+   * cannot be mid-send when ownership changes. The lock is session-level and
+   * released after the transaction commits.
+   *
+   * Flow inside the lock:
    *   Step 1: Look up any existing row for this token (active or disabled).
    *   Step 2a: No existing row → plain insert.
-   *   Step 2b: Same owner, active → touch lastUsedAt only.
+   *   Step 2b: Same owner, active  → touch lastUsedAt.
    *   Step 2c: Same owner, disabled → re-enable + touch lastUsedAt.
-   *   Step 2d: Different owner → disable old row, invalidate its PENDING/PROCESSING
-   *            deliveries to prevent cross-account push, insert brand-new row with
-   *            a new UUID so the processor never races on the old row's ID.
-   *
-   * All mutations run inside a single transaction (serialized on the token string).
+   *   Step 2d: Different owner → disable old row, invalidate PENDING/PROCESSING
+   *            deliveries, insert new row with new UUID.
    */
   async registerOrTransfer(
     values: {
@@ -44,7 +69,6 @@ export class DeviceTokensRepository implements DeviceTokensRepositoryPort {
     executor?: DatabaseExecutor,
   ): Promise<RegisterTokenResult> {
     const run = async (tx: DatabaseExecutor): Promise<RegisterTokenResult> => {
-      // Step 1: find any existing row for this token (active or disabled)
       const [existing] = await tx
         .select()
         .from(notificationDeviceTokens)
@@ -54,7 +78,6 @@ export class DeviceTokensRepository implements DeviceTokensRepositoryPort {
       const now = new Date();
 
       if (!existing) {
-        // Step 2a: fresh token — plain insert
         const [inserted] = await tx
           .insert(notificationDeviceTokens)
           .values({
@@ -69,7 +92,6 @@ export class DeviceTokensRepository implements DeviceTokensRepositoryPort {
       }
 
       if (existing.userId === values.userId) {
-        // Step 2b/c: same owner — re-enable if disabled, always touch lastUsedAt
         const [updated] = await tx
           .update(notificationDeviceTokens)
           .set({
@@ -85,8 +107,7 @@ export class DeviceTokensRepository implements DeviceTokensRepositoryPort {
         return { token: updated!, created: false, transferred: false };
       }
 
-      // Step 2d: different owner — atomic transfer
-      // Disable the old row so the processor's owner check sees it gone immediately
+      // Different owner — atomic transfer
       await tx
         .update(notificationDeviceTokens)
         .set({
@@ -96,10 +117,6 @@ export class DeviceTokensRepository implements DeviceTokensRepositoryPort {
         })
         .where(eq(notificationDeviceTokens.id, existing.id));
 
-      // Invalidate any PENDING or PROCESSING deliveries that reference the old token
-      // row. This prevents the processor from sending a notification belonging to
-      // the previous owner after the ownership check passes at claim time but before
-      // sendToToken() is called.
       await tx
         .update(notificationDeliveries)
         .set({
@@ -114,9 +131,6 @@ export class DeviceTokensRepository implements DeviceTokensRepositoryPort {
           ),
         );
 
-      // Insert a brand-new row so the new owner gets a distinct UUID — the
-      // processor's tokenMap is keyed by ID, so stale claims from the old ID can
-      // never reach the new user's token string.
       const [inserted] = await tx
         .insert(notificationDeviceTokens)
         .values({
@@ -130,26 +144,31 @@ export class DeviceTokensRepository implements DeviceTokensRepositoryPort {
       return { token: inserted!, created: true, transferred: true };
     };
 
-    // If we already have a transaction executor, run inside it; otherwise open one
-    // so all three mutations (disable, invalidate deliveries, insert) are atomic.
+    // When called inside an existing executor skip advisory locking — the
+    // caller is responsible for serialization in that context.
     if (executor) {
       return run(executor as DatabaseTransaction);
     }
 
-    return runInTransaction(this.database, run);
-  }
+    // Acquire the per-token lock so that a concurrent delivery processor
+    // holding the same lock cannot be between its owner-check and FCM send
+    // while we swap ownership.
+    const result = await this.advisoryLock.withAdvisoryLock(
+      tokenLockId(values.token),
+      () => runInTransaction(this.database, run),
+    );
 
-  /** @deprecated Use registerOrTransfer. */
-  async upsert(
-    values: {
-      userId: string;
-      token: string;
-      platform: NotificationDevicePlatform;
-    },
-    executor: DatabaseExecutor = this.database,
-  ) {
-    const { token } = await this.registerOrTransfer(values, executor);
-    return token;
+    if (result === null) {
+      // Lock unavailable → delivery processor is currently sending to this token.
+      // A brief retry at the HTTP level is safe; return a 409 so the client can retry.
+      throw new AppError(
+        ERROR_CODES.RESOURCE_CONFLICT,
+        'Device token is temporarily locked by an in-progress delivery; please retry',
+        409,
+      );
+    }
+
+    return result;
   }
 
   async listByUserId(
