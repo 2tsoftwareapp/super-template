@@ -7,6 +7,7 @@ import { createDatabaseClient } from './database.types';
 import { setTenantContextOnPgClient } from './tenant-context';
 
 export const DATABASE_POOL = Symbol('DATABASE_POOL');
+export const ADVISORY_LOCK_POOL = Symbol('ADVISORY_LOCK_POOL');
 export const DATABASE = Symbol('DATABASE');
 
 type PoolRelease = (err?: Error) => void;
@@ -149,5 +150,25 @@ export const databaseProviders: Provider[] = [
     provide: DATABASE,
     inject: [DATABASE_POOL],
     useFactory: createDatabaseClient,
+  },
+  {
+    provide: ADVISORY_LOCK_POOL,
+    inject: [EnvironmentService],
+    useFactory: (environmentService: EnvironmentService) => {
+      const connectionString = environmentService.isTest
+        ? environmentService.databaseUrlTest
+        : environmentService.databaseUrl;
+
+      if (!connectionString) {
+        throw new Error(
+          'DATABASE_URL_TEST is required when APP_ENV=test but was not provided',
+        );
+      }
+
+      // Dedicated pool for session-level advisory locks.  A small max prevents
+      // pool starvation when the main pool connections are held by lock-holder
+      // callbacks that also need to query the database.
+      return new Pool({ connectionString, max: 10 });
+    },
   },
 ];

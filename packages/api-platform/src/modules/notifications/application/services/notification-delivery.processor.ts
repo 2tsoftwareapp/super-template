@@ -14,7 +14,7 @@ import type { PushMessage, PushNotifier } from '../push.interface';
 
 import { DELIVERIES_REPOSITORY, type DeliveriesRepositoryPort } from '../ports/deliveries.repository.port';
 import { DEVICE_TOKENS_REPOSITORY, type DeviceTokensRepositoryPort } from '../ports/device-tokens.repository.port';
-import { NOTIFICATIONS_REPOSITORY, type NotificationsRepositoryPort } from '../ports/notifications.repository.port';
+import { NOTIFICATIONS_REPOSITORY, type NotificationRecord, type NotificationsRepositoryPort } from '../ports/notifications.repository.port';
 import { PUSH_NOTIFIER } from '../push.interface';
 
 const DELIVERY_BATCH_SIZE = 50;
@@ -169,7 +169,7 @@ export class NotificationDeliveryProcessor {
    */
   private async processOneDelivery(
     delivery: { id: string; notificationId: string; deviceTokenId: string; attempts: number },
-    notificationMap: Map<string, { id: string; userId: string; type: string; title: string; body: string; data: unknown }>,
+    notificationMap: Map<string, NotificationRecord>,
     tokenMap: Map<string, { id: string; userId: string; token: string }>,
   ) {
     const notification = notificationMap.get(delivery.notificationId);
@@ -217,7 +217,7 @@ export class NotificationDeliveryProcessor {
           type: notification.type,
           title: notification.title,
           body: notification.body,
-          data: notification.data as Record<string, unknown> | null,
+          data: notification.data,
         };
 
         // Step 5: Send to FCM while holding the lock.

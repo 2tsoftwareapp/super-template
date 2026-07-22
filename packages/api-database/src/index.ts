@@ -1,5 +1,5 @@
 export { DatabaseModule } from './database.module';
-export { DATABASE, DATABASE_POOL, databaseProviders } from './database.provider';
+export { ADVISORY_LOCK_POOL, DATABASE, DATABASE_POOL, databaseProviders } from './database.provider';
 export { createDatabaseClient } from './database.types';
 export type { DatabaseClient, DatabaseExecutor, DatabaseTransaction } from './database.types';
 export { DrizzleTransactionService } from './drizzle-transaction.service';

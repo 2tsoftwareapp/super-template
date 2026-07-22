@@ -9,7 +9,7 @@ import {
 import { ADVISORY_LOCK_PORT, PLATFORM_TRANSACTION_PORT, TenantContextService, TRANSACTION_PORT } from '@repo/api-core';
 
 import { DatabaseRlsGuard } from './database-rls.guard';
-import { DATABASE_POOL, databaseProviders } from './database.provider';
+import { ADVISORY_LOCK_POOL, DATABASE_POOL, databaseProviders } from './database.provider';
 import { DrizzlePlatformTransactionService } from './drizzle-platform-transaction.service';
 import { DrizzleTransactionService } from './drizzle-transaction.service';
 import { PostgresAdvisoryLockService } from './postgres-advisory-lock.service';
@@ -39,9 +39,12 @@ import { PostgresAdvisoryLockService } from './postgres-advisory-lock.service';
   ],
 })
 export class DatabaseModule implements OnApplicationShutdown {
-  constructor(@Inject(DATABASE_POOL) private readonly pool: Pool) {}
+  constructor(
+    @Inject(DATABASE_POOL) private readonly pool: Pool,
+    @Inject(ADVISORY_LOCK_POOL) private readonly advisoryLockPool: Pool,
+  ) {}
 
   async onApplicationShutdown(): Promise<void> {
-    await this.pool.end();
+    await Promise.all([this.pool.end(), this.advisoryLockPool.end()]);
   }
 }

@@ -111,9 +111,6 @@ export class DeliveriesRepository implements DeliveriesRepositoryPort {
     return delivery ?? null;
   }
 
-    return delivery ?? null;
-  }
-
   async markFailed(
     deliveryId: string,
     error: string,

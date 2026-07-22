@@ -17,7 +17,6 @@ import {
 
 import {
   DELIVERIES_REPOSITORY,
-  DEVICE_TOKENS_REPOSITORY,
   NotificationDeliveryProcessor,
   NotificationDeliveryUseCase,
   PUSH_NOTIFIER,
@@ -440,16 +439,7 @@ describe('Notifications (e2e)', () => {
       expect(deliveryBefore!.status).toBe('PENDING');
 
       // Step 3: User B registers the SAME token (ownership transfer)
-      // We need a second user — look for one already seeded in the test DB
-      let userB: Awaited<ReturnType<typeof loginAs>>;
-      try {
-        userB = await loginAs(app, 'member@example.local', 'ChangeMe123!');
-      } catch {
-        // If no second user in seed, skip the transfer assertion but keep the
-        // invalidation assertion below.  The registerOrTransfer path is still
-        // exercised by unit tests.
-        return;
-      }
+      const userB = await loginAs(app, 'user@example.local', 'ChangeMe123!');
 
       await registerDevice(app, userB, sharedToken);
 
@@ -487,9 +477,126 @@ describe('Notifications (e2e)', () => {
 
       // sendToToken must not have been called with the original device token
       const calledTokens = pushNotifier.sendToToken.mock.calls.map(
-        ([token]: [string]) => token,
+        (args) => args[0] as string,
       );
       expect(calledTokens).not.toContain(sharedToken);
+    });
+
+    it('rejects concurrent register when processor holds the token lock', async () => {
+      const admin = await loginAs(app, 'admin@example.local', 'ChangeMe123!');
+      const userB = await loginAs(app, 'user@example.local', 'ChangeMe123!');
+      const sharedToken = `concurrent-token-${Date.now()}`;
+
+      // Step 1: Admin registers T
+      await registerDevice(app, admin, sharedToken);
+
+      // Step 2: Create notification and processJob (creates PENDING delivery)
+      const job = await sendNotification(app, admin);
+      const useCase = app.get(NotificationDeliveryUseCase);
+      await useCase.processJob(job.id);
+
+      // Verify delivery is PENDING
+      const notificationRows = await dbQuery(app, (db) =>
+        db
+          .select()
+          .from(notifications)
+          .where(eq(notifications.sourceJobId, job.id)),
+      );
+      const notificationId = notificationRows.find(
+        (r) => r.userId === admin.userId,
+      )!.id;
+
+      // Step 3: Set up a barrier — sendToToken will pause until we resolve it
+      let barrierResolve: () => void;
+      const barrier = new Promise<void>((resolve) => { barrierResolve = resolve; });
+
+      const pushNotifier = app.get<{ sendToToken: ReturnType<typeof vi.fn> }>(PUSH_NOTIFIER);
+      pushNotifier.sendToToken = vi.fn().mockImplementation(async () => {
+        await barrier;
+        return { success: true, providerMessageId: 'mock-barrier-msg' };
+      });
+
+      // Step 4: Start the processor in the background
+      const processor = app.get(NotificationDeliveryProcessor);
+      const processorPromise = processor.processDeliveries();
+
+      // Wait for sendToToken to be called (processor holds the lock now)
+      await vi.waitFor(() => {
+        expect(pushNotifier.sendToToken).toHaveBeenCalled();
+      });
+
+      // Step 5: Try to register the same token for user B while lock is held
+      const conflictResponse = await request(app.getHttpServer())
+        .post('/api/v1/notifications/devices')
+        .set(bearer(userB.accessToken))
+        .send({ token: sharedToken, platform: 'ANDROID' })
+        .expect(409);
+
+      expect(conflictResponse.body).toBeDefined();
+
+      // Step 6: Release the barrier so the processor can finish
+      barrierResolve!();
+      await processorPromise;
+
+      // Step 7: Now retry the registration — should succeed (transfer)
+      await request(app.getHttpServer())
+        .post('/api/v1/notifications/devices')
+        .set(bearer(userB.accessToken))
+        .send({ token: sharedToken, platform: 'ANDROID' })
+        .expect(201);
+
+      // Step 8: Verify final state — only 1 active row, owned by userB
+      const finalTokens = await dbQuery(app, (db) =>
+        db
+          .select()
+          .from(notificationDeviceTokens)
+          .where(eq(notificationDeviceTokens.token, sharedToken)),
+      );
+      const activeFinal = finalTokens.filter((t) => !t.disabledAt);
+      expect(activeFinal).toHaveLength(1);
+      expect(activeFinal[0]!.userId).toBe(userB.userId);
+    });
+
+    it('does not violate unique constraint when same user re-registers after transfer', async () => {
+      const admin = await loginAs(app, 'admin@example.local', 'ChangeMe123!');
+      const userB = await loginAs(app, 'user@example.local', 'ChangeMe123!');
+      const sharedToken = `re-register-token-${Date.now()}`;
+
+      // A register T
+      await registerDevice(app, admin, sharedToken);
+
+      // B transfer T (admin → userB)
+      await registerDevice(app, userB, sharedToken);
+
+      // DB: A-disabled + B-active
+      const afterTransfer = await dbQuery(app, (db) =>
+        db
+          .select()
+          .from(notificationDeviceTokens)
+          .where(eq(notificationDeviceTokens.token, sharedToken)),
+      );
+      expect(afterTransfer.length).toBe(2);
+      const activeAfterTransfer = afterTransfer.filter((r) => !r.disabledAt);
+      expect(activeAfterTransfer).toHaveLength(1);
+      expect(activeAfterTransfer[0]!.userId).toBe(userB.userId);
+
+      // B register T again — must NOT throw unique violation
+      // The repository should find the existing active row (same owner) and
+      // simply touch it instead of attempting a duplicate insert.
+      const result = await registerDevice(app, userB, sharedToken);
+      expect(result.token).toBe(sharedToken);
+
+      const finalRows = await dbQuery(app, (db) =>
+        db
+          .select()
+          .from(notificationDeviceTokens)
+          .where(eq(notificationDeviceTokens.token, sharedToken)),
+      );
+      // Still exactly 2 rows: A-disabled + B-active (no duplicate)
+      expect(finalRows.length).toBe(2);
+      const activeFinal = finalRows.filter((r) => !r.disabledAt);
+      expect(activeFinal).toHaveLength(1);
+      expect(activeFinal[0]!.userId).toBe(userB.userId);
     });
   });
 });

@@ -2,13 +2,13 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import type { Pool } from 'pg';
 import type { AdvisoryLockPort } from '@repo/api-core';
 
-import { DATABASE_POOL } from './database.provider';
+import { ADVISORY_LOCK_POOL } from './database.provider';
 
 @Injectable()
 export class PostgresAdvisoryLockService implements AdvisoryLockPort {
   private readonly logger = new Logger(PostgresAdvisoryLockService.name);
 
-  constructor(@Inject(DATABASE_POOL) private readonly pool: Pool) {}
+  constructor(@Inject(ADVISORY_LOCK_POOL) private readonly pool: Pool) {}
 
   async withAdvisoryLock<T>(lockId: number, fn: () => Promise<T>): Promise<T | null> {
     const client = await this.pool.connect();

@@ -53,12 +53,13 @@ export class DeviceTokensRepository implements DeviceTokensRepositoryPort {
    * released after the transaction commits.
    *
    * Flow inside the lock:
-   *   Step 1: Look up any existing row for this token (active or disabled).
-   *   Step 2a: No existing row → plain insert.
-   *   Step 2b: Same owner, active  → touch lastUsedAt.
-   *   Step 2c: Same owner, disabled → re-enable + touch lastUsedAt.
-   *   Step 2d: Different owner → disable old row, invalidate PENDING/PROCESSING
-   *            deliveries, insert new row with new UUID.
+   *   Step 1: Look up the active (non-disabled) row for this token.
+   *   Step 2a: No active row exists → plain insert.
+   *   Step 2b: Active row, same owner → touch lastUsedAt.
+   *   Step 2c: Active row, different owner → disable it, invalidate
+   *            PENDING/PROCESSING deliveries, insert new row with new UUID.
+   *   Historical (disabled) rows are never re-enabled; the partial unique index
+   *   guarantees at most one active row per token.
    */
   async registerOrTransfer(
     values: {
@@ -72,7 +73,12 @@ export class DeviceTokensRepository implements DeviceTokensRepositoryPort {
       const [existing] = await tx
         .select()
         .from(notificationDeviceTokens)
-        .where(eq(notificationDeviceTokens.token, values.token))
+        .where(
+          and(
+            eq(notificationDeviceTokens.token, values.token),
+            isNull(notificationDeviceTokens.disabledAt),
+          ),
+        )
         .limit(1);
 
       const now = new Date();
