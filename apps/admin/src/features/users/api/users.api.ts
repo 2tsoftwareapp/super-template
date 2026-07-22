@@ -11,7 +11,7 @@ import type {
 import { webFetch } from "@/lib/http";
 import { buildAdminUsersListPath } from "@/lib/search-params";
 
-import type { UsersListParams } from "../model/types";
+import type { UsersListParams } from "../model/users.types";
 
 export function buildUsersListPath(params: UsersListParams) {
   const primarySort = params.sort[0] ?? { field: "createdAt", order: "desc" };

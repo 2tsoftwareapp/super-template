@@ -9,7 +9,7 @@ import {
 } from "@tanstack/react-table";
 import { useCallback, useMemo, useState } from "react";
 
-import type { UsersListParams } from "@/features/users/model/types";
+import type { UsersListParams } from "@/features/users/model/users.types";
 import type { AdminUserDto } from "@/lib/api-types";
 
 import {

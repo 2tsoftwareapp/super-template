@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import type { UsersListParams } from "../model/types";
+import type { UsersListParams } from "../model/users.types";
 
 import { usersSortKey } from "../model/sorting";
 import { buildUsersListPath, usersApi } from "./users.api";

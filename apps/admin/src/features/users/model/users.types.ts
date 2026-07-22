@@ -2,13 +2,41 @@ import type { Table } from "@tanstack/react-table";
 import type { UseFormReturn } from "react-hook-form";
 
 import type {
+  SortCriterion,
+  SortOrder,
+} from "@repo/api-sort";
+
+import { PAGE_SIZE_OPTIONS, type PageSize } from "@repo/config";
+
+import type {
   AdminUserDto,
   OrganizationDto,
   RoleDto,
 } from "@/lib/api-types";
 
-import type { UsersListParams, UsersPageSize, UserStatusFilter } from "./types";
 import type { ProfileForm } from "./users.schemas";
+
+// ── List params & filter types (merged from types.ts) ──────────────────────
+
+export type UserStatusFilter = "all" | "PENDING" | "ACTIVE" | "BLOCKED";
+
+export const USERS_PAGE_SIZE_OPTIONS = PAGE_SIZE_OPTIONS;
+
+export type UsersPageSize = PageSize;
+
+export type UsersSortField = "createdAt" | "displayName" | "email" | "status";
+
+export type UsersSortOrder = SortOrder;
+
+export type UsersSortCriterion = SortCriterion<UsersSortField>;
+
+export interface UsersListParams {
+  page: number;
+  limit: UsersPageSize;
+  search: string;
+  status: UserStatusFilter;
+  sort: UsersSortCriterion[];
+}
 
 interface MutationState {
   isPending: boolean;

@@ -10,8 +10,8 @@ import type {
   UsersListParams,
   UsersPageSize,
   UserStatusFilter,
-} from "@/features/users/model/types";
-import type { UsersListViewModel } from "@/features/users/model/users.types";
+  UsersListViewModel,
+} from "@/features/users/model/users.types";
 
 import {
   useActivateUsers,

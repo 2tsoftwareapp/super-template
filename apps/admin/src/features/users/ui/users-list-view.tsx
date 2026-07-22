@@ -13,7 +13,7 @@ import { BulkActionBar } from "@/components/bulk-action-bar";
 import { ResourceTable } from "@/components/resource-table";
 import { ResourceToolbar } from "@/components/resource-toolbar";
 import { STATUS_FILTERS } from "@/features/users/model/constants";
-import { USERS_PAGE_SIZE_OPTIONS } from "@/features/users/model/types";
+import { USERS_PAGE_SIZE_OPTIONS } from "@/features/users/model/users.types";
 
 import { CreateUserDrawer } from "./create-user-drawer";
 import { UsersConfirmBlockDialog } from "./users-confirm-block-dialog";
