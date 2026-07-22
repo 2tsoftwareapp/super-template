@@ -5,7 +5,7 @@ import { TenantContextService, WORKER_DISPATCH_CONTEXT } from '@repo/api-core';
 import request from 'supertest';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
-import { asc, eq, inArray } from 'drizzle-orm';
+import { and, asc, eq, inArray, ne } from 'drizzle-orm';
 import {
   type DatabaseClient,
   DATABASE,
@@ -488,14 +488,14 @@ describe('Notifications (e2e)', () => {
       const sharedToken = `concurrent-token-${Date.now()}`;
 
       // Step 1: Admin registers T
-      await registerDevice(app, admin, sharedToken);
+      const deviceA = await registerDevice(app, admin, sharedToken);
 
       // Step 2: Create notification and processJob (creates PENDING delivery)
       const job = await sendNotification(app, admin);
       const useCase = app.get(NotificationDeliveryUseCase);
       await useCase.processJob(job.id);
 
-      // Verify delivery is PENDING
+      // Step 3: Find the exact delivery for sharedToken
       const notificationRows = await dbQuery(app, (db) =>
         db
           .select()
@@ -505,38 +505,83 @@ describe('Notifications (e2e)', () => {
       const notificationId = notificationRows.find(
         (r) => r.userId === admin.userId,
       )!.id;
+      const exactDelivery = await findDelivery(app, notificationId, deviceA.id);
+      expect(exactDelivery).toBeTruthy();
+      expect(exactDelivery!.status).toBe('PENDING');
 
-      // Step 3: Set up a barrier — sendToToken will pause until we resolve it
-      let barrierResolve: () => void;
-      const barrier = new Promise<void>((resolve) => { barrierResolve = resolve; });
+      // Move all other PENDING deliveries to FAILED so the processor batch
+      // only contains the exact delivery for sharedToken.
+      await dbQuery(app, (db) =>
+        db
+          .update(notificationDeliveries)
+          .set({
+            status: 'FAILED',
+            lastError: 'Cleared for concurrent test isolation',
+            updatedAt: new Date(),
+          })
+          .where(
+            and(
+              eq(notificationDeliveries.status, 'PENDING'),
+              ne(notificationDeliveries.id, exactDelivery!.id),
+            ),
+          ),
+      );
+
+      // Confirm only our target delivery is PENDING
+      const remainingPending = await dbQuery(app, (db) =>
+        db
+          .select()
+          .from(notificationDeliveries)
+          .where(eq(notificationDeliveries.status, 'PENDING')),
+      );
+      expect(remainingPending).toHaveLength(1);
+      expect(remainingPending[0]!.id).toBe(exactDelivery!.id);
+
+      // Step 4: Set up a barrier — sendToToken will pause until we resolve it
+      const sendStarted = (() => {
+        let resolve!: () => void;
+        const promise = new Promise<void>((r) => { resolve = r; });
+        return { promise, resolve };
+      })();
+      const allowSend = (() => {
+        let resolve!: () => void;
+        const promise = new Promise<void>((r) => { resolve = r; });
+        return { promise, resolve };
+      })();
 
       const pushNotifier = app.get<{ sendToToken: ReturnType<typeof vi.fn> }>(PUSH_NOTIFIER);
-      pushNotifier.sendToToken = vi.fn().mockImplementation(async () => {
-        await barrier;
-        return { success: true, providerMessageId: 'mock-barrier-msg' };
-      });
+      pushNotifier.sendToToken = vi.fn().mockImplementation(
+        async (token: string) => {
+          expect(token).toBe(sharedToken);
+          sendStarted.resolve();
+          await allowSend.promise;
+          return { success: true, providerMessageId: 'mock-barrier-msg' };
+        },
+      );
 
-      // Step 4: Start the processor in the background
+      // Step 5: Start the processor in the background
       const processor = app.get(NotificationDeliveryProcessor);
       const processorPromise = processor.processDeliveries();
 
-      // Wait for sendToToken to be called (processor holds the lock now)
-      await vi.waitFor(() => {
-        expect(pushNotifier.sendToToken).toHaveBeenCalled();
-      });
+      try {
+        // Wait for sendToToken to be called (processor holds the lock now)
+        await vi.waitFor(() => {
+          expect(pushNotifier.sendToToken).toHaveBeenCalled();
+        });
 
-      // Step 5: Try to register the same token for user B while lock is held
-      const conflictResponse = await request(app.getHttpServer())
-        .post('/api/v1/notifications/devices')
-        .set(bearer(userB.accessToken))
-        .send({ token: sharedToken, platform: 'ANDROID' })
-        .expect(409);
+        // Step 6: Try to register the same token for user B while lock is held
+        const conflictResponse = await request(app.getHttpServer())
+          .post('/api/v1/notifications/devices')
+          .set(bearer(userB.accessToken))
+          .send({ token: sharedToken, platform: 'ANDROID' })
+          .expect(409);
 
-      expect(conflictResponse.body).toBeDefined();
-
-      // Step 6: Release the barrier so the processor can finish
-      barrierResolve!();
-      await processorPromise;
+        expect(conflictResponse.body).toBeDefined();
+      } finally {
+        // Always release the barrier so the processor can finish
+        allowSend.resolve();
+        await processorPromise;
+      }
 
       // Step 7: Now retry the registration — should succeed (transfer)
       await request(app.getHttpServer())
