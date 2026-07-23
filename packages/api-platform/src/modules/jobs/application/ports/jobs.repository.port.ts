@@ -1,5 +1,7 @@
 import type { JsonObject, TransactionExecutor } from '@repo/api-core';
 
+import type { JobStatus } from '../../domain/job-status';
+
 export type JobScope =
   | { type: 'organization'; organizationId: string }
   | { type: 'platform' };
@@ -9,7 +11,7 @@ export interface JobRecord {
   organizationId: string | null;
   type: string;
   payload: JsonObject;
-  status: string;
+  status: JobStatus;
   scheduledAt: Date;
   priority: number;
   attempts: number;
@@ -139,13 +141,15 @@ export interface JobsRepositoryPort {
   }>;
   markBlocked(
     jobId: string,
+    scope: JobScope,
     message: string,
     executor?: TransactionExecutor,
   ): Promise<JobRecord | null>;
   listDependents(
     jobId: string,
+    scope: JobScope,
     executor?: TransactionExecutor,
-  ): Promise<{ id: string; jobId: string; status: string }[]>;
+  ): Promise<{ id: string; jobId: string; status: JobStatus; organizationId: string | null }[]>;
 }
 
 export const JOBS_REPOSITORY = Symbol('JOBS_REPOSITORY');
