@@ -93,7 +93,8 @@ export class JobHandlersRegistry {
         type,
         title,
         body,
-        ...(data ? { data: { ...data, sourceBackgroundJobId: jobId } } : { data: { sourceBackgroundJobId: jobId } }),
+        ...(data ? { data } : {}),
+        sourceBackgroundJobId: jobId,
       });
     });
   }

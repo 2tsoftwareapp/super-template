@@ -24,6 +24,7 @@ export interface CreateNotificationInput {
   readAt?: Date | null;
   organizationId: string;
   sourceJobId?: string | null;
+  sourceBackgroundJobId?: string | null;
 }
 
 export interface NotificationsListResult {

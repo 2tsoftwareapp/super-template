@@ -79,6 +79,7 @@ export class SendNotificationUseCase {
           title: input.title,
           body: input.body,
           data: input.data ?? null,
+          sourceBackgroundJobId: input.sourceBackgroundJobId ?? null,
         },
         tx,
       );

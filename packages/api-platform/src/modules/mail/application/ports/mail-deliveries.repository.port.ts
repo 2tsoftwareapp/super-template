@@ -26,6 +26,16 @@ export interface MailDeliveriesRepositoryPort {
     createdAt: Date;
   } | null>;
 
+  updateStatus(
+    id: string,
+    values: {
+      status: 'SENT' | 'FAILED';
+      errorMessage?: string | null;
+      sentAt?: Date | null;
+    },
+    executor?: TransactionExecutor,
+  ): Promise<void>;
+
   list(
     params: {
       page: number;

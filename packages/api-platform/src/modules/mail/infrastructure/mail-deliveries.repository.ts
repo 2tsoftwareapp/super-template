@@ -34,6 +34,25 @@ export class MailDeliveriesRepository implements MailDeliveriesRepositoryPort {
     return delivery ?? null;
   }
 
+  async updateStatus(
+    id: string,
+    values: {
+      status: 'SENT' | 'FAILED';
+      errorMessage?: string | null;
+      sentAt?: Date | null;
+    },
+    executor: DatabaseExecutor = this.database,
+  ): Promise<void> {
+    await executor
+      .update(mailDeliveries)
+      .set({
+        status: values.status,
+        ...(values.errorMessage !== undefined ? { errorMessage: values.errorMessage } : {}),
+        ...(values.sentAt !== undefined ? { sentAt: values.sentAt } : {}),
+      })
+      .where(eq(mailDeliveries.id, id));
+  }
+
   async list(
     params: ListDeliveriesParams,
     executor: DatabaseExecutor = this.database,

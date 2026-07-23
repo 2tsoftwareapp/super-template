@@ -9,6 +9,7 @@ export interface SendUserNotificationInput {
   title: string;
   body: string;
   data?: JsonObject;
+  sourceBackgroundJobId?: string | null;
 }
 
 export interface NotificationMessage {

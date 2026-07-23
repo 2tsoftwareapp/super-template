@@ -14,6 +14,7 @@ import {
 
 import { organizations } from '../identity/organizations';
 import { users } from '../identity/users';
+import { jobs } from './jobs';
 import { timestamps } from '../shared/timestamps';
 import {
   notificationAudienceEnum,
@@ -43,6 +44,9 @@ export const notifications = pgTable(
     sourceJobId: uuid('source_job_id').references(() => notificationJobs.id, {
       onDelete: 'set null',
     }),
+    sourceBackgroundJobId: uuid('source_background_job_id').references(() => jobs.id, {
+      onDelete: 'set null',
+    }),
   },
   (table) => [
     index('notifications_organization_id_idx').on(table.organizationId),
@@ -61,6 +65,9 @@ export const notifications = pgTable(
     uniqueIndex('notifications_source_job_id_user_id_unique')
       .on(table.sourceJobId, table.userId)
       .where(sql`${table.sourceJobId} is not null`),
+    uniqueIndex('notifications_source_bg_job_id_user_id_unique')
+      .on(table.sourceBackgroundJobId, table.userId)
+      .where(sql`${table.sourceBackgroundJobId} is not null`),
   ],
 );
 

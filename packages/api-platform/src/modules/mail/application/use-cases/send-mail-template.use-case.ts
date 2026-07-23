@@ -57,6 +57,20 @@ export class SendMailTemplateUseCase {
       );
     }
 
+    const delivery = await this.mailDeliveriesRepository.create({
+      templateKey: input.templateKey,
+      recipient: input.to,
+      subject: rendered.subject.trim(),
+      status: 'FAILED',
+      errorMessage: null,
+      metadata: input.metadata ?? null,
+      sourceJobId: input.sourceJobId ?? null,
+    });
+
+    if (!delivery) {
+      return;
+    }
+
     try {
       await this.mailer.send({
         to: input.to,
@@ -65,27 +79,18 @@ export class SendMailTemplateUseCase {
         html: rendered.html.trim(),
       });
 
-      await this.mailDeliveriesRepository.create({
-        templateKey: input.templateKey,
-        recipient: input.to,
-        subject: rendered.subject.trim(),
+      await this.mailDeliveriesRepository.updateStatus(delivery.id, {
         status: 'SENT',
-        metadata: input.metadata ?? null,
         sentAt: new Date(),
-        sourceJobId: input.sourceJobId ?? null,
+        errorMessage: null,
       });
     } catch (error) {
-      await this.mailDeliveriesRepository.create({
-        templateKey: input.templateKey,
-        recipient: input.to,
-        subject: rendered.subject.trim(),
+      await this.mailDeliveriesRepository.updateStatus(delivery.id, {
         status: 'FAILED',
         errorMessage:
           error instanceof Error
             ? error.message
             : 'Unknown mail delivery error',
-        metadata: input.metadata ?? null,
-        sourceJobId: input.sourceJobId ?? null,
       });
 
       throw error;

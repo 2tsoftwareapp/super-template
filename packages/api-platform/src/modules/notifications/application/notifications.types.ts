@@ -48,6 +48,7 @@ export interface SendNotificationCommand {
   body: string;
   data?: JsonObject;
   organizationId?: string;
+  sourceBackgroundJobId?: string | null;
 }
 
 export interface SendNotificationRequestCommand {
