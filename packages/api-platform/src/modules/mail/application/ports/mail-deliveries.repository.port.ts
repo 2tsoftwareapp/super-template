@@ -11,6 +11,7 @@ export interface MailDeliveriesRepositoryPort {
       errorMessage?: string | null;
       metadata?: JsonObject | null;
       sentAt?: Date | null;
+      sourceJobId?: string | null;
     },
     executor?: TransactionExecutor,
   ): Promise<{

@@ -36,6 +36,12 @@ import {
   JobMetricsQueryDto,
 } from './jobs.dto';
 
+function scopeFromUser(user: AuthenticatedRequestUser): JobScope {
+  return user.organizationId
+    ? { type: 'organization', organizationId: user.organizationId }
+    : { type: 'platform' };
+}
+
 @ApiTags('admin-jobs')
 @ApiBearerAuth()
 @Controller('admin/jobs')
@@ -53,21 +59,15 @@ export class AdminJobsController {
   @Get()
   @Authorize({ permissions: [perm('jobs', ACTION.READ)] })
   @ApiPaginatedResponse(JobListDto)
-  async listJobs(@Query() query: AdminJobsQueryDto) {
-    const scope = query.organizationId
-      ? { type: 'organization' as const, organizationId: query.organizationId }
-      : undefined;
-
-    const result = await this.listJobsUseCase.execute({ ...query, ...(scope ? { scope } : {}) });
+  async listJobs(
+    @CurrentUser() user: AuthenticatedRequestUser,
+    @Query() query: AdminJobsQueryDto,
+  ) {
+    const result = await this.listJobsUseCase.execute({ ...query, scope: scopeFromUser(user) });
 
     return {
       data: result.rows,
-      meta: {
-        page: query.page,
-        limit: query.limit,
-        total: result.total,
-        totalPages: Math.ceil(result.total / query.limit),
-      },
+      meta: { page: query.page, limit: query.limit, total: result.total, totalPages: Math.ceil(result.total / query.limit) },
     };
   }
 
@@ -78,11 +78,7 @@ export class AdminJobsController {
     @CurrentUser() user: AuthenticatedRequestUser,
     @Query() query: JobMetricsQueryDto,
   ) {
-    const scope = user.organizationId
-      ? { type: 'organization' as const, organizationId: user.organizationId }
-      : undefined;
-
-    return { data: await this.getJobMetricsUseCase.execute({ ...query, ...(scope ? { scope } : {}) }) };
+    return { data: await this.getJobMetricsUseCase.execute({ ...query, scope: scopeFromUser(user) }) };
   }
 
   @Get(':id')
@@ -92,11 +88,7 @@ export class AdminJobsController {
     @Param('id', new ParseUUIDPipe()) jobId: string,
     @CurrentUser() user: AuthenticatedRequestUser,
   ) {
-    const scope = user.organizationId
-      ? { type: 'organization' as const, organizationId: user.organizationId }
-      : undefined;
-
-    return { data: await this.getJobUseCase.execute(jobId, scope) };
+    return { data: await this.getJobUseCase.execute(jobId, scopeFromUser(user)) };
   }
 
   @Get(':id/logs')
@@ -107,20 +99,11 @@ export class AdminJobsController {
     @Query() query: JobLogsQueryDto,
     @CurrentUser() user: AuthenticatedRequestUser,
   ) {
-    const scope = user.organizationId
-      ? { type: 'organization' as const, organizationId: user.organizationId }
-      : undefined;
-
-    const result = await this.getJobLogsUseCase.execute(jobId, query, scope);
+    const result = await this.getJobLogsUseCase.execute(jobId, query, scopeFromUser(user));
 
     return {
       data: result.rows,
-      meta: {
-        page: query.page,
-        limit: query.limit,
-        total: result.total,
-        totalPages: Math.ceil(result.total / query.limit),
-      },
+      meta: { page: query.page, limit: query.limit, total: result.total, totalPages: Math.ceil(result.total / query.limit) },
     };
   }
 
@@ -131,11 +114,7 @@ export class AdminJobsController {
     @Param('id', new ParseUUIDPipe()) jobId: string,
     @CurrentUser() user: AuthenticatedRequestUser,
   ) {
-    const scope = user.organizationId
-      ? { type: 'organization' as const, organizationId: user.organizationId }
-      : undefined;
-
-    return { data: await this.listJobDependenciesUseCase.execute(jobId, scope) };
+    return { data: await this.listJobDependenciesUseCase.execute(jobId, scopeFromUser(user)) };
   }
 
   @Post(':id/dependencies')
@@ -146,12 +125,8 @@ export class AdminJobsController {
     @Body() input: AddJobDependencyDto,
     @CurrentUser() user: AuthenticatedRequestUser,
   ) {
-    const scope = user.organizationId
-      ? { type: 'organization' as const, organizationId: user.organizationId }
-      : undefined;
-
     return {
-      data: await this.addJobDependencyUseCase.execute(jobId, input.dependsOnJobId, scope),
+      data: await this.addJobDependencyUseCase.execute(jobId, input.dependsOnJobId, scopeFromUser(user)),
     };
   }
 

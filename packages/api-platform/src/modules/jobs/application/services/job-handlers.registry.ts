@@ -21,7 +21,6 @@ function readOptionalJsonObject(value: JsonValue | undefined): JsonObject | null
   if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
     return value;
   }
-
   return null;
 }
 
@@ -29,24 +28,18 @@ function readStringRecord(value: JsonValue | undefined): Record<string, string> 
   if (typeof value !== 'object' || value === null || Array.isArray(value)) {
     return {};
   }
-
   const result: Record<string, string> = {};
-
   for (const [key, entry] of Object.entries(value)) {
     if (typeof entry === 'string') {
       result[key] = entry;
     }
   }
-
   return result;
 }
 
 @Injectable()
 export class JobHandlersRegistry {
   private readonly handlers = new Map<string, JobHandler>();
-
-  /** Dedup set for idempotent notification handling. */
-  private readonly processedNotifications = new Set<string>();
 
   constructor(
     @Inject(forwardRef(() => MailService))
@@ -65,12 +58,12 @@ export class JobHandlersRegistry {
         throw new Error('mail.send requires templateKey and to');
       }
 
-      // T-006: The delivery record + DB dedup serves as idempotency.
       await this.mailService.sendTemplate({
         templateKey,
         to,
         variables,
         metadata: readOptionalJsonObject(payload.metadata),
+        sourceJobId: jobId,
       });
     });
 
@@ -89,17 +82,8 @@ export class JobHandlersRegistry {
       const body = readStringField(payload, 'body');
 
       if (!userId || !type || !title || !body) {
-        throw new Error(
-          'notification.send requires userId, type, title, and body',
-        );
+        throw new Error('notification.send requires userId, type, title, and body');
       }
-
-      // T-006: In-memory dedup for notification.send idempotency.
-      const dedupKey = `${jobId}:${userId}:${type}`;
-      if (this.processedNotifications.has(dedupKey)) {
-        return;
-      }
-      this.processedNotifications.add(dedupKey);
 
       const data = readOptionalJsonObject(payload.data);
 
@@ -109,7 +93,7 @@ export class JobHandlersRegistry {
         type,
         title,
         body,
-        ...(data ? { data } : {}),
+        ...(data ? { data: { ...data, sourceBackgroundJobId: jobId } } : { data: { sourceBackgroundJobId: jobId } }),
       });
     });
   }

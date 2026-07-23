@@ -1,6 +1,6 @@
 import type { JsonObject } from '@repo/api-core';
 
-import { index, jsonb, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { index, jsonb, pgTable, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
 
 import { mailDeliveryStatusEnum } from './enums';
 import { jobs } from './jobs';
@@ -24,6 +24,7 @@ export const mailDeliveries = pgTable(
       .defaultNow(),
   },
   (table) => [
+    uniqueIndex('mail_deliveries_job_recipient_uniq').on(table.sourceJobId, table.recipient),
     index('mail_deliveries_template_key_idx').on(table.templateKey),
     index('mail_deliveries_created_at_idx').on(table.createdAt),
     index('mail_deliveries_source_job_id_idx').on(table.sourceJobId),

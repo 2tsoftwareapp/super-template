@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { JobView, ListJobsQuery } from '../jobs.types';
+import type { JobView, JobListView, ListJobsQuery } from '../jobs.types';
 
 import { JobsMapper } from '../jobs.mapper';
 import {
@@ -17,10 +17,10 @@ export class ListJobsUseCase {
   ) {}
 
   async execute(
-    query: ListJobsQuery & { scope?: JobScope },
-  ): Promise<{ rows: JobView[]; total: number }> {
+    query: ListJobsQuery & { scope: JobScope },
+  ): Promise<{ rows: JobListView[]; total: number }> {
     const result = await this.jobsRepository.list({
-      ...(query.scope ? { scope: query.scope } : {}),
+      scope: query.scope,
       page: query.page,
       limit: query.limit,
       ...(query.status ? { status: query.status } : {}),
@@ -28,7 +28,7 @@ export class ListJobsUseCase {
     });
 
     return {
-      rows: result.rows.map((row) => this.jobsMapper.toJobView(row)),
+      rows: result.rows.map((row) => this.jobsMapper.toJobListView(row)),
       total: result.total,
     };
   }

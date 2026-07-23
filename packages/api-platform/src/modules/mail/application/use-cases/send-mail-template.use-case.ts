@@ -17,6 +17,7 @@ export interface SendTemplateInput {
   to: string;
   variables: Record<string, string>;
   metadata?: JsonObject | null;
+  sourceJobId?: string | null;
 }
 
 @Injectable()
@@ -71,6 +72,7 @@ export class SendMailTemplateUseCase {
         status: 'SENT',
         metadata: input.metadata ?? null,
         sentAt: new Date(),
+        sourceJobId: input.sourceJobId ?? null,
       });
     } catch (error) {
       await this.mailDeliveriesRepository.create({
@@ -83,6 +85,7 @@ export class SendMailTemplateUseCase {
             ? error.message
             : 'Unknown mail delivery error',
         metadata: input.metadata ?? null,
+        sourceJobId: input.sourceJobId ?? null,
       });
 
       throw error;

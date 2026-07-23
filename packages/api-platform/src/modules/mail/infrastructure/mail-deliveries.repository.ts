@@ -28,6 +28,7 @@ export class MailDeliveriesRepository implements MailDeliveriesRepositoryPort {
     const [delivery] = await executor
       .insert(mailDeliveries)
       .values(values)
+      .onConflictDoNothing()
       .returning();
 
     return delivery ?? null;

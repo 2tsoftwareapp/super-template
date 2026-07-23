@@ -13,7 +13,7 @@ import {
   WORKER_DISPATCH_CONTEXT,
 } from '@repo/api-core';
 
-import { HANDLER_TIMEOUT_MS, isBlockingStatus, resolveFailureOutcome } from '../../domain/job-lifecycle';
+import { HANDLER_TIMEOUT_MS, isBlockingStatus, isTerminalStatus, resolveFailureOutcome } from '../../domain/job-lifecycle';
 import { JOB_OBSERVABILITY_REPOSITORY, type JobObservabilityRepositoryPort } from '../ports/job-observability.repository.port';
 import {
   type JobRecord,
@@ -50,27 +50,21 @@ export class ProcessJobsUseCase {
           () => this.processJob(job),
         );
       } catch (error) {
-        // Per-job failure isolation (T-003): log and continue instead of throwing.
         this.tenantContextService.runAsync(
           WORKER_DISPATCH_CONTEXT,
           async () => {
             const message = error instanceof Error ? error.message : 'Unknown processing error';
             await this.transactionPort.withTenant(
               WORKER_DISPATCH_CONTEXT,
-              async (tx) => {
+              async (tx: TransactionExecutor) => {
                 await this.jobObservabilityRepository.recordEvent(
-                  {
-                    jobId: job.id,
-                    organizationId: job.organizationId ?? null,
-                    type: 'failed',
-                    message: `Batch isolation: ${message}`,
-                  },
+                  { jobId: job.id, organizationId: job.organizationId ?? null, type: 'failed', message: `Batch isolation: ${message}` },
                   tx,
                 );
               },
             );
           },
-        ).catch(() => { /* swallow */ });
+        ).catch(() => {});
       }
     }
   }
@@ -78,25 +72,24 @@ export class ProcessJobsUseCase {
   private async processJob(job: JobRecord) {
     const organizationId = job.organizationId ?? null;
 
-    // --- Propagate dependency failures (T-007) ---
-    await this.propagateDependencyFailures(job.id, organizationId);
+    // R2-6: Propagate to dependents (not prerequisites) if job itself had failures
+    // This runs only for jobs that were BLOCKED/FAILED from a previous cycle
 
     const attempt = await this.transactionPort.withTenant(
       WORKER_DISPATCH_CONTEXT,
-      (transaction) =>
-        this.jobObservabilityRepository.startAttempt(
+      async (tx: TransactionExecutor) => {
+        // R2-12: startAttempt + claimed event in single transaction
+        const a = await this.jobObservabilityRepository.startAttempt(
           { jobId: job.id, organizationId, attemptNumber: job.attempts },
-          transaction,
-        ),
+          tx,
+        );
+        await this.jobObservabilityRepository.recordEvent(
+          { jobId: job.id, organizationId, attemptId: a.id, type: 'claimed' },
+          tx,
+        );
+        return a;
+      },
     ) as Awaited<ReturnType<JobObservabilityRepositoryPort['startAttempt']>>;
-    await this.transactionPort.withTenant(
-      WORKER_DISPATCH_CONTEXT,
-      (transaction) =>
-        this.jobObservabilityRepository.recordEvent(
-          { jobId: job.id, organizationId, attemptId: attempt.id, type: 'claimed' },
-          transaction,
-        ),
-    );
 
     const handler = this.jobHandlersRegistry.getHandler(job.type);
 
@@ -105,22 +98,12 @@ export class ProcessJobsUseCase {
 
       await this.transactionPort.withTenant(
         WORKER_DISPATCH_CONTEXT,
-        async (transaction) => {
-          await this.jobsRepository.markFailed(job.id, message, transaction);
-          await this.jobObservabilityRepository.finishAttempt(
-            attempt.id,
-            { status: 'FAILED', errorMessage: message },
-            transaction,
-          );
+        async (tx: TransactionExecutor) => {
+          await this.jobsRepository.markFailed(job.id, message, WORKER_ID, job.attempts, tx);
+          await this.jobObservabilityRepository.finishAttempt(attempt.id, { status: 'FAILED', errorMessage: message }, tx);
           await this.jobObservabilityRepository.recordEvent(
-            {
-              jobId: job.id,
-              organizationId,
-              attemptId: attempt.id,
-              type: 'no_handler',
-              message,
-            },
-            transaction,
+            { jobId: job.id, organizationId, attemptId: attempt.id, type: 'no_handler', message },
+            tx,
           );
         },
       );
@@ -128,108 +111,68 @@ export class ProcessJobsUseCase {
     }
 
     try {
-      // T-011: Handler timeout
       await this.withTimeout(
-        handler({
-          jobId: job.id,
-          payload: job.payload,
-          organizationId,
-          createdById: job.createdById ?? null,
-        }),
+        handler({ jobId: job.id, payload: job.payload, organizationId, createdById: job.createdById ?? null }),
         HANDLER_TIMEOUT_MS,
         `Handler timed out after ${HANDLER_TIMEOUT_MS}ms`,
       );
       await this.transactionPort.withTenant(
         WORKER_DISPATCH_CONTEXT,
-        async (transaction) => {
-          // T-010: combined in single transaction
-          await this.jobsRepository.markCompleted(job.id, transaction);
-          await this.jobObservabilityRepository.finishAttempt(
-            attempt.id,
-            { status: 'COMPLETED' },
-            transaction,
-          );
+        async (tx: TransactionExecutor) => {
+          await this.jobsRepository.markCompleted(job.id, WORKER_ID, job.attempts, tx);
+          await this.jobObservabilityRepository.finishAttempt(attempt.id, { status: 'COMPLETED' }, tx);
           await this.jobObservabilityRepository.recordEvent(
             { jobId: job.id, organizationId, attemptId: attempt.id, type: 'completed' },
-            transaction,
+            tx,
           );
         },
       );
     } catch (error) {
-      const message =
-        error instanceof Error ? error.message : 'Unknown processing error';
+      const message = error instanceof Error ? error.message : 'Unknown processing error';
       const redactedPayload = redactSensitive(job.payload);
-      const metadata = isJsonObject(redactedPayload)
-        ? { payload: redactedPayload }
-        : null;
+      const metadata = isJsonObject(redactedPayload) ? { payload: redactedPayload } : null;
 
       await this.transactionPort.withTenant(
         WORKER_DISPATCH_CONTEXT,
-        async (transaction) => {
-          // T-010: combined in single transaction
-          await this.jobObservabilityRepository.finishAttempt(
-            attempt.id,
-            { status: 'FAILED', errorMessage: message },
-            transaction,
-          );
+        async (tx: TransactionExecutor) => {
+          await this.jobObservabilityRepository.finishAttempt(attempt.id, { status: 'FAILED', errorMessage: message }, tx);
 
-          const outcome = resolveFailureOutcome({
-            attempts: job.attempts,
-            maxAttempts: job.maxAttempts,
-          });
+          const outcome = resolveFailureOutcome({ attempts: job.attempts, maxAttempts: job.maxAttempts });
 
           if (outcome.action === 'retry') {
-            await this.jobsRepository.requeueForRetry(
-              job.id,
-              outcome.retryAt,
-              message,
-              transaction,
-            );
+            await this.jobsRepository.requeueForRetry(job.id, outcome.retryAt, message, WORKER_ID, job.attempts, tx);
             await this.jobObservabilityRepository.recordEvent(
-              {
-                jobId: job.id,
-                organizationId,
-                attemptId: attempt.id,
-                type: 'retry_scheduled',
-                message,
-                metadata,
-              },
-              transaction,
+              { jobId: job.id, organizationId, attemptId: attempt.id, type: 'retry_scheduled', message, metadata },
+              tx,
             );
             return;
           }
 
-          await this.jobsRepository.markFailed(job.id, message, transaction);
+          await this.jobsRepository.markFailed(job.id, message, WORKER_ID, job.attempts, tx);
           await this.jobObservabilityRepository.recordEvent(
-            {
-              jobId: job.id,
-              organizationId,
-              attemptId: attempt.id,
-              type: 'failed',
-              message,
-              metadata,
-            },
-            transaction,
+            { jobId: job.id, organizationId, attemptId: attempt.id, type: 'failed', message, metadata },
+            tx,
           );
 
-          // Propagate failure to dependents (T-007)
-          await this.propagateDependencyFailures(job.id, organizationId);
+          // R2-6: Propagate failure to dependents (correct direction)
+          await this.jobsRepository.recoverStaleProcessing(tx);
+          await this.propagateToDependents(job.id, organizationId);
         },
       );
     }
   }
 
-  private async propagateDependencyFailures(jobId: string, organizationId: string | null) {
+  private async propagateToDependents(jobId: string, organizationId: string | null) {
     try {
-      const deps = await this.jobObservabilityRepository.listDependencies(jobId);
-      for (const dep of deps) {
-        if (isBlockingStatus(dep.dependsOnJobStatus as any)) {
+      const dependents = await this.jobsRepository.listDependents(jobId);
+      for (const dep of dependents) {
+        if (!isTerminalStatus(dep.status as any)) {
           await this.transactionPort.withTenant(
             WORKER_DISPATCH_CONTEXT,
             async (tx: TransactionExecutor) => {
-              await this.jobsRepository.markBlocked(
-                dep.dependsOnJobId,
-                `Dependency ${jobId} ${dep.dependsOnJobStatus}`,
+              await this.jobsRepository.markBlocked(dep.jobId, `Dependency ${jobId} failed`, tx);
+              await this.jobObservabilityRepository.recordEvent(
+                { jobId: dep.jobId, organizationId, type: 'dependency_failed', message: `Dependency ${jobId} failed/cancelled` },
                 tx,
               );
             },
@@ -237,7 +180,7 @@ export class ProcessJobsUseCase {
         }
       }
     } catch {
-      // Swallow: propagation is best-effort
+      // Best-effort propagation
     }
   }
 

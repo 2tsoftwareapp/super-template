@@ -28,7 +28,7 @@ export interface JobRecord {
 }
 
 interface ListJobsParams {
-  scope?: JobScope;
+  scope: JobScope;
   page: number;
   limit: number;
   status?: string;
@@ -84,7 +84,7 @@ export interface JobsRepositoryPort {
   ): Promise<JobRecord | null>;
   findById(
     jobId: string,
-    scope?: JobScope,
+    scope: JobScope,
     executor?: TransactionExecutor,
   ): Promise<JobRecord | null>;
 
@@ -100,6 +100,7 @@ export interface JobsRepositoryPort {
   ): Promise<{ rows: JobRecord[]; total: number }>;
   markCancelled(
     jobId: string,
+    scope: JobScope,
     executor?: TransactionExecutor,
   ): Promise<JobRecord | null>;
   claimDueJobs(
@@ -109,29 +110,42 @@ export interface JobsRepositoryPort {
   ): Promise<JobRecord[]>;
   markCompleted(
     jobId: string,
+    workerId: string,
+    attempts: number,
     executor?: TransactionExecutor,
   ): Promise<JobRecord | null>;
   markFailed(
     jobId: string,
     message: string,
+    workerId: string,
+    attempts: number,
     executor?: TransactionExecutor,
   ): Promise<JobRecord | null>;
   requeueForRetry(
     jobId: string,
     scheduledAt: Date,
     message: string,
+    workerId: string,
+    attempts: number,
     executor?: TransactionExecutor,
   ): Promise<JobRecord | null>;
-  recoverStaleProcessing(
-    timeoutMinutes: number,
-    maxAttempts: number,
+  acquireDependencyGraphLock(
+    scope: JobScope,
     executor?: TransactionExecutor,
-  ): Promise<JobRecord[]>;
+  ): Promise<void>;
+  recoverStaleProcessing(executor?: TransactionExecutor): Promise<{
+    requeued: JobRecord[];
+    failed: JobRecord[];
+  }>;
   markBlocked(
     jobId: string,
     message: string,
     executor?: TransactionExecutor,
   ): Promise<JobRecord | null>;
+  listDependents(
+    jobId: string,
+    executor?: TransactionExecutor,
+  ): Promise<{ id: string; jobId: string; status: string }[]>;
 }
 
 export const JOBS_REPOSITORY = Symbol('JOBS_REPOSITORY');

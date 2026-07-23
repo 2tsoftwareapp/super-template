@@ -1,7 +1,7 @@
 import type { AuthenticatedRequestUser } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { AppError, ERROR_CODES } from '@repo/api-core';
+import { AppError, ERROR_CODES, TRANSACTION_PORT, type TransactionPort, WORKER_DISPATCH_CONTEXT, type TransactionExecutor } from '@repo/api-core';
 
 import type { JobView } from '../jobs.types';
 
@@ -19,6 +19,7 @@ export class CancelJobUseCase {
     @Inject(JOBS_REPOSITORY) private readonly jobsRepository: JobsRepositoryPort,
     @Inject(JOB_OBSERVABILITY_REPOSITORY) private readonly jobObservabilityRepository: JobObservabilityRepositoryPort,
     private readonly jobsMapper: JobsMapper,
+    @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
   ) {}
 
   async execute(
@@ -26,32 +27,29 @@ export class CancelJobUseCase {
     jobId: string,
   ): Promise<JobView> {
     const scope = this.buildScope(actor);
-    const cancelled = await this.jobsRepository.markCancelled(jobId);
+
+    const cancelled = await this.transactionPort.withTenant(
+      WORKER_DISPATCH_CONTEXT,
+      async (tx: TransactionExecutor) => {
+        const result = await this.jobsRepository.markCancelled(jobId, scope, tx);
+        if (!result) return null;
+        await this.jobObservabilityRepository.recordEvent(
+          { jobId: result.id, organizationId: result.organizationId ?? null, type: 'cancelled', message: `Cancelled by user ${actor.userId}` },
+          tx,
+        );
+        return result;
+      },
+    );
 
     if (!cancelled) {
       const existing = await this.jobsRepository.findById(jobId, scope);
 
       if (!existing) {
-        throw new AppError(
-          ERROR_CODES.JOB_NOT_FOUND,
-          'Job not found',
-          HttpStatus.NOT_FOUND,
-        );
+        throw new AppError(ERROR_CODES.JOB_NOT_FOUND, 'Job not found', HttpStatus.NOT_FOUND);
       }
 
-      throw new AppError(
-        ERROR_CODES.RESOURCE_CONFLICT,
-        'Only pending jobs can be cancelled',
-        HttpStatus.CONFLICT,
-      );
+      throw new AppError(ERROR_CODES.RESOURCE_CONFLICT, 'Only pending jobs can be cancelled', HttpStatus.CONFLICT);
     }
-
-    await this.jobObservabilityRepository.recordEvent({
-      jobId: cancelled.id,
-      organizationId: cancelled.organizationId ?? null,
-      type: 'cancelled',
-      message: `Cancelled by user ${actor.userId}`,
-    });
 
     return this.jobsMapper.toJobView(cancelled);
   }

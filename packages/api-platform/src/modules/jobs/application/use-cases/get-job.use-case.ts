@@ -17,18 +17,11 @@ export class GetJobUseCase {
     private readonly jobsMapper: JobsMapper,
   ) {}
 
-  async execute(
-    jobId: string,
-    scope?: JobScope,
-  ): Promise<JobView> {
+  async execute(jobId: string, scope: JobScope): Promise<JobView> {
     const job = await this.jobsRepository.findById(jobId, scope);
 
     if (!job) {
-      throw new AppError(
-        ERROR_CODES.JOB_NOT_FOUND,
-        'Job not found',
-        HttpStatus.NOT_FOUND,
-      );
+      throw new AppError(ERROR_CODES.JOB_NOT_FOUND, 'Job not found', HttpStatus.NOT_FOUND);
     }
 
     return this.jobsMapper.toJobView(job);

@@ -2,6 +2,8 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { GetJobMetricsUseCase } from '../get-job-metrics.use-case';
 
+const scope = { type: 'platform' as const };
+
 describe('GetJobMetricsUseCase', () => {
   it('computes retry rate and failure rate from terminal jobs only', async () => {
     const jobObservabilityRepository = {
@@ -17,7 +19,7 @@ describe('GetJobMetricsUseCase', () => {
 
     const useCase = new GetJobMetricsUseCase(jobObservabilityRepository as never);
 
-    const result = await useCase.execute({});
+    const result = await useCase.execute({ scope });
 
     expect(result).toMatchObject({
       totalCompleted: 8,
@@ -41,13 +43,11 @@ describe('GetJobMetricsUseCase', () => {
 
     const useCase = new GetJobMetricsUseCase(jobObservabilityRepository as never);
 
-    const result = await useCase.execute({ from: '2026-01-01' });
+    const result = await useCase.execute({ from: '2026-01-01', scope });
 
     expect(result.retryRate).toBe(0);
     expect(result.failureRate).toBe(0);
     expect(result.averageDurationMs).toBeNull();
-    expect(jobObservabilityRepository.getStatusCounts).toHaveBeenCalledWith({
-      from: '2026-01-01',
-    });
+    expect(jobObservabilityRepository.getStatusCounts).toHaveBeenCalledWith(scope, { from: '2026-01-01' });
   });
 });

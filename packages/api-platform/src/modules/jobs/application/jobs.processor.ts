@@ -68,12 +68,14 @@ export class JobsProcessor {
     try {
       const recovered = await this.transactionPort.withTenant(
         WORKER_DISPATCH_CONTEXT,
-        (tx) => this.jobsRepository.recoverStaleProcessing(10, 5, tx),
+        (tx) => this.jobsRepository.recoverStaleProcessing(tx),
       );
 
-      if (recovered.length > 0) {
+      const total = recovered.requeued.length + recovered.failed.length;
+      if (total > 0) {
         this.logger.info('Recovered stale processing jobs', {
-          count: String(recovered.length),
+          requeued: String(recovered.requeued.length),
+          failed: String(recovered.failed.length),
           workerId: WORKER_ID,
         });
       }
