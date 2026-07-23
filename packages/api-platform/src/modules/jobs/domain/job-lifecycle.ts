@@ -4,7 +4,6 @@ const TERMINAL_STATUSES: ReadonlySet<JobStatus> = new Set([
   'COMPLETED',
   'CANCELLED',
   'FAILED',
-  'BLOCKED',
 ]);
 
 const CANCELLABLE_STATUSES: ReadonlySet<JobStatus> = new Set(['PENDING']);
@@ -12,7 +11,6 @@ const CANCELLABLE_STATUSES: ReadonlySet<JobStatus> = new Set(['PENDING']);
 const BLOCKING_STATUSES: ReadonlySet<JobStatus> = new Set([
   'FAILED',
   'CANCELLED',
-  'BLOCKED',
 ]);
 
 export const LEASE_DURATION_MS = 5 * 60 * 1000;

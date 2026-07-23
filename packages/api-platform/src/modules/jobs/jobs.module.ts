@@ -8,6 +8,7 @@ import { JobsService } from './application/jobs.service';
 import { JOB_OBSERVABILITY_REPOSITORY } from './application/ports/job-observability.repository.port';
 import { JOBS_REPOSITORY } from './application/ports/jobs.repository.port';
 import { JobHandlersRegistry } from './application/services/job-handlers.registry';
+import { PropagationService } from './application/services/propagation.service';
 import { AddJobDependencyUseCase } from './application/use-cases/add-job-dependency.use-case';
 import { CancelJobUseCase } from './application/use-cases/cancel-job.use-case';
 import { EnqueueJobUseCase } from './application/use-cases/enqueue-job.use-case';
@@ -35,6 +36,7 @@ import { AdminJobsController } from './presentation/admin-jobs.controller';
     JobHandlersRegistry,
     EnqueueJobUseCase,
     ListJobsUseCase,
+    PropagationService,
     CancelJobUseCase,
     ProcessJobsUseCase,
     GetJobUseCase,

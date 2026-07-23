@@ -9,6 +9,7 @@ import { DATABASE, runIdempotentInsert } from '@repo/api-database';
 import { jobAttempts, jobs } from '@repo/api-database';
 import { and, count, desc, eq, isNull, sql } from 'drizzle-orm';
 
+import type { JobStatus } from '../domain/job-status';
 import type { JobRecord, JobScope, JobsRepositoryPort } from '../application/ports/jobs.repository.port';
 
 function scopeCondition(scope: JobScope) {
@@ -236,6 +237,7 @@ export class JobsRepository implements JobsRepositoryPort {
 
   async markBlocked(
     jobId: string,
+    scope: JobScope,
     message: string,
     executor?: TransactionExecutor,
   ): Promise<JobRecord | null> {
@@ -243,7 +245,7 @@ export class JobsRepository implements JobsRepositoryPort {
     const [job] = await db
       .update(jobs)
       .set({ status: 'BLOCKED', errorMessage: message, updatedAt: new Date() })
-      .where(and(eq(jobs.id, jobId), eq(jobs.status, 'PENDING')))
+      .where(and(eq(jobs.id, jobId), eq(jobs.status, 'PENDING'), scopeCondition(scope)))
       .returning();
     return (job as JobRecord) ?? null;
   }
@@ -332,15 +334,22 @@ export class JobsRepository implements JobsRepositoryPort {
 
   async listDependents(
     jobId: string,
+    scope: JobScope,
     executor?: TransactionExecutor,
-  ): Promise<{ id: string; jobId: string; status: string }[]> {
+  ): Promise<{ id: string; jobId: string; status: JobStatus; organizationId: string | null }[]> {
     const db = (executor ?? this.database) as DatabaseExecutor;
-    const result = await db.execute<{ id: string; job_id: string; status: string }>(sql`
-      SELECT jd.id, jd.job_id, j.status
+    const result = await db.execute<{ id: string; job_id: string; status: string; organization_id: string | null }>(sql`
+      SELECT jd.id, jd.job_id, j.status, j.organization_id
       FROM job_dependencies jd
       INNER JOIN jobs j ON j.id = jd.job_id
       WHERE jd.depends_on_job_id = ${jobId}
+      AND ${scopeCondition(scope)}
     `);
-    return result.rows.map((r) => ({ id: r.id, jobId: r.job_id, status: r.status }));
+    return result.rows.map((r) => ({
+      id: r.id,
+      jobId: r.job_id,
+      status: r.status as JobStatus,
+      organizationId: r.organization_id,
+    }));
   }
 }

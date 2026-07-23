@@ -46,6 +46,10 @@ export interface NotificationsRepositoryPort {
     userIds: string[],
     executor?: TransactionExecutor,
   ): Promise<NotificationRecord[]>;
+  findBySourceBackgroundJobId(
+    sourceBackgroundJobId: string,
+    executor?: TransactionExecutor,
+  ): Promise<NotificationRecord | null>;
   findById(
     notificationId: string,
     organizationId?: string,

@@ -26,6 +26,17 @@ export interface MailDeliveriesRepositoryPort {
     createdAt: Date;
   } | null>;
 
+  findBySourceJobId(
+    sourceJobId: string,
+    executor?: TransactionExecutor,
+  ): Promise<{
+    id: string;
+    status: string;
+    recipient: string;
+    errorMessage: string | null;
+    createdAt: Date;
+  } | null>;
+
   updateStatus(
     id: string,
     values: {

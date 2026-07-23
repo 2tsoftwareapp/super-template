@@ -68,7 +68,13 @@ export class SendMailTemplateUseCase {
     });
 
     if (!delivery) {
-      return;
+      if (input.sourceJobId) {
+        const existing = await this.mailDeliveriesRepository.findBySourceJobId(input.sourceJobId);
+        if (existing && existing.status === 'SENT') {
+          return;
+        }
+      }
+      throw new Error('Mail delivery already attempted but not confirmed sent');
     }
 
     try {

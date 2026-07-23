@@ -85,6 +85,15 @@ export class SendNotificationUseCase {
       );
 
       if (!notification) {
+        if (input.sourceBackgroundJobId) {
+          const existing = await this.notificationsRepository.findBySourceBackgroundJobId(
+            input.sourceBackgroundJobId,
+            tx,
+          );
+          if (existing) {
+            return existing;
+          }
+        }
         throw new Error('Notification insert returned no rows');
       }
 

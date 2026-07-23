@@ -10,14 +10,15 @@ import {
   WORKER_DISPATCH_CONTEXT,
 } from '@repo/api-core';
 
-import { isTerminalStatus } from '../domain/job-lifecycle';
 import { JOB_OBSERVABILITY_REPOSITORY, type JobObservabilityRepositoryPort } from './ports/job-observability.repository.port';
 import {
   type JobRecord,
+  type JobScope,
   JOBS_REPOSITORY,
   type JobsRepositoryPort,
 } from './ports/jobs.repository.port';
 import { JobsService } from './jobs.service';
+import { PropagationService } from './services/propagation.service';
 
 const WORKER_ID = `worker-${Math.random().toString(36).slice(2, 10)}`;
 
@@ -32,6 +33,7 @@ export class JobsProcessor {
     @Inject(JOBS_REPOSITORY) private readonly jobsRepository: JobsRepositoryPort,
     @Inject(JOB_OBSERVABILITY_REPOSITORY) private readonly jobObservabilityRepository: JobObservabilityRepositoryPort,
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
+    private readonly propagationService: PropagationService,
   ) {}
 
   @Cron(CronExpression.EVERY_MINUTE)
@@ -86,7 +88,16 @@ export class JobsProcessor {
           }
 
           for (const failed of recovered.failed) {
-            await this.propagateToDependents(failed, tx);
+            const scope: JobScope = failed.organizationId
+              ? { type: 'organization', organizationId: failed.organizationId }
+              : { type: 'platform' };
+            await this.propagationService.propagateBlocked(
+              failed.id,
+              scope,
+              failed.organizationId ?? null,
+              'stale recovery exhausted',
+              tx,
+            );
           }
         },
       );
@@ -97,29 +108,5 @@ export class JobsProcessor {
     }
   }
 
-  private async propagateToDependents(
-    job: Pick<JobRecord, 'id' | 'organizationId'>,
-    executor: TransactionExecutor,
-  ) {
-    const organizationId = job.organizationId ?? null;
-    const dependents = await this.jobsRepository.listDependents(job.id, executor);
-    for (const dep of dependents) {
-      if (isTerminalStatus(dep.status as any)) {
-        continue;
-      }
-      try {
-        await this.jobsRepository.markBlocked(dep.jobId, `Dependency ${job.id} failed after stale recovery`, executor);
-        await this.jobObservabilityRepository.recordEvent(
-          { jobId: dep.jobId, organizationId, type: 'dependency_failed', message: `Dependency ${job.id} failed after stale recovery` },
-          executor,
-        );
-      } catch (err) {
-        this.logger.error('Propagation error during stale recovery', {
-          sourceId: job.id,
-          targetId: dep.jobId,
-          error: err instanceof Error ? err.message : String(err),
-        });
-      }
-    }
-  }
+
 }

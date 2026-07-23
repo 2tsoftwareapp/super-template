@@ -34,6 +34,19 @@ export class MailDeliveriesRepository implements MailDeliveriesRepositoryPort {
     return delivery ?? null;
   }
 
+  async findBySourceJobId(
+    sourceJobId: string,
+    executor: DatabaseExecutor = this.database,
+  ) {
+    const [delivery] = await executor
+      .select({ id: mailDeliveries.id, status: mailDeliveries.status, recipient: mailDeliveries.recipient, errorMessage: mailDeliveries.errorMessage, createdAt: mailDeliveries.createdAt })
+      .from(mailDeliveries)
+      .where(eq(mailDeliveries.sourceJobId, sourceJobId))
+      .limit(1);
+
+    return delivery ?? null;
+  }
+
   async updateStatus(
     id: string,
     values: {

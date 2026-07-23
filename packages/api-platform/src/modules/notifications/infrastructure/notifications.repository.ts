@@ -25,10 +25,18 @@ export class NotificationsRepository implements NotificationsRepositoryPort {
     values: typeof notifications.$inferInsert,
     executor: DatabaseExecutor = this.database,
   ) {
-    const [notification] = await executor
+    const query = executor
       .insert(notifications)
-      .values(values)
-      .returning();
+      .values(values);
+
+    if (values.sourceBackgroundJobId) {
+      query.onConflictDoNothing({
+        target: notifications.sourceBackgroundJobId,
+        where: sql`${notifications.sourceBackgroundJobId} is not null`,
+      });
+    }
+
+    const [notification] = await query.returning();
     return notification ?? null;
   }
 
@@ -70,6 +78,19 @@ export class NotificationsRepository implements NotificationsRepositoryPort {
           inArray(notifications.userId, userIds),
         ),
       );
+  }
+
+  async findBySourceBackgroundJobId(
+    sourceBackgroundJobId: string,
+    executor: DatabaseExecutor = this.database,
+  ) {
+    const [notification] = await executor
+      .select()
+      .from(notifications)
+      .where(eq(notifications.sourceBackgroundJobId, sourceBackgroundJobId))
+      .limit(1);
+
+    return notification ?? null;
   }
 
   async findById(

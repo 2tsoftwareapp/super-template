@@ -13,14 +13,16 @@ import {
   WORKER_DISPATCH_CONTEXT,
 } from '@repo/api-core';
 
-import { HANDLER_TIMEOUT_MS, isTerminalStatus, isBlockingStatus, resolveFailureOutcome } from '../../domain/job-lifecycle';
+import { HANDLER_TIMEOUT_MS, resolveFailureOutcome } from '../../domain/job-lifecycle';
 import { JOB_OBSERVABILITY_REPOSITORY, type JobObservabilityRepositoryPort } from '../ports/job-observability.repository.port';
 import {
   type JobRecord,
+  type JobScope,
   JOBS_REPOSITORY,
   type JobsRepositoryPort,
 } from '../ports/jobs.repository.port';
 import { JobHandlersRegistry } from '../services/job-handlers.registry';
+import { PropagationService } from '../services/propagation.service';
 
 const WORKER_ID = `worker-${Math.random().toString(36).slice(2, 10)}`;
 
@@ -32,6 +34,7 @@ export class ProcessJobsUseCase {
     private readonly jobHandlersRegistry: JobHandlersRegistry,
     @Inject(JOB_OBSERVABILITY_REPOSITORY) private readonly jobObservabilityRepository: JobObservabilityRepositoryPort,
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
+    private readonly propagationService: PropagationService,
   ) {}
 
   async execute(): Promise<void> {
@@ -95,13 +98,22 @@ export class ProcessJobsUseCase {
       await this.transactionPort.withTenant(
         WORKER_DISPATCH_CONTEXT,
         async (tx: TransactionExecutor) => {
-          await this.jobsRepository.markFailed(job.id, message, WORKER_ID, job.attempts, tx);
+          const failed = await this.jobsRepository.markFailed(job.id, message, WORKER_ID, job.attempts, tx);
+          if (!failed) {
+            return;
+          }
           await this.jobObservabilityRepository.finishAttempt(attempt.id, { status: 'FAILED', errorMessage: message }, tx);
           await this.jobObservabilityRepository.recordEvent(
             { jobId: job.id, organizationId, attemptId: attempt.id, type: 'no_handler', message },
             tx,
           );
-          await this.propagateToDependents(job.id, organizationId, tx);
+          await this.propagationService.propagateBlocked(
+            job.id,
+            this.scopeFromOrg(organizationId),
+            organizationId,
+            'no handler',
+            tx,
+          );
         },
       );
       return;
@@ -136,8 +148,6 @@ export class ProcessJobsUseCase {
       await this.transactionPort.withTenant(
         WORKER_DISPATCH_CONTEXT,
         async (tx: TransactionExecutor) => {
-          await this.jobObservabilityRepository.finishAttempt(attempt.id, { status: 'FAILED', errorMessage: message }, tx);
-
           const outcome = resolveFailureOutcome({ attempts: job.attempts, maxAttempts: job.maxAttempts });
 
           if (outcome.action === 'retry') {
@@ -145,6 +155,7 @@ export class ProcessJobsUseCase {
             if (!requeued) {
               return;
             }
+            await this.jobObservabilityRepository.finishAttempt(attempt.id, { status: 'FAILED', errorMessage: message }, tx);
             await this.jobObservabilityRepository.recordEvent(
               { jobId: job.id, organizationId, attemptId: attempt.id, type: 'retry_scheduled', message, metadata },
               tx,
@@ -156,54 +167,28 @@ export class ProcessJobsUseCase {
           if (!failed) {
             return;
           }
+          await this.jobObservabilityRepository.finishAttempt(attempt.id, { status: 'FAILED', errorMessage: message }, tx);
           await this.jobObservabilityRepository.recordEvent(
             { jobId: job.id, organizationId, attemptId: attempt.id, type: 'failed', message, metadata },
             tx,
           );
 
-          await this.propagateToDependents(job.id, organizationId, tx);
+          await this.propagationService.propagateBlocked(
+            job.id,
+            this.scopeFromOrg(organizationId),
+            organizationId,
+            'failed',
+            tx,
+          );
         },
       );
     }
   }
 
-  private async propagateToDependents(
-    jobId: string,
-    organizationId: string | null,
-    executor: TransactionExecutor | undefined,
-  ) {
-    const visited = new Set<string>();
-    const queue = [jobId];
-
-    while (queue.length > 0) {
-      const currentId = queue.shift()!;
-      if (visited.has(currentId)) {
-        continue;
-      }
-      visited.add(currentId);
-
-      const dependents = await this.jobsRepository.listDependents(currentId, executor);
-      for (const dep of dependents) {
-        if (isTerminalStatus(dep.status as any) || isBlockingStatus(dep.status as any)) {
-          continue;
-        }
-        try {
-          await this.jobsRepository.markBlocked(dep.jobId, `Dependency ${currentId} failed/cancelled`, executor);
-          await this.jobObservabilityRepository.recordEvent(
-            { jobId: dep.jobId, organizationId, type: 'dependency_failed', message: `Dependency ${currentId} failed/cancelled` },
-            executor,
-          );
-        } catch (err) {
-          this.logPropagationError(currentId, dep.jobId, err);
-        }
-        queue.push(dep.jobId);
-      }
-    }
-  }
-
-  private logPropagationError(sourceId: string, targetId: string, err: unknown) {
-    const message = err instanceof Error ? err.message : String(err);
-    console.error(`[ProcessJobsUseCase] propagation failed: ${sourceId} -> ${targetId}: ${message}`);
+  private scopeFromOrg(organizationId: string | null): JobScope {
+    return organizationId
+      ? { type: 'organization', organizationId }
+      : { type: 'platform' };
   }
 
   private async withTimeout<T>(promise: Promise<T>, ms: number, message: string): Promise<T> {
