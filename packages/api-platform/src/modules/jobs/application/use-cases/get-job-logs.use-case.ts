@@ -5,6 +5,7 @@ import { JOB_OBSERVABILITY_REPOSITORY, type JobObservabilityRepositoryPort } fro
 import {
   JOBS_REPOSITORY,
   type JobsRepositoryPort,
+  type JobScope,
 } from '../ports/jobs.repository.port';
 
 export interface ListJobLogsQuery {
@@ -19,8 +20,8 @@ export class GetJobLogsUseCase {
     @Inject(JOB_OBSERVABILITY_REPOSITORY) private readonly jobObservabilityRepository: JobObservabilityRepositoryPort,
   ) {}
 
-  async execute(jobId: string, query: ListJobLogsQuery) {
-    const job = await this.jobsRepository.findById(jobId);
+  async execute(jobId: string, query: ListJobLogsQuery, scope?: JobScope) {
+    const job = await this.jobsRepository.findById(jobId, scope);
 
     if (!job) {
       throw new AppError(

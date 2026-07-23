@@ -22,6 +22,9 @@ export const jobs = pgTable(
     priority: integer('priority').notNull().default(0),
     attempts: integer('attempts').notNull().default(0),
     maxAttempts: integer('max_attempts').notNull().default(3),
+    processingStartedAt: timestamp('processing_started_at', { withTimezone: true }),
+    leaseExpiresAt: timestamp('lease_expires_at', { withTimezone: true }),
+    workerId: text('worker_id'),
     startedAt: timestamp('started_at', { withTimezone: true }),
     completedAt: timestamp('completed_at', { withTimezone: true }),
     cancelledAt: timestamp('cancelled_at', { withTimezone: true }),
@@ -35,8 +38,9 @@ export const jobs = pgTable(
   (table) => [
     index('jobs_status_scheduled_at_idx').on(table.status, table.scheduledAt),
     index('jobs_type_idx').on(table.type),
-    uniqueIndex('jobs_created_by_idempotency_key_unique')
-      .on(table.createdById, table.idempotencyKey)
+    index('jobs_status_lease_idx').on(table.status, table.leaseExpiresAt),
+    uniqueIndex('jobs_org_created_by_idempotency_key_unique')
+      .on(table.organizationId, table.createdById, table.idempotencyKey)
       .where(sql`${table.idempotencyKey} is not null`),
   ],
 );

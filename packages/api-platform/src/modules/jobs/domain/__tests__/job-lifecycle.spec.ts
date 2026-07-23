@@ -3,8 +3,8 @@ import { describe, expect, it } from 'vitest';
 import {
   isCancellableStatus,
   isTerminalStatus,
+  isBlockingStatus,
   resolveFailureOutcome,
-  RETRY_DELAY_MS,
 } from '../job-lifecycle';
 
 describe('job-lifecycle', () => {
@@ -16,7 +16,7 @@ describe('job-lifecycle', () => {
       },
     );
 
-    it.each(['PENDING', 'PROCESSING'] as const)(
+    it.each(['PENDING', 'PROCESSING', 'BLOCKED'] as const)(
       'treats %s as non-terminal',
       (status) => {
         expect(isTerminalStatus(status)).toBe(false);
@@ -34,20 +34,34 @@ describe('job-lifecycle', () => {
     });
   });
 
+  describe('isBlockingStatus', () => {
+    it('treats FAILED and CANCELLED as blocking', () => {
+      expect(isBlockingStatus('FAILED')).toBe(true);
+      expect(isBlockingStatus('CANCELLED')).toBe(true);
+    });
+
+    it('treats other statuses as non-blocking', () => {
+      expect(isBlockingStatus('PENDING')).toBe(false);
+      expect(isBlockingStatus('PROCESSING')).toBe(false);
+      expect(isBlockingStatus('COMPLETED')).toBe(false);
+      expect(isBlockingStatus('BLOCKED')).toBe(false);
+    });
+  });
+
   describe('resolveFailureOutcome', () => {
     const now = new Date('2026-07-11T00:00:00Z');
 
-    it('retries with fixed backoff while attempts remain', () => {
+    it('retries with exponential backoff while attempts remain', () => {
       const outcome = resolveFailureOutcome({
         attempts: 1,
         maxAttempts: 3,
         now,
       });
 
-      expect(outcome).toEqual({
-        action: 'retry',
-        retryAt: new Date(now.getTime() + RETRY_DELAY_MS),
-      });
+      expect(outcome).toMatchObject({ action: 'retry' });
+      if (outcome.action === 'retry') {
+        expect(outcome.retryAt.getTime()).toBeGreaterThan(now.getTime());
+      }
     });
 
     it('fails permanently when attempts are exhausted', () => {

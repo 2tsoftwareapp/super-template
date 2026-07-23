@@ -13,9 +13,9 @@ export class JobDto {
   payload: JsonObject;
 
   @ApiProperty({
-    enum: ['PENDING', 'PROCESSING', 'COMPLETED', 'CANCELLED', 'FAILED'],
+    enum: ['PENDING', 'PROCESSING', 'COMPLETED', 'CANCELLED', 'FAILED', 'BLOCKED'],
   })
-  status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'CANCELLED' | 'FAILED';
+  status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'CANCELLED' | 'FAILED' | 'BLOCKED';
 
   @ApiProperty()
   scheduledAt: string;
@@ -49,20 +49,51 @@ export class JobDto {
 
   @ApiProperty()
   updatedAt: string;
+
+  @ApiPropertyOptional()
+  organizationId: string | null;
 }
 
+/** Job list view with redacted payload. */
+export class JobListDto extends JobDto {
+  @ApiProperty({ type: 'object', additionalProperties: true })
+  declare payload: Record<string, never>;
+}
+
+const STATUS_ENUM = ['PENDING', 'PROCESSING', 'COMPLETED', 'CANCELLED', 'FAILED', 'BLOCKED'] as const;
+
 export class JobsQueryDto extends PaginationQueryDto {
-  @ApiPropertyOptional({
-    enum: ['PENDING', 'PROCESSING', 'COMPLETED', 'CANCELLED', 'FAILED'],
-  })
+  @ApiPropertyOptional({ enum: STATUS_ENUM })
   @IsOptional()
-  @IsEnum(['PENDING', 'PROCESSING', 'COMPLETED', 'CANCELLED', 'FAILED'])
-  status?: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'CANCELLED' | 'FAILED';
+  @IsEnum(STATUS_ENUM)
+  status?: (typeof STATUS_ENUM)[number];
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
   type?: string;
+
+  @ApiPropertyOptional({ type: String, nullable: true })
+  @IsOptional()
+  @IsUUID()
+  organizationId?: string;
+}
+
+export class AdminJobsQueryDto extends PaginationQueryDto {
+  @ApiPropertyOptional({ enum: STATUS_ENUM })
+  @IsOptional()
+  @IsEnum(STATUS_ENUM)
+  status?: (typeof STATUS_ENUM)[number];
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  type?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsUUID()
+  organizationId?: string;
 }
 
 export class JobEventDto {
@@ -107,7 +138,7 @@ export class JobDependencyDto {
   dependsOnJobId: string;
 
   @ApiProperty({
-    enum: ['PENDING', 'PROCESSING', 'COMPLETED', 'CANCELLED', 'FAILED'],
+    enum: ['PENDING', 'PROCESSING', 'COMPLETED', 'CANCELLED', 'FAILED', 'BLOCKED'],
   })
   dependsOnJobStatus: string;
 

@@ -12,6 +12,10 @@ const job = (overrides: Partial<{ id: string; status: string; organizationId: st
 });
 
 describe('AddJobDependencyUseCase', () => {
+  const transactionPort = {
+    withTenant: vi.fn(async (_ctx: unknown, fn: (tx: unknown) => Promise<unknown>) => fn({ execute: vi.fn() })),
+  };
+
   it('rejects a job depending on itself without querying the cycle check', async () => {
     const jobsRepository = { findById: vi.fn() };
     const jobObservabilityRepository = {
@@ -22,6 +26,7 @@ describe('AddJobDependencyUseCase', () => {
     const useCase = new AddJobDependencyUseCase(
       jobsRepository as never,
       jobObservabilityRepository as never,
+      transactionPort as never,
     );
 
     await expect(useCase.execute('job-1', 'job-1')).rejects.toMatchObject({ code: ERROR_CODES.JOB_DEPENDENCY_CYCLE });
@@ -42,6 +47,7 @@ describe('AddJobDependencyUseCase', () => {
     const useCase = new AddJobDependencyUseCase(
       jobsRepository as never,
       jobObservabilityRepository as never,
+      transactionPort as never,
     );
 
     await expect(useCase.execute('job-1', 'job-missing')).rejects.toMatchObject({ code: ERROR_CODES.JOB_NOT_FOUND });
@@ -59,6 +65,7 @@ describe('AddJobDependencyUseCase', () => {
     const useCase = new AddJobDependencyUseCase(
       jobsRepository as never,
       jobObservabilityRepository as never,
+      transactionPort as never,
     );
 
     await expect(useCase.execute('job-1', 'job-2')).rejects.toMatchObject({ code: ERROR_CODES.JOB_DEPENDENCY_CYCLE });
@@ -83,6 +90,7 @@ describe('AddJobDependencyUseCase', () => {
     const useCase = new AddJobDependencyUseCase(
       jobsRepository as never,
       jobObservabilityRepository as never,
+      transactionPort as never,
     );
 
     const result = await useCase.execute('job-1', 'job-2');

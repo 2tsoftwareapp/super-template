@@ -7,6 +7,7 @@ import { JobsMapper } from '../jobs.mapper';
 import {
   JOBS_REPOSITORY,
   type JobsRepositoryPort,
+  type JobScope,
 } from '../ports/jobs.repository.port';
 
 @Injectable()
@@ -16,8 +17,11 @@ export class GetJobUseCase {
     private readonly jobsMapper: JobsMapper,
   ) {}
 
-  async execute(jobId: string): Promise<JobView> {
-    const job = await this.jobsRepository.findById(jobId);
+  async execute(
+    jobId: string,
+    scope?: JobScope,
+  ): Promise<JobView> {
+    const job = await this.jobsRepository.findById(jobId, scope);
 
     if (!job) {
       throw new AppError(

@@ -7,4 +7,5 @@ export type JobStatus =
   | 'PROCESSING'
   | 'COMPLETED'
   | 'CANCELLED'
-  | 'FAILED';
+  | 'FAILED'
+  | 'BLOCKED';

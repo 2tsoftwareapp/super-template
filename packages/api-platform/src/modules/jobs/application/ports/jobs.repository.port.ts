@@ -1,5 +1,9 @@
 import type { JsonObject, TransactionExecutor } from '@repo/api-core';
 
+export type JobScope =
+  | { type: 'organization'; organizationId: string }
+  | { type: 'platform' };
+
 export interface JobRecord {
   id: string;
   organizationId: string | null;
@@ -10,6 +14,9 @@ export interface JobRecord {
   priority: number;
   attempts: number;
   maxAttempts: number;
+  processingStartedAt: Date | null;
+  leaseExpiresAt: Date | null;
+  workerId: string | null;
   startedAt: Date | null;
   completedAt: Date | null;
   cancelledAt: Date | null;
@@ -21,6 +28,7 @@ export interface JobRecord {
 }
 
 interface ListJobsParams {
+  scope?: JobScope;
   page: number;
   limit: number;
   status?: string;
@@ -38,6 +46,9 @@ export interface JobsRepositoryPort {
       priority?: number;
       attempts?: number;
       maxAttempts?: number;
+      processingStartedAt?: Date | null;
+      leaseExpiresAt?: Date | null;
+      workerId?: string | null;
       startedAt?: Date | null;
       completedAt?: Date | null;
       cancelledAt?: Date | null;
@@ -58,6 +69,9 @@ export interface JobsRepositoryPort {
       priority?: number;
       attempts?: number;
       maxAttempts?: number;
+      processingStartedAt?: Date | null;
+      leaseExpiresAt?: Date | null;
+      workerId?: string | null;
       startedAt?: Date | null;
       completedAt?: Date | null;
       cancelledAt?: Date | null;
@@ -70,6 +84,14 @@ export interface JobsRepositoryPort {
   ): Promise<JobRecord | null>;
   findById(
     jobId: string,
+    scope?: JobScope,
+    executor?: TransactionExecutor,
+  ): Promise<JobRecord | null>;
+
+  findByIdempotencyKey(
+    organizationId: string | null,
+    createdById: string,
+    idempotencyKey: string,
     executor?: TransactionExecutor,
   ): Promise<JobRecord | null>;
   list(
@@ -82,6 +104,7 @@ export interface JobsRepositoryPort {
   ): Promise<JobRecord | null>;
   claimDueJobs(
     limit: number,
+    workerId: string,
     executor?: TransactionExecutor,
   ): Promise<JobRecord[]>;
   markCompleted(
@@ -96,6 +119,16 @@ export interface JobsRepositoryPort {
   requeueForRetry(
     jobId: string,
     scheduledAt: Date,
+    message: string,
+    executor?: TransactionExecutor,
+  ): Promise<JobRecord | null>;
+  recoverStaleProcessing(
+    timeoutMinutes: number,
+    maxAttempts: number,
+    executor?: TransactionExecutor,
+  ): Promise<JobRecord[]>;
+  markBlocked(
+    jobId: string,
     message: string,
     executor?: TransactionExecutor,
   ): Promise<JobRecord | null>;

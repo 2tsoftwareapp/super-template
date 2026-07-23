@@ -10,6 +10,7 @@ import { JOB_OBSERVABILITY_REPOSITORY, type JobObservabilityRepositoryPort } fro
 import {
   JOBS_REPOSITORY,
   type JobsRepositoryPort,
+  type JobScope,
 } from '../ports/jobs.repository.port';
 
 @Injectable()
@@ -24,10 +25,11 @@ export class CancelJobUseCase {
     actor: AuthenticatedRequestUser,
     jobId: string,
   ): Promise<JobView> {
+    const scope = this.buildScope(actor);
     const cancelled = await this.jobsRepository.markCancelled(jobId);
 
     if (!cancelled) {
-      const existing = await this.jobsRepository.findById(jobId);
+      const existing = await this.jobsRepository.findById(jobId, scope);
 
       if (!existing) {
         throw new AppError(
@@ -52,5 +54,11 @@ export class CancelJobUseCase {
     });
 
     return this.jobsMapper.toJobView(cancelled);
+  }
+
+  private buildScope(actor: AuthenticatedRequestUser): JobScope {
+    return actor.organizationId
+      ? { type: 'organization', organizationId: actor.organizationId }
+      : { type: 'platform' };
   }
 }

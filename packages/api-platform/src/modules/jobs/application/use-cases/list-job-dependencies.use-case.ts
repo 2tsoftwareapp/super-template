@@ -5,6 +5,7 @@ import { JOB_OBSERVABILITY_REPOSITORY, type JobObservabilityRepositoryPort } fro
 import {
   JOBS_REPOSITORY,
   type JobsRepositoryPort,
+  type JobScope,
 } from '../ports/jobs.repository.port';
 
 @Injectable()
@@ -14,8 +15,8 @@ export class ListJobDependenciesUseCase {
     @Inject(JOB_OBSERVABILITY_REPOSITORY) private readonly jobObservabilityRepository: JobObservabilityRepositoryPort,
   ) {}
 
-  async execute(jobId: string) {
-    const job = await this.jobsRepository.findById(jobId);
+  async execute(jobId: string, scope?: JobScope) {
+    const job = await this.jobsRepository.findById(jobId, scope);
 
     if (!job) {
       throw new AppError(

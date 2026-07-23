@@ -45,6 +45,9 @@ function readStringRecord(value: JsonValue | undefined): Record<string, string> 
 export class JobHandlersRegistry {
   private readonly handlers = new Map<string, JobHandler>();
 
+  /** Dedup set for idempotent notification handling. */
+  private readonly processedNotifications = new Set<string>();
+
   constructor(
     @Inject(forwardRef(() => MailService))
     private readonly mailService: MailService,
@@ -53,7 +56,7 @@ export class JobHandlersRegistry {
     @Inject(USER_NOTIFICATION_SENDER)
     private readonly notificationSender: UserNotificationSender,
   ) {
-    this.registerHandler('mail.send', async ({ payload }) => {
+    this.registerHandler('mail.send', async ({ jobId, payload }) => {
       const templateKey = readStringField(payload, 'templateKey');
       const to = readStringField(payload, 'to');
       const variables = readStringRecord(payload.variables);
@@ -62,6 +65,7 @@ export class JobHandlersRegistry {
         throw new Error('mail.send requires templateKey and to');
       }
 
+      // T-006: The delivery record + DB dedup serves as idempotency.
       await this.mailService.sendTemplate({
         templateKey,
         to,
@@ -78,7 +82,7 @@ export class JobHandlersRegistry {
       await this.authTokenCleanup.cleanupExpiredTokens();
     });
 
-    this.registerHandler('notification.send', async ({ payload, organizationId }) => {
+    this.registerHandler('notification.send', async ({ jobId, payload, organizationId }) => {
       const userId = readStringField(payload, 'userId');
       const type = readStringField(payload, 'type');
       const title = readStringField(payload, 'title');
@@ -89,6 +93,13 @@ export class JobHandlersRegistry {
           'notification.send requires userId, type, title, and body',
         );
       }
+
+      // T-006: In-memory dedup for notification.send idempotency.
+      const dedupKey = `${jobId}:${userId}:${type}`;
+      if (this.processedNotifications.has(dedupKey)) {
+        return;
+      }
+      this.processedNotifications.add(dedupKey);
 
       const data = readOptionalJsonObject(payload.data);
 

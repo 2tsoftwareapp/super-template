@@ -6,6 +6,7 @@ import { JobsMapper } from '../jobs.mapper';
 import {
   JOBS_REPOSITORY,
   type JobsRepositoryPort,
+  type JobScope,
 } from '../ports/jobs.repository.port';
 
 @Injectable()
@@ -15,8 +16,11 @@ export class ListJobsUseCase {
     private readonly jobsMapper: JobsMapper,
   ) {}
 
-  async execute(query: ListJobsQuery): Promise<{ rows: JobView[]; total: number }> {
+  async execute(
+    query: ListJobsQuery & { scope?: JobScope },
+  ): Promise<{ rows: JobView[]; total: number }> {
     const result = await this.jobsRepository.list({
+      ...(query.scope ? { scope: query.scope } : {}),
       page: query.page,
       limit: query.limit,
       ...(query.status ? { status: query.status } : {}),

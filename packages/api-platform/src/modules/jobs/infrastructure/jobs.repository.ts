@@ -7,16 +7,9 @@ import type { JsonObject, TransactionExecutor } from '@repo/api-core';
 import { Inject, Injectable } from '@nestjs/common';
 import { DATABASE, runIdempotentInsert } from '@repo/api-database';
 import { jobs } from '@repo/api-database';
-import { and, count, desc, eq, sql } from 'drizzle-orm';
+import { and, count, desc, eq, gt, inArray, isNull, lte, or, sql } from 'drizzle-orm';
 
-import type { JobRecord, JobsRepositoryPort } from '../application/ports/jobs.repository.port';
-
-interface ListJobsParams {
-  page: number;
-  limit: number;
-  status?: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'CANCELLED' | 'FAILED';
-  type?: string;
-}
+import type { JobRecord, JobScope, JobsRepositoryPort } from '../application/ports/jobs.repository.port';
 
 @Injectable()
 export class JobsRepository implements JobsRepositoryPort {
@@ -32,6 +25,9 @@ export class JobsRepository implements JobsRepositoryPort {
       priority?: number;
       attempts?: number;
       maxAttempts?: number;
+      processingStartedAt?: Date | null;
+      leaseExpiresAt?: Date | null;
+      workerId?: string | null;
       startedAt?: Date | null;
       completedAt?: Date | null;
       cancelledAt?: Date | null;
@@ -58,6 +54,9 @@ export class JobsRepository implements JobsRepositoryPort {
       priority?: number;
       attempts?: number;
       maxAttempts?: number;
+      processingStartedAt?: Date | null;
+      leaseExpiresAt?: Date | null;
+      workerId?: string | null;
       startedAt?: Date | null;
       completedAt?: Date | null;
       cancelledAt?: Date | null;
@@ -77,6 +76,7 @@ export class JobsRepository implements JobsRepositoryPort {
       },
       () =>
         this.findByIdempotencyKey(
+          values.organizationId ?? null,
           values.createdById,
           values.idempotencyKey,
           executor,
@@ -88,29 +88,41 @@ export class JobsRepository implements JobsRepositoryPort {
 
   async findById(
     jobId: string,
+    scope?: JobScope,
     executor?: TransactionExecutor,
   ): Promise<JobRecord | null> {
     const db = (executor ?? this.database) as DatabaseExecutor;
+    const filters: ReturnType<typeof eq>[] = [eq(jobs.id, jobId)];
+
+    if (scope?.type === 'organization') {
+      filters.push(eq(jobs.organizationId, scope.organizationId));
+    }
+
     const [job] = await db
       .select()
       .from(jobs)
-      .where(eq(jobs.id, jobId))
+      .where(and(...filters))
       .limit(1);
 
     return (job as JobRecord) ?? null;
   }
 
   async findByIdempotencyKey(
+    organizationId: string | null,
     createdById: string,
     idempotencyKey: string,
     executor?: TransactionExecutor,
   ): Promise<JobRecord | null> {
     const db = (executor ?? this.database) as DatabaseExecutor;
+    const orgFilter = organizationId === null
+      ? isNull(jobs.organizationId)
+      : eq(jobs.organizationId, organizationId);
     const [job] = await db
       .select()
       .from(jobs)
       .where(
         and(
+          orgFilter,
           eq(jobs.createdById, createdById),
           eq(jobs.idempotencyKey, idempotencyKey),
         ),
@@ -121,14 +133,18 @@ export class JobsRepository implements JobsRepositoryPort {
   }
 
   async list(
-    params: ListJobsParams,
+    params: { scope?: JobScope; page: number; limit: number; status?: string; type?: string },
     executor?: TransactionExecutor,
   ): Promise<{ rows: JobRecord[]; total: number }> {
     const db = (executor ?? this.database) as DatabaseExecutor;
-    const filters = [];
+    const filters: ReturnType<typeof eq>[] = [];
+
+    if (params.scope?.type === 'organization') {
+      filters.push(eq(jobs.organizationId, params.scope.organizationId));
+    }
 
     if (params.status) {
-      filters.push(eq(jobs.status, params.status));
+      filters.push(eq(jobs.status, params.status as any));
     }
 
     if (params.type) {
@@ -157,6 +173,7 @@ export class JobsRepository implements JobsRepositoryPort {
 
   async claimDueJobs(
     limit: number,
+    workerId: string,
     executor?: TransactionExecutor,
   ): Promise<JobRecord[]> {
     const db = (executor ?? this.database) as DatabaseExecutor;
@@ -164,6 +181,9 @@ export class JobsRepository implements JobsRepositoryPort {
       UPDATE jobs
       SET
         status = 'PROCESSING',
+        processing_started_at = now(),
+        lease_expires_at = now() + interval '5 minutes',
+        worker_id = ${workerId},
         started_at = now(),
         attempts = attempts + 1,
         updated_at = now()
@@ -192,6 +212,9 @@ export class JobsRepository implements JobsRepositoryPort {
         priority,
         attempts,
         max_attempts AS "maxAttempts",
+        processing_started_at AS "processingStartedAt",
+        lease_expires_at AS "leaseExpiresAt",
+        worker_id AS "workerId",
         started_at AS "startedAt",
         completed_at AS "completedAt",
         cancelled_at AS "cancelledAt",
@@ -214,10 +237,14 @@ export class JobsRepository implements JobsRepositoryPort {
       .update(jobs)
       .set({
         status: 'COMPLETED',
+        errorMessage: null,
         completedAt: new Date(),
+        processingStartedAt: null,
+        leaseExpiresAt: null,
+        workerId: null,
         updatedAt: new Date(),
       })
-      .where(eq(jobs.id, jobId))
+      .where(and(eq(jobs.id, jobId), eq(jobs.status, 'PROCESSING')))
       .returning();
 
     return (job as JobRecord) ?? null;
@@ -235,9 +262,12 @@ export class JobsRepository implements JobsRepositoryPort {
         status: 'FAILED',
         errorMessage: message,
         completedAt: new Date(),
+        processingStartedAt: null,
+        leaseExpiresAt: null,
+        workerId: null,
         updatedAt: new Date(),
       })
-      .where(eq(jobs.id, jobId))
+      .where(and(eq(jobs.id, jobId), eq(jobs.status, 'PROCESSING')))
       .returning();
 
     return (job as JobRecord) ?? null;
@@ -253,6 +283,28 @@ export class JobsRepository implements JobsRepositoryPort {
       .set({
         status: 'CANCELLED',
         cancelledAt: new Date(),
+        processingStartedAt: null,
+        leaseExpiresAt: null,
+        workerId: null,
+        updatedAt: new Date(),
+      })
+      .where(and(eq(jobs.id, jobId), eq(jobs.status, 'PENDING')))
+      .returning();
+
+    return (job as JobRecord) ?? null;
+  }
+
+  async markBlocked(
+    jobId: string,
+    message: string,
+    executor?: TransactionExecutor,
+  ): Promise<JobRecord | null> {
+    const db = (executor ?? this.database) as DatabaseExecutor;
+    const [job] = await db
+      .update(jobs)
+      .set({
+        status: 'BLOCKED',
+        errorMessage: message,
         updatedAt: new Date(),
       })
       .where(and(eq(jobs.id, jobId), eq(jobs.status, 'PENDING')))
@@ -275,11 +327,61 @@ export class JobsRepository implements JobsRepositoryPort {
         scheduledAt,
         errorMessage: message,
         startedAt: null,
+        processingStartedAt: null,
+        leaseExpiresAt: null,
+        workerId: null,
         updatedAt: new Date(),
       })
-      .where(eq(jobs.id, jobId))
+      .where(and(eq(jobs.id, jobId), eq(jobs.status, 'PROCESSING')))
       .returning();
 
     return (job as JobRecord) ?? null;
+  }
+
+  async recoverStaleProcessing(
+    timeoutMinutes: number,
+    maxAttempts: number,
+    executor?: TransactionExecutor,
+  ): Promise<JobRecord[]> {
+    const db = (executor ?? this.database) as DatabaseExecutor;
+    const result = await db.execute<typeof jobs.$inferSelect>(sql`
+      UPDATE jobs
+      SET
+        status = 'PENDING',
+        processing_started_at = NULL,
+        lease_expires_at = NULL,
+        worker_id = NULL,
+        started_at = NULL,
+        updated_at = now(),
+        error_message = CONCAT('Stale recovery: lease expired at ', lease_expires_at)
+      WHERE
+        status = 'PROCESSING'
+        AND lease_expires_at IS NOT NULL
+        AND lease_expires_at < now()
+        AND attempts < ${maxAttempts}
+      RETURNING
+        id,
+        organization_id AS "organizationId",
+        type,
+        payload,
+        status,
+        scheduled_at AS "scheduledAt",
+        priority,
+        attempts,
+        max_attempts AS "maxAttempts",
+        processing_started_at AS "processingStartedAt",
+        lease_expires_at AS "leaseExpiresAt",
+        worker_id AS "workerId",
+        started_at AS "startedAt",
+        completed_at AS "completedAt",
+        cancelled_at AS "cancelledAt",
+        error_message AS "errorMessage",
+        created_by_id AS "createdById",
+        idempotency_key AS "idempotencyKey",
+        created_at AS "createdAt",
+        updated_at AS "updatedAt"
+    `);
+
+    return result.rows as JobRecord[];
   }
 }

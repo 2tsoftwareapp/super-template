@@ -22,6 +22,11 @@ export interface JobView {
   updatedAt: string;
 }
 
+/** JobView with payload redacted (used in list responses). */
+export interface JobListView extends Omit<JobView, 'payload'> {
+  payload: Record<string, never>;
+}
+
 export interface EnqueueJobCommand {
   type: string;
   payload: JsonObject;

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { GetJobMetricsUseCase } from './get-job-metrics.use-case';
+import { GetJobMetricsUseCase } from '../get-job-metrics.use-case';
 
 describe('GetJobMetricsUseCase', () => {
   it('computes retry rate and failure rate from terminal jobs only', async () => {

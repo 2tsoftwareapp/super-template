@@ -11,6 +11,7 @@ export const jobStatusEnum = pgEnum('job_status', [
   'COMPLETED',
   'CANCELLED',
   'FAILED',
+  'BLOCKED',
 ]);
 
 export const importExportJobStatusEnum = pgEnum('import_export_job_status', [

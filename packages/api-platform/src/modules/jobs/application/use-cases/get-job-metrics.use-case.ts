@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 
 import { JOB_OBSERVABILITY_REPOSITORY, type JobObservabilityRepositoryPort } from '../ports/job-observability.repository.port';
+import type { JobScope } from '../ports/jobs.repository.port';
 
 export interface JobMetricsQuery {
   from?: string;
@@ -13,13 +14,14 @@ export class GetJobMetricsUseCase {
     @Inject(JOB_OBSERVABILITY_REPOSITORY) private readonly jobObservabilityRepository: JobObservabilityRepositoryPort,
   ) {}
 
-  async execute(query: JobMetricsQuery) {
+  async execute(query: JobMetricsQuery & { scope?: JobScope }) {
+    const scope = query.scope ?? { type: 'platform' };
     const [statusCounts, typeCounts, retryCounts, averageDurationMs] =
       await Promise.all([
-        this.jobObservabilityRepository.getStatusCounts(query),
-        this.jobObservabilityRepository.getTypeCounts(query),
-        this.jobObservabilityRepository.getRetryCounts(query),
-        this.jobObservabilityRepository.getAverageDurationMs(query),
+        this.jobObservabilityRepository.getStatusCounts(scope, query),
+        this.jobObservabilityRepository.getTypeCounts(scope, query),
+        this.jobObservabilityRepository.getRetryCounts(scope, query),
+        this.jobObservabilityRepository.getAverageDurationMs(scope, query),
       ]);
 
     const completed =

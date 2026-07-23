@@ -3,6 +3,7 @@ import type { JsonObject } from '@repo/api-core';
 import { index, jsonb, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 import { mailDeliveryStatusEnum } from './enums';
+import { jobs } from './jobs';
 
 export const mailDeliveries = pgTable(
   'mail_deliveries',
@@ -14,6 +15,9 @@ export const mailDeliveries = pgTable(
     status: mailDeliveryStatusEnum('status').notNull(),
     errorMessage: text('error_message'),
     metadata: jsonb('metadata').$type<JsonObject | null>(),
+    sourceJobId: uuid('source_job_id').references(() => jobs.id, {
+      onDelete: 'set null',
+    }),
     sentAt: timestamp('sent_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true })
       .notNull()
@@ -22,5 +26,6 @@ export const mailDeliveries = pgTable(
   (table) => [
     index('mail_deliveries_template_key_idx').on(table.templateKey),
     index('mail_deliveries_created_at_idx').on(table.createdAt),
+    index('mail_deliveries_source_job_id_idx').on(table.sourceJobId),
   ],
 );

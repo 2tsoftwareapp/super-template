@@ -53,21 +53,25 @@ export interface JobObservabilityRepositoryPort {
   hasIncompleteDependencies(jobId: string, executor?: TransactionExecutor): Promise<boolean>;
 
   getStatusCounts(
+    scope: { type: 'organization'; organizationId: string } | { type: 'platform' },
     filters: { from?: string; to?: string },
     executor?: TransactionExecutor,
   ): Promise<{ status: string; total: string | number }[]>;
 
   getTypeCounts(
+    scope: { type: 'organization'; organizationId: string } | { type: 'platform' },
     filters: { from?: string; to?: string },
     executor?: TransactionExecutor,
   ): Promise<{ type: string; total: string | number }[]>;
 
   getRetryCounts(
+    scope: { type: 'organization'; organizationId: string } | { type: 'platform' },
     filters: { from?: string; to?: string },
     executor?: TransactionExecutor,
   ): Promise<{ retried: number; terminal: number }>;
 
   getAverageDurationMs(
+    scope: { type: 'organization'; organizationId: string } | { type: 'platform' },
     filters: { from?: string; to?: string },
     executor?: TransactionExecutor,
   ): Promise<number | null>;
