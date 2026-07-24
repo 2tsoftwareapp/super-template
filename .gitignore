@@ -42,3 +42,6 @@ apps/mobile/ios/Runner/GoogleService-Info.plist
 
 # Browser-automation snapshots, screenshots, and logs (scratch output)
 packages/extension/artifacts/
+
+# Simple Skills — Work layer (sessions + memory; nested git)
+.agent-work/

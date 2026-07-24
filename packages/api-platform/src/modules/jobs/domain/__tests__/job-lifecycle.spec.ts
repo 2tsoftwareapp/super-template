@@ -9,14 +9,14 @@ import {
 
 describe('job-lifecycle', () => {
   describe('isTerminalStatus', () => {
-    it.each(['COMPLETED', 'CANCELLED', 'FAILED'] as const)(
+    it.each(['COMPLETED', 'CANCELLED', 'FAILED', 'BLOCKED'] as const)(
       'treats %s as terminal',
       (status) => {
         expect(isTerminalStatus(status)).toBe(true);
       },
     );
 
-    it.each(['PENDING', 'PROCESSING', 'BLOCKED'] as const)(
+    it.each(['PENDING', 'PROCESSING'] as const)(
       'treats %s as non-terminal',
       (status) => {
         expect(isTerminalStatus(status)).toBe(false);
