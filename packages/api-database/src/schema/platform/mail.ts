@@ -19,6 +19,10 @@ export const mailDeliveries = pgTable(
       onDelete: 'set null',
     }),
     sentAt: timestamp('sent_at', { withTimezone: true }),
+    leaseExpiresAt: timestamp('lease_expires_at', { withTimezone: true }),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
     createdAt: timestamp('created_at', { withTimezone: true })
       .notNull()
       .defaultNow(),

@@ -36,35 +36,45 @@ export class PropagationService {
 
       const dependents = await this.jobsRepository.listDependents(currentId, scope, executor);
       for (const dep of dependents) {
-        if (isTerminalStatus(dep.status) || isBlockingStatus(dep.status)) {
+        // COMPLETED jobs do not block their dependents; nothing to propagate.
+        if (dep.status === 'COMPLETED') {
           continue;
         }
-        // Per-edge isolation: a failure while marking a single dependent BLOCKED
-        // must not roll back the whole BFS (cancel / markFailed / stale recovery
-        // batch). The savepoint is rolled back internally by withSavepoint; here
-        // we swallow the error, record it, and keep traversing the graph.
-        try {
-          await this.transactionPort.withSavepoint(
-            executor,
-            `propagate_${dep.jobId}`,
-            async () => {
-              const blocked = await this.jobsRepository.markBlocked(dep.jobId, scope, `Dependency ${currentId} ${message}`, executor);
-              if (!blocked) {
-                return;
-              }
-              await this.jobObservabilityRepository.recordEvent(
-                { jobId: dep.jobId, organizationId, type: 'dependency_failed', message: `Dependency ${currentId} ${message}` },
-                executor,
-              );
-            },
-          );
-        } catch (error) {
-          const detail = error instanceof Error ? error.message : 'Unknown blocking error';
-          await this.jobObservabilityRepository.recordEvent(
-            { jobId: dep.jobId, organizationId, type: 'dependency_failed', message: `Blocked propagation isolated: ${detail}` },
-            executor,
-          );
+
+        // For BLOCKED/FAILED/CANCELLED: already in a terminal/blocking state,
+        // no need to markBlocked again, but descendants still need traversal
+        // (a previous propagation run may have crashed mid-graph — see H-002).
+        // For PENDING/PROCESSING: attempt to mark BLOCKED now.
+        const needsBlock = !isTerminalStatus(dep.status) && !isBlockingStatus(dep.status);
+
+        if (needsBlock) {
+          try {
+            await this.transactionPort.withSavepoint(
+              executor,
+              `propagate_${dep.jobId}`,
+              async () => {
+                const blocked = await this.jobsRepository.markBlocked(dep.jobId, scope, `Dependency ${currentId} ${message}`, executor);
+                if (!blocked) {
+                  return;
+                }
+                await this.jobObservabilityRepository.recordEvent(
+                  { jobId: dep.jobId, organizationId, type: 'dependency_failed', message: `Dependency ${currentId} ${message}` },
+                  executor,
+                );
+              },
+            );
+          } catch (error) {
+            const detail = error instanceof Error ? error.message : 'Unknown blocking error';
+            await this.jobObservabilityRepository.recordEvent(
+              { jobId: dep.jobId, organizationId, type: 'dependency_failed', message: `Blocked propagation isolated: ${detail}` },
+              executor,
+            );
+          }
         }
+
+        // Always queue for descendant traversal — even if the node was already
+        // terminal/blocking, its descendants may not have been visited yet if a
+        // prior propagation run crashed mid-graph (H-002).
         queue.push(dep.jobId);
       }
     }

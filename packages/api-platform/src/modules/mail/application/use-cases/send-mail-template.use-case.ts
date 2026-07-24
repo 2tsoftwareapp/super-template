@@ -61,18 +61,19 @@ export class SendMailTemplateUseCase {
       templateKey: input.templateKey,
       recipient: input.to,
       subject: rendered.subject.trim(),
-      status: 'FAILED',
+      status: 'PENDING',
       errorMessage: null,
       metadata: input.metadata ?? null,
       sourceJobId: input.sourceJobId ?? null,
     });
 
-    // Idempotent mail state machine (H-003):
+    // Idempotent mail state machine (H-001):
     //   PENDING → PROCESSING → SENT
-    //                    ↘ FAILED → PROCESSING (retry)
+    //                    ↘ FAILED
+    //   FAILED → PROCESSING (retry, via reclaimForRetry)
     // On insert conflict the row already exists for this (sourceJobId, recipient).
     // - SENT  → already delivered, nothing to do.
-    // - FAILED/stale PROCESSING → reclaim to PENDING and re-run SMTP below.
+    // - FAILED/stale PROCESSING with expired lease → reclaim to PENDING and retry.
     let target = delivery;
     if (!target && input.sourceJobId) {
       const existing = await this.mailDeliveriesRepository.findBySourceJobId(input.sourceJobId);
@@ -86,6 +87,14 @@ export class SendMailTemplateUseCase {
       throw new Error('Mail delivery already attempted but not confirmed sent');
     }
 
+    // Atomically claim the PENDING row for this worker. If another worker
+    // already claimed it, claimForProcessing returns the row with current
+    // status; skip processing if it's not PENDING anymore.
+    const claimed = await this.mailDeliveriesRepository.claimForProcessing(target.id);
+    if (!claimed || claimed.status !== 'PROCESSING') {
+      return;
+    }
+
     try {
       await this.mailer.send({
         to: input.to,
@@ -94,13 +103,13 @@ export class SendMailTemplateUseCase {
         html: rendered.html.trim(),
       });
 
-      await this.mailDeliveriesRepository.updateStatus(target.id, {
+      await this.mailDeliveriesRepository.updateStatus(claimed.id, {
         status: 'SENT',
         sentAt: new Date(),
         errorMessage: null,
       });
     } catch (error) {
-      await this.mailDeliveriesRepository.updateStatus(target.id, {
+      await this.mailDeliveriesRepository.updateStatus(claimed.id, {
         status: 'FAILED',
         errorMessage:
           error instanceof Error

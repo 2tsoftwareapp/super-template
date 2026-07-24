@@ -70,6 +70,8 @@ export class SendNotificationUseCase {
       );
     }
 
+    let isExisting = false;
+
     const persist = async (tx: TransactionExecutor) => {
       const notification = await this.notificationsRepository.create(
         {
@@ -91,6 +93,7 @@ export class SendNotificationUseCase {
             tx,
           );
           if (existing) {
+            isExisting = true;
             return existing;
           }
         }
@@ -129,7 +132,10 @@ export class SendNotificationUseCase {
 
     const view = this.notificationsMapper.toNotificationView(notification);
 
-    if (!options?.deferDispatch) {
+    // Only emit SSE for newly created notifications, not for idempotent
+    // replays of existing ones (M-001). Background handlers should also
+    // pass deferDispatch: true to avoid duplicate live events on retry.
+    if (!options?.deferDispatch && !isExisting) {
       this.dispatchService.emitSSE(view, resolvedOrganizationId);
     }
 
