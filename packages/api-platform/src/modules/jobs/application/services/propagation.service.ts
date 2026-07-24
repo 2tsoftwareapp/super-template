@@ -39,20 +39,32 @@ export class PropagationService {
         if (isTerminalStatus(dep.status) || isBlockingStatus(dep.status)) {
           continue;
         }
-        await this.transactionPort.withSavepoint(
-          executor,
-          `propagate_${dep.jobId}`,
-          async () => {
-            const blocked = await this.jobsRepository.markBlocked(dep.jobId, scope, `Dependency ${currentId} ${message}`, executor);
-            if (!blocked) {
-              return;
-            }
-            await this.jobObservabilityRepository.recordEvent(
-              { jobId: dep.jobId, organizationId, type: 'dependency_failed', message: `Dependency ${currentId} ${message}` },
-              executor,
-            );
-          },
-        );
+        // Per-edge isolation: a failure while marking a single dependent BLOCKED
+        // must not roll back the whole BFS (cancel / markFailed / stale recovery
+        // batch). The savepoint is rolled back internally by withSavepoint; here
+        // we swallow the error, record it, and keep traversing the graph.
+        try {
+          await this.transactionPort.withSavepoint(
+            executor,
+            `propagate_${dep.jobId}`,
+            async () => {
+              const blocked = await this.jobsRepository.markBlocked(dep.jobId, scope, `Dependency ${currentId} ${message}`, executor);
+              if (!blocked) {
+                return;
+              }
+              await this.jobObservabilityRepository.recordEvent(
+                { jobId: dep.jobId, organizationId, type: 'dependency_failed', message: `Dependency ${currentId} ${message}` },
+                executor,
+              );
+            },
+          );
+        } catch (error) {
+          const detail = error instanceof Error ? error.message : 'Unknown blocking error';
+          await this.jobObservabilityRepository.recordEvent(
+            { jobId: dep.jobId, organizationId, type: 'dependency_failed', message: `Blocked propagation isolated: ${detail}` },
+            executor,
+          );
+        }
         queue.push(dep.jobId);
       }
     }

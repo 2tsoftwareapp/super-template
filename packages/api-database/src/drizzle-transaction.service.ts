@@ -25,16 +25,22 @@ export class DrizzleTransactionService implements TransactionPort {
     if (typeof tx.execute !== 'function') {
       throw new Error('TransactionExecutor does not support savepoints in the current implementation');
     }
-    
+
+    // Savepoint names are PostgreSQL identifiers. A job id is a UUID containing
+    // hyphens ("550e8400-e29b-..."), which is not a valid bare identifier, so
+    // the name must be double-quoted (and any embedded quote escaped) to avoid
+    // a syntax error. See H-002 (Feature 07 Round 5).
     const { sql } = await import('drizzle-orm');
+    const escaped = name.replace(/"/g, '""');
+    const identifier = `"${escaped}"`;
     try {
-      await tx.execute(sql.raw(`SAVEPOINT ${name}`));
+      await tx.execute(sql.raw(`SAVEPOINT ${identifier}`));
       const result = await fn();
-      await tx.execute(sql.raw(`RELEASE SAVEPOINT ${name}`));
+      await tx.execute(sql.raw(`RELEASE SAVEPOINT ${identifier}`));
       return result;
     } catch (error) {
-      await tx.execute(sql.raw(`ROLLBACK TO SAVEPOINT ${name}`));
-      await tx.execute(sql.raw(`RELEASE SAVEPOINT ${name}`));
+      await tx.execute(sql.raw(`ROLLBACK TO SAVEPOINT ${identifier}`));
+      await tx.execute(sql.raw(`RELEASE SAVEPOINT ${identifier}`));
       throw error;
     }
   }

@@ -1,9 +1,13 @@
 import type { JobStatus } from './job-status';
 
+// BLOCKED is terminal: it is set only when a dependency has FAILED or CANCELLED
+// (see PropagationService.propagateBlocked). There is no transition out of BLOCKED,
+// and the worker only claims PENDING jobs, so BLOCKED jobs stay parked permanently.
 const TERMINAL_STATUSES: ReadonlySet<JobStatus> = new Set([
   'COMPLETED',
   'CANCELLED',
   'FAILED',
+  'BLOCKED',
 ]);
 
 const CANCELLABLE_STATUSES: ReadonlySet<JobStatus> = new Set(['PENDING']);

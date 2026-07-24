@@ -6,7 +6,7 @@ import type {
 import { Inject, Injectable } from '@nestjs/common';
 import { DATABASE } from '@repo/api-database';
 import { mailDeliveries } from '@repo/api-database';
-import { and, count, desc, eq } from 'drizzle-orm';
+import { and, count, desc, eq, sql } from 'drizzle-orm';
 
 import type { MailDeliveriesRepositoryPort } from '../application/ports/mail-deliveries.repository.port';
 
@@ -42,6 +42,47 @@ export class MailDeliveriesRepository implements MailDeliveriesRepositoryPort {
       .select({ id: mailDeliveries.id, status: mailDeliveries.status, recipient: mailDeliveries.recipient, errorMessage: mailDeliveries.errorMessage, createdAt: mailDeliveries.createdAt })
       .from(mailDeliveries)
       .where(eq(mailDeliveries.sourceJobId, sourceJobId))
+      .limit(1);
+
+    return delivery ?? null;
+  }
+
+  async reclaimForRetry(
+    sourceJobId: string,
+    executor: DatabaseExecutor = this.database,
+  ) {
+    // Reclaim only a FAILED delivery (or a stale PROCESSING one) back to PENDING.
+    // SENT rows must stay terminal — never reset them. FOR UPDATE SKIP LOCKED
+    // keeps concurrent workers from double-claiming the same row.
+    const reclaimed = await executor.execute<{ id: string }>(
+      sql`
+        UPDATE mail_deliveries
+        SET status = 'PENDING', error_message = NULL, sent_at = NULL, updated_at = now()
+        WHERE id IN (
+          SELECT id FROM mail_deliveries
+          WHERE source_job_id = ${sourceJobId}
+            AND status IN ('FAILED', 'PROCESSING')
+          LIMIT 1
+          FOR UPDATE SKIP LOCKED
+        )
+        RETURNING id
+      `,
+    );
+
+    if (!reclaimed.rows || reclaimed.rows.length === 0) {
+      return null;
+    }
+
+    const first = reclaimed.rows?.[0];
+    if (!first) {
+      return null;
+    }
+
+    const reclaimedId = first.id;
+    const [delivery] = await executor
+      .select()
+      .from(mailDeliveries)
+      .where(eq(mailDeliveries.id, reclaimedId))
       .limit(1);
 
     return delivery ?? null;

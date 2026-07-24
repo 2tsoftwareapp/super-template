@@ -67,13 +67,22 @@ export class SendMailTemplateUseCase {
       sourceJobId: input.sourceJobId ?? null,
     });
 
-    if (!delivery) {
-      if (input.sourceJobId) {
-        const existing = await this.mailDeliveriesRepository.findBySourceJobId(input.sourceJobId);
-        if (existing && existing.status === 'SENT') {
-          return;
-        }
+    // Idempotent mail state machine (H-003):
+    //   PENDING → PROCESSING → SENT
+    //                    ↘ FAILED → PROCESSING (retry)
+    // On insert conflict the row already exists for this (sourceJobId, recipient).
+    // - SENT  → already delivered, nothing to do.
+    // - FAILED/stale PROCESSING → reclaim to PENDING and re-run SMTP below.
+    let target = delivery;
+    if (!target && input.sourceJobId) {
+      const existing = await this.mailDeliveriesRepository.findBySourceJobId(input.sourceJobId);
+      if (existing?.status === 'SENT') {
+        return;
       }
+      target = await this.mailDeliveriesRepository.reclaimForRetry(input.sourceJobId);
+    }
+
+    if (!target) {
       throw new Error('Mail delivery already attempted but not confirmed sent');
     }
 
@@ -85,13 +94,13 @@ export class SendMailTemplateUseCase {
         html: rendered.html.trim(),
       });
 
-      await this.mailDeliveriesRepository.updateStatus(delivery.id, {
+      await this.mailDeliveriesRepository.updateStatus(target.id, {
         status: 'SENT',
         sentAt: new Date(),
         errorMessage: null,
       });
     } catch (error) {
-      await this.mailDeliveriesRepository.updateStatus(delivery.id, {
+      await this.mailDeliveriesRepository.updateStatus(target.id, {
         status: 'FAILED',
         errorMessage:
           error instanceof Error

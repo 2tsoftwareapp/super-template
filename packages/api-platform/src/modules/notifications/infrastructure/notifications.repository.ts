@@ -29,9 +29,11 @@ export class NotificationsRepository implements NotificationsRepositoryPort {
       .insert(notifications)
       .values(values);
 
+    // Idempotency for general-job-sourced inbox rows: match the unique index
+    // `notifications_source_bg_job_id_user_id_unique` (sourceBackgroundJobId + userId).
     if (values.sourceBackgroundJobId) {
       query.onConflictDoNothing({
-        target: notifications.sourceBackgroundJobId,
+        target: [notifications.sourceBackgroundJobId, notifications.userId],
         where: sql`${notifications.sourceBackgroundJobId} is not null`,
       });
     }

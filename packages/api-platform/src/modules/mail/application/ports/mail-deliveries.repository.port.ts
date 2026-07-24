@@ -37,6 +37,27 @@ export interface MailDeliveriesRepositoryPort {
     createdAt: Date;
   } | null>;
 
+  /**
+   * Atomically reclaim a previously-attempted delivery (FAILED, or a stale
+   * PROCESSING row) back to PENDING so the caller can retry it. Returns the
+   * reclaimed row, or null when the row is SENT or does not exist. Used by the
+   * idempotent mail state machine to recover a FAILED delivery on retry (H-003).
+   */
+  reclaimForRetry(
+    sourceJobId: string,
+    executor?: TransactionExecutor,
+  ): Promise<{
+    id: string;
+    templateKey: string;
+    recipient: string;
+    subject: string;
+    status: string;
+    errorMessage: string | null;
+    metadata: JsonObject | null;
+    sentAt: Date | null;
+    createdAt: Date;
+  } | null>;
+
   updateStatus(
     id: string,
     values: {
