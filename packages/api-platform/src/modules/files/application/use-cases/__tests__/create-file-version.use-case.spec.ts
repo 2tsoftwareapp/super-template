@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { AppError, ERROR_CODES } from '@repo/api-core';
 
-import { CreateFileVersionUseCase } from './create-file-version.use-case';
+import { CreateFileVersionUseCase } from '@platform/modules/files/application/use-cases/create-file-version.use-case';
 
 const actor = {
   userId: 'user-1',
