@@ -50,19 +50,22 @@ export class PropagationService {
         let marked = false;
         if (needsBlock) {
           try {
-            await this.transactionPort.withSavepoint(
+            // withSavepoint returns the callback result. If recordEvent
+            // throws inside, the savepoint rolls back and the error is
+            // rethrown — marked stays false (H-002).
+            marked = await this.transactionPort.withSavepoint<boolean>(
               executor,
               `propagate_${dep.jobId}`,
               async () => {
                 const blocked = await this.jobsRepository.markBlocked(dep.jobId, scope, `Dependency ${currentId} ${message}`, executor);
                 if (!blocked) {
-                  return;
+                  return false;
                 }
-                marked = true;
                 await this.jobObservabilityRepository.recordEvent(
                   { jobId: dep.jobId, organizationId, type: 'dependency_failed', message: `Dependency ${currentId} ${message}` },
                   executor,
                 );
+                return true;
               },
             );
           } catch (error) {

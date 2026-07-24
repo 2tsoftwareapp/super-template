@@ -14,7 +14,7 @@ interface ListDeliveriesParams {
   page: number;
   limit: number;
   templateKey?: string;
-  status?: 'SENT' | 'FAILED';
+  status?: 'PENDING' | 'PROCESSING' | 'SENT' | 'FAILED';
 }
 
 @Injectable()
@@ -36,8 +36,13 @@ export class MailDeliveriesRepository implements MailDeliveriesRepositoryPort {
 
   async findBySourceJobId(
     sourceJobId: string,
+    recipient?: string,
     executor: DatabaseExecutor = this.database,
   ) {
+    const filters: ReturnType<typeof eq>[] = [eq(mailDeliveries.sourceJobId, sourceJobId)];
+    if (recipient) {
+      filters.push(eq(mailDeliveries.recipient, recipient));
+    }
     const [delivery] = await executor
       .select({
         id: mailDeliveries.id,
@@ -47,7 +52,7 @@ export class MailDeliveriesRepository implements MailDeliveriesRepositoryPort {
         createdAt: mailDeliveries.createdAt,
       })
       .from(mailDeliveries)
-      .where(eq(mailDeliveries.sourceJobId, sourceJobId))
+      .where(and(...filters))
       .limit(1);
 
     return delivery ?? null;

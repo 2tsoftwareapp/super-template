@@ -1,1 +1,0 @@
-ALTER TABLE "mail_deliveries" ADD COLUMN "claim_token" text;

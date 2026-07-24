@@ -34,6 +34,7 @@ export interface MailDeliveriesRepositoryPort {
 
   findBySourceJobId(
     sourceJobId: string,
+    recipient?: string,
     executor?: TransactionExecutor,
   ): Promise<{
     id: string;

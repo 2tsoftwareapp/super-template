@@ -76,7 +76,7 @@ export class SendMailTemplateUseCase {
     // - FAILED/stale PROCESSING with expired lease → reclaim to PENDING and retry.
     let target = delivery;
     if (!target && input.sourceJobId) {
-      const existing = await this.mailDeliveriesRepository.findBySourceJobId(input.sourceJobId);
+      const existing = await this.mailDeliveriesRepository.findBySourceJobId(input.sourceJobId, input.to);
       if (existing?.status === 'SENT') {
         return;
       }
@@ -102,23 +102,46 @@ export class SendMailTemplateUseCase {
         html: rendered.html.trim(),
       });
 
-      await this.mailDeliveriesRepository.updateStatus(
-        claimed.id,
-        claimed.claimToken!,
-        { status: 'SENT', sentAt: new Date(), errorMessage: null },
-      );
+      try {
+        await this.mailDeliveriesRepository.updateStatus(
+          claimed.id,
+          claimed.claimToken!,
+          { status: 'SENT', sentAt: new Date(), errorMessage: null },
+        );
+      } catch (statusError) {
+        // SMTP already sent the email. If the DB update is fenced because
+        // another worker reclaimed our lease, the external side effect
+        // already happened — do NOT throw so the job is not retried.
+        // If the error is *not* a stale worker (e.g. connection error),
+        // still throw so the job can retry (the email was likely sent but
+        // the caller should decide; we err on the side of not duplicating).
+        if (statusError instanceof Error && statusError.message.includes('Stale worker')) {
+          return;
+        }
+        throw statusError;
+      }
     } catch (error) {
-      await this.mailDeliveriesRepository.updateStatus(
-        claimed.id,
-        claimed.claimToken!,
-        {
-          status: 'FAILED',
-          errorMessage:
-            error instanceof Error
-              ? error.message
-              : 'Unknown mail delivery error',
-        },
-      );
+      // SMTP failed (or a non-stale DB error after send). Mark FAILED.
+      try {
+        await this.mailDeliveriesRepository.updateStatus(
+          claimed.id,
+          claimed.claimToken!,
+          {
+            status: 'FAILED',
+            errorMessage:
+              error instanceof Error
+                ? error.message
+                : 'Unknown mail delivery error',
+          },
+        );
+      } catch (statusError) {
+        // Even marking FAILED can be stale-fenced if the lease expired
+        // between the SMTP failure and this catch. Swallow — the reclaiming
+        // worker owns this row now.
+        if (statusError instanceof Error && statusError.message.includes('Stale worker')) {
+          return;
+        }
+      }
 
       throw error;
     }
