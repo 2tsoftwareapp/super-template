@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { TRANSACTION_PORT, type TransactionExecutor, type TransactionPort } from '@repo/api-core';
 
 import { isBlockingStatus, isTerminalStatus } from '../../domain/job-lifecycle';
@@ -11,6 +11,8 @@ import {
 
 @Injectable()
 export class PropagationService {
+  private readonly logger = new Logger(PropagationService.name);
+
   constructor(
     @Inject(JOBS_REPOSITORY) private readonly jobsRepository: JobsRepositoryPort,
     @Inject(JOB_OBSERVABILITY_REPOSITORY) private readonly jobObservabilityRepository: JobObservabilityRepositoryPort,
@@ -70,17 +72,11 @@ export class PropagationService {
             );
           } catch (error) {
             // Savepoint rolled back — markBlocked did not take effect.
-            // Log outside the savepoint but swallow on failure so the outer
-            // transaction (cancel/markFailed/stale-recovery batch) is not affected.
+            // Use application logger here — writing a diagnostic event to
+            // the same transaction executor could abort the outer transaction
+            // if the write fails (H-002).
             const detail = error instanceof Error ? error.message : 'Unknown blocking error';
-            try {
-              await this.jobObservabilityRepository.recordEvent(
-                { jobId: dep.jobId, organizationId, type: 'dependency_failed', message: `Blocked propagation isolated: ${detail}` },
-                executor,
-              );
-            } catch {
-              // Observability failure must not roll back outer transaction.
-            }
+            this.logger.warn(`Blocked propagation isolated for ${dep.jobId}: ${detail}`);
           }
         }
 

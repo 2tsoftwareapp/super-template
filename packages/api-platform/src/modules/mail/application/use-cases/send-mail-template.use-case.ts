@@ -1,4 +1,4 @@
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import {
   AppError,
   ERROR_CODES,
@@ -22,6 +22,8 @@ export interface SendTemplateInput {
 
 @Injectable()
 export class SendMailTemplateUseCase {
+  private readonly logger = new Logger(SendMailTemplateUseCase.name);
+
   constructor(
     @Inject(MAILER) private readonly mailer: Mailer,
     @Inject(TEMPLATE_RENDERER_SERVICE) private readonly templateRenderer: TemplateRendererServicePort,
@@ -109,19 +111,17 @@ export class SendMailTemplateUseCase {
           { status: 'SENT', sentAt: new Date(), errorMessage: null },
         );
       } catch (statusError) {
-        // SMTP already sent the email. If the DB update is fenced because
-        // another worker reclaimed our lease, the external side effect
-        // already happened — do NOT throw so the job is not retried.
-        // If the error is *not* a stale worker (e.g. connection error),
-        // still throw so the job can retry (the email was likely sent but
-        // the caller should decide; we err on the side of not duplicating).
-        if (statusError instanceof Error && statusError.message.includes('Stale worker')) {
-          return;
-        }
-        throw statusError;
+        // SMTP already accepted the email. ANY DB error (stale worker,
+        // connection drop, etc.) must NOT trigger a retry — the external
+        // side effect already happened and retrying would duplicate the
+        // send (H-001). Log and return.
+        this.logger.warn(
+          `Mail sent but DB update failed: ${statusError instanceof Error ? statusError.message : String(statusError)}`,
+        );
+        return;
       }
     } catch (error) {
-      // SMTP failed (or a non-stale DB error after send). Mark FAILED.
+      // SMTP rejected the email. Safe to mark FAILED and retry.
       try {
         await this.mailDeliveriesRepository.updateStatus(
           claimed.id,
@@ -135,12 +135,9 @@ export class SendMailTemplateUseCase {
           },
         );
       } catch (statusError) {
-        // Even marking FAILED can be stale-fenced if the lease expired
-        // between the SMTP failure and this catch. Swallow — the reclaiming
-        // worker owns this row now.
-        if (statusError instanceof Error && statusError.message.includes('Stale worker')) {
-          return;
-        }
+        this.logger.warn(
+          `Mail FAILED but DB update also failed: ${statusError instanceof Error ? statusError.message : String(statusError)}`,
+        );
       }
 
       throw error;
