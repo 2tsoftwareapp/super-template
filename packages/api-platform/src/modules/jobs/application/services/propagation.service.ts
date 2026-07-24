@@ -47,6 +47,7 @@ export class PropagationService {
         // For PENDING/PROCESSING: attempt to mark BLOCKED now.
         const needsBlock = !isTerminalStatus(dep.status) && !isBlockingStatus(dep.status);
 
+        let marked = false;
         if (needsBlock) {
           try {
             await this.transactionPort.withSavepoint(
@@ -57,6 +58,7 @@ export class PropagationService {
                 if (!blocked) {
                   return;
                 }
+                marked = true;
                 await this.jobObservabilityRepository.recordEvent(
                   { jobId: dep.jobId, organizationId, type: 'dependency_failed', message: `Dependency ${currentId} ${message}` },
                   executor,
@@ -64,18 +66,31 @@ export class PropagationService {
               },
             );
           } catch (error) {
+            // Savepoint rolled back — markBlocked did not take effect.
+            // Log outside the savepoint but swallow on failure so the outer
+            // transaction (cancel/markFailed/stale-recovery batch) is not affected.
             const detail = error instanceof Error ? error.message : 'Unknown blocking error';
-            await this.jobObservabilityRepository.recordEvent(
-              { jobId: dep.jobId, organizationId, type: 'dependency_failed', message: `Blocked propagation isolated: ${detail}` },
-              executor,
-            );
+            try {
+              await this.jobObservabilityRepository.recordEvent(
+                { jobId: dep.jobId, organizationId, type: 'dependency_failed', message: `Blocked propagation isolated: ${detail}` },
+                executor,
+              );
+            } catch {
+              // Observability failure must not roll back outer transaction.
+            }
           }
         }
 
-        // Always queue for descendant traversal — even if the node was already
-        // terminal/blocking, its descendants may not have been visited yet if a
-        // prior propagation run crashed mid-graph (H-002).
-        queue.push(dep.jobId);
+        // Only queue for descendant traversal when:
+        // - The node was already BLOCKED/FAILED/CANCELLED (needsBlock = false);
+        //   descendants still need visiting if a prior BFS crashed mid-graph.
+        // - markBlocked just succeeded (marked = true).
+        // If needsBlock is true and marked is false (markBlocked returned null
+        // or savepoint rolled back), the node is still PENDING/PROCESSING and
+        // its descendants must not be BLOCKED (H-002).
+        if (!needsBlock || marked) {
+          queue.push(dep.jobId);
+        }
       }
     }
   }

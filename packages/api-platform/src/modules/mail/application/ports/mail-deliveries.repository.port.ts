@@ -13,6 +13,7 @@ export interface DeliveryRecord {
   metadata: JsonObject | null;
   sentAt: Date | null;
   leaseExpiresAt: Date | null;
+  claimToken: string | null;
   createdAt: Date;
 }
 
@@ -56,15 +57,22 @@ export interface MailDeliveriesRepositoryPort {
   /**
    * Atomically reclaim a previously-failed delivery (FAILED, or a stale
    * PROCESSING row whose lease has expired) back to PENDING for retry.
+   * Filters by recipient to match the composite unique index.
    * Returns the reclaimed row, or null when the row is SENT or does not exist.
    */
   reclaimForRetry(
     sourceJobId: string,
+    recipient: string,
     executor?: TransactionExecutor,
   ): Promise<DeliveryRecord | null>;
 
+  /**
+   * Update delivery status with fencing: requires id + claimToken + status = PROCESSING
+   * to prevent a stale worker from writing after lease expiry and reclaim.
+   */
   updateStatus(
     id: string,
+    claimToken: string,
     values: {
       status: 'SENT' | 'FAILED';
       errorMessage?: string | null;

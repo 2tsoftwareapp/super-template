@@ -80,16 +80,15 @@ export class SendMailTemplateUseCase {
       if (existing?.status === 'SENT') {
         return;
       }
-      target = await this.mailDeliveriesRepository.reclaimForRetry(input.sourceJobId);
+      target = await this.mailDeliveriesRepository.reclaimForRetry(input.sourceJobId, input.to);
     }
 
     if (!target) {
       throw new Error('Mail delivery already attempted but not confirmed sent');
     }
 
-    // Atomically claim the PENDING row for this worker. If another worker
-    // already claimed it, claimForProcessing returns the row with current
-    // status; skip processing if it's not PENDING anymore.
+    // Atomically claim the PENDING row for this worker. Returns null if
+    // another worker already claimed it (status is no longer PENDING).
     const claimed = await this.mailDeliveriesRepository.claimForProcessing(target.id);
     if (!claimed || claimed.status !== 'PROCESSING') {
       return;
@@ -103,19 +102,23 @@ export class SendMailTemplateUseCase {
         html: rendered.html.trim(),
       });
 
-      await this.mailDeliveriesRepository.updateStatus(claimed.id, {
-        status: 'SENT',
-        sentAt: new Date(),
-        errorMessage: null,
-      });
+      await this.mailDeliveriesRepository.updateStatus(
+        claimed.id,
+        claimed.claimToken!,
+        { status: 'SENT', sentAt: new Date(), errorMessage: null },
+      );
     } catch (error) {
-      await this.mailDeliveriesRepository.updateStatus(claimed.id, {
-        status: 'FAILED',
-        errorMessage:
-          error instanceof Error
-            ? error.message
-            : 'Unknown mail delivery error',
-      });
+      await this.mailDeliveriesRepository.updateStatus(
+        claimed.id,
+        claimed.claimToken!,
+        {
+          status: 'FAILED',
+          errorMessage:
+            error instanceof Error
+              ? error.message
+              : 'Unknown mail delivery error',
+        },
+      );
 
       throw error;
     }

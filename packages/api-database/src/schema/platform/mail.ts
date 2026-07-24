@@ -20,6 +20,7 @@ export const mailDeliveries = pgTable(
     }),
     sentAt: timestamp('sent_at', { withTimezone: true }),
     leaseExpiresAt: timestamp('lease_expires_at', { withTimezone: true }),
+    claimToken: text('claim_token'),
     updatedAt: timestamp('updated_at', { withTimezone: true })
       .notNull()
       .defaultNow(),
