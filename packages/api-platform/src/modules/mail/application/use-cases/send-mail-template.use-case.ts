@@ -97,19 +97,24 @@ export class SendMailTemplateUseCase {
       return;
     }
 
+    // Provider idempotency key: deterministic from delivery ID so the same
+    // Message-ID is generated on retry, allowing SMTP servers to deduplicate.
+    const providerMessageId = `mail-${claimed.id}`;
+
     try {
       await this.mailer.send({
         to: input.to,
         subject: rendered.subject.trim(),
         text: rendered.text.trim(),
         html: rendered.html.trim(),
+        messageId: providerMessageId,
       });
 
       try {
         await this.mailDeliveriesRepository.updateStatus(
           claimed.id,
           claimed.claimToken!,
-          { status: 'SENT', sentAt: new Date(), errorMessage: null },
+          { status: 'SENT', sentAt: new Date(), errorMessage: null, providerMessageId },
         );
       } catch (statusError) {
         // SMTP already accepted the email. The fenced updateStatus(SENT)
@@ -117,7 +122,7 @@ export class SendMailTemplateUseCase {
         // escape hatch to persist PROVIDER_ACCEPTED so the row is terminal
         // and never auto-retried (H-001).
         try {
-          await this.mailDeliveriesRepository.markProviderAccepted(claimed.id);
+          await this.mailDeliveriesRepository.markProviderAccepted(claimed.id, providerMessageId);
         } catch (hatchError) {
           // Both fenced and unfenced updates failed. Window for duplicate
           // sends on worker crash is now extremely narrow but unavoidable.
@@ -143,6 +148,7 @@ export class SendMailTemplateUseCase {
               error instanceof Error
                 ? error.message
                 : 'Unknown mail delivery error',
+            providerMessageId,
           },
         );
       } catch (statusError) {

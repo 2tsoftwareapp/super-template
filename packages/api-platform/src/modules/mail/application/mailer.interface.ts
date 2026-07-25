@@ -3,6 +3,7 @@ export interface MailMessage {
   subject: string;
   text: string;
   html?: string;
+  messageId?: string;
 }
 
 export const MAILER = Symbol('MAILER');

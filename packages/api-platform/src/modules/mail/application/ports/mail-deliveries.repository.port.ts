@@ -79,6 +79,7 @@ export interface MailDeliveriesRepositoryPort {
       status: 'SENT' | 'FAILED';
       errorMessage?: string | null;
       sentAt?: Date | null;
+      providerMessageId?: string | null;
     },
     executor?: TransactionExecutor,
   ): Promise<void>;

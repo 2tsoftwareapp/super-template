@@ -153,6 +153,7 @@ export class MailDeliveriesRepository implements MailDeliveriesRepositoryPort {
       status: 'SENT' | 'FAILED';
       errorMessage?: string | null;
       sentAt?: Date | null;
+      providerMessageId?: string | null;
     },
     executor: DatabaseExecutor = this.database,
   ): Promise<void> {
@@ -165,6 +166,7 @@ export class MailDeliveriesRepository implements MailDeliveriesRepositoryPort {
           status = ${values.status}::mail_delivery_status,
           error_message = ${values.errorMessage ?? null},
           sent_at = ${values.sentAt ?? null},
+          provider_message_id = ${values.providerMessageId ?? null},
           lease_expires_at = NULL,
           claim_token = NULL,
           updated_at = now()
