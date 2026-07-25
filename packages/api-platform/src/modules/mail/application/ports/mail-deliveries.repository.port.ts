@@ -1,7 +1,7 @@
 import type { JsonObject } from '@repo/api-core';
 import type { TransactionExecutor } from '@repo/api-core';
 
-export type MailDeliveryStatus = 'PENDING' | 'PROCESSING' | 'SENT' | 'FAILED';
+export type MailDeliveryStatus = 'PENDING' | 'PROCESSING' | 'PROVIDER_ACCEPTED' | 'SENT' | 'FAILED';
 
 export interface DeliveryRecord {
   id: string;
@@ -14,6 +14,7 @@ export interface DeliveryRecord {
   sentAt: Date | null;
   leaseExpiresAt: Date | null;
   claimToken: string | null;
+  providerMessageId: string | null;
   createdAt: Date;
 }
 
@@ -79,6 +80,17 @@ export interface MailDeliveriesRepositoryPort {
       errorMessage?: string | null;
       sentAt?: Date | null;
     },
+    executor?: TransactionExecutor,
+  ): Promise<void>;
+
+  /**
+   * Unfenced escape-hatch status update used after SMTP accepted the email
+   * but the fenced updateStatus(SENT) failed. Uses raw SQL to bypass Drizzle's
+   * type safety and the claim-token fence. Only sets PROVIDER_ACCEPTED.
+   */
+  markProviderAccepted(
+    deliveryId: string,
+    providerMessageId?: string,
     executor?: TransactionExecutor,
   ): Promise<void>;
 

@@ -14,7 +14,7 @@ interface ListDeliveriesParams {
   page: number;
   limit: number;
   templateKey?: string;
-  status?: 'PENDING' | 'PROCESSING' | 'SENT' | 'FAILED';
+  status?: 'PENDING' | 'PROCESSING' | 'PROVIDER_ACCEPTED' | 'SENT' | 'FAILED';
 }
 
 @Injectable()
@@ -103,10 +103,10 @@ export class MailDeliveriesRepository implements MailDeliveriesRepositoryPort {
     executor: DatabaseExecutor = this.database,
   ) {
     // Reclaim only a FAILED delivery or a stale PROCESSING row (lease expired)
-    // back to PENDING. SENT rows must stay terminal. Matches by the composite
-    // unique key (sourceJobId + recipient) to handle multi-recipient source jobs
-    // correctly. FOR UPDATE SKIP LOCKED keeps concurrent workers from
-    // double-claiming the same row.
+    // back to PENDING. Terminal statuses (SENT, PROVIDER_ACCEPTED) must stay
+    // final. Matches by the composite unique key (sourceJobId + recipient) to
+    // handle multi-recipient source jobs correctly. FOR UPDATE SKIP LOCKED
+    // keeps concurrent workers from double-claiming the same row.
     const reclaimed = await executor.execute<{ id: string }>(
       sql`
         UPDATE mail_deliveries
@@ -125,6 +125,7 @@ export class MailDeliveriesRepository implements MailDeliveriesRepositoryPort {
               status = 'FAILED'
               OR (status = 'PROCESSING' AND lease_expires_at IS NOT NULL AND lease_expires_at < now())
             )
+            AND status NOT IN ('SENT', 'PROVIDER_ACCEPTED')
           LIMIT 1
           FOR UPDATE SKIP LOCKED
         )
@@ -185,6 +186,28 @@ export class MailDeliveriesRepository implements MailDeliveriesRepositoryPort {
         );
       }
     }
+  }
+
+  async markProviderAccepted(
+    deliveryId: string,
+    providerMessageId?: string,
+    executor: DatabaseExecutor = this.database,
+  ): Promise<void> {
+    // Unfenced raw-SQL escape hatch: sets PROVIDER_ACCEPTED without requiring
+    // a matching claim_token. Used when the fenced updateStatus(SENT) fails
+    // after the external provider has already accepted the email.
+    await executor.execute(
+      sql`
+        UPDATE mail_deliveries
+        SET
+          status = 'PROVIDER_ACCEPTED',
+          provider_message_id = ${providerMessageId ?? null},
+          lease_expires_at = NULL,
+          claim_token = NULL,
+          updated_at = now()
+        WHERE id = ${deliveryId}
+      `,
+    );
   }
 
   async list(

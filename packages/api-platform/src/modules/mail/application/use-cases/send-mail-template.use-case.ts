@@ -70,16 +70,17 @@ export class SendMailTemplateUseCase {
     });
 
     // Idempotent mail state machine (H-001):
-    //   PENDING → PROCESSING → SENT
+    //   PENDING → PROCESSING ──→ SENT
+    //                    ├──→ PROVIDER_ACCEPTED (escape hatch when fenced SENT fails)
     //                    ↘ FAILED
     //   FAILED → PROCESSING (retry, via reclaimForRetry)
     // On insert conflict the row already exists for this (sourceJobId, recipient).
-    // - SENT  → already delivered, nothing to do.
+    // - SENT / PROVIDER_ACCEPTED → already delivered, nothing to do.
     // - FAILED/stale PROCESSING with expired lease → reclaim to PENDING and retry.
     let target = delivery;
     if (!target && input.sourceJobId) {
       const existing = await this.mailDeliveriesRepository.findBySourceJobId(input.sourceJobId, input.to);
-      if (existing?.status === 'SENT') {
+      if (existing?.status === 'SENT' || existing?.status === 'PROVIDER_ACCEPTED') {
         return;
       }
       target = await this.mailDeliveriesRepository.reclaimForRetry(input.sourceJobId, input.to);
@@ -111,12 +112,22 @@ export class SendMailTemplateUseCase {
           { status: 'SENT', sentAt: new Date(), errorMessage: null },
         );
       } catch (statusError) {
-        // SMTP already accepted the email. ANY DB error (stale worker,
-        // connection drop, etc.) must NOT trigger a retry — the external
-        // side effect already happened and retrying would duplicate the
-        // send (H-001). Log and return.
+        // SMTP already accepted the email. The fenced updateStatus(SENT)
+        // failed (stale worker, connection drop, etc.). Try the unfenced
+        // escape hatch to persist PROVIDER_ACCEPTED so the row is terminal
+        // and never auto-retried (H-001).
+        try {
+          await this.mailDeliveriesRepository.markProviderAccepted(claimed.id);
+        } catch (hatchError) {
+          // Both fenced and unfenced updates failed. Window for duplicate
+          // sends on worker crash is now extremely narrow but unavoidable.
+          this.logger.warn(
+            `Mail sent but both fenced and unfenced status updates failed: fenced=${statusError instanceof Error ? statusError.message : String(statusError)} unfenced=${hatchError instanceof Error ? hatchError.message : String(hatchError)}`,
+          );
+          return;
+        }
         this.logger.warn(
-          `Mail sent but DB update failed: ${statusError instanceof Error ? statusError.message : String(statusError)}`,
+          `Mail sent but fenced updateStatus(SENT) failed; marked PROVIDER_ACCEPTED: ${statusError instanceof Error ? statusError.message : String(statusError)}`,
         );
         return;
       }
