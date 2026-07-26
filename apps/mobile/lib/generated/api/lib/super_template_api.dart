@@ -107,6 +107,7 @@ export 'package:super_template_api/src/model/imports_controller_create201_respon
 export 'package:super_template_api/src/model/job_dependency_dto.dart';
 export 'package:super_template_api/src/model/job_dto.dart';
 export 'package:super_template_api/src/model/job_event_dto.dart';
+export 'package:super_template_api/src/model/job_list_dto.dart';
 export 'package:super_template_api/src/model/job_metrics_dto.dart';
 export 'package:super_template_api/src/model/job_status_count_dto.dart';
 export 'package:super_template_api/src/model/job_type_count_dto.dart';

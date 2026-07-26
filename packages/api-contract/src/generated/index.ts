@@ -1311,11 +1311,20 @@ export interface components {
             /** @enum {string} */
             status: "ok" | "ready";
         };
+        PaginationMetaDto: {
+            requestId: string;
+            page: number;
+            limit: number;
+            total: number;
+            totalPages: number;
+        };
         PermissionDto: {
             id: string;
             name: string;
             description: Record<string, never> | null;
             isSystem: boolean;
+            /** @enum {string} */
+            scope: "platform" | "organization";
         };
         RoleDto: {
             id: string;
@@ -1413,13 +1422,6 @@ export interface components {
             emailPreferences?: {
                 [key: string]: unknown;
             };
-        };
-        PaginationMetaDto: {
-            requestId: string;
-            page: number;
-            limit: number;
-            total: number;
-            totalPages: number;
         };
         RoleAssignmentDto: {
             roleName: string;
@@ -1649,14 +1651,14 @@ export interface components {
             /** @description Replaying the same key returns the original job instead of sending again. */
             idempotencyKey?: string;
         };
-        JobDto: {
+        JobListDto: {
             id: string;
             type: string;
             payload: {
                 [key: string]: unknown;
             };
             /** @enum {string} */
-            status: "PENDING" | "PROCESSING" | "COMPLETED" | "CANCELLED" | "FAILED";
+            status: "PENDING" | "PROCESSING" | "COMPLETED" | "CANCELLED" | "FAILED" | "BLOCKED";
             scheduledAt: string;
             priority: number;
             attempts: number;
@@ -1668,6 +1670,7 @@ export interface components {
             createdById?: string | null;
             createdAt: string;
             updatedAt: string;
+            organizationId?: Record<string, never>;
         };
         JobStatusCountDto: {
             status: string;
@@ -1686,6 +1689,27 @@ export interface components {
             totalCompleted: number;
             totalFailed: number;
         };
+        JobDto: {
+            id: string;
+            type: string;
+            payload: {
+                [key: string]: unknown;
+            };
+            /** @enum {string} */
+            status: "PENDING" | "PROCESSING" | "COMPLETED" | "CANCELLED" | "FAILED" | "BLOCKED";
+            scheduledAt: string;
+            priority: number;
+            attempts: number;
+            maxAttempts: number;
+            startedAt?: Record<string, never>;
+            completedAt?: Record<string, never>;
+            cancelledAt?: Record<string, never>;
+            errorMessage?: Record<string, never>;
+            createdById?: string | null;
+            createdAt: string;
+            updatedAt: string;
+            organizationId?: Record<string, never>;
+        };
         JobEventDto: {
             id: string;
             jobId: string;
@@ -1702,7 +1726,7 @@ export interface components {
             id: string;
             dependsOnJobId: string;
             /** @enum {string} */
-            dependsOnJobStatus: "PENDING" | "PROCESSING" | "COMPLETED" | "CANCELLED" | "FAILED";
+            dependsOnJobStatus: "PENDING" | "PROCESSING" | "COMPLETED" | "CANCELLED" | "FAILED" | "BLOCKED";
             createdAt: string;
         };
         AddJobDependencyDto: {
@@ -1882,7 +1906,8 @@ export interface components {
             updatedAt: string;
         };
         CreateImportDto: {
-            type: string;
+            /** @enum {string} */
+            type: "users" | "projects";
             fileId: string;
             /** @description Client-supplied idempotency key. Retries with the same key return the original import job. */
             idempotencyKey?: string;
@@ -1964,7 +1989,13 @@ export interface operations {
     };
     AdminRolesController_listRoles: {
         parameters: {
-            query?: never;
+            query?: {
+                page?: number;
+                limit?: number;
+                organizationId?: string;
+                search?: string;
+                scope?: "platform" | "organization";
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -1978,7 +2009,7 @@ export interface operations {
                 content: {
                     "application/json": {
                         data: components["schemas"]["RoleDto"][];
-                        meta: components["schemas"]["RequestMetaDto"];
+                        meta: components["schemas"]["PaginationMetaDto"];
                     };
                 };
             };
@@ -2114,7 +2145,9 @@ export interface operations {
     };
     OrganizationsController_list: {
         parameters: {
-            query?: never;
+            query: {
+                memberOnly: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -3449,8 +3482,9 @@ export interface operations {
                 page?: number;
                 limit?: number;
                 sortOrder?: "asc" | "desc";
-                status?: "PENDING" | "PROCESSING" | "COMPLETED" | "CANCELLED" | "FAILED";
+                status?: "PENDING" | "PROCESSING" | "COMPLETED" | "CANCELLED" | "FAILED" | "BLOCKED";
                 type?: string;
+                organizationId?: string;
             };
             header?: never;
             path?: never;
@@ -3464,7 +3498,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        data: components["schemas"]["JobDto"][];
+                        data: components["schemas"]["JobListDto"][];
                         meta: components["schemas"]["PaginationMetaDto"];
                     };
                 };

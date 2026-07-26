@@ -5,8 +5,16 @@
  * (web-core is the single source of truth for UI — see the 2026-07-11
  * re-architecture roadmap, P1).
  */
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { render, screen, cleanup } from "@testing-library/react";
+import { describe, expect, it, vi, afterEach, beforeAll } from "vitest";
+
+beforeAll(() => {
+  global.ResizeObserver = class ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  };
+});
 
 import { Alert } from "../alert";
 import { Avatar } from "../avatar";
@@ -40,7 +48,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 import { Textarea } from "../textarea";
 import { Tooltip } from "../tooltip";
 
-describe("web-core UI primitives smoke", () => {
+describe("UI Component Smoke Tests", () => {
+  afterEach(() => {
+    cleanup();
+  });
+
   it("renders Alert", () => {
     render(<Alert>alert body</Alert>);
     expect(screen.getByText("alert body")).toBeInTheDocument();
@@ -224,18 +236,18 @@ describe("web-core UI primitives smoke", () => {
   });
 
   it("renders Show when true", () => {
-    render(<Show when>content</Show>);
-    expect(screen.getByText("content")).toBeInTheDocument();
+    render(<Show when>show-content-1</Show>);
+    expect(screen.getByText("show-content-1")).toBeInTheDocument();
   });
 
   it("renders Show fallback when false", () => {
-    render(<Show when={false} fallback={<span>fallback</span>}>content</Show>);
+    render(<Show when={false} fallback={<span>fallback</span>}>hidden-content</Show>);
     expect(screen.getByText("fallback")).toBeInTheDocument();
-    expect(screen.queryByText("content")).not.toBeInTheDocument();
+    expect(screen.queryByText("hidden-content")).not.toBeInTheDocument();
   });
 
   it("renders nothing when false without fallback", () => {
-    const { container } = render(<Show when={false}>content</Show>);
+    const { container } = render(<Show when={false}>show-content-3</Show>);
     expect(container.firstChild).toBeNull();
   });
 

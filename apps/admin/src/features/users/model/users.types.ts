@@ -189,4 +189,4 @@ export interface UserDetailViewModel {
   };
 }
 
-export type { UsersPageSize };
+

@@ -5,8 +5,8 @@
 // ignore_for_file: unused_element
 // @dart=3.0
 
-import 'package:super_template_api/src/model/job_dto.dart';
 import 'package:built_collection/built_collection.dart';
+import 'package:super_template_api/src/model/job_list_dto.dart';
 import 'package:super_template_api/src/model/pagination_meta_dto.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
@@ -24,7 +24,7 @@ abstract class AdminJobsControllerListJobs200Response
         Built<AdminJobsControllerListJobs200Response,
             AdminJobsControllerListJobs200ResponseBuilder> {
   @BuiltValueField(wireName: r'data')
-  BuiltList<JobDto> get data;
+  BuiltList<JobListDto> get data;
 
   @BuiltValueField(wireName: r'meta')
   PaginationMetaDto get meta;
@@ -62,7 +62,7 @@ class _$AdminJobsControllerListJobs200ResponseSerializer
     yield r'data';
     yield serializers.serialize(
       object.data,
-      specifiedType: const FullType(BuiltList, [FullType(JobDto)]),
+      specifiedType: const FullType(BuiltList, [FullType(JobListDto)]),
     );
     yield r'meta';
     yield serializers.serialize(
@@ -100,9 +100,9 @@ class _$AdminJobsControllerListJobs200ResponseSerializer
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(BuiltList, [
-              FullType(JobDto),
+              FullType(JobListDto),
             ]),
-          ) as BuiltList<JobDto>;
+          ) as BuiltList<JobListDto>;
           result.data.replace(valueDes);
           break;
         case r'meta':

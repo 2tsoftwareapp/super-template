@@ -16,8 +16,6 @@ class _$FileVersionDto extends FileVersionDto {
   @override
   final num versionNumber;
   @override
-  final String storageKey;
-  @override
   final String mimeType;
   @override
   final num sizeBytes;
@@ -35,7 +33,6 @@ class _$FileVersionDto extends FileVersionDto {
     required this.id,
     required this.fileId,
     required this.versionNumber,
-    required this.storageKey,
     required this.mimeType,
     required this.sizeBytes,
     required this.checksum,
@@ -56,7 +53,6 @@ class _$FileVersionDto extends FileVersionDto {
         id == other.id &&
         fileId == other.fileId &&
         versionNumber == other.versionNumber &&
-        storageKey == other.storageKey &&
         mimeType == other.mimeType &&
         sizeBytes == other.sizeBytes &&
         checksum == other.checksum &&
@@ -70,7 +66,6 @@ class _$FileVersionDto extends FileVersionDto {
     _$hash = $jc(_$hash, id.hashCode);
     _$hash = $jc(_$hash, fileId.hashCode);
     _$hash = $jc(_$hash, versionNumber.hashCode);
-    _$hash = $jc(_$hash, storageKey.hashCode);
     _$hash = $jc(_$hash, mimeType.hashCode);
     _$hash = $jc(_$hash, sizeBytes.hashCode);
     _$hash = $jc(_$hash, checksum.hashCode);
@@ -86,7 +81,6 @@ class _$FileVersionDto extends FileVersionDto {
           ..add('id', id)
           ..add('fileId', fileId)
           ..add('versionNumber', versionNumber)
-          ..add('storageKey', storageKey)
           ..add('mimeType', mimeType)
           ..add('sizeBytes', sizeBytes)
           ..add('checksum', checksum)
@@ -112,10 +106,6 @@ class FileVersionDtoBuilder
   num? get versionNumber => _$this._versionNumber;
   set versionNumber(num? versionNumber) =>
       _$this._versionNumber = versionNumber;
-
-  String? _storageKey;
-  String? get storageKey => _$this._storageKey;
-  set storageKey(String? storageKey) => _$this._storageKey = storageKey;
 
   String? _mimeType;
   String? get mimeType => _$this._mimeType;
@@ -147,7 +137,6 @@ class FileVersionDtoBuilder
       _id = $v.id;
       _fileId = $v.fileId;
       _versionNumber = $v.versionNumber;
-      _storageKey = $v.storageKey;
       _mimeType = $v.mimeType;
       _sizeBytes = $v.sizeBytes;
       _checksum = $v.checksum;
@@ -188,11 +177,6 @@ class FileVersionDtoBuilder
             versionNumber,
             r'FileVersionDto',
             'versionNumber',
-          ),
-          storageKey: BuiltValueNullFieldError.checkNotNull(
-            storageKey,
-            r'FileVersionDto',
-            'storageKey',
           ),
           mimeType: BuiltValueNullFieldError.checkNotNull(
             mimeType,

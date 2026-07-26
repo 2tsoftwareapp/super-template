@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { DEFAULT_USERS_LIST_PARAMS } from "./constants";
+import { DEFAULT_USERS_LIST_PARAMS } from "../constants";
 import {
   parseUsersListSearchParams,
   serializeUsersListSearchParams,
   usersListParamsEqual,
-} from "./users.search-params";
+} from "../users.search-params";
 
 describe("users search params", () => {
   it("uses defaults for an empty query string", () => {

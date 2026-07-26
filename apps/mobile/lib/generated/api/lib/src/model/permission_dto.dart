@@ -5,6 +5,7 @@
 // ignore_for_file: unused_element
 // @dart=3.0
 
+import 'package:built_collection/built_collection.dart';
 import 'package:built_value/json_object.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
@@ -18,6 +19,7 @@ part 'permission_dto.g.dart';
 /// * [name]
 /// * [description]
 /// * [isSystem]
+/// * [scope]
 @BuiltValue()
 abstract class PermissionDto
     implements Built<PermissionDto, PermissionDtoBuilder> {
@@ -32,6 +34,10 @@ abstract class PermissionDto
 
   @BuiltValueField(wireName: r'isSystem')
   bool get isSystem;
+
+  @BuiltValueField(wireName: r'scope')
+  PermissionDtoScopeEnum get scope;
+  // enum scopeEnum {  platform,  organization,  };
 
   PermissionDto._();
 
@@ -79,6 +85,11 @@ class _$PermissionDtoSerializer implements PrimitiveSerializer<PermissionDto> {
     yield serializers.serialize(
       object.isSystem,
       specifiedType: const FullType(bool),
+    );
+    yield r'scope';
+    yield serializers.serialize(
+      object.scope,
+      specifiedType: const FullType(PermissionDtoScopeEnum),
     );
   }
 
@@ -136,6 +147,13 @@ class _$PermissionDtoSerializer implements PrimitiveSerializer<PermissionDto> {
           ) as bool;
           result.isSystem = valueDes;
           break;
+        case r'scope':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(PermissionDtoScopeEnum),
+          ) as PermissionDtoScopeEnum;
+          result.scope = valueDes;
+          break;
         default:
           unhandled.add(key);
           unhandled.add(value);
@@ -163,4 +181,23 @@ class _$PermissionDtoSerializer implements PrimitiveSerializer<PermissionDto> {
     );
     return result.build();
   }
+}
+
+class PermissionDtoScopeEnum extends EnumClass {
+  @BuiltValueEnumConst(wireName: r'platform')
+  static const PermissionDtoScopeEnum platform =
+      _$permissionDtoScopeEnum_platform;
+  @BuiltValueEnumConst(wireName: r'organization')
+  static const PermissionDtoScopeEnum organization =
+      _$permissionDtoScopeEnum_organization;
+
+  static Serializer<PermissionDtoScopeEnum> get serializer =>
+      _$permissionDtoScopeEnumSerializer;
+
+  const PermissionDtoScopeEnum._(String name) : super(name);
+
+  static BuiltSet<PermissionDtoScopeEnum> get values =>
+      _$permissionDtoScopeEnumValues;
+  static PermissionDtoScopeEnum valueOf(String name) =>
+      _$permissionDtoScopeEnumValueOf(name);
 }

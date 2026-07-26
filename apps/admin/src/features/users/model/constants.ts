@@ -1,8 +1,8 @@
 import { DEFAULT_PAGE_SIZE } from "@repo/config";
 
-import type { UsersListParams, UsersPageSize, UserStatusFilter } from "./types";
+import type { UsersListParams, UsersPageSize, UserStatusFilter } from "./users.types";
 
-export { USERS_PAGE_SIZE_OPTIONS, type UsersPageSize } from "./types";
+export { USERS_PAGE_SIZE_OPTIONS, type UsersPageSize } from "./users.types";
 
 export const USERS_PAGE_SIZE = DEFAULT_PAGE_SIZE satisfies UsersPageSize;
 

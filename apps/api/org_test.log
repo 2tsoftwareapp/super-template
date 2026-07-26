@@ -1,0 +1,249 @@
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.9 [39m[90m/Users/truongdev/Documents/projects/labs/super-template/apps/api[39m
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39mApplied migration 0000_stale_nebula.sql
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39mApplied migration 0001_notification_device_tokens.sql
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39mApplied migration 0002_notification_jobs.sql
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39mApplied migration 0003_small_dorian_gray.sql
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39mApplied migration 0004_organizations_rls.sql
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39mApplied migration 0005_expand_organization_rls.sql
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39mApplied migration 0006_idempotency_keys.sql
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39mApplied migration 0007_app_database_role.sql
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39mApplied migration 0007_files_export_metadata.sql
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39mApplied migration 0008_dynamic_rbac_roles.sql
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39mApplied migration 0008_reconcile_app_database_role.sql
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39mApplied migration 0009_simplify_rbac_crud.sql
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39mApplied migration 0010_two_factor_auth.sql
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39mApplied migration 0011_sso_external_identities.sql
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39mApplied migration 0012_file_versions_and_batch.sql
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39mApplied migration 0013_job_observability.sql
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39mApplied migration 0014_sso_session_exchanges.sql
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39mApplied migration 0015_drop_workspace_domain.sql
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39mApplied migration 0016_refresh_rotation_grace.sql
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39mApplied migration 0017_must_change_password_and_outbox.sql
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39mApplied migration 0018_cleanup_org_role_permissions.sql
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39mApplied migration 0019_fix_audit_rls_tenant_isolation.sql
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39mApplied migration 0020_audit_logs_indexes.sql
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39mApplied migration 0021_notification_hardening.sql
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39mApplied migration 0022_notification_deliveries.sql
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39mApplied migration 0023_notification_jobs_org_idempotency.sql
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39mApplied migration 0024_notification_device_tokens_disable.sql
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39mApplied migration 0025_sso_secrets_at_rest.sql
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39mApplied migration 0026_notification_jobs_attempts_active_token_index.sql
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39mApplied migration 0027_job_lease_and_idempotency_scope.sql
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39mApplied migration 0028_mail_deliveries_job_uniq.sql
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39mApplied migration 0029_notifications_source_background_job_id.sql
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39mApplied migration 0030_mail_delivery_processing_fencing.sql
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39mApplied migration 0031_provider_accepted_state.sql
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39mApplied migration 0032_org_system_role_unique_and_cleanup.sql
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39mApplied migration 0033_permission_scope_column.sql
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39mApplied migration 0034_user_roles_org_consistency.sql
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39mApplied migration 0035_repair_permission_scopes.sql
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39m[DEBUG] createTestApp: Test.createTestingModule
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39m[DEBUG] createTestApp: moduleRef.createNestApplication
+[DEBUG] createTestApp: app.init
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39m[DEBUG] createTestApp: seedDatabase
+[DEBUG] seedDatabase: inside seedDatabase function
+[DEBUG] seedDatabase: starting tenant transaction
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39m[DEBUG] seedDatabase: seedAccessControl
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39m[DEBUG] seedDatabase: seedSettings
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39m[DEBUG] seedDatabase: seedUsers
+[DEBUG] seedUsers: ensureUser admin@example.local - findByEmail
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39m[DEBUG] seedUsers: ensureUser admin@example.local - hashPassword
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39m[DEBUG] seedUsers: ensureUser admin@example.local - create
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39m[DEBUG] seedUsers: ensureUser admin@example.local - done user db
+[DEBUG] seedUsers: ensureUser admin@example.local - getRoleByName
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39m[DEBUG] seedUsers: ensureUser admin@example.local - replaceUserRoles
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39m[DEBUG] seedUsers: ensureUser admin@example.local - ensurePersonalOrganization
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39m[DEBUG] seedUsers: ensureUser admin@example.local - all done
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39m[DEBUG] seedUsers: ensureUser user@example.local - findByEmail
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39m[DEBUG] seedUsers: ensureUser user@example.local - hashPassword
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39m[DEBUG] seedUsers: ensureUser user@example.local - create
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39m[DEBUG] seedUsers: ensureUser user@example.local - done user db
+[DEBUG] seedUsers: ensureUser user@example.local - getRoleByName
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39m[DEBUG] seedUsers: ensureUser user@example.local - replaceUserRoles
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39m[DEBUG] seedUsers: ensureUser user@example.local - ensurePersonalOrganization
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39m[DEBUG] seedUsers: ensureUser user@example.local - all done
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39m[DEBUG] seedDatabase: seedNotifications
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39m[DEBUG] seedDatabase: revoke sessions
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39m[DEBUG] seedDatabase: transaction done
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39m[DEBUG] seedDatabase: done
+
+[90mstdout[2m | test/organization-management.e2e.spec.ts[2m > [22m[2mOrganization management (e2e)
+[22m[39m[DEBUG] createTestApp: done
+
+[31m[Nest] 55341  - [39m07/26/2026, 5:35:57 PM [31m  ERROR[39m [38;5;3m[App] [39m[31m{"timestamp":"2026-07-26T10:35:57.950Z","level":"error","message":"Unhandled request exception","context":{"requestId":"f7534cc4-3854-47bf-82aa-da289191f268","method":"PATCH","path":"/api/v1/organizations/ab2a48cf-fec5-4193-b177-e6320e896e95/members/c4ff3a4d-ae28-47c8-8729-421515f61885","statusCode":500,"userId":"768ce99a-ddbb-4c3d-9cdb-dc7897afa324","errorCode":"INTERNAL_ERROR","stack":"Error: Failed query: insert into \"audit_logs\" (\"id\", \"organization_id\", \"actor_id\", \"action\", \"entity_type\", \"entity_id\", \"metadata\", \"ip_address\", \"user_agent\", \"request_id\", \"created_at\") values (default, $1, $2, $3, $4, $5, $6, $7, $8, $9, default) returning \"id\", \"organization_id\", \"actor_id\", \"action\", \"entity_type\", \"entity_id\", \"metadata\", \"ip_address\", \"user_agent\", \"request_id\", \"created_at\"\nparams: ab2a48cf-fec5-4193-b177-e6320e896e95,768ce99a-ddbb-4c3d-9cdb-dc7897afa324,organization.member.role-update,organization_member,c4ff3a4d-ae28-47c8-8729-421515f61885,{\"organizationId\":\"ab2a48cf-fec5-4193-b177-e6320e896e95\",\"role\":\"ADMIN\"},::ffff:127.0.0.1,,f7534cc4-3854-47bf-82aa-da289191f268\n    at NodePgPreparedQuery.queryWithCache (file:///Users/truongdev/Documents/projects/labs/super-template/node_modules/.pnpm/drizzle-orm@0.45.2_@opentelemetry+api@1.9.1_@types+pg@8.15.6_pg@8.21.0/node_modules/drizzle-orm/pg-core/session.js:41:15)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/truongdev/Documents/projects/labs/super-template/node_modules/.pnpm/drizzle-orm@0.45.2_@opentelemetry+api@1.9.1_@types+pg@8.15.6_pg@8.21.0/node_modules/drizzle-orm/node-postgres/session.js:117:22\n    at AuditRepository.create (/Users/truongdev/Documents/projects/labs/super-template/packages/api-platform/src/modules/audit/infrastructure/audit.repository.ts:218:24)\n    at /Users/truongdev/Documents/projects/labs/super-template/packages/api-identity/src/modules/organizations/application/use-cases/update-member-role.use-case.ts:142:7\n    at NodePgSession.transaction (file:///Users/truongdev/Documents/projects/labs/super-template/node_modules/.pnpm/drizzle-orm@0.45.2_@opentelemetry+api@1.9.1_@types+pg@8.15.6_pg@8.21.0/node_modules/drizzle-orm/node-postgres/session.js:186:22)","details":null},"requestId":"f7534cc4-3854-47bf-82aa-da289191f268","method":"PATCH","path":"/api/v1/organizations/ab2a48cf-fec5-4193-b177-e6320e896e95/members/c4ff3a4d-ae28-47c8-8729-421515f61885","statusCode":500,"userId":"768ce99a-ddbb-4c3d-9cdb-dc7897afa324","errorCode":"INTERNAL_ERROR","stack":"Error: Failed query: insert into \"audit_logs\" (\"id\", \"organization_id\", \"actor_id\", \"action\", \"entity_type\", \"entity_id\", \"metadata\", \"ip_address\", \"user_agent\", \"request_id\", \"created_at\") values (default, $1, $2, $3, $4, $5, $6, $7, $8, $9, default) returning \"id\", \"organization_id\", \"actor_id\", \"action\", \"entity_type\", \"entity_id\", \"metadata\", \"ip_address\", \"user_agent\", \"request_id\", \"created_at\"\nparams: ab2a48cf-fec5-4193-b177-e6320e896e95,768ce99a-ddbb-4c3d-9cdb-dc7897afa324,organization.member.role-update,organization_member,c4ff3a4d-ae28-47c8-8729-421515f61885,{\"organizationId\":\"ab2a48cf-fec5-4193-b177-e6320e896e95\",\"role\":\"ADMIN\"},::ffff:127.0.0.1,,f7534cc4-3854-47bf-82aa-da289191f268\n    at NodePgPreparedQuery.queryWithCache (file:///Users/truongdev/Documents/projects/labs/super-template/node_modules/.pnpm/drizzle-orm@0.45.2_@opentelemetry+api@1.9.1_@types+pg@8.15.6_pg@8.21.0/node_modules/drizzle-orm/pg-core/session.js:41:15)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/truongdev/Documents/projects/labs/super-template/node_modules/.pnpm/drizzle-orm@0.45.2_@opentelemetry+api@1.9.1_@types+pg@8.15.6_pg@8.21.0/node_modules/drizzle-orm/node-postgres/session.js:117:22\n    at AuditRepository.create (/Users/truongdev/Documents/projects/labs/super-template/packages/api-platform/src/modules/audit/infrastructure/audit.repository.ts:218:24)\n    at /Users/truongdev/Documents/projects/labs/super-template/packages/api-identity/src/modules/organizations/application/use-cases/update-member-role.use-case.ts:142:7\n    at NodePgSession.transaction (file:///Users/truongdev/Documents/projects/labs/super-template/node_modules/.pnpm/drizzle-orm@0.45.2_@opentelemetry+api@1.9.1_@types+pg@8.15.6_pg@8.21.0/node_modules/drizzle-orm/node-postgres/session.js:186:22)","details":null}[39m
+[31m[Nest] 55341  - [39m07/26/2026, 5:35:57 PM [31m  ERROR[39m [38;5;3m[App] [39m[31m{"timestamp":"2026-07-26T10:35:57.950Z","level":"error","message":"HTTP request completed","context":{"requestId":"f7534cc4-3854-47bf-82aa-da289191f268","method":"PATCH","path":"/api/v1/organizations/ab2a48cf-fec5-4193-b177-e6320e896e95/members/c4ff3a4d-ae28-47c8-8729-421515f61885","statusCode":500,"duration":16,"userId":"768ce99a-ddbb-4c3d-9cdb-dc7897afa324","errorCode":"INTERNAL_ERROR"},"requestId":"f7534cc4-3854-47bf-82aa-da289191f268","method":"PATCH","path":"/api/v1/organizations/ab2a48cf-fec5-4193-b177-e6320e896e95/members/c4ff3a4d-ae28-47c8-8729-421515f61885","statusCode":500,"duration":16,"userId":"768ce99a-ddbb-4c3d-9cdb-dc7897afa324","errorCode":"INTERNAL_ERROR"}[39m
+[31m[Nest] 55341  - [39m07/26/2026, 5:35:58 PM [31m  ERROR[39m [38;5;3m[App] [39m[31m{"timestamp":"2026-07-26T10:35:58.302Z","level":"error","message":"Unhandled request exception","context":{"requestId":"0504553a-59ff-4739-a4ab-33b5681060b1","method":"PATCH","path":"/api/v1/organizations/5e61bd19-3b4d-4599-b25e-d2d58ea7b17f/members/bac16687-4381-48a7-8aa9-0a8a5a28c808","statusCode":500,"userId":"a0a73bbf-c1f2-4196-aeff-18da85d058db","errorCode":"INTERNAL_ERROR","stack":"Error: Failed query: insert into \"audit_logs\" (\"id\", \"organization_id\", \"actor_id\", \"action\", \"entity_type\", \"entity_id\", \"metadata\", \"ip_address\", \"user_agent\", \"request_id\", \"created_at\") values (default, $1, $2, $3, $4, $5, $6, $7, $8, $9, default) returning \"id\", \"organization_id\", \"actor_id\", \"action\", \"entity_type\", \"entity_id\", \"metadata\", \"ip_address\", \"user_agent\", \"request_id\", \"created_at\"\nparams: 5e61bd19-3b4d-4599-b25e-d2d58ea7b17f,a0a73bbf-c1f2-4196-aeff-18da85d058db,organization.member.role-update,organization_member,bac16687-4381-48a7-8aa9-0a8a5a28c808,{\"organizationId\":\"5e61bd19-3b4d-4599-b25e-d2d58ea7b17f\",\"role\":\"ADMIN\"},::ffff:127.0.0.1,,0504553a-59ff-4739-a4ab-33b5681060b1\n    at NodePgPreparedQuery.queryWithCache (file:///Users/truongdev/Documents/projects/labs/super-template/node_modules/.pnpm/drizzle-orm@0.45.2_@opentelemetry+api@1.9.1_@types+pg@8.15.6_pg@8.21.0/node_modules/drizzle-orm/pg-core/session.js:41:15)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/truongdev/Documents/projects/labs/super-template/node_modules/.pnpm/drizzle-orm@0.45.2_@opentelemetry+api@1.9.1_@types+pg@8.15.6_pg@8.21.0/node_modules/drizzle-orm/node-postgres/session.js:117:22\n    at AuditRepository.create (/Users/truongdev/Documents/projects/labs/super-template/packages/api-platform/src/modules/audit/infrastructure/audit.repository.ts:218:24)\n    at /Users/truongdev/Documents/projects/labs/super-template/packages/api-identity/src/modules/organizations/application/use-cases/update-member-role.use-case.ts:142:7\n    at NodePgSession.transaction (file:///Users/truongdev/Documents/projects/labs/super-template/node_modules/.pnpm/drizzle-orm@0.45.2_@opentelemetry+api@1.9.1_@types+pg@8.15.6_pg@8.21.0/node_modules/drizzle-orm/node-postgres/session.js:186:22)","details":null},"requestId":"0504553a-59ff-4739-a4ab-33b5681060b1","method":"PATCH","path":"/api/v1/organizations/5e61bd19-3b4d-4599-b25e-d2d58ea7b17f/members/bac16687-4381-48a7-8aa9-0a8a5a28c808","statusCode":500,"userId":"a0a73bbf-c1f2-4196-aeff-18da85d058db","errorCode":"INTERNAL_ERROR","stack":"Error: Failed query: insert into \"audit_logs\" (\"id\", \"organization_id\", \"actor_id\", \"action\", \"entity_type\", \"entity_id\", \"metadata\", \"ip_address\", \"user_agent\", \"request_id\", \"created_at\") values (default, $1, $2, $3, $4, $5, $6, $7, $8, $9, default) returning \"id\", \"organization_id\", \"actor_id\", \"action\", \"entity_type\", \"entity_id\", \"metadata\", \"ip_address\", \"user_agent\", \"request_id\", \"created_at\"\nparams: 5e61bd19-3b4d-4599-b25e-d2d58ea7b17f,a0a73bbf-c1f2-4196-aeff-18da85d058db,organization.member.role-update,organization_member,bac16687-4381-48a7-8aa9-0a8a5a28c808,{\"organizationId\":\"5e61bd19-3b4d-4599-b25e-d2d58ea7b17f\",\"role\":\"ADMIN\"},::ffff:127.0.0.1,,0504553a-59ff-4739-a4ab-33b5681060b1\n    at NodePgPreparedQuery.queryWithCache (file:///Users/truongdev/Documents/projects/labs/super-template/node_modules/.pnpm/drizzle-orm@0.45.2_@opentelemetry+api@1.9.1_@types+pg@8.15.6_pg@8.21.0/node_modules/drizzle-orm/pg-core/session.js:41:15)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/truongdev/Documents/projects/labs/super-template/node_modules/.pnpm/drizzle-orm@0.45.2_@opentelemetry+api@1.9.1_@types+pg@8.15.6_pg@8.21.0/node_modules/drizzle-orm/node-postgres/session.js:117:22\n    at AuditRepository.create (/Users/truongdev/Documents/projects/labs/super-template/packages/api-platform/src/modules/audit/infrastructure/audit.repository.ts:218:24)\n    at /Users/truongdev/Documents/projects/labs/super-template/packages/api-identity/src/modules/organizations/application/use-cases/update-member-role.use-case.ts:142:7\n    at NodePgSession.transaction (file:///Users/truongdev/Documents/projects/labs/super-template/node_modules/.pnpm/drizzle-orm@0.45.2_@opentelemetry+api@1.9.1_@types+pg@8.15.6_pg@8.21.0/node_modules/drizzle-orm/node-postgres/session.js:186:22)","details":null}[39m
+[31m[Nest] 55341  - [39m07/26/2026, 5:35:58 PM [31m  ERROR[39m [38;5;3m[App] [39m[31m{"timestamp":"2026-07-26T10:35:58.302Z","level":"error","message":"HTTP request completed","context":{"requestId":"0504553a-59ff-4739-a4ab-33b5681060b1","method":"PATCH","path":"/api/v1/organizations/5e61bd19-3b4d-4599-b25e-d2d58ea7b17f/members/bac16687-4381-48a7-8aa9-0a8a5a28c808","statusCode":500,"duration":13,"userId":"a0a73bbf-c1f2-4196-aeff-18da85d058db","errorCode":"INTERNAL_ERROR"},"requestId":"0504553a-59ff-4739-a4ab-33b5681060b1","method":"PATCH","path":"/api/v1/organizations/5e61bd19-3b4d-4599-b25e-d2d58ea7b17f/members/bac16687-4381-48a7-8aa9-0a8a5a28c808","statusCode":500,"duration":13,"userId":"a0a73bbf-c1f2-4196-aeff-18da85d058db","errorCode":"INTERNAL_ERROR"}[39m
+ [31m❯[39m test/organization-management.e2e.spec.ts [2m([22m[2m4 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[33m 2307[2mms[22m[39m
+[31m     [31m×[31m runs owner/admin/member lifecycle: view, manage, last-owner protection, and leave[39m[33m 660[2mms[22m[39m
+[31m     [31m×[31m enforces RBAC sync, member leaves, concurrency locks, session revokes, and SUPER_ADMIN bypass[39m[33m 351[2mms[22m[39m
+     [32m✓[39m handles concurrent demotions, enforcing last-owner locking and exactly one success[32m 275[2mms[22m[39m
+     [33m[2m✓[22m[39m synchronizes membership role and RBAC role via Users API, blocking OWNER demotion [33m 343[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 2 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m test/organization-management.e2e.spec.ts[2m > [22mOrganization management (e2e)[2m > [22mruns owner/admin/member lifecycle: view, manage, last-owner protection, and leave
+[31m[1mError[22m: expected 200 "OK", got 500 "Internal Server Error"[39m
+[36m [2m❯[22m test/organization-management.e2e.spec.ts:[2m170:8[22m[39m
+    [90m168|[39m       [33m.[39m[35mset[39m([34mbearer[39m(ownerSession[33m.[39maccessToken))
+    [90m169|[39m       [33m.[39m[34msend[39m({ role[33m:[39m [32m'ADMIN'[39m })
+    [90m170|[39m       [33m.[39m[34mexpect[39m([34m200[39m)[33m;[39m
+    [90m   |[39m        [31m^[39m
+    [90m171|[39m
+    [90m172|[39m     [90m// The owner is the only owner: leaving must be blocked.[39m
+[90m [2m❯[22m Test._assertStatus ../../node_modules/.pnpm/supertest@7.1.4_supports-color@10.2.2/node_modules/supertest/lib/test.js:[2m309:14[22m[39m
+[90m [2m❯[22m ../../node_modules/.pnpm/supertest@7.1.4_supports-color@10.2.2/node_modules/supertest/lib/test.js:[2m365:13[22m[39m
+[90m [2m❯[22m Test._assertFunction ../../node_modules/.pnpm/supertest@7.1.4_supports-color@10.2.2/node_modules/supertest/lib/test.js:[2m342:13[22m[39m
+[90m [2m❯[22m Test.assert ../../node_modules/.pnpm/supertest@7.1.4_supports-color@10.2.2/node_modules/supertest/lib/test.js:[2m195:23[22m[39m
+[90m [2m❯[22m localAssert ../../node_modules/.pnpm/supertest@7.1.4_supports-color@10.2.2/node_modules/supertest/lib/test.js:[2m138:14[22m[39m
+[90m [2m❯[22m Server.<anonymous> ../../node_modules/.pnpm/supertest@7.1.4_supports-color@10.2.2/node_modules/supertest/lib/test.js:[2m152:11[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m test/organization-management.e2e.spec.ts[2m > [22mOrganization management (e2e)[2m > [22menforces RBAC sync, member leaves, concurrency locks, session revokes, and SUPER_ADMIN bypass
+[31m[1mError[22m: expected 200 "OK", got 500 "Internal Server Error"[39m
+[36m [2m❯[22m test/organization-management.e2e.spec.ts:[2m255:8[22m[39m
+    [90m253|[39m       [33m.[39m[35mset[39m([34mbearer[39m(ownerSession[33m.[39maccessToken))
+    [90m254|[39m       [33m.[39m[34msend[39m({ role[33m:[39m [32m'ADMIN'[39m })
+    [90m255|[39m       [33m.[39m[34mexpect[39m([34m200[39m)[33m;[39m
+    [90m   |[39m        [31m^[39m
+    [90m256|[39m
+    [90m257|[39m     [90m// Verify ADMIN database RBAC role is assigned in userRoles table[39m
+[90m [2m❯[22m Test._assertStatus ../../node_modules/.pnpm/supertest@7.1.4_supports-color@10.2.2/node_modules/supertest/lib/test.js:[2m309:14[22m[39m
+[90m [2m❯[22m ../../node_modules/.pnpm/supertest@7.1.4_supports-color@10.2.2/node_modules/supertest/lib/test.js:[2m365:13[22m[39m
+[90m [2m❯[22m Test._assertFunction ../../node_modules/.pnpm/supertest@7.1.4_supports-color@10.2.2/node_modules/supertest/lib/test.js:[2m342:13[22m[39m
+[90m [2m❯[22m Test.assert ../../node_modules/.pnpm/supertest@7.1.4_supports-color@10.2.2/node_modules/supertest/lib/test.js:[2m195:23[22m[39m
+[90m [2m❯[22m localAssert ../../node_modules/.pnpm/supertest@7.1.4_supports-color@10.2.2/node_modules/supertest/lib/test.js:[2m138:14[22m[39m
+[90m [2m❯[22m Server.<anonymous> ../../node_modules/.pnpm/supertest@7.1.4_supports-color@10.2.2/node_modules/supertest/lib/test.js:[2m152:11[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m2 passed[39m[22m[90m (4)[39m
+[2m   Start at [22m 17:35:54
+[2m   Duration [22m 4.00s[2m (transform 543ms, setup 0ms, import 1.63s, tests 2.31s, environment 0ms)[22m
+

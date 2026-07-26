@@ -2,6 +2,7 @@ import {
   allSeedPermissionNames,
   RESOURCE_SCOPE,
   ROLE_NAMES,
+  scopeForPermission,
 } from '@repo/api-core';
 
 export interface RoleSeedEntry {
@@ -26,13 +27,6 @@ export const ROLE_SEED_ENTRIES: RoleSeedEntry[] = [
   { name: ROLE_NAMES.ADMIN, description: 'Administrative role', isSystem: true },
   { name: ROLE_NAMES.USER, description: 'Standard user role', isSystem: true },
 ];
-
-function scopeForPermission(name: string): 'platform' | 'organization' {
-  const dot = name.indexOf('.');
-  if (dot === -1) return 'platform';
-  const resource = name.slice(0, dot);
-  return (RESOURCE_SCOPE as Record<string, 'platform' | 'organization'>)[resource] ?? 'platform';
-}
 
 export const PERMISSION_SEED_ENTRIES: PermissionSeedEntry[] =
   allSeedPermissionNames().map((name) => ({

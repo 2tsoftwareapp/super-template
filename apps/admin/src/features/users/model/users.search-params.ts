@@ -13,7 +13,7 @@ import {
 } from "@repo/web-utils/params";
 import { z } from "zod";
 
-import type { UsersListParams, UsersSortField } from "./types";
+import type { UsersListParams, UsersSortField } from "./users.types";
 
 import { DEFAULT_USERS_LIST_PARAMS, USERS_PAGE_SIZE } from "./constants";
 

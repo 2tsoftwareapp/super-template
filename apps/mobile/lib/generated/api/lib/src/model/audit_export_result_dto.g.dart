@@ -13,14 +13,22 @@ class _$AuditExportResultDto extends AuditExportResultDto {
   final String fileId;
   @override
   final num rowCount;
+  @override
+  final num totalMatching;
+  @override
+  final bool truncated;
 
   factory _$AuditExportResultDto([
     void Function(AuditExportResultDtoBuilder)? updates,
   ]) =>
       (AuditExportResultDtoBuilder()..update(updates))._build();
 
-  _$AuditExportResultDto._({required this.fileId, required this.rowCount})
-      : super._();
+  _$AuditExportResultDto._({
+    required this.fileId,
+    required this.rowCount,
+    required this.totalMatching,
+    required this.truncated,
+  }) : super._();
   @override
   AuditExportResultDto rebuild(
     void Function(AuditExportResultDtoBuilder) updates,
@@ -36,7 +44,9 @@ class _$AuditExportResultDto extends AuditExportResultDto {
     if (identical(other, this)) return true;
     return other is AuditExportResultDto &&
         fileId == other.fileId &&
-        rowCount == other.rowCount;
+        rowCount == other.rowCount &&
+        totalMatching == other.totalMatching &&
+        truncated == other.truncated;
   }
 
   @override
@@ -44,6 +54,8 @@ class _$AuditExportResultDto extends AuditExportResultDto {
     var _$hash = 0;
     _$hash = $jc(_$hash, fileId.hashCode);
     _$hash = $jc(_$hash, rowCount.hashCode);
+    _$hash = $jc(_$hash, totalMatching.hashCode);
+    _$hash = $jc(_$hash, truncated.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -52,7 +64,9 @@ class _$AuditExportResultDto extends AuditExportResultDto {
   String toString() {
     return (newBuiltValueToStringHelper(r'AuditExportResultDto')
           ..add('fileId', fileId)
-          ..add('rowCount', rowCount))
+          ..add('rowCount', rowCount)
+          ..add('totalMatching', totalMatching)
+          ..add('truncated', truncated))
         .toString();
   }
 }
@@ -69,6 +83,15 @@ class AuditExportResultDtoBuilder
   num? get rowCount => _$this._rowCount;
   set rowCount(num? rowCount) => _$this._rowCount = rowCount;
 
+  num? _totalMatching;
+  num? get totalMatching => _$this._totalMatching;
+  set totalMatching(num? totalMatching) =>
+      _$this._totalMatching = totalMatching;
+
+  bool? _truncated;
+  bool? get truncated => _$this._truncated;
+  set truncated(bool? truncated) => _$this._truncated = truncated;
+
   AuditExportResultDtoBuilder() {
     AuditExportResultDto._defaults(this);
   }
@@ -78,6 +101,8 @@ class AuditExportResultDtoBuilder
     if ($v != null) {
       _fileId = $v.fileId;
       _rowCount = $v.rowCount;
+      _totalMatching = $v.totalMatching;
+      _truncated = $v.truncated;
       _$v = null;
     }
     return this;
@@ -108,6 +133,16 @@ class AuditExportResultDtoBuilder
             rowCount,
             r'AuditExportResultDto',
             'rowCount',
+          ),
+          totalMatching: BuiltValueNullFieldError.checkNotNull(
+            totalMatching,
+            r'AuditExportResultDto',
+            'totalMatching',
+          ),
+          truncated: BuiltValueNullFieldError.checkNotNull(
+            truncated,
+            r'AuditExportResultDto',
+            'truncated',
           ),
         );
     replace(_$result);

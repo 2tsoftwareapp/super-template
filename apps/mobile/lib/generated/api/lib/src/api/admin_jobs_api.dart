@@ -593,6 +593,7 @@ class AdminJobsApi {
   /// * [sortOrder]
   /// * [status]
   /// * [type]
+  /// * [organizationId]
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
   /// * [headers] - Can be used to add additional headers to the request
   /// * [extras] - Can be used to add flags to the request
@@ -609,6 +610,7 @@ class AdminJobsApi {
     String? sortOrder = 'desc',
     String? status,
     String? type,
+    String? organizationId,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? extra,
@@ -654,6 +656,12 @@ class AdminJobsApi {
         r'type': encodeQueryParameter(
           _serializers,
           type,
+          const FullType(String),
+        ),
+      if (organizationId != null)
+        r'organizationId': encodeQueryParameter(
+          _serializers,
+          organizationId,
           const FullType(String),
         ),
     };

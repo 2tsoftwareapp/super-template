@@ -1,6 +1,6 @@
 import type { ManagedRoleDto } from "@/features/roles/model/roles.schemas";
 
-export type MergedRole = ManagedRoleDto & { scopes: string[] };
+export type MergedRole = ManagedRoleDto & { scopes: ManagedRoleDto["scope"][] };
 
 export function optionalText(value: string | null | undefined | object): string {
   return typeof value === "string" ? value : "";

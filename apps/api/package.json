@@ -34,6 +34,7 @@
     "@nestjs/platform-express": "11.1.27",
     "@nestjs/schedule": "6.1.1",
     "@nestjs/swagger": "11.4.4",
+    "@nestjs/terminus": "^11.1.1",
     "@nestjs/throttler": "6.5.0",
     "@repo/api-core": "workspace:*",
     "@repo/api-database": "workspace:*",

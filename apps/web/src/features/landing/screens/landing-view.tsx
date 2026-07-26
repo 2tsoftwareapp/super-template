@@ -23,8 +23,8 @@ import {
   Zap,
 } from "lucide-react";
 
-import { ArchDiagram } from "../ui/arch-diagram
-import { ScrollToTop } from "../ui/scroll-to-top
+import { ArchDiagram } from "../ui/arch-diagram";
+import { ScrollToTop } from "../ui/scroll-to-top";
 
 const ADMIN_URL =
   process.env.NEXT_PUBLIC_ADMIN_URL ?? "http://localhost:3002";

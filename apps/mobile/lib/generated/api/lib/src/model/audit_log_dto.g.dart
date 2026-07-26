@@ -12,6 +12,8 @@ class _$AuditLogDto extends AuditLogDto {
   @override
   final String id;
   @override
+  final String? organizationId;
+  @override
   final String? actorId;
   @override
   final String action;
@@ -35,6 +37,7 @@ class _$AuditLogDto extends AuditLogDto {
 
   _$AuditLogDto._({
     required this.id,
+    this.organizationId,
     this.actorId,
     required this.action,
     required this.entityType,
@@ -57,6 +60,7 @@ class _$AuditLogDto extends AuditLogDto {
     if (identical(other, this)) return true;
     return other is AuditLogDto &&
         id == other.id &&
+        organizationId == other.organizationId &&
         actorId == other.actorId &&
         action == other.action &&
         entityType == other.entityType &&
@@ -72,6 +76,7 @@ class _$AuditLogDto extends AuditLogDto {
   int get hashCode {
     var _$hash = 0;
     _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, organizationId.hashCode);
     _$hash = $jc(_$hash, actorId.hashCode);
     _$hash = $jc(_$hash, action.hashCode);
     _$hash = $jc(_$hash, entityType.hashCode);
@@ -89,6 +94,7 @@ class _$AuditLogDto extends AuditLogDto {
   String toString() {
     return (newBuiltValueToStringHelper(r'AuditLogDto')
           ..add('id', id)
+          ..add('organizationId', organizationId)
           ..add('actorId', actorId)
           ..add('action', action)
           ..add('entityType', entityType)
@@ -108,6 +114,11 @@ class AuditLogDtoBuilder implements Builder<AuditLogDto, AuditLogDtoBuilder> {
   String? _id;
   String? get id => _$this._id;
   set id(String? id) => _$this._id = id;
+
+  String? _organizationId;
+  String? get organizationId => _$this._organizationId;
+  set organizationId(String? organizationId) =>
+      _$this._organizationId = organizationId;
 
   String? _actorId;
   String? get actorId => _$this._actorId;
@@ -155,6 +166,7 @@ class AuditLogDtoBuilder implements Builder<AuditLogDto, AuditLogDtoBuilder> {
     final $v = _$v;
     if ($v != null) {
       _id = $v.id;
+      _organizationId = $v.organizationId;
       _actorId = $v.actorId;
       _action = $v.action;
       _entityType = $v.entityType;
@@ -188,6 +200,7 @@ class AuditLogDtoBuilder implements Builder<AuditLogDto, AuditLogDtoBuilder> {
       _$result = _$v ??
           _$AuditLogDto._(
             id: BuiltValueNullFieldError.checkNotNull(id, r'AuditLogDto', 'id'),
+            organizationId: organizationId,
             actorId: actorId,
             action: BuiltValueNullFieldError.checkNotNull(
               action,

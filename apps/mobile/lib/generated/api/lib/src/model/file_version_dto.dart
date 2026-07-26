@@ -17,7 +17,6 @@ part 'file_version_dto.g.dart';
 /// * [id]
 /// * [fileId]
 /// * [versionNumber]
-/// * [storageKey]
 /// * [mimeType]
 /// * [sizeBytes]
 /// * [checksum]
@@ -34,9 +33,6 @@ abstract class FileVersionDto
 
   @BuiltValueField(wireName: r'versionNumber')
   num get versionNumber;
-
-  @BuiltValueField(wireName: r'storageKey')
-  String get storageKey;
 
   @BuiltValueField(wireName: r'mimeType')
   String get mimeType;
@@ -93,11 +89,6 @@ class _$FileVersionDtoSerializer
     yield serializers.serialize(
       object.versionNumber,
       specifiedType: const FullType(num),
-    );
-    yield r'storageKey';
-    yield serializers.serialize(
-      object.storageKey,
-      specifiedType: const FullType(String),
     );
     yield r'mimeType';
     yield serializers.serialize(
@@ -171,13 +162,6 @@ class _$FileVersionDtoSerializer
           final valueDes = serializers.deserialize(value,
               specifiedType: const FullType(num)) as num;
           result.versionNumber = valueDes;
-          break;
-        case r'storageKey':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.storageKey = valueDes;
           break;
         case r'mimeType':
           final valueDes = serializers.deserialize(

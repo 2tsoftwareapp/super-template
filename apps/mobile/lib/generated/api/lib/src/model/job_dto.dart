@@ -30,6 +30,7 @@ part 'job_dto.g.dart';
 /// * [createdById]
 /// * [createdAt]
 /// * [updatedAt]
+/// * [organizationId]
 @BuiltValue()
 abstract class JobDto implements Built<JobDto, JobDtoBuilder> {
   @BuiltValueField(wireName: r'id')
@@ -43,7 +44,7 @@ abstract class JobDto implements Built<JobDto, JobDtoBuilder> {
 
   @BuiltValueField(wireName: r'status')
   JobDtoStatusEnum get status;
-  // enum statusEnum {  PENDING,  PROCESSING,  COMPLETED,  CANCELLED,  FAILED,  };
+  // enum statusEnum {  PENDING,  PROCESSING,  COMPLETED,  CANCELLED,  FAILED,  BLOCKED,  };
 
   @BuiltValueField(wireName: r'scheduledAt')
   String get scheduledAt;
@@ -77,6 +78,9 @@ abstract class JobDto implements Built<JobDto, JobDtoBuilder> {
 
   @BuiltValueField(wireName: r'updatedAt')
   String get updatedAt;
+
+  @BuiltValueField(wireName: r'organizationId')
+  JsonObject? get organizationId;
 
   JobDto._();
 
@@ -189,6 +193,13 @@ class _$JobDtoSerializer implements PrimitiveSerializer<JobDto> {
       object.updatedAt,
       specifiedType: const FullType(String),
     );
+    if (object.organizationId != null) {
+      yield r'organizationId';
+      yield serializers.serialize(
+        object.organizationId,
+        specifiedType: const FullType(JsonObject),
+      );
+    }
   }
 
   @override
@@ -319,6 +330,13 @@ class _$JobDtoSerializer implements PrimitiveSerializer<JobDto> {
           ) as String;
           result.updatedAt = valueDes;
           break;
+        case r'organizationId':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(JsonObject),
+          ) as JsonObject;
+          result.organizationId = valueDes;
+          break;
         default:
           unhandled.add(key);
           unhandled.add(value);
@@ -359,6 +377,8 @@ class JobDtoStatusEnum extends EnumClass {
   static const JobDtoStatusEnum CANCELLED = _$jobDtoStatusEnum_CANCELLED;
   @BuiltValueEnumConst(wireName: r'FAILED')
   static const JobDtoStatusEnum FAILED = _$jobDtoStatusEnum_FAILED;
+  @BuiltValueEnumConst(wireName: r'BLOCKED')
+  static const JobDtoStatusEnum BLOCKED = _$jobDtoStatusEnum_BLOCKED;
 
   static Serializer<JobDtoStatusEnum> get serializer =>
       _$jobDtoStatusEnumSerializer;

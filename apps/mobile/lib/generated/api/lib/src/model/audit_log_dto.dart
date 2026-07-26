@@ -16,6 +16,7 @@ part 'audit_log_dto.g.dart';
 ///
 /// Properties:
 /// * [id]
+/// * [organizationId]
 /// * [actorId]
 /// * [action]
 /// * [entityType]
@@ -29,6 +30,9 @@ part 'audit_log_dto.g.dart';
 abstract class AuditLogDto implements Built<AuditLogDto, AuditLogDtoBuilder> {
   @BuiltValueField(wireName: r'id')
   String get id;
+
+  @BuiltValueField(wireName: r'organizationId')
+  String? get organizationId;
 
   @BuiltValueField(wireName: r'actorId')
   String? get actorId;
@@ -85,6 +89,13 @@ class _$AuditLogDtoSerializer implements PrimitiveSerializer<AuditLogDto> {
       object.id,
       specifiedType: const FullType(String),
     );
+    if (object.organizationId != null) {
+      yield r'organizationId';
+      yield serializers.serialize(
+        object.organizationId,
+        specifiedType: const FullType.nullable(String),
+      );
+    }
     if (object.actorId != null) {
       yield r'actorId';
       yield serializers.serialize(
@@ -178,6 +189,14 @@ class _$AuditLogDtoSerializer implements PrimitiveSerializer<AuditLogDto> {
             specifiedType: const FullType(String),
           ) as String;
           result.id = valueDes;
+          break;
+        case r'organizationId':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
+          if (valueDes == null) continue;
+          result.organizationId = valueDes;
           break;
         case r'actorId':
           final valueDes = serializers.deserialize(

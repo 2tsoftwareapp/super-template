@@ -192,20 +192,10 @@ export const resetTestDatabase = async (): Promise<void> => {
   } finally {
     await pool.end();
   }
-
-  const context = await NestFactory.createApplicationContext(AppModule, {
-    logger: false,
-    abortOnError: false,
-  });
-
-  try {
-    await seedDatabase(context);
-  } finally {
-    await context.close();
-  }
 };
 
 export const createTestApp = async (): Promise<INestApplication> => {
+  console.log('[DEBUG] createTestApp: Test.createTestingModule');
   const moduleRef = await Test.createTestingModule({
     imports: [AppModule],
   })
@@ -215,6 +205,7 @@ export const createTestApp = async (): Promise<INestApplication> => {
     })
     .compile();
 
+  console.log('[DEBUG] createTestApp: moduleRef.createNestApplication');
   const app = moduleRef.createNestApplication({ abortOnError: false });
   app.setGlobalPrefix('api/v1');
   app.useGlobalPipes(
@@ -228,7 +219,11 @@ export const createTestApp = async (): Promise<INestApplication> => {
     }),
   );
 
+  console.log('[DEBUG] createTestApp: app.init');
   await app.init();
+  console.log('[DEBUG] createTestApp: seedDatabase');
+  await seedDatabase(app);
+  console.log('[DEBUG] createTestApp: done');
   return app;
 };
 

@@ -5,9 +5,9 @@
 // ignore_for_file: unused_element
 // @dart=3.0
 
-import 'package:super_template_api/src/model/request_meta_dto.dart';
 import 'package:built_collection/built_collection.dart';
 import 'package:super_template_api/src/model/role_dto.dart';
+import 'package:super_template_api/src/model/pagination_meta_dto.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
@@ -27,7 +27,7 @@ abstract class AdminRolesControllerListRoles200Response
   BuiltList<RoleDto> get data;
 
   @BuiltValueField(wireName: r'meta')
-  RequestMetaDto get meta;
+  PaginationMetaDto get meta;
 
   AdminRolesControllerListRoles200Response._();
 
@@ -67,7 +67,7 @@ class _$AdminRolesControllerListRoles200ResponseSerializer
     yield r'meta';
     yield serializers.serialize(
       object.meta,
-      specifiedType: const FullType(RequestMetaDto),
+      specifiedType: const FullType(PaginationMetaDto),
     );
   }
 
@@ -108,8 +108,8 @@ class _$AdminRolesControllerListRoles200ResponseSerializer
         case r'meta':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(RequestMetaDto),
-          ) as RequestMetaDto;
+            specifiedType: const FullType(PaginationMetaDto),
+          ) as PaginationMetaDto;
           result.meta.replace(valueDes);
           break;
         default:

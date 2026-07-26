@@ -1,0 +1,292 @@
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.9 [39m[90m/Users/truongdev/Documents/projects/labs/super-template/apps/api[39m
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39mApplied migration 0000_stale_nebula.sql
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39mApplied migration 0001_notification_device_tokens.sql
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39mApplied migration 0002_notification_jobs.sql
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39mApplied migration 0003_small_dorian_gray.sql
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39mApplied migration 0004_organizations_rls.sql
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39mApplied migration 0005_expand_organization_rls.sql
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39mApplied migration 0006_idempotency_keys.sql
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39mApplied migration 0007_app_database_role.sql
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39mApplied migration 0007_files_export_metadata.sql
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39mApplied migration 0008_dynamic_rbac_roles.sql
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39mApplied migration 0008_reconcile_app_database_role.sql
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39mApplied migration 0009_simplify_rbac_crud.sql
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39mApplied migration 0010_two_factor_auth.sql
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39mApplied migration 0011_sso_external_identities.sql
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39mApplied migration 0012_file_versions_and_batch.sql
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39mApplied migration 0013_job_observability.sql
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39mApplied migration 0014_sso_session_exchanges.sql
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39mApplied migration 0015_drop_workspace_domain.sql
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39mApplied migration 0016_refresh_rotation_grace.sql
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39mApplied migration 0017_must_change_password_and_outbox.sql
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39mApplied migration 0018_cleanup_org_role_permissions.sql
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39mApplied migration 0019_fix_audit_rls_tenant_isolation.sql
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39mApplied migration 0020_audit_logs_indexes.sql
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39mApplied migration 0021_notification_hardening.sql
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39mApplied migration 0022_notification_deliveries.sql
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39mApplied migration 0023_notification_jobs_org_idempotency.sql
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39mApplied migration 0024_notification_device_tokens_disable.sql
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39mApplied migration 0025_sso_secrets_at_rest.sql
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39mApplied migration 0026_notification_jobs_attempts_active_token_index.sql
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39mApplied migration 0027_job_lease_and_idempotency_scope.sql
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39mApplied migration 0028_mail_deliveries_job_uniq.sql
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39mApplied migration 0029_notifications_source_background_job_id.sql
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39mApplied migration 0030_mail_delivery_processing_fencing.sql
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39mApplied migration 0031_provider_accepted_state.sql
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39mApplied migration 0032_org_system_role_unique_and_cleanup.sql
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39mApplied migration 0033_permission_scope_column.sql
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39mApplied migration 0034_user_roles_org_consistency.sql
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39mApplied migration 0035_repair_permission_scopes.sql
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39m[DEBUG] createTestApp: Test.createTestingModule
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39m[DEBUG] createTestApp: moduleRef.createNestApplication
+[DEBUG] createTestApp: app.init
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39m[DEBUG] createTestApp: seedDatabase
+[DEBUG] seedDatabase: inside seedDatabase function
+[DEBUG] seedDatabase: starting tenant transaction
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39m[DEBUG] seedDatabase: seedAccessControl
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39m[DEBUG] seedDatabase: seedSettings
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39m[DEBUG] seedDatabase: seedUsers
+[DEBUG] seedUsers: ensureUser admin@example.local - findByEmail
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39m[DEBUG] seedUsers: ensureUser admin@example.local - hashPassword
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39m[DEBUG] seedUsers: ensureUser admin@example.local - create
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39m[DEBUG] seedUsers: ensureUser admin@example.local - done user db
+[DEBUG] seedUsers: ensureUser admin@example.local - getRoleByName
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39m[DEBUG] seedUsers: ensureUser admin@example.local - replaceUserRoles
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39m[DEBUG] seedUsers: ensureUser admin@example.local - ensurePersonalOrganization
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39m[DEBUG] seedUsers: ensureUser admin@example.local - all done
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39m[DEBUG] seedUsers: ensureUser user@example.local - findByEmail
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39m[DEBUG] seedUsers: ensureUser user@example.local - hashPassword
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39m[DEBUG] seedUsers: ensureUser user@example.local - create
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39m[DEBUG] seedUsers: ensureUser user@example.local - done user db
+[DEBUG] seedUsers: ensureUser user@example.local - getRoleByName
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39m[DEBUG] seedUsers: ensureUser user@example.local - replaceUserRoles
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39m[DEBUG] seedUsers: ensureUser user@example.local - ensurePersonalOrganization
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39m[DEBUG] seedUsers: ensureUser user@example.local - all done
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39m[DEBUG] seedDatabase: seedNotifications
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39m[DEBUG] seedDatabase: revoke sessions
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39m[DEBUG] seedDatabase: transaction done
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39m[DEBUG] seedDatabase: done
+
+[90mstdout[2m | test/sso.e2e.spec.ts[2m > [22m[2mSSO (e2e, fake provider)
+[22m[39m[DEBUG] createTestApp: done
+
+[31m[Nest] 52727  - [39m07/26/2026, 5:30:51 PM [31m  ERROR[39m [38;5;3m[App] [39m[31m{"timestamp":"2026-07-26T10:30:51.599Z","level":"error","message":"Unhandled request exception","context":{"requestId":"86e9141b-3359-4e4c-b1ba-71baad622dc4","method":"GET","path":"/api/v1/auth/sso/fake/callback?code=4ea8863f0c20577068d8893db5fa2cc22163a2d9258aa3e7fb4536f43774c734&state=d7e651486d76a168c16721a420433321b3df4698d939653cbc92a59a19bc897d","statusCode":500,"userId":null,"errorCode":"INTERNAL_ERROR","stack":"Error: Failed query: insert into \"audit_logs\" (\"id\", \"organization_id\", \"actor_id\", \"action\", \"entity_type\", \"entity_id\", \"metadata\", \"ip_address\", \"user_agent\", \"request_id\", \"created_at\") values (default, default, $1, $2, $3, $4, $5, $6, $7, $8, default) returning \"id\", \"organization_id\", \"actor_id\", \"action\", \"entity_type\", \"entity_id\", \"metadata\", \"ip_address\", \"user_agent\", \"request_id\", \"created_at\"\nparams: 275f18a5-bed9-4499-831e-4edc87647323,auth.sso.signup,user,275f18a5-bed9-4499-831e-4edc87647323,{\"provider\":\"fake\"},::ffff:127.0.0.1,,86e9141b-3359-4e4c-b1ba-71baad622dc4\n    at NodePgPreparedQuery.queryWithCache (file:///Users/truongdev/Documents/projects/labs/super-template/node_modules/.pnpm/drizzle-orm@0.45.2_@opentelemetry+api@1.9.1_@types+pg@8.15.6_pg@8.21.0/node_modules/drizzle-orm/pg-core/session.js:41:15)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/truongdev/Documents/projects/labs/super-template/node_modules/.pnpm/drizzle-orm@0.45.2_@opentelemetry+api@1.9.1_@types+pg@8.15.6_pg@8.21.0/node_modules/drizzle-orm/node-postgres/session.js:117:22\n    at AuditRepository.create (/Users/truongdev/Documents/projects/labs/super-template/packages/api-platform/src/modules/audit/infrastructure/audit.repository.ts:218:24)\n    at /Users/truongdev/Documents/projects/labs/super-template/packages/api-identity/src/modules/sso/application/use-cases/handle-sso-callback.use-case.ts:220:7\n    at NodePgSession.transaction (file:///Users/truongdev/Documents/projects/labs/super-template/node_modules/.pnpm/drizzle-orm@0.45.2_@opentelemetry+api@1.9.1_@types+pg@8.15.6_pg@8.21.0/node_modules/drizzle-orm/node-postgres/session.js:186:22)\n    at HandleSsoCallbackUseCase.execute (/Users/truongdev/Documents/projects/labs/super-template/packages/api-identity/src/modules/sso/application/use-cases/handle-sso-callback.use-case.ts:113:18)\n    at SsoController.handleCallback (/Users/truongdev/Documents/projects/labs/super-template/packages/api-identity/src/modules/sso/presentation/sso.controller.ts:114:38)\n    at SsoController.handleCallbackGet (/Users/truongdev/Documents/projects/labs/super-template/packages/api-identity/src/modules/sso/presentation/sso.controller.ts:73:5)","details":null},"requestId":"86e9141b-3359-4e4c-b1ba-71baad622dc4","method":"GET","path":"/api/v1/auth/sso/fake/callback?code=4ea8863f0c20577068d8893db5fa2cc22163a2d9258aa3e7fb4536f43774c734&state=d7e651486d76a168c16721a420433321b3df4698d939653cbc92a59a19bc897d","statusCode":500,"userId":null,"errorCode":"INTERNAL_ERROR","stack":"Error: Failed query: insert into \"audit_logs\" (\"id\", \"organization_id\", \"actor_id\", \"action\", \"entity_type\", \"entity_id\", \"metadata\", \"ip_address\", \"user_agent\", \"request_id\", \"created_at\") values (default, default, $1, $2, $3, $4, $5, $6, $7, $8, default) returning \"id\", \"organization_id\", \"actor_id\", \"action\", \"entity_type\", \"entity_id\", \"metadata\", \"ip_address\", \"user_agent\", \"request_id\", \"created_at\"\nparams: 275f18a5-bed9-4499-831e-4edc87647323,auth.sso.signup,user,275f18a5-bed9-4499-831e-4edc87647323,{\"provider\":\"fake\"},::ffff:127.0.0.1,,86e9141b-3359-4e4c-b1ba-71baad622dc4\n    at NodePgPreparedQuery.queryWithCache (file:///Users/truongdev/Documents/projects/labs/super-template/node_modules/.pnpm/drizzle-orm@0.45.2_@opentelemetry+api@1.9.1_@types+pg@8.15.6_pg@8.21.0/node_modules/drizzle-orm/pg-core/session.js:41:15)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/truongdev/Documents/projects/labs/super-template/node_modules/.pnpm/drizzle-orm@0.45.2_@opentelemetry+api@1.9.1_@types+pg@8.15.6_pg@8.21.0/node_modules/drizzle-orm/node-postgres/session.js:117:22\n    at AuditRepository.create (/Users/truongdev/Documents/projects/labs/super-template/packages/api-platform/src/modules/audit/infrastructure/audit.repository.ts:218:24)\n    at /Users/truongdev/Documents/projects/labs/super-template/packages/api-identity/src/modules/sso/application/use-cases/handle-sso-callback.use-case.ts:220:7\n    at NodePgSession.transaction (file:///Users/truongdev/Documents/projects/labs/super-template/node_modules/.pnpm/drizzle-orm@0.45.2_@opentelemetry+api@1.9.1_@types+pg@8.15.6_pg@8.21.0/node_modules/drizzle-orm/node-postgres/session.js:186:22)\n    at HandleSsoCallbackUseCase.execute (/Users/truongdev/Documents/projects/labs/super-template/packages/api-identity/src/modules/sso/application/use-cases/handle-sso-callback.use-case.ts:113:18)\n    at SsoController.handleCallback (/Users/truongdev/Documents/projects/labs/super-template/packages/api-identity/src/modules/sso/presentation/sso.controller.ts:114:38)\n    at SsoController.handleCallbackGet (/Users/truongdev/Documents/projects/labs/super-template/packages/api-identity/src/modules/sso/presentation/sso.controller.ts:73:5)","details":null}[39m
+[31m[Nest] 52727  - [39m07/26/2026, 5:30:51 PM [31m  ERROR[39m [38;5;3m[App] [39m[31m{"timestamp":"2026-07-26T10:30:51.599Z","level":"error","message":"HTTP request completed","context":{"requestId":"86e9141b-3359-4e4c-b1ba-71baad622dc4","method":"GET","path":"/api/v1/auth/sso/fake/callback?code=4ea8863f0c20577068d8893db5fa2cc22163a2d9258aa3e7fb4536f43774c734&state=d7e651486d76a168c16721a420433321b3df4698d939653cbc92a59a19bc897d","statusCode":500,"duration":48,"userId":null,"errorCode":"INTERNAL_ERROR"},"requestId":"86e9141b-3359-4e4c-b1ba-71baad622dc4","method":"GET","path":"/api/v1/auth/sso/fake/callback?code=4ea8863f0c20577068d8893db5fa2cc22163a2d9258aa3e7fb4536f43774c734&state=d7e651486d76a168c16721a420433321b3df4698d939653cbc92a59a19bc897d","statusCode":500,"duration":48,"userId":null,"errorCode":"INTERNAL_ERROR"}[39m
+[31m[Nest] 52727  - [39m07/26/2026, 5:30:51 PM [31m  ERROR[39m [38;5;3m[App] [39m[31m{"timestamp":"2026-07-26T10:30:51.647Z","level":"error","message":"Unhandled request exception","context":{"requestId":"c1af3196-9d17-47f4-a022-6521655802c8","method":"GET","path":"/api/v1/auth/sso/fake/callback?code=c642a9bf8bca0f6b8c6bebfe0565105ea76283339eaff93ab37f7a837845b0f6&state=9a56b7d060e5edc40040aa9b5a75e72459f6dd50c49d6b3f595f2b16c9042012","statusCode":500,"userId":null,"errorCode":"INTERNAL_ERROR","stack":"Error: Failed query: insert into \"audit_logs\" (\"id\", \"organization_id\", \"actor_id\", \"action\", \"entity_type\", \"entity_id\", \"metadata\", \"ip_address\", \"user_agent\", \"request_id\", \"created_at\") values (default, default, $1, $2, $3, $4, $5, $6, $7, $8, default) returning \"id\", \"organization_id\", \"actor_id\", \"action\", \"entity_type\", \"entity_id\", \"metadata\", \"ip_address\", \"user_agent\", \"request_id\", \"created_at\"\nparams: 50de3917-d12a-434f-8476-1f0fc45f18b8,auth.sso.signup,user,50de3917-d12a-434f-8476-1f0fc45f18b8,{\"provider\":\"fake\"},::ffff:127.0.0.1,,c1af3196-9d17-47f4-a022-6521655802c8\n    at NodePgPreparedQuery.queryWithCache (file:///Users/truongdev/Documents/projects/labs/super-template/node_modules/.pnpm/drizzle-orm@0.45.2_@opentelemetry+api@1.9.1_@types+pg@8.15.6_pg@8.21.0/node_modules/drizzle-orm/pg-core/session.js:41:15)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/truongdev/Documents/projects/labs/super-template/node_modules/.pnpm/drizzle-orm@0.45.2_@opentelemetry+api@1.9.1_@types+pg@8.15.6_pg@8.21.0/node_modules/drizzle-orm/node-postgres/session.js:117:22\n    at AuditRepository.create (/Users/truongdev/Documents/projects/labs/super-template/packages/api-platform/src/modules/audit/infrastructure/audit.repository.ts:218:24)\n    at /Users/truongdev/Documents/projects/labs/super-template/packages/api-identity/src/modules/sso/application/use-cases/handle-sso-callback.use-case.ts:220:7\n    at NodePgSession.transaction (file:///Users/truongdev/Documents/projects/labs/super-template/node_modules/.pnpm/drizzle-orm@0.45.2_@opentelemetry+api@1.9.1_@types+pg@8.15.6_pg@8.21.0/node_modules/drizzle-orm/node-postgres/session.js:186:22)\n    at HandleSsoCallbackUseCase.execute (/Users/truongdev/Documents/projects/labs/super-template/packages/api-identity/src/modules/sso/application/use-cases/handle-sso-callback.use-case.ts:113:18)\n    at SsoController.handleCallback (/Users/truongdev/Documents/projects/labs/super-template/packages/api-identity/src/modules/sso/presentation/sso.controller.ts:114:38)\n    at SsoController.handleCallbackGet (/Users/truongdev/Documents/projects/labs/super-template/packages/api-identity/src/modules/sso/presentation/sso.controller.ts:73:5)","details":null},"requestId":"c1af3196-9d17-47f4-a022-6521655802c8","method":"GET","path":"/api/v1/auth/sso/fake/callback?code=c642a9bf8bca0f6b8c6bebfe0565105ea76283339eaff93ab37f7a837845b0f6&state=9a56b7d060e5edc40040aa9b5a75e72459f6dd50c49d6b3f595f2b16c9042012","statusCode":500,"userId":null,"errorCode":"INTERNAL_ERROR","stack":"Error: Failed query: insert into \"audit_logs\" (\"id\", \"organization_id\", \"actor_id\", \"action\", \"entity_type\", \"entity_id\", \"metadata\", \"ip_address\", \"user_agent\", \"request_id\", \"created_at\") values (default, default, $1, $2, $3, $4, $5, $6, $7, $8, default) returning \"id\", \"organization_id\", \"actor_id\", \"action\", \"entity_type\", \"entity_id\", \"metadata\", \"ip_address\", \"user_agent\", \"request_id\", \"created_at\"\nparams: 50de3917-d12a-434f-8476-1f0fc45f18b8,auth.sso.signup,user,50de3917-d12a-434f-8476-1f0fc45f18b8,{\"provider\":\"fake\"},::ffff:127.0.0.1,,c1af3196-9d17-47f4-a022-6521655802c8\n    at NodePgPreparedQuery.queryWithCache (file:///Users/truongdev/Documents/projects/labs/super-template/node_modules/.pnpm/drizzle-orm@0.45.2_@opentelemetry+api@1.9.1_@types+pg@8.15.6_pg@8.21.0/node_modules/drizzle-orm/pg-core/session.js:41:15)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/truongdev/Documents/projects/labs/super-template/node_modules/.pnpm/drizzle-orm@0.45.2_@opentelemetry+api@1.9.1_@types+pg@8.15.6_pg@8.21.0/node_modules/drizzle-orm/node-postgres/session.js:117:22\n    at AuditRepository.create (/Users/truongdev/Documents/projects/labs/super-template/packages/api-platform/src/modules/audit/infrastructure/audit.repository.ts:218:24)\n    at /Users/truongdev/Documents/projects/labs/super-template/packages/api-identity/src/modules/sso/application/use-cases/handle-sso-callback.use-case.ts:220:7\n    at NodePgSession.transaction (file:///Users/truongdev/Documents/projects/labs/super-template/node_modules/.pnpm/drizzle-orm@0.45.2_@opentelemetry+api@1.9.1_@types+pg@8.15.6_pg@8.21.0/node_modules/drizzle-orm/node-postgres/session.js:186:22)\n    at HandleSsoCallbackUseCase.execute (/Users/truongdev/Documents/projects/labs/super-template/packages/api-identity/src/modules/sso/application/use-cases/handle-sso-callback.use-case.ts:113:18)\n    at SsoController.handleCallback (/Users/truongdev/Documents/projects/labs/super-template/packages/api-identity/src/modules/sso/presentation/sso.controller.ts:114:38)\n    at SsoController.handleCallbackGet (/Users/truongdev/Documents/projects/labs/super-template/packages/api-identity/src/modules/sso/presentation/sso.controller.ts:73:5)","details":null}[39m
+[31m[Nest] 52727  - [39m07/26/2026, 5:30:51 PM [31m  ERROR[39m [38;5;3m[App] [39m[31m{"timestamp":"2026-07-26T10:30:51.647Z","level":"error","message":"HTTP request completed","context":{"requestId":"c1af3196-9d17-47f4-a022-6521655802c8","method":"GET","path":"/api/v1/auth/sso/fake/callback?code=c642a9bf8bca0f6b8c6bebfe0565105ea76283339eaff93ab37f7a837845b0f6&state=9a56b7d060e5edc40040aa9b5a75e72459f6dd50c49d6b3f595f2b16c9042012","statusCode":500,"duration":43,"userId":null,"errorCode":"INTERNAL_ERROR"},"requestId":"c1af3196-9d17-47f4-a022-6521655802c8","method":"GET","path":"/api/v1/auth/sso/fake/callback?code=c642a9bf8bca0f6b8c6bebfe0565105ea76283339eaff93ab37f7a837845b0f6&state=9a56b7d060e5edc40040aa9b5a75e72459f6dd50c49d6b3f595f2b16c9042012","statusCode":500,"duration":43,"userId":null,"errorCode":"INTERNAL_ERROR"}[39m
+[31m[Nest] 52727  - [39m07/26/2026, 5:30:51 PM [31m  ERROR[39m [38;5;3m[App] [39m[31m{"timestamp":"2026-07-26T10:30:51.693Z","level":"error","message":"Unhandled request exception","context":{"requestId":"12aff01f-f733-4a95-a3ec-5167243a4beb","method":"GET","path":"/api/v1/auth/sso/fake/callback?code=9bd496148cd9852c5cfd4443d84b4bd7789d791055c029e186a0106a96e85d8e&state=1eeb2afae648e277ad2a0d979a0e544d29c6473a2017c1ea2b6ad942763ff81a","statusCode":500,"userId":null,"errorCode":"INTERNAL_ERROR","stack":"Error: Failed query: insert into \"audit_logs\" (\"id\", \"organization_id\", \"actor_id\", \"action\", \"entity_type\", \"entity_id\", \"metadata\", \"ip_address\", \"user_agent\", \"request_id\", \"created_at\") values (default, default, $1, $2, $3, $4, $5, $6, $7, $8, default) returning \"id\", \"organization_id\", \"actor_id\", \"action\", \"entity_type\", \"entity_id\", \"metadata\", \"ip_address\", \"user_agent\", \"request_id\", \"created_at\"\nparams: 03bf9422-9530-4c3f-99f3-f50668aa6458,auth.sso.signup,user,03bf9422-9530-4c3f-99f3-f50668aa6458,{\"provider\":\"fake\"},::ffff:127.0.0.1,,12aff01f-f733-4a95-a3ec-5167243a4beb\n    at NodePgPreparedQuery.queryWithCache (file:///Users/truongdev/Documents/projects/labs/super-template/node_modules/.pnpm/drizzle-orm@0.45.2_@opentelemetry+api@1.9.1_@types+pg@8.15.6_pg@8.21.0/node_modules/drizzle-orm/pg-core/session.js:41:15)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/truongdev/Documents/projects/labs/super-template/node_modules/.pnpm/drizzle-orm@0.45.2_@opentelemetry+api@1.9.1_@types+pg@8.15.6_pg@8.21.0/node_modules/drizzle-orm/node-postgres/session.js:117:22\n    at AuditRepository.create (/Users/truongdev/Documents/projects/labs/super-template/packages/api-platform/src/modules/audit/infrastructure/audit.repository.ts:218:24)\n    at /Users/truongdev/Documents/projects/labs/super-template/packages/api-identity/src/modules/sso/application/use-cases/handle-sso-callback.use-case.ts:220:7\n    at NodePgSession.transaction (file:///Users/truongdev/Documents/projects/labs/super-template/node_modules/.pnpm/drizzle-orm@0.45.2_@opentelemetry+api@1.9.1_@types+pg@8.15.6_pg@8.21.0/node_modules/drizzle-orm/node-postgres/session.js:186:22)\n    at HandleSsoCallbackUseCase.execute (/Users/truongdev/Documents/projects/labs/super-template/packages/api-identity/src/modules/sso/application/use-cases/handle-sso-callback.use-case.ts:113:18)\n    at SsoController.handleCallback (/Users/truongdev/Documents/projects/labs/super-template/packages/api-identity/src/modules/sso/presentation/sso.controller.ts:114:38)\n    at SsoController.handleCallbackGet (/Users/truongdev/Documents/projects/labs/super-template/packages/api-identity/src/modules/sso/presentation/sso.controller.ts:73:5)","details":null},"requestId":"12aff01f-f733-4a95-a3ec-5167243a4beb","method":"GET","path":"/api/v1/auth/sso/fake/callback?code=9bd496148cd9852c5cfd4443d84b4bd7789d791055c029e186a0106a96e85d8e&state=1eeb2afae648e277ad2a0d979a0e544d29c6473a2017c1ea2b6ad942763ff81a","statusCode":500,"userId":null,"errorCode":"INTERNAL_ERROR","stack":"Error: Failed query: insert into \"audit_logs\" (\"id\", \"organization_id\", \"actor_id\", \"action\", \"entity_type\", \"entity_id\", \"metadata\", \"ip_address\", \"user_agent\", \"request_id\", \"created_at\") values (default, default, $1, $2, $3, $4, $5, $6, $7, $8, default) returning \"id\", \"organization_id\", \"actor_id\", \"action\", \"entity_type\", \"entity_id\", \"metadata\", \"ip_address\", \"user_agent\", \"request_id\", \"created_at\"\nparams: 03bf9422-9530-4c3f-99f3-f50668aa6458,auth.sso.signup,user,03bf9422-9530-4c3f-99f3-f50668aa6458,{\"provider\":\"fake\"},::ffff:127.0.0.1,,12aff01f-f733-4a95-a3ec-5167243a4beb\n    at NodePgPreparedQuery.queryWithCache (file:///Users/truongdev/Documents/projects/labs/super-template/node_modules/.pnpm/drizzle-orm@0.45.2_@opentelemetry+api@1.9.1_@types+pg@8.15.6_pg@8.21.0/node_modules/drizzle-orm/pg-core/session.js:41:15)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/truongdev/Documents/projects/labs/super-template/node_modules/.pnpm/drizzle-orm@0.45.2_@opentelemetry+api@1.9.1_@types+pg@8.15.6_pg@8.21.0/node_modules/drizzle-orm/node-postgres/session.js:117:22\n    at AuditRepository.create (/Users/truongdev/Documents/projects/labs/super-template/packages/api-platform/src/modules/audit/infrastructure/audit.repository.ts:218:24)\n    at /Users/truongdev/Documents/projects/labs/super-template/packages/api-identity/src/modules/sso/application/use-cases/handle-sso-callback.use-case.ts:220:7\n    at NodePgSession.transaction (file:///Users/truongdev/Documents/projects/labs/super-template/node_modules/.pnpm/drizzle-orm@0.45.2_@opentelemetry+api@1.9.1_@types+pg@8.15.6_pg@8.21.0/node_modules/drizzle-orm/node-postgres/session.js:186:22)\n    at HandleSsoCallbackUseCase.execute (/Users/truongdev/Documents/projects/labs/super-template/packages/api-identity/src/modules/sso/application/use-cases/handle-sso-callback.use-case.ts:113:18)\n    at SsoController.handleCallback (/Users/truongdev/Documents/projects/labs/super-template/packages/api-identity/src/modules/sso/presentation/sso.controller.ts:114:38)\n    at SsoController.handleCallbackGet (/Users/truongdev/Documents/projects/labs/super-template/packages/api-identity/src/modules/sso/presentation/sso.controller.ts:73:5)","details":null}[39m
+[31m[Nest] 52727  - [39m07/26/2026, 5:30:51 PM [31m  ERROR[39m [38;5;3m[App] [39m[31m{"timestamp":"2026-07-26T10:30:51.694Z","level":"error","message":"HTTP request completed","context":{"requestId":"12aff01f-f733-4a95-a3ec-5167243a4beb","method":"GET","path":"/api/v1/auth/sso/fake/callback?code=9bd496148cd9852c5cfd4443d84b4bd7789d791055c029e186a0106a96e85d8e&state=1eeb2afae648e277ad2a0d979a0e544d29c6473a2017c1ea2b6ad942763ff81a","statusCode":500,"duration":42,"userId":null,"errorCode":"INTERNAL_ERROR"},"requestId":"12aff01f-f733-4a95-a3ec-5167243a4beb","method":"GET","path":"/api/v1/auth/sso/fake/callback?code=9bd496148cd9852c5cfd4443d84b4bd7789d791055c029e186a0106a96e85d8e&state=1eeb2afae648e277ad2a0d979a0e544d29c6473a2017c1ea2b6ad942763ff81a","statusCode":500,"duration":42,"userId":null,"errorCode":"INTERNAL_ERROR"}[39m
+[31m[Nest] 52727  - [39m07/26/2026, 5:30:51 PM [31m  ERROR[39m [38;5;3m[App] [39m[31m{"timestamp":"2026-07-26T10:30:51.737Z","level":"error","message":"Unhandled request exception","context":{"requestId":"b32de69c-3f88-4690-8245-d80e1ffd7922","method":"GET","path":"/api/v1/auth/sso/fake/callback?code=3550c77dcc52335f9e95c763806355081428e6251eac630b8a5be7a8fc891b2d&state=c2796180dc2b250a08ab724cba9ea0c81ca8ed8009e56abf90a74ee38a4d5292","statusCode":500,"userId":null,"errorCode":"INTERNAL_ERROR","stack":"Error: Failed query: insert into \"audit_logs\" (\"id\", \"organization_id\", \"actor_id\", \"action\", \"entity_type\", \"entity_id\", \"metadata\", \"ip_address\", \"user_agent\", \"request_id\", \"created_at\") values (default, default, $1, $2, $3, $4, $5, $6, $7, $8, default) returning \"id\", \"organization_id\", \"actor_id\", \"action\", \"entity_type\", \"entity_id\", \"metadata\", \"ip_address\", \"user_agent\", \"request_id\", \"created_at\"\nparams: fc146a23-2716-46e4-a494-f4c5a669d9e8,auth.sso.signup,user,fc146a23-2716-46e4-a494-f4c5a669d9e8,{\"provider\":\"fake\"},::ffff:127.0.0.1,,b32de69c-3f88-4690-8245-d80e1ffd7922\n    at NodePgPreparedQuery.queryWithCache (file:///Users/truongdev/Documents/projects/labs/super-template/node_modules/.pnpm/drizzle-orm@0.45.2_@opentelemetry+api@1.9.1_@types+pg@8.15.6_pg@8.21.0/node_modules/drizzle-orm/pg-core/session.js:41:15)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/truongdev/Documents/projects/labs/super-template/node_modules/.pnpm/drizzle-orm@0.45.2_@opentelemetry+api@1.9.1_@types+pg@8.15.6_pg@8.21.0/node_modules/drizzle-orm/node-postgres/session.js:117:22\n    at AuditRepository.create (/Users/truongdev/Documents/projects/labs/super-template/packages/api-platform/src/modules/audit/infrastructure/audit.repository.ts:218:24)\n    at /Users/truongdev/Documents/projects/labs/super-template/packages/api-identity/src/modules/sso/application/use-cases/handle-sso-callback.use-case.ts:220:7\n    at NodePgSession.transaction (file:///Users/truongdev/Documents/projects/labs/super-template/node_modules/.pnpm/drizzle-orm@0.45.2_@opentelemetry+api@1.9.1_@types+pg@8.15.6_pg@8.21.0/node_modules/drizzle-orm/node-postgres/session.js:186:22)\n    at HandleSsoCallbackUseCase.execute (/Users/truongdev/Documents/projects/labs/super-template/packages/api-identity/src/modules/sso/application/use-cases/handle-sso-callback.use-case.ts:113:18)\n    at SsoController.handleCallback (/Users/truongdev/Documents/projects/labs/super-template/packages/api-identity/src/modules/sso/presentation/sso.controller.ts:114:38)\n    at SsoController.handleCallbackGet (/Users/truongdev/Documents/projects/labs/super-template/packages/api-identity/src/modules/sso/presentation/sso.controller.ts:73:5)","details":null},"requestId":"b32de69c-3f88-4690-8245-d80e1ffd7922","method":"GET","path":"/api/v1/auth/sso/fake/callback?code=3550c77dcc52335f9e95c763806355081428e6251eac630b8a5be7a8fc891b2d&state=c2796180dc2b250a08ab724cba9ea0c81ca8ed8009e56abf90a74ee38a4d5292","statusCode":500,"userId":null,"errorCode":"INTERNAL_ERROR","stack":"Error: Failed query: insert into \"audit_logs\" (\"id\", \"organization_id\", \"actor_id\", \"action\", \"entity_type\", \"entity_id\", \"metadata\", \"ip_address\", \"user_agent\", \"request_id\", \"created_at\") values (default, default, $1, $2, $3, $4, $5, $6, $7, $8, default) returning \"id\", \"organization_id\", \"actor_id\", \"action\", \"entity_type\", \"entity_id\", \"metadata\", \"ip_address\", \"user_agent\", \"request_id\", \"created_at\"\nparams: fc146a23-2716-46e4-a494-f4c5a669d9e8,auth.sso.signup,user,fc146a23-2716-46e4-a494-f4c5a669d9e8,{\"provider\":\"fake\"},::ffff:127.0.0.1,,b32de69c-3f88-4690-8245-d80e1ffd7922\n    at NodePgPreparedQuery.queryWithCache (file:///Users/truongdev/Documents/projects/labs/super-template/node_modules/.pnpm/drizzle-orm@0.45.2_@opentelemetry+api@1.9.1_@types+pg@8.15.6_pg@8.21.0/node_modules/drizzle-orm/pg-core/session.js:41:15)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/truongdev/Documents/projects/labs/super-template/node_modules/.pnpm/drizzle-orm@0.45.2_@opentelemetry+api@1.9.1_@types+pg@8.15.6_pg@8.21.0/node_modules/drizzle-orm/node-postgres/session.js:117:22\n    at AuditRepository.create (/Users/truongdev/Documents/projects/labs/super-template/packages/api-platform/src/modules/audit/infrastructure/audit.repository.ts:218:24)\n    at /Users/truongdev/Documents/projects/labs/super-template/packages/api-identity/src/modules/sso/application/use-cases/handle-sso-callback.use-case.ts:220:7\n    at NodePgSession.transaction (file:///Users/truongdev/Documents/projects/labs/super-template/node_modules/.pnpm/drizzle-orm@0.45.2_@opentelemetry+api@1.9.1_@types+pg@8.15.6_pg@8.21.0/node_modules/drizzle-orm/node-postgres/session.js:186:22)\n    at HandleSsoCallbackUseCase.execute (/Users/truongdev/Documents/projects/labs/super-template/packages/api-identity/src/modules/sso/application/use-cases/handle-sso-callback.use-case.ts:113:18)\n    at SsoController.handleCallback (/Users/truongdev/Documents/projects/labs/super-template/packages/api-identity/src/modules/sso/presentation/sso.controller.ts:114:38)\n    at SsoController.handleCallbackGet (/Users/truongdev/Documents/projects/labs/super-template/packages/api-identity/src/modules/sso/presentation/sso.controller.ts:73:5)","details":null}[39m
+[31m[Nest] 52727  - [39m07/26/2026, 5:30:51 PM [31m  ERROR[39m [38;5;3m[App] [39m[31m{"timestamp":"2026-07-26T10:30:51.737Z","level":"error","message":"HTTP request completed","context":{"requestId":"b32de69c-3f88-4690-8245-d80e1ffd7922","method":"GET","path":"/api/v1/auth/sso/fake/callback?code=3550c77dcc52335f9e95c763806355081428e6251eac630b8a5be7a8fc891b2d&state=c2796180dc2b250a08ab724cba9ea0c81ca8ed8009e56abf90a74ee38a4d5292","statusCode":500,"duration":39,"userId":null,"errorCode":"INTERNAL_ERROR"},"requestId":"b32de69c-3f88-4690-8245-d80e1ffd7922","method":"GET","path":"/api/v1/auth/sso/fake/callback?code=3550c77dcc52335f9e95c763806355081428e6251eac630b8a5be7a8fc891b2d&state=c2796180dc2b250a08ab724cba9ea0c81ca8ed8009e56abf90a74ee38a4d5292","statusCode":500,"duration":39,"userId":null,"errorCode":"INTERNAL_ERROR"}[39m
+ [31m❯[39m test/sso.e2e.spec.ts [2m([22m[2m7 tests[22m[2m | [22m[31m4 failed[39m[2m)[22m[33m 1045[2mms[22m[39m
+     [32m✓[39m rejects an unknown provider on start[32m 10[2mms[22m[39m
+     [32m✓[39m rejects a redirectUri outside the allowed web origin[32m 3[2mms[22m[39m
+[31m     [31m×[31m signs up a new user, then links subsequent logins by email[39m[32m 55[2mms[22m[39m
+[31m     [31m×[31m returns an exchange code when Accept is application/json[39m[32m 47[2mms[22m[39m
+[31m     [31m×[31m rejects replaying a consumed exchange code[39m[32m 47[2mms[22m[39m
+[31m     [31m×[31m rejects replaying a consumed state/code pair[39m[32m 43[2mms[22m[39m
+     [32m✓[39m rejects linking onto an existing unverified-email account[32m 147[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 4 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m test/sso.e2e.spec.ts[2m > [22mSSO (e2e, fake provider)[2m > [22msigns up a new user, then links subsequent logins by email
+[31m[1mError[22m: expected 302 "Found", got 500 "Internal Server Error"[39m
+[36m [2m❯[22m test/sso.e2e.spec.ts:[2m92:8[22m[39m
+    [90m 90|[39m       [33m.[39m[35mget[39m([32m'/api/v1/auth/sso/fake/callback'[39m)
+    [90m 91|[39m       [33m.[39m[34mquery[39m({ code[33m:[39m first[33m.[39mcode[33m,[39m state[33m:[39m first[33m.[39mstate })
+    [90m 92|[39m       [33m.[39m[34mexpect[39m([34m302[39m)[33m;[39m
+    [90m   |[39m        [31m^[39m
+    [90m 93|[39m
+    [90m 94|[39m     const firstLocation = new URL(requireLocation(firstCallback.header…
+[90m [2m❯[22m Test._assertStatus ../../node_modules/.pnpm/supertest@7.1.4_supports-color@10.2.2/node_modules/supertest/lib/test.js:[2m309:14[22m[39m
+[90m [2m❯[22m ../../node_modules/.pnpm/supertest@7.1.4_supports-color@10.2.2/node_modules/supertest/lib/test.js:[2m365:13[22m[39m
+[90m [2m❯[22m Test._assertFunction ../../node_modules/.pnpm/supertest@7.1.4_supports-color@10.2.2/node_modules/supertest/lib/test.js:[2m342:13[22m[39m
+[90m [2m❯[22m Test.assert ../../node_modules/.pnpm/supertest@7.1.4_supports-color@10.2.2/node_modules/supertest/lib/test.js:[2m195:23[22m[39m
+[90m [2m❯[22m localAssert ../../node_modules/.pnpm/supertest@7.1.4_supports-color@10.2.2/node_modules/supertest/lib/test.js:[2m138:14[22m[39m
+[90m [2m❯[22m Server.<anonymous> ../../node_modules/.pnpm/supertest@7.1.4_supports-color@10.2.2/node_modules/supertest/lib/test.js:[2m152:11[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m test/sso.e2e.spec.ts[2m > [22mSSO (e2e, fake provider)[2m > [22mreturns an exchange code when Accept is application/json
+[31m[1mError[22m: expected 200 "OK", got 500 "Internal Server Error"[39m
+[36m [2m❯[22m test/sso.e2e.spec.ts:[2m138:8[22m[39m
+    [90m136|[39m       [33m.[39m[35mset[39m([32m'Accept'[39m[33m,[39m [32m'application/json'[39m)
+    [90m137|[39m       [33m.[39m[34mquery[39m({ code[33m,[39m state })
+    [90m138|[39m       [33m.[39m[34mexpect[39m([34m200[39m)[33m;[39m
+    [90m   |[39m        [31m^[39m
+    [90m139|[39m
+    [90m140|[39m     [34mexpect[39m(callback[33m.[39mbody[33m.[39mdata[33m.[39mexchangeCode)[33m.[39m[34mtoBeTruthy[39m()[33m;[39m
+[90m [2m❯[22m Test._assertStatus ../../node_modules/.pnpm/supertest@7.1.4_supports-color@10.2.2/node_modules/supertest/lib/test.js:[2m309:14[22m[39m
+[90m [2m❯[22m ../../node_modules/.pnpm/supertest@7.1.4_supports-color@10.2.2/node_modules/supertest/lib/test.js:[2m365:13[22m[39m
+[90m [2m❯[22m Test._assertFunction ../../node_modules/.pnpm/supertest@7.1.4_supports-color@10.2.2/node_modules/supertest/lib/test.js:[2m342:13[22m[39m
+[90m [2m❯[22m Test.assert ../../node_modules/.pnpm/supertest@7.1.4_supports-color@10.2.2/node_modules/supertest/lib/test.js:[2m195:23[22m[39m
+[90m [2m❯[22m localAssert ../../node_modules/.pnpm/supertest@7.1.4_supports-color@10.2.2/node_modules/supertest/lib/test.js:[2m138:14[22m[39m
+[90m [2m❯[22m Server.<anonymous> ../../node_modules/.pnpm/supertest@7.1.4_supports-color@10.2.2/node_modules/supertest/lib/test.js:[2m152:11[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m test/sso.e2e.spec.ts[2m > [22mSSO (e2e, fake provider)[2m > [22mrejects replaying a consumed exchange code
+[31m[1mError[22m: expected 302 "Found", got 500 "Internal Server Error"[39m
+[36m [2m❯[22m test/sso.e2e.spec.ts:[2m151:8[22m[39m
+    [90m149|[39m       [33m.[39m[35mget[39m([32m'/api/v1/auth/sso/fake/callback'[39m)
+    [90m150|[39m       [33m.[39m[34mquery[39m({ code[33m,[39m state })
+    [90m151|[39m       [33m.[39m[34mexpect[39m([34m302[39m)[33m;[39m
+    [90m   |[39m        [31m^[39m
+    [90m152|[39m
+    [90m153|[39m     [35mconst[39m exchangeCode [33m=[39m [35mnew[39m [33mURL[39m(
+[90m [2m❯[22m Test._assertStatus ../../node_modules/.pnpm/supertest@7.1.4_supports-color@10.2.2/node_modules/supertest/lib/test.js:[2m309:14[22m[39m
+[90m [2m❯[22m ../../node_modules/.pnpm/supertest@7.1.4_supports-color@10.2.2/node_modules/supertest/lib/test.js:[2m365:13[22m[39m
+[90m [2m❯[22m Test._assertFunction ../../node_modules/.pnpm/supertest@7.1.4_supports-color@10.2.2/node_modules/supertest/lib/test.js:[2m342:13[22m[39m
+[90m [2m❯[22m Test.assert ../../node_modules/.pnpm/supertest@7.1.4_supports-color@10.2.2/node_modules/supertest/lib/test.js:[2m195:23[22m[39m
+[90m [2m❯[22m localAssert ../../node_modules/.pnpm/supertest@7.1.4_supports-color@10.2.2/node_modules/supertest/lib/test.js:[2m138:14[22m[39m
+[90m [2m❯[22m Server.<anonymous> ../../node_modules/.pnpm/supertest@7.1.4_supports-color@10.2.2/node_modules/supertest/lib/test.js:[2m152:11[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m test/sso.e2e.spec.ts[2m > [22mSSO (e2e, fake provider)[2m > [22mrejects replaying a consumed state/code pair
+[31m[1mError[22m: expected 302 "Found", got 500 "Internal Server Error"[39m
+[36m [2m❯[22m test/sso.e2e.spec.ts:[2m174:8[22m[39m
+    [90m172|[39m       [33m.[39m[35mget[39m([32m'/api/v1/auth/sso/fake/callback'[39m)
+    [90m173|[39m       [33m.[39m[34mquery[39m({ code[33m,[39m state })
+    [90m174|[39m       [33m.[39m[34mexpect[39m([34m302[39m)[33m;[39m
+    [90m   |[39m        [31m^[39m
+    [90m175|[39m
+    [90m176|[39m     [35mawait[39m [34mrequest[39m(app[33m.[39m[34mgetHttpServer[39m())
+[90m [2m❯[22m Test._assertStatus ../../node_modules/.pnpm/supertest@7.1.4_supports-color@10.2.2/node_modules/supertest/lib/test.js:[2m309:14[22m[39m
+[90m [2m❯[22m ../../node_modules/.pnpm/supertest@7.1.4_supports-color@10.2.2/node_modules/supertest/lib/test.js:[2m365:13[22m[39m
+[90m [2m❯[22m Test._assertFunction ../../node_modules/.pnpm/supertest@7.1.4_supports-color@10.2.2/node_modules/supertest/lib/test.js:[2m342:13[22m[39m
+[90m [2m❯[22m Test.assert ../../node_modules/.pnpm/supertest@7.1.4_supports-color@10.2.2/node_modules/supertest/lib/test.js:[2m195:23[22m[39m
+[90m [2m❯[22m localAssert ../../node_modules/.pnpm/supertest@7.1.4_supports-color@10.2.2/node_modules/supertest/lib/test.js:[2m138:14[22m[39m
+[90m [2m❯[22m Server.<anonymous> ../../node_modules/.pnpm/supertest@7.1.4_supports-color@10.2.2/node_modules/supertest/lib/test.js:[2m152:11[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m4 failed[39m[22m[2m | [22m[1m[32m3 passed[39m[22m[90m (7)[39m
+[2m   Start at [22m 17:30:49
+[2m   Duration [22m 2.73s[2m (transform 512ms, setup 0ms, import 1.63s, tests 1.05s, environment 0ms)[22m
+

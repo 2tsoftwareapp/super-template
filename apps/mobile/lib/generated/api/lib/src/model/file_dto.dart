@@ -15,7 +15,6 @@ part 'file_dto.g.dart';
 ///
 /// Properties:
 /// * [id]
-/// * [storageKey]
 /// * [originalName]
 /// * [mimeType]
 /// * [sizeBytes]
@@ -28,9 +27,6 @@ part 'file_dto.g.dart';
 abstract class FileDto implements Built<FileDto, FileDtoBuilder> {
   @BuiltValueField(wireName: r'id')
   String get id;
-
-  @BuiltValueField(wireName: r'storageKey')
-  String get storageKey;
 
   @BuiltValueField(wireName: r'originalName')
   String get originalName;
@@ -82,11 +78,6 @@ class _$FileDtoSerializer implements PrimitiveSerializer<FileDto> {
     yield r'id';
     yield serializers.serialize(
       object.id,
-      specifiedType: const FullType(String),
-    );
-    yield r'storageKey';
-    yield serializers.serialize(
-      object.storageKey,
       specifiedType: const FullType(String),
     );
     yield r'originalName';
@@ -166,13 +157,6 @@ class _$FileDtoSerializer implements PrimitiveSerializer<FileDto> {
             specifiedType: const FullType(String),
           ) as String;
           result.id = valueDes;
-          break;
-        case r'storageKey':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.storageKey = valueDes;
           break;
         case r'originalName':
           final valueDes = serializers.deserialize(

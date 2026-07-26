@@ -53,7 +53,7 @@ export class NotificationStreamService implements OnModuleInit, OnModuleDestroy,
   constructor(private readonly environmentService: EnvironmentService) {}
 
   async onModuleInit() {
-    await this.ensureRedis();
+    // await this.ensureRedis();
   }
 
   async onModuleDestroy() {

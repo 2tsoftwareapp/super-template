@@ -42,6 +42,8 @@ export function RolesListView(vm: RolesViewModel) {
     onRefresh,
     systemRoles,
     customRoles,
+    scopeFilter,
+    onScopeFilterChange,
     pagination,
     anyRoles,
     noResults,
@@ -91,6 +93,29 @@ export function RolesListView(vm: RolesViewModel) {
                 onChange={(e) => onSearchChange(e.target.value)}
               />
             </div>
+            <select
+              className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+              value={scopeFilter ?? ""}
+              onChange={(e) => onScopeFilterChange((e.target.value as "platform" | "organization") || undefined)}
+            >
+              <option value="">All scopes</option>
+              <option value="platform">Platform</option>
+              <option value="organization">Organization</option>
+            </select>
+            {isSuperAdmin && (
+              <select
+                className="h-9 rounded-md border border-input bg-background px-2 text-sm max-w-[200px]"
+                value={vm.organizationFilter ?? ""}
+                onChange={(e) => vm.onOrganizationFilterChange(e.target.value || undefined)}
+              >
+                <option value="">All organizations</option>
+                {organizations.items.map((org) => (
+                  <option key={org.id} value={org.id}>
+                    {org.name}
+                  </option>
+                ))}
+              </select>
+            )}
             {search && (
               <Button variant="ghost" size="sm" onClick={() => onSearchChange("")}>
                 <X className="size-4" />

@@ -11,7 +11,7 @@ part of 'admin_jobs_controller_list_jobs200_response.dart';
 class _$AdminJobsControllerListJobs200Response
     extends AdminJobsControllerListJobs200Response {
   @override
-  final BuiltList<JobDto> data;
+  final BuiltList<JobListDto> data;
   @override
   final PaginationMetaDto meta;
 
@@ -69,9 +69,10 @@ class AdminJobsControllerListJobs200ResponseBuilder
             AdminJobsControllerListJobs200ResponseBuilder> {
   _$AdminJobsControllerListJobs200Response? _$v;
 
-  ListBuilder<JobDto>? _data;
-  ListBuilder<JobDto> get data => _$this._data ??= ListBuilder<JobDto>();
-  set data(ListBuilder<JobDto>? data) => _$this._data = data;
+  ListBuilder<JobListDto>? _data;
+  ListBuilder<JobListDto> get data =>
+      _$this._data ??= ListBuilder<JobListDto>();
+  set data(ListBuilder<JobListDto>? data) => _$this._data = data;
 
   PaginationMetaDtoBuilder? _meta;
   PaginationMetaDtoBuilder get meta =>

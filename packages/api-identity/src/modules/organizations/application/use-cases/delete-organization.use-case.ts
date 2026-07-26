@@ -31,7 +31,13 @@ export class DeleteOrganizationUseCase {
       ? { userId: actor, isSuperAdmin: false }
       : { userId: actor.userId, isSuperAdmin: actor.roles?.includes(ROLE_NAMES.SUPER_ADMIN) ?? false };
 
-    await this.transactionPort.run(async (transaction) => {
+    const tenantContext = {
+      tenantId: organizationId,
+      userId: actorUserId,
+      bypassRls: isSuperAdmin,
+    };
+
+    await this.transactionPort.withTenant(tenantContext, async (transaction) => {
       if (!isSuperAdmin) {
         const membership = await this.organizationsRepository.findMembership(
           organizationId,

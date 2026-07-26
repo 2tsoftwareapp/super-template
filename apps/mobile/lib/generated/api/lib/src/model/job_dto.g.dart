@@ -23,6 +23,9 @@ const JobDtoStatusEnum _$jobDtoStatusEnum_CANCELLED = const JobDtoStatusEnum._(
 const JobDtoStatusEnum _$jobDtoStatusEnum_FAILED = const JobDtoStatusEnum._(
   'FAILED',
 );
+const JobDtoStatusEnum _$jobDtoStatusEnum_BLOCKED = const JobDtoStatusEnum._(
+  'BLOCKED',
+);
 
 JobDtoStatusEnum _$jobDtoStatusEnumValueOf(String name) {
   switch (name) {
@@ -36,6 +39,8 @@ JobDtoStatusEnum _$jobDtoStatusEnumValueOf(String name) {
       return _$jobDtoStatusEnum_CANCELLED;
     case 'FAILED':
       return _$jobDtoStatusEnum_FAILED;
+    case 'BLOCKED':
+      return _$jobDtoStatusEnum_BLOCKED;
     default:
       throw ArgumentError(name);
   }
@@ -48,6 +53,7 @@ final BuiltSet<JobDtoStatusEnum> _$jobDtoStatusEnumValues =
   _$jobDtoStatusEnum_COMPLETED,
   _$jobDtoStatusEnum_CANCELLED,
   _$jobDtoStatusEnum_FAILED,
+  _$jobDtoStatusEnum_BLOCKED,
 ]);
 
 Serializer<JobDtoStatusEnum> _$jobDtoStatusEnumSerializer =
@@ -61,6 +67,7 @@ class _$JobDtoStatusEnumSerializer
     'COMPLETED': 'COMPLETED',
     'CANCELLED': 'CANCELLED',
     'FAILED': 'FAILED',
+    'BLOCKED': 'BLOCKED',
   };
   static const Map<Object, String> _fromWire = const <Object, String>{
     'PENDING': 'PENDING',
@@ -68,6 +75,7 @@ class _$JobDtoStatusEnumSerializer
     'COMPLETED': 'COMPLETED',
     'CANCELLED': 'CANCELLED',
     'FAILED': 'FAILED',
+    'BLOCKED': 'BLOCKED',
   };
 
   @override
@@ -125,6 +133,8 @@ class _$JobDto extends JobDto {
   final String createdAt;
   @override
   final String updatedAt;
+  @override
+  final JsonObject? organizationId;
 
   factory _$JobDto([void Function(JobDtoBuilder)? updates]) =>
       (JobDtoBuilder()..update(updates))._build();
@@ -145,6 +155,7 @@ class _$JobDto extends JobDto {
     this.createdById,
     required this.createdAt,
     required this.updatedAt,
+    this.organizationId,
   }) : super._();
   @override
   JobDto rebuild(void Function(JobDtoBuilder) updates) =>
@@ -171,7 +182,8 @@ class _$JobDto extends JobDto {
         errorMessage == other.errorMessage &&
         createdById == other.createdById &&
         createdAt == other.createdAt &&
-        updatedAt == other.updatedAt;
+        updatedAt == other.updatedAt &&
+        organizationId == other.organizationId;
   }
 
   @override
@@ -192,6 +204,7 @@ class _$JobDto extends JobDto {
     _$hash = $jc(_$hash, createdById.hashCode);
     _$hash = $jc(_$hash, createdAt.hashCode);
     _$hash = $jc(_$hash, updatedAt.hashCode);
+    _$hash = $jc(_$hash, organizationId.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -213,7 +226,8 @@ class _$JobDto extends JobDto {
           ..add('errorMessage', errorMessage)
           ..add('createdById', createdById)
           ..add('createdAt', createdAt)
-          ..add('updatedAt', updatedAt))
+          ..add('updatedAt', updatedAt)
+          ..add('organizationId', organizationId))
         .toString();
   }
 }
@@ -284,6 +298,11 @@ class JobDtoBuilder implements Builder<JobDto, JobDtoBuilder> {
   String? get updatedAt => _$this._updatedAt;
   set updatedAt(String? updatedAt) => _$this._updatedAt = updatedAt;
 
+  JsonObject? _organizationId;
+  JsonObject? get organizationId => _$this._organizationId;
+  set organizationId(JsonObject? organizationId) =>
+      _$this._organizationId = organizationId;
+
   JobDtoBuilder() {
     JobDto._defaults(this);
   }
@@ -306,6 +325,7 @@ class JobDtoBuilder implements Builder<JobDto, JobDtoBuilder> {
       _createdById = $v.createdById;
       _createdAt = $v.createdAt;
       _updatedAt = $v.updatedAt;
+      _organizationId = $v.organizationId;
       _$v = null;
     }
     return this;
@@ -376,6 +396,7 @@ class JobDtoBuilder implements Builder<JobDto, JobDtoBuilder> {
               r'JobDto',
               'updatedAt',
             ),
+            organizationId: organizationId,
           );
     } catch (_) {
       late String _$failedField;

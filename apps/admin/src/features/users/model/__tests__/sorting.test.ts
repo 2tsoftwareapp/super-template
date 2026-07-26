@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { createTableSortBridge } from "@/lib/table-sort";
 
-import type { UsersSortCriterion } from "./types";
+import type { UsersSortCriterion } from "../users.types";
 
 import { paramsFromSortingState, sortingStateFromParams } from "../sorting";
 

@@ -39,6 +39,7 @@ WITH normalized AS (
     id,
     organization_id,
     UPPER(TRIM(name)) AS canonical_name,
+    created_at,
     EXISTS (
       SELECT 1 FROM roles system_role
       WHERE system_role.is_system = true

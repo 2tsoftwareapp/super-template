@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { AUTH_ERROR_QUERY_VALUES } from "./auth.constants";
+import { AUTH_ERROR_QUERY_VALUES } from "../auth.constants";
 import {
   parseAuthLoginSearchParams,
   parseSsoCallbackSearchParams,
-} from "./auth.search-params";
+} from "../auth.search-params";
 
 describe("parseAuthLoginSearchParams", () => {
   it("keeps a known SSO error flag", () => {

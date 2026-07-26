@@ -48,7 +48,13 @@ export class UpdateOrganizationUseCase {
       assertOrganizationRole(membership, ['OWNER', 'ADMIN']);
     }
 
-    const result = await this.transactionPort.run(async (transaction) => {
+    const tenantContext = {
+      tenantId: organizationId,
+      userId: actorUserId,
+      bypassRls: isSuperAdmin,
+    };
+
+    const result = await this.transactionPort.withTenant(tenantContext, async (transaction) => {
       const organization = await this.organizationsRepository.updateOrganization(
         organizationId,
         { name: input.name.trim() },

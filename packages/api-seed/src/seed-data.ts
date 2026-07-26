@@ -19,6 +19,7 @@ import { seedUsers } from './seeds/users/seed';
 export const seedDatabase = async (
   app: INestApplicationContext,
 ): Promise<void> => {
+  console.log('[DEBUG] seedDatabase: inside seedDatabase function');
   const accessControlService = app.get(AccessControlService);
   const authRepository = app.get<AuthSessionRepositoryPort>(AUTH_SESSION_REPOSITORY);
   const notificationsRepository = app.get<NotificationsRepositoryPort>(NOTIFICATIONS_REPOSITORY);
@@ -29,11 +30,15 @@ export const seedDatabase = async (
   const environmentService = app.get(EnvironmentService);
   const tenantContextService = app.get(TenantContextService);
 
+  console.log('[DEBUG] seedDatabase: starting tenant transaction');
   await tenantContextService.runAsync(WORKER_DISPATCH_CONTEXT, () =>
     database.transaction(async (transaction) => {
+      console.log('[DEBUG] seedDatabase: seedAccessControl');
       await seedAccessControl(accessControlService, transaction);
+      console.log('[DEBUG] seedDatabase: seedSettings');
       await seedSettings(ensureSettingsSeedData, transaction);
 
+      console.log('[DEBUG] seedDatabase: seedUsers');
       const seededUsers = await seedUsers(
         {
           accessControlService,
@@ -44,8 +49,10 @@ export const seedDatabase = async (
         transaction,
       );
 
+      console.log('[DEBUG] seedDatabase: seedNotifications');
       await seedNotifications(notificationsRepository, seededUsers, transaction);
 
+      console.log('[DEBUG] seedDatabase: revoke sessions');
       await authRepository.revokeAllSessionsForUser(
         seededUsers.adminUserId,
         transaction,
@@ -54,6 +61,8 @@ export const seedDatabase = async (
         seededUsers.regularUserId,
         transaction,
       );
+      console.log('[DEBUG] seedDatabase: transaction done');
     }),
   );
+  console.log('[DEBUG] seedDatabase: done');
 };

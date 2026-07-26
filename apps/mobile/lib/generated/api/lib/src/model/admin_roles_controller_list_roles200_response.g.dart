@@ -13,7 +13,7 @@ class _$AdminRolesControllerListRoles200Response
   @override
   final BuiltList<RoleDto> data;
   @override
-  final RequestMetaDto meta;
+  final PaginationMetaDto meta;
 
   factory _$AdminRolesControllerListRoles200Response([
     void Function(AdminRolesControllerListRoles200ResponseBuilder)? updates,
@@ -73,9 +73,10 @@ class AdminRolesControllerListRoles200ResponseBuilder
   ListBuilder<RoleDto> get data => _$this._data ??= ListBuilder<RoleDto>();
   set data(ListBuilder<RoleDto>? data) => _$this._data = data;
 
-  RequestMetaDtoBuilder? _meta;
-  RequestMetaDtoBuilder get meta => _$this._meta ??= RequestMetaDtoBuilder();
-  set meta(RequestMetaDtoBuilder? meta) => _$this._meta = meta;
+  PaginationMetaDtoBuilder? _meta;
+  PaginationMetaDtoBuilder get meta =>
+      _$this._meta ??= PaginationMetaDtoBuilder();
+  set meta(PaginationMetaDtoBuilder? meta) => _$this._meta = meta;
 
   AdminRolesControllerListRoles200ResponseBuilder() {
     AdminRolesControllerListRoles200Response._defaults(this);

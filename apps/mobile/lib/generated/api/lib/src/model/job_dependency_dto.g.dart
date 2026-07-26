@@ -23,6 +23,9 @@ const JobDependencyDtoDependsOnJobStatusEnum
 const JobDependencyDtoDependsOnJobStatusEnum
     _$jobDependencyDtoDependsOnJobStatusEnum_FAILED =
     const JobDependencyDtoDependsOnJobStatusEnum._('FAILED');
+const JobDependencyDtoDependsOnJobStatusEnum
+    _$jobDependencyDtoDependsOnJobStatusEnum_BLOCKED =
+    const JobDependencyDtoDependsOnJobStatusEnum._('BLOCKED');
 
 JobDependencyDtoDependsOnJobStatusEnum
     _$jobDependencyDtoDependsOnJobStatusEnumValueOf(String name) {
@@ -37,6 +40,8 @@ JobDependencyDtoDependsOnJobStatusEnum
       return _$jobDependencyDtoDependsOnJobStatusEnum_CANCELLED;
     case 'FAILED':
       return _$jobDependencyDtoDependsOnJobStatusEnum_FAILED;
+    case 'BLOCKED':
+      return _$jobDependencyDtoDependsOnJobStatusEnum_BLOCKED;
     default:
       throw ArgumentError(name);
   }
@@ -51,6 +56,7 @@ final BuiltSet<JobDependencyDtoDependsOnJobStatusEnum>
     _$jobDependencyDtoDependsOnJobStatusEnum_COMPLETED,
     _$jobDependencyDtoDependsOnJobStatusEnum_CANCELLED,
     _$jobDependencyDtoDependsOnJobStatusEnum_FAILED,
+    _$jobDependencyDtoDependsOnJobStatusEnum_BLOCKED,
   ],
 );
 
@@ -66,6 +72,7 @@ class _$JobDependencyDtoDependsOnJobStatusEnumSerializer
     'COMPLETED': 'COMPLETED',
     'CANCELLED': 'CANCELLED',
     'FAILED': 'FAILED',
+    'BLOCKED': 'BLOCKED',
   };
   static const Map<Object, String> _fromWire = const <Object, String>{
     'PENDING': 'PENDING',
@@ -73,6 +80,7 @@ class _$JobDependencyDtoDependsOnJobStatusEnumSerializer
     'COMPLETED': 'COMPLETED',
     'CANCELLED': 'CANCELLED',
     'FAILED': 'FAILED',
+    'BLOCKED': 'BLOCKED',
   };
 
   @override

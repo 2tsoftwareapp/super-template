@@ -100,6 +100,12 @@ describe('Tenant isolation (e2e)', () => {
     const organizationAId = superAdminMe.body.data.organizationId as string;
     const organizationBId = seededUserMe.body.data.organizationId as string;
 
+    const rolesResponse = await request(app.getHttpServer())
+      .get('/api/v1/admin/roles')
+      .set(bearer(superAdminSession.accessToken))
+      .expect(200);
+    const adminRoleId = rolesResponse.body.data.find((r: any) => r.name === 'ADMIN' && r.organizationId === null)?.id;
+
     const orgAdminA = await request(app.getHttpServer())
       .post('/api/v1/admin/users')
       .set(bearer(superAdminSession.accessToken))
@@ -108,7 +114,7 @@ describe('Tenant isolation (e2e)', () => {
         password: 'OrgAdminPass123!',
         displayName: 'Org Admin A',
         status: 'ACTIVE',
-        role: 'ADMIN',
+        roleId: adminRoleId,
         organizationId: organizationAId,
       })
       .expect(201);
@@ -121,20 +127,33 @@ describe('Tenant isolation (e2e)', () => {
         password: 'OrgAdminPass123!',
         displayName: 'Org Admin B',
         status: 'ACTIVE',
-        role: 'ADMIN',
+        roleId: adminRoleId,
         organizationId: organizationBId,
       })
       .expect(201);
 
-    const orgAdminASession = await loginAs(
+    const orgAdminAInitialSession = await loginAs(
       app,
       'org-admin-a@example.local',
       'OrgAdminPass123!',
     );
 
+    await request(app.getHttpServer())
+      .patch('/api/v1/users/me/password')
+      .set(bearer(orgAdminAInitialSession.accessToken))
+      .send({ currentPassword: 'OrgAdminPass123!', newPassword: 'NewPassword123!' })
+      .expect(200);
+
+    const orgAdminASession = await loginAs(
+      app,
+      'org-admin-a@example.local',
+      'NewPassword123!',
+    );
+
     const listResponse = await request(app.getHttpServer())
       .get('/api/v1/admin/users')
       .set(bearer(orgAdminASession.accessToken))
+      .set('x-organization-id', organizationAId)
       .expect(200);
 
     const visibleEmails = listResponse.body.data.map(

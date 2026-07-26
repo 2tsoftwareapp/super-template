@@ -286,6 +286,11 @@ class AdminRolesApi {
   ///
   ///
   /// Parameters:
+  /// * [page]
+  /// * [limit]
+  /// * [organizationId]
+  /// * [search]
+  /// * [scope]
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
   /// * [headers] - Can be used to add additional headers to the request
   /// * [extras] - Can be used to add flags to the request
@@ -297,6 +302,11 @@ class AdminRolesApi {
   /// Throws [DioException] if API call or serialization fails
   Future<Response<AdminRolesControllerListRoles200Response>>
       adminRolesControllerListRoles({
+    num? page = 1,
+    num? limit = 50,
+    String? organizationId,
+    String? search,
+    String? scope,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? extra,
@@ -317,9 +327,39 @@ class AdminRolesApi {
       validateStatus: validateStatus,
     );
 
+    final _queryParameters = <String, dynamic>{
+      if (page != null)
+        r'page': encodeQueryParameter(_serializers, page, const FullType(num)),
+      if (limit != null)
+        r'limit': encodeQueryParameter(
+          _serializers,
+          limit,
+          const FullType(num),
+        ),
+      if (organizationId != null)
+        r'organizationId': encodeQueryParameter(
+          _serializers,
+          organizationId,
+          const FullType(String),
+        ),
+      if (search != null)
+        r'search': encodeQueryParameter(
+          _serializers,
+          search,
+          const FullType(String),
+        ),
+      if (scope != null)
+        r'scope': encodeQueryParameter(
+          _serializers,
+          scope,
+          const FullType(String),
+        ),
+    };
+
     final _response = await _dio.request<Object>(
       _path,
       options: _options,
+      queryParameters: _queryParameters,
       cancelToken: cancelToken,
       onSendProgress: onSendProgress,
       onReceiveProgress: onReceiveProgress,

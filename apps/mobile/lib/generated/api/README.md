@@ -71,6 +71,7 @@ All URIs are relative to *http://localhost*
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
 [*ActivitiesApi*](doc/ActivitiesApi.md) | [**activitiesControllerList**](doc/ActivitiesApi.md#activitiescontrollerlist) | **GET** /api/v1/activities | 
+[*AdminAuditApi*](doc/AdminAuditApi.md) | [**auditControllerDownloadExport**](doc/AdminAuditApi.md#auditcontrollerdownloadexport) | **GET** /api/v1/admin/audit-logs/exports/{fileId}/download | 
 [*AdminAuditApi*](doc/AdminAuditApi.md) | [**auditControllerExportAuditLogs**](doc/AdminAuditApi.md#auditcontrollerexportauditlogs) | **POST** /api/v1/admin/audit-logs/export | 
 [*AdminAuditApi*](doc/AdminAuditApi.md) | [**auditControllerGetAuditLog**](doc/AdminAuditApi.md#auditcontrollergetauditlog) | **GET** /api/v1/admin/audit-logs/{id} | 
 [*AdminAuditApi*](doc/AdminAuditApi.md) | [**auditControllerListAuditLogs**](doc/AdminAuditApi.md#auditcontrollerlistauditlogs) | **GET** /api/v1/admin/audit-logs | 
@@ -249,6 +250,7 @@ Class | Method | HTTP request | Description
  - [JobDependencyDto](doc/JobDependencyDto.md)
  - [JobDto](doc/JobDto.md)
  - [JobEventDto](doc/JobEventDto.md)
+ - [JobListDto](doc/JobListDto.md)
  - [JobMetricsDto](doc/JobMetricsDto.md)
  - [JobStatusCountDto](doc/JobStatusCountDto.md)
  - [JobTypeCountDto](doc/JobTypeCountDto.md)

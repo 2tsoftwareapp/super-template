@@ -29,7 +29,7 @@ abstract class JobDependencyDto
 
   @BuiltValueField(wireName: r'dependsOnJobStatus')
   JobDependencyDtoDependsOnJobStatusEnum get dependsOnJobStatus;
-  // enum dependsOnJobStatusEnum {  PENDING,  PROCESSING,  COMPLETED,  CANCELLED,  FAILED,  };
+  // enum dependsOnJobStatusEnum {  PENDING,  PROCESSING,  COMPLETED,  CANCELLED,  FAILED,  BLOCKED,  };
 
   @BuiltValueField(wireName: r'createdAt')
   String get createdAt;
@@ -182,6 +182,9 @@ class JobDependencyDtoDependsOnJobStatusEnum extends EnumClass {
   @BuiltValueEnumConst(wireName: r'FAILED')
   static const JobDependencyDtoDependsOnJobStatusEnum FAILED =
       _$jobDependencyDtoDependsOnJobStatusEnum_FAILED;
+  @BuiltValueEnumConst(wireName: r'BLOCKED')
+  static const JobDependencyDtoDependsOnJobStatusEnum BLOCKED =
+      _$jobDependencyDtoDependsOnJobStatusEnum_BLOCKED;
 
   static Serializer<JobDependencyDtoDependsOnJobStatusEnum> get serializer =>
       _$jobDependencyDtoDependsOnJobStatusEnumSerializer;

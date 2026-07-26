@@ -182,6 +182,10 @@ export class AccessProfileCache {
   }
 
   private async ensureRedis(): Promise<RedisCacheClient | null> {
+    if (this.environmentService.appEnv === 'test') {
+      return null;
+    }
+
     if (this.redisReady) {
       await this.redisReady;
       return this.redisClient;

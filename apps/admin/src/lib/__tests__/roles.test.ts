@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { RoleDto } from "./api-types";
+import type { RoleDto } from "../api-types";
 
 import {
   buildRoleLookup,
@@ -11,7 +11,7 @@ import {
   getAssignableRoles,
   isOrganizationRole,
   isPrivilegedRoleName,
-} from "./roles";
+} from "../roles";
 
 const roles: RoleDto[] = [
   { id: "1", name: "SUPER_ADMIN", scope: "platform" } as RoleDto,

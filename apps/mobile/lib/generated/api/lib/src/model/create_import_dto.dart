@@ -5,6 +5,7 @@
 // ignore_for_file: unused_element
 // @dart=3.0
 
+import 'package:built_collection/built_collection.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
@@ -20,7 +21,8 @@ part 'create_import_dto.g.dart';
 abstract class CreateImportDto
     implements Built<CreateImportDto, CreateImportDtoBuilder> {
   @BuiltValueField(wireName: r'type')
-  String get type;
+  CreateImportDtoTypeEnum get type;
+  // enum typeEnum {  users,  projects,  };
 
   @BuiltValueField(wireName: r'fileId')
   String get fileId;
@@ -58,7 +60,7 @@ class _$CreateImportDtoSerializer
     yield r'type';
     yield serializers.serialize(
       object.type,
-      specifiedType: const FullType(String),
+      specifiedType: const FullType(CreateImportDtoTypeEnum),
     );
     yield r'fileId';
     yield serializers.serialize(
@@ -102,8 +104,8 @@ class _$CreateImportDtoSerializer
         case r'type':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(String),
-          ) as String;
+            specifiedType: const FullType(CreateImportDtoTypeEnum),
+          ) as CreateImportDtoTypeEnum;
           result.type = valueDes;
           break;
         case r'fileId':
@@ -147,4 +149,22 @@ class _$CreateImportDtoSerializer
     );
     return result.build();
   }
+}
+
+class CreateImportDtoTypeEnum extends EnumClass {
+  @BuiltValueEnumConst(wireName: r'users')
+  static const CreateImportDtoTypeEnum users = _$createImportDtoTypeEnum_users;
+  @BuiltValueEnumConst(wireName: r'projects')
+  static const CreateImportDtoTypeEnum projects =
+      _$createImportDtoTypeEnum_projects;
+
+  static Serializer<CreateImportDtoTypeEnum> get serializer =>
+      _$createImportDtoTypeEnumSerializer;
+
+  const CreateImportDtoTypeEnum._(String name) : super(name);
+
+  static BuiltSet<CreateImportDtoTypeEnum> get values =>
+      _$createImportDtoTypeEnumValues;
+  static CreateImportDtoTypeEnum valueOf(String name) =>
+      _$createImportDtoTypeEnumValueOf(name);
 }

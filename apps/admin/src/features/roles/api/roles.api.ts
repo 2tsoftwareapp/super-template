@@ -1,8 +1,8 @@
-import { bffPath } from "@repo/api-contract";
+import { bffPath, type operations } from "@repo/api-contract";
 
 import type { ListResponse } from "@/lib/api-types";
 
-import { webFetch } from "@/lib/http";
+import { webFetch, buildPath } from "@/lib/http";
 
 import type {
   EditableRole,
@@ -15,24 +15,8 @@ interface RoleSaveResult {
   data: EditableRole & { permissions: PermissionDto[] };
 }
 
-export interface RolesListParams {
-  page?: number;
-  limit?: number;
-  search?: string;
-  organizationId?: string;
-  scope?: string;
-}
+export type RolesListParams = operations["AdminRolesController_listRoles"]["parameters"]["query"];
 
-function buildRolesListPath(params: RolesListParams): string {
-  const searchParams = new URLSearchParams();
-  if (params.page && params.page > 1) searchParams.set("page", String(params.page));
-  if (params.limit && params.limit !== 50) searchParams.set("limit", String(params.limit));
-  if (params.search) searchParams.set("search", params.search);
-  if (params.organizationId) searchParams.set("organizationId", params.organizationId);
-  if (params.scope) searchParams.set("scope", params.scope);
-  const qs = searchParams.toString();
-  return qs ? `${bffPath("/api/v1/admin/roles")}?${qs}` : bffPath("/api/v1/admin/roles");
-}
 
 function buildRolePayload(input: RoleForm) {
   return {
@@ -46,7 +30,7 @@ function buildRolePayload(input: RoleForm) {
 export const rolesApi = {
   list(params?: RolesListParams) {
     return webFetch<ListResponse<ManagedRoleDto>>(
-      params ? buildRolesListPath(params) : bffPath("/api/v1/admin/roles"),
+      params ? buildPath(bffPath("/api/v1/admin/roles"), params as Record<string, any>) : bffPath("/api/v1/admin/roles"),
     );
   },
 

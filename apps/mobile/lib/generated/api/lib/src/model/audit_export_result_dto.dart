@@ -15,6 +15,8 @@ part 'audit_export_result_dto.g.dart';
 /// Properties:
 /// * [fileId]
 /// * [rowCount]
+/// * [totalMatching]
+/// * [truncated]
 @BuiltValue()
 abstract class AuditExportResultDto
     implements Built<AuditExportResultDto, AuditExportResultDtoBuilder> {
@@ -23,6 +25,12 @@ abstract class AuditExportResultDto
 
   @BuiltValueField(wireName: r'rowCount')
   num get rowCount;
+
+  @BuiltValueField(wireName: r'totalMatching')
+  num get totalMatching;
+
+  @BuiltValueField(wireName: r'truncated')
+  bool get truncated;
 
   AuditExportResultDto._();
 
@@ -63,6 +71,16 @@ class _$AuditExportResultDtoSerializer
       object.rowCount,
       specifiedType: const FullType(num),
     );
+    yield r'totalMatching';
+    yield serializers.serialize(
+      object.totalMatching,
+      specifiedType: const FullType(num),
+    );
+    yield r'truncated';
+    yield serializers.serialize(
+      object.truncated,
+      specifiedType: const FullType(bool),
+    );
   }
 
   @override
@@ -101,6 +119,18 @@ class _$AuditExportResultDtoSerializer
           final valueDes = serializers.deserialize(value,
               specifiedType: const FullType(num)) as num;
           result.rowCount = valueDes;
+          break;
+        case r'totalMatching':
+          final valueDes = serializers.deserialize(value,
+              specifiedType: const FullType(num)) as num;
+          result.totalMatching = valueDes;
+          break;
+        case r'truncated':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(bool),
+          ) as bool;
+          result.truncated = valueDes;
           break;
         default:
           unhandled.add(key);

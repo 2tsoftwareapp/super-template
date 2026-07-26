@@ -12,8 +12,6 @@ class _$FileDto extends FileDto {
   @override
   final String id;
   @override
-  final String storageKey;
-  @override
   final String originalName;
   @override
   final String mimeType;
@@ -35,7 +33,6 @@ class _$FileDto extends FileDto {
 
   _$FileDto._({
     required this.id,
-    required this.storageKey,
     required this.originalName,
     required this.mimeType,
     required this.sizeBytes,
@@ -57,7 +54,6 @@ class _$FileDto extends FileDto {
     if (identical(other, this)) return true;
     return other is FileDto &&
         id == other.id &&
-        storageKey == other.storageKey &&
         originalName == other.originalName &&
         mimeType == other.mimeType &&
         sizeBytes == other.sizeBytes &&
@@ -72,7 +68,6 @@ class _$FileDto extends FileDto {
   int get hashCode {
     var _$hash = 0;
     _$hash = $jc(_$hash, id.hashCode);
-    _$hash = $jc(_$hash, storageKey.hashCode);
     _$hash = $jc(_$hash, originalName.hashCode);
     _$hash = $jc(_$hash, mimeType.hashCode);
     _$hash = $jc(_$hash, sizeBytes.hashCode);
@@ -89,7 +84,6 @@ class _$FileDto extends FileDto {
   String toString() {
     return (newBuiltValueToStringHelper(r'FileDto')
           ..add('id', id)
-          ..add('storageKey', storageKey)
           ..add('originalName', originalName)
           ..add('mimeType', mimeType)
           ..add('sizeBytes', sizeBytes)
@@ -108,10 +102,6 @@ class FileDtoBuilder implements Builder<FileDto, FileDtoBuilder> {
   String? _id;
   String? get id => _$this._id;
   set id(String? id) => _$this._id = id;
-
-  String? _storageKey;
-  String? get storageKey => _$this._storageKey;
-  set storageKey(String? storageKey) => _$this._storageKey = storageKey;
 
   String? _originalName;
   String? get originalName => _$this._originalName;
@@ -155,7 +145,6 @@ class FileDtoBuilder implements Builder<FileDto, FileDtoBuilder> {
     final $v = _$v;
     if ($v != null) {
       _id = $v.id;
-      _storageKey = $v.storageKey;
       _originalName = $v.originalName;
       _mimeType = $v.mimeType;
       _sizeBytes = $v.sizeBytes;
@@ -186,11 +175,6 @@ class FileDtoBuilder implements Builder<FileDto, FileDtoBuilder> {
     final _$result = _$v ??
         _$FileDto._(
           id: BuiltValueNullFieldError.checkNotNull(id, r'FileDto', 'id'),
-          storageKey: BuiltValueNullFieldError.checkNotNull(
-            storageKey,
-            r'FileDto',
-            'storageKey',
-          ),
           originalName: BuiltValueNullFieldError.checkNotNull(
             originalName,
             r'FileDto',

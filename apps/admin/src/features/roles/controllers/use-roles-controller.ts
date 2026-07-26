@@ -1,10 +1,12 @@
 "use client";
 
+import { useDebouncedValue } from "@repo/web-hooks/use-debounced-value";
 import { getErrorMessage } from "@repo/web-utils/errors";
 import { useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
+import type { RolesListParams } from "@/features/roles/api/roles.api";
 import type {
   EditableRole,
   ManagedRoleDto,
@@ -30,7 +32,8 @@ import {
 } from "@/features/roles/model/roles.filtering";
 import { selectRoleManagementPermissions } from "@/features/roles/model/roles.permissions";
 import { useSession } from "@/hooks/use-session";
-import { usePathname, useRouter, useSearchParams } from "@/i18n/navigation";
+import { usePathname, useRouter } from "@/i18n/navigation";
+import { useSearchParams } from "next/navigation";
 
 export type { RolesViewModel };
 
@@ -49,22 +52,39 @@ export function useRolesController(): RolesViewModel {
     );
 
   const urlPage = Math.max(1, Number(searchParams.get("page")) || 1);
-  const urlSearch = searchParams.get("search") ?? "";
-  const urlScope = searchParams.get("scope") ?? undefined;
+  const urlScopeRaw = searchParams.get("scope");
+  const urlScope = (urlScopeRaw === "platform" || urlScopeRaw === "organization") ? urlScopeRaw : undefined;
   const urlOrgId = searchParams.get("organizationId") ?? undefined;
+
+  const [searchInput, setSearchInput] = useState(searchParams.get("search") ?? "");
+  const debouncedSearch = useDebouncedValue(searchInput, 300);
+
+  useEffect(() => {
+    const current = searchParams.get("search") ?? "";
+    if (debouncedSearch !== current) {
+      const next = new URLSearchParams(searchParams.toString());
+      if (debouncedSearch) {
+        next.set("search", debouncedSearch);
+      } else {
+        next.delete("search");
+      }
+      next.delete("page");
+      router.replace(`${pathname}?${next.toString()}`);
+    }
+  }, [debouncedSearch, searchParams, pathname, router]);
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingRole, setEditingRole] = useState<EditableRole | null>(null);
   const [deletingRole, setDeletingRole] = useState<ManagedRoleDto | null>(null);
   const [selectedOrganizationId, setSelectedOrganizationId] = useState("");
 
-  const queryParams = useMemo(() => ({
-    page: urlPage,
-    limit: 50,
-    search: urlSearch || undefined,
-    scope: urlScope,
-    organizationId: urlOrgId || undefined,
-  }), [urlPage, urlSearch, urlScope, urlOrgId]);
+  const queryParams = useMemo(() => {
+    const p: RolesListParams = { page: urlPage, limit: 50 };
+    if (debouncedSearch) p.search = debouncedSearch;
+    if (urlScope) p.scope = urlScope;
+    if (urlOrgId) p.organizationId = urlOrgId;
+    return p;
+  }, [urlPage, debouncedSearch, urlScope, urlOrgId]);
 
   const roles = useRolesQuery(queryParams);
   const permissionCatalog = usePermissionCatalogQuery();
@@ -90,12 +110,12 @@ export function useRolesController(): RolesViewModel {
   }, [rolesData]);
 
   const filteredSystem = useMemo(
-    () => filterRolesBySearch(systemRoles, urlSearch),
-    [systemRoles, urlSearch],
+    () => filterRolesBySearch(systemRoles, searchInput),
+    [systemRoles, searchInput],
   );
   const filteredCustom = useMemo(
-    () => filterRolesBySearch(customRoles, urlSearch),
-    [customRoles, urlSearch],
+    () => filterRolesBySearch(customRoles, searchInput),
+    [customRoles, searchInput],
   );
 
   const total = meta?.total ?? 0;
@@ -119,7 +139,11 @@ export function useRolesController(): RolesViewModel {
   };
 
   const handleSearchChange = (value: string) => {
-    patchParams({ search: value || undefined, page: undefined });
+    setSearchInput(value);
+  };
+
+  const handleScopeFilterChange = (value: 'platform' | 'organization' | undefined) => {
+    patchParams({ scope: value || undefined, page: undefined });
   };
 
   const handleSaveRole = (values: {
@@ -185,7 +209,7 @@ export function useRolesController(): RolesViewModel {
 
   const anyRoles = systemRoles.length > 0 || customRoles.length > 0;
   const noResults =
-    Boolean(urlSearch) &&
+    Boolean(debouncedSearch) &&
     filteredSystem.length === 0 &&
     filteredCustom.length === 0;
 
@@ -200,8 +224,12 @@ export function useRolesController(): RolesViewModel {
     canUpdate,
     canDelete,
     isSuperAdmin,
-    search: urlSearch,
+    search: searchInput,
     onSearchChange: handleSearchChange,
+    scopeFilter: urlScope,
+    onScopeFilterChange: handleScopeFilterChange,
+    organizationFilter: urlOrgId,
+    onOrganizationFilterChange: (value) => patchParams({ organizationId: value || undefined, page: undefined }),
     isLoading: roles.isLoading,
     isRefreshing: roles.isFetching || permissionCatalog.isFetching,
     isError,

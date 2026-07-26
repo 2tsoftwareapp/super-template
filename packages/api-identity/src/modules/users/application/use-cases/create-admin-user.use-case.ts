@@ -116,13 +116,14 @@ export class CreateAdminUserUseCase {
           );
         }
 
+        const assignmentOrganizationId = resolvedRole.organizationId || organizationId;
         assertRoleScopeCanBeAssigned(
-          { name: resolvedRole.name, organizationId: resolvedRole.organizationId, isSystem: resolvedRole.isSystem },
+          { name: resolvedRole.name, organizationId: assignmentOrganizationId, isSystem: resolvedRole.isSystem },
           actor,
         );
         assertCanAssignRoleTargets(
           actor,
-          [{ name: resolvedRole.name, organizationId: resolvedRole.organizationId, isSystem: resolvedRole.isSystem }],
+          [{ name: resolvedRole.name, organizationId: assignmentOrganizationId, isSystem: resolvedRole.isSystem }],
         );
         this.accessControlService.assertCanAssignUserRoles(
           actor,

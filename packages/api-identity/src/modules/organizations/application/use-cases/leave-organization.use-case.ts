@@ -31,7 +31,13 @@ export class LeaveOrganizationUseCase {
   ): Promise<void> {
     const userId = typeof actor === 'string' ? actor : actor.userId;
 
-    await this.transactionPort.run(async (transaction) => {
+    const tenantContext = {
+      tenantId: organizationId,
+      userId,
+      bypassRls: false,
+    };
+
+    await this.transactionPort.withTenant(tenantContext, async (transaction) => {
       const membership = await this.organizationsRepository.findMembership(
         organizationId,
         userId,
@@ -90,7 +96,7 @@ export class LeaveOrganizationUseCase {
         metadata: { organizationId },
         requestContext,
           ...(organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
-    });
+    }, transaction);
     });
   }
 }

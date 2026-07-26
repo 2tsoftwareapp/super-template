@@ -12,7 +12,7 @@ import {
   normalizeEmail,
   SYSTEM_SCOPE,
 } from '@repo/api-core';
-import { TRANSACTION_PORT } from '@repo/api-core';
+import { PLATFORM_TRANSACTION_PORT } from '@repo/api-core';
 
 import type { HandleSsoCallbackCommand } from '../sso.types';
 
@@ -33,7 +33,7 @@ export class HandleSsoCallbackUseCase {
   constructor(
     @Inject(SSO_PROVIDER_REGISTRY)
     private readonly providers: SsoProviderRegistry,
-    @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
+    @Inject(PLATFORM_TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
     @Inject(SSO_REPOSITORY) private readonly ssoRepository: SsoRepositoryPort,
     @Inject(USERS_REPOSITORY) private readonly usersRepository: UsersRepositoryPort,
     private readonly accessControlService: AccessControlService,

@@ -5,7 +5,7 @@ import {
 
 import { createTableSortBridge } from "@/lib/table-sort";
 
-import type { UsersListParams, UsersSortCriterion } from "./types";
+import type { UsersListParams, UsersSortCriterion } from "./users.types";
 
 const usersTableSort = createTableSortBridge<UsersSortCriterion["field"]>({
   fieldByColumn: {

@@ -39,7 +39,13 @@ export class UpdateMemberRoleUseCase {
       ? { userId: actor, isSuperAdmin: false }
       : { userId: actor.userId, isSuperAdmin: actor.roles?.includes(ROLE_NAMES.SUPER_ADMIN) ?? false };
 
-    return this.transactionPort.run(async (transaction) => {
+    const tenantContext = {
+      tenantId: organizationId,
+      userId: actorUserId,
+      bypassRls: isSuperAdmin,
+    };
+
+    return this.transactionPort.withTenant(tenantContext, async (transaction) => {
       if (!isSuperAdmin) {
         const actorMembership = await this.organizationsRepository.findMembership(
           organizationId,
@@ -141,7 +147,7 @@ export class UpdateMemberRoleUseCase {
         metadata: { organizationId, role },
         requestContext,
           ...(organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
-    });
+    }, transaction);
 
       return {
         userId: updated.userId,

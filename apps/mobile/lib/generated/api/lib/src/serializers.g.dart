@@ -61,6 +61,7 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(CreateAdminUserDtoStatusEnum.serializer)
       ..add(CreateExportDto.serializer)
       ..add(CreateImportDto.serializer)
+      ..add(CreateImportDtoTypeEnum.serializer)
       ..add(CreateOrganizationDto.serializer)
       ..add(CreateRoleDto.serializer)
       ..add(DeviceTokenDto.serializer)
@@ -94,6 +95,8 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(JobDtoStatusEnum.serializer)
       ..add(JobEventDto.serializer)
       ..add(JobEventDtoTypeEnum.serializer)
+      ..add(JobListDto.serializer)
+      ..add(JobListDtoStatusEnum.serializer)
       ..add(JobMetricsDto.serializer)
       ..add(JobStatusCountDto.serializer)
       ..add(JobTypeCountDto.serializer)
@@ -131,6 +134,7 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(OrganizationsControllerUpdateMemberRole200Response.serializer)
       ..add(PaginationMetaDto.serializer)
       ..add(PermissionDto.serializer)
+      ..add(PermissionDtoScopeEnum.serializer)
       ..add(PreferencesControllerGetMyPreferences200Response.serializer)
       ..add(RefreshTokenDto.serializer)
       ..add(RegisterDeviceDto.serializer)
@@ -222,12 +226,12 @@ Serializers _$serializers = (Serializers().toBuilder()
         () => ListBuilder<JobDependencyDto>(),
       )
       ..addBuilderFactory(
-        const FullType(BuiltList, const [const FullType(JobDto)]),
-        () => ListBuilder<JobDto>(),
-      )
-      ..addBuilderFactory(
         const FullType(BuiltList, const [const FullType(JobEventDto)]),
         () => ListBuilder<JobEventDto>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, const [const FullType(JobListDto)]),
+        () => ListBuilder<JobListDto>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltList, const [
@@ -373,6 +377,13 @@ Serializers _$serializers = (Serializers().toBuilder()
           const FullType(String),
         ]),
         () => MapBuilder<String, String>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltMap, const [
+          const FullType(String),
+          const FullType.nullable(JsonObject),
+        ]),
+        () => MapBuilder<String, JsonObject?>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltMap, const [

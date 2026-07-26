@@ -8,9 +8,69 @@ part of 'create_import_dto.dart';
 // BuiltValueGenerator
 // **************************************************************************
 
+const CreateImportDtoTypeEnum _$createImportDtoTypeEnum_users =
+    const CreateImportDtoTypeEnum._('users');
+const CreateImportDtoTypeEnum _$createImportDtoTypeEnum_projects =
+    const CreateImportDtoTypeEnum._('projects');
+
+CreateImportDtoTypeEnum _$createImportDtoTypeEnumValueOf(String name) {
+  switch (name) {
+    case 'users':
+      return _$createImportDtoTypeEnum_users;
+    case 'projects':
+      return _$createImportDtoTypeEnum_projects;
+    default:
+      throw ArgumentError(name);
+  }
+}
+
+final BuiltSet<CreateImportDtoTypeEnum> _$createImportDtoTypeEnumValues =
+    BuiltSet<CreateImportDtoTypeEnum>(const <CreateImportDtoTypeEnum>[
+  _$createImportDtoTypeEnum_users,
+  _$createImportDtoTypeEnum_projects,
+]);
+
+Serializer<CreateImportDtoTypeEnum> _$createImportDtoTypeEnumSerializer =
+    _$CreateImportDtoTypeEnumSerializer();
+
+class _$CreateImportDtoTypeEnumSerializer
+    implements PrimitiveSerializer<CreateImportDtoTypeEnum> {
+  static const Map<String, Object> _toWire = const <String, Object>{
+    'users': 'users',
+    'projects': 'projects',
+  };
+  static const Map<Object, String> _fromWire = const <Object, String>{
+    'users': 'users',
+    'projects': 'projects',
+  };
+
+  @override
+  final Iterable<Type> types = const <Type>[CreateImportDtoTypeEnum];
+  @override
+  final String wireName = 'CreateImportDtoTypeEnum';
+
+  @override
+  Object serialize(
+    Serializers serializers,
+    CreateImportDtoTypeEnum object, {
+    FullType specifiedType = FullType.unspecified,
+  }) =>
+      _toWire[object.name] ?? object.name;
+
+  @override
+  CreateImportDtoTypeEnum deserialize(
+    Serializers serializers,
+    Object serialized, {
+    FullType specifiedType = FullType.unspecified,
+  }) =>
+      CreateImportDtoTypeEnum.valueOf(
+        _fromWire[serialized] ?? (serialized is String ? serialized : ''),
+      );
+}
+
 class _$CreateImportDto extends CreateImportDto {
   @override
-  final String type;
+  final CreateImportDtoTypeEnum type;
   @override
   final String fileId;
   @override
@@ -64,9 +124,9 @@ class CreateImportDtoBuilder
     implements Builder<CreateImportDto, CreateImportDtoBuilder> {
   _$CreateImportDto? _$v;
 
-  String? _type;
-  String? get type => _$this._type;
-  set type(String? type) => _$this._type = type;
+  CreateImportDtoTypeEnum? _type;
+  CreateImportDtoTypeEnum? get type => _$this._type;
+  set type(CreateImportDtoTypeEnum? type) => _$this._type = type;
 
   String? _fileId;
   String? get fileId => _$this._fileId;
