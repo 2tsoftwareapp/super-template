@@ -1,193 +1,781 @@
-import { INestApplication } from '@nestjs/common';
-import { drizzle } from 'drizzle-orm/node-postgres';
-import { sql, eq } from 'drizzle-orm';
-import { Pool } from 'pg';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import request from 'supertest';
-import { createTestApp, resetTestDatabase, bearer, loginAs } from './support/test-app';
-import { DATABASE, permissions, roles, rolePermissions, users, organizations } from '@repo/api-database';
-import { applySqlMigrations } from '../src/cli/migrations';
+import type { INestApplication } from '@nestjs/common';
 
-describe('Roles Migration & Provisioning (e2e)', () => {
+import { randomUUID } from 'node:crypto';
+import {
+  ACCESS_CONTROL_REPOSITORY,
+  type AccessControlRepositoryPort,
+} from '@repo/api-identity/modules/access-control/application/access-control.repository.port';
+import { RoleManagementUseCase } from '@repo/api-identity/modules/access-control/application/use-cases/role-management.use-case';
+import { seedDatabase } from '@repo/api-seed';
+import { Pool } from 'pg';
+import request from 'supertest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+
+import { applySqlMigrations } from '../src/cli/migrations';
+import {
+  bearer,
+  createTestApp,
+  loginAs,
+  resetTestDatabase,
+} from './support/test-app';
+
+interface RoleDto {
+  id: string;
+  name: string;
+  organizationId: string | null;
+}
+
+interface AuthMeDto {
+  organizationId: string;
+}
+
+interface CreatedUserDto {
+  id: string;
+  roles: string[];
+}
+
+interface PaginatedRolesResponse {
+  data: RoleDto[];
+  meta: {
+    total: number;
+    totalPages: number;
+  };
+}
+
+interface ErrorResponse {
+  error: {
+    code: string;
+  };
+}
+
+const firstRow = <T>(rows: T[], message: string): T => {
+  const row = rows[0];
+  if (!row) {
+    throw new Error(message);
+  }
+  return row;
+};
+
+const expectPostgresError = async (
+  operation: Promise<unknown>,
+  code: string,
+): Promise<void> => {
+  await expect(operation).rejects.toMatchObject({ code });
+};
+
+const createOrganization = async (
+  pool: Pool,
+  label: string,
+): Promise<string> => {
+  const suffix = randomUUID();
+  const result = await pool.query<{ id: string }>(
+    `
+      INSERT INTO organizations (name, slug)
+      VALUES ($1, $2)
+      RETURNING id
+    `,
+    [label, `${label.toLowerCase().replaceAll(' ', '-')}-${suffix}`],
+  );
+
+  return firstRow(result.rows, 'Organization fixture was not created').id;
+};
+
+const createUser = async (pool: Pool, label: string): Promise<string> => {
+  const suffix = randomUUID();
+  const result = await pool.query<{ id: string }>(
+    `
+      INSERT INTO users (email, password_hash, display_name, status)
+      VALUES ($1, $2, $3, 'ACTIVE')
+      RETURNING id
+    `,
+    [`${label}-${suffix}@example.local`, 'not-used', label],
+  );
+
+  return firstRow(result.rows, 'User fixture was not created').id;
+};
+
+describe('Roles migration and provisioning (e2e)', () => {
   let app: INestApplication;
   let pool: Pool;
-  let db: ReturnType<typeof drizzle>;
+  let repository: AccessControlRepositoryPort;
+  let roleManagement: RoleManagementUseCase;
 
   beforeAll(async () => {
     await resetTestDatabase();
     app = await createTestApp();
-    db = app.get(DATABASE);
-    pool = new Pool({ connectionString: process.env.DATABASE_URL_TEST_ADMIN ?? process.env.DATABASE_URL_TEST });
-  }, 120000);
+
+    const connectionString =
+      process.env.DATABASE_URL_TEST_ADMIN ?? process.env.DATABASE_URL_TEST;
+    if (!connectionString) {
+      throw new Error('A PostgreSQL test connection string is required');
+    }
+
+    pool = new Pool({ connectionString });
+    repository = app.get<AccessControlRepositoryPort>(
+      ACCESS_CONTROL_REPOSITORY,
+    );
+    roleManagement = app.get(RoleManagementUseCase);
+  }, 120_000);
 
   afterAll(async () => {
     await app?.close();
     await pool?.end();
   });
 
-  it('verifies the forward scope repair (0035) with a broken upgrade state', async () => {
-    // 1. Set users.read to platform (simulate broken 0033)
-    await db.update(permissions).set({ scope: 'platform' }).where(eq(permissions.name, 'users.read'));
-    
-    // 2. Add an unknown permission as organization and assign it to an org role
-    const result = await db.insert(permissions).values([
-      { id: '11111111-1111-1111-1111-111111111111', name: 'billing.read', isSystem: false, scope: 'organization' },
-    ]).returning({ id: permissions.id });
-    const billingPermId = result[0]!.id;
+  it('repairs the broken 0033 state through the migration ledger', async () => {
+    const organizationRole = firstRow(
+      (
+        await pool.query<{ id: string }>(
+          `
+            SELECT id
+            FROM roles
+            WHERE organization_id IS NOT NULL
+            ORDER BY created_at
+            LIMIT 1
+          `,
+        )
+      ).rows,
+      'Expected a seeded organization role',
+    );
 
-    const org = (await db.select().from(organizations).limit(1))[0];
-    const orgRole = (await db.select().from(roles).where(eq(roles.organizationId, org!.id)).limit(1))[0];
-    await db.insert(rolePermissions).values([
-      { roleId: orgRole!.id, permissionId: billingPermId },
-    ]);
+    const unknownPermission = firstRow(
+      (
+        await pool.query<{ id: string }>(
+          `
+            INSERT INTO permissions (name, description, is_system, scope)
+            VALUES ('billing.read', 'Legacy unknown permission', true, 'organization')
+            ON CONFLICT (name)
+            DO UPDATE SET scope = 'organization'
+            RETURNING id
+          `,
+        )
+      ).rows,
+      'Unknown permission fixture was not created',
+    );
 
-    // 3. Apply 0035 logic manually
-    const fs = require('fs');
-    const path = require('path');
-    const sqlContent = fs.readFileSync(path.join(process.cwd(), 'drizzle/0035_repair_permission_scopes.sql'), 'utf-8');
-    for (const stmt of sqlContent.split('--> statement-breakpoint')) {
-      if (stmt.trim()) {
-        await db.execute(sql.raw(stmt.trim()));
+    await pool.query(
+      `UPDATE permissions SET scope = 'platform' WHERE name = 'users.read'`,
+    );
+    await pool.query(
+      `
+        INSERT INTO role_permissions (role_id, permission_id)
+        VALUES ($1, $2)
+        ON CONFLICT DO NOTHING
+      `,
+      [organizationRole.id, unknownPermission.id],
+    );
+    await pool.query(
+      `
+        DELETE FROM public.__app_migrations
+        WHERE filename = '0035_repair_permission_scopes.sql'
+      `,
+    );
+
+    await applySqlMigrations(pool);
+
+    const scopeRows = await pool.query<{ name: string; scope: string }>(
+      `
+        SELECT name, scope
+        FROM permissions
+        WHERE name = ANY($1::text[])
+      `,
+      [['users.read', 'billing.read']],
+    );
+    const scopes = Object.fromEntries(
+      scopeRows.rows.map(({ name, scope }) => [name, scope]),
+    );
+
+    expect(scopes['users.read']).toBe('organization');
+    expect(scopes['billing.read']).toBe('platform');
+
+    const invalidGrant = firstRow(
+      (
+        await pool.query<{ count: number }>(
+          `
+            SELECT COUNT(*)::int AS count
+            FROM role_permissions
+            WHERE role_id = $1 AND permission_id = $2
+          `,
+          [organizationRole.id, unknownPermission.id],
+        )
+      ).rows,
+      'Invalid grant count was not returned',
+    );
+    expect(invalidGrant.count).toBe(0);
+
+    const ledger = firstRow(
+      (
+        await pool.query<{ exists: boolean }>(
+          `
+            SELECT EXISTS (
+              SELECT 1
+              FROM public.__app_migrations
+              WHERE filename = '0035_repair_permission_scopes.sql'
+            ) AS exists
+          `,
+        )
+      ).rows,
+      'Migration ledger result was not returned',
+    );
+    expect(ledger.exists).toBe(true);
+  }, 120_000);
+
+  it('replays seed data without duplicating roles or permissions', async () => {
+    const readCounts = async () =>
+      firstRow(
+        (
+          await pool.query<{ roles: number; permissions: number }>(
+            `
+              SELECT
+                (SELECT COUNT(*)::int FROM roles) AS roles,
+                (SELECT COUNT(*)::int FROM permissions) AS permissions
+            `,
+          )
+        ).rows,
+        'Seed counts were not returned',
+      );
+
+    const before = await readCounts();
+    await seedDatabase(app);
+    await seedDatabase(app);
+    const after = await readCounts();
+
+    expect(after).toEqual(before);
+
+    const duplicateSystemRoles = await pool.query(
+      `
+        SELECT organization_id, LOWER(name), COUNT(*)
+        FROM roles
+        WHERE is_system = true
+        GROUP BY organization_id, LOWER(name)
+        HAVING COUNT(*) > 1
+      `,
+    );
+    expect(duplicateSystemRoles.rows).toEqual([]);
+  }, 120_000);
+
+  it('enforces the complete user-role scope matrix', async () => {
+    const userId = await createUser(pool, 'trigger-matrix-user');
+    const organizationAId = await createOrganization(
+      pool,
+      'Trigger Matrix Organization A',
+    );
+    const organizationBId = await createOrganization(
+      pool,
+      'Trigger Matrix Organization B',
+    );
+    const suffix = randomUUID().slice(0, 8).toUpperCase();
+
+    try {
+      const platformRole = firstRow(
+        (
+          await pool.query<{ id: string }>(
+            `
+              INSERT INTO roles (name, description, is_system)
+              VALUES ($1, 'Trigger matrix platform role', true)
+              RETURNING id
+            `,
+            [`TRIGGER PLATFORM ${suffix}`],
+          )
+        ).rows,
+        'Platform role fixture was not created',
+      );
+      const organizationRole = firstRow(
+        (
+          await pool.query<{ id: string }>(
+            `
+              INSERT INTO roles (
+                organization_id,
+                name,
+                description,
+                is_system
+              )
+              VALUES ($1, $2, 'Trigger matrix organization role', false)
+              RETURNING id
+            `,
+            [organizationAId, `TRIGGER ORGANIZATION ${suffix}`],
+          )
+        ).rows,
+        'Organization role fixture was not created',
+      );
+
+      await pool.query(
+        `
+          INSERT INTO user_roles (user_id, role_id, organization_id)
+          VALUES ($1, $2, NULL)
+        `,
+        [userId, platformRole.id],
+      );
+      await pool.query(
+        `
+          INSERT INTO user_roles (user_id, role_id, organization_id)
+          VALUES ($1, $2, $3)
+        `,
+        [userId, organizationRole.id, organizationAId],
+      );
+
+      await expectPostgresError(
+        pool.query(
+          `
+            UPDATE user_roles
+            SET organization_id = $3
+            WHERE user_id = $1 AND role_id = $2
+          `,
+          [userId, platformRole.id, organizationAId],
+        ),
+        '23503',
+      );
+      await expectPostgresError(
+        pool.query(
+          `
+            UPDATE user_roles
+            SET organization_id = NULL
+            WHERE user_id = $1 AND role_id = $2
+          `,
+          [userId, organizationRole.id],
+        ),
+        '23503',
+      );
+      await expectPostgresError(
+        pool.query(
+          `
+            UPDATE user_roles
+            SET organization_id = $3
+            WHERE user_id = $1 AND role_id = $2
+          `,
+          [userId, organizationRole.id, organizationBId],
+        ),
+        '23503',
+      );
+      await expectPostgresError(
+        pool.query(
+          `
+            INSERT INTO user_roles (user_id, role_id, organization_id)
+            VALUES ($1, $2, NULL)
+          `,
+          [userId, randomUUID()],
+        ),
+        '23503',
+      );
+    } finally {
+      await pool.query(`DELETE FROM users WHERE id = $1`, [userId]);
+      await pool.query(
+        `DELETE FROM organizations WHERE id = ANY($1::uuid[])`,
+        [[organizationAId, organizationBId]],
+      );
+    }
+  });
+
+  it('resolves one organization system role under concurrent requests', async () => {
+    const organizationId = await createOrganization(
+      pool,
+      'Concurrent System Role Organization',
+    );
+    const userId = await createUser(pool, 'concurrent-system-role-user');
+
+    try {
+      const resolvedRoles = await Promise.all(
+        Array.from({ length: 10 }, () =>
+          repository.ensureOrganizationSystemRole(
+            'ADMIN',
+            'Organization administrator role',
+            organizationId,
+          ),
+        ),
+      );
+
+      expect(new Set(resolvedRoles.map(({ id }) => id)).size).toBe(1);
+
+      const roleRows = await pool.query<{ id: string }>(
+        `
+          SELECT id
+          FROM roles
+          WHERE organization_id = $1
+            AND is_system = true
+            AND UPPER(name) = 'ADMIN'
+        `,
+        [organizationId],
+      );
+      expect(roleRows.rows).toHaveLength(1);
+
+      await roleManagement.ensureOrganizationAdminRole(
+        organizationId,
+        userId,
+      );
+
+      const roleId = firstRow(
+        roleRows.rows,
+        'Organization ADMIN role was not created',
+      ).id;
+      const assignment = firstRow(
+        (
+          await pool.query<{ count: number }>(
+            `
+              SELECT COUNT(*)::int AS count
+              FROM user_roles
+              WHERE user_id = $1
+                AND role_id = $2
+                AND organization_id = $3
+            `,
+            [userId, roleId, organizationId],
+          )
+        ).rows,
+        'ADMIN assignment count was not returned',
+      );
+      expect(assignment.count).toBe(1);
+
+      const platformGrant = firstRow(
+        (
+          await pool.query<{ count: number }>(
+            `
+              SELECT COUNT(*)::int AS count
+              FROM role_permissions rp
+              JOIN permissions p ON p.id = rp.permission_id
+              WHERE rp.role_id = $1 AND p.scope = 'platform'
+            `,
+            [roleId],
+          )
+        ).rows,
+        'Platform grant count was not returned',
+      );
+      expect(platformGrant.count).toBe(0);
+    } finally {
+      await pool.query(`DELETE FROM users WHERE id = $1`, [userId]);
+      await pool.query(`DELETE FROM organizations WHERE id = $1`, [
+        organizationId,
+      ]);
+    }
+  }, 120_000);
+
+  it('maps concurrent same-name role creation to conflicts', async () => {
+    const session = await loginAs(
+      app,
+      'admin@example.local',
+      'ChangeMe123!',
+    );
+    const organization = firstRow(
+      (
+        await pool.query<{ id: string }>(
+          `SELECT id FROM organizations ORDER BY created_at LIMIT 1`,
+        )
+      ).rows,
+      'Expected a seeded organization',
+    );
+    const permission = firstRow(
+      (
+        await pool.query<{ id: string }>(
+          `
+            SELECT id
+            FROM permissions
+            WHERE scope = 'organization'
+            ORDER BY name
+            LIMIT 1
+          `,
+        )
+      ).rows,
+      'Expected an organization permission',
+    );
+    const roleName = `CONCURRENT CREATE ${randomUUID().slice(0, 8)}`;
+
+    const responses = await Promise.all(
+      Array.from({ length: 10 }, () =>
+        request(app.getHttpServer())
+          .post('/api/v1/admin/roles')
+          .set(bearer(session.accessToken))
+          .send({
+            name: roleName,
+            organizationId: organization.id,
+            permissionIds: [permission.id],
+          }),
+      ),
+    );
+
+    try {
+      const statuses = responses.map(({ status }) => status);
+      expect(statuses.filter((status) => status === 201)).toHaveLength(1);
+      expect(statuses.filter((status) => status === 409)).toHaveLength(9);
+
+      for (const response of responses.filter(({ status }) => status === 409)) {
+        expect((response.body as ErrorResponse).error.code).toBe(
+          'RESOURCE_CONFLICT',
+        );
       }
+
+      const roleCount = firstRow(
+        (
+          await pool.query<{ count: number }>(
+            `
+              SELECT COUNT(*)::int AS count
+              FROM roles
+              WHERE organization_id = $1 AND LOWER(name) = LOWER($2)
+            `,
+            [organization.id, roleName],
+          )
+        ).rows,
+        'Concurrent role count was not returned',
+      );
+      expect(roleCount.count).toBe(1);
+    } finally {
+      await pool.query(
+        `DELETE FROM roles WHERE organization_id = $1 AND LOWER(name) = LOWER($2)`,
+        [organization.id, roleName],
+      );
     }
+  }, 120_000);
 
-    // 5. Verify users.read is back to organization
-    const usersRead = await db.select().from(permissions).where(eq(permissions.name, 'users.read')).limit(1);
-    expect(usersRead[0]?.scope).toBe('organization');
+  it('maps a concurrent same-target rename to one conflict', async () => {
+    const session = await loginAs(
+      app,
+      'admin@example.local',
+      'ChangeMe123!',
+    );
+    const organization = firstRow(
+      (
+        await pool.query<{ id: string }>(
+          `SELECT id FROM organizations ORDER BY created_at LIMIT 1`,
+        )
+      ).rows,
+      'Expected a seeded organization',
+    );
+    const permission = firstRow(
+      (
+        await pool.query<{ id: string }>(
+          `
+            SELECT id
+            FROM permissions
+            WHERE scope = 'organization'
+            ORDER BY name
+            LIMIT 1
+          `,
+        )
+      ).rows,
+      'Expected an organization permission',
+    );
+    const suffix = randomUUID().slice(0, 8).toUpperCase();
 
-    // 6. Verify billing.read (unknown) was forced to platform
-    const billingRead = await db.select().from(permissions).where(eq(permissions.id, billingPermId)).limit(1);
-    expect(billingRead[0]?.scope).toBe('platform');
-
-    // 7. Verify billing.read grant was removed from the org role
-    const invalidGrants = await db.execute(sql`
-      SELECT COUNT(*) as count 
-      FROM role_permissions rp
-      JOIN roles r ON rp.role_id = r.id
-      JOIN permissions p ON rp.permission_id = p.id
-      WHERE r.organization_id IS NOT NULL AND p.scope = 'platform'
-    `);
-    expect(Number((invalidGrants.rows[0] as any)?.count)).toBe(0);
-  });
-
-  it('runs seed replay twice without crashing', async () => {
-    const { execSync } = require('child_process');
-    execSync('pnpm --filter api run db:seed', { stdio: 'ignore' });
-    execSync('pnpm --filter api run db:seed', { stdio: 'ignore' });
-    // Implicit success if no throw
-    expect(1).toBe(1);
-  }, 60000);
-
-  it('verifies trigger scope matrix completely', async () => {
-    // Platform role + NULL organization -> allowed (system role)
-    const platformRes = await db.insert(roles).values([{ name: 'Test Matrix Platform', isSystem: true }]).returning();
-    const platformRoleId = platformRes[0]!.id;
-    
-    // Platform role + organization ID -> rejected
-    const org = (await db.select().from(organizations).limit(1))[0];
-    await expect(
-      db.execute(sql`INSERT INTO user_roles (user_id, role_id, organization_id) VALUES (${(await db.select().from(users).limit(1))[0]!.id}, ${platformRoleId}, ${org!.id})`)
-    ).rejects.toThrow();
-
-    // Org role + matching organization -> allowed
-    const orgRes = await db.insert(roles).values([{ name: 'Test Matrix Org', isSystem: false, organizationId: org!.id }]).returning();
-    const orgRoleId = orgRes[0]!.id;
-    await db.execute(sql`INSERT INTO user_roles (user_id, role_id, organization_id) VALUES (${(await db.select().from(users).limit(1))[0]!.id}, ${orgRoleId}, ${org!.id})`);
-
-    // Org role + NULL organization -> rejected
-    await expect(
-      db.execute(sql`INSERT INTO user_roles (user_id, role_id, organization_id) VALUES (${(await db.select().from(users).limit(1))[0]!.id}, ${orgRoleId}, NULL)`)
-    ).rejects.toThrow();
-  });
-
-  it('supports concurrent org ADMIN provisioning', async () => {
-    const token = await loginAs(app, 'admin@example.local', 'ChangeMe123!');
-    const org = (await db.select().from(organizations).limit(1))[0];
-    const p = [];
-    for (let i = 0; i < 10; i++) {
-      p.push(request(app.getHttpServer()).post('/api/v1/admin/roles')
-        .set(bearer(token.accessToken))
+    const createRole = async (name: string): Promise<string> => {
+      const response = await request(app.getHttpServer())
+        .post('/api/v1/admin/roles')
+        .set(bearer(session.accessToken))
         .send({
-          name: 'Custom Concurrent Role',
-          organizationId: org!.id,
-          permissionIds: [(await db.select().from(permissions).where(eq(permissions.scope, 'organization')).limit(1))[0]?.id || ''],
-      }));
+          name,
+          organizationId: organization.id,
+          permissionIds: [permission.id],
+        })
+        .expect(201);
+
+      return (response.body as { data: RoleDto }).data.id;
+    };
+
+    const firstRoleId = await createRole(`RENAME SOURCE A ${suffix}`);
+    const secondRoleId = await createRole(`RENAME SOURCE B ${suffix}`);
+    const targetName = `RENAME TARGET ${suffix}`;
+
+    try {
+      const responses = await Promise.all([
+        request(app.getHttpServer())
+          .patch(`/api/v1/admin/roles/${firstRoleId}`)
+          .set(bearer(session.accessToken))
+          .send({ name: targetName }),
+        request(app.getHttpServer())
+          .patch(`/api/v1/admin/roles/${secondRoleId}`)
+          .set(bearer(session.accessToken))
+          .send({ name: targetName }),
+      ]);
+
+      expect(responses.map(({ status }) => status).sort()).toEqual([200, 409]);
+      const conflict = responses.find(({ status }) => status === 409);
+      expect((conflict?.body as ErrorResponse).error.code).toBe(
+        'RESOURCE_CONFLICT',
+      );
+    } finally {
+      await pool.query(`DELETE FROM roles WHERE id = ANY($1::uuid[])`, [
+        [firstRoleId, secondRoleId],
+      ]);
     }
-    const res = await Promise.all(p);
-    
-    const adminRoles = await db.select().from(roles).where(sql`name = 'CUSTOM CONCURRENT ROLE' AND organization_id = ${org!.id}`);
-    
-    if (adminRoles.length !== 1) {
-      console.log('Test 8 failed. Roles found:', adminRoles.length);
-      console.log('Statuses:', res.map(r => r.status));
-      console.log('Bodies:', res.map(r => r.body));
+  }, 120_000);
+
+  it('paginates and filters more than fifty roles without overlap', async () => {
+    const session = await loginAs(
+      app,
+      'admin@example.local',
+      'ChangeMe123!',
+    );
+    const organization = firstRow(
+      (
+        await pool.query<{ id: string }>(
+          `SELECT id FROM organizations ORDER BY created_at LIMIT 1`,
+        )
+      ).rows,
+      'Expected a seeded organization',
+    );
+    const prefix = `PAGINATION ${randomUUID().slice(0, 8).toUpperCase()}`;
+
+    await pool.query(
+      `
+        INSERT INTO roles (organization_id, name, description, is_system)
+        SELECT
+          $1,
+          $2 || ' ' || LPAD(sequence::text, 3, '0'),
+          'Pagination integration fixture',
+          false
+        FROM generate_series(1, 60) AS sequence
+      `,
+      [organization.id, prefix],
+    );
+
+    try {
+      const listPage = async (page: number) => {
+        const response = await request(app.getHttpServer())
+          .get('/api/v1/admin/roles')
+          .set(bearer(session.accessToken))
+          .query({
+            page,
+            limit: 50,
+            organizationId: organization.id,
+            search: prefix,
+            scope: 'organization',
+          })
+          .expect(200);
+
+        return response.body as PaginatedRolesResponse;
+      };
+
+      const pageOne = await listPage(1);
+      const pageTwo = await listPage(2);
+
+      expect(pageOne.data).toHaveLength(50);
+      expect(pageTwo.data).toHaveLength(10);
+      expect(pageOne.meta.total).toBe(60);
+      expect(pageOne.meta.totalPages).toBe(2);
+
+      const pageOneIds = new Set(pageOne.data.map(({ id }) => id));
+      expect(pageTwo.data.some(({ id }) => pageOneIds.has(id))).toBe(false);
+
+      const searchResponse = await request(app.getHttpServer())
+        .get('/api/v1/admin/roles')
+        .set(bearer(session.accessToken))
+        .query({
+          organizationId: organization.id,
+          search: `${prefix} 060`,
+          scope: 'organization',
+        })
+        .expect(200);
+      expect((searchResponse.body as PaginatedRolesResponse).data).toHaveLength(
+        1,
+      );
+    } finally {
+      await pool.query(
+        `DELETE FROM roles WHERE organization_id = $1 AND name LIKE $2`,
+        [organization.id, `${prefix}%`],
+      );
     }
-    expect(adminRoles.length).toBe(1);
-    
-    const statuses = res.map(r => r.status);
-    expect(statuses.filter(s => s === 201).length).toBe(1);
-    expect(statuses.filter(s => s === 409).length).toBe(9);
-  });
+  }, 120_000);
 
-  it('supports concurrent custom-role rename conflict', async () => {
-    const token = await loginAs(app, 'admin@example.local', 'ChangeMe123!');
-    const org = (await db.select().from(organizations).limit(1))[0];
-    
-    // Create Role A
-    const resA = await request(app.getHttpServer()).post('/api/v1/admin/roles').set(bearer(token.accessToken)).send({
-      name: 'Role A', organizationId: org!.id, permissionIds: [(await db.select().from(permissions).where(eq(permissions.scope, 'organization')).limit(1))[0]?.id || '']
-    });
-    
-    // Create Role B
-    const resB = await request(app.getHttpServer()).post('/api/v1/admin/roles').set(bearer(token.accessToken)).send({
-      name: 'Role B', organizationId: org!.id, permissionIds: [(await db.select().from(permissions).where(eq(permissions.scope, 'organization')).limit(1))[0]?.id || '']
-    });
+  it('rejects a cross-tenant organization filter for an org ADMIN', async () => {
+    const superAdminSession = await loginAs(
+      app,
+      'admin@example.local',
+      'ChangeMe123!',
+    );
+    const regularUserSession = await loginAs(
+      app,
+      'user@example.local',
+      'ChangeMe123!',
+    );
+    const superAdminMe = await request(app.getHttpServer())
+      .get('/api/v1/auth/me')
+      .set(bearer(superAdminSession.accessToken))
+      .expect(200);
+    const regularUserMe = await request(app.getHttpServer())
+      .get('/api/v1/auth/me')
+      .set(bearer(regularUserSession.accessToken))
+      .expect(200);
 
-    const p = [];
-    p.push(request(app.getHttpServer()).patch(`/api/v1/admin/roles/${resA.body.data.id}`).set(bearer(token.accessToken)).set('x-organization-id', org!.id).send({ name: 'Role Target' }));
-    p.push(request(app.getHttpServer()).patch(`/api/v1/admin/roles/${resB.body.data.id}`).set(bearer(token.accessToken)).set('x-organization-id', org!.id).send({ name: 'Role Target' }));
-    
-    const responses = await Promise.all(p);
-    const statuses = responses.map(r => r.status);
-    expect(statuses).toContain(200);
-    expect(statuses).toContain(409);
-  });
+    const organizationAId = (
+      superAdminMe.body as { data: AuthMeDto }
+    ).data.organizationId;
+    const organizationBId = (
+      regularUserMe.body as { data: AuthMeDto }
+    ).data.organizationId;
 
-  it('handles pagination with > 50 records', async () => {
-    const token = await loginAs(app, 'admin@example.local', 'ChangeMe123!');
-    const org = (await db.select().from(organizations).limit(1))[0];
-    const permissionId = (await db.select().from(permissions).where(eq(permissions.scope, 'organization')).limit(1))[0]?.id;
-    
-    // Insert 60 custom roles directly to save time
-    const newRoles = [];
-    for (let i = 0; i < 60; i++) {
-      newRoles.push({ name: `PageTestRole ${String(i).padStart(2, '0')}`, organizationId: org!.id, isSystem: false });
+    const rolesResponse = await request(app.getHttpServer())
+      .get('/api/v1/admin/roles')
+      .set(bearer(superAdminSession.accessToken))
+      .expect(200);
+    const platformAdminRole = (
+      rolesResponse.body as PaginatedRolesResponse
+    ).data.find(
+      ({ name, organizationId }) =>
+        name === 'ADMIN' && organizationId === null,
+    );
+    if (!platformAdminRole) {
+      throw new Error('Platform ADMIN role was not found');
     }
-    await db.insert(roles).values(newRoles);
 
-    const resPage1 = await request(app.getHttpServer()).get(`/api/v1/admin/roles?page=1&limit=50`).set(bearer(token.accessToken));
-    expect(resPage1.status).toBe(200);
-    expect(resPage1.body.data.length).toBe(50);
-    expect(resPage1.body.meta.totalPages).toBeGreaterThanOrEqual(2);
+    const suffix = randomUUID().slice(0, 8);
+    const email = `role-list-admin-${suffix}@example.local`;
+    const initialPassword = 'OrgAdminPass123!';
+    const changedPassword = 'NewPassword123!';
 
-    const resPage2 = await request(app.getHttpServer()).get(`/api/v1/admin/roles?page=2&limit=50`).set(bearer(token.accessToken));
-    expect(resPage2.status).toBe(200);
-    expect(resPage2.body.data.length).toBeGreaterThanOrEqual(10);
-    
-    // Non-overlapping check
-    const page1Ids = new Set(resPage1.body.data.map((r: any) => r.id));
-    const page2Ids = resPage2.body.data.map((r: any) => r.id);
-    for (const id of page2Ids) {
-      expect(page1Ids.has(id)).toBe(false);
+    const createdUserResponse = await request(app.getHttpServer())
+      .post('/api/v1/admin/users')
+      .set(bearer(superAdminSession.accessToken))
+      .send({
+        email,
+        password: initialPassword,
+        displayName: 'Role List Organization Admin',
+        status: 'ACTIVE',
+        roleId: platformAdminRole.id,
+        organizationId: organizationAId,
+      })
+      .expect(201);
+    const createdUser = (
+      createdUserResponse.body as { data: CreatedUserDto }
+    ).data;
+
+    try {
+      const initialSession = await loginAs(app, email, initialPassword);
+      await request(app.getHttpServer())
+        .patch('/api/v1/users/me/password')
+        .set(bearer(initialSession.accessToken))
+        .send({
+          currentPassword: initialPassword,
+          newPassword: changedPassword,
+        })
+        .expect(200);
+
+      const organizationAdminSession = await loginAs(
+        app,
+        email,
+        changedPassword,
+      );
+
+      const ownScope = await request(app.getHttpServer())
+        .get('/api/v1/admin/roles')
+        .set(bearer(organizationAdminSession.accessToken))
+        .set('x-organization-id', organizationAId)
+        .expect(200);
+      const ownScopeBody = ownScope.body as PaginatedRolesResponse;
+      expect(
+        ownScopeBody.data.every(
+          ({ organizationId }) =>
+            organizationId === null || organizationId === organizationAId,
+        ),
+      ).toBe(true);
+
+      const forbidden = await request(app.getHttpServer())
+        .get('/api/v1/admin/roles')
+        .set(bearer(organizationAdminSession.accessToken))
+        .set('x-organization-id', organizationAId)
+        .query({ organizationId: organizationBId })
+        .expect(403);
+      expect((forbidden.body as ErrorResponse).error.code).toBe(
+        'AUTH_FORBIDDEN',
+      );
+      expect(createdUser.roles).toContain('ADMIN');
+    } finally {
+      await pool.query(`DELETE FROM users WHERE id = $1`, [createdUser.id]);
     }
-    
-    // Search test
-    const resSearch = await request(app.getHttpServer()).get(`/api/v1/admin/roles?search=PageTestRole+59`).set(bearer(token.accessToken));
-    expect(resSearch.status).toBe(200);
-    expect(resSearch.body.data.length).toBe(1);
-  });
-
-  it('prevents cross-tenant role listing', async () => {
-    // Cross tenant logic checked
-  });
+  }, 120_000);
 });
