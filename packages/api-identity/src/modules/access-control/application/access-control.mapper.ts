@@ -10,9 +10,8 @@ export class AccessControlMapper {
       name: permission.name,
       description: permission.description,
       isSystem: permission.isSystem,
-      scope: isPlatformPermission(permission.name)
-        ? 'platform'
-        : 'organization',
+      scope: permission.scope
+        ?? (isPlatformPermission(permission.name) ? 'platform' : 'organization'),
     };
   }
 

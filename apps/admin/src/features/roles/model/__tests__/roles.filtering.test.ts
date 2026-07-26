@@ -50,7 +50,7 @@ describe("optionalText", () => {
 });
 
 describe("mergeSystemRoles", () => {
-  it("merges roles with the same name and combines scopes", () => {
+  it("keeps each role as a separate entry with its own scope", () => {
     const roles = [
       systemRole({ scope: "platform", permissions: [{ id: "p1", name: "users.read", description: null, isSystem: true, scope: "platform" }] }),
       systemRole({ id: "r2", scope: "organization", permissions: [] }),
@@ -58,13 +58,12 @@ describe("mergeSystemRoles", () => {
 
     const result = mergeSystemRoles(roles);
 
-    expect(result).toHaveLength(1);
-    expect(result[0]!.name).toBe("ADMIN");
-    expect(result[0]!.scopes).toContain("platform");
-    expect(result[0]!.scopes).toContain("organization");
+    expect(result).toHaveLength(2);
+    expect(result[0]!.scopes).toEqual(["platform"]);
+    expect(result[1]!.scopes).toEqual(["organization"]);
   });
 
-  it("keeps first-encountered permission set (identical across scopes)", () => {
+  it("preserves each role's own permission set", () => {
     const roles = [
       systemRole({
         scope: "platform",
@@ -82,19 +81,9 @@ describe("mergeSystemRoles", () => {
 
     const result = mergeSystemRoles(roles);
 
-    expect(result).toHaveLength(1);
+    expect(result).toHaveLength(2);
     expect(result[0]!.permissions).toHaveLength(1);
-  });
-
-  it("deduplicates scopes", () => {
-    const roles = [
-      systemRole({ scope: "platform" }),
-      systemRole({ id: "r2", scope: "platform" }),
-    ];
-
-    const result = mergeSystemRoles(roles);
-
-    expect(result[0]!.scopes).toEqual(["platform"]);
+    expect(result[1]!.permissions).toHaveLength(2);
   });
 
   it("sorts results alphabetically by name", () => {

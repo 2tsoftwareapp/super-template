@@ -124,6 +124,7 @@ export class AccessControlRepository implements AccessControlRepositoryPort {
         name: permissions.name,
         description: permissions.description,
         isSystem: permissions.isSystem,
+        scope: permissions.scope,
       })
       .from(rolePermissions)
       .innerJoin(permissions, eq(rolePermissions.permissionId, permissions.id))
@@ -201,7 +202,11 @@ export class AccessControlRepository implements AccessControlRepositoryPort {
     values: typeof roles.$inferInsert,
     executor: DatabaseExecutor = this.database,
   ) {
-    const [role] = await executor.insert(roles).values(values).returning();
+    const [role] = await executor
+      .insert(roles)
+      .values(values)
+      .onConflictDoNothing()
+      .returning();
     return role ?? null;
   }
 
@@ -210,15 +215,22 @@ export class AccessControlRepository implements AccessControlRepositoryPort {
     values: Partial<typeof roles.$inferInsert>,
     executor: DatabaseExecutor = this.database,
   ) {
-    const [role] = await executor
-      .update(roles)
-      .set({
-        ...values,
-        updatedAt: new Date(),
-      })
-      .where(eq(roles.id, roleId))
-      .returning();
-    return role ?? null;
+    try {
+      const [role] = await executor
+        .update(roles)
+        .set({
+          ...values,
+          updatedAt: new Date(),
+        })
+        .where(eq(roles.id, roleId))
+        .returning();
+      return role ?? null;
+    } catch (error: any) {
+      if (error?.code === '23505') {
+        return null;
+      }
+      throw error;
+    }
   }
 
   async deleteRole(

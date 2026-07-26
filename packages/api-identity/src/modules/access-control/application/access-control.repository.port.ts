@@ -13,6 +13,7 @@ export interface PermissionRecord {
   name: string;
   description: string | null;
   isSystem: boolean;
+  scope: string | null;
 }
 
 export interface RolePermissionRecord extends PermissionRecord {

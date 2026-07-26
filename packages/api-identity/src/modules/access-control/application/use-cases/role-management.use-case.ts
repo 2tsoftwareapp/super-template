@@ -1,4 +1,4 @@
-import type { AuthenticatedRequestUser, JsonValue } from '@repo/api-core';
+import type { AuthenticatedRequestUser, JsonValue, RequestContext } from '@repo/api-core';
 import type { AuditWriter, TransactionExecutor, TransactionPort } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
@@ -87,7 +87,7 @@ export class RoleManagementUseCase {
   async createCustomRole(
     actor: AuthenticatedRequestUser,
     command: CreateRoleCommand,
-    _executor?: TransactionExecutor,
+    requestContext?: RequestContext,
   ): Promise<RoleView> {
     const isSuperAdmin = actor.roles.includes(ROLE_NAMES.SUPER_ADMIN);
 
@@ -148,6 +148,16 @@ export class RoleManagementUseCase {
       );
 
       if (!role) {
+        const existing = await this.accessControlRepository.findRoleByName(
+          normalizedName, organizationId, tx,
+        );
+        if (existing) {
+          throw new AppError(
+            ERROR_CODES.RESOURCE_CONFLICT,
+            'A role with this name already exists in the organization',
+            HttpStatus.CONFLICT,
+          );
+        }
         throw new AppError(
           ERROR_CODES.INTERNAL_ERROR,
           'Custom role could not be created',
@@ -172,7 +182,8 @@ export class RoleManagementUseCase {
             organizationId,
             permissionIds: command.permissionIds,
           },
-            ...(organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
+          ...(requestContext ? { requestContext } : {}),
+          ...(organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId } : { scope: SYSTEM_SCOPE.PLATFORM }),
         },
         tx,
       );
@@ -190,7 +201,7 @@ export class RoleManagementUseCase {
     actor: AuthenticatedRequestUser,
     roleId: string,
     command: UpdateRoleCommand,
-    _executor?: TransactionExecutor,
+    requestContext?: RequestContext,
   ): Promise<RoleView> {
     return this.transactionPort.run(async (tx) => {
       const role = await this.accessControlRepository.findRoleById(roleId, tx);
@@ -245,6 +256,18 @@ export class RoleManagementUseCase {
       );
 
       if (!updatedRole) {
+        const conflict = newName
+          ? await this.accessControlRepository.findRoleByName(
+              newName, role.organizationId, tx,
+            )
+          : undefined;
+        if (conflict && conflict.id !== roleId) {
+          throw new AppError(
+            ERROR_CODES.RESOURCE_CONFLICT,
+            'A role with this name already exists in the organization',
+            HttpStatus.CONFLICT,
+          );
+        }
         throw new AppError(
           ERROR_CODES.INTERNAL_ERROR,
           'Custom role could not be updated',
@@ -289,7 +312,8 @@ export class RoleManagementUseCase {
           entityType: 'role',
           entityId: roleId,
           metadata: updateMeta,
-            ...(role.organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: role.organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
+          ...(requestContext ? { requestContext } : {}),
+          ...(role.organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: role.organizationId } : { scope: SYSTEM_SCOPE.PLATFORM }),
         },
         tx,
       );
@@ -307,20 +331,20 @@ export class RoleManagementUseCase {
     actor: AuthenticatedRequestUser,
     roleId: string,
     permissionIds: string[],
-    _executor?: TransactionExecutor,
+    requestContext?: RequestContext,
   ): Promise<RoleView> {
     return this.updateCustomRole(
       actor,
       roleId,
       { permissionIds },
-      _executor,
+      requestContext,
     );
   }
 
   async deleteCustomRole(
     actor: AuthenticatedRequestUser,
     roleId: string,
-    _executor?: TransactionExecutor,
+    requestContext?: RequestContext,
   ): Promise<void> {
     return this.transactionPort.run(async (tx) => {
       const role =
@@ -362,7 +386,8 @@ export class RoleManagementUseCase {
             name: role.name,
             organizationId: role.organizationId,
           },
-            ...(role.organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: role.organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
+          ...(requestContext ? { requestContext } : {}),
+          ...(role.organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: role.organizationId } : { scope: SYSTEM_SCOPE.PLATFORM }),
         },
         tx,
       );

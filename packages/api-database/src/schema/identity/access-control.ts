@@ -42,6 +42,7 @@ export const permissions = pgTable('permissions', {
   name: text('name').notNull().unique(),
   description: text('description'),
   isSystem: boolean('is_system').notNull().default(false),
+  scope: text('scope'),
   ...timestamps,
 });
 

@@ -1,4 +1,5 @@
 import type { AuthenticatedRequestUser } from '@repo/api-core';
+import type { Request } from 'express';
 
 import {
   Body,
@@ -10,6 +11,7 @@ import {
   Patch,
   Post,
   Put,
+  Req,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import {
@@ -69,8 +71,9 @@ export class AdminRolesController {
   async createRole(
     @CurrentUser() actor: AuthenticatedRequestUser,
     @Body() input: CreateRoleDto,
+    @Req() request: Request,
   ) {
-    const role = await this.roleManagement.createCustomRole(actor, input);
+    const role = await this.roleManagement.createCustomRole(actor, input, request.requestContext);
 
     return {
       data: role,
@@ -84,11 +87,13 @@ export class AdminRolesController {
     @CurrentUser() actor: AuthenticatedRequestUser,
     @Param('id', ParseUUIDPipe) roleId: string,
     @Body() input: UpdateRoleDto,
+    @Req() request: Request,
   ) {
     const role = await this.roleManagement.updateCustomRole(
       actor,
       roleId,
       input,
+      request.requestContext,
     );
 
     return {
@@ -103,11 +108,13 @@ export class AdminRolesController {
     @CurrentUser() actor: AuthenticatedRequestUser,
     @Param('id', ParseUUIDPipe) roleId: string,
     @Body() input: ReplaceRolePermissionsDto,
+    @Req() request: Request,
   ) {
     const role = await this.roleManagement.replaceCustomRolePermissions(
       actor,
       roleId,
       input.permissionIds,
+      request.requestContext,
     );
 
     return {
@@ -121,8 +128,9 @@ export class AdminRolesController {
   async deleteRole(
     @CurrentUser() actor: AuthenticatedRequestUser,
     @Param('id', ParseUUIDPipe) roleId: string,
+    @Req() request: Request,
   ) {
-    await this.roleManagement.deleteCustomRole(actor, roleId);
+    await this.roleManagement.deleteCustomRole(actor, roleId, request.requestContext);
 
     return {
       data: { success: true },

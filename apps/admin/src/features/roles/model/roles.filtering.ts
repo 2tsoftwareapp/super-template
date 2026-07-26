@@ -7,26 +7,14 @@ export function optionalText(value: string | null | undefined | object): string 
 }
 
 /**
- * Merge system roles with the same name (e.g. platform ADMIN + org ADMIN)
- * into a single node showing multiple scopes. System roles are seeded with
- * identical permission sets across scopes, so we keep the first encounter.
+ * Each system role is a distinct record with its own scope and permissions.
+ * Platform ADMIN and organization ADMIN have different permission sets and
+ * must not be merged by name alone (M-003).
  */
 export function mergeSystemRoles(roles: ManagedRoleDto[]): MergedRole[] {
-  const map = new Map<string, MergedRole>();
-
-  for (const role of roles) {
-    const existing = map.get(role.name);
-
-    if (existing) {
-      if (!existing.scopes.includes(role.scope)) {
-        existing.scopes.push(role.scope);
-      }
-    } else {
-      map.set(role.name, { ...role, scopes: [role.scope] });
-    }
-  }
-
-  return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
+  return roles
+    .map((role) => ({ ...role, scopes: [role.scope] }))
+    .sort((a, b) => a.name.localeCompare(b.name));
 }
 
 /**
