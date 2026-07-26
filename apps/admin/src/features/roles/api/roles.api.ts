@@ -1,12 +1,10 @@
 import { bffPath, type operations } from "@repo/api-contract";
 
 import type { ListResponse } from "@/lib/api-types";
-
-import { webFetch, buildPath } from "@/lib/http";
+import { buildPath, webFetch } from "@/lib/http";
 
 import type {
   EditableRole,
-  ManagedRoleDto,
   PermissionDto,
   RoleForm,
 } from "../model/roles.schemas";
@@ -15,9 +13,13 @@ interface RoleSaveResult {
   data: EditableRole & { permissions: PermissionDto[] };
 }
 
-export type RolesListParams = operations["AdminRolesController_listRoles"]["parameters"]["query"];
-export type RolesListResponse = operations["AdminRolesController_listRoles"]["responses"][200]["content"]["application/json"];
+type RolesListOperation = operations["AdminRolesController_listRoles"];
 
+export type RolesListParams = NonNullable<
+  RolesListOperation["parameters"]["query"]
+>;
+export type RolesListResponse =
+  RolesListOperation["responses"][200]["content"]["application/json"];
 
 function buildRolePayload(input: RoleForm) {
   return {
@@ -31,7 +33,9 @@ function buildRolePayload(input: RoleForm) {
 export const rolesApi = {
   list(params?: RolesListParams) {
     return webFetch<RolesListResponse>(
-      params ? buildPath(bffPath("/api/v1/admin/roles"), params) : bffPath("/api/v1/admin/roles"),
+      params
+        ? buildPath(bffPath("/api/v1/admin/roles"), { ...params })
+        : bffPath("/api/v1/admin/roles"),
     );
   },
 
