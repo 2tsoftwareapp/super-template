@@ -3,7 +3,7 @@
 import { useDebouncedValue } from "@repo/web-hooks/use-debounced-value";
 import { getErrorMessage } from "@repo/web-utils/errors";
 import { useQueryClient } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import type { RolesListParams } from "@/features/roles/api/roles.api";
@@ -52,26 +52,59 @@ export function useRolesController(): RolesViewModel {
     );
 
   const urlPage = Math.max(1, Number(searchParams.get("page")) || 1);
+  const urlSearch = searchParams.get("search") ?? "";
   const urlScopeRaw = searchParams.get("scope");
-  const urlScope = (urlScopeRaw === "platform" || urlScopeRaw === "organization") ? urlScopeRaw : undefined;
+  const urlScope =
+    urlScopeRaw === "platform" || urlScopeRaw === "organization"
+      ? urlScopeRaw
+      : undefined;
   const urlOrgId = searchParams.get("organizationId") ?? undefined;
 
-  const [searchInput, setSearchInput] = useState(searchParams.get("search") ?? "");
+  const [searchInput, setSearchInput] = useState(urlSearch);
   const debouncedSearch = useDebouncedValue(searchInput, 300);
+  const lastUrlSearchRef = useRef(urlSearch);
+  const syncingFromUrlRef = useRef(false);
 
   useEffect(() => {
-    const current = searchParams.get("search") ?? "";
-    if (debouncedSearch !== current) {
-      const next = new URLSearchParams(searchParams.toString());
-      if (debouncedSearch) {
-        next.set("search", debouncedSearch);
-      } else {
-        next.delete("search");
-      }
-      next.delete("page");
-      router.replace(`${pathname}?${next.toString()}`);
+    if (lastUrlSearchRef.current === urlSearch) {
+      return;
     }
-  }, [debouncedSearch, searchParams, pathname, router]);
+
+    lastUrlSearchRef.current = urlSearch;
+    syncingFromUrlRef.current = true;
+    setSearchInput(urlSearch);
+  }, [urlSearch]);
+
+  useEffect(() => {
+    if (syncingFromUrlRef.current) {
+      if (debouncedSearch === urlSearch) {
+        syncingFromUrlRef.current = false;
+      }
+      return;
+    }
+
+    if (debouncedSearch !== searchInput || debouncedSearch === urlSearch) {
+      return;
+    }
+
+    const next = new URLSearchParams(searchParams.toString());
+    if (debouncedSearch) {
+      next.set("search", debouncedSearch);
+    } else {
+      next.delete("search");
+    }
+    next.delete("page");
+
+    const queryString = next.toString();
+    router.replace(queryString ? `${pathname}?${queryString}` : pathname);
+  }, [
+    debouncedSearch,
+    pathname,
+    router,
+    searchInput,
+    searchParams,
+    urlSearch,
+  ]);
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingRole, setEditingRole] = useState<EditableRole | null>(null);
@@ -79,11 +112,11 @@ export function useRolesController(): RolesViewModel {
   const [selectedOrganizationId, setSelectedOrganizationId] = useState("");
 
   const queryParams = useMemo(() => {
-    const p: RolesListParams = { page: urlPage, limit: 50 };
-    if (debouncedSearch) p.search = debouncedSearch;
-    if (urlScope) p.scope = urlScope;
-    if (urlOrgId) p.organizationId = urlOrgId;
-    return p;
+    const params: RolesListParams = { page: urlPage, limit: 50 };
+    if (debouncedSearch) params.search = debouncedSearch;
+    if (urlScope) params.scope = urlScope;
+    if (urlOrgId) params.organizationId = urlOrgId;
+    return params;
   }, [urlPage, debouncedSearch, urlScope, urlOrgId]);
 
   const roles = useRolesQuery(queryParams);
@@ -130,8 +163,8 @@ export function useRolesController(): RolesViewModel {
         next.set(key, value);
       }
     }
-    const qs = next.toString();
-    router.replace(qs ? `${pathname}?${qs}` : pathname);
+    const queryString = next.toString();
+    router.replace(queryString ? `${pathname}?${queryString}` : pathname);
   };
 
   const handlePageChange = (page: number) => {
@@ -142,7 +175,9 @@ export function useRolesController(): RolesViewModel {
     setSearchInput(value);
   };
 
-  const handleScopeFilterChange = (value: 'platform' | 'organization' | undefined) => {
+  const handleScopeFilterChange = (
+    value: "platform" | "organization" | undefined,
+  ) => {
     patchParams({ scope: value || undefined, page: undefined });
   };
 
@@ -229,7 +264,11 @@ export function useRolesController(): RolesViewModel {
     scopeFilter: urlScope,
     onScopeFilterChange: handleScopeFilterChange,
     organizationFilter: urlOrgId,
-    onOrganizationFilterChange: (value) => patchParams({ organizationId: value || undefined, page: undefined }),
+    onOrganizationFilterChange: (value) =>
+      patchParams({
+        organizationId: value || undefined,
+        page: undefined,
+      }),
     isLoading: roles.isLoading,
     isRefreshing: roles.isFetching || permissionCatalog.isFetching,
     isError,
