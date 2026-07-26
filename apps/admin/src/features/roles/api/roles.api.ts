@@ -15,6 +15,25 @@ interface RoleSaveResult {
   data: EditableRole & { permissions: PermissionDto[] };
 }
 
+export interface RolesListParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  organizationId?: string;
+  scope?: string;
+}
+
+function buildRolesListPath(params: RolesListParams): string {
+  const searchParams = new URLSearchParams();
+  if (params.page && params.page > 1) searchParams.set("page", String(params.page));
+  if (params.limit && params.limit !== 50) searchParams.set("limit", String(params.limit));
+  if (params.search) searchParams.set("search", params.search);
+  if (params.organizationId) searchParams.set("organizationId", params.organizationId);
+  if (params.scope) searchParams.set("scope", params.scope);
+  const qs = searchParams.toString();
+  return qs ? `${bffPath("/api/v1/admin/roles")}?${qs}` : bffPath("/api/v1/admin/roles");
+}
+
 function buildRolePayload(input: RoleForm) {
   return {
     name: input.name,
@@ -25,9 +44,9 @@ function buildRolePayload(input: RoleForm) {
 }
 
 export const rolesApi = {
-  list() {
+  list(params?: RolesListParams) {
     return webFetch<ListResponse<ManagedRoleDto>>(
-      bffPath("/api/v1/admin/roles"),
+      params ? buildRolesListPath(params) : bffPath("/api/v1/admin/roles"),
     );
   },
 

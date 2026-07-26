@@ -160,7 +160,7 @@ export function RolesListView(vm: RolesViewModel) {
                       Custom roles
                     </span>
                     <span className="ml-auto text-xs text-muted-foreground">
-                      {pagination.total}
+                      {customRoles.length}
                     </span>
                   </div>
                   {customRoles.map((role) => (
@@ -178,15 +178,15 @@ export function RolesListView(vm: RolesViewModel) {
                       onDelete={onRequestDelete}
                     />
                   ))}
-                  <Pagination
-                    page={pagination.page}
-                    pageSize={pagination.pageSize}
-                    totalPages={pagination.totalPages}
-                    total={pagination.total}
-                    onPageChange={pagination.onPageChange}
-                  />
                 </div>
               )}
+              <Pagination
+                page={pagination.page}
+                pageSize={pagination.pageSize}
+                totalPages={pagination.totalPages}
+                total={pagination.total}
+                onPageChange={pagination.onPageChange}
+              />
             </div>
           )}
         </CardContent>

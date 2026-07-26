@@ -1,4 +1,8 @@
-import { allSeedPermissionNames, PLATFORM_RESOURCES, ROLE_NAMES } from '@repo/api-core';
+import {
+  allSeedPermissionNames,
+  RESOURCE_SCOPE,
+  ROLE_NAMES,
+} from '@repo/api-core';
 
 export interface RoleSeedEntry {
   name: string;
@@ -23,13 +27,11 @@ export const ROLE_SEED_ENTRIES: RoleSeedEntry[] = [
   { name: ROLE_NAMES.USER, description: 'Standard user role', isSystem: true },
 ];
 
-const PLATFORM_SCOPE_CATALOG = new Set<string>(PLATFORM_RESOURCES as readonly string[]);
-
 function scopeForPermission(name: string): 'platform' | 'organization' {
   const dot = name.indexOf('.');
-  return dot !== -1 && PLATFORM_SCOPE_CATALOG.has(name.slice(0, dot))
-    ? 'platform'
-    : 'organization';
+  if (dot === -1) return 'platform';
+  const resource = name.slice(0, dot);
+  return (RESOURCE_SCOPE as Record<string, 'platform' | 'organization'>)[resource] ?? 'platform';
 }
 
 export const PERMISSION_SEED_ENTRIES: PermissionSeedEntry[] =

@@ -1,6 +1,7 @@
 import { sql } from 'drizzle-orm';
 import {
   boolean,
+  check,
   index,
   pgTable,
   primaryKey,
@@ -47,7 +48,9 @@ export const permissions = pgTable('permissions', {
   isSystem: boolean('is_system').notNull().default(false),
   scope: text('scope').notNull(),
   ...timestamps,
-});
+}, (table) => [
+  check('permissions_scope_check', sql`${table.scope} IN ('platform', 'organization')`),
+]);
 
 export const userRoles = pgTable(
   'user_roles',

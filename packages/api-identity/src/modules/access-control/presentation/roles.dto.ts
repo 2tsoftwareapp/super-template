@@ -120,35 +120,6 @@ export class ReplaceRolePermissionsDto {
   permissionIds: string[];
 }
 
-export class CreatePermissionDto {
-  @ApiProperty()
-  @IsString()
-  @MinLength(3)
-  @MaxLength(120)
-  name: string;
-
-  @ApiPropertyOptional({ nullable: true })
-  @IsOptional()
-  @IsString()
-  @MaxLength(500)
-  description?: string | null;
-}
-
-export class UpdatePermissionDto {
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsString()
-  @MinLength(3)
-  @MaxLength(120)
-  name?: string;
-
-  @ApiPropertyOptional({ nullable: true })
-  @IsOptional()
-  @IsString()
-  @MaxLength(500)
-  description?: string | null;
-}
-
 export class ListRolesQueryDto {
   @ApiPropertyOptional({ default: 1 })
   @IsOptional()

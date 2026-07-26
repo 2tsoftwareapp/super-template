@@ -13,7 +13,7 @@ import {
   roles,
   userRoles,
 } from '@repo/api-database';
-import { and, count, eq, ilike, inArray, isNotNull, isNull, or, type SQL } from 'drizzle-orm';
+import { and, count, eq, ilike, inArray, isNotNull, isNull, or, sql, type SQL } from 'drizzle-orm';
 
 import type { AccessControlRepositoryPort, CreatePermissionValues, RoleRecord } from '../application/access-control.repository.port';
 
@@ -315,7 +315,10 @@ export class AccessControlRepository implements AccessControlRepositoryPort {
     await executor
       .insert(permissions)
       .values(permissionValues)
-      .onConflictDoNothing();
+      .onConflictDoUpdate({
+        target: permissions.name,
+        set: { scope: sql`EXCLUDED.scope` },
+      });
     return this.findPermissionsByNames(
       permissionValues.map((permission) => permission.name),
       executor,

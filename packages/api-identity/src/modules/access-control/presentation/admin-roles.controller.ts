@@ -61,12 +61,15 @@ export class AdminRolesController {
       scope: query.scope,
     });
 
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 50;
     return {
       data: result.rows,
       meta: {
         total: result.total,
-        page: query.page ?? 1,
-        limit: query.limit ?? 50,
+        page,
+        limit,
+        totalPages: Math.ceil(result.total / limit),
       },
     };
   }

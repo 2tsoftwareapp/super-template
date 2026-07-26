@@ -5,8 +5,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
-const CUSTOM_ROLES_PAGE_SIZE = 20;
-
 import type {
   EditableRole,
   ManagedRoleDto,
@@ -32,22 +30,15 @@ import {
 } from "@/features/roles/model/roles.filtering";
 import { selectRoleManagementPermissions } from "@/features/roles/model/roles.permissions";
 import { useSession } from "@/hooks/use-session";
+import { usePathname, useRouter, useSearchParams } from "@/i18n/navigation";
 
 export type { RolesViewModel };
 
-/**
- * Orchestration hook for the roles management screen.
- *
- * Flow:
- *   1. Session → role/permission booleans (incl. SUPER_ADMIN).
- *   2. Parallel roles + permission catalog (+ orgs when super admin).
- *   3. Client-side search filter over merged system/custom roles.
- *   4. Drawer create/edit and delete confirm with toast on mutation errors.
- * Owns: roles/permissions queries, drawer save/delete, client search.
- * Does not own: role tree / form drawer markup.
- */
 export function useRolesController(): RolesViewModel {
   const queryClient = useQueryClient();
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const session = useSession();
   const sessionData = session.data?.data;
   const permissions = sessionData?.permissions ?? [];
@@ -57,14 +48,25 @@ export function useRolesController(): RolesViewModel {
       sessionData?.user?.roles,
     );
 
-  const [search, setSearch] = useState("");
-  const [customPage, setCustomPage] = useState(1);
+  const urlPage = Math.max(1, Number(searchParams.get("page")) || 1);
+  const urlSearch = searchParams.get("search") ?? "";
+  const urlScope = searchParams.get("scope") ?? undefined;
+  const urlOrgId = searchParams.get("organizationId") ?? undefined;
+
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingRole, setEditingRole] = useState<EditableRole | null>(null);
   const [deletingRole, setDeletingRole] = useState<ManagedRoleDto | null>(null);
   const [selectedOrganizationId, setSelectedOrganizationId] = useState("");
 
-  const roles = useRolesQuery();
+  const queryParams = useMemo(() => ({
+    page: urlPage,
+    limit: 50,
+    search: urlSearch || undefined,
+    scope: urlScope,
+    organizationId: urlOrgId || undefined,
+  }), [urlPage, urlSearch, urlScope, urlOrgId]);
+
+  const roles = useRolesQuery(queryParams);
   const permissionCatalog = usePermissionCatalogQuery();
   const deleteRole = useDeleteRoleMutation();
   const saveRole = useSaveRoleMutation({
@@ -76,38 +78,48 @@ export function useRolesController(): RolesViewModel {
     enabled: isSuperAdmin,
   });
 
+  const rolesData = roles.data?.data ?? [];
+  const meta = roles.data?.meta;
+
   const { systemRoles, customRoles } = useMemo(() => {
-    const all = roles.data?.data ?? [];
+    const all = rolesData;
     return {
       systemRoles: mergeSystemRoles(all.filter((role) => role.isSystem)),
       customRoles: mergeCustomRoles(all.filter((role) => !role.isSystem)),
     };
-  }, [roles.data?.data]);
+  }, [rolesData]);
 
   const filteredSystem = useMemo(
-    () => filterRolesBySearch(systemRoles, search),
-    [systemRoles, search],
+    () => filterRolesBySearch(systemRoles, urlSearch),
+    [systemRoles, urlSearch],
   );
   const filteredCustom = useMemo(
-    () => filterRolesBySearch(customRoles, search),
-    [customRoles, search],
+    () => filterRolesBySearch(customRoles, urlSearch),
+    [customRoles, urlSearch],
   );
 
-  const paginatedCustom = useMemo(() => {
-    const start = (customPage - 1) * CUSTOM_ROLES_PAGE_SIZE;
-    return filteredCustom.slice(start, start + CUSTOM_ROLES_PAGE_SIZE);
-  }, [filteredCustom, customPage]);
+  const total = meta?.total ?? 0;
+  const totalPages = meta?.totalPages ?? 1;
 
-  const customTotalPages = Math.max(1, Math.ceil(filteredCustom.length / CUSTOM_ROLES_PAGE_SIZE));
-
-  const handlePageChange = (page: number) => {
-    setCustomPage(page);
+  const patchParams = (patch: Record<string, string | undefined>) => {
+    const next = new URLSearchParams(searchParams.toString());
+    for (const [key, value] of Object.entries(patch)) {
+      if (value === undefined || value === "") {
+        next.delete(key);
+      } else {
+        next.set(key, value);
+      }
+    }
+    const qs = next.toString();
+    router.replace(qs ? `${pathname}?${qs}` : pathname);
   };
 
-  // Reset to page 1 when search changes
+  const handlePageChange = (page: number) => {
+    patchParams({ page: page > 1 ? String(page) : undefined });
+  };
+
   const handleSearchChange = (value: string) => {
-    setSearch(value);
-    setCustomPage(1);
+    patchParams({ search: value || undefined, page: undefined });
   };
 
   const handleSaveRole = (values: {
@@ -173,7 +185,7 @@ export function useRolesController(): RolesViewModel {
 
   const anyRoles = systemRoles.length > 0 || customRoles.length > 0;
   const noResults =
-    Boolean(search) &&
+    Boolean(urlSearch) &&
     filteredSystem.length === 0 &&
     filteredCustom.length === 0;
 
@@ -188,7 +200,7 @@ export function useRolesController(): RolesViewModel {
     canUpdate,
     canDelete,
     isSuperAdmin,
-    search,
+    search: urlSearch,
     onSearchChange: handleSearchChange,
     isLoading: roles.isLoading,
     isRefreshing: roles.isFetching || permissionCatalog.isFetching,
@@ -196,14 +208,14 @@ export function useRolesController(): RolesViewModel {
     onRetry: handleRetry,
     onRefresh: handleRetry,
     systemRoles: filteredSystem,
-    customRoles: paginatedCustom,
+    customRoles: filteredCustom,
     anyRoles,
     noResults,
     pagination: {
-      page: customPage,
-      pageSize: CUSTOM_ROLES_PAGE_SIZE,
-      totalPages: customTotalPages,
-      total: filteredCustom.length,
+      page: urlPage,
+      pageSize: 50,
+      totalPages,
+      total,
       onPageChange: handlePageChange,
     },
     deletingRoleId: deletingRole?.id ?? null,
