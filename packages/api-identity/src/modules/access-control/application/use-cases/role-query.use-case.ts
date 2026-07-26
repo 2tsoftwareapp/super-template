@@ -13,6 +13,14 @@ import {
   type AccessControlRepositoryPort,
 } from '../access-control.repository.port';
 
+export interface ListRolesParams {
+  page: number;
+  limit: number;
+  organizationId?: string | undefined;
+  search?: string | undefined;
+  scope?: 'platform' | 'organization' | undefined;
+}
+
 @Injectable()
 export class RoleQueryUseCase {
   constructor(
@@ -90,15 +98,25 @@ export class RoleQueryUseCase {
     );
   }
 
-  async listRoles(actor?: AuthenticatedRequestUser): Promise<RoleView[]> {
-    const roles = actor?.roles.includes(ROLE_NAMES.SUPER_ADMIN)
-      ? await this.accessControlRepository.findAllRoles()
-      : actor
-        ? await this.accessControlRepository.findManageableRolesForActor(
-            actor.organizationId,
-            false,
-          )
-        : await this.accessControlRepository.findAllRoles();
+  async listRoles(
+    actor?: AuthenticatedRequestUser,
+    params?: ListRolesParams,
+  ): Promise<{ rows: RoleView[]; total: number }> {
+    const isSuperAdmin = actor?.roles.includes(ROLE_NAMES.SUPER_ADMIN) ?? false;
+
+    const { rows: roles, total } = await this.accessControlRepository.findRolesPaginated({
+      page: params?.page ?? 1,
+      limit: params?.limit ?? 50,
+      organizationId: params?.organizationId,
+      search: params?.search,
+      scope: params?.scope,
+      manageableByOrg: isSuperAdmin ? undefined : (actor?.organizationId ?? null),
+    });
+
+    if (roles.length === 0) {
+      return { rows: [], total };
+    }
+
     const permissionRows =
       await this.accessControlRepository.findPermissionsForRoleIds(
         roles.map((role) => role.id),
@@ -112,17 +130,20 @@ export class RoleQueryUseCase {
         name: row.name,
         description: row.description,
         isSystem: row.isSystem,
-        scope: isPlatformPermission(row.name) ? 'platform' : 'organization',
+        scope: (row.scope ?? (isPlatformPermission(row.name) ? 'platform' : 'organization')) as 'platform' | 'organization',
       });
       permissionsByRoleId.set(row.roleId, existing);
     }
 
-    return roles.map((role) =>
-      this.accessControlMapper.toRoleView(
-        role,
-        permissionsByRoleId.get(role.id) ?? [],
+    return {
+      rows: roles.map((role) =>
+        this.accessControlMapper.toRoleView(
+          role,
+          permissionsByRoleId.get(role.id) ?? [],
+        ),
       ),
-    );
+      total,
+    };
   }
 
   async listPermissions(

@@ -13,13 +13,84 @@ import {
   roles,
   userRoles,
 } from '@repo/api-database';
-import { and, eq, inArray, isNull, or, type SQL } from 'drizzle-orm';
+import { and, count, eq, ilike, inArray, isNotNull, isNull, or, type SQL } from 'drizzle-orm';
 
 import type { AccessControlRepositoryPort, RoleRecord } from '../application/access-control.repository.port';
 
 @Injectable()
 export class AccessControlRepository implements AccessControlRepositoryPort {
   constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
+
+  async findRolesPaginated(
+    params: {
+      page: number;
+      limit: number;
+      organizationId?: string | undefined;
+      search?: string | undefined;
+      scope?: 'platform' | 'organization' | undefined;
+      manageableByOrg?: string | null | undefined;
+    },
+    executor: DatabaseExecutor = this.database,
+  ): Promise<{ rows: RoleRecord[]; total: number }> {
+    const filters: SQL[] = [];
+
+    if (params.manageableByOrg !== undefined) {
+      const roleNames = [...FIXED_ROLE_NAMES];
+      const roleNameMatch = inArray(roles.name, roleNames);
+      const platformMatch = isNull(roles.organizationId);
+      const userMatch = and(eq(roles.name, ROLE_NAMES.USER), isNull(roles.organizationId));
+      const orgMatch = params.manageableByOrg !== null
+        ? and(eq(roles.name, ROLE_NAMES.ADMIN), eq(roles.organizationId, params.manageableByOrg))
+        : undefined;
+      const customMatch = params.manageableByOrg !== null
+        ? and(eq(roles.isSystem, false), eq(roles.organizationId, params.manageableByOrg))
+        : undefined;
+      filters.push(
+        or(roleNameMatch, platformMatch, userMatch, orgMatch, customMatch)!,
+      );
+    }
+
+    if (params.organizationId) {
+      filters.push(eq(roles.organizationId, params.organizationId));
+    }
+
+    if (params.scope === 'platform') {
+      filters.push(isNull(roles.organizationId));
+    } else if (params.scope === 'organization') {
+      filters.push(isNotNull(roles.organizationId));
+    }
+
+    if (params.search) {
+      filters.push(
+        or(
+          ilike(roles.name, `%${params.search}%`),
+          ilike(roles.description ?? '', `%${params.search}%`),
+        )!,
+      );
+    }
+
+    const where = filters.length > 0 ? and(...filters) : undefined;
+    const offset = (params.page - 1) * params.limit;
+
+    const [rows, totals] = await Promise.all([
+      executor
+        .select()
+        .from(roles)
+        .where(where)
+        .orderBy(roles.name)
+        .limit(params.limit)
+        .offset(offset),
+      executor
+        .select({ total: count() })
+        .from(roles)
+        .where(where),
+    ]);
+
+    return {
+      rows: rows as RoleRecord[],
+      total: Number(totals[0]?.total ?? 0),
+    };
+  }
 
   async findAllRoles(executor: DatabaseExecutor = this.database) {
     return executor.select().from(roles).orderBy(roles.name);

@@ -11,6 +11,7 @@ import {
   Patch,
   Post,
   Put,
+  Query,
   Req,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
@@ -46,11 +47,32 @@ export class AdminRolesController {
   @Get()
   @Authorize({ permissions: [perm('roles', ACTION.READ)] })
   @ApiArrayResponse(RoleDto)
-  async listRoles(@CurrentUser() actor: AuthenticatedRequestUser) {
-    const roles = await this.roleQuery.listRoles(actor);
+  async listRoles(
+    @CurrentUser() actor: AuthenticatedRequestUser,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('organizationId') organizationId?: string,
+    @Query('search') search?: string,
+    @Query('scope') scope?: string,
+  ) {
+    const pageNum = Math.max(1, Number(page) || 1);
+    const limitNum = Math.min(100, Math.max(1, Number(limit) || 50));
+
+    const result = await this.roleQuery.listRoles(actor, {
+      page: pageNum,
+      limit: limitNum,
+      organizationId: organizationId || undefined,
+      search: search || undefined,
+      scope: scope as 'platform' | 'organization' | undefined,
+    });
 
     return {
-      data: roles,
+      data: result.rows,
+      meta: {
+        total: result.total,
+        page: pageNum,
+        limit: limitNum,
+      },
     };
   }
 

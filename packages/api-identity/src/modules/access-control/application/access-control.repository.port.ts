@@ -189,6 +189,17 @@ export interface AccessControlRepositoryPort {
   findAllRoles(
     executor?: TransactionExecutor,
   ): Promise<RoleRecord[]>;
+  findRolesPaginated(
+    params: {
+      page: number;
+      limit: number;
+      organizationId?: string | undefined;
+      search?: string | undefined;
+      scope?: 'platform' | 'organization' | undefined;
+      manageableByOrg?: string | null | undefined;
+    },
+    executor?: TransactionExecutor,
+  ): Promise<{ rows: RoleRecord[]; total: number }>;
   findManageableRolesForActor(
     organizationId: string | null,
     includePlatformRoles: boolean,
