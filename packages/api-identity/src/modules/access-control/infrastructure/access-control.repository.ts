@@ -15,7 +15,7 @@ import {
 } from '@repo/api-database';
 import { and, count, eq, ilike, inArray, isNotNull, isNull, or, type SQL } from 'drizzle-orm';
 
-import type { AccessControlRepositoryPort, RoleRecord } from '../application/access-control.repository.port';
+import type { AccessControlRepositoryPort, CreatePermissionValues, RoleRecord } from '../application/access-control.repository.port';
 
 @Injectable()
 export class AccessControlRepository implements AccessControlRepositoryPort {
@@ -35,19 +35,18 @@ export class AccessControlRepository implements AccessControlRepositoryPort {
     const filters: SQL[] = [];
 
     if (params.manageableByOrg !== undefined) {
-      const roleNames = [...FIXED_ROLE_NAMES];
-      const roleNameMatch = inArray(roles.name, roleNames);
-      const platformMatch = isNull(roles.organizationId);
-      const userMatch = and(eq(roles.name, ROLE_NAMES.USER), isNull(roles.organizationId));
-      const orgMatch = params.manageableByOrg !== null
-        ? and(eq(roles.name, ROLE_NAMES.ADMIN), eq(roles.organizationId, params.manageableByOrg))
-        : undefined;
-      const customMatch = params.manageableByOrg !== null
-        ? and(eq(roles.isSystem, false), eq(roles.organizationId, params.manageableByOrg))
-        : undefined;
-      filters.push(
-        or(roleNameMatch, platformMatch, userMatch, orgMatch, customMatch)!,
-      );
+      const filtersOr: SQL[] = [
+        and(eq(roles.name, ROLE_NAMES.USER), isNull(roles.organizationId))!,
+      ];
+      if (params.manageableByOrg !== null) {
+        filtersOr.push(
+          and(eq(roles.name, ROLE_NAMES.ADMIN), eq(roles.organizationId, params.manageableByOrg))!,
+        );
+        filtersOr.push(
+          and(eq(roles.isSystem, false), eq(roles.organizationId, params.manageableByOrg))!,
+        );
+      }
+      filters.push(or(...filtersOr)!);
     }
 
     if (params.organizationId) {
@@ -77,7 +76,7 @@ export class AccessControlRepository implements AccessControlRepositoryPort {
         .select()
         .from(roles)
         .where(where)
-        .orderBy(roles.name)
+        .orderBy(roles.name, roles.id)
         .limit(params.limit)
         .offset(offset),
       executor
@@ -286,22 +285,15 @@ export class AccessControlRepository implements AccessControlRepositoryPort {
     values: Partial<typeof roles.$inferInsert>,
     executor: DatabaseExecutor = this.database,
   ) {
-    try {
-      const [role] = await executor
-        .update(roles)
-        .set({
-          ...values,
-          updatedAt: new Date(),
-        })
-        .where(eq(roles.id, roleId))
-        .returning();
-      return role ?? null;
-    } catch (error: any) {
-      if (error?.code === '23505') {
-        return null;
-      }
-      throw error;
-    }
+    const [role] = await executor
+      .update(roles)
+      .set({
+        ...values,
+        updatedAt: new Date(),
+      })
+      .where(eq(roles.id, roleId))
+      .returning();
+    return role ?? null;
   }
 
   async deleteRole(
@@ -316,12 +308,21 @@ export class AccessControlRepository implements AccessControlRepositoryPort {
       name: string;
       description: string;
       isSystem?: boolean;
+      scope?: string;
     }[],
     executor: DatabaseExecutor = this.database,
   ) {
+    const isPlatformPermission = (name: string) => {
+      const prefix = name.split('.')[0]?.toLowerCase();
+      return prefix !== undefined && ['settings', 'audit', 'mail', 'jobs'].includes(prefix);
+    };
+    const values = permissionValues.map((p) => ({
+      ...p,
+      scope: p.scope ?? (isPlatformPermission(p.name) ? 'platform' : 'organization'),
+    }));
     await executor
       .insert(permissions)
-      .values(permissionValues)
+      .values(values)
       .onConflictDoNothing();
     return this.findPermissionsByNames(
       permissionValues.map((permission) => permission.name),
@@ -629,12 +630,20 @@ export class AccessControlRepository implements AccessControlRepositoryPort {
   }
 
   async createPermission(
-    values: typeof permissions.$inferInsert,
+    values: CreatePermissionValues,
     executor: DatabaseExecutor = this.database,
   ) {
+    const isPlatformPermission = (name: string) => {
+      const prefix = name.split('.')[0]?.toLowerCase();
+      return prefix !== undefined && ['settings', 'audit', 'mail', 'jobs'].includes(prefix);
+    };
+    const dbValues = {
+      ...values,
+      scope: values.scope ?? (isPlatformPermission(values.name) ? 'platform' : 'organization'),
+    };
     const [permission] = await executor
       .insert(permissions)
-      .values(values)
+      .values(dbValues)
       .returning();
     return permission ?? null;
   }

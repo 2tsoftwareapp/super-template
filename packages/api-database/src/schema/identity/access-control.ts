@@ -33,6 +33,9 @@ export const roles = pgTable(
     uniqueIndex('roles_organization_name_lower_unique')
       .on(table.organizationId, sql`LOWER(${table.name})`)
       .where(sql`${table.isSystem} = false`),
+    uniqueIndex('roles_org_system_name_unique')
+      .on(table.organizationId, sql`LOWER(${table.name})`)
+      .where(sql`${table.isSystem} = true AND ${table.organizationId} IS NOT NULL`),
     index('roles_organization_id_idx').on(table.organizationId),
   ],
 );
@@ -42,7 +45,7 @@ export const permissions = pgTable('permissions', {
   name: text('name').notNull().unique(),
   description: text('description'),
   isSystem: boolean('is_system').notNull().default(false),
-  scope: text('scope'),
+  scope: text('scope').notNull(),
   ...timestamps,
 });
 

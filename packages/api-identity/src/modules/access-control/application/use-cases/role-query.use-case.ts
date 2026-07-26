@@ -2,7 +2,7 @@ import type { AuthenticatedRequestUser } from '@repo/api-core';
 import type { TransactionExecutor } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { AppError, ERROR_CODES, isPlatformPermission } from '@repo/api-core';
+import { AppError, ERROR_CODES } from '@repo/api-core';
 
 import type { PermissionView, RoleView } from '../access-control.types';
 
@@ -104,6 +104,14 @@ export class RoleQueryUseCase {
   ): Promise<{ rows: RoleView[]; total: number }> {
     const isSuperAdmin = actor?.roles.includes(ROLE_NAMES.SUPER_ADMIN) ?? false;
 
+    if (!isSuperAdmin && params?.organizationId && params.organizationId !== actor?.organizationId) {
+      throw new AppError(
+        ERROR_CODES.AUTH_FORBIDDEN,
+        'You can only list roles within your own organization',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
     const { rows: roles, total } = await this.accessControlRepository.findRolesPaginated({
       page: params?.page ?? 1,
       limit: params?.limit ?? 50,
@@ -130,7 +138,7 @@ export class RoleQueryUseCase {
         name: row.name,
         description: row.description,
         isSystem: row.isSystem,
-        scope: (row.scope ?? (isPlatformPermission(row.name) ? 'platform' : 'organization')) as 'platform' | 'organization',
+        scope: row.scope as 'platform' | 'organization',
       });
       permissionsByRoleId.set(row.roleId, existing);
     }

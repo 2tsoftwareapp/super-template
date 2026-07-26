@@ -1,11 +1,12 @@
 -- L-002: Enforce user_roles.organization_id matches roles.organization_id.
--- Composite FK ensures org-scoped assignments have a matching org-scoped role.
--- When organization_id is NULL (platform role), MATCH SIMPLE skips the check.
--- Existing invalid rows are deleted before the constraint is added.
+-- A BEFORE trigger validates scope consistency because a composite FK would
+-- require a unique constraint on roles(id, organization_id) and MATCH SIMPLE
+-- would skip null-org checks anyway.
+-- Existing invalid rows are cleaned up before the trigger is applied.
 
 --> statement-breakpoint
 
--- Remove any dangling assignments where role does not exist
+-- Remove dangling assignments where role does not exist
 DELETE FROM user_roles ur
 WHERE NOT EXISTS (SELECT 1 FROM roles r WHERE r.id = ur.role_id);
 
@@ -19,14 +20,38 @@ WHERE ur.role_id = r.id
 
 --> statement-breakpoint
 
--- Drop old single-column FK first
-ALTER TABLE user_roles DROP CONSTRAINT IF EXISTS user_roles_role_id_fkey;
+CREATE OR REPLACE FUNCTION check_user_role_scope()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  role_org_id text;
+BEGIN
+  SELECT r.organization_id INTO role_org_id
+  FROM roles r
+  WHERE r.id = NEW.role_id;
+
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'referenced role % does not exist', NEW.role_id
+      USING ERRCODE = '23503';
+  END IF;
+
+  IF NEW.organization_id IS DISTINCT FROM role_org_id THEN
+    RAISE EXCEPTION 'user_roles.organization_id must match roles.organization_id (expected %, got %)',
+      role_org_id, NEW.organization_id
+      USING ERRCODE = '23503';
+  END IF;
+
+  RETURN NEW;
+END;
+$$;
 
 --> statement-breakpoint
 
--- Add composite FK on (role_id, organization_id) referencing roles(id, organization_id)
-ALTER TABLE user_roles
-  ADD CONSTRAINT user_roles_role_org_fkey
-  FOREIGN KEY (role_id, organization_id)
-  REFERENCES roles (id, organization_id)
-  ON DELETE CASCADE;
+DROP TRIGGER IF EXISTS trg_user_role_scope ON user_roles;
+
+--> statement-breakpoint
+
+CREATE TRIGGER trg_user_role_scope
+  BEFORE INSERT OR UPDATE ON user_roles
+  FOR EACH ROW EXECUTE FUNCTION check_user_role_scope();

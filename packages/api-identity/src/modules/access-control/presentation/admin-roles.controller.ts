@@ -29,6 +29,7 @@ import { RoleManagementUseCase } from '../application/use-cases/role-management.
 import { RoleQueryUseCase } from '../application/use-cases/role-query.use-case';
 import {
   CreateRoleDto,
+  ListRolesQueryDto,
   PermissionDto,
   ReplaceRolePermissionsDto,
   RoleDto,
@@ -49,29 +50,22 @@ export class AdminRolesController {
   @ApiArrayResponse(RoleDto)
   async listRoles(
     @CurrentUser() actor: AuthenticatedRequestUser,
-    @Query('page') page?: string,
-    @Query('limit') limit?: string,
-    @Query('organizationId') organizationId?: string,
-    @Query('search') search?: string,
-    @Query('scope') scope?: string,
+    @Query() query: ListRolesQueryDto,
   ) {
-    const pageNum = Math.max(1, Number(page) || 1);
-    const limitNum = Math.min(100, Math.max(1, Number(limit) || 50));
-
     const result = await this.roleQuery.listRoles(actor, {
-      page: pageNum,
-      limit: limitNum,
-      organizationId: organizationId || undefined,
-      search: search || undefined,
-      scope: scope as 'platform' | 'organization' | undefined,
+      page: query.page ?? 1,
+      limit: query.limit ?? 50,
+      organizationId: query.organizationId || undefined,
+      search: query.search || undefined,
+      scope: query.scope,
     });
 
     return {
       data: result.rows,
       meta: {
         total: result.total,
-        page: pageNum,
-        limit: limitNum,
+        page: query.page ?? 1,
+        limit: query.limit ?? 50,
       },
     };
   }

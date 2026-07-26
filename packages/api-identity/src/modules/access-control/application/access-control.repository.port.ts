@@ -36,6 +36,7 @@ export interface CreatePermissionValues {
   name: string;
   description: string;
   isSystem?: boolean;
+  scope?: string;
 }
 
 export interface UpdatePermissionValues {
@@ -58,6 +59,7 @@ export interface AccessControlRepositoryPort {
       name: string;
       description: string;
       isSystem?: boolean;
+      scope?: string;
     }[],
     executor?: TransactionExecutor,
   ): Promise<PermissionRecord[]>;

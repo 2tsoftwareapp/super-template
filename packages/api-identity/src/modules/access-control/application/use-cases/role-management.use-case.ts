@@ -7,7 +7,6 @@ import {
   AUDIT_WRITER,
   ERROR_CODES,
   isFixedRoleName,
-  isPlatformPermission,
   permissionNamesForRole,
   ROLE_NAMES,
   TRANSACTION_PORT,
@@ -60,7 +59,7 @@ export class RoleManagementUseCase {
         executor,
       );
     const permissions = allPermissions.filter(
-      (p) => !isPlatformPermission(p.name),
+      (p) => p.scope !== 'platform',
     );
     const role =
       await this.accessControlRepository.ensureOrganizationSystemRole(
@@ -203,77 +202,66 @@ export class RoleManagementUseCase {
     command: UpdateRoleCommand,
     requestContext?: RequestContext,
   ): Promise<RoleView> {
-    return this.transactionPort.run(async (tx) => {
-      const role = await this.accessControlRepository.findRoleById(roleId, tx);
+    try {
+      return await this.transactionPort.run(async (tx) => {
+        const role = await this.accessControlRepository.findRoleById(roleId, tx);
 
-      if (!role) {
-        throw new AppError(
-          ERROR_CODES.ROLE_NOT_FOUND,
-          'Role not found',
-          HttpStatus.NOT_FOUND,
-        );
-      }
-
-      assertCanModifyCustomRole(actor, role);
-
-      const newName = command.name !== undefined
-        ? normalizeRoleName(command.name)
-        : undefined;
-
-      if (newName !== undefined && newName !== role.name) {
-        if (isFixedRoleName(newName)) {
+        if (!role) {
           throw new AppError(
-            ERROR_CODES.VALIDATION_FAILED,
-            'Custom roles cannot use system role names',
-            HttpStatus.BAD_REQUEST,
+            ERROR_CODES.ROLE_NOT_FOUND,
+            'Role not found',
+            HttpStatus.NOT_FOUND,
           );
         }
 
-        const existingRole = await this.accessControlRepository.findRoleByName(
-          newName,
-          role.organizationId,
+        assertCanModifyCustomRole(actor, role);
+
+        const newName = command.name !== undefined
+          ? normalizeRoleName(command.name)
+          : undefined;
+
+        if (newName !== undefined && newName !== role.name) {
+          if (isFixedRoleName(newName)) {
+            throw new AppError(
+              ERROR_CODES.VALIDATION_FAILED,
+              'Custom roles cannot use system role names',
+              HttpStatus.BAD_REQUEST,
+            );
+          }
+
+          const existingRole = await this.accessControlRepository.findRoleByName(
+            newName,
+            role.organizationId,
+            tx,
+          );
+
+          if (existingRole && existingRole.id !== role.id) {
+            throw new AppError(
+              ERROR_CODES.RESOURCE_CONFLICT,
+              'A role with this name already exists in the organization',
+              HttpStatus.CONFLICT,
+            );
+          }
+        }
+
+        const updatedRole = await this.accessControlRepository.updateRole(
+          roleId,
+          {
+            ...(newName !== undefined ? { name: newName } : {}),
+            ...(command.description !== undefined
+              ? { description: command.description }
+              : {}),
+          },
           tx,
         );
 
-        if (existingRole && existingRole.id !== role.id) {
+        if (!updatedRole) {
           throw new AppError(
-            ERROR_CODES.RESOURCE_CONFLICT,
-            'A role with this name already exists in the organization',
-            HttpStatus.CONFLICT,
+            ERROR_CODES.INTERNAL_ERROR,
+            'Custom role could not be updated',
+            HttpStatus.INTERNAL_SERVER_ERROR,
           );
         }
-      }
-
-      const updatedRole = await this.accessControlRepository.updateRole(
-        roleId,
-        {
-          ...(newName !== undefined ? { name: newName } : {}),
-          ...(command.description !== undefined
-            ? { description: command.description }
-            : {}),
-        },
-        tx,
-      );
-
-      if (!updatedRole) {
-        const conflict = newName
-          ? await this.accessControlRepository.findRoleByName(
-              newName, role.organizationId, tx,
-            )
-          : undefined;
-        if (conflict && conflict.id !== roleId) {
-          throw new AppError(
-            ERROR_CODES.RESOURCE_CONFLICT,
-            'A role with this name already exists in the organization',
-            HttpStatus.CONFLICT,
-          );
-        }
-        throw new AppError(
-          ERROR_CODES.INTERNAL_ERROR,
-          'Custom role could not be updated',
-          HttpStatus.INTERNAL_SERVER_ERROR,
-        );
-      }
 
       let permissions: PermissionView[] = [];
 
@@ -325,7 +313,17 @@ export class RoleManagementUseCase {
         ),
       );
     });
+  } catch (error: any) {
+    if (error?.code === '23505') {
+      throw new AppError(
+        ERROR_CODES.RESOURCE_CONFLICT,
+        'A role with this name already exists in the organization',
+        HttpStatus.CONFLICT,
+      );
+    }
+    throw error;
   }
+}
 
   async replaceCustomRolePermissions(
     actor: AuthenticatedRequestUser,
@@ -429,7 +427,7 @@ export class RoleManagementUseCase {
     const isOrgScoped = targetOrganizationId !== null;
 
     for (const permission of permissions) {
-      if (isOrgScoped && isPlatformPermission(permission.name)) {
+      if (isOrgScoped && permission.scope === 'platform') {
         throw new AppError(
           ERROR_CODES.AUTH_FORBIDDEN,
           `Permission "${permission.name}" is platform-scoped and cannot be assigned to organization roles`,

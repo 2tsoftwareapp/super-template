@@ -1,5 +1,6 @@
 import {
   allSeedPermissionNames,
+  isPlatformPermission,
   ROLE_NAMES,
 } from '@repo/api-core';
 
@@ -13,6 +14,7 @@ export interface PermissionSeedEntry {
   name: string;
   description: string;
   isSystem: boolean;
+  scope: 'platform' | 'organization';
 }
 
 export const ROLE_SEED_ENTRIES: RoleSeedEntry[] = [
@@ -30,4 +32,5 @@ export const PERMISSION_SEED_ENTRIES: PermissionSeedEntry[] =
     name,
     description: name,
     isSystem: true,
+    scope: isPlatformPermission(name) ? 'platform' : 'organization',
   }));

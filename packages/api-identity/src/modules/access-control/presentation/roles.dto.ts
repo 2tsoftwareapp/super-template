@@ -1,14 +1,18 @@
-import { Transform, Type } from 'class-transformer';
+import { Transform } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { SYSTEM_SCOPE } from '@repo/api-core';
 import {
   ArrayMinSize,
   ArrayUnique,
   IsArray,
+  IsIn,
+  IsNumber,
   IsOptional,
   IsString,
   IsUUID,
+  Max,
   MaxLength,
+  Min,
   MinLength,
 } from 'class-validator';
 
@@ -143,4 +147,37 @@ export class UpdatePermissionDto {
   @IsString()
   @MaxLength(500)
   description?: string | null;
+}
+
+export class ListRolesQueryDto {
+  @ApiPropertyOptional({ default: 1 })
+  @IsOptional()
+  @Transform(({ value }) => (value !== undefined ? Number(value) : 1))
+  @IsNumber()
+  @Min(1)
+  page?: number = 1;
+
+  @ApiPropertyOptional({ default: 50 })
+  @IsOptional()
+  @Transform(({ value }) => (value !== undefined ? Number(value) : 50))
+  @IsNumber()
+  @Min(1)
+  @Max(100)
+  limit?: number = 50;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsUUID()
+  organizationId?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  search?: string;
+
+  @ApiPropertyOptional({ enum: ['platform', 'organization'] })
+  @IsOptional()
+  @IsIn(['platform', 'organization'])
+  scope?: 'platform' | 'organization';
 }
