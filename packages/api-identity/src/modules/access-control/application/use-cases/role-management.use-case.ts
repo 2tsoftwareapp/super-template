@@ -314,7 +314,10 @@ export class RoleManagementUseCase {
       );
     });
   } catch (error: any) {
-    if (error?.code === '23505') {
+    if (
+      error?.code === '23505' &&
+      error?.constraint === 'roles_organization_name_lower_unique'
+    ) {
       throw new AppError(
         ERROR_CODES.RESOURCE_CONFLICT,
         'A role with this name already exists in the organization',

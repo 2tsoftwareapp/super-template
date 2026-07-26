@@ -6,7 +6,7 @@ import {
   ArrayUnique,
   IsArray,
   IsIn,
-  IsNumber,
+  IsInt,
   IsOptional,
   IsString,
   IsUUID,
@@ -153,14 +153,14 @@ export class ListRolesQueryDto {
   @ApiPropertyOptional({ default: 1 })
   @IsOptional()
   @Transform(({ value }) => (value !== undefined ? Number(value) : 1))
-  @IsNumber()
+  @IsInt()
   @Min(1)
   page?: number = 1;
 
   @ApiPropertyOptional({ default: 50 })
   @IsOptional()
   @Transform(({ value }) => (value !== undefined ? Number(value) : 50))
-  @IsNumber()
+  @IsInt()
   @Min(1)
   @Max(100)
   limit?: number = 50;

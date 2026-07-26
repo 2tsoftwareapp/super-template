@@ -26,20 +26,24 @@ FROM dupes;
 
 --> statement-breakpoint
 
--- 2. Rewire user_roles to the canonical role; skip if already present
-UPDATE user_roles ur
-SET role_id = d.keep_id
+-- 2. Insert canonical assignments from dedup, skip when PK already exists
+INSERT INTO user_roles (user_id, role_id, organization_id, assigned_at)
+SELECT DISTINCT ur.user_id, d.keep_id, d.organization_id, MIN(ur.assigned_at)
 FROM _org_role_dedup d
-WHERE ur.role_id = ANY(d.delete_ids)
-  AND NOT EXISTS (
-    SELECT 1 FROM user_roles ur2
-    WHERE ur2.user_id = ur.user_id
-      AND ur2.role_id = d.keep_id
-  );
+JOIN user_roles ur ON ur.role_id = ANY(d.delete_ids)
+GROUP BY ur.user_id, d.keep_id, d.organization_id
+ON CONFLICT (user_id, role_id) DO NOTHING;
 
 --> statement-breakpoint
 
--- 3. Merge role_permissions into the canonical role (dedup via ON CONFLICT)
+-- 3. Delete old assignments pointing to duplicate roles
+DELETE FROM user_roles ur
+USING _org_role_dedup d
+WHERE ur.role_id = ANY(d.delete_ids);
+
+--> statement-breakpoint
+
+-- 4. Merge role_permissions into the canonical role (dedup via ON CONFLICT)
 INSERT INTO role_permissions (role_id, permission_id)
 SELECT d.keep_id, rp.permission_id
 FROM _org_role_dedup d
@@ -48,26 +52,26 @@ ON CONFLICT DO NOTHING;
 
 --> statement-breakpoint
 
--- 4. Delete duplicate roles (user_roles and role_permissions already rewired)
+-- 5. Delete duplicate roles (user_roles and role_permissions already rewired)
 DELETE FROM roles r
 USING _org_role_dedup d
 WHERE r.id = ANY(d.delete_ids);
 
 --> statement-breakpoint
 
--- 5. Drop temp table
+-- 6. Drop temp table
 DROP TABLE IF EXISTS _org_role_dedup;
 
 --> statement-breakpoint
 
--- 6. Add partial unique index for organization system roles
+-- 7. Add partial unique index for organization system roles
 CREATE UNIQUE INDEX IF NOT EXISTS "roles_org_system_name_unique"
   ON "roles" (organization_id, LOWER(name))
   WHERE is_system = true AND organization_id IS NOT NULL;
 
 --> statement-breakpoint
 
--- 7. C-001 defensive: remove any platform permissions from org roles
+-- 8. Remove any platform permissions from org roles (C-001 defensive)
 DELETE FROM role_permissions rp
 USING roles r, permissions p
 WHERE rp.role_id = r.id

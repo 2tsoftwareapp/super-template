@@ -7,6 +7,7 @@ import { Empty } from "@repo/web-ui/empty";
 import { ErrorState } from "@repo/web-ui/error-state";
 import { Input } from "@repo/web-ui/input";
 import { SectionLoading } from "@repo/web-ui/loading";
+import { Pagination } from "@repo/web-ui/pagination";
 import { Show } from "@repo/web-ui/show";
 import { LockKeyhole, Plus, RefreshCcw, Search, ShieldCheck, X } from "lucide-react";
 
@@ -41,6 +42,7 @@ export function RolesListView(vm: RolesViewModel) {
     onRefresh,
     systemRoles,
     customRoles,
+    pagination,
     anyRoles,
     noResults,
     deletingRoleId,
@@ -158,7 +160,7 @@ export function RolesListView(vm: RolesViewModel) {
                       Custom roles
                     </span>
                     <span className="ml-auto text-xs text-muted-foreground">
-                      {customRoles.length}
+                      {pagination.total}
                     </span>
                   </div>
                   {customRoles.map((role) => (
@@ -176,6 +178,13 @@ export function RolesListView(vm: RolesViewModel) {
                       onDelete={onRequestDelete}
                     />
                   ))}
+                  <Pagination
+                    page={pagination.page}
+                    pageSize={pagination.pageSize}
+                    totalPages={pagination.totalPages}
+                    total={pagination.total}
+                    onPageChange={pagination.onPageChange}
+                  />
                 </div>
               )}
             </div>

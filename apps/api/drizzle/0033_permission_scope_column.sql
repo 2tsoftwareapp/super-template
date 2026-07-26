@@ -14,7 +14,7 @@ WHERE LOWER(SPLIT_PART(name, '.', 1)) IN ('settings', 'audit', 'mail', 'jobs');
 
 --> statement-breakpoint
 
-UPDATE permissions SET scope = 'organization'
+UPDATE permissions SET scope = 'platform'
 WHERE scope IS NULL;
 
 --> statement-breakpoint

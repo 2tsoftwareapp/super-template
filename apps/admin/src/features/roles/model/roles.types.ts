@@ -25,6 +25,13 @@ export interface RolesViewModel {
   isDeleting: boolean;
   onEditRole: (role: ManagedRoleDto) => void;
   onRequestDelete: (role: ManagedRoleDto) => void;
+  pagination: {
+    page: number;
+    pageSize: number;
+    totalPages: number;
+    total: number;
+    onPageChange: (page: number) => void;
+  };
   drawer: {
     open: boolean;
     editingRole: EditableRole | null;

@@ -25,7 +25,7 @@ RETURNS TRIGGER
 LANGUAGE plpgsql
 AS $$
 DECLARE
-  role_org_id text;
+  role_org_id uuid;
 BEGIN
   SELECT r.organization_id INTO role_org_id
   FROM roles r

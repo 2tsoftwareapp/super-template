@@ -36,7 +36,7 @@ export interface CreatePermissionValues {
   name: string;
   description: string;
   isSystem?: boolean;
-  scope?: string;
+  scope: 'platform' | 'organization';
 }
 
 export interface UpdatePermissionValues {

@@ -308,21 +308,13 @@ export class AccessControlRepository implements AccessControlRepositoryPort {
       name: string;
       description: string;
       isSystem?: boolean;
-      scope?: string;
+      scope: 'platform' | 'organization';
     }[],
     executor: DatabaseExecutor = this.database,
   ) {
-    const isPlatformPermission = (name: string) => {
-      const prefix = name.split('.')[0]?.toLowerCase();
-      return prefix !== undefined && ['settings', 'audit', 'mail', 'jobs'].includes(prefix);
-    };
-    const values = permissionValues.map((p) => ({
-      ...p,
-      scope: p.scope ?? (isPlatformPermission(p.name) ? 'platform' : 'organization'),
-    }));
     await executor
       .insert(permissions)
-      .values(values)
+      .values(permissionValues)
       .onConflictDoNothing();
     return this.findPermissionsByNames(
       permissionValues.map((permission) => permission.name),
@@ -633,17 +625,9 @@ export class AccessControlRepository implements AccessControlRepositoryPort {
     values: CreatePermissionValues,
     executor: DatabaseExecutor = this.database,
   ) {
-    const isPlatformPermission = (name: string) => {
-      const prefix = name.split('.')[0]?.toLowerCase();
-      return prefix !== undefined && ['settings', 'audit', 'mail', 'jobs'].includes(prefix);
-    };
-    const dbValues = {
-      ...values,
-      scope: values.scope ?? (isPlatformPermission(values.name) ? 'platform' : 'organization'),
-    };
     const [permission] = await executor
       .insert(permissions)
-      .values(dbValues)
+      .values(values)
       .returning();
     return permission ?? null;
   }

@@ -5,6 +5,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
+const CUSTOM_ROLES_PAGE_SIZE = 20;
+
 import type {
   EditableRole,
   ManagedRoleDto,
@@ -56,6 +58,7 @@ export function useRolesController(): RolesViewModel {
     );
 
   const [search, setSearch] = useState("");
+  const [customPage, setCustomPage] = useState(1);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingRole, setEditingRole] = useState<EditableRole | null>(null);
   const [deletingRole, setDeletingRole] = useState<ManagedRoleDto | null>(null);
@@ -89,6 +92,23 @@ export function useRolesController(): RolesViewModel {
     () => filterRolesBySearch(customRoles, search),
     [customRoles, search],
   );
+
+  const paginatedCustom = useMemo(() => {
+    const start = (customPage - 1) * CUSTOM_ROLES_PAGE_SIZE;
+    return filteredCustom.slice(start, start + CUSTOM_ROLES_PAGE_SIZE);
+  }, [filteredCustom, customPage]);
+
+  const customTotalPages = Math.max(1, Math.ceil(filteredCustom.length / CUSTOM_ROLES_PAGE_SIZE));
+
+  const handlePageChange = (page: number) => {
+    setCustomPage(page);
+  };
+
+  // Reset to page 1 when search changes
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    setCustomPage(1);
+  };
 
   const handleSaveRole = (values: {
     name: string;
@@ -169,16 +189,23 @@ export function useRolesController(): RolesViewModel {
     canDelete,
     isSuperAdmin,
     search,
-    onSearchChange: setSearch,
+    onSearchChange: handleSearchChange,
     isLoading: roles.isLoading,
     isRefreshing: roles.isFetching || permissionCatalog.isFetching,
     isError,
     onRetry: handleRetry,
     onRefresh: handleRetry,
     systemRoles: filteredSystem,
-    customRoles: filteredCustom,
+    customRoles: paginatedCustom,
     anyRoles,
     noResults,
+    pagination: {
+      page: customPage,
+      pageSize: CUSTOM_ROLES_PAGE_SIZE,
+      totalPages: customTotalPages,
+      total: filteredCustom.length,
+      onPageChange: handlePageChange,
+    },
     deletingRoleId: deletingRole?.id ?? null,
     isDeleting: deleteRole.isPending,
     onEditRole: openEditDrawer,

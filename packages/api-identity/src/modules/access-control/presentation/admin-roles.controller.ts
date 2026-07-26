@@ -19,6 +19,7 @@ import {
   ACTION,
   ApiArrayResponse,
   ApiDataResponse,
+  ApiPaginatedResponse,
   Authorize,
   CurrentUser,
   perm,
@@ -47,7 +48,7 @@ export class AdminRolesController {
 
   @Get()
   @Authorize({ permissions: [perm('roles', ACTION.READ)] })
-  @ApiArrayResponse(RoleDto)
+  @ApiPaginatedResponse(RoleDto)
   async listRoles(
     @CurrentUser() actor: AuthenticatedRequestUser,
     @Query() query: ListRolesQueryDto,
