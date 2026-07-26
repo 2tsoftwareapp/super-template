@@ -64,17 +64,19 @@ vi.mock("@/features/organizations", () => ({
   })),
 }));
 
+const asRouter = (replace: ReturnType<typeof vi.fn>) =>
+  ({ replace }) as unknown as ReturnType<typeof useRouter>;
+
+const asSearchParams = (searchParams: URLSearchParams) =>
+  searchParams as unknown as ReturnType<typeof useSearchParams>;
+
 const mockNavigation = (
   searchParams: URLSearchParams,
   replace: ReturnType<typeof vi.fn>,
 ) => {
-  vi.mocked(useRouter).mockReturnValue({
-    replace,
-  } as ReturnType<typeof useRouter>);
+  vi.mocked(useRouter).mockReturnValue(asRouter(replace));
   vi.mocked(usePathname).mockReturnValue("/admin/roles");
-  vi.mocked(useSearchParams).mockReturnValue(
-    searchParams as ReturnType<typeof useSearchParams>,
-  );
+  vi.mocked(useSearchParams).mockReturnValue(asSearchParams(searchParams));
 };
 
 beforeEach(() => {
@@ -114,12 +116,10 @@ describe("useRolesController", () => {
     const replace = vi.fn();
     let currentSearchParams = new URLSearchParams("?search=alpha");
 
-    vi.mocked(useRouter).mockReturnValue({
-      replace,
-    } as ReturnType<typeof useRouter>);
+    vi.mocked(useRouter).mockReturnValue(asRouter(replace));
     vi.mocked(usePathname).mockReturnValue("/admin/roles");
-    vi.mocked(useSearchParams).mockImplementation(
-      () => currentSearchParams as ReturnType<typeof useSearchParams>,
+    vi.mocked(useSearchParams).mockImplementation(() =>
+      asSearchParams(currentSearchParams),
     );
 
     const { result, rerender } = renderHook(() => useRolesController());
