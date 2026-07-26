@@ -173,6 +173,12 @@ export interface AccessControlRepositoryPort {
     organizationId?: string | null,
     executor?: TransactionExecutor,
   ): Promise<RoleRecord | null>;
+  ensureOrganizationSystemRole(
+    name: string,
+    description: string,
+    organizationId: string,
+    executor?: TransactionExecutor,
+  ): Promise<RoleRecord>;
   assignUserRole(
     userId: string,
     roleId: string,

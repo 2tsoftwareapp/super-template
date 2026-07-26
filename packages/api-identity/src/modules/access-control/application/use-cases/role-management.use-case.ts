@@ -62,29 +62,13 @@ export class RoleManagementUseCase {
     const permissions = allPermissions.filter(
       (p) => !isPlatformPermission(p.name),
     );
-    let role = await this.accessControlRepository.findRoleByName(
-      ROLE_NAMES.ADMIN,
-      organizationId,
-      executor,
-    );
-
-    role ??= await this.accessControlRepository.createRole(
-      {
-        name: ROLE_NAMES.ADMIN,
-        description: 'Organization administrator role',
+    const role =
+      await this.accessControlRepository.ensureOrganizationSystemRole(
+        ROLE_NAMES.ADMIN,
+        'Organization administrator role',
         organizationId,
-        isSystem: true,
-      },
-      executor,
-    );
-
-    if (!role) {
-      throw new AppError(
-        ERROR_CODES.INTERNAL_ERROR,
-        'Organization admin role could not be created',
-        HttpStatus.INTERNAL_SERVER_ERROR,
+        executor,
       );
-    }
 
     await this.accessControlRepository.replaceRolePermissions(
       role.id,

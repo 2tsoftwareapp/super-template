@@ -15,7 +15,7 @@ import {
 } from '@repo/api-database';
 import { and, eq, inArray, isNull, or, type SQL } from 'drizzle-orm';
 
-import type { AccessControlRepositoryPort } from '../application/access-control.repository.port';
+import type { AccessControlRepositoryPort, RoleRecord } from '../application/access-control.repository.port';
 
 @Injectable()
 export class AccessControlRepository implements AccessControlRepositoryPort {
@@ -577,6 +577,31 @@ export class AccessControlRepository implements AccessControlRepositoryPort {
     executor: DatabaseExecutor = this.database,
   ): Promise<void> {
     await executor.delete(permissions).where(eq(permissions.id, permissionId));
+  }
+
+  async ensureOrganizationSystemRole(
+    name: string,
+    description: string,
+    organizationId: string,
+    executor: DatabaseExecutor = this.database,
+  ): Promise<RoleRecord> {
+    const [role] = await executor
+      .insert(roles)
+      .values({ name, description, organizationId, isSystem: true })
+      .onConflictDoNothing()
+      .returning();
+
+    if (role) {
+      return role as RoleRecord;
+    }
+
+    const existing = await this.findRoleByName(name, organizationId, executor);
+    if (!existing) {
+      throw new Error(
+        `Failed to resolve system role "${name}" for organization ${organizationId}`,
+      );
+    }
+    return existing;
   }
 
   async assignUserRole(
