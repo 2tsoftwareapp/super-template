@@ -45,3 +45,4 @@ packages/extension/artifacts/
 
 # Simple Skills — Work layer (sessions + memory; nested git)
 .agent-work/
+*.log

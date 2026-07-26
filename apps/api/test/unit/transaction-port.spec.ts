@@ -8,7 +8,8 @@ describe('DrizzleTransactionService', () => {
     const database = { transaction: vi.fn().mockImplementation(
       (fn: (tx: unknown) => unknown) => fn(tx),
     ) };
-    const service = new DrizzleTransactionService(database as never);
+    const tenantContextService = { get: () => undefined };
+    const service = new DrizzleTransactionService(database as never, tenantContextService as never);
 
     const result = await service.run((executor) => {
       expect(executor).toBe(tx as unknown as TransactionExecutor);
@@ -23,7 +24,8 @@ describe('DrizzleTransactionService', () => {
     const database = { transaction: vi.fn().mockImplementation(
       (fn: (tx: unknown) => unknown) => fn({}),
     ) };
-    const service = new DrizzleTransactionService(database as never);
+    const tenantContextService = { get: () => undefined };
+    const service = new DrizzleTransactionService(database as never, tenantContextService as never);
     const error = new Error('test error');
 
     await expect(

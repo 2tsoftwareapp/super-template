@@ -6,6 +6,7 @@ import { UpdateMemberRoleUseCase } from '../update-member-role.use-case';
 
 const transactionPort = {
   run: vi.fn().mockImplementation(async (fn: any) => fn(null)),
+  withTenant: vi.fn().mockImplementation(async (tenant: any, fn: any) => fn(null)),
 };
 
 const accessControlService = {

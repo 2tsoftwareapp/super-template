@@ -244,16 +244,33 @@ export class RoleManagementUseCase {
           }
         }
 
-        const updatedRole = await this.accessControlRepository.updateRole(
-          roleId,
-          {
-            ...(newName !== undefined ? { name: newName } : {}),
-            ...(command.description !== undefined
-              ? { description: command.description }
-              : {}),
-          },
-          tx,
-        );
+        let updatedRole;
+        try {
+          updatedRole = await this.accessControlRepository.updateRole(
+            roleId,
+            {
+              ...(newName !== undefined ? { name: newName } : {}),
+              ...(command.description !== undefined
+                ? { description: command.description }
+                : {}),
+            },
+            tx,
+          );
+        } catch (error: any) {
+          if (
+            error.code === '23505' ||
+            error.cause?.code === '23505' ||
+            (error.message && error.message.includes('roles_organization_id_name_unique')) ||
+            (error.message && error.message.includes('duplicate key value'))
+          ) {
+            throw new AppError(
+              ERROR_CODES.RESOURCE_CONFLICT,
+              'A role with this name already exists in the organization',
+              HttpStatus.CONFLICT,
+            );
+          }
+          throw error;
+        }
 
         if (!updatedRole) {
           throw new AppError(

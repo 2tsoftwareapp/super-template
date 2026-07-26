@@ -22,7 +22,10 @@ WHERE LOWER(SPLIT_PART(name, '.', 1)) IN ('settings', 'audit', 'mail', 'jobs');
 
 -- 3. Unknown permissions → platform (fail closed)
 UPDATE permissions SET scope = 'platform'
-WHERE scope IS NULL;
+WHERE LOWER(SPLIT_PART(name, '.', 1)) NOT IN (
+  'users', 'roles', 'notifications', 'files',
+  'attachments', 'imports', 'exports', 'activities'
+);
 
 --> statement-breakpoint
 

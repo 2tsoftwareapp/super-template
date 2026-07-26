@@ -16,6 +16,7 @@ interface RoleSaveResult {
 }
 
 export type RolesListParams = operations["AdminRolesController_listRoles"]["parameters"]["query"];
+export type RolesListResponse = operations["AdminRolesController_listRoles"]["responses"][200]["content"]["application/json"];
 
 
 function buildRolePayload(input: RoleForm) {
@@ -29,8 +30,8 @@ function buildRolePayload(input: RoleForm) {
 
 export const rolesApi = {
   list(params?: RolesListParams) {
-    return webFetch<ListResponse<ManagedRoleDto>>(
-      params ? buildPath(bffPath("/api/v1/admin/roles"), params as Record<string, any>) : bffPath("/api/v1/admin/roles"),
+    return webFetch<RolesListResponse>(
+      params ? buildPath(bffPath("/api/v1/admin/roles"), params) : bffPath("/api/v1/admin/roles"),
     );
   },
 

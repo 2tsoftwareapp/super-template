@@ -6,6 +6,7 @@ import { LeaveOrganizationUseCase } from '../leave-organization.use-case';
 
 const transactionPort = {
   run: vi.fn().mockImplementation(async (fn: any) => fn(null)),
+  withTenant: vi.fn().mockImplementation(async (tenant: any, fn: any) => fn(null)),
 };
 
 const accessControlService = {

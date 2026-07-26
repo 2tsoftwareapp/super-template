@@ -59,9 +59,14 @@ export function useRolesController(): RolesViewModel {
   const [searchInput, setSearchInput] = useState(searchParams.get("search") ?? "");
   const debouncedSearch = useDebouncedValue(searchInput, 300);
 
+  const urlSearch = searchParams.get("search") ?? "";
+
   useEffect(() => {
-    const current = searchParams.get("search") ?? "";
-    if (debouncedSearch !== current) {
+    setSearchInput(urlSearch);
+  }, [urlSearch]);
+
+  useEffect(() => {
+    if (debouncedSearch !== urlSearch) {
       const next = new URLSearchParams(searchParams.toString());
       if (debouncedSearch) {
         next.set("search", debouncedSearch);
