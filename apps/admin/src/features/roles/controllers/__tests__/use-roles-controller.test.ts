@@ -134,4 +134,27 @@ describe("useRolesController", () => {
     });
     expect(replace).not.toHaveBeenCalled();
   });
+
+  it("debounces user search changes into the URL", async () => {
+    const replace = vi.fn();
+    mockNavigation(new URLSearchParams(), replace);
+
+    const { result } = renderHook(() => useRolesController());
+
+    act(() => {
+      result.current.onSearchChange("security admin");
+    });
+
+    expect(result.current.search).toBe("security admin");
+    expect(replace).not.toHaveBeenCalled();
+
+    await waitFor(
+      () => {
+        expect(replace).toHaveBeenCalledWith(
+          "/admin/roles?search=security+admin",
+        );
+      },
+      { timeout: 1_000 },
+    );
+  });
 });
