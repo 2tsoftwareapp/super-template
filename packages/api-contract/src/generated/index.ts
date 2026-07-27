@@ -1907,7 +1907,7 @@ export interface components {
         };
         CreateImportDto: {
             /** @enum {string} */
-            type: "users" | "projects";
+            type: "users";
             fileId: string;
             /** @description Client-supplied idempotency key. Retries with the same key return the original import job. */
             idempotencyKey?: string;

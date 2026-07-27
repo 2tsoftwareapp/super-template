@@ -40,7 +40,7 @@ class _CapturingHandler extends ErrorInterceptorHandler {
   void resolve(Response<dynamic> response) => resolved = response;
 }
 
-DioException _make401({String path = '/api/v1/projects'}) {
+DioException _make401({String path = '/api/v1/users'}) {
   final opts = RequestOptions(path: path);
   return DioException(
     requestOptions: opts,
@@ -150,7 +150,7 @@ void main() {
     );
 
     final interceptor = container.read(authInterceptorProvider);
-    final opts = RequestOptions(path: '/api/v1/projects')
+    final opts = RequestOptions(path: '/api/v1/users')
       ..extra['retried'] = true;
     final err = DioException(
       requestOptions: opts,

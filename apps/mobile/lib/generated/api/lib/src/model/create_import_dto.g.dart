@@ -10,15 +10,11 @@ part of 'create_import_dto.dart';
 
 const CreateImportDtoTypeEnum _$createImportDtoTypeEnum_users =
     const CreateImportDtoTypeEnum._('users');
-const CreateImportDtoTypeEnum _$createImportDtoTypeEnum_projects =
-    const CreateImportDtoTypeEnum._('projects');
 
 CreateImportDtoTypeEnum _$createImportDtoTypeEnumValueOf(String name) {
   switch (name) {
     case 'users':
       return _$createImportDtoTypeEnum_users;
-    case 'projects':
-      return _$createImportDtoTypeEnum_projects;
     default:
       throw ArgumentError(name);
   }
@@ -27,7 +23,6 @@ CreateImportDtoTypeEnum _$createImportDtoTypeEnumValueOf(String name) {
 final BuiltSet<CreateImportDtoTypeEnum> _$createImportDtoTypeEnumValues =
     BuiltSet<CreateImportDtoTypeEnum>(const <CreateImportDtoTypeEnum>[
   _$createImportDtoTypeEnum_users,
-  _$createImportDtoTypeEnum_projects,
 ]);
 
 Serializer<CreateImportDtoTypeEnum> _$createImportDtoTypeEnumSerializer =
@@ -37,11 +32,9 @@ class _$CreateImportDtoTypeEnumSerializer
     implements PrimitiveSerializer<CreateImportDtoTypeEnum> {
   static const Map<String, Object> _toWire = const <String, Object>{
     'users': 'users',
-    'projects': 'projects',
   };
   static const Map<Object, String> _fromWire = const <Object, String>{
     'users': 'users',
-    'projects': 'projects',
   };
 
   @override

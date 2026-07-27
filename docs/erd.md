@@ -7,13 +7,10 @@ erDiagram
   organizations ||--o{ organization_members : has
   organizations ||--o{ roles : has
   organizations ||--o{ user_roles : scopes
-  organizations ||--o{ projects : contains
-  organizations ||--o{ notifications : scopes
-  organizations ||--o{ invitations : scopes
+  organizations ||--o{ notification_jobs : scopes
   organizations ||--o{ audit_logs : scopes
   organizations ||--o{ files : contains
   organizations ||--o{ jobs : scopes
-  organizations ||--o{ comments : scopes
   organizations ||--o{ activities : scopes
   users ||--o{ organization_members : belongs_to
   users ||--o{ auth_sessions : has
@@ -25,13 +22,10 @@ erDiagram
   users ||--o{ mfa_challenges : has
   users ||--o{ external_identities : has
   users ||--o{ user_preferences : has
-  users ||--o{ projects : owns
   users ||--o{ notifications : receives
   users ||--o{ notification_device_tokens : registers
   users ||--o{ notification_jobs : creates
-  users ||--o{ invitations : sends
   users ||--o{ audit_logs : acts
-  users ||--o{ comments : authors
   users ||--o{ activities : performs
   users ||--o{ files : uploads
   roles ||--o{ user_roles : linked
@@ -411,128 +405,15 @@ erDiagram
   }
 ```
 
-## Workspace Domain
+## Removed: Workspace Domain
 
-```mermaid
-erDiagram
-  organizations ||--o{ projects : contains
-  organizations ||--o{ notifications : scopes
-  organizations ||--o{ notification_jobs : scopes
-  organizations ||--o{ invitations : scopes
-  organizations ||--o{ comments : scopes
-  organizations ||--o{ activities : scopes
-  users ||--o{ projects : owns
-  users ||--o{ notifications : receives
-  users ||--o{ notification_device_tokens : registers
-  users ||--o{ invitation_sender : as_sender
-  users ||--o{ invitation_acceptor : as_acceptor
-  users ||--o{ comments : authors
-  users ||--o{ activities : performs
+The workspace domain (projects, invitations, comments) has been removed from the template.
 
-  projects {
-    uuid id PK
-    uuid organization_id FK
-    text name
-    text description
-    project_status status
-    uuid owner_id FK
-    uuid created_by_id FK
-    uuid updated_by_id FK
-    timestamptz deleted_at
-    timestamptz created_at
-    timestamptz updated_at
-  }
-
-  notifications {
-    uuid id PK
-    uuid organization_id FK
-    uuid user_id FK
-    text type
-    text title
-    text body
-    jsonb data
-    timestamptz read_at
-    timestamptz created_at
-  }
-
-  notification_device_tokens {
-    uuid id PK
-    uuid user_id FK
-    text token
-    notification_device_platform platform
-    timestamptz last_used_at
-    timestamptz created_at
-    timestamptz updated_at
-  }
-
-  notification_jobs {
-    uuid id PK
-    uuid organization_id FK
-    uuid actor_id FK
-    notification_audience audience
-    uuid target_user_id FK
-    jsonb user_ids
-    text type
-    text title
-    text body
-    jsonb data
-    timestamptz scheduled_at
-    notification_job_status status
-    integer recipient_count
-    timestamptz processed_at
-    text error_message
-    text idempotency_key
-    timestamptz created_at
-    timestamptz updated_at
-  }
-
-  invitations {
-    uuid id PK
-    uuid organization_id FK
-    text email
-    text token_hash
-    text entity_type
-    uuid entity_id
-    text role
-    uuid invited_by_id FK
-    invitation_status status
-    timestamptz expires_at
-    timestamptz accepted_at
-    uuid accepted_by_id FK
-    timestamptz created_at
-    timestamptz updated_at
-  }
-
-  comments {
-    uuid id PK
-    uuid organization_id FK
-    text entity_type
-    uuid entity_id
-    uuid parent_id
-    uuid author_id FK
-    text content
-    timestamptz deleted_at
-    timestamptz created_at
-    timestamptz updated_at
-  }
-
-  activities {
-    uuid id PK
-    uuid organization_id FK
-    text summary
-    text entity_type
-    uuid entity_id
-    uuid actor_id FK
-    activity_visibility visibility
-    jsonb metadata
-    timestamptz created_at
-  }
-```
+Notifications, notification_device_tokens, notification_jobs, and activities are now part of the Platform domain (see Platform ERD above).
 
 ## Counts
 
-- **37 tables** across 3 domains (Identity: 17, Platform: 13, Workspace: 7)
+- **30 tables** across 2 domains (Identity: 17, Platform: 13)
 - **2 PostgreSQL enums** in identity: `user_status`, `organization_member_role`
-- **3 enums** in platform: `mail_delivery_status`, `job_status`, `import_export_job_status`
-- **5 enums** in workspace: `project_status`, `notification_device_platform`, `notification_audience`, `notification_job_status`, `invitation_status`, `activity_visibility`
+- **6 enums** in platform: `mail_delivery_status`, `job_status`, `import_export_job_status`, `notification_device_platform`, `notification_audience`, `notification_job_status`, `activity_visibility`
 - Tenancy is centered on `organizations` — most data tables carry a scoping `organization_id` FK

@@ -51,9 +51,7 @@ It is produced from the API OpenAPI document by `make generate`.
 | `/forgot-password` | public | `AuthApi.forgotPassword` |
 | `/verify-email` | public | `AuthApi.verifyEmail` |
 | `/reset-password` | public | `AuthApi.resetPassword` |
-| `/invite/:token` | authenticated | `InvitationsApi.accept` |
 | `/home` | authenticated | — |
-| `/projects` | `projects.read` | `ProjectsApi.list` |
 | `/notifications` | `notifications.read` | `NotificationsApi.list` |
 | `/profile` | authenticated | `AuthApi.getMe` |
 | `/preferences` | authenticated | `UsersApi.preferences` |

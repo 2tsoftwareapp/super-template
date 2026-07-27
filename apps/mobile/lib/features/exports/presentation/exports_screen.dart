@@ -49,7 +49,7 @@ class _ExportsScreenState extends ConsumerState<ExportsScreen> {
             FilledButton.icon(
               onPressed: _working || !permissions.canCreate ? null : _startExport,
               icon: const Icon(Icons.download),
-              label: const Text('Export projects CSV'),
+              label: const Text('Export data CSV'),
             ),
             const SizedBox(height: 24),
             if (_job != null) ...[
@@ -77,7 +77,7 @@ class _ExportsScreenState extends ConsumerState<ExportsScreen> {
     try {
       final job = await ref
           .read(exportsRepositoryProvider)
-          .create(type: 'projects', idempotencyKey: const Uuid().v4());
+          .create(type: 'users', idempotencyKey: const Uuid().v4());
       setState(() => _job = job);
       _pollTimer?.cancel();
       _pollTimer = Timer.periodic(

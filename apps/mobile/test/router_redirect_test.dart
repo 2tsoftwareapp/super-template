@@ -62,7 +62,7 @@ void main() {
         resolveRedirect(
           isAuthenticated: false,
           isLoading: true,
-          location: '/projects',
+          location: '/home',
         ),
         '/splash',
       );

@@ -1,5 +1,5 @@
 /** Supported import adapter types exposed via the admin API. */
-export const SUPPORTED_IMPORT_TYPES = ['users', 'projects'] as const;
+export const SUPPORTED_IMPORT_TYPES = ['users'] as const;
 
 export type SupportedImportType = (typeof SUPPORTED_IMPORT_TYPES)[number];
 

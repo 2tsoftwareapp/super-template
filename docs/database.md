@@ -10,7 +10,7 @@
 - explicit indexes and unique constraints
 - soft deletion only where business recovery matters
 
-## Tables (37 total)
+## Tables (30 total)
 
 ### Identity (17)
 
@@ -48,15 +48,9 @@
 - `mail_deliveries` — transactional email delivery log
 - `application_settings` — key/value app-wide settings
 
-### Workspace (7)
+### Platform (additional)
 
-- `projects` — reference domain CRUD with ownership and audit
-- `notifications` — in-app notification inbox
-- `notification_device_tokens` — FCM push notification tokens
-- `notification_jobs` — scheduled/sent notification jobs
-- `invitations` — polymorphic invitation flows (org, project, etc.)
-- `comments` — polymorphic entity comments with threading
-- `activities` — human-readable activity feed entries
+Notes: `notifications`, `notification_device_tokens`, `notification_jobs`, and `activities` are included in the Platform domain above (see notifications and activities modules). The workspace domain (projects, invitations, comments) has been removed from the template.
 
 ## Migration Workflow
 
@@ -83,7 +77,7 @@ Production must create an equivalent non-superuser role, rotate its password, an
 - Repositories accept the default database client or an existing transaction executor
 - Related operations stay inside a single transaction when consistency matters
 - Examples:
-  - project creation plus notification creation
+  - user creation plus notification creation
   - user blocking plus session revocation plus audit logging
 
 ## Seed Workflow
@@ -92,15 +86,13 @@ Production must create an equivalent non-superuser role, rotate its password, an
 - Roles and permissions are inserted or reused
 - role-permission mappings are reconciled
 - admin and regular users are inserted or reused
-- sample projects and notifications are inserted for development
+- sample seed data is inserted for development
 
 ## Soft Delete Strategy
 
 - `users.deleted_at` supports safe uniqueness and future recovery workflows
-- `projects.deleted_at` supports restore behavior
 - `organizations.deleted_at` supports slug reclamation and restore
 - `files.deleted_at` and `attachments.deleted_at` support soft-remove before hard cleanup
-- `comments.deleted_at` supports content moderation
 - Auth, token, and queue tables do not use soft delete
 
 ## Indexing Strategy
@@ -108,7 +100,7 @@ Production must create an equivalent non-superuser role, rotate its password, an
 - foreign key columns have explicit indexes
 - list-heavy filters have dedicated indexes
 - active email uniqueness is enforced through a partial unique index
-- project uniqueness is scoped to owner and active rows
+- soft-deleted entities are scoped for uniqueness on active rows only
 - organization slug uniqueness is enforced through a partial unique index
 - role names are unique per-organization (and globally for platform-level roles)
 - composite unique indexes on junction tables prevent duplicate relationships

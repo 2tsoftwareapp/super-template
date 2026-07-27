@@ -22,7 +22,7 @@ abstract class CreateImportDto
     implements Built<CreateImportDto, CreateImportDtoBuilder> {
   @BuiltValueField(wireName: r'type')
   CreateImportDtoTypeEnum get type;
-  // enum typeEnum {  users,  projects,  };
+  // enum typeEnum {  users,  };
 
   @BuiltValueField(wireName: r'fileId')
   String get fileId;
@@ -154,9 +154,9 @@ class _$CreateImportDtoSerializer
 class CreateImportDtoTypeEnum extends EnumClass {
   @BuiltValueEnumConst(wireName: r'users')
   static const CreateImportDtoTypeEnum users = _$createImportDtoTypeEnum_users;
-  @BuiltValueEnumConst(wireName: r'projects')
-  static const CreateImportDtoTypeEnum projects =
-      _$createImportDtoTypeEnum_projects;
+  // @BuiltValueEnumConst(wireName: r'projects')
+  // static const CreateImportDtoTypeEnum projects =
+  //     _$createImportDtoTypeEnum_projects;
 
   static Serializer<CreateImportDtoTypeEnum> get serializer =>
       _$createImportDtoTypeEnumSerializer;

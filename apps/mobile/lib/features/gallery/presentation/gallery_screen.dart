@@ -202,7 +202,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
             AppTextField(
               controller: _searchController,
               label: 'Search',
-              hint: 'Search projects…',
+              hint: 'Search…',
               prefixIcon: Icons.search_rounded,
               suffix: IconButton(
                 onPressed: () => _searchController.clear(),
@@ -457,10 +457,10 @@ class _GalleryScreenState extends State<GalleryScreen> {
             AppCard(
               child: CenterMessage(
                 icon: Icons.inbox_outlined,
-                title: 'No projects yet',
-                body: 'Create your first project to get started.',
+                title: 'No items yet',
+                body: 'Create your first item to get started.',
                 action: AppButton(
-                  label: 'Create project',
+                  label: 'Create item',
                   size: AppButtonSize.small,
                   fullWidth: false,
                   onPressed: _noop,

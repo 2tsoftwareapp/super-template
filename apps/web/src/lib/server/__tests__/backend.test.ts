@@ -101,18 +101,18 @@ describe("proxyWithRefresh", () => {
         ),
       );
 
-    const request = new NextRequest("http://localhost/api/bff/projects", {
+    const request = new NextRequest("http://localhost/api/bff/users", {
       method: "GET",
       headers: {
         accept: "application/json",
       },
     });
 
-    const response = await proxyWithRefresh(request, "projects");
+    const response = await proxyWithRefresh(request, "users");
     const payload = (await response.json()) as ApiEnvelope<{ id: string }[]>;
 
     expect(response.status).toBe(200);
-    expect(payload.data).toEqual([{ id: "project-1" }]);
+    expect(payload.data).toEqual([{ id: "user-1" }]);
     expect(fetchMock).toHaveBeenCalledTimes(3);
     expect(setAuthCookiesMock).toHaveBeenCalledWith(
       response,
@@ -178,7 +178,7 @@ describe("proxyWithRefresh", () => {
     );
 
     const request = new NextRequest(
-      "http://localhost/api/bff/projects?page=2&limit=5&status=ACTIVE&sortField=name&sortOrder=asc&unknown=drop-me",
+      "http://localhost/api/bff/users?page=2&limit=5&status=ACTIVE&sortField=name&sortOrder=asc&unknown=drop-me",
       {
         method: "GET",
         headers: {
@@ -189,7 +189,7 @@ describe("proxyWithRefresh", () => {
 
     const response = await proxyWithRefresh(
       request,
-      "projects?page=2&limit=5&status=ACTIVE&sortField=name&sortOrder=asc",
+      "admin/users?page=2&limit=5&status=ACTIVE&sortField=name&sortOrder=asc",
     );
 
     expect(response.status).toBe(200);
@@ -202,7 +202,7 @@ describe("proxyWithRefresh", () => {
       typeof url === "string" ? url : url instanceof URL ? url.href : "";
 
     expect(requestUrl).toContain(
-      "/api/v1/projects?page=2&limit=5&status=ACTIVE&sortField=name&sortOrder=asc",
+      "/api/v1/admin/users?page=2&limit=5&status=ACTIVE&sortField=name&sortOrder=asc",
     );
     expect(requestUrl).not.toContain("unknown=drop-me");
   });

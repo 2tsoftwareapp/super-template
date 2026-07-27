@@ -49,7 +49,7 @@ class _ImportsScreenState extends ConsumerState<ImportsScreen> {
             FilledButton.icon(
               onPressed: _working || !permissions.canCreate ? null : _startImport,
               icon: const Icon(Icons.upload_file),
-              label: const Text('Pick CSV and import projects'),
+              label: const Text('Pick CSV and import data'),
             ),
             const SizedBox(height: 24),
             if (_job != null) ...[
@@ -94,7 +94,7 @@ class _ImportsScreenState extends ConsumerState<ImportsScreen> {
         result!.files.single.name,
       );
       final job = await repository.create(
-        type: 'projects',
+        type: 'users',
         fileId: fileId,
         idempotencyKey: const Uuid().v4(),
       );

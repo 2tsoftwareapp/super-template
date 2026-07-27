@@ -52,13 +52,13 @@ sequenceDiagram
   participant API as NestJS API
   participant DB as PostgreSQL
 
-  Browser->>BFF: POST /api/bff/projects
-  BFF->>API: POST /api/v1/projects with access token
+  Browser->>BFF: POST /api/bff/users
+  BFF->>API: POST /api/v1/users with access token
   API-->>BFF: 401 expired
   BFF->>API: POST /api/v1/auth/refresh with refresh token
   API->>DB: verify session hash and rotate token
   API-->>BFF: new token pair
-  BFF->>API: retry POST /api/v1/projects
+  BFF->>API: retry POST /api/v1/users
   API-->>BFF: 201 created
   BFF-->>Browser: updated cookies + success payload
 ```
@@ -77,13 +77,13 @@ sequenceDiagram
   participant API as NestJS API
   participant DB as PostgreSQL
 
-  App->>API: GET /projects with access token
+  App->>API: GET /users with access token
   API-->>App: 401 expired
   App->>API: POST /auth/refresh with refresh token
   API->>DB: verify session hash
   API-->>App: new access token + refresh token
-  App->>API: retry GET /projects once
-  API-->>App: 200 projects
+  App->>API: retry GET /users once
+  API-->>App: 200 users
 ```
 
 ## Session Revocation

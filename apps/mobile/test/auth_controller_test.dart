@@ -8,7 +8,7 @@ void main() {
       email: 'user@example.local',
       displayName: 'User',
       roles: ['USER'],
-      permissions: ['projects.read'],
+      permissions: ['users.read'],
       sessionId: 'session-1',
     );
 

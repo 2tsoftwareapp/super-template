@@ -22,7 +22,7 @@ const actor = {
 const existingJob = {
   id: '33333333-3333-4333-8333-333333333333',
   organizationId: actor.organizationId,
-  type: 'projects',
+  type: 'users',
   status: 'COMPLETED' as const,
   fileId: '44444444-4444-4444-8444-444444444444',
   filters: null,
@@ -71,7 +71,7 @@ describe('CreateExportUseCase idempotency', () => {
 
     const createExport = moduleRef.get(CreateExportUseCase);
     const result = await createExport.execute(actor, {
-      type: 'projects',
+      type: 'users',
       idempotencyKey: 'export-attempt-1',
     });
 

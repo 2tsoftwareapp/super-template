@@ -121,7 +121,7 @@ Shared packages: `@repo/web-core` · `@repo/env-loader` · `@repo/api-contract`
 
 - [x] **Contract-first API** — OpenAPI from NestJS; TypeScript + Dart clients via `make generate`
 - [x] **Authentication** — JWT rotation, Argon2id, CSRF, RBAC, TOTP MFA, OIDC SSO backend (Google / Apple / GitHub; configure credentials + UI)
-- [x] **Admin dashboard** — users, roles, projects, jobs, mail, imports/exports, audit logs, SSE notifications
+- [x] **Admin dashboard** — users, roles, jobs, mail, imports/exports, audit logs, SSE notifications
 - [x] **Flutter mobile** — Material 3 design system, 20+ widgets, in-app UI Kit gallery, optional FCM push
 - [x] **Environment layering** — `development` · `staging` · `production` across API, web, admin, and mobile
 - [x] **CI pipeline** — `pnpm run generate:check`, lint, typecheck, tests, build, and Flutter checks (see `.github/workflows/ci.yml`)

@@ -5,6 +5,6 @@ export interface SeededUsersContext {
   adminOrganizationId: string;
   // The regular account is the non-privileged reference user for app-level demo data.
   regularUserId: string;
-  // This organization is used by user-owned projects, notifications, and other tenant-bound records.
+  // This organization is used by user-owned notifications and other tenant-bound records.
   regularOrganizationId: string;
 }

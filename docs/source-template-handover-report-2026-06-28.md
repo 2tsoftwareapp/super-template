@@ -5,7 +5,11 @@
 > Branch: `main`  
 > Commit nền: `66c19c8` + working tree remediation  
 > Người lập báo cáo: fullstack reviewer / handover reviewer  
-> Ngôn ngữ báo cáo: Tiếng Việt
+> Ngôn ngữ báo cáo: Tiếng Việt  
+>
+> **Cập nhật 2026-07-27:** Workspace domain (projects, invitations, comments) đã bị xóa khỏi template
+> kể từ commit `31c3fc8`. Các tham chiếu đến `api-workspace`, `projects`, `invitations`,
+> `comments` trong báo cáo này không còn phản ánh trạng thái hiện tại của template.
 
 ---
 

@@ -13,9 +13,7 @@ import {
 } from "nuqs/server";
 
 const sortOrders = ["asc", "desc"] as const;
-const projectStatuses = ["ALL", "DRAFT", "ACTIVE", "ARCHIVED"] as const;
 const userStatuses = ["ALL", "PENDING", "ACTIVE", "BLOCKED"] as const;
-const projectSortFields = ["updatedAt", "createdAt", "name", "status"] as const;
 const userSortFields = ["createdAt", "displayName", "email", "status"] as const;
 
 interface SelectOption<T extends string | number | boolean> {
@@ -37,20 +35,6 @@ export const sortOrderOptions = [
   { label: "Ascending", value: "asc" },
 ] satisfies readonly SelectOption<(typeof sortOrders)[number]>[];
 
-export const projectStatusOptions = [
-  { label: "All statuses", value: "ALL" },
-  { label: "Draft", value: "DRAFT" },
-  { label: "Active", value: "ACTIVE" },
-  { label: "Archived", value: "ARCHIVED" },
-] satisfies readonly SelectOption<(typeof projectStatuses)[number]>[];
-
-export const projectSortFieldOptions = [
-  { label: "Recently updated", value: "updatedAt" },
-  { label: "Recently created", value: "createdAt" },
-  { label: "Name", value: "name" },
-  { label: "Status", value: "status" },
-] satisfies readonly SelectOption<(typeof projectSortFields)[number]>[];
-
 export const userStatusOptions = [
   { label: "All statuses", value: "ALL" },
   { label: "Pending", value: "PENDING" },
@@ -69,15 +53,6 @@ export const notificationUnreadOptions = [
   { label: "All notifications", value: false },
   { label: "Unread only", value: true },
 ] satisfies readonly SelectOption<boolean>[];
-
-export const projectsSearchParams = {
-  page: parseAsInteger.withDefault(1),
-  limit: parseAsInteger.withDefault(20),
-  search: parseAsString.withDefault(""),
-  status: parseAsStringLiteral(projectStatuses).withDefault("ALL"),
-  sortField: parseAsStringLiteral(projectSortFields).withDefault("updatedAt"),
-  sortOrder: parseAsStringLiteral(sortOrders).withDefault("desc"),
-};
 
 export const usersSearchParams = {
   page: parseAsInteger.withDefault(1),
@@ -113,18 +88,10 @@ export const sessionsSearchParams = {
   limit: parseAsInteger.withDefault(20),
 };
 
-export const projectNavigationSearchParams = {
-  returnTo: parseAsString.withDefault("/projects"),
-};
-
-const loadProjectsSearchParams = createLoader(projectsSearchParams);
 const loadUsersSearchParams = createLoader(usersSearchParams);
 const loadNotificationsSearchParams = createLoader(notificationsSearchParams);
 const loadAuditLogsSearchParams = createLoader(auditLogsSearchParams);
 const loadSessionsSearchParams = createLoader(sessionsSearchParams);
-const loadProjectNavigationSearchParams = createLoader(
-  projectNavigationSearchParams,
-);
 
 type SyncLoaderInput =
   | URL
@@ -133,13 +100,11 @@ type SyncLoaderInput =
   | Record<string, string | string[] | undefined>
   | string;
 
-const projectsSerializer = createSerializer(projectsSearchParams);
 const usersSerializer = createSerializer(usersSearchParams);
 const notificationsSerializer = createSerializer(notificationsSearchParams);
 const auditLogsSerializer = createSerializer(auditLogsSearchParams);
 const sessionsSerializer = createSerializer(sessionsSearchParams);
 
-export type ProjectsSearchState = inferParserType<typeof projectsSearchParams>;
 export type UsersSearchState = inferParserType<typeof usersSearchParams>;
 export type NotificationsSearchState = inferParserType<
   typeof notificationsSearchParams
@@ -148,12 +113,6 @@ export type AuditLogsSearchState = inferParserType<
   typeof auditLogsSearchParams
 >;
 export type SessionsSearchState = inferParserType<typeof sessionsSearchParams>;
-export type ProjectNavigationState = inferParserType<
-  typeof projectNavigationSearchParams
->;
-
-export const defaultProjectsSearch: ProjectsSearchState =
-  loadProjectsSearchParams(new URLSearchParams());
 export const defaultUsersSearch: UsersSearchState = loadUsersSearchParams(
   new URLSearchParams(),
 );
@@ -163,16 +122,6 @@ export const defaultAuditLogsSearch: AuditLogsSearchState =
   loadAuditLogsSearchParams(new URLSearchParams());
 export const defaultSessionsSearch: SessionsSearchState =
   loadSessionsSearchParams(new URLSearchParams());
-export const defaultProjectNavigation: ProjectNavigationState =
-  loadProjectNavigationSearchParams(new URLSearchParams());
-
-const mergeProjectsSearch = (
-  overrides: Partial<ProjectsSearchState> = {},
-): ProjectsSearchState => ({
-  ...defaultProjectsSearch,
-  ...overrides,
-});
-
 const mergeUsersSearch = (
   overrides: Partial<UsersSearchState> = {},
 ): UsersSearchState => ({
@@ -200,16 +149,6 @@ const mergeSessionsSearch = (
   ...defaultSessionsSearch,
   ...overrides,
 });
-
-export const serializeProjectsSearch = (state: ProjectsSearchState) =>
-  projectsSerializer({
-    page: state.page,
-    limit: state.limit,
-    ...(state.search ? { search: state.search } : {}),
-    ...(state.status !== "ALL" ? { status: state.status } : {}),
-    ...(state.sortField !== "updatedAt" ? { sortField: state.sortField } : {}),
-    ...(state.sortOrder !== "desc" ? { sortOrder: state.sortOrder } : {}),
-  });
 
 export const serializeUsersSearch = (state: UsersSearchState) =>
   usersSerializer({
@@ -249,9 +188,6 @@ export const serializeSessionsSearch = (state: SessionsSearchState) =>
     limit: state.limit,
   });
 
-export const normalizeProjectsSearch = (input: SyncLoaderInput) =>
-  loadProjectsSearchParams(input);
-
 export const normalizeUsersSearch = (input: SyncLoaderInput) =>
   loadUsersSearchParams(input);
 
@@ -263,18 +199,6 @@ export const normalizeAuditLogsSearch = (input: SyncLoaderInput) =>
 
 export const normalizeSessionsSearch = (input: SyncLoaderInput) =>
   loadSessionsSearchParams(input);
-
-export const normalizeProjectNavigation = (input: SyncLoaderInput) =>
-  loadProjectNavigationSearchParams(input);
-
-export const buildProjectsListPath = (
-  overrides: Partial<ProjectsSearchState> = {},
-) =>
-  withQuery(
-    // Legacy helper — no `/projects` resource in current OpenAPI.
-    "/api/bff/projects",
-    serializeProjectsSearch(mergeProjectsSearch(overrides)),
-  );
 
 export const buildAdminUsersListPath = (
   overrides: Partial<UsersSearchState> = {},
@@ -308,50 +232,10 @@ export const buildSessionsListPath = (
     serializeSessionsSearch(mergeSessionsSearch(overrides)),
   );
 
-export const buildProjectReturnTo = (
-  filters: Partial<ProjectsSearchState> = {},
-) =>
-  withQuery("/projects", serializeProjectsSearch(mergeProjectsSearch(filters)));
-
-export const normalizeProjectReturnTo = (value: string | null | undefined) => {
-  const candidate =
-    typeof value === "string" ? value : defaultProjectNavigation.returnTo;
-
-  if (!candidate.startsWith("/projects") || candidate.startsWith("//")) {
-    return defaultProjectNavigation.returnTo;
-  }
-
-  return candidate;
-};
-
-const buildProjectNavigationQuery = (returnTo?: string) =>
-  new URLSearchParams({
-    returnTo: normalizeProjectReturnTo(returnTo),
-  }).toString();
-
-export const buildProjectDetailPath = (projectId: string, returnTo?: string) =>
-  withQuery(`/projects/${projectId}`, buildProjectNavigationQuery(returnTo));
-
-export const buildProjectEditPath = (projectId: string, returnTo?: string) =>
-  withQuery(
-    `/projects/${projectId}/edit`,
-    buildProjectNavigationQuery(returnTo),
-  );
-
-export const buildProjectCreatePath = (returnTo?: string) =>
-  withQuery("/projects/new", buildProjectNavigationQuery(returnTo));
-
 export const normalizeBffListPath = (
   path: string,
   searchParams: URLSearchParams,
 ) => {
-  if (path === "projects") {
-    return withQuery(
-      path,
-      serializeProjectsSearch(normalizeProjectsSearch(searchParams)),
-    );
-  }
-
   if (path === "admin/users") {
     return withQuery(
       path,
