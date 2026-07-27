@@ -25,6 +25,7 @@
     "@nestjs/throttler": "6.5.0",
     "@repo/api-core": "workspace:*",
     "@repo/api-database": "workspace:*",
+    "@repo/api-identity": "workspace:*",
     "class-transformer": "0.5.1",
     "class-validator": "0.15.1",
     "drizzle-orm": "0.45.2",

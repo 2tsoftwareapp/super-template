@@ -63,10 +63,10 @@ export function ArchDiagram() {
               <CardContent className="px-4 py-4">
                 <p className="text-base font-semibold text-foreground">NestJS 11 API</p>
                 <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                  auth · users · access-control · audit · notifications · projects
+                  auth · users · access-control · audit · notifications
                 </p>
                 <p className="text-xs leading-5 text-muted-foreground">
-                  storage · mail · jobs · invitations · imports/exports · comments
+                  storage · mail · jobs · imports/exports
                 </p>
                 <p className="mt-2 text-xs leading-5 text-muted-foreground">
                   Drizzle ORM · Argon2 · JWT access + refresh rotation · OpenAPI
@@ -156,8 +156,8 @@ export function ArchDiagram() {
 
           <rect x="16" y="268" width="848" height="96" rx="10" fill="var(--card)" stroke="var(--primary)" strokeWidth="1.8" />
           <text x="440" y="282" textAnchor="middle" fill="var(--foreground)" fontSize="13" fontWeight="600">NestJS 11 API</text>
-          <text x="440" y="302" textAnchor="middle" fill="var(--foreground)" fillOpacity="0.74" fontSize="11">auth · users · access-control · audit · notifications · projects</text>
-          <text x="440" y="321" textAnchor="middle" fill="var(--foreground)" fillOpacity="0.74" fontSize="11">storage · mail · jobs · invitations · imports/exports · comments</text>
+          <text x="440" y="302" textAnchor="middle" fill="var(--foreground)" fillOpacity="0.74" fontSize="11">auth · users · access-control · audit · notifications</text>
+          <text x="440" y="321" textAnchor="middle" fill="var(--foreground)" fillOpacity="0.74" fontSize="11">storage · mail · jobs · imports/exports</text>
           <text x="440" y="344" textAnchor="middle" fill="var(--foreground)" fillOpacity="0.68" fontSize="10.5">Drizzle ORM · Argon2 · JWT access + refresh rotation · OpenAPI schema auto-generated</text>
 
           <rect x="16" y="412" width="200" height="52" rx="10" fill="var(--card)" stroke="var(--border)" strokeWidth="1.25" />

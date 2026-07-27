@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_app/features/auth/presentation/auth_controller.dart';
 import 'package:mobile_app/features/imports/data/imports_repository.dart';
 import 'package:mobile_app/features/imports/domain/import_permissions.dart';
+import 'package:super_template_api/super_template_api.dart';
 import 'package:uuid/uuid.dart';
 
 class ImportsScreen extends ConsumerStatefulWidget {
@@ -94,7 +95,7 @@ class _ImportsScreenState extends ConsumerState<ImportsScreen> {
         result!.files.single.name,
       );
       final job = await repository.create(
-        type: 'users',
+        type: CreateImportDtoTypeEnum.users,
         fileId: fileId,
         idempotencyKey: const Uuid().v4(),
       );

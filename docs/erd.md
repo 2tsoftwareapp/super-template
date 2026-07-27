@@ -413,7 +413,7 @@ Notifications, notification_device_tokens, notification_jobs, and activities are
 
 ## Counts
 
-- **30 tables** across 2 domains (Identity: 17, Platform: 13)
+- **36 tables** across 2 domains (Identity: 18, Platform: 18)
 - **2 PostgreSQL enums** in identity: `user_status`, `organization_member_role`
-- **6 enums** in platform: `mail_delivery_status`, `job_status`, `import_export_job_status`, `notification_device_platform`, `notification_audience`, `notification_job_status`, `activity_visibility`
+- **8 enums** in platform: `activity_visibility`, `import_export_job_status`, `job_status`, `mail_delivery_status`, `notification_audience`, `notification_delivery_status`, `notification_device_platform`, `notification_job_status`
 - Tenancy is centered on `organizations` — most data tables carry a scoping `organization_id` FK

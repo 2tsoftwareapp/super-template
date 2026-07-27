@@ -49,7 +49,7 @@ class ImportsRepository {
   }
 
   Future<ImportJobSummary> create({
-    required String type,
+    required CreateImportDtoTypeEnum type,
     required String fileId,
     required String idempotencyKey,
   }) async {

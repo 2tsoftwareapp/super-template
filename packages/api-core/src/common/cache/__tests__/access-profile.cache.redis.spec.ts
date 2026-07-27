@@ -60,13 +60,13 @@ describe('AccessProfileCache (redis path resilience)', () => {
   it('reads and parses a cached profile from redis', async () => {
     connectMock.mockResolvedValue(undefined);
     getMock.mockResolvedValue(
-      JSON.stringify({ roles: ['ADMIN'], permissions: ['projects.read'] }),
+      JSON.stringify({ roles: ['ADMIN'], permissions: ['users.read'] }),
     );
     const cache = new AccessProfileCache(redisEnv());
 
     await expect(cache.get('user-1')).resolves.toEqual({
       roles: ['ADMIN'],
-      permissions: ['projects.read'],
+      permissions: ['users.read'],
     });
   });
 

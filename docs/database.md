@@ -10,9 +10,9 @@
 - explicit indexes and unique constraints
 - soft deletion only where business recovery matters
 
-## Tables (30 total)
+## Tables (36 total)
 
-### Identity (17)
+### Identity (18)
 
 - `users` — core user accounts with email, password hash, avatar, status
 - `auth_sessions` — refresh-token-backed login sessions
@@ -31,8 +31,9 @@
 - `sso_login_states` — short-lived PKCE state records for SSO flows
 - `sso_session_exchanges` — one-time code exchange records for SSO callback
 - `user_preferences` — per-user theme, language, timezone, notification prefs
+- `outbox_messages` — outbox for outbound integration events
 
-### Platform (13)
+### Platform (18)
 
 - `audit_logs` — append-only action log
 - `files` — file/object storage metadata
@@ -47,10 +48,11 @@
 - `export_jobs` — CSV/data export jobs
 - `mail_deliveries` — transactional email delivery log
 - `application_settings` — key/value app-wide settings
+- `notification_deliveries` — per-notification delivery tracking
+- `notification_device_tokens` — FCM push notification tokens
+- `notification_jobs` — scheduled/sent notification jobs
 
-### Platform (additional)
-
-Notes: `notifications`, `notification_device_tokens`, `notification_jobs`, and `activities` are included in the Platform domain above (see notifications and activities modules). The workspace domain (projects, invitations, comments) has been removed from the template.
+The workspace domain (projects, invitations, comments) has been removed from the template. `notifications`, `notification_device_tokens`, `notification_jobs`, `notification_deliveries`, and `activities` are included in the Platform domain.
 
 ## Migration Workflow
 

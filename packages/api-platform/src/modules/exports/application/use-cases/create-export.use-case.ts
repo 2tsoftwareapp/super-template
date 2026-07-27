@@ -36,6 +36,9 @@ export class CreateExportUseCase {
   ) {
     const organizationId = requireOrganizationId(actor);
 
+    // Resolve adapter before creating any DB records
+    const adapter = this.importExportAdapters.resolve(input.type);
+
     const jobValues = {
       organizationId,
       type: input.type,
@@ -66,7 +69,6 @@ export class CreateExportUseCase {
     let storageKey: string | undefined;
 
     try {
-      const adapter = this.importExportAdapters.resolve(input.type);
       const rows = await adapter.listForExport({
         organizationId,
         ownerId: actor.userId,

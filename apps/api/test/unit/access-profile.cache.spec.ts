@@ -12,7 +12,7 @@ describe('AccessProfileCache', () => {
 
     const profile = {
       roles: ['ADMIN'],
-      permissions: ['projects.read'],
+      permissions: ['users.read'],
     };
 
     await cache.set('user-1', profile);
@@ -29,7 +29,7 @@ describe('AccessProfileCache', () => {
 
     await cache.set('user-1', {
       roles: ['USER'],
-      permissions: ['projects.read'],
+      permissions: ['users.read'],
     });
 
     await cache.invalidateUser('user-1');

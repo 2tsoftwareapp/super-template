@@ -6,7 +6,7 @@ import { AccessProfileCache, type AccessProfileSnapshot } from '../access-profil
 
 const profile: AccessProfileSnapshot = {
   roles: ['ADMIN'],
-  permissions: ['projects.read'],
+  permissions: ['users.read'],
 };
 
 // Env stub with Redis disabled so the cache exercises its in-process fallback path.

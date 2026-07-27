@@ -7,6 +7,7 @@ import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import {
   AppError,
   ERROR_CODES,
+  ImportExportAdapterRegistry,
   SYSTEM_SCOPE,
   TRANSACTION_PORT,
   type TransactionPort,
@@ -32,6 +33,7 @@ export class CreateImportUseCase {
     private readonly auditService: AuditService,
     private readonly getImportUseCase: GetImportUseCase,
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
+    private readonly importExportAdapters: ImportExportAdapterRegistry,
   ) {}
 
   async execute(
@@ -53,6 +55,10 @@ export class CreateImportUseCase {
     }
 
     const organizationId = file.organizationId;
+
+    // Resolve adapter before creating any DB records
+    const adapter = this.importExportAdapters.resolve(input.type);
+
     const jobValues = {
       organizationId,
       type: input.type,

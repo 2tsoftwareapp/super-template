@@ -91,7 +91,7 @@ describe("proxyWithRefresh", () => {
       .mockResolvedValueOnce(
         new Response(
           JSON.stringify({
-            data: [{ id: "project-1" }],
+            data: [{ id: "user-1" }],
             meta: { page: 1, limit: 20, total: 1, totalPages: 1 },
           }),
           {
@@ -101,14 +101,14 @@ describe("proxyWithRefresh", () => {
         ),
       );
 
-    const request = new NextRequest("http://localhost/api/bff/users", {
+    const request = new NextRequest("http://localhost/api/bff/admin/users", {
       method: "GET",
       headers: {
         accept: "application/json",
       },
     });
 
-    const response = await proxyWithRefresh(request, "users");
+    const response = await proxyWithRefresh(request, "admin/users");
     const payload = (await response.json()) as ApiEnvelope<{ id: string }[]>;
 
     expect(response.status).toBe(200);
