@@ -5,6 +5,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { DatabaseClient } from './database.types';
 
 import { DATABASE } from './database.provider';
+import { toSavepointExecutor } from './savepoint-executor';
 import { withTenantContext } from './tenant-context';
 
 @Injectable()
@@ -24,11 +25,8 @@ export class DrizzlePlatformTransactionService implements PlatformTransactionPor
   }
 
   async withSavepoint<T>(executor: TransactionExecutor, name: string, fn: () => Promise<T>): Promise<T> {
-    const tx = executor as any;
-    if (typeof tx.execute !== 'function') {
-      throw new Error('TransactionExecutor does not support savepoints in the current implementation');
-    }
-    
+    const tx = toSavepointExecutor(executor);
+
     const { sql } = await import('drizzle-orm');
     try {
       await tx.execute(sql.raw(`SAVEPOINT ${name}`));

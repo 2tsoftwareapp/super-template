@@ -53,6 +53,8 @@ export const ERROR_CODES = {
   AUDIT_LOG_NOT_FOUND: 'AUDIT_LOG_NOT_FOUND',
   // Conflicts indicate the request was syntactically valid but violates uniqueness or state rules.
   RESOURCE_CONFLICT: 'RESOURCE_CONFLICT',
+  // Rate limiting rejects requests sent before a cooldown window has elapsed.
+  RATE_LIMITED: 'RATE_LIMITED',
   // Internal errors are reserved for unrecoverable server-side failures.
   INTERNAL_ERROR: 'INTERNAL_ERROR',
 } as const;

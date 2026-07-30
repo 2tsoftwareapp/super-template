@@ -26,13 +26,10 @@ export async function seedUsers(
     roleName: string;
   }) => {
     const normalizedEmail = input.email.trim().toLowerCase();
-    console.log(`[DEBUG] seedUsers: ensureUser ${normalizedEmail} - findByEmail`);
     let user = await params.usersRepository.findByEmail(normalizedEmail, executor);
 
     if (!user) {
-      console.log(`[DEBUG] seedUsers: ensureUser ${normalizedEmail} - hashPassword`);
       const passwordHash = await hashPassword(input.password);
-      console.log(`[DEBUG] seedUsers: ensureUser ${normalizedEmail} - create`);
       user = await params.usersRepository.create(
         {
           email: normalizedEmail,
@@ -44,9 +41,7 @@ export async function seedUsers(
         executor,
       );
     } else {
-      console.log(`[DEBUG] seedUsers: ensureUser ${normalizedEmail} - update (hashPassword)`);
       const passwordHash = await hashPassword(input.password);
-      console.log(`[DEBUG] seedUsers: ensureUser ${normalizedEmail} - update`);
       const updatedUser = await params.usersRepository.update(
         user.id,
         {
@@ -64,9 +59,7 @@ export async function seedUsers(
 
       user = updatedUser;
     }
-    console.log(`[DEBUG] seedUsers: ensureUser ${normalizedEmail} - done user db`);
 
-    console.log(`[DEBUG] seedUsers: ensureUser ${normalizedEmail} - getRoleByName`);
     const role = await params.accessControlService.getRoleByName(
       input.roleName,
       null,
@@ -77,7 +70,6 @@ export async function seedUsers(
       throw new Error(`Seed role ${input.roleName} was not found.`);
     }
 
-    console.log(`[DEBUG] seedUsers: ensureUser ${normalizedEmail} - replaceUserRoles`);
     // Assign the exact bootstrap role for each account instead of relying on defaults.
     await params.accessControlService.replaceUserRoles(
       user.id,
@@ -86,7 +78,6 @@ export async function seedUsers(
       executor,
     );
 
-    console.log(`[DEBUG] seedUsers: ensureUser ${normalizedEmail} - ensurePersonalOrganization`);
     const organizationId =
       await params.organizationsService.ensurePersonalOrganization(
         user.id,
@@ -94,7 +85,6 @@ export async function seedUsers(
         executor,
       );
 
-    console.log(`[DEBUG] seedUsers: ensureUser ${normalizedEmail} - all done`);
     return { userId: user.id, organizationId };
   };
 

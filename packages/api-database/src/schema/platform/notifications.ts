@@ -14,7 +14,6 @@ import {
 
 import { organizations } from '../identity/organizations';
 import { users } from '../identity/users';
-import { jobs } from './jobs';
 import { timestamps } from '../shared/timestamps';
 import {
   notificationAudienceEnum,
@@ -22,6 +21,7 @@ import {
   notificationDevicePlatformEnum,
   notificationJobStatusEnum,
 } from './enums';
+import { jobs } from './jobs';
 
 export const notifications = pgTable(
   'notifications',

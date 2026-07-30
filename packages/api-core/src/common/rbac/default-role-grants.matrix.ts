@@ -1,5 +1,5 @@
-import { ACTION, type Action, perm } from './permission.helpers';
 import { type CatalogResource } from './permission-catalog';
+import { ACTION, type Action, perm } from './permission.helpers';
 import { ROLE_NAMES, type RoleName } from './role.constants';
 
 export interface ResourceGrant {

@@ -1,6 +1,7 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
-import type { Pool } from 'pg';
 import type { AdvisoryLockPort } from '@repo/api-core';
+import type { Pool } from 'pg';
+
+import { Inject, Injectable, Logger } from '@nestjs/common';
 
 import { ADVISORY_LOCK_POOL } from './database.provider';
 
@@ -14,7 +15,10 @@ export class PostgresAdvisoryLockService implements AdvisoryLockPort {
     const client = await this.pool.connect();
     
     try {
-      const { rows } = await client.query('SELECT pg_try_advisory_lock($1) as locked', [lockId]);
+      const { rows } = await client.query<{ locked: boolean }>(
+        'SELECT pg_try_advisory_lock($1) as locked',
+        [lockId],
+      );
       const locked = rows[0]?.locked === true;
       
       if (!locked) {

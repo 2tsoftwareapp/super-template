@@ -1,5 +1,10 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { durationToMilliseconds, normalizeEmail } from '@repo/api-core';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import {
+  AppError,
+  durationToMilliseconds,
+  ERROR_CODES,
+  normalizeEmail,
+} from '@repo/api-core';
 
 import type { ResendVerificationCommand } from '../auth.types';
 
@@ -36,12 +41,9 @@ export class ResendVerificationUseCase {
         const elapsed = Date.now() - latest.createdAt.getTime();
         if (elapsed < RESEND_COOLDOWN_MS) {
           const remaining = Math.ceil((RESEND_COOLDOWN_MS - elapsed) / 1000);
-          throw new HttpException(
-            {
-              error: {
-                message: `Please wait ${remaining}s before requesting another email.`,
-              },
-            },
+          throw new AppError(
+            ERROR_CODES.RATE_LIMITED,
+            `Please wait ${remaining}s before requesting another email.`,
             HttpStatus.TOO_MANY_REQUESTS,
           );
         }

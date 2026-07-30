@@ -1,8 +1,7 @@
+import type { SYSTEM_SCOPE } from '../common/constants/system.constants';
 import type { JsonObject } from '../common/types/json-value';
 import type { RequestContext } from '../common/types/request-context';
 import type { TransactionExecutor } from '../common/types/transaction-executor';
-
-import { SYSTEM_SCOPE } from '../common/constants/system.constants';
 
 export interface AuditLogBaseInput {
   actorId?: string | null;

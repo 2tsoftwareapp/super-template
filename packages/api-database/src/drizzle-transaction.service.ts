@@ -1,11 +1,12 @@
 import type { TenantContext, TransactionExecutor, TransactionPort } from '@repo/api-core';
 
-import { TenantContextService } from '@repo/api-core';
 import { Inject, Injectable } from '@nestjs/common';
+import { TenantContextService } from '@repo/api-core';
 
 import type { DatabaseClient } from './database.types';
 
 import { DATABASE } from './database.provider';
+import { toSavepointExecutor } from './savepoint-executor';
 import { withTenantContext } from './tenant-context';
 import { runInTransaction } from './transaction';
 
@@ -29,10 +30,7 @@ export class DrizzleTransactionService implements TransactionPort {
   }
 
   async withSavepoint<T>(executor: TransactionExecutor, name: string, fn: () => Promise<T>): Promise<T> {
-    const tx = executor as any;
-    if (typeof tx.execute !== 'function') {
-      throw new Error('TransactionExecutor does not support savepoints in the current implementation');
-    }
+    const tx = toSavepointExecutor(executor);
 
     // Savepoint names are PostgreSQL identifiers. A job id is a UUID containing
     // hyphens ("550e8400-e29b-..."), which is not a valid bare identifier, so
