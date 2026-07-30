@@ -9,17 +9,20 @@ import type {
   UpdateOrganizationInput,
 } from "@/lib/api-types";
 
-import { buildPath, webFetch } from "@/lib/http";
+import { webFetch } from "@/lib/http";
+import {
+  fetchMyOrganizations,
+  fetchOrganizationsList,
+} from "@/lib/lookup-api";
 
 /**
  * Organizations transport. BFF catch-all paths use `bffPath`.
  * Switch-org stays on the dedicated `/api/auth/*` Next route (cookie session).
+ * `mine`/`list` delegate to the shared lookup transport in `lib/lookup-api`.
  */
 export const organizationsApi = {
   mine() {
-    return webFetch<ListResponse<OrganizationDto>>(
-      buildPath(bffPath("/api/v1/organizations"), { memberOnly: true }),
-    );
+    return fetchMyOrganizations();
   },
 
   switch(organizationId: string) {
@@ -33,9 +36,7 @@ export const organizationsApi = {
   },
 
   list() {
-    return webFetch<ListResponse<OrganizationDto>>(
-      bffPath("/api/v1/organizations"),
-    );
+    return fetchOrganizationsList();
   },
 
   get(id: string) {
@@ -101,29 +102,3 @@ export const organizationsApi = {
     );
   },
 };
-
-/** @deprecated Prefer `organizationsApi` */
-export const fetchMyOrganizations = () => organizationsApi.mine();
-export const switchOrganization = (organizationId: string) =>
-  organizationsApi.switch(organizationId);
-export const fetchOrganizations = () => organizationsApi.list();
-export const fetchOrganizationDetail = (id: string) =>
-  organizationsApi.get(id);
-export const createOrganizationApi = (input: CreateOrganizationInput) =>
-  organizationsApi.create(input);
-export const updateOrganizationApi = (
-  id: string,
-  input: UpdateOrganizationInput,
-) => organizationsApi.update(id, input);
-export const deleteOrganizationApi = (id: string) =>
-  organizationsApi.delete(id);
-export const leaveOrganizationApi = (id: string) => organizationsApi.leave(id);
-export const fetchOrganizationMembers = (id: string) =>
-  organizationsApi.members(id);
-export const updateMemberRoleApi = (
-  id: string,
-  userId: string,
-  role: string,
-) => organizationsApi.updateMemberRole(id, userId, role);
-export const removeMemberApi = (id: string, userId: string) =>
-  organizationsApi.removeMember(id, userId);

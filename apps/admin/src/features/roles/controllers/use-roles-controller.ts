@@ -15,14 +15,12 @@ import type {
 } from "@/features/roles/model/roles.schemas";
 import type { RolesViewModel } from "@/features/roles/model/roles.types";
 
-import { useOrganizationsQuery } from "@/features/organizations";
 import {
   useDeleteRoleMutation,
   useSaveRoleMutation,
 } from "@/features/roles/api/roles.mutations";
 import {
   usePermissionCatalogQuery,
-  useRolesQuery,
 } from "@/features/roles/api/roles.queries";
 import { rolesKeys } from "@/features/roles/api/roles.query-keys";
 import {
@@ -32,6 +30,8 @@ import {
   optionalText,
 } from "@/features/roles/model/roles.filtering";
 import { selectRoleManagementPermissions } from "@/features/roles/model/roles.permissions";
+import { useOrganizationsQuery } from "@/hooks/use-organizations-lookup";
+import { useRolesQuery } from "@/hooks/use-roles-lookup";
 import { useSession } from "@/hooks/use-session";
 import { usePathname, useRouter } from "@/i18n/navigation";
 
@@ -178,7 +178,7 @@ export function useRolesController(): RolesViewModel {
   const handleScopeFilterChange = (
     value: "platform" | "organization" | undefined,
   ) => {
-    patchParams({ scope: value || undefined, page: undefined });
+    patchParams({ scope: value, page: undefined });
   };
 
   const handleSaveRole = (values: {
@@ -266,7 +266,7 @@ export function useRolesController(): RolesViewModel {
     organizationFilter: urlOrgId,
     onOrganizationFilterChange: (value) =>
       patchParams({
-        organizationId: value || undefined,
+        organizationId: value === "" ? undefined : value,
         page: undefined,
       }),
     isLoading: roles.isLoading,

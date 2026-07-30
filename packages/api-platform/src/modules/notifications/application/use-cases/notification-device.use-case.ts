@@ -23,6 +23,16 @@ export class NotificationDeviceUseCase {
       platform: input.platform,
     });
 
+    if (!result) {
+      // Lock unavailable → delivery processor is currently sending to this token.
+      // A brief retry at the HTTP level is safe; return a 409 so the client can retry.
+      throw new AppError(
+        ERROR_CODES.RESOURCE_CONFLICT,
+        'Device token is temporarily locked by an in-progress delivery; please retry',
+        HttpStatus.CONFLICT,
+      );
+    }
+
     const deviceToken = result.token;
 
     return {

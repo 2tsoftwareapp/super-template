@@ -1,7 +1,10 @@
-import { bffPath, type operations } from "@repo/api-contract";
+import { bffPath } from "@repo/api-contract";
 
 import type { ListResponse } from "@/lib/api-types";
-import { buildPath, webFetch } from "@/lib/http";
+import type { RolesListParams } from "@/lib/lookup-api";
+
+import { webFetch } from "@/lib/http";
+import { fetchRolesList } from "@/lib/lookup-api";
 
 import type {
   EditableRole,
@@ -13,13 +16,8 @@ interface RoleSaveResult {
   data: EditableRole & { permissions: PermissionDto[] };
 }
 
-type RolesListOperation = operations["AdminRolesController_listRoles"];
-
-export type RolesListParams = NonNullable<
-  RolesListOperation["parameters"]["query"]
->;
-export type RolesListResponse =
-  RolesListOperation["responses"][200]["content"]["application/json"];
+// Shared with the cross-feature lookup hook in `src/hooks/use-roles-lookup`.
+export type { RolesListParams, RolesListResponse } from "@/lib/lookup-api";
 
 function buildRolePayload(input: RoleForm) {
   return {
@@ -32,11 +30,7 @@ function buildRolePayload(input: RoleForm) {
 
 export const rolesApi = {
   list(params?: RolesListParams) {
-    return webFetch<RolesListResponse>(
-      params
-        ? buildPath(bffPath("/api/v1/admin/roles"), { ...params })
-        : bffPath("/api/v1/admin/roles"),
-    );
+    return fetchRolesList(params);
   },
 
   permissions() {

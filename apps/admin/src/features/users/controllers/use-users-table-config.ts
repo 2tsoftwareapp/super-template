@@ -9,7 +9,10 @@ import {
 } from "@tanstack/react-table";
 import { useCallback, useMemo, useState } from "react";
 
-import type { UsersListParams } from "@/features/users/model/users.types";
+import type {
+  UsersListParams,
+  UsersTableColumnFactory,
+} from "@/features/users/model/users.types";
 import type { AdminUserDto } from "@/lib/api-types";
 
 import {
@@ -17,7 +20,6 @@ import {
   sortingStateFromParams,
   usersSortChanged,
 } from "@/features/users/model/sorting";
-import { createUsersTableColumns } from "@/features/users/ui/users-table-columns";
 
 interface UseUsersTableConfigOptions {
   pageUsers: AdminUserDto[];
@@ -28,6 +30,8 @@ interface UseUsersTableConfigOptions {
   handleBlock: (userId: string) => void;
   handleResendVerification: (email: string) => void;
   onSortChange: (nextSort: UsersListParams["sort"]) => void;
+  /** Injected by the screen (ui/users-table-columns) — handlers must not import ui/. */
+  createColumns: UsersTableColumnFactory;
 }
 
 /**
@@ -43,6 +47,7 @@ export function useUsersTableConfig({
   handleBlock,
   handleResendVerification,
   onSortChange,
+  createColumns,
 }: UseUsersTableConfigOptions) {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
@@ -57,7 +62,7 @@ export function useUsersTableConfig({
 
   const columns = useMemo(
     () =>
-      createUsersTableColumns({
+      createColumns({
         canUpdate,
         onActivate: handleActivate,
         onBlock: handleBlock,
@@ -66,6 +71,7 @@ export function useUsersTableConfig({
       }),
     [
       canUpdate,
+      createColumns,
       handleActivate,
       handleBlock,
       handleResendVerification,

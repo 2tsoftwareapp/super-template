@@ -1,10 +1,9 @@
-import type { Table } from "@tanstack/react-table";
-import type { UseFormReturn } from "react-hook-form";
-
 import type {
   SortCriterion,
   SortOrder,
 } from "@repo/api-sort";
+import type { ColumnDef, Table } from "@tanstack/react-table";
+import type { UseFormReturn } from "react-hook-form";
 
 import { PAGE_SIZE_OPTIONS, type PageSize } from "@repo/config";
 
@@ -29,6 +28,25 @@ export type UsersSortField = "createdAt" | "displayName" | "email" | "status";
 export type UsersSortOrder = SortOrder;
 
 export type UsersSortCriterion = SortCriterion<UsersSortField>;
+
+// ── Users table column contract (implemented in ui/users-table-columns) ─────
+
+export interface UsersTableColumnOptions {
+  canUpdate?: boolean;
+  onActivate?: (userId: string) => void | Promise<void>;
+  onBlock?: (userId: string) => void | Promise<void>;
+  onResendVerification?: (email: string) => void | Promise<void>;
+  isDisabled?: boolean;
+}
+
+/**
+ * Column-factory contract: the screen injects the ui/ implementation into the
+ * handler so controllers never import from ui/ (see CODING_RULES.md §10).
+ */
+export type UsersTableColumnFactory = (
+  options?: UsersTableColumnOptions,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- mirrors TanStack's own `columns: ColumnDef<TData, any>[]` input type
+) => ColumnDef<AdminUserDto, any>[];
 
 export interface UsersListParams {
   page: number;

@@ -6,12 +6,16 @@ import { Spinner } from "@repo/web-ui/spinner";
 import { useUsersListController } from "@/features/users/controllers/use-users-list-controller";
 
 import { UsersListView } from "../ui/users-list-view";
+import { createUsersTableColumns } from "../ui/users-table-columns";
 
 /**
  * Users list screen: session guard, then presentational list view from controller.
+ * Injects the ui/ column factory so the handler layer never imports ui/ (§10).
  */
 export function UsersView() {
-  const controller = useUsersListController();
+  const controller = useUsersListController({
+    createColumns: createUsersTableColumns,
+  });
 
   if (controller.session.isLoading) {
     return (

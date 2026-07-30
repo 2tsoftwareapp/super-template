@@ -7,7 +7,7 @@ import type { OrganizationSwitcherViewModel } from "@/features/organizations/mod
 
 import { useAdminSession } from "@/components/admin-guard";
 import { useSwitchOrganizationMutation } from "@/features/organizations/api/organizations.mutations";
-import { useMyOrganizationsQuery } from "@/features/organizations/api/organizations.queries";
+import { useMyOrganizationsQuery } from "@/hooks/use-organizations-lookup";
 
 export type { OrganizationSwitcherViewModel };
 

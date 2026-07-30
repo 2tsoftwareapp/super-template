@@ -36,14 +36,17 @@ vi.mock("@/hooks/use-session", () => ({
 }));
 
 vi.mock("@/features/roles/api/roles.queries", () => ({
-  useRolesQuery: vi.fn(() => ({
-    data: { data: [], meta: { total: 0, totalPages: 1 } },
-    isLoading: false,
+  usePermissionCatalogQuery: vi.fn(() => ({
+    data: { data: [] },
     isFetching: false,
     isError: false,
   })),
-  usePermissionCatalogQuery: vi.fn(() => ({
-    data: { data: [] },
+}));
+
+vi.mock("@/hooks/use-roles-lookup", () => ({
+  useRolesQuery: vi.fn(() => ({
+    data: { data: [], meta: { total: 0, totalPages: 1 } },
+    isLoading: false,
     isFetching: false,
     isError: false,
   })),
@@ -57,7 +60,7 @@ vi.mock("@/features/roles/api/roles.mutations", () => ({
   })),
 }));
 
-vi.mock("@/features/organizations", () => ({
+vi.mock("@/hooks/use-organizations-lookup", () => ({
   useOrganizationsQuery: vi.fn(() => ({
     data: { data: [] },
     isLoading: false,

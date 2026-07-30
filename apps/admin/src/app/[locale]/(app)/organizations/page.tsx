@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+
 import { Suspense } from "react";
 
 import { OrganizationsView } from "@/features/organizations";

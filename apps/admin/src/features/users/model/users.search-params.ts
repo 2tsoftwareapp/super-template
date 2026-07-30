@@ -61,7 +61,7 @@ export function parseUsersListSearchParams(
   // fall back to the single-column sortField/sortOrder pair.
   const rawMultiSort = searchParams.get("sort");
   const sort =
-    rawMultiSort && rawMultiSort.trim()
+    rawMultiSort?.trim()
       ? parseSortParam(rawMultiSort, SORT_FIELDS, defaultSort)
       : [
           {

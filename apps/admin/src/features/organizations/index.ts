@@ -7,13 +7,12 @@ export {
   useUpdateMemberRoleMutation,
   useUpdateOrganizationMutation,
 } from "./api/organizations.mutations";
+// Cross-feature lookups (`useMyOrganizationsQuery`, `useOrganizationsQuery`)
+// live in `@/hooks/use-organizations-lookup`; keys in `@/lib/query-keys`.
 export {
-  useMyOrganizationsQuery,
   useOrganizationDetailQuery,
   useOrganizationMembersQuery,
-  useOrganizationsQuery,
 } from "./api/organizations.queries";
-export { organizationsKeys } from "./api/organizations.query-keys";
 export { useOrganizationDetailController } from "./controllers/use-organization-detail-controller";
 export { useOrganizationSwitcherController } from "./controllers/use-organization-switcher-controller";
 export { useOrganizationsController } from "./controllers/use-organizations-controller";

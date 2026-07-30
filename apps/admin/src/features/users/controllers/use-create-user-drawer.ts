@@ -4,11 +4,9 @@ import { getErrorMessage } from "@repo/web-utils/errors";
 import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 
-import type { RoleDto } from "@/lib/api-types";
-
-import { useMyOrganizationsQuery } from "@/features/organizations";
-import { useRolesQuery } from "@/features/roles";
 import { useCreateUser } from "@/features/users/api/users.mutations";
+import { useMyOrganizationsQuery } from "@/hooks/use-organizations-lookup";
+import { useRolesQuery } from "@/hooks/use-roles-lookup";
 import { filterRolesForOrganization, getAssignableRoles } from "@/lib/roles";
 
 interface UseCreateUserDrawerOptions {
@@ -39,7 +37,7 @@ export function useCreateUserDrawer({
     () =>
       getAssignableRoles(
         actorRoles,
-        (rolesQuery.data?.data ?? []) as RoleDto[],
+        rolesQuery.data?.data ?? [],
       ),
     [actorRoles, rolesQuery.data],
   );

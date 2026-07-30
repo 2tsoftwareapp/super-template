@@ -9,10 +9,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 import type { UserDetailViewModel } from "@/features/users/model/users.types";
-import type { RoleDto } from "@/lib/api-types";
 
-import { useMyOrganizationsQuery } from "@/features/organizations";
-import { useRolesQuery } from "@/features/roles";
 import {
   useDeleteUserMutation,
   useReplaceRolesMutation,
@@ -25,6 +22,8 @@ import {
   profileSchema,
   userRouteParamsSchema,
 } from "@/features/users/model/users.schemas";
+import { useMyOrganizationsQuery } from "@/hooks/use-organizations-lookup";
+import { useRolesQuery } from "@/hooks/use-roles-lookup";
 import { useSession } from "@/hooks/use-session";
 import { useRouter } from "@/i18n/navigation";
 import { getAssignableRoles } from "@/lib/roles";
@@ -91,7 +90,7 @@ export function useUserDetailController(): UserDetailViewModel {
 
   const assignableRoles = getAssignableRoles(
     actorRoles,
-    (roles.data?.data ?? []) as RoleDto[],
+    roles.data?.data ?? [],
   ).map((r) => ({
     id: r.id,
     name: r.name,

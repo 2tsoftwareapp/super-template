@@ -45,8 +45,12 @@ export interface DeviceTokensRepositoryPort {
    *
    * All mutations happen inside a single transaction so the processor can never
    * read a half-transferred state.
+   *
+   * Returns `null` when the per-token advisory lock is unavailable (a delivery
+   * to this token is in flight). The caller decides how to surface that — the
+   * repository never raises domain/HTTP errors itself.
    */
-  registerOrTransfer(values: UpsertDeviceTokenInput, executor?: TransactionExecutor): Promise<RegisterTokenResult>;
+  registerOrTransfer(values: UpsertDeviceTokenInput, executor?: TransactionExecutor): Promise<RegisterTokenResult | null>;
   listByUserId(userId: string, executor?: TransactionExecutor): Promise<DeviceTokenRecord[]>;
   listByIds(ids: string[], executor?: TransactionExecutor): Promise<DeviceTokenRecord[]>;
   disableByToken(userId: string, token: string, reason: string, executor?: TransactionExecutor): Promise<DeviceTokenRecord | null>;

@@ -1,22 +1,18 @@
 import type {
   DatabaseClient,
   DatabaseExecutor,
-  DatabaseTransaction,
 } from '@repo/api-database';
 
 import { Inject, Injectable } from '@nestjs/common';
 import {
   ADVISORY_LOCK_PORT,
   type AdvisoryLockPort,
-  AppError,
-  ERROR_CODES,
 } from '@repo/api-core';
 import { DATABASE, runInTransaction } from '@repo/api-database';
 import { notificationDeliveries, notificationDeviceTokens } from '@repo/api-database';
 import { and, eq, inArray, isNull } from 'drizzle-orm';
 
 import type {
-  DeviceTokenRecord,
   DeviceTokensRepositoryPort,
   RegisterTokenResult,
 } from '../application/ports/device-tokens.repository.port';
@@ -60,6 +56,11 @@ export class DeviceTokensRepository implements DeviceTokensRepositoryPort {
    *            PENDING/PROCESSING deliveries, insert new row with new UUID.
    *   Historical (disabled) rows are never re-enabled; the partial unique index
    *   guarantees at most one active row per token.
+   *
+   * The lock + transaction stay in this repository on purpose: they enforce a
+   * storage invariant (atomic ownership swap, lock hash shared with the
+   * delivery processor), not business orchestration. Returns `null` when the
+   * lock is unavailable — the use case decides how to surface it.
    */
   async registerOrTransfer(
     values: {
@@ -68,7 +69,7 @@ export class DeviceTokensRepository implements DeviceTokensRepositoryPort {
       platform: NotificationDevicePlatform;
     },
     executor?: DatabaseExecutor,
-  ): Promise<RegisterTokenResult> {
+  ): Promise<RegisterTokenResult | null> {
     const run = async (tx: DatabaseExecutor): Promise<RegisterTokenResult> => {
       const [existing] = await tx
         .select()
@@ -153,28 +154,16 @@ export class DeviceTokensRepository implements DeviceTokensRepositoryPort {
     // When called inside an existing executor skip advisory locking — the
     // caller is responsible for serialization in that context.
     if (executor) {
-      return run(executor as DatabaseTransaction);
+      return run(executor);
     }
 
     // Acquire the per-token lock so that a concurrent delivery processor
     // holding the same lock cannot be between its owner-check and FCM send
-    // while we swap ownership.
-    const result = await this.advisoryLock.withAdvisoryLock(
+    // while we swap ownership. `null` = lock unavailable (delivery in flight).
+    return this.advisoryLock.withAdvisoryLock(
       tokenLockId(values.token),
       () => runInTransaction(this.database, run),
     );
-
-    if (result === null) {
-      // Lock unavailable → delivery processor is currently sending to this token.
-      // A brief retry at the HTTP level is safe; return a 409 so the client can retry.
-      throw new AppError(
-        ERROR_CODES.RESOURCE_CONFLICT,
-        'Device token is temporarily locked by an in-progress delivery; please retry',
-        409,
-      );
-    }
-
-    return result;
   }
 
   async listByUserId(

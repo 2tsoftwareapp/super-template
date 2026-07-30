@@ -1,9 +1,6 @@
-export const organizationsKeys = {
-  all: ["admin-organizations"] as const,
-  mine: () => [...organizationsKeys.all, "mine"] as const,
-  lists: () => [...organizationsKeys.all, "list"] as const,
-  list: () => [...organizationsKeys.lists()] as const,
-  details: () => [...organizationsKeys.all, "detail"] as const,
-  detail: (id: string) => [...organizationsKeys.details(), id] as const,
-  members: (id: string) => [...organizationsKeys.all, "members", id] as const,
-};
+/**
+ * Re-export of the shared key factory in `lib/query-keys` so feature-internal
+ * imports keep working. The factory itself lives in `lib/` because the
+ * cross-feature lookup hooks in `src/hooks/` must share the same cache keys.
+ */
+export { organizationsKeys } from "@/lib/query-keys";

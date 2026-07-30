@@ -11,8 +11,8 @@ import type { OrganizationsListViewModel } from "@/features/organizations/model/
 import {
   useCreateOrganizationMutation,
 } from "@/features/organizations/api/organizations.mutations";
-import { useOrganizationsQuery } from "@/features/organizations/api/organizations.queries";
 import { organizationsKeys } from "@/features/organizations/api/organizations.query-keys";
+import { useOrganizationsQuery } from "@/hooks/use-organizations-lookup";
 import { useRouter } from "@/i18n/navigation";
 
 export type { OrganizationsListViewModel };

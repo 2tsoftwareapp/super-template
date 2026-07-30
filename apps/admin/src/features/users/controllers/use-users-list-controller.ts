@@ -8,9 +8,10 @@ import { toast } from "sonner";
 
 import type {
   UsersListParams,
-  UsersPageSize,
-  UserStatusFilter,
   UsersListViewModel,
+  UsersPageSize,
+  UsersTableColumnFactory,
+  UserStatusFilter,
 } from "@/features/users/model/users.types";
 
 import {
@@ -34,6 +35,11 @@ import { useUsersTableConfig } from "./use-users-table-config";
 
 export type { UsersListViewModel };
 
+interface UseUsersListControllerOptions {
+  /** Column factory from ui/users-table-columns, injected by the screen (§10). */
+  createColumns: UsersTableColumnFactory;
+}
+
 /**
  * Orchestration hook for the users list screen.
  *
@@ -45,7 +51,9 @@ export type { UsersListViewModel };
  * Owns: URL list params, list query, bulk/create composition.
  * Does not own: table config (use-users-table-config) or column atoms.
  */
-export function useUsersListController(): UsersListViewModel {
+export function useUsersListController({
+  createColumns,
+}: UseUsersListControllerOptions): UsersListViewModel {
   const router = useRouter();
   const pathname = usePathname();
   const session = useSession();
@@ -165,6 +173,7 @@ export function useUsersListController(): UsersListViewModel {
     handleBlock,
     handleResendVerification,
     onSortChange: handleSortChange,
+    createColumns,
   });
 
   const hasFilters = Boolean(searchInput || queryParams.status !== "all");

@@ -1,8 +1,6 @@
-import type { RolesListParams } from "./roles.api";
-
-export const rolesKeys = {
-  all: ["admin-roles"] as const,
-  lists: () => [...rolesKeys.all, "list"] as const,
-  list: (params: RolesListParams) => [...rolesKeys.lists(), params] as const,
-  permissions: () => [...rolesKeys.all, "permissions"] as const,
-};
+/**
+ * Re-export of the shared key factory in `lib/query-keys` so feature-internal
+ * imports keep working. The factory itself lives in `lib/` because the
+ * cross-feature lookup hook in `src/hooks/` must share the same cache keys.
+ */
+export { rolesKeys } from "@/lib/query-keys";

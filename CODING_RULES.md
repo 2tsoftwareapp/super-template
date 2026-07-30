@@ -933,9 +933,14 @@ import { db } from "@/db"; // ← vi phạm R2
 **File pattern:**
 ```
 modules/<domain>/infrastructure/
-  ├── drizzle-<resource>.repository.ts  # Drizzle implementation
-  └── <service>.adapter.ts              # External service adapter
+  ├── <resource>.repository.ts  # Drizzle implementation
+  └── <service>.adapter.ts      # External service adapter
 ```
+
+> **Naming (thực tế trong repo):** repository file dùng `<resource>.repository.ts`
+> và class `<Resource>Repository` (VD: `users.repository.ts` →
+> `UsersRepository`). Không dùng tiền tố `drizzle-`/`Drizzle` — mọi repository
+> đã là Drizzle-backed nên tiền tố không thêm thông tin.
 
 | # | Rule |
 |---|------|
@@ -947,17 +952,19 @@ modules/<domain>/infrastructure/
 
 ✅ **DO**
 ```ts
-// packages/api-identity/src/modules/users/infrastructure/drizzle-users.repository.ts
+// packages/api-identity/src/modules/users/infrastructure/users.repository.ts
 @Injectable()
-export class DrizzleUsersRepository implements UsersRepositoryPort {
-  constructor(private readonly db: DatabaseService) {}
+export class UsersRepository implements UsersRepositoryPort {
+  constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
 
   // Infrastructure chứa raw Drizzle query — không business logic
   async findByEmail(email: string): Promise<UserRecord | null> {
-    const result = await this.db.query.users.findFirst({
-      where: eq(usersTable.email, email),
-    });
-    return result ?? null;
+    const [user] = await this.database
+      .select()
+      .from(users)
+      .where(eq(users.email, email))
+      .limit(1);
+    return user ?? null;
   }
 }
 ```
@@ -981,13 +988,21 @@ async execute(input: CreateUserCommand) {
 }
 ```
 
-### 11.6 DI Wiring (apps/api/src/shell/)
+### 11.6 DI Wiring (`<domain>.module.ts`)
 
-- Module wiring thuộc về `shell/` — không hardcode dependency trong Use Case
+- Module wiring thuộc về NestJS module của mỗi Bounded Context
+  (VD: `packages/api-identity/src/modules/users/users.module.ts`,
+  `packages/api-platform/src/modules/notifications/notifications.module.ts`) —
+  không hardcode dependency trong Use Case. `apps/api/src/shell/` chỉ chứa
+  cross-cutting infra (guard, interceptor), không phải nơi wiring repository.
 - Mỗi Bounded Context có NestJS Module riêng (VD: `AuthModule`, `UsersModule`)
-- Infrastructure providers đăng ký với token từ Port:
+- Infrastructure providers đăng ký với token từ Port. Repository được khai báo
+  một lần rồi bind vào token qua `useExisting` (không tạo instance thứ hai):
   ```ts
-  { provide: USERS_REPOSITORY, useClass: DrizzleUsersRepository }
+  providers: [
+    UsersRepository,
+    { provide: USERS_REPOSITORY, useExisting: UsersRepository },
+  ]
   ```
 
 ---
@@ -1003,14 +1018,14 @@ async execute(input: CreateUserCommand) {
 ✅ **DO**
 ```
 1. Tạo interface: modules/<domain>/application/ports/<resource>.repository.port.ts
-2. Tạo implementation: modules/<domain>/infrastructure/drizzle-<resource>.repository.ts
+2. Tạo implementation: modules/<domain>/infrastructure/<resource>.repository.ts
 3. Đăng ký DI trong Module
 ```
 
 ❌ **DON'T**
 ```ts
 // WRONG: Use Case inject concrete implementation trực tiếp
-constructor(private readonly repo: DrizzleUsersRepository) {} // ← inject Port, không phải implementation
+constructor(private readonly repo: UsersRepository) {} // ← inject Port, không phải implementation
 ```
 
 ---
@@ -1021,7 +1036,7 @@ constructor(private readonly repo: DrizzleUsersRepository) {} // ← inject Port
 
 🔒 **SECURITY:** Drizzle schema (table definitions) **không được import** ra ngoài Infrastructure — schema là internal detail của infrastructure.
 
-✅ **DO:** Tất cả raw queries trong `drizzle-*.repository.ts`
+✅ **DO:** Tất cả raw queries trong `<resource>.repository.ts`
 
 ❌ **DON'T**
 ```ts
@@ -1184,7 +1199,7 @@ export default [
 | Entity | `<domain>.entity.ts` | `<Domain>Entity` | `UserEntity` |
 | Policy | `<domain>.policy.ts` | `<Domain>Policy` | `PasswordPolicy` |
 | Port | `<resource>.repository.port.ts` | Interface `<Resource>RepositoryPort` | `UsersRepositoryPort` |
-| Repository | `drizzle-<resource>.repository.ts` | `Drizzle<Resource>Repository` | `DrizzleUsersRepository` |
+| Repository | `<resource>.repository.ts` | `<Resource>Repository` | `UsersRepository` |
 | Adapter | `<service>.adapter.ts` | `<Service>Adapter` | `ResendEmailAdapter` |
 
 ---
