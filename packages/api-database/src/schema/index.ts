@@ -96,6 +96,7 @@ import { jobEvents } from './platform/job-events';
 import { jobs } from './platform/jobs';
 import { mailDeliveries } from './platform/mail';
 import {
+  notificationDeliveries,
   notificationDeviceTokens,
   notificationJobs,
   notifications,
@@ -120,6 +121,7 @@ export const schema = {
   jobEvents,
   jobs,
   mailDeliveries,
+  notificationDeliveries,
   notificationDeviceTokens,
   notificationJobs,
   notifications,

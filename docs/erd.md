@@ -221,6 +221,8 @@ erDiagram
   organizations ||--o{ job_events : scopes
   organizations ||--o{ job_dependencies : scopes
   organizations ||--o{ file_batch_operations : scopes
+  organizations ||--o{ notification_jobs : scopes
+  organizations ||--o{ activities : scopes
   users ||--o{ audit_logs : acts
   users ||--o{ files : uploads
   users ||--o{ file_versions : creates
@@ -228,6 +230,10 @@ erDiagram
   users ||--o{ attachments : attaches
   users ||--o{ jobs : creates
   users ||--o{ application_settings : updates
+  users ||--o{ notifications : receives
+  users ||--o{ notification_device_tokens : registers
+  users ||--o{ notification_jobs : creates
+  users ||--o{ activities : performs
   files ||--o{ file_versions : versioned
   files ||--o{ attachments : attached
   files ||--o{ import_jobs : imported
@@ -235,6 +241,7 @@ erDiagram
   jobs ||--o{ job_attempts : has
   jobs ||--o{ job_events : emits
   jobs ||--o{ job_dependencies : depends_on
+  notifications ||--o{ notification_deliveries : delivers_to
 
   audit_logs {
     uuid id PK
@@ -402,6 +409,69 @@ erDiagram
     uuid updated_by_id FK
     timestamptz created_at
     timestamptz updated_at
+  }
+
+  notifications {
+    uuid id PK
+    uuid organization_id FK
+    uuid recipient_id FK
+    text type
+    text title
+    text body
+    jsonb data
+    notification_audience audience
+    timestamptz read_at
+    timestamptz created_at
+  }
+
+  notification_deliveries {
+    uuid id PK
+    uuid notification_id FK
+    text channel
+    notification_delivery_status status
+    text error_message
+    timestamptz delivered_at
+    timestamptz created_at
+  }
+
+  notification_device_tokens {
+    uuid id PK
+    uuid user_id FK
+    notification_device_platform platform
+    text token
+    timestamptz created_at
+    timestamptz updated_at
+  }
+
+  notification_jobs {
+    uuid id PK
+    uuid organization_id FK
+    uuid created_by_id FK
+    notification_job_status status
+    notification_audience audience
+    text filter_role
+    uuid filter_role_id
+    jsonb metadata
+    integer total_notifications
+    integer sent_count
+    integer failed_count
+    timestamptz scheduled_at
+    timestamptz completed_at
+    timestamptz cancelled_at
+    timestamptz created_at
+    timestamptz updated_at
+  }
+
+  activities {
+    uuid id PK
+    uuid organization_id FK
+    uuid actor_id FK
+    text type
+    text entity_type
+    uuid entity_id
+    jsonb metadata
+    activity_visibility visibility
+    timestamptz created_at
   }
 ```
 

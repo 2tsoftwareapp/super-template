@@ -12,6 +12,15 @@ export {
   ROLE_NAMES,
 } from '@repo/api-core';
 
+export { USERS_REPOSITORY } from './modules/users/application/ports/users.repository.port';
+export type { UsersRepositoryPort, UserRecord, CreateUserInput, UsersListResult } from './modules/users/application/ports/users.repository.port';
+
+export { ORGANIZATIONS_REPOSITORY } from './modules/organizations/application/ports/organizations.repository.port';
+export type { OrganizationsRepositoryPort, OrganizationMemberRecord } from './modules/organizations/application/ports/organizations.repository.port';
+
+export { ACCESS_CONTROL_REPOSITORY } from './modules/access-control/application/access-control.repository.port';
+export type { AccessControlRepositoryPort, RoleRecord } from './modules/access-control/application/access-control.repository.port';
+
 import { IdentityPortsModule } from './identity-ports.module';
 import { AccessControlModule } from './modules/access-control/access-control.module';
 import { AuthModule } from './modules/auth/auth.module';

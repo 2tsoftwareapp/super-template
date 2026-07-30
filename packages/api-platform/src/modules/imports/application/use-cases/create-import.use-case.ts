@@ -1,8 +1,3 @@
-import type {
-  AuthenticatedRequestUser,
-  RequestContext,
-} from '@repo/api-core';
-
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import {
   AppError,
@@ -10,6 +5,8 @@ import {
   ImportExportAdapterRegistry,
   SYSTEM_SCOPE,
   TRANSACTION_PORT,
+  type AuthenticatedRequestUser,
+  type RequestContext,
   type TransactionPort,
 } from '@repo/api-core';
 
@@ -57,7 +54,18 @@ export class CreateImportUseCase {
     const organizationId = file.organizationId;
 
     // Resolve adapter before creating any DB records
-    const adapter = this.importExportAdapters.resolve(input.type);
+    this.importExportAdapters.resolve(input.type);
+
+    const importPermissions = this.importExportAdapters.getImportPermissions(input.type);
+    for (const permission of importPermissions) {
+      if (!actor.permissions.includes(permission)) {
+        throw new AppError(
+          ERROR_CODES.AUTH_FORBIDDEN,
+          `Missing required permission: ${permission}`,
+          HttpStatus.FORBIDDEN,
+        );
+      }
+    }
 
     const jobValues = {
       organizationId,

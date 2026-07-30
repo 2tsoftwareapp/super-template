@@ -102,6 +102,17 @@ export class ConfirmImportUseCase {
     );
     const adapter = this.importExportAdapters.resolve(job.type);
 
+    const importPermissions = this.importExportAdapters.getImportPermissions(job.type);
+    for (const permission of importPermissions) {
+      if (!actor.permissions.includes(permission)) {
+        throw new AppError(
+          ERROR_CODES.AUTH_FORBIDDEN,
+          `Missing required permission: ${permission}`,
+          HttpStatus.FORBIDDEN,
+        );
+      }
+    }
+
     let successCount = 0;
     const errors: ImportValidationError[] = [];
 

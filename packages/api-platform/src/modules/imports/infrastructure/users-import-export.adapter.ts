@@ -1,20 +1,26 @@
+import { randomBytes } from 'node:crypto';
 import { Inject, Injectable } from '@nestjs/common';
 import { hash } from 'argon2';
 
 import {
   ImportExportAdapter,
   ImportExportRowContext,
-  type ImportValidationError,
   type TransactionExecutor,
 } from '@repo/api-core';
 
-import { USERS_REPOSITORY, type UsersRepositoryPort } from '@repo/api-identity';
+import {
+  ACCESS_CONTROL_REPOSITORY,
+  type AccessControlRepositoryPort,
+  ORGANIZATIONS_REPOSITORY,
+  type OrganizationsRepositoryPort,
+  USERS_REPOSITORY,
+  type UsersRepositoryPort,
+} from '@repo/api-identity';
 
 export interface UserRow {
   id?: string;
   email: string;
   displayName: string;
-  password?: string | undefined;
   avatarUrl?: string | null | undefined;
   status?: string;
   emailVerifiedAt?: string | null;
@@ -24,40 +30,58 @@ export interface UserRow {
 @Injectable()
 export class UsersImportExportAdapter implements ImportExportAdapter<UserRow> {
   readonly type = 'users';
-  readonly csvHeader = ['email', 'displayName', 'password', 'avatarUrl'];
+  readonly csvHeader = ['email', 'displayName', 'avatarUrl'];
+  readonly importPermissions = ['users.create'];
+  readonly exportPermissions = ['users.read'];
 
   constructor(
     @Inject(USERS_REPOSITORY)
     private readonly usersRepository: UsersRepositoryPort,
+    @Inject(ORGANIZATIONS_REPOSITORY)
+    private readonly organizationsRepository: OrganizationsRepositoryPort,
+    @Inject(ACCESS_CONTROL_REPOSITORY)
+    private readonly accessControlRepository: AccessControlRepositoryPort,
   ) {}
 
   async listForExport(params: {
     organizationId: string;
     ownerId: string;
   }): Promise<UserRow[]> {
-    const result = await this.usersRepository.list({
-      page: 1,
-      limit: 10000,
-      organizationId: params.organizationId,
-      sort: [{ field: 'createdAt', order: 'asc' }],
-    });
+    const allRows: UserRow[] = [];
+    let page = 1;
+    const limit = 1000;
 
-    return result.rows.map((user) => ({
-      id: user.id,
-      email: user.email,
-      displayName: user.displayName,
-      avatarUrl: user.avatarUrl,
-      status: user.status,
-      emailVerifiedAt: user.emailVerifiedAt?.toISOString() ?? null,
-      createdAt: user.createdAt.toISOString(),
-    }));
+    while (true) {
+      const result = await this.usersRepository.list({
+        page,
+        limit,
+        organizationId: params.organizationId,
+        sort: [{ field: 'createdAt', order: 'asc' }],
+      });
+
+      for (const user of result.rows) {
+        allRows.push({
+          id: user.id,
+          email: user.email,
+          displayName: user.displayName,
+          avatarUrl: user.avatarUrl,
+          status: user.status,
+          emailVerifiedAt: user.emailVerifiedAt?.toISOString() ?? null,
+          createdAt: user.createdAt.toISOString(),
+        });
+      }
+
+      if (allRows.length >= result.total) break;
+      page++;
+    }
+
+    return allRows;
   }
 
   toCsvRow(row: UserRow): string[] {
     return [
       row.email,
       row.displayName,
-      '', // Password is never exported
       row.avatarUrl ?? '',
     ];
   }
@@ -66,7 +90,6 @@ export class UsersImportExportAdapter implements ImportExportAdapter<UserRow> {
     return {
       email: record.email?.trim() ?? '',
       displayName: record.displayName?.trim() ?? '',
-      password: record.password?.trim() || undefined,
       avatarUrl: record.avatarUrl?.trim() || undefined,
     };
   }
@@ -89,14 +112,6 @@ export class UsersImportExportAdapter implements ImportExportAdapter<UserRow> {
       return 'Display name must be between 2 and 100 characters';
     }
 
-    if (!row.password) {
-      return 'Password is required';
-    }
-
-    if (row.password.length < 8) {
-      return 'Password must be at least 8 characters';
-    }
-
     return null;
   }
 
@@ -105,19 +120,44 @@ export class UsersImportExportAdapter implements ImportExportAdapter<UserRow> {
     context: ImportExportRowContext,
     executor?: TransactionExecutor,
   ): Promise<void> {
-    const passwordHash = await hash(row.password ?? '');
+    const temporaryPassword = randomBytes(32).toString('hex');
+    const passwordHash = await hash(temporaryPassword);
 
-    await this.usersRepository.create(
+    const user = await this.usersRepository.create(
       {
         email: row.email,
         passwordHash,
         displayName: row.displayName,
-        avatarUrl: row.avatarUrl,
+        avatarUrl: row.avatarUrl ?? null,
         status: 'ACTIVE',
         emailVerifiedAt: new Date(),
         mustChangePassword: true,
       },
       executor,
     );
+
+    await this.organizationsRepository.addMember(
+      {
+        organizationId: context.organizationId,
+        userId: user.id,
+        role: 'MEMBER',
+      },
+      executor,
+    );
+
+    const role = await this.accessControlRepository.findRoleByName(
+      'USER',
+      null,
+      executor,
+    );
+
+    if (role) {
+      await this.accessControlRepository.assignUserRole(
+        user.id,
+        role.id,
+        context.organizationId,
+        executor,
+      );
+    }
   }
 }

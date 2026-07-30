@@ -48,11 +48,11 @@
 - `export_jobs` — CSV/data export jobs
 - `mail_deliveries` — transactional email delivery log
 - `application_settings` — key/value app-wide settings
+- `notifications` — notification records addressed to users
 - `notification_deliveries` — per-notification delivery tracking
 - `notification_device_tokens` — FCM push notification tokens
 - `notification_jobs` — scheduled/sent notification jobs
-
-The workspace domain (projects, invitations, comments) has been removed from the template. `notifications`, `notification_device_tokens`, `notification_jobs`, `notification_deliveries`, and `activities` are included in the Platform domain.
+- `activities` — user activity event log
 
 ## Migration Workflow
 

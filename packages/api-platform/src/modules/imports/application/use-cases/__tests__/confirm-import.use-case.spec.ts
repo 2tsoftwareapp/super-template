@@ -67,6 +67,7 @@ describe('ConfirmImportUseCase', () => {
 
     const importExportAdapters = {
       resolve: vi.fn(() => adapter),
+      getImportPermissions: vi.fn(() => []),
     };
 
     const importFileParser = {

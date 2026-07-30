@@ -19,6 +19,9 @@ export interface ImportExportAdapter<TRow extends object> {
   readonly type: string;
   readonly csvHeader: string[];
 
+  readonly importPermissions?: string[];
+  readonly exportPermissions?: string[];
+
   listForExport(params: {
     organizationId: string;
     ownerId: string;
@@ -53,5 +56,13 @@ export class ImportExportAdapterRegistry {
     }
 
     return adapter;
+  }
+
+  getImportPermissions(type: string): string[] {
+    return this.resolve(type).importPermissions ?? [];
+  }
+
+  getExportPermissions(type: string): string[] {
+    return this.resolve(type).exportPermissions ?? [];
   }
 }

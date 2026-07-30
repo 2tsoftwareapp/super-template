@@ -3,8 +3,8 @@ import type {
   RequestContext,
 } from '@repo/api-core';
 
-import { Inject, Injectable } from '@nestjs/common';
-import {  ImportExportAdapterRegistry, requireOrganizationId, toCsv , SYSTEM_SCOPE, TRANSACTION_PORT, type TransactionPort } from '@repo/api-core';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import {  AppError, ERROR_CODES, ImportExportAdapterRegistry, requireOrganizationId, toCsv , SYSTEM_SCOPE, TRANSACTION_PORT, type TransactionPort } from '@repo/api-core';
 import { randomUUID } from 'node:crypto';
 
 import type { CreateExportCommand } from '../exports.types';
@@ -38,6 +38,17 @@ export class CreateExportUseCase {
 
     // Resolve adapter before creating any DB records
     const adapter = this.importExportAdapters.resolve(input.type);
+
+    const exportPermissions = this.importExportAdapters.getExportPermissions(input.type);
+    for (const permission of exportPermissions) {
+      if (!actor.permissions.includes(permission)) {
+        throw new AppError(
+          ERROR_CODES.AUTH_FORBIDDEN,
+          `Missing required permission: ${permission}`,
+          HttpStatus.FORBIDDEN,
+        );
+      }
+    }
 
     const jobValues = {
       organizationId,
