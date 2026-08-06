@@ -1,6 +1,11 @@
 title: Super Template Architecture Wiki
 description: Frontend architecture and engineering conventions
-theme: jekyll-theme-cayman
+remote_theme: pages-themes/cayman@v0.2.0
+plugins:
+  - jekyll-remote-theme
+  - jekyll-seo-tag
 markdown: kramdown
-baseurl: ""
-url: ""
+kramdown:
+  input: GFM
+baseurl: /super-template/docs-wiki
+url: https://truongnat.github.io
