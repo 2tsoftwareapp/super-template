@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ page.title }} · {{ site.title }}</title>
+<link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+</head>
+<body>
+<div class="wiki-shell">
+<aside class="wiki-sidebar">
+<a class="brand" href="{{ '/' | relative_url }}"><span class="brand-mark">S</span><span><strong>Super Template</strong><small>Architecture Wiki</small></span></a>
+<nav class="sidebar-nav">
+<p class="nav-label">FE Web Admin</p>
+<a href="{{ '/frontend/' | relative_url }}">Overview</a>
+<a href="{{ '/frontend/system-map/' | relative_url }}">System map</a>
+<a href="{{ '/frontend/folder-structure/' | relative_url }}">Folder structure</a>
+<a href="{{ '/frontend/request-flow/' | relative_url }}">Request flow</a>
+<a href="{{ '/frontend/service-di/' | relative_url }}">Service & DI</a>
+<a href="{{ '/frontend/state-ownership/' | relative_url }}">State ownership</a>
+<a href="{{ '/frontend/shared-packages/' | relative_url }}">Shared packages</a>
+<a href="{{ '/frontend/quality-rules/' | relative_url }}">Quality rules</a>
+<a href="{{ '/frontend/reference-feature/' | relative_url }}">Golden feature</a>
+</nav>
+<div class="sidebar-footer"><a href="https://github.com/truongnat/super-template">View repository ↗</a><span>FE baseline · v1</span></div>
+</aside>
+<main class="wiki-main"><div class="topbar"><span>Architecture Wiki</span><a href="https://github.com/truongnat/super-template">GitHub ↗</a></div>
+<article class="content">{{ content }}</article>
+<footer class="content-footer">Canonical source: docs/architecture/ARCHITECTURE_RULES.md</footer>
+</main>
+</div>
+<script type="module">
+import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+mermaid.initialize({startOnLoad:true,theme:'base',themeVariables:{primaryColor:'#e8f0ff',primaryTextColor:'#172033',primaryBorderColor:'#5478ff',lineColor:'#8090b0'}});
+</script>
+</body></html>
