@@ -30,7 +30,15 @@ jobs:
         uses: actions/jekyll-build-pages@v1
         with:
           source: docs/architecture-wiki
-          destination: ./_site
+          destination: ./_site/docs-wiki
+
+      - name: Add root redirect
+        run: |
+          cat > ./_site/index.html <<'HTML'
+          <!doctype html>
+          <meta http-equiv="refresh" content="0; url=./docs-wiki/">
+          <link rel="canonical" href="./docs-wiki/">
+          HTML
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
