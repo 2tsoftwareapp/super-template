@@ -87,3 +87,6 @@ features/
 - [Quality rules](./quality-rules.md)
 - [Architecture diagrams](./diagrams.md)
 - [Golden reference feature: Users](./reference-feature.md)
+
+- [Feature lifecycle](./feature-lifecycle.md)
+- [Code placement matrix](./decision-matrix.md)
