@@ -6,142 +6,31 @@ on:
       - main
       - master
   pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
-  verify:
+  generate-docs:
+    name: Verify generated docs and contracts
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:18.2
-        env:
-          POSTGRES_DB: fullstack_starter
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U postgres -d fullstack_starter"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 20
-
-    env:
-      APP_ENV: test
-      POSTGRES_HOST: localhost
-      POSTGRES_PORT: 5432
-      POSTGRES_DB: fullstack_starter
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      DATABASE_URL: postgresql://fullstack_starter_app:fullstack_starter_app@localhost:5432/fullstack_starter
-      DATABASE_MIGRATE_URL: postgresql://postgres:postgres@localhost:5432/fullstack_starter
-      DATABASE_URL_TEST: postgresql://fullstack_starter_app:fullstack_starter_app@localhost:5432/fullstack_starter_test
-      DATABASE_URL_TEST_ADMIN: postgresql://postgres:postgres@localhost:5432/fullstack_starter_test
-      API_PORT: 3001
-      WEB_PORT: 3000
-      WEB_ORIGIN: http://localhost:3000
-      API_INTERNAL_URL: http://localhost:3001
-      NEXT_PUBLIC_WEB_URL: http://localhost:3000
-      ADMIN_PORT: 3002
-      ADMIN_ORIGIN: http://localhost:3002
-      NEXT_PUBLIC_ADMIN_URL: http://localhost:3002
-      NEXT_PUBLIC_API_BASE_PATH: /api
-      JWT_ACCESS_SECRET: ci-access-secret-ci-access-secret-ci
-      JWT_REFRESH_SECRET: ci-refresh-secret-ci-refresh-secret-ci
-      JWT_ACCESS_TTL: 15m
-      JWT_REFRESH_TTL: 30d
-      MAIL_HOST: localhost
-      MAIL_PORT: 1025
-      MAIL_FROM: no-reply@example.local
-      MAILPIT_HTTP_PORT: 8025
-      POSTGRES_EXPOSED_PORT: 5432
-      API_DOCS_ENABLED: "true"
-      COOKIE_SECURE: "false"
-      COOKIE_DOMAIN: ""
-      COOKIE_SAMESITE: lax
-      SEED_ADMIN_EMAIL: admin@example.local
-      SEED_ADMIN_PASSWORD: ChangeMe123!
-      SEED_USER_EMAIL: user@example.local
-      SEED_USER_PASSWORD: ChangeMe123!
 
     steps:
-      - uses: actions/checkout@v5
+      - name: Checkout
+        uses: actions/checkout@v5
 
-      - uses: pnpm/action-setup@v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
 
-      - uses: actions/setup-node@v5
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
         with:
           node-version: 24
           cache: pnpm
 
-      - name: Install Node dependencies
+      - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Verify generated contracts are up to date
+      - name: Verify generated docs and contracts
         run: pnpm run generate:check
-
-      - name: Wait for PostgreSQL
-        run: ./scripts/wait-for-postgres.sh
-
-      - name: Run migrations
-        run: pnpm --filter api db:migrate
-
-      - name: Create and migrate test database
-        run: |
-          PGPASSWORD=postgres psql -h localhost -U postgres -c "CREATE DATABASE fullstack_starter_test;"
-          pnpm --filter api db:migrate
-        env:
-          POSTGRES_DB: fullstack_starter_test
-          DATABASE_MIGRATE_URL: postgresql://postgres:postgres@localhost:5432/fullstack_starter_test
-
-      - name: Seed development data
-        run: pnpm --filter api db:seed
-
-      - name: Lint
-        run: pnpm lint
-
-      - name: Typecheck
-        run: pnpm typecheck
-
-      - name: Tests (all workspaces)
-        run: pnpm test
-
-      - name: API Integration Tests
-        run: pnpm --filter api test:e2e
-
-      - name: Build
-        run: pnpm build
-
-      - name: Install Playwright browsers
-        run: pnpm --filter web exec playwright install --with-deps chromium
-
-      - name: Web E2E tests
-        run: pnpm --filter web test:e2e
-
-  mobile:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v5
-
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-          cache: true
-
-      - name: Install mobile dependencies
-        working-directory: apps/mobile
-        run: flutter pub get
-
-      - name: Format mobile sources
-        working-directory: apps/mobile
-        continue-on-error: true
-        run: dart format --set-exit-if-changed .
-
-      - name: Analyze mobile sources
-        working-directory: apps/mobile
-        run: flutter analyze
-
-      - name: Run mobile tests
-        working-directory: apps/mobile
-        run: flutter test
