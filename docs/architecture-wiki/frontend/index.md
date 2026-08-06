@@ -80,8 +80,10 @@ features/
 - **Master**: dữ liệu nền, CRUD, active/inactive.
 - **Transaction**: hành động nghiệp vụ, lifecycle, retry/cancel/complete.
 
-## Tiếp theo
+## Tài liệu
 
 - [Folder structure](./folder-structure.md)
 - [Service and DI](./service-di.md)
 - [Quality rules](./quality-rules.md)
+- [Architecture diagrams](./diagrams.md)
+- [Golden reference feature: Users](./reference-feature.md)
