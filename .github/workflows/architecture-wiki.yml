@@ -34,11 +34,13 @@ jobs:
 
       - name: Add root redirect
         run: |
-          cat > ./_site/index.html <<'HTML'
-          <!doctype html>
-          <meta http-equiv="refresh" content="0; url=./docs-wiki/">
-          <link rel="canonical" href="./docs-wiki/">
-          HTML
+          sudo mkdir -p ./_site
+          printf '%s\n' \
+            '<!doctype html>' \
+            '<meta http-equiv="refresh" content="0; url=./docs-wiki/">' \
+            '<link rel="canonical" href="./docs-wiki/">' \
+            | sudo tee ./_site/index.html > /dev/null
+          sudo chmod 644 ./_site/index.html
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
