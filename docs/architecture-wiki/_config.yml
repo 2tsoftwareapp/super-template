@@ -1,0 +1,6 @@
+title: Super Template Architecture Wiki
+description: Frontend architecture and engineering conventions
+theme: jekyll-theme-cayman
+markdown: kramdown
+baseurl: ""
+url: ""
