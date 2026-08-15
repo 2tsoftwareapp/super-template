@@ -5,7 +5,9 @@ import type {
 import type { TransactionPort } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { 
+import {
+  ACTIVITY_EMITTER,
+  type ActivityEmitter,
   AppError,
   AUDIT_WRITER,
   type AuditWriter,
@@ -13,8 +15,8 @@ import {
   ERROR_CODES,
   normalizeEmail,
   SYSTEM_SCOPE,
+  TRANSACTION_PORT,
 } from '@repo/api-core';
-import { TRANSACTION_PORT } from '@repo/api-core';
 
 import type { CreateAdminUserCommand, UserView } from '../users.types';
 
@@ -52,6 +54,7 @@ export class CreateAdminUserUseCase {
     private readonly organizationsService: OrganizationsService,
     @Inject(ORGANIZATIONS_REPOSITORY) private readonly organizationsRepository: OrganizationsRepositoryPort,
     @Inject(AUTH_SESSION_REPOSITORY) private readonly authRepository: AuthSessionRepositoryPort,
+    @Inject(ACTIVITY_EMITTER) private readonly activityEmitter: ActivityEmitter,
     private readonly getUserUseCase: GetUserUseCase,
   ) {}
 
@@ -228,6 +231,21 @@ export class CreateAdminUserUseCase {
         },
           transaction,
         );
+
+        if (organizationId) {
+          await this.activityEmitter.emit(
+            {
+              organizationId,
+              summary: `User "${user.displayName}" created`,
+              entityType: 'user',
+              entityId: user.id,
+              actorId: actor.userId,
+              visibility: 'INTERNAL',
+              metadata: { email, status: user.status },
+            },
+            transaction,
+          );
+        }
 
         return { userId: user.id };
       },

@@ -38,6 +38,7 @@ function buildDependencies(
   const authSessionRepository = {
     revokeAllSessionsForUser: vi.fn(async () => undefined),
   };
+  const activityEmitter = { emit: vi.fn(async () => undefined) };
   const getUserUseCase = {
     execute: vi.fn(async () => ({ id: target.id, status: 'ACTIVE' })),
   };
@@ -57,6 +58,7 @@ function buildDependencies(
     accessControlService as never,
     auditWriter as never,
     authSessionRepository as never,
+    activityEmitter as never,
     getUserUseCase as never,
   );
 
@@ -66,6 +68,7 @@ function buildDependencies(
     accessControlService,
     auditWriter,
     authSessionRepository,
+    activityEmitter,
   };
 }
 
@@ -93,7 +96,8 @@ describe('UpdateUserStatusUseCase', () => {
   });
 
   it('revokes all sessions and writes an audit log when blocking', async () => {
-    const { useCase, auditWriter, authSessionRepository } = buildDependencies();
+    const { useCase, auditWriter, authSessionRepository, activityEmitter } =
+      buildDependencies();
 
     await useCase.execute(actor as never, 'user-1', 'BLOCKED');
 
@@ -105,5 +109,34 @@ describe('UpdateUserStatusUseCase', () => {
       expect.objectContaining({ action: 'user.blocked', entityId: 'user-1' }),
       null,
     );
+  });
+
+  it('emits an activity when blocking a user in an organization context', async () => {
+    const { useCase, activityEmitter } = buildDependencies();
+
+    await useCase.execute(
+      { ...actor, organizationId: 'org-1' } as never,
+      'user-1',
+      'BLOCKED',
+    );
+
+    expect(activityEmitter.emit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        organizationId: 'org-1',
+        entityType: 'user',
+        entityId: 'user-1',
+        actorId: 'admin-1',
+        metadata: { status: 'BLOCKED' },
+      }),
+      null,
+    );
+  });
+
+  it('skips activity emission when the actor has no organization context', async () => {
+    const { useCase, activityEmitter } = buildDependencies();
+
+    await useCase.execute(actor as never, 'user-1', 'BLOCKED');
+
+    expect(activityEmitter.emit).not.toHaveBeenCalled();
   });
 });

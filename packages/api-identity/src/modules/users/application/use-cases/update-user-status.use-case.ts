@@ -5,14 +5,16 @@ import type {
 import type { TransactionPort } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { 
+import {
+  ACTIVITY_EMITTER,
+  type ActivityEmitter,
   AppError,
   AUDIT_WRITER,
   type AuditWriter,
   ERROR_CODES,
   SYSTEM_SCOPE,
+  TRANSACTION_PORT,
 } from '@repo/api-core';
-import { TRANSACTION_PORT } from '@repo/api-core';
 
 import type { UserStatus, UserView } from '../users.types';
 
@@ -35,6 +37,7 @@ export class UpdateUserStatusUseCase {
     private readonly accessControlService: AccessControlService,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
     @Inject(AUTH_SESSION_REPOSITORY) private readonly authRepository: AuthSessionRepositoryPort,
+    @Inject(ACTIVITY_EMITTER) private readonly activityEmitter: ActivityEmitter,
     private readonly getUserUseCase: GetUserUseCase,
   ) {}
 
@@ -112,6 +115,24 @@ export class UpdateUserStatusUseCase {
         },
         transaction,
       );
+
+      if (actor.organizationId) {
+        await this.activityEmitter.emit(
+          {
+            organizationId: actor.organizationId,
+            summary:
+              status === 'BLOCKED'
+                ? `User "${user.displayName}" blocked`
+                : `User "${user.displayName}" activated`,
+            entityType: 'user',
+            entityId: userId,
+            actorId: actor.userId,
+            visibility: 'INTERNAL',
+            metadata: { status },
+          },
+          transaction,
+        );
+      }
     });
 
     return this.getUserUseCase.execute(userId, actor);
