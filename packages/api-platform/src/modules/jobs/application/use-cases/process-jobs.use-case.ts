@@ -3,6 +3,8 @@ import {
   Injectable,
 } from '@nestjs/common';
 import {
+  ACTIVITY_EMITTER,
+  type ActivityEmitter,
   isJsonObject,
   redactSensitive,
   tenantContextForJob,
@@ -34,6 +36,7 @@ export class ProcessJobsUseCase {
     private readonly jobHandlersRegistry: JobHandlersRegistry,
     @Inject(JOB_OBSERVABILITY_REPOSITORY) private readonly jobObservabilityRepository: JobObservabilityRepositoryPort,
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
+    @Inject(ACTIVITY_EMITTER) private readonly activityEmitter: ActivityEmitter,
     private readonly propagationService: PropagationService,
   ) {}
 
@@ -138,6 +141,19 @@ export class ProcessJobsUseCase {
             { jobId: job.id, organizationId, attemptId: attempt.id, type: 'completed' },
             tx,
           );
+          if (job.organizationId) {
+            await this.activityEmitter.emit(
+              {
+                organizationId: job.organizationId,
+                summary: `Background job completed (${job.type})`,
+                entityType: 'job',
+                entityId: job.id,
+                actorId: job.createdById ?? null,
+                visibility: 'INTERNAL',
+              },
+              tx,
+            );
+          }
         },
       );
     } catch (error) {

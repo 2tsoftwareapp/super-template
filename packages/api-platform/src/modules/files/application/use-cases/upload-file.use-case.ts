@@ -4,7 +4,16 @@ import type {
 } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import {  AppError, ERROR_CODES, requireOrganizationId , SYSTEM_SCOPE, TRANSACTION_PORT, type TransactionPort } from '@repo/api-core';
+import {
+  ACTIVITY_EMITTER,
+  type ActivityEmitter,
+  AppError,
+  ERROR_CODES,
+  requireOrganizationId,
+  SYSTEM_SCOPE,
+  TRANSACTION_PORT,
+  type TransactionPort,
+} from '@repo/api-core';
 import { createHash, randomUUID } from 'node:crypto';
 
 import { AuditService } from '../../../audit/application/audit.service';
@@ -33,6 +42,7 @@ export class UploadFileUseCase {
     @Inject(FILES_REPOSITORY) private readonly filesRepository: FilesRepositoryPort,
     @Inject(OBJECT_STORAGE) private readonly objectStorage: ObjectStorage,
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
+    @Inject(ACTIVITY_EMITTER) private readonly activityEmitter: ActivityEmitter,
     private readonly auditService: AuditService,
   ) {}
 
@@ -119,6 +129,19 @@ export class UploadFileUseCase {
             scope: SYSTEM_SCOPE.ORGANIZATION,
             organizationId,
           }, tx);
+
+          await this.activityEmitter.emit(
+            {
+              organizationId,
+              summary: `File "${file.originalname}" uploaded`,
+              entityType: 'file',
+              entityId: fileRecord.id,
+              actorId: actor.userId,
+              visibility: 'INTERNAL',
+              metadata: { sizeBytes: file.size, mimeType: detectedMimeType },
+            },
+            tx,
+          );
 
           return fileRecord;
         }

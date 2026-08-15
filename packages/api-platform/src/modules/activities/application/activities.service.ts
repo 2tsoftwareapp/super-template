@@ -1,11 +1,10 @@
 import type { TransactionExecutor } from '@repo/api-core';
-
-import { Injectable } from '@nestjs/common';
-
 import type {
   ActivityEmitInput,
   ActivityEmitter,
-} from './activity-emitter.port';
+} from '@repo/api-core';
+
+import { Injectable } from '@nestjs/common';
 
 import { EmitActivityUseCase } from './use-cases/emit-activity.use-case';
 

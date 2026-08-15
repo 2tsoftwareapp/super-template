@@ -57,6 +57,11 @@ export type { AppEnvironment } from "./config/env.schema";
 export { validateEnvironment } from "./config/env.schema";
 export { EnvironmentService } from "./config/environment.service";
 export { loadEnvFiles } from "./config/load-env-files";
+export {
+  ACTIVITY_EMITTER,
+  type ActivityEmitInput,
+  type ActivityEmitter,
+} from "./ports/activity-emitter.port";
 export * from "./ports/advisory-lock.port";
 export {
   AUDIT_WRITER,

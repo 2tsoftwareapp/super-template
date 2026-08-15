@@ -2,12 +2,17 @@ import type { AuthenticatedRequestUser, RequestContext } from '@repo/api-core';
 import type { TransactionPort } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import {  
+import {
+  ACTIVITY_EMITTER,
+  type ActivityEmitter,
   AppError,
   AUDIT_WRITER,
   type AuditWriter,
   ERROR_CODES,
-  ROLE_NAMES, SYSTEM_SCOPE , TRANSACTION_PORT } from '@repo/api-core';
+  ROLE_NAMES,
+  SYSTEM_SCOPE,
+  TRANSACTION_PORT,
+} from '@repo/api-core';
 
 import { assertOrganizationRole } from '../../domain/organization-access.policy';
 import { ORGANIZATIONS_REPOSITORY, type OrganizationsRepositoryPort } from '../ports/organizations.repository.port';
@@ -18,6 +23,7 @@ export class UpdateOrganizationUseCase {
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
     @Inject(ORGANIZATIONS_REPOSITORY) private readonly organizationsRepository: OrganizationsRepositoryPort,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
+    @Inject(ACTIVITY_EMITTER) private readonly activityEmitter: ActivityEmitter,
   ) {}
 
   async execute(
@@ -76,8 +82,22 @@ export class UpdateOrganizationUseCase {
         entityId: organizationId,
         metadata: { name: organization.name },
         requestContext,
-          ...(organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
-    }, transaction);
+        ...(organizationId
+          ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: organizationId }
+          : { scope: SYSTEM_SCOPE.PLATFORM }),
+      }, transaction);
+
+      await this.activityEmitter.emit(
+        {
+          organizationId,
+          summary: `Organization renamed to "${organization.name}"`,
+          entityType: 'organization',
+          entityId: organizationId,
+          actorId: actorUserId,
+          visibility: 'INTERNAL',
+        },
+        transaction,
+      );
 
       return organization;
     });

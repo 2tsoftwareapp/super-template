@@ -2,8 +2,13 @@ import type { AuthenticatedRequestUser } from '@repo/api-core';
 import type { TransactionPort } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { AppError, ERROR_CODES } from '@repo/api-core';
-import { TRANSACTION_PORT } from '@repo/api-core';
+import {
+  ACTIVITY_EMITTER,
+  type ActivityEmitter,
+  AppError,
+  ERROR_CODES,
+  TRANSACTION_PORT,
+} from '@repo/api-core';
 
 import type { CreateOrganizationCommand } from '../organizations.types';
 
@@ -23,6 +28,7 @@ export class CreateOrganizationUseCase {
   constructor(
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
     @Inject(ORGANIZATIONS_REPOSITORY) private readonly organizationsRepository: OrganizationsRepositoryPort,
+    @Inject(ACTIVITY_EMITTER) private readonly activityEmitter: ActivityEmitter,
     private readonly accessControlService: AccessControlService,
   ) {}
 
@@ -82,6 +88,18 @@ export class CreateOrganizationUseCase {
           await this.accessControlService.ensureOrganizationAdminRole(
             created.id,
             user.userId,
+            transaction,
+          );
+
+          await this.activityEmitter.emit(
+            {
+              organizationId: created.id,
+              summary: `Organization "${created.name}" created`,
+              entityType: 'organization',
+              entityId: created.id,
+              actorId: user.userId,
+              visibility: 'INTERNAL',
+            },
             transaction,
           );
 

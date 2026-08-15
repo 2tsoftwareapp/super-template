@@ -15,6 +15,8 @@ const accessControlService = {
   invalidateAccessProfile: vi.fn(async () => undefined),
 };
 
+const activityEmitter = { emit: vi.fn(async () => undefined) };
+
 function buildRepository(
   overrides: Partial<{
     actorRole: 'OWNER' | 'ADMIN' | 'MEMBER';
@@ -51,10 +53,12 @@ describe('UpdateMemberRoleUseCase', () => {
   it('lets an owner promote a member to admin', async () => {
     const repository = buildRepository({ actorRole: 'OWNER', targetRole: 'MEMBER' });
     const auditWriter = { log: vi.fn(async () => undefined) };
+    activityEmitter.emit.mockClear();
     const useCase = new UpdateMemberRoleUseCase(
       transactionPort as any,
       repository as never,
       auditWriter as never,
+      activityEmitter as never,
       accessControlService as any,
     );
 
@@ -67,6 +71,16 @@ describe('UpdateMemberRoleUseCase', () => {
       null,
     );
     expect(result.role).toBe('ADMIN');
+    expect(activityEmitter.emit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        organizationId: 'org-1',
+        entityType: 'organization',
+        entityId: 'org-1',
+        actorId: 'actor',
+        metadata: { targetUserId: 'target', role: 'ADMIN' },
+      }),
+      null,
+    );
   });
 
   it('blocks an admin from promoting a member to admin', async () => {
@@ -76,6 +90,7 @@ describe('UpdateMemberRoleUseCase', () => {
       transactionPort as any,
       repository as never,
       auditWriter as never,
+      activityEmitter as never,
       accessControlService as any,
     );
 
@@ -92,6 +107,7 @@ describe('UpdateMemberRoleUseCase', () => {
       transactionPort as any,
       repository as never,
       auditWriter as never,
+      activityEmitter as never,
       accessControlService as any,
     );
 
@@ -111,6 +127,7 @@ describe('UpdateMemberRoleUseCase', () => {
       transactionPort as any,
       repository as never,
       auditWriter as never,
+      activityEmitter as never,
       accessControlService as any,
     );
 
@@ -130,6 +147,7 @@ describe('UpdateMemberRoleUseCase', () => {
       transactionPort as any,
       repository as never,
       auditWriter as never,
+      activityEmitter as never,
       accessControlService as any,
     );
 
@@ -145,6 +163,7 @@ describe('UpdateMemberRoleUseCase', () => {
       transactionPort as any,
       repository as never,
       auditWriter as never,
+      activityEmitter as never,
       accessControlService as any,
     );
 

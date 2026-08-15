@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_app/core/widgets/widgets.dart';
+import 'package:mobile_app/features/activities/presentation/activities_section.dart';
 import 'package:mobile_app/features/auth/presentation/auth_controller.dart';
 import 'package:mobile_app/features/organizations/data/organizations_repository.dart';
 
@@ -219,6 +220,11 @@ class _OrganizationDetailScreenState
                       .toList(),
                 ),
               ),
+              const SizedBox(height: 24),
+              Text('Activity', style: Theme.of(context).textTheme.titleMedium),
+              const SizedBox(height: 8),
+              ActivitiesSection(organizationId: widget.organizationId),
+              const SizedBox(height: 8),
               if (detail.role != 'OWNER') ...[
                 const SizedBox(height: 24),
                 OutlinedButton(

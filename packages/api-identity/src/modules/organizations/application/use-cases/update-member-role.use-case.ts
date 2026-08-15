@@ -2,12 +2,17 @@ import type { AuthenticatedRequestUser, RequestContext } from '@repo/api-core';
 import type { TransactionPort } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import {  
+import {
+  ACTIVITY_EMITTER,
+  type ActivityEmitter,
   AppError,
   AUDIT_WRITER,
   type AuditWriter,
   ERROR_CODES,
-  ROLE_NAMES, SYSTEM_SCOPE , TRANSACTION_PORT } from '@repo/api-core';
+  ROLE_NAMES,
+  SYSTEM_SCOPE,
+  TRANSACTION_PORT,
+} from '@repo/api-core';
 
 import type { OrganizationMemberRole } from '../../domain/organization-access.policy';
 
@@ -25,6 +30,7 @@ export class UpdateMemberRoleUseCase {
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
     @Inject(ORGANIZATIONS_REPOSITORY) private readonly organizationsRepository: OrganizationsRepositoryPort,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
+    @Inject(ACTIVITY_EMITTER) private readonly activityEmitter: ActivityEmitter,
     private readonly accessControlService: AccessControlService,
   ) {}
 
@@ -146,8 +152,23 @@ export class UpdateMemberRoleUseCase {
         entityId: targetUserId,
         metadata: { organizationId, role },
         requestContext,
-          ...(organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
-    }, transaction);
+        ...(organizationId
+          ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: organizationId }
+          : { scope: SYSTEM_SCOPE.PLATFORM }),
+      }, transaction);
+
+      await this.activityEmitter.emit(
+        {
+          organizationId,
+          summary: `Member promoted to ${role}`,
+          entityType: 'organization',
+          entityId: organizationId,
+          actorId: actorUserId,
+          visibility: 'INTERNAL',
+          metadata: { targetUserId, role },
+        },
+        transaction,
+      );
 
       return {
         userId: updated.userId,
