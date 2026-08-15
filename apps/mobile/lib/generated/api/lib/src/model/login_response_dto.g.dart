@@ -24,7 +24,7 @@ class _$LoginResponseDto extends LoginResponseDto {
   @override
   final AuthSessionDto? session;
   @override
-  final JsonObject? organizationId;
+  final String? organizationId;
   @override
   final bool? mustChangePassword;
 
@@ -134,9 +134,9 @@ class LoginResponseDtoBuilder
       _$this._session ??= AuthSessionDtoBuilder();
   set session(AuthSessionDtoBuilder? session) => _$this._session = session;
 
-  JsonObject? _organizationId;
-  JsonObject? get organizationId => _$this._organizationId;
-  set organizationId(JsonObject? organizationId) =>
+  String? _organizationId;
+  String? get organizationId => _$this._organizationId;
+  set organizationId(String? organizationId) =>
       _$this._organizationId = organizationId;
 
   bool? _mustChangePassword;

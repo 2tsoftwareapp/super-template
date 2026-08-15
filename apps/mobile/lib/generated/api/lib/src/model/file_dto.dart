@@ -5,7 +5,6 @@
 // ignore_for_file: unused_element
 // @dart=3.0
 
-import 'package:built_value/json_object.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
@@ -38,13 +37,13 @@ abstract class FileDto implements Built<FileDto, FileDtoBuilder> {
   num get sizeBytes;
 
   @BuiltValueField(wireName: r'checksum')
-  JsonObject? get checksum;
+  String? get checksum;
 
   @BuiltValueField(wireName: r'latestVersion')
   num get latestVersion;
 
   @BuiltValueField(wireName: r'uploadedById')
-  JsonObject? get uploadedById;
+  String? get uploadedById;
 
   @BuiltValueField(wireName: r'createdAt')
   String get createdAt;
@@ -99,7 +98,7 @@ class _$FileDtoSerializer implements PrimitiveSerializer<FileDto> {
       yield r'checksum';
       yield serializers.serialize(
         object.checksum,
-        specifiedType: const FullType.nullable(JsonObject),
+        specifiedType: const FullType.nullable(String),
       );
     }
     yield r'latestVersion';
@@ -112,7 +111,7 @@ class _$FileDtoSerializer implements PrimitiveSerializer<FileDto> {
         ? null
         : serializers.serialize(
             object.uploadedById,
-            specifiedType: const FullType.nullable(JsonObject),
+            specifiedType: const FullType.nullable(String),
           );
     yield r'createdAt';
     yield serializers.serialize(
@@ -180,8 +179,8 @@ class _$FileDtoSerializer implements PrimitiveSerializer<FileDto> {
         case r'checksum':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType.nullable(JsonObject),
-          ) as JsonObject?;
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
           if (valueDes == null) continue;
           result.checksum = valueDes;
           break;
@@ -193,8 +192,8 @@ class _$FileDtoSerializer implements PrimitiveSerializer<FileDto> {
         case r'uploadedById':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType.nullable(JsonObject),
-          ) as JsonObject?;
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
           if (valueDes == null) continue;
           result.uploadedById = valueDes;
           break;

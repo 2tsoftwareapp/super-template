@@ -31,7 +31,7 @@ abstract class FileHistoryEventDto
   String get action;
 
   @BuiltValueField(wireName: r'actorId')
-  JsonObject? get actorId;
+  String? get actorId;
 
   @BuiltValueField(wireName: r'metadata')
   BuiltMap<String, JsonObject?>? get metadata;
@@ -82,7 +82,7 @@ class _$FileHistoryEventDtoSerializer
       yield r'actorId';
       yield serializers.serialize(
         object.actorId,
-        specifiedType: const FullType.nullable(JsonObject),
+        specifiedType: const FullType.nullable(String),
       );
     }
     if (object.metadata != null) {
@@ -144,8 +144,8 @@ class _$FileHistoryEventDtoSerializer
         case r'actorId':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType.nullable(JsonObject),
-          ) as JsonObject?;
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
           if (valueDes == null) continue;
           result.actorId = valueDes;
           break;

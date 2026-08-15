@@ -55,7 +55,9 @@ class OrganizationsRepository {
 
   Future<List<OrganizationSummary>> list() async {
     try {
-      final response = await _api.organizationsControllerList();
+      final response = await _api.organizationsControllerList(
+        memberOnly: 'true',
+      );
       return response.data!.data
           .map(
             (org) => OrganizationSummary(

@@ -16,7 +16,7 @@ class _$AuthMeDto extends AuthMeDto {
   @override
   final String sessionId;
   @override
-  final JsonObject? organizationId;
+  final String? organizationId;
   @override
   final bool? mustChangePassword;
 
@@ -89,9 +89,9 @@ class AuthMeDtoBuilder implements Builder<AuthMeDto, AuthMeDtoBuilder> {
   String? get sessionId => _$this._sessionId;
   set sessionId(String? sessionId) => _$this._sessionId = sessionId;
 
-  JsonObject? _organizationId;
-  JsonObject? get organizationId => _$this._organizationId;
-  set organizationId(JsonObject? organizationId) =>
+  String? _organizationId;
+  String? get organizationId => _$this._organizationId;
+  set organizationId(String? organizationId) =>
       _$this._organizationId = organizationId;
 
   bool? _mustChangePassword;

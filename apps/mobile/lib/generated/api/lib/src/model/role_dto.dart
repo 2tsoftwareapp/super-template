@@ -7,7 +7,6 @@
 
 import 'package:built_collection/built_collection.dart';
 import 'package:super_template_api/src/model/permission_dto.dart';
-import 'package:built_value/json_object.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
@@ -29,13 +28,13 @@ abstract class RoleDto implements Built<RoleDto, RoleDtoBuilder> {
   String get id;
 
   @BuiltValueField(wireName: r'organizationId')
-  JsonObject? get organizationId;
+  String? get organizationId;
 
   @BuiltValueField(wireName: r'name')
   String get name;
 
   @BuiltValueField(wireName: r'description')
-  JsonObject? get description;
+  String? get description;
 
   @BuiltValueField(wireName: r'scope')
   RoleDtoScopeEnum get scope;
@@ -80,7 +79,7 @@ class _$RoleDtoSerializer implements PrimitiveSerializer<RoleDto> {
         ? null
         : serializers.serialize(
             object.organizationId,
-            specifiedType: const FullType.nullable(JsonObject),
+            specifiedType: const FullType.nullable(String),
           );
     yield r'name';
     yield serializers.serialize(
@@ -92,7 +91,7 @@ class _$RoleDtoSerializer implements PrimitiveSerializer<RoleDto> {
         ? null
         : serializers.serialize(
             object.description,
-            specifiedType: const FullType.nullable(JsonObject),
+            specifiedType: const FullType.nullable(String),
           );
     yield r'scope';
     yield serializers.serialize(
@@ -146,8 +145,8 @@ class _$RoleDtoSerializer implements PrimitiveSerializer<RoleDto> {
         case r'organizationId':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType.nullable(JsonObject),
-          ) as JsonObject?;
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
           if (valueDes == null) continue;
           result.organizationId = valueDes;
           break;
@@ -161,8 +160,8 @@ class _$RoleDtoSerializer implements PrimitiveSerializer<RoleDto> {
         case r'description':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType.nullable(JsonObject),
-          ) as JsonObject?;
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
           if (valueDes == null) continue;
           result.description = valueDes;
           break;

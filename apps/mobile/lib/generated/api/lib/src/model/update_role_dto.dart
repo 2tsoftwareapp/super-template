@@ -6,7 +6,6 @@
 // @dart=3.0
 
 import 'package:built_collection/built_collection.dart';
-import 'package:built_value/json_object.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
@@ -25,7 +24,7 @@ abstract class UpdateRoleDto
   String? get name;
 
   @BuiltValueField(wireName: r'description')
-  JsonObject? get description;
+  String? get description;
 
   @BuiltValueField(wireName: r'permissionIds')
   BuiltList<String>? get permissionIds;
@@ -66,7 +65,7 @@ class _$UpdateRoleDtoSerializer implements PrimitiveSerializer<UpdateRoleDto> {
       yield r'description';
       yield serializers.serialize(
         object.description,
-        specifiedType: const FullType.nullable(JsonObject),
+        specifiedType: const FullType.nullable(String),
       );
     }
     if (object.permissionIds != null) {
@@ -113,8 +112,8 @@ class _$UpdateRoleDtoSerializer implements PrimitiveSerializer<UpdateRoleDto> {
         case r'description':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType.nullable(JsonObject),
-          ) as JsonObject?;
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
           if (valueDes == null) continue;
           result.description = valueDes;
           break;

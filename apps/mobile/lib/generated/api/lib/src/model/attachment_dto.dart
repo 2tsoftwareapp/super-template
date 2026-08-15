@@ -5,7 +5,6 @@
 // ignore_for_file: unused_element
 // @dart=3.0
 
-import 'package:built_value/json_object.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
@@ -38,10 +37,10 @@ abstract class AttachmentDto
   String get entityId;
 
   @BuiltValueField(wireName: r'label')
-  JsonObject? get label;
+  String? get label;
 
   @BuiltValueField(wireName: r'createdById')
-  JsonObject? get createdById;
+  String? get createdById;
 
   @BuiltValueField(wireName: r'createdAt')
   String get createdAt;
@@ -98,14 +97,14 @@ class _$AttachmentDtoSerializer implements PrimitiveSerializer<AttachmentDto> {
       yield r'label';
       yield serializers.serialize(
         object.label,
-        specifiedType: const FullType.nullable(JsonObject),
+        specifiedType: const FullType.nullable(String),
       );
     }
     if (object.createdById != null) {
       yield r'createdById';
       yield serializers.serialize(
         object.createdById,
-        specifiedType: const FullType.nullable(JsonObject),
+        specifiedType: const FullType.nullable(String),
       );
     }
     yield r'createdAt';
@@ -176,16 +175,16 @@ class _$AttachmentDtoSerializer implements PrimitiveSerializer<AttachmentDto> {
         case r'label':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType.nullable(JsonObject),
-          ) as JsonObject?;
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
           if (valueDes == null) continue;
           result.label = valueDes;
           break;
         case r'createdById':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType.nullable(JsonObject),
-          ) as JsonObject?;
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
           if (valueDes == null) continue;
           result.createdById = valueDes;
           break;

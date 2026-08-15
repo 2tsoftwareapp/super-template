@@ -74,7 +74,7 @@ class _$PermissionDto extends PermissionDto {
   @override
   final String name;
   @override
-  final JsonObject? description;
+  final String? description;
   @override
   final bool isSystem;
   @override
@@ -144,9 +144,9 @@ class PermissionDtoBuilder
   String? get name => _$this._name;
   set name(String? name) => _$this._name = name;
 
-  JsonObject? _description;
-  JsonObject? get description => _$this._description;
-  set description(JsonObject? description) => _$this._description = description;
+  String? _description;
+  String? get description => _$this._description;
+  set description(String? description) => _$this._description = description;
 
   bool? _isSystem;
   bool? get isSystem => _$this._isSystem;

@@ -12,7 +12,7 @@ class _$UpdateRoleDto extends UpdateRoleDto {
   @override
   final String? name;
   @override
-  final JsonObject? description;
+  final String? description;
   @override
   final BuiltList<String>? permissionIds;
 
@@ -65,9 +65,9 @@ class UpdateRoleDtoBuilder
   String? get name => _$this._name;
   set name(String? name) => _$this._name = name;
 
-  JsonObject? _description;
-  JsonObject? get description => _$this._description;
-  set description(JsonObject? description) => _$this._description = description;
+  String? _description;
+  String? get description => _$this._description;
+  set description(String? description) => _$this._description = description;
 
   ListBuilder<String>? _permissionIds;
   ListBuilder<String> get permissionIds =>

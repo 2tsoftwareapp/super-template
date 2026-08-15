@@ -5,7 +5,6 @@
 // ignore_for_file: unused_element
 // @dart=3.0
 
-import 'package:built_value/json_object.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
@@ -28,7 +27,7 @@ abstract class BatchDeleteResultItemDto
   bool get success;
 
   @BuiltValueField(wireName: r'error')
-  JsonObject? get error;
+  String? get error;
 
   BatchDeleteResultItemDto._();
 
@@ -74,7 +73,7 @@ class _$BatchDeleteResultItemDtoSerializer
       yield r'error';
       yield serializers.serialize(
         object.error,
-        specifiedType: const FullType.nullable(JsonObject),
+        specifiedType: const FullType.nullable(String),
       );
     }
   }
@@ -121,8 +120,8 @@ class _$BatchDeleteResultItemDtoSerializer
         case r'error':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType.nullable(JsonObject),
-          ) as JsonObject?;
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
           if (valueDes == null) continue;
           result.error = valueDes;
           break;

@@ -8,7 +8,6 @@
 import 'package:built_collection/built_collection.dart';
 import 'package:super_template_api/src/model/user_dto.dart';
 import 'package:super_template_api/src/model/auth_session_dto.dart';
-import 'package:built_value/json_object.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
@@ -51,7 +50,7 @@ abstract class LoginResponseDto
   AuthSessionDto? get session;
 
   @BuiltValueField(wireName: r'organizationId')
-  JsonObject? get organizationId;
+  String? get organizationId;
 
   @BuiltValueField(wireName: r'mustChangePassword')
   bool? get mustChangePassword;
@@ -133,7 +132,7 @@ class _$LoginResponseDtoSerializer
       yield r'organizationId';
       yield serializers.serialize(
         object.organizationId,
-        specifiedType: const FullType.nullable(JsonObject),
+        specifiedType: const FullType.nullable(String),
       );
     }
     if (object.mustChangePassword != null) {
@@ -224,8 +223,8 @@ class _$LoginResponseDtoSerializer
         case r'organizationId':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType.nullable(JsonObject),
-          ) as JsonObject?;
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
           if (valueDes == null) continue;
           result.organizationId = valueDes;
           break;

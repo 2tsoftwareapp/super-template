@@ -5,7 +5,6 @@
 // ignore_for_file: unused_element
 // @dart=3.0
 
-import 'package:built_value/json_object.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
@@ -44,7 +43,7 @@ abstract class FileVersionDto
   String get checksum;
 
   @BuiltValueField(wireName: r'createdById')
-  JsonObject? get createdById;
+  String? get createdById;
 
   @BuiltValueField(wireName: r'createdAt')
   String get createdAt;
@@ -109,7 +108,7 @@ class _$FileVersionDtoSerializer
       yield r'createdById';
       yield serializers.serialize(
         object.createdById,
-        specifiedType: const FullType.nullable(JsonObject),
+        specifiedType: const FullType.nullable(String),
       );
     }
     yield r'createdAt';
@@ -185,8 +184,8 @@ class _$FileVersionDtoSerializer
         case r'createdById':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType.nullable(JsonObject),
-          ) as JsonObject?;
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
           if (valueDes == null) continue;
           result.createdById = valueDes;
           break;

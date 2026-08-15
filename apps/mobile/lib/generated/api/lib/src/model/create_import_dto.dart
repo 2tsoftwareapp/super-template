@@ -22,6 +22,7 @@ abstract class CreateImportDto
     implements Built<CreateImportDto, CreateImportDtoBuilder> {
   @BuiltValueField(wireName: r'type')
   CreateImportDtoTypeEnum get type;
+  // enum typeEnum {  users,  };
 
   @BuiltValueField(wireName: r'fileId')
   String get fileId;

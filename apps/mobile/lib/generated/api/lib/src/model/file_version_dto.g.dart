@@ -22,7 +22,7 @@ class _$FileVersionDto extends FileVersionDto {
   @override
   final String checksum;
   @override
-  final JsonObject? createdById;
+  final String? createdById;
   @override
   final String createdAt;
 
@@ -119,9 +119,9 @@ class FileVersionDtoBuilder
   String? get checksum => _$this._checksum;
   set checksum(String? checksum) => _$this._checksum = checksum;
 
-  JsonObject? _createdById;
-  JsonObject? get createdById => _$this._createdById;
-  set createdById(JsonObject? createdById) => _$this._createdById = createdById;
+  String? _createdById;
+  String? get createdById => _$this._createdById;
+  set createdById(String? createdById) => _$this._createdById = createdById;
 
   String? _createdAt;
   String? get createdAt => _$this._createdAt;

@@ -1,4 +1,3 @@
-import 'package:built_value/json_object.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_app/core/errors/app_exception.dart';
@@ -36,7 +35,7 @@ class AttachmentsRepository {
             (item) => AttachmentSummary(
               id: item.id,
               fileId: item.fileId,
-              label: _jsonObjectToString(item.label),
+              label: item.label,
               createdAt: DateTime.parse(item.createdAt),
             ),
           )
@@ -66,7 +65,7 @@ class AttachmentsRepository {
       return AttachmentSummary(
         id: item.id,
         fileId: item.fileId,
-        label: _jsonObjectToString(item.label),
+        label: item.label,
         createdAt: DateTime.parse(item.createdAt),
       );
     } on DioException catch (error) {
@@ -102,8 +101,4 @@ class AttachmentsRepository {
     return file;
   }
 
-  String? _jsonObjectToString(JsonObject? value) {
-    final raw = value?.value;
-    return raw is String ? raw : null;
-  }
 }

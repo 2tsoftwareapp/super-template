@@ -18,9 +18,9 @@ class _$AttachmentDto extends AttachmentDto {
   @override
   final String entityId;
   @override
-  final JsonObject? label;
+  final String? label;
   @override
-  final JsonObject? createdById;
+  final String? createdById;
   @override
   final String createdAt;
   @override
@@ -110,13 +110,13 @@ class AttachmentDtoBuilder
   String? get entityId => _$this._entityId;
   set entityId(String? entityId) => _$this._entityId = entityId;
 
-  JsonObject? _label;
-  JsonObject? get label => _$this._label;
-  set label(JsonObject? label) => _$this._label = label;
+  String? _label;
+  String? get label => _$this._label;
+  set label(String? label) => _$this._label = label;
 
-  JsonObject? _createdById;
-  JsonObject? get createdById => _$this._createdById;
-  set createdById(JsonObject? createdById) => _$this._createdById = createdById;
+  String? _createdById;
+  String? get createdById => _$this._createdById;
+  set createdById(String? createdById) => _$this._createdById = createdById;
 
   String? _createdAt;
   String? get createdAt => _$this._createdAt;

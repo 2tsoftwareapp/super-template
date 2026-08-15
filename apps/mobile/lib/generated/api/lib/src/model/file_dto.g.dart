@@ -18,11 +18,11 @@ class _$FileDto extends FileDto {
   @override
   final num sizeBytes;
   @override
-  final JsonObject? checksum;
+  final String? checksum;
   @override
   final num latestVersion;
   @override
-  final JsonObject? uploadedById;
+  final String? uploadedById;
   @override
   final String createdAt;
   @override
@@ -115,19 +115,18 @@ class FileDtoBuilder implements Builder<FileDto, FileDtoBuilder> {
   num? get sizeBytes => _$this._sizeBytes;
   set sizeBytes(num? sizeBytes) => _$this._sizeBytes = sizeBytes;
 
-  JsonObject? _checksum;
-  JsonObject? get checksum => _$this._checksum;
-  set checksum(JsonObject? checksum) => _$this._checksum = checksum;
+  String? _checksum;
+  String? get checksum => _$this._checksum;
+  set checksum(String? checksum) => _$this._checksum = checksum;
 
   num? _latestVersion;
   num? get latestVersion => _$this._latestVersion;
   set latestVersion(num? latestVersion) =>
       _$this._latestVersion = latestVersion;
 
-  JsonObject? _uploadedById;
-  JsonObject? get uploadedById => _$this._uploadedById;
-  set uploadedById(JsonObject? uploadedById) =>
-      _$this._uploadedById = uploadedById;
+  String? _uploadedById;
+  String? get uploadedById => _$this._uploadedById;
+  set uploadedById(String? uploadedById) => _$this._uploadedById = uploadedById;
 
   String? _createdAt;
   String? get createdAt => _$this._createdAt;

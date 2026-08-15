@@ -77,7 +77,7 @@ class _$FileHistoryEventDto extends FileHistoryEventDto {
   @override
   final String action;
   @override
-  final JsonObject? actorId;
+  final String? actorId;
   @override
   final BuiltMap<String, JsonObject?>? metadata;
   @override
@@ -152,9 +152,9 @@ class FileHistoryEventDtoBuilder
   String? get action => _$this._action;
   set action(String? action) => _$this._action = action;
 
-  JsonObject? _actorId;
-  JsonObject? get actorId => _$this._actorId;
-  set actorId(JsonObject? actorId) => _$this._actorId = actorId;
+  String? _actorId;
+  String? get actorId => _$this._actorId;
+  set actorId(String? actorId) => _$this._actorId = actorId;
 
   MapBuilder<String, JsonObject?>? _metadata;
   MapBuilder<String, JsonObject?> get metadata =>

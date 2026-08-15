@@ -14,7 +14,7 @@ class _$BatchDeleteResultItemDto extends BatchDeleteResultItemDto {
   @override
   final bool success;
   @override
-  final JsonObject? error;
+  final String? error;
 
   factory _$BatchDeleteResultItemDto([
     void Function(BatchDeleteResultItemDtoBuilder)? updates,
@@ -78,9 +78,9 @@ class BatchDeleteResultItemDtoBuilder
   bool? get success => _$this._success;
   set success(bool? success) => _$this._success = success;
 
-  JsonObject? _error;
-  JsonObject? get error => _$this._error;
-  set error(JsonObject? error) => _$this._error = error;
+  String? _error;
+  String? get error => _$this._error;
+  set error(String? error) => _$this._error = error;
 
   BatchDeleteResultItemDtoBuilder() {
     BatchDeleteResultItemDto._defaults(this);
