@@ -35,6 +35,7 @@ import { AuthService } from '@repo/api-identity/modules/auth/application/auth.se
 import { PlatformModule } from '@repo/api-platform';
 
 import { AuthGuard } from './shell/auth.guard';
+import { MaintenanceModeGuard } from './shell/maintenance-mode.guard';
 import { TenantContextInterceptor } from './shell/tenant-context.interceptor';
 
 @Module({
@@ -87,6 +88,7 @@ import { TenantContextInterceptor } from './shell/tenant-context.interceptor';
       useFactory: (reflector: Reflector) => new AuthorizeGuard(reflector),
       inject: [Reflector],
     },
+    MaintenanceModeGuard,
     {
       provide: APP_INTERCEPTOR,
       useFactory: (reflector: Reflector) =>

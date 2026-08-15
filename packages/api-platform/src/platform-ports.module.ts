@@ -7,6 +7,7 @@ import { FilesModule } from './modules/files/files.module';
 import { JobsModule } from './modules/jobs/jobs.module';
 import { MailModule } from './modules/mail/mail.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+import { SettingsModule } from './modules/settings/settings.module';
 
 @Global()
 @Module({
@@ -18,6 +19,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
     JobsModule,
     NotificationsModule,
     ActivitiesModule,
+    SettingsModule,
   ],
   exports: [
     AuditModule,
@@ -27,6 +29,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
     JobsModule,
     NotificationsModule,
     ActivitiesModule,
+    SettingsModule,
   ],
 })
 export class PlatformPortsModule {}

@@ -2,8 +2,10 @@ import type { RequestContext } from '@repo/api-core';
 import type { TransactionPort } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { 
+import {
   AppError,
+  APPLICATION_SETTINGS_LOOKUP,
+  type ApplicationSettingsLookup,
   AUDIT_WRITER,
   type AuditWriter,
   durationToMilliseconds,
@@ -46,10 +48,23 @@ export class RegisterUseCase {
     @Inject(AUTH_SESSION_REPOSITORY)
     private readonly authSessionRepository: AuthSessionRepositoryPort,
     @Inject(OUTBOX_REPOSITORY) private readonly outboxRepository: OutboxRepositoryPort,
+    @Inject(APPLICATION_SETTINGS_LOOKUP)
+    private readonly applicationSettingsLookup: ApplicationSettingsLookup,
     private readonly organizationsService: OrganizationsService,
   ) {}
 
   async execute(input: RegisterCommand, requestContext?: RequestContext) {
+    const registrationEnabled =
+      await this.applicationSettingsLookup.isRegistrationEnabled();
+
+    if (!registrationEnabled) {
+      throw new AppError(
+        ERROR_CODES.REGISTRATION_DISABLED,
+        'Registration is currently disabled',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
     const email = normalizeEmail(input.email);
     const existingUser = await this.usersRepository.findByEmail(email);
     if (existingUser) {

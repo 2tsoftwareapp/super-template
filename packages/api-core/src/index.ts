@@ -64,6 +64,10 @@ export {
 } from "./ports/activity-emitter.port";
 export * from "./ports/advisory-lock.port";
 export {
+  APPLICATION_SETTINGS_LOOKUP,
+  type ApplicationSettingsLookup,
+} from "./ports/application-settings-lookup.port";
+export {
   AUDIT_WRITER,
   type AuditLogInput,
   type AuditWriter,

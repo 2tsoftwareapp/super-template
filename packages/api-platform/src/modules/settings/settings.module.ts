@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
+import { APPLICATION_SETTINGS_LOOKUP } from '@repo/api-core';
 
 import { AuditModule } from '../audit/audit.module';
+import { ApplicationSettingsLookupService } from './application/application-settings-lookup.service';
 import { SETTINGS_REPOSITORY } from './application/ports/settings.repository.port';
 import { EnsureSettingsSeedDataUseCase } from './application/use-cases/ensure-settings-seed-data.use-case';
 import { ListSettingsUseCase } from './application/use-cases/list-settings.use-case';
@@ -16,11 +18,20 @@ import { AdminSettingsController } from './presentation/admin-settings.controlle
     EnsureSettingsSeedDataUseCase,
     ListSettingsUseCase,
     UpdateSettingUseCase,
+    ApplicationSettingsLookupService,
     {
       provide: SETTINGS_REPOSITORY,
       useExisting: SettingsRepository,
     },
+    {
+      provide: APPLICATION_SETTINGS_LOOKUP,
+      useExisting: ApplicationSettingsLookupService,
+    },
   ],
-  exports: [SETTINGS_REPOSITORY, EnsureSettingsSeedDataUseCase],
+  exports: [
+    SETTINGS_REPOSITORY,
+    APPLICATION_SETTINGS_LOOKUP,
+    EnsureSettingsSeedDataUseCase,
+  ],
 })
 export class SettingsModule {}

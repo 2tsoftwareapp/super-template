@@ -55,6 +55,9 @@ export const ERROR_CODES = {
   RESOURCE_CONFLICT: 'RESOURCE_CONFLICT',
   // Rate limiting rejects requests sent before a cooldown window has elapsed.
   RATE_LIMITED: 'RATE_LIMITED',
+  // Feature toggles enforced from application settings.
+  REGISTRATION_DISABLED: 'REGISTRATION_DISABLED',
+  SERVICE_UNAVAILABLE: 'SERVICE_UNAVAILABLE',
   // Internal errors are reserved for unrecoverable server-side failures.
   INTERNAL_ERROR: 'INTERNAL_ERROR',
 } as const;
