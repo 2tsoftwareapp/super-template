@@ -1,6 +1,6 @@
 import type { JsonObject } from '@repo/api-core';
 import type { TransactionExecutor } from '@repo/api-core';
-import { SYSTEM_SCOPE } from '@repo/api-core';
+import type { SYSTEM_SCOPE } from '@repo/api-core';
 
 export interface AuditLogRecord {
   id: string;

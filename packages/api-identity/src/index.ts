@@ -2,8 +2,17 @@ import { Module } from '@nestjs/common';
 
 export { IdentityPortsModule } from './identity-ports.module';
 
-export { AccessControlService } from './modules/access-control/application/access-control.service';
+export { ACCESS_CONTROL_REPOSITORY } from './modules/access-control/application/access-control.repository.port';
 
+export type { AccessControlRepositoryPort, RoleRecord } from './modules/access-control/application/access-control.repository.port';
+
+export { AccessControlService } from './modules/access-control/application/access-control.service';
+export { ORGANIZATIONS_REPOSITORY } from './modules/organizations/application/ports/organizations.repository.port';
+
+export type { OrganizationMemberRecord, OrganizationsRepositoryPort } from './modules/organizations/application/ports/organizations.repository.port';
+export { USERS_REPOSITORY } from './modules/users/application/ports/users.repository.port';
+
+export type { CreateUserInput, UserRecord, UsersListResult, UsersRepositoryPort } from './modules/users/application/ports/users.repository.port';
 export {
   ACTION,
   hasPermission,
@@ -11,15 +20,6 @@ export {
   PRIVILEGED_ROLE_NAMES,
   ROLE_NAMES,
 } from '@repo/api-core';
-
-export { USERS_REPOSITORY } from './modules/users/application/ports/users.repository.port';
-export type { UsersRepositoryPort, UserRecord, CreateUserInput, UsersListResult } from './modules/users/application/ports/users.repository.port';
-
-export { ORGANIZATIONS_REPOSITORY } from './modules/organizations/application/ports/organizations.repository.port';
-export type { OrganizationsRepositoryPort, OrganizationMemberRecord } from './modules/organizations/application/ports/organizations.repository.port';
-
-export { ACCESS_CONTROL_REPOSITORY } from './modules/access-control/application/access-control.repository.port';
-export type { AccessControlRepositoryPort, RoleRecord } from './modules/access-control/application/access-control.repository.port';
 
 import { IdentityPortsModule } from './identity-ports.module';
 import { AccessControlModule } from './modules/access-control/access-control.module';

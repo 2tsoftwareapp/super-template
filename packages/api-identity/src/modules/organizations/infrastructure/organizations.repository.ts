@@ -5,9 +5,9 @@ import { DATABASE, type DatabaseClient } from '@repo/api-database';
 import {
   organizationMembers,
   organizations,
-  users,
-  userRoles,
   roles,
+  userRoles,
+  users,
 } from '@repo/api-database';
 import { and, asc, count, eq, isNull, ne } from 'drizzle-orm';
 

@@ -4,20 +4,18 @@ import {
   APP_LOGGER,
   type AppLogger,
   ErrorReporterService,
-  type TransactionExecutor,
   TRANSACTION_PORT,
   type TransactionPort,
   WORKER_DISPATCH_CONTEXT,
 } from '@repo/api-core';
 
+import { JobsService } from './jobs.service';
 import { JOB_OBSERVABILITY_REPOSITORY, type JobObservabilityRepositoryPort } from './ports/job-observability.repository.port';
 import {
-  type JobRecord,
-  type JobScope,
   JOBS_REPOSITORY,
+  type JobScope,
   type JobsRepositoryPort,
 } from './ports/jobs.repository.port';
-import { JobsService } from './jobs.service';
 import { PropagationService } from './services/propagation.service';
 
 const WORKER_ID = `worker-${Math.random().toString(36).slice(2, 10)}`;

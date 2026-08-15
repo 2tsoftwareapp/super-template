@@ -1,15 +1,15 @@
 import { ROLE_NAMES } from '@repo/api-core';
 
-export type ImportAccessActor = {
+export interface ImportAccessActor {
   userId: string;
   organizationId: string | null;
   roles: readonly string[];
-};
+}
 
-export type ImportAccessSubject = {
+export interface ImportAccessSubject {
   createdById: string;
   organizationId: string | null;
-};
+}
 
 /**
  * Whether an actor may read/confirm an import job.

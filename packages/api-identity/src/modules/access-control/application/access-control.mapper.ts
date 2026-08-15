@@ -8,7 +8,7 @@ export class AccessControlMapper {
       name: permission.name,
       description: permission.description,
       isSystem: permission.isSystem,
-      scope: permission.scope as 'platform' | 'organization',
+      scope: permission.scope,
     };
   }
 

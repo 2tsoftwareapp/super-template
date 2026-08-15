@@ -1,4 +1,4 @@
-import type { RequestContext, AuthenticatedRequestUser } from '@repo/api-core';
+import type { AuthenticatedRequestUser, RequestContext } from '@repo/api-core';
 import type { TransactionPort } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
@@ -7,7 +7,7 @@ import {
   AUDIT_WRITER,
   type AuditWriter,
   ERROR_CODES,
-  TRANSACTION_PORT, SYSTEM_SCOPE , ROLE_NAMES } from '@repo/api-core';
+  ROLE_NAMES, SYSTEM_SCOPE , TRANSACTION_PORT } from '@repo/api-core';
 
 import { assertOrganizationRole } from '../../domain/organization-access.policy';
 import { ORGANIZATIONS_REPOSITORY, type OrganizationsRepositoryPort } from '../ports/organizations.repository.port';
@@ -86,7 +86,7 @@ export class UpdateOrganizationUseCase {
       id: result.id,
       name: result.name,
       slug: result.slug,
-      role: isSuperAdmin ? ('ADMIN' as const) : membership!.role,
+      role: membership?.role ?? ('ADMIN' as const),
       createdAt: result.createdAt.toISOString(),
       updatedAt: result.updatedAt.toISOString(),
     };

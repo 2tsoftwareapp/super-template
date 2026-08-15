@@ -1,6 +1,7 @@
 import type { DatabaseExecutor } from '@repo/api-database';
 
 import { Inject, Injectable } from '@nestjs/common';
+import { EnvironmentService } from '@repo/api-core';
 import {
   DATABASE,
   type DatabaseClient,
@@ -8,7 +9,6 @@ import {
   ssoLoginStates,
   ssoSessionExchanges,
 } from '@repo/api-database';
-import { EnvironmentService } from '@repo/api-core';
 import { and, eq, gt, isNull } from 'drizzle-orm';
 
 import type {

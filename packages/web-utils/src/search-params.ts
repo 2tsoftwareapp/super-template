@@ -1,8 +1,8 @@
-import { bffPath } from "@repo/api-contract";
 import type {
   inferParserType
 } from "nuqs/server";
 
+import { bffPath } from "@repo/api-contract";
 import {
   createLoader,
   createSerializer,

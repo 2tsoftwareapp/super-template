@@ -93,7 +93,7 @@ export class SendMailTemplateUseCase {
     // Atomically claim the PENDING row for this worker. Returns null if
     // another worker already claimed it (status is no longer PENDING).
     const claimed = await this.mailDeliveriesRepository.claimForProcessing(target.id);
-    if (!claimed || claimed.status !== 'PROCESSING') {
+    if (claimed?.status !== 'PROCESSING') {
       return;
     }
 

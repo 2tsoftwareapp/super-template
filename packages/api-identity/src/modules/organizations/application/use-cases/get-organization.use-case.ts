@@ -1,4 +1,5 @@
 import type { AuthenticatedRequestUser } from '@repo/api-core';
+
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import {  AppError, ERROR_CODES , ROLE_NAMES } from '@repo/api-core';
 
@@ -49,7 +50,7 @@ export class GetOrganizationUseCase {
       id: organization.id,
       name: organization.name,
       slug: organization.slug,
-      role: isSuperAdmin ? ('ADMIN' as const) : membership!.role,
+      role: membership?.role ?? ('ADMIN' as const),
       memberCount,
       createdAt: organization.createdAt.toISOString(),
       updatedAt: organization.updatedAt.toISOString(),

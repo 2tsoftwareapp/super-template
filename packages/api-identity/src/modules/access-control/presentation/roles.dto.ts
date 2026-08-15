@@ -1,6 +1,6 @@
-import { Transform } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { SYSTEM_SCOPE } from '@repo/api-core';
+import { Transform } from 'class-transformer';
 import {
   ArrayMinSize,
   ArrayUnique,

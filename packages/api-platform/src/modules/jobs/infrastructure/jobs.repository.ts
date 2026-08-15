@@ -1,16 +1,16 @@
+import type { JsonObject, TransactionExecutor } from '@repo/api-core';
 import type {
   DatabaseClient,
   DatabaseExecutor,
 } from '@repo/api-database';
-import type { JsonObject, TransactionExecutor } from '@repo/api-core';
 
 import { Inject, Injectable } from '@nestjs/common';
 import { DATABASE, runIdempotentInsert } from '@repo/api-database';
-import { jobAttempts, jobs } from '@repo/api-database';
+import { jobs } from '@repo/api-database';
 import { and, count, desc, eq, isNull, sql } from 'drizzle-orm';
 
-import type { JobStatus } from '../domain/job-status';
 import type { JobRecord, JobScope, JobsRepositoryPort } from '../application/ports/jobs.repository.port';
+import type { JobStatus } from '../domain/job-status';
 
 function scopeCondition(scope: JobScope) {
   return scope.type === 'organization'
@@ -77,7 +77,7 @@ export class JobsRepository implements JobsRepositoryPort {
     const result = await runIdempotentInsert(
       async () => {
         const [inserted] = await db.insert(jobs).values(values as typeof jobs.$inferInsert & { createdById: string; idempotencyKey: string }).returning();
-        return inserted as JobRecord | undefined;
+        return inserted;
       },
       () =>
         this.findByIdempotencyKey(
@@ -130,7 +130,7 @@ export class JobsRepository implements JobsRepositoryPort {
     const filters: ReturnType<typeof eq>[] = [scopeCondition(params.scope)];
 
     if (params.status) {
-      filters.push(eq(jobs.status, params.status as any));
+      filters.push(eq(jobs.status, params.status as JobStatus));
     }
     if (params.type) {
       filters.push(eq(jobs.type, params.type));
@@ -144,7 +144,7 @@ export class JobsRepository implements JobsRepositoryPort {
       db.select({ total: count() }).from(jobs).where(whereClause),
     ]);
 
-    return { rows: rows as JobRecord[], total: Number(totals[0]?.total ?? 0) };
+    return { rows: rows, total: Number(totals[0]?.total ?? 0) };
   }
 
   async claimDueJobs(
@@ -187,7 +187,7 @@ export class JobsRepository implements JobsRepositoryPort {
         created_by_id AS "createdById", idempotency_key AS "idempotencyKey",
         created_at AS "createdAt", updated_at AS "updatedAt"
     `);
-    return result.rows as JobRecord[];
+    return result.rows;
   }
 
   async markCompleted(
@@ -316,8 +316,8 @@ export class JobsRepository implements JobsRepositoryPort {
     `);
 
     return {
-      requeued: requeued.rows as JobRecord[],
-      failed: failed.rows as JobRecord[],
+      requeued: requeued.rows,
+      failed: failed.rows,
     };
   }
 

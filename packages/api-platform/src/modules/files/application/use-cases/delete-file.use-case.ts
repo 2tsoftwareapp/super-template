@@ -3,8 +3,9 @@ import type {
   RequestContext,
 } from '@repo/api-core';
 
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import {  AppError, ERROR_CODES , SYSTEM_SCOPE } from '@repo/api-core';
+import { Inject, Injectable } from '@nestjs/common';
+import { SYSTEM_SCOPE } from '@repo/api-core';
+import { TRANSACTION_PORT, type TransactionPort } from '@repo/api-core';
 
 import { AuditService } from '../../../audit/application/audit.service';
 import {
@@ -13,7 +14,6 @@ import {
 } from '../../../storage/application/object-storage.interface';
 import { FILES_REPOSITORY, type FilesRepositoryPort } from '../ports/files.repository.port';
 import { FileAccessService } from '../services/file-access.service';
-import { TRANSACTION_PORT, type TransactionPort } from '@repo/api-core';
 
 @Injectable()
 export class DeleteFileUseCase {

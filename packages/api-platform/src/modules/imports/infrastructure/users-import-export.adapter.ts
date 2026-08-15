@@ -1,13 +1,9 @@
-import { randomBytes } from 'node:crypto';
 import { Inject, Injectable } from '@nestjs/common';
-import { hash } from 'argon2';
-
 import {
   ImportExportAdapter,
   ImportExportRowContext,
   type TransactionExecutor,
 } from '@repo/api-core';
-
 import {
   ACCESS_CONTROL_REPOSITORY,
   type AccessControlRepositoryPort,
@@ -16,6 +12,8 @@ import {
   USERS_REPOSITORY,
   type UsersRepositoryPort,
 } from '@repo/api-identity';
+import { hash } from 'argon2';
+import { randomBytes } from 'node:crypto';
 
 export interface UserRow {
   id?: string;
@@ -90,7 +88,7 @@ export class UsersImportExportAdapter implements ImportExportAdapter<UserRow> {
     return {
       email: record.email?.trim() ?? '',
       displayName: record.displayName?.trim() ?? '',
-      avatarUrl: record.avatarUrl?.trim() || undefined,
+      avatarUrl: record.avatarUrl?.trim() ?? undefined,
     };
   }
 

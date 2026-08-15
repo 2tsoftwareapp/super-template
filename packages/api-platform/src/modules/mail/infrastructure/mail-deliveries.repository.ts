@@ -6,7 +6,7 @@ import type {
 import { Inject, Injectable } from '@nestjs/common';
 import { DATABASE } from '@repo/api-database';
 import { mailDeliveries } from '@repo/api-database';
-import { and, count, desc, eq, sql, lt } from 'drizzle-orm';
+import { and, count, desc, eq, sql } from 'drizzle-orm';
 
 import type { DeliveryRecord, MailDeliveriesRepositoryPort } from '../application/ports/mail-deliveries.repository.port';
 
@@ -223,7 +223,7 @@ export class MailDeliveriesRepository implements MailDeliveriesRepositoryPort {
     }
 
     if (params.status) {
-      filters.push(eq(mailDeliveries.status, params.status as any));
+      filters.push(eq(mailDeliveries.status, params.status));
     }
 
     const whereClause = filters.length > 0 ? and(...filters) : undefined;

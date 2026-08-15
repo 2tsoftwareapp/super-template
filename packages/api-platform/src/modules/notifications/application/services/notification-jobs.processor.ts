@@ -6,8 +6,8 @@ import {
   ErrorReporterService,
 } from '@repo/api-core';
 
-import { NOTIFICATION_JOBS_REPOSITORY, type NotificationJobsRepositoryPort } from '../ports/notification-jobs.repository.port';
 import { NotificationsService } from '../notifications.service';
+import { NOTIFICATION_JOBS_REPOSITORY, type NotificationJobsRepositoryPort } from '../ports/notification-jobs.repository.port';
 
 const JOB_STALE_TIMEOUT_MINUTES = 10;
 const JOB_MAX_ATTEMPTS = 3;

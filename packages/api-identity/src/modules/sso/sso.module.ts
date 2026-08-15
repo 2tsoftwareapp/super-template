@@ -5,11 +5,11 @@ import { AccessControlModule } from '../access-control/access-control.module';
 import { AuthModule } from '../auth/auth.module';
 import { OrganizationsModule } from '../organizations/organizations.module';
 import { UsersModule } from '../users/users.module';
-import { SSO_REPOSITORY } from './application/ports/sso.repository.port';
 import {
   SSO_PROVIDER_REGISTRY,
   type SsoProviderAdapter,
 } from './application/ports/sso-provider.port';
+import { SSO_REPOSITORY } from './application/ports/sso.repository.port';
 import { HandleSsoCallbackUseCase } from './application/use-cases/handle-sso-callback.use-case';
 import {
   CreateSsoSessionExchangeUseCase,

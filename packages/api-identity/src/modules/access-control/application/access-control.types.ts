@@ -1,4 +1,4 @@
-import { SYSTEM_SCOPE } from '@repo/api-core';
+import type { SYSTEM_SCOPE } from '@repo/api-core';
 export type RoleScope = 'platform' | 'organization';
 
 export interface PermissionView {

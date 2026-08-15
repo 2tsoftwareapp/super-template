@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common';
 import { USER_PREFERENCES_LOOKUP } from '@repo/api-core';
 
 import { UsersModule } from '../users/users.module';
-import { PreferencesMapper } from './application/preferences.mapper';
 import { PREFERENCES_REPOSITORY } from './application/ports/preferences.repository.port';
+import { PreferencesMapper } from './application/preferences.mapper';
 import { GetPreferencesUseCase } from './application/use-cases/get-preferences.use-case';
 import { ResetPreferencesUseCase } from './application/use-cases/reset-preferences.use-case';
 import { UpdatePreferencesUseCase } from './application/use-cases/update-preferences.use-case';

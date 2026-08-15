@@ -8,8 +8,8 @@ import { DATABASE } from '@repo/api-database';
 import { organizationMembers, roles, userRoles, users } from '@repo/api-database';
 import { and, asc, count, desc, eq, inArray, isNull, or, sql } from 'drizzle-orm';
 
-import type { UserSortCriterion } from '../application/user-sort';
 import type { UsersRepositoryPort } from '../application/ports/users.repository.port';
+import type { UserSortCriterion } from '../application/user-sort';
 
 interface ListUsersParams {
   page: number;

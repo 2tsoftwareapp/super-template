@@ -30,6 +30,7 @@ import {
   optionalText,
 } from "@/features/roles/model/roles.filtering";
 import { selectRoleManagementPermissions } from "@/features/roles/model/roles.permissions";
+import { parseRolesSearchParams } from "@/features/roles/model/roles.search-params";
 import { useOrganizationsQuery } from "@/hooks/use-organizations-lookup";
 import { useRolesQuery } from "@/hooks/use-roles-lookup";
 import { useSession } from "@/hooks/use-session";
@@ -51,14 +52,8 @@ export function useRolesController(): RolesViewModel {
       sessionData?.user?.roles,
     );
 
-  const urlPage = Math.max(1, Number(searchParams.get("page")) || 1);
-  const urlSearch = searchParams.get("search") ?? "";
-  const urlScopeRaw = searchParams.get("scope");
-  const urlScope =
-    urlScopeRaw === "platform" || urlScopeRaw === "organization"
-      ? urlScopeRaw
-      : undefined;
-  const urlOrgId = searchParams.get("organizationId") ?? undefined;
+  const { page: urlPage, search: urlSearch, scope: urlScope, organizationId: urlOrgId } =
+    parseRolesSearchParams(searchParams);
 
   const [searchInput, setSearchInput] = useState(urlSearch);
   const debouncedSearch = useDebouncedValue(searchInput, 300);
@@ -131,16 +126,15 @@ export function useRolesController(): RolesViewModel {
     enabled: isSuperAdmin,
   });
 
-  const rolesData = roles.data?.data ?? [];
   const meta = roles.data?.meta;
 
   const { systemRoles, customRoles } = useMemo(() => {
-    const all = rolesData;
+    const all = roles.data?.data ?? [];
     return {
       systemRoles: mergeSystemRoles(all.filter((role) => role.isSystem)),
       customRoles: mergeCustomRoles(all.filter((role) => !role.isSystem)),
     };
-  }, [rolesData]);
+  }, [roles.data?.data]);
 
   const filteredSystem = useMemo(
     () => filterRolesBySearch(systemRoles, searchInput),

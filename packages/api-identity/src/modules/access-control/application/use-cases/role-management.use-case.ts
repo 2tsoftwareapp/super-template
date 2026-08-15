@@ -9,8 +9,8 @@ import {
   isFixedRoleName,
   permissionNamesForRole,
   ROLE_NAMES,
-  TRANSACTION_PORT,
   SYSTEM_SCOPE,
+  TRANSACTION_PORT,
 } from '@repo/api-core';
 
 import type {
@@ -256,12 +256,17 @@ export class RoleManagementUseCase {
             },
             tx,
           );
-        } catch (error: any) {
+        } catch (error) {
+          const pgError = error as {
+            code?: string;
+            cause?: { code?: string };
+            message?: string;
+          };
           if (
-            error.code === '23505' ||
-            error.cause?.code === '23505' ||
-            (error.message && error.message.includes('roles_organization_id_name_unique')) ||
-            (error.message && error.message.includes('duplicate key value'))
+            pgError.code === '23505' ||
+            pgError.cause?.code === '23505' ||
+            (pgError.message?.includes('roles_organization_id_name_unique')) ||
+            (pgError.message?.includes('duplicate key value'))
           ) {
             throw new AppError(
               ERROR_CODES.RESOURCE_CONFLICT,
@@ -330,10 +335,11 @@ export class RoleManagementUseCase {
         ),
       );
     });
-  } catch (error: any) {
+  } catch (error) {
+    const pgError = error as { code?: string; constraint?: string };
     if (
-      error?.code === '23505' &&
-      error?.constraint === 'roles_organization_name_lower_unique'
+      pgError.code === '23505' &&
+      pgError.constraint === 'roles_organization_name_lower_unique'
     ) {
       throw new AppError(
         ERROR_CODES.RESOURCE_CONFLICT,

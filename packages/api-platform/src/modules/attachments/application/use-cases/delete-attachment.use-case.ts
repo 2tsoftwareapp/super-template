@@ -5,10 +5,10 @@ import type {
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import {  AppError, ERROR_CODES , SYSTEM_SCOPE } from '@repo/api-core';
+import { TRANSACTION_PORT, type TransactionPort } from '@repo/api-core';
 
 import { AuditService } from '../../../audit/application/audit.service';
 import { ATTACHMENTS_REPOSITORY, type AttachmentsRepositoryPort } from '../ports/attachments.repository.port';
-import { TRANSACTION_PORT, type TransactionPort } from '@repo/api-core';
 
 @Injectable()
 export class DeleteAttachmentUseCase {

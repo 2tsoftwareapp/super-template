@@ -1,12 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common';
 
-import type { JobView, JobListView, ListJobsQuery } from '../jobs.types';
+import type { JobListView, ListJobsQuery } from '../jobs.types';
 
 import { JobsMapper } from '../jobs.mapper';
 import {
   JOBS_REPOSITORY,
-  type JobsRepositoryPort,
   type JobScope,
+  type JobsRepositoryPort,
 } from '../ports/jobs.repository.port';
 
 @Injectable()

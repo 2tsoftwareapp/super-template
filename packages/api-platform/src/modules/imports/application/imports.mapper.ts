@@ -1,5 +1,3 @@
-import type { ImportValidationError } from '@repo/api-core';
-
 import { Injectable } from '@nestjs/common';
 
 import type { ImportJobStatus, ImportJobView } from './imports.types';
@@ -16,7 +14,7 @@ export class ImportsMapper {
       rowCount: job.rowCount ?? null,
       successCount: job.successCount ?? null,
       errorCount: job.errorCount ?? null,
-      errors: job.errors as ImportValidationError[] | null,
+      errors: job.errors,
       createdById: job.createdById,
       confirmedAt: job.confirmedAt?.toISOString() ?? null,
       completedAt: job.completedAt?.toISOString() ?? null,

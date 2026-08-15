@@ -6,8 +6,8 @@ import type { JobView } from '../jobs.types';
 import { JobsMapper } from '../jobs.mapper';
 import {
   JOBS_REPOSITORY,
-  type JobsRepositoryPort,
   type JobScope,
+  type JobsRepositoryPort,
 } from '../ports/jobs.repository.port';
 
 @Injectable()

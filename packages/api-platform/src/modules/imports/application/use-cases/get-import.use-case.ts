@@ -3,9 +3,10 @@ import type { AuthenticatedRequestUser } from '@repo/api-core';
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { AppError, ERROR_CODES } from '@repo/api-core';
 
+import type { ImportJobView } from '../imports.types';
+
 import { canAccessImportJob } from '../../domain/import-access.policy';
 import { ImportsMapper } from '../imports.mapper';
-import type { ImportJobView } from '../imports.types';
 import {
   IMPORT_JOBS_REPOSITORY,
   type ImportJobsRepositoryPort,

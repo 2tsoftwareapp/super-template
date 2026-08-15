@@ -21,6 +21,7 @@ import {
 import {
   AUTH_TOKEN_PROVIDER,
   type AuthTokenProviderPort,
+  type TokenPayload,
 } from '../ports/auth-token.provider.port';
 
 /** CAS retries for grace-path rotation racing other refreshes. */
@@ -41,7 +42,7 @@ export class RefreshSessionUseCase {
   ) {}
 
   async execute(input: RefreshSessionCommand, requestContext?: RequestContext) {
-    let payload: import('../ports/auth-token.provider.port').TokenPayload;
+    let payload: TokenPayload;
     try {
       payload = await this.tokenProvider.verifyToken(
         input.refreshToken,

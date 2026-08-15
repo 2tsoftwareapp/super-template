@@ -1,8 +1,8 @@
+import type { TransactionExecutor } from '@repo/api-core';
 import type {
   DatabaseClient,
   DatabaseExecutor,
 } from '@repo/api-database';
-import type { TransactionExecutor } from '@repo/api-core';
 
 import { Inject, Injectable } from '@nestjs/common';
 import { DATABASE, runIdempotentInsert } from '@repo/api-database';
@@ -39,7 +39,7 @@ export class ImportJobsRepository implements ImportJobsRepositoryPort {
       async () => {
         const [inserted] = await db.insert(importJobs).values(values).returning();
 
-        return inserted as ImportJobRecord | undefined;
+        return inserted;
       },
       () =>
         this.findByIdempotencyKey(

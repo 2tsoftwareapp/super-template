@@ -9,8 +9,8 @@ import {
   durationToMilliseconds,
   ERROR_CODES,
   normalizeEmail,
-  TRANSACTION_PORT,
   SYSTEM_SCOPE,
+  TRANSACTION_PORT,
 } from '@repo/api-core';
 
 import type { RegisterCommand } from '../auth.types';

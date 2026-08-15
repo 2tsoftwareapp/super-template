@@ -1,5 +1,6 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
 import type { TransactionExecutor } from '@repo/api-core';
+
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import {
   USER_PREFERENCES_LOOKUP,
   type UserPreferencesLookup,

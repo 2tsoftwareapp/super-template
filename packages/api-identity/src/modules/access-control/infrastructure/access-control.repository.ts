@@ -86,7 +86,7 @@ export class AccessControlRepository implements AccessControlRepositoryPort {
     ]);
 
     return {
-      rows: rows as RoleRecord[],
+      rows: rows,
       total: Number(totals[0]?.total ?? 0),
     };
   }
@@ -671,7 +671,7 @@ export class AccessControlRepository implements AccessControlRepositoryPort {
       .returning();
 
     if (role) {
-      return role as RoleRecord;
+      return role;
     }
 
     const existing = await this.findRoleByName(name, organizationId, executor);

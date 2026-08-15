@@ -1,11 +1,11 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { AppError, ERROR_CODES, TRANSACTION_PORT, type TransactionPort, WORKER_DISPATCH_CONTEXT, type TransactionExecutor } from '@repo/api-core';
+import { AppError, ERROR_CODES, TRANSACTION_PORT, type TransactionExecutor, type TransactionPort, WORKER_DISPATCH_CONTEXT } from '@repo/api-core';
 
 import { JOB_OBSERVABILITY_REPOSITORY, type JobObservabilityRepositoryPort } from '../ports/job-observability.repository.port';
 import {
   JOBS_REPOSITORY,
-  type JobsRepositoryPort,
   type JobScope,
+  type JobsRepositoryPort,
 } from '../ports/jobs.repository.port';
 
 @Injectable()

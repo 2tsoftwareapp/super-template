@@ -6,19 +6,19 @@ import {
   ROLE_NAMES,
 } from '@repo/api-core';
 
-export type FileAccessActor = {
+export interface FileAccessActor {
   userId: string;
   organizationId: string | null;
   roles: readonly string[];
   permissions: readonly string[];
-};
+}
 
-export type FileAccessSubject = {
+export interface FileAccessSubject {
   organizationId: string | null;
   uploadedById: string | null;
   kind: string;
   visibility: string;
-};
+}
 
 /**
  * Whether an actor may read/download/mutate a single file.

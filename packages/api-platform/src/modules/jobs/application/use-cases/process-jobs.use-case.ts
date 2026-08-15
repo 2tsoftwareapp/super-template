@@ -8,8 +8,8 @@ import {
   tenantContextForJob,
   TenantContextService,
   TRANSACTION_PORT,
-  type TransactionPort,
   type TransactionExecutor,
+  type TransactionPort,
   WORKER_DISPATCH_CONTEXT,
 } from '@repo/api-core';
 
@@ -17,8 +17,8 @@ import { HANDLER_TIMEOUT_MS, resolveFailureOutcome } from '../../domain/job-life
 import { JOB_OBSERVABILITY_REPOSITORY, type JobObservabilityRepositoryPort } from '../ports/job-observability.repository.port';
 import {
   type JobRecord,
-  type JobScope,
   JOBS_REPOSITORY,
+  type JobScope,
   type JobsRepositoryPort,
 } from '../ports/jobs.repository.port';
 import { JobHandlersRegistry } from '../services/job-handlers.registry';
@@ -67,7 +67,7 @@ export class ProcessJobsUseCase {
               },
             );
           },
-        ).catch(() => {});
+        ).catch(() => undefined);
       }
     }
   }
@@ -88,7 +88,7 @@ export class ProcessJobsUseCase {
         );
         return a;
       },
-    ) as Awaited<ReturnType<JobObservabilityRepositoryPort['startAttempt']>>;
+    );
 
     const handler = this.jobHandlersRegistry.getHandler(job.type);
 

@@ -56,8 +56,8 @@ export class AdminRolesController {
     const result = await this.roleQuery.listRoles(actor, {
       page: query.page ?? 1,
       limit: query.limit ?? 50,
-      organizationId: query.organizationId || undefined,
-      search: query.search || undefined,
+      organizationId: query.organizationId ?? undefined,
+      search: query.search ?? undefined,
       scope: query.scope,
     });
 

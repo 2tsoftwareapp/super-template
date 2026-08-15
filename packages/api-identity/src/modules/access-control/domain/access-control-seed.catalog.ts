@@ -1,6 +1,5 @@
 import {
   allSeedPermissionNames,
-  RESOURCE_SCOPE,
   ROLE_NAMES,
   scopeForPermission,
 } from '@repo/api-core';

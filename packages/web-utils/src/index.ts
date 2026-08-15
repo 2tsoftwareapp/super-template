@@ -7,6 +7,8 @@ export {
   shouldRetryQuery,
 } from "./errors";
 export { ApiClientError, getCsrfCookieName, webFetch, webFetchBlob } from "./http";
+export type { JsonArray, JsonObject, JsonPrimitive, JsonValue } from "./json";
+export { isJsonObject, isJsonValue, parseJsonValue } from "./json";
 export type { RouteParamResult, SearchParamsResult } from "./params";
 export {
   booleanParam,
@@ -23,8 +25,6 @@ export {
   sortOrderParam,
   uuidParam,
 } from "./params";
-export type { JsonArray, JsonObject, JsonPrimitive, JsonValue } from "./json";
-export { isJsonObject, isJsonValue, parseJsonValue } from "./json";
 export type { CreateUseSessionOptions } from "./session";
 export { createUseSession } from "./session";
 export type { CookieOptions } from "./storage";

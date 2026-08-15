@@ -89,12 +89,17 @@ export class CreateOrganizationUseCase {
         });
 
         break;
-      } catch (error: any) {
+      } catch (error) {
+        const pgError = error as {
+          code?: string;
+          message?: string;
+          errorCode?: string;
+        };
         const isUniqueViolation =
-          error.code === '23505' ||
-          error.message?.includes('unique') ||
-          error.errorCode === ERROR_CODES.RESOURCE_CONFLICT ||
-          error.message?.includes('Slug already exists');
+          pgError.code === '23505' ||
+          (pgError.message?.includes('unique') ?? false) ||
+          pgError.errorCode === ERROR_CODES.RESOURCE_CONFLICT ||
+          (pgError.message?.includes('Slug already exists') ?? false);
 
         if (isUniqueViolation && attempt < 9) {
           attempt += 1;

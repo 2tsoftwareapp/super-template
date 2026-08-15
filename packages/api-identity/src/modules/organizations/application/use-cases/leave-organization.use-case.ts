@@ -1,4 +1,4 @@
-import type { RequestContext, AuthenticatedRequestUser } from '@repo/api-core';
+import type { AuthenticatedRequestUser, RequestContext } from '@repo/api-core';
 import type { TransactionPort } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
@@ -7,13 +7,13 @@ import {
   AUDIT_WRITER,
   type AuditWriter,
   ERROR_CODES,
-  TRANSACTION_PORT,
   SYSTEM_SCOPE,
+  TRANSACTION_PORT,
 } from '@repo/api-core';
 
+import { AccessControlService } from '../../../access-control/application/access-control.service';
 import { assertNotLastOwner } from '../../domain/organization-access.policy';
 import { ORGANIZATIONS_REPOSITORY, type OrganizationsRepositoryPort } from '../ports/organizations.repository.port';
-import { AccessControlService } from '../../../access-control/application/access-control.service';
 
 @Injectable()
 export class LeaveOrganizationUseCase {

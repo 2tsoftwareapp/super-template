@@ -17,6 +17,7 @@ import {
 import {
   AUTH_TOKEN_PROVIDER,
   type AuthTokenProviderPort,
+  type TokenPayload,
 } from '../ports/auth-token.provider.port';
 
 @Injectable()
@@ -33,7 +34,7 @@ export class AuthenticateAccessTokenUseCase {
   ) {}
 
   async execute(token: string): Promise<AuthenticatedRequestUser> {
-    let payload: import('../ports/auth-token.provider.port').TokenPayload;
+    let payload: TokenPayload;
     try {
       payload = await this.tokenProvider.verifyToken(token, 'access');
     } catch {

@@ -116,7 +116,7 @@ export class CreateAdminUserUseCase {
           );
         }
 
-        const assignmentOrganizationId = resolvedRole.organizationId || organizationId;
+        const assignmentOrganizationId = resolvedRole.organizationId ?? organizationId;
         assertRoleScopeCanBeAssigned(
           { name: resolvedRole.name, organizationId: assignmentOrganizationId, isSystem: resolvedRole.isSystem },
           actor,

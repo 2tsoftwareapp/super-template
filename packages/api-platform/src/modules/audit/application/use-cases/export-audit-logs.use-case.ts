@@ -2,10 +2,10 @@ import type {
   AuthenticatedRequestUser,
   RequestContext,
 } from '@repo/api-core';
-import { PLATFORM_TRANSACTION_PORT, TRANSACTION_PORT, type PlatformTransactionPort, type TransactionPort } from '@repo/api-core';
 
 import { Inject, Injectable } from '@nestjs/common';
-import {     requireOrganizationId, toCsv , SYSTEM_SCOPE , FILE_KIND , FILE_VISIBILITY , ROLE_NAMES } from '@repo/api-core';
+import { PLATFORM_TRANSACTION_PORT, type PlatformTransactionPort, TRANSACTION_PORT, type TransactionExecutor, type TransactionPort } from '@repo/api-core';
+import {     FILE_KIND, FILE_VISIBILITY , requireOrganizationId , ROLE_NAMES , SYSTEM_SCOPE , toCsv } from '@repo/api-core';
 import { randomUUID } from 'node:crypto';
 
 import type { ExportAuditLogsQuery } from '../audit.types';
@@ -63,7 +63,7 @@ export class ExportAuditLogsUseCase {
       ...(typeof organizationId === 'string' ? { organizationId } : {}),
     };
 
-    const runInTx = <T>(fn: (tx: any) => Promise<T>) => {
+    const runInTx = <T>(fn: (tx: TransactionExecutor) => Promise<T>) => {
       if (organizationId === null) {
         return this.platformTransactionPort.run(fn);
       }

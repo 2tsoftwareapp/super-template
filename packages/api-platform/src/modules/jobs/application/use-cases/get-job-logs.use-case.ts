@@ -4,8 +4,8 @@ import { AppError, ERROR_CODES } from '@repo/api-core';
 import { JOB_OBSERVABILITY_REPOSITORY, type JobObservabilityRepositoryPort } from '../ports/job-observability.repository.port';
 import {
   JOBS_REPOSITORY,
-  type JobsRepositoryPort,
   type JobScope,
+  type JobsRepositoryPort,
 } from '../ports/jobs.repository.port';
 
 export interface ListJobLogsQuery {

@@ -26,7 +26,7 @@ export class ResolveOrganizationIdForUserUseCase {
           executor,
         );
         return organizationId;
-      } catch (err) {
+      } catch {
         // Fall back to primary organization if the specified one is invalid/deleted/non-member
       }
     }

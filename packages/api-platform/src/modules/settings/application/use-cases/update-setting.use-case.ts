@@ -5,13 +5,13 @@ import type {
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import {  AppError, ERROR_CODES, ROLE_NAMES , SYSTEM_SCOPE } from '@repo/api-core';
+import { PLATFORM_TRANSACTION_PORT, type PlatformTransactionPort } from '@repo/api-core';
 
 import type { UpdateSettingCommand } from '../settings.types';
 
 import { AuditService } from '../../../audit/application/audit.service';
 import { SETTINGS_REPOSITORY, type SettingsRepositoryPort } from '../ports/settings.repository.port';
 import { SettingsMapper } from '../settings.mapper';
-import { PLATFORM_TRANSACTION_PORT, type PlatformTransactionPort } from '@repo/api-core';
 
 @Injectable()
 export class UpdateSettingUseCase {

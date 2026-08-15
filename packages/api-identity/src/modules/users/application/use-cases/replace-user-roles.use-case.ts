@@ -127,7 +127,7 @@ export class ReplaceUserRolesUseCase {
           transaction,
         );
 
-        if (membership && membership.role === 'OWNER') {
+        if (membership?.role === 'OWNER') {
           throw new AppError(
             ERROR_CODES.AUTH_FORBIDDEN,
             'Cannot modify the roles of an organization owner',

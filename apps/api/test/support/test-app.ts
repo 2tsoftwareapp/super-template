@@ -2,7 +2,6 @@ import type { TenantContext } from '@repo/api-core';
 import type { Server } from 'node:http';
 
 import { type INestApplication, ValidationPipe } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { TenantContextService } from '@repo/api-core';

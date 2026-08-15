@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-import type { JobStatus, JobView, JobListView } from './jobs.types';
+import type { JobListView, JobView } from './jobs.types';
 import type { JobRecord } from './ports/jobs.repository.port';
 
 @Injectable()
@@ -10,7 +10,7 @@ export class JobsMapper {
       id: job.id,
       type: job.type,
       payload: job.payload,
-      status: job.status as JobStatus,
+      status: job.status,
       scheduledAt: job.scheduledAt.toISOString(),
       priority: job.priority,
       attempts: job.attempts,
@@ -30,7 +30,7 @@ export class JobsMapper {
       id: job.id,
       type: job.type,
       payload: {},
-      status: job.status as JobStatus,
+      status: job.status,
       scheduledAt: job.scheduledAt.toISOString(),
       priority: job.priority,
       attempts: job.attempts,

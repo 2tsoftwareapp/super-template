@@ -10,11 +10,11 @@ import {
   type AuditWriter,
   ERROR_CODES,
   requireOrganizationId,
+  SYSTEM_SCOPE,
   TRANSACTION_PORT,
   type TransactionPort,
   USER_LOOKUP,
   type UserLookup,
-  SYSTEM_SCOPE,
 } from '@repo/api-core';
 import {
   tenantContextForJob,
@@ -308,7 +308,7 @@ export class NotificationDeliveryUseCase {
       }
 
       // Collect all notifications for SSE emission after transaction commits
-      const allNotificationViews: Array<{ view: NotificationView; userId: string; organizationId: string }> = [];
+      const allNotificationViews: { view: NotificationView; userId: string; organizationId: string }[] = [];
 
       await this.transactionPort.run(async (tx) => {
         let deliveredCount = 0;

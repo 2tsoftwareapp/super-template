@@ -14,7 +14,7 @@ import type { PushMessage, PushNotifier } from '../push.interface';
 
 import { DELIVERIES_REPOSITORY, type DeliveriesRepositoryPort } from '../ports/deliveries.repository.port';
 import { DEVICE_TOKENS_REPOSITORY, type DeviceTokensRepositoryPort } from '../ports/device-tokens.repository.port';
-import { NOTIFICATIONS_REPOSITORY, type NotificationRecord, type NotificationsRepositoryPort } from '../ports/notifications.repository.port';
+import { type NotificationRecord, NOTIFICATIONS_REPOSITORY, type NotificationsRepositoryPort } from '../ports/notifications.repository.port';
 import { PUSH_NOTIFIER } from '../push.interface';
 
 const DELIVERY_BATCH_SIZE = 50;
