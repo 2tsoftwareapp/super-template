@@ -337,5 +337,6 @@ export function createBackendHelpers({
     enforceCsrf,
     enforceMutationGuard,
     proxyWithRefresh,
+    readAuthCookies: auth.readAuthCookies,
   };
 }

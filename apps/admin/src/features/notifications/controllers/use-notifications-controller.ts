@@ -17,6 +17,7 @@ import {
   useRecentNotificationsQuery,
 } from "@/features/notifications/api/notifications.queries";
 import { notificationsKeys } from "@/features/notifications/api/notifications.query-keys";
+import { useNotificationStream } from "@/features/notifications/api/notifications.stream";
 import { notificationJobStatusProps } from "@/features/notifications/model/notifications.constants";
 import { selectNotificationPermissions } from "@/features/notifications/model/notifications.permissions";
 import { useSession } from "@/hooks/use-session";
@@ -42,6 +43,9 @@ export function useNotificationsController(): NotificationsViewModel {
 
   const jobs = useNotificationJobsQuery(permissions.canRead);
   const recentNotifications = useRecentNotificationsQuery();
+
+  // Subscribe to SSE so new notifications invalidate the inbox in real time.
+  useNotificationStream(Boolean(session.data));
 
   const [audience, setAudience] = useState("ALL");
   const [userId, setUserId] = useState("");

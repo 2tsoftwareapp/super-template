@@ -30,6 +30,7 @@ const backend = createBackendHelpers({
 
 export const {
   callBackend,
+  readAuthCookies,
   refreshSession,
   enforceOrigin,
   enforceCsrf,
