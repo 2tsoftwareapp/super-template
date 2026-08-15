@@ -52,7 +52,10 @@ describe('CreateExportUseCase idempotency', () => {
         { provide: FILES_REPOSITORY, useValue: {} },
         {
           provide: ImportExportAdapterRegistry,
-          useValue: { resolve: vi.fn() },
+          useValue: {
+            resolve: vi.fn(),
+            getExportPermissions: vi.fn(() => ['exports.create']),
+          },
         },
         {
           provide: OBJECT_STORAGE,

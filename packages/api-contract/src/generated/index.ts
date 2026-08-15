@@ -1321,16 +1321,16 @@ export interface components {
         PermissionDto: {
             id: string;
             name: string;
-            description: Record<string, never> | null;
+            description: string | null;
             isSystem: boolean;
             /** @enum {string} */
             scope: "platform" | "organization";
         };
         RoleDto: {
             id: string;
-            organizationId: Record<string, never> | null;
+            organizationId: string | null;
             name: string;
-            description: Record<string, never> | null;
+            description: string | null;
             /** @enum {string} */
             scope: "platform" | "organization";
             isSystem: boolean;
@@ -1338,13 +1338,13 @@ export interface components {
         };
         CreateRoleDto: {
             name: string;
-            description?: Record<string, never> | null;
-            organizationId?: Record<string, never> | null;
+            description?: string | null;
+            organizationId?: string | null;
             permissionIds: string[];
         };
         UpdateRoleDto: {
             name?: string;
-            description?: Record<string, never> | null;
+            description?: string | null;
             permissionIds?: string[];
         };
         ReplaceRolePermissionsDto: {
@@ -1495,7 +1495,7 @@ export interface components {
             user?: components["schemas"]["UserDto"];
             permissions?: string[];
             session?: components["schemas"]["AuthSessionDto"];
-            organizationId?: Record<string, never> | null;
+            organizationId?: string | null;
             mustChangePassword?: boolean;
         };
         LoginDto: {
@@ -1508,7 +1508,7 @@ export interface components {
             user: components["schemas"]["UserDto"];
             permissions: string[];
             session: components["schemas"]["AuthSessionDto"];
-            organizationId: Record<string, never> | null;
+            organizationId: string | null;
             mustChangePassword?: boolean;
         };
         VerifyMfaChallengeDto: {
@@ -1544,7 +1544,7 @@ export interface components {
             user: components["schemas"]["UserDto"];
             permissions: string[];
             sessionId: string;
-            organizationId: Record<string, never> | null;
+            organizationId: string | null;
             mustChangePassword?: boolean;
         };
         SwitchOrganizationResponseDto: {
@@ -1737,16 +1737,16 @@ export interface components {
             originalName: string;
             mimeType: string;
             sizeBytes: number;
-            checksum?: Record<string, never> | null;
+            checksum?: string | null;
             latestVersion: number;
-            uploadedById: Record<string, never> | null;
+            uploadedById: string | null;
             createdAt: string;
             updatedAt: string;
         };
         BatchDeleteResultItemDto: {
             fileId: string;
             success: boolean;
-            error?: Record<string, never> | null;
+            error?: string | null;
         };
         BatchDeleteResultDto: {
             results: components["schemas"]["BatchDeleteResultItemDto"][];
@@ -1768,14 +1768,14 @@ export interface components {
             mimeType: string;
             sizeBytes: number;
             checksum: string;
-            createdById?: Record<string, never> | null;
+            createdById?: string | null;
             createdAt: string;
         };
         FileHistoryEventDto: {
             /** @enum {string} */
             type: "version" | "audit";
             action: string;
-            actorId?: Record<string, never> | null;
+            actorId?: string | null;
             metadata?: {
                 [key: string]: unknown;
             };
@@ -1786,8 +1786,8 @@ export interface components {
             fileId: string;
             entityType: string;
             entityId: string;
-            label?: Record<string, never> | null;
-            createdById?: Record<string, never> | null;
+            label?: string | null;
+            createdById?: string | null;
             createdAt: string;
             updatedAt: string;
         };

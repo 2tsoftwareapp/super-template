@@ -23,7 +23,7 @@ export class PermissionDto {
   @ApiProperty()
   name: string;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ type: String, nullable: true })
   description: string | null;
 
   @ApiProperty()
@@ -37,13 +37,13 @@ export class RoleDto {
   @ApiProperty()
   id: string;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ type: String, nullable: true })
   organizationId: string | null;
 
   @ApiProperty()
   name: string;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ type: String, nullable: true })
   description: string | null;
 
   @ApiProperty({ enum: ['platform', 'organization'] })
@@ -66,13 +66,13 @@ export class CreateRoleDto {
   @MaxLength(80)
   name: string;
 
-  @ApiPropertyOptional({ nullable: true })
+  @ApiPropertyOptional({ type: String, nullable: true })
   @IsOptional()
   @IsString()
   @MaxLength(500)
   description?: string | null;
 
-  @ApiPropertyOptional({ nullable: true })
+  @ApiPropertyOptional({ type: String, nullable: true })
   @IsOptional()
   @IsUUID()
   organizationId?: string | null;
@@ -96,7 +96,7 @@ export class UpdateRoleDto {
   @MaxLength(80)
   name?: string;
 
-  @ApiPropertyOptional({ nullable: true })
+  @ApiPropertyOptional({ type: String, nullable: true })
   @IsOptional()
   @IsString()
   @MaxLength(500)

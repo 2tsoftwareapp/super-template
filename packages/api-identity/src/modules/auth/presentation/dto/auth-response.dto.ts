@@ -50,7 +50,7 @@ export class AuthResponseDto {
   @ApiProperty({ type: AuthSessionDto })
   session: AuthSessionDto;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ type: String, nullable: true })
   organizationId: string | null;
 
   @ApiPropertyOptional()
@@ -67,7 +67,7 @@ export class AuthMeDto {
   @ApiProperty()
   sessionId: string;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ type: String, nullable: true })
   organizationId: string | null;
 
   @ApiPropertyOptional()

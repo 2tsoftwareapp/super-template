@@ -14,10 +14,10 @@ export class AttachmentDto {
   @ApiProperty()
   entityId: string;
 
-  @ApiPropertyOptional({ nullable: true })
+  @ApiPropertyOptional({ type: String, nullable: true })
   label: string | null;
 
-  @ApiPropertyOptional({ nullable: true })
+  @ApiPropertyOptional({ type: String, nullable: true })
   createdById: string | null;
 
   @ApiProperty()

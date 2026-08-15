@@ -54,7 +54,7 @@ export class LoginResponseDto {
   @ApiPropertyOptional({ type: AuthSessionDto })
   session?: AuthSessionDto;
 
-  @ApiPropertyOptional({ nullable: true })
+  @ApiPropertyOptional({ type: String, nullable: true })
   organizationId?: string | null;
 
   @ApiPropertyOptional()

@@ -25,13 +25,13 @@ export class FileDto {
   @ApiProperty()
   sizeBytes: number;
 
-  @ApiPropertyOptional({ nullable: true })
+  @ApiPropertyOptional({ type: String, nullable: true })
   checksum: string | null;
 
   @ApiProperty()
   latestVersion: number;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ type: String, nullable: true })
   uploadedById: string | null;
 
   @ApiProperty()
@@ -107,7 +107,7 @@ export class FileVersionDto {
   @ApiProperty()
   checksum: string;
 
-  @ApiPropertyOptional({ nullable: true })
+  @ApiPropertyOptional({ type: String, nullable: true })
   createdById: string | null;
 
   @ApiProperty()
@@ -121,7 +121,7 @@ export class FileHistoryEventDto {
   @ApiProperty()
   action: string;
 
-  @ApiPropertyOptional({ nullable: true })
+  @ApiPropertyOptional({ type: String, nullable: true })
   actorId: string | null;
 
   @ApiPropertyOptional({ type: 'object', additionalProperties: true })
@@ -155,7 +155,7 @@ export class BatchDeleteResultItemDto {
   @ApiProperty()
   success: boolean;
 
-  @ApiPropertyOptional({ nullable: true })
+  @ApiPropertyOptional({ type: String, nullable: true })
   error: string | null;
 }
 

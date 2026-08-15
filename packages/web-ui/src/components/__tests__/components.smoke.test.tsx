@@ -9,7 +9,7 @@ import { render, screen, cleanup } from "@testing-library/react";
 import { describe, expect, it, vi, afterEach, beforeAll } from "vitest";
 
 beforeAll(() => {
-  global.ResizeObserver = class ResizeObserver {
+  globalThis.ResizeObserver = class ResizeObserver {
     observe() {}
     unobserve() {}
     disconnect() {}

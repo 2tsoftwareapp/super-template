@@ -356,8 +356,8 @@ describe('UsersImportExportAdapter', () => {
       });
 
       expect(result).toHaveLength(1500);
-      expect(result[0].id).toBe('user-0');
-      expect(result[1499].id).toBe('user-1499');
+      expect(result[0]!.id).toBe('user-0');
+      expect(result[1499]!.id).toBe('user-1499');
     });
 
     it('handles single page when total fits in one request', async () => {
