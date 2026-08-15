@@ -116,6 +116,10 @@ describe('ConfirmImportUseCase', () => {
       ),
     };
 
+    const activityEmitter = {
+      emit: vi.fn(async () => undefined),
+    };
+
     const useCase = new ConfirmImportUseCase(
       importJobsRepository as never,
       fileAccessService as never,
@@ -124,6 +128,7 @@ describe('ConfirmImportUseCase', () => {
       auditService as never,
       importsMapper as never,
       transactionPort as never,
+      activityEmitter as never,
     );
 
     const result = await useCase.execute(actor, 'job-1');
@@ -155,6 +160,18 @@ describe('ConfirmImportUseCase', () => {
     expect(auditService.log).toHaveBeenCalledWith(
       expect.objectContaining({
         action: 'import.confirmed',
+        metadata: { successCount: 2, errorCount: 1 },
+      }),
+      expect.anything(),
+    );
+
+    expect(activityEmitter.emit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        organizationId: 'org-1',
+        summary: expect.stringContaining('Import "users" confirmed'),
+        entityType: 'import_job',
+        entityId: 'job-1',
+        actorId: 'user-1',
         metadata: { successCount: 2, errorCount: 1 },
       }),
       expect.anything(),

@@ -4,7 +4,15 @@ import type {
 } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import {  AppError, ERROR_CODES , SYSTEM_SCOPE, TRANSACTION_PORT, type TransactionPort } from '@repo/api-core';
+import {
+  ACTIVITY_EMITTER,
+  type ActivityEmitter,
+  AppError,
+  ERROR_CODES,
+  SYSTEM_SCOPE,
+  TRANSACTION_PORT,
+  type TransactionPort,
+} from '@repo/api-core';
 
 import type { AttachEntityCommand } from '../attachments.types';
 
@@ -19,6 +27,7 @@ export class AttachFileUseCase {
     @Inject(ATTACHMENTS_REPOSITORY) private readonly attachmentsRepository: AttachmentsRepositoryPort,
     @Inject(FILES_REPOSITORY) private readonly filesRepository: FilesRepositoryPort,
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
+    @Inject(ACTIVITY_EMITTER) private readonly activityEmitter: ActivityEmitter,
     private readonly auditService: AuditService,
   ) {}
 
@@ -71,6 +80,23 @@ export class AttachFileUseCase {
           scope: SYSTEM_SCOPE.ORGANIZATION,
           organizationId: file.organizationId!,
         }, tx);
+
+        await this.activityEmitter.emit(
+          {
+            organizationId: file.organizationId!,
+            summary: `File "${file.originalName}" attached to ${input.entityType}`,
+            entityType: 'attachment',
+            entityId: attachRecord.id,
+            actorId: actor.userId,
+            visibility: 'INTERNAL',
+            metadata: {
+              fileId: input.fileId,
+              targetEntityType: input.entityType,
+              targetEntityId: input.entityId,
+            },
+          },
+          tx,
+        );
 
         return attachRecord;
       }

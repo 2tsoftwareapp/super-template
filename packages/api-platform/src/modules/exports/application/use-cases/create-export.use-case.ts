@@ -4,7 +4,18 @@ import type {
 } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import {  AppError, ERROR_CODES, ImportExportAdapterRegistry, requireOrganizationId, SYSTEM_SCOPE , toCsv, TRANSACTION_PORT, type TransactionPort } from '@repo/api-core';
+import {
+  ACTIVITY_EMITTER,
+  type ActivityEmitter,
+  AppError,
+  ERROR_CODES,
+  ImportExportAdapterRegistry,
+  requireOrganizationId,
+  SYSTEM_SCOPE,
+  toCsv,
+  TRANSACTION_PORT,
+  type TransactionPort,
+} from '@repo/api-core';
 import { randomUUID } from 'node:crypto';
 
 import type { CreateExportCommand } from '../exports.types';
@@ -27,6 +38,7 @@ export class CreateExportUseCase {
     @Inject(OBJECT_STORAGE) private readonly objectStorage: ObjectStorage,
     private readonly auditService: AuditService,
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
+    @Inject(ACTIVITY_EMITTER) private readonly activityEmitter: ActivityEmitter,
   ) {}
 
   async execute(
@@ -122,6 +134,19 @@ export class CreateExportUseCase {
           requestContext,
           ...(organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
         }, tx);
+
+        await this.activityEmitter.emit(
+          {
+            organizationId,
+            summary: `Export "${input.type}" completed (${rows.length} rows)`,
+            entityType: 'export_job',
+            entityId: job.id,
+            actorId: actor.userId,
+            visibility: 'INTERNAL',
+            metadata: { type: input.type, fileId: file.id, rowCount: rows.length },
+          },
+          tx,
+        );
 
         return updated;
       });

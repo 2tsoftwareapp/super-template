@@ -5,6 +5,8 @@ import type {
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import {
+  ACTIVITY_EMITTER,
+  type ActivityEmitter,
   AppError,
   ERROR_CODES,
   ImportExportAdapterRegistry,
@@ -37,6 +39,7 @@ export class ConfirmImportUseCase {
     private readonly auditService: AuditService,
     private readonly importsMapper: ImportsMapper,
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
+    @Inject(ACTIVITY_EMITTER) private readonly activityEmitter: ActivityEmitter,
   ) {}
 
   async execute(
@@ -164,6 +167,19 @@ export class ConfirmImportUseCase {
           requestContext,
           scope: SYSTEM_SCOPE.ORGANIZATION,
           organizationId: job.organizationId,
+        },
+        tx,
+      );
+
+      await this.activityEmitter.emit(
+        {
+          organizationId: job.organizationId,
+          summary: `Import "${job.type}" confirmed (${successCount} rows)`,
+          entityType: 'import_job',
+          entityId: job.id,
+          actorId: actor.userId,
+          visibility: 'INTERNAL',
+          metadata: { successCount, errorCount: errors.length },
         },
         tx,
       );

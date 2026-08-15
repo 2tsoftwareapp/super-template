@@ -75,6 +75,11 @@ function createUseCase(overrides?: Record<string, unknown>) {
     ...(overrides?.transactionPort as Record<string, unknown> ?? {}),
   };
 
+  const activityEmitter = {
+    emit: vi.fn(async () => undefined),
+    ...(overrides?.activityEmitter as Record<string, unknown> ?? {}),
+  };
+
   const useCase = new CreateExportUseCase(
     exportJobsRepository as never,
     filesRepository as never,
@@ -82,6 +87,7 @@ function createUseCase(overrides?: Record<string, unknown>) {
     mockObjectStorage as never,
     auditService as never,
     transactionPort as never,
+    activityEmitter as never,
   );
 
   return {
@@ -92,6 +98,7 @@ function createUseCase(overrides?: Record<string, unknown>) {
     mockObjectStorage,
     auditService,
     transactionPort,
+    activityEmitter,
     mockAdapter,
   };
 }
@@ -139,6 +146,52 @@ describe('CreateExportUseCase', () => {
     );
 
     expect(result.status).toBe('COMPLETED');
+  });
+
+  it('emits an activity when the export completes', async () => {
+    const { useCase, activityEmitter } = createUseCase();
+
+    await useCase.execute(createActor(), { type: 'users' });
+
+    expect(activityEmitter.emit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        organizationId: 'org-1',
+        summary: expect.stringContaining('Export "users" completed'),
+        entityType: 'export_job',
+        entityId: 'export-1',
+        actorId: 'user-1',
+        metadata: expect.objectContaining({ rowCount: 2 }),
+      }),
+      expect.anything(),
+    );
+  });
+
+  it('does not emit an activity when the export is idempotently returned', async () => {
+    const { useCase, activityEmitter } = createUseCase({
+      exportJobsRepository: {
+        create: vi.fn(),
+        createIdempotent: vi.fn(async () => ({
+          value: {
+            id: 'export-existing',
+            type: 'users',
+            organizationId: 'org-1',
+            status: 'COMPLETED',
+            createdById: 'user-1',
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+          created: false,
+        })),
+        update: vi.fn(),
+      },
+    });
+
+    await useCase.execute(
+      createActor(),
+      { type: 'users', idempotencyKey: 'idem-456' },
+    );
+
+    expect(activityEmitter.emit).not.toHaveBeenCalled();
   });
 
   it('rejects when actor lacks required export permissions', async () => {

@@ -1,5 +1,9 @@
 import { Test } from '@nestjs/testing';
-import { ImportExportAdapterRegistry, TRANSACTION_PORT } from '@repo/api-core';
+import {
+  ACTIVITY_EMITTER,
+  ImportExportAdapterRegistry,
+  TRANSACTION_PORT,
+} from '@repo/api-core';
 import { CreateExportUseCase } from '@repo/api-platform/modules/exports/application/use-cases/create-export.use-case';
 import { GetExportUseCase } from '@repo/api-platform/modules/exports/application/use-cases/get-export.use-case';
 import { EXPORT_JOBS_REPOSITORY } from '@repo/api-platform/modules/exports/application/ports/export-jobs.repository.port';
@@ -68,6 +72,10 @@ describe('CreateExportUseCase idempotency', () => {
         {
           provide: TRANSACTION_PORT,
           useValue: { run: vi.fn((fn: (tx: unknown) => unknown) => fn({})) },
+        },
+        {
+          provide: ACTIVITY_EMITTER,
+          useValue: { emit: vi.fn() },
         },
       ],
     }).compile();

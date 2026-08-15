@@ -4,8 +4,15 @@ import type {
 } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import {  AppError, ERROR_CODES , SYSTEM_SCOPE } from '@repo/api-core';
-import { TRANSACTION_PORT, type TransactionPort } from '@repo/api-core';
+import {
+  ACTIVITY_EMITTER,
+  type ActivityEmitter,
+  AppError,
+  ERROR_CODES,
+  SYSTEM_SCOPE,
+  TRANSACTION_PORT,
+  type TransactionPort,
+} from '@repo/api-core';
 
 import { AuditService } from '../../../audit/application/audit.service';
 import { ATTACHMENTS_REPOSITORY, type AttachmentsRepositoryPort } from '../ports/attachments.repository.port';
@@ -16,6 +23,7 @@ export class DeleteAttachmentUseCase {
     @Inject(ATTACHMENTS_REPOSITORY) private readonly attachmentsRepository: AttachmentsRepositoryPort,
     private readonly auditService: AuditService,
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
+    @Inject(ACTIVITY_EMITTER) private readonly activityEmitter: ActivityEmitter,
   ) {}
 
   async execute(
@@ -46,6 +54,25 @@ export class DeleteAttachmentUseCase {
         requestContext,
         ...(attachment.organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: attachment.organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
       }, tx);
+
+      if (attachment.organizationId) {
+        await this.activityEmitter.emit(
+          {
+            organizationId: attachment.organizationId,
+            summary: `Attachment removed from ${attachment.entityType}`,
+            entityType: 'attachment',
+            entityId: attachment.id,
+            actorId: actor.userId,
+            visibility: 'INTERNAL',
+            metadata: {
+              fileId: attachment.fileId,
+              targetEntityType: attachment.entityType,
+              targetEntityId: attachment.entityId,
+            },
+          },
+          tx,
+        );
+      }
     });
   }
 }
