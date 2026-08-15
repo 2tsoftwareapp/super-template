@@ -324,7 +324,7 @@ check_app_router_purity() {
     -type f \( -name '*.tsx' -o -name '*.ts' \) \
     ! -name 'page.tsx' ! -name 'layout.tsx' ! -name 'route.ts' \
     ! -name 'loading.tsx' ! -name 'error.tsx' ! -name 'not-found.tsx' \
-    ! -name 'template.tsx' ! -name 'default.tsx' 2>/dev/null || true)
+    ! -name 'template.tsx' ! -name 'default.tsx' ! -name 'global-error.tsx' 2>/dev/null || true)
 
   if [ -n "$output" ]; then
     failed=1

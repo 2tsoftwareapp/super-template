@@ -4,15 +4,13 @@ export { IdentityPortsModule } from './identity-ports.module';
 
 export { ACCESS_CONTROL_REPOSITORY } from './modules/access-control/application/access-control.repository.port';
 
-export type { AccessControlRepositoryPort, RoleRecord } from './modules/access-control/application/access-control.repository.port';
+export type * from './modules/access-control/application/access-control.repository.port';
 
 export { AccessControlService } from './modules/access-control/application/access-control.service';
+export type * from './modules/organizations/application/ports/organizations.repository.port';
 export { ORGANIZATIONS_REPOSITORY } from './modules/organizations/application/ports/organizations.repository.port';
-
-export type { OrganizationMemberRecord, OrganizationsRepositoryPort } from './modules/organizations/application/ports/organizations.repository.port';
+export type * from './modules/users/application/ports/users.repository.port';
 export { USERS_REPOSITORY } from './modules/users/application/ports/users.repository.port';
-
-export type { CreateUserInput, UserRecord, UsersListResult, UsersRepositoryPort } from './modules/users/application/ports/users.repository.port';
 export {
   ACTION,
   hasPermission,
