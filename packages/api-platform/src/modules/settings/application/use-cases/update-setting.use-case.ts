@@ -10,6 +10,7 @@ import { PLATFORM_TRANSACTION_PORT, type PlatformTransactionPort } from '@repo/a
 import type { UpdateSettingCommand } from '../settings.types';
 
 import { AuditService } from '../../../audit/application/audit.service';
+import { ApplicationSettingsLookupService } from '../application-settings-lookup.service';
 import { SETTINGS_REPOSITORY, type SettingsRepositoryPort } from '../ports/settings.repository.port';
 import { SettingsMapper } from '../settings.mapper';
 
@@ -19,6 +20,7 @@ export class UpdateSettingUseCase {
     @Inject(SETTINGS_REPOSITORY) private readonly settingsRepository: SettingsRepositoryPort,
     private readonly auditService: AuditService,
     @Inject(PLATFORM_TRANSACTION_PORT) private readonly platformTransactionPort: PlatformTransactionPort,
+    private readonly settingsLookup: ApplicationSettingsLookupService,
   ) {}
 
   async execute(
@@ -65,6 +67,10 @@ export class UpdateSettingUseCase {
 
       return setting;
     });
+
+    // The lookup service caches flags for a few seconds; invalidate the updated
+    // key so guards (maintenance/registration) pick up the change immediately.
+    this.settingsLookup.invalidate(key);
 
     return SettingsMapper.toDto(updated);
   }

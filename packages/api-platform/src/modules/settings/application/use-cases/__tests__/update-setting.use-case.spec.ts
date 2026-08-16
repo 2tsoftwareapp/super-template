@@ -24,10 +24,12 @@ describe('UpdateSettingUseCase', () => {
     const settingsRepository = { upsert: vi.fn(async () => updated) };
     const auditService = { log: vi.fn(async () => undefined) };
     const platformTransactionPort = { run: vi.fn(async (cb) => cb({})) };
+    const settingsLookup = { invalidate: vi.fn() };
     const useCase = new UpdateSettingUseCase(
       settingsRepository as never,
       auditService as never,
       platformTransactionPort as never,
+      settingsLookup as never,
     );
 
     const result = await useCase.execute(actor, 'feature.flag', {
@@ -49,6 +51,8 @@ describe('UpdateSettingUseCase', () => {
       }),
       expect.anything(),
     );
+    // The updated key is invalidated so guards pick up the change immediately.
+    expect(settingsLookup.invalidate).toHaveBeenCalledWith('feature.flag');
     expect(result).toMatchObject({ key: 'feature.flag' });
   });
 
@@ -56,15 +60,18 @@ describe('UpdateSettingUseCase', () => {
     const settingsRepository = { upsert: vi.fn(async () => null) };
     const auditService = { log: vi.fn() };
     const platformTransactionPort = { run: vi.fn(async (cb) => cb({})) };
+    const settingsLookup = { invalidate: vi.fn() };
     const useCase = new UpdateSettingUseCase(
       settingsRepository as never,
       auditService as never,
       platformTransactionPort as never,
+      settingsLookup as never,
     );
 
     await expect(
       useCase.execute(actor, 'missing.key', { value: { x: 'y' } }),
     ).rejects.toMatchObject({ code: ERROR_CODES.SETTINGS_NOT_FOUND });
     expect(auditService.log).not.toHaveBeenCalled();
+    expect(settingsLookup.invalidate).not.toHaveBeenCalled();
   });
 });

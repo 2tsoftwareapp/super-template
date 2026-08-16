@@ -13,10 +13,23 @@ import {
 const REGISTRATION_ENABLED_KEY = 'registration_enabled';
 const MAINTENANCE_MODE_KEY = 'maintenance_mode';
 
+/**
+ * How long a fetched flag stays cached. The global MaintenanceModeGuard calls
+ * isMaintenanceMode on every request; a short TTL avoids hammering the DB while
+ * keeping toggles effective within a few seconds. Updates invalidate the cache
+ * immediately (see UpdateSettingUseCase), so admin toggles apply at once.
+ */
+const CACHE_TTL_MS = 5_000;
+
 function readEnabledFlag(value: JsonObject | undefined): boolean {
   const enabled = value?.enabled;
 
   return typeof enabled === 'boolean' ? enabled : false;
+}
+
+interface CachedFlag {
+  value: boolean;
+  expiresAt: number;
 }
 
 /**
@@ -28,33 +41,41 @@ function readEnabledFlag(value: JsonObject | undefined): boolean {
 export class ApplicationSettingsLookupService
   implements ApplicationSettingsLookup
 {
+  private readonly cache = new Map<string, CachedFlag>();
+
   constructor(
     @Inject(SETTINGS_REPOSITORY)
     private readonly settingsRepository: SettingsRepositoryPort,
   ) {}
 
   async isRegistrationEnabled(): Promise<boolean> {
-    const setting = await this.settingsRepository.findByKey(
-      REGISTRATION_ENABLED_KEY,
-    );
-
     // Absent setting means the seed has not run: keep the default permissive.
-    if (!setting) {
-      return true;
-    }
-
-    return readEnabledFlag(isJsonObject(setting.value) ? setting.value : undefined);
+    return this.readFlag(REGISTRATION_ENABLED_KEY, true);
   }
 
   async isMaintenanceMode(): Promise<boolean> {
-    const setting = await this.settingsRepository.findByKey(
-      MAINTENANCE_MODE_KEY,
-    );
+    return this.readFlag(MAINTENANCE_MODE_KEY, false);
+  }
 
-    if (!setting) {
-      return false;
+  /** Drop the cached flag for a setting key so the next read hits the store. */
+  invalidate(key: string): void {
+    this.cache.delete(key);
+  }
+
+  private async readFlag(key: string, defaultValue: boolean): Promise<boolean> {
+    const cached = this.cache.get(key);
+    const now = Date.now();
+
+    if (cached && cached.expiresAt > now) {
+      return cached.value;
     }
 
-    return readEnabledFlag(isJsonObject(setting.value) ? setting.value : undefined);
+    const setting = await this.settingsRepository.findByKey(key);
+    const value = setting
+      ? readEnabledFlag(isJsonObject(setting.value) ? setting.value : undefined)
+      : defaultValue;
+
+    this.cache.set(key, { value, expiresAt: now + CACHE_TTL_MS });
+    return value;
   }
 }
