@@ -70,7 +70,8 @@ export class UpdateSettingUseCase {
 
     // The lookup service caches flags for a few seconds; invalidate the updated
     // key so guards (maintenance/registration) pick up the change immediately.
-    this.settingsLookup.invalidate(key);
+    // With Redis this also clears the entry on every other instance.
+    await this.settingsLookup.invalidate(key);
 
     return SettingsMapper.toDto(updated);
   }

@@ -55,6 +55,7 @@ describe('validateEnvironment', () => {
     expect(env.APP_ENV).toBe('test');
     expect(env.API_PORT).toBe(3001);
     expect(env.ACCESS_PROFILE_CACHE_TTL_SECONDS).toBe(60);
+    expect(env.SETTINGS_LOOKUP_CACHE_TTL_SECONDS).toBe(5);
     expect(env.COOKIE_SAMESITE).toBe('lax');
     expect(env.STORAGE_DRIVER).toBe('local');
   });

@@ -116,6 +116,13 @@ export const envSchema = z.object({
     .int()
     .positive()
     .default(60),
+  // TTL for application-settings flag lookups (maintenance mode, registration
+  // enabled). Redis-backed in production so toggles propagate across instances.
+  SETTINGS_LOOKUP_CACHE_TTL_SECONDS: z.coerce
+    .number()
+    .int()
+    .positive()
+    .default(5),
   // Optional error-reporting sinks. Sentry stores structured exceptions; Telegram sends human alerts.
   SENTRY_DSN: emptyStringToUndefined,
   SENTRY_ENVIRONMENT: emptyStringToUndefined,

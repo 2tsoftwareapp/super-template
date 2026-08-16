@@ -41,6 +41,10 @@ export class EnvironmentService {
     return this.env.ACCESS_PROFILE_CACHE_TTL_SECONDS;
   }
 
+  get settingsLookupCacheTtlSeconds(): number {
+    return this.env.SETTINGS_LOOKUP_CACHE_TTL_SECONDS;
+  }
+
   get apiDocsEnabled(): boolean {
     return this.env.API_DOCS_ENABLED;
   }

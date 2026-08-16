@@ -67,9 +67,13 @@ describe('EnvironmentService', () => {
       DATABASE_URL: 'postgres://primary/app',
       DATABASE_URL_TEST: 'postgres://test/app',
       REDIS_URL: 'redis://localhost:6379',
+      ACCESS_PROFILE_CACHE_TTL_SECONDS: 30,
+      SETTINGS_LOOKUP_CACHE_TTL_SECONDS: 5,
     });
     expect(service.databaseUrl).toBe('postgres://primary/app');
     expect(service.databaseUrlTest).toBe('postgres://test/app');
     expect(service.redisUrl).toBe('redis://localhost:6379');
+    expect(service.accessProfileCacheTtlSeconds).toBe(30);
+    expect(service.settingsLookupCacheTtlSeconds).toBe(5);
   });
 });
