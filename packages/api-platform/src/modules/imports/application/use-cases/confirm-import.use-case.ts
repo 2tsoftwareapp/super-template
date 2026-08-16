@@ -121,6 +121,19 @@ export class ConfirmImportUseCase {
     const errors: ImportValidationError[] = [];
 
     const updatedJob = await this.transactionPort.run(async (tx) => {
+      // CAS claim before importing any rows: only the first confirm request
+      // wins the `WHERE confirmed_at IS NULL` guard; a concurrent confirm
+      // gets null here, throws, and its whole transaction (including the row
+      // imports) rolls back - preventing double-import of the same data.
+      const claimed = await this.importJobsRepository.confirm(job.id, tx);
+      if (!claimed) {
+        throw new AppError(
+          ERROR_CODES.RESOURCE_CONFLICT,
+          'Import job has already been confirmed',
+          HttpStatus.CONFLICT,
+        );
+      }
+
       for (const [index, row] of parsed.rows.entries()) {
         const spName = `import_row_${index}`;
         try {
@@ -148,7 +161,6 @@ export class ConfirmImportUseCase {
         job.id,
         {
           status: errors.length > 0 ? 'FAILED' : 'COMPLETED',
-          confirmedAt: new Date(),
           completedAt: new Date(),
           successCount,
           errorCount: errors.length,

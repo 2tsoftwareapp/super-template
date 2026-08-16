@@ -7,7 +7,7 @@ import type {
 import { Inject, Injectable } from '@nestjs/common';
 import { DATABASE, runIdempotentInsert } from '@repo/api-database';
 import { importJobs } from '@repo/api-database';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, isNull } from 'drizzle-orm';
 
 import type {
   CreateImportJobValues,
@@ -82,6 +82,23 @@ export class ImportJobsRepository implements ImportJobsRepositoryPort {
         ),
       )
       .limit(1);
+
+    return (job as ImportJobRecord) ?? null;
+  }
+
+  async confirm(
+    jobId: string,
+    executor?: TransactionExecutor,
+  ): Promise<ImportJobRecord | null> {
+    const db = (executor ?? this.database) as DatabaseExecutor;
+    // CAS guard: the UPDATE only matches rows that have not been confirmed yet.
+    // Under concurrent requests the second UPDATE blocks on the row lock, then
+    // re-evaluates the WHERE clause and matches zero rows -> null -> conflict.
+    const [job] = await db
+      .update(importJobs)
+      .set({ confirmedAt: new Date(), updatedAt: new Date() })
+      .where(and(eq(importJobs.id, jobId), isNull(importJobs.confirmedAt)))
+      .returning();
 
     return (job as ImportJobRecord) ?? null;
   }

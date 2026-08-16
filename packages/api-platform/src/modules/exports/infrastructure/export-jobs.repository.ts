@@ -6,7 +6,7 @@ import type {
 import { Inject, Injectable } from '@nestjs/common';
 import { DATABASE, runIdempotentInsert } from '@repo/api-database';
 import { exportJobs } from '@repo/api-database';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, lt } from 'drizzle-orm';
 
 import type { ExportJobsRepositoryPort } from '../application/ports/export-jobs.repository.port';
 
@@ -92,5 +92,23 @@ export class ExportJobsRepository implements ExportJobsRepositoryPort {
       .returning();
 
     return job ?? null;
+  }
+
+  async recoverStaleProcessing(
+    before: Date,
+    executor: DatabaseExecutor = this.database,
+  ): Promise<number> {
+    // Exports are synchronous (created PROCESSING, completed in the request), so
+    // a PROCESSING row untouched past the cutoff means the request died before
+    // finishing. Fail it so the history is terminal and the user can retry.
+    const recovered = await executor
+      .update(exportJobs)
+      .set({ status: 'FAILED', completedAt: new Date(), updatedAt: new Date() })
+      .where(
+        and(eq(exportJobs.status, 'PROCESSING'), lt(exportJobs.updatedAt, before)),
+      )
+      .returning({ id: exportJobs.id });
+
+    return recovered.length;
   }
 }

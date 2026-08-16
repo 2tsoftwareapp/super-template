@@ -43,6 +43,15 @@ export interface ExportJobsRepositoryPort {
     values: Partial<Record<string, unknown>>,
     executor?: TransactionExecutor,
   ): Promise<ExportJobRecord | null>;
+
+  /**
+   * Marks export jobs stuck in PROCESSING beyond `before` as FAILED (their
+   * originating request died before completion). Returns the count recovered.
+   */
+  recoverStaleProcessing(
+    before: Date,
+    executor?: TransactionExecutor,
+  ): Promise<number>;
 }
 
 export const EXPORT_JOBS_REPOSITORY = Symbol('EXPORT_JOBS_REPOSITORY');

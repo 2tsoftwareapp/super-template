@@ -26,6 +26,8 @@ export interface ImportExportAdapter<TRow extends object> {
   listForExport(params: {
     organizationId: string;
     ownerId: string;
+    /** Optional hard bound on rows returned; callers use it to cap memory. */
+    limit?: number;
   }): Promise<TRow[]>;
 
   toCsvRow(row: TRow): string[];

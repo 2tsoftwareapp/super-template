@@ -108,7 +108,18 @@ export interface FilesRepositoryPort {
   softDelete(fileId: string, executor?: TransactionExecutor): Promise<FileRecord | null>;
   listSoftDeleted(limit: number, executor?: TransactionExecutor): Promise<FileRecord[]>;
   list(params: ListFilesQuery, executor?: TransactionExecutor): Promise<FileListResult>;
-  setCurrentVersion(fileId: string, values: SetCurrentVersionInput, executor?: TransactionExecutor): Promise<FileRecord | null>;
+  /**
+   * Advances the file to a new current version, guarded by a CAS on
+   * `latest_version`: the UPDATE only matches when the file still points at
+   * `expectedLatestVersion`, so a concurrent version upload cannot silently
+   * overwrite a newer state. Returns null when the guard fails.
+   */
+  setCurrentVersion(
+    fileId: string,
+    values: SetCurrentVersionInput,
+    expectedLatestVersion: number,
+    executor?: TransactionExecutor,
+  ): Promise<FileRecord | null>;
   createVersion(values: CreateFileVersionInput, executor?: TransactionExecutor): Promise<FileVersionRecord>;
   listVersions(fileId: string, executor?: TransactionExecutor): Promise<FileVersionRecord[]>;
   findBatchOperationByIdempotencyKey(actorId: string, idempotencyKey: string, executor?: TransactionExecutor): Promise<FileBatchOperationRecord | null>;

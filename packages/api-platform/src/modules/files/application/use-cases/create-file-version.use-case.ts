@@ -5,6 +5,7 @@ import type {
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import {  AppError, ERROR_CODES, requireOrganizationId , SYSTEM_SCOPE, TRANSACTION_PORT, type TransactionPort } from '@repo/api-core';
+import { isPostgresUniqueViolation } from '@repo/api-database';
 import { createHash, randomUUID } from 'node:crypto';
 
 import { AuditService } from '../../../audit/application/audit.service';
@@ -94,16 +95,30 @@ export class CreateFileVersionUseCase {
       const updated = await this.transactionPort.withTenant(
         { tenantId: organizationId, userId: actor.userId },
         async (tx) => {
-          await this.filesRepository.createVersion({
-            fileId: existing.id,
-            organizationId,
-            versionNumber: nextVersion,
-            storageKey,
-            mimeType: detectedMimeType,
-            sizeBytes: file.size,
-            checksum,
-            createdById: actor.userId,
-          }, tx);
+          try {
+            await this.filesRepository.createVersion({
+              fileId: existing.id,
+              organizationId,
+              versionNumber: nextVersion,
+              storageKey,
+              mimeType: detectedMimeType,
+              sizeBytes: file.size,
+              checksum,
+              createdById: actor.userId,
+            }, tx);
+          } catch (error) {
+            // A concurrent upload computed the same version number and won the
+            // unique (file_id, version_number) index - surface a soft conflict
+            // instead of a 500.
+            if (isPostgresUniqueViolation(error)) {
+              throw new AppError(
+                ERROR_CODES.RESOURCE_CONFLICT,
+                'File version was updated concurrently, please retry',
+                HttpStatus.CONFLICT,
+              );
+            }
+            throw error;
+          }
 
           const updatedRecord = await this.filesRepository.setCurrentVersion(
             existing.id,
@@ -114,11 +129,18 @@ export class CreateFileVersionUseCase {
               checksum,
               latestVersion: nextVersion,
             },
+            // CAS: the file must still point at the version we are bumping
+            // from, otherwise a concurrent upload already advanced it.
+            existing.latestVersion,
             tx
           );
 
           if (!updatedRecord) {
-            throw new Error('File version update returned no rows');
+            throw new AppError(
+              ERROR_CODES.RESOURCE_CONFLICT,
+              'File version was updated concurrently, please retry',
+              HttpStatus.CONFLICT,
+            );
           }
 
           await this.auditService.log({

@@ -130,6 +130,7 @@ describe('CreateExportUseCase', () => {
     expect(mockAdapter.listForExport).toHaveBeenCalledWith({
       organizationId: 'org-1',
       ownerId: 'user-1',
+      limit: 50001,
     });
 
     expect(mockObjectStorage.upload).toHaveBeenCalledWith(
@@ -146,6 +147,43 @@ describe('CreateExportUseCase', () => {
     );
 
     expect(result.status).toBe('COMPLETED');
+  });
+
+  it('fails the export when the row cap is exceeded', async () => {
+    const { useCase, exportJobsRepository, mockObjectStorage } = createUseCase({
+      mockAdapter: {
+        type: 'users',
+        csvHeader: ['email'],
+        listForExport: vi.fn(async () =>
+          Array.from({ length: 50001 }, (_, i) => ({ email: `u${i}@x.com` })),
+        ),
+        toCsvRow: vi.fn((row: { email: string }) => [row.email]),
+      },
+      importExportAdapters: {
+        resolve: vi.fn(() => ({
+          type: 'users',
+          csvHeader: ['email'],
+          listForExport: vi.fn(async () =>
+            Array.from({ length: 50001 }, (_, i) => ({
+              email: `u${i}@x.com`,
+            })),
+          ),
+          toCsvRow: vi.fn((row: { email: string }) => [row.email]),
+        })),
+        getExportPermissions: vi.fn(() => []),
+      },
+    });
+
+    await expect(
+      useCase.execute(createActor(), { type: 'users' }),
+    ).rejects.toThrow(/exceeds the maximum of 50000 rows/);
+
+    // No CSV was uploaded and the job was marked FAILED.
+    expect(mockObjectStorage.upload).not.toHaveBeenCalled();
+    expect(exportJobsRepository.update).toHaveBeenCalledWith(
+      'export-1',
+      expect.objectContaining({ status: 'FAILED' }),
+    );
   });
 
   it('emits an activity when the export completes', async () => {

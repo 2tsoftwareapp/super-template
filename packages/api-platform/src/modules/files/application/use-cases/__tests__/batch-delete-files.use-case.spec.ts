@@ -76,6 +76,38 @@ describe('BatchDeleteFilesUseCase', () => {
     ]);
   });
 
+  it('absorbs a concurrent first-time insert race via runIdempotentInsert instead of 500ing', async () => {
+    const storedResults = [
+      { fileId: 'file-1', success: true, error: null },
+    ];
+    const filesRepository = {
+      // Fast-path read misses, then the runIdempotentInsert retry finds the
+      // record the concurrent request just committed.
+      findBatchOperationByIdempotencyKey: vi
+        .fn()
+        .mockResolvedValueOnce(null)
+        .mockResolvedValueOnce({ id: 'op-1', results: storedResults }),
+      createBatchOperation: vi.fn(async () => {
+        throw Object.assign(new Error('duplicate key value'), {
+          code: '23505',
+        });
+      }),
+    };
+    const deleteFileUseCase = { execute: vi.fn(async () => undefined) };
+
+    const useCase = new BatchDeleteFilesUseCase(
+      filesRepository as never,
+      deleteFileUseCase as never,
+    );
+
+    const results = await useCase.execute(actor, ['file-1'], 'race-key');
+
+    // Deletes ran once, then the unique violation resolved to the concurrent
+    // record's results instead of surfacing an error.
+    expect(deleteFileUseCase.execute).toHaveBeenCalledTimes(1);
+    expect(results).toBe(storedResults);
+  });
+
   it('replays the stored result instead of re-deleting when the idempotency key matches', async () => {
     const storedResults = [
       { fileId: 'file-1', success: true, error: null },

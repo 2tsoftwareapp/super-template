@@ -4,6 +4,7 @@ import {
   type AuthenticatedRequestUser,
   ERROR_CODES,
   ImportExportAdapterRegistry,
+  type ImportValidationError,
   type RequestContext,
   SYSTEM_SCOPE,
   TRANSACTION_PORT,
@@ -14,6 +15,7 @@ import type { CreateImportCommand, ImportJobView } from '../imports.types';
 
 import { AuditService } from '../../../audit/application/audit.service';
 import { FileAccessService } from '../../../files/application/services/file-access.service';
+import { MAX_IMPORT_ROWS } from '../../domain/import-types';
 import {
   IMPORT_JOBS_REPOSITORY,
   type ImportJobsRepositoryPort,
@@ -127,6 +129,22 @@ export class CreateImportUseCase {
       input.type,
       file.storageKey,
     );
+
+    if (parsed.rows.length > MAX_IMPORT_ROWS) {
+      const tooManyRowsError: ImportValidationError = {
+        row: 0,
+        message: `Import exceeds the maximum of ${MAX_IMPORT_ROWS} rows`,
+      };
+      await this.importJobsRepository.update(job.id, {
+        status: 'FAILED',
+        rowCount: parsed.rows.length,
+        successCount: 0,
+        errorCount: 1,
+        errors: [tooManyRowsError],
+      });
+      return this.getImportUseCase.execute(actor, job.id);
+    }
+
     const errors = this.importFileParser.validateRows(input.type, parsed.rows);
 
     await this.importJobsRepository.update(job.id, {

@@ -50,6 +50,7 @@ describe('ConfirmImportUseCase', () => {
 
     const importJobsRepository = {
       findById: vi.fn(async () => importJob),
+      confirm: vi.fn(async () => importJob),
       update: vi.fn(async (_id, data) => ({ ...importJob, ...data })),
     };
 
@@ -134,6 +135,10 @@ describe('ConfirmImportUseCase', () => {
     const result = await useCase.execute(actor, 'job-1');
 
     expect(importJobsRepository.findById).toHaveBeenCalledWith('job-1');
+    expect(importJobsRepository.confirm).toHaveBeenCalledWith(
+      'job-1',
+      expect.anything(),
+    );
     expect(fileAccessService.findAccessibleFile).toHaveBeenCalledWith(
       actor,
       'file-1',
@@ -180,5 +185,78 @@ describe('ConfirmImportUseCase', () => {
     expect(result.status).toBe('FAILED');
     expect(result.successCount).toBe(2);
     expect(result.errorCount).toBe(1);
+  });
+
+  it('aborts with a conflict when the job is confirmed concurrently', async () => {
+    const importJob = {
+      id: 'job-1',
+      createdById: 'user-1',
+      type: 'users',
+      fileId: 'file-1',
+      organizationId: 'org-1',
+      status: 'PENDING',
+      confirmedAt: null,
+      completedAt: null,
+      rowCount: null,
+      successCount: null,
+      errorCount: null,
+      errors: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    const adapter = {
+      importRow: vi.fn(),
+    };
+
+    const importJobsRepository = {
+      findById: vi.fn(async () => importJob),
+      // CAS claim fails: another request already confirmed the job.
+      confirm: vi.fn(async () => null),
+      update: vi.fn(),
+    };
+
+    const transactionPort = {
+      run: vi.fn(async (cb: (tx: unknown) => Promise<unknown>) => cb({})),
+      withSavepoint: vi.fn(
+        async (_tx: unknown, _name: string, cb: () => Promise<unknown>) =>
+          cb(),
+      ),
+    };
+
+    const useCase = new ConfirmImportUseCase(
+      importJobsRepository as never,
+      {
+        findAccessibleFile: vi.fn(async () => ({
+          id: 'file-1',
+          organizationId: 'org-1',
+          storageKey: 'imports/file.csv',
+        })),
+      } as never,
+      {
+        resolve: vi.fn(() => adapter),
+        getImportPermissions: vi.fn(() => []),
+      } as never,
+      {
+        parseImportFile: vi.fn(async () => ({ rows: [{ name: 'Row 1' }] })),
+      } as never,
+      { log: vi.fn() } as never,
+      {
+        toImportJobView: vi.fn((job: Record<string, unknown>) => ({
+          id: String(job.id),
+          status: String(job.status),
+        })),
+      } as never,
+      transactionPort as never,
+      { emit: vi.fn() } as never,
+    );
+
+    await expect(useCase.execute(actor, 'job-1')).rejects.toMatchObject({
+      code: 'RESOURCE_CONFLICT',
+    });
+
+    // No rows were imported and no final status was written.
+    expect(adapter.importRow).not.toHaveBeenCalled();
+    expect(importJobsRepository.update).not.toHaveBeenCalled();
   });
 });

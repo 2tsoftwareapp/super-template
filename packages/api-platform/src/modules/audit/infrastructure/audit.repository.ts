@@ -6,7 +6,7 @@ import type {
 import { Inject, Injectable } from '@nestjs/common';
 import { DATABASE } from '@repo/api-database';
 import { auditLogs } from '@repo/api-database';
-import { and, count, desc, eq, gte, ilike, lt, lte, or, sql, type SQL } from 'drizzle-orm';
+import { and, count, desc, eq, gte, ilike, lt, or, sql, type SQL } from 'drizzle-orm';
 
 import type { AuditRepositoryPort } from '../application/ports/audit.repository.port';
 
@@ -142,19 +142,6 @@ export class AuditRepository implements AuditRepositoryPort {
       .from(auditLogs)
       .where(whereClause);
     return Number(result?.total ?? 0);
-  }
-
-  /** Permanently deletes audit entries older than the cutoff; returns the count removed. */
-  async deleteOlderThan(
-    cutoff: Date,
-    executor: DatabaseExecutor = this.database,
-  ): Promise<number> {
-    const deleted = await executor
-      .delete(auditLogs)
-      .where(lte(auditLogs.createdAt, cutoff))
-      .returning({ id: auditLogs.id });
-
-    return deleted.length;
   }
 
   async deleteOlderThanBatched(

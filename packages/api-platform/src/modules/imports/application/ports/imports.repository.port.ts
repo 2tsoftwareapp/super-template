@@ -56,6 +56,16 @@ export interface ImportJobsRepositoryPort {
     jobId: string,
     executor?: TransactionExecutor,
   ): Promise<ImportJobRecord | null>;
+  /**
+   * Atomically claims an import job for confirmation: only succeeds while
+   * `confirmed_at` is still NULL, so concurrent confirm requests cannot both
+   * import the same rows. Returns the claimed row or null when already
+   * confirmed (caller must treat null as a conflict).
+   */
+  confirm(
+    jobId: string,
+    executor?: TransactionExecutor,
+  ): Promise<ImportJobRecord | null>;
   update(
     jobId: string,
     values: UpdateImportJobValues,

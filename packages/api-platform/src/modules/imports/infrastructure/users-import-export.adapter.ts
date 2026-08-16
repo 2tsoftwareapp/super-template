@@ -44,15 +44,16 @@ export class UsersImportExportAdapter implements ImportExportAdapter<UserRow> {
   async listForExport(params: {
     organizationId: string;
     ownerId: string;
+    limit?: number;
   }): Promise<UserRow[]> {
     const allRows: UserRow[] = [];
     let page = 1;
-    const limit = 1000;
+    const pageSize = 1000;
 
     while (true) {
       const result = await this.usersRepository.list({
         page,
-        limit,
+        limit: pageSize,
         organizationId: params.organizationId,
         sort: [{ field: 'createdAt', order: 'asc' }],
       });
@@ -67,6 +68,10 @@ export class UsersImportExportAdapter implements ImportExportAdapter<UserRow> {
           emailVerifiedAt: user.emailVerifiedAt?.toISOString() ?? null,
           createdAt: user.createdAt.toISOString(),
         });
+
+        if (params.limit !== undefined && allRows.length >= params.limit) {
+          return allRows;
+        }
       }
 
       if (allRows.length >= result.total) break;

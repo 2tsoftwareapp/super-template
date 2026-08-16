@@ -26,6 +26,7 @@ import {
   OBJECT_STORAGE,
   type ObjectStorage,
 } from '../../../storage/application/object-storage.interface';
+import { MAX_EXPORT_ROWS } from '../../domain/export-policy';
 import { ExportsMapper } from '../exports.mapper';
 import { EXPORT_JOBS_REPOSITORY, type ExportJobsRepositoryPort } from '../ports/export-jobs.repository.port';
 
@@ -95,7 +96,16 @@ export class CreateExportUseCase {
       const rows = await adapter.listForExport({
         organizationId,
         ownerId: actor.userId,
+        limit: MAX_EXPORT_ROWS + 1,
       });
+
+      if (rows.length > MAX_EXPORT_ROWS) {
+        throw new AppError(
+          ERROR_CODES.VALIDATION_FAILED,
+          `Export exceeds the maximum of ${MAX_EXPORT_ROWS} rows; narrow your filters and try again`,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
 
       const csv = toCsv(adapter.csvHeader, rows.map((row) => adapter.toCsvRow(row)));
       storageKey = `exports/${actor.userId}/${randomUUID()}.csv`;

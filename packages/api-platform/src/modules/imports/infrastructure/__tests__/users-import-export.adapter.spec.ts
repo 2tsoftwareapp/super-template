@@ -360,6 +360,35 @@ describe('UsersImportExportAdapter', () => {
       expect(result[1499]!.id).toBe('user-1499');
     });
 
+    it('stops early when a limit is supplied', async () => {
+      const page1 = Array.from({ length: 1000 }, (_, i) => ({
+        id: `user-${i}`,
+        email: `user${i}@test.com`,
+        displayName: `User ${i}`,
+        avatarUrl: null,
+        status: 'ACTIVE' as const,
+        emailVerifiedAt: new Date(),
+        createdAt: new Date(),
+      }));
+
+      const usersRepo = {
+        list: vi.fn().mockResolvedValueOnce({ rows: page1, total: 5000 }),
+      };
+
+      const { adapter } = createAdapter({
+        usersRepository: usersRepo,
+      });
+
+      const result = await adapter.listForExport({
+        organizationId: 'org-1',
+        ownerId: 'owner-1',
+        limit: 3,
+      });
+
+      expect(usersRepo.list).toHaveBeenCalledTimes(1);
+      expect(result).toHaveLength(3);
+    });
+
     it('handles single page when total fits in one request', async () => {
       const rows = Array.from({ length: 500 }, (_, i) => ({
         id: `user-${i}`,

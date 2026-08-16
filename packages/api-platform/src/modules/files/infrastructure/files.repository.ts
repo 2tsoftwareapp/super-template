@@ -156,12 +156,17 @@ export class FilesRepository implements FilesRepositoryPort {
       checksum: string;
       latestVersion: number;
     },
+    expectedLatestVersion: number,
     executor: DatabaseExecutor = this.database,
   ) {
+    // CAS guard: only bump the current version if nobody else already did.
+    // Under concurrent uploads the losing UPDATE matches zero rows -> null.
     const [file] = await executor
       .update(files)
       .set({ ...values, updatedAt: new Date() })
-      .where(eq(files.id, fileId))
+      .where(
+        and(eq(files.id, fileId), eq(files.latestVersion, expectedLatestVersion)),
+      )
       .returning();
 
     return file ?? null;

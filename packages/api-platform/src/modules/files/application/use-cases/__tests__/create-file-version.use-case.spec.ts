@@ -73,6 +73,7 @@ describe('CreateFileVersionUseCase', () => {
     expect(filesRepository.setCurrentVersion).toHaveBeenCalledWith(
       'file-1',
       expect.objectContaining({ latestVersion: 2 }),
+      1, // CAS: expected previous latestVersion
       expect.anything(),
     );
     expect(auditService.log).toHaveBeenCalledWith(
@@ -117,6 +118,73 @@ describe('CreateFileVersionUseCase', () => {
     });
 
     expect(objectStorage.upload).not.toHaveBeenCalled();
+  });
+
+  it('surfaces a soft conflict when a concurrent upload won the CAS on setCurrentVersion', async () => {
+    const fileAccessService = {
+      findAccessibleFile: vi.fn(async () => ({
+        id: 'file-1',
+        latestVersion: 1,
+      })),
+    };
+    const filesRepository = {
+      createVersion: vi.fn(async () => ({ id: 'version-2' })),
+      // CAS guard fails: another upload already bumped latestVersion.
+      setCurrentVersion: vi.fn(async () => null),
+    };
+    const objectStorage = {
+      upload: vi.fn(async () => ({ key: 'uploads/new-key.png' })),
+      delete: vi.fn(async () => undefined),
+    };
+    const auditService = { log: vi.fn() };
+    const transactionPort = { withTenant: vi.fn(async (_, cb) => cb({} as any)) };
+
+    const useCase = new CreateFileVersionUseCase(
+      fileAccessService as never,
+      filesRepository as never,
+      objectStorage as never,
+      transactionPort as never,
+      auditService as never,
+    );
+
+    await expect(useCase.execute(actor, 'file-1', buildFile())).rejects.toMatchObject(
+      { code: ERROR_CODES.RESOURCE_CONFLICT },
+    );
+    expect(auditService.log).not.toHaveBeenCalled();
+  });
+
+  it('surfaces a soft conflict when a concurrent upload won the unique version index', async () => {
+    const fileAccessService = {
+      findAccessibleFile: vi.fn(async () => ({
+        id: 'file-1',
+        latestVersion: 1,
+      })),
+    };
+    const filesRepository = {
+      createVersion: vi.fn(async () => {
+        throw Object.assign(new Error('duplicate key value'), { code: '23505' });
+      }),
+      setCurrentVersion: vi.fn(),
+    };
+    const objectStorage = {
+      upload: vi.fn(async () => ({ key: 'uploads/new-key.png' })),
+      delete: vi.fn(async () => undefined),
+    };
+    const auditService = { log: vi.fn() };
+    const transactionPort = { withTenant: vi.fn(async (_, cb) => cb({} as any)) };
+
+    const useCase = new CreateFileVersionUseCase(
+      fileAccessService as never,
+      filesRepository as never,
+      objectStorage as never,
+      transactionPort as never,
+      auditService as never,
+    );
+
+    await expect(useCase.execute(actor, 'file-1', buildFile())).rejects.toMatchObject(
+      { code: ERROR_CODES.RESOURCE_CONFLICT },
+    );
+    expect(filesRepository.setCurrentVersion).not.toHaveBeenCalled();
   });
 
   it('cleans up the uploaded blob if persisting the new version fails', async () => {
