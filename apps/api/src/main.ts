@@ -8,6 +8,7 @@ import helmet from 'helmet';
 
 import { AppModule } from './app.module';
 import { openApiSetup } from './openapi/open-api-setup';
+import { logStartupWarnings } from './shell/startup-warnings';
 
 const pipeConfigs: ValidationPipeOptions = {
   whitelist: true,
@@ -27,6 +28,8 @@ async function bootstrap() {
   });
 
   const environmentService = app.get(EnvironmentService);
+
+  logStartupWarnings(environmentService);
 
   app.setGlobalPrefix('api/v1');
   app.use(json({ limit: environmentService.apiBodyLimit }));
