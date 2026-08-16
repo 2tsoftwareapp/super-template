@@ -43,6 +43,8 @@ describe('HealthController (e2e)', () => {
       data: { status: 'ok' },
       meta: { requestId: expect.any(String) },
     });
+    // Test env has no warnings; the array must still be present for monitoring.
+    expect(response.body.data.warnings).toEqual([]);
   });
 
   it('returns the readiness payload when postgres is reachable', async () => {
@@ -54,5 +56,6 @@ describe('HealthController (e2e)', () => {
       data: { status: 'ready' },
       meta: { requestId: expect.any(String) },
     });
+    expect(response.body.data.warnings).toEqual([]);
   });
 });

@@ -1,14 +1,14 @@
 import type { ValidationPipeOptions } from '@nestjs/common';
 
-import { ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { EnvironmentService } from '@repo/api-core';
+import { HealthWarningsService } from '@repo/api-health';
 import { json, urlencoded } from 'express';
 import helmet from 'helmet';
 
 import { AppModule } from './app.module';
 import { openApiSetup } from './openapi/open-api-setup';
-import { logStartupWarnings } from './shell/startup-warnings';
 
 const pipeConfigs: ValidationPipeOptions = {
   whitelist: true,
@@ -29,7 +29,11 @@ async function bootstrap() {
 
   const environmentService = app.get(EnvironmentService);
 
-  logStartupWarnings(environmentService);
+  // Surface the same warnings exposed via GET /health (e.g. missing REDIS_URL
+  // in production) in the startup log so operators see them without polling.
+  for (const warning of app.get(HealthWarningsService).collect()) {
+    Logger.warn(warning, 'Bootstrap');
+  }
 
   app.setGlobalPrefix('api/v1');
   app.use(json({ limit: environmentService.apiBodyLimit }));
