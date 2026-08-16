@@ -1,5 +1,7 @@
 import type { INestApplication } from '@nestjs/common';
 
+import { DATABASE, files } from '@repo/api-database';
+import { eq } from 'drizzle-orm';
 import request from 'supertest';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
@@ -162,9 +164,7 @@ describe('Audit logs (e2e)', () => {
     // Test T-006.2: Uploader lacking audit.read downloading their own audit file -> 403
     // We simulate this by changing the file's uploadedById to the regular user directly in the database
     // This simulates the case where a user had audit.read, created an export, and then lost audit.read
-    const { files, DATABASE } = require('@repo/api-database');
     const db = app.get(DATABASE);
-    const { eq } = require('drizzle-orm');
     await db.update(files).set({ uploadedById: regularUserId.id }).where(eq(files.id, fileId));
 
     // Even though they are the uploader, they lack audit.read and SUPER_ADMIN, so they should get 403

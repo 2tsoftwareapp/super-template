@@ -106,7 +106,6 @@ describe('ConfirmMfaUseCase', () => {
     );
     expect(auditWriter.log).toHaveBeenCalledWith(
       expect.objectContaining({ action: 'mfa.enabled' }),
-      'tx',
     );
   });
 });

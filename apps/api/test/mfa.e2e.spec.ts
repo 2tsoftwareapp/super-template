@@ -1,10 +1,12 @@
 import type { INestApplication } from '@nestjs/common';
 
 import { ERROR_CODES } from '@repo/api-core';
+import { DATABASE, users } from '@repo/api-database';
 import {
   base32Decode,
   generateTotpCode,
 } from '@repo/api-identity/modules/mfa/domain/totp';
+import { eq } from 'drizzle-orm';
 import request from 'supertest';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
@@ -27,8 +29,8 @@ describe('Two-factor authentication (e2e)', () => {
   const createActiveUser = async (
     admin: { accessToken: string },
     email: string,
-  ) => {
-    await request(app.getHttpServer())
+  ): Promise<string> => {
+    const response = await request(app.getHttpServer())
       .post('/api/v1/admin/users')
       .set(bearer(admin.accessToken))
       .send({
@@ -38,6 +40,19 @@ describe('Two-factor authentication (e2e)', () => {
         status: 'ACTIVE',
       })
       .expect(201);
+
+    const userId = response.body.data.id as string;
+
+    // Admin-created users must change their password on first login; the MFA
+    // lifecycle below is unrelated to that gate, so clear it like the other
+    // e2e specs that exercise admin-created users.
+    await app
+      .get(DATABASE)
+      .update(users)
+      .set({ mustChangePassword: false })
+      .where(eq(users.id, userId));
+
+    return userId;
   };
 
   it('runs the full setup, login-challenge, recovery-code, and disable lifecycle', async () => {

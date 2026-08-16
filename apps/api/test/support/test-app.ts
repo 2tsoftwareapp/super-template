@@ -281,7 +281,10 @@ export const runWithTenantContext = async <T>(
   operation: () => Promise<T>,
 ): Promise<T> => {
   const tenantContextService = app.get(TenantContextService);
-  return tenantContextService.runAsync(context, operation);
+  // Wrap in an async callback so lazy drizzle queries execute (and thus apply
+  // tenant GUCs) inside the ALS context. Returning the thenable directly lets
+  // runAsync exit the context before the query actually runs.
+  return tenantContextService.runAsync(context, async () => operation());
 };
 
 export const getCurrentDatabaseUser = async (

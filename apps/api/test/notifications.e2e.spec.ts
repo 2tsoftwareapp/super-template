@@ -39,9 +39,11 @@ const dbQuery = async <T>(
 ): Promise<T> => {
   const tenantContextService = app.get(TenantContextService);
   const db = app.get(DATABASE);
+  // async wrapper keeps the ALS context alive until the lazy drizzle query
+  // actually executes (see runWithTenantContext in support/test-app).
   return tenantContextService.runAsync(
     WORKER_DISPATCH_CONTEXT as TenantContext,
-    () => fn(db),
+    async () => fn(db),
   );
 };
 

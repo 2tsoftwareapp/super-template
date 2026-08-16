@@ -338,12 +338,19 @@ export class JobsRepository implements JobsRepositoryPort {
     executor?: TransactionExecutor,
   ): Promise<{ id: string; jobId: string; status: JobStatus; organizationId: string | null }[]> {
     const db = (executor ?? this.database) as DatabaseExecutor;
+    // The join aliases jobs as "j", so the scope condition must reference the
+    // alias: scopeCondition() renders "jobs"."organization_id", which is an
+    // invalid reference once the table name is shadowed by the alias.
+    const scopeFilter =
+      scope.type === 'organization'
+        ? sql`j.organization_id = ${scope.organizationId}`
+        : sql`j.organization_id IS NULL`;
     const result = await db.execute<{ id: string; job_id: string; status: string; organization_id: string | null }>(sql`
       SELECT jd.id, jd.job_id, j.status, j.organization_id
       FROM job_dependencies jd
       INNER JOIN jobs j ON j.id = jd.job_id
       WHERE jd.depends_on_job_id = ${jobId}
-      AND ${scopeCondition(scope)}
+      AND ${scopeFilter}
     `);
     return result.rows.map((r) => ({
       id: r.id,

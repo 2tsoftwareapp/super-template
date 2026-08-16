@@ -1,5 +1,4 @@
 import type { AuthenticatedRequestUser } from '@repo/api-core';
-import type { TransactionPort } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import {
@@ -7,7 +6,8 @@ import {
   type ActivityEmitter,
   AppError,
   ERROR_CODES,
-  TRANSACTION_PORT,
+  PLATFORM_TRANSACTION_PORT,
+  type PlatformTransactionPort,
 } from '@repo/api-core';
 
 import type { CreateOrganizationCommand } from '../organizations.types';
@@ -26,7 +26,13 @@ const slugify = (value: string) =>
 @Injectable()
 export class CreateOrganizationUseCase {
   constructor(
-    @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
+    // Creating an organization is a platform-level operation: the new tenant's
+    // id is unknown until the insert, so the write cannot run under a request
+    // tenant context. The platform transaction runs with RLS bypass so the
+    // cross-context activity emit (which references the brand-new org) passes
+    // the tenant-isolation policies.
+    @Inject(PLATFORM_TRANSACTION_PORT)
+    private readonly transactionPort: PlatformTransactionPort,
     @Inject(ORGANIZATIONS_REPOSITORY) private readonly organizationsRepository: OrganizationsRepositoryPort,
     @Inject(ACTIVITY_EMITTER) private readonly activityEmitter: ActivityEmitter,
     private readonly accessControlService: AccessControlService,

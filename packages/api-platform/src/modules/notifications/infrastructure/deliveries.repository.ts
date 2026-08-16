@@ -2,7 +2,7 @@ import type { DatabaseClient, DatabaseExecutor } from '@repo/api-database';
 
 import { Inject, Injectable } from '@nestjs/common';
 import { DATABASE, notificationDeliveries } from '@repo/api-database';
-import { and, eq, sql } from 'drizzle-orm';
+import { and, eq, inArray, sql } from 'drizzle-orm';
 
 import type {
   DeliveriesRepositoryPort,
@@ -59,7 +59,7 @@ export class DeliveriesRepository implements DeliveriesRepositoryPort {
     return executor
       .select()
       .from(notificationDeliveries)
-      .where(sql`${notificationDeliveries.id} = ANY(${ids})`);
+      .where(inArray(notificationDeliveries.id, ids));
   }
 
   async markSent(
@@ -190,7 +190,7 @@ export class DeliveriesRepository implements DeliveriesRepositoryPort {
         })
         .where(
           and(
-            sql`${notificationDeliveries.id} = ANY(${ids})`,
+            inArray(notificationDeliveries.id, ids),
             sql`${notificationDeliveries.attempts} < ${MAX_RETRY_ATTEMPTS}`,
           ),
         ),
@@ -203,7 +203,7 @@ export class DeliveriesRepository implements DeliveriesRepositoryPort {
         })
         .where(
           and(
-            sql`${notificationDeliveries.id} = ANY(${ids})`,
+            inArray(notificationDeliveries.id, ids),
             sql`${notificationDeliveries.attempts} >= ${MAX_RETRY_ATTEMPTS}`,
           ),
         ),
@@ -213,6 +213,6 @@ export class DeliveriesRepository implements DeliveriesRepositoryPort {
     return executor
       .select()
       .from(notificationDeliveries)
-      .where(sql`${notificationDeliveries.id} = ANY(${ids})`);
+      .where(inArray(notificationDeliveries.id, ids));
   }
 }

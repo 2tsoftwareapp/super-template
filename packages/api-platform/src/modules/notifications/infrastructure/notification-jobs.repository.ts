@@ -6,7 +6,7 @@ import type {
 import { Inject, Injectable } from '@nestjs/common';
 import { DATABASE, runIdempotentInsert } from '@repo/api-database';
 import { notificationJobs } from '@repo/api-database';
-import { and, asc, count, desc, eq, lte, sql } from 'drizzle-orm';
+import { and, asc, count, desc, eq, inArray, lte, sql } from 'drizzle-orm';
 
 import type { NotificationJobsRepositoryPort } from '../application/ports/notification-jobs.repository.port';
 
@@ -172,7 +172,7 @@ export class NotificationJobsRepository implements NotificationJobsRepositoryPor
     return executor
       .select()
       .from(notificationJobs)
-      .where(sql`${notificationJobs.id} = ANY(${ids})`);
+      .where(inArray(notificationJobs.id, ids));
   }
 
 
@@ -293,7 +293,7 @@ export class NotificationJobsRepository implements NotificationJobsRepositoryPor
         .set({ status: 'PENDING', updatedAt: new Date() })
         .where(
           and(
-            sql`${notificationJobs.id} = ANY(${ids})`,
+            inArray(notificationJobs.id, ids),
             sql`${notificationJobs.attempts} < ${maxAttempts}`,
           ),
         )
@@ -308,7 +308,7 @@ export class NotificationJobsRepository implements NotificationJobsRepositoryPor
         })
         .where(
           and(
-            sql`${notificationJobs.id} = ANY(${ids})`,
+            inArray(notificationJobs.id, ids),
             sql`${notificationJobs.attempts} >= ${maxAttempts}`,
           ),
         )

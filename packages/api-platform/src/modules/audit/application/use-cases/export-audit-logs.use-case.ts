@@ -51,11 +51,12 @@ export class ExportAuditLogsUseCase {
     requestContext?: RequestContext,
   ): Promise<{ fileId: string; rowCount: number; totalMatching: number; truncated: boolean }> {
     const isSuperAdmin = actor.roles.includes(ROLE_NAMES.SUPER_ADMIN);
-    
-    // Nếu không phải SUPER_ADMIN hoặc SUPER_ADMIN đang view as tenant, yêu cầu organizationId
-    // Global export thì organizationId sẽ là undefined/null.
-    const organizationId = isSuperAdmin && !actor.organizationId 
-      ? null 
+
+    // SUPER_ADMIN always exports the full trail (including platform-scoped rows
+    // recorded without an organization); non-super admins stay scoped to their
+    // organization.
+    const organizationId = isSuperAdmin
+      ? null
       : requireOrganizationId(actor);
 
     const fullQuery = {

@@ -231,22 +231,32 @@ describe('Background jobs under restricted DB role (e2e)', () => {
     const jobsService = app.get(JobsService);
     const idempotencyKey = `cross-org-test-${Date.now()}`;
 
-    const job1 = await jobsService.enqueue({
-      type: 'files.cleanup',
-      payload: {},
-      createdById: session.userId,
-      organizationId: organizationId,
-      idempotencyKey,
-    });
+    const job1 = await runWithTenantContext(
+      app,
+      { tenantId: organizationId, userId: session.userId },
+      () =>
+        jobsService.enqueue({
+          type: 'files.cleanup',
+          payload: {},
+          createdById: session.userId,
+          organizationId: organizationId,
+          idempotencyKey,
+        }),
+    );
 
     // A different org (null org) should get a different job with same key
-    const job2 = await jobsService.enqueue({
-      type: 'files.cleanup',
-      payload: {},
-      createdById: session.userId,
-      organizationId: null,
-      idempotencyKey,
-    });
+    const job2 = await runWithTenantContext(
+      app,
+      { tenantId: organizationId, userId: session.userId },
+      () =>
+        jobsService.enqueue({
+          type: 'files.cleanup',
+          payload: {},
+          createdById: session.userId,
+          organizationId: null,
+          idempotencyKey,
+        }),
+    );
 
     expect((job1 as any).id).not.toBe((job2 as any).id);
   });
@@ -259,12 +269,17 @@ describe('Background jobs under restricted DB role (e2e)', () => {
     const organizationId = org!.id;
     const jobsService = app.get(JobsService);
 
-    const job = await jobsService.enqueue({
-      type: 'files.cleanup',
-      payload: { password: 'secret123' },
-      createdById: session.userId,
-      organizationId: organizationId,
-    });
+    const job = await runWithTenantContext(
+      app,
+      { tenantId: organizationId, userId: session.userId },
+      () =>
+        jobsService.enqueue({
+          type: 'files.cleanup',
+          payload: { password: 'secret123' },
+          createdById: session.userId,
+          organizationId: organizationId,
+        }),
+    );
 
     expect(job.payload).toEqual({ password: 'secret123' });
   });

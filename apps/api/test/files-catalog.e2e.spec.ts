@@ -1,5 +1,7 @@
 import type { INestApplication } from '@nestjs/common';
 
+import { DATABASE, users } from '@repo/api-database';
+import { eq } from 'drizzle-orm';
 import request from 'supertest';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
@@ -72,30 +74,68 @@ describe('Files catalog, versioning, and batch operations (e2e)', () => {
     const organizationAId = superAdminMe.body.data.organizationId as string;
     const organizationBId = seededUserMe.body.data.organizationId as string;
 
-    await request(app.getHttpServer())
-      .post('/api/v1/admin/users')
+    // The users API assigns roles by uuid (roleId), so resolve the org-scoped
+    // ADMIN role for each organization first.
+    const rolesResponse = await request(app.getHttpServer())
+      .get('/api/v1/admin/roles')
       .set(bearer(superAdmin.accessToken))
-      .send({
-        email: 'files-org-admin-a@example.local',
-        password: 'OrgAdminPass123!',
-        displayName: 'Files Org Admin A',
-        status: 'ACTIVE',
-        role: 'ADMIN',
-        organizationId: organizationAId,
-      })
-      .expect(201);
-    await request(app.getHttpServer())
-      .post('/api/v1/admin/users')
-      .set(bearer(superAdmin.accessToken))
-      .send({
-        email: 'files-org-admin-b@example.local',
-        password: 'OrgAdminPass123!',
-        displayName: 'Files Org Admin B',
-        status: 'ACTIVE',
-        role: 'ADMIN',
-        organizationId: organizationBId,
-      })
-      .expect(201);
+      .expect(200);
+    const roles = rolesResponse.body.data as {
+      id: string;
+      name: string;
+      organizationId: string | null;
+    }[];
+    const adminRoleA = roles.find(
+      (role) => role.name === 'ADMIN' && role.organizationId === organizationAId,
+    );
+    const adminRoleB = roles.find(
+      (role) => role.name === 'ADMIN' && role.organizationId === organizationBId,
+    );
+    expect(adminRoleA).toBeDefined();
+    expect(adminRoleB).toBeDefined();
+
+    const createOrgAdmin = async (
+      email: string,
+      displayName: string,
+      roleId: string,
+      organizationId: string,
+    ) => {
+      const response = await request(app.getHttpServer())
+        .post('/api/v1/admin/users')
+        .set(bearer(superAdmin.accessToken))
+        .send({
+          email,
+          password: 'OrgAdminPass123!',
+          displayName,
+          status: 'ACTIVE',
+          roleId,
+          organizationId,
+        })
+        .expect(201);
+
+      const userId = response.body.data.id as string;
+
+      // Admin-created users must change their password on first login; the
+      // file isolation flow is unrelated to that gate, so clear it.
+      await app
+        .get(DATABASE)
+        .update(users)
+        .set({ mustChangePassword: false })
+        .where(eq(users.id, userId));
+    };
+
+    await createOrgAdmin(
+      'files-org-admin-a@example.local',
+      'Files Org Admin A',
+      adminRoleA!.id,
+      organizationAId,
+    );
+    await createOrgAdmin(
+      'files-org-admin-b@example.local',
+      'Files Org Admin B',
+      adminRoleB!.id,
+      organizationBId,
+    );
 
     const orgAdminB = await loginAs(
       app,

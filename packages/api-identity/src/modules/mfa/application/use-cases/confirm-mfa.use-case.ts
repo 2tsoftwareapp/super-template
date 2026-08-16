@@ -79,17 +79,18 @@ export class ConfirmMfaUseCase {
         recoveryCodes.map((code) => hashRecoveryCode(code)),
         transaction,
       );
-      await this.auditWriter.log(
-        {
-          actorId: input.userId,
-          action: 'mfa.enabled',
-          entityType: 'user',
-          entityId: input.userId,
-          requestContext,
-            scope: SYSTEM_SCOPE.PLATFORM
-        },
-        transaction,
-      );
+      // Platform-scoped audit rows have organization_id NULL; the RLS policy
+      // rejects them unless written with bypass. Write via the platform
+      // transaction (bypass) like login/register do, instead of passing the
+      // tenant-scoped executor.
+      await this.auditWriter.log({
+        actorId: input.userId,
+        action: 'mfa.enabled',
+        entityType: 'user',
+        entityId: input.userId,
+        requestContext,
+        scope: SYSTEM_SCOPE.PLATFORM,
+      });
     });
 
     return { recoveryCodes };

@@ -18,9 +18,10 @@ export class ListAuditLogsUseCase {
   async execute(actor: AuthenticatedRequestUser, query: ListAuditLogsQuery) {
     const isSuperAdmin = actor.roles.includes(ROLE_NAMES.SUPER_ADMIN);
 
-    const organizationId = isSuperAdmin && !actor.organizationId 
-      ? null 
-      : actor.organizationId;
+    // SUPER_ADMIN sees the full audit trail (including platform-scoped rows
+    // recorded without an organization); non-super admins stay scoped to
+    // their organization.
+    const organizationId = isSuperAdmin ? null : actor.organizationId;
 
     if (!isSuperAdmin && !organizationId) {
       throw new AppError(
