@@ -75,6 +75,10 @@ import { TenantContextInterceptor } from './shell/tenant-context.interceptor';
     },
     {
       provide: APP_GUARD,
+      useClass: MaintenanceModeGuard,
+    },
+    {
+      provide: APP_GUARD,
       useClass: ThrottlerGuard,
     },
     {
@@ -88,7 +92,6 @@ import { TenantContextInterceptor } from './shell/tenant-context.interceptor';
       useFactory: (reflector: Reflector) => new AuthorizeGuard(reflector),
       inject: [Reflector],
     },
-    MaintenanceModeGuard,
     {
       provide: APP_INTERCEPTOR,
       useFactory: (reflector: Reflector) =>

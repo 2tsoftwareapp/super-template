@@ -55,7 +55,9 @@ export class UpdateSettingUseCase {
         actorId: actor.userId,
         action: 'settings.updated',
         entityType: 'application_setting',
-        entityId: key,
+        // application_settings rows are identified by a text key, not a uuid;
+        // the entity_id column is uuid-typed so the key is kept in metadata.
+        entityId: null,
         metadata: { key },
         requestContext,
         scope: SYSTEM_SCOPE.PLATFORM

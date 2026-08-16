@@ -43,7 +43,9 @@ describe('UpdateSettingUseCase', () => {
     expect(auditService.log).toHaveBeenCalledWith(
       expect.objectContaining({
         action: 'settings.updated',
-        entityId: 'feature.flag',
+        // The audit entity_id column is uuid-typed; settings are keyed by text.
+        entityId: null,
+        metadata: { key: 'feature.flag' },
       }),
       expect.anything(),
     );
