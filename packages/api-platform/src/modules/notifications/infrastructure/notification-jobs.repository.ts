@@ -6,7 +6,7 @@ import type {
 import { Inject, Injectable } from '@nestjs/common';
 import { DATABASE, runIdempotentInsert } from '@repo/api-database';
 import { notificationJobs } from '@repo/api-database';
-import { and, asc, count, desc, eq, inArray, lte, sql } from 'drizzle-orm';
+import { and, count, desc, eq, inArray, sql } from 'drizzle-orm';
 
 import type { NotificationJobsRepositoryPort } from '../application/ports/notification-jobs.repository.port';
 
@@ -127,20 +127,6 @@ export class NotificationJobsRepository implements NotificationJobsRepositoryPor
     };
   }
 
-  async listDue(limit: number, executor: DatabaseExecutor = this.database) {
-    return executor
-      .select()
-      .from(notificationJobs)
-      .where(
-        and(
-          eq(notificationJobs.status, 'PENDING'),
-          lte(notificationJobs.scheduledAt, sql`now()`),
-        ),
-      )
-      .orderBy(asc(notificationJobs.scheduledAt))
-      .limit(limit);
-  }
-
   /**
    * Atomically claim up to `limit` pending jobs that are due.
    * Step 1: SELECT … FOR UPDATE SKIP LOCKED so concurrent workers each get distinct rows.
@@ -200,6 +186,7 @@ export class NotificationJobsRepository implements NotificationJobsRepositoryPor
   async markCompleted(
     jobId: string,
     recipientCount: number,
+    expectedAttempts: number,
     executor: DatabaseExecutor = this.database,
   ) {
     const [job] = await executor
@@ -210,7 +197,13 @@ export class NotificationJobsRepository implements NotificationJobsRepositoryPor
         processedAt: new Date(),
         updatedAt: new Date(),
       })
-      .where(eq(notificationJobs.id, jobId))
+      .where(
+        and(
+          eq(notificationJobs.id, jobId),
+          eq(notificationJobs.status, 'PROCESSING'),
+          eq(notificationJobs.attempts, expectedAttempts),
+        ),
+      )
       .returning();
 
     return job ?? null;
@@ -219,6 +212,7 @@ export class NotificationJobsRepository implements NotificationJobsRepositoryPor
   async markFailed(
     jobId: string,
     errorMessage: string,
+    expectedAttempts: number,
     executor: DatabaseExecutor = this.database,
   ) {
     const [job] = await executor
@@ -229,7 +223,13 @@ export class NotificationJobsRepository implements NotificationJobsRepositoryPor
         processedAt: new Date(),
         updatedAt: new Date(),
       })
-      .where(eq(notificationJobs.id, jobId))
+      .where(
+        and(
+          eq(notificationJobs.id, jobId),
+          eq(notificationJobs.status, 'PROCESSING'),
+          eq(notificationJobs.attempts, expectedAttempts),
+        ),
+      )
       .returning();
 
     return job ?? null;

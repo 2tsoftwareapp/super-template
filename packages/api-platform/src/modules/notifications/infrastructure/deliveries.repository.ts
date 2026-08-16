@@ -9,6 +9,8 @@ import type {
   UpsertDeliveryInput,
 } from '../application/ports/deliveries.repository.port';
 
+import { MAX_DELIVERY_RETRY_ATTEMPTS } from '../domain/delivery-policy';
+
 @Injectable()
 export class DeliveriesRepository implements DeliveriesRepositoryPort {
   constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
@@ -160,8 +162,6 @@ export class DeliveriesRepository implements DeliveriesRepositoryPort {
     timeoutMinutes: number,
     executor: DatabaseExecutor = this.database,
   ) {
-    const MAX_RETRY_ATTEMPTS = 5;
-
     const staleIds = await executor.execute<{ id: string }>(
       sql`
         SELECT id FROM notification_deliveries
@@ -191,7 +191,7 @@ export class DeliveriesRepository implements DeliveriesRepositoryPort {
         .where(
           and(
             inArray(notificationDeliveries.id, ids),
-            sql`${notificationDeliveries.attempts} < ${MAX_RETRY_ATTEMPTS}`,
+            sql`${notificationDeliveries.attempts} < ${MAX_DELIVERY_RETRY_ATTEMPTS}`,
           ),
         ),
       executor
@@ -204,7 +204,7 @@ export class DeliveriesRepository implements DeliveriesRepositoryPort {
         .where(
           and(
             inArray(notificationDeliveries.id, ids),
-            sql`${notificationDeliveries.attempts} >= ${MAX_RETRY_ATTEMPTS}`,
+            sql`${notificationDeliveries.attempts} >= ${MAX_DELIVERY_RETRY_ATTEMPTS}`,
           ),
         ),
     ]);

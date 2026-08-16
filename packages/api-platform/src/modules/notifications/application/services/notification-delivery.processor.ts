@@ -12,30 +12,15 @@ import {
 
 import type { PushMessage, PushNotifier } from '../push.interface';
 
+import { MAX_DELIVERY_RETRY_ATTEMPTS } from '../../domain/delivery-policy';
+import { tokenLockId } from '../../domain/token-lock';
 import { DELIVERIES_REPOSITORY, type DeliveriesRepositoryPort } from '../ports/deliveries.repository.port';
 import { DEVICE_TOKENS_REPOSITORY, type DeviceTokensRepositoryPort } from '../ports/device-tokens.repository.port';
 import { type NotificationRecord, NOTIFICATIONS_REPOSITORY, type NotificationsRepositoryPort } from '../ports/notifications.repository.port';
 import { PUSH_NOTIFIER } from '../push.interface';
 
 const DELIVERY_BATCH_SIZE = 50;
-const MAX_RETRY_ATTEMPTS = 5;
 const RECOVERY_INTERVAL = 10; // Run stale recovery every Nth tick (~5min at 30s interval)
-
-/**
- * Derive a stable 32-bit integer lock ID from a token string.
- * Advisory locks are per-session so two different tokens map to different
- * numeric IDs with overwhelming probability (birthday bound ~2^16 collisions
- * in 2^32 space, acceptable for per-token serialization).
- */
-function tokenLockId(token: string): number {
-  let h = 0x811c9dc5;
-  for (let i = 0; i < token.length; i++) {
-    h ^= token.charCodeAt(i);
-    h = (Math.imul(h, 0x01000193) >>> 0);
-  }
-  // pg_try_advisory_lock takes a signed int4; keep positive by masking top bit
-  return h & 0x7fffffff;
-}
 
 @Injectable()
 export class NotificationDeliveryProcessor {
@@ -249,7 +234,7 @@ export class NotificationDeliveryProcessor {
           this.logger.warn(
             `Disabled invalid token for delivery ${delivery.id}`,
           );
-        } else if (delivery.attempts >= MAX_RETRY_ATTEMPTS) {
+        } else if (delivery.attempts >= MAX_DELIVERY_RETRY_ATTEMPTS) {
           await this.deliveriesRepository.markFailed(
             delivery.id,
             `Max retries exceeded: ${result.error}`,
@@ -261,7 +246,7 @@ export class NotificationDeliveryProcessor {
           );
           await this.deliveriesRepository.markRetryable(delivery.id, nextAttemptAt);
           this.logger.warn(
-            `Delivery ${delivery.id} will retry in ${backoffMinutes}min (attempt ${delivery.attempts}/${MAX_RETRY_ATTEMPTS}): ${result.error}`,
+            `Delivery ${delivery.id} will retry in ${backoffMinutes}min (attempt ${delivery.attempts}/${MAX_DELIVERY_RETRY_ATTEMPTS}): ${result.error}`,
           );
         }
 

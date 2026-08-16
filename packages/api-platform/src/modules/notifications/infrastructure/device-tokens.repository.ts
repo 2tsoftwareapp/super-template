@@ -17,21 +17,9 @@ import type {
   RegisterTokenResult,
 } from '../application/ports/device-tokens.repository.port';
 
-export type NotificationDevicePlatform = 'IOS' | 'ANDROID';
+import { tokenLockId } from '../domain/token-lock';
 
-/**
- * Derive the same 32-bit advisory lock ID used by the delivery processor for
- * a given FCM token string. Both paths must use identical hashing so they
- * serialize against each other.
- */
-function tokenLockId(token: string): number {
-  let h = 0x811c9dc5;
-  for (let i = 0; i < token.length; i++) {
-    h ^= token.charCodeAt(i);
-    h = (Math.imul(h, 0x01000193) >>> 0);
-  }
-  return h & 0x7fffffff;
-}
+export type NotificationDevicePlatform = 'IOS' | 'ANDROID';
 
 @Injectable()
 export class DeviceTokensRepository implements DeviceTokensRepositoryPort {

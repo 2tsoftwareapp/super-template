@@ -90,22 +90,25 @@ export interface NotificationJobsRepositoryPort {
     params: ListNotificationJobsQuery,
     executor?: TransactionExecutor,
   ): Promise<NotificationJobsListResult>;
-  listDue(
-    limit: number,
-    executor?: TransactionExecutor,
-  ): Promise<NotificationJobRecord[]>;
   markProcessing(
     jobId: string,
     executor?: TransactionExecutor,
   ): Promise<NotificationJobRecord | null>;
+  /**
+   * CAS-style completion: only succeeds while the job is still PROCESSING at
+   * the same attempt count captured at claim time, so a stale worker cannot
+   * overwrite the outcome of a recovered-and-reclaimed job.
+   */
   markCompleted(
     jobId: string,
     recipientCount: number,
+    expectedAttempts: number,
     executor?: TransactionExecutor,
   ): Promise<NotificationJobRecord | null>;
   markFailed(
     jobId: string,
     errorMessage: string,
+    expectedAttempts: number,
     executor?: TransactionExecutor,
   ): Promise<NotificationJobRecord | null>;
   markCancelled(

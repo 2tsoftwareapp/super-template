@@ -297,7 +297,11 @@ export class NotificationDeliveryUseCase {
       const recipientIds = await this.resolveRecipientIds(locked);
 
       if (recipientIds.length === 0) {
-        await this.notificationJobsRepository.markCompleted(locked.id, 0);
+        await this.notificationJobsRepository.markCompleted(
+          locked.id,
+          0,
+          locked.attempts,
+        );
         return;
       }
 
@@ -361,7 +365,12 @@ export class NotificationDeliveryUseCase {
           deliveredCount += allInBatch.length;
         }
 
-        await this.notificationJobsRepository.markCompleted(locked.id, deliveredCount, tx);
+        await this.notificationJobsRepository.markCompleted(
+          locked.id,
+          deliveredCount,
+          locked.attempts,
+          tx,
+        );
       });
 
       // Emit SSE after transaction commits — best-effort, inbox state is the source of truth
@@ -376,6 +385,7 @@ export class NotificationDeliveryUseCase {
       await this.notificationJobsRepository.markFailed(
         locked.id,
         error instanceof Error ? error.message : 'Unknown processing error',
+        locked.attempts,
       );
     }
   }
