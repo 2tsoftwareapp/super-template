@@ -10,7 +10,7 @@ if (!process.env.DATABASE_MIGRATE_URL && !process.env.DATABASE_URL) {
 }
 
 export default defineConfig({
-  schema: '../../packages/api-database/src/schema/**/*.ts',
+  schema: './src/schema/**/*.ts',
   out: './drizzle',
   dialect: 'postgresql',
   dbCredentials: {

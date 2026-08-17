@@ -58,7 +58,7 @@
 
 1. Edit `packages/api-database/src/schema.ts`
 2. Run `make db-generate`
-3. Review generated SQL under `apps/api/drizzle/`
+3. Review generated SQL under `packages/api-database/drizzle/`
 4. Run `make db-migrate` (uses `DATABASE_MIGRATE_URL` or `POSTGRES_*` admin credentials)
 5. Run `make db-seed` if needed
 

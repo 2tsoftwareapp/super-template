@@ -26,4 +26,4 @@ Prefer the root scripts so the API stays aligned with the rest of the monorepo:
 ## Schema
 
 The Drizzle schema lives in `packages/api-database/src/schema.ts`.
-Generated SQL migrations are written under `apps/api/drizzle/`.
+Generated SQL migrations are written under `packages/api-database/drizzle/`.
