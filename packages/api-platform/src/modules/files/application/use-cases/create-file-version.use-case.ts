@@ -4,8 +4,7 @@ import type {
 } from '@repo/api-core';
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import {  AppError, ERROR_CODES, requireOrganizationId , SYSTEM_SCOPE, TRANSACTION_PORT, type TransactionPort } from '@repo/api-core';
-import { isPostgresUniqueViolation } from '@repo/api-database';
+import { AppError, ERROR_CODES, requireOrganizationId, SYSTEM_SCOPE, TRANSACTION_PORT, type TransactionPort } from '@repo/api-core';
 import { createHash, randomUUID } from 'node:crypto';
 
 import { AuditService } from '../../../audit/application/audit.service';
@@ -13,6 +12,7 @@ import {
   OBJECT_STORAGE,
   type ObjectStorage,
 } from '../../../storage/application/object-storage.interface';
+import { FileVersionConflictError } from '../../domain/errors';
 import {
   getUploadExtension,
   MAX_FILE_SIZE_BYTES,
@@ -107,10 +107,10 @@ export class CreateFileVersionUseCase {
               createdById: actor.userId,
             }, tx);
           } catch (error) {
-            // A concurrent upload computed the same version number and won the
-            // unique (file_id, version_number) index - surface a soft conflict
-            // instead of a 500.
-            if (isPostgresUniqueViolation(error)) {
+            // The repository translates the unique (file_id, version_number)
+            // violation into a domain error — surface a soft conflict instead
+            // of a 500; a concurrent upload can simply be retried.
+            if (error instanceof FileVersionConflictError) {
               throw new AppError(
                 ERROR_CODES.RESOURCE_CONFLICT,
                 'File version was updated concurrently, please retry',

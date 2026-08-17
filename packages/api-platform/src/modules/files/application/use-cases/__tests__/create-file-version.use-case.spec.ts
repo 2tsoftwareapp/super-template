@@ -2,7 +2,8 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { AppError, ERROR_CODES } from '@repo/api-core';
 
-import { CreateFileVersionUseCase } from '@platform/modules/files/application/use-cases/create-file-version.use-case';
+import { FileVersionConflictError } from '../../../domain/errors';
+import { CreateFileVersionUseCase } from '../create-file-version.use-case';
 
 const actor = {
   userId: 'user-1',
@@ -162,7 +163,7 @@ describe('CreateFileVersionUseCase', () => {
     };
     const filesRepository = {
       createVersion: vi.fn(async () => {
-        throw Object.assign(new Error('duplicate key value'), { code: '23505' });
+        throw new FileVersionConflictError();
       }),
       setCurrentVersion: vi.fn(),
     };

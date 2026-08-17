@@ -2,7 +2,7 @@ import type {
   DatabaseClient,
   DatabaseExecutor,
 } from '@repo/api-database';
-import { runIdempotentInsert } from '@repo/api-database';
+import { isPostgresUniqueViolation, runIdempotentInsert } from '@repo/api-database';
 
 import { Inject, Injectable } from '@nestjs/common';
 import { DATABASE } from '@repo/api-database';
@@ -28,6 +28,8 @@ import type {
   JsonObject,
   ListFilesQuery,
 } from '../application/ports/files.repository.port';
+
+import { FileVersionConflictError } from '../domain/errors';
 
 const FILE_SORT_FIELDS = {
   createdAt: files.createdAt,
@@ -179,16 +181,26 @@ export class FilesRepository implements FilesRepositoryPort {
     values: typeof fileVersions.$inferInsert,
     executor: DatabaseExecutor = this.database,
   ) {
-    const [version] = await executor
-      .insert(fileVersions)
-      .values(values)
-      .returning();
+    try {
+      const [version] = await executor
+        .insert(fileVersions)
+        .values(values)
+        .returning();
 
-    if (!version) {
-      throw new Error('File version insert returned no rows');
+      if (!version) {
+        throw new Error('File version insert returned no rows');
+      }
+
+      return version;
+    } catch (error) {
+      // A concurrent upload computed the same version number and won the
+      // unique (file_id, version_number) index — surface a soft conflict to
+      // the application layer instead of leaking the raw DB error.
+      if (isPostgresUniqueViolation(error)) {
+        throw new FileVersionConflictError();
+      }
+      throw error;
     }
-
-    return version;
   }
 
   async listVersions(
