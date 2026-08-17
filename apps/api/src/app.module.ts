@@ -47,11 +47,10 @@ import { TenantContextInterceptor } from './shell/tenant-context.interceptor';
       inject: [EnvironmentService],
       useFactory: (environmentService: EnvironmentService) => ({
         skipIf: () => environmentService.isTest,
-        // TODO: replace to config TTL and LIMIT
         throttlers: [
           {
-            ttl: 60_000,
-            limit: 120,
+            ttl: environmentService.values.THROTTLER_TTL_MS,
+            limit: environmentService.values.THROTTLER_LIMIT,
           },
         ],
         storage: new RedisThrottlerStorage(environmentService),

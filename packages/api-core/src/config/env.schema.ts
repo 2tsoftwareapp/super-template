@@ -32,6 +32,12 @@ export const envSchema = z.object({
   DATABASE_URL_TEST_ADMIN: emptyStringToUndefined,
   // Public and internal HTTP endpoints.
   API_PORT: z.coerce.number().int().positive().default(3001),
+  // Global URL prefix for all API routes (e.g. "api/v1"). Kept configurable so
+  // deployed environments can mount the service under a different base path.
+  API_GLOBAL_PREFIX: z.string().min(1).default('api/v1'),
+  // Shared throttler window/limit across all routes (60s / 120 requests by default).
+  THROTTLER_TTL_MS: z.coerce.number().int().positive().default(60_000),
+  THROTTLER_LIMIT: z.coerce.number().int().positive().default(120),
   // Max JSON/urlencoded request body size accepted by Express (e.g. "1mb", "500kb").
   API_BODY_LIMIT: z
     .string()
