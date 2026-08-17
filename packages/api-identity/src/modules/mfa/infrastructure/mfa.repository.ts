@@ -119,14 +119,24 @@ export class MfaRepository implements MfaRepositoryPort {
     return code ?? null;
   }
 
+  /**
+   * Atomically mark a recovery code used, but ONLY if it is still unused.
+   * Returns false when another concurrent request already consumed it
+   * (TOCTOU guard: the row-level predicate is the gate, not a prior SELECT).
+   */
   async consumeRecoveryCode(
     id: string,
     executor: DatabaseExecutor = this.database,
-  ) {
-    await executor
+  ): Promise<boolean> {
+    const updated = await executor
       .update(userRecoveryCodes)
       .set({ usedAt: new Date() })
-      .where(eq(userRecoveryCodes.id, id));
+      .where(
+        and(eq(userRecoveryCodes.id, id), isNull(userRecoveryCodes.usedAt)),
+      )
+      .returning({ id: userRecoveryCodes.id });
+
+    return updated.length > 0;
   }
 
   async createChallenge(
@@ -173,16 +183,23 @@ export class MfaRepository implements MfaRepositoryPort {
     return challenge ?? null;
   }
 
+  /**
+   * Atomically mark a challenge consumed, but ONLY if it is still unconsumed.
+   * Returns false when another concurrent request already consumed it, so the
+   * caller must treat a false result as "this one-time challenge is gone".
+   */
   async consumeChallenge(
     id: string,
     executor: DatabaseExecutor = this.database,
-  ) {
-    const [challenge] = await executor
+  ): Promise<boolean> {
+    const updated = await executor
       .update(mfaChallenges)
       .set({ consumedAt: new Date() })
-      .where(eq(mfaChallenges.id, id))
-      .returning();
+      .where(
+        and(eq(mfaChallenges.id, id), isNull(mfaChallenges.consumedAt)),
+      )
+      .returning({ id: mfaChallenges.id });
 
-    return challenge ?? null;
+    return updated.length > 0;
   }
 }

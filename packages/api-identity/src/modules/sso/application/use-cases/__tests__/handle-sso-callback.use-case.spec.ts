@@ -80,6 +80,30 @@ describe('HandleSsoCallbackUseCase', () => {
     ).rejects.toMatchObject({ code: ERROR_CODES.SSO_STATE_INVALID });
   });
 
+  it('rejects a state a concurrent request already consumed (replay)', async () => {
+    const ssoRepository = {
+      findValidLoginStateByStateHash: vi.fn(async () => buildLoginState()),
+      // CAS consume loses the race: this state was already replayed.
+      consumeLoginState: vi.fn(async () => false),
+    };
+    const provider = {
+      exchangeCode: vi.fn(async () => ({ idToken: 'idtok' })),
+    };
+    const issueSessionUseCase = buildIssueSessionUseCase();
+    const useCase = buildUseCase({
+      providers: new Map([['fake', provider]]),
+      ssoRepository,
+      issueSessionUseCase,
+    });
+
+    await expect(
+      useCase.execute({ provider: 'fake', code: 'c', state: 's' }),
+    ).rejects.toMatchObject({ code: ERROR_CODES.SSO_STATE_INVALID });
+    // Consume-first: no provider exchange, no account/session side effects.
+    expect(provider.exchangeCode).not.toHaveBeenCalled();
+    expect(issueSessionUseCase.execute).not.toHaveBeenCalled();
+  });
+
   it('rejects when the state belongs to a different provider', async () => {
     const ssoRepository = {
       findValidLoginStateByStateHash: vi.fn(async () =>
@@ -99,7 +123,7 @@ describe('HandleSsoCallbackUseCase', () => {
   it('audits and rejects when the provider fails to verify the identity', async () => {
     const ssoRepository = {
       findValidLoginStateByStateHash: vi.fn(async () => buildLoginState()),
-      consumeLoginState: vi.fn(async () => undefined),
+      consumeLoginState: vi.fn(async () => true),
     };
     const provider = {
       exchangeCode: vi.fn(async () => {
@@ -124,7 +148,7 @@ describe('HandleSsoCallbackUseCase', () => {
   it('rejects creating a new account when the provider did not verify the email', async () => {
     const ssoRepository = {
       findValidLoginStateByStateHash: vi.fn(async () => buildLoginState()),
-      consumeLoginState: vi.fn(async () => undefined),
+      consumeLoginState: vi.fn(async () => true),
       findIdentity: vi.fn(async () => null),
     };
     const provider = {
@@ -150,7 +174,7 @@ describe('HandleSsoCallbackUseCase', () => {
   it('rejects linking onto an unverified existing account (conflict)', async () => {
     const ssoRepository = {
       findValidLoginStateByStateHash: vi.fn(async () => buildLoginState()),
-      consumeLoginState: vi.fn(async () => undefined),
+      consumeLoginState: vi.fn(async () => true),
       findIdentity: vi.fn(async () => null),
     };
     const provider = {
@@ -181,7 +205,7 @@ describe('HandleSsoCallbackUseCase', () => {
   it('rejects linking when the provider did not verify the email', async () => {
     const ssoRepository = {
       findValidLoginStateByStateHash: vi.fn(async () => buildLoginState()),
-      consumeLoginState: vi.fn(async () => undefined),
+      consumeLoginState: vi.fn(async () => true),
       findIdentity: vi.fn(async () => null),
     };
     const provider = {
@@ -212,7 +236,7 @@ describe('HandleSsoCallbackUseCase', () => {
   it('links to a verified existing account and issues a session', async () => {
     const ssoRepository = {
       findValidLoginStateByStateHash: vi.fn(async () => buildLoginState()),
-      consumeLoginState: vi.fn(async () => undefined),
+      consumeLoginState: vi.fn(async () => true),
       findIdentity: vi.fn(async () => null),
       createIdentity: vi.fn(async () => undefined),
     };
@@ -271,7 +295,7 @@ describe('HandleSsoCallbackUseCase', () => {
   it('creates a new account, assigns the USER role, and provisions a personal organization', async () => {
     const ssoRepository = {
       findValidLoginStateByStateHash: vi.fn(async () => buildLoginState()),
-      consumeLoginState: vi.fn(async () => undefined),
+      consumeLoginState: vi.fn(async () => true),
       findIdentity: vi.fn(async () => null),
       createIdentity: vi.fn(async () => undefined),
     };
@@ -333,7 +357,7 @@ describe('HandleSsoCallbackUseCase', () => {
     const linkedUser = { id: 'linked-user' };
     const ssoRepository = {
       findValidLoginStateByStateHash: vi.fn(async () => buildLoginState()),
-      consumeLoginState: vi.fn(async () => undefined),
+      consumeLoginState: vi.fn(async () => true),
       findIdentity: vi.fn(async () => ({ userId: 'linked-user' })),
     };
     const provider = {

@@ -68,7 +68,20 @@ export class HandleSsoCallbackUseCase {
       );
     }
 
-    await this.ssoRepository.consumeLoginState(loginState.id);
+    // CAS-consume the one-time state BEFORE any side effect: a false result
+    // means a concurrent request already replayed this state, so the callback
+    // must abort instead of running the login flow twice (TOCTOU guard).
+    const stateConsumed = await this.ssoRepository.consumeLoginState(
+      loginState.id,
+    );
+
+    if (!stateConsumed) {
+      throw new AppError(
+        ERROR_CODES.SSO_STATE_INVALID,
+        'SSO login state was already used',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
 
     let identity: Awaited<ReturnType<typeof provider.verifyIdToken>>;
 

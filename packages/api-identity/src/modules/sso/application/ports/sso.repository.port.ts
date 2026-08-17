@@ -50,10 +50,14 @@ export interface SsoRepositoryPort {
     executor?: TransactionExecutor,
   ): Promise<SsoLoginStateRecord | null>;
 
+  /**
+   * CAS-consume a login state: only succeeds when still unconsumed.
+   * Returns false if a concurrent request already replayed the same state.
+   */
   consumeLoginState(
     id: string,
     executor?: TransactionExecutor,
-  ): Promise<void>;
+  ): Promise<boolean>;
 
   createSessionExchange(
     values: {
@@ -70,10 +74,14 @@ export interface SsoRepositoryPort {
     executor?: TransactionExecutor,
   ): Promise<SsoSessionExchangeRecord | null>;
 
+  /**
+   * CAS-consume a session exchange: only succeeds when still unconsumed.
+   * Returns false if a concurrent request already redeemed the same code.
+   */
   consumeSessionExchange(
     id: string,
     executor?: TransactionExecutor,
-  ): Promise<void>;
+  ): Promise<boolean>;
 
   findIdentity(
     provider: string,

@@ -58,7 +58,7 @@ describe('MfaCodeVerifierService', () => {
       findUnusedRecoveryCodeByHash: vi.fn(async (_userId, hash) =>
         hash === hashRecoveryCode(recoveryCode) ? { id: 'rc1' } : null,
       ),
-      consumeRecoveryCode: vi.fn(async () => undefined),
+      consumeRecoveryCode: vi.fn(async () => true),
     };
     const service = new MfaCodeVerifierService(
       mfaRepository as never,
@@ -66,6 +66,29 @@ describe('MfaCodeVerifierService', () => {
     );
 
     expect(await service.verifyCode('u1', recoveryCode)).toBe(true);
+    expect(mfaRepository.consumeRecoveryCode).toHaveBeenCalledWith('rc1', undefined);
+  });
+
+  it('rejects a recovery code that a concurrent request already consumed', async () => {
+    const secret = generateTotpSecret();
+    const encrypted = encryptTotpSecret(secret, ENCRYPTION_KEY);
+    const recoveryCode = 'ABCD-EFGH';
+    const mfaRepository = {
+      findSecretByUserId: vi.fn(async () => ({
+        secretCiphertext: encrypted.ciphertext,
+        secretIv: encrypted.iv,
+        secretAuthTag: encrypted.authTag,
+      })),
+      findUnusedRecoveryCodeByHash: vi.fn(async () => ({ id: 'rc1' })),
+      consumeRecoveryCode: vi.fn(async () => false),
+    };
+    const service = new MfaCodeVerifierService(
+      mfaRepository as never,
+      buildEnvironmentService(),
+    );
+
+    // The CAS consume lost the race — the code must not authenticate twice.
+    expect(await service.verifyCode('u1', recoveryCode)).toBe(false);
     expect(mfaRepository.consumeRecoveryCode).toHaveBeenCalledWith('rc1', undefined);
   });
 

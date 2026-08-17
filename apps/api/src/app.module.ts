@@ -47,6 +47,7 @@ import { TenantContextInterceptor } from './shell/tenant-context.interceptor';
       inject: [EnvironmentService],
       useFactory: (environmentService: EnvironmentService) => ({
         skipIf: () => environmentService.isTest,
+        // TODO: replace to config TTL and LIMIT
         throttlers: [
           {
             ttl: 60_000,

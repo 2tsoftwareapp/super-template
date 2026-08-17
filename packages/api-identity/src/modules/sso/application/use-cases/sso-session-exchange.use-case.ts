@@ -57,17 +57,19 @@ export class ExchangeSsoSessionUseCase {
   ) {}
 
   /**
-   * Redeem an exchange code: validate session, re-issue tokens, consume code.
+   * Redeem an exchange code: consume code, validate session, re-issue tokens.
    *
-   * Flow:
-   *   1. Resolve unused, unexpired exchange by code hash.
+   * Flow (consume-first so the one-time code is the atomic gate):
+   *   1. CAS-consume the unused, unexpired exchange by id. False → the code
+   *      was already redeemed by a concurrent request — never re-issue.
    *   2. Load the bound session; reject if missing/revoked/expired.
    *   3. Re-issue access/refresh for that session (invalidates unused pre-exchange tokens).
-   *   4. Consume the exchange (one-time).
    * Trace: CODING_RULES §12 secret-at-rest / D-001.
    */
   async execute(code: string) {
-    // Step 1
+    // Step 1 — resolve the exchange, then consume it atomically. The CAS
+    // consume is the gate: two racing redemptions of the same code cannot
+    // both win, so a stolen code cannot mint tokens twice (TOCTOU guard).
     const exchange = await this.ssoRepository.findValidSessionExchangeByCodeHash(
       hashOpaqueToken(code),
     );
@@ -76,6 +78,18 @@ export class ExchangeSsoSessionUseCase {
       throw new AppError(
         ERROR_CODES.SSO_EXCHANGE_INVALID,
         'SSO exchange code is invalid or expired',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    const consumed = await this.ssoRepository.consumeSessionExchange(
+      exchange.id,
+    );
+
+    if (!consumed) {
+      throw new AppError(
+        ERROR_CODES.SSO_EXCHANGE_INVALID,
+        'SSO exchange code was already used',
         HttpStatus.UNAUTHORIZED,
       );
     }
@@ -109,9 +123,6 @@ export class ExchangeSsoSessionUseCase {
         userAgent: session.userAgent,
       },
     );
-
-    // Step 4
-    await this.ssoRepository.consumeSessionExchange(exchange.id);
 
     return {
       accessToken: tokens.accessToken,

@@ -72,7 +72,19 @@ export class VerifyMfaChallengeUseCase {
       );
     }
 
-    await this.mfaRepository.consumeChallenge(challenge.id);
+    // CAS-consume the one-time challenge BEFORE granting access. A false
+    // result means a concurrent request already consumed it — this request
+    // loses the race and must not authenticate (TOCTOU guard).
+    const consumed = await this.mfaRepository.consumeChallenge(challenge.id);
+
+    if (!consumed) {
+      throw new AppError(
+        ERROR_CODES.MFA_CHALLENGE_INVALID,
+        'Challenge was already used',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
     await this.auditWriter.log({
       actorId: challenge.userId,
       action: 'mfa.challenge.succeeded',

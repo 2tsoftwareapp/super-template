@@ -1,6 +1,5 @@
 import { Test } from '@nestjs/testing';
 import {
-  ACTIVITY_EMITTER,
   ImportExportAdapterRegistry,
   TRANSACTION_PORT,
 } from '@repo/api-core';
@@ -8,8 +7,6 @@ import { CreateExportUseCase } from '@repo/api-platform/modules/exports/applicat
 import { GetExportUseCase } from '@repo/api-platform/modules/exports/application/use-cases/get-export.use-case';
 import { EXPORT_JOBS_REPOSITORY } from '@repo/api-platform/modules/exports/application/ports/export-jobs.repository.port';
 import { AuditService } from '@repo/api-platform/modules/audit/application/audit.service';
-import { FILES_REPOSITORY } from '@repo/api-platform/modules/files/application/ports/files.repository.port';
-import { OBJECT_STORAGE } from '@repo/api-platform/modules/storage/application/object-storage.interface';
 import { describe, expect, it, vi } from 'vitest';
 
 const actor = {
@@ -46,6 +43,7 @@ describe('CreateExportUseCase idempotency', () => {
       }),
       create: vi.fn(),
       update: vi.fn(),
+      findById: vi.fn().mockResolvedValue(existingJob),
     };
 
     const moduleRef = await Test.createTestingModule({
@@ -53,7 +51,6 @@ describe('CreateExportUseCase idempotency', () => {
         CreateExportUseCase,
         GetExportUseCase,
         { provide: EXPORT_JOBS_REPOSITORY, useValue: exportJobsRepository },
-        { provide: FILES_REPOSITORY, useValue: {} },
         {
           provide: ImportExportAdapterRegistry,
           useValue: {
@@ -62,20 +59,16 @@ describe('CreateExportUseCase idempotency', () => {
           },
         },
         {
-          provide: OBJECT_STORAGE,
-          useValue: { upload: vi.fn(), delete: vi.fn() },
-        },
-        {
           provide: AuditService,
           useValue: { log: vi.fn() },
         },
         {
           provide: TRANSACTION_PORT,
-          useValue: { run: vi.fn((fn: (tx: unknown) => unknown) => fn({})) },
-        },
-        {
-          provide: ACTIVITY_EMITTER,
-          useValue: { emit: vi.fn() },
+          useValue: {
+            withTenant: vi.fn((_ctx: unknown, fn: (tx: unknown) => unknown) =>
+              fn({}),
+            ),
+          },
         },
       ],
     }).compile();
@@ -91,8 +84,11 @@ describe('CreateExportUseCase idempotency', () => {
         createdById: actor.userId,
         idempotencyKey: 'export-attempt-1',
       }),
+      expect.anything(),
     );
     expect(exportJobsRepository.create).not.toHaveBeenCalled();
+    // Replay resolves through GetExportUseCase -> the existing completed job.
+    expect(exportJobsRepository.findById).toHaveBeenCalledWith(existingJob.id);
     expect(result).toMatchObject({
       id: existingJob.id,
       status: 'COMPLETED',

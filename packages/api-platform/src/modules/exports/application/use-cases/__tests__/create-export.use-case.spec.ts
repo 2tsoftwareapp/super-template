@@ -13,54 +13,33 @@ const createActor = (permissions: string[] = []) => ({
   organizationId: 'org-1',
 });
 
-function createUseCase(overrides?: Record<string, unknown>) {
-  const mockAdapter = {
-    type: 'users',
-    csvHeader: ['email', 'displayName', 'avatarUrl'],
-    listForExport: vi.fn(async () => [
-      { email: 'a@b.com', displayName: 'A' },
-      { email: 'c@d.com', displayName: 'C' },
-    ]),
-    toCsvRow: vi.fn((row: Record<string, string>) => [
-      row.email,
-      row.displayName,
-    ]),
-  };
+const buildJob = (overrides: Record<string, unknown> = {}) => ({
+  id: 'export-1',
+  type: 'users',
+  status: 'PENDING',
+  filters: null,
+  fileId: null,
+  organizationId: 'org-1',
+  createdById: 'user-1',
+  idempotencyKey: null,
+  completedAt: null,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  ...overrides,
+});
 
+function createUseCase(overrides?: Record<string, unknown>) {
   const exportJobsRepository = {
-    create: vi.fn(async (values: Record<string, unknown>) => ({
-      id: 'export-1',
-      ...values,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    })),
+    create: vi.fn(async (values: Record<string, unknown>) =>
+      buildJob(values),
+    ),
     createIdempotent: vi.fn(),
-    update: vi.fn(async (id: string, _data: Record<string, unknown>) => ({
-      id,
-      status: 'COMPLETED',
-      completedAt: new Date(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    })),
+    update: vi.fn(),
     ...(overrides?.exportJobsRepository as Record<string, unknown> ?? {}),
   };
 
-  const filesRepository = {
-    create: vi.fn(async (values: Record<string, unknown>) => ({
-      id: 'file-export-1',
-      ...values,
-    })),
-    ...(overrides?.filesRepository as Record<string, unknown> ?? {}),
-  };
-
-  const mockObjectStorage = {
-    upload: vi.fn(),
-    delete: vi.fn(),
-    ...(overrides?.objectStorage as Record<string, unknown> ?? {}),
-  };
-
   const importExportAdapters = {
-    resolve: vi.fn(() => mockAdapter),
+    resolve: vi.fn(),
     getExportPermissions: vi.fn(() => []),
     ...(overrides?.importExportAdapters as Record<string, unknown> ?? {}),
   };
@@ -71,165 +50,74 @@ function createUseCase(overrides?: Record<string, unknown>) {
   };
 
   const transactionPort = {
-    run: vi.fn(async (cb: (tx: unknown) => Promise<unknown>) => cb({})),
+    withTenant: vi.fn(async (_ctx: unknown, cb: (tx: unknown) => Promise<unknown>) =>
+      cb({}),
+    ),
+    run: vi.fn(),
+    withSavepoint: vi.fn(),
     ...(overrides?.transactionPort as Record<string, unknown> ?? {}),
   };
 
-  const activityEmitter = {
-    emit: vi.fn(async () => undefined),
-    ...(overrides?.activityEmitter as Record<string, unknown> ?? {}),
+  const getExportUseCase = {
+    execute: vi.fn(async () => buildJob({ id: 'export-existing' })),
+    ...(overrides?.getExportUseCase as Record<string, unknown> ?? {}),
   };
 
   const useCase = new CreateExportUseCase(
     exportJobsRepository as never,
-    filesRepository as never,
     importExportAdapters as never,
-    mockObjectStorage as never,
     auditService as never,
     transactionPort as never,
-    activityEmitter as never,
+    getExportUseCase as never,
   );
 
   return {
     useCase,
     exportJobsRepository,
-    filesRepository,
     importExportAdapters,
-    mockObjectStorage,
     auditService,
     transactionPort,
-    activityEmitter,
-    mockAdapter,
+    getExportUseCase,
   };
 }
 
 describe('CreateExportUseCase', () => {
-  it('creates an export job, calls listForExport, and uploads CSV', async () => {
-    const {
-      useCase,
-      exportJobsRepository,
-      mockObjectStorage,
-      auditService,
-      mockAdapter,
-    } = createUseCase();
+  it('enqueues a PENDING export job without doing any export work', async () => {
+    const { useCase, exportJobsRepository, auditService, transactionPort } =
+      createUseCase();
 
-    const result = await useCase.execute(
-      createActor(),
-      { type: 'users' },
+    const result = await useCase.execute(createActor(), { type: 'users' });
+
+    expect(transactionPort.withTenant).toHaveBeenCalledWith(
+      { tenantId: 'org-1', userId: 'user-1' },
+      expect.any(Function),
     );
-
     expect(exportJobsRepository.create).toHaveBeenCalledWith(
       expect.objectContaining({
         type: 'users',
         organizationId: 'org-1',
-        status: 'PROCESSING',
+        status: 'PENDING',
         createdById: 'user-1',
       }),
-    );
-
-    expect(mockAdapter.listForExport).toHaveBeenCalledWith({
-      organizationId: 'org-1',
-      ownerId: 'user-1',
-      limit: 50001,
-    });
-
-    expect(mockObjectStorage.upload).toHaveBeenCalledWith(
-      expect.objectContaining({
-        mimeType: 'text/csv',
-      }),
+      expect.anything(),
     );
 
     expect(auditService.log).toHaveBeenCalledWith(
       expect.objectContaining({
         action: 'export.created',
-      }),
-      expect.anything(),
-    );
-
-    expect(result.status).toBe('COMPLETED');
-  });
-
-  it('fails the export when the row cap is exceeded', async () => {
-    const { useCase, exportJobsRepository, mockObjectStorage } = createUseCase({
-      mockAdapter: {
-        type: 'users',
-        csvHeader: ['email'],
-        listForExport: vi.fn(async () =>
-          Array.from({ length: 50001 }, (_, i) => ({ email: `u${i}@x.com` })),
-        ),
-        toCsvRow: vi.fn((row: { email: string }) => [row.email]),
-      },
-      importExportAdapters: {
-        resolve: vi.fn(() => ({
-          type: 'users',
-          csvHeader: ['email'],
-          listForExport: vi.fn(async () =>
-            Array.from({ length: 50001 }, (_, i) => ({
-              email: `u${i}@x.com`,
-            })),
-          ),
-          toCsvRow: vi.fn((row: { email: string }) => [row.email]),
-        })),
-        getExportPermissions: vi.fn(() => []),
-      },
-    });
-
-    await expect(
-      useCase.execute(createActor(), { type: 'users' }),
-    ).rejects.toThrow(/exceeds the maximum of 50000 rows/);
-
-    // No CSV was uploaded and the job was marked FAILED.
-    expect(mockObjectStorage.upload).not.toHaveBeenCalled();
-    expect(exportJobsRepository.update).toHaveBeenCalledWith(
-      'export-1',
-      expect.objectContaining({ status: 'FAILED' }),
-    );
-  });
-
-  it('emits an activity when the export completes', async () => {
-    const { useCase, activityEmitter } = createUseCase();
-
-    await useCase.execute(createActor(), { type: 'users' });
-
-    expect(activityEmitter.emit).toHaveBeenCalledWith(
-      expect.objectContaining({
-        organizationId: 'org-1',
-        summary: expect.stringContaining('Export "users" completed'),
         entityType: 'export_job',
         entityId: 'export-1',
-        actorId: 'user-1',
-        metadata: expect.objectContaining({ rowCount: 2 }),
+        metadata: { type: 'users' },
       }),
       expect.anything(),
     );
-  });
 
-  it('does not emit an activity when the export is idempotently returned', async () => {
-    const { useCase, activityEmitter } = createUseCase({
-      exportJobsRepository: {
-        create: vi.fn(),
-        createIdempotent: vi.fn(async () => ({
-          value: {
-            id: 'export-existing',
-            type: 'users',
-            organizationId: 'org-1',
-            status: 'COMPLETED',
-            createdById: 'user-1',
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-          created: false,
-        })),
-        update: vi.fn(),
-      },
+    expect(result).toMatchObject({
+      id: 'export-1',
+      status: 'PENDING',
+      fileId: null,
+      completedAt: null,
     });
-
-    await useCase.execute(
-      createActor(),
-      { type: 'users', idempotencyKey: 'idem-456' },
-    );
-
-    expect(activityEmitter.emit).not.toHaveBeenCalled();
   });
 
   it('rejects when actor lacks required export permissions', async () => {
@@ -243,90 +131,49 @@ describe('CreateExportUseCase', () => {
     await expect(
       useCase.execute(createActor([]), { type: 'users' }),
     ).rejects.toThrow('Missing required permission: users.read');
+    expect(useCase).toBeDefined();
   });
 
-  it('allows when actor has required export permissions', async () => {
-    const { useCase, exportJobsRepository } = createUseCase({
-      importExportAdapters: {
-        resolve: vi.fn(() => ({
-          type: 'users',
-          csvHeader: ['email'],
-          listForExport: vi.fn(async () => []),
-          toCsvRow: vi.fn(),
-        })),
-        getExportPermissions: vi.fn(() => ['users.read']),
-      },
-    });
-
-    const actor = createActor(['users.read']);
-    const result = await useCase.execute(actor, { type: 'users' });
-
-    expect(exportJobsRepository.create).toHaveBeenCalled();
-    expect(result).toBeDefined();
-  });
-
-  it('supports idempotency key', async () => {
-    const { useCase, exportJobsRepository } = createUseCase({
+  it('supports idempotency key by replaying the existing job', async () => {
+    const { useCase, exportJobsRepository, auditService } = createUseCase({
       exportJobsRepository: {
         create: vi.fn(),
         createIdempotent: vi.fn(async () => ({
-          value: {
-            id: 'export-existing',
-            type: 'users',
-            organizationId: 'org-1',
-            status: 'COMPLETED',
-            createdById: 'user-1',
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
+          value: buildJob({ id: 'export-existing', status: 'COMPLETED' }),
           created: false,
         })),
         update: vi.fn(),
       },
     });
 
-    const result = await useCase.execute(
-      createActor(),
-      { type: 'users', idempotencyKey: 'idem-456' },
-    );
+    const result = await useCase.execute(createActor(), {
+      type: 'users',
+      idempotencyKey: 'idem-456',
+    });
 
     expect(exportJobsRepository.createIdempotent).toHaveBeenCalledWith(
       expect.objectContaining({ idempotencyKey: 'idem-456' }),
+      expect.anything(),
     );
     expect(exportJobsRepository.create).not.toHaveBeenCalled();
-    expect(result.status).toBe('COMPLETED');
+    // No duplicate audit on replay.
+    expect(auditService.log).not.toHaveBeenCalled();
+    expect(result).toMatchObject({ id: 'export-existing' });
   });
 
-  it('cleans up storage on failure', async () => {
-    const { useCase, mockObjectStorage, exportJobsRepository } = createUseCase({
-      mockAdapter: {
-        type: 'users',
-        csvHeader: ['email'],
-        listForExport: vi.fn(async () => {
-          throw new Error('Export failed');
-        }),
-        toCsvRow: vi.fn(),
-      },
+  it('resolves the adapter up front so an unknown type fails fast', async () => {
+    const { useCase, importExportAdapters } = createUseCase({
       importExportAdapters: {
-        resolve: vi.fn(() => ({
-          type: 'users',
-          csvHeader: ['email'],
-          listForExport: vi.fn(async () => {
-            throw new Error('Export failed');
-          }),
-          toCsvRow: vi.fn(),
-        })),
+        resolve: vi.fn(() => {
+          throw new Error('Unsupported import/export type "unknown"');
+        }),
         getExportPermissions: vi.fn(() => []),
       },
     });
 
     await expect(
-      useCase.execute(createActor(), { type: 'users' }),
-    ).rejects.toThrow('Export failed');
-
-    expect(exportJobsRepository.update).toHaveBeenCalledWith(
-      'export-1',
-      expect.objectContaining({ status: 'FAILED' }),
-    );
+      useCase.execute(createActor(), { type: 'unknown' }),
+    ).rejects.toThrow('Unsupported import/export type "unknown"');
+    expect(importExportAdapters.resolve).toHaveBeenCalledWith('unknown');
   });
 });

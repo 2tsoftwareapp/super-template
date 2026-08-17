@@ -44,7 +44,7 @@ describe('Sso session exchange use cases', () => {
           organizationId: 'org-1',
         })
         .mockResolvedValueOnce(null),
-      consumeSessionExchange: vi.fn(async () => undefined),
+      consumeSessionExchange: vi.fn(async () => true),
     };
     const authSessionRepository = {
       findSessionById: vi.fn(async () => ({
@@ -85,8 +85,39 @@ describe('Sso session exchange use cases', () => {
       'exchange-1',
     );
 
+    // Replay: the code is gone from the exchange table → rejected.
     await expect(useCase.execute('exchange-code')).rejects.toMatchObject({
       code: ERROR_CODES.SSO_EXCHANGE_INVALID,
     });
+  });
+
+  it('rejects a code a concurrent request already consumed (no double token mint)', async () => {
+    const ssoRepository = {
+      findValidSessionExchangeByCodeHash: vi.fn(async () => ({
+        id: 'exchange-1',
+        sessionId: 'session-1',
+        organizationId: 'org-1',
+      })),
+      // CAS consume loses the race: another request already redeemed this code.
+      consumeSessionExchange: vi.fn(async () => false),
+    };
+    const authSessionRepository = {
+      findSessionById: vi.fn(),
+    };
+    const tokenProvider = {
+      reissueSessionTokens: vi.fn(),
+    };
+    const useCase = new ExchangeSsoSessionUseCase(
+      ssoRepository as never,
+      authSessionRepository as never,
+      tokenProvider as never,
+    );
+
+    await expect(useCase.execute('exchange-code')).rejects.toMatchObject({
+      code: ERROR_CODES.SSO_EXCHANGE_INVALID,
+    });
+    // Consume-first: tokens must never be re-issued after a lost race.
+    expect(tokenProvider.reissueSessionTokens).not.toHaveBeenCalled();
+    expect(authSessionRepository.findSessionById).not.toHaveBeenCalled();
   });
 });

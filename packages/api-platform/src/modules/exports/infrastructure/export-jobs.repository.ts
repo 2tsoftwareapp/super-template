@@ -6,9 +6,12 @@ import type {
 import { Inject, Injectable } from '@nestjs/common';
 import { DATABASE, runIdempotentInsert } from '@repo/api-database';
 import { exportJobs } from '@repo/api-database';
-import { and, eq, lt } from 'drizzle-orm';
+import { and, eq, inArray, lt, sql } from 'drizzle-orm';
 
-import type { ExportJobsRepositoryPort } from '../application/ports/export-jobs.repository.port';
+import type {
+  ExportJobRecord,
+  ExportJobsRepositoryPort,
+} from '../application/ports/export-jobs.repository.port';
 
 @Injectable()
 export class ExportJobsRepository implements ExportJobsRepositoryPort {
@@ -94,13 +97,46 @@ export class ExportJobsRepository implements ExportJobsRepositoryPort {
     return job ?? null;
   }
 
+  async claimPending(
+    limit: number,
+    executor: DatabaseExecutor = this.database,
+  ): Promise<ExportJobRecord[]> {
+    // Raw SQL for FOR UPDATE SKIP LOCKED (Drizzle builder does not expose it).
+    // Single statement: claim = PENDING -> PROCESSING atomically; concurrent
+    // workers select distinct rows, so a job is never double-processed.
+    const claimed = await executor.execute<{ id: string }>(sql`
+      UPDATE export_jobs
+      SET status = 'PROCESSING', updated_at = now()
+      WHERE id IN (
+        SELECT id FROM export_jobs
+        WHERE status = 'PENDING'
+        ORDER BY created_at ASC
+        LIMIT ${limit}
+        FOR UPDATE SKIP LOCKED
+      )
+      RETURNING id
+    `);
+
+    if (!claimed.rows || claimed.rows.length === 0) {
+      return [];
+    }
+
+    const ids = claimed.rows.map((r) => r.id);
+
+    return executor
+      .select()
+      .from(exportJobs)
+      .where(inArray(exportJobs.id, ids));
+  }
+
   async recoverStaleProcessing(
     before: Date,
     executor: DatabaseExecutor = this.database,
   ): Promise<number> {
-    // Exports are synchronous (created PROCESSING, completed in the request), so
-    // a PROCESSING row untouched past the cutoff means the request died before
-    // finishing. Fail it so the history is terminal and the user can retry.
+    // Export jobs are claimed (PENDING -> PROCESSING) by a worker and completed
+    // in bounded time; a PROCESSING row untouched past the cutoff means the
+    // worker died mid-export. Fail it so history is terminal and the user can
+    // retry.
     const recovered = await executor
       .update(exportJobs)
       .set({ status: 'FAILED', completedAt: new Date(), updatedAt: new Date() })

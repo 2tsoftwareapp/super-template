@@ -12,6 +12,7 @@ export class RequestLoggerMiddleware implements NestMiddleware {
     const startedAt = Date.now();
 
     response.on('finish', () => {
+      // FIX: Do not use magic number, make common function or make common status. Refer: HttpCode in common NestJS
       const level =
         response.statusCode >= 500
           ? 'error'
@@ -26,6 +27,7 @@ export class RequestLoggerMiddleware implements NestMiddleware {
         statusCode: response.statusCode,
         duration: Date.now() - startedAt,
         userId: request.user?.userId ?? null,
+        // FIX: do not use pattern check.
         errorCode:
           typeof response.locals.errorCode === 'string'
             ? response.locals.errorCode

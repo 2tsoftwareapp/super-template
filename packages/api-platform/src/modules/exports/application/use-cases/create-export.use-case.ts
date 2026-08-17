@@ -5,41 +5,34 @@ import type {
 
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import {
-  ACTIVITY_EMITTER,
-  type ActivityEmitter,
   AppError,
   ERROR_CODES,
   ImportExportAdapterRegistry,
   requireOrganizationId,
   SYSTEM_SCOPE,
-  toCsv,
   TRANSACTION_PORT,
   type TransactionPort,
 } from '@repo/api-core';
-import { randomUUID } from 'node:crypto';
 
 import type { CreateExportCommand } from '../exports.types';
 
 import { AuditService } from '../../../audit/application/audit.service';
-import { FILES_REPOSITORY, type FilesRepositoryPort } from '../../../files/application/ports/files.repository.port';
-import {
-  OBJECT_STORAGE,
-  type ObjectStorage,
-} from '../../../storage/application/object-storage.interface';
-import { MAX_EXPORT_ROWS } from '../../domain/export-policy';
 import { ExportsMapper } from '../exports.mapper';
-import { EXPORT_JOBS_REPOSITORY, type ExportJobsRepositoryPort } from '../ports/export-jobs.repository.port';
+import {
+  EXPORT_JOBS_REPOSITORY,
+  type ExportJobsRepositoryPort,
+} from '../ports/export-jobs.repository.port';
+import { GetExportUseCase } from './get-export.use-case';
 
 @Injectable()
 export class CreateExportUseCase {
   constructor(
-    @Inject(EXPORT_JOBS_REPOSITORY) private readonly exportJobsRepository: ExportJobsRepositoryPort,
-    @Inject(FILES_REPOSITORY) private readonly filesRepository: FilesRepositoryPort,
+    @Inject(EXPORT_JOBS_REPOSITORY)
+    private readonly exportJobsRepository: ExportJobsRepositoryPort,
     private readonly importExportAdapters: ImportExportAdapterRegistry,
-    @Inject(OBJECT_STORAGE) private readonly objectStorage: ObjectStorage,
     private readonly auditService: AuditService,
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
-    @Inject(ACTIVITY_EMITTER) private readonly activityEmitter: ActivityEmitter,
+    private readonly getExportUseCase: GetExportUseCase,
   ) {}
 
   async execute(
@@ -50,9 +43,10 @@ export class CreateExportUseCase {
     const organizationId = requireOrganizationId(actor);
 
     // Resolve adapter before creating any DB records
-    const adapter = this.importExportAdapters.resolve(input.type);
+    this.importExportAdapters.resolve(input.type);
 
-    const exportPermissions = this.importExportAdapters.getExportPermissions(input.type);
+    const exportPermissions =
+      this.importExportAdapters.getExportPermissions(input.type);
     for (const permission of exportPermissions) {
       if (!actor.permissions.includes(permission)) {
         throw new AppError(
@@ -66,119 +60,64 @@ export class CreateExportUseCase {
     const jobValues = {
       organizationId,
       type: input.type,
-      status: 'PROCESSING' as const,
+      status: 'PENDING' as const,
       filters: input.filters ?? null,
       createdById: actor.userId,
     };
 
-    const idempotentResult = input.idempotencyKey
-      ? await this.exportJobsRepository.createIdempotent({
-          ...jobValues,
-          idempotencyKey: input.idempotencyKey,
-        })
-      : null;
+    const { job, created } = await this.transactionPort.withTenant(
+      { tenantId: organizationId, userId: actor.userId },
+      async (tx) => {
+        const idempotentResult = input.idempotencyKey
+          ? await this.exportJobsRepository.createIdempotent(
+              {
+                ...jobValues,
+                idempotencyKey: input.idempotencyKey,
+              },
+              tx,
+            )
+          : null;
 
-    const job = idempotentResult
-      ? idempotentResult.value
-      : await this.exportJobsRepository.create(jobValues);
+        const jobRecord = idempotentResult
+          ? idempotentResult.value
+          : await this.exportJobsRepository.create(jobValues, tx);
 
-    if (!job) {
-      throw new Error('Export job insert returned no rows');
+        if (!jobRecord) {
+          throw new Error('Export job insert returned no rows');
+        }
+
+        const isCreated = idempotentResult ? idempotentResult.created : true;
+
+        if (isCreated) {
+          await this.auditService.log(
+            {
+              actorId: actor.userId,
+              action: 'export.created',
+              entityType: 'export_job',
+              entityId: jobRecord.id,
+              metadata: {
+                type: input.type,
+                ...(input.filters ? { filters: input.filters } : {}),
+              },
+              requestContext,
+              scope: SYSTEM_SCOPE.ORGANIZATION,
+              organizationId,
+            },
+            tx,
+          );
+        }
+
+        return { job: jobRecord, created: isCreated };
+      },
+    );
+
+    if (!created) {
+      return this.getExportUseCase.execute(actor, job.id);
     }
 
-    if (idempotentResult && !idempotentResult.created) {
-      return ExportsMapper.toDto(job);
-    }
-
-    let storageKey: string | undefined;
-
-    try {
-      const rows = await adapter.listForExport({
-        organizationId,
-        ownerId: actor.userId,
-        limit: MAX_EXPORT_ROWS + 1,
-      });
-
-      if (rows.length > MAX_EXPORT_ROWS) {
-        throw new AppError(
-          ERROR_CODES.VALIDATION_FAILED,
-          `Export exceeds the maximum of ${MAX_EXPORT_ROWS} rows; narrow your filters and try again`,
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-
-      const csv = toCsv(adapter.csvHeader, rows.map((row) => adapter.toCsvRow(row)));
-      storageKey = `exports/${actor.userId}/${randomUUID()}.csv`;
-      const body = Buffer.from(csv, 'utf8');
-
-      await this.objectStorage.upload({
-        key: storageKey,
-        body,
-        mimeType: 'text/csv',
-      });
-
-      const updatedJob = await this.transactionPort.run(async (tx) => {
-        const file = await this.filesRepository.create({
-          organizationId,
-          storageKey: storageKey!,
-          originalName: `${input.type}-export-${Date.now()}.csv`,
-          mimeType: 'text/csv',
-          sizeBytes: body.length,
-          uploadedById: actor.userId,
-        }, tx);
-
-        if (!file) throw new Error('Export file insert returned no rows');
-
-        const updated = await this.exportJobsRepository.update(job.id, {
-          status: 'COMPLETED',
-          fileId: file.id,
-          completedAt: new Date(),
-        }, tx);
-
-        await this.auditService.log({
-          actorId: actor.userId,
-          action: 'export.created',
-          entityType: 'export_job',
-          entityId: job.id,
-          metadata: { type: input.type, fileId: file.id },
-          requestContext,
-          ...(organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
-        }, tx);
-
-        await this.activityEmitter.emit(
-          {
-            organizationId,
-            summary: `Export "${input.type}" completed (${rows.length} rows)`,
-            entityType: 'export_job',
-            entityId: job.id,
-            actorId: actor.userId,
-            visibility: 'INTERNAL',
-            metadata: { type: input.type, fileId: file.id, rowCount: rows.length },
-          },
-          tx,
-        );
-
-        return updated;
-      });
-
-      return ExportsMapper.toDto(updatedJob ?? job);
-    } catch (error) {
-      if (storageKey) {
-        await this.objectStorage.delete(storageKey).catch((err) => {
-          console.error(`Failed to cleanup orphaned export object ${storageKey}:`, err);
-        });
-      }
-      
-      await this.exportJobsRepository.update(job.id, {
-        status: 'FAILED',
-        completedAt: new Date(),
-      }).catch((err) => {
-        console.error(`Failed to mark export job ${job.id} as FAILED:`, err);
-      });
-
-      throw error;
-    }
+    // The actual export (CSV generation + upload) runs asynchronously in
+    // ExportJobsProcessor; the client polls GET /exports/:id until the job
+    // reaches COMPLETED and exposes a downloadable fileId.
+    return ExportsMapper.toDto(job);
   }
-
-
 }

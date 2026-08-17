@@ -62,8 +62,9 @@ export class MfaCodeVerifierService {
       return false;
     }
 
-    await this.mfaRepository.consumeRecoveryCode(recoveryCode.id, executor);
-
-    return true;
+    // CAS-consume: only the first concurrent request wins the row. A false
+    // result means another request already used this recovery code — the code
+    // must not authenticate a second time (TOCTOU guard).
+    return this.mfaRepository.consumeRecoveryCode(recoveryCode.id, executor);
   }
 }

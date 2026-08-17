@@ -35,6 +35,7 @@ async function bootstrap() {
     Logger.warn(warning, 'Bootstrap');
   }
 
+  // TODO: replace to base, not implement fixed version here.
   app.setGlobalPrefix('api/v1');
   app.use(json({ limit: environmentService.apiBodyLimit }));
   app.use(

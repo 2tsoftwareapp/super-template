@@ -69,10 +69,14 @@ export interface MfaRepositoryPort {
     executor?: TransactionExecutor,
   ): Promise<RecoveryCodeRecord | null>;
 
+  /**
+   * CAS-consume a recovery code: only succeeds when the row is still unused.
+   * Returns false if a concurrent request already consumed it.
+   */
   consumeRecoveryCode(
     id: string,
     executor?: TransactionExecutor,
-  ): Promise<void>;
+  ): Promise<boolean>;
 
   createChallenge(
     values: {
@@ -95,10 +99,14 @@ export interface MfaRepositoryPort {
     executor?: TransactionExecutor,
   ): Promise<MfaChallengeRecord | null>;
 
+  /**
+   * CAS-consume a challenge: only succeeds when the row is still unconsumed.
+   * Returns false if a concurrent request already consumed it.
+   */
   consumeChallenge(
     id: string,
     executor?: TransactionExecutor,
-  ): Promise<MfaChallengeRecord | null>;
+  ): Promise<boolean>;
 }
 
 export const MFA_REPOSITORY = Symbol('MFA_REPOSITORY');

@@ -58,6 +58,10 @@ export {
   notifications,
 } from './platform/notifications';
 export { applicationSettings } from './platform/settings';
+export {
+  storageDeleteOutbox,
+  storageObjects,
+} from './platform/storage-objects';
 
 import {
   permissions,
@@ -102,6 +106,10 @@ import {
   notifications,
 } from './platform/notifications';
 import { applicationSettings } from './platform/settings';
+import {
+  storageDeleteOutbox,
+  storageObjects,
+} from './platform/storage-objects';
 
 export const schema = {
   activities,
@@ -134,6 +142,8 @@ export const schema = {
   mfaChallenges,
   ssoLoginStates,
   ssoSessionExchanges,
+  storageDeleteOutbox,
+  storageObjects,
   userPreferences,
   userRecoveryCodes,
   userRoles,

@@ -38,6 +38,16 @@ export interface ExportJobsRepositoryPort {
     executor?: TransactionExecutor,
   ): Promise<ExportJobRecord | null>;
 
+  /**
+   * Atomically claims up to `limit` pending export jobs for processing.
+   * Single UPDATE ... WHERE id IN (SELECT ... FOR UPDATE SKIP LOCKED) so
+   * concurrent workers each get distinct jobs and never double-claim.
+   */
+  claimPending(
+    limit: number,
+    executor?: TransactionExecutor,
+  ): Promise<ExportJobRecord[]>;
+
   update(
     jobId: string,
     values: Partial<Record<string, unknown>>,

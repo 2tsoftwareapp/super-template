@@ -86,7 +86,7 @@ describe('VerifyMfaChallengeUseCase', () => {
         userId: 'u1',
         attempts: 0,
       })),
-      consumeChallenge: vi.fn(async () => undefined),
+      consumeChallenge: vi.fn(async () => true),
     };
     const auditWriter = { log: vi.fn(async () => undefined) };
     const useCase = new VerifyMfaChallengeUseCase(
@@ -106,5 +106,34 @@ describe('VerifyMfaChallengeUseCase', () => {
     expect(auditWriter.log).toHaveBeenCalledWith(
       expect.objectContaining({ action: 'mfa.challenge.succeeded' }),
     );
+  });
+
+  it('rejects a challenge a concurrent request already consumed (no double login)', async () => {
+    const mfaRepository = {
+      findValidChallengeByTokenHash: vi.fn(async () => ({
+        id: 'c1',
+        userId: 'u1',
+        attempts: 0,
+      })),
+      consumeChallenge: vi.fn(async () => false),
+    };
+    const auditWriter = { log: vi.fn(async () => undefined) };
+    const useCase = new VerifyMfaChallengeUseCase(
+      mfaRepository as never,
+      { verifyCode: vi.fn(async () => true) } as never,
+      auditWriter as never,
+    );
+
+    // The CAS consume lost the race: the same mfaToken + code was already
+    // used by another request, so this one must NOT authenticate.
+    await expect(
+      useCase.execute({
+        mfaToken: 'token',
+        code: '123456',
+        metadata: { ipAddress: null, userAgent: null },
+      }),
+    ).rejects.toMatchObject({ code: ERROR_CODES.MFA_CHALLENGE_INVALID });
+
+    expect(auditWriter.log).not.toHaveBeenCalled();
   });
 });

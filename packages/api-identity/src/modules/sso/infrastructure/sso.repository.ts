@@ -87,14 +87,24 @@ export class SsoRepository implements SsoRepositoryPort {
     return state ? this.toLoginStateRecord(state) : null;
   }
 
+  /**
+   * CAS-consume a login state: only succeeds when the row is still
+   * unconsumed. Returns false when a concurrent request already replayed
+   * the same state — the caller must abort the callback (TOCTOU guard).
+   */
   async consumeLoginState(
     id: string,
     executor: DatabaseExecutor = this.database,
-  ) {
-    await executor
+  ): Promise<boolean> {
+    const updated = await executor
       .update(ssoLoginStates)
       .set({ consumedAt: new Date() })
-      .where(eq(ssoLoginStates.id, id));
+      .where(
+        and(eq(ssoLoginStates.id, id), isNull(ssoLoginStates.consumedAt)),
+      )
+      .returning({ id: ssoLoginStates.id });
+
+    return updated.length > 0;
   }
 
   async createSessionExchange(
@@ -133,14 +143,27 @@ export class SsoRepository implements SsoRepositoryPort {
     return exchange ?? null;
   }
 
+  /**
+   * CAS-consume a session exchange: only succeeds when the row is still
+   * unconsumed. Returns false when a concurrent request already redeemed
+   * the same code — the caller must not re-issue tokens (TOCTOU guard).
+   */
   async consumeSessionExchange(
     id: string,
     executor: DatabaseExecutor = this.database,
-  ) {
-    await executor
+  ): Promise<boolean> {
+    const updated = await executor
       .update(ssoSessionExchanges)
       .set({ consumedAt: new Date() })
-      .where(eq(ssoSessionExchanges.id, id));
+      .where(
+        and(
+          eq(ssoSessionExchanges.id, id),
+          isNull(ssoSessionExchanges.consumedAt),
+        ),
+      )
+      .returning({ id: ssoSessionExchanges.id });
+
+    return updated.length > 0;
   }
 
   async findIdentity(
