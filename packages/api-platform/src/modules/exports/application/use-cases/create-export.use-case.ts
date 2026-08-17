@@ -12,7 +12,7 @@ import {
   TRANSACTION_PORT,
   type TransactionPort,
 } from '@repo/api-core';
-import { ImportExportAdapterRegistry } from '@repo/api-platform';
+import { ImportExportAdapterRegistry } from '../../../../import-export/import-export-adapter.registry';
 
 import type { CreateExportCommand } from '../exports.types';
 

@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
-import { ImportExportAdapterRegistry } from '@repo/api-platform';
 import { IdentityPortsModule } from '@repo/api-identity';
+
+import { ImportExportAdapterRegistry } from '../../import-export/import-export-adapter.registry';
 
 import { AuditModule } from '../audit/audit.module';
 import { FilesModule } from '../files/files.module';

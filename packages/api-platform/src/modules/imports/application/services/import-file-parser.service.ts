@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { type ImportValidationError } from '@repo/api-core';
-import { ImportExportAdapterRegistry } from '@repo/api-platform';
+import { ImportExportAdapterRegistry } from '../../../../import-export/import-export-adapter.registry';
 
 import {
   OBJECT_STORAGE,
