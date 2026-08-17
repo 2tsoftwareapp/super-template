@@ -22,11 +22,11 @@ Source copy: `docs/policy/SKILL_PREAMBLE.md` / `docs/policy/AGENT_WORK.md`.
 Turn an initial request into a clear direction via a **forced step sequence**:
 
 1. Seed `DISCUSSION.md` from template  
-2. Frame goal / facts / assumptions / unknowns; **Spec quality review**; triage issues; **stop and ask**
+2. Frame goal / facts / assumptions; **Spec quality review**; triage issues; **stop and ask**
    on unresolved critical/blocking/Spec-quality items
 3. Scope + options matrix (only after Spec quality gate passes)
-4. Finalize Spec quality; recommendation + handoff
-5. Self-check  
+4. Finalize recommendation + handoff
+5. Self-check the decision gate and step ledger
 
 Do not invent PLAN/TASKS or implement code here.
 
@@ -34,13 +34,11 @@ Do not invent PLAN/TASKS or implement code here.
 
 - Read **one** step fully; finish it before the next.
 - Keep the **Step ledger** in `DISCUSSION.md` updated every step.
-- **NEVER** skip step-01 (template seed).
 - **NEVER** jump to recommendation before frame + Spec quality + scope/options.
 - **NEVER** skip Spec quality review (Feasibility / Correctness / Capability).
 - **NEVER** continue past step-02 while a Critical issue, blocking unknown, or
   blocking Spec quality finding is unresolved. Ask focused questions and wait
   for the user.
-- **NEVER** claim complete until step-05 passes (or blockers documented).
 - Each step has a **Precondition**. If it fails, return to the previous step —
   do not “catch up” by filling later sections first.
 
@@ -52,7 +50,7 @@ Do not invent PLAN/TASKS or implement code here.
 | [steps/step-02-frame.md](./steps/step-02-frame.md) | Goal, facts, Spec quality review, triage |
 | [steps/step-03-scope-options.md](./steps/step-03-scope-options.md) | Scope + options matrix |
 | [steps/step-04-recommend.md](./steps/step-04-recommend.md) | Recommendation, risks, handoff |
-| [steps/step-05-self-check.md](./steps/step-05-self-check.md) | Verify + stop |
+| [steps/step-05-self-check.md](./steps/step-05-self-check.md) | Self-check the decision gate before ending |
 
 ### Execution entry
 
@@ -72,12 +70,10 @@ This skill is a **hard contract**. Obey it before any other action.
 ### Required artifacts
 
 #### `DISCUSSION.md` (from template)
-executive_summary, developer_overview, **keywords** (or none), charts (Mermaid when useful),
-goal, desired_outcome,
-confirmed_facts, constraints, assumptions, unknowns, issue_triage,
-clarification_checkpoint, spec_quality_review (feasibility, correctness,
-capability_recommendations), visual_triage, scope_in, scope_out, non_goals,
-options_considered, recommendation, risks, handoff.
+Step ledger, executive_summary, developer_overview, charts, goal_and_outcome,
+context (facts + constraints + assumptions), issue_triage, clarification_checkpoint,
+spec_quality_review, visual_triage, scope (in + out + non-goals),
+options_and_recommendation, risks, handoff.
 
 
 #### `VISUAL_DECISION.html`
@@ -140,18 +136,18 @@ rows; Spec quality can be one concrete finding per table.
 ## Quality Standards
 
 - [ ] Goal is one sentence.
-- [ ] Facts / assumptions / unknowns separated.
-- [ ] Issues classified by severity, clarity, blocking status, visual need, and Ask method.
-- [ ] Spec quality review covers Feasibility, Correctness, and Capability recommendations.
+- [ ] Facts / assumptions separated in Context section.
+- [ ] Issues classified by severity and blocking status in Issue triage.
+- [ ] Spec quality review covers Feasibility, Correctness, and Capability (own section, before Scope in).
+- [ ] Focused questions and answers recorded in Clarification checkpoint.
 - [ ] No unresolved Critical/blocking issue or blocking Spec quality finding was bypassed; questions and answers are recorded.
-- [ ] HTML is used only when spatial/state comparison materially improves the decision.
-- [ ] Scope in and out separated.
-- [ ] Options matrix used; recommendation has reason + confidence.
+- [ ] HTML is used only when spatial/state comparison materially improves the decision (Visual triage).
+- [ ] Scope in and out separated (Scope in / Scope out sections).
+- [ ] Options matrix used; recommendation has reason + confidence (within Options & Recommendation).
 - [ ] Handoff names one next skill.
-- [ ] `DISCUSSION.md` on disk; step-05 passed.
+- [ ] `DISCUSSION.md` on disk; step-05 self-check completed.
 
 - [ ] First-pass readable: concrete names (paths/APIs/IDs); no abstract filler.
-- [ ] Keywords present when opaque domain terms appear (or marked none).
 - [ ] No leftover `_(TODO)_` or placeholder Mermaid in finished sections.
 - [ ] Spec/review findings state finding + evidence + verdict (not essays).
 

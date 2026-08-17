@@ -2,49 +2,49 @@
 
 ## Goal
 
-Verify `DISCUSSION.md` against the brainstorming contract. Fail closed.
+Verify `DISCUSSION.md` against the contract. Fail closed.
 
 ## Precondition (fail closed)
 
-- [ ] Step ledger 01–04 marked (`done` or earlier `blocked` with questions)
-- [ ] Spec quality review section exists before Scope/Options
+- [ ] Step ledger 01–04 = `done` (or `blocked` with questions asked)
+- [ ] Spec quality review sits **before** Scope in/out in the artifact
+- [ ] Handoff names exactly one next skill
 
-If precondition fails → return to the earliest incomplete step.
+If precondition fails → return to the earliest incomplete step. Do **not** set
+Ready=Yes.
 
 ## Checks (run all)
 
-1. Session folder listing shows `DISCUSSION.md`.
-2. File was seeded from template (has Step ledger, Spec quality review, then
-   Goal, Facts, Scope, Options, Recommendation, Handoff).
-3. Step ledger is sequential: no later step `done` while an earlier step is `todo`.
-4. Goal is one sentence — Outcome-first (WHO + WHAT + EVIDENCE), not activity-only
-   (“write/implement/refactor/fix X”, “works per spec”). Desired outcome is
-   observable behaviors, not a disguised backlog.
-5. Facts / assumptions / unknowns are separated (no assumption labeled as fact).
-6. Scope in and scope out both present; Scope serves the Goal (not unrelated work).
-7. Options matrix has ≥1 real option with verify method.
-8. Recommendation has Choose + Reason + Confidence.
-9. Handoff names one of: business-analysis, basic-design, planning, research, execution.
-10. If Unknowns/Risks/Capability gaps still block code merge, Handoff **Blockers** is not empty (must not claim “no blockers” while Unknowns list open decision/data/auth items).
-11. No PLAN.md/TASKS.md/code changes invented by this skill (unless user explicitly asked outside contract).
-12. Executive summary has at most five decision-oriented bullets.
-13. Issue triage covers material decisions; no Critical/blocking item was
-    bypassed without a recorded user answer.
-14. Spec quality review exists with Feasibility, Correctness, and Capability
-    recommendations; no leftover `_(TODO)_` on verdicts unless ledger 02/04 is
-    `blocked`. No recommendation was made while Feasibility/Correctness is
-    Fail/Unknown+blocking, or while Blocking=Yes capability gaps are open.
-15. Visual triage distinguishes text/table/diagram/HTML. Any generated HTML
-    includes Tailwind + anime.js CDN tags, is user-confirmed, accessible, and
-    linked to an Issue ID. Choice logging may still require session-serve.
-16. Mark Step ledger 05 `done` or `blocked` with checklist evidence.
+1. File exists and was seeded from template (has Step ledger + Spec quality review).
+2. Step ledger is sequential: no later step `done` while an earlier step is `todo`.
+3. Issue triage classifies every material issue by severity, blocking status,
+   reversibility, and status.
+4. Clarification checkpoint records the focused questions actually asked and
+   the answers received — not left as unresolved placeholders while later
+   steps are `done`.
+5. Spec quality review has Feasibility, Correctness, and Capability gaps with
+   clear verdicts (no leftover `_(TODO)_` unless blocked).
+6. Visual triage matches what was actually created — no `html-recommended`
+   row without either a confirmed skip or a linked `VISUAL_DECISION.html`.
+7. Scope in and Scope out are both present and do not contradict each other.
+8. Options matrix has ≥1 real option; Recommendation has Choose/Reason/Not
+   choosing/Confidence.
+9. No Ready=Yes / recommendation locked while a Critical issue, blocking
+   Spec quality Fail/Unknown, or open Blocking=Yes capability gap remains.
+10. Executive summary ≤5 bullets and mentions direction, top risk, and next action.
+11. Developer overview Status/Path/Next action reflect the final state.
+12. Handoff names exactly one next skill with blockers listed honestly (not
+    hidden because the next skill is planning/execution).
+13. No PLAN/TASKS/code invented by this skill.
+14. Mark Step ledger 05 `done` or `blocked` with checklist evidence.
 
 ## Done when
 
-- [ ] All checks pass **or** remaining issues sit under Unknowns + Handoff Blockers.
-- [ ] Step ledger 05 updated.
-- [ ] User is told next skill and path to `DISCUSSION.md` (and that blockers still apply downstream).
+- [ ] All checks pass **or** Handoff blockers are non-empty and honest.
+- [ ] Step ledger 05 = `done` or `blocked`.
+- [ ] User is told the next skill and path to `DISCUSSION.md`.
 
 ## Stop
 
-Brainstorming ends here. Do **not** auto-run planning/design unless user asks.
+Brainstorming ends here. Do **not** auto-run business-analysis/basic-design/
+planning/research/execution unless the user asks.
