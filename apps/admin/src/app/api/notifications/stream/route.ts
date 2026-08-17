@@ -15,16 +15,13 @@ export async function GET() {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const upstream = await fetch(
-    `${env.API_INTERNAL_URL}/api/v1/notifications/stream`,
-    {
-      headers: {
-        accept: "text/event-stream",
-        authorization: `Bearer ${accessToken}`,
-      },
-      cache: "no-store",
+  const upstream = await fetch(`${env.API_INTERNAL_URL}/api/v1/notifications/stream`, {
+    headers: {
+      accept: "text/event-stream",
+      authorization: `Bearer ${accessToken}`,
     },
-  );
+    cache: "no-store",
+  });
 
   if (!upstream.ok || !upstream.body) {
     return new Response("Upstream stream unavailable", {

@@ -1,12 +1,12 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from "vitest";
 
-import { ERROR_CODES, EnvironmentService } from '@repo/api-core';
+import { ERROR_CODES, EnvironmentService } from "@repo/api-core";
 
-import { encryptTotpSecret } from '../../../domain/totp-encryption';
-import { generateTotpCode, generateTotpSecret } from '../../../domain/totp';
-import { ConfirmMfaUseCase } from '../confirm-mfa.use-case';
+import { encryptTotpSecret } from "../../../domain/totp-encryption";
+import { generateTotpCode, generateTotpSecret } from "../../../domain/totp";
+import { ConfirmMfaUseCase } from "../confirm-mfa.use-case";
 
-const ENCRYPTION_KEY = 'a'.repeat(64);
+const ENCRYPTION_KEY = "a".repeat(64);
 
 const buildEnvironmentService = () =>
   ({
@@ -14,11 +14,11 @@ const buildEnvironmentService = () =>
   }) as unknown as EnvironmentService;
 
 const buildTransactionPort = () => ({
-  run: vi.fn().mockImplementation(async (fn: any) => fn('tx')),
+  run: vi.fn().mockImplementation(async (fn: any) => fn("tx")),
 });
 
-describe('ConfirmMfaUseCase', () => {
-  it('rejects when setup was never started', async () => {
+describe("ConfirmMfaUseCase", () => {
+  it("rejects when setup was never started", async () => {
     const mfaRepository = {
       findSecretByUserId: vi.fn(async () => null),
     };
@@ -29,12 +29,12 @@ describe('ConfirmMfaUseCase', () => {
       { log: vi.fn() } as never,
     );
 
-    await expect(
-      useCase.execute({ userId: 'u1', code: '000000' }),
-    ).rejects.toMatchObject({ code: ERROR_CODES.MFA_SETUP_REQUIRED });
+    await expect(useCase.execute({ userId: "u1", code: "000000" })).rejects.toMatchObject({
+      code: ERROR_CODES.MFA_SETUP_REQUIRED,
+    });
   });
 
-  it('rejects when already enabled', async () => {
+  it("rejects when already enabled", async () => {
     const mfaRepository = {
       findSecretByUserId: vi.fn(async () => ({ enabled: true })),
     };
@@ -45,12 +45,12 @@ describe('ConfirmMfaUseCase', () => {
       { log: vi.fn() } as never,
     );
 
-    await expect(
-      useCase.execute({ userId: 'u1', code: '000000' }),
-    ).rejects.toMatchObject({ code: ERROR_CODES.MFA_ALREADY_ENABLED });
+    await expect(useCase.execute({ userId: "u1", code: "000000" })).rejects.toMatchObject({
+      code: ERROR_CODES.MFA_ALREADY_ENABLED,
+    });
   });
 
-  it('rejects an invalid code', async () => {
+  it("rejects an invalid code", async () => {
     const secret = generateTotpSecret();
     const encrypted = encryptTotpSecret(secret, ENCRYPTION_KEY);
     const mfaRepository = {
@@ -68,12 +68,12 @@ describe('ConfirmMfaUseCase', () => {
       { log: vi.fn() } as never,
     );
 
-    await expect(
-      useCase.execute({ userId: 'u1', code: '000000' }),
-    ).rejects.toMatchObject({ code: ERROR_CODES.MFA_INVALID_CODE });
+    await expect(useCase.execute({ userId: "u1", code: "000000" })).rejects.toMatchObject({
+      code: ERROR_CODES.MFA_INVALID_CODE,
+    });
   });
 
-  it('enables MFA and returns recovery codes for a valid code', async () => {
+  it("enables MFA and returns recovery codes for a valid code", async () => {
     const secret = generateTotpSecret();
     const encrypted = encryptTotpSecret(secret, ENCRYPTION_KEY);
     const code = generateTotpCode(secret);
@@ -95,17 +95,17 @@ describe('ConfirmMfaUseCase', () => {
       auditWriter as never,
     );
 
-    const result = await useCase.execute({ userId: 'u1', code });
+    const result = await useCase.execute({ userId: "u1", code });
 
     expect(result.recoveryCodes).toHaveLength(8);
-    expect(mfaRepository.confirmSecret).toHaveBeenCalledWith('u1', 'tx');
+    expect(mfaRepository.confirmSecret).toHaveBeenCalledWith("u1", "tx");
     expect(mfaRepository.replaceRecoveryCodes).toHaveBeenCalledWith(
-      'u1',
+      "u1",
       expect.arrayContaining([expect.any(String)]),
-      'tx',
+      "tx",
     );
     expect(auditWriter.log).toHaveBeenCalledWith(
-      expect.objectContaining({ action: 'mfa.enabled' }),
+      expect.objectContaining({ action: "mfa.enabled" }),
     );
   });
 });

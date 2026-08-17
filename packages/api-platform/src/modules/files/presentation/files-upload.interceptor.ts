@@ -1,13 +1,13 @@
-import { BadRequestException } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { BadRequestException } from "@nestjs/common";
+import { FileInterceptor } from "@nestjs/platform-express";
 
 import {
   getUploadExtension,
   isAllowedUploadExtension,
   MAX_FILE_SIZE_BYTES,
-} from '../application/upload-limits';
+} from "../application/upload-limits";
 
-export const UploadFileInterceptor = FileInterceptor('file', {
+export const UploadFileInterceptor = FileInterceptor("file", {
   limits: {
     fileSize: MAX_FILE_SIZE_BYTES,
   },
@@ -15,7 +15,7 @@ export const UploadFileInterceptor = FileInterceptor('file', {
     const extension = getUploadExtension(file.originalname);
 
     if (!isAllowedUploadExtension(extension)) {
-      callback(new BadRequestException('Unsupported file extension'), false);
+      callback(new BadRequestException("Unsupported file extension"), false);
       return;
     }
 

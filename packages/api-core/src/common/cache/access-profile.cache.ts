@@ -1,8 +1,8 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { z } from 'zod';
+import { Injectable, Logger } from "@nestjs/common";
+import { z } from "zod";
 
-import { EnvironmentService } from '../../config/environment.service';
-import { adaptRedisClient, createRedisClient } from '../redis/redis-client.adapter';
+import { EnvironmentService } from "../../config/environment.service";
+import { adaptRedisClient, createRedisClient } from "../redis/redis-client.adapter";
 
 export interface AccessProfileSnapshot {
   permissions: string[];
@@ -18,13 +18,9 @@ interface RedisCacheClient {
   connect: () => Promise<void>;
   del: (key: string | string[]) => Promise<number>;
   get: (key: string) => Promise<string | null>;
-  on: (event: 'error', listener: (error: Error) => void) => void;
+  on: (event: "error", listener: (error: Error) => void) => void;
   quit: () => Promise<void>;
-  set: (
-    key: string,
-    value: string,
-    options: { EX: number },
-  ) => Promise<'OK' | null>;
+  set: (key: string, value: string, options: { EX: number }) => Promise<"OK" | null>;
 }
 
 interface LocalCacheEntry {
@@ -32,7 +28,7 @@ interface LocalCacheEntry {
   profile: AccessProfileSnapshot;
 }
 
-const CACHE_KEY_PREFIX = 'access-profile:';
+const CACHE_KEY_PREFIX = "access-profile:";
 const DEFAULT_TTL_SECONDS = 60;
 
 function cacheKey(userId: string): string {
@@ -43,9 +39,7 @@ function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 
-function parseAccessProfileSnapshot(
-  cached: string,
-): AccessProfileSnapshot | null {
+function parseAccessProfileSnapshot(cached: string): AccessProfileSnapshot | null {
   try {
     const parsed: unknown = JSON.parse(cached);
     const result = AccessProfileSnapshotSchema.safeParse(parsed);
@@ -117,9 +111,7 @@ export class AccessProfileCache {
           EX: ttlSeconds,
         });
       } catch (error) {
-        this.logger.warn(
-          `Redis set failed for access profile: ${errorMessage(error)}`,
-        );
+        this.logger.warn(`Redis set failed for access profile: ${errorMessage(error)}`);
       }
       return;
     }
@@ -137,9 +129,7 @@ export class AccessProfileCache {
       try {
         await redis.del(cacheKey(userId));
       } catch (error) {
-        this.logger.warn(
-          `Redis invalidate failed for access profile: ${errorMessage(error)}`,
-        );
+        this.logger.warn(`Redis invalidate failed for access profile: ${errorMessage(error)}`);
       }
       return;
     }
@@ -182,7 +172,7 @@ export class AccessProfileCache {
   }
 
   private async ensureRedis(): Promise<RedisCacheClient | null> {
-    if (this.environmentService.appEnv === 'test') {
+    if (this.environmentService.appEnv === "test") {
       return null;
     }
 
@@ -199,17 +189,13 @@ export class AccessProfileCache {
     }
 
     this.redisReady = (async () => {
-      const client = adaptRedisClient<RedisCacheClient>(
-        createRedisClient(redisUrl),
-      );
+      const client = adaptRedisClient<RedisCacheClient>(createRedisClient(redisUrl));
 
-      client.on('error', (error) => {
+      client.on("error", (error) => {
         // node-redis reconnects internally, so log the blip rather than discarding
         // a self-healing client (which previously stranded the instance on the
         // local cache forever and silently broke cross-instance invalidation).
-        this.logger.warn(
-          `Redis client error for access-profile cache: ${error.message}`,
-        );
+        this.logger.warn(`Redis client error for access-profile cache: ${error.message}`);
       });
 
       try {

@@ -1,25 +1,19 @@
-import type {
-  DatabaseClient,
-  DatabaseExecutor,
-} from '@repo/api-database';
+import type { DatabaseClient, DatabaseExecutor } from "@repo/api-database";
 
-import { Inject, Injectable } from '@nestjs/common';
-import {
-  ADVISORY_LOCK_PORT,
-  type AdvisoryLockPort,
-} from '@repo/api-core';
-import { DATABASE, runInTransaction } from '@repo/api-database';
-import { notificationDeliveries, notificationDeviceTokens } from '@repo/api-database';
-import { and, eq, inArray, isNull } from 'drizzle-orm';
+import { Inject, Injectable } from "@nestjs/common";
+import { ADVISORY_LOCK_PORT, type AdvisoryLockPort } from "@repo/api-core";
+import { DATABASE, runInTransaction } from "@repo/api-database";
+import { notificationDeliveries, notificationDeviceTokens } from "@repo/api-database";
+import { and, eq, inArray, isNull } from "drizzle-orm";
 
 import type {
   DeviceTokensRepositoryPort,
   RegisterTokenResult,
-} from '../application/ports/device-tokens.repository.port';
+} from "../application/ports/device-tokens.repository.port";
 
-import { tokenLockId } from '../domain/token-lock';
+import { tokenLockId } from "../domain/token-lock";
 
-export type NotificationDevicePlatform = 'IOS' | 'ANDROID';
+export type NotificationDevicePlatform = "IOS" | "ANDROID";
 
 @Injectable()
 export class DeviceTokensRepository implements DeviceTokensRepositoryPort {
@@ -107,7 +101,7 @@ export class DeviceTokensRepository implements DeviceTokensRepositoryPort {
         .update(notificationDeviceTokens)
         .set({
           disabledAt: now,
-          disabledReason: 'Token claimed by new account',
+          disabledReason: "Token claimed by new account",
           updatedAt: now,
         })
         .where(eq(notificationDeviceTokens.id, existing.id));
@@ -115,14 +109,14 @@ export class DeviceTokensRepository implements DeviceTokensRepositoryPort {
       await tx
         .update(notificationDeliveries)
         .set({
-          status: 'FAILED',
-          lastError: 'Device token ownership transferred to another account',
+          status: "FAILED",
+          lastError: "Device token ownership transferred to another account",
           updatedAt: now,
         })
         .where(
           and(
             eq(notificationDeliveries.deviceTokenId, existing.id),
-            inArray(notificationDeliveries.status, ['PENDING', 'PROCESSING']),
+            inArray(notificationDeliveries.status, ["PENDING", "PROCESSING"]),
           ),
         );
 
@@ -148,16 +142,12 @@ export class DeviceTokensRepository implements DeviceTokensRepositoryPort {
     // Acquire the per-token lock so that a concurrent delivery processor
     // holding the same lock cannot be between its owner-check and FCM send
     // while we swap ownership. `null` = lock unavailable (delivery in flight).
-    return this.advisoryLock.withAdvisoryLock(
-      tokenLockId(values.token),
-      () => runInTransaction(this.database, run),
+    return this.advisoryLock.withAdvisoryLock(tokenLockId(values.token), () =>
+      runInTransaction(this.database, run),
     );
   }
 
-  async listByUserId(
-    userId: string,
-    executor: DatabaseExecutor = this.database,
-  ) {
+  async listByUserId(userId: string, executor: DatabaseExecutor = this.database) {
     return executor
       .select()
       .from(notificationDeviceTokens)
@@ -169,10 +159,7 @@ export class DeviceTokensRepository implements DeviceTokensRepositoryPort {
       );
   }
 
-  async listByIds(
-    ids: string[],
-    executor: DatabaseExecutor = this.database,
-  ) {
+  async listByIds(ids: string[], executor: DatabaseExecutor = this.database) {
     if (ids.length === 0) {
       return [];
     }
@@ -181,25 +168,16 @@ export class DeviceTokensRepository implements DeviceTokensRepositoryPort {
       .select()
       .from(notificationDeviceTokens)
       .where(
-        and(
-          inArray(notificationDeviceTokens.id, ids),
-          isNull(notificationDeviceTokens.disabledAt),
-        ),
+        and(inArray(notificationDeviceTokens.id, ids), isNull(notificationDeviceTokens.disabledAt)),
       );
   }
 
-  async listActiveByToken(
-    token: string,
-    executor: DatabaseExecutor = this.database,
-  ) {
+  async listActiveByToken(token: string, executor: DatabaseExecutor = this.database) {
     const [deviceToken] = await executor
       .select()
       .from(notificationDeviceTokens)
       .where(
-        and(
-          eq(notificationDeviceTokens.token, token),
-          isNull(notificationDeviceTokens.disabledAt),
-        ),
+        and(eq(notificationDeviceTokens.token, token), isNull(notificationDeviceTokens.disabledAt)),
       )
       .limit(1);
 
@@ -220,10 +198,7 @@ export class DeviceTokensRepository implements DeviceTokensRepositoryPort {
         updatedAt: new Date(),
       })
       .where(
-        and(
-          eq(notificationDeviceTokens.userId, userId),
-          eq(notificationDeviceTokens.token, token),
-        ),
+        and(eq(notificationDeviceTokens.userId, userId), eq(notificationDeviceTokens.token, token)),
       )
       .returning();
 

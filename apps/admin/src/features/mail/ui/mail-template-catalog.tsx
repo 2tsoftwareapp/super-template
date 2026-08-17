@@ -1,24 +1,11 @@
 "use client";
 
 import { Badge } from "@repo/web-ui/badge";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@repo/web-ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/web-ui/card";
 import { ErrorState } from "@repo/web-ui/error-state";
 import { SectionLoading } from "@repo/web-ui/loading";
 import { Show } from "@repo/web-ui/show";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@repo/web-ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@repo/web-ui/table";
 
 import type { MailViewModel } from "@/features/mail/model/mail.types";
 
@@ -71,10 +58,7 @@ export function MailTemplateCatalog({ catalog }: MailTemplateCatalogProps) {
             ) : null}
             {!isLoading && !isError && items.length === 0 ? (
               <TableRow>
-                <TableCell
-                  colSpan={4}
-                  className="py-16 text-center text-sm text-muted-foreground"
-                >
+                <TableCell colSpan={4} className="py-16 text-center text-sm text-muted-foreground">
                   No templates found.
                 </TableCell>
               </TableRow>
@@ -86,9 +70,7 @@ export function MailTemplateCatalog({ catalog }: MailTemplateCatalogProps) {
                     className="cursor-pointer"
                     onClick={() => onSelect(tmpl.key)}
                   >
-                    <TableCell className="font-mono text-xs">
-                      {tmpl.key}
-                    </TableCell>
+                    <TableCell className="font-mono text-xs">{tmpl.key}</TableCell>
                     <TableCell>
                       {tmpl.mandatory ? (
                         <Badge
@@ -98,29 +80,20 @@ export function MailTemplateCatalog({ catalog }: MailTemplateCatalogProps) {
                           Yes
                         </Badge>
                       ) : (
-                        <span className="text-xs text-muted-foreground">
-                          No
-                        </span>
+                        <span className="text-xs text-muted-foreground">No</span>
                       )}
                     </TableCell>
                     <TableCell>
                       {tmpl.sendable ? (
-                        <Badge
-                          variant="default"
-                          className="bg-primary/15 text-xs text-primary"
-                        >
+                        <Badge variant="default" className="bg-primary/15 text-xs text-primary">
                           Yes
                         </Badge>
                       ) : (
-                        <span className="text-xs text-muted-foreground">
-                          No
-                        </span>
+                        <span className="text-xs text-muted-foreground">No</span>
                       )}
                     </TableCell>
                     <TableCell className="text-xs text-muted-foreground">
-                      {tmpl.variables.length > 0
-                        ? tmpl.variables.join(", ")
-                        : "\u2014"}
+                      {tmpl.variables.length > 0 ? tmpl.variables.join(", ") : "\u2014"}
                     </TableCell>
                   </TableRow>
                 ))

@@ -1,5 +1,5 @@
-import type { AuthenticatedRequestUser } from '@repo/api-core';
-import type { Request } from 'express';
+import type { AuthenticatedRequestUser } from "@repo/api-core";
+import type { Request } from "express";
 
 import {
   Body,
@@ -13,8 +13,8 @@ import {
   Put,
   Query,
   Req,
-} from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+} from "@nestjs/common";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import {
   ACTION,
   ApiArrayResponse,
@@ -24,10 +24,10 @@ import {
   CurrentUser,
   perm,
   SuccessFlagDto,
-} from '@repo/api-core';
+} from "@repo/api-core";
 
-import { RoleManagementUseCase } from '../application/use-cases/role-management.use-case';
-import { RoleQueryUseCase } from '../application/use-cases/role-query.use-case';
+import { RoleManagementUseCase } from "../application/use-cases/role-management.use-case";
+import { RoleQueryUseCase } from "../application/use-cases/role-query.use-case";
 import {
   CreateRoleDto,
   ListRolesQueryDto,
@@ -35,11 +35,11 @@ import {
   ReplaceRolePermissionsDto,
   RoleDto,
   UpdateRoleDto,
-} from './roles.dto';
+} from "./roles.dto";
 
-@ApiTags('admin-roles')
+@ApiTags("admin-roles")
 @ApiBearerAuth()
-@Controller('admin/roles')
+@Controller("admin/roles")
 export class AdminRolesController {
   constructor(
     private readonly roleQuery: RoleQueryUseCase,
@@ -47,7 +47,7 @@ export class AdminRolesController {
   ) {}
 
   @Get()
-  @Authorize({ permissions: [perm('roles', ACTION.READ)] })
+  @Authorize({ permissions: [perm("roles", ACTION.READ)] })
   @ApiPaginatedResponse(RoleDto)
   async listRoles(
     @CurrentUser() actor: AuthenticatedRequestUser,
@@ -74,8 +74,8 @@ export class AdminRolesController {
     };
   }
 
-  @Get('permissions')
-  @Authorize({ permissions: [perm('roles', ACTION.READ)] })
+  @Get("permissions")
+  @Authorize({ permissions: [perm("roles", ACTION.READ)] })
   @ApiArrayResponse(PermissionDto)
   async listPermissions(@CurrentUser() actor: AuthenticatedRequestUser) {
     const permissions = await this.roleQuery.listPermissions(actor);
@@ -86,7 +86,7 @@ export class AdminRolesController {
   }
 
   @Post()
-  @Authorize({ permissions: [perm('roles', ACTION.CREATE)] })
+  @Authorize({ permissions: [perm("roles", ACTION.CREATE)] })
   @ApiDataResponse(RoleDto, 201)
   async createRole(
     @CurrentUser() actor: AuthenticatedRequestUser,
@@ -100,12 +100,12 @@ export class AdminRolesController {
     };
   }
 
-  @Patch(':id')
-  @Authorize({ permissions: [perm('roles', ACTION.UPDATE)] })
+  @Patch(":id")
+  @Authorize({ permissions: [perm("roles", ACTION.UPDATE)] })
   @ApiDataResponse(RoleDto)
   async updateRole(
     @CurrentUser() actor: AuthenticatedRequestUser,
-    @Param('id', ParseUUIDPipe) roleId: string,
+    @Param("id", ParseUUIDPipe) roleId: string,
     @Body() input: UpdateRoleDto,
     @Req() request: Request,
   ) {
@@ -121,12 +121,12 @@ export class AdminRolesController {
     };
   }
 
-  @Put(':id/permissions')
-  @Authorize({ permissions: [perm('roles', ACTION.UPDATE)] })
+  @Put(":id/permissions")
+  @Authorize({ permissions: [perm("roles", ACTION.UPDATE)] })
   @ApiDataResponse(RoleDto)
   async replaceRolePermissions(
     @CurrentUser() actor: AuthenticatedRequestUser,
-    @Param('id', ParseUUIDPipe) roleId: string,
+    @Param("id", ParseUUIDPipe) roleId: string,
     @Body() input: ReplaceRolePermissionsDto,
     @Req() request: Request,
   ) {
@@ -142,12 +142,12 @@ export class AdminRolesController {
     };
   }
 
-  @Delete(':id')
-  @Authorize({ permissions: [perm('roles', ACTION.DELETE)] })
+  @Delete(":id")
+  @Authorize({ permissions: [perm("roles", ACTION.DELETE)] })
   @ApiDataResponse(SuccessFlagDto)
   async deleteRole(
     @CurrentUser() actor: AuthenticatedRequestUser,
-    @Param('id', ParseUUIDPipe) roleId: string,
+    @Param("id", ParseUUIDPipe) roleId: string,
     @Req() request: Request,
   ) {
     await this.roleManagement.deleteCustomRole(actor, roleId, request.requestContext);

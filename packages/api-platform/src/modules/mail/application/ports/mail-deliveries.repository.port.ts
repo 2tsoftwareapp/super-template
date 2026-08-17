@@ -1,7 +1,7 @@
-import type { JsonObject } from '@repo/api-core';
-import type { TransactionExecutor } from '@repo/api-core';
+import type { JsonObject } from "@repo/api-core";
+import type { TransactionExecutor } from "@repo/api-core";
 
-export type MailDeliveryStatus = 'PENDING' | 'PROCESSING' | 'PROVIDER_ACCEPTED' | 'SENT' | 'FAILED';
+export type MailDeliveryStatus = "PENDING" | "PROCESSING" | "PROVIDER_ACCEPTED" | "SENT" | "FAILED";
 
 export interface DeliveryRecord {
   id: string;
@@ -76,7 +76,7 @@ export interface MailDeliveriesRepositoryPort {
     id: string,
     claimToken: string,
     values: {
-      status: 'SENT' | 'FAILED';
+      status: "SENT" | "FAILED";
       errorMessage?: string | null;
       sentAt?: Date | null;
       providerMessageId?: string | null;
@@ -109,4 +109,4 @@ export interface MailDeliveriesRepositoryPort {
   }>;
 }
 
-export const MAIL_DELIVERIES_REPOSITORY = Symbol('MAIL_DELIVERIES_REPOSITORY');
+export const MAIL_DELIVERIES_REPOSITORY = Symbol("MAIL_DELIVERIES_REPOSITORY");

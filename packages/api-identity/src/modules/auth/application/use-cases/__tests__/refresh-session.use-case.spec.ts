@@ -1,19 +1,19 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from "vitest";
 
-import { ERROR_CODES } from '@repo/api-core';
+import { ERROR_CODES } from "@repo/api-core";
 
-import { REFRESH_ROTATION_GRACE_MS } from '../../../domain/refresh-rotation.policy';
-import { hashRefreshToken } from '../../auth.helpers';
-import { AuthMapper } from '../../auth.mapper';
-import { RefreshSessionUseCase } from '../refresh-session.use-case';
+import { REFRESH_ROTATION_GRACE_MS } from "../../../domain/refresh-rotation.policy";
+import { hashRefreshToken } from "../../auth.helpers";
+import { AuthMapper } from "../../auth.mapper";
+import { RefreshSessionUseCase } from "../refresh-session.use-case";
 
-const CURRENT_TOKEN = 'current-refresh-token';
-const PREVIOUS_TOKEN = 'previous-refresh-token';
+const CURRENT_TOKEN = "current-refresh-token";
+const PREVIOUS_TOKEN = "previous-refresh-token";
 
 async function createSessionRow(overrides: Record<string, unknown> = {}) {
   return {
-    id: 'session-1',
-    userId: 'user-1',
+    id: "session-1",
+    userId: "user-1",
     refreshTokenHash: await hashRefreshToken(CURRENT_TOKEN),
     previousRefreshTokenHash: null,
     previousRotatedAt: null,
@@ -30,9 +30,9 @@ async function createSessionRow(overrides: Record<string, unknown> = {}) {
 
 function createHarness(sessionRow: Awaited<ReturnType<typeof createSessionRow>>) {
   const rotatedResult = {
-    accessToken: 'new-access',
-    refreshToken: 'new-refresh',
-    session: { ...sessionRow, id: 'session-1' },
+    accessToken: "new-access",
+    refreshToken: "new-refresh",
+    session: { ...sessionRow, id: "session-1" },
   };
 
   const authRepository = {
@@ -41,10 +41,10 @@ function createHarness(sessionRow: Awaited<ReturnType<typeof createSessionRow>>)
   };
   const usersRepository = {
     findById: vi.fn(async () => ({
-      id: 'user-1',
-      status: 'ACTIVE',
-      email: 'user@example.local',
-      displayName: 'User One',
+      id: "user-1",
+      status: "ACTIVE",
+      email: "user@example.local",
+      displayName: "User One",
       avatarUrl: null,
       emailVerifiedAt: new Date(),
       createdAt: new Date(),
@@ -53,18 +53,18 @@ function createHarness(sessionRow: Awaited<ReturnType<typeof createSessionRow>>)
   };
   const accessControlService = {
     getAccessProfile: vi.fn(async () => ({
-      roles: ['USER'],
+      roles: ["USER"],
       permissions: [],
     })),
   };
   const organizationsService = {
-    resolveOrganizationIdForUser: vi.fn(async () => 'org-1'),
+    resolveOrganizationIdForUser: vi.fn(async () => "org-1"),
   };
   const sessionTokenService = {
     verifyToken: vi.fn(async () => ({
-      sid: 'session-1',
-      sub: 'user-1',
-      oid: 'org-1',
+      sid: "session-1",
+      sub: "user-1",
+      oid: "org-1",
     })),
     rotateSessionTokens: vi.fn(async () => rotatedResult),
     tryRotateSessionTokens: vi.fn(async () => rotatedResult),
@@ -88,41 +88,38 @@ function createHarness(sessionRow: Awaited<ReturnType<typeof createSessionRow>>)
   };
 }
 
-describe('RefreshSessionUseCase rotation grace', () => {
-  it('rotates strictly when the current token is presented', async () => {
+describe("RefreshSessionUseCase rotation grace", () => {
+  it("rotates strictly when the current token is presented", async () => {
     const session = await createSessionRow();
-    const { useCase, sessionTokenService, authRepository } =
-      createHarness(session);
+    const { useCase, sessionTokenService, authRepository } = createHarness(session);
 
     const result = await useCase.execute({ refreshToken: CURRENT_TOKEN });
 
-    expect(result.accessToken).toBe('new-access');
+    expect(result.accessToken).toBe("new-access");
     expect(sessionTokenService.tryRotateSessionTokens).toHaveBeenCalledTimes(1);
     expect(authRepository.revokeSession).not.toHaveBeenCalled();
   });
 
-  it('honors the previous token inside the grace window (grace rotation)', async () => {
+  it("honors the previous token inside the grace window (grace rotation)", async () => {
     const session = await createSessionRow({
       previousRefreshTokenHash: await hashRefreshToken(PREVIOUS_TOKEN),
       previousRotatedAt: new Date(Date.now() - 5_000),
     });
-    const { useCase, sessionTokenService, authRepository } =
-      createHarness(session);
+    const { useCase, sessionTokenService, authRepository } = createHarness(session);
 
     const result = await useCase.execute({ refreshToken: PREVIOUS_TOKEN });
 
-    expect(result.accessToken).toBe('new-access');
+    expect(result.accessToken).toBe("new-access");
     expect(sessionTokenService.tryRotateSessionTokens).toHaveBeenCalledTimes(1);
     expect(authRepository.revokeSession).not.toHaveBeenCalled();
   });
 
-  it('retries the grace CAS against a re-read session before giving up', async () => {
+  it("retries the grace CAS against a re-read session before giving up", async () => {
     const session = await createSessionRow({
       previousRefreshTokenHash: await hashRefreshToken(PREVIOUS_TOKEN),
       previousRotatedAt: new Date(Date.now() - 5_000),
     });
-    const { useCase, sessionTokenService, rotatedResult } =
-      createHarness(session);
+    const { useCase, sessionTokenService, rotatedResult } = createHarness(session);
     // First CAS misses (another racer rotated); the retry wins.
     sessionTokenService.tryRotateSessionTokens
       .mockResolvedValueOnce(null as never)
@@ -130,28 +127,25 @@ describe('RefreshSessionUseCase rotation grace', () => {
 
     const result = await useCase.execute({ refreshToken: PREVIOUS_TOKEN });
 
-    expect(result.accessToken).toBe('new-access');
+    expect(result.accessToken).toBe("new-access");
     expect(sessionTokenService.tryRotateSessionTokens).toHaveBeenCalledTimes(2);
   });
 
-  it('revokes the session when the previous token is outside the grace window', async () => {
+  it("revokes the session when the previous token is outside the grace window", async () => {
     const session = await createSessionRow({
       previousRefreshTokenHash: await hashRefreshToken(PREVIOUS_TOKEN),
-      previousRotatedAt: new Date(
-        Date.now() - REFRESH_ROTATION_GRACE_MS - 1_000,
-      ),
+      previousRotatedAt: new Date(Date.now() - REFRESH_ROTATION_GRACE_MS - 1_000),
     });
-    const { useCase, authRepository, sessionTokenService } =
-      createHarness(session);
+    const { useCase, authRepository, sessionTokenService } = createHarness(session);
 
-    await expect(
-      useCase.execute({ refreshToken: PREVIOUS_TOKEN }),
-    ).rejects.toMatchObject({ code: ERROR_CODES.AUTH_REFRESH_TOKEN_REUSED });
-    expect(authRepository.revokeSession).toHaveBeenCalledWith('session-1');
+    await expect(useCase.execute({ refreshToken: PREVIOUS_TOKEN })).rejects.toMatchObject({
+      code: ERROR_CODES.AUTH_REFRESH_TOKEN_REUSED,
+    });
+    expect(authRepository.revokeSession).toHaveBeenCalledWith("session-1");
     expect(sessionTokenService.tryRotateSessionTokens).not.toHaveBeenCalled();
   });
 
-  it('revokes the session for a token matching neither current nor previous', async () => {
+  it("revokes the session for a token matching neither current nor previous", async () => {
     const session = await createSessionRow({
       previousRefreshTokenHash: await hashRefreshToken(PREVIOUS_TOKEN),
       previousRotatedAt: new Date(Date.now() - 5_000),
@@ -159,8 +153,8 @@ describe('RefreshSessionUseCase rotation grace', () => {
     const { useCase, authRepository } = createHarness(session);
 
     await expect(
-      useCase.execute({ refreshToken: 'stolen-or-ancient-token' }),
+      useCase.execute({ refreshToken: "stolen-or-ancient-token" }),
     ).rejects.toMatchObject({ code: ERROR_CODES.AUTH_REFRESH_TOKEN_REUSED });
-    expect(authRepository.revokeSession).toHaveBeenCalledWith('session-1');
+    expect(authRepository.revokeSession).toHaveBeenCalledWith("session-1");
   });
 });

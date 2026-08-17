@@ -22,21 +22,12 @@ const GENERATED_HEADER =
   "// Source of truth: packages/config/src/app-config.ts\n" +
   "// Regenerate with: pnpm --filter @repo/config generate\n";
 
-type Json =
-  | string
-  | number
-  | boolean
-  | readonly Json[]
-  | { readonly [key: string]: Json };
+type Json = string | number | boolean | readonly Json[] | { readonly [key: string]: Json };
 
 function writeJson(): void {
   const outDir = resolve(packageDir, "generated");
   mkdirSync(outDir, { recursive: true });
-  writeFileSync(
-    resolve(outDir, "config.json"),
-    `${JSON.stringify(appConfig, null, 2)}\n`,
-    "utf8",
-  );
+  writeFileSync(resolve(outDir, "config.json"), `${JSON.stringify(appConfig, null, 2)}\n`, "utf8");
 }
 
 // --- Dart emitter -----------------------------------------------------------
@@ -87,10 +78,7 @@ function writeDart(): void {
   }
 
   const body = `${GENERATED_HEADER}\n${classes.join("\n\n")}\n`;
-  const outPath = resolve(
-    repoRoot,
-    "apps/mobile/lib/generated/config/shared_config.dart",
-  );
+  const outPath = resolve(repoRoot, "apps/mobile/lib/generated/config/shared_config.dart");
   mkdirSync(dirname(outPath), { recursive: true });
   writeFileSync(outPath, body, "utf8");
 }

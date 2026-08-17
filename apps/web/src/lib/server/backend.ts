@@ -18,8 +18,7 @@ const auth = createAuthCookieHelpers({
     refreshToken: REFRESH_TOKEN_COOKIE,
     csrf: CSRF_TOKEN_COOKIE,
   },
-  requireSignedCsrf:
-    env.APP_ENV === "staging" || env.APP_ENV === "production",
+  requireSignedCsrf: env.APP_ENV === "staging" || env.APP_ENV === "production",
 });
 
 const backend = createBackendHelpers({

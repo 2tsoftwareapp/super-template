@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import { EnvironmentService, generateOpaqueToken } from '@repo/api-core';
+import { Injectable } from "@nestjs/common";
+import { EnvironmentService, generateOpaqueToken } from "@repo/api-core";
 
 import type {
   SsoIdentity,
   SsoProviderAdapter,
   SsoTokenSet,
-} from '../application/ports/sso-provider.port';
+} from "../application/ports/sso-provider.port";
 
 interface IssuedFakeCode {
   subject: string;
@@ -19,7 +19,7 @@ interface IssuedFakeCode {
 // when APP_ENV=production (enforced at env-validation time and at module wiring).
 @Injectable()
 export class FakeSsoAdapter implements SsoProviderAdapter {
-  readonly provider = 'fake';
+  readonly provider = "fake";
 
   private readonly issuedCodes = new Map<string, IssuedFakeCode>();
 
@@ -44,17 +44,14 @@ export class FakeSsoAdapter implements SsoProviderAdapter {
     });
 
     const url = new URL(this.getCallbackRedirectUri());
-    url.searchParams.set('code', code);
-    url.searchParams.set('state', params.state);
+    url.searchParams.set("code", code);
+    url.searchParams.set("state", params.state);
     return url.toString();
   }
 
-  exchangeCode(params: {
-    code: string;
-    codeVerifier: string;
-  }): Promise<SsoTokenSet> {
+  exchangeCode(params: { code: string; codeVerifier: string }): Promise<SsoTokenSet> {
     if (!this.issuedCodes.has(params.code)) {
-      throw new Error('Unknown fake authorization code');
+      throw new Error("Unknown fake authorization code");
     }
 
     // The fake "id token" is just a handle back to the in-memory record.
@@ -65,13 +62,13 @@ export class FakeSsoAdapter implements SsoProviderAdapter {
     const issued = this.issuedCodes.get(idToken);
 
     if (!issued) {
-      throw new Error('Unknown fake id token');
+      throw new Error("Unknown fake id token");
     }
 
     this.issuedCodes.delete(idToken);
 
     if (issued.nonce !== nonce) {
-      throw new Error('Nonce mismatch');
+      throw new Error("Nonce mismatch");
     }
 
     return Promise.resolve({

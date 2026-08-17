@@ -7,12 +7,7 @@ import { useAdminSession } from "@/components/admin-guard";
 import { usePathname } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
-import {
-  DesktopSidebar,
-  MobileSidebar,
-  SidebarContext,
-  TopHeader,
-} from "./admin-shell/index";
+import { DesktopSidebar, MobileSidebar, SidebarContext, TopHeader } from "./admin-shell/index";
 
 // Presentational shell. Auth + RBAC gating lives in AdminGuard/useAdminGuard;
 // by the time this renders, `user` and `permissions` are validated and read
@@ -21,9 +16,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const { user, permissions } = useAdminSession();
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(() => {
-    return (
-      safeLocalStorage.getItem<boolean>("admin-sidebar-collapsed") ?? false
-    );
+    return safeLocalStorage.getItem<boolean>("admin-sidebar-collapsed") ?? false;
   });
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -41,9 +34,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <SidebarContext.Provider
-      value={{ collapsed, setCollapsed: toggleCollapsed }}
-    >
+    <SidebarContext.Provider value={{ collapsed, setCollapsed: toggleCollapsed }}>
       <div className="relative flex min-h-screen w-full bg-background overflow-hidden">
         {/* Ambient Decorative Backdrops */}
         <div className="absolute top-0 right-0 -z-10 size-[450px] rounded-full bg-primary/5 blur-[120px] pointer-events-none" />

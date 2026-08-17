@@ -1,11 +1,14 @@
-import type { AuthenticatedRequestUser } from '@repo/api-core';
+import type { AuthenticatedRequestUser } from "@repo/api-core";
 
-import { forwardRef, HttpStatus, Inject, Injectable } from '@nestjs/common';
-import {  AppError, ERROR_CODES, isMandatoryMailTemplate , SYSTEM_SCOPE } from '@repo/api-core';
+import { forwardRef, HttpStatus, Inject, Injectable } from "@nestjs/common";
+import { AppError, ERROR_CODES, isMandatoryMailTemplate, SYSTEM_SCOPE } from "@repo/api-core";
 
-import { AuditService } from '../../../audit/application/audit.service';
-import { JobsService } from '../../../jobs/application/jobs.service';
-import { TEMPLATE_RENDERER_SERVICE, type TemplateRendererServicePort } from '../ports/template-renderer.service.port';
+import { AuditService } from "../../../audit/application/audit.service";
+import { JobsService } from "../../../jobs/application/jobs.service";
+import {
+  TEMPLATE_RENDERER_SERVICE,
+  type TemplateRendererServicePort,
+} from "../ports/template-renderer.service.port";
 
 export interface SendAdminMailCommand {
   templateKey: string;
@@ -17,16 +20,14 @@ export interface SendAdminMailCommand {
 @Injectable()
 export class SendAdminMailUseCase {
   constructor(
-    @Inject(TEMPLATE_RENDERER_SERVICE) private readonly templateRenderer: TemplateRendererServicePort,
+    @Inject(TEMPLATE_RENDERER_SERVICE)
+    private readonly templateRenderer: TemplateRendererServicePort,
     @Inject(forwardRef(() => JobsService))
     private readonly jobsService: JobsService,
     private readonly auditService: AuditService,
   ) {}
 
-  async execute(
-    actor: AuthenticatedRequestUser,
-    command: SendAdminMailCommand,
-  ) {
+  async execute(actor: AuthenticatedRequestUser, command: SendAdminMailCommand) {
     if (isMandatoryMailTemplate(command.templateKey)) {
       throw new AppError(
         ERROR_CODES.VALIDATION_FAILED,
@@ -52,13 +53,13 @@ export class SendAdminMailUseCase {
     if (missingVariables.length > 0) {
       throw new AppError(
         ERROR_CODES.VALIDATION_FAILED,
-        `Missing required template variables: ${missingVariables.join(', ')}`,
+        `Missing required template variables: ${missingVariables.join(", ")}`,
         HttpStatus.BAD_REQUEST,
       );
     }
 
     const job = await this.jobsService.enqueue({
-      type: 'mail.send',
+      type: "mail.send",
       payload: {
         templateKey: command.templateKey,
         to: command.to,
@@ -67,18 +68,16 @@ export class SendAdminMailUseCase {
       },
       createdById: actor.userId,
       organizationId: actor.organizationId ?? null,
-      ...(command.idempotencyKey
-        ? { idempotencyKey: command.idempotencyKey }
-        : {}),
+      ...(command.idempotencyKey ? { idempotencyKey: command.idempotencyKey } : {}),
     });
 
     await this.auditService.log({
       actorId: actor.userId,
-      action: 'mail.send_requested',
-      entityType: 'mail_template',
+      action: "mail.send_requested",
+      entityType: "mail_template",
       entityId: job.id,
       metadata: { templateKey: command.templateKey, to: command.to },
-        scope: SYSTEM_SCOPE.PLATFORM
+      scope: SYSTEM_SCOPE.PLATFORM,
     });
 
     return { jobId: job.id, status: job.status };

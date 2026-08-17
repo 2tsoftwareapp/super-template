@@ -1,4 +1,4 @@
-import type { TransactionExecutor } from '@repo/api-core';
+import type { TransactionExecutor } from "@repo/api-core";
 
 export interface PendingDeleteRecord {
   id: string;
@@ -31,11 +31,7 @@ export interface StorageTrackingPort {
 
   markDeleteDone(id: string, executor?: TransactionExecutor): Promise<void>;
 
-  markDeleteFailed(
-    id: string,
-    errorMessage: string,
-    executor?: TransactionExecutor,
-  ): Promise<void>;
+  markDeleteFailed(id: string, errorMessage: string, executor?: TransactionExecutor): Promise<void>;
 }
 
-export const STORAGE_TRACKING_PORT = Symbol('STORAGE_TRACKING_PORT');
+export const STORAGE_TRACKING_PORT = Symbol("STORAGE_TRACKING_PORT");

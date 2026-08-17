@@ -6,11 +6,7 @@ import type { RolesListParams } from "@/lib/lookup-api";
 import { webFetch } from "@/lib/http";
 import { fetchRolesList } from "@/lib/lookup-api";
 
-import type {
-  EditableRole,
-  PermissionDto,
-  RoleForm,
-} from "../model/roles.schemas";
+import type { EditableRole, PermissionDto, RoleForm } from "../model/roles.schemas";
 
 interface RoleSaveResult {
   data: EditableRole & { permissions: PermissionDto[] };
@@ -34,9 +30,7 @@ export const rolesApi = {
   },
 
   permissions() {
-    return webFetch<ListResponse<PermissionDto>>(
-      bffPath("/api/v1/admin/roles/permissions"),
-    );
+    return webFetch<ListResponse<PermissionDto>>(bffPath("/api/v1/admin/roles/permissions"));
   },
 
   delete(roleId: string) {
@@ -53,13 +47,10 @@ export const rolesApi = {
   },
 
   update(roleId: string, input: RoleForm) {
-    return webFetch<RoleSaveResult>(
-      bffPath("/api/v1/admin/roles/{id}", { id: roleId }),
-      {
-        method: "PATCH",
-        body: JSON.stringify(buildRolePayload(input)),
-      },
-    );
+    return webFetch<RoleSaveResult>(bffPath("/api/v1/admin/roles/{id}", { id: roleId }), {
+      method: "PATCH",
+      body: JSON.stringify(buildRolePayload(input)),
+    });
   },
 };
 
@@ -68,5 +59,4 @@ export const fetchRoles = () => rolesApi.list();
 export const fetchPermissions = () => rolesApi.permissions();
 export const deleteRole = (roleId: string) => rolesApi.delete(roleId);
 export const createRole = (input: RoleForm) => rolesApi.create(input);
-export const updateRole = (roleId: string, input: RoleForm) =>
-  rolesApi.update(roleId, input);
+export const updateRole = (roleId: string, input: RoleForm) => rolesApi.update(roleId, input);

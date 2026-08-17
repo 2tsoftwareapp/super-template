@@ -69,12 +69,7 @@ export function MfaEnabledActions({
           : "Enter a code to regenerate your recovery codes."}
       </p>
       <Label>Verification code</Label>
-      <InputOTP
-        maxLength={6}
-        value={otpCode}
-        onChange={onOtpChange}
-        onComplete={handleSubmit}
-      >
+      <InputOTP maxLength={6} value={otpCode} onChange={onOtpChange} onComplete={handleSubmit}>
         <InputOTPGroup>
           <InputOTPSlot index={0} />
           <InputOTPSlot index={1} />

@@ -1,4 +1,4 @@
-import type { TransactionExecutor } from '@repo/api-core';
+import type { TransactionExecutor } from "@repo/api-core";
 
 export interface OrganizationRecord {
   id: string;
@@ -12,14 +12,14 @@ export interface OrganizationRecord {
 export interface OrganizationMemberRecord {
   organizationId: string;
   userId: string;
-  role: 'OWNER' | 'ADMIN' | 'MEMBER';
+  role: "OWNER" | "ADMIN" | "MEMBER";
   createdAt: Date;
   updatedAt: Date;
 }
 
 export interface OrganizationMemberWithUserRecord {
   userId: string;
-  role: 'OWNER' | 'ADMIN' | 'MEMBER';
+  role: "OWNER" | "ADMIN" | "MEMBER";
   email: string;
   displayName: string;
   createdAt: Date;
@@ -30,7 +30,7 @@ export interface UserOrganizationRecord {
   id: string;
   name: string;
   slug: string;
-  role: 'OWNER' | 'ADMIN' | 'MEMBER';
+  role: "OWNER" | "ADMIN" | "MEMBER";
   createdAt: Date;
   updatedAt: Date;
 }
@@ -42,19 +42,16 @@ export interface OrganizationsRepositoryPort {
   ): Promise<OrganizationRecord | null>;
 
   addMember(
-    values: { organizationId: string; userId: string; role: 'OWNER' | 'ADMIN' | 'MEMBER' },
+    values: { organizationId: string; userId: string; role: "OWNER" | "ADMIN" | "MEMBER" },
     executor?: TransactionExecutor,
   ): Promise<OrganizationMemberRecord | null>;
 
   upsertMember(
-    values: { organizationId: string; userId: string; role: 'OWNER' | 'ADMIN' | 'MEMBER' },
+    values: { organizationId: string; userId: string; role: "OWNER" | "ADMIN" | "MEMBER" },
     executor?: TransactionExecutor,
   ): Promise<OrganizationMemberRecord | null>;
 
-  findBySlug(
-    slug: string,
-    executor?: TransactionExecutor,
-  ): Promise<OrganizationRecord | null>;
+  findBySlug(slug: string, executor?: TransactionExecutor): Promise<OrganizationRecord | null>;
 
   findById(
     organizationId: string,
@@ -67,14 +64,9 @@ export interface OrganizationsRepositoryPort {
     executor?: TransactionExecutor,
   ): Promise<OrganizationMemberRecord | null>;
 
-  listForUser(
-    userId: string,
-    executor?: TransactionExecutor,
-  ): Promise<UserOrganizationRecord[]>;
+  listForUser(userId: string, executor?: TransactionExecutor): Promise<UserOrganizationRecord[]>;
 
-  listAll(
-    executor?: TransactionExecutor,
-  ): Promise<OrganizationRecord[]>;
+  listAll(executor?: TransactionExecutor): Promise<OrganizationRecord[]>;
 
   updateOrganization(
     organizationId: string,
@@ -97,15 +89,12 @@ export interface OrganizationsRepositoryPort {
     options?: { excludingUserId?: string; executor?: TransactionExecutor; lock?: boolean },
   ): Promise<number>;
 
-  countMembers(
-    organizationId: string,
-    executor?: TransactionExecutor,
-  ): Promise<number>;
+  countMembers(organizationId: string, executor?: TransactionExecutor): Promise<number>;
 
   updateMemberRole(
     organizationId: string,
     userId: string,
-    role: 'OWNER' | 'ADMIN' | 'MEMBER',
+    role: "OWNER" | "ADMIN" | "MEMBER",
     executor?: TransactionExecutor,
   ): Promise<OrganizationMemberRecord | null>;
 
@@ -115,10 +104,7 @@ export interface OrganizationsRepositoryPort {
     executor?: TransactionExecutor,
   ): Promise<OrganizationMemberRecord | null>;
 
-  findPrimaryOrganizationId(
-    userId: string,
-    executor?: TransactionExecutor,
-  ): Promise<string | null>;
+  findPrimaryOrganizationId(userId: string, executor?: TransactionExecutor): Promise<string | null>;
 
   deleteOrganizationMembershipsAndRoles(
     organizationId: string,
@@ -126,4 +112,4 @@ export interface OrganizationsRepositoryPort {
   ): Promise<void>;
 }
 
-export const ORGANIZATIONS_REPOSITORY = Symbol('ORGANIZATIONS_REPOSITORY');
+export const ORGANIZATIONS_REPOSITORY = Symbol("ORGANIZATIONS_REPOSITORY");

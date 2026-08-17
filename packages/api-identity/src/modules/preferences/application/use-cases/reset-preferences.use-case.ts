@@ -1,21 +1,25 @@
-import type { RequestContext } from '@repo/api-core';
+import type { RequestContext } from "@repo/api-core";
 
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { 
+import { HttpStatus, Inject, Injectable } from "@nestjs/common";
+import {
   AppError,
   AUDIT_WRITER,
   type AuditWriter,
   ERROR_CODES,
   SYSTEM_SCOPE,
-} from '@repo/api-core';
+} from "@repo/api-core";
 
-import { PREFERENCES_REPOSITORY, type PreferencesRepositoryPort } from '../ports/preferences.repository.port';
-import { PreferencesMapper } from '../preferences.mapper';
+import {
+  PREFERENCES_REPOSITORY,
+  type PreferencesRepositoryPort,
+} from "../ports/preferences.repository.port";
+import { PreferencesMapper } from "../preferences.mapper";
 
 @Injectable()
 export class ResetPreferencesUseCase {
   constructor(
-    @Inject(PREFERENCES_REPOSITORY) private readonly preferencesRepository: PreferencesRepositoryPort,
+    @Inject(PREFERENCES_REPOSITORY)
+    private readonly preferencesRepository: PreferencesRepositoryPort,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
     private readonly preferencesMapper: PreferencesMapper,
   ) {}
@@ -26,18 +30,18 @@ export class ResetPreferencesUseCase {
     if (!reset) {
       throw new AppError(
         ERROR_CODES.INTERNAL_ERROR,
-        'Failed to reset user preferences',
+        "Failed to reset user preferences",
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
 
     await this.auditWriter.log({
       actorId: userId,
-      action: 'user.preferences.reset',
-      entityType: 'user_preferences',
+      action: "user.preferences.reset",
+      entityType: "user_preferences",
       entityId: userId,
       requestContext,
-        scope: SYSTEM_SCOPE.PLATFORM
+      scope: SYSTEM_SCOPE.PLATFORM,
     });
 
     return this.preferencesMapper.toDto(reset);

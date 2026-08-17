@@ -1,6 +1,6 @@
-import type { TransactionExecutor } from '@repo/api-core';
+import type { TransactionExecutor } from "@repo/api-core";
 
-import type { AuthSessionModel, CreateSessionInput } from '../models/auth-session';
+import type { AuthSessionModel, CreateSessionInput } from "../models/auth-session";
 
 export interface AuthSessionRepositoryPort {
   createSession(
@@ -43,20 +43,14 @@ export interface AuthSessionRepositoryPort {
     executor?: TransactionExecutor,
   ): Promise<AuthSessionModel | null>;
 
-  listSessionsForUser(
-    userId: string,
-    executor?: TransactionExecutor,
-  ): Promise<AuthSessionModel[]>;
+  listSessionsForUser(userId: string, executor?: TransactionExecutor): Promise<AuthSessionModel[]>;
 
   revokeSession(
     sessionId: string,
     executor?: TransactionExecutor,
   ): Promise<AuthSessionModel | null>;
 
-  revokeAllSessionsForUser(
-    userId: string,
-    executor?: TransactionExecutor,
-  ): Promise<void>;
+  revokeAllSessionsForUser(userId: string, executor?: TransactionExecutor): Promise<void>;
 
   // Email verification tokens
   findLatestEmailVerificationToken(
@@ -106,4 +100,4 @@ export interface AuthSessionRepositoryPort {
   cleanupExpiredTokens(executor?: TransactionExecutor): Promise<void>;
 }
 
-export const AUTH_SESSION_REPOSITORY = Symbol('AUTH_SESSION_REPOSITORY');
+export const AUTH_SESSION_REPOSITORY = Symbol("AUTH_SESSION_REPOSITORY");

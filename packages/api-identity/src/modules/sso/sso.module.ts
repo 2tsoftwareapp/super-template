@@ -1,28 +1,28 @@
-import { Module } from '@nestjs/common';
-import { EnvironmentService } from '@repo/api-core';
+import { Module } from "@nestjs/common";
+import { EnvironmentService } from "@repo/api-core";
 
-import { AccessControlModule } from '../access-control/access-control.module';
-import { AuthModule } from '../auth/auth.module';
-import { OrganizationsModule } from '../organizations/organizations.module';
-import { UsersModule } from '../users/users.module';
+import { AccessControlModule } from "../access-control/access-control.module";
+import { AuthModule } from "../auth/auth.module";
+import { OrganizationsModule } from "../organizations/organizations.module";
+import { UsersModule } from "../users/users.module";
 import {
   SSO_PROVIDER_REGISTRY,
   type SsoProviderAdapter,
-} from './application/ports/sso-provider.port';
-import { SSO_REPOSITORY } from './application/ports/sso.repository.port';
-import { HandleSsoCallbackUseCase } from './application/use-cases/handle-sso-callback.use-case';
+} from "./application/ports/sso-provider.port";
+import { SSO_REPOSITORY } from "./application/ports/sso.repository.port";
+import { HandleSsoCallbackUseCase } from "./application/use-cases/handle-sso-callback.use-case";
 import {
   CreateSsoSessionExchangeUseCase,
   ExchangeSsoSessionUseCase,
-} from './application/use-cases/sso-session-exchange.use-case';
-import { StartSsoLoginUseCase } from './application/use-cases/start-sso-login.use-case';
-import { AppleSsoAdapter } from './infrastructure/apple-sso.adapter';
-import { FakeSsoAdapter } from './infrastructure/fake-sso.adapter';
-import { GithubSsoAdapter } from './infrastructure/github-sso.adapter';
-import { GoogleSsoAdapter } from './infrastructure/google-sso.adapter';
-import { JwksCacheService } from './infrastructure/jwks-cache.service';
-import { SsoRepository } from './infrastructure/sso.repository';
-import { SsoController } from './presentation/sso.controller';
+} from "./application/use-cases/sso-session-exchange.use-case";
+import { StartSsoLoginUseCase } from "./application/use-cases/start-sso-login.use-case";
+import { AppleSsoAdapter } from "./infrastructure/apple-sso.adapter";
+import { FakeSsoAdapter } from "./infrastructure/fake-sso.adapter";
+import { GithubSsoAdapter } from "./infrastructure/github-sso.adapter";
+import { GoogleSsoAdapter } from "./infrastructure/google-sso.adapter";
+import { JwksCacheService } from "./infrastructure/jwks-cache.service";
+import { SsoRepository } from "./infrastructure/sso.repository";
+import { SsoController } from "./presentation/sso.controller";
 
 @Module({
   imports: [AccessControlModule, AuthModule, OrganizationsModule, UsersModule],
@@ -59,12 +59,8 @@ import { SsoController } from './presentation/sso.controller';
         fakeSsoAdapter: FakeSsoAdapter,
       ) => {
         const registry = new Map<string, SsoProviderAdapter>();
-        const {
-          GOOGLE_CLIENT_ID,
-          APPLE_CLIENT_ID,
-          GITHUB_CLIENT_ID,
-          SSO_FAKE_PROVIDER_ENABLED,
-        } = environmentService.values;
+        const { GOOGLE_CLIENT_ID, APPLE_CLIENT_ID, GITHUB_CLIENT_ID, SSO_FAKE_PROVIDER_ENABLED } =
+          environmentService.values;
 
         if (GOOGLE_CLIENT_ID) {
           registry.set(googleSsoAdapter.provider, googleSsoAdapter);

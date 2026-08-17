@@ -53,10 +53,7 @@ export function DashboardStats({
   return (
     <div className="grid shrink-0 gap-2 sm:grid-cols-2 xl:grid-cols-4">
       {usersError ? (
-        <StatErrorCard
-          label="Users"
-          onRetry={onRetryUsers}
-        />
+        <StatErrorCard label="Users" onRetry={onRetryUsers} />
       ) : (
         <MiniStat
           label="Users"
@@ -81,10 +78,7 @@ export function DashboardStats({
           }
           icon={
             <Workflow
-              className={cn(
-                "size-3.5",
-                failedJobs > 0 ? "text-destructive" : "text-chart-5",
-              )}
+              className={cn("size-3.5", failedJobs > 0 ? "text-destructive" : "text-chart-5")}
             />
           }
           iconBg={failedJobs > 0 ? "bg-destructive/10" : "bg-accent"}
@@ -96,9 +90,7 @@ export function DashboardStats({
         label="Permissions"
         value={permissionCount}
         sub="Your role"
-        icon={
-          <ShieldCheck className="size-3.5 text-secondary-foreground" />
-        }
+        icon={<ShieldCheck className="size-3.5 text-secondary-foreground" />}
         iconBg="bg-muted"
       />
       <MiniStat
@@ -106,12 +98,7 @@ export function DashboardStats({
         value={healthFetching ? "…" : isHealthy ? "OK" : "Down"}
         sub={healthFetching ? "Checking" : "Health check"}
         icon={
-          <Activity
-            className={cn(
-              "size-3.5",
-              isHealthy ? "text-primary" : "text-destructive",
-            )}
-          />
+          <Activity className={cn("size-3.5", isHealthy ? "text-primary" : "text-destructive")} />
         }
         iconBg={isHealthy ? "bg-primary/10" : "bg-destructive/10"}
         loading={healthFetching}
@@ -120,13 +107,7 @@ export function DashboardStats({
   );
 }
 
-function StatErrorCard({
-  label,
-  onRetry,
-}: {
-  label: string;
-  onRetry: () => void;
-}) {
+function StatErrorCard({ label, onRetry }: { label: string; onRetry: () => void }) {
   return (
     <Card size="sm">
       <CardContent className="py-2">
@@ -186,18 +167,9 @@ function MiniStat({
               {value}
             </p>
           )}
-          {sub ? (
-            <p className="truncate text-[10px] text-muted-foreground">
-              {sub}
-            </p>
-          ) : null}
+          {sub ? <p className="truncate text-[10px] text-muted-foreground">{sub}</p> : null}
         </div>
-        <div
-          className={cn(
-            "flex size-7 shrink-0 items-center justify-center rounded-md",
-            iconBg,
-          )}
-        >
+        <div className={cn("flex size-7 shrink-0 items-center justify-center rounded-md", iconBg)}>
           {icon}
         </div>
       </CardContent>

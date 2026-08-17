@@ -1,12 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable } from "@nestjs/common";
 
 import type {
   ObjectStorage,
   UploadInput,
   UploadResult,
-} from '../application/object-storage.interface';
+} from "../application/object-storage.interface";
 
-import { StorageTrackingRepository } from './storage-tracking.repository';
+import { StorageTrackingRepository } from "./storage-tracking.repository";
 
 /**
  * Wraps the active storage driver so every upload/delete is recorded in the

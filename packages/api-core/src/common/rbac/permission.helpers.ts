@@ -1,8 +1,8 @@
 export const ACTION = {
-  READ: 'read',
-  CREATE: 'create',
-  UPDATE: 'update',
-  DELETE: 'delete',
+  READ: "read",
+  CREATE: "create",
+  UPDATE: "update",
+  DELETE: "delete",
 } as const;
 
 export type Action = (typeof ACTION)[keyof typeof ACTION];

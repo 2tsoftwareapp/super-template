@@ -1,13 +1,13 @@
-import { Injectable } from '@nestjs/common';
-import { EnvironmentService } from '@repo/api-core';
-import { mkdir, readFile, unlink, writeFile } from 'node:fs/promises';
-import { dirname, join } from 'node:path';
+import { Injectable } from "@nestjs/common";
+import { EnvironmentService } from "@repo/api-core";
+import { mkdir, readFile, unlink, writeFile } from "node:fs/promises";
+import { dirname, join } from "node:path";
 
 import type {
   ObjectStorage,
   UploadInput,
   UploadResult,
-} from '../application/object-storage.interface';
+} from "../application/object-storage.interface";
 
 @Injectable()
 export class LocalObjectStorage implements ObjectStorage {
@@ -43,10 +43,7 @@ export class LocalObjectStorage implements ObjectStorage {
   async getSignedUrl(key: string): Promise<string> {
     const filePath = join(this.basePath, key);
     await readFile(filePath);
-    const baseUrl = this.environmentService.values.API_INTERNAL_URL.replace(
-      /\/$/,
-      '',
-    );
+    const baseUrl = this.environmentService.values.API_INTERNAL_URL.replace(/\/$/, "");
     return `${baseUrl}/storage/local/${encodeURIComponent(key)}`;
   }
 }

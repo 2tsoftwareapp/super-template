@@ -42,10 +42,7 @@ export function useAuditLogsController(): AuditLogsViewModel {
   );
   const [selectedEntry, setSelectedEntry] = useState<AuditLogDto | null>(null);
 
-  const onFilterChange = (
-    key: keyof AuditLogsFilters,
-    value: string | number,
-  ) => {
+  const onFilterChange = (key: keyof AuditLogsFilters, value: string | number) => {
     const next = { ...filters, [key]: value };
     if (key !== "page") {
       next.page = 1;
@@ -97,9 +94,7 @@ export function useAuditLogsController(): AuditLogsViewModel {
         },
         onError: (error) => {
           const classified = classifyError(error);
-          toast.error(
-            getErrorMessage(error, classified.message || "Failed to export audit logs."),
-          );
+          toast.error(getErrorMessage(error, classified.message || "Failed to export audit logs."));
         },
       },
     );

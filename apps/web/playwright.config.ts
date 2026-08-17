@@ -18,14 +18,14 @@ const migrateUrl =
 
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? `http://localhost:${webPort}`;
 const adminPort = process.env.ADMIN_PORT ?? "3002";
-const adminURL =
-  process.env.PLAYWRIGHT_ADMIN_URL ?? `http://localhost:${adminPort}`;
+const adminURL = process.env.PLAYWRIGHT_ADMIN_URL ?? `http://localhost:${adminPort}`;
 const apiHealthUrl =
-  process.env.PLAYWRIGHT_API_HEALTH_URL ??
-  `http://localhost:${apiPort}/api/v1/health`;
+  process.env.PLAYWRIGHT_API_HEALTH_URL ?? `http://localhost:${apiPort}/api/v1/health`;
 
 const toStringEnv = (env: NodeJS.ProcessEnv): Record<string, string> =>
-  Object.fromEntries(Object.entries(env).filter((entry): entry is [string, string] => entry[1] !== undefined));
+  Object.fromEntries(
+    Object.entries(env).filter((entry): entry is [string, string] => entry[1] !== undefined),
+  );
 
 // Create clean environment for API without test-specific database URLs
 const apiEnv = { ...process.env };

@@ -1,9 +1,12 @@
-import type { JsonObject } from '@repo/api-core';
-import type { TransactionExecutor } from '@repo/api-core';
+import type { JsonObject } from "@repo/api-core";
+import type { TransactionExecutor } from "@repo/api-core";
 
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from "@nestjs/common";
 
-import { ACTIVITIES_REPOSITORY, type ActivitiesRepositoryPort } from '../ports/activities.repository.port';
+import {
+  ACTIVITIES_REPOSITORY,
+  type ActivitiesRepositoryPort,
+} from "../ports/activities.repository.port";
 
 export interface EmitActivityInput {
   organizationId: string;
@@ -11,7 +14,7 @@ export interface EmitActivityInput {
   entityType: string;
   entityId: string;
   actorId?: string | null;
-  visibility?: 'PUBLIC' | 'PRIVATE' | 'INTERNAL';
+  visibility?: "PUBLIC" | "PRIVATE" | "INTERNAL";
   metadata?: JsonObject | null;
 }
 
@@ -29,7 +32,7 @@ export class EmitActivityUseCase {
         entityType: input.entityType,
         entityId: input.entityId,
         actorId: input.actorId ?? null,
-        visibility: input.visibility ?? 'INTERNAL',
+        visibility: input.visibility ?? "INTERNAL",
         metadata: input.metadata ?? null,
       },
       executor,

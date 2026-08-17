@@ -2,10 +2,7 @@ import type { NextRequest } from "next/server";
 
 import { NextResponse } from "next/server";
 
-import {
-  readAuthCookies,
-  setAuthCookies,
-} from "@/lib/auth/cookies";
+import { readAuthCookies, setAuthCookies } from "@/lib/auth/cookies";
 import { callBackend, enforceMutationGuard } from "@/lib/server/backend";
 
 interface SwitchOrganizationPayload {

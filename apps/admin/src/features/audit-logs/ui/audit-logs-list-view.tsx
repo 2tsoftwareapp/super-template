@@ -91,11 +91,7 @@ export function AuditLogsListView({
               disabled={isExporting}
               className="h-7 px-2 text-xs"
             >
-              {isExporting ? (
-                <Spinner className="size-3.5" />
-              ) : (
-                <Download className="size-3.5" />
-              )}
+              {isExporting ? <Spinner className="size-3.5" /> : <Download className="size-3.5" />}
               Export
             </Button>
           </div>
@@ -105,11 +101,7 @@ export function AuditLogsListView({
           {hasError ? (
             <p className="p-4 text-center text-xs text-destructive">
               Failed to load audit logs.{" "}
-              <button
-                type="button"
-                onClick={onRefresh}
-                className="underline underline-offset-2"
-              >
+              <button type="button" onClick={onRefresh} className="underline underline-offset-2">
                 Try again
               </button>
             </p>
@@ -137,10 +129,7 @@ export function AuditLogsListView({
         onClose={() => onSelectEntry(null)}
       >
         {selectedEntry && (
-          <AuditLogsEventDetail
-            entry={selectedEntry}
-            formatAction={formatAction}
-          />
+          <AuditLogsEventDetail entry={selectedEntry} formatAction={formatAction} />
         )}
       </ResourceDrawer>
     </ResourcePageShell>

@@ -2,10 +2,7 @@
 
 import { useMutation } from "@tanstack/react-query";
 
-import {
-  downloadAuditLogExport,
-  exportAuditLogs,
-} from "./audit-logs.api";
+import { downloadAuditLogExport, exportAuditLogs } from "./audit-logs.api";
 
 export interface ExportAndDownloadAuditLogsInput {
   from: string | undefined;

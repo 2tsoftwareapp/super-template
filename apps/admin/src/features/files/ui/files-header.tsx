@@ -77,25 +77,13 @@ export function FilesHeader({
           )}
         </div>
         {canUpload ? (
-          <LoadingButton
-            size="sm"
-            onClick={onUploadClick}
-            loading={isUploadPending}
-          >
+          <LoadingButton size="sm" onClick={onUploadClick} loading={isUploadPending}>
             <Upload data-icon="inline-start" />
             Upload
           </LoadingButton>
         ) : null}
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onRefresh}
-          disabled={isFetching}
-        >
-          <RefreshCw
-            data-icon="inline-start"
-            className={cn(isFetching && "animate-spin")}
-          />
+        <Button variant="outline" size="sm" onClick={onRefresh} disabled={isFetching}>
+          <RefreshCw data-icon="inline-start" className={cn(isFetching && "animate-spin")} />
           Refresh
         </Button>
       </div>

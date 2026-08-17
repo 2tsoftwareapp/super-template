@@ -1,12 +1,12 @@
-import type { AuthenticatedRequestUser, TransactionExecutor } from '@repo/api-core';
+import type { AuthenticatedRequestUser, TransactionExecutor } from "@repo/api-core";
 
-import { Injectable } from '@nestjs/common';
+import { Injectable } from "@nestjs/common";
 
-import type { ListAuditLogsQuery } from './audit.types';
-import type { AuditInput } from './use-cases/record-audit-log.use-case';
+import type { ListAuditLogsQuery } from "./audit.types";
+import type { AuditInput } from "./use-cases/record-audit-log.use-case";
 
-import { ListAuditLogsUseCase } from './use-cases/list-audit-logs.use-case';
-import { RecordAuditLogUseCase } from './use-cases/record-audit-log.use-case';
+import { ListAuditLogsUseCase } from "./use-cases/list-audit-logs.use-case";
+import { RecordAuditLogUseCase } from "./use-cases/record-audit-log.use-case";
 
 /**
  * Cross-module facade for audit writing (AUDIT_WRITER port via `log`) and the

@@ -1,7 +1,7 @@
-import { describe, expect, it, vi } from 'vitest';
-import { ERROR_CODES } from '@repo/api-core';
+import { describe, expect, it, vi } from "vitest";
+import { ERROR_CODES } from "@repo/api-core";
 
-import { RegisterUseCase } from '../register.use-case';
+import { RegisterUseCase } from "../register.use-case";
 
 function buildUseCase(
   overrides: {
@@ -31,31 +31,31 @@ function buildUseCase(
   return { useCase, applicationSettingsLookup };
 }
 
-describe('RegisterUseCase', () => {
-  it('rejects registration when the registration_enabled setting is off', async () => {
+describe("RegisterUseCase", () => {
+  it("rejects registration when the registration_enabled setting is off", async () => {
     const { useCase } = buildUseCase({ registrationEnabled: false });
 
     await expect(
       useCase.execute({
-        email: 'new@test.com',
-        password: 'strong-password-123',
-        displayName: 'New User',
+        email: "new@test.com",
+        password: "strong-password-123",
+        displayName: "New User",
       }),
     ).rejects.toMatchObject({
       code: ERROR_CODES.REGISTRATION_DISABLED,
     });
   });
 
-  it('proceeds when registration is enabled', async () => {
+  it("proceeds when registration is enabled", async () => {
     const { useCase, applicationSettingsLookup } = buildUseCase({
       registrationEnabled: true,
     });
 
     await expect(
       useCase.execute({
-        email: 'new@test.com',
-        password: 'strong-password-123',
-        displayName: 'New User',
+        email: "new@test.com",
+        password: "strong-password-123",
+        displayName: "New User",
       }),
     ).rejects.not.toMatchObject({
       code: ERROR_CODES.REGISTRATION_DISABLED,

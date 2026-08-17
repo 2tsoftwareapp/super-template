@@ -1,12 +1,9 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from "@nestjs/common";
 
-import type { EnqueueJobCommand, JobView } from '../jobs.types';
+import type { EnqueueJobCommand, JobView } from "../jobs.types";
 
-import { JobsMapper } from '../jobs.mapper';
-import {
-  JOBS_REPOSITORY,
-  type JobsRepositoryPort,
-} from '../ports/jobs.repository.port';
+import { JobsMapper } from "../jobs.mapper";
+import { JOBS_REPOSITORY, type JobsRepositoryPort } from "../ports/jobs.repository.port";
 
 @Injectable()
 export class EnqueueJobUseCase {
@@ -27,12 +24,12 @@ export class EnqueueJobUseCase {
         createdById,
         organizationId: input.organizationId ?? null,
         maxAttempts: input.maxAttempts ?? 3,
-        status: 'PENDING',
+        status: "PENDING",
         idempotencyKey: input.idempotencyKey,
       });
 
       if (!job) {
-        throw new Error('Job insert returned no rows');
+        throw new Error("Job insert returned no rows");
       }
 
       return this.jobsMapper.toJobView(job);
@@ -46,12 +43,12 @@ export class EnqueueJobUseCase {
       createdById,
       organizationId: input.organizationId ?? null,
       maxAttempts: input.maxAttempts ?? 3,
-      status: 'PENDING',
+      status: "PENDING",
       ...(input.idempotencyKey ? { idempotencyKey: input.idempotencyKey } : {}),
     });
 
     if (!job) {
-      throw new Error('Job insert returned no rows');
+      throw new Error("Job insert returned no rows");
     }
 
     return this.jobsMapper.toJobView(job);

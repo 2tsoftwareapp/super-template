@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable } from "@nestjs/common";
 
-import type { ErrorReportContext } from './observability.types';
+import type { ErrorReportContext } from "./observability.types";
 
-import { SentryTransportService } from './sentry-transport.service';
-import { TelegramTransportService } from './telegram-transport.service';
+import { SentryTransportService } from "./sentry-transport.service";
+import { TelegramTransportService } from "./telegram-transport.service";
 
 @Injectable()
 export class ErrorReporterService {
@@ -14,7 +14,7 @@ export class ErrorReporterService {
 
   reportException(error: Error, context: ErrorReportContext): void {
     this.sentryTransport.captureException(error, context);
-    void this.telegramTransport.send(error.message || 'Unhandled error', context);
+    void this.telegramTransport.send(error.message || "Unhandled error", context);
   }
 
   reportMessage(message: string, context: ErrorReportContext): void {

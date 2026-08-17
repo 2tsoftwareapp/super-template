@@ -23,12 +23,7 @@ vi.mock("@/hooks/use-session", () => ({
   useSession: vi.fn(() => ({
     data: {
       data: {
-        permissions: [
-          "roles.read",
-          "roles.create",
-          "roles.update",
-          "roles.delete",
-        ],
+        permissions: ["roles.read", "roles.create", "roles.update", "roles.delete"],
         user: { roles: [] },
       },
     },
@@ -73,10 +68,7 @@ const asRouter = (replace: ReturnType<typeof vi.fn>) =>
 const asSearchParams = (searchParams: URLSearchParams) =>
   searchParams as unknown as ReturnType<typeof useSearchParams>;
 
-const mockNavigation = (
-  searchParams: URLSearchParams,
-  replace: ReturnType<typeof vi.fn>,
-) => {
+const mockNavigation = (searchParams: URLSearchParams, replace: ReturnType<typeof vi.fn>) => {
   vi.mocked(useRouter).mockReturnValue(asRouter(replace));
   vi.mocked(usePathname).mockReturnValue("/admin/roles");
   vi.mocked(useSearchParams).mockReturnValue(asSearchParams(searchParams));
@@ -110,9 +102,7 @@ describe("useRolesController", () => {
       result.current.onOrganizationFilterChange("org-123");
     });
 
-    expect(replace).toHaveBeenCalledWith(
-      "/admin/roles?organizationId=org-123",
-    );
+    expect(replace).toHaveBeenCalledWith("/admin/roles?organizationId=org-123");
   });
 
   it("synchronizes search state when browser navigation changes the URL", async () => {
@@ -121,9 +111,7 @@ describe("useRolesController", () => {
 
     vi.mocked(useRouter).mockReturnValue(asRouter(replace));
     vi.mocked(usePathname).mockReturnValue("/admin/roles");
-    vi.mocked(useSearchParams).mockImplementation(() =>
-      asSearchParams(currentSearchParams),
-    );
+    vi.mocked(useSearchParams).mockImplementation(() => asSearchParams(currentSearchParams));
 
     const { result, rerender } = renderHook(() => useRolesController());
 
@@ -153,9 +141,7 @@ describe("useRolesController", () => {
 
     await waitFor(
       () => {
-        expect(replace).toHaveBeenCalledWith(
-          "/admin/roles?search=security+admin",
-        );
+        expect(replace).toHaveBeenCalledWith("/admin/roles?search=security+admin");
       },
       { timeout: 1_000 },
     );

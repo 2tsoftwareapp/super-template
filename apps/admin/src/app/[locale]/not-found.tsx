@@ -17,8 +17,8 @@ export default function NotFound() {
       <p className="text-muted-foreground text-sm font-medium">404</p>
       <h1 className="text-xl font-semibold">This page does not exist</h1>
       <p className="text-muted-foreground max-w-md text-sm">
-        The link may be outdated, or the record was removed. Check the address
-        or head back to the dashboard.
+        The link may be outdated, or the record was removed. Check the address or head back to the
+        dashboard.
       </p>
       <Link href="/" className={buttonVariants({ variant: "outline" })}>
         Back to dashboard

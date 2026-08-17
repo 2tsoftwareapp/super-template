@@ -37,9 +37,7 @@ export type { NotificationsViewModel };
 export function useNotificationsController(): NotificationsViewModel {
   const queryClient = useQueryClient();
   const session = useSession();
-  const permissions = selectNotificationPermissions(
-    session.data?.data.permissions,
-  );
+  const permissions = selectNotificationPermissions(session.data?.data.permissions);
 
   const jobs = useNotificationJobsQuery(permissions.canRead);
   const recentNotifications = useRecentNotificationsQuery();

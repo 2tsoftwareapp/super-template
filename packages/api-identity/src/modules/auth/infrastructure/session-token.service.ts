@@ -1,21 +1,18 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import {
-  durationToMilliseconds,
-  EnvironmentService,
-} from '@repo/api-core';
-import { randomUUID } from 'node:crypto';
+import { Inject, Injectable } from "@nestjs/common";
+import { JwtService } from "@nestjs/jwt";
+import { durationToMilliseconds, EnvironmentService } from "@repo/api-core";
+import { randomUUID } from "node:crypto";
 
 import type {
   AuthTokenProviderPort,
   TokenPayload,
-} from '../application/ports/auth-token.provider.port';
+} from "../application/ports/auth-token.provider.port";
 
-import { hashRefreshToken } from '../application/auth.helpers';
+import { hashRefreshToken } from "../application/auth.helpers";
 import {
   AUTH_SESSION_REPOSITORY,
   type AuthSessionRepositoryPort,
-} from '../application/ports/auth-session.repository.port';
+} from "../application/ports/auth-session.repository.port";
 
 export { type TokenPayload };
 
@@ -35,11 +32,13 @@ export class SessionTokenService implements AuthTokenProviderPort {
   ) {
     const sessionId = randomUUID();
     const expiresAt = new Date(
-      Date.now() +
-        durationToMilliseconds(this.environmentService.values.JWT_REFRESH_TTL),
+      Date.now() + durationToMilliseconds(this.environmentService.values.JWT_REFRESH_TTL),
     );
-    const { accessToken, refreshToken, refreshTokenHash } =
-      await this.issueTokenPair(userId, sessionId, organizationId);
+    const { accessToken, refreshToken, refreshTokenHash } = await this.issueTokenPair(
+      userId,
+      sessionId,
+      organizationId,
+    );
     const session = await this.authSessionRepository.createSession({
       id: sessionId,
       userId,
@@ -51,7 +50,7 @@ export class SessionTokenService implements AuthTokenProviderPort {
     });
 
     if (!session) {
-      throw new Error('Session insert returned no rows');
+      throw new Error("Session insert returned no rows");
     }
 
     return {
@@ -97,10 +96,7 @@ export class SessionTokenService implements AuthTokenProviderPort {
             }
           : {}),
         expiresAt: new Date(
-          Date.now() +
-            durationToMilliseconds(
-              this.environmentService.values.JWT_REFRESH_TTL,
-            ),
+          Date.now() + durationToMilliseconds(this.environmentService.values.JWT_REFRESH_TTL),
         ),
         lastUsedAt: new Date(),
         ipAddress: metadata.ipAddress,
@@ -141,10 +137,7 @@ export class SessionTokenService implements AuthTokenProviderPort {
       previousRefreshTokenHash: null,
       previousRotatedAt: null,
       expiresAt: new Date(
-        Date.now() +
-          durationToMilliseconds(
-            this.environmentService.values.JWT_REFRESH_TTL,
-          ),
+        Date.now() + durationToMilliseconds(this.environmentService.values.JWT_REFRESH_TTL),
       ),
       lastUsedAt: new Date(),
       ipAddress: metadata.ipAddress,
@@ -152,7 +145,7 @@ export class SessionTokenService implements AuthTokenProviderPort {
     });
 
     if (!session) {
-      throw new Error('Session update returned no rows');
+      throw new Error("Session update returned no rows");
     }
 
     return {
@@ -162,23 +155,9 @@ export class SessionTokenService implements AuthTokenProviderPort {
     };
   }
 
-  private async issueTokenPair(
-    userId: string,
-    sessionId: string,
-    organizationId: string,
-  ) {
-    const accessToken = await this.signToken(
-      userId,
-      sessionId,
-      'access',
-      organizationId,
-    );
-    const refreshToken = await this.signToken(
-      userId,
-      sessionId,
-      'refresh',
-      organizationId,
-    );
+  private async issueTokenPair(userId: string, sessionId: string, organizationId: string) {
+    const accessToken = await this.signToken(userId, sessionId, "access", organizationId);
+    const refreshToken = await this.signToken(userId, sessionId, "refresh", organizationId);
     const refreshTokenHash = await hashRefreshToken(refreshToken);
 
     return { accessToken, refreshToken, refreshTokenHash };
@@ -187,16 +166,16 @@ export class SessionTokenService implements AuthTokenProviderPort {
   async signToken(
     userId: string,
     sessionId: string,
-    type: TokenPayload['typ'],
+    type: TokenPayload["typ"],
     organizationId: string,
   ) {
     const secret =
-      type === 'access'
+      type === "access"
         ? this.environmentService.values.JWT_ACCESS_SECRET
         : this.environmentService.values.JWT_REFRESH_SECRET;
     const expiresIn = Math.floor(
       durationToMilliseconds(
-        type === 'access'
+        type === "access"
           ? this.environmentService.values.JWT_ACCESS_TTL
           : this.environmentService.values.JWT_REFRESH_TTL,
       ) / 1000,
@@ -217,17 +196,17 @@ export class SessionTokenService implements AuthTokenProviderPort {
     );
   }
 
-  async verifyToken(token: string, expectedType: TokenPayload['typ']) {
+  async verifyToken(token: string, expectedType: TokenPayload["typ"]) {
     try {
       const payload = await this.jwtService.verifyAsync<TokenPayload>(token, {
         secret:
-          expectedType === 'access'
+          expectedType === "access"
             ? this.environmentService.values.JWT_ACCESS_SECRET
             : this.environmentService.values.JWT_REFRESH_SECRET,
       });
 
       if (payload.typ !== expectedType) {
-        throw new Error('Invalid token type');
+        throw new Error("Invalid token type");
       }
 
       return payload;
@@ -236,7 +215,7 @@ export class SessionTokenService implements AuthTokenProviderPort {
         throw error;
       }
 
-      throw new Error('Token is invalid or expired');
+      throw new Error("Token is invalid or expired");
     }
   }
 }

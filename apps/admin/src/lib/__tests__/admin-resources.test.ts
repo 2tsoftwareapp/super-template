@@ -33,9 +33,7 @@ describe("admin resource registry", () => {
 
   it("checks resource access using any configured permission", () => {
     const users = adminResources.find((resource) => resource.id === "users");
-    const dashboard = adminResources.find(
-      (resource) => resource.id === "dashboard",
-    );
+    const dashboard = adminResources.find((resource) => resource.id === "dashboard");
 
     expect(users).toBeDefined();
     expect(dashboard).toBeDefined();
@@ -51,9 +49,7 @@ describe("admin resource registry", () => {
   });
 
   it("allows super admins into the app even before permission expansion", () => {
-    expect(hasAdminAppAccess({ roles: ["SUPER_ADMIN"], permissions: [] })).toBe(
-      true,
-    );
+    expect(hasAdminAppAccess({ roles: ["SUPER_ADMIN"], permissions: [] })).toBe(true);
   });
 
   it("returns the first accessible route for a permission set", () => {

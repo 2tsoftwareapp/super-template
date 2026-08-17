@@ -1,12 +1,15 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { Inject } from '@nestjs/common';
-import { EnvironmentService } from '@repo/api-core';
-import { type App, cert, getApps, initializeApp } from 'firebase-admin/app';
-import { getMessaging } from 'firebase-admin/messaging';
+import { Injectable, Logger } from "@nestjs/common";
+import { Inject } from "@nestjs/common";
+import { EnvironmentService } from "@repo/api-core";
+import { type App, cert, getApps, initializeApp } from "firebase-admin/app";
+import { getMessaging } from "firebase-admin/messaging";
 
-import type { PushMessage, PushNotifier, PushSendResult } from '../application/push.interface';
+import type { PushMessage, PushNotifier, PushSendResult } from "../application/push.interface";
 
-import { DEVICE_TOKENS_REPOSITORY, type DeviceTokensRepositoryPort } from '../application/ports/device-tokens.repository.port';
+import {
+  DEVICE_TOKENS_REPOSITORY,
+  type DeviceTokensRepositoryPort,
+} from "../application/ports/device-tokens.repository.port";
 
 @Injectable()
 export class FcmPushService implements PushNotifier {
@@ -18,8 +21,7 @@ export class FcmPushService implements PushNotifier {
     @Inject(DEVICE_TOKENS_REPOSITORY)
     private readonly deviceTokensRepository: DeviceTokensRepositoryPort,
   ) {
-    const { FCM_PROJECT_ID, FCM_CLIENT_EMAIL, FCM_PRIVATE_KEY } =
-      this.environmentService.values;
+    const { FCM_PROJECT_ID, FCM_CLIENT_EMAIL, FCM_PRIVATE_KEY } = this.environmentService.values;
 
     if (!FCM_PROJECT_ID || !FCM_CLIENT_EMAIL || !FCM_PRIVATE_KEY) {
       this.app = null;
@@ -32,7 +34,7 @@ export class FcmPushService implements PushNotifier {
         credential: cert({
           projectId: FCM_PROJECT_ID,
           clientEmail: FCM_CLIENT_EMAIL,
-          privateKey: FCM_PRIVATE_KEY.replace(/\\n/g, '\n'),
+          privateKey: FCM_PRIVATE_KEY.replace(/\\n/g, "\n"),
         }),
       });
   }
@@ -63,7 +65,7 @@ export class FcmPushService implements PushNotifier {
 
       if (
         result.success ||
-        result.error?.code !== 'messaging/registration-token-not-registered' ||
+        result.error?.code !== "messaging/registration-token-not-registered" ||
         !token
       ) {
         return [];
@@ -73,16 +75,14 @@ export class FcmPushService implements PushNotifier {
     });
 
     if (invalidTokens.length > 0) {
-      await this.deviceTokensRepository.disableTokens(invalidTokens, 'Invalid FCM token');
-      this.logger.warn(
-        `Removed ${invalidTokens.length} invalid FCM token(s) for user ${userId}`,
-      );
+      await this.deviceTokensRepository.disableTokens(invalidTokens, "Invalid FCM token");
+      this.logger.warn(`Removed ${invalidTokens.length} invalid FCM token(s) for user ${userId}`);
     }
   }
 
   async sendToToken(token: string, message: PushMessage): Promise<PushSendResult> {
     if (!this.app) {
-      return { success: false, providerMessageId: null, error: 'FCM not configured' };
+      return { success: false, providerMessageId: null, error: "FCM not configured" };
     }
 
     try {
@@ -97,16 +97,16 @@ export class FcmPushService implements PushNotifier {
 
       return { success: true, providerMessageId: response || null };
     } catch (error) {
-      const errorCode = (error as { code?: string }).code ?? '';
+      const errorCode = (error as { code?: string }).code ?? "";
       const isInvalidToken =
-        errorCode === 'messaging/registration-token-not-registered' ||
-        errorCode === 'messaging/invalid-registration-token';
+        errorCode === "messaging/registration-token-not-registered" ||
+        errorCode === "messaging/invalid-registration-token";
 
       const errorMessage = error instanceof Error ? error.message : String(error);
       return {
         success: false,
         providerMessageId: null,
-        error: isInvalidToken ? 'INVALID_TOKEN' : errorMessage,
+        error: isInvalidToken ? "INVALID_TOKEN" : errorMessage,
       };
     }
   }
@@ -119,8 +119,7 @@ export class FcmPushService implements PushNotifier {
 
     if (message.data) {
       for (const [key, value] of Object.entries(message.data)) {
-        data[key] =
-          typeof value === 'string' ? value : JSON.stringify(value ?? null);
+        data[key] = typeof value === "string" ? value : JSON.stringify(value ?? null);
       }
     }
 

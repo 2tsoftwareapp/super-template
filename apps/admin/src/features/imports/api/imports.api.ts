@@ -21,9 +21,7 @@ export const importsApi = {
   },
 
   get(jobId: string) {
-    return webFetch<{ data: ImportJobDto }>(
-      bffPath("/api/v1/imports/{id}", { id: jobId }),
-    );
+    return webFetch<{ data: ImportJobDto }>(bffPath("/api/v1/imports/{id}", { id: jobId }));
   },
 
   confirm(jobId: string) {

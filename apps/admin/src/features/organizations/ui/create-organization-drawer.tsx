@@ -55,12 +55,7 @@ export function CreateOrganizationDrawer({
       description="Create a new organization workspace."
       onClose={handleClose}
       footer={
-        <Button
-          type="submit"
-          form="create-org-form"
-          className="w-full"
-          disabled={isSubmitting}
-        >
+        <Button type="submit" form="create-org-form" className="w-full" disabled={isSubmitting}>
           {isSubmitting ? <Spinner data-icon="inline-start" /> : null}
           Create Workspace
         </Button>
@@ -76,9 +71,7 @@ export function CreateOrganizationDrawer({
             {...form.register("name")}
           />
           {form.formState.errors.name ? (
-            <p className="text-xs text-destructive">
-              {form.formState.errors.name.message}
-            </p>
+            <p className="text-xs text-destructive">{form.formState.errors.name.message}</p>
           ) : null}
         </div>
       </form>

@@ -1,10 +1,10 @@
-import { NestFactory } from '@nestjs/core';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { loadEnvFiles } from '@repo/env-loader';
-import { writeFile } from 'node:fs/promises';
-import { resolve } from 'node:path';
+import { NestFactory } from "@nestjs/core";
+import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import { loadEnvFiles } from "@repo/env-loader";
+import { writeFile } from "node:fs/promises";
+import { resolve } from "node:path";
 
-import { AppModule } from '../app.module';
+import { AppModule } from "../app.module";
 
 loadEnvFiles();
 
@@ -13,20 +13,17 @@ const generate = async (): Promise<void> => {
     logger: false,
   });
 
-  app.setGlobalPrefix('api/v1');
+  app.setGlobalPrefix("api/v1");
 
   const config = new DocumentBuilder()
-    .setTitle('Super Template API')
-    .setDescription('Generated OpenAPI contract')
-    .setVersion('1.0.0')
+    .setTitle("Super Template API")
+    .setDescription("Generated OpenAPI contract")
+    .setVersion("1.0.0")
     .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  await writeFile(
-    resolve(process.cwd(), 'openapi.json'),
-    JSON.stringify(document, null, 2),
-  );
+  await writeFile(resolve(process.cwd(), "openapi.json"), JSON.stringify(document, null, 2));
   await app.close();
 };
 

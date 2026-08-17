@@ -2,13 +2,7 @@
 
 import { standardSchemaResolver as zodResolver } from "@hookform/resolvers/standard-schema";
 import { Button } from "@repo/web-ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@repo/web-ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/web-ui/card";
 import { Label } from "@repo/web-ui/label";
 import { PasswordInput } from "@repo/web-ui/password-input";
 import { Spinner } from "@repo/web-ui/spinner";
@@ -47,9 +41,7 @@ export function ChangePasswordForm({
     <Card>
       <CardHeader>
         <CardTitle className="text-lg">Change password</CardTitle>
-        <CardDescription>
-          Update your password to keep your account secure.
-        </CardDescription>
+        <CardDescription>Update your password to keep your account secure.</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="max-w-md space-y-4">
@@ -61,9 +53,7 @@ export function ChangePasswordForm({
               {...register("currentPassword")}
             />
             {errors.currentPassword && (
-              <p className="text-xs text-destructive">
-                {errors.currentPassword.message}
-              </p>
+              <p className="text-xs text-destructive">{errors.currentPassword.message}</p>
             )}
           </div>
 
@@ -75,9 +65,7 @@ export function ChangePasswordForm({
               {...register("newPassword")}
             />
             {errors.newPassword && (
-              <p className="text-xs text-destructive">
-                {errors.newPassword.message}
-              </p>
+              <p className="text-xs text-destructive">{errors.newPassword.message}</p>
             )}
           </div>
 
@@ -89,9 +77,7 @@ export function ChangePasswordForm({
               {...register("confirmPassword")}
             />
             {errors.confirmPassword && (
-              <p className="text-xs text-destructive">
-                {errors.confirmPassword.message}
-              </p>
+              <p className="text-xs text-destructive">{errors.confirmPassword.message}</p>
             )}
           </div>
 

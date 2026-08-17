@@ -1,10 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { AUTH_ERROR_QUERY_VALUES } from "../auth.constants";
-import {
-  parseAuthLoginSearchParams,
-  parseSsoCallbackSearchParams,
-} from "../auth.search-params";
+import { parseAuthLoginSearchParams, parseSsoCallbackSearchParams } from "../auth.search-params";
 
 describe("parseAuthLoginSearchParams", () => {
   it("keeps a known SSO error flag", () => {
@@ -15,17 +12,18 @@ describe("parseAuthLoginSearchParams", () => {
   });
 
   it("recovers unknown error values to undefined", () => {
-    expect(parseAuthLoginSearchParams(new URLSearchParams("error=nope"))).toEqual(
-      { error: undefined },
-    );
+    expect(parseAuthLoginSearchParams(new URLSearchParams("error=nope"))).toEqual({
+      error: undefined,
+    });
   });
 });
 
 describe("parseSsoCallbackSearchParams", () => {
   it("parses a present exchange code", () => {
-    expect(
-      parseSsoCallbackSearchParams(new URLSearchParams("exchange=abc123")),
-    ).toEqual({ error: undefined, exchange: "abc123" });
+    expect(parseSsoCallbackSearchParams(new URLSearchParams("exchange=abc123"))).toEqual({
+      error: undefined,
+      exchange: "abc123",
+    });
   });
 
   it("defaults a missing exchange to empty string", () => {

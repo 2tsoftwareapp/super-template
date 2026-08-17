@@ -1,10 +1,10 @@
-import type { JsonObject } from '../types/json-value';
+import type { JsonObject } from "../types/json-value";
 
-export const APP_LOGGER = Symbol('APP_LOGGER');
+export const APP_LOGGER = Symbol("APP_LOGGER");
 
 export type LogContext = JsonObject;
 
-export type LogLevel = 'info' | 'warn' | 'error';
+export type LogLevel = "info" | "warn" | "error";
 
 export interface LogEntry {
   timestamp: string;

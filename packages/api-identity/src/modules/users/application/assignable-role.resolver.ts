@@ -1,12 +1,12 @@
-import type { TransactionExecutor } from '@repo/api-core';
+import type { TransactionExecutor } from "@repo/api-core";
 
-import { AppError, ERROR_CODES } from '@repo/api-core';
+import { AppError, ERROR_CODES } from "@repo/api-core";
 
-import type { AccessControlService } from '../../access-control/application/access-control.service';
-import type { RolePolicyTarget } from '../../access-control/domain/role-assignment.policy';
-import type { AssignableRoleName } from './users.types';
+import type { AccessControlService } from "../../access-control/application/access-control.service";
+import type { RolePolicyTarget } from "../../access-control/domain/role-assignment.policy";
+import type { AssignableRoleName } from "./users.types";
 
-import { ROLE_NAMES } from '../../access-control/access-control.constants';
+import { ROLE_NAMES } from "../../access-control/access-control.constants";
 
 export async function resolveAssignableRole(
   accessControlService: AccessControlService,
@@ -17,18 +17,10 @@ export async function resolveAssignableRole(
   const isSystemRole = roleName === ROLE_NAMES.USER || roleName === ROLE_NAMES.ADMIN;
 
   if (roleName === ROLE_NAMES.USER) {
-    const role = await accessControlService.getRoleByName(
-      ROLE_NAMES.USER,
-      null,
-      executor,
-    );
+    const role = await accessControlService.getRoleByName(ROLE_NAMES.USER, null, executor);
 
     if (!role) {
-      throw new AppError(
-        ERROR_CODES.INTERNAL_ERROR,
-        'USER role is missing',
-        500,
-      );
+      throw new AppError(ERROR_CODES.INTERNAL_ERROR, "USER role is missing", 500);
     }
 
     return {
@@ -51,7 +43,11 @@ export async function resolveAssignableRole(
     }
 
     const role = isSystemRole
-      ? await accessControlService.getOrganizationRoleByName(ROLE_NAMES.ADMIN, organizationId, executor)
+      ? await accessControlService.getOrganizationRoleByName(
+          ROLE_NAMES.ADMIN,
+          organizationId,
+          executor,
+        )
       : await accessControlService.getRoleByName(roleName, organizationId, executor);
 
     if (!role) {
@@ -72,11 +68,7 @@ export async function resolveAssignableRole(
     };
   }
 
-  throw new AppError(
-    ERROR_CODES.VALIDATION_FAILED,
-    `Unknown role: ${roleName}`,
-    400,
-  );
+  throw new AppError(ERROR_CODES.VALIDATION_FAILED, `Unknown role: ${roleName}`, 400);
 }
 
 export async function resolveRoleById(
@@ -87,11 +79,7 @@ export async function resolveRoleById(
   const role = await accessControlService.getRoleById(roleId, executor);
 
   if (!role) {
-    throw new AppError(
-      ERROR_CODES.VALIDATION_FAILED,
-      `Role not found: ${roleId}`,
-      400,
-    );
+    throw new AppError(ERROR_CODES.VALIDATION_FAILED, `Role not found: ${roleId}`, 400);
   }
 
   return {

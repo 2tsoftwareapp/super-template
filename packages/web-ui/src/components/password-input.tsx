@@ -5,10 +5,7 @@ import * as React from "react";
 
 import { Input } from "./input";
 
-function PasswordInput({
-  className,
-  ...props
-}: React.InputHTMLAttributes<HTMLInputElement>) {
+function PasswordInput({ className, ...props }: React.InputHTMLAttributes<HTMLInputElement>) {
   const [visible, setVisible] = React.useState(false);
 
   return (

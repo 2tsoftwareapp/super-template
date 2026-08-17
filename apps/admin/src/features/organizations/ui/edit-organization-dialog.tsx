@@ -66,9 +66,7 @@ export function EditOrganizationDialog({
               {...form.register("name")}
             />
             {form.formState.errors.name ? (
-              <p className="text-xs text-destructive">
-                {form.formState.errors.name.message}
-              </p>
+              <p className="text-xs text-destructive">{form.formState.errors.name.message}</p>
             ) : null}
           </div>
           <DialogFooter className="mt-4 gap-2">

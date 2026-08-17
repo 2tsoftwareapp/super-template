@@ -1,10 +1,10 @@
-import type { AuthSessionModel } from '../models/auth-session';
+import type { AuthSessionModel } from "../models/auth-session";
 
 export interface TokenPayload {
   sub: string;
   sid: string;
   jti: string;
-  typ: 'access' | 'refresh';
+  typ: "access" | "refresh";
   oid?: string;
 }
 
@@ -18,14 +18,11 @@ export interface AuthTokenProviderPort {
   signToken(
     userId: string,
     sessionId: string,
-    type: TokenPayload['typ'],
+    type: TokenPayload["typ"],
     organizationId: string,
   ): Promise<string>;
 
-  verifyToken(
-    token: string,
-    expectedType: TokenPayload['typ'],
-  ): Promise<TokenPayload>;
+  verifyToken(token: string, expectedType: TokenPayload["typ"]): Promise<TokenPayload>;
 
   createSessionTokens(
     userId: string,
@@ -58,4 +55,4 @@ export interface AuthTokenProviderPort {
   ): Promise<RotateTokensResult>;
 }
 
-export const AUTH_TOKEN_PROVIDER = Symbol('AUTH_TOKEN_PROVIDER');
+export const AUTH_TOKEN_PROVIDER = Symbol("AUTH_TOKEN_PROVIDER");

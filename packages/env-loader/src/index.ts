@@ -1,9 +1,9 @@
-import { config as loadEnv } from 'dotenv';
-import { execSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { config as loadEnv } from "dotenv";
+import { execSync } from "node:child_process";
+import { existsSync } from "node:fs";
+import { dirname, resolve } from "node:path";
 
-const WORKSPACE_MARKER = 'pnpm-workspace.yaml';
+const WORKSPACE_MARKER = "pnpm-workspace.yaml";
 
 /** Walks up from [start] to find the monorepo root (folder with pnpm-workspace.yaml). */
 const findRepoRoot = (start: string): string => {
@@ -21,7 +21,7 @@ const findRepoRoot = (start: string): string => {
   return start;
 };
 
-export type AppEnvName = 'development' | 'test' | 'staging' | 'production';
+export type AppEnvName = "development" | "test" | "staging" | "production";
 
 export interface LoadEnvOptions {
   /** Override APP_ENV detection (defaults to process.env.APP_ENV or 'development'). */
@@ -34,7 +34,7 @@ const isPortInUseSync = (port: number): boolean => {
   try {
     execSync(
       `"${process.execPath}" -e "const s = require('net').createServer(); s.once('error', () => process.exit(1)); s.listen(${port}, () => { s.close(); process.exit(0); })"`,
-      { stdio: 'ignore' }
+      { stdio: "ignore" },
     );
     return false;
   } catch {
@@ -45,8 +45,8 @@ const isPortInUseSync = (port: number): boolean => {
 const isComposeServiceRunning = (root: string, serviceName: string): boolean => {
   try {
     const output = execSync(
-      'docker compose -f infra/docker-compose.yml ps --services --filter status=running',
-      { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }
+      "docker compose -f infra/docker-compose.yml ps --services --filter status=running",
+      { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] },
     );
     return output.includes(serviceName);
   } catch {
@@ -54,11 +54,15 @@ const isComposeServiceRunning = (root: string, serviceName: string): boolean => 
   }
 };
 
-const getComposeServiceHostPort = (root: string, serviceName: string, containerPort: number): number | null => {
+const getComposeServiceHostPort = (
+  root: string,
+  serviceName: string,
+  containerPort: number,
+): number | null => {
   try {
     const mapped = execSync(
       `docker compose -f infra/docker-compose.yml port ${serviceName} ${containerPort}`,
-      { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }
+      { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] },
     ).trim();
     const match = /:(\d+)$/.exec(mapped);
     return match ? Number(match[1]) : null;
@@ -67,7 +71,12 @@ const getComposeServiceHostPort = (root: string, serviceName: string, containerP
   }
 };
 
-const resolveServicePort = (root: string, serviceName: string, containerPort: number, defaultPort: number): number => {
+const resolveServicePort = (
+  root: string,
+  serviceName: string,
+  containerPort: number,
+  defaultPort: number,
+): number => {
   if (isComposeServiceRunning(root, serviceName)) {
     const ourPort = getComposeServiceHostPort(root, serviceName, containerPort);
     if (ourPort) {
@@ -96,7 +105,9 @@ const updateUrlPort = (urlString: string | undefined, newPort: number): string |
 
 const resolveDynamicPorts = (root: string): void => {
   // 1. Postgres
-  let postgresPort = process.env.POSTGRES_EXPOSED_PORT ? Number(process.env.POSTGRES_EXPOSED_PORT) : 5432;
+  let postgresPort = process.env.POSTGRES_EXPOSED_PORT
+    ? Number(process.env.POSTGRES_EXPOSED_PORT)
+    : 5432;
   if (process.env.POSTGRES_PORT) {
     postgresPort = Number(process.env.POSTGRES_PORT);
   }
@@ -120,7 +131,7 @@ const resolveDynamicPorts = (root: string): void => {
     }
   }
 
-  const resolvedPostgresPort = resolveServicePort(root, 'postgres', 5432, postgresPort);
+  const resolvedPostgresPort = resolveServicePort(root, "postgres", 5432, postgresPort);
   process.env.POSTGRES_EXPOSED_PORT = resolvedPostgresPort.toString();
   if (process.env.POSTGRES_PORT) {
     process.env.POSTGRES_PORT = resolvedPostgresPort.toString();
@@ -129,13 +140,22 @@ const resolveDynamicPorts = (root: string): void => {
     process.env.DATABASE_URL = updateUrlPort(process.env.DATABASE_URL, resolvedPostgresPort);
   }
   if (process.env.DATABASE_MIGRATE_URL) {
-    process.env.DATABASE_MIGRATE_URL = updateUrlPort(process.env.DATABASE_MIGRATE_URL, resolvedPostgresPort);
+    process.env.DATABASE_MIGRATE_URL = updateUrlPort(
+      process.env.DATABASE_MIGRATE_URL,
+      resolvedPostgresPort,
+    );
   }
   if (process.env.DATABASE_URL_TEST) {
-    process.env.DATABASE_URL_TEST = updateUrlPort(process.env.DATABASE_URL_TEST, resolvedPostgresPort);
+    process.env.DATABASE_URL_TEST = updateUrlPort(
+      process.env.DATABASE_URL_TEST,
+      resolvedPostgresPort,
+    );
   }
   if (process.env.DATABASE_URL_TEST_ADMIN) {
-    process.env.DATABASE_URL_TEST_ADMIN = updateUrlPort(process.env.DATABASE_URL_TEST_ADMIN, resolvedPostgresPort);
+    process.env.DATABASE_URL_TEST_ADMIN = updateUrlPort(
+      process.env.DATABASE_URL_TEST_ADMIN,
+      resolvedPostgresPort,
+    );
   }
 
   // 2. Redis
@@ -153,7 +173,7 @@ const resolveDynamicPorts = (root: string): void => {
     }
   }
 
-  const resolvedRedisPort = resolveServicePort(root, 'redis', 6379, redisPort);
+  const resolvedRedisPort = resolveServicePort(root, "redis", 6379, redisPort);
   process.env.REDIS_PORT = resolvedRedisPort.toString();
   if (redisUrl) {
     process.env.REDIS_URL = updateUrlPort(redisUrl, resolvedRedisPort);
@@ -161,12 +181,14 @@ const resolveDynamicPorts = (root: string): void => {
 
   // 3. Mailpit SMTP
   const mailPort = process.env.MAIL_PORT ? Number(process.env.MAIL_PORT) : 1025;
-  const resolvedMailPort = resolveServicePort(root, 'mailpit', 1025, mailPort);
+  const resolvedMailPort = resolveServicePort(root, "mailpit", 1025, mailPort);
   process.env.MAIL_PORT = resolvedMailPort.toString();
 
   // 4. Mailpit HTTP
-  const mailpitHttpPort = process.env.MAILPIT_HTTP_PORT ? Number(process.env.MAILPIT_HTTP_PORT) : 8025;
-  const resolvedMailpitHttpPort = resolveServicePort(root, 'mailpit', 8025, mailpitHttpPort);
+  const mailpitHttpPort = process.env.MAILPIT_HTTP_PORT
+    ? Number(process.env.MAILPIT_HTTP_PORT)
+    : 8025;
+  const resolvedMailpitHttpPort = resolveServicePort(root, "mailpit", 8025, mailpitHttpPort);
   process.env.MAILPIT_HTTP_PORT = resolvedMailpitHttpPort.toString();
 };
 
@@ -177,7 +199,7 @@ const resolveDynamicPorts = (root: string): void => {
  */
 export const resolveAppEnv = (explicit?: string): string => {
   const value = explicit ?? process.env.APP_ENV;
-  return value && value.length > 0 ? value : 'development';
+  return value && value.length > 0 ? value : "development";
 };
 
 /**
@@ -187,7 +209,7 @@ export const resolveAppEnv = (explicit?: string): string => {
  *
  *   1. real process env (already set — always wins)
  *   2. .env.<APP_ENV>.local   personal per-env overrides       [gitignored]
-  *   3. .env.local             personal overrides (dev only)    [gitignored, skipped outside APP_ENV=development]
+ *   3. .env.local             personal overrides (dev only)    [gitignored, skipped outside APP_ENV=development]
  *   4. .env.<APP_ENV>         committed non-secret defaults
  *   5. .env                   legacy local catch-all           [gitignored]
  *   6. .env.example           documented fallback
@@ -204,10 +226,10 @@ export const loadEnvFiles = (options: LoadEnvOptions = {}): string => {
 
   const files = [
     `.env.${appEnv}.local`,
-    appEnv === 'development' ? '.env.local' : null,
+    appEnv === "development" ? ".env.local" : null,
     `.env.${appEnv}`,
-    '.env',
-    '.env.example',
+    ".env",
+    ".env.example",
   ].filter((name): name is string => name !== null);
 
   const roots = cwd === root ? [cwd] : [cwd, root];

@@ -10,10 +10,7 @@ async function handleRequest(
   context: { params: Promise<{ path: string[] }> },
 ) {
   const { path } = await context.params;
-  const normalizedPath = normalizeBffListPath(
-    normalizePath(path),
-    request.nextUrl.searchParams,
-  );
+  const normalizedPath = normalizeBffListPath(normalizePath(path), request.nextUrl.searchParams);
 
   if (
     normalizedPath.includes("..") ||

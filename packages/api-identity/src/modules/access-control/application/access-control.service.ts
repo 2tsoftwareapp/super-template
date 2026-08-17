@@ -1,19 +1,19 @@
-import type { AuthenticatedRequestUser } from '@repo/api-core';
-import type { TransactionExecutor } from '@repo/api-core';
+import type { AuthenticatedRequestUser } from "@repo/api-core";
+import type { TransactionExecutor } from "@repo/api-core";
 
-import { Injectable } from '@nestjs/common';
+import { Injectable } from "@nestjs/common";
 
 import {
   assertCanAssignRoles,
   assertCanManagePrivilegedAccount,
-} from '../domain/role-assignment.policy';
-import { AccessProfileUseCase } from './use-cases/access-profile.use-case';
-import { ReplaceUserRolesUseCase } from './use-cases/replace-user-roles.use-case';
-import { RoleManagementUseCase } from './use-cases/role-management.use-case';
-import { RoleQueryUseCase } from './use-cases/role-query.use-case';
-import { SeedAccessControlUseCase } from './use-cases/seed-access-control.use-case';
+} from "../domain/role-assignment.policy";
+import { AccessProfileUseCase } from "./use-cases/access-profile.use-case";
+import { ReplaceUserRolesUseCase } from "./use-cases/replace-user-roles.use-case";
+import { RoleManagementUseCase } from "./use-cases/role-management.use-case";
+import { RoleQueryUseCase } from "./use-cases/role-query.use-case";
+import { SeedAccessControlUseCase } from "./use-cases/seed-access-control.use-case";
 
-export type { AccessProfileView, RoleView as RoleDto } from './access-control.types';
+export type { AccessProfileView, RoleView as RoleDto } from "./access-control.types";
 
 @Injectable()
 export class AccessControlService {
@@ -57,10 +57,7 @@ export class AccessControlService {
     return this.roleQueryUseCase.validateRoleIds(roleIds);
   }
 
-  assertCanManageUserAccount(
-    actor: AuthenticatedRequestUser,
-    targetRoleNames: string[],
-  ): void {
+  assertCanManageUserAccount(actor: AuthenticatedRequestUser, targetRoleNames: string[]): void {
     assertCanManagePrivilegedAccount(actor, targetRoleNames);
   }
 
@@ -76,19 +73,11 @@ export class AccessControlService {
     return this.roleQueryUseCase.getRoleById(roleId, executor);
   }
 
-  getRoleByName(
-    name: string,
-    organizationId?: string | null,
-    executor?: TransactionExecutor,
-  ) {
+  getRoleByName(name: string, organizationId?: string | null, executor?: TransactionExecutor) {
     return this.roleQueryUseCase.getRoleByName(name, organizationId ?? null, executor);
   }
 
-  getOrganizationRoleByName(
-    name: string,
-    organizationId: string,
-    executor?: TransactionExecutor,
-  ) {
+  getOrganizationRoleByName(name: string, organizationId: string, executor?: TransactionExecutor) {
     return this.roleQueryUseCase.getRoleByName(name, organizationId, executor);
   }
 
@@ -97,11 +86,7 @@ export class AccessControlService {
     userId: string,
     executor?: TransactionExecutor,
   ) {
-    return this.roleManagementUseCase.ensureOrganizationAdminRole(
-      organizationId,
-      userId,
-      executor,
-    );
+    return this.roleManagementUseCase.ensureOrganizationAdminRole(organizationId, userId, executor);
   }
 
   replaceUserRoles(
@@ -110,11 +95,6 @@ export class AccessControlService {
     organizationId: string | null,
     executor?: TransactionExecutor,
   ) {
-    return this.replaceUserRolesUseCase.execute(
-      userId,
-      roleIds,
-      organizationId,
-      executor,
-    );
+    return this.replaceUserRolesUseCase.execute(userId, roleIds, organizationId, executor);
   }
 }

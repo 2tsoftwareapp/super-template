@@ -1,11 +1,11 @@
-import { applyDecorators, type Type } from '@nestjs/common';
+import { applyDecorators, type Type } from "@nestjs/common";
 import {
   ApiCreatedResponse,
   ApiExtraModels,
   ApiOkResponse,
   ApiProperty,
   getSchemaPath,
-} from '@nestjs/swagger';
+} from "@nestjs/swagger";
 
 export class RequestMetaDto {
   @ApiProperty()
@@ -52,8 +52,8 @@ export const ApiDataResponse = <TModel extends Type<unknown>>(
     ApiExtraModels(RequestMetaDto, model),
     responseDecoratorByStatus(status)({
       schema: {
-        type: 'object',
-        required: ['data', 'meta'],
+        type: "object",
+        required: ["data", "meta"],
         properties: {
           data: {
             $ref: getSchemaPath(model),
@@ -66,18 +66,16 @@ export const ApiDataResponse = <TModel extends Type<unknown>>(
     }),
   );
 
-export const ApiPaginatedResponse = <TModel extends Type<unknown>>(
-  model: TModel,
-) =>
+export const ApiPaginatedResponse = <TModel extends Type<unknown>>(model: TModel) =>
   applyDecorators(
     ApiExtraModels(PaginationMetaDto, model),
     ApiOkResponse({
       schema: {
-        type: 'object',
-        required: ['data', 'meta'],
+        type: "object",
+        required: ["data", "meta"],
         properties: {
           data: {
-            type: 'array',
+            type: "array",
             items: {
               $ref: getSchemaPath(model),
             },
@@ -95,11 +93,11 @@ export const ApiArrayResponse = <TModel extends Type<unknown>>(model: TModel) =>
     ApiExtraModels(RequestMetaDto, model),
     ApiOkResponse({
       schema: {
-        type: 'object',
-        required: ['data', 'meta'],
+        type: "object",
+        required: ["data", "meta"],
         properties: {
           data: {
-            type: 'array',
+            type: "array",
             items: {
               $ref: getSchemaPath(model),
             },

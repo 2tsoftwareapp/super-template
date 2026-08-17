@@ -1,12 +1,9 @@
-import type {
-  DatabaseClient,
-  DatabaseExecutor,
-} from '@repo/api-database';
+import type { DatabaseClient, DatabaseExecutor } from "@repo/api-database";
 
-import { Inject, Injectable } from '@nestjs/common';
-import { isPostgresUniqueViolation, runIdempotentInsert } from '@repo/api-database';
-import { DATABASE } from '@repo/api-database';
-import { fileBatchOperations, files, fileVersions } from '@repo/api-database';
+import { Inject, Injectable } from "@nestjs/common";
+import { isPostgresUniqueViolation, runIdempotentInsert } from "@repo/api-database";
+import { DATABASE } from "@repo/api-database";
+import { fileBatchOperations, files, fileVersions } from "@repo/api-database";
 import {
   and,
   asc,
@@ -19,7 +16,7 @@ import {
   isNull,
   lte,
   notInArray,
-} from 'drizzle-orm';
+} from "drizzle-orm";
 
 import type {
   CreateFileBatchOperationInput,
@@ -27,9 +24,9 @@ import type {
   FilesRepositoryPort,
   JsonObject,
   ListFilesQuery,
-} from '../application/ports/files.repository.port';
+} from "../application/ports/files.repository.port";
 
-import { FileVersionConflictError } from '../domain/errors';
+import { FileVersionConflictError } from "../domain/errors";
 
 const FILE_SORT_FIELDS = {
   createdAt: files.createdAt,
@@ -41,10 +38,7 @@ const FILE_SORT_FIELDS = {
 export class FilesRepository implements FilesRepositoryPort {
   constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
 
-  async create(
-    values: typeof files.$inferInsert,
-    executor: DatabaseExecutor = this.database,
-  ) {
+  async create(values: typeof files.$inferInsert, executor: DatabaseExecutor = this.database) {
     const [file] = await executor.insert(files).values(values).returning();
     return file ?? null;
   }
@@ -69,10 +63,7 @@ export class FilesRepository implements FilesRepositoryPort {
     return file ?? null;
   }
 
-  async listSoftDeleted(
-    limit: number,
-    executor: DatabaseExecutor = this.database,
-  ) {
+  async listSoftDeleted(limit: number, executor: DatabaseExecutor = this.database) {
     return executor
       .select()
       .from(files)
@@ -81,10 +72,7 @@ export class FilesRepository implements FilesRepositoryPort {
       .limit(limit);
   }
 
-  async list(
-    params: ListFilesQuery,
-    executor: DatabaseExecutor = this.database,
-  ) {
+  async list(params: ListFilesQuery, executor: DatabaseExecutor = this.database) {
     const filters = [];
     if (params.organizationId) {
       filters.push(eq(files.organizationId, params.organizationId));
@@ -102,7 +90,7 @@ export class FilesRepository implements FilesRepositoryPort {
 
     if (params.mimeType) {
       // FE mime chips send prefixes (`image/`); exact MIME still uses equality.
-      if (params.mimeType.endsWith('/')) {
+      if (params.mimeType.endsWith("/")) {
         filters.push(ilike(files.mimeType, `${params.mimeType}%`));
       } else {
         filters.push(eq(files.mimeType, params.mimeType));
@@ -138,9 +126,7 @@ export class FilesRepository implements FilesRepositoryPort {
         .select()
         .from(files)
         .where(whereClause)
-        .orderBy(
-          params.sortOrder === 'asc' ? asc(sortColumn) : desc(sortColumn),
-        )
+        .orderBy(params.sortOrder === "asc" ? asc(sortColumn) : desc(sortColumn))
         .limit(params.limit)
         .offset(offset),
       executor.select({ total: count() }).from(files).where(whereClause),
@@ -169,9 +155,7 @@ export class FilesRepository implements FilesRepositoryPort {
     const [file] = await executor
       .update(files)
       .set({ ...values, updatedAt: new Date() })
-      .where(
-        and(eq(files.id, fileId), eq(files.latestVersion, expectedLatestVersion)),
-      )
+      .where(and(eq(files.id, fileId), eq(files.latestVersion, expectedLatestVersion)))
       .returning();
 
     return file ?? null;
@@ -182,13 +166,10 @@ export class FilesRepository implements FilesRepositoryPort {
     executor: DatabaseExecutor = this.database,
   ) {
     try {
-      const [version] = await executor
-        .insert(fileVersions)
-        .values(values)
-        .returning();
+      const [version] = await executor.insert(fileVersions).values(values).returning();
 
       if (!version) {
-        throw new Error('File version insert returned no rows');
+        throw new Error("File version insert returned no rows");
       }
 
       return version;
@@ -203,10 +184,7 @@ export class FilesRepository implements FilesRepositoryPort {
     }
   }
 
-  async listVersions(
-    fileId: string,
-    executor: DatabaseExecutor = this.database,
-  ) {
+  async listVersions(fileId: string, executor: DatabaseExecutor = this.database) {
     return executor
       .select()
       .from(fileVersions)
@@ -237,20 +215,19 @@ export class FilesRepository implements FilesRepositoryPort {
     values: typeof fileBatchOperations.$inferInsert,
     executor: DatabaseExecutor = this.database,
   ) {
-    const [operation] = await executor
-      .insert(fileBatchOperations)
-      .values(values)
-      .returning();
+    const [operation] = await executor.insert(fileBatchOperations).values(values).returning();
 
     if (!operation) {
-      throw new Error('File batch operation insert returned no rows');
+      throw new Error("File batch operation insert returned no rows");
     }
 
     return operation;
   }
 
   async createBatchOperationIdempotent(
-    input: Omit<CreateFileBatchOperationInput, 'results' | 'idempotencyKey'> & { idempotencyKey: string },
+    input: Omit<CreateFileBatchOperationInput, "results" | "idempotencyKey"> & {
+      idempotencyKey: string;
+    },
     computeResults: () => Promise<JsonObject[]>,
     executor: DatabaseExecutor = this.database,
   ): Promise<JsonObject[] | null> {
@@ -260,10 +237,7 @@ export class FilesRepository implements FilesRepositoryPort {
     const result = await runIdempotentInsert(
       async () => {
         const results = await computeResults();
-        const operation = await this.createBatchOperation(
-          { ...input, results },
-          executor,
-        );
+        const operation = await this.createBatchOperation({ ...input, results }, executor);
         return operation.results;
       },
       async () => {

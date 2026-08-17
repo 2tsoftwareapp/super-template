@@ -1,7 +1,7 @@
-import type { JsonObject } from '@repo/api-core';
-import type { TransactionExecutor } from '@repo/api-core';
+import type { JsonObject } from "@repo/api-core";
+import type { TransactionExecutor } from "@repo/api-core";
 
-export type { JsonObject } from '@repo/api-core';
+export type { JsonObject } from "@repo/api-core";
 
 export interface FileRecord {
   id: string;
@@ -95,8 +95,8 @@ export interface ListFilesQuery {
   includeDeleted?: boolean;
   excludeKinds?: string[];
   excludeVisibilities?: string[];
-  sortField: 'createdAt' | 'originalName' | 'sizeBytes';
-  sortOrder: 'asc' | 'desc';
+  sortField: "createdAt" | "originalName" | "sizeBytes";
+  sortOrder: "asc" | "desc";
 }
 
 export interface FileListResult {
@@ -122,10 +122,20 @@ export interface FilesRepositoryPort {
     expectedLatestVersion: number,
     executor?: TransactionExecutor,
   ): Promise<FileRecord | null>;
-  createVersion(values: CreateFileVersionInput, executor?: TransactionExecutor): Promise<FileVersionRecord>;
+  createVersion(
+    values: CreateFileVersionInput,
+    executor?: TransactionExecutor,
+  ): Promise<FileVersionRecord>;
   listVersions(fileId: string, executor?: TransactionExecutor): Promise<FileVersionRecord[]>;
-  findBatchOperationByIdempotencyKey(actorId: string, idempotencyKey: string, executor?: TransactionExecutor): Promise<FileBatchOperationRecord | null>;
-  createBatchOperation(values: CreateFileBatchOperationInput, executor?: TransactionExecutor): Promise<FileBatchOperationRecord>;
+  findBatchOperationByIdempotencyKey(
+    actorId: string,
+    idempotencyKey: string,
+    executor?: TransactionExecutor,
+  ): Promise<FileBatchOperationRecord | null>;
+  createBatchOperation(
+    values: CreateFileBatchOperationInput,
+    executor?: TransactionExecutor,
+  ): Promise<FileBatchOperationRecord>;
   /**
    * Persists a batch operation with atomic idempotency: when the insert hits
    * the partial-unique (actor_id, idempotency_key) index, the concurrent
@@ -136,10 +146,12 @@ export interface FilesRepositoryPort {
    * persistence attempt.
    */
   createBatchOperationIdempotent(
-    input: Omit<CreateFileBatchOperationInput, 'results' | 'idempotencyKey'> & { idempotencyKey: string },
+    input: Omit<CreateFileBatchOperationInput, "results" | "idempotencyKey"> & {
+      idempotencyKey: string;
+    },
     computeResults: () => Promise<JsonObject[]>,
     executor?: TransactionExecutor,
   ): Promise<JsonObject[] | null>;
 }
 
-export const FILES_REPOSITORY = Symbol('FILES_REPOSITORY');
+export const FILES_REPOSITORY = Symbol("FILES_REPOSITORY");

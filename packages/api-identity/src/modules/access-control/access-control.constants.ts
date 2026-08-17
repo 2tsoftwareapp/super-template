@@ -10,4 +10,4 @@ export {
   permissionNamesForRole,
   PRIVILEGED_ROLE_NAMES,
   ROLE_NAMES,
-} from '@repo/api-core';
+} from "@repo/api-core";

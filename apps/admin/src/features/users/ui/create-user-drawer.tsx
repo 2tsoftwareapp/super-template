@@ -5,13 +5,7 @@ import { Button } from "@repo/web-ui/button";
 import { Input } from "@repo/web-ui/input";
 import { Label } from "@repo/web-ui/label";
 import { PasswordInput } from "@repo/web-ui/password-input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@repo/web-ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@repo/web-ui/select";
 import { Spinner } from "@repo/web-ui/spinner";
 import { Building2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -21,14 +15,8 @@ import type { CreateUserForm } from "@/features/users/model/users.schemas";
 import type { AdminUserDto, RoleDto } from "@/lib/api-types";
 
 import { ResourceDrawer } from "@/components/resource-drawer";
-import {
-  createUserSchema,
-} from "@/features/users/model/users.schemas";
-import {
-  filterRolesForOrganization,
-  findPlatformUserRoleId,
-  formatRoleName,
-} from "@/lib/roles";
+import { createUserSchema } from "@/features/users/model/users.schemas";
+import { filterRolesForOrganization, findPlatformUserRoleId, formatRoleName } from "@/lib/roles";
 
 interface CreateUserDrawerProps {
   open: boolean;
@@ -63,24 +51,16 @@ export function CreateUserDrawer({
 
   const [selectedOrgId, setSelectedOrgId] = useState<string>("");
 
-  const effectiveOrgId = isActorSuperAdmin
-    ? selectedOrgId
-    : (actorOrganizationId ?? "");
+  const effectiveOrgId = isActorSuperAdmin ? selectedOrgId : (actorOrganizationId ?? "");
 
   const rolesForOrg = useMemo(
     () => filterRolesForOrganization(assignableRoles, effectiveOrgId),
     [assignableRoles, effectiveOrgId],
   );
 
-  const roleIdsForOrg = useMemo(
-    () => rolesForOrg.map((r) => r.id),
-    [rolesForOrg],
-  );
+  const roleIdsForOrg = useMemo(() => rolesForOrg.map((r) => r.id), [rolesForOrg]);
 
-  const createSchema = useMemo(
-    () => createUserSchema(roleIdsForOrg),
-    [roleIdsForOrg],
-  );
+  const createSchema = useMemo(() => createUserSchema(roleIdsForOrg), [roleIdsForOrg]);
 
   const form = useForm<CreateUserForm>({
     resolver: zodResolver(createSchema),
@@ -126,23 +106,14 @@ export function CreateUserDrawer({
         shouldValidate: false,
       });
     }
-  }, [
-    open,
-    isActorSuperAdmin,
-    actorOrganizationId,
-    assignableRoles,
-    organizations,
-    form,
-  ]);
+  }, [open, isActorSuperAdmin, actorOrganizationId, assignableRoles, organizations, form]);
 
   const selectedRoleId = useWatch<CreateUserForm, "roleId">({
     control: form.control,
     name: "roleId",
   });
 
-  const actorOrg = organizations.find(
-    (o) => o.id === actorOrganizationId,
-  );
+  const actorOrg = organizations.find((o) => o.id === actorOrganizationId);
 
   return (
     <ResourceDrawer
@@ -151,12 +122,7 @@ export function CreateUserDrawer({
       description="Create an account and send an invite email to set up access."
       onClose={onClose}
       footer={
-        <Button
-          type="submit"
-          form="create-user-form"
-          className="w-full"
-          disabled={isSaving}
-        >
+        <Button type="submit" form="create-user-form" className="w-full" disabled={isSaving}>
           {isSaving ? <Spinner data-icon="inline-start" /> : null}
           Send invite
         </Button>
@@ -177,9 +143,7 @@ export function CreateUserDrawer({
             {...form.register("displayName")}
           />
           {form.formState.errors.displayName ? (
-            <p className="text-xs text-destructive">
-              {form.formState.errors.displayName.message}
-            </p>
+            <p className="text-xs text-destructive">{form.formState.errors.displayName.message}</p>
           ) : null}
         </div>
         <div className="flex flex-col gap-1.5">
@@ -191,9 +155,7 @@ export function CreateUserDrawer({
             {...form.register("email")}
           />
           {form.formState.errors.email ? (
-            <p className="text-xs text-destructive">
-              {form.formState.errors.email.message}
-            </p>
+            <p className="text-xs text-destructive">{form.formState.errors.email.message}</p>
           ) : null}
         </div>
         <div className="flex flex-col gap-1.5">
@@ -204,13 +166,10 @@ export function CreateUserDrawer({
             {...form.register("password")}
           />
           <p className="text-xs text-muted-foreground">
-            The user will be asked to set a new password after verifying their
-            email.
+            The user will be asked to set a new password after verifying their email.
           </p>
           {form.formState.errors.password ? (
-            <p className="text-xs text-destructive">
-              {form.formState.errors.password.message}
-            </p>
+            <p className="text-xs text-destructive">{form.formState.errors.password.message}</p>
           ) : null}
         </div>
 
@@ -271,9 +230,7 @@ export function CreateUserDrawer({
                   type="button"
                   variant={selectedRoleId === role.id ? "default" : "outline"}
                   size="sm"
-                  onClick={() =>
-                    form.setValue("roleId", role.id, { shouldValidate: true })
-                  }
+                  onClick={() => form.setValue("roleId", role.id, { shouldValidate: true })}
                 >
                   {formatRoleName(role.name)}
                 </Button>
@@ -281,16 +238,14 @@ export function CreateUserDrawer({
             </div>
           )}
           {form.formState.errors.roleId ? (
-            <p className="text-xs text-destructive">
-              {form.formState.errors.roleId.message}
-            </p>
+            <p className="text-xs text-destructive">{form.formState.errors.roleId.message}</p>
           ) : null}
         </div>
 
         <div className="rounded-md border border-border bg-muted/50 px-3 py-2">
           <p className="text-xs text-muted-foreground">
-            An invite email with a verification link will be sent to the user.
-            They must verify their email before signing in.
+            An invite email with a verification link will be sent to the user. They must verify
+            their email before signing in.
           </p>
         </div>
       </form>

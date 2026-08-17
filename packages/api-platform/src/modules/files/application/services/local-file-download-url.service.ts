@@ -1,8 +1,8 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
-import { ERROR_CODES } from '@repo/api-core';
-import { AppError } from '@repo/api-core';
-import { EnvironmentService } from '@repo/api-core';
-import { createHmac, timingSafeEqual } from 'node:crypto';
+import { HttpStatus, Injectable } from "@nestjs/common";
+import { ERROR_CODES } from "@repo/api-core";
+import { AppError } from "@repo/api-core";
+import { EnvironmentService } from "@repo/api-core";
+import { createHmac, timingSafeEqual } from "node:crypto";
 
 const LOCAL_DOWNLOAD_TTL_SECONDS = 3600;
 
@@ -15,16 +15,13 @@ export class LocalFileDownloadUrlService {
   }
 
   isEnabled(): boolean {
-    return this.environmentService.values.STORAGE_DRIVER === 'local';
+    return this.environmentService.values.STORAGE_DRIVER === "local";
   }
 
   createSignedUrl(fileId: string, storageKey: string): string {
     const expiresAt = Date.now() + this.expiresInSeconds * 1000;
     const token = this.createToken(fileId, storageKey, expiresAt);
-    const baseUrl = this.environmentService.values.API_INTERNAL_URL.replace(
-      /\/$/,
-      '',
-    );
+    const baseUrl = this.environmentService.values.API_INTERNAL_URL.replace(/\/$/, "");
 
     return `${baseUrl}/api/v1/files/${fileId}/download?token=${encodeURIComponent(token)}`;
   }
@@ -33,22 +30,18 @@ export class LocalFileDownloadUrlService {
     if (!token) {
       throw new AppError(
         ERROR_CODES.AUTH_FORBIDDEN,
-        'Download token is required',
+        "Download token is required",
         HttpStatus.FORBIDDEN,
       );
     }
 
-    const [expiresAtRaw, providedSignature] = token.split('.', 2);
+    const [expiresAtRaw, providedSignature] = token.split(".", 2);
     const expiresAt = Number(expiresAtRaw);
 
-    if (
-      !providedSignature ||
-      !Number.isFinite(expiresAt) ||
-      expiresAt <= Date.now()
-    ) {
+    if (!providedSignature || !Number.isFinite(expiresAt) || expiresAt <= Date.now()) {
       throw new AppError(
         ERROR_CODES.AUTH_FORBIDDEN,
-        'Download token is invalid or expired',
+        "Download token is invalid or expired",
         HttpStatus.FORBIDDEN,
       );
     }
@@ -63,28 +56,21 @@ export class LocalFileDownloadUrlService {
     ) {
       throw new AppError(
         ERROR_CODES.AUTH_FORBIDDEN,
-        'Download token is invalid or expired',
+        "Download token is invalid or expired",
         HttpStatus.FORBIDDEN,
       );
     }
   }
 
-  private createToken(
-    fileId: string,
-    storageKey: string,
-    expiresAt: number,
-  ): string {
+  private createToken(fileId: string, storageKey: string, expiresAt: number): string {
     const signature = this.sign(fileId, storageKey, expiresAt);
 
     return `${expiresAt}.${signature}`;
   }
 
   private sign(fileId: string, storageKey: string, expiresAt: number): string {
-    return createHmac(
-      'sha256',
-      this.environmentService.values.JWT_ACCESS_SECRET,
-    )
+    return createHmac("sha256", this.environmentService.values.JWT_ACCESS_SECRET)
       .update(`${fileId}:${storageKey}:${expiresAt}`)
-      .digest('hex');
+      .digest("hex");
   }
 }

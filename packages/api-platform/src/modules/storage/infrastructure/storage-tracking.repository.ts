@@ -1,41 +1,35 @@
-import type { TransactionExecutor } from '@repo/api-core';
-import type { DatabaseClient, DatabaseExecutor } from '@repo/api-database';
+import type { TransactionExecutor } from "@repo/api-core";
+import type { DatabaseClient, DatabaseExecutor } from "@repo/api-database";
 
-import { Inject, Injectable } from '@nestjs/common';
-import { DATABASE } from '@repo/api-database';
-import { storageDeleteOutbox, storageObjects } from '@repo/api-database';
-import { eq, sql } from 'drizzle-orm';
+import { Inject, Injectable } from "@nestjs/common";
+import { DATABASE } from "@repo/api-database";
+import { storageDeleteOutbox, storageObjects } from "@repo/api-database";
+import { eq, sql } from "drizzle-orm";
 
 import type {
   PendingDeleteRecord,
   StorageTrackingPort,
-} from '../application/ports/storage-tracking.port';
+} from "../application/ports/storage-tracking.port";
 
 @Injectable()
 export class StorageTrackingRepository implements StorageTrackingPort {
   constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
 
   /** Record that an object was uploaded (no-op if already tracked). */
-  async recordUpload(
-    storageKey: string,
-    executor?: TransactionExecutor,
-  ): Promise<void> {
+  async recordUpload(storageKey: string, executor?: TransactionExecutor): Promise<void> {
     const db = (executor ?? this.database) as DatabaseExecutor;
     await db
       .insert(storageObjects)
-      .values({ storageKey, status: 'UPLOADED' })
+      .values({ storageKey, status: "UPLOADED" })
       .onConflictDoNothing();
   }
 
   /** Mark an object as confirmed deleted. */
-  async recordDelete(
-    storageKey: string,
-    executor?: TransactionExecutor,
-  ): Promise<void> {
+  async recordDelete(storageKey: string, executor?: TransactionExecutor): Promise<void> {
     const db = (executor ?? this.database) as DatabaseExecutor;
     await db
       .update(storageObjects)
-      .set({ status: 'DELETED', updatedAt: new Date() })
+      .set({ status: "DELETED", updatedAt: new Date() })
       .where(eq(storageObjects.storageKey, storageKey));
   }
 
@@ -44,17 +38,14 @@ export class StorageTrackingRepository implements StorageTrackingPort {
    * PENDING without resetting the attempt counter, so repeated transient
    * failures keep their backoff progress.
    */
-  async enqueueDelete(
-    storageKey: string,
-    executor?: TransactionExecutor,
-  ): Promise<void> {
+  async enqueueDelete(storageKey: string, executor?: TransactionExecutor): Promise<void> {
     const db = (executor ?? this.database) as DatabaseExecutor;
     await db
       .insert(storageDeleteOutbox)
       .values({ storageKey })
       .onConflictDoUpdate({
         target: storageDeleteOutbox.storageKey,
-        set: { status: 'PENDING', updatedAt: new Date() },
+        set: { status: "PENDING", updatedAt: new Date() },
       });
   }
 
@@ -64,11 +55,7 @@ export class StorageTrackingRepository implements StorageTrackingPort {
    * transaction): the reference checks read the tenant-isolated `files` /
    * `file_versions` tables across all organizations.
    */
-  async listOrphans(
-    cutoff: Date,
-    limit: number,
-    executor: TransactionExecutor,
-  ): Promise<string[]> {
+  async listOrphans(cutoff: Date, limit: number, executor: TransactionExecutor): Promise<string[]> {
     const db = executor as DatabaseExecutor;
     const rows = await db.execute<{ storageKey: string }>(sql`
       SELECT so.storage_key AS "storageKey"
@@ -121,14 +108,11 @@ export class StorageTrackingRepository implements StorageTrackingPort {
     return claimed.rows ?? [];
   }
 
-  async markDeleteDone(
-    id: string,
-    executor?: TransactionExecutor,
-  ): Promise<void> {
+  async markDeleteDone(id: string, executor?: TransactionExecutor): Promise<void> {
     const db = (executor ?? this.database) as DatabaseExecutor;
     await db
       .update(storageDeleteOutbox)
-      .set({ status: 'DONE', errorMessage: null, updatedAt: new Date() })
+      .set({ status: "DONE", errorMessage: null, updatedAt: new Date() })
       .where(eq(storageDeleteOutbox.id, id));
   }
 

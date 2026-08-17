@@ -2,13 +2,7 @@
 
 import { Alert } from "@repo/web-ui/alert";
 import { Button } from "@repo/web-ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@repo/web-ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/web-ui/card";
 import { Copy, KeyRound } from "lucide-react";
 import { useCallback } from "react";
 
@@ -19,12 +13,7 @@ interface MfaRecoveryCodesProps {
   onCopyError: () => void;
 }
 
-export function MfaRecoveryCodes({
-  codes,
-  onDone,
-  onCopy,
-  onCopyError,
-}: MfaRecoveryCodesProps) {
+export function MfaRecoveryCodes({ codes, onDone, onCopy, onCopyError }: MfaRecoveryCodesProps) {
   const copyCodes = useCallback(() => {
     void navigator.clipboard
       .writeText(codes.join("\n"))
@@ -40,14 +29,12 @@ export function MfaRecoveryCodes({
           Recovery codes
         </CardTitle>
         <CardDescription>
-          Save these codes in a safe place. Each code can only be used once to
-          sign in if you lose access to your authenticator.
+          Save these codes in a safe place. Each code can only be used once to sign in if you lose
+          access to your authenticator.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <Alert variant="warning">
-          Store these codes securely. They will not be shown again.
-        </Alert>
+        <Alert variant="warning">Store these codes securely. They will not be shown again.</Alert>
         <div className="grid grid-cols-2 gap-2 rounded-lg border border-border bg-muted/50 p-4 font-mono text-sm">
           {codes.map((code) => (
             <span key={code} className="select-all">

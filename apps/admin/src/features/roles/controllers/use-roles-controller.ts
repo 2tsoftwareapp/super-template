@@ -8,20 +8,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import type { RolesListParams } from "@/features/roles/api/roles.api";
-import type {
-  EditableRole,
-  ManagedRoleDto,
-  RoleForm,
-} from "@/features/roles/model/roles.schemas";
+import type { EditableRole, ManagedRoleDto, RoleForm } from "@/features/roles/model/roles.schemas";
 import type { RolesViewModel } from "@/features/roles/model/roles.types";
 
-import {
-  useDeleteRoleMutation,
-  useSaveRoleMutation,
-} from "@/features/roles/api/roles.mutations";
-import {
-  usePermissionCatalogQuery,
-} from "@/features/roles/api/roles.queries";
+import { useDeleteRoleMutation, useSaveRoleMutation } from "@/features/roles/api/roles.mutations";
+import { usePermissionCatalogQuery } from "@/features/roles/api/roles.queries";
 import { rolesKeys } from "@/features/roles/api/roles.query-keys";
 import {
   filterRolesBySearch,
@@ -46,14 +37,17 @@ export function useRolesController(): RolesViewModel {
   const session = useSession();
   const sessionData = session.data?.data;
   const permissions = sessionData?.permissions ?? [];
-  const { canCreate, canUpdate, canDelete, isSuperAdmin } =
-    selectRoleManagementPermissions(
-      permissions,
-      sessionData?.user?.roles,
-    );
+  const { canCreate, canUpdate, canDelete, isSuperAdmin } = selectRoleManagementPermissions(
+    permissions,
+    sessionData?.user?.roles,
+  );
 
-  const { page: urlPage, search: urlSearch, scope: urlScope, organizationId: urlOrgId } =
-    parseRolesSearchParams(searchParams);
+  const {
+    page: urlPage,
+    search: urlSearch,
+    scope: urlScope,
+    organizationId: urlOrgId,
+  } = parseRolesSearchParams(searchParams);
 
   const [searchInput, setSearchInput] = useState(urlSearch);
   const debouncedSearch = useDebouncedValue(searchInput, 300);
@@ -92,14 +86,7 @@ export function useRolesController(): RolesViewModel {
 
     const queryString = next.toString();
     router.replace(queryString ? `${pathname}?${queryString}` : pathname);
-  }, [
-    debouncedSearch,
-    pathname,
-    router,
-    searchInput,
-    searchParams,
-    urlSearch,
-  ]);
+  }, [debouncedSearch, pathname, router, searchInput, searchParams, urlSearch]);
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingRole, setEditingRole] = useState<EditableRole | null>(null);
@@ -169,9 +156,7 @@ export function useRolesController(): RolesViewModel {
     setSearchInput(value);
   };
 
-  const handleScopeFilterChange = (
-    value: "platform" | "organization" | undefined,
-  ) => {
+  const handleScopeFilterChange = (value: "platform" | "organization" | undefined) => {
     patchParams({ scope: value, page: undefined });
   };
 
@@ -238,9 +223,7 @@ export function useRolesController(): RolesViewModel {
 
   const anyRoles = systemRoles.length > 0 || customRoles.length > 0;
   const noResults =
-    Boolean(debouncedSearch) &&
-    filteredSystem.length === 0 &&
-    filteredCustom.length === 0;
+    Boolean(debouncedSearch) && filteredSystem.length === 0 && filteredCustom.length === 0;
 
   const isError = roles.isError || permissionCatalog.isError;
 

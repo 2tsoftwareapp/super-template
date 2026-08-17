@@ -23,8 +23,7 @@ export const AUTH_FLOW_ERROR_CODES = {
   ssoStartFailed: "sso-start-failed",
 } as const;
 
-export type AuthFlowErrorCode =
-  (typeof AUTH_FLOW_ERROR_CODES)[keyof typeof AUTH_FLOW_ERROR_CODES];
+export type AuthFlowErrorCode = (typeof AUTH_FLOW_ERROR_CODES)[keyof typeof AUTH_FLOW_ERROR_CODES];
 
 export const AUTH_FLOW_RESULTS = {
   authenticated: "authenticated",
@@ -32,8 +31,7 @@ export const AUTH_FLOW_RESULTS = {
   mustChangePassword: "must-change-password",
 } as const;
 
-export type AuthFlowResult =
-  (typeof AUTH_FLOW_RESULTS)[keyof typeof AUTH_FLOW_RESULTS];
+export type AuthFlowResult = (typeof AUTH_FLOW_RESULTS)[keyof typeof AUTH_FLOW_RESULTS];
 
 export const AUTH_FORM_FIELD_NAMES = {
   code: "code",
@@ -53,8 +51,7 @@ export const AUTH_MESSAGES = {
   completingSignIn: "Completing sign in...",
   invalidCredentials: "Invalid email or password.",
   invalidMfaCode: "Invalid verification code. Please try again.",
-  mfaRequired:
-    "This account requires two-factor verification. Enter your code below.",
+  mfaRequired: "This account requires two-factor verification. Enter your code below.",
   missingMfaToken: "Start sign-in again before entering a verification code.",
   ssoFailed: "SSO sign-in failed. Please try again or use email/password.",
   ssoStartFailed: "Could not start SSO. Please try again.",
@@ -82,8 +79,7 @@ export const LOGIN_CONTENT = {
     title: "Sign in to the admin app",
   },
   mfa: {
-    description:
-      "Open your authenticator app and enter the 6-digit code to complete sign-in.",
+    description: "Open your authenticator app and enter the 6-digit code to complete sign-in.",
     eyebrow: "Two-factor verification",
     title: "Enter your verification code",
   },
@@ -104,8 +100,7 @@ export const LOGIN_FORM_COPY = {
   verify: "Verify",
   verifyIdentityTitle: "Verify your identity",
   verifying: "Verifying...",
-  verificationDescription:
-    "Enter the 6-digit code from your authenticator app.",
+  verificationDescription: "Enter the 6-digit code from your authenticator app.",
 } as const;
 
 export const SSO_PROVIDER_OPTIONS = [

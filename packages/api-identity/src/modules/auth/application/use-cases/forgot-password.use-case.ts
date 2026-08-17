@@ -1,18 +1,18 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { durationToMilliseconds, normalizeEmail } from '@repo/api-core';
+import { Inject, Injectable } from "@nestjs/common";
+import { durationToMilliseconds, normalizeEmail } from "@repo/api-core";
 
-import type { ForgotPasswordCommand } from '../auth.types';
+import type { ForgotPasswordCommand } from "../auth.types";
 
 import {
   USERS_REPOSITORY,
   type UsersRepositoryPort,
-} from '../../../users/application/ports/users.repository.port';
-import { generateOpaqueToken, hashOpaqueToken } from '../auth.helpers';
+} from "../../../users/application/ports/users.repository.port";
+import { generateOpaqueToken, hashOpaqueToken } from "../auth.helpers";
 import {
   AUTH_SESSION_REPOSITORY,
   type AuthSessionRepositoryPort,
-} from '../ports/auth-session.repository.port';
-import { AuthMailService } from '../services/auth-mail.service';
+} from "../ports/auth-session.repository.port";
+import { AuthMailService } from "../services/auth-mail.service";
 
 @Injectable()
 export class ForgotPasswordUseCase {
@@ -33,14 +33,14 @@ export class ForgotPasswordUseCase {
       await this.authSessionRepository.storePasswordResetToken({
         userId: user.id,
         tokenHash: hashOpaqueToken(token),
-        expiresAt: new Date(Date.now() + durationToMilliseconds('1h')),
+        expiresAt: new Date(Date.now() + durationToMilliseconds("1h")),
       });
       await this.authMailService.sendPasswordResetEmail(user.email, token);
     }
 
     return {
       success: true,
-      message: 'If the account exists, a reset email has been sent.',
+      message: "If the account exists, a reset email has been sent.",
     };
   }
 }

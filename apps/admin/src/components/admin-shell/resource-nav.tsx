@@ -3,11 +3,7 @@
 import { Tooltip } from "@repo/web-ui/tooltip";
 
 import { Link } from "@/i18n/navigation";
-import {
-  adminResourceGroups,
-  adminResources,
-  canAccessResource,
-} from "@/lib/admin-resources";
+import { adminResourceGroups, adminResources, canAccessResource } from "@/lib/admin-resources";
 import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
@@ -18,21 +14,14 @@ interface ResourceNavProps {
   onNavigate?: () => void;
 }
 
-export function ResourceNav({
-  collapsed,
-  permissions,
-  pathname,
-  onNavigate,
-}: ResourceNavProps) {
+export function ResourceNav({ collapsed, permissions, pathname, onNavigate }: ResourceNavProps) {
   const { t } = useI18n();
 
   return (
     <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-4">
       {adminResourceGroups.map((group) => {
         const resources = adminResources.filter(
-          (resource) =>
-            resource.group === group &&
-            canAccessResource(resource, permissions),
+          (resource) => resource.group === group && canAccessResource(resource, permissions),
         );
         if (resources.length === 0) return null;
 
@@ -49,8 +38,7 @@ export function ResourceNav({
                 const isActive =
                   resource.path === "/"
                     ? pathname === "/"
-                    : pathname === resource.path ||
-                      pathname.startsWith(`${resource.path}/`);
+                    : pathname === resource.path || pathname.startsWith(`${resource.path}/`);
                 const link = (
                   <Link
                     key={resource.path}
@@ -73,19 +61,13 @@ export function ResourceNav({
                       )}
                     />
                     {!collapsed ? (
-                      <span className="truncate">
-                        {t(`nav.${resource.id}`)}
-                      </span>
+                      <span className="truncate">{t(`nav.${resource.id}`)}</span>
                     ) : null}
                   </Link>
                 );
 
                 return collapsed ? (
-                  <Tooltip
-                    key={resource.path}
-                    content={t(`nav.${resource.id}`)}
-                    side="right"
-                  >
+                  <Tooltip key={resource.path} content={t(`nav.${resource.id}`)} side="right">
                     {link}
                   </Tooltip>
                 ) : (

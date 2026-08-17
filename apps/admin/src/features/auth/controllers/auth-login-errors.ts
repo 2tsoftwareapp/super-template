@@ -2,10 +2,7 @@ import { classifyError } from "@repo/web-utils/errors";
 
 import { ApiClientError } from "@/lib/http";
 
-import {
-  AUTH_HTTP_STATUS,
-  AUTH_MESSAGES,
-} from "../model/auth.constants";
+import { AUTH_HTTP_STATUS, AUTH_MESSAGES } from "../model/auth.constants";
 import { AuthFlowError } from "../model/auth.errors";
 
 /**
@@ -45,8 +42,7 @@ export function getMfaErrorMessage(error: unknown) {
   const classified = classifyError(error);
   if (
     classified.kind === "auth" ||
-    (error instanceof ApiClientError &&
-      error.status === AUTH_HTTP_STATUS.unauthorized)
+    (error instanceof ApiClientError && error.status === AUTH_HTTP_STATUS.unauthorized)
   ) {
     return AUTH_MESSAGES.invalidMfaCode;
   }

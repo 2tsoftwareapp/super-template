@@ -1,19 +1,24 @@
-import type { Request } from 'express';
+import type { Request } from "express";
 
-import { Body, Controller, Post, Req } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
-import { Throttle } from '@nestjs/throttler';
-import { ApiDataResponse } from '@repo/api-core';
-import { Public } from '@repo/api-core';
+import { Body, Controller, Post, Req } from "@nestjs/common";
+import { ApiTags } from "@nestjs/swagger";
+import { Throttle } from "@nestjs/throttler";
+import { ApiDataResponse } from "@repo/api-core";
+import { Public } from "@repo/api-core";
 
-import { CompleteMfaLoginUseCase } from '../application/use-cases/complete-mfa-login.use-case';
-import { LoginUseCase } from '../application/use-cases/login.use-case';
-import { RefreshSessionUseCase } from '../application/use-cases/refresh-session.use-case';
-import { AuthResponseDto } from './dto/auth-response.dto';
-import { LoginDto, LoginResponseDto, RefreshTokenDto, VerifyMfaChallengeDto } from './dto/login.dto';
+import { CompleteMfaLoginUseCase } from "../application/use-cases/complete-mfa-login.use-case";
+import { LoginUseCase } from "../application/use-cases/login.use-case";
+import { RefreshSessionUseCase } from "../application/use-cases/refresh-session.use-case";
+import { AuthResponseDto } from "./dto/auth-response.dto";
+import {
+  LoginDto,
+  LoginResponseDto,
+  RefreshTokenDto,
+  VerifyMfaChallengeDto,
+} from "./dto/login.dto";
 
-@ApiTags('auth')
-@Controller('auth')
+@ApiTags("auth")
+@Controller("auth")
 export class AuthLoginController {
   constructor(
     private readonly loginUseCase: LoginUseCase,
@@ -22,7 +27,7 @@ export class AuthLoginController {
   ) {}
 
   @Public()
-  @Post('login')
+  @Post("login")
   @Throttle({ default: { limit: 5, ttl: 60_000 } })
   @ApiDataResponse(LoginResponseDto, 201)
   login(@Body() input: LoginDto, @Req() request: Request) {
@@ -36,13 +41,10 @@ export class AuthLoginController {
   }
 
   @Public()
-  @Post('mfa/verify-challenge')
+  @Post("mfa/verify-challenge")
   @Throttle({ default: { limit: 10, ttl: 60_000 } })
   @ApiDataResponse(AuthResponseDto, 201)
-  verifyMfaChallenge(
-    @Body() input: VerifyMfaChallengeDto,
-    @Req() request: Request,
-  ) {
+  verifyMfaChallenge(@Body() input: VerifyMfaChallengeDto, @Req() request: Request) {
     return this.completeMfaLoginUseCase.execute(
       {
         mfaToken: input.mfaToken,
@@ -53,7 +55,7 @@ export class AuthLoginController {
   }
 
   @Public()
-  @Post('refresh')
+  @Post("refresh")
   @Throttle({ default: { limit: 20, ttl: 60_000 } })
   @ApiDataResponse(AuthResponseDto, 201)
   refresh(@Body() input: RefreshTokenDto, @Req() request: Request) {

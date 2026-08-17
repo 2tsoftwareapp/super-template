@@ -1,14 +1,9 @@
-import type { JsonObject } from '@repo/api-core';
-export type NotificationAudience = 'USER' | 'USERS' | 'ALL';
+import type { JsonObject } from "@repo/api-core";
+export type NotificationAudience = "USER" | "USERS" | "ALL";
 
-export type NotificationJobStatus =
-  | 'PENDING'
-  | 'PROCESSING'
-  | 'COMPLETED'
-  | 'CANCELLED'
-  | 'FAILED';
+export type NotificationJobStatus = "PENDING" | "PROCESSING" | "COMPLETED" | "CANCELLED" | "FAILED";
 
-export type NotificationDevicePlatform = 'IOS' | 'ANDROID';
+export type NotificationDevicePlatform = "IOS" | "ANDROID";
 
 export interface NotificationView {
   id: string;

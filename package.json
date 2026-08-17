@@ -33,7 +33,8 @@
     "extension:plan": "node .agents/skills/playwright-extension-live-browser/scripts/run-plan.mjs",
     "extension:session:reset": "node .agents/skills/playwright-extension-live-browser/scripts/reset-session.mjs",
     "browser-control:plan": "node .agents/skills/playwright-extension-live-browser/scripts/run-plan.mjs",
-    "browser-control:session:reset": "node .agents/skills/playwright-extension-live-browser/scripts/reset-session.mjs"
+    "browser-control:session:reset": "node .agents/skills/playwright-extension-live-browser/scripts/reset-session.mjs",
+    "format:check": "prettier --check \"packages/**/src/**/*.ts\" \"apps/**/src/**/*.ts\" \"apps/api/test/**/*.ts\""
   },
   "devDependencies": {
     "@eslint/js": "9.39.1",

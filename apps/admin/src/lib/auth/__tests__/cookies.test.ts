@@ -29,11 +29,9 @@ describe("csrf cookies", () => {
   });
 
   it("uses admin-specific cookie names", async () => {
-    const {
-      ACCESS_TOKEN_COOKIE,
-      REFRESH_TOKEN_COOKIE,
-      CSRF_TOKEN_COOKIE,
-    } = await import("../cookies");
+    const { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE, CSRF_TOKEN_COOKIE } = await import(
+      "../cookies"
+    );
 
     expect(ACCESS_TOKEN_COOKIE).toBe("st_admin_access_token");
     expect(REFRESH_TOKEN_COOKIE).toBe("st_admin_refresh_token");

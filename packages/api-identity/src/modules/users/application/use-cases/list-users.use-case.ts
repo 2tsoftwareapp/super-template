@@ -1,16 +1,13 @@
-import type { AuthenticatedRequestUser } from '@repo/api-core';
+import type { AuthenticatedRequestUser } from "@repo/api-core";
 
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from "@nestjs/common";
 
-import type { ListUsersQuery } from '../users.types';
+import type { ListUsersQuery } from "../users.types";
 
-import { AccessControlService } from '../../../access-control/application/access-control.service';
-import { resolveUsersListOrganizationId } from '../../domain/user-org-scope.policy';
-import {
-  USERS_REPOSITORY,
-  type UsersRepositoryPort,
-} from '../ports/users.repository.port';
-import { UsersMapper } from '../users.mapper';
+import { AccessControlService } from "../../../access-control/application/access-control.service";
+import { resolveUsersListOrganizationId } from "../../domain/user-org-scope.policy";
+import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";
+import { UsersMapper } from "../users.mapper";
 
 @Injectable()
 export class ListUsersUseCase {

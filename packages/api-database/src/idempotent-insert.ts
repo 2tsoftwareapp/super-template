@@ -1,4 +1,4 @@
-import { isPostgresUniqueViolation } from './postgres-errors';
+import { isPostgresUniqueViolation } from "./postgres-errors";
 
 export interface IdempotentInsertResult<T> {
   value: T;

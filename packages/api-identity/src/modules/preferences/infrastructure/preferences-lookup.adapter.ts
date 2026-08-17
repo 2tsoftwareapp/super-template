@@ -1,13 +1,13 @@
-import type {
-  NotificationChannelPreferences,
-  UserPreferencesLookup,
-} from '@repo/api-core';
+import type { NotificationChannelPreferences, UserPreferencesLookup } from "@repo/api-core";
 
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from "@nestjs/common";
 
-import { USERS_REPOSITORY, type UsersRepositoryPort } from '../../users/application/ports/users.repository.port';
-import { DEFAULT_USER_PREFERENCES } from '../application/preferences.constants';
-import { PreferencesRepository } from './preferences.repository';
+import {
+  USERS_REPOSITORY,
+  type UsersRepositoryPort,
+} from "../../users/application/ports/users.repository.port";
+import { DEFAULT_USER_PREFERENCES } from "../application/preferences.constants";
+import { PreferencesRepository } from "./preferences.repository";
 
 function resolveNotificationPreferences(
   value: Record<string, unknown> | null | undefined,
@@ -31,8 +31,7 @@ export class PreferencesLookupAdapter implements UserPreferencesLookup {
     const preferences = await this.preferencesRepository.findByUserId(userId);
 
     return resolveNotificationPreferences(
-      preferences?.notificationPreferences ??
-        DEFAULT_USER_PREFERENCES.notificationPreferences,
+      preferences?.notificationPreferences ?? DEFAULT_USER_PREFERENCES.notificationPreferences,
     );
   }
 

@@ -101,9 +101,7 @@ export function JobsDetailDrawer({
               <Separator />
               <div>
                 <Label className="text-xs text-muted-foreground">Error</Label>
-                <p className="mt-0.5 text-destructive">
-                  {scalarString(selectedJob.errorMessage)}
-                </p>
+                <p className="mt-0.5 text-destructive">{scalarString(selectedJob.errorMessage)}</p>
               </div>
             </>
           ) : null}
@@ -126,40 +124,28 @@ export function JobsDetailDrawer({
             </div>
             {selectedJob.startedAt ? (
               <div>
-                <Label className="text-xs text-muted-foreground">
-                  Started at
-                </Label>
-                <p className="mt-0.5">
-                  {formatUnknownDateTime(selectedJob.startedAt)}
-                </p>
+                <Label className="text-xs text-muted-foreground">Started at</Label>
+                <p className="mt-0.5">{formatUnknownDateTime(selectedJob.startedAt)}</p>
               </div>
             ) : null}
             {selectedJob.completedAt ? (
               <div>
-                <Label className="text-xs text-muted-foreground">
-                  Completed at
-                </Label>
-                <p className="mt-0.5">
-                  {formatUnknownDateTime(selectedJob.completedAt)}
-                </p>
+                <Label className="text-xs text-muted-foreground">Completed at</Label>
+                <p className="mt-0.5">{formatUnknownDateTime(selectedJob.completedAt)}</p>
               </div>
             ) : null}
           </div>
           <Separator />
           <div>
             <Label className="text-xs text-muted-foreground">Created by</Label>
-            <p className="mt-0.5 font-mono text-xs">
-              {selectedJob.createdById ?? "System"}
-            </p>
+            <p className="mt-0.5 font-mono text-xs">{selectedJob.createdById ?? "System"}</p>
           </div>
 
           <Show when={isOpen}>
             <>
               <Separator />
               <div>
-                <Label className="text-xs text-muted-foreground">
-                  Event timeline
-                </Label>
+                <Label className="text-xs text-muted-foreground">Event timeline</Label>
                 <JobsEventTimeline
                   events={events}
                   isLoading={eventsLoading}

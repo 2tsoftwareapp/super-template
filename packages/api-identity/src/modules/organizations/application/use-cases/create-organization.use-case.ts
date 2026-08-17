@@ -1,6 +1,6 @@
-import type { AuthenticatedRequestUser } from '@repo/api-core';
+import type { AuthenticatedRequestUser } from "@repo/api-core";
 
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import {
   ACTIVITY_EMITTER,
   type ActivityEmitter,
@@ -8,20 +8,23 @@ import {
   ERROR_CODES,
   PLATFORM_TRANSACTION_PORT,
   type PlatformTransactionPort,
-} from '@repo/api-core';
+} from "@repo/api-core";
 
-import type { CreateOrganizationCommand } from '../organizations.types';
+import type { CreateOrganizationCommand } from "../organizations.types";
 
-import { AccessControlService } from '../../../access-control/application/access-control.service';
-import { ORGANIZATIONS_REPOSITORY, type OrganizationsRepositoryPort } from '../ports/organizations.repository.port';
+import { AccessControlService } from "../../../access-control/application/access-control.service";
+import {
+  ORGANIZATIONS_REPOSITORY,
+  type OrganizationsRepositoryPort,
+} from "../ports/organizations.repository.port";
 
 const slugify = (value: string) =>
   value
     .trim()
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 64) || 'organization';
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 64) || "organization";
 
 @Injectable()
 export class CreateOrganizationUseCase {
@@ -33,15 +36,13 @@ export class CreateOrganizationUseCase {
     // the tenant-isolation policies.
     @Inject(PLATFORM_TRANSACTION_PORT)
     private readonly transactionPort: PlatformTransactionPort,
-    @Inject(ORGANIZATIONS_REPOSITORY) private readonly organizationsRepository: OrganizationsRepositoryPort,
+    @Inject(ORGANIZATIONS_REPOSITORY)
+    private readonly organizationsRepository: OrganizationsRepositoryPort,
     @Inject(ACTIVITY_EMITTER) private readonly activityEmitter: ActivityEmitter,
     private readonly accessControlService: AccessControlService,
   ) {}
 
-  async execute(
-    user: AuthenticatedRequestUser,
-    input: CreateOrganizationCommand,
-  ) {
+  async execute(user: AuthenticatedRequestUser, input: CreateOrganizationCommand) {
     const baseSlug = slugify(input.name);
     let organization = null;
     let attempt = 0;
@@ -55,14 +56,11 @@ export class CreateOrganizationUseCase {
             slug = `${baseSlug}-${randomSuffix}`;
           }
 
-          const existing = await this.organizationsRepository.findBySlug(
-            slug,
-            transaction,
-          );
+          const existing = await this.organizationsRepository.findBySlug(slug, transaction);
           if (existing) {
             throw new AppError(
               ERROR_CODES.RESOURCE_CONFLICT,
-              'Slug already exists',
+              "Slug already exists",
               HttpStatus.CONFLICT,
             );
           }
@@ -78,7 +76,7 @@ export class CreateOrganizationUseCase {
           if (!created) {
             throw new AppError(
               ERROR_CODES.INTERNAL_ERROR,
-              'Organization could not be created',
+              "Organization could not be created",
               HttpStatus.INTERNAL_SERVER_ERROR,
             );
           }
@@ -87,7 +85,7 @@ export class CreateOrganizationUseCase {
             {
               organizationId: created.id,
               userId: user.userId,
-              role: 'OWNER',
+              role: "OWNER",
             },
             transaction,
           );
@@ -101,10 +99,10 @@ export class CreateOrganizationUseCase {
             {
               organizationId: created.id,
               summary: `Organization "${created.name}" created`,
-              entityType: 'organization',
+              entityType: "organization",
               entityId: created.id,
               actorId: user.userId,
-              visibility: 'INTERNAL',
+              visibility: "INTERNAL",
             },
             transaction,
           );
@@ -120,10 +118,10 @@ export class CreateOrganizationUseCase {
           errorCode?: string;
         };
         const isUniqueViolation =
-          pgError.code === '23505' ||
-          (pgError.message?.includes('unique') ?? false) ||
+          pgError.code === "23505" ||
+          (pgError.message?.includes("unique") ?? false) ||
           pgError.errorCode === ERROR_CODES.RESOURCE_CONFLICT ||
-          (pgError.message?.includes('Slug already exists') ?? false);
+          (pgError.message?.includes("Slug already exists") ?? false);
 
         if (isUniqueViolation && attempt < 9) {
           attempt += 1;
@@ -136,7 +134,7 @@ export class CreateOrganizationUseCase {
     if (!organization) {
       throw new AppError(
         ERROR_CODES.INTERNAL_ERROR,
-        'Organization could not be created after retries',
+        "Organization could not be created after retries",
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
@@ -145,7 +143,7 @@ export class CreateOrganizationUseCase {
       id: organization.id,
       name: organization.name,
       slug: organization.slug,
-      role: 'OWNER' as const,
+      role: "OWNER" as const,
       createdAt: organization.createdAt.toISOString(),
       updatedAt: organization.updatedAt.toISOString(),
       current: false,

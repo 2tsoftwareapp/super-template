@@ -1,12 +1,9 @@
-import type { TransactionExecutor } from '@repo/api-core';
-import type {
-  ActivityEmitInput,
-  ActivityEmitter,
-} from '@repo/api-core';
+import type { TransactionExecutor } from "@repo/api-core";
+import type { ActivityEmitInput, ActivityEmitter } from "@repo/api-core";
 
-import { Injectable } from '@nestjs/common';
+import { Injectable } from "@nestjs/common";
 
-import { EmitActivityUseCase } from './use-cases/emit-activity.use-case';
+import { EmitActivityUseCase } from "./use-cases/emit-activity.use-case";
 
 /**
  * Adapter implementing the ACTIVITY_EMITTER port for cross-module activity
@@ -16,10 +13,7 @@ import { EmitActivityUseCase } from './use-cases/emit-activity.use-case';
 export class ActivitiesService implements ActivityEmitter {
   constructor(private readonly emitActivityUseCase: EmitActivityUseCase) {}
 
-  async emit(
-    input: ActivityEmitInput,
-    executor?: TransactionExecutor,
-  ): Promise<void> {
+  async emit(input: ActivityEmitInput, executor?: TransactionExecutor): Promise<void> {
     await this.emitActivityUseCase.execute(input, executor);
   }
 }

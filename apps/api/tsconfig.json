@@ -5,19 +5,10 @@
     "strictPropertyInitialization": false,
     "tsBuildInfoFile": "dist/tsconfig.build.tsbuildinfo",
     "paths": {
-      "src/*": [
-        "./src/*"
-      ],
-      "@identity/*": [
-        "../../packages/api-identity/src/*"
-      ],
-      "@platform/*": [
-        "../../packages/api-platform/src/*"
-      ]
+      "src/*": ["./src/*"],
+      "@identity/*": ["../../packages/api-identity/src/*"],
+      "@platform/*": ["../../packages/api-platform/src/*"]
     }
   },
-  "include": [
-    "src/**/*.ts",
-    "test/**/*.ts"
-  ]
+  "include": ["src/**/*.ts", "test/**/*.ts"]
 }

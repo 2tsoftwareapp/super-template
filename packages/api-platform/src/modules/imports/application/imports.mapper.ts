@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable } from "@nestjs/common";
 
-import type { ImportJobStatus, ImportJobView } from './imports.types';
-import type { ImportJobRecord } from './ports/imports.repository.port';
+import type { ImportJobStatus, ImportJobView } from "./imports.types";
+import type { ImportJobRecord } from "./ports/imports.repository.port";
 
 @Injectable()
 export class ImportsMapper {

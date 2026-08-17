@@ -1,9 +1,9 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { NotificationsMapper } from '../notifications.mapper';
-import { NotificationDeliveryUseCase } from '../use-cases/notification-delivery.use-case';
+import { NotificationsMapper } from "../notifications.mapper";
+import { NotificationDeliveryUseCase } from "../use-cases/notification-delivery.use-case";
 
-describe('NotificationDeliveryUseCase - scope & idempotency', () => {
+describe("NotificationDeliveryUseCase - scope & idempotency", () => {
   const mockUserLookup = {
     findActiveUserInOrganization: vi.fn(),
     filterActiveUserIdsInOrganization: vi.fn(),
@@ -23,7 +23,7 @@ describe('NotificationDeliveryUseCase - scope & idempotency', () => {
   };
 
   const mockTransactionPort = {
-    run: vi.fn(async <T>(fn: (tx: unknown) => Promise<T>) => fn('tx')),
+    run: vi.fn(async <T>(fn: (tx: unknown) => Promise<T>) => fn("tx")),
   };
 
   const mockNotificationsRepository = {
@@ -60,81 +60,74 @@ describe('NotificationDeliveryUseCase - scope & idempotency', () => {
     vi.clearAllMocks();
   });
 
-  describe('resolveRecipientIds', () => {
-    it('returns empty array for target user not in organization', async () => {
+  describe("resolveRecipientIds", () => {
+    it("returns empty array for target user not in organization", async () => {
       mockUserLookup.findActiveUserInOrganization.mockResolvedValue(null);
       const useCase = createUseCase();
       const result = await useCase.resolveRecipientIds({
-        audience: 'USER',
-        targetUserId: 'user-outside-org',
-        organizationId: 'org-a',
+        audience: "USER",
+        targetUserId: "user-outside-org",
+        organizationId: "org-a",
       } as never);
       expect(result).toEqual([]);
     });
 
-    it('returns only org members for USERS audience', async () => {
-      mockUserLookup.filterActiveUserIdsInOrganization.mockResolvedValue([
-        'user-in-org',
-      ]);
+    it("returns only org members for USERS audience", async () => {
+      mockUserLookup.filterActiveUserIdsInOrganization.mockResolvedValue(["user-in-org"]);
       const useCase = createUseCase();
       const result = await useCase.resolveRecipientIds({
-        audience: 'USERS',
-        userIds: ['user-in-org', 'user-outside-org'],
-        organizationId: 'org-a',
+        audience: "USERS",
+        userIds: ["user-in-org", "user-outside-org"],
+        organizationId: "org-a",
       } as never);
-      expect(result).toEqual(['user-in-org']);
+      expect(result).toEqual(["user-in-org"]);
     });
 
-    it('returns deliverable users in org for ALL audience', async () => {
-      mockUserLookup.listDeliverableUserIdsInOrganization.mockResolvedValue([
-        'user-a',
-        'user-b',
-      ]);
+    it("returns deliverable users in org for ALL audience", async () => {
+      mockUserLookup.listDeliverableUserIdsInOrganization.mockResolvedValue(["user-a", "user-b"]);
       const useCase = createUseCase();
       const result = await useCase.resolveRecipientIds({
-        audience: 'ALL',
-        organizationId: 'org-a',
+        audience: "ALL",
+        organizationId: "org-a",
       } as never);
-      expect(result).toEqual(['user-a', 'user-b']);
+      expect(result).toEqual(["user-a", "user-b"]);
     });
   });
 
-  describe('idempotency (sourceJobId conflict)', () => {
-    it('does not insert duplicate inbox rows when retrying same job', async () => {
+  describe("idempotency (sourceJobId conflict)", () => {
+    it("does not insert duplicate inbox rows when retrying same job", async () => {
       mockNotificationsRepository.createMany.mockResolvedValue([
-        { id: 'n-1', userId: 'user-a', organizationId: 'org-a' },
+        { id: "n-1", userId: "user-a", organizationId: "org-a" },
       ]);
       mockJobsRepository.markProcessing.mockResolvedValue({
-        id: 'job-1',
-        organizationId: 'org-a',
-        type: 'test',
-        title: 'Test',
-        body: 'Body',
+        id: "job-1",
+        organizationId: "org-a",
+        type: "test",
+        title: "Test",
+        body: "Body",
       });
       mockJobsRepository.markCompleted.mockResolvedValue(null);
-      mockUserLookup.listDeliverableUserIdsInOrganization.mockResolvedValue([
-        'user-a',
-      ]);
+      mockUserLookup.listDeliverableUserIdsInOrganization.mockResolvedValue(["user-a"]);
 
       const useCase = createUseCase();
-      await useCase.processJob('job-1');
+      await useCase.processJob("job-1");
 
       expect(mockNotificationsRepository.createMany).toHaveBeenCalledTimes(1);
     });
   });
 
-  describe('claimDue — concurrent worker safety', () => {
-    it('returns distinct jobs for each worker', async () => {
+  describe("claimDue — concurrent worker safety", () => {
+    it("returns distinct jobs for each worker", async () => {
       const now = new Date();
       const jobA = {
-        id: 'job-a',
-        organizationId: 'org-a',
-        audience: 'ALL' as const,
-        type: 'test',
-        title: 'Test',
-        body: 'Body',
+        id: "job-a",
+        organizationId: "org-a",
+        audience: "ALL" as const,
+        type: "test",
+        title: "Test",
+        body: "Body",
         data: null,
-        status: 'PROCESSING' as const,
+        status: "PROCESSING" as const,
         scheduledAt: now,
         createdAt: now,
         updatedAt: now,
@@ -147,14 +140,14 @@ describe('NotificationDeliveryUseCase - scope & idempotency', () => {
         idempotencyKey: null,
       };
       const jobB = {
-        id: 'job-b',
-        organizationId: 'org-b',
-        audience: 'ALL' as const,
-        type: 'test',
-        title: 'Test',
-        body: 'Body',
+        id: "job-b",
+        organizationId: "org-b",
+        audience: "ALL" as const,
+        type: "test",
+        title: "Test",
+        body: "Body",
         data: null,
-        status: 'PROCESSING' as const,
+        status: "PROCESSING" as const,
         scheduledAt: now,
         createdAt: now,
         updatedAt: now,
@@ -182,50 +175,47 @@ describe('NotificationDeliveryUseCase - scope & idempotency', () => {
     });
   });
 
-  describe('admin job scope', () => {
-    it('listJobs passes organizationId to repository', async () => {
+  describe("admin job scope", () => {
+    it("listJobs passes organizationId to repository", async () => {
       mockJobsRepository.list.mockResolvedValue({ rows: [], total: 0 });
       const useCase = createUseCase();
-      await useCase.listJobs(
-        { userId: 'admin', organizationId: 'org-a' } as never,
-        { page: 1, limit: 10 },
-      );
+      await useCase.listJobs({ userId: "admin", organizationId: "org-a" } as never, {
+        page: 1,
+        limit: 10,
+      });
       expect(mockJobsRepository.list).toHaveBeenCalledWith({
         page: 1,
         limit: 10,
-        organizationId: 'org-a',
+        organizationId: "org-a",
       });
     });
 
-    it('getJob returns 404 when job belongs to different org', async () => {
+    it("getJob returns 404 when job belongs to different org", async () => {
       mockJobsRepository.findById.mockResolvedValue({
-        id: 'job-1',
-        organizationId: 'org-b',
+        id: "job-1",
+        organizationId: "org-b",
       });
       const useCase = createUseCase();
       await expect(
-        useCase.getJob(
-          { userId: 'admin', organizationId: 'org-a' } as never,
-          'job-1',
-        ),
-      ).rejects.toThrow('Notification job not found');
+        useCase.getJob({ userId: "admin", organizationId: "org-a" } as never, "job-1"),
+      ).rejects.toThrow("Notification job not found");
     });
 
-    it('getJob returns job when org matches', async () => {
+    it("getJob returns job when org matches", async () => {
       const now = new Date();
       mockJobsRepository.findById.mockResolvedValue({
-        id: 'job-1',
-        organizationId: 'org-a',
-        actorId: 'admin',
+        id: "job-1",
+        organizationId: "org-a",
+        actorId: "admin",
         scheduledAt: now,
         createdAt: now,
         updatedAt: now,
-        audience: 'ALL',
-        type: 'test',
-        title: 'Test',
-        body: 'Body',
+        audience: "ALL",
+        type: "test",
+        title: "Test",
+        body: "Body",
         data: null,
-        status: 'PENDING',
+        status: "PENDING",
         targetUserId: null,
         userIds: null,
         recipientCount: null,
@@ -235,10 +225,10 @@ describe('NotificationDeliveryUseCase - scope & idempotency', () => {
       });
       const useCase = createUseCase();
       const result = await useCase.getJob(
-        { userId: 'admin', organizationId: 'org-a' } as never,
-        'job-1',
+        { userId: "admin", organizationId: "org-a" } as never,
+        "job-1",
       );
-      expect(result.id).toBe('job-1');
+      expect(result.id).toBe("job-1");
     });
   });
 });

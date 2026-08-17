@@ -1,13 +1,16 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
-import { TRANSACTION_PORT, type TransactionExecutor, type TransactionPort } from '@repo/api-core';
+import { Inject, Injectable, Logger } from "@nestjs/common";
+import { TRANSACTION_PORT, type TransactionExecutor, type TransactionPort } from "@repo/api-core";
 
-import { isBlockingStatus, isTerminalStatus } from '../../domain/job-lifecycle';
-import { JOB_OBSERVABILITY_REPOSITORY, type JobObservabilityRepositoryPort } from '../ports/job-observability.repository.port';
+import { isBlockingStatus, isTerminalStatus } from "../../domain/job-lifecycle";
+import {
+  JOB_OBSERVABILITY_REPOSITORY,
+  type JobObservabilityRepositoryPort,
+} from "../ports/job-observability.repository.port";
 import {
   JOBS_REPOSITORY,
   type JobScope,
   type JobsRepositoryPort,
-} from '../ports/jobs.repository.port';
+} from "../ports/jobs.repository.port";
 
 @Injectable()
 export class PropagationService {
@@ -15,7 +18,8 @@ export class PropagationService {
 
   constructor(
     @Inject(JOBS_REPOSITORY) private readonly jobsRepository: JobsRepositoryPort,
-    @Inject(JOB_OBSERVABILITY_REPOSITORY) private readonly jobObservabilityRepository: JobObservabilityRepositoryPort,
+    @Inject(JOB_OBSERVABILITY_REPOSITORY)
+    private readonly jobObservabilityRepository: JobObservabilityRepositoryPort,
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
   ) {}
 
@@ -39,7 +43,7 @@ export class PropagationService {
       const dependents = await this.jobsRepository.listDependents(currentId, scope, executor);
       for (const dep of dependents) {
         // COMPLETED jobs do not block their dependents; nothing to propagate.
-        if (dep.status === 'COMPLETED') {
+        if (dep.status === "COMPLETED") {
           continue;
         }
 
@@ -59,12 +63,22 @@ export class PropagationService {
               executor,
               `propagate_${dep.jobId}`,
               async () => {
-                const blocked = await this.jobsRepository.markBlocked(dep.jobId, scope, `Dependency ${currentId} ${message}`, executor);
+                const blocked = await this.jobsRepository.markBlocked(
+                  dep.jobId,
+                  scope,
+                  `Dependency ${currentId} ${message}`,
+                  executor,
+                );
                 if (!blocked) {
                   return false;
                 }
                 await this.jobObservabilityRepository.recordEvent(
-                  { jobId: dep.jobId, organizationId, type: 'dependency_failed', message: `Dependency ${currentId} ${message}` },
+                  {
+                    jobId: dep.jobId,
+                    organizationId,
+                    type: "dependency_failed",
+                    message: `Dependency ${currentId} ${message}`,
+                  },
                   executor,
                 );
                 return true;
@@ -75,7 +89,7 @@ export class PropagationService {
             // Use application logger here — writing a diagnostic event to
             // the same transaction executor could abort the outer transaction
             // if the write fails (H-002).
-            const detail = error instanceof Error ? error.message : 'Unknown blocking error';
+            const detail = error instanceof Error ? error.message : "Unknown blocking error";
             this.logger.warn(`Blocked propagation isolated for ${dep.jobId}: ${detail}`);
           }
         }

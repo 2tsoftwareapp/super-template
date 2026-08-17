@@ -1,6 +1,6 @@
-import type { TransactionExecutor } from '@repo/api-core';
+import type { TransactionExecutor } from "@repo/api-core";
 
-import type { ListUsersQuery } from '../users.types';
+import type { ListUsersQuery } from "../users.types";
 
 export interface UserRecord {
   id: string;
@@ -9,7 +9,7 @@ export interface UserRecord {
   displayName: string;
   avatarUrl: string | null;
   avatarFileId: string | null;
-  status: 'PENDING' | 'ACTIVE' | 'BLOCKED';
+  status: "PENDING" | "ACTIVE" | "BLOCKED";
   emailVerifiedAt: Date | null;
   mustChangePassword: boolean;
   deletedAt: Date | null;
@@ -23,7 +23,7 @@ export interface CreateUserInput {
   displayName: string;
   avatarUrl?: string | null;
   avatarFileId?: string | null;
-  status?: 'PENDING' | 'ACTIVE' | 'BLOCKED';
+  status?: "PENDING" | "ACTIVE" | "BLOCKED";
   emailVerifiedAt?: Date | null;
   mustChangePassword?: boolean;
   deletedAt?: Date | null;
@@ -37,31 +37,16 @@ export interface UsersListResult {
 }
 
 export interface UsersRepositoryPort {
-  create(
-    values: CreateUserInput,
-    executor?: TransactionExecutor,
-  ): Promise<UserRecord>;
-  findById(
-    userId: string,
-    executor?: TransactionExecutor,
-  ): Promise<UserRecord | null>;
-  findByEmail(
-    email: string,
-    executor?: TransactionExecutor,
-  ): Promise<UserRecord | null>;
+  create(values: CreateUserInput, executor?: TransactionExecutor): Promise<UserRecord>;
+  findById(userId: string, executor?: TransactionExecutor): Promise<UserRecord | null>;
+  findByEmail(email: string, executor?: TransactionExecutor): Promise<UserRecord | null>;
   update(
     userId: string,
     values: UpdateUserInput,
     executor?: TransactionExecutor,
   ): Promise<UserRecord | null>;
-  softDelete(
-    userId: string,
-    executor?: TransactionExecutor,
-  ): Promise<UserRecord | null>;
-  list(
-    params: ListUsersQuery,
-    executor?: TransactionExecutor,
-  ): Promise<UsersListResult>;
+  softDelete(userId: string, executor?: TransactionExecutor): Promise<UserRecord | null>;
+  list(params: ListUsersQuery, executor?: TransactionExecutor): Promise<UsersListResult>;
   isUserInOrganization(
     userId: string,
     organizationId: string,
@@ -69,4 +54,4 @@ export interface UsersRepositoryPort {
   ): Promise<boolean>;
 }
 
-export const USERS_REPOSITORY = Symbol('USERS_REPOSITORY');
+export const USERS_REPOSITORY = Symbol("USERS_REPOSITORY");

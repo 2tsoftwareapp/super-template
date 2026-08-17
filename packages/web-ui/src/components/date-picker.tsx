@@ -5,11 +5,7 @@ import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 
 import { Calendar } from "./calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "./popover";
+import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 
 export function DatePicker({
   value,
@@ -56,12 +52,13 @@ export function DatePickerWithRange({
   onChange: (range: { from: string; to: string }) => void;
   className?: string;
 }) {
-  const range = value.from || value.to
-    ? {
-        from: value.from ? new Date(value.from + "T00:00:00") : undefined,
-        to: value.to ? new Date(value.to + "T00:00:00") : undefined,
-      }
-    : undefined;
+  const range =
+    value.from || value.to
+      ? {
+          from: value.from ? new Date(value.from + "T00:00:00") : undefined,
+          to: value.to ? new Date(value.to + "T00:00:00") : undefined,
+        }
+      : undefined;
 
   return (
     <Popover>

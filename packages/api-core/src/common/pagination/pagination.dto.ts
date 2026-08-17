@@ -1,7 +1,7 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
-import { DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE } from '@repo/config';
-import { Transform, Type } from 'class-transformer';
-import { IsIn, IsInt, IsOptional, Max, Min } from 'class-validator';
+import { ApiPropertyOptional } from "@nestjs/swagger";
+import { DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE } from "@repo/config";
+import { Transform, Type } from "class-transformer";
+import { IsIn, IsInt, IsOptional, Max, Min } from "class-validator";
 
 export class PaginationQueryDto {
   @ApiPropertyOptional({ type: Number, default: 1 })
@@ -23,11 +23,11 @@ export class PaginationQueryDto {
   @IsOptional()
   limit = DEFAULT_PAGE_SIZE;
 
-  @ApiPropertyOptional({ default: 'desc', enum: ['asc', 'desc'] })
+  @ApiPropertyOptional({ default: "desc", enum: ["asc", "desc"] })
   @Transform(({ value }): string =>
-    typeof value === 'string' ? value.toLowerCase() : String(value),
+    typeof value === "string" ? value.toLowerCase() : String(value),
   )
-  @IsIn(['asc', 'desc'])
+  @IsIn(["asc", "desc"])
   @IsOptional()
-  sortOrder: 'asc' | 'desc' = 'desc';
+  sortOrder: "asc" | "desc" = "desc";
 }

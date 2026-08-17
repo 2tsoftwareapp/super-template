@@ -2,10 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import {
-  fetchMyOrganizations,
-  fetchOrganizationsList,
-} from "@/lib/lookup-api";
+import { fetchMyOrganizations, fetchOrganizationsList } from "@/lib/lookup-api";
 import { organizationsKeys } from "@/lib/query-keys";
 
 const ORGANIZATIONS_STALE_TIME_MS = 5 * 60_000;

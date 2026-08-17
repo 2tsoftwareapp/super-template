@@ -1,20 +1,7 @@
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@repo/web-ui/card";
+import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@repo/web-ui/card";
 import { ErrorState } from "@repo/web-ui/error-state";
 import { SectionLoading } from "@repo/web-ui/loading";
-import {
-  Activity,
-  ArrowRight,
-  LogIn,
-  Mail,
-  Users,
-  Workflow,
-} from "lucide-react";
+import { Activity, ArrowRight, LogIn, Mail, Users, Workflow } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
@@ -63,26 +50,17 @@ export function DashboardActivity({
             action={{ label: "Retry", onClick: onRetry }}
           />
         ) : recentActivity.length === 0 ? (
-          <p className="py-6 text-center text-xs text-muted-foreground">
-            No recent activity
-          </p>
+          <p className="py-6 text-center text-xs text-muted-foreground">No recent activity</p>
         ) : (
           <div className="divide-y divide-border">
             {recentActivity.map((entry) => {
               const { icon, c } = auditIcon(entry.action);
               return (
-                <div
-                  key={entry.id}
-                  className="flex items-center gap-2 py-2 first:pt-0 last:pb-0"
-                >
+                <div key={entry.id} className="flex items-center gap-2 py-2 first:pt-0 last:pb-0">
                   <span className={cn("shrink-0", c)}>{icon}</span>
                   <div className="min-w-0 flex-1 leading-tight">
-                    <p className="truncate text-xs font-medium">
-                      {formatAction(entry.action)}
-                    </p>
-                    <p className="truncate text-[10px] text-muted-foreground">
-                      {entry.entityType}
-                    </p>
+                    <p className="truncate text-xs font-medium">{formatAction(entry.action)}</p>
+                    <p className="truncate text-[10px] text-muted-foreground">{entry.entityType}</p>
                   </div>
                   <span className="shrink-0 text-[10px] text-muted-foreground">
                     {timeAgo(entry.createdAt)}
@@ -117,14 +95,11 @@ function formatAction(action: string): string {
 }
 
 function auditIcon(action: string) {
-  if (action.startsWith("user"))
-    return { icon: <Users className="size-3" />, c: "text-chart-2" };
+  if (action.startsWith("user")) return { icon: <Users className="size-3" />, c: "text-chart-2" };
   if (action.startsWith("auth") || action.startsWith("login"))
     return { icon: <LogIn className="size-3" />, c: "text-primary" };
-  if (action.startsWith("job"))
-    return { icon: <Workflow className="size-3" />, c: "text-chart-5" };
-  if (action.startsWith("mail"))
-    return { icon: <Mail className="size-3" />, c: "text-chart-3" };
+  if (action.startsWith("job")) return { icon: <Workflow className="size-3" />, c: "text-chart-5" };
+  if (action.startsWith("mail")) return { icon: <Mail className="size-3" />, c: "text-chart-3" };
   return {
     icon: <Activity className="size-3" />,
     c: "text-muted-foreground",

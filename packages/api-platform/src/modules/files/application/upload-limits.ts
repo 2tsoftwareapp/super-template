@@ -6,4 +6,4 @@ export {
   getUploadExtension,
   isAllowedUploadExtension,
   MAX_FILE_SIZE_BYTES,
-} from '../domain/upload-policy';
+} from "../domain/upload-policy";

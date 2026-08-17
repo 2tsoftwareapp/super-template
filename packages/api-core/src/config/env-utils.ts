@@ -1,16 +1,16 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 export const booleanFromString = z.preprocess((value) => {
-  if (typeof value === 'boolean') {
+  if (typeof value === "boolean") {
     return value;
   }
 
-  if (typeof value === 'string') {
-    if (value === 'true') {
+  if (typeof value === "string") {
+    if (value === "true") {
       return true;
     }
 
-    if (value === 'false') {
+    if (value === "false") {
       return false;
     }
   }
@@ -19,7 +19,7 @@ export const booleanFromString = z.preprocess((value) => {
 }, z.boolean());
 
 export const emptyStringToUndefined = z.preprocess(
-  (value) => (value === '' ? undefined : value),
+  (value) => (value === "" ? undefined : value),
   z.string().optional(),
 );
 
@@ -39,11 +39,11 @@ export const commaSeparatedOrigins = z
   .refine(
     (value) =>
       value
-        .split(',')
+        .split(",")
         .map((origin) => origin.trim())
         .filter(Boolean)
         .every(isHttpUrl),
-    { message: 'must be a comma-separated list of valid origin URLs' },
+    { message: "must be a comma-separated list of valid origin URLs" },
   );
 
 // Matches the format accepted by durationToMilliseconds (e.g. "15m", "7d").
@@ -53,7 +53,7 @@ export const durationString = z
 
 export const everyOriginIsHttps = (value: string): boolean =>
   value
-    .split(',')
+    .split(",")
     .map((origin) => origin.trim())
     .filter(Boolean)
-    .every((origin) => origin.startsWith('https://'));
+    .every((origin) => origin.startsWith("https://"));

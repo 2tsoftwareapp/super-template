@@ -34,11 +34,7 @@ export default async function RootLayout({
   }
 
   return (
-    <html
-      lang={locale}
-      suppressHydrationWarning
-      className={tweakcnFontClassName}
-    >
+    <html lang={locale} suppressHydrationWarning className={tweakcnFontClassName}>
       <body>
         <script
           id="theme-init"

@@ -1,4 +1,4 @@
-import type { TransactionExecutor } from '@repo/api-core';
+import type { TransactionExecutor } from "@repo/api-core";
 
 export interface ImportExportRowContext {
   organizationId: string;
@@ -31,5 +31,9 @@ export interface ImportExportAdapter<TRow extends object> {
 
   validateRow(row: TRow): string | null;
 
-  importRow(row: TRow, context: ImportExportRowContext, executor?: TransactionExecutor): Promise<void>;
+  importRow(
+    row: TRow,
+    context: ImportExportRowContext,
+    executor?: TransactionExecutor,
+  ): Promise<void>;
 }

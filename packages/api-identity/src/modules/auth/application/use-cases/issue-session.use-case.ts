@@ -1,16 +1,13 @@
-import type { RequestContext } from '@repo/api-core';
+import type { RequestContext } from "@repo/api-core";
 
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from "@nestjs/common";
 
-import type { AuthUserModel } from '../models/auth-user';
+import type { AuthUserModel } from "../models/auth-user";
 
-import { AccessControlService } from '../../../access-control/application/access-control.service';
-import { OrganizationsService } from '../../../organizations/application/organizations.service';
-import { AuthMapper } from '../auth.mapper';
-import {
-  AUTH_TOKEN_PROVIDER,
-  type AuthTokenProviderPort,
-} from '../ports/auth-token.provider.port';
+import { AccessControlService } from "../../../access-control/application/access-control.service";
+import { OrganizationsService } from "../../../organizations/application/organizations.service";
+import { AuthMapper } from "../auth.mapper";
+import { AUTH_TOKEN_PROVIDER, type AuthTokenProviderPort } from "../ports/auth-token.provider.port";
 
 /** Shared tail of login and post-MFA-challenge flows: builds the full session response for an already-verified user. */
 @Injectable()
@@ -28,22 +25,14 @@ export class IssueSessionUseCase {
     requestContext?: RequestContext,
     options?: { mustChangePassword?: boolean },
   ) {
-    const organizationId =
-      await this.organizationsService.resolveOrganizationIdForUser(user.id);
+    const organizationId = await this.organizationsService.resolveOrganizationIdForUser(user.id);
 
-    const accessProfile = await this.accessControlService.getAccessProfile(
-      user.id,
-      organizationId,
-    );
+    const accessProfile = await this.accessControlService.getAccessProfile(user.id, organizationId);
 
-    const sessionPayload = await this.tokenProvider.createSessionTokens(
-      user.id,
-      organizationId,
-      {
-        ipAddress: requestContext?.ipAddress ?? null,
-        userAgent: requestContext?.userAgent ?? null,
-      },
-    );
+    const sessionPayload = await this.tokenProvider.createSessionTokens(user.id, organizationId, {
+      ipAddress: requestContext?.ipAddress ?? null,
+      userAgent: requestContext?.userAgent ?? null,
+    });
 
     return {
       accessToken: sessionPayload.accessToken,
@@ -52,10 +41,7 @@ export class IssueSessionUseCase {
       permissions: accessProfile.permissions,
       organizationId,
       mustChangePassword: options?.mustChangePassword ?? false,
-      session: this.authMapper.toSessionDto(
-        sessionPayload.session,
-        sessionPayload.session.id,
-      ),
+      session: this.authMapper.toSessionDto(sessionPayload.session, sessionPayload.session.id),
     };
   }
 }

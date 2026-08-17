@@ -38,8 +38,7 @@ export function useAdminGuard(session: AdminSessionQuery): AdminGuardDecision {
   });
 
   const { status } = decision;
-  const redirectPath =
-    decision.status === "redirect-resource" ? decision.path : null;
+  const redirectPath = decision.status === "redirect-resource" ? decision.path : null;
 
   useEffect(() => {
     switch (status) {

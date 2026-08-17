@@ -1,5 +1,5 @@
-import type { JsonObject } from '@repo/api-core';
-import type { TransactionExecutor } from '@repo/api-core';
+import type { JsonObject } from "@repo/api-core";
+import type { TransactionExecutor } from "@repo/api-core";
 
 export interface UserPreferencesRecord {
   userId: string;
@@ -30,10 +30,7 @@ export interface PreferencesRepositoryPort {
     executor?: TransactionExecutor,
   ): Promise<UserPreferencesRecord | null>;
 
-  reset(
-    userId: string,
-    executor?: TransactionExecutor,
-  ): Promise<UserPreferencesRecord | null>;
+  reset(userId: string, executor?: TransactionExecutor): Promise<UserPreferencesRecord | null>;
 }
 
-export const PREFERENCES_REPOSITORY = Symbol('PREFERENCES_REPOSITORY');
+export const PREFERENCES_REPOSITORY = Symbol("PREFERENCES_REPOSITORY");

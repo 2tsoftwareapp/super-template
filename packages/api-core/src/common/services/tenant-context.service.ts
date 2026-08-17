@@ -1,12 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import { AsyncLocalStorage } from 'node:async_hooks';
+import { Injectable } from "@nestjs/common";
+import { AsyncLocalStorage } from "node:async_hooks";
 
-import type { TenantContext } from '../../ports/tenant-context.port';
+import type { TenantContext } from "../../ports/tenant-context.port";
 
 const tenantContextStorage = new AsyncLocalStorage<TenantContext>();
 
-export const getTenantContext = (): TenantContext | undefined =>
-  tenantContextStorage.getStore();
+export const getTenantContext = (): TenantContext | undefined => tenantContextStorage.getStore();
 
 @Injectable()
 export class TenantContextService {
@@ -14,10 +13,7 @@ export class TenantContextService {
     return tenantContextStorage.run(context, operation);
   }
 
-  runAsync<T>(
-    context: TenantContext,
-    operation: () => Promise<T>,
-  ): Promise<T> {
+  runAsync<T>(context: TenantContext, operation: () => Promise<T>): Promise<T> {
     return tenantContextStorage.run(context, operation);
   }
 

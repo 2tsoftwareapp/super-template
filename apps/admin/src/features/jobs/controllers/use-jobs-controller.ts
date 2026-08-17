@@ -17,10 +17,7 @@ import {
   useJobsQuery,
 } from "@/features/jobs/api/jobs.queries";
 import { jobsKeys } from "@/features/jobs/api/jobs.query-keys";
-import {
-  jobStatusProps,
-  STATUS_OPTIONS,
-} from "@/features/jobs/model/jobs.constants";
+import { jobStatusProps, STATUS_OPTIONS } from "@/features/jobs/model/jobs.constants";
 import { selectJobPermissions } from "@/features/jobs/model/jobs.permissions";
 import {
   type JobsFilters,
@@ -59,10 +56,7 @@ export function useJobsController(): JobsViewModel {
 
   const debouncedType = useDebouncedValue(filters.type, 400);
 
-  const onFilterChange = (
-    key: keyof JobsFilters,
-    value: string | number,
-  ) => {
+  const onFilterChange = (key: keyof JobsFilters, value: string | number) => {
     const next = { ...filters, [key]: value };
     if (key !== "page") {
       next.page = 1;
@@ -90,9 +84,7 @@ export function useJobsController(): JobsViewModel {
   const selectedEvents = jobLogs.data?.data ?? [];
 
   const hasFilters = Boolean(filters.status || filters.type);
-  const emptyMessage = hasFilters
-    ? "No jobs match your filters."
-    : "No jobs found.";
+  const emptyMessage = hasFilters ? "No jobs match your filters." : "No jobs found.";
 
   const retryList = () => {
     void queryClient.invalidateQueries({ queryKey: jobsKeys.lists() });

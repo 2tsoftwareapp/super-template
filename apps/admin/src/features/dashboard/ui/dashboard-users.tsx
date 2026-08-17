@@ -1,11 +1,5 @@
 import { Badge } from "@repo/web-ui/badge";
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@repo/web-ui/card";
+import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@repo/web-ui/card";
 import { ErrorState } from "@repo/web-ui/error-state";
 import { SectionLoading } from "@repo/web-ui/loading";
 import { ArrowRight } from "lucide-react";
@@ -26,12 +20,7 @@ interface DashboardUsersProps {
   recentUsers: User[];
 }
 
-export function DashboardUsers({
-  isLoading,
-  isError,
-  onRetry,
-  recentUsers,
-}: DashboardUsersProps) {
+export function DashboardUsers({ isLoading, isError, onRetry, recentUsers }: DashboardUsersProps) {
   return (
     <Card size="sm" className="flex min-h-0 flex-1 flex-col">
       <CardHeader className="border-b pb-0">
@@ -56,9 +45,7 @@ export function DashboardUsers({
             action={{ label: "Retry", onClick: onRetry }}
           />
         ) : recentUsers.length === 0 ? (
-          <p className="py-4 text-center text-xs text-muted-foreground">
-            No users yet
-          </p>
+          <p className="py-4 text-center text-xs text-muted-foreground">No users yet</p>
         ) : (
           <div className="divide-y divide-border">
             {recentUsers.map((user) => (
@@ -71,9 +58,7 @@ export function DashboardUsers({
                   {user.displayName.charAt(0).toUpperCase()}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-xs font-medium leading-tight">
-                    {user.displayName}
-                  </p>
+                  <p className="truncate text-xs font-medium leading-tight">{user.displayName}</p>
                   <p className="truncate text-[10px] text-muted-foreground leading-tight">
                     {user.email}
                   </p>
@@ -96,7 +81,6 @@ export function DashboardUsers({
 function statusVariant(status: string): "default" | "secondary" | "outline" {
   const s = status.toLowerCase();
   if (s === "active" || s === "completed") return "default";
-  if (s === "pending" || s === "processing" || s === "running")
-    return "secondary";
+  if (s === "pending" || s === "processing" || s === "running") return "secondary";
   return "outline";
 }

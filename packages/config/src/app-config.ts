@@ -1,8 +1,4 @@
-import {
-  DEFAULT_PAGE_SIZE,
-  MAX_PAGE_SIZE,
-  PAGE_SIZE_OPTIONS,
-} from "./pagination";
+import { DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE, PAGE_SIZE_OPTIONS } from "./pagination";
 
 /**
  * Non-API application config shared across all runtimes (NestJS API, web/admin

@@ -1,4 +1,4 @@
-import { ROLE_NAMES } from '@repo/api-core';
+import { ROLE_NAMES } from "@repo/api-core";
 
 export interface ImportAccessActor {
   userId: string;
@@ -25,8 +25,7 @@ export function canAccessImportJob(input: {
 }): boolean {
   const { actor, job } = input;
   const isSuperAdmin = actor.roles.includes(ROLE_NAMES.SUPER_ADMIN);
-  const isAdmin =
-    actor.roles.includes(ROLE_NAMES.ADMIN) || isSuperAdmin;
+  const isAdmin = actor.roles.includes(ROLE_NAMES.ADMIN) || isSuperAdmin;
 
   if (job.organizationId !== actor.organizationId && !isSuperAdmin) {
     return false;

@@ -24,10 +24,7 @@ export function OrganizationSwitcherView({
 
   if (items.length <= 1) {
     return (
-      <Badge
-        variant="outline"
-        className="hidden gap-1.5 text-muted-foreground sm:inline-flex"
-      >
+      <Badge variant="outline" className="hidden gap-1.5 text-muted-foreground sm:inline-flex">
         <Building2 className="size-3" />
         {label}
       </Badge>
@@ -44,11 +41,7 @@ export function OrganizationSwitcherView({
           aria-label="Switch organization"
           disabled={isSwitching}
         >
-          {isSwitching ? (
-            <Spinner className="size-3" />
-          ) : (
-            <Building2 className="size-3" />
-          )}
+          {isSwitching ? <Spinner className="size-3" /> : <Building2 className="size-3" />}
           <span className="max-w-32 truncate">{label}</span>
           <ChevronDown className="size-3" />
         </button>

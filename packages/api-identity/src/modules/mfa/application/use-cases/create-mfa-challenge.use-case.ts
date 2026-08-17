@@ -1,11 +1,11 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { durationToMilliseconds, generateOpaqueToken, hashOpaqueToken } from '@repo/api-core';
+import { Inject, Injectable } from "@nestjs/common";
+import { durationToMilliseconds, generateOpaqueToken, hashOpaqueToken } from "@repo/api-core";
 
-import type { MfaCreateChallengeCommand } from '../mfa.types';
+import type { MfaCreateChallengeCommand } from "../mfa.types";
 
-import { MFA_REPOSITORY, type MfaRepositoryPort } from '../ports/mfa.repository.port';
+import { MFA_REPOSITORY, type MfaRepositoryPort } from "../ports/mfa.repository.port";
 
-const CHALLENGE_TTL = '5m';
+const CHALLENGE_TTL = "5m";
 
 @Injectable()
 export class CreateMfaChallengeUseCase {

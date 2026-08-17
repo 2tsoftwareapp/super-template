@@ -4,13 +4,9 @@
     "outDir": "dist",
     "strictPropertyInitialization": false,
     "paths": {
-      "@identity/*": [
-        "./src/*"
-      ]
+      "@identity/*": ["./src/*"]
     }
   },
-  "include": [
-    "src/**/*.ts"
-  ],
+  "include": ["src/**/*.ts"],
   "exclude": []
 }

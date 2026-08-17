@@ -14,10 +14,7 @@ import {
   useMailTemplatesQuery,
 } from "@/features/mail/api/mail.queries";
 import { mailKeys } from "@/features/mail/api/mail.query-keys";
-import {
-  DELIVERY_STATUS_OPTIONS,
-  mailStatusProps,
-} from "@/features/mail/model/mail.constants";
+import { DELIVERY_STATUS_OPTIONS, mailStatusProps } from "@/features/mail/model/mail.constants";
 import { selectMailPermissions } from "@/features/mail/model/mail.permissions";
 import { DELIVERY_PAGE_SIZE } from "@/features/mail/model/mail.search-params";
 import { useSession } from "@/hooks/use-session";
@@ -50,11 +47,7 @@ export function useMailController(): MailViewModel {
   const session = useSession();
   const permissions = selectMailPermissions(session.data?.data.permissions);
 
-  const { filters, updateFilter } = useMailFilters(
-    searchParams,
-    pathname,
-    router,
-  );
+  const { filters, updateFilter } = useMailFilters(searchParams, pathname, router);
   const debouncedTemplateKey = useDebouncedValue(filters.templateKey, 400);
 
   const [templateKey, setTemplateKey] = useState("auth.welcome");
@@ -74,10 +67,7 @@ export function useMailController(): MailViewModel {
   const totalPages = deliveries.data?.meta?.totalPages ?? 1;
 
   const preview = useMailPreviewQuery(templateKey);
-  const sendForm = useMailSendForm(
-    templates.data?.data,
-    permissions.canSend,
-  );
+  const sendForm = useMailSendForm(templates.data?.data, permissions.canSend);
 
   const retryTemplates = useCallback(() => {
     void queryClient.invalidateQueries({ queryKey: mailKeys.templates() });
@@ -94,8 +84,7 @@ export function useMailController(): MailViewModel {
   return {
     header: {
       resource: mailResource,
-      description:
-        "Review delivery history, browse templates, and send test emails.",
+      description: "Review delivery history, browse templates, and send test emails.",
       isRefreshing: templates.isFetching || deliveries.isFetching,
       onRefresh: handleRefresh,
     },

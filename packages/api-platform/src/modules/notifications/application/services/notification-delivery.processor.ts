@@ -1,5 +1,5 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
+import { Inject, Injectable } from "@nestjs/common";
+import { Cron, CronExpression } from "@nestjs/schedule";
 import {
   ADVISORY_LOCK_PORT,
   type AdvisoryLockPort,
@@ -8,16 +8,26 @@ import {
   ErrorReporterService,
   TenantContextService,
   WORKER_DISPATCH_CONTEXT,
-} from '@repo/api-core';
+} from "@repo/api-core";
 
-import type { PushMessage, PushNotifier } from '../push.interface';
+import type { PushMessage, PushNotifier } from "../push.interface";
 
-import { MAX_DELIVERY_RETRY_ATTEMPTS } from '../../domain/delivery-policy';
-import { tokenLockId } from '../../domain/token-lock';
-import { DELIVERIES_REPOSITORY, type DeliveriesRepositoryPort } from '../ports/deliveries.repository.port';
-import { DEVICE_TOKENS_REPOSITORY, type DeviceTokensRepositoryPort } from '../ports/device-tokens.repository.port';
-import { type NotificationRecord, NOTIFICATIONS_REPOSITORY, type NotificationsRepositoryPort } from '../ports/notifications.repository.port';
-import { PUSH_NOTIFIER } from '../push.interface';
+import { MAX_DELIVERY_RETRY_ATTEMPTS } from "../../domain/delivery-policy";
+import { tokenLockId } from "../../domain/token-lock";
+import {
+  DELIVERIES_REPOSITORY,
+  type DeliveriesRepositoryPort,
+} from "../ports/deliveries.repository.port";
+import {
+  DEVICE_TOKENS_REPOSITORY,
+  type DeviceTokensRepositoryPort,
+} from "../ports/device-tokens.repository.port";
+import {
+  type NotificationRecord,
+  NOTIFICATIONS_REPOSITORY,
+  type NotificationsRepositoryPort,
+} from "../ports/notifications.repository.port";
+import { PUSH_NOTIFIER } from "../push.interface";
 
 const DELIVERY_BATCH_SIZE = 50;
 const RECOVERY_INTERVAL = 10; // Run stale recovery every Nth tick (~5min at 30s interval)
@@ -52,55 +62,46 @@ export class NotificationDeliveryProcessor {
     this.processing = true;
 
     try {
-      await this.tenantContextService.runAsync(
-        WORKER_DISPATCH_CONTEXT,
-        async () => {
-          // Periodically recover stale PROCESSING deliveries
-          this.tickCount++;
-          if (this.tickCount >= RECOVERY_INTERVAL) {
-            this.tickCount = 0;
-            try {
-              const recovered = await this.deliveriesRepository.recoverStaleProcessing(5);
-              if (recovered.length > 0) {
-                this.logger.warn(`Recovered ${recovered.length} stale delivery(ies) from PROCESSING`);
-              }
-            } catch (recoveryError) {
-              this.logger.error('Stale delivery recovery failed', {
-                error: recoveryError instanceof Error ? recoveryError.message : String(recoveryError),
-              });
+      await this.tenantContextService.runAsync(WORKER_DISPATCH_CONTEXT, async () => {
+        // Periodically recover stale PROCESSING deliveries
+        this.tickCount++;
+        if (this.tickCount >= RECOVERY_INTERVAL) {
+          this.tickCount = 0;
+          try {
+            const recovered = await this.deliveriesRepository.recoverStaleProcessing(5);
+            if (recovered.length > 0) {
+              this.logger.warn(`Recovered ${recovered.length} stale delivery(ies) from PROCESSING`);
             }
+          } catch (recoveryError) {
+            this.logger.error("Stale delivery recovery failed", {
+              error: recoveryError instanceof Error ? recoveryError.message : String(recoveryError),
+            });
           }
+        }
 
-          const deliveries = await this.deliveriesRepository.claimPending(
-            DELIVERY_BATCH_SIZE,
-          );
+        const deliveries = await this.deliveriesRepository.claimPending(DELIVERY_BATCH_SIZE);
 
-          if (deliveries.length === 0) {
-            return;
-          }
+        if (deliveries.length === 0) {
+          return;
+        }
 
-          const notificationIds = [...new Set(deliveries.map((d) => d.notificationId))];
-          const tokenIds = [...new Set(deliveries.map((d) => d.deviceTokenId))];
+        const notificationIds = [...new Set(deliveries.map((d) => d.notificationId))];
+        const tokenIds = [...new Set(deliveries.map((d) => d.deviceTokenId))];
 
-          const [notificationResults, tokens] = await Promise.all([
-            Promise.all(
-              notificationIds.map((id) => this.notificationsRepository.findById(id)),
-            ),
-            this.deviceTokensRepository.listByIds(tokenIds),
-          ]);
+        const [notificationResults, tokens] = await Promise.all([
+          Promise.all(notificationIds.map((id) => this.notificationsRepository.findById(id))),
+          this.deviceTokensRepository.listByIds(tokenIds),
+        ]);
 
-          const notificationMap = new Map(
-            notificationResults.filter(Boolean).map((n) => [n!.id, n!]),
-          );
-          const tokenMap = new Map(
-            tokens.map((t) => [t.id, t]),
-          );
+        const notificationMap = new Map(
+          notificationResults.filter(Boolean).map((n) => [n!.id, n!]),
+        );
+        const tokenMap = new Map(tokens.map((t) => [t.id, t]));
 
-          for (const delivery of deliveries) {
-            await this.processOneDelivery(delivery, notificationMap, tokenMap);
-          }
-        },
-      );
+        for (const delivery of deliveries) {
+          await this.processOneDelivery(delivery, notificationMap, tokenMap);
+        }
+      });
     } catch (error) {
       const logContext: Record<string, string> = {
         error: error instanceof Error ? error.message : String(error),
@@ -108,20 +109,17 @@ export class NotificationDeliveryProcessor {
       if (error instanceof Error && error.stack) {
         logContext.stack = error.stack;
       }
-      this.logger.error('Failed to process delivery batch', logContext);
+      this.logger.error("Failed to process delivery batch", logContext);
       if (error instanceof Error) {
         this.errorReporter.reportException(error, {
-          errorCode: 'DELIVERY_PROCESSING_FAILED',
-          tags: { job: 'notification-delivery-processor' },
+          errorCode: "DELIVERY_PROCESSING_FAILED",
+          tags: { job: "notification-delivery-processor" },
         });
       } else {
-        this.errorReporter.reportMessage(
-          'Failed to process delivery batch',
-          {
-            errorCode: 'DELIVERY_PROCESSING_FAILED',
-            tags: { job: 'notification-delivery-processor' },
-          },
-        );
+        this.errorReporter.reportMessage("Failed to process delivery batch", {
+          errorCode: "DELIVERY_PROCESSING_FAILED",
+          tags: { job: "notification-delivery-processor" },
+        });
       }
     } finally {
       this.processing = false;
@@ -163,7 +161,7 @@ export class NotificationDeliveryProcessor {
     if (!notification || !preClaimToken) {
       await this.deliveriesRepository.markFailed(
         delivery.id,
-        'Missing notification or device token',
+        "Missing notification or device token",
       );
       return;
     }
@@ -175,26 +173,24 @@ export class NotificationDeliveryProcessor {
       async () => {
         // Step 3: Re-read the active token inside the lock — ownership may have
         // changed between claimPending and now.
-        const freshToken = await this.deviceTokensRepository.listActiveByToken(
-          preClaimToken.token,
-        );
+        const freshToken = await this.deviceTokensRepository.listActiveByToken(preClaimToken.token);
 
         // Token was disabled (e.g. transferred) before we acquired the lock.
         if (!freshToken) {
           await this.deliveriesRepository.markFailed(
             delivery.id,
-            'Device token was deactivated before send',
+            "Device token was deactivated before send",
           );
-          return 'skipped';
+          return "skipped";
         }
 
         // Step 4: Re-verify ownership with the fresh row.
         if (notification.userId !== freshToken.userId) {
           await this.deliveriesRepository.markFailed(
             delivery.id,
-            'Notification owner does not match device token owner after re-check',
+            "Notification owner does not match device token owner after re-check",
           );
-          return 'skipped';
+          return "skipped";
         }
 
         const message: PushMessage = {
@@ -206,10 +202,7 @@ export class NotificationDeliveryProcessor {
         };
 
         // Step 5: Send to FCM while holding the lock.
-        const result = await this.pushNotifier.sendToToken(
-          freshToken.token,
-          message,
-        );
+        const result = await this.pushNotifier.sendToToken(freshToken.token, message);
 
         if (result.success) {
           // Step 6: Conditional update — no-op if transfer already invalidated the row.
@@ -222,18 +215,13 @@ export class NotificationDeliveryProcessor {
               `Delivery ${delivery.id} was superseded by token transfer; FCM send discarded`,
             );
           }
-        } else if (result.error === 'INVALID_TOKEN') {
+        } else if (result.error === "INVALID_TOKEN") {
           await this.deviceTokensRepository.disableTokens(
             [freshToken.token],
-            'FCM returned INVALID_TOKEN',
+            "FCM returned INVALID_TOKEN",
           );
-          await this.deliveriesRepository.markFailed(
-            delivery.id,
-            'Invalid device token',
-          );
-          this.logger.warn(
-            `Disabled invalid token for delivery ${delivery.id}`,
-          );
+          await this.deliveriesRepository.markFailed(delivery.id, "Invalid device token");
+          this.logger.warn(`Disabled invalid token for delivery ${delivery.id}`);
         } else if (delivery.attempts >= MAX_DELIVERY_RETRY_ATTEMPTS) {
           await this.deliveriesRepository.markFailed(
             delivery.id,
@@ -241,16 +229,14 @@ export class NotificationDeliveryProcessor {
           );
         } else {
           const backoffMinutes = Math.pow(2, delivery.attempts - 1);
-          const nextAttemptAt = new Date(
-            Date.now() + backoffMinutes * 60 * 1000,
-          );
+          const nextAttemptAt = new Date(Date.now() + backoffMinutes * 60 * 1000);
           await this.deliveriesRepository.markRetryable(delivery.id, nextAttemptAt);
           this.logger.warn(
             `Delivery ${delivery.id} will retry in ${backoffMinutes}min (attempt ${delivery.attempts}/${MAX_DELIVERY_RETRY_ATTEMPTS}): ${result.error}`,
           );
         }
 
-        return 'processed';
+        return "processed";
       },
     );
 

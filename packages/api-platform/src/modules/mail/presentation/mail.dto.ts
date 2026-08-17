@@ -1,14 +1,7 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { type JsonObject, type JsonValue, PaginationQueryDto } from '@repo/api-core';
-import { Transform } from 'class-transformer';
-import {
-  IsEmail,
-  IsEnum,
-  IsObject,
-  IsOptional,
-  IsString,
-  MaxLength,
-} from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { type JsonObject, type JsonValue, PaginationQueryDto } from "@repo/api-core";
+import { Transform } from "class-transformer";
+import { IsEmail, IsEnum, IsObject, IsOptional, IsString, MaxLength } from "class-validator";
 
 export class MailDeliveryDto {
   @ApiProperty()
@@ -23,13 +16,13 @@ export class MailDeliveryDto {
   @ApiProperty()
   subject: string;
 
-  @ApiProperty({ enum: ['SENT', 'FAILED'] })
-  status: 'SENT' | 'FAILED';
+  @ApiProperty({ enum: ["SENT", "FAILED"] })
+  status: "SENT" | "FAILED";
 
   @ApiPropertyOptional()
   errorMessage: string | null;
 
-  @ApiPropertyOptional({ type: 'object', additionalProperties: true })
+  @ApiPropertyOptional({ type: "object", additionalProperties: true })
   metadata: JsonObject | null;
 
   @ApiPropertyOptional()
@@ -45,10 +38,10 @@ export class MailDeliveriesQueryDto extends PaginationQueryDto {
   @IsString()
   templateKey?: string;
 
-  @ApiPropertyOptional({ enum: ['SENT', 'FAILED'] })
+  @ApiPropertyOptional({ enum: ["SENT", "FAILED"] })
   @IsOptional()
-  @IsEnum(['SENT', 'FAILED'])
-  status?: 'SENT' | 'FAILED';
+  @IsEnum(["SENT", "FAILED"])
+  status?: "SENT" | "FAILED";
 }
 
 export class MailTemplateDto {
@@ -59,7 +52,7 @@ export class MailTemplateDto {
   mandatory: boolean;
 
   @ApiProperty({
-    description: 'Whether this template can be sent ad hoc via POST /admin/mail/send.',
+    description: "Whether this template can be sent ad hoc via POST /admin/mail/send.",
   })
   sendable: boolean;
 
@@ -79,20 +72,19 @@ export class MailPreviewDto {
 
   @ApiProperty({
     type: [String],
-    description: 'Template variables with no supplied or default value.',
+    description: "Template variables with no supplied or default value.",
   })
   missingVariables: string[];
 }
 
 export class MailPreviewQueryDto {
   @ApiPropertyOptional({
-    type: 'string',
-    description:
-      'Template variables encoded as a JSON object string, e.g. {"displayName":"Jane"}.',
+    type: "string",
+    description: 'Template variables encoded as a JSON object string, e.g. {"displayName":"Jane"}.',
   })
   @IsOptional()
   @Transform(({ value }): JsonValue => {
-    if (typeof value !== 'string') {
+    if (typeof value !== "string") {
       return value as JsonValue;
     }
 
@@ -108,7 +100,7 @@ export class MailPreviewQueryDto {
 
 export class SendAdminMailDto {
   @ApiProperty({
-    description: 'Non-mandatory template key (security templates cannot be sent ad hoc).',
+    description: "Non-mandatory template key (security templates cannot be sent ad hoc).",
   })
   @IsString()
   @MaxLength(120)
@@ -118,13 +110,13 @@ export class SendAdminMailDto {
   @IsEmail()
   to: string;
 
-  @ApiPropertyOptional({ type: 'object', additionalProperties: { type: 'string' } })
+  @ApiPropertyOptional({ type: "object", additionalProperties: { type: "string" } })
   @IsOptional()
   @IsObject()
   variables?: Record<string, string>;
 
   @ApiPropertyOptional({
-    description: 'Replaying the same key returns the original job instead of sending again.',
+    description: "Replaying the same key returns the original job instead of sending again.",
   })
   @IsOptional()
   @IsString()
@@ -137,7 +129,7 @@ export class SendAdminMailResultDto {
   jobId: string;
 
   @ApiProperty({
-    enum: ['PENDING', 'PROCESSING', 'COMPLETED', 'CANCELLED', 'FAILED'],
+    enum: ["PENDING", "PROCESSING", "COMPLETED", "CANCELLED", "FAILED"],
   })
   status: string;
 }

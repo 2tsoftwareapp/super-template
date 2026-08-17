@@ -1,23 +1,23 @@
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import {
   AppError,
   durationToMilliseconds,
   ERROR_CODES,
   generateOpaqueToken,
   hashOpaqueToken,
-} from '@repo/api-core';
+} from "@repo/api-core";
 
 import {
   AUTH_SESSION_REPOSITORY,
   type AuthSessionRepositoryPort,
-} from '../../../auth/application/ports/auth-session.repository.port';
+} from "../../../auth/application/ports/auth-session.repository.port";
 import {
   AUTH_TOKEN_PROVIDER,
   type AuthTokenProviderPort,
-} from '../../../auth/application/ports/auth-token.provider.port';
-import { SSO_REPOSITORY, type SsoRepositoryPort } from '../ports/sso.repository.port';
+} from "../../../auth/application/ports/auth-token.provider.port";
+import { SSO_REPOSITORY, type SsoRepositoryPort } from "../ports/sso.repository.port";
 
-const EXCHANGE_TTL = '2m';
+const EXCHANGE_TTL = "2m";
 
 interface SessionExchangePayload {
   sessionId: string;
@@ -77,41 +77,33 @@ export class ExchangeSsoSessionUseCase {
     if (!exchange) {
       throw new AppError(
         ERROR_CODES.SSO_EXCHANGE_INVALID,
-        'SSO exchange code is invalid or expired',
+        "SSO exchange code is invalid or expired",
         HttpStatus.UNAUTHORIZED,
       );
     }
 
-    const consumed = await this.ssoRepository.consumeSessionExchange(
-      exchange.id,
-    );
+    const consumed = await this.ssoRepository.consumeSessionExchange(exchange.id);
 
     if (!consumed) {
       throw new AppError(
         ERROR_CODES.SSO_EXCHANGE_INVALID,
-        'SSO exchange code was already used',
+        "SSO exchange code was already used",
         HttpStatus.UNAUTHORIZED,
       );
     }
 
     // Step 2
-    const session = await this.authSessionRepository.findSessionById(
-      exchange.sessionId,
-    );
+    const session = await this.authSessionRepository.findSessionById(exchange.sessionId);
 
-    if (
-      !session ||
-      session.revokedAt ||
-      session.expiresAt.getTime() <= Date.now()
-    ) {
+    if (!session || session.revokedAt || session.expiresAt.getTime() <= Date.now()) {
       throw new AppError(
         ERROR_CODES.SSO_EXCHANGE_INVALID,
-        'SSO exchange session is invalid or expired',
+        "SSO exchange session is invalid or expired",
         HttpStatus.UNAUTHORIZED,
       );
     }
 
-    const organizationId = exchange.organizationId ?? '';
+    const organizationId = exchange.organizationId ?? "";
 
     // Step 3
     const tokens = await this.tokenProvider.reissueSessionTokens(

@@ -11,12 +11,12 @@ export const REFRESH_ROTATION_GRACE_MS = 60_000;
 
 export type RefreshAttemptDecision =
   /** Token is the current one — rotate normally. */
-  | { action: 'rotate' }
+  | { action: "rotate" }
   /** Token is the previous one inside the grace window — rotate, but keep the
    *  original pre-race token as `previous` so later racers still qualify. */
-  | { action: 'grace-rotate' }
+  | { action: "grace-rotate" }
   /** Token matches neither current nor an in-grace previous — treat as reuse. */
-  | { action: 'reuse' };
+  | { action: "reuse" };
 
 export function resolveRefreshAttempt(input: {
   matchesCurrent: boolean;
@@ -25,7 +25,7 @@ export function resolveRefreshAttempt(input: {
   now?: Date;
 }): RefreshAttemptDecision {
   if (input.matchesCurrent) {
-    return { action: 'rotate' };
+    return { action: "rotate" };
   }
 
   if (input.matchesPrevious && input.previousRotatedAt) {
@@ -33,9 +33,9 @@ export function resolveRefreshAttempt(input: {
     const age = now - input.previousRotatedAt.getTime();
 
     if (age >= 0 && age <= REFRESH_ROTATION_GRACE_MS) {
-      return { action: 'grace-rotate' };
+      return { action: "grace-rotate" };
     }
   }
 
-  return { action: 'reuse' };
+  return { action: "reuse" };
 }

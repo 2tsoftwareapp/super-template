@@ -1,1 +1,1 @@
-export { seedDatabase } from './seed-data';
+export { seedDatabase } from "./seed-data";

@@ -1,11 +1,6 @@
 export type * from "./api-types";
 export type { ClassifiedError, ErrorKind, ErrorScope } from "./errors";
-export {
-  classifyError,
-  getErrorMessage,
-  isRetryableError,
-  shouldRetryQuery,
-} from "./errors";
+export { classifyError, getErrorMessage, isRetryableError, shouldRetryQuery } from "./errors";
 export { ApiClientError, getCsrfCookieName, webFetch, webFetchBlob } from "./http";
 export type { JsonArray, JsonObject, JsonPrimitive, JsonValue } from "./json";
 export { isJsonObject, isJsonValue, parseJsonValue } from "./json";

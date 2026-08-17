@@ -38,15 +38,8 @@ export function UsersHeader({
         </div>
       </div>
       <div className="flex items-center gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onRefresh}
-          disabled={isFetching}
-        >
-          <RefreshCw
-            className={cn("size-3", isFetching && "animate-spin")}
-          />
+        <Button variant="outline" size="sm" onClick={onRefresh} disabled={isFetching}>
+          <RefreshCw className={cn("size-3", isFetching && "animate-spin")} />
           Refresh
         </Button>
         {canCreate ? (

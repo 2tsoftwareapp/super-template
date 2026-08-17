@@ -22,8 +22,7 @@ export function DashboardHeader({
   return (
     <div className="flex shrink-0 items-center justify-between gap-3">
       <p className="truncate text-sm text-muted-foreground">
-        Welcome back,{" "}
-        <span className="font-medium text-foreground">{userName}</span>
+        Welcome back, <span className="font-medium text-foreground">{userName}</span>
       </p>
       <div className="flex shrink-0 items-center gap-2">
         <span
@@ -40,17 +39,10 @@ export function DashboardHeader({
             <Spinner className="size-2" />
           ) : (
             <span
-              className={cn(
-                "size-1.5 rounded-full",
-                isHealthy ? "bg-primary" : "bg-destructive",
-              )}
+              className={cn("size-1.5 rounded-full", isHealthy ? "bg-primary" : "bg-destructive")}
             />
           )}
-          {healthFetching
-            ? "Checking"
-            : isHealthy
-              ? "Healthy"
-              : "Degraded"}
+          {healthFetching ? "Checking" : isHealthy ? "Healthy" : "Degraded"}
         </span>
         <Button
           variant="outline"
@@ -59,9 +51,7 @@ export function DashboardHeader({
           onClick={onRefresh}
           disabled={isRefreshing}
         >
-          <RefreshCw
-            className={cn("size-3", isRefreshing && "animate-spin")}
-          />
+          <RefreshCw className={cn("size-3", isRefreshing && "animate-spin")} />
           <span className="sr-only md:not-sr-only md:ml-1.5">
             {isRefreshing ? "Refreshing" : "Refresh"}
           </span>

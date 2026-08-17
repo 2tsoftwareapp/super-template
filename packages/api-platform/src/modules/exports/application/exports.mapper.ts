@@ -1,4 +1,4 @@
-import type { ExportJobRecord } from './ports/export-jobs.repository.port';
+import type { ExportJobRecord } from "./ports/export-jobs.repository.port";
 
 export class ExportsMapper {
   static toDto(job: ExportJobRecord) {

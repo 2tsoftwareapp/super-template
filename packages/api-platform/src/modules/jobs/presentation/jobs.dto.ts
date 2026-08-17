@@ -1,6 +1,6 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { type JsonObject, PaginationQueryDto } from '@repo/api-core';
-import { IsDateString, IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { type JsonObject, PaginationQueryDto } from "@repo/api-core";
+import { IsDateString, IsEnum, IsOptional, IsString, IsUUID } from "class-validator";
 
 export class JobDto {
   @ApiProperty()
@@ -9,13 +9,13 @@ export class JobDto {
   @ApiProperty()
   type: string;
 
-  @ApiProperty({ type: 'object', additionalProperties: true })
+  @ApiProperty({ type: "object", additionalProperties: true })
   payload: JsonObject;
 
   @ApiProperty({
-    enum: ['PENDING', 'PROCESSING', 'COMPLETED', 'CANCELLED', 'FAILED', 'BLOCKED'],
+    enum: ["PENDING", "PROCESSING", "COMPLETED", "CANCELLED", "FAILED", "BLOCKED"],
   })
-  status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'CANCELLED' | 'FAILED' | 'BLOCKED';
+  status: "PENDING" | "PROCESSING" | "COMPLETED" | "CANCELLED" | "FAILED" | "BLOCKED";
 
   @ApiProperty()
   scheduledAt: string;
@@ -56,11 +56,18 @@ export class JobDto {
 
 /** Job list view with redacted payload. */
 export class JobListDto extends JobDto {
-  @ApiProperty({ type: 'object', additionalProperties: true })
+  @ApiProperty({ type: "object", additionalProperties: true })
   declare payload: Record<string, never>;
 }
 
-const STATUS_ENUM = ['PENDING', 'PROCESSING', 'COMPLETED', 'CANCELLED', 'FAILED', 'BLOCKED'] as const;
+const STATUS_ENUM = [
+  "PENDING",
+  "PROCESSING",
+  "COMPLETED",
+  "CANCELLED",
+  "FAILED",
+  "BLOCKED",
+] as const;
 
 export class JobsQueryDto extends PaginationQueryDto {
   @ApiPropertyOptional({ enum: STATUS_ENUM })
@@ -107,21 +114,14 @@ export class JobEventDto {
   attemptId: string | null;
 
   @ApiProperty({
-    enum: [
-      'claimed',
-      'completed',
-      'failed',
-      'retry_scheduled',
-      'cancelled',
-      'no_handler',
-    ],
+    enum: ["claimed", "completed", "failed", "retry_scheduled", "cancelled", "no_handler"],
   })
   type: string;
 
   @ApiPropertyOptional({ type: String, nullable: true })
   message: string | null;
 
-  @ApiPropertyOptional({ type: 'object', additionalProperties: true, nullable: true })
+  @ApiPropertyOptional({ type: "object", additionalProperties: true, nullable: true })
   metadata: JsonObject | null;
 
   @ApiProperty()
@@ -138,7 +138,7 @@ export class JobDependencyDto {
   dependsOnJobId: string;
 
   @ApiProperty({
-    enum: ['PENDING', 'PROCESSING', 'COMPLETED', 'CANCELLED', 'FAILED', 'BLOCKED'],
+    enum: ["PENDING", "PROCESSING", "COMPLETED", "CANCELLED", "FAILED", "BLOCKED"],
   })
   dependsOnJobStatus: string;
 

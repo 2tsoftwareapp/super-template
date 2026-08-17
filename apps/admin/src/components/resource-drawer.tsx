@@ -67,28 +67,15 @@ export function ResourceDrawer({
               {title}
             </h2>
             {description ? (
-              <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                {description}
-              </p>
+              <p className="mt-1 text-sm leading-6 text-muted-foreground">{description}</p>
             ) : null}
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onClose}
-            aria-label="Close panel"
-          >
+          <Button variant="ghost" size="icon" onClick={onClose} aria-label="Close panel">
             <X />
           </Button>
         </div>
-        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5">
-          {children}
-        </div>
-        {footer ? (
-          <div className="shrink-0 border-t border-border px-5 py-4">
-            {footer}
-          </div>
-        ) : null}
+        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5">{children}</div>
+        {footer ? <div className="shrink-0 border-t border-border px-5 py-4">{footer}</div> : null}
       </section>
     </>
   );

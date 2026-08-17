@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from "@nestjs/common";
 import {
   AUTH_TOKEN_CLEANUP,
   type AuthTokenCleanup,
@@ -6,31 +6,31 @@ import {
   type JsonValue,
   USER_NOTIFICATION_SENDER,
   type UserNotificationSender,
-} from '@repo/api-core';
+} from "@repo/api-core";
 
-import type { JobHandler } from '../jobs.types';
+import type { JobHandler } from "../jobs.types";
 
-import { MailService } from '../../../mail/application/mail.service';
+import { MailService } from "../../../mail/application/mail.service";
 
 function readStringField(payload: JsonObject, key: string): string {
   const value = payload[key];
-  return typeof value === 'string' ? value : '';
+  return typeof value === "string" ? value : "";
 }
 
 function readOptionalJsonObject(value: JsonValue | undefined): JsonObject | null {
-  if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+  if (typeof value === "object" && value !== null && !Array.isArray(value)) {
     return value;
   }
   return null;
 }
 
 function readStringRecord(value: JsonValue | undefined): Record<string, string> {
-  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
     return {};
   }
   const result: Record<string, string> = {};
   for (const [key, entry] of Object.entries(value)) {
-    if (typeof entry === 'string') {
+    if (typeof entry === "string") {
       result[key] = entry;
     }
   }
@@ -49,13 +49,13 @@ export class JobHandlersRegistry {
     @Inject(USER_NOTIFICATION_SENDER)
     private readonly notificationSender: UserNotificationSender,
   ) {
-    this.registerHandler('mail.send', async ({ jobId, payload }) => {
-      const templateKey = readStringField(payload, 'templateKey');
-      const to = readStringField(payload, 'to');
+    this.registerHandler("mail.send", async ({ jobId, payload }) => {
+      const templateKey = readStringField(payload, "templateKey");
+      const to = readStringField(payload, "to");
       const variables = readStringRecord(payload.variables);
 
       if (!templateKey || !to) {
-        throw new Error('mail.send requires templateKey and to');
+        throw new Error("mail.send requires templateKey and to");
       }
 
       await this.mailService.sendTemplate({
@@ -67,22 +67,22 @@ export class JobHandlersRegistry {
       });
     });
 
-    this.registerHandler('files.cleanup', async () => {
+    this.registerHandler("files.cleanup", async () => {
       // Stub: reserved for orphaned file cleanup.
     });
 
-    this.registerHandler('auth.cleanup-tokens', async () => {
+    this.registerHandler("auth.cleanup-tokens", async () => {
       await this.authTokenCleanup.cleanupExpiredTokens();
     });
 
-    this.registerHandler('notification.send', async ({ jobId, payload, organizationId }) => {
-      const userId = readStringField(payload, 'userId');
-      const type = readStringField(payload, 'type');
-      const title = readStringField(payload, 'title');
-      const body = readStringField(payload, 'body');
+    this.registerHandler("notification.send", async ({ jobId, payload, organizationId }) => {
+      const userId = readStringField(payload, "userId");
+      const type = readStringField(payload, "type");
+      const title = readStringField(payload, "title");
+      const body = readStringField(payload, "body");
 
       if (!userId || !type || !title || !body) {
-        throw new Error('notification.send requires userId, type, title, and body');
+        throw new Error("notification.send requires userId, type, title, and body");
       }
 
       const data = readOptionalJsonObject(payload.data);

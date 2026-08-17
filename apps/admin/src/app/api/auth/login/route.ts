@@ -5,11 +5,7 @@ import { NextResponse } from "next/server";
 
 import type { AuthLoginResponse, LoginInput } from "@/lib/api-types";
 
-import {
-  clearSessionCookies,
-  readAuthCookies,
-  setAuthCookies,
-} from "@/lib/auth/cookies";
+import { clearSessionCookies, readAuthCookies, setAuthCookies } from "@/lib/auth/cookies";
 import { callBackend, enforceMutationGuard } from "@/lib/server/backend";
 
 export async function POST(request: NextRequest) {
@@ -28,10 +24,9 @@ export async function POST(request: NextRequest) {
   });
 
   const payload = (await response.json()) as AuthLoginResponse;
-  const nextResponse = NextResponse.json(
-    stripTokensFromAuthEnvelope(payload) ?? payload,
-    { status: response.status },
-  );
+  const nextResponse = NextResponse.json(stripTokensFromAuthEnvelope(payload) ?? payload, {
+    status: response.status,
+  });
 
   if (!response.ok) {
     clearSessionCookies(nextResponse);

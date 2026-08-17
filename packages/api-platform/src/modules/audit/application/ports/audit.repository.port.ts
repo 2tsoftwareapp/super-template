@@ -1,6 +1,6 @@
-import type { JsonObject } from '@repo/api-core';
-import type { TransactionExecutor } from '@repo/api-core';
-import type { SYSTEM_SCOPE } from '@repo/api-core';
+import type { JsonObject } from "@repo/api-core";
+import type { TransactionExecutor } from "@repo/api-core";
+import type { SYSTEM_SCOPE } from "@repo/api-core";
 
 export interface AuditLogRecord {
   id: string;
@@ -50,19 +50,12 @@ export interface ListAuditLogsParams {
   from?: string;
   to?: string;
   q?: string;
-  sortOrder: 'asc' | 'desc';
+  sortOrder: "asc" | "desc";
 }
 
 export type AuditLogSearchParams = Pick<
   ListAuditLogsParams,
-  | 'organizationId'
-  | 'actorId'
-  | 'action'
-  | 'resourceType'
-  | 'resourceId'
-  | 'from'
-  | 'to'
-  | 'q'
+  "organizationId" | "actorId" | "action" | "resourceType" | "resourceId" | "from" | "to" | "q"
 >;
 
 export interface AuditLogListResult {
@@ -72,13 +65,20 @@ export interface AuditLogListResult {
 
 export interface AuditRepositoryPort {
   list(params: ListAuditLogsParams, executor?: TransactionExecutor): Promise<AuditLogListResult>;
-  listForExport(params: AuditLogSearchParams & { limit: number }, executor?: TransactionExecutor): Promise<AuditLogRecord[]>;
+  listForExport(
+    params: AuditLogSearchParams & { limit: number },
+    executor?: TransactionExecutor,
+  ): Promise<AuditLogRecord[]>;
   count(params: AuditLogSearchParams, executor?: TransactionExecutor): Promise<number>;
-  deleteOlderThanBatched(cutoff: Date, batchSize: number, executor?: TransactionExecutor): Promise<number>;
+  deleteOlderThanBatched(
+    cutoff: Date,
+    batchSize: number,
+    executor?: TransactionExecutor,
+  ): Promise<number>;
   tryAdvisoryLock(lockId: number, executor?: TransactionExecutor): Promise<boolean>;
   unlockAdvisoryLock(lockId: number, executor?: TransactionExecutor): Promise<boolean>;
   findById(id: string, executor?: TransactionExecutor): Promise<AuditLogRecord | null>;
   create(values: CreateAuditLogInput, executor?: TransactionExecutor): Promise<AuditLogRecord>;
 }
 
-export const AUDIT_REPOSITORY = Symbol('AUDIT_REPOSITORY');
+export const AUDIT_REPOSITORY = Symbol("AUDIT_REPOSITORY");

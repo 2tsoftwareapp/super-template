@@ -1,25 +1,29 @@
-import type { AuthenticatedRequestUser, RequestContext } from '@repo/api-core';
-import type { TransactionPort } from '@repo/api-core';
+import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-core";
+import type { TransactionPort } from "@repo/api-core";
 
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { 
+import { HttpStatus, Inject, Injectable } from "@nestjs/common";
+import {
   AppError,
   AUDIT_WRITER,
   type AuditWriter,
   ERROR_CODES,
   SYSTEM_SCOPE,
   TRANSACTION_PORT,
-} from '@repo/api-core';
+} from "@repo/api-core";
 
-import { AccessControlService } from '../../../access-control/application/access-control.service';
-import { assertNotLastOwner } from '../../domain/organization-access.policy';
-import { ORGANIZATIONS_REPOSITORY, type OrganizationsRepositoryPort } from '../ports/organizations.repository.port';
+import { AccessControlService } from "../../../access-control/application/access-control.service";
+import { assertNotLastOwner } from "../../domain/organization-access.policy";
+import {
+  ORGANIZATIONS_REPOSITORY,
+  type OrganizationsRepositoryPort,
+} from "../ports/organizations.repository.port";
 
 @Injectable()
 export class LeaveOrganizationUseCase {
   constructor(
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
-    @Inject(ORGANIZATIONS_REPOSITORY) private readonly organizationsRepository: OrganizationsRepositoryPort,
+    @Inject(ORGANIZATIONS_REPOSITORY)
+    private readonly organizationsRepository: OrganizationsRepositoryPort,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
     private readonly accessControlService: AccessControlService,
   ) {}
@@ -29,7 +33,7 @@ export class LeaveOrganizationUseCase {
     actor: string | AuthenticatedRequestUser,
     requestContext?: RequestContext,
   ): Promise<void> {
-    const userId = typeof actor === 'string' ? actor : actor.userId;
+    const userId = typeof actor === "string" ? actor : actor.userId;
 
     const tenantContext = {
       tenantId: organizationId,
@@ -47,20 +51,18 @@ export class LeaveOrganizationUseCase {
       if (!membership) {
         throw new AppError(
           ERROR_CODES.AUTH_FORBIDDEN,
-          'You are not a member of this organization',
+          "You are not a member of this organization",
           HttpStatus.FORBIDDEN,
         );
       }
 
-      if (membership.role === 'OWNER') {
-        const remainingOwners = await this.organizationsRepository.countOwners(
-          organizationId,
-          { excludingUserId: userId, executor: transaction, lock: true },
-        );
-        assertNotLastOwner(
-          { userId, role: membership.role },
-          remainingOwners,
-        );
+      if (membership.role === "OWNER") {
+        const remainingOwners = await this.organizationsRepository.countOwners(organizationId, {
+          excludingUserId: userId,
+          executor: transaction,
+          lock: true,
+        });
+        assertNotLastOwner({ userId, role: membership.role }, remainingOwners);
       }
 
       const removed = await this.organizationsRepository.removeMember(
@@ -72,31 +74,31 @@ export class LeaveOrganizationUseCase {
       if (!removed) {
         throw new AppError(
           ERROR_CODES.ORGANIZATION_MEMBER_NOT_FOUND,
-          'You are not a member of this organization',
+          "You are not a member of this organization",
           HttpStatus.NOT_FOUND,
         );
       }
 
       // Cleanup user roles scoped to organization
-      await this.accessControlService.replaceUserRoles(
-        userId,
-        [],
-        organizationId,
-        transaction,
-      );
+      await this.accessControlService.replaceUserRoles(userId, [], organizationId, transaction);
 
       // Invalidate access profile cache
       await this.accessControlService.invalidateAccessProfile(userId);
 
-      await this.auditWriter.log({
-        actorId: userId,
-        action: 'organization.leave',
-        entityType: 'organization_member',
-        entityId: userId,
-        metadata: { organizationId },
-        requestContext,
-          ...(organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
-    }, transaction);
+      await this.auditWriter.log(
+        {
+          actorId: userId,
+          action: "organization.leave",
+          entityType: "organization_member",
+          entityId: userId,
+          metadata: { organizationId },
+          requestContext,
+          ...(organizationId
+            ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: organizationId }
+            : { scope: SYSTEM_SCOPE.PLATFORM }),
+        },
+        transaction,
+      );
     });
   }
 }

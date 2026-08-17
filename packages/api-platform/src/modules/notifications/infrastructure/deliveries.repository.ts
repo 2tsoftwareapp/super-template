@@ -1,24 +1,21 @@
-import type { DatabaseClient, DatabaseExecutor } from '@repo/api-database';
+import type { DatabaseClient, DatabaseExecutor } from "@repo/api-database";
 
-import { Inject, Injectable } from '@nestjs/common';
-import { DATABASE, notificationDeliveries } from '@repo/api-database';
-import { and, eq, inArray, sql } from 'drizzle-orm';
+import { Inject, Injectable } from "@nestjs/common";
+import { DATABASE, notificationDeliveries } from "@repo/api-database";
+import { and, eq, inArray, sql } from "drizzle-orm";
 
 import type {
   DeliveriesRepositoryPort,
   UpsertDeliveryInput,
-} from '../application/ports/deliveries.repository.port';
+} from "../application/ports/deliveries.repository.port";
 
-import { MAX_DELIVERY_RETRY_ATTEMPTS } from '../domain/delivery-policy';
+import { MAX_DELIVERY_RETRY_ATTEMPTS } from "../domain/delivery-policy";
 
 @Injectable()
 export class DeliveriesRepository implements DeliveriesRepositoryPort {
   constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
 
-  async upsertBatch(
-    values: UpsertDeliveryInput[],
-    executor: DatabaseExecutor = this.database,
-  ) {
+  async upsertBatch(values: UpsertDeliveryInput[], executor: DatabaseExecutor = this.database) {
     if (values.length === 0) {
       return [];
     }
@@ -72,7 +69,7 @@ export class DeliveriesRepository implements DeliveriesRepositoryPort {
     const [delivery] = await executor
       .update(notificationDeliveries)
       .set({
-        status: 'SENT',
+        status: "SENT",
         providerMessageId,
         sentAt: new Date(),
         updatedAt: new Date(),
@@ -97,7 +94,7 @@ export class DeliveriesRepository implements DeliveriesRepositoryPort {
     const [delivery] = await executor
       .update(notificationDeliveries)
       .set({
-        status: 'SENT',
+        status: "SENT",
         providerMessageId,
         sentAt: new Date(),
         updatedAt: new Date(),
@@ -105,7 +102,7 @@ export class DeliveriesRepository implements DeliveriesRepositoryPort {
       .where(
         and(
           eq(notificationDeliveries.id, deliveryId),
-          eq(notificationDeliveries.status, 'PROCESSING'),
+          eq(notificationDeliveries.status, "PROCESSING"),
         ),
       )
       .returning();
@@ -113,15 +110,11 @@ export class DeliveriesRepository implements DeliveriesRepositoryPort {
     return delivery ?? null;
   }
 
-  async markFailed(
-    deliveryId: string,
-    error: string,
-    executor: DatabaseExecutor = this.database,
-  ) {
+  async markFailed(deliveryId: string, error: string, executor: DatabaseExecutor = this.database) {
     const [delivery] = await executor
       .update(notificationDeliveries)
       .set({
-        status: 'FAILED',
+        status: "FAILED",
         lastError: error,
         updatedAt: new Date(),
       })
@@ -139,7 +132,7 @@ export class DeliveriesRepository implements DeliveriesRepositoryPort {
     const [delivery] = await executor
       .update(notificationDeliveries)
       .set({
-        status: 'PENDING',
+        status: "PENDING",
         nextAttemptAt,
         lastError: null,
         updatedAt: new Date(),
@@ -158,10 +151,7 @@ export class DeliveriesRepository implements DeliveriesRepositoryPort {
    *
    * Uses FOR UPDATE SKIP LOCKED so concurrent workers don't double-recover.
    */
-  async recoverStaleProcessing(
-    timeoutMinutes: number,
-    executor: DatabaseExecutor = this.database,
-  ) {
+  async recoverStaleProcessing(timeoutMinutes: number, executor: DatabaseExecutor = this.database) {
     const staleIds = await executor.execute<{ id: string }>(
       sql`
         SELECT id FROM notification_deliveries
@@ -183,9 +173,9 @@ export class DeliveriesRepository implements DeliveriesRepositoryPort {
       executor
         .update(notificationDeliveries)
         .set({
-          status: 'PENDING',
+          status: "PENDING",
           nextAttemptAt: new Date(),
-          lastError: 'Recovered from stale PROCESSING',
+          lastError: "Recovered from stale PROCESSING",
           updatedAt: new Date(),
         })
         .where(
@@ -197,8 +187,8 @@ export class DeliveriesRepository implements DeliveriesRepositoryPort {
       executor
         .update(notificationDeliveries)
         .set({
-          status: 'FAILED',
-          lastError: 'Max retry attempts exceeded during stale recovery',
+          status: "FAILED",
+          lastError: "Max retry attempts exceeded during stale recovery",
           updatedAt: new Date(),
         })
         .where(

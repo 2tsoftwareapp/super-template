@@ -42,12 +42,7 @@ function ErrorState({
   }
 
   return (
-    <div
-      className={cn(
-        "flex min-h-64 items-center justify-center",
-        className,
-      )}
-    >
+    <div className={cn("flex min-h-64 items-center justify-center", className)}>
       <Alert variant="error" className="max-w-md">
         <div className="flex items-center gap-2 font-semibold">
           <AlertTriangle className="size-4" />

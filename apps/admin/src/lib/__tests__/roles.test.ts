@@ -55,15 +55,14 @@ describe("canAssignRole", () => {
 
 describe("getAssignableRoles", () => {
   it("returns only USER for a plain admin", () => {
-    expect(getAssignableRoles(["ADMIN"], roles).map((r) => r.name)).toEqual([
-      "USER",
-    ]);
+    expect(getAssignableRoles(["ADMIN"], roles).map((r) => r.name)).toEqual(["USER"]);
   });
 
   it("returns ADMIN and USER for a super admin", () => {
-    expect(
-      getAssignableRoles(["SUPER_ADMIN"], roles).map((r) => r.name),
-    ).toEqual(["ADMIN", "USER"]);
+    expect(getAssignableRoles(["SUPER_ADMIN"], roles).map((r) => r.name)).toEqual([
+      "ADMIN",
+      "USER",
+    ]);
   });
 
   it("does not deduplicate — dedup is handled by filterRolesForOrganization", () => {
@@ -75,9 +74,7 @@ describe("getAssignableRoles", () => {
       { id: "5", name: "USER", scope: "platform" } as RoleDto,
     ];
 
-    expect(
-      getAssignableRoles(["SUPER_ADMIN"], rolesWithDuplicates).length,
-    ).toBe(4);
+    expect(getAssignableRoles(["SUPER_ADMIN"], rolesWithDuplicates).length).toBe(4);
   });
 });
 
@@ -108,14 +105,7 @@ describe("multi-org scenarios", () => {
     const result = getAssignableRoles(["SUPER_ADMIN"], multiOrgRoles);
     // SUPER_ADMIN can assign all org roles + USER (but not SUPER_ADMIN which isn't in list)
     // Sorted by name: ACCOUNTANT(r3), ACCOUNTANT(r4), ADMIN(r2), MANAGER(r5), USER(r1), USER(r6)
-    expect(result.map((r) => r.id)).toEqual([
-      "r3",
-      "r4",
-      "r2",
-      "r5",
-      "r1",
-      "r6",
-    ]);
+    expect(result.map((r) => r.id)).toEqual(["r3", "r4", "r2", "r5", "r1", "r6"]);
   });
 
   it("returns USER and org-scoped custom roles for org ADMIN sorted", () => {

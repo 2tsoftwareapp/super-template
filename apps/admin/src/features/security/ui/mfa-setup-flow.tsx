@@ -1,13 +1,7 @@
 "use client";
 
 import { Button } from "@repo/web-ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@repo/web-ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/web-ui/card";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@repo/web-ui/input-otp";
 import { Label } from "@repo/web-ui/label";
 import { Separator } from "@repo/web-ui/separator";
@@ -43,8 +37,7 @@ export function MfaSetupFlow({
           Set up two-factor authentication
         </CardTitle>
         <CardDescription>
-          Scan the QR code with your authenticator app, then enter the
-          verification code below.
+          Scan the QR code with your authenticator app, then enter the verification code below.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -59,9 +52,7 @@ export function MfaSetupFlow({
             />
           </div>
           <div className="text-center">
-            <p className="mb-1 text-xs text-muted-foreground">
-              Or enter this key manually:
-            </p>
+            <p className="mb-1 text-xs text-muted-foreground">Or enter this key manually:</p>
             <code className="select-all rounded bg-muted px-2 py-1 font-mono text-xs">
               {setupData.secret}
             </code>

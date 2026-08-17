@@ -1,220 +1,216 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from "vitest";
 
-import { validateEnvironment } from '../env.schema';
+import { validateEnvironment } from "../env.schema";
 
 // Minimal set of required variables; everything else has a schema default.
 const baseEnv: Record<string, unknown> = {
-  APP_ENV: 'test',
-  POSTGRES_HOST: 'localhost',
-  POSTGRES_PORT: '5432',
-  POSTGRES_DB: 'app',
-  POSTGRES_USER: 'app',
-  POSTGRES_PASSWORD: 'secret',
-  DATABASE_URL: 'postgres://app:secret@localhost:5432/app',
-  DATABASE_URL_TEST: 'postgres://app:secret@localhost:5432/app_test',
-  WEB_PORT: '3000',
-  WEB_ORIGIN: 'http://localhost:3000',
-  API_INTERNAL_URL: 'http://localhost:3001',
-  NEXT_PUBLIC_WEB_URL: 'http://localhost:3000',
-  JWT_ACCESS_SECRET: 'a'.repeat(24),
-  JWT_REFRESH_SECRET: 'b'.repeat(24),
-  JWT_ACCESS_TTL: '15m',
-  JWT_REFRESH_TTL: '7d',
-  MFA_ENCRYPTION_KEY: 'a'.repeat(64),
-  MAIL_HOST: 'localhost',
-  MAIL_PORT: '1025',
-  MAIL_FROM: 'noreply@example.com',
-  SEED_ADMIN_EMAIL: 'admin@example.com',
-  SEED_ADMIN_PASSWORD: 'password123',
-  SEED_USER_EMAIL: 'user@example.com',
-  SEED_USER_PASSWORD: 'password123',
+  APP_ENV: "test",
+  POSTGRES_HOST: "localhost",
+  POSTGRES_PORT: "5432",
+  POSTGRES_DB: "app",
+  POSTGRES_USER: "app",
+  POSTGRES_PASSWORD: "secret",
+  DATABASE_URL: "postgres://app:secret@localhost:5432/app",
+  DATABASE_URL_TEST: "postgres://app:secret@localhost:5432/app_test",
+  WEB_PORT: "3000",
+  WEB_ORIGIN: "http://localhost:3000",
+  API_INTERNAL_URL: "http://localhost:3001",
+  NEXT_PUBLIC_WEB_URL: "http://localhost:3000",
+  JWT_ACCESS_SECRET: "a".repeat(24),
+  JWT_REFRESH_SECRET: "b".repeat(24),
+  JWT_ACCESS_TTL: "15m",
+  JWT_REFRESH_TTL: "7d",
+  MFA_ENCRYPTION_KEY: "a".repeat(64),
+  MAIL_HOST: "localhost",
+  MAIL_PORT: "1025",
+  MAIL_FROM: "noreply@example.com",
+  SEED_ADMIN_EMAIL: "admin@example.com",
+  SEED_ADMIN_PASSWORD: "password123",
+  SEED_USER_EMAIL: "user@example.com",
+  SEED_USER_PASSWORD: "password123",
 };
 
 // Overrides that turn baseEnv into a valid production configuration: real (non
 // placeholder) secrets from baseEnv, secure cookies, and https public URLs.
 const secureProdOverrides: Record<string, unknown> = {
-  APP_ENV: 'production',
-  COOKIE_SECURE: 'true',
-  WEB_ORIGIN: 'https://app.example.com',
-  NEXT_PUBLIC_WEB_URL: 'https://app.example.com',
-  API_INTERNAL_URL: 'https://api.internal.example.com',
+  APP_ENV: "production",
+  COOKIE_SECURE: "true",
+  WEB_ORIGIN: "https://app.example.com",
+  NEXT_PUBLIC_WEB_URL: "https://app.example.com",
+  API_INTERNAL_URL: "https://api.internal.example.com",
 };
 
 const secureStagingOverrides: Record<string, unknown> = {
-  APP_ENV: 'staging',
-  COOKIE_SECURE: 'true',
-  WEB_ORIGIN: 'https://staging.example.com',
-  NEXT_PUBLIC_WEB_URL: 'https://staging.example.com',
-  API_INTERNAL_URL: 'https://api.staging.internal.example.com',
-  ADMIN_ORIGIN: 'https://admin.staging.example.com',
+  APP_ENV: "staging",
+  COOKIE_SECURE: "true",
+  WEB_ORIGIN: "https://staging.example.com",
+  NEXT_PUBLIC_WEB_URL: "https://staging.example.com",
+  API_INTERNAL_URL: "https://api.staging.internal.example.com",
+  ADMIN_ORIGIN: "https://admin.staging.example.com",
 };
 
-describe('validateEnvironment', () => {
-  it('parses a valid environment and applies defaults', () => {
+describe("validateEnvironment", () => {
+  it("parses a valid environment and applies defaults", () => {
     const env = validateEnvironment({ ...baseEnv });
-    expect(env.APP_ENV).toBe('test');
+    expect(env.APP_ENV).toBe("test");
     expect(env.API_PORT).toBe(3001);
     expect(env.ACCESS_PROFILE_CACHE_TTL_SECONDS).toBe(60);
     expect(env.SETTINGS_LOOKUP_CACHE_TTL_SECONDS).toBe(5);
-    expect(env.COOKIE_SAMESITE).toBe('lax');
-    expect(env.STORAGE_DRIVER).toBe('local');
+    expect(env.COOKIE_SAMESITE).toBe("lax");
+    expect(env.STORAGE_DRIVER).toBe("local");
   });
 
-  it('coerces numeric strings into numbers', () => {
+  it("coerces numeric strings into numbers", () => {
     const env = validateEnvironment({ ...baseEnv });
     expect(env.POSTGRES_PORT).toBe(5432);
     expect(env.WEB_PORT).toBe(3000);
   });
 
-  it('coerces boolean-like strings', () => {
+  it("coerces boolean-like strings", () => {
     const env = validateEnvironment({
       ...baseEnv,
-      API_DOCS_ENABLED: 'false',
-      COOKIE_SECURE: 'true',
+      API_DOCS_ENABLED: "false",
+      COOKIE_SECURE: "true",
     });
     expect(env.API_DOCS_ENABLED).toBe(false);
     expect(env.COOKIE_SECURE).toBe(true);
   });
 
-  it('treats empty optional strings as undefined', () => {
-    const env = validateEnvironment({ ...baseEnv, REDIS_URL: '' });
+  it("treats empty optional strings as undefined", () => {
+    const env = validateEnvironment({ ...baseEnv, REDIS_URL: "" });
     expect(env.REDIS_URL).toBeUndefined();
   });
 
-  it('throws a descriptive error when a required variable is missing', () => {
+  it("throws a descriptive error when a required variable is missing", () => {
     const { POSTGRES_HOST: _omitted, ...withoutHost } = baseEnv;
-    expect(() => validateEnvironment(withoutHost)).toThrow(
+    expect(() => validateEnvironment(withoutHost)).toThrow(/Invalid environment variables/);
+  });
+
+  it("throws when a numeric variable is not a number", () => {
+    expect(() => validateEnvironment({ ...baseEnv, POSTGRES_PORT: "not-a-port" })).toThrow(
       /Invalid environment variables/,
     );
   });
 
-  it('throws when a numeric variable is not a number', () => {
-    expect(() =>
-      validateEnvironment({ ...baseEnv, POSTGRES_PORT: 'not-a-port' }),
-    ).toThrow(/Invalid environment variables/);
+  it("rejects JWT secrets that are too short", () => {
+    expect(() => validateEnvironment({ ...baseEnv, JWT_ACCESS_SECRET: "short" })).toThrow(
+      /Invalid environment variables/,
+    );
   });
 
-  it('rejects JWT secrets that are too short', () => {
-    expect(() =>
-      validateEnvironment({ ...baseEnv, JWT_ACCESS_SECRET: 'short' }),
-    ).toThrow(/Invalid environment variables/);
+  it("rejects a JWT TTL that is not a valid duration", () => {
+    expect(() => validateEnvironment({ ...baseEnv, JWT_ACCESS_TTL: "15min" })).toThrow(
+      /Invalid environment variables/,
+    );
   });
 
-  it('rejects a JWT TTL that is not a valid duration', () => {
-    expect(() =>
-      validateEnvironment({ ...baseEnv, JWT_ACCESS_TTL: '15min' }),
-    ).toThrow(/Invalid environment variables/);
+  it("rejects a WEB_ORIGIN entry that is not a valid URL", () => {
+    expect(() => validateEnvironment({ ...baseEnv, WEB_ORIGIN: "not a url" })).toThrow(
+      /Invalid environment variables/,
+    );
   });
 
-  it('rejects a WEB_ORIGIN entry that is not a valid URL', () => {
-    expect(() =>
-      validateEnvironment({ ...baseEnv, WEB_ORIGIN: 'not a url' }),
-    ).toThrow(/Invalid environment variables/);
-  });
-
-  it('accepts a comma-separated list of WEB_ORIGIN URLs', () => {
+  it("accepts a comma-separated list of WEB_ORIGIN URLs", () => {
     const env = validateEnvironment({
       ...baseEnv,
-      WEB_ORIGIN: 'http://a.com, http://b.com',
+      WEB_ORIGIN: "http://a.com, http://b.com",
     });
-    expect(env.WEB_ORIGIN).toBe('http://a.com, http://b.com');
+    expect(env.WEB_ORIGIN).toBe("http://a.com, http://b.com");
   });
 
-  it('requires DATABASE_URL_TEST only when APP_ENV=test', () => {
+  it("requires DATABASE_URL_TEST only when APP_ENV=test", () => {
     const { DATABASE_URL_TEST: _testUrl, ...withoutTestUrl } = baseEnv;
 
     // Production boots fine without a test database URL (given secure prod config).
     expect(
-      validateEnvironment({ ...withoutTestUrl, ...secureProdOverrides })
-        .DATABASE_URL_TEST,
+      validateEnvironment({ ...withoutTestUrl, ...secureProdOverrides }).DATABASE_URL_TEST,
     ).toBeUndefined();
 
     // Test runs must provide it.
-    expect(() =>
-      validateEnvironment({ ...withoutTestUrl, APP_ENV: 'test' }),
-    ).toThrow(/DATABASE_URL_TEST is required/);
+    expect(() => validateEnvironment({ ...withoutTestUrl, APP_ENV: "test" })).toThrow(
+      /DATABASE_URL_TEST is required/,
+    );
   });
 
-  it('rejects insecure cookies in production', () => {
+  it("rejects insecure cookies in production", () => {
     expect(() =>
       validateEnvironment({
         ...baseEnv,
         ...secureProdOverrides,
-        COOKIE_SECURE: 'false',
+        COOKIE_SECURE: "false",
       }),
     ).toThrow(/COOKIE_SECURE/);
   });
 
-  it('rejects insecure cookies in staging', () => {
+  it("rejects insecure cookies in staging", () => {
     expect(() =>
       validateEnvironment({
         ...baseEnv,
         ...secureStagingOverrides,
-        COOKIE_SECURE: 'false',
+        COOKIE_SECURE: "false",
       }),
     ).toThrow(/COOKIE_SECURE/);
   });
 
-  it('rejects a non-https WEB_ORIGIN in production', () => {
+  it("rejects a non-https WEB_ORIGIN in production", () => {
     expect(() =>
       validateEnvironment({
         ...baseEnv,
         ...secureProdOverrides,
-        WEB_ORIGIN: 'http://app.example.com',
+        WEB_ORIGIN: "http://app.example.com",
       }),
     ).toThrow(/https/);
   });
 
-  it('rejects a non-https WEB_ORIGIN in staging', () => {
+  it("rejects a non-https WEB_ORIGIN in staging", () => {
     expect(() =>
       validateEnvironment({
         ...baseEnv,
         ...secureStagingOverrides,
-        WEB_ORIGIN: 'http://staging.example.com',
+        WEB_ORIGIN: "http://staging.example.com",
       }),
     ).toThrow(/https/);
   });
 
-  it('rejects a non-https ADMIN_ORIGIN in staging when set', () => {
+  it("rejects a non-https ADMIN_ORIGIN in staging when set", () => {
     expect(() =>
       validateEnvironment({
         ...baseEnv,
         ...secureStagingOverrides,
-        ADMIN_ORIGIN: 'http://admin.staging.example.com',
+        ADMIN_ORIGIN: "http://admin.staging.example.com",
       }),
     ).toThrow(/ADMIN_ORIGIN/);
   });
 
-  it('accepts a fully configured staging environment', () => {
+  it("accepts a fully configured staging environment", () => {
     const env = validateEnvironment({ ...baseEnv, ...secureStagingOverrides });
-    expect(env.APP_ENV).toBe('staging');
+    expect(env.APP_ENV).toBe("staging");
     expect(env.COOKIE_SECURE).toBe(true);
   });
 
-  it('rejects reusing the dev placeholder JWT secret in production', () => {
+  it("rejects reusing the dev placeholder JWT secret in production", () => {
     expect(() =>
       validateEnvironment({
         ...baseEnv,
         ...secureProdOverrides,
-        JWT_ACCESS_SECRET: 'replace-with-a-long-random-development-secret',
+        JWT_ACCESS_SECRET: "replace-with-a-long-random-development-secret",
       }),
     ).toThrow(/placeholder/);
   });
 
-  it('rejects reusing the dev placeholder secrets in staging', () => {
+  it("rejects reusing the dev placeholder secrets in staging", () => {
     expect(() =>
       validateEnvironment({
         ...baseEnv,
-        APP_ENV: 'staging',
-        JWT_REFRESH_SECRET:
-          'replace-with-another-long-random-development-secret',
+        APP_ENV: "staging",
+        JWT_REFRESH_SECRET: "replace-with-another-long-random-development-secret",
       }),
     ).toThrow(/placeholder/);
   });
 
-  it('accepts a fully configured production environment', () => {
+  it("accepts a fully configured production environment", () => {
     const env = validateEnvironment({ ...baseEnv, ...secureProdOverrides });
-    expect(env.APP_ENV).toBe('production');
+    expect(env.APP_ENV).toBe("production");
     expect(env.COOKIE_SECURE).toBe(true);
   });
 });

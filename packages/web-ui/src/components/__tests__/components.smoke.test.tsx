@@ -111,9 +111,7 @@ describe("UI Component Smoke Tests", () => {
   });
 
   it("renders DatePicker", () => {
-    const { container } = render(
-      <DatePicker value="" onChange={vi.fn()} />,
-    );
+    const { container } = render(<DatePicker value="" onChange={vi.fn()} />);
     expect(container.querySelector("button")).not.toBeNull();
   });
 
@@ -144,12 +142,7 @@ describe("UI Component Smoke Tests", () => {
   });
 
   it("renders ErrorState full-page", () => {
-    render(
-      <ErrorState
-        title="Session error"
-        description="Could not load your session."
-      />,
-    );
+    render(<ErrorState title="Session error" description="Could not load your session." />);
     expect(screen.getByText("Session error")).toBeInTheDocument();
     expect(screen.getByText("Could not load your session.")).toBeInTheDocument();
   });
@@ -157,11 +150,7 @@ describe("UI Component Smoke Tests", () => {
   it("renders ErrorState inline with action", () => {
     const onClick = vi.fn();
     render(
-      <ErrorState
-        title="Failed to load"
-        variant="inline"
-        action={{ label: "Retry", onClick }}
-      />,
+      <ErrorState title="Failed to load" variant="inline" action={{ label: "Retry", onClick }} />,
     );
     expect(screen.getByText("Failed to load")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Retry" })).toBeInTheDocument();
@@ -213,15 +202,7 @@ describe("UI Component Smoke Tests", () => {
   });
 
   it("renders Pagination", () => {
-    render(
-      <Pagination
-        page={2}
-        pageSize={20}
-        totalPages={5}
-        total={100}
-        onPageChange={vi.fn()}
-      />,
-    );
+    render(<Pagination page={2} pageSize={20} totalPages={5} total={100} onPageChange={vi.fn()} />);
     expect(screen.getByText(/100/)).toBeInTheDocument();
   });
 
@@ -241,7 +222,11 @@ describe("UI Component Smoke Tests", () => {
   });
 
   it("renders Show fallback when false", () => {
-    render(<Show when={false} fallback={<span>fallback</span>}>hidden-content</Show>);
+    render(
+      <Show when={false} fallback={<span>fallback</span>}>
+        hidden-content
+      </Show>,
+    );
     expect(screen.getByText("fallback")).toBeInTheDocument();
     expect(screen.queryByText("hidden-content")).not.toBeInTheDocument();
   });

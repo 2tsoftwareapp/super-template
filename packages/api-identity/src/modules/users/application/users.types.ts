@@ -1,8 +1,8 @@
-import type { UserSortCriterion } from './user-sort';
+import type { UserSortCriterion } from "./user-sort";
 
-export type UserStatus = 'PENDING' | 'ACTIVE' | 'BLOCKED';
+export type UserStatus = "PENDING" | "ACTIVE" | "BLOCKED";
 
-export type UserSortField = 'createdAt' | 'displayName' | 'email' | 'status';
+export type UserSortField = "createdAt" | "displayName" | "email" | "status";
 
 export interface RoleAssignment {
   roleName: string;

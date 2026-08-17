@@ -2,19 +2,11 @@ import { describe, expect, it } from "vitest";
 
 import type { AuthLoginResponse } from "@/lib/api-types";
 
-import {
-  AUTH_FLOW_ERROR_CODES,
-  AUTH_FLOW_RESULTS,
-} from "../auth.constants";
+import { AUTH_FLOW_ERROR_CODES, AUTH_FLOW_RESULTS } from "../auth.constants";
 import { AuthFlowError } from "../auth.errors";
-import {
-  assertAdminLoginAccess,
-  resolveAdminLoginResult,
-} from "../auth.login-flow";
+import { assertAdminLoginAccess, resolveAdminLoginResult } from "../auth.login-flow";
 
-function loginResponse(
-  overrides: Record<string, unknown> = {},
-): AuthLoginResponse {
+function loginResponse(overrides: Record<string, unknown> = {}): AuthLoginResponse {
   return {
     data: {
       mfaRequired: false,
@@ -42,9 +34,7 @@ function loginResponse(
 describe("resolveAdminLoginResult", () => {
   it("returns mfaRequired when the payload asks for a challenge", () => {
     expect(
-      resolveAdminLoginResult(
-        loginResponse({ mfaRequired: true, mfaToken: "mfa-token" }),
-      ),
+      resolveAdminLoginResult(loginResponse({ mfaRequired: true, mfaToken: "mfa-token" })),
     ).toEqual({
       status: AUTH_FLOW_RESULTS.mfaRequired,
       mfaToken: "mfa-token",
@@ -52,9 +42,9 @@ describe("resolveAdminLoginResult", () => {
   });
 
   it("fails closed when MFA is required without a token", () => {
-    expect(() =>
-      resolveAdminLoginResult(loginResponse({ mfaRequired: true })),
-    ).toThrow(AuthFlowError);
+    expect(() => resolveAdminLoginResult(loginResponse({ mfaRequired: true }))).toThrow(
+      AuthFlowError,
+    );
   });
 
   it("rejects principals without admin access", () => {

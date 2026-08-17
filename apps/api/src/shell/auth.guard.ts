@@ -1,19 +1,14 @@
-import type { Request as ExpressRequest } from 'express';
+import type { Request as ExpressRequest } from "express";
 
-import {
-  type CanActivate,
-  type ExecutionContext,
-  HttpStatus,
-  Injectable,
-} from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
+import { type CanActivate, type ExecutionContext, HttpStatus, Injectable } from "@nestjs/common";
+import { Reflector } from "@nestjs/core";
 import {
   ALLOW_MUST_CHANGE_PASSWORD_KEY,
   AppError,
   ERROR_CODES,
   IS_PUBLIC_KEY,
-} from '@repo/api-core';
-import { AuthService } from '@repo/api-identity/modules/auth/application/auth.service';
+} from "@repo/api-core";
+import { AuthService } from "@repo/api-identity/modules/auth/application/auth.service";
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -35,18 +30,18 @@ export class AuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest<ExpressRequest>();
     const authorization = request.headers.authorization;
 
-    if (!authorization?.startsWith('Bearer ')) {
+    if (!authorization?.startsWith("Bearer ")) {
       throw new AppError(
         ERROR_CODES.AUTH_UNAUTHORIZED,
-        'Authentication is required',
+        "Authentication is required",
         HttpStatus.UNAUTHORIZED,
       );
     }
 
-    const token = authorization.slice('Bearer '.length);
+    const token = authorization.slice("Bearer ".length);
     request.user = await this.authService.authenticateAccessToken(token);
 
-    if (process.env.NODE_ENV === 'test' && request.headers['x-organization-id'] === '') {
+    if (process.env.NODE_ENV === "test" && request.headers["x-organization-id"] === "") {
       request.user.organizationId = null;
     }
 
@@ -58,7 +53,7 @@ export class AuthGuard implements CanActivate {
     if (!allowMustChangePassword && request.user?.mustChangePassword) {
       throw new AppError(
         ERROR_CODES.AUTH_FORBIDDEN,
-        'You must change your password before accessing this resource',
+        "You must change your password before accessing this resource",
         HttpStatus.FORBIDDEN,
       );
     }

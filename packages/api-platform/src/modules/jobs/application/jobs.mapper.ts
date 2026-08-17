@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable } from "@nestjs/common";
 
-import type { JobListView, JobView } from './jobs.types';
-import type { JobRecord } from './ports/jobs.repository.port';
+import type { JobListView, JobView } from "./jobs.types";
+import type { JobRecord } from "./ports/jobs.repository.port";
 
 @Injectable()
 export class JobsMapper {

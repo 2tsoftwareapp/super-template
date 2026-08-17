@@ -1,5 +1,5 @@
-import { ApiProperty, ApiPropertyOptional, OmitType, PartialType } from '@nestjs/swagger';
-import { PaginationQueryDto } from '@repo/api-core';
+import { ApiProperty, ApiPropertyOptional, OmitType, PartialType } from "@nestjs/swagger";
+import { PaginationQueryDto } from "@repo/api-core";
 import {
   IsEmail,
   IsEnum,
@@ -8,7 +8,7 @@ import {
   IsUUID,
   MaxLength,
   MinLength,
-} from 'class-validator';
+} from "class-validator";
 
 export class RoleAssignmentDto {
   @ApiProperty()
@@ -34,8 +34,8 @@ export class UserDto {
   @ApiPropertyOptional()
   avatarUrl: string | null;
 
-  @ApiProperty({ enum: ['PENDING', 'ACTIVE', 'BLOCKED'] })
-  status: 'PENDING' | 'ACTIVE' | 'BLOCKED';
+  @ApiProperty({ enum: ["PENDING", "ACTIVE", "BLOCKED"] })
+  status: "PENDING" | "ACTIVE" | "BLOCKED";
 
   @ApiProperty({ type: String, nullable: true })
   emailVerifiedAt: string | null;
@@ -110,10 +110,10 @@ export class CreateAdminUserDto {
   @MaxLength(2048)
   avatarUrl?: string | null;
 
-  @ApiPropertyOptional({ enum: ['PENDING', 'ACTIVE', 'BLOCKED'] })
+  @ApiPropertyOptional({ enum: ["PENDING", "ACTIVE", "BLOCKED"] })
   @IsOptional()
-  @IsEnum(['PENDING', 'ACTIVE', 'BLOCKED'])
-  status?: 'PENDING' | 'ACTIVE' | 'BLOCKED';
+  @IsEnum(["PENDING", "ACTIVE", "BLOCKED"])
+  status?: "PENDING" | "ACTIVE" | "BLOCKED";
 
   @ApiPropertyOptional()
   @IsOptional()
@@ -127,13 +127,13 @@ export class CreateAdminUserDto {
 }
 
 export class UpdateAdminUserDto extends PartialType(
-  OmitType(CreateAdminUserDto, ['roleId', 'organizationId', 'password', 'status'] as const),
+  OmitType(CreateAdminUserDto, ["roleId", "organizationId", "password", "status"] as const),
 ) {}
 
 export class UpdateUserStatusDto {
-  @ApiProperty({ enum: ['PENDING', 'ACTIVE', 'BLOCKED'] })
-  @IsEnum(['PENDING', 'ACTIVE', 'BLOCKED'])
-  status: 'PENDING' | 'ACTIVE' | 'BLOCKED';
+  @ApiProperty({ enum: ["PENDING", "ACTIVE", "BLOCKED"] })
+  @IsEnum(["PENDING", "ACTIVE", "BLOCKED"])
+  status: "PENDING" | "ACTIVE" | "BLOCKED";
 }
 
 export class ReplaceUserRolesDto {
@@ -153,10 +153,10 @@ export class AdminUsersQueryDto extends PaginationQueryDto {
   @IsString()
   search?: string;
 
-  @ApiPropertyOptional({ enum: ['PENDING', 'ACTIVE', 'BLOCKED'] })
+  @ApiPropertyOptional({ enum: ["PENDING", "ACTIVE", "BLOCKED"] })
   @IsOptional()
-  @IsEnum(['PENDING', 'ACTIVE', 'BLOCKED'])
-  status?: 'PENDING' | 'ACTIVE' | 'BLOCKED';
+  @IsEnum(["PENDING", "ACTIVE", "BLOCKED"])
+  status?: "PENDING" | "ACTIVE" | "BLOCKED";
 
   @ApiPropertyOptional()
   @IsOptional()
@@ -164,19 +164,18 @@ export class AdminUsersQueryDto extends PaginationQueryDto {
   role?: string;
 
   @ApiPropertyOptional({
-    description:
-      'Comma-separated sort rules in field:order format, e.g. status:asc,createdAt:desc',
-    example: 'status:asc,createdAt:desc',
+    description: "Comma-separated sort rules in field:order format, e.g. status:asc,createdAt:desc",
+    example: "status:asc,createdAt:desc",
   })
   @IsOptional()
   @IsString()
   sort?: string;
 
   @ApiPropertyOptional({
-    enum: ['createdAt', 'displayName', 'email', 'status'],
-    default: 'createdAt',
+    enum: ["createdAt", "displayName", "email", "status"],
+    default: "createdAt",
   })
   @IsOptional()
-  @IsEnum(['createdAt', 'displayName', 'email', 'status'])
-  sortField: 'createdAt' | 'displayName' | 'email' | 'status' = 'createdAt';
+  @IsEnum(["createdAt", "displayName", "email", "status"])
+  sortField: "createdAt" | "displayName" | "email" | "status" = "createdAt";
 }

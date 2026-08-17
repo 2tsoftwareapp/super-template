@@ -56,11 +56,7 @@ describe("parseSearchParams", () => {
   });
 
   it("falls back on out-of-range page sizes", () => {
-    const { data } = parseSearchParams(
-      schema,
-      new URLSearchParams("limit=99999"),
-      fallback,
-    );
+    const { data } = parseSearchParams(schema, new URLSearchParams("limit=99999"), fallback);
 
     expect(data.limit).toBe(20);
   });
@@ -91,7 +87,7 @@ describe("boolean and date params", () => {
   const schema = z.object({ archived: booleanParam, from: dateParam });
   const fallback = { archived: false, from: undefined };
 
-  it("reads only the literal \"true\" as true", () => {
+  it('reads only the literal "true" as true', () => {
     const yes = parseSearchParams(schema, new URLSearchParams("archived=true"), fallback);
     const junk = parseSearchParams(schema, new URLSearchParams("archived=1"), fallback);
 

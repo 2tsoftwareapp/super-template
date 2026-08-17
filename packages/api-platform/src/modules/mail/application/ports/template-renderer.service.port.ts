@@ -14,14 +14,11 @@ export interface TemplateRendererServicePort {
     missingVariables: string[];
   }>;
 
-  findMissingVariables(
-    templateKey: string,
-    variables: Record<string, string>,
-  ): Promise<string[]>;
+  findMissingVariables(templateKey: string, variables: Record<string, string>): Promise<string[]>;
 
   listTemplateKeys(): string[];
 
   findVariables(templateKey: string): Promise<string[]>;
 }
 
-export const TEMPLATE_RENDERER_SERVICE = Symbol('TEMPLATE_RENDERER_SERVICE');
+export const TEMPLATE_RENDERER_SERVICE = Symbol("TEMPLATE_RENDERER_SERVICE");

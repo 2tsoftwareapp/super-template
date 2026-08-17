@@ -1,24 +1,24 @@
-import type { AuthenticatedRequestUser } from '@repo/api-core';
+import type { AuthenticatedRequestUser } from "@repo/api-core";
 
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { AppError, ERROR_CODES } from '@repo/api-core';
+import { HttpStatus, Inject, Injectable } from "@nestjs/common";
+import { AppError, ERROR_CODES } from "@repo/api-core";
 
-import { AccessControlService } from '../../../access-control/application/access-control.service';
-import { OrganizationsService } from '../../../organizations/application/organizations.service';
+import { AccessControlService } from "../../../access-control/application/access-control.service";
+import { OrganizationsService } from "../../../organizations/application/organizations.service";
 import {
   USERS_REPOSITORY,
   type UsersRepositoryPort,
-} from '../../../users/application/ports/users.repository.port';
-import { assertSessionUsable } from '../auth.helpers';
+} from "../../../users/application/ports/users.repository.port";
+import { assertSessionUsable } from "../auth.helpers";
 import {
   AUTH_SESSION_REPOSITORY,
   type AuthSessionRepositoryPort,
-} from '../ports/auth-session.repository.port';
+} from "../ports/auth-session.repository.port";
 import {
   AUTH_TOKEN_PROVIDER,
   type AuthTokenProviderPort,
   type TokenPayload,
-} from '../ports/auth-token.provider.port';
+} from "../ports/auth-token.provider.port";
 
 @Injectable()
 export class AuthenticateAccessTokenUseCase {
@@ -36,11 +36,11 @@ export class AuthenticateAccessTokenUseCase {
   async execute(token: string): Promise<AuthenticatedRequestUser> {
     let payload: TokenPayload;
     try {
-      payload = await this.tokenProvider.verifyToken(token, 'access');
+      payload = await this.tokenProvider.verifyToken(token, "access");
     } catch {
       throw new AppError(
         ERROR_CODES.AUTH_UNAUTHORIZED,
-        'Token is invalid or expired',
+        "Token is invalid or expired",
         HttpStatus.UNAUTHORIZED,
       );
     }
@@ -54,36 +54,28 @@ export class AuthenticateAccessTokenUseCase {
     if (session.expiresAt <= new Date()) {
       throw new AppError(
         ERROR_CODES.AUTH_SESSION_EXPIRED,
-        'Session has expired',
+        "Session has expired",
         HttpStatus.UNAUTHORIZED,
       );
     }
 
     if (!user) {
-      throw new AppError(
-        ERROR_CODES.USER_NOT_FOUND,
-        'User not found',
-        HttpStatus.NOT_FOUND,
-      );
+      throw new AppError(ERROR_CODES.USER_NOT_FOUND, "User not found", HttpStatus.NOT_FOUND);
     }
 
-    if (user.status !== 'ACTIVE') {
+    if (user.status !== "ACTIVE") {
       throw new AppError(
         ERROR_CODES.AUTH_FORBIDDEN,
-        'The account is not active',
+        "The account is not active",
         HttpStatus.FORBIDDEN,
       );
     }
 
-    const organizationId =
-      await this.organizationsService.resolveOrganizationIdForUser(
-        user.id,
-        payload.oid,
-      );
-    const accessProfile = await this.accessControlService.getAccessProfile(
+    const organizationId = await this.organizationsService.resolveOrganizationIdForUser(
       user.id,
-      organizationId,
+      payload.oid,
     );
+    const accessProfile = await this.accessControlService.getAccessProfile(user.id, organizationId);
 
     return {
       userId: user.id,

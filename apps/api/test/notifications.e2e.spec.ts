@@ -1,11 +1,11 @@
-import type { TenantContext } from '@repo/api-core';
-import type { INestApplication } from '@nestjs/common';
+import type { TenantContext } from "@repo/api-core";
+import type { INestApplication } from "@nestjs/common";
 
-import { TenantContextService, WORKER_DISPATCH_CONTEXT } from '@repo/api-core';
-import request from 'supertest';
-import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import { TenantContextService, WORKER_DISPATCH_CONTEXT } from "@repo/api-core";
+import request from "supertest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
-import { and, asc, eq, inArray, ne } from 'drizzle-orm';
+import { and, asc, eq, inArray, ne } from "drizzle-orm";
 import {
   type DatabaseClient,
   DATABASE,
@@ -13,21 +13,16 @@ import {
   notificationDeviceTokens,
   notificationJobs,
   notifications,
-} from '@repo/api-database';
+} from "@repo/api-database";
 
 import {
   DELIVERIES_REPOSITORY,
   NotificationDeliveryProcessor,
   NotificationDeliveryUseCase,
   PUSH_NOTIFIER,
-} from '@repo/api-platform';
+} from "@repo/api-platform";
 
-import {
-  bearer,
-  createTestApp,
-  loginAs,
-  resetTestDatabase,
-} from './support/test-app';
+import { bearer, createTestApp, loginAs, resetTestDatabase } from "./support/test-app";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -41,9 +36,8 @@ const dbQuery = async <T>(
   const db = app.get(DATABASE);
   // async wrapper keeps the ALS context alive until the lazy drizzle query
   // actually executes (see runWithTenantContext in support/test-app).
-  return tenantContextService.runAsync(
-    WORKER_DISPATCH_CONTEXT as TenantContext,
-    async () => fn(db),
+  return tenantContextService.runAsync(WORKER_DISPATCH_CONTEXT as TenantContext, async () =>
+    fn(db),
   );
 };
 
@@ -54,13 +48,13 @@ const sendNotification = async (
   overrides: Record<string, unknown> = {},
 ) => {
   const response = await request(app.getHttpServer())
-    .post('/api/v1/admin/notifications')
+    .post("/api/v1/admin/notifications")
     .set(bearer(admin.accessToken))
     .send({
-      audience: 'ALL',
-      type: 'test',
-      title: 'Test notification',
-      body: 'Test body',
+      audience: "ALL",
+      type: "test",
+      title: "Test notification",
+      body: "Test body",
       ...overrides,
     })
     .expect(201);
@@ -75,11 +69,11 @@ const registerDevice = async (
   tokenValue?: string,
 ) => {
   const response = await request(app.getHttpServer())
-    .post('/api/v1/notifications/devices')
+    .post("/api/v1/notifications/devices")
     .set(bearer(user.accessToken))
     .send({
       token: tokenValue ?? `fcm-token-${Date.now()}-${Math.random()}`,
-      platform: 'ANDROID',
+      platform: "ANDROID",
     })
     .expect(201);
 
@@ -87,18 +81,12 @@ const registerDevice = async (
 };
 
 /** Find the delivery row for a given (notificationId, deviceTokenId) pair. */
-const findDelivery = (
-  app: INestApplication,
-  notificationId: string,
-  deviceTokenId: string,
-) =>
+const findDelivery = (app: INestApplication, notificationId: string, deviceTokenId: string) =>
   dbQuery(app, (db) =>
     db
       .select()
       .from(notificationDeliveries)
-      .where(
-        eq(notificationDeliveries.notificationId, notificationId),
-      )
+      .where(eq(notificationDeliveries.notificationId, notificationId))
       .then((rows) => rows.find((r) => r.deviceTokenId === deviceTokenId)),
   );
 
@@ -106,7 +94,7 @@ const findDelivery = (
 // Test suite
 // ---------------------------------------------------------------------------
 
-describe('Notifications (e2e)', () => {
+describe("Notifications (e2e)", () => {
   let app: INestApplication;
 
   beforeAll(async () => {
@@ -124,9 +112,9 @@ describe('Notifications (e2e)', () => {
   // 1. Inbox idempotency — duplicate job processing must not duplicate rows
   // -------------------------------------------------------------------------
 
-  describe('inbox idempotency', () => {
-    it('does not create duplicate inbox rows when the same job is processed twice', async () => {
-      const admin = await loginAs(app, 'admin@example.local', 'ChangeMe123!');
+  describe("inbox idempotency", () => {
+    it("does not create duplicate inbox rows when the same job is processed twice", async () => {
+      const admin = await loginAs(app, "admin@example.local", "ChangeMe123!");
 
       // sendNotification triggers immediate processJob internally when scheduledAt <= now
       const job = await sendNotification(app, admin);
@@ -137,7 +125,7 @@ describe('Notifications (e2e)', () => {
       await dbQuery(app, (db) =>
         db
           .update(notificationJobs)
-          .set({ status: 'PENDING', attempts: 0, processedAt: null })
+          .set({ status: "PENDING", attempts: 0, processedAt: null })
           .where(eq(notificationJobs.id, job.id)),
       );
 
@@ -164,9 +152,9 @@ describe('Notifications (e2e)', () => {
   // 2. Delivery pipeline — PENDING → SENT via processor
   // -------------------------------------------------------------------------
 
-  describe('delivery pipeline', () => {
-    it('creates delivery rows after job processing and marks them SENT', async () => {
-      const admin = await loginAs(app, 'admin@example.local', 'ChangeMe123!');
+  describe("delivery pipeline", () => {
+    it("creates delivery rows after job processing and marks them SENT", async () => {
+      const admin = await loginAs(app, "admin@example.local", "ChangeMe123!");
       const device = await registerDevice(app, admin);
 
       const job = await sendNotification(app, admin);
@@ -183,9 +171,7 @@ describe('Notifications (e2e)', () => {
       );
       expect(notificationRows.length).toBeGreaterThan(0);
 
-      const notificationId = notificationRows.find(
-        (r) => r.userId === admin.userId,
-      )!.id;
+      const notificationId = notificationRows.find((r) => r.userId === admin.userId)!.id;
 
       const deliveries = await dbQuery(app, (db) =>
         db
@@ -200,7 +186,7 @@ describe('Notifications (e2e)', () => {
       const pushNotifier = app.get<{ sendToToken: ReturnType<typeof vi.fn> }>(PUSH_NOTIFIER);
       pushNotifier.sendToToken = vi.fn().mockResolvedValue({
         success: true,
-        providerMessageId: 'mock-msg-id',
+        providerMessageId: "mock-msg-id",
       });
 
       const processor = app.get(NotificationDeliveryProcessor);
@@ -212,12 +198,12 @@ describe('Notifications (e2e)', () => {
           .from(notificationDeliveries)
           .where(eq(notificationDeliveries.id, deliveries[0]!.id)),
       );
-      expect(updated[0]!.status).toBe('SENT');
-      expect(updated[0]!.providerMessageId).toBe('mock-msg-id');
+      expect(updated[0]!.status).toBe("SENT");
+      expect(updated[0]!.providerMessageId).toBe("mock-msg-id");
     });
 
-    it('disables invalid device tokens and marks delivery as FAILED with a delivery row', async () => {
-      const admin = await loginAs(app, 'admin@example.local', 'ChangeMe123!');
+    it("disables invalid device tokens and marks delivery as FAILED with a delivery row", async () => {
+      const admin = await loginAs(app, "admin@example.local", "ChangeMe123!");
       const tokenValue = `invalid-token-${Date.now()}`;
       const device = await registerDevice(app, admin, tokenValue);
 
@@ -227,14 +213,9 @@ describe('Notifications (e2e)', () => {
 
       // Find the notification row for the admin user
       const notificationRows = await dbQuery(app, (db) =>
-        db
-          .select()
-          .from(notifications)
-          .where(eq(notifications.sourceJobId, job.id)),
+        db.select().from(notifications).where(eq(notifications.sourceJobId, job.id)),
       );
-      const notificationId = notificationRows.find(
-        (r) => r.userId === admin.userId,
-      )!.id;
+      const notificationId = notificationRows.find((r) => r.userId === admin.userId)!.id;
 
       // Verify delivery row exists before processing
       const deliveriesBefore = await dbQuery(app, (db) =>
@@ -244,16 +225,14 @@ describe('Notifications (e2e)', () => {
           .where(eq(notificationDeliveries.notificationId, notificationId)),
       );
       expect(deliveriesBefore.length).toBeGreaterThan(0);
-      const deliveryId = deliveriesBefore.find(
-        (d) => d.deviceTokenId === device.id,
-      )!.id;
+      const deliveryId = deliveriesBefore.find((d) => d.deviceTokenId === device.id)!.id;
 
       // Simulate FCM reporting the token as invalid
       const pushNotifier = app.get<{ sendToToken: ReturnType<typeof vi.fn> }>(PUSH_NOTIFIER);
       pushNotifier.sendToToken = vi.fn().mockResolvedValue({
         success: false,
         providerMessageId: null,
-        error: 'INVALID_TOKEN',
+        error: "INVALID_TOKEN",
       });
 
       const processor = app.get(NotificationDeliveryProcessor);
@@ -272,13 +251,10 @@ describe('Notifications (e2e)', () => {
 
       // Delivery row must survive and have status FAILED
       const deliveryAfter = await dbQuery(app, (db) =>
-        db
-          .select()
-          .from(notificationDeliveries)
-          .where(eq(notificationDeliveries.id, deliveryId)),
+        db.select().from(notificationDeliveries).where(eq(notificationDeliveries.id, deliveryId)),
       );
       expect(deliveryAfter).toHaveLength(1);
-      expect(deliveryAfter[0]!.status).toBe('FAILED');
+      expect(deliveryAfter[0]!.status).toBe("FAILED");
     });
   });
 
@@ -286,9 +262,9 @@ describe('Notifications (e2e)', () => {
   // 3. Retry backoff — nextAttemptAt in future skips claimPending
   // -------------------------------------------------------------------------
 
-  describe('delivery retry backoff', () => {
-    it('sets nextAttemptAt with exponential backoff and claimPending skips until due', async () => {
-      const admin = await loginAs(app, 'admin@example.local', 'ChangeMe123!');
+  describe("delivery retry backoff", () => {
+    it("sets nextAttemptAt with exponential backoff and claimPending skips until due", async () => {
+      const admin = await loginAs(app, "admin@example.local", "ChangeMe123!");
       const device = await registerDevice(app, admin);
       const job = await sendNotification(app, admin);
 
@@ -302,9 +278,7 @@ describe('Notifications (e2e)', () => {
           .where(eq(notifications.sourceJobId, job.id))
           .orderBy(asc(notifications.createdAt)),
       );
-      const notificationId = notificationRows.find(
-        (r) => r.userId === admin.userId,
-      )!.id;
+      const notificationId = notificationRows.find((r) => r.userId === admin.userId)!.id;
 
       // Query the delivery row that was already created by processJob — do NOT
       // call upsertBatch again (the unique constraint would return nothing).
@@ -323,22 +297,15 @@ describe('Notifications (e2e)', () => {
       await deliveriesRepo.markRetryable(delivery.id, nextAttemptAt);
 
       const afterRetry = await dbQuery(app, (db) =>
-        db
-          .select()
-          .from(notificationDeliveries)
-          .where(eq(notificationDeliveries.id, delivery.id)),
+        db.select().from(notificationDeliveries).where(eq(notificationDeliveries.id, delivery.id)),
       );
-      expect(afterRetry[0]!.status).toBe('PENDING');
+      expect(afterRetry[0]!.status).toBe("PENDING");
       expect(afterRetry[0]!.nextAttemptAt).toBeTruthy();
-      expect(
-        new Date(afterRetry[0]!.nextAttemptAt!).getTime(),
-      ).toBeGreaterThan(Date.now());
+      expect(new Date(afterRetry[0]!.nextAttemptAt!).getTime()).toBeGreaterThan(Date.now());
 
       // Delivery must NOT be claimable until nextAttemptAt passes
       const claimed = await deliveriesRepo.claimPending(100);
-      expect(
-        claimed.find((c: { id: string }) => c.id === delivery.id),
-      ).toBeFalsy();
+      expect(claimed.find((c: { id: string }) => c.id === delivery.id)).toBeFalsy();
     });
   });
 
@@ -346,9 +313,9 @@ describe('Notifications (e2e)', () => {
   // 4. Stale delivery recovery
   // -------------------------------------------------------------------------
 
-  describe('stale delivery recovery', () => {
-    it('recovers PROCESSING deliveries stuck beyond timeout back to PENDING', async () => {
-      const admin = await loginAs(app, 'admin@example.local', 'ChangeMe123!');
+  describe("stale delivery recovery", () => {
+    it("recovers PROCESSING deliveries stuck beyond timeout back to PENDING", async () => {
+      const admin = await loginAs(app, "admin@example.local", "ChangeMe123!");
       const device = await registerDevice(app, admin);
       const job = await sendNotification(app, admin);
 
@@ -362,9 +329,7 @@ describe('Notifications (e2e)', () => {
           .where(eq(notifications.sourceJobId, job.id))
           .orderBy(asc(notifications.createdAt)),
       );
-      const notificationId = notificationRows.find(
-        (r) => r.userId === admin.userId,
-      )!.id;
+      const notificationId = notificationRows.find((r) => r.userId === admin.userId)!.id;
 
       // Query the delivery row created by processJob
       const existingRows = await dbQuery(app, (db) =>
@@ -381,7 +346,7 @@ describe('Notifications (e2e)', () => {
         db
           .update(notificationDeliveries)
           .set({
-            status: 'PROCESSING',
+            status: "PROCESSING",
             updatedAt: new Date(Date.now() - 5 * 60 * 1000),
           })
           .where(eq(notificationDeliveries.id, delivery.id)),
@@ -391,18 +356,13 @@ describe('Notifications (e2e)', () => {
       const recovered = await deliveriesRepo.recoverStaleProcessing(1);
 
       expect(recovered.length).toBeGreaterThan(0);
-      expect(
-        recovered.find((r: { id: string }) => r.id === delivery.id),
-      ).toBeTruthy();
+      expect(recovered.find((r: { id: string }) => r.id === delivery.id)).toBeTruthy();
 
       const after = await dbQuery(app, (db) =>
-        db
-          .select()
-          .from(notificationDeliveries)
-          .where(eq(notificationDeliveries.id, delivery.id)),
+        db.select().from(notificationDeliveries).where(eq(notificationDeliveries.id, delivery.id)),
       );
       // Under attempt cap → should be PENDING
-      expect(after[0]!.status).toBe('PENDING');
+      expect(after[0]!.status).toBe("PENDING");
     });
   });
 
@@ -410,9 +370,9 @@ describe('Notifications (e2e)', () => {
   // 5. Token ownership transfer — cross-account push must NOT happen
   // -------------------------------------------------------------------------
 
-  describe('token ownership transfer', () => {
-    it('invalidates pending deliveries and prevents push when token is re-registered by another user', async () => {
-      const admin = await loginAs(app, 'admin@example.local', 'ChangeMe123!');
+  describe("token ownership transfer", () => {
+    it("invalidates pending deliveries and prevents push when token is re-registered by another user", async () => {
+      const admin = await loginAs(app, "admin@example.local", "ChangeMe123!");
 
       // Use a fixed token value so user B can re-register the same string
       const sharedToken = `shared-token-${Date.now()}`;
@@ -428,20 +388,15 @@ describe('Notifications (e2e)', () => {
 
       // Delivery row must exist and be PENDING for user A's token
       const notificationRows = await dbQuery(app, (db) =>
-        db
-          .select()
-          .from(notifications)
-          .where(eq(notifications.sourceJobId, job.id)),
+        db.select().from(notifications).where(eq(notifications.sourceJobId, job.id)),
       );
-      const notificationId = notificationRows.find(
-        (r) => r.userId === admin.userId,
-      )!.id;
+      const notificationId = notificationRows.find((r) => r.userId === admin.userId)!.id;
       const deliveryBefore = await findDelivery(app, notificationId, deviceA.id);
       expect(deliveryBefore).toBeTruthy();
-      expect(deliveryBefore!.status).toBe('PENDING');
+      expect(deliveryBefore!.status).toBe("PENDING");
 
       // Step 3: User B registers the SAME token (ownership transfer)
-      const userB = await loginAs(app, 'user@example.local', 'ChangeMe123!');
+      const userB = await loginAs(app, "user@example.local", "ChangeMe123!");
 
       await registerDevice(app, userB, sharedToken);
 
@@ -464,29 +419,27 @@ describe('Notifications (e2e)', () => {
           .from(notificationDeliveries)
           .where(eq(notificationDeliveries.id, deliveryBefore!.id)),
       );
-      expect(deliveryAfterTransfer[0]!.status).toBe('FAILED');
+      expect(deliveryAfterTransfer[0]!.status).toBe("FAILED");
 
       // Step 6: Running the processor must NOT call sendToToken for the
       // invalidated delivery (it is already FAILED, not claimable)
       const pushNotifier = app.get<{ sendToToken: ReturnType<typeof vi.fn> }>(PUSH_NOTIFIER);
       pushNotifier.sendToToken = vi.fn().mockResolvedValue({
         success: true,
-        providerMessageId: 'should-not-be-called',
+        providerMessageId: "should-not-be-called",
       });
 
       const processor = app.get(NotificationDeliveryProcessor);
       await processor.processDeliveries();
 
       // sendToToken must not have been called with the original device token
-      const calledTokens = pushNotifier.sendToToken.mock.calls.map(
-        (args) => args[0] as string,
-      );
+      const calledTokens = pushNotifier.sendToToken.mock.calls.map((args) => args[0] as string);
       expect(calledTokens).not.toContain(sharedToken);
     });
 
-    it('rejects concurrent register when processor holds the token lock', async () => {
-      const admin = await loginAs(app, 'admin@example.local', 'ChangeMe123!');
-      const userB = await loginAs(app, 'user@example.local', 'ChangeMe123!');
+    it("rejects concurrent register when processor holds the token lock", async () => {
+      const admin = await loginAs(app, "admin@example.local", "ChangeMe123!");
+      const userB = await loginAs(app, "user@example.local", "ChangeMe123!");
       const sharedToken = `concurrent-token-${Date.now()}`;
 
       // Step 1: Admin registers T
@@ -499,17 +452,12 @@ describe('Notifications (e2e)', () => {
 
       // Step 3: Find the exact delivery for sharedToken
       const notificationRows = await dbQuery(app, (db) =>
-        db
-          .select()
-          .from(notifications)
-          .where(eq(notifications.sourceJobId, job.id)),
+        db.select().from(notifications).where(eq(notifications.sourceJobId, job.id)),
       );
-      const notificationId = notificationRows.find(
-        (r) => r.userId === admin.userId,
-      )!.id;
+      const notificationId = notificationRows.find((r) => r.userId === admin.userId)!.id;
       const exactDelivery = await findDelivery(app, notificationId, deviceA.id);
       expect(exactDelivery).toBeTruthy();
-      expect(exactDelivery!.status).toBe('PENDING');
+      expect(exactDelivery!.status).toBe("PENDING");
 
       // Move all other PENDING deliveries to FAILED so the processor batch
       // only contains the exact delivery for sharedToken.
@@ -517,13 +465,13 @@ describe('Notifications (e2e)', () => {
         db
           .update(notificationDeliveries)
           .set({
-            status: 'FAILED',
-            lastError: 'Cleared for concurrent test isolation',
+            status: "FAILED",
+            lastError: "Cleared for concurrent test isolation",
             updatedAt: new Date(),
           })
           .where(
             and(
-              eq(notificationDeliveries.status, 'PENDING'),
+              eq(notificationDeliveries.status, "PENDING"),
               ne(notificationDeliveries.id, exactDelivery!.id),
             ),
           ),
@@ -534,7 +482,7 @@ describe('Notifications (e2e)', () => {
         db
           .select()
           .from(notificationDeliveries)
-          .where(eq(notificationDeliveries.status, 'PENDING')),
+          .where(eq(notificationDeliveries.status, "PENDING")),
       );
       expect(remainingPending).toHaveLength(1);
       expect(remainingPending[0]!.id).toBe(exactDelivery!.id);
@@ -542,24 +490,26 @@ describe('Notifications (e2e)', () => {
       // Step 4: Set up a barrier — sendToToken will pause until we resolve it
       const sendStarted = (() => {
         let resolve!: () => void;
-        const promise = new Promise<void>((r) => { resolve = r; });
+        const promise = new Promise<void>((r) => {
+          resolve = r;
+        });
         return { promise, resolve };
       })();
       const allowSend = (() => {
         let resolve!: () => void;
-        const promise = new Promise<void>((r) => { resolve = r; });
+        const promise = new Promise<void>((r) => {
+          resolve = r;
+        });
         return { promise, resolve };
       })();
 
       const pushNotifier = app.get<{ sendToToken: ReturnType<typeof vi.fn> }>(PUSH_NOTIFIER);
-      pushNotifier.sendToToken = vi.fn().mockImplementation(
-        async (token: string) => {
-          expect(token).toBe(sharedToken);
-          sendStarted.resolve();
-          await allowSend.promise;
-          return { success: true, providerMessageId: 'mock-barrier-msg' };
-        },
-      );
+      pushNotifier.sendToToken = vi.fn().mockImplementation(async (token: string) => {
+        expect(token).toBe(sharedToken);
+        sendStarted.resolve();
+        await allowSend.promise;
+        return { success: true, providerMessageId: "mock-barrier-msg" };
+      });
 
       // Step 5: Start the processor in the background
       const processor = app.get(NotificationDeliveryProcessor);
@@ -573,9 +523,9 @@ describe('Notifications (e2e)', () => {
 
         // Step 6: Try to register the same token for user B while lock is held
         const conflictResponse = await request(app.getHttpServer())
-          .post('/api/v1/notifications/devices')
+          .post("/api/v1/notifications/devices")
           .set(bearer(userB.accessToken))
-          .send({ token: sharedToken, platform: 'ANDROID' })
+          .send({ token: sharedToken, platform: "ANDROID" })
           .expect(409);
 
         expect(conflictResponse.body).toBeDefined();
@@ -587,9 +537,9 @@ describe('Notifications (e2e)', () => {
 
       // Step 7: Now retry the registration — should succeed (transfer)
       await request(app.getHttpServer())
-        .post('/api/v1/notifications/devices')
+        .post("/api/v1/notifications/devices")
         .set(bearer(userB.accessToken))
-        .send({ token: sharedToken, platform: 'ANDROID' })
+        .send({ token: sharedToken, platform: "ANDROID" })
         .expect(201);
 
       // Step 8: Verify final state — only 1 active row, owned by userB
@@ -604,9 +554,9 @@ describe('Notifications (e2e)', () => {
       expect(activeFinal[0]!.userId).toBe(userB.userId);
     });
 
-    it('does not violate unique constraint when same user re-registers after transfer', async () => {
-      const admin = await loginAs(app, 'admin@example.local', 'ChangeMe123!');
-      const userB = await loginAs(app, 'user@example.local', 'ChangeMe123!');
+    it("does not violate unique constraint when same user re-registers after transfer", async () => {
+      const admin = await loginAs(app, "admin@example.local", "ChangeMe123!");
+      const userB = await loginAs(app, "user@example.local", "ChangeMe123!");
       const sharedToken = `re-register-token-${Date.now()}`;
 
       // A register T

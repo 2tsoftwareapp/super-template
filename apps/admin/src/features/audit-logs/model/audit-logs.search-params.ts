@@ -1,9 +1,4 @@
-import {
-  dateParam,
-  pageParam,
-  parseSearchParams,
-  searchTextParam,
-} from "@repo/web-utils/params";
+import { dateParam, pageParam, parseSearchParams, searchTextParam } from "@repo/web-utils/params";
 import { z } from "zod";
 
 /**
@@ -32,11 +27,7 @@ const AUDIT_LOGS_FILTERS_FALLBACK = {
 } as const;
 
 export function parseAuditLogsFilters(sp: URLSearchParams): AuditLogsFilters {
-  const parsed = parseSearchParams(
-    auditLogsFiltersSchema,
-    sp,
-    AUDIT_LOGS_FILTERS_FALLBACK,
-  );
+  const parsed = parseSearchParams(auditLogsFiltersSchema, sp, AUDIT_LOGS_FILTERS_FALLBACK);
 
   return {
     from: parsed.data.from ?? "",

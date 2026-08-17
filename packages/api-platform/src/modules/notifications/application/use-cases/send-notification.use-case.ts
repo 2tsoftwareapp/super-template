@@ -1,11 +1,8 @@
-import type {
-  AuthenticatedRequestUser,
-  RequestContext,
-} from '@repo/api-core';
-import type { TransactionExecutor } from '@repo/api-core';
+import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-core";
+import type { TransactionExecutor } from "@repo/api-core";
 
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { 
+import { HttpStatus, Inject, Injectable } from "@nestjs/common";
+import {
   AppError,
   AUDIT_WRITER,
   type AuditWriter,
@@ -15,19 +12,16 @@ import {
   SYSTEM_SCOPE,
   TRANSACTION_PORT,
   type TransactionPort,
-} from '@repo/api-core';
+} from "@repo/api-core";
 
-import type {
-  NotificationView,
-  SendNotificationCommand,
-} from '../notifications.types';
+import type { NotificationView, SendNotificationCommand } from "../notifications.types";
 
-import { NotificationsMapper } from '../notifications.mapper';
+import { NotificationsMapper } from "../notifications.mapper";
 import {
   NOTIFICATIONS_REPOSITORY,
   type NotificationsRepositoryPort,
-} from '../ports/notifications.repository.port';
-import { NotificationDispatchService } from '../services/notification-dispatch.service';
+} from "../ports/notifications.repository.port";
+import { NotificationDispatchService } from "../services/notification-dispatch.service";
 
 @Injectable()
 export class SendNotificationUseCase {
@@ -51,21 +45,15 @@ export class SendNotificationUseCase {
     options?: { deferDispatch?: boolean },
   ): Promise<NotificationView> {
     const recipientOrganizationId = input.userId
-      ? await this.organizationLookup.findPrimaryOrganizationId(
-          input.userId,
-          executor,
-        )
+      ? await this.organizationLookup.findPrimaryOrganizationId(input.userId, executor)
       : null;
     const resolvedOrganizationId =
-      input.organizationId ??
-      recipientOrganizationId ??
-      actor?.organizationId ??
-      null;
+      input.organizationId ?? recipientOrganizationId ?? actor?.organizationId ?? null;
 
     if (!resolvedOrganizationId) {
       throw new AppError(
         ERROR_CODES.VALIDATION_FAILED,
-        'organizationId is required to send notifications',
+        "organizationId is required to send notifications",
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -97,22 +85,24 @@ export class SendNotificationUseCase {
             return existing;
           }
         }
-        throw new Error('Notification insert returned no rows');
+        throw new Error("Notification insert returned no rows");
       }
 
       if (actor) {
         await this.auditWriter.log(
           {
             actorId: actor.userId,
-            action: 'notification.sent',
-            entityType: 'notification',
+            action: "notification.sent",
+            entityType: "notification",
             entityId: notification.id,
             metadata: {
               userId: input.userId,
               type: input.type,
             },
             requestContext,
-              ...(resolvedOrganizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: resolvedOrganizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
+            ...(resolvedOrganizationId
+              ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: resolvedOrganizationId }
+              : { scope: SYSTEM_SCOPE.PLATFORM }),
           },
           tx,
         );

@@ -9,9 +9,7 @@ import { routing } from "@/i18n/routing";
 /** Paths that must render before a session cookie exists (login + SSO callback). */
 const PUBLIC_PREFIXES = ["/login"];
 
-export type ProxyDecision =
-  | { action: "next" }
-  | { action: "redirect"; to: string };
+export type ProxyDecision = { action: "next" } | { action: "redirect"; to: string };
 
 /** Split "/vi/users" → { locale: "vi", pathname: "/users" }. */
 export function splitLocale(pathname: string): {

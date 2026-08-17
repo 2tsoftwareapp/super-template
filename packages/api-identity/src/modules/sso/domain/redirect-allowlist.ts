@@ -1,9 +1,9 @@
-import { AppError, ERROR_CODES } from '@repo/api-core';
+import { AppError, ERROR_CODES } from "@repo/api-core";
 
 const normalizeRedirectUri = (redirectUri: string): string => {
   const parsed = new URL(redirectUri);
 
-  if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+  if (parsed.protocol === "http:" || parsed.protocol === "https:") {
     return `${parsed.origin}${parsed.pathname}${parsed.search}`;
   }
 
@@ -22,25 +22,21 @@ export const assertAllowedRedirectUri = (
   } catch {
     throw new AppError(
       ERROR_CODES.SSO_INVALID_REDIRECT,
-      'redirectUri must be an absolute URL',
+      "redirectUri must be an absolute URL",
       400,
     );
   }
 
   const normalized = normalizeRedirectUri(redirectUri);
 
-  if (
-    allowedExactUris.some(
-      (uri) => normalizeRedirectUri(uri) === normalized,
-    )
-  ) {
+  if (allowedExactUris.some((uri) => normalizeRedirectUri(uri) === normalized)) {
     return;
   }
 
-  if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
     throw new AppError(
       ERROR_CODES.SSO_INVALID_REDIRECT,
-      'redirectUri is not an allowed origin',
+      "redirectUri is not an allowed origin",
       400,
     );
   }
@@ -56,7 +52,7 @@ export const assertAllowedRedirectUri = (
   if (!isAllowed) {
     throw new AppError(
       ERROR_CODES.SSO_INVALID_REDIRECT,
-      'redirectUri is not an allowed origin',
+      "redirectUri is not an allowed origin",
       400,
     );
   }

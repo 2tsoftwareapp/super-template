@@ -108,9 +108,7 @@ export function sortOrderParam(fallback: "asc" | "desc" = "desc") {
 // Parsers
 // ---------------------------------------------------------------------------
 
-export type RouteParamResult<T> =
-  | { ok: true; data: T }
-  | { ok: false; issues: string[] };
+export type RouteParamResult<T> = { ok: true; data: T } | { ok: false; issues: string[] };
 
 /**
  * Validate a route param bundle (`/users/[id]`, `/orgs/[slug]/reports/[period]`).

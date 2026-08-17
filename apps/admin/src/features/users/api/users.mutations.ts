@@ -55,8 +55,7 @@ export function useUpdateProfileMutation(
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (input: UpdateAdminUserInput) =>
-      usersApi.updateProfile(userId, input),
+    mutationFn: (input: UpdateAdminUserInput) => usersApi.updateProfile(userId, input),
     onSuccess: async (data) => {
       await queryClient.invalidateQueries({ queryKey: usersKeys.detail(userId) });
       await queryClient.invalidateQueries({ queryKey: usersKeys.all });
@@ -72,8 +71,7 @@ export function useUpdateStatusMutation(
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (status: string) =>
-      usersApi.updateStatus(userId, status),
+    mutationFn: (status: string) => usersApi.updateStatus(userId, status),
     onSuccess: async (data) => {
       await queryClient.invalidateQueries({ queryKey: usersKeys.detail(userId) });
       await queryClient.invalidateQueries({ queryKey: usersKeys.all });
@@ -106,8 +104,7 @@ export function useDeleteUserMutation(
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: () =>
-      usersApi.delete(userId),
+    mutationFn: () => usersApi.delete(userId),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: usersKeys.all });
       await options?.onSuccess?.();

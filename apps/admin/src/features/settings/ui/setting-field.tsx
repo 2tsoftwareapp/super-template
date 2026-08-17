@@ -23,13 +23,9 @@ export function SettingField({ label, value, onChange }: SettingFieldProps) {
 
   return (
     <div className="space-y-1">
-      <Label className="text-[11px] text-muted-foreground font-mono">
-        {label}
-      </Label>
+      <Label className="text-[11px] text-muted-foreground font-mono">{label}</Label>
       <Input
-        value={
-          typeof value === "string" ? value : value == null ? "" : String(value)
-        }
+        value={typeof value === "string" ? value : value == null ? "" : String(value)}
         onChange={(e) => onChange(e.target.value)}
         placeholder={value === null ? "null" : `Value for ${label}`}
       />

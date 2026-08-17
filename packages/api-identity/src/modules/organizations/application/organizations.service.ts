@@ -1,10 +1,10 @@
-import type { TransactionExecutor } from '@repo/api-core';
+import type { TransactionExecutor } from "@repo/api-core";
 
-import { Injectable } from '@nestjs/common';
+import { Injectable } from "@nestjs/common";
 
-import { AssertOrganizationMembershipUseCase } from './use-cases/assert-organization-membership.use-case';
-import { EnsurePersonalOrganizationUseCase } from './use-cases/ensure-personal-organization.use-case';
-import { ResolveOrganizationIdForUserUseCase } from './use-cases/resolve-organization-id-for-user.use-case';
+import { AssertOrganizationMembershipUseCase } from "./use-cases/assert-organization-membership.use-case";
+import { EnsurePersonalOrganizationUseCase } from "./use-cases/ensure-personal-organization.use-case";
+import { ResolveOrganizationIdForUserUseCase } from "./use-cases/resolve-organization-id-for-user.use-case";
 
 /**
  * Cross-module facade for the organization operations other bounded contexts
@@ -25,23 +25,11 @@ export class OrganizationsService {
     displayName: string,
     executor?: TransactionExecutor,
   ) {
-    return this.ensurePersonalOrganizationUseCase.execute(
-      userId,
-      displayName,
-      executor,
-    );
+    return this.ensurePersonalOrganizationUseCase.execute(userId, displayName, executor);
   }
 
-  async assertMembership(
-    organizationId: string,
-    userId: string,
-    executor?: TransactionExecutor,
-  ) {
-    return this.assertOrganizationMembershipUseCase.execute(
-      organizationId,
-      userId,
-      executor,
-    );
+  async assertMembership(organizationId: string, userId: string, executor?: TransactionExecutor) {
+    return this.assertOrganizationMembershipUseCase.execute(organizationId, userId, executor);
   }
 
   async resolveOrganizationIdForUser(
@@ -49,10 +37,6 @@ export class OrganizationsService {
     organizationId?: string | null,
     executor?: TransactionExecutor,
   ) {
-    return this.resolveOrganizationIdForUserUseCase.execute(
-      userId,
-      organizationId,
-      executor,
-    );
+    return this.resolveOrganizationIdForUserUseCase.execute(userId, organizationId, executor);
   }
 }

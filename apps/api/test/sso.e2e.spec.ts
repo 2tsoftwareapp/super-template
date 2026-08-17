@@ -1,16 +1,16 @@
-import type { INestApplication } from '@nestjs/common';
+import type { INestApplication } from "@nestjs/common";
 
-import { ERROR_CODES } from '@repo/api-core';
-import request from 'supertest';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { ERROR_CODES } from "@repo/api-core";
+import request from "supertest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { bearer, createTestApp, loginAs, resetTestDatabase } from './support/test-app';
+import { bearer, createTestApp, loginAs, resetTestDatabase } from "./support/test-app";
 
-const REDIRECT_URI = 'http://localhost:3000/sso/callback';
+const REDIRECT_URI = "http://localhost:3000/sso/callback";
 
 const requireLocation = (location: string | undefined): string => {
   if (!location) {
-    throw new Error('Response was missing a Location header');
+    throw new Error("Response was missing a Location header");
   }
 
   return location;
@@ -18,7 +18,7 @@ const requireLocation = (location: string | undefined): string => {
 
 const exchangeSession = async (app: INestApplication, code: string) => {
   const response = await request(app.getHttpServer())
-    .post('/api/v1/auth/sso/exchange')
+    .post("/api/v1/auth/sso/exchange")
     .send({ code })
     .expect(201);
 
@@ -28,11 +28,11 @@ const exchangeSession = async (app: INestApplication, code: string) => {
   };
 };
 
-describe('SSO (e2e, fake provider)', () => {
+describe("SSO (e2e, fake provider)", () => {
   let app: INestApplication;
 
   beforeAll(async () => {
-    process.env.SSO_FAKE_PROVIDER_ENABLED = 'true';
+    process.env.SSO_FAKE_PROVIDER_ENABLED = "true";
     // Allow this test's redirect origin regardless of the developer's local
     // WEB_ORIGIN (e.g. a custom dev port), so the suite is self-contained.
     process.env.WEB_ORIGIN = new URL(REDIRECT_URI).origin;
@@ -48,7 +48,7 @@ describe('SSO (e2e, fake provider)', () => {
 
   const startLogin = async (email?: string) => {
     const response = await request(app.getHttpServer())
-      .get('/api/v1/auth/sso/fake/start')
+      .get("/api/v1/auth/sso/fake/start")
       .query({
         redirectUri: REDIRECT_URI,
         ...(email ? { testEmail: email } : {}),
@@ -57,14 +57,14 @@ describe('SSO (e2e, fake provider)', () => {
 
     const authorizationUrl = new URL(response.body.data.authorizationUrl);
     return {
-      code: authorizationUrl.searchParams.get('code')!,
-      state: authorizationUrl.searchParams.get('state')!,
+      code: authorizationUrl.searchParams.get("code")!,
+      state: authorizationUrl.searchParams.get("state")!,
     };
   };
 
-  it('rejects an unknown provider on start', async () => {
+  it("rejects an unknown provider on start", async () => {
     await request(app.getHttpServer())
-      .get('/api/v1/auth/sso/not-a-provider/start')
+      .get("/api/v1/auth/sso/not-a-provider/start")
       .query({ redirectUri: REDIRECT_URI })
       .expect(404)
       .expect((res) => {
@@ -72,37 +72,34 @@ describe('SSO (e2e, fake provider)', () => {
       });
   });
 
-  it('rejects a redirectUri outside the allowed web origin', async () => {
+  it("rejects a redirectUri outside the allowed web origin", async () => {
     await request(app.getHttpServer())
-      .get('/api/v1/auth/sso/fake/start')
-      .query({ redirectUri: 'http://evil.example.com/callback' })
+      .get("/api/v1/auth/sso/fake/start")
+      .query({ redirectUri: "http://evil.example.com/callback" })
       .expect(400)
       .expect((res) => {
         expect(res.body.error.code).toBe(ERROR_CODES.SSO_INVALID_REDIRECT);
       });
   });
 
-  it('signs up a new user, then links subsequent logins by email', async () => {
-    const email = 'sso-new-user@example.test';
+  it("signs up a new user, then links subsequent logins by email", async () => {
+    const email = "sso-new-user@example.test";
 
     const first = await startLogin(email);
     const firstCallback = await request(app.getHttpServer())
-      .get('/api/v1/auth/sso/fake/callback')
+      .get("/api/v1/auth/sso/fake/callback")
       .query({ code: first.code, state: first.state })
       .expect(302);
 
     const firstLocation = new URL(requireLocation(firstCallback.headers.location));
     expect(firstLocation.origin + firstLocation.pathname).toBe(REDIRECT_URI);
-    const firstExchangeCode = firstLocation.searchParams.get('exchange')!;
+    const firstExchangeCode = firstLocation.searchParams.get("exchange")!;
     expect(firstExchangeCode).toBeTruthy();
 
-    const { accessToken: firstAccessToken } = await exchangeSession(
-      app,
-      firstExchangeCode,
-    );
+    const { accessToken: firstAccessToken } = await exchangeSession(app, firstExchangeCode);
 
     const meResponse = await request(app.getHttpServer())
-      .get('/api/v1/auth/me')
+      .get("/api/v1/auth/me")
       .set(bearer(firstAccessToken))
       .expect(200);
     expect(meResponse.body.data.user.email).toBe(email);
@@ -110,30 +107,27 @@ describe('SSO (e2e, fake provider)', () => {
 
     const second = await startLogin(email);
     const secondCallback = await request(app.getHttpServer())
-      .get('/api/v1/auth/sso/fake/callback')
+      .get("/api/v1/auth/sso/fake/callback")
       .query({ code: second.code, state: second.state })
       .expect(302);
     const secondExchangeCode = new URL(
       requireLocation(secondCallback.headers.location),
-    ).searchParams.get('exchange')!;
-    const { accessToken: secondAccessToken } = await exchangeSession(
-      app,
-      secondExchangeCode,
-    );
+    ).searchParams.get("exchange")!;
+    const { accessToken: secondAccessToken } = await exchangeSession(app, secondExchangeCode);
 
     const secondMeResponse = await request(app.getHttpServer())
-      .get('/api/v1/auth/me')
+      .get("/api/v1/auth/me")
       .set(bearer(secondAccessToken))
       .expect(200);
     expect(secondMeResponse.body.data.user.id).toBe(firstUserId);
   });
 
-  it('returns an exchange code when Accept is application/json', async () => {
-    const { code, state } = await startLogin('sso-json@example.test');
+  it("returns an exchange code when Accept is application/json", async () => {
+    const { code, state } = await startLogin("sso-json@example.test");
 
     const callback = await request(app.getHttpServer())
-      .get('/api/v1/auth/sso/fake/callback')
-      .set('Accept', 'application/json')
+      .get("/api/v1/auth/sso/fake/callback")
+      .set("Accept", "application/json")
       .query({ code, state })
       .expect(200);
 
@@ -142,22 +136,22 @@ describe('SSO (e2e, fake provider)', () => {
     expect(callback.headers.location).toBeUndefined();
   });
 
-  it('rejects replaying a consumed exchange code', async () => {
-    const { code, state } = await startLogin('sso-replay-exchange@example.test');
+  it("rejects replaying a consumed exchange code", async () => {
+    const { code, state } = await startLogin("sso-replay-exchange@example.test");
 
     const callback = await request(app.getHttpServer())
-      .get('/api/v1/auth/sso/fake/callback')
+      .get("/api/v1/auth/sso/fake/callback")
       .query({ code, state })
       .expect(302);
 
-    const exchangeCode = new URL(
-      requireLocation(callback.headers.location),
-    ).searchParams.get('exchange')!;
+    const exchangeCode = new URL(requireLocation(callback.headers.location)).searchParams.get(
+      "exchange",
+    )!;
 
     await exchangeSession(app, exchangeCode);
 
     await request(app.getHttpServer())
-      .post('/api/v1/auth/sso/exchange')
+      .post("/api/v1/auth/sso/exchange")
       .send({ code: exchangeCode })
       .expect(401)
       .expect((res) => {
@@ -165,16 +159,16 @@ describe('SSO (e2e, fake provider)', () => {
       });
   });
 
-  it('rejects replaying a consumed state/code pair', async () => {
-    const { code, state } = await startLogin('sso-replay@example.test');
+  it("rejects replaying a consumed state/code pair", async () => {
+    const { code, state } = await startLogin("sso-replay@example.test");
 
     await request(app.getHttpServer())
-      .get('/api/v1/auth/sso/fake/callback')
+      .get("/api/v1/auth/sso/fake/callback")
       .query({ code, state })
       .expect(302);
 
     await request(app.getHttpServer())
-      .get('/api/v1/auth/sso/fake/callback')
+      .get("/api/v1/auth/sso/fake/callback")
       .query({ code, state })
       .expect(401)
       .expect((res) => {
@@ -182,25 +176,25 @@ describe('SSO (e2e, fake provider)', () => {
       });
   });
 
-  it('rejects linking onto an existing unverified-email account', async () => {
-    const admin = await loginAs(app, 'admin@example.local', 'ChangeMe123!');
-    const conflictEmail = 'sso-conflict@example.test';
+  it("rejects linking onto an existing unverified-email account", async () => {
+    const admin = await loginAs(app, "admin@example.local", "ChangeMe123!");
+    const conflictEmail = "sso-conflict@example.test";
 
     await request(app.getHttpServer())
-      .post('/api/v1/admin/users')
+      .post("/api/v1/admin/users")
       .set(bearer(admin.accessToken))
       .send({
         email: conflictEmail,
-        password: 'ChangeMe123!',
-        displayName: 'Conflict User',
-        status: 'PENDING',
+        password: "ChangeMe123!",
+        displayName: "Conflict User",
+        status: "PENDING",
       })
       .expect(201);
 
     const { code, state } = await startLogin(conflictEmail);
 
     await request(app.getHttpServer())
-      .get('/api/v1/auth/sso/fake/callback')
+      .get("/api/v1/auth/sso/fake/callback")
       .query({ code, state })
       .expect(409)
       .expect((res) => {

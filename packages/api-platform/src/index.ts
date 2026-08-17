@@ -1,25 +1,25 @@
-import { Module } from '@nestjs/common';
+import { Module } from "@nestjs/common";
 
-export { ImportExportAdapterRegistry } from './import-export/import-export-adapter.registry';
-export { ImportExportModule } from './import-export/import-export.module';
-export { DELIVERIES_REPOSITORY } from './modules/notifications/application/ports/deliveries.repository.port';
-export { PUSH_NOTIFIER } from './modules/notifications/application/push.interface';
-export { NotificationDeliveryProcessor } from './modules/notifications/application/services/notification-delivery.processor';
-export { NotificationDeliveryUseCase } from './modules/notifications/application/use-cases/notification-delivery.use-case';
-export { PlatformPortsModule } from './platform-ports.module';
+export { ImportExportAdapterRegistry } from "./import-export/import-export-adapter.registry";
+export { ImportExportModule } from "./import-export/import-export.module";
+export { DELIVERIES_REPOSITORY } from "./modules/notifications/application/ports/deliveries.repository.port";
+export { PUSH_NOTIFIER } from "./modules/notifications/application/push.interface";
+export { NotificationDeliveryProcessor } from "./modules/notifications/application/services/notification-delivery.processor";
+export { NotificationDeliveryUseCase } from "./modules/notifications/application/use-cases/notification-delivery.use-case";
+export { PlatformPortsModule } from "./platform-ports.module";
 
-import { ActivitiesModule } from './modules/activities/activities.module';
-import { AttachmentsModule } from './modules/attachments/attachments.module';
-import { AuditModule } from './modules/audit/audit.module';
-import { ExportsModule } from './modules/exports/exports.module';
-import { FilesModule } from './modules/files/files.module';
-import { ImportsModule } from './modules/imports/imports.module';
-import { JobsModule } from './modules/jobs/jobs.module';
-import { MailModule } from './modules/mail/mail.module';
-import { NotificationsModule } from './modules/notifications/notifications.module';
-import { SettingsModule } from './modules/settings/settings.module';
-import { StorageModule } from './modules/storage/storage.module';
-import { PlatformPortsModule } from './platform-ports.module';
+import { ActivitiesModule } from "./modules/activities/activities.module";
+import { AttachmentsModule } from "./modules/attachments/attachments.module";
+import { AuditModule } from "./modules/audit/audit.module";
+import { ExportsModule } from "./modules/exports/exports.module";
+import { FilesModule } from "./modules/files/files.module";
+import { ImportsModule } from "./modules/imports/imports.module";
+import { JobsModule } from "./modules/jobs/jobs.module";
+import { MailModule } from "./modules/mail/mail.module";
+import { NotificationsModule } from "./modules/notifications/notifications.module";
+import { SettingsModule } from "./modules/settings/settings.module";
+import { StorageModule } from "./modules/storage/storage.module";
+import { PlatformPortsModule } from "./platform-ports.module";
 
 @Module({
   imports: [

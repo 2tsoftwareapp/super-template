@@ -5,9 +5,6 @@
     "rootDir": "src",
     "strictPropertyInitialization": false
   },
-  "include": [
-    "src/**/*.ts",
-    "src/common/types/express.d.ts"
-  ],
+  "include": ["src/**/*.ts", "src/common/types/express.d.ts"],
   "exclude": []
 }

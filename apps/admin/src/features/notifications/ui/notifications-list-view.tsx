@@ -2,27 +2,14 @@
 
 import { Badge } from "@repo/web-ui/badge";
 import { Button } from "@repo/web-ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@repo/web-ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/web-ui/card";
 import { ErrorState } from "@repo/web-ui/error-state";
 import { Input } from "@repo/web-ui/input";
 import { Label } from "@repo/web-ui/label";
 import { SectionLoading } from "@repo/web-ui/loading";
 import { LoadingButton } from "@repo/web-ui/loading-button";
 import { Show } from "@repo/web-ui/show";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@repo/web-ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@repo/web-ui/table";
 import { Textarea } from "@repo/web-ui/textarea";
 import { Tooltip } from "@repo/web-ui/tooltip";
 import {
@@ -42,9 +29,7 @@ import { adminResources } from "@/lib/admin-resources";
 import { formatUnknownDateTime, scalarString, timeAgo } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
-const notificationsResource = adminResources.find(
-  (r) => r.id === "notifications",
-)!;
+const notificationsResource = adminResources.find((r) => r.id === "notifications")!;
 
 function statusIcon(status: string): LucideIcon {
   if (status === "COMPLETED") return CheckCircle2;
@@ -234,14 +219,9 @@ export function NotificationsListView({
                         const Icon = statusIcon(s);
                         return (
                           <TableRow key={job.id}>
-                            <TableCell className="font-mono text-xs">
-                              {job.type}
-                            </TableCell>
+                            <TableCell className="font-mono text-xs">{job.type}</TableCell>
                             <TableCell>
-                              <Badge
-                                variant="outline"
-                                className="text-xs capitalize"
-                              >
+                              <Badge variant="outline" className="text-xs capitalize">
                                 {job.audience?.toLowerCase() ?? "—"}
                               </Badge>
                             </TableCell>
@@ -256,10 +236,7 @@ export function NotificationsListView({
                               >
                                 <Badge
                                   variant={sb.variant}
-                                  className={cn(
-                                    "gap-1 text-xs capitalize",
-                                    sb.className,
-                                  )}
+                                  className={cn("gap-1 text-xs capitalize", sb.className)}
                                 >
                                   <Icon className="size-3" />
                                   {s.toLowerCase()}
@@ -278,9 +255,7 @@ export function NotificationsListView({
                                 }
                                 side="top"
                               >
-                                <span>
-                                  {timeAgo(scalarString(job.scheduledAt, ""))}
-                                </span>
+                                <span>{timeAgo(scalarString(job.scheduledAt, ""))}</span>
                               </Tooltip>
                             </TableCell>
                             <TableCell>
@@ -323,9 +298,7 @@ export function NotificationsListView({
                   action={{ label: "Retry", onClick: recent.onRetry }}
                 />
               </Show>
-              {!recent.isLoading &&
-              !recent.isError &&
-              recent.data.length === 0 ? (
+              {!recent.isLoading && !recent.isError && recent.data.length === 0 ? (
                 <p className="py-4 text-center text-sm text-muted-foreground">
                   No recent notifications.
                 </p>
@@ -336,31 +309,22 @@ export function NotificationsListView({
                       key={item.id}
                       className={cn(
                         "rounded-xl p-3",
-                        item.readAt
-                          ? "bg-muted/30"
-                          : "border border-border bg-card",
+                        item.readAt ? "bg-muted/30" : "border border-border bg-card",
                       )}
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">
                           <p className="text-sm font-medium">{item.title}</p>
-                          <p className="mt-0.5 text-xs text-muted-foreground">
-                            {item.body}
-                          </p>
+                          <p className="mt-0.5 text-xs text-muted-foreground">{item.body}</p>
                         </div>
-                        <Badge
-                          variant="secondary"
-                          className="shrink-0 text-[10px]"
-                        >
+                        <Badge variant="secondary" className="shrink-0 text-[10px]">
                           {item.type}
                         </Badge>
                       </div>
                       <div className="mt-1.5 flex items-center gap-2 text-[10px] text-muted-foreground">
                         <span>{timeAgo(String(item.createdAt))}</span>
                         {item.readAt ? (
-                          <span>
-                            · Read {timeAgo(scalarString(item.readAt, ""))}
-                          </span>
+                          <span>· Read {timeAgo(scalarString(item.readAt, ""))}</span>
                         ) : null}
                       </div>
                     </div>

@@ -4,17 +4,8 @@ import { Tooltip as TooltipPrimitive } from "@base-ui/react/tooltip";
 import { cn } from "@repo/web-utils/utils";
 import * as React from "react";
 
-function TooltipProvider({
-  delay = 0,
-  ...props
-}: TooltipPrimitive.Provider.Props) {
-  return (
-    <TooltipPrimitive.Provider
-      data-slot="tooltip-provider"
-      delay={delay}
-      {...props}
-    />
-  );
+function TooltipProvider({ delay = 0, ...props }: TooltipPrimitive.Provider.Props) {
+  return <TooltipPrimitive.Provider data-slot="tooltip-provider" delay={delay} {...props} />;
 }
 
 function TooltipRoot({ ...props }: TooltipPrimitive.Root.Props) {
@@ -34,11 +25,7 @@ function Tooltip({ children, content, side = "top" }: TooltipProps) {
     return <TooltipRoot>{children}</TooltipRoot>;
   }
 
-  const trigger = React.isValidElement(children) ? (
-    children
-  ) : (
-    <span>{children}</span>
-  );
+  const trigger = React.isValidElement(children) ? children : <span>{children}</span>;
 
   return (
     <TooltipProvider>
@@ -63,10 +50,7 @@ function TooltipContent({
   children,
   ...props
 }: TooltipPrimitive.Popup.Props &
-  Pick<
-    TooltipPrimitive.Positioner.Props,
-    "align" | "alignOffset" | "side" | "sideOffset"
-  >) {
+  Pick<TooltipPrimitive.Positioner.Props, "align" | "alignOffset" | "side" | "sideOffset">) {
   return (
     <TooltipPrimitive.Portal>
       <TooltipPrimitive.Positioner

@@ -104,9 +104,8 @@ export function OrganizationDetailContent(vm: OrganizationDetailViewModel) {
         title="Delete Organization"
         message={
           <>
-            Are you sure you want to delete{" "}
-            <span className="font-semibold">{org.name}</span>? This action is a
-            soft-delete but will disable access for all members.
+            Are you sure you want to delete <span className="font-semibold">{org.name}</span>? This
+            action is a soft-delete but will disable access for all members.
           </>
         }
         confirmLabel={deleteConfirm.isPending ? "Deleting…" : "Delete"}
@@ -122,8 +121,8 @@ export function OrganizationDetailContent(vm: OrganizationDetailViewModel) {
         message={
           isLastOwner ? (
             <p className="text-destructive font-medium">
-              You are the last owner of this organization. You must promote
-              another member to Owner or delete the organization instead.
+              You are the last owner of this organization. You must promote another member to Owner
+              or delete the organization instead.
             </p>
           ) : (
             <>Are you sure you want to leave {org.name}?</>
@@ -306,9 +305,7 @@ export function OrganizationDetailContent(vm: OrganizationDetailViewModel) {
                                   variant="outline"
                                   size="sm"
                                   disabled={memberActions.isUpdatingRole}
-                                  onClick={() =>
-                                    memberActions.onUpdateRole(member.userId, "ADMIN")
-                                  }
+                                  onClick={() => memberActions.onUpdateRole(member.userId, "ADMIN")}
                                 >
                                   {memberActions.isUpdatingRole ? (
                                     <Spinner className="size-3 mr-1" />
@@ -342,9 +339,7 @@ export function OrganizationDetailContent(vm: OrganizationDetailViewModel) {
                                   variant="outline"
                                   size="sm"
                                   disabled={memberActions.isUpdatingRole}
-                                  onClick={() =>
-                                    memberActions.onUpdateRole(member.userId, "OWNER")
-                                  }
+                                  onClick={() => memberActions.onUpdateRole(member.userId, "OWNER")}
                                 >
                                   {memberActions.isUpdatingRole ? (
                                     <Spinner className="size-3 mr-1" />
@@ -360,9 +355,7 @@ export function OrganizationDetailContent(vm: OrganizationDetailViewModel) {
                                   variant="outline"
                                   size="sm"
                                   disabled={memberActions.isUpdatingRole}
-                                  onClick={() =>
-                                    memberActions.onUpdateRole(member.userId, "ADMIN")
-                                  }
+                                  onClick={() => memberActions.onUpdateRole(member.userId, "ADMIN")}
                                 >
                                   {memberActions.isUpdatingRole ? (
                                     <Spinner className="size-3 mr-1" />

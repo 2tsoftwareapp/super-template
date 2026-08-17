@@ -1,6 +1,6 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from "@nestjs/common";
 
-import { MFA_REPOSITORY, type MfaRepositoryPort } from '../ports/mfa.repository.port';
+import { MFA_REPOSITORY, type MfaRepositoryPort } from "../ports/mfa.repository.port";
 
 @Injectable()
 export class GetMfaStatusUseCase {

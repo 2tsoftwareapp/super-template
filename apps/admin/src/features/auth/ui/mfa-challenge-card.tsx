@@ -4,13 +4,7 @@ import type { UseFormReturn } from "react-hook-form";
 
 import { Alert } from "@repo/web-ui/alert";
 import { Button } from "@repo/web-ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@repo/web-ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/web-ui/card";
 import { Input } from "@repo/web-ui/input";
 import { Label } from "@repo/web-ui/label";
 
@@ -62,20 +56,13 @@ export function MfaChallengeCard({
               className="text-center font-mono text-2xl tracking-[0.5em]"
               {...form.register("code")}
             />
-            {codeError ? (
-              <p className="text-xs text-destructive">{codeError}</p>
-            ) : null}
+            {codeError ? <p className="text-xs text-destructive">{codeError}</p> : null}
           </div>
           {errorMessage && !codeError ? <Alert>{errorMessage}</Alert> : null}
           <Button className="w-full" type="submit" disabled={isPending}>
             {isPending ? copy.verifying : copy.verify}
           </Button>
-          <Button
-            variant="ghost"
-            className="w-full"
-            type="button"
-            onClick={onBack}
-          >
+          <Button variant="ghost" className="w-full" type="button" onClick={onBack}>
             {copy.backToLogin}
           </Button>
         </form>

@@ -14,24 +14,19 @@ import { displayValue } from "@/features/settings/model/settings-drafts";
 import { SettingField } from "./setting-field";
 
 export function SettingCard({ row }: { row: SettingRow }) {
-  const { setting, isObject, hasChanges, isSaving, canUpdate, scalar, object } =
-    row;
+  const { setting, isObject, hasChanges, isSaving, canUpdate, scalar, object } = row;
 
   return (
     <div className="rounded-xl border border-border p-4">
       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div className="min-w-0 flex-1 space-y-1.5">
-          <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs">
-            {setting.key}
-          </code>
+          <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs">{setting.key}</code>
           {isObject ? (
             <pre className="mt-1 max-h-20 overflow-auto rounded bg-muted/40 px-2 py-1.5 text-xs text-muted-foreground">
               {displayValue(setting.value)}
             </pre>
           ) : (
-            <p className="text-sm text-muted-foreground">
-              {displayValue(setting.value)}
-            </p>
+            <p className="text-sm text-muted-foreground">{displayValue(setting.value)}</p>
           )}
         </div>
         <Show when={canUpdate}>

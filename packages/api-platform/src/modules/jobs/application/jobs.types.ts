@@ -1,6 +1,6 @@
-import type { JsonObject } from '@repo/api-core';
+import type { JsonObject } from "@repo/api-core";
 
-import type { JobStatus } from '../domain/job-status';
+import type { JobStatus } from "../domain/job-status";
 
 export type { JobStatus };
 
@@ -23,7 +23,7 @@ export interface JobView {
 }
 
 /** JobView with payload redacted (used in list responses). */
-export interface JobListView extends Omit<JobView, 'payload'> {
+export interface JobListView extends Omit<JobView, "payload"> {
   payload: Record<string, never>;
 }
 

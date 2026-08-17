@@ -1,19 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable } from "@nestjs/common";
 
-import type { ErrorReportContext } from './observability.types';
+import type { ErrorReportContext } from "./observability.types";
 
-import { EnvironmentService } from '../../config/environment.service';
+import { EnvironmentService } from "../../config/environment.service";
 
 @Injectable()
 export class TelegramTransportService {
   constructor(private readonly environmentService: EnvironmentService) {}
 
   async send(title: string, context: ErrorReportContext): Promise<void> {
-    const {
-      TELEGRAM_ERROR_BOT_TOKEN,
-      TELEGRAM_ERROR_BOT_CHAT_ID,
-      TELEGRAM_ERROR_BOT_TIMEOUT_MS,
-    } = this.environmentService.values;
+    const { TELEGRAM_ERROR_BOT_TOKEN, TELEGRAM_ERROR_BOT_CHAT_ID, TELEGRAM_ERROR_BOT_TIMEOUT_MS } =
+      this.environmentService.values;
 
     if (!TELEGRAM_ERROR_BOT_TOKEN || !TELEGRAM_ERROR_BOT_CHAT_ID) {
       return;
@@ -21,27 +18,21 @@ export class TelegramTransportService {
 
     const text = this.buildMessage(title, context);
     const controller = new AbortController();
-    const timeout = setTimeout(
-      () => controller.abort(),
-      TELEGRAM_ERROR_BOT_TIMEOUT_MS,
-    );
+    const timeout = setTimeout(() => controller.abort(), TELEGRAM_ERROR_BOT_TIMEOUT_MS);
 
     try {
-      await fetch(
-        `https://api.telegram.org/bot${TELEGRAM_ERROR_BOT_TOKEN}/sendMessage`,
-        {
-          method: 'POST',
-          headers: {
-            'content-type': 'application/json',
-          },
-          body: JSON.stringify({
-            chat_id: TELEGRAM_ERROR_BOT_CHAT_ID,
-            text,
-            disable_web_page_preview: true,
-          }),
-          signal: controller.signal,
+      await fetch(`https://api.telegram.org/bot${TELEGRAM_ERROR_BOT_TOKEN}/sendMessage`, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
         },
-      );
+        body: JSON.stringify({
+          chat_id: TELEGRAM_ERROR_BOT_CHAT_ID,
+          text,
+          disable_web_page_preview: true,
+        }),
+        signal: controller.signal,
+      });
     } catch {
       // Telegram alerting is best-effort and must never block the main request path.
     } finally {
@@ -61,18 +52,18 @@ export class TelegramTransportService {
       context.stack ? `stack: ${this.truncate(context.stack)}` : null,
     ].filter(Boolean);
 
-    return this.truncate(lines.join('\n'));
+    return this.truncate(lines.join("\n"));
   }
 
   private stringifyDetails(details: unknown): string {
-    if (typeof details === 'string') {
+    if (typeof details === "string") {
       return details;
     }
 
     try {
       return JSON.stringify(details);
     } catch {
-      return '[unserializable details]';
+      return "[unserializable details]";
     }
   }
 

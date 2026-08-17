@@ -1,21 +1,16 @@
+import type { DatabaseClient, DatabaseExecutor } from "@repo/api-database";
+
+import { Inject, Injectable } from "@nestjs/common";
+import { FIXED_ROLE_NAMES, ROLE_NAMES } from "@repo/api-core";
+import { DATABASE } from "@repo/api-database";
+import { organizations, permissions, rolePermissions, roles, userRoles } from "@repo/api-database";
+import { and, count, eq, ilike, inArray, isNotNull, isNull, or, sql, type SQL } from "drizzle-orm";
+
 import type {
-  DatabaseClient,
-  DatabaseExecutor,
-} from '@repo/api-database';
-
-import { Inject, Injectable } from '@nestjs/common';
-import { FIXED_ROLE_NAMES, ROLE_NAMES } from '@repo/api-core';
-import { DATABASE } from '@repo/api-database';
-import {
-  organizations,
-  permissions,
-  rolePermissions,
-  roles,
-  userRoles,
-} from '@repo/api-database';
-import { and, count, eq, ilike, inArray, isNotNull, isNull, or, sql, type SQL } from 'drizzle-orm';
-
-import type { AccessControlRepositoryPort, CreatePermissionValues, RoleRecord } from '../application/access-control.repository.port';
+  AccessControlRepositoryPort,
+  CreatePermissionValues,
+  RoleRecord,
+} from "../application/access-control.repository.port";
 
 @Injectable()
 export class AccessControlRepository implements AccessControlRepositoryPort {
@@ -27,7 +22,7 @@ export class AccessControlRepository implements AccessControlRepositoryPort {
       limit: number;
       organizationId?: string | undefined;
       search?: string | undefined;
-      scope?: 'platform' | 'organization' | undefined;
+      scope?: "platform" | "organization" | undefined;
       manageableByOrg?: string | null | undefined;
     },
     executor: DatabaseExecutor = this.database,
@@ -53,9 +48,9 @@ export class AccessControlRepository implements AccessControlRepositoryPort {
       filters.push(eq(roles.organizationId, params.organizationId));
     }
 
-    if (params.scope === 'platform') {
+    if (params.scope === "platform") {
       filters.push(isNull(roles.organizationId));
-    } else if (params.scope === 'organization') {
+    } else if (params.scope === "organization") {
       filters.push(isNotNull(roles.organizationId));
     }
 
@@ -63,7 +58,7 @@ export class AccessControlRepository implements AccessControlRepositoryPort {
       filters.push(
         or(
           ilike(roles.name, `%${params.search}%`),
-          ilike(roles.description ?? '', `%${params.search}%`),
+          ilike(roles.description ?? "", `%${params.search}%`),
         )!,
       );
     }
@@ -79,10 +74,7 @@ export class AccessControlRepository implements AccessControlRepositoryPort {
         .orderBy(roles.name, roles.id)
         .limit(params.limit)
         .offset(offset),
-      executor
-        .select({ total: count() })
-        .from(roles)
-        .where(where),
+      executor.select({ total: count() }).from(roles).where(where),
     ]);
 
     return {
@@ -104,12 +96,7 @@ export class AccessControlRepository implements AccessControlRepositoryPort {
       return executor
         .select()
         .from(roles)
-        .where(
-          and(
-            inArray(roles.name, [...FIXED_ROLE_NAMES]),
-            isNull(roles.organizationId),
-          ),
-        )
+        .where(and(inArray(roles.name, [...FIXED_ROLE_NAMES]), isNull(roles.organizationId)))
         .orderBy(roles.name);
     }
 
@@ -120,16 +107,10 @@ export class AccessControlRepository implements AccessControlRepositoryPort {
         or(
           and(eq(roles.name, ROLE_NAMES.USER), isNull(roles.organizationId)),
           organizationId
-            ? and(
-                eq(roles.name, ROLE_NAMES.ADMIN),
-                eq(roles.organizationId, organizationId),
-              )
+            ? and(eq(roles.name, ROLE_NAMES.ADMIN), eq(roles.organizationId, organizationId))
             : undefined,
           organizationId
-            ? and(
-                eq(roles.isSystem, false),
-                eq(roles.organizationId, organizationId),
-              )
+            ? and(eq(roles.isSystem, false), eq(roles.organizationId, organizationId))
             : undefined,
         ),
       )
@@ -140,35 +121,22 @@ export class AccessControlRepository implements AccessControlRepositoryPort {
     return executor.select().from(permissions).orderBy(permissions.name);
   }
 
-  async findRoleById(
-    roleId: string,
-    executor: DatabaseExecutor = this.database,
-  ) {
+  async findRoleById(roleId: string, executor: DatabaseExecutor = this.database) {
+    const [role] = await executor.select().from(roles).where(eq(roles.id, roleId)).limit(1);
+    return role ?? null;
+  }
+
+  async findRoleByIdWithLock(roleId: string, executor: DatabaseExecutor) {
     const [role] = await executor
       .select()
       .from(roles)
       .where(eq(roles.id, roleId))
+      .for("update")
       .limit(1);
     return role ?? null;
   }
 
-  async findRoleByIdWithLock(
-    roleId: string,
-    executor: DatabaseExecutor,
-  ) {
-    const [role] = await executor
-      .select()
-      .from(roles)
-      .where(eq(roles.id, roleId))
-      .for('update')
-      .limit(1);
-    return role ?? null;
-  }
-
-  async findPermissionIdsForRole(
-    roleId: string,
-    executor: DatabaseExecutor = this.database,
-  ) {
+  async findPermissionIdsForRole(roleId: string, executor: DatabaseExecutor = this.database) {
     const rows = await executor
       .select({
         permissionId: rolePermissions.permissionId,
@@ -179,10 +147,7 @@ export class AccessControlRepository implements AccessControlRepositoryPort {
     return rows.map((row) => row.permissionId);
   }
 
-  async findPermissionsForRoleIds(
-    roleIds: string[],
-    executor: DatabaseExecutor = this.database,
-  ) {
+  async findPermissionsForRoleIds(roleIds: string[], executor: DatabaseExecutor = this.database) {
     if (roleIds.length === 0) {
       return [];
     }
@@ -202,10 +167,7 @@ export class AccessControlRepository implements AccessControlRepositoryPort {
       .orderBy(permissions.name);
   }
 
-  async findRolesByIds(
-    roleIds: string[],
-    executor: DatabaseExecutor = this.database,
-  ) {
+  async findRolesByIds(roleIds: string[], executor: DatabaseExecutor = this.database) {
     if (roleIds.length === 0) {
       return [];
     }
@@ -213,10 +175,7 @@ export class AccessControlRepository implements AccessControlRepositoryPort {
     return executor.select().from(roles).where(inArray(roles.id, roleIds));
   }
 
-  async findRolesByNames(
-    roleNames: string[],
-    executor: DatabaseExecutor = this.database,
-  ) {
+  async findRolesByNames(roleNames: string[], executor: DatabaseExecutor = this.database) {
     if (roleNames.length === 0) {
       return [];
     }
@@ -232,24 +191,15 @@ export class AccessControlRepository implements AccessControlRepositoryPort {
       return [];
     }
 
-    return executor
-      .select()
-      .from(permissions)
-      .where(inArray(permissions.name, permissionNames));
+    return executor.select().from(permissions).where(inArray(permissions.name, permissionNames));
   }
 
-  async findPermissionsByIds(
-    permissionIds: string[],
-    executor: DatabaseExecutor = this.database,
-  ) {
+  async findPermissionsByIds(permissionIds: string[], executor: DatabaseExecutor = this.database) {
     if (permissionIds.length === 0) {
       return [];
     }
 
-    return executor
-      .select()
-      .from(permissions)
-      .where(inArray(permissions.id, permissionIds));
+    return executor.select().from(permissions).where(inArray(permissions.id, permissionIds));
   }
 
   async ensureRoles(
@@ -268,15 +218,8 @@ export class AccessControlRepository implements AccessControlRepositoryPort {
     );
   }
 
-  async createRole(
-    values: typeof roles.$inferInsert,
-    executor: DatabaseExecutor = this.database,
-  ) {
-    const [role] = await executor
-      .insert(roles)
-      .values(values)
-      .onConflictDoNothing()
-      .returning();
+  async createRole(values: typeof roles.$inferInsert, executor: DatabaseExecutor = this.database) {
+    const [role] = await executor.insert(roles).values(values).onConflictDoNothing().returning();
     return role ?? null;
   }
 
@@ -296,10 +239,7 @@ export class AccessControlRepository implements AccessControlRepositoryPort {
     return role ?? null;
   }
 
-  async deleteRole(
-    roleId: string,
-    executor: DatabaseExecutor = this.database,
-  ): Promise<void> {
+  async deleteRole(roleId: string, executor: DatabaseExecutor = this.database): Promise<void> {
     await executor.delete(roles).where(eq(roles.id, roleId));
   }
 
@@ -308,7 +248,7 @@ export class AccessControlRepository implements AccessControlRepositoryPort {
       name: string;
       description: string;
       isSystem?: boolean;
-      scope: 'platform' | 'organization';
+      scope: "platform" | "organization";
     }[],
     executor: DatabaseExecutor = this.database,
   ) {
@@ -330,9 +270,7 @@ export class AccessControlRepository implements AccessControlRepositoryPort {
     permissionIds: string[],
     executor: DatabaseExecutor = this.database,
   ): Promise<void> {
-    await executor
-      .delete(rolePermissions)
-      .where(eq(rolePermissions.roleId, roleId));
+    await executor.delete(rolePermissions).where(eq(rolePermissions.roleId, roleId));
 
     if (permissionIds.length > 0) {
       await executor.insert(rolePermissions).values(
@@ -388,31 +326,26 @@ export class AccessControlRepository implements AccessControlRepositoryPort {
     } else {
       await executor
         .delete(userRoles)
-        .where(
-          and(
-            eq(userRoles.userId, userId),
-            eq(userRoles.organizationId, organizationId),
-          ),
-        );
+        .where(and(eq(userRoles.userId, userId), eq(userRoles.organizationId, organizationId)));
     }
 
     if (roleIds.length > 0) {
-      const assignedRoles = await this.findRolesByIds(roleIds, executor).then(
-        (roles) =>
-          roles.filter(
-            (role) =>
-              role.organizationId === null ||
-              role.organizationId === organizationId,
-          ),
+      const assignedRoles = await this.findRolesByIds(roleIds, executor).then((roles) =>
+        roles.filter(
+          (role) => role.organizationId === null || role.organizationId === organizationId,
+        ),
       );
 
-      await executor.insert(userRoles).values(
-        assignedRoles.map((role) => ({
-          userId,
-          roleId: role.id,
-          organizationId: role.organizationId,
-        })),
-      ).onConflictDoNothing();
+      await executor
+        .insert(userRoles)
+        .values(
+          assignedRoles.map((role) => ({
+            userId,
+            roleId: role.id,
+            organizationId: role.organizationId,
+          })),
+        )
+        .onConflictDoNothing();
     }
   }
 
@@ -428,7 +361,9 @@ export class AccessControlRepository implements AccessControlRepositoryPort {
         filters.push(isNull(userRoles.organizationId));
         filters.push(isNull(roles.organizationId));
       } else {
-        filters.push(or(isNull(userRoles.organizationId), eq(userRoles.organizationId, organizationId))!);
+        filters.push(
+          or(isNull(userRoles.organizationId), eq(userRoles.organizationId, organizationId))!,
+        );
         filters.push(or(isNull(roles.organizationId), eq(roles.organizationId, organizationId))!);
       }
     }
@@ -463,7 +398,9 @@ export class AccessControlRepository implements AccessControlRepositoryPort {
         filters.push(isNull(userRoles.organizationId));
         filters.push(isNull(roles.organizationId));
       } else {
-        filters.push(or(isNull(userRoles.organizationId), eq(userRoles.organizationId, organizationId))!);
+        filters.push(
+          or(isNull(userRoles.organizationId), eq(userRoles.organizationId, organizationId))!,
+        );
         filters.push(or(isNull(roles.organizationId), eq(roles.organizationId, organizationId))!);
       }
     }
@@ -501,7 +438,9 @@ export class AccessControlRepository implements AccessControlRepositoryPort {
     if (organizationId === null) {
       filters.push(isNull(userRoles.organizationId));
     } else if (organizationId !== undefined) {
-      filters.push(or(isNull(userRoles.organizationId), eq(userRoles.organizationId, organizationId))!);
+      filters.push(
+        or(isNull(userRoles.organizationId), eq(userRoles.organizationId, organizationId))!,
+      );
     }
 
     return executor
@@ -523,7 +462,9 @@ export class AccessControlRepository implements AccessControlRepositoryPort {
     if (organizationId === null) {
       filters.push(isNull(userRoles.organizationId));
     } else if (organizationId !== undefined) {
-      filters.push(or(isNull(userRoles.organizationId), eq(userRoles.organizationId, organizationId))!);
+      filters.push(
+        or(isNull(userRoles.organizationId), eq(userRoles.organizationId, organizationId))!,
+      );
     }
 
     const rows = await executor
@@ -546,7 +487,9 @@ export class AccessControlRepository implements AccessControlRepositoryPort {
     if (organizationId === null) {
       filters.push(isNull(userRoles.organizationId));
     } else if (organizationId !== undefined) {
-      filters.push(or(isNull(userRoles.organizationId), eq(userRoles.organizationId, organizationId))!);
+      filters.push(
+        or(isNull(userRoles.organizationId), eq(userRoles.organizationId, organizationId))!,
+      );
     }
 
     const rows = await executor
@@ -579,7 +522,9 @@ export class AccessControlRepository implements AccessControlRepositoryPort {
     if (organizationId === null) {
       filters.push(isNull(userRoles.organizationId));
     } else if (organizationId !== undefined) {
-      filters.push(or(isNull(userRoles.organizationId), eq(userRoles.organizationId, organizationId))!);
+      filters.push(
+        or(isNull(userRoles.organizationId), eq(userRoles.organizationId, organizationId))!,
+      );
     }
 
     return executor
@@ -603,19 +548,14 @@ export class AccessControlRepository implements AccessControlRepositoryPort {
       .where(
         and(
           eq(roles.name, name),
-          organizationId
-            ? eq(roles.organizationId, organizationId)
-            : isNull(roles.organizationId),
+          organizationId ? eq(roles.organizationId, organizationId) : isNull(roles.organizationId),
         ),
       )
       .limit(1);
     return role ?? null;
   }
 
-  async findPermissionById(
-    permissionId: string,
-    executor: DatabaseExecutor = this.database,
-  ) {
+  async findPermissionById(permissionId: string, executor: DatabaseExecutor = this.database) {
     const [permission] = await executor
       .select()
       .from(permissions)
@@ -628,10 +568,7 @@ export class AccessControlRepository implements AccessControlRepositoryPort {
     values: CreatePermissionValues,
     executor: DatabaseExecutor = this.database,
   ) {
-    const [permission] = await executor
-      .insert(permissions)
-      .values(values)
-      .returning();
+    const [permission] = await executor.insert(permissions).values(values).returning();
     return permission ?? null;
   }
 
@@ -676,9 +613,7 @@ export class AccessControlRepository implements AccessControlRepositoryPort {
 
     const existing = await this.findRoleByName(name, organizationId, executor);
     if (!existing) {
-      throw new Error(
-        `Failed to resolve system role "${name}" for organization ${organizationId}`,
-      );
+      throw new Error(`Failed to resolve system role "${name}" for organization ${organizationId}`);
     }
     return existing;
   }

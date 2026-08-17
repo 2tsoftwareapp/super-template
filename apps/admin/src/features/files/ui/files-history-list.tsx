@@ -14,12 +14,7 @@ interface FilesHistoryListProps {
   onRetry: () => void;
 }
 
-export function FilesHistoryList({
-  data,
-  isLoading,
-  isError,
-  onRetry,
-}: FilesHistoryListProps) {
+export function FilesHistoryList({ data, isLoading, isError, onRetry }: FilesHistoryListProps) {
   return (
     <div className="space-y-2">
       <Show when={isLoading}>
@@ -43,15 +38,11 @@ export function FilesHistoryList({
               <Badge variant="outline" className="text-xs capitalize">
                 {event.action.replace(/_/g, " ")}
               </Badge>
-              <span className="text-xs text-muted-foreground">
-                {timeAgo(event.createdAt)}
-              </span>
+              <span className="text-xs text-muted-foreground">{timeAgo(event.createdAt)}</span>
             </div>
             {event.metadata &&
               typeof event.metadata === "object" &&
-              Object.keys(
-                event.metadata as Record<string, unknown>,
-              ).length > 0 && (
+              Object.keys(event.metadata as Record<string, unknown>).length > 0 && (
                 <pre className="mt-2 overflow-x-auto rounded bg-muted p-2 text-xs">
                   {JSON.stringify(event.metadata, null, 2)}
                 </pre>

@@ -1,9 +1,6 @@
-import type { JsonObject } from '@repo/api-core';
+import type { JsonObject } from "@repo/api-core";
 
-import type {
-  PreferenceLanguage,
-  PreferenceTheme,
-} from './preferences.constants';
+import type { PreferenceLanguage, PreferenceTheme } from "./preferences.constants";
 
 export interface UpdatePreferencesCommand {
   theme?: PreferenceTheme;

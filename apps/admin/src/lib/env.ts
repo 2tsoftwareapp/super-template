@@ -39,9 +39,7 @@ const envSchema = z.object({
   COOKIE_SECURE: booleanFromString.optional(),
   APP_ENV: appEnvSchema,
   NEXT_PUBLIC_APP_ENV: appEnvSchema,
-  NODE_ENV: z
-    .enum(["development", "test", "production"])
-    .default("development"),
+  NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
 });
 
 export const env = envSchema.parse({
@@ -52,13 +50,11 @@ export const env = envSchema.parse({
   CSRF_SECRET: process.env.CSRF_SECRET,
   COOKIE_SECURE: process.env.COOKIE_SECURE,
   APP_ENV: process.env.APP_ENV,
-  NEXT_PUBLIC_APP_ENV:
-    process.env.NEXT_PUBLIC_APP_ENV ?? process.env.APP_ENV,
+  NEXT_PUBLIC_APP_ENV: process.env.NEXT_PUBLIC_APP_ENV ?? process.env.APP_ENV,
   NODE_ENV: process.env.NODE_ENV,
 });
 
 // Secure cookies on every deployed environment (staging + production), opt-in
 // elsewhere via COOKIE_SECURE.
 export const isSecureCookie =
-  env.COOKIE_SECURE ??
-  (env.APP_ENV !== "development" && env.APP_ENV !== "test");
+  env.COOKIE_SECURE ?? (env.APP_ENV !== "development" && env.APP_ENV !== "test");

@@ -14,9 +14,7 @@ export function useBulkMutation({
 
   return useMutation({
     mutationFn: async (ids: string[]) => {
-      const results = await Promise.allSettled(
-        ids.map((id) => mutationFn(id)),
-      );
+      const results = await Promise.allSettled(ids.map((id) => mutationFn(id)));
       const succeeded = results.filter((r) => r.status === "fulfilled").length;
       const failed = results.filter((r) => r.status === "rejected").length;
 

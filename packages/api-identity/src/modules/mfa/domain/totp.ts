@@ -1,6 +1,6 @@
-import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
+import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 
-const BASE32_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+const BASE32_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
 const TOTP_PERIOD_SECONDS = 30;
 const TOTP_DIGITS = 6;
 // Tolerates +/- 1 step (30s) of clock drift between server and authenticator app.
@@ -11,7 +11,7 @@ export const generateTotpSecret = (): Buffer => randomBytes(20);
 export const base32Encode = (buffer: Buffer): string => {
   let bits = 0;
   let value = 0;
-  let output = '';
+  let output = "";
 
   for (const byte of buffer) {
     value = (value << 8) | byte;
@@ -31,7 +31,7 @@ export const base32Encode = (buffer: Buffer): string => {
 };
 
 export const base32Decode = (input: string): Buffer => {
-  const cleaned = input.toUpperCase().replace(/[^A-Z2-7]/g, '');
+  const cleaned = input.toUpperCase().replace(/[^A-Z2-7]/g, "");
   let bits = 0;
   let value = 0;
   const bytes: number[] = [];
@@ -58,7 +58,7 @@ const hotp = (secret: Buffer, counter: bigint): string => {
   const counterBuffer = Buffer.alloc(8);
   counterBuffer.writeBigUInt64BE(counter);
 
-  const hmac = createHmac('sha1', secret).update(counterBuffer).digest();
+  const hmac = createHmac("sha1", secret).update(counterBuffer).digest();
   const offset = hmac[hmac.length - 1]! & 0x0f;
   const binCode =
     ((hmac[offset]! & 0x7f) << 24) |
@@ -66,7 +66,7 @@ const hotp = (secret: Buffer, counter: bigint): string => {
     ((hmac[offset + 2]! & 0xff) << 8) |
     (hmac[offset + 3]! & 0xff);
 
-  return (binCode % 10 ** TOTP_DIGITS).toString().padStart(TOTP_DIGITS, '0');
+  return (binCode % 10 ** TOTP_DIGITS).toString().padStart(TOTP_DIGITS, "0");
 };
 
 const timingSafeEqualStrings = (a: string, b: string): boolean => {
@@ -80,28 +80,17 @@ const timingSafeEqualStrings = (a: string, b: string): boolean => {
   return timingSafeEqual(bufferA, bufferB);
 };
 
-export const generateTotpCode = (
-  secret: Buffer,
-  at: Date = new Date(),
-): string => {
-  const counter = BigInt(
-    Math.floor(at.getTime() / 1000 / TOTP_PERIOD_SECONDS),
-  );
+export const generateTotpCode = (secret: Buffer, at: Date = new Date()): string => {
+  const counter = BigInt(Math.floor(at.getTime() / 1000 / TOTP_PERIOD_SECONDS));
   return hotp(secret, counter);
 };
 
-export const verifyTotpCode = (
-  secret: Buffer,
-  code: string,
-  at: Date = new Date(),
-): boolean => {
+export const verifyTotpCode = (secret: Buffer, code: string, at: Date = new Date()): boolean => {
   if (!/^\d{6}$/.test(code)) {
     return false;
   }
 
-  const counter = BigInt(
-    Math.floor(at.getTime() / 1000 / TOTP_PERIOD_SECONDS),
-  );
+  const counter = BigInt(Math.floor(at.getTime() / 1000 / TOTP_PERIOD_SECONDS));
 
   for (let drift = -TOTP_WINDOW; drift <= TOTP_WINDOW; drift++) {
     const candidate = hotp(secret, counter + BigInt(drift));
@@ -123,7 +112,7 @@ export const buildOtpauthUri = (params: {
   const query = new URLSearchParams({
     secret: base32Secret,
     issuer: params.issuer,
-    algorithm: 'SHA1',
+    algorithm: "SHA1",
     digits: String(TOTP_DIGITS),
     period: String(TOTP_PERIOD_SECONDS),
   });

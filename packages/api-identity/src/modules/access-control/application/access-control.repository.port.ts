@@ -1,4 +1,4 @@
-import type { TransactionExecutor } from '@repo/api-core';
+import type { TransactionExecutor } from "@repo/api-core";
 
 export interface RoleRecord {
   id: string;
@@ -36,7 +36,7 @@ export interface CreatePermissionValues {
   name: string;
   description: string;
   isSystem?: boolean;
-  scope: 'platform' | 'organization';
+  scope: "platform" | "organization";
 }
 
 export interface UpdatePermissionValues {
@@ -68,35 +68,17 @@ export interface AccessControlRepositoryPort {
     permissionIds: string[],
     executor?: TransactionExecutor,
   ): Promise<void>;
-  createRole(
-    values: CreateRoleValues,
-    executor?: TransactionExecutor,
-  ): Promise<RoleRecord | null>;
+  createRole(values: CreateRoleValues, executor?: TransactionExecutor): Promise<RoleRecord | null>;
   updateRole(
     roleId: string,
     values: UpdateRoleValues,
     executor?: TransactionExecutor,
   ): Promise<RoleRecord | null>;
-  deleteRole(
-    roleId: string,
-    executor?: TransactionExecutor,
-  ): Promise<void>;
-  findRoleById(
-    roleId: string,
-    executor?: TransactionExecutor,
-  ): Promise<RoleRecord | null>;
-  findRoleByIdWithLock(
-    roleId: string,
-    executor: TransactionExecutor,
-  ): Promise<RoleRecord | null>;
-  findUserIdsForRole(
-    roleId: string,
-    executor?: TransactionExecutor,
-  ): Promise<string[]>;
-  findUserIdsForPermission(
-    permissionId: string,
-    executor?: TransactionExecutor,
-  ): Promise<string[]>;
+  deleteRole(roleId: string, executor?: TransactionExecutor): Promise<void>;
+  findRoleById(roleId: string, executor?: TransactionExecutor): Promise<RoleRecord | null>;
+  findRoleByIdWithLock(roleId: string, executor: TransactionExecutor): Promise<RoleRecord | null>;
+  findUserIdsForRole(roleId: string, executor?: TransactionExecutor): Promise<string[]>;
+  findUserIdsForPermission(permissionId: string, executor?: TransactionExecutor): Promise<string[]>;
   findRoleNamesForUser(
     userId: string,
     organizationId?: string | null,
@@ -127,10 +109,7 @@ export interface AccessControlRepositoryPort {
     organizationId?: string | null,
     executor?: TransactionExecutor,
   ): Promise<{ userId: string; roleId: string }[]>;
-  findRolesByIds(
-    roleIds: string[],
-    executor?: TransactionExecutor,
-  ): Promise<RoleRecord[]>;
+  findRolesByIds(roleIds: string[], executor?: TransactionExecutor): Promise<RoleRecord[]>;
   findPermissionsByIds(
     permissionIds: string[],
     executor?: TransactionExecutor,
@@ -139,13 +118,8 @@ export interface AccessControlRepositoryPort {
     permissionNames: string[],
     executor?: TransactionExecutor,
   ): Promise<PermissionRecord[]>;
-  findAllPermissions(
-    executor?: TransactionExecutor,
-  ): Promise<PermissionRecord[]>;
-  findPermissionIdsForRole(
-    roleId: string,
-    executor?: TransactionExecutor,
-  ): Promise<string[]>;
+  findAllPermissions(executor?: TransactionExecutor): Promise<PermissionRecord[]>;
+  findPermissionIdsForRole(roleId: string, executor?: TransactionExecutor): Promise<string[]>;
   findPermissionsForRoleIds(
     roleIds: string[],
     executor?: TransactionExecutor,
@@ -163,14 +137,8 @@ export interface AccessControlRepositoryPort {
     values: UpdatePermissionValues,
     executor?: TransactionExecutor,
   ): Promise<PermissionRecord | null>;
-  deletePermission(
-    permissionId: string,
-    executor?: TransactionExecutor,
-  ): Promise<void>;
-  findRolesByNames(
-    roleNames: string[],
-    executor?: TransactionExecutor,
-  ): Promise<RoleRecord[]>;
+  deletePermission(permissionId: string, executor?: TransactionExecutor): Promise<void>;
+  findRolesByNames(roleNames: string[], executor?: TransactionExecutor): Promise<RoleRecord[]>;
   findRoleByName(
     name: string,
     organizationId?: string | null,
@@ -188,16 +156,14 @@ export interface AccessControlRepositoryPort {
     organizationId: string | null,
     executor?: TransactionExecutor,
   ): Promise<void>;
-  findAllRoles(
-    executor?: TransactionExecutor,
-  ): Promise<RoleRecord[]>;
+  findAllRoles(executor?: TransactionExecutor): Promise<RoleRecord[]>;
   findRolesPaginated(
     params: {
       page: number;
       limit: number;
       organizationId?: string | undefined;
       search?: string | undefined;
-      scope?: 'platform' | 'organization' | undefined;
+      scope?: "platform" | "organization" | undefined;
       manageableByOrg?: string | null | undefined;
     },
     executor?: TransactionExecutor,
@@ -215,4 +181,4 @@ export interface AccessControlRepositoryPort {
   ): Promise<void>;
 }
 
-export const ACCESS_CONTROL_REPOSITORY = Symbol('ACCESS_CONTROL_REPOSITORY');
+export const ACCESS_CONTROL_REPOSITORY = Symbol("ACCESS_CONTROL_REPOSITORY");

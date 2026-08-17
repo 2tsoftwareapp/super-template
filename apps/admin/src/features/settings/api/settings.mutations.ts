@@ -14,13 +14,8 @@ export function useUpdateSettingMutation(options?: {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      key,
-      value,
-    }: {
-      key: string;
-      value: ApplicationSettingDto["value"];
-    }) => settingsApi.update(key, value),
+    mutationFn: ({ key, value }: { key: string; value: ApplicationSettingDto["value"] }) =>
+      settingsApi.update(key, value),
     onSuccess: async (data) => {
       await queryClient.invalidateQueries({ queryKey: settingsKeys.all });
       options?.onSuccess?.(data);

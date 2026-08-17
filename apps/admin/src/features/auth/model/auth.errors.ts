@@ -1,8 +1,4 @@
-import {
-  AUTH_FLOW_ERROR_CODES,
-  AUTH_MESSAGES,
-  type AuthFlowErrorCode,
-} from "./auth.constants";
+import { AUTH_FLOW_ERROR_CODES, AUTH_MESSAGES, type AuthFlowErrorCode } from "./auth.constants";
 
 const authFlowMessages: Record<AuthFlowErrorCode, string> = {
   [AUTH_FLOW_ERROR_CODES.mfaRequired]: AUTH_MESSAGES.mfaRequired,

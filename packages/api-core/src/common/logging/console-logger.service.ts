@@ -1,33 +1,24 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger } from "@nestjs/common";
 
-import {
-  type AppLogger,
-  type LogContext,
-  type LogEntry,
-  type LogLevel,
-} from './logger.interface';
+import { type AppLogger, type LogContext, type LogEntry, type LogLevel } from "./logger.interface";
 
 @Injectable()
 export class ConsoleAppLogger implements AppLogger {
-  private readonly logger = new Logger('App');
+  private readonly logger = new Logger("App");
 
   info(message: string, context?: LogContext): void {
-    this.write('info', message, context);
+    this.write("info", message, context);
   }
 
   warn(message: string, context?: LogContext): void {
-    this.write('warn', message, context);
+    this.write("warn", message, context);
   }
 
   error(message: string, context?: LogContext): void {
-    this.write('error', message, context);
+    this.write("error", message, context);
   }
 
-  private write(
-    level: LogLevel,
-    message: string,
-    context?: LogContext,
-  ): void {
+  private write(level: LogLevel, message: string, context?: LogContext): void {
     const payload: LogEntry = {
       timestamp: new Date().toISOString(),
       level,
@@ -40,9 +31,9 @@ export class ConsoleAppLogger implements AppLogger {
       ...(context ?? {}),
     });
 
-    if (level === 'error') {
+    if (level === "error") {
       this.logger.error(serialized);
-    } else if (level === 'warn') {
+    } else if (level === "warn") {
       this.logger.warn(serialized);
     } else {
       this.logger.log(serialized);

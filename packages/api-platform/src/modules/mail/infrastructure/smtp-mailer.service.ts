@@ -1,10 +1,10 @@
-import type { SendMailOptions } from 'nodemailer';
+import type { SendMailOptions } from "nodemailer";
 
-import { Injectable } from '@nestjs/common';
-import { EnvironmentService } from '@repo/api-core';
-import { createTransport, type Transporter } from 'nodemailer';
+import { Injectable } from "@nestjs/common";
+import { EnvironmentService } from "@repo/api-core";
+import { createTransport, type Transporter } from "nodemailer";
 
-import type { Mailer, MailMessage } from '../application/mailer.interface';
+import type { Mailer, MailMessage } from "../application/mailer.interface";
 
 @Injectable()
 export class SmtpMailerService implements Mailer {

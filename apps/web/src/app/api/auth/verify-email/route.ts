@@ -2,11 +2,7 @@ import type { NextRequest } from "next/server";
 
 import { NextResponse } from "next/server";
 
-import {
-  callBackend,
-  enforceMutationGuard,
-  enforceOrigin,
-} from "@/lib/server/backend";
+import { callBackend, enforceMutationGuard, enforceOrigin } from "@/lib/server/backend";
 
 export async function POST(request: NextRequest) {
   const guardFailure = await enforceMutationGuard(request);

@@ -1,8 +1,8 @@
-import js from '@eslint/js';
-import globals from 'globals';
-import perfectionistPlugin from 'eslint-plugin-perfectionist';
-import tseslint from 'typescript-eslint';
-import eslintConfigPrettier from 'eslint-config-prettier';
+import js from "@eslint/js";
+import globals from "globals";
+import perfectionistPlugin from "eslint-plugin-perfectionist";
+import tseslint from "typescript-eslint";
+import eslintConfigPrettier from "eslint-config-prettier";
 
 export const baseConfig = [
   js.configs.recommended,
@@ -23,34 +23,34 @@ export const baseConfig = [
       },
     },
     rules: {
-      '@typescript-eslint/consistent-type-assertions': [
-        'error',
+      "@typescript-eslint/consistent-type-assertions": [
+        "error",
         {
-          assertionStyle: 'as',
-          objectLiteralTypeAssertions: 'allow',
+          assertionStyle: "as",
+          objectLiteralTypeAssertions: "allow",
         },
       ],
-      '@typescript-eslint/consistent-type-imports': 'error',
-      '@typescript-eslint/no-explicit-any': 'error',
-      '@typescript-eslint/no-misused-promises': [
-        'error',
+      "@typescript-eslint/consistent-type-imports": "error",
+      "@typescript-eslint/no-explicit-any": "error",
+      "@typescript-eslint/no-misused-promises": [
+        "error",
         {
           checksVoidReturn: {
             attributes: false,
           },
         },
       ],
-      '@typescript-eslint/no-unused-vars': [
-        'error',
+      "@typescript-eslint/no-unused-vars": [
+        "error",
         {
-          argsIgnorePattern: '^_',
-          varsIgnorePattern: '^_',
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
         },
       ],
-      'perfectionist/sort-exports': 'error',
-      'perfectionist/sort-imports': 'error',
-      'perfectionist/sort-named-exports': 'error',
-      'perfectionist/sort-named-imports': 'error',
+      "perfectionist/sort-exports": "error",
+      "perfectionist/sort-imports": "error",
+      "perfectionist/sort-named-exports": "error",
+      "perfectionist/sort-named-imports": "error",
     },
   },
 ];

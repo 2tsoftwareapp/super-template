@@ -1,27 +1,27 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from "vitest";
 
-import { ConfirmImportUseCase } from '../confirm-import.use-case';
+import { ConfirmImportUseCase } from "../confirm-import.use-case";
 
 const actor = {
-  userId: 'user-1',
-  sessionId: 'session-1',
-  email: 'admin@example.local',
-  displayName: 'Admin',
-  status: 'ACTIVE' as const,
-  roles: ['ADMIN'],
+  userId: "user-1",
+  sessionId: "session-1",
+  email: "admin@example.local",
+  displayName: "Admin",
+  status: "ACTIVE" as const,
+  roles: ["ADMIN"],
   permissions: [],
-  organizationId: 'org-1',
+  organizationId: "org-1",
 };
 
-describe('ConfirmImportUseCase', () => {
-  it('imports rows using savepoints and continues on row failure', async () => {
+describe("ConfirmImportUseCase", () => {
+  it("imports rows using savepoints and continues on row failure", async () => {
     const importJob = {
-      id: 'job-1',
-      createdById: 'user-1',
-      type: 'users',
-      fileId: 'file-1',
-      organizationId: 'org-1',
-      status: 'PENDING',
+      id: "job-1",
+      createdById: "user-1",
+      type: "users",
+      fileId: "file-1",
+      organizationId: "org-1",
+      status: "PENDING",
       confirmedAt: null,
       completedAt: null,
       rowCount: null,
@@ -33,18 +33,14 @@ describe('ConfirmImportUseCase', () => {
     };
 
     const file = {
-      id: 'file-1',
-      organizationId: 'org-1',
-      storageKey: 'imports/file.csv',
+      id: "file-1",
+      organizationId: "org-1",
+      storageKey: "imports/file.csv",
     };
 
     const parsedData = {
-      headers: ['name'],
-      rows: [
-        { name: 'Row 1' },
-        { name: 'Row 2 Error' },
-        { name: 'Row 3' },
-      ],
+      headers: ["name"],
+      rows: [{ name: "Row 1" }, { name: "Row 2 Error" }, { name: "Row 3" }],
       totalRows: 3,
     };
 
@@ -60,8 +56,8 @@ describe('ConfirmImportUseCase', () => {
 
     const adapter = {
       importRow: vi.fn(async (row: { name: string }) => {
-        if (row.name === 'Row 2 Error') {
-          throw new Error('Constraint violation');
+        if (row.name === "Row 2 Error") {
+          throw new Error("Constraint violation");
         }
       }),
     };
@@ -90,31 +86,18 @@ describe('ConfirmImportUseCase', () => {
         errorCount: (job.errorCount as number | null) ?? null,
         errors: (job.errors as unknown[] | null) ?? null,
         createdById: String(job.createdById),
-        confirmedAt:
-          job.confirmedAt instanceof Date
-            ? job.confirmedAt.toISOString()
-            : null,
-        completedAt:
-          job.completedAt instanceof Date
-            ? job.completedAt.toISOString()
-            : null,
+        confirmedAt: job.confirmedAt instanceof Date ? job.confirmedAt.toISOString() : null,
+        completedAt: job.completedAt instanceof Date ? job.completedAt.toISOString() : null,
         createdAt:
-          job.createdAt instanceof Date
-            ? job.createdAt.toISOString()
-            : new Date().toISOString(),
+          job.createdAt instanceof Date ? job.createdAt.toISOString() : new Date().toISOString(),
         updatedAt:
-          job.updatedAt instanceof Date
-            ? job.updatedAt.toISOString()
-            : new Date().toISOString(),
+          job.updatedAt instanceof Date ? job.updatedAt.toISOString() : new Date().toISOString(),
       })),
     };
 
     const transactionPort = {
       run: vi.fn(async (cb: (tx: unknown) => Promise<unknown>) => cb({})),
-      withSavepoint: vi.fn(
-        async (_tx: unknown, _name: string, cb: () => Promise<unknown>) =>
-          cb(),
-      ),
+      withSavepoint: vi.fn(async (_tx: unknown, _name: string, cb: () => Promise<unknown>) => cb()),
     };
 
     const activityEmitter = {
@@ -132,39 +115,30 @@ describe('ConfirmImportUseCase', () => {
       activityEmitter as never,
     );
 
-    const result = await useCase.execute(actor, 'job-1');
+    const result = await useCase.execute(actor, "job-1");
 
-    expect(importJobsRepository.findById).toHaveBeenCalledWith('job-1');
-    expect(importJobsRepository.confirm).toHaveBeenCalledWith(
-      'job-1',
-      expect.anything(),
-    );
-    expect(fileAccessService.findAccessibleFile).toHaveBeenCalledWith(
-      actor,
-      'file-1',
-    );
-    expect(importFileParser.parseImportFile).toHaveBeenCalledWith(
-      'users',
-      'imports/file.csv',
-    );
+    expect(importJobsRepository.findById).toHaveBeenCalledWith("job-1");
+    expect(importJobsRepository.confirm).toHaveBeenCalledWith("job-1", expect.anything());
+    expect(fileAccessService.findAccessibleFile).toHaveBeenCalledWith(actor, "file-1");
+    expect(importFileParser.parseImportFile).toHaveBeenCalledWith("users", "imports/file.csv");
 
     expect(adapter.importRow).toHaveBeenCalledTimes(3);
     expect(transactionPort.withSavepoint).toHaveBeenCalledTimes(3);
 
     expect(importJobsRepository.update).toHaveBeenCalledWith(
-      'job-1',
+      "job-1",
       expect.objectContaining({
-        status: 'FAILED',
+        status: "FAILED",
         successCount: 2,
         errorCount: 1,
-        errors: [{ row: 2, message: 'Constraint violation' }],
+        errors: [{ row: 2, message: "Constraint violation" }],
       }),
       expect.anything(),
     );
 
     expect(auditService.log).toHaveBeenCalledWith(
       expect.objectContaining({
-        action: 'import.confirmed',
+        action: "import.confirmed",
         metadata: { successCount: 2, errorCount: 1 },
       }),
       expect.anything(),
@@ -172,29 +146,29 @@ describe('ConfirmImportUseCase', () => {
 
     expect(activityEmitter.emit).toHaveBeenCalledWith(
       expect.objectContaining({
-        organizationId: 'org-1',
+        organizationId: "org-1",
         summary: expect.stringContaining('Import "users" confirmed'),
-        entityType: 'import_job',
-        entityId: 'job-1',
-        actorId: 'user-1',
+        entityType: "import_job",
+        entityId: "job-1",
+        actorId: "user-1",
         metadata: { successCount: 2, errorCount: 1 },
       }),
       expect.anything(),
     );
 
-    expect(result.status).toBe('FAILED');
+    expect(result.status).toBe("FAILED");
     expect(result.successCount).toBe(2);
     expect(result.errorCount).toBe(1);
   });
 
-  it('aborts with a conflict when the job is confirmed concurrently', async () => {
+  it("aborts with a conflict when the job is confirmed concurrently", async () => {
     const importJob = {
-      id: 'job-1',
-      createdById: 'user-1',
-      type: 'users',
-      fileId: 'file-1',
-      organizationId: 'org-1',
-      status: 'PENDING',
+      id: "job-1",
+      createdById: "user-1",
+      type: "users",
+      fileId: "file-1",
+      organizationId: "org-1",
+      status: "PENDING",
       confirmedAt: null,
       completedAt: null,
       rowCount: null,
@@ -218,19 +192,16 @@ describe('ConfirmImportUseCase', () => {
 
     const transactionPort = {
       run: vi.fn(async (cb: (tx: unknown) => Promise<unknown>) => cb({})),
-      withSavepoint: vi.fn(
-        async (_tx: unknown, _name: string, cb: () => Promise<unknown>) =>
-          cb(),
-      ),
+      withSavepoint: vi.fn(async (_tx: unknown, _name: string, cb: () => Promise<unknown>) => cb()),
     };
 
     const useCase = new ConfirmImportUseCase(
       importJobsRepository as never,
       {
         findAccessibleFile: vi.fn(async () => ({
-          id: 'file-1',
-          organizationId: 'org-1',
-          storageKey: 'imports/file.csv',
+          id: "file-1",
+          organizationId: "org-1",
+          storageKey: "imports/file.csv",
         })),
       } as never,
       {
@@ -238,7 +209,7 @@ describe('ConfirmImportUseCase', () => {
         getImportPermissions: vi.fn(() => []),
       } as never,
       {
-        parseImportFile: vi.fn(async () => ({ rows: [{ name: 'Row 1' }] })),
+        parseImportFile: vi.fn(async () => ({ rows: [{ name: "Row 1" }] })),
       } as never,
       { log: vi.fn() } as never,
       {
@@ -251,8 +222,8 @@ describe('ConfirmImportUseCase', () => {
       { emit: vi.fn() } as never,
     );
 
-    await expect(useCase.execute(actor, 'job-1')).rejects.toMatchObject({
-      code: 'RESOURCE_CONFLICT',
+    await expect(useCase.execute(actor, "job-1")).rejects.toMatchObject({
+      code: "RESOURCE_CONFLICT",
     });
 
     // No rows were imported and no final status was written.

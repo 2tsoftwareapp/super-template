@@ -1,28 +1,22 @@
-import type {
-  AuthenticatedRequestUser,
-  RequestContext,
-} from '@repo/api-core';
-import type { TransactionPort } from '@repo/api-core';
+import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-core";
+import type { TransactionPort } from "@repo/api-core";
 
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { 
+import { HttpStatus, Inject, Injectable } from "@nestjs/common";
+import {
   AppError,
   AUDIT_WRITER,
   type AuditWriter,
   ERROR_CODES,
   SYSTEM_SCOPE,
-} from '@repo/api-core';
-import { TRANSACTION_PORT } from '@repo/api-core';
+} from "@repo/api-core";
+import { TRANSACTION_PORT } from "@repo/api-core";
 
+import { hashPassword, verifyPassword } from "../../../auth/application/auth.helpers";
 import {
-  hashPassword,
-  verifyPassword,
-} from '../../../auth/application/auth.helpers';
-import { AUTH_SESSION_REPOSITORY, type AuthSessionRepositoryPort } from '../../../auth/application/ports/auth-session.repository.port';
-import {
-  USERS_REPOSITORY,
-  type UsersRepositoryPort,
-} from '../ports/users.repository.port';
+  AUTH_SESSION_REPOSITORY,
+  type AuthSessionRepositoryPort,
+} from "../../../auth/application/ports/auth-session.repository.port";
+import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";
 
 @Injectable()
 export class ChangePasswordUseCase {
@@ -43,27 +37,20 @@ export class ChangePasswordUseCase {
     const user = await this.usersRepository.findById(actor.userId);
 
     if (!user) {
-      throw new AppError(
-        ERROR_CODES.USER_NOT_FOUND,
-        'User not found',
-        HttpStatus.NOT_FOUND,
-      );
+      throw new AppError(ERROR_CODES.USER_NOT_FOUND, "User not found", HttpStatus.NOT_FOUND);
     }
 
-    const passwordMatches = await verifyPassword(
-      user.passwordHash,
-      currentPassword,
-    );
+    const passwordMatches = await verifyPassword(user.passwordHash, currentPassword);
 
     if (!passwordMatches) {
       throw new AppError(
         ERROR_CODES.AUTH_INVALID_CREDENTIALS,
-        'Current password is incorrect',
+        "Current password is incorrect",
         HttpStatus.UNAUTHORIZED,
       );
     }
 
-    await this.transactionPort.run( async (transaction) => {
+    await this.transactionPort.run(async (transaction) => {
       await this.usersRepository.update(
         actor.userId,
         {
@@ -72,18 +59,17 @@ export class ChangePasswordUseCase {
         },
         transaction,
       );
-      await this.authRepository.revokeAllSessionsForUser(
-        actor.userId,
-        transaction,
-      );
+      await this.authRepository.revokeAllSessionsForUser(actor.userId, transaction);
       await this.auditWriter.log(
         {
           actorId: actor.userId,
-          action: 'user.password.changed',
-          entityType: 'user',
+          action: "user.password.changed",
+          entityType: "user",
           entityId: actor.userId,
           requestContext,
-            ...(actor.organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: actor.organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
+          ...(actor.organizationId
+            ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: actor.organizationId }
+            : { scope: SYSTEM_SCOPE.PLATFORM }),
         },
         transaction,
       );

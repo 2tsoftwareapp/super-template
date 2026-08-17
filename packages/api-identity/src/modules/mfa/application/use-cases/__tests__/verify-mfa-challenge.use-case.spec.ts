@@ -1,11 +1,11 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from "vitest";
 
-import { ERROR_CODES } from '@repo/api-core';
+import { ERROR_CODES } from "@repo/api-core";
 
-import { VerifyMfaChallengeUseCase } from '../verify-mfa-challenge.use-case';
+import { VerifyMfaChallengeUseCase } from "../verify-mfa-challenge.use-case";
 
-describe('VerifyMfaChallengeUseCase', () => {
-  it('rejects an unknown or expired challenge', async () => {
+describe("VerifyMfaChallengeUseCase", () => {
+  it("rejects an unknown or expired challenge", async () => {
     const mfaRepository = {
       findValidChallengeByTokenHash: vi.fn(async () => null),
     };
@@ -17,18 +17,18 @@ describe('VerifyMfaChallengeUseCase', () => {
 
     await expect(
       useCase.execute({
-        mfaToken: 'bad-token',
-        code: '000000',
+        mfaToken: "bad-token",
+        code: "000000",
         metadata: { ipAddress: null, userAgent: null },
       }),
     ).rejects.toMatchObject({ code: ERROR_CODES.MFA_CHALLENGE_INVALID });
   });
 
-  it('rejects once max attempts are exceeded', async () => {
+  it("rejects once max attempts are exceeded", async () => {
     const mfaRepository = {
       findValidChallengeByTokenHash: vi.fn(async () => ({
-        id: 'c1',
-        userId: 'u1',
+        id: "c1",
+        userId: "u1",
         attempts: 5,
       })),
     };
@@ -40,18 +40,18 @@ describe('VerifyMfaChallengeUseCase', () => {
 
     await expect(
       useCase.execute({
-        mfaToken: 'token',
-        code: '000000',
+        mfaToken: "token",
+        code: "000000",
         metadata: { ipAddress: null, userAgent: null },
       }),
     ).rejects.toMatchObject({ code: ERROR_CODES.MFA_TOO_MANY_ATTEMPTS });
   });
 
-  it('increments attempts and rejects an invalid code', async () => {
+  it("increments attempts and rejects an invalid code", async () => {
     const mfaRepository = {
       findValidChallengeByTokenHash: vi.fn(async () => ({
-        id: 'c1',
-        userId: 'u1',
+        id: "c1",
+        userId: "u1",
         attempts: 0,
       })),
       incrementChallengeAttempts: vi.fn(async () => undefined),
@@ -65,25 +65,23 @@ describe('VerifyMfaChallengeUseCase', () => {
 
     await expect(
       useCase.execute({
-        mfaToken: 'token',
-        code: '000000',
+        mfaToken: "token",
+        code: "000000",
         metadata: { ipAddress: null, userAgent: null },
       }),
     ).rejects.toMatchObject({ code: ERROR_CODES.MFA_INVALID_CODE });
 
-    expect(mfaRepository.incrementChallengeAttempts).toHaveBeenCalledWith(
-      'c1',
-    );
+    expect(mfaRepository.incrementChallengeAttempts).toHaveBeenCalledWith("c1");
     expect(auditWriter.log).toHaveBeenCalledWith(
-      expect.objectContaining({ action: 'mfa.challenge.failed' }),
+      expect.objectContaining({ action: "mfa.challenge.failed" }),
     );
   });
 
-  it('consumes the challenge and returns the user id on success', async () => {
+  it("consumes the challenge and returns the user id on success", async () => {
     const mfaRepository = {
       findValidChallengeByTokenHash: vi.fn(async () => ({
-        id: 'c1',
-        userId: 'u1',
+        id: "c1",
+        userId: "u1",
         attempts: 0,
       })),
       consumeChallenge: vi.fn(async () => true),
@@ -96,23 +94,23 @@ describe('VerifyMfaChallengeUseCase', () => {
     );
 
     const result = await useCase.execute({
-      mfaToken: 'token',
-      code: '123456',
+      mfaToken: "token",
+      code: "123456",
       metadata: { ipAddress: null, userAgent: null },
     });
 
-    expect(result).toEqual({ userId: 'u1' });
-    expect(mfaRepository.consumeChallenge).toHaveBeenCalledWith('c1');
+    expect(result).toEqual({ userId: "u1" });
+    expect(mfaRepository.consumeChallenge).toHaveBeenCalledWith("c1");
     expect(auditWriter.log).toHaveBeenCalledWith(
-      expect.objectContaining({ action: 'mfa.challenge.succeeded' }),
+      expect.objectContaining({ action: "mfa.challenge.succeeded" }),
     );
   });
 
-  it('rejects a challenge a concurrent request already consumed (no double login)', async () => {
+  it("rejects a challenge a concurrent request already consumed (no double login)", async () => {
     const mfaRepository = {
       findValidChallengeByTokenHash: vi.fn(async () => ({
-        id: 'c1',
-        userId: 'u1',
+        id: "c1",
+        userId: "u1",
         attempts: 0,
       })),
       consumeChallenge: vi.fn(async () => false),
@@ -128,8 +126,8 @@ describe('VerifyMfaChallengeUseCase', () => {
     // used by another request, so this one must NOT authenticate.
     await expect(
       useCase.execute({
-        mfaToken: 'token',
-        code: '123456',
+        mfaToken: "token",
+        code: "123456",
         metadata: { ipAddress: null, userAgent: null },
       }),
     ).rejects.toMatchObject({ code: ERROR_CODES.MFA_CHALLENGE_INVALID });

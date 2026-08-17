@@ -1,14 +1,9 @@
-import type { Pool } from 'pg';
+import type { Pool } from "pg";
 
-import {
-  Inject,
-  Injectable,
-  Logger,
-  type OnModuleInit,
-} from '@nestjs/common';
-import { EnvironmentService } from '@repo/api-core';
+import { Inject, Injectable, Logger, type OnModuleInit } from "@nestjs/common";
+import { EnvironmentService } from "@repo/api-core";
 
-import { DATABASE_POOL } from './database.provider';
+import { DATABASE_POOL } from "./database.provider";
 
 interface RoleCapabilitiesRow {
   currentUser: string;
@@ -28,7 +23,7 @@ export class DatabaseRlsGuard implements OnModuleInit {
   async onModuleInit(): Promise<void> {
     if (this.environmentService.databaseSkipRlsCheck) {
       this.logger.warn(
-        'DATABASE_SKIP_RLS_CHECK is enabled; skipping database RLS capability check',
+        "DATABASE_SKIP_RLS_CHECK is enabled; skipping database RLS capability check",
       );
       return;
     }
@@ -45,23 +40,19 @@ export class DatabaseRlsGuard implements OnModuleInit {
     const capabilities = result.rows[0];
 
     if (!capabilities) {
-      throw new Error(
-        'Database RLS guard could not resolve the current PostgreSQL role',
-      );
+      throw new Error("Database RLS guard could not resolve the current PostgreSQL role");
     }
 
     if (capabilities.isSuperuser || capabilities.bypassesRls) {
       throw new Error(
         `DATABASE_URL connects as "${capabilities.currentUser}", which bypasses row-level security ` +
           `(rolsuper=${capabilities.isSuperuser}, rolbypassrls=${capabilities.bypassesRls}). ` +
-          'Use the restricted application role from migration 0007_app_database_role.sql ' +
-          '(for example fullstack_starter_app) for DATABASE_URL, and keep a privileged ' +
-          'DATABASE_MIGRATE_URL for migrations and db:reset.',
+          "Use the restricted application role from migration 0007_app_database_role.sql " +
+          "(for example fullstack_starter_app) for DATABASE_URL, and keep a privileged " +
+          "DATABASE_MIGRATE_URL for migrations and db:reset.",
       );
     }
 
-    this.logger.log(
-      `Database RLS guard passed for restricted role "${capabilities.currentUser}"`,
-    );
+    this.logger.log(`Database RLS guard passed for restricted role "${capabilities.currentUser}"`);
   }
 }

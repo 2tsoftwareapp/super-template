@@ -1,4 +1,4 @@
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import {
   AppError,
   type AuthenticatedRequestUser,
@@ -8,20 +8,20 @@ import {
   SYSTEM_SCOPE,
   TRANSACTION_PORT,
   type TransactionPort,
-} from '@repo/api-core';
+} from "@repo/api-core";
 
-import type { CreateImportCommand, ImportJobView } from '../imports.types';
+import type { CreateImportCommand, ImportJobView } from "../imports.types";
 
-import { ImportExportAdapterRegistry } from '../../../../import-export/import-export-adapter.registry';
-import { AuditService } from '../../../audit/application/audit.service';
-import { FileAccessService } from '../../../files/application/services/file-access.service';
-import { MAX_IMPORT_ROWS } from '../../domain/import-types';
+import { ImportExportAdapterRegistry } from "../../../../import-export/import-export-adapter.registry";
+import { AuditService } from "../../../audit/application/audit.service";
+import { FileAccessService } from "../../../files/application/services/file-access.service";
+import { MAX_IMPORT_ROWS } from "../../domain/import-types";
 import {
   IMPORT_JOBS_REPOSITORY,
   type ImportJobsRepositoryPort,
-} from '../ports/imports.repository.port';
-import { ImportFileParserService } from '../services/import-file-parser.service';
-import { GetImportUseCase } from './get-import.use-case';
+} from "../ports/imports.repository.port";
+import { ImportFileParserService } from "../services/import-file-parser.service";
+import { GetImportUseCase } from "./get-import.use-case";
 
 @Injectable()
 export class CreateImportUseCase {
@@ -41,15 +41,12 @@ export class CreateImportUseCase {
     input: CreateImportCommand,
     requestContext?: RequestContext,
   ): Promise<ImportJobView> {
-    const file = await this.fileAccessService.findAccessibleFile(
-      actor,
-      input.fileId,
-    );
+    const file = await this.fileAccessService.findAccessibleFile(actor, input.fileId);
 
     if (!file.organizationId) {
       throw new AppError(
         ERROR_CODES.VALIDATION_FAILED,
-        'Cannot import a global file',
+        "Cannot import a global file",
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -74,7 +71,7 @@ export class CreateImportUseCase {
       organizationId,
       type: input.type,
       fileId: input.fileId,
-      status: 'PENDING' as const,
+      status: "PENDING" as const,
       createdById: actor.userId,
     };
 
@@ -96,7 +93,7 @@ export class CreateImportUseCase {
           : await this.importJobsRepository.create(jobValues, tx);
 
         if (!jobRecord) {
-          throw new Error('Import job insert returned no rows');
+          throw new Error("Import job insert returned no rows");
         }
 
         const isCreated = idempotentResult ? idempotentResult.created : true;
@@ -105,8 +102,8 @@ export class CreateImportUseCase {
           await this.auditService.log(
             {
               actorId: actor.userId,
-              action: 'import.created',
-              entityType: 'import_job',
+              action: "import.created",
+              entityType: "import_job",
               entityId: jobRecord.id,
               metadata: { type: input.type, fileId: input.fileId },
               requestContext,
@@ -125,10 +122,7 @@ export class CreateImportUseCase {
       return this.getImportUseCase.execute(actor, job.id);
     }
 
-    const parsed = await this.importFileParser.parseImportFile(
-      input.type,
-      file.storageKey,
-    );
+    const parsed = await this.importFileParser.parseImportFile(input.type, file.storageKey);
 
     if (parsed.rows.length > MAX_IMPORT_ROWS) {
       const tooManyRowsError: ImportValidationError = {
@@ -136,7 +130,7 @@ export class CreateImportUseCase {
         message: `Import exceeds the maximum of ${MAX_IMPORT_ROWS} rows`,
       };
       await this.importJobsRepository.update(job.id, {
-        status: 'FAILED',
+        status: "FAILED",
         rowCount: parsed.rows.length,
         successCount: 0,
         errorCount: 1,
@@ -148,7 +142,7 @@ export class CreateImportUseCase {
     const errors = this.importFileParser.validateRows(input.type, parsed.rows);
 
     await this.importJobsRepository.update(job.id, {
-      status: errors.length > 0 ? 'FAILED' : 'PROCESSING',
+      status: errors.length > 0 ? "FAILED" : "PROCESSING",
       rowCount: parsed.rows.length,
       successCount: errors.length > 0 ? 0 : parsed.rows.length,
       errorCount: errors.length,

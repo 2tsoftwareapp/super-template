@@ -1,14 +1,11 @@
-import type {
-  DatabaseClient,
-  DatabaseExecutor,
-} from '@repo/api-database';
+import type { DatabaseClient, DatabaseExecutor } from "@repo/api-database";
 
-import { Inject, Injectable } from '@nestjs/common';
-import { DATABASE } from '@repo/api-database';
-import { auditLogs } from '@repo/api-database';
-import { and, count, desc, eq, gte, ilike, lt, or, sql, type SQL } from 'drizzle-orm';
+import { Inject, Injectable } from "@nestjs/common";
+import { DATABASE } from "@repo/api-database";
+import { auditLogs } from "@repo/api-database";
+import { and, count, desc, eq, gte, ilike, lt, or, sql, type SQL } from "drizzle-orm";
 
-import type { AuditRepositoryPort } from '../application/ports/audit.repository.port';
+import type { AuditRepositoryPort } from "../application/ports/audit.repository.port";
 
 interface ListAuditLogsParams {
   page: number;
@@ -22,12 +19,12 @@ interface ListAuditLogsParams {
   to?: string;
   /** Free-text match against action, entity type, and request ID. */
   q?: string;
-  sortOrder: 'asc' | 'desc';
+  sortOrder: "asc" | "desc";
 }
 
 type AuditLogSearchParams = Pick<
   ListAuditLogsParams,
-  'organizationId' | 'actorId' | 'action' | 'resourceType' | 'resourceId' | 'from' | 'to' | 'q'
+  "organizationId" | "actorId" | "action" | "resourceType" | "resourceId" | "from" | "to" | "q"
 >;
 
 const buildAuditLogFilters = (params: AuditLogSearchParams): SQL[] => {
@@ -86,16 +83,10 @@ const buildAuditLogFilters = (params: AuditLogSearchParams): SQL[] => {
 export class AuditRepository implements AuditRepositoryPort {
   constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
 
-  async list(
-    params: ListAuditLogsParams,
-    executor: DatabaseExecutor = this.database,
-  ) {
+  async list(params: ListAuditLogsParams, executor: DatabaseExecutor = this.database) {
     const filters = buildAuditLogFilters(params);
     const whereClause = filters.length ? and(...filters) : undefined;
-    const orderBy =
-      params.sortOrder === 'asc'
-        ? auditLogs.createdAt
-        : desc(auditLogs.createdAt);
+    const orderBy = params.sortOrder === "asc" ? auditLogs.createdAt : desc(auditLogs.createdAt);
     const offset = (params.page - 1) * params.limit;
 
     const [rows, totalResult] = await Promise.all([
@@ -137,10 +128,7 @@ export class AuditRepository implements AuditRepositoryPort {
   ): Promise<number> {
     const filters = buildAuditLogFilters(params);
     const whereClause = filters.length ? and(...filters) : undefined;
-    const [result] = await executor
-      .select({ total: count() })
-      .from(auditLogs)
-      .where(whereClause);
+    const [result] = await executor.select({ total: count() }).from(auditLogs).where(whereClause);
     return Number(result?.total ?? 0);
   }
 
@@ -168,9 +156,7 @@ export class AuditRepository implements AuditRepositoryPort {
     lockId: number,
     executor: DatabaseExecutor = this.database,
   ): Promise<boolean> {
-    const result = await executor.execute(
-      sql`SELECT pg_try_advisory_lock(${lockId}) AS acquired`,
-    );
+    const result = await executor.execute(sql`SELECT pg_try_advisory_lock(${lockId}) AS acquired`);
     const row = result.rows?.[0] as { acquired: boolean } | undefined;
     return row?.acquired === true;
   }
@@ -179,22 +165,13 @@ export class AuditRepository implements AuditRepositoryPort {
     lockId: number,
     executor: DatabaseExecutor = this.database,
   ): Promise<boolean> {
-    const result = await executor.execute(
-      sql`SELECT pg_advisory_unlock(${lockId}) AS released`,
-    );
+    const result = await executor.execute(sql`SELECT pg_advisory_unlock(${lockId}) AS released`);
     const row = result.rows?.[0] as { released: boolean } | undefined;
     return row?.released === true;
   }
 
-  async findById(
-    id: string,
-    executor: DatabaseExecutor = this.database,
-  ) {
-    const [row] = await executor
-      .select()
-      .from(auditLogs)
-      .where(eq(auditLogs.id, id))
-      .limit(1);
+  async findById(id: string, executor: DatabaseExecutor = this.database) {
+    const [row] = await executor.select().from(auditLogs).where(eq(auditLogs.id, id)).limit(1);
     return row ?? null;
   }
 
@@ -202,13 +179,10 @@ export class AuditRepository implements AuditRepositoryPort {
     values: typeof auditLogs.$inferInsert,
     executor: DatabaseExecutor = this.database,
   ): Promise<typeof auditLogs.$inferSelect> {
-    const [auditLog] = await executor
-      .insert(auditLogs)
-      .values(values)
-      .returning();
+    const [auditLog] = await executor.insert(auditLogs).values(values).returning();
 
     if (!auditLog) {
-      throw new Error('Audit log insert returned no rows');
+      throw new Error("Audit log insert returned no rows");
     }
 
     return auditLog;

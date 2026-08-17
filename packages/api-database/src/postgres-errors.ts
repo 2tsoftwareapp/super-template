@@ -1,5 +1,5 @@
 const readPostgresErrorCode = (error: unknown): string | undefined => {
-  if (typeof error !== 'object' || error === null) {
+  if (typeof error !== "object" || error === null) {
     return undefined;
   }
 
@@ -9,7 +9,7 @@ const readPostgresErrorCode = (error: unknown): string | undefined => {
   }
 
   const cause = (error as { cause?: unknown }).cause;
-  if (typeof cause === 'object' && cause !== null) {
+  if (typeof cause === "object" && cause !== null) {
     return (cause as { code?: string }).code;
   }
 
@@ -17,4 +17,4 @@ const readPostgresErrorCode = (error: unknown): string | undefined => {
 };
 
 export const isPostgresUniqueViolation = (error: unknown): boolean =>
-  readPostgresErrorCode(error) === '23505';
+  readPostgresErrorCode(error) === "23505";

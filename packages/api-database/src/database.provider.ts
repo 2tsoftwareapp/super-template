@@ -1,14 +1,14 @@
-import type { Provider } from '@nestjs/common';
+import type { Provider } from "@nestjs/common";
 
-import { EnvironmentService, getTenantContext } from '@repo/api-core';
-import { Pool, type PoolClient, type PoolConfig } from 'pg';
+import { EnvironmentService, getTenantContext } from "@repo/api-core";
+import { Pool, type PoolClient, type PoolConfig } from "pg";
 
-import { createDatabaseClient } from './database.types';
-import { setTenantContextOnPgClient } from './tenant-context';
+import { createDatabaseClient } from "./database.types";
+import { setTenantContextOnPgClient } from "./tenant-context";
 
-export const DATABASE_POOL = Symbol('DATABASE_POOL');
-export const ADVISORY_LOCK_POOL = Symbol('ADVISORY_LOCK_POOL');
-export const DATABASE = Symbol('DATABASE');
+export const DATABASE_POOL = Symbol("DATABASE_POOL");
+export const ADVISORY_LOCK_POOL = Symbol("ADVISORY_LOCK_POOL");
+export const DATABASE = Symbol("DATABASE");
 
 type PoolRelease = (err?: Error) => void;
 type PoolConnectCallback = (
@@ -34,9 +34,7 @@ async function executeClientQuery<TResult>(
   client: PoolClient,
   args: readonly unknown[],
 ): Promise<TResult> {
-  return (client.query as (...input: readonly unknown[]) => Promise<TResult>)(
-    ...args,
-  );
+  return (client.query as (...input: readonly unknown[]) => Promise<TResult>)(...args);
 }
 
 export async function withTenantContextClient<T>(
@@ -55,11 +53,11 @@ export async function withTenantContextClient<T>(
 }
 
 export function createTenantAwareConnect(
-  originalConnect: Pool['connect'],
+  originalConnect: Pool["connect"],
   applyTenantContext: (client: PoolClient) => Promise<void>,
-): Pool['connect'] {
+): Pool["connect"] {
   return ((callback?: PoolConnectCallback) => {
-    if (typeof callback === 'function') {
+    if (typeof callback === "function") {
       originalConnect((err, client, release) => {
         if (err || !client) {
           invokeConnectCallback(callback, err, client, release);
@@ -86,30 +84,26 @@ export function createTenantAwareConnect(
 export function createTenantAwareQuery(
   checkoutClient: () => Promise<PoolClient>,
   applyTenantContext: (client: PoolClient) => Promise<void>,
-): Pool['query'] {
+): Pool["query"] {
   return ((...args: unknown[]) => {
     const maybeCallback = args.at(-1);
 
-    if (typeof maybeCallback === 'function') {
+    if (typeof maybeCallback === "function") {
       const callback = maybeCallback as PoolQueryCallback;
       const queryArgs = args.slice(0, -1);
 
-      void withTenantContextClient(
-        checkoutClient,
-        applyTenantContext,
-        (client) => executeClientQuery(client, queryArgs),
+      void withTenantContextClient(checkoutClient, applyTenantContext, (client) =>
+        executeClientQuery(client, queryArgs),
       )
         .then((result) => callback(undefined, result))
         .catch((error: Error) => callback(error, undefined));
       return;
     }
 
-    return withTenantContextClient(
-      checkoutClient,
-      applyTenantContext,
-      (client) => executeClientQuery(client, args),
+    return withTenantContextClient(checkoutClient, applyTenantContext, (client) =>
+      executeClientQuery(client, args),
     );
-  }) as Pool['query'];
+  }) as Pool["query"];
 }
 
 export const createTenantAwarePool = (config: PoolConfig): Pool => {
@@ -138,9 +132,7 @@ export const databaseProviders: Provider[] = [
         : environmentService.databaseUrl;
 
       if (!connectionString) {
-        throw new Error(
-          'DATABASE_URL_TEST is required when APP_ENV=test but was not provided',
-        );
+        throw new Error("DATABASE_URL_TEST is required when APP_ENV=test but was not provided");
       }
 
       return createTenantAwarePool({ connectionString });
@@ -160,9 +152,7 @@ export const databaseProviders: Provider[] = [
         : environmentService.databaseUrl;
 
       if (!connectionString) {
-        throw new Error(
-          'DATABASE_URL_TEST is required when APP_ENV=test but was not provided',
-        );
+        throw new Error("DATABASE_URL_TEST is required when APP_ENV=test but was not provided");
       }
 
       // Dedicated pool for session-level advisory locks.  A small max prevents

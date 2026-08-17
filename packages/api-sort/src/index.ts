@@ -1,4 +1,4 @@
-export type SortOrder = 'asc' | 'desc';
+export type SortOrder = "asc" | "desc";
 
 export interface SortCriterion<TField extends string = string> {
   field: TField;
@@ -12,9 +12,9 @@ function toAllowedFieldSet<TField extends string>(
 }
 
 function parseSortOrder(value: string | undefined): SortOrder | null {
-  const order = (value ?? 'asc').trim().toLowerCase();
+  const order = (value ?? "asc").trim().toLowerCase();
 
-  if (order === 'asc' || order === 'desc') {
+  if (order === "asc" || order === "desc") {
     return order;
   }
 
@@ -43,7 +43,7 @@ function resolveAllowedField<TField extends string>(
 export function formatSortParam<TField extends string>(
   sort: readonly SortCriterion<TField>[],
 ): string {
-  return sort.map((criterion) => `${criterion.field}:${criterion.order}`).join(',');
+  return sort.map((criterion) => `${criterion.field}:${criterion.order}`).join(",");
 }
 
 export function sortCriteriaEqual<TField extends string>(
@@ -56,8 +56,7 @@ export function sortCriteriaEqual<TField extends string>(
 
   return left.every(
     (criterion, index) =>
-      criterion.field === right[index]?.field &&
-      criterion.order === right[index]?.order,
+      criterion.field === right[index]?.field && criterion.order === right[index]?.order,
   );
 }
 
@@ -74,13 +73,13 @@ export function parseSortParam<TField extends string>(
   const parsed: SortCriterion<TField>[] = [];
   const seen = new Set<TField>();
 
-  for (const part of sort.split(',')) {
+  for (const part of sort.split(",")) {
     const trimmed = part.trim();
     if (!trimmed) {
       continue;
     }
 
-    const [fieldRaw, orderRaw] = trimmed.split(':');
+    const [fieldRaw, orderRaw] = trimmed.split(":");
     const field = resolveAllowedField<TField>(fieldRaw, allowed);
     const order = parseSortOrder(orderRaw);
 
@@ -107,9 +106,7 @@ export function sortsFromQuery<TField extends string>(
   },
   allowedFields: ReadonlySet<TField> | readonly TField[],
 ): SortCriterion<TField>[] {
-  return parseSortParam(
-    query.sort,
-    allowedFields,
-    [{ field: query.sortField, order: query.sortOrder }],
-  );
+  return parseSortParam(query.sort, allowedFields, [
+    { field: query.sortField, order: query.sortOrder },
+  ]);
 }

@@ -56,13 +56,9 @@ export function ResourceToolbar({
             </Button>
           ) : null}
         </div>
-        {actions ? (
-          <div className="flex shrink-0 flex-wrap gap-2">{actions}</div>
-        ) : null}
+        {actions ? <div className="flex shrink-0 flex-wrap gap-2">{actions}</div> : null}
       </div>
-      {resultLabel ? (
-        <p className={cn("text-xs text-muted-foreground")}>{resultLabel}</p>
-      ) : null}
+      {resultLabel ? <p className={cn("text-xs text-muted-foreground")}>{resultLabel}</p> : null}
     </div>
   );
 }

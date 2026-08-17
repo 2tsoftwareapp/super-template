@@ -10,10 +10,7 @@ import type {
 } from "@/lib/api-types";
 
 import { webFetch } from "@/lib/http";
-import {
-  fetchMyOrganizations,
-  fetchOrganizationsList,
-} from "@/lib/lookup-api";
+import { fetchMyOrganizations, fetchOrganizationsList } from "@/lib/lookup-api";
 
 /**
  * Organizations transport. BFF catch-all paths use `bffPath`.
@@ -26,13 +23,10 @@ export const organizationsApi = {
   },
 
   switch(organizationId: string) {
-    return webFetch<{ data: { organizationId: string } }>(
-      "/api/auth/switch-organization",
-      {
-        method: "POST",
-        body: JSON.stringify({ organizationId }),
-      },
-    );
+    return webFetch<{ data: { organizationId: string } }>("/api/auth/switch-organization", {
+      method: "POST",
+      body: JSON.stringify({ organizationId }),
+    });
   },
 
   list() {
@@ -40,19 +34,14 @@ export const organizationsApi = {
   },
 
   get(id: string) {
-    return webFetch<{ data: OrganizationDetailDto }>(
-      bffPath("/api/v1/organizations/{id}", { id }),
-    );
+    return webFetch<{ data: OrganizationDetailDto }>(bffPath("/api/v1/organizations/{id}", { id }));
   },
 
   create(input: CreateOrganizationInput) {
-    return webFetch<{ data: OrganizationDto }>(
-      bffPath("/api/v1/organizations"),
-      {
-        method: "POST",
-        body: JSON.stringify(input),
-      },
-    );
+    return webFetch<{ data: OrganizationDto }>(bffPath("/api/v1/organizations"), {
+      method: "POST",
+      body: JSON.stringify(input),
+    });
   },
 
   update(id: string, input: UpdateOrganizationInput) {
@@ -66,10 +55,9 @@ export const organizationsApi = {
   },
 
   delete(id: string) {
-    return webFetch<{ data: { success: boolean } }>(
-      bffPath("/api/v1/organizations/{id}", { id }),
-      { method: "DELETE" },
-    );
+    return webFetch<{ data: { success: boolean } }>(bffPath("/api/v1/organizations/{id}", { id }), {
+      method: "DELETE",
+    });
   },
 
   leave(id: string) {

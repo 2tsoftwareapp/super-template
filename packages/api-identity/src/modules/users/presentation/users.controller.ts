@@ -1,23 +1,19 @@
-import type { AuthenticatedRequestUser } from '@repo/api-core';
-import type { Request } from 'express';
+import type { AuthenticatedRequestUser } from "@repo/api-core";
+import type { Request } from "express";
 
-import { Body, Controller, Get, Patch, Req } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import {
-  AllowMustChangePassword,
-  ApiDataResponse,
-  SuccessFlagDto,
-} from '@repo/api-core';
-import { CurrentUser } from '@repo/api-core';
+import { Body, Controller, Get, Patch, Req } from "@nestjs/common";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
+import { AllowMustChangePassword, ApiDataResponse, SuccessFlagDto } from "@repo/api-core";
+import { CurrentUser } from "@repo/api-core";
 
-import { ChangePasswordUseCase } from '../application/use-cases/change-password.use-case';
-import { GetUserUseCase } from '../application/use-cases/get-user.use-case';
-import { UpdateProfileUseCase } from '../application/use-cases/update-profile.use-case';
-import { ChangePasswordDto, UpdateProfileDto, UserDto } from './users.dto';
+import { ChangePasswordUseCase } from "../application/use-cases/change-password.use-case";
+import { GetUserUseCase } from "../application/use-cases/get-user.use-case";
+import { UpdateProfileUseCase } from "../application/use-cases/update-profile.use-case";
+import { ChangePasswordDto, UpdateProfileDto, UserDto } from "./users.dto";
 
-@ApiTags('users')
+@ApiTags("users")
 @ApiBearerAuth()
-@Controller('users')
+@Controller("users")
 export class UsersController {
   constructor(
     private readonly getUser: GetUserUseCase,
@@ -25,13 +21,13 @@ export class UsersController {
     private readonly changePasswordUseCase: ChangePasswordUseCase,
   ) {}
 
-  @Get('me')
+  @Get("me")
   @ApiDataResponse(UserDto)
   getMe(@CurrentUser() user: AuthenticatedRequestUser) {
     return this.getUser.execute(user.userId);
   }
 
-  @Patch('me')
+  @Patch("me")
   @ApiDataResponse(UserDto)
   updateMe(
     @CurrentUser() user: AuthenticatedRequestUser,
@@ -41,19 +37,15 @@ export class UsersController {
     return this.updateProfile.execute(
       user.userId,
       {
-        ...(input.displayName !== undefined
-          ? { displayName: input.displayName }
-          : {}),
+        ...(input.displayName !== undefined ? { displayName: input.displayName } : {}),
         ...(input.avatarUrl !== undefined ? { avatarUrl: input.avatarUrl } : {}),
-        ...(input.avatarFileId !== undefined
-          ? { avatarFileId: input.avatarFileId }
-          : {}),
+        ...(input.avatarFileId !== undefined ? { avatarFileId: input.avatarFileId } : {}),
       },
       request.requestContext,
     );
   }
 
-  @Patch('me/password')
+  @Patch("me/password")
   @AllowMustChangePassword()
   @ApiDataResponse(SuccessFlagDto)
   async changePassword(

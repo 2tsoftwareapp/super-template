@@ -1,8 +1,8 @@
-import type { AuthenticatedRequestUser, JsonValue, RequestContext } from '@repo/api-core';
-import type { AuditWriter, TransactionExecutor, TransactionPort } from '@repo/api-core';
+import type { AuthenticatedRequestUser, JsonValue, RequestContext } from "@repo/api-core";
+import type { AuditWriter, TransactionExecutor, TransactionPort } from "@repo/api-core";
 
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { 
+import { HttpStatus, Inject, Injectable } from "@nestjs/common";
+import {
   AppError,
   AUDIT_WRITER,
   ERROR_CODES,
@@ -11,25 +11,25 @@ import {
   ROLE_NAMES,
   SYSTEM_SCOPE,
   TRANSACTION_PORT,
-} from '@repo/api-core';
+} from "@repo/api-core";
 
 import type {
   CreateRoleCommand,
   PermissionView,
   RoleView,
   UpdateRoleCommand,
-} from '../access-control.types';
+} from "../access-control.types";
 
 import {
   assertCanCreateCustomRole,
   assertCanModifyCustomRole,
-} from '../../domain/role-assignment.policy';
-import { AccessControlMapper } from '../access-control.mapper';
+} from "../../domain/role-assignment.policy";
+import { AccessControlMapper } from "../access-control.mapper";
 import {
   ACCESS_CONTROL_REPOSITORY,
   type AccessControlRepositoryPort,
-} from '../access-control.repository.port';
-import { AccessProfileUseCase } from './access-profile.use-case';
+} from "../access-control.repository.port";
+import { AccessProfileUseCase } from "./access-profile.use-case";
 
 function normalizeRoleName(name: string): string {
   return name.trim().toUpperCase();
@@ -53,33 +53,24 @@ export class RoleManagementUseCase {
     userId: string,
     executor?: TransactionExecutor,
   ): Promise<void> {
-    const allPermissions =
-      await this.accessControlRepository.findPermissionsByNames(
-        permissionNamesForRole(ROLE_NAMES.ADMIN),
-        executor,
-      );
-    const permissions = allPermissions.filter(
-      (p) => p.scope !== 'platform',
+    const allPermissions = await this.accessControlRepository.findPermissionsByNames(
+      permissionNamesForRole(ROLE_NAMES.ADMIN),
+      executor,
     );
-    const role =
-      await this.accessControlRepository.ensureOrganizationSystemRole(
-        ROLE_NAMES.ADMIN,
-        'Organization administrator role',
-        organizationId,
-        executor,
-      );
+    const permissions = allPermissions.filter((p) => p.scope !== "platform");
+    const role = await this.accessControlRepository.ensureOrganizationSystemRole(
+      ROLE_NAMES.ADMIN,
+      "Organization administrator role",
+      organizationId,
+      executor,
+    );
 
     await this.accessControlRepository.replaceRolePermissions(
       role.id,
       permissions.map((permission) => permission.id),
       executor,
     );
-    await this.accessControlRepository.assignUserRole(
-      userId,
-      role.id,
-      organizationId,
-      executor,
-    );
+    await this.accessControlRepository.assignUserRole(userId, role.id, organizationId, executor);
     await this.accessProfileUseCase.invalidateAccessProfile(userId);
   }
 
@@ -97,7 +88,7 @@ export class RoleManagementUseCase {
     if (isSuperAdmin && !organizationId) {
       throw new AppError(
         ERROR_CODES.VALIDATION_FAILED,
-        'Organization ID is required when creating a role',
+        "Organization ID is required when creating a role",
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -110,7 +101,7 @@ export class RoleManagementUseCase {
       if (isFixedRoleName(normalizedName)) {
         throw new AppError(
           ERROR_CODES.VALIDATION_FAILED,
-          'Custom roles cannot use system role names',
+          "Custom roles cannot use system role names",
           HttpStatus.BAD_REQUEST,
         );
       }
@@ -124,7 +115,7 @@ export class RoleManagementUseCase {
       if (existingRole) {
         throw new AppError(
           ERROR_CODES.RESOURCE_CONFLICT,
-          'A role with this name already exists in the organization',
+          "A role with this name already exists in the organization",
           HttpStatus.CONFLICT,
         );
       }
@@ -139,7 +130,7 @@ export class RoleManagementUseCase {
       const role = await this.accessControlRepository.createRole(
         {
           name: normalizedName,
-          description: command.description ?? '',
+          description: command.description ?? "",
           organizationId,
           isSystem: false,
         },
@@ -148,18 +139,20 @@ export class RoleManagementUseCase {
 
       if (!role) {
         const existing = await this.accessControlRepository.findRoleByName(
-          normalizedName, organizationId, tx,
+          normalizedName,
+          organizationId,
+          tx,
         );
         if (existing) {
           throw new AppError(
             ERROR_CODES.RESOURCE_CONFLICT,
-            'A role with this name already exists in the organization',
+            "A role with this name already exists in the organization",
             HttpStatus.CONFLICT,
           );
         }
         throw new AppError(
           ERROR_CODES.INTERNAL_ERROR,
-          'Custom role could not be created',
+          "Custom role could not be created",
           HttpStatus.INTERNAL_SERVER_ERROR,
         );
       }
@@ -173,8 +166,8 @@ export class RoleManagementUseCase {
       await this.auditWriter.log(
         {
           actorId: actor.userId,
-          action: 'role.created',
-          entityType: 'role',
+          action: "role.created",
+          entityType: "role",
           entityId: role.id,
           metadata: {
             name: normalizedName,
@@ -182,16 +175,16 @@ export class RoleManagementUseCase {
             permissionIds: command.permissionIds,
           },
           ...(requestContext ? { requestContext } : {}),
-          ...(organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId } : { scope: SYSTEM_SCOPE.PLATFORM }),
+          ...(organizationId
+            ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId }
+            : { scope: SYSTEM_SCOPE.PLATFORM }),
         },
         tx,
       );
 
       return this.accessControlMapper.toRoleView(
         role,
-        permissions.map((permission) =>
-          this.accessControlMapper.toPermissionView(permission),
-        ),
+        permissions.map((permission) => this.accessControlMapper.toPermissionView(permission)),
       );
     });
   }
@@ -207,24 +200,18 @@ export class RoleManagementUseCase {
         const role = await this.accessControlRepository.findRoleById(roleId, tx);
 
         if (!role) {
-          throw new AppError(
-            ERROR_CODES.ROLE_NOT_FOUND,
-            'Role not found',
-            HttpStatus.NOT_FOUND,
-          );
+          throw new AppError(ERROR_CODES.ROLE_NOT_FOUND, "Role not found", HttpStatus.NOT_FOUND);
         }
 
         assertCanModifyCustomRole(actor, role);
 
-        const newName = command.name !== undefined
-          ? normalizeRoleName(command.name)
-          : undefined;
+        const newName = command.name !== undefined ? normalizeRoleName(command.name) : undefined;
 
         if (newName !== undefined && newName !== role.name) {
           if (isFixedRoleName(newName)) {
             throw new AppError(
               ERROR_CODES.VALIDATION_FAILED,
-              'Custom roles cannot use system role names',
+              "Custom roles cannot use system role names",
               HttpStatus.BAD_REQUEST,
             );
           }
@@ -238,7 +225,7 @@ export class RoleManagementUseCase {
           if (existingRole && existingRole.id !== role.id) {
             throw new AppError(
               ERROR_CODES.RESOURCE_CONFLICT,
-              'A role with this name already exists in the organization',
+              "A role with this name already exists in the organization",
               HttpStatus.CONFLICT,
             );
           }
@@ -250,9 +237,7 @@ export class RoleManagementUseCase {
             roleId,
             {
               ...(newName !== undefined ? { name: newName } : {}),
-              ...(command.description !== undefined
-                ? { description: command.description }
-                : {}),
+              ...(command.description !== undefined ? { description: command.description } : {}),
             },
             tx,
           );
@@ -263,14 +248,14 @@ export class RoleManagementUseCase {
             message?: string;
           };
           if (
-            pgError.code === '23505' ||
-            pgError.cause?.code === '23505' ||
-            (pgError.message?.includes('roles_organization_id_name_unique')) ||
-            (pgError.message?.includes('duplicate key value'))
+            pgError.code === "23505" ||
+            pgError.cause?.code === "23505" ||
+            pgError.message?.includes("roles_organization_id_name_unique") ||
+            pgError.message?.includes("duplicate key value")
           ) {
             throw new AppError(
               ERROR_CODES.RESOURCE_CONFLICT,
-              'A role with this name already exists in the organization',
+              "A role with this name already exists in the organization",
               HttpStatus.CONFLICT,
             );
           }
@@ -280,76 +265,76 @@ export class RoleManagementUseCase {
         if (!updatedRole) {
           throw new AppError(
             ERROR_CODES.INTERNAL_ERROR,
-            'Custom role could not be updated',
+            "Custom role could not be updated",
             HttpStatus.INTERNAL_SERVER_ERROR,
           );
         }
 
-      let permissions: PermissionView[] = [];
+        let permissions: PermissionView[] = [];
 
-      if (command.permissionIds) {
-        permissions = await this.resolveCatalogPermissions(
-          actor,
-          command.permissionIds,
-          role.organizationId,
+        if (command.permissionIds) {
+          permissions = await this.resolveCatalogPermissions(
+            actor,
+            command.permissionIds,
+            role.organizationId,
+            tx,
+          );
+
+          await this.accessControlRepository.replaceRolePermissions(
+            roleId,
+            permissions.map((permission) => permission.id),
+            tx,
+          );
+          await this.accessProfileUseCase.invalidateUsersForRole(roleId, tx);
+        } else {
+          permissions = await this.loadPermissionsForRole(roleId, tx);
+        }
+
+        const updateMeta: Record<string, JsonValue> = {};
+
+        if (newName !== undefined) {
+          updateMeta.name = newName;
+        }
+
+        if (command.permissionIds) {
+          updateMeta.permissionIds = command.permissionIds;
+        }
+
+        await this.auditWriter.log(
+          {
+            actorId: actor.userId,
+            action: "role.updated",
+            entityType: "role",
+            entityId: roleId,
+            metadata: updateMeta,
+            ...(requestContext ? { requestContext } : {}),
+            ...(role.organizationId
+              ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: role.organizationId }
+              : { scope: SYSTEM_SCOPE.PLATFORM }),
+          },
           tx,
         );
 
-        await this.accessControlRepository.replaceRolePermissions(
-          roleId,
-          permissions.map((permission) => permission.id),
-          tx,
+        return this.accessControlMapper.toRoleView(
+          updatedRole,
+          permissions.map((permission) => this.accessControlMapper.toPermissionView(permission)),
         );
-        await this.accessProfileUseCase.invalidateUsersForRole(roleId, tx);
-      } else {
-        permissions = await this.loadPermissionsForRole(roleId, tx);
+      });
+    } catch (error) {
+      const pgError = error as { code?: string; constraint?: string };
+      if (
+        pgError.code === "23505" &&
+        pgError.constraint === "roles_organization_name_lower_unique"
+      ) {
+        throw new AppError(
+          ERROR_CODES.RESOURCE_CONFLICT,
+          "A role with this name already exists in the organization",
+          HttpStatus.CONFLICT,
+        );
       }
-
-      const updateMeta: Record<string, JsonValue> = {};
-
-      if (newName !== undefined) {
-        updateMeta.name = newName;
-      }
-
-      if (command.permissionIds) {
-        updateMeta.permissionIds = command.permissionIds;
-      }
-
-      await this.auditWriter.log(
-        {
-          actorId: actor.userId,
-          action: 'role.updated',
-          entityType: 'role',
-          entityId: roleId,
-          metadata: updateMeta,
-          ...(requestContext ? { requestContext } : {}),
-          ...(role.organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: role.organizationId } : { scope: SYSTEM_SCOPE.PLATFORM }),
-        },
-        tx,
-      );
-
-      return this.accessControlMapper.toRoleView(
-        updatedRole,
-        permissions.map((permission) =>
-          this.accessControlMapper.toPermissionView(permission),
-        ),
-      );
-    });
-  } catch (error) {
-    const pgError = error as { code?: string; constraint?: string };
-    if (
-      pgError.code === '23505' &&
-      pgError.constraint === 'roles_organization_name_lower_unique'
-    ) {
-      throw new AppError(
-        ERROR_CODES.RESOURCE_CONFLICT,
-        'A role with this name already exists in the organization',
-        HttpStatus.CONFLICT,
-      );
+      throw error;
     }
-    throw error;
   }
-}
 
   async replaceCustomRolePermissions(
     actor: AuthenticatedRequestUser,
@@ -357,12 +342,7 @@ export class RoleManagementUseCase {
     permissionIds: string[],
     requestContext?: RequestContext,
   ): Promise<RoleView> {
-    return this.updateCustomRole(
-      actor,
-      roleId,
-      { permissionIds },
-      requestContext,
-    );
+    return this.updateCustomRole(actor, roleId, { permissionIds }, requestContext);
   }
 
   async deleteCustomRole(
@@ -371,29 +351,20 @@ export class RoleManagementUseCase {
     requestContext?: RequestContext,
   ): Promise<void> {
     return this.transactionPort.run(async (tx) => {
-      const role =
-        await this.accessControlRepository.findRoleByIdWithLock(
-          roleId,
-          tx,
-        );
+      const role = await this.accessControlRepository.findRoleByIdWithLock(roleId, tx);
 
       if (!role) {
-        throw new AppError(
-          ERROR_CODES.ROLE_NOT_FOUND,
-          'Role not found',
-          HttpStatus.NOT_FOUND,
-        );
+        throw new AppError(ERROR_CODES.ROLE_NOT_FOUND, "Role not found", HttpStatus.NOT_FOUND);
       }
 
       assertCanModifyCustomRole(actor, role);
 
-      const assignedUserIds =
-        await this.accessControlRepository.findUserIdsForRole(roleId, tx);
+      const assignedUserIds = await this.accessControlRepository.findUserIdsForRole(roleId, tx);
 
       if (assignedUserIds.length > 0) {
         throw new AppError(
           ERROR_CODES.RESOURCE_CONFLICT,
-          'Custom roles assigned to users cannot be deleted',
+          "Custom roles assigned to users cannot be deleted",
           HttpStatus.CONFLICT,
         );
       }
@@ -403,15 +374,17 @@ export class RoleManagementUseCase {
       await this.auditWriter.log(
         {
           actorId: actor.userId,
-          action: 'role.deleted',
-          entityType: 'role',
+          action: "role.deleted",
+          entityType: "role",
           entityId: roleId,
           metadata: {
             name: role.name,
             organizationId: role.organizationId,
           },
           ...(requestContext ? { requestContext } : {}),
-          ...(role.organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: role.organizationId } : { scope: SYSTEM_SCOPE.PLATFORM }),
+          ...(role.organizationId
+            ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: role.organizationId }
+            : { scope: SYSTEM_SCOPE.PLATFORM }),
         },
         tx,
       );
@@ -424,28 +397,25 @@ export class RoleManagementUseCase {
     targetOrganizationId: string | null,
     executor?: TransactionExecutor,
   ): Promise<PermissionView[]> {
-    const permissions =
-      await this.accessControlRepository.findPermissionsByIds(
-        permissionIds,
-        executor,
-      );
+    const permissions = await this.accessControlRepository.findPermissionsByIds(
+      permissionIds,
+      executor,
+    );
 
     if (permissions.length !== permissionIds.length) {
       throw new AppError(
         ERROR_CODES.VALIDATION_FAILED,
-        'One or more permissions do not exist',
+        "One or more permissions do not exist",
         HttpStatus.BAD_REQUEST,
       );
     }
 
-    const invalidPermission = permissions.find(
-      (permission) => !permission.isSystem,
-    );
+    const invalidPermission = permissions.find((permission) => !permission.isSystem);
 
     if (invalidPermission) {
       throw new AppError(
         ERROR_CODES.VALIDATION_FAILED,
-        'Custom roles can only use system catalog permissions',
+        "Custom roles can only use system catalog permissions",
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -453,7 +423,7 @@ export class RoleManagementUseCase {
     const isOrgScoped = targetOrganizationId !== null;
 
     for (const permission of permissions) {
-      if (isOrgScoped && permission.scope === 'platform') {
+      if (isOrgScoped && permission.scope === "platform") {
         throw new AppError(
           ERROR_CODES.AUTH_FORBIDDEN,
           `Permission "${permission.name}" is platform-scoped and cannot be assigned to organization roles`,
@@ -476,28 +446,20 @@ export class RoleManagementUseCase {
       }
     }
 
-    return permissions.map((p) =>
-      this.accessControlMapper.toPermissionView(p as PermissionView),
-    );
+    return permissions.map((p) => this.accessControlMapper.toPermissionView(p as PermissionView));
   }
 
   private async loadPermissionsForRole(
     roleId: string,
     executor?: TransactionExecutor,
   ): Promise<PermissionView[]> {
-    const permissionIds =
-      await this.accessControlRepository.findPermissionIdsForRole(
-        roleId,
-        executor,
-      );
-
-    const rows = await this.accessControlRepository.findPermissionsByIds(
-      permissionIds,
+    const permissionIds = await this.accessControlRepository.findPermissionIdsForRole(
+      roleId,
       executor,
     );
 
-    return rows.map((p) =>
-      this.accessControlMapper.toPermissionView(p as PermissionView),
-    );
+    const rows = await this.accessControlRepository.findPermissionsByIds(permissionIds, executor);
+
+    return rows.map((p) => this.accessControlMapper.toPermissionView(p as PermissionView));
   }
 }

@@ -1,12 +1,6 @@
 import { Badge } from "@repo/web-ui/badge";
 import { Button } from "@repo/web-ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@repo/web-ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/web-ui/card";
 import { Separator } from "@repo/web-ui/separator";
 import { Show } from "@repo/web-ui/show";
 import {
@@ -26,11 +20,8 @@ import {
 import { ArchDiagram } from "../ui/arch-diagram";
 import { ScrollToTop } from "../ui/scroll-to-top";
 
-const ADMIN_URL =
-  process.env.NEXT_PUBLIC_ADMIN_URL ?? "http://localhost:3002";
-const API_DOCS_URL =
-  process.env.NEXT_PUBLIC_API_DOCS_URL ??
-  "http://localhost:3001/api/docs";
+const ADMIN_URL = process.env.NEXT_PUBLIC_ADMIN_URL ?? "http://localhost:3002";
+const API_DOCS_URL = process.env.NEXT_PUBLIC_API_DOCS_URL ?? "http://localhost:3001/api/docs";
 
 const surfaces = [
   {
@@ -70,11 +61,7 @@ const features = [
     title: "Contract-first API",
     description:
       "OpenAPI schema auto-generated from NestJS decorators. TypeScript and Dart clients regenerate on every change — no manual sync.",
-    items: [
-      "@nestjs/swagger decorators",
-      "openapi-typescript client",
-      "Dart codegen for Flutter",
-    ],
+    items: ["@nestjs/swagger decorators", "openapi-typescript client", "Dart codegen for Flutter"],
   },
   {
     icon: Shield,
@@ -118,11 +105,7 @@ const features = [
     title: "Flutter + design system",
     description:
       "Material 3 tokens, 20+ shared widgets, and an in-app UI Kit tab for visual QA. Auto-generated API client from OpenAPI.",
-    items: [
-      "Riverpod + go_router",
-      "Design tokens & UI Kit gallery",
-      "FCM push (optional)",
-    ],
+    items: ["Riverpod + go_router", "Design tokens & UI Kit gallery", "FCM push (optional)"],
   },
   {
     icon: Palette,
@@ -145,8 +128,7 @@ const stackLayers = [
       {
         name: "Next.js",
         version: "16",
-        description:
-          "App Router · SEO landing · lightweight public marketing surface",
+        description: "App Router · SEO landing · lightweight public marketing surface",
       },
       {
         name: "shadcn/ui",
@@ -171,14 +153,12 @@ const stackLayers = [
       {
         name: "@repo/web-ui",
         version: "workspace:*",
-        description:
-          "Shared UI primitives (components + hooks)",
+        description: "Shared UI primitives (components + hooks)",
       },
       {
         name: "@repo/env-loader",
         version: "workspace:*",
-        description:
-          "Layered .env loading for development, staging, and production",
+        description: "Layered .env loading for development, staging, and production",
       },
     ],
   },
@@ -198,8 +178,7 @@ const stackLayers = [
       {
         name: "PostgreSQL",
         version: "18",
-        description:
-          "Primary relational store with multi-tenant workspace isolation",
+        description: "Primary relational store with multi-tenant workspace isolation",
       },
     ],
   },
@@ -209,14 +188,12 @@ const stackLayers = [
       {
         name: "Next.js",
         version: "16",
-        description:
-          "App Router · same-origin auth BFF · primary product surface",
+        description: "App Router · same-origin auth BFF · primary product surface",
       },
       {
         name: "TanStack Table",
         version: "8.x",
-        description:
-          "Headless table with sorting, filtering, and pagination hooks",
+        description: "Headless table with sorting, filtering, and pagination hooks",
       },
     ],
   },
@@ -256,8 +233,7 @@ const stackLayers = [
       {
         name: "Playwright",
         version: "1.61",
-        description:
-          "End-to-end browser testing across Chromium, Firefox, WebKit",
+        description: "End-to-end browser testing across Chromium, Firefox, WebKit",
       },
     ],
   },
@@ -267,8 +243,7 @@ const steps = [
   {
     step: "01",
     title: "Clone the repo",
-    description:
-      "One git clone to get the full monorepo — API, web, admin, and Flutter mobile.",
+    description: "One git clone to get the full monorepo — API, web, admin, and Flutter mobile.",
     code: "git clone https://github.com/truongnat/super-template",
   },
   {
@@ -281,8 +256,7 @@ const steps = [
   {
     step: "03",
     title: "Start building",
-    description:
-      "API, web, and admin start together. Run Flutter separately with make dev-mobile.",
+    description: "API, web, and admin start together. Run Flutter separately with make dev-mobile.",
     code: "make dev",
   },
 ];
@@ -305,43 +279,26 @@ export function LandingView() {
               <Zap className="size-4 text-background" />
             </div>
             <div className="min-w-0">
-              <span className="text-sm font-semibold tracking-tight">
-                Super Template
-              </span>
+              <span className="text-sm font-semibold tracking-tight">Super Template</span>
               <p className="truncate text-[11px] text-muted-foreground">
                 Full-stack monorepo starter
               </p>
             </div>
           </div>
           <nav className="hidden items-center gap-6 text-sm text-muted-foreground md:flex">
-            <a
-              href="#surfaces"
-              className="transition-colors hover:text-foreground"
-            >
+            <a href="#surfaces" className="transition-colors hover:text-foreground">
               Surfaces
             </a>
-            <a
-              href="#features"
-              className="transition-colors hover:text-foreground"
-            >
+            <a href="#features" className="transition-colors hover:text-foreground">
               Features
             </a>
-            <a
-              href="#architecture"
-              className="transition-colors hover:text-foreground"
-            >
+            <a href="#architecture" className="transition-colors hover:text-foreground">
               Architecture
             </a>
-            <a
-              href="#stack"
-              className="transition-colors hover:text-foreground"
-            >
+            <a href="#stack" className="transition-colors hover:text-foreground">
               Stack
             </a>
-            <a
-              href="#get-started"
-              className="transition-colors hover:text-foreground"
-            >
+            <a href="#get-started" className="transition-colors hover:text-foreground">
               Get started
             </a>
             <a
@@ -366,34 +323,22 @@ export function LandingView() {
             </Badge>
             <h1 className="max-w-4xl text-5xl font-bold leading-[1.1] tracking-tight md:text-7xl">
               Ship your product.{" "}
-              <span className="text-muted-foreground">
-                Not your boilerplate.
-              </span>
+              <span className="text-muted-foreground">Not your boilerplate.</span>
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-8 text-muted-foreground md:text-lg">
-              A complete monorepo with a NestJS API, a public SEO landing page,
-              an admin app with auth BFF, and a Flutter mobile client — wired
-              with contract-driven clients and production tooling from day one.
+              A complete monorepo with a NestJS API, a public SEO landing page, an admin app with
+              auth BFF, and a Flutter mobile client — wired with contract-driven clients and
+              production tooling from day one.
             </p>
             <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
-              <Button
-                size="lg"
-                nativeButton={false}
-                render={<a href="#get-started" />}
-              >
+              <Button size="lg" nativeButton={false} render={<a href="#get-started" />}>
                 Get started
               </Button>
               <Button
                 variant="outline"
                 size="lg"
                 nativeButton={false}
-                render={
-                  <a
-                    href={ADMIN_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  />
-                }
+                render={<a href={ADMIN_URL} target="_blank" rel="noopener noreferrer" />}
               >
                 <LayoutDashboard className="size-4" />
                 Open admin
@@ -433,13 +378,10 @@ export function LandingView() {
             <Badge variant="outline" className="mb-4">
               Four surfaces
             </Badge>
-            <h2 className="text-4xl font-bold tracking-tight">
-              One backend, clear separation
-            </h2>
+            <h2 className="text-4xl font-bold tracking-tight">One backend, clear separation</h2>
             <p className="mt-4 text-muted-foreground">
-              Web is a lean SEO landing page. Admin is the primary app with auth
-              and operations. Mobile ships the native experience. All three talk
-              to the same NestJS API.
+              Web is a lean SEO landing page. Admin is the primary app with auth and operations.
+              Mobile ships the native experience. All three talk to the same NestJS API.
             </p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -464,9 +406,7 @@ export function LandingView() {
                     <CardTitle>{surface.title}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm leading-6 text-muted-foreground">
-                      {surface.description}
-                    </p>
+                    <p className="text-sm leading-6 text-muted-foreground">{surface.description}</p>
                   </CardContent>
                 </Card>
               </a>
@@ -486,9 +426,8 @@ export function LandingView() {
               Everything connected, nothing missing
             </h2>
             <p className="mt-4 text-muted-foreground">
-              Four apps sharing one database schema and one API contract. Admin
-              hosts auth via a BFF; web stays marketing-only — change the
-              schema, regenerate, all clients update.
+              Four apps sharing one database schema and one API contract. Admin hosts auth via a
+              BFF; web stays marketing-only — change the schema, regenerate, all clients update.
             </p>
           </div>
           <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
@@ -539,14 +478,11 @@ export function LandingView() {
             <Badge variant="outline" className="mb-4">
               Architecture
             </Badge>
-            <h2 className="text-4xl font-bold tracking-tight">
-              Three clients, one backend
-            </h2>
+            <h2 className="text-4xl font-bold tracking-tight">Three clients, one backend</h2>
             <p className="mt-4 text-muted-foreground">
-              The NestJS API serves web, admin, and mobile from a single
-              Postgres database. Admin traffic flows through a Next.js BFF
-               with @repo/web-server; web is static marketing; Flutter talks
-              directly to the API.
+              The NestJS API serves web, admin, and mobile from a single Postgres database. Admin
+              traffic flows through a Next.js BFF with @repo/web-server; web is static marketing;
+              Flutter talks directly to the API.
             </p>
           </div>
           <ArchDiagram />
@@ -568,9 +504,8 @@ export function LandingView() {
               </h2>
             </div>
             <p className="max-w-xs shrink-0 text-sm leading-6 text-muted-foreground lg:text-right">
-              {stackLayers.reduce((n, l) => n + l.packages.length, 0)} packages
-              across {stackLayers.length} layers. Every version pinned. Every
-              choice documented.
+              {stackLayers.reduce((n, l) => n + l.packages.length, 0)} packages across{" "}
+              {stackLayers.length} layers. Every version pinned. Every choice documented.
             </p>
           </div>
 
@@ -587,9 +522,7 @@ export function LandingView() {
                   {layer.packages.map((pkg, pkgIndex) => (
                     <div key={pkg.name}>
                       <div className="grid grid-cols-1 gap-1 px-6 py-3.5 sm:grid-cols-[160px_56px_1fr] sm:items-baseline sm:gap-6">
-                        <span className="font-semibold text-foreground">
-                          {pkg.name}
-                        </span>
+                        <span className="font-semibold text-foreground">{pkg.name}</span>
                         <span className="font-mono text-xs text-muted-foreground sm:text-center">
                           {pkg.version}
                         </span>
@@ -619,9 +552,7 @@ export function LandingView() {
             <Badge variant="outline" className="mb-4">
               Get started
             </Badge>
-            <h2 className="text-4xl font-bold tracking-tight">
-              Running in under 5 minutes
-            </h2>
+            <h2 className="text-4xl font-bold tracking-tight">Running in under 5 minutes</h2>
             <p className="mt-4 text-muted-foreground">
               Docker, pnpm, and the Flutter SDK are all you need.
             </p>
@@ -688,9 +619,7 @@ export function LandingView() {
                 GitHub
               </a>
             </nav>
-            <p className="text-center text-sm text-muted-foreground">
-              MIT licensed.
-            </p>
+            <p className="text-center text-sm text-muted-foreground">MIT licensed.</p>
           </div>
         </div>
       </footer>

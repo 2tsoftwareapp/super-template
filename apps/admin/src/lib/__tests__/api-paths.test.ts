@@ -8,9 +8,7 @@ describe("apiPaths", () => {
   it("centralizes auth BFF paths", () => {
     expect(apiPaths.auth.login).toBe("/api/auth/login");
     expect(apiPaths.auth.logout).toBe("/api/auth/logout");
-    expect(apiPaths.auth.mfaVerifyChallenge).toBe(
-      "/api/auth/mfa/verify-challenge",
-    );
+    expect(apiPaths.auth.mfaVerifyChallenge).toBe("/api/auth/mfa/verify-challenge");
   });
 
   it("encodes SSO start redirect URIs", () => {

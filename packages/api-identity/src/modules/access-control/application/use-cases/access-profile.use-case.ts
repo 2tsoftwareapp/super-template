@@ -1,14 +1,14 @@
-import type { TransactionExecutor } from '@repo/api-core';
+import type { TransactionExecutor } from "@repo/api-core";
 
-import { Inject, Injectable } from '@nestjs/common';
-import { AccessProfileCache } from '@repo/api-core';
+import { Inject, Injectable } from "@nestjs/common";
+import { AccessProfileCache } from "@repo/api-core";
 
-import type { AccessProfileView } from '../access-control.types';
+import type { AccessProfileView } from "../access-control.types";
 
 import {
   ACCESS_CONTROL_REPOSITORY,
   type AccessControlRepositoryPort,
-} from '../access-control.repository.port';
+} from "../access-control.repository.port";
 
 @Injectable()
 export class AccessProfileUseCase {
@@ -22,9 +22,7 @@ export class AccessProfileUseCase {
     userId: string,
     organizationId?: string | null,
   ): Promise<AccessProfileView> {
-    const cached = organizationId === null
-      ? await this.accessProfileCache.get(userId)
-      : null;
+    const cached = organizationId === null ? await this.accessProfileCache.get(userId) : null;
 
     if (cached) {
       return cached;
@@ -32,10 +30,7 @@ export class AccessProfileUseCase {
 
     const [roles, permissions] = await Promise.all([
       this.accessControlRepository.findRoleNamesForUser(userId, organizationId),
-      this.accessControlRepository.findPermissionNamesForUser(
-        userId,
-        organizationId,
-      ),
+      this.accessControlRepository.findPermissionNamesForUser(userId, organizationId),
     ]);
 
     const profile: AccessProfileView = {
@@ -54,14 +49,8 @@ export class AccessProfileUseCase {
     await this.accessProfileCache.invalidateUser(userId);
   }
 
-  async invalidateUsersForRole(
-    roleId: string,
-    executor?: TransactionExecutor,
-  ): Promise<void> {
-    const userIds = await this.accessControlRepository.findUserIdsForRole(
-      roleId,
-      executor,
-    );
+  async invalidateUsersForRole(roleId: string, executor?: TransactionExecutor): Promise<void> {
+    const userIds = await this.accessControlRepository.findUserIdsForRole(roleId, executor);
 
     await this.accessProfileCache.invalidateUsers(userIds);
   }

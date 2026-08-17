@@ -1,4 +1,4 @@
-import type { TransactionExecutor } from '@repo/api-core';
+import type { TransactionExecutor } from "@repo/api-core";
 
 export interface SettingRecord {
   key: string;
@@ -26,4 +26,4 @@ export interface SettingsRepositoryPort {
   ): Promise<void>;
 }
 
-export const SETTINGS_REPOSITORY = Symbol('SETTINGS_REPOSITORY');
+export const SETTINGS_REPOSITORY = Symbol("SETTINGS_REPOSITORY");

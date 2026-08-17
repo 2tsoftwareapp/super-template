@@ -1,6 +1,6 @@
-import type { JsonObject } from '@repo/api-core';
+import type { JsonObject } from "@repo/api-core";
 
-import { Injectable } from '@nestjs/common';
+import { Injectable } from "@nestjs/common";
 
 export interface MailDeliveryRecord {
   id: string;

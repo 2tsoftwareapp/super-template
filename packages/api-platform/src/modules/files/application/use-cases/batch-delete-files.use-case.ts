@@ -1,14 +1,10 @@
-import type {
-  AuthenticatedRequestUser,
-  JsonObject,
-  RequestContext,
-} from '@repo/api-core';
+import type { AuthenticatedRequestUser, JsonObject, RequestContext } from "@repo/api-core";
 
-import { Inject, Injectable } from '@nestjs/common';
-import { requireOrganizationId } from '@repo/api-core';
+import { Inject, Injectable } from "@nestjs/common";
+import { requireOrganizationId } from "@repo/api-core";
 
-import { FILES_REPOSITORY, type FilesRepositoryPort } from '../ports/files.repository.port';
-import { DeleteFileUseCase } from './delete-file.use-case';
+import { FILES_REPOSITORY, type FilesRepositoryPort } from "../ports/files.repository.port";
+import { DeleteFileUseCase } from "./delete-file.use-case";
 
 export interface BatchDeleteResultItem {
   fileId: string;
@@ -30,11 +26,10 @@ export class BatchDeleteFilesUseCase {
     requestContext?: RequestContext,
   ): Promise<BatchDeleteResultItem[]> {
     if (idempotencyKey) {
-      const existing =
-        await this.filesRepository.findBatchOperationByIdempotencyKey(
-          actor.userId,
-          idempotencyKey,
-        );
+      const existing = await this.filesRepository.findBatchOperationByIdempotencyKey(
+        actor.userId,
+        idempotencyKey,
+      );
 
       if (existing) {
         return existing.results as unknown as BatchDeleteResultItem[];
@@ -49,8 +44,7 @@ export class BatchDeleteFilesUseCase {
           await this.deleteFileUseCase.execute(actor, fileId, requestContext);
           results.push({ fileId, success: true, error: null });
         } catch (error) {
-          const message =
-            error instanceof Error ? error.message : 'Delete failed';
+          const message = error instanceof Error ? error.message : "Delete failed";
           results.push({ fileId, success: false, error: message });
         }
       }
@@ -62,17 +56,16 @@ export class BatchDeleteFilesUseCase {
       this.filesRepository.createBatchOperation({
         organizationId: requireOrganizationId(actor),
         actorId: actor.userId,
-        operation: 'delete',
+        operation: "delete",
         idempotencyKey: idempotencyKey ?? null,
         results: results as unknown as JsonObject[],
       });
 
     if (idempotencyKey) {
-      const existing =
-        await this.filesRepository.findBatchOperationByIdempotencyKey(
-          actor.userId,
-          idempotencyKey,
-        );
+      const existing = await this.filesRepository.findBatchOperationByIdempotencyKey(
+        actor.userId,
+        idempotencyKey,
+      );
 
       if (existing) {
         return existing.results as unknown as BatchDeleteResultItem[];
@@ -88,14 +81,13 @@ export class BatchDeleteFilesUseCase {
         {
           organizationId: requireOrganizationId(actor),
           actorId: actor.userId,
-          operation: 'delete',
+          operation: "delete",
           idempotencyKey,
         },
         async () => (await runDeletes()) as unknown as JsonObject[],
       );
 
-      return (persisted as unknown as BatchDeleteResultItem[] | null) ??
-        (await runDeletes());
+      return (persisted as unknown as BatchDeleteResultItem[] | null) ?? (await runDeletes());
     }
 
     const results = await runDeletes();

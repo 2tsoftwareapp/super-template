@@ -1,36 +1,32 @@
-import type { TransactionExecutor } from '@repo/api-core';
+import type { TransactionExecutor } from "@repo/api-core";
 
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { AppError, ERROR_CODES } from '@repo/api-core';
+import { HttpStatus, Inject, Injectable } from "@nestjs/common";
+import { AppError, ERROR_CODES } from "@repo/api-core";
 
-import { AccessControlService } from '../../../access-control/application/access-control.service';
-import { ORGANIZATIONS_REPOSITORY, type OrganizationsRepositoryPort } from '../ports/organizations.repository.port';
+import { AccessControlService } from "../../../access-control/application/access-control.service";
+import {
+  ORGANIZATIONS_REPOSITORY,
+  type OrganizationsRepositoryPort,
+} from "../ports/organizations.repository.port";
 
 const slugify = (value: string) =>
   value
     .trim()
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 64) || 'organization';
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 64) || "organization";
 
 @Injectable()
 export class EnsurePersonalOrganizationUseCase {
   constructor(
-    @Inject(ORGANIZATIONS_REPOSITORY) private readonly organizationsRepository: OrganizationsRepositoryPort,
+    @Inject(ORGANIZATIONS_REPOSITORY)
+    private readonly organizationsRepository: OrganizationsRepositoryPort,
     private readonly accessControlService: AccessControlService,
   ) {}
 
-  async execute(
-    userId: string,
-    displayName: string,
-    executor?: TransactionExecutor,
-  ) {
-    const existing =
-      await this.organizationsRepository.findPrimaryOrganizationId(
-        userId,
-        executor,
-      );
+  async execute(userId: string, displayName: string, executor?: TransactionExecutor) {
+    const existing = await this.organizationsRepository.findPrimaryOrganizationId(userId, executor);
 
     if (existing) {
       return existing;
@@ -48,7 +44,7 @@ export class EnsurePersonalOrganizationUseCase {
     if (!organization) {
       throw new AppError(
         ERROR_CODES.INTERNAL_ERROR,
-        'Default organization could not be created',
+        "Default organization could not be created",
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
@@ -57,15 +53,11 @@ export class EnsurePersonalOrganizationUseCase {
       {
         organizationId: organization.id,
         userId,
-        role: 'OWNER',
+        role: "OWNER",
       },
       executor,
     );
-    await this.accessControlService.ensureOrganizationAdminRole(
-      organization.id,
-      userId,
-      executor,
-    );
+    await this.accessControlService.ensureOrganizationAdminRole(organization.id, userId, executor);
 
     return organization.id;
   }

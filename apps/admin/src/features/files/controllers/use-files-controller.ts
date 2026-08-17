@@ -22,10 +22,7 @@ import {
   useFileVersionsQuery,
 } from "@/features/files/api/files.queries";
 import { filesKeys } from "@/features/files/api/files.query-keys";
-import {
-  formatBytes,
-  formatMimeType,
-} from "@/features/files/model/files-formatting";
+import { formatBytes, formatMimeType } from "@/features/files/model/files-formatting";
 import { FILE_MIME_OPTIONS } from "@/features/files/model/files.constants";
 import { selectFilePermissions } from "@/features/files/model/files.permissions";
 import {
@@ -62,15 +59,10 @@ export function useFilesController(): FilesViewModel {
     parseFilesFilters(new URLSearchParams(searchParams.toString())),
   );
   const [selectedFile, setSelectedFile] = useState<FileDto | null>(null);
-  const [detailTab, setDetailTab] = useState<"versions" | "history">(
-    "versions",
-  );
+  const [detailTab, setDetailTab] = useState<"versions" | "history">("versions");
   const [deleteTarget, setDeleteTarget] = useState<FileDto | null>(null);
 
-  const onFilterChange = (
-    key: keyof FilesFilters,
-    value: string | number,
-  ) => {
+  const onFilterChange = (key: keyof FilesFilters, value: string | number) => {
     const next = { ...filters, [key]: value };
     if (key !== "page") {
       next.page = 1;

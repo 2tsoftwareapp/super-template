@@ -6,5 +6,8 @@
     "./base.json": "./base.json",
     "./nest.json": "./nest.json",
     "./next.json": "./next.json"
+  },
+  "scripts": {
+    "format": "prettier --write ."
   }
 }

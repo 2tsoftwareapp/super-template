@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable } from "@nestjs/common";
 
-import type { AuditLogRecord } from './ports/audit.repository.port';
+import type { AuditLogRecord } from "./ports/audit.repository.port";
 
 @Injectable()
 export class AuditMapper {

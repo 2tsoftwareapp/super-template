@@ -6,11 +6,8 @@ import { buildPath, webFetch } from "@/lib/http";
 
 type RolesListOperation = operations["AdminRolesController_listRoles"];
 
-export type RolesListParams = NonNullable<
-  RolesListOperation["parameters"]["query"]
->;
-export type RolesListResponse =
-  RolesListOperation["responses"][200]["content"]["application/json"];
+export type RolesListParams = NonNullable<RolesListOperation["parameters"]["query"]>;
+export type RolesListResponse = RolesListOperation["responses"][200]["content"]["application/json"];
 
 /**
  * Cross-feature lookup transport (reference data shared by ≥2 features).
@@ -24,9 +21,7 @@ export function fetchMyOrganizations() {
 }
 
 export function fetchOrganizationsList() {
-  return webFetch<ListResponse<OrganizationDto>>(
-    bffPath("/api/v1/organizations"),
-  );
+  return webFetch<ListResponse<OrganizationDto>>(bffPath("/api/v1/organizations"));
 }
 
 export function fetchRolesList(params?: RolesListParams) {

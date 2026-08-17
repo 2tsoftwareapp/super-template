@@ -1,19 +1,11 @@
-import {
-  type CanActivate,
-  type ExecutionContext,
-  HttpStatus,
-  Injectable,
-} from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
+import { type CanActivate, type ExecutionContext, HttpStatus, Injectable } from "@nestjs/common";
+import { Reflector } from "@nestjs/core";
 
-import { ERROR_CODES } from '../constants/error-codes';
-import {
-  AUTHORIZE_KEY,
-  type AuthorizeOptions,
-} from '../decorators/authorize.decorator';
-import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
-import { AppError } from '../errors/app-error';
-import { ROLE_NAMES } from '../rbac/role.constants';
+import { ERROR_CODES } from "../constants/error-codes";
+import { AUTHORIZE_KEY, type AuthorizeOptions } from "../decorators/authorize.decorator";
+import { IS_PUBLIC_KEY } from "../decorators/public.decorator";
+import { AppError } from "../errors/app-error";
+import { ROLE_NAMES } from "../rbac/role.constants";
 
 @Injectable()
 export class AuthorizeGuard implements CanActivate {
@@ -29,10 +21,10 @@ export class AuthorizeGuard implements CanActivate {
       return true;
     }
 
-    const authorize = this.reflector.getAllAndOverride<AuthorizeOptions>(
-      AUTHORIZE_KEY,
-      [context.getHandler(), context.getClass()],
-    );
+    const authorize = this.reflector.getAllAndOverride<AuthorizeOptions>(AUTHORIZE_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
 
     const requiredRoles = authorize?.roles ?? [];
     const requiredPermissions = authorize?.permissions ?? [];
@@ -47,7 +39,7 @@ export class AuthorizeGuard implements CanActivate {
     if (!user) {
       throw new AppError(
         ERROR_CODES.AUTH_UNAUTHORIZED,
-        'Authentication is required',
+        "Authentication is required",
         HttpStatus.UNAUTHORIZED,
       );
     }
@@ -57,19 +49,16 @@ export class AuthorizeGuard implements CanActivate {
     }
 
     const hasRequiredRole =
-      requiredRoles.length === 0 ||
-      requiredRoles.some((role) => user.roles.includes(role));
+      requiredRoles.length === 0 || requiredRoles.some((role) => user.roles.includes(role));
 
     const hasRequiredPermissions =
       requiredPermissions.length === 0 ||
-      requiredPermissions.every((permission) =>
-        user.permissions.includes(permission),
-      );
+      requiredPermissions.every((permission) => user.permissions.includes(permission));
 
     if (!hasRequiredRole || !hasRequiredPermissions) {
       throw new AppError(
         ERROR_CODES.AUTH_FORBIDDEN,
-        'You do not have the required role or permission to perform this action',
+        "You do not have the required role or permission to perform this action",
         HttpStatus.FORBIDDEN,
       );
     }

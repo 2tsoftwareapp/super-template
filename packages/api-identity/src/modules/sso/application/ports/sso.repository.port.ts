@@ -1,4 +1,4 @@
-import type { TransactionExecutor } from '@repo/api-core';
+import type { TransactionExecutor } from "@repo/api-core";
 
 export interface SsoLoginStateRecord {
   id: string;
@@ -54,10 +54,7 @@ export interface SsoRepositoryPort {
    * CAS-consume a login state: only succeeds when still unconsumed.
    * Returns false if a concurrent request already replayed the same state.
    */
-  consumeLoginState(
-    id: string,
-    executor?: TransactionExecutor,
-  ): Promise<boolean>;
+  consumeLoginState(id: string, executor?: TransactionExecutor): Promise<boolean>;
 
   createSessionExchange(
     values: {
@@ -78,10 +75,7 @@ export interface SsoRepositoryPort {
    * CAS-consume a session exchange: only succeeds when still unconsumed.
    * Returns false if a concurrent request already redeemed the same code.
    */
-  consumeSessionExchange(
-    id: string,
-    executor?: TransactionExecutor,
-  ): Promise<boolean>;
+  consumeSessionExchange(id: string, executor?: TransactionExecutor): Promise<boolean>;
 
   findIdentity(
     provider: string,
@@ -100,4 +94,4 @@ export interface SsoRepositoryPort {
   ): Promise<ExternalIdentityRecord | null>;
 }
 
-export const SSO_REPOSITORY = Symbol('SSO_REPOSITORY');
+export const SSO_REPOSITORY = Symbol("SSO_REPOSITORY");

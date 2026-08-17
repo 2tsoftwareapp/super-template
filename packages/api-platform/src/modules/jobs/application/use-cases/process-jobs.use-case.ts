@@ -1,7 +1,4 @@
-import {
-  Inject,
-  Injectable,
-} from '@nestjs/common';
+import { Inject, Injectable } from "@nestjs/common";
 import {
   ACTIVITY_EMITTER,
   type ActivityEmitter,
@@ -13,18 +10,21 @@ import {
   type TransactionExecutor,
   type TransactionPort,
   WORKER_DISPATCH_CONTEXT,
-} from '@repo/api-core';
+} from "@repo/api-core";
 
-import { HANDLER_TIMEOUT_MS, resolveFailureOutcome } from '../../domain/job-lifecycle';
-import { JOB_OBSERVABILITY_REPOSITORY, type JobObservabilityRepositoryPort } from '../ports/job-observability.repository.port';
+import { HANDLER_TIMEOUT_MS, resolveFailureOutcome } from "../../domain/job-lifecycle";
+import {
+  JOB_OBSERVABILITY_REPOSITORY,
+  type JobObservabilityRepositoryPort,
+} from "../ports/job-observability.repository.port";
 import {
   type JobRecord,
   JOBS_REPOSITORY,
   type JobScope,
   type JobsRepositoryPort,
-} from '../ports/jobs.repository.port';
-import { JobHandlersRegistry } from '../services/job-handlers.registry';
-import { PropagationService } from '../services/propagation.service';
+} from "../ports/jobs.repository.port";
+import { JobHandlersRegistry } from "../services/job-handlers.registry";
+import { PropagationService } from "../services/propagation.service";
 
 const WORKER_ID = `worker-${Math.random().toString(36).slice(2, 10)}`;
 
@@ -34,16 +34,16 @@ export class ProcessJobsUseCase {
     @Inject(JOBS_REPOSITORY) private readonly jobsRepository: JobsRepositoryPort,
     private readonly tenantContextService: TenantContextService,
     private readonly jobHandlersRegistry: JobHandlersRegistry,
-    @Inject(JOB_OBSERVABILITY_REPOSITORY) private readonly jobObservabilityRepository: JobObservabilityRepositoryPort,
+    @Inject(JOB_OBSERVABILITY_REPOSITORY)
+    private readonly jobObservabilityRepository: JobObservabilityRepositoryPort,
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
     @Inject(ACTIVITY_EMITTER) private readonly activityEmitter: ActivityEmitter,
     private readonly propagationService: PropagationService,
   ) {}
 
   async execute(): Promise<void> {
-    const dueJobs = await this.tenantContextService.runAsync(
-      WORKER_DISPATCH_CONTEXT,
-      () => this.jobsRepository.claimDueJobs(20, WORKER_ID),
+    const dueJobs = await this.tenantContextService.runAsync(WORKER_DISPATCH_CONTEXT, () =>
+      this.jobsRepository.claimDueJobs(20, WORKER_ID),
     );
 
     for (const job of dueJobs) {
@@ -56,21 +56,25 @@ export class ProcessJobsUseCase {
           () => this.processJob(job),
         );
       } catch (error) {
-        this.tenantContextService.runAsync(
-          WORKER_DISPATCH_CONTEXT,
-          async () => {
-            const message = error instanceof Error ? error.message : 'Unknown processing error';
+        this.tenantContextService
+          .runAsync(WORKER_DISPATCH_CONTEXT, async () => {
+            const message = error instanceof Error ? error.message : "Unknown processing error";
             await this.transactionPort.withTenant(
               WORKER_DISPATCH_CONTEXT,
               async (tx: TransactionExecutor) => {
                 await this.jobObservabilityRepository.recordEvent(
-                  { jobId: job.id, organizationId: job.organizationId ?? null, type: 'failed', message: `Batch isolation: ${message}` },
+                  {
+                    jobId: job.id,
+                    organizationId: job.organizationId ?? null,
+                    type: "failed",
+                    message: `Batch isolation: ${message}`,
+                  },
                   tx,
                 );
               },
             );
-          },
-        ).catch(() => undefined);
+          })
+          .catch(() => undefined);
       }
     }
   }
@@ -86,7 +90,7 @@ export class ProcessJobsUseCase {
           tx,
         );
         await this.jobObservabilityRepository.recordEvent(
-          { jobId: job.id, organizationId, attemptId: a.id, type: 'claimed' },
+          { jobId: job.id, organizationId, attemptId: a.id, type: "claimed" },
           tx,
         );
         return a;
@@ -101,20 +105,30 @@ export class ProcessJobsUseCase {
       await this.transactionPort.withTenant(
         WORKER_DISPATCH_CONTEXT,
         async (tx: TransactionExecutor) => {
-          const failed = await this.jobsRepository.markFailed(job.id, message, WORKER_ID, job.attempts, tx);
+          const failed = await this.jobsRepository.markFailed(
+            job.id,
+            message,
+            WORKER_ID,
+            job.attempts,
+            tx,
+          );
           if (!failed) {
             return;
           }
-          await this.jobObservabilityRepository.finishAttempt(attempt.id, { status: 'FAILED', errorMessage: message }, tx);
+          await this.jobObservabilityRepository.finishAttempt(
+            attempt.id,
+            { status: "FAILED", errorMessage: message },
+            tx,
+          );
           await this.jobObservabilityRepository.recordEvent(
-            { jobId: job.id, organizationId, attemptId: attempt.id, type: 'no_handler', message },
+            { jobId: job.id, organizationId, attemptId: attempt.id, type: "no_handler", message },
             tx,
           );
           await this.propagationService.propagateBlocked(
             job.id,
             this.scopeFromOrg(organizationId),
             organizationId,
-            'no handler',
+            "no handler",
             tx,
           );
         },
@@ -124,7 +138,12 @@ export class ProcessJobsUseCase {
 
     try {
       await this.withTimeout(
-        handler({ jobId: job.id, payload: job.payload, organizationId, createdById: job.createdById ?? null }),
+        handler({
+          jobId: job.id,
+          payload: job.payload,
+          organizationId,
+          createdById: job.createdById ?? null,
+        }),
         HANDLER_TIMEOUT_MS,
         `Handler timed out after ${HANDLER_TIMEOUT_MS}ms`,
       );
@@ -132,13 +151,22 @@ export class ProcessJobsUseCase {
       await this.transactionPort.withTenant(
         WORKER_DISPATCH_CONTEXT,
         async (tx: TransactionExecutor) => {
-          const completed = await this.jobsRepository.markCompleted(job.id, WORKER_ID, job.attempts, tx);
+          const completed = await this.jobsRepository.markCompleted(
+            job.id,
+            WORKER_ID,
+            job.attempts,
+            tx,
+          );
           if (!completed) {
             return;
           }
-          await this.jobObservabilityRepository.finishAttempt(attempt.id, { status: 'COMPLETED' }, tx);
+          await this.jobObservabilityRepository.finishAttempt(
+            attempt.id,
+            { status: "COMPLETED" },
+            tx,
+          );
           await this.jobObservabilityRepository.recordEvent(
-            { jobId: job.id, organizationId, attemptId: attempt.id, type: 'completed' },
+            { jobId: job.id, organizationId, attemptId: attempt.id, type: "completed" },
             tx,
           );
           if (job.organizationId) {
@@ -146,10 +174,10 @@ export class ProcessJobsUseCase {
               {
                 organizationId: job.organizationId,
                 summary: `Background job completed (${job.type})`,
-                entityType: 'job',
+                entityType: "job",
                 entityId: job.id,
                 actorId: job.createdById ?? null,
-                visibility: 'INTERNAL',
+                visibility: "INTERNAL",
               },
               tx,
             );
@@ -157,35 +185,73 @@ export class ProcessJobsUseCase {
         },
       );
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Unknown processing error';
+      const message = error instanceof Error ? error.message : "Unknown processing error";
       const redactedPayload = redactSensitive(job.payload);
       const metadata = isJsonObject(redactedPayload) ? { payload: redactedPayload } : null;
 
       await this.transactionPort.withTenant(
         WORKER_DISPATCH_CONTEXT,
         async (tx: TransactionExecutor) => {
-          const outcome = resolveFailureOutcome({ attempts: job.attempts, maxAttempts: job.maxAttempts });
+          const outcome = resolveFailureOutcome({
+            attempts: job.attempts,
+            maxAttempts: job.maxAttempts,
+          });
 
-          if (outcome.action === 'retry') {
-            const requeued = await this.jobsRepository.requeueForRetry(job.id, outcome.retryAt, message, WORKER_ID, job.attempts, tx);
+          if (outcome.action === "retry") {
+            const requeued = await this.jobsRepository.requeueForRetry(
+              job.id,
+              outcome.retryAt,
+              message,
+              WORKER_ID,
+              job.attempts,
+              tx,
+            );
             if (!requeued) {
               return;
             }
-            await this.jobObservabilityRepository.finishAttempt(attempt.id, { status: 'FAILED', errorMessage: message }, tx);
+            await this.jobObservabilityRepository.finishAttempt(
+              attempt.id,
+              { status: "FAILED", errorMessage: message },
+              tx,
+            );
             await this.jobObservabilityRepository.recordEvent(
-              { jobId: job.id, organizationId, attemptId: attempt.id, type: 'retry_scheduled', message, metadata },
+              {
+                jobId: job.id,
+                organizationId,
+                attemptId: attempt.id,
+                type: "retry_scheduled",
+                message,
+                metadata,
+              },
               tx,
             );
             return;
           }
 
-          const failed = await this.jobsRepository.markFailed(job.id, message, WORKER_ID, job.attempts, tx);
+          const failed = await this.jobsRepository.markFailed(
+            job.id,
+            message,
+            WORKER_ID,
+            job.attempts,
+            tx,
+          );
           if (!failed) {
             return;
           }
-          await this.jobObservabilityRepository.finishAttempt(attempt.id, { status: 'FAILED', errorMessage: message }, tx);
+          await this.jobObservabilityRepository.finishAttempt(
+            attempt.id,
+            { status: "FAILED", errorMessage: message },
+            tx,
+          );
           await this.jobObservabilityRepository.recordEvent(
-            { jobId: job.id, organizationId, attemptId: attempt.id, type: 'failed', message, metadata },
+            {
+              jobId: job.id,
+              organizationId,
+              attemptId: attempt.id,
+              type: "failed",
+              message,
+              metadata,
+            },
             tx,
           );
 
@@ -193,7 +259,7 @@ export class ProcessJobsUseCase {
             job.id,
             this.scopeFromOrg(organizationId),
             organizationId,
-            'failed',
+            "failed",
             tx,
           );
         },
@@ -202,9 +268,7 @@ export class ProcessJobsUseCase {
   }
 
   private scopeFromOrg(organizationId: string | null): JobScope {
-    return organizationId
-      ? { type: 'organization', organizationId }
-      : { type: 'platform' };
+    return organizationId ? { type: "organization", organizationId } : { type: "platform" };
   }
 
   private async withTimeout<T>(promise: Promise<T>, ms: number, message: string): Promise<T> {

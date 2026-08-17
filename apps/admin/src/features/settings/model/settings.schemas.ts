@@ -6,10 +6,7 @@ const settingValueSchema = z.union([
   z.number(),
   z.boolean(),
   z.null(),
-  z.record(
-    z.string(),
-    z.union([z.string(), z.number(), z.boolean(), z.null()]),
-  ),
+  z.record(z.string(), z.union([z.string(), z.number(), z.boolean(), z.null()])),
 ]);
 
 export const updateSettingInputSchema = z.object({

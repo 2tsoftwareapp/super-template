@@ -30,10 +30,7 @@ import {
   SSO_PROVIDER_OPTIONS,
 } from "../model/auth.constants";
 import { AuthFlowError } from "../model/auth.errors";
-import {
-  assertAdminLoginAccess,
-  resolveAdminLoginResult,
-} from "../model/auth.login-flow";
+import { assertAdminLoginAccess, resolveAdminLoginResult } from "../model/auth.login-flow";
 import {
   type AdminLoginInput,
   adminLoginSchema,
@@ -85,10 +82,7 @@ export function useAdminLoginFlow() {
   const ssoStartMutation = useSsoStartMutation();
 
   async function denyNonAdmin(error: unknown) {
-    if (
-      error instanceof AuthFlowError &&
-      error.code === AUTH_FLOW_ERROR_CODES.notAdmin
-    ) {
+    if (error instanceof AuthFlowError && error.code === AUTH_FLOW_ERROR_CODES.notAdmin) {
       await logoutMutation.mutateAsync();
     }
   }
@@ -194,8 +188,6 @@ export function useAdminLoginFlow() {
     ssoProviders: SSO_PROVIDER_OPTIONS,
     checkingSessionMessage: AUTH_MESSAGES.checkingSession,
     ssoFailedMessage: AUTH_MESSAGES.ssoFailed,
-    ssoError:
-      ssoStartMutation.isError ||
-      loginSearch.error === AUTH_ERROR_QUERY_VALUES.ssoFailed,
+    ssoError: ssoStartMutation.isError || loginSearch.error === AUTH_ERROR_QUERY_VALUES.ssoFailed,
   };
 }

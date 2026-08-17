@@ -1,18 +1,18 @@
-import type { Request } from 'express';
+import type { Request } from "express";
 
-import { Body, Controller, Post, Req } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { Throttle } from '@nestjs/throttler';
-import { ApiDataResponse, SuccessFlagDto, SuccessMessageDto } from '@repo/api-core';
-import { Public } from '@repo/api-core';
+import { Body, Controller, Post, Req } from "@nestjs/common";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
+import { Throttle } from "@nestjs/throttler";
+import { ApiDataResponse, SuccessFlagDto, SuccessMessageDto } from "@repo/api-core";
+import { Public } from "@repo/api-core";
 
-import { ForgotPasswordUseCase } from '../application/use-cases/forgot-password.use-case';
-import { ResetPasswordUseCase } from '../application/use-cases/reset-password.use-case';
-import { ForgotPasswordDto, ResetPasswordDto } from './dto/password-recovery.dto';
+import { ForgotPasswordUseCase } from "../application/use-cases/forgot-password.use-case";
+import { ResetPasswordUseCase } from "../application/use-cases/reset-password.use-case";
+import { ForgotPasswordDto, ResetPasswordDto } from "./dto/password-recovery.dto";
 
-@ApiTags('auth')
+@ApiTags("auth")
 @ApiBearerAuth()
-@Controller('auth')
+@Controller("auth")
 export class AuthRecoveryController {
   constructor(
     private readonly forgotPasswordUseCase: ForgotPasswordUseCase,
@@ -20,7 +20,7 @@ export class AuthRecoveryController {
   ) {}
 
   @Public()
-  @Post('forgot-password')
+  @Post("forgot-password")
   @Throttle({ default: { limit: 3, ttl: 3_600_000 } })
   @ApiDataResponse(SuccessMessageDto, 201)
   async forgotPassword(@Body() input: ForgotPasswordDto) {
@@ -30,7 +30,7 @@ export class AuthRecoveryController {
   }
 
   @Public()
-  @Post('reset-password')
+  @Post("reset-password")
   @Throttle({ default: { limit: 3, ttl: 3_600_000 } })
   @ApiDataResponse(SuccessFlagDto, 201)
   async resetPassword(@Body() input: ResetPasswordDto, @Req() request: Request) {

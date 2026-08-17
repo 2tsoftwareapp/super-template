@@ -6,7 +6,7 @@
  */
 export class FileVersionConflictError extends Error {
   constructor() {
-    super('A file version was created concurrently with the same version number');
-    this.name = 'FileVersionConflictError';
+    super("A file version was created concurrently with the same version number");
+    this.name = "FileVersionConflictError";
   }
 }

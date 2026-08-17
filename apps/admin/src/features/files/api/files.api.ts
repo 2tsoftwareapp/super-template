@@ -1,11 +1,6 @@
 import { bffPath } from "@repo/api-contract";
 
-import type {
-  FileDto,
-  FileHistoryEventDto,
-  FileVersionDto,
-  ListResponse,
-} from "@/lib/api-types";
+import type { FileDto, FileHistoryEventDto, FileVersionDto, ListResponse } from "@/lib/api-types";
 
 import { buildPath, webFetch } from "@/lib/http";
 

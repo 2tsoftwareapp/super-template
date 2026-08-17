@@ -1,4 +1,4 @@
-import { FILE_KIND, ROLE_NAMES } from '@repo/api-core';
+import { FILE_KIND, ROLE_NAMES } from "@repo/api-core";
 
 /**
  * Whether an actor may download a stored audit-export file.
@@ -24,7 +24,6 @@ export function canDownloadAuditExport(input: {
   }
 
   return (
-    input.actorOrganizationId !== null &&
-    input.fileOrganizationId === input.actorOrganizationId
+    input.actorOrganizationId !== null && input.fileOrganizationId === input.actorOrganizationId
   );
 }

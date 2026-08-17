@@ -1,22 +1,19 @@
-import type { DatabaseExecutor } from '@repo/api-database';
+import type { DatabaseExecutor } from "@repo/api-database";
 
-import { Inject, Injectable } from '@nestjs/common';
-import { DATABASE, type DatabaseClient } from '@repo/api-database';
-import { userPreferences } from '@repo/api-database';
-import { eq } from 'drizzle-orm';
+import { Inject, Injectable } from "@nestjs/common";
+import { DATABASE, type DatabaseClient } from "@repo/api-database";
+import { userPreferences } from "@repo/api-database";
+import { eq } from "drizzle-orm";
 
-import type { PreferencesRepositoryPort } from '../application/ports/preferences.repository.port';
+import type { PreferencesRepositoryPort } from "../application/ports/preferences.repository.port";
 
-import { DEFAULT_USER_PREFERENCES } from '../application/preferences.constants';
+import { DEFAULT_USER_PREFERENCES } from "../application/preferences.constants";
 
 @Injectable()
 export class PreferencesRepository implements PreferencesRepositoryPort {
   constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
 
-  async findByUserId(
-    userId: string,
-    executor: DatabaseExecutor = this.database,
-  ) {
+  async findByUserId(userId: string, executor: DatabaseExecutor = this.database) {
     const [preferences] = await executor
       .select()
       .from(userPreferences)
@@ -42,10 +39,8 @@ export class PreferencesRepository implements PreferencesRepositoryPort {
           language: values.language ?? DEFAULT_USER_PREFERENCES.language,
           timezone: values.timezone ?? DEFAULT_USER_PREFERENCES.timezone,
           notificationPreferences:
-            values.notificationPreferences ??
-            DEFAULT_USER_PREFERENCES.notificationPreferences,
-          emailPreferences:
-            values.emailPreferences ?? DEFAULT_USER_PREFERENCES.emailPreferences,
+            values.notificationPreferences ?? DEFAULT_USER_PREFERENCES.notificationPreferences,
+          emailPreferences: values.emailPreferences ?? DEFAULT_USER_PREFERENCES.emailPreferences,
         })
         .returning();
 
@@ -64,18 +59,14 @@ export class PreferencesRepository implements PreferencesRepositoryPort {
     return updated ?? null;
   }
 
-  async reset(
-    userId: string,
-    executor: DatabaseExecutor = this.database,
-  ) {
+  async reset(userId: string, executor: DatabaseExecutor = this.database) {
     return this.upsert(
       userId,
       {
         theme: DEFAULT_USER_PREFERENCES.theme,
         language: DEFAULT_USER_PREFERENCES.language,
         timezone: DEFAULT_USER_PREFERENCES.timezone,
-        notificationPreferences:
-          DEFAULT_USER_PREFERENCES.notificationPreferences,
+        notificationPreferences: DEFAULT_USER_PREFERENCES.notificationPreferences,
         emailPreferences: DEFAULT_USER_PREFERENCES.emailPreferences,
       },
       executor,

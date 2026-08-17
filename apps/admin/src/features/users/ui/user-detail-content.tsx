@@ -1,13 +1,7 @@
 "use client";
 
 import { Alert } from "@repo/web-ui/alert";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@repo/web-ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/web-ui/card";
 import { Separator } from "@repo/web-ui/separator";
 import { ShieldAlert } from "lucide-react";
 
@@ -53,9 +47,7 @@ export function UserDetailContent({ vm, user }: UserDetailContentProps) {
         <Alert variant="info">
           <div className="flex items-center gap-2">
             <ShieldAlert className="size-4 shrink-0" />
-            <span>
-              This is your own account. Status changes and deletion are disabled.
-            </span>
+            <span>This is your own account. Status changes and deletion are disabled.</span>
           </div>
         </Alert>
       )}
@@ -63,10 +55,7 @@ export function UserDetailContent({ vm, user }: UserDetailContentProps) {
         <Alert variant="warning">
           <div className="flex items-center gap-2">
             <ShieldAlert className="size-4 shrink-0" />
-            <span>
-              This is a privileged account. Only a SUPER_ADMIN can edit or delete
-              it.
-            </span>
+            <span>This is a privileged account. Only a SUPER_ADMIN can edit or delete it.</span>
           </div>
         </Alert>
       )}

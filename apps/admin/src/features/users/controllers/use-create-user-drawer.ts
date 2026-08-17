@@ -34,19 +34,13 @@ export function useCreateUserDrawer({
   const isActorSuperAdmin = actorRoles.includes("SUPER_ADMIN");
 
   const allAssignable = useMemo(
-    () =>
-      getAssignableRoles(
-        actorRoles,
-        rolesQuery.data?.data ?? [],
-      ),
+    () => getAssignableRoles(actorRoles, rolesQuery.data?.data ?? []),
     [actorRoles, rolesQuery.data],
   );
 
   const [selectedOrgId, setSelectedOrgId] = useState<string>("");
 
-  const effectiveOrgId = isActorSuperAdmin
-    ? selectedOrgId
-    : (actorOrganizationId ?? "");
+  const effectiveOrgId = isActorSuperAdmin ? selectedOrgId : (actorOrganizationId ?? "");
 
   const rolesForOrg = useMemo(
     () => filterRolesForOrganization(allAssignable, effectiveOrgId),
@@ -56,20 +50,11 @@ export function useCreateUserDrawer({
   const organizations = organizationsQuery.data?.data ?? [];
   const isOrganizationsLoading = organizationsQuery.isLoading;
 
-  const actorOrg = organizationsQuery.data?.data?.find(
-    (o) => o.id === actorOrganizationId,
-  );
+  const actorOrg = organizationsQuery.data?.data?.find((o) => o.id === actorOrganizationId);
 
   const handleSubmit = useCallback(
-    async (values: {
-      email: string;
-      password: string;
-      displayName: string;
-      roleId: string;
-    }) => {
-      const orgId = isActorSuperAdmin
-        ? selectedOrgId
-        : actorOrganizationId;
+    async (values: { email: string; password: string; displayName: string; roleId: string }) => {
+      const orgId = isActorSuperAdmin ? selectedOrgId : actorOrganizationId;
       try {
         return await createUser.mutateAsync({
           email: values.email,

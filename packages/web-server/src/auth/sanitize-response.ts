@@ -10,8 +10,11 @@ export function stripTokensFromAuthData<T extends object>(
     return null;
   }
 
-  const { accessToken: _accessToken, refreshToken: _refreshToken, ...rest } =
-    data as T & AuthTokenFields;
+  const {
+    accessToken: _accessToken,
+    refreshToken: _refreshToken,
+    ...rest
+  } = data as T & AuthTokenFields;
   return rest;
 }
 

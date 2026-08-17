@@ -20,11 +20,7 @@ interface TopHeaderProps {
   onOpenMobileMenu: () => void;
 }
 
-export function TopHeader({
-  displayName,
-  onSignOut,
-  onOpenMobileMenu,
-}: TopHeaderProps) {
+export function TopHeader({ displayName, onSignOut, onOpenMobileMenu }: TopHeaderProps) {
   const { collapsed, setCollapsed } = useSidebar();
   const { t } = useI18n();
   const router = useRouter();
@@ -67,11 +63,7 @@ export function TopHeader({
               className="ml-1.5 flex size-8 items-center justify-center rounded-full transition-all duration-300 hover:ring-2 hover:ring-primary/40 hover:scale-105"
               aria-label={displayName}
             >
-              <Avatar
-                name={displayName}
-                size="sm"
-                className="ring-1 ring-border/20"
-              />
+              <Avatar name={displayName} size="sm" className="ring-1 ring-border/20" />
             </button>
           }
           items={[

@@ -1,20 +1,14 @@
-import type { JsonObject } from '@repo/api-core';
+import type { JsonObject } from "@repo/api-core";
 
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import {
-  IsEnum,
-  IsObject,
-  IsOptional,
-  IsString,
-  MaxLength,
-} from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { IsEnum, IsObject, IsOptional, IsString, MaxLength } from "class-validator";
 
 import {
   PREFERENCE_LANGUAGES,
   PREFERENCE_THEMES,
   type PreferenceLanguage,
   type PreferenceTheme,
-} from '../application/preferences.constants';
+} from "../application/preferences.constants";
 
 export class UserPreferencesDto {
   @ApiProperty()
@@ -29,10 +23,10 @@ export class UserPreferencesDto {
   @ApiProperty()
   timezone: string;
 
-  @ApiProperty({ type: 'object', additionalProperties: true })
+  @ApiProperty({ type: "object", additionalProperties: true })
   notificationPreferences: JsonObject;
 
-  @ApiProperty({ type: 'object', additionalProperties: true })
+  @ApiProperty({ type: "object", additionalProperties: true })
   emailPreferences: JsonObject;
 
   @ApiProperty()
@@ -59,12 +53,12 @@ export class UpdatePreferencesDto {
   @MaxLength(64)
   timezone?: string;
 
-  @ApiPropertyOptional({ type: 'object', additionalProperties: true })
+  @ApiPropertyOptional({ type: "object", additionalProperties: true })
   @IsOptional()
   @IsObject()
   notificationPreferences?: JsonObject;
 
-  @ApiPropertyOptional({ type: 'object', additionalProperties: true })
+  @ApiPropertyOptional({ type: "object", additionalProperties: true })
   @IsOptional()
   @IsObject()
   emailPreferences?: JsonObject;

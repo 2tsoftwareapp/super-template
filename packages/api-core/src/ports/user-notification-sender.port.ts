@@ -1,6 +1,6 @@
-import type { JsonObject } from '../common/types/json-value';
-import type { AuthenticatedRequestUser, RequestContext } from '../common/types/request-context';
-import type { TransactionExecutor } from '../common/types/transaction-executor';
+import type { JsonObject } from "../common/types/json-value";
+import type { AuthenticatedRequestUser, RequestContext } from "../common/types/request-context";
+import type { TransactionExecutor } from "../common/types/transaction-executor";
 
 export interface SendUserNotificationInput {
   organizationId?: string;
@@ -35,4 +35,4 @@ export interface UserNotificationSender {
   dispatch(notification: NotificationMessage, organizationId: string): Promise<void>;
 }
 
-export const USER_NOTIFICATION_SENDER = Symbol('USER_NOTIFICATION_SENDER');
+export const USER_NOTIFICATION_SENDER = Symbol("USER_NOTIFICATION_SENDER");

@@ -6,10 +6,7 @@ import { useCallback, useState } from "react";
 
 import type { MailFilters } from "@/features/mail/model/mail.search-params";
 
-import {
-  parseMailFilters,
-  serializeMailFilters,
-} from "@/features/mail/model/mail.search-params";
+import { parseMailFilters, serializeMailFilters } from "@/features/mail/model/mail.search-params";
 
 export function useMailFilters(
   searchParams: URLSearchParams,

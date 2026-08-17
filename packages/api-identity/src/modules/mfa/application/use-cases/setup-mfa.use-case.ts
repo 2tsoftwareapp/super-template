@@ -1,17 +1,13 @@
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { AppError, EnvironmentService, ERROR_CODES } from '@repo/api-core';
+import { HttpStatus, Inject, Injectable } from "@nestjs/common";
+import { AppError, EnvironmentService, ERROR_CODES } from "@repo/api-core";
 
-import type { MfaSetupResult } from '../mfa.types';
+import type { MfaSetupResult } from "../mfa.types";
 
-import {
-  base32Encode,
-  buildOtpauthUri,
-  generateTotpSecret,
-} from '../../domain/totp';
-import { encryptTotpSecret } from '../../domain/totp-encryption';
-import { MFA_REPOSITORY, type MfaRepositoryPort } from '../ports/mfa.repository.port';
+import { base32Encode, buildOtpauthUri, generateTotpSecret } from "../../domain/totp";
+import { encryptTotpSecret } from "../../domain/totp-encryption";
+import { MFA_REPOSITORY, type MfaRepositoryPort } from "../ports/mfa.repository.port";
 
-const OTPAUTH_ISSUER = 'SuperTemplate';
+const OTPAUTH_ISSUER = "SuperTemplate";
 
 @Injectable()
 export class SetupMfaUseCase {
@@ -26,16 +22,13 @@ export class SetupMfaUseCase {
     if (existing?.enabled) {
       throw new AppError(
         ERROR_CODES.MFA_ALREADY_ENABLED,
-        'Two-factor authentication is already enabled',
+        "Two-factor authentication is already enabled",
         HttpStatus.CONFLICT,
       );
     }
 
     const secret = generateTotpSecret();
-    const encrypted = encryptTotpSecret(
-      secret,
-      this.environmentService.values.MFA_ENCRYPTION_KEY,
-    );
+    const encrypted = encryptTotpSecret(secret, this.environmentService.values.MFA_ENCRYPTION_KEY);
 
     await this.mfaRepository.upsertPendingSecret({
       userId,

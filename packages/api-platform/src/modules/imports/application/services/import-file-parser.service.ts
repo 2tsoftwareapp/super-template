@@ -1,11 +1,11 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { type ImportValidationError } from '@repo/api-core';
+import { Inject, Injectable } from "@nestjs/common";
+import { type ImportValidationError } from "@repo/api-core";
 
-import { ImportExportAdapterRegistry } from '../../../../import-export/import-export-adapter.registry';
+import { ImportExportAdapterRegistry } from "../../../../import-export/import-export-adapter.registry";
 import {
   OBJECT_STORAGE,
   type ObjectStorage,
-} from '../../../storage/application/object-storage.interface';
+} from "../../../storage/application/object-storage.interface";
 
 @Injectable()
 export class ImportFileParserService {
@@ -14,14 +14,11 @@ export class ImportFileParserService {
     private readonly importExportAdapters: ImportExportAdapterRegistry,
   ) {}
 
-  async parseImportFile(
-    type: string,
-    storageKey: string,
-  ): Promise<{ rows: object[] }> {
+  async parseImportFile(type: string, storageKey: string): Promise<{ rows: object[] }> {
     const adapter = this.importExportAdapters.resolve(type);
     const content = await this.objectStorage.read(storageKey);
     const lines = content
-      .toString('utf8')
+      .toString("utf8")
       .split(/\r?\n/)
       .map((line) => line.trim())
       .filter(Boolean);
@@ -31,12 +28,12 @@ export class ImportFileParserService {
     }
 
     const [headerLine, ...dataLines] = lines;
-    const headers = headerLine?.split(',').map((value) => value.trim()) ?? [];
+    const headers = headerLine?.split(",").map((value) => value.trim()) ?? [];
 
     const rows = dataLines.map((line) => {
-      const values = line.split(',').map((value) => value.trim());
+      const values = line.split(",").map((value) => value.trim());
       const record = Object.fromEntries(
-        headers.map((header, index) => [header, values[index] ?? '']),
+        headers.map((header, index) => [header, values[index] ?? ""]),
       );
 
       return adapter.parseCsvRecord(record);

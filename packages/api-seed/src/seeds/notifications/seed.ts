@@ -1,8 +1,8 @@
-import type { NotificationsRepositoryPort } from '@repo/api-platform/modules/notifications/application/ports/notifications.repository.port';
+import type { NotificationsRepositoryPort } from "@repo/api-platform/modules/notifications/application/ports/notifications.repository.port";
 
-import { type DatabaseExecutor } from '@repo/api-database';
+import { type DatabaseExecutor } from "@repo/api-database";
 
-import { type SeededUsersContext } from '../types';
+import { type SeededUsersContext } from "../types";
 
 export async function seedNotifications(
   notificationsRepository: NotificationsRepositoryPort,
@@ -16,7 +16,7 @@ export async function seedNotifications(
     {
       page: 1,
       limit: 1,
-      type: 'system.seed',
+      type: "system.seed",
     },
     executor,
   );
@@ -26,9 +26,9 @@ export async function seedNotifications(
       {
         userId: context.regularUserId,
         organizationId: context.regularOrganizationId,
-        type: 'system.seed',
-        title: 'Welcome to the starter',
-        body: 'Your account has been provisioned with sample data.',
+        type: "system.seed",
+        title: "Welcome to the starter",
+        body: "Your account has been provisioned with sample data.",
       },
       executor,
     );

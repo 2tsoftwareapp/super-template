@@ -1,10 +1,8 @@
-import type { JsonObject, TransactionExecutor } from '@repo/api-core';
+import type { JsonObject, TransactionExecutor } from "@repo/api-core";
 
-import type { JobStatus } from '../../domain/job-status';
+import type { JobStatus } from "../../domain/job-status";
 
-export type JobScope =
-  | { type: 'organization'; organizationId: string }
-  | { type: 'platform' };
+export type JobScope = { type: "organization"; organizationId: string } | { type: "platform" };
 
 export interface JobRecord {
   id: string;
@@ -131,10 +129,7 @@ export interface JobsRepositoryPort {
     attempts: number,
     executor?: TransactionExecutor,
   ): Promise<JobRecord | null>;
-  acquireDependencyGraphLock(
-    scope: JobScope,
-    executor?: TransactionExecutor,
-  ): Promise<void>;
+  acquireDependencyGraphLock(scope: JobScope, executor?: TransactionExecutor): Promise<void>;
   recoverStaleProcessing(executor?: TransactionExecutor): Promise<{
     requeued: JobRecord[];
     failed: JobRecord[];
@@ -152,4 +147,4 @@ export interface JobsRepositoryPort {
   ): Promise<{ id: string; jobId: string; status: JobStatus; organizationId: string | null }[]>;
 }
 
-export const JOBS_REPOSITORY = Symbol('JOBS_REPOSITORY');
+export const JOBS_REPOSITORY = Symbol("JOBS_REPOSITORY");

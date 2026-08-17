@@ -31,12 +31,9 @@ export default function GlobalError({
           }}
         >
           <div style={{ maxWidth: "28rem" }}>
-            <h1 style={{ fontSize: "1.25rem", fontWeight: 600 }}>
-              The console failed to start
-            </h1>
+            <h1 style={{ fontSize: "1.25rem", fontWeight: 600 }}>The console failed to start</h1>
             <p style={{ marginTop: "0.5rem", color: "#666" }}>
-              An unexpected error broke the application shell. Retrying reloads
-              the whole console.
+              An unexpected error broke the application shell. Retrying reloads the whole console.
             </p>
             {error.digest ? (
               <p style={{ marginTop: "0.5rem", fontSize: "0.75rem", color: "#999" }}>

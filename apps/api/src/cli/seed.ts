@@ -1,14 +1,14 @@
-import { NestFactory } from '@nestjs/core';
-import { seedDatabase } from '@repo/api-seed';
+import { NestFactory } from "@nestjs/core";
+import { seedDatabase } from "@repo/api-seed";
 
-import { AppModule } from '../app.module';
-import { loadCliEnv } from './load-cli-env';
+import { AppModule } from "../app.module";
+import { loadCliEnv } from "./load-cli-env";
 
 loadCliEnv();
 
 const main = async (): Promise<void> => {
   const app = await NestFactory.createApplicationContext(AppModule, {
-    logger: ['error', 'warn'],
+    logger: ["error", "warn"],
   });
 
   try {

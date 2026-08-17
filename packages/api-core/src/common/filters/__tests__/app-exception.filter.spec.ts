@@ -1,11 +1,11 @@
-import type { ArgumentsHost } from '@nestjs/common';
+import type { ArgumentsHost } from "@nestjs/common";
 
-import { HttpException, HttpStatus } from '@nestjs/common';
-import { describe, expect, it, vi } from 'vitest';
+import { HttpException, HttpStatus } from "@nestjs/common";
+import { describe, expect, it, vi } from "vitest";
 
-import { ERROR_CODES } from '../../constants/error-codes';
-import { AppError } from '../../errors/app-error';
-import { AppExceptionFilter } from '../app-exception.filter';
+import { ERROR_CODES } from "../../constants/error-codes";
+import { AppError } from "../../errors/app-error";
+import { AppExceptionFilter } from "../app-exception.filter";
 
 function createHost() {
   const json = vi.fn();
@@ -15,10 +15,10 @@ function createHost() {
     status,
   };
   const request = {
-    method: 'POST',
-    originalUrl: '/api/v1/users',
-    requestId: 'req-1',
-    user: { userId: 'user-1' },
+    method: "POST",
+    originalUrl: "/api/v1/users",
+    requestId: "req-1",
+    user: { userId: "user-1" },
   };
 
   const host = {
@@ -41,39 +41,32 @@ function createFilter(isProduction = false) {
     reportException: vi.fn(),
     reportMessage: vi.fn(),
   };
-  const filter = new AppExceptionFilter(
-    { isProduction } as never,
-    logger,
-    errorReporter as never,
-  );
+  const filter = new AppExceptionFilter({ isProduction } as never, logger, errorReporter as never);
 
   return { errorReporter, filter, logger };
 }
 
-describe('AppExceptionFilter', () => {
-  it('logs handled AppError warnings without reporting them', () => {
+describe("AppExceptionFilter", () => {
+  it("logs handled AppError warnings without reporting them", () => {
     const { filter, logger, errorReporter } = createFilter();
     const { host, json, response, status } = createHost();
-    const exception = new AppError(
-      ERROR_CODES.AUTH_FORBIDDEN,
-      'Forbidden',
-      HttpStatus.FORBIDDEN,
-      { missing: 'users.update' },
-    );
+    const exception = new AppError(ERROR_CODES.AUTH_FORBIDDEN, "Forbidden", HttpStatus.FORBIDDEN, {
+      missing: "users.update",
+    });
 
     filter.catch(exception, host);
 
     expect(response.locals.errorCode).toBe(ERROR_CODES.AUTH_FORBIDDEN);
     expect(logger.warn).toHaveBeenCalledWith(
-      'Handled request exception',
+      "Handled request exception",
       expect.objectContaining({
-        details: { missing: 'users.update' },
+        details: { missing: "users.update" },
         errorCode: ERROR_CODES.AUTH_FORBIDDEN,
-        method: 'POST',
-        path: '/api/v1/users',
-        requestId: 'req-1',
+        method: "POST",
+        path: "/api/v1/users",
+        requestId: "req-1",
         statusCode: HttpStatus.FORBIDDEN,
-        userId: 'user-1',
+        userId: "user-1",
       }),
     );
     expect(logger.error).not.toHaveBeenCalled();
@@ -83,22 +76,22 @@ describe('AppExceptionFilter', () => {
     expect(json).toHaveBeenCalledWith({
       error: {
         code: ERROR_CODES.AUTH_FORBIDDEN,
-        message: 'Forbidden',
-        details: { missing: 'users.update' },
+        message: "Forbidden",
+        details: { missing: "users.update" },
       },
-      meta: { requestId: 'req-1' },
+      meta: { requestId: "req-1" },
     });
   });
 
-  it('reports non-AppError server failures with stack in non-production', () => {
+  it("reports non-AppError server failures with stack in non-production", () => {
     const { filter, logger, errorReporter } = createFilter(false);
     const { host } = createHost();
-    const exception = new Error('boom');
+    const exception = new Error("boom");
 
     filter.catch(exception, host);
 
     expect(logger.error).toHaveBeenCalledWith(
-      'Unhandled request exception',
+      "Unhandled request exception",
       expect.objectContaining({
         errorCode: ERROR_CODES.INTERNAL_ERROR,
         stack: exception.stack,
@@ -113,32 +106,29 @@ describe('AppExceptionFilter', () => {
     );
   });
 
-  it('maps bad-request HttpException arrays to validation failures', () => {
+  it("maps bad-request HttpException arrays to validation failures", () => {
     const { filter, logger } = createFilter(true);
     const { host, json } = createHost();
 
     filter.catch(
-      new HttpException(
-        { message: ['email must be valid'] },
-        HttpStatus.BAD_REQUEST,
-      ),
+      new HttpException({ message: ["email must be valid"] }, HttpStatus.BAD_REQUEST),
       host,
     );
 
     expect(logger.warn).toHaveBeenCalledWith(
-      'Handled request exception',
+      "Handled request exception",
       expect.objectContaining({
-        details: ['email must be valid'],
+        details: ["email must be valid"],
         errorCode: ERROR_CODES.VALIDATION_FAILED,
       }),
     );
     expect(json).toHaveBeenCalledWith({
       error: {
         code: ERROR_CODES.VALIDATION_FAILED,
-        message: 'Validation failed',
-        details: ['email must be valid'],
+        message: "Validation failed",
+        details: ["email must be valid"],
       },
-      meta: { requestId: 'req-1' },
+      meta: { requestId: "req-1" },
     });
   });
 });

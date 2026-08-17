@@ -1,13 +1,13 @@
-import type { JsonObject } from '@repo/api-core';
+import type { JsonObject } from "@repo/api-core";
 
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsObject } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { IsObject } from "class-validator";
 
 export class ApplicationSettingDto {
   @ApiProperty()
   key: string;
 
-  @ApiProperty({ type: 'object', additionalProperties: true })
+  @ApiProperty({ type: "object", additionalProperties: true })
   value: JsonObject;
 
   @ApiPropertyOptional()
@@ -21,7 +21,7 @@ export class ApplicationSettingDto {
 }
 
 export class UpdateSettingDto {
-  @ApiProperty({ type: 'object', additionalProperties: true })
+  @ApiProperty({ type: "object", additionalProperties: true })
   @IsObject()
   value: JsonObject;
 }

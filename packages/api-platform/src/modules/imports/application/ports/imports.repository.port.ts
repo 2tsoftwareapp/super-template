@@ -1,4 +1,4 @@
-import type { ImportValidationError, TransactionExecutor } from '@repo/api-core';
+import type { ImportValidationError, TransactionExecutor } from "@repo/api-core";
 
 export interface ImportJobRecord {
   id: string;
@@ -21,17 +21,12 @@ export interface CreateImportJobValues {
   organizationId: string;
   type: string;
   fileId: string;
-  status: 'PENDING';
+  status: "PENDING";
   createdById: string;
   idempotencyKey?: string;
 }
 
-export type ImportJobStatusValue =
-  | 'PENDING'
-  | 'PROCESSING'
-  | 'COMPLETED'
-  | 'FAILED'
-  | 'CANCELLED';
+export type ImportJobStatusValue = "PENDING" | "PROCESSING" | "COMPLETED" | "FAILED" | "CANCELLED";
 
 export interface UpdateImportJobValues {
   status?: ImportJobStatusValue;
@@ -52,20 +47,14 @@ export interface ImportJobsRepositoryPort {
     values: CreateImportJobValues & { idempotencyKey: string },
     executor?: TransactionExecutor,
   ): Promise<{ value: ImportJobRecord | undefined; created: boolean }>;
-  findById(
-    jobId: string,
-    executor?: TransactionExecutor,
-  ): Promise<ImportJobRecord | null>;
+  findById(jobId: string, executor?: TransactionExecutor): Promise<ImportJobRecord | null>;
   /**
    * Atomically claims an import job for confirmation: only succeeds while
    * `confirmed_at` is still NULL, so concurrent confirm requests cannot both
    * import the same rows. Returns the claimed row or null when already
    * confirmed (caller must treat null as a conflict).
    */
-  confirm(
-    jobId: string,
-    executor?: TransactionExecutor,
-  ): Promise<ImportJobRecord | null>;
+  confirm(jobId: string, executor?: TransactionExecutor): Promise<ImportJobRecord | null>;
   update(
     jobId: string,
     values: UpdateImportJobValues,
@@ -73,4 +62,4 @@ export interface ImportJobsRepositoryPort {
   ): Promise<ImportJobRecord | null>;
 }
 
-export const IMPORT_JOBS_REPOSITORY = Symbol('IMPORT_JOBS_REPOSITORY');
+export const IMPORT_JOBS_REPOSITORY = Symbol("IMPORT_JOBS_REPOSITORY");

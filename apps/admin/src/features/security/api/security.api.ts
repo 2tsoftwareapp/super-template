@@ -55,12 +55,9 @@ export const securityApi = {
   },
 
   regenerateMfaCodes: (code: string) => {
-    return webFetch<MfaRecoveryCodesResponse>(
-      SECURITY_BFF_PATHS.mfa.regenerateCodes,
-      {
-        method: "POST",
-        body: JSON.stringify({ code }),
-      },
-    );
+    return webFetch<MfaRecoveryCodesResponse>(SECURITY_BFF_PATHS.mfa.regenerateCodes, {
+      method: "POST",
+      body: JSON.stringify({ code }),
+    });
   },
 };

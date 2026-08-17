@@ -1,4 +1,4 @@
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import {
   AppError,
   durationToMilliseconds,
@@ -6,19 +6,16 @@ import {
   ERROR_CODES,
   generateOpaqueToken,
   hashOpaqueToken,
-} from '@repo/api-core';
+} from "@repo/api-core";
 
-import type { StartSsoLoginCommand } from '../sso.types';
+import type { StartSsoLoginCommand } from "../sso.types";
 
-import { computeCodeChallenge, generateCodeVerifier } from '../../domain/pkce';
-import { assertAllowedRedirectUri } from '../../domain/redirect-allowlist';
-import {
-  SSO_PROVIDER_REGISTRY,
-  type SsoProviderRegistry,
-} from '../ports/sso-provider.port';
-import { SSO_REPOSITORY, type SsoRepositoryPort } from '../ports/sso.repository.port';
+import { computeCodeChallenge, generateCodeVerifier } from "../../domain/pkce";
+import { assertAllowedRedirectUri } from "../../domain/redirect-allowlist";
+import { SSO_PROVIDER_REGISTRY, type SsoProviderRegistry } from "../ports/sso-provider.port";
+import { SSO_REPOSITORY, type SsoRepositoryPort } from "../ports/sso.repository.port";
 
-const STATE_TTL = '10m';
+const STATE_TTL = "10m";
 
 @Injectable()
 export class StartSsoLoginUseCase {
@@ -29,9 +26,7 @@ export class StartSsoLoginUseCase {
     private readonly environmentService: EnvironmentService,
   ) {}
 
-  async execute(
-    input: StartSsoLoginCommand,
-  ): Promise<{ authorizationUrl: string }> {
+  async execute(input: StartSsoLoginCommand): Promise<{ authorizationUrl: string }> {
     const provider = this.providers.get(input.provider);
 
     if (!provider) {

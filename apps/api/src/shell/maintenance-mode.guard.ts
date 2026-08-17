@@ -1,4 +1,4 @@
-import type { Request as ExpressRequest } from 'express';
+import type { Request as ExpressRequest } from "express";
 
 import {
   type CanActivate,
@@ -6,13 +6,13 @@ import {
   HttpStatus,
   Inject,
   Injectable,
-} from '@nestjs/common';
+} from "@nestjs/common";
 import {
   AppError,
   APPLICATION_SETTINGS_LOOKUP,
   type ApplicationSettingsLookup,
   ERROR_CODES,
-} from '@repo/api-core';
+} from "@repo/api-core";
 
 /**
  * Paths that must stay reachable while maintenance mode is enabled so the
@@ -21,10 +21,10 @@ import {
  * themselves (the switch that turns maintenance off).
  */
 const MAINTENANCE_EXEMPT_PATHS = [
-  '/api/v1/health',
-  '/api/v1/auth/login',
-  '/api/v1/auth/sso',
-  '/api/v1/admin/settings',
+  "/api/v1/health",
+  "/api/v1/auth/login",
+  "/api/v1/auth/sso",
+  "/api/v1/admin/settings",
 ] as const;
 
 @Injectable()
@@ -47,7 +47,7 @@ export class MaintenanceModeGuard implements CanActivate {
 
     throw new AppError(
       ERROR_CODES.SERVICE_UNAVAILABLE,
-      'Service is under maintenance, please try again later',
+      "Service is under maintenance, please try again later",
       HttpStatus.SERVICE_UNAVAILABLE,
     );
   }
