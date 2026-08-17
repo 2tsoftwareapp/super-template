@@ -10,10 +10,7 @@ import {
   type AuthSessionRepositoryPort,
 } from "@repo/api-identity/modules/auth";
 import { OrganizationsService } from "@repo/api-identity/modules/organizations";
-import {
-  USERS_REPOSITORY,
-  type UsersRepositoryPort,
-} from "@repo/api-identity/modules/users";
+import { USERS_REPOSITORY, type UsersRepositoryPort } from "@repo/api-identity/modules/users";
 import {
   NOTIFICATIONS_REPOSITORY,
   type NotificationsRepositoryPort,

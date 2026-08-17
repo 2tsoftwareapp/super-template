@@ -7,10 +7,7 @@ import {
   FILES_REPOSITORY,
   type FilesRepositoryPort,
 } from "../../../files/application/ports/files.repository.port";
-import {
-  OBJECT_STORAGE,
-  type ObjectStorage,
-} from "../../../storage";
+import { OBJECT_STORAGE, type ObjectStorage } from "../../../storage";
 import { canDownloadAuditExport } from "../../domain/audit-export-access.policy";
 
 @Injectable()

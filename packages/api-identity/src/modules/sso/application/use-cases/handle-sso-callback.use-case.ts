@@ -19,10 +19,7 @@ import type { HandleSsoCallbackCommand } from "../sso.types";
 import { AccessControlService } from "../../../access-control";
 import { hashPassword, IssueSessionUseCase } from "../../../auth";
 import { OrganizationsService } from "../../../organizations";
-import {
-  USERS_REPOSITORY,
-  type UsersRepositoryPort,
-} from "../../../users";
+import { USERS_REPOSITORY, type UsersRepositoryPort } from "../../../users";
 import { decideAccountLinking } from "../../domain/account-linking.policy";
 import { SSO_PROVIDER_REGISTRY, type SsoProviderRegistry } from "../ports/sso-provider.port";
 import { SSO_REPOSITORY, type SsoRepositoryPort } from "../ports/sso.repository.port";

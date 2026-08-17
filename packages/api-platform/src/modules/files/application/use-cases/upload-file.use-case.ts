@@ -14,10 +14,7 @@ import {
 import { createHash, randomUUID } from "node:crypto";
 
 import { AuditService } from "../../../audit";
-import {
-  OBJECT_STORAGE,
-  type ObjectStorage,
-} from "../../../storage";
+import { OBJECT_STORAGE, type ObjectStorage } from "../../../storage";
 import {
   getUploadExtension,
   MAX_FILE_SIZE_BYTES,

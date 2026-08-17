@@ -18,10 +18,7 @@ import {
 import type { CreateAdminUserCommand, UserView } from "../users.types";
 
 import { AccessControlService, ROLE_NAMES } from "../../../access-control";
-import {
-  assertCanAssignRoleTargets,
-  assertRoleScopeCanBeAssigned,
-} from "../../../access-control";
+import { assertCanAssignRoleTargets, assertRoleScopeCanBeAssigned } from "../../../access-control";
 import {
   generateOpaqueToken,
   hashOpaqueToken,

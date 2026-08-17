@@ -2,10 +2,7 @@ import type { AuthenticatedRequestUser } from "@repo/api-core";
 
 import { Inject, Injectable } from "@nestjs/common";
 
-import {
-  OBJECT_STORAGE,
-  type ObjectStorage,
-} from "../../../storage";
+import { OBJECT_STORAGE, type ObjectStorage } from "../../../storage";
 import { FileAccessService } from "../services/file-access.service";
 import { LocalFileDownloadUrlService } from "../services/local-file-download-url.service";
 

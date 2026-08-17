@@ -12,10 +12,7 @@ import {
 import { createHash, randomUUID } from "node:crypto";
 
 import { AuditService } from "../../../audit";
-import {
-  OBJECT_STORAGE,
-  type ObjectStorage,
-} from "../../../storage";
+import { OBJECT_STORAGE, type ObjectStorage } from "../../../storage";
 import { FileVersionConflictError } from "../../domain/errors";
 import {
   getUploadExtension,

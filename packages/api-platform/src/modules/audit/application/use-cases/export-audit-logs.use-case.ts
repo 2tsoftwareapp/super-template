@@ -24,10 +24,7 @@ import {
   FILES_REPOSITORY,
   type FilesRepositoryPort,
 } from "../../../files/application/ports/files.repository.port";
-import {
-  OBJECT_STORAGE,
-  type ObjectStorage,
-} from "../../../storage";
+import { OBJECT_STORAGE, type ObjectStorage } from "../../../storage";
 import { AUDIT_REPOSITORY, type AuditRepositoryPort } from "../ports/audit.repository.port";
 import { RecordAuditLogUseCase } from "./record-audit-log.use-case";
 

@@ -6,7 +6,6 @@ import type { AssignableRoleName } from "./users.types";
 
 import { type AccessControlService, ROLE_NAMES, type RolePolicyTarget } from "../../access-control";
 
-
 export async function resolveAssignableRole(
   accessControlService: AccessControlService,
   roleName: AssignableRoleName,

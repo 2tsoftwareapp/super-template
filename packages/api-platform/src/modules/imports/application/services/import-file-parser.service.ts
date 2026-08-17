@@ -2,10 +2,7 @@ import { Inject, Injectable } from "@nestjs/common";
 import { type ImportValidationError } from "@repo/api-core";
 
 import { ImportExportAdapterRegistry } from "../../../../import-export/import-export-adapter.registry";
-import {
-  OBJECT_STORAGE,
-  type ObjectStorage,
-} from "../../../storage";
+import { OBJECT_STORAGE, type ObjectStorage } from "../../../storage";
 
 @Injectable()
 export class ImportFileParserService {
