@@ -1,6 +1,6 @@
 import { Global, Module } from "@nestjs/common";
 
-import { AccessControlModule } from "./modules/access-control/access-control.module";
+import { AccessControlModule } from "./modules/access-control";
 import { AuthDataModule } from "./modules/auth/auth-data.module";
 import { OrganizationsModule } from "./modules/organizations/organizations.module";
 import { PreferencesModule } from "./modules/preferences/preferences.module";

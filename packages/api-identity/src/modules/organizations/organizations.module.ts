@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 import { ORGANIZATION_LOOKUP } from "@repo/api-core";
 
-import { AccessControlModule } from "../access-control/access-control.module";
+import { AccessControlModule } from "../access-control";
 import { OrganizationsService } from "./application/organizations.service";
 import { ORGANIZATIONS_REPOSITORY } from "./application/ports/organizations.repository.port";
 import { AssertOrganizationMembershipUseCase } from "./application/use-cases/assert-organization-membership.use-case";

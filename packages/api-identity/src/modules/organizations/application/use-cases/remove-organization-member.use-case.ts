@@ -14,7 +14,7 @@ import {
   TRANSACTION_PORT,
 } from "@repo/api-core";
 
-import { AccessControlService } from "../../../access-control/application/access-control.service";
+import { AccessControlService } from "../../../access-control";
 import {
   assertCanManageTargetRole,
   assertNotLastOwner,

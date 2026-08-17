@@ -1,10 +1,9 @@
 import type { EnvironmentService } from "@repo/api-core";
-import type { AccessControlService } from "@repo/api-identity/modules/access-control/application/access-control.service";
 import type { OrganizationsService } from "@repo/api-identity/modules/organizations/application/organizations.service";
 import type { UsersRepositoryPort } from "@repo/api-identity/modules/users/application/ports/users.repository.port";
 
 import { type DatabaseExecutor } from "@repo/api-database";
-import { ROLE_NAMES } from "@repo/api-identity/modules/access-control/access-control.constants";
+import { type AccessControlService, ROLE_NAMES } from "@repo/api-identity/modules/access-control";
 import { hashPassword } from "@repo/api-identity/modules/auth/application/auth.helpers";
 
 import { type SeededUsersContext } from "../types";

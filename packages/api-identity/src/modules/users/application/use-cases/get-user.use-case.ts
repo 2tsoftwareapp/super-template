@@ -3,7 +3,7 @@ import { AppError, type AuthenticatedRequestUser, ERROR_CODES, ROLE_NAMES } from
 
 import type { UserView } from "../users.types";
 
-import { AccessControlService } from "../../../access-control/application/access-control.service";
+import { AccessControlService } from "../../../access-control";
 import {
   ORGANIZATIONS_REPOSITORY,
   type OrganizationsRepositoryPort,

@@ -12,8 +12,7 @@ import {
 
 import type { UpdateAdminUserCommand, UserView } from "../users.types";
 
-import { ROLE_NAMES } from "../../../access-control/access-control.constants";
-import { AccessControlService } from "../../../access-control/application/access-control.service";
+import { AccessControlService, ROLE_NAMES } from "../../../access-control";
 import { assertUserBelongsToOrganization } from "../../domain/user-org-scope.policy";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";
 import { GetUserUseCase } from "./get-user.use-case";

@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 import { EnvironmentService } from "@repo/api-core";
 
-import { AccessControlModule } from "../access-control/access-control.module";
+import { AccessControlModule } from "../access-control";
 import { AuthModule } from "../auth/auth.module";
 import { OrganizationsModule } from "../organizations/organizations.module";
 import { UsersModule } from "../users/users.module";

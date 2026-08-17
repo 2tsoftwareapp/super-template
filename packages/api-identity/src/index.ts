@@ -2,11 +2,11 @@ import { Module } from "@nestjs/common";
 
 export { IdentityPortsModule } from "./identity-ports.module";
 
-export { ACCESS_CONTROL_REPOSITORY } from "./modules/access-control/application/access-control.repository.port";
+export { ACCESS_CONTROL_REPOSITORY } from "./modules/access-control";
 
-export type * from "./modules/access-control/application/access-control.repository.port";
+export type * from "./modules/access-control";
 
-export { AccessControlService } from "./modules/access-control/application/access-control.service";
+export { AccessControlService } from "./modules/access-control";
 export type * from "./modules/organizations/application/ports/organizations.repository.port";
 export { ORGANIZATIONS_REPOSITORY } from "./modules/organizations/application/ports/organizations.repository.port";
 export type * from "./modules/users/application/ports/users.repository.port";
@@ -14,7 +14,7 @@ export { USERS_REPOSITORY } from "./modules/users/application/ports/users.reposi
 export { ACTION, hasPermission, perm, PRIVILEGED_ROLE_NAMES, ROLE_NAMES } from "@repo/api-core";
 
 import { IdentityPortsModule } from "./identity-ports.module";
-import { AccessControlModule } from "./modules/access-control/access-control.module";
+import { AccessControlModule } from "./modules/access-control";
 import { AuthModule } from "./modules/auth/auth.module";
 import { OrganizationsModule } from "./modules/organizations/organizations.module";
 import { PreferencesModule } from "./modules/preferences/preferences.module";

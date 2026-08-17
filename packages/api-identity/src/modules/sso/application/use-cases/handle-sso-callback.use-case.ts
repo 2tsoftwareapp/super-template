@@ -16,7 +16,7 @@ import { PLATFORM_TRANSACTION_PORT } from "@repo/api-core";
 
 import type { HandleSsoCallbackCommand } from "../sso.types";
 
-import { AccessControlService } from "../../../access-control/application/access-control.service";
+import { AccessControlService } from "../../../access-control";
 import { hashPassword } from "../../../auth/application/auth.helpers";
 import { IssueSessionUseCase } from "../../../auth/application/use-cases/issue-session.use-case";
 import { OrganizationsService } from "../../../organizations/application/organizations.service";

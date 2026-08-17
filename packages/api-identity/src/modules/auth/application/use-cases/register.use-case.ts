@@ -17,7 +17,7 @@ import {
 
 import type { RegisterCommand } from "../auth.types";
 
-import { AccessControlService } from "../../../access-control/application/access-control.service";
+import { AccessControlService } from "../../../access-control";
 import { OrganizationsService } from "../../../organizations/application/organizations.service";
 import {
   USERS_REPOSITORY,

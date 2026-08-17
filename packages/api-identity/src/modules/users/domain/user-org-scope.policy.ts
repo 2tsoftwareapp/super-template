@@ -2,7 +2,7 @@ import type { AuthenticatedRequestUser } from "@repo/api-core";
 
 import { AppError, ERROR_CODES } from "@repo/api-core";
 
-import { ROLE_NAMES } from "../../access-control/access-control.constants";
+import { ROLE_NAMES } from "../../access-control";
 
 export function resolveUsersListOrganizationId(
   actor: AuthenticatedRequestUser,

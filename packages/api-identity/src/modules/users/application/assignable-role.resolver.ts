@@ -2,11 +2,10 @@ import type { TransactionExecutor } from "@repo/api-core";
 
 import { AppError, ERROR_CODES } from "@repo/api-core";
 
-import type { AccessControlService } from "../../access-control/application/access-control.service";
-import type { RolePolicyTarget } from "../../access-control/domain/role-assignment.policy";
 import type { AssignableRoleName } from "./users.types";
 
-import { ROLE_NAMES } from "../../access-control/access-control.constants";
+import { type AccessControlService, ROLE_NAMES, type RolePolicyTarget } from "../../access-control";
+
 
 export async function resolveAssignableRole(
   accessControlService: AccessControlService,

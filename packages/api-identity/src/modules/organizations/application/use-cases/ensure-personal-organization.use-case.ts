@@ -3,7 +3,7 @@ import type { TransactionExecutor } from "@repo/api-core";
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { AppError, ERROR_CODES } from "@repo/api-core";
 
-import { AccessControlService } from "../../../access-control/application/access-control.service";
+import { AccessControlService } from "../../../access-control";
 import {
   ORGANIZATIONS_REPOSITORY,
   type OrganizationsRepositoryPort,

@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 import { USER_LOOKUP } from "@repo/api-core";
 
-import { AccessControlModule } from "../access-control/access-control.module";
+import { AccessControlModule } from "../access-control";
 import { AuthDataModule } from "../auth/auth-data.module";
 import { OrganizationsModule } from "../organizations/organizations.module";
 import { USERS_REPOSITORY } from "./application/ports/users.repository.port";

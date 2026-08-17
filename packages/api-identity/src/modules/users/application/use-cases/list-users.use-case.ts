@@ -4,7 +4,7 @@ import { Inject, Injectable } from "@nestjs/common";
 
 import type { ListUsersQuery } from "../users.types";
 
-import { AccessControlService } from "../../../access-control/application/access-control.service";
+import { AccessControlService } from "../../../access-control";
 import { resolveUsersListOrganizationId } from "../../domain/user-org-scope.policy";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";
 import { UsersMapper } from "../users.mapper";

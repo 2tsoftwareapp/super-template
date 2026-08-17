@@ -13,12 +13,11 @@ import { TRANSACTION_PORT } from "@repo/api-core";
 
 import type { UserView } from "../users.types";
 
-import { ROLE_NAMES } from "../../../access-control/access-control.constants";
-import { AccessControlService } from "../../../access-control/application/access-control.service";
+import { AccessControlService, ROLE_NAMES } from "../../../access-control";
 import {
   assertCanAssignRoleTargets,
   assertRoleScopeCanBeAssigned,
-} from "../../../access-control/domain/role-assignment.policy";
+} from "../../../access-control";
 import {
   ORGANIZATIONS_REPOSITORY,
   type OrganizationsRepositoryPort,

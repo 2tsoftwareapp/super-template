@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 import { JwtModule } from "@nestjs/jwt";
 
-import { AccessControlModule } from "../access-control/access-control.module";
+import { AccessControlModule } from "../access-control";
 import { MfaModule } from "../mfa/mfa.module";
 import { OrganizationsModule } from "../organizations/organizations.module";
 import { UsersModule } from "../users/users.module";

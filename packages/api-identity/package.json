@@ -4,6 +4,7 @@
   "private": true,
   "type": "commonjs",
   "exports": {
+    "./modules/access-control": "./src/modules/access-control/index.ts",
     ".": "./src/index.ts",
     "./*": "./src/*.ts",
     "./modules/*/*": "./src/modules/*/*.ts",

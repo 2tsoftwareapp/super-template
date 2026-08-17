@@ -5,7 +5,7 @@ import { AppError, ERROR_CODES } from "@repo/api-core";
 
 import type { RefreshSessionCommand } from "../auth.types";
 
-import { AccessControlService } from "../../../access-control/application/access-control.service";
+import { AccessControlService } from "../../../access-control";
 import { OrganizationsService } from "../../../organizations/application/organizations.service";
 import {
   USERS_REPOSITORY,

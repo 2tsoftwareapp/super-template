@@ -12,7 +12,7 @@ import {
   TRANSACTION_PORT,
 } from "@repo/api-core";
 
-import { AccessControlService } from "../../../access-control/application/access-control.service";
+import { AccessControlService } from "../../../access-control";
 import { assertOrganizationRole } from "../../domain/organization-access.policy";
 import {
   ORGANIZATIONS_REPOSITORY,
