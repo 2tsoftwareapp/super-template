@@ -10,15 +10,15 @@ export { PlatformPortsModule } from "./platform-ports.module";
 
 import { ActivitiesModule } from "./modules/activities/activities.module";
 import { AttachmentsModule } from "./modules/attachments/attachments.module";
-import { AuditModule } from "./modules/audit/audit.module";
+import { AuditModule } from "./modules/audit";
 import { ExportsModule } from "./modules/exports/exports.module";
 import { FilesModule } from "./modules/files/files.module";
 import { ImportsModule } from "./modules/imports/imports.module";
-import { JobsModule } from "./modules/jobs/jobs.module";
-import { MailModule } from "./modules/mail/mail.module";
+import { JobsModule } from "./modules/jobs";
+import { MailModule } from "./modules/mail";
 import { NotificationsModule } from "./modules/notifications/notifications.module";
 import { SettingsModule } from "./modules/settings/settings.module";
-import { StorageModule } from "./modules/storage/storage.module";
+import { StorageModule } from "./modules/storage";
 import { PlatformPortsModule } from "./platform-ports.module";
 
 @Module({

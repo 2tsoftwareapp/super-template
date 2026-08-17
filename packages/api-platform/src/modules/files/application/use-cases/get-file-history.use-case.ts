@@ -2,7 +2,7 @@ import type { AuthenticatedRequestUser, JsonObject } from "@repo/api-core";
 
 import { Inject, Injectable } from "@nestjs/common";
 
-import { AuditService } from "../../../audit/application/audit.service";
+import { AuditService } from "../../../audit";
 import { FILES_REPOSITORY, type FilesRepositoryPort } from "../ports/files.repository.port";
 import { FileAccessService } from "../services/file-access.service";
 

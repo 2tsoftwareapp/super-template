@@ -13,7 +13,7 @@ import {
 import type { CreateExportCommand } from "../exports.types";
 
 import { ImportExportAdapterRegistry } from "../../../../import-export/import-export-adapter.registry";
-import { AuditService } from "../../../audit/application/audit.service";
+import { AuditService } from "../../../audit";
 import { ExportsMapper } from "../exports.mapper";
 import {
   EXPORT_JOBS_REPOSITORY,

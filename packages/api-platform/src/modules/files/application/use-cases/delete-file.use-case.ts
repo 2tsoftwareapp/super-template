@@ -4,11 +4,11 @@ import { Inject, Injectable } from "@nestjs/common";
 import { SYSTEM_SCOPE } from "@repo/api-core";
 import { TRANSACTION_PORT, type TransactionPort } from "@repo/api-core";
 
-import { AuditService } from "../../../audit/application/audit.service";
+import { AuditService } from "../../../audit";
 import {
   OBJECT_STORAGE,
   type ObjectStorage,
-} from "../../../storage/application/object-storage.interface";
+} from "../../../storage";
 import { FILES_REPOSITORY, type FilesRepositoryPort } from "../ports/files.repository.port";
 import { FileAccessService } from "../services/file-access.service";
 

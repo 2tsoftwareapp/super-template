@@ -2,9 +2,9 @@ import { Module } from "@nestjs/common";
 import { IdentityPortsModule } from "@repo/api-identity";
 
 import { ImportExportAdapterRegistry } from "../../import-export/import-export-adapter.registry";
-import { AuditModule } from "../audit/audit.module";
+import { AuditModule } from "../audit";
 import { FilesModule } from "../files/files.module";
-import { StorageModule } from "../storage/storage.module";
+import { StorageModule } from "../storage";
 import { ImportsMapper } from "./application/imports.mapper";
 import { IMPORT_JOBS_REPOSITORY } from "./application/ports/imports.repository.port";
 import { ImportFileParserService } from "./application/services/import-file-parser.service";

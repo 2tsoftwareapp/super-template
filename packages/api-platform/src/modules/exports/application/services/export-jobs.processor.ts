@@ -17,7 +17,7 @@ import {
 import { randomUUID } from "node:crypto";
 
 import { ImportExportAdapterRegistry } from "../../../../import-export/import-export-adapter.registry";
-import { AuditService } from "../../../audit/application/audit.service";
+import { AuditService } from "../../../audit";
 import {
   FILES_REPOSITORY,
   type FilesRepositoryPort,
@@ -25,7 +25,7 @@ import {
 import {
   OBJECT_STORAGE,
   type ObjectStorage,
-} from "../../../storage/application/object-storage.interface";
+} from "../../../storage";
 import { MAX_EXPORT_ROWS } from "../../domain/export-policy";
 import {
   EXPORT_JOBS_REPOSITORY,

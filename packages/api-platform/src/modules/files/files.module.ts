@@ -1,8 +1,8 @@
 import { Module } from "@nestjs/common";
 import { FILE_LOOKUP } from "@repo/api-core";
 
-import { AuditModule } from "../audit/audit.module";
-import { StorageModule } from "../storage/storage.module";
+import { AuditModule } from "../audit";
+import { StorageModule } from "../storage";
 import { FILES_REPOSITORY } from "./application/ports/files.repository.port";
 import { FileAccessService } from "./application/services/file-access.service";
 import { LocalFileDownloadUrlService } from "./application/services/local-file-download-url.service";

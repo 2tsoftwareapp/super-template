@@ -27,7 +27,7 @@ import {
 import {
   OBJECT_STORAGE,
   type ObjectStorage,
-} from "../../../storage/application/object-storage.interface";
+} from "../../../storage";
 import { AUDIT_REPOSITORY, type AuditRepositoryPort } from "../ports/audit.repository.port";
 import { RecordAuditLogUseCase } from "./record-audit-log.use-case";
 

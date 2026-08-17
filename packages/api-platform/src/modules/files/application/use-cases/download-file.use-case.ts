@@ -5,7 +5,7 @@ import { Inject, Injectable } from "@nestjs/common";
 import {
   OBJECT_STORAGE,
   type ObjectStorage,
-} from "../../../storage/application/object-storage.interface";
+} from "../../../storage";
 import { FileAccessService } from "../services/file-access.service";
 import { LocalFileDownloadUrlService } from "../services/local-file-download-url.service";
 

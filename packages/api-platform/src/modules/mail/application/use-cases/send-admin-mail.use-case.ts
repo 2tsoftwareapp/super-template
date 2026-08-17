@@ -3,7 +3,7 @@ import type { AuthenticatedRequestUser } from "@repo/api-core";
 import { forwardRef, HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { AppError, ERROR_CODES, isMandatoryMailTemplate, SYSTEM_SCOPE } from "@repo/api-core";
 
-import { AuditService } from "../../../audit/application/audit.service";
+import { AuditService } from "../../../audit";
 import { JobsService } from "../../../jobs/application/jobs.service";
 import {
   TEMPLATE_RENDERER_SERVICE,

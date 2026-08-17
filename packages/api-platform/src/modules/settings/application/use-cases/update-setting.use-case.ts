@@ -6,7 +6,7 @@ import { PLATFORM_TRANSACTION_PORT, type PlatformTransactionPort } from "@repo/a
 
 import type { UpdateSettingCommand } from "../settings.types";
 
-import { AuditService } from "../../../audit/application/audit.service";
+import { AuditService } from "../../../audit";
 import { ApplicationSettingsLookupService } from "../application-settings-lookup.service";
 import {
   SETTINGS_REPOSITORY,

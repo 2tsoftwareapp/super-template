@@ -13,11 +13,11 @@ import {
 } from "@repo/api-core";
 import { createHash, randomUUID } from "node:crypto";
 
-import { AuditService } from "../../../audit/application/audit.service";
+import { AuditService } from "../../../audit";
 import {
   OBJECT_STORAGE,
   type ObjectStorage,
-} from "../../../storage/application/object-storage.interface";
+} from "../../../storage";
 import {
   getUploadExtension,
   MAX_FILE_SIZE_BYTES,

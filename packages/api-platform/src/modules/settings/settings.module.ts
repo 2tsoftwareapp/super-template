@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 import { APPLICATION_SETTINGS_LOOKUP } from "@repo/api-core";
 
-import { AuditModule } from "../audit/audit.module";
+import { AuditModule } from "../audit";
 import { ApplicationSettingsLookupService } from "./application/application-settings-lookup.service";
 import { SETTINGS_REPOSITORY } from "./application/ports/settings.repository.port";
 import { EnsureSettingsSeedDataUseCase } from "./application/use-cases/ensure-settings-seed-data.use-case";

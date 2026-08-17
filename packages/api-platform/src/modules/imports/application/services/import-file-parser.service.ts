@@ -5,7 +5,7 @@ import { ImportExportAdapterRegistry } from "../../../../import-export/import-ex
 import {
   OBJECT_STORAGE,
   type ObjectStorage,
-} from "../../../storage/application/object-storage.interface";
+} from "../../../storage";
 
 @Injectable()
 export class ImportFileParserService {

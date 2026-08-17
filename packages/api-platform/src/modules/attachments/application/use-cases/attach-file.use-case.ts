@@ -13,7 +13,7 @@ import {
 
 import type { AttachEntityCommand } from "../attachments.types";
 
-import { AuditService } from "../../../audit/application/audit.service";
+import { AuditService } from "../../../audit";
 import {
   FILES_REPOSITORY,
   type FilesRepositoryPort,

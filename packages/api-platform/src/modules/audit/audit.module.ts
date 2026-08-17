@@ -3,7 +3,7 @@ import { AUDIT_WRITER } from "@repo/api-core";
 
 import { FILES_REPOSITORY } from "../files/application/ports/files.repository.port";
 import { FilesRepository } from "../files/infrastructure/files.repository";
-import { StorageModule } from "../storage/storage.module";
+import { StorageModule } from "../storage";
 import { AuditRetentionService } from "./application/audit-retention.service";
 import { AuditMapper } from "./application/audit.mapper";
 import { AuditService } from "./application/audit.service";

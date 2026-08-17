@@ -13,7 +13,7 @@ import {
 import type { CreateImportCommand, ImportJobView } from "../imports.types";
 
 import { ImportExportAdapterRegistry } from "../../../../import-export/import-export-adapter.registry";
-import { AuditService } from "../../../audit/application/audit.service";
+import { AuditService } from "../../../audit";
 import { FileAccessService } from "../../../files/application/services/file-access.service";
 import { MAX_IMPORT_ROWS } from "../../domain/import-types";
 import {

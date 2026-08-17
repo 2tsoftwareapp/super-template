@@ -10,7 +10,7 @@ import {
 import {
   OBJECT_STORAGE,
   type ObjectStorage,
-} from "../../../storage/application/object-storage.interface";
+} from "../../../storage";
 import { canDownloadAuditExport } from "../../domain/audit-export-access.policy";
 
 @Injectable()

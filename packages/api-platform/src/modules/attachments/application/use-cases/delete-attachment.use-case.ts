@@ -11,7 +11,7 @@ import {
   type TransactionPort,
 } from "@repo/api-core";
 
-import { AuditService } from "../../../audit/application/audit.service";
+import { AuditService } from "../../../audit";
 import {
   ATTACHMENTS_REPOSITORY,
   type AttachmentsRepositoryPort,
