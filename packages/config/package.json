@@ -10,7 +10,7 @@
     "build": "node ../../tools/tsc7/node_modules/typescript7/bin/tsc -p tsconfig.json",
     "generate": "tsx scripts/generate.ts",
     "lint": "eslint .",
-    "typecheck": "node ../../tools/tsc7/node_modules/typescript7/bin/tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {
     "@repo/tsconfig": "workspace:*",
