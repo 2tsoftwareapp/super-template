@@ -1,71 +1,16 @@
 import { z } from 'zod';
 
-const booleanFromString = z.preprocess((value) => {
-  if (typeof value === 'boolean') {
-    return value;
-  }
-
-  if (typeof value === 'string') {
-    if (value === 'true') {
-      return true;
-    }
-
-    if (value === 'false') {
-      return false;
-    }
-  }
-
-  return value;
-}, z.boolean());
-
-const emptyStringToUndefined = z.preprocess(
-  (value) => (value === '' ? undefined : value),
-  z.string().optional(),
-);
-
-const isHttpUrl = (value: string): boolean => {
-  try {
-    new URL(value);
-    return true;
-  } catch {
-    return false;
-  }
-};
-
-// Accepts one origin or a comma-separated list, validating each entry as a URL.
-const commaSeparatedOrigins = z
-  .string()
-  .min(1)
-  .refine(
-    (value) =>
-      value
-        .split(',')
-        .map((origin) => origin.trim())
-        .filter(Boolean)
-        .every(isHttpUrl),
-    { message: 'must be a comma-separated list of valid origin URLs' },
-  );
-
-// Matches the format accepted by durationToMilliseconds (e.g. "15m", "7d").
-const durationString = z
-  .string()
-  .regex(/^\d+[smhdw]$/, 'must be a duration like "15m" or "7d"');
-
-// Placeholder secrets shipped in .env.example / .env.development. They are fine for
-// local development but MUST be replaced with real secrets in staging/production.
-const DEV_PLACEHOLDER_SECRETS = new Set([
-  'replace-with-a-long-random-development-secret',
-  'replace-with-another-long-random-development-secret',
-]);
-const DEV_PLACEHOLDER_MFA_KEY =
-  '0861abb090792515d50d973600fced671ad99f2edd463d5da88887d90d594f99';
-
-const everyOriginIsHttps = (value: string): boolean =>
-  value
-    .split(',')
-    .map((origin) => origin.trim())
-    .filter(Boolean)
-    .every((origin) => origin.startsWith('https://'));
+import {
+  booleanFromString,
+  commaSeparatedOrigins,
+  durationString,
+  emptyStringToUndefined,
+  everyOriginIsHttps,
+} from './env-utils';
+import {
+  DEV_PLACEHOLDER_MFA_KEY,
+  DEV_PLACEHOLDER_SECRETS,
+} from './env.constants';
 
 export const envSchema = z.object({
   // Environment and process metadata.
