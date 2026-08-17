@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { loadEnvFiles } from '@repo/api-core/config/load-env-files';
+import { loadEnvFiles } from '@repo/env-loader';
 import { writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 

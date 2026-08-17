@@ -6,8 +6,7 @@
   "exports": {
     ".": "./src/index.ts",
     "./config/app-config.module": "./src/config/app-config.module.ts",
-    "./config/environment.service": "./src/config/environment.service.ts",
-    "./config/load-env-files": "./src/config/load-env-files.ts"
+    "./config/environment.service": "./src/config/environment.service.ts"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json --noEmit",

@@ -265,6 +265,9 @@ importers:
       '@repo/api-seed':
         specifier: workspace:*
         version: link:../../packages/api-seed
+      '@repo/env-loader':
+        specifier: workspace:*
+        version: link:../../packages/env-loader
       argon2:
         specifier: 0.44.0
         version: 0.44.0
@@ -613,6 +616,9 @@ importers:
       '@repo/api-core':
         specifier: workspace:*
         version: link:../api-core
+      '@repo/env-loader':
+        specifier: workspace:*
+        version: link:../env-loader
       drizzle-orm:
         specifier: 0.45.2
         version: 0.45.2(@opentelemetry/api@1.9.1)(@types/pg@8.15.6)(pg@8.21.0)

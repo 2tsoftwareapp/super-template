@@ -1,4 +1,4 @@
-import { loadEnvFiles } from '@repo/api-core/config/load-env-files';
+import { loadEnvFiles } from '@repo/env-loader';
 import { defineConfig } from 'drizzle-kit';
 
 loadEnvFiles();

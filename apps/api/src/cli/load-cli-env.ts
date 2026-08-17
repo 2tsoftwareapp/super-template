@@ -1,1 +1,1 @@
-export { loadEnvFiles as loadCliEnv } from '@repo/api-core/config/load-env-files';
+export { loadEnvFiles as loadCliEnv } from '@repo/env-loader';
