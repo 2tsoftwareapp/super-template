@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { PurgeExpiredAuditLogsUseCase } from '@platform/modules/audit/application/use-cases/purge-expired-audit-logs.use-case';
+import { PurgeExpiredAuditLogsUseCase } from '../purge-expired-audit-logs.use-case';
 
 const buildEnvironmentService = (retentionDays: number) => ({
   values: { AUDIT_RETENTION_DAYS: retentionDays },

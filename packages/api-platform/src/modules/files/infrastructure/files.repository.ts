@@ -2,9 +2,9 @@ import type {
   DatabaseClient,
   DatabaseExecutor,
 } from '@repo/api-database';
-import { isPostgresUniqueViolation, runIdempotentInsert } from '@repo/api-database';
 
 import { Inject, Injectable } from '@nestjs/common';
+import { isPostgresUniqueViolation, runIdempotentInsert } from '@repo/api-database';
 import { DATABASE } from '@repo/api-database';
 import { fileBatchOperations, files, fileVersions } from '@repo/api-database';
 import {
