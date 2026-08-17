@@ -17,7 +17,7 @@ import type {
   SsoSessionExchangeRecord,
 } from "../application/ports/sso.repository.port";
 
-import { decryptTotpSecret, encryptTotpSecret } from "../../mfa/domain/totp-encryption";
+import { decryptTotpSecret, encryptTotpSecret } from "../../mfa";
 
 /**
  * Drizzle SSO repository.

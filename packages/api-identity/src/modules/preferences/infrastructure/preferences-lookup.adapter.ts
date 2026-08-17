@@ -5,7 +5,7 @@ import { Inject, Injectable } from "@nestjs/common";
 import {
   USERS_REPOSITORY,
   type UsersRepositoryPort,
-} from "../../users/application/ports/users.repository.port";
+} from "../../users";
 import { DEFAULT_USER_PREFERENCES } from "../application/preferences.constants";
 import { PreferencesRepository } from "./preferences.repository";
 

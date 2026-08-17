@@ -8,12 +8,12 @@ import { AccessControlService } from "@repo/api-identity/modules/access-control"
 import {
   AUTH_SESSION_REPOSITORY,
   type AuthSessionRepositoryPort,
-} from "@repo/api-identity/modules/auth/application/ports/auth-session.repository.port";
-import { OrganizationsService } from "@repo/api-identity/modules/organizations/application/organizations.service";
+} from "@repo/api-identity/modules/auth";
+import { OrganizationsService } from "@repo/api-identity/modules/organizations";
 import {
   USERS_REPOSITORY,
   type UsersRepositoryPort,
-} from "@repo/api-identity/modules/users/application/ports/users.repository.port";
+} from "@repo/api-identity/modules/users";
 import {
   NOTIFICATIONS_REPOSITORY,
   type NotificationsRepositoryPort,

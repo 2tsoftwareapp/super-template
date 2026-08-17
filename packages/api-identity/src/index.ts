@@ -7,19 +7,19 @@ export { ACCESS_CONTROL_REPOSITORY } from "./modules/access-control";
 export type * from "./modules/access-control";
 
 export { AccessControlService } from "./modules/access-control";
-export type * from "./modules/organizations/application/ports/organizations.repository.port";
-export { ORGANIZATIONS_REPOSITORY } from "./modules/organizations/application/ports/organizations.repository.port";
-export type * from "./modules/users/application/ports/users.repository.port";
-export { USERS_REPOSITORY } from "./modules/users/application/ports/users.repository.port";
+export type * from "./modules/organizations";
+export { ORGANIZATIONS_REPOSITORY } from "./modules/organizations";
+export type * from "./modules/users";
+export { USERS_REPOSITORY } from "./modules/users";
 export { ACTION, hasPermission, perm, PRIVILEGED_ROLE_NAMES, ROLE_NAMES } from "@repo/api-core";
 
 import { IdentityPortsModule } from "./identity-ports.module";
 import { AccessControlModule } from "./modules/access-control";
-import { AuthModule } from "./modules/auth/auth.module";
-import { OrganizationsModule } from "./modules/organizations/organizations.module";
+import { AuthModule } from "./modules/auth";
+import { OrganizationsModule } from "./modules/organizations";
 import { PreferencesModule } from "./modules/preferences/preferences.module";
 import { SsoModule } from "./modules/sso/sso.module";
-import { UsersModule } from "./modules/users/users.module";
+import { UsersModule } from "./modules/users";
 
 @Module({
   imports: [

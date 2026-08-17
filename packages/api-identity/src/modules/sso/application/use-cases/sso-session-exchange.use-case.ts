@@ -9,12 +9,10 @@ import {
 
 import {
   AUTH_SESSION_REPOSITORY,
-  type AuthSessionRepositoryPort,
-} from "../../../auth/application/ports/auth-session.repository.port";
-import {
   AUTH_TOKEN_PROVIDER,
+  type AuthSessionRepositoryPort,
   type AuthTokenProviderPort,
-} from "../../../auth/application/ports/auth-token.provider.port";
+} from "../../../auth";
 import { SSO_REPOSITORY, type SsoRepositoryPort } from "../ports/sso.repository.port";
 
 const EXCHANGE_TTL = "2m";
