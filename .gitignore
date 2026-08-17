@@ -31,7 +31,7 @@ android/app/release
 !.env.development
 !.env.staging.example
 !.env.production.example
-apps/api/drizzle/meta
+packages/api-database/drizzle/meta
 apps/api/storage/uploads/
 apps/api/storage/exports/
 *.tsbuildinfo
