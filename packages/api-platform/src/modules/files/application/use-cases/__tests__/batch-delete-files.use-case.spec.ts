@@ -76,22 +76,19 @@ describe('BatchDeleteFilesUseCase', () => {
     ]);
   });
 
-  it('absorbs a concurrent first-time insert race via runIdempotentInsert instead of 500ing', async () => {
+  it('delegates race absorption to the repository idempotent insert and returns its result', async () => {
     const storedResults = [
       { fileId: 'file-1', success: true, error: null },
     ];
     const filesRepository = {
-      // Fast-path read misses, then the runIdempotentInsert retry finds the
-      // record the concurrent request just committed.
-      findBatchOperationByIdempotencyKey: vi
-        .fn()
-        .mockResolvedValueOnce(null)
-        .mockResolvedValueOnce({ id: 'op-1', results: storedResults }),
-      createBatchOperation: vi.fn(async () => {
-        throw Object.assign(new Error('duplicate key value'), {
-          code: '23505',
-        });
-      }),
+      findBatchOperationByIdempotencyKey: vi.fn(async () => null),
+      createBatchOperation: vi.fn(),
+      createBatchOperationIdempotent: vi.fn(
+        async (_input, computeResults: () => Promise<unknown>) => {
+          await computeResults();
+          return storedResults;
+        },
+      ),
     };
     const deleteFileUseCase = { execute: vi.fn(async () => undefined) };
 
@@ -102,10 +99,39 @@ describe('BatchDeleteFilesUseCase', () => {
 
     const results = await useCase.execute(actor, ['file-1'], 'race-key');
 
-    // Deletes ran once, then the unique violation resolved to the concurrent
-    // record's results instead of surfacing an error.
+    // The compute callback runs the deletes; the repository owns the
+    // unique-violation retry and returns the concurrent record's results.
     expect(deleteFileUseCase.execute).toHaveBeenCalledTimes(1);
+    expect(filesRepository.createBatchOperationIdempotent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        organizationId: 'org-1',
+        actorId: 'user-1',
+        operation: 'delete',
+        idempotencyKey: 'race-key',
+      }),
+      expect.any(Function),
+    );
     expect(results).toBe(storedResults);
+  });
+
+  it('re-runs deletes when the repository reports no persisted results', async () => {
+    const filesRepository = {
+      findBatchOperationByIdempotencyKey: vi.fn(async () => null),
+      createBatchOperationIdempotent: vi.fn(async () => null),
+    };
+    const deleteFileUseCase = { execute: vi.fn(async () => undefined) };
+
+    const useCase = new BatchDeleteFilesUseCase(
+      filesRepository as never,
+      deleteFileUseCase as never,
+    );
+
+    const results = await useCase.execute(actor, ['file-1'], 'race-key');
+
+    expect(deleteFileUseCase.execute).toHaveBeenCalledTimes(1);
+    expect(results).toEqual([
+      { fileId: 'file-1', success: true, error: null },
+    ]);
   });
 
   it('replays the stored result instead of re-deleting when the idempotency key matches', async () => {

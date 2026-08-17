@@ -1,6 +1,8 @@
 import type { JsonObject } from '@repo/api-core';
 import type { TransactionExecutor } from '@repo/api-core';
 
+export type { JsonObject } from '@repo/api-core';
+
 export interface FileRecord {
   id: string;
   organizationId: string | null;
@@ -124,6 +126,20 @@ export interface FilesRepositoryPort {
   listVersions(fileId: string, executor?: TransactionExecutor): Promise<FileVersionRecord[]>;
   findBatchOperationByIdempotencyKey(actorId: string, idempotencyKey: string, executor?: TransactionExecutor): Promise<FileBatchOperationRecord | null>;
   createBatchOperation(values: CreateFileBatchOperationInput, executor?: TransactionExecutor): Promise<FileBatchOperationRecord>;
+  /**
+   * Persists a batch operation with atomic idempotency: when the insert hits
+   * the partial-unique (actor_id, idempotency_key) index, the concurrent
+   * record's results are returned instead of surfacing a 500. Returns null
+   * when neither the insert nor an existing record produced results — the
+   * caller falls back to re-running the operation. The `computeResults`
+   * callback holds the caller's domain work (deletes) that runs before the
+   * persistence attempt.
+   */
+  createBatchOperationIdempotent(
+    input: Omit<CreateFileBatchOperationInput, 'results' | 'idempotencyKey'> & { idempotencyKey: string },
+    computeResults: () => Promise<JsonObject[]>,
+    executor?: TransactionExecutor,
+  ): Promise<JsonObject[] | null>;
 }
 
 export const FILES_REPOSITORY = Symbol('FILES_REPOSITORY');

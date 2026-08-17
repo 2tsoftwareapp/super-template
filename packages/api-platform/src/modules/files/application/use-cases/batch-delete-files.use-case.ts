@@ -6,7 +6,6 @@ import type {
 
 import { Inject, Injectable } from '@nestjs/common';
 import { requireOrganizationId } from '@repo/api-core';
-import { runIdempotentInsert } from '@repo/api-database';
 
 import { FILES_REPOSITORY, type FilesRepositoryPort } from '../ports/files.repository.port';
 import { DeleteFileUseCase } from './delete-file.use-case';
@@ -68,28 +67,34 @@ export class BatchDeleteFilesUseCase {
         results: results as unknown as JsonObject[],
       });
 
-    // Atomic idempotency: with a key, the insert races are absorbed by
-    // runIdempotentInsert (unique violation -> fetch the concurrent record)
-    // instead of surfacing a 500. Without a key there is no conflict surface
-    // (the partial unique index only covers non-null keys).
     if (idempotencyKey) {
-      const result = await runIdempotentInsert(
-        async () => {
-          const results = await runDeletes();
-          const operation = await persist(results);
-          return operation?.results;
+      const existing =
+        await this.filesRepository.findBatchOperationByIdempotencyKey(
+          actor.userId,
+          idempotencyKey,
+        );
+
+      if (existing) {
+        return existing.results as unknown as BatchDeleteResultItem[];
+      }
+    }
+
+    // Atomic idempotency: with a key, insert races are absorbed by the
+    // repository (unique violation -> fetch the concurrent record) instead of
+    // surfacing a 500. Without a key there is no conflict surface (the partial
+    // unique index only covers non-null keys).
+    if (idempotencyKey) {
+      const persisted = await this.filesRepository.createBatchOperationIdempotent(
+        {
+          organizationId: requireOrganizationId(actor),
+          actorId: actor.userId,
+          operation: 'delete',
+          idempotencyKey,
         },
-        async () => {
-          const operation =
-            await this.filesRepository.findBatchOperationByIdempotencyKey(
-              actor.userId,
-              idempotencyKey,
-            );
-          return operation?.results ?? null;
-        },
+        async () => (await runDeletes()) as unknown as JsonObject[],
       );
 
-      return (result?.value as unknown as BatchDeleteResultItem[] | undefined) ??
+      return (persisted as unknown as BatchDeleteResultItem[] | null) ??
         (await runDeletes());
     }
 

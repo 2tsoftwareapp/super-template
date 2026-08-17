@@ -2,6 +2,7 @@ import type {
   DatabaseClient,
   DatabaseExecutor,
 } from '@repo/api-database';
+import { runIdempotentInsert } from '@repo/api-database';
 
 import { Inject, Injectable } from '@nestjs/common';
 import { DATABASE } from '@repo/api-database';
@@ -21,8 +22,10 @@ import {
 } from 'drizzle-orm';
 
 import type {
+  CreateFileBatchOperationInput,
   FileListResult,
   FilesRepositoryPort,
+  JsonObject,
   ListFilesQuery,
 } from '../application/ports/files.repository.port';
 
@@ -232,5 +235,35 @@ export class FilesRepository implements FilesRepositoryPort {
     }
 
     return operation;
+  }
+
+  async createBatchOperationIdempotent(
+    input: Omit<CreateFileBatchOperationInput, 'results' | 'idempotencyKey'> & { idempotencyKey: string },
+    computeResults: () => Promise<JsonObject[]>,
+    executor: DatabaseExecutor = this.database,
+  ): Promise<JsonObject[] | null> {
+    // Atomic idempotency: concurrent inserts with the same key collide on the
+    // partial unique index; runIdempotentInsert absorbs the race by fetching
+    // the concurrent record instead of surfacing a 500.
+    const result = await runIdempotentInsert(
+      async () => {
+        const results = await computeResults();
+        const operation = await this.createBatchOperation(
+          { ...input, results },
+          executor,
+        );
+        return operation.results;
+      },
+      async () => {
+        const operation = await this.findBatchOperationByIdempotencyKey(
+          input.actorId,
+          input.idempotencyKey,
+          executor,
+        );
+        return operation?.results ?? null;
+      },
+    );
+
+    return result?.value ?? null;
   }
 }
