@@ -19,13 +19,13 @@ import {
   AuthorizeGuard,
   EnvironmentService,
   ErrorReporterService,
-  ImportExportModule,
   LoggingModule,
   RedisThrottlerStorage,
   RequestContextMiddleware,
   RequestLoggerMiddleware,
   ResponseEnvelopeInterceptor,
 } from '@repo/api-core';
+import { ImportExportModule } from '@repo/api-platform';
 import { TenantContextService } from '@repo/api-core';
 import { AppConfigModule } from '@repo/api-core/config/app-config.module';
 import { DatabaseModule } from '@repo/api-database';

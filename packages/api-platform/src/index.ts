@@ -5,6 +5,8 @@ export { PUSH_NOTIFIER } from './modules/notifications/application/push.interfac
 export { NotificationDeliveryProcessor } from './modules/notifications/application/services/notification-delivery.processor';
 export { NotificationDeliveryUseCase } from './modules/notifications/application/use-cases/notification-delivery.use-case';
 export { PlatformPortsModule } from './platform-ports.module';
+export { ImportExportAdapterRegistry } from './import-export/import-export-adapter.registry';
+export { ImportExportModule } from './import-export/import-export.module';
 
 import { ActivitiesModule } from './modules/activities/activities.module';
 import { AttachmentsModule } from './modules/attachments/attachments.module';

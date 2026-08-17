@@ -3,13 +3,13 @@ import {
   AppError,
   type AuthenticatedRequestUser,
   ERROR_CODES,
-  ImportExportAdapterRegistry,
   type ImportValidationError,
   type RequestContext,
   SYSTEM_SCOPE,
   TRANSACTION_PORT,
   type TransactionPort,
 } from '@repo/api-core';
+import { ImportExportAdapterRegistry } from '@repo/api-platform';
 
 import type { CreateImportCommand, ImportJobView } from '../imports.types';
 

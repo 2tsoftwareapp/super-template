@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ImportExportAdapterRegistry } from '@repo/api-core';
+import { ImportExportAdapterRegistry } from '@repo/api-platform';
 import { IdentityPortsModule } from '@repo/api-identity';
 
 import { AuditModule } from '../audit/audit.module';

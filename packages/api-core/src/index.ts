@@ -26,7 +26,6 @@ export * from "./common/decorators/skip-envelope.decorator";
 export * from "./common/errors/app-error";
 export * from "./common/filters/app-exception.filter";
 export { AuthorizeGuard } from "./common/guards/authorize.guard";
-export { ImportExportModule } from "./common/import-export/import-export.module";
 export * from "./common/interceptors/response-envelope.interceptor";
 export { ConsoleAppLogger } from "./common/logging/console-logger.service";
 export * from "./common/logging/logger.interface";
@@ -92,7 +91,6 @@ export {
 } from "./ports/file-lookup.port";
 export {
   type ImportExportAdapter,
-  ImportExportAdapterRegistry,
   type ImportExportRowContext,
   type ImportValidationError,
 } from "./ports/import-export-adapter.port";

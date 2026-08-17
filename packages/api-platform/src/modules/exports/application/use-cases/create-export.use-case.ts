@@ -7,12 +7,12 @@ import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import {
   AppError,
   ERROR_CODES,
-  ImportExportAdapterRegistry,
   requireOrganizationId,
   SYSTEM_SCOPE,
   TRANSACTION_PORT,
   type TransactionPort,
 } from '@repo/api-core';
+import { ImportExportAdapterRegistry } from '@repo/api-platform';
 
 import type { CreateExportCommand } from '../exports.types';
 

@@ -1,8 +1,6 @@
 import { Test } from '@nestjs/testing';
-import {
-  ImportExportAdapterRegistry,
-  TRANSACTION_PORT,
-} from '@repo/api-core';
+import { TRANSACTION_PORT } from '@repo/api-core';
+import { ImportExportAdapterRegistry } from '@repo/api-platform';
 import { CreateExportUseCase } from '@repo/api-platform/modules/exports/application/use-cases/create-export.use-case';
 import { GetExportUseCase } from '@repo/api-platform/modules/exports/application/use-cases/get-export.use-case';
 import { EXPORT_JOBS_REPOSITORY } from '@repo/api-platform/modules/exports/application/ports/export-jobs.repository.port';

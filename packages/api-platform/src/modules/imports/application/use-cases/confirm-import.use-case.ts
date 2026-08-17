@@ -9,12 +9,12 @@ import {
   type ActivityEmitter,
   AppError,
   ERROR_CODES,
-  ImportExportAdapterRegistry,
   type ImportValidationError,
   SYSTEM_SCOPE,
   TRANSACTION_PORT,
   type TransactionPort,
 } from '@repo/api-core';
+import { ImportExportAdapterRegistry } from '@repo/api-platform';
 
 import type { ImportJobView } from '../imports.types';
 

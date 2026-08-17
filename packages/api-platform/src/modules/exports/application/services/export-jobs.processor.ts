@@ -8,13 +8,13 @@ import {
   type AppLogger,
   ERROR_CODES,
   ErrorReporterService,
-  ImportExportAdapterRegistry,
   SYSTEM_SCOPE,
   TenantContextService,
   toCsv,
   TRANSACTION_PORT,
   type TransactionPort,
 } from '@repo/api-core';
+import { ImportExportAdapterRegistry } from '@repo/api-platform';
 import { randomUUID } from 'node:crypto';
 
 import { AuditService } from '../../../audit/application/audit.service';
