@@ -20,7 +20,7 @@ import { AppConfigModule } from "@repo/api-core/config/app-config.module";
 import { DatabaseModule } from "@repo/api-database";
 import { HealthModule } from "@repo/api-health";
 import { IdentityModule } from "@repo/api-identity";
-import { AuthService } from "@repo/api-identity/modules/auth/application/auth.service";
+import { AuthService } from "@repo/api-identity/modules/auth";
 import { ImportExportModule } from "@repo/api-platform";
 import { PlatformModule } from "@repo/api-platform";
 

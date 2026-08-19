@@ -8,7 +8,7 @@ import {
   ERROR_CODES,
   IS_PUBLIC_KEY,
 } from "@repo/api-core";
-import { AuthService } from "@repo/api-identity/modules/auth/application/auth.service";
+import { AuthService } from "@repo/api-identity/modules/auth";
 
 @Injectable()
 export class AuthGuard implements CanActivate {

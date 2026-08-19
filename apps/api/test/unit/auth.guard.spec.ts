@@ -1,6 +1,6 @@
 import type { ExecutionContext } from "@nestjs/common";
 import type { Reflector } from "@nestjs/core";
-import type { AuthService } from "@repo/api-identity/modules/auth/application/auth.service";
+import type { AuthService } from "@repo/api-identity/modules/auth";
 
 import { AppError } from "@repo/api-core";
 import { describe, expect, it, vi } from "vitest";

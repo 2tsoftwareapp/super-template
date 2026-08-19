@@ -46,3 +46,9 @@ jobs:
 
       - name: Typecheck
         run: pnpm -r typecheck
+
+      - name: Test
+        run: pnpm --filter api test
+
+      - name: Build
+        run: pnpm build
