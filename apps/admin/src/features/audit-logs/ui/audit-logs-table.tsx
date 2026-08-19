@@ -5,14 +5,7 @@ import { Button } from "@repo/web-ui/button";
 import { SectionLoading } from "@repo/web-ui/loading";
 import { Pagination } from "@repo/web-ui/pagination";
 import { Show } from "@repo/web-ui/show";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@repo/web-ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@repo/web-ui/table";
 import { Tooltip } from "@repo/web-ui/tooltip";
 
 import type { AuditLogDto } from "@/lib/api-types";
@@ -72,13 +65,8 @@ export function AuditLogsTable({
           </Show>
           {!isLoading && entries.length === 0 ? (
             <TableRow>
-              <TableCell
-                colSpan={6}
-                className="py-16 text-center text-sm text-muted-foreground"
-              >
-                {hasFilters
-                  ? "No events match your filters."
-                  : "No events recorded yet."}
+              <TableCell colSpan={6} className="py-16 text-center text-sm text-muted-foreground">
+                {hasFilters ? "No events match your filters." : "No events recorded yet."}
               </TableCell>
             </TableRow>
           ) : (
@@ -89,22 +77,14 @@ export function AuditLogsTable({
                 onClick={() => onSelectEntry(entry)}
               >
                 <TableCell className="whitespace-nowrap font-mono text-xs text-muted-foreground">
-                  <Tooltip
-                    content={formatDateTime(entry.createdAt)}
-                    side="top"
-                  >
+                  <Tooltip content={formatDateTime(entry.createdAt)} side="top">
                     <span>{timeAgo(entry.createdAt)}</span>
                   </Tooltip>
                 </TableCell>
-                <TableCell className="text-sm font-medium">
-                  {formatAction(entry.action)}
-                </TableCell>
+                <TableCell className="text-sm font-medium">{formatAction(entry.action)}</TableCell>
                 <TableCell>
                   {entry.entityType ? (
-                    <Badge
-                      variant="secondary"
-                      className="text-xs capitalize"
-                    >
+                    <Badge variant="secondary" className="text-xs capitalize">
                       {entry.entityType.toLowerCase()}
                     </Badge>
                   ) : (
@@ -128,9 +108,7 @@ export function AuditLogsTable({
                       </span>
                     </Tooltip>
                   ) : (
-                    <span className="text-xs text-muted-foreground">
-                      System
-                    </span>
+                    <span className="text-xs text-muted-foreground">System</span>
                   )}
                 </TableCell>
                 <TableCell>

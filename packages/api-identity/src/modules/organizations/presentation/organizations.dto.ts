@@ -1,8 +1,8 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsIn, IsString, MaxLength, MinLength } from 'class-validator';
+import { ApiProperty } from "@nestjs/swagger";
+import { IsIn, IsString, MaxLength, MinLength } from "class-validator";
 
 export class CreateOrganizationDto {
-  @ApiProperty({ example: 'Acme Corp' })
+  @ApiProperty({ example: "Acme Corp" })
   @IsString()
   @MinLength(2)
   @MaxLength(120)
@@ -10,7 +10,7 @@ export class CreateOrganizationDto {
 }
 
 export class UpdateOrganizationDto {
-  @ApiProperty({ example: 'Acme Corp' })
+  @ApiProperty({ example: "Acme Corp" })
   @IsString()
   @MinLength(2)
   @MaxLength(120)
@@ -27,8 +27,8 @@ export class OrganizationDetailDto {
   @ApiProperty()
   slug!: string;
 
-  @ApiProperty({ enum: ['OWNER', 'ADMIN', 'MEMBER'] })
-  role!: 'OWNER' | 'ADMIN' | 'MEMBER';
+  @ApiProperty({ enum: ["OWNER", "ADMIN", "MEMBER"] })
+  role!: "OWNER" | "ADMIN" | "MEMBER";
 
   @ApiProperty()
   memberCount!: number;
@@ -50,8 +50,8 @@ export class OrganizationMemberDto {
   @ApiProperty()
   displayName!: string;
 
-  @ApiProperty({ enum: ['OWNER', 'ADMIN', 'MEMBER'] })
-  role!: 'OWNER' | 'ADMIN' | 'MEMBER';
+  @ApiProperty({ enum: ["OWNER", "ADMIN", "MEMBER"] })
+  role!: "OWNER" | "ADMIN" | "MEMBER";
 
   @ApiProperty()
   createdAt!: string;
@@ -61,9 +61,9 @@ export class OrganizationMemberDto {
 }
 
 export class UpdateMemberRoleDto {
-  @ApiProperty({ enum: ['OWNER', 'ADMIN', 'MEMBER'] })
-  @IsIn(['OWNER', 'ADMIN', 'MEMBER'])
-  role!: 'OWNER' | 'ADMIN' | 'MEMBER';
+  @ApiProperty({ enum: ["OWNER", "ADMIN", "MEMBER"] })
+  @IsIn(["OWNER", "ADMIN", "MEMBER"])
+  role!: "OWNER" | "ADMIN" | "MEMBER";
 }
 
 export class OrganizationDto {
@@ -76,8 +76,8 @@ export class OrganizationDto {
   @ApiProperty()
   slug!: string;
 
-  @ApiProperty({ enum: ['OWNER', 'ADMIN', 'MEMBER'] })
-  role!: 'OWNER' | 'ADMIN' | 'MEMBER';
+  @ApiProperty({ enum: ["OWNER", "ADMIN", "MEMBER"] })
+  role!: "OWNER" | "ADMIN" | "MEMBER";
 
   @ApiProperty()
   createdAt!: string;

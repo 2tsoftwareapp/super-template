@@ -1,8 +1,8 @@
-import type { RequestContext } from '@repo/api-core';
-import type { TransactionPort } from '@repo/api-core';
+import type { RequestContext } from "@repo/api-core";
+import type { TransactionPort } from "@repo/api-core";
 
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { 
+import { HttpStatus, Inject, Injectable } from "@nestjs/common";
+import {
   AppError,
   AUDIT_WRITER,
   type AuditWriter,
@@ -11,22 +11,18 @@ import {
   hashOpaqueToken,
   normalizeEmail,
   SYSTEM_SCOPE,
-} from '@repo/api-core';
-import { PLATFORM_TRANSACTION_PORT } from '@repo/api-core';
+} from "@repo/api-core";
+import { PLATFORM_TRANSACTION_PORT } from "@repo/api-core";
 
-import type { HandleSsoCallbackCommand } from '../sso.types';
+import type { HandleSsoCallbackCommand } from "../sso.types";
 
-import { AccessControlService } from '../../../access-control/application/access-control.service';
-import { hashPassword } from '../../../auth/application/auth.helpers';
-import { IssueSessionUseCase } from '../../../auth/application/use-cases/issue-session.use-case';
-import { OrganizationsService } from '../../../organizations/application/organizations.service';
-import { USERS_REPOSITORY, type UsersRepositoryPort } from '../../../users/application/ports/users.repository.port';
-import { decideAccountLinking } from '../../domain/account-linking.policy';
-import {
-  SSO_PROVIDER_REGISTRY,
-  type SsoProviderRegistry,
-} from '../ports/sso-provider.port';
-import { SSO_REPOSITORY, type SsoRepositoryPort } from '../ports/sso.repository.port';
+import { AccessControlService } from "../../../access-control";
+import { hashPassword, IssueSessionUseCase } from "../../../auth";
+import { OrganizationsService } from "../../../organizations";
+import { USERS_REPOSITORY, type UsersRepositoryPort } from "../../../users";
+import { decideAccountLinking } from "../../domain/account-linking.policy";
+import { SSO_PROVIDER_REGISTRY, type SsoProviderRegistry } from "../ports/sso-provider.port";
+import { SSO_REPOSITORY, type SsoRepositoryPort } from "../ports/sso.repository.port";
 
 @Injectable()
 export class HandleSsoCallbackUseCase {
@@ -42,10 +38,7 @@ export class HandleSsoCallbackUseCase {
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
   ) {}
 
-  async execute(
-    input: HandleSsoCallbackCommand,
-    requestContext?: RequestContext,
-  ) {
+  async execute(input: HandleSsoCallbackCommand, requestContext?: RequestContext) {
     const provider = this.providers.get(input.provider);
 
     if (!provider) {
@@ -63,7 +56,7 @@ export class HandleSsoCallbackUseCase {
     if (loginState?.provider !== input.provider) {
       throw new AppError(
         ERROR_CODES.SSO_STATE_INVALID,
-        'SSO login state is invalid or expired',
+        "SSO login state is invalid or expired",
         HttpStatus.UNAUTHORIZED,
       );
     }
@@ -71,14 +64,12 @@ export class HandleSsoCallbackUseCase {
     // CAS-consume the one-time state BEFORE any side effect: a false result
     // means a concurrent request already replayed this state, so the callback
     // must abort instead of running the login flow twice (TOCTOU guard).
-    const stateConsumed = await this.ssoRepository.consumeLoginState(
-      loginState.id,
-    );
+    const stateConsumed = await this.ssoRepository.consumeLoginState(loginState.id);
 
     if (!stateConsumed) {
       throw new AppError(
         ERROR_CODES.SSO_STATE_INVALID,
-        'SSO login state was already used',
+        "SSO login state was already used",
         HttpStatus.UNAUTHORIZED,
       );
     }
@@ -90,25 +81,22 @@ export class HandleSsoCallbackUseCase {
         code: input.code,
         codeVerifier: loginState.codeVerifier,
       });
-      identity = await provider.verifyIdToken(
-        tokenSet.idToken,
-        loginState.nonce,
-      );
+      identity = await provider.verifyIdToken(tokenSet.idToken, loginState.nonce);
     } catch (error) {
       await this.auditWriter.log({
-        action: 'auth.sso.failed',
-        entityType: 'user',
+        action: "auth.sso.failed",
+        entityType: "user",
         metadata: {
           provider: input.provider,
-          reason: error instanceof Error ? error.message : 'unknown error',
+          reason: error instanceof Error ? error.message : "unknown error",
         },
         requestContext,
-          scope: SYSTEM_SCOPE.PLATFORM
-    });
+        scope: SYSTEM_SCOPE.PLATFORM,
+      });
 
       throw new AppError(
         ERROR_CODES.SSO_TOKEN_INVALID,
-        'Failed to verify SSO identity',
+        "Failed to verify SSO identity",
         HttpStatus.UNAUTHORIZED,
       );
     }
@@ -116,14 +104,14 @@ export class HandleSsoCallbackUseCase {
     if (!identity.email) {
       throw new AppError(
         ERROR_CODES.SSO_TOKEN_INVALID,
-        'Provider did not return an email address',
+        "Provider did not return an email address",
         HttpStatus.UNAUTHORIZED,
       );
     }
 
     const email = normalizeEmail(identity.email);
 
-    const user = await this.transactionPort.run( async (transaction) => {
+    const user = await this.transactionPort.run(async (transaction) => {
       const existingIdentity = await this.ssoRepository.findIdentity(
         input.provider,
         identity.subject,
@@ -139,7 +127,7 @@ export class HandleSsoCallbackUseCase {
         if (!linkedUser) {
           throw new AppError(
             ERROR_CODES.USER_NOT_FOUND,
-            'Linked user not found',
+            "Linked user not found",
             HttpStatus.UNAUTHORIZED,
           );
         }
@@ -147,10 +135,7 @@ export class HandleSsoCallbackUseCase {
         return linkedUser;
       }
 
-      const existingUserByEmail = await this.usersRepository.findByEmail(
-        email,
-        transaction,
-      );
+      const existingUserByEmail = await this.usersRepository.findByEmail(email, transaction);
       const decision = decideAccountLinking({
         existingUserByEmail: existingUserByEmail
           ? {
@@ -160,10 +145,10 @@ export class HandleSsoCallbackUseCase {
           : null,
       });
 
-      if (decision.kind === 'conflict') {
+      if (decision.kind === "conflict") {
         throw new AppError(
           ERROR_CODES.SSO_EMAIL_CONFLICT,
-          'An account with this email already exists. Verify your email or sign in with a password first.',
+          "An account with this email already exists. Verify your email or sign in with a password first.",
           HttpStatus.CONFLICT,
         );
       }
@@ -171,37 +156,33 @@ export class HandleSsoCallbackUseCase {
       if (!identity.emailVerified) {
         throw new AppError(
           ERROR_CODES.SSO_TOKEN_INVALID,
-          'Provider did not verify the email address',
+          "Provider did not verify the email address",
           HttpStatus.UNAUTHORIZED,
         );
       }
 
       let targetUser;
 
-      if (decision.kind === 'link_existing') {
+      if (decision.kind === "link_existing") {
         targetUser = existingUserByEmail!;
       } else {
         targetUser = await this.usersRepository.create(
           {
             email,
             passwordHash: await hashPassword(generateOpaqueToken()),
-            displayName: email.split('@')[0] ?? email,
-            status: 'ACTIVE',
+            displayName: email.split("@")[0] ?? email,
+            status: "ACTIVE",
             emailVerifiedAt: new Date(),
           },
           transaction,
         );
 
-        const userRole = await this.accessControlService.getRoleByName(
-          'USER',
-          null,
-          transaction,
-        );
+        const userRole = await this.accessControlService.getRoleByName("USER", null, transaction);
 
         if (!userRole) {
           throw new AppError(
             ERROR_CODES.INTERNAL_ERROR,
-            'Default USER role is missing',
+            "Default USER role is missing",
             HttpStatus.INTERNAL_SERVER_ERROR,
           );
         }
@@ -233,15 +214,12 @@ export class HandleSsoCallbackUseCase {
       await this.auditWriter.log(
         {
           actorId: targetUser.id,
-          action:
-            decision.kind === 'create_new'
-              ? 'auth.sso.signup'
-              : 'auth.sso.linked',
-          entityType: 'user',
+          action: decision.kind === "create_new" ? "auth.sso.signup" : "auth.sso.linked",
+          entityType: "user",
           entityId: targetUser.id,
           metadata: { provider: input.provider },
           requestContext,
-            scope: SYSTEM_SCOPE.PLATFORM
+          scope: SYSTEM_SCOPE.PLATFORM,
         },
         transaction,
       );
@@ -249,19 +227,16 @@ export class HandleSsoCallbackUseCase {
       return targetUser;
     });
 
-    const session = await this.issueSessionUseCase.execute(
-      user,
-      requestContext,
-    );
+    const session = await this.issueSessionUseCase.execute(user, requestContext);
 
     await this.auditWriter.log({
       actorId: user.id,
-      action: 'auth.sso.login_succeeded',
-      entityType: 'user',
+      action: "auth.sso.login_succeeded",
+      entityType: "user",
       entityId: user.id,
       metadata: { provider: input.provider },
       requestContext,
-        scope: SYSTEM_SCOPE.PLATFORM
+      scope: SYSTEM_SCOPE.PLATFORM,
     });
 
     return { session, redirectUri: loginState.redirectUri };

@@ -1,24 +1,24 @@
-import { Injectable } from '@nestjs/common';
-import { EnvironmentService } from '@repo/api-core';
+import { Injectable } from "@nestjs/common";
+import { EnvironmentService } from "@repo/api-core";
 
 import type {
   SsoIdentity,
   SsoProviderAdapter,
   SsoTokenSet,
-} from '../application/ports/sso-provider.port';
+} from "../application/ports/sso-provider.port";
 
-import { verifyOidcIdToken } from '../domain/oidc-verify';
-import { JwksCacheService } from './jwks-cache.service';
+import { verifyOidcIdToken } from "../domain/oidc-verify";
+import { JwksCacheService } from "./jwks-cache.service";
 
-const AUTHORIZATION_ENDPOINT = 'https://accounts.google.com/o/oauth2/v2/auth';
-const TOKEN_ENDPOINT = 'https://oauth2.googleapis.com/token';
-const JWKS_URI = 'https://www.googleapis.com/oauth2/v3/certs';
+const AUTHORIZATION_ENDPOINT = "https://accounts.google.com/o/oauth2/v2/auth";
+const TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token";
+const JWKS_URI = "https://www.googleapis.com/oauth2/v3/certs";
 // Google has issued tokens with both forms historically; accept either.
-const ISSUERS = ['https://accounts.google.com', 'accounts.google.com'];
+const ISSUERS = ["https://accounts.google.com", "accounts.google.com"];
 
 @Injectable()
 export class GoogleSsoAdapter implements SsoProviderAdapter {
-  readonly provider = 'google';
+  readonly provider = "google";
 
   constructor(
     private readonly environmentService: EnvironmentService,
@@ -26,51 +26,40 @@ export class GoogleSsoAdapter implements SsoProviderAdapter {
   ) {}
 
   getCallbackRedirectUri(): string {
-    const { GOOGLE_REDIRECT_URI, API_INTERNAL_URL } =
-      this.environmentService.values;
-    return (
-      GOOGLE_REDIRECT_URI ??
-      `${API_INTERNAL_URL}/api/v1/auth/sso/google/callback`
-    );
+    const { GOOGLE_REDIRECT_URI, API_INTERNAL_URL } = this.environmentService.values;
+    return GOOGLE_REDIRECT_URI ?? `${API_INTERNAL_URL}/api/v1/auth/sso/google/callback`;
   }
 
-  buildAuthorizationUrl(params: {
-    state: string;
-    nonce: string;
-    codeChallenge: string;
-  }): string {
+  buildAuthorizationUrl(params: { state: string; nonce: string; codeChallenge: string }): string {
     const url = new URL(AUTHORIZATION_ENDPOINT);
-    url.searchParams.set('client_id', this.requireClientId());
-    url.searchParams.set('redirect_uri', this.getCallbackRedirectUri());
-    url.searchParams.set('response_type', 'code');
-    url.searchParams.set('scope', 'openid email profile');
-    url.searchParams.set('state', params.state);
-    url.searchParams.set('nonce', params.nonce);
-    url.searchParams.set('code_challenge', params.codeChallenge);
-    url.searchParams.set('code_challenge_method', 'S256');
+    url.searchParams.set("client_id", this.requireClientId());
+    url.searchParams.set("redirect_uri", this.getCallbackRedirectUri());
+    url.searchParams.set("response_type", "code");
+    url.searchParams.set("scope", "openid email profile");
+    url.searchParams.set("state", params.state);
+    url.searchParams.set("nonce", params.nonce);
+    url.searchParams.set("code_challenge", params.codeChallenge);
+    url.searchParams.set("code_challenge_method", "S256");
     return url.toString();
   }
 
-  async exchangeCode(params: {
-    code: string;
-    codeVerifier: string;
-  }): Promise<SsoTokenSet> {
+  async exchangeCode(params: { code: string; codeVerifier: string }): Promise<SsoTokenSet> {
     const { GOOGLE_CLIENT_SECRET } = this.environmentService.values;
 
     if (!GOOGLE_CLIENT_SECRET) {
-      throw new Error('Google SSO is not configured');
+      throw new Error("Google SSO is not configured");
     }
 
     const response = await fetch(TOKEN_ENDPOINT, {
-      method: 'POST',
-      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      method: "POST",
+      headers: { "content-type": "application/x-www-form-urlencoded" },
       body: new URLSearchParams({
         client_id: this.requireClientId(),
         client_secret: GOOGLE_CLIENT_SECRET,
         code: params.code,
         code_verifier: params.codeVerifier,
         redirect_uri: this.getCallbackRedirectUri(),
-        grant_type: 'authorization_code',
+        grant_type: "authorization_code",
       }).toString(),
     });
 
@@ -81,7 +70,7 @@ export class GoogleSsoAdapter implements SsoProviderAdapter {
     const body = (await response.json()) as { id_token?: string };
 
     if (!body.id_token) {
-      throw new Error('Google token response missing id_token');
+      throw new Error("Google token response missing id_token");
     }
 
     return { idToken: body.id_token };
@@ -99,10 +88,8 @@ export class GoogleSsoAdapter implements SsoProviderAdapter {
 
     return {
       subject: payload.sub,
-      email: typeof payload.email === 'string' ? payload.email : '',
-      emailVerified:
-        payload.email_verified === true ||
-        payload.email_verified === 'true',
+      email: typeof payload.email === "string" ? payload.email : "",
+      emailVerified: payload.email_verified === true || payload.email_verified === "true",
     };
   }
 
@@ -110,7 +97,7 @@ export class GoogleSsoAdapter implements SsoProviderAdapter {
     const clientId = this.environmentService.values.GOOGLE_CLIENT_ID;
 
     if (!clientId) {
-      throw new Error('Google SSO is not configured');
+      throw new Error("Google SSO is not configured");
     }
 
     return clientId;

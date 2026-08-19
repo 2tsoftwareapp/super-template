@@ -27,22 +27,14 @@ export function DashboardHealth({
           {
             label: "Job queue",
             ok: failedJobs === 0,
-            detail:
-              failedJobs > 0
-                ? `${failedJobs} failed`
-                : `${pendingJobs} pending`,
+            detail: failedJobs > 0 ? `${failedJobs} failed` : `${pendingJobs} pending`,
           },
         ].map((item) => (
-          <div
-            key={item.label}
-            className="flex items-center justify-between py-1.5 text-xs"
-          >
+          <div key={item.label} className="flex items-center justify-between py-1.5 text-xs">
             <span className="text-muted-foreground">{item.label}</span>
             <div className="flex items-center gap-1.5">
               {item.detail ? (
-                <span className="text-[10px] text-muted-foreground">
-                  {item.detail}
-                </span>
+                <span className="text-[10px] text-muted-foreground">{item.detail}</span>
               ) : null}
               <span
                 className={cn(
@@ -51,10 +43,7 @@ export function DashboardHealth({
                 )}
               >
                 <span
-                  className={cn(
-                    "size-1.5 rounded-full",
-                    item.ok ? "bg-primary" : "bg-destructive",
-                  )}
+                  className={cn("size-1.5 rounded-full", item.ok ? "bg-primary" : "bg-destructive")}
                 />
                 {item.ok ? "OK" : "Issue"}
               </span>

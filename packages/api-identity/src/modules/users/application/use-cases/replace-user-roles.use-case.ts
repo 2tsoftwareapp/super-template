@@ -1,35 +1,28 @@
-import type {
-  AuthenticatedRequestUser,
-  RequestContext,
-} from '@repo/api-core';
-import type { TransactionPort } from '@repo/api-core';
+import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-core";
+import type { TransactionPort } from "@repo/api-core";
 
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { 
+import { HttpStatus, Inject, Injectable } from "@nestjs/common";
+import {
   AppError,
   AUDIT_WRITER,
   type AuditWriter,
   ERROR_CODES,
   SYSTEM_SCOPE,
-} from '@repo/api-core';
-import { TRANSACTION_PORT } from '@repo/api-core';
+} from "@repo/api-core";
+import { TRANSACTION_PORT } from "@repo/api-core";
 
-import type { UserView } from '../users.types';
+import type { UserView } from "../users.types";
 
-import { ROLE_NAMES } from '../../../access-control/access-control.constants';
-import { AccessControlService } from '../../../access-control/application/access-control.service';
+import { AccessControlService, ROLE_NAMES } from "../../../access-control";
+import { assertCanAssignRoleTargets, assertRoleScopeCanBeAssigned } from "../../../access-control";
 import {
-  assertCanAssignRoleTargets,
-  assertRoleScopeCanBeAssigned,
-} from '../../../access-control/domain/role-assignment.policy';
-import { ORGANIZATIONS_REPOSITORY, type OrganizationsRepositoryPort } from '../../../organizations/application/ports/organizations.repository.port';
-import { assertUserBelongsToOrganization } from '../../domain/user-org-scope.policy';
-import { resolveRoleById } from '../assignable-role.resolver';
-import {
-  USERS_REPOSITORY,
-  type UsersRepositoryPort,
-} from '../ports/users.repository.port';
-import { GetUserUseCase } from './get-user.use-case';
+  ORGANIZATIONS_REPOSITORY,
+  type OrganizationsRepositoryPort,
+} from "../../../organizations/application/ports/organizations.repository.port";
+import { assertUserBelongsToOrganization } from "../../domain/user-org-scope.policy";
+import { resolveRoleById } from "../assignable-role.resolver";
+import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";
+import { GetUserUseCase } from "./get-user.use-case";
 
 @Injectable()
 export class ReplaceUserRolesUseCase {
@@ -54,24 +47,19 @@ export class ReplaceUserRolesUseCase {
     const user = await this.usersRepository.findById(userId);
 
     if (!user) {
-      throw new AppError(
-        ERROR_CODES.USER_NOT_FOUND,
-        'User not found',
-        HttpStatus.NOT_FOUND,
-      );
+      throw new AppError(ERROR_CODES.USER_NOT_FOUND, "User not found", HttpStatus.NOT_FOUND);
     }
 
     if (actor.userId === userId) {
       throw new AppError(
         ERROR_CODES.AUTH_FORBIDDEN,
-        'You cannot change your own roles',
+        "You cannot change your own roles",
         HttpStatus.FORBIDDEN,
       );
     }
 
     await assertUserBelongsToOrganization(
-      (targetUserId, orgId) =>
-        this.usersRepository.isUserInOrganization(targetUserId, orgId),
+      (targetUserId, orgId) => this.usersRepository.isUserInOrganization(targetUserId, orgId),
       actor,
       userId,
     );
@@ -86,10 +74,7 @@ export class ReplaceUserRolesUseCase {
         userId,
         actorIsSuperAdmin ? null : actor.organizationId,
       ),
-      resolveRoleById(
-        this.accessControlService,
-        roleId,
-      ),
+      resolveRoleById(this.accessControlService, roleId),
     ]);
 
     if (
@@ -98,7 +83,7 @@ export class ReplaceUserRolesUseCase {
     ) {
       throw new AppError(
         ERROR_CODES.VALIDATION_FAILED,
-        'Role does not belong to the selected organization',
+        "Role does not belong to the selected organization",
         400,
       );
     }
@@ -109,11 +94,9 @@ export class ReplaceUserRolesUseCase {
       isSystem: resolvedRole.isSystem,
     };
 
-    this.accessControlService.assertCanAssignUserRoles(
-      actor,
-      currentAccess.roles,
-      [resolvedRole.name],
-    );
+    this.accessControlService.assertCanAssignUserRoles(actor, currentAccess.roles, [
+      resolvedRole.name,
+    ]);
     assertCanAssignRoleTargets(actor, [rolePolicyTarget]);
     assertRoleScopeCanBeAssigned(rolePolicyTarget, actor);
 
@@ -127,16 +110,15 @@ export class ReplaceUserRolesUseCase {
           transaction,
         );
 
-        if (membership?.role === 'OWNER') {
+        if (membership?.role === "OWNER") {
           throw new AppError(
             ERROR_CODES.AUTH_FORBIDDEN,
-            'Cannot modify the roles of an organization owner',
+            "Cannot modify the roles of an organization owner",
             HttpStatus.FORBIDDEN,
           );
         }
 
-        const targetMembershipRole =
-          resolvedRole.name === ROLE_NAMES.ADMIN ? 'ADMIN' : 'MEMBER';
+        const targetMembershipRole = resolvedRole.name === ROLE_NAMES.ADMIN ? "ADMIN" : "MEMBER";
 
         if (!membership) {
           await this.organizationsRepository.addMember(
@@ -158,11 +140,7 @@ export class ReplaceUserRolesUseCase {
       }
 
       if (resolvedRole.name === ROLE_NAMES.ADMIN && roleScope) {
-        await this.accessControlService.ensureOrganizationAdminRole(
-          roleScope,
-          userId,
-          transaction,
-        );
+        await this.accessControlService.ensureOrganizationAdminRole(roleScope, userId, transaction);
         await this.accessControlService.replaceUserRoles(
           userId,
           [resolvedRole.id],
@@ -170,7 +148,8 @@ export class ReplaceUserRolesUseCase {
           transaction,
         );
       } else {
-        const replaceOrgId = roleScope ?? (actorIsSuperAdmin ? null : (actor.organizationId ?? null));
+        const replaceOrgId =
+          roleScope ?? (actorIsSuperAdmin ? null : (actor.organizationId ?? null));
         await this.accessControlService.replaceUserRoles(
           userId,
           [resolvedRole.id],
@@ -182,8 +161,8 @@ export class ReplaceUserRolesUseCase {
       await this.auditWriter.log(
         {
           actorId: actor.userId,
-          action: 'user.roles.replaced',
-          entityType: 'user',
+          action: "user.roles.replaced",
+          entityType: "user",
           entityId: userId,
           metadata: {
             roleId,
@@ -191,7 +170,9 @@ export class ReplaceUserRolesUseCase {
             organizationId: resolvedOrganizationId,
           },
           requestContext,
-            ...(resolvedOrganizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: resolvedOrganizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
+          ...(resolvedOrganizationId
+            ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: resolvedOrganizationId }
+            : { scope: SYSTEM_SCOPE.PLATFORM }),
         },
         transaction,
       );

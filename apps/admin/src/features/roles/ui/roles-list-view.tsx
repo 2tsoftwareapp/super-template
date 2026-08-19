@@ -96,7 +96,9 @@ export function RolesListView(vm: RolesViewModel) {
             <select
               className="h-9 rounded-md border border-input bg-background px-2 text-sm"
               value={scopeFilter ?? ""}
-              onChange={(e) => onScopeFilterChange((e.target.value as "platform" | "organization") || undefined)}
+              onChange={(e) =>
+                onScopeFilterChange((e.target.value as "platform" | "organization") || undefined)
+              }
             >
               <option value="">All scopes</option>
               <option value="platform">Platform</option>
@@ -137,10 +139,7 @@ export function RolesListView(vm: RolesViewModel) {
           ) : null}
 
           {!isLoading && !isError && noResults ? (
-            <Empty
-              title="No roles match your search"
-              description="Try different keywords."
-            />
+            <Empty title="No roles match your search" description="Try different keywords." />
           ) : null}
 
           {!isLoading && !isError && !anyRoles && !search ? (
@@ -156,9 +155,7 @@ export function RolesListView(vm: RolesViewModel) {
                 <div>
                   <div className="flex items-center gap-2 border-b border-border bg-muted/30 px-4 py-2">
                     <LockKeyhole className="size-3.5 text-muted-foreground" />
-                    <span className="text-xs font-medium text-muted-foreground">
-                      System roles
-                    </span>
+                    <span className="text-xs font-medium text-muted-foreground">System roles</span>
                     <span className="ml-auto text-xs text-muted-foreground">
                       {systemRoles.length}
                     </span>
@@ -181,9 +178,7 @@ export function RolesListView(vm: RolesViewModel) {
                 <div>
                   <div className="flex items-center gap-2 border-b border-border bg-muted/30 px-4 py-2">
                     <ShieldCheck className="size-3.5 text-muted-foreground" />
-                    <span className="text-xs font-medium text-muted-foreground">
-                      Custom roles
-                    </span>
+                    <span className="text-xs font-medium text-muted-foreground">Custom roles</span>
                     <span className="ml-auto text-xs text-muted-foreground">
                       {customRoles.length}
                     </span>

@@ -7,10 +7,7 @@ export const STATUS_OPTIONS = [
   { value: "CANCELLED", label: "Cancelled" },
 ] as const;
 
-export const EVENT_STYLES: Record<
-  string,
-  { label: string; dot: string; text: string }
-> = {
+export const EVENT_STYLES: Record<string, { label: string; dot: string; text: string }> = {
   claimed: {
     label: "Claimed",
     dot: "bg-chart-5",

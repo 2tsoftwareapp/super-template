@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
-import * as Sentry from '@sentry/node';
+import { Injectable } from "@nestjs/common";
+import * as Sentry from "@sentry/node";
 
-import type { ErrorReportContext } from './observability.types';
+import type { ErrorReportContext } from "./observability.types";
 
-import { EnvironmentService } from '../../config/environment.service';
+import { EnvironmentService } from "../../config/environment.service";
 
 let sentryInitialized = false;
 
@@ -46,11 +46,7 @@ export class SentryTransportService {
       return;
     }
 
-    const {
-      SENTRY_DSN,
-      SENTRY_ENVIRONMENT,
-      SENTRY_RELEASE,
-    } = this.environmentService.values;
+    const { SENTRY_DSN, SENTRY_ENVIRONMENT, SENTRY_RELEASE } = this.environmentService.values;
 
     if (!SENTRY_DSN) {
       return;
@@ -66,31 +62,28 @@ export class SentryTransportService {
     sentryInitialized = true;
   }
 
-  private applyContext(
-    scope: Sentry.Scope,
-    context: ErrorReportContext,
-  ): void {
+  private applyContext(scope: Sentry.Scope, context: ErrorReportContext): void {
     if (context.requestId) {
-      scope.setTag('requestId', context.requestId);
+      scope.setTag("requestId", context.requestId);
     }
 
     if (context.method) {
-      scope.setTag('method', context.method);
+      scope.setTag("method", context.method);
     }
 
     if (context.path) {
-      scope.setTag('path', context.path);
+      scope.setTag("path", context.path);
     }
 
     if (context.errorCode) {
-      scope.setTag('errorCode', context.errorCode);
+      scope.setTag("errorCode", context.errorCode);
     }
 
-    if (typeof context.statusCode === 'number') {
-      scope.setTag('statusCode', String(context.statusCode));
+    if (typeof context.statusCode === "number") {
+      scope.setTag("statusCode", String(context.statusCode));
     }
 
-    if (typeof context.userId === 'string') {
+    if (typeof context.userId === "string") {
       scope.setUser({ id: context.userId });
     }
 
@@ -98,7 +91,7 @@ export class SentryTransportService {
       scope.setTags(context.tags);
     }
 
-    scope.setContext('report', {
+    scope.setContext("report", {
       ...context,
       details: context.details ?? null,
     });

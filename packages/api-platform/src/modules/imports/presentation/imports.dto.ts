@@ -1,9 +1,9 @@
-import type { ImportValidationError } from '@repo/api-core';
+import type { ImportValidationError } from "@repo/api-core";
 
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsIn, IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { IsIn, IsOptional, IsString, IsUUID, MaxLength } from "class-validator";
 
-import { SUPPORTED_IMPORT_TYPES } from '../domain/import-types';
+import { SUPPORTED_IMPORT_TYPES } from "../domain/import-types";
 
 export class ImportJobDto {
   @ApiProperty()
@@ -16,9 +16,9 @@ export class ImportJobDto {
   fileId: string;
 
   @ApiProperty({
-    enum: ['PENDING', 'PROCESSING', 'COMPLETED', 'FAILED', 'CANCELLED'],
+    enum: ["PENDING", "PROCESSING", "COMPLETED", "FAILED", "CANCELLED"],
   })
-  status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED' | 'CANCELLED';
+  status: "PENDING" | "PROCESSING" | "COMPLETED" | "FAILED" | "CANCELLED";
 
   @ApiPropertyOptional()
   rowCount: number | null;
@@ -29,7 +29,7 @@ export class ImportJobDto {
   @ApiPropertyOptional()
   errorCount: number | null;
 
-  @ApiPropertyOptional({ type: 'array', items: { type: 'object' } })
+  @ApiPropertyOptional({ type: "array", items: { type: "object" } })
   errors: ImportValidationError[] | null;
 
   @ApiProperty()
@@ -59,7 +59,7 @@ export class CreateImportDto {
 
   @ApiPropertyOptional({
     description:
-      'Client-supplied idempotency key. Retries with the same key return the original import job.',
+      "Client-supplied idempotency key. Retries with the same key return the original import job.",
   })
   @IsOptional()
   @IsString()

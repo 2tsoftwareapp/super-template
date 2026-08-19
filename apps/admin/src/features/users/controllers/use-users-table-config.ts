@@ -9,10 +9,7 @@ import {
 } from "@tanstack/react-table";
 import { useCallback, useMemo, useState } from "react";
 
-import type {
-  UsersListParams,
-  UsersTableColumnFactory,
-} from "@/features/users/model/users.types";
+import type { UsersListParams, UsersTableColumnFactory } from "@/features/users/model/users.types";
 import type { AdminUserDto } from "@/lib/api-types";
 
 import {
@@ -69,32 +66,17 @@ export function useUsersTableConfig({
         onResendVerification: handleResendVerification,
         isDisabled: isMutating,
       }),
-    [
-      canUpdate,
-      createColumns,
-      handleActivate,
-      handleBlock,
-      handleResendVerification,
-      isMutating,
-    ],
+    [canUpdate, createColumns, handleActivate, handleBlock, handleResendVerification, isMutating],
   );
 
-  const sorting = useMemo(
-    () => sortingStateFromParams(listParams),
-    [listParams],
-  );
+  const sorting = useMemo(() => sortingStateFromParams(listParams), [listParams]);
 
   const handleSortingChange = useCallback(
     (updater: Updater<SortingState>) => {
       const currentSorting = sortingStateFromParams(listParams);
-      const nextSorting =
-        typeof updater === "function" ? updater(currentSorting) : updater;
-      const resolvedSorting =
-        nextSorting.length > 0 ? nextSorting : currentSorting;
-      const { sort: nextSort } = paramsFromSortingState(
-        resolvedSorting,
-        listParams,
-      );
+      const nextSorting = typeof updater === "function" ? updater(currentSorting) : updater;
+      const resolvedSorting = nextSorting.length > 0 ? nextSorting : currentSorting;
+      const { sort: nextSort } = paramsFromSortingState(resolvedSorting, listParams);
 
       if (!usersSortChanged(listParams.sort, nextSort)) {
         return;

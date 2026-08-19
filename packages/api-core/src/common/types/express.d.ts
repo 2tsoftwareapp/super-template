@@ -1,7 +1,4 @@
-import type {
-  AuthenticatedRequestUser,
-  RequestContext,
-} from './request-context';
+import type { AuthenticatedRequestUser, RequestContext } from "./request-context";
 
 declare global {
   namespace Express {

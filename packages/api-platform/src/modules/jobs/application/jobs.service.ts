@@ -1,14 +1,14 @@
-import type { BackgroundJobEnqueueInput } from '@repo/api-core';
+import type { BackgroundJobEnqueueInput } from "@repo/api-core";
 
-import { Injectable } from '@nestjs/common';
+import { Injectable } from "@nestjs/common";
 
-import type { EnqueueJobCommand, JobHandler } from './jobs.types';
+import type { EnqueueJobCommand, JobHandler } from "./jobs.types";
 
-import { JobHandlersRegistry } from './services/job-handlers.registry';
-import { EnqueueJobUseCase } from './use-cases/enqueue-job.use-case';
-import { ProcessJobsUseCase } from './use-cases/process-jobs.use-case';
+import { JobHandlersRegistry } from "./services/job-handlers.registry";
+import { EnqueueJobUseCase } from "./use-cases/enqueue-job.use-case";
+import { ProcessJobsUseCase } from "./use-cases/process-jobs.use-case";
 
-export type { JobHandler } from './jobs.types';
+export type { JobHandler } from "./jobs.types";
 
 /**
  * Cross-module facade for the background-job system: handler registration, the

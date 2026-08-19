@@ -1,19 +1,19 @@
-import type { Request } from 'express';
+import type { Request } from "express";
 
-import { Body, Controller, Post, Req } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { Throttle } from '@nestjs/throttler';
-import { ApiDataResponse, SuccessFlagDto, SuccessMessageDto } from '@repo/api-core';
-import { Public } from '@repo/api-core';
+import { Body, Controller, Post, Req } from "@nestjs/common";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
+import { Throttle } from "@nestjs/throttler";
+import { ApiDataResponse, SuccessFlagDto, SuccessMessageDto } from "@repo/api-core";
+import { Public } from "@repo/api-core";
 
-import { RegisterUseCase } from '../application/use-cases/register.use-case';
-import { ResendVerificationUseCase } from '../application/use-cases/resend-verification.use-case';
-import { VerifyEmailUseCase } from '../application/use-cases/verify-email.use-case';
-import { RegisterDto, ResendVerificationDto, VerifyEmailDto } from './dto/register.dto';
+import { RegisterUseCase } from "../application/use-cases/register.use-case";
+import { ResendVerificationUseCase } from "../application/use-cases/resend-verification.use-case";
+import { VerifyEmailUseCase } from "../application/use-cases/verify-email.use-case";
+import { RegisterDto, ResendVerificationDto, VerifyEmailDto } from "./dto/register.dto";
 
-@ApiTags('auth')
+@ApiTags("auth")
 @ApiBearerAuth()
-@Controller('auth')
+@Controller("auth")
 export class AuthRegistrationController {
   constructor(
     private readonly registerUseCase: RegisterUseCase,
@@ -22,7 +22,7 @@ export class AuthRegistrationController {
   ) {}
 
   @Public()
-  @Post('register')
+  @Post("register")
   @Throttle({ default: { limit: 5, ttl: 60_000 } })
   @ApiDataResponse(SuccessMessageDto, 201)
   async register(@Body() input: RegisterDto, @Req() request: Request) {
@@ -39,7 +39,7 @@ export class AuthRegistrationController {
   }
 
   @Public()
-  @Post('verify-email')
+  @Post("verify-email")
   @Throttle({ default: { limit: 10, ttl: 3_600_000 } })
   @ApiDataResponse(SuccessFlagDto, 201)
   async verifyEmail(@Body() input: VerifyEmailDto, @Req() request: Request) {
@@ -52,7 +52,7 @@ export class AuthRegistrationController {
   }
 
   @Public()
-  @Post('resend-verification')
+  @Post("resend-verification")
   @Throttle({ default: { limit: 3, ttl: 60_000 } })
   @ApiDataResponse(SuccessMessageDto, 201)
   async resendVerification(@Body() input: ResendVerificationDto) {

@@ -81,11 +81,7 @@ export function useOrganizationDetailController(): OrganizationDetailViewModel {
 
   const actorUserId = session.data?.data.user.id;
   const actorRoles = session.data?.data.user.roles ?? [];
-  const actorContext = selectOrganizationActorContext(
-    actorUserId,
-    actorRoles,
-    members,
-  );
+  const actorContext = selectOrganizationActorContext(actorUserId, actorRoles, members);
 
   const handleRetry = () => {
     void queryClient.invalidateQueries({
@@ -173,12 +169,9 @@ export function useOrganizationDetailController(): OrganizationDetailViewModel {
     canLeave: canLeaveOrganization(actorContext, members),
     isLastOwner: lastOwner,
     canManageMember: (member) => canManageMember(actorContext, member),
-    canDemoteAdminToMember: (member) =>
-      canDemoteAdminToMember(actorContext, member),
-    canPromoteAdminToOwner: (member) =>
-      canPromoteAdminToOwner(actorContext, member),
-    canDemoteOwnerToAdmin: (member) =>
-      canDemoteOwnerToAdmin(actorContext, member),
+    canDemoteAdminToMember: (member) => canDemoteAdminToMember(actorContext, member),
+    canPromoteAdminToOwner: (member) => canPromoteAdminToOwner(actorContext, member),
+    canDemoteOwnerToAdmin: (member) => canDemoteOwnerToAdmin(actorContext, member),
     editDialog: {
       open: editOpen,
       currentName: org?.name ?? "",

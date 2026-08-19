@@ -7,8 +7,7 @@ import { MailView } from "@/features/mail/screens/mail-view";
 
 export const metadata: Metadata = {
   title: "Mail Logs & Templates | Super Admin",
-  description:
-    "View sent emails, preview templates, and send testing messages.",
+  description: "View sent emails, preview templates, and send testing messages.",
 };
 
 export default function Page() {

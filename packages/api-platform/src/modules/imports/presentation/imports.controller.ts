@@ -1,27 +1,20 @@
-import type { AuthenticatedRequestUser } from '@repo/api-core';
-import type { Request } from 'express';
+import type { AuthenticatedRequestUser } from "@repo/api-core";
+import type { Request } from "express";
 
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  ParseUUIDPipe,
-  Post,
-  Req } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import {  ACTION, ApiDataResponse, perm } from '@repo/api-core';
-import { CurrentUser } from '@repo/api-core';
-import { Authorize } from '@repo/api-core';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Req } from "@nestjs/common";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
+import { ACTION, ApiDataResponse, perm } from "@repo/api-core";
+import { CurrentUser } from "@repo/api-core";
+import { Authorize } from "@repo/api-core";
 
-import { ConfirmImportUseCase } from '../application/use-cases/confirm-import.use-case';
-import { CreateImportUseCase } from '../application/use-cases/create-import.use-case';
-import { GetImportUseCase } from '../application/use-cases/get-import.use-case';
-import { CreateImportDto, ImportJobDto } from './imports.dto';
+import { ConfirmImportUseCase } from "../application/use-cases/confirm-import.use-case";
+import { CreateImportUseCase } from "../application/use-cases/create-import.use-case";
+import { GetImportUseCase } from "../application/use-cases/get-import.use-case";
+import { CreateImportDto, ImportJobDto } from "./imports.dto";
 
-@ApiTags('imports')
+@ApiTags("imports")
 @ApiBearerAuth()
-@Controller('imports')
+@Controller("imports")
 export class ImportsController {
   constructor(
     private readonly createImport: CreateImportUseCase,
@@ -30,7 +23,7 @@ export class ImportsController {
   ) {}
 
   @Post()
-  @Authorize({ permissions: [perm('imports', ACTION.CREATE)] })
+  @Authorize({ permissions: [perm("imports", ACTION.CREATE)] })
   @ApiDataResponse(ImportJobDto, 201)
   create(
     @CurrentUser() user: AuthenticatedRequestUser,
@@ -42,29 +35,28 @@ export class ImportsController {
       {
         type: input.type,
         fileId: input.fileId,
-        ...(input.idempotencyKey !== undefined
-          ? { idempotencyKey: input.idempotencyKey }
-          : {}) },
+        ...(input.idempotencyKey !== undefined ? { idempotencyKey: input.idempotencyKey } : {}),
+      },
       request.requestContext,
     );
   }
 
-  @Get(':id')
-  @Authorize({ permissions: [perm('imports', ACTION.READ)] })
+  @Get(":id")
+  @Authorize({ permissions: [perm("imports", ACTION.READ)] })
   @ApiDataResponse(ImportJobDto)
   getById(
     @CurrentUser() user: AuthenticatedRequestUser,
-    @Param('id', new ParseUUIDPipe()) jobId: string,
+    @Param("id", new ParseUUIDPipe()) jobId: string,
   ) {
     return this.getImport.execute(user, jobId);
   }
 
-  @Post(':id/confirm')
-  @Authorize({ permissions: [perm('imports', ACTION.UPDATE)] })
+  @Post(":id/confirm")
+  @Authorize({ permissions: [perm("imports", ACTION.UPDATE)] })
   @ApiDataResponse(ImportJobDto)
   confirm(
     @CurrentUser() user: AuthenticatedRequestUser,
-    @Param('id', new ParseUUIDPipe()) jobId: string,
+    @Param("id", new ParseUUIDPipe()) jobId: string,
     @Req() request: Request,
   ) {
     return this.confirmImport.execute(user, jobId, request.requestContext);

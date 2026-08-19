@@ -10,10 +10,7 @@ export interface EntityAttachmentRecord {
 }
 
 export interface EntityAttachmentListing {
-  listByEntity(
-    entityType: string,
-    entityId: string,
-  ): Promise<EntityAttachmentRecord[]>;
+  listByEntity(entityType: string, entityId: string): Promise<EntityAttachmentRecord[]>;
 }
 
-export const ENTITY_ATTACHMENT_LISTING = Symbol('ENTITY_ATTACHMENT_LISTING');
+export const ENTITY_ATTACHMENT_LISTING = Symbol("ENTITY_ATTACHMENT_LISTING");

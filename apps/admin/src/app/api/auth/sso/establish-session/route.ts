@@ -102,10 +102,7 @@ export async function POST(request: NextRequest) {
     return response;
   }
 
-  const nextResponse = NextResponse.json(
-    stripTokensFromAuthEnvelope(mePayload),
-    { status: 200 },
-  );
+  const nextResponse = NextResponse.json(stripTokensFromAuthEnvelope(mePayload), { status: 200 });
 
   setAuthCookies(nextResponse, { accessToken, refreshToken });
   return nextResponse;

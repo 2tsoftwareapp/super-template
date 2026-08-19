@@ -117,11 +117,15 @@ export default defineConfig([
           patterns: [
             {
               group: ["react", "react-dom", "next/*"],
-              message:
-                "model/ files must not import React or Next.js (see CODING_RULES.md §7 R1).",
+              message: "model/ files must not import React or Next.js (see CODING_RULES.md §7 R1).",
             },
             {
-              group: ["@/features/*/api/*", "@/features/*/controllers/*", "@/features/*/screens/*", "@/features/*/ui/*"],
+              group: [
+                "@/features/*/api/*",
+                "@/features/*/controllers/*",
+                "@/features/*/screens/*",
+                "@/features/*/ui/*",
+              ],
               message:
                 "model/ must not import from other feature sub-layers (see CODING_RULES.md §7 R4).",
             },

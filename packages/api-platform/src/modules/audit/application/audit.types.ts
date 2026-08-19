@@ -1,7 +1,7 @@
 export interface ListAuditLogsQuery {
   page: number;
   limit: number;
-  sortOrder: 'asc' | 'desc';
+  sortOrder: "asc" | "desc";
   actorId?: string;
   action?: string;
   resourceType?: string;

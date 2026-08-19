@@ -17,12 +17,7 @@ interface JobsEventTimelineProps {
   onRetry: () => void;
 }
 
-export function JobsEventTimeline({
-  events,
-  isLoading,
-  isError,
-  onRetry,
-}: JobsEventTimelineProps) {
+export function JobsEventTimeline({ events, isLoading, isError, onRetry }: JobsEventTimelineProps) {
   return (
     <div className="mt-2 space-y-3">
       <Show when={isLoading}>
@@ -54,25 +49,16 @@ export function JobsEventTimeline({
                 {idx < events.length - 1 ? (
                   <div className="absolute bottom-0 left-[7px] top-4 w-px bg-border" />
                 ) : null}
-                <div
-                  className={cn(
-                    "mt-1 size-3 shrink-0 rounded-full",
-                    evProps.dot,
-                  )}
-                />
+                <div className={cn("mt-1 size-3 shrink-0 rounded-full", evProps.dot)} />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <span className={cn("text-xs font-medium", evProps.text)}>
-                      {evProps.label}
-                    </span>
+                    <span className={cn("text-xs font-medium", evProps.text)}>{evProps.label}</span>
                     <span className="text-[10px] text-muted-foreground">
                       {timeAgo(String(event.createdAt))}
                     </span>
                   </div>
                   {event.message ? (
-                    <p className="mt-0.5 text-xs text-muted-foreground">
-                      {String(event.message)}
-                    </p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">{String(event.message)}</p>
                   ) : null}
                 </div>
               </div>

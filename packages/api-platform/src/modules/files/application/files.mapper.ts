@@ -1,4 +1,4 @@
-import type { FileRecord } from './ports/files.repository.port';
+import type { FileRecord } from "./ports/files.repository.port";
 
 export class FilesMapper {
   static toFileDto(file: FileRecord) {

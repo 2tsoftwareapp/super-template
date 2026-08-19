@@ -1,7 +1,4 @@
-import {
-  formatSortParam,
-  sortCriteriaEqual,
-} from "@repo/api-sort";
+import { formatSortParam, sortCriteriaEqual } from "@repo/api-sort";
 
 import { createTableSortBridge } from "@/lib/table-sort";
 
@@ -38,9 +35,6 @@ export function usersSortKey(sort: UsersSortCriterion[]) {
   return formatSortParam(sort);
 }
 
-export function usersSortChanged(
-  current: UsersSortCriterion[],
-  next: UsersSortCriterion[],
-) {
+export function usersSortChanged(current: UsersSortCriterion[], next: UsersSortCriterion[]) {
   return !sortCriteriaEqual(current, next);
 }

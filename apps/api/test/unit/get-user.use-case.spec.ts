@@ -89,14 +89,8 @@ describe("GetUserUseCase", () => {
       organizationId: "org-a",
     } satisfies AuthenticatedRequestUser);
 
-    expect(usersRepository.isUserInOrganization).toHaveBeenCalledWith(
-      "user-1",
-      "org-a",
-    );
-    expect(accessControlService.getAccessProfile).toHaveBeenCalledWith(
-      "user-1",
-      "org-a",
-    );
+    expect(usersRepository.isUserInOrganization).toHaveBeenCalledWith("user-1", "org-a");
+    expect(accessControlService.getAccessProfile).toHaveBeenCalledWith("user-1", "org-a");
     expect(result.memberOrganizationIds).toEqual(["org-a"]);
   });
 
@@ -114,10 +108,7 @@ describe("GetUserUseCase", () => {
       organizationId: null,
     } satisfies AuthenticatedRequestUser);
 
-    expect(accessControlService.getAccessProfile).toHaveBeenCalledWith(
-      "user-1",
-      undefined,
-    );
+    expect(accessControlService.getAccessProfile).toHaveBeenCalledWith("user-1", undefined);
     expect(result.memberOrganizationIds).toEqual(["org-a", "org-b"]);
   });
 });

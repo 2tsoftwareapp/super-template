@@ -1,18 +1,7 @@
 import { Empty } from "@repo/web-ui/empty";
 import { Skeleton } from "@repo/web-ui/skeleton";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@repo/web-ui/table";
-import {
-  flexRender,
-  type Table as ReactTable,
-  type Row,
-} from "@tanstack/react-table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@repo/web-ui/table";
+import { flexRender, type Table as ReactTable, type Row } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -48,8 +37,7 @@ export function ResourceTable<T>({
               const sorted = header.column.getIsSorted();
               const canSort = header.column.getCanSort();
               const sortIndex = header.column.getSortIndex();
-              const showSortPriority =
-                multiSort && activeSortCount > 1 && sortIndex >= 0;
+              const showSortPriority = multiSort && activeSortCount > 1 && sortIndex >= 0;
               return (
                 <TableHead
                   key={header.id}
@@ -62,10 +50,7 @@ export function ResourceTable<T>({
                 >
                   {header.isPlaceholder ? null : (
                     <span className="inline-flex items-center gap-1.5">
-                      {flexRender(
-                        header.column.columnDef.header,
-                        header.getContext(),
-                      )}
+                      {flexRender(header.column.columnDef.header, header.getContext())}
                       {showSortPriority ? (
                         <span className="inline-flex size-4 items-center justify-center rounded-full bg-muted text-[10px] font-medium text-muted-foreground">
                           {sortIndex + 1}
@@ -75,9 +60,7 @@ export function ResourceTable<T>({
                         <span
                           className={cn(
                             "inline-flex transition-colors",
-                            sorted
-                              ? "text-muted-foreground"
-                              : "text-muted-foreground/25",
+                            sorted ? "text-muted-foreground" : "text-muted-foreground/25",
                           )}
                         >
                           <ArrowUpDown
@@ -106,8 +89,16 @@ export function ResourceTable<T>({
                 const isCheckbox = col.id === "select";
                 const isNarrow = col.id === "status" || col.id === "actions" || width < 100;
                 return (
-                  <TableCell key={col.id} className="px-4 py-3" style={{ width: col.getSize() ? `${col.getSize()}px` : undefined }}>
-                    <Skeleton className={isCheckbox ? "size-4" : isNarrow ? "h-5 w-16" : "h-5 w-full max-w-[240px]"} />
+                  <TableCell
+                    key={col.id}
+                    className="px-4 py-3"
+                    style={{ width: col.getSize() ? `${col.getSize()}px` : undefined }}
+                  >
+                    <Skeleton
+                      className={
+                        isCheckbox ? "size-4" : isNarrow ? "h-5 w-16" : "h-5 w-full max-w-[240px]"
+                      }
+                    />
                   </TableCell>
                 );
               })}

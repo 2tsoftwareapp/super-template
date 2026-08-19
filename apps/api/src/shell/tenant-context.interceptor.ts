@@ -3,11 +3,11 @@ import {
   type ExecutionContext,
   Injectable,
   type NestInterceptor,
-} from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
-import { IS_PUBLIC_KEY, ROLE_NAMES } from '@repo/api-core';
-import { TenantContextService } from '@repo/api-core';
-import { Observable } from 'rxjs';
+} from "@nestjs/common";
+import { Reflector } from "@nestjs/core";
+import { IS_PUBLIC_KEY, ROLE_NAMES } from "@repo/api-core";
+import { TenantContextService } from "@repo/api-core";
+import { Observable } from "rxjs";
 
 @Injectable()
 export class TenantContextInterceptor implements NestInterceptor {
@@ -39,7 +39,7 @@ export class TenantContextInterceptor implements NestInterceptor {
       return next.handle();
     }
 
-    const tenantId = user.organizationId ?? '';
+    const tenantId = user.organizationId ?? "";
     const bypassRls = isSuperAdmin;
 
     return new Observable((subscriber) => {

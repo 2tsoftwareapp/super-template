@@ -1,6 +1,6 @@
-import type { TransactionExecutor } from '../common/types/transaction-executor';
+import type { TransactionExecutor } from "../common/types/transaction-executor";
 
-export const PLATFORM_TRANSACTION_PORT = Symbol('PLATFORM_TRANSACTION_PORT');
+export const PLATFORM_TRANSACTION_PORT = Symbol("PLATFORM_TRANSACTION_PORT");
 
 export interface PlatformTransactionPort {
   /**

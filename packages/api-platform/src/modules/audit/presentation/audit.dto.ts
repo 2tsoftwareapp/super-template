@@ -1,6 +1,6 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { type JsonObject, PaginationQueryDto } from '@repo/api-core';
-import { IsDateString, IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { type JsonObject, PaginationQueryDto } from "@repo/api-core";
+import { IsDateString, IsOptional, IsString, IsUUID, MaxLength } from "class-validator";
 
 export class AuditLogDto {
   @ApiProperty()
@@ -21,7 +21,7 @@ export class AuditLogDto {
   @ApiPropertyOptional({ type: String, nullable: true })
   entityId: string | null;
 
-  @ApiPropertyOptional({ type: 'object', additionalProperties: true })
+  @ApiPropertyOptional({ type: "object", additionalProperties: true })
   metadata: JsonObject | null;
 
   @ApiPropertyOptional({ type: String, nullable: true })
@@ -69,7 +69,7 @@ export class AuditLogsQueryDto extends PaginationQueryDto {
   to?: string;
 
   @ApiPropertyOptional({
-    description: 'Free-text match against action, entity type, and request ID.',
+    description: "Free-text match against action, entity type, and request ID.",
   })
   @IsOptional()
   @IsString()

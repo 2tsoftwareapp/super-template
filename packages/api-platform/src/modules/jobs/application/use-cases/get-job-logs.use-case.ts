@@ -1,12 +1,15 @@
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { AppError, ERROR_CODES } from '@repo/api-core';
+import { HttpStatus, Inject, Injectable } from "@nestjs/common";
+import { AppError, ERROR_CODES } from "@repo/api-core";
 
-import { JOB_OBSERVABILITY_REPOSITORY, type JobObservabilityRepositoryPort } from '../ports/job-observability.repository.port';
+import {
+  JOB_OBSERVABILITY_REPOSITORY,
+  type JobObservabilityRepositoryPort,
+} from "../ports/job-observability.repository.port";
 import {
   JOBS_REPOSITORY,
   type JobScope,
   type JobsRepositoryPort,
-} from '../ports/jobs.repository.port';
+} from "../ports/jobs.repository.port";
 
 export interface ListJobLogsQuery {
   page: number;
@@ -17,22 +20,31 @@ export interface ListJobLogsQuery {
 export class GetJobLogsUseCase {
   constructor(
     @Inject(JOBS_REPOSITORY) private readonly jobsRepository: JobsRepositoryPort,
-    @Inject(JOB_OBSERVABILITY_REPOSITORY) private readonly jobObservabilityRepository: JobObservabilityRepositoryPort,
+    @Inject(JOB_OBSERVABILITY_REPOSITORY)
+    private readonly jobObservabilityRepository: JobObservabilityRepositoryPort,
   ) {}
 
   async execute(jobId: string, query: ListJobLogsQuery, scope: JobScope) {
     const job = await this.jobsRepository.findById(jobId, scope);
 
     if (!job) {
-      throw new AppError(ERROR_CODES.JOB_NOT_FOUND, 'Job not found', HttpStatus.NOT_FOUND);
+      throw new AppError(ERROR_CODES.JOB_NOT_FOUND, "Job not found", HttpStatus.NOT_FOUND);
     }
 
-    const result = await this.jobObservabilityRepository.listEvents({ jobId, page: query.page, limit: query.limit });
+    const result = await this.jobObservabilityRepository.listEvents({
+      jobId,
+      page: query.page,
+      limit: query.limit,
+    });
 
     return {
       rows: result.rows.map((event) => ({
-        id: event.id, jobId: event.jobId, attemptId: event.attemptId,
-        type: event.type, message: event.message, metadata: event.metadata,
+        id: event.id,
+        jobId: event.jobId,
+        attemptId: event.attemptId,
+        type: event.type,
+        message: event.message,
+        metadata: event.metadata,
         createdAt: event.createdAt.toISOString(),
       })),
       total: result.total,

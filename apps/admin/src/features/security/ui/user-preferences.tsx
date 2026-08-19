@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@repo/web-ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/web-ui/card";
 import { Label } from "@repo/web-ui/label";
 import { Check, Globe, Laptop, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
@@ -27,9 +21,7 @@ export function UserPreferences() {
       <CardContent className="space-y-6">
         {/* Theme Settings */}
         <div className="space-y-3">
-          <Label className="text-sm font-medium">
-            {t("preferences.theme")}
-          </Label>
+          <Label className="text-sm font-medium">{t("preferences.theme")}</Label>
           <div className="grid grid-cols-3 gap-2">
             {[
               { id: "light", label: t("preferences.themeLight"), icon: Sun },
@@ -58,9 +50,7 @@ export function UserPreferences() {
 
         {/* Language Settings */}
         <div className="space-y-3">
-          <Label className="text-sm font-medium">
-            {t("preferences.language")}
-          </Label>
+          <Label className="text-sm font-medium">{t("preferences.language")}</Label>
           <div className="grid grid-cols-2 gap-2">
             {[
               {
@@ -87,10 +77,7 @@ export function UserPreferences() {
                 >
                   <div className="flex items-center gap-2">
                     <Globe
-                      className={cn(
-                        "size-4 text-muted-foreground",
-                        active && "text-primary",
-                      )}
+                      className={cn("size-4 text-muted-foreground", active && "text-primary")}
                     />
                     <span className="text-xs font-medium">{option.label}</span>
                   </div>

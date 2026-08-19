@@ -1,25 +1,33 @@
-import type { TransactionExecutor } from '@repo/api-core';
+import type { TransactionExecutor } from "@repo/api-core";
 
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from "@nestjs/common";
+import { USER_PREFERENCES_LOOKUP, type UserPreferencesLookup } from "@repo/api-core";
+
+import type { NotificationView } from "../notifications.types";
+
 import {
-  USER_PREFERENCES_LOOKUP,
-  type UserPreferencesLookup,
-} from '@repo/api-core';
-
-import type { NotificationView } from '../notifications.types';
-
-import { DELIVERIES_REPOSITORY, type DeliveriesRepositoryPort } from '../ports/deliveries.repository.port';
-import { DEVICE_TOKENS_REPOSITORY, type DeviceTokensRepositoryPort } from '../ports/device-tokens.repository.port';
-import { NOTIFICATION_STREAM_SERVICE, type NotificationStreamServicePort } from '../ports/notification-stream.service.port';
+  DELIVERIES_REPOSITORY,
+  type DeliveriesRepositoryPort,
+} from "../ports/deliveries.repository.port";
+import {
+  DEVICE_TOKENS_REPOSITORY,
+  type DeviceTokensRepositoryPort,
+} from "../ports/device-tokens.repository.port";
+import {
+  NOTIFICATION_STREAM_SERVICE,
+  type NotificationStreamServicePort,
+} from "../ports/notification-stream.service.port";
 
 @Injectable()
 export class NotificationDispatchService {
   private readonly logger = new Logger(NotificationDispatchService.name);
 
   constructor(
-    @Inject(NOTIFICATION_STREAM_SERVICE) private readonly notificationStreamService: NotificationStreamServicePort,
+    @Inject(NOTIFICATION_STREAM_SERVICE)
+    private readonly notificationStreamService: NotificationStreamServicePort,
     @Inject(DELIVERIES_REPOSITORY) private readonly deliveriesRepository: DeliveriesRepositoryPort,
-    @Inject(DEVICE_TOKENS_REPOSITORY) private readonly deviceTokensRepository: DeviceTokensRepositoryPort,
+    @Inject(DEVICE_TOKENS_REPOSITORY)
+    private readonly deviceTokensRepository: DeviceTokensRepositoryPort,
     @Inject(USER_PREFERENCES_LOOKUP)
     private readonly userPreferencesLookup: UserPreferencesLookup,
   ) {}
@@ -55,17 +63,15 @@ export class NotificationDispatchService {
     notification: NotificationView,
     executor?: TransactionExecutor,
   ): Promise<void> {
-    const preferences = await this.userPreferencesLookup
-      .findNotificationPreferencesByUserId(notification.userId);
+    const preferences = await this.userPreferencesLookup.findNotificationPreferencesByUserId(
+      notification.userId,
+    );
 
     if (!preferences.push) {
       return;
     }
 
-    const tokens = await this.deviceTokensRepository.listByUserId(
-      notification.userId,
-      executor,
-    );
+    const tokens = await this.deviceTokensRepository.listByUserId(notification.userId, executor);
 
     if (tokens.length === 0) {
       return;
@@ -75,7 +81,7 @@ export class NotificationDispatchService {
       tokens.map((token) => ({
         notificationId: notification.id,
         deviceTokenId: token.id,
-        channel: 'fcm',
+        channel: "fcm",
       })),
       executor,
     );
@@ -85,4 +91,3 @@ export class NotificationDispatchService {
     return this.notificationStreamService.stream(userId, organizationId);
   }
 }
-

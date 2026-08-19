@@ -22,13 +22,7 @@ export function useSaveRoleMutation(options?: { onSuccess?: () => void }) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      roleId,
-      input,
-    }: {
-      roleId?: string | undefined;
-      input: RoleForm;
-    }) => {
+    mutationFn: ({ roleId, input }: { roleId?: string | undefined; input: RoleForm }) => {
       if (roleId) {
         return rolesApi.update(roleId, input);
       }

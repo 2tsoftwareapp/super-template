@@ -4,13 +4,7 @@ import type { UseFormReturn } from "react-hook-form";
 
 import { Alert } from "@repo/web-ui/alert";
 import { Button } from "@repo/web-ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@repo/web-ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/web-ui/card";
 import { Input } from "@repo/web-ui/input";
 import { Label } from "@repo/web-ui/label";
 import { PasswordInput } from "@repo/web-ui/password-input";
@@ -76,9 +70,7 @@ export function LoginCard({
               {...form.register("email")}
             />
             {form.formState.errors.email?.message ? (
-              <p className="text-xs text-destructive">
-                {form.formState.errors.email.message}
-              </p>
+              <p className="text-xs text-destructive">{form.formState.errors.email.message}</p>
             ) : null}
           </div>
           <div className="space-y-2">
@@ -90,9 +82,7 @@ export function LoginCard({
               {...form.register("password")}
             />
             {form.formState.errors.password?.message ? (
-              <p className="text-xs text-destructive">
-                {form.formState.errors.password.message}
-              </p>
+              <p className="text-xs text-destructive">{form.formState.errors.password.message}</p>
             ) : null}
           </div>
           {errorMessage ? <Alert>{errorMessage}</Alert> : null}

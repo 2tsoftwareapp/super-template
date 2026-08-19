@@ -59,10 +59,7 @@ export function useUsersListController({
   const session = useSession();
   const searchParams = useSearchParams();
 
-  const listParams = useMemo(
-    () => parseUsersListSearchParams(searchParams),
-    [searchParams],
-  );
+  const listParams = useMemo(() => parseUsersListSearchParams(searchParams), [searchParams]);
   const [searchInput, setSearchInput] = useState(listParams.search);
   const [showCreate, setShowCreate] = useState(false);
 
@@ -112,9 +109,7 @@ export function useUsersListController({
 
   const actorRoles = session.data?.data.user.roles ?? [];
   const actorOrganizationId = session.data?.data.organizationId;
-  const { canCreate, canUpdate } = selectUserManagementPermissions(
-    session.data?.data.permissions,
-  );
+  const { canCreate, canUpdate } = selectUserManagementPermissions(session.data?.data.permissions);
 
   const drawerController = useCreateUserDrawer({
     open: showCreate,
@@ -180,9 +175,7 @@ export function useUsersListController({
 
   const handleRowClick = (id: string) => {
     const returnTo = serializeUsersListSearchParams(queryParams).toString();
-    const suffix = returnTo
-      ? `?returnTo=${encodeURIComponent(`/users?${returnTo}`)}`
-      : "";
+    const suffix = returnTo ? `?returnTo=${encodeURIComponent(`/users?${returnTo}`)}` : "";
     void router.push(`/users/${id}${suffix}`);
   };
 

@@ -1,6 +1,6 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { SYSTEM_SCOPE } from '@repo/api-core';
-import { Transform } from 'class-transformer';
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { SYSTEM_SCOPE } from "@repo/api-core";
+import { Transform } from "class-transformer";
 import {
   ArrayMinSize,
   ArrayUnique,
@@ -14,7 +14,7 @@ import {
   MaxLength,
   Min,
   MinLength,
-} from 'class-validator';
+} from "class-validator";
 
 export class PermissionDto {
   @ApiProperty()
@@ -29,8 +29,8 @@ export class PermissionDto {
   @ApiProperty()
   isSystem: boolean;
 
-  @ApiProperty({ enum: ['platform', 'organization'] })
-  scope: typeof SYSTEM_SCOPE.PLATFORM | 'organization';
+  @ApiProperty({ enum: ["platform", "organization"] })
+  scope: typeof SYSTEM_SCOPE.PLATFORM | "organization";
 }
 
 export class RoleDto {
@@ -46,8 +46,8 @@ export class RoleDto {
   @ApiProperty({ type: String, nullable: true })
   description: string | null;
 
-  @ApiProperty({ enum: ['platform', 'organization'] })
-  scope: typeof SYSTEM_SCOPE.PLATFORM | 'organization';
+  @ApiProperty({ enum: ["platform", "organization"] })
+  scope: typeof SYSTEM_SCOPE.PLATFORM | "organization";
 
   @ApiProperty()
   isSystem: boolean;
@@ -59,7 +59,7 @@ export class RoleDto {
 export class CreateRoleDto {
   @ApiProperty()
   @Transform(({ value }: { value: string }): string =>
-    typeof value === 'string' ? value.trim() : value,
+    typeof value === "string" ? value.trim() : value,
   )
   @IsString()
   @MinLength(2)
@@ -81,7 +81,7 @@ export class CreateRoleDto {
   @IsArray()
   @ArrayMinSize(1)
   @ArrayUnique()
-  @IsUUID('4', { each: true })
+  @IsUUID("4", { each: true })
   permissionIds: string[];
 }
 
@@ -89,7 +89,7 @@ export class UpdateRoleDto {
   @ApiPropertyOptional()
   @IsOptional()
   @Transform(({ value }: { value: string }): string =>
-    typeof value === 'string' ? value.trim() : value,
+    typeof value === "string" ? value.trim() : value,
   )
   @IsString()
   @MinLength(2)
@@ -107,7 +107,7 @@ export class UpdateRoleDto {
   @IsArray()
   @ArrayMinSize(1)
   @ArrayUnique()
-  @IsUUID('4', { each: true })
+  @IsUUID("4", { each: true })
   permissionIds?: string[];
 }
 
@@ -116,7 +116,7 @@ export class ReplaceRolePermissionsDto {
   @IsArray()
   @ArrayMinSize(1)
   @ArrayUnique()
-  @IsUUID('4', { each: true })
+  @IsUUID("4", { each: true })
   permissionIds: string[];
 }
 
@@ -147,8 +147,8 @@ export class ListRolesQueryDto {
   @MaxLength(100)
   search?: string;
 
-  @ApiPropertyOptional({ enum: ['platform', 'organization'] })
+  @ApiPropertyOptional({ enum: ["platform", "organization"] })
   @IsOptional()
-  @IsIn(['platform', 'organization'])
-  scope?: 'platform' | 'organization';
+  @IsIn(["platform", "organization"])
+  scope?: "platform" | "organization";
 }

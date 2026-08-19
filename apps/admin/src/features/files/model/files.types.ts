@@ -1,8 +1,4 @@
-import type {
-  FileDto,
-  FileHistoryEventDto,
-  FileVersionDto,
-} from "@/lib/api-types";
+import type { FileDto, FileHistoryEventDto, FileVersionDto } from "@/lib/api-types";
 
 import type { FILE_MIME_OPTIONS } from "./files.constants";
 

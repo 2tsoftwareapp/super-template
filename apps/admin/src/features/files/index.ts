@@ -5,11 +5,7 @@ export {
   useUploadFileMutation,
   useUploadVersionMutation,
 } from "./api/files.mutations";
-export {
-  useFileHistoryQuery,
-  useFilesQuery,
-  useFileVersionsQuery,
-} from "./api/files.queries";
+export { useFileHistoryQuery, useFilesQuery, useFileVersionsQuery } from "./api/files.queries";
 export { filesKeys } from "./api/files.query-keys";
 export { useFilesController } from "./controllers/use-files-controller";
 export type { FilesViewModel } from "./model/files.types";

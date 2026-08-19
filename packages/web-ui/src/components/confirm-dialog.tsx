@@ -44,7 +44,9 @@ export function ConfirmDialog({
   return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-center justify-center"
-      onClick={(e) => { if (e.target === e.currentTarget) onCancel(); }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onCancel();
+      }}
     >
       <div className="fixed inset-0 bg-foreground/35 backdrop-blur-[2px]" />
       <div

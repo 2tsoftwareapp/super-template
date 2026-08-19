@@ -1,24 +1,24 @@
-import type { RequestContext } from '@repo/api-core';
-import type { TransactionPort } from '@repo/api-core';
+import type { RequestContext } from "@repo/api-core";
+import type { TransactionPort } from "@repo/api-core";
 
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { 
+import { HttpStatus, Inject, Injectable } from "@nestjs/common";
+import {
   AppError,
   AUDIT_WRITER,
   type AuditWriter,
   EnvironmentService,
   ERROR_CODES,
   SYSTEM_SCOPE,
-} from '@repo/api-core';
-import { TRANSACTION_PORT } from '@repo/api-core';
+} from "@repo/api-core";
+import { TRANSACTION_PORT } from "@repo/api-core";
 
-import type { MfaConfirmCommand } from '../mfa.types';
+import type { MfaConfirmCommand } from "../mfa.types";
 
-import { hashRecoveryCode } from '../../domain/hash-recovery-code';
-import { generateRecoveryCodes } from '../../domain/recovery-codes';
-import { verifyTotpCode } from '../../domain/totp';
-import { decryptTotpSecret } from '../../domain/totp-encryption';
-import { MFA_REPOSITORY, type MfaRepositoryPort } from '../ports/mfa.repository.port';
+import { hashRecoveryCode } from "../../domain/hash-recovery-code";
+import { generateRecoveryCodes } from "../../domain/recovery-codes";
+import { verifyTotpCode } from "../../domain/totp";
+import { decryptTotpSecret } from "../../domain/totp-encryption";
+import { MFA_REPOSITORY, type MfaRepositoryPort } from "../ports/mfa.repository.port";
 
 @Injectable()
 export class ConfirmMfaUseCase {
@@ -33,14 +33,12 @@ export class ConfirmMfaUseCase {
     input: MfaConfirmCommand,
     requestContext?: RequestContext,
   ): Promise<{ recoveryCodes: string[] }> {
-    const secretRow = await this.mfaRepository.findSecretByUserId(
-      input.userId,
-    );
+    const secretRow = await this.mfaRepository.findSecretByUserId(input.userId);
 
     if (!secretRow) {
       throw new AppError(
         ERROR_CODES.MFA_SETUP_REQUIRED,
-        'Start two-factor setup before confirming a code',
+        "Start two-factor setup before confirming a code",
         HttpStatus.CONFLICT,
       );
     }
@@ -48,7 +46,7 @@ export class ConfirmMfaUseCase {
     if (secretRow.enabled) {
       throw new AppError(
         ERROR_CODES.MFA_ALREADY_ENABLED,
-        'Two-factor authentication is already enabled',
+        "Two-factor authentication is already enabled",
         HttpStatus.CONFLICT,
       );
     }
@@ -65,14 +63,14 @@ export class ConfirmMfaUseCase {
     if (!verifyTotpCode(secret, input.code)) {
       throw new AppError(
         ERROR_CODES.MFA_INVALID_CODE,
-        'Invalid verification code',
+        "Invalid verification code",
         HttpStatus.UNAUTHORIZED,
       );
     }
 
     const recoveryCodes = generateRecoveryCodes();
 
-    await this.transactionPort.run( async (transaction) => {
+    await this.transactionPort.run(async (transaction) => {
       await this.mfaRepository.confirmSecret(input.userId, transaction);
       await this.mfaRepository.replaceRecoveryCodes(
         input.userId,
@@ -85,8 +83,8 @@ export class ConfirmMfaUseCase {
       // tenant-scoped executor.
       await this.auditWriter.log({
         actorId: input.userId,
-        action: 'mfa.enabled',
-        entityType: 'user',
+        action: "mfa.enabled",
+        entityType: "user",
         entityId: input.userId,
         requestContext,
         scope: SYSTEM_SCOPE.PLATFORM,

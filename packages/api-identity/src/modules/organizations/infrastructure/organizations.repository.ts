@@ -1,19 +1,13 @@
-import type { DatabaseExecutor } from '@repo/api-database';
+import type { DatabaseExecutor } from "@repo/api-database";
 
-import { Inject, Injectable } from '@nestjs/common';
-import { DATABASE, type DatabaseClient } from '@repo/api-database';
-import {
-  organizationMembers,
-  organizations,
-  roles,
-  userRoles,
-  users,
-} from '@repo/api-database';
-import { and, asc, count, eq, isNull, ne } from 'drizzle-orm';
+import { Inject, Injectable } from "@nestjs/common";
+import { DATABASE, type DatabaseClient } from "@repo/api-database";
+import { organizationMembers, organizations, roles, userRoles, users } from "@repo/api-database";
+import { and, asc, count, eq, isNull, ne } from "drizzle-orm";
 
-import type { OrganizationsRepositoryPort } from '../application/ports/organizations.repository.port';
+import type { OrganizationsRepositoryPort } from "../application/ports/organizations.repository.port";
 
-export type OrganizationMemberRole = 'OWNER' | 'ADMIN' | 'MEMBER';
+export type OrganizationMemberRole = "OWNER" | "ADMIN" | "MEMBER";
 
 @Injectable()
 export class OrganizationsRepository implements OrganizationsRepositoryPort {
@@ -23,10 +17,7 @@ export class OrganizationsRepository implements OrganizationsRepositoryPort {
     values: typeof organizations.$inferInsert,
     executor: DatabaseExecutor = this.database,
   ) {
-    const [organization] = await executor
-      .insert(organizations)
-      .values(values)
-      .returning();
+    const [organization] = await executor.insert(organizations).values(values).returning();
     return organization ?? null;
   }
 
@@ -34,10 +25,7 @@ export class OrganizationsRepository implements OrganizationsRepositoryPort {
     values: typeof organizationMembers.$inferInsert,
     executor: DatabaseExecutor = this.database,
   ) {
-    const [member] = await executor
-      .insert(organizationMembers)
-      .values(values)
-      .returning();
+    const [member] = await executor.insert(organizationMembers).values(values).returning();
     return member ?? null;
   }
 
@@ -49,10 +37,7 @@ export class OrganizationsRepository implements OrganizationsRepositoryPort {
       .insert(organizationMembers)
       .values(values)
       .onConflictDoUpdate({
-        target: [
-          organizationMembers.organizationId,
-          organizationMembers.userId,
-        ],
+        target: [organizationMembers.organizationId, organizationMembers.userId],
         set: {
           role: values.role,
           updatedAt: new Date(),
@@ -63,10 +48,7 @@ export class OrganizationsRepository implements OrganizationsRepositoryPort {
     return member ?? null;
   }
 
-  async findBySlug(
-    slug: string,
-    executor: DatabaseExecutor = this.database,
-  ) {
+  async findBySlug(slug: string, executor: DatabaseExecutor = this.database) {
     const [organization] = await executor
       .select()
       .from(organizations)
@@ -75,19 +57,11 @@ export class OrganizationsRepository implements OrganizationsRepositoryPort {
     return organization ?? null;
   }
 
-  async findById(
-    organizationId: string,
-    executor: DatabaseExecutor = this.database,
-  ) {
+  async findById(organizationId: string, executor: DatabaseExecutor = this.database) {
     const [organization] = await executor
       .select()
       .from(organizations)
-      .where(
-        and(
-          eq(organizations.id, organizationId),
-          isNull(organizations.deletedAt),
-        ),
-      )
+      .where(and(eq(organizations.id, organizationId), isNull(organizations.deletedAt)))
       .limit(1);
     return organization ?? null;
   }
@@ -121,16 +95,8 @@ export class OrganizationsRepository implements OrganizationsRepositoryPort {
         updatedAt: organizations.updatedAt,
       })
       .from(organizationMembers)
-      .innerJoin(
-        organizations,
-        eq(organizationMembers.organizationId, organizations.id),
-      )
-      .where(
-        and(
-          eq(organizationMembers.userId, userId),
-          isNull(organizations.deletedAt),
-        ),
-      )
+      .innerJoin(organizations, eq(organizationMembers.organizationId, organizations.id))
+      .where(and(eq(organizationMembers.userId, userId), isNull(organizations.deletedAt)))
       .orderBy(asc(organizations.name));
   }
 
@@ -144,43 +110,27 @@ export class OrganizationsRepository implements OrganizationsRepositoryPort {
 
   async updateOrganization(
     organizationId: string,
-    values: Partial<Pick<typeof organizations.$inferInsert, 'name'>>,
+    values: Partial<Pick<typeof organizations.$inferInsert, "name">>,
     executor: DatabaseExecutor = this.database,
   ) {
     const [organization] = await executor
       .update(organizations)
       .set({ ...values, updatedAt: new Date() })
-      .where(
-        and(
-          eq(organizations.id, organizationId),
-          isNull(organizations.deletedAt),
-        ),
-      )
+      .where(and(eq(organizations.id, organizationId), isNull(organizations.deletedAt)))
       .returning();
     return organization ?? null;
   }
 
-  async softDeleteOrganization(
-    organizationId: string,
-    executor: DatabaseExecutor = this.database,
-  ) {
+  async softDeleteOrganization(organizationId: string, executor: DatabaseExecutor = this.database) {
     const [organization] = await executor
       .update(organizations)
       .set({ deletedAt: new Date(), updatedAt: new Date() })
-      .where(
-        and(
-          eq(organizations.id, organizationId),
-          isNull(organizations.deletedAt),
-        ),
-      )
+      .where(and(eq(organizations.id, organizationId), isNull(organizations.deletedAt)))
       .returning();
     return organization ?? null;
   }
 
-  async listMembers(
-    organizationId: string,
-    executor: DatabaseExecutor = this.database,
-  ) {
+  async listMembers(organizationId: string, executor: DatabaseExecutor = this.database) {
     return executor
       .select({
         userId: organizationMembers.userId,
@@ -208,10 +158,10 @@ export class OrganizationsRepository implements OrganizationsRepositoryPort {
         .where(
           and(
             eq(organizationMembers.organizationId, organizationId),
-            eq(organizationMembers.role, 'OWNER'),
+            eq(organizationMembers.role, "OWNER"),
           ),
         )
-        .for('update');
+        .for("update");
       const filtered = options.excludingUserId
         ? owners.filter((o) => o.userId !== options.excludingUserId)
         : owners;
@@ -223,7 +173,7 @@ export class OrganizationsRepository implements OrganizationsRepositoryPort {
       .where(
         and(
           eq(organizationMembers.organizationId, organizationId),
-          eq(organizationMembers.role, 'OWNER'),
+          eq(organizationMembers.role, "OWNER"),
           options.excludingUserId
             ? ne(organizationMembers.userId, options.excludingUserId)
             : undefined,
@@ -232,10 +182,7 @@ export class OrganizationsRepository implements OrganizationsRepositoryPort {
     return result?.value ?? 0;
   }
 
-  async countMembers(
-    organizationId: string,
-    executor: DatabaseExecutor = this.database,
-  ) {
+  async countMembers(organizationId: string, executor: DatabaseExecutor = this.database) {
     const [result] = await executor
       .select({ value: count() })
       .from(organizationMembers)
@@ -279,23 +226,12 @@ export class OrganizationsRepository implements OrganizationsRepositoryPort {
     return member ?? null;
   }
 
-  async findPrimaryOrganizationId(
-    userId: string,
-    executor: DatabaseExecutor = this.database,
-  ) {
+  async findPrimaryOrganizationId(userId: string, executor: DatabaseExecutor = this.database) {
     const [member] = await executor
       .select({ organizationId: organizationMembers.organizationId })
       .from(organizationMembers)
-      .innerJoin(
-        organizations,
-        eq(organizationMembers.organizationId, organizations.id),
-      )
-      .where(
-        and(
-          eq(organizationMembers.userId, userId),
-          isNull(organizations.deletedAt),
-        ),
-      )
+      .innerJoin(organizations, eq(organizationMembers.organizationId, organizations.id))
+      .where(and(eq(organizationMembers.userId, userId), isNull(organizations.deletedAt)))
       .orderBy(asc(organizations.createdAt))
       .limit(1);
 
@@ -306,12 +242,8 @@ export class OrganizationsRepository implements OrganizationsRepositoryPort {
     organizationId: string,
     executor: DatabaseExecutor = this.database,
   ): Promise<void> {
-    await executor
-      .delete(userRoles)
-      .where(eq(userRoles.organizationId, organizationId));
-    await executor
-      .delete(roles)
-      .where(eq(roles.organizationId, organizationId));
+    await executor.delete(userRoles).where(eq(userRoles.organizationId, organizationId));
+    await executor.delete(roles).where(eq(roles.organizationId, organizationId));
     await executor
       .delete(organizationMembers)
       .where(eq(organizationMembers.organizationId, organizationId));

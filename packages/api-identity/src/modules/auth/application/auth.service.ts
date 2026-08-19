@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable } from "@nestjs/common";
 
-import { AuthenticateAccessTokenUseCase } from './use-cases/authenticate-access-token.use-case';
+import { AuthenticateAccessTokenUseCase } from "./use-cases/authenticate-access-token.use-case";
 
 /**
  * Cross-module facade exposing the single auth operation the app-shell auth
@@ -10,9 +10,7 @@ import { AuthenticateAccessTokenUseCase } from './use-cases/authenticate-access-
  */
 @Injectable()
 export class AuthService {
-  constructor(
-    private readonly authenticateAccessTokenUseCase: AuthenticateAccessTokenUseCase,
-  ) {}
+  constructor(private readonly authenticateAccessTokenUseCase: AuthenticateAccessTokenUseCase) {}
 
   authenticateAccessToken(token: string) {
     return this.authenticateAccessTokenUseCase.execute(token);

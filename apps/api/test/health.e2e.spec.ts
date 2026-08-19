@@ -1,12 +1,12 @@
-import type { INestApplication } from '@nestjs/common';
-import { ValidationPipe } from '@nestjs/common';
-import { Test } from '@nestjs/testing';
-import request from 'supertest';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { AppModule } from '../src/app.module';
-import './support/test-app';
+import type { INestApplication } from "@nestjs/common";
+import { ValidationPipe } from "@nestjs/common";
+import { Test } from "@nestjs/testing";
+import request from "supertest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { AppModule } from "../src/app.module";
+import "./support/test-app";
 
-describe('HealthController (e2e)', () => {
+describe("HealthController (e2e)", () => {
   let app: INestApplication;
 
   beforeAll(async () => {
@@ -15,7 +15,7 @@ describe('HealthController (e2e)', () => {
     }).compile();
 
     app = moduleRef.createNestApplication();
-    app.setGlobalPrefix('api/v1');
+    app.setGlobalPrefix("api/v1");
     app.useGlobalPipes(
       new ValidationPipe({
         whitelist: true,
@@ -34,26 +34,22 @@ describe('HealthController (e2e)', () => {
     await app.close();
   });
 
-  it('returns the liveness payload', async () => {
-    const response = await request(app.getHttpServer())
-      .get('/api/v1/health')
-      .expect(200);
+  it("returns the liveness payload", async () => {
+    const response = await request(app.getHttpServer()).get("/api/v1/health").expect(200);
 
     expect(response.body).toMatchObject({
-      data: { status: 'ok' },
+      data: { status: "ok" },
       meta: { requestId: expect.any(String) },
     });
     // Test env has no warnings; the array must still be present for monitoring.
     expect(response.body.data.warnings).toEqual([]);
   });
 
-  it('returns the readiness payload when postgres is reachable', async () => {
-    const response = await request(app.getHttpServer())
-      .get('/api/v1/health/ready')
-      .expect(200);
+  it("returns the readiness payload when postgres is reachable", async () => {
+    const response = await request(app.getHttpServer()).get("/api/v1/health/ready").expect(200);
 
     expect(response.body).toMatchObject({
-      data: { status: 'ready' },
+      data: { status: "ready" },
       meta: { requestId: expect.any(String) },
     });
     expect(response.body.data.warnings).toEqual([]);

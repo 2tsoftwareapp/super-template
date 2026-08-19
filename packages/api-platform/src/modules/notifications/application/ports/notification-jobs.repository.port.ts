@@ -1,10 +1,15 @@
-import type { JsonObject } from '@repo/api-core';
-import type { TransactionExecutor } from '@repo/api-core';
+import type { JsonObject } from "@repo/api-core";
+import type { TransactionExecutor } from "@repo/api-core";
 
-import type { ListNotificationJobsQuery } from '../notifications.types';
+import type { ListNotificationJobsQuery } from "../notifications.types";
 
-export type NotificationJobAudience = 'ALL' | 'USER' | 'USERS';
-export type NotificationJobStatusType = 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'CANCELLED' | 'FAILED';
+export type NotificationJobAudience = "ALL" | "USER" | "USERS";
+export type NotificationJobStatusType =
+  | "PENDING"
+  | "PROCESSING"
+  | "COMPLETED"
+  | "CANCELLED"
+  | "FAILED";
 
 export interface NotificationJobRecord {
   id: string;
@@ -70,10 +75,7 @@ export interface NotificationJobsListResult {
 }
 
 export interface NotificationJobsRepositoryPort {
-  claimDue(
-    limit: number,
-    executor?: TransactionExecutor,
-  ): Promise<NotificationJobRecord[]>;
+  claimDue(limit: number, executor?: TransactionExecutor): Promise<NotificationJobRecord[]>;
   create(
     values: CreateNotificationJobInput,
     executor?: TransactionExecutor,
@@ -82,10 +84,7 @@ export interface NotificationJobsRepositoryPort {
     values: CreateIdempotentNotificationJobInput,
     executor?: TransactionExecutor,
   ): Promise<{ value: NotificationJobRecord; created: boolean } | null>;
-  findById(
-    jobId: string,
-    executor?: TransactionExecutor,
-  ): Promise<NotificationJobRecord | null>;
+  findById(jobId: string, executor?: TransactionExecutor): Promise<NotificationJobRecord | null>;
   list(
     params: ListNotificationJobsQuery,
     executor?: TransactionExecutor,
@@ -130,6 +129,4 @@ export interface NotificationJobsRepositoryPort {
   ): Promise<{ recovered: NotificationJobRecord[]; failed: NotificationJobRecord[] }>;
 }
 
-export const NOTIFICATION_JOBS_REPOSITORY = Symbol(
-  'NOTIFICATION_JOBS_REPOSITORY',
-);
+export const NOTIFICATION_JOBS_REPOSITORY = Symbol("NOTIFICATION_JOBS_REPOSITORY");

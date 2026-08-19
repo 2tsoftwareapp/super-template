@@ -23,7 +23,11 @@ export function useUsersBulkActions(
 
   const handleBulkBlock = useCallback(
     (selectedIds: string[]) => {
-      requestBlock(selectedIds, `${selectedIds.length} user${selectedIds.length > 1 ? "s" : ""}`, selectedIds.length);
+      requestBlock(
+        selectedIds,
+        `${selectedIds.length} user${selectedIds.length > 1 ? "s" : ""}`,
+        selectedIds.length,
+      );
     },
     [requestBlock],
   );

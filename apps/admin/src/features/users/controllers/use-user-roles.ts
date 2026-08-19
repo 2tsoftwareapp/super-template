@@ -6,10 +6,7 @@ import { toast } from "sonner";
 
 import type { AdminUserDto } from "@/lib/api-types";
 
-import {
-  filterRolesForOrganization,
-  findPlatformUserRoleId,
-} from "@/lib/roles";
+import { filterRolesForOrganization, findPlatformUserRoleId } from "@/lib/roles";
 
 export interface RoleOption {
   id: string;
@@ -31,10 +28,7 @@ export function useUserRoles(
     isPending: boolean;
     isSuccess: boolean;
     isError: boolean;
-    mutateAsync: (args: {
-      roleId: string;
-      organizationId?: string;
-    }) => Promise<unknown>;
+    mutateAsync: (args: { roleId: string; organizationId?: string }) => Promise<unknown>;
   },
   isActorSuperAdmin: boolean,
   actorOrganizationId: string | null | undefined,
@@ -45,8 +39,7 @@ export function useUserRoles(
   organizationsLoading: boolean,
   initialOrganizationId?: string | null,
 ) {
-  const [selectedOrganizationId, setSelectedOrganizationId] =
-    useState<string>("");
+  const [selectedOrganizationId, setSelectedOrganizationId] = useState<string>("");
   const [selectedRoleId, setSelectedRoleId] = useState<string>("");
 
   const scopeOrganizationId = isActorSuperAdmin
@@ -66,17 +59,13 @@ export function useUserRoles(
   }, [userId, initialOrganizationId]);
 
   const currentAssignment = useMemo(
-    () =>
-      currentUser?.roleAssignments?.find(
-        (a) => a.organizationId === scopeOrganizationId,
-      ),
+    () => currentUser?.roleAssignments?.find((a) => a.organizationId === scopeOrganizationId),
     [currentUser, scopeOrganizationId],
   );
 
   const memberOrganizationIds = currentUser?.memberOrganizationIds ?? [];
   const membershipExists =
-    memberOrganizationIds.includes(scopeOrganizationId) ||
-    currentAssignment !== undefined;
+    memberOrganizationIds.includes(scopeOrganizationId) || currentAssignment !== undefined;
 
   const platformUserRoleId = useMemo(
     () => findPlatformUserRoleId(filteredOptions),
@@ -92,11 +81,9 @@ export function useUserRoles(
     setSelectedRoleId(defaultRoleId);
   }, [defaultRoleId]);
 
-  const selectedRoleName =
-    filteredOptions.find((r) => r.id === selectedRoleId)?.name ?? "USER";
+  const selectedRoleName = filteredOptions.find((r) => r.id === selectedRoleId)?.name ?? "USER";
 
-  const isCurrentRoleOrgScoped =
-    selectedRoleName !== "USER" && selectedRoleName !== "SUPER_ADMIN";
+  const isCurrentRoleOrgScoped = selectedRoleName !== "USER" && selectedRoleName !== "SUPER_ADMIN";
   const orgRequired = isCurrentRoleOrgScoped;
 
   const canSave =

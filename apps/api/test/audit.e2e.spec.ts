@@ -1,13 +1,13 @@
-import type { INestApplication } from '@nestjs/common';
+import type { INestApplication } from "@nestjs/common";
 
-import { DATABASE, files } from '@repo/api-database';
-import { eq } from 'drizzle-orm';
-import request from 'supertest';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { DATABASE, files } from "@repo/api-database";
+import { eq } from "drizzle-orm";
+import request from "supertest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { bearer, createTestApp, loginAs, resetTestDatabase } from './support/test-app';
+import { bearer, createTestApp, loginAs, resetTestDatabase } from "./support/test-app";
 
-describe('Audit logs (e2e)', () => {
+describe("Audit logs (e2e)", () => {
   let app: INestApplication;
 
   beforeAll(async () => {
@@ -21,68 +21,60 @@ describe('Audit logs (e2e)', () => {
     }
   });
 
-  const createActiveUser = async (
-    admin: { accessToken: string },
-    email: string,
-  ) => {
+  const createActiveUser = async (admin: { accessToken: string }, email: string) => {
     const response = await request(app.getHttpServer())
-      .post('/api/v1/admin/users')
+      .post("/api/v1/admin/users")
       .set(bearer(admin.accessToken))
       .send({
         email,
-        password: 'ChangeMe123!',
-        displayName: 'Audit Test User',
-        status: 'ACTIVE',
+        password: "ChangeMe123!",
+        displayName: "Audit Test User",
+        status: "ACTIVE",
       })
       .expect(201);
 
     return response.body.data as { id: string };
   };
 
-  it('searches audit logs by free-text query across action and entity type', async () => {
-    const admin = await loginAs(app, 'admin@example.local', 'ChangeMe123!');
+  it("searches audit logs by free-text query across action and entity type", async () => {
+    const admin = await loginAs(app, "admin@example.local", "ChangeMe123!");
     const marker = `audit-search-${Date.now()}@example.test`;
     await createActiveUser(admin, marker);
 
     const response = await request(app.getHttpServer())
-      .get('/api/v1/admin/audit-logs')
-      .query({ q: 'admin.user.created' })
+      .get("/api/v1/admin/audit-logs")
+      .query({ q: "admin.user.created" })
       .set(bearer(admin.accessToken))
       .expect(200);
 
     expect(response.body.data.length).toBeGreaterThan(0);
     for (const row of response.body.data) {
-      expect(row.action).toBe('admin.user.created');
+      expect(row.action).toBe("admin.user.created");
     }
 
     const noMatch = await request(app.getHttpServer())
-      .get('/api/v1/admin/audit-logs')
-      .query({ q: 'no-such-action-exists' })
+      .get("/api/v1/admin/audit-logs")
+      .query({ q: "no-such-action-exists" })
       .set(bearer(admin.accessToken))
       .expect(200);
     expect(noMatch.body.data).toHaveLength(0);
   });
 
-  it('rejects listing and exporting audit logs without authentication', async () => {
-    await request(app.getHttpServer())
-      .get('/api/v1/admin/audit-logs')
-      .expect(401);
+  it("rejects listing and exporting audit logs without authentication", async () => {
+    await request(app.getHttpServer()).get("/api/v1/admin/audit-logs").expect(401);
 
-    await request(app.getHttpServer())
-      .post('/api/v1/admin/audit-logs/export')
-      .send({})
-      .expect(401);
+    await request(app.getHttpServer()).post("/api/v1/admin/audit-logs/export").send({}).expect(401);
   });
 
-  it('exports filtered audit logs as a downloadable CSV file scoped to the actor org', async () => {
-    const admin = await loginAs(app, 'admin@example.local', 'ChangeMe123!');
+  it("exports filtered audit logs as a downloadable CSV file scoped to the actor org", async () => {
+    const admin = await loginAs(app, "admin@example.local", "ChangeMe123!");
     const marker = `audit-export-${Date.now()}@example.test`;
     await createActiveUser(admin, marker);
 
     const exportResponse = await request(app.getHttpServer())
-      .post('/api/v1/admin/audit-logs/export')
+      .post("/api/v1/admin/audit-logs/export")
       .set(bearer(admin.accessToken))
-      .send({ q: 'admin.user.created' })
+      .send({ q: "admin.user.created" })
       .expect(201);
 
     const { fileId, rowCount } = exportResponse.body.data as {
@@ -96,54 +88,53 @@ describe('Audit logs (e2e)', () => {
       .get(`/api/v1/files/${fileId}`)
       .set(bearer(admin.accessToken))
       .expect(200);
-    expect(fileMeta.body.data.mimeType).toBe('text/csv');
+    expect(fileMeta.body.data.mimeType).toBe("text/csv");
 
     const signedUrl = await request(app.getHttpServer())
       .get(`/api/v1/files/${fileId}/url`)
       .set(bearer(admin.accessToken))
       .expect(200);
-    const downloadToken = new URL(
-      signedUrl.body.data.url,
-      'http://localhost',
-    ).searchParams.get('token')!;
+    const downloadToken = new URL(signedUrl.body.data.url, "http://localhost").searchParams.get(
+      "token",
+    )!;
 
     const download = await request(app.getHttpServer())
       .get(`/api/v1/files/${fileId}/download`)
       .query({ token: downloadToken })
       .set(bearer(admin.accessToken))
       .expect(200);
-    const csv = Buffer.from(download.body as Buffer).toString('utf8');
-    expect(csv.split('\n')[0]).toContain('action');
-    expect(csv).toContain('admin.user.created');
+    const csv = Buffer.from(download.body as Buffer).toString("utf8");
+    expect(csv.split("\n")[0]).toContain("action");
+    expect(csv).toContain("admin.user.created");
 
     // The export itself is recorded as its own audit entry.
     const exportedLog = await request(app.getHttpServer())
-      .get('/api/v1/admin/audit-logs')
-      .query({ q: 'audit.exported' })
+      .get("/api/v1/admin/audit-logs")
+      .query({ q: "audit.exported" })
       .set(bearer(admin.accessToken))
       .expect(200);
     expect(exportedLog.body.data.length).toBeGreaterThan(0);
   });
 
-  it('caps export queries to the maximum row safety bound via the same filters as listing', async () => {
-    const admin = await loginAs(app, 'admin@example.local', 'ChangeMe123!');
+  it("caps export queries to the maximum row safety bound via the same filters as listing", async () => {
+    const admin = await loginAs(app, "admin@example.local", "ChangeMe123!");
 
     const exportResponse = await request(app.getHttpServer())
-      .post('/api/v1/admin/audit-logs/export')
+      .post("/api/v1/admin/audit-logs/export")
       .set(bearer(admin.accessToken))
-      .send({ action: 'no-such-action' })
+      .send({ action: "no-such-action" })
       .expect(201);
 
     expect(exportResponse.body.data.rowCount).toBe(0);
   });
 
-  it('prevents non-authorized users from bypassing export ACL using generic file downloads', async () => {
-    const admin = await loginAs(app, 'admin@example.local', 'ChangeMe123!');
+  it("prevents non-authorized users from bypassing export ACL using generic file downloads", async () => {
+    const admin = await loginAs(app, "admin@example.local", "ChangeMe123!");
     const marker = `audit-export-acl-${Date.now()}@example.test`;
     await createActiveUser(admin, marker);
 
     const exportResponse = await request(app.getHttpServer())
-      .post('/api/v1/admin/audit-logs/export')
+      .post("/api/v1/admin/audit-logs/export")
       .set(bearer(admin.accessToken))
       .send({ q: marker })
       .expect(201);
@@ -153,7 +144,7 @@ describe('Audit logs (e2e)', () => {
     // Create a regular user who does not have audit.read permissions
     const regularEmail = `regular-${Date.now()}@example.test`;
     const regularUserId = await createActiveUser(admin, regularEmail);
-    const regularUserLogin = await loginAs(app, regularEmail, 'ChangeMe123!');
+    const regularUserLogin = await loginAs(app, regularEmail, "ChangeMe123!");
 
     // They should not be able to get a download token for this audit export
     await request(app.getHttpServer())
@@ -174,14 +165,14 @@ describe('Audit logs (e2e)', () => {
       .expect(403);
   });
 
-  it('prevents downloading ordinary files via the specialized audit export download endpoint (returns 404)', async () => {
-    const admin = await loginAs(app, 'admin@example.local', 'ChangeMe123!');
+  it("prevents downloading ordinary files via the specialized audit export download endpoint (returns 404)", async () => {
+    const admin = await loginAs(app, "admin@example.local", "ChangeMe123!");
 
     // Create an ordinary attachment file
     const fileUploadResponse = await request(app.getHttpServer())
-      .post('/api/v1/files')
+      .post("/api/v1/files")
       .set(bearer(admin.accessToken))
-      .attach('file', Buffer.from('ordinary file content'), 'test.txt')
+      .attach("file", Buffer.from("ordinary file content"), "test.txt")
       .expect(201);
 
     const fileId = fileUploadResponse.body.data.id;
@@ -193,20 +184,20 @@ describe('Audit logs (e2e)', () => {
       .expect(404);
   });
 
-  it('allows SUPER_ADMIN to perform a global export without an active organization', async () => {
+  it("allows SUPER_ADMIN to perform a global export without an active organization", async () => {
     // In test environment, admin@example.local is a SUPER_ADMIN.
-    const admin = await loginAs(app, 'admin@example.local', 'ChangeMe123!');
-    
+    const admin = await loginAs(app, "admin@example.local", "ChangeMe123!");
+
     // We will simulate a global export by ensuring the request context has no organizationId.
     // In our E2E framework, if we don't pass 'x-organization-id', the tenant context is derived
     // from the user's default organization. We can explicitly pass 'x-organization-id': '' to try to clear it,
     // or rely on the fact that admin global export bypasses RLS.
     // Let's just call the export endpoint. If it succeeds and returns results, the fix is verified.
     const exportResponse = await request(app.getHttpServer())
-      .post('/api/v1/admin/audit-logs/export')
+      .post("/api/v1/admin/audit-logs/export")
       .set(bearer(admin.accessToken))
-      .set('x-organization-id', '') // Explicitly testing global export by clearing tenant context
-      .send({ q: 'global-export-test' })
+      .set("x-organization-id", "") // Explicitly testing global export by clearing tenant context
+      .send({ q: "global-export-test" })
       .expect(201);
 
     expect(exportResponse.body.data.fileId).toBeTruthy();

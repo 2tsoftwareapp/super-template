@@ -1,13 +1,7 @@
 "use client";
 
 import { Button } from "@repo/web-ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@repo/web-ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/web-ui/card";
 import { ErrorState } from "@repo/web-ui/error-state";
 import { Input } from "@repo/web-ui/input";
 import { SectionLoading } from "@repo/web-ui/loading";
@@ -44,11 +38,7 @@ export function MailTemplateCard({ preview }: MailTemplateCardProps) {
             onClick={preview.onPreview}
             disabled={preview.isFetching}
           >
-            {preview.isFetching ? (
-              <Spinner className="size-3.5" />
-            ) : (
-              "Preview"
-            )}
+            {preview.isFetching ? <Spinner className="size-3.5" /> : "Preview"}
           </Button>
         </div>
 
@@ -88,9 +78,7 @@ export function MailTemplateCard({ preview }: MailTemplateCardProps) {
             </>
           ) : !preview.isLoading && !preview.isError ? (
             <p className="py-2 text-center text-xs text-muted-foreground">
-              {preview.templateKey
-                ? "Template not found."
-                : "Enter a template key above."}
+              {preview.templateKey ? "Template not found." : "Enter a template key above."}
             </p>
           ) : null}
         </div>

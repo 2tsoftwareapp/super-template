@@ -45,11 +45,7 @@ export interface AuthCookieHelpers {
     csrfToken: string | null;
   }>;
   setCsrfCookie: (response: NextResponse, csrfToken?: string) => string;
-  setAuthCookies: (
-    response: NextResponse,
-    payload: AuthTokenPayload,
-    csrfToken?: string,
-  ) => void;
+  setAuthCookies: (response: NextResponse, payload: AuthTokenPayload, csrfToken?: string) => void;
   clearSessionCookies: (response: NextResponse) => void;
   clearAuthCookies: (response: NextResponse) => void;
 }
@@ -62,10 +58,8 @@ export const createAuthCookieHelpers = ({
   cookieNames,
   requireSignedCsrf = false,
 }: AuthCookieOptions): AuthCookieHelpers => {
-  const accessTokenCookie =
-    cookieNames?.accessToken ?? DEFAULT_ACCESS_TOKEN_COOKIE;
-  const refreshTokenCookie =
-    cookieNames?.refreshToken ?? DEFAULT_REFRESH_TOKEN_COOKIE;
+  const accessTokenCookie = cookieNames?.accessToken ?? DEFAULT_ACCESS_TOKEN_COOKIE;
+  const refreshTokenCookie = cookieNames?.refreshToken ?? DEFAULT_REFRESH_TOKEN_COOKIE;
   const csrfTokenCookie = cookieNames?.csrf ?? DEFAULT_CSRF_TOKEN_COOKIE;
 
   const baseCookieOptions = {
@@ -81,9 +75,7 @@ export const createAuthCookieHelpers = ({
       return nonce;
     }
 
-    const signature = createHmac(CSRF_HMAC_ALGORITHM, csrfSecret)
-      .update(nonce)
-      .digest("base64url");
+    const signature = createHmac(CSRF_HMAC_ALGORITHM, csrfSecret).update(nonce).digest("base64url");
 
     return `${nonce}${CSRF_SEPARATOR}${signature}`;
   };
@@ -152,11 +144,7 @@ export const createAuthCookieHelpers = ({
   ) => {
     setCsrfCookie(response, csrfToken);
     response.cookies.set(accessTokenCookie, payload.accessToken, baseCookieOptions);
-    response.cookies.set(
-      refreshTokenCookie,
-      payload.refreshToken,
-      baseCookieOptions,
-    );
+    response.cookies.set(refreshTokenCookie, payload.refreshToken, baseCookieOptions);
   };
 
   const clearSessionCookies = (response: NextResponse) => {

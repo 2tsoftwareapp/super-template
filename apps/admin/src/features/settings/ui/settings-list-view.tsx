@@ -1,13 +1,7 @@
 "use client";
 
 import { Button } from "@repo/web-ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@repo/web-ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/web-ui/card";
 import { ConfirmDialog } from "@repo/web-ui/confirm-dialog";
 import { ErrorState } from "@repo/web-ui/error-state";
 import { Input } from "@repo/web-ui/input";

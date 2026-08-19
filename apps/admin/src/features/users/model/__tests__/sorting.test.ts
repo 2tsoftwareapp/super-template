@@ -6,9 +6,7 @@ import type { UsersSortCriterion } from "../users.types";
 
 import { paramsFromSortingState, sortingStateFromParams } from "../sorting";
 
-const defaultSort: UsersSortCriterion[] = [
-  { field: "createdAt", order: "desc" },
-];
+const defaultSort: UsersSortCriterion[] = [{ field: "createdAt", order: "desc" }];
 
 describe("users sorting helpers", () => {
   it("maps API sort params to table sorting state", () => {
@@ -66,8 +64,8 @@ describe("createTableSortBridge", () => {
       columnByField: { name: "title", updatedAt: "updatedAt" },
     });
 
-    expect(
-      bridge.sortingStateFromParams([{ field: "name", order: "asc" }]),
-    ).toEqual([{ id: "title", desc: false }]);
+    expect(bridge.sortingStateFromParams([{ field: "name", order: "asc" }])).toEqual([
+      { id: "title", desc: false },
+    ]);
   });
 });

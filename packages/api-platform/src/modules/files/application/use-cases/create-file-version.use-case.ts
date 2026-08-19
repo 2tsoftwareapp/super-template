@@ -1,26 +1,27 @@
-import type {
-  AuthenticatedRequestUser,
-  RequestContext,
-} from '@repo/api-core';
+import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-core";
 
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import {  AppError, ERROR_CODES, requireOrganizationId , SYSTEM_SCOPE, TRANSACTION_PORT, type TransactionPort } from '@repo/api-core';
-import { isPostgresUniqueViolation } from '@repo/api-database';
-import { createHash, randomUUID } from 'node:crypto';
-
-import { AuditService } from '../../../audit/application/audit.service';
+import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import {
-  OBJECT_STORAGE,
-  type ObjectStorage,
-} from '../../../storage/application/object-storage.interface';
+  AppError,
+  ERROR_CODES,
+  requireOrganizationId,
+  SYSTEM_SCOPE,
+  TRANSACTION_PORT,
+  type TransactionPort,
+} from "@repo/api-core";
+import { createHash, randomUUID } from "node:crypto";
+
+import { AuditService } from "../../../audit";
+import { OBJECT_STORAGE, type ObjectStorage } from "../../../storage";
+import { FileVersionConflictError } from "../../domain/errors";
 import {
   getUploadExtension,
   MAX_FILE_SIZE_BYTES,
   resolveUploadedFileMimeType,
-} from '../../domain/upload-policy';
-import { FilesMapper } from '../files.mapper';
-import { FILES_REPOSITORY, type FilesRepositoryPort } from '../ports/files.repository.port';
-import { FileAccessService } from '../services/file-access.service';
+} from "../../domain/upload-policy";
+import { FilesMapper } from "../files.mapper";
+import { FILES_REPOSITORY, type FilesRepositoryPort } from "../ports/files.repository.port";
+import { FileAccessService } from "../services/file-access.service";
 
 interface UploadedFile {
   buffer: Buffer;
@@ -45,44 +46,34 @@ export class CreateFileVersionUseCase {
     file: UploadedFile,
     requestContext?: RequestContext,
   ) {
-    const existing = await this.fileAccessService.findAccessibleFile(
-      actor,
-      fileId,
-    );
+    const existing = await this.fileAccessService.findAccessibleFile(actor, fileId);
 
     if (!file?.buffer) {
-      throw new AppError(
-        ERROR_CODES.VALIDATION_FAILED,
-        'File is required',
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new AppError(ERROR_CODES.VALIDATION_FAILED, "File is required", HttpStatus.BAD_REQUEST);
     }
 
     if (file.size > MAX_FILE_SIZE_BYTES) {
       throw new AppError(
         ERROR_CODES.VALIDATION_FAILED,
-        'File exceeds maximum size of 10MB',
+        "File exceeds maximum size of 10MB",
         HttpStatus.BAD_REQUEST,
       );
     }
 
     const extension = getUploadExtension(file.originalname);
-    const detectedMimeType = resolveUploadedFileMimeType(
-      file.buffer,
-      file.originalname,
-    );
+    const detectedMimeType = resolveUploadedFileMimeType(file.buffer, file.originalname);
 
     if (!detectedMimeType) {
       throw new AppError(
         ERROR_CODES.VALIDATION_FAILED,
-        'Unsupported or invalid file type',
+        "Unsupported or invalid file type",
         HttpStatus.BAD_REQUEST,
       );
     }
 
     const organizationId = requireOrganizationId(actor);
     const storageKey = `uploads/${actor.userId}/${randomUUID()}${extension}`;
-    const checksum = createHash('sha256').update(file.buffer).digest('hex');
+    const checksum = createHash("sha256").update(file.buffer).digest("hex");
     const nextVersion = existing.latestVersion + 1;
 
     await this.objectStorage.upload({
@@ -96,24 +87,27 @@ export class CreateFileVersionUseCase {
         { tenantId: organizationId, userId: actor.userId },
         async (tx) => {
           try {
-            await this.filesRepository.createVersion({
-              fileId: existing.id,
-              organizationId,
-              versionNumber: nextVersion,
-              storageKey,
-              mimeType: detectedMimeType,
-              sizeBytes: file.size,
-              checksum,
-              createdById: actor.userId,
-            }, tx);
+            await this.filesRepository.createVersion(
+              {
+                fileId: existing.id,
+                organizationId,
+                versionNumber: nextVersion,
+                storageKey,
+                mimeType: detectedMimeType,
+                sizeBytes: file.size,
+                checksum,
+                createdById: actor.userId,
+              },
+              tx,
+            );
           } catch (error) {
-            // A concurrent upload computed the same version number and won the
-            // unique (file_id, version_number) index - surface a soft conflict
-            // instead of a 500.
-            if (isPostgresUniqueViolation(error)) {
+            // The repository translates the unique (file_id, version_number)
+            // violation into a domain error — surface a soft conflict instead
+            // of a 500; a concurrent upload can simply be retried.
+            if (error instanceof FileVersionConflictError) {
               throw new AppError(
                 ERROR_CODES.RESOURCE_CONFLICT,
-                'File version was updated concurrently, please retry',
+                "File version was updated concurrently, please retry",
                 HttpStatus.CONFLICT,
               );
             }
@@ -132,30 +126,33 @@ export class CreateFileVersionUseCase {
             // CAS: the file must still point at the version we are bumping
             // from, otherwise a concurrent upload already advanced it.
             existing.latestVersion,
-            tx
+            tx,
           );
 
           if (!updatedRecord) {
             throw new AppError(
               ERROR_CODES.RESOURCE_CONFLICT,
-              'File version was updated concurrently, please retry',
+              "File version was updated concurrently, please retry",
               HttpStatus.CONFLICT,
             );
           }
 
-          await this.auditService.log({
-            actorId: actor.userId,
-            action: 'file.version_uploaded',
-            entityType: 'file',
-            entityId: existing.id,
-            metadata: { versionNumber: nextVersion },
-            requestContext,
-            scope: SYSTEM_SCOPE.ORGANIZATION,
-            organizationId,
-          }, tx);
+          await this.auditService.log(
+            {
+              actorId: actor.userId,
+              action: "file.version_uploaded",
+              entityType: "file",
+              entityId: existing.id,
+              metadata: { versionNumber: nextVersion },
+              requestContext,
+              scope: SYSTEM_SCOPE.ORGANIZATION,
+              organizationId,
+            },
+            tx,
+          );
 
           return updatedRecord;
-        }
+        },
       );
 
       return FilesMapper.toFileDto(updated);

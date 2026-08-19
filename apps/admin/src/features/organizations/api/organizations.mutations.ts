@@ -2,10 +2,7 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import type {
-  CreateOrganizationInput,
-  UpdateOrganizationInput,
-} from "@/lib/api-types";
+import type { CreateOrganizationInput, UpdateOrganizationInput } from "@/lib/api-types";
 
 import { organizationsApi } from "./organizations.api";
 import { organizationsKeys } from "./organizations.query-keys";
@@ -14,8 +11,7 @@ export function useSwitchOrganizationMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (organizationId: string) =>
-      organizationsApi.switch(organizationId),
+    mutationFn: (organizationId: string) => organizationsApi.switch(organizationId),
     onSuccess: () => {
       // Every cached resource belongs to the previous tenant — drop it all.
       // queryClient.clear() prevents data from the old org leaking into the
@@ -29,8 +25,7 @@ export function useCreateOrganizationMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (input: CreateOrganizationInput) =>
-      organizationsApi.create(input),
+    mutationFn: (input: CreateOrganizationInput) => organizationsApi.create(input),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: organizationsKeys.all });
     },
@@ -41,8 +36,7 @@ export function useUpdateOrganizationMutation(id: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (input: UpdateOrganizationInput) =>
-      organizationsApi.update(id, input),
+    mutationFn: (input: UpdateOrganizationInput) => organizationsApi.update(id, input),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: organizationsKeys.all });
     },
@@ -75,13 +69,8 @@ export function useUpdateMemberRoleMutation(orgId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      userId,
-      role,
-    }: {
-      userId: string;
-      role: string;
-    }) => organizationsApi.updateMemberRole(orgId, userId, role),
+    mutationFn: ({ userId, role }: { userId: string; role: string }) =>
+      organizationsApi.updateMemberRole(orgId, userId, role),
     onSuccess: () => {
       void queryClient.invalidateQueries({
         queryKey: organizationsKeys.members(orgId),
@@ -94,8 +83,7 @@ export function useRemoveMemberMutation(orgId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (userId: string) =>
-      organizationsApi.removeMember(orgId, userId),
+    mutationFn: (userId: string) => organizationsApi.removeMember(orgId, userId),
     onSuccess: () => {
       void queryClient.invalidateQueries({
         queryKey: organizationsKeys.members(orgId),

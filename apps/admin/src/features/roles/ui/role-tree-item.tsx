@@ -2,14 +2,7 @@
 
 import { Badge } from "@repo/web-ui/badge";
 import { Button } from "@repo/web-ui/button";
-import {
-  ChevronDown,
-  ChevronRight,
-  LockKeyhole,
-  Pencil,
-  ShieldCheck,
-  Trash2,
-} from "lucide-react";
+import { ChevronDown, ChevronRight, LockKeyhole, Pencil, ShieldCheck, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 import type { ManagedRoleDto } from "@/features/roles/model/roles.schemas";
@@ -59,30 +52,19 @@ export function RoleTreeItem({
           )}
         </div>
         <div className="flex min-w-0 flex-1 items-center gap-2">
-          <span className="truncate text-sm font-medium">
-            {formatRoleName(role.name)}
-          </span>
+          <span className="truncate text-sm font-medium">{formatRoleName(role.name)}</span>
           {role.scopes.map((s) => (
-            <Badge
-              key={s}
-              variant="outline"
-              className="shrink-0 text-[10px] capitalize"
-            >
+            <Badge key={s} variant="outline" className="shrink-0 text-[10px] capitalize">
               {s}
             </Badge>
           ))}
           {organizationName && (
-            <span className="truncate text-[10px] text-muted-foreground">
-              {organizationName}
-            </span>
+            <span className="truncate text-[10px] text-muted-foreground">{organizationName}</span>
           )}
         </div>
         <div className="flex shrink-0 items-center gap-1">
           {isEditable && (
-            <span
-              className="flex items-center gap-0.5"
-              onClick={(e) => e.stopPropagation()}
-            >
+            <span className="flex items-center gap-0.5" onClick={(e) => e.stopPropagation()}>
               {canUpdate && (
                 <Button
                   type="button"
@@ -133,11 +115,7 @@ export function RoleTreeItem({
           {role.permissions.length > 0 && (
             <div className="flex flex-wrap gap-1">
               {role.permissions.map((p) => (
-                <Badge
-                  key={p.id}
-                  variant="secondary"
-                  className="font-mono text-[10px]"
-                >
+                <Badge key={p.id} variant="secondary" className="font-mono text-[10px]">
                   {p.name}
                 </Badge>
               ))}

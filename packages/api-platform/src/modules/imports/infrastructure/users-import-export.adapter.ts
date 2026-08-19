@@ -1,9 +1,9 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from "@nestjs/common";
 import {
   ImportExportAdapter,
   ImportExportRowContext,
   type TransactionExecutor,
-} from '@repo/api-core';
+} from "@repo/api-core";
 import {
   ACCESS_CONTROL_REPOSITORY,
   type AccessControlRepositoryPort,
@@ -11,9 +11,9 @@ import {
   type OrganizationsRepositoryPort,
   USERS_REPOSITORY,
   type UsersRepositoryPort,
-} from '@repo/api-identity';
-import { hash } from 'argon2';
-import { randomBytes } from 'node:crypto';
+} from "@repo/api-identity";
+import { hash } from "argon2";
+import { randomBytes } from "node:crypto";
 
 export interface UserRow {
   id?: string;
@@ -27,10 +27,10 @@ export interface UserRow {
 
 @Injectable()
 export class UsersImportExportAdapter implements ImportExportAdapter<UserRow> {
-  readonly type = 'users';
-  readonly csvHeader = ['email', 'displayName', 'avatarUrl'];
-  readonly importPermissions = ['users.create'];
-  readonly exportPermissions = ['users.read'];
+  readonly type = "users";
+  readonly csvHeader = ["email", "displayName", "avatarUrl"];
+  readonly importPermissions = ["users.create"];
+  readonly exportPermissions = ["users.read"];
 
   constructor(
     @Inject(USERS_REPOSITORY)
@@ -55,7 +55,7 @@ export class UsersImportExportAdapter implements ImportExportAdapter<UserRow> {
         page,
         limit: pageSize,
         organizationId: params.organizationId,
-        sort: [{ field: 'createdAt', order: 'asc' }],
+        sort: [{ field: "createdAt", order: "asc" }],
       });
 
       for (const user of result.rows) {
@@ -82,37 +82,33 @@ export class UsersImportExportAdapter implements ImportExportAdapter<UserRow> {
   }
 
   toCsvRow(row: UserRow): string[] {
-    return [
-      row.email,
-      row.displayName,
-      row.avatarUrl ?? '',
-    ];
+    return [row.email, row.displayName, row.avatarUrl ?? ""];
   }
 
   parseCsvRecord(record: Record<string, string>): UserRow {
     return {
-      email: record.email?.trim() ?? '',
-      displayName: record.displayName?.trim() ?? '',
+      email: record.email?.trim() ?? "",
+      displayName: record.displayName?.trim() ?? "",
       avatarUrl: record.avatarUrl?.trim() ?? undefined,
     };
   }
 
   validateRow(row: UserRow): string | null {
     if (!row.email) {
-      return 'Email is required';
+      return "Email is required";
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(row.email)) {
-      return 'Email must be a valid email address';
+      return "Email must be a valid email address";
     }
 
     if (!row.displayName) {
-      return 'Display name is required';
+      return "Display name is required";
     }
 
     if (row.displayName.length < 2 || row.displayName.length > 100) {
-      return 'Display name must be between 2 and 100 characters';
+      return "Display name must be between 2 and 100 characters";
     }
 
     return null;
@@ -123,7 +119,7 @@ export class UsersImportExportAdapter implements ImportExportAdapter<UserRow> {
     context: ImportExportRowContext,
     executor?: TransactionExecutor,
   ): Promise<void> {
-    const temporaryPassword = randomBytes(32).toString('hex');
+    const temporaryPassword = randomBytes(32).toString("hex");
     const passwordHash = await hash(temporaryPassword);
 
     const user = await this.usersRepository.create(
@@ -132,7 +128,7 @@ export class UsersImportExportAdapter implements ImportExportAdapter<UserRow> {
         passwordHash,
         displayName: row.displayName,
         avatarUrl: row.avatarUrl ?? null,
-        status: 'ACTIVE',
+        status: "ACTIVE",
         emailVerifiedAt: new Date(),
         mustChangePassword: true,
       },
@@ -143,16 +139,12 @@ export class UsersImportExportAdapter implements ImportExportAdapter<UserRow> {
       {
         organizationId: context.organizationId,
         userId: user.id,
-        role: 'MEMBER',
+        role: "MEMBER",
       },
       executor,
     );
 
-    const role = await this.accessControlRepository.findRoleByName(
-      'USER',
-      null,
-      executor,
-    );
+    const role = await this.accessControlRepository.findRoleByName("USER", null, executor);
 
     if (role) {
       await this.accessControlRepository.assignUserRole(

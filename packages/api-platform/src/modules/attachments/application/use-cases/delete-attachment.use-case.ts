@@ -1,9 +1,6 @@
-import type {
-  AuthenticatedRequestUser,
-  RequestContext,
-} from '@repo/api-core';
+import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-core";
 
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import {
   ACTIVITY_EMITTER,
   type ActivityEmitter,
@@ -12,15 +9,19 @@ import {
   SYSTEM_SCOPE,
   TRANSACTION_PORT,
   type TransactionPort,
-} from '@repo/api-core';
+} from "@repo/api-core";
 
-import { AuditService } from '../../../audit/application/audit.service';
-import { ATTACHMENTS_REPOSITORY, type AttachmentsRepositoryPort } from '../ports/attachments.repository.port';
+import { AuditService } from "../../../audit";
+import {
+  ATTACHMENTS_REPOSITORY,
+  type AttachmentsRepositoryPort,
+} from "../ports/attachments.repository.port";
 
 @Injectable()
 export class DeleteAttachmentUseCase {
   constructor(
-    @Inject(ATTACHMENTS_REPOSITORY) private readonly attachmentsRepository: AttachmentsRepositoryPort,
+    @Inject(ATTACHMENTS_REPOSITORY)
+    private readonly attachmentsRepository: AttachmentsRepositoryPort,
     private readonly auditService: AuditService,
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
     @Inject(ACTIVITY_EMITTER) private readonly activityEmitter: ActivityEmitter,
@@ -31,13 +32,12 @@ export class DeleteAttachmentUseCase {
     attachmentId: string,
     requestContext?: RequestContext,
   ) {
-    const attachment =
-      await this.attachmentsRepository.findById(attachmentId);
+    const attachment = await this.attachmentsRepository.findById(attachmentId);
 
     if (!attachment) {
       throw new AppError(
         ERROR_CODES.ATTACHMENT_NOT_FOUND,
-        'Attachment not found',
+        "Attachment not found",
         HttpStatus.NOT_FOUND,
       );
     }
@@ -45,25 +45,30 @@ export class DeleteAttachmentUseCase {
     await this.transactionPort.run(async (tx) => {
       await this.attachmentsRepository.softDelete(attachmentId, tx);
 
-      await this.auditService.log({
-        actorId: actor.userId,
-        action: 'attachment.deleted',
-        entityType: attachment.entityType,
-        entityId: attachment.entityId,
-        metadata: { attachmentId },
-        requestContext,
-        ...(attachment.organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: attachment.organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
-      }, tx);
+      await this.auditService.log(
+        {
+          actorId: actor.userId,
+          action: "attachment.deleted",
+          entityType: attachment.entityType,
+          entityId: attachment.entityId,
+          metadata: { attachmentId },
+          requestContext,
+          ...(attachment.organizationId
+            ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: attachment.organizationId }
+            : { scope: SYSTEM_SCOPE.PLATFORM }),
+        },
+        tx,
+      );
 
       if (attachment.organizationId) {
         await this.activityEmitter.emit(
           {
             organizationId: attachment.organizationId,
             summary: `Attachment removed from ${attachment.entityType}`,
-            entityType: 'attachment',
+            entityType: "attachment",
             entityId: attachment.id,
             actorId: actor.userId,
-            visibility: 'INTERNAL',
+            visibility: "INTERNAL",
             metadata: {
               fileId: attachment.fileId,
               targetEntityType: attachment.entityType,

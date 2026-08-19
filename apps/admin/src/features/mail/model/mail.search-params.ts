@@ -1,9 +1,5 @@
 import { DEFAULT_PAGE_SIZE } from "@repo/config";
-import {
-  pageParam,
-  parseSearchParams,
-  searchTextParam,
-} from "@repo/web-utils/params";
+import { pageParam, parseSearchParams, searchTextParam } from "@repo/web-utils/params";
 import { z } from "zod";
 
 import { DELIVERY_STATUS_OPTIONS } from "./mail.constants";
@@ -16,10 +12,7 @@ export interface MailFilters {
   page: number;
 }
 
-const statusValues = DELIVERY_STATUS_OPTIONS.map((option) => option.value) as [
-  string,
-  ...string[],
-];
+const statusValues = DELIVERY_STATUS_OPTIONS.map((option) => option.value) as [string, ...string[]];
 
 const mailFiltersSchema = z.object({
   status: z.enum(statusValues).catch(""),
@@ -34,11 +27,7 @@ const MAIL_FILTERS_FALLBACK = {
 } as const;
 
 export function parseMailFilters(sp: URLSearchParams): MailFilters {
-  const parsed = parseSearchParams(
-    mailFiltersSchema,
-    sp,
-    MAIL_FILTERS_FALLBACK,
-  );
+  const parsed = parseSearchParams(mailFiltersSchema, sp, MAIL_FILTERS_FALLBACK);
 
   return {
     status: parsed.data.status,

@@ -14,17 +14,8 @@ import { FilesHeader } from "./files-header";
 import { FilesTable } from "./files-table";
 
 export function FilesListView(viewModel: FilesViewModel) {
-  const {
-    header,
-    toolbar,
-    list,
-    upload,
-    detail,
-    versions,
-    history,
-    detailTabs,
-    confirmDelete,
-  } = viewModel;
+  const { header, toolbar, list, upload, detail, versions, history, detailTabs, confirmDelete } =
+    viewModel;
   const uploadFileRef = useRef<HTMLInputElement>(null);
   const versionFileRef = useRef<HTMLInputElement>(null);
 
@@ -129,11 +120,7 @@ export function FilesListView(viewModel: FilesViewModel) {
 
         <ConfirmDialog
           open={!!confirmDelete.target}
-          title={
-            confirmDelete.target
-              ? `Delete "${confirmDelete.target.originalName}"?`
-              : ""
-          }
+          title={confirmDelete.target ? `Delete "${confirmDelete.target.originalName}"?` : ""}
           message="This action cannot be undone. The file and all its versions will be permanently removed."
           confirmLabel="Delete"
           destructive

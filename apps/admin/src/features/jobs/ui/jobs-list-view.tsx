@@ -15,14 +15,7 @@ import { adminResources } from "@/lib/admin-resources";
 
 const jobsResource = adminResources.find((r) => r.id === "jobs")!;
 
-export function JobsListView({
-  header,
-  filters,
-  list,
-  detail,
-  logs,
-  cancel,
-}: JobsViewModel) {
+export function JobsListView({ header, filters, list, detail, logs, cancel }: JobsViewModel) {
   return (
     <>
       <ResourcePageShell

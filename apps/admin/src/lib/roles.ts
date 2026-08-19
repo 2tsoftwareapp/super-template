@@ -7,9 +7,7 @@ export function formatRoleName(name: string) {
 }
 
 export function isPrivilegedRoleName(name: string) {
-  return PRIVILEGED_ROLE_NAMES.includes(
-    name as (typeof PRIVILEGED_ROLE_NAMES)[number],
-  );
+  return PRIVILEGED_ROLE_NAMES.includes(name as (typeof PRIVILEGED_ROLE_NAMES)[number]);
 }
 
 export function isOrganizationRole(role: string) {
@@ -40,10 +38,7 @@ export function canAssignRole(actorRoles: string[], roleName: string) {
   return false;
 }
 
-export function getAssignableRoles(
-  actorRoles: string[],
-  roles: RoleDto[],
-): RoleDto[] {
+export function getAssignableRoles(actorRoles: string[], roles: RoleDto[]): RoleDto[] {
   return roles
     .filter((role) => {
       if (!canAssignRole(actorRoles, role.name)) return false;
@@ -92,8 +87,7 @@ export function filterRolesForOrganization<T extends RoleWithOrg>(
 
 export function findPlatformUserRoleId<T extends RoleWithOrg>(roles: T[]) {
   return (
-    roles.find((role) => role.name === "USER" && role.organizationId == null)
-      ?.id ??
+    roles.find((role) => role.name === "USER" && role.organizationId == null)?.id ??
     roles[0]?.id ??
     ""
   );

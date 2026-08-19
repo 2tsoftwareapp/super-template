@@ -15,17 +15,10 @@ export function UserDetailProfile({ profile, canEdit }: UserDetailProfileProps) 
   return (
     <div>
       <h4 className="mb-3 text-sm font-medium">Profile</h4>
-      <form
-        className="grid gap-4 sm:grid-cols-2"
-        onSubmit={profile.onSubmit}
-      >
+      <form className="grid gap-4 sm:grid-cols-2" onSubmit={profile.onSubmit}>
         <div className="space-y-1.5">
           <Label htmlFor="p-name">Display name</Label>
-          <Input
-            id="p-name"
-            {...profile.form.register("displayName")}
-            disabled={!canEdit}
-          />
+          <Input id="p-name" {...profile.form.register("displayName")} disabled={!canEdit} />
           {profile.form.formState.errors.displayName && (
             <p className="text-xs text-destructive">
               {profile.form.formState.errors.displayName.message}
@@ -50,10 +43,7 @@ export function UserDetailProfile({ profile, canEdit }: UserDetailProfileProps) 
           <LoadingButton
             type="submit"
             loading={profile.state.isPending}
-            disabled={
-              !canEdit ||
-              (!profile.form.formState.isDirty && !profile.state.isError)
-            }
+            disabled={!canEdit || (!profile.form.formState.isDirty && !profile.state.isError)}
           >
             Save profile
           </LoadingButton>

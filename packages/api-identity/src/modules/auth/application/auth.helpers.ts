@@ -1,11 +1,11 @@
-import { HttpStatus } from '@nestjs/common';
-import { AppError, ERROR_CODES, generateOpaqueToken, hashOpaqueToken } from '@repo/api-core';
-import * as argon2 from 'argon2';
+import { HttpStatus } from "@nestjs/common";
+import { AppError, ERROR_CODES, generateOpaqueToken, hashOpaqueToken } from "@repo/api-core";
+import * as argon2 from "argon2";
 
-import type { AuthSessionModel } from './models/auth-session';
+import type { AuthSessionModel } from "./models/auth-session";
 
 const DUMMY_PASSWORD_HASH =
-  '$argon2id$v=19$m=65536,t=3,p=4$EnMqZqWbztDZjMH5GrNZJQ$jEXMP23MqS+/Dp20m83Kwq7wktQ3jyT+BEfr7UqSFZo';
+  "$argon2id$v=19$m=65536,t=3,p=4$EnMqZqWbztDZjMH5GrNZJQ$jEXMP23MqS+/Dp20m83Kwq7wktQ3jyT+BEfr7UqSFZo";
 
 export function assertSessionUsable(
   session: AuthSessionModel | null,
@@ -13,7 +13,7 @@ export function assertSessionUsable(
   if (!session) {
     throw new AppError(
       ERROR_CODES.AUTH_SESSION_REVOKED,
-      'Session not found',
+      "Session not found",
       HttpStatus.UNAUTHORIZED,
     );
   }
@@ -21,7 +21,7 @@ export function assertSessionUsable(
   if (session.revokedAt) {
     throw new AppError(
       ERROR_CODES.AUTH_SESSION_REVOKED,
-      'Session has been revoked',
+      "Session has been revoked",
       HttpStatus.UNAUTHORIZED,
     );
   }
@@ -53,4 +53,3 @@ export const verifyPasswordWithTimingPadding = async (
 
 export const hashRefreshToken = hashPassword;
 export const verifyRefreshTokenHash = verifyPassword;
-

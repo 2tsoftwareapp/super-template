@@ -1,5 +1,5 @@
-import type { UserRecord } from './ports/users.repository.port';
-import type { RoleAssignment, UserView } from './users.types';
+import type { UserRecord } from "./ports/users.repository.port";
+import type { RoleAssignment, UserView } from "./users.types";
 
 export class UsersMapper {
   toUserView(
@@ -18,11 +18,13 @@ export class UsersMapper {
       emailVerifiedAt: user.emailVerifiedAt?.toISOString() ?? null,
       roles,
       roleIds,
-      roleAssignments: roleAssignments ?? roles.map((name, i) => ({
-        roleName: name,
-        roleId: roleIds[i] ?? '',
-        organizationId: null,
-      })),
+      roleAssignments:
+        roleAssignments ??
+        roles.map((name, i) => ({
+          roleName: name,
+          roleId: roleIds[i] ?? "",
+          organizationId: null,
+        })),
       memberOrganizationIds: memberOrganizationIds ?? [],
       createdAt: user.createdAt.toISOString(),
       updatedAt: user.updatedAt.toISOString(),

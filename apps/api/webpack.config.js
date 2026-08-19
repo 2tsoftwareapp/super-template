@@ -1,8 +1,8 @@
-const nodeExternals = require('webpack-node-externals');
-const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
+const nodeExternals = require("webpack-node-externals");
+const TsconfigPathsPlugin = require("tsconfig-paths-webpack-plugin");
 
 const externalizeTerminus = ({ request }, callback) => {
-  if (request === '@nestjs/terminus') {
+  if (request === "@nestjs/terminus") {
     callback(null, `commonjs ${request}`);
     return;
   }
@@ -23,13 +23,13 @@ module.exports = (options) => ({
     ...options.resolve,
     alias: {
       ...(options.resolve.alias ?? {}),
-      '@mikro-orm/core': false,
-      '@mikro-orm/nestjs': false,
-      '@nestjs/axios': false,
-      '@nestjs/mongoose': false,
-      '@nestjs/sequelize': false,
-      '@nestjs/typeorm': false,
-      '@prisma/client': false,
+      "@mikro-orm/core": false,
+      "@mikro-orm/nestjs": false,
+      "@nestjs/axios": false,
+      "@nestjs/mongoose": false,
+      "@nestjs/sequelize": false,
+      "@nestjs/typeorm": false,
+      "@prisma/client": false,
       mongoose: false,
       sequelize: false,
       typeorm: false,
@@ -37,7 +37,7 @@ module.exports = (options) => ({
     plugins: [
       ...(options.resolve.plugins ?? []),
       new TsconfigPathsPlugin({
-        configFile: 'tsconfig.json',
+        configFile: "tsconfig.json",
       }),
     ],
   },

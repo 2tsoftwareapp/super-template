@@ -1,30 +1,27 @@
-import type { JsonObject } from '@repo/api-core';
-import type {
-  DatabaseClient,
-  DatabaseExecutor,
-} from '@repo/api-database';
+import type { JsonObject } from "@repo/api-core";
+import type { DatabaseClient, DatabaseExecutor } from "@repo/api-database";
 
-import { Inject, Injectable } from '@nestjs/common';
-import { DATABASE } from '@repo/api-database';
-import { jobAttempts, jobDependencies, jobEvents, jobs } from '@repo/api-database';
-import { and, count, desc, eq, gte, inArray, isNull, lte, sql } from 'drizzle-orm';
+import { Inject, Injectable } from "@nestjs/common";
+import { DATABASE } from "@repo/api-database";
+import { jobAttempts, jobDependencies, jobEvents, jobs } from "@repo/api-database";
+import { and, count, desc, eq, gte, inArray, isNull, lte, sql } from "drizzle-orm";
 
-import type { JobObservabilityRepositoryPort } from '../application/ports/job-observability.repository.port';
+import type { JobObservabilityRepositoryPort } from "../application/ports/job-observability.repository.port";
 
-type JobAttemptStatus = 'PROCESSING' | 'COMPLETED' | 'FAILED';
+type JobAttemptStatus = "PROCESSING" | "COMPLETED" | "FAILED";
 type JobEventType =
-  | 'claimed'
-  | 'completed'
-  | 'failed'
-  | 'retry_scheduled'
-  | 'cancelled'
-  | 'no_handler';
+  | "claimed"
+  | "completed"
+  | "failed"
+  | "retry_scheduled"
+  | "cancelled"
+  | "no_handler";
 
 function scopeWhereClause(
-  scope: { type: 'organization'; organizationId: string } | { type: 'platform' },
+  scope: { type: "organization"; organizationId: string } | { type: "platform" },
   table: typeof jobs | typeof jobEvents | typeof jobAttempts,
 ) {
-  if (scope.type === 'organization') {
+  if (scope.type === "organization") {
     return eq(table.organizationId, scope.organizationId);
   }
   return isNull(table.organizationId);
@@ -44,11 +41,11 @@ export class JobObservabilityRepository implements JobObservabilityRepositoryPor
   ) {
     const [attempt] = await executor
       .insert(jobAttempts)
-      .values({ ...values, status: 'PROCESSING' })
+      .values({ ...values, status: "PROCESSING" })
       .returning();
 
     if (!attempt) {
-      throw new Error('Job attempt insert returned no rows');
+      throw new Error("Job attempt insert returned no rows");
     }
 
     return attempt;
@@ -97,7 +94,7 @@ export class JobObservabilityRepository implements JobObservabilityRepositoryPor
       .returning();
 
     if (!event) {
-      throw new Error('Job event insert returned no rows');
+      throw new Error("Job event insert returned no rows");
     }
 
     return event;
@@ -132,22 +129,16 @@ export class JobObservabilityRepository implements JobObservabilityRepositoryPor
     },
     executor: DatabaseExecutor = this.database,
   ) {
-    const [dependency] = await executor
-      .insert(jobDependencies)
-      .values(values)
-      .returning();
+    const [dependency] = await executor.insert(jobDependencies).values(values).returning();
 
     if (!dependency) {
-      throw new Error('Job dependency insert returned no rows');
+      throw new Error("Job dependency insert returned no rows");
     }
 
     return dependency;
   }
 
-  async listDependencies(
-    jobId: string,
-    executor: DatabaseExecutor = this.database,
-  ) {
+  async listDependencies(jobId: string, executor: DatabaseExecutor = this.database) {
     return executor
       .select({
         id: jobDependencies.id,
@@ -202,7 +193,7 @@ export class JobObservabilityRepository implements JobObservabilityRepositoryPor
   }
 
   async getStatusCounts(
-    scope: { type: 'organization'; organizationId: string } | { type: 'platform' },
+    scope: { type: "organization"; organizationId: string } | { type: "platform" },
     filters: { from?: string; to?: string },
     executor: DatabaseExecutor = this.database,
   ) {
@@ -218,7 +209,7 @@ export class JobObservabilityRepository implements JobObservabilityRepositoryPor
   }
 
   async getTypeCounts(
-    scope: { type: 'organization'; organizationId: string } | { type: 'platform' },
+    scope: { type: "organization"; organizationId: string } | { type: "platform" },
     filters: { from?: string; to?: string },
     executor: DatabaseExecutor = this.database,
   ) {
@@ -234,23 +225,22 @@ export class JobObservabilityRepository implements JobObservabilityRepositoryPor
   }
 
   async getRetryCounts(
-    scope: { type: 'organization'; organizationId: string } | { type: 'platform' },
+    scope: { type: "organization"; organizationId: string } | { type: "platform" },
     filters: { from?: string; to?: string },
     executor: DatabaseExecutor = this.database,
   ) {
     const scopeFilter = scopeWhereClause(scope, jobs);
     const dateFilter = this.buildDateFilter(filters);
-    const terminalFilter = inArray(jobs.status, ['COMPLETED', 'FAILED']);
-    const baseWhere = dateFilter ? and(scopeFilter, terminalFilter, dateFilter) : and(scopeFilter, terminalFilter);
+    const terminalFilter = inArray(jobs.status, ["COMPLETED", "FAILED"]);
+    const baseWhere = dateFilter
+      ? and(scopeFilter, terminalFilter, dateFilter)
+      : and(scopeFilter, terminalFilter);
 
     const [retried] = await executor
       .select({ total: count() })
       .from(jobs)
       .where(and(baseWhere, sql`${jobs.attempts} > 1`));
-    const [terminal] = await executor
-      .select({ total: count() })
-      .from(jobs)
-      .where(baseWhere);
+    const [terminal] = await executor.select({ total: count() }).from(jobs).where(baseWhere);
 
     return {
       retried: Number(retried?.total ?? 0),
@@ -259,7 +249,7 @@ export class JobObservabilityRepository implements JobObservabilityRepositoryPor
   }
 
   async getAverageDurationMs(
-    scope: { type: 'organization'; organizationId: string } | { type: 'platform' },
+    scope: { type: "organization"; organizationId: string } | { type: "platform" },
     filters: { from?: string; to?: string },
     executor: DatabaseExecutor = this.database,
   ): Promise<number | null> {
@@ -267,7 +257,7 @@ export class JobObservabilityRepository implements JobObservabilityRepositoryPor
     const dateFilter = this.buildAttemptDateFilter(filters);
     const whereClause = and(
       scopeFilter,
-      eq(jobAttempts.status, 'COMPLETED'),
+      eq(jobAttempts.status, "COMPLETED"),
       ...(dateFilter ? [dateFilter] : []),
     );
 

@@ -52,7 +52,12 @@ describe("optionalText", () => {
 describe("mergeSystemRoles", () => {
   it("keeps each role as a separate entry with its own scope", () => {
     const roles = [
-      systemRole({ scope: "platform", permissions: [{ id: "p1", name: "users.read", description: null, isSystem: true, scope: "platform" }] }),
+      systemRole({
+        scope: "platform",
+        permissions: [
+          { id: "p1", name: "users.read", description: null, isSystem: true, scope: "platform" },
+        ],
+      }),
       systemRole({ id: "r2", scope: "organization", permissions: [] }),
     ];
 
@@ -67,7 +72,9 @@ describe("mergeSystemRoles", () => {
     const roles = [
       systemRole({
         scope: "platform",
-        permissions: [{ id: "p1", name: "users.read", description: null, isSystem: true, scope: "platform" }],
+        permissions: [
+          { id: "p1", name: "users.read", description: null, isSystem: true, scope: "platform" },
+        ],
       }),
       systemRole({
         id: "r2",
@@ -147,8 +154,22 @@ describe("mergeCustomRoles", () => {
 describe("filterRolesBySearch", () => {
   const roles = [
     { name: "Admin", description: "Full system access", permissions: [], scopes: ["platform"] },
-    { name: "Finance Manager", description: null, permissions: [{ id: "p1", name: "finance.read", description: null, isSystem: true, scope: "platform" }], scopes: ["organization"] },
-    { name: "Auditor", description: "Read-only", permissions: [{ id: "p2", name: "audit.view", description: null, isSystem: true, scope: "platform" }], scopes: ["organization"] },
+    {
+      name: "Finance Manager",
+      description: null,
+      permissions: [
+        { id: "p1", name: "finance.read", description: null, isSystem: true, scope: "platform" },
+      ],
+      scopes: ["organization"],
+    },
+    {
+      name: "Auditor",
+      description: "Read-only",
+      permissions: [
+        { id: "p2", name: "audit.view", description: null, isSystem: true, scope: "platform" },
+      ],
+      scopes: ["organization"],
+    },
   ] as const;
 
   it("returns all for empty search", () => {

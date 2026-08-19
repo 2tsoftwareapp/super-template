@@ -1,20 +1,17 @@
-import type { TransactionExecutor } from '@repo/api-core';
-import type {
-  DatabaseClient,
-  DatabaseExecutor,
-} from '@repo/api-database';
+import type { TransactionExecutor } from "@repo/api-core";
+import type { DatabaseClient, DatabaseExecutor } from "@repo/api-database";
 
-import { Inject, Injectable } from '@nestjs/common';
-import { DATABASE, runIdempotentInsert } from '@repo/api-database';
-import { importJobs } from '@repo/api-database';
-import { and, eq, isNull } from 'drizzle-orm';
+import { Inject, Injectable } from "@nestjs/common";
+import { DATABASE, runIdempotentInsert } from "@repo/api-database";
+import { importJobs } from "@repo/api-database";
+import { and, eq, isNull } from "drizzle-orm";
 
 import type {
   CreateImportJobValues,
   ImportJobRecord,
   ImportJobsRepositoryPort,
   UpdateImportJobValues,
-} from '../application/ports/imports.repository.port';
+} from "../application/ports/imports.repository.port";
 
 @Injectable()
 export class ImportJobsRepository implements ImportJobsRepositoryPort {
@@ -41,27 +38,15 @@ export class ImportJobsRepository implements ImportJobsRepositoryPort {
 
         return inserted;
       },
-      () =>
-        this.findByIdempotencyKey(
-          values.createdById,
-          values.idempotencyKey,
-          executor,
-        ),
+      () => this.findByIdempotencyKey(values.createdById, values.idempotencyKey, executor),
     );
 
     return result ?? { value: undefined, created: false };
   }
 
-  async findById(
-    jobId: string,
-    executor?: TransactionExecutor,
-  ): Promise<ImportJobRecord | null> {
+  async findById(jobId: string, executor?: TransactionExecutor): Promise<ImportJobRecord | null> {
     const db = (executor ?? this.database) as DatabaseExecutor;
-    const [job] = await db
-      .select()
-      .from(importJobs)
-      .where(eq(importJobs.id, jobId))
-      .limit(1);
+    const [job] = await db.select().from(importJobs).where(eq(importJobs.id, jobId)).limit(1);
 
     return (job as ImportJobRecord) ?? null;
   }
@@ -76,20 +61,14 @@ export class ImportJobsRepository implements ImportJobsRepositoryPort {
       .select()
       .from(importJobs)
       .where(
-        and(
-          eq(importJobs.createdById, createdById),
-          eq(importJobs.idempotencyKey, idempotencyKey),
-        ),
+        and(eq(importJobs.createdById, createdById), eq(importJobs.idempotencyKey, idempotencyKey)),
       )
       .limit(1);
 
     return (job as ImportJobRecord) ?? null;
   }
 
-  async confirm(
-    jobId: string,
-    executor?: TransactionExecutor,
-  ): Promise<ImportJobRecord | null> {
+  async confirm(jobId: string, executor?: TransactionExecutor): Promise<ImportJobRecord | null> {
     const db = (executor ?? this.database) as DatabaseExecutor;
     // CAS guard: the UPDATE only matches rows that have not been confirmed yet.
     // Under concurrent requests the second UPDATE blocks on the row lock, then

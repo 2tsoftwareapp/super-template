@@ -13,10 +13,7 @@ import {
 } from "@/features/imports/api/imports.mutations";
 import { useImportJobQuery } from "@/features/imports/api/imports.queries";
 import { importsKeys } from "@/features/imports/api/imports.query-keys";
-import {
-  DEFAULT_IMPORT_TYPE,
-  IMPORT_TYPES,
-} from "@/features/imports/model/imports.constants";
+import { DEFAULT_IMPORT_TYPE, IMPORT_TYPES } from "@/features/imports/model/imports.constants";
 import { selectImportPermissions } from "@/features/imports/model/imports.permissions";
 import { createImportSchema } from "@/features/imports/model/imports.schemas";
 import { useSession } from "@/hooks/use-session";
@@ -115,9 +112,7 @@ export function useImportsController(): ImportsViewModel {
     confirm: {
       open: confirmOpen,
       isConfirming: confirm.isPending,
-      canConfirm:
-        permissions.canUpdate &&
-        (status === "PENDING" || status === "PROCESSING"),
+      canConfirm: permissions.canUpdate && (status === "PENDING" || status === "PROCESSING"),
       onOpen: () => setConfirmOpen(true),
       onCancel: () => setConfirmOpen(false),
       onConfirm: handleConfirm,

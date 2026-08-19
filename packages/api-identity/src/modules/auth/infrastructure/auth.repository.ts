@@ -1,18 +1,11 @@
-import type {
-  DatabaseClient,
-  DatabaseExecutor,
-} from '@repo/api-database';
+import type { DatabaseClient, DatabaseExecutor } from "@repo/api-database";
 
-import { Inject, Injectable } from '@nestjs/common';
-import { DATABASE } from '@repo/api-database';
-import {
-  authSessions,
-  emailVerificationTokens,
-  passwordResetTokens,
-} from '@repo/api-database';
-import { and, desc, eq, gt, isNull, sql } from 'drizzle-orm';
+import { Inject, Injectable } from "@nestjs/common";
+import { DATABASE } from "@repo/api-database";
+import { authSessions, emailVerificationTokens, passwordResetTokens } from "@repo/api-database";
+import { and, desc, eq, gt, isNull, sql } from "drizzle-orm";
 
-import type { AuthSessionRepositoryPort } from '../application/ports/auth-session.repository.port';
+import type { AuthSessionRepositoryPort } from "../application/ports/auth-session.repository.port";
 
 @Injectable()
 export class AuthRepository implements AuthSessionRepositoryPort {
@@ -22,17 +15,11 @@ export class AuthRepository implements AuthSessionRepositoryPort {
     values: typeof authSessions.$inferInsert,
     executor: DatabaseExecutor = this.database,
   ) {
-    const [session] = await executor
-      .insert(authSessions)
-      .values(values)
-      .returning();
+    const [session] = await executor.insert(authSessions).values(values).returning();
     return session ?? null;
   }
 
-  async findSessionById(
-    sessionId: string,
-    executor: DatabaseExecutor = this.database,
-  ) {
+  async findSessionById(sessionId: string, executor: DatabaseExecutor = this.database) {
     const [session] = await executor
       .select()
       .from(authSessions)
@@ -49,9 +36,7 @@ export class AuthRepository implements AuthSessionRepositoryPort {
     const [session] = await executor
       .select()
       .from(authSessions)
-      .where(
-        and(eq(authSessions.id, sessionId), eq(authSessions.userId, userId)),
-      )
+      .where(and(eq(authSessions.id, sessionId), eq(authSessions.userId, userId)))
       .limit(1);
     return session ?? null;
   }
@@ -97,10 +82,7 @@ export class AuthRepository implements AuthSessionRepositoryPort {
     return session ?? null;
   }
 
-  async listSessionsForUser(
-    userId: string,
-    executor: DatabaseExecutor = this.database,
-  ) {
+  async listSessionsForUser(userId: string, executor: DatabaseExecutor = this.database) {
     return executor
       .select()
       .from(authSessions)
@@ -108,10 +90,7 @@ export class AuthRepository implements AuthSessionRepositoryPort {
       .orderBy(authSessions.createdAt);
   }
 
-  async revokeSession(
-    sessionId: string,
-    executor: DatabaseExecutor = this.database,
-  ) {
+  async revokeSession(sessionId: string, executor: DatabaseExecutor = this.database) {
     return this.updateSession(
       sessionId,
       {
@@ -121,19 +100,14 @@ export class AuthRepository implements AuthSessionRepositoryPort {
     );
   }
 
-  async revokeAllSessionsForUser(
-    userId: string,
-    executor: DatabaseExecutor = this.database,
-  ) {
+  async revokeAllSessionsForUser(userId: string, executor: DatabaseExecutor = this.database) {
     await executor
       .update(authSessions)
       .set({
         revokedAt: new Date(),
         updatedAt: new Date(),
       })
-      .where(
-        and(eq(authSessions.userId, userId), isNull(authSessions.revokedAt)),
-      );
+      .where(and(eq(authSessions.userId, userId), isNull(authSessions.revokedAt)));
   }
 
   async findLatestEmailVerificationToken(
@@ -153,10 +127,7 @@ export class AuthRepository implements AuthSessionRepositoryPort {
     values: typeof emailVerificationTokens.$inferInsert,
     executor: DatabaseExecutor = this.database,
   ) {
-    const [token] = await executor
-      .insert(emailVerificationTokens)
-      .values(values)
-      .returning();
+    const [token] = await executor.insert(emailVerificationTokens).values(values).returning();
     return token ?? null;
   }
 
@@ -179,10 +150,7 @@ export class AuthRepository implements AuthSessionRepositoryPort {
     return token ?? null;
   }
 
-  async consumeEmailVerificationToken(
-    tokenId: string,
-    executor: DatabaseExecutor = this.database,
-  ) {
+  async consumeEmailVerificationToken(tokenId: string, executor: DatabaseExecutor = this.database) {
     const [token] = await executor
       .update(emailVerificationTokens)
       .set({
@@ -198,17 +166,11 @@ export class AuthRepository implements AuthSessionRepositoryPort {
     values: typeof passwordResetTokens.$inferInsert,
     executor: DatabaseExecutor = this.database,
   ) {
-    const [token] = await executor
-      .insert(passwordResetTokens)
-      .values(values)
-      .returning();
+    const [token] = await executor.insert(passwordResetTokens).values(values).returning();
     return token ?? null;
   }
 
-  async findValidPasswordResetToken(
-    tokenHash: string,
-    executor: DatabaseExecutor = this.database,
-  ) {
+  async findValidPasswordResetToken(tokenHash: string, executor: DatabaseExecutor = this.database) {
     const [token] = await executor
       .select()
       .from(passwordResetTokens)
@@ -224,10 +186,7 @@ export class AuthRepository implements AuthSessionRepositoryPort {
     return token ?? null;
   }
 
-  async consumePasswordResetToken(
-    tokenId: string,
-    executor: DatabaseExecutor = this.database,
-  ) {
+  async consumePasswordResetToken(tokenId: string, executor: DatabaseExecutor = this.database) {
     const [token] = await executor
       .update(passwordResetTokens)
       .set({

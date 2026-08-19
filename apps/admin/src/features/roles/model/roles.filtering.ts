@@ -40,10 +40,7 @@ export function mergeCustomRoles(roles: ManagedRoleDto[]): MergedRole[] {
 }
 
 /** Case-insensitive search across role name, description and permission names. */
-export function filterRolesBySearch(
-  roles: MergedRole[],
-  search: string,
-): MergedRole[] {
+export function filterRolesBySearch(roles: MergedRole[], search: string): MergedRole[] {
   if (!search) {
     return roles;
   }
@@ -54,8 +51,6 @@ export function filterRolesBySearch(
     (role) =>
       role.name.toLowerCase().includes(query) ||
       optionalText(role.description).toLowerCase().includes(query) ||
-      role.permissions.some((permission) =>
-        permission.name.toLowerCase().includes(query),
-      ),
+      role.permissions.some((permission) => permission.name.toLowerCase().includes(query)),
   );
 }

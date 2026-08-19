@@ -1,4 +1,4 @@
-import type { JsonObject } from '../common/types/json-value';
+import type { JsonObject } from "../common/types/json-value";
 export interface MailTemplateSendInput {
   templateKey: string;
   to: string;
@@ -10,4 +10,4 @@ export interface MailTemplateSender {
   sendTemplate(input: MailTemplateSendInput): Promise<void>;
 }
 
-export const MAIL_TEMPLATE_SENDER = Symbol('MAIL_TEMPLATE_SENDER');
+export const MAIL_TEMPLATE_SENDER = Symbol("MAIL_TEMPLATE_SENDER");

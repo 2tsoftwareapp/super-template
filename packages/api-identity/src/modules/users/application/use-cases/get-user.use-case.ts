@@ -1,24 +1,16 @@
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import {
-  AppError,
-  type AuthenticatedRequestUser,
-  ERROR_CODES,
-  ROLE_NAMES,
-} from '@repo/api-core';
+import { HttpStatus, Inject, Injectable } from "@nestjs/common";
+import { AppError, type AuthenticatedRequestUser, ERROR_CODES, ROLE_NAMES } from "@repo/api-core";
 
-import type { UserView } from '../users.types';
+import type { UserView } from "../users.types";
 
-import { AccessControlService } from '../../../access-control/application/access-control.service';
+import { AccessControlService } from "../../../access-control";
 import {
   ORGANIZATIONS_REPOSITORY,
   type OrganizationsRepositoryPort,
-} from '../../../organizations/application/ports/organizations.repository.port';
-import { assertUserBelongsToOrganization } from '../../domain/user-org-scope.policy';
-import {
-  USERS_REPOSITORY,
-  type UsersRepositoryPort,
-} from '../ports/users.repository.port';
-import { UsersMapper } from '../users.mapper';
+} from "../../../organizations/application/ports/organizations.repository.port";
+import { assertUserBelongsToOrganization } from "../../domain/user-org-scope.policy";
+import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";
+import { UsersMapper } from "../users.mapper";
 
 @Injectable()
 export class GetUserUseCase {
@@ -31,27 +23,17 @@ export class GetUserUseCase {
     private readonly usersMapper: UsersMapper,
   ) {}
 
-  async execute(
-    userId: string,
-    actor?: AuthenticatedRequestUser,
-  ): Promise<UserView> {
+  async execute(userId: string, actor?: AuthenticatedRequestUser): Promise<UserView> {
     const user = await this.usersRepository.findById(userId);
 
     if (!user) {
-      throw new AppError(
-        ERROR_CODES.USER_NOT_FOUND,
-        'User not found',
-        HttpStatus.NOT_FOUND,
-      );
+      throw new AppError(ERROR_CODES.USER_NOT_FOUND, "User not found", HttpStatus.NOT_FOUND);
     }
 
     if (actor) {
       await assertUserBelongsToOrganization(
         (targetUserId, organizationId) =>
-          this.usersRepository.isUserInOrganization(
-            targetUserId,
-            organizationId,
-          ),
+          this.usersRepository.isUserInOrganization(targetUserId, organizationId),
         actor,
         userId,
       );
@@ -65,16 +47,12 @@ export class GetUserUseCase {
         : (actor.organizationId ?? null)
       : null;
 
-    const [accessProfile, roleIds, roleAssignments, userOrgs] =
-      await Promise.all([
-        this.accessControlService.getAccessProfile(userId, organizationId),
-        this.accessControlService.getRoleIdsForUser(userId, organizationId),
-        this.accessControlService.getRoleAssignmentsForUser(
-          userId,
-          organizationId,
-        ),
-        this.organizationsRepository.listForUser(userId),
-      ]);
+    const [accessProfile, roleIds, roleAssignments, userOrgs] = await Promise.all([
+      this.accessControlService.getAccessProfile(userId, organizationId),
+      this.accessControlService.getRoleIdsForUser(userId, organizationId),
+      this.accessControlService.getRoleAssignmentsForUser(userId, organizationId),
+      this.organizationsRepository.listForUser(userId),
+    ]);
 
     const visibleMemberOrganizationIds =
       !actor || actor.roles.includes(ROLE_NAMES.SUPER_ADMIN)

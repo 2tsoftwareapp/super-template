@@ -13,9 +13,7 @@ interface UserDetailMetaProps {
 
 export function UserDetailMeta({ user, flags }: UserDetailMetaProps) {
   const { variant: sv, className: sc } = statusProps(user.status);
-  const isVerified = Boolean(
-    (user as Record<string, unknown>).emailVerifiedAt,
-  );
+  const isVerified = Boolean((user as Record<string, unknown>).emailVerifiedAt);
 
   return (
     <>
@@ -26,9 +24,7 @@ export function UserDetailMeta({ user, flags }: UserDetailMetaProps) {
         variant="outline"
         className={cn(
           "gap-1 text-[11px] px-1.5 py-0",
-          isVerified
-            ? "text-primary border-primary/30"
-            : "text-muted-foreground",
+          isVerified ? "text-primary border-primary/30" : "text-muted-foreground",
         )}
       >
         {isVerified ? (
@@ -42,10 +38,7 @@ export function UserDetailMeta({ user, flags }: UserDetailMetaProps) {
         )}
       </Badge>
       {user.roles.map((r) => (
-        <Badge
-          key={r}
-          variant={r === "SUPER_ADMIN" || r === "ADMIN" ? "default" : "secondary"}
-        >
+        <Badge key={r} variant={r === "SUPER_ADMIN" || r === "ADMIN" ? "default" : "secondary"}>
           {r.toLowerCase().replace(/_/g, " ")}
         </Badge>
       ))}

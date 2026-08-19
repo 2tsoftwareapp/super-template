@@ -1,12 +1,12 @@
-import type { TransactionExecutor } from '@repo/api-core';
+import type { TransactionExecutor } from "@repo/api-core";
 
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from "@nestjs/common";
 
 import {
   ACCESS_CONTROL_REPOSITORY,
   type AccessControlRepositoryPort,
-} from '../access-control.repository.port';
-import { AccessProfileUseCase } from './access-profile.use-case';
+} from "../access-control.repository.port";
+import { AccessProfileUseCase } from "./access-profile.use-case";
 
 @Injectable()
 export class ReplaceUserRolesUseCase {
@@ -22,12 +22,7 @@ export class ReplaceUserRolesUseCase {
     organizationId: string | null,
     executor?: TransactionExecutor,
   ): Promise<void> {
-    await this.accessControlRepository.replaceUserRoles(
-      userId,
-      roleIds,
-      organizationId,
-      executor,
-    );
+    await this.accessControlRepository.replaceUserRoles(userId, roleIds, organizationId, executor);
     await this.accessProfileUseCase.invalidateAccessProfile(userId);
   }
 }

@@ -6,7 +6,7 @@ export interface MailMessage {
   messageId?: string;
 }
 
-export const MAILER = Symbol('MAILER');
+export const MAILER = Symbol("MAILER");
 
 export interface Mailer {
   send(message: MailMessage): Promise<void>;

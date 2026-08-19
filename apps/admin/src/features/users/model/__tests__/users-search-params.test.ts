@@ -31,9 +31,7 @@ describe("users search params", () => {
     };
 
     const serialized = serializeUsersListSearchParams(params).toString();
-    expect(parseUsersListSearchParams(new URLSearchParams(serialized))).toEqual(
-      params,
-    );
+    expect(parseUsersListSearchParams(new URLSearchParams(serialized))).toEqual(params);
   });
 
   it("omits default values when serializing", () => {

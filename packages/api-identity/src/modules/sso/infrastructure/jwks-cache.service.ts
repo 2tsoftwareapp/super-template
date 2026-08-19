@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable } from "@nestjs/common";
 
-import type { Jwk } from '../domain/oidc-verify';
+import type { Jwk } from "../domain/oidc-verify";
 
 const DEFAULT_TTL_MS = 60 * 60 * 1000;
 
@@ -23,9 +23,7 @@ export class JwksCacheService {
     const response = await fetch(jwksUri);
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to fetch JWKS from ${jwksUri}: ${response.status}`,
-      );
+      throw new Error(`Failed to fetch JWKS from ${jwksUri}: ${response.status}`);
     }
 
     const body = (await response.json()) as { keys: Jwk[] };

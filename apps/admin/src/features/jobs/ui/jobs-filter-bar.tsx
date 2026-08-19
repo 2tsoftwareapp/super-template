@@ -1,12 +1,7 @@
 "use client";
 
 import { Button } from "@repo/web-ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@repo/web-ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@repo/web-ui/card";
 import { RefreshCw } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -40,24 +35,15 @@ export function JobsFilterBar({
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-base">Filters</CardTitle>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onRefresh}
-            disabled={isFetching}
-          >
-            <RefreshCw
-              className={cn("size-3.5", isFetching && "animate-spin")}
-            />
+          <Button variant="outline" size="sm" onClick={onRefresh} disabled={isFetching}>
+            <RefreshCw className={cn("size-3.5", isFetching && "animate-spin")} />
             Refresh
           </Button>
         </div>
       </CardHeader>
       <CardContent className="grid gap-3 pb-4 md:grid-cols-2">
         <div className="space-y-1.5">
-          <label className="text-xs font-medium text-muted-foreground">
-            Status
-          </label>
+          <label className="text-xs font-medium text-muted-foreground">Status</label>
           <select
             className="flex h-9 w-full rounded-lg border border-input bg-background px-3 text-sm shadow-xs outline-hidden transition-colors focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
             value={status}
@@ -71,9 +57,7 @@ export function JobsFilterBar({
           </select>
         </div>
         <div className="space-y-1.5">
-          <label className="text-xs font-medium text-muted-foreground">
-            Type
-          </label>
+          <label className="text-xs font-medium text-muted-foreground">Type</label>
           <input
             className="flex h-9 w-full rounded-lg border border-input bg-background px-3 text-sm shadow-xs outline-hidden transition-colors focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
             placeholder="e.g. SEND_NOTIFICATION"

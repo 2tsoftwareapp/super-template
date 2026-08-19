@@ -1,19 +1,19 @@
-import type { AuthenticatedRequestUser } from '@repo/api-core';
-import type { Request } from 'express';
+import type { AuthenticatedRequestUser } from "@repo/api-core";
+import type { Request } from "express";
 
-import { Body, Controller, Delete, Get, Patch, Req } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { ApiDataResponse } from '@repo/api-core';
-import { CurrentUser } from '@repo/api-core';
+import { Body, Controller, Delete, Get, Patch, Req } from "@nestjs/common";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
+import { ApiDataResponse } from "@repo/api-core";
+import { CurrentUser } from "@repo/api-core";
 
-import { GetPreferencesUseCase } from '../application/use-cases/get-preferences.use-case';
-import { ResetPreferencesUseCase } from '../application/use-cases/reset-preferences.use-case';
-import { UpdatePreferencesUseCase } from '../application/use-cases/update-preferences.use-case';
-import { UpdatePreferencesDto, UserPreferencesDto } from './preferences.dto';
+import { GetPreferencesUseCase } from "../application/use-cases/get-preferences.use-case";
+import { ResetPreferencesUseCase } from "../application/use-cases/reset-preferences.use-case";
+import { UpdatePreferencesUseCase } from "../application/use-cases/update-preferences.use-case";
+import { UpdatePreferencesDto, UserPreferencesDto } from "./preferences.dto";
 
-@ApiTags('users')
+@ApiTags("users")
 @ApiBearerAuth()
-@Controller('users/me/preferences')
+@Controller("users/me/preferences")
 export class PreferencesController {
   constructor(
     private readonly getPreferences: GetPreferencesUseCase,
@@ -53,10 +53,7 @@ export class PreferencesController {
 
   @Delete()
   @ApiDataResponse(UserPreferencesDto)
-  resetMyPreferences(
-    @CurrentUser() user: AuthenticatedRequestUser,
-    @Req() request: Request,
-  ) {
+  resetMyPreferences(@CurrentUser() user: AuthenticatedRequestUser, @Req() request: Request) {
     return this.resetPreferences.execute(user.userId, request.requestContext);
   }
 }

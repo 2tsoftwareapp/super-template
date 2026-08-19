@@ -1,19 +1,23 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from "@nestjs/common";
 
-import { MailMapper } from '../mail.mapper';
-import { MAIL_DELIVERIES_REPOSITORY, type MailDeliveriesRepositoryPort } from '../ports/mail-deliveries.repository.port';
+import { MailMapper } from "../mail.mapper";
+import {
+  MAIL_DELIVERIES_REPOSITORY,
+  type MailDeliveriesRepositoryPort,
+} from "../ports/mail-deliveries.repository.port";
 
 export interface ListMailDeliveriesQuery {
   page: number;
   limit: number;
   templateKey?: string;
-  status?: 'SENT' | 'FAILED';
+  status?: "SENT" | "FAILED";
 }
 
 @Injectable()
 export class ListMailDeliveriesUseCase {
   constructor(
-    @Inject(MAIL_DELIVERIES_REPOSITORY) private readonly mailDeliveriesRepository: MailDeliveriesRepositoryPort,
+    @Inject(MAIL_DELIVERIES_REPOSITORY)
+    private readonly mailDeliveriesRepository: MailDeliveriesRepositoryPort,
     private readonly mailMapper: MailMapper,
   ) {}
 
@@ -21,9 +25,7 @@ export class ListMailDeliveriesUseCase {
     const result = await this.mailDeliveriesRepository.list({
       page: query.page,
       limit: query.limit,
-      ...(query.templateKey !== undefined
-        ? { templateKey: query.templateKey }
-        : {}),
+      ...(query.templateKey !== undefined ? { templateKey: query.templateKey } : {}),
       ...(query.status !== undefined ? { status: query.status } : {}),
     });
 

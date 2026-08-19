@@ -1,5 +1,5 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { IsOptional, IsString, IsUUID, MaxLength } from "class-validator";
 
 export class AttachmentDto {
   @ApiProperty()
@@ -29,7 +29,7 @@ export class AttachmentDto {
 
 export class AttachEntityDto {
   @ApiProperty()
-  @IsUUID('4')
+  @IsUUID("4")
   fileId: string;
 
   @ApiProperty()
@@ -38,7 +38,7 @@ export class AttachEntityDto {
   entityType: string;
 
   @ApiProperty()
-  @IsUUID('4')
+  @IsUUID("4")
   entityId: string;
 
   @ApiPropertyOptional()
@@ -55,6 +55,6 @@ export class AttachmentsQueryDto {
   entityType: string;
 
   @ApiProperty()
-  @IsUUID('4')
+  @IsUUID("4")
   entityId: string;
 }

@@ -9,22 +9,21 @@ const ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD ?? "ChangeMe123!";
 test.describe.configure({ mode: "serial" });
 
 test.describe("admin console smoke", () => {
-  test("anonymous requests are redirected to the locale login", async ({
-    page,
-  }) => {
+  test("anonymous requests are redirected to the locale login", async ({ page }) => {
     await page.goto(`${ADMIN_URL}/users`);
 
     await expect(page).toHaveURL(/\/en\/login$/);
-    await expect(
-      page.getByText(/admin login/i).first(),
-    ).toBeVisible();
+    await expect(page.getByText(/admin login/i).first()).toBeVisible();
   });
 
   test("seeded admin can sign in and reach the dashboard", async ({ page }) => {
     await page.goto(`${ADMIN_URL}/en/login`);
 
     await page.getByLabel(/email/i).fill(ADMIN_EMAIL);
-    await page.getByLabel(/password/i).first().fill(ADMIN_PASSWORD);
+    await page
+      .getByLabel(/password/i)
+      .first()
+      .fill(ADMIN_PASSWORD);
     await page.getByRole("button", { name: /sign in/i }).click();
 
     await expect(page).toHaveURL(new RegExp(`${ADMIN_URL}/en$`), {

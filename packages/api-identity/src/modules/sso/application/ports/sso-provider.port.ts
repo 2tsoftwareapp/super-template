@@ -22,14 +22,11 @@ export interface SsoProviderAdapter {
     testEmail?: string;
   }): string;
 
-  exchangeCode(params: {
-    code: string;
-    codeVerifier: string;
-  }): Promise<SsoTokenSet>;
+  exchangeCode(params: { code: string; codeVerifier: string }): Promise<SsoTokenSet>;
 
   verifyIdToken(idToken: string, nonce: string): Promise<SsoIdentity>;
 }
 
-export const SSO_PROVIDER_REGISTRY = Symbol('SSO_PROVIDER_REGISTRY');
+export const SSO_PROVIDER_REGISTRY = Symbol("SSO_PROVIDER_REGISTRY");
 
 export type SsoProviderRegistry = ReadonlyMap<string, SsoProviderAdapter>;

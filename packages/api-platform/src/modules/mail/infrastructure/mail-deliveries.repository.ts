@@ -1,20 +1,20 @@
+import type { DatabaseClient, DatabaseExecutor } from "@repo/api-database";
+
+import { Inject, Injectable } from "@nestjs/common";
+import { DATABASE } from "@repo/api-database";
+import { mailDeliveries } from "@repo/api-database";
+import { and, count, desc, eq, sql } from "drizzle-orm";
+
 import type {
-  DatabaseClient,
-  DatabaseExecutor,
-} from '@repo/api-database';
-
-import { Inject, Injectable } from '@nestjs/common';
-import { DATABASE } from '@repo/api-database';
-import { mailDeliveries } from '@repo/api-database';
-import { and, count, desc, eq, sql } from 'drizzle-orm';
-
-import type { DeliveryRecord, MailDeliveriesRepositoryPort } from '../application/ports/mail-deliveries.repository.port';
+  DeliveryRecord,
+  MailDeliveriesRepositoryPort,
+} from "../application/ports/mail-deliveries.repository.port";
 
 interface ListDeliveriesParams {
   page: number;
   limit: number;
   templateKey?: string;
-  status?: 'PENDING' | 'PROCESSING' | 'PROVIDER_ACCEPTED' | 'SENT' | 'FAILED';
+  status?: "PENDING" | "PROCESSING" | "PROVIDER_ACCEPTED" | "SENT" | "FAILED";
 }
 
 @Injectable()
@@ -150,7 +150,7 @@ export class MailDeliveriesRepository implements MailDeliveriesRepositoryPort {
     id: string,
     claimToken: string,
     values: {
-      status: 'SENT' | 'FAILED';
+      status: "SENT" | "FAILED";
       errorMessage?: string | null;
       sentAt?: Date | null;
       providerMessageId?: string | null;
@@ -212,10 +212,7 @@ export class MailDeliveriesRepository implements MailDeliveriesRepositoryPort {
     );
   }
 
-  async list(
-    params: ListDeliveriesParams,
-    executor: DatabaseExecutor = this.database,
-  ) {
+  async list(params: ListDeliveriesParams, executor: DatabaseExecutor = this.database) {
     const filters = [];
 
     if (params.templateKey) {
@@ -237,10 +234,7 @@ export class MailDeliveriesRepository implements MailDeliveriesRepositoryPort {
         .orderBy(desc(mailDeliveries.createdAt))
         .limit(params.limit)
         .offset(offset),
-      executor
-        .select({ total: count() })
-        .from(mailDeliveries)
-        .where(whereClause),
+      executor.select({ total: count() }).from(mailDeliveries).where(whereClause),
     ]);
 
     return {

@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 
 type Theme = "light" | "dark" | "system";
 
@@ -37,9 +31,7 @@ function getStoredTheme(): Theme {
 
 function getSystemTheme(): "light" | "dark" {
   if (typeof window === "undefined") return "light";
-  return window.matchMedia("(prefers-color-scheme: dark)").matches
-    ? "dark"
-    : "light";
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
 
 function resolveTheme(theme: Theme): "light" | "dark" {

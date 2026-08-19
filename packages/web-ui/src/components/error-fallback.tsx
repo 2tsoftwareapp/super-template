@@ -23,12 +23,7 @@ interface ErrorFallbackProps {
  * copy and the retry affordance match its kind, and never renders the raw
  * message for unknown errors — those can carry internals. See CODING_RULES.md §18.
  */
-function ErrorFallback({
-  error,
-  onRetry,
-  title,
-  variant = "full-page",
-}: ErrorFallbackProps) {
+function ErrorFallback({ error, onRetry, title, variant = "full-page" }: ErrorFallbackProps) {
   const classified = classifyError(error);
 
   return (

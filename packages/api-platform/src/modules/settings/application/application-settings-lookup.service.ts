@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import {
   adaptRedisClient,
   type ApplicationSettingsLookup,
@@ -6,17 +6,14 @@ import {
   EnvironmentService,
   isJsonObject,
   type JsonObject,
-} from '@repo/api-core';
+} from "@repo/api-core";
 
-import {
-  SETTINGS_REPOSITORY,
-  type SettingsRepositoryPort,
-} from './ports/settings.repository.port';
+import { SETTINGS_REPOSITORY, type SettingsRepositoryPort } from "./ports/settings.repository.port";
 
-const REGISTRATION_ENABLED_KEY = 'registration_enabled';
-const MAINTENANCE_MODE_KEY = 'maintenance_mode';
+const REGISTRATION_ENABLED_KEY = "registration_enabled";
+const MAINTENANCE_MODE_KEY = "maintenance_mode";
 
-const CACHE_KEY_PREFIX = 'settings-flag:';
+const CACHE_KEY_PREFIX = "settings-flag:";
 const DEFAULT_TTL_SECONDS = 5;
 
 function cacheKey(key: string): string {
@@ -26,19 +23,15 @@ function cacheKey(key: string): string {
 function readEnabledFlag(value: JsonObject | undefined): boolean {
   const enabled = value?.enabled;
 
-  return typeof enabled === 'boolean' ? enabled : false;
+  return typeof enabled === "boolean" ? enabled : false;
 }
 
 interface RedisCacheClient {
   connect: () => Promise<void>;
   del: (key: string) => Promise<number>;
   get: (key: string) => Promise<string | null>;
-  on: (event: 'error', listener: (error: Error) => void) => void;
-  set: (
-    key: string,
-    value: string,
-    options: { EX: number },
-  ) => Promise<'OK' | null>;
+  on: (event: "error", listener: (error: Error) => void) => void;
+  set: (key: string, value: string, options: { EX: number }) => Promise<"OK" | null>;
 }
 
 interface LocalCacheEntry {
@@ -58,9 +51,7 @@ interface LocalCacheEntry {
  * Without Redis it falls back to in-process memory (single-instance / test).
  */
 @Injectable()
-export class ApplicationSettingsLookupService
-  implements ApplicationSettingsLookup
-{
+export class ApplicationSettingsLookupService implements ApplicationSettingsLookup {
   private readonly logger = new Logger(ApplicationSettingsLookupService.name);
   private readonly localEntries = new Map<string, LocalCacheEntry>();
   private redisClient: RedisCacheClient | null = null;
@@ -126,11 +117,11 @@ export class ApplicationSettingsLookupService
       try {
         const raw = await redis.get(cacheKey(key));
 
-        if (raw === 'true') {
+        if (raw === "true") {
           return true;
         }
 
-        if (raw === 'false') {
+        if (raw === "false") {
           return false;
         }
 
@@ -192,7 +183,7 @@ export class ApplicationSettingsLookupService
   }
 
   private async ensureRedis(): Promise<RedisCacheClient | null> {
-    if (this.environmentService.appEnv === 'test') {
+    if (this.environmentService.appEnv === "test") {
       return null;
     }
 
@@ -209,18 +200,14 @@ export class ApplicationSettingsLookupService
     }
 
     this.redisReady = (async () => {
-      const client = adaptRedisClient<RedisCacheClient>(
-        createRedisClient(redisUrl),
-      );
+      const client = adaptRedisClient<RedisCacheClient>(createRedisClient(redisUrl));
 
-      client.on('error', (error) => {
+      client.on("error", (error) => {
         // node-redis reconnects internally, so log the blip rather than
         // discarding a self-healing client (which previously stranded the
         // instance on the in-process cache and silently broke cross-instance
         // invalidation).
-        this.logger.warn(
-          `Redis client error for settings-flag cache: ${error.message}`,
-        );
+        this.logger.warn(`Redis client error for settings-flag cache: ${error.message}`);
       });
 
       try {

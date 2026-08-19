@@ -1,5 +1,5 @@
-import type { RoleRecord } from './access-control.repository.port';
-import type { PermissionView, RoleView } from './access-control.types';
+import type { RoleRecord } from "./access-control.repository.port";
+import type { PermissionView, RoleView } from "./access-control.types";
 
 export class AccessControlMapper {
   toPermissionView(permission: PermissionView): PermissionView {
@@ -18,7 +18,7 @@ export class AccessControlMapper {
       organizationId: role.organizationId,
       name: role.name,
       description: role.description,
-      scope: role.organizationId ? 'organization' : 'platform',
+      scope: role.organizationId ? "organization" : "platform",
       isSystem: role.isSystem,
       permissions,
     };

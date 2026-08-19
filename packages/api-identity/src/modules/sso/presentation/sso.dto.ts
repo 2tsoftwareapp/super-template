@@ -1,5 +1,5 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEmail, IsOptional, IsString, IsUrl } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { IsEmail, IsOptional, IsString, IsUrl } from "class-validator";
 
 export class StartSsoLoginQueryDto {
   @ApiProperty()
@@ -7,8 +7,7 @@ export class StartSsoLoginQueryDto {
   redirectUri: string;
 
   @ApiPropertyOptional({
-    description:
-      'Only honored by the "fake" provider (dev/test); seeds the mock identity email.',
+    description: 'Only honored by the "fake" provider (dev/test); seeds the mock identity email.',
   })
   @IsOptional()
   @IsEmail()

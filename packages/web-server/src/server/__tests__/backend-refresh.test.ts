@@ -74,10 +74,7 @@ describe("refreshSession single-flight", () => {
       .mockImplementation(() => Promise.resolve(jsonResponse(refreshEnvelope)));
     vi.stubGlobal("fetch", fetchMock);
 
-    await Promise.all([
-      backend.refreshSession("token-a"),
-      backend.refreshSession("token-b"),
-    ]);
+    await Promise.all([backend.refreshSession("token-a"), backend.refreshSession("token-b")]);
 
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
@@ -97,9 +94,7 @@ describe("refreshSession single-flight", () => {
 
   it("returns null (and releases the flight) when the backend rejects the token", async () => {
     const { backend } = createHarness();
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValue(jsonResponse({ error: { code: "X" } }, 401));
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ error: { code: "X" } }, 401));
     vi.stubGlobal("fetch", fetchMock);
 
     await expect(backend.refreshSession("stale")).resolves.toBeNull();
@@ -139,16 +134,11 @@ describe("proxyWithRefresh", () => {
       .mockResolvedValueOnce(jsonResponse({ data: { ok: true } }));
     vi.stubGlobal("fetch", fetchMock);
 
-    const response = await backend.proxyWithRefresh(
-      proxiedRequest(),
-      "admin/users",
-    );
+    const response = await backend.proxyWithRefresh(proxiedRequest(), "admin/users");
 
     expect(response.status).toBe(200);
     expect(fetchMock).toHaveBeenCalledTimes(3);
-    const retryHeaders = new Headers(
-      (fetchMock.mock.calls[2]?.[1] as RequestInit).headers,
-    );
+    const retryHeaders = new Headers((fetchMock.mock.calls[2]?.[1] as RequestInit).headers);
     expect(retryHeaders.get("authorization")).toBe("Bearer new-access");
     // refreshed tokens are written back as cookies
     expect(response.headers.getSetCookie().join(";")).toContain("new-refresh");
@@ -164,10 +154,7 @@ describe("proxyWithRefresh", () => {
       .mockResolvedValueOnce(jsonResponse({ error: { code: "REUSED" } }, 401));
     vi.stubGlobal("fetch", fetchMock);
 
-    const response = await backend.proxyWithRefresh(
-      proxiedRequest(),
-      "admin/users",
-    );
+    const response = await backend.proxyWithRefresh(proxiedRequest(), "admin/users");
 
     expect(response.status).toBe(401);
     const setCookies = response.headers.getSetCookie().join(";");
@@ -178,15 +165,10 @@ describe("proxyWithRefresh", () => {
     const { auth, backend } = createHarness();
     stubCookies(auth, { accessToken: "ok", refreshToken: "refresh-1" });
 
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValueOnce(jsonResponse({ data: { ok: true } }));
+    const fetchMock = vi.fn().mockResolvedValueOnce(jsonResponse({ data: { ok: true } }));
     vi.stubGlobal("fetch", fetchMock);
 
-    const response = await backend.proxyWithRefresh(
-      proxiedRequest(),
-      "admin/users",
-    );
+    const response = await backend.proxyWithRefresh(proxiedRequest(), "admin/users");
 
     expect(response.status).toBe(200);
     expect(fetchMock).toHaveBeenCalledTimes(1);

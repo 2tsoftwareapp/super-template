@@ -1,4 +1,4 @@
-import type { TransactionExecutor } from '@repo/api-core';
+import type { TransactionExecutor } from "@repo/api-core";
 
 export interface TwoFactorSecretRecord {
   userId: string;
@@ -52,10 +52,7 @@ export interface MfaRepositoryPort {
     executor?: TransactionExecutor,
   ): Promise<TwoFactorSecretRecord | null>;
 
-  deleteSecret(
-    userId: string,
-    executor?: TransactionExecutor,
-  ): Promise<void>;
+  deleteSecret(userId: string, executor?: TransactionExecutor): Promise<void>;
 
   replaceRecoveryCodes(
     userId: string,
@@ -73,10 +70,7 @@ export interface MfaRepositoryPort {
    * CAS-consume a recovery code: only succeeds when the row is still unused.
    * Returns false if a concurrent request already consumed it.
    */
-  consumeRecoveryCode(
-    id: string,
-    executor?: TransactionExecutor,
-  ): Promise<boolean>;
+  consumeRecoveryCode(id: string, executor?: TransactionExecutor): Promise<boolean>;
 
   createChallenge(
     values: {
@@ -103,10 +97,7 @@ export interface MfaRepositoryPort {
    * CAS-consume a challenge: only succeeds when the row is still unconsumed.
    * Returns false if a concurrent request already consumed it.
    */
-  consumeChallenge(
-    id: string,
-    executor?: TransactionExecutor,
-  ): Promise<boolean>;
+  consumeChallenge(id: string, executor?: TransactionExecutor): Promise<boolean>;
 }
 
-export const MFA_REPOSITORY = Symbol('MFA_REPOSITORY');
+export const MFA_REPOSITORY = Symbol("MFA_REPOSITORY");

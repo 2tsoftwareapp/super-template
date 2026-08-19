@@ -135,12 +135,7 @@ export const adminResources: AdminResourceConfig[] = [
   },
 ];
 
-export const adminResourceGroups = [
-  "Overview",
-  "People",
-  "Operations",
-  "System",
-] as const;
+export const adminResourceGroups = ["Overview", "People", "Operations", "System"] as const;
 
 export const adminAppPermissions = Array.from(
   new Set(adminResources.flatMap((resource) => resource.permissions ?? [])),
@@ -152,27 +147,17 @@ export function getResourceForPath(pathname: string) {
       .sort((a, b) => b.path.length - a.path.length)
       .find((resource) => {
         if (resource.path === "/") return pathname === "/";
-        return (
-          pathname === resource.path || pathname.startsWith(`${resource.path}/`)
-        );
+        return pathname === resource.path || pathname.startsWith(`${resource.path}/`);
       }) ?? adminResources[0]!
   );
 }
 
-export function canAccessResource(
-  resource: AdminResourceConfig,
-  permissions: string[],
-) {
+export function canAccessResource(resource: AdminResourceConfig, permissions: string[]) {
   if (!resource.permissions?.length) return true;
-  return resource.permissions.some((permission) =>
-    permissions.includes(permission),
-  );
+  return resource.permissions.some((permission) => permissions.includes(permission));
 }
 
-export function hasAdminAppAccess(input: {
-  roles?: string[];
-  permissions?: string[];
-}) {
+export function hasAdminAppAccess(input: { roles?: string[]; permissions?: string[] }) {
   const roles = input.roles ?? [];
   const permissions = input.permissions ?? [];
 
@@ -180,21 +165,17 @@ export function hasAdminAppAccess(input: {
     return true;
   }
 
-  return adminAppPermissions.some((permission) =>
-    permissions.includes(permission),
-  );
+  return adminAppPermissions.some((permission) => permissions.includes(permission));
 }
 
 export function getFirstAccessibleResourcePath(permissions: string[]) {
   const firstProtectedResource = adminResources.find(
-    (resource) =>
-      resource.permissions?.length && canAccessResource(resource, permissions),
+    (resource) => resource.permissions?.length && canAccessResource(resource, permissions),
   );
 
   return (
     firstProtectedResource?.path ??
-    adminResources.find((resource) => canAccessResource(resource, permissions))
-      ?.path ??
+    adminResources.find((resource) => canAccessResource(resource, permissions))?.path ??
     "/"
   );
 }

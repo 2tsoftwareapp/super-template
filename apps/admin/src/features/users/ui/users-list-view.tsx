@@ -90,9 +90,7 @@ export function UsersListView({
                   <Button
                     key={tab.value}
                     type="button"
-                    variant={
-                      toolbar.currentStatus === tab.value ? "default" : "ghost"
-                    }
+                    variant={toolbar.currentStatus === tab.value ? "default" : "ghost"}
                     size="sm"
                     onClick={() => toolbar.onStatusFilter(tab.value)}
                   >

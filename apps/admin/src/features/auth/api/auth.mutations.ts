@@ -26,21 +26,15 @@ export function useLoginMutation() {
 /** Thin MFA mutation — handler asserts admin access. */
 export function useMfaMutation(mfaToken: string | null) {
   return useMutation({
-    mutationFn: (values: MfaChallengeInput) =>
-      verifyAdminMfaChallenge({ ...values, mfaToken }),
+    mutationFn: (values: MfaChallengeInput) => verifyAdminMfaChallenge({ ...values, mfaToken }),
   });
 }
 
 /** Fetch IdP authorization URL (handler performs the browser redirect). */
 export function useSsoStartMutation() {
   return useMutation({
-    mutationFn: async ({
-      provider,
-      redirectUri,
-    }: {
-      provider: SsoProvider;
-      redirectUri: string;
-    }) => startSso(provider, redirectUri),
+    mutationFn: async ({ provider, redirectUri }: { provider: SsoProvider; redirectUri: string }) =>
+      startSso(provider, redirectUri),
   });
 }
 

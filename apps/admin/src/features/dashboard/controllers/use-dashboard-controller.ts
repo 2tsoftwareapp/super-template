@@ -28,8 +28,7 @@ export function useDashboardController(): DashboardViewModel {
   const session = useSession();
   const refresh = useRefreshDashboard();
   const queryClient = useQueryClient();
-  const [users, jobs, auditLogs, health, healthReady] =
-    useDashboardOverviewQueries();
+  const [users, jobs, auditLogs, health, healthReady] = useDashboardOverviewQueries();
 
   const jobSummary = summarizeJobMetrics(jobs.data?.data);
   const { pending, failed, active: activeJobs } = jobSummary;
@@ -42,8 +41,7 @@ export function useDashboardController(): DashboardViewModel {
     healthReady.isFetching;
 
   const apiHealthy = !health.isError && health.data?.data?.status === "ok";
-  const dbHealthy =
-    !healthReady.isError && healthReady.data?.data?.status === "ready";
+  const dbHealthy = !healthReady.isError && healthReady.data?.data?.status === "ready";
   const isHealthy = apiHealthy && dbHealthy;
 
   const retryUsers = () => {

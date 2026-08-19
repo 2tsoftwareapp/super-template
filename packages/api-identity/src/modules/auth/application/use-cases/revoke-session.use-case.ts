@@ -1,21 +1,18 @@
-import type {
-  AuthenticatedRequestUser,
-  RequestContext,
-} from '@repo/api-core';
+import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-core";
 
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { 
+import { HttpStatus, Inject, Injectable } from "@nestjs/common";
+import {
   AppError,
   AUDIT_WRITER,
   type AuditWriter,
   ERROR_CODES,
   SYSTEM_SCOPE,
-} from '@repo/api-core';
+} from "@repo/api-core";
 
 import {
   AUTH_SESSION_REPOSITORY,
   type AuthSessionRepositoryPort,
-} from '../ports/auth-session.repository.port';
+} from "../ports/auth-session.repository.port";
 
 @Injectable()
 export class RevokeSessionUseCase {
@@ -30,15 +27,12 @@ export class RevokeSessionUseCase {
     sessionId: string,
     requestContext?: RequestContext,
   ) {
-    const session = await this.authSessionRepository.findSessionForUser(
-      sessionId,
-      user.userId,
-    );
+    const session = await this.authSessionRepository.findSessionForUser(sessionId, user.userId);
 
     if (!session) {
       throw new AppError(
         ERROR_CODES.AUTH_SESSION_REVOKED,
-        'Session not found',
+        "Session not found",
         HttpStatus.NOT_FOUND,
       );
     }
@@ -46,11 +40,13 @@ export class RevokeSessionUseCase {
     await this.authSessionRepository.revokeSession(sessionId);
     await this.auditWriter.log({
       actorId: user.userId,
-      action: 'auth.session.revoked',
-      entityType: 'session',
+      action: "auth.session.revoked",
+      entityType: "session",
       entityId: sessionId,
       requestContext,
-        ...(user.organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: user.organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
+      ...(user.organizationId
+        ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: user.organizationId }
+        : { scope: SYSTEM_SCOPE.PLATFORM }),
     });
   }
 }

@@ -6,9 +6,7 @@ import { webFetch } from "@/lib/http";
 
 export const settingsApi = {
   list() {
-    return webFetch<ListResponse<ApplicationSettingDto>>(
-      bffPath("/api/v1/admin/settings"),
-    );
+    return webFetch<ListResponse<ApplicationSettingDto>>(bffPath("/api/v1/admin/settings"));
   },
 
   update(key: string, value: ApplicationSettingDto["value"]) {
@@ -24,7 +22,5 @@ export const settingsApi = {
 
 /** @deprecated Prefer `settingsApi` */
 export const fetchSettings = () => settingsApi.list();
-export const updateSetting = (
-  key: string,
-  value: ApplicationSettingDto["value"],
-) => settingsApi.update(key, value);
+export const updateSetting = (key: string, value: ApplicationSettingDto["value"]) =>
+  settingsApi.update(key, value);

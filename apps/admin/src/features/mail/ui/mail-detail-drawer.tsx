@@ -16,43 +16,28 @@ interface MailDetailDrawerProps {
   onClose: () => void;
 }
 
-export function MailDetailDrawer({
-  selectedDelivery,
-  onClose,
-}: MailDetailDrawerProps) {
+export function MailDetailDrawer({ selectedDelivery, onClose }: MailDetailDrawerProps) {
   return (
     <ResourceDrawer
       open={!!selectedDelivery}
       title="Delivery detail"
-      description={
-        selectedDelivery
-          ? `Template: ${selectedDelivery.templateKey}`
-          : ""
-      }
+      description={selectedDelivery ? `Template: ${selectedDelivery.templateKey}` : ""}
       onClose={onClose}
     >
       {selectedDelivery && (
         <div className="space-y-4 text-sm">
           <div>
             <Label className="text-xs text-muted-foreground">ID</Label>
-            <p className="mt-0.5 font-mono text-xs">
-              {selectedDelivery.id}
-            </p>
+            <p className="mt-0.5 font-mono text-xs">{selectedDelivery.id}</p>
           </div>
           <Separator />
           <div>
-            <Label className="text-xs text-muted-foreground">
-              Template key
-            </Label>
-            <p className="mt-0.5 font-mono text-xs">
-              {selectedDelivery.templateKey}
-            </p>
+            <Label className="text-xs text-muted-foreground">Template key</Label>
+            <p className="mt-0.5 font-mono text-xs">{selectedDelivery.templateKey}</p>
           </div>
           <Separator />
           <div>
-            <Label className="text-xs text-muted-foreground">
-              Recipient
-            </Label>
+            <Label className="text-xs text-muted-foreground">Recipient</Label>
             <p className="mt-0.5">{selectedDelivery.recipient}</p>
           </div>
           <Separator />
@@ -65,13 +50,10 @@ export function MailDetailDrawer({
             <Label className="text-xs text-muted-foreground">Status</Label>
             <div className="mt-0.5">
               <Badge
-                variant={
-                  mailStatusProps(String(selectedDelivery.status)).variant
-                }
+                variant={mailStatusProps(String(selectedDelivery.status)).variant}
                 className={cn(
                   "text-xs capitalize",
-                  mailStatusProps(String(selectedDelivery.status))
-                    .className,
+                  mailStatusProps(String(selectedDelivery.status)).className,
                 )}
               >
                 {String(selectedDelivery.status).toLowerCase()}
@@ -82,9 +64,7 @@ export function MailDetailDrawer({
             <>
               <Separator />
               <div>
-                <Label className="text-xs text-muted-foreground">
-                  Error
-                </Label>
+                <Label className="text-xs text-muted-foreground">Error</Label>
                 <p className="mt-0.5 text-destructive">
                   {scalarString(selectedDelivery.errorMessage)}
                 </p>
@@ -94,21 +74,13 @@ export function MailDetailDrawer({
           <Separator />
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label className="text-xs text-muted-foreground">
-                Created at
-              </Label>
-              <p className="mt-0.5">
-                {formatDateTime(selectedDelivery.createdAt)}
-              </p>
+              <Label className="text-xs text-muted-foreground">Created at</Label>
+              <p className="mt-0.5">{formatDateTime(selectedDelivery.createdAt)}</p>
             </div>
             {selectedDelivery.sentAt && (
               <div>
-                <Label className="text-xs text-muted-foreground">
-                  Sent at
-                </Label>
-                <p className="mt-0.5">
-                  {formatUnknownDateTime(selectedDelivery.sentAt)}
-                </p>
+                <Label className="text-xs text-muted-foreground">Sent at</Label>
+                <p className="mt-0.5">{formatUnknownDateTime(selectedDelivery.sentAt)}</p>
               </div>
             )}
           </div>

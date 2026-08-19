@@ -1,13 +1,10 @@
-import type { AuthenticatedRequestUser } from '@repo/api-core';
+import type { AuthenticatedRequestUser } from "@repo/api-core";
 
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from "@nestjs/common";
 
-import {
-  OBJECT_STORAGE,
-  type ObjectStorage,
-} from '../../../storage/application/object-storage.interface';
-import { FileAccessService } from '../services/file-access.service';
-import { LocalFileDownloadUrlService } from '../services/local-file-download-url.service';
+import { OBJECT_STORAGE, type ObjectStorage } from "../../../storage";
+import { FileAccessService } from "../services/file-access.service";
+import { LocalFileDownloadUrlService } from "../services/local-file-download-url.service";
 
 @Injectable()
 export class DownloadFileUseCase {
@@ -17,22 +14,11 @@ export class DownloadFileUseCase {
     private readonly localFileDownloadUrlService: LocalFileDownloadUrlService,
   ) {}
 
-  async execute(
-    actor: AuthenticatedRequestUser,
-    fileId: string,
-    token?: string,
-  ) {
-    const file = await this.fileAccessService.findAccessibleFile(
-      actor,
-      fileId,
-    );
+  async execute(actor: AuthenticatedRequestUser, fileId: string, token?: string) {
+    const file = await this.fileAccessService.findAccessibleFile(actor, fileId);
 
     if (this.localFileDownloadUrlService.isEnabled()) {
-      this.localFileDownloadUrlService.assertValidToken(
-        file.id,
-        file.storageKey,
-        token,
-      );
+      this.localFileDownloadUrlService.assertValidToken(file.id, file.storageKey, token);
     }
 
     const content = await this.objectStorage.read(file.storageKey);

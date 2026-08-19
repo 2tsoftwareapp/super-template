@@ -58,9 +58,7 @@ describe("roleSchema", () => {
   });
 
   it("rejects description longer than 500 characters", () => {
-    expect(() =>
-      roleSchema.parse({ ...validInput, description: "x".repeat(501) }),
-    ).toThrow();
+    expect(() => roleSchema.parse({ ...validInput, description: "x".repeat(501) })).toThrow();
   });
 
   it("accepts optional organizationId", () => {

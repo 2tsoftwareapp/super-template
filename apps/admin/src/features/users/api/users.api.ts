@@ -44,9 +44,7 @@ export const usersApi = {
   },
 
   get(userId: string) {
-    return webFetch<{ data: AdminUserDto }>(
-      bffPath("/api/v1/admin/users/{id}", { id: userId }),
-    );
+    return webFetch<{ data: AdminUserDto }>(bffPath("/api/v1/admin/users/{id}", { id: userId }));
   },
 
   create(input: CreateAdminUserInput) {
@@ -57,13 +55,10 @@ export const usersApi = {
   },
 
   updateProfile(userId: string, input: UpdateAdminUserInput) {
-    return webFetch<{ data: AdminUserDto }>(
-      bffPath("/api/v1/admin/users/{id}", { id: userId }),
-      {
-        method: "PATCH",
-        body: JSON.stringify(input),
-      },
-    );
+    return webFetch<{ data: AdminUserDto }>(bffPath("/api/v1/admin/users/{id}", { id: userId }), {
+      method: "PATCH",
+      body: JSON.stringify(input),
+    });
   },
 
   updateStatus(userId: string, status: string) {

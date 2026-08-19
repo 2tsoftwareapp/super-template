@@ -6,7 +6,7 @@
   "scripts": {
     "build": "nest build",
     "dev": "nest start --watch",
-    "format": "biome format --write .",
+    "format": "prettier --write .",
     "generate": "pnpm run contract:generate",
     "lint": "eslint .",
     "openapi:generate": "bash ../../scripts/generate-openapi.sh",
@@ -54,7 +54,6 @@
     "zod": "4.4.3"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.0",
     "@nestjs/cli": "11.0.12",
     "@nestjs/testing": "11.1.27",
     "@repo/tsconfig": "workspace:*",

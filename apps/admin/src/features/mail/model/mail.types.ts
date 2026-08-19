@@ -1,9 +1,5 @@
 import type { AdminResourceConfig } from "@/lib/admin-resources";
-import type {
-  MailDeliveryDto,
-  MailPreviewDto,
-  MailTemplateDto,
-} from "@/lib/api-types";
+import type { MailDeliveryDto, MailPreviewDto, MailTemplateDto } from "@/lib/api-types";
 
 import type { DELIVERY_STATUS_OPTIONS } from "./mail.constants";
 import type { MailFilters } from "./mail.search-params";

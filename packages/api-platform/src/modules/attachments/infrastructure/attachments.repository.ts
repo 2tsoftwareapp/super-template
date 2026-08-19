@@ -1,14 +1,11 @@
-import type {
-  DatabaseClient,
-  DatabaseExecutor,
-} from '@repo/api-database';
+import type { DatabaseClient, DatabaseExecutor } from "@repo/api-database";
 
-import { Inject, Injectable } from '@nestjs/common';
-import { DATABASE } from '@repo/api-database';
-import { attachments } from '@repo/api-database';
-import { and, count, desc, eq, isNull } from 'drizzle-orm';
+import { Inject, Injectable } from "@nestjs/common";
+import { DATABASE } from "@repo/api-database";
+import { attachments } from "@repo/api-database";
+import { and, count, desc, eq, isNull } from "drizzle-orm";
 
-import type { AttachmentsRepositoryPort } from '../application/ports/attachments.repository.port';
+import type { AttachmentsRepositoryPort } from "../application/ports/attachments.repository.port";
 
 @Injectable()
 export class AttachmentsRepository implements AttachmentsRepositoryPort {
@@ -18,24 +15,16 @@ export class AttachmentsRepository implements AttachmentsRepositoryPort {
     values: typeof attachments.$inferInsert,
     executor: DatabaseExecutor = this.database,
   ) {
-    const [attachment] = await executor
-      .insert(attachments)
-      .values(values)
-      .returning();
+    const [attachment] = await executor.insert(attachments).values(values).returning();
 
     return attachment ?? null;
   }
 
-  async findById(
-    attachmentId: string,
-    executor: DatabaseExecutor = this.database,
-  ) {
+  async findById(attachmentId: string, executor: DatabaseExecutor = this.database) {
     const [attachment] = await executor
       .select()
       .from(attachments)
-      .where(
-        and(eq(attachments.id, attachmentId), isNull(attachments.deletedAt)),
-      )
+      .where(and(eq(attachments.id, attachmentId), isNull(attachments.deletedAt)))
       .limit(1);
 
     return attachment ?? null;
@@ -59,16 +48,11 @@ export class AttachmentsRepository implements AttachmentsRepositoryPort {
       .orderBy(desc(attachments.createdAt));
   }
 
-  async softDelete(
-    attachmentId: string,
-    executor: DatabaseExecutor = this.database,
-  ) {
+  async softDelete(attachmentId: string, executor: DatabaseExecutor = this.database) {
     const [attachment] = await executor
       .update(attachments)
       .set({ deletedAt: new Date(), updatedAt: new Date() })
-      .where(
-        and(eq(attachments.id, attachmentId), isNull(attachments.deletedAt)),
-      )
+      .where(and(eq(attachments.id, attachmentId), isNull(attachments.deletedAt)))
       .returning();
 
     return attachment ?? null;

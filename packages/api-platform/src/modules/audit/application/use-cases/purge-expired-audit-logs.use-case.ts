@@ -1,9 +1,14 @@
-import { Inject, Injectable } from '@nestjs/common';
-import {  EnvironmentService , SYSTEM_SCOPE } from '@repo/api-core';
-import { ADVISORY_LOCK_PORT, type AdvisoryLockPort, PLATFORM_TRANSACTION_PORT, type PlatformTransactionPort } from '@repo/api-core';
+import { Inject, Injectable } from "@nestjs/common";
+import { EnvironmentService, SYSTEM_SCOPE } from "@repo/api-core";
+import {
+  ADVISORY_LOCK_PORT,
+  type AdvisoryLockPort,
+  PLATFORM_TRANSACTION_PORT,
+  type PlatformTransactionPort,
+} from "@repo/api-core";
 
-import { AUDIT_REPOSITORY, type AuditRepositoryPort } from '../ports/audit.repository.port';
-import { RecordAuditLogUseCase } from './record-audit-log.use-case';
+import { AUDIT_REPOSITORY, type AuditRepositoryPort } from "../ports/audit.repository.port";
+import { RecordAuditLogUseCase } from "./record-audit-log.use-case";
 
 const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
 const PURGE_LOCK_ID = 42_001;
@@ -16,7 +21,8 @@ export class PurgeExpiredAuditLogsUseCase {
     private readonly recordAuditLogUseCase: RecordAuditLogUseCase,
     private readonly environmentService: EnvironmentService,
     @Inject(ADVISORY_LOCK_PORT) private readonly advisoryLockPort: AdvisoryLockPort,
-    @Inject(PLATFORM_TRANSACTION_PORT) private readonly platformTransactionPort: PlatformTransactionPort,
+    @Inject(PLATFORM_TRANSACTION_PORT)
+    private readonly platformTransactionPort: PlatformTransactionPort,
   ) {}
 
   async execute(): Promise<{ deletedCount: number; cutoff: Date } | null> {
@@ -35,11 +41,7 @@ export class PurgeExpiredAuditLogsUseCase {
       for (;;) {
         const deletedInBatch = await this.platformTransactionPort.run(async (tx) => {
           // Delete one batch per transaction to keep locks short
-          return this.auditRepository.deleteOlderThanBatched(
-            cutoff,
-            BATCH_SIZE,
-            tx,
-          );
+          return this.auditRepository.deleteOlderThanBatched(cutoff, BATCH_SIZE, tx);
         });
 
         if (deletedInBatch === 0) {
@@ -51,16 +53,19 @@ export class PurgeExpiredAuditLogsUseCase {
 
       if (totalDeleted > 0) {
         await this.platformTransactionPort.run(async (tx) => {
-          await this.recordAuditLogUseCase.execute({
-            scope: SYSTEM_SCOPE.PLATFORM,
-            action: 'audit.retention_purged',
-            entityType: 'audit_log',
-            metadata: {
-              deletedCount: totalDeleted,
-              cutoff: cutoff.toISOString(),
-              retentionDays,
+          await this.recordAuditLogUseCase.execute(
+            {
+              scope: SYSTEM_SCOPE.PLATFORM,
+              action: "audit.retention_purged",
+              entityType: "audit_log",
+              metadata: {
+                deletedCount: totalDeleted,
+                cutoff: cutoff.toISOString(),
+                retentionDays,
+              },
             },
-          }, tx);
+            tx,
+          );
         });
       }
 

@@ -1,23 +1,18 @@
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import {
-  AppError,
-  durationToMilliseconds,
-  ERROR_CODES,
-  normalizeEmail,
-} from '@repo/api-core';
+import { HttpStatus, Inject, Injectable } from "@nestjs/common";
+import { AppError, durationToMilliseconds, ERROR_CODES, normalizeEmail } from "@repo/api-core";
 
-import type { ResendVerificationCommand } from '../auth.types';
+import type { ResendVerificationCommand } from "../auth.types";
 
 import {
   USERS_REPOSITORY,
   type UsersRepositoryPort,
-} from '../../../users/application/ports/users.repository.port';
-import { generateOpaqueToken, hashOpaqueToken } from '../auth.helpers';
+} from "../../../users/application/ports/users.repository.port";
+import { generateOpaqueToken, hashOpaqueToken } from "../auth.helpers";
 import {
   AUTH_SESSION_REPOSITORY,
   type AuthSessionRepositoryPort,
-} from '../ports/auth-session.repository.port';
-import { AuthMailService } from '../services/auth-mail.service';
+} from "../ports/auth-session.repository.port";
+import { AuthMailService } from "../services/auth-mail.service";
 
 const RESEND_COOLDOWN_MS = 60_000;
 
@@ -35,7 +30,7 @@ export class ResendVerificationUseCase {
     const email = normalizeEmail(input.email);
     const user = await this.usersRepository.findByEmail(email);
 
-    if (user?.status === 'PENDING') {
+    if (user?.status === "PENDING") {
       const latest = await this.authSessionRepository.findLatestEmailVerificationToken(user.id);
       if (latest && !latest.usedAt) {
         const elapsed = Date.now() - latest.createdAt.getTime();
@@ -53,14 +48,14 @@ export class ResendVerificationUseCase {
       await this.authSessionRepository.storeEmailVerificationToken({
         userId: user.id,
         tokenHash: hashOpaqueToken(token),
-        expiresAt: new Date(Date.now() + durationToMilliseconds('1d')),
+        expiresAt: new Date(Date.now() + durationToMilliseconds("1d")),
       });
       await this.authMailService.sendVerificationEmail(user.email, token);
     }
 
     return {
       success: true,
-      message: 'If the account exists, a verification email has been sent.',
+      message: "If the account exists, a verification email has been sent.",
     };
   }
 }

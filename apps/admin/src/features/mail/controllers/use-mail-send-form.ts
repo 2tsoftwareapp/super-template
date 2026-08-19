@@ -8,22 +8,14 @@ import type { MailTemplateDto } from "@/lib/api-types";
 
 import { useSendMailMutation } from "@/features/mail/api/mail.mutations";
 
-export function useMailSendForm(
-  templates: MailTemplateDto[] | undefined,
-  canAccess: boolean,
-) {
+export function useMailSendForm(templates: MailTemplateDto[] | undefined, canAccess: boolean) {
   const [sendTemplateKey, setSendTemplateKey] = useState("");
   const [sendRecipient, setSendRecipient] = useState("");
-  const [variableValues, setVariableValues] = useState<
-    Record<string, string>
-  >({});
+  const [variableValues, setVariableValues] = useState<Record<string, string>>({});
   const [sendIdempotencyKey, setSendIdempotencyKey] = useState("");
 
   const selectedTemplate = useMemo(
-    () =>
-      sendTemplateKey
-        ? (templates ?? []).find((t) => t.key === sendTemplateKey)
-        : undefined,
+    () => (sendTemplateKey ? (templates ?? []).find((t) => t.key === sendTemplateKey) : undefined),
     [sendTemplateKey, templates],
   );
 
@@ -31,9 +23,7 @@ export function useMailSendForm(
     (key: string) => {
       setSendTemplateKey(key);
       const tmpl = (templates ?? []).find((t) => t.key === key);
-      setVariableValues(
-        Object.fromEntries((tmpl?.variables ?? []).map((v) => [v, ""])),
-      );
+      setVariableValues(Object.fromEntries((tmpl?.variables ?? []).map((v) => [v, ""])));
     },
     [templates],
   );
@@ -63,9 +53,7 @@ export function useMailSendForm(
       templateKey: sendTemplateKey,
       to: sendRecipient,
       variables: variableValues,
-      ...(sendIdempotencyKey
-        ? { idempotencyKey: sendIdempotencyKey }
-        : {}),
+      ...(sendIdempotencyKey ? { idempotencyKey: sendIdempotencyKey } : {}),
     });
   }, [
     canAccess,

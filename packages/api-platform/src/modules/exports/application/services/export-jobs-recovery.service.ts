@@ -1,11 +1,11 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
-import { APP_LOGGER, type AppLogger } from '@repo/api-core';
+import { Inject, Injectable } from "@nestjs/common";
+import { Cron, CronExpression } from "@nestjs/schedule";
+import { APP_LOGGER, type AppLogger } from "@repo/api-core";
 
 import {
   EXPORT_JOBS_REPOSITORY,
   type ExportJobsRepositoryPort,
-} from '../ports/export-jobs.repository.port';
+} from "../ports/export-jobs.repository.port";
 
 // Exports run synchronously inside the originating request; anything still
 // PROCESSING after this long lost its request (crash / deploy) and can never
@@ -25,8 +25,7 @@ export class ExportJobsRecoveryService {
     const cutoff = new Date(Date.now() - EXPORT_JOB_STALE_MS);
 
     try {
-      const recovered =
-        await this.exportJobsRepository.recoverStaleProcessing(cutoff);
+      const recovered = await this.exportJobsRepository.recoverStaleProcessing(cutoff);
 
       if (recovered > 0) {
         this.logger.warn(
@@ -34,7 +33,7 @@ export class ExportJobsRecoveryService {
         );
       }
     } catch (error) {
-      this.logger.error('Stale export job recovery failed', {
+      this.logger.error("Stale export job recovery failed", {
         error: error instanceof Error ? error.message : String(error),
       });
     }

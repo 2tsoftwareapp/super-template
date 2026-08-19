@@ -1,5 +1,5 @@
-import type { JsonObject } from '@repo/api-core';
-import type { TransactionExecutor } from '@repo/api-core';
+import type { JsonObject } from "@repo/api-core";
+import type { TransactionExecutor } from "@repo/api-core";
 
 export interface ActivityRecord {
   id: string;
@@ -8,7 +8,7 @@ export interface ActivityRecord {
   entityType: string;
   entityId: string;
   actorId: string | null;
-  visibility: 'PUBLIC' | 'PRIVATE' | 'INTERNAL';
+  visibility: "PUBLIC" | "PRIVATE" | "INTERNAL";
   metadata: JsonObject | null;
   createdAt: Date;
 }
@@ -19,7 +19,7 @@ export interface CreateActivityInput {
   entityType: string;
   entityId: string;
   actorId?: string | null;
-  visibility?: 'PUBLIC' | 'PRIVATE' | 'INTERNAL';
+  visibility?: "PUBLIC" | "PRIVATE" | "INTERNAL";
   metadata?: JsonObject | null;
 }
 
@@ -37,8 +37,11 @@ export interface ActivityListResult {
 }
 
 export interface ActivitiesRepositoryPort {
-  create(values: CreateActivityInput, executor?: TransactionExecutor): Promise<ActivityRecord | null>;
+  create(
+    values: CreateActivityInput,
+    executor?: TransactionExecutor,
+  ): Promise<ActivityRecord | null>;
   list(params: ListActivitiesQuery, executor?: TransactionExecutor): Promise<ActivityListResult>;
 }
 
-export const ACTIVITIES_REPOSITORY = Symbol('ACTIVITIES_REPOSITORY');
+export const ACTIVITIES_REPOSITORY = Symbol("ACTIVITIES_REPOSITORY");

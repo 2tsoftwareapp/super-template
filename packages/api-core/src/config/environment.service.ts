@@ -1,8 +1,8 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from "@nestjs/common";
 
-import type { AppEnvironment } from './env.schema';
+import type { AppEnvironment } from "./env.schema";
 
-import { APP_ENVIRONMENT } from './config.constants';
+import { APP_ENVIRONMENT } from "./config.constants";
 
 @Injectable()
 export class EnvironmentService {
@@ -13,27 +13,27 @@ export class EnvironmentService {
   }
 
   get isProduction(): boolean {
-    return this.env.APP_ENV === 'production';
+    return this.env.APP_ENV === "production";
   }
 
   get isStaging(): boolean {
-    return this.env.APP_ENV === 'staging';
+    return this.env.APP_ENV === "staging";
   }
 
   get isDevelopment(): boolean {
-    return this.env.APP_ENV === 'development';
+    return this.env.APP_ENV === "development";
   }
 
   get isTest(): boolean {
-    return this.env.APP_ENV === 'test';
+    return this.env.APP_ENV === "test";
   }
 
   /** True for deployed, internet-facing environments (staging + production). */
   get isProductionLike(): boolean {
-    return this.env.APP_ENV === 'production' || this.env.APP_ENV === 'staging';
+    return this.env.APP_ENV === "production" || this.env.APP_ENV === "staging";
   }
 
-  get appEnv(): AppEnvironment['APP_ENV'] {
+  get appEnv(): AppEnvironment["APP_ENV"] {
     return this.env.APP_ENV;
   }
 
@@ -58,7 +58,7 @@ export class EnvironmentService {
   }
 
   get corsOrigins(): string[] {
-    return this.env.WEB_ORIGIN.split(',')
+    return this.env.WEB_ORIGIN.split(",")
       .map((origin) => origin.trim())
       .filter(Boolean);
   }
@@ -66,7 +66,7 @@ export class EnvironmentService {
   /** HTTP(S) origins allowed for SSO post-login redirects (web + admin). */
   get ssoRedirectOrigins(): string[] {
     const adminOrigins = this.env.ADMIN_ORIGIN
-      ? this.env.ADMIN_ORIGIN.split(',')
+      ? this.env.ADMIN_ORIGIN.split(",")
           .map((origin) => origin.trim())
           .filter(Boolean)
       : [];
@@ -80,7 +80,7 @@ export class EnvironmentService {
       return [];
     }
 
-    return this.env.SSO_REDIRECT_URIS.split(',')
+    return this.env.SSO_REDIRECT_URIS.split(",")
       .map((uri) => uri.trim())
       .filter(Boolean);
   }

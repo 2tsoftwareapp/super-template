@@ -6,16 +6,16 @@ export const resolveMigrateDatabaseUrl = (): string => {
     return explicit;
   }
 
-  const host = process.env.POSTGRES_HOST ?? 'localhost';
-  const port = process.env.POSTGRES_PORT ?? '5432';
+  const host = process.env.POSTGRES_HOST ?? "localhost";
+  const port = process.env.POSTGRES_PORT ?? "5432";
   const database = process.env.POSTGRES_DB;
   const user = process.env.POSTGRES_USER;
   const password = process.env.POSTGRES_PASSWORD;
 
   if (!database || !user || password === undefined) {
     throw new Error(
-      'DATABASE_MIGRATE_URL is required when POSTGRES_* variables are incomplete. ' +
-        'Point it at a privileged role (for example postgres) for migrate and reset.',
+      "DATABASE_MIGRATE_URL is required when POSTGRES_* variables are incomplete. " +
+        "Point it at a privileged role (for example postgres) for migrate and reset.",
     );
   }
 

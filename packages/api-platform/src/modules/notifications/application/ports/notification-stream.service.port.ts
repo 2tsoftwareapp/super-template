@@ -1,6 +1,6 @@
-import type { MessageEvent } from '@nestjs/common';
-import type { JsonObject } from '@repo/api-core';
-import type { Observable } from 'rxjs';
+import type { MessageEvent } from "@nestjs/common";
+import type { JsonObject } from "@repo/api-core";
+import type { Observable } from "rxjs";
 
 export interface NotificationStreamEvent {
   id: string;
@@ -19,4 +19,4 @@ export interface NotificationStreamServicePort {
   stream(userId: string, organizationId: string): Observable<MessageEvent>;
 }
 
-export const NOTIFICATION_STREAM_SERVICE = Symbol('NOTIFICATION_STREAM_SERVICE');
+export const NOTIFICATION_STREAM_SERVICE = Symbol("NOTIFICATION_STREAM_SERVICE");

@@ -3,7 +3,7 @@ export interface AuthenticatedRequestUser {
   sessionId: string;
   email: string;
   displayName: string;
-  status: 'PENDING' | 'ACTIVE' | 'BLOCKED';
+  status: "PENDING" | "ACTIVE" | "BLOCKED";
   roles: string[];
   permissions: string[];
   organizationId: string | null;

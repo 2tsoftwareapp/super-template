@@ -32,9 +32,7 @@ function buildSettingRow(
   draftObjectValues: Record<string, Record<string, string | boolean>>,
   updateSettingIsPending: boolean,
   savingKey: string | null,
-  onSetDraftValues: (
-    updater: (prev: Record<string, string>) => Record<string, string>,
-  ) => void,
+  onSetDraftValues: (updater: (prev: Record<string, string>) => Record<string, string>) => void,
   onSetDraftObjectValues: (
     updater: (
       prev: Record<string, Record<string, string | boolean>>,
@@ -61,8 +59,7 @@ function buildSettingRow(
     canUpdate,
     scalar: {
       value: draftValues[setting.key] ?? initDraft(setting.value),
-      onChange: (value) =>
-        onSetDraftValues((prev) => ({ ...prev, [setting.key]: value })),
+      onChange: (value) => onSetDraftValues((prev) => ({ ...prev, [setting.key]: value })),
       onReset: () =>
         onSetDraftValues((prev) => {
           const next = { ...prev };
@@ -75,16 +72,13 @@ function buildSettingRow(
         ? {
             fields: Object.entries(objValue).map(([k, v]) => ({
               key: k,
-              value: hasObjectDraft
-                ? (draftObjectValues[setting.key]?.[k] ?? v)
-                : v,
+              value: hasObjectDraft ? (draftObjectValues[setting.key]?.[k] ?? v) : v,
               onChange: (val) =>
                 onSetDraftObjectValues((prev) => {
                   const base = prev[setting.key] ?? {};
                   for (const [bk, bv] of Object.entries(objValue)) {
                     if (!(bk in base)) {
-                      base[bk] =
-                        typeof bv === "boolean" ? bv : String(bv ?? "");
+                      base[bk] = typeof bv === "boolean" ? bv : String(bv ?? "");
                     }
                   }
                   return {
@@ -119,9 +113,7 @@ function buildSettingRow(
 export function useSettingsController(): SettingsViewModel {
   const queryClient = useQueryClient();
   const session = useSession();
-  const { canRead, canUpdate } = selectSettingsPermissions(
-    session.data?.data?.permissions,
-  );
+  const { canRead, canUpdate } = selectSettingsPermissions(session.data?.data?.permissions);
 
   const settings = useSettingsQuery();
 
@@ -166,15 +158,13 @@ export function useSettingsController(): SettingsViewModel {
   const handleSave = () => {
     if (!savingKey) return;
     const setting = settings.data?.data.find((s) => s.key === savingKey);
-    const isObject =
-      setting && typeof setting.value === "object" && setting.value !== null;
+    const isObject = setting && typeof setting.value === "object" && setting.value !== null;
 
     let next: SettingValue;
     if (isObject && draftObjectValues[savingKey]) {
       next = draftObjectValues[savingKey];
     } else {
-      const raw =
-        draftValues[savingKey] ?? initDraft(setting?.value ?? (null as never));
+      const raw = draftValues[savingKey] ?? initDraft(setting?.value ?? (null as never));
       next = parseJsonValue(raw) as SettingValue;
     }
 

@@ -1,4 +1,4 @@
-import type { DatabaseClient, DatabaseTransaction } from './database.types';
+import type { DatabaseClient, DatabaseTransaction } from "./database.types";
 
 export const runInTransaction = async <T>(
   database: DatabaseClient,

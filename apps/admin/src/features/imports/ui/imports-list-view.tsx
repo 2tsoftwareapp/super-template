@@ -2,13 +2,7 @@
 
 import { Badge } from "@repo/web-ui/badge";
 import { Button } from "@repo/web-ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@repo/web-ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/web-ui/card";
 import { ConfirmDialog } from "@repo/web-ui/confirm-dialog";
 import { ErrorState } from "@repo/web-ui/error-state";
 import { Input } from "@repo/web-ui/input";
@@ -17,13 +11,7 @@ import { SectionLoading } from "@repo/web-ui/loading";
 import { LoadingButton } from "@repo/web-ui/loading-button";
 import { Separator } from "@repo/web-ui/separator";
 import { Show } from "@repo/web-ui/show";
-import {
-  AlertCircle,
-  CheckCircle2,
-  Clock,
-  RefreshCw,
-  Search,
-} from "lucide-react";
+import { AlertCircle, CheckCircle2, Clock, RefreshCw, Search } from "lucide-react";
 
 import type { ImportsViewModel } from "@/features/imports/model/imports.types";
 
@@ -63,12 +51,7 @@ function statusBadge(status: string) {
  * Presentational imports view. Receives a fully-resolved view model from the
  * imports controller and renders it; it owns no server state or orchestration.
  */
-export function ImportsListView({
-  form,
-  lookup,
-  job,
-  confirm,
-}: ImportsViewModel) {
+export function ImportsListView({ form, lookup, job, confirm }: ImportsViewModel) {
   const jobData = job.data;
   const sb = job.status ? statusBadge(job.status) : null;
   const Icon = sb?.icon;
@@ -82,9 +65,7 @@ export function ImportsListView({
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Create import</CardTitle>
-            <CardDescription>
-              Queue a new import job referencing an uploaded file.
-            </CardDescription>
+            <CardDescription>Queue a new import job referencing an uploaded file.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
@@ -133,9 +114,7 @@ export function ImportsListView({
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Job detail</CardTitle>
-            <CardDescription>
-              Look up an import job by ID to inspect and confirm.
-            </CardDescription>
+            <CardDescription>Look up an import job by ID to inspect and confirm.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex gap-2">
@@ -154,9 +133,7 @@ export function ImportsListView({
                 onClick={lookup.onRefresh}
                 disabled={lookup.isFetching || !lookup.jobId}
               >
-                <RefreshCw
-                  className={cn("size-3.5", lookup.isFetching && "animate-spin")}
-                />
+                <RefreshCw className={cn("size-3.5", lookup.isFetching && "animate-spin")} />
               </Button>
             </div>
 
@@ -172,9 +149,7 @@ export function ImportsListView({
             </Show>
             {!job.isLoading && !job.isError && !jobData ? (
               <div className="rounded-xl border border-border p-6 text-center text-sm text-muted-foreground">
-                {lookup.jobId
-                  ? "No data returned"
-                  : "Enter a job ID and click refresh"}
+                {lookup.jobId ? "No data returned" : "Enter a job ID and click refresh"}
               </div>
             ) : !job.isLoading && !job.isError && jobData ? (
               <div className="space-y-4 rounded-xl border border-border p-4">
@@ -186,10 +161,7 @@ export function ImportsListView({
                     </p>
                   </div>
                   {Icon && sb && (
-                    <Badge
-                      variant={sb.variant}
-                      className={cn("gap-1 capitalize", sb.className)}
-                    >
+                    <Badge variant={sb.variant} className={cn("gap-1 capitalize", sb.className)}>
                       <Icon className="size-3" />
                       {job.status.toLowerCase()}
                     </Badge>
@@ -201,9 +173,7 @@ export function ImportsListView({
                 <div className="grid grid-cols-3 gap-3 text-xs">
                   <div>
                     <span className="text-muted-foreground">Rows</span>
-                    <p className="mt-0.5 font-medium">
-                      {scalarString(jobData.rowCount)}
-                    </p>
+                    <p className="mt-0.5 font-medium">{scalarString(jobData.rowCount)}</p>
                   </div>
                   <div>
                     <span className="text-muted-foreground">Success</span>
@@ -222,9 +192,7 @@ export function ImportsListView({
                 <div className="space-y-1 text-xs">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">File</span>
-                    <span className="font-mono">
-                      {jobData.fileId.slice(0, 8)}…
-                    </span>
+                    <span className="font-mono">{jobData.fileId.slice(0, 8)}…</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Created</span>
@@ -233,17 +201,13 @@ export function ImportsListView({
                   {jobData.completedAt && (
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Completed</span>
-                      <span>
-                        {timeAgo(scalarString(jobData.completedAt, ""))}
-                      </span>
+                      <span>{timeAgo(scalarString(jobData.completedAt, ""))}</span>
                     </div>
                   )}
                   {jobData.confirmedAt && (
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Confirmed</span>
-                      <span>
-                        {timeAgo(scalarString(jobData.confirmedAt, ""))}
-                      </span>
+                      <span>{timeAgo(scalarString(jobData.confirmedAt, ""))}</span>
                     </div>
                   )}
                 </div>
@@ -257,12 +221,8 @@ export function ImportsListView({
                       </p>
                       <div className="max-h-32 overflow-y-auto space-y-1">
                         {jobData.errors.map((err, i) => (
-                          <p
-                            key={i}
-                            className="text-[10px] text-muted-foreground"
-                          >
-                            Row {String(err.row ?? "?")}:{" "}
-                            {String(err.message ?? "")}
+                          <p key={i} className="text-[10px] text-muted-foreground">
+                            Row {String(err.row ?? "?")}: {String(err.message ?? "")}
                           </p>
                         ))}
                       </div>

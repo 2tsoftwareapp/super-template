@@ -1,52 +1,42 @@
-import { sql } from 'drizzle-orm';
-import {
-  index,
-  pgTable,
-  text,
-  timestamp,
-  uniqueIndex,
-  uuid,
-} from 'drizzle-orm/pg-core';
+import { sql } from "drizzle-orm";
+import { index, pgTable, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
 
-import { timestamps } from '../shared/timestamps';
-import { organizationMemberRoleEnum } from './enums';
-import { users } from './users';
+import { timestamps } from "../shared/timestamps";
+import { organizationMemberRoleEnum } from "./enums";
+import { users } from "./users";
 
 export const organizations = pgTable(
-  'organizations',
+  "organizations",
   {
-    id: uuid('id').defaultRandom().primaryKey(),
-    name: text('name').notNull(),
-    slug: text('slug').notNull(),
-    deletedAt: timestamp('deleted_at', { withTimezone: true }),
+    id: uuid("id").defaultRandom().primaryKey(),
+    name: text("name").notNull(),
+    slug: text("slug").notNull(),
+    deletedAt: timestamp("deleted_at", { withTimezone: true }),
     ...timestamps,
   },
   (table) => [
-    uniqueIndex('organizations_slug_active_unique')
+    uniqueIndex("organizations_slug_active_unique")
       .on(table.slug)
       .where(sql`${table.deletedAt} is null`),
   ],
 );
 
 export const organizationMembers = pgTable(
-  'organization_members',
+  "organization_members",
   {
-    id: uuid('id').defaultRandom().primaryKey(),
-    organizationId: uuid('organization_id')
+    id: uuid("id").defaultRandom().primaryKey(),
+    organizationId: uuid("organization_id")
       .notNull()
-      .references(() => organizations.id, { onDelete: 'cascade' }),
-    userId: uuid('user_id')
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
       .notNull()
-      .references(() => users.id, { onDelete: 'cascade' }),
-    role: organizationMemberRoleEnum('role').notNull().default('MEMBER'),
+      .references(() => users.id, { onDelete: "cascade" }),
+    role: organizationMemberRoleEnum("role").notNull().default("MEMBER"),
     ...timestamps,
   },
   (table) => [
-    uniqueIndex('organization_members_org_user_unique').on(
-      table.organizationId,
-      table.userId,
-    ),
-    index('organization_members_user_id_idx').on(table.userId),
-    index('organization_members_organization_id_idx').on(table.organizationId),
+    uniqueIndex("organization_members_org_user_unique").on(table.organizationId, table.userId),
+    index("organization_members_user_id_idx").on(table.userId),
+    index("organization_members_organization_id_idx").on(table.organizationId),
   ],
 );

@@ -1,11 +1,6 @@
 import { bffPath } from "@repo/api-contract";
 
-import type {
-  JobDto,
-  JobEventDto,
-  JobMetricsDto,
-  ListResponse,
-} from "@/lib/api-types";
+import type { JobDto, JobEventDto, JobMetricsDto, ListResponse } from "@/lib/api-types";
 
 import { buildPath, webFetch } from "@/lib/http";
 
@@ -30,15 +25,11 @@ export const jobsApi = {
   },
 
   metrics() {
-    return webFetch<{ data: JobMetricsDto }>(
-      bffPath("/api/v1/admin/jobs/metrics"),
-    );
+    return webFetch<{ data: JobMetricsDto }>(bffPath("/api/v1/admin/jobs/metrics"));
   },
 
   get(jobId: string) {
-    return webFetch<{ data: JobDto }>(
-      bffPath("/api/v1/admin/jobs/{id}", { id: jobId }),
-    );
+    return webFetch<{ data: JobDto }>(bffPath("/api/v1/admin/jobs/{id}", { id: jobId }));
   },
 
   logs(jobId: string) {
@@ -48,10 +39,9 @@ export const jobsApi = {
   },
 
   cancel(jobId: string) {
-    return webFetch<{ data: JobDto }>(
-      bffPath("/api/v1/admin/jobs/{id}", { id: jobId }),
-      { method: "DELETE" },
-    );
+    return webFetch<{ data: JobDto }>(bffPath("/api/v1/admin/jobs/{id}", { id: jobId }), {
+      method: "DELETE",
+    });
   },
 };
 

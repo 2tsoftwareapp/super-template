@@ -1,14 +1,11 @@
-import type {
-  DatabaseClient,
-  DatabaseExecutor,
-} from '@repo/api-database';
+import type { DatabaseClient, DatabaseExecutor } from "@repo/api-database";
 
-import { Inject, Injectable } from '@nestjs/common';
-import { DATABASE } from '@repo/api-database';
-import { notifications } from '@repo/api-database';
-import { and, count, desc, eq, inArray, isNull, sql } from 'drizzle-orm';
+import { Inject, Injectable } from "@nestjs/common";
+import { DATABASE } from "@repo/api-database";
+import { notifications } from "@repo/api-database";
+import { and, count, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 
-import type { NotificationsRepositoryPort } from '../application/ports/notifications.repository.port';
+import type { NotificationsRepositoryPort } from "../application/ports/notifications.repository.port";
 
 interface ListNotificationsParams {
   page: number;
@@ -25,9 +22,7 @@ export class NotificationsRepository implements NotificationsRepositoryPort {
     values: typeof notifications.$inferInsert,
     executor: DatabaseExecutor = this.database,
   ) {
-    const query = executor
-      .insert(notifications)
-      .values(values);
+    const query = executor.insert(notifications).values(values);
 
     // Idempotency for general-job-sourced inbox rows: match the unique index
     // `notifications_source_bg_job_id_user_id_unique` (sourceBackgroundJobId + userId).
@@ -43,7 +38,7 @@ export class NotificationsRepository implements NotificationsRepositoryPort {
   }
 
   async createMany(
-    values: typeof notifications.$inferInsert[],
+    values: (typeof notifications.$inferInsert)[],
     executor: DatabaseExecutor = this.database,
   ) {
     if (values.length === 0) {
@@ -75,10 +70,7 @@ export class NotificationsRepository implements NotificationsRepositoryPort {
       .select()
       .from(notifications)
       .where(
-        and(
-          eq(notifications.sourceJobId, sourceJobId),
-          inArray(notifications.userId, userIds),
-        ),
+        and(eq(notifications.sourceJobId, sourceJobId), inArray(notifications.userId, userIds)),
       );
   }
 
@@ -120,7 +112,10 @@ export class NotificationsRepository implements NotificationsRepositoryPort {
     params: ListNotificationsParams,
     executor: DatabaseExecutor = this.database,
   ) {
-    const filters = [eq(notifications.userId, userId), eq(notifications.organizationId, organizationId)];
+    const filters = [
+      eq(notifications.userId, userId),
+      eq(notifications.organizationId, organizationId),
+    ];
 
     if (params.unread === true) {
       filters.push(isNull(notifications.readAt));
@@ -140,10 +135,7 @@ export class NotificationsRepository implements NotificationsRepositoryPort {
         .orderBy(desc(notifications.createdAt))
         .limit(params.limit)
         .offset(offset),
-      executor
-        .select({ total: count() })
-        .from(notifications)
-        .where(whereClause),
+      executor.select({ total: count() }).from(notifications).where(whereClause),
     ]);
 
     return {
@@ -161,7 +153,11 @@ export class NotificationsRepository implements NotificationsRepositoryPort {
       .select({ total: count() })
       .from(notifications)
       .where(
-        and(eq(notifications.userId, userId), eq(notifications.organizationId, organizationId), isNull(notifications.readAt)),
+        and(
+          eq(notifications.userId, userId),
+          eq(notifications.organizationId, organizationId),
+          isNull(notifications.readAt),
+        ),
       );
 
     return Number(row?.total ?? 0);
@@ -178,7 +174,13 @@ export class NotificationsRepository implements NotificationsRepositoryPort {
       .set({
         readAt: new Date(),
       })
-      .where(and(eq(notifications.id, notificationId), eq(notifications.userId, userId), eq(notifications.organizationId, organizationId)))
+      .where(
+        and(
+          eq(notifications.id, notificationId),
+          eq(notifications.userId, userId),
+          eq(notifications.organizationId, organizationId),
+        ),
+      )
       .returning();
 
     return notification ?? null;
@@ -195,7 +197,11 @@ export class NotificationsRepository implements NotificationsRepositoryPort {
         readAt: new Date(),
       })
       .where(
-        and(eq(notifications.userId, userId), eq(notifications.organizationId, organizationId), isNull(notifications.readAt)),
+        and(
+          eq(notifications.userId, userId),
+          eq(notifications.organizationId, organizationId),
+          isNull(notifications.readAt),
+        ),
       );
   }
 
@@ -207,7 +213,13 @@ export class NotificationsRepository implements NotificationsRepositoryPort {
   ) {
     const [notification] = await executor
       .delete(notifications)
-      .where(and(eq(notifications.id, notificationId), eq(notifications.userId, userId), eq(notifications.organizationId, organizationId)))
+      .where(
+        and(
+          eq(notifications.id, notificationId),
+          eq(notifications.userId, userId),
+          eq(notifications.organizationId, organizationId),
+        ),
+      )
       .returning();
 
     return notification ?? null;

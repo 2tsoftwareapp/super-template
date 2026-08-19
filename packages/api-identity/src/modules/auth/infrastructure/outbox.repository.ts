@@ -1,15 +1,15 @@
-import type { DatabaseExecutor } from '@repo/api-database';
+import type { DatabaseExecutor } from "@repo/api-database";
 
-import { Inject, Injectable } from '@nestjs/common';
-import { DATABASE, outboxMessages } from '@repo/api-database';
-import { eq, sql } from 'drizzle-orm';
+import { Inject, Injectable } from "@nestjs/common";
+import { DATABASE, outboxMessages } from "@repo/api-database";
+import { eq, sql } from "drizzle-orm";
 
 import type {
   OutboxMessagePayload,
   OutboxRecord,
   OutboxRepositoryPort,
   OutboxTopic,
-} from '../application/ports/outbox.repository.port';
+} from "../application/ports/outbox.repository.port";
 
 @Injectable()
 export class OutboxRepository implements OutboxRepositoryPort {
@@ -71,7 +71,7 @@ export class OutboxRepository implements OutboxRepositoryPort {
     await this.database
       .update(outboxMessages)
       .set({
-        status: 'SENT',
+        status: "SENT",
         processedAt: new Date(),
         updatedAt: new Date(),
       })

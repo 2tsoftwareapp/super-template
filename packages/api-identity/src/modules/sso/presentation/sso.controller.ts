@@ -1,36 +1,27 @@
-import type { Response } from 'express';
-import type { Request } from 'express';
+import type { Response } from "express";
+import type { Request } from "express";
 
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Post,
-  Query,
-  Req,
-  Res,
-} from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
-import { Throttle } from '@nestjs/throttler';
-import { ApiDataResponse, Public } from '@repo/api-core';
-import { randomUUID } from 'node:crypto';
+import { Body, Controller, Get, Param, Post, Query, Req, Res } from "@nestjs/common";
+import { ApiTags } from "@nestjs/swagger";
+import { Throttle } from "@nestjs/throttler";
+import { ApiDataResponse, Public } from "@repo/api-core";
+import { randomUUID } from "node:crypto";
 
-import { HandleSsoCallbackUseCase } from '../application/use-cases/handle-sso-callback.use-case';
+import { HandleSsoCallbackUseCase } from "../application/use-cases/handle-sso-callback.use-case";
 import {
   CreateSsoSessionExchangeUseCase,
   ExchangeSsoSessionUseCase,
-} from '../application/use-cases/sso-session-exchange.use-case';
-import { StartSsoLoginUseCase } from '../application/use-cases/start-sso-login.use-case';
+} from "../application/use-cases/sso-session-exchange.use-case";
+import { StartSsoLoginUseCase } from "../application/use-cases/start-sso-login.use-case";
 import {
   ExchangeSsoSessionDto,
   SsoCallbackQueryDto,
   StartSsoLoginQueryDto,
   StartSsoLoginResponseDto,
-} from './sso.dto';
+} from "./sso.dto";
 
-@ApiTags('sso')
-@Controller('auth/sso')
+@ApiTags("sso")
+@Controller("auth/sso")
 export class SsoController {
   constructor(
     private readonly startSsoLogin: StartSsoLoginUseCase,
@@ -40,13 +31,10 @@ export class SsoController {
   ) {}
 
   @Public()
-  @Get(':provider/start')
+  @Get(":provider/start")
   @Throttle({ default: { limit: 10, ttl: 60_000 } })
   @ApiDataResponse(StartSsoLoginResponseDto)
-  startLogin(
-    @Param('provider') provider: string,
-    @Query() query: StartSsoLoginQueryDto,
-  ) {
+  startLogin(@Param("provider") provider: string, @Query() query: StartSsoLoginQueryDto) {
     return this.startSsoLogin.execute({
       provider,
       redirectUri: query.redirectUri,
@@ -55,53 +43,41 @@ export class SsoController {
   }
 
   @Public()
-  @Post('exchange')
+  @Post("exchange")
   @Throttle({ default: { limit: 20, ttl: 60_000 } })
   exchangeSession(@Body() body: ExchangeSsoSessionDto) {
     return this.exchangeSsoSession.execute(body.code);
   }
 
   @Public()
-  @Get(':provider/callback')
+  @Get(":provider/callback")
   @Throttle({ default: { limit: 20, ttl: 60_000 } })
   async handleCallbackGet(
-    @Param('provider') provider: string,
+    @Param("provider") provider: string,
     @Query() query: SsoCallbackQueryDto,
     @Req() request: Request,
     @Res() response: Response,
   ): Promise<void> {
-    await this.handleCallback(
-      provider,
-      query.code,
-      query.state,
-      request,
-      response,
-    );
+    await this.handleCallback(provider, query.code, query.state, request, response);
   }
 
   // Apple mandates response_mode=form_post for the "email"/"name" scopes, so its
   // redirect arrives as a POST with a urlencoded body instead of a query string.
   @Public()
-  @Post(':provider/callback')
+  @Post(":provider/callback")
   @Throttle({ default: { limit: 20, ttl: 60_000 } })
   async handleCallbackPost(
-    @Param('provider') provider: string,
+    @Param("provider") provider: string,
     @Body() body: SsoCallbackQueryDto,
     @Req() request: Request,
     @Res() response: Response,
   ): Promise<void> {
-    await this.handleCallback(
-      provider,
-      body.code,
-      body.state,
-      request,
-      response,
-    );
+    await this.handleCallback(provider, body.code, body.state, request, response);
   }
 
   private wantsJsonResponse(request: Request): boolean {
-    const accept = request.headers.accept ?? '';
-    return accept.includes('application/json');
+    const accept = request.headers.accept ?? "";
+    return accept.includes("application/json");
   }
 
   private async handleCallback(
@@ -135,7 +111,7 @@ export class SsoController {
     }
 
     const target = new URL(redirectUri);
-    target.searchParams.set('exchange', exchangeCode);
+    target.searchParams.set("exchange", exchangeCode);
     response.redirect(302, target.toString());
   }
 }

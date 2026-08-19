@@ -1,28 +1,28 @@
-import type { RequestContext } from '@repo/api-core';
+import type { RequestContext } from "@repo/api-core";
 
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { AppError, ERROR_CODES } from '@repo/api-core';
+import { HttpStatus, Inject, Injectable } from "@nestjs/common";
+import { AppError, ERROR_CODES } from "@repo/api-core";
 
-import type { RefreshSessionCommand } from '../auth.types';
+import type { RefreshSessionCommand } from "../auth.types";
 
-import { AccessControlService } from '../../../access-control/application/access-control.service';
-import { OrganizationsService } from '../../../organizations/application/organizations.service';
+import { AccessControlService } from "../../../access-control";
+import { OrganizationsService } from "../../../organizations/application/organizations.service";
 import {
   USERS_REPOSITORY,
   type UsersRepositoryPort,
-} from '../../../users/application/ports/users.repository.port';
-import { resolveRefreshAttempt } from '../../domain/refresh-rotation.policy';
-import { assertSessionUsable, verifyRefreshTokenHash } from '../auth.helpers';
-import { AuthMapper } from '../auth.mapper';
+} from "../../../users/application/ports/users.repository.port";
+import { resolveRefreshAttempt } from "../../domain/refresh-rotation.policy";
+import { assertSessionUsable, verifyRefreshTokenHash } from "../auth.helpers";
+import { AuthMapper } from "../auth.mapper";
 import {
   AUTH_SESSION_REPOSITORY,
   type AuthSessionRepositoryPort,
-} from '../ports/auth-session.repository.port';
+} from "../ports/auth-session.repository.port";
 import {
   AUTH_TOKEN_PROVIDER,
   type AuthTokenProviderPort,
   type TokenPayload,
-} from '../ports/auth-token.provider.port';
+} from "../ports/auth-token.provider.port";
 
 /** CAS retries for grace-path rotation racing other refreshes. */
 const GRACE_ROTATION_MAX_ATTEMPTS = 3;
@@ -44,22 +44,16 @@ export class RefreshSessionUseCase {
   async execute(input: RefreshSessionCommand, requestContext?: RequestContext) {
     let payload: TokenPayload;
     try {
-      payload = await this.tokenProvider.verifyToken(
-        input.refreshToken,
-        'refresh',
-      );
+      payload = await this.tokenProvider.verifyToken(input.refreshToken, "refresh");
     } catch {
       throw new AppError(
         ERROR_CODES.AUTH_UNAUTHORIZED,
-        'Token is invalid or expired',
+        "Token is invalid or expired",
         HttpStatus.UNAUTHORIZED,
       );
     }
 
-    const session = await this.authSessionRepository.findSessionForUser(
-      payload.sid,
-      payload.sub,
-    );
+    const session = await this.authSessionRepository.findSessionForUser(payload.sid, payload.sub);
 
     assertSessionUsable(session);
 
@@ -67,50 +61,46 @@ export class RefreshSessionUseCase {
       await this.authSessionRepository.revokeSession(session.id);
       throw new AppError(
         ERROR_CODES.AUTH_SESSION_EXPIRED,
-        'Session has expired',
+        "Session has expired",
         HttpStatus.UNAUTHORIZED,
       );
     }
 
     const decision = await this.resolveAttempt(session, input.refreshToken);
 
-    if (decision.action === 'reuse') {
+    if (decision.action === "reuse") {
       await this.authSessionRepository.revokeSession(session.id);
       throw new AppError(
         ERROR_CODES.AUTH_REFRESH_TOKEN_REUSED,
-        'Refresh token reuse detected',
+        "Refresh token reuse detected",
         HttpStatus.UNAUTHORIZED,
       );
     }
 
     const user = await this.usersRepository.findById(session.userId);
 
-    if (user?.status !== 'ACTIVE') {
+    if (user?.status !== "ACTIVE") {
       await this.authSessionRepository.revokeSession(session.id);
       throw new AppError(
         ERROR_CODES.AUTH_FORBIDDEN,
-        'The account is not active',
+        "The account is not active",
         HttpStatus.FORBIDDEN,
       );
     }
 
-    const organizationId =
-      await this.organizationsService.resolveOrganizationIdForUser(
-        user.id,
-        payload.oid,
-      );
-
-    const accessProfile = await this.accessControlService.getAccessProfile(
+    const organizationId = await this.organizationsService.resolveOrganizationIdForUser(
       user.id,
-      organizationId,
+      payload.oid,
     );
+
+    const accessProfile = await this.accessControlService.getAccessProfile(user.id, organizationId);
     const metadata = {
       ipAddress: requestContext?.ipAddress ?? null,
       userAgent: requestContext?.userAgent ?? null,
     };
 
     const refreshedSession =
-      decision.action === 'rotate'
+      decision.action === "rotate"
         ? await this.rotateWithStrictFallback(
             session.id,
             session.refreshTokenHash,
@@ -134,10 +124,7 @@ export class RefreshSessionUseCase {
       user: this.authMapper.toUserView(user, accessProfile.roles),
       permissions: accessProfile.permissions,
       organizationId,
-      session: this.authMapper.toSessionDto(
-        refreshedSession.session,
-        refreshedSession.session.id,
-      ),
+      session: this.authMapper.toSessionDto(refreshedSession.session, refreshedSession.session.id),
     };
   }
 
@@ -149,16 +136,10 @@ export class RefreshSessionUseCase {
     },
     refreshToken: string,
   ) {
-    const matchesCurrent = await verifyRefreshTokenHash(
-      session.refreshTokenHash,
-      refreshToken,
-    );
+    const matchesCurrent = await verifyRefreshTokenHash(session.refreshTokenHash, refreshToken);
     const matchesPrevious =
       !matchesCurrent && session.previousRefreshTokenHash
-        ? await verifyRefreshTokenHash(
-            session.previousRefreshTokenHash,
-            refreshToken,
-          )
+        ? await verifyRefreshTokenHash(session.previousRefreshTokenHash, refreshToken)
         : false;
 
     return resolveRefreshAttempt({
@@ -196,26 +177,23 @@ export class RefreshSessionUseCase {
 
     // CAS miss — another request rotated first. Re-read session and classify
     // the caller's token against the new state.
-    const fresh = await this.authSessionRepository.findSessionForUser(
-      sessionId,
-      userId,
-    );
+    const fresh = await this.authSessionRepository.findSessionForUser(sessionId, userId);
 
     if (!fresh || fresh.revokedAt) {
       throw new AppError(
         ERROR_CODES.AUTH_SESSION_REVOKED,
-        'Session has been revoked',
+        "Session has been revoked",
         HttpStatus.UNAUTHORIZED,
       );
     }
 
     const fallbackDecision = await this.resolveAttempt(fresh, refreshToken);
 
-    if (fallbackDecision.action === 'reuse') {
+    if (fallbackDecision.action === "reuse") {
       await this.authSessionRepository.revokeSession(sessionId);
       throw new AppError(
         ERROR_CODES.AUTH_REFRESH_TOKEN_REUSED,
-        'Refresh token reuse detected',
+        "Refresh token reuse detected",
         HttpStatus.UNAUTHORIZED,
       );
     }
@@ -261,10 +239,7 @@ export class RefreshSessionUseCase {
         return rotated;
       }
 
-      const fresh = await this.authSessionRepository.findSessionForUser(
-        sessionId,
-        userId,
-      );
+      const fresh = await this.authSessionRepository.findSessionForUser(sessionId, userId);
 
       if (!fresh || fresh.revokedAt) {
         break;
@@ -272,7 +247,7 @@ export class RefreshSessionUseCase {
 
       const decision = await this.resolveAttempt(fresh, refreshToken);
 
-      if (decision.action === 'reuse') {
+      if (decision.action === "reuse") {
         break;
       }
 
@@ -282,7 +257,7 @@ export class RefreshSessionUseCase {
     await this.authSessionRepository.revokeSession(sessionId);
     throw new AppError(
       ERROR_CODES.AUTH_REFRESH_TOKEN_REUSED,
-      'Refresh token reuse detected',
+      "Refresh token reuse detected",
       HttpStatus.UNAUTHORIZED,
     );
   }

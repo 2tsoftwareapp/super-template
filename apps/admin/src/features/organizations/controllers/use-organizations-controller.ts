@@ -8,9 +8,7 @@ import { toast } from "sonner";
 import type { CreateOrganizationForm } from "@/features/organizations/model/organizations.schemas";
 import type { OrganizationsListViewModel } from "@/features/organizations/model/organizations.types";
 
-import {
-  useCreateOrganizationMutation,
-} from "@/features/organizations/api/organizations.mutations";
+import { useCreateOrganizationMutation } from "@/features/organizations/api/organizations.mutations";
 import { organizationsKeys } from "@/features/organizations/api/organizations.query-keys";
 import { useOrganizationsQuery } from "@/hooks/use-organizations-lookup";
 import { useRouter } from "@/i18n/navigation";

@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable } from "@nestjs/common";
 
-import type { UserPreferencesRecord } from './ports/preferences.repository.port';
+import type { UserPreferencesRecord } from "./ports/preferences.repository.port";
 
 @Injectable()
 export class PreferencesMapper {

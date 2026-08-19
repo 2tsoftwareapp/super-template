@@ -1,10 +1,4 @@
-import {
-  ACTION,
-  FILE_KIND,
-  FILE_VISIBILITY,
-  perm,
-  ROLE_NAMES,
-} from '@repo/api-core';
+import { ACTION, FILE_KIND, FILE_VISIBILITY, perm, ROLE_NAMES } from "@repo/api-core";
 
 export interface FileAccessActor {
   userId: string;
@@ -29,32 +23,20 @@ export interface FileAccessSubject {
  *   3. Otherwise: uploader, ADMIN, or SUPER_ADMIN.
  * Trace: file-access service / list ACL alignment.
  */
-export function canAccessFile(input: {
-  actor: FileAccessActor;
-  file: FileAccessSubject;
-}): boolean {
+export function canAccessFile(input: { actor: FileAccessActor; file: FileAccessSubject }): boolean {
   const { actor, file } = input;
   const isSuperAdmin = actor.roles.includes(ROLE_NAMES.SUPER_ADMIN);
-  const isAdmin =
-    actor.roles.includes(ROLE_NAMES.ADMIN) || isSuperAdmin;
+  const isAdmin = actor.roles.includes(ROLE_NAMES.ADMIN) || isSuperAdmin;
 
   if (file.organizationId !== actor.organizationId && !isSuperAdmin) {
     return false;
   }
 
-  if (
-    file.kind === FILE_KIND.AUDIT_EXPORT ||
-    file.visibility === FILE_VISIBILITY.RESTRICTED
-  ) {
-    return (
-      isSuperAdmin ||
-      actor.permissions.includes(perm('audit', ACTION.READ))
-    );
+  if (file.kind === FILE_KIND.AUDIT_EXPORT || file.visibility === FILE_VISIBILITY.RESTRICTED) {
+    return isSuperAdmin || actor.permissions.includes(perm("audit", ACTION.READ));
   }
 
-  return (
-    file.uploadedById === actor.userId || isAdmin
-  );
+  return file.uploadedById === actor.userId || isAdmin;
 }
 
 /** List-query scope that mirrors `canAccessFile` for bulk listing. */
@@ -64,17 +46,12 @@ export function listFilesAccessScope(actor: FileAccessActor): {
   excludeVisibilities?: string[];
 } {
   const isSuperAdmin = actor.roles.includes(ROLE_NAMES.SUPER_ADMIN);
-  const isAdmin =
-    actor.roles.includes(ROLE_NAMES.ADMIN) || isSuperAdmin;
-  const hasAuditAccess =
-    isSuperAdmin ||
-    actor.permissions.includes(perm('audit', ACTION.READ));
+  const isAdmin = actor.roles.includes(ROLE_NAMES.ADMIN) || isSuperAdmin;
+  const hasAuditAccess = isSuperAdmin || actor.permissions.includes(perm("audit", ACTION.READ));
 
   return {
     ...(!isSuperAdmin ? { excludeKinds: [FILE_KIND.AUDIT_EXPORT] } : {}),
-    ...(!hasAuditAccess
-      ? { excludeVisibilities: [FILE_VISIBILITY.RESTRICTED] }
-      : {}),
+    ...(!hasAuditAccess ? { excludeVisibilities: [FILE_VISIBILITY.RESTRICTED] } : {}),
     ...(!isAdmin ? { uploadedById: actor.userId } : {}),
   };
 }

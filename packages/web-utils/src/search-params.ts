@@ -1,6 +1,4 @@
-import type {
-  inferParserType
-} from "nuqs/server";
+import type { inferParserType } from "nuqs/server";
 
 import { bffPath } from "@repo/api-contract";
 import {
@@ -21,8 +19,7 @@ interface SelectOption<T extends string | number | boolean> {
   value: T;
 }
 
-const normalizeQueryString = (query: string) =>
-  query.startsWith("?") ? query.slice(1) : query;
+const normalizeQueryString = (query: string) => (query.startsWith("?") ? query.slice(1) : query);
 
 const withQuery = (path: string, query: string) => {
   const normalizedQuery = normalizeQueryString(query);
@@ -106,25 +103,20 @@ const auditLogsSerializer = createSerializer(auditLogsSearchParams);
 const sessionsSerializer = createSerializer(sessionsSearchParams);
 
 export type UsersSearchState = inferParserType<typeof usersSearchParams>;
-export type NotificationsSearchState = inferParserType<
-  typeof notificationsSearchParams
->;
-export type AuditLogsSearchState = inferParserType<
-  typeof auditLogsSearchParams
->;
+export type NotificationsSearchState = inferParserType<typeof notificationsSearchParams>;
+export type AuditLogsSearchState = inferParserType<typeof auditLogsSearchParams>;
 export type SessionsSearchState = inferParserType<typeof sessionsSearchParams>;
-export const defaultUsersSearch: UsersSearchState = loadUsersSearchParams(
+export const defaultUsersSearch: UsersSearchState = loadUsersSearchParams(new URLSearchParams());
+export const defaultNotificationsSearch: NotificationsSearchState = loadNotificationsSearchParams(
   new URLSearchParams(),
 );
-export const defaultNotificationsSearch: NotificationsSearchState =
-  loadNotificationsSearchParams(new URLSearchParams());
-export const defaultAuditLogsSearch: AuditLogsSearchState =
-  loadAuditLogsSearchParams(new URLSearchParams());
-export const defaultSessionsSearch: SessionsSearchState =
-  loadSessionsSearchParams(new URLSearchParams());
-const mergeUsersSearch = (
-  overrides: Partial<UsersSearchState> = {},
-): UsersSearchState => ({
+export const defaultAuditLogsSearch: AuditLogsSearchState = loadAuditLogsSearchParams(
+  new URLSearchParams(),
+);
+export const defaultSessionsSearch: SessionsSearchState = loadSessionsSearchParams(
+  new URLSearchParams(),
+);
+const mergeUsersSearch = (overrides: Partial<UsersSearchState> = {}): UsersSearchState => ({
   ...defaultUsersSearch,
   ...overrides,
 });
@@ -188,8 +180,7 @@ export const serializeSessionsSearch = (state: SessionsSearchState) =>
     limit: state.limit,
   });
 
-export const normalizeUsersSearch = (input: SyncLoaderInput) =>
-  loadUsersSearchParams(input);
+export const normalizeUsersSearch = (input: SyncLoaderInput) => loadUsersSearchParams(input);
 
 export const normalizeNotificationsSearch = (input: SyncLoaderInput) =>
   loadNotificationsSearchParams(input);
@@ -197,50 +188,32 @@ export const normalizeNotificationsSearch = (input: SyncLoaderInput) =>
 export const normalizeAuditLogsSearch = (input: SyncLoaderInput) =>
   loadAuditLogsSearchParams(input);
 
-export const normalizeSessionsSearch = (input: SyncLoaderInput) =>
-  loadSessionsSearchParams(input);
+export const normalizeSessionsSearch = (input: SyncLoaderInput) => loadSessionsSearchParams(input);
 
-export const buildAdminUsersListPath = (
-  overrides: Partial<UsersSearchState> = {},
-) =>
-  withQuery(
-    bffPath("/api/v1/admin/users"),
-    serializeUsersSearch(mergeUsersSearch(overrides)),
-  );
+export const buildAdminUsersListPath = (overrides: Partial<UsersSearchState> = {}) =>
+  withQuery(bffPath("/api/v1/admin/users"), serializeUsersSearch(mergeUsersSearch(overrides)));
 
-export const buildNotificationsListPath = (
-  overrides: Partial<NotificationsSearchState> = {},
-) =>
+export const buildNotificationsListPath = (overrides: Partial<NotificationsSearchState> = {}) =>
   withQuery(
     bffPath("/api/v1/notifications"),
     serializeNotificationsSearch(mergeNotificationsSearch(overrides)),
   );
 
-export const buildAuditLogsListPath = (
-  overrides: Partial<AuditLogsSearchState> = {},
-) =>
+export const buildAuditLogsListPath = (overrides: Partial<AuditLogsSearchState> = {}) =>
   withQuery(
     bffPath("/api/v1/admin/audit-logs"),
     serializeAuditLogsSearch(mergeAuditLogsSearch(overrides)),
   );
 
-export const buildSessionsListPath = (
-  overrides: Partial<SessionsSearchState> = {},
-) =>
+export const buildSessionsListPath = (overrides: Partial<SessionsSearchState> = {}) =>
   withQuery(
     bffPath("/api/v1/auth/sessions"),
     serializeSessionsSearch(mergeSessionsSearch(overrides)),
   );
 
-export const normalizeBffListPath = (
-  path: string,
-  searchParams: URLSearchParams,
-) => {
+export const normalizeBffListPath = (path: string, searchParams: URLSearchParams) => {
   if (path === "admin/users") {
-    return withQuery(
-      path,
-      serializeUsersSearch(normalizeUsersSearch(searchParams)),
-    );
+    return withQuery(path, serializeUsersSearch(normalizeUsersSearch(searchParams)));
   }
 
   if (path === "notifications") {
@@ -251,17 +224,11 @@ export const normalizeBffListPath = (
   }
 
   if (path === "admin/audit-logs") {
-    return withQuery(
-      path,
-      serializeAuditLogsSearch(normalizeAuditLogsSearch(searchParams)),
-    );
+    return withQuery(path, serializeAuditLogsSearch(normalizeAuditLogsSearch(searchParams)));
   }
 
   if (path === "auth/sessions") {
-    return withQuery(
-      path,
-      serializeSessionsSearch(normalizeSessionsSearch(searchParams)),
-    );
+    return withQuery(path, serializeSessionsSearch(normalizeSessionsSearch(searchParams)));
   }
 
   return withQuery(path, searchParams.toString());

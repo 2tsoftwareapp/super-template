@@ -2,10 +2,7 @@ import type { AuthLoginResponse } from "@/lib/api-types";
 
 import { hasAdminAppAccess } from "@/lib/admin-resources";
 
-import {
-  AUTH_FLOW_ERROR_CODES,
-  AUTH_FLOW_RESULTS,
-} from "./auth.constants";
+import { AUTH_FLOW_ERROR_CODES, AUTH_FLOW_RESULTS } from "./auth.constants";
 import { AuthFlowError } from "./auth.errors";
 
 /**
@@ -39,9 +36,7 @@ export type AdminLoginFlowResult =
  * SECURITY: hasAdminAppAccess here only drives UX (logout + message). Every
  * admin BFF route must still authorize independently.
  */
-export function resolveAdminLoginResult(
-  response: AuthLoginResponse,
-): AdminLoginFlowResult {
+export function resolveAdminLoginResult(response: AuthLoginResponse): AdminLoginFlowResult {
   // Step 1: MFA challenge
   if (response.data.mfaRequired) {
     if (!response.data.mfaToken) {

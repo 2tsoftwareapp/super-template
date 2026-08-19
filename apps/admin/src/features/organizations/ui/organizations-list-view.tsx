@@ -129,9 +129,7 @@ export function OrganizationsListView(vm: OrganizationsListViewModel) {
                       </div>
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="font-medium text-sm text-foreground">
-                            {org.name}
-                          </span>
+                          <span className="font-medium text-sm text-foreground">{org.name}</span>
                         </div>
                         <div className="flex items-center gap-2 mt-0.5 text-xs text-muted-foreground">
                           <span className="font-mono bg-muted/65 px-1.5 py-0.5 rounded border border-border">

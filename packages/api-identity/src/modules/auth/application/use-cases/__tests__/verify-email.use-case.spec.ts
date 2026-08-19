@@ -1,20 +1,18 @@
-import { describe, expect, it, vi } from 'vitest';
-import { ERROR_CODES } from '@repo/api-core';
+import { describe, expect, it, vi } from "vitest";
+import { ERROR_CODES } from "@repo/api-core";
 
-import { VerifyEmailUseCase } from '../verify-email.use-case';
+import { VerifyEmailUseCase } from "../verify-email.use-case";
 
 function buildDependencies() {
   const transactionPort = {
-    run: vi.fn().mockImplementation(async (fn: (tx: unknown) => unknown) =>
-      fn(null),
-    ),
+    run: vi.fn().mockImplementation(async (fn: (tx: unknown) => unknown) => fn(null)),
   };
 
   const usersRepository = {
-    update: vi.fn(async () => ({ id: 'user-1', status: 'ACTIVE' })),
+    update: vi.fn(async () => ({ id: "user-1", status: "ACTIVE" })),
     findById: vi.fn(async () => ({
-      id: 'user-1',
-      status: 'ACTIVE',
+      id: "user-1",
+      status: "ACTIVE",
       emailVerifiedAt: new Date(),
     })),
   };
@@ -41,36 +39,33 @@ function buildDependencies() {
   return { useCase, authSessionRepository, usersRepository, auditWriter };
 }
 
-describe('VerifyEmailUseCase', () => {
-  it('rejects an invalid or expired verification token', async () => {
+describe("VerifyEmailUseCase", () => {
+  it("rejects an invalid or expired verification token", async () => {
     const { useCase, authSessionRepository } = buildDependencies();
-    authSessionRepository.findValidEmailVerificationToken.mockResolvedValueOnce(
-      null,
-    );
+    authSessionRepository.findValidEmailVerificationToken.mockResolvedValueOnce(null);
 
-    await expect(
-      useCase.execute({ token: 'bad-token' }),
-    ).rejects.toMatchObject({ code: ERROR_CODES.AUTH_UNAUTHORIZED });
+    await expect(useCase.execute({ token: "bad-token" })).rejects.toMatchObject({
+      code: ERROR_CODES.AUTH_UNAUTHORIZED,
+    });
   });
 
-  it('activates the user, consumes the token, and audits on success', async () => {
-    const { useCase, authSessionRepository, usersRepository, auditWriter } =
-      buildDependencies();
+  it("activates the user, consumes the token, and audits on success", async () => {
+    const { useCase, authSessionRepository, usersRepository, auditWriter } = buildDependencies();
     authSessionRepository.findValidEmailVerificationToken.mockResolvedValueOnce({
-      id: 'token-1',
-      userId: 'user-1',
+      id: "token-1",
+      userId: "user-1",
       expiresAt: new Date(),
     });
 
-    await useCase.execute({ token: 'valid-token' });
+    await useCase.execute({ token: "valid-token" });
 
     expect(usersRepository.update).toHaveBeenCalledWith(
-      'user-1',
-      expect.objectContaining({ status: 'ACTIVE' }),
+      "user-1",
+      expect.objectContaining({ status: "ACTIVE" }),
       null,
     );
     expect(auditWriter.log).toHaveBeenCalledWith(
-      expect.objectContaining({ action: 'auth.email_verified' }),
+      expect.objectContaining({ action: "auth.email_verified" }),
       null,
     );
   });

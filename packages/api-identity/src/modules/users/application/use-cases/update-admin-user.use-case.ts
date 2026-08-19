@@ -1,28 +1,21 @@
-import type {
-  AuthenticatedRequestUser,
-  RequestContext,
-} from '@repo/api-core';
+import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-core";
 
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { 
+import { HttpStatus, Inject, Injectable } from "@nestjs/common";
+import {
   AppError,
   AUDIT_WRITER,
   type AuditWriter,
   ERROR_CODES,
   normalizeEmail,
   SYSTEM_SCOPE,
-} from '@repo/api-core';
+} from "@repo/api-core";
 
-import type { UpdateAdminUserCommand, UserView } from '../users.types';
+import type { UpdateAdminUserCommand, UserView } from "../users.types";
 
-import { ROLE_NAMES } from '../../../access-control/access-control.constants';
-import { AccessControlService } from '../../../access-control/application/access-control.service';
-import { assertUserBelongsToOrganization } from '../../domain/user-org-scope.policy';
-import {
-  USERS_REPOSITORY,
-  type UsersRepositoryPort,
-} from '../ports/users.repository.port';
-import { GetUserUseCase } from './get-user.use-case';
+import { AccessControlService, ROLE_NAMES } from "../../../access-control";
+import { assertUserBelongsToOrganization } from "../../domain/user-org-scope.policy";
+import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";
+import { GetUserUseCase } from "./get-user.use-case";
 
 @Injectable()
 export class UpdateAdminUserUseCase {
@@ -50,11 +43,7 @@ export class UpdateAdminUserUseCase {
     const user = await this.usersRepository.findById(userId);
 
     if (!user) {
-      throw new AppError(
-        ERROR_CODES.USER_NOT_FOUND,
-        'User not found',
-        HttpStatus.NOT_FOUND,
-      );
+      throw new AppError(ERROR_CODES.USER_NOT_FOUND, "User not found", HttpStatus.NOT_FOUND);
     }
 
     // Org-scoped roles (e.g. an organization ADMIN) are invisible to
@@ -62,21 +51,16 @@ export class UpdateAdminUserUseCase {
     // privileged-account check below would otherwise silently miss them.
     const targetProfile = await this.accessControlService.getAccessProfile(
       userId,
-      actor.roles.includes(ROLE_NAMES.SUPER_ADMIN)
-        ? null
-        : (actor.organizationId ?? null),
+      actor.roles.includes(ROLE_NAMES.SUPER_ADMIN) ? null : (actor.organizationId ?? null),
     );
-    this.accessControlService.assertCanManageUserAccount(
-      actor,
-      targetProfile.roles,
-    );
+    this.accessControlService.assertCanManageUserAccount(actor, targetProfile.roles);
 
     if (input.email) {
       const existingUser = await this.usersRepository.findByEmail(normalizeEmail(input.email));
       if (existingUser && existingUser.id !== userId) {
         throw new AppError(
           ERROR_CODES.USER_EMAIL_ALREADY_EXISTS,
-          'A user with this email already exists',
+          "A user with this email already exists",
           HttpStatus.CONFLICT,
         );
       }
@@ -85,17 +69,18 @@ export class UpdateAdminUserUseCase {
     const updated = await this.usersRepository.update(userId, {
       email: input.email ? normalizeEmail(input.email) : user.email,
       displayName: input.displayName ?? user.displayName,
-      avatarUrl:
-        input.avatarUrl === undefined ? user.avatarUrl : input.avatarUrl,
+      avatarUrl: input.avatarUrl === undefined ? user.avatarUrl : input.avatarUrl,
     });
 
     await this.auditWriter.log({
       actorId: actor.userId,
-      action: 'admin.user.updated',
-      entityType: 'user',
+      action: "admin.user.updated",
+      entityType: "user",
       entityId: userId,
       requestContext,
-        ...(actor.organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: actor.organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
+      ...(actor.organizationId
+        ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: actor.organizationId }
+        : { scope: SYSTEM_SCOPE.PLATFORM }),
     });
 
     return this.getUserUseCase.execute(updated?.id ?? userId, actor);

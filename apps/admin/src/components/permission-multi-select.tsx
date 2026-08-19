@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@repo/web-ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@repo/web-ui/popover";
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 
@@ -39,9 +35,7 @@ export function PermissionMultiSelect({
           )}
         >
           <span className="truncate">
-            {selected.length === 0
-              ? "Select permissions…"
-              : `${selected.length} selected`}
+            {selected.length === 0 ? "Select permissions…" : `${selected.length} selected`}
           </span>
           <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
         </PopoverTrigger>
@@ -54,11 +48,7 @@ export function PermissionMultiSelect({
                   key={p.id}
                   type="button"
                   onClick={() =>
-                    onChange(
-                      isSelected
-                        ? selected.filter((s) => s !== p.id)
-                        : [...selected, p.id],
-                    )
+                    onChange(isSelected ? selected.filter((s) => s !== p.id) : [...selected, p.id])
                   }
                   className={cn(
                     "flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm transition-colors hover:bg-accent",

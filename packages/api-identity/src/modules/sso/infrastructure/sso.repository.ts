@@ -1,26 +1,23 @@
-import type { DatabaseExecutor } from '@repo/api-database';
+import type { DatabaseExecutor } from "@repo/api-database";
 
-import { Inject, Injectable } from '@nestjs/common';
-import { EnvironmentService } from '@repo/api-core';
+import { Inject, Injectable } from "@nestjs/common";
+import { EnvironmentService } from "@repo/api-core";
 import {
   DATABASE,
   type DatabaseClient,
   externalIdentities,
   ssoLoginStates,
   ssoSessionExchanges,
-} from '@repo/api-database';
-import { and, eq, gt, isNull } from 'drizzle-orm';
+} from "@repo/api-database";
+import { and, eq, gt, isNull } from "drizzle-orm";
 
 import type {
   SsoLoginStateRecord,
   SsoRepositoryPort,
   SsoSessionExchangeRecord,
-} from '../application/ports/sso.repository.port';
+} from "../application/ports/sso.repository.port";
 
-import {
-  decryptTotpSecret,
-  encryptTotpSecret,
-} from '../../mfa/domain/totp-encryption';
+import { decryptTotpSecret, encryptTotpSecret } from "../../mfa";
 
 /**
  * Drizzle SSO repository.
@@ -47,7 +44,7 @@ export class SsoRepository implements SsoRepositoryPort {
     executor: DatabaseExecutor = this.database,
   ): Promise<SsoLoginStateRecord | null> {
     const encrypted = encryptTotpSecret(
-      Buffer.from(values.codeVerifier, 'utf8'),
+      Buffer.from(values.codeVerifier, "utf8"),
       this.encryptionKey(),
     );
 
@@ -99,9 +96,7 @@ export class SsoRepository implements SsoRepositoryPort {
     const updated = await executor
       .update(ssoLoginStates)
       .set({ consumedAt: new Date() })
-      .where(
-        and(eq(ssoLoginStates.id, id), isNull(ssoLoginStates.consumedAt)),
-      )
+      .where(and(eq(ssoLoginStates.id, id), isNull(ssoLoginStates.consumedAt)))
       .returning({ id: ssoLoginStates.id });
 
     return updated.length > 0;
@@ -116,10 +111,7 @@ export class SsoRepository implements SsoRepositoryPort {
     },
     executor: DatabaseExecutor = this.database,
   ): Promise<SsoSessionExchangeRecord | null> {
-    const [exchange] = await executor
-      .insert(ssoSessionExchanges)
-      .values(values)
-      .returning();
+    const [exchange] = await executor.insert(ssoSessionExchanges).values(values).returning();
 
     return exchange ?? null;
   }
@@ -155,12 +147,7 @@ export class SsoRepository implements SsoRepositoryPort {
     const updated = await executor
       .update(ssoSessionExchanges)
       .set({ consumedAt: new Date() })
-      .where(
-        and(
-          eq(ssoSessionExchanges.id, id),
-          isNull(ssoSessionExchanges.consumedAt),
-        ),
-      )
+      .where(and(eq(ssoSessionExchanges.id, id), isNull(ssoSessionExchanges.consumedAt)))
       .returning({ id: ssoSessionExchanges.id });
 
     return updated.length > 0;
@@ -189,10 +176,7 @@ export class SsoRepository implements SsoRepositoryPort {
     values: typeof externalIdentities.$inferInsert,
     executor: DatabaseExecutor = this.database,
   ) {
-    const [identity] = await executor
-      .insert(externalIdentities)
-      .values(values)
-      .returning();
+    const [identity] = await executor.insert(externalIdentities).values(values).returning();
 
     return identity ?? null;
   }
@@ -201,9 +185,7 @@ export class SsoRepository implements SsoRepositoryPort {
     return this.environmentService.values.MFA_ENCRYPTION_KEY;
   }
 
-  private toLoginStateRecord(
-    state: typeof ssoLoginStates.$inferSelect,
-  ): SsoLoginStateRecord {
+  private toLoginStateRecord(state: typeof ssoLoginStates.$inferSelect): SsoLoginStateRecord {
     const codeVerifier = decryptTotpSecret(
       {
         ciphertext: state.codeVerifierCiphertext,
@@ -211,7 +193,7 @@ export class SsoRepository implements SsoRepositoryPort {
         authTag: state.codeVerifierAuthTag,
       },
       this.encryptionKey(),
-    ).toString('utf8');
+    ).toString("utf8");
 
     return {
       id: state.id,

@@ -1,19 +1,16 @@
-import type {
-  DatabaseClient,
-  DatabaseExecutor,
-} from '@repo/api-database';
+import type { DatabaseClient, DatabaseExecutor } from "@repo/api-database";
 
-import { Inject, Injectable } from '@nestjs/common';
-import { DATABASE, runIdempotentInsert } from '@repo/api-database';
-import { notificationJobs } from '@repo/api-database';
-import { and, count, desc, eq, inArray, sql } from 'drizzle-orm';
+import { Inject, Injectable } from "@nestjs/common";
+import { DATABASE, runIdempotentInsert } from "@repo/api-database";
+import { notificationJobs } from "@repo/api-database";
+import { and, count, desc, eq, inArray, sql } from "drizzle-orm";
 
-import type { NotificationJobsRepositoryPort } from '../application/ports/notification-jobs.repository.port';
+import type { NotificationJobsRepositoryPort } from "../application/ports/notification-jobs.repository.port";
 
 interface ListJobsParams {
   page: number;
   limit: number;
-  status?: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'CANCELLED' | 'FAILED';
+  status?: "PENDING" | "PROCESSING" | "COMPLETED" | "CANCELLED" | "FAILED";
   organizationId?: string;
 }
 
@@ -25,10 +22,7 @@ export class NotificationJobsRepository implements NotificationJobsRepositoryPor
     values: typeof notificationJobs.$inferInsert,
     executor: DatabaseExecutor = this.database,
   ) {
-    const [job] = await executor
-      .insert(notificationJobs)
-      .values(values)
-      .returning();
+    const [job] = await executor.insert(notificationJobs).values(values).returning();
 
     return job ?? null;
   }
@@ -42,10 +36,7 @@ export class NotificationJobsRepository implements NotificationJobsRepositoryPor
   ) {
     return runIdempotentInsert(
       async () => {
-        const [inserted] = await executor
-          .insert(notificationJobs)
-          .values(values)
-          .returning();
+        const [inserted] = await executor.insert(notificationJobs).values(values).returning();
 
         return inserted ?? undefined;
       },
@@ -90,10 +81,7 @@ export class NotificationJobsRepository implements NotificationJobsRepositoryPor
     return job ?? null;
   }
 
-  async list(
-    params: ListJobsParams,
-    executor: DatabaseExecutor = this.database,
-  ) {
+  async list(params: ListJobsParams, executor: DatabaseExecutor = this.database) {
     const filters = [];
 
     if (params.status) {
@@ -115,10 +103,7 @@ export class NotificationJobsRepository implements NotificationJobsRepositoryPor
         .orderBy(desc(notificationJobs.scheduledAt))
         .limit(params.limit)
         .offset(offset),
-      executor
-        .select({ total: count() })
-        .from(notificationJobs)
-        .where(whereClause),
+      executor.select({ total: count() }).from(notificationJobs).where(whereClause),
     ]);
 
     return {
@@ -155,29 +140,17 @@ export class NotificationJobsRepository implements NotificationJobsRepositoryPor
     }
 
     const ids = claimed.rows.map((r) => r.id);
-    return executor
-      .select()
-      .from(notificationJobs)
-      .where(inArray(notificationJobs.id, ids));
+    return executor.select().from(notificationJobs).where(inArray(notificationJobs.id, ids));
   }
 
-
-  async markProcessing(
-    jobId: string,
-    executor: DatabaseExecutor = this.database,
-  ) {
+  async markProcessing(jobId: string, executor: DatabaseExecutor = this.database) {
     const [job] = await executor
       .update(notificationJobs)
       .set({
-        status: 'PROCESSING',
+        status: "PROCESSING",
         updatedAt: new Date(),
       })
-      .where(
-        and(
-          eq(notificationJobs.id, jobId),
-          eq(notificationJobs.status, 'PENDING'),
-        ),
-      )
+      .where(and(eq(notificationJobs.id, jobId), eq(notificationJobs.status, "PENDING")))
       .returning();
 
     return job ?? null;
@@ -192,7 +165,7 @@ export class NotificationJobsRepository implements NotificationJobsRepositoryPor
     const [job] = await executor
       .update(notificationJobs)
       .set({
-        status: 'COMPLETED',
+        status: "COMPLETED",
         recipientCount,
         processedAt: new Date(),
         updatedAt: new Date(),
@@ -200,7 +173,7 @@ export class NotificationJobsRepository implements NotificationJobsRepositoryPor
       .where(
         and(
           eq(notificationJobs.id, jobId),
-          eq(notificationJobs.status, 'PROCESSING'),
+          eq(notificationJobs.status, "PROCESSING"),
           eq(notificationJobs.attempts, expectedAttempts),
         ),
       )
@@ -218,7 +191,7 @@ export class NotificationJobsRepository implements NotificationJobsRepositoryPor
     const [job] = await executor
       .update(notificationJobs)
       .set({
-        status: 'FAILED',
+        status: "FAILED",
         errorMessage,
         processedAt: new Date(),
         updatedAt: new Date(),
@@ -226,7 +199,7 @@ export class NotificationJobsRepository implements NotificationJobsRepositoryPor
       .where(
         and(
           eq(notificationJobs.id, jobId),
-          eq(notificationJobs.status, 'PROCESSING'),
+          eq(notificationJobs.status, "PROCESSING"),
           eq(notificationJobs.attempts, expectedAttempts),
         ),
       )
@@ -235,22 +208,14 @@ export class NotificationJobsRepository implements NotificationJobsRepositoryPor
     return job ?? null;
   }
 
-  async markCancelled(
-    jobId: string,
-    executor: DatabaseExecutor = this.database,
-  ) {
+  async markCancelled(jobId: string, executor: DatabaseExecutor = this.database) {
     const [job] = await executor
       .update(notificationJobs)
       .set({
-        status: 'CANCELLED',
+        status: "CANCELLED",
         updatedAt: new Date(),
       })
-      .where(
-        and(
-          eq(notificationJobs.id, jobId),
-          eq(notificationJobs.status, 'PENDING'),
-        ),
-      )
+      .where(and(eq(notificationJobs.id, jobId), eq(notificationJobs.status, "PENDING")))
       .returning();
 
     return job ?? null;
@@ -290,7 +255,7 @@ export class NotificationJobsRepository implements NotificationJobsRepositoryPor
     const [retryRows, failRows] = await Promise.all([
       executor
         .update(notificationJobs)
-        .set({ status: 'PENDING', updatedAt: new Date() })
+        .set({ status: "PENDING", updatedAt: new Date() })
         .where(
           and(
             inArray(notificationJobs.id, ids),
@@ -301,8 +266,8 @@ export class NotificationJobsRepository implements NotificationJobsRepositoryPor
       executor
         .update(notificationJobs)
         .set({
-          status: 'FAILED',
-          errorMessage: 'Max attempts exceeded during stale recovery',
+          status: "FAILED",
+          errorMessage: "Max attempts exceeded during stale recovery",
           processedAt: new Date(),
           updatedAt: new Date(),
         })

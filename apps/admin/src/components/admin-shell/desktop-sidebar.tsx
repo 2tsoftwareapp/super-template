@@ -56,11 +56,7 @@ export function DesktopSidebar({
         ) : null}
       </div>
 
-      <ResourceNav
-        collapsed={collapsed}
-        permissions={permissions}
-        pathname={pathname}
-      />
+      <ResourceNav collapsed={collapsed} permissions={permissions} pathname={pathname} />
 
       {collapsed ? (
         <div className="flex justify-center border-t border-border/40 py-2">

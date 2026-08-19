@@ -1,18 +1,15 @@
-import type { AuthenticatedRequestUser } from '@repo/api-core';
+import type { AuthenticatedRequestUser } from "@repo/api-core";
 
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { AppError, ERROR_CODES, requireOrganizationId } from '@repo/api-core';
+import { HttpStatus, Inject, Injectable } from "@nestjs/common";
+import { AppError, ERROR_CODES, requireOrganizationId } from "@repo/api-core";
 
-import type {
-  ListNotificationsQuery,
-  NotificationView,
-} from '../notifications.types';
+import type { ListNotificationsQuery, NotificationView } from "../notifications.types";
 
-import { NotificationsMapper } from '../notifications.mapper';
+import { NotificationsMapper } from "../notifications.mapper";
 import {
   NOTIFICATIONS_REPOSITORY,
   type NotificationsRepositoryPort,
-} from '../ports/notifications.repository.port';
+} from "../ports/notifications.repository.port";
 
 @Injectable()
 export class NotificationInboxUseCase {
@@ -22,10 +19,7 @@ export class NotificationInboxUseCase {
     private readonly notificationsMapper: NotificationsMapper,
   ) {}
 
-  async listForUser(
-    user: AuthenticatedRequestUser,
-    query: ListNotificationsQuery,
-  ) {
+  async listForUser(user: AuthenticatedRequestUser, query: ListNotificationsQuery) {
     // Scope inbox strictly to the active organization — tenant isolation (T-002/T-003)
     const organizationId = requireOrganizationId(user);
     const result = await this.notificationsRepository.listForUser(
@@ -35,9 +29,7 @@ export class NotificationInboxUseCase {
     );
 
     return {
-      rows: result.rows.map((row) =>
-        this.notificationsMapper.toNotificationView(row),
-      ),
+      rows: result.rows.map((row) => this.notificationsMapper.toNotificationView(row)),
       total: result.total,
     };
   }
@@ -54,21 +46,25 @@ export class NotificationInboxUseCase {
     const organizationId = requireOrganizationId(user);
 
     // findById scoped to org+user — prevents cross-tenant read (T-003)
-    const notification =
-      await this.notificationsRepository.findById(notificationId, organizationId);
+    const notification = await this.notificationsRepository.findById(
+      notificationId,
+      organizationId,
+    );
 
     if (notification?.userId !== user.userId) {
       throw new AppError(
         ERROR_CODES.NOTIFICATION_NOT_FOUND,
-        'Notification not found',
+        "Notification not found",
         HttpStatus.NOT_FOUND,
       );
     }
 
-    const updated = await this.notificationsRepository.markRead(notificationId, user.userId, organizationId);
-    return this.notificationsMapper.toNotificationView(
-      updated ?? notification,
+    const updated = await this.notificationsRepository.markRead(
+      notificationId,
+      user.userId,
+      organizationId,
     );
+    return this.notificationsMapper.toNotificationView(updated ?? notification);
   }
 
   async markAllRead(user: AuthenticatedRequestUser) {
@@ -80,13 +76,15 @@ export class NotificationInboxUseCase {
     const organizationId = requireOrganizationId(user);
 
     // findById scoped to org — prevents cross-tenant delete (T-003)
-    const notification =
-      await this.notificationsRepository.findById(notificationId, organizationId);
+    const notification = await this.notificationsRepository.findById(
+      notificationId,
+      organizationId,
+    );
 
     if (notification?.userId !== user.userId) {
       throw new AppError(
         ERROR_CODES.NOTIFICATION_NOT_FOUND,
-        'Notification not found',
+        "Notification not found",
         HttpStatus.NOT_FOUND,
       );
     }

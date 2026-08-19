@@ -1,23 +1,18 @@
-import type { INestApplication } from '@nestjs/common';
+import type { INestApplication } from "@nestjs/common";
 
-import { randomUUID } from 'node:crypto';
+import { randomUUID } from "node:crypto";
 import {
   ACCESS_CONTROL_REPOSITORY,
   type AccessControlRepositoryPort,
-} from '@repo/api-identity/modules/access-control/application/access-control.repository.port';
-import { RoleManagementUseCase } from '@repo/api-identity/modules/access-control/application/use-cases/role-management.use-case';
-import { seedDatabase } from '@repo/api-seed';
-import { Pool } from 'pg';
-import request from 'supertest';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+} from "@repo/api-identity/modules/access-control/application/access-control.repository.port";
+import { RoleManagementUseCase } from "@repo/api-identity/modules/access-control/application/use-cases/role-management.use-case";
+import { seedDatabase } from "@repo/api-seed";
+import { Pool } from "pg";
+import request from "supertest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { applySqlMigrations } from '../src/cli/migrations';
-import {
-  bearer,
-  createTestApp,
-  loginAs,
-  resetTestDatabase,
-} from './support/test-app';
+import { applySqlMigrations } from "../src/cli/migrations";
+import { bearer, createTestApp, loginAs, resetTestDatabase } from "./support/test-app";
 
 interface RoleDto {
   id: string;
@@ -56,17 +51,11 @@ const firstRow = <T>(rows: T[], message: string): T => {
   return row;
 };
 
-const expectPostgresError = async (
-  operation: Promise<unknown>,
-  code: string,
-): Promise<void> => {
+const expectPostgresError = async (operation: Promise<unknown>, code: string): Promise<void> => {
   await expect(operation).rejects.toMatchObject({ code });
 };
 
-const createOrganization = async (
-  pool: Pool,
-  label: string,
-): Promise<string> => {
+const createOrganization = async (pool: Pool, label: string): Promise<string> => {
   const suffix = randomUUID();
   const result = await pool.query<{ id: string }>(
     `
@@ -74,10 +63,10 @@ const createOrganization = async (
       VALUES ($1, $2)
       RETURNING id
     `,
-    [label, `${label.toLowerCase().replaceAll(' ', '-')}-${suffix}`],
+    [label, `${label.toLowerCase().replaceAll(" ", "-")}-${suffix}`],
   );
 
-  return firstRow(result.rows, 'Organization fixture was not created').id;
+  return firstRow(result.rows, "Organization fixture was not created").id;
 };
 
 const createUser = async (pool: Pool, label: string): Promise<string> => {
@@ -88,13 +77,13 @@ const createUser = async (pool: Pool, label: string): Promise<string> => {
       VALUES ($1, $2, $3, 'ACTIVE')
       RETURNING id
     `,
-    [`${label}-${suffix}@example.local`, 'not-used', label],
+    [`${label}-${suffix}@example.local`, "not-used", label],
   );
 
-  return firstRow(result.rows, 'User fixture was not created').id;
+  return firstRow(result.rows, "User fixture was not created").id;
 };
 
-describe('Roles migration and provisioning (e2e)', () => {
+describe("Roles migration and provisioning (e2e)", () => {
   let app: INestApplication;
   let pool: Pool;
   let repository: AccessControlRepositoryPort;
@@ -104,16 +93,13 @@ describe('Roles migration and provisioning (e2e)', () => {
     await resetTestDatabase();
     app = await createTestApp();
 
-    const connectionString =
-      process.env.DATABASE_URL_TEST_ADMIN ?? process.env.DATABASE_URL_TEST;
+    const connectionString = process.env.DATABASE_URL_TEST_ADMIN ?? process.env.DATABASE_URL_TEST;
     if (!connectionString) {
-      throw new Error('A PostgreSQL test connection string is required');
+      throw new Error("A PostgreSQL test connection string is required");
     }
 
     pool = new Pool({ connectionString });
-    repository = app.get<AccessControlRepositoryPort>(
-      ACCESS_CONTROL_REPOSITORY,
-    );
+    repository = app.get<AccessControlRepositoryPort>(ACCESS_CONTROL_REPOSITORY);
     roleManagement = app.get(RoleManagementUseCase);
   }, 120_000);
 
@@ -122,7 +108,7 @@ describe('Roles migration and provisioning (e2e)', () => {
     await pool?.end();
   });
 
-  it('repairs the broken 0033 state through the migration ledger', async () => {
+  it("repairs the broken 0033 state through the migration ledger", async () => {
     const organizationRole = firstRow(
       (
         await pool.query<{ id: string }>(
@@ -135,7 +121,7 @@ describe('Roles migration and provisioning (e2e)', () => {
           `,
         )
       ).rows,
-      'Expected a seeded organization role',
+      "Expected a seeded organization role",
     );
 
     const unknownPermission = firstRow(
@@ -150,12 +136,10 @@ describe('Roles migration and provisioning (e2e)', () => {
           `,
         )
       ).rows,
-      'Unknown permission fixture was not created',
+      "Unknown permission fixture was not created",
     );
 
-    await pool.query(
-      `UPDATE permissions SET scope = 'platform' WHERE name = 'users.read'`,
-    );
+    await pool.query(`UPDATE permissions SET scope = 'platform' WHERE name = 'users.read'`);
     await pool.query(
       `
         INSERT INTO role_permissions (role_id, permission_id)
@@ -179,14 +163,12 @@ describe('Roles migration and provisioning (e2e)', () => {
         FROM permissions
         WHERE name = ANY($1::text[])
       `,
-      [['users.read', 'billing.read']],
+      [["users.read", "billing.read"]],
     );
-    const scopes = Object.fromEntries(
-      scopeRows.rows.map(({ name, scope }) => [name, scope]),
-    );
+    const scopes = Object.fromEntries(scopeRows.rows.map(({ name, scope }) => [name, scope]));
 
-    expect(scopes['users.read']).toBe('organization');
-    expect(scopes['billing.read']).toBe('platform');
+    expect(scopes["users.read"]).toBe("organization");
+    expect(scopes["billing.read"]).toBe("platform");
 
     const invalidGrant = firstRow(
       (
@@ -199,7 +181,7 @@ describe('Roles migration and provisioning (e2e)', () => {
           [organizationRole.id, unknownPermission.id],
         )
       ).rows,
-      'Invalid grant count was not returned',
+      "Invalid grant count was not returned",
     );
     expect(invalidGrant.count).toBe(0);
 
@@ -215,12 +197,12 @@ describe('Roles migration and provisioning (e2e)', () => {
           `,
         )
       ).rows,
-      'Migration ledger result was not returned',
+      "Migration ledger result was not returned",
     );
     expect(ledger.exists).toBe(true);
   }, 120_000);
 
-  it('replays seed data without duplicating roles or permissions', async () => {
+  it("replays seed data without duplicating roles or permissions", async () => {
     const readCounts = async () =>
       firstRow(
         (
@@ -232,7 +214,7 @@ describe('Roles migration and provisioning (e2e)', () => {
             `,
           )
         ).rows,
-        'Seed counts were not returned',
+        "Seed counts were not returned",
       );
 
     const before = await readCounts();
@@ -254,16 +236,10 @@ describe('Roles migration and provisioning (e2e)', () => {
     expect(duplicateSystemRoles.rows).toEqual([]);
   }, 120_000);
 
-  it('enforces the complete user-role scope matrix', async () => {
-    const userId = await createUser(pool, 'trigger-matrix-user');
-    const organizationAId = await createOrganization(
-      pool,
-      'Trigger Matrix Organization A',
-    );
-    const organizationBId = await createOrganization(
-      pool,
-      'Trigger Matrix Organization B',
-    );
+  it("enforces the complete user-role scope matrix", async () => {
+    const userId = await createUser(pool, "trigger-matrix-user");
+    const organizationAId = await createOrganization(pool, "Trigger Matrix Organization A");
+    const organizationBId = await createOrganization(pool, "Trigger Matrix Organization B");
     const suffix = randomUUID().slice(0, 8).toUpperCase();
 
     try {
@@ -278,7 +254,7 @@ describe('Roles migration and provisioning (e2e)', () => {
             [`TRIGGER PLATFORM ${suffix}`],
           )
         ).rows,
-        'Platform role fixture was not created',
+        "Platform role fixture was not created",
       );
       const organizationRole = firstRow(
         (
@@ -296,7 +272,7 @@ describe('Roles migration and provisioning (e2e)', () => {
             [organizationAId, `TRIGGER ORGANIZATION ${suffix}`],
           )
         ).rows,
-        'Organization role fixture was not created',
+        "Organization role fixture was not created",
       );
 
       await pool.query(
@@ -323,7 +299,7 @@ describe('Roles migration and provisioning (e2e)', () => {
           `,
           [userId, platformRole.id, organizationAId],
         ),
-        '23503',
+        "23503",
       );
       await expectPostgresError(
         pool.query(
@@ -334,7 +310,7 @@ describe('Roles migration and provisioning (e2e)', () => {
           `,
           [userId, organizationRole.id],
         ),
-        '23503',
+        "23503",
       );
       await expectPostgresError(
         pool.query(
@@ -345,7 +321,7 @@ describe('Roles migration and provisioning (e2e)', () => {
           `,
           [userId, organizationRole.id, organizationBId],
         ),
-        '23503',
+        "23503",
       );
       await expectPostgresError(
         pool.query(
@@ -355,30 +331,26 @@ describe('Roles migration and provisioning (e2e)', () => {
           `,
           [userId, randomUUID()],
         ),
-        '23503',
+        "23503",
       );
     } finally {
       await pool.query(`DELETE FROM users WHERE id = $1`, [userId]);
-      await pool.query(
-        `DELETE FROM organizations WHERE id = ANY($1::uuid[])`,
-        [[organizationAId, organizationBId]],
-      );
+      await pool.query(`DELETE FROM organizations WHERE id = ANY($1::uuid[])`, [
+        [organizationAId, organizationBId],
+      ]);
     }
   });
 
-  it('resolves one organization system role under concurrent requests', async () => {
-    const organizationId = await createOrganization(
-      pool,
-      'Concurrent System Role Organization',
-    );
-    const userId = await createUser(pool, 'concurrent-system-role-user');
+  it("resolves one organization system role under concurrent requests", async () => {
+    const organizationId = await createOrganization(pool, "Concurrent System Role Organization");
+    const userId = await createUser(pool, "concurrent-system-role-user");
 
     try {
       const resolvedRoles = await Promise.all(
         Array.from({ length: 10 }, () =>
           repository.ensureOrganizationSystemRole(
-            'ADMIN',
-            'Organization administrator role',
+            "ADMIN",
+            "Organization administrator role",
             organizationId,
           ),
         ),
@@ -398,15 +370,9 @@ describe('Roles migration and provisioning (e2e)', () => {
       );
       expect(roleRows.rows).toHaveLength(1);
 
-      await roleManagement.ensureOrganizationAdminRole(
-        organizationId,
-        userId,
-      );
+      await roleManagement.ensureOrganizationAdminRole(organizationId, userId);
 
-      const roleId = firstRow(
-        roleRows.rows,
-        'Organization ADMIN role was not created',
-      ).id;
+      const roleId = firstRow(roleRows.rows, "Organization ADMIN role was not created").id;
       const assignment = firstRow(
         (
           await pool.query<{ count: number }>(
@@ -420,7 +386,7 @@ describe('Roles migration and provisioning (e2e)', () => {
             [userId, roleId, organizationId],
           )
         ).rows,
-        'ADMIN assignment count was not returned',
+        "ADMIN assignment count was not returned",
       );
       expect(assignment.count).toBe(1);
 
@@ -436,30 +402,21 @@ describe('Roles migration and provisioning (e2e)', () => {
             [roleId],
           )
         ).rows,
-        'Platform grant count was not returned',
+        "Platform grant count was not returned",
       );
       expect(platformGrant.count).toBe(0);
     } finally {
       await pool.query(`DELETE FROM users WHERE id = $1`, [userId]);
-      await pool.query(`DELETE FROM organizations WHERE id = $1`, [
-        organizationId,
-      ]);
+      await pool.query(`DELETE FROM organizations WHERE id = $1`, [organizationId]);
     }
   }, 120_000);
 
-  it('maps concurrent same-name role creation to conflicts', async () => {
-    const session = await loginAs(
-      app,
-      'admin@example.local',
-      'ChangeMe123!',
-    );
+  it("maps concurrent same-name role creation to conflicts", async () => {
+    const session = await loginAs(app, "admin@example.local", "ChangeMe123!");
     const organization = firstRow(
-      (
-        await pool.query<{ id: string }>(
-          `SELECT id FROM organizations ORDER BY created_at LIMIT 1`,
-        )
-      ).rows,
-      'Expected a seeded organization',
+      (await pool.query<{ id: string }>(`SELECT id FROM organizations ORDER BY created_at LIMIT 1`))
+        .rows,
+      "Expected a seeded organization",
     );
     const permission = firstRow(
       (
@@ -473,14 +430,14 @@ describe('Roles migration and provisioning (e2e)', () => {
           `,
         )
       ).rows,
-      'Expected an organization permission',
+      "Expected an organization permission",
     );
     const roleName = `CONCURRENT CREATE ${randomUUID().slice(0, 8)}`;
 
     const responses = await Promise.all(
       Array.from({ length: 10 }, () =>
         request(app.getHttpServer())
-          .post('/api/v1/admin/roles')
+          .post("/api/v1/admin/roles")
           .set(bearer(session.accessToken))
           .send({
             name: roleName,
@@ -496,9 +453,7 @@ describe('Roles migration and provisioning (e2e)', () => {
       expect(statuses.filter((status) => status === 409)).toHaveLength(9);
 
       for (const response of responses.filter(({ status }) => status === 409)) {
-        expect((response.body as ErrorResponse).error.code).toBe(
-          'RESOURCE_CONFLICT',
-        );
+        expect((response.body as ErrorResponse).error.code).toBe("RESOURCE_CONFLICT");
       }
 
       const roleCount = firstRow(
@@ -512,30 +467,23 @@ describe('Roles migration and provisioning (e2e)', () => {
             [organization.id, roleName],
           )
         ).rows,
-        'Concurrent role count was not returned',
+        "Concurrent role count was not returned",
       );
       expect(roleCount.count).toBe(1);
     } finally {
-      await pool.query(
-        `DELETE FROM roles WHERE organization_id = $1 AND LOWER(name) = LOWER($2)`,
-        [organization.id, roleName],
-      );
+      await pool.query(`DELETE FROM roles WHERE organization_id = $1 AND LOWER(name) = LOWER($2)`, [
+        organization.id,
+        roleName,
+      ]);
     }
   }, 120_000);
 
-  it('maps a concurrent same-target rename to one conflict', async () => {
-    const session = await loginAs(
-      app,
-      'admin@example.local',
-      'ChangeMe123!',
-    );
+  it("maps a concurrent same-target rename to one conflict", async () => {
+    const session = await loginAs(app, "admin@example.local", "ChangeMe123!");
     const organization = firstRow(
-      (
-        await pool.query<{ id: string }>(
-          `SELECT id FROM organizations ORDER BY created_at LIMIT 1`,
-        )
-      ).rows,
-      'Expected a seeded organization',
+      (await pool.query<{ id: string }>(`SELECT id FROM organizations ORDER BY created_at LIMIT 1`))
+        .rows,
+      "Expected a seeded organization",
     );
     const permission = firstRow(
       (
@@ -549,13 +497,13 @@ describe('Roles migration and provisioning (e2e)', () => {
           `,
         )
       ).rows,
-      'Expected an organization permission',
+      "Expected an organization permission",
     );
     const suffix = randomUUID().slice(0, 8).toUpperCase();
 
     const createRole = async (name: string): Promise<string> => {
       const response = await request(app.getHttpServer())
-        .post('/api/v1/admin/roles')
+        .post("/api/v1/admin/roles")
         .set(bearer(session.accessToken))
         .send({
           name,
@@ -585,9 +533,7 @@ describe('Roles migration and provisioning (e2e)', () => {
 
       expect(responses.map(({ status }) => status).sort()).toEqual([200, 409]);
       const conflict = responses.find(({ status }) => status === 409);
-      expect((conflict?.body as ErrorResponse).error.code).toBe(
-        'RESOURCE_CONFLICT',
-      );
+      expect((conflict?.body as ErrorResponse).error.code).toBe("RESOURCE_CONFLICT");
     } finally {
       await pool.query(`DELETE FROM roles WHERE id = ANY($1::uuid[])`, [
         [firstRoleId, secondRoleId],
@@ -595,19 +541,12 @@ describe('Roles migration and provisioning (e2e)', () => {
     }
   }, 120_000);
 
-  it('paginates and filters more than fifty roles without overlap', async () => {
-    const session = await loginAs(
-      app,
-      'admin@example.local',
-      'ChangeMe123!',
-    );
+  it("paginates and filters more than fifty roles without overlap", async () => {
+    const session = await loginAs(app, "admin@example.local", "ChangeMe123!");
     const organization = firstRow(
-      (
-        await pool.query<{ id: string }>(
-          `SELECT id FROM organizations ORDER BY created_at LIMIT 1`,
-        )
-      ).rows,
-      'Expected a seeded organization',
+      (await pool.query<{ id: string }>(`SELECT id FROM organizations ORDER BY created_at LIMIT 1`))
+        .rows,
+      "Expected a seeded organization",
     );
     const prefix = `PAGINATION ${randomUUID().slice(0, 8).toUpperCase()}`;
 
@@ -627,14 +566,14 @@ describe('Roles migration and provisioning (e2e)', () => {
     try {
       const listPage = async (page: number) => {
         const response = await request(app.getHttpServer())
-          .get('/api/v1/admin/roles')
+          .get("/api/v1/admin/roles")
           .set(bearer(session.accessToken))
           .query({
             page,
             limit: 50,
             organizationId: organization.id,
             search: prefix,
-            scope: 'organization',
+            scope: "organization",
           })
           .expect(200);
 
@@ -653,91 +592,72 @@ describe('Roles migration and provisioning (e2e)', () => {
       expect(pageTwo.data.some(({ id }) => pageOneIds.has(id))).toBe(false);
 
       const searchResponse = await request(app.getHttpServer())
-        .get('/api/v1/admin/roles')
+        .get("/api/v1/admin/roles")
         .set(bearer(session.accessToken))
         .query({
           organizationId: organization.id,
           search: `${prefix} 060`,
-          scope: 'organization',
+          scope: "organization",
         })
         .expect(200);
-      expect((searchResponse.body as PaginatedRolesResponse).data).toHaveLength(
-        1,
-      );
+      expect((searchResponse.body as PaginatedRolesResponse).data).toHaveLength(1);
     } finally {
-      await pool.query(
-        `DELETE FROM roles WHERE organization_id = $1 AND name LIKE $2`,
-        [organization.id, `${prefix}%`],
-      );
+      await pool.query(`DELETE FROM roles WHERE organization_id = $1 AND name LIKE $2`, [
+        organization.id,
+        `${prefix}%`,
+      ]);
     }
   }, 120_000);
 
-  it('rejects a cross-tenant organization filter for an org ADMIN', async () => {
-    const superAdminSession = await loginAs(
-      app,
-      'admin@example.local',
-      'ChangeMe123!',
-    );
-    const regularUserSession = await loginAs(
-      app,
-      'user@example.local',
-      'ChangeMe123!',
-    );
+  it("rejects a cross-tenant organization filter for an org ADMIN", async () => {
+    const superAdminSession = await loginAs(app, "admin@example.local", "ChangeMe123!");
+    const regularUserSession = await loginAs(app, "user@example.local", "ChangeMe123!");
     const superAdminMe = await request(app.getHttpServer())
-      .get('/api/v1/auth/me')
+      .get("/api/v1/auth/me")
       .set(bearer(superAdminSession.accessToken))
       .expect(200);
     const regularUserMe = await request(app.getHttpServer())
-      .get('/api/v1/auth/me')
+      .get("/api/v1/auth/me")
       .set(bearer(regularUserSession.accessToken))
       .expect(200);
 
-    const organizationAId = (
-      superAdminMe.body as { data: AuthMeDto }
-    ).data.organizationId;
-    const organizationBId = (
-      regularUserMe.body as { data: AuthMeDto }
-    ).data.organizationId;
+    const organizationAId = (superAdminMe.body as { data: AuthMeDto }).data.organizationId;
+    const organizationBId = (regularUserMe.body as { data: AuthMeDto }).data.organizationId;
 
     const rolesResponse = await request(app.getHttpServer())
-      .get('/api/v1/admin/roles')
+      .get("/api/v1/admin/roles")
       .set(bearer(superAdminSession.accessToken))
       .expect(200);
-    const platformAdminRole = (
-      rolesResponse.body as PaginatedRolesResponse
-    ).data.find(
-      ({ name, organizationId }) =>
-        name === 'ADMIN' && organizationId === null,
+    const platformAdminRole = (rolesResponse.body as PaginatedRolesResponse).data.find(
+      ({ name, organizationId }) => name === "ADMIN" && organizationId === null,
     );
     if (!platformAdminRole) {
-      throw new Error('Platform ADMIN role was not found');
+      throw new Error("Platform ADMIN role was not found");
     }
 
     const suffix = randomUUID().slice(0, 8);
     const email = `role-list-admin-${suffix}@example.local`;
-    const initialPassword = 'OrgAdminPass123!';
-    const changedPassword = 'NewPassword123!';
+    const initialPassword = "OrgAdminPass123!";
+    const changedPassword = "NewPassword123!";
 
     const createdUserResponse = await request(app.getHttpServer())
-      .post('/api/v1/admin/users')
+      .post("/api/v1/admin/users")
       .set(bearer(superAdminSession.accessToken))
       .send({
         email,
         password: initialPassword,
-        displayName: 'Role List Organization Admin',
-        status: 'ACTIVE',
+        displayName: "Role List Organization Admin",
+        status: "ACTIVE",
         roleId: platformAdminRole.id,
         organizationId: organizationAId,
       })
       .expect(201);
-    const createdUser = (
-      createdUserResponse.body as { data: CreatedUserDto }
-    ).data;
+    const createdUser = (createdUserResponse.body as { data: CreatedUserDto }).data;
 
     try {
       const initialSession = await loginAs(app, email, initialPassword);
       await request(app.getHttpServer())
-        .patch('/api/v1/users/me/password')
+        .patch("/api/v1/users/me/password")
         .set(bearer(initialSession.accessToken))
         .send({
           currentPassword: initialPassword,
@@ -745,35 +665,28 @@ describe('Roles migration and provisioning (e2e)', () => {
         })
         .expect(200);
 
-      const organizationAdminSession = await loginAs(
-        app,
-        email,
-        changedPassword,
-      );
+      const organizationAdminSession = await loginAs(app, email, changedPassword);
 
       const ownScope = await request(app.getHttpServer())
-        .get('/api/v1/admin/roles')
+        .get("/api/v1/admin/roles")
         .set(bearer(organizationAdminSession.accessToken))
-        .set('x-organization-id', organizationAId)
+        .set("x-organization-id", organizationAId)
         .expect(200);
       const ownScopeBody = ownScope.body as PaginatedRolesResponse;
       expect(
         ownScopeBody.data.every(
-          ({ organizationId }) =>
-            organizationId === null || organizationId === organizationAId,
+          ({ organizationId }) => organizationId === null || organizationId === organizationAId,
         ),
       ).toBe(true);
 
       const forbidden = await request(app.getHttpServer())
-        .get('/api/v1/admin/roles')
+        .get("/api/v1/admin/roles")
         .set(bearer(organizationAdminSession.accessToken))
-        .set('x-organization-id', organizationAId)
+        .set("x-organization-id", organizationAId)
         .query({ organizationId: organizationBId })
         .expect(403);
-      expect((forbidden.body as ErrorResponse).error.code).toBe(
-        'AUTH_FORBIDDEN',
-      );
-      expect(createdUser.roles).toContain('ADMIN');
+      expect((forbidden.body as ErrorResponse).error.code).toBe("AUTH_FORBIDDEN");
+      expect(createdUser.roles).toContain("ADMIN");
     } finally {
       await pool.query(`DELETE FROM users WHERE id = $1`, [createdUser.id]);
     }

@@ -1,12 +1,12 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from "vitest";
 
-import type { ErrorReportContext } from '../observability.types';
-import type { SentryTransportService } from '../sentry-transport.service';
-import type { TelegramTransportService } from '../telegram-transport.service';
+import type { ErrorReportContext } from "../observability.types";
+import type { SentryTransportService } from "../sentry-transport.service";
+import type { TelegramTransportService } from "../telegram-transport.service";
 
-import { ErrorReporterService } from '../error-reporter.service';
+import { ErrorReporterService } from "../error-reporter.service";
 
-const context = { requestId: 'req-1', errorCode: 'INTERNAL_ERROR' } as ErrorReportContext;
+const context = { requestId: "req-1", errorCode: "INTERNAL_ERROR" } as ErrorReportContext;
 
 function createReporter() {
   const sentry = {
@@ -20,31 +20,31 @@ function createReporter() {
   return { reporter: new ErrorReporterService(sentry, telegram), sentry, telegram };
 }
 
-describe('ErrorReporterService', () => {
-  it('fans an exception out to both transports', () => {
+describe("ErrorReporterService", () => {
+  it("fans an exception out to both transports", () => {
     const { reporter, sentry, telegram } = createReporter();
-    const error = new Error('boom');
+    const error = new Error("boom");
 
     reporter.reportException(error, context);
 
     expect(sentry.captureException).toHaveBeenCalledWith(error, context);
-    expect(telegram.send).toHaveBeenCalledWith('boom', context);
+    expect(telegram.send).toHaveBeenCalledWith("boom", context);
   });
 
-  it('uses a default title when the error message is empty', () => {
+  it("uses a default title when the error message is empty", () => {
     const { reporter, telegram } = createReporter();
 
-    reporter.reportException(new Error(''), context);
+    reporter.reportException(new Error(""), context);
 
-    expect(telegram.send).toHaveBeenCalledWith('Unhandled error', context);
+    expect(telegram.send).toHaveBeenCalledWith("Unhandled error", context);
   });
 
-  it('fans a message out to both transports', () => {
+  it("fans a message out to both transports", () => {
     const { reporter, sentry, telegram } = createReporter();
 
-    reporter.reportMessage('something happened', context);
+    reporter.reportMessage("something happened", context);
 
-    expect(sentry.captureMessage).toHaveBeenCalledWith('something happened', context);
-    expect(telegram.send).toHaveBeenCalledWith('something happened', context);
+    expect(sentry.captureMessage).toHaveBeenCalledWith("something happened", context);
+    expect(telegram.send).toHaveBeenCalledWith("something happened", context);
   });
 });

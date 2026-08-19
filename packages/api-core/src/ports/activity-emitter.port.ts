@@ -1,5 +1,5 @@
-import type { JsonObject } from '../common/types/json-value';
-import type { TransactionExecutor } from '../common/types/transaction-executor';
+import type { JsonObject } from "../common/types/json-value";
+import type { TransactionExecutor } from "../common/types/transaction-executor";
 
 export interface ActivityEmitInput {
   organizationId: string;
@@ -7,7 +7,7 @@ export interface ActivityEmitInput {
   entityType: string;
   entityId: string;
   actorId?: string | null;
-  visibility?: 'PUBLIC' | 'PRIVATE' | 'INTERNAL';
+  visibility?: "PUBLIC" | "PRIVATE" | "INTERNAL";
   metadata?: JsonObject | null;
 }
 
@@ -20,4 +20,4 @@ export interface ActivityEmitter {
   emit(input: ActivityEmitInput, executor?: TransactionExecutor): Promise<void>;
 }
 
-export const ACTIVITY_EMITTER = Symbol('ACTIVITY_EMITTER');
+export const ACTIVITY_EMITTER = Symbol("ACTIVITY_EMITTER");

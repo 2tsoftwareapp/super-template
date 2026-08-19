@@ -1,5 +1,5 @@
-import type { AuthenticatedRequestUser } from '@repo/api-core';
-import type { Request } from 'express';
+import type { AuthenticatedRequestUser } from "@repo/api-core";
+import type { Request } from "express";
 
 import {
   Body,
@@ -12,31 +12,39 @@ import {
   Post,
   Put,
   Query,
-  Req } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import {  ACTION, ApiDataResponse, ApiPaginatedResponse, perm, SuccessFlagDto } from '@repo/api-core';
-import { CurrentUser } from '@repo/api-core';
-import { Authorize } from '@repo/api-core';
+  Req,
+} from "@nestjs/common";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
+import {
+  ACTION,
+  ApiDataResponse,
+  ApiPaginatedResponse,
+  perm,
+  SuccessFlagDto,
+} from "@repo/api-core";
+import { CurrentUser } from "@repo/api-core";
+import { Authorize } from "@repo/api-core";
 
-import { CreateAdminUserUseCase } from '../application/use-cases/create-admin-user.use-case';
-import { DeleteUserUseCase } from '../application/use-cases/delete-user.use-case';
-import { GetUserUseCase } from '../application/use-cases/get-user.use-case';
-import { ListUsersUseCase } from '../application/use-cases/list-users.use-case';
-import { ReplaceUserRolesUseCase } from '../application/use-cases/replace-user-roles.use-case';
-import { UpdateAdminUserUseCase } from '../application/use-cases/update-admin-user.use-case';
-import { UpdateUserStatusUseCase } from '../application/use-cases/update-user-status.use-case';
-import { userSortsFromQuery } from '../application/user-sort';
+import { CreateAdminUserUseCase } from "../application/use-cases/create-admin-user.use-case";
+import { DeleteUserUseCase } from "../application/use-cases/delete-user.use-case";
+import { GetUserUseCase } from "../application/use-cases/get-user.use-case";
+import { ListUsersUseCase } from "../application/use-cases/list-users.use-case";
+import { ReplaceUserRolesUseCase } from "../application/use-cases/replace-user-roles.use-case";
+import { UpdateAdminUserUseCase } from "../application/use-cases/update-admin-user.use-case";
+import { UpdateUserStatusUseCase } from "../application/use-cases/update-user-status.use-case";
+import { userSortsFromQuery } from "../application/user-sort";
 import {
   AdminUsersQueryDto,
   CreateAdminUserDto,
   ReplaceUserRolesDto,
   UpdateAdminUserDto,
   UpdateUserStatusDto,
-  UserDto } from './users.dto';
+  UserDto,
+} from "./users.dto";
 
-@ApiTags('admin-users')
+@ApiTags("admin-users")
 @ApiBearerAuth()
-@Controller('admin/users')
+@Controller("admin/users")
 export class AdminUsersController {
   constructor(
     private readonly listUsersUseCase: ListUsersUseCase,
@@ -49,7 +57,7 @@ export class AdminUsersController {
   ) {}
 
   @Get()
-  @Authorize({ permissions: [perm('users', ACTION.READ)] })
+  @Authorize({ permissions: [perm("users", ACTION.READ)] })
   @ApiPaginatedResponse(UserDto)
   async listUsers(
     @CurrentUser() actor: AuthenticatedRequestUser,
@@ -58,7 +66,8 @@ export class AdminUsersController {
     const sort = userSortsFromQuery({
       sort: query.sort,
       sortField: query.sortField,
-      sortOrder: query.sortOrder });
+      sortOrder: query.sortOrder,
+    });
 
     const result = await this.listUsersUseCase.execute(actor, {
       page: query.page,
@@ -66,7 +75,8 @@ export class AdminUsersController {
       sort,
       ...(query.search !== undefined ? { search: query.search } : {}),
       ...(query.status !== undefined ? { status: query.status } : {}),
-      ...(query.role !== undefined ? { role: query.role } : {}) });
+      ...(query.role !== undefined ? { role: query.role } : {}),
+    });
 
     return {
       data: result.rows,
@@ -74,11 +84,13 @@ export class AdminUsersController {
         page: query.page,
         limit: query.limit,
         total: result.total,
-        totalPages: Math.ceil(result.total / query.limit) } };
+        totalPages: Math.ceil(result.total / query.limit),
+      },
+    };
   }
 
   @Post()
-  @Authorize({ permissions: [perm('users', ACTION.CREATE)] })
+  @Authorize({ permissions: [perm("users", ACTION.CREATE)] })
   @ApiDataResponse(UserDto, 201)
   createUser(
     @CurrentUser() actor: AuthenticatedRequestUser,
@@ -94,29 +106,28 @@ export class AdminUsersController {
         ...(input.avatarUrl !== undefined ? { avatarUrl: input.avatarUrl } : {}),
         ...(input.status !== undefined ? { status: input.status } : {}),
         ...(input.roleId !== undefined ? { roleId: input.roleId } : {}),
-        ...(input.organizationId !== undefined
-          ? { organizationId: input.organizationId }
-          : {}) },
+        ...(input.organizationId !== undefined ? { organizationId: input.organizationId } : {}),
+      },
       request.requestContext,
     );
   }
 
-  @Get(':id')
-  @Authorize({ permissions: [perm('users', ACTION.READ)] })
+  @Get(":id")
+  @Authorize({ permissions: [perm("users", ACTION.READ)] })
   @ApiDataResponse(UserDto)
   getUser(
     @CurrentUser() actor: AuthenticatedRequestUser,
-    @Param('id', new ParseUUIDPipe()) userId: string,
+    @Param("id", new ParseUUIDPipe()) userId: string,
   ) {
     return this.getUserUseCase.execute(userId, actor);
   }
 
-  @Patch(':id')
-  @Authorize({ permissions: [perm('users', ACTION.UPDATE)] })
+  @Patch(":id")
+  @Authorize({ permissions: [perm("users", ACTION.UPDATE)] })
   @ApiDataResponse(UserDto)
   updateUser(
     @CurrentUser() actor: AuthenticatedRequestUser,
-    @Param('id', new ParseUUIDPipe()) userId: string,
+    @Param("id", new ParseUUIDPipe()) userId: string,
     @Body() input: UpdateAdminUserDto,
     @Req() request: Request,
   ) {
@@ -125,36 +136,36 @@ export class AdminUsersController {
       userId,
       {
         ...(input.email !== undefined ? { email: input.email } : {}),
-        ...(input.displayName !== undefined
-          ? { displayName: input.displayName }
-          : {}),
+        ...(input.displayName !== undefined ? { displayName: input.displayName } : {}),
         ...(input.avatarUrl !== undefined ? { avatarUrl: input.avatarUrl } : {}),
       },
       request.requestContext,
     );
   }
 
-  @Delete(':id')
-  @Authorize({ permissions: [perm('users', ACTION.DELETE)] })
+  @Delete(":id")
+  @Authorize({ permissions: [perm("users", ACTION.DELETE)] })
   @ApiDataResponse(SuccessFlagDto)
   async deleteUser(
     @CurrentUser() actor: AuthenticatedRequestUser,
-    @Param('id', new ParseUUIDPipe()) userId: string,
+    @Param("id", new ParseUUIDPipe()) userId: string,
     @Req() request: Request,
   ) {
     await this.deleteUserUseCase.execute(actor, userId, request.requestContext);
 
     return {
       data: {
-        success: true } };
+        success: true,
+      },
+    };
   }
 
-  @Patch(':id/status')
-  @Authorize({ permissions: [perm('users', ACTION.UPDATE)] })
+  @Patch(":id/status")
+  @Authorize({ permissions: [perm("users", ACTION.UPDATE)] })
   @ApiDataResponse(UserDto)
   updateStatus(
     @CurrentUser() actor: AuthenticatedRequestUser,
-    @Param('id', new ParseUUIDPipe()) userId: string,
+    @Param("id", new ParseUUIDPipe()) userId: string,
     @Body() input: UpdateUserStatusDto,
     @Req() request: Request,
   ) {
@@ -166,12 +177,12 @@ export class AdminUsersController {
     );
   }
 
-  @Put(':id/roles')
-  @Authorize({ permissions: [perm('roles', ACTION.UPDATE)] })
+  @Put(":id/roles")
+  @Authorize({ permissions: [perm("roles", ACTION.UPDATE)] })
   @ApiDataResponse(UserDto)
   replaceRoles(
     @CurrentUser() actor: AuthenticatedRequestUser,
-    @Param('id', new ParseUUIDPipe()) userId: string,
+    @Param("id", new ParseUUIDPipe()) userId: string,
     @Body() input: ReplaceUserRolesDto,
     @Req() request: Request,
   ) {

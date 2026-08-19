@@ -1,10 +1,10 @@
-import { describe, expect, it, vi } from 'vitest';
-import { ERROR_CODES } from '@repo/api-core';
+import { describe, expect, it, vi } from "vitest";
+import { ERROR_CODES } from "@repo/api-core";
 
-import { LoginUseCase } from '../login.use-case';
+import { LoginUseCase } from "../login.use-case";
 
-describe('LoginUseCase', () => {
-  it('rejects invalid credentials', async () => {
+describe("LoginUseCase", () => {
+  it("rejects invalid credentials", async () => {
     const auditWriter = { log: vi.fn() };
     const useCase = new LoginUseCase(
       {
@@ -17,15 +17,15 @@ describe('LoginUseCase', () => {
 
     await expect(
       useCase.execute({
-        email: 'missing@test.com',
-        password: 'wrong-password',
+        email: "missing@test.com",
+        password: "wrong-password",
       }),
     ).rejects.toMatchObject({
       code: ERROR_CODES.AUTH_INVALID_CREDENTIALS,
     });
 
     expect(auditWriter.log).toHaveBeenCalledWith(
-      expect.objectContaining({ action: 'auth.login.failed' }),
+      expect.objectContaining({ action: "auth.login.failed" }),
     );
   });
 });

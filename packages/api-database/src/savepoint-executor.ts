@@ -1,4 +1,4 @@
-import type { TransactionExecutor } from '@repo/api-core';
+import type { TransactionExecutor } from "@repo/api-core";
 
 /**
  * Minimal structural view of an executor that can run raw SQL, which is what
@@ -13,8 +13,10 @@ export interface SavepointExecutor {
 
 export function toSavepointExecutor(executor: TransactionExecutor): SavepointExecutor {
   const candidate = executor as Partial<SavepointExecutor> | null | undefined;
-  if (typeof candidate?.execute !== 'function') {
-    throw new Error('TransactionExecutor does not support savepoints in the current implementation');
+  if (typeof candidate?.execute !== "function") {
+    throw new Error(
+      "TransactionExecutor does not support savepoints in the current implementation",
+    );
   }
   return candidate as SavepointExecutor;
 }

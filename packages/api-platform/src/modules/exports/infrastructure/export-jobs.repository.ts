@@ -1,26 +1,20 @@
-import type {
-  DatabaseClient,
-  DatabaseExecutor,
-} from '@repo/api-database';
+import type { DatabaseClient, DatabaseExecutor } from "@repo/api-database";
 
-import { Inject, Injectable } from '@nestjs/common';
-import { DATABASE, runIdempotentInsert } from '@repo/api-database';
-import { exportJobs } from '@repo/api-database';
-import { and, eq, inArray, lt, sql } from 'drizzle-orm';
+import { Inject, Injectable } from "@nestjs/common";
+import { DATABASE, runIdempotentInsert } from "@repo/api-database";
+import { exportJobs } from "@repo/api-database";
+import { and, eq, inArray, lt, sql } from "drizzle-orm";
 
 import type {
   ExportJobRecord,
   ExportJobsRepositoryPort,
-} from '../application/ports/export-jobs.repository.port';
+} from "../application/ports/export-jobs.repository.port";
 
 @Injectable()
 export class ExportJobsRepository implements ExportJobsRepositoryPort {
   constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
 
-  async create(
-    values: typeof exportJobs.$inferInsert,
-    executor: DatabaseExecutor = this.database,
-  ) {
+  async create(values: typeof exportJobs.$inferInsert, executor: DatabaseExecutor = this.database) {
     const [job] = await executor.insert(exportJobs).values(values).returning();
 
     return job ?? null;
@@ -35,28 +29,16 @@ export class ExportJobsRepository implements ExportJobsRepositoryPort {
   ) {
     return runIdempotentInsert(
       async () => {
-        const [inserted] = await executor
-          .insert(exportJobs)
-          .values(values)
-          .returning();
+        const [inserted] = await executor.insert(exportJobs).values(values).returning();
 
         return inserted ?? undefined;
       },
-      () =>
-        this.findByIdempotencyKey(
-          values.createdById,
-          values.idempotencyKey,
-          executor,
-        ),
+      () => this.findByIdempotencyKey(values.createdById, values.idempotencyKey, executor),
     );
   }
 
   async findById(jobId: string, executor: DatabaseExecutor = this.database) {
-    const [job] = await executor
-      .select()
-      .from(exportJobs)
-      .where(eq(exportJobs.id, jobId))
-      .limit(1);
+    const [job] = await executor.select().from(exportJobs).where(eq(exportJobs.id, jobId)).limit(1);
 
     return job ?? null;
   }
@@ -70,10 +52,7 @@ export class ExportJobsRepository implements ExportJobsRepositoryPort {
       .select()
       .from(exportJobs)
       .where(
-        and(
-          eq(exportJobs.createdById, createdById),
-          eq(exportJobs.idempotencyKey, idempotencyKey),
-        ),
+        and(eq(exportJobs.createdById, createdById), eq(exportJobs.idempotencyKey, idempotencyKey)),
       )
       .limit(1);
 
@@ -123,10 +102,7 @@ export class ExportJobsRepository implements ExportJobsRepositoryPort {
 
     const ids = claimed.rows.map((r) => r.id);
 
-    return executor
-      .select()
-      .from(exportJobs)
-      .where(inArray(exportJobs.id, ids));
+    return executor.select().from(exportJobs).where(inArray(exportJobs.id, ids));
   }
 
   async recoverStaleProcessing(
@@ -139,10 +115,8 @@ export class ExportJobsRepository implements ExportJobsRepositoryPort {
     // retry.
     const recovered = await executor
       .update(exportJobs)
-      .set({ status: 'FAILED', completedAt: new Date(), updatedAt: new Date() })
-      .where(
-        and(eq(exportJobs.status, 'PROCESSING'), lt(exportJobs.updatedAt, before)),
-      )
+      .set({ status: "FAILED", completedAt: new Date(), updatedAt: new Date() })
+      .where(and(eq(exportJobs.status, "PROCESSING"), lt(exportJobs.updatedAt, before)))
       .returning({ id: exportJobs.id });
 
     return recovered.length;

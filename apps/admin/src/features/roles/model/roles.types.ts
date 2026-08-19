@@ -12,8 +12,8 @@ export interface RolesViewModel {
   isSuperAdmin: boolean;
   search: string;
   onSearchChange: (value: string) => void;
-  scopeFilter: 'platform' | 'organization' | undefined;
-  onScopeFilterChange: (value: 'platform' | 'organization' | undefined) => void;
+  scopeFilter: "platform" | "organization" | undefined;
+  onScopeFilterChange: (value: "platform" | "organization" | undefined) => void;
   organizationFilter: string | undefined;
   onOrganizationFilterChange: (value: string | undefined) => void;
   isLoading: boolean;

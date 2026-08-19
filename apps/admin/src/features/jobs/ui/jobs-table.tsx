@@ -7,14 +7,7 @@ import { SectionLoading } from "@repo/web-ui/loading";
 import { LoadingButton } from "@repo/web-ui/loading-button";
 import { Pagination } from "@repo/web-ui/pagination";
 import { Show } from "@repo/web-ui/show";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@repo/web-ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@repo/web-ui/table";
 
 import type { JobDto } from "@/lib/api-types";
 
@@ -88,10 +81,7 @@ export function JobsTable({
         ) : null}
         {!isLoading && !isError && jobs.length === 0 ? (
           <TableRow>
-            <TableCell
-              colSpan={5}
-              className="py-16 text-center text-sm text-muted-foreground"
-            >
+            <TableCell colSpan={5} className="py-16 text-center text-sm text-muted-foreground">
               {emptyMessage}
             </TableCell>
           </TableRow>
@@ -106,10 +96,7 @@ export function JobsTable({
                 <TableRow key={job.id}>
                   <TableCell className="font-mono text-xs">{job.type}</TableCell>
                   <TableCell>
-                    <Badge
-                      variant={variant}
-                      className={cn("text-xs capitalize", className)}
-                    >
+                    <Badge variant={variant} className={cn("text-xs capitalize", className)}>
                       {s.toLowerCase()}
                     </Badge>
                   </TableCell>

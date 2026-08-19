@@ -1,4 +1,4 @@
-import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable, Logger } from "@nestjs/common";
 import {
   AppError,
   ERROR_CODES,
@@ -6,11 +6,17 @@ import {
   type JsonObject,
   USER_PREFERENCES_LOOKUP,
   type UserPreferencesLookup,
-} from '@repo/api-core';
+} from "@repo/api-core";
 
-import { MAILER, type Mailer } from '../mailer.interface';
-import { MAIL_DELIVERIES_REPOSITORY, type MailDeliveriesRepositoryPort } from '../ports/mail-deliveries.repository.port';
-import { TEMPLATE_RENDERER_SERVICE, type TemplateRendererServicePort } from '../ports/template-renderer.service.port';
+import { MAILER, type Mailer } from "../mailer.interface";
+import {
+  MAIL_DELIVERIES_REPOSITORY,
+  type MailDeliveriesRepositoryPort,
+} from "../ports/mail-deliveries.repository.port";
+import {
+  TEMPLATE_RENDERER_SERVICE,
+  type TemplateRendererServicePort,
+} from "../ports/template-renderer.service.port";
 
 export interface SendTemplateInput {
   templateKey: string;
@@ -26,18 +32,19 @@ export class SendMailTemplateUseCase {
 
   constructor(
     @Inject(MAILER) private readonly mailer: Mailer,
-    @Inject(TEMPLATE_RENDERER_SERVICE) private readonly templateRenderer: TemplateRendererServicePort,
-    @Inject(MAIL_DELIVERIES_REPOSITORY) private readonly mailDeliveriesRepository: MailDeliveriesRepositoryPort,
+    @Inject(TEMPLATE_RENDERER_SERVICE)
+    private readonly templateRenderer: TemplateRendererServicePort,
+    @Inject(MAIL_DELIVERIES_REPOSITORY)
+    private readonly mailDeliveriesRepository: MailDeliveriesRepositoryPort,
     @Inject(USER_PREFERENCES_LOOKUP)
     private readonly userPreferencesLookup: UserPreferencesLookup,
   ) {}
 
   async execute(input: SendTemplateInput): Promise<void> {
     if (!isMandatoryMailTemplate(input.templateKey)) {
-      const preferences =
-        await this.userPreferencesLookup.findNotificationPreferencesByEmail(
-          input.to,
-        );
+      const preferences = await this.userPreferencesLookup.findNotificationPreferencesByEmail(
+        input.to,
+      );
 
       if (preferences && !preferences.email) {
         return;
@@ -47,10 +54,7 @@ export class SendMailTemplateUseCase {
     let rendered: { subject: string; text: string; html: string };
 
     try {
-      rendered = await this.templateRenderer.render(
-        input.templateKey,
-        input.variables,
-      );
+      rendered = await this.templateRenderer.render(input.templateKey, input.variables);
     } catch {
       throw new AppError(
         ERROR_CODES.VALIDATION_FAILED,
@@ -63,7 +67,7 @@ export class SendMailTemplateUseCase {
       templateKey: input.templateKey,
       recipient: input.to,
       subject: rendered.subject.trim(),
-      status: 'PENDING',
+      status: "PENDING",
       errorMessage: null,
       metadata: input.metadata ?? null,
       sourceJobId: input.sourceJobId ?? null,
@@ -79,21 +83,24 @@ export class SendMailTemplateUseCase {
     // - FAILED/stale PROCESSING with expired lease → reclaim to PENDING and retry.
     let target = delivery;
     if (!target && input.sourceJobId) {
-      const existing = await this.mailDeliveriesRepository.findBySourceJobId(input.sourceJobId, input.to);
-      if (existing?.status === 'SENT' || existing?.status === 'PROVIDER_ACCEPTED') {
+      const existing = await this.mailDeliveriesRepository.findBySourceJobId(
+        input.sourceJobId,
+        input.to,
+      );
+      if (existing?.status === "SENT" || existing?.status === "PROVIDER_ACCEPTED") {
         return;
       }
       target = await this.mailDeliveriesRepository.reclaimForRetry(input.sourceJobId, input.to);
     }
 
     if (!target) {
-      throw new Error('Mail delivery already attempted but not confirmed sent');
+      throw new Error("Mail delivery already attempted but not confirmed sent");
     }
 
     // Atomically claim the PENDING row for this worker. Returns null if
     // another worker already claimed it (status is no longer PENDING).
     const claimed = await this.mailDeliveriesRepository.claimForProcessing(target.id);
-    if (claimed?.status !== 'PROCESSING') {
+    if (claimed?.status !== "PROCESSING") {
       return;
     }
 
@@ -111,11 +118,12 @@ export class SendMailTemplateUseCase {
       });
 
       try {
-        await this.mailDeliveriesRepository.updateStatus(
-          claimed.id,
-          claimed.claimToken!,
-          { status: 'SENT', sentAt: new Date(), errorMessage: null, providerMessageId },
-        );
+        await this.mailDeliveriesRepository.updateStatus(claimed.id, claimed.claimToken!, {
+          status: "SENT",
+          sentAt: new Date(),
+          errorMessage: null,
+          providerMessageId,
+        });
       } catch (statusError) {
         // SMTP already accepted the email. The fenced updateStatus(SENT)
         // failed (stale worker, connection drop, etc.). Try the unfenced
@@ -139,18 +147,11 @@ export class SendMailTemplateUseCase {
     } catch (error) {
       // SMTP rejected the email. Safe to mark FAILED and retry.
       try {
-        await this.mailDeliveriesRepository.updateStatus(
-          claimed.id,
-          claimed.claimToken!,
-          {
-            status: 'FAILED',
-            errorMessage:
-              error instanceof Error
-                ? error.message
-                : 'Unknown mail delivery error',
-            providerMessageId,
-          },
-        );
+        await this.mailDeliveriesRepository.updateStatus(claimed.id, claimed.claimToken!, {
+          status: "FAILED",
+          errorMessage: error instanceof Error ? error.message : "Unknown mail delivery error",
+          providerMessageId,
+        });
       } catch (statusError) {
         this.logger.warn(
           `Mail FAILED but DB update also failed: ${statusError instanceof Error ? statusError.message : String(statusError)}`,

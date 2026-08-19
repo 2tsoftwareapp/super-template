@@ -1,19 +1,20 @@
-import type { JsonObject, TransactionExecutor } from '@repo/api-core';
+import type { JsonObject, TransactionExecutor } from "@repo/api-core";
+import type { DatabaseClient, DatabaseExecutor } from "@repo/api-database";
+
+import { Inject, Injectable } from "@nestjs/common";
+import { DATABASE, runIdempotentInsert } from "@repo/api-database";
+import { jobs } from "@repo/api-database";
+import { and, count, desc, eq, isNull, sql } from "drizzle-orm";
+
 import type {
-  DatabaseClient,
-  DatabaseExecutor,
-} from '@repo/api-database';
-
-import { Inject, Injectable } from '@nestjs/common';
-import { DATABASE, runIdempotentInsert } from '@repo/api-database';
-import { jobs } from '@repo/api-database';
-import { and, count, desc, eq, isNull, sql } from 'drizzle-orm';
-
-import type { JobRecord, JobScope, JobsRepositoryPort } from '../application/ports/jobs.repository.port';
-import type { JobStatus } from '../domain/job-status';
+  JobRecord,
+  JobScope,
+  JobsRepositoryPort,
+} from "../application/ports/jobs.repository.port";
+import type { JobStatus } from "../domain/job-status";
 
 function scopeCondition(scope: JobScope) {
-  return scope.type === 'organization'
+  return scope.type === "organization"
     ? eq(jobs.organizationId, scope.organizationId)
     : isNull(jobs.organizationId);
 }
@@ -46,7 +47,10 @@ export class JobsRepository implements JobsRepositoryPort {
     executor?: TransactionExecutor,
   ): Promise<JobRecord | null> {
     const db = (executor ?? this.database) as DatabaseExecutor;
-    const [job] = await db.insert(jobs).values(values as typeof jobs.$inferInsert).returning();
+    const [job] = await db
+      .insert(jobs)
+      .values(values as typeof jobs.$inferInsert)
+      .returning();
     return (job as JobRecord) ?? null;
   }
 
@@ -76,7 +80,12 @@ export class JobsRepository implements JobsRepositoryPort {
     const db = (executor ?? this.database) as DatabaseExecutor;
     const result = await runIdempotentInsert(
       async () => {
-        const [inserted] = await db.insert(jobs).values(values as typeof jobs.$inferInsert & { createdById: string; idempotencyKey: string }).returning();
+        const [inserted] = await db
+          .insert(jobs)
+          .values(
+            values as typeof jobs.$inferInsert & { createdById: string; idempotencyKey: string },
+          )
+          .returning();
         return inserted;
       },
       () =>
@@ -111,13 +120,16 @@ export class JobsRepository implements JobsRepositoryPort {
     executor?: TransactionExecutor,
   ): Promise<JobRecord | null> {
     const db = (executor ?? this.database) as DatabaseExecutor;
-    const orgFilter = organizationId === null
-      ? isNull(jobs.organizationId)
-      : eq(jobs.organizationId, organizationId);
+    const orgFilter =
+      organizationId === null
+        ? isNull(jobs.organizationId)
+        : eq(jobs.organizationId, organizationId);
     const [job] = await db
       .select()
       .from(jobs)
-      .where(and(orgFilter, eq(jobs.createdById, createdById), eq(jobs.idempotencyKey, idempotencyKey)))
+      .where(
+        and(orgFilter, eq(jobs.createdById, createdById), eq(jobs.idempotencyKey, idempotencyKey)),
+      )
       .limit(1);
     return (job as JobRecord) ?? null;
   }
@@ -140,7 +152,13 @@ export class JobsRepository implements JobsRepositoryPort {
     const offset = (params.page - 1) * params.limit;
 
     const [rows, totals] = await Promise.all([
-      db.select().from(jobs).where(whereClause).orderBy(desc(jobs.scheduledAt)).limit(params.limit).offset(offset),
+      db
+        .select()
+        .from(jobs)
+        .where(whereClause)
+        .orderBy(desc(jobs.scheduledAt))
+        .limit(params.limit)
+        .offset(offset),
       db.select({ total: count() }).from(jobs).where(whereClause),
     ]);
 
@@ -199,8 +217,23 @@ export class JobsRepository implements JobsRepositoryPort {
     const db = (executor ?? this.database) as DatabaseExecutor;
     const [job] = await db
       .update(jobs)
-      .set({ status: 'COMPLETED', errorMessage: null, completedAt: new Date(), processingStartedAt: null, leaseExpiresAt: null, workerId: null, updatedAt: new Date() })
-      .where(and(eq(jobs.id, jobId), eq(jobs.status, 'PROCESSING'), eq(jobs.workerId, workerId), eq(jobs.attempts, attempts)))
+      .set({
+        status: "COMPLETED",
+        errorMessage: null,
+        completedAt: new Date(),
+        processingStartedAt: null,
+        leaseExpiresAt: null,
+        workerId: null,
+        updatedAt: new Date(),
+      })
+      .where(
+        and(
+          eq(jobs.id, jobId),
+          eq(jobs.status, "PROCESSING"),
+          eq(jobs.workerId, workerId),
+          eq(jobs.attempts, attempts),
+        ),
+      )
       .returning();
     return (job as JobRecord) ?? null;
   }
@@ -215,8 +248,23 @@ export class JobsRepository implements JobsRepositoryPort {
     const db = (executor ?? this.database) as DatabaseExecutor;
     const [job] = await db
       .update(jobs)
-      .set({ status: 'FAILED', errorMessage: message, completedAt: new Date(), processingStartedAt: null, leaseExpiresAt: null, workerId: null, updatedAt: new Date() })
-      .where(and(eq(jobs.id, jobId), eq(jobs.status, 'PROCESSING'), eq(jobs.workerId, workerId), eq(jobs.attempts, attempts)))
+      .set({
+        status: "FAILED",
+        errorMessage: message,
+        completedAt: new Date(),
+        processingStartedAt: null,
+        leaseExpiresAt: null,
+        workerId: null,
+        updatedAt: new Date(),
+      })
+      .where(
+        and(
+          eq(jobs.id, jobId),
+          eq(jobs.status, "PROCESSING"),
+          eq(jobs.workerId, workerId),
+          eq(jobs.attempts, attempts),
+        ),
+      )
       .returning();
     return (job as JobRecord) ?? null;
   }
@@ -229,8 +277,15 @@ export class JobsRepository implements JobsRepositoryPort {
     const db = (executor ?? this.database) as DatabaseExecutor;
     const [job] = await db
       .update(jobs)
-      .set({ status: 'CANCELLED', cancelledAt: new Date(), processingStartedAt: null, leaseExpiresAt: null, workerId: null, updatedAt: new Date() })
-      .where(and(eq(jobs.id, jobId), eq(jobs.status, 'PENDING'), scopeCondition(scope)))
+      .set({
+        status: "CANCELLED",
+        cancelledAt: new Date(),
+        processingStartedAt: null,
+        leaseExpiresAt: null,
+        workerId: null,
+        updatedAt: new Date(),
+      })
+      .where(and(eq(jobs.id, jobId), eq(jobs.status, "PENDING"), scopeCondition(scope)))
       .returning();
     return (job as JobRecord) ?? null;
   }
@@ -244,8 +299,8 @@ export class JobsRepository implements JobsRepositoryPort {
     const db = (executor ?? this.database) as DatabaseExecutor;
     const [job] = await db
       .update(jobs)
-      .set({ status: 'BLOCKED', errorMessage: message, updatedAt: new Date() })
-      .where(and(eq(jobs.id, jobId), eq(jobs.status, 'PENDING'), scopeCondition(scope)))
+      .set({ status: "BLOCKED", errorMessage: message, updatedAt: new Date() })
+      .where(and(eq(jobs.id, jobId), eq(jobs.status, "PENDING"), scopeCondition(scope)))
       .returning();
     return (job as JobRecord) ?? null;
   }
@@ -261,8 +316,24 @@ export class JobsRepository implements JobsRepositoryPort {
     const db = (executor ?? this.database) as DatabaseExecutor;
     const [job] = await db
       .update(jobs)
-      .set({ status: 'PENDING', scheduledAt, errorMessage: message, startedAt: null, processingStartedAt: null, leaseExpiresAt: null, workerId: null, updatedAt: new Date() })
-      .where(and(eq(jobs.id, jobId), eq(jobs.status, 'PROCESSING'), eq(jobs.workerId, workerId), eq(jobs.attempts, attempts)))
+      .set({
+        status: "PENDING",
+        scheduledAt,
+        errorMessage: message,
+        startedAt: null,
+        processingStartedAt: null,
+        leaseExpiresAt: null,
+        workerId: null,
+        updatedAt: new Date(),
+      })
+      .where(
+        and(
+          eq(jobs.id, jobId),
+          eq(jobs.status, "PROCESSING"),
+          eq(jobs.workerId, workerId),
+          eq(jobs.attempts, attempts),
+        ),
+      )
       .returning();
     return (job as JobRecord) ?? null;
   }
@@ -321,14 +392,10 @@ export class JobsRepository implements JobsRepositoryPort {
     };
   }
 
-  async acquireDependencyGraphLock(
-    scope: JobScope,
-    executor?: TransactionExecutor,
-  ): Promise<void> {
+  async acquireDependencyGraphLock(scope: JobScope, executor?: TransactionExecutor): Promise<void> {
     const db = (executor ?? this.database) as DatabaseExecutor;
-    const lockKey = scope.type === 'organization'
-      ? `dep-graph-${scope.organizationId}`
-      : 'dep-graph-platform';
+    const lockKey =
+      scope.type === "organization" ? `dep-graph-${scope.organizationId}` : "dep-graph-platform";
     await db.execute(sql`SELECT pg_advisory_xact_lock(hashtext(${lockKey}))`);
   }
 
@@ -342,10 +409,15 @@ export class JobsRepository implements JobsRepositoryPort {
     // alias: scopeCondition() renders "jobs"."organization_id", which is an
     // invalid reference once the table name is shadowed by the alias.
     const scopeFilter =
-      scope.type === 'organization'
+      scope.type === "organization"
         ? sql`j.organization_id = ${scope.organizationId}`
         : sql`j.organization_id IS NULL`;
-    const result = await db.execute<{ id: string; job_id: string; status: string; organization_id: string | null }>(sql`
+    const result = await db.execute<{
+      id: string;
+      job_id: string;
+      status: string;
+      organization_id: string | null;
+    }>(sql`
       SELECT jd.id, jd.job_id, j.status, j.organization_id
       FROM job_dependencies jd
       INNER JOIN jobs j ON j.id = jd.job_id

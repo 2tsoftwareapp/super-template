@@ -1,20 +1,17 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
+import { Inject, Injectable } from "@nestjs/common";
+import { Cron, CronExpression } from "@nestjs/schedule";
 import {
   APP_LOGGER,
   type AppLogger,
   ErrorReporterService,
   PLATFORM_TRANSACTION_PORT,
   type PlatformTransactionPort,
-} from '@repo/api-core';
+} from "@repo/api-core";
 
-import type { ObjectStorage } from './object-storage.interface';
+import type { ObjectStorage } from "./object-storage.interface";
 
-import { OBJECT_STORAGE } from './object-storage.interface';
-import {
-  STORAGE_TRACKING_PORT,
-  type StorageTrackingPort,
-} from './ports/storage-tracking.port';
+import { OBJECT_STORAGE } from "./object-storage.interface";
+import { STORAGE_TRACKING_PORT, type StorageTrackingPort } from "./ports/storage-tracking.port";
 
 const ORPHAN_GRACE_MS = 60 * 60 * 1000; // object untouched for 1h is a candidate
 const ORPHAN_BATCH_SIZE = 50;
@@ -64,16 +61,16 @@ export class StorageCleanupService {
       if (error instanceof Error && error.stack) {
         logContext.stack = error.stack;
       }
-      this.logger.error('Storage cleanup failed', logContext);
+      this.logger.error("Storage cleanup failed", logContext);
       if (error instanceof Error) {
         this.errorReporter.reportException(error, {
-          errorCode: 'STORAGE_CLEANUP_FAILED',
-          tags: { job: 'storage-cleanup' },
+          errorCode: "STORAGE_CLEANUP_FAILED",
+          tags: { job: "storage-cleanup" },
         });
       } else {
-        this.errorReporter.reportMessage('Storage cleanup failed', {
-          errorCode: 'STORAGE_CLEANUP_FAILED',
-          tags: { job: 'storage-cleanup' },
+        this.errorReporter.reportMessage("Storage cleanup failed", {
+          errorCode: "STORAGE_CLEANUP_FAILED",
+          tags: { job: "storage-cleanup" },
         });
       }
     } finally {
@@ -129,10 +126,9 @@ export class StorageCleanupService {
           const message = error instanceof Error ? error.message : String(error);
           await this.tracking.markDeleteFailed(item.id, message);
           if (item.attempts + 1 >= item.maxAttempts) {
-            this.logger.error(
-              `Storage delete for ${item.storageKey} exhausted retries`,
-              { error: message },
-            );
+            this.logger.error(`Storage delete for ${item.storageKey} exhausted retries`, {
+              error: message,
+            });
           }
         }
       }

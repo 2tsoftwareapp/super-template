@@ -16,9 +16,7 @@ export function SecurityView() {
   return (
     <div className="mx-auto max-w-2xl space-y-8">
       <div className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">
-          Account settings
-        </h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Account settings</h1>
         <p className="text-sm text-muted-foreground">
           Manage your password, security, and preferences.
         </p>
@@ -44,13 +42,7 @@ export function SecurityView() {
         />
       ) : (
         <MfaManagement
-          status={
-            mfa.status.isLoading
-              ? "loading"
-              : mfa.status.mfaEnabled
-                ? "enabled"
-                : "disabled"
-          }
+          status={mfa.status.isLoading ? "loading" : mfa.status.mfaEnabled ? "enabled" : "disabled"}
           view={mfa.view}
           setupData={mfa.setupData}
           recoveryCodes={mfa.recoveryCodes}

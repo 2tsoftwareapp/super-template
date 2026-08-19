@@ -1,6 +1,6 @@
-import type { TransactionExecutor } from '@repo/api-core';
+import type { TransactionExecutor } from "@repo/api-core";
 
-export type DeliveryStatus = 'PENDING' | 'PROCESSING' | 'SENT' | 'FAILED';
+export type DeliveryStatus = "PENDING" | "PROCESSING" | "SENT" | "FAILED";
 
 export interface DeliveryRecord {
   id: string;
@@ -29,10 +29,7 @@ export interface DeliveriesRepositoryPort {
     executor?: TransactionExecutor,
   ): Promise<DeliveryRecord[]>;
 
-  claimPending(
-    limit: number,
-    executor?: TransactionExecutor,
-  ): Promise<DeliveryRecord[]>;
+  claimPending(limit: number, executor?: TransactionExecutor): Promise<DeliveryRecord[]>;
 
   markSent(
     deliveryId: string,
@@ -70,4 +67,4 @@ export interface DeliveriesRepositoryPort {
   ): Promise<DeliveryRecord[]>;
 }
 
-export const DELIVERIES_REPOSITORY = Symbol('DELIVERIES_REPOSITORY');
+export const DELIVERIES_REPOSITORY = Symbol("DELIVERIES_REPOSITORY");

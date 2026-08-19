@@ -46,9 +46,7 @@ export function Pagination({
     <div className="flex flex-col gap-3 border-t border-border px-4 py-3 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between md:px-5">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
         <p className="text-xs">
-          {total === 0
-            ? "No results"
-            : `${rangeStart}–${rangeEnd} of ${total}`}
+          {total === 0 ? "No results" : `${rangeStart}–${rangeEnd} of ${total}`}
         </p>
         {onPageSizeChange && (
           <div className="flex items-center gap-2">
@@ -86,7 +84,9 @@ export function Pagination({
         </Button>
         {pageNumbers.map((item, idx) =>
           item === "dots" ? (
-            <span key={`dots-${idx}`} className="px-1 text-xs text-muted-foreground">…</span>
+            <span key={`dots-${idx}`} className="px-1 text-xs text-muted-foreground">
+              …
+            </span>
           ) : (
             <Button
               key={item}

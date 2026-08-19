@@ -55,9 +55,7 @@ export function createUsersTableColumns(options?: {
         <div className="flex items-center gap-2.5 py-0.5">
           <Avatar name={row.original.displayName} size="sm" />
           <div className="min-w-0">
-            <p className="truncate text-sm font-medium leading-tight">
-              {row.original.displayName}
-            </p>
+            <p className="truncate text-sm font-medium leading-tight">{row.original.displayName}</p>
             <p className="truncate text-[11px] text-muted-foreground leading-tight">
               {row.original.email}
             </p>
@@ -69,9 +67,7 @@ export function createUsersTableColumns(options?: {
       header: "Email",
       enableSorting: true,
       meta: { className: "hidden md:table-cell" } as const,
-      cell: ({ getValue }) => (
-        <span className="text-sm text-foreground">{getValue()}</span>
-      ),
+      cell: ({ getValue }) => <span className="text-sm text-foreground">{getValue()}</span>,
     }),
     columnHelper.accessor("status", {
       header: "Status",
@@ -157,20 +153,26 @@ export function createUsersTableColumns(options?: {
         if (canUpdate && status !== "ACTIVE") {
           items.push({
             label: "Activate",
-            onClick: () => { void onActivate?.(row.original.id); },
+            onClick: () => {
+              void onActivate?.(row.original.id);
+            },
           });
         }
         if (status === "PENDING") {
           items.push({
             label: "Resend verification",
-            onClick: () => { void onResendVerification?.(row.original.email); },
+            onClick: () => {
+              void onResendVerification?.(row.original.email);
+            },
           });
         }
         if (canUpdate && status !== "BLOCKED") {
           items.push({
             label: "Block",
             destructive: true,
-            onClick: () => { void onBlock?.(row.original.id); },
+            onClick: () => {
+              void onBlock?.(row.original.id);
+            },
           });
         }
 

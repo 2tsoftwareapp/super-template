@@ -5,16 +5,11 @@ import { webFetch } from "@/lib/http";
 
 import type { AdminLoginInput, MfaChallengeInput } from "../model/auth.schemas";
 
-import {
-  AUTH_FLOW_ERROR_CODES,
-  HTTP_METHODS,
-} from "../model/auth.constants";
+import { AUTH_FLOW_ERROR_CODES, HTTP_METHODS } from "../model/auth.constants";
 import { AuthFlowError } from "../model/auth.errors";
 
 /** Password login against the admin BFF — returns the raw session payload. */
-export async function loginToAdmin(
-  values: AdminLoginInput,
-): Promise<AuthLoginResponse> {
+export async function loginToAdmin(values: AdminLoginInput): Promise<AuthLoginResponse> {
   return webFetch<AuthLoginResponse>(apiPaths.auth.login, {
     method: HTTP_METHODS.post,
     body: JSON.stringify(values),

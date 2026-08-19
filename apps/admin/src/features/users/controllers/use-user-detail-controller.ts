@@ -88,19 +88,15 @@ export function useUserDetailController(): UserDetailViewModel {
     },
   });
 
-  const assignableRoles = getAssignableRoles(
-    actorRoles,
-    roles.data?.data ?? [],
-  ).map((r) => ({
+  const assignableRoles = getAssignableRoles(actorRoles, roles.data?.data ?? []).map((r) => ({
     id: r.id,
     name: r.name,
     description: r.description,
     organizationId: r.organizationId,
     scope: r.scope,
   }));
-  const orgScopedAssignments = currentUser?.roleAssignments?.filter(
-    (a) => a.organizationId !== null,
-  ) ?? [];
+  const orgScopedAssignments =
+    currentUser?.roleAssignments?.filter((a) => a.organizationId !== null) ?? [];
   const primaryOrgAssignment = orgScopedAssignments[0];
   const initialOrgId = isActorSuperAdmin
     ? primaryOrgAssignment?.organizationId
@@ -108,11 +104,7 @@ export function useUserDetailController(): UserDetailViewModel {
   const statusDisabled = isSelf || !canEdit || updateStatus.isPending;
   const roleDisabled = isSelf || !canEdit || replaceRoles.isPending;
 
-  const status = useUserStatus(
-    currentUser?.status,
-    updateStatus,
-    statusDisabled,
-  );
+  const status = useUserStatus(currentUser?.status, updateStatus, statusDisabled);
 
   const userRoles = useUserRoles(
     userId,

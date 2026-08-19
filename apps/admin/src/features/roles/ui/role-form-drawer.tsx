@@ -4,13 +4,7 @@ import { standardSchemaResolver as zodResolver } from "@hookform/resolvers/stand
 import { Button } from "@repo/web-ui/button";
 import { Input } from "@repo/web-ui/input";
 import { Label } from "@repo/web-ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@repo/web-ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@repo/web-ui/select";
 import { Spinner } from "@repo/web-ui/spinner";
 import { Building2 } from "lucide-react";
 import { useEffect, useMemo } from "react";
@@ -61,9 +55,7 @@ export function RoleFormDrawer({
 }) {
   const isEditing = role !== null;
 
-  const schema = isSuperAdmin && !isEditing
-    ? createRoleFormSchema
-    : roleSchema;
+  const schema = isSuperAdmin && !isEditing ? createRoleFormSchema : roleSchema;
 
   const form = useForm<RoleForm>({
     resolver: zodResolver(schema),
@@ -91,12 +83,7 @@ export function RoleFormDrawer({
   });
 
   const orgPermissions = useMemo(
-    () =>
-      selectDelegatablePermissions(
-        permissions,
-        actorPermissions,
-        isSuperAdmin,
-      ),
+    () => selectDelegatablePermissions(permissions, actorPermissions, isSuperAdmin),
     [actorPermissions, permissions, isSuperAdmin],
   );
 
@@ -116,12 +103,7 @@ export function RoleFormDrawer({
       description="Custom roles use permissions from the system catalog and stay scoped to your organization."
       onClose={onClose}
       footer={
-        <Button
-          type="submit"
-          form="role-form"
-          className="w-full"
-          disabled={isSaving}
-        >
+        <Button type="submit" form="role-form" className="w-full" disabled={isSaving}>
           {isSaving ? <Spinner data-icon="inline-start" /> : null}
           {isEditing ? "Save changes" : "Create role"}
         </Button>
@@ -166,9 +148,7 @@ export function RoleFormDrawer({
           <Label htmlFor="role-name">Name</Label>
           <Input id="role-name" {...form.register("name")} />
           {form.formState.errors.name ? (
-            <p className="text-xs text-destructive">
-              {form.formState.errors.name.message}
-            </p>
+            <p className="text-xs text-destructive">{form.formState.errors.name.message}</p>
           ) : null}
         </div>
 

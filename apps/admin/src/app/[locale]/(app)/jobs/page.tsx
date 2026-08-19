@@ -4,8 +4,7 @@ import { JobsView } from "@/features/jobs/screens/jobs-view";
 
 export const metadata: Metadata = {
   title: "Job Queue | Super Admin",
-  description:
-    "Monitor and manage background tasks, execution metrics, and workers.",
+  description: "Monitor and manage background tasks, execution metrics, and workers.",
 };
 
 export default function Page() {

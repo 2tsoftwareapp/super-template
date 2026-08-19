@@ -1,10 +1,10 @@
-import { Test } from '@nestjs/testing';
-import { EnvironmentService } from '@repo/api-core';
-import { describe, expect, it } from 'vitest';
-import { NotificationStreamService } from '../notification-stream.service';
+import { Test } from "@nestjs/testing";
+import { EnvironmentService } from "@repo/api-core";
+import { describe, expect, it } from "vitest";
+import { NotificationStreamService } from "../notification-stream.service";
 
-describe('NotificationStreamService', () => {
-  it('emits notification events to subscribed streams, scoped per org', async () => {
+describe("NotificationStreamService", () => {
+  it("emits notification events to subscribed streams, scoped per org", async () => {
     const moduleRef = await Test.createTestingModule({
       providers: [
         NotificationStreamService,
@@ -20,26 +20,26 @@ describe('NotificationStreamService', () => {
     const org2Events: unknown[] = [];
 
     // Subscribe to org-1 and org-2 channels for the same user — they must remain isolated
-    const sub1 = service.stream('user-1', 'org-1').subscribe((event) => {
+    const sub1 = service.stream("user-1", "org-1").subscribe((event) => {
       org1Events.push(event.data);
     });
-    const sub2 = service.stream('user-1', 'org-2').subscribe((event) => {
+    const sub2 = service.stream("user-1", "org-2").subscribe((event) => {
       org2Events.push(event.data);
     });
 
     const baseEvent = {
-      id: 'notification-1',
-      userId: 'user-1',
-      organizationId: 'org-1',
-      type: 'ops.alert',
-      title: 'Hello',
-      body: 'World',
+      id: "notification-1",
+      userId: "user-1",
+      organizationId: "org-1",
+      type: "ops.alert",
+      title: "Hello",
+      body: "World",
       data: null,
       readAt: null,
-      createdAt: '2026-06-16T00:00:00.000Z',
+      createdAt: "2026-06-16T00:00:00.000Z",
     };
 
-    service.emit('user-1', 'org-1', baseEvent);
+    service.emit("user-1", "org-1", baseEvent);
 
     sub1.unsubscribe();
     sub2.unsubscribe();

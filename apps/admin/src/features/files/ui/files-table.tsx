@@ -3,14 +3,7 @@ import { Button } from "@repo/web-ui/button";
 import { ErrorState } from "@repo/web-ui/error-state";
 import { SectionLoading } from "@repo/web-ui/loading";
 import { Show } from "@repo/web-ui/show";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@repo/web-ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@repo/web-ui/table";
 import { FileIcon, Trash2 } from "lucide-react";
 
 import type { FileDto } from "@/lib/api-types";
@@ -83,29 +76,18 @@ export function FilesTable({
           ) : null}
           {!isLoading && !isError && files.length === 0 ? (
             <TableRow>
-              <TableCell
-                colSpan={6}
-                className="py-16 text-center text-sm text-muted-foreground"
-              >
-                {hasFilters
-                  ? "No files match your filters."
-                  : "No files uploaded yet."}
+              <TableCell colSpan={6} className="py-16 text-center text-sm text-muted-foreground">
+                {hasFilters ? "No files match your filters." : "No files uploaded yet."}
               </TableCell>
             </TableRow>
           ) : null}
           {!isLoading && !isError
             ? files.map((file) => (
-                <TableRow
-                  key={file.id}
-                  className="cursor-pointer"
-                  onClick={() => onRowClick(file)}
-                >
+                <TableRow key={file.id} className="cursor-pointer" onClick={() => onRowClick(file)}>
                   <TableCell className="font-medium text-sm">
                     <div className="flex items-center gap-2">
                       <FileIcon className="size-4 shrink-0 text-muted-foreground" />
-                      <span className="truncate max-w-[260px]">
-                        {file.originalName}
-                      </span>
+                      <span className="truncate max-w-[260px]">{file.originalName}</span>
                     </div>
                   </TableCell>
                   <TableCell>

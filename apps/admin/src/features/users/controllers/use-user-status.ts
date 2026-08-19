@@ -9,7 +9,12 @@ export type UserStatus = (typeof STATUS_OPTIONS)[number];
 
 export function useUserStatus(
   currentStatus: UserStatus | undefined,
-  updateStatus: { isPending: boolean; isSuccess: boolean; isError: boolean; mutateAsync: (status: UserStatus) => Promise<unknown> },
+  updateStatus: {
+    isPending: boolean;
+    isSuccess: boolean;
+    isError: boolean;
+    mutateAsync: (status: UserStatus) => Promise<unknown>;
+  },
   disabled: boolean,
 ) {
   const [selectedStatus, setSelectedStatus] = useState<UserStatus>("PENDING");

@@ -1,5 +1,5 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { type JsonObject, PaginationQueryDto } from '@repo/api-core';
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { type JsonObject, PaginationQueryDto } from "@repo/api-core";
 import {
   ArrayMaxSize,
   ArrayMinSize,
@@ -10,7 +10,7 @@ import {
   IsString,
   IsUUID,
   MaxLength,
-} from 'class-validator';
+} from "class-validator";
 
 export class FileDto {
   @ApiProperty()
@@ -53,7 +53,7 @@ export class FileUrlDto {
 }
 
 export class FilesQueryDto extends PaginationQueryDto {
-  @ApiPropertyOptional({ description: 'Match against the original file name.' })
+  @ApiPropertyOptional({ description: "Match against the original file name." })
   @IsOptional()
   @IsString()
   @MaxLength(200)
@@ -80,12 +80,12 @@ export class FilesQueryDto extends PaginationQueryDto {
   to?: string;
 
   @ApiPropertyOptional({
-    enum: ['createdAt', 'originalName', 'sizeBytes'],
-    default: 'createdAt',
+    enum: ["createdAt", "originalName", "sizeBytes"],
+    default: "createdAt",
   })
   @IsOptional()
-  @IsEnum(['createdAt', 'originalName', 'sizeBytes'])
-  sortField: 'createdAt' | 'originalName' | 'sizeBytes' = 'createdAt';
+  @IsEnum(["createdAt", "originalName", "sizeBytes"])
+  sortField: "createdAt" | "originalName" | "sizeBytes" = "createdAt";
 }
 
 export class FileVersionDto {
@@ -115,8 +115,8 @@ export class FileVersionDto {
 }
 
 export class FileHistoryEventDto {
-  @ApiProperty({ enum: ['version', 'audit'] })
-  type: 'version' | 'audit';
+  @ApiProperty({ enum: ["version", "audit"] })
+  type: "version" | "audit";
 
   @ApiProperty()
   action: string;
@@ -124,7 +124,7 @@ export class FileHistoryEventDto {
   @ApiPropertyOptional({ type: String, nullable: true })
   actorId: string | null;
 
-  @ApiPropertyOptional({ type: 'object', additionalProperties: true })
+  @ApiPropertyOptional({ type: "object", additionalProperties: true })
   metadata: JsonObject | null;
 
   @ApiProperty()
@@ -136,11 +136,12 @@ export class BatchDeleteFilesDto {
   @IsArray()
   @ArrayMinSize(1)
   @ArrayMaxSize(100)
-  @IsUUID('all', { each: true })
+  @IsUUID("all", { each: true })
   fileIds: string[];
 
   @ApiPropertyOptional({
-    description: 'Replaying the same key returns the original result instead of re-running the batch.',
+    description:
+      "Replaying the same key returns the original result instead of re-running the batch.",
   })
   @IsOptional()
   @IsString()

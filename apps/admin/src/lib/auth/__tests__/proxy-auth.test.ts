@@ -24,33 +24,36 @@ describe("splitLocale", () => {
 
 describe("resolveAdminProxy", () => {
   it("redirects a protected route to the locale's login when the cookie is absent", () => {
-    expect(
-      resolveAdminProxy({ pathname: "/vi/users", hasRefreshToken: false }),
-    ).toEqual({ action: "redirect", to: "/vi/login" });
+    expect(resolveAdminProxy({ pathname: "/vi/users", hasRefreshToken: false })).toEqual({
+      action: "redirect",
+      to: "/vi/login",
+    });
   });
 
   it("redirects unprefixed protected routes to the default-locale login", () => {
-    expect(
-      resolveAdminProxy({ pathname: "/users", hasRefreshToken: false }),
-    ).toEqual({ action: "redirect", to: "/en/login" });
+    expect(resolveAdminProxy({ pathname: "/users", hasRefreshToken: false })).toEqual({
+      action: "redirect",
+      to: "/en/login",
+    });
   });
 
   it("lets a protected route through when the refresh cookie is present", () => {
-    expect(
-      resolveAdminProxy({ pathname: "/en/users", hasRefreshToken: true }),
-    ).toEqual({ action: "next" });
+    expect(resolveAdminProxy({ pathname: "/en/users", hasRefreshToken: true })).toEqual({
+      action: "next",
+    });
   });
 
   it("redirects the dashboard root when unauthenticated", () => {
-    expect(
-      resolveAdminProxy({ pathname: "/en", hasRefreshToken: false }),
-    ).toEqual({ action: "redirect", to: "/en/login" });
+    expect(resolveAdminProxy({ pathname: "/en", hasRefreshToken: false })).toEqual({
+      action: "redirect",
+      to: "/en/login",
+    });
   });
 
   it("never redirects the login page, even without a cookie", () => {
-    expect(
-      resolveAdminProxy({ pathname: "/vi/login", hasRefreshToken: false }),
-    ).toEqual({ action: "next" });
+    expect(resolveAdminProxy({ pathname: "/vi/login", hasRefreshToken: false })).toEqual({
+      action: "next",
+    });
   });
 
   it("never redirects the SSO callback, which runs before a session exists", () => {

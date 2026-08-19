@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@repo/web-ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/web-ui/card";
 import { Input } from "@repo/web-ui/input";
 import { Label } from "@repo/web-ui/label";
 import { LoadingButton } from "@repo/web-ui/loading-button";
@@ -52,9 +46,7 @@ export function MailListView({
           <CardContent>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <Label className="text-xs text-muted-foreground">
-                  Template key
-                </Label>
+                <Label className="text-xs text-muted-foreground">Template key</Label>
                 <select
                   className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   value={sendForm.selectedTemplateKey}
@@ -69,9 +61,7 @@ export function MailListView({
                 </select>
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs text-muted-foreground">
-                  Recipient email
-                </Label>
+                <Label className="text-xs text-muted-foreground">Recipient email</Label>
                 <Input
                   type="email"
                   placeholder="user@example.com"
@@ -82,9 +72,7 @@ export function MailListView({
               {sendForm.selectedTemplate?.variables &&
               sendForm.selectedTemplate.variables.length > 0 ? (
                 <div className="space-y-3 sm:col-span-2">
-                  <Label className="text-xs text-muted-foreground">
-                    Variables
-                  </Label>
+                  <Label className="text-xs text-muted-foreground">Variables</Label>
                   <div className="grid gap-3 sm:grid-cols-2">
                     {sendForm.selectedTemplate.variables.map((varName) => (
                       <div key={varName} className="space-y-1">
@@ -94,9 +82,7 @@ export function MailListView({
                         <Input
                           placeholder={`Value for ${varName}`}
                           value={sendForm.variableValues[varName] ?? ""}
-                          onChange={(e) =>
-                            sendForm.onVariableChange(varName, e.target.value)
-                          }
+                          onChange={(e) => sendForm.onVariableChange(varName, e.target.value)}
                         />
                       </div>
                     ))}
@@ -104,15 +90,11 @@ export function MailListView({
                 </div>
               ) : null}
               <div className="space-y-1.5">
-                <Label className="text-xs text-muted-foreground">
-                  Idempotency key (optional)
-                </Label>
+                <Label className="text-xs text-muted-foreground">Idempotency key (optional)</Label>
                 <Input
                   placeholder="uuid or unique string"
                   value={sendForm.idempotencyKey}
-                  onChange={(e) =>
-                    sendForm.onChangeIdempotencyKey(e.target.value)
-                  }
+                  onChange={(e) => sendForm.onChangeIdempotencyKey(e.target.value)}
                 />
               </div>
             </div>
@@ -130,15 +112,9 @@ export function MailListView({
         </Card>
       </Show>
 
-      <MailDeliveriesTable
-        deliveries={deliveries}
-        onSelectDelivery={detail.onSelect}
-      />
+      <MailDeliveriesTable deliveries={deliveries} onSelectDelivery={detail.onSelect} />
 
-      <MailDetailDrawer
-        selectedDelivery={detail.selectedDelivery}
-        onClose={detail.onClose}
-      />
+      <MailDetailDrawer selectedDelivery={detail.selectedDelivery} onClose={detail.onClose} />
     </ResourcePageShell>
   );
 }

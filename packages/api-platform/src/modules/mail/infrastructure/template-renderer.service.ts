@@ -1,24 +1,18 @@
-import { Injectable } from '@nestjs/common';
-import { existsSync, readdirSync } from 'node:fs';
-import { readFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import { Injectable } from "@nestjs/common";
+import { existsSync, readdirSync } from "node:fs";
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 
-import type { TemplateRendererServicePort } from '../application/ports/template-renderer.service.port';
+import type { TemplateRendererServicePort } from "../application/ports/template-renderer.service.port";
 
 function resolveTemplatesDir(): string {
-  const marker = 'auth.verify-email.subject.txt';
+  const marker = "auth.verify-email.subject.txt";
   const candidates = [
-    join(__dirname, 'templates'),
-    join(__dirname, 'infrastructure', 'templates'),
-    join(process.cwd(), 'dist', 'templates'),
-    join(
-      process.cwd(),
-      '../../packages/api-platform/src/modules/mail/infrastructure/templates',
-    ),
-    join(
-      process.cwd(),
-      'packages/api-platform/src/modules/mail/infrastructure/templates',
-    ),
+    join(__dirname, "templates"),
+    join(__dirname, "infrastructure", "templates"),
+    join(process.cwd(), "dist", "templates"),
+    join(process.cwd(), "../../packages/api-platform/src/modules/mail/infrastructure/templates"),
+    join(process.cwd(), "packages/api-platform/src/modules/mail/infrastructure/templates"),
   ];
 
   for (const dir of candidates) {
@@ -27,14 +21,14 @@ function resolveTemplatesDir(): string {
     }
   }
 
-  return join(__dirname, 'templates');
+  return join(__dirname, "templates");
 }
 
 const PREVIEW_DEFAULT_VARIABLES: Record<string, string> = {
-  displayName: 'Example User',
-  verifyUrl: 'https://example.com/verify-email?token=sample',
-  resetUrl: 'https://example.com/reset-password?token=sample',
-  webUrl: 'https://example.com/login',
+  displayName: "Example User",
+  verifyUrl: "https://example.com/verify-email?token=sample",
+  resetUrl: "https://example.com/reset-password?token=sample",
+  webUrl: "https://example.com/login",
 };
 
 @Injectable()
@@ -86,7 +80,7 @@ export class TemplateRendererService implements TemplateRendererServicePort {
   }
 
   listTemplateKeys(): string[] {
-    const suffix = '.subject.txt';
+    const suffix = ".subject.txt";
     return readdirSync(this.templatesDir)
       .filter((file) => file.endsWith(suffix))
       .map((file) => file.slice(0, -suffix.length))
@@ -95,8 +89,8 @@ export class TemplateRendererService implements TemplateRendererServicePort {
 
   async findVariables(templateKey: string): Promise<string[]> {
     const contents = await Promise.all(
-      ['subject', 'text', 'html'].map((part) =>
-        readFile(join(this.templatesDir, `${templateKey}.${part}.txt`), 'utf8'),
+      ["subject", "text", "html"].map((part) =>
+        readFile(join(this.templatesDir, `${templateKey}.${part}.txt`), "utf8"),
       ),
     );
 
@@ -110,15 +104,12 @@ export class TemplateRendererService implements TemplateRendererServicePort {
     return [...variables].sort();
   }
 
-  private async renderFile(
-    fileName: string,
-    variables: Record<string, string>,
-  ): Promise<string> {
+  private async renderFile(fileName: string, variables: Record<string, string>): Promise<string> {
     const filePath = join(this.templatesDir, fileName);
-    const template = await readFile(filePath, 'utf8');
+    const template = await readFile(filePath, "utf8");
 
     return template.replace(/\{\{(\w+)\}\}/g, (_, key: string) => {
-      return variables[key] ?? '';
+      return variables[key] ?? "";
     });
   }
 }

@@ -51,11 +51,7 @@ export function UserDetailStatus({ status }: UserDetailStatusProps) {
         <Show when={status.state.isError}>
           <span className="text-xs text-destructive">
             Failed.{" "}
-            <button
-              type="button"
-              className="underline"
-              onClick={status.onApply}
-            >
+            <button type="button" className="underline" onClick={status.onApply}>
               Retry
             </button>
           </span>

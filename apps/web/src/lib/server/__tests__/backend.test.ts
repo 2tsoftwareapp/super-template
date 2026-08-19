@@ -5,12 +5,11 @@ import type { ApiEnvelope } from "@/lib/api-types";
 
 import { proxyWithRefresh } from "../backend";
 
-const { readAuthCookiesMock, setAuthCookiesMock, clearAuthCookiesMock } =
-  vi.hoisted(() => ({
-    readAuthCookiesMock: vi.fn(),
-    setAuthCookiesMock: vi.fn(),
-    clearAuthCookiesMock: vi.fn(),
-  }));
+const { readAuthCookiesMock, setAuthCookiesMock, clearAuthCookiesMock } = vi.hoisted(() => ({
+  readAuthCookiesMock: vi.fn(),
+  setAuthCookiesMock: vi.fn(),
+  clearAuthCookiesMock: vi.fn(),
+}));
 
 vi.mock("@/lib/env", () => ({
   env: {
@@ -198,8 +197,7 @@ describe("proxyWithRefresh", () => {
     const firstCall = fetchMock.mock.calls[0];
     expect(firstCall).toBeDefined();
     const [url] = firstCall!;
-    const requestUrl =
-      typeof url === "string" ? url : url instanceof URL ? url.href : "";
+    const requestUrl = typeof url === "string" ? url : url instanceof URL ? url.href : "";
 
     expect(requestUrl).toContain(
       "/api/v1/admin/users?page=2&limit=5&status=ACTIVE&sortField=name&sortOrder=asc",

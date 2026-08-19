@@ -1,9 +1,9 @@
-import type { AuthenticatedRequestUser } from '@repo/api-core';
+import type { AuthenticatedRequestUser } from "@repo/api-core";
 
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from "@nestjs/common";
 
-import { FILES_REPOSITORY, type FilesRepositoryPort } from '../ports/files.repository.port';
-import { FileAccessService } from '../services/file-access.service';
+import { FILES_REPOSITORY, type FilesRepositoryPort } from "../ports/files.repository.port";
+import { FileAccessService } from "../services/file-access.service";
 
 @Injectable()
 export class ListFileVersionsUseCase {
@@ -13,10 +13,7 @@ export class ListFileVersionsUseCase {
   ) {}
 
   async execute(actor: AuthenticatedRequestUser, fileId: string) {
-    const file = await this.fileAccessService.findAccessibleFile(
-      actor,
-      fileId,
-    );
+    const file = await this.fileAccessService.findAccessibleFile(actor, fileId);
     const versions = await this.filesRepository.listVersions(file.id);
 
     return versions.map((version) => ({

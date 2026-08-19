@@ -29,8 +29,10 @@ export function ActionsDropdown({
     const close = () => setOpen(false);
     const handleClickOutside = (e: MouseEvent) => {
       if (
-        menuRef.current && !menuRef.current.contains(e.target as Node) &&
-        triggerRef.current && !triggerRef.current.contains(e.target as Node)
+        menuRef.current &&
+        !menuRef.current.contains(e.target as Node) &&
+        triggerRef.current &&
+        !triggerRef.current.contains(e.target as Node)
       ) {
         close();
       }
@@ -58,7 +60,10 @@ export function ActionsDropdown({
         ref={triggerRef}
         type="button"
         disabled={disabled}
-        onClick={(e) => { e.stopPropagation(); handleToggle(); }}
+        onClick={(e) => {
+          e.stopPropagation();
+          handleToggle();
+        }}
         className="inline-flex size-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:opacity-30 disabled:pointer-events-none"
       >
         <svg
@@ -98,7 +103,10 @@ export function ActionsDropdown({
                       ? "text-destructive hover:bg-destructive/10"
                       : "text-foreground hover:bg-accent",
                   )}
-                  onClick={() => { item.onClick(); setOpen(false); }}
+                  onClick={() => {
+                    item.onClick();
+                    setOpen(false);
+                  }}
                 >
                   {item.icon}
                   {item.label}

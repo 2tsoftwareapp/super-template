@@ -26,13 +26,10 @@ export const notificationsApi = {
   },
 
   send(input: SendNotificationInput) {
-    return webFetch<{ data: NotificationJobDto }>(
-      bffPath("/api/v1/admin/notifications"),
-      {
-        method: "POST",
-        body: JSON.stringify(input),
-      },
-    );
+    return webFetch<{ data: NotificationJobDto }>(bffPath("/api/v1/admin/notifications"), {
+      method: "POST",
+      body: JSON.stringify(input),
+    });
   },
 
   cancelJob(jobId: string) {

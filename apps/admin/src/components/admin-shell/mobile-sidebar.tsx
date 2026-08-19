@@ -28,17 +28,9 @@ export function MobileSidebar({
       <div className="flex min-h-14 items-center justify-between border-b border-border/40 px-4">
         <Brand />
       </div>
-      <ResourceNav
-        permissions={permissions}
-        pathname={pathname}
-        onNavigate={onNavigate}
-      />
+      <ResourceNav permissions={permissions} pathname={pathname} onNavigate={onNavigate} />
       <Separator className="bg-border/40" />
-      <UserMenu
-        displayName={displayName}
-        roles={roles}
-        onSignOut={onSignOut}
-      />
+      <UserMenu displayName={displayName} roles={roles} onSignOut={onSignOut} />
     </aside>
   );
 }

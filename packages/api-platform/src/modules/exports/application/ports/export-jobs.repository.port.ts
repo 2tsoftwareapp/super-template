@@ -1,4 +1,4 @@
-import type { TransactionExecutor } from '@repo/api-core';
+import type { TransactionExecutor } from "@repo/api-core";
 
 export interface IdempotentInsertResult<T> {
   value: T;
@@ -43,10 +43,7 @@ export interface ExportJobsRepositoryPort {
    * Single UPDATE ... WHERE id IN (SELECT ... FOR UPDATE SKIP LOCKED) so
    * concurrent workers each get distinct jobs and never double-claim.
    */
-  claimPending(
-    limit: number,
-    executor?: TransactionExecutor,
-  ): Promise<ExportJobRecord[]>;
+  claimPending(limit: number, executor?: TransactionExecutor): Promise<ExportJobRecord[]>;
 
   update(
     jobId: string,
@@ -58,10 +55,7 @@ export interface ExportJobsRepositoryPort {
    * Marks export jobs stuck in PROCESSING beyond `before` as FAILED (their
    * originating request died before completion). Returns the count recovered.
    */
-  recoverStaleProcessing(
-    before: Date,
-    executor?: TransactionExecutor,
-  ): Promise<number>;
+  recoverStaleProcessing(before: Date, executor?: TransactionExecutor): Promise<number>;
 }
 
-export const EXPORT_JOBS_REPOSITORY = Symbol('EXPORT_JOBS_REPOSITORY');
+export const EXPORT_JOBS_REPOSITORY = Symbol("EXPORT_JOBS_REPOSITORY");

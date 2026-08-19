@@ -21,9 +21,7 @@ export function PageHeader({
       <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
         <div className="space-y-2">
           <h1 className="text-4xl font-semibold">{title}</h1>
-          <p className="max-w-3xl text-sm leading-7 text-muted-foreground">
-            {description}
-          </p>
+          <p className="max-w-3xl text-sm leading-7 text-muted-foreground">{description}</p>
         </div>
         {actions ? <div className="flex flex-wrap gap-2">{actions}</div> : null}
       </div>

@@ -33,9 +33,7 @@ import { useMfaStatusQuery } from "@/features/security/api/security.queries";
 export function useMfaController(): MfaSecurityViewModel {
   // Step 1: sensitive setup state is memory-only and scoped to this screen.
   const [view, setView] = useState<MfaView>("idle");
-  const [setupData, setSetupData] = useState<MfaSetupResponse["data"] | null>(
-    null,
-  );
+  const [setupData, setSetupData] = useState<MfaSetupResponse["data"] | null>(null);
   const [recoveryCodes, setRecoveryCodes] = useState<string[]>([]);
   const [otpCode, setOtpCode] = useState("");
 
@@ -98,9 +96,7 @@ export function useMfaController(): MfaSecurityViewModel {
       setOtpCode("");
     } catch (error) {
       setOtpCode("");
-      toast.error(
-        getErrorMessage(error, "Could not regenerate recovery codes."),
-      );
+      toast.error(getErrorMessage(error, "Could not regenerate recovery codes."));
     }
   }
 
@@ -135,10 +131,8 @@ export function useMfaController(): MfaSecurityViewModel {
     handleRegenerate,
     handleCancelSetup,
     handleRecoveryCodesDone,
-    handleCopyRecoveryCodes: () =>
-      toast.success("Recovery codes copied to clipboard"),
-    handleCopyRecoveryCodesError: () =>
-      toast.error("Could not copy recovery codes"),
+    handleCopyRecoveryCodes: () => toast.success("Recovery codes copied to clipboard"),
+    handleCopyRecoveryCodesError: () => toast.error("Could not copy recovery codes"),
     isSettingUp: setupMutation.isPending,
     isVerifying: confirmMutation.isPending,
     isDisabling: disableMutation.isPending,

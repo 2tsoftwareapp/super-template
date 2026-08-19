@@ -1,16 +1,16 @@
-import type { AuthenticatedRequestUser } from '@repo/api-core';
+import type { AuthenticatedRequestUser } from "@repo/api-core";
 
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { AppError, ERROR_CODES } from '@repo/api-core';
+import { HttpStatus, Inject, Injectable } from "@nestjs/common";
+import { AppError, ERROR_CODES } from "@repo/api-core";
 
-import type { ImportJobView } from '../imports.types';
+import type { ImportJobView } from "../imports.types";
 
-import { canAccessImportJob } from '../../domain/import-access.policy';
-import { ImportsMapper } from '../imports.mapper';
+import { canAccessImportJob } from "../../domain/import-access.policy";
+import { ImportsMapper } from "../imports.mapper";
 import {
   IMPORT_JOBS_REPOSITORY,
   type ImportJobsRepositoryPort,
-} from '../ports/imports.repository.port';
+} from "../ports/imports.repository.port";
 
 @Injectable()
 export class GetImportUseCase {
@@ -20,10 +20,7 @@ export class GetImportUseCase {
     private readonly importsMapper: ImportsMapper,
   ) {}
 
-  async execute(
-    actor: AuthenticatedRequestUser,
-    jobId: string,
-  ): Promise<ImportJobView> {
+  async execute(actor: AuthenticatedRequestUser, jobId: string): Promise<ImportJobView> {
     const job = await this.importJobsRepository.findById(jobId);
 
     if (
@@ -42,7 +39,7 @@ export class GetImportUseCase {
     ) {
       throw new AppError(
         ERROR_CODES.IMPORT_JOB_NOT_FOUND,
-        'Import job not found',
+        "Import job not found",
         HttpStatus.NOT_FOUND,
       );
     }

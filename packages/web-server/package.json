@@ -12,7 +12,8 @@
   "scripts": {
     "build": "node ../../tools/tsc7/node_modules/typescript7/bin/tsc -p tsconfig.json",
     "lint": "eslint .",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "@repo/api-contract": "workspace:*",

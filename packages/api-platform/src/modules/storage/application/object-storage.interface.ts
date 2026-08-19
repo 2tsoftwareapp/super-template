@@ -8,7 +8,7 @@ export interface UploadResult {
   key: string;
 }
 
-export const OBJECT_STORAGE = Symbol('OBJECT_STORAGE');
+export const OBJECT_STORAGE = Symbol("OBJECT_STORAGE");
 
 export interface ObjectStorage {
   upload(input: UploadInput): Promise<UploadResult>;

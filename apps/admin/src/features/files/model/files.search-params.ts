@@ -1,8 +1,4 @@
-import {
-  pageParam,
-  parseSearchParams,
-  searchTextParam,
-} from "@repo/web-utils/params";
+import { pageParam, parseSearchParams, searchTextParam } from "@repo/web-utils/params";
 import { z } from "zod";
 
 import { FILE_MIME_OPTIONS } from "./files.constants";
@@ -17,10 +13,7 @@ export interface FilesFilters {
   page: number;
 }
 
-const mimeValues = FILE_MIME_OPTIONS.map((option) => option.value) as [
-  string,
-  ...string[],
-];
+const mimeValues = FILE_MIME_OPTIONS.map((option) => option.value) as [string, ...string[]];
 
 const filesFiltersSchema = z.object({
   q: searchTextParam(200),
@@ -35,11 +28,7 @@ const FILES_FILTERS_FALLBACK = {
 } as const;
 
 export function parseFilesFilters(sp: URLSearchParams): FilesFilters {
-  const parsed = parseSearchParams(
-    filesFiltersSchema,
-    sp,
-    FILES_FILTERS_FALLBACK,
-  );
+  const parsed = parseSearchParams(filesFiltersSchema, sp, FILES_FILTERS_FALLBACK);
 
   return {
     q: parsed.data.q,

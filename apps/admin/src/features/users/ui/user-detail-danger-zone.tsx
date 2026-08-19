@@ -11,11 +11,7 @@ interface UserDetailDangerZoneProps {
   canEdit: boolean;
 }
 
-export function UserDetailDangerZone({
-  danger,
-  displayName,
-  canEdit,
-}: UserDetailDangerZoneProps) {
+export function UserDetailDangerZone({ danger, displayName, canEdit }: UserDetailDangerZoneProps) {
   return (
     <div>
       <h4 className="mb-3 text-sm font-medium text-destructive flex items-center gap-2">
@@ -34,17 +30,11 @@ export function UserDetailDangerZone({
               message={
                 <>
                   Permanently delete{" "}
-                  <span className="font-medium text-foreground">
-                    {displayName}
-                  </span>
-                  ? This cannot be undone.
+                  <span className="font-medium text-foreground">{displayName}</span>? This cannot be
+                  undone.
                 </>
               }
-              confirmLabel={
-                danger.state.isPending
-                  ? "Deleting…"
-                  : "Confirm delete"
-              }
+              confirmLabel={danger.state.isPending ? "Deleting…" : "Confirm delete"}
               destructive
               loading={danger.state.isPending}
               onCancel={danger.onCancel}
@@ -63,11 +53,7 @@ export function UserDetailDangerZone({
           <Show when={danger.state.isError}>
             <p className="mt-2 text-xs text-destructive">
               Delete failed.{" "}
-              <button
-                type="button"
-                className="underline"
-                onClick={danger.onRetry}
-              >
+              <button type="button" className="underline" onClick={danger.onRetry}>
                 Retry
               </button>
             </p>

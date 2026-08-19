@@ -27,9 +27,7 @@ const isBackendConnectionError = (error: Error): boolean => {
 
   const cause = (error as TypeError & { cause?: { code?: string } }).cause;
   return (
-    cause?.code === "ECONNREFUSED" ||
-    cause?.code === "ENOTFOUND" ||
-    cause?.code === "ECONNRESET"
+    cause?.code === "ECONNREFUSED" || cause?.code === "ENOTFOUND" || cause?.code === "ECONNRESET"
   );
 };
 
@@ -38,8 +36,7 @@ const backendUnavailableResponse = () =>
     JSON.stringify({
       error: {
         code: "BACKEND_UNAVAILABLE",
-        message:
-          "API server is not reachable. Start it with `make dev-api` or `make dev`.",
+        message: "API server is not reachable. Start it with `make dev-api` or `make dev`.",
         details: null,
       },
       meta: {
@@ -159,9 +156,7 @@ export function createBackendHelpers({
     }
   };
 
-  const doRefreshSession = async (
-    refreshToken: string,
-  ): Promise<RefreshSessionPayload | null> => {
+  const doRefreshSession = async (refreshToken: string): Promise<RefreshSessionPayload | null> => {
     let response: Response;
 
     try {
@@ -183,11 +178,7 @@ export function createBackendHelpers({
 
     const payload = await parseJson<RefreshSessionPayload>(response);
 
-    if (
-      !response.ok ||
-      !payload?.data?.accessToken ||
-      !payload?.data?.refreshToken
-    ) {
+    if (!response.ok || !payload?.data?.accessToken || !payload?.data?.refreshToken) {
       return null;
     }
     return payload;
@@ -196,14 +187,9 @@ export function createBackendHelpers({
   // Single-flight per refresh token: N concurrent 401s (parallel queries from
   // one browser) share one refresh call instead of racing the API's rotation
   // CAS, which would trip reuse detection and revoke the session.
-  const inflightRefreshes = new Map<
-    string,
-    Promise<RefreshSessionPayload | null>
-  >();
+  const inflightRefreshes = new Map<string, Promise<RefreshSessionPayload | null>>();
 
-  const refreshSession = (
-    refreshToken: string,
-  ): Promise<RefreshSessionPayload | null> => {
+  const refreshSession = (refreshToken: string): Promise<RefreshSessionPayload | null> => {
     const existing = inflightRefreshes.get(refreshToken);
     if (existing) {
       return existing;
@@ -240,11 +226,7 @@ export function createBackendHelpers({
 
     const requestCsrfToken = request.headers.get("x-csrf-token");
 
-    if (
-      !csrfToken ||
-      requestCsrfToken !== csrfToken ||
-      !auth.isValidCsrfToken(csrfToken)
-    ) {
+    if (!csrfToken || requestCsrfToken !== csrfToken || !auth.isValidCsrfToken(csrfToken)) {
       return csrfForbiddenResponse();
     }
 

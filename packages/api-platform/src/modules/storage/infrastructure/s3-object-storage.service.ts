@@ -3,16 +3,16 @@ import {
   GetObjectCommand,
   PutObjectCommand,
   S3Client,
-} from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { Injectable } from '@nestjs/common';
-import { EnvironmentService } from '@repo/api-core';
+} from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { Injectable } from "@nestjs/common";
+import { EnvironmentService } from "@repo/api-core";
 
 import type {
   ObjectStorage,
   UploadInput,
   UploadResult,
-} from '../application/object-storage.interface';
+} from "../application/object-storage.interface";
 
 @Injectable()
 export class S3ObjectStorage implements ObjectStorage {
@@ -21,10 +21,10 @@ export class S3ObjectStorage implements ObjectStorage {
 
   constructor(private readonly environmentService: EnvironmentService) {
     const env = this.environmentService.values;
-    this.bucket = env.S3_BUCKET ?? '';
+    this.bucket = env.S3_BUCKET ?? "";
 
     const config = {
-      region: env.S3_REGION ?? 'us-east-1',
+      region: env.S3_REGION ?? "us-east-1",
       forcePathStyle: Boolean(env.S3_ENDPOINT),
       ...(env.S3_ACCESS_KEY_ID && env.S3_SECRET_ACCESS_KEY
         ? {
@@ -64,7 +64,7 @@ export class S3ObjectStorage implements ObjectStorage {
     const body = response.Body;
 
     if (!body) {
-      throw new Error('S3 object body is empty');
+      throw new Error("S3 object body is empty");
     }
 
     return Buffer.from(await body.transformToByteArray());

@@ -1,9 +1,4 @@
-import {
-  pageParam,
-  parseSearchParams,
-  searchTextParam,
-  uuidParam,
-} from "@repo/web-utils/params";
+import { pageParam, parseSearchParams, searchTextParam, uuidParam } from "@repo/web-utils/params";
 import { z } from "zod";
 
 const scopeParam = z.enum(["platform", "organization"]).optional();
@@ -28,12 +23,7 @@ const ROLES_SEARCH_PARAMS_FALLBACK: RolesSearchParams = {
  * Parse the roles list search params with per-key recovery: a malformed key
  * falls back instead of blanking the whole list (CODING_RULES §15 R4).
  */
-export function parseRolesSearchParams(
-  searchParams: URLSearchParams,
-): RolesSearchParams {
-  return parseSearchParams(
-    rolesSearchParamsSchema,
-    searchParams,
-    ROLES_SEARCH_PARAMS_FALLBACK,
-  ).data;
+export function parseRolesSearchParams(searchParams: URLSearchParams): RolesSearchParams {
+  return parseSearchParams(rolesSearchParamsSchema, searchParams, ROLES_SEARCH_PARAMS_FALLBACK)
+    .data;
 }

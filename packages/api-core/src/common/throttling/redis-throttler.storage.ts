@@ -1,23 +1,19 @@
-import type { ThrottlerStorage } from '@nestjs/throttler';
+import type { ThrottlerStorage } from "@nestjs/throttler";
 
-import type { EnvironmentService } from '../../config/environment.service';
+import type { EnvironmentService } from "../../config/environment.service";
 
-import { adaptRedisClient, createRedisClient } from '../redis/redis-client.adapter';
+import { adaptRedisClient, createRedisClient } from "../redis/redis-client.adapter";
 
 interface RedisStorageClient {
   connect: () => Promise<void>;
   incr: (key: string) => Promise<number>;
   pExpire: (key: string, ttl: number) => Promise<boolean>;
   pTTL: (key: string) => Promise<number>;
-  set: (
-    key: string,
-    value: string,
-    options: { PX: number },
-  ) => Promise<'OK' | null>;
+  set: (key: string, value: string, options: { PX: number }) => Promise<"OK" | null>;
   del: (key: string) => Promise<number>;
   get: (key: string) => Promise<string | null>;
   duplicate: () => RedisStorageClient;
-  on: (event: 'error', listener: (error: Error) => void) => void;
+  on: (event: "error", listener: (error: Error) => void) => void;
 }
 
 interface LocalBucketState {
@@ -81,7 +77,7 @@ export class RedisThrottlerStorage implements ThrottlerStorage {
     const isBlocked = totalHits > limit;
 
     if (isBlocked) {
-      await redis.set(blockKey, '1', { PX: blockDuration });
+      await redis.set(blockKey, "1", { PX: blockDuration });
       await redis.del(bucketKey);
     }
 
@@ -167,10 +163,8 @@ export class RedisThrottlerStorage implements ThrottlerStorage {
     }
 
     this.redisReady = (async () => {
-      const client = adaptRedisClient<RedisStorageClient>(
-        createRedisClient(redisUrl),
-      );
-      client.on('error', () => void 0);
+      const client = adaptRedisClient<RedisStorageClient>(createRedisClient(redisUrl));
+      client.on("error", () => void 0);
 
       try {
         await client.connect();
@@ -184,10 +178,7 @@ export class RedisThrottlerStorage implements ThrottlerStorage {
     return this.redisClient;
   }
 
-  private async readCurrentHits(
-    client: RedisStorageClient,
-    bucketKey: string,
-  ): Promise<number> {
+  private async readCurrentHits(client: RedisStorageClient, bucketKey: string): Promise<number> {
     const current = await client.get(bucketKey);
 
     if (!current) {

@@ -1,5 +1,5 @@
-import type { AuthenticatedRequestUser } from '@repo/api-core';
-import type { Request } from 'express';
+import type { AuthenticatedRequestUser } from "@repo/api-core";
+import type { Request } from "express";
 
 import {
   Body,
@@ -12,24 +12,20 @@ import {
   Post,
   Query,
   Req,
-} from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import {
-  ApiArrayResponse,
-  ApiDataResponse,
-  SuccessFlagDto,
-} from '@repo/api-core';
-import { CurrentUser } from '@repo/api-core';
+} from "@nestjs/common";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
+import { ApiArrayResponse, ApiDataResponse, SuccessFlagDto } from "@repo/api-core";
+import { CurrentUser } from "@repo/api-core";
 
-import { CreateOrganizationUseCase } from '../application/use-cases/create-organization.use-case';
-import { DeleteOrganizationUseCase } from '../application/use-cases/delete-organization.use-case';
-import { GetOrganizationUseCase } from '../application/use-cases/get-organization.use-case';
-import { LeaveOrganizationUseCase } from '../application/use-cases/leave-organization.use-case';
-import { ListOrganizationMembersUseCase } from '../application/use-cases/list-organization-members.use-case';
-import { ListOrganizationsForUserUseCase } from '../application/use-cases/list-organizations-for-user.use-case';
-import { RemoveOrganizationMemberUseCase } from '../application/use-cases/remove-organization-member.use-case';
-import { UpdateMemberRoleUseCase } from '../application/use-cases/update-member-role.use-case';
-import { UpdateOrganizationUseCase } from '../application/use-cases/update-organization.use-case';
+import { CreateOrganizationUseCase } from "../application/use-cases/create-organization.use-case";
+import { DeleteOrganizationUseCase } from "../application/use-cases/delete-organization.use-case";
+import { GetOrganizationUseCase } from "../application/use-cases/get-organization.use-case";
+import { LeaveOrganizationUseCase } from "../application/use-cases/leave-organization.use-case";
+import { ListOrganizationMembersUseCase } from "../application/use-cases/list-organization-members.use-case";
+import { ListOrganizationsForUserUseCase } from "../application/use-cases/list-organizations-for-user.use-case";
+import { RemoveOrganizationMemberUseCase } from "../application/use-cases/remove-organization-member.use-case";
+import { UpdateMemberRoleUseCase } from "../application/use-cases/update-member-role.use-case";
+import { UpdateOrganizationUseCase } from "../application/use-cases/update-organization.use-case";
 import {
   CreateOrganizationDto,
   OrganizationDetailDto,
@@ -37,11 +33,11 @@ import {
   OrganizationMemberDto,
   UpdateMemberRoleDto,
   UpdateOrganizationDto,
-} from './organizations.dto';
+} from "./organizations.dto";
 
-@ApiTags('organizations')
+@ApiTags("organizations")
 @ApiBearerAuth()
-@Controller('organizations')
+@Controller("organizations")
 export class OrganizationsController {
   constructor(
     private readonly listOrganizationsForUser: ListOrganizationsForUserUseCase,
@@ -57,39 +53,30 @@ export class OrganizationsController {
 
   @Get()
   @ApiArrayResponse(OrganizationDto)
-  list(
-    @CurrentUser() user: AuthenticatedRequestUser,
-    @Query('memberOnly') memberOnly?: string,
-  ) {
-    return this.listOrganizationsForUser.execute(user, memberOnly === 'true');
+  list(@CurrentUser() user: AuthenticatedRequestUser, @Query("memberOnly") memberOnly?: string) {
+    return this.listOrganizationsForUser.execute(user, memberOnly === "true");
   }
 
   @Post()
   @ApiDataResponse(OrganizationDto)
-  create(
-    @CurrentUser() user: AuthenticatedRequestUser,
-    @Body() input: CreateOrganizationDto,
-  ) {
+  create(@CurrentUser() user: AuthenticatedRequestUser, @Body() input: CreateOrganizationDto) {
     return this.createOrganization.execute(user, { name: input.name });
   }
 
-  @Get(':id')
+  @Get(":id")
   @ApiDataResponse(OrganizationDetailDto)
   getOne(
     @CurrentUser() user: AuthenticatedRequestUser,
-    @Param('id', new ParseUUIDPipe()) organizationId: string,
+    @Param("id", new ParseUUIDPipe()) organizationId: string,
   ) {
-    return this.getOrganization.execute(
-      organizationId,
-      user,
-    );
+    return this.getOrganization.execute(organizationId, user);
   }
 
-  @Patch(':id')
+  @Patch(":id")
   @ApiDataResponse(OrganizationDetailDto)
   update(
     @CurrentUser() user: AuthenticatedRequestUser,
-    @Param('id', new ParseUUIDPipe()) organizationId: string,
+    @Param("id", new ParseUUIDPipe()) organizationId: string,
     @Body() input: UpdateOrganizationDto,
     @Req() request: Request,
   ) {
@@ -101,53 +88,45 @@ export class OrganizationsController {
     );
   }
 
-  @Delete(':id')
+  @Delete(":id")
   @ApiDataResponse(SuccessFlagDto)
   async remove(
     @CurrentUser() user: AuthenticatedRequestUser,
-    @Param('id', new ParseUUIDPipe()) organizationId: string,
+    @Param("id", new ParseUUIDPipe()) organizationId: string,
     @Req() request: Request,
   ) {
-    await this.deleteOrganization.execute(
-      organizationId,
-      user,
-      request.requestContext,
-    );
+    await this.deleteOrganization.execute(organizationId, user, request.requestContext);
 
     return { data: { success: true } };
   }
 
-  @Post(':id/leave')
+  @Post(":id/leave")
   @ApiDataResponse(SuccessFlagDto)
   async leave(
     @CurrentUser() user: AuthenticatedRequestUser,
-    @Param('id', new ParseUUIDPipe()) organizationId: string,
+    @Param("id", new ParseUUIDPipe()) organizationId: string,
     @Req() request: Request,
   ) {
-    await this.leaveOrganization.execute(
-      organizationId,
-      user,
-      request.requestContext,
-    );
+    await this.leaveOrganization.execute(organizationId, user, request.requestContext);
 
     return { data: { success: true } };
   }
 
-  @Get(':id/members')
+  @Get(":id/members")
   @ApiArrayResponse(OrganizationMemberDto)
   listMembers(
     @CurrentUser() user: AuthenticatedRequestUser,
-    @Param('id', new ParseUUIDPipe()) organizationId: string,
+    @Param("id", new ParseUUIDPipe()) organizationId: string,
   ) {
     return this.listOrganizationMembers.execute(organizationId, user);
   }
 
-  @Patch(':id/members/:userId')
+  @Patch(":id/members/:userId")
   @ApiDataResponse(OrganizationMemberDto)
   updateMemberRole(
     @CurrentUser() user: AuthenticatedRequestUser,
-    @Param('id', new ParseUUIDPipe()) organizationId: string,
-    @Param('userId', new ParseUUIDPipe()) targetUserId: string,
+    @Param("id", new ParseUUIDPipe()) organizationId: string,
+    @Param("userId", new ParseUUIDPipe()) targetUserId: string,
     @Body() input: UpdateMemberRoleDto,
     @Req() request: Request,
   ) {
@@ -160,12 +139,12 @@ export class OrganizationsController {
     );
   }
 
-  @Delete(':id/members/:userId')
+  @Delete(":id/members/:userId")
   @ApiDataResponse(SuccessFlagDto)
   async removeMember(
     @CurrentUser() user: AuthenticatedRequestUser,
-    @Param('id', new ParseUUIDPipe()) organizationId: string,
-    @Param('userId', new ParseUUIDPipe()) targetUserId: string,
+    @Param("id", new ParseUUIDPipe()) organizationId: string,
+    @Param("userId", new ParseUUIDPipe()) targetUserId: string,
     @Req() request: Request,
   ) {
     await this.removeOrganizationMember.execute(

@@ -15,13 +15,7 @@ export interface VerifyEmailSearchParams {
 }
 
 /** Parse presentation params on `/verify-email`. */
-export function parseVerifyEmailSearchParams(
-  sp: URLSearchParams,
-): VerifyEmailSearchParams {
-  const parsed = parseSearchParams(
-    verifyEmailSearchSchema,
-    sp,
-    VERIFY_EMAIL_SEARCH_FALLBACK,
-  );
+export function parseVerifyEmailSearchParams(sp: URLSearchParams): VerifyEmailSearchParams {
+  const parsed = parseSearchParams(verifyEmailSearchSchema, sp, VERIFY_EMAIL_SEARCH_FALLBACK);
   return { token: parsed.data.token };
 }

@@ -111,8 +111,7 @@ function isNetworkError(error: unknown): boolean {
  */
 export function classifyError(error: unknown): ClassifiedError {
   if (error instanceof ApiClientError) {
-    const kind =
-      KIND_BY_STATUS[error.status] ?? (error.status >= 500 ? "server" : "unknown");
+    const kind = KIND_BY_STATUS[error.status] ?? (error.status >= 500 ? "server" : "unknown");
 
     return {
       kind,

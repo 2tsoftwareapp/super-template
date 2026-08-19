@@ -66,16 +66,10 @@ export function canManageMember(
   if (member.userId === ctx.actorUserId) {
     return false;
   }
-  return (
-    ctx.isSuperAdmin ||
-    ctx.isOwner ||
-    (ctx.isAdmin && member.role === "MEMBER")
-  );
+  return ctx.isSuperAdmin || ctx.isOwner || (ctx.isAdmin && member.role === "MEMBER");
 }
 
-export function canPromoteMemberToAdmin(
-  member: OrganizationMemberDto,
-): boolean {
+export function canPromoteMemberToAdmin(member: OrganizationMemberDto): boolean {
   return member.role === "MEMBER";
 }
 

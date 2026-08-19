@@ -1,29 +1,26 @@
-import type { AuthenticatedRequestUser } from '@repo/api-core';
+import type { AuthenticatedRequestUser } from "@repo/api-core";
 
+import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Post, Query } from "@nestjs/common";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseUUIDPipe,
-  Post,
-  Query,
-} from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { ACTION, ApiArrayResponse, ApiDataResponse, ApiPaginatedResponse, perm } from '@repo/api-core';
-import { CurrentUser } from '@repo/api-core';
-import { Authorize } from '@repo/api-core';
+  ACTION,
+  ApiArrayResponse,
+  ApiDataResponse,
+  ApiPaginatedResponse,
+  perm,
+} from "@repo/api-core";
+import { CurrentUser } from "@repo/api-core";
+import { Authorize } from "@repo/api-core";
 
-import type { JobScope } from '../application/ports/jobs.repository.port';
+import type { JobScope } from "../application/ports/jobs.repository.port";
 
-import { AddJobDependencyUseCase } from '../application/use-cases/add-job-dependency.use-case';
-import { CancelJobUseCase } from '../application/use-cases/cancel-job.use-case';
-import { GetJobLogsUseCase } from '../application/use-cases/get-job-logs.use-case';
-import { GetJobMetricsUseCase } from '../application/use-cases/get-job-metrics.use-case';
-import { GetJobUseCase } from '../application/use-cases/get-job.use-case';
-import { ListJobDependenciesUseCase } from '../application/use-cases/list-job-dependencies.use-case';
-import { ListJobsUseCase } from '../application/use-cases/list-jobs.use-case';
+import { AddJobDependencyUseCase } from "../application/use-cases/add-job-dependency.use-case";
+import { CancelJobUseCase } from "../application/use-cases/cancel-job.use-case";
+import { GetJobLogsUseCase } from "../application/use-cases/get-job-logs.use-case";
+import { GetJobMetricsUseCase } from "../application/use-cases/get-job-metrics.use-case";
+import { GetJobUseCase } from "../application/use-cases/get-job.use-case";
+import { ListJobDependenciesUseCase } from "../application/use-cases/list-job-dependencies.use-case";
+import { ListJobsUseCase } from "../application/use-cases/list-jobs.use-case";
 import {
   AddJobDependencyDto,
   AdminJobsQueryDto,
@@ -34,17 +31,17 @@ import {
   JobLogsQueryDto,
   JobMetricsDto,
   JobMetricsQueryDto,
-} from './jobs.dto';
+} from "./jobs.dto";
 
 function scopeFromUser(user: AuthenticatedRequestUser): JobScope {
   return user.organizationId
-    ? { type: 'organization', organizationId: user.organizationId }
-    : { type: 'platform' };
+    ? { type: "organization", organizationId: user.organizationId }
+    : { type: "platform" };
 }
 
-@ApiTags('admin-jobs')
+@ApiTags("admin-jobs")
 @ApiBearerAuth()
-@Controller('admin/jobs')
+@Controller("admin/jobs")
 export class AdminJobsController {
   constructor(
     private readonly listJobsUseCase: ListJobsUseCase,
@@ -57,45 +54,49 @@ export class AdminJobsController {
   ) {}
 
   @Get()
-  @Authorize({ permissions: [perm('jobs', ACTION.READ)] })
+  @Authorize({ permissions: [perm("jobs", ACTION.READ)] })
   @ApiPaginatedResponse(JobListDto)
-  async listJobs(
-    @CurrentUser() user: AuthenticatedRequestUser,
-    @Query() query: AdminJobsQueryDto,
-  ) {
+  async listJobs(@CurrentUser() user: AuthenticatedRequestUser, @Query() query: AdminJobsQueryDto) {
     const result = await this.listJobsUseCase.execute({ ...query, scope: scopeFromUser(user) });
 
     return {
       data: result.rows,
-      meta: { page: query.page, limit: query.limit, total: result.total, totalPages: Math.ceil(result.total / query.limit) },
+      meta: {
+        page: query.page,
+        limit: query.limit,
+        total: result.total,
+        totalPages: Math.ceil(result.total / query.limit),
+      },
     };
   }
 
-  @Get('metrics')
-  @Authorize({ permissions: [perm('jobs', ACTION.READ)] })
+  @Get("metrics")
+  @Authorize({ permissions: [perm("jobs", ACTION.READ)] })
   @ApiDataResponse(JobMetricsDto)
   async getMetrics(
     @CurrentUser() user: AuthenticatedRequestUser,
     @Query() query: JobMetricsQueryDto,
   ) {
-    return { data: await this.getJobMetricsUseCase.execute({ ...query, scope: scopeFromUser(user) }) };
+    return {
+      data: await this.getJobMetricsUseCase.execute({ ...query, scope: scopeFromUser(user) }),
+    };
   }
 
-  @Get(':id')
-  @Authorize({ permissions: [perm('jobs', ACTION.READ)] })
+  @Get(":id")
+  @Authorize({ permissions: [perm("jobs", ACTION.READ)] })
   @ApiDataResponse(JobDto)
   async getJob(
-    @Param('id', new ParseUUIDPipe()) jobId: string,
+    @Param("id", new ParseUUIDPipe()) jobId: string,
     @CurrentUser() user: AuthenticatedRequestUser,
   ) {
     return { data: await this.getJobUseCase.execute(jobId, scopeFromUser(user)) };
   }
 
-  @Get(':id/logs')
-  @Authorize({ permissions: [perm('jobs', ACTION.READ)] })
+  @Get(":id/logs")
+  @Authorize({ permissions: [perm("jobs", ACTION.READ)] })
   @ApiPaginatedResponse(JobEventDto)
   async getJobLogs(
-    @Param('id', new ParseUUIDPipe()) jobId: string,
+    @Param("id", new ParseUUIDPipe()) jobId: string,
     @Query() query: JobLogsQueryDto,
     @CurrentUser() user: AuthenticatedRequestUser,
   ) {
@@ -103,39 +104,48 @@ export class AdminJobsController {
 
     return {
       data: result.rows,
-      meta: { page: query.page, limit: query.limit, total: result.total, totalPages: Math.ceil(result.total / query.limit) },
+      meta: {
+        page: query.page,
+        limit: query.limit,
+        total: result.total,
+        totalPages: Math.ceil(result.total / query.limit),
+      },
     };
   }
 
-  @Get(':id/dependencies')
-  @Authorize({ permissions: [perm('jobs', ACTION.READ)] })
+  @Get(":id/dependencies")
+  @Authorize({ permissions: [perm("jobs", ACTION.READ)] })
   @ApiArrayResponse(JobDependencyDto)
   async listDependencies(
-    @Param('id', new ParseUUIDPipe()) jobId: string,
+    @Param("id", new ParseUUIDPipe()) jobId: string,
     @CurrentUser() user: AuthenticatedRequestUser,
   ) {
     return { data: await this.listJobDependenciesUseCase.execute(jobId, scopeFromUser(user)) };
   }
 
-  @Post(':id/dependencies')
-  @Authorize({ permissions: [perm('jobs', ACTION.UPDATE)] })
+  @Post(":id/dependencies")
+  @Authorize({ permissions: [perm("jobs", ACTION.UPDATE)] })
   @ApiDataResponse(JobDependencyDto, 201)
   async addDependency(
-    @Param('id', new ParseUUIDPipe()) jobId: string,
+    @Param("id", new ParseUUIDPipe()) jobId: string,
     @Body() input: AddJobDependencyDto,
     @CurrentUser() user: AuthenticatedRequestUser,
   ) {
     return {
-      data: await this.addJobDependencyUseCase.execute(jobId, input.dependsOnJobId, scopeFromUser(user)),
+      data: await this.addJobDependencyUseCase.execute(
+        jobId,
+        input.dependsOnJobId,
+        scopeFromUser(user),
+      ),
     };
   }
 
-  @Delete(':id')
-  @Authorize({ permissions: [perm('jobs', ACTION.UPDATE)] })
+  @Delete(":id")
+  @Authorize({ permissions: [perm("jobs", ACTION.UPDATE)] })
   @ApiDataResponse(JobDto)
   async cancelJob(
     @CurrentUser() user: AuthenticatedRequestUser,
-    @Param('id', new ParseUUIDPipe()) jobId: string,
+    @Param("id", new ParseUUIDPipe()) jobId: string,
   ) {
     return { data: await this.cancelJobUseCase.execute(user, jobId) };
   }

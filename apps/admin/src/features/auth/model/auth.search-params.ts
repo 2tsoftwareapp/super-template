@@ -32,26 +32,14 @@ export interface SsoCallbackSearchParams {
 }
 
 /** Parse presentation params on `/login` (SSO error flag). */
-export function parseAuthLoginSearchParams(
-  sp: URLSearchParams,
-): AuthLoginSearchParams {
-  const parsed = parseSearchParams(
-    authLoginSearchSchema,
-    sp,
-    AUTH_LOGIN_SEARCH_FALLBACK,
-  );
+export function parseAuthLoginSearchParams(sp: URLSearchParams): AuthLoginSearchParams {
+  const parsed = parseSearchParams(authLoginSearchSchema, sp, AUTH_LOGIN_SEARCH_FALLBACK);
   return { error: parsed.data.error };
 }
 
 /** Parse presentation params on `/login/sso/callback`. */
-export function parseSsoCallbackSearchParams(
-  sp: URLSearchParams,
-): SsoCallbackSearchParams {
-  const parsed = parseSearchParams(
-    ssoCallbackSearchSchema,
-    sp,
-    SSO_CALLBACK_SEARCH_FALLBACK,
-  );
+export function parseSsoCallbackSearchParams(sp: URLSearchParams): SsoCallbackSearchParams {
+  const parsed = parseSearchParams(ssoCallbackSearchSchema, sp, SSO_CALLBACK_SEARCH_FALLBACK);
   return {
     error: parsed.data.error,
     exchange: parsed.data.exchange,

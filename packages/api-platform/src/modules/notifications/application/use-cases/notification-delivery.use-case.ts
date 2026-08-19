@@ -1,9 +1,6 @@
-import type {
-  AuthenticatedRequestUser,
-  RequestContext,
-} from '@repo/api-core';
+import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-core";
 
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import {
   AppError,
   AUDIT_WRITER,
@@ -15,31 +12,27 @@ import {
   type TransactionPort,
   USER_LOOKUP,
   type UserLookup,
-} from '@repo/api-core';
-import {
-  tenantContextForJob,
-  TenantContextService,
-  WORKER_DISPATCH_CONTEXT,
-} from '@repo/api-core';
+} from "@repo/api-core";
+import { tenantContextForJob, TenantContextService, WORKER_DISPATCH_CONTEXT } from "@repo/api-core";
 
 import type {
   ListNotificationJobsQuery,
   NotificationJobView,
   NotificationView,
   SendNotificationRequestCommand,
-} from '../notifications.types';
-import type { NotificationJobRecord } from '../ports/notification-jobs.repository.port';
+} from "../notifications.types";
+import type { NotificationJobRecord } from "../ports/notification-jobs.repository.port";
 
-import { NotificationsMapper } from '../notifications.mapper';
+import { NotificationsMapper } from "../notifications.mapper";
 import {
   NOTIFICATION_JOBS_REPOSITORY,
   type NotificationJobsRepositoryPort,
-} from '../ports/notification-jobs.repository.port';
+} from "../ports/notification-jobs.repository.port";
 import {
   NOTIFICATIONS_REPOSITORY,
   type NotificationsRepositoryPort,
-} from '../ports/notifications.repository.port';
-import { NotificationDispatchService } from '../services/notification-dispatch.service';
+} from "../ports/notifications.repository.port";
+import { NotificationDispatchService } from "../services/notification-dispatch.service";
 
 const DUE_JOB_BATCH_SIZE = 20;
 const RECIPIENT_BATCH_SIZE = 100;
@@ -67,14 +60,12 @@ export class NotificationDeliveryUseCase {
   ): Promise<NotificationJobView> {
     this.assertAudiencePayload(input);
 
-    const scheduledAt = input.scheduledAt
-      ? new Date(input.scheduledAt)
-      : new Date();
+    const scheduledAt = input.scheduledAt ? new Date(input.scheduledAt) : new Date();
 
     if (Number.isNaN(scheduledAt.getTime())) {
       throw new AppError(
         ERROR_CODES.VALIDATION_FAILED,
-        'scheduledAt must be a valid ISO-8601 datetime',
+        "scheduledAt must be a valid ISO-8601 datetime",
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -82,7 +73,7 @@ export class NotificationDeliveryUseCase {
     const organizationId = requireOrganizationId(actor);
 
     // Validate recipient membership at creation time — reject early if target users are outside the organization
-    if (input.audience === 'USER' && input.userId) {
+    if (input.audience === "USER" && input.userId) {
       const member = await this.userLookup.findActiveUserInOrganization(
         input.userId,
         organizationId,
@@ -90,13 +81,13 @@ export class NotificationDeliveryUseCase {
       if (!member) {
         throw new AppError(
           ERROR_CODES.VALIDATION_FAILED,
-          'Target user is not an active member of this organization',
+          "Target user is not an active member of this organization",
           HttpStatus.BAD_REQUEST,
         );
       }
     }
 
-    if (input.audience === 'USERS' && input.userIds && input.userIds.length > 0) {
+    if (input.audience === "USERS" && input.userIds && input.userIds.length > 0) {
       const validIds = await this.userLookup.filterActiveUserIdsInOrganization(
         input.userIds,
         organizationId,
@@ -104,7 +95,7 @@ export class NotificationDeliveryUseCase {
       if (validIds.length !== input.userIds.length) {
         throw new AppError(
           ERROR_CODES.VALIDATION_FAILED,
-          'One or more target users are not active members of this organization',
+          "One or more target users are not active members of this organization",
           HttpStatus.BAD_REQUEST,
         );
       }
@@ -114,22 +105,25 @@ export class NotificationDeliveryUseCase {
       organizationId,
       actorId: actor.userId,
       audience: input.audience,
-      targetUserId: input.audience === 'USER' ? (input.userId ?? null) : null,
-      userIds: input.audience === 'USERS' ? (input.userIds ?? null) : null,
+      targetUserId: input.audience === "USER" ? (input.userId ?? null) : null,
+      userIds: input.audience === "USERS" ? (input.userIds ?? null) : null,
       type: input.type,
       title: input.title,
       body: input.body,
       data: input.data ?? null,
       scheduledAt,
-      status: 'PENDING' as const,
+      status: "PENDING" as const,
     };
 
     const result = await this.transactionPort.run(async (tx) => {
       const idempotentResult = input.idempotencyKey
-        ? await this.notificationJobsRepository.createIdempotent({
-            ...jobValues,
-            idempotencyKey: input.idempotencyKey,
-          }, tx)
+        ? await this.notificationJobsRepository.createIdempotent(
+            {
+              ...jobValues,
+              idempotencyKey: input.idempotencyKey,
+            },
+            tx,
+          )
         : null;
 
       const job = idempotentResult
@@ -137,25 +131,30 @@ export class NotificationDeliveryUseCase {
         : await this.notificationJobsRepository.create(jobValues, tx);
 
       if (!job) {
-        throw new Error('Notification job insert returned no rows');
+        throw new Error("Notification job insert returned no rows");
       }
 
       if (idempotentResult && !idempotentResult.created) {
         return { job, created: false };
       }
 
-      await this.auditWriter.log({
-        actorId: actor.userId,
-        action: 'notification.job.created',
-        entityType: 'notification_job',
-        entityId: job.id,
-        metadata: {
-          audience: input.audience,
-          scheduledAt: scheduledAt.toISOString(),
+      await this.auditWriter.log(
+        {
+          actorId: actor.userId,
+          action: "notification.job.created",
+          entityType: "notification_job",
+          entityId: job.id,
+          metadata: {
+            audience: input.audience,
+            scheduledAt: scheduledAt.toISOString(),
+          },
+          requestContext,
+          ...(actor.organizationId
+            ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: actor.organizationId }
+            : { scope: SYSTEM_SCOPE.PLATFORM }),
         },
-        requestContext,
-          ...(actor.organizationId ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId: actor.organizationId } : { scope: SYSTEM_SCOPE.PLATFORM })
-      }, tx);
+        tx,
+      );
 
       return { job, created: true };
     });
@@ -169,18 +168,13 @@ export class NotificationDeliveryUseCase {
     if (scheduledAt.getTime() <= Date.now()) {
       await this.processJob(result.job.id);
       const processed = await this.notificationJobsRepository.findById(result.job.id);
-      return processed
-        ? this.notificationsMapper.toNotificationJobView(processed)
-        : jobView;
+      return processed ? this.notificationsMapper.toNotificationJobView(processed) : jobView;
     }
 
     return jobView;
   }
 
-  async listJobs(
-    actor: AuthenticatedRequestUser,
-    query: ListNotificationJobsQuery,
-  ) {
+  async listJobs(actor: AuthenticatedRequestUser, query: ListNotificationJobsQuery) {
     const organizationId = requireOrganizationId(actor);
     const result = await this.notificationJobsRepository.list({
       ...query,
@@ -188,23 +182,18 @@ export class NotificationDeliveryUseCase {
     });
 
     return {
-      rows: result.rows.map((row) =>
-        this.notificationsMapper.toNotificationJobView(row),
-      ),
+      rows: result.rows.map((row) => this.notificationsMapper.toNotificationJobView(row)),
       total: result.total,
     };
   }
 
-  async getJob(
-    actor: AuthenticatedRequestUser,
-    jobId: string,
-  ): Promise<NotificationJobView> {
+  async getJob(actor: AuthenticatedRequestUser, jobId: string): Promise<NotificationJobView> {
     const job = await this.notificationJobsRepository.findById(jobId);
 
     if (!job) {
       throw new AppError(
         ERROR_CODES.NOTIFICATION_JOB_NOT_FOUND,
-        'Notification job not found',
+        "Notification job not found",
         HttpStatus.NOT_FOUND,
       );
     }
@@ -213,7 +202,7 @@ export class NotificationDeliveryUseCase {
     if (job.organizationId !== organizationId) {
       throw new AppError(
         ERROR_CODES.NOTIFICATION_JOB_NOT_FOUND,
-        'Notification job not found',
+        "Notification job not found",
         HttpStatus.NOT_FOUND,
       );
     }
@@ -221,10 +210,7 @@ export class NotificationDeliveryUseCase {
     return this.notificationsMapper.toNotificationJobView(job);
   }
 
-  async cancelJob(
-    actor: AuthenticatedRequestUser,
-    jobId: string,
-  ): Promise<NotificationJobView> {
+  async cancelJob(actor: AuthenticatedRequestUser, jobId: string): Promise<NotificationJobView> {
     const organizationId = requireOrganizationId(actor);
 
     // Verify the job belongs to the actor's organization
@@ -233,7 +219,7 @@ export class NotificationDeliveryUseCase {
     if (!job) {
       throw new AppError(
         ERROR_CODES.NOTIFICATION_JOB_NOT_FOUND,
-        'Notification job not found',
+        "Notification job not found",
         HttpStatus.NOT_FOUND,
       );
     }
@@ -241,32 +227,34 @@ export class NotificationDeliveryUseCase {
     if (job.organizationId !== organizationId) {
       throw new AppError(
         ERROR_CODES.NOTIFICATION_JOB_NOT_FOUND,
-        'Notification job not found',
+        "Notification job not found",
         HttpStatus.NOT_FOUND,
       );
     }
 
     const cancelled = await this.transactionPort.run(async (tx) => {
-      const result =
-        await this.notificationJobsRepository.markCancelled(jobId, tx);
+      const result = await this.notificationJobsRepository.markCancelled(jobId, tx);
 
       if (!result) {
         throw new AppError(
           ERROR_CODES.NOTIFICATION_JOB_NOT_CANCELLABLE,
-          'Only pending notification jobs can be cancelled',
+          "Only pending notification jobs can be cancelled",
           HttpStatus.CONFLICT,
         );
       }
 
-      await this.auditWriter.log({
-        actorId: actor.userId,
-        action: 'notification.job.cancelled',
-        entityType: 'notification_job',
-        entityId: jobId,
-        ...(organizationId
-          ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId }
-          : { scope: SYSTEM_SCOPE.PLATFORM }),
-      }, tx);
+      await this.auditWriter.log(
+        {
+          actorId: actor.userId,
+          action: "notification.job.cancelled",
+          entityType: "notification_job",
+          entityId: jobId,
+          ...(organizationId
+            ? { scope: SYSTEM_SCOPE.ORGANIZATION, organizationId }
+            : { scope: SYSTEM_SCOPE.PLATFORM }),
+        },
+        tx,
+      );
 
       return result;
     });
@@ -297,31 +285,27 @@ export class NotificationDeliveryUseCase {
       const recipientIds = await this.resolveRecipientIds(locked);
 
       if (recipientIds.length === 0) {
-        await this.notificationJobsRepository.markCompleted(
-          locked.id,
-          0,
-          locked.attempts,
-        );
+        await this.notificationJobsRepository.markCompleted(locked.id, 0, locked.attempts);
         return;
       }
 
       const organizationId = locked.organizationId;
 
       if (!organizationId) {
-        throw new Error('Notification job is missing organizationId');
+        throw new Error("Notification job is missing organizationId");
       }
 
       // Collect all notifications for SSE emission after transaction commits
-      const allNotificationViews: { view: NotificationView; userId: string; organizationId: string }[] = [];
+      const allNotificationViews: {
+        view: NotificationView;
+        userId: string;
+        organizationId: string;
+      }[] = [];
 
       await this.transactionPort.run(async (tx) => {
         let deliveredCount = 0;
 
-        for (
-          let offset = 0;
-          offset < recipientIds.length;
-          offset += RECIPIENT_BATCH_SIZE
-        ) {
+        for (let offset = 0; offset < recipientIds.length; offset += RECIPIENT_BATCH_SIZE) {
           const batch = recipientIds.slice(offset, offset + RECIPIENT_BATCH_SIZE);
           const inserted = await this.notificationsRepository.createMany(
             batch.map((userId) => ({
@@ -338,16 +322,15 @@ export class NotificationDeliveryUseCase {
 
           // On retry, createMany returns only newly inserted rows (ON CONFLICT DO NOTHING).
           // Load any existing rows to ensure delivery rows are created for all recipients.
-          const existing = inserted.length < batch.length
-            ? await this.notificationsRepository.findBySourceJobAndUsers(locked.id, batch, tx)
-            : [];
+          const existing =
+            inserted.length < batch.length
+              ? await this.notificationsRepository.findBySourceJobAndUsers(locked.id, batch, tx)
+              : [];
 
           // Dedupe by id: findBySourceJobAndUsers runs in the same transaction
           // so it also returns rows that were just inserted by createMany above.
           const allInBatch = [
-            ...new Map(
-              [...inserted, ...existing].map((row) => [row.id, row]),
-            ).values(),
+            ...new Map([...inserted, ...existing].map((row) => [row.id, row])).values(),
           ];
 
           for (const notification of allInBatch) {
@@ -384,7 +367,7 @@ export class NotificationDeliveryUseCase {
     } catch (error) {
       await this.notificationJobsRepository.markFailed(
         locked.id,
-        error instanceof Error ? error.message : 'Unknown processing error',
+        error instanceof Error ? error.message : "Unknown processing error",
         locked.attempts,
       );
     }
@@ -404,44 +387,41 @@ export class NotificationDeliveryUseCase {
     const audience = job.audience;
     const organizationId = job.organizationId;
 
-    if (audience === 'USER') {
+    if (audience === "USER") {
       if (!job.targetUserId) {
         return [];
       }
 
       const user = await this.userLookup.findActiveUserInOrganization(
         job.targetUserId,
-        organizationId ?? '',
+        organizationId ?? "",
       );
       return user ? [user.id] : [];
     }
 
-    if (audience === 'USERS') {
+    if (audience === "USERS") {
       return this.userLookup.filterActiveUserIdsInOrganization(
         job.userIds ?? [],
-        organizationId ?? '',
+        organizationId ?? "",
       );
     }
 
-    return this.userLookup.listDeliverableUserIdsInOrganization(organizationId ?? '');
+    return this.userLookup.listDeliverableUserIdsInOrganization(organizationId ?? "");
   }
 
   private assertAudiencePayload(input: SendNotificationRequestCommand) {
-    if (input.audience === 'USER' && !input.userId) {
+    if (input.audience === "USER" && !input.userId) {
       throw new AppError(
         ERROR_CODES.NOTIFICATION_INVALID_AUDIENCE,
-        'userId is required when audience is USER',
+        "userId is required when audience is USER",
         HttpStatus.BAD_REQUEST,
       );
     }
 
-    if (
-      input.audience === 'USERS' &&
-      (!input.userIds || input.userIds.length === 0)
-    ) {
+    if (input.audience === "USERS" && (!input.userIds || input.userIds.length === 0)) {
       throw new AppError(
         ERROR_CODES.NOTIFICATION_INVALID_AUDIENCE,
-        'userIds is required when audience is USERS',
+        "userIds is required when audience is USERS",
         HttpStatus.BAD_REQUEST,
       );
     }

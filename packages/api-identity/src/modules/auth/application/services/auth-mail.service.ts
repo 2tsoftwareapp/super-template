@@ -1,9 +1,5 @@
-import { Inject, Injectable } from '@nestjs/common';
-import {
-  EnvironmentService,
-  MAIL_TEMPLATE_SENDER,
-  type MailTemplateSender,
-} from '@repo/api-core';
+import { Inject, Injectable } from "@nestjs/common";
+import { EnvironmentService, MAIL_TEMPLATE_SENDER, type MailTemplateSender } from "@repo/api-core";
 
 @Injectable()
 export class AuthMailService {
@@ -13,14 +9,10 @@ export class AuthMailService {
     private readonly mailSender: MailTemplateSender,
   ) {}
 
-  async sendVerificationEmail(
-    email: string,
-    token: string,
-    displayName?: string,
-  ) {
+  async sendVerificationEmail(email: string, token: string, displayName?: string) {
     const verifyUrl = `${this.environmentService.values.NEXT_PUBLIC_WEB_URL}/verify-email?token=${token}`;
     await this.mailSender.sendTemplate({
-      templateKey: 'auth.verify-email',
+      templateKey: "auth.verify-email",
       to: email,
       variables: {
         displayName: displayName ?? email,
@@ -32,7 +24,7 @@ export class AuthMailService {
   async sendPasswordResetEmail(email: string, token: string) {
     const resetUrl = `${this.environmentService.values.NEXT_PUBLIC_WEB_URL}/reset-password?token=${token}`;
     await this.mailSender.sendTemplate({
-      templateKey: 'auth.reset-password',
+      templateKey: "auth.reset-password",
       to: email,
       variables: {
         displayName: email,
@@ -43,7 +35,7 @@ export class AuthMailService {
 
   async sendWelcomeEmail(email: string, displayName: string) {
     await this.mailSender.sendTemplate({
-      templateKey: 'auth.welcome',
+      templateKey: "auth.welcome",
       to: email,
       variables: {
         displayName,

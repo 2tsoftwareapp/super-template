@@ -1,13 +1,12 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
-import {
-  APP_LOGGER,
-  type AppLogger,
-  ErrorReporterService,
-} from '@repo/api-core';
+import { Inject, Injectable } from "@nestjs/common";
+import { Cron, CronExpression } from "@nestjs/schedule";
+import { APP_LOGGER, type AppLogger, ErrorReporterService } from "@repo/api-core";
 
-import { NotificationsService } from '../notifications.service';
-import { NOTIFICATION_JOBS_REPOSITORY, type NotificationJobsRepositoryPort } from '../ports/notification-jobs.repository.port';
+import { NotificationsService } from "../notifications.service";
+import {
+  NOTIFICATION_JOBS_REPOSITORY,
+  type NotificationJobsRepositoryPort,
+} from "../ports/notification-jobs.repository.port";
 
 const JOB_STALE_TIMEOUT_MINUTES = 10;
 const JOB_MAX_ATTEMPTS = 3;
@@ -47,9 +46,7 @@ export class NotificationJobsProcessor {
               JOB_MAX_ATTEMPTS,
             );
           if (recovered.length > 0) {
-            this.logger.warn(
-              `Recovered ${recovered.length} stale notification job(s) to PENDING`,
-            );
+            this.logger.warn(`Recovered ${recovered.length} stale notification job(s) to PENDING`);
           }
           if (failed.length > 0) {
             this.logger.warn(
@@ -57,11 +54,8 @@ export class NotificationJobsProcessor {
             );
           }
         } catch (recoveryError) {
-          this.logger.error('Stale notification job recovery failed', {
-            error:
-              recoveryError instanceof Error
-                ? recoveryError.message
-                : String(recoveryError),
+          this.logger.error("Stale notification job recovery failed", {
+            error: recoveryError instanceof Error ? recoveryError.message : String(recoveryError),
           });
         }
       }
@@ -74,20 +68,17 @@ export class NotificationJobsProcessor {
       if (error instanceof Error && error.stack) {
         logContext.stack = error.stack;
       }
-      this.logger.error('Failed to process due notification jobs', logContext);
+      this.logger.error("Failed to process due notification jobs", logContext);
       if (error instanceof Error) {
         this.errorReporter.reportException(error, {
-          errorCode: 'NOTIFICATION_JOB_PROCESSING_FAILED',
-          tags: { job: 'notification-due-jobs' },
+          errorCode: "NOTIFICATION_JOB_PROCESSING_FAILED",
+          tags: { job: "notification-due-jobs" },
         });
       } else {
-        this.errorReporter.reportMessage(
-          'Failed to process due notification jobs',
-          {
-            errorCode: 'NOTIFICATION_JOB_PROCESSING_FAILED',
-            tags: { job: 'notification-due-jobs' },
-          },
-        );
+        this.errorReporter.reportMessage("Failed to process due notification jobs", {
+          errorCode: "NOTIFICATION_JOB_PROCESSING_FAILED",
+          tags: { job: "notification-due-jobs" },
+        });
       }
     } finally {
       this.processing = false;

@@ -1,15 +1,12 @@
-import type {
-  DatabaseClient,
-  DatabaseExecutor,
-} from '@repo/api-database';
+import type { DatabaseClient, DatabaseExecutor } from "@repo/api-database";
 
-import { Inject, Injectable } from '@nestjs/common';
-import { type JsonObject } from '@repo/api-core';
-import { DATABASE } from '@repo/api-database';
-import { applicationSettings } from '@repo/api-database';
-import { eq } from 'drizzle-orm';
+import { Inject, Injectable } from "@nestjs/common";
+import { type JsonObject } from "@repo/api-core";
+import { DATABASE } from "@repo/api-database";
+import { applicationSettings } from "@repo/api-database";
+import { eq } from "drizzle-orm";
 
-import type { SettingsRepositoryPort } from '../application/ports/settings.repository.port';
+import type { SettingsRepositoryPort } from "../application/ports/settings.repository.port";
 
 @Injectable()
 export class SettingsRepository implements SettingsRepositoryPort {

@@ -1,13 +1,9 @@
-import type { TenantContext } from '@repo/api-core';
-import type { PoolClient } from 'pg';
+import type { TenantContext } from "@repo/api-core";
+import type { PoolClient } from "pg";
 
-import { sql } from 'drizzle-orm';
+import { sql } from "drizzle-orm";
 
-import type {
-  DatabaseClient,
-  DatabaseExecutor,
-  DatabaseTransaction,
-} from './database.types';
+import type { DatabaseClient, DatabaseExecutor, DatabaseTransaction } from "./database.types";
 
 // Transaction-scoped path: is_local=true so the GUCs auto-reset when the
 // surrounding transaction ends. Used inside runInTransaction/withTenantContext.
@@ -20,7 +16,7 @@ export const setTenantContextOnExecutor = async (
     select
       set_config('app.tenant_id', ${context.tenantId}, true),
       set_config('app.user_id', ${context.userId}, true),
-      set_config('app.bypass_rls', ${context.bypassRls ? 'true' : 'false'}, true)
+      set_config('app.bypass_rls', ${context.bypassRls ? "true" : "false"}, true)
   `);
 };
 
@@ -38,11 +34,7 @@ export const setTenantContextOnPgClient = async (
       set_config('app.tenant_id', $1, false),
       set_config('app.user_id', $2, false),
       set_config('app.bypass_rls', $3, false)`,
-    [
-      context?.tenantId ?? '',
-      context?.userId ?? '',
-      context?.bypassRls ? 'true' : 'false',
-    ],
+    [context?.tenantId ?? "", context?.userId ?? "", context?.bypassRls ? "true" : "false"],
   );
 };
 
@@ -55,4 +47,3 @@ export const withTenantContext = async <T>(
     await setTenantContextOnExecutor(transaction, context);
     return operation(transaction);
   });
-

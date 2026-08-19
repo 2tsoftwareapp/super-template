@@ -1,22 +1,23 @@
-import type { AuthenticatedRequestUser } from '@repo/api-core';
+import type { AuthenticatedRequestUser } from "@repo/api-core";
 
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { AppError, ERROR_CODES } from '@repo/api-core';
+import { HttpStatus, Inject, Injectable } from "@nestjs/common";
+import { AppError, ERROR_CODES } from "@repo/api-core";
 
-import type { RegisterDeviceCommand } from '../notifications.types';
+import type { RegisterDeviceCommand } from "../notifications.types";
 
-import { DEVICE_TOKENS_REPOSITORY, type DeviceTokensRepositoryPort } from '../ports/device-tokens.repository.port';
+import {
+  DEVICE_TOKENS_REPOSITORY,
+  type DeviceTokensRepositoryPort,
+} from "../ports/device-tokens.repository.port";
 
 @Injectable()
 export class NotificationDeviceUseCase {
   constructor(
-    @Inject(DEVICE_TOKENS_REPOSITORY) private readonly deviceTokensRepository: DeviceTokensRepositoryPort,
+    @Inject(DEVICE_TOKENS_REPOSITORY)
+    private readonly deviceTokensRepository: DeviceTokensRepositoryPort,
   ) {}
 
-  async registerDevice(
-    user: AuthenticatedRequestUser,
-    input: RegisterDeviceCommand,
-  ) {
+  async registerDevice(user: AuthenticatedRequestUser, input: RegisterDeviceCommand) {
     const result = await this.deviceTokensRepository.registerOrTransfer({
       userId: user.userId,
       token: input.token,
@@ -28,7 +29,7 @@ export class NotificationDeviceUseCase {
       // A brief retry at the HTTP level is safe; return a 409 so the client can retry.
       throw new AppError(
         ERROR_CODES.RESOURCE_CONFLICT,
-        'Device token is temporarily locked by an in-progress delivery; please retry',
+        "Device token is temporarily locked by an in-progress delivery; please retry",
         HttpStatus.CONFLICT,
       );
     }
@@ -47,13 +48,13 @@ export class NotificationDeviceUseCase {
     const deviceToken = await this.deviceTokensRepository.disableByToken(
       user.userId,
       token,
-      'User unregistered device',
+      "User unregistered device",
     );
 
     if (!deviceToken) {
       throw new AppError(
         ERROR_CODES.NOTIFICATION_DEVICE_NOT_FOUND,
-        'Device token not found',
+        "Device token not found",
         HttpStatus.NOT_FOUND,
       );
     }

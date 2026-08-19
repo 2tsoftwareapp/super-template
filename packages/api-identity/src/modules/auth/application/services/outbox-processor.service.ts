@@ -1,12 +1,9 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
-import { APP_LOGGER, type AppLogger } from '@repo/api-core';
+import { Inject, Injectable } from "@nestjs/common";
+import { Cron, CronExpression } from "@nestjs/schedule";
+import { APP_LOGGER, type AppLogger } from "@repo/api-core";
 
-import {
-  OUTBOX_REPOSITORY,
-  type OutboxRepositoryPort,
-} from '../ports/outbox.repository.port';
-import { AuthMailService } from './auth-mail.service';
+import { OUTBOX_REPOSITORY, type OutboxRepositoryPort } from "../ports/outbox.repository.port";
+import { AuthMailService } from "./auth-mail.service";
 
 @Injectable()
 export class OutboxProcessor {
@@ -30,7 +27,7 @@ export class OutboxProcessor {
 
       for (const message of messages) {
         try {
-          if (message.topic === 'auth.send-verification-email') {
+          if (message.topic === "auth.send-verification-email") {
             await this.authMailService.sendVerificationEmail(
               message.payload.email,
               message.payload.token,
@@ -39,9 +36,8 @@ export class OutboxProcessor {
           }
           await this.outboxRepository.markSent(message.id);
         } catch (error) {
-          const errorMessage =
-            error instanceof Error ? error.message : String(error);
-          this.logger.warn('Outbox message failed, will retry', {
+          const errorMessage = error instanceof Error ? error.message : String(error);
+          this.logger.warn("Outbox message failed, will retry", {
             messageId: message.id,
             topic: message.topic,
             attempts: message.attempts,
@@ -52,7 +48,7 @@ export class OutboxProcessor {
         }
       }
     } catch (error) {
-      this.logger.error('Outbox processing failed', {
+      this.logger.error("Outbox processing failed", {
         error: error instanceof Error ? error.message : String(error),
       });
     } finally {

@@ -1,9 +1,9 @@
-import { createPrivateKey, createSign } from 'node:crypto';
+import { createPrivateKey, createSign } from "node:crypto";
 
-const APPLE_AUDIENCE = 'https://appleid.apple.com';
+const APPLE_AUDIENCE = "https://appleid.apple.com";
 
 const base64UrlEncode = (input: Buffer | string): string =>
-  Buffer.from(input).toString('base64url');
+  Buffer.from(input).toString("base64url");
 
 // Apple requires the OAuth client_secret to be a JWT signed with the developer's
 // ES256 key (team/key id in the header), not a static string. Built fresh per
@@ -15,7 +15,7 @@ export const buildAppleClientSecret = (params: {
   privateKeyPem: string;
   ttlSeconds?: number;
 }): string => {
-  const header = { alg: 'ES256', kid: params.keyId };
+  const header = { alg: "ES256", kid: params.keyId };
   const now = Math.floor(Date.now() / 1000);
   const payload = {
     iss: params.teamId,
@@ -27,10 +27,10 @@ export const buildAppleClientSecret = (params: {
 
   const signingInput = `${base64UrlEncode(JSON.stringify(header))}.${base64UrlEncode(JSON.stringify(payload))}`;
   const privateKey = createPrivateKey(params.privateKeyPem);
-  const sign = createSign('SHA256');
+  const sign = createSign("SHA256");
   sign.update(signingInput);
   sign.end();
-  const signature = sign.sign({ key: privateKey, dsaEncoding: 'ieee-p1363' });
+  const signature = sign.sign({ key: privateKey, dsaEncoding: "ieee-p1363" });
 
   return `${signingInput}.${base64UrlEncode(signature)}`;
 };

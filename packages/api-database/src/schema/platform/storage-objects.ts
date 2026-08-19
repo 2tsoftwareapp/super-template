@@ -1,6 +1,6 @@
-import { integer, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { integer, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 
-import { timestamps } from '../shared/timestamps';
+import { timestamps } from "../shared/timestamps";
 
 /**
  * Ledger of every object that was uploaded to object storage. Rows are written
@@ -15,9 +15,9 @@ import { timestamps } from '../shared/timestamps';
  * it; the sweep's reference checks run with RLS bypass so live files in every
  * organization are seen.
  */
-export const storageObjects = pgTable('storage_objects', {
-  storageKey: text('storage_key').primaryKey(),
-  status: text('status').notNull().default('UPLOADED'),
+export const storageObjects = pgTable("storage_objects", {
+  storageKey: text("storage_key").primaryKey(),
+  status: text("status").notNull().default("UPLOADED"),
   ...timestamps,
 });
 
@@ -25,17 +25,13 @@ export const storageObjects = pgTable('storage_objects', {
  * Retry queue for storage deletes that failed. The cleanup worker claims
  * PENDING rows, retries the delete, and marks DONE / FAILED (max attempts).
  */
-export const storageDeleteOutbox = pgTable('storage_delete_outbox', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  storageKey: text('storage_key').notNull().unique(),
-  status: text('status').notNull().default('PENDING'),
-  attempts: integer('attempts').notNull().default(0),
-  maxAttempts: integer('max_attempts').notNull().default(5),
-  errorMessage: text('error_message'),
-  createdAt: timestamp('created_at', { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true })
-    .notNull()
-    .defaultNow(),
+export const storageDeleteOutbox = pgTable("storage_delete_outbox", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  storageKey: text("storage_key").notNull().unique(),
+  status: text("status").notNull().default("PENDING"),
+  attempts: integer("attempts").notNull().default(0),
+  maxAttempts: integer("max_attempts").notNull().default(5),
+  errorMessage: text("error_message"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });

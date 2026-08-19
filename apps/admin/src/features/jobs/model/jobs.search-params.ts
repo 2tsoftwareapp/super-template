@@ -1,8 +1,4 @@
-import {
-  pageParam,
-  parseSearchParams,
-  searchTextParam,
-} from "@repo/web-utils/params";
+import { pageParam, parseSearchParams, searchTextParam } from "@repo/web-utils/params";
 import { z } from "zod";
 
 import { STATUS_OPTIONS } from "./jobs.constants";
@@ -13,10 +9,7 @@ export interface JobsFilters {
   page: number;
 }
 
-const statusValues = STATUS_OPTIONS.map((option) => option.value) as [
-  string,
-  ...string[],
-];
+const statusValues = STATUS_OPTIONS.map((option) => option.value) as [string, ...string[]];
 
 const jobsFiltersSchema = z.object({
   status: z.enum(statusValues).catch(""),
@@ -31,11 +24,7 @@ const JOBS_FILTERS_FALLBACK = {
 } as const;
 
 export function parseJobsFilters(sp: URLSearchParams): JobsFilters {
-  const parsed = parseSearchParams(
-    jobsFiltersSchema,
-    sp,
-    JOBS_FILTERS_FALLBACK,
-  );
+  const parsed = parseSearchParams(jobsFiltersSchema, sp, JOBS_FILTERS_FALLBACK);
 
   return {
     status: parsed.data.status,

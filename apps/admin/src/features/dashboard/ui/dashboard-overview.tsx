@@ -47,10 +47,7 @@ export function DashboardOverview({
               {failedJobsAlert.failed > 1 ? "s" : ""}
             </strong>
             {" · "}
-            <Link
-              href="/jobs"
-              className="underline underline-offset-2 hover:no-underline"
-            >
+            <Link href="/jobs" className="underline underline-offset-2 hover:no-underline">
               Review
             </Link>
           </span>

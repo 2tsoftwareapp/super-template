@@ -1,11 +1,11 @@
-import { baseConfig } from './base.mjs';
+import { baseConfig } from "./base.mjs";
 
 export default [
   ...baseConfig,
   {
-    files: ['**/*.ts'],
+    files: ["**/*.ts"],
     rules: {
-      '@typescript-eslint/no-extraneous-class': 'off',
+      "@typescript-eslint/no-extraneous-class": "off",
     },
   },
 ];

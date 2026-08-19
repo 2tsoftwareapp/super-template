@@ -23,18 +23,11 @@ export const auditLogsApi = {
     return webFetch<ListResponse<AuditLogDto>>(path);
   },
 
-  export(body: {
-    from: string | undefined;
-    to: string | undefined;
-    q: string | undefined;
-  }) {
-    return webFetch<{ data: ExportResponse }>(
-      bffPath("/api/v1/admin/audit-logs/export"),
-      {
-        method: "POST",
-        body: JSON.stringify(body),
-      },
-    );
+  export(body: { from: string | undefined; to: string | undefined; q: string | undefined }) {
+    return webFetch<{ data: ExportResponse }>(bffPath("/api/v1/admin/audit-logs/export"), {
+      method: "POST",
+      body: JSON.stringify(body),
+    });
   },
 
   downloadExport(fileId: string) {
@@ -52,10 +45,7 @@ export interface ExportResponse {
 }
 
 /** @deprecated Prefer `auditLogsApi` */
-export const fetchAuditLogs = (params: AuditLogsParams) =>
-  auditLogsApi.list(params);
-export const exportAuditLogs = (
-  body: Parameters<typeof auditLogsApi.export>[0],
-) => auditLogsApi.export(body);
-export const downloadAuditLogExport = (fileId: string) =>
-  auditLogsApi.downloadExport(fileId);
+export const fetchAuditLogs = (params: AuditLogsParams) => auditLogsApi.list(params);
+export const exportAuditLogs = (body: Parameters<typeof auditLogsApi.export>[0]) =>
+  auditLogsApi.export(body);
+export const downloadAuditLogExport = (fileId: string) => auditLogsApi.downloadExport(fileId);

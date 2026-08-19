@@ -1,24 +1,24 @@
-import type { AuthenticatedRequestUser } from '@repo/api-core';
-import type { TransactionExecutor } from '@repo/api-core';
+import type { AuthenticatedRequestUser } from "@repo/api-core";
+import type { TransactionExecutor } from "@repo/api-core";
 
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { AppError, ERROR_CODES } from '@repo/api-core';
+import { HttpStatus, Inject, Injectable } from "@nestjs/common";
+import { AppError, ERROR_CODES } from "@repo/api-core";
 
-import type { PermissionView, RoleView } from '../access-control.types';
+import type { PermissionView, RoleView } from "../access-control.types";
 
-import { ROLE_NAMES } from '../../access-control.constants';
-import { AccessControlMapper } from '../access-control.mapper';
+import { ROLE_NAMES } from "../../access-control.constants";
+import { AccessControlMapper } from "../access-control.mapper";
 import {
   ACCESS_CONTROL_REPOSITORY,
   type AccessControlRepositoryPort,
-} from '../access-control.repository.port';
+} from "../access-control.repository.port";
 
 export interface ListRolesParams {
   page: number;
   limit: number;
   organizationId?: string | undefined;
   search?: string | undefined;
-  scope?: 'platform' | 'organization' | undefined;
+  scope?: "platform" | "organization" | undefined;
 }
 
 @Injectable()
@@ -30,8 +30,7 @@ export class RoleQueryUseCase {
   ) {}
 
   async getRoleNamesForUsers(userIds: string[], organizationId?: string | null) {
-    const rows =
-      await this.accessControlRepository.findRoleNamesForUsers(userIds, organizationId);
+    const rows = await this.accessControlRepository.findRoleNamesForUsers(userIds, organizationId);
     const grouped = new Map<string, string[]>();
 
     for (const row of rows) {
@@ -54,8 +53,7 @@ export class RoleQueryUseCase {
   }
 
   async getRoleIdsForUsers(userIds: string[], organizationId?: string | null) {
-    const rows =
-      await this.accessControlRepository.findRoleIdsForUsers(userIds, organizationId);
+    const rows = await this.accessControlRepository.findRoleIdsForUsers(userIds, organizationId);
     const grouped = new Map<string, string[]>();
 
     for (const row of rows) {
@@ -68,13 +66,12 @@ export class RoleQueryUseCase {
   }
 
   async validateRoleIds(roleIds: string[]) {
-    const foundRoles =
-      await this.accessControlRepository.findRolesByIds(roleIds);
+    const foundRoles = await this.accessControlRepository.findRolesByIds(roleIds);
 
     if (foundRoles.length !== roleIds.length) {
       throw new AppError(
         ERROR_CODES.RESOURCE_CONFLICT,
-        'One or more roles do not exist',
+        "One or more roles do not exist",
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -91,11 +88,7 @@ export class RoleQueryUseCase {
     organizationId: string | null = null,
     executor?: TransactionExecutor,
   ) {
-    return this.accessControlRepository.findRoleByName(
-      name,
-      organizationId,
-      executor,
-    );
+    return this.accessControlRepository.findRoleByName(name, organizationId, executor);
   }
 
   async listRoles(
@@ -104,10 +97,14 @@ export class RoleQueryUseCase {
   ): Promise<{ rows: RoleView[]; total: number }> {
     const isSuperAdmin = actor?.roles.includes(ROLE_NAMES.SUPER_ADMIN) ?? false;
 
-    if (!isSuperAdmin && params?.organizationId && params.organizationId !== actor?.organizationId) {
+    if (
+      !isSuperAdmin &&
+      params?.organizationId &&
+      params.organizationId !== actor?.organizationId
+    ) {
       throw new AppError(
         ERROR_CODES.AUTH_FORBIDDEN,
-        'You can only list roles within your own organization',
+        "You can only list roles within your own organization",
         HttpStatus.FORBIDDEN,
       );
     }
@@ -125,10 +122,9 @@ export class RoleQueryUseCase {
       return { rows: [], total };
     }
 
-    const permissionRows =
-      await this.accessControlRepository.findPermissionsForRoleIds(
-        roles.map((role) => role.id),
-      );
+    const permissionRows = await this.accessControlRepository.findPermissionsForRoleIds(
+      roles.map((role) => role.id),
+    );
     const permissionsByRoleId = new Map<string, PermissionView[]>();
 
     for (const row of permissionRows) {
@@ -138,35 +134,25 @@ export class RoleQueryUseCase {
         name: row.name,
         description: row.description,
         isSystem: row.isSystem,
-        scope: row.scope as 'platform' | 'organization',
+        scope: row.scope as "platform" | "organization",
       });
       permissionsByRoleId.set(row.roleId, existing);
     }
 
     return {
       rows: roles.map((role) =>
-        this.accessControlMapper.toRoleView(
-          role,
-          permissionsByRoleId.get(role.id) ?? [],
-        ),
+        this.accessControlMapper.toRoleView(role, permissionsByRoleId.get(role.id) ?? []),
       ),
       total,
     };
   }
 
-  async listPermissions(
-    actor?: AuthenticatedRequestUser,
-  ): Promise<PermissionView[]> {
+  async listPermissions(actor?: AuthenticatedRequestUser): Promise<PermissionView[]> {
     const permissions = await this.accessControlRepository.findAllPermissions();
     const isSuperAdmin = actor?.roles.includes(ROLE_NAMES.SUPER_ADMIN) ?? false;
 
     return permissions
-      .map((permission) =>
-        this.accessControlMapper.toPermissionView(permission as PermissionView),
-      )
-      .filter(
-        (permission) =>
-          isSuperAdmin || permission.scope === 'organization',
-      );
+      .map((permission) => this.accessControlMapper.toPermissionView(permission as PermissionView))
+      .filter((permission) => isSuperAdmin || permission.scope === "organization");
   }
 }

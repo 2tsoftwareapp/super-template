@@ -9,10 +9,7 @@ export const safeLocalStorage = {
    * Check if localStorage is available (browser environment).
    */
   isAvailable(): boolean {
-    return (
-      typeof window !== "undefined" &&
-      typeof window.localStorage !== "undefined"
-    );
+    return typeof window !== "undefined" && typeof window.localStorage !== "undefined";
   },
 
   /**
@@ -90,10 +87,7 @@ export const safeCookies = {
    * Check if document.cookie is available (browser environment).
    */
   isAvailable(): boolean {
-    return (
-      typeof window !== "undefined" &&
-      typeof window.document !== "undefined"
-    );
+    return typeof window !== "undefined" && typeof window.document !== "undefined";
   },
 
   /**
@@ -167,10 +161,7 @@ export const safeCookies = {
   /**
    * Delete a cookie.
    */
-  removeItem(
-    key: string,
-    options: Pick<CookieOptions, "path" | "domain"> = {},
-  ): boolean {
+  removeItem(key: string, options: Pick<CookieOptions, "path" | "domain"> = {}): boolean {
     return this.setItem(key, "", {
       ...options,
       expires: new Date(0),

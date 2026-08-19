@@ -1,8 +1,8 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEmail, IsString } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { IsEmail, IsString } from "class-validator";
 
-import { UserDto } from '../../../users/presentation/users.dto';
-import { AuthSessionDto } from './auth-response.dto';
+import { UserDto } from "../../../users/presentation/users.dto";
+import { AuthSessionDto } from "./auth-response.dto";
 
 export class LoginDto {
   @ApiProperty()

@@ -2,26 +2,13 @@
 
 import { Badge } from "@repo/web-ui/badge";
 import { Button } from "@repo/web-ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@repo/web-ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/web-ui/card";
 import { ErrorState } from "@repo/web-ui/error-state";
 import { Input } from "@repo/web-ui/input";
 import { SectionLoading } from "@repo/web-ui/loading";
 import { Pagination } from "@repo/web-ui/pagination";
 import { Show } from "@repo/web-ui/show";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@repo/web-ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@repo/web-ui/table";
 import { RefreshCw } from "lucide-react";
 
 import type { MailViewModel } from "@/features/mail/model/mail.types";
@@ -35,10 +22,7 @@ interface MailDeliveriesTableProps {
   onSelectDelivery: (delivery: MailDeliveryDto) => void;
 }
 
-export function MailDeliveriesTable({
-  deliveries,
-  onSelectDelivery,
-}: MailDeliveriesTableProps) {
+export function MailDeliveriesTable({ deliveries, onSelectDelivery }: MailDeliveriesTableProps) {
   const {
     items,
     total,
@@ -69,15 +53,8 @@ export function MailDeliveriesTable({
                 : "History from the mail delivery endpoint."}
             </CardDescription>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onRefresh}
-            disabled={isFetching}
-          >
-            <RefreshCw
-              className={cn("size-3.5", isFetching && "animate-spin")}
-            />
+          <Button variant="outline" size="sm" onClick={onRefresh} disabled={isFetching}>
+            <RefreshCw className={cn("size-3.5", isFetching && "animate-spin")} />
             Refresh
           </Button>
         </div>
@@ -134,10 +111,7 @@ export function MailDeliveriesTable({
             ) : null}
             {!isLoading && !isError && items.length === 0 ? (
               <TableRow>
-                <TableCell
-                  colSpan={5}
-                  className="py-16 text-center text-sm text-muted-foreground"
-                >
+                <TableCell colSpan={5} className="py-16 text-center text-sm text-muted-foreground">
                   {filters.templateKey || filters.status
                     ? "No deliveries match your filters."
                     : "No deliveries recorded."}
@@ -146,9 +120,7 @@ export function MailDeliveriesTable({
             ) : null}
             {!isLoading && !isError
               ? items.map((delivery) => {
-                  const { variant, className } = statusProps(
-                    String(delivery.status),
-                  );
+                  const { variant, className } = statusProps(String(delivery.status));
                   return (
                     <TableRow key={delivery.id}>
                       <TableCell className="max-w-[160px] truncate text-sm font-medium">
@@ -158,10 +130,7 @@ export function MailDeliveriesTable({
                         {delivery.recipient}
                       </TableCell>
                       <TableCell>
-                        <Badge
-                          variant={variant}
-                          className={cn("text-xs capitalize", className)}
-                        >
+                        <Badge variant={variant} className={cn("text-xs capitalize", className)}>
                           {String(delivery.status).toLowerCase()}
                         </Badge>
                       </TableCell>

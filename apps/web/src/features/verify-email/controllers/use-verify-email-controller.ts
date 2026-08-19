@@ -6,19 +6,14 @@ import { useEffect, useState } from "react";
 
 import { ApiClientError } from "@/lib/http";
 
-import type {
-  VerifyEmailStatus,
-  VerifyEmailViewModel,
-} from "../model/verify-email.types";
+import type { VerifyEmailStatus, VerifyEmailViewModel } from "../model/verify-email.types";
 
 import { verifyEmail } from "../api/verify-email.api";
 import { parseVerifyEmailSearchParams } from "../model/verify-email.search-params";
 
-const ADMIN_URL =
-  process.env.NEXT_PUBLIC_ADMIN_URL ?? "http://localhost:3002";
+const ADMIN_URL = process.env.NEXT_PUBLIC_ADMIN_URL ?? "http://localhost:3002";
 
-const VERIFY_SUCCESS_MESSAGE =
-  "Email verified successfully! Your account is now active.";
+const VERIFY_SUCCESS_MESSAGE = "Email verified successfully! Your account is now active.";
 const MISSING_TOKEN_MESSAGE = "Missing verification token.";
 
 function getVerifyEmailErrorMessage(error: unknown): string {
@@ -48,12 +43,8 @@ export function useVerifyEmailController(): VerifyEmailViewModel {
   const router = useRouter();
   const { token } = parseVerifyEmailSearchParams(searchParams);
 
-  const [status, setStatus] = useState<VerifyEmailStatus>(
-    token ? "verifying" : "error",
-  );
-  const [message, setMessage] = useState(
-    token ? "" : MISSING_TOKEN_MESSAGE,
-  );
+  const [status, setStatus] = useState<VerifyEmailStatus>(token ? "verifying" : "error");
+  const [message, setMessage] = useState(token ? "" : MISSING_TOKEN_MESSAGE);
 
   useEffect(() => {
     if (!token) return;

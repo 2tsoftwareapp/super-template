@@ -1,21 +1,18 @@
-import type {
-  DatabaseClient,
-  DatabaseExecutor,
-} from '@repo/api-database';
+import type { DatabaseClient, DatabaseExecutor } from "@repo/api-database";
 
-import { Inject, Injectable } from '@nestjs/common';
-import { DATABASE } from '@repo/api-database';
-import { organizationMembers, roles, userRoles, users } from '@repo/api-database';
-import { and, asc, count, desc, eq, inArray, isNull, or, sql } from 'drizzle-orm';
+import { Inject, Injectable } from "@nestjs/common";
+import { DATABASE } from "@repo/api-database";
+import { organizationMembers, roles, userRoles, users } from "@repo/api-database";
+import { and, asc, count, desc, eq, inArray, isNull, or, sql } from "drizzle-orm";
 
-import type { UsersRepositoryPort } from '../application/ports/users.repository.port';
-import type { UserSortCriterion } from '../application/user-sort';
+import type { UsersRepositoryPort } from "../application/ports/users.repository.port";
+import type { UserSortCriterion } from "../application/user-sort";
 
 interface ListUsersParams {
   page: number;
   limit: number;
   search?: string;
-  status?: 'PENDING' | 'ACTIVE' | 'BLOCKED';
+  status?: "PENDING" | "ACTIVE" | "BLOCKED";
   role?: string;
   organizationId?: string;
   sort: UserSortCriterion[];
@@ -32,14 +29,11 @@ const USER_SORT_FIELDS = {
 export class UsersRepository implements UsersRepositoryPort {
   constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
 
-  async create(
-    values: typeof users.$inferInsert,
-    executor: DatabaseExecutor = this.database,
-  ) {
+  async create(values: typeof users.$inferInsert, executor: DatabaseExecutor = this.database) {
     const [user] = await executor.insert(users).values(values).returning();
 
     if (!user) {
-      throw new Error('User insert returned no rows');
+      throw new Error("User insert returned no rows");
     }
 
     return user;
@@ -87,16 +81,13 @@ export class UsersRepository implements UsersRepositoryPort {
       userId,
       {
         deletedAt: new Date(),
-        status: 'BLOCKED',
+        status: "BLOCKED",
       },
       executor,
     );
   }
 
-  async list(
-    params: ListUsersParams,
-    executor: DatabaseExecutor = this.database,
-  ) {
+  async list(params: ListUsersParams, executor: DatabaseExecutor = this.database) {
     const filters = [isNull(users.deletedAt)];
 
     if (params.search) {
@@ -144,7 +135,7 @@ export class UsersRepository implements UsersRepositoryPort {
 
     const sortClauses = params.sort.map((criterion) => {
       const sortColumn = USER_SORT_FIELDS[criterion.field];
-      return criterion.order === 'asc' ? asc(sortColumn) : desc(sortColumn);
+      return criterion.order === "asc" ? asc(sortColumn) : desc(sortColumn);
     });
     const whereClause = filters.length > 0 ? and(...filters) : undefined;
     const offset = (params.page - 1) * params.limit;
@@ -189,15 +180,12 @@ export class UsersRepository implements UsersRepositoryPort {
     const rows = await executor
       .select({ id: users.id })
       .from(users)
-      .where(and(isNull(users.deletedAt), eq(users.status, 'ACTIVE')));
+      .where(and(isNull(users.deletedAt), eq(users.status, "ACTIVE")));
 
     return rows.map((row) => row.id);
   }
 
-  async filterExistingUserIds(
-    userIds: string[],
-    executor: DatabaseExecutor = this.database,
-  ) {
+  async filterExistingUserIds(userIds: string[], executor: DatabaseExecutor = this.database) {
     if (userIds.length === 0) {
       return [];
     }
@@ -205,13 +193,7 @@ export class UsersRepository implements UsersRepositoryPort {
     const rows = await executor
       .select({ id: users.id })
       .from(users)
-      .where(
-        and(
-          inArray(users.id, userIds),
-          isNull(users.deletedAt),
-          eq(users.status, 'ACTIVE'),
-        ),
-      );
+      .where(and(inArray(users.id, userIds), isNull(users.deletedAt), eq(users.status, "ACTIVE")));
 
     return rows.map((row) => row.id);
   }
@@ -222,7 +204,12 @@ export class UsersRepository implements UsersRepositoryPort {
     executor: DatabaseExecutor = this.database,
   ) {
     const [row] = await executor
-      .select({ id: users.id, email: users.email, displayName: users.displayName, status: users.status })
+      .select({
+        id: users.id,
+        email: users.email,
+        displayName: users.displayName,
+        status: users.status,
+      })
       .from(users)
       .innerJoin(organizationMembers, eq(users.id, organizationMembers.userId))
       .where(
@@ -230,7 +217,7 @@ export class UsersRepository implements UsersRepositoryPort {
           eq(users.id, userId),
           eq(organizationMembers.organizationId, organizationId),
           isNull(users.deletedAt),
-          eq(users.status, 'ACTIVE'),
+          eq(users.status, "ACTIVE"),
         ),
       )
       .limit(1);
@@ -256,7 +243,7 @@ export class UsersRepository implements UsersRepositoryPort {
           inArray(users.id, userIds),
           eq(organizationMembers.organizationId, organizationId),
           isNull(users.deletedAt),
-          eq(users.status, 'ACTIVE'),
+          eq(users.status, "ACTIVE"),
         ),
       );
 
@@ -275,7 +262,7 @@ export class UsersRepository implements UsersRepositoryPort {
         and(
           eq(organizationMembers.organizationId, organizationId),
           isNull(users.deletedAt),
-          eq(users.status, 'ACTIVE'),
+          eq(users.status, "ACTIVE"),
         ),
       );
 

@@ -1,13 +1,13 @@
-import type { TransactionExecutor } from '@repo/api-core';
+import type { TransactionExecutor } from "@repo/api-core";
 
-import { Inject, Injectable } from '@nestjs/common';
-import { EnvironmentService } from '@repo/api-core';
+import { Inject, Injectable } from "@nestjs/common";
+import { EnvironmentService } from "@repo/api-core";
 
-import { hashRecoveryCode } from '../../domain/hash-recovery-code';
-import { normalizeRecoveryCode } from '../../domain/recovery-codes';
-import { verifyTotpCode } from '../../domain/totp';
-import { decryptTotpSecret } from '../../domain/totp-encryption';
-import { MFA_REPOSITORY, type MfaRepositoryPort } from '../ports/mfa.repository.port';
+import { hashRecoveryCode } from "../../domain/hash-recovery-code";
+import { normalizeRecoveryCode } from "../../domain/recovery-codes";
+import { verifyTotpCode } from "../../domain/totp";
+import { decryptTotpSecret } from "../../domain/totp-encryption";
+import { MFA_REPOSITORY, type MfaRepositoryPort } from "../ports/mfa.repository.port";
 
 const RECOVERY_CODE_LENGTH = 8;
 
@@ -19,15 +19,8 @@ export class MfaCodeVerifierService {
   ) {}
 
   /** Accepts either a 6-digit TOTP code or an unused recovery code, consuming the latter on success. */
-  async verifyCode(
-    userId: string,
-    code: string,
-    executor?: TransactionExecutor,
-  ): Promise<boolean> {
-    const secretRow = await this.mfaRepository.findSecretByUserId(
-      userId,
-      executor,
-    );
+  async verifyCode(userId: string, code: string, executor?: TransactionExecutor): Promise<boolean> {
+    const secretRow = await this.mfaRepository.findSecretByUserId(userId, executor);
 
     if (!secretRow) {
       return false;

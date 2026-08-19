@@ -1,13 +1,13 @@
-import type { AuthenticatedRequestUser, JsonObject } from '@repo/api-core';
+import type { AuthenticatedRequestUser, JsonObject } from "@repo/api-core";
 
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from "@nestjs/common";
 
-import { AuditService } from '../../../audit/application/audit.service';
-import { FILES_REPOSITORY, type FilesRepositoryPort } from '../ports/files.repository.port';
-import { FileAccessService } from '../services/file-access.service';
+import { AuditService } from "../../../audit";
+import { FILES_REPOSITORY, type FilesRepositoryPort } from "../ports/files.repository.port";
+import { FileAccessService } from "../services/file-access.service";
 
 export interface FileHistoryEvent {
-  type: 'version' | 'audit';
+  type: "version" | "audit";
   action: string;
   actorId: string | null;
   metadata: JsonObject | null;
@@ -24,30 +24,23 @@ export class GetFileHistoryUseCase {
     private readonly auditService: AuditService,
   ) {}
 
-  async execute(
-    actor: AuthenticatedRequestUser,
-    fileId: string,
-  ): Promise<FileHistoryEvent[]> {
-    const file = await this.fileAccessService.findAccessibleFile(
-      actor,
-      fileId,
-    );
+  async execute(actor: AuthenticatedRequestUser, fileId: string): Promise<FileHistoryEvent[]> {
+    const file = await this.fileAccessService.findAccessibleFile(actor, fileId);
 
     const [versions, auditResult] = await Promise.all([
       this.filesRepository.listVersions(file.id),
       this.auditService.listAuditLogs(actor, {
         page: 1,
         limit: AUDIT_HISTORY_LIMIT,
-        sortOrder: 'desc',
-        resourceType: 'file',
+        sortOrder: "desc",
+        resourceType: "file",
         resourceId: file.id,
       }),
     ]);
 
     const versionEvents: FileHistoryEvent[] = versions.map((version) => ({
-      type: 'version',
-      action:
-        version.versionNumber === 1 ? 'file.uploaded' : 'file.version_uploaded',
+      type: "version",
+      action: version.versionNumber === 1 ? "file.uploaded" : "file.version_uploaded",
       actorId: version.createdById,
       metadata: {
         versionNumber: version.versionNumber,
@@ -58,7 +51,7 @@ export class GetFileHistoryUseCase {
     }));
 
     const auditEvents: FileHistoryEvent[] = auditResult.rows.map((row) => ({
-      type: 'audit',
+      type: "audit",
       action: row.action,
       actorId: row.actorId,
       metadata: row.metadata,

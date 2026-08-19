@@ -1,6 +1,14 @@
-import type { AuthenticatedRequestUser } from '@repo/api-core';
+import type { AuthenticatedRequestUser } from "@repo/api-core";
 
-import { ACTION, AppError, ERROR_CODES, hasPermission, isPrivilegedRoleName, perm, ROLE_NAMES } from '@repo/api-core';
+import {
+  ACTION,
+  AppError,
+  ERROR_CODES,
+  hasPermission,
+  isPrivilegedRoleName,
+  perm,
+  ROLE_NAMES,
+} from "@repo/api-core";
 
 export interface RolePolicyTarget {
   name: string;
@@ -17,7 +25,7 @@ export function assertCanManagePrivilegedAccount(
   if (targetIsPrivileged && !actor.roles.includes(ROLE_NAMES.SUPER_ADMIN)) {
     throw new AppError(
       ERROR_CODES.AUTH_FORBIDDEN,
-      'Only SUPER_ADMIN can manage privileged user accounts',
+      "Only SUPER_ADMIN can manage privileged user accounts",
       403,
     );
   }
@@ -35,7 +43,7 @@ export function assertCanAssignRoles(
   if (!actorIsSuperAdmin && (targetIsPrivileged || assigningPrivilegedRole)) {
     throw new AppError(
       ERROR_CODES.AUTH_FORBIDDEN,
-      'Only SUPER_ADMIN can manage privileged accounts or roles',
+      "Only SUPER_ADMIN can manage privileged accounts or roles",
       403,
     );
   }
@@ -46,7 +54,7 @@ export function assertCanAssignRoles(
     if (privilegedRole) {
       throw new AppError(
         ERROR_CODES.AUTH_FORBIDDEN,
-        'Admins can only assign the USER role or custom roles',
+        "Admins can only assign the USER role or custom roles",
         403,
       );
     }
@@ -58,18 +66,15 @@ export function assertCanAssignRoles(
   ) {
     throw new AppError(
       ERROR_CODES.AUTH_FORBIDDEN,
-      'This role cannot be assigned through the API',
+      "This role cannot be assigned through the API",
       403,
     );
   }
 
-  if (
-    !actor.permissions.includes(perm('roles', ACTION.UPDATE)) &&
-    !actorIsSuperAdmin
-  ) {
+  if (!actor.permissions.includes(perm("roles", ACTION.UPDATE)) && !actorIsSuperAdmin) {
     throw new AppError(
       ERROR_CODES.AUTH_FORBIDDEN,
-      'You do not have permission to manage roles',
+      "You do not have permission to manage roles",
       403,
     );
   }
@@ -88,14 +93,13 @@ export function assertCanAssignRoleTargets(
   if (!actor.organizationId) {
     throw new AppError(
       ERROR_CODES.AUTH_FORBIDDEN,
-      'An organization context is required to assign roles',
+      "An organization context is required to assign roles",
       403,
     );
   }
 
   for (const role of desiredRoles) {
-    const isPlatformUserRole =
-      role.organizationId === null && role.name === ROLE_NAMES.USER;
+    const isPlatformUserRole = role.organizationId === null && role.name === ROLE_NAMES.USER;
 
     if (isPlatformUserRole) {
       continue;
@@ -112,28 +116,26 @@ export function assertCanAssignRoleTargets(
 
     throw new AppError(
       ERROR_CODES.AUTH_FORBIDDEN,
-      'Admins can only assign the USER role or organization custom roles',
+      "Admins can only assign the USER role or organization custom roles",
       403,
     );
   }
 }
 
-export function assertCanManageCustomRoleCatalog(
-  actor: AuthenticatedRequestUser,
-): void {
+export function assertCanManageCustomRoleCatalog(actor: AuthenticatedRequestUser): void {
   if (actor.roles.includes(ROLE_NAMES.SUPER_ADMIN)) {
     return;
   }
 
   const canManage =
-    hasPermission(actor.permissions, 'roles', ACTION.CREATE) ||
-    hasPermission(actor.permissions, 'roles', ACTION.UPDATE) ||
-    hasPermission(actor.permissions, 'roles', ACTION.DELETE);
+    hasPermission(actor.permissions, "roles", ACTION.CREATE) ||
+    hasPermission(actor.permissions, "roles", ACTION.UPDATE) ||
+    hasPermission(actor.permissions, "roles", ACTION.DELETE);
 
   if (!canManage) {
     throw new AppError(
       ERROR_CODES.AUTH_FORBIDDEN,
-      'You do not have permission to manage roles',
+      "You do not have permission to manage roles",
       403,
     );
   }
@@ -152,7 +154,7 @@ export function assertCanCreateCustomRole(
   if (!organizationId || organizationId !== actor.organizationId) {
     throw new AppError(
       ERROR_CODES.AUTH_FORBIDDEN,
-      'Custom roles can only be created within your organization',
+      "Custom roles can only be created within your organization",
       403,
     );
   }
@@ -163,11 +165,7 @@ export function assertCanModifyCustomRole(
   role: RolePolicyTarget,
 ): void {
   if (role.isSystem) {
-    throw new AppError(
-      ERROR_CODES.AUTH_FORBIDDEN,
-      'System roles cannot be modified',
-      403,
-    );
+    throw new AppError(ERROR_CODES.AUTH_FORBIDDEN, "System roles cannot be modified", 403);
   }
 
   assertCanManageCustomRoleCatalog(actor);
@@ -179,7 +177,7 @@ export function assertCanModifyCustomRole(
   if (!role.organizationId || role.organizationId !== actor.organizationId) {
     throw new AppError(
       ERROR_CODES.AUTH_FORBIDDEN,
-      'You can only manage custom roles in your organization',
+      "You can only manage custom roles in your organization",
       403,
     );
   }
@@ -187,13 +185,13 @@ export function assertCanModifyCustomRole(
 
 export function assertRoleScopeCanBeAssigned(
   role: RolePolicyTarget,
-  actor?: Pick<AuthenticatedRequestUser, 'roles'>,
+  actor?: Pick<AuthenticatedRequestUser, "roles">,
 ): void {
   if (role.name === ROLE_NAMES.ADMIN) {
     if (!actor?.roles.includes(ROLE_NAMES.SUPER_ADMIN)) {
       throw new AppError(
         ERROR_CODES.AUTH_FORBIDDEN,
-        'Only SUPER_ADMIN can assign the ADMIN role',
+        "Only SUPER_ADMIN can assign the ADMIN role",
         403,
       );
     }
@@ -201,7 +199,7 @@ export function assertRoleScopeCanBeAssigned(
     if (!role.organizationId) {
       throw new AppError(
         ERROR_CODES.AUTH_FORBIDDEN,
-        'ADMIN must be assigned as an organization-scoped role',
+        "ADMIN must be assigned as an organization-scoped role",
         403,
       );
     }
@@ -212,7 +210,7 @@ export function assertRoleScopeCanBeAssigned(
   if (role.name === ROLE_NAMES.SUPER_ADMIN) {
     throw new AppError(
       ERROR_CODES.AUTH_FORBIDDEN,
-      'SUPER_ADMIN can only be assigned during system initialization',
+      "SUPER_ADMIN can only be assigned during system initialization",
       403,
     );
   }

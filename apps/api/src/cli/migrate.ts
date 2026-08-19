@@ -1,19 +1,16 @@
-import { spawnSync } from 'node:child_process';
-import { resolve } from 'node:path';
-import { Pool } from 'pg';
+import { spawnSync } from "node:child_process";
+import { resolve } from "node:path";
+import { Pool } from "pg";
 
-import { loadCliEnv } from './load-cli-env';
-import { applySqlMigrations } from './migrations';
-import { resolveMigrateDatabaseUrl } from './resolve-migrate-database-url';
+import { loadCliEnv } from "./load-cli-env";
+import { applySqlMigrations } from "./migrations";
+import { resolveMigrateDatabaseUrl } from "./resolve-migrate-database-url";
 
 const printPostgresConnectionHint = (databaseUrl: string): void => {
-  const hintScript = resolve(
-    __dirname,
-    '../../../../scripts/postgres-connection-hint.mjs',
-  );
+  const hintScript = resolve(__dirname, "../../../../scripts/postgres-connection-hint.mjs");
   spawnSync(process.execPath, [hintScript, databaseUrl], {
     env: process.env,
-    stdio: 'inherit',
+    stdio: "inherit",
   });
 };
 
@@ -23,7 +20,7 @@ const isConnectionRefused = (error: unknown): boolean => {
   }
 
   return error.errors.some(
-    (cause) => cause instanceof Error && cause.message.includes('ECONNREFUSED'),
+    (cause) => cause instanceof Error && cause.message.includes("ECONNREFUSED"),
   );
 };
 
@@ -38,7 +35,7 @@ const main = async (): Promise<void> => {
 
   try {
     await applySqlMigrations(pool);
-    console.log('Database migrations complete.');
+    console.log("Database migrations complete.");
   } catch (error) {
     if (isConnectionRefused(error)) {
       printPostgresConnectionHint(databaseUrl);

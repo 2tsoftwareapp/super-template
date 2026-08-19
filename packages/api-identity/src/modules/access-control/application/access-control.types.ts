@@ -1,12 +1,12 @@
-import type { SYSTEM_SCOPE } from '@repo/api-core';
-export type RoleScope = 'platform' | 'organization';
+import type { SYSTEM_SCOPE } from "@repo/api-core";
+export type RoleScope = "platform" | "organization";
 
 export interface PermissionView {
   id: string;
   name: string;
   description: string | null;
   isSystem: boolean;
-  scope: typeof SYSTEM_SCOPE.PLATFORM | 'organization';
+  scope: typeof SYSTEM_SCOPE.PLATFORM | "organization";
 }
 
 export interface RoleView {

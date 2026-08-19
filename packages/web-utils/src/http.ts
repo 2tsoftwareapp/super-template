@@ -36,10 +36,7 @@ async function ensureCsrfToken(): Promise<void> {
   await csrfFetchPromise;
 }
 
-async function requestSameOrigin(
-  path: string,
-  init: RequestInit = {},
-): Promise<Response> {
+async function requestSameOrigin(path: string, init: RequestInit = {}): Promise<Response> {
   const headers = new Headers(init.headers);
   const method = init.method?.toUpperCase() ?? "GET";
 
@@ -79,10 +76,7 @@ async function throwIfNotOk(response: Response): Promise<void> {
 }
 
 /** JSON BFF/API calls — CSRF + same-origin credentials. */
-export async function webFetch<T>(
-  path: string,
-  init: RequestInit = {},
-): Promise<T> {
+export async function webFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
   const response = await requestSameOrigin(path, init);
   await throwIfNotOk(response);
   return (await response.json()) as T;
@@ -93,10 +87,7 @@ export async function webFetch<T>(
  * `webFetch`. Prefer this over raw `fetch` for BFF downloads.
  * Trace: CODING_RULES §20 R3.
  */
-export async function webFetchBlob(
-  path: string,
-  init: RequestInit = {},
-): Promise<Blob> {
+export async function webFetchBlob(path: string, init: RequestInit = {}): Promise<Blob> {
   const response = await requestSameOrigin(path, init);
   await throwIfNotOk(response);
   return response.blob();

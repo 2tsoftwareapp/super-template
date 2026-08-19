@@ -1,4 +1,4 @@
-import type { AuthSessionModel } from './models/auth-session';
+import type { AuthSessionModel } from "./models/auth-session";
 
 export interface AuthUserView {
   id: string;
@@ -13,7 +13,7 @@ export interface AuthUserView {
   updatedAt: string;
 }
 
-import { Injectable } from '@nestjs/common';
+import { Injectable } from "@nestjs/common";
 
 @Injectable()
 export class AuthMapper {

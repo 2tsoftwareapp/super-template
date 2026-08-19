@@ -11,7 +11,4 @@ export const tweakcnFontMono = JetBrains_Mono({
   variable: "--font-mono",
 });
 
-export const tweakcnFontClassName = [
-  tweakcnFontSans.variable,
-  tweakcnFontMono.variable,
-].join(" ");
+export const tweakcnFontClassName = [tweakcnFontSans.variable, tweakcnFontMono.variable].join(" ");

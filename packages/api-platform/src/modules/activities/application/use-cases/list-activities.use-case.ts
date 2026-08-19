@@ -1,8 +1,11 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from "@nestjs/common";
 
-import type { ListActivitiesQuery } from '../activities.types';
+import type { ListActivitiesQuery } from "../activities.types";
 
-import { ACTIVITIES_REPOSITORY, type ActivitiesRepositoryPort } from '../ports/activities.repository.port';
+import {
+  ACTIVITIES_REPOSITORY,
+  type ActivitiesRepositoryPort,
+} from "../ports/activities.repository.port";
 
 @Injectable()
 export class ListActivitiesUseCase {
@@ -14,9 +17,7 @@ export class ListActivitiesUseCase {
     const result = await this.activitiesRepository.list({
       page: query.page,
       limit: query.limit,
-      ...(query.entityType !== undefined
-        ? { entityType: query.entityType }
-        : {}),
+      ...(query.entityType !== undefined ? { entityType: query.entityType } : {}),
       ...(query.entityId !== undefined ? { entityId: query.entityId } : {}),
       ...(query.actorId !== undefined ? { actorId: query.actorId } : {}),
     });

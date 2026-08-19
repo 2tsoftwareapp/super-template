@@ -1,11 +1,5 @@
 import { LoadingButton } from "@repo/web-ui/loading-button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@repo/web-ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@repo/web-ui/select";
 import { Show } from "@repo/web-ui/show";
 import { Spinner } from "@repo/web-ui/spinner";
 import { Building2, CheckCircle2 } from "lucide-react";
@@ -47,9 +41,7 @@ export function UserDetailRoles({ roles }: UserDetailRolesProps) {
             </SelectContent>
           </Select>
           {roles.orgRequired && !roles.selectedOrganizationId && (
-            <p className="text-xs text-destructive">
-              Organization is required for this role
-            </p>
+            <p className="text-xs text-destructive">Organization is required for this role</p>
           )}
         </div>
       </Show>
@@ -77,23 +69,15 @@ export function UserDetailRoles({ roles }: UserDetailRolesProps) {
                 <span
                   className={cn(
                     "flex size-4 shrink-0 items-center justify-center rounded-full border-2 transition-colors",
-                    checked
-                      ? "border-foreground bg-foreground"
-                      : "border-muted-foreground",
+                    checked ? "border-foreground bg-foreground" : "border-muted-foreground",
                   )}
                 >
-                  {checked && (
-                    <span className="size-1.5 rounded-full bg-background" />
-                  )}
+                  {checked && <span className="size-1.5 rounded-full bg-background" />}
                 </span>
                 <div className="min-w-0">
-                  <p className="text-sm font-medium">
-                    {formatRoleName(role.name)}
-                  </p>
+                  <p className="text-sm font-medium">{formatRoleName(role.name)}</p>
                   {typeof role.description === "string" && (
-                    <p className="text-xs text-muted-foreground">
-                      {role.description}
-                    </p>
+                    <p className="text-xs text-muted-foreground">{role.description}</p>
                   )}
                 </div>
               </button>
@@ -120,11 +104,7 @@ export function UserDetailRoles({ roles }: UserDetailRolesProps) {
         <Show when={roles.state.isError}>
           <span className="text-xs text-destructive">
             Failed.{" "}
-            <button
-              type="button"
-              className="underline"
-              onClick={roles.onSave}
-            >
+            <button type="button" className="underline" onClick={roles.onSave}>
               Retry
             </button>
           </span>

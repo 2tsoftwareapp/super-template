@@ -1,17 +1,10 @@
-import type {
-  SortCriterion,
-  SortOrder,
-} from "@repo/api-sort";
+import type { SortCriterion, SortOrder } from "@repo/api-sort";
 import type { ColumnDef, Table } from "@tanstack/react-table";
 import type { UseFormReturn } from "react-hook-form";
 
 import { PAGE_SIZE_OPTIONS, type PageSize } from "@repo/config";
 
-import type {
-  AdminUserDto,
-  OrganizationDto,
-  RoleDto,
-} from "@/lib/api-types";
+import type { AdminUserDto, OrganizationDto, RoleDto } from "@/lib/api-types";
 
 import type { ProfileForm } from "./users.schemas";
 
@@ -206,5 +199,3 @@ export interface UserDetailViewModel {
     onRetry: () => void;
   };
 }
-
-

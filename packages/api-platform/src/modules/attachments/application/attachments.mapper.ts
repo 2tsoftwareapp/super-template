@@ -1,4 +1,4 @@
-import type { AttachmentRecord } from './ports/attachments.repository.port';
+import type { AttachmentRecord } from "./ports/attachments.repository.port";
 
 export class AttachmentsMapper {
   static toAttachmentDto(attachment: AttachmentRecord) {

@@ -4,13 +4,9 @@
     "outDir": "dist",
     "strictPropertyInitialization": false,
     "paths": {
-      "@platform/*": [
-        "./src/*"
-      ]
+      "@platform/*": ["./src/*"]
     }
   },
-  "include": [
-    "src/**/*.ts"
-  ],
+  "include": ["src/**/*.ts"],
   "exclude": []
 }

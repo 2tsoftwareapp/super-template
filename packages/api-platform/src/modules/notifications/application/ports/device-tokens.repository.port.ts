@@ -1,6 +1,6 @@
-import type { TransactionExecutor } from '@repo/api-core';
+import type { TransactionExecutor } from "@repo/api-core";
 
-export type NotificationDevicePlatform = 'IOS' | 'ANDROID';
+export type NotificationDevicePlatform = "IOS" | "ANDROID";
 
 export interface DeviceTokenRecord {
   id: string;
@@ -50,12 +50,23 @@ export interface DeviceTokensRepositoryPort {
    * to this token is in flight). The caller decides how to surface that — the
    * repository never raises domain/HTTP errors itself.
    */
-  registerOrTransfer(values: UpsertDeviceTokenInput, executor?: TransactionExecutor): Promise<RegisterTokenResult | null>;
+  registerOrTransfer(
+    values: UpsertDeviceTokenInput,
+    executor?: TransactionExecutor,
+  ): Promise<RegisterTokenResult | null>;
   listByUserId(userId: string, executor?: TransactionExecutor): Promise<DeviceTokenRecord[]>;
   listByIds(ids: string[], executor?: TransactionExecutor): Promise<DeviceTokenRecord[]>;
-  disableByToken(userId: string, token: string, reason: string, executor?: TransactionExecutor): Promise<DeviceTokenRecord | null>;
+  disableByToken(
+    userId: string,
+    token: string,
+    reason: string,
+    executor?: TransactionExecutor,
+  ): Promise<DeviceTokenRecord | null>;
   disableTokens(tokens: string[], reason: string, executor?: TransactionExecutor): Promise<void>;
-  listActiveByToken(token: string, executor?: TransactionExecutor): Promise<DeviceTokenRecord | null>;
+  listActiveByToken(
+    token: string,
+    executor?: TransactionExecutor,
+  ): Promise<DeviceTokenRecord | null>;
 }
 
-export const DEVICE_TOKENS_REPOSITORY = Symbol('DEVICE_TOKENS_REPOSITORY');
+export const DEVICE_TOKENS_REPOSITORY = Symbol("DEVICE_TOKENS_REPOSITORY");

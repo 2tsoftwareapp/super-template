@@ -1,9 +1,6 @@
 import { bffPath } from "@repo/api-contract";
 
-import type {
-  MailDeliveriesParams,
-  SendMailInput,
-} from "@/features/mail/model/mail.types";
+import type { MailDeliveriesParams, SendMailInput } from "@/features/mail/model/mail.types";
 import type {
   ListResponse,
   MailDeliveryDto,
@@ -21,9 +18,7 @@ export type { MailDeliveriesParams, SendMailInput };
  */
 export const mailApi = {
   templates() {
-    return webFetch<{ data: MailTemplateDto[] }>(
-      bffPath("/api/v1/admin/mail/templates"),
-    );
+    return webFetch<{ data: MailTemplateDto[] }>(bffPath("/api/v1/admin/mail/templates"));
   },
 
   deliveries(params: MailDeliveriesParams) {
@@ -43,12 +38,9 @@ export const mailApi = {
   },
 
   send(input: SendMailInput) {
-    return webFetch<{ data: SendAdminMailResultDto }>(
-      bffPath("/api/v1/admin/mail/send"),
-      {
-        method: "POST",
-        body: JSON.stringify(input),
-      },
-    );
+    return webFetch<{ data: SendAdminMailResultDto }>(bffPath("/api/v1/admin/mail/send"), {
+      method: "POST",
+      body: JSON.stringify(input),
+    });
   },
 };

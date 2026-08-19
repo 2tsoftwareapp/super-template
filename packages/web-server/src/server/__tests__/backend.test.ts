@@ -73,15 +73,12 @@ describe("createBackendHelpers mutation guards", () => {
   });
 
   it("allows establish-session with origin check only", () => {
-    const request = new NextRequest(
-      "http://localhost:3000/api/auth/sso/establish-session",
-      {
-        method: "POST",
-        headers: {
-          origin: "http://localhost:3000",
-        },
+    const request = new NextRequest("http://localhost:3000/api/auth/sso/establish-session", {
+      method: "POST",
+      headers: {
+        origin: "http://localhost:3000",
       },
-    );
+    });
 
     const response = backend.enforceOrigin(request);
 

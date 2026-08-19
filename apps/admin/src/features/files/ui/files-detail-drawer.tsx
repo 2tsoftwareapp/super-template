@@ -2,11 +2,7 @@ import { Button } from "@repo/web-ui/button";
 import { LoadingButton } from "@repo/web-ui/loading-button";
 import { Download, History, Layers, Trash2, Upload } from "lucide-react";
 
-import type {
-  FileDto,
-  FileHistoryEventDto,
-  FileVersionDto,
-} from "@/lib/api-types";
+import type { FileDto, FileHistoryEventDto, FileVersionDto } from "@/lib/api-types";
 
 import { ResourceDrawer } from "@/components/resource-drawer";
 import { cn } from "@/lib/utils";
@@ -110,12 +106,7 @@ export function FilesDetailDrawer({
       footer={
         file ? (
           <div className="flex gap-2">
-            <LoadingButton
-              size="sm"
-              variant="outline"
-              onClick={onDownload}
-              loading={isDownloading}
-            >
+            <LoadingButton size="sm" variant="outline" onClick={onDownload} loading={isDownloading}>
               <Download data-icon="inline-start" />
               Download
             </LoadingButton>
@@ -131,12 +122,7 @@ export function FilesDetailDrawer({
               </LoadingButton>
             ) : null}
             {canDelete ? (
-              <Button
-                size="sm"
-                variant="outline"
-                className="text-destructive"
-                onClick={onDelete}
-              >
+              <Button size="sm" variant="outline" className="text-destructive" onClick={onDelete}>
                 <Trash2 data-icon="inline-start" />
                 Delete
               </Button>

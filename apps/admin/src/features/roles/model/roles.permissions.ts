@@ -38,7 +38,6 @@ export function selectDelegatablePermissions(
   const held = new Set(actorPermissions);
   return catalog.filter(
     (permission) =>
-      permission.scope === "organization" &&
-      (isSuperAdmin || held.has(permission.name)),
+      permission.scope === "organization" && (isSuperAdmin || held.has(permission.name)),
   );
 }

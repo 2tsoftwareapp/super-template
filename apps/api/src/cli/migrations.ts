@@ -1,15 +1,15 @@
-import type { Pool, PoolClient } from 'pg';
+import type { Pool, PoolClient } from "pg";
 
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { resolve } from "node:path";
 
-const MIGRATIONS_TABLE = 'public.__app_migrations';
+const MIGRATIONS_TABLE = "public.__app_migrations";
 
 export const resolveMigrationsFolder = (): string => {
   const candidates = [
-    resolve(process.cwd(), 'drizzle'),
-    resolve(process.cwd(), 'packages/api-database/drizzle'),
-    resolve(process.cwd(), '../../packages/api-database/drizzle'),
+    resolve(process.cwd(), "drizzle"),
+    resolve(process.cwd(), "packages/api-database/drizzle"),
+    resolve(process.cwd(), "../../packages/api-database/drizzle"),
   ];
 
   const folder = candidates.find((candidate) => {
@@ -17,11 +17,11 @@ export const resolveMigrationsFolder = (): string => {
       return false;
     }
 
-    return readdirSync(candidate).some((file) => file.endsWith('.sql'));
+    return readdirSync(candidate).some((file) => file.endsWith(".sql"));
   });
 
   if (!folder) {
-    throw new Error('Could not resolve the Drizzle migrations folder');
+    throw new Error("Could not resolve the Drizzle migrations folder");
   }
 
   return folder;
@@ -29,12 +29,12 @@ export const resolveMigrationsFolder = (): string => {
 
 const listMigrationFiles = (migrationsFolder: string): string[] =>
   readdirSync(migrationsFolder)
-    .filter((file) => file.endsWith('.sql'))
+    .filter((file) => file.endsWith(".sql"))
     .sort((left, right) => left.localeCompare(right));
 
 const splitSqlStatements = (sql: string): string[] =>
   sql
-    .split('--> statement-breakpoint')
+    .split("--> statement-breakpoint")
     .map((statement) => statement.trim())
     .filter(Boolean);
 
@@ -82,10 +82,7 @@ const parseMigrationIndex = (filename: string): number => {
 };
 
 /** Backfill ledger for DBs migrated before tracking existed. */
-const backfillMigrationsLedger = async (
-  pool: Pool,
-  migrationFiles: string[],
-): Promise<void> => {
+const backfillMigrationsLedger = async (pool: Pool, migrationFiles: string[]): Promise<void> => {
   const applied = await getAppliedMigrations(pool);
   if (applied.size > 0) {
     return;
@@ -114,23 +111,20 @@ const applyMigrationFile = async (
   migrationsFolder: string,
   migrationFile: string,
 ): Promise<void> => {
-  const sql = readFileSync(resolve(migrationsFolder, migrationFile), 'utf8');
+  const sql = readFileSync(resolve(migrationsFolder, migrationFile), "utf8");
   const statements = splitSqlStatements(sql);
 
-  await client.query('BEGIN');
+  await client.query("BEGIN");
 
   try {
     for (const statement of statements) {
       await client.query(statement);
     }
 
-    await client.query(
-      `INSERT INTO ${MIGRATIONS_TABLE} (filename) VALUES ($1)`,
-      [migrationFile],
-    );
-    await client.query('COMMIT');
+    await client.query(`INSERT INTO ${MIGRATIONS_TABLE} (filename) VALUES ($1)`, [migrationFile]);
+    await client.query("COMMIT");
   } catch (error) {
-    await client.query('ROLLBACK');
+    await client.query("ROLLBACK");
     throw error;
   }
 };

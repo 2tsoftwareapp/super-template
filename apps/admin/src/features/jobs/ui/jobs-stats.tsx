@@ -25,7 +25,11 @@ function StatChip({
 export function JobsMetricsRow({ metrics }: { metrics: JobMetricsDto }) {
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-      <StatChip label="Total completed" count={metrics.totalCompleted} className="border-primary/30 bg-primary/5" />
+      <StatChip
+        label="Total completed"
+        count={metrics.totalCompleted}
+        className="border-primary/30 bg-primary/5"
+      />
       <StatChip
         label="Total failed"
         count={metrics.totalFailed}
@@ -40,11 +44,7 @@ export function JobsMetricsRow({ metrics }: { metrics: JobMetricsDto }) {
       />
       <div className="rounded-xl border border-border px-4 py-3">
         <p className="text-2xl font-bold tabular-nums">
-          {metrics.totalCompleted > 0
-            ? `${Math.round(
-                (metrics.retryRate ?? 0) * 100,
-              )}%`
-            : "\u2014"}
+          {metrics.totalCompleted > 0 ? `${Math.round((metrics.retryRate ?? 0) * 100)}%` : "\u2014"}
         </p>
         <p className="mt-0.5 text-xs text-muted-foreground">Retry rate</p>
       </div>
@@ -64,16 +64,12 @@ export function JobsStatusRow({ metrics }: { metrics: JobMetricsDto }) {
       <StatChip
         label="Processing"
         count={totalProcessing}
-        {...(totalProcessing > 0
-          ? { className: "border-border bg-accent" }
-          : {})}
+        {...(totalProcessing > 0 ? { className: "border-border bg-accent" } : {})}
       />
       <StatChip
         label="Failed"
         count={totalFailed}
-        {...(totalFailed > 0
-          ? { className: "border-destructive/30 bg-destructive/5" }
-          : {})}
+        {...(totalFailed > 0 ? { className: "border-destructive/30 bg-destructive/5" } : {})}
       />
       <StatChip
         label="Completed"

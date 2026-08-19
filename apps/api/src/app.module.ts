@@ -1,17 +1,7 @@
-import {
-  type MiddlewareConsumer,
-  Module,
-  type NestModule,
-  RequestMethod,
-} from '@nestjs/common';
-import {
-  APP_FILTER,
-  APP_GUARD,
-  APP_INTERCEPTOR,
-  Reflector,
-} from '@nestjs/core';
-import { ScheduleModule } from '@nestjs/schedule';
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { type MiddlewareConsumer, Module, type NestModule, RequestMethod } from "@nestjs/common";
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, Reflector } from "@nestjs/core";
+import { ScheduleModule } from "@nestjs/schedule";
+import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 import {
   APP_LOGGER,
   AppExceptionFilter,
@@ -24,19 +14,19 @@ import {
   RequestContextMiddleware,
   RequestLoggerMiddleware,
   ResponseEnvelopeInterceptor,
-} from '@repo/api-core';
-import { ImportExportModule } from '@repo/api-platform';
-import { TenantContextService } from '@repo/api-core';
-import { AppConfigModule } from '@repo/api-core/config/app-config.module';
-import { DatabaseModule } from '@repo/api-database';
-import { HealthModule } from '@repo/api-health';
-import { IdentityModule } from '@repo/api-identity';
-import { AuthService } from '@repo/api-identity/modules/auth/application/auth.service';
-import { PlatformModule } from '@repo/api-platform';
+} from "@repo/api-core";
+import { TenantContextService } from "@repo/api-core";
+import { AppConfigModule } from "@repo/api-core/config/app-config.module";
+import { DatabaseModule } from "@repo/api-database";
+import { HealthModule } from "@repo/api-health";
+import { IdentityModule } from "@repo/api-identity";
+import { AuthService } from "@repo/api-identity/modules/auth/application/auth.service";
+import { ImportExportModule } from "@repo/api-platform";
+import { PlatformModule } from "@repo/api-platform";
 
-import { AuthGuard } from './shell/auth.guard';
-import { MaintenanceModeGuard } from './shell/maintenance-mode.guard';
-import { TenantContextInterceptor } from './shell/tenant-context.interceptor';
+import { AuthGuard } from "./shell/auth.guard";
+import { MaintenanceModeGuard } from "./shell/maintenance-mode.guard";
+import { TenantContextInterceptor } from "./shell/tenant-context.interceptor";
 
 @Module({
   imports: [
@@ -47,11 +37,10 @@ import { TenantContextInterceptor } from './shell/tenant-context.interceptor';
       inject: [EnvironmentService],
       useFactory: (environmentService: EnvironmentService) => ({
         skipIf: () => environmentService.isTest,
-        // TODO: replace to config TTL and LIMIT
         throttlers: [
           {
-            ttl: 60_000,
-            limit: 120,
+            ttl: environmentService.values.THROTTLER_TTL_MS,
+            limit: environmentService.values.THROTTLER_LIMIT,
           },
         ],
         storage: new RedisThrottlerStorage(environmentService),
@@ -95,16 +84,13 @@ import { TenantContextInterceptor } from './shell/tenant-context.interceptor';
     },
     {
       provide: APP_INTERCEPTOR,
-      useFactory: (reflector: Reflector) =>
-        new ResponseEnvelopeInterceptor(reflector),
+      useFactory: (reflector: Reflector) => new ResponseEnvelopeInterceptor(reflector),
       inject: [Reflector],
     },
     {
       provide: APP_INTERCEPTOR,
-      useFactory: (
-        reflector: Reflector,
-        tenantContextService: TenantContextService,
-      ) => new TenantContextInterceptor(reflector, tenantContextService),
+      useFactory: (reflector: Reflector, tenantContextService: TenantContextService) =>
+        new TenantContextInterceptor(reflector, tenantContextService),
       inject: [Reflector, TenantContextService],
     },
     TenantContextService,
@@ -114,6 +100,6 @@ export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {
     consumer
       .apply(RequestContextMiddleware, RequestLoggerMiddleware)
-      .forRoutes({ path: '*path', method: RequestMethod.ALL });
+      .forRoutes({ path: "*path", method: RequestMethod.ALL });
   }
 }

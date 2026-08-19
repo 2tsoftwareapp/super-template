@@ -3,11 +3,7 @@ import type { NextRequest } from "next/server";
 import { stripTokensFromAuthEnvelope } from "@repo/web-server/auth/sanitize-response";
 import { NextResponse } from "next/server";
 
-import {
-  clearAuthCookies,
-  readAuthCookies,
-  setAuthCookies,
-} from "@/lib/auth/cookies";
+import { clearAuthCookies, readAuthCookies, setAuthCookies } from "@/lib/auth/cookies";
 import { enforceCsrf, refreshSession } from "@/lib/server/backend";
 
 export async function POST(request: NextRequest) {
@@ -52,9 +48,7 @@ export async function POST(request: NextRequest) {
     return response;
   }
 
-  const response = NextResponse.json(
-    stripTokensFromAuthEnvelope(refreshed) ?? refreshed,
-  );
+  const response = NextResponse.json(stripTokensFromAuthEnvelope(refreshed) ?? refreshed);
   setAuthCookies(response, refreshed.data, csrfToken ?? undefined);
   return response;
 }

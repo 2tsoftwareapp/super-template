@@ -1,10 +1,5 @@
-import type { ImportValidationError } from '@repo/api-core';
-export type ImportJobStatus =
-  | 'PENDING'
-  | 'PROCESSING'
-  | 'COMPLETED'
-  | 'FAILED'
-  | 'CANCELLED';
+import type { ImportValidationError } from "@repo/api-core";
+export type ImportJobStatus = "PENDING" | "PROCESSING" | "COMPLETED" | "FAILED" | "CANCELLED";
 
 export interface ImportJobView {
   id: string;

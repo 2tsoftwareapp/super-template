@@ -7,21 +7,13 @@ interface EmptyProps extends Omit<React.ComponentProps<"div">, "title"> {
   title?: React.ReactNode;
 }
 
-function Empty({
-  className,
-  children,
-  description,
-  title,
-  ...props
-}: EmptyProps) {
+function Empty({ className, children, description, title, ...props }: EmptyProps) {
   const fallbackContent =
     title || description ? (
       <EmptyContent>
         <EmptyHeader>
           {title ? <EmptyTitle>{title}</EmptyTitle> : null}
-          {description ? (
-            <EmptyDescription>{description}</EmptyDescription>
-          ) : null}
+          {description ? <EmptyDescription>{description}</EmptyDescription> : null}
         </EmptyHeader>
       </EmptyContent>
     ) : null;
@@ -116,11 +108,4 @@ function EmptyContent({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
-export {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-};
+export { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle };

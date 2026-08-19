@@ -1,7 +1,7 @@
-import type { SYSTEM_SCOPE } from '../common/constants/system.constants';
-import type { JsonObject } from '../common/types/json-value';
-import type { RequestContext } from '../common/types/request-context';
-import type { TransactionExecutor } from '../common/types/transaction-executor';
+import type { SYSTEM_SCOPE } from "../common/constants/system.constants";
+import type { JsonObject } from "../common/types/json-value";
+import type { RequestContext } from "../common/types/request-context";
+import type { TransactionExecutor } from "../common/types/transaction-executor";
 
 export interface AuditLogBaseInput {
   actorId?: string | null;
@@ -36,4 +36,4 @@ export interface AuditWriter {
   log(input: AuditLogInput, executor?: TransactionExecutor): Promise<void>;
 }
 
-export const AUDIT_WRITER = Symbol('AUDIT_WRITER');
+export const AUDIT_WRITER = Symbol("AUDIT_WRITER");

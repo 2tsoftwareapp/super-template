@@ -1,5 +1,5 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { type JsonObject, PaginationQueryDto } from '@repo/api-core';
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { type JsonObject, PaginationQueryDto } from "@repo/api-core";
 import {
   ArrayMinSize,
   IsArray,
@@ -12,15 +12,15 @@ import {
   IsUUID,
   MaxLength,
   ValidateIf,
-} from 'class-validator';
+} from "class-validator";
 
-export const NOTIFICATION_AUDIENCE_VALUES = ['USER', 'USERS', 'ALL'] as const;
+export const NOTIFICATION_AUDIENCE_VALUES = ["USER", "USERS", "ALL"] as const;
 export const NOTIFICATION_JOB_STATUS_VALUES = [
-  'PENDING',
-  'PROCESSING',
-  'COMPLETED',
-  'CANCELLED',
-  'FAILED',
+  "PENDING",
+  "PROCESSING",
+  "COMPLETED",
+  "CANCELLED",
+  "FAILED",
 ] as const;
 
 export class NotificationDto {
@@ -39,7 +39,7 @@ export class NotificationDto {
   @ApiProperty()
   body: string;
 
-  @ApiPropertyOptional({ type: 'object', additionalProperties: true })
+  @ApiPropertyOptional({ type: "object", additionalProperties: true })
   data: JsonObject | null;
 
   @ApiPropertyOptional()
@@ -62,17 +62,17 @@ export class NotificationsQueryDto extends PaginationQueryDto {
 }
 
 export enum NotificationAudienceDto {
-  USER = 'USER',
-  USERS = 'USERS',
-  ALL = 'ALL',
+  USER = "USER",
+  USERS = "USERS",
+  ALL = "ALL",
 }
 
 export enum NotificationJobStatusDto {
-  PENDING = 'PENDING',
-  PROCESSING = 'PROCESSING',
-  COMPLETED = 'COMPLETED',
-  CANCELLED = 'CANCELLED',
-  FAILED = 'FAILED',
+  PENDING = "PENDING",
+  PROCESSING = "PROCESSING",
+  COMPLETED = "COMPLETED",
+  CANCELLED = "CANCELLED",
+  FAILED = "FAILED",
 }
 
 export class SendNotificationRequestDto {
@@ -82,20 +82,18 @@ export class SendNotificationRequestDto {
 
   @ApiPropertyOptional()
   @ValidateIf(
-    (input: SendNotificationRequestDto) =>
-      input.audience === NotificationAudienceDto.USER,
+    (input: SendNotificationRequestDto) => input.audience === NotificationAudienceDto.USER,
   )
   @IsUUID()
   userId?: string;
 
   @ApiPropertyOptional({ type: [String] })
   @ValidateIf(
-    (input: SendNotificationRequestDto) =>
-      input.audience === NotificationAudienceDto.USERS,
+    (input: SendNotificationRequestDto) => input.audience === NotificationAudienceDto.USERS,
   )
   @IsArray()
   @ArrayMinSize(1)
-  @IsUUID('4', { each: true })
+  @IsUUID("4", { each: true })
   userIds?: string[];
 
   @ApiProperty()
@@ -110,14 +108,13 @@ export class SendNotificationRequestDto {
   @IsString()
   body: string;
 
-  @ApiPropertyOptional({ type: 'object', additionalProperties: true })
+  @ApiPropertyOptional({ type: "object", additionalProperties: true })
   @IsOptional()
   @IsObject()
   data?: JsonObject;
 
   @ApiPropertyOptional({
-    description:
-      'ISO-8601 datetime. Omit or set to now for immediate delivery.',
+    description: "ISO-8601 datetime. Omit or set to now for immediate delivery.",
   })
   @IsOptional()
   @IsDateString()
@@ -125,7 +122,7 @@ export class SendNotificationRequestDto {
 
   @ApiPropertyOptional({
     description:
-      'Client-supplied idempotency key. Retries with the same key return the original notification job.',
+      "Client-supplied idempotency key. Retries with the same key return the original notification job.",
   })
   @IsOptional()
   @IsString()
@@ -151,7 +148,7 @@ export class SendNotificationDto {
   @IsString()
   body: string;
 
-  @ApiPropertyOptional({ type: 'object', additionalProperties: true })
+  @ApiPropertyOptional({ type: "object", additionalProperties: true })
   @IsOptional()
   @IsObject()
   data?: JsonObject;
@@ -187,7 +184,7 @@ export class NotificationJobDto {
   @ApiProperty()
   body: string;
 
-  @ApiPropertyOptional({ type: 'object', additionalProperties: true })
+  @ApiPropertyOptional({ type: "object", additionalProperties: true })
   data: JsonObject | null;
 
   @ApiProperty()
@@ -220,8 +217,8 @@ export class NotificationJobsQueryDto extends PaginationQueryDto {
 }
 
 export enum NotificationDevicePlatformDto {
-  IOS = 'IOS',
-  ANDROID = 'ANDROID',
+  IOS = "IOS",
+  ANDROID = "ANDROID",
 }
 
 export class RegisterDeviceDto {

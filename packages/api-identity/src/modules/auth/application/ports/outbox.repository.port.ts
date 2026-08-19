@@ -1,6 +1,6 @@
-import type { TransactionExecutor } from '@repo/api-core';
+import type { TransactionExecutor } from "@repo/api-core";
 
-export type OutboxTopic = 'auth.send-verification-email';
+export type OutboxTopic = "auth.send-verification-email";
 
 export interface OutboxMessagePayload {
   email: string;
@@ -31,4 +31,4 @@ export interface OutboxRepositoryPort {
   recoverStaleProcessing(): Promise<void>;
 }
 
-export const OUTBOX_REPOSITORY = Symbol('OUTBOX_REPOSITORY');
+export const OUTBOX_REPOSITORY = Symbol("OUTBOX_REPOSITORY");

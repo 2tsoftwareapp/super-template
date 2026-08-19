@@ -1,9 +1,6 @@
-import type {
-  AuthenticatedRequestUser,
-  RequestContext,
-} from '@repo/api-core';
+import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-core";
 
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import {
   AppError,
   ERROR_CODES,
@@ -11,18 +8,18 @@ import {
   SYSTEM_SCOPE,
   TRANSACTION_PORT,
   type TransactionPort,
-} from '@repo/api-core';
-import { ImportExportAdapterRegistry } from '../../../../import-export/import-export-adapter.registry';
+} from "@repo/api-core";
 
-import type { CreateExportCommand } from '../exports.types';
+import type { CreateExportCommand } from "../exports.types";
 
-import { AuditService } from '../../../audit/application/audit.service';
-import { ExportsMapper } from '../exports.mapper';
+import { ImportExportAdapterRegistry } from "../../../../import-export/import-export-adapter.registry";
+import { AuditService } from "../../../audit";
+import { ExportsMapper } from "../exports.mapper";
 import {
   EXPORT_JOBS_REPOSITORY,
   type ExportJobsRepositoryPort,
-} from '../ports/export-jobs.repository.port';
-import { GetExportUseCase } from './get-export.use-case';
+} from "../ports/export-jobs.repository.port";
+import { GetExportUseCase } from "./get-export.use-case";
 
 @Injectable()
 export class CreateExportUseCase {
@@ -45,8 +42,7 @@ export class CreateExportUseCase {
     // Resolve adapter before creating any DB records
     this.importExportAdapters.resolve(input.type);
 
-    const exportPermissions =
-      this.importExportAdapters.getExportPermissions(input.type);
+    const exportPermissions = this.importExportAdapters.getExportPermissions(input.type);
     for (const permission of exportPermissions) {
       if (!actor.permissions.includes(permission)) {
         throw new AppError(
@@ -60,7 +56,7 @@ export class CreateExportUseCase {
     const jobValues = {
       organizationId,
       type: input.type,
-      status: 'PENDING' as const,
+      status: "PENDING" as const,
       filters: input.filters ?? null,
       createdById: actor.userId,
     };
@@ -83,7 +79,7 @@ export class CreateExportUseCase {
           : await this.exportJobsRepository.create(jobValues, tx);
 
         if (!jobRecord) {
-          throw new Error('Export job insert returned no rows');
+          throw new Error("Export job insert returned no rows");
         }
 
         const isCreated = idempotentResult ? idempotentResult.created : true;
@@ -92,8 +88,8 @@ export class CreateExportUseCase {
           await this.auditService.log(
             {
               actorId: actor.userId,
-              action: 'export.created',
-              entityType: 'export_job',
+              action: "export.created",
+              entityType: "export_job",
               entityId: jobRecord.id,
               metadata: {
                 type: input.type,

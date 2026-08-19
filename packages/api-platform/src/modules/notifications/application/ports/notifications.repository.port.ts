@@ -1,7 +1,7 @@
-import type { JsonObject } from '@repo/api-core';
-import type { TransactionExecutor } from '@repo/api-core';
+import type { JsonObject } from "@repo/api-core";
+import type { TransactionExecutor } from "@repo/api-core";
 
-import type { ListNotificationsQuery } from '../notifications.types';
+import type { ListNotificationsQuery } from "../notifications.types";
 
 export interface NotificationRecord {
   id: string;
@@ -61,14 +61,22 @@ export interface NotificationsRepositoryPort {
     params: ListNotificationsQuery,
     executor?: TransactionExecutor,
   ): Promise<NotificationsListResult>;
-  getUnreadCount(userId: string, organizationId: string, executor?: TransactionExecutor): Promise<number>;
+  getUnreadCount(
+    userId: string,
+    organizationId: string,
+    executor?: TransactionExecutor,
+  ): Promise<number>;
   markRead(
     notificationId: string,
     userId: string,
     organizationId: string,
     executor?: TransactionExecutor,
   ): Promise<NotificationRecord | null>;
-  markAllRead(userId: string, organizationId: string, executor?: TransactionExecutor): Promise<void>;
+  markAllRead(
+    userId: string,
+    organizationId: string,
+    executor?: TransactionExecutor,
+  ): Promise<void>;
   delete(
     notificationId: string,
     userId: string,
@@ -77,4 +85,4 @@ export interface NotificationsRepositoryPort {
   ): Promise<NotificationRecord | null>;
 }
 
-export const NOTIFICATIONS_REPOSITORY = Symbol('NOTIFICATIONS_REPOSITORY');
+export const NOTIFICATIONS_REPOSITORY = Symbol("NOTIFICATIONS_REPOSITORY");

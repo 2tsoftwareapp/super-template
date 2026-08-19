@@ -1,43 +1,36 @@
-import type { TenantContext } from '@repo/api-core';
-import type { Server } from 'node:http';
+import type { TenantContext } from "@repo/api-core";
+import type { Server } from "node:http";
 
-import { type INestApplication, ValidationPipe } from '@nestjs/common';
-import { Test } from '@nestjs/testing';
-import { ThrottlerGuard } from '@nestjs/throttler';
-import { TenantContextService } from '@repo/api-core';
-import { loadEnvFiles } from '@repo/env-loader';
-import {
-  DATABASE,
-  type DatabaseClient,
-} from '@repo/api-database';
-import { seedDatabase } from '@repo/api-seed';
-import { sql } from 'drizzle-orm';
-import { Pool } from 'pg';
-import request from 'supertest';
+import { type INestApplication, ValidationPipe } from "@nestjs/common";
+import { Test } from "@nestjs/testing";
+import { ThrottlerGuard } from "@nestjs/throttler";
+import { TenantContextService } from "@repo/api-core";
+import { DATABASE, type DatabaseClient } from "@repo/api-database";
+import { seedDatabase } from "@repo/api-seed";
+import { loadEnvFiles } from "@repo/env-loader";
+import { sql } from "drizzle-orm";
+import { Pool } from "pg";
+import request from "supertest";
 
-import { AppModule } from '../../src/app.module';
-import { applySqlMigrations } from '../../src/cli/migrations';
+import { AppModule } from "../../src/app.module";
+import { applySqlMigrations } from "../../src/cli/migrations";
 
 loadEnvFiles();
 
-const TEST_APP_ROLE_NAME = 'fullstack_starter_app';
-const TEST_APP_ROLE_PASSWORD = 'fullstack_starter_app';
-const TEST_DATABASE_NAME = 'fullstack_starter_test';
+const TEST_APP_ROLE_NAME = "fullstack_starter_app";
+const TEST_APP_ROLE_PASSWORD = "fullstack_starter_app";
+const TEST_DATABASE_NAME = "fullstack_starter_test";
 
-const buildDatabaseUrl = (
-  role: string,
-  password: string,
-  database: string,
-): string => {
-  const host = process.env.POSTGRES_HOST ?? 'localhost';
-  const port = process.env.POSTGRES_PORT ?? '5432';
+const buildDatabaseUrl = (role: string, password: string, database: string): string => {
+  const host = process.env.POSTGRES_HOST ?? "localhost";
+  const port = process.env.POSTGRES_PORT ?? "5432";
 
   return `postgresql://${encodeURIComponent(role)}:${encodeURIComponent(password)}@${host}:${port}/${database}`;
 };
 
 /** Keep e2e on the restricted app role even when a stale .env still points at postgres. */
 export const configureTestDatabaseUrls = (): void => {
-  process.env.APP_ENV = 'test';
+  process.env.APP_ENV = "test";
 
   const appTestUrl = buildDatabaseUrl(
     TEST_APP_ROLE_NAME,
@@ -45,8 +38,8 @@ export const configureTestDatabaseUrls = (): void => {
     TEST_DATABASE_NAME,
   );
   const adminTestUrl = buildDatabaseUrl(
-    process.env.POSTGRES_USER ?? 'postgres',
-    process.env.POSTGRES_PASSWORD ?? 'postgres',
+    process.env.POSTGRES_USER ?? "postgres",
+    process.env.POSTGRES_PASSWORD ?? "postgres",
     TEST_DATABASE_NAME,
   );
 
@@ -74,18 +67,15 @@ const resolveTestDatabaseUrl = () => process.env.DATABASE_URL_TEST;
 const resolveTestDatabaseAdminUrl = () =>
   process.env.DATABASE_URL_TEST_ADMIN ?? process.env.DATABASE_URL_TEST;
 
-const ensureTestDatabaseExists = async (
-  databaseUrl: string,
-  adminDatabaseUrl: string,
-) => {
-  const databaseName = new URL(databaseUrl).pathname.replace(/^\//, '');
+const ensureTestDatabaseExists = async (databaseUrl: string, adminDatabaseUrl: string) => {
+  const databaseName = new URL(databaseUrl).pathname.replace(/^\//, "");
 
   if (!databaseName) {
-    throw new Error('Test database name could not be resolved');
+    throw new Error("Test database name could not be resolved");
   }
 
   const adminUrl = new URL(adminDatabaseUrl);
-  adminUrl.pathname = '/postgres';
+  adminUrl.pathname = "/postgres";
 
   const adminPool = new Pool({
     connectionString: adminUrl.toString(),
@@ -110,20 +100,18 @@ const ensureRestrictedTestRole = async (adminDatabaseUrl: string) => {
   const pool = new Pool({
     connectionString: adminDatabaseUrl,
   });
-  const databaseName = new URL(adminDatabaseUrl).pathname.replace(/^\//, '');
+  const databaseName = new URL(adminDatabaseUrl).pathname.replace(/^\//, "");
   const quotedDatabaseName = `"${databaseName.replace(/"/g, '""')}"`;
   const quotedRoleName = `"${TEST_APP_ROLE_NAME.replace(/"/g, '""')}"`;
 
   try {
     const existingRole = await pool.query<{ exists: boolean }>(
-      'select exists(select 1 from pg_roles where rolname = $1) as exists',
+      "select exists(select 1 from pg_roles where rolname = $1) as exists",
       [TEST_APP_ROLE_NAME],
     );
 
     if (!existingRole.rows[0]?.exists) {
-      await pool.query(
-        `create role ${quotedRoleName} login password '${TEST_APP_ROLE_PASSWORD}'`,
-      );
+      await pool.query(`create role ${quotedRoleName} login password '${TEST_APP_ROLE_PASSWORD}'`);
     }
 
     await pool.query(
@@ -132,9 +120,7 @@ const ensureRestrictedTestRole = async (adminDatabaseUrl: string) => {
     await pool.query(
       `alter default privileges in schema public grant usage, select, update on sequences to ${quotedRoleName}`,
     );
-    await pool.query(
-      `grant connect on database ${quotedDatabaseName} to ${quotedRoleName}`,
-    );
+    await pool.query(`grant connect on database ${quotedDatabaseName} to ${quotedRoleName}`);
   } finally {
     await pool.end();
   }
@@ -146,15 +132,15 @@ export const resetTestDatabase = async (): Promise<void> => {
 
   if (!databaseUrl) {
     throw new Error(
-      'DATABASE_URL_TEST is required for tests. ' +
-        'Set it to a dedicated test database to avoid wiping the development database.',
+      "DATABASE_URL_TEST is required for tests. " +
+        "Set it to a dedicated test database to avoid wiping the development database.",
     );
   }
 
   if (!adminDatabaseUrl) {
     throw new Error(
-      'DATABASE_URL_TEST_ADMIN is required for test setup. ' +
-        'Set it to a privileged connection string for creating the test role and grants.',
+      "DATABASE_URL_TEST_ADMIN is required for test setup. " +
+        "Set it to a privileged connection string for creating the test role and grants.",
     );
   }
 
@@ -166,17 +152,15 @@ export const resetTestDatabase = async (): Promise<void> => {
   });
 
   try {
-    await pool.query('drop schema if exists public cascade;');
-    await pool.query('create schema public;');
+    await pool.query("drop schema if exists public cascade;");
+    await pool.query("create schema public;");
     await applySqlMigrations(pool);
+    await pool.query("grant usage, create on schema public to fullstack_starter_app");
     await pool.query(
-      'grant usage, create on schema public to fullstack_starter_app',
+      "grant select, insert, update, delete on all tables in schema public to fullstack_starter_app",
     );
     await pool.query(
-      'grant select, insert, update, delete on all tables in schema public to fullstack_starter_app',
-    );
-    await pool.query(
-      'grant usage, select, update on all sequences in schema public to fullstack_starter_app',
+      "grant usage, select, update on all sequences in schema public to fullstack_starter_app",
     );
 
     const verification = await pool.query<{ exists: boolean }>(
@@ -184,9 +168,7 @@ export const resetTestDatabase = async (): Promise<void> => {
     );
 
     if (!verification.rows[0]?.exists) {
-      throw new Error(
-        'Migrations did not create organizations table in the test database',
-      );
+      throw new Error("Migrations did not create organizations table in the test database");
     }
   } finally {
     await pool.end();
@@ -194,7 +176,7 @@ export const resetTestDatabase = async (): Promise<void> => {
 };
 
 export const createTestApp = async (): Promise<INestApplication> => {
-  console.log('[DEBUG] createTestApp: Test.createTestingModule');
+  console.log("[DEBUG] createTestApp: Test.createTestingModule");
   const moduleRef = await Test.createTestingModule({
     imports: [AppModule],
   })
@@ -204,9 +186,9 @@ export const createTestApp = async (): Promise<INestApplication> => {
     })
     .compile();
 
-  console.log('[DEBUG] createTestApp: moduleRef.createNestApplication');
+  console.log("[DEBUG] createTestApp: moduleRef.createNestApplication");
   const app = moduleRef.createNestApplication({ abortOnError: false });
-  app.setGlobalPrefix('api/v1');
+  app.setGlobalPrefix("api/v1");
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -218,11 +200,11 @@ export const createTestApp = async (): Promise<INestApplication> => {
     }),
   );
 
-  console.log('[DEBUG] createTestApp: app.init');
+  console.log("[DEBUG] createTestApp: app.init");
   await app.init();
-  console.log('[DEBUG] createTestApp: seedDatabase');
+  console.log("[DEBUG] createTestApp: seedDatabase");
   await seedDatabase(app);
-  console.log('[DEBUG] createTestApp: done');
+  console.log("[DEBUG] createTestApp: done");
   return app;
 };
 
@@ -253,7 +235,7 @@ export const loginAs = async (
 ): Promise<LoginResult> => {
   const httpServer = app.getHttpServer() as Server;
   const response = await request(httpServer)
-    .post('/api/v1/auth/login')
+    .post("/api/v1/auth/login")
     .send({
       email,
       password,
@@ -287,13 +269,11 @@ export const runWithTenantContext = async <T>(
   return tenantContextService.runAsync(context, async () => operation());
 };
 
-export const getCurrentDatabaseUser = async (
-  app: INestApplication,
-): Promise<string> => {
+export const getCurrentDatabaseUser = async (app: INestApplication): Promise<string> => {
   const database = app.get<DatabaseClient>(DATABASE);
   const result = (await database.execute(
     sql<{ currentUser: string }>`select current_user as "currentUser"`,
   )) as { rows: { currentUser: string }[] };
 
-  return result.rows[0]?.currentUser ?? '';
+  return result.rows[0]?.currentUser ?? "";
 };

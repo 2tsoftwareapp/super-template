@@ -1,10 +1,10 @@
-import { Global, Module } from '@nestjs/common';
+import { Global, Module } from "@nestjs/common";
 
-import { ErrorReporterService } from '../observability/error-reporter.service';
-import { SentryTransportService } from '../observability/sentry-transport.service';
-import { TelegramTransportService } from '../observability/telegram-transport.service';
-import { ConsoleAppLogger } from './console-logger.service';
-import { APP_LOGGER } from './logger.interface';
+import { ErrorReporterService } from "../observability/error-reporter.service";
+import { SentryTransportService } from "../observability/sentry-transport.service";
+import { TelegramTransportService } from "../observability/telegram-transport.service";
+import { ConsoleAppLogger } from "./console-logger.service";
+import { APP_LOGGER } from "./logger.interface";
 
 @Global()
 @Module({

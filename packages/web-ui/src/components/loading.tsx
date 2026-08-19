@@ -51,10 +51,7 @@ interface SectionLoadingProps {
   className?: string;
 }
 
-function SectionLoading({
-  title = "Loading data...",
-  className,
-}: SectionLoadingProps) {
+function SectionLoading({ title = "Loading data...", className }: SectionLoadingProps) {
   return (
     <div
       className={cn(
@@ -74,12 +71,7 @@ interface PageLoadingProps {
 
 function PageLoading({ className }: PageLoadingProps) {
   return (
-    <div
-      className={cn(
-        "flex min-h-screen w-full flex-col",
-        className,
-      )}
-    >
+    <div className={cn("flex min-h-screen w-full flex-col", className)}>
       {/* Top nav skeleton */}
       <div className="flex h-14 items-center gap-3 border-b px-6">
         <Skeleton className="size-8 rounded-full" />
@@ -142,11 +134,7 @@ interface TableSkeletonProps {
   className?: string;
 }
 
-function TableSkeleton({
-  rows = 5,
-  columns = 4,
-  className,
-}: TableSkeletonProps) {
+function TableSkeleton({ rows = 5, columns = 4, className }: TableSkeletonProps) {
   return (
     <div className={cn("w-full", className)}>
       {/* Header row */}
@@ -165,10 +153,7 @@ function TableSkeleton({
             {Array.from({ length: columns }).map((_, c) => (
               <Skeleton
                 key={`c-${r}-${c}`}
-                className={cn(
-                  "h-4",
-                  c === 0 ? "w-32" : c === columns - 1 ? "w-20" : "flex-1",
-                )}
+                className={cn("h-4", c === 0 ? "w-32" : c === columns - 1 ? "w-20" : "flex-1")}
               />
             ))}
           </div>
@@ -178,10 +163,4 @@ function TableSkeleton({
   );
 }
 
-export {
-  FullScreenLoading,
-  LoadingOverlay,
-  PageLoading,
-  SectionLoading,
-  TableSkeleton,
-};
+export { FullScreenLoading, LoadingOverlay, PageLoading, SectionLoading, TableSkeleton };

@@ -1,13 +1,7 @@
 "use client";
 
 import { Button } from "@repo/web-ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@repo/web-ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/web-ui/card";
 import { Spinner } from "@repo/web-ui/spinner";
 import { Shield } from "lucide-react";
 
@@ -107,8 +101,7 @@ export function MfaManagement({
               Two-factor authentication
             </CardTitle>
             <CardDescription>
-              Add an extra layer of security to your account with a TOTP
-              authenticator app.
+              Add an extra layer of security to your account with a TOTP authenticator app.
             </CardDescription>
           </div>
           <MfaStatusBadge enabled={mfaEnabled} />
