@@ -65,7 +65,7 @@ Browser requests to the Nest API from admin go through Next.js route handlers. A
 Established by the 2026-07 re-architecture (roadmap:
 `docs/superpowers/specs/2026-07-11-project-rearchitecture-roadmap.md`):
 
-- **Design system**: `@repo/web-core/components/*` is the single source of UI
+- **Design system**: `@repo/web-ui/components/*` is the single source of UI
   primitives; apps never keep local copies. Full convention set in
   `apps/admin/AGENTS.md`.
 - **Layering**: `app/[locale]/**` holds route entries only; business logic

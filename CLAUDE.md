@@ -25,7 +25,7 @@ packages/
   @repo/api-platform     platform features (bounded context)
   @repo/api-sort         sorting/query helpers
   @repo/env-loader       layered env resolution
-  @repo/web-core         shared web UI + logic (consumed by web & admin)
+  @repo/web-ui          shared React UI component library (design system)
   @repo/web-test         shared web test utilities
   @repo/eslint-config / @repo/tsconfig   shared config
 infra/
@@ -58,7 +58,7 @@ Mailpit UI: http://localhost:8025 · Swagger: http://localhost:3001/api/docs
   `application/` → `infrastructure/`) rather than introducing new structure.
 - **Env files**: commit `.env.example`, `.env.development`, and `.env.*.example` only.
   Put personal secrets in `.env.local` (gitignored).
-- **App Router layering (web + admin)**: Route files in `src/app/[locale]/**` must only contain route entry components (`page.tsx`, `layout.tsx`, Suspense page wrappers) and metadata/SEO exports. Views, drawers, forms, table columns, and other UI components live under `src/features/<resource>/components/`. No file under the app router directory may contain business logic — ESLint boundary rules enforce that `app/**` never imports `@tanstack/react-query` or `@/lib/http`. UI primitives come only from `@repo/web-core/components/*` (never local copies). Full conventions: `apps/admin/AGENTS.md`; i18n is next-intl with an always-prefixed `[locale]` segment and internal navigation via `@/i18n/navigation`.
+- **App Router layering (web + admin)**: Route files in `src/app/[locale]/**` must only contain route entry components (`page.tsx`, `layout.tsx`, Suspense page wrappers) and metadata/SEO exports. Views, drawers, forms, table columns, and other UI components live under `src/features/<resource>/components/`. No file under the app router directory may contain business logic — ESLint boundary rules enforce that `app/**` never imports `@tanstack/react-query` or `@/lib/http`. UI primitives come only from `@repo/web-ui/components/*` (never local copies). Full conventions: `apps/admin/AGENTS.md`; i18n is next-intl with an always-prefixed `[locale]` segment and internal navigation via `@/i18n/navigation`.
 - **Modular Admin Architecture Layers**:
   - *Network Layer*: HTTP endpoints wrapped cleanly in services (e.g., `roles-service.ts`) using the unified fetch handler.
   - *Business & Data Layer*: Dedicated react-query queries and mutations (e.g., `use-roles-queries.ts`) managing caching, invalidation logic, and operation states.
@@ -79,7 +79,7 @@ Mailpit UI: http://localhost:8025 · Swagger: http://localhost:3001/api/docs
 - **Generated Dart files need `// @dart=3.0`** or `flutter test` fails on CFE part files.
   This is baked into `generate-contracts.sh`.
 - **Tailwind `@source`**: admin/web `globals.css` must include `@source` for
-  `packages/web-core/src`, or shared utility classes silently vanish from compiled CSS.
+  `packages/web-ui/src`, or shared utility classes silently vanish from compiled CSS.
 - **Cross-module circular DI** in `api-platform` can cause a silent `process.abort()`
   in e2e; use `abortOnError: false` + `forwardRef` both directions.
 

@@ -113,7 +113,7 @@ holder, then run `pnpm install && pnpm generate` and `pnpm lint && pnpm typechec
                └─────────────────────┘
 </pre>
 
-Shared packages: `@repo/web-core` · `@repo/env-loader` · `@repo/api-contract`
+Shared packages: `@repo/web-ui` · `@repo/web-hooks` · `@repo/web-utils` · `@repo/env-loader` · `@repo/api-contract`
 
 <br />
 
@@ -159,7 +159,7 @@ super-template/
 │   ├── api-platform/     Mail, files, jobs, notifications, audit
 │   ├── api-contract/     Generated OpenAPI client
 │   ├── env-loader/       Layered .env loading
-│   └── web-core/         Shared auth + HTTP layer
+│   └── web-ui/           Shared React UI component library
 ├── infra/                Docker Compose
 ├── scripts/              bootstrap · dev · verify
 └── docs/
