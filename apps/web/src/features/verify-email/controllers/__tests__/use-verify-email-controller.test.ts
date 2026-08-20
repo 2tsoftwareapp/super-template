@@ -17,10 +17,16 @@ vi.mock("../../api/verify-email.api", () => ({
 const verifyEmailMock = vi.mocked(verifyEmail);
 const routerPushMock = vi.fn();
 
+const asRouter = (push: ReturnType<typeof vi.fn>) =>
+  ({ push }) as unknown as ReturnType<typeof useRouter>;
+
+const asSearchParams = (searchParams: URLSearchParams) =>
+  searchParams as unknown as ReturnType<typeof useSearchParams>;
+
 beforeEach(() => {
   vi.clearAllMocks();
-  vi.mocked(useRouter).mockReturnValue({ push: routerPushMock });
-  vi.mocked(useSearchParams).mockReturnValue(new URLSearchParams());
+  vi.mocked(useRouter).mockReturnValue(asRouter(routerPushMock));
+  vi.mocked(useSearchParams).mockReturnValue(asSearchParams(new URLSearchParams()));
   vi.useFakeTimers();
 });
 
@@ -30,7 +36,7 @@ afterEach(() => {
 
 describe("useVerifyEmailController", () => {
   it("shows the error state without calling the API when the token is missing", () => {
-    vi.mocked(useSearchParams).mockReturnValue(new URLSearchParams());
+    vi.mocked(useSearchParams).mockReturnValue(asSearchParams(new URLSearchParams()));
 
     const { result } = renderHook(() => useVerifyEmailController());
 
@@ -42,7 +48,9 @@ describe("useVerifyEmailController", () => {
   });
 
   it("verifies the token and reports success", async () => {
-    vi.mocked(useSearchParams).mockReturnValue(new URLSearchParams("token=tok-123"));
+    vi.mocked(useSearchParams).mockReturnValue(
+      asSearchParams(new URLSearchParams("token=tok-123")),
+    );
     verifyEmailMock.mockResolvedValueOnce(undefined);
 
     const { result } = renderHook(() => useVerifyEmailController());
@@ -61,7 +69,9 @@ describe("useVerifyEmailController", () => {
   });
 
   it("redirects to the admin app shortly after success", async () => {
-    vi.mocked(useSearchParams).mockReturnValue(new URLSearchParams("token=tok-123"));
+    vi.mocked(useSearchParams).mockReturnValue(
+      asSearchParams(new URLSearchParams("token=tok-123")),
+    );
     verifyEmailMock.mockResolvedValueOnce(undefined);
 
     const { result } = renderHook(() => useVerifyEmailController());
@@ -80,7 +90,9 @@ describe("useVerifyEmailController", () => {
   });
 
   it("surfaces a safe error message on API failure", async () => {
-    vi.mocked(useSearchParams).mockReturnValue(new URLSearchParams("token=tok-123"));
+    vi.mocked(useSearchParams).mockReturnValue(
+      asSearchParams(new URLSearchParams("token=tok-123")),
+    );
     verifyEmailMock.mockRejectedValueOnce(new Error("boom"));
 
     const { result } = renderHook(() => useVerifyEmailController());
