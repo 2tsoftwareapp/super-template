@@ -30,7 +30,7 @@ import { canPromoteMemberToAdmin } from "@/features/organizations/model/organiza
 import { Link } from "@/i18n/navigation";
 import { adminResources } from "@/lib/admin-resources";
 
-import { EditOrganizationDialog } from "./edit-organization-dialog";
+import { EditOrganizationDrawer } from "./edit-organization-drawer";
 
 const organizationsResource = adminResources.find((r) => r.id === "organizations")!;
 
@@ -91,7 +91,7 @@ export function OrganizationDetailContent(vm: OrganizationDetailViewModel) {
 
   return (
     <>
-      <EditOrganizationDialog
+      <EditOrganizationDrawer
         open={editDialog.open}
         onClose={editDialog.onClose}
         currentName={editDialog.currentName}

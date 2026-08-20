@@ -11,6 +11,8 @@ export function useFilesQuery(params: FilesParams) {
       search: params.search,
       mimeFilter: params.mimeFilter,
       page: params.page,
+      sortField: params.sortField,
+      sortOrder: params.sortOrder,
     }),
     queryFn: () => filesApi.list(params),
     placeholderData: (previous) => previous,

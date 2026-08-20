@@ -8,6 +8,7 @@ export interface JobsParams {
   status?: string | undefined;
   type?: string | undefined;
   page: number;
+  sortOrder?: "asc" | "desc" | undefined;
 }
 
 /**
@@ -20,6 +21,7 @@ export const jobsApi = {
       page: params.page,
       status: params.status,
       type: params.type,
+      sortOrder: params.sortOrder,
     });
     return webFetch<ListResponse<JobDto>>(path);
   },

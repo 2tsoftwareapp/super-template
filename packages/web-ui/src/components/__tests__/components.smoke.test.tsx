@@ -40,6 +40,7 @@ import {
 import { LoadingButton } from "../loading-button";
 import { Pagination } from "../pagination";
 import { PasswordInput } from "../password-input";
+import { RefreshButton } from "../refresh-button";
 import { Separator } from "../separator";
 import { Show } from "../show";
 import { Skeleton } from "../skeleton";
@@ -209,6 +210,23 @@ describe("UI Component Smoke Tests", () => {
   it("renders PasswordInput", () => {
     render(<PasswordInput placeholder="secret" />);
     expect(screen.getByPlaceholderText("secret")).toBeInTheDocument();
+  });
+
+  it("renders RefreshButton idle", () => {
+    render(<RefreshButton />);
+    expect(screen.getByRole("button", { name: "Refresh" })).toBeInTheDocument();
+  });
+
+  it("renders RefreshButton with custom label", () => {
+    render(<RefreshButton label="Reload" />);
+    expect(screen.getByRole("button", { name: "Reload" })).toBeInTheDocument();
+  });
+
+  it("renders RefreshButton refreshing (spinner + disabled)", () => {
+    render(<RefreshButton isRefreshing />);
+    const button = screen.getByRole("button");
+    expect(button).toBeDisabled();
+    expect(screen.getByRole("status")).toBeInTheDocument();
   });
 
   it("renders Separator", () => {

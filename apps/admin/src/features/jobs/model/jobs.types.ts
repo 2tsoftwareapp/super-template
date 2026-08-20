@@ -1,6 +1,27 @@
+import type { ColumnDef, Table as ReactTable } from "@tanstack/react-table";
+
 import type { JobDto, JobEventDto, JobMetricsDto } from "@/lib/api-types";
 
 import type { STATUS_OPTIONS } from "./jobs.constants";
+
+export interface JobsColumnOptions {
+  canCancel: boolean;
+  confirmId: string | null;
+  cancelPending: boolean;
+  statusProps: (status: string) => {
+    variant: "default" | "secondary" | "outline";
+    className?: string;
+  };
+  onDetail: (jobId: string) => void;
+  onCancelRequest: (jobId: string) => void;
+  onCancelConfirm: () => void;
+  onCancelDismiss: () => void;
+}
+
+export type JobsColumnFactory = (
+  options: JobsColumnOptions,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- mirrors TanStack's own `columns: ColumnDef<TData, any>[]` input type
+) => ColumnDef<JobDto, any>[];
 
 export interface JobsViewModel {
   header: {
@@ -17,11 +38,12 @@ export interface JobsViewModel {
     statusOptions: typeof STATUS_OPTIONS;
     onStatusChange: (value: string) => void;
     onTypeChange: (value: string) => void;
+    hasFilters: boolean;
+    onClearFilters: () => void;
     onRefresh: () => void;
     isFetching: boolean;
   };
   list: {
-    jobs: JobDto[];
     total: number;
     totalPages: number;
     page: number;
@@ -31,7 +53,6 @@ export interface JobsViewModel {
     onRetry: () => void;
     emptyMessage: string;
     onPageChange: (page: number) => void;
-    canCancel: boolean;
     statusProps: (status: string) => {
       variant: "default" | "secondary" | "outline";
       className?: string;
@@ -59,4 +80,5 @@ export interface JobsViewModel {
     onConfirm: () => void;
     onDismiss: () => void;
   };
+  table: ReactTable<JobDto>;
 }

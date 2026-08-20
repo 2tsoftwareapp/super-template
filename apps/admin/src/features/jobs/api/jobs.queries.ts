@@ -11,6 +11,7 @@ export function useJobsQuery(params: JobsParams) {
       status: params.status,
       type: params.type,
       page: params.page,
+      sortOrder: params.sortOrder,
     }),
     queryFn: () => jobsApi.list(params),
     placeholderData: (previous) => previous,

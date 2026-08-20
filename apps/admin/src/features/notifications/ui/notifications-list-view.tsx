@@ -1,42 +1,22 @@
 "use client";
 
 import { Badge } from "@repo/web-ui/badge";
-import { Button } from "@repo/web-ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/web-ui/card";
 import { ErrorState } from "@repo/web-ui/error-state";
-import { Input } from "@repo/web-ui/input";
-import { Label } from "@repo/web-ui/label";
 import { SectionLoading } from "@repo/web-ui/loading";
-import { LoadingButton } from "@repo/web-ui/loading-button";
 import { Show } from "@repo/web-ui/show";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@repo/web-ui/table";
-import { Textarea } from "@repo/web-ui/textarea";
-import { Tooltip } from "@repo/web-ui/tooltip";
-import {
-  AlertCircle,
-  CheckCircle2,
-  Clock,
-  type LucideIcon,
-  RefreshCcw,
-  Trash2,
-} from "lucide-react";
 
 import type { NotificationsViewModel } from "@/features/notifications/model/notifications.types";
 
 import { ResourcePageShell } from "@/components/resource-page-shell";
-import { normalizeJobStatus } from "@/features/notifications/model/notifications.constants";
+import { ResourceTable } from "@/components/resource-table";
 import { adminResources } from "@/lib/admin-resources";
-import { formatUnknownDateTime, scalarString, timeAgo } from "@/lib/format";
+import { scalarString, timeAgo } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
-const notificationsResource = adminResources.find((r) => r.id === "notifications")!;
+import { NotificationComposeForm } from "./notification-compose-form";
 
-function statusIcon(status: string): LucideIcon {
-  if (status === "COMPLETED") return CheckCircle2;
-  if (status === "PROCESSING") return RefreshCcw;
-  if (status === "FAILED") return AlertCircle;
-  return Clock;
-}
+const notificationsResource = adminResources.find((r) => r.id === "notifications")!;
 
 /**
  * Presentational notifications view. Receives a fully-resolved view model from
@@ -49,6 +29,7 @@ export function NotificationsListView({
   compose,
   jobs,
   recent,
+  table,
 }: NotificationsViewModel) {
   return (
     <ResourcePageShell
@@ -67,90 +48,11 @@ export function NotificationsListView({
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Show when={compose.isError}>
-                <ErrorState
-                  variant="inline"
-                  title="Failed to queue notification."
-                  action={{ label: "Retry", onClick: compose.onRetrySend }}
-                />
-              </Show>
-
-              <div className="space-y-1.5">
-                <Label htmlFor="notif-audience">Audience</Label>
-                <select
-                  id="notif-audience"
-                  className="flex h-9 w-full rounded-lg border border-input bg-background px-3 text-sm shadow-xs outline-hidden transition-colors focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
-                  value={compose.audience}
-                  onChange={(e) => compose.onAudienceChange(e.target.value)}
-                >
-                  <option value="ALL">All users</option>
-                  <option value="USER">Single user</option>
-                  <option value="USERS">Multiple users</option>
-                </select>
-              </div>
-
-              {compose.audience === "USER" ? (
-                <div className="space-y-1.5">
-                  <Label htmlFor="notif-user-id">User ID</Label>
-                  <Input
-                    id="notif-user-id"
-                    placeholder="uuid of the target user"
-                    value={compose.userId}
-                    onChange={(e) => compose.onUserIdChange(e.target.value)}
-                  />
-                </div>
-              ) : null}
-
-              {compose.audience === "USERS" ? (
-                <div className="space-y-1.5">
-                  <Label htmlFor="notif-user-ids">User IDs</Label>
-                  <Textarea
-                    id="notif-user-ids"
-                    placeholder="One UUID per line, or comma-separated"
-                    value={compose.userIds}
-                    onChange={(e) => compose.onUserIdsChange(e.target.value)}
-                    className="min-h-[60px]"
-                  />
-                </div>
-              ) : null}
-
-              <div className="space-y-1.5">
-                <Label htmlFor="notif-type">Type</Label>
-                <Input
-                  id="notif-type"
-                  value={compose.type}
-                  onChange={(e) => compose.onTypeChange(e.target.value)}
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <Label htmlFor="notif-title">Title</Label>
-                <Input
-                  id="notif-title"
-                  placeholder="Test notification"
-                  value={compose.title}
-                  onChange={(e) => compose.onTitleChange(e.target.value)}
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <Label htmlFor="notif-body">Body</Label>
-                <Textarea
-                  id="notif-body"
-                  placeholder="This is a test notification sent from the admin panel."
-                  value={compose.body}
-                  onChange={(e) => compose.onBodyChange(e.target.value)}
-                  className="min-h-[80px]"
-                />
-              </div>
-
-              <LoadingButton
-                className="w-full"
-                onClick={compose.onSend}
-                loading={compose.isSending}
-              >
-                Send test notification
-              </LoadingButton>
+              <NotificationComposeForm
+                isSending={compose.isSending}
+                isError={compose.isError}
+                onSubmit={compose.onSubmit}
+              />
             </CardContent>
           </Card>
         </Show>
@@ -158,125 +60,19 @@ export function NotificationsListView({
         <div className="space-y-4">
           <Card>
             <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-base">Delivery jobs</CardTitle>
-                  <CardDescription className="text-xs">
-                    Recent notification jobs and their status.
-                  </CardDescription>
-                </div>
-                <Button variant="ghost" size="sm" onClick={jobs.onRefresh}>
-                  <RefreshCcw className="size-3.5" />
-                </Button>
-              </div>
+              <CardTitle className="text-base">Delivery jobs</CardTitle>
+              <CardDescription className="text-xs">
+                Recent notification jobs and their status.
+              </CardDescription>
             </CardHeader>
             <CardContent className="p-0 pb-1">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Audience</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Recipients</TableHead>
-                    <TableHead>Scheduled</TableHead>
-                    <TableHead className="w-10" />
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  <Show when={jobs.isLoading}>
-                    <TableRow>
-                      <TableCell colSpan={6} className="py-10 text-center">
-                        <SectionLoading />
-                      </TableCell>
-                    </TableRow>
-                  </Show>
-                  {!jobs.isLoading && jobs.isError ? (
-                    <TableRow>
-                      <TableCell colSpan={6} className="py-8">
-                        <ErrorState
-                          variant="inline"
-                          className="m-0"
-                          title="Could not load delivery jobs."
-                          action={{ label: "Retry", onClick: jobs.onRetry }}
-                        />
-                      </TableCell>
-                    </TableRow>
-                  ) : null}
-                  {!jobs.isLoading && !jobs.isError && jobs.data.length === 0 ? (
-                    <TableRow>
-                      <TableCell
-                        colSpan={6}
-                        className="py-10 text-center text-sm text-muted-foreground"
-                      >
-                        No notification jobs yet.
-                      </TableCell>
-                    </TableRow>
-                  ) : null}
-                  {!jobs.isLoading && !jobs.isError
-                    ? jobs.data.map((job) => {
-                        const s = normalizeJobStatus(job.status);
-                        const sb = jobs.statusProps(s);
-                        const Icon = statusIcon(s);
-                        return (
-                          <TableRow key={job.id}>
-                            <TableCell className="font-mono text-xs">{job.type}</TableCell>
-                            <TableCell>
-                              <Badge variant="outline" className="text-xs capitalize">
-                                {job.audience?.toLowerCase() ?? "—"}
-                              </Badge>
-                            </TableCell>
-                            <TableCell>
-                              <Tooltip
-                                content={
-                                  s === "FAILED" && job.errorMessage
-                                    ? scalarString(job.errorMessage)
-                                    : s
-                                }
-                                side="top"
-                              >
-                                <Badge
-                                  variant={sb.variant}
-                                  className={cn("gap-1 text-xs capitalize", sb.className)}
-                                >
-                                  <Icon className="size-3" />
-                                  {s.toLowerCase()}
-                                </Badge>
-                              </Tooltip>
-                            </TableCell>
-                            <TableCell className="text-xs text-muted-foreground">
-                              {scalarString(job.recipientCount)}
-                            </TableCell>
-                            <TableCell className="text-xs text-muted-foreground">
-                              <Tooltip
-                                content={
-                                  job.processedAt
-                                    ? `Processed ${formatUnknownDateTime(job.processedAt)}`
-                                    : formatUnknownDateTime(job.scheduledAt)
-                                }
-                                side="top"
-                              >
-                                <span>{timeAgo(scalarString(job.scheduledAt, ""))}</span>
-                              </Tooltip>
-                            </TableCell>
-                            <TableCell>
-                              {jobs.canCancel && s === "PENDING" ? (
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="size-7 text-muted-foreground hover:text-destructive"
-                                  disabled={jobs.isCancelling}
-                                  onClick={() => jobs.onCancel(job.id)}
-                                >
-                                  <Trash2 className="size-3.5" />
-                                </Button>
-                              ) : null}
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })
-                    : null}
-                </TableBody>
-              </Table>
+              <ResourceTable
+                table={table}
+                isLoading={jobs.isLoading}
+                {...(jobs.isError ? { error: { title: "Could not load delivery jobs." } } : {})}
+                onRetry={jobs.onRetry}
+                emptyTitle="No notification jobs yet."
+              />
             </CardContent>
           </Card>
 

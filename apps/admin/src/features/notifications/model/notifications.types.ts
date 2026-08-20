@@ -1,40 +1,38 @@
+import type { ColumnDef, Table as ReactTable } from "@tanstack/react-table";
+
 import type { NotificationDto, NotificationJobDto } from "@/lib/api-types";
+
+import type { NotificationComposeFormValues } from "./notifications.schemas";
+
+export interface NotificationsColumnOptions {
+  canCancel: boolean;
+  isCancelling: boolean;
+  statusProps: (status: string) => {
+    variant: "default" | "secondary" | "outline";
+    className?: string;
+  };
+  onCancel: (jobId: string) => void;
+}
+
+export type NotificationsColumnFactory = (
+  options: NotificationsColumnOptions,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- mirrors TanStack's own `columns: ColumnDef<TData, any>[]` input type
+) => ColumnDef<NotificationJobDto, any>[];
 
 export interface NotificationsViewModel {
   isRefreshing: boolean;
   onRefresh: () => void;
   compose: {
     canAccess: boolean;
-    audience: string;
-    userId: string;
-    userIds: string;
-    type: string;
-    title: string;
-    body: string;
-    onAudienceChange: (value: string) => void;
-    onUserIdChange: (value: string) => void;
-    onUserIdsChange: (value: string) => void;
-    onTypeChange: (value: string) => void;
-    onTitleChange: (value: string) => void;
-    onBodyChange: (value: string) => void;
     isSending: boolean;
     isError: boolean;
-    onRetrySend: () => void;
-    onSend: () => void;
+    onSubmit: (values: NotificationComposeFormValues) => void;
   };
   jobs: {
     isLoading: boolean;
     isError: boolean;
     onRetry: () => void;
-    data: NotificationJobDto[];
     onRefresh: () => void;
-    canCancel: boolean;
-    isCancelling: boolean;
-    onCancel: (jobId: string) => void;
-    statusProps: (status: string) => {
-      variant: "default" | "secondary" | "outline";
-      className?: string;
-    };
   };
   recent: {
     isLoading: boolean;
@@ -42,4 +40,5 @@ export interface NotificationsViewModel {
     onRetry: () => void;
     data: NotificationDto[];
   };
+  table: ReactTable<NotificationJobDto>;
 }

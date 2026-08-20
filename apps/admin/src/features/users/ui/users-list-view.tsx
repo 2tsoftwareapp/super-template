@@ -6,18 +6,22 @@ import { ErrorState } from "@repo/web-ui/error-state";
 import { Pagination } from "@repo/web-ui/pagination";
 import { Show } from "@repo/web-ui/show";
 import { Spinner } from "@repo/web-ui/spinner";
+import { UserPlus } from "lucide-react";
 
 import type { UsersListViewModel } from "@/features/users/model/users.types";
 
 import { BulkActionBar } from "@/components/bulk-action-bar";
+import { ResourcePageShell } from "@/components/resource-page-shell";
 import { ResourceTable } from "@/components/resource-table";
 import { ResourceToolbar } from "@/components/resource-toolbar";
 import { STATUS_FILTERS } from "@/features/users/model/constants";
 import { USERS_PAGE_SIZE_OPTIONS } from "@/features/users/model/users.types";
+import { adminResources } from "@/lib/admin-resources";
 
 import { CreateUserDrawer } from "./create-user-drawer";
 import { UsersConfirmBlockDialog } from "./users-confirm-block-dialog";
-import { UsersHeader } from "./users-header";
+
+const usersResource = adminResources.find((r) => r.id === "users")!;
 
 /**
  * Presentational users list view. Receives a fully-resolved view model
@@ -60,16 +64,26 @@ export function UsersListView({
         />
       ) : null}
 
-      <div className="flex flex-col gap-5">
-        <UsersHeader
-          isLoading={header.isLoading}
-          isFetching={header.isFetching}
-          total={header.total}
-          canCreate={header.canCreate}
-          onRefresh={header.onRefresh}
-          onCreateClick={header.onCreateClick}
-        />
-
+      <ResourcePageShell
+        resource={usersResource}
+        description={
+          header.isLoading
+            ? "Loading…"
+            : header.total === 0
+              ? "No users yet"
+              : `${header.total} user${header.total > 1 ? "s" : ""}`
+        }
+        isRefreshing={header.isFetching}
+        onRefresh={header.onRefresh}
+        actions={
+          header.canCreate ? (
+            <Button size="sm" onClick={header.onCreateClick}>
+              <UserPlus data-icon="inline-start" />
+              New user
+            </Button>
+          ) : null
+        }
+      >
         <Card>
           <Show when={list.isError}>
             <ErrorState
@@ -152,7 +166,7 @@ export function UsersListView({
             />
           </CardContent>
         </Card>
-      </div>
+      </ResourcePageShell>
     </>
   );
 }

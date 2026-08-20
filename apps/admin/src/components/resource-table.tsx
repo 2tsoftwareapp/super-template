@@ -1,4 +1,5 @@
 import { Empty } from "@repo/web-ui/empty";
+import { ErrorState } from "@repo/web-ui/error-state";
 import { Skeleton } from "@repo/web-ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@repo/web-ui/table";
 import { flexRender, type Table as ReactTable, type Row } from "@tanstack/react-table";
@@ -14,6 +15,8 @@ export function ResourceTable<T>({
   onRowClick,
   binarySort: _binarySort = false,
   multiSort = false,
+  error,
+  onRetry,
 }: {
   table: ReactTable<T>;
   isLoading?: boolean;
@@ -24,6 +27,10 @@ export function ResourceTable<T>({
   binarySort?: boolean;
   /** When true, show sort priority badges for multi-column sorting. */
   multiSort?: boolean;
+  /** When set, renders an error state in place of rows/empty (wins over empty). */
+  error?: { title: string; description?: string };
+  /** Retry action for the error state. */
+  onRetry?: () => void;
 }) {
   const columnCount = table.getAllLeafColumns().length;
   const activeSortCount = table.getState().sorting.length;
@@ -104,6 +111,17 @@ export function ResourceTable<T>({
               })}
             </TableRow>
           ))
+        ) : error ? (
+          <TableRow>
+            <TableCell colSpan={columnCount} className="p-4">
+              <ErrorState
+                variant="inline"
+                title={error.title}
+                {...(error.description ? { description: error.description } : {})}
+                {...(onRetry ? { action: { label: "Retry", onClick: onRetry } } : {})}
+              />
+            </TableCell>
+          </TableRow>
         ) : table.getRowModel().rows.length === 0 ? (
           <TableRow>
             <TableCell colSpan={columnCount}>

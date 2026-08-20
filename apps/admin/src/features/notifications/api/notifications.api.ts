@@ -13,9 +13,12 @@ import { buildPath, webFetch } from "@/lib/http";
  * Notifications transport layer. Paths from OpenAPI via `bffPath` (§22).
  */
 export const notificationsApi = {
-  jobs() {
+  jobs(sortOrder?: "asc" | "desc") {
     return webFetch<ListResponse<NotificationJobDto>>(
-      buildPath(bffPath("/api/v1/admin/notifications/jobs"), { limit: 50 }),
+      buildPath(bffPath("/api/v1/admin/notifications/jobs"), {
+        limit: 50,
+        sortOrder,
+      }),
     );
   },
 

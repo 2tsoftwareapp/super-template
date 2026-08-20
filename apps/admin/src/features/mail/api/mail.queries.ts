@@ -21,6 +21,7 @@ export function useMailDeliveriesQuery(params: MailDeliveriesParams) {
       status: params.status,
       page: params.page,
       limit: params.limit,
+      sortOrder: params.sortOrder,
     }),
     queryFn: () => mailApi.deliveries(params),
     placeholderData: (previous) => previous,

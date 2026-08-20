@@ -1,103 +1,23 @@
 "use client";
 
+import { useDebouncedValue } from "@repo/web-hooks/use-debounced-value";
 import { classifyError, getErrorMessage } from "@repo/web-utils/errors";
 import { useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
-import type { SettingRow, SettingsViewModel } from "@/features/settings/model/settings.types";
-import type { ApplicationSettingDto } from "@/lib/api-types";
+import type { SettingsViewModel, SettingValue } from "@/features/settings/model/settings.types";
 
 import { useUpdateSettingMutation } from "@/features/settings/api/settings.mutations";
 import { useSettingsQuery } from "@/features/settings/api/settings.queries";
 import { settingsKeys } from "@/features/settings/api/settings.query-keys";
-import {
-  initDraft,
-  isObjectValue,
-  objectDraftChanged,
-} from "@/features/settings/model/settings-drafts";
 import { selectSettingsPermissions } from "@/features/settings/model/settings.permissions";
-import { updateSettingInputSchema } from "@/features/settings/model/settings.schemas";
+import { parseSettingsSearchParams } from "@/features/settings/model/settings.search-params";
 import { useSession } from "@/hooks/use-session";
-import { parseJsonValue } from "@/lib/json";
+import { usePathname, useRouter } from "@/i18n/navigation";
 
 export type { SettingsViewModel };
-
-type SettingValue = ApplicationSettingDto["value"];
-
-function buildSettingRow(
-  setting: ApplicationSettingDto,
-  canUpdate: boolean,
-  draftValues: Record<string, string>,
-  draftObjectValues: Record<string, Record<string, string | boolean>>,
-  updateSettingIsPending: boolean,
-  savingKey: string | null,
-  onSetDraftValues: (updater: (prev: Record<string, string>) => Record<string, string>) => void,
-  onSetDraftObjectValues: (
-    updater: (
-      prev: Record<string, Record<string, string | boolean>>,
-    ) => Record<string, Record<string, string | boolean>>,
-  ) => void,
-  onRequestSave: () => void,
-): SettingRow {
-  const isObject = isObjectValue(setting.value);
-  const objValue = isObject
-    ? (setting.value as Record<string, string | boolean | number | null>)
-    : null;
-
-  const hasObjectDraft = draftObjectValues[setting.key] !== undefined;
-  const hasChanges = isObject
-    ? objectDraftChanged(setting.value, draftObjectValues[setting.key])
-    : draftValues[setting.key] !== undefined &&
-      draftValues[setting.key] !== initDraft(setting.value);
-
-  return {
-    setting,
-    isObject,
-    hasChanges,
-    isSaving: updateSettingIsPending && savingKey === setting.key,
-    canUpdate,
-    scalar: {
-      value: draftValues[setting.key] ?? initDraft(setting.value),
-      onChange: (value) => onSetDraftValues((prev) => ({ ...prev, [setting.key]: value })),
-      onReset: () =>
-        onSetDraftValues((prev) => {
-          const next = { ...prev };
-          delete next[setting.key];
-          return next;
-        }),
-    },
-    object:
-      isObject && objValue
-        ? {
-            fields: Object.entries(objValue).map(([k, v]) => ({
-              key: k,
-              value: hasObjectDraft ? (draftObjectValues[setting.key]?.[k] ?? v) : v,
-              onChange: (val) =>
-                onSetDraftObjectValues((prev) => {
-                  const base = prev[setting.key] ?? {};
-                  for (const [bk, bv] of Object.entries(objValue)) {
-                    if (!(bk in base)) {
-                      base[bk] = typeof bv === "boolean" ? bv : String(bv ?? "");
-                    }
-                  }
-                  return {
-                    ...prev,
-                    [setting.key]: { ...base, [k]: val },
-                  };
-                }),
-            })),
-            onReset: () =>
-              onSetDraftObjectValues((prev) => {
-                const next = { ...prev };
-                delete next[setting.key];
-                return next;
-              }),
-          }
-        : null,
-    onRequestSave,
-  };
-}
 
 /**
  * Orchestration hook for the settings screen.
@@ -112,38 +32,53 @@ function buildSettingRow(
  */
 export function useSettingsController(): SettingsViewModel {
   const queryClient = useQueryClient();
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const session = useSession();
   const { canRead, canUpdate } = selectSettingsPermissions(session.data?.data?.permissions);
 
+  const { q: urlSearch } = parseSettingsSearchParams(new URLSearchParams(searchParams.toString()));
+
   const settings = useSettingsQuery();
 
-  const [search, setSearch] = useState("");
-  const [draftValues, setDraftValues] = useState<Record<string, string>>({});
-  const [draftObjectValues, setDraftObjectValues] = useState<
-    Record<string, Record<string, string | boolean>>
-  >({});
+  const [searchInput, setSearchInput] = useState(urlSearch);
+  const debouncedSearch = useDebouncedValue(searchInput, 300);
+  const lastUrlSearchRef = useRef(urlSearch);
+  const syncingFromUrlRef = useRef(false);
   const [savingKey, setSavingKey] = useState<string | null>(null);
-  const [confirmOpen, setConfirmOpen] = useState(false);
+
+  useEffect(() => {
+    if (lastUrlSearchRef.current === urlSearch) return;
+    lastUrlSearchRef.current = urlSearch;
+    syncingFromUrlRef.current = true;
+    setSearchInput(urlSearch);
+  }, [urlSearch]);
+
+  useEffect(() => {
+    if (syncingFromUrlRef.current) {
+      if (debouncedSearch === urlSearch) syncingFromUrlRef.current = false;
+      return;
+    }
+    if (debouncedSearch !== searchInput || debouncedSearch === urlSearch) return;
+
+    const next = new URLSearchParams(searchParams.toString());
+    if (debouncedSearch) next.set("q", debouncedSearch);
+    else next.delete("q");
+
+    const queryString = next.toString();
+    router.replace(queryString ? `${pathname}?${queryString}` : pathname);
+  }, [debouncedSearch, pathname, router, searchInput, searchParams, urlSearch]);
 
   const filtered = useMemo(() => {
     const all = settings.data?.data ?? [];
-    if (!search) return all;
-    const q = search.toLowerCase();
+    if (!debouncedSearch) return all;
+    const q = debouncedSearch.toLowerCase();
     return all.filter((s) => s.key.toLowerCase().includes(q));
-  }, [settings.data?.data, search]);
+  }, [settings.data?.data, debouncedSearch]);
 
   const updateSetting = useUpdateSettingMutation({
     onSuccess: () => {
-      setDraftValues((prev) => {
-        const next = { ...prev };
-        delete next[savingKey!];
-        return next;
-      });
-      setDraftObjectValues((prev) => {
-        const next = { ...prev };
-        delete next[savingKey!];
-        return next;
-      });
       setSavingKey(null);
       toast.success("Setting saved");
     },
@@ -155,61 +90,20 @@ export function useSettingsController(): SettingsViewModel {
     },
   });
 
-  const handleSave = () => {
-    if (!savingKey) return;
-    const setting = settings.data?.data.find((s) => s.key === savingKey);
-    const isObject = setting && typeof setting.value === "object" && setting.value !== null;
-
-    let next: SettingValue;
-    if (isObject && draftObjectValues[savingKey]) {
-      next = draftObjectValues[savingKey];
-    } else {
-      const raw = draftValues[savingKey] ?? initDraft(setting?.value ?? (null as never));
-      next = parseJsonValue(raw) as SettingValue;
-    }
-
-    const parsed = updateSettingInputSchema.safeParse({
-      key: savingKey,
-      value: next,
-    });
-    if (!parsed.success) {
-      toast.error(parsed.error.issues[0]?.message ?? "Invalid setting value");
-      return;
-    }
-
-    updateSetting.mutate({
-      key: parsed.data.key,
-      value: parsed.data.value as SettingValue,
-    });
-    setConfirmOpen(false);
+  const handleSave = (key: string, value: SettingValue) => {
+    setSavingKey(key);
+    updateSetting.mutate({ key, value });
   };
 
   const handleRetry = () => {
     void queryClient.invalidateQueries({ queryKey: settingsKeys.all });
   };
 
-  const getRow = (setting: ApplicationSettingDto): SettingRow => {
-    return buildSettingRow(
-      setting,
-      canUpdate,
-      draftValues,
-      draftObjectValues,
-      updateSetting.isPending,
-      savingKey,
-      setDraftValues,
-      setDraftObjectValues,
-      () => {
-        setSavingKey(setting.key);
-        setConfirmOpen(true);
-      },
-    );
-  };
-
   return {
     canRead,
     canUpdate,
-    search,
-    onSearchChange: setSearch,
+    search: debouncedSearch,
+    onSearchChange: setSearchInput,
     isLoading: settings.isLoading,
     isRefreshing: settings.isFetching,
     isError: settings.isError,
@@ -217,15 +111,7 @@ export function useSettingsController(): SettingsViewModel {
     onRefresh: handleRetry,
     totalCount: settings.data ? settings.data.data.length : null,
     filtered,
-    getRow,
-    confirm: {
-      open: confirmOpen,
-      isSaving: updateSetting.isPending,
-      onCancel: () => {
-        setConfirmOpen(false);
-        setSavingKey(null);
-      },
-      onConfirm: handleSave,
-    },
+    onSave: handleSave,
+    isSavingKey: savingKey,
   };
 }

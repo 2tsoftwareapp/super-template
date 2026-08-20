@@ -1,4 +1,10 @@
-import { dateParam, pageParam, parseSearchParams, searchTextParam } from "@repo/web-utils/params";
+import {
+  dateParam,
+  pageParam,
+  parseSearchParams,
+  searchTextParam,
+  sortOrderParam,
+} from "@repo/web-utils/params";
 import { z } from "zod";
 
 /**
@@ -10,6 +16,7 @@ export interface AuditLogsFilters {
   to: string;
   q: string;
   page: number;
+  sortOrder: "asc" | "desc";
 }
 
 const auditLogsFiltersSchema = z.object({
@@ -17,6 +24,7 @@ const auditLogsFiltersSchema = z.object({
   to: dateParam,
   q: searchTextParam(500),
   page: pageParam,
+  sortOrder: sortOrderParam("desc"),
 });
 
 const AUDIT_LOGS_FILTERS_FALLBACK = {
@@ -24,6 +32,7 @@ const AUDIT_LOGS_FILTERS_FALLBACK = {
   to: undefined,
   q: "",
   page: 1,
+  sortOrder: "desc",
 } as const;
 
 export function parseAuditLogsFilters(sp: URLSearchParams): AuditLogsFilters {
@@ -34,6 +43,7 @@ export function parseAuditLogsFilters(sp: URLSearchParams): AuditLogsFilters {
     to: parsed.data.to ?? "",
     q: parsed.data.q,
     page: parsed.data.page,
+    sortOrder: parsed.data.sortOrder,
   };
 }
 
@@ -43,6 +53,7 @@ export function serializeAuditLogsFilters(filters: AuditLogsFilters): string {
   if (filters.to) sp.set("to", filters.to);
   if (filters.q) sp.set("q", filters.q);
   if (filters.page > 1) sp.set("page", String(filters.page));
+  if (filters.sortOrder !== "desc") sp.set("sortOrder", filters.sortOrder);
   return sp.toString();
 }
 

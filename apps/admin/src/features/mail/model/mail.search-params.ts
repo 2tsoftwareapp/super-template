@@ -1,5 +1,10 @@
 import { DEFAULT_PAGE_SIZE } from "@repo/config";
-import { pageParam, parseSearchParams, searchTextParam } from "@repo/web-utils/params";
+import {
+  pageParam,
+  parseSearchParams,
+  searchTextParam,
+  sortOrderParam,
+} from "@repo/web-utils/params";
 import { z } from "zod";
 
 import { DELIVERY_STATUS_OPTIONS } from "./mail.constants";
@@ -10,6 +15,7 @@ export interface MailFilters {
   status: string;
   templateKey: string;
   page: number;
+  sortOrder: "asc" | "desc";
 }
 
 const statusValues = DELIVERY_STATUS_OPTIONS.map((option) => option.value) as [string, ...string[]];
@@ -18,12 +24,14 @@ const mailFiltersSchema = z.object({
   status: z.enum(statusValues).catch(""),
   templateKey: searchTextParam(100),
   page: pageParam,
+  sortOrder: sortOrderParam("desc"),
 });
 
 const MAIL_FILTERS_FALLBACK = {
   status: "",
   templateKey: "",
   page: 1,
+  sortOrder: "desc",
 } as const;
 
 export function parseMailFilters(sp: URLSearchParams): MailFilters {
@@ -33,6 +41,7 @@ export function parseMailFilters(sp: URLSearchParams): MailFilters {
     status: parsed.data.status,
     templateKey: parsed.data.templateKey,
     page: parsed.data.page,
+    sortOrder: parsed.data.sortOrder,
   };
 }
 
@@ -41,5 +50,6 @@ export function serializeMailFilters(filters: MailFilters): string {
   if (filters.status) sp.set("status", filters.status);
   if (filters.templateKey) sp.set("templateKey", filters.templateKey);
   if (filters.page > 1) sp.set("page", String(filters.page));
+  if (filters.sortOrder !== "desc") sp.set("sortOrder", filters.sortOrder);
   return sp.toString();
 }
