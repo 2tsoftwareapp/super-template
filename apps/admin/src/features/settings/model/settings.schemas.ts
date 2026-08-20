@@ -17,7 +17,6 @@ export const updateSettingInputSchema = z.object({
 export type UpdateSettingInput = z.infer<typeof updateSettingInputSchema>;
 
 /** Scalar card input: raw JSON text that must parse into a valid setting value. */
-/** Scalar card input: raw JSON text that must parse into a valid setting value. */
 export const settingScalarInputSchema = z.object({
   value: z.string().refine((raw) => {
     try {

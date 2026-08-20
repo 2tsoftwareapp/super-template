@@ -67,7 +67,7 @@ interface UseUsersListControllerOptions {
  *   3. Row/bulk activate-block with confirm dialog; toast on mutation errors.
  *   4. Create-user drawer (roles/orgs) when permitted.
  * Owns: URL list params, list query, bulk/create composition.
- * Does not own: table config (use-users-table-config) or column atoms.
+ * Does not own: table config (useResourceTableConfig) or column atoms.
  */
 export function useUsersListController({
   createColumns,

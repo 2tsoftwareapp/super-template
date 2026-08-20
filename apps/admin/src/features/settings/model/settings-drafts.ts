@@ -19,22 +19,3 @@ export function initDraft(value: SettingValue): string {
 export function isObjectValue(value: SettingValue): boolean {
   return typeof value === "object" && value !== null;
 }
-
-/** Whether an object-setting draft differs from its original value. */
-export function objectDraftChanged(
-  original: SettingValue,
-  draft: Record<string, string | boolean> | undefined,
-): boolean {
-  if (typeof original !== "object" || original === null || !draft) {
-    return false;
-  }
-
-  return Object.keys(original).some((k) => {
-    const origVal = (original as Record<string, unknown>)[k];
-    const draftVal = draft[k];
-    if (typeof origVal === "boolean") {
-      return draftVal !== origVal;
-    }
-    return draftVal !== (origVal ?? "");
-  });
-}
