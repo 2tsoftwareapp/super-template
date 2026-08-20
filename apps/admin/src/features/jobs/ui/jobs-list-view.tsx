@@ -2,20 +2,22 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/web-ui/card";
 import { ErrorState } from "@repo/web-ui/error-state";
+import { Pagination } from "@repo/web-ui/pagination";
 import { Show } from "@repo/web-ui/show";
 
 import type { JobsViewModel } from "@/features/jobs/model/jobs.types";
 
 import { ResourcePageShell } from "@/components/resource-page-shell";
-import { JobsDetailDrawer } from "@/features/jobs/ui/jobs-detail-drawer";
-import { JobsFilterBar } from "@/features/jobs/ui/jobs-filter-bar";
-import { JobsMetricsRow, JobsStatusRow } from "@/features/jobs/ui/jobs-stats";
-import { JobsTable, JobsTablePagination } from "@/features/jobs/ui/jobs-table";
+import { ResourceTable } from "@/components/resource-table";
+import { ResourceToolbar } from "@/components/resource-toolbar";
 import { adminResources } from "@/lib/admin-resources";
+
+import { JobsDetailDrawer } from "./jobs-detail-drawer";
+import { JobsMetricsRow, JobsStatusRow } from "./jobs-stats";
 
 const jobsResource = adminResources.find((r) => r.id === "jobs")!;
 
-export function JobsListView({ header, filters, list, detail, logs, cancel }: JobsViewModel) {
+export function JobsListView({ header, filters, list, detail, logs, table }: JobsViewModel) {
   return (
     <>
       <ResourcePageShell
@@ -40,16 +42,6 @@ export function JobsListView({ header, filters, list, detail, logs, cancel }: Jo
           <JobsStatusRow metrics={header.metrics!} />
         </Show>
 
-        <JobsFilterBar
-          status={filters.status}
-          type={filters.type}
-          statusOptions={filters.statusOptions}
-          onStatusChange={filters.onStatusChange}
-          onTypeChange={filters.onTypeChange}
-          onRefresh={filters.onRefresh}
-          isFetching={filters.isFetching}
-        />
-
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-base">Queue</CardTitle>
@@ -59,28 +51,40 @@ export function JobsListView({ header, filters, list, detail, logs, cancel }: Jo
                 : "Manage scheduled and running jobs."}
             </CardDescription>
           </CardHeader>
+          <ResourceToolbar
+            search={filters.type}
+            onSearchChange={filters.onTypeChange}
+            searchPlaceholder="Job type (e.g. SEND_NOTIFICATION)"
+            hasFilters={filters.hasFilters}
+            onClearFilters={filters.onClearFilters}
+            filters={
+              <select
+                className="h-9 rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                value={filters.status}
+                onChange={(e) => filters.onStatusChange(e.target.value)}
+              >
+                {filters.statusOptions.map((opt) => (
+                  <option key={opt.value || "all"} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            }
+          />
           <CardContent className="p-0 pb-1">
-            <JobsTable
-              jobs={list.jobs}
+            <ResourceTable
+              table={table}
               isLoading={list.isLoading}
-              isError={list.isError}
+              {...(list.isError ? { error: { title: "Could not load jobs." } } : {})}
               onRetry={list.onRetry}
-              emptyMessage={list.emptyMessage}
-              confirmId={cancel.confirmId}
-              cancelPending={cancel.isPending}
-              canCancel={list.canCancel}
-              statusProps={list.statusProps}
-              onDetail={detail.onOpen}
-              onCancelRequest={cancel.onRequest}
-              onCancelConfirm={cancel.onConfirm}
-              onCancelDismiss={cancel.onDismiss}
+              emptyTitle={list.emptyMessage}
             />
-
-            <JobsTablePagination
+            <Pagination
               page={list.page}
+              pageSize={50}
               totalPages={list.totalPages}
               total={list.total}
-              isFetching={list.isFetching}
+              isLoading={list.isFetching}
               onPageChange={list.onPageChange}
             />
           </CardContent>

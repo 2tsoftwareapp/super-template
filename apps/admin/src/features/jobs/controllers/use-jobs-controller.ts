@@ -1,5 +1,7 @@
 "use client";
 
+import type { SortCriterion } from "@repo/api-sort";
+
 import { useDebouncedValue } from "@repo/web-hooks/use-debounced-value";
 import { getErrorMessage } from "@repo/web-utils/errors";
 import { useQueryClient } from "@tanstack/react-query";
@@ -7,8 +9,10 @@ import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import type { JobsViewModel } from "@/features/jobs/model/jobs.types";
+import type { JobsColumnFactory, JobsViewModel } from "@/features/jobs/model/jobs.types";
+import type { JobDto } from "@/lib/api-types";
 
+import { useResourceTableConfig } from "@/components/use-resource-table-config";
 import { useCancelJobMutation } from "@/features/jobs/api/jobs.mutations";
 import {
   useJobDetailQuery,
@@ -26,8 +30,24 @@ import {
 } from "@/features/jobs/model/jobs.search-params";
 import { useSession } from "@/hooks/use-session";
 import { usePathname, useRouter } from "@/i18n/navigation";
+import { createTableSortBridge } from "@/lib/table-sort";
 
 export type { JobsViewModel };
+
+type JobsSortField = "createdAt";
+
+const jobsSortBridge = createTableSortBridge<JobsSortField>({
+  fieldByColumn: {
+    scheduledAt: "createdAt",
+  },
+  columnByField: {
+    createdAt: "scheduledAt",
+  },
+});
+
+interface UseJobsControllerOptions {
+  createColumns: JobsColumnFactory;
+}
 
 /**
  * Orchestration hook for the jobs queue screen.
@@ -40,7 +60,7 @@ export type { JobsViewModel };
  * Owns: URL filters, list/metrics/detail/logs queries, cancel confirm.
  * Does not own: table/drawer presentational markup.
  */
-export function useJobsController(): JobsViewModel {
+export function useJobsController({ createColumns }: UseJobsControllerOptions): JobsViewModel {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -70,6 +90,7 @@ export function useJobsController(): JobsViewModel {
     status: filters.status || undefined,
     type: debouncedType || undefined,
     page: filters.page,
+    sortOrder: filters.sortOrder,
   });
 
   const metrics = useJobMetricsQuery();
@@ -82,6 +103,50 @@ export function useJobsController(): JobsViewModel {
   const total = jobs.data?.meta?.total ?? 0;
   const selectedJob = jobDetail.data?.data ?? null;
   const selectedEvents = jobLogs.data?.data ?? [];
+
+  const handleConfirmCancel = () => {
+    if (!confirmCancel) return;
+    cancelJob.mutate(confirmCancel, {
+      onSuccess: () => {
+        setConfirmCancel(null);
+      },
+      onError: (error) => {
+        toast.error(getErrorMessage(error));
+      },
+    });
+  };
+
+  const handleSortChange = (nextSort: SortCriterion<JobsSortField>[]) => {
+    const primary = nextSort[0] ?? { field: "createdAt" as const, order: "desc" as const };
+    const next = { ...filters, sortOrder: primary.order, page: 1 };
+    setFilters(next);
+    const qs = serializeJobsFilters(next);
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+  };
+
+  const jobsSort: SortCriterion<JobsSortField>[] = [
+    { field: "createdAt", order: filters.sortOrder },
+  ];
+
+  const { table } = useResourceTableConfig<JobDto, JobsSortField>({
+    data: allJobs,
+    columns: createColumns({
+      canCancel: permissions.canCancel,
+      confirmId: confirmCancel,
+      cancelPending: cancelJob.isPending,
+      statusProps: jobStatusProps,
+      onDetail: (jobId) => setSelectedJobId(jobId),
+      onCancelRequest: (jobId) => setConfirmCancel(jobId),
+      onCancelConfirm: handleConfirmCancel,
+      onCancelDismiss: () => setConfirmCancel(null),
+    }),
+    enableSelection: false,
+    getRowId: (row) => row.id,
+    listParams: { sort: jobsSort },
+    sortBridge: jobsSortBridge,
+    onSortChange: handleSortChange,
+    onPageChange: (page) => onFilterChange("page", page),
+  });
 
   const hasFilters = Boolean(filters.status || filters.type);
   const emptyMessage = hasFilters ? "No jobs match your filters." : "No jobs found.";
@@ -109,18 +174,6 @@ export function useJobsController(): JobsViewModel {
     void queryClient.invalidateQueries({ queryKey: jobsKeys.all });
   };
 
-  const handleConfirmCancel = () => {
-    if (!confirmCancel) return;
-    cancelJob.mutate(confirmCancel, {
-      onSuccess: () => {
-        setConfirmCancel(null);
-      },
-      onError: (error) => {
-        toast.error(getErrorMessage(error));
-      },
-    });
-  };
-
   return {
     header: {
       metrics: metrics.data?.data ?? null,
@@ -136,11 +189,15 @@ export function useJobsController(): JobsViewModel {
       statusOptions: STATUS_OPTIONS,
       onStatusChange: (value) => onFilterChange("status", value),
       onTypeChange: (value) => onFilterChange("type", value),
+      hasFilters,
+      onClearFilters: () => {
+        setFilters({ status: "", type: "", page: 1, sortOrder: "desc" });
+        router.replace(pathname, { scroll: false });
+      },
       onRefresh: retryList,
       isFetching: jobs.isFetching,
     },
     list: {
-      jobs: allJobs,
       total,
       totalPages,
       page: filters.page,
@@ -150,7 +207,6 @@ export function useJobsController(): JobsViewModel {
       onRetry: retryList,
       emptyMessage,
       onPageChange: (page) => onFilterChange("page", page),
-      canCancel: permissions.canCancel,
       statusProps: jobStatusProps,
     },
     detail: {
@@ -175,5 +231,6 @@ export function useJobsController(): JobsViewModel {
       onConfirm: handleConfirmCancel,
       onDismiss: () => setConfirmCancel(null),
     },
+    table,
   };
 }

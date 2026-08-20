@@ -1,5 +1,7 @@
 "use client";
 
+import type { SortCriterion } from "@repo/api-sort";
+
 import { useDebouncedValue } from "@repo/web-hooks/use-debounced-value";
 import { getErrorMessage } from "@repo/web-utils/errors";
 import { useQueryClient } from "@tanstack/react-query";
@@ -7,9 +9,14 @@ import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import type { FilesViewModel } from "@/features/files/model/files.types";
+import type {
+  FilesColumnFactory,
+  FilesSortCriterion,
+  FilesViewModel,
+} from "@/features/files/model/files.types";
 import type { FileDto } from "@/lib/api-types";
 
+import { useResourceTableConfig } from "@/components/use-resource-table-config";
 import {
   useDeleteFileMutation,
   useGetFileDownloadUrlMutation,
@@ -32,8 +39,28 @@ import {
 } from "@/features/files/model/files.search-params";
 import { useSession } from "@/hooks/use-session";
 import { usePathname, useRouter } from "@/i18n/navigation";
+import { createTableSortBridge } from "@/lib/table-sort";
 
 export type { FilesViewModel };
+
+type FilesSortField = FilesSortCriterion["field"];
+
+const filesSortBridge = createTableSortBridge<FilesSortField>({
+  fieldByColumn: {
+    originalName: "originalName",
+    sizeBytes: "sizeBytes",
+    createdAt: "createdAt",
+  },
+  columnByField: {
+    originalName: "originalName",
+    sizeBytes: "sizeBytes",
+    createdAt: "createdAt",
+  },
+});
+
+interface UseFilesControllerOptions {
+  createColumns: FilesColumnFactory;
+}
 
 /**
  * Orchestration hook for the files screen.
@@ -47,7 +74,7 @@ export type { FilesViewModel };
  * Owns: URL filters, list/upload/delete orchestration, selection.
  * Does not own: table column atoms or drawer markup.
  */
-export function useFilesController(): FilesViewModel {
+export function useFilesController({ createColumns }: UseFilesControllerOptions): FilesViewModel {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -73,8 +100,16 @@ export function useFilesController(): FilesViewModel {
   };
 
   const onClearFilters = () => {
-    setFilters({ q: "", mime: "", page: 1 });
+    setFilters({ q: "", mime: "", page: 1, sortField: "createdAt", sortOrder: "desc" });
     router.replace(pathname, { scroll: false });
+  };
+
+  const handleSortChange = (nextSort: SortCriterion<FilesSortField>[]) => {
+    const primary = nextSort[0] ?? { field: "createdAt" as const, order: "desc" as const };
+    const next = { ...filters, sortField: primary.field, sortOrder: primary.order, page: 1 };
+    setFilters(next);
+    const qs = serializeFilesFilters(next);
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
   };
 
   const hasFilters = Boolean(filters.q || filters.mime);
@@ -84,6 +119,8 @@ export function useFilesController(): FilesViewModel {
     search: debouncedSearch,
     mimeFilter: filters.mime || undefined,
     page: filters.page,
+    sortField: filters.sortField,
+    sortOrder: filters.sortOrder,
   });
 
   const versions = useFileVersionsQuery(selectedFile?.id);
@@ -97,6 +134,24 @@ export function useFilesController(): FilesViewModel {
   const entries = files.data?.data ?? [];
   const totalPages = files.data?.meta?.totalPages ?? 1;
   const total = files.data?.meta?.total ?? 0;
+
+  const filesSort: FilesSortCriterion[] = [{ field: filters.sortField, order: filters.sortOrder }];
+
+  const { table } = useResourceTableConfig<FileDto, FilesSortField>({
+    data: entries,
+    columns: createColumns({
+      canDelete: permissions.canDelete,
+      formatBytes,
+      formatMimeType,
+      onDeleteClick: (file) => setDeleteTarget(file),
+    }),
+    enableSelection: false,
+    getRowId: (row) => row.id,
+    listParams: { sort: filesSort },
+    sortBridge: filesSortBridge,
+    onSortChange: handleSortChange,
+    onPageChange: (page) => onFilterChange("page", page),
+  });
 
   const retryList = () => {
     void queryClient.invalidateQueries({ queryKey: filesKeys.lists() });
@@ -194,9 +249,7 @@ export function useFilesController(): FilesViewModel {
       onPageChange: (page) => onFilterChange("page", page),
       resultLabel: `${entries.length} files${total ? ` (${total} total)` : ""}`,
       onRowClick: handleRowClick,
-      onDeleteClick: (file) => setDeleteTarget(file),
       hasFilters,
-      canDelete: permissions.canDelete,
       formatBytes,
       formatMimeType,
     },
@@ -244,5 +297,6 @@ export function useFilesController(): FilesViewModel {
       onCancel: () => setDeleteTarget(null),
       onConfirm: handleConfirmDelete,
     },
+    table,
   };
 }

@@ -10,10 +10,13 @@ import type {
   UsersListParams,
   UsersListViewModel,
   UsersPageSize,
+  UsersSortCriterion,
   UsersTableColumnFactory,
   UserStatusFilter,
 } from "@/features/users/model/users.types";
+import type { AdminUserDto } from "@/lib/api-types";
 
+import { useResourceTableConfig } from "@/components/use-resource-table-config";
 import {
   useActivateUsers,
   useBlockUsers,
@@ -27,11 +30,26 @@ import {
 } from "@/features/users/model/users.search-params";
 import { useSession } from "@/hooks/use-session";
 import { usePathname, useRouter } from "@/i18n/navigation";
+import { createTableSortBridge } from "@/lib/table-sort";
 
 import { useCreateUserDrawer } from "./use-create-user-drawer";
 import { useUsersBulkActions } from "./use-users-bulk-actions";
 import { useUsersConfirmBlock } from "./use-users-confirm-block";
-import { useUsersTableConfig } from "./use-users-table-config";
+
+const usersSortBridge = createTableSortBridge<UsersSortCriterion["field"]>({
+  fieldByColumn: {
+    user: "displayName",
+    email: "email",
+    status: "status",
+    createdAt: "createdAt",
+  },
+  columnByField: {
+    displayName: "user",
+    email: "email",
+    status: "status",
+    createdAt: "createdAt",
+  },
+});
 
 export type { UsersListViewModel };
 
@@ -49,7 +67,7 @@ interface UseUsersListControllerOptions {
  *   3. Row/bulk activate-block with confirm dialog; toast on mutation errors.
  *   4. Create-user drawer (roles/orgs) when permitted.
  * Owns: URL list params, list query, bulk/create composition.
- * Does not own: table config (use-users-table-config) or column atoms.
+ * Does not own: table config (useResourceTableConfig) or column atoms.
  */
 export function useUsersListController({
   createColumns,
@@ -159,17 +177,22 @@ export function useUsersListController({
     [patchListParams],
   );
 
-  const { table, selectedIds, clearSelection } = useUsersTableConfig({
-    pageUsers,
-    listParams,
-    canUpdate,
-    isMutating,
-    handleActivate,
-    handleBlock,
-    handleResendVerification,
-    onSortChange: handleSortChange,
-    createColumns,
-  });
+  const { table, selectedIds, clearSelection, handlePageChange, handlePageSizeChange } =
+    useResourceTableConfig<AdminUserDto, UsersSortCriterion["field"]>({
+      data: pageUsers,
+      listParams,
+      sortBridge: usersSortBridge,
+      columns: createColumns({
+        canUpdate,
+        onActivate: handleActivate,
+        onBlock: handleBlock,
+        onResendVerification: handleResendVerification,
+        isDisabled: isMutating,
+      }),
+      onSortChange: handleSortChange,
+      onPageChange: (page) => patchListParams({ page }),
+      onPageSizeChange: (limit) => patchListParams({ limit: limit as UsersPageSize, page: 1 }),
+    });
 
   const hasFilters = Boolean(searchInput || queryParams.status !== "all");
 
@@ -210,28 +233,8 @@ export function useUsersListController({
     clearSelection();
   };
 
-  const handlePageChange = (page: number) => {
-    patchListParams({ page });
-    clearSelection();
-  };
-
-  const handlePageSizeChange = (limit: number) => {
-    patchListParams({ limit: limit as UsersPageSize, page: 1 });
-    clearSelection();
-  };
-
   return {
     session: { isLoading: session.isLoading, isError: session.isError },
-    columnData: {
-      pageUsers,
-      canUpdate,
-      isMutating,
-      handleActivate,
-      handleBlock,
-      handleResendVerification,
-      listParams,
-      onSortChange: handleSortChange,
-    },
     header: {
       isLoading: users.isLoading,
       isFetching: users.isFetching,

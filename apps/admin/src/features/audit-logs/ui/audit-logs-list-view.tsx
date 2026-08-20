@@ -3,18 +3,19 @@
 import { Button } from "@repo/web-ui/button";
 import { Card, CardContent } from "@repo/web-ui/card";
 import { DatePicker } from "@repo/web-ui/date-picker";
-import { Input } from "@repo/web-ui/input";
+import { Pagination } from "@repo/web-ui/pagination";
 import { Spinner } from "@repo/web-ui/spinner";
-import { Download, Search, X } from "lucide-react";
+import { Download } from "lucide-react";
 
 import type { AuditLogsViewModel } from "@/features/audit-logs/model/audit-logs.types";
 
 import { ResourceDrawer } from "@/components/resource-drawer";
 import { ResourcePageShell } from "@/components/resource-page-shell";
+import { ResourceTable } from "@/components/resource-table";
+import { ResourceToolbar } from "@/components/resource-toolbar";
 import { adminResources } from "@/lib/admin-resources";
 
 import { AuditLogsEventDetail } from "./audit-logs-event-detail";
-import { AuditLogsTable } from "./audit-logs-table";
 
 const auditLogsResource = adminResources.find((r) => r.id === "audit-logs")!;
 
@@ -32,7 +33,6 @@ export function AuditLogsListView({
   isRefreshing,
   hasError,
   onRefresh,
-  entries,
   total,
   totalPages,
   selectedEntry,
@@ -40,6 +40,7 @@ export function AuditLogsListView({
   onExport,
   isExporting,
   formatAction,
+  table,
 }: AuditLogsViewModel) {
   return (
     <ResourcePageShell
@@ -49,76 +50,52 @@ export function AuditLogsListView({
       onRefresh={onRefresh}
     >
       <Card>
-        <div className="flex flex-wrap items-center gap-2 border-b border-border px-4 pb-4">
-          <div className="relative flex-1 basis-[200px]">
-            <Search className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Search events…"
-              value={filters.q}
-              onChange={(e) => onFilterChange("q", e.target.value)}
-              className="h-7 pl-7 text-xs"
-            />
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2">
-            <DatePicker
-              value={filters.from}
-              onChange={(v) => onFilterChange("from", v)}
-              placeholder="From"
-              className="h-7 text-xs"
-            />
-            <DatePicker
-              value={filters.to}
-              onChange={(v) => onFilterChange("to", v)}
-              placeholder="To"
-              className="h-7 text-xs"
-            />
-            {hasFilters && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onClearFilters}
-                className="h-7 px-2 text-xs"
-              >
-                <X className="size-3.5" />
-                Clear
-              </Button>
-            )}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onExport}
-              disabled={isExporting}
-              className="h-7 px-2 text-xs"
-            >
+        <ResourceToolbar
+          search={filters.q}
+          onSearchChange={(value) => onFilterChange("q", value)}
+          searchPlaceholder="Search events…"
+          hasFilters={hasFilters}
+          onClearFilters={onClearFilters}
+          {...(total > 0 ? { resultLabel: `${total} event${total !== 1 ? "s" : ""}` } : {})}
+          filters={
+            <>
+              <DatePicker
+                value={filters.from}
+                onChange={(v) => onFilterChange("from", v)}
+                placeholder="From"
+              />
+              <DatePicker
+                value={filters.to}
+                onChange={(v) => onFilterChange("to", v)}
+                placeholder="To"
+              />
+            </>
+          }
+          actions={
+            <Button variant="outline" size="sm" onClick={onExport} disabled={isExporting}>
               {isExporting ? <Spinner className="size-3.5" /> : <Download className="size-3.5" />}
               Export
             </Button>
-          </div>
-        </div>
+          }
+        />
 
         <CardContent className="p-0 pb-1">
-          {hasError ? (
-            <p className="p-4 text-center text-xs text-destructive">
-              Failed to load audit logs.{" "}
-              <button type="button" onClick={onRefresh} className="underline underline-offset-2">
-                Try again
-              </button>
-            </p>
-          ) : (
-            <AuditLogsTable
-              entries={entries}
-              isLoading={isLoading}
-              hasFilters={hasFilters}
-              total={total}
-              totalPages={totalPages}
-              page={filters.page}
-              isRefreshing={isRefreshing}
-              onSelectEntry={onSelectEntry}
-              onPageChange={(p) => onFilterChange("page", p)}
-              formatAction={formatAction}
-            />
-          )}
+          <ResourceTable
+            table={table}
+            isLoading={isLoading}
+            {...(hasError ? { error: { title: "Could not load audit logs." } } : {})}
+            onRetry={onRefresh}
+            onRowClick={(row) => onSelectEntry(row.original)}
+            emptyTitle={hasFilters ? "No events match your filters." : "No events recorded yet."}
+          />
+          <Pagination
+            page={filters.page}
+            pageSize={50}
+            totalPages={totalPages}
+            total={total}
+            isLoading={isRefreshing}
+            onPageChange={(p) => onFilterChange("page", p)}
+          />
         </CardContent>
       </Card>
 

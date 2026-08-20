@@ -1,17 +1,17 @@
 "use client";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/web-ui/card";
-import { Input } from "@repo/web-ui/input";
-import { Label } from "@repo/web-ui/label";
-import { LoadingButton } from "@repo/web-ui/loading-button";
+import { Pagination } from "@repo/web-ui/pagination";
 import { Show } from "@repo/web-ui/show";
 
 import type { MailViewModel } from "@/features/mail/model/mail.types";
 
 import { ResourcePageShell } from "@/components/resource-page-shell";
+import { ResourceTable } from "@/components/resource-table";
+import { ResourceToolbar } from "@/components/resource-toolbar";
 
-import { MailDeliveriesTable } from "./mail-deliveries-table";
 import { MailDetailDrawer } from "./mail-detail-drawer";
+import { MailSendForm } from "./mail-send-form";
 import { MailTemplateCard } from "./mail-template-card";
 import { MailTemplateCatalog } from "./mail-template-catalog";
 
@@ -22,6 +22,7 @@ export function MailListView({
   sendForm,
   deliveries,
   detail,
+  table,
 }: MailViewModel) {
   return (
     <ResourcePageShell
@@ -44,75 +45,73 @@ export function MailListView({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-1.5">
-                <Label className="text-xs text-muted-foreground">Template key</Label>
-                <select
-                  className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  value={sendForm.selectedTemplateKey}
-                  onChange={(e) => sendForm.onChangeTemplate(e.target.value)}
-                >
-                  <option value="">Select a template</option>
-                  {sendForm.sendableTemplates.map((tmpl) => (
-                    <option key={tmpl.key} value={tmpl.key}>
-                      {tmpl.key}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="space-y-1.5">
-                <Label className="text-xs text-muted-foreground">Recipient email</Label>
-                <Input
-                  type="email"
-                  placeholder="user@example.com"
-                  value={sendForm.recipient}
-                  onChange={(e) => sendForm.onChangeRecipient(e.target.value)}
-                />
-              </div>
-              {sendForm.selectedTemplate?.variables &&
-              sendForm.selectedTemplate.variables.length > 0 ? (
-                <div className="space-y-3 sm:col-span-2">
-                  <Label className="text-xs text-muted-foreground">Variables</Label>
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    {sendForm.selectedTemplate.variables.map((varName) => (
-                      <div key={varName} className="space-y-1">
-                        <Label className="font-mono text-[11px] text-muted-foreground">
-                          {varName}
-                        </Label>
-                        <Input
-                          placeholder={`Value for ${varName}`}
-                          value={sendForm.variableValues[varName] ?? ""}
-                          onChange={(e) => sendForm.onVariableChange(varName, e.target.value)}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
-              <div className="space-y-1.5">
-                <Label className="text-xs text-muted-foreground">Idempotency key (optional)</Label>
-                <Input
-                  placeholder="uuid or unique string"
-                  value={sendForm.idempotencyKey}
-                  onChange={(e) => sendForm.onChangeIdempotencyKey(e.target.value)}
-                />
-              </div>
-            </div>
-            <div className="mt-4 flex justify-end">
-              <LoadingButton
-                size="sm"
-                onClick={sendForm.onSend}
-                disabled={!sendForm.canSend}
-                loading={sendForm.isPending}
-              >
-                Send mail
-              </LoadingButton>
-            </div>
+            <MailSendForm
+              templates={sendForm.sendableTemplates}
+              isPending={sendForm.isPending}
+              onSubmit={sendForm.onSend}
+            />
           </CardContent>
         </Card>
       </Show>
 
-      <MailDeliveriesTable deliveries={deliveries} onSelectDelivery={detail.onSelect} />
+      <Card>
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-base">Deliveries</CardTitle>
+              <CardDescription className="text-xs">
+                {deliveries.total > 0
+                  ? `${deliveries.total} deliver${deliveries.total !== 1 ? "ies" : "y"}`
+                  : "History from the mail delivery endpoint."}
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <ResourceToolbar
+          search={deliveries.filters.templateKey}
+          onSearchChange={(value) => deliveries.onFilterChange("templateKey", value)}
+          searchPlaceholder="Template key"
+          hasFilters={Boolean(deliveries.filters.templateKey || deliveries.filters.status)}
+          onClearFilters={() => {
+            deliveries.onFilterChange("templateKey", "");
+            deliveries.onFilterChange("status", "");
+          }}
+          filters={
+            <select
+              className="h-9 rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              value={deliveries.filters.status}
+              onChange={(e) => deliveries.onFilterChange("status", e.target.value)}
+            >
+              {deliveries.statusOptions.map((opt) => (
+                <option key={opt.value || "all"} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          }
+        />
+        <CardContent className="p-0 pb-1">
+          <ResourceTable
+            table={table}
+            isLoading={deliveries.isLoading}
+            {...(deliveries.isError ? { error: { title: "Could not load deliveries." } } : {})}
+            onRetry={deliveries.onRetry}
+            emptyTitle={
+              deliveries.filters.templateKey || deliveries.filters.status
+                ? "No deliveries match your filters."
+                : "No deliveries recorded."
+            }
+          />
+          <Pagination
+            page={deliveries.page}
+            pageSize={deliveries.pageSize}
+            totalPages={deliveries.totalPages}
+            total={deliveries.total}
+            isLoading={deliveries.isFetching}
+            onPageChange={deliveries.onPageChange}
+          />
+        </CardContent>
+      </Card>
 
       <MailDetailDrawer selectedDelivery={detail.selectedDelivery} onClose={detail.onClose} />
     </ResourcePageShell>

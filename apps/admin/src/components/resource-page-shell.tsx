@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 
-import { Button } from "@repo/web-ui/button";
-import { Spinner } from "@repo/web-ui/spinner";
+import { RefreshButton } from "@repo/web-ui/refresh-button";
 
 import type { AdminResourceConfig } from "@/lib/admin-resources";
 
@@ -73,10 +72,7 @@ export function ResourcePageShell({
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {onRefresh ? (
-            <Button variant="outline" size="sm" onClick={onRefresh} disabled={isRefreshing}>
-              {isRefreshing ? <Spinner data-icon="inline-start" /> : null}
-              Refresh
-            </Button>
+            <RefreshButton {...(isRefreshing ? { isRefreshing } : {})} onClick={onRefresh} />
           ) : null}
           {actions}
         </div>

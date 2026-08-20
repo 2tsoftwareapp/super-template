@@ -12,6 +12,7 @@ export function useAuditLogsQuery(params: AuditLogsParams) {
       from: params.from,
       to: params.to,
       page: params.page,
+      sortOrder: params.sortOrder,
     }),
     queryFn: () => fetchAuditLogs(params),
     placeholderData: (previous) => previous,

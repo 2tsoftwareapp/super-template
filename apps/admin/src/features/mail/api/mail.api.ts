@@ -27,6 +27,7 @@ export const mailApi = {
       page: params.page,
       templateKey: params.templateKey,
       status: params.status,
+      sortOrder: params.sortOrder,
     });
     return webFetch<ListResponse<MailDeliveryDto>>(path);
   },

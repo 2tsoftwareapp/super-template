@@ -5,15 +5,15 @@ import { Card, CardContent } from "@repo/web-ui/card";
 import { ConfirmDialog } from "@repo/web-ui/confirm-dialog";
 import { Empty } from "@repo/web-ui/empty";
 import { ErrorState } from "@repo/web-ui/error-state";
-import { Input } from "@repo/web-ui/input";
 import { SectionLoading } from "@repo/web-ui/loading";
 import { Pagination } from "@repo/web-ui/pagination";
 import { Show } from "@repo/web-ui/show";
-import { LockKeyhole, Plus, RefreshCcw, Search, ShieldCheck, X } from "lucide-react";
+import { LockKeyhole, Plus, RefreshCcw, ShieldCheck } from "lucide-react";
 
 import type { RolesViewModel } from "@/features/roles/model/roles.types";
 
 import { ResourcePageShell } from "@/components/resource-page-shell";
+import { ResourceToolbar } from "@/components/resource-toolbar";
 import { adminResources } from "@/lib/admin-resources";
 import { formatRoleName } from "@/lib/roles";
 
@@ -83,47 +83,48 @@ export function RolesListView(vm: RolesViewModel) {
     >
       <Card>
         <CardContent className="p-0">
-          <div className="flex items-center gap-3 border-b border-border px-4 py-3">
-            <div className="relative flex-1">
-              <Search className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Search roles or permissions"
-                className="h-9 pl-9 text-sm"
-                value={search}
-                onChange={(e) => onSearchChange(e.target.value)}
-              />
-            </div>
-            <select
-              className="h-9 rounded-md border border-input bg-background px-2 text-sm"
-              value={scopeFilter ?? ""}
-              onChange={(e) =>
-                onScopeFilterChange((e.target.value as "platform" | "organization") || undefined)
-              }
-            >
-              <option value="">All scopes</option>
-              <option value="platform">Platform</option>
-              <option value="organization">Organization</option>
-            </select>
-            {isSuperAdmin && (
-              <select
-                className="h-9 rounded-md border border-input bg-background px-2 text-sm max-w-[200px]"
-                value={vm.organizationFilter ?? ""}
-                onChange={(e) => vm.onOrganizationFilterChange(e.target.value || undefined)}
-              >
-                <option value="">All organizations</option>
-                {organizations.items.map((org) => (
-                  <option key={org.id} value={org.id}>
-                    {org.name}
-                  </option>
-                ))}
-              </select>
-            )}
-            {search && (
-              <Button variant="ghost" size="sm" onClick={() => onSearchChange("")}>
-                <X className="size-4" />
-              </Button>
-            )}
-          </div>
+          <ResourceToolbar
+            search={search}
+            onSearchChange={onSearchChange}
+            searchPlaceholder="Search roles or permissions"
+            hasFilters={Boolean(search ?? scopeFilter ?? vm.organizationFilter)}
+            onClearFilters={() => {
+              onSearchChange("");
+              onScopeFilterChange(undefined);
+              vm.onOrganizationFilterChange(undefined);
+            }}
+            filters={
+              <>
+                <select
+                  className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+                  value={scopeFilter ?? ""}
+                  onChange={(e) =>
+                    onScopeFilterChange(
+                      (e.target.value as "platform" | "organization") || undefined,
+                    )
+                  }
+                >
+                  <option value="">All scopes</option>
+                  <option value="platform">Platform</option>
+                  <option value="organization">Organization</option>
+                </select>
+                {isSuperAdmin && (
+                  <select
+                    className="h-9 rounded-md border border-input bg-background px-2 text-sm max-w-[200px]"
+                    value={vm.organizationFilter ?? ""}
+                    onChange={(e) => vm.onOrganizationFilterChange(e.target.value || undefined)}
+                  >
+                    <option value="">All organizations</option>
+                    {organizations.items.map((org) => (
+                      <option key={org.id} value={org.id}>
+                        {org.name}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </>
+            }
+          />
 
           <Show when={isLoading}>
             <SectionLoading />

@@ -1,14 +1,20 @@
 "use client";
 
+import type { SortCriterion } from "@repo/api-sort";
+
 import { useDebouncedValue } from "@repo/web-hooks/use-debounced-value";
 import { classifyError, getErrorMessage } from "@repo/web-utils/errors";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import type { AuditLogsViewModel } from "@/features/audit-logs/model/audit-logs.types";
+import type {
+  AuditLogsColumnFactory,
+  AuditLogsViewModel,
+} from "@/features/audit-logs/model/audit-logs.types";
 import type { AuditLogDto } from "@/lib/api-types";
 
+import { useResourceTableConfig } from "@/components/use-resource-table-config";
 import { useExportAndDownloadAuditLogsMutation } from "@/features/audit-logs/api/audit-logs.mutations";
 import { useAuditLogsQuery } from "@/features/audit-logs/api/audit-logs.queries";
 import {
@@ -18,8 +24,24 @@ import {
   serializeAuditLogsFilters,
 } from "@/features/audit-logs/model/audit-logs.search-params";
 import { usePathname, useRouter } from "@/i18n/navigation";
+import { createTableSortBridge } from "@/lib/table-sort";
 
 export type { AuditLogsViewModel };
+
+type AuditLogsSortField = "createdAt";
+
+const auditLogsSortBridge = createTableSortBridge<AuditLogsSortField>({
+  fieldByColumn: {
+    createdAt: "createdAt",
+  },
+  columnByField: {
+    createdAt: "createdAt",
+  },
+});
+
+interface UseAuditLogsControllerOptions {
+  createColumns: AuditLogsColumnFactory;
+}
 
 /**
  * Orchestration hook for the audit-logs screen.
@@ -32,7 +54,9 @@ export type { AuditLogsViewModel };
  * Owns: URL ↔ filter sync, list query, export, detail selection.
  * Does not own: table column definitions (presentational UI).
  */
-export function useAuditLogsController(): AuditLogsViewModel {
+export function useAuditLogsController({
+  createColumns,
+}: UseAuditLogsControllerOptions): AuditLogsViewModel {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -54,8 +78,16 @@ export function useAuditLogsController(): AuditLogsViewModel {
   };
 
   const onClearFilters = () => {
-    setFilters({ from: "", to: "", q: "", page: 1 });
+    setFilters({ from: "", to: "", q: "", page: 1, sortOrder: "desc" });
     router.replace(pathname, { scroll: false });
+  };
+
+  const handleSortChange = (nextSort: SortCriterion<AuditLogsSortField>[]) => {
+    const primary = nextSort[0] ?? { field: "createdAt" as const, order: "desc" as const };
+    const next = { ...filters, sortOrder: primary.order, page: 1 };
+    setFilters(next);
+    const qs = serializeAuditLogsFilters(next);
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
   };
 
   const hasFilters = Boolean(filters.from || filters.to || filters.q);
@@ -66,9 +98,32 @@ export function useAuditLogsController(): AuditLogsViewModel {
     from: filters.from ?? undefined,
     to: filters.to ?? undefined,
     q,
+    sortOrder: filters.sortOrder,
   });
 
   const exportMutation = useExportAndDownloadAuditLogsMutation();
+
+  const entries = auditLogs.data?.data ?? [];
+  const totalPages = auditLogs.data?.meta?.totalPages ?? 1;
+  const total = auditLogs.data?.meta?.total ?? 0;
+
+  const auditLogsSort: SortCriterion<AuditLogsSortField>[] = [
+    { field: "createdAt", order: filters.sortOrder },
+  ];
+
+  const { table } = useResourceTableConfig<AuditLogDto, AuditLogsSortField>({
+    data: entries,
+    columns: createColumns({
+      formatAction: formatAuditAction,
+      onSelectEntry: setSelectedEntry,
+    }),
+    enableSelection: false,
+    getRowId: (row) => row.id,
+    listParams: { sort: auditLogsSort },
+    sortBridge: auditLogsSortBridge,
+    onSortChange: handleSortChange,
+    onPageChange: (page) => onFilterChange("page", page),
+  });
 
   function handleExport() {
     exportMutation.mutate(
@@ -109,13 +164,13 @@ export function useAuditLogsController(): AuditLogsViewModel {
     isRefreshing: auditLogs.isFetching,
     hasError: auditLogs.isError,
     onRefresh: () => void auditLogs.refetch(),
-    entries: auditLogs.data?.data ?? [],
-    total: auditLogs.data?.meta?.total ?? 0,
-    totalPages: auditLogs.data?.meta?.totalPages ?? 1,
+    total,
+    totalPages,
     selectedEntry,
     onSelectEntry: setSelectedEntry,
     onExport: handleExport,
     isExporting: exportMutation.isPending,
     formatAction: formatAuditAction,
+    table,
   };
 }

@@ -92,16 +92,6 @@ export interface UserRolesViewModel {
 
 export interface UsersListViewModel {
   session: { isLoading: boolean; isError: boolean };
-  columnData: {
-    pageUsers: AdminUserDto[];
-    canUpdate: boolean;
-    isMutating: boolean;
-    handleActivate: (userId: string) => Promise<void>;
-    handleBlock: (userId: string) => void;
-    handleResendVerification: (email: string) => void;
-    listParams: UsersListParams;
-    onSortChange: (nextSort: UsersListParams["sort"]) => void;
-  };
   header: {
     isLoading: boolean;
     isFetching: boolean;

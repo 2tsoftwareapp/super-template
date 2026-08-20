@@ -1,18 +1,14 @@
 import type { ImportJobDto } from "@/lib/api-types";
 
 import type { IMPORT_TYPES } from "./imports.constants";
+import type { CreateImportFormValues } from "./imports.schemas";
 
 export interface ImportsViewModel {
   form: {
-    fileId: string;
-    type: string;
-    onFileIdChange: (value: string) => void;
-    onTypeChange: (value: string) => void;
-    canSubmit: boolean;
     isCreating: boolean;
     canCreate: boolean;
     importTypes: typeof IMPORT_TYPES;
-    onCreate: () => void;
+    onSubmit: (values: CreateImportFormValues) => void;
   };
   lookup: {
     jobId: string;

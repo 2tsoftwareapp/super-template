@@ -19,6 +19,7 @@ export * from "./label";
 export * from "./loading";
 export * from "./loading-button";
 export * from "./password-input";
+export * from "./refresh-button";
 export * from "./select";
 export * from "./separator";
 export * from "./sheet";

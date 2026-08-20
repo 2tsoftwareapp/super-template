@@ -9,6 +9,7 @@ export interface AuditLogsParams {
   from?: string;
   to?: string;
   q?: string;
+  sortOrder?: "asc" | "desc";
 }
 
 export const auditLogsApi = {
@@ -19,6 +20,7 @@ export const auditLogsApi = {
       from: params.from,
       to: params.to,
       q: params.q,
+      sortOrder: params.sortOrder,
     });
     return webFetch<ListResponse<AuditLogDto>>(path);
   },

@@ -1,6 +1,25 @@
+import type { SortCriterion } from "@repo/api-sort";
+import type { ColumnDef, Table as ReactTable } from "@tanstack/react-table";
+
 import type { FileDto, FileHistoryEventDto, FileVersionDto } from "@/lib/api-types";
 
 import type { FILE_MIME_OPTIONS } from "./files.constants";
+
+export type FilesSortField = "createdAt" | "originalName" | "sizeBytes";
+
+export type FilesSortCriterion = SortCriterion<FilesSortField>;
+
+export interface FilesColumnOptions {
+  canDelete: boolean;
+  formatBytes: (bytes: number) => string;
+  formatMimeType: (mime: string) => string;
+  onDeleteClick: (file: FileDto) => void;
+}
+
+export type FilesColumnFactory = (
+  options: FilesColumnOptions,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- mirrors TanStack's own `columns: ColumnDef<TData, any>[]` input type
+) => ColumnDef<FileDto, any>[];
 
 export interface FilesViewModel {
   header: {
@@ -29,9 +48,7 @@ export interface FilesViewModel {
     onPageChange: (page: number) => void;
     resultLabel: string;
     onRowClick: (file: FileDto) => void;
-    onDeleteClick: (file: FileDto) => void;
     hasFilters: boolean;
-    canDelete: boolean;
     formatBytes: (bytes: number) => string;
     formatMimeType: (mime: string) => string;
   };
@@ -75,4 +92,5 @@ export interface FilesViewModel {
     onCancel: () => void;
     onConfirm: () => void;
   };
+  table: ReactTable<FileDto>;
 }

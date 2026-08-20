@@ -2,20 +2,33 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/web-ui/card";
 import { ConfirmDialog } from "@repo/web-ui/confirm-dialog";
+import { LoadingButton } from "@repo/web-ui/loading-button";
+import { Pagination } from "@repo/web-ui/pagination";
+import { Upload } from "lucide-react";
 import { useRef } from "react";
 
 import type { FilesViewModel } from "@/features/files/model/files.types";
 
 import { ResourcePageShell } from "@/components/resource-page-shell";
+import { ResourceTable } from "@/components/resource-table";
+import { ResourceToolbar } from "@/components/resource-toolbar";
 import { adminResources } from "@/lib/admin-resources";
 
 import { FilesDetailDrawer } from "./files-detail-drawer";
-import { FilesHeader } from "./files-header";
-import { FilesTable } from "./files-table";
 
 export function FilesListView(viewModel: FilesViewModel) {
-  const { header, toolbar, list, upload, detail, versions, history, detailTabs, confirmDelete } =
-    viewModel;
+  const {
+    header,
+    toolbar,
+    list,
+    upload,
+    detail,
+    versions,
+    history,
+    detailTabs,
+    confirmDelete,
+    table,
+  } = viewModel;
   const uploadFileRef = useRef<HTMLInputElement>(null);
   const versionFileRef = useRef<HTMLInputElement>(null);
 
@@ -50,45 +63,63 @@ export function FilesListView(viewModel: FilesViewModel) {
         onRefresh={header.onRefresh}
       >
         <Card>
-          <FilesHeader
-            search={toolbar.search}
-            onSearchChange={toolbar.onSearchChange}
-            hasFilters={toolbar.hasFilters}
-            onClearFilters={toolbar.onClearFilters}
-            mimeFilter={toolbar.mimeFilter}
-            onMimeFilterChange={toolbar.onMimeFilterChange}
-            mimeOptions={toolbar.mimeOptions}
-            isFetching={header.isFetching}
-            onRefresh={header.onRefresh}
-            isUploadPending={upload.isPending}
-            onUploadClick={() => uploadFileRef.current?.click()}
-            canUpload={toolbar.canUpload}
-            resultLabel={list.resultLabel}
-          />
-        </Card>
-
-        <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-base">Files</CardTitle>
             <CardDescription className="text-xs">
               {list.total} file{list.total !== 1 ? "s" : ""} stored
             </CardDescription>
           </CardHeader>
+          <ResourceToolbar
+            search={toolbar.search}
+            onSearchChange={toolbar.onSearchChange}
+            searchPlaceholder="Search by file name"
+            hasFilters={toolbar.hasFilters}
+            onClearFilters={toolbar.onClearFilters}
+            resultLabel={list.resultLabel}
+            filters={
+              <select
+                className="h-9 rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                value={toolbar.mimeFilter}
+                onChange={(e) => toolbar.onMimeFilterChange(e.target.value)}
+              >
+                {toolbar.mimeOptions.map((opt) => (
+                  <option key={opt.value || "all"} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            }
+            actions={
+              toolbar.canUpload ? (
+                <LoadingButton
+                  size="sm"
+                  onClick={() => uploadFileRef.current?.click()}
+                  loading={upload.isPending}
+                >
+                  <Upload data-icon="inline-start" />
+                  Upload
+                </LoadingButton>
+              ) : null
+            }
+          />
           <CardContent className="p-0 pb-1">
-            <FilesTable
-              files={list.files}
+            <ResourceTable
+              table={table}
               isLoading={list.isLoading}
-              isError={list.isError}
+              {...(list.isError ? { error: { title: "Could not load files." } } : {})}
               onRetry={list.onRetry}
+              onRowClick={(row) => list.onRowClick(row.original)}
+              emptyTitle={
+                list.hasFilters ? "No files match your filters." : "No files uploaded yet."
+              }
+            />
+            <Pagination
               page={list.page}
+              pageSize={50}
               totalPages={list.totalPages}
+              total={list.total}
+              isLoading={header.isFetching}
               onPageChange={list.onPageChange}
-              onRowClick={list.onRowClick}
-              onDeleteClick={list.onDeleteClick}
-              hasFilters={list.hasFilters}
-              canDelete={list.canDelete}
-              formatBytes={list.formatBytes}
-              formatMimeType={list.formatMimeType}
             />
           </CardContent>
         </Card>

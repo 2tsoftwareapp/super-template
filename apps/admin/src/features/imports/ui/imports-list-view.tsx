@@ -1,21 +1,20 @@
 "use client";
 
 import { Badge } from "@repo/web-ui/badge";
-import { Button } from "@repo/web-ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/web-ui/card";
 import { ConfirmDialog } from "@repo/web-ui/confirm-dialog";
 import { ErrorState } from "@repo/web-ui/error-state";
-import { Input } from "@repo/web-ui/input";
-import { Label } from "@repo/web-ui/label";
 import { SectionLoading } from "@repo/web-ui/loading";
 import { LoadingButton } from "@repo/web-ui/loading-button";
 import { Separator } from "@repo/web-ui/separator";
 import { Show } from "@repo/web-ui/show";
-import { AlertCircle, CheckCircle2, Clock, RefreshCw, Search } from "lucide-react";
+import { AlertCircle, CheckCircle2, Clock, RefreshCw } from "lucide-react";
 
 import type { ImportsViewModel } from "@/features/imports/model/imports.types";
 
 import { ResourcePageShell } from "@/components/resource-page-shell";
+import { ResourceToolbar } from "@/components/resource-toolbar";
+import { CreateImportForm } from "@/features/imports/ui/create-import-form";
 import { adminResources } from "@/lib/admin-resources";
 import { scalarString, timeAgo } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -60,6 +59,8 @@ export function ImportsListView({ form, lookup, job, confirm }: ImportsViewModel
     <ResourcePageShell
       resource={importsResource}
       description="Create import jobs from uploaded files, inspect progress, and confirm when ready."
+      isRefreshing={lookup.isFetching}
+      onRefresh={lookup.onRefresh}
     >
       <div className="grid gap-4 xl:grid-cols-[0.95fr_1.05fr]">
         <Card>
@@ -68,46 +69,12 @@ export function ImportsListView({ form, lookup, job, confirm }: ImportsViewModel
             <CardDescription>Queue a new import job referencing an uploaded file.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="import-file-id">File ID</Label>
-              <Input
-                id="import-file-id"
-                placeholder="UUID of the uploaded file"
-                value={form.fileId}
-                onChange={(e) => form.onFileIdChange(e.target.value)}
-                disabled={!form.canCreate}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="import-type">Type</Label>
-              <select
-                id="import-type"
-                className="flex h-9 w-full rounded-lg border border-input bg-background px-3 text-sm shadow-xs outline-hidden transition-colors focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
-                value={form.type}
-                onChange={(e) => form.onTypeChange(e.target.value)}
-                disabled={!form.canCreate}
-              >
-                {form.importTypes.map((t) => (
-                  <option key={t.value} value={t.value}>
-                    {t.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-            {form.canCreate ? (
-              <LoadingButton
-                className="w-full"
-                onClick={form.onCreate}
-                disabled={!form.canSubmit}
-                loading={form.isCreating}
-              >
-                Create import
-              </LoadingButton>
-            ) : (
-              <p className="text-xs text-muted-foreground">
-                You do not have permission to create imports.
-              </p>
-            )}
+            <CreateImportForm
+              importTypes={form.importTypes}
+              canCreate={form.canCreate}
+              isCreating={form.isCreating}
+              onSubmit={form.onSubmit}
+            />
           </CardContent>
         </Card>
 
@@ -116,27 +83,12 @@ export function ImportsListView({ form, lookup, job, confirm }: ImportsViewModel
             <CardTitle className="text-base">Job detail</CardTitle>
             <CardDescription>Look up an import job by ID to inspect and confirm.</CardDescription>
           </CardHeader>
+          <ResourceToolbar
+            search={lookup.jobId}
+            onSearchChange={lookup.onJobIdChange}
+            searchPlaceholder="Import job ID"
+          />
           <CardContent className="space-y-4">
-            <div className="flex gap-2">
-              <div className="relative flex-1">
-                <Search className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  placeholder="Import job ID"
-                  value={lookup.jobId}
-                  onChange={(e) => lookup.onJobIdChange(e.target.value)}
-                  className="pl-8"
-                />
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={lookup.onRefresh}
-                disabled={lookup.isFetching || !lookup.jobId}
-              >
-                <RefreshCw className={cn("size-3.5", lookup.isFetching && "animate-spin")} />
-              </Button>
-            </div>
-
             <Show when={!!lookup.jobId && job.isLoading}>
               <SectionLoading />
             </Show>

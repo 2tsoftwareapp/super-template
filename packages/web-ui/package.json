@@ -33,6 +33,7 @@
     "./pagination": "./src/components/pagination.tsx",
     "./password-input": "./src/components/password-input.tsx",
     "./popover": "./src/components/popover.tsx",
+    "./refresh-button": "./src/components/refresh-button.tsx",
     "./select": "./src/components/select.tsx",
     "./separator": "./src/components/separator.tsx",
     "./sheet": "./src/components/sheet.tsx",

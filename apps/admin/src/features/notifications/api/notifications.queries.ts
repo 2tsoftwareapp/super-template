@@ -5,10 +5,10 @@ import { useQuery } from "@tanstack/react-query";
 import { notificationsApi } from "./notifications.api";
 import { notificationsKeys } from "./notifications.query-keys";
 
-export function useNotificationJobsQuery(enabled = true) {
+export function useNotificationJobsQuery(enabled = true, sortOrder?: "asc" | "desc") {
   return useQuery({
-    queryKey: notificationsKeys.jobs(),
-    queryFn: () => notificationsApi.jobs(),
+    queryKey: notificationsKeys.jobs({ sortOrder }),
+    queryFn: () => notificationsApi.jobs(sortOrder),
     staleTime: 0,
     enabled,
   });

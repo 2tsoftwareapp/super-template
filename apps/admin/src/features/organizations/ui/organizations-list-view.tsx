@@ -4,14 +4,14 @@ import { Button } from "@repo/web-ui/button";
 import { Card, CardContent } from "@repo/web-ui/card";
 import { Empty } from "@repo/web-ui/empty";
 import { ErrorState } from "@repo/web-ui/error-state";
-import { Input } from "@repo/web-ui/input";
 import { SectionLoading } from "@repo/web-ui/loading";
 import { Show } from "@repo/web-ui/show";
-import { Building, Plus, RefreshCcw, Search, X } from "lucide-react";
+import { Building, Plus, RefreshCcw } from "lucide-react";
 
 import type { OrganizationsListViewModel } from "@/features/organizations/model/organizations.types";
 
 import { ResourcePageShell } from "@/components/resource-page-shell";
+import { ResourceToolbar } from "@/components/resource-toolbar";
 import { adminResources } from "@/lib/admin-resources";
 
 import { CreateOrganizationDrawer } from "./create-organization-drawer";
@@ -69,22 +69,13 @@ export function OrganizationsListView(vm: OrganizationsListViewModel) {
       >
         <Card>
           <CardContent className="p-0">
-            <div className="flex items-center gap-3 border-b border-border px-4 py-3">
-              <div className="relative flex-1">
-                <Search className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  placeholder="Search organizations or slugs..."
-                  className="h-9 pl-9 text-sm"
-                  value={search}
-                  onChange={(e) => onSearchChange(e.target.value)}
-                />
-              </div>
-              {search ? (
-                <Button variant="ghost" size="sm" onClick={() => onSearchChange("")}>
-                  <X className="size-4" />
-                </Button>
-              ) : null}
-            </div>
+            <ResourceToolbar
+              search={search}
+              onSearchChange={onSearchChange}
+              searchPlaceholder="Search organizations or slugs..."
+              hasFilters={Boolean(search)}
+              onClearFilters={() => onSearchChange("")}
+            />
 
             <Show when={isLoading}>
               <div className="p-8">

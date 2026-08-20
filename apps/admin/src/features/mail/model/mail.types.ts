@@ -1,7 +1,11 @@
+import type { ColumnDef } from "@tanstack/react-table";
+import type { Table as ReactTable } from "@tanstack/react-table";
+
 import type { AdminResourceConfig } from "@/lib/admin-resources";
 import type { MailDeliveryDto, MailPreviewDto, MailTemplateDto } from "@/lib/api-types";
 
 import type { DELIVERY_STATUS_OPTIONS } from "./mail.constants";
+import type { SendMailFormValues } from "./mail.schemas";
 import type { MailFilters } from "./mail.search-params";
 
 export interface MailDeliveriesParams {
@@ -9,7 +13,17 @@ export interface MailDeliveriesParams {
   status?: string | undefined;
   page: number;
   limit: number;
+  sortOrder?: "asc" | "desc" | undefined;
 }
+
+export interface MailDeliveriesColumnOptions {
+  onSelectDelivery: (delivery: MailDeliveryDto) => void;
+}
+
+export type MailDeliveriesColumnFactory = (
+  options: MailDeliveriesColumnOptions,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- mirrors TanStack's own `columns: ColumnDef<TData, any>[]` input type
+) => ColumnDef<MailDeliveryDto, any>[];
 
 export interface SendMailInput {
   templateKey: string;
@@ -44,19 +58,9 @@ export interface MailViewModel {
   };
   sendForm: {
     canAccess: boolean;
-    selectedTemplateKey: string;
-    recipient: string;
-    variableValues: Record<string, string>;
-    idempotencyKey: string;
     sendableTemplates: MailTemplateDto[];
-    selectedTemplate: MailTemplateDto | undefined;
-    onChangeTemplate: (key: string) => void;
-    onChangeRecipient: (email: string) => void;
-    onVariableChange: (name: string, value: string) => void;
-    onChangeIdempotencyKey: (key: string) => void;
-    onSend: () => void;
     isPending: boolean;
-    canSend: boolean;
+    onSend: (values: SendMailFormValues) => void;
   };
   deliveries: {
     items: MailDeliveryDto[];
@@ -79,11 +83,11 @@ export interface MailViewModel {
     };
     onFilterChange: (key: keyof MailFilters, value: string | number) => void;
     onPageChange: (page: number) => void;
-    onRefresh: () => void;
   };
   detail: {
     selectedDelivery: MailDeliveryDto | null;
     onSelect: (delivery: MailDeliveryDto | null) => void;
     onClose: () => void;
   };
+  table: ReactTable<MailDeliveryDto>;
 }

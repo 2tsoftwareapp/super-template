@@ -8,6 +8,8 @@ export interface FilesParams {
   search?: string | undefined;
   mimeFilter?: string | undefined;
   page: number;
+  sortField?: "createdAt" | "originalName" | "sizeBytes" | undefined;
+  sortOrder?: "asc" | "desc" | undefined;
 }
 
 /**
@@ -20,6 +22,8 @@ export const filesApi = {
       page: params.page,
       search: params.search,
       mimeType: params.mimeFilter,
+      sortField: params.sortField,
+      sortOrder: params.sortOrder,
     });
     return webFetch<ListResponse<FileDto>>(path);
   },
