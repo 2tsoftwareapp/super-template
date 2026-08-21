@@ -1,4 +1,8 @@
-import type { BackgroundJobEnqueueInput } from "@repo/api-core";
+import type {
+  BackgroundJobEnqueueInput,
+  BackgroundJobEnqueuerWithResult,
+  BackgroundJobRef,
+} from "@repo/api-core";
 
 import { Injectable } from "@nestjs/common";
 
@@ -17,7 +21,7 @@ export type { JobHandler } from "./jobs.types";
  * directly instead of this facade.
  */
 @Injectable()
-export class JobsService {
+export class JobsService implements BackgroundJobEnqueuerWithResult {
   constructor(
     private readonly enqueueJobUseCase: EnqueueJobUseCase,
     private readonly processJobsUseCase: ProcessJobsUseCase,
@@ -30,6 +34,12 @@ export class JobsService {
 
   enqueue(input: EnqueueJobCommand | BackgroundJobEnqueueInput) {
     return this.enqueueJobUseCase.execute(input);
+  }
+
+  enqueueWithResult(input: BackgroundJobEnqueueInput): Promise<BackgroundJobRef> {
+    return this.enqueueJobUseCase
+      .execute(input)
+      .then((view) => ({ id: view.id, status: view.status }));
   }
 
   processDueJobs() {

@@ -1,10 +1,15 @@
-import type { AuthenticatedRequestUser } from "@repo/api-core";
+import type { AuthenticatedRequestUser, BackgroundJobEnqueuerWithResult } from "@repo/api-core";
 
-import { forwardRef, HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, ERROR_CODES, isMandatoryMailTemplate, SYSTEM_SCOPE } from "@repo/api-core";
+import { HttpStatus, Inject, Injectable } from "@nestjs/common";
+import {
+  AppError,
+  BACKGROUND_JOB_ENQUEUER_WITH_RESULT,
+  ERROR_CODES,
+  isMandatoryMailTemplate,
+  SYSTEM_SCOPE,
+} from "@repo/api-core";
 
 import { AuditService } from "../../../audit";
-import { JobsService } from "../../../jobs/application/jobs.service";
 import {
   TEMPLATE_RENDERER_SERVICE,
   type TemplateRendererServicePort,
@@ -22,8 +27,8 @@ export class SendAdminMailUseCase {
   constructor(
     @Inject(TEMPLATE_RENDERER_SERVICE)
     private readonly templateRenderer: TemplateRendererServicePort,
-    @Inject(forwardRef(() => JobsService))
-    private readonly jobsService: JobsService,
+    @Inject(BACKGROUND_JOB_ENQUEUER_WITH_RESULT)
+    private readonly jobEnqueuer: BackgroundJobEnqueuerWithResult,
     private readonly auditService: AuditService,
   ) {}
 
@@ -58,7 +63,7 @@ export class SendAdminMailUseCase {
       );
     }
 
-    const job = await this.jobsService.enqueue({
+    const job = await this.jobEnqueuer.enqueueWithResult({
       type: "mail.send",
       payload: {
         templateKey: command.templateKey,

@@ -21,12 +21,12 @@ describe("SendAdminMailUseCase", () => {
       listTemplateKeys: vi.fn(() => ["auth.welcome"]),
       findMissingVariables: vi.fn(),
     };
-    const jobsService = { enqueue: vi.fn() };
+    const jobEnqueuer = { enqueueWithResult: vi.fn() };
     const auditService = { log: vi.fn() };
 
     const useCase = new SendAdminMailUseCase(
       templateRenderer as never,
-      jobsService as never,
+      jobEnqueuer as never,
       auditService as never,
     );
 
@@ -39,7 +39,7 @@ describe("SendAdminMailUseCase", () => {
       code: ERROR_CODES.VALIDATION_FAILED,
     });
 
-    expect(jobsService.enqueue).not.toHaveBeenCalled();
+    expect(jobEnqueuer.enqueueWithResult).not.toHaveBeenCalled();
     expect(auditService.log).not.toHaveBeenCalled();
   });
 
@@ -48,12 +48,12 @@ describe("SendAdminMailUseCase", () => {
       listTemplateKeys: vi.fn(() => ["auth.welcome"]),
       findMissingVariables: vi.fn(),
     };
-    const jobsService = { enqueue: vi.fn() };
+    const jobEnqueuer = { enqueueWithResult: vi.fn() };
     const auditService = { log: vi.fn() };
 
     const useCase = new SendAdminMailUseCase(
       templateRenderer as never,
-      jobsService as never,
+      jobEnqueuer as never,
       auditService as never,
     );
 
@@ -72,12 +72,12 @@ describe("SendAdminMailUseCase", () => {
       listTemplateKeys: vi.fn(() => ["auth.welcome"]),
       findMissingVariables: vi.fn(async () => ["displayName"]),
     };
-    const jobsService = { enqueue: vi.fn() };
+    const jobEnqueuer = { enqueueWithResult: vi.fn() };
     const auditService = { log: vi.fn() };
 
     const useCase = new SendAdminMailUseCase(
       templateRenderer as never,
-      jobsService as never,
+      jobEnqueuer as never,
       auditService as never,
     );
 
@@ -89,7 +89,7 @@ describe("SendAdminMailUseCase", () => {
     ).rejects.toMatchObject({
       code: ERROR_CODES.VALIDATION_FAILED,
     });
-    expect(jobsService.enqueue).not.toHaveBeenCalled();
+    expect(jobEnqueuer.enqueueWithResult).not.toHaveBeenCalled();
   });
 
   it("enqueues a mail.send job and records an audit entry when valid", async () => {
@@ -97,14 +97,14 @@ describe("SendAdminMailUseCase", () => {
       listTemplateKeys: vi.fn(() => ["auth.welcome"]),
       findMissingVariables: vi.fn(async () => []),
     };
-    const jobsService = {
-      enqueue: vi.fn(async () => ({ id: "job-1", status: "PENDING" })),
+    const jobEnqueuer = {
+      enqueueWithResult: vi.fn(async () => ({ id: "job-1", status: "PENDING" })),
     };
     const auditService = { log: vi.fn(async () => undefined) };
 
     const useCase = new SendAdminMailUseCase(
       templateRenderer as never,
-      jobsService as never,
+      jobEnqueuer as never,
       auditService as never,
     );
 
@@ -115,7 +115,7 @@ describe("SendAdminMailUseCase", () => {
       idempotencyKey: "key-1",
     });
 
-    expect(jobsService.enqueue).toHaveBeenCalledWith(
+    expect(jobEnqueuer.enqueueWithResult).toHaveBeenCalledWith(
       expect.objectContaining({
         type: "mail.send",
         organizationId: "org-1",

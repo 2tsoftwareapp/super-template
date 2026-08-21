@@ -1,13 +1,7 @@
 "use client";
 
-import type { SortCriterion } from "@repo/api-sort";
-
-import { useDebouncedValue } from "@repo/web-hooks/use-debounced-value";
-import { getErrorMessage } from "@repo/web-utils/errors";
 import { useQueryClient } from "@tanstack/react-query";
-import { useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { toast } from "sonner";
 
 import type {
   FilesColumnFactory,
@@ -18,12 +12,6 @@ import type { FileDto } from "@/lib/api-types";
 
 import { useResourceTableConfig } from "@/components/use-resource-table-config";
 import {
-  useDeleteFileMutation,
-  useGetFileDownloadUrlMutation,
-  useUploadFileMutation,
-  useUploadVersionMutation,
-} from "@/features/files/api/files.mutations";
-import {
   useFileHistoryQuery,
   useFilesQuery,
   useFileVersionsQuery,
@@ -32,14 +20,11 @@ import { filesKeys } from "@/features/files/api/files.query-keys";
 import { formatBytes, formatMimeType } from "@/features/files/model/files-formatting";
 import { FILE_MIME_OPTIONS } from "@/features/files/model/files.constants";
 import { selectFilePermissions } from "@/features/files/model/files.permissions";
-import {
-  type FilesFilters,
-  parseFilesFilters,
-  serializeFilesFilters,
-} from "@/features/files/model/files.search-params";
 import { useSession } from "@/hooks/use-session";
-import { usePathname, useRouter } from "@/i18n/navigation";
 import { createTableSortBridge } from "@/lib/table-sort";
+
+import { useFilesMutations } from "./use-files-mutations";
+import { useFilesUrlState } from "./use-files-url-state";
 
 export type { FilesViewModel };
 
@@ -75,45 +60,15 @@ interface UseFilesControllerOptions {
  * Does not own: table column atoms or drawer markup.
  */
 export function useFilesController({ createColumns }: UseFilesControllerOptions): FilesViewModel {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const pathname = usePathname();
   const queryClient = useQueryClient();
   const session = useSession();
   const permissions = selectFilePermissions(session.data?.data.permissions);
 
-  const [filters, setFilters] = useState<FilesFilters>(() =>
-    parseFilesFilters(new URLSearchParams(searchParams.toString())),
-  );
+  const { filters, debouncedSearch, hasFilters, onFilterChange, onClearFilters, handleSortChange } =
+    useFilesUrlState();
+
   const [selectedFile, setSelectedFile] = useState<FileDto | null>(null);
   const [detailTab, setDetailTab] = useState<"versions" | "history">("versions");
-  const [deleteTarget, setDeleteTarget] = useState<FileDto | null>(null);
-
-  const onFilterChange = (key: keyof FilesFilters, value: string | number) => {
-    const next = { ...filters, [key]: value };
-    if (key !== "page") {
-      next.page = 1;
-    }
-    setFilters(next);
-    const qs = serializeFilesFilters(next);
-    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
-  };
-
-  const onClearFilters = () => {
-    setFilters({ q: "", mime: "", page: 1, sortField: "createdAt", sortOrder: "desc" });
-    router.replace(pathname, { scroll: false });
-  };
-
-  const handleSortChange = (nextSort: SortCriterion<FilesSortField>[]) => {
-    const primary = nextSort[0] ?? { field: "createdAt" as const, order: "desc" as const };
-    const next = { ...filters, sortField: primary.field, sortOrder: primary.order, page: 1 };
-    setFilters(next);
-    const qs = serializeFilesFilters(next);
-    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
-  };
-
-  const hasFilters = Boolean(filters.q || filters.mime);
-  const debouncedSearch = useDebouncedValue(filters.q, 400);
 
   const files = useFilesQuery({
     search: debouncedSearch,
@@ -126,10 +81,18 @@ export function useFilesController({ createColumns }: UseFilesControllerOptions)
   const versions = useFileVersionsQuery(selectedFile?.id);
   const history = useFileHistoryQuery(selectedFile?.id);
 
-  const deleteFile = useDeleteFileMutation();
-  const uploadFile = useUploadFileMutation();
-  const uploadVersion = useUploadVersionMutation();
-  const downloadUrl = useGetFileDownloadUrlMutation();
+  const {
+    deleteFile,
+    uploadFile,
+    uploadVersion,
+    downloadUrl,
+    handleDownload,
+    handleUpload,
+    handleUploadVersion,
+    handleConfirmDelete,
+    deleteTarget,
+    setDeleteTarget,
+  } = useFilesMutations({ selectedFile, setSelectedFile });
 
   const entries = files.data?.data ?? [];
   const totalPages = files.data?.meta?.totalPages ?? 1;
@@ -173,54 +136,6 @@ export function useFilesController({ createColumns }: UseFilesControllerOptions)
   const handleRowClick = (file: FileDto) => {
     setSelectedFile(file);
     setDetailTab("versions");
-  };
-
-  const handleDownload = () => {
-    if (!selectedFile) return;
-    downloadUrl.mutate(selectedFile.id, {
-      onSuccess: (url) => {
-        window.open(url, "_blank");
-      },
-      onError: (error) => {
-        toast.error(getErrorMessage(error));
-      },
-    });
-  };
-
-  const handleUpload = (file: File) => {
-    uploadFile.mutate(file, {
-      onError: (error) => {
-        toast.error(getErrorMessage(error));
-      },
-    });
-  };
-
-  const handleUploadVersion = (file: File) => {
-    if (!selectedFile) return;
-    uploadVersion.mutate(
-      { fileId: selectedFile.id, file },
-      {
-        onError: (error) => {
-          toast.error(getErrorMessage(error));
-        },
-      },
-    );
-  };
-
-  const handleConfirmDelete = () => {
-    if (!deleteTarget) return;
-    const targetId = deleteTarget.id;
-    deleteFile.mutate(targetId, {
-      onSuccess: () => {
-        setDeleteTarget(null);
-        if (selectedFile?.id === targetId) {
-          setSelectedFile(null);
-        }
-      },
-      onError: (error) => {
-        toast.error(getErrorMessage(error));
-      },
-    });
   };
 
   return {

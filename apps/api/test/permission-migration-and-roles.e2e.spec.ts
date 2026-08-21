@@ -1,10 +1,7 @@
 import type { INestApplication } from "@nestjs/common";
 
 import { randomUUID } from "node:crypto";
-import {
-  ACCESS_CONTROL_REPOSITORY,
-  type AccessControlRepositoryPort,
-} from "@repo/api-identity/modules/access-control/application/access-control.repository.port";
+import { ACCESS_CONTROL_REPOSITORY, type AccessControlRepositoryPort } from "@repo/api-identity";
 import { RoleManagementUseCase } from "@repo/api-identity/modules/access-control/application/use-cases/role-management.use-case";
 import { seedDatabase } from "@repo/api-seed";
 import { Pool } from "pg";
@@ -356,7 +353,7 @@ describe("Roles migration and provisioning (e2e)", () => {
         ),
       );
 
-      expect(new Set(resolvedRoles.map(({ id }) => id)).size).toBe(1);
+      expect(new Set(resolvedRoles.map((role: { id: string }) => role.id)).size).toBe(1);
 
       const roleRows = await pool.query<{ id: string }>(
         `

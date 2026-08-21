@@ -67,8 +67,11 @@ export { AUDIT_WRITER, type AuditLogInput, type AuditWriter } from "./ports/audi
 export { AUTH_TOKEN_CLEANUP, type AuthTokenCleanup } from "./ports/auth-token-cleanup.port";
 export {
   BACKGROUND_JOB_ENQUEUER,
+  BACKGROUND_JOB_ENQUEUER_WITH_RESULT,
   type BackgroundJobEnqueueInput,
   type BackgroundJobEnqueuer,
+  type BackgroundJobEnqueuerWithResult,
+  type BackgroundJobRef,
 } from "./ports/background-job-enqueuer.port";
 export {
   ENTITY_ATTACHMENT_LISTING,

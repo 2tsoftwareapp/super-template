@@ -1,5 +1,5 @@
-import { forwardRef, Module } from "@nestjs/common";
-import { BACKGROUND_JOB_ENQUEUER } from "@repo/api-core";
+import { Module } from "@nestjs/common";
+import { BACKGROUND_JOB_ENQUEUER, BACKGROUND_JOB_ENQUEUER_WITH_RESULT } from "@repo/api-core";
 
 import { MailModule } from "../mail";
 import { JobsMapper } from "./application/jobs.mapper";
@@ -23,7 +23,7 @@ import { JobsRepository } from "./infrastructure/jobs.repository";
 import { AdminJobsController } from "./presentation/admin-jobs.controller";
 
 @Module({
-  imports: [forwardRef(() => MailModule)],
+  imports: [MailModule],
   controllers: [AdminJobsController],
   providers: [
     JobsRepository,
@@ -54,7 +54,16 @@ import { AdminJobsController } from "./presentation/admin-jobs.controller";
       provide: BACKGROUND_JOB_ENQUEUER,
       useExisting: JobsService,
     },
+    {
+      provide: BACKGROUND_JOB_ENQUEUER_WITH_RESULT,
+      useExisting: JobsService,
+    },
   ],
-  exports: [JobsService, BACKGROUND_JOB_ENQUEUER, JOBS_REPOSITORY, JOB_OBSERVABILITY_REPOSITORY],
+  exports: [
+    BACKGROUND_JOB_ENQUEUER,
+    BACKGROUND_JOB_ENQUEUER_WITH_RESULT,
+    JOBS_REPOSITORY,
+    JOB_OBSERVABILITY_REPOSITORY,
+  ],
 })
 export class JobsModule {}
