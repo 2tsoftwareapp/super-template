@@ -47,7 +47,7 @@ import { Skeleton } from "../skeleton";
 import { Spinner } from "../spinner";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../table";
 import { Textarea } from "../textarea";
-import { Tooltip } from "../tooltip";
+import { Tooltip, TooltipProvider } from "../tooltip";
 
 describe("UI Component Smoke Tests", () => {
   afterEach(() => {
@@ -289,18 +289,22 @@ describe("UI Component Smoke Tests", () => {
 
   it("renders Tooltip convenience API without content", () => {
     render(
-      <Tooltip>
-        <button type="button">bare trigger</button>
-      </Tooltip>,
+      <TooltipProvider>
+        <Tooltip>
+          <button type="button">bare trigger</button>
+        </Tooltip>
+      </TooltipProvider>,
     );
     expect(screen.getByText("bare trigger")).toBeInTheDocument();
   });
 
   it("renders Tooltip convenience API with content", () => {
     render(
-      <Tooltip content="tip text">
-        <button type="button">hover me</button>
-      </Tooltip>,
+      <TooltipProvider>
+        <Tooltip content="tip text">
+          <button type="button">hover me</button>
+        </Tooltip>
+      </TooltipProvider>,
     );
     expect(screen.getByText("hover me")).toBeInTheDocument();
   });

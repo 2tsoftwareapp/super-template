@@ -331,32 +331,24 @@ export function LandingView() {
               production tooling from day one.
             </p>
             <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
-              <Button size="lg" nativeButton={false} render={<a href="#get-started" />}>
-                Get started
+              <Button size="lg" asChild>
+                <a href="#get-started">Get started</a>
               </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                nativeButton={false}
-                render={<a href={ADMIN_URL} target="_blank" rel="noopener noreferrer" />}
-              >
-                <LayoutDashboard className="size-4" />
-                Open admin
+              <Button variant="outline" size="lg" asChild>
+                <a href={ADMIN_URL} target="_blank" rel="noopener noreferrer">
+                  <LayoutDashboard className="size-4" />
+                  Open admin
+                </a>
               </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                nativeButton={false}
-                render={
-                  <a
-                    href="https://github.com/truongnat/super-template"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  />
-                }
-              >
-                <Github className="size-4" />
-                GitHub
+              <Button variant="outline" size="lg" asChild>
+                <a
+                  href="https://github.com/truongnat/super-template"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Github className="size-4" />
+                  GitHub
+                </a>
               </Button>
             </div>
             <div className="mt-12 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-muted-foreground">

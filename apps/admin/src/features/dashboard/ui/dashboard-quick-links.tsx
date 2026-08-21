@@ -27,10 +27,12 @@ export function DashboardQuickLinks() {
               variant="outline"
               size="sm"
               className="h-7 gap-1.5 px-2 text-xs"
-              render={<Link href={item.href} />}
+              asChild
             >
-              <Icon className="size-3" />
-              {item.label}
+              <Link href={item.href}>
+                <Icon className="size-3" />
+                {item.label}
+              </Link>
             </Button>
           );
         })}
