@@ -1,8 +1,9 @@
 import { Badge } from "@repo/web-ui/badge";
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@repo/web-ui/card";
+import { Empty, EmptyContent, EmptyHeader, EmptyTitle } from "@repo/web-ui/empty";
 import { ErrorState } from "@repo/web-ui/error-state";
 import { SectionLoading } from "@repo/web-ui/loading";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, UserPlus } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
 
@@ -45,7 +46,13 @@ export function DashboardUsers({ isLoading, isError, onRetry, recentUsers }: Das
             action={{ label: "Retry", onClick: onRetry }}
           />
         ) : recentUsers.length === 0 ? (
-          <p className="py-4 text-center text-xs text-muted-foreground">No users yet</p>
+          <Empty className="py-6">
+            <EmptyContent>
+              <EmptyHeader>
+                <EmptyTitle>No users yet</EmptyTitle>
+              </EmptyHeader>
+            </EmptyContent>
+          </Empty>
         ) : (
           <div className="divide-y divide-border">
             {recentUsers.map((user) => (

@@ -2,6 +2,7 @@
 
 import { Badge } from "@repo/web-ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/web-ui/card";
+import { Empty, EmptyContent, EmptyHeader, EmptyTitle } from "@repo/web-ui/empty";
 import { ErrorState } from "@repo/web-ui/error-state";
 import { SectionLoading } from "@repo/web-ui/loading";
 import { Show } from "@repo/web-ui/show";
@@ -58,8 +59,14 @@ export function MailTemplateCatalog({ catalog }: MailTemplateCatalogProps) {
             ) : null}
             {!isLoading && !isError && items.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={4} className="py-16 text-center text-sm text-muted-foreground">
-                  No templates found.
+                <TableCell colSpan={4}>
+                  <Empty className="py-10">
+                    <EmptyContent>
+                      <EmptyHeader>
+                        <EmptyTitle>No templates found</EmptyTitle>
+                      </EmptyHeader>
+                    </EmptyContent>
+                  </Empty>
                 </TableCell>
               </TableRow>
             ) : null}

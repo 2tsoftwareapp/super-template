@@ -2,6 +2,7 @@
 
 import { Badge } from "@repo/web-ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/web-ui/card";
+import { Empty, EmptyContent, EmptyHeader, EmptyTitle } from "@repo/web-ui/empty";
 import { ErrorState } from "@repo/web-ui/error-state";
 import { SectionLoading } from "@repo/web-ui/loading";
 import { Show } from "@repo/web-ui/show";
@@ -95,9 +96,13 @@ export function NotificationsListView({
                 />
               </Show>
               {!recent.isLoading && !recent.isError && recent.data.length === 0 ? (
-                <p className="py-4 text-center text-sm text-muted-foreground">
-                  No recent notifications.
-                </p>
+                <Empty className="py-6">
+                  <EmptyContent>
+                    <EmptyHeader>
+                      <EmptyTitle>No recent notifications</EmptyTitle>
+                    </EmptyHeader>
+                  </EmptyContent>
+                </Empty>
               ) : null}
               {!recent.isLoading && !recent.isError
                 ? recent.data.map((item) => (

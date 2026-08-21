@@ -4,13 +4,15 @@ import { Button } from "@repo/web-ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/web-ui/card";
 import { ErrorState } from "@repo/web-ui/error-state";
 import { SectionLoading } from "@repo/web-ui/loading";
-import { RefreshCcw } from "lucide-react";
+import { RefreshCcw, Settings } from "lucide-react";
 
 import type { SettingsViewModel } from "@/features/settings/model/settings.types";
 
 import { ResourcePageShell } from "@/components/resource-page-shell";
 import { ResourceToolbar } from "@/components/resource-toolbar";
 import { adminResources } from "@/lib/admin-resources";
+
+import { ResourceEmpty } from "@/components/resource-empty";
 
 import { SettingCard } from "./setting-card";
 
@@ -78,9 +80,12 @@ export function SettingsListView({
               action={{ label: "Retry", onClick: onRetry }}
             />
           ) : filtered.length === 0 ? (
-            <p className="py-8 text-center text-sm text-muted-foreground">
-              {search ? "No settings match your search." : "No settings found."}
-            </p>
+            <ResourceEmpty
+              icon={Settings}
+              title={search ? "No settings match your search." : "No settings found."}
+              description={search ? "Try different keywords or clear your search." : "No configuration settings returned by the API."}
+              isFiltered={Boolean(search)}
+            />
           ) : (
             <div className="space-y-4">
               {filtered.map((setting) => (
