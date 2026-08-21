@@ -4,7 +4,7 @@ import { Injectable } from "@nestjs/common";
 import { EnvironmentService } from "@repo/api-core";
 import { createTransport, type Transporter } from "nodemailer";
 
-import type { Mailer, MailMessage } from "../application/mailer.interface";
+import type { Mailer, MailMessage } from "../../application/ports/mailer.interface";
 
 @Injectable()
 export class SmtpMailerService implements Mailer {

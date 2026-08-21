@@ -2,7 +2,11 @@ import { describe, expect, it, vi } from "vitest";
 import { ACTION, ERROR_CODES, ROLE_NAMES } from "@repo/api-core";
 
 import { AccessControlMapper } from "../../access-control.mapper";
+import { CreateCustomRoleUseCase } from "../create-custom-role.use-case";
+import { DeleteCustomRoleUseCase } from "../delete-custom-role.use-case";
+import { EnsureOrganizationAdminRoleUseCase } from "../ensure-organization-admin-role.use-case";
 import { RoleManagementUseCase } from "../role-management.use-case";
+import { UpdateCustomRoleUseCase } from "../update-custom-role.use-case";
 
 const TX = "tx" as unknown;
 
@@ -77,15 +81,14 @@ describe("RoleManagementUseCase", () => {
       invalidateUsersForRole: vi.fn(),
       invalidateAccessProfile: vi.fn(),
     };
+    const mapper = new AccessControlMapper();
+    const createUc = new CreateCustomRoleUseCase(repo as never, txPort as never, audit as never, mapper);
+    const updateUc = new UpdateCustomRoleUseCase(repo as never, txPort as never, audit as never, profile as never, mapper);
+    const deleteUc = new DeleteCustomRoleUseCase(repo as never, txPort as never, audit as never);
+    const ensureUc = new EnsureOrganizationAdminRoleUseCase(repo as never, profile as never);
 
     return {
-      useCase: new RoleManagementUseCase(
-        repo as never,
-        txPort as never,
-        audit as never,
-        profile as never,
-        new AccessControlMapper(),
-      ),
+      useCase: new RoleManagementUseCase(createUc, updateUc, deleteUc, ensureUc),
       repo,
       txPort,
       audit,

@@ -12,7 +12,7 @@ import {
 import { CurrentUser } from "@repo/api-core";
 import { Authorize } from "@repo/api-core";
 
-import type { JobScope } from "../application/ports/jobs.repository.port";
+import type { JobScope } from "../application/jobs.types";
 
 import { AddJobDependencyUseCase } from "../application/use-cases/add-job-dependency.use-case";
 import { CancelJobUseCase } from "../application/use-cases/cancel-job.use-case";

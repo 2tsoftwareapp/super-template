@@ -53,3 +53,5 @@ export interface JobHandlerContext {
 }
 
 export type JobHandler = (context: JobHandlerContext) => Promise<void>;
+
+export type JobScope = { type: "organization"; organizationId: string } | { type: "platform" };

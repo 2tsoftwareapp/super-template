@@ -1,8 +1,9 @@
 import type { JsonObject, TransactionExecutor } from "@repo/api-core";
 
 import type { JobStatus } from "../../domain/job-status";
+import type { JobScope } from "../jobs.types";
 
-export type JobScope = { type: "organization"; organizationId: string } | { type: "platform" };
+export type { JobScope };
 
 export interface JobRecord {
   id: string;

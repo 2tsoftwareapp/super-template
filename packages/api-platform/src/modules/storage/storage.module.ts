@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 import { EnvironmentService } from "@repo/api-core";
 
-import { OBJECT_STORAGE } from "./application/object-storage.interface";
+import { OBJECT_STORAGE } from "./application/ports/object-storage.interface";
 import { STORAGE_TRACKING_PORT } from "./application/ports/storage-tracking.port";
 import { StorageCleanupService } from "./application/storage-cleanup.service";
 import { LocalObjectStorage } from "./infrastructure/local-object-storage.service";

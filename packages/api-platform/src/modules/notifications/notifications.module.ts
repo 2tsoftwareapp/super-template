@@ -8,7 +8,7 @@ import { DEVICE_TOKENS_REPOSITORY } from "./application/ports/device-tokens.repo
 import { NOTIFICATION_JOBS_REPOSITORY } from "./application/ports/notification-jobs.repository.port";
 import { NOTIFICATION_STREAM_SERVICE } from "./application/ports/notification-stream.service.port";
 import { NOTIFICATIONS_REPOSITORY } from "./application/ports/notifications.repository.port";
-import { PUSH_NOTIFIER } from "./application/push.interface";
+import { PUSH_NOTIFIER } from "./application/ports/push.interface";
 import { NotificationDeliveryProcessor } from "./application/services/notification-delivery.processor";
 import { NotificationDispatchService } from "./application/services/notification-dispatch.service";
 import { NotificationJobsProcessor } from "./application/services/notification-jobs.processor";

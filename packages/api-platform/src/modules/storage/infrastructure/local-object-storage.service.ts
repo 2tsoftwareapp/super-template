@@ -7,7 +7,7 @@ import type {
   ObjectStorage,
   UploadInput,
   UploadResult,
-} from "../application/object-storage.interface";
+} from "../application/ports/object-storage.interface";
 
 @Injectable()
 export class LocalObjectStorage implements ObjectStorage {

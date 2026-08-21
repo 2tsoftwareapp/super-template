@@ -10,7 +10,7 @@ import {
   WORKER_DISPATCH_CONTEXT,
 } from "@repo/api-core";
 
-import type { PushMessage, PushNotifier } from "../push.interface";
+import type { PushMessage, PushNotifier } from "../ports/push.interface";
 
 import { MAX_DELIVERY_RETRY_ATTEMPTS } from "../../domain/delivery-policy";
 import { tokenLockId } from "../../domain/token-lock";
@@ -27,7 +27,7 @@ import {
   NOTIFICATIONS_REPOSITORY,
   type NotificationsRepositoryPort,
 } from "../ports/notifications.repository.port";
-import { PUSH_NOTIFIER } from "../push.interface";
+import { PUSH_NOTIFIER } from "../ports/push.interface";
 
 const DELIVERY_BATCH_SIZE = 50;
 const RECOVERY_INTERVAL = 10; // Run stale recovery every Nth tick (~5min at 30s interval)

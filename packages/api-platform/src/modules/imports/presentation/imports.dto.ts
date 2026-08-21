@@ -3,7 +3,7 @@ import type { ImportValidationError } from "@repo/api-core";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { IsIn, IsOptional, IsString, IsUUID, MaxLength } from "class-validator";
 
-import { SUPPORTED_IMPORT_TYPES } from "../domain/import-types";
+import { SUPPORTED_IMPORT_TYPES } from "../application/import-constants";
 
 export class ImportJobDto {
   @ApiProperty()

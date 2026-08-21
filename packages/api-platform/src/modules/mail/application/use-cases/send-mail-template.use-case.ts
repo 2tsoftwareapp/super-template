@@ -8,11 +8,11 @@ import {
   type UserPreferencesLookup,
 } from "@repo/api-core";
 
-import { MAILER, type Mailer } from "../mailer.interface";
 import {
   MAIL_DELIVERIES_REPOSITORY,
   type MailDeliveriesRepositoryPort,
 } from "../ports/mail-deliveries.repository.port";
+import { MAILER, type Mailer } from "../ports/mailer.interface";
 import {
   TEMPLATE_RENDERER_SERVICE,
   type TemplateRendererServicePort,

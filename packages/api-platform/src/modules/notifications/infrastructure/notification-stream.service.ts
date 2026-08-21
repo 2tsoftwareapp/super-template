@@ -1,4 +1,4 @@
-import { Injectable, type MessageEvent, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
+import { Injectable, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
 import {
   adaptRedisClient,
   createRedisClient,
@@ -7,7 +7,6 @@ import {
   type JsonObject,
 } from "@repo/api-core";
 import { Observable, Subject } from "rxjs";
-import { map } from "rxjs/operators";
 
 import type { NotificationStreamServicePort } from "../application/ports/notification-stream.service.port";
 
@@ -61,13 +60,9 @@ export class NotificationStreamService
     void this.publish(organizationId, event);
   }
 
-  stream(userId: string, organizationId: string): Observable<MessageEvent> {
+  stream(userId: string, organizationId: string): Observable<NotificationStreamEvent> {
     void this.ensureRedis();
-    return this.getSubject(this.channelKey(userId, organizationId)).pipe(
-      map((event) => ({
-        data: event,
-      })),
-    );
+    return this.getSubject(this.channelKey(userId, organizationId)).asObservable();
   }
 
   /** Channel key that scopes SSE events per user+organization. */

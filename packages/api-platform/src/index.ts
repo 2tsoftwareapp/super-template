@@ -3,7 +3,7 @@ import { Module } from "@nestjs/common";
 export { ImportExportAdapterRegistry } from "./import-export/import-export-adapter.registry";
 export { ImportExportModule } from "./import-export/import-export.module";
 export { DELIVERIES_REPOSITORY } from "./modules/notifications/application/ports/deliveries.repository.port";
-export { PUSH_NOTIFIER } from "./modules/notifications/application/push.interface";
+export { PUSH_NOTIFIER } from "./modules/notifications/application/ports/push.interface";
 export { NotificationDeliveryProcessor } from "./modules/notifications/application/services/notification-delivery.processor";
 export { NotificationDeliveryUseCase } from "./modules/notifications/application/use-cases/notification-delivery.use-case";
 export { PlatformPortsModule } from "./platform-ports.module";

@@ -3,5 +3,5 @@ export {
   type ObjectStorage,
   type UploadInput,
   type UploadResult,
-} from "./application/object-storage.interface";
+} from "./application/ports/object-storage.interface";
 export { StorageModule } from "./storage.module";

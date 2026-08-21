@@ -29,6 +29,7 @@ import {
 import { CurrentUser } from "@repo/api-core";
 import { Authorize } from "@repo/api-core";
 import { SkipEnvelope } from "@repo/api-core";
+import { map } from "rxjs/operators";
 
 import { NotificationDispatchService } from "../application/services/notification-dispatch.service";
 import { NotificationDeliveryUseCase } from "../application/use-cases/notification-delivery.use-case";
@@ -78,9 +79,9 @@ export class NotificationsController {
   @Sse("stream")
   @SkipEnvelope()
   stream(@CurrentUser() user: AuthenticatedRequestUser): Observable<MessageEvent> {
-    // SSE channel is scoped per user+org — cross-org events are never forwarded (T-007)
+    // Port is now framework-neutral (Observable<NotificationStreamEvent>); map to MessageEvent at presentation boundary
     const organizationId = requireOrganizationId(user);
-    return this.dispatch.streamForUser(user.userId, organizationId);
+    return this.dispatch.streamForUser(user.userId, organizationId).pipe(map((event) => ({ data: event })));
   }
 
   @Get("unread-count")

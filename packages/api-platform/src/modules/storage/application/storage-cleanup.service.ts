@@ -8,9 +8,9 @@ import {
   type PlatformTransactionPort,
 } from "@repo/api-core";
 
-import type { ObjectStorage } from "./object-storage.interface";
+import type { ObjectStorage } from "./ports/object-storage.interface";
 
-import { OBJECT_STORAGE } from "./object-storage.interface";
+import { OBJECT_STORAGE } from "./ports/object-storage.interface";
 import { STORAGE_TRACKING_PORT, type StorageTrackingPort } from "./ports/storage-tracking.port";
 
 const ORPHAN_GRACE_MS = 60 * 60 * 1000; // object untouched for 1h is a candidate

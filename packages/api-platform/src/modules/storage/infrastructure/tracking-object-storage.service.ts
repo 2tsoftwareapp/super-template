@@ -4,7 +4,7 @@ import type {
   ObjectStorage,
   UploadInput,
   UploadResult,
-} from "../application/object-storage.interface";
+} from "../application/ports/object-storage.interface";
 
 import { StorageTrackingRepository } from "./storage-tracking.repository";
 
