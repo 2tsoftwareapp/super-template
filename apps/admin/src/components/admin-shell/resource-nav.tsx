@@ -25,10 +25,8 @@ export function ResourceNav({ collapsed, permissions, pathname, onNavigate }: Re
         );
         if (resources.length === 0) return null;
 
-        return (
-          <div key={group} className="space-y-1.5">
-            {!collapsed ? (
-              <p className="px-2 text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground/50">
+        return (                    <div key={group} className="space-y-1">
+            {!collapsed ? (                      <p className="px-2.5 pb-1 text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground/40">
                 {t(`nav.groups.${group}`)}
               </p>
             ) : null}
@@ -45,11 +43,11 @@ export function ResourceNav({ collapsed, permissions, pathname, onNavigate }: Re
                     href={resource.path}
                     {...(onNavigate ? { onClick: onNavigate } : {})}
                     className={cn(
-                      "group flex min-h-9 items-center rounded-lg px-2.5 text-xs font-medium transition-all duration-200 relative",
+                      "group flex min-h-9 items-center rounded-lg px-2.5 text-[13px] font-medium transition-all duration-200 relative",
                       collapsed ? "justify-center" : "gap-3",
                       isActive
-                        ? "bg-primary/10 text-primary font-semibold shadow-[inset_1px_1px_0px_rgba(255,255,255,0.05)] after:absolute after:left-0 after:top-1.5 after:bottom-1.5 after:w-0.5 after:rounded-r-md after:bg-primary"
-                        : "text-muted-foreground hover:bg-muted/50 hover:text-foreground hover:translate-x-0.5",
+                        ? "bg-primary/10 text-primary font-semibold shadow-[inset_1px_1px_0px_rgba(255,255,255,0.05)] after:absolute after:left-0 after:top-1.5 after:bottom-1.5 after:w-[3px] after:rounded-r-full after:bg-primary"
+                        : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
                     )}
                   >
                     <Icon

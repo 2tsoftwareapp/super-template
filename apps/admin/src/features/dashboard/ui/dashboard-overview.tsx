@@ -64,7 +64,7 @@ export function DashboardOverview({
         </span>
       }
     >
-      <div className="flex h-[calc(100dvh-7rem)] max-h-[calc(100dvh-7rem)] flex-col gap-3 overflow-hidden">
+      <div className="flex h-[calc(100dvh-7rem)] max-h-[calc(100dvh-7rem)] flex-col gap-4 overflow-hidden">
         <Show when={failedJobsAlert.show}>
           <div className="flex shrink-0 items-center gap-2 rounded-md border border-border bg-accent px-2.5 py-1.5 text-xs">
             <AlertTriangle className="size-3.5 shrink-0 text-accent-foreground" />
@@ -98,7 +98,7 @@ export function DashboardOverview({
           isHealthy={stats.isHealthy}
         />
 
-        <div className="grid min-h-0 flex-1 gap-2 lg:grid-cols-[minmax(0,1fr)_240px]">
+        <div className="grid min-h-0 flex-1 gap-3 lg:grid-cols-[minmax(0,1fr)_260px]">
           <DashboardActivity
             isLoading={activity.isLoading}
             isError={activity.isError}
@@ -106,7 +106,7 @@ export function DashboardOverview({
             recentActivity={activity.recentActivity}
           />
 
-          <div className="flex min-h-0 flex-col gap-2">
+          <div className="flex min-h-0 flex-col gap-3">
             <DashboardHealth
               apiHealthy={health.apiHealthy}
               dbHealthy={health.dbHealthy}

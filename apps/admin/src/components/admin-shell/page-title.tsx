@@ -11,8 +11,8 @@ export function PageTitle() {
   const { t } = useI18n();
 
   return (
-    <div className="flex min-w-0 items-center gap-2 text-xs font-semibold tracking-wide text-muted-foreground/90 bg-muted/30 border border-border/20 px-2.5 py-1 rounded-md">
-      <Icon className="shrink-0 size-3.5 text-primary" />
+    <div className="flex min-w-0 items-center gap-2 rounded-lg bg-muted/50 px-2.5 py-1.5 text-xs font-semibold text-foreground/80">
+      <Icon className="size-3.5 shrink-0 text-primary" />
       <span className="truncate">{t(`nav.${matched.id}`)}</span>
     </div>
   );

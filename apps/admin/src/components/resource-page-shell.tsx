@@ -31,23 +31,22 @@ export function ResourcePageShell({
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div className="flex min-w-0 flex-col gap-3">
           {backHref ? (
             <Link
               href={backHref}
-              className="inline-flex w-fit items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+              className="inline-flex w-fit items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
             >
               <svg
-                width="14"
-                height="14"
+                width="12"
+                height="12"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="size-3.5"
               >
                 <path d="M19 12H5" />
                 <polyline points="12 19 5 12 12 5" />
@@ -55,22 +54,22 @@ export function ResourcePageShell({
               Back
             </Link>
           ) : null}
-          <div className="flex items-start gap-3">
-            <div className="hidden size-10 shrink-0 items-center justify-center rounded-lg border border-border bg-card sm:flex">
-              <Icon className="size-5 text-muted-foreground" />
+          <div className="flex items-start gap-4">
+            <div className="hidden size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 ring-1 ring-primary/20 sm:flex">
+              <Icon className="size-5 text-primary" />
             </div>
             <div className="min-w-0">
-              <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">
+              <h1 className="text-xl font-bold tracking-tight text-foreground md:text-2xl">
                 {title ?? resource.label}
               </h1>
-              <p className="mt-1 max-w-3xl text-sm leading-6 text-muted-foreground">
+              <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted-foreground">
                 {description}
               </p>
               {meta ? <div className="mt-3 flex flex-wrap gap-2">{meta}</div> : null}
             </div>
           </div>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2">
           {onRefresh ? (
             <RefreshButton {...(isRefreshing ? { isRefreshing } : {})} onClick={onRefresh} />
           ) : null}

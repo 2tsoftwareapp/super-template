@@ -26,7 +26,7 @@ export function TopHeader({ displayName, onSignOut, onOpenMobileMenu }: TopHeade
   const router = useRouter();
 
   return (
-    <header className="sticky top-0 z-20 flex min-h-14 shrink-0 items-center justify-between border-b border-border/40 bg-background/50 backdrop-blur-md px-3 md:px-6">
+    <header className="sticky top-0 z-20 flex min-h-14 shrink-0 items-center justify-between border-b border-border/60 bg-background/80 backdrop-blur-lg px-3 md:px-6">
       <div className="flex min-w-0 items-center gap-2">
         <Button
           variant="ghost"

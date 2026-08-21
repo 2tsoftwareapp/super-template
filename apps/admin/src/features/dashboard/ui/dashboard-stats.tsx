@@ -41,7 +41,7 @@ export function DashboardStats({
 }: DashboardStatsProps) {
   if (firstLoad) {
     return (
-      <div className="grid shrink-0 gap-2 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid shrink-0 gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <SkeletonStat />
         <SkeletonStat />
         <SkeletonStat />
@@ -51,7 +51,7 @@ export function DashboardStats({
   }
 
   return (
-    <div className="grid shrink-0 gap-2 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="grid shrink-0 gap-3 sm:grid-cols-2 xl:grid-cols-4">
       {usersError ? (
         <StatErrorCard label="Users" onRetry={onRetryUsers} />
       ) : (
@@ -59,8 +59,8 @@ export function DashboardStats({
           label="Users"
           value={totalUsers}
           sub="Registered"
-          icon={<Users className="size-3.5 text-chart-2" />}
-          iconBg="bg-muted"
+          icon={<Users className="size-4 text-emerald-600 dark:text-emerald-400" />}
+          iconBg="bg-emerald-50 dark:bg-emerald-500/10"
           href="/users"
           loading={usersLoading}
         />
@@ -78,10 +78,17 @@ export function DashboardStats({
           }
           icon={
             <Workflow
-              className={cn("size-3.5", failedJobs > 0 ? "text-destructive" : "text-chart-5")}
+              className={cn(
+                "size-4",
+                failedJobs > 0
+                  ? "text-destructive"
+                  : "text-violet-600 dark:text-violet-400",
+              )}
             />
           }
-          iconBg={failedJobs > 0 ? "bg-destructive/10" : "bg-accent"}
+          iconBg={
+            failedJobs > 0 ? "bg-destructive/10" : "bg-violet-50 dark:bg-violet-500/10"
+          }
           href="/jobs"
           loading={jobsLoading}
         />
@@ -90,15 +97,22 @@ export function DashboardStats({
         label="Permissions"
         value={permissionCount}
         sub="Your role"
-        icon={<ShieldCheck className="size-3.5 text-secondary-foreground" />}
-        iconBg="bg-muted"
+        icon={<ShieldCheck className="size-4 text-amber-600 dark:text-amber-400" />}
+        iconBg="bg-amber-50 dark:bg-amber-500/10"
       />
       <MiniStat
         label="API"
         value={healthFetching ? "…" : isHealthy ? "OK" : "Down"}
         sub={healthFetching ? "Checking" : "Health check"}
         icon={
-          <Activity className={cn("size-3.5", isHealthy ? "text-primary" : "text-destructive")} />
+          <Activity
+            className={cn(
+              "size-4",
+              isHealthy
+                ? "text-primary"
+                : "text-destructive",
+            )}
+          />
         }
         iconBg={isHealthy ? "bg-primary/10" : "bg-destructive/10"}
         loading={healthFetching}
@@ -110,7 +124,7 @@ export function DashboardStats({
 function StatErrorCard({ label, onRetry }: { label: string; onRetry: () => void }) {
   return (
     <Card size="sm">
-      <CardContent className="py-2">
+      <CardContent className="py-3">
         <ErrorState
           variant="inline"
           className="m-0"
@@ -125,12 +139,13 @@ function StatErrorCard({ label, onRetry }: { label: string; onRetry: () => void 
 function SkeletonStat() {
   return (
     <Card size="sm">
-      <CardContent className="flex items-center justify-between gap-2 py-0">
-        <div className="min-w-0 space-y-1">
-          <div className="h-2.5 w-12 animate-pulse rounded bg-muted" />
-          <div className="h-5 w-10 animate-pulse rounded bg-muted" />
+      <CardContent className="flex items-center gap-4 py-3">
+        <div className="min-w-0 flex-1 space-y-2">
+          <div className="h-2.5 w-14 animate-pulse rounded-full bg-muted" />
+          <div className="h-6 w-12 animate-pulse rounded-lg bg-muted" />
+          <div className="h-2 w-20 animate-pulse rounded-full bg-muted" />
         </div>
-        <div className="size-7 shrink-0 animate-pulse rounded-md bg-muted" />
+        <div className="size-10 shrink-0 animate-pulse rounded-xl bg-muted" />
       </CardContent>
     </Card>
   );
@@ -153,23 +168,32 @@ function MiniStat({
   loading?: boolean;
   href?: string;
 }) {
-  return (
-    <Card size="sm" className="relative">
-      <CardContent className="flex items-center justify-between gap-2 py-0">
-        <div className="min-w-0">
-          <p className="text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
+  const card = (
+    <Card size="sm" hoverable={!!href} className="relative">
+      <CardContent className="flex items-center gap-4 py-3">
+        <div className="min-w-0 flex-1">
+          <p className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
             {label}
           </p>
           {loading ? (
-            <div className="mt-1 h-5 w-10 animate-pulse rounded bg-muted" />
+            <div className="mt-1.5 h-6 w-12 animate-pulse rounded-lg bg-muted" />
           ) : (
-            <p className="text-lg font-semibold tracking-tight tabular-nums leading-tight">
+            <p className="mt-0.5 text-2xl font-bold tracking-tight tabular-nums leading-none text-foreground">
               {value}
             </p>
           )}
-          {sub ? <p className="truncate text-[10px] text-muted-foreground">{sub}</p> : null}
+          {sub ? (
+            <p className="mt-1 truncate text-[11px] text-muted-foreground">
+              {sub}
+            </p>
+          ) : null}
         </div>
-        <div className={cn("flex size-7 shrink-0 items-center justify-center rounded-md", iconBg)}>
+        <div
+          className={cn(
+            "flex size-10 shrink-0 items-center justify-center rounded-xl",
+            iconBg,
+          )}
+        >
           {icon}
         </div>
       </CardContent>
@@ -180,4 +204,6 @@ function MiniStat({
       ) : null}
     </Card>
   );
+
+  return card;
 }

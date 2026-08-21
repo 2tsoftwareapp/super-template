@@ -15,8 +15,8 @@ const QUICK_ACTIONS = [
 export function DashboardQuickLinks() {
   return (
     <Card size="sm" className="shrink-0">
-      <CardContent className="flex flex-wrap items-center gap-1.5 py-0">
-        <span className="mr-1 text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
+      <CardContent className="flex flex-wrap items-center gap-2 py-1">
+        <span className="mr-1 text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
           Quick
         </span>
         {QUICK_ACTIONS.map((item) => {
@@ -24,13 +24,13 @@ export function DashboardQuickLinks() {
           return (
             <Button
               key={item.href}
-              variant="outline"
+              variant="secondary"
               size="sm"
-              className="h-7 gap-1.5 px-2 text-xs"
+              className="h-8 gap-1.5 px-3 text-xs font-medium"
               asChild
             >
               <Link href={item.href}>
-                <Icon className="size-3" />
+                <Icon className="size-3.5" />
                 {item.label}
               </Link>
             </Button>

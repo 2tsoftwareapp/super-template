@@ -52,20 +52,22 @@ export function DashboardUsers({ isLoading, isError, onRetry, recentUsers }: Das
               <Link
                 key={user.id}
                 href={`/users/${user.id}`}
-                className="flex items-center gap-2 py-2 first:pt-0 last:pb-0 transition-colors hover:text-foreground"
+                className="flex items-center gap-3 py-2.5 first:pt-0 last:pb-0 transition-colors hover:bg-muted/50 rounded-lg -mx-1 px-1"
               >
-                <div className="flex size-6 shrink-0 items-center justify-center rounded-full bg-muted text-[10px] font-medium text-muted-foreground">
+                <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
                   {user.displayName.charAt(0).toUpperCase()}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-xs font-medium leading-tight">{user.displayName}</p>
-                  <p className="truncate text-[10px] text-muted-foreground leading-tight">
+                  <p className="truncate text-xs font-semibold text-foreground leading-tight">
+                    {user.displayName}
+                  </p>
+                  <p className="truncate text-[11px] text-muted-foreground leading-tight">
                     {user.email}
                   </p>
                 </div>
                 <Badge
                   variant={statusVariant(user.status)}
-                  className="shrink-0 px-1 py-0 text-[9px] capitalize"
+                  className="shrink-0 px-1.5 py-0 text-[9px] capitalize"
                 >
                   {user.status.toLowerCase()}
                 </Badge>

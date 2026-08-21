@@ -26,16 +26,20 @@ export function ResourceToolbar({
   onClearFilters?: () => void;
 }) {
   return (
-    <div className="flex flex-col gap-3 border-b border-border px-4 py-3 md:px-5">
+    <div className="flex flex-col gap-3 border-b border-border px-5 py-3 md:px-6">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex min-w-0 flex-1 flex-col gap-3 md:flex-row md:items-center">
-          <div className="relative min-w-0 flex-1 md:max-w-md">
-            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          <div className="relative min-w-0 flex-1 md:max-w-sm">
+            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground/60" />
             <Input
               value={search}
               onChange={(event) => onSearchChange(event.target.value)}
               placeholder={searchPlaceholder}
-              className={cn("pl-9", search && "pr-9")}
+              className={cn(
+                "h-9 bg-muted/40 border-transparent focus:border-input focus:bg-background transition-colors",
+                "pl-9",
+                search && "pr-9",
+              )}
             />
             {search ? (
               <button
@@ -44,7 +48,7 @@ export function ResourceToolbar({
                 aria-label="Clear search"
                 className="absolute inset-y-0 right-0 flex w-9 items-center justify-center text-muted-foreground transition-colors hover:text-foreground"
               >
-                <X className="size-4" />
+                <X className="size-3.5" />
               </button>
             ) : null}
           </div>
@@ -58,7 +62,7 @@ export function ResourceToolbar({
         </div>
         {actions ? <div className="flex shrink-0 flex-wrap gap-2">{actions}</div> : null}
       </div>
-      {resultLabel ? <p className={cn("text-xs text-muted-foreground")}>{resultLabel}</p> : null}
+      {resultLabel ? <p className="text-xs text-muted-foreground">{resultLabel}</p> : null}
     </div>
   );
 }

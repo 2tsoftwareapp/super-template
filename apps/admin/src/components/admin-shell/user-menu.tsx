@@ -21,24 +21,24 @@ export function UserMenu({ collapsed, displayName, roles, onSignOut }: UserMenuP
   const { t } = useI18n();
 
   return (
-    <div className={cn("p-2", collapsed && "flex justify-center")}>
+    <div className={cn("p-2", collapsed && "flex justify-center pt-3")}>
       <Dropdown
         align="start"
         trigger={
           collapsed ? (
             <Tooltip content={displayName} side="right">
-              <button
-                type="button"
-                className="flex size-9 items-center justify-center rounded-lg transition-all duration-200 hover:bg-muted/80 hover:scale-105"
-                aria-label={displayName}
-              >
+            <button
+              type="button"
+              className="flex size-9 items-center justify-center rounded-xl transition-all duration-200 hover:bg-accent hover:scale-105"
+              aria-label={displayName}
+            >
                 <Avatar name={displayName} size="sm" className="ring-1 ring-border/20" />
               </button>
             </Tooltip>
           ) : (
             <button
               type="button"
-              className="flex min-h-10 w-full items-center gap-2.5 rounded-lg px-2 text-left transition-all duration-200 hover:bg-muted/80"
+              className="flex min-h-10 w-full items-center gap-2.5 rounded-lg px-2.5 text-left transition-all duration-200 hover:bg-accent"
             >
               <Avatar name={displayName} size="sm" className="ring-1 ring-border/20" />
               <div className="min-w-0 flex-1 leading-tight">
