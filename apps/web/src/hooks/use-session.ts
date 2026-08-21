@@ -1,6 +1,6 @@
 "use client";
 
-import { createUseSession } from "@repo/web-utils/session";
+import { createUseSession } from "@repo/web-hooks/use-session-factory";
 
 export const sessionQueryKey = ["session"] as const;
 

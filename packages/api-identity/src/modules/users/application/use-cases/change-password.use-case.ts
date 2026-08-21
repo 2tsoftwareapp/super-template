@@ -12,10 +12,7 @@ import {
 import { TRANSACTION_PORT } from "@repo/api-core";
 
 import { hashPassword, verifyPassword } from "../../../auth";
-import {
-  AUTH_SESSION_REPOSITORY,
-  type AuthSessionRepositoryPort,
-} from "../../../auth";
+import { AUTH_SESSION_REPOSITORY, type AuthSessionRepositoryPort } from "../../../auth";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";
 
 @Injectable()

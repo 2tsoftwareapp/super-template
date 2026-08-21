@@ -4,7 +4,11 @@ import { EnvironmentService } from "@repo/api-core";
 import { type App, cert, getApps, initializeApp } from "firebase-admin/app";
 import { getMessaging } from "firebase-admin/messaging";
 
-import type { PushMessage, PushNotifier, PushSendResult } from "../application/ports/push.interface";
+import type {
+  PushMessage,
+  PushNotifier,
+  PushSendResult,
+} from "../application/ports/push.interface";
 
 import {
   DEVICE_TOKENS_REPOSITORY,

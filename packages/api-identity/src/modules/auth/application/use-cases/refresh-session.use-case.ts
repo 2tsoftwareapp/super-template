@@ -7,10 +7,7 @@ import type { RefreshSessionCommand } from "../auth.types";
 
 import { AccessControlService } from "../../../access-control";
 import { OrganizationsService } from "../../../organizations";
-import {
-  USERS_REPOSITORY,
-  type UsersRepositoryPort,
-} from "../../../users";
+import { USERS_REPOSITORY, type UsersRepositoryPort } from "../../../users";
 import { resolveRefreshAttempt } from "../../domain/refresh-rotation.policy";
 import { assertSessionUsable, verifyRefreshTokenHash } from "../auth.helpers";
 import { AuthMapper } from "../auth.mapper";

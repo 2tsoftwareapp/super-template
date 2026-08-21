@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { SecurityView } from "@/features/security/screens/security-view";
+import { SecurityView } from "@/features/security";
 
 export const metadata: Metadata = {
   title: "Account Security & Preferences | Super Admin",

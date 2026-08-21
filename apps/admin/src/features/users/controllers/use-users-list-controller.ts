@@ -62,7 +62,9 @@ export function useUsersListController({
   const resendVerification = useResendVerification();
   const { confirmBlock, requestBlock, cancelBlock } = useUsersConfirmBlock();
   const { isMutating, handleBulkActivate, handleBulkBlock } = useUsersBulkActions(
-    activateUsers, blockUsers, requestBlock,
+    activateUsers,
+    blockUsers,
+    requestBlock,
   );
 
   const actorRoles = session.data?.data.user.roles ?? [];
@@ -70,7 +72,10 @@ export function useUsersListController({
   const { canCreate, canUpdate } = selectUserManagementPermissions(session.data?.data.permissions);
 
   const drawerController = useCreateUserDrawer({
-    open: showCreate, actorRoles, actorOrganizationId, onClose: () => setShowCreate(false),
+    open: showCreate,
+    actorRoles,
+    actorOrganizationId,
+    onClose: () => setShowCreate(false),
   });
 
   const pageUsers = users.data?.data ?? [];
@@ -78,30 +83,55 @@ export function useUsersListController({
   const totalPages = users.data?.meta?.totalPages ?? 1;
   const currentPage = users.data?.meta?.page ?? queryParams.page;
 
-  const handleActivate = useCallback(async (userId: string) => {
-    try { await activateUsers.mutateAsync([userId]); }
-    catch (error) { toast.error(getErrorMessage(error)); }
-  }, [activateUsers]);
+  const handleActivate = useCallback(
+    async (userId: string) => {
+      try {
+        await activateUsers.mutateAsync([userId]);
+      } catch (error) {
+        toast.error(getErrorMessage(error));
+      }
+    },
+    [activateUsers],
+  );
 
-  const handleBlock = useCallback((userId: string) => {
-    requestBlock([userId], "this user", 1);
-  }, [requestBlock]);
+  const handleBlock = useCallback(
+    (userId: string) => {
+      requestBlock([userId], "this user", 1);
+    },
+    [requestBlock],
+  );
 
-  const handleResendVerification = useCallback((email: string) => {
-    resendVerification.mutate(email, {
-      onError: (error) => { toast.error(getErrorMessage(error)); },
-    });
-  }, [resendVerification]);
+  const handleResendVerification = useCallback(
+    (email: string) => {
+      resendVerification.mutate(email, {
+        onError: (error) => {
+          toast.error(getErrorMessage(error));
+        },
+      });
+    },
+    [resendVerification],
+  );
 
-  const handleSortChange = useCallback((nextSort: UsersListParams["sort"]) => {
-    patchListParams({ sort: nextSort, page: 1 });
-  }, [patchListParams]);
+  const handleSortChange = useCallback(
+    (nextSort: UsersListParams["sort"]) => {
+      patchListParams({ sort: nextSort, page: 1 });
+    },
+    [patchListParams],
+  );
 
   const { table, selectedIds, clearSelection, handlePageChange, handlePageSizeChange } =
     useResourceTableConfig<AdminUserDto, UsersSortCriterion["field"]>({
-      data: pageUsers, listParams, sortBridge: usersSortBridge,
+      data: pageUsers,
+      listParams,
+      sortBridge: usersSortBridge,
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- model now any[]
-    columns: createColumns({ canUpdate, onActivate: handleActivate, onBlock: handleBlock, onResendVerification: handleResendVerification, isDisabled: isMutating }),
+      columns: createColumns({
+        canUpdate,
+        onActivate: handleActivate,
+        onBlock: handleBlock,
+        onResendVerification: handleResendVerification,
+        isDisabled: isMutating,
+      }),
       onSortChange: handleSortChange,
       onPageChange: (page) => patchListParams({ page }),
       onPageSizeChange: (limit) => patchListParams({ limit: limit as UsersPageSize, page: 1 }),
@@ -118,19 +148,90 @@ export function useUsersListController({
   const handleConfirmBlock = async () => {
     if (!confirmBlock) return;
     clearSelection();
-    try { await blockUsers.mutateAsync(confirmBlock.userIds); cancelBlock(); }
-    catch (error) { toast.error(getErrorMessage(error)); }
+    try {
+      await blockUsers.mutateAsync(confirmBlock.userIds);
+      cancelBlock();
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+    }
   };
 
   return {
     session: { isLoading: session.isLoading, isError: session.isError },
-    header: { isLoading: users.isLoading, isFetching: users.isFetching, total, canCreate, onRefresh: () => void users.refetch(), onCreateClick: () => setShowCreate(true) },
-    list: { isError: users.isError, isLoading: users.isLoading, onRetry: () => void users.refetch(), hasFilters, emptyTitle: hasFilters ? "No users match your filters" : "No users yet", emptyDescription: hasFilters ? "Clear filters or adjust the search terms." : "Create a user to start managing access.", onRowClick: handleRowClick },
-    toolbar: { search: searchInput, onSearchChange: (v: string) => { setSearchInput(v); clearSelection(); }, onClearFilters: () => { setSearchInput(""); patchListParams({ status: "all", search: "", page: 1 }); clearSelection(); }, currentStatus: queryParams.status, onStatusFilter: (status: UserStatusFilter) => { patchListParams({ status, page: 1 }); clearSelection(); } },
-    bulk: { canUpdate, selectedIds, isMutating, isActivating: activateUsers.isPending, isBlocking: Boolean(confirmBlock && blockUsers.isPending), onClearSelection: clearSelection, onBulkActivate: async () => { await handleBulkActivate(selectedIds, clearSelection); }, onBulkBlock: () => handleBulkBlock(selectedIds) },
-    pagination: { page: currentPage, pageSize: queryParams.limit, totalPages, total, isFetching: users.isFetching, onPageChange: handlePageChange, onPageSizeChange: handlePageSizeChange },
-    createDrawer: { open: showCreate, actorRoles, actorOrganizationId, assignableRoles: drawerController.allAssignable, organizations: drawerController.organizations, isOrganizationsLoading: drawerController.isOrganizationsLoading, isSaving: drawerController.isSaving, onClose: () => setShowCreate(false), onSubmit: drawerController.onSubmit },
-    confirmBlock: { state: confirmBlock, isLoading: Boolean(confirmBlock && blockUsers.isPending), onCancel: cancelBlock, onConfirm: handleConfirmBlock },
+    header: {
+      isLoading: users.isLoading,
+      isFetching: users.isFetching,
+      total,
+      canCreate,
+      onRefresh: () => void users.refetch(),
+      onCreateClick: () => setShowCreate(true),
+    },
+    list: {
+      isError: users.isError,
+      isLoading: users.isLoading,
+      onRetry: () => void users.refetch(),
+      hasFilters,
+      emptyTitle: hasFilters ? "No users match your filters" : "No users yet",
+      emptyDescription: hasFilters
+        ? "Clear filters or adjust the search terms."
+        : "Create a user to start managing access.",
+      onRowClick: handleRowClick,
+    },
+    toolbar: {
+      search: searchInput,
+      onSearchChange: (v: string) => {
+        setSearchInput(v);
+        clearSelection();
+      },
+      onClearFilters: () => {
+        setSearchInput("");
+        patchListParams({ status: "all", search: "", page: 1 });
+        clearSelection();
+      },
+      currentStatus: queryParams.status,
+      onStatusFilter: (status: UserStatusFilter) => {
+        patchListParams({ status, page: 1 });
+        clearSelection();
+      },
+    },
+    bulk: {
+      canUpdate,
+      selectedIds,
+      isMutating,
+      isActivating: activateUsers.isPending,
+      isBlocking: Boolean(confirmBlock && blockUsers.isPending),
+      onClearSelection: clearSelection,
+      onBulkActivate: async () => {
+        await handleBulkActivate(selectedIds, clearSelection);
+      },
+      onBulkBlock: () => handleBulkBlock(selectedIds),
+    },
+    pagination: {
+      page: currentPage,
+      pageSize: queryParams.limit,
+      totalPages,
+      total,
+      isFetching: users.isFetching,
+      onPageChange: handlePageChange,
+      onPageSizeChange: handlePageSizeChange,
+    },
+    createDrawer: {
+      open: showCreate,
+      actorRoles,
+      actorOrganizationId,
+      assignableRoles: drawerController.allAssignable,
+      organizations: drawerController.organizations,
+      isOrganizationsLoading: drawerController.isOrganizationsLoading,
+      isSaving: drawerController.isSaving,
+      onClose: () => setShowCreate(false),
+      onSubmit: drawerController.onSubmit,
+    },
+    confirmBlock: {
+      state: confirmBlock,
+      isLoading: Boolean(confirmBlock && blockUsers.isPending),
+      onCancel: cancelBlock,
+      onConfirm: handleConfirmBlock,
+    },
     table,
   };
 }

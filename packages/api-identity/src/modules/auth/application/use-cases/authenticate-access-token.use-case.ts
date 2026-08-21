@@ -5,10 +5,7 @@ import { AppError, ERROR_CODES } from "@repo/api-core";
 
 import { AccessControlService } from "../../../access-control";
 import { OrganizationsService } from "../../../organizations";
-import {
-  USERS_REPOSITORY,
-  type UsersRepositoryPort,
-} from "../../../users";
+import { USERS_REPOSITORY, type UsersRepositoryPort } from "../../../users";
 import { assertSessionUsable } from "../auth.helpers";
 import {
   AUTH_SESSION_REPOSITORY,

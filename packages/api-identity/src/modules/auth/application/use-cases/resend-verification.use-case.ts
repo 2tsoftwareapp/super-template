@@ -3,10 +3,7 @@ import { AppError, durationToMilliseconds, ERROR_CODES, normalizeEmail } from "@
 
 import type { ResendVerificationCommand } from "../auth.types";
 
-import {
-  USERS_REPOSITORY,
-  type UsersRepositoryPort,
-} from "../../../users";
+import { USERS_REPOSITORY, type UsersRepositoryPort } from "../../../users";
 import { generateOpaqueToken, hashOpaqueToken } from "../auth.helpers";
 import {
   AUTH_SESSION_REPOSITORY,

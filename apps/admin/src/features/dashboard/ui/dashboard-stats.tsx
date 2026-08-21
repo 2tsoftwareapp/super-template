@@ -80,15 +80,11 @@ export function DashboardStats({
             <Workflow
               className={cn(
                 "size-4",
-                failedJobs > 0
-                  ? "text-destructive"
-                  : "text-violet-600 dark:text-violet-400",
+                failedJobs > 0 ? "text-destructive" : "text-violet-600 dark:text-violet-400",
               )}
             />
           }
-          iconBg={
-            failedJobs > 0 ? "bg-destructive/10" : "bg-violet-50 dark:bg-violet-500/10"
-          }
+          iconBg={failedJobs > 0 ? "bg-destructive/10" : "bg-violet-50 dark:bg-violet-500/10"}
           href="/jobs"
           loading={jobsLoading}
         />
@@ -105,14 +101,7 @@ export function DashboardStats({
         value={healthFetching ? "…" : isHealthy ? "OK" : "Down"}
         sub={healthFetching ? "Checking" : "Health check"}
         icon={
-          <Activity
-            className={cn(
-              "size-4",
-              isHealthy
-                ? "text-primary"
-                : "text-destructive",
-            )}
-          />
+          <Activity className={cn("size-4", isHealthy ? "text-primary" : "text-destructive")} />
         }
         iconBg={isHealthy ? "bg-primary/10" : "bg-destructive/10"}
         loading={healthFetching}
@@ -182,18 +171,9 @@ function MiniStat({
               {value}
             </p>
           )}
-          {sub ? (
-            <p className="mt-1 truncate text-[11px] text-muted-foreground">
-              {sub}
-            </p>
-          ) : null}
+          {sub ? <p className="mt-1 truncate text-[11px] text-muted-foreground">{sub}</p> : null}
         </div>
-        <div
-          className={cn(
-            "flex size-10 shrink-0 items-center justify-center rounded-xl",
-            iconBg,
-          )}
-        >
+        <div className={cn("flex size-10 shrink-0 items-center justify-center rounded-xl", iconBg)}>
           {icon}
         </div>
       </CardContent>

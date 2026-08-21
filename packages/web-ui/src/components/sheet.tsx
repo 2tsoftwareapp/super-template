@@ -23,7 +23,10 @@ function SheetPortal({ ...props }: React.ComponentProps<typeof DialogPrimitive.P
   return <DialogPrimitive.Portal data-slot="sheet-portal" {...props} />;
 }
 
-function SheetOverlay({ className, ...props }: React.ComponentProps<typeof DialogPrimitive.Overlay>) {
+function SheetOverlay({
+  className,
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Overlay>) {
   return (
     <DialogPrimitive.Overlay
       data-slot="sheet-overlay"
@@ -102,7 +105,10 @@ function SheetTitle({ className, ...props }: React.ComponentProps<typeof DialogP
   );
 }
 
-function SheetDescription({ className, ...props }: React.ComponentProps<typeof DialogPrimitive.Description>) {
+function SheetDescription({
+  className,
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Description>) {
   return (
     <DialogPrimitive.Description
       data-slot="sheet-description"

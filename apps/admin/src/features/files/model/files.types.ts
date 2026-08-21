@@ -17,7 +17,7 @@ export interface FilesColumnOptions {
 
 export type FilesColumnFactory = (
   options: FilesColumnOptions,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- column defs are opaque in model
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- column defs are opaque in model
 ) => any[];
 
 export interface FilesViewModel {

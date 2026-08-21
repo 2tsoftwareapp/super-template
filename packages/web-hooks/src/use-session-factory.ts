@@ -1,12 +1,10 @@
 "use client";
 
+import type { SessionResponse } from "@repo/web-utils/api-types";
 import type { QueryKey } from "@tanstack/react-query";
 
+import { webFetch } from "@repo/web-utils/http";
 import { useQuery } from "@tanstack/react-query";
-
-import type { SessionResponse } from "./api-types";
-
-import { webFetch } from "./http";
 
 export interface CreateUseSessionOptions {
   queryKey: QueryKey;

@@ -1,4 +1,3 @@
-
 import type { JobDto, JobEventDto, JobMetricsDto } from "@/lib/api-types";
 
 import type { STATUS_OPTIONS } from "./jobs.constants";
@@ -19,7 +18,7 @@ export interface JobsColumnOptions {
 
 export type JobsColumnFactory = (
   options: JobsColumnOptions,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- column defs are opaque in model
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- column defs are opaque in model
 ) => any[];
 
 export interface JobsViewModel {

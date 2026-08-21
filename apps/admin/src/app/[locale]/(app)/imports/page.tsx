@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { ImportsView } from "@/features/imports/screens/imports-view";
+import { ImportsView } from "@/features/imports";
 
 export const metadata: Metadata = {
   title: "Data Imports | Super Admin",

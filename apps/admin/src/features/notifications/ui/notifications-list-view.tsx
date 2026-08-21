@@ -1,6 +1,5 @@
 "use client";
 
-
 import { Badge } from "@repo/web-ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/web-ui/card";
 import { Empty, EmptyContent, EmptyHeader, EmptyTitle } from "@repo/web-ui/empty";
@@ -71,9 +70,8 @@ export function NotificationsListView({
             </CardHeader>
             <CardContent className="p-0 pb-1">
               <ResourceTable
-                 
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- model table is any
-            table={table}
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- model table is any
+                table={table}
                 isLoading={jobs.isLoading}
                 {...(jobs.isError ? { error: { title: "Could not load delivery jobs." } } : {})}
                 onRetry={jobs.onRetry}

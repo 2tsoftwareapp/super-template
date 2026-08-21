@@ -25,8 +25,10 @@ export function ResourceNav({ collapsed, permissions, pathname, onNavigate }: Re
         );
         if (resources.length === 0) return null;
 
-        return (                    <div key={group} className="space-y-1">
-            {!collapsed ? (                      <p className="px-2.5 pb-1 text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground/40">
+        return (
+          <div key={group} className="space-y-1">
+            {!collapsed ? (
+              <p className="px-2.5 pb-1 text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground/40">
                 {t(`nav.groups.${group}`)}
               </p>
             ) : null}

@@ -13,10 +13,7 @@ import { TRANSACTION_PORT } from "@repo/api-core";
 
 import type { ResetPasswordCommand } from "../auth.types";
 
-import {
-  USERS_REPOSITORY,
-  type UsersRepositoryPort,
-} from "../../../users";
+import { USERS_REPOSITORY, type UsersRepositoryPort } from "../../../users";
 import { hashOpaqueToken, hashPassword } from "../auth.helpers";
 import {
   AUTH_SESSION_REPOSITORY,

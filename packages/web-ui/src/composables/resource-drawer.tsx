@@ -1,10 +1,9 @@
-import { type ReactNode } from "react";
-import { X } from "lucide-react";
-
+import { useAnimatePresence } from "@repo/web-hooks/use-animate-presence";
 import { cn } from "@repo/web-utils/utils";
+import { X } from "lucide-react";
+import { type ReactNode } from "react";
 
 import { Button } from "../components/button";
-import { useAnimatePresence } from "../hooks/use-animate-presence";
 
 export function ResourceDrawer({
   open,

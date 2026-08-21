@@ -4,7 +4,6 @@ import { PAGE_SIZE_OPTIONS, type PageSize } from "@repo/config";
 
 import type { AdminUserDto, OrganizationDto, RoleDto } from "@/lib/api-types";
 
-
 // ── List params & filter types (merged from types.ts) ──────────────────────
 
 export type UserStatusFilter = "all" | "PENDING" | "ACTIVE" | "BLOCKED";
@@ -35,7 +34,7 @@ export interface UsersTableColumnOptions {
  */
 export type UsersTableColumnFactory = (
   options?: UsersTableColumnOptions,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- column defs are opaque in model
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- column defs are opaque in model
 ) => any[];
 
 export interface UsersListParams {

@@ -1,6 +1,5 @@
 "use client";
 
-
 import { Button } from "@repo/web-ui/button";
 import { Card, CardContent } from "@repo/web-ui/card";
 import { DatePicker } from "@repo/web-ui/date-picker";
@@ -83,7 +82,6 @@ export function AuditLogsListView({
 
         <CardContent className="p-0 pb-1">
           <ResourceTable
-             
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- model table is any
             table={table}
             isLoading={isLoading}

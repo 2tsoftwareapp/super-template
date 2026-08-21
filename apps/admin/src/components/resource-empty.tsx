@@ -44,9 +44,7 @@ export function ResourceEmpty({
           <div
             className={cn(
               "absolute size-20 rounded-full blur-2xl transition-opacity duration-500",
-              isFiltered
-                ? "bg-muted/60 opacity-60"
-                : "bg-primary/10 opacity-80",
+              isFiltered ? "bg-muted/60 opacity-60" : "bg-primary/10 opacity-80",
             )}
           />
           <EmptyMedia variant="icon">

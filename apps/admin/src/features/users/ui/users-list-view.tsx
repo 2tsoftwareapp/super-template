@@ -1,6 +1,5 @@
 "use client";
 
-
 import { Button } from "@repo/web-ui/button";
 import { Card, CardContent } from "@repo/web-ui/card";
 import { ErrorState } from "@repo/web-ui/error-state";
@@ -148,17 +147,14 @@ export function UsersListView({
           />
           <CardContent className="p-0 pb-1">
             <ResourceTable
-               
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- model table is any
-            table={table}
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- model table is any
+              table={table}
               binarySort
               multiSort
               isLoading={list.isLoading}
               emptyTitle={list.emptyTitle}
               emptyDescription={list.emptyDescription}
-   
-               
-            onRowClick={(row) => list.onRowClick((row.original as AdminUserDto).id)}
+              onRowClick={(row) => list.onRowClick((row.original as AdminUserDto).id)}
             />
             <Pagination
               page={pagination.page}

@@ -17,7 +17,7 @@ import { useEffect, useRef, useState } from "react";
  */
 export function useAnimatePresence(
   isOpen: boolean,
-  durationMs: number = 200,
+  durationMs = 200,
 ): { visible: boolean; animate: boolean } {
   const [visible, setVisible] = useState(false);
   const [animate, setAnimate] = useState(false);

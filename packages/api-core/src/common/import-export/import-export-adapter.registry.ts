@@ -1,5 +1,9 @@
 import { HttpStatus, Injectable } from "@nestjs/common";
-import { AppError, ERROR_CODES, type ImportExportAdapter } from "@repo/api-core";
+
+import type { ImportExportAdapter } from "../../ports/import-export-adapter.port";
+
+import { ERROR_CODES } from "../constants/error-codes";
+import { AppError } from "../errors/app-error";
 
 @Injectable()
 export class ImportExportAdapterRegistry {

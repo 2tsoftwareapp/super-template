@@ -1,4 +1,3 @@
-
 import type { AuditLogDto } from "@/lib/api-types";
 
 import type { AuditLogsFilters } from "./audit-logs.search-params";
@@ -10,7 +9,7 @@ export interface AuditLogsColumnOptions {
 
 export type AuditLogsColumnFactory = (
   options: AuditLogsColumnOptions,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- column defs are opaque in model
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- column defs are opaque in model
 ) => any[];
 
 /**

@@ -13,10 +13,7 @@ import {
 import type { LoginCommand } from "../auth.types";
 
 import { MfaService } from "../../../mfa";
-import {
-  USERS_REPOSITORY,
-  type UsersRepositoryPort,
-} from "../../../users";
+import { USERS_REPOSITORY, type UsersRepositoryPort } from "../../../users";
 import { verifyPasswordWithTimingPadding } from "../auth.helpers";
 import { IssueSessionUseCase } from "./issue-session.use-case";
 

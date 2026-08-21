@@ -6,21 +6,32 @@
   "exports": {
     ".": "./src/index.ts",
     "./use-debounced-value": "./src/use-debounced-value.ts",
-    "./use-is-mobile": "./src/use-is-mobile.ts"
+    "./use-is-mobile": "./src/use-is-mobile.ts",
+    "./use-session-factory": "./src/use-session-factory.ts",
+    "./use-animate-presence": "./src/use-animate-presence.ts",
+    "./use-debounced-url-search": "./src/use-debounced-url-search.ts"
   },
   "scripts": {
     "build": "node ../../tools/tsc7/node_modules/typescript7/bin/tsc -p tsconfig.json",
     "lint": "eslint .",
     "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@repo/web-utils": "workspace:*",
+    "@tanstack/react-query": "5.101.0",
     "react": "19.2.4"
   },
   "devDependencies": {
     "@repo/tsconfig": "workspace:*",
+    "@repo/web-test": "workspace:*",
+    "@testing-library/react": "16.3.2",
     "@types/react": "19.2.6",
-    "typescript": "5.9.3"
+    "@vitejs/plugin-react": "^5.0.0",
+    "jsdom": "29.1.1",
+    "typescript": "5.9.3",
+    "vitest": "4.1.9"
   },
   "sideEffects": false
 }

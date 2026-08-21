@@ -1,9 +1,8 @@
+import { useAnimatePresence } from "@repo/web-hooks/use-animate-presence";
+import { cn } from "@repo/web-utils/utils";
 import { type ReactNode } from "react";
 
-import { cn } from "@repo/web-utils/utils";
-
 import { Button } from "../components/button";
-import { useAnimatePresence } from "../hooks/use-animate-presence";
 
 export function BulkActionBar({
   selectedCount,

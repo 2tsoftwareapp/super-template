@@ -56,10 +56,7 @@ export function DashboardActivity({
             {recentActivity.map((entry) => {
               const { icon, c } = auditIcon(entry.action);
               return (
-                <div
-                  key={entry.id}
-                  className="flex items-center gap-3 py-2.5 first:pt-0 last:pb-0"
-                >
+                <div key={entry.id} className="flex items-center gap-3 py-2.5 first:pt-0 last:pb-0">
                   <span
                     className={cn(
                       "flex size-7 shrink-0 items-center justify-center rounded-lg bg-muted/50",
@@ -72,9 +69,7 @@ export function DashboardActivity({
                     <p className="truncate text-xs font-semibold text-foreground">
                       {formatAction(entry.action)}
                     </p>
-                    <p className="truncate text-[11px] text-muted-foreground">
-                      {entry.entityType}
-                    </p>
+                    <p className="truncate text-[11px] text-muted-foreground">{entry.entityType}</p>
                   </div>
                   <span className="shrink-0 text-[10px] text-muted-foreground">
                     {timeAgo(entry.createdAt)}
@@ -109,11 +104,14 @@ function formatAction(action: string): string {
 }
 
 function auditIcon(action: string) {
-  if (action.startsWith("user")) return { icon: <Users className="size-3.5" />, c: "text-emerald-600 dark:text-emerald-400" };
+  if (action.startsWith("user"))
+    return { icon: <Users className="size-3.5" />, c: "text-emerald-600 dark:text-emerald-400" };
   if (action.startsWith("auth") || action.startsWith("login"))
     return { icon: <LogIn className="size-3.5" />, c: "text-primary" };
-  if (action.startsWith("job")) return { icon: <Workflow className="size-3.5" />, c: "text-violet-600 dark:text-violet-400" };
-  if (action.startsWith("mail")) return { icon: <Mail className="size-3.5" />, c: "text-sky-600 dark:text-sky-400" };
+  if (action.startsWith("job"))
+    return { icon: <Workflow className="size-3.5" />, c: "text-violet-600 dark:text-violet-400" };
+  if (action.startsWith("mail"))
+    return { icon: <Mail className="size-3.5" />, c: "text-sky-600 dark:text-sky-400" };
   return {
     icon: <Activity className="size-3.5" />,
     c: "text-muted-foreground",

@@ -16,6 +16,7 @@ export default defineConfig([
     'apps/api/vitest.config.ts',
     'apps/api/webpack.config.js',
     'packages/web-ui/vitest.config.ts',
+    'packages/web-hooks/vitest.config.ts',
     'packages/api-core/vitest.config.ts',
     'eslint.config.mjs',
   ]),

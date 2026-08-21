@@ -19,24 +19,11 @@ import type { CreateAdminUserCommand, UserView } from "../users.types";
 
 import { AccessControlService, ROLE_NAMES } from "../../../access-control";
 import { assertCanAssignRoleTargets, assertRoleScopeCanBeAssigned } from "../../../access-control";
-import {
-  generateOpaqueToken,
-  hashOpaqueToken,
-  hashPassword,
-} from "../../../auth";
-import {
-  AUTH_SESSION_REPOSITORY,
-  type AuthSessionRepositoryPort,
-} from "../../../auth";
-import {
-  OUTBOX_REPOSITORY,
-  type OutboxRepositoryPort,
-} from "../../../auth";
+import { generateOpaqueToken, hashOpaqueToken, hashPassword } from "../../../auth";
+import { AUTH_SESSION_REPOSITORY, type AuthSessionRepositoryPort } from "../../../auth";
+import { OUTBOX_REPOSITORY, type OutboxRepositoryPort } from "../../../auth";
 import { OrganizationsService } from "../../../organizations";
-import {
-  ORGANIZATIONS_REPOSITORY,
-  type OrganizationsRepositoryPort,
-} from "../../../organizations";
+import { ORGANIZATIONS_REPOSITORY, type OrganizationsRepositoryPort } from "../../../organizations";
 import { resolveRoleById } from "../assignable-role.resolver";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";
 import { GetUserUseCase } from "./get-user.use-case";

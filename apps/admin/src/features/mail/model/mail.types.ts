@@ -1,4 +1,3 @@
-
 import type { AdminResourceConfig } from "@/lib/admin-resources";
 import type { MailDeliveryDto, MailPreviewDto, MailTemplateDto } from "@/lib/api-types";
 
@@ -20,7 +19,7 @@ export interface MailDeliveriesColumnOptions {
 
 export type MailDeliveriesColumnFactory = (
   options: MailDeliveriesColumnOptions,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- column defs are opaque in model
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- column defs are opaque in model
 ) => any[];
 
 export interface SendMailInput {

@@ -27,11 +27,11 @@ export function UserMenu({ collapsed, displayName, roles, onSignOut }: UserMenuP
         trigger={
           collapsed ? (
             <Tooltip content={displayName} side="right">
-            <button
-              type="button"
-              className="flex size-9 items-center justify-center rounded-xl transition-all duration-200 hover:bg-accent hover:scale-105"
-              aria-label={displayName}
-            >
+              <button
+                type="button"
+                className="flex size-9 items-center justify-center rounded-xl transition-all duration-200 hover:bg-accent hover:scale-105"
+                aria-label={displayName}
+              >
                 <Avatar name={displayName} size="sm" className="ring-1 ring-border/20" />
               </button>
             </Tooltip>

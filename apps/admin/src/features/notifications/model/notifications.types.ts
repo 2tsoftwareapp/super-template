@@ -1,4 +1,3 @@
-
 import type { NotificationDto } from "@/lib/api-types";
 
 import type { NotificationComposeFormValues } from "./notifications.schemas";
@@ -15,7 +14,7 @@ export interface NotificationsColumnOptions {
 
 export type NotificationsColumnFactory = (
   options: NotificationsColumnOptions,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- column defs are opaque in model
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- column defs are opaque in model
 ) => any[];
 
 export interface NotificationsViewModel {

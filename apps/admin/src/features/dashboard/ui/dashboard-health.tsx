@@ -30,10 +30,7 @@ export function DashboardHealth({
             detail: failedJobs > 0 ? `${failedJobs} failed` : `${pendingJobs} pending`,
           },
         ].map((item) => (
-          <div
-            key={item.label}
-            className="flex items-center justify-between py-2 text-xs"
-          >
+          <div key={item.label} className="flex items-center justify-between py-2 text-xs">
             <span className="text-muted-foreground">{item.label}</span>
             <div className="flex items-center gap-2">
               {item.detail ? (
@@ -46,10 +43,7 @@ export function DashboardHealth({
                 )}
               >
                 <span
-                  className={cn(
-                    "size-1.5 rounded-full",
-                    item.ok ? "bg-primary" : "bg-destructive",
-                  )}
+                  className={cn("size-1.5 rounded-full", item.ok ? "bg-primary" : "bg-destructive")}
                 />
                 {item.ok ? "OK" : "Issue"}
               </span>

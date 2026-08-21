@@ -21,10 +21,9 @@ describe("useAnimatePresence", () => {
   });
 
   it("transitions to visible + animate on open", () => {
-    const { result, rerender } = renderHook(
-      ({ isOpen }) => useAnimatePresence(isOpen),
-      { initialProps: { isOpen: false } },
-    );
+    const { result, rerender } = renderHook(({ isOpen }) => useAnimatePresence(isOpen), {
+      initialProps: { isOpen: false },
+    });
 
     expect(result.current.visible).toBe(false);
 
@@ -41,10 +40,9 @@ describe("useAnimatePresence", () => {
   });
 
   it("transitions to hidden after close with delay", () => {
-    const { result, rerender } = renderHook(
-      ({ isOpen }) => useAnimatePresence(isOpen),
-      { initialProps: { isOpen: true } },
-    );
+    const { result, rerender } = renderHook(({ isOpen }) => useAnimatePresence(isOpen), {
+      initialProps: { isOpen: true },
+    });
 
     // Open state
     act(() => {
@@ -97,10 +95,9 @@ describe("useAnimatePresence", () => {
   });
 
   it("cleans up timer on unmount", () => {
-    const { result, rerender, unmount } = renderHook(
-      ({ isOpen }) => useAnimatePresence(isOpen),
-      { initialProps: { isOpen: true } },
-    );
+    const { result, rerender, unmount } = renderHook(({ isOpen }) => useAnimatePresence(isOpen), {
+      initialProps: { isOpen: true },
+    });
 
     act(() => {
       vi.runAllTimers();
@@ -118,10 +115,9 @@ describe("useAnimatePresence", () => {
   });
 
   it("cancels rAF on cleanup", () => {
-    const { rerender, unmount } = renderHook(
-      ({ isOpen }) => useAnimatePresence(isOpen),
-      { initialProps: { isOpen: false } },
-    );
+    const { rerender, unmount } = renderHook(({ isOpen }) => useAnimatePresence(isOpen), {
+      initialProps: { isOpen: false },
+    });
 
     // Open then unmount before rAF fires
     rerender({ isOpen: true });

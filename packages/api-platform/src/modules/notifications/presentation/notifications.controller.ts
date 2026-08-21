@@ -81,7 +81,9 @@ export class NotificationsController {
   stream(@CurrentUser() user: AuthenticatedRequestUser): Observable<MessageEvent> {
     // Port is now framework-neutral (Observable<NotificationStreamEvent>); map to MessageEvent at presentation boundary
     const organizationId = requireOrganizationId(user);
-    return this.dispatch.streamForUser(user.userId, organizationId).pipe(map((event) => ({ data: event })));
+    return this.dispatch
+      .streamForUser(user.userId, organizationId)
+      .pipe(map((event) => ({ data: event })));
   }
 
   @Get("unread-count")

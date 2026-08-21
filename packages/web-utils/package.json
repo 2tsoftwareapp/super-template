@@ -12,7 +12,6 @@
     "./json": "./src/json.ts",
     "./params": "./src/params.ts",
     "./search-params": "./src/search-params.ts",
-    "./session": "./src/session.ts",
     "./theme/tweakcn-fonts": "./src/tweakcn-fonts.ts",
     "./storage": "./src/storage.ts",
     "./utils": "./src/utils.ts"

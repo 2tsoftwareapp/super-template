@@ -15,10 +15,7 @@ import type { UserView } from "../users.types";
 
 import { AccessControlService, ROLE_NAMES } from "../../../access-control";
 import { assertCanAssignRoleTargets, assertRoleScopeCanBeAssigned } from "../../../access-control";
-import {
-  ORGANIZATIONS_REPOSITORY,
-  type OrganizationsRepositoryPort,
-} from "../../../organizations";
+import { ORGANIZATIONS_REPOSITORY, type OrganizationsRepositoryPort } from "../../../organizations";
 import { assertUserBelongsToOrganization } from "../../domain/user-org-scope.policy";
 import { resolveRoleById } from "../assignable-role.resolver";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { NotificationsView } from "@/features/notifications/screens/notifications-view";
+import { NotificationsView } from "@/features/notifications";
 
 export const metadata: Metadata = {
   title: "Notifications | Super Admin",

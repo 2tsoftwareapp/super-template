@@ -1,6 +1,5 @@
 "use client";
 
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/web-ui/card";
 import { Pagination } from "@repo/web-ui/pagination";
 import { Show } from "@repo/web-ui/show";
@@ -95,7 +94,6 @@ export function MailListView({
         />
         <CardContent className="p-0 pb-1">
           <ResourceTable
-             
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- model table is any
             table={table}
             isLoading={deliveries.isLoading}

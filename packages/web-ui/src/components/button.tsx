@@ -1,6 +1,6 @@
-import * as React from "react";
 import * as SlotPrimitive from "@radix-ui/react-slot";
 import { cn } from "@repo/web-utils/utils";
+import * as React from "react";
 
 import type { ButtonVariantProps } from "./button-variants";
 

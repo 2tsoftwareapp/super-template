@@ -19,9 +19,7 @@ export function Brand({ collapsed }: BrandProps) {
           <p className="truncate text-[11px] font-bold tracking-widest text-foreground uppercase">
             Super Admin
           </p>
-          <p className="truncate text-[10px] text-muted-foreground font-medium">
-            Control center
-          </p>
+          <p className="truncate text-[10px] text-muted-foreground font-medium">Control center</p>
         </div>
       ) : null}
     </div>

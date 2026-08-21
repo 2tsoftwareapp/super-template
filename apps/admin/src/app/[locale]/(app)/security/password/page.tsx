@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { ChangePasswordScreen } from "@/features/security/screens/change-password-screen";
+import { ChangePasswordScreen } from "@/features/security";
 
 export const metadata: Metadata = {
   title: "Change Password | Super Admin",

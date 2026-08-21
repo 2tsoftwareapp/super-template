@@ -82,7 +82,11 @@ export function SettingsListView({
             <ResourceEmpty
               icon={Settings}
               title={search ? "No settings match your search." : "No settings found."}
-              description={search ? "Try different keywords or clear your search." : "No configuration settings returned by the API."}
+              description={
+                search
+                  ? "Try different keywords or clear your search."
+                  : "No configuration settings returned by the API."
+              }
               isFiltered={Boolean(search)}
             />
           ) : (

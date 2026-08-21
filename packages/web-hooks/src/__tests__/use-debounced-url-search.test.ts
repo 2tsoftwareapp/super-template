@@ -150,15 +150,9 @@ describe("useDebouncedUrlSearch", () => {
       vi.advanceTimersByTime(300);
     });
 
-    expect(mockReplaceSpy).toHaveBeenCalledWith(
-      expect.stringContaining("page=2"),
-    );
-    expect(mockReplaceSpy).toHaveBeenCalledWith(
-      expect.stringContaining("status=active"),
-    );
-    expect(mockReplaceSpy).toHaveBeenCalledWith(
-      expect.stringContaining("q=search+term"),
-    );
+    expect(mockReplaceSpy).toHaveBeenCalledWith(expect.stringContaining("page=2"));
+    expect(mockReplaceSpy).toHaveBeenCalledWith(expect.stringContaining("status=active"));
+    expect(mockReplaceSpy).toHaveBeenCalledWith(expect.stringContaining("q=search+term"));
   });
 
   it("uses custom debounceMs", () => {

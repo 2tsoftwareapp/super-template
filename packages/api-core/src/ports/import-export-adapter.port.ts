@@ -1,4 +1,4 @@
-import type { TransactionExecutor } from "@repo/api-core";
+import type { TransactionExecutor } from "../common/types/transaction-executor";
 
 export interface ImportExportRowContext {
   organizationId: string;

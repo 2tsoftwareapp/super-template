@@ -24,23 +24,14 @@ export function UserDetailProfile({ profile, canEdit }: UserDetailProfileProps) 
           <Label htmlFor="p-name">Display name</Label>
           <Input id="p-name" {...form.register("displayName")} disabled={!canEdit} />
           {form.formState.errors.displayName && (
-            <p className="text-xs text-destructive">
-              {form.formState.errors.displayName.message}
-            </p>
+            <p className="text-xs text-destructive">{form.formState.errors.displayName.message}</p>
           )}
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="p-email">Email</Label>
-          <Input
-            id="p-email"
-            type="email"
-            {...form.register("email")}
-            disabled={!canEdit}
-          />
+          <Input id="p-email" type="email" {...form.register("email")} disabled={!canEdit} />
           {form.formState.errors.email && (
-            <p className="text-xs text-destructive">
-              {form.formState.errors.email.message}
-            </p>
+            <p className="text-xs text-destructive">{form.formState.errors.email.message}</p>
           )}
         </div>
         <div className="flex items-center gap-3 sm:col-span-2">

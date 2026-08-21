@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
-import { Search, X } from "lucide-react";
 
 import { cn } from "@repo/web-utils/utils";
+import { Search, X } from "lucide-react";
 
 import { Button } from "../components/button";
 import { Input } from "../components/input";

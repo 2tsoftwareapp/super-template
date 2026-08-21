@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { Suspense } from "react";
 
-import { UserDetailView } from "@/features/users/screens/user-detail-view";
+import { UserDetailView } from "@/features/users";
 
 export const metadata: Metadata = {
   title: "User Profile | Super Admin",

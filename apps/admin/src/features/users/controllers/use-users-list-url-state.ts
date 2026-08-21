@@ -41,10 +41,7 @@ export function useUsersListUrlState(): UseUsersListUrlStateReturn {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const listParams = useMemo(
-    () => parseUsersListSearchParams(searchParams),
-    [searchParams],
-  );
+  const listParams = useMemo(() => parseUsersListSearchParams(searchParams), [searchParams]);
 
   const [searchInput, setSearchInput] = useState(listParams.search);
   const debouncedSearch = useDebouncedValue(searchInput, 500);

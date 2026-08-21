@@ -1,7 +1,7 @@
 import { Skeleton } from "@repo/web-ui/skeleton";
 import { Suspense } from "react";
 
-import { SsoCallbackView } from "@/features/auth/screens/sso-callback-view";
+import { SsoCallbackView } from "@/features/auth";
 
 function SsoCallbackFallback() {
   return (

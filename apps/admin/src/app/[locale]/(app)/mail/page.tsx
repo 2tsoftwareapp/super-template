@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { Spinner } from "@repo/web-ui/spinner";
 import { Suspense } from "react";
 
-import { MailView } from "@/features/mail/screens/mail-view";
+import { MailView } from "@/features/mail";
 
 export const metadata: Metadata = {
   title: "Mail Logs & Templates | Super Admin",

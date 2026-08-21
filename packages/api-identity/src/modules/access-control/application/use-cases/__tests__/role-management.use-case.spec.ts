@@ -82,8 +82,19 @@ describe("RoleManagementUseCase", () => {
       invalidateAccessProfile: vi.fn(),
     };
     const mapper = new AccessControlMapper();
-    const createUc = new CreateCustomRoleUseCase(repo as never, txPort as never, audit as never, mapper);
-    const updateUc = new UpdateCustomRoleUseCase(repo as never, txPort as never, audit as never, profile as never, mapper);
+    const createUc = new CreateCustomRoleUseCase(
+      repo as never,
+      txPort as never,
+      audit as never,
+      mapper,
+    );
+    const updateUc = new UpdateCustomRoleUseCase(
+      repo as never,
+      txPort as never,
+      audit as never,
+      profile as never,
+      mapper,
+    );
     const deleteUc = new DeleteCustomRoleUseCase(repo as never, txPort as never, audit as never);
     const ensureUc = new EnsureOrganizationAdminRoleUseCase(repo as never, profile as never);
 

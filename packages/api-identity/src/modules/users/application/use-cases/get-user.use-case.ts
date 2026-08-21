@@ -4,10 +4,7 @@ import { AppError, type AuthenticatedRequestUser, ERROR_CODES, ROLE_NAMES } from
 import type { UserView } from "../users.types";
 
 import { AccessControlService } from "../../../access-control";
-import {
-  ORGANIZATIONS_REPOSITORY,
-  type OrganizationsRepositoryPort,
-} from "../../../organizations";
+import { ORGANIZATIONS_REPOSITORY, type OrganizationsRepositoryPort } from "../../../organizations";
 import { assertUserBelongsToOrganization } from "../../domain/user-org-scope.policy";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";
 import { UsersMapper } from "../users.mapper";
