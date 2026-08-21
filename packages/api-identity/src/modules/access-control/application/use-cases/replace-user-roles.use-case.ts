@@ -5,7 +5,7 @@ import { Inject, Injectable } from "@nestjs/common";
 import {
   ACCESS_CONTROL_REPOSITORY,
   type AccessControlRepositoryPort,
-} from "../access-control.repository.port";
+} from "../ports/access-control.repository.port";
 import { AccessProfileUseCase } from "./access-profile.use-case";
 
 @Injectable()

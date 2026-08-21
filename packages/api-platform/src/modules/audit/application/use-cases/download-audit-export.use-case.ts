@@ -3,10 +3,7 @@ import type { AuthenticatedRequestUser } from "@repo/api-core";
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { AppError, ERROR_CODES } from "@repo/api-core";
 
-import {
-  FILES_REPOSITORY,
-  type FilesRepositoryPort,
-} from "../../../files/application/ports/files.repository.port";
+import { FILES_REPOSITORY, type FilesRepositoryPort } from "../../../files";
 import { OBJECT_STORAGE, type ObjectStorage } from "../../../storage";
 import { canDownloadAuditExport } from "../../domain/audit-export-access.policy";
 

@@ -1,3 +1,4 @@
+export { MfaService } from "./application/mfa.service";
 export {
   decryptTotpSecret,
   type EncryptedSecret,

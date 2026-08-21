@@ -9,12 +9,12 @@ import {
   TRANSACTION_PORT,
   type TransactionPort,
 } from "@repo/api-core";
+import { ImportExportAdapterRegistry } from "@repo/api-core";
 
 import type { CreateImportCommand, ImportJobView } from "../imports.types";
 
-import { ImportExportAdapterRegistry } from "../../../../import-export/import-export-adapter.registry";
 import { AuditService } from "../../../audit";
-import { FileAccessService } from "../../../files/application/services/file-access.service";
+import { FileAccessService } from "../../../files";
 import { MAX_IMPORT_ROWS } from "../../domain/import-types";
 import {
   IMPORT_JOBS_REPOSITORY,

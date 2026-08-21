@@ -1,5 +1,5 @@
-import type { RoleRecord } from "./access-control.repository.port";
 import type { PermissionView, RoleView } from "./access-control.types";
+import type { RoleRecord } from "./ports/access-control.repository.port";
 
 export class AccessControlMapper {
   toPermissionView(permission: PermissionView): PermissionView {

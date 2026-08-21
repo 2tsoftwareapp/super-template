@@ -7,7 +7,7 @@ import { AccessControlService } from "../../../access-control";
 import {
   ORGANIZATIONS_REPOSITORY,
   type OrganizationsRepositoryPort,
-} from "../../../organizations/application/ports/organizations.repository.port";
+} from "../../../organizations";
 import { assertUserBelongsToOrganization } from "../../domain/user-org-scope.policy";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";
 import { UsersMapper } from "../users.mapper";

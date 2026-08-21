@@ -11,7 +11,7 @@ import { AccessControlMapper } from "../access-control.mapper";
 import {
   ACCESS_CONTROL_REPOSITORY,
   type AccessControlRepositoryPort,
-} from "../access-control.repository.port";
+} from "../ports/access-control.repository.port";
 
 export interface ListRolesParams {
   page: number;

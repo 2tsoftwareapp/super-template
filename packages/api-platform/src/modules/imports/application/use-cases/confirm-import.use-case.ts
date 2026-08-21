@@ -11,12 +11,12 @@ import {
   TRANSACTION_PORT,
   type TransactionPort,
 } from "@repo/api-core";
+import { ImportExportAdapterRegistry } from "@repo/api-core";
 
 import type { ImportJobView } from "../imports.types";
 
-import { ImportExportAdapterRegistry } from "../../../../import-export/import-export-adapter.registry";
 import { AuditService } from "../../../audit";
-import { FileAccessService } from "../../../files/application/services/file-access.service";
+import { FileAccessService } from "../../../files";
 import { canAccessImportJob } from "../../domain/import-access.policy";
 import { ImportsMapper } from "../imports.mapper";
 import {

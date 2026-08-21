@@ -18,7 +18,7 @@ import { assertCanAssignRoleTargets, assertRoleScopeCanBeAssigned } from "../../
 import {
   ORGANIZATIONS_REPOSITORY,
   type OrganizationsRepositoryPort,
-} from "../../../organizations/application/ports/organizations.repository.port";
+} from "../../../organizations";
 import { assertUserBelongsToOrganization } from "../../domain/user-org-scope.policy";
 import { resolveRoleById } from "../assignable-role.resolver";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";

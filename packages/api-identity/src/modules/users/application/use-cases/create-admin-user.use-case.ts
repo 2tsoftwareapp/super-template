@@ -23,20 +23,20 @@ import {
   generateOpaqueToken,
   hashOpaqueToken,
   hashPassword,
-} from "../../../auth/application/auth.helpers";
+} from "../../../auth";
 import {
   AUTH_SESSION_REPOSITORY,
   type AuthSessionRepositoryPort,
-} from "../../../auth/application/ports/auth-session.repository.port";
+} from "../../../auth";
 import {
   OUTBOX_REPOSITORY,
   type OutboxRepositoryPort,
-} from "../../../auth/application/ports/outbox.repository.port";
-import { OrganizationsService } from "../../../organizations/application/organizations.service";
+} from "../../../auth";
+import { OrganizationsService } from "../../../organizations";
 import {
   ORGANIZATIONS_REPOSITORY,
   type OrganizationsRepositoryPort,
-} from "../../../organizations/application/ports/organizations.repository.port";
+} from "../../../organizations";
 import { resolveRoleById } from "../assignable-role.resolver";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";
 import { GetUserUseCase } from "./get-user.use-case";

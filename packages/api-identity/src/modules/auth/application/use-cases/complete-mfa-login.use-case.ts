@@ -5,11 +5,11 @@ import { AppError, ERROR_CODES } from "@repo/api-core";
 
 import type { VerifyMfaChallengeCommand } from "../auth.types";
 
-import { MfaService } from "../../../mfa/application/mfa.service";
+import { MfaService } from "../../../mfa";
 import {
   USERS_REPOSITORY,
   type UsersRepositoryPort,
-} from "../../../users/application/ports/users.repository.port";
+} from "../../../users";
 import { IssueSessionUseCase } from "./issue-session.use-case";
 
 @Injectable()

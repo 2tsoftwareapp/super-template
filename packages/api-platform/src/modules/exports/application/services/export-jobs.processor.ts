@@ -14,14 +14,11 @@ import {
   TRANSACTION_PORT,
   type TransactionPort,
 } from "@repo/api-core";
+import { ImportExportAdapterRegistry } from "@repo/api-core";
 import { randomUUID } from "node:crypto";
 
-import { ImportExportAdapterRegistry } from "../../../../import-export/import-export-adapter.registry";
 import { AuditService } from "../../../audit";
-import {
-  FILES_REPOSITORY,
-  type FilesRepositoryPort,
-} from "../../../files/application/ports/files.repository.port";
+import { FILES_REPOSITORY, type FilesRepositoryPort } from "../../../files";
 import { OBJECT_STORAGE, type ObjectStorage } from "../../../storage";
 import { MAX_EXPORT_ROWS } from "../../domain/export-policy";
 import {

@@ -80,6 +80,7 @@ export {
   type ImportExportRowContext,
   type ImportValidationError,
 } from "./ports/import-export-adapter.port";
+export { ImportExportAdapterRegistry } from "./ports/import-export-adapter.registry";
 export {
   MAIL_TEMPLATE_SENDER,
   type MailTemplateSender,

@@ -2,7 +2,7 @@ import { Module } from "@nestjs/common";
 import { ENTITY_ATTACHMENT_LISTING } from "@repo/api-core";
 
 import { AuditModule } from "../audit";
-import { FilesModule } from "../files/files.module";
+import { FilesModule } from "../files";
 import { ATTACHMENTS_REPOSITORY } from "./application/ports/attachments.repository.port";
 import { AttachFileUseCase } from "./application/use-cases/attach-file.use-case";
 import { DeleteAttachmentUseCase } from "./application/use-cases/delete-attachment.use-case";

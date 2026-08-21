@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 
-import { UserDto } from "../../../users/presentation/users.dto";
+import { UserDto } from "../../../users";
 
 export class AuthSessionDto {
   @ApiProperty()

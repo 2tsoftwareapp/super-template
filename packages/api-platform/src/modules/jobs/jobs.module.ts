@@ -1,7 +1,7 @@
 import { forwardRef, Module } from "@nestjs/common";
 import { BACKGROUND_JOB_ENQUEUER } from "@repo/api-core";
 
-import { MailModule } from "../mail/mail.module";
+import { MailModule } from "../mail";
 import { JobsMapper } from "./application/jobs.mapper";
 import { JobsProcessor } from "./application/jobs.processor";
 import { JobsService } from "./application/jobs.service";

@@ -1,16 +1,16 @@
-import { forwardRef, Inject, Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import {
   AUTH_TOKEN_CLEANUP,
   type AuthTokenCleanup,
   type JsonObject,
   type JsonValue,
+  MAIL_TEMPLATE_SENDER,
+  type MailTemplateSender,
   USER_NOTIFICATION_SENDER,
   type UserNotificationSender,
 } from "@repo/api-core";
 
 import type { JobHandler } from "../jobs.types";
-
-import { MailService } from "../../../mail/application/mail.service";
 
 function readStringField(payload: JsonObject, key: string): string {
   const value = payload[key];
@@ -42,8 +42,8 @@ export class JobHandlersRegistry {
   private readonly handlers = new Map<string, JobHandler>();
 
   constructor(
-    @Inject(forwardRef(() => MailService))
-    private readonly mailService: MailService,
+    @Inject(MAIL_TEMPLATE_SENDER)
+    private readonly mailSender: MailTemplateSender,
     @Inject(AUTH_TOKEN_CLEANUP)
     private readonly authTokenCleanup: AuthTokenCleanup,
     @Inject(USER_NOTIFICATION_SENDER)
@@ -58,7 +58,7 @@ export class JobHandlersRegistry {
         throw new Error("mail.send requires templateKey and to");
       }
 
-      await this.mailService.sendTemplate({
+      await this.mailSender.sendTemplate({
         templateKey,
         to,
         variables,

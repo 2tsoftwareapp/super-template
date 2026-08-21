@@ -1,7 +1,7 @@
 import { forwardRef, Module } from "@nestjs/common";
 import { MAIL_TEMPLATE_SENDER } from "@repo/api-core";
 
-import { JobsModule } from "../jobs/jobs.module";
+import { JobsModule } from "../jobs";
 import { MailMapper } from "./application/mail.mapper";
 import { MailService } from "./application/mail.service";
 import { MAILER } from "./application/mailer.interface";

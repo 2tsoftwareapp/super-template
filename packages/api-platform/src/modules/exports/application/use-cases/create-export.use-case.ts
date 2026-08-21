@@ -9,10 +9,10 @@ import {
   TRANSACTION_PORT,
   type TransactionPort,
 } from "@repo/api-core";
+import { ImportExportAdapterRegistry } from "@repo/api-core";
 
 import type { CreateExportCommand } from "../exports.types";
 
-import { ImportExportAdapterRegistry } from "../../../../import-export/import-export-adapter.registry";
 import { AuditService } from "../../../audit";
 import { ExportsMapper } from "../exports.mapper";
 import {

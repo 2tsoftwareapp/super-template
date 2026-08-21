@@ -10,7 +10,7 @@ import type {
   AccessControlRepositoryPort,
   CreatePermissionValues,
   RoleRecord,
-} from "../application/access-control.repository.port";
+} from "../application/ports/access-control.repository.port";
 
 @Injectable()
 export class AccessControlRepository implements AccessControlRepositoryPort {

@@ -4,11 +4,11 @@ import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { AppError, ERROR_CODES } from "@repo/api-core";
 
 import { AccessControlService } from "../../../access-control";
-import { OrganizationsService } from "../../../organizations/application/organizations.service";
+import { OrganizationsService } from "../../../organizations";
 import {
   USERS_REPOSITORY,
   type UsersRepositoryPort,
-} from "../../../users/application/ports/users.repository.port";
+} from "../../../users";
 import { assertSessionUsable } from "../auth.helpers";
 import {
   AUTH_SESSION_REPOSITORY,

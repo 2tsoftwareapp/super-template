@@ -14,10 +14,7 @@ import {
 import type { AttachEntityCommand } from "../attachments.types";
 
 import { AuditService } from "../../../audit";
-import {
-  FILES_REPOSITORY,
-  type FilesRepositoryPort,
-} from "../../../files/application/ports/files.repository.port";
+import { FILES_REPOSITORY, type FilesRepositoryPort } from "../../../files";
 import { AttachmentsMapper } from "../attachments.mapper";
 import {
   ATTACHMENTS_REPOSITORY,

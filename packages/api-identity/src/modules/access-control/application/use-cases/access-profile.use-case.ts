@@ -8,7 +8,7 @@ import type { AccessProfileView } from "../access-control.types";
 import {
   ACCESS_CONTROL_REPOSITORY,
   type AccessControlRepositoryPort,
-} from "../access-control.repository.port";
+} from "../ports/access-control.repository.port";
 
 @Injectable()
 export class AccessProfileUseCase {

@@ -4,6 +4,7 @@ export interface MailTemplateSendInput {
   to: string;
   variables: Record<string, string>;
   metadata?: JsonObject | null;
+  sourceJobId?: string | null;
 }
 
 export interface MailTemplateSender {

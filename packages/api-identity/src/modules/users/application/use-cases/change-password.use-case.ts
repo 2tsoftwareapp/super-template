@@ -11,11 +11,11 @@ import {
 } from "@repo/api-core";
 import { TRANSACTION_PORT } from "@repo/api-core";
 
-import { hashPassword, verifyPassword } from "../../../auth/application/auth.helpers";
+import { hashPassword, verifyPassword } from "../../../auth";
 import {
   AUTH_SESSION_REPOSITORY,
   type AuthSessionRepositoryPort,
-} from "../../../auth/application/ports/auth-session.repository.port";
+} from "../../../auth";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";
 
 @Injectable()
