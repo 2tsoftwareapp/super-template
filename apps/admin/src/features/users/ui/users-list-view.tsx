@@ -1,5 +1,6 @@
 "use client";
 
+
 import { Button } from "@repo/web-ui/button";
 import { Card, CardContent } from "@repo/web-ui/card";
 import { ErrorState } from "@repo/web-ui/error-state";
@@ -9,6 +10,7 @@ import { Spinner } from "@repo/web-ui/spinner";
 import { UserPlus } from "lucide-react";
 
 import type { UsersListViewModel } from "@/features/users/model/users.types";
+import type { AdminUserDto } from "@/lib/api-types";
 
 import { BulkActionBar } from "@/components/bulk-action-bar";
 import { ResourcePageShell } from "@/components/resource-page-shell";
@@ -146,13 +148,17 @@ export function UsersListView({
           />
           <CardContent className="p-0 pb-1">
             <ResourceTable
-              table={table}
+               
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- model table is any
+            table={table}
               binarySort
               multiSort
               isLoading={list.isLoading}
               emptyTitle={list.emptyTitle}
               emptyDescription={list.emptyDescription}
-              onRowClick={(row) => list.onRowClick(row.original.id)}
+   
+               
+            onRowClick={(row) => list.onRowClick((row.original as AdminUserDto).id)}
             />
             <Pagination
               page={pagination.page}

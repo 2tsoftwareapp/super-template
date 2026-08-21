@@ -1,3 +1,5 @@
+import type { LucideIcon } from "lucide-react";
+
 import {
   Empty,
   EmptyContent,
@@ -6,7 +8,6 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@repo/web-ui/empty";
-import type { LucideIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 

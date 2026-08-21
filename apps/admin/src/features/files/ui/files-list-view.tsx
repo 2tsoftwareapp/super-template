@@ -1,5 +1,6 @@
 "use client";
 
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/web-ui/card";
 import { ConfirmDialog } from "@repo/web-ui/confirm-dialog";
 import { LoadingButton } from "@repo/web-ui/loading-button";
@@ -8,6 +9,7 @@ import { Upload } from "lucide-react";
 import { useRef } from "react";
 
 import type { FilesViewModel } from "@/features/files/model/files.types";
+import type { FileDto } from "@/lib/api-types";
 
 import { ResourcePageShell } from "@/components/resource-page-shell";
 import { ResourceTable } from "@/components/resource-table";
@@ -27,6 +29,7 @@ export function FilesListView(viewModel: FilesViewModel) {
     history,
     detailTabs,
     confirmDelete,
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- model table is any
     table,
   } = viewModel;
   const uploadFileRef = useRef<HTMLInputElement>(null);
@@ -104,11 +107,14 @@ export function FilesListView(viewModel: FilesViewModel) {
           />
           <CardContent className="p-0 pb-1">
             <ResourceTable
-              table={table}
+               
+             
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- model table is any
+            table={table}
               isLoading={list.isLoading}
               {...(list.isError ? { error: { title: "Could not load files." } } : {})}
               onRetry={list.onRetry}
-              onRowClick={(row) => list.onRowClick(row.original)}
+              onRowClick={(row) => list.onRowClick(row.original as FileDto)}
               emptyTitle={
                 list.hasFilters ? "No files match your filters." : "No files uploaded yet."
               }

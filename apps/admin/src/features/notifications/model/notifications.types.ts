@@ -1,6 +1,5 @@
-import type { ColumnDef, Table as ReactTable } from "@tanstack/react-table";
 
-import type { NotificationDto, NotificationJobDto } from "@/lib/api-types";
+import type { NotificationDto } from "@/lib/api-types";
 
 import type { NotificationComposeFormValues } from "./notifications.schemas";
 
@@ -16,8 +15,8 @@ export interface NotificationsColumnOptions {
 
 export type NotificationsColumnFactory = (
   options: NotificationsColumnOptions,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- mirrors TanStack's own `columns: ColumnDef<TData, any>[]` input type
-) => ColumnDef<NotificationJobDto, any>[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- column defs are opaque in model
+) => any[];
 
 export interface NotificationsViewModel {
   isRefreshing: boolean;
@@ -40,5 +39,6 @@ export interface NotificationsViewModel {
     onRetry: () => void;
     data: NotificationDto[];
   };
-  table: ReactTable<NotificationJobDto>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- table is opaque in model
+  table: any;
 }

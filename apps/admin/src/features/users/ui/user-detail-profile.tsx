@@ -1,9 +1,12 @@
+import type { UseFormReturn } from "react-hook-form";
+
 import { Input } from "@repo/web-ui/input";
 import { Label } from "@repo/web-ui/label";
 import { LoadingButton } from "@repo/web-ui/loading-button";
 import { Show } from "@repo/web-ui/show";
 import { CheckCircle2 } from "lucide-react";
 
+import type { ProfileForm } from "@/features/users/model/users.schemas";
 import type { UserDetailViewModel } from "@/features/users/model/users.types";
 
 interface UserDetailProfileProps {
@@ -12,16 +15,17 @@ interface UserDetailProfileProps {
 }
 
 export function UserDetailProfile({ profile, canEdit }: UserDetailProfileProps) {
+  const form = profile.form as UseFormReturn<ProfileForm>;
   return (
     <div>
       <h4 className="mb-3 text-sm font-medium">Profile</h4>
       <form className="grid gap-4 sm:grid-cols-2" onSubmit={profile.onSubmit}>
         <div className="space-y-1.5">
           <Label htmlFor="p-name">Display name</Label>
-          <Input id="p-name" {...profile.form.register("displayName")} disabled={!canEdit} />
-          {profile.form.formState.errors.displayName && (
+          <Input id="p-name" {...form.register("displayName")} disabled={!canEdit} />
+          {form.formState.errors.displayName && (
             <p className="text-xs text-destructive">
-              {profile.form.formState.errors.displayName.message}
+              {form.formState.errors.displayName.message}
             </p>
           )}
         </div>
@@ -30,12 +34,12 @@ export function UserDetailProfile({ profile, canEdit }: UserDetailProfileProps) 
           <Input
             id="p-email"
             type="email"
-            {...profile.form.register("email")}
+            {...form.register("email")}
             disabled={!canEdit}
           />
-          {profile.form.formState.errors.email && (
+          {form.formState.errors.email && (
             <p className="text-xs text-destructive">
-              {profile.form.formState.errors.email.message}
+              {form.formState.errors.email.message}
             </p>
           )}
         </div>
@@ -43,7 +47,7 @@ export function UserDetailProfile({ profile, canEdit }: UserDetailProfileProps) 
           <LoadingButton
             type="submit"
             loading={profile.state.isPending}
-            disabled={!canEdit || (!profile.form.formState.isDirty && !profile.state.isError)}
+            disabled={!canEdit || (!form.formState.isDirty && !profile.state.isError)}
           >
             Save profile
           </LoadingButton>

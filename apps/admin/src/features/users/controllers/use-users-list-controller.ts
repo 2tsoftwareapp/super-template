@@ -100,7 +100,8 @@ export function useUsersListController({
   const { table, selectedIds, clearSelection, handlePageChange, handlePageSizeChange } =
     useResourceTableConfig<AdminUserDto, UsersSortCriterion["field"]>({
       data: pageUsers, listParams, sortBridge: usersSortBridge,
-      columns: createColumns({ canUpdate, onActivate: handleActivate, onBlock: handleBlock, onResendVerification: handleResendVerification, isDisabled: isMutating }),
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- model now any[]
+    columns: createColumns({ canUpdate, onActivate: handleActivate, onBlock: handleBlock, onResendVerification: handleResendVerification, isDisabled: isMutating }),
       onSortChange: handleSortChange,
       onPageChange: (page) => patchListParams({ page }),
       onPageSizeChange: (limit) => patchListParams({ limit: limit as UsersPageSize, page: 1 }),

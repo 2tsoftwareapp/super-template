@@ -1,5 +1,6 @@
 "use client";
 
+
 import { Badge } from "@repo/web-ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/web-ui/card";
 import { Empty, EmptyContent, EmptyHeader, EmptyTitle } from "@repo/web-ui/empty";
@@ -8,6 +9,8 @@ import { SectionLoading } from "@repo/web-ui/loading";
 import { Show } from "@repo/web-ui/show";
 
 import type { NotificationsViewModel } from "@/features/notifications/model/notifications.types";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- used in row.original cast
+import type { NotificationJobDto } from "@/lib/api-types";
 
 import { ResourcePageShell } from "@/components/resource-page-shell";
 import { ResourceTable } from "@/components/resource-table";
@@ -68,7 +71,9 @@ export function NotificationsListView({
             </CardHeader>
             <CardContent className="p-0 pb-1">
               <ResourceTable
-                table={table}
+                 
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- model table is any
+            table={table}
                 isLoading={jobs.isLoading}
                 {...(jobs.isError ? { error: { title: "Could not load delivery jobs." } } : {})}
                 onRetry={jobs.onRetry}

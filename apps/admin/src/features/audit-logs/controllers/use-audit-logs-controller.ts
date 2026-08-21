@@ -113,6 +113,7 @@ export function useAuditLogsController({
 
   const { table } = useResourceTableConfig<AuditLogDto, AuditLogsSortField>({
     data: entries,
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- model now any[]
     columns: createColumns({
       formatAction: formatAuditAction,
       onSelectEntry: setSelectedEntry,

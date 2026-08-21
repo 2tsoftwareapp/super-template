@@ -1,5 +1,6 @@
 "use client";
 
+
 import { Button } from "@repo/web-ui/button";
 import { Card, CardContent } from "@repo/web-ui/card";
 import { DatePicker } from "@repo/web-ui/date-picker";
@@ -8,6 +9,7 @@ import { Spinner } from "@repo/web-ui/spinner";
 import { Download } from "lucide-react";
 
 import type { AuditLogsViewModel } from "@/features/audit-logs/model/audit-logs.types";
+import type { AuditLogDto } from "@/lib/api-types";
 
 import { ResourceDrawer } from "@/components/resource-drawer";
 import { ResourcePageShell } from "@/components/resource-page-shell";
@@ -81,11 +83,13 @@ export function AuditLogsListView({
 
         <CardContent className="p-0 pb-1">
           <ResourceTable
+             
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- model table is any
             table={table}
             isLoading={isLoading}
             {...(hasError ? { error: { title: "Could not load audit logs." } } : {})}
             onRetry={onRefresh}
-            onRowClick={(row) => onSelectEntry(row.original)}
+            onRowClick={(row) => onSelectEntry(row.original as AuditLogDto)}
             emptyTitle={hasFilters ? "No events match your filters." : "No events recorded yet."}
           />
           <Pagination

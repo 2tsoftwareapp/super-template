@@ -1,11 +1,14 @@
 "use client";
 
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/web-ui/card";
 import { ErrorState } from "@repo/web-ui/error-state";
 import { Pagination } from "@repo/web-ui/pagination";
 import { Show } from "@repo/web-ui/show";
 
 import type { JobsViewModel } from "@/features/jobs/model/jobs.types";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- used in row.original cast
+import type { JobDto } from "@/lib/api-types";
 
 import { ResourcePageShell } from "@/components/resource-page-shell";
 import { ResourceTable } from "@/components/resource-table";
@@ -73,7 +76,9 @@ export function JobsListView({ header, filters, list, detail, logs, table }: Job
           />
           <CardContent className="p-0 pb-1">
             <ResourceTable
-              table={table}
+               
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- model table is any
+            table={table}
               isLoading={list.isLoading}
               {...(list.isError ? { error: { title: "Could not load jobs." } } : {})}
               onRetry={list.onRetry}

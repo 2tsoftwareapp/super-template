@@ -1,12 +1,9 @@
 import type { SortCriterion, SortOrder } from "@repo/api-sort";
-import type { ColumnDef, Table } from "@tanstack/react-table";
-import type { UseFormReturn } from "react-hook-form";
 
 import { PAGE_SIZE_OPTIONS, type PageSize } from "@repo/config";
 
 import type { AdminUserDto, OrganizationDto, RoleDto } from "@/lib/api-types";
 
-import type { ProfileForm } from "./users.schemas";
 
 // ── List params & filter types (merged from types.ts) ──────────────────────
 
@@ -38,8 +35,8 @@ export interface UsersTableColumnOptions {
  */
 export type UsersTableColumnFactory = (
   options?: UsersTableColumnOptions,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- mirrors TanStack's own `columns: ColumnDef<TData, any>[]` input type
-) => ColumnDef<AdminUserDto, any>[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- column defs are opaque in model
+) => any[];
 
 export interface UsersListParams {
   page: number;
@@ -158,7 +155,8 @@ export interface UsersListViewModel {
     onCancel: () => void;
     onConfirm: () => Promise<void>;
   };
-  table: Table<AdminUserDto>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- table is opaque in model
+  table: any;
 }
 
 export interface UserDetailViewModel {
@@ -174,7 +172,8 @@ export interface UserDetailViewModel {
     canEdit: boolean;
   };
   profile: {
-    form: UseFormReturn<ProfileForm>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- form is opaque in model
+    form: any;
     onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
     state: MutationState;
   };

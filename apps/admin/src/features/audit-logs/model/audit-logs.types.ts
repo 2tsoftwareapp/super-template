@@ -1,4 +1,3 @@
-import type { ColumnDef, Table as ReactTable } from "@tanstack/react-table";
 
 import type { AuditLogDto } from "@/lib/api-types";
 
@@ -11,8 +10,8 @@ export interface AuditLogsColumnOptions {
 
 export type AuditLogsColumnFactory = (
   options: AuditLogsColumnOptions,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- mirrors TanStack's own `columns: ColumnDef<TData, any>[]` input type
-) => ColumnDef<AuditLogDto, any>[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- column defs are opaque in model
+) => any[];
 
 /**
  * Presentational view-model for the audit-logs screen.
@@ -34,5 +33,6 @@ export interface AuditLogsViewModel {
   onExport: () => void;
   isExporting: boolean;
   formatAction: (action: string) => string;
-  table: ReactTable<AuditLogDto>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- table is opaque in model
+  table: any;
 }

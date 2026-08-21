@@ -107,12 +107,11 @@ export default defineConfig([
   {
     // Architecture boundary: model/ is the pure domain layer — no React, no
     // API calls, no side effects. See CODING_RULES.md §7.
-    // NOTE: severity is "warn" — same migration strategy as boundary-ui-layer above.
     name: "web/boundary-model-layer",
     files: ["src/features/*/model/**/*.{ts,tsx}"],
     rules: {
       "no-restricted-imports": [
-        "warn",
+        "error",
         {
           patterns: [
             {

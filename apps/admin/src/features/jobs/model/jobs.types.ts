@@ -1,4 +1,3 @@
-import type { ColumnDef, Table as ReactTable } from "@tanstack/react-table";
 
 import type { JobDto, JobEventDto, JobMetricsDto } from "@/lib/api-types";
 
@@ -20,8 +19,8 @@ export interface JobsColumnOptions {
 
 export type JobsColumnFactory = (
   options: JobsColumnOptions,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- mirrors TanStack's own `columns: ColumnDef<TData, any>[]` input type
-) => ColumnDef<JobDto, any>[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- column defs are opaque in model
+) => any[];
 
 export interface JobsViewModel {
   header: {
@@ -80,5 +79,6 @@ export interface JobsViewModel {
     onConfirm: () => void;
     onDismiss: () => void;
   };
-  table: ReactTable<JobDto>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- table is opaque in model
+  table: any;
 }

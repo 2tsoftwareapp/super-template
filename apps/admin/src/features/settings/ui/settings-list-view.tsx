@@ -8,11 +8,10 @@ import { RefreshCcw, Settings } from "lucide-react";
 
 import type { SettingsViewModel } from "@/features/settings/model/settings.types";
 
+import { ResourceEmpty } from "@/components/resource-empty";
 import { ResourcePageShell } from "@/components/resource-page-shell";
 import { ResourceToolbar } from "@/components/resource-toolbar";
 import { adminResources } from "@/lib/admin-resources";
-
-import { ResourceEmpty } from "@/components/resource-empty";
 
 import { SettingCard } from "./setting-card";
 
