@@ -4,6 +4,7 @@ import { Badge } from "@repo/web-ui/badge";
 import { Button } from "@repo/web-ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/web-ui/card";
 import { ConfirmDialog } from "@repo/web-ui/confirm-dialog";
+import { Empty, EmptyContent, EmptyHeader, EmptyTitle } from "@repo/web-ui/empty";
 import { ErrorState } from "@repo/web-ui/error-state";
 import { Show } from "@repo/web-ui/show";
 import { Spinner } from "@repo/web-ui/spinner";
@@ -241,9 +242,13 @@ export function OrganizationDetailContent(vm: OrganizationDetailViewModel) {
               </Show>
 
               {!membersError && members.length === 0 ? (
-                <div className="p-6 text-center text-sm text-muted-foreground">
-                  No members found in this organization.
-                </div>
+                <Empty className="py-8">
+                  <EmptyContent>
+                    <EmptyHeader>
+                      <EmptyTitle>No members yet</EmptyTitle>
+                    </EmptyHeader>
+                  </EmptyContent>
+                </Empty>
               ) : null}
 
               {!membersError && members.length > 0 ? (

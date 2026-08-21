@@ -88,7 +88,7 @@ export function UsersListView({
           <Show when={list.isError}>
             <ErrorState
               variant="inline"
-              title="Failed to load users"
+              title="Could not load users."
               action={{ label: "Retry", onClick: list.onRetry }}
             />
           </Show>

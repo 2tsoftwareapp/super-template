@@ -96,7 +96,7 @@ export function RolesListView(vm: RolesViewModel) {
             filters={
               <>
                 <select
-                  className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+                  className="h-9 rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   value={scopeFilter ?? ""}
                   onChange={(e) =>
                     onScopeFilterChange(
@@ -110,7 +110,7 @@ export function RolesListView(vm: RolesViewModel) {
                 </select>
                 {isSuperAdmin && (
                   <select
-                    className="h-9 rounded-md border border-input bg-background px-2 text-sm max-w-[200px]"
+                    className="h-9 rounded-md border border-input bg-background px-3 text-sm max-w-[200px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     value={vm.organizationFilter ?? ""}
                     onChange={(e) => vm.onOrganizationFilterChange(e.target.value || undefined)}
                   >
