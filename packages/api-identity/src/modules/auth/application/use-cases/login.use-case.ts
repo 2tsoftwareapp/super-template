@@ -12,8 +12,11 @@ import {
 
 import type { LoginCommand } from "../auth.types";
 
-import { MfaService } from "../../../mfa";
-import { USERS_REPOSITORY, type UsersRepositoryPort } from "../../../users";
+import { MfaService } from "../../../mfa/application/mfa.service";
+import {
+  USERS_REPOSITORY,
+  type UsersRepositoryPort,
+} from "../../../users/application/ports/users.repository.port";
 import { verifyPasswordWithTimingPadding } from "../auth.helpers";
 import { IssueSessionUseCase } from "./issue-session.use-case";
 

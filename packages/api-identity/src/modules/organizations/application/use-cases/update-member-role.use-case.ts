@@ -16,7 +16,7 @@ import {
 
 import type { OrganizationMemberRole } from "../../domain/organization-access.policy";
 
-import { AccessControlService } from "../../../access-control";
+import { AccessControlService } from "../../../access-control/application/access-control.service";
 import {
   assertCanManageTargetRole,
   assertNotLastOwner,

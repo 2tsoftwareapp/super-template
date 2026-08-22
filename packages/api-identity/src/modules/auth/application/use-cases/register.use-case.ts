@@ -18,8 +18,11 @@ import {
 import type { RegisterCommand } from "../auth.types";
 
 import { AccessControlService } from "../../../access-control";
-import { OrganizationsService } from "../../../organizations";
-import { USERS_REPOSITORY, type UsersRepositoryPort } from "../../../users";
+import { OrganizationsService } from "../../../organizations/application/organizations.service";
+import {
+  USERS_REPOSITORY,
+  type UsersRepositoryPort,
+} from "../../../users/application/ports/users.repository.port";
 import { generateOpaqueToken, hashOpaqueToken, hashPassword } from "../auth.helpers";
 import {
   AUTH_SESSION_REPOSITORY,

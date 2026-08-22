@@ -9,7 +9,7 @@ import {
   SYSTEM_SCOPE,
 } from "@repo/api-core";
 
-import { OrganizationsService } from "../../../organizations";
+import { OrganizationsService } from "../../../organizations/application/organizations.service";
 import {
   AUTH_SESSION_REPOSITORY,
   type AuthSessionRepositoryPort,

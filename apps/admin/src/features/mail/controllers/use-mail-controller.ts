@@ -116,7 +116,7 @@ export function useMailController({ createColumns }: UseMailControllerOptions): 
 
   const { table, handlePageChange } = useResourceTableConfig<MailDeliveryDto, MailSortField>({
     data: deliveriesItems,
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- model now any[]
+
     columns: createColumns({ onSelectDelivery: setSelectedDelivery }),
     enableSelection: false,
     getRowId: (row) => row.id,

@@ -16,10 +16,14 @@ import { PLATFORM_TRANSACTION_PORT } from "@repo/api-core";
 
 import type { HandleSsoCallbackCommand } from "../sso.types";
 
-import { AccessControlService } from "../../../access-control";
-import { hashPassword, IssueSessionUseCase } from "../../../auth";
-import { OrganizationsService } from "../../../organizations";
-import { USERS_REPOSITORY, type UsersRepositoryPort } from "../../../users";
+import { AccessControlService } from "../../../access-control/application/access-control.service";
+import { hashPassword } from "../../../auth/application/auth.helpers";
+import { IssueSessionUseCase } from "../../../auth/application/use-cases/issue-session.use-case";
+import { OrganizationsService } from "../../../organizations/application/organizations.service";
+import {
+  USERS_REPOSITORY,
+  type UsersRepositoryPort,
+} from "../../../users/application/ports/users.repository.port";
 import { decideAccountLinking } from "../../domain/account-linking.policy";
 import { SSO_PROVIDER_REGISTRY, type SsoProviderRegistry } from "../ports/sso-provider.port";
 import { SSO_REPOSITORY, type SsoRepositoryPort } from "../ports/sso.repository.port";

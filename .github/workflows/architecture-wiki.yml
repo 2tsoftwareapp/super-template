@@ -1,6 +1,11 @@
 name: Deploy Architecture Wiki
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/architecture-wiki/**"
+      - ".github/workflows/architecture-wiki.yml"
   workflow_dispatch:
 
 permissions:

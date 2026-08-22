@@ -336,6 +336,10 @@ Serializers _$serializers = (Serializers().toBuilder()
         () => ListBuilder<String>(),
       )
       ..addBuilderFactory(
+        const FullType(BuiltList, const [const FullType(String)]),
+        () => ListBuilder<String>(),
+      )
+      ..addBuilderFactory(
         const FullType(BuiltList, const [
           const FullType(RoleAssignmentDto),
         ]),

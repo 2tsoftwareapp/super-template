@@ -94,7 +94,6 @@ export function MailListView({
         />
         <CardContent className="p-0 pb-1">
           <ResourceTable
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- model table is any
             table={table}
             isLoading={deliveries.isLoading}
             {...(deliveries.isError ? { error: { title: "Could not load deliveries." } } : {})}

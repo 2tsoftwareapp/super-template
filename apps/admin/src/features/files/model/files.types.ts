@@ -1,4 +1,5 @@
 import type { SortCriterion } from "@repo/api-sort";
+import type { ColumnDef, Table as ReactTable } from "@tanstack/react-table";
 
 import type { FileDto, FileHistoryEventDto, FileVersionDto } from "@/lib/api-types";
 
@@ -18,7 +19,7 @@ export interface FilesColumnOptions {
 export type FilesColumnFactory = (
   options: FilesColumnOptions,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- column defs are opaque in model
-) => any[];
+) => ColumnDef<FileDto, any>[];
 
 export interface FilesViewModel {
   header: {
@@ -91,6 +92,5 @@ export interface FilesViewModel {
     onCancel: () => void;
     onConfirm: () => void;
   };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- table is opaque in model
-  table: any;
+  table: ReactTable<FileDto>;
 }

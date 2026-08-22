@@ -130,7 +130,7 @@ export function useJobsController({ createColumns }: UseJobsControllerOptions): 
 
   const { table } = useResourceTableConfig<JobDto, JobsSortField>({
     data: allJobs,
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- model now any[]
+
     columns: createColumns({
       canCancel: permissions.canCancel,
       confirmId: confirmCancel,

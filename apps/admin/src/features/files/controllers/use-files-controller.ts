@@ -102,7 +102,7 @@ export function useFilesController({ createColumns }: UseFilesControllerOptions)
 
   const { table } = useResourceTableConfig<FileDto, FilesSortField>({
     data: entries,
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- model now any[]
+
     columns: createColumns({
       canDelete: permissions.canDelete,
       formatBytes,

@@ -70,7 +70,6 @@ export function NotificationsListView({
             </CardHeader>
             <CardContent className="p-0 pb-1">
               <ResourceTable
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- model table is any
                 table={table}
                 isLoading={jobs.isLoading}
                 {...(jobs.isError ? { error: { title: "Could not load delivery jobs." } } : {})}

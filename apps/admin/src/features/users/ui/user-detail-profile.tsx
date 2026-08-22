@@ -1,12 +1,9 @@
-import type { UseFormReturn } from "react-hook-form";
-
 import { Input } from "@repo/web-ui/input";
 import { Label } from "@repo/web-ui/label";
 import { LoadingButton } from "@repo/web-ui/loading-button";
 import { Show } from "@repo/web-ui/show";
 import { CheckCircle2 } from "lucide-react";
 
-import type { ProfileForm } from "@/features/users/model/users.schemas";
 import type { UserDetailViewModel } from "@/features/users/model/users.types";
 
 interface UserDetailProfileProps {
@@ -15,7 +12,7 @@ interface UserDetailProfileProps {
 }
 
 export function UserDetailProfile({ profile, canEdit }: UserDetailProfileProps) {
-  const form = profile.form as UseFormReturn<ProfileForm>;
+  const form = profile.form;
   return (
     <div>
       <h4 className="mb-3 text-sm font-medium">Profile</h4>

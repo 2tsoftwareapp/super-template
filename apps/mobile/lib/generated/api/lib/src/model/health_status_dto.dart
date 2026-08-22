@@ -15,12 +15,17 @@ part 'health_status_dto.g.dart';
 ///
 /// Properties:
 /// * [status]
+/// * [warnings] - Operational warnings surfaced for monitoring (e.g. missing REDIS_URL in production).
 @BuiltValue()
 abstract class HealthStatusDto
     implements Built<HealthStatusDto, HealthStatusDtoBuilder> {
   @BuiltValueField(wireName: r'status')
   HealthStatusDtoStatusEnum get status;
   // enum statusEnum {  ok,  ready,  };
+
+  /// Operational warnings surfaced for monitoring (e.g. missing REDIS_URL in production).
+  @BuiltValueField(wireName: r'warnings')
+  BuiltList<String>? get warnings;
 
   HealthStatusDto._();
 
@@ -53,6 +58,13 @@ class _$HealthStatusDtoSerializer
       object.status,
       specifiedType: const FullType(HealthStatusDtoStatusEnum),
     );
+    if (object.warnings != null) {
+      yield r'warnings';
+      yield serializers.serialize(
+        object.warnings,
+        specifiedType: const FullType(BuiltList, [FullType(String)]),
+      );
+    }
   }
 
   @override
@@ -86,6 +98,15 @@ class _$HealthStatusDtoSerializer
             specifiedType: const FullType(HealthStatusDtoStatusEnum),
           ) as HealthStatusDtoStatusEnum;
           result.status = valueDes;
+          break;
+        case r'warnings':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(BuiltList, [
+              FullType(String),
+            ]),
+          ) as BuiltList<String>;
+          result.warnings.replace(valueDes);
           break;
         default:
           unhandled.add(key);

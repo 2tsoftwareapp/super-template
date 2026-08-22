@@ -3,7 +3,10 @@ import { durationToMilliseconds, normalizeEmail } from "@repo/api-core";
 
 import type { ForgotPasswordCommand } from "../auth.types";
 
-import { USERS_REPOSITORY, type UsersRepositoryPort } from "../../../users";
+import {
+  USERS_REPOSITORY,
+  type UsersRepositoryPort,
+} from "../../../users/application/ports/users.repository.port";
 import { generateOpaqueToken, hashOpaqueToken } from "../auth.helpers";
 import {
   AUTH_SESSION_REPOSITORY,

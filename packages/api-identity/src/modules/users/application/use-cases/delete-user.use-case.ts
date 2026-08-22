@@ -12,7 +12,10 @@ import {
 import { TRANSACTION_PORT } from "@repo/api-core";
 
 import { AccessControlService, ROLE_NAMES } from "../../../access-control";
-import { AUTH_SESSION_REPOSITORY, type AuthSessionRepositoryPort } from "../../../auth";
+import {
+  AUTH_SESSION_REPOSITORY,
+  type AuthSessionRepositoryPort,
+} from "../../../auth/application/ports/auth-session.repository.port";
 import { assertUserBelongsToOrganization } from "../../domain/user-org-scope.policy";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";
 

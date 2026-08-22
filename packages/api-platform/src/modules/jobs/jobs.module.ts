@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { forwardRef, Module } from "@nestjs/common";
 import { BACKGROUND_JOB_ENQUEUER, BACKGROUND_JOB_ENQUEUER_WITH_RESULT } from "@repo/api-core";
 
 import { MailModule } from "../mail";
@@ -23,7 +23,7 @@ import { JobsRepository } from "./infrastructure/jobs.repository";
 import { AdminJobsController } from "./presentation/admin-jobs.controller";
 
 @Module({
-  imports: [MailModule],
+  imports: [forwardRef(() => MailModule)],
   controllers: [AdminJobsController],
   providers: [
     JobsRepository,

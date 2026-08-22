@@ -34,7 +34,7 @@ API_PID=$!
 
 printf '[openapi] Waiting for API on port %s' "$OPENAPI_PORT"
 for _ in $(seq 1 90); do
-  if curl -fsS "http://127.0.0.1:${OPENAPI_PORT}/api/docs-json" >"$JSON_FILE" 2>/dev/null; then
+  if curl -fsS "http://127.0.0.1:${OPENAPI_PORT}/api/docs-json" | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>process.stdout.write(JSON.stringify(JSON.parse(d),null,2)))" >"$JSON_FILE" 2>/dev/null; then
     printf ' ready\n'
     mv "$JSON_FILE" "$API_DIR/openapi.json"
     exit 0

@@ -146,7 +146,7 @@ export function useNotificationsController({
 
   const { table } = useResourceTableConfig<NotificationJobDto, NotificationsSortField>({
     data: jobs.data?.data ?? [],
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- model now any[]
+
     columns: createColumns({
       canCancel: permissions.canCancel,
       isCancelling: cancelJob.isPending,

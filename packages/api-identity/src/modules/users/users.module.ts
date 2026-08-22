@@ -2,7 +2,7 @@ import { Module } from "@nestjs/common";
 import { USER_LOOKUP } from "@repo/api-core";
 
 import { AccessControlModule } from "../access-control";
-import { AuthDataModule } from "../auth/auth-data.module";
+import { AuthDataModule } from "../auth";
 import { OrganizationsModule } from "../organizations/organizations.module";
 import { USERS_REPOSITORY } from "./application/ports/users.repository.port";
 import { ChangePasswordUseCase } from "./application/use-cases/change-password.use-case";

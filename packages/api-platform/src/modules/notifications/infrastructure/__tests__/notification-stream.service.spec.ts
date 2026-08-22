@@ -21,10 +21,10 @@ describe("NotificationStreamService", () => {
 
     // Subscribe to org-1 and org-2 channels for the same user — they must remain isolated
     const sub1 = service.stream("user-1", "org-1").subscribe((event) => {
-      org1Events.push(event.data);
+      org1Events.push(event);
     });
     const sub2 = service.stream("user-1", "org-2").subscribe((event) => {
-      org2Events.push(event.data);
+      org2Events.push(event);
     });
 
     const baseEvent = {

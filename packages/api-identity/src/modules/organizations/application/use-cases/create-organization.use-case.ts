@@ -12,7 +12,7 @@ import {
 
 import type { CreateOrganizationCommand } from "../organizations.types";
 
-import { AccessControlService } from "../../../access-control";
+import { AccessControlService } from "../../../access-control/application/access-control.service";
 import {
   ORGANIZATIONS_REPOSITORY,
   type OrganizationsRepositoryPort,

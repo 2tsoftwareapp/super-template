@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { forwardRef, Module } from "@nestjs/common";
 import { FILE_LOOKUP } from "@repo/api-core";
 
 import { AuditModule } from "../audit";
@@ -20,7 +20,7 @@ import { FilesRepository } from "./infrastructure/files.repository";
 import { FilesController } from "./presentation/files.controller";
 
 @Module({
-  imports: [StorageModule, AuditModule],
+  imports: [StorageModule, forwardRef(() => AuditModule)],
   controllers: [FilesController],
   providers: [
     FilesRepository,

@@ -71,11 +71,13 @@ class _$HealthStatusDtoStatusEnumSerializer
 class _$HealthStatusDto extends HealthStatusDto {
   @override
   final HealthStatusDtoStatusEnum status;
+  @override
+  final BuiltList<String>? warnings;
 
   factory _$HealthStatusDto([void Function(HealthStatusDtoBuilder)? updates]) =>
       (HealthStatusDtoBuilder()..update(updates))._build();
 
-  _$HealthStatusDto._({required this.status}) : super._();
+  _$HealthStatusDto._({required this.status, this.warnings}) : super._();
   @override
   HealthStatusDto rebuild(void Function(HealthStatusDtoBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -86,22 +88,25 @@ class _$HealthStatusDto extends HealthStatusDto {
   @override
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
-    return other is HealthStatusDto && status == other.status;
+    return other is HealthStatusDto &&
+        status == other.status &&
+        warnings == other.warnings;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
     _$hash = $jc(_$hash, status.hashCode);
+    _$hash = $jc(_$hash, warnings.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper(
-      r'HealthStatusDto',
-    )..add('status', status))
+    return (newBuiltValueToStringHelper(r'HealthStatusDto')
+          ..add('status', status)
+          ..add('warnings', warnings))
         .toString();
   }
 }
@@ -114,6 +119,11 @@ class HealthStatusDtoBuilder
   HealthStatusDtoStatusEnum? get status => _$this._status;
   set status(HealthStatusDtoStatusEnum? status) => _$this._status = status;
 
+  ListBuilder<String>? _warnings;
+  ListBuilder<String> get warnings =>
+      _$this._warnings ??= ListBuilder<String>();
+  set warnings(ListBuilder<String>? warnings) => _$this._warnings = warnings;
+
   HealthStatusDtoBuilder() {
     HealthStatusDto._defaults(this);
   }
@@ -122,6 +132,7 @@ class HealthStatusDtoBuilder
     final $v = _$v;
     if ($v != null) {
       _status = $v.status;
+      _warnings = $v.warnings?.toBuilder();
       _$v = null;
     }
     return this;
@@ -141,14 +152,31 @@ class HealthStatusDtoBuilder
   HealthStatusDto build() => _build();
 
   _$HealthStatusDto _build() {
-    final _$result = _$v ??
-        _$HealthStatusDto._(
-          status: BuiltValueNullFieldError.checkNotNull(
-            status,
-            r'HealthStatusDto',
-            'status',
-          ),
+    _$HealthStatusDto _$result;
+    try {
+      _$result = _$v ??
+          _$HealthStatusDto._(
+            status: BuiltValueNullFieldError.checkNotNull(
+              status,
+              r'HealthStatusDto',
+              'status',
+            ),
+            warnings: _warnings?.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'warnings';
+        _warnings?.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+          r'HealthStatusDto',
+          _$failedField,
+          e.toString(),
         );
+      }
+      rethrow;
+    }
     replace(_$result);
     return _$result;
   }

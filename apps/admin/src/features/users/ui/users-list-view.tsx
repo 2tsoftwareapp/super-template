@@ -9,7 +9,6 @@ import { Spinner } from "@repo/web-ui/spinner";
 import { UserPlus } from "lucide-react";
 
 import type { UsersListViewModel } from "@/features/users/model/users.types";
-import type { AdminUserDto } from "@/lib/api-types";
 
 import { BulkActionBar } from "@/components/bulk-action-bar";
 import { ResourcePageShell } from "@/components/resource-page-shell";
@@ -147,14 +146,13 @@ export function UsersListView({
           />
           <CardContent className="p-0 pb-1">
             <ResourceTable
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- model table is any
               table={table}
               binarySort
               multiSort
               isLoading={list.isLoading}
               emptyTitle={list.emptyTitle}
               emptyDescription={list.emptyDescription}
-              onRowClick={(row) => list.onRowClick((row.original as AdminUserDto).id)}
+              onRowClick={(row) => list.onRowClick(row.original.id)}
             />
             <Pagination
               page={pagination.page}

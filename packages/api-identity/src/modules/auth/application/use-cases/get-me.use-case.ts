@@ -3,7 +3,10 @@ import type { AuthenticatedRequestUser } from "@repo/api-core";
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { AppError, ERROR_CODES } from "@repo/api-core";
 
-import { USERS_REPOSITORY, type UsersRepositoryPort } from "../../../users";
+import {
+  USERS_REPOSITORY,
+  type UsersRepositoryPort,
+} from "../../../users/application/ports/users.repository.port";
 import { AuthMapper } from "../auth.mapper";
 
 @Injectable()

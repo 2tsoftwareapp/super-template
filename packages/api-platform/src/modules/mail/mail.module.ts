@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { forwardRef, Module } from "@nestjs/common";
 import { MAIL_TEMPLATE_SENDER } from "@repo/api-core";
 
 import { JobsModule } from "../jobs";
@@ -18,7 +18,7 @@ import { TemplateRendererService } from "./infrastructure/template-renderer.serv
 import { AdminMailController } from "./presentation/admin-mail.controller";
 
 @Module({
-  imports: [JobsModule],
+  imports: [forwardRef(() => JobsModule)],
   controllers: [AdminMailController],
   providers: [
     SmtpMailerService,

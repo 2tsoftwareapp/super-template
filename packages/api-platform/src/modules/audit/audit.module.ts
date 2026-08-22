@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 import { AUDIT_WRITER } from "@repo/api-core";
 
-import { FILES_REPOSITORY } from "../files";
+import { FILES_REPOSITORY } from "../files/application/ports/files.repository.port";
 import { FilesRepository } from "../files/infrastructure/files.repository";
 import { StorageModule } from "../storage";
 import { AuditRetentionService } from "./application/audit-retention.service";

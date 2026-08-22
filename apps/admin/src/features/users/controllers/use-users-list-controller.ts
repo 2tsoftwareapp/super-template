@@ -124,7 +124,7 @@ export function useUsersListController({
       data: pageUsers,
       listParams,
       sortBridge: usersSortBridge,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- model now any[]
+
       columns: createColumns({
         canUpdate,
         onActivate: handleActivate,

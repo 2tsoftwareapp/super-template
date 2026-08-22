@@ -1,3 +1,5 @@
+import type { ColumnDef, Table as ReactTable } from "@tanstack/react-table";
+
 import type { AdminResourceConfig } from "@/lib/admin-resources";
 import type { MailDeliveryDto, MailPreviewDto, MailTemplateDto } from "@/lib/api-types";
 
@@ -20,7 +22,7 @@ export interface MailDeliveriesColumnOptions {
 export type MailDeliveriesColumnFactory = (
   options: MailDeliveriesColumnOptions,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- column defs are opaque in model
-) => any[];
+) => ColumnDef<MailDeliveryDto, any>[];
 
 export interface SendMailInput {
   templateKey: string;
@@ -86,6 +88,5 @@ export interface MailViewModel {
     onSelect: (delivery: MailDeliveryDto | null) => void;
     onClose: () => void;
   };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- table is opaque in model
-  table: any;
+  table: ReactTable<MailDeliveryDto>;
 }

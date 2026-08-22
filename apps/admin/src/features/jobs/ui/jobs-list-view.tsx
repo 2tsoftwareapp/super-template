@@ -75,7 +75,6 @@ export function JobsListView({ header, filters, list, detail, logs, table }: Job
           />
           <CardContent className="p-0 pb-1">
             <ResourceTable
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- model table is any
               table={table}
               isLoading={list.isLoading}
               {...(list.isError ? { error: { title: "Could not load jobs." } } : {})}

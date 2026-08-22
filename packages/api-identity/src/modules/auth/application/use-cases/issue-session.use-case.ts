@@ -5,7 +5,7 @@ import { Inject, Injectable } from "@nestjs/common";
 import type { AuthUserModel } from "../models/auth-user";
 
 import { AccessControlService } from "../../../access-control";
-import { OrganizationsService } from "../../../organizations";
+import { OrganizationsService } from "../../../organizations/application/organizations.service";
 import { AuthMapper } from "../auth.mapper";
 import { AUTH_TOKEN_PROVIDER, type AuthTokenProviderPort } from "../ports/auth-token.provider.port";
 
