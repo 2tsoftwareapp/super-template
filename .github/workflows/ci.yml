@@ -38,7 +38,6 @@ jobs:
       POSTGRES_DB: fullstack_starter
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      DATABASE_URL: postgresql://postgres:postgres@localhost:65432/fullstack_starter
       DATABASE_MIGRATE_URL: postgresql://postgres:postgres@localhost:65432/fullstack_starter
       DATABASE_URL_TEST: postgresql://postgres:postgres@localhost:65432/fullstack_starter_test
       DATABASE_URL_TEST_ADMIN: postgresql://postgres:postgres@localhost:65432/fullstack_starter_test
@@ -69,6 +68,10 @@ jobs:
 
       - name: Run database migrations
         run: pnpm --filter api db:migrate
+
+      - name: Set application DATABASE_URL (restricted role from migration 0007)
+        run: |
+          echo "DATABASE_URL=postgresql://fullstack_starter_app:fullstack_starter_app@localhost:65432/fullstack_starter" >> "$GITHUB_ENV"
 
       - name: Verify generated docs and contracts
         run: pnpm run generate:check
