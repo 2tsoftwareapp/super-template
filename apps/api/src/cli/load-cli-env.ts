@@ -10,7 +10,7 @@ export const loadCliEnv = (): string => {
     ? Number(process.env.POSTGRES_EXPOSED_PORT)
     : undefined;
   if (Number.isFinite(pinned)) {
-    return loadEnvFiles({ pinnedPostgresPort: pinned as number });
+    return loadEnvFiles({ pinnedPostgresPort: pinned! });
   }
   return loadEnvFiles();
 };
