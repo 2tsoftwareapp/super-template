@@ -40,8 +40,21 @@ describe("ImportExportAdapterRegistry", () => {
     expect(registry.getExportPermissions("users")).toEqual(["exports.read"]);
 
     const bare = new ImportExportAdapterRegistry();
-    bare.register({ ...adapter, type: "bare" });
+    bare.register({ ...adapter, type: "bare", importPermissions: [], exportPermissions: [] });
     expect(bare.getImportPermissions("bare")).toEqual([]);
     expect(bare.getExportPermissions("bare")).toEqual([]);
+
+    const noPermsAdapter: ImportExportAdapter<Row> = {
+      type: "no-perms",
+      csvHeader: ["name"],
+      listForExport: async () => [],
+      toCsvRow: (row) => [row.name],
+      parseCsvRecord: (record) => ({ name: record.name ?? "" }),
+      validateRow: () => null,
+      importRow: async () => {},
+    };
+    bare.register(noPermsAdapter);
+    expect(bare.getImportPermissions("no-perms")).toEqual([]);
+    expect(bare.getExportPermissions("no-perms")).toEqual([]);
   });
 });
