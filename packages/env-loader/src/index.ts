@@ -28,6 +28,12 @@ export interface LoadEnvOptions {
   appEnv?: string;
   /** Directory to resolve env files from (defaults to process.cwd()). */
   cwd?: string;
+  /**
+   * Pin the Postgres host port: skip the free-port scan entirely and rewrite
+   * DATABASE_* URLs to this port. For CI / hosted environments where the
+   * service is already live at a known port.
+   */
+  pinnedPostgresPort?: number;
 }
 
 const isPortInUseSync = (port: number): boolean => {
@@ -76,7 +82,13 @@ const resolveServicePort = (
   serviceName: string,
   containerPort: number,
   defaultPort: number,
+  pinnedPort?: number,
 ): number => {
+  // Operator pinned the port via real environment (e.g. CI with a live
+  // service): trust it and never scan past a listening instance.
+  if (pinnedPort !== undefined) {
+    return pinnedPort;
+  }
   if (isComposeServiceRunning(root, serviceName)) {
     const ourPort = getComposeServiceHostPort(root, serviceName, containerPort);
     if (ourPort) {
@@ -103,7 +115,7 @@ const updateUrlPort = (urlString: string | undefined, newPort: number): string |
   }
 };
 
-const resolveDynamicPorts = (root: string): void => {
+const resolveDynamicPorts = (root: string, pinnedPostgresPort?: number): void => {
   // 1. Postgres
   let postgresPort = process.env.POSTGRES_EXPOSED_PORT
     ? Number(process.env.POSTGRES_EXPOSED_PORT)
@@ -131,7 +143,8 @@ const resolveDynamicPorts = (root: string): void => {
     }
   }
 
-  const resolvedPostgresPort = resolveServicePort(root, "postgres", 5432, postgresPort);
+  const resolvedPostgresPort =
+    pinnedPostgresPort ?? resolveServicePort(root, "postgres", 5432, postgresPort);
   process.env.POSTGRES_EXPOSED_PORT = resolvedPostgresPort.toString();
   if (process.env.POSTGRES_PORT) {
     process.env.POSTGRES_PORT = resolvedPostgresPort.toString();
@@ -240,7 +253,7 @@ export const loadEnvFiles = (options: LoadEnvOptions = {}): string => {
     }
   }
 
-  resolveDynamicPorts(root);
+  resolveDynamicPorts(root, options.pinnedPostgresPort);
 
   process.env.APP_ENV ??= appEnv;
 
