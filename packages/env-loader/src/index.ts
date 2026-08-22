@@ -237,6 +237,12 @@ export const loadEnvFiles = (options: LoadEnvOptions = {}): string => {
   const appEnv = resolveAppEnv(options.appEnv);
   const root = findRepoRoot(cwd);
 
+  // Snapshot real-environment pin BEFORE file loading: a POSTGRES_EXPOSED_PORT
+  // set by the operator/CI pins the port; file-only values still get scanned.
+  const realEnvPinnedPostgresPort = process.env.POSTGRES_EXPOSED_PORT
+    ? Number(process.env.POSTGRES_EXPOSED_PORT)
+    : undefined;
+
   const files = [
     `.env.${appEnv}.local`,
     appEnv === "development" ? ".env.local" : null,
@@ -253,7 +259,7 @@ export const loadEnvFiles = (options: LoadEnvOptions = {}): string => {
     }
   }
 
-  resolveDynamicPorts(root, options.pinnedPostgresPort);
+  resolveDynamicPorts(root, options.pinnedPostgresPort ?? realEnvPinnedPostgresPort);
 
   process.env.APP_ENV ??= appEnv;
 
