@@ -40,14 +40,16 @@ apps/
   web/        public web/landing Next.js application
   mobile/     Flutter application
 
-packages/
+apps/api/src/
+  identity/       identity bounded context (core business)
+  platform/       platform bounded context (core business)
+  cli/            migrate / seed / reset entry points (+ seeds/)
+
+packages/          kernel libraries + optional ADD-ON feature packages
   api-core/       shared backend kernel, ports, errors, auth primitives
   api-database/   Drizzle schema, database runtime, migration support
-  api-health/     health-check capability
-  api-identity/   identity bounded context
-  api-platform/   platform bounded context
+  api-health/     health-check capability — the exemplar add-on package
   api-contract/   generated TypeScript API contract
-  api-seed/       seed data
   api-sort/       shared sorting contract/helpers
   env-loader/     environment resolution
   config/         cross-runtime non-API config, single source of truth
@@ -63,14 +65,14 @@ packages/
 
 Package placement is governed by **which runtimes** may import the code:
 
-| Package | May import | Never contains |
-| --- | --- | --- |
-| `@repo/utils` | backend + web + app-via-codegen | `react`, `next`, `@nestjs/*`, DOM or Node-only APIs |
-| `@repo/config` | backend + web + app-via-JSON/Dart | framework code; API-shaped config (that is the contract's job) |
-| `@repo/web-ui` | web only | hooks, data-fetching, business logic |
-| `@repo/web-hooks` | web only | non-hook logic, UI markup |
-| `@repo/web-utils` | web only | React components, React hooks |
-| `@repo/web-server` | web server only | client-only (`"use client"`) code |
+| Package            | May import                        | Never contains                                                 |
+| ------------------ | --------------------------------- | -------------------------------------------------------------- |
+| `@repo/utils`      | backend + web + app-via-codegen   | `react`, `next`, `@nestjs/*`, DOM or Node-only APIs            |
+| `@repo/config`     | backend + web + app-via-JSON/Dart | framework code; API-shaped config (that is the contract's job) |
+| `@repo/web-ui`     | web only                          | hooks, data-fetching, business logic                           |
+| `@repo/web-hooks`  | web only                          | non-hook logic, UI markup                                      |
+| `@repo/web-utils`  | web only                          | React components, React hooks                                  |
+| `@repo/web-server` | web server only                   | client-only (`"use client"`) code                              |
 
 Rules:
 
@@ -101,11 +103,11 @@ It may contain:
 
 It must not contain feature business logic.
 
-Business features belong under the correct bounded context:
+Business features belong under the correct bounded context inside `apps/api`:
 
 ```text
-packages/api-identity/src/modules/<feature>/
-packages/api-platform/src/modules/<feature>/
+apps/api/src/identity/modules/<feature>/
+apps/api/src/platform/modules/<feature>/
 ```
 
 `apps/admin/src/app/**` and `apps/web/src/app/**` are routing composition roots.
@@ -575,6 +577,30 @@ Before adding `forwardRef()`:
 4. consider emitting an event;
 5. document why the cycle is unavoidable if it remains.
 
+### 15.1 Add-on package contract (`packages/*`)
+
+`packages/` contains two kinds of code:
+
+1. **Kernel libraries** — `api-core`, `api-database`, `api-contract`, `api-sort`,
+   `env-loader`, `config`, `utils`, and all `web-*` packages.
+2. **Add-on feature packages** — optional, self-contained Nest modules the app
+   wires in explicitly. `api-health` is the exemplar.
+
+An add-on package MUST:
+
+- export exactly one public surface: its Nest `Module` (plus deliberate types)
+  from `index.ts`;
+- depend only on kernel packages (`layer:core/env/database/sort/contract`) —
+  never on another add-on's internals, never on any `apps/*` internals;
+- keep its full vertical slice inside the package
+  (application/infrastructure/presentation/domain as needed);
+- carry colocated unit tests and its own lint/typecheck scripts.
+
+The app decides whether an add-on participates by importing it in a module
+`imports[]`; removing that import removes the capability without touching
+core business code. Core business modules (identity, platform contexts) are
+NOT add-ons — they live inside `apps/api/src/{identity,platform}/modules/`.
+
 ---
 
 ## 16. Transactions
@@ -708,9 +734,7 @@ Example:
 ```ts
 export const usersApi = {
   list(params: UsersListParams) {
-    return webFetch<ListUsersResponse>(
-      buildUsersListPath(params),
-    );
+    return webFetch<ListUsersResponse>(buildUsersListPath(params));
   },
 
   block(input: BlockUsersInput) {
@@ -802,9 +826,7 @@ It must not import:
 ### Permission selector example
 
 ```ts
-export function selectUserPermissions(
-  session: AdminSession,
-): UserPermissions {
+export function selectUserPermissions(session: AdminSession): UserPermissions {
   const permissions = new Set(session.permissions);
 
   return {
@@ -940,17 +962,17 @@ export function UsersTable(props: UsersTableProps) {
 
 ## 26. Frontend state ownership
 
-| State | Correct owner |
-|---|---|
-| server data | TanStack Query |
-| page/filter/sort state that should survive/share | URL search params |
-| form values | React Hook Form |
-| validation | Zod |
-| drawer/dialog open state | controller or local UI |
-| authenticated session | session provider |
-| permissions | pure selector |
-| locale/theme | dedicated provider |
-| cross-page client state | store only when other mechanisms are insufficient |
+| State                                            | Correct owner                                     |
+| ------------------------------------------------ | ------------------------------------------------- |
+| server data                                      | TanStack Query                                    |
+| page/filter/sort state that should survive/share | URL search params                                 |
+| form values                                      | React Hook Form                                   |
+| validation                                       | Zod                                               |
+| drawer/dialog open state                         | controller or local UI                            |
+| authenticated session                            | session provider                                  |
+| permissions                                      | pure selector                                     |
+| locale/theme                                     | dedicated provider                                |
+| cross-page client state                          | store only when other mechanisms are insufficient |
 
 Do not copy server data into local state without a clear reason.
 
@@ -1069,15 +1091,15 @@ Avoid:
 
 ## 31. Complexity warning thresholds
 
-| Type | Review threshold |
-|---|---:|
-| backend controller | 150 lines |
-| backend use case | 200 lines |
-| React controller hook | 200 lines |
-| React view/component | 200 lines |
-| function | 60 lines |
-| constructor dependencies | 7 |
-| component props | 15 |
+| Type                     | Review threshold |
+| ------------------------ | ---------------: |
+| backend controller       |        150 lines |
+| backend use case         |        200 lines |
+| React controller hook    |        200 lines |
+| React view/component     |        200 lines |
+| function                 |         60 lines |
+| constructor dependencies |                7 |
+| component props          |               15 |
 
 These are review triggers, not automatic failures.
 

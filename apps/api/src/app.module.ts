@@ -1,7 +1,11 @@
+import { IdentityModule } from "@identity";
+import { AuthService } from "@identity/modules/auth";
 import { type MiddlewareConsumer, Module, type NestModule, RequestMethod } from "@nestjs/common";
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, Reflector } from "@nestjs/core";
 import { ScheduleModule } from "@nestjs/schedule";
 import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
+import { ImportExportModule } from "@platform";
+import { PlatformModule } from "@platform";
 import {
   APP_LOGGER,
   AppExceptionFilter,
@@ -19,10 +23,6 @@ import { TenantContextService } from "@repo/api-core";
 import { AppConfigModule } from "@repo/api-core/config/app-config.module";
 import { DatabaseModule } from "@repo/api-database";
 import { HealthModule } from "@repo/api-health";
-import { IdentityModule } from "@repo/api-identity";
-import { AuthService } from "@repo/api-identity/modules/auth";
-import { ImportExportModule } from "@repo/api-platform";
-import { PlatformModule } from "@repo/api-platform";
 
 import { AuthGuard } from "./shell/auth.guard";
 import { MaintenanceModeGuard } from "./shell/maintenance-mode.guard";

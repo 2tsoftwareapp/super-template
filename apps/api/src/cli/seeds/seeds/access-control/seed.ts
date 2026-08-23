@@ -1,4 +1,4 @@
-import type { AccessControlService } from "@repo/api-identity/modules/access-control";
+import type { AccessControlService } from "@identity/modules/access-control";
 
 import { type DatabaseExecutor } from "@repo/api-database";
 

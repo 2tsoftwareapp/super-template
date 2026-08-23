@@ -8,9 +8,15 @@ import { tokenLockId } from "../token-lock";
 // The suite runs both from the package root (direct vitest) and from apps/api
 // (turbo), so resolve the module dir from whichever cwd we are in.
 function resolveModuleRoot(): string {
-  const fromPackageRoot = join(process.cwd(), "src/modules/notifications");
-  if (existsSync(fromPackageRoot)) {
-    return fromPackageRoot;
+  // Suite runs from apps/api root (turbo/vitest) or from the module dir directly.
+  const candidates = [
+    join(process.cwd(), "src/platform/modules/notifications"),
+    join(process.cwd(), "src/modules/notifications"),
+  ];
+  for (const candidate of candidates) {
+    if (existsSync(candidate)) {
+      return candidate;
+    }
   }
   return join(process.cwd(), "../../packages/api-platform/src/modules/notifications");
 }

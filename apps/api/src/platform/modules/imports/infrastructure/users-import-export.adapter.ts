@@ -1,17 +1,21 @@
+import {
+  ACCESS_CONTROL_REPOSITORY,
+  type AccessControlRepositoryPort,
+} from "@identity/modules/access-control/application/ports/access-control.repository.port";
+import {
+  ORGANIZATIONS_REPOSITORY,
+  type OrganizationsRepositoryPort,
+} from "@identity/modules/organizations/application/ports/organizations.repository.port";
+import {
+  USERS_REPOSITORY,
+  type UsersRepositoryPort,
+} from "@identity/modules/users/application/ports/users.repository.port";
 import { Inject, Injectable } from "@nestjs/common";
 import {
   ImportExportAdapter,
   ImportExportRowContext,
   type TransactionExecutor,
 } from "@repo/api-core";
-import {
-  ACCESS_CONTROL_REPOSITORY,
-  type AccessControlRepositoryPort,
-  ORGANIZATIONS_REPOSITORY,
-  type OrganizationsRepositoryPort,
-  USERS_REPOSITORY,
-  type UsersRepositoryPort,
-} from "@repo/api-identity";
 import { hash } from "argon2";
 import { randomBytes } from "node:crypto";
 

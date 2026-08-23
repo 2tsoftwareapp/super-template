@@ -6,7 +6,6 @@ import { Test } from "@nestjs/testing";
 import { ThrottlerGuard } from "@nestjs/throttler";
 import { TenantContextService } from "@repo/api-core";
 import { DATABASE, type DatabaseClient } from "@repo/api-database";
-import { seedDatabase } from "@repo/api-seed";
 import { loadEnvFiles } from "@repo/env-loader";
 import { sql } from "drizzle-orm";
 import { Pool } from "pg";
@@ -14,6 +13,7 @@ import request from "supertest";
 
 import { AppModule } from "../../src/app.module";
 import { applySqlMigrations } from "../../src/cli/migrations";
+import { seedDatabase } from "../../src/cli/seeds/seed-data";
 
 loadEnvFiles();
 

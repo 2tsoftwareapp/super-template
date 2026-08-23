@@ -1,9 +1,9 @@
 import type { INestApplication } from "@nestjs/common";
 
 import { randomUUID } from "node:crypto";
-import { ACCESS_CONTROL_REPOSITORY, type AccessControlRepositoryPort } from "@repo/api-identity";
-import { RoleManagementUseCase } from "@repo/api-identity/modules/access-control/application/use-cases/role-management.use-case";
-import { seedDatabase } from "@repo/api-seed";
+import { ACCESS_CONTROL_REPOSITORY, type AccessControlRepositoryPort } from "@identity";
+import { RoleManagementUseCase } from "@identity/modules/access-control/application/use-cases/role-management.use-case";
+import { seedDatabase } from "../src/cli/seeds/seed-data";
 import { Pool } from "pg";
 import request from "supertest";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";

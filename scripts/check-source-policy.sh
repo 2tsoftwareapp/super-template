@@ -14,8 +14,8 @@ apps/admin/src
 apps/web/src
 packages/api-core/src
 packages/api-database/src
-packages/api-identity/src
-packages/api-platform/src
+apps/api/src/identity
+apps/api/src/platform
 "
 
 search_matches() {
@@ -66,9 +66,9 @@ search_unknown_targets() {
 
   if command -v rg >/dev/null 2>&1; then
     rg -n "$pattern" \
-      packages/api-identity/src/modules \
-      packages/api-platform/src/modules \
-      packages/api-platform/src/modules \
+      apps/api/src/identity/modules \
+      apps/api/src/platform/modules \
+      apps/api/src/platform/modules \
       apps/admin/src \
       apps/web/src \
       --glob '**/application/**' \
@@ -130,9 +130,9 @@ search_index_exports() {
     rg -n "$pattern" \
       packages/api-core/src/index.ts \
       packages/api-database/src/index.ts \
-      packages/api-identity/src/index.ts \
-      packages/api-platform/src/index.ts \
-      packages/api-platform/src/index.ts \
+      apps/api/src/identity/index.ts \
+      apps/api/src/platform/index.ts \
+      apps/api/src/platform/index.ts \
       packages/api-seed/src/index.ts \
       packages/api-health/src/index.ts
     return
@@ -141,9 +141,9 @@ search_index_exports() {
   grep -nE "$pattern" \
     packages/api-core/src/index.ts \
     packages/api-database/src/index.ts \
-    packages/api-identity/src/index.ts \
-    packages/api-platform/src/index.ts \
-    packages/api-platform/src/index.ts \
+    apps/api/src/identity/index.ts \
+    apps/api/src/platform/index.ts \
+    apps/api/src/platform/index.ts \
     packages/api-seed/src/index.ts \
     packages/api-health/src/index.ts \
     2>/dev/null || true
@@ -169,15 +169,15 @@ search_presentation_imports() {
 
   if command -v rg >/dev/null 2>&1; then
     rg -n "$pattern" \
-      packages/api-identity/src/modules \
-      packages/api-platform/src/modules \
-      packages/api-platform/src/modules \
+      apps/api/src/identity/modules \
+      apps/api/src/platform/modules \
+      apps/api/src/platform/modules \
       --glob '**/presentation/**/*.ts' \
       --glob '!**/*.spec.ts'
     return
   fi
 
-  find packages/api-identity/src/modules packages/api-platform/src/modules packages/api-platform/src/modules \
+  find apps/api/src/identity/modules apps/api/src/platform/modules apps/api/src/platform/modules \
     -path '*/presentation/*' -name '*.ts' ! -name '*.spec.ts' -print |
     xargs grep -nE "$pattern" 2>/dev/null || true
 }
@@ -217,9 +217,9 @@ search_application_imports() {
 
   if command -v rg >/dev/null 2>&1; then
     rg -n "$pattern" \
-      packages/api-identity/src/modules \
-      packages/api-platform/src/modules \
-      packages/api-platform/src/modules \
+      apps/api/src/identity/modules \
+      apps/api/src/platform/modules \
+      apps/api/src/platform/modules \
       --glob '**/application/**/*.ts' \
       --glob '!**/*.spec.ts' \
       --glob '!**/*.repository.port.ts' \
@@ -227,7 +227,7 @@ search_application_imports() {
     return
   fi
 
-  find packages/api-identity/src/modules packages/api-platform/src/modules packages/api-platform/src/modules \
+  find apps/api/src/identity/modules apps/api/src/platform/modules apps/api/src/platform/modules \
     -path '*/application/*' -name '*.ts' ! -name '*.spec.ts' ! -name '*.repository.port.ts' ! -name '*.mapper.ts' -print |
     xargs grep -nE "$pattern" 2>/dev/null || true
 }
@@ -297,8 +297,8 @@ check_domain_policy() {
   if command -v rg >/dev/null 2>&1; then
     # Type-only imports are allowed: they carry no runtime coupling.
     output=$(rg -n "$pattern" \
-      packages/api-identity/src/modules \
-      packages/api-platform/src/modules \
+      apps/api/src/identity/modules \
+      apps/api/src/platform/modules \
       --glob '**/domain/**' \
       --glob '!**/*.spec.ts' \
       --glob '!**/*.test.ts' 2>/dev/null | grep -v 'import type' || true)
@@ -338,7 +338,7 @@ check_app_router_purity
 
 warn_large_application_services() {
   if command -v rg >/dev/null 2>&1; then
-  files=$(find packages/api-identity/src/modules packages/api-platform/src/modules packages/api-platform/src/modules \
+  files=$(find apps/api/src/identity/modules apps/api/src/platform/modules apps/api/src/platform/modules \
     -path '*/application/*.service.ts' ! -name '*.spec.ts' 2>/dev/null || true)
   for file in $files; do
     lines=$(wc -l <"$file" | tr -d ' ')

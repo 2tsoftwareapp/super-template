@@ -15,15 +15,16 @@ apps/
   web      Next.js BFF — landing + auth (:3000)
   admin    Next.js BFF — operations console (:3002)
   mobile   Flutter app (iOS/Android)
+apps/api/src
+  identity              auth, RBAC, MFA, users, orgs (core bounded context)
+  platform              mail, files, jobs, audit, notifications… (core context)
+  cli/seeds             development/demo data seeding
 packages/
-  @repo/api-seed        development/demo data seeding
   @repo/api-contract    OpenAPI contract source of truth
   @repo/api-core        shared ports, config, cross-context tokens
-  @repo/api-database     Drizzle schema + migrations
-  @repo/api-health       health checks
-  @repo/api-identity     auth, RBAC, MFA (bounded context)
-  @repo/api-platform     platform features (bounded context)
-  @repo/api-sort         sorting/query helpers
+  @repo/api-database    Drizzle schema + migrations
+  @repo/api-health      health checks (add-on package exemplar)
+  @repo/api-sort        sorting/query helpers
   @repo/env-loader       layered env resolution
   @repo/web-ui          shared React UI component library (design system)
   @repo/web-test         shared web test utilities
@@ -60,11 +61,11 @@ Mailpit UI: http://localhost:8025 · Swagger: http://localhost:3001/api/docs
   Put personal secrets in `.env.local` (gitignored).
 - **App Router layering (web + admin)**: Route files in `src/app/[locale]/**` must only contain route entry components (`page.tsx`, `layout.tsx`, Suspense page wrappers) and metadata/SEO exports. Views, drawers, forms, table columns, and other UI components live under `src/features/<resource>/components/`. No file under the app router directory may contain business logic — ESLint boundary rules enforce that `app/**` never imports `@tanstack/react-query` or `@/lib/http`. UI primitives come only from `@repo/web-ui/components/*` (never local copies). Full conventions: `apps/admin/AGENTS.md`; i18n is next-intl with an always-prefixed `[locale]` segment and internal navigation via `@/i18n/navigation`.
 - **Modular Admin Architecture Layers**:
-  - *Network Layer*: HTTP endpoints wrapped cleanly in services (e.g., `roles-service.ts`) using the unified fetch handler.
-  - *Business & Data Layer*: Dedicated react-query queries and mutations (e.g., `use-roles-queries.ts`) managing caching, invalidation logic, and operation states.
-  - *State & Serialization Layer*: Parameter parsing/stringifying helpers (e.g., `users-search-params.ts`) managing list states.
-  - *Mapping & Validation Layer*: Explicit DTO types and zod schema configurations (e.g., `roles-schemas.ts`).
-  - *Atom Component Design*: Keep page views layout-centric, splitting complex interfaces into atomic presentational sub-components (like table cells, specific card atoms, drawer components) and keeping logic out of UI markup.
+  - _Network Layer_: HTTP endpoints wrapped cleanly in services (e.g., `roles-service.ts`) using the unified fetch handler.
+  - _Business & Data Layer_: Dedicated react-query queries and mutations (e.g., `use-roles-queries.ts`) managing caching, invalidation logic, and operation states.
+  - _State & Serialization Layer_: Parameter parsing/stringifying helpers (e.g., `users-search-params.ts`) managing list states.
+  - _Mapping & Validation Layer_: Explicit DTO types and zod schema configurations (e.g., `roles-schemas.ts`).
+  - _Atom Component Design_: Keep page views layout-centric, splitting complex interfaces into atomic presentational sub-components (like table cells, specific card atoms, drawer components) and keeping logic out of UI markup.
 
 ## Known hazards
 

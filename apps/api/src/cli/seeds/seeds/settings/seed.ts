@@ -1,4 +1,4 @@
-import type { EnsureSettingsSeedDataUseCase } from "@repo/api-platform/modules/settings/application/use-cases/ensure-settings-seed-data.use-case";
+import type { EnsureSettingsSeedDataUseCase } from "@platform/modules/settings/application/use-cases/ensure-settings-seed-data.use-case";
 
 import { type DatabaseExecutor } from "@repo/api-database";
 

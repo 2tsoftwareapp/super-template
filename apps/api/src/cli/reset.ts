@@ -1,12 +1,12 @@
 import { NestFactory } from "@nestjs/core";
 import { createDatabaseClient } from "@repo/api-database";
-import { seedDatabase } from "@repo/api-seed";
 import { Pool } from "pg";
 
 import { AppModule } from "../app.module";
 import { loadCliEnv } from "./load-cli-env";
 import { applySqlMigrations } from "./migrations";
 import { resolveMigrateDatabaseUrl } from "./resolve-migrate-database-url";
+import { seedDatabase } from "./seeds/seed-data";
 
 loadCliEnv();
 

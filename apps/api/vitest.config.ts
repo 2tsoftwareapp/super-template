@@ -13,25 +13,20 @@ const packageSubpathAlias = (name: string) => ({
   replacement: path.join(packagesDir, name, "src/$1"),
 });
 
-const intraPackageAlias = (alias: string, packageName: string) => ({
-  find: new RegExp(`^${alias}/(.+)$`),
-  replacement: path.join(packagesDir, packageName, "src/$1"),
-});
-
 export default defineConfig({
   test: {
     maxWorkers: 1,
     // oxc: false,
     include: [
       "test/**/*.{test,spec}.ts",
+      "src/identity/**/*.spec.ts",
+      "src/platform/**/*.spec.ts",
+      "src/cli/seeds/**/*.spec.ts",
       "../../packages/api-contract/src/**/*.{test,spec}.ts",
-      "../../packages/api-seed/src/**/*.{test,spec}.ts",
       "../../packages/api-core/src/**/*.{test,spec}.ts",
       "../../packages/api-sort/src/**/*.{test,spec}.ts",
       "../../packages/api-database/src/**/*.{test,spec}.ts",
-      "../../packages/api-identity/src/**/*.{test,spec}.ts",
       "../../packages/api-health/src/**/*.{test,spec}.ts",
-      "../../packages/api-platform/src/**/*.{test,spec}.ts",
       "../../packages/env-loader/src/**/*.{test,spec}.ts",
     ],
   },
@@ -45,12 +40,10 @@ export default defineConfig({
       packageSubpathAlias("api-database"),
       packageAlias("api-sort"),
       packageSubpathAlias("api-sort"),
-      packageAlias("api-identity"),
-      packageSubpathAlias("api-identity"),
-      packageAlias("api-platform"),
-      packageSubpathAlias("api-platform"),
-      intraPackageAlias("@identity", "api-identity"),
-      intraPackageAlias("@platform", "api-platform"),
+      { find: /^@identity\/(.+)$/, replacement: path.resolve(__dirname, "src/identity/$1") },
+      { find: /^@identity$/, replacement: path.resolve(__dirname, "src/identity/index.ts") },
+      { find: /^@platform\/(.+)$/, replacement: path.resolve(__dirname, "src/platform/$1") },
+      { find: /^@platform$/, replacement: path.resolve(__dirname, "src/platform/index.ts") },
     ],
   },
 });

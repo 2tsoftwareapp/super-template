@@ -14,7 +14,14 @@
       },
       "layer:database": {
         "dependencies": {
-          "allow": ["layer:core", "layer:env", "layer:database", "layer:sort", "layer:tsconfig", "layer:eslint"]
+          "allow": [
+            "layer:core",
+            "layer:env",
+            "layer:database",
+            "layer:sort",
+            "layer:tsconfig",
+            "layer:eslint"
+          ]
         }
       },
       "layer:contract": {
@@ -24,30 +31,11 @@
       },
       "layer:health": {
         "dependencies": {
-          "allow": ["layer:core", "layer:env", "layer:database", "layer:health", "layer:sort", "layer:tsconfig", "layer:eslint"]
-        }
-      },
-      "layer:identity": {
-        "dependencies": {
           "allow": [
             "layer:core",
             "layer:env",
             "layer:database",
-            "layer:identity",
-            "layer:sort",
-            "layer:tsconfig",
-            "layer:eslint"
-          ]
-        }
-      },
-      "layer:platform": {
-        "dependencies": {
-          "allow": [
-            "layer:core",
-            "layer:env",
-            "layer:database",
-            "layer:identity",
-            "layer:platform",
+            "layer:health",
             "layer:sort",
             "layer:tsconfig",
             "layer:eslint"
@@ -60,8 +48,6 @@
             "layer:core",
             "layer:env",
             "layer:database",
-            "layer:identity",
-            "layer:platform",
             "layer:bootstrap",
             "layer:health",
             "layer:sort",
@@ -76,8 +62,6 @@
             "layer:core",
             "layer:env",
             "layer:database",
-            "layer:identity",
-            "layer:platform",
             "layer:bootstrap",
             "layer:health",
             "layer:contract",
@@ -103,7 +87,15 @@
       },
       "layer:frontend-core": {
         "dependencies": {
-          "allow": ["layer:core", "layer:frontend-core", "layer:contract", "layer:sort", "layer:tsconfig", "layer:eslint", "layer:frontend-test"]
+          "allow": [
+            "layer:core",
+            "layer:frontend-core",
+            "layer:contract",
+            "layer:sort",
+            "layer:tsconfig",
+            "layer:eslint",
+            "layer:frontend-test"
+          ]
         }
       },
       "layer:frontend-ui": {
@@ -156,7 +148,10 @@
     },
     "generate": {
       "dependsOn": ["^generate"],
-      "outputs": ["$TURBO_ROOT$/apps/api/openapi.json", "$TURBO_ROOT$/packages/api-contract/src/generated/**"]
+      "outputs": [
+        "$TURBO_ROOT$/apps/api/openapi.json",
+        "$TURBO_ROOT$/packages/api-contract/src/generated/**"
+      ]
     },
     "lint": {
       "dependsOn": []

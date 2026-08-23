@@ -1,6 +1,5 @@
 import { Module } from "@nestjs/common";
 import { ImportExportAdapterRegistry } from "@repo/api-core";
-import { IdentityPortsModule } from "@repo/api-identity";
 
 import { AuditModule } from "../audit";
 import { FilesModule } from "../files";
@@ -16,7 +15,7 @@ import { UsersImportExportAdapter } from "./infrastructure/users-import-export.a
 import { ImportsController } from "./presentation/imports.controller";
 
 @Module({
-  imports: [AuditModule, FilesModule, StorageModule, IdentityPortsModule],
+  imports: [AuditModule, FilesModule, StorageModule],
   controllers: [ImportsController],
   providers: [
     ImportJobsRepository,

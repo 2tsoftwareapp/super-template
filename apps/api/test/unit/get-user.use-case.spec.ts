@@ -2,9 +2,9 @@ import type { AuthenticatedRequestUser } from "@repo/api-core";
 
 import { describe, expect, it, vi } from "vitest";
 
-import type { OrganizationsRepositoryPort } from "@repo/api-identity/modules/organizations/application/ports/organizations.repository.port";
-import { UsersMapper } from "@repo/api-identity/modules/users/application/users.mapper";
-import { GetUserUseCase } from "@repo/api-identity/modules/users/application/use-cases/get-user.use-case";
+import type { OrganizationsRepositoryPort } from "@identity/modules/organizations/application/ports/organizations.repository.port";
+import { UsersMapper } from "@identity/modules/users/application/users.mapper";
+import { GetUserUseCase } from "@identity/modules/users/application/use-cases/get-user.use-case";
 
 const userRecord = {
   id: "user-1",

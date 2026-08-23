@@ -1,10 +1,10 @@
+import type { OrganizationsService } from "@identity/modules/organizations";
+import type { UsersRepositoryPort } from "@identity/modules/users";
 import type { EnvironmentService } from "@repo/api-core";
-import type { OrganizationsService } from "@repo/api-identity/modules/organizations";
-import type { UsersRepositoryPort } from "@repo/api-identity/modules/users";
 
+import { type AccessControlService, ROLE_NAMES } from "@identity/modules/access-control";
+import { hashPassword } from "@identity/modules/auth";
 import { type DatabaseExecutor } from "@repo/api-database";
-import { type AccessControlService, ROLE_NAMES } from "@repo/api-identity/modules/access-control";
-import { hashPassword } from "@repo/api-identity/modules/auth";
 
 import { type SeededUsersContext } from "../types";
 

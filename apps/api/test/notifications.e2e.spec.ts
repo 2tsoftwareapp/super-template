@@ -20,7 +20,7 @@ import {
   NotificationDeliveryProcessor,
   NotificationDeliveryUseCase,
   PUSH_NOTIFIER,
-} from "@repo/api-platform";
+} from "@platform";
 
 import { bearer, createTestApp, loginAs, resetTestDatabase } from "./support/test-app";
 

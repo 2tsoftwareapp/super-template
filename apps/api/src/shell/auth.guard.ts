@@ -1,5 +1,6 @@
 import type { Request as ExpressRequest } from "express";
 
+import { AuthService } from "@identity/modules/auth";
 import { type CanActivate, type ExecutionContext, HttpStatus, Injectable } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import {
@@ -8,7 +9,6 @@ import {
   ERROR_CODES,
   IS_PUBLIC_KEY,
 } from "@repo/api-core";
-import { AuthService } from "@repo/api-identity/modules/auth";
 
 @Injectable()
 export class AuthGuard implements CanActivate {
