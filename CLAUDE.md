@@ -55,7 +55,7 @@ Mailpit UI: http://localhost:8025 · Swagger: http://localhost:3001/api/docs
 - **Contract is generated.** After editing NestJS controllers, DTOs, or decorators,
   run `pnpm generate` and commit the regenerated clients. Don't hand-edit generated
   code under `apps/mobile/lib/generated/`.
-- **Mirror existing patterns** in the bounded-context packages (`presentation/` →
+- **Mirror existing patterns** in the in-app bounded contexts (see ARCHITECTURE_RULES) (`presentation/` →
   `application/` → `infrastructure/`) rather than introducing new structure.
 - **Env files**: commit `.env.example`, `.env.development`, and `.env.*.example` only.
   Put personal secrets in `.env.local` (gitignored).
@@ -81,7 +81,7 @@ Mailpit UI: http://localhost:8025 · Swagger: http://localhost:3001/api/docs
   This is baked into `generate-contracts.sh`.
 - **Tailwind `@source`**: admin/web `globals.css` must include `@source` for
   `packages/web-ui/src`, or shared utility classes silently vanish from compiled CSS.
-- **Cross-module circular DI** in `api-platform` can cause a silent `process.abort()`
+- **Cross-module circular DI** in the platform context (`apps/api/src/platform`) can cause a silent `process.abort()`
   in e2e; use `abortOnError: false` + `forwardRef` both directions.
 
 ## Making this template your own

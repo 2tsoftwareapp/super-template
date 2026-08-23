@@ -8,7 +8,7 @@
     "webpackConfigPath": "webpack.config.js",
     "assets": [
       {
-        "include": "../../packages/api-platform/src/modules/mail/infrastructure/templates/**/*",
+        "include": "src/platform/modules/mail/infrastructure/templates/**/*",
         "outDir": "dist",
         "watchAssets": true
       }

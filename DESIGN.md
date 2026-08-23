@@ -191,6 +191,12 @@ Phải thực thi bằng:
 
 # 3. Backend architecture đề xuất
 
+> **LƯU Ý (2026-08, superseded):** Thiết kế ban đầu đặt bounded contexts trong
+> `packages/`. Quyết định cuối cùng (Task-16) đưa core business vào
+> `apps/api/src/{identity,platform}` và giới hạn `packages/` cho kernel libs +
+> add-on packages (xem ARCHITECTURE_RULES §15.1). Nội dung dưới đây giữ nguyên
+> như hồ sơ thiết kế gốc.
+
 ## 3.1 Cấu trúc bounded context
 
 ```text

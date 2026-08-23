@@ -42,27 +42,12 @@
           ]
         }
       },
-      "layer:bootstrap": {
-        "dependencies": {
-          "allow": [
-            "layer:core",
-            "layer:env",
-            "layer:database",
-            "layer:bootstrap",
-            "layer:health",
-            "layer:sort",
-            "layer:tsconfig",
-            "layer:eslint"
-          ]
-        }
-      },
       "layer:app": {
         "dependencies": {
           "allow": [
             "layer:core",
             "layer:env",
             "layer:database",
-            "layer:bootstrap",
             "layer:health",
             "layer:contract",
             "layer:frontend-core",

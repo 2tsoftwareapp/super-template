@@ -1,5 +1,9 @@
-export const SUPPORTED_IMPORT_TYPES = ["users"] as const;
-export type SupportedImportType = (typeof SUPPORTED_IMPORT_TYPES)[number];
-export function isSupportedImportType(value: string): value is SupportedImportType {
-  return (SUPPORTED_IMPORT_TYPES as readonly string[]).includes(value);
-}
+/**
+ * Application-layer re-export of the domain-owned import type contract.
+ * Consumers outside the module should use the module barrel instead.
+ */
+export {
+  isSupportedImportType,
+  SUPPORTED_IMPORT_TYPES,
+  type SupportedImportType,
+} from "../domain/import-types";

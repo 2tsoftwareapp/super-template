@@ -149,14 +149,13 @@ Shared packages: `@repo/web-ui` · `@repo/web-hooks` · `@repo/web-utils` · `@r
 ```text
 super-template/
 ├── apps/
-│   ├── api/              NestJS REST API
+│   ├── api/              NestJS REST API — core business in src/{identity,platform}
 │   ├── admin/            Next.js operations dashboard
 │   ├── web/              Next.js landing + auth BFF
 │   └── mobile/           Flutter + design-system/
 ├── packages/
-│   ├── api-core/         Config, env schema, ports
-│   ├── api-identity/     Auth, users, SSO, MFA
-│   ├── api-platform/     Mail, files, jobs, notifications, audit
+│   ├── api-core/         Kernel: config, env schema, cross-context ports
+│   ├── api-health/       Health-check add-on module (addon exemplar)
 │   ├── api-contract/     Generated OpenAPI client
 │   ├── env-loader/       Layered .env loading
 │   └── web-ui/           Shared React UI component library

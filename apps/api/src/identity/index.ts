@@ -11,8 +11,6 @@ export type * from "./modules/organizations";
 export { ORGANIZATIONS_REPOSITORY } from "./modules/organizations";
 export type * from "./modules/users";
 export { USERS_REPOSITORY } from "./modules/users";
-export { ACTION, hasPermission, perm, PRIVILEGED_ROLE_NAMES, ROLE_NAMES } from "@repo/api-core";
-
 import { IdentityPortsModule } from "./identity-ports.module";
 import { AccessControlModule } from "./modules/access-control";
 import { AuthModule } from "./modules/auth";

@@ -556,7 +556,7 @@ unless the scope is narrow and unmistakable.
 
 ## 15. Cross-context communication
 
-`api-identity` and `api-platform` are bounded contexts.
+The identity and platform contexts (`apps/api/src/identity`, `apps/api/src/platform`) are in-app bounded contexts.
 
 They communicate through:
 

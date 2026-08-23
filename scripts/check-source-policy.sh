@@ -132,8 +132,6 @@ search_index_exports() {
       packages/api-database/src/index.ts \
       apps/api/src/identity/index.ts \
       apps/api/src/platform/index.ts \
-      apps/api/src/platform/index.ts \
-      packages/api-seed/src/index.ts \
       packages/api-health/src/index.ts
     return
   fi
@@ -143,8 +141,6 @@ search_index_exports() {
     packages/api-database/src/index.ts \
     apps/api/src/identity/index.ts \
     apps/api/src/platform/index.ts \
-    apps/api/src/platform/index.ts \
-    packages/api-seed/src/index.ts \
     packages/api-health/src/index.ts \
     2>/dev/null || true
 }

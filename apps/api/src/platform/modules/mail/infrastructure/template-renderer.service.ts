@@ -8,12 +8,15 @@ import type { TemplateRendererServicePort } from "../application/ports/template-
 function resolveTemplatesDir(): string {
   const marker = "auth.verify-email.subject.txt";
   const candidates = [
+    // Ops escape hatch: point at templates shipped outside the bundle.
+    process.env.MAIL_TEMPLATES_DIR,
+    // Webpack build (nest build): CopyPlugin emits them beside the bundle
+    // mirroring the src layout.
+    join(process.cwd(), "dist", "platform", "modules", "mail", "infrastructure", "templates"),
+    // tsc-style builds / running from compiled folder.
     join(__dirname, "templates"),
     join(__dirname, "infrastructure", "templates"),
-    join(process.cwd(), "dist", "templates"),
-    join(process.cwd(), "../../packages/api-platform/src/modules/mail/infrastructure/templates"),
-    join(process.cwd(), "packages/api-platform/src/modules/mail/infrastructure/templates"),
-  ];
+  ].filter((dir): dir is string => Boolean(dir));
 
   for (const dir of candidates) {
     if (existsSync(join(dir, marker))) {

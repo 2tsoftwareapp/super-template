@@ -1,3 +1,4 @@
+const CopyPlugin = require("copy-webpack-plugin");
 const nodeExternals = require("webpack-node-externals");
 const TsconfigPathsPlugin = require("tsconfig-paths-webpack-plugin");
 
@@ -17,6 +18,20 @@ module.exports = (options) => ({
     nodeExternals({
       // Bundle workspace packages; keep npm deps external.
       allowlist: [/^@repo\//],
+    }),
+  ],
+  plugins: [
+    ...(options.plugins ?? []),
+    // Mail templates are read from disk at runtime (dynamic dir listing is
+    // incompatible with bundling), so copy them next to the bundle mirroring
+    // the src layout the renderer resolves against.
+    new CopyPlugin({
+      patterns: [
+        {
+          from: "src/platform/modules/mail/infrastructure/templates",
+          to: "platform/modules/mail/infrastructure/templates",
+        },
+      ],
     }),
   ],
   resolve: {

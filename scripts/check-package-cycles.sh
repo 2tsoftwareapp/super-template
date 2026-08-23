@@ -39,40 +39,32 @@ record_violation() {
   fi
 }
 
-record_violation \
-  'identity must not import platform application services' \
-  'Depend on api-core ports instead of concrete platform services.' \
-  "from '@repo/api-platform/modules/.+/application/" \
-  packages/api-identity/src
+# Bounded contexts live inside apps/api. Cross-context imports use the
+# @identity / @platform aliases; the stable surface (application/ports,
+# domain, constants files) is allowed — everything else mirrors the ESLint
+# ctxForbidden rules.
+CTX_DIR="apps/api/src"
 
-record_violation \
-  'identity must not import platform infrastructure' \
-  'Depend on api-core ports instead of concrete platform repositories.' \
-  "from '@repo/api-platform/modules/.+/infrastructure/" \
-  packages/api-identity/src
+check_ctx() {
+  label=$1 pattern=$2 dir=$3
+  output=$(rg -n "$pattern" "$dir" --glob '*.ts' || true)
+  if [ -n "$output" ]; then
+    failed=1
+    printf 'Cycle/boundary violation: %s\n%s\n' "$label" "$output" >&2
+  fi
+}
 
-record_violation \
-  'platform must not import identity application services' \
-  'Depend on api-core ports instead of concrete identity services.' \
-  "from '@repo/api-identity/modules/.+/application/" \
-  packages/api-platform/src
-
-record_violation \
-  'platform must not import identity infrastructure' \
-  'Depend on api-core ports instead of concrete identity repositories.' \
-  "from '@repo/api-identity/modules/.+/infrastructure/" \
-  packages/api-platform/src
-
-record_violation \
-  'identity must not import cross-context Nest modules' \
-  'Register providers via global *PortsModule and depend on api-core port tokens.' \
-  "from '@repo/api-platform/modules/.+\\.module'" \
-  packages/api-identity/src
-
-record_violation \
-  'platform must not import cross-context Nest modules' \
-  'Register providers via global *PortsModule and depend on api-core port tokens.' \
-  "from '@repo/api-identity/modules/.+\\.module'" \
-  packages/api-platform/src
+check_ctx 'identity imports platform services (unstable surface)' \
+  '@platform/.*[Ss]ervice' "$CTX_DIR/identity"
+check_ctx 'identity imports platform infrastructure' \
+  '@platform/.*infrastructure' "$CTX_DIR/identity"
+check_ctx 'identity imports platform controllers/modules' \
+  '@platform/(.*controller|.*\.module)' "$CTX_DIR/identity"
+check_ctx 'platform imports identity services (unstable surface)' \
+  '@identity/.*[Ss]ervice' "$CTX_DIR/platform"
+check_ctx 'platform imports identity infrastructure' \
+  '@identity/.*infrastructure' "$CTX_DIR/platform"
+check_ctx 'platform imports identity controllers/modules' \
+  '@identity/(.*controller|.*\.module)' "$CTX_DIR/platform"
 
 exit "$failed"

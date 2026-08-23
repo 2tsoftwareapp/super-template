@@ -3,7 +3,7 @@ SHELL := /bin/bash
 # Active environment. Override per invocation, e.g. `make dev-api APP_ENV=staging`.
 APP_ENV ?= development
 
-.PHONY: help bootstrap dev dev-api dev-web dev-admin dev-mobile dev-mobile-staging dev-mobile-prod infra-up infra-down db-generate db-migrate db-seed db-reset db-studio generate generate-check lint format test test-api test-web test-mobile build verify extension-build extension-dev
+.PHONY: help bootstrap dev dev-api dev-web dev-admin dev-mobile dev-mobile-staging dev-mobile-prod infra-up infra-down db-generate db-migrate db-seed db-reset db-studio generate generate-check lint format test test-api test-web test-mobile build verify
 
 help:
 	@printf '%s\n' \
@@ -32,9 +32,7 @@ help:
 		'  test-web     Run Web tests' \
 		'  test-mobile  Run Flutter tests' \
 		'  build        Build all packages' \
-		'  verify       Full CI-style verify script' \
-		'  extension-build  Build the browser-control extension (packages/extension)' \
-		'  extension-dev    Start the shared Playwright MCP server in --extension mode'
+		'  verify       Full CI-style verify script'
 
 bootstrap:
 	./scripts/bootstrap.sh
@@ -114,8 +112,3 @@ build:
 verify:
 	./scripts/verify.sh
 
-extension-build:
-	pnpm --filter @repo/extension build
-
-extension-dev:
-	APP_ENV=$(APP_ENV) . ./scripts/load-env.sh && pnpm --filter @repo/extension dev

@@ -61,8 +61,8 @@
 │   ├── web-hooks/    # Shared React hooks
 │   ├── api-contract/ # Shared API types/DTOs (generated)
 │   ├── api-core/     # Shared NestJS base infrastructure
-│   ├── api-identity/ # Bounded Context: auth, users, organizations
-│   ├── api-platform/ # Bounded Context: files, notifications, audit, exports
+│   ├── (apps/api) identity/  # Bounded Context: auth, users, organizations
+│   ├── (apps/api) platform/  # Bounded Context: files, notifications, audit, exports
 │   └── eslint-config/ # Shared ESLint config
 └── CODING_RULES.md   # ← file này
 ```
@@ -744,7 +744,7 @@ Presentation → Application → Domain
 
 ✅ **DO**
 ```ts
-// packages/api-identity/src/modules/auth/presentation/auth.controller.ts
+// apps/api/src/identity/modules/auth/presentation/auth.controller.ts
 @Controller("auth")
 export class AuthController {
   constructor(private readonly loginUseCase: LoginUseCase) {}
@@ -793,7 +793,7 @@ async login(@Body() dto: LoginDto) {
 
 ✅ **DO** (từ codebase thực tế)
 ```ts
-// packages/api-identity/src/modules/auth/application/use-cases/login.use-case.ts
+// apps/api/src/identity/modules/auth/application/use-cases/login.use-case.ts
 @Injectable()
 export class LoginUseCase {
   constructor(
@@ -847,7 +847,7 @@ const repo = new DrizzleUsersRepository(db); // ← vi phạm R3 — dùng @Inje
 
 ✅ **DO**
 ```ts
-// packages/api-identity/src/modules/users/domain/user.entity.ts
+// apps/api/src/identity/modules/users/domain/user.entity.ts
 
 // Domain entity — không có import từ NestJS hay Drizzle
 export class UserEntity {
@@ -896,7 +896,7 @@ export class UserPolicy {
 
 ✅ **DO** (từ codebase thực tế)
 ```ts
-// packages/api-identity/src/modules/auth/application/ports/auth-session.repository.port.ts
+// apps/api/src/identity/modules/auth/application/ports/auth-session.repository.port.ts
 import type { TransactionExecutor } from "@repo/api-core";
 import type { AuthSessionModel, CreateSessionInput } from "../models/auth-session";
 
@@ -952,7 +952,7 @@ modules/<domain>/infrastructure/
 
 ✅ **DO**
 ```ts
-// packages/api-identity/src/modules/users/infrastructure/users.repository.ts
+// apps/api/src/identity/modules/users/infrastructure/users.repository.ts
 @Injectable()
 export class UsersRepository implements UsersRepositoryPort {
   constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
@@ -991,8 +991,8 @@ async execute(input: CreateUserCommand) {
 ### 11.6 DI Wiring (`<domain>.module.ts`)
 
 - Module wiring thuộc về NestJS module của mỗi Bounded Context
-  (VD: `packages/api-identity/src/modules/users/users.module.ts`,
-  `packages/api-platform/src/modules/notifications/notifications.module.ts`) —
+  (VD: `apps/api/src/identity/modules/users/users.module.ts`,
+  `apps/api/src/platform/modules/notifications/notifications.module.ts`) —
   không hardcode dependency trong Use Case. `apps/api/src/shell/` chỉ chứa
   cross-cutting infra (guard, interceptor), không phải nơi wiring repository.
 - Mỗi Bounded Context có NestJS Module riêng (VD: `AuthModule`, `UsersModule`)

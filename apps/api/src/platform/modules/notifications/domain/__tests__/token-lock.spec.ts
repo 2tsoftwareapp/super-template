@@ -18,7 +18,7 @@ function resolveModuleRoot(): string {
       return candidate;
     }
   }
-  return join(process.cwd(), "../../packages/api-platform/src/modules/notifications");
+  return candidates[0]!;
 }
 
 const moduleRoot = resolveModuleRoot();

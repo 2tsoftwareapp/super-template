@@ -20,6 +20,10 @@ import { FilesRepository } from "./infrastructure/files.repository";
 import { FilesController } from "./presentation/files.controller";
 
 @Module({
+  // forwardRef is REQUIRED despite audit.module not importing FilesModule as a
+  // module: it deep-imports files/infrastructure/files.repository, forming a
+  // TS-level load cycle that makes AuditModule undefined during FilesModule
+  // evaluation (Nest UndefinedModuleException without forwardRef).
   imports: [StorageModule, forwardRef(() => AuditModule)],
   controllers: [FilesController],
   providers: [
