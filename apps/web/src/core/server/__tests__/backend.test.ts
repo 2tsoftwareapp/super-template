@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { ApiEnvelope } from "@/lib/api-types";
+import type { ApiEnvelope } from "@/core/types/api-types";
 
 import { proxyWithRefresh } from "../backend";
 
@@ -11,7 +11,7 @@ const { readAuthCookiesMock, setAuthCookiesMock, clearAuthCookiesMock } = vi.hoi
   clearAuthCookiesMock: vi.fn(),
 }));
 
-vi.mock("@/lib/env", () => ({
+vi.mock("@/core/config/env", () => ({
   env: {
     API_INTERNAL_URL: "http://localhost:3001",
     NEXT_PUBLIC_WEB_URL: "http://localhost:3000",

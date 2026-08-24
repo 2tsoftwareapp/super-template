@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { ApiClientError } from "@/lib/http";
-import * as http from "@/lib/http";
+import { ApiClientError } from "@/core/http";
+import * as http from "@/core/http";
 
 import { verifyEmail } from "../verify-email.api";
 
-vi.mock("@/lib/http", async () => {
-  const actual = await vi.importActual<typeof http>("@/lib/http");
+vi.mock("@/core/http", async () => {
+  const actual = await vi.importActual<typeof http>("@/core/http");
   return {
     ...actual,
     webFetch: vi.fn(),

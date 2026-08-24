@@ -4,7 +4,7 @@ import { classifyError, getErrorMessage } from "@repo/web-utils/errors";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { ApiClientError } from "@/lib/http";
+import { ApiClientError } from "@/core/http";
 
 import type { VerifyEmailStatus, VerifyEmailViewModel } from "../model/verify-email.types";
 

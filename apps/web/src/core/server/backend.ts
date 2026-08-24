@@ -5,8 +5,8 @@ import {
   ACCESS_TOKEN_COOKIE,
   CSRF_TOKEN_COOKIE,
   REFRESH_TOKEN_COOKIE,
-} from "@/lib/auth/cookie-names";
-import { env, isSecureCookie } from "@/lib/env";
+} from "@/core/auth/cookie-names";
+import { env, isSecureCookie } from "@/core/config/env";
 
 const auth = createAuthCookieHelpers({
   cookieDomain: env.COOKIE_DOMAIN,

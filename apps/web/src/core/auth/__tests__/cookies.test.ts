@@ -19,7 +19,7 @@ const envMock: { env: MockEnv; isSecureCookie: boolean } = vi.hoisted(() => ({
   isSecureCookie: false,
 }));
 
-vi.mock("@/lib/env", () => envMock);
+vi.mock("@/core/config/env", () => envMock);
 
 describe("csrf cookies", () => {
   beforeEach(() => {
@@ -40,7 +40,6 @@ describe("csrf cookies", () => {
 
   it("signs and validates csrf tokens when a secret is configured", async () => {
     const { createCsrfToken, isValidCsrfToken } = await import("../cookies");
-
     const token = createCsrfToken();
 
     expect(token).toMatch(/^[0-9a-f-]+\.[A-Za-z0-9_-]+$/i);
