@@ -26,11 +26,11 @@ import {
   stackLayers,
   steps,
   surfaces,
-} from "../model/landing.content";
+} from "../config/landing-config";
 import { ArchDiagram } from "../ui/arch-diagram";
 import { ScrollToTop } from "../ui/scroll-to-top";
 
-/** Icon lookup for feature cards (model stores keys only). */
+/** Icon lookup for feature cards (config stores keys only). */
 const FEATURE_ICONS: Record<string, LucideIcon> = {
   code: Code2,
   shield: Shield,

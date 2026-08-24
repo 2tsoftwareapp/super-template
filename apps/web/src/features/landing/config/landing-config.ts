@@ -1,6 +1,6 @@
 /**
- * Static marketing content for the landing page.
- * Pure data — no React. Icons are referenced by key and mapped to components in the view.
+ * Static marketing configuration for the landing feature.
+ * Presentation-oriented data only; no React components or runtime state.
  */
 
 export const ADMIN_URL = process.env.NEXT_PUBLIC_ADMIN_URL ?? "http://localhost:3002";
