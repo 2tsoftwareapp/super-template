@@ -1,6 +1,5 @@
+import { ApiClientError } from "@repo/web-utils/http";
 import { describe, expect, it } from "vitest";
-
-import { ApiClientError } from "@/core/http/errors";
 
 import { VERIFY_EMAIL_MESSAGES } from "../../config/verify-email-config";
 import { getVerifyEmailErrorMessage } from "../verify-email-error";
