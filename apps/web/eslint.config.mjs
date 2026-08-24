@@ -6,6 +6,14 @@ const featureAppBoundaryPattern = {
   message: "features/** must not import from app/**; dependency points app → feature.",
 };
 
+const featureDeepAliasBoundaryPattern = {
+  group: ["@/features/*/*", "@/features/*/*/**"],
+  message:
+    "Do not deep-import feature internals through @/features. Same-feature internals use relative imports; cross-feature consumers use @/features/<feature> public contract.",
+};
+
+const featureBasePatterns = [featureAppBoundaryPattern, featureDeepAliasBoundaryPattern];
+
 export default defineConfig([
   ...nextConfig,
   globalIgnores([
@@ -18,7 +26,6 @@ export default defineConfig([
     "public/**",
   ]),
   {
-    // Next.js route entries consume feature public contracts only.
     name: "web/boundary-app-router",
     files: ["src/app/**/*.{ts,tsx}"],
     ignores: ["src/app/api/**"],
@@ -55,20 +62,53 @@ export default defineConfig([
     },
   },
   {
-    // Features never depend on the application routing composition root.
     name: "web/boundary-features",
     files: ["src/features/**/*.{ts,tsx}"],
     rules: {
       "no-restricted-imports": [
         "error",
         {
-          patterns: [featureAppBoundaryPattern],
+          patterns: featureBasePatterns,
         },
       ],
     },
   },
   {
-    // Presentational UI receives data/actions; it does not own application workflows.
+    name: "web/boundary-config-layer",
+    files: ["src/features/*/config/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            ...featureBasePatterns,
+            {
+              group: [
+                "react",
+                "react-dom",
+                "next/navigation",
+                "@tanstack/react-query",
+                "swr",
+                "**/api/*",
+                "**/api/**",
+                "**/controllers/*",
+                "**/controllers/**",
+                "**/screens/*",
+                "**/screens/**",
+                "**/ui/*",
+                "**/ui/**",
+                "**/state/*",
+                "**/state/**",
+              ],
+              message:
+                "config/ is deterministic static feature configuration. It must not depend on runtime/application/presentation/state layers.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     name: "web/boundary-ui-layer",
     files: ["src/features/*/ui/**/*.{ts,tsx}"],
     rules: {
@@ -76,23 +116,14 @@ export default defineConfig([
         "error",
         {
           patterns: [
-            featureAppBoundaryPattern,
+            ...featureBasePatterns,
             {
               group: ["@tanstack/react-query", "swr", "next/navigation"],
               message:
                 "UI components are presentational. Move querying/routing to the feature controller/application layer.",
             },
             {
-              group: [
-                "@/features/*/api/*",
-                "@/features/*/api/**",
-                "@/features/*/controllers/*",
-                "@/features/*/controllers/**",
-                "**/api/*",
-                "**/api/**",
-                "**/controllers/*",
-                "**/controllers/**",
-              ],
+              group: ["**/api/*", "**/api/**", "**/controllers/*", "**/controllers/**"],
               message:
                 "UI must not depend on API/controllers. Use props and neutral feature contracts.",
             },
@@ -102,7 +133,31 @@ export default defineConfig([
     },
   },
   {
-    // Controllers are the application layer and must not depend back on presentation implementation.
+    name: "web/boundary-screen-layer",
+    files: ["src/features/*/screens/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            ...featureBasePatterns,
+            {
+              group: [
+                "@tanstack/react-query",
+                "swr",
+                "@/core/http",
+                "**/api/*",
+                "**/api/**",
+              ],
+              message:
+                "screens/ compose controllers and UI; they must not own data fetching or call the API layer directly.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     name: "web/boundary-controller-layer",
     files: ["src/features/*/controllers/**/*.{ts,tsx}"],
     rules: {
@@ -110,18 +165,9 @@ export default defineConfig([
         "error",
         {
           patterns: [
-            featureAppBoundaryPattern,
+            ...featureBasePatterns,
             {
-              group: [
-                "@/features/*/ui/*",
-                "@/features/*/ui/**",
-                "@/features/*/screens/*",
-                "@/features/*/screens/**",
-                "**/ui/*",
-                "**/ui/**",
-                "**/screens/*",
-                "**/screens/**",
-              ],
+              group: ["**/ui/*", "**/ui/**", "**/screens/*", "**/screens/**"],
               message:
                 "Controllers orchestrate behavior and produce contracts; they must not import UI/screens.",
             },
@@ -131,33 +177,17 @@ export default defineConfig([
     },
   },
   {
-    // model/ is optional pure domain/decision knowledge.
-    name: "web/boundary-model-layer",
-    files: ["src/features/*/model/**/*.{ts,tsx}"],
+    name: "web/boundary-state-layer",
+    files: ["src/features/*/state/**/*.{ts,tsx}"],
     rules: {
       "no-restricted-imports": [
         "error",
         {
           patterns: [
-            featureAppBoundaryPattern,
-            {
-              group: ["react", "react-dom", "next/*", "@tanstack/react-query", "swr"],
-              message: "model/ must remain framework-free and side-effect free.",
-            },
+            ...featureBasePatterns,
             {
               group: [
-                "@/core/*",
-                "@/core/**",
-                "@/features/*/api/*",
-                "@/features/*/api/**",
-                "@/features/*/controllers/*",
-                "@/features/*/controllers/**",
-                "@/features/*/screens/*",
-                "@/features/*/screens/**",
-                "@/features/*/ui/*",
-                "@/features/*/ui/**",
-                "**/api/*",
-                "**/api/**",
+                "next/navigation",
                 "**/controllers/*",
                 "**/controllers/**",
                 "**/screens/*",
@@ -166,7 +196,7 @@ export default defineConfig([
                 "**/ui/**",
               ],
               message:
-                "model/ must not depend on infrastructure, application, or presentation layers.",
+                "state/ owns feature state only; it must not depend on orchestration or presentation layers.",
             },
           ],
         },
@@ -174,7 +204,42 @@ export default defineConfig([
     },
   },
   {
-    // contracts/ is a neutral compile-time boundary between feature layers.
+    name: "web/boundary-model-layer",
+    files: ["src/features/*/model/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            ...featureBasePatterns,
+            {
+              group: ["react", "react-dom", "next/*", "@tanstack/react-query", "swr"],
+              message: "model/ must remain framework-free and side-effect free.",
+            },
+            {
+              group: [
+                "@/core/*",
+                "@/core/**",
+                "**/api/*",
+                "**/api/**",
+                "**/controllers/*",
+                "**/controllers/**",
+                "**/screens/*",
+                "**/screens/**",
+                "**/ui/*",
+                "**/ui/**",
+                "**/state/*",
+                "**/state/**",
+              ],
+              message:
+                "model/ must not depend on infrastructure, application, state, or presentation layers.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     name: "web/boundary-contracts-layer",
     files: ["src/features/*/contracts/**/*.{ts,tsx}"],
     rules: {
@@ -182,7 +247,7 @@ export default defineConfig([
         "error",
         {
           patterns: [
-            featureAppBoundaryPattern,
+            ...featureBasePatterns,
             {
               group: [
                 "react",
@@ -192,14 +257,6 @@ export default defineConfig([
                 "swr",
                 "@/core/*",
                 "@/core/**",
-                "@/features/*/api/*",
-                "@/features/*/api/**",
-                "@/features/*/controllers/*",
-                "@/features/*/controllers/**",
-                "@/features/*/screens/*",
-                "@/features/*/screens/**",
-                "@/features/*/ui/*",
-                "@/features/*/ui/**",
                 "**/api/*",
                 "**/api/**",
                 "**/controllers/*",
@@ -208,9 +265,11 @@ export default defineConfig([
                 "**/screens/**",
                 "**/ui/*",
                 "**/ui/**",
+                "**/state/*",
+                "**/state/**",
               ],
               message:
-                "contracts/ must contain neutral data contracts only; no framework, infrastructure, or layer implementation dependencies.",
+                "contracts/ must contain neutral data contracts only; no framework, infrastructure, state, or layer implementation dependencies.",
             },
           ],
         },
@@ -218,7 +277,71 @@ export default defineConfig([
     },
   },
   {
-    // Reusable lower-scope layers never depend on business features.
+    name: "web/boundary-api-layer",
+    files: ["src/features/*/api/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            ...featureBasePatterns,
+            {
+              group: [
+                "next/navigation",
+                "**/controllers/*",
+                "**/controllers/**",
+                "**/screens/*",
+                "**/screens/**",
+                "**/ui/*",
+                "**/ui/**",
+                "**/state/*",
+                "**/state/**",
+              ],
+              message:
+                "api/ is an integration boundary; it must not depend on orchestration, state, routing, or presentation layers.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    name: "web/boundary-api-no-notifications",
+    files: ["src/features/*/api/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "sonner",
+              message:
+                "api/ must not raise toasts. Surface the failure and let the controller/application layer decide.",
+            },
+          ],
+          patterns: [
+            ...featureBasePatterns,
+            {
+              group: [
+                "next/navigation",
+                "**/controllers/*",
+                "**/controllers/**",
+                "**/screens/*",
+                "**/screens/**",
+                "**/ui/*",
+                "**/ui/**",
+                "**/state/*",
+                "**/state/**",
+              ],
+              message:
+                "api/ is an integration boundary; it must not depend on orchestration, state, routing, or presentation layers.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     name: "web/boundary-core-shared",
     files: ["src/core/**/*.{ts,tsx}", "src/shared/**/*.{ts,tsx}"],
     rules: {
@@ -236,27 +359,6 @@ export default defineConfig([
     },
   },
   {
-    // API adapters surface state/errors; user-facing notification policy belongs to application orchestration.
-    name: "web/boundary-api-no-notifications",
-    files: ["src/features/*/api/**/*.{ts,tsx}"],
-    rules: {
-      "no-restricted-imports": [
-        "warn",
-        {
-          paths: [
-            {
-              name: "sonner",
-              message:
-                "api/ must not raise toasts. Surface the failure and let the controller/application layer decide.",
-            },
-          ],
-          patterns: [featureAppBoundaryPattern],
-        },
-      ],
-    },
-  },
-  {
-    // Cross-feature shared hooks remain independent from feature implementations.
     name: "web/shared-hooks-flat",
     files: ["src/hooks/**/*.{ts,tsx}"],
     rules: {
@@ -279,7 +381,6 @@ export default defineConfig([
     },
   },
   {
-    // Raw URL reads bypass bounded parsing and fallback behavior.
     name: "web/params-must-be-parsed",
     files: [
       "src/features/*/controllers/**/*.{ts,tsx}",
