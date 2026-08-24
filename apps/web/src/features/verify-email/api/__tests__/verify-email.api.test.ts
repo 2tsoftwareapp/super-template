@@ -1,7 +1,7 @@
+import { ApiClientError } from "@repo/web-utils/http";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import * as httpClient from "@/core/http/client";
-import { ApiClientError } from "@/core/http/errors";
 
 import { verifyEmail } from "../verify-email.api";
 
