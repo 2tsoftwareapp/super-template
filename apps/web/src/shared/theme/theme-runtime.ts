@@ -7,7 +7,7 @@ export function getStoredTheme(): Theme {
 
   try {
     const stored = localStorage.getItem(THEME_STORAGE_KEY) as Theme | null;
-    return stored === "light" || stored === "dark" ? stored : "light";
+    return stored === "light" || stored === "dark" || stored === "system" ? stored : "light";
   } catch {
     return "light";
   }
