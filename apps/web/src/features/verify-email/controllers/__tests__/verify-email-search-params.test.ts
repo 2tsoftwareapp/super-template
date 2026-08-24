@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { parseVerifyEmailSearchParams } from "../verify-email.search-params";
+import { parseVerifyEmailSearchParams } from "../verify-email-search-params";
 
 describe("parseVerifyEmailSearchParams", () => {
   it("parses a present token", () => {

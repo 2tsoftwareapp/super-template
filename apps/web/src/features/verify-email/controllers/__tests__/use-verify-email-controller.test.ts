@@ -3,7 +3,12 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { verifyEmail } from "../../api/verify-email.api";
-import { useVerifyEmailController } from "../../controllers/use-verify-email-controller";
+import {
+  VERIFY_EMAIL_ADMIN_URL,
+  VERIFY_EMAIL_MESSAGES,
+  VERIFY_EMAIL_REDIRECT_DELAY_MS,
+} from "../../config/verify-email-config";
+import { useVerifyEmailController } from "../use-verify-email-controller";
 
 vi.mock("next/navigation", () => ({
   useRouter: vi.fn(() => ({ push: vi.fn() })),
@@ -42,7 +47,7 @@ describe("useVerifyEmailController", () => {
 
     expect(result.current).toEqual({
       status: "error",
-      message: "Missing verification token.",
+      message: VERIFY_EMAIL_MESSAGES.missingToken,
     });
     expect(verifyEmailMock).not.toHaveBeenCalled();
   });
@@ -64,11 +69,11 @@ describe("useVerifyEmailController", () => {
 
     expect(result.current).toEqual({
       status: "success",
-      message: "Email verified successfully! Your account is now active.",
+      message: VERIFY_EMAIL_MESSAGES.success,
     });
   });
 
-  it("redirects to the admin app shortly after success", async () => {
+  it("redirects to the admin app after the configured delay", async () => {
     vi.mocked(useSearchParams).mockReturnValue(
       asSearchParams(new URLSearchParams("token=tok-123")),
     );
@@ -83,10 +88,31 @@ describe("useVerifyEmailController", () => {
     expect(routerPushMock).not.toHaveBeenCalled();
 
     await act(async () => {
-      await vi.advanceTimersByTimeAsync(3000);
+      await vi.advanceTimersByTimeAsync(VERIFY_EMAIL_REDIRECT_DELAY_MS);
     });
 
-    expect(routerPushMock).toHaveBeenCalledWith(expect.stringContaining("http://localhost:3002"));
+    expect(routerPushMock).toHaveBeenCalledWith(VERIFY_EMAIL_ADMIN_URL);
+  });
+
+  it("cancels the scheduled redirect when the screen unmounts", async () => {
+    vi.mocked(useSearchParams).mockReturnValue(
+      asSearchParams(new URLSearchParams("token=tok-123")),
+    );
+    verifyEmailMock.mockResolvedValueOnce(undefined);
+
+    const { unmount } = renderHook(() => useVerifyEmailController());
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(0);
+    });
+
+    unmount();
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(VERIFY_EMAIL_REDIRECT_DELAY_MS);
+    });
+
+    expect(routerPushMock).not.toHaveBeenCalled();
   });
 
   it("surfaces a safe error message on API failure", async () => {
@@ -102,6 +128,6 @@ describe("useVerifyEmailController", () => {
     });
 
     expect(result.current.status).toBe("error");
-    expect(result.current.message).toBe("Verification failed.");
+    expect(result.current.message).toBe(VERIFY_EMAIL_MESSAGES.fallbackError);
   });
 });

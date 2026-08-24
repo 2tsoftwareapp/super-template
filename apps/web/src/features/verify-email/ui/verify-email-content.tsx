@@ -1,7 +1,7 @@
 import { ErrorState } from "@repo/web-ui/error-state";
 import { Spinner } from "@repo/web-ui/spinner";
 
-import type { VerifyEmailStatus } from "../model/verify-email.types";
+import type { VerifyEmailStatus } from "../contracts/verify-email-view-model";
 
 export interface VerifyEmailContentProps {
   status: VerifyEmailStatus;

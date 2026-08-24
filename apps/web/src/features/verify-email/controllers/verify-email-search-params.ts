@@ -2,7 +2,6 @@ import { parseSearchParams, searchTextParam } from "@repo/web-utils/params";
 import { z } from "zod";
 
 const verifyEmailSearchSchema = z.object({
-  // Opaque one-time verification token — bounded length; empty means missing.
   token: searchTextParam(512),
 });
 
@@ -14,7 +13,6 @@ export interface VerifyEmailSearchParams {
   token: string;
 }
 
-/** Parse presentation params on `/verify-email`. */
 export function parseVerifyEmailSearchParams(sp: URLSearchParams): VerifyEmailSearchParams {
   const parsed = parseSearchParams(verifyEmailSearchSchema, sp, VERIFY_EMAIL_SEARCH_FALLBACK);
   return { token: parsed.data.token };
