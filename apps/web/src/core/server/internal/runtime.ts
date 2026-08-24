@@ -2,7 +2,7 @@ import "server-only";
 
 import { createBackendHelpers } from "@repo/web-server/server";
 
-import { authRuntime } from "@/core/auth/runtime";
+import { authRuntime } from "@/core/auth/server/runtime";
 import { serverEnv } from "@/core/config/server-env";
 
 export const serverRuntime = createBackendHelpers({
