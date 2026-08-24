@@ -42,7 +42,3 @@ export const serverEnv = serverEnvSchema.parse({
   APP_ENV: process.env.APP_ENV,
   NODE_ENV: process.env.NODE_ENV,
 });
-
-export const isSecureCookie =
-  serverEnv.COOKIE_SECURE ??
-  (serverEnv.APP_ENV !== "development" && serverEnv.APP_ENV !== "test");
