@@ -14,7 +14,6 @@ Organize code by **ownership first**, then by **responsibility**:
 - `features/` owns business capabilities and feature-specific knowledge.
 - `shared/` owns reusable presentation/helpers that are feature-agnostic.
 - `core/` owns application infrastructure and external mechanisms.
-- `lib/` is a legacy compatibility area only; do not add new files there.
 
 Keep code at the narrowest valid scope. A feature-specific abstraction stays in
 that feature even when several files use it. Promote to `shared/` or `core/`
@@ -45,13 +44,10 @@ src/features/<x>/     vertical slice per feature:
 src/components/       app shell + cross-feature domain composites. UI
                       primitives do NOT live here.
 src/hooks/            app-wide shared hooks (e.g. session).
-src/shared/           feature-agnostic reusable application presentation and
-                      helpers (theme, utilities). Must not depend on features.
-src/core/             application infrastructure and external mechanisms
-                      (HTTP now; auth/config/server migrate here incrementally).
-src/lib/              LEGACY compatibility area. Do not add new code; migrate
-                      infrastructure to core/ and reusable presentation/helpers
-                      to shared/ when touched.
+src/shared/           feature-agnostic reusable presentation/helpers
+                      (theme, navigation configuration, utilities).
+src/core/             application infrastructure and external mechanisms:
+                      auth, config, HTTP, server/BFF helpers, shared contracts.
 src/i18n/             next-intl routing/messages (en, vi).
 src/proxy.ts          Next 16 proxy (formerly middleware): locale negotiation.
 ```
@@ -88,8 +84,7 @@ Never reverse the dependency:
    read raw session state — presentational only.
 4. `src/features/*/model/**` must stay framework-free (no React, no HTTP, no
    router, no zod in UI layer).
-5. `src/core/**`, `src/shared/**`, and legacy `src/lib/**` must not import from
-   business features.
+5. `src/core/**` and `src/shared/**` must not import from business features.
 
 ## Conventions (review-enforced)
 
@@ -107,11 +102,11 @@ Never reverse the dependency:
 - **Pure decision, thin hook**: URL parsing and state machines are pure
   functions in `model/` with unit tests; hooks only add React wiring.
 - **Core is mechanism, not business**: HTTP, auth/session infrastructure,
-  runtime configuration, server/BFF helpers, navigation infrastructure and
-  observability belong in `core/` when app-owned.
-- **Shared is reusable but not infrastructure**: theme, feature-agnostic
-  presentation helpers, and stable reusable application helpers belong in
-  `shared/`.
+  runtime configuration, server/BFF helpers and cross-cutting contracts belong
+  in `core/` when app-owned.
+- **Shared is reusable but not infrastructure**: theme, navigation config,
+  feature-agnostic presentation helpers, and stable reusable application
+  helpers belong in `shared/`.
 - **No dumping grounds**: do not create generic `utils`, `helpers`, `types`, or
   `services` buckets without clear ownership and responsibility.
 - **i18n**: locale-aware pages live under `[locale]`; messages live in
