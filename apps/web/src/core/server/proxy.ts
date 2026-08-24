@@ -1,5 +1,5 @@
 import "server-only";
 
-import { serverRuntime } from "./internal/runtime";
+import { serverCapabilities } from "./internal/runtime";
 
-export const { proxyWithRefresh } = serverRuntime;
+export const { proxyWithRefresh } = serverCapabilities.proxy;
