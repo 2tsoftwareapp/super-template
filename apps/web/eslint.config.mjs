@@ -29,7 +29,7 @@ export default defineConfig([
                 "Route files must not use react-query directly. Move queries/mutations into features/<resource>/api/ (see CODING_RULES.md §3).",
             },
             {
-              name: "@/lib/http",
+              name: "@/core/http",
               message:
                 "Route files must not fetch directly. Move the call into features/<resource>/api/*.api.ts (see CODING_RULES.md §3).",
             },
@@ -134,10 +134,14 @@ export default defineConfig([
     },
   },
   {
-    // Architecture boundary: lib/ is infrastructure — must not import from features/.
-    // See CODING_RULES.md §9.2.
-    name: "web/boundary-lib",
-    files: ["src/lib/**/*.{ts,tsx}"],
+    // Architecture boundary: core/shared/legacy-lib are lower-scope reusable layers
+    // and must never depend on business features.
+    name: "web/boundary-core-shared",
+    files: [
+      "src/core/**/*.{ts,tsx}",
+      "src/shared/**/*.{ts,tsx}",
+      "src/lib/**/*.{ts,tsx}",
+    ],
     rules: {
       "no-restricted-imports": [
         "error",
@@ -146,7 +150,7 @@ export default defineConfig([
             {
               group: ["@/features/*"],
               message:
-                "lib/ must not import from features/ — dependency points the other way (see CODING_RULES.md §9.2).",
+                "core/shared infrastructure must not import from features/ — dependency points the other way (see CODING_RULES.md §9.2).",
             },
           ],
         },
@@ -240,8 +244,6 @@ export default defineConfig([
       "no-restricted-syntax": [
         "warn",
         {
-          // Flags a raw read; a read passed straight into a validator
-          // (internalPath(...), parseXSearchParams(...)) is fine.
           selector:
             ":not(CallExpression[callee.name=/^(internalPath|parse[A-Z])/]) > CallExpression[callee.type='MemberExpression'][callee.property.name='get'][callee.object.name='searchParams']",
           message:
