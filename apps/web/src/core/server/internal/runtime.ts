@@ -3,12 +3,9 @@ import "server-only";
 import { createBackendHelpers } from "@repo/web-server/server";
 
 import { authRuntime } from "@/core/auth/server/runtime";
-import { serverEnv } from "@/core/config/server-env";
+import { serverConfig } from "@/core/config/server-config";
 
 export const serverRuntime = createBackendHelpers({
-  apiInternalUrl: serverEnv.API_INTERNAL_URL,
-  allowedOrigins: serverEnv.WEB_ORIGIN.split(",")
-    .map((value) => value.trim())
-    .filter(Boolean),
+  ...serverConfig.backend,
   auth: authRuntime,
 });
