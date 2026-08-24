@@ -1,5 +1,5 @@
 import "server-only";
 
-import { serverRuntime } from "./internal/runtime";
+import { serverCapabilities } from "./internal/runtime";
 
-export const { callBackend } = serverRuntime;
+export const { callBackend } = serverCapabilities.transport;
