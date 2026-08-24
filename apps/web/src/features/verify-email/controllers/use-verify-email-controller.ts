@@ -3,15 +3,15 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { verifyEmail } from "../api/verify-email.api";
 import {
   VERIFY_EMAIL_ADMIN_URL,
   VERIFY_EMAIL_MESSAGES,
   VERIFY_EMAIL_REDIRECT_DELAY_MS,
 } from "../config/verify-email-config";
-import { verifyEmail } from "../api/verify-email.api";
+import type { VerifyEmailStatus, VerifyEmailViewModel } from "../contracts/verify-email-view-model";
 import { getVerifyEmailErrorMessage } from "./verify-email-error";
 import { parseVerifyEmailSearchParams } from "./verify-email-search-params";
-import type { VerifyEmailStatus, VerifyEmailViewModel } from "./verify-email-view-model";
 
 /**
  * Application orchestration for the verify-email screen.
