@@ -13,7 +13,7 @@ Organize code by **ownership first**, then by **responsibility**:
 
 Keep code at the narrowest valid scope. Promote to `shared/` or `core/` only after cross-feature reuse and responsibility are clear.
 
-A layer is **optional**. Do not create `model/`, `state/`, `api/`, or any other folder only to satisfy a template. Create a boundary only when the feature actually has that responsibility.
+A layer is **optional**. Do not create `model/`, `state/`, `api/`, `contracts/`, or any other folder only to satisfy a template. Create a boundary only when the feature actually has that responsibility.
 
 ## Feature responsibility map
 
@@ -24,29 +24,31 @@ src/features/<x>/
   config/               static feature-owned configuration and copy
     <x>-config.ts
 
-  api/                  integration boundary: BFF/API calls, query/mutation adapters
+  contracts/            OPTIONAL neutral data contracts shared by feature layers
+    <x>-view-model.ts
+
+  api/                   integration boundary: BFF/API calls, query/mutation adapters
     <x>.api.ts
     <x>.queries.ts
     <x>.mutations.ts
     <x>.query-keys.ts
 
-  model/                OPTIONAL pure domain/decision knowledge only
+  model/                 OPTIONAL pure domain/decision knowledge only
     <x>.rules.ts
     <x>.schemas.ts       only when the schema represents domain/business input
     <x>.types.ts         domain types only
 
-  controllers/          application orchestration + presentation contract
+  controllers/           application orchestration and adapters
     use-<x>-controller.ts
-    <x>-view-model.ts
     <x>-search-params.ts
     <x>-error.ts
 
-  state/                OPTIONAL feature state when state outlives a component/controller
+  state/                 OPTIONAL feature state when state outlives a component/controller
 
-  screens/              route-facing feature composition
+  screens/               route-facing feature composition
     <x>-view.tsx
 
-  ui/                   private presentational components; props in, events out
+  ui/                    private presentational components; props in, events out
     <x>-content.tsx
 ```
 
@@ -55,7 +57,8 @@ src/features/<x>/
 Before choosing a folder, ask:
 
 - **Is it a business/domain decision that remains meaningful without React/Next/API?** → `model/`.
-- **Is it orchestration, URL input adaptation, view state, error-to-copy mapping, or a screen contract?** → `controllers/`.
+- **Is it a neutral data shape shared across feature layers?** → `contracts/`.
+- **Is it orchestration, URL input adaptation, lifecycle, or error-to-copy mapping?** → `controllers/`.
 - **Is it static feature-owned data/copy/options?** → `config/`.
 - **Does it communicate with the backend/external system?** → `api/`.
 - **Does it only render and emit user events?** → `ui/`.
@@ -77,7 +80,7 @@ Rules:
 
 - Routes and other features consume a feature through `features/<x>/index.ts`.
 - Export the smallest stable capability required by external consumers.
-- Do not export API functions, controllers, internal models, config, or UI components merely because they exist.
+- Do not export API functions, controllers, internal models, config, contracts, or UI components merely because they exist.
 - Internal files import each other directly; they do not route through their own feature barrel.
 - Cross-feature deep imports are architecture violations.
 
@@ -87,8 +90,9 @@ Allowed direction is toward more stable, less feature-specific boundaries:
 
 ```text
 app → feature public contract
-feature screens/ui → controllers
-controllers → model/api/config/core/shared/packages
+screens → controllers + ui
+controllers → contracts/model/api/config/core/shared/packages
+ui → contracts/shared/packages
 api → core/packages
 model → runtime-agnostic packages only
 shared → core/packages (when needed)
@@ -100,7 +104,9 @@ Never reverse the dependency:
 - `core/` must not import `features/`.
 - `shared/` must not import `features/`.
 - `model/` must not import React, Next.js, router APIs, HTTP clients, feature API, controllers, screens, or UI.
+- `contracts/` must stay neutral: types/interfaces only; no React, HTTP, routing, state, side effects, or business workflows.
 - `ui/` must not fetch data or own application workflows.
+- `controllers/` must not import feature UI components.
 - one feature must not deep-import another feature's internals.
 
 ## Layer rules
@@ -113,6 +119,14 @@ Route files are composition entries only. They may resolve Next.js route props a
 
 Screens connect a controller/view-model to presentational UI. They may handle top-level loading/error boundaries and simple layout composition, but not business decisions or data fetching.
 
+### Contracts = neutral feature boundary types
+
+`contracts/` contains data shapes intentionally shared by multiple internal layers without giving one layer ownership over another. A view-model contract used by both controller and UI belongs here.
+
+Contracts are deliberately boring: TypeScript types/interfaces only. They do not contain logic, React, validation execution, HTTP, navigation, stores, or environment access.
+
+Do not create `contracts/` for a type used by only one file/layer; colocate that type instead.
+
 ### Controllers = application layer
 
 Controllers own user-flow orchestration:
@@ -124,7 +138,7 @@ Controllers own user-flow orchestration:
 - mapping infrastructure failures to safe presentation outcomes;
 - producing the view model consumed by the screen/UI.
 
-Keep pure helpers next to the controller when they exist only to support that application flow (`<x>-search-params.ts`, `<x>-error.ts`, `<x>-view-model.ts`). Do **not** misclassify them as domain model code.
+Keep pure helpers next to the controller when they exist only to support that application flow (`<x>-search-params.ts`, `<x>-error.ts`). Do **not** misclassify them as domain model code.
 
 ### Model = domain/decision layer
 
@@ -152,7 +166,7 @@ If a feature has no domain decision logic, it may have **no `model/` folder at a
 
 ### UI
 
-`ui/` is presentational. Components receive data and callbacks as props and must not know how application workflows, routing, HTTP, or server state are implemented.
+`ui/` is presentational. Components receive data and callbacks as props and must not know how application workflows, routing, HTTP, or server state are implemented. UI may depend on neutral feature contracts, not controllers.
 
 ### State
 
@@ -177,7 +191,8 @@ Every scheduled side effect must have lifecycle cleanup when applicable (timers,
 Tests follow responsibility, not just file type:
 
 - pure domain/decision tests colocate with `model/`;
-- controller/application tests cover orchestration, lifecycle, state, and failure mapping;
+- controller/application tests cover orchestration, lifecycle, state, parsing, and failure mapping;
+- contract tests are usually unnecessary because contracts are compile-time only; test the producer/consumer behavior instead;
 - API tests cover request contract and HTTP behavior;
 - UI tests cover rendering and user events;
 - feature tests prove the capability as a whole;
@@ -196,6 +211,7 @@ A refactor that moves responsibility should move its tests with it.
 
 - `api/`: dot notation for transport concerns (`verify-email.api.ts`).
 - `config/`: `<feature>-config.ts`.
+- `contracts/`: responsibility-specific names (`verify-email-view-model.ts`), never generic `types.ts`.
 - `model/`: responsibility suffixes such as `.rules.ts`, `.schemas.ts`, `.types.ts`.
 - `controllers/`, `screens/`, `ui/`: kebab-case.
 - names must describe responsibility, not implementation vagueness.
