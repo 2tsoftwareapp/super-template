@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { setCsrfCookie } from "@/core/auth/cookies";
+import { setCsrfCookie } from "@/core/auth/server/cookies";
 
 export function GET() {
   const response = NextResponse.json({

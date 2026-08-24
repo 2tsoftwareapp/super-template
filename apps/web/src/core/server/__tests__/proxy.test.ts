@@ -2,7 +2,7 @@ import type { ApiEnvelope } from "@repo/web-utils/api-types";
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { proxyWithRefresh } from "../backend";
+import { proxyWithRefresh } from "../proxy";
 
 const { readAuthCookiesMock, setAuthCookiesMock, clearAuthCookiesMock } = vi.hoisted(() => ({
   readAuthCookiesMock: vi.fn(),

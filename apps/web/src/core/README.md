@@ -4,10 +4,17 @@
 
 Core is organized by capability, not by a generic technical dumping ground:
 
-- `auth/` — web auth/session runtime, cookie policy, and auth-specific server helpers.
+- `auth/` — auth/session infrastructure split by runtime boundary:
+  - `cookie-names.ts` — client-safe cookie-name contract used by browser HTTP configuration and server auth;
+  - `server/runtime.ts` — private server-side auth composition;
+  - `server/cookies.ts` — server-only cookie/session operations.
 - `config/` — runtime configuration with an explicit server-only boundary (`server-env.ts`).
 - `http/` — configured browser HTTP client. Error contracts live separately in `http/errors.ts` so consumers can classify HTTP failures without bootstrapping the client runtime.
-- `server/` — BFF/backend gateway helpers composed from server configuration and auth runtime.
+- `server/` — app-owned BFF capabilities. Public route-facing capabilities are split by responsibility:
+  - `transport.ts` — raw backend calls and refresh transport;
+  - `guards.ts` — origin/CSRF/mutation request guards;
+  - `proxy.ts` — authenticated proxy-with-refresh orchestration;
+  - `internal/runtime.ts` — private composition root that binds server config + auth runtime to `@repo/web-server`.
 
 Rules:
 
@@ -16,4 +23,7 @@ Rules:
 - Do not create pass-through wrappers around repository packages unless the app adds policy, configuration, or ownership semantics.
 - Separate runtime/bootstrap modules from neutral contracts when importing one would otherwise trigger side effects.
 - Keep server secrets/configuration out of generic or client-facing config modules.
+- Server-only modules must declare the `server-only` boundary and live under an explicit server/internal ownership path when a client-safe sibling capability exists.
+- Route handlers depend on the narrow public server capability they need; they must not import `core/server/internal/**` directly.
+- Do not expose one god facade that re-exports unrelated transport, security, session, and proxy mechanisms.
 - Prefer small capability-oriented folders over generic `types`, `utils`, or `helpers` dumping grounds.

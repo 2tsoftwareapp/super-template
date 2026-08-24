@@ -1,4 +1,6 @@
-import { authRuntime } from "@/core/auth/runtime";
+import "server-only";
+
+import { authRuntime } from "./runtime";
 
 export {
   ACCESS_TOKEN_COOKIE,

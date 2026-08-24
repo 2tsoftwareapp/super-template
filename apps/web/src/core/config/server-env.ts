@@ -1,3 +1,5 @@
+import "server-only";
+
 import { loadEnvFiles } from "@repo/env-loader";
 import { z } from "zod";
 
