@@ -2,8 +2,8 @@ import type { NextRequest } from "next/server";
 
 import { NextResponse } from "next/server";
 
-import { clearSessionCookies, readAuthCookies, setCsrfCookie } from "@/lib/auth/cookies";
-import { callBackend, enforceCsrf } from "@/lib/server/backend";
+import { clearSessionCookies, readAuthCookies, setCsrfCookie } from "@/core/auth/cookies";
+import { callBackend, enforceCsrf } from "@/core/server/backend";
 
 export async function POST(request: NextRequest) {
   const csrfFailure = await enforceCsrf(request);
