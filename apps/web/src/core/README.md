@@ -4,10 +4,11 @@
 
 Core is organized by capability, not by a generic technical dumping ground:
 
-- `auth/` — auth/session infrastructure split by runtime boundary:
+- `auth/` — auth/session infrastructure split by runtime boundary and capability:
   - `cookie-names.ts` — client-safe app-owned cookie-name policy used by browser HTTP configuration and server auth;
   - `server/runtime.ts` — private server-side auth composition;
-  - `server/cookies.ts` — narrow route-facing cookie/session operations only.
+  - `server/session.ts` — route-facing session read/clear capability;
+  - `server/csrf.ts` — route-facing CSRF issuance capability.
 - `config/` — server configuration split by responsibility:
   - `server-env.ts` — load + validate raw environment input only;
   - `server-config.ts` — normalize app-owned runtime policy such as allowed origins, cookie security, and signed-CSRF requirements.
@@ -18,7 +19,7 @@ Core is organized by capability, not by a generic technical dumping ground:
   - `transport.ts` — raw backend transport required by route composition;
   - `guards.ts` — route-level CSRF/mutation request guards;
   - `proxy.ts` — authenticated proxy-with-refresh orchestration;
-  - `internal/runtime.ts` — private composition root that binds normalized server config + auth runtime to `@repo/web-server`.
+  - `internal/runtime.ts` — private composition root that binds normalized server config + auth runtime to `@repo/web-server`, then groups the resulting implementation into internal transport/guards/proxy capabilities.
 
 Rules:
 
@@ -30,7 +31,8 @@ Rules:
 - Separate raw environment validation from normalized application configuration/policy. Runtime capabilities consume normalized config instead of re-parsing or re-interpreting environment values independently.
 - Keep server secrets/configuration out of generic or client-facing config modules.
 - Server-only modules must declare the `server-only` boundary and live under an explicit server/internal ownership path when a client-safe sibling capability exists.
-- Route handlers depend on the narrow public server capability they need; they must not import `core/server/internal/**` or `core/auth/server/runtime` directly.
+- Route handlers depend on the narrow public capability they need; they must not import `core/server/internal/**` or `core/auth/server/runtime` directly.
+- Name public modules by capability (`session`, `csrf`, `transport`, `guards`, `proxy`) rather than by storage/mechanism (`cookies`) when consumers care about behavior rather than implementation.
 - Public capability modules expose only operations required by current consumers; internal primitives such as token signing/validation, auth cookie mutation helpers, refresh orchestration, or raw origin checks stay private until a real use case needs them.
 - Do not expose one god facade that re-exports unrelated transport, security, session, and proxy mechanisms.
 - Prefer small capability-oriented folders over generic `types`, `utils`, or `helpers` dumping grounds.
