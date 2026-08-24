@@ -7,18 +7,13 @@ import {
   CSRF_TOKEN_COOKIE,
   REFRESH_TOKEN_COOKIE,
 } from "@/core/auth/cookie-names";
-import { isSecureCookie, serverEnv } from "@/core/config/server-env";
+import { serverConfig } from "@/core/config/server-config";
 
 export const authRuntime = createAuthCookieHelpers({
-  cookieDomain: serverEnv.COOKIE_DOMAIN,
-  cookieSameSite: serverEnv.COOKIE_SAMESITE,
-  cookieSecure: isSecureCookie,
-  csrfSecret: serverEnv.CSRF_SECRET ?? null,
+  ...serverConfig.auth,
   cookieNames: {
     accessToken: ACCESS_TOKEN_COOKIE,
     refreshToken: REFRESH_TOKEN_COOKIE,
     csrf: CSRF_TOKEN_COOKIE,
   },
-  requireSignedCsrf:
-    serverEnv.APP_ENV === "staging" || serverEnv.APP_ENV === "production",
 });
