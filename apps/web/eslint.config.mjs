@@ -134,14 +134,10 @@ export default defineConfig([
     },
   },
   {
-    // Architecture boundary: core/shared/legacy-lib are lower-scope reusable layers
+    // Architecture boundary: core/shared are lower-scope reusable layers
     // and must never depend on business features.
     name: "web/boundary-core-shared",
-    files: [
-      "src/core/**/*.{ts,tsx}",
-      "src/shared/**/*.{ts,tsx}",
-      "src/lib/**/*.{ts,tsx}",
-    ],
+    files: ["src/core/**/*.{ts,tsx}", "src/shared/**/*.{ts,tsx}"],
     rules: {
       "no-restricted-imports": [
         "error",
