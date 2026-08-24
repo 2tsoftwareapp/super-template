@@ -1,7 +1,6 @@
+import type { ApiEnvelope } from "@repo/web-utils/api-types";
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-
-import type { ApiEnvelope } from "@/core/types/api-types";
 
 import { proxyWithRefresh } from "../backend";
 
@@ -11,15 +10,15 @@ const { readAuthCookiesMock, setAuthCookiesMock, clearAuthCookiesMock } = vi.hoi
   clearAuthCookiesMock: vi.fn(),
 }));
 
-vi.mock("@/core/config/env", () => ({
-  env: {
+vi.mock("@/core/config/server-env", () => ({
+  serverEnv: {
     API_INTERNAL_URL: "http://localhost:3001",
-    NEXT_PUBLIC_WEB_URL: "http://localhost:3000",
     WEB_ORIGIN: "http://localhost:3000",
     COOKIE_DOMAIN: undefined,
     COOKIE_SAMESITE: "lax",
     CSRF_SECRET: undefined,
     COOKIE_SECURE: false,
+    APP_ENV: "test",
     NODE_ENV: "test",
   },
   isSecureCookie: false,
@@ -60,31 +59,18 @@ describe("proxyWithRefresh", () => {
       .mockResolvedValueOnce(
         new Response(
           JSON.stringify({
-            error: {
-              code: "AUTH_UNAUTHORIZED",
-              message: "expired",
-              details: null,
-            },
+            error: { code: "AUTH_UNAUTHORIZED", message: "expired", details: null },
             meta: { requestId: "first" },
           }),
-          {
-            status: 401,
-            headers: { "content-type": "application/json" },
-          },
+          { status: 401, headers: { "content-type": "application/json" } },
         ),
       )
       .mockResolvedValueOnce(
         new Response(
           JSON.stringify({
-            data: {
-              accessToken: "fresh-access-token",
-              refreshToken: "fresh-refresh-token",
-            },
+            data: { accessToken: "fresh-access-token", refreshToken: "fresh-refresh-token" },
           }),
-          {
-            status: 200,
-            headers: { "content-type": "application/json" },
-          },
+          { status: 200, headers: { "content-type": "application/json" } },
         ),
       )
       .mockResolvedValueOnce(
@@ -93,18 +79,13 @@ describe("proxyWithRefresh", () => {
             data: [{ id: "user-1" }],
             meta: { page: 1, limit: 20, total: 1, totalPages: 1 },
           }),
-          {
-            status: 200,
-            headers: { "content-type": "application/json" },
-          },
+          { status: 200, headers: { "content-type": "application/json" } },
         ),
       );
 
     const request = new NextRequest("http://localhost/api/bff/admin/users", {
       method: "GET",
-      headers: {
-        accept: "application/json",
-      },
+      headers: { accept: "application/json" },
     });
 
     const response = await proxyWithRefresh(request, "admin/users");
@@ -115,10 +96,7 @@ describe("proxyWithRefresh", () => {
     expect(fetchMock).toHaveBeenCalledTimes(3);
     expect(setAuthCookiesMock).toHaveBeenCalledWith(
       response,
-      {
-        accessToken: "fresh-access-token",
-        refreshToken: "fresh-refresh-token",
-      },
+      { accessToken: "fresh-access-token", refreshToken: "fresh-refresh-token" },
       "csrf-token",
     );
     expect(clearAuthCookiesMock).not.toHaveBeenCalled();
@@ -128,17 +106,10 @@ describe("proxyWithRefresh", () => {
     fetchMock.mockResolvedValueOnce(
       new Response(
         JSON.stringify({
-          error: {
-            code: "AUTH_UNAUTHORIZED",
-            message: "expired",
-            details: null,
-          },
+          error: { code: "AUTH_UNAUTHORIZED", message: "expired", details: null },
           meta: { requestId: "req-1" },
         }),
-        {
-          status: 401,
-          headers: { "content-type": "application/json" },
-        },
+        { status: 401, headers: { "content-type": "application/json" } },
       ),
     );
 
@@ -150,9 +121,7 @@ describe("proxyWithRefresh", () => {
 
     const request = new NextRequest("http://localhost/api/auth/session", {
       method: "GET",
-      headers: {
-        accept: "application/json",
-      },
+      headers: { accept: "application/json" },
     });
 
     const response = await proxyWithRefresh(request, "auth/me");
@@ -165,25 +134,14 @@ describe("proxyWithRefresh", () => {
   it("forwards a normalized list-route query string to the backend", async () => {
     fetchMock.mockResolvedValueOnce(
       new Response(
-        JSON.stringify({
-          data: [],
-          meta: { page: 2, limit: 5, total: 0, totalPages: 0 },
-        }),
-        {
-          status: 200,
-          headers: { "content-type": "application/json" },
-        },
+        JSON.stringify({ data: [], meta: { page: 2, limit: 5, total: 0, totalPages: 0 } }),
+        { status: 200, headers: { "content-type": "application/json" } },
       ),
     );
 
     const request = new NextRequest(
       "http://localhost/api/bff/users?page=2&limit=5&status=ACTIVE&sortField=name&sortOrder=asc&unknown=drop-me",
-      {
-        method: "GET",
-        headers: {
-          accept: "application/json",
-        },
-      },
+      { method: "GET", headers: { accept: "application/json" } },
     );
 
     const response = await proxyWithRefresh(
