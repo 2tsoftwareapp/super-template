@@ -26,11 +26,11 @@ import {
   stackLayers,
   steps,
   surfaces,
-} from "../model/landing.content";
+} from "../config/landing-config";
 import { ArchDiagram } from "../ui/arch-diagram";
 import { ScrollToTop } from "../ui/scroll-to-top";
 
-/** Icon lookup for feature cards (model stores keys only). */
+/** Icon lookup for feature cards (config stores keys only). */
 const FEATURE_ICONS: Record<string, LucideIcon> = {
   code: Code2,
   shield: Shield,
@@ -82,148 +82,131 @@ export function LandingView() {
               Admin
             </a>
           </nav>
-          <div className="hidden md:block" />
+          <div className="flex items-center justify-end gap-2">
+            <Button variant="ghost" size="sm" asChild>
+              <a
+                href="https://github.com/truongnat/super-template"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Github className="size-4" />
+                <span className="hidden sm:inline">GitHub</span>
+              </a>
+            </Button>
+          </div>
         </div>
       </header>
 
-      {/* ── Hero ── */}
-      <section className="border-b border-border">
-        <div className="mx-auto max-w-7xl px-3 py-28 md:px-6 md:py-40">
-          <div className="flex flex-col items-center text-center">
-            <Badge variant="outline" className="mb-6 text-xs">
-              Production-ready · 4 surfaces · MIT licensed
+      <main>
+        {/* ── Hero ── */}
+        <section className="border-b border-border bg-card">
+          <div className="mx-auto flex max-w-7xl flex-col items-center px-4 py-20 text-center md:px-6 md:py-28">
+            <Badge variant="secondary" className="mb-5">
+              Production-ready full-stack starter
             </Badge>
-            <h1 className="max-w-4xl text-5xl font-bold leading-[1.1] tracking-tight md:text-7xl">
-              Ship your product.{" "}
-              <span className="text-muted-foreground">Not your boilerplate.</span>
+            <h1 className="max-w-4xl text-balance text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
+              Build products, not boilerplate.
             </h1>
-            <p className="mt-6 max-w-2xl text-base leading-8 text-muted-foreground md:text-lg">
-              A complete monorepo with a NestJS API, a public SEO landing page, an admin app with
-              auth BFF, and a Flutter mobile client — wired with contract-driven clients and
-              production tooling from day one.
+            <p className="mt-6 max-w-2xl text-pretty text-base leading-relaxed text-muted-foreground md:text-lg">
+              A batteries-included monorepo with web, admin, API, and mobile surfaces — wired for
+              authentication, multi-tenancy, generated contracts, and CI from day one.
             </p>
-            <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
-              <Button size="lg" asChild>
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+              <Button asChild>
                 <a href="#get-started">Get started</a>
               </Button>
-              <Button variant="outline" size="lg" asChild>
-                <a href={ADMIN_URL} target="_blank" rel="noopener noreferrer">
-                  <LayoutDashboard className="size-4" />
-                  Open admin
-                </a>
-              </Button>
-              <Button variant="outline" size="lg" asChild>
-                <a
-                  href="https://github.com/truongnat/super-template"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Github className="size-4" />
-                  GitHub
+              <Button variant="outline" asChild>
+                <a href={API_DOCS_URL} target="_blank" rel="noopener noreferrer">
+                  API docs <ExternalLink className="size-4" />
                 </a>
               </Button>
             </div>
-            <div className="mt-12 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-muted-foreground">
+            <div className="mt-10 flex flex-wrap justify-center gap-x-5 gap-y-2 text-xs text-muted-foreground">
               {highlights.map((item) => (
-                <span key={item} className="flex items-center gap-2">
-                  <CheckCircle2 className="size-4 text-primary" />
+                <span key={item} className="flex items-center gap-1.5">
+                  <CheckCircle2 className="size-3.5" />
                   {item}
                 </span>
               ))}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ── Surfaces ── */}
-      <section id="surfaces" className="border-b border-border py-24">
-        <div className="mx-auto max-w-7xl px-3 md:px-6">
-          <div className="mx-auto mb-16 max-w-2xl text-center">
-            <Badge variant="outline" className="mb-4">
-              Four surfaces
+        {/* ── Surfaces ── */}
+        <section id="surfaces" className="mx-auto max-w-7xl px-4 py-16 md:px-6 md:py-20">
+          <div className="mb-8 max-w-2xl">
+            <Badge variant="outline" className="mb-3">
+              Surfaces
             </Badge>
-            <h2 className="text-4xl font-bold tracking-tight">One backend, clear separation</h2>
-            <p className="mt-4 text-muted-foreground">
-              Web is a lean SEO landing page. Admin is the primary app with auth and operations.
-              Mobile ships the native experience. All three talk to the same NestJS API.
+            <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">
+              One repository, four product surfaces
+            </h2>
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground md:text-base">
+              Each app has a focused responsibility while sharing contracts, tooling, and design
+              primitives across the monorepo.
             </p>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {surfaces.map((surface) => (
-              <a
-                key={surface.label}
-                href={surface.href}
-                target={surface.external ? "_blank" : undefined}
-                rel={surface.external ? "noopener noreferrer" : undefined}
-                className="group block h-full"
-              >
-                <Card className="h-full transition-shadow hover:shadow-md">
-                  <CardHeader>
-                    <div className="flex items-center justify-between gap-2">
-                      <CardDescription className="text-xs font-semibold uppercase tracking-widest">
-                        {surface.label}
-                      </CardDescription>
-                      <Show when={surface.external}>
-                        <ExternalLink className="size-3.5 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
-                      </Show>
-                    </div>
-                    <CardTitle>{surface.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm leading-6 text-muted-foreground">{surface.description}</p>
-                  </CardContent>
-                </Card>
-              </a>
+              <Card key={surface.label} className="h-full">
+                <CardHeader>
+                  <Badge variant="secondary" className="w-fit">
+                    {surface.label}
+                  </Badge>
+                  <CardTitle className="text-lg">{surface.title}</CardTitle>
+                  <CardDescription>{surface.description}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button variant="outline" size="sm" asChild>
+                    <a
+                      href={surface.href}
+                      {...(surface.external
+                        ? { target: "_blank", rel: "noopener noreferrer" }
+                        : {})}
+                    >
+                      Open {surface.label}
+                      {surface.external ? <ExternalLink className="size-3.5" /> : null}
+                    </a>
+                  </Button>
+                </CardContent>
+              </Card>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ── Features ── */}
-      <section id="features" className="border-b border-border py-24">
-        <div className="mx-auto max-w-7xl px-3 md:px-6">
-          <div className="mx-auto mb-16 max-w-2xl text-center">
-            <Badge variant="outline" className="mb-4">
-              What&apos;s inside
+        <Separator />
+
+        {/* ── Features ── */}
+        <section id="features" className="mx-auto max-w-7xl px-4 py-16 md:px-6 md:py-20">
+          <div className="mb-8 max-w-2xl">
+            <Badge variant="outline" className="mb-3">
+              Features
             </Badge>
-            <h2 className="text-4xl font-bold tracking-tight">
-              Everything connected, nothing missing
+            <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">
+              Production concerns already wired
             </h2>
-            <p className="mt-4 text-muted-foreground">
-              Four apps sharing one database schema and one API contract. Admin hosts auth via a
-              BFF; web stays marketing-only — change the schema, regenerate, all clients update.
-            </p>
           </div>
-          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-            {features.map((feat) => {
-              const Icon = FEATURE_ICONS[feat.icon] ?? Code2;
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {features.map((feature) => {
+              const Icon = FEATURE_ICONS[feature.icon];
               return (
-                <Card key={feat.title} className="transition-shadow hover:shadow-md">
+                <Card key={feature.title} className="h-full">
                   <CardHeader>
-                    <div className="flex items-start gap-4">
-                      <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-muted">
-                        <Icon className="size-5 text-primary" />
-                      </div>
-                      <div className="min-w-0 space-y-1">
-                        <CardDescription className="text-xs uppercase tracking-widest">
-                          {feat.label}
-                        </CardDescription>
-                        <CardTitle>{feat.title}</CardTitle>
-                        <CardDescription className="text-sm leading-6">
-                          {feat.description}
-                        </CardDescription>
-                      </div>
+                    <div className="mb-2 flex size-9 items-center justify-center rounded-md border border-border bg-muted">
+                      {Icon ? <Icon className="size-4" /> : null}
                     </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="secondary">{feature.label}</Badge>
+                    </div>
+                    <CardTitle className="text-lg">{feature.title}</CardTitle>
+                    <CardDescription>{feature.description}</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <ul className="space-y-1.5">
-                      {feat.items.map((item) => (
-                        <li
-                          key={item}
-                          className="flex items-center gap-2 text-sm text-muted-foreground"
-                        >
-                          <span className="size-1.5 shrink-0 rounded-full bg-primary" />
-                          {item}
+                    <ul className="space-y-2 text-sm text-muted-foreground">
+                      {feature.items.map((item) => (
+                        <li key={item} className="flex gap-2">
+                          <CheckCircle2 className="mt-0.5 size-3.5 shrink-0" />
+                          <span>{item}</span>
                         </li>
                       ))}
                     </ul>
@@ -232,161 +215,110 @@ export function LandingView() {
               );
             })}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ── Architecture ── */}
-      <section id="architecture" className="border-b border-border py-32">
-        <div className="mx-auto max-w-7xl px-3 md:px-6">
-          <div className="mx-auto mb-16 max-w-2xl text-center">
-            <Badge variant="outline" className="mb-4">
+        <Separator />
+
+        {/* ── Architecture ── */}
+        <section id="architecture" className="mx-auto max-w-7xl px-4 py-16 md:px-6 md:py-20">
+          <div className="mb-8 max-w-2xl">
+            <Badge variant="outline" className="mb-3">
               Architecture
             </Badge>
-            <h2 className="text-4xl font-bold tracking-tight">Three clients, one backend</h2>
-            <p className="mt-4 text-muted-foreground">
-              The NestJS API serves web, admin, and mobile from a single Postgres database. Admin
-              traffic flows through a Next.js BFF with @repo/web-server; web is static marketing;
-              Flutter talks directly to the API.
-            </p>
+            <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">
+              Clear ownership, explicit boundaries
+            </h2>
           </div>
           <ArchDiagram />
-        </div>
-      </section>
+        </section>
 
-      {/* ── Stack ── */}
-      <section id="stack" className="border-b border-border py-24">
-        <div className="mx-auto max-w-7xl px-3 md:px-6">
-          {/* Header — left-aligned, editorial */}
-          <div className="mb-16 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-              <Badge variant="outline" className="mb-3">
-                Tech stack
-              </Badge>
-              <h2 className="text-4xl font-bold tracking-tight lg:text-5xl">
-                Every dependency chosen
-                <br className="hidden lg:block" /> for production, not demos.
-              </h2>
-            </div>
-            <p className="max-w-xs shrink-0 text-sm leading-6 text-muted-foreground lg:text-right">
-              {stackLayers.reduce((n, l) => n + l.packages.length, 0)} packages across{" "}
-              {stackLayers.length} layers. Every version pinned. Every choice documented.
-            </p>
+        <Separator />
+
+        {/* ── Stack ── */}
+        <section id="stack" className="mx-auto max-w-7xl px-4 py-16 md:px-6 md:py-20">
+          <div className="mb-8 max-w-2xl">
+            <Badge variant="outline" className="mb-3">
+              Stack
+            </Badge>
+            <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">
+              Modern tools, one workflow
+            </h2>
           </div>
-
-          <Card>
-            <CardContent className="px-0">
-              {stackLayers.map((layer, layerIndex) => (
-                <div key={layer.label}>
-                  <div className="flex items-center gap-5 px-6 pb-1 pt-6">
-                    <span className="shrink-0 text-xs font-bold uppercase tracking-widest text-muted-foreground">
-                      {layer.label}
-                    </span>
-                    <Separator className="flex-1" />
-                  </div>
-                  {layer.packages.map((pkg, pkgIndex) => (
-                    <div key={pkg.name}>
-                      <div className="grid grid-cols-1 gap-1 px-6 py-3.5 sm:grid-cols-[160px_56px_1fr] sm:items-baseline sm:gap-6">
-                        <span className="font-semibold text-foreground">{pkg.name}</span>
-                        <span className="font-mono text-xs text-muted-foreground sm:text-center">
-                          {pkg.version}
-                        </span>
-                        <span className="text-sm leading-6 text-muted-foreground">
-                          {pkg.description}
-                        </span>
-                      </div>
-                      <Show when={pkgIndex < layer.packages.length - 1}>
-                        <Separator className="mx-6" />
-                      </Show>
-                    </div>
+          <div className="space-y-6">
+            {stackLayers.map((layer) => (
+              <div key={layer.label}>
+                <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                  {layer.label}
+                </h3>
+                <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+                  {layer.packages.map((pkg) => (
+                    <Card key={`${layer.label}-${pkg.name}`}>
+                      <CardHeader className="pb-3">
+                        <div className="flex items-center justify-between gap-3">
+                          <CardTitle className="text-base">{pkg.name}</CardTitle>
+                          <Badge variant="outline">{pkg.version}</Badge>
+                        </div>
+                        <CardDescription>{pkg.description}</CardDescription>
+                      </CardHeader>
+                    </Card>
                   ))}
-                  <Show when={layerIndex < stackLayers.length - 1}>
-                    <Separator className="mt-2" />
-                  </Show>
                 </div>
-              ))}
-            </CardContent>
-          </Card>
-        </div>
-      </section>
+              </div>
+            ))}
+          </div>
+        </section>
 
-      {/* ── Get Started ── */}
-      <section id="get-started" className="border-b border-border py-24">
-        <div className="mx-auto max-w-7xl px-3 md:px-6">
-          <div className="mx-auto mb-16 max-w-2xl text-center">
-            <Badge variant="outline" className="mb-4">
+        <Separator />
+
+        {/* ── Get started ── */}
+        <section id="get-started" className="mx-auto max-w-5xl px-4 py-16 md:px-6 md:py-20">
+          <div className="mb-8 text-center">
+            <Badge variant="outline" className="mb-3">
               Get started
             </Badge>
-            <h2 className="text-4xl font-bold tracking-tight">Running in under 5 minutes</h2>
-            <p className="mt-4 text-muted-foreground">
-              Docker, pnpm, and the Flutter SDK are all you need.
-            </p>
+            <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">
+              From clone to running in three steps
+            </h2>
           </div>
-          <div className="grid gap-5 md:grid-cols-3">
+          <div className="space-y-4">
             {steps.map((step) => (
               <Card key={step.step}>
-                <CardHeader>
-                  <CardDescription className="font-mono text-4xl font-bold text-muted-foreground">
+                <CardContent className="grid gap-4 p-6 md:grid-cols-[auto_1fr_auto] md:items-center">
+                  <div className="flex size-10 items-center justify-center rounded-full border border-border bg-muted text-sm font-semibold">
                     {step.step}
-                  </CardDescription>
-                  <CardTitle>{step.title}</CardTitle>
-                  <CardDescription>{step.description}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="rounded-lg bg-muted px-3 py-2">
-                    <code className="font-mono text-xs text-foreground">
-                      <span className="text-muted-foreground">$ </span>
-                      {step.code}
-                    </code>
                   </div>
+                  <div>
+                    <h3 className="font-semibold">{step.title}</h3>
+                    <p className="mt-1 text-sm text-muted-foreground">{step.description}</p>
+                  </div>
+                  <code className="rounded-md bg-muted px-3 py-2 text-xs">{step.code}</code>
                 </CardContent>
               </Card>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
+      </main>
 
-      <ScrollToTop />
-
-      {/* ── Footer ── */}
-      <footer className="py-12">
-        <div className="mx-auto max-w-7xl px-3 md:px-6">
-          <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
-            <div className="flex items-center gap-2.5">
-              <div className="flex size-8 items-center justify-center rounded-lg bg-foreground">
-                <Zap className="size-4 text-background" />
-              </div>
-              <span className="text-sm font-semibold">Super Template</span>
-            </div>
-            <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
-              <a
-                href={ADMIN_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-foreground"
-              >
-                Admin
-              </a>
-              <a
-                href={API_DOCS_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-foreground"
-              >
-                API docs
-              </a>
-              <a
-                href="https://github.com/truongnat/super-template"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-foreground"
-              >
-                GitHub
-              </a>
-            </nav>
-            <p className="text-center text-sm text-muted-foreground">MIT licensed.</p>
+      <footer className="border-t border-border bg-card">
+        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-8 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between md:px-6">
+          <span>Super Template · full-stack monorepo starter</span>
+          <div className="flex items-center gap-4">
+            <a
+              href="https://github.com/truongnat/super-template"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-foreground"
+            >
+              GitHub
+            </a>
+            <a href={API_DOCS_URL} target="_blank" rel="noopener noreferrer" className="hover:text-foreground">
+              API docs
+            </a>
           </div>
         </div>
       </footer>
+
+      <ScrollToTop />
     </div>
   );
 }
