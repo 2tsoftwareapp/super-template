@@ -109,56 +109,140 @@ export const stackLayers = [
   {
     label: "Web",
     packages: [
-      { name: "Next.js", version: "16", description: "App Router · SEO landing · lightweight public marketing surface" },
-      { name: "shadcn/ui", version: "4.x", description: "Unstyled component system built on Base UI primitives" },
-      { name: "TanStack Query", version: "5.x", description: "Server state synchronization, mutations, and caching" },
-      { name: "Tailwind CSS", version: "4.x", description: "Utility-first styling with OKLCH perceptual color tokens" },
+      {
+        name: "Next.js",
+        version: "16",
+        description: "App Router · SEO landing · lightweight public marketing surface",
+      },
+      {
+        name: "shadcn/ui",
+        version: "4.x",
+        description: "Unstyled component system built on Base UI primitives",
+      },
+      {
+        name: "TanStack Query",
+        version: "5.x",
+        description: "Server state synchronization, mutations, and caching",
+      },
+      {
+        name: "Tailwind CSS",
+        version: "4.x",
+        description: "Utility-first styling with OKLCH perceptual color tokens",
+      },
     ],
   },
   {
     label: "Shared",
     packages: [
-      { name: "@repo/web-ui", version: "workspace:*", description: "Shared UI primitives (components + hooks)" },
-      { name: "@repo/env-loader", version: "workspace:*", description: "Layered .env loading for development, staging, and production" },
+      {
+        name: "@repo/web-ui",
+        version: "workspace:*",
+        description: "Shared UI primitives (components + hooks)",
+      },
+      {
+        name: "@repo/env-loader",
+        version: "workspace:*",
+        description: "Layered .env loading for development, staging, and production",
+      },
     ],
   },
   {
     label: "API",
     packages: [
-      { name: "NestJS", version: "11", description: "Modular Node.js framework with dependency injection" },
-      { name: "Drizzle ORM", version: "0.45", description: "Type-safe SQL with zero runtime overhead — no magic" },
-      { name: "PostgreSQL", version: "18", description: "Primary relational store with multi-tenant workspace isolation" },
+      {
+        name: "NestJS",
+        version: "11",
+        description: "Modular Node.js framework with dependency injection",
+      },
+      {
+        name: "Drizzle ORM",
+        version: "0.45",
+        description: "Type-safe SQL with zero runtime overhead — no magic",
+      },
+      {
+        name: "PostgreSQL",
+        version: "18",
+        description: "Primary relational store with multi-tenant workspace isolation",
+      },
     ],
   },
   {
     label: "Admin",
     packages: [
-      { name: "Next.js", version: "16", description: "App Router · same-origin auth BFF · primary product surface" },
-      { name: "TanStack Table", version: "8.x", description: "Headless table with sorting, filtering, and pagination hooks" },
+      {
+        name: "Next.js",
+        version: "16",
+        description: "App Router · same-origin auth BFF · primary product surface",
+      },
+      {
+        name: "TanStack Table",
+        version: "8.x",
+        description: "Headless table with sorting, filtering, and pagination hooks",
+      },
     ],
   },
   {
     label: "Mobile",
     packages: [
-      { name: "Flutter", version: "3.x", description: "Cross-platform iOS and Android from a single codebase" },
-      { name: "Riverpod", version: "2.x", description: "Compile-safe reactive state management for Flutter" },
+      {
+        name: "Flutter",
+        version: "3.x",
+        description: "Cross-platform iOS and Android from a single codebase",
+      },
+      {
+        name: "Riverpod",
+        version: "2.x",
+        description: "Compile-safe reactive state management for Flutter",
+      },
     ],
   },
   {
     label: "Tooling",
     packages: [
-      { name: "Turborepo", version: "2.x", description: "Monorepo task orchestration with remote caching" },
-      { name: "pnpm", version: "11", description: "Content-addressable, disk-efficient package manager" },
-      { name: "Vitest", version: "4.x", description: "Vite-native test runner · compatible with Jest APIs" },
-      { name: "Playwright", version: "1.61", description: "End-to-end browser testing across Chromium, Firefox, WebKit" },
+      {
+        name: "Turborepo",
+        version: "2.x",
+        description: "Monorepo task orchestration with remote caching",
+      },
+      {
+        name: "pnpm",
+        version: "11",
+        description: "Content-addressable, disk-efficient package manager",
+      },
+      {
+        name: "Vitest",
+        version: "4.x",
+        description: "Vite-native test runner · compatible with Jest APIs",
+      },
+      {
+        name: "Playwright",
+        version: "1.61",
+        description: "End-to-end browser testing across Chromium, Firefox, WebKit",
+      },
     ],
   },
 ];
 
 export const steps = [
-  { step: "01", title: "Clone the repo", description: "One git clone to get the full monorepo — API, web, admin, and Flutter mobile.", code: "git clone https://github.com/truongnat/super-template" },
-  { step: "02", title: "Bootstrap", description: "Installs deps, starts Postgres, migrates, seeds demo accounts, and generates all API contracts. Uses .env.development by default.", code: "make bootstrap" },
-  { step: "03", title: "Start building", description: "API, web, and admin start together. Run Flutter separately with make dev-mobile.", code: "make dev" },
+  {
+    step: "01",
+    title: "Clone the repo",
+    description: "One git clone to get the full monorepo — API, web, admin, and Flutter mobile.",
+    code: "git clone https://github.com/truongnat/super-template",
+  },
+  {
+    step: "02",
+    title: "Bootstrap",
+    description:
+      "Installs deps, starts Postgres, migrates, seeds demo accounts, and generates all API contracts. Uses .env.development by default.",
+    code: "make bootstrap",
+  },
+  {
+    step: "03",
+    title: "Start building",
+    description: "API, web, and admin start together. Run Flutter separately with make dev-mobile.",
+    code: "make dev",
+  },
 ];
 
 export const highlights = [
