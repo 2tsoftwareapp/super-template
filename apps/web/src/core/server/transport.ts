@@ -2,4 +2,4 @@ import "server-only";
 
 import { serverRuntime } from "./internal/runtime";
 
-export const { callBackend, refreshSession } = serverRuntime;
+export const { callBackend } = serverRuntime;

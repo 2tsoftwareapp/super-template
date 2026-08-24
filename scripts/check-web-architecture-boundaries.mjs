@@ -24,12 +24,12 @@ const blockedCases = [
   {
     name: "config cannot import core by alias",
     file: "src/features/example/config/example-config.ts",
-    source: 'import "@/core/config/env";',
+    source: 'import "@/core/config/server-env";',
   },
   {
     name: "config cannot import core relatively",
     file: "src/features/example/config/example-config.ts",
-    source: 'import "../../../core/config/env";',
+    source: 'import "../../../core/config/server-env";',
   },
   {
     name: "ui cannot import controllers",
@@ -54,7 +54,7 @@ const blockedCases = [
   {
     name: "model cannot import core infrastructure",
     file: "src/features/example/model/example-rule.ts",
-    source: 'import "@/core/http";',
+    source: 'import "@/core/http/client";',
   },
   {
     name: "contracts cannot import api",
@@ -110,9 +110,9 @@ const allowedCases = [
     source: 'import type { ExampleViewModel } from "../contracts/example-contract";',
   },
   {
-    name: "api may depend on core infrastructure",
+    name: "api may depend on configured core HTTP client",
     file: "src/features/example/api/example.api.ts",
-    source: 'import "@/core/http";',
+    source: 'import "@/core/http/client";',
   },
 ];
 

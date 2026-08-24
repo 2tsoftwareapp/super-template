@@ -2,4 +2,4 @@ import "server-only";
 
 import { serverRuntime } from "./internal/runtime";
 
-export const { enforceOrigin, enforceCsrf, enforceMutationGuard } = serverRuntime;
+export const { enforceCsrf, enforceMutationGuard } = serverRuntime;
