@@ -10,18 +10,20 @@ const { readAuthCookiesMock, setAuthCookiesMock, clearAuthCookiesMock } = vi.hoi
   clearAuthCookiesMock: vi.fn(),
 }));
 
-vi.mock("@/core/config/server-env", () => ({
-  serverEnv: {
-    API_INTERNAL_URL: "http://localhost:3001",
-    WEB_ORIGIN: "http://localhost:3000",
-    COOKIE_DOMAIN: undefined,
-    COOKIE_SAMESITE: "lax",
-    CSRF_SECRET: undefined,
-    COOKIE_SECURE: false,
-    APP_ENV: "test",
-    NODE_ENV: "test",
+vi.mock("@/core/config/server-config", () => ({
+  serverConfig: {
+    backend: {
+      apiInternalUrl: "http://localhost:3001",
+      allowedOrigins: ["http://localhost:3000"],
+    },
+    auth: {
+      cookieDomain: undefined,
+      cookieSameSite: "lax",
+      cookieSecure: false,
+      csrfSecret: null,
+      requireSignedCsrf: false,
+    },
   },
-  isSecureCookie: false,
 }));
 
 vi.mock("@repo/web-server/auth/cookies", () => ({
