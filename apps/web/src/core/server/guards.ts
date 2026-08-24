@@ -1,5 +1,5 @@
 import "server-only";
 
-import { serverRuntime } from "./internal/runtime";
+import { serverCapabilities } from "./internal/runtime";
 
-export const { enforceCsrf, enforceMutationGuard } = serverRuntime;
+export const { enforceCsrf, enforceMutationGuard } = serverCapabilities.guards;
