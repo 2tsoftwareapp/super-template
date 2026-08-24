@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-interface MockEnv {
+interface MockServerEnv {
   APP_ENV: "development" | "test" | "staging" | "production";
   COOKIE_DOMAIN: undefined;
   COOKIE_SAMESITE: "lax";
@@ -8,8 +8,8 @@ interface MockEnv {
   NODE_ENV: "test";
 }
 
-const envMock: { env: MockEnv; isSecureCookie: boolean } = vi.hoisted(() => ({
-  env: {
+const envMock: { serverEnv: MockServerEnv; isSecureCookie: boolean } = vi.hoisted(() => ({
+  serverEnv: {
     APP_ENV: "test",
     COOKIE_DOMAIN: undefined,
     COOKIE_SAMESITE: "lax",
@@ -19,12 +19,12 @@ const envMock: { env: MockEnv; isSecureCookie: boolean } = vi.hoisted(() => ({
   isSecureCookie: false,
 }));
 
-vi.mock("@/core/config/env", () => envMock);
+vi.mock("@/core/config/server-env", () => envMock);
 
 describe("csrf cookies", () => {
   beforeEach(() => {
-    envMock.env.APP_ENV = "test";
-    envMock.env.CSRF_SECRET = "test-csrf-secret";
+    envMock.serverEnv.APP_ENV = "test";
+    envMock.serverEnv.CSRF_SECRET = "test-csrf-secret";
     vi.resetModules();
   });
 
@@ -48,8 +48,8 @@ describe("csrf cookies", () => {
   });
 
   it("accepts any non-empty token when no secret is configured in development", async () => {
-    envMock.env.APP_ENV = "development";
-    envMock.env.CSRF_SECRET = undefined;
+    envMock.serverEnv.APP_ENV = "development";
+    envMock.serverEnv.CSRF_SECRET = undefined;
 
     const { isValidCsrfToken } = await import("../cookies");
 
@@ -58,8 +58,8 @@ describe("csrf cookies", () => {
   });
 
   it("rejects unsigned tokens in staging when no secret is configured", async () => {
-    envMock.env.APP_ENV = "staging";
-    envMock.env.CSRF_SECRET = undefined;
+    envMock.serverEnv.APP_ENV = "staging";
+    envMock.serverEnv.CSRF_SECRET = undefined;
 
     const { isValidCsrfToken } = await import("../cookies");
 
