@@ -221,7 +221,7 @@ A refactor that moves responsibility should move its tests with it.
 At minimum:
 
 ```text
-pnpm --filter web format:check
+pnpm format:check
 pnpm --filter web lint
 pnpm --filter web typecheck
 pnpm --filter web test
