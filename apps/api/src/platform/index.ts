@@ -1,54 +1,23 @@
 import { Module } from "@nestjs/common";
 
-export { ImportExportAdapterRegistry } from "./import-export/import-export-adapter.registry";
 export { ImportExportModule } from "./import-export/import-export.module";
 export { DELIVERIES_REPOSITORY } from "./modules/notifications/application/ports/deliveries.repository.port";
 export { PUSH_NOTIFIER } from "./modules/notifications/application/ports/push.interface";
 export { NotificationDeliveryProcessor } from "./modules/notifications/application/services/notification-delivery.processor";
 export { NotificationDeliveryUseCase } from "./modules/notifications/application/use-cases/notification-delivery.use-case";
 export { PlatformPortsModule } from "./platform-ports.module";
+export { ImportExportAdapterRegistry } from "@repo/api-core";
 
-import { ActivitiesModule } from "./modules/activities/activities.module";
-import { AttachmentsModule } from "./modules/attachments/attachments.module";
-import { AuditModule } from "./modules/audit";
 import { ExportsModule } from "./modules/exports/exports.module";
-import { FilesModule } from "./modules/files/files.module";
 import { ImportsModule } from "./modules/imports/imports.module";
-import { JobsModule } from "./modules/jobs";
-import { MailModule } from "./modules/mail";
-import { NotificationsModule } from "./modules/notifications/notifications.module";
-import { SettingsModule } from "./modules/settings/settings.module";
 import { StorageModule } from "./modules/storage";
 import { PlatformPortsModule } from "./platform-ports.module";
 
 @Module({
-  imports: [
-    PlatformPortsModule,
-    StorageModule,
-    AuditModule,
-    MailModule,
-    SettingsModule,
-    FilesModule,
-    AttachmentsModule,
-    JobsModule,
-    ImportsModule,
-    ExportsModule,
-    NotificationsModule,
-    ActivitiesModule,
-  ],
-  exports: [
-    PlatformPortsModule,
-    StorageModule,
-    AuditModule,
-    MailModule,
-    SettingsModule,
-    FilesModule,
-    AttachmentsModule,
-    JobsModule,
-    ImportsModule,
-    ExportsModule,
-    NotificationsModule,
-    ActivitiesModule,
-  ],
+  // PlatformPortsModule (@Global) is the single owner of the eight globally
+  // exported feature modules. PlatformModule adds only the three modules that
+  // are intentionally non-global (storage, imports, exports).
+  imports: [PlatformPortsModule, StorageModule, ImportsModule, ExportsModule],
+  exports: [PlatformPortsModule, StorageModule, ImportsModule, ExportsModule],
 })
 export class PlatformModule {}
