@@ -1,4 +1,4 @@
-import { webFetch } from "@/core/http";
+import { webFetch } from "@/core/http/client";
 
 /** POST the email-verification token to the web BFF. Errors propagate to the handler. */
 export async function verifyEmail(token: string): Promise<void> {
