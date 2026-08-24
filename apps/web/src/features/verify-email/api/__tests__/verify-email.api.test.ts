@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { ApiClientError } from "@/core/http";
 import * as http from "@/core/http";
+import { ApiClientError } from "@/core/http/errors";
 
 import { verifyEmail } from "../verify-email.api";
 
