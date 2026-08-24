@@ -1,19 +1,19 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import * as http from "@/core/http";
+import * as httpClient from "@/core/http/client";
 import { ApiClientError } from "@/core/http/errors";
 
 import { verifyEmail } from "../verify-email.api";
 
-vi.mock("@/core/http", async () => {
-  const actual = await vi.importActual<typeof http>("@/core/http");
+vi.mock("@/core/http/client", async () => {
+  const actual = await vi.importActual<typeof httpClient>("@/core/http/client");
   return {
     ...actual,
     webFetch: vi.fn(),
   };
 });
 
-const webFetchMock = vi.mocked(http.webFetch);
+const webFetchMock = vi.mocked(httpClient.webFetch);
 
 beforeEach(() => {
   webFetchMock.mockReset();
