@@ -1,10 +1,10 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { Providers } from "@/components/providers";
+import { Providers } from "@/app/providers";
 
 describe("Providers", () => {
-  it("renders children for the public landing shell", () => {
+  it("renders children for the application shell", () => {
     render(
       <Providers>
         <div>Child</div>
