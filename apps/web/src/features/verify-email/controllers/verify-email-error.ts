@@ -1,6 +1,6 @@
 import { classifyError, getErrorMessage } from "@repo/web-utils/errors";
 
-import { ApiClientError } from "@/core/http";
+import { ApiClientError } from "@/core/http/errors";
 
 import { VERIFY_EMAIL_MESSAGES } from "../config/verify-email-config";
 
