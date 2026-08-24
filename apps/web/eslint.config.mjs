@@ -1,6 +1,11 @@
 import { defineConfig, globalIgnores } from "eslint/config";
 import nextConfig from "@repo/eslint-config/next";
 
+const featureAppBoundaryPattern = {
+  group: ["@/app/*", "@/app/**", "**/app/**"],
+  message: "features/** must not import from app/**; dependency points app → feature.",
+};
+
 export default defineConfig([
   ...nextConfig,
   globalIgnores([
@@ -35,7 +40,12 @@ export default defineConfig([
           ],
           patterns: [
             {
-              group: ["@/features/*/*", "@/features/*/*/**"],
+              group: [
+                "@/features/*/*",
+                "@/features/*/*/**",
+                "**/features/*/*",
+                "**/features/*/*/**",
+              ],
               message:
                 "Route files must not deep-import feature internals. Import from @/features/<feature> (index.ts public contract).",
             },
@@ -52,12 +62,7 @@ export default defineConfig([
       "no-restricted-imports": [
         "error",
         {
-          patterns: [
-            {
-              group: ["@/app/*", "@/app/**", "**/app/**"],
-              message: "features/** must not import from app/**; dependency points app → feature.",
-            },
-          ],
+          patterns: [featureAppBoundaryPattern],
         },
       ],
     },
@@ -71,13 +76,23 @@ export default defineConfig([
         "error",
         {
           patterns: [
+            featureAppBoundaryPattern,
             {
               group: ["@tanstack/react-query", "swr", "next/navigation"],
               message:
                 "UI components are presentational. Move querying/routing to the feature controller/application layer.",
             },
             {
-              group: ["@/features/*/api/*", "@/features/*/controllers/*"],
+              group: [
+                "@/features/*/api/*",
+                "@/features/*/api/**",
+                "@/features/*/controllers/*",
+                "@/features/*/controllers/**",
+                "**/api/*",
+                "**/api/**",
+                "**/controllers/*",
+                "**/controllers/**",
+              ],
               message:
                 "UI must not depend on API/controllers. Use props and neutral feature contracts.",
             },
@@ -95,8 +110,18 @@ export default defineConfig([
         "error",
         {
           patterns: [
+            featureAppBoundaryPattern,
             {
-              group: ["@/features/*/ui/*", "@/features/*/screens/*"],
+              group: [
+                "@/features/*/ui/*",
+                "@/features/*/ui/**",
+                "@/features/*/screens/*",
+                "@/features/*/screens/**",
+                "**/ui/*",
+                "**/ui/**",
+                "**/screens/*",
+                "**/screens/**",
+              ],
               message:
                 "Controllers orchestrate behavior and produce contracts; they must not import UI/screens.",
             },
@@ -114,6 +139,7 @@ export default defineConfig([
         "error",
         {
           patterns: [
+            featureAppBoundaryPattern,
             {
               group: ["react", "react-dom", "next/*", "@tanstack/react-query", "swr"],
               message: "model/ must remain framework-free and side-effect free.",
@@ -123,9 +149,21 @@ export default defineConfig([
                 "@/core/*",
                 "@/core/**",
                 "@/features/*/api/*",
+                "@/features/*/api/**",
                 "@/features/*/controllers/*",
+                "@/features/*/controllers/**",
                 "@/features/*/screens/*",
+                "@/features/*/screens/**",
                 "@/features/*/ui/*",
+                "@/features/*/ui/**",
+                "**/api/*",
+                "**/api/**",
+                "**/controllers/*",
+                "**/controllers/**",
+                "**/screens/*",
+                "**/screens/**",
+                "**/ui/*",
+                "**/ui/**",
               ],
               message:
                 "model/ must not depend on infrastructure, application, or presentation layers.",
@@ -144,6 +182,7 @@ export default defineConfig([
         "error",
         {
           patterns: [
+            featureAppBoundaryPattern,
             {
               group: [
                 "react",
@@ -154,9 +193,21 @@ export default defineConfig([
                 "@/core/*",
                 "@/core/**",
                 "@/features/*/api/*",
+                "@/features/*/api/**",
                 "@/features/*/controllers/*",
+                "@/features/*/controllers/**",
                 "@/features/*/screens/*",
+                "@/features/*/screens/**",
                 "@/features/*/ui/*",
+                "@/features/*/ui/**",
+                "**/api/*",
+                "**/api/**",
+                "**/controllers/*",
+                "**/controllers/**",
+                "**/screens/*",
+                "**/screens/**",
+                "**/ui/*",
+                "**/ui/**",
               ],
               message:
                 "contracts/ must contain neutral data contracts only; no framework, infrastructure, or layer implementation dependencies.",
@@ -176,7 +227,7 @@ export default defineConfig([
         {
           patterns: [
             {
-              group: ["@/features/*", "@/features/**"],
+              group: ["@/features/*", "@/features/**", "**/features/*", "**/features/**"],
               message: "core/shared must not import business features; dependency points the other way.",
             },
           ],
@@ -199,6 +250,7 @@ export default defineConfig([
                 "api/ must not raise toasts. Surface the failure and let the controller/application layer decide.",
             },
           ],
+          patterns: [featureAppBoundaryPattern],
         },
       ],
     },
@@ -218,7 +270,7 @@ export default defineConfig([
                 "A shared hook must not hide another shared hook dependency. Compose them at the feature application boundary.",
             },
             {
-              group: ["@/features/*", "@/features/**"],
+              group: ["@/features/*", "@/features/**", "**/features/*", "**/features/**"],
               message: "src/hooks/ is cross-feature and must not depend on feature implementations.",
             },
           ],
