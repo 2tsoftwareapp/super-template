@@ -54,7 +54,6 @@ export function ThemeProvider({
   const [theme, setThemeState] = useState<Theme>(defaultTheme);
   const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("light");
 
-  // Hydrate from localStorage after mount (client-only; avoids SSR mismatch).
   useEffect(() => {
     const stored = getStoredTheme();
     const resolved = resolveTheme(stored);
@@ -64,7 +63,6 @@ export function ThemeProvider({
     applyTheme(resolved);
   }, []);
 
-  // Listen for system preference changes when theme === "system"
   useEffect(() => {
     if (theme !== "system") return;
 

@@ -7,7 +7,7 @@ import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 import { Providers } from "@/components/providers";
 import { routing } from "@/i18n/routing";
-import { ThemeProvider } from "@/lib/theme";
+import { ThemeProvider } from "@/shared/theme";
 
 import "../globals.css";
 
