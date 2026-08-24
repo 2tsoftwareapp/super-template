@@ -8,11 +8,20 @@ const appEnvSchema = z
   .default("development");
 
 const booleanFromString = z.preprocess((value) => {
-  if (typeof value === "boolean") return value;
-  if (typeof value === "string") {
-    if (value === "true") return true;
-    if (value === "false") return false;
+  if (typeof value === "boolean") {
+    return value;
   }
+
+  if (typeof value === "string") {
+    if (value === "true") {
+      return true;
+    }
+
+    if (value === "false") {
+      return false;
+    }
+  }
+
   return value;
 }, z.boolean());
 
@@ -47,5 +56,7 @@ export const env = envSchema.parse({
   NODE_ENV: process.env.NODE_ENV,
 });
 
+// Secure cookies on every deployed environment (staging + production), opt-in
+// elsewhere via COOKIE_SECURE.
 export const isSecureCookie =
   env.COOKIE_SECURE ?? (env.APP_ENV !== "development" && env.APP_ENV !== "test");
