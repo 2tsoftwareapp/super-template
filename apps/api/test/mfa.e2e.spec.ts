@@ -2,7 +2,7 @@ import type { INestApplication } from "@nestjs/common";
 
 import { ERROR_CODES } from "@repo/api-core";
 import { DATABASE, users } from "@repo/api-database";
-import { base32Decode, generateTotpCode } from "@identity/modules/mfa/domain/totp";
+import { base32Decode, generateTotpCode } from "@repo/feature-identity/modules/mfa/domain/totp";
 import { eq } from "drizzle-orm";
 import request from "supertest";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";

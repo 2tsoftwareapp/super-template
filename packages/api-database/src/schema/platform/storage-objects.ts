@@ -15,7 +15,7 @@ import { timestamps } from "../shared/timestamps";
  * it; the sweep's reference checks run with RLS bypass so live files in every
  * organization are seen.
  */
-export const storageObjects = pgTable("storage_objects", {
+export const storageObjects = pgTable("t_storage_objects", {
   storageKey: text("storage_key").primaryKey(),
   status: text("status").notNull().default("UPLOADED"),
   ...timestamps,
@@ -25,7 +25,7 @@ export const storageObjects = pgTable("storage_objects", {
  * Retry queue for storage deletes that failed. The cleanup worker claims
  * PENDING rows, retries the delete, and marks DONE / FAILED (max attempts).
  */
-export const storageDeleteOutbox = pgTable("storage_delete_outbox", {
+export const storageDeleteOutbox = pgTable("w_storage_delete_outbox", {
   id: uuid("id").defaultRandom().primaryKey(),
   storageKey: text("storage_key").notNull().unique(),
   status: text("status").notNull().default("PENDING"),

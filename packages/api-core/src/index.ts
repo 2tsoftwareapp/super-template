@@ -54,6 +54,17 @@ export type { AppEnvironment } from "./config/env.schema";
 export { validateEnvironment } from "./config/env.schema";
 export { EnvironmentService } from "./config/environment.service";
 export {
+  collectFeatureModules,
+  composeFeatureSchemas,
+  defineFeature,
+  type FeatureManifest,
+  type FeatureSchema,
+} from "./plugin/feature-manifest";
+export {
+  ACCESS_TOKEN_AUTHENTICATOR,
+  type AccessTokenAuthenticator,
+} from "./ports/access-token-authenticator.port";
+export {
   ACTIVITY_EMITTER,
   type ActivityEmitInput,
   type ActivityEmitter,

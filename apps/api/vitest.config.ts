@@ -19,8 +19,8 @@ export default defineConfig({
     // oxc: false,
     include: [
       "test/**/*.{test,spec}.ts",
-      "src/identity/**/*.spec.ts",
-      "src/platform/**/*.spec.ts",
+      "../../packages/features/identity/src/**/*.spec.ts",
+      "../../packages/features/platform/src/**/*.spec.ts",
       "src/cli/seeds/**/*.spec.ts",
       "../../packages/api-contract/src/**/*.{test,spec}.ts",
       "../../packages/api-core/src/**/*.{test,spec}.ts",
@@ -40,10 +40,22 @@ export default defineConfig({
       packageSubpathAlias("api-database"),
       packageAlias("api-sort"),
       packageSubpathAlias("api-sort"),
-      { find: /^@identity\/(.+)$/, replacement: path.resolve(__dirname, "src/identity/$1") },
-      { find: /^@identity$/, replacement: path.resolve(__dirname, "src/identity/index.ts") },
-      { find: /^@platform\/(.+)$/, replacement: path.resolve(__dirname, "src/platform/$1") },
-      { find: /^@platform$/, replacement: path.resolve(__dirname, "src/platform/index.ts") },
+      {
+        find: /^@repo\/feature-identity\/(.+)$/,
+        replacement: path.join(packagesDir, "features/identity/src/$1"),
+      },
+      {
+        find: /^@repo\/feature-identity$/,
+        replacement: path.join(packagesDir, "features/identity/src/index.ts"),
+      },
+      {
+        find: /^@repo\/feature-platform\/(.+)$/,
+        replacement: path.join(packagesDir, "features/platform/src/$1"),
+      },
+      {
+        find: /^@repo\/feature-platform$/,
+        replacement: path.join(packagesDir, "features/platform/src/index.ts"),
+      },
     ],
   },
 });

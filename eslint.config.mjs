@@ -17,7 +17,8 @@ const ctxForbidden = (alias) => [
   `${alias}/**/index.ts`,
 ];
 const identityPlatformRestriction = (dir, otherAlias) => ({
-  files: [`apps/api/src/${dir}/**/*.{ts,tsx}`],
+  files: [`packages/features/${dir}/src/**/*.{ts,tsx}`],
+  ignores: [`packages/features/${dir}/src/web/**`, `packages/features/${dir}/src/admin/**`],
   rules: {
     "no-restricted-imports": [
       "error",
@@ -45,6 +46,9 @@ export default defineConfig([
     "**/*.spec.tsx",
     "**/*.test.ts",
     "**/*.test.tsx",
+    "packages/features/**/src/web/**",
+    "packages/features/**/src/admin/**",
+    "packages/features/**/vitest.web.config.ts",
     "apps/api/vitest.config.ts",
     "apps/api/webpack.config.js",
     "packages/web-ui/vitest.config.ts",

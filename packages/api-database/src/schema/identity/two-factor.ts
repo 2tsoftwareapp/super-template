@@ -12,7 +12,7 @@ import {
 import { timestamps } from "../shared/timestamps";
 import { users } from "./users";
 
-export const userTwoFactorSecrets = pgTable("user_two_factor_secrets", {
+export const userTwoFactorSecrets = pgTable("m_user_two_factor_secrets", {
   userId: uuid("user_id")
     .primaryKey()
     .references(() => users.id, { onDelete: "cascade" }),
@@ -27,7 +27,7 @@ export const userTwoFactorSecrets = pgTable("user_two_factor_secrets", {
 });
 
 export const userRecoveryCodes = pgTable(
-  "user_recovery_codes",
+  "t_user_recovery_codes",
   {
     id: uuid("id").defaultRandom().primaryKey(),
     userId: uuid("user_id")
@@ -41,7 +41,7 @@ export const userRecoveryCodes = pgTable(
 );
 
 export const mfaChallenges = pgTable(
-  "mfa_challenges",
+  "t_mfa_challenges",
   {
     id: uuid("id").defaultRandom().primaryKey(),
     userId: uuid("user_id")

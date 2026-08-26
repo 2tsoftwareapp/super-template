@@ -49,11 +49,30 @@
             "layer:env",
             "layer:database",
             "layer:health",
+            "layer:feature",
             "layer:contract",
             "layer:frontend-core",
             "layer:frontend-ui",
             "layer:frontend-test",
             "layer:app",
+            "layer:sort",
+            "layer:tsconfig",
+            "layer:eslint"
+          ]
+        }
+      },
+      "layer:feature": {
+        "dependencies": {
+          "allow": [
+            "layer:core",
+            "layer:env",
+            "layer:database",
+            "layer:health",
+            "layer:contract",
+            "layer:frontend-core",
+            "layer:frontend-ui",
+            "layer:frontend-test",
+            "layer:feature",
             "layer:sort",
             "layer:tsconfig",
             "layer:eslint"

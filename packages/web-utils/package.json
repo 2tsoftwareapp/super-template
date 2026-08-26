@@ -5,6 +5,7 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
+    "./admin-resource": "./src/admin-resource.ts",
     "./api-types": "./src/api-types.ts",
     "./errors": "./src/errors.ts",
     "./http": "./src/http.ts",

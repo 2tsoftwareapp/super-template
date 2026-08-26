@@ -5,7 +5,7 @@ import { users } from "../identity/users";
 import { files } from "./files";
 
 export const fileVersions = pgTable(
-  "file_versions",
+  "t_file_versions",
   {
     id: uuid("id").defaultRandom().primaryKey(),
     fileId: uuid("file_id")

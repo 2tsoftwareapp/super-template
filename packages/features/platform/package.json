@@ -1,0 +1,48 @@
+{
+  "name": "@repo/feature-platform",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "exports": {
+    ".": "./src/index.ts",
+    "./admin": "./src/admin/index.ts",
+    "./*": "./src/*"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.admin.json --noEmit",
+    "lint": "eslint .",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.admin.json --noEmit",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.1068.0",
+    "@aws-sdk/s3-request-presigner": "^3.1068.0",
+    "@nestjs/common": "11.1.27",
+    "@nestjs/platform-express": "11.1.27",
+    "@nestjs/schedule": "6.1.1",
+    "@nestjs/swagger": "11.4.4",
+    "@nestjs/throttler": "6.5.0",
+    "@repo/api-core": "workspace:*",
+    "@repo/api-database": "workspace:*",
+    "@repo/feature-identity": "workspace:*",
+    "@repo/web-utils": "workspace:*",
+    "argon2": "0.44.0",
+    "class-transformer": "0.5.1",
+    "class-validator": "0.15.1",
+    "drizzle-orm": "0.45.2",
+    "express": "5.2.1",
+    "firebase-admin": "13.6.0",
+    "lucide-react": "0.552.0",
+    "nodemailer": "9.0.0",
+    "rxjs": "7.8.2"
+  },
+  "devDependencies": {
+    "@nestjs/testing": "11.1.27",
+    "@repo/tsconfig": "workspace:*",
+    "@types/express": "5.0.4",
+    "@types/node": "24.10.1",
+    "@types/nodemailer": "7.0.4",
+    "typescript": "5.9.3",
+    "vitest": "4.1.9"
+  }
+}

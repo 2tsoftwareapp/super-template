@@ -7,7 +7,7 @@ import { organizations } from "../identity/organizations";
 import { users } from "../identity/users";
 
 export const fileBatchOperations = pgTable(
-  "file_batch_operations",
+  "t_file_batch_operations",
   {
     id: uuid("id").defaultRandom().primaryKey(),
     organizationId: uuid("organization_id")

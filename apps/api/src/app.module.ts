@@ -1,12 +1,10 @@
-import { IdentityModule } from "@identity";
-import { AuthService } from "@identity/modules/auth";
 import { type MiddlewareConsumer, Module, type NestModule, RequestMethod } from "@nestjs/common";
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, Reflector } from "@nestjs/core";
 import { ScheduleModule } from "@nestjs/schedule";
 import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
-import { ImportExportModule } from "@platform";
-import { PlatformModule } from "@platform";
 import {
+  ACCESS_TOKEN_AUTHENTICATOR,
+  type AccessTokenAuthenticator,
   APP_LOGGER,
   AppExceptionFilter,
   type AppLogger,
@@ -22,8 +20,8 @@ import {
 import { TenantContextService } from "@repo/api-core";
 import { AppConfigModule } from "@repo/api-core/config/app-config.module";
 import { DatabaseModule } from "@repo/api-database";
-import { HealthModule } from "@repo/api-health";
 
+import { composedSchema, featureModules } from "./features";
 import { AuthGuard } from "./shell/auth.guard";
 import { MaintenanceModeGuard } from "./shell/maintenance-mode.guard";
 import { TenantContextInterceptor } from "./shell/tenant-context.interceptor";
@@ -32,7 +30,6 @@ import { TenantContextInterceptor } from "./shell/tenant-context.interceptor";
   imports: [
     AppConfigModule,
     LoggingModule,
-    ImportExportModule,
     ThrottlerModule.forRootAsync({
       inject: [EnvironmentService],
       useFactory: (environmentService: EnvironmentService) => ({
@@ -47,10 +44,8 @@ import { TenantContextInterceptor } from "./shell/tenant-context.interceptor";
       }),
     }),
     ScheduleModule.forRoot(),
-    DatabaseModule,
-    HealthModule,
-    IdentityModule,
-    PlatformModule,
+    DatabaseModule.forRoot({ schema: composedSchema }),
+    ...featureModules,
   ],
   providers: [
     RequestLoggerMiddleware,
@@ -73,9 +68,9 @@ import { TenantContextInterceptor } from "./shell/tenant-context.interceptor";
     },
     {
       provide: APP_GUARD,
-      useFactory: (reflector: Reflector, authService: AuthService) =>
-        new AuthGuard(reflector, authService),
-      inject: [Reflector, AuthService],
+      useFactory: (reflector: Reflector, accessTokenAuthenticator: AccessTokenAuthenticator) =>
+        new AuthGuard(reflector, accessTokenAuthenticator),
+      inject: [Reflector, ACCESS_TOKEN_AUTHENTICATOR],
     },
     {
       provide: APP_GUARD,

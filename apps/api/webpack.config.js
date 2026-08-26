@@ -28,7 +28,7 @@ module.exports = (options) => ({
     new CopyPlugin({
       patterns: [
         {
-          from: "src/platform/modules/mail/infrastructure/templates",
+          from: "../../packages/features/platform/src/modules/mail/infrastructure/templates",
           to: "platform/modules/mail/infrastructure/templates",
         },
       ],

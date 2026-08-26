@@ -5,7 +5,7 @@ import { users } from "../identity/users";
 import { timestamps } from "../shared/timestamps";
 
 export const files = pgTable(
-  "files",
+  "m_files",
   {
     id: uuid("id").defaultRandom().primaryKey(),
     organizationId: uuid("organization_id").references(() => organizations.id, {

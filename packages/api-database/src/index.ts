@@ -3,6 +3,7 @@ export {
   ADVISORY_LOCK_POOL,
   DATABASE,
   DATABASE_POOL,
+  DATABASE_SCHEMA,
   databaseProviders,
 } from "./database.provider";
 export { createDatabaseClient } from "./database.types";

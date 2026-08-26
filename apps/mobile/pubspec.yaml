@@ -25,6 +25,12 @@ dependencies:
   file_picker: ^10.2.0
   url_launcher: ^6.3.2
   uuid: ^4.5.1
+  mobile_core:
+    path: ../../packages/mobile_core
+  feature_identity:
+    path: ../../packages/features/identity/mobile
+  feature_platform:
+    path: ../../packages/features/platform/mobile
 
 dev_dependencies:
   flutter_test:

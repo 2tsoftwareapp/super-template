@@ -1,6 +1,6 @@
 import type { Pool } from "pg";
 
-import { Global, Inject, Module, type OnApplicationShutdown } from "@nestjs/common";
+import { type DynamicModule, Global, Inject, Module, type OnApplicationShutdown } from "@nestjs/common";
 import {
   ADVISORY_LOCK_PORT,
   PLATFORM_TRANSACTION_PORT,
@@ -9,7 +9,12 @@ import {
 } from "@repo/api-core";
 
 import { DatabaseRlsGuard } from "./database-rls.guard";
-import { ADVISORY_LOCK_POOL, DATABASE_POOL, databaseProviders } from "./database.provider";
+import {
+  ADVISORY_LOCK_POOL,
+  DATABASE_POOL,
+  DATABASE_SCHEMA,
+  databaseProviders,
+} from "./database.provider";
 import { DrizzlePlatformTransactionService } from "./drizzle-platform-transaction.service";
 import { DrizzleTransactionService } from "./drizzle-transaction.service";
 import { PostgresAdvisoryLockService } from "./postgres-advisory-lock.service";
@@ -39,6 +44,20 @@ import { PostgresAdvisoryLockService } from "./postgres-advisory-lock.service";
   ],
 })
 export class DatabaseModule implements OnApplicationShutdown {
+  /**
+   * Compose the database runtime with an application-supplied schema. The schema
+   * is the merged contribution of every enabled feature package (see
+   * `composeFeatureSchemas` in `@repo/api-core`). Omitting `forRoot` keeps the
+   * full built-in schema, so existing wiring continues to work unchanged.
+   */
+  static forRoot(options: { schema: Record<string, unknown> }): DynamicModule {
+    return {
+      module: DatabaseModule,
+      providers: [{ provide: DATABASE_SCHEMA, useValue: options.schema }],
+      exports: [DATABASE_SCHEMA],
+    };
+  }
+
   constructor(
     @Inject(DATABASE_POOL) private readonly pool: Pool,
     @Inject(ADVISORY_LOCK_POOL) private readonly advisoryLockPool: Pool,

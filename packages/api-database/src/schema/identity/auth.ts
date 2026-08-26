@@ -4,7 +4,7 @@ import { timestamps } from "../shared/timestamps";
 import { users } from "./users";
 
 export const authSessions = pgTable(
-  "auth_sessions",
+  "t_auth_sessions",
   {
     id: uuid("id").defaultRandom().primaryKey(),
     userId: uuid("user_id")
@@ -26,7 +26,7 @@ export const authSessions = pgTable(
 );
 
 export const emailVerificationTokens = pgTable(
-  "email_verification_tokens",
+  "t_email_verification_tokens",
   {
     id: uuid("id").defaultRandom().primaryKey(),
     userId: uuid("user_id")
@@ -44,7 +44,7 @@ export const emailVerificationTokens = pgTable(
 );
 
 export const passwordResetTokens = pgTable(
-  "password_reset_tokens",
+  "t_password_reset_tokens",
   {
     id: uuid("id").defaultRandom().primaryKey(),
     userId: uuid("user_id")

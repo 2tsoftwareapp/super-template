@@ -5,7 +5,7 @@ import { authSessions } from "./auth";
 import { users } from "./users";
 
 export const externalIdentities = pgTable(
-  "external_identities",
+  "r_external_identities",
   {
     id: uuid("id").defaultRandom().primaryKey(),
     userId: uuid("user_id")
@@ -30,7 +30,7 @@ export const externalIdentities = pgTable(
 // from the query string as anything more than an opaque lookup key.
 // SECURITY: code_verifier is AES-GCM encrypted at rest (never plaintext).
 export const ssoLoginStates = pgTable(
-  "sso_login_states",
+  "t_sso_login_states",
   {
     id: uuid("id").defaultRandom().primaryKey(),
     provider: text("provider").notNull(),
@@ -51,7 +51,7 @@ export const ssoLoginStates = pgTable(
 // never travel in URL fragments. Consumed by POST /auth/sso/exchange.
 // SECURITY: stores session_id only — tokens are re-issued on exchange.
 export const ssoSessionExchanges = pgTable(
-  "sso_session_exchanges",
+  "t_sso_session_exchanges",
   {
     id: uuid("id").defaultRandom().primaryKey(),
     codeHash: text("code_hash").notNull(),

@@ -1,8 +1,7 @@
 import type { ExecutionContext } from "@nestjs/common";
 import type { Reflector } from "@nestjs/core";
-import type { AuthService } from "@identity/modules/auth";
 
-import { AppError } from "@repo/api-core";
+import { type AccessTokenAuthenticator, AppError } from "@repo/api-core";
 import { describe, expect, it, vi } from "vitest";
 
 import { AuthGuard } from "../../src/shell/auth.guard";
@@ -25,11 +24,11 @@ function createGuard(options: { isPublic: boolean; authenticate?: ReturnType<typ
     getAllAndOverride: vi.fn().mockReturnValue(options.isPublic),
   } as unknown as Reflector;
   const authenticate = options.authenticate ?? vi.fn().mockResolvedValue({ userId: "u1" });
-  const authService = {
+  const accessTokenAuthenticator = {
     authenticateAccessToken: authenticate,
-  } as unknown as AuthService;
+  } as unknown as AccessTokenAuthenticator;
 
-  return { guard: new AuthGuard(reflector, authService), authenticate };
+  return { guard: new AuthGuard(reflector, accessTokenAuthenticator), authenticate };
 }
 
 describe("AuthGuard", () => {

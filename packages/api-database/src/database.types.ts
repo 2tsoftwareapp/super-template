@@ -2,11 +2,18 @@ import type { Pool } from "pg";
 
 import { drizzle } from "drizzle-orm/node-postgres";
 
-import { schema } from "./schema";
+import { schema as defaultSchema } from "./schema";
 
-export const createDatabaseClient = (pool: Pool) =>
+/**
+ * Build the Drizzle client. The composed schema is injected by the application
+ * (via {@link DatabaseModule.forRoot}) so optional feature packages can each
+ * contribute their own tables. When no schema is supplied the full built-in
+ * schema is used, preserving the previous behaviour for callers that construct
+ * a client directly (scripts, tests).
+ */
+export const createDatabaseClient = (pool: Pool, schema: Record<string, unknown> = defaultSchema) =>
   drizzle(pool, {
-    schema,
+    schema: schema as typeof defaultSchema,
   });
 
 export type DatabaseClient = ReturnType<typeof createDatabaseClient>;

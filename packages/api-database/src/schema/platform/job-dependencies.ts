@@ -4,7 +4,7 @@ import { organizations } from "../identity/organizations";
 import { jobs } from "./jobs";
 
 export const jobDependencies = pgTable(
-  "job_dependencies",
+  "r_job_dependencies",
   {
     id: uuid("id").defaultRandom().primaryKey(),
     jobId: uuid("job_id")

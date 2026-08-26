@@ -1,0 +1,18 @@
+name: feature_platform
+description: Platform feature plugin (jobs/mail/files/notifications/import-export) for the Flutter app.
+publish_to: "none"
+version: 1.0.0
+
+environment:
+  sdk: ^3.12.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  mobile_core:
+    path: ../../../mobile_core
+
+dev_dependencies:
+  flutter_lints: ^6.0.0
+  flutter_test:
+    sdk: flutter

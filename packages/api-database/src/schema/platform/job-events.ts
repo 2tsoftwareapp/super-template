@@ -7,7 +7,7 @@ import { jobAttempts } from "./job-attempts";
 import { jobs } from "./jobs";
 
 export const jobEvents = pgTable(
-  "job_events",
+  "w_job_events",
   {
     id: uuid("id").defaultRandom().primaryKey(),
     jobId: uuid("job_id")

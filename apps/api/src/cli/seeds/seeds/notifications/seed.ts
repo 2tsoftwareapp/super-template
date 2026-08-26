@@ -1,4 +1,4 @@
-import type { NotificationsRepositoryPort } from "@platform/modules/notifications/application/ports/notifications.repository.port";
+import type { NotificationsRepositoryPort } from "@repo/feature-platform/modules/notifications/application/ports/notifications.repository.port";
 
 import { type DatabaseExecutor } from "@repo/api-database";
 

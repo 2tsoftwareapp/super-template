@@ -1,10 +1,10 @@
 import { Test } from "@nestjs/testing";
 import { TRANSACTION_PORT } from "@repo/api-core";
-import { ImportExportAdapterRegistry } from "@platform";
-import { CreateExportUseCase } from "@platform/modules/exports/application/use-cases/create-export.use-case";
-import { GetExportUseCase } from "@platform/modules/exports/application/use-cases/get-export.use-case";
-import { EXPORT_JOBS_REPOSITORY } from "@platform/modules/exports/application/ports/export-jobs.repository.port";
-import { AuditService } from "@platform/modules/audit/application/audit.service";
+import { ImportExportAdapterRegistry } from "@repo/feature-platform";
+import { CreateExportUseCase } from "@repo/feature-platform/modules/exports/application/use-cases/create-export.use-case";
+import { GetExportUseCase } from "@repo/feature-platform/modules/exports/application/use-cases/get-export.use-case";
+import { EXPORT_JOBS_REPOSITORY } from "@repo/feature-platform/modules/exports/application/ports/export-jobs.repository.port";
+import { AuditService } from "@repo/feature-platform/modules/audit/application/audit.service";
 import { describe, expect, it, vi } from "vitest";
 
 const actor = {

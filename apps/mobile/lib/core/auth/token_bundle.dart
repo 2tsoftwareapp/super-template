@@ -1,6 +1,1 @@
-class TokenBundle {
-  const TokenBundle({required this.accessToken, required this.refreshToken});
-
-  final String accessToken;
-  final String refreshToken;
-}
+export 'package:mobile_core/src/auth/token_bundle.dart';

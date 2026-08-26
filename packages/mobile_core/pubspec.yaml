@@ -1,0 +1,20 @@
+name: mobile_core
+description: Flutter kernel for Super Template — design tokens, widgets, errors, storage, auth primitives.
+publish_to: "none"
+version: 1.0.0
+
+environment:
+  sdk: ^3.12.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  dio: ^5.9.0
+  flutter_riverpod: ^2.6.1
+  flutter_secure_storage: ^9.2.4
+  shared_preferences: ^2.5.3
+
+dev_dependencies:
+  flutter_lints: ^6.0.0
+  flutter_test:
+    sdk: flutter

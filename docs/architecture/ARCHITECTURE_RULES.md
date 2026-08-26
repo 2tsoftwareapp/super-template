@@ -103,11 +103,12 @@ It may contain:
 
 It must not contain feature business logic.
 
-Business features belong under the correct bounded context inside `apps/api`:
+Business features belong in compile-time feature-plugin packages, each module
+keeping the standard vertical-slice layering (see §15.1):
 
 ```text
-apps/api/src/identity/modules/<feature>/
-apps/api/src/platform/modules/<feature>/
+packages/features/identity/src/modules/<feature>/
+packages/features/platform/src/modules/<feature>/
 ```
 
 `apps/admin/src/app/**` and `apps/web/src/app/**` are routing composition roots.
@@ -556,7 +557,7 @@ unless the scope is narrow and unmistakable.
 
 ## 15. Cross-context communication
 
-The identity and platform contexts (`apps/api/src/identity`, `apps/api/src/platform`) are in-app bounded contexts.
+The identity and platform contexts (`@repo/feature-identity`, `@repo/feature-platform` under `packages/features/*`) are compile-time feature-plugin packages (see §15.1).
 
 They communicate through:
 
@@ -577,29 +578,57 @@ Before adding `forwardRef()`:
 4. consider emitting an event;
 5. document why the cycle is unavoidable if it remains.
 
-### 15.1 Add-on package contract (`packages/*`)
+### 15.1 Feature plugin & kernel contract (`packages/*`)
 
-`packages/` contains two kinds of code:
+See [ADR 0002](../adr/0002-feature-plugin-architecture.md). `packages/` contains
+two kinds of code:
 
-1. **Kernel libraries** — `api-core`, `api-database`, `api-contract`, `api-sort`,
-   `env-loader`, `config`, `utils`, and all `web-*` packages.
-2. **Add-on feature packages** — optional, self-contained Nest modules the app
-   wires in explicitly. `api-health` is the exemplar.
+1. **Kernel libraries** (always on) — `api-core`, `api-database`, `api-contract`,
+   `api-sort`, `env-loader`, `config`, `utils`, all `web-*` packages, and the
+   Flutter `mobile_core`. The kernel holds no identity/platform business tables.
+2. **Feature plugins** — optional, self-contained capabilities under
+   `packages/features/<id>/`, wired in explicitly at compile time. `api-health`
+   is the minimal exemplar (backend-only, no schema).
 
-An add-on package MUST:
+A feature plugin's **backend** surface MUST:
 
-- export exactly one public surface: its Nest `Module` (plus deliberate types)
+- export exactly one public surface — its Nest `Module` — plus a
+  `FeatureManifest` (`@repo/api-core`: `{ id, nestModule, schema?, permissions? }`)
   from `index.ts`;
-- depend only on kernel packages (`layer:core/env/database/sort/contract`) —
-  never on another add-on's internals, never on any `apps/*` internals;
+- depend only on kernel packages (`layer:core/env/database/sort/contract`) and
+  peer feature **public** surfaces (`layer:feature`) — never on another feature's
+  internals, never on any `apps/*` internals;
 - keep its full vertical slice inside the package
   (application/infrastructure/presentation/domain as needed);
+- own its Drizzle tables + SQL migrations under `src/database/`;
 - carry colocated unit tests and its own lint/typecheck scripts.
 
-The app decides whether an add-on participates by importing it in a module
-`imports[]`; removing that import removes the capability without touching
-core business code. Core business modules (identity, platform contexts) are
-NOT add-ons — they live inside `apps/api/src/{identity,platform}/modules/`.
+> **Transitional exception:** `feature-identity` and `feature-platform` were
+> extracted as whole bounded contexts and still keep their tables in the built-in
+> `@repo/api-database` schema (identity because `m_users`/`m_organizations` are the
+> FK anchors every other feature references). Their manifests contribute no schema;
+> `features.ts` merges the built-in schema with feature-contributed schema so the
+> composed result is identical. Finer-grained per-capability schema ownership is a
+> follow-up.
+
+A feature plugin's **frontend** surfaces (admin/web slices, Flutter package) live
+in the same package behind per-surface entrypoints (`./admin`, `./web`) and a Dart
+sub-package. They use only kernel design-system packages (`@repo/web-*`,
+`mobile_core`) — never an app's `@/` aliases.
+
+The app decides whether a feature participates by importing its manifest in one
+composition file (`apps/api/src/features.ts` for backend + schema, admin resource
+list for nav, `pubspec.yaml` for mobile) and rendering its thin route entries.
+Removing the workspace dependency + those composition lines removes the capability
+on every surface without touching kernel code. Cross-feature communication goes
+through kernel ports or a peer's public module — never a deep import.
+
+Removing a feature does not drop its already-migrated tables; that is a separate,
+deliberate data migration.
+
+> **Naming across all platforms** (DB table prefixes, feature package ids
+> `@repo/feature-<id>`, file/class/route conventions): see
+> [Naming Conventions](./NAMING_CONVENTIONS.md).
 
 ---
 

@@ -19,6 +19,9 @@ vi.mock("../seeds/notifications/seed", () => ({
 }));
 
 describe("seedDatabase", () => {
+  // seed-data is imported dynamically inside the test; it now transitively pulls
+  // the whole @repo/feature-platform graph (aws-sdk, firebase-admin, nodemailer),
+  // so allow extra time for that one-time module load on cold runs.
   it("runs the seed pipeline inside the worker tenant context and one transaction", async () => {
     const calls: string[] = [];
     const transaction = { id: "tx-1" };
@@ -107,5 +110,5 @@ describe("seedDatabase", () => {
       "revoke:admin-user",
       "revoke:regular-user",
     ]);
-  });
+  }, 30000);
 });

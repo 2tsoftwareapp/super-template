@@ -6,7 +6,7 @@ import { organizationMemberRoleEnum } from "./enums";
 import { users } from "./users";
 
 export const organizations = pgTable(
-  "organizations",
+  "m_organizations",
   {
     id: uuid("id").defaultRandom().primaryKey(),
     name: text("name").notNull(),
@@ -22,7 +22,7 @@ export const organizations = pgTable(
 );
 
 export const organizationMembers = pgTable(
-  "organization_members",
+  "r_organization_members",
   {
     id: uuid("id").defaultRandom().primaryKey(),
     organizationId: uuid("organization_id")
