@@ -4,8 +4,6 @@ import type { TransactionPort } from "@repo/api-runtime";
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import {
   AppError,
-  AUDIT_WRITER,
-  type AuditWriter,
   ERROR_CODES,
   ROLE_NAMES,
   SYSTEM_SCOPE,
@@ -18,13 +16,15 @@ import {
   ORGANIZATION_ACCESS_CONTROL,
   type OrganizationAccessControlPort,
 } from "../../public/contracts";
+import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
+import type { AuditWriter } from "@repo/feature-audit/contracts";
+
 import {
   ORGANIZATIONS_REPOSITORY,
   type OrganizationsRepositoryPort,
 } from "../ports/organizations.repository.port";
 
 @Injectable()
-
 export class DeleteOrganizationUseCase {
   constructor(
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,

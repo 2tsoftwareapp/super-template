@@ -114,9 +114,7 @@ export function defineFeature(manifest: FeatureManifest): FeatureManifest {
  * Validate feature ids/deps, reject cycles, and return a deterministic
  * topological composition order. Tie-break preserves input order.
  */
-export function orderFeatureManifests(
-  features: readonly FeatureManifest[],
-): FeatureManifest[] {
+export function orderFeatureManifests(features: readonly FeatureManifest[]): FeatureManifest[] {
   const byId = new Map<string, FeatureManifest>();
   const inputIndex = new Map<string, number>();
 
@@ -137,9 +135,7 @@ export function orderFeatureManifests(
   for (const feature of features) {
     for (const dep of feature.dependsOn ?? []) {
       if (!byId.has(dep)) {
-        throw new Error(
-          `Feature "${feature.id}" depends on missing feature "${dep}".`,
-        );
+        throw new Error(`Feature "${feature.id}" depends on missing feature "${dep}".`);
       }
     }
   }

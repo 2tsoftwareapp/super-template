@@ -57,6 +57,27 @@ export default defineConfig({
       packageSubpathAlias("api-sort"),
       packageAlias("env-loader"),
       packageSubpathAlias("env-loader"),
+      // Specific subpath aliases that don't follow the default naming pattern
+      {
+        find: /^@repo\/feature-audit\/export$/,
+        replacement: path.join(packagesDir, "feature-audit/src/audit-export.feature.ts"),
+      },
+      // Preferences module file keeps legacy name
+      {
+        find: /^@repo\/feature-user-preferences\/module$/,
+        replacement: path.join(packagesDir, "feature-user-preferences/src/preferences.module.ts"),
+      },
+      {
+        find: /^@repo\/feature-import-export\/module$/,
+        replacement: path.join(
+          packagesDir,
+          "feature-import-export/src/import-export-feature.module.ts",
+        ),
+      },
+      {
+        find: /^@repo\/config\/environment$/,
+        replacement: path.join(packagesDir, "config/src/environment/index.ts"),
+      },
       ...featureNames.flatMap((name) => {
         const id = name.replace(/^feature-/, "");
         return [
@@ -70,11 +91,7 @@ export default defineConfig({
           },
           {
             find: new RegExp(`^@repo/${name}/schema$`),
-            replacement: path.join(
-              packagesDir,
-              name,
-              "src/infrastructure/persistence/index.ts",
-            ),
+            replacement: path.join(packagesDir, name, "src/infrastructure/persistence/index.ts"),
           },
           {
             find: new RegExp(`^@repo/${name}/module$`),
@@ -83,25 +100,6 @@ export default defineConfig({
           packageSubpathAlias(name),
         ];
       }),
-      // Preferences module file keeps legacy name
-      {
-        find: /^@repo\/feature-user-preferences\/module$/,
-        replacement: path.join(
-          packagesDir,
-          "feature-user-preferences/src/preferences.module.ts",
-        ),
-      },
-      {
-        find: /^@repo\/feature-import-export\/module$/,
-        replacement: path.join(
-          packagesDir,
-          "feature-import-export/src/import-export-feature.module.ts",
-        ),
-      },
-      {
-        find: /^@repo\/config\/environment$/,
-        replacement: path.join(packagesDir, "config/src/environment/index.ts"),
-      },
     ],
   },
 });

@@ -4,9 +4,7 @@
     "outDir": "dist",
     "strictPropertyInitialization": false,
     "paths": {
-      "@repo/feature-access-control": [
-        "../feature-access-control/src/access-control.feature.ts"
-      ],
+      "@repo/feature-access-control": ["../feature-access-control/src/access-control.feature.ts"],
       "@repo/feature-access-control/contracts": [
         "../feature-access-control/src/public/contracts.ts"
       ],
@@ -16,204 +14,88 @@
       "@repo/feature-access-control/module": [
         "../feature-access-control/src/access-control.module.ts"
       ],
-      "@repo/feature-access-control/testing": [
-        "../feature-access-control/src/testing/index.ts"
-      ],
-      "@repo/feature-activities": [
-        "../feature-activities/src/activities.feature.ts"
-      ],
-      "@repo/feature-activities/contracts": [
-        "../feature-activities/src/public/contracts.ts"
-      ],
+      "@repo/feature-access-control/testing": ["../feature-access-control/src/testing/index.ts"],
+      "@repo/feature-activities": ["../feature-activities/src/activities.feature.ts"],
+      "@repo/feature-activities/contracts": ["../feature-activities/src/public/contracts.ts"],
       "@repo/feature-activities/schema": [
         "../feature-activities/src/infrastructure/persistence/index.ts"
       ],
-      "@repo/feature-activities/module": [
-        "../feature-activities/src/activities.module.ts"
-      ],
-      "@repo/feature-activities/testing": [
-        "../feature-activities/src/testing/index.ts"
-      ],
-      "@repo/feature-audit": [
-        "./src/audit.feature.ts"
-      ],
-      "@repo/feature-audit/contracts": [
-        "./src/public/contracts.ts"
-      ],
-      "@repo/feature-audit/schema": [
-        "./src/infrastructure/persistence/index.ts"
-      ],
-      "@repo/feature-audit/module": [
-        "./src/audit.module.ts"
-      ],
-      "@repo/feature-audit/testing": [
-        "./src/testing/index.ts"
-      ],
-      "@repo/feature-auth": [
-        "../feature-auth/src/auth.feature.ts"
-      ],
-      "@repo/feature-auth/contracts": [
-        "../feature-auth/src/public/contracts.ts"
-      ],
-      "@repo/feature-auth/schema": [
-        "../feature-auth/src/infrastructure/persistence/index.ts"
-      ],
-      "@repo/feature-auth/module": [
-        "../feature-auth/src/auth.module.ts"
-      ],
-      "@repo/feature-auth/testing": [
-        "../feature-auth/src/testing/index.ts"
-      ],
-      "@repo/feature-health": [
-        "../feature-health/src/health.feature.ts"
-      ],
-      "@repo/feature-health/contracts": [
-        "../feature-health/src/public/contracts.ts"
-      ],
-      "@repo/feature-health/schema": [
-        "../feature-health/src/infrastructure/persistence/index.ts"
-      ],
-      "@repo/feature-health/module": [
-        "../feature-health/src/health.module.ts"
-      ],
-      "@repo/feature-health/testing": [
-        "../feature-health/src/testing/index.ts"
-      ],
-      "@repo/feature-import-export": [
-        "../feature-import-export/src/import-export.feature.ts"
-      ],
-      "@repo/feature-import-export/contracts": [
-        "../feature-import-export/src/public/contracts.ts"
-      ],
+      "@repo/feature-activities/module": ["../feature-activities/src/activities.module.ts"],
+      "@repo/feature-activities/testing": ["../feature-activities/src/testing/index.ts"],
+      "@repo/feature-audit": ["./src/audit.feature.ts"],
+      "@repo/feature-audit/contracts": ["./src/public/contracts.ts"],
+      "@repo/feature-audit/schema": ["./src/infrastructure/persistence/index.ts"],
+      "@repo/feature-audit/module": ["./src/audit.module.ts"],
+      "@repo/feature-audit/testing": ["./src/testing/index.ts"],
+      "@repo/feature-auth": ["../feature-auth/src/auth.feature.ts"],
+      "@repo/feature-auth/contracts": ["../feature-auth/src/public/contracts.ts"],
+      "@repo/feature-auth/schema": ["../feature-auth/src/infrastructure/persistence/index.ts"],
+      "@repo/feature-auth/module": ["../feature-auth/src/auth.module.ts"],
+      "@repo/feature-auth/testing": ["../feature-auth/src/testing/index.ts"],
+      "@repo/feature-health": ["../feature-health/src/health.feature.ts"],
+      "@repo/feature-health/contracts": ["../feature-health/src/public/contracts.ts"],
+      "@repo/feature-health/schema": ["../feature-health/src/infrastructure/persistence/index.ts"],
+      "@repo/feature-health/module": ["../feature-health/src/health.module.ts"],
+      "@repo/feature-health/testing": ["../feature-health/src/testing/index.ts"],
+      "@repo/feature-import-export": ["../feature-import-export/src/import-export.feature.ts"],
+      "@repo/feature-import-export/contracts": ["../feature-import-export/src/public/contracts.ts"],
       "@repo/feature-import-export/schema": [
         "../feature-import-export/src/infrastructure/persistence/index.ts"
       ],
       "@repo/feature-import-export/module": [
         "../feature-import-export/src/import-export-feature.module.ts"
       ],
-      "@repo/feature-import-export/testing": [
-        "../feature-import-export/src/testing/index.ts"
-      ],
-      "@repo/feature-jobs": [
-        "../feature-jobs/src/jobs.feature.ts"
-      ],
-      "@repo/feature-jobs/contracts": [
-        "../feature-jobs/src/public/contracts.ts"
-      ],
-      "@repo/feature-jobs/schema": [
-        "../feature-jobs/src/infrastructure/persistence/index.ts"
-      ],
-      "@repo/feature-jobs/module": [
-        "../feature-jobs/src/jobs.module.ts"
-      ],
-      "@repo/feature-jobs/testing": [
-        "../feature-jobs/src/testing/index.ts"
-      ],
-      "@repo/feature-mail": [
-        "../feature-mail/src/mail.feature.ts"
-      ],
-      "@repo/feature-mail/contracts": [
-        "../feature-mail/src/public/contracts.ts"
-      ],
-      "@repo/feature-mail/schema": [
-        "../feature-mail/src/infrastructure/persistence/index.ts"
-      ],
-      "@repo/feature-mail/module": [
-        "../feature-mail/src/mail.module.ts"
-      ],
-      "@repo/feature-mail/testing": [
-        "../feature-mail/src/testing/index.ts"
-      ],
-      "@repo/feature-mfa": [
-        "../feature-mfa/src/mfa.feature.ts"
-      ],
-      "@repo/feature-mfa/contracts": [
-        "../feature-mfa/src/public/contracts.ts"
-      ],
-      "@repo/feature-mfa/schema": [
-        "../feature-mfa/src/infrastructure/persistence/index.ts"
-      ],
-      "@repo/feature-mfa/module": [
-        "../feature-mfa/src/mfa.module.ts"
-      ],
-      "@repo/feature-mfa/testing": [
-        "../feature-mfa/src/testing/index.ts"
-      ],
-      "@repo/feature-notifications": [
-        "../feature-notifications/src/notifications.feature.ts"
-      ],
-      "@repo/feature-notifications/contracts": [
-        "../feature-notifications/src/public/contracts.ts"
-      ],
+      "@repo/feature-import-export/testing": ["../feature-import-export/src/testing/index.ts"],
+      "@repo/feature-jobs": ["../feature-jobs/src/jobs.feature.ts"],
+      "@repo/feature-jobs/contracts": ["../feature-jobs/src/public/contracts.ts"],
+      "@repo/feature-jobs/schema": ["../feature-jobs/src/infrastructure/persistence/index.ts"],
+      "@repo/feature-jobs/module": ["../feature-jobs/src/jobs.module.ts"],
+      "@repo/feature-jobs/testing": ["../feature-jobs/src/testing/index.ts"],
+      "@repo/feature-mail": ["../feature-mail/src/mail.feature.ts"],
+      "@repo/feature-mail/contracts": ["../feature-mail/src/public/contracts.ts"],
+      "@repo/feature-mail/schema": ["../feature-mail/src/infrastructure/persistence/index.ts"],
+      "@repo/feature-mail/module": ["../feature-mail/src/mail.module.ts"],
+      "@repo/feature-mail/testing": ["../feature-mail/src/testing/index.ts"],
+      "@repo/feature-mfa": ["../feature-mfa/src/mfa.feature.ts"],
+      "@repo/feature-mfa/contracts": ["../feature-mfa/src/public/contracts.ts"],
+      "@repo/feature-mfa/schema": ["../feature-mfa/src/infrastructure/persistence/index.ts"],
+      "@repo/feature-mfa/module": ["../feature-mfa/src/mfa.module.ts"],
+      "@repo/feature-mfa/testing": ["../feature-mfa/src/testing/index.ts"],
+      "@repo/feature-notifications": ["../feature-notifications/src/notifications.feature.ts"],
+      "@repo/feature-notifications/contracts": ["../feature-notifications/src/public/contracts.ts"],
       "@repo/feature-notifications/schema": [
         "../feature-notifications/src/infrastructure/persistence/index.ts"
       ],
       "@repo/feature-notifications/module": [
         "../feature-notifications/src/notifications.module.ts"
       ],
-      "@repo/feature-notifications/testing": [
-        "../feature-notifications/src/testing/index.ts"
-      ],
-      "@repo/feature-organizations": [
-        "../feature-organizations/src/organizations.feature.ts"
-      ],
-      "@repo/feature-organizations/contracts": [
-        "../feature-organizations/src/public/contracts.ts"
-      ],
+      "@repo/feature-notifications/testing": ["../feature-notifications/src/testing/index.ts"],
+      "@repo/feature-organizations": ["../feature-organizations/src/organizations.feature.ts"],
+      "@repo/feature-organizations/contracts": ["../feature-organizations/src/public/contracts.ts"],
       "@repo/feature-organizations/schema": [
         "../feature-organizations/src/infrastructure/persistence/index.ts"
       ],
       "@repo/feature-organizations/module": [
         "../feature-organizations/src/organizations.module.ts"
       ],
-      "@repo/feature-organizations/testing": [
-        "../feature-organizations/src/testing/index.ts"
-      ],
-      "@repo/feature-settings": [
-        "../feature-settings/src/settings.feature.ts"
-      ],
-      "@repo/feature-settings/contracts": [
-        "../feature-settings/src/public/contracts.ts"
-      ],
+      "@repo/feature-organizations/testing": ["../feature-organizations/src/testing/index.ts"],
+      "@repo/feature-settings": ["../feature-settings/src/settings.feature.ts"],
+      "@repo/feature-settings/contracts": ["../feature-settings/src/public/contracts.ts"],
       "@repo/feature-settings/schema": [
         "../feature-settings/src/infrastructure/persistence/index.ts"
       ],
-      "@repo/feature-settings/module": [
-        "../feature-settings/src/settings.module.ts"
-      ],
-      "@repo/feature-settings/testing": [
-        "../feature-settings/src/testing/index.ts"
-      ],
-      "@repo/feature-sso": [
-        "../feature-sso/src/sso.feature.ts"
-      ],
-      "@repo/feature-sso/contracts": [
-        "../feature-sso/src/public/contracts.ts"
-      ],
-      "@repo/feature-sso/schema": [
-        "../feature-sso/src/infrastructure/persistence/index.ts"
-      ],
-      "@repo/feature-sso/module": [
-        "../feature-sso/src/sso.module.ts"
-      ],
-      "@repo/feature-sso/testing": [
-        "../feature-sso/src/testing/index.ts"
-      ],
-      "@repo/feature-upload": [
-        "../feature-upload/src/upload.feature.ts"
-      ],
-      "@repo/feature-upload/contracts": [
-        "../feature-upload/src/public/contracts.ts"
-      ],
-      "@repo/feature-upload/schema": [
-        "../feature-upload/src/infrastructure/persistence/index.ts"
-      ],
-      "@repo/feature-upload/module": [
-        "../feature-upload/src/upload.module.ts"
-      ],
-      "@repo/feature-upload/testing": [
-        "../feature-upload/src/testing/index.ts"
-      ],
+      "@repo/feature-settings/module": ["../feature-settings/src/settings.module.ts"],
+      "@repo/feature-settings/testing": ["../feature-settings/src/testing/index.ts"],
+      "@repo/feature-sso": ["../feature-sso/src/sso.feature.ts"],
+      "@repo/feature-sso/contracts": ["../feature-sso/src/public/contracts.ts"],
+      "@repo/feature-sso/schema": ["../feature-sso/src/infrastructure/persistence/index.ts"],
+      "@repo/feature-sso/module": ["../feature-sso/src/sso.module.ts"],
+      "@repo/feature-sso/testing": ["../feature-sso/src/testing/index.ts"],
+      "@repo/feature-upload": ["../feature-upload/src/upload.feature.ts"],
+      "@repo/feature-upload/contracts": ["../feature-upload/src/public/contracts.ts"],
+      "@repo/feature-upload/schema": ["../feature-upload/src/infrastructure/persistence/index.ts"],
+      "@repo/feature-upload/module": ["../feature-upload/src/upload.module.ts"],
+      "@repo/feature-upload/testing": ["../feature-upload/src/testing/index.ts"],
       "@repo/feature-user-preferences": [
         "../feature-user-preferences/src/user-preferences.feature.ts"
       ],
@@ -229,29 +111,14 @@
       "@repo/feature-user-preferences/testing": [
         "../feature-user-preferences/src/testing/index.ts"
       ],
-      "@repo/feature-users": [
-        "../feature-users/src/users.feature.ts"
-      ],
-      "@repo/feature-users/contracts": [
-        "../feature-users/src/public/contracts.ts"
-      ],
-      "@repo/feature-users/schema": [
-        "../feature-users/src/infrastructure/persistence/index.ts"
-      ],
-      "@repo/feature-users/module": [
-        "../feature-users/src/users.module.ts"
-      ],
-      "@repo/feature-users/testing": [
-        "../feature-users/src/testing/index.ts"
-      ]
+      "@repo/feature-users": ["../feature-users/src/users.feature.ts"],
+      "@repo/feature-users/contracts": ["../feature-users/src/public/contracts.ts"],
+      "@repo/feature-users/schema": ["../feature-users/src/infrastructure/persistence/index.ts"],
+      "@repo/feature-users/module": ["../feature-users/src/users.module.ts"],
+      "@repo/feature-users/testing": ["../feature-users/src/testing/index.ts"]
     },
     "baseUrl": "."
   },
-  "include": [
-    "src/**/*.ts"
-  ],
-  "exclude": [
-    "src/**/*.spec.ts",
-    "test"
-  ]
+  "include": ["src/**/*.ts"],
+  "exclude": ["src/**/*.spec.ts", "test"]
 }

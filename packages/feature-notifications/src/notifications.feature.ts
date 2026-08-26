@@ -15,7 +15,7 @@ import { notificationsSeeders } from "./seed";
 
 export const notificationsFeature: FeatureManifest = defineFeature({
   id: "notifications",
-  dependsOn: ["jobs", "users", "organizations", "user-preferences"],
+  dependsOn: ["jobs", "users", "organizations", "user-preferences", "audit"],
   nestModule: NotificationsModule,
   resourceScopes: {
     notifications: "organization",

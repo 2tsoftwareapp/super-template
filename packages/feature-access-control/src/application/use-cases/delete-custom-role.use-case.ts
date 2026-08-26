@@ -1,16 +1,13 @@
 import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime";
-import type { AuditWriter, TransactionPort } from "@repo/api-runtime";
+import type { TransactionPort } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {
-  AppError,
-  AUDIT_WRITER,
-  ERROR_CODES,
-  SYSTEM_SCOPE,
-  TRANSACTION_PORT,
-} from "@repo/api-runtime";
+import { AppError, ERROR_CODES, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
 
 import { assertCanModifyCustomRole } from "../../domain/role-assignment.policy";
+import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
+import type { AuditWriter } from "@repo/feature-audit/contracts";
+
 import {
   ACCESS_CONTROL_REPOSITORY,
   type AccessControlRepositoryPort,

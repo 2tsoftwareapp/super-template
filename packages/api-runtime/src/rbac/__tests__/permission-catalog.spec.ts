@@ -1,10 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { allSeedPermissionNames } from "../default-role-grants.matrix";
-import {
-  scopeForPermission,
-  setResourceScopeCatalog,
-} from "../permission-catalog";
+import { scopeForPermission, setResourceScopeCatalog } from "../permission-catalog";
 
 describe("Permission Catalog Completeness", () => {
   beforeEach(() => {

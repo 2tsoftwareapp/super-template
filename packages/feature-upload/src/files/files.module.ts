@@ -1,5 +1,4 @@
 import { Global, Module } from "@nestjs/common";
-import { FILE_LOOKUP } from "@repo/api-runtime";
 
 import { StorageModule } from "../storage/storage.module";
 import { FILES_REPOSITORY } from "./application/ports/files.repository.port";
@@ -17,6 +16,7 @@ import { ListFilesUseCase } from "./application/use-cases/list-files.use-case";
 import { UploadFileUseCase } from "./application/use-cases/upload-file.use-case";
 import { FilesRepository } from "./infrastructure/files.repository";
 import { FilesController } from "./presentation/files.controller";
+import { FILE_LOOKUP } from "@repo/feature-upload/contracts";
 
 @Global()
 @Module({

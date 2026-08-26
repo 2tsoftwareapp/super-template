@@ -2,24 +2,19 @@ import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime
 import type { TransactionPort } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {
-  AppError,
-  AUDIT_WRITER,
-  type AuditWriter,
-  ERROR_CODES,
-  SYSTEM_SCOPE,
-  TRANSACTION_PORT,
-} from "@repo/api-runtime";
+import { AppError, ERROR_CODES, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
 
 import { assertNotLastOwner } from "../../domain/organization-access.policy";
 import { ORGANIZATION_MEMBERSHIP, type OrganizationMembership } from "../../public/contracts";
+import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
+import type { AuditWriter } from "@repo/feature-audit/contracts";
+
 import {
   ORGANIZATION_ACCESS_CONTROL,
   type OrganizationAccessControlPort,
 } from "../../public/contracts";
 
 @Injectable()
-
 export class LeaveOrganizationUseCase {
   constructor(
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,

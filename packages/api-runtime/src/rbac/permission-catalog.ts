@@ -7,9 +7,7 @@ export type PermissionScope = "platform" | "organization";
  */
 let resourceScopeCatalog: Readonly<Record<string, PermissionScope>> = {};
 
-export function setResourceScopeCatalog(
-  catalog: Readonly<Record<string, PermissionScope>>,
-): void {
+export function setResourceScopeCatalog(catalog: Readonly<Record<string, PermissionScope>>): void {
   resourceScopeCatalog = catalog;
 }
 

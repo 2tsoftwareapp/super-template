@@ -2,11 +2,7 @@ import type { NextRequest } from "next/server";
 
 import { NextResponse } from "next/server";
 
-import {
-  clearSessionCookies,
-  readAuthCookies,
-  setCsrfCookie,
-} from "@/core/auth/server/cookies";
+import { clearSessionCookies, readAuthCookies, setCsrfCookie } from "@/core/auth/server/cookies";
 import { enforceCsrf } from "@/core/server/guards";
 import { callBackend } from "@/core/server/transport";
 

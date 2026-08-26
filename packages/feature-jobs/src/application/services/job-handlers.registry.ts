@@ -1,8 +1,12 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { type JsonObject, type JsonValue, MAIL_TEMPLATE_SENDER, type MailTemplateSender, USER_NOTIFICATION_SENDER, type UserNotificationSender } from "@repo/api-runtime";
+import { type JsonObject, type JsonValue } from "@repo/api-runtime";
 import { AUTH_TOKEN_CLEANUP, type AuthTokenCleanup } from "@repo/feature-users/contracts";
 
 import type { JobHandler } from "../jobs.types";
+import { MAIL_TEMPLATE_SENDER } from "@repo/feature-mail/contracts";
+import type { MailTemplateSender } from "@repo/feature-mail/contracts";
+import { USER_NOTIFICATION_SENDER } from "@repo/feature-notifications/contracts";
+import type { UserNotificationSender } from "@repo/feature-notifications/contracts";
 
 function readStringField(payload: JsonObject, key: string): string {
   const value = payload[key];

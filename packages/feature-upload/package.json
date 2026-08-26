@@ -30,6 +30,7 @@
     "@repo/config": "workspace:*",
     "@repo/database-runtime": "workspace:*",
     "@repo/feature-activities": "workspace:*",
+    "@repo/feature-audit": "workspace:*",
     "@repo/feature-organizations": "workspace:*",
     "@repo/feature-users": "workspace:*",
     "class-transformer": "0.5.1",

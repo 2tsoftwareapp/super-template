@@ -2,14 +2,7 @@ import type { RequestContext } from "@repo/api-runtime";
 import type { TransactionPort } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {
-  AppError,
-  AUDIT_WRITER,
-  type AuditWriter,
-  EnvironmentService,
-  ERROR_CODES,
-  SYSTEM_SCOPE,
-} from "@repo/api-runtime";
+import { AppError, EnvironmentService, ERROR_CODES, SYSTEM_SCOPE } from "@repo/api-runtime";
 import { TRANSACTION_PORT } from "@repo/api-runtime";
 
 import type { MfaConfirmCommand } from "../mfa.types";
@@ -19,6 +12,8 @@ import { generateRecoveryCodes } from "../../domain/recovery-codes";
 import { verifyTotpCode } from "../../domain/totp";
 import { decryptTotpSecret } from "../../domain/totp-encryption";
 import { MFA_REPOSITORY, type MfaRepositoryPort } from "../ports/mfa.repository.port";
+import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
+import type { AuditWriter } from "@repo/feature-audit/contracts";
 
 @Injectable()
 export class ConfirmMfaUseCase {

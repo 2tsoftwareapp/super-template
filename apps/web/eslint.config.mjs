@@ -146,13 +146,7 @@ export default defineConfig([
           patterns: [
             ...featureBasePatterns,
             {
-              group: [
-                "@tanstack/react-query",
-                "swr",
-                "@/core/http",
-                "**/api/*",
-                "**/api/**",
-              ],
+              group: ["@tanstack/react-query", "swr", "@/core/http", "**/api/*", "**/api/**"],
               message:
                 "screens/ compose controllers and UI; they must not own data fetching or call the API layer directly.",
             },
@@ -355,7 +349,8 @@ export default defineConfig([
           patterns: [
             {
               group: ["@/features/*", "@/features/**", "**/features/*", "**/features/**"],
-              message: "core/shared must not import business features; dependency points the other way.",
+              message:
+                "core/shared must not import business features; dependency points the other way.",
             },
           ],
         },
@@ -377,7 +372,8 @@ export default defineConfig([
             },
             {
               group: ["@/features/*", "@/features/**", "**/features/*", "**/features/**"],
-              message: "src/hooks/ is cross-feature and must not depend on feature implementations.",
+              message:
+                "src/hooks/ is cross-feature and must not depend on feature implementations.",
             },
           ],
         },

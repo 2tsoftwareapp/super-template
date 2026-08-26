@@ -5,7 +5,7 @@ import { PreferencesModule } from "./preferences.module";
 
 export const userPreferencesFeature: FeatureManifest = defineFeature({
   id: "user-preferences",
-  dependsOn: ["users"],
+  dependsOn: ["users", "audit"],
   nestModule: PreferencesModule,
   schema: { userPreferences },
 });

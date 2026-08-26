@@ -2,8 +2,17 @@ import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime
 import type { TransactionExecutor } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, AUDIT_WRITER, type AuditWriter, ERROR_CODES, SYSTEM_SCOPE, TRANSACTION_PORT, type TransactionPort } from "@repo/api-runtime";
-import { ORGANIZATION_LOOKUP, type OrganizationLookup } from "@repo/feature-organizations/contracts";
+import {
+  AppError,
+  ERROR_CODES,
+  SYSTEM_SCOPE,
+  TRANSACTION_PORT,
+  type TransactionPort,
+} from "@repo/api-runtime";
+import {
+  ORGANIZATION_LOOKUP,
+  type OrganizationLookup,
+} from "@repo/feature-organizations/contracts";
 
 import type { NotificationView, SendNotificationCommand } from "../notifications.types";
 
@@ -13,6 +22,8 @@ import {
   type NotificationsRepositoryPort,
 } from "../ports/notifications.repository.port";
 import { NotificationDispatchService } from "../services/notification-dispatch.service";
+import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
+import type { AuditWriter } from "@repo/feature-audit/contracts";
 
 @Injectable()
 export class SendNotificationUseCase {

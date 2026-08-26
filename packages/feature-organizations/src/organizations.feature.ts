@@ -5,7 +5,7 @@ import { OrganizationsModule } from "./organizations.module";
 
 export const organizationsFeature: FeatureManifest = defineFeature({
   id: "organizations",
-  dependsOn: ["activities"],
+  dependsOn: ["activities", "audit"],
   nestModule: OrganizationsModule,
   schema: { organizations },
 });

@@ -1,7 +1,7 @@
-import type { SYSTEM_SCOPE } from "../constants/system.constants";
-import type { JsonObject } from "../types/json-value";
-import type { RequestContext } from "../types/request-context";
-import type { TransactionExecutor } from "../types/transaction-executor";
+import type { SYSTEM_SCOPE } from "@repo/api-kernel";
+import type { JsonObject } from "@repo/api-kernel";
+import type { RequestContext } from "@repo/api-kernel";
+import type { TransactionExecutor } from "@repo/api-kernel";
 
 export interface AuditLogBaseInput {
   actorId?: string | null;

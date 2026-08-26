@@ -5,7 +5,6 @@ import { AppError, ERROR_CODES, ROLE_NAMES } from "@repo/api-runtime";
 
 import { ORGANIZATION_MEMBERSHIP, type OrganizationMembership } from "../../public/contracts";
 
-
 @Injectable()
 export class ListOrganizationMembersUseCase {
   constructor(

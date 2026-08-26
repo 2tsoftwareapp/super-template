@@ -2,19 +2,15 @@ import type { RequestContext } from "@repo/api-runtime";
 import type { TransactionPort } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {
-  AppError,
-  AUDIT_WRITER,
-  type AuditWriter,
-  ERROR_CODES,
-  SYSTEM_SCOPE,
-} from "@repo/api-runtime";
+import { AppError, ERROR_CODES, SYSTEM_SCOPE } from "@repo/api-runtime";
 import { TRANSACTION_PORT } from "@repo/api-runtime";
 
 import type { MfaDisableCommand } from "../mfa.types";
 
 import { MFA_REPOSITORY, type MfaRepositoryPort } from "../ports/mfa.repository.port";
 import { MfaCodeVerifierService } from "../services/mfa-code-verifier.service";
+import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
+import type { AuditWriter } from "@repo/feature-audit/contracts";
 
 @Injectable()
 export class DisableMfaUseCase {

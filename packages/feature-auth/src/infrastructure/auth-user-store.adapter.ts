@@ -1,8 +1,5 @@
 import { Inject, Injectable } from "@nestjs/common";
-import {
-  USERS_REPOSITORY,
-  type UsersRepositoryPort,
-} from "@repo/feature-users/contracts";
+import { USERS_REPOSITORY, type UsersRepositoryPort } from "@repo/feature-users/contracts";
 
 import type {
   AuthUserCreateInput,
@@ -18,9 +15,7 @@ import type {
  */
 @Injectable()
 export class AuthUserStoreAdapter implements AuthUserStore {
-  constructor(
-    @Inject(USERS_REPOSITORY) private readonly usersRepository: UsersRepositoryPort,
-  ) {}
+  constructor(@Inject(USERS_REPOSITORY) private readonly usersRepository: UsersRepositoryPort) {}
 
   create(values: AuthUserCreateInput, executor?: unknown): Promise<AuthUserRecord> {
     return this.usersRepository.create(values, executor);

@@ -2,7 +2,13 @@ import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime
 import type { TransactionPort } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, AUDIT_WRITER, type AuditWriter, ERROR_CODES, ROLE_NAMES, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
+import {
+  AppError,
+  ERROR_CODES,
+  ROLE_NAMES,
+  SYSTEM_SCOPE,
+  TRANSACTION_PORT,
+} from "@repo/api-runtime";
 import { ACTIVITY_EMITTER, type ActivityEmitter } from "@repo/feature-activities/contracts";
 
 import type { OrganizationMemberRole } from "../../domain/organization-access.policy";
@@ -13,13 +19,15 @@ import {
   assertOrganizationRole,
 } from "../../domain/organization-access.policy";
 import { ORGANIZATION_MEMBERSHIP, type OrganizationMembership } from "../../public/contracts";
+import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
+import type { AuditWriter } from "@repo/feature-audit/contracts";
+
 import {
   ORGANIZATION_ACCESS_CONTROL,
   type OrganizationAccessControlPort,
 } from "../../public/contracts";
 
 @Injectable()
-
 export class UpdateMemberRoleUseCase {
   constructor(
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
@@ -128,12 +136,7 @@ export class UpdateMemberRoleUseCase {
 
       // Synchronize RBAC roles
       if (role === "MEMBER") {
-        await this.accessControl.replaceUserRoles(
-          targetUserId,
-          [],
-          organizationId,
-          transaction,
-        );
+        await this.accessControl.replaceUserRoles(targetUserId, [], organizationId, transaction);
       } else if (role === "ADMIN" || role === "OWNER") {
         await this.accessControl.ensureOrganizationAdminRole(
           organizationId,

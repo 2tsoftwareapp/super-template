@@ -6,9 +6,7 @@ import { SettingsModule } from "./settings.module";
 
 export const settingsFeature: FeatureManifest = defineFeature({
   id: "settings",
-  // Writes audit through the kernel AUDIT_WRITER port (bound by the always
-  // composed global audit module), so no static feature dependency exists.
-  dependsOn: [],
+  dependsOn: ["audit"],
   nestModule: SettingsModule,
   resourceScopes: {
     settings: "platform",

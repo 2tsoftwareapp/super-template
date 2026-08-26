@@ -1,4 +1,5 @@
-import type { ImportValidationError } from "@repo/api-runtime";
+import type { ImportValidationError } from "@repo/feature-import-export/contracts";
+
 export type ImportJobStatus = "PENDING" | "PROCESSING" | "COMPLETED" | "FAILED" | "CANCELLED";
 
 export interface ImportJobView {

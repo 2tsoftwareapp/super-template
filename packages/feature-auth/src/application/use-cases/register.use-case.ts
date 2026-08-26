@@ -2,11 +2,21 @@ import type { RequestContext } from "@repo/api-runtime";
 import type { TransactionPort } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, AUDIT_WRITER, type AuditWriter, durationToMilliseconds, ERROR_CODES, normalizeEmail, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
+import {
+  AppError,
+  durationToMilliseconds,
+  ERROR_CODES,
+  normalizeEmail,
+  SYSTEM_SCOPE,
+  TRANSACTION_PORT,
+} from "@repo/api-runtime";
 import { AccessControlService } from "@repo/feature-access-control/contracts";
 import { AUTH_USER_STORE, type AuthUserStore } from "@repo/feature-auth/contracts";
 import { OrganizationsService } from "@repo/feature-organizations/contracts";
-import { APPLICATION_SETTINGS_LOOKUP, type ApplicationSettingsLookup } from "@repo/feature-settings/contracts";
+import {
+  APPLICATION_SETTINGS_LOOKUP,
+  type ApplicationSettingsLookup,
+} from "@repo/feature-settings/contracts";
 
 import type { RegisterCommand } from "../auth.types";
 
@@ -16,6 +26,8 @@ import {
   type AuthSessionRepositoryPort,
 } from "../ports/auth-session.repository.port";
 import { OUTBOX_REPOSITORY, type OutboxRepositoryPort } from "../ports/outbox.repository.port";
+import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
+import type { AuditWriter } from "@repo/feature-audit/contracts";
 
 @Injectable()
 export class RegisterUseCase {

@@ -56,9 +56,10 @@ describe("composeFeatureSchemas", () => {
 
 describe("collectFeatureModules", () => {
   it("preserves feature order", () => {
-    expect(
-      collectFeatureModules([{ nestModule: ModuleA }, { nestModule: ModuleB }]),
-    ).toEqual([ModuleA, ModuleB]);
+    expect(collectFeatureModules([{ nestModule: ModuleA }, { nestModule: ModuleB }])).toEqual([
+      ModuleA,
+      ModuleB,
+    ]);
   });
 });
 
@@ -78,9 +79,10 @@ describe("collectFeatureSeeders", () => {
     const seedA = { id: "a", run: () => undefined };
     const seedB = { id: "b", run: () => undefined };
 
-    expect(
-      collectFeatureSeeders([{ seeders: [seedA] }, {}, { seeders: [seedB] }]),
-    ).toEqual([seedA, seedB]);
+    expect(collectFeatureSeeders([{ seeders: [seedA] }, {}, { seeders: [seedB] }])).toEqual([
+      seedA,
+      seedB,
+    ]);
   });
 });
 
@@ -96,9 +98,7 @@ describe("orderFeatureManifests / composeFeatures", () => {
 
   it("rejects missing dependencies", () => {
     expect(() =>
-      orderFeatureManifests([
-        { id: "a", nestModule: ModuleA, dependsOn: ["missing"] },
-      ]),
+      orderFeatureManifests([{ id: "a", nestModule: ModuleA, dependsOn: ["missing"] }]),
     ).toThrow(/depends on missing feature "missing"/);
   });
 

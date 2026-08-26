@@ -1,6 +1,4 @@
-import {
-  ROLE_NAMES,
-} from "@repo/api-runtime";
+import { ROLE_NAMES } from "@repo/api-runtime";
 import { FILE_KIND } from "@repo/feature-upload/contracts";
 
 /**

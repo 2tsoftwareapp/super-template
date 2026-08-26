@@ -25,6 +25,7 @@
     "@repo/api-runtime": "workspace:*",
     "@repo/config": "workspace:*",
     "@repo/database-runtime": "workspace:*",
+    "@repo/feature-audit": "workspace:*",
     "@repo/feature-jobs": "workspace:*",
     "@repo/feature-organizations": "workspace:*",
     "@repo/feature-user-preferences": "workspace:*",

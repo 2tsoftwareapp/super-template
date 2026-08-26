@@ -3,15 +3,13 @@ import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import {
   AppError,
-  AUDIT_WRITER,
-  type AuditWriter,
   ERROR_CODES,
   requireOrganizationId,
   SYSTEM_SCOPE,
   TRANSACTION_PORT,
   type TransactionPort,
 } from "@repo/api-runtime";
-import { ImportExportAdapterRegistry } from "@repo/api-runtime";
+import { ImportExportAdapterRegistry } from "../../../import-export/import-export-adapter.registry";
 
 import type { CreateExportCommand } from "../exports.types";
 
@@ -21,6 +19,8 @@ import {
   type ExportJobsRepositoryPort,
 } from "../ports/export-jobs.repository.port";
 import { GetExportUseCase } from "./get-export.use-case";
+import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
+import type { AuditWriter } from "@repo/feature-audit/contracts";
 
 @Injectable()
 export class CreateExportUseCase {

@@ -15,9 +15,7 @@ import { AccessControlService } from "../application/access-control.service";
  */
 @Injectable()
 export class OrganizationAccessControlAdapter implements OrganizationAccessControlPort {
-  constructor(
-    @Inject(AccessControlService) private readonly accessControl: AccessControlService,
-  ) {}
+  constructor(@Inject(AccessControlService) private readonly accessControl: AccessControlService) {}
 
   async ensureOrganizationAdminRole(
     organizationId: string,

@@ -6,7 +6,7 @@ import { accessControlSeeders } from "./seed";
 
 export const accessControlFeature: FeatureManifest = defineFeature({
   id: "access-control",
-  dependsOn: ["organizations"],
+  dependsOn: ["organizations", "audit"],
   nestModule: AccessControlModule,
   resourceScopes: {
     roles: "organization",

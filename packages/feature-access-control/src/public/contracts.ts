@@ -27,10 +27,7 @@ export interface UserRoleAssignment {
 export interface UserRoleAssignments {
   findUserIdsForRole(roleId: string, executor?: TransactionExecutor): Promise<string[]>;
 
-  findUserIdsForPermission(
-    permissionId: string,
-    executor?: TransactionExecutor,
-  ): Promise<string[]>;
+  findUserIdsForPermission(permissionId: string, executor?: TransactionExecutor): Promise<string[]>;
 
   replaceUserRoles(
     userId: string,

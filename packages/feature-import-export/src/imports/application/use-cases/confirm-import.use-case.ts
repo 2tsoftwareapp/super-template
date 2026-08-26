@@ -1,8 +1,14 @@
 import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, AUDIT_WRITER, type AuditWriter, ERROR_CODES, type ImportValidationError, SYSTEM_SCOPE, TRANSACTION_PORT, type TransactionPort } from "@repo/api-runtime";
-import { ImportExportAdapterRegistry } from "@repo/api-runtime";
+import {
+  AppError,
+  ERROR_CODES,
+  SYSTEM_SCOPE,
+  TRANSACTION_PORT,
+  type TransactionPort,
+} from "@repo/api-runtime";
+import { ImportExportAdapterRegistry } from "../../../import-export/import-export-adapter.registry";
 import { ACTIVITY_EMITTER, type ActivityEmitter } from "@repo/feature-activities/contracts";
 import { FileAccessService } from "@repo/feature-upload/contracts";
 
@@ -15,6 +21,9 @@ import {
   type ImportJobsRepositoryPort,
 } from "../ports/imports.repository.port";
 import { ImportFileParserService } from "../services/import-file-parser.service";
+import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
+import type { AuditWriter } from "@repo/feature-audit/contracts";
+import type { ImportValidationError } from "@repo/feature-import-export/contracts";
 
 @Injectable()
 export class ConfirmImportUseCase {

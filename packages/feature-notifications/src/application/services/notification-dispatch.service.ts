@@ -1,7 +1,10 @@
 import type { TransactionExecutor } from "@repo/api-runtime";
 
 import { Inject, Injectable, Logger } from "@nestjs/common";
-import { USER_PREFERENCES_LOOKUP, type UserPreferencesLookup } from "@repo/feature-user-preferences/contracts";
+import {
+  USER_PREFERENCES_LOOKUP,
+  type UserPreferencesLookup,
+} from "@repo/feature-user-preferences/contracts";
 
 import type { NotificationView } from "../notifications.types";
 

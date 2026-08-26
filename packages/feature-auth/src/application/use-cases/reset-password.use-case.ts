@@ -2,19 +2,16 @@ import type { RequestContext } from "@repo/api-runtime";
 import type { TransactionPort } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {
-  AppError,
-  AUDIT_WRITER,
-  type AuditWriter,
-  ERROR_CODES,
-  SYSTEM_SCOPE,
-} from "@repo/api-runtime";
+import { AppError, ERROR_CODES, SYSTEM_SCOPE } from "@repo/api-runtime";
 import { TRANSACTION_PORT } from "@repo/api-runtime";
 import { AUTH_USER_STORE, type AuthUserStore } from "@repo/feature-auth/contracts";
 
 import type { ResetPasswordCommand } from "../auth.types";
 
 import { hashOpaqueToken, hashPassword } from "../auth.helpers";
+import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
+import type { AuditWriter } from "@repo/feature-audit/contracts";
+
 import {
   AUTH_SESSION_REPOSITORY,
   type AuthSessionRepositoryPort,

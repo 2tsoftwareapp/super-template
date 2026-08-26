@@ -12,7 +12,7 @@ import { UsersModule } from "./users.module";
 
 export const usersFeature: FeatureManifest = defineFeature({
   id: "users",
-  dependsOn: ["access-control", "organizations", "settings", "activities"],
+  dependsOn: ["access-control", "organizations", "settings", "activities", "audit"],
   nestModule: UsersModule,
   resourceScopes: {
     users: "organization",

@@ -1,9 +1,3 @@
-import type {
-  BackgroundJobEnqueueInput,
-  BackgroundJobEnqueuerWithResult,
-  BackgroundJobRef,
-} from "@repo/api-runtime";
-
 import { Injectable } from "@nestjs/common";
 
 import type { EnqueueJobCommand, JobHandler } from "./jobs.types";
@@ -11,6 +5,11 @@ import type { EnqueueJobCommand, JobHandler } from "./jobs.types";
 import { JobHandlersRegistry } from "./services/job-handlers.registry";
 import { EnqueueJobUseCase } from "./use-cases/enqueue-job.use-case";
 import { ProcessJobsUseCase } from "./use-cases/process-jobs.use-case";
+import type {
+  BackgroundJobEnqueueInput,
+  BackgroundJobEnqueuerWithResult,
+  BackgroundJobRef,
+} from "@repo/feature-jobs/contracts";
 
 export type { JobHandler } from "./jobs.types";
 

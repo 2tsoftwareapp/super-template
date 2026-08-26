@@ -1,6 +1,6 @@
-import type { JsonObject } from "../types/json-value";
-import type { AuthenticatedRequestUser, RequestContext } from "../types/request-context";
-import type { TransactionExecutor } from "../types/transaction-executor";
+import type { JsonObject } from "@repo/api-kernel";
+import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-kernel";
+import type { TransactionExecutor } from "@repo/api-kernel";
 
 export interface SendUserNotificationInput {
   organizationId?: string;

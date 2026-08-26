@@ -3,6 +3,7 @@ import type { FeatureManifest } from "@repo/api-plugin-kit";
 import { accessControlFeature } from "@repo/feature-access-control";
 import { activitiesFeature } from "@repo/feature-activities";
 import { auditFeature } from "@repo/feature-audit";
+import { auditExportFeature } from "@repo/feature-audit/export";
 import { authFeature } from "@repo/feature-auth";
 import { healthFeature } from "@repo/feature-health";
 import { importExportFeature } from "@repo/feature-import-export";
@@ -33,6 +34,7 @@ export const enabledFeatures: readonly FeatureManifest[] = [
   mailFeature,
   uploadFeature,
   auditFeature,
+  auditExportFeature,
   activitiesFeature,
   notificationsFeature,
   settingsFeature,

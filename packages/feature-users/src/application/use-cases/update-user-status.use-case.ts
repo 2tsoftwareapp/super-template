@@ -2,7 +2,7 @@ import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime
 import type { TransactionPort } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, AUDIT_WRITER, type AuditWriter, ERROR_CODES, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
+import { AppError, ERROR_CODES, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
 import { AccessControlService, ROLE_NAMES } from "@repo/feature-access-control/contracts";
 import { ACTIVITY_EMITTER, type ActivityEmitter } from "@repo/feature-activities/contracts";
 import { AUTH_TOKEN_CLEANUP, type AuthTokenCleanup } from "@repo/feature-users/contracts";
@@ -12,6 +12,8 @@ import type { UserStatus, UserView } from "../users.types";
 import { assertUserBelongsToOrganization } from "../../domain/user-org-scope.policy";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";
 import { GetUserUseCase } from "./get-user.use-case";
+import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
+import type { AuditWriter } from "@repo/feature-audit/contracts";
 
 @Injectable()
 export class UpdateUserStatusUseCase {

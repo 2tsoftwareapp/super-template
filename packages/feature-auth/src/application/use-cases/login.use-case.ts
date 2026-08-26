@@ -1,14 +1,7 @@
 import type { RequestContext } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {
-  AppError,
-  AUDIT_WRITER,
-  type AuditWriter,
-  ERROR_CODES,
-  normalizeEmail,
-  SYSTEM_SCOPE,
-} from "@repo/api-runtime";
+import { AppError, ERROR_CODES, normalizeEmail, SYSTEM_SCOPE } from "@repo/api-runtime";
 import { AUTH_USER_STORE, type AuthUserStore } from "@repo/feature-auth/contracts";
 import { MfaService } from "@repo/feature-mfa/contracts";
 
@@ -16,6 +9,8 @@ import type { LoginCommand } from "../auth.types";
 
 import { verifyPasswordWithTimingPadding } from "../auth.helpers";
 import { IssueSessionUseCase } from "./issue-session.use-case";
+import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
+import type { AuditWriter } from "@repo/feature-audit/contracts";
 
 @Injectable()
 export class LoginUseCase {

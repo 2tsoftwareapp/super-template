@@ -1,8 +1,15 @@
 import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, ERROR_CODES, requireOrganizationId, SYSTEM_SCOPE, TRANSACTION_PORT, type TransactionPort } from "@repo/api-runtime";
-import { AUDIT_WRITER, type AuditWriter } from "@repo/api-runtime";
+import {
+  AppError,
+  ERROR_CODES,
+  requireOrganizationId,
+  SYSTEM_SCOPE,
+  TRANSACTION_PORT,
+  type TransactionPort,
+} from "@repo/api-runtime";
+
 import { ACTIVITY_EMITTER, type ActivityEmitter } from "@repo/feature-activities/contracts";
 import { createHash, randomUUID } from "node:crypto";
 
@@ -14,6 +21,8 @@ import {
 } from "../../domain/upload-policy";
 import { FilesMapper } from "../files.mapper";
 import { FILES_REPOSITORY, type FilesRepositoryPort } from "../ports/files.repository.port";
+import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
+import type { AuditWriter } from "@repo/feature-audit/contracts";
 
 interface UploadedFile {
   buffer: Buffer;

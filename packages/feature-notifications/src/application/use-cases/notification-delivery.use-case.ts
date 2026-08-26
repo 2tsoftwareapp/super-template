@@ -1,8 +1,19 @@
 import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, AUDIT_WRITER, type AuditWriter, ERROR_CODES, requireOrganizationId, SYSTEM_SCOPE, TRANSACTION_PORT, type TransactionPort } from "@repo/api-runtime";
-import { tenantContextForJob, TenantContextService, WORKER_DISPATCH_CONTEXT } from "@repo/api-runtime";
+import {
+  AppError,
+  ERROR_CODES,
+  requireOrganizationId,
+  SYSTEM_SCOPE,
+  TRANSACTION_PORT,
+  type TransactionPort,
+} from "@repo/api-runtime";
+import {
+  tenantContextForJob,
+  TenantContextService,
+  WORKER_DISPATCH_CONTEXT,
+} from "@repo/api-runtime";
 import { USER_LOOKUP, type UserLookup } from "@repo/feature-users/contracts";
 
 import type {
@@ -23,6 +34,8 @@ import {
   type NotificationsRepositoryPort,
 } from "../ports/notifications.repository.port";
 import { NotificationDispatchService } from "../services/notification-dispatch.service";
+import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
+import type { AuditWriter } from "@repo/feature-audit/contracts";
 
 const DUE_JOB_BATCH_SIZE = 20;
 const RECIPIENT_BATCH_SIZE = 100;

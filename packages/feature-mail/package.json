@@ -25,6 +25,7 @@
     "@repo/api-runtime": "workspace:*",
     "@repo/config": "workspace:*",
     "@repo/database-runtime": "workspace:*",
+    "@repo/feature-audit": "workspace:*",
     "@repo/feature-jobs": "workspace:*",
     "@repo/feature-user-preferences": "workspace:*",
     "class-transformer": "0.5.1",

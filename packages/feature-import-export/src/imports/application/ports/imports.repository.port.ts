@@ -1,4 +1,5 @@
-import type { ImportValidationError, TransactionExecutor } from "@repo/api-runtime";
+import type { TransactionExecutor } from "@repo/api-runtime";
+import type { ImportValidationError } from "@repo/feature-import-export/contracts";
 
 export interface ImportJobRecord {
   id: string;

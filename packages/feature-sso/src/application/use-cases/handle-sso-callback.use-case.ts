@@ -4,8 +4,6 @@ import type { TransactionPort } from "@repo/api-runtime";
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import {
   AppError,
-  AUDIT_WRITER,
-  type AuditWriter,
   ERROR_CODES,
   generateOpaqueToken,
   hashOpaqueToken,
@@ -17,16 +15,15 @@ import { AccessControlService } from "@repo/feature-access-control/contracts";
 import { hashPassword } from "@repo/feature-auth/contracts";
 import { IssueSessionUseCase } from "@repo/feature-auth/contracts";
 import { OrganizationsService } from "@repo/feature-organizations/contracts";
-import {
-  USERS_REPOSITORY,
-  type UsersRepositoryPort,
-} from "@repo/feature-users/contracts";
+import { USERS_REPOSITORY, type UsersRepositoryPort } from "@repo/feature-users/contracts";
 
 import type { HandleSsoCallbackCommand } from "../sso.types";
 
 import { decideAccountLinking } from "../../domain/account-linking.policy";
 import { SSO_PROVIDER_REGISTRY, type SsoProviderRegistry } from "../ports/sso-provider.port";
 import { SSO_REPOSITORY, type SsoRepositoryPort } from "../ports/sso.repository.port";
+import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
+import type { AuditWriter } from "@repo/feature-audit/contracts";
 
 @Injectable()
 export class HandleSsoCallbackUseCase {

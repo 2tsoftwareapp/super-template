@@ -1,13 +1,7 @@
 import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {
-  AppError,
-  AUDIT_WRITER,
-  type AuditWriter,
-  ERROR_CODES,
-  SYSTEM_SCOPE,
-} from "@repo/api-runtime";
+import { AppError, ERROR_CODES, SYSTEM_SCOPE } from "@repo/api-runtime";
 import { OrganizationsService } from "@repo/feature-organizations/contracts";
 
 import {
@@ -15,6 +9,8 @@ import {
   type AuthSessionRepositoryPort,
 } from "../ports/auth-session.repository.port";
 import { AUTH_TOKEN_PROVIDER, type AuthTokenProviderPort } from "../ports/auth-token.provider.port";
+import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
+import type { AuditWriter } from "@repo/feature-audit/contracts";
 
 @Injectable()
 export class SwitchOrganizationUseCase {

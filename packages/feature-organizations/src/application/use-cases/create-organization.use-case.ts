@@ -1,7 +1,12 @@
 import type { AuthenticatedRequestUser } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, ERROR_CODES, PLATFORM_TRANSACTION_PORT, type PlatformTransactionPort } from "@repo/api-runtime";
+import {
+  AppError,
+  ERROR_CODES,
+  PLATFORM_TRANSACTION_PORT,
+  type PlatformTransactionPort,
+} from "@repo/api-runtime";
 import { ACTIVITY_EMITTER, type ActivityEmitter } from "@repo/feature-activities/contracts";
 
 import type { CreateOrganizationCommand } from "../organizations.types";
@@ -26,7 +31,6 @@ import {
 } from "../../public/contracts";
 
 @Injectable()
-
 export class CreateOrganizationUseCase {
   constructor(
     // Creating an organization is a platform-level operation: the new tenant's

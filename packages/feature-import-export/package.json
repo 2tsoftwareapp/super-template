@@ -27,6 +27,7 @@
     "@repo/database-runtime": "workspace:*",
     "@repo/feature-access-control": "workspace:*",
     "@repo/feature-activities": "workspace:*",
+    "@repo/feature-audit": "workspace:*",
     "@repo/feature-organizations": "workspace:*",
     "@repo/feature-upload": "workspace:*",
     "@repo/feature-users": "workspace:*",

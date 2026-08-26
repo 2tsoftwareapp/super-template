@@ -1,4 +1,3 @@
- 
 import type { FeatureSeedContext, FeatureSeeder } from "@repo/api-plugin-kit";
 import type { DatabaseExecutor } from "@repo/database-runtime";
 
@@ -22,8 +21,9 @@ async function runNotificationsSeed(ctx: FeatureSeedContext): Promise<void> {
     );
   }
 
-  const notificationsRepository =
-    ctx.app.get(NOTIFICATIONS_REPOSITORY) as NotificationsRepositoryPort;
+  const notificationsRepository = ctx.app.get(
+    NOTIFICATIONS_REPOSITORY,
+  ) as NotificationsRepositoryPort;
   const executor = ctx.executor as DatabaseExecutor;
 
   // Only seed the welcome notification once so repeated resets keep the same visible inbox shape.

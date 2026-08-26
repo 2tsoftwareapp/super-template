@@ -9,7 +9,7 @@ import {
   TRANSACTION_PORT,
   type TransactionPort,
 } from "@repo/api-runtime";
-import { AUDIT_WRITER, type AuditWriter } from "@repo/api-runtime";
+
 import { createHash, randomUUID } from "node:crypto";
 
 import { OBJECT_STORAGE, type ObjectStorage } from "../../../storage";
@@ -22,6 +22,8 @@ import {
 import { FilesMapper } from "../files.mapper";
 import { FILES_REPOSITORY, type FilesRepositoryPort } from "../ports/files.repository.port";
 import { FileAccessService } from "../services/file-access.service";
+import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
+import type { AuditWriter } from "@repo/feature-audit/contracts";
 
 interface UploadedFile {
   buffer: Buffer;

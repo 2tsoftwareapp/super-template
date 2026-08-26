@@ -4,4 +4,10 @@ export { GetExportUseCase } from "../exports/application/use-cases/get-export.us
 /** Public contracts for @repo/feature-import-export. */
 export { ImportExportFeatureModule } from "../import-export-feature.module";
 export { ImportExportModule } from "../import-export/import-export.module";
-export { ImportExportAdapterRegistry } from "@repo/api-runtime";
+export { ImportExportAdapterRegistry } from "../import-export/import-export-adapter.registry";
+export {
+  IMPORT_EXPORT_ADAPTER,
+  type ImportExportAdapter,
+  type ImportExportRowContext,
+  type ImportValidationError,
+} from "./import-export-adapter.port";

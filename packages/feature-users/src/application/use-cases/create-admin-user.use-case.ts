@@ -2,9 +2,18 @@ import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime
 import type { TransactionPort } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, AUDIT_WRITER, type AuditWriter, ERROR_CODES, normalizeEmail, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
+import {
+  AppError,
+  ERROR_CODES,
+  normalizeEmail,
+  SYSTEM_SCOPE,
+  TRANSACTION_PORT,
+} from "@repo/api-runtime";
 import { AccessControlService, ROLE_NAMES } from "@repo/feature-access-control/contracts";
-import { assertCanAssignRoleTargets, assertRoleScopeCanBeAssigned } from "@repo/feature-access-control/contracts";
+import {
+  assertCanAssignRoleTargets,
+  assertRoleScopeCanBeAssigned,
+} from "@repo/feature-access-control/contracts";
 import { ACTIVITY_EMITTER, type ActivityEmitter } from "@repo/feature-activities/contracts";
 import {
   ORGANIZATION_MEMBERSHIP,
@@ -19,6 +28,8 @@ import type { CreateAdminUserCommand, UserView } from "../users.types";
 import { resolveRoleById } from "../assignable-role.resolver";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";
 import { GetUserUseCase } from "./get-user.use-case";
+import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
+import type { AuditWriter } from "@repo/feature-audit/contracts";
 
 @Injectable()
 export class CreateAdminUserUseCase {

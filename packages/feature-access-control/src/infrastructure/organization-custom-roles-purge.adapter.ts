@@ -16,10 +16,7 @@ import { AccessControlRolePersistence } from "./access-control-role.persistence"
 export class OrganizationCustomRolesPurgeAdapter implements OrganizationCustomRolesPurgePort {
   constructor(private readonly rolePersistence: AccessControlRolePersistence) {}
 
-  async deleteByOrganizationId(
-    organizationId: string,
-    executor?: DatabaseExecutor,
-  ): Promise<void> {
+  async deleteByOrganizationId(organizationId: string, executor?: DatabaseExecutor): Promise<void> {
     await this.rolePersistence.deleteByOrganizationId(organizationId, executor);
   }
 }

@@ -1,10 +1,9 @@
 import type { AuthenticatedRequestUser, JsonValue, RequestContext } from "@repo/api-runtime";
-import type { AuditWriter, TransactionExecutor, TransactionPort } from "@repo/api-runtime";
+import type { TransactionExecutor, TransactionPort } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import {
   AppError,
-  AUDIT_WRITER,
   ERROR_CODES,
   isFixedRoleName,
   ROLE_NAMES,
@@ -21,6 +20,8 @@ import {
   type AccessControlRepositoryPort,
 } from "../ports/access-control.repository.port";
 import { AccessProfileUseCase } from "./access-profile.use-case";
+import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
+import type { AuditWriter } from "@repo/feature-audit/contracts";
 
 function normalizeRoleName(name: string): string {
   return name.trim().toUpperCase();

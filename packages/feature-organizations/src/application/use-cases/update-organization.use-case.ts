@@ -2,11 +2,20 @@ import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime
 import type { TransactionPort } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, AUDIT_WRITER, type AuditWriter, ERROR_CODES, ROLE_NAMES, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
+import {
+  AppError,
+  ERROR_CODES,
+  ROLE_NAMES,
+  SYSTEM_SCOPE,
+  TRANSACTION_PORT,
+} from "@repo/api-runtime";
 import { ACTIVITY_EMITTER, type ActivityEmitter } from "@repo/feature-activities/contracts";
 
 import { assertOrganizationRole } from "../../domain/organization-access.policy";
 import { ORGANIZATION_MEMBERSHIP, type OrganizationMembership } from "../../public/contracts";
+import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
+import type { AuditWriter } from "@repo/feature-audit/contracts";
+
 import {
   ORGANIZATIONS_REPOSITORY,
   type OrganizationsRepositoryPort,

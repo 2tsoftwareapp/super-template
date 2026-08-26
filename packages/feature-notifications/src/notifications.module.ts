@@ -1,5 +1,6 @@
 import { Global, Module } from "@nestjs/common";
-import { USER_NOTIFICATION_SENDER } from "@repo/api-runtime";
+
+import { USER_NOTIFICATION_SENDER } from "@repo/feature-notifications/contracts";
 
 import { NotificationsMapper } from "./application/notifications.mapper";
 import { NotificationsService } from "./application/notifications.service";

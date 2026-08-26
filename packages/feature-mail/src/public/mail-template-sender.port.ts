@@ -1,4 +1,5 @@
-import type { JsonObject } from "../types/json-value";
+import type { JsonObject } from "@repo/api-kernel";
+
 export interface MailTemplateSendInput {
   templateKey: string;
   to: string;

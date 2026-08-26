@@ -5,10 +5,7 @@
 /// <reference path="./types/express.d.ts" />
 
 // --- runtime surface ---
-export {
-  AccessProfileCache,
-  type AccessProfileSnapshot,
-} from "./cache/access-profile.cache";
+export { AccessProfileCache, type AccessProfileSnapshot } from "./cache/access-profile.cache";
 export {
   APP_ENVIRONMENT,
   AppConfigModule,
@@ -26,7 +23,6 @@ export * from "./decorators/skip-envelope.decorator";
 export * from "./error-codes";
 export * from "./filters/app-exception.filter";
 export { AuthorizeGuard } from "./guards/authorize.guard";
-export { ImportExportAdapterRegistry } from "./import-export/import-export-adapter.registry";
 export * from "./interceptors/response-envelope.interceptor";
 export { ConsoleAppLogger } from "./logging/console-logger.service";
 export { LoggingModule } from "./logging/logging.module";

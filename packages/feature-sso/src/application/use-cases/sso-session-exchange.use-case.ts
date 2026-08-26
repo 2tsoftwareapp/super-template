@@ -10,10 +10,7 @@ import {
   AUTH_SESSION_REPOSITORY,
   type AuthSessionRepositoryPort,
 } from "@repo/feature-auth/contracts";
-import {
-  AUTH_TOKEN_PROVIDER,
-  type AuthTokenProviderPort,
-} from "@repo/feature-auth/contracts";
+import { AUTH_TOKEN_PROVIDER, type AuthTokenProviderPort } from "@repo/feature-auth/contracts";
 
 import { SSO_REPOSITORY, type SsoRepositoryPort } from "../ports/sso.repository.port";
 

@@ -5,7 +5,7 @@ import { auditLogs } from "./infrastructure/persistence";
 
 export const auditFeature: FeatureManifest = defineFeature({
   id: "audit",
-  dependsOn: ["upload"],
+  dependsOn: [],
   nestModule: AuditModule,
   resourceScopes: {
     audit: "platform",
