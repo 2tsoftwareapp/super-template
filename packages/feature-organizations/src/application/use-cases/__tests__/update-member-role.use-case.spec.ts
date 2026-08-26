@@ -17,7 +17,7 @@ const accessControlService = {
 
 const activityEmitter = { emit: vi.fn(async () => undefined) };
 
-function buildRepository(
+function buildMembership(
   overrides: Partial<{
     actorRole: "OWNER" | "ADMIN" | "MEMBER";
     targetRole: "OWNER" | "ADMIN" | "MEMBER";
@@ -49,12 +49,12 @@ function buildRepository(
 
 describe("UpdateMemberRoleUseCase", () => {
   it("lets an owner promote a member to admin", async () => {
-    const repository = buildRepository({ actorRole: "OWNER", targetRole: "MEMBER" });
+    const membership = buildMembership({ actorRole: "OWNER", targetRole: "MEMBER" });
     const auditWriter = { log: vi.fn(async () => undefined) };
     activityEmitter.emit.mockClear();
     const useCase = new UpdateMemberRoleUseCase(
       transactionPort as any,
-      repository as never,
+      membership as never,
       auditWriter as never,
       activityEmitter as never,
       accessControlService as any,
@@ -62,7 +62,7 @@ describe("UpdateMemberRoleUseCase", () => {
 
     const result = await useCase.execute("org-1", "actor", "target", "ADMIN");
 
-    expect(repository.updateMemberRole).toHaveBeenCalledWith("org-1", "target", "ADMIN", null);
+    expect(membership.updateMemberRole).toHaveBeenCalledWith("org-1", "target", "ADMIN", null);
     expect(result.role).toBe("ADMIN");
     expect(activityEmitter.emit).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -77,11 +77,11 @@ describe("UpdateMemberRoleUseCase", () => {
   });
 
   it("blocks an admin from promoting a member to admin", async () => {
-    const repository = buildRepository({ actorRole: "ADMIN", targetRole: "MEMBER" });
+    const membership = buildMembership({ actorRole: "ADMIN", targetRole: "MEMBER" });
     const auditWriter = { log: vi.fn() };
     const useCase = new UpdateMemberRoleUseCase(
       transactionPort as any,
-      repository as never,
+      membership as never,
       auditWriter as never,
       activityEmitter as never,
       accessControlService as any,
@@ -90,15 +90,15 @@ describe("UpdateMemberRoleUseCase", () => {
     await expect(useCase.execute("org-1", "actor", "target", "ADMIN")).rejects.toMatchObject({
       code: ERROR_CODES.AUTH_FORBIDDEN,
     });
-    expect(repository.updateMemberRole).not.toHaveBeenCalled();
+    expect(membership.updateMemberRole).not.toHaveBeenCalled();
   });
 
   it("blocks an admin from touching another admin", async () => {
-    const repository = buildRepository({ actorRole: "ADMIN", targetRole: "ADMIN" });
+    const membership = buildMembership({ actorRole: "ADMIN", targetRole: "ADMIN" });
     const auditWriter = { log: vi.fn() };
     const useCase = new UpdateMemberRoleUseCase(
       transactionPort as any,
-      repository as never,
+      membership as never,
       auditWriter as never,
       activityEmitter as never,
       accessControlService as any,
@@ -110,7 +110,7 @@ describe("UpdateMemberRoleUseCase", () => {
   });
 
   it("blocks demoting the last owner", async () => {
-    const repository = buildRepository({
+    const membership = buildMembership({
       actorRole: "OWNER",
       targetRole: "OWNER",
       remainingOwners: 0,
@@ -118,7 +118,7 @@ describe("UpdateMemberRoleUseCase", () => {
     const auditWriter = { log: vi.fn() };
     const useCase = new UpdateMemberRoleUseCase(
       transactionPort as any,
-      repository as never,
+      membership as never,
       auditWriter as never,
       activityEmitter as never,
       accessControlService as any,
@@ -130,7 +130,7 @@ describe("UpdateMemberRoleUseCase", () => {
   });
 
   it("allows demoting an owner when another owner remains", async () => {
-    const repository = buildRepository({
+    const membership = buildMembership({
       actorRole: "OWNER",
       targetRole: "OWNER",
       remainingOwners: 1,
@@ -138,7 +138,7 @@ describe("UpdateMemberRoleUseCase", () => {
     const auditWriter = { log: vi.fn(async () => undefined) };
     const useCase = new UpdateMemberRoleUseCase(
       transactionPort as any,
-      repository as never,
+      membership as never,
       auditWriter as never,
       activityEmitter as never,
       accessControlService as any,
@@ -150,11 +150,11 @@ describe("UpdateMemberRoleUseCase", () => {
   });
 
   it("rejects when the target is not a member", async () => {
-    const repository = buildRepository();
+    const membership = buildMembership();
     const auditWriter = { log: vi.fn() };
     const useCase = new UpdateMemberRoleUseCase(
       transactionPort as any,
-      repository as never,
+      membership as never,
       auditWriter as never,
       activityEmitter as never,
       accessControlService as any,

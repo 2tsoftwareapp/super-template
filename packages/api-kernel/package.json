@@ -16,7 +16,8 @@
   "dependencies": {
     "@repo/api-sort": "workspace:*",
     "@repo/utils": "workspace:*",
-    "zod": "4.4.3"
+    "zod": "4.4.3",
+    "argon2": "0.44.0"
   },
   "devDependencies": {
     "@repo/tsconfig": "workspace:*",

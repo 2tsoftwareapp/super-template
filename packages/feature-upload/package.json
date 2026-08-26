@@ -7,7 +7,8 @@
     ".": "./src/upload.feature.ts",
     "./contracts": "./src/public/contracts.ts",
     "./testing": "./src/testing/index.ts",
-    "./schema": "./src/infrastructure/persistence/index.ts"
+    "./schema": "./src/infrastructure/persistence/index.ts",
+    "./module": "./src/upload.module.ts"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json --noEmit",
@@ -32,7 +33,9 @@
     "@aws-sdk/s3-request-presigner": "^3.1068.0",
     "@nestjs/platform-express": "11.1.27",
     "express": "5.2.1",
-    "@nestjs/schedule": "6.1.1"
+    "@nestjs/schedule": "6.1.1",
+    "@repo/feature-organizations": "workspace:*",
+    "@repo/feature-users": "workspace:*"
   },
   "devDependencies": {
     "@repo/tsconfig": "workspace:*",

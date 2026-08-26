@@ -36,7 +36,8 @@
     "@nestjs/schedule": "6.1.1",
     "@repo/feature-access-control": "workspace:*",
     "@repo/feature-organizations": "workspace:*",
-    "@repo/feature-mfa": "workspace:*"
+    "@repo/feature-mfa": "workspace:*",
+    "@repo/feature-users": "workspace:*"
   },
   "devDependencies": {
     "@repo/tsconfig": "workspace:*",

@@ -42,6 +42,9 @@ export interface FeatureManifest {
   /** RBAC permission keys this feature defines (for documentation/seeding). */
   readonly permissions?: readonly string[];
 
+  /** Resource → scope map this feature owns (composed into the RBAC catalog). */
+  readonly resourceScopes?: Readonly<Record<string, "platform" | "organization">>;
+
   /** Optional seed runners contributed by this feature. */
   readonly seeders?: readonly FeatureSeeder[];
 }
@@ -54,13 +57,34 @@ export interface FeatureManifest {
 export type FeatureSchema = Record<string, unknown>;
 
 /**
- * Feature-owned seed contribution. Kept structurally loose so host apps can
- * inject their own seed context without coupling the plugin kit to CLI details.
+ * Runtime context the host passes to every {@link FeatureSeeder.run}.
+ * Features resolve Nest providers via `app.get(...)` and may stash cross-seeder
+ * values on the mutable `bag` (e.g. seeded user ids).
+ */
+export interface FeatureSeedContext {
+  /**
+   * Nest-like locator. Typed loosely so hosts can pass `INestApplicationContext`
+   * without fighting Nest's overloaded `get` signature.
+   */
+  readonly app: {
+    get: (
+      token: string | symbol | (abstract new (...args: never[]) => unknown),
+      ...rest: unknown[]
+    ) => unknown;
+  };
+  /** Active DB executor (typically the seed transaction). */
+  readonly executor: unknown;
+  /** Mutable scratch pad shared across seeders in composition order. */
+  readonly bag: Record<string, unknown>;
+}
+
+/**
+ * Feature-owned seed contribution. The host builds {@link FeatureSeedContext};
+ * the plugin kit stays free of Nest/CLI concrete types.
  */
 export interface FeatureSeeder {
   readonly id: string;
-  // Host supplies runtime context (db, env, etc.).
-  readonly run: (ctx: unknown) => Promise<void> | void;
+  readonly run: (ctx: FeatureSeedContext) => Promise<void> | void;
 }
 
 export interface ComposedFeatures {
@@ -74,6 +98,8 @@ export interface ComposedFeatures {
   readonly permissions: readonly string[];
   /** Seeders in composition order. */
   readonly seeders: readonly FeatureSeeder[];
+  /** Merged resource scope catalog. */
+  readonly resourceScopes: Readonly<Record<string, "platform" | "organization">>;
 }
 
 /**
@@ -227,6 +253,28 @@ export function composeFeaturePermissions(
 /**
  * Collect seeders across features in composition order.
  */
+
+/**
+ * Merge resource scope catalogs across features. Later duplicates must match.
+ */
+export function composeFeatureResourceScopes(
+  features: readonly Pick<FeatureManifest, "id" | "resourceScopes">[],
+): Record<string, "platform" | "organization"> {
+  const composed: Record<string, "platform" | "organization"> = {};
+  for (const feature of features) {
+    for (const [resource, scope] of Object.entries(feature.resourceScopes ?? {})) {
+      const existing = composed[resource];
+      if (existing && existing !== scope) {
+        throw new Error(
+          `Conflicting resource scope for "${resource}" from feature "${feature.id}": ${existing} vs ${scope}`,
+        );
+      }
+      composed[resource] = scope;
+    }
+  }
+  return composed;
+}
+
 export function collectFeatureSeeders(
   features: readonly Pick<FeatureManifest, "seeders">[],
 ): FeatureSeeder[] {
@@ -255,5 +303,6 @@ export function composeFeatures(features: readonly FeatureManifest[]): ComposedF
     modules: collectFeatureModules(ordered),
     permissions: composeFeaturePermissions(ordered),
     seeders: collectFeatureSeeders(ordered),
+    resourceScopes: composeFeatureResourceScopes(ordered),
   };
 }

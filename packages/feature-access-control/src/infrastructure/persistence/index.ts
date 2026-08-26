@@ -1,1 +1,1 @@
-export { permissions, rolePermissions, roles, userRoles } from "./access-control";
+export { permissions, rolePermissions, roles } from "./access-control";

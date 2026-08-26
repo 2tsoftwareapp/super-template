@@ -1,4 +1,6 @@
-import { ACTION, FILE_KIND, FILE_VISIBILITY, perm, ROLE_NAMES } from "@repo/api-runtime";
+import { ACTION, perm, ROLE_NAMES } from "@repo/api-runtime";
+
+import { FILE_KIND, FILE_VISIBILITY } from "../../constants/file.constants";
 
 export interface FileAccessActor {
   userId: string;

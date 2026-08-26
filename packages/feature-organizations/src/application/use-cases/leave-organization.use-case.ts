@@ -13,17 +13,13 @@ import {
 import { AccessControlService } from "@repo/feature-access-control/contracts";
 
 import { assertNotLastOwner } from "../../domain/organization-access.policy";
-import {
-  ORGANIZATIONS_REPOSITORY,
-  type OrganizationsRepositoryPort,
-} from "../ports/organizations.repository.port";
+import { OrganizationMembershipGateway } from "../../infrastructure/organization-membership.gateway";
 
 @Injectable()
 export class LeaveOrganizationUseCase {
   constructor(
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
-    @Inject(ORGANIZATIONS_REPOSITORY)
-    private readonly organizationsRepository: OrganizationsRepositoryPort,
+    private readonly membership: OrganizationMembershipGateway,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
     private readonly accessControlService: AccessControlService,
   ) {}
@@ -42,11 +38,7 @@ export class LeaveOrganizationUseCase {
     };
 
     await this.transactionPort.withTenant(tenantContext, async (transaction) => {
-      const membership = await this.organizationsRepository.findMembership(
-        organizationId,
-        userId,
-        transaction,
-      );
+      const membership = await this.membership.findMembership(organizationId, userId, transaction);
 
       if (!membership) {
         throw new AppError(
@@ -57,7 +49,7 @@ export class LeaveOrganizationUseCase {
       }
 
       if (membership.role === "OWNER") {
-        const remainingOwners = await this.organizationsRepository.countOwners(organizationId, {
+        const remainingOwners = await this.membership.countOwners(organizationId, {
           excludingUserId: userId,
           executor: transaction,
           lock: true,
@@ -65,11 +57,7 @@ export class LeaveOrganizationUseCase {
         assertNotLastOwner({ userId, role: membership.role }, remainingOwners);
       }
 
-      const removed = await this.organizationsRepository.removeMember(
-        organizationId,
-        userId,
-        transaction,
-      );
+      const removed = await this.membership.removeMember(organizationId, userId, transaction);
 
       if (!removed) {
         throw new AppError(

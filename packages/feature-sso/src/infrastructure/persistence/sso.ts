@@ -1,4 +1,5 @@
 import { timestamps } from "@repo/database-runtime";
+import { users } from "@repo/feature-users/schema";
 import { index, pgTable, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
 
 export const externalIdentities = pgTable(
@@ -6,7 +7,8 @@ export const externalIdentities = pgTable(
   {
     id: uuid("id").defaultRandom().primaryKey(),
     userId: uuid("user_id")
-      .notNull(),
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
     provider: text("provider").notNull(),
     providerSubject: text("provider_subject").notNull(),
     email: text("email").notNull(),

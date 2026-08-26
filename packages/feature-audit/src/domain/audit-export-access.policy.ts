@@ -1,4 +1,7 @@
-import { FILE_KIND, ROLE_NAMES } from "@repo/api-runtime";
+import {
+  ROLE_NAMES,
+} from "@repo/api-runtime";
+import { FILE_KIND } from "@repo/feature-upload/contracts";
 
 /**
  * Whether an actor may download a stored audit-export file.

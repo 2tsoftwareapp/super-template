@@ -1,29 +1,27 @@
 export type PermissionScope = "platform" | "organization";
 
 /**
- * Authoritative scope catalog: every resource involved in role grants must
- * declare its scope here. A resource not listed causes scopeForResource to
- * return 'platform' (fail closed).
+ * Fail-closed default when a resource is unknown: treat as platform-scoped.
+ * The authoritative map is installed at composition time via
+ * {@link setResourceScopeCatalog} from feature `resourceScopes`.
  */
-export const RESOURCE_SCOPE = {
-  settings: "platform",
-  audit: "platform",
-  mail: "platform",
-  jobs: "platform",
-  users: "organization",
-  roles: "organization",
-  notifications: "organization",
-  files: "organization",
-  attachments: "organization",
-  imports: "organization",
-  exports: "organization",
-  activities: "organization",
-} as const satisfies Record<string, PermissionScope>;
+let resourceScopeCatalog: Readonly<Record<string, PermissionScope>> = {};
 
-export type CatalogResource = keyof typeof RESOURCE_SCOPE;
+export function setResourceScopeCatalog(
+  catalog: Readonly<Record<string, PermissionScope>>,
+): void {
+  resourceScopeCatalog = catalog;
+}
+
+export function getResourceScopeCatalog(): Readonly<Record<string, PermissionScope>> {
+  return resourceScopeCatalog;
+}
+
+/** @deprecated Use composed feature resourceScopes; retained for transitional typing. */
+export type CatalogResource = string;
 
 export function scopeForResource(resource: string): PermissionScope {
-  return (RESOURCE_SCOPE as Record<string, PermissionScope>)[resource] ?? "platform";
+  return resourceScopeCatalog[resource] ?? "platform";
 }
 
 export function scopeForPermission(name: string): PermissionScope {
@@ -32,13 +30,13 @@ export function scopeForPermission(name: string): PermissionScope {
 }
 
 export function getPlatformResources(): string[] {
-  return Object.entries(RESOURCE_SCOPE)
+  return Object.entries(resourceScopeCatalog)
     .filter(([, s]) => s === "platform")
     .map(([r]) => r);
 }
 
 export function getOrganizationResources(): string[] {
-  return Object.entries(RESOURCE_SCOPE)
+  return Object.entries(resourceScopeCatalog)
     .filter(([, s]) => s === "organization")
     .map(([r]) => r);
 }

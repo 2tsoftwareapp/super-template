@@ -576,6 +576,9 @@ importers:
       '@repo/utils':
         specifier: workspace:*
         version: link:../utils
+      argon2:
+        specifier: 0.44.0
+        version: 0.44.0
       zod:
         specifier: 4.4.3
         version: 4.4.3
@@ -825,6 +828,9 @@ importers:
       '@nestjs/common':
         specifier: 11.1.27
         version: 11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@10.2.2)
+      '@nestjs/core':
+        specifier: 11.1.27
+        version: 11.1.27(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/platform-express@11.1.27)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/swagger':
         specifier: 11.4.4
         version: 11.4.4(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)
@@ -1029,6 +1035,9 @@ importers:
       '@repo/feature-organizations':
         specifier: workspace:*
         version: link:../feature-organizations
+      '@repo/feature-users':
+        specifier: workspace:*
+        version: link:../feature-users
       argon2:
         specifier: 0.44.0
         version: 0.44.0
@@ -1343,6 +1352,9 @@ importers:
       '@repo/database-runtime':
         specifier: workspace:*
         version: link:../database-runtime
+      '@repo/feature-users':
+        specifier: workspace:*
+        version: link:../feature-users
       class-transformer:
         specifier: 0.5.1
         version: 0.5.1
@@ -1450,6 +1462,9 @@ importers:
       '@nestjs/common':
         specifier: 11.1.27
         version: 11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@10.2.2)
+      '@nestjs/core':
+        specifier: 11.1.27
+        version: 11.1.27(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/platform-express@11.1.27)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/swagger':
         specifier: 11.4.4
         version: 11.4.4(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)
@@ -1675,6 +1690,12 @@ importers:
       '@repo/database-runtime':
         specifier: workspace:*
         version: link:../database-runtime
+      '@repo/feature-organizations':
+        specifier: workspace:*
+        version: link:../feature-organizations
+      '@repo/feature-users':
+        specifier: workspace:*
+        version: link:../feature-users
       class-transformer:
         specifier: 0.5.1
         version: 0.5.1
@@ -1791,9 +1812,6 @@ importers:
       '@repo/feature-access-control':
         specifier: workspace:*
         version: link:../feature-access-control
-      '@repo/feature-auth':
-        specifier: workspace:*
-        version: link:../feature-auth
       '@repo/feature-organizations':
         specifier: workspace:*
         version: link:../feature-organizations

@@ -14,7 +14,6 @@ import { RoleManagementUseCase } from "./application/use-cases/role-management.u
 import { RoleQueryUseCase } from "./application/use-cases/role-query.use-case";
 import { SeedAccessControlUseCase } from "./application/use-cases/seed-access-control.use-case";
 import { UpdateCustomRoleUseCase } from "./application/use-cases/update-custom-role.use-case";
-import { AccessControlAssignmentPersistence } from "./infrastructure/access-control-assignment.persistence";
 import { AccessControlPermissionPersistence } from "./infrastructure/access-control-permission.persistence";
 import { AccessControlRolePersistence } from "./infrastructure/access-control-role.persistence";
 import { AccessControlRepository } from "./infrastructure/access-control.repository";
@@ -27,7 +26,6 @@ import { AdminRolesController } from "./presentation/admin-roles.controller";
   providers: [
     AccessControlRolePersistence,
     AccessControlPermissionPersistence,
-    AccessControlAssignmentPersistence,
     AccessControlRepository,
     AccessControlMapper,
     AccessProfileUseCase,

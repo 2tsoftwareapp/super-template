@@ -20,17 +20,13 @@ import {
   assertNotLastOwner,
   assertOrganizationRole,
 } from "../../domain/organization-access.policy";
-import {
-  ORGANIZATIONS_REPOSITORY,
-  type OrganizationsRepositoryPort,
-} from "../ports/organizations.repository.port";
+import { OrganizationMembershipGateway } from "../../infrastructure/organization-membership.gateway";
 
 @Injectable()
 export class RemoveOrganizationMemberUseCase {
   constructor(
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
-    @Inject(ORGANIZATIONS_REPOSITORY)
-    private readonly organizationsRepository: OrganizationsRepositoryPort,
+    private readonly membership: OrganizationMembershipGateway,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
     @Inject(ACTIVITY_EMITTER) private readonly activityEmitter: ActivityEmitter,
     private readonly accessControlService: AccessControlService,
@@ -58,7 +54,7 @@ export class RemoveOrganizationMemberUseCase {
 
     await this.transactionPort.withTenant(tenantContext, async (transaction) => {
       if (!isSuperAdmin) {
-        const actorMembership = await this.organizationsRepository.findMembership(
+        const actorMembership = await this.membership.findMembership(
           organizationId,
           actorUserId,
           transaction,
@@ -74,7 +70,7 @@ export class RemoveOrganizationMemberUseCase {
 
         assertOrganizationRole(actorMembership, ["OWNER", "ADMIN"]);
 
-        const targetMembership = await this.organizationsRepository.findMembership(
+        const targetMembership = await this.membership.findMembership(
           organizationId,
           targetUserId,
           transaction,
@@ -91,7 +87,7 @@ export class RemoveOrganizationMemberUseCase {
         assertCanManageTargetRole(actorMembership.role, targetMembership.role);
       }
 
-      const targetMembership = await this.organizationsRepository.findMembership(
+      const targetMembership = await this.membership.findMembership(
         organizationId,
         targetUserId,
         transaction,
@@ -106,7 +102,7 @@ export class RemoveOrganizationMemberUseCase {
       }
 
       if (targetMembership.role === "OWNER") {
-        const remainingOwners = await this.organizationsRepository.countOwners(organizationId, {
+        const remainingOwners = await this.membership.countOwners(organizationId, {
           excludingUserId: targetUserId,
           executor: transaction,
           lock: true,
@@ -114,11 +110,7 @@ export class RemoveOrganizationMemberUseCase {
         assertNotLastOwner({ userId: targetUserId, role: targetMembership.role }, remainingOwners);
       }
 
-      const removed = await this.organizationsRepository.removeMember(
-        organizationId,
-        targetUserId,
-        transaction,
-      );
+      const removed = await this.membership.removeMember(organizationId, targetUserId, transaction);
 
       if (!removed) {
         throw new AppError(

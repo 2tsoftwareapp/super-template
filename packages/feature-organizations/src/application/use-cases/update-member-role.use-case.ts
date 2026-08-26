@@ -22,17 +22,13 @@ import {
   assertNotLastOwner,
   assertOrganizationRole,
 } from "../../domain/organization-access.policy";
-import {
-  ORGANIZATIONS_REPOSITORY,
-  type OrganizationsRepositoryPort,
-} from "../ports/organizations.repository.port";
+import { OrganizationMembershipGateway } from "../../infrastructure/organization-membership.gateway";
 
 @Injectable()
 export class UpdateMemberRoleUseCase {
   constructor(
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
-    @Inject(ORGANIZATIONS_REPOSITORY)
-    private readonly organizationsRepository: OrganizationsRepositoryPort,
+    private readonly membership: OrganizationMembershipGateway,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
     @Inject(ACTIVITY_EMITTER) private readonly activityEmitter: ActivityEmitter,
     private readonly accessControlService: AccessControlService,
@@ -61,7 +57,7 @@ export class UpdateMemberRoleUseCase {
 
     return this.transactionPort.withTenant(tenantContext, async (transaction) => {
       if (!isSuperAdmin) {
-        const actorMembership = await this.organizationsRepository.findMembership(
+        const actorMembership = await this.membership.findMembership(
           organizationId,
           actorUserId,
           transaction,
@@ -77,7 +73,7 @@ export class UpdateMemberRoleUseCase {
 
         assertOrganizationRole(actorMembership, ["OWNER", "ADMIN"]);
 
-        const targetMembership = await this.organizationsRepository.findMembership(
+        const targetMembership = await this.membership.findMembership(
           organizationId,
           targetUserId,
           transaction,
@@ -95,7 +91,7 @@ export class UpdateMemberRoleUseCase {
         assertCanManageTargetRole(actorMembership.role, role);
       }
 
-      const targetMembership = await this.organizationsRepository.findMembership(
+      const targetMembership = await this.membership.findMembership(
         organizationId,
         targetUserId,
         transaction,
@@ -110,7 +106,7 @@ export class UpdateMemberRoleUseCase {
       }
 
       if (targetMembership.role === "OWNER" && role !== "OWNER") {
-        const remainingOwners = await this.organizationsRepository.countOwners(organizationId, {
+        const remainingOwners = await this.membership.countOwners(organizationId, {
           excludingUserId: targetUserId,
           executor: transaction,
           lock: true,
@@ -118,7 +114,7 @@ export class UpdateMemberRoleUseCase {
         assertNotLastOwner({ userId: targetUserId, role: targetMembership.role }, remainingOwners);
       }
 
-      const updated = await this.organizationsRepository.updateMemberRole(
+      const updated = await this.membership.updateMemberRole(
         organizationId,
         targetUserId,
         role,

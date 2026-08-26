@@ -3,6 +3,7 @@ import type { AuthenticatedRequestUser } from "@repo/api-runtime";
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { AppError, ERROR_CODES, ROLE_NAMES } from "@repo/api-runtime";
 
+import { OrganizationMembershipGateway } from "../../infrastructure/organization-membership.gateway";
 import {
   ORGANIZATIONS_REPOSITORY,
   type OrganizationsRepositoryPort,
@@ -13,6 +14,7 @@ export class GetOrganizationUseCase {
   constructor(
     @Inject(ORGANIZATIONS_REPOSITORY)
     private readonly organizationsRepository: OrganizationsRepositoryPort,
+    private readonly membership: OrganizationMembershipGateway,
   ) {}
 
   async execute(organizationId: string, actor: string | AuthenticatedRequestUser) {
@@ -26,7 +28,7 @@ export class GetOrganizationUseCase {
 
     let membership = null;
     if (!isSuperAdmin) {
-      membership = await this.organizationsRepository.findMembership(organizationId, actorUserId);
+      membership = await this.membership.findMembership(organizationId, actorUserId);
 
       if (!membership) {
         throw new AppError(
@@ -47,7 +49,7 @@ export class GetOrganizationUseCase {
       );
     }
 
-    const memberCount = await this.organizationsRepository.countMembers(organizationId);
+    const memberCount = await this.membership.countMembers(organizationId);
 
     return {
       id: organization.id,

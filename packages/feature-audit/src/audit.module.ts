@@ -1,8 +1,6 @@
 import { Global, Module } from "@nestjs/common";
 import { AUDIT_WRITER } from "@repo/api-runtime";
-import { FILES_REPOSITORY } from "@repo/feature-upload/contracts";
-import { FilesRepository } from "@repo/feature-upload/contracts";
-import { StorageModule } from "@repo/feature-upload/contracts";
+import { FilesModule } from "@repo/feature-upload/module";
 
 import { AuditRetentionService } from "./application/audit-retention.service";
 import { AuditMapper } from "./application/audit.mapper";
@@ -17,20 +15,16 @@ import { RecordAuditLogUseCase } from "./application/use-cases/record-audit-log.
 import { AuditRepository } from "./infrastructure/audit.repository";
 import { AuditController } from "./presentation/audit.controller";
 
-// FilesRepository is provided directly (not via FilesModule) because FilesModule
-// itself imports AuditModule; importing it back here would create a cycle.
+// FILES_REPOSITORY / OBJECT_STORAGE come from global FilesModule (which imports
+// StorageModule). Upload use cases depend on AUDIT_WRITER, not AuditModule, so
+// there is no Files ↔ Audit Nest module cycle.
 @Global()
 @Module({
-  imports: [StorageModule],
+  imports: [FilesModule],
   controllers: [AuditController],
   providers: [
     AuditMapper,
     AuditRepository,
-    FilesRepository,
-    {
-      provide: FILES_REPOSITORY,
-      useExisting: FilesRepository,
-    },
     {
       provide: AUDIT_REPOSITORY,
       useExisting: AuditRepository,

@@ -8,29 +8,21 @@ import {
   AppError,
   AUDIT_WRITER,
   type AuditWriter,
-  durationToMilliseconds,
   ERROR_CODES,
   normalizeEmail,
   SYSTEM_SCOPE,
   TRANSACTION_PORT,
 } from "@repo/api-runtime";
+import {
+  AUTH_EMAIL_VERIFICATION,
+  type AuthEmailVerification,
+  hashPassword,
+  ORGANIZATION_MEMBERSHIP,
+  type OrganizationMembership,
+} from "@repo/api-runtime";
 import { AccessControlService, ROLE_NAMES } from "@repo/feature-access-control/contracts";
 import { assertCanAssignRoleTargets, assertRoleScopeCanBeAssigned } from "@repo/feature-access-control/contracts";
-import {
-  generateOpaqueToken,
-  hashOpaqueToken,
-  hashPassword,
-} from "@repo/feature-auth/contracts";
-import {
-  AUTH_SESSION_REPOSITORY,
-  type AuthSessionRepositoryPort,
-} from "@repo/feature-auth/contracts";
-import {
-  OUTBOX_REPOSITORY,
-  type OutboxRepositoryPort,
-} from "@repo/feature-auth/contracts";
 import { OrganizationsService } from "@repo/feature-organizations/contracts";
-import { ORGANIZATIONS_REPOSITORY, type OrganizationsRepositoryPort } from "@repo/feature-organizations/contracts";
 
 import type { CreateAdminUserCommand, UserView } from "../users.types";
 
@@ -46,11 +38,11 @@ export class CreateAdminUserUseCase {
     private readonly usersRepository: UsersRepositoryPort,
     private readonly accessControlService: AccessControlService,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
-    @Inject(OUTBOX_REPOSITORY) private readonly outboxRepository: OutboxRepositoryPort,
     private readonly organizationsService: OrganizationsService,
-    @Inject(ORGANIZATIONS_REPOSITORY)
-    private readonly organizationsRepository: OrganizationsRepositoryPort,
-    @Inject(AUTH_SESSION_REPOSITORY) private readonly authRepository: AuthSessionRepositoryPort,
+    @Inject(ORGANIZATION_MEMBERSHIP)
+    private readonly membership: OrganizationMembership,
+    @Inject(AUTH_EMAIL_VERIFICATION)
+    private readonly authEmailVerification: AuthEmailVerification,
     @Inject(ACTIVITY_EMITTER) private readonly activityEmitter: ActivityEmitter,
     private readonly getUserUseCase: GetUserUseCase,
   ) {}
@@ -140,7 +132,7 @@ export class CreateAdminUserUseCase {
       }
 
       if (resolvedRole.name === ROLE_NAMES.ADMIN && organizationId) {
-        await this.organizationsRepository.addMember(
+        await this.membership.addMember(
           {
             organizationId,
             userId: user.id,
@@ -164,13 +156,13 @@ export class CreateAdminUserUseCase {
         );
 
         if (organizationId) {
-          const membership = await this.organizationsRepository.findMembership(
+          const membership = await this.membership.findMembership(
             organizationId,
             user.id,
             transaction,
           );
           if (!membership) {
-            await this.organizationsRepository.addMember(
+            await this.membership.addMember(
               {
                 organizationId,
                 userId: user.id,
@@ -189,20 +181,11 @@ export class CreateAdminUserUseCase {
       }
 
       if (status === "PENDING") {
-        const verificationToken = generateOpaqueToken();
-        await this.authRepository.storeEmailVerificationToken(
+        await this.authEmailVerification.issueVerificationEmail(
           {
             userId: user.id,
-            tokenHash: hashOpaqueToken(verificationToken),
-            expiresAt: new Date(Date.now() + durationToMilliseconds("1d")),
-          },
-          transaction,
-        );
-
-        await this.outboxRepository.create(
-          {
-            topic: "auth.send-verification-email",
-            payload: { email: user.email, token: verificationToken, displayName: user.displayName },
+            email: user.email,
+            displayName: user.displayName,
           },
           transaction,
         );

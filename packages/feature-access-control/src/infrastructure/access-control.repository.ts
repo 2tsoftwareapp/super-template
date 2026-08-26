@@ -1,6 +1,8 @@
+import type { UserRoleAssignments } from "@repo/api-runtime";
 import type { DatabaseExecutor } from "@repo/database-runtime";
 
 import { Injectable } from "@nestjs/common";
+import { resolveLazyPort, USER_ROLE_ASSIGNMENTS } from "@repo/api-runtime";
 
 import type {
   AccessControlRepositoryPort,
@@ -8,7 +10,6 @@ import type {
   RoleRecord,
 } from "../application/ports/access-control.repository.port";
 
-import { AccessControlAssignmentPersistence } from "./access-control-assignment.persistence";
 import { AccessControlPermissionPersistence } from "./access-control-permission.persistence";
 import { AccessControlRolePersistence } from "./access-control-role.persistence";
 
@@ -17,8 +18,11 @@ export class AccessControlRepository implements AccessControlRepositoryPort {
   constructor(
     private readonly rolePersistence: AccessControlRolePersistence,
     private readonly permissionPersistence: AccessControlPermissionPersistence,
-    private readonly assignmentPersistence: AccessControlAssignmentPersistence,
   ) {}
+
+  private userRoleAssignments(): UserRoleAssignments {
+    return resolveLazyPort<UserRoleAssignments>(USER_ROLE_ASSIGNMENTS);
+  }
 
   findRolesPaginated(
     params: Parameters<AccessControlRolePersistence["findRolesPaginated"]>[0],
@@ -133,10 +137,10 @@ export class AccessControlRepository implements AccessControlRepositoryPort {
   }
 
   findUserIdsForRole(roleId: string, executor?: DatabaseExecutor) {
-    return this.assignmentPersistence.findUserIdsForRole(roleId, executor);
+    return this.userRoleAssignments().findUserIdsForRole(roleId, executor);
   }
   findUserIdsForPermission(permissionId: string, executor?: DatabaseExecutor) {
-    return this.assignmentPersistence.findUserIdsForPermission(permissionId, executor);
+    return this.userRoleAssignments().findUserIdsForPermission(permissionId, executor);
   }
   replaceUserRoles(
     userId: string,
@@ -144,45 +148,45 @@ export class AccessControlRepository implements AccessControlRepositoryPort {
     organizationId: string | null,
     executor?: DatabaseExecutor,
   ) {
-    return this.assignmentPersistence.replaceUserRoles(userId, roleIds, organizationId, executor);
+    return this.userRoleAssignments().replaceUserRoles(userId, roleIds, organizationId, executor);
   }
   findRoleNamesForUser(
     userId: string,
     organizationId?: string | null,
     executor?: DatabaseExecutor,
   ) {
-    return this.assignmentPersistence.findRoleNamesForUser(userId, organizationId, executor);
+    return this.userRoleAssignments().findRoleNamesForUser(userId, organizationId, executor);
   }
   findPermissionNamesForUser(
     userId: string,
     organizationId?: string | null,
     executor?: DatabaseExecutor,
   ) {
-    return this.assignmentPersistence.findPermissionNamesForUser(userId, organizationId, executor);
+    return this.userRoleAssignments().findPermissionNamesForUser(userId, organizationId, executor);
   }
   findRoleNamesForUsers(
     userIds: string[],
     organizationId?: string | null,
     executor?: DatabaseExecutor,
   ) {
-    return this.assignmentPersistence.findRoleNamesForUsers(userIds, organizationId, executor);
+    return this.userRoleAssignments().findRoleNamesForUsers(userIds, organizationId, executor);
   }
   findRoleIdsForUser(userId: string, organizationId?: string | null, executor?: DatabaseExecutor) {
-    return this.assignmentPersistence.findRoleIdsForUser(userId, organizationId, executor);
+    return this.userRoleAssignments().findRoleIdsForUser(userId, organizationId, executor);
   }
   findRoleAssignmentsForUser(
     userId: string,
     organizationId?: string | null,
     executor?: DatabaseExecutor,
   ) {
-    return this.assignmentPersistence.findRoleAssignmentsForUser(userId, organizationId, executor);
+    return this.userRoleAssignments().findRoleAssignmentsForUser(userId, organizationId, executor);
   }
   findRoleIdsForUsers(
     userIds: string[],
     organizationId?: string | null,
     executor?: DatabaseExecutor,
   ) {
-    return this.assignmentPersistence.findRoleIdsForUsers(userIds, organizationId, executor);
+    return this.userRoleAssignments().findRoleIdsForUsers(userIds, organizationId, executor);
   }
   assignUserRole(
     userId: string,
@@ -190,6 +194,6 @@ export class AccessControlRepository implements AccessControlRepositoryPort {
     organizationId: string | null,
     executor?: DatabaseExecutor,
   ) {
-    return this.assignmentPersistence.assignUserRole(userId, roleId, organizationId, executor);
+    return this.userRoleAssignments().assignUserRole(userId, roleId, organizationId, executor);
   }
 }

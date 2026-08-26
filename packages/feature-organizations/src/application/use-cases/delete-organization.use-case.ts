@@ -14,6 +14,7 @@ import {
 import { AccessControlService } from "@repo/feature-access-control/contracts";
 
 import { assertOrganizationRole } from "../../domain/organization-access.policy";
+import { OrganizationMembershipGateway } from "../../infrastructure/organization-membership.gateway";
 import {
   ORGANIZATIONS_REPOSITORY,
   type OrganizationsRepositoryPort,
@@ -25,6 +26,7 @@ export class DeleteOrganizationUseCase {
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
     @Inject(ORGANIZATIONS_REPOSITORY)
     private readonly organizationsRepository: OrganizationsRepositoryPort,
+    private readonly membership: OrganizationMembershipGateway,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
     private readonly accessControlService: AccessControlService,
   ) {}
@@ -50,7 +52,7 @@ export class DeleteOrganizationUseCase {
 
     await this.transactionPort.withTenant(tenantContext, async (transaction) => {
       if (!isSuperAdmin) {
-        const membership = await this.organizationsRepository.findMembership(
+        const membership = await this.membership.findMembership(
           organizationId,
           actorUserId,
           transaction,
@@ -77,13 +79,13 @@ export class DeleteOrganizationUseCase {
       }
 
       // Lock owner rows for concurrency safety
-      await this.organizationsRepository.countOwners(organizationId, {
+      await this.membership.countOwners(organizationId, {
         executor: transaction,
         lock: true,
       });
 
       // Fetch all organization members to clean up their sessions and access profiles
-      const members = await this.organizationsRepository.listMembers(organizationId, transaction);
+      const members = await this.membership.listMembers(organizationId, transaction);
 
       // Perform soft delete first so the organization is marked deleted
       const deleted = await this.organizationsRepository.softDeleteOrganization(
@@ -99,11 +101,8 @@ export class DeleteOrganizationUseCase {
         );
       }
 
-      // Clean up memberships and organization-scoped roles from the DB
-      await this.organizationsRepository.deleteOrganizationMembershipsAndRoles(
-        organizationId,
-        transaction,
-      );
+      await this.membership.deleteByOrganizationId(organizationId, transaction);
+      await this.organizationsRepository.deleteOrganizationRoles(organizationId, transaction);
 
       // Clean up each member's cache
       for (const member of members) {

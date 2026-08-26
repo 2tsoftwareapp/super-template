@@ -1,19 +1,25 @@
+import type { UserRoleAssignments } from "@repo/api-runtime";
 import type { DatabaseExecutor } from "@repo/database-runtime";
 
 import { Inject, Injectable } from "@nestjs/common";
+import { resolveLazyPort, USER_ROLE_ASSIGNMENTS } from "@repo/api-runtime";
 import { DATABASE, type DatabaseClient } from "@repo/database-runtime";
-import { roles, userRoles } from "@repo/feature-access-control/schema";
-import { and, asc, count, eq, isNull, ne, sql } from "drizzle-orm";
+import { roles } from "@repo/feature-access-control/schema";
+import { and, asc, eq, isNull } from "drizzle-orm";
 
 import type { OrganizationsRepositoryPort } from "../application/ports/organizations.repository.port";
 
-import { organizationMembers, organizations } from "./persistence";
-
-export type OrganizationMemberRole = "OWNER" | "ADMIN" | "MEMBER";
+import { organizations } from "./persistence";
 
 @Injectable()
 export class OrganizationsRepository implements OrganizationsRepositoryPort {
-  constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
+  constructor(
+    @Inject(DATABASE) private readonly database: DatabaseClient,
+  ) {}
+
+  private userRoleAssignments(): UserRoleAssignments {
+    return resolveLazyPort<UserRoleAssignments>(USER_ROLE_ASSIGNMENTS);
+  }
 
   async createOrganization(
     values: typeof organizations.$inferInsert,
@@ -21,33 +27,6 @@ export class OrganizationsRepository implements OrganizationsRepositoryPort {
   ) {
     const [organization] = await executor.insert(organizations).values(values).returning();
     return organization ?? null;
-  }
-
-  async addMember(
-    values: typeof organizationMembers.$inferInsert,
-    executor: DatabaseExecutor = this.database,
-  ) {
-    const [member] = await executor.insert(organizationMembers).values(values).returning();
-    return member ?? null;
-  }
-
-  async upsertMember(
-    values: typeof organizationMembers.$inferInsert,
-    executor: DatabaseExecutor = this.database,
-  ) {
-    const [member] = await executor
-      .insert(organizationMembers)
-      .values(values)
-      .onConflictDoUpdate({
-        target: [organizationMembers.organizationId, organizationMembers.userId],
-        set: {
-          role: values.role,
-          updatedAt: new Date(),
-        },
-      })
-      .returning();
-
-    return member ?? null;
   }
 
   async findBySlug(slug: string, executor: DatabaseExecutor = this.database) {
@@ -66,40 +45,6 @@ export class OrganizationsRepository implements OrganizationsRepositoryPort {
       .where(and(eq(organizations.id, organizationId), isNull(organizations.deletedAt)))
       .limit(1);
     return organization ?? null;
-  }
-
-  async findMembership(
-    organizationId: string,
-    userId: string,
-    executor: DatabaseExecutor = this.database,
-  ) {
-    const [member] = await executor
-      .select()
-      .from(organizationMembers)
-      .where(
-        and(
-          eq(organizationMembers.organizationId, organizationId),
-          eq(organizationMembers.userId, userId),
-        ),
-      )
-      .limit(1);
-    return member ?? null;
-  }
-
-  async listForUser(userId: string, executor: DatabaseExecutor = this.database) {
-    return executor
-      .select({
-        id: organizations.id,
-        name: organizations.name,
-        slug: organizations.slug,
-        role: organizationMembers.role,
-        createdAt: organizations.createdAt,
-        updatedAt: organizations.updatedAt,
-      })
-      .from(organizationMembers)
-      .innerJoin(organizations, eq(organizationMembers.organizationId, organizations.id))
-      .where(and(eq(organizationMembers.userId, userId), isNull(organizations.deletedAt)))
-      .orderBy(asc(organizations.name));
   }
 
   async listAll(executor: DatabaseExecutor = this.database) {
@@ -132,126 +77,11 @@ export class OrganizationsRepository implements OrganizationsRepositoryPort {
     return organization ?? null;
   }
 
-  async listMembers(organizationId: string, executor: DatabaseExecutor = this.database) {
-    // Avoid importing @repo/feature-users/schema (package DAG cycle). Read m_users via SQL.
-    return executor
-      .select({
-        userId: organizationMembers.userId,
-        role: organizationMembers.role,
-        email: sql<string>`(select u.email from m_users u where u.id = ${organizationMembers.userId})`.as(
-          "email",
-        ),
-        displayName: sql<string>`(select u.display_name from m_users u where u.id = ${organizationMembers.userId})`.as(
-          "display_name",
-        ),
-        createdAt: organizationMembers.createdAt,
-        updatedAt: organizationMembers.updatedAt,
-      })
-      .from(organizationMembers)
-      .where(eq(organizationMembers.organizationId, organizationId))
-      .orderBy(asc(organizationMembers.createdAt));
-  }
-
-  async countOwners(
-    organizationId: string,
-    options: { excludingUserId?: string; executor?: DatabaseExecutor; lock?: boolean } = {},
-  ) {
-    const executor = options.executor ?? this.database;
-    if (options.lock) {
-      const owners = await executor
-        .select({ userId: organizationMembers.userId })
-        .from(organizationMembers)
-        .where(
-          and(
-            eq(organizationMembers.organizationId, organizationId),
-            eq(organizationMembers.role, "OWNER"),
-          ),
-        )
-        .for("update");
-      const filtered = options.excludingUserId
-        ? owners.filter((o) => o.userId !== options.excludingUserId)
-        : owners;
-      return filtered.length;
-    }
-    const [result] = await executor
-      .select({ value: count() })
-      .from(organizationMembers)
-      .where(
-        and(
-          eq(organizationMembers.organizationId, organizationId),
-          eq(organizationMembers.role, "OWNER"),
-          options.excludingUserId
-            ? ne(organizationMembers.userId, options.excludingUserId)
-            : undefined,
-        ),
-      );
-    return result?.value ?? 0;
-  }
-
-  async countMembers(organizationId: string, executor: DatabaseExecutor = this.database) {
-    const [result] = await executor
-      .select({ value: count() })
-      .from(organizationMembers)
-      .where(eq(organizationMembers.organizationId, organizationId));
-    return result?.value ?? 0;
-  }
-
-  async updateMemberRole(
-    organizationId: string,
-    userId: string,
-    role: OrganizationMemberRole,
-    executor: DatabaseExecutor = this.database,
-  ) {
-    const [member] = await executor
-      .update(organizationMembers)
-      .set({ role, updatedAt: new Date() })
-      .where(
-        and(
-          eq(organizationMembers.organizationId, organizationId),
-          eq(organizationMembers.userId, userId),
-        ),
-      )
-      .returning();
-    return member ?? null;
-  }
-
-  async removeMember(
-    organizationId: string,
-    userId: string,
-    executor: DatabaseExecutor = this.database,
-  ) {
-    const [member] = await executor
-      .delete(organizationMembers)
-      .where(
-        and(
-          eq(organizationMembers.organizationId, organizationId),
-          eq(organizationMembers.userId, userId),
-        ),
-      )
-      .returning();
-    return member ?? null;
-  }
-
-  async findPrimaryOrganizationId(userId: string, executor: DatabaseExecutor = this.database) {
-    const [member] = await executor
-      .select({ organizationId: organizationMembers.organizationId })
-      .from(organizationMembers)
-      .innerJoin(organizations, eq(organizationMembers.organizationId, organizations.id))
-      .where(and(eq(organizationMembers.userId, userId), isNull(organizations.deletedAt)))
-      .orderBy(asc(organizations.createdAt))
-      .limit(1);
-
-    return member?.organizationId ?? null;
-  }
-
-  async deleteOrganizationMembershipsAndRoles(
+  async deleteOrganizationRoles(
     organizationId: string,
     executor: DatabaseExecutor = this.database,
   ): Promise<void> {
-    await executor.delete(userRoles).where(eq(userRoles.organizationId, organizationId));
+    await this.userRoleAssignments().deleteByOrganizationId(organizationId, executor);
     await executor.delete(roles).where(eq(roles.organizationId, organizationId));
-    await executor
-      .delete(organizationMembers)
-      .where(eq(organizationMembers.organizationId, organizationId));
   }
 }

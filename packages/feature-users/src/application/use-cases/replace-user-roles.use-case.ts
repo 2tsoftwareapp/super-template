@@ -10,9 +10,12 @@ import {
   SYSTEM_SCOPE,
 } from "@repo/api-runtime";
 import { TRANSACTION_PORT } from "@repo/api-runtime";
+import {
+  ORGANIZATION_MEMBERSHIP,
+  type OrganizationMembership,
+} from "@repo/api-runtime";
 import { AccessControlService, ROLE_NAMES } from "@repo/feature-access-control/contracts";
 import { assertCanAssignRoleTargets, assertRoleScopeCanBeAssigned } from "@repo/feature-access-control/contracts";
-import { ORGANIZATIONS_REPOSITORY, type OrganizationsRepositoryPort } from "@repo/feature-organizations/contracts";
 
 import type { UserView } from "../users.types";
 
@@ -29,8 +32,8 @@ export class ReplaceUserRolesUseCase {
     private readonly usersRepository: UsersRepositoryPort,
     private readonly accessControlService: AccessControlService,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
-    @Inject(ORGANIZATIONS_REPOSITORY)
-    private readonly organizationsRepository: OrganizationsRepositoryPort,
+    @Inject(ORGANIZATION_MEMBERSHIP)
+    private readonly membership: OrganizationMembership,
     private readonly getUserUseCase: GetUserUseCase,
   ) {}
 
@@ -101,11 +104,7 @@ export class ReplaceUserRolesUseCase {
       const roleScope = resolvedRole.organizationId ?? resolvedOrganizationId;
 
       if (roleScope) {
-        const membership = await this.organizationsRepository.findMembership(
-          roleScope,
-          userId,
-          transaction,
-        );
+        const membership = await this.membership.findMembership(roleScope, userId, transaction);
 
         if (membership?.role === "OWNER") {
           throw new AppError(
@@ -118,7 +117,7 @@ export class ReplaceUserRolesUseCase {
         const targetMembershipRole = resolvedRole.name === ROLE_NAMES.ADMIN ? "ADMIN" : "MEMBER";
 
         if (!membership) {
-          await this.organizationsRepository.addMember(
+          await this.membership.addMember(
             {
               organizationId: roleScope,
               userId,
@@ -127,7 +126,7 @@ export class ReplaceUserRolesUseCase {
             transaction,
           );
         } else if (membership.role !== targetMembershipRole) {
-          await this.organizationsRepository.updateMemberRole(
+          await this.membership.updateMemberRole(
             roleScope,
             userId,
             targetMembershipRole,

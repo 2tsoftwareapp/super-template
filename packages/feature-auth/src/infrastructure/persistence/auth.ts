@@ -1,4 +1,5 @@
 import { timestamps } from "@repo/database-runtime";
+import { users } from "@repo/feature-users/schema";
 import { index, pgTable, text, timestamp, uniqueIndex, uuid, varchar } from "drizzle-orm/pg-core";
 
 export const authSessions = pgTable(
@@ -6,7 +7,8 @@ export const authSessions = pgTable(
   {
     id: uuid("id").defaultRandom().primaryKey(),
     userId: uuid("user_id")
-      .notNull(),
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
     refreshTokenHash: text("refresh_token_hash").notNull(),
     // Rotation grace: the previous hash stays valid for a short window so
     // concurrent refreshes (parallel tabs/requests) don't trip reuse detection.
@@ -27,7 +29,8 @@ export const emailVerificationTokens = pgTable(
   {
     id: uuid("id").defaultRandom().primaryKey(),
     userId: uuid("user_id")
-      .notNull(),
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
     tokenHash: text("token_hash").notNull(),
     expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
     usedAt: timestamp("used_at", { withTimezone: true }),
@@ -44,7 +47,8 @@ export const passwordResetTokens = pgTable(
   {
     id: uuid("id").defaultRandom().primaryKey(),
     userId: uuid("user_id")
-      .notNull(),
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
     tokenHash: text("token_hash").notNull(),
     expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
     usedAt: timestamp("used_at", { withTimezone: true }),

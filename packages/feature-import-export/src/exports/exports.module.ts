@@ -1,7 +1,6 @@
 import { Module } from "@nestjs/common";
 import { AuditModule } from "@repo/feature-audit/contracts";
-import { FilesModule } from "@repo/feature-upload/contracts";
-import { StorageModule } from "@repo/feature-upload/contracts";
+import { FilesModule, StorageModule } from "@repo/feature-upload/module";
 
 import { EXPORT_JOBS_REPOSITORY } from "./application/ports/export-jobs.repository.port";
 import { ExportJobsRecoveryService } from "./application/services/export-jobs-recovery.service";

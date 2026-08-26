@@ -1,13 +1,15 @@
+import type { UserRoleAssignments } from "@repo/api-runtime";
 import type { DatabaseClient, DatabaseExecutor } from "@repo/database-runtime";
 
 import { Inject, Injectable } from "@nestjs/common";
 import { DATABASE } from "@repo/database-runtime";
+import { permissions, rolePermissions, roles } from "@repo/feature-access-control/schema";
 import { and, eq, inArray, isNull, or, sql, type SQL } from "drizzle-orm";
 
-import { permissions, rolePermissions, roles, userRoles } from "./persistence";
+import { userRoles } from "./persistence";
 
 @Injectable()
-export class AccessControlAssignmentPersistence {
+export class UserRoleAssignmentsPersistence implements UserRoleAssignments {
   constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
 
   async findUserIdsForRole(
@@ -92,12 +94,14 @@ export class AccessControlAssignmentPersistence {
       .select({ roleName: roles.name })
       .from(userRoles)
       .innerJoin(roles, eq(userRoles.roleId, roles.id))
-      
       .where(
         and(
           eq(userRoles.userId, userId),
           ...filters,
-          or(isNull(userRoles.organizationId), sql`exists (select 1 from m_organizations o where o.id = ${userRoles.organizationId} and o.deleted_at is null)`),
+          or(
+            isNull(userRoles.organizationId),
+            sql`exists (select 1 from m_organizations o where o.id = ${userRoles.organizationId} and o.deleted_at is null)`,
+          ),
         ),
       );
     return rows.map((row) => row.roleName);
@@ -126,12 +130,14 @@ export class AccessControlAssignmentPersistence {
       .innerJoin(roles, eq(userRoles.roleId, roles.id))
       .innerJoin(rolePermissions, eq(rolePermissions.roleId, roles.id))
       .innerJoin(permissions, eq(rolePermissions.permissionId, permissions.id))
-      
       .where(
         and(
           eq(userRoles.userId, userId),
           ...filters,
-          or(isNull(userRoles.organizationId), sql`exists (select 1 from m_organizations o where o.id = ${userRoles.organizationId} and o.deleted_at is null)`),
+          or(
+            isNull(userRoles.organizationId),
+            sql`exists (select 1 from m_organizations o where o.id = ${userRoles.organizationId} and o.deleted_at is null)`,
+          ),
         ),
       );
     return [...new Set(rows.map((row) => row.permissionName))];
@@ -227,5 +233,12 @@ export class AccessControlAssignmentPersistence {
       .insert(userRoles)
       .values({ userId, roleId, organizationId })
       .onConflictDoNothing();
+  }
+
+  async deleteByOrganizationId(
+    organizationId: string,
+    executor: DatabaseExecutor = this.database,
+  ): Promise<void> {
+    await executor.delete(userRoles).where(eq(userRoles.organizationId, organizationId));
   }
 }

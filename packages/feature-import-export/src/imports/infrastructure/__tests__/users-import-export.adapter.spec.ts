@@ -9,7 +9,7 @@ vi.mock("argon2", () => ({
 function createAdapter(
   overrides?: Partial<{
     usersRepository: Record<string, unknown>;
-    organizationsRepository: Record<string, unknown>;
+    membership: Record<string, unknown>;
     accessControlRepository: Record<string, unknown>;
   }>,
 ) {
@@ -19,9 +19,9 @@ function createAdapter(
     ...overrides?.usersRepository,
   } as never;
 
-  const orgsRepo = {
+  const membership = {
     addMember: vi.fn(),
-    ...overrides?.organizationsRepository,
+    ...overrides?.membership,
   } as never;
 
   const accessRepo = {
@@ -30,9 +30,9 @@ function createAdapter(
     ...overrides?.accessControlRepository,
   } as never;
 
-  const adapter = new UsersImportExportAdapter(usersRepo, orgsRepo, accessRepo);
+  const adapter = new UsersImportExportAdapter(usersRepo, membership, accessRepo);
 
-  return { adapter, usersRepo, orgsRepo, accessRepo };
+  return { adapter, usersRepo, membership, accessRepo };
 }
 
 describe("UsersImportExportAdapter", () => {
@@ -172,7 +172,7 @@ describe("UsersImportExportAdapter", () => {
         })),
       };
 
-      const orgsRepo = { addMember: vi.fn() };
+      const membership = { addMember: vi.fn() };
       const accessRepo = {
         findRoleByName: vi.fn(async () => ({
           id: "user-role-id",
@@ -186,7 +186,7 @@ describe("UsersImportExportAdapter", () => {
 
       const { adapter } = createAdapter({
         usersRepository: usersRepo,
-        organizationsRepository: orgsRepo,
+        membership,
         accessControlRepository: accessRepo,
       });
 
@@ -210,7 +210,7 @@ describe("UsersImportExportAdapter", () => {
         undefined,
       );
 
-      expect(orgsRepo.addMember).toHaveBeenCalledWith(
+      expect(membership.addMember).toHaveBeenCalledWith(
         {
           organizationId: "org-1",
           userId: "user-created-1",
@@ -255,7 +255,7 @@ describe("UsersImportExportAdapter", () => {
       const usersRepo = {
         create: vi.fn(async () => ({ id: "user-3" })),
       };
-      const orgsRepo = { addMember: vi.fn() };
+      const membership = { addMember: vi.fn() };
       const accessRepo = {
         findRoleByName: vi.fn(async () => null),
         assignUserRole: vi.fn(),
@@ -263,14 +263,14 @@ describe("UsersImportExportAdapter", () => {
 
       const { adapter } = createAdapter({
         usersRepository: usersRepo,
-        organizationsRepository: orgsRepo,
+        membership,
         accessControlRepository: accessRepo,
       });
 
       await adapter.importRow({ email: "a@b.com", displayName: "Test" }, context, tx as never);
 
       expect(usersRepo.create).toHaveBeenCalledWith(expect.anything(), tx);
-      expect(orgsRepo.addMember).toHaveBeenCalledWith(expect.anything(), tx);
+      expect(membership.addMember).toHaveBeenCalledWith(expect.anything(), tx);
       expect(accessRepo.findRoleByName).toHaveBeenCalledWith("USER", null, tx);
     });
   });

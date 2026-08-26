@@ -16,6 +16,8 @@ import { RemoveOrganizationMemberUseCase } from "./application/use-cases/remove-
 import { ResolveOrganizationIdForUserUseCase } from "./application/use-cases/resolve-organization-id-for-user.use-case";
 import { UpdateMemberRoleUseCase } from "./application/use-cases/update-member-role.use-case";
 import { UpdateOrganizationUseCase } from "./application/use-cases/update-organization.use-case";
+import { OrganizationLookupAdapter } from "./infrastructure/organization-lookup.adapter";
+import { OrganizationMembershipGateway } from "./infrastructure/organization-membership.gateway";
 import { OrganizationsRepository } from "./infrastructure/organizations.repository";
 import { OrganizationsController } from "./presentation/organizations.controller";
 
@@ -29,6 +31,8 @@ import { OrganizationsController } from "./presentation/organizations.controller
       provide: ORGANIZATIONS_REPOSITORY,
       useExisting: OrganizationsRepository,
     },
+    OrganizationMembershipGateway,
+    OrganizationLookupAdapter,
     OrganizationsService,
     ListOrganizationsForUserUseCase,
     CreateOrganizationUseCase,
@@ -44,7 +48,7 @@ import { OrganizationsController } from "./presentation/organizations.controller
     LeaveOrganizationUseCase,
     {
       provide: ORGANIZATION_LOOKUP,
-      useExisting: OrganizationsRepository,
+      useExisting: OrganizationLookupAdapter,
     },
   ],
   exports: [OrganizationsService, ORGANIZATIONS_REPOSITORY, ORGANIZATION_LOOKUP],

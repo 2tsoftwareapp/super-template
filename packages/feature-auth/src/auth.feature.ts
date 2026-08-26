@@ -7,6 +7,7 @@ import {
   outboxMessages,
   passwordResetTokens,
 } from "./infrastructure/persistence";
+import { authSeeders } from "./seed";
 
 export const authFeature: FeatureManifest = defineFeature({
   id: "auth",
@@ -18,4 +19,5 @@ export const authFeature: FeatureManifest = defineFeature({
     passwordResetTokens,
     outboxMessages,
   },
+  seeders: authSeeders,
 });

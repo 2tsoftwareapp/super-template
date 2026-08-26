@@ -1,6 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { type AuthenticatedRequestUser, ROLE_NAMES } from "@repo/api-runtime";
 
+import { OrganizationMembershipGateway } from "../../infrastructure/organization-membership.gateway";
 import {
   ORGANIZATIONS_REPOSITORY,
   type OrganizationsRepositoryPort,
@@ -11,6 +12,7 @@ export class ListOrganizationsForUserUseCase {
   constructor(
     @Inject(ORGANIZATIONS_REPOSITORY)
     private readonly organizationsRepository: OrganizationsRepositoryPort,
+    private readonly membership: OrganizationMembershipGateway,
   ) {}
 
   async execute(user: AuthenticatedRequestUser, memberOnly = false) {
@@ -27,7 +29,7 @@ export class ListOrganizationsForUserUseCase {
       }));
     }
 
-    const rows = await this.organizationsRepository.listForUser(user.userId);
+    const rows = await this.membership.listForUser(user.userId);
     return rows.map((row) => ({
       id: row.id,
       name: row.name,

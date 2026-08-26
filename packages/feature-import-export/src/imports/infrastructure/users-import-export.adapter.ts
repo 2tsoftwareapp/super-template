@@ -5,13 +5,13 @@ import {
   type TransactionExecutor,
 } from "@repo/api-runtime";
 import {
+  ORGANIZATION_MEMBERSHIP,
+  type OrganizationMembership,
+} from "@repo/api-runtime";
+import {
   ACCESS_CONTROL_REPOSITORY,
   type AccessControlRepositoryPort,
 } from "@repo/feature-access-control/contracts";
-import {
-  ORGANIZATIONS_REPOSITORY,
-  type OrganizationsRepositoryPort,
-} from "@repo/feature-organizations/contracts";
 import {
   USERS_REPOSITORY,
   type UsersRepositoryPort,
@@ -39,8 +39,8 @@ export class UsersImportExportAdapter implements ImportExportAdapter<UserRow> {
   constructor(
     @Inject(USERS_REPOSITORY)
     private readonly usersRepository: UsersRepositoryPort,
-    @Inject(ORGANIZATIONS_REPOSITORY)
-    private readonly organizationsRepository: OrganizationsRepositoryPort,
+    @Inject(ORGANIZATION_MEMBERSHIP)
+    private readonly membership: OrganizationMembership,
     @Inject(ACCESS_CONTROL_REPOSITORY)
     private readonly accessControlRepository: AccessControlRepositoryPort,
   ) {}
@@ -139,7 +139,7 @@ export class UsersImportExportAdapter implements ImportExportAdapter<UserRow> {
       executor,
     );
 
-    await this.organizationsRepository.addMember(
+    await this.membership.addMember(
       {
         organizationId: context.organizationId,
         userId: user.id,

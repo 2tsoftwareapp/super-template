@@ -3,7 +3,7 @@ import { ImportExportAdapterRegistry } from "@repo/api-runtime";
 import { AccessControlModule } from "@repo/feature-access-control/contracts";
 import { AuditModule } from "@repo/feature-audit/contracts";
 import { OrganizationsModule } from "@repo/feature-organizations/contracts";
-import { FilesModule, StorageModule } from "@repo/feature-upload/contracts";
+import { FilesModule, StorageModule } from "@repo/feature-upload/module";
 import { UsersModule } from "@repo/feature-users/module";
 
 import { ImportsMapper } from "./application/imports.mapper";

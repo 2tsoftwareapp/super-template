@@ -7,5 +7,8 @@ export const mailFeature: FeatureManifest = defineFeature({
   id: "mail",
   dependsOn: ["jobs"],
   nestModule: MailModule,
+  resourceScopes: {
+    mail: "platform",
+  },
   schema: { mailDeliveries, mailDeliveryStatusEnum },
 });

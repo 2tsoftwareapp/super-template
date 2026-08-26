@@ -1,13 +1,6 @@
-import { Test } from "@nestjs/testing";
-import { TRANSACTION_PORT } from "@repo/api-runtime";
-import { ImportExportAdapterRegistry } from "@repo/api-runtime";
-import {
-  CreateExportUseCase,
-  EXPORT_JOBS_REPOSITORY,
-  GetExportUseCase,
-} from "@repo/feature-import-export/contracts";
-import { AuditService } from "@repo/feature-audit/contracts";
 import { describe, expect, it, vi } from "vitest";
+
+import { CreateExportUseCase } from "../create-export.use-case";
 
 const actor = {
   userId: "11111111-1111-4111-8111-111111111111",
@@ -46,32 +39,31 @@ describe("CreateExportUseCase idempotency", () => {
       findById: vi.fn().mockResolvedValue(existingJob),
     };
 
-    const moduleRef = await Test.createTestingModule({
-      providers: [
-        CreateExportUseCase,
-        GetExportUseCase,
-        { provide: EXPORT_JOBS_REPOSITORY, useValue: exportJobsRepository },
-        {
-          provide: ImportExportAdapterRegistry,
-          useValue: {
-            resolve: vi.fn(),
-            getExportPermissions: vi.fn(() => ["exports.create"]),
-          },
-        },
-        {
-          provide: AuditService,
-          useValue: { log: vi.fn() },
-        },
-        {
-          provide: TRANSACTION_PORT,
-          useValue: {
-            withTenant: vi.fn((_ctx: unknown, fn: (tx: unknown) => unknown) => fn({})),
-          },
-        },
-      ],
-    }).compile();
+    const importExportAdapters = {
+      resolve: vi.fn(),
+      getExportPermissions: vi.fn(() => ["exports.create"]),
+    };
 
-    const createExport = moduleRef.get(CreateExportUseCase);
+    const auditService = { log: vi.fn() };
+
+    const transactionPort = {
+      withTenant: vi.fn((_ctx: unknown, fn: (tx: unknown) => unknown) => fn({})),
+      run: vi.fn(),
+      withSavepoint: vi.fn(),
+    };
+
+    const getExportUseCase = {
+      execute: vi.fn(async () => existingJob),
+    };
+
+    const createExport = new CreateExportUseCase(
+      exportJobsRepository as never,
+      importExportAdapters as never,
+      auditService as never,
+      transactionPort as never,
+      getExportUseCase as never,
+    );
+
     const result = await createExport.execute(actor, {
       type: "users",
       idempotencyKey: "export-attempt-1",
@@ -85,8 +77,7 @@ describe("CreateExportUseCase idempotency", () => {
       expect.anything(),
     );
     expect(exportJobsRepository.create).not.toHaveBeenCalled();
-    // Replay resolves through GetExportUseCase -> the existing completed job.
-    expect(exportJobsRepository.findById).toHaveBeenCalledWith(existingJob.id);
+    expect(getExportUseCase.execute).toHaveBeenCalledWith(actor, existingJob.id);
     expect(result).toMatchObject({
       id: existingJob.id,
       status: "COMPLETED",

@@ -16,7 +16,7 @@ const accessControlService = {
 
 describe("LeaveOrganizationUseCase", () => {
   it("blocks the last owner from leaving", async () => {
-    const repository = {
+    const membership = {
       findMembership: vi.fn(async () => ({ userId: "u1", role: "OWNER" })),
       countOwners: vi.fn(async () => 0),
       removeMember: vi.fn(),
@@ -24,7 +24,7 @@ describe("LeaveOrganizationUseCase", () => {
     const auditWriter = { log: vi.fn(async () => undefined) };
     const useCase = new LeaveOrganizationUseCase(
       transactionPort as any,
-      repository as never,
+      membership as never,
       auditWriter as never,
       accessControlService as any,
     );
@@ -32,11 +32,11 @@ describe("LeaveOrganizationUseCase", () => {
     await expect(useCase.execute("org-1", "u1")).rejects.toMatchObject({
       code: ERROR_CODES.ORGANIZATION_LAST_OWNER,
     });
-    expect(repository.removeMember).not.toHaveBeenCalled();
+    expect(membership.removeMember).not.toHaveBeenCalled();
   });
 
   it("allows an owner to leave when another owner remains", async () => {
-    const repository = {
+    const membership = {
       findMembership: vi.fn(async () => ({ userId: "u1", role: "OWNER" })),
       countOwners: vi.fn(async () => 1),
       removeMember: vi.fn(async () => ({ userId: "u1" })),
@@ -44,19 +44,19 @@ describe("LeaveOrganizationUseCase", () => {
     const auditWriter = { log: vi.fn(async () => undefined) };
     const useCase = new LeaveOrganizationUseCase(
       transactionPort as any,
-      repository as never,
+      membership as never,
       auditWriter as never,
       accessControlService as any,
     );
 
     await useCase.execute("org-1", "u1");
 
-    expect(repository.removeMember).toHaveBeenCalledWith("org-1", "u1", null);
+    expect(membership.removeMember).toHaveBeenCalledWith("org-1", "u1", null);
     expect(auditWriter.log).toHaveBeenCalled();
   });
 
   it("allows a member to leave without an owner check", async () => {
-    const repository = {
+    const membership = {
       findMembership: vi.fn(async () => ({ userId: "u2", role: "MEMBER" })),
       countOwners: vi.fn(),
       removeMember: vi.fn(async () => ({ userId: "u2" })),
@@ -64,19 +64,19 @@ describe("LeaveOrganizationUseCase", () => {
     const auditWriter = { log: vi.fn(async () => undefined) };
     const useCase = new LeaveOrganizationUseCase(
       transactionPort as any,
-      repository as never,
+      membership as never,
       auditWriter as never,
       accessControlService as any,
     );
 
     await useCase.execute("org-1", "u2");
 
-    expect(repository.countOwners).not.toHaveBeenCalled();
-    expect(repository.removeMember).toHaveBeenCalledWith("org-1", "u2", null);
+    expect(membership.countOwners).not.toHaveBeenCalled();
+    expect(membership.removeMember).toHaveBeenCalledWith("org-1", "u2", null);
   });
 
   it("rejects when the caller is not a member", async () => {
-    const repository = {
+    const membership = {
       findMembership: vi.fn(async () => null),
       countOwners: vi.fn(),
       removeMember: vi.fn(),
@@ -84,7 +84,7 @@ describe("LeaveOrganizationUseCase", () => {
     const auditWriter = { log: vi.fn() };
     const useCase = new LeaveOrganizationUseCase(
       transactionPort as any,
-      repository as never,
+      membership as never,
       auditWriter as never,
       accessControlService as any,
     );

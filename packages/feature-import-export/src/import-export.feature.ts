@@ -11,5 +11,9 @@ export const importExportFeature: FeatureManifest = defineFeature({
   id: "import-export",
   dependsOn: ["upload", "audit", "users", "organizations", "access-control"],
   nestModule: ImportExportFeatureModule,
+  resourceScopes: {
+    imports: "organization",
+    exports: "organization",
+  },
   schema: { importJobs, exportJobs, importExportJobStatusEnum },
 });

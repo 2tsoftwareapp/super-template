@@ -13,6 +13,7 @@ import { AccessControlService } from "@repo/feature-access-control/contracts";
 
 import type { CreateOrganizationCommand } from "../organizations.types";
 
+import { OrganizationMembershipGateway } from "../../infrastructure/organization-membership.gateway";
 import {
   ORGANIZATIONS_REPOSITORY,
   type OrganizationsRepositoryPort,
@@ -38,6 +39,7 @@ export class CreateOrganizationUseCase {
     private readonly transactionPort: PlatformTransactionPort,
     @Inject(ORGANIZATIONS_REPOSITORY)
     private readonly organizationsRepository: OrganizationsRepositoryPort,
+    private readonly membership: OrganizationMembershipGateway,
     @Inject(ACTIVITY_EMITTER) private readonly activityEmitter: ActivityEmitter,
     private readonly accessControlService: AccessControlService,
   ) {}
@@ -81,7 +83,7 @@ export class CreateOrganizationUseCase {
             );
           }
 
-          await this.organizationsRepository.addMember(
+          await this.membership.addMember(
             {
               organizationId: created.id,
               userId: user.userId,

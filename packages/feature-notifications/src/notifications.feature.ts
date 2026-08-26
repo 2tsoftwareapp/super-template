@@ -11,11 +11,15 @@ import {
   notifications,
 } from "./infrastructure/persistence";
 import { NotificationsModule } from "./notifications.module";
+import { notificationsSeeders } from "./seed";
 
 export const notificationsFeature: FeatureManifest = defineFeature({
   id: "notifications",
-  dependsOn: ["jobs"],
+  dependsOn: ["jobs", "users"],
   nestModule: NotificationsModule,
+  resourceScopes: {
+    notifications: "organization",
+  },
   schema: {
     notifications,
     notificationDeviceTokens,
@@ -26,4 +30,5 @@ export const notificationsFeature: FeatureManifest = defineFeature({
     notificationDevicePlatformEnum,
     notificationJobStatusEnum,
   },
+  seeders: notificationsSeeders,
 });

@@ -51,25 +51,6 @@ export const permissions = pgTable(
   ],
 );
 
-export const userRoles = pgTable(
-  "r_user_roles",
-  {
-    userId: uuid("user_id")
-      .notNull(),
-    organizationId: uuid("organization_id"),
-    roleId: uuid("role_id")
-      .notNull()
-      .references(() => roles.id, { onDelete: "cascade" }),
-    assignedAt: timestamp("assigned_at", { withTimezone: true }).notNull().defaultNow(),
-  },
-  (table) => [
-    primaryKey({ columns: [table.userId, table.roleId] }),
-    index("user_roles_user_id_idx").on(table.userId),
-    index("user_roles_role_id_idx").on(table.roleId),
-    index("user_roles_organization_id_idx").on(table.organizationId),
-  ],
-);
-
 export const rolePermissions = pgTable(
   "r_role_permissions",
   {

@@ -1,74 +1,78 @@
 import { describe, expect, it, vi } from "vitest";
 
-const seedAccessControl = vi.fn();
-const seedSettings = vi.fn();
-const seedUsers = vi.fn();
-const seedNotifications = vi.fn();
+const runAccessControl = vi.fn();
+const runSettings = vi.fn();
+const runUsers = vi.fn();
+const runNotifications = vi.fn();
+const runAuth = vi.fn();
 
-vi.mock("../seeds/access-control/seed", () => ({
-  seedAccessControl,
-}));
-vi.mock("../seeds/settings/seed", () => ({
-  seedSettings,
-}));
-vi.mock("../seeds/users/seed", () => ({
-  seedUsers,
-}));
-vi.mock("../seeds/notifications/seed", () => ({
-  seedNotifications,
+vi.mock("../../../composition/composed-schema", () => ({
+  composedSeeders: [
+    { id: "access-control", run: runAccessControl },
+    { id: "settings", run: runSettings },
+    { id: "users", run: runUsers },
+    { id: "notifications", run: runNotifications },
+    { id: "auth-session-cleanup", run: runAuth },
+  ],
 }));
 
 describe("seedDatabase", () => {
-  // seed-data is imported dynamically inside the test; it now transitively pulls
-  // the whole @repo/feature-upload graph (aws-sdk, firebase-admin, nodemailer),
-  // so allow extra time for that one-time module load on cold runs.
-  it("runs the seed pipeline inside the worker tenant context and one transaction", async () => {
+  it("runs composed seeders inside the worker tenant context and one transaction", async () => {
     const calls: string[] = [];
     const transaction = { id: "tx-1" };
-    const seededUsers = {
-      adminUserId: "admin-user",
-      regularUserId: "regular-user",
-    };
 
-    seedAccessControl.mockImplementation(async () => {
+    runAccessControl.mockImplementation(async () => {
       calls.push("access-control");
     });
-    seedSettings.mockImplementation(async () => {
+    runSettings.mockImplementation(async () => {
       calls.push("settings");
     });
-    seedUsers.mockImplementation(async () => {
+    runUsers.mockImplementation(async (ctx: { bag: Record<string, unknown> }) => {
       calls.push("users");
-      return seededUsers;
+      ctx.bag.seededUsers = {
+        adminUserId: "admin-user",
+        regularUserId: "regular-user",
+      };
     });
-    seedNotifications.mockImplementation(async () => {
+    runNotifications.mockImplementation(async () => {
       calls.push("notifications");
     });
+    runAuth.mockImplementation(async () => {
+      calls.push("auth-session-cleanup");
+    });
 
-    const authRepository = {
-      revokeAllSessionsForUser: vi.fn(async (userId: string) => {
-        calls.push(`revoke:${userId}`);
-      }),
-    };
-    const usersRepository = { id: "users-repository" };
     const database = {
       transaction: vi.fn((callback: (value: unknown) => Promise<unknown>) => callback(transaction)),
     };
     const tenantContextService = {
       runAsync: vi.fn((context: unknown, callback: () => Promise<unknown>) => callback()),
     };
+    const environmentService = { id: "environment-service" };
     const app = {
-      get: vi
-        .fn()
-        .mockReturnValueOnce({ id: "access-control-service" })
-        .mockReturnValueOnce(authRepository)
-        .mockReturnValueOnce({ id: "notifications-repository" })
-        .mockReturnValueOnce({ id: "organizations-service" })
-        .mockReturnValueOnce({ id: "settings-service" })
-        .mockReturnValueOnce(usersRepository)
-        .mockReturnValueOnce(database)
-        .mockReturnValueOnce({ id: "environment-service" })
-        .mockReturnValueOnce(tenantContextService),
+      get: vi.fn((token: unknown) => {
+        if (token === database || String(token).includes("DATABASE")) {
+          // resolved below via explicit mock sequence
+        }
+        return undefined;
+      }),
     };
+
+    // Match seed-data resolution order: DATABASE, TenantContextService, EnvironmentService
+    const { DATABASE } = await import("@repo/database-runtime");
+    const { TenantContextService, EnvironmentService } = await import("@repo/api-runtime");
+
+    (app as { get: (token: unknown) => unknown }).get = vi.fn((token: unknown): unknown => {
+      if (token === DATABASE) {
+        return database;
+      }
+      if (token === TenantContextService) {
+        return tenantContextService;
+      }
+      if (token === EnvironmentService) {
+        return environmentService;
+      }
+      throw new Error(`Unexpected token: ${String(token)}`);
+    });
 
     const { seedDatabase } = await import("../seed-data.js");
 
@@ -76,39 +80,28 @@ describe("seedDatabase", () => {
 
     expect(tenantContextService.runAsync).toHaveBeenCalledTimes(1);
     expect(database.transaction).toHaveBeenCalledTimes(1);
-    expect(seedAccessControl).toHaveBeenCalledWith({ id: "access-control-service" }, transaction);
-    expect(seedSettings).toHaveBeenCalledWith({ id: "settings-service" }, transaction);
-    expect(seedUsers).toHaveBeenCalledWith(
-      {
-        accessControlService: { id: "access-control-service" },
-        environmentService: { id: "environment-service" },
-        organizationsService: { id: "organizations-service" },
-        usersRepository,
-      },
-      transaction,
-    );
-    expect(seedNotifications).toHaveBeenCalledWith(
-      { id: "notifications-repository" },
-      seededUsers,
-      transaction,
-    );
-    expect(authRepository.revokeAllSessionsForUser).toHaveBeenNthCalledWith(
-      1,
-      seededUsers.adminUserId,
-      transaction,
-    );
-    expect(authRepository.revokeAllSessionsForUser).toHaveBeenNthCalledWith(
-      2,
-      seededUsers.regularUserId,
-      transaction,
-    );
+    expect(runAccessControl).toHaveBeenCalledTimes(1);
+    expect(runSettings).toHaveBeenCalledTimes(1);
+    expect(runUsers).toHaveBeenCalledTimes(1);
+    expect(runNotifications).toHaveBeenCalledTimes(1);
+    expect(runAuth).toHaveBeenCalledTimes(1);
+
+    const seedCtx = runAccessControl.mock.calls[0]?.[0];
+    expect(seedCtx).toMatchObject({
+      app,
+      executor: transaction,
+      bag: expect.any(Object),
+    });
+    expect(runUsers.mock.calls[0]?.[0]).toBe(seedCtx);
+    expect(runNotifications.mock.calls[0]?.[0]).toBe(seedCtx);
+    expect(runAuth.mock.calls[0]?.[0]).toBe(seedCtx);
+
     expect(calls).toEqual([
       "access-control",
       "settings",
       "users",
       "notifications",
-      "revoke:admin-user",
-      "revoke:regular-user",
+      "auth-session-cleanup",
     ]);
   }, 30000);
 });

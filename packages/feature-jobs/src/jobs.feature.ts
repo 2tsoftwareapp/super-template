@@ -13,5 +13,8 @@ export const jobsFeature: FeatureManifest = defineFeature({
   id: "jobs",
   dependsOn: [],
   nestModule: JobsModule,
+  resourceScopes: {
+    jobs: "platform",
+  },
   schema: { jobs, jobAttempts, jobDependencies, jobEvents, jobStatusEnum },
 });

@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@nestjs/common": "11.1.27",
+    "@nestjs/core": "11.1.27",
     "@nestjs/swagger": "11.4.4",
     "@repo/api-kernel": "workspace:*",
     "@repo/api-plugin-kit": "workspace:*",

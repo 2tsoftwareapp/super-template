@@ -1,11 +1,15 @@
 import { timestamps } from "@repo/database-runtime";
+import { organizations } from "@repo/feature-organizations/schema";
+import { users } from "@repo/feature-users/schema";
 import { index, integer, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 
 export const files = pgTable(
   "m_files",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    organizationId: uuid("organization_id"),
+    organizationId: uuid("organization_id").references(() => organizations.id, {
+      onDelete: "restrict",
+    }),
     storageKey: text("storage_key").notNull(),
     originalName: text("original_name").notNull(),
     mimeType: text("mime_type").notNull(),
@@ -16,7 +20,9 @@ export const files = pgTable(
     latestVersion: integer("latest_version").notNull().default(1),
     kind: text("kind").notNull().default("GENERIC"),
     visibility: text("visibility").notNull().default("TENANT"),
-    uploadedById: uuid("uploaded_by_id"),
+    uploadedById: uuid("uploaded_by_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
     deletedAt: timestamp("deleted_at", { withTimezone: true }),
     ...timestamps,
   },

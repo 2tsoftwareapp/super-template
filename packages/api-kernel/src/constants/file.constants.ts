@@ -1,3 +1,4 @@
+/** @deprecated Prefer `@repo/feature-upload/contracts` — kept for transitional imports. */
 export const FILE_VISIBILITY = {
   PUBLIC: "PUBLIC",
   PRIVATE: "PRIVATE",

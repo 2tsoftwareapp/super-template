@@ -1,6 +1,9 @@
+import { FILE_KIND, FILE_VISIBILITY } from "@repo/feature-upload/contracts";
 import { describe, expect, it } from "vitest";
 
-import { FILE_KIND, ROLE_NAMES } from "@repo/api-runtime";
+import {
+  ROLE_NAMES,
+} from "@repo/api-runtime";
 
 import { canDownloadAuditExport } from "../audit-export-access.policy";
 

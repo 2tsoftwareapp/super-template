@@ -10,11 +10,8 @@ import {
   SYSTEM_SCOPE,
 } from "@repo/api-runtime";
 import { TRANSACTION_PORT } from "@repo/api-runtime";
+import { AUTH_TOKEN_CLEANUP, type AuthTokenCleanup } from "@repo/api-runtime";
 import { AccessControlService, ROLE_NAMES } from "@repo/feature-access-control/contracts";
-import {
-  AUTH_SESSION_REPOSITORY,
-  type AuthSessionRepositoryPort,
-} from "@repo/feature-auth/contracts";
 
 import { assertUserBelongsToOrganization } from "../../domain/user-org-scope.policy";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";
@@ -27,7 +24,7 @@ export class DeleteUserUseCase {
     private readonly usersRepository: UsersRepositoryPort,
     private readonly accessControlService: AccessControlService,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
-    @Inject(AUTH_SESSION_REPOSITORY) private readonly authRepository: AuthSessionRepositoryPort,
+    @Inject(AUTH_TOKEN_CLEANUP) private readonly authTokenCleanup: AuthTokenCleanup,
   ) {}
 
   async execute(actor: AuthenticatedRequestUser, userId: string, requestContext?: RequestContext) {
@@ -63,7 +60,7 @@ export class DeleteUserUseCase {
 
     await this.transactionPort.run(async (transaction) => {
       await this.usersRepository.softDelete(userId, transaction);
-      await this.authRepository.revokeAllSessionsForUser(userId, transaction);
+      await this.authTokenCleanup.revokeAllSessionsForUser(userId, transaction);
       await this.auditWriter.log(
         {
           actorId: actor.userId,

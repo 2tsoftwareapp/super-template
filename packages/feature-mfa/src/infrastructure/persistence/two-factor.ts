@@ -1,4 +1,5 @@
 import { timestamps } from "@repo/database-runtime";
+import { users } from "@repo/feature-users/schema";
 import {
   boolean,
   index,
@@ -12,7 +13,8 @@ import {
 
 export const userTwoFactorSecrets = pgTable("m_user_two_factor_secrets", {
   userId: uuid("user_id")
-    .primaryKey(),
+    .primaryKey()
+    .references(() => users.id, { onDelete: "cascade" }),
   // AES-256-GCM ciphertext/iv/authTag, all base64. The TOTP secret itself is never
   // stored in plaintext; the encryption key lives outside the database (env var).
   secretCiphertext: text("secret_ciphertext").notNull(),
@@ -28,7 +30,8 @@ export const userRecoveryCodes = pgTable(
   {
     id: uuid("id").defaultRandom().primaryKey(),
     userId: uuid("user_id")
-      .notNull(),
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
     codeHash: text("code_hash").notNull(),
     usedAt: timestamp("used_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
@@ -41,7 +44,8 @@ export const mfaChallenges = pgTable(
   {
     id: uuid("id").defaultRandom().primaryKey(),
     userId: uuid("user_id")
-      .notNull(),
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
     tokenHash: text("token_hash").notNull(),
     attempts: integer("attempts").notNull().default(0),
     expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),

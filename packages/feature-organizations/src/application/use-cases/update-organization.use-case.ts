@@ -15,6 +15,7 @@ import {
 } from "@repo/api-runtime";
 
 import { assertOrganizationRole } from "../../domain/organization-access.policy";
+import { OrganizationMembershipGateway } from "../../infrastructure/organization-membership.gateway";
 import {
   ORGANIZATIONS_REPOSITORY,
   type OrganizationsRepositoryPort,
@@ -26,6 +27,7 @@ export class UpdateOrganizationUseCase {
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
     @Inject(ORGANIZATIONS_REPOSITORY)
     private readonly organizationsRepository: OrganizationsRepositoryPort,
+    private readonly membership: OrganizationMembershipGateway,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
     @Inject(ACTIVITY_EMITTER) private readonly activityEmitter: ActivityEmitter,
   ) {}
@@ -46,7 +48,7 @@ export class UpdateOrganizationUseCase {
 
     let membership = null;
     if (!isSuperAdmin) {
-      membership = await this.organizationsRepository.findMembership(organizationId, actorUserId);
+      membership = await this.membership.findMembership(organizationId, actorUserId);
 
       if (!membership) {
         throw new AppError(

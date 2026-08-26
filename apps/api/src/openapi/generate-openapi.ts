@@ -28,7 +28,8 @@ const sortKeysDeep = (value: unknown): unknown => {
 
 const generate = async (): Promise<void> => {
   const app = await NestFactory.create(AppModule, {
-    logger: false,
+    logger: ["error", "warn"],
+    abortOnError: false,
   });
 
   app.setGlobalPrefix("api/v1");

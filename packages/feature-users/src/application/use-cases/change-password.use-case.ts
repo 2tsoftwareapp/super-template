@@ -10,11 +10,12 @@ import {
   SYSTEM_SCOPE,
 } from "@repo/api-runtime";
 import { TRANSACTION_PORT } from "@repo/api-runtime";
-import { hashPassword, verifyPassword } from "@repo/feature-auth/contracts";
 import {
-  AUTH_SESSION_REPOSITORY,
-  type AuthSessionRepositoryPort,
-} from "@repo/feature-auth/contracts";
+  AUTH_TOKEN_CLEANUP,
+  type AuthTokenCleanup,
+  hashPassword,
+  verifyPassword,
+} from "@repo/api-runtime";
 
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";
 
@@ -24,7 +25,7 @@ export class ChangePasswordUseCase {
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
     @Inject(USERS_REPOSITORY)
     private readonly usersRepository: UsersRepositoryPort,
-    @Inject(AUTH_SESSION_REPOSITORY) private readonly authRepository: AuthSessionRepositoryPort,
+    @Inject(AUTH_TOKEN_CLEANUP) private readonly authTokenCleanup: AuthTokenCleanup,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
   ) {}
 
@@ -59,7 +60,7 @@ export class ChangePasswordUseCase {
         },
         transaction,
       );
-      await this.authRepository.revokeAllSessionsForUser(actor.userId, transaction);
+      await this.authTokenCleanup.revokeAllSessionsForUser(actor.userId, transaction);
       await this.auditWriter.log(
         {
           actorId: actor.userId,

@@ -6,7 +6,7 @@ const configMock = vi.hoisted(() => ({
       cookieDomain: undefined,
       cookieSameSite: "lax" as const,
       cookieSecure: false,
-      csrfSecret: "test-csrf-secret" as string | null,
+      csrfSecret: "test-csrf-secret",
       requireSignedCsrf: false,
     },
   },

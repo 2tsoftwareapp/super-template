@@ -12,11 +12,8 @@ import {
   SYSTEM_SCOPE,
   TRANSACTION_PORT,
 } from "@repo/api-runtime";
+import { AUTH_TOKEN_CLEANUP, type AuthTokenCleanup } from "@repo/api-runtime";
 import { AccessControlService, ROLE_NAMES } from "@repo/feature-access-control/contracts";
-import {
-  AUTH_SESSION_REPOSITORY,
-  type AuthSessionRepositoryPort,
-} from "@repo/feature-auth/contracts";
 
 import type { UserStatus, UserView } from "../users.types";
 
@@ -32,7 +29,7 @@ export class UpdateUserStatusUseCase {
     private readonly usersRepository: UsersRepositoryPort,
     private readonly accessControlService: AccessControlService,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
-    @Inject(AUTH_SESSION_REPOSITORY) private readonly authRepository: AuthSessionRepositoryPort,
+    @Inject(AUTH_TOKEN_CLEANUP) private readonly authTokenCleanup: AuthTokenCleanup,
     @Inject(ACTIVITY_EMITTER) private readonly activityEmitter: ActivityEmitter,
     private readonly getUserUseCase: GetUserUseCase,
   ) {}
@@ -85,7 +82,7 @@ export class UpdateUserStatusUseCase {
       );
 
       if (status === "BLOCKED") {
-        await this.authRepository.revokeAllSessionsForUser(userId, transaction);
+        await this.authTokenCleanup.revokeAllSessionsForUser(userId, transaction);
       }
 
       await this.auditWriter.log(

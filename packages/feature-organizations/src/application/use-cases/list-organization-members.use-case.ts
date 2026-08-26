@@ -1,19 +1,13 @@
 import type { AuthenticatedRequestUser } from "@repo/api-runtime";
 
-import { HttpStatus, Inject, Injectable } from "@nestjs/common";
+import { HttpStatus, Injectable } from "@nestjs/common";
 import { AppError, ERROR_CODES, ROLE_NAMES } from "@repo/api-runtime";
 
-import {
-  ORGANIZATIONS_REPOSITORY,
-  type OrganizationsRepositoryPort,
-} from "../ports/organizations.repository.port";
+import { OrganizationMembershipGateway } from "../../infrastructure/organization-membership.gateway";
 
 @Injectable()
 export class ListOrganizationMembersUseCase {
-  constructor(
-    @Inject(ORGANIZATIONS_REPOSITORY)
-    private readonly organizationsRepository: OrganizationsRepositoryPort,
-  ) {}
+  constructor(private readonly membership: OrganizationMembershipGateway) {}
 
   async execute(organizationId: string, actor: string | AuthenticatedRequestUser) {
     const { userId: actorUserId, isSuperAdmin } =
@@ -25,10 +19,7 @@ export class ListOrganizationMembersUseCase {
           };
 
     if (!isSuperAdmin) {
-      const membership = await this.organizationsRepository.findMembership(
-        organizationId,
-        actorUserId,
-      );
+      const membership = await this.membership.findMembership(organizationId, actorUserId);
 
       if (!membership) {
         throw new AppError(
@@ -39,7 +30,7 @@ export class ListOrganizationMembersUseCase {
       }
     }
 
-    const members = await this.organizationsRepository.listMembers(organizationId);
+    const members = await this.membership.listMembers(organizationId);
 
     return members.map((member) => ({
       userId: member.userId,

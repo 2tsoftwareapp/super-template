@@ -7,5 +7,8 @@ export const activitiesFeature: FeatureManifest = defineFeature({
   id: "activities",
   dependsOn: [],
   nestModule: ActivitiesModule,
+  resourceScopes: {
+    activities: "organization",
+  },
   schema: { activities, activityVisibilityEnum },
 });

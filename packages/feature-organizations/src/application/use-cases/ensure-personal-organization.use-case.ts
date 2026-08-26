@@ -4,6 +4,7 @@ import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { AppError, ERROR_CODES } from "@repo/api-runtime";
 import { AccessControlService } from "@repo/feature-access-control/contracts";
 
+import { OrganizationMembershipGateway } from "../../infrastructure/organization-membership.gateway";
 import {
   ORGANIZATIONS_REPOSITORY,
   type OrganizationsRepositoryPort,
@@ -22,11 +23,12 @@ export class EnsurePersonalOrganizationUseCase {
   constructor(
     @Inject(ORGANIZATIONS_REPOSITORY)
     private readonly organizationsRepository: OrganizationsRepositoryPort,
+    private readonly membership: OrganizationMembershipGateway,
     private readonly accessControlService: AccessControlService,
   ) {}
 
   async execute(userId: string, displayName: string, executor?: TransactionExecutor) {
-    const existing = await this.organizationsRepository.findPrimaryOrganizationId(userId, executor);
+    const existing = await this.membership.findPrimaryOrganizationId(userId, executor);
 
     if (existing) {
       return existing;
@@ -49,7 +51,7 @@ export class EnsurePersonalOrganizationUseCase {
       );
     }
 
-    await this.organizationsRepository.addMember(
+    await this.membership.addMember(
       {
         organizationId: organization.id,
         userId,

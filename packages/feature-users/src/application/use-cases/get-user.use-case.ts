@@ -1,7 +1,13 @@
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, type AuthenticatedRequestUser, ERROR_CODES, ROLE_NAMES } from "@repo/api-runtime";
+import {
+  AppError,
+  type AuthenticatedRequestUser,
+  ERROR_CODES,
+  ORGANIZATION_MEMBERSHIP,
+  type OrganizationMembership,
+  ROLE_NAMES,
+} from "@repo/api-runtime";
 import { AccessControlService } from "@repo/feature-access-control/contracts";
-import { ORGANIZATIONS_REPOSITORY, type OrganizationsRepositoryPort } from "@repo/feature-organizations/contracts";
 
 import type { UserView } from "../users.types";
 
@@ -15,8 +21,8 @@ export class GetUserUseCase {
     @Inject(USERS_REPOSITORY)
     private readonly usersRepository: UsersRepositoryPort,
     private readonly accessControlService: AccessControlService,
-    @Inject(ORGANIZATIONS_REPOSITORY)
-    private readonly organizationsRepository: OrganizationsRepositoryPort,
+    @Inject(ORGANIZATION_MEMBERSHIP)
+    private readonly membership: OrganizationMembership,
     private readonly usersMapper: UsersMapper,
   ) {}
 
@@ -48,7 +54,7 @@ export class GetUserUseCase {
       this.accessControlService.getAccessProfile(userId, organizationId),
       this.accessControlService.getRoleIdsForUser(userId, organizationId),
       this.accessControlService.getRoleAssignmentsForUser(userId, organizationId),
-      this.organizationsRepository.listForUser(userId),
+      this.membership.listForUser(userId),
     ]);
 
     const visibleMemberOrganizationIds =

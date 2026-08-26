@@ -2,8 +2,9 @@ import type { AuthenticatedRequestUser } from "@repo/api-runtime";
 
 import { describe, expect, it, vi } from "vitest";
 
-import type { OrganizationsRepositoryPort } from "@repo/feature-organizations/contracts";
-import { GetUserUseCase, UsersMapper } from "@repo/feature-users/contracts";
+import type { OrganizationMembership } from "@repo/api-runtime";
+import { UsersMapper } from "../../users.mapper";
+import { GetUserUseCase } from "../get-user.use-case";
 
 const userRecord = {
   id: "user-1",
@@ -38,7 +39,7 @@ function makeUseCase() {
       ]),
     ),
   };
-  const organizationsRepository = {
+  const membership = {
     listForUser: vi.fn(() =>
       Promise.resolve([
         {
@@ -67,7 +68,7 @@ function makeUseCase() {
     useCase: new GetUserUseCase(
       usersRepository as never,
       accessControlService as never,
-      organizationsRepository as unknown as OrganizationsRepositoryPort,
+      membership as unknown as OrganizationMembership,
       new UsersMapper(),
     ),
   };

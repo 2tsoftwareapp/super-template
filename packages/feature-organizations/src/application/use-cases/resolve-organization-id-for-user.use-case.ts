@@ -1,19 +1,15 @@
 import type { TransactionExecutor } from "@repo/api-runtime";
 
-import { HttpStatus, Inject, Injectable } from "@nestjs/common";
+import { HttpStatus, Injectable } from "@nestjs/common";
 import { AppError, ERROR_CODES } from "@repo/api-runtime";
 
-import {
-  ORGANIZATIONS_REPOSITORY,
-  type OrganizationsRepositoryPort,
-} from "../ports/organizations.repository.port";
+import { OrganizationMembershipGateway } from "../../infrastructure/organization-membership.gateway";
 import { AssertOrganizationMembershipUseCase } from "./assert-organization-membership.use-case";
 
 @Injectable()
 export class ResolveOrganizationIdForUserUseCase {
   constructor(
-    @Inject(ORGANIZATIONS_REPOSITORY)
-    private readonly organizationsRepository: OrganizationsRepositoryPort,
+    private readonly membership: OrganizationMembershipGateway,
     private readonly assertOrganizationMembershipUseCase: AssertOrganizationMembershipUseCase,
   ) {}
 
@@ -27,7 +23,7 @@ export class ResolveOrganizationIdForUserUseCase {
       }
     }
 
-    const primary = await this.organizationsRepository.findPrimaryOrganizationId(userId, executor);
+    const primary = await this.membership.findPrimaryOrganizationId(userId, executor);
 
     if (!primary) {
       throw new AppError(

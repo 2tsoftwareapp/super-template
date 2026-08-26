@@ -29,7 +29,8 @@
     "drizzle-orm": "0.45.2",
     "zod": "4.4.3",
     "express": "5.2.1",
-    "@nestjs/throttler": "6.5.0"
+    "@nestjs/throttler": "6.5.0",
+    "@repo/feature-users": "workspace:*"
   },
   "devDependencies": {
     "@repo/tsconfig": "workspace:*",

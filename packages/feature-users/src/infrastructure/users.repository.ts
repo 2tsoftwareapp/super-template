@@ -2,14 +2,13 @@ import type { DatabaseClient, DatabaseExecutor } from "@repo/database-runtime";
 
 import { Inject, Injectable } from "@nestjs/common";
 import { DATABASE } from "@repo/database-runtime";
-import { roles, userRoles } from "@repo/feature-access-control/schema";
-import { organizationMembers } from "@repo/feature-organizations/schema";
+import { roles } from "@repo/feature-access-control/schema";
 import { and, asc, count, desc, eq, inArray, isNull, or, sql } from "drizzle-orm";
 
 import type { UsersRepositoryPort } from "../application/ports/users.repository.port";
 import type { UserSortCriterion } from "../application/user-sort";
 
-import { users } from "./persistence";
+import { organizationMembers, userRoles, users } from "./persistence";
 
 interface ListUsersParams {
   page: number;

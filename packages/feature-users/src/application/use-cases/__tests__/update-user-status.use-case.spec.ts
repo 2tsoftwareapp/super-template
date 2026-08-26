@@ -35,7 +35,8 @@ function buildDependencies(
   };
 
   const auditWriter = { log: vi.fn(async () => undefined) };
-  const authSessionRepository = {
+  const authTokenCleanup = {
+    cleanupExpiredTokens: vi.fn(async () => undefined),
     revokeAllSessionsForUser: vi.fn(async () => undefined),
   };
   const activityEmitter = { emit: vi.fn(async () => undefined) };
@@ -57,7 +58,7 @@ function buildDependencies(
     usersRepository as never,
     accessControlService as never,
     auditWriter as never,
-    authSessionRepository as never,
+    authTokenCleanup as never,
     activityEmitter as never,
     getUserUseCase as never,
   );
@@ -67,7 +68,7 @@ function buildDependencies(
     usersRepository,
     accessControlService,
     auditWriter,
-    authSessionRepository,
+    authTokenCleanup,
     activityEmitter,
   };
 }
@@ -92,11 +93,11 @@ describe("UpdateUserStatusUseCase", () => {
   });
 
   it("revokes all sessions and writes an audit log when blocking", async () => {
-    const { useCase, auditWriter, authSessionRepository, activityEmitter } = buildDependencies();
+    const { useCase, auditWriter, authTokenCleanup, activityEmitter } = buildDependencies();
 
     await useCase.execute(actor as never, "user-1", "BLOCKED");
 
-    expect(authSessionRepository.revokeAllSessionsForUser).toHaveBeenCalledWith("user-1", null);
+    expect(authTokenCleanup.revokeAllSessionsForUser).toHaveBeenCalledWith("user-1", null);
     expect(auditWriter.log).toHaveBeenCalledWith(
       expect.objectContaining({ action: "user.blocked", entityId: "user-1" }),
       null,

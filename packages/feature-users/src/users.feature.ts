@@ -1,11 +1,28 @@
 import { defineFeature, type FeatureManifest } from "@repo/api-plugin-kit";
 
-import { users, userStatusEnum } from "./infrastructure/persistence";
+import {
+  organizationMemberRoleEnum,
+  organizationMembers,
+  userRoles,
+  users,
+  userStatusEnum,
+} from "./infrastructure/persistence";
+import { usersSeeders } from "./seed";
 import { UsersModule } from "./users.module";
 
 export const usersFeature: FeatureManifest = defineFeature({
   id: "users",
-  dependsOn: ["access-control", "organizations"],
+  dependsOn: ["access-control", "organizations", "settings"],
   nestModule: UsersModule,
-  schema: { users, userStatusEnum },
+  resourceScopes: {
+    users: "organization",
+  },
+  schema: {
+    users,
+    userStatusEnum,
+    organizationMembers,
+    organizationMemberRoleEnum,
+    userRoles,
+  },
+  seeders: usersSeeders,
 });

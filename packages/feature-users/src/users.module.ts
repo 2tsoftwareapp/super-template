@@ -1,7 +1,11 @@
 import { Global, Module } from "@nestjs/common";
-import { AUTH_USER_STORE, USER_LOOKUP } from "@repo/api-runtime";
+import {
+  AUTH_USER_STORE,
+  ORGANIZATION_MEMBERSHIP,
+  USER_LOOKUP,
+  USER_ROLE_ASSIGNMENTS,
+} from "@repo/api-runtime";
 import { AccessControlModule } from "@repo/feature-access-control/contracts";
-import { AuthDataModule } from "@repo/feature-auth/contracts";
 import { OrganizationsModule } from "@repo/feature-organizations/contracts";
 
 import { USERS_REPOSITORY } from "./application/ports/users.repository.port";
@@ -15,16 +19,22 @@ import { UpdateAdminUserUseCase } from "./application/use-cases/update-admin-use
 import { UpdateProfileUseCase } from "./application/use-cases/update-profile.use-case";
 import { UpdateUserStatusUseCase } from "./application/use-cases/update-user-status.use-case";
 import { UsersMapper } from "./application/users.mapper";
+import { LazyPortRegistrarService } from "./infrastructure/lazy-port-registrar.service";
+import { OrganizationMembersRepository } from "./infrastructure/organization-members.repository";
+import { UserRoleAssignmentsPersistence } from "./infrastructure/user-role-assignments.persistence";
 import { UsersRepository } from "./infrastructure/users.repository";
 import { AdminUsersController } from "./presentation/admin-users.controller";
 import { UsersController } from "./presentation/users.controller";
 
 @Global()
 @Module({
-  imports: [AccessControlModule, AuthDataModule, OrganizationsModule],
+  imports: [AccessControlModule, OrganizationsModule],
   controllers: [AdminUsersController, UsersController],
   providers: [
     UsersRepository,
+    OrganizationMembersRepository,
+    UserRoleAssignmentsPersistence,
+    LazyPortRegistrarService,
     UsersMapper,
     GetUserUseCase,
     UpdateProfileUseCase,
@@ -47,7 +57,21 @@ import { UsersController } from "./presentation/users.controller";
       provide: AUTH_USER_STORE,
       useExisting: UsersRepository,
     },
+    {
+      provide: ORGANIZATION_MEMBERSHIP,
+      useExisting: OrganizationMembersRepository,
+    },
+    {
+      provide: USER_ROLE_ASSIGNMENTS,
+      useExisting: UserRoleAssignmentsPersistence,
+    },
   ],
-  exports: [USER_LOOKUP, USERS_REPOSITORY, AUTH_USER_STORE],
+  exports: [
+    USER_LOOKUP,
+    USERS_REPOSITORY,
+    AUTH_USER_STORE,
+    ORGANIZATION_MEMBERSHIP,
+    USER_ROLE_ASSIGNMENTS,
+  ],
 })
 export class UsersModule {}
