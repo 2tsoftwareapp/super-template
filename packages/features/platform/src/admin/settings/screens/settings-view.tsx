@@ -1,7 +1,6 @@
 "use client";
 
-import { useSettingsController } from "@/features/settings/controllers/use-settings-controller";
-
+import { useSettingsController } from "../controllers/use-settings-controller";
 import { SettingsListView } from "../ui/settings-list-view";
 
 /**

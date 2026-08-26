@@ -9,5 +9,5 @@
     "moduleResolution": "Bundler",
     "plugins": []
   },
-  "include": ["src/admin/**/*.ts"]
+  "include": ["src/admin/**/*.ts", "src/admin/**/*.tsx"]
 }

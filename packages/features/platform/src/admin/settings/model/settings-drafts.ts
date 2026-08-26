@@ -1,4 +1,4 @@
-import type { ApplicationSettingDto } from "@/lib/api-types";
+import type { ApplicationSettingDto } from "@repo/web-utils/api-types";
 
 type SettingValue = ApplicationSettingDto["value"];
 

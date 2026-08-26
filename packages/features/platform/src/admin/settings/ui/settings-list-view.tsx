@@ -4,18 +4,15 @@ import { Button } from "@repo/web-ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/web-ui/card";
 import { ErrorState } from "@repo/web-ui/error-state";
 import { SectionLoading } from "@repo/web-ui/loading";
+import { ResourceEmpty } from "@repo/web-ui/resource-empty";
+import { ResourcePageShell } from "@repo/web-ui/resource-page-shell";
+import { ResourceToolbar } from "@repo/web-ui/resource-toolbar";
 import { RefreshCcw, Settings } from "lucide-react";
 
-import type { SettingsViewModel } from "@/features/settings/model/settings.types";
-
-import { ResourceEmpty } from "@/components/resource-empty";
-import { ResourcePageShell } from "@/components/resource-page-shell";
-import { ResourceToolbar } from "@/components/resource-toolbar";
-import { adminResources } from "@/lib/admin-resources";
+import { settingsAdminResource } from "../../resources";
+import type { SettingsViewModel } from "../model/settings.types";
 
 import { SettingCard } from "./setting-card";
-
-const settingsResource = adminResources.find((r) => r.id === "settings")!;
 
 /**
  * Presentational settings view. Receives a fully-resolved view model from the
@@ -38,7 +35,7 @@ export function SettingsListView({
 }: SettingsViewModel) {
   return (
     <ResourcePageShell
-      resource={settingsResource}
+      resource={settingsAdminResource}
       description="View and update application settings."
       isRefreshing={isRefreshing}
       onRefresh={onRefresh}

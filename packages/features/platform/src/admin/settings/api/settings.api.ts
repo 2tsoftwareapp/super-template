@@ -1,8 +1,6 @@
 import { bffPath } from "@repo/api-contract";
-
-import type { ApplicationSettingDto, ListResponse } from "@/lib/api-types";
-
-import { webFetch } from "@/lib/http";
+import type { ApplicationSettingDto, ListResponse } from "@repo/web-utils/api-types";
+import { webFetch } from "@repo/web-utils/http";
 
 export const settingsApi = {
   list() {

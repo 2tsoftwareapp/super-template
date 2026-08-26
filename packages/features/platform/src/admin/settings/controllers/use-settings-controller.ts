@@ -1,21 +1,24 @@
 "use client";
 
-import { useDebouncedValue } from "@repo/web-hooks/use-debounced-value";
+import { adminSessionQueryKey } from "@repo/web-hooks/admin-session-query-key";
+import { useDebouncedUrlSearch } from "@repo/web-hooks/use-debounced-url-search";
+import { createUseSession } from "@repo/web-hooks/use-session-factory";
 import { classifyError, getErrorMessage } from "@repo/web-utils/errors";
 import { useQueryClient } from "@tanstack/react-query";
-import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
-import type { SettingsViewModel, SettingValue } from "@/features/settings/model/settings.types";
+import type { SettingsViewModel, SettingValue } from "../model/settings.types";
 
-import { useUpdateSettingMutation } from "@/features/settings/api/settings.mutations";
-import { useSettingsQuery } from "@/features/settings/api/settings.queries";
-import { settingsKeys } from "@/features/settings/api/settings.query-keys";
-import { selectSettingsPermissions } from "@/features/settings/model/settings.permissions";
-import { parseSettingsSearchParams } from "@/features/settings/model/settings.search-params";
-import { useSession } from "@/hooks/use-session";
-import { usePathname, useRouter } from "@/i18n/navigation";
+import { useUpdateSettingMutation } from "../api/settings.mutations";
+import { useSettingsQuery } from "../api/settings.queries";
+import { settingsKeys } from "../api/settings.query-keys";
+import { selectSettingsPermissions } from "../model/settings.permissions";
+
+const useAdminSession = createUseSession({
+  queryKey: adminSessionQueryKey,
+});
 
 export type { SettingsViewModel };
 
@@ -35,40 +38,19 @@ export function useSettingsController(): SettingsViewModel {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const session = useSession();
+  const session = useAdminSession();
   const { canRead, canUpdate } = selectSettingsPermissions(session.data?.data?.permissions);
 
-  const { q: urlSearch } = parseSettingsSearchParams(new URLSearchParams(searchParams.toString()));
+  const { value: search, debouncedValue: debouncedSearch, setValue: setSearchInput } =
+    useDebouncedUrlSearch({
+      searchParams,
+      pathname,
+      replace: router.replace,
+      paramName: "q",
+    });
 
   const settings = useSettingsQuery();
-
-  const [searchInput, setSearchInput] = useState(urlSearch);
-  const debouncedSearch = useDebouncedValue(searchInput, 300);
-  const lastUrlSearchRef = useRef(urlSearch);
-  const syncingFromUrlRef = useRef(false);
   const [savingKey, setSavingKey] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (lastUrlSearchRef.current === urlSearch) return;
-    lastUrlSearchRef.current = urlSearch;
-    syncingFromUrlRef.current = true;
-    setSearchInput(urlSearch);
-  }, [urlSearch]);
-
-  useEffect(() => {
-    if (syncingFromUrlRef.current) {
-      if (debouncedSearch === urlSearch) syncingFromUrlRef.current = false;
-      return;
-    }
-    if (debouncedSearch !== searchInput || debouncedSearch === urlSearch) return;
-
-    const next = new URLSearchParams(searchParams.toString());
-    if (debouncedSearch) next.set("q", debouncedSearch);
-    else next.delete("q");
-
-    const queryString = next.toString();
-    router.replace(queryString ? `${pathname}?${queryString}` : pathname);
-  }, [debouncedSearch, pathname, router, searchInput, searchParams, urlSearch]);
 
   const filtered = useMemo(() => {
     const all = settings.data?.data ?? [];
@@ -102,7 +84,7 @@ export function useSettingsController(): SettingsViewModel {
   return {
     canRead,
     canUpdate,
-    search: debouncedSearch,
+    search,
     onSearchChange: setSearchInput,
     isLoading: settings.isLoading,
     isRefreshing: settings.isFetching,

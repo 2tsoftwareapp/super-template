@@ -2,7 +2,7 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import type { ApplicationSettingDto } from "@/lib/api-types";
+import type { ApplicationSettingDto } from "@repo/web-utils/api-types";
 
 import { settingsApi } from "./settings.api";
 import { settingsKeys } from "./settings.query-keys";

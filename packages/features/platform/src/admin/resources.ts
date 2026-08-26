@@ -7,6 +7,17 @@ import { File, Mail, Megaphone, Settings, Shield, Ticket, Workflow } from "lucid
  * admin app; dropping `@repo/feature-platform` removes these operations/system
  * routes from the shell.
  */
+export const settingsAdminResource: AdminResourceConfig<LucideIcon> = {
+  id: "settings",
+  label: "Settings",
+  group: "System",
+  path: "/settings",
+  icon: Settings,
+  features: ["list", "edit"],
+  permissions: ["settings.read"],
+  queryKey: "admin-settings",
+};
+
 export const platformAdminResources: readonly AdminResourceConfig<LucideIcon>[] = [
   {
     id: "audit-logs",
@@ -68,14 +79,5 @@ export const platformAdminResources: readonly AdminResourceConfig<LucideIcon>[] 
     permissions: ["imports.read"],
     queryKey: "admin-imports",
   },
-  {
-    id: "settings",
-    label: "Settings",
-    group: "System",
-    path: "/settings",
-    icon: Settings,
-    features: ["list", "edit"],
-    permissions: ["settings.read"],
-    queryKey: "admin-settings",
-  },
+  settingsAdminResource,
 ];

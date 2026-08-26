@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 interface UseDebouncedUrlSearchOptions {
   /** Current URL search params (from useSearchParams). */
-  searchParams: URLSearchParams;
+  searchParams: Pick<URLSearchParams, "get" | "toString">;
   /** Current pathname (from usePathname). */
   pathname: string;
   /** Router.replace function (from useRouter). */

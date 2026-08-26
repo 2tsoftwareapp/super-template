@@ -49,6 +49,7 @@ export default defineConfig([
     "packages/features/**/src/web/**",
     "packages/features/**/src/admin/**",
     "packages/features/**/vitest.web.config.ts",
+    "packages/features/**/vitest.admin.config.ts",
     "apps/api/vitest.config.ts",
     "apps/api/webpack.config.js",
     "packages/web-ui/vitest.config.ts",

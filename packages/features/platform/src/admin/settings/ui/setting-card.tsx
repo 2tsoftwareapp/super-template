@@ -9,16 +9,17 @@ import { LoadingButton } from "@repo/web-ui/loading-button";
 import { RotateCcw } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 
-import type { SettingValue } from "@/features/settings/model/settings.types";
-import type { ApplicationSettingDto } from "@/lib/api-types";
+import type { ApplicationSettingDto } from "@repo/web-utils/api-types";
 
-import { displayValue, initDraft, isObjectValue } from "@/features/settings/model/settings-drafts";
+import type { SettingValue } from "../model/settings.types";
+
+import { displayValue, initDraft, isObjectValue } from "../model/settings-drafts";
 import {
   type SettingObjectInput,
   settingObjectInputSchema,
   type SettingScalarInput,
   settingScalarInputSchema,
-} from "@/features/settings/model/settings.schemas";
+} from "../model/settings.schemas";
 
 function ScalarSettingCard({
   setting,
