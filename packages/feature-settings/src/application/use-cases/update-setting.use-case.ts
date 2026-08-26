@@ -1,9 +1,15 @@
 import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, ERROR_CODES, ROLE_NAMES, SYSTEM_SCOPE } from "@repo/api-runtime";
+import {
+  AppError,
+  AUDIT_WRITER,
+  type AuditWriter,
+  ERROR_CODES,
+  ROLE_NAMES,
+  SYSTEM_SCOPE,
+} from "@repo/api-runtime";
 import { PLATFORM_TRANSACTION_PORT, type PlatformTransactionPort } from "@repo/api-runtime";
-import { AuditService } from "@repo/feature-audit/contracts";
 
 import type { UpdateSettingCommand } from "../settings.types";
 
@@ -18,7 +24,8 @@ import { SettingsMapper } from "../settings.mapper";
 export class UpdateSettingUseCase {
   constructor(
     @Inject(SETTINGS_REPOSITORY) private readonly settingsRepository: SettingsRepositoryPort,
-    private readonly auditService: AuditService,
+    @Inject(AUDIT_WRITER)
+    private readonly auditWriter: AuditWriter,
     @Inject(PLATFORM_TRANSACTION_PORT)
     private readonly platformTransactionPort: PlatformTransactionPort,
     private readonly settingsLookup: ApplicationSettingsLookupService,
@@ -49,7 +56,7 @@ export class UpdateSettingUseCase {
         );
       }
 
-      await this.auditService.log(
+      await this.auditWriter.log(
         {
           actorId: actor.userId,
           action: "settings.updated",

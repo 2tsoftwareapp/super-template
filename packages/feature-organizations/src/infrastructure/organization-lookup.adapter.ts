@@ -1,23 +1,25 @@
+import type { TransactionExecutor } from "@repo/api-runtime";
+
+import { Inject, Injectable } from "@nestjs/common";
+
 import type {
   OrganizationLookup,
   OrganizationMemberRole,
-  TransactionExecutor,
-} from "@repo/api-runtime";
-
-import { Inject, Injectable } from "@nestjs/common";
+} from "../public/organization-lookup.port";
 
 import {
   ORGANIZATIONS_REPOSITORY,
   type OrganizationsRepositoryPort,
 } from "../application/ports/organizations.repository.port";
-import { OrganizationMembershipGateway } from "./organization-membership.gateway";
+import { ORGANIZATION_MEMBERSHIP, type OrganizationMembership } from "../public/contracts";
 
 @Injectable()
 export class OrganizationLookupAdapter implements OrganizationLookup {
   constructor(
     @Inject(ORGANIZATIONS_REPOSITORY)
     private readonly organizationsRepository: OrganizationsRepositoryPort,
-    private readonly membership: OrganizationMembershipGateway,
+    @Inject(ORGANIZATION_MEMBERSHIP)
+    private readonly membership: OrganizationMembership,
   ) {}
 
   findPrimaryOrganizationId(userId: string, executor?: TransactionExecutor) {

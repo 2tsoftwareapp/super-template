@@ -2,34 +2,31 @@ import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime
 import type { TransactionPort } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {
-  ACTIVITY_EMITTER,
-  type ActivityEmitter,
-  AppError,
-  AUDIT_WRITER,
-  type AuditWriter,
-  ERROR_CODES,
-  ROLE_NAMES,
-  SYSTEM_SCOPE,
-  TRANSACTION_PORT,
-} from "@repo/api-runtime";
-import { AccessControlService } from "@repo/feature-access-control/contracts";
+import { AppError, AUDIT_WRITER, type AuditWriter, ERROR_CODES, ROLE_NAMES, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
+import { ACTIVITY_EMITTER, type ActivityEmitter } from "@repo/feature-activities/contracts";
 
 import {
   assertCanManageTargetRole,
   assertNotLastOwner,
   assertOrganizationRole,
 } from "../../domain/organization-access.policy";
-import { OrganizationMembershipGateway } from "../../infrastructure/organization-membership.gateway";
+import { ORGANIZATION_MEMBERSHIP, type OrganizationMembership } from "../../public/contracts";
+import {
+  ORGANIZATION_ACCESS_CONTROL,
+  type OrganizationAccessControlPort,
+} from "../../public/contracts";
 
 @Injectable()
+
 export class RemoveOrganizationMemberUseCase {
   constructor(
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
-    private readonly membership: OrganizationMembershipGateway,
+    @Inject(ORGANIZATION_MEMBERSHIP)
+    private readonly membership: OrganizationMembership,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
     @Inject(ACTIVITY_EMITTER) private readonly activityEmitter: ActivityEmitter,
-    private readonly accessControlService: AccessControlService,
+    @Inject(ORGANIZATION_ACCESS_CONTROL)
+    private readonly accessControl: OrganizationAccessControlPort,
   ) {}
 
   async execute(
@@ -121,7 +118,7 @@ export class RemoveOrganizationMemberUseCase {
       }
 
       // Cleanup user roles scoped to organization
-      await this.accessControlService.replaceUserRoles(
+      await this.accessControl.replaceUserRoles(
         targetUserId,
         [],
         organizationId,
@@ -129,7 +126,7 @@ export class RemoveOrganizationMemberUseCase {
       );
 
       // Invalidate access profile cache
-      await this.accessControlService.invalidateAccessProfile(targetUserId);
+      await this.accessControl.invalidateAccessProfile(targetUserId);
 
       await this.auditWriter.log(
         {

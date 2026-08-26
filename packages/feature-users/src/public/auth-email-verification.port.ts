@@ -1,9 +1,9 @@
-import type { TransactionExecutor } from "../types/transaction-executor";
+import type { TransactionExecutor } from "@repo/api-kernel";
 
 export interface AuthEmailVerification {
   /**
    * Persist a verification token and enqueue the verify-email outbox message.
-   * Implemented by feature-auth; consumed by feature-users without AuthDataModule.
+   * Consumer-owned by feature-users; implemented and bound by feature-auth.
    */
   issueVerificationEmail(
     input: {

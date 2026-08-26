@@ -1,7 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { type AuthenticatedRequestUser, ROLE_NAMES } from "@repo/api-runtime";
 
-import { OrganizationMembershipGateway } from "../../infrastructure/organization-membership.gateway";
+import { ORGANIZATION_MEMBERSHIP, type OrganizationMembership } from "../../public/contracts";
 import {
   ORGANIZATIONS_REPOSITORY,
   type OrganizationsRepositoryPort,
@@ -12,7 +12,8 @@ export class ListOrganizationsForUserUseCase {
   constructor(
     @Inject(ORGANIZATIONS_REPOSITORY)
     private readonly organizationsRepository: OrganizationsRepositoryPort,
-    private readonly membership: OrganizationMembershipGateway,
+    @Inject(ORGANIZATION_MEMBERSHIP)
+    private readonly membership: OrganizationMembership,
   ) {}
 
   async execute(user: AuthenticatedRequestUser, memberOnly = false) {

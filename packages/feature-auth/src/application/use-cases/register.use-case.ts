@@ -2,24 +2,11 @@ import type { RequestContext } from "@repo/api-runtime";
 import type { TransactionPort } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {
-  AppError,
-  APPLICATION_SETTINGS_LOOKUP,
-  type ApplicationSettingsLookup,
-  AUDIT_WRITER,
-  type AuditWriter,
-  durationToMilliseconds,
-  ERROR_CODES,
-  normalizeEmail,
-  SYSTEM_SCOPE,
-  TRANSACTION_PORT,
-} from "@repo/api-runtime";
-import {
-  AUTH_USER_STORE,
-  type AuthUserStore,
-} from "@repo/api-runtime";
+import { AppError, AUDIT_WRITER, type AuditWriter, durationToMilliseconds, ERROR_CODES, normalizeEmail, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
 import { AccessControlService } from "@repo/feature-access-control/contracts";
+import { AUTH_USER_STORE, type AuthUserStore } from "@repo/feature-auth/contracts";
 import { OrganizationsService } from "@repo/feature-organizations/contracts";
+import { APPLICATION_SETTINGS_LOOKUP, type ApplicationSettingsLookup } from "@repo/feature-settings/contracts";
 
 import type { RegisterCommand } from "../auth.types";
 

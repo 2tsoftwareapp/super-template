@@ -1,16 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common";
-import {
-  ACTIVITY_EMITTER,
-  type ActivityEmitter,
-  isJsonObject,
-  redactSensitive,
-  tenantContextForJob,
-  TenantContextService,
-  TRANSACTION_PORT,
-  type TransactionExecutor,
-  type TransactionPort,
-  WORKER_DISPATCH_CONTEXT,
-} from "@repo/api-runtime";
+import { isJsonObject, redactSensitive, tenantContextForJob, TenantContextService, TRANSACTION_PORT, type TransactionExecutor, type TransactionPort, WORKER_DISPATCH_CONTEXT } from "@repo/api-runtime";
+import { ACTIVITY_EMITTER, type ActivityEmitter } from "@repo/feature-activities/contracts";
 
 import { HANDLER_TIMEOUT_MS, resolveFailureOutcome } from "../../domain/job-lifecycle";
 import {

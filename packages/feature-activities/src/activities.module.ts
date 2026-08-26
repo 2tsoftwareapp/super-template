@@ -1,5 +1,5 @@
 import { Global, Module } from "@nestjs/common";
-import { ACTIVITY_EMITTER } from "@repo/api-runtime";
+import { ACTIVITY_EMITTER } from "@repo/feature-activities/contracts";
 
 import { ActivitiesService } from "./application/activities.service";
 import { ACTIVITIES_REPOSITORY } from "./application/ports/activities.repository.port";

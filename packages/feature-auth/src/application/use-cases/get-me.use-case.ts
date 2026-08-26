@@ -2,10 +2,7 @@ import type { AuthenticatedRequestUser } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { AppError, ERROR_CODES } from "@repo/api-runtime";
-import {
-  AUTH_USER_STORE,
-  type AuthUserStore,
-} from "@repo/api-runtime";
+import { AUTH_USER_STORE, type AuthUserStore } from "@repo/feature-auth/contracts";
 
 import { AuthMapper } from "../auth.mapper";
 

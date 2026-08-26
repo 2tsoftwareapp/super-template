@@ -9,7 +9,7 @@ import {
 
 export const importExportFeature: FeatureManifest = defineFeature({
   id: "import-export",
-  dependsOn: ["upload", "audit", "users", "organizations", "access-control"],
+  dependsOn: ["upload", "users", "organizations", "access-control", "activities"],
   nestModule: ImportExportFeatureModule,
   resourceScopes: {
     imports: "organization",

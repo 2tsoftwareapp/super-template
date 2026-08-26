@@ -1,25 +1,28 @@
-import type { UserRoleAssignments } from "@repo/api-runtime";
 import type { DatabaseExecutor } from "@repo/database-runtime";
 
 import { Inject, Injectable } from "@nestjs/common";
-import { resolveLazyPort, USER_ROLE_ASSIGNMENTS } from "@repo/api-runtime";
 import { DATABASE, type DatabaseClient } from "@repo/database-runtime";
-import { roles } from "@repo/feature-access-control/schema";
 import { and, asc, eq, isNull } from "drizzle-orm";
 
 import type { OrganizationsRepositoryPort } from "../application/ports/organizations.repository.port";
 
+import {
+  ORGANIZATION_CUSTOM_ROLES_PURGE,
+  ORGANIZATION_USER_ROLES_PURGE,
+  type OrganizationCustomRolesPurgePort,
+  type OrganizationUserRolePurgePort,
+} from "../public/contracts";
 import { organizations } from "./persistence";
 
 @Injectable()
 export class OrganizationsRepository implements OrganizationsRepositoryPort {
   constructor(
     @Inject(DATABASE) private readonly database: DatabaseClient,
+    @Inject(ORGANIZATION_USER_ROLES_PURGE)
+    private readonly userRolesPurge: OrganizationUserRolePurgePort,
+    @Inject(ORGANIZATION_CUSTOM_ROLES_PURGE)
+    private readonly customRolesPurge: OrganizationCustomRolesPurgePort,
   ) {}
-
-  private userRoleAssignments(): UserRoleAssignments {
-    return resolveLazyPort<UserRoleAssignments>(USER_ROLE_ASSIGNMENTS);
-  }
 
   async createOrganization(
     values: typeof organizations.$inferInsert,
@@ -81,7 +84,7 @@ export class OrganizationsRepository implements OrganizationsRepositoryPort {
     organizationId: string,
     executor: DatabaseExecutor = this.database,
   ): Promise<void> {
-    await this.userRoleAssignments().deleteByOrganizationId(organizationId, executor);
-    await executor.delete(roles).where(eq(roles.organizationId, organizationId));
+    await this.userRolesPurge.deleteByOrganizationId(organizationId, executor);
+    await this.customRolesPurge.deleteByOrganizationId(organizationId, executor);
   }
 }

@@ -1,6 +1,4 @@
 import { Global, Module } from "@nestjs/common";
-import { ORGANIZATION_LOOKUP } from "@repo/api-runtime";
-import { AccessControlModule } from "@repo/feature-access-control/contracts";
 
 import { OrganizationsService } from "./application/organizations.service";
 import { ORGANIZATIONS_REPOSITORY } from "./application/ports/organizations.repository.port";
@@ -17,13 +15,12 @@ import { ResolveOrganizationIdForUserUseCase } from "./application/use-cases/res
 import { UpdateMemberRoleUseCase } from "./application/use-cases/update-member-role.use-case";
 import { UpdateOrganizationUseCase } from "./application/use-cases/update-organization.use-case";
 import { OrganizationLookupAdapter } from "./infrastructure/organization-lookup.adapter";
-import { OrganizationMembershipGateway } from "./infrastructure/organization-membership.gateway";
 import { OrganizationsRepository } from "./infrastructure/organizations.repository";
 import { OrganizationsController } from "./presentation/organizations.controller";
+import { ORGANIZATION_LOOKUP } from "./public/organization-lookup.port";
 
 @Global()
 @Module({
-  imports: [AccessControlModule],
   controllers: [OrganizationsController],
   providers: [
     OrganizationsRepository,
@@ -31,7 +28,6 @@ import { OrganizationsController } from "./presentation/organizations.controller
       provide: ORGANIZATIONS_REPOSITORY,
       useExisting: OrganizationsRepository,
     },
-    OrganizationMembershipGateway,
     OrganizationLookupAdapter,
     OrganizationsService,
     ListOrganizationsForUserUseCase,

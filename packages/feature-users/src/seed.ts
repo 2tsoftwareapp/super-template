@@ -1,9 +1,10 @@
 import type { FeatureSeedContext, FeatureSeeder } from "@repo/api-plugin-kit";
 import type { DatabaseExecutor } from "@repo/database-runtime";
 
-import { EnvironmentService, hashPassword } from "@repo/api-runtime";
+import { EnvironmentService } from "@repo/api-runtime";
 import { AccessControlService, ROLE_NAMES } from "@repo/feature-access-control/contracts";
 import { OrganizationsService } from "@repo/feature-organizations/contracts";
+import { hashPassword } from "@repo/utils/password";
 
 import {
   USERS_REPOSITORY,

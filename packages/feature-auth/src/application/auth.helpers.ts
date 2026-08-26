@@ -1,15 +1,6 @@
 import { HttpStatus } from "@nestjs/common";
-import {
-  AppError,
-  ERROR_CODES,
-  generateOpaqueToken,
-  hashOpaqueToken,
-  hashPassword,
-  hashRefreshToken,
-  verifyPassword,
-  verifyPasswordWithTimingPadding,
-  verifyRefreshTokenHash,
-} from "@repo/api-runtime";
+import { AppError, ERROR_CODES, generateOpaqueToken, hashOpaqueToken } from "@repo/api-runtime";
+import { hashPassword, hashRefreshToken, verifyPassword, verifyPasswordWithTimingPadding, verifyRefreshTokenHash } from "@repo/utils/password";
 
 import type { AuthSessionModel } from "./models/auth-session";
 

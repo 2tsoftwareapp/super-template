@@ -1,5 +1,5 @@
 import { Global, Module } from "@nestjs/common";
-import { APPLICATION_SETTINGS_LOOKUP } from "@repo/api-runtime";
+import { APPLICATION_SETTINGS_LOOKUP } from "@repo/feature-settings/contracts";
 
 import { ApplicationSettingsLookupService } from "./application/application-settings-lookup.service";
 import { SETTINGS_REPOSITORY } from "./application/ports/settings.repository.port";

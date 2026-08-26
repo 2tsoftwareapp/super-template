@@ -1,6 +1,9 @@
 import type { JsonObject } from "@repo/api-kernel";
 
 import { timestamps } from "@repo/database-runtime";
+import { jobs } from "@repo/feature-jobs/schema";
+import { organizations } from "@repo/feature-organizations/schema";
+import { users } from "@repo/feature-users/schema";
 import { isNull, sql } from "drizzle-orm";
 import {
   index,
@@ -25,9 +28,11 @@ export const notifications = pgTable(
   {
     id: uuid("id").defaultRandom().primaryKey(),
     organizationId: uuid("organization_id")
-      .notNull(),
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
     userId: uuid("user_id")
-      .notNull(),
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
     type: text("type").notNull(),
     title: text("title").notNull(),
     body: text("body").notNull(),
@@ -37,7 +42,9 @@ export const notifications = pgTable(
     sourceJobId: uuid("source_job_id").references(() => notificationJobs.id, {
       onDelete: "set null",
     }),
-    sourceBackgroundJobId: uuid("source_background_job_id"),
+    sourceBackgroundJobId: uuid("source_background_job_id").references(() => jobs.id, {
+      onDelete: "set null",
+    }),
   },
   (table) => [
     index("notifications_organization_id_idx").on(table.organizationId),
@@ -63,7 +70,8 @@ export const notificationDeviceTokens = pgTable(
   {
     id: uuid("id").defaultRandom().primaryKey(),
     userId: uuid("user_id")
-      .notNull(),
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
     token: text("token").notNull(),
     platform: notificationDevicePlatformEnum("platform").notNull(),
     lastUsedAt: timestamp("last_used_at", { withTimezone: true }).notNull().defaultNow(),
@@ -114,10 +122,14 @@ export const notificationJobs = pgTable(
   "w_notification_jobs",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    organizationId: uuid("organization_id"),
-    actorId: uuid("actor_id"),
+    organizationId: uuid("organization_id").references(() => organizations.id, {
+      onDelete: "set null",
+    }),
+    actorId: uuid("actor_id").references(() => users.id, { onDelete: "set null" }),
     audience: notificationAudienceEnum("audience").notNull(),
-    targetUserId: uuid("target_user_id"),
+    targetUserId: uuid("target_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
     userIds: jsonb("user_ids").$type<string[] | null>(),
     type: text("type").notNull(),
     title: text("title").notNull(),

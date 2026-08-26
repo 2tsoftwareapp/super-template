@@ -1,5 +1,4 @@
 import { Module } from "@nestjs/common";
-import { AuditModule } from "@repo/feature-audit/contracts";
 import { FilesModule, StorageModule } from "@repo/feature-upload/module";
 
 import { EXPORT_JOBS_REPOSITORY } from "./application/ports/export-jobs.repository.port";
@@ -11,7 +10,7 @@ import { ExportJobsRepository } from "./infrastructure/export-jobs.repository";
 import { ExportsController } from "./presentation/exports.controller";
 
 @Module({
-  imports: [AuditModule, FilesModule, StorageModule],
+  imports: [FilesModule, StorageModule],
   controllers: [ExportsController],
   providers: [
     ExportJobsRepository,

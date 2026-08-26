@@ -13,3 +13,5 @@ export { IssueSessionUseCase } from "../application/use-cases/issue-session.use-
  * need the Nest module should import `@repo/feature-auth/module`.
  */
 export { AuthDataModule } from "../auth-data.module";
+export * from "./access-token-authenticator.port";
+export * from "./auth-user-store.port";

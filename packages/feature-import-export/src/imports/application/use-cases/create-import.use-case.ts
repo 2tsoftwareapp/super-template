@@ -1,6 +1,8 @@
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import {
   AppError,
+  AUDIT_WRITER,
+  type AuditWriter,
   type AuthenticatedRequestUser,
   ERROR_CODES,
   type ImportValidationError,
@@ -10,7 +12,6 @@ import {
   type TransactionPort,
 } from "@repo/api-runtime";
 import { ImportExportAdapterRegistry } from "@repo/api-runtime";
-import { AuditService } from "@repo/feature-audit/contracts";
 import { FileAccessService } from "@repo/feature-upload/contracts";
 
 import type { CreateImportCommand, ImportJobView } from "../imports.types";
@@ -30,7 +31,8 @@ export class CreateImportUseCase {
     private readonly importJobsRepository: ImportJobsRepositoryPort,
     private readonly fileAccessService: FileAccessService,
     private readonly importFileParser: ImportFileParserService,
-    private readonly auditService: AuditService,
+    @Inject(AUDIT_WRITER)
+    private readonly auditWriter: AuditWriter,
     private readonly getImportUseCase: GetImportUseCase,
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
     private readonly importExportAdapters: ImportExportAdapterRegistry,
@@ -99,7 +101,7 @@ export class CreateImportUseCase {
         const isCreated = idempotentResult ? idempotentResult.created : true;
 
         if (isCreated) {
-          await this.auditService.log(
+          await this.auditWriter.log(
             {
               actorId: actor.userId,
               action: "import.created",

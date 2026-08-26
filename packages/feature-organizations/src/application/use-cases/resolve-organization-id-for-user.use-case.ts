@@ -1,15 +1,16 @@
 import type { TransactionExecutor } from "@repo/api-runtime";
 
-import { HttpStatus, Injectable } from "@nestjs/common";
+import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { AppError, ERROR_CODES } from "@repo/api-runtime";
 
-import { OrganizationMembershipGateway } from "../../infrastructure/organization-membership.gateway";
+import { ORGANIZATION_MEMBERSHIP, type OrganizationMembership } from "../../public/contracts";
 import { AssertOrganizationMembershipUseCase } from "./assert-organization-membership.use-case";
 
 @Injectable()
 export class ResolveOrganizationIdForUserUseCase {
   constructor(
-    private readonly membership: OrganizationMembershipGateway,
+    @Inject(ORGANIZATION_MEMBERSHIP)
+    private readonly membership: OrganizationMembership,
     private readonly assertOrganizationMembershipUseCase: AssertOrganizationMembershipUseCase,
   ) {}
 

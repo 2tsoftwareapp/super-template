@@ -1,5 +1,5 @@
-import type { JsonObject } from "../types/json-value";
-import type { TransactionExecutor } from "../types/transaction-executor";
+import type { JsonObject } from "@repo/api-kernel";
+import type { TransactionExecutor } from "@repo/api-kernel";
 
 export interface ActivityEmitInput {
   organizationId: string;

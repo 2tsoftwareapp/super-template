@@ -2,10 +2,7 @@ import type { RequestContext } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { AppError, ERROR_CODES } from "@repo/api-runtime";
-import {
-  AUTH_USER_STORE,
-  type AuthUserStore,
-} from "@repo/api-runtime";
+import { AUTH_USER_STORE, type AuthUserStore } from "@repo/feature-auth/contracts";
 import { MfaService } from "@repo/feature-mfa/contracts";
 
 import type { VerifyMfaChallengeCommand } from "../auth.types";

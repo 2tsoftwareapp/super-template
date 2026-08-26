@@ -2,11 +2,8 @@ import type { RequestContext } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { AppError, ERROR_CODES } from "@repo/api-runtime";
-import {
-  AUTH_USER_STORE,
-  type AuthUserStore,
-} from "@repo/api-runtime";
 import { AccessControlService } from "@repo/feature-access-control/contracts";
+import { AUTH_USER_STORE, type AuthUserStore } from "@repo/feature-auth/contracts";
 import { OrganizationsService } from "@repo/feature-organizations/contracts";
 
 import type { RefreshSessionCommand } from "../auth.types";

@@ -179,6 +179,13 @@ export class AccessControlRolePersistence {
     await executor.delete(roles).where(eq(roles.id, roleId));
   }
 
+  async deleteByOrganizationId(
+    organizationId: string,
+    executor: DatabaseExecutor = this.database,
+  ): Promise<void> {
+    await executor.delete(roles).where(eq(roles.organizationId, organizationId));
+  }
+
   async ensureOrganizationSystemRole(
     name: string,
     description: string,

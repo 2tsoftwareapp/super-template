@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 
-import { ERROR_CODES } from "../../constants/error-codes";
 import { AppError } from "../../errors/app-error";
 import { requireOrganizationId } from "../require-organization";
 
@@ -17,7 +16,7 @@ describe("requireOrganizationId", () => {
         throw new Error("expected requireOrganizationId to throw");
       } catch (error) {
         expect(error).toBeInstanceOf(AppError);
-        expect((error as AppError).code).toBe(ERROR_CODES.AUTH_FORBIDDEN);
+        expect((error as AppError).code).toBe("AUTH_FORBIDDEN");
       }
     },
   );

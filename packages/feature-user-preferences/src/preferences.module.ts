@@ -1,5 +1,5 @@
 import { Global, Module } from "@nestjs/common";
-import { USER_PREFERENCES_LOOKUP } from "@repo/api-runtime";
+import { USER_PREFERENCES_LOOKUP } from "@repo/feature-user-preferences/contracts";
 import { UsersModule } from "@repo/feature-users/module";
 
 import { PREFERENCES_REPOSITORY } from "./application/ports/preferences.repository.port";

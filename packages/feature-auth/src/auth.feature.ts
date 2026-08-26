@@ -11,7 +11,7 @@ import { authSeeders } from "./seed";
 
 export const authFeature: FeatureManifest = defineFeature({
   id: "auth",
-  dependsOn: ["access-control", "organizations", "mfa", "users"],
+  dependsOn: ["access-control", "organizations", "mfa", "users", "settings"],
   nestModule: AuthModule,
   schema: {
     authSessions,

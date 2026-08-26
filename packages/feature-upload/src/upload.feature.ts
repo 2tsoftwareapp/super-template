@@ -12,7 +12,7 @@ import { UploadModule } from "./upload.module";
 
 export const uploadFeature: FeatureManifest = defineFeature({
   id: "upload",
-  dependsOn: ["auth", "organizations", "users"],
+  dependsOn: ["auth", "organizations", "users", "activities"],
   nestModule: UploadModule,
   resourceScopes: {
     files: "organization",

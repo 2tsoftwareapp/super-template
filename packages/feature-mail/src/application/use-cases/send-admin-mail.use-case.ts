@@ -3,13 +3,14 @@ import type { AuthenticatedRequestUser, BackgroundJobEnqueuerWithResult } from "
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import {
   AppError,
+  AUDIT_WRITER,
+  type AuditWriter,
   BACKGROUND_JOB_ENQUEUER_WITH_RESULT,
   ERROR_CODES,
-  isMandatoryMailTemplate,
   SYSTEM_SCOPE,
 } from "@repo/api-runtime";
-import { AuditService } from "@repo/feature-audit/contracts";
 
+import { isMandatoryMailTemplate } from "../../constants/mandatory-mail-templates";
 import {
   TEMPLATE_RENDERER_SERVICE,
   type TemplateRendererServicePort,
@@ -29,7 +30,8 @@ export class SendAdminMailUseCase {
     private readonly templateRenderer: TemplateRendererServicePort,
     @Inject(BACKGROUND_JOB_ENQUEUER_WITH_RESULT)
     private readonly jobEnqueuer: BackgroundJobEnqueuerWithResult,
-    private readonly auditService: AuditService,
+    @Inject(AUDIT_WRITER)
+    private readonly auditWriter: AuditWriter,
   ) {}
 
   async execute(actor: AuthenticatedRequestUser, command: SendAdminMailCommand) {
@@ -76,7 +78,7 @@ export class SendAdminMailUseCase {
       ...(command.idempotencyKey ? { idempotencyKey: command.idempotencyKey } : {}),
     });
 
-    await this.auditService.log({
+    await this.auditWriter.log({
       actorId: actor.userId,
       action: "mail.send_requested",
       entityType: "mail_template",

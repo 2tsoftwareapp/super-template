@@ -3,7 +3,8 @@ import type { ArgumentsHost } from "@nestjs/common";
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { describe, expect, it, vi } from "vitest";
 
-import { AppError, ERROR_CODES } from "@repo/api-kernel";
+import { AppError } from "@repo/api-kernel";
+import { ERROR_CODES } from "../../error-codes";
 
 import { AppExceptionFilter } from "../app-exception.filter";
 

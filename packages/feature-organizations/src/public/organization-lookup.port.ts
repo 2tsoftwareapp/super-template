@@ -1,4 +1,4 @@
-import type { TransactionExecutor } from "../types/transaction-executor";
+import type { TransactionExecutor } from "@repo/api-kernel";
 
 export type OrganizationMemberRole = "OWNER" | "ADMIN" | "MEMBER";
 

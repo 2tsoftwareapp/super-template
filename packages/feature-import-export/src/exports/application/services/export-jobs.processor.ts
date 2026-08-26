@@ -1,21 +1,8 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { Cron, CronExpression } from "@nestjs/schedule";
-import {
-  ACTIVITY_EMITTER,
-  type ActivityEmitter,
-  APP_LOGGER,
-  AppError,
-  type AppLogger,
-  ERROR_CODES,
-  ErrorReporterService,
-  SYSTEM_SCOPE,
-  TenantContextService,
-  toCsv,
-  TRANSACTION_PORT,
-  type TransactionPort,
-} from "@repo/api-runtime";
+import { APP_LOGGER, AppError, type AppLogger, AUDIT_WRITER, type AuditWriter, ERROR_CODES, ErrorReporterService, SYSTEM_SCOPE, TenantContextService, toCsv, TRANSACTION_PORT, type TransactionPort } from "@repo/api-runtime";
 import { ImportExportAdapterRegistry } from "@repo/api-runtime";
-import { AuditService } from "@repo/feature-audit/contracts";
+import { ACTIVITY_EMITTER, type ActivityEmitter } from "@repo/feature-activities/contracts";
 import { FILES_REPOSITORY, type FilesRepositoryPort } from "@repo/feature-upload/contracts";
 import { OBJECT_STORAGE, type ObjectStorage } from "@repo/feature-upload/contracts";
 import { randomUUID } from "node:crypto";
@@ -38,7 +25,8 @@ export class ExportJobsProcessor {
     private readonly importExportAdapters: ImportExportAdapterRegistry,
     @Inject(FILES_REPOSITORY) private readonly filesRepository: FilesRepositoryPort,
     @Inject(OBJECT_STORAGE) private readonly objectStorage: ObjectStorage,
-    private readonly auditService: AuditService,
+    @Inject(AUDIT_WRITER)
+    private readonly auditWriter: AuditWriter,
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
     @Inject(ACTIVITY_EMITTER) private readonly activityEmitter: ActivityEmitter,
     private readonly tenantContextService: TenantContextService,
@@ -167,7 +155,7 @@ export class ExportJobsProcessor {
           tx,
         );
 
-        await this.auditService.log(
+        await this.auditWriter.log(
           {
             actorId: job.createdById,
             action: "export.completed",

@@ -849,6 +849,9 @@ importers:
       '@repo/database-runtime':
         specifier: workspace:*
         version: link:../database-runtime
+      '@repo/feature-organizations':
+        specifier: workspace:*
+        version: link:../feature-organizations
       class-transformer:
         specifier: 0.5.1
         version: 0.5.1
@@ -1035,9 +1038,15 @@ importers:
       '@repo/feature-organizations':
         specifier: workspace:*
         version: link:../feature-organizations
+      '@repo/feature-settings':
+        specifier: workspace:*
+        version: link:../feature-settings
       '@repo/feature-users':
         specifier: workspace:*
         version: link:../feature-users
+      '@repo/utils':
+        specifier: workspace:*
+        version: link:../utils
       argon2:
         specifier: 0.44.0
         version: 0.44.0
@@ -1157,9 +1166,9 @@ importers:
       '@repo/feature-access-control':
         specifier: workspace:*
         version: link:../feature-access-control
-      '@repo/feature-audit':
+      '@repo/feature-activities':
         specifier: workspace:*
-        version: link:../feature-audit
+        version: link:../feature-activities
       '@repo/feature-organizations':
         specifier: workspace:*
         version: link:../feature-organizations
@@ -1230,6 +1239,12 @@ importers:
       '@repo/database-runtime':
         specifier: workspace:*
         version: link:../database-runtime
+      '@repo/feature-activities':
+        specifier: workspace:*
+        version: link:../feature-activities
+      '@repo/feature-users':
+        specifier: workspace:*
+        version: link:../feature-users
       class-transformer:
         specifier: 0.5.1
         version: 0.5.1
@@ -1285,12 +1300,12 @@ importers:
       '@repo/database-runtime':
         specifier: workspace:*
         version: link:../database-runtime
-      '@repo/feature-audit':
-        specifier: workspace:*
-        version: link:../feature-audit
       '@repo/feature-jobs':
         specifier: workspace:*
         version: link:../feature-jobs
+      '@repo/feature-user-preferences':
+        specifier: workspace:*
+        version: link:../feature-user-preferences
       class-transformer:
         specifier: 0.5.1
         version: 0.5.1
@@ -1416,6 +1431,15 @@ importers:
       '@repo/feature-jobs':
         specifier: workspace:*
         version: link:../feature-jobs
+      '@repo/feature-organizations':
+        specifier: workspace:*
+        version: link:../feature-organizations
+      '@repo/feature-user-preferences':
+        specifier: workspace:*
+        version: link:../feature-user-preferences
+      '@repo/feature-users':
+        specifier: workspace:*
+        version: link:../feature-users
       class-transformer:
         specifier: 0.5.1
         version: 0.5.1
@@ -1483,9 +1507,9 @@ importers:
       '@repo/database-runtime':
         specifier: workspace:*
         version: link:../database-runtime
-      '@repo/feature-access-control':
+      '@repo/feature-activities':
         specifier: workspace:*
-        version: link:../feature-access-control
+        version: link:../feature-activities
       class-transformer:
         specifier: 0.5.1
         version: 0.5.1
@@ -1544,9 +1568,6 @@ importers:
       '@repo/database-runtime':
         specifier: workspace:*
         version: link:../database-runtime
-      '@repo/feature-audit':
-        specifier: workspace:*
-        version: link:../feature-audit
       class-transformer:
         specifier: 0.5.1
         version: 0.5.1
@@ -1623,6 +1644,9 @@ importers:
       '@repo/feature-users':
         specifier: workspace:*
         version: link:../feature-users
+      '@repo/utils':
+        specifier: workspace:*
+        version: link:../utils
       class-transformer:
         specifier: 0.5.1
         version: 0.5.1
@@ -1690,6 +1714,9 @@ importers:
       '@repo/database-runtime':
         specifier: workspace:*
         version: link:../database-runtime
+      '@repo/feature-activities':
+        specifier: workspace:*
+        version: link:../feature-activities
       '@repo/feature-organizations':
         specifier: workspace:*
         version: link:../feature-organizations
@@ -1812,9 +1839,15 @@ importers:
       '@repo/feature-access-control':
         specifier: workspace:*
         version: link:../feature-access-control
+      '@repo/feature-activities':
+        specifier: workspace:*
+        version: link:../feature-activities
       '@repo/feature-organizations':
         specifier: workspace:*
         version: link:../feature-organizations
+      '@repo/utils':
+        specifier: workspace:*
+        version: link:../utils
       class-transformer:
         specifier: 0.5.1
         version: 0.5.1
@@ -1878,6 +1911,10 @@ importers:
   packages/tsconfig: {}
 
   packages/utils:
+    dependencies:
+      argon2:
+        specifier: 0.44.0
+        version: 0.44.0
     devDependencies:
       '@repo/tsconfig':
         specifier: workspace:*

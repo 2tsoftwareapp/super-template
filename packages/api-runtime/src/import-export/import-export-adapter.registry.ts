@@ -1,9 +1,7 @@
 import { Injectable } from "@nestjs/common";
-import {
-  AppError,
-  ERROR_CODES,
-  type ImportExportAdapter,
-} from "@repo/api-kernel";
+import { AppError, type ImportExportAdapter } from "@repo/api-kernel";
+
+import { ERROR_CODES } from "../error-codes";
 
 @Injectable()
 export class ImportExportAdapterRegistry {

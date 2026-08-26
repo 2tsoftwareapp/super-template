@@ -1,6 +1,5 @@
 import type { AuthenticatedRequestUser } from "../types/request-context";
 
-import { ERROR_CODES } from "../constants/error-codes";
 import { AppError } from "../errors/app-error";
 
 export const requireOrganizationId = (
@@ -8,7 +7,8 @@ export const requireOrganizationId = (
 ): string => {
   if (!user.organizationId) {
     throw new AppError(
-      ERROR_CODES.AUTH_FORBIDDEN,
+      // Platform-generic auth code; the aggregated catalog lives in api-runtime.
+      "AUTH_FORBIDDEN",
       "An active organization is required",
       403,
     );

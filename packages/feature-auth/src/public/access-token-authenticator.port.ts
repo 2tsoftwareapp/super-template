@@ -1,4 +1,4 @@
-import type { AuthenticatedRequestUser } from "../types/request-context";
+import type { AuthenticatedRequestUser } from "@repo/api-kernel";
 
 /**
  * DI token for {@link AccessTokenAuthenticator}.

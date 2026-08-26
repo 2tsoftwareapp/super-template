@@ -10,18 +10,24 @@ import {
   SYSTEM_SCOPE,
   TRANSACTION_PORT,
 } from "@repo/api-runtime";
-import { AccessControlService } from "@repo/feature-access-control/contracts";
 
 import { assertNotLastOwner } from "../../domain/organization-access.policy";
-import { OrganizationMembershipGateway } from "../../infrastructure/organization-membership.gateway";
+import { ORGANIZATION_MEMBERSHIP, type OrganizationMembership } from "../../public/contracts";
+import {
+  ORGANIZATION_ACCESS_CONTROL,
+  type OrganizationAccessControlPort,
+} from "../../public/contracts";
 
 @Injectable()
+
 export class LeaveOrganizationUseCase {
   constructor(
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
-    private readonly membership: OrganizationMembershipGateway,
+    @Inject(ORGANIZATION_MEMBERSHIP)
+    private readonly membership: OrganizationMembership,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
-    private readonly accessControlService: AccessControlService,
+    @Inject(ORGANIZATION_ACCESS_CONTROL)
+    private readonly accessControl: OrganizationAccessControlPort,
   ) {}
 
   async execute(
@@ -68,10 +74,10 @@ export class LeaveOrganizationUseCase {
       }
 
       // Cleanup user roles scoped to organization
-      await this.accessControlService.replaceUserRoles(userId, [], organizationId, transaction);
+      await this.accessControl.replaceUserRoles(userId, [], organizationId, transaction);
 
       // Invalidate access profile cache
-      await this.accessControlService.invalidateAccessProfile(userId);
+      await this.accessControl.invalidateAccessProfile(userId);
 
       await this.auditWriter.log(
         {

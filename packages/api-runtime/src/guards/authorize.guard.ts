@@ -1,9 +1,11 @@
 import { type CanActivate, type ExecutionContext, HttpStatus, Injectable } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
-import { AppError, ERROR_CODES, ROLE_NAMES } from "@repo/api-kernel";
+import { AppError } from "@repo/api-kernel";
 
 import { AUTHORIZE_KEY, type AuthorizeOptions } from "../decorators/authorize.decorator";
 import { IS_PUBLIC_KEY } from "../decorators/public.decorator";
+import { ERROR_CODES } from "../error-codes";
+import { ROLE_NAMES } from "../rbac";
 
 @Injectable()
 export class AuthorizeGuard implements CanActivate {

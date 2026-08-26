@@ -1,6 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { isMandatoryMailTemplate } from "@repo/api-runtime";
 
+import { isMandatoryMailTemplate } from "../../constants/mandatory-mail-templates";
 import {
   TEMPLATE_RENDERER_SERVICE,
   type TemplateRendererServicePort,

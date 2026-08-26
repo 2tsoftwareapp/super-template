@@ -3,19 +3,8 @@ import type { MiddlewareConsumer, NestModule } from "@nestjs/common";
 import { RequestMethod } from "@nestjs/common";
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, Reflector } from "@nestjs/core";
 import { ThrottlerGuard } from "@nestjs/throttler";
-import {
-  ACCESS_TOKEN_AUTHENTICATOR,
-  type AccessTokenAuthenticator,
-  APP_LOGGER,
-  AppExceptionFilter,
-  type AppLogger,
-  AuthorizeGuard,
-  EnvironmentService,
-  RequestContextMiddleware,
-  RequestLoggerMiddleware,
-  ResponseEnvelopeInterceptor,
-  TenantContextService,
-} from "@repo/api-runtime";
+import { APP_LOGGER, AppExceptionFilter, type AppLogger, AuthorizeGuard, EnvironmentService, RequestContextMiddleware, RequestLoggerMiddleware, ResponseEnvelopeInterceptor, TenantContextService } from "@repo/api-runtime";
+import { ACCESS_TOKEN_AUTHENTICATOR, type AccessTokenAuthenticator } from "@repo/feature-auth/contracts";
 import { ErrorReporterService } from "@repo/observability";
 
 import { AuthGuard } from "../shell/auth.guard";

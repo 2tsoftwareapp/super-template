@@ -8,3 +8,4 @@ export type { FilesRepositoryPort } from "../files/application/ports/files.repos
 export { FileAccessService } from "../files/application/services/file-access.service";
 export { OBJECT_STORAGE } from "../storage/application/ports/object-storage.interface";
 export type { ObjectStorage } from "../storage/application/ports/object-storage.interface";
+export * from "./entity-attachment-listing.port";

@@ -3,11 +3,13 @@ import {
   AppError,
   type AuthenticatedRequestUser,
   ERROR_CODES,
-  ORGANIZATION_MEMBERSHIP,
-  type OrganizationMembership,
   ROLE_NAMES,
 } from "@repo/api-runtime";
 import { AccessControlService } from "@repo/feature-access-control/contracts";
+import {
+  ORGANIZATION_MEMBERSHIP,
+  type OrganizationMembership,
+} from "@repo/feature-organizations/contracts";
 
 import type { UserView } from "../users.types";
 

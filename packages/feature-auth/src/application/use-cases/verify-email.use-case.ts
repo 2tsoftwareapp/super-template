@@ -10,10 +10,7 @@ import {
   SYSTEM_SCOPE,
 } from "@repo/api-runtime";
 import { TRANSACTION_PORT } from "@repo/api-runtime";
-import {
-  AUTH_USER_STORE,
-  type AuthUserStore,
-} from "@repo/api-runtime";
+import { AUTH_USER_STORE, type AuthUserStore } from "@repo/feature-auth/contracts";
 
 import type { VerifyEmailCommand } from "../auth.types";
 

@@ -1,9 +1,9 @@
+import type { DatabaseExecutor } from "@repo/database-runtime";
 import type {
   OrganizationMemberRecord,
   OrganizationMemberRole,
   OrganizationMembership,
-} from "@repo/api-runtime";
-import type { DatabaseExecutor } from "@repo/database-runtime";
+} from "@repo/feature-organizations/contracts";
 
 import { Inject, Injectable } from "@nestjs/common";
 import { DATABASE, type DatabaseClient } from "@repo/database-runtime";

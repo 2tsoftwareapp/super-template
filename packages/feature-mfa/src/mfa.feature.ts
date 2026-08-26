@@ -9,7 +9,7 @@ import { MfaModule } from "./mfa.module";
 
 export const mfaFeature: FeatureManifest = defineFeature({
   id: "mfa",
-  dependsOn: [],
+  dependsOn: ["users"],
   nestModule: MfaModule,
   schema: { userTwoFactorSecrets, userRecoveryCodes, mfaChallenges },
 });

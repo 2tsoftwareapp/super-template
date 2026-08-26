@@ -10,12 +10,8 @@ import {
   SYSTEM_SCOPE,
 } from "@repo/api-runtime";
 import { TRANSACTION_PORT } from "@repo/api-runtime";
-import {
-  AUTH_TOKEN_CLEANUP,
-  type AuthTokenCleanup,
-  hashPassword,
-  verifyPassword,
-} from "@repo/api-runtime";
+import { AUTH_TOKEN_CLEANUP, type AuthTokenCleanup } from "@repo/feature-users/contracts";
+import { hashPassword, verifyPassword } from "@repo/utils/password";
 
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";
 

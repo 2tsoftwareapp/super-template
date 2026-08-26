@@ -41,7 +41,7 @@ describe("auth runtime", () => {
   });
 
   it("accepts any non-empty token when signed csrf is not required", async () => {
-    configMock.serverConfig.auth.csrfSecret = null;
+    configMock.serverConfig.auth.csrfSecret = null as string | null;
     configMock.serverConfig.auth.requireSignedCsrf = false;
 
     const { authRuntime } = await import("../runtime");
@@ -51,7 +51,7 @@ describe("auth runtime", () => {
   });
 
   it("rejects unsigned tokens when signed csrf is required", async () => {
-    configMock.serverConfig.auth.csrfSecret = null;
+    configMock.serverConfig.auth.csrfSecret = null as string | null;
     configMock.serverConfig.auth.requireSignedCsrf = true;
 
     const { authRuntime } = await import("../runtime");

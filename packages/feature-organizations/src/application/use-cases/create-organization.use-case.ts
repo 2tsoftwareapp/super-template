@@ -1,19 +1,12 @@
 import type { AuthenticatedRequestUser } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {
-  ACTIVITY_EMITTER,
-  type ActivityEmitter,
-  AppError,
-  ERROR_CODES,
-  PLATFORM_TRANSACTION_PORT,
-  type PlatformTransactionPort,
-} from "@repo/api-runtime";
-import { AccessControlService } from "@repo/feature-access-control/contracts";
+import { AppError, ERROR_CODES, PLATFORM_TRANSACTION_PORT, type PlatformTransactionPort } from "@repo/api-runtime";
+import { ACTIVITY_EMITTER, type ActivityEmitter } from "@repo/feature-activities/contracts";
 
 import type { CreateOrganizationCommand } from "../organizations.types";
 
-import { OrganizationMembershipGateway } from "../../infrastructure/organization-membership.gateway";
+import { ORGANIZATION_MEMBERSHIP, type OrganizationMembership } from "../../public/contracts";
 import {
   ORGANIZATIONS_REPOSITORY,
   type OrganizationsRepositoryPort,
@@ -27,7 +20,13 @@ const slugify = (value: string) =>
     .replace(/^-+|-+$/g, "")
     .slice(0, 64) || "organization";
 
+import {
+  ORGANIZATION_ACCESS_CONTROL,
+  type OrganizationAccessControlPort,
+} from "../../public/contracts";
+
 @Injectable()
+
 export class CreateOrganizationUseCase {
   constructor(
     // Creating an organization is a platform-level operation: the new tenant's
@@ -39,9 +38,11 @@ export class CreateOrganizationUseCase {
     private readonly transactionPort: PlatformTransactionPort,
     @Inject(ORGANIZATIONS_REPOSITORY)
     private readonly organizationsRepository: OrganizationsRepositoryPort,
-    private readonly membership: OrganizationMembershipGateway,
+    @Inject(ORGANIZATION_MEMBERSHIP)
+    private readonly membership: OrganizationMembership,
     @Inject(ACTIVITY_EMITTER) private readonly activityEmitter: ActivityEmitter,
-    private readonly accessControlService: AccessControlService,
+    @Inject(ORGANIZATION_ACCESS_CONTROL)
+    private readonly accessControl: OrganizationAccessControlPort,
   ) {}
 
   async execute(user: AuthenticatedRequestUser, input: CreateOrganizationCommand) {
@@ -91,7 +92,7 @@ export class CreateOrganizationUseCase {
             },
             transaction,
           );
-          await this.accessControlService.ensureOrganizationAdminRole(
+          await this.accessControl.ensureOrganizationAdminRole(
             created.id,
             user.userId,
             transaction,

@@ -1,19 +1,9 @@
 import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {
-  AppError,
-  AUDIT_WRITER,
-  type AuditWriter,
-  ERROR_CODES,
-  requireOrganizationId,
-  SYSTEM_SCOPE,
-  TRANSACTION_PORT,
-  type TransactionPort,
-  USER_LOOKUP,
-  type UserLookup,
-} from "@repo/api-runtime";
+import { AppError, AUDIT_WRITER, type AuditWriter, ERROR_CODES, requireOrganizationId, SYSTEM_SCOPE, TRANSACTION_PORT, type TransactionPort } from "@repo/api-runtime";
 import { tenantContextForJob, TenantContextService, WORKER_DISPATCH_CONTEXT } from "@repo/api-runtime";
+import { USER_LOOKUP, type UserLookup } from "@repo/feature-users/contracts";
 
 import type {
   ListNotificationJobsQuery,

@@ -13,8 +13,6 @@ import {
   APP_LOGGER,
   AppError,
   type AppLogger,
-  ERROR_CODES,
-  type ErrorCode,
   type JsonObject,
   type JsonValue,
 } from "@repo/api-kernel";
@@ -24,6 +22,7 @@ import {
 } from "@repo/observability";
 
 import { EnvironmentService } from "../config/environment";
+import { ERROR_CODES } from "../error-codes";
 
 function toLogDetails(value: unknown): JsonValue | null {
   if (value === null || value === undefined) {
@@ -46,7 +45,7 @@ function toLogDetails(value: unknown): JsonValue | null {
 }
 
 interface ExceptionContextBase {
-  errorCode: ErrorCode;
+  errorCode: string;
   method: string;
   path: string;
   requestId?: string;
@@ -56,7 +55,7 @@ interface ExceptionContextBase {
 }
 
 function buildExceptionContextBase(input: {
-  code: ErrorCode;
+  code: string;
   environmentService: EnvironmentService;
   exception: unknown;
   request: Request;
@@ -93,7 +92,7 @@ export class AppExceptionFilter implements ExceptionFilter {
 
     // Default to a generic 500 so unexpected exceptions never leak an untyped response.
     let statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
-    let code: ErrorCode = ERROR_CODES.INTERNAL_ERROR;
+    let code: string = ERROR_CODES.INTERNAL_ERROR;
     let message = "An unexpected error occurred";
     let details: unknown = null;
 

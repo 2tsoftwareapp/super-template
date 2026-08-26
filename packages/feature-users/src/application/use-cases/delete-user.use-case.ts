@@ -10,8 +10,8 @@ import {
   SYSTEM_SCOPE,
 } from "@repo/api-runtime";
 import { TRANSACTION_PORT } from "@repo/api-runtime";
-import { AUTH_TOKEN_CLEANUP, type AuthTokenCleanup } from "@repo/api-runtime";
 import { AccessControlService, ROLE_NAMES } from "@repo/feature-access-control/contracts";
+import { AUTH_TOKEN_CLEANUP, type AuthTokenCleanup } from "@repo/feature-users/contracts";
 
 import { assertUserBelongsToOrganization } from "../../domain/user-org-scope.policy";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";

@@ -6,8 +6,8 @@ import { SettingsModule } from "./settings.module";
 
 export const settingsFeature: FeatureManifest = defineFeature({
   id: "settings",
-  // No audit dep: settings schema/seed is independent, and audit→upload→users
-  // would cycle if users also dependsOn settings for seeder order.
+  // Writes audit through the kernel AUDIT_WRITER port (bound by the always
+  // composed global audit module), so no static feature dependency exists.
   dependsOn: [],
   nestModule: SettingsModule,
   resourceScopes: {

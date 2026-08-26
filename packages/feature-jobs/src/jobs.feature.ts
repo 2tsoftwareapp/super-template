@@ -11,7 +11,7 @@ import { JobsModule } from "./jobs.module";
 
 export const jobsFeature: FeatureManifest = defineFeature({
   id: "jobs",
-  dependsOn: [],
+  dependsOn: ["activities", "users"],
   nestModule: JobsModule,
   resourceScopes: {
     jobs: "platform",

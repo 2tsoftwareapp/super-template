@@ -1,12 +1,11 @@
 import { Global, Module } from "@nestjs/common";
+import { AccessControlModule, USER_ROLE_ASSIGNMENTS } from "@repo/feature-access-control/contracts";
 import {
-  AUTH_USER_STORE,
   ORGANIZATION_MEMBERSHIP,
-  USER_LOOKUP,
-  USER_ROLE_ASSIGNMENTS,
-} from "@repo/api-runtime";
-import { AccessControlModule } from "@repo/feature-access-control/contracts";
+  ORGANIZATION_USER_ROLES_PURGE,
+} from "@repo/feature-organizations/contracts";
 import { OrganizationsModule } from "@repo/feature-organizations/contracts";
+import { USER_LOOKUP } from "@repo/feature-users/contracts";
 
 import { USERS_REPOSITORY } from "./application/ports/users.repository.port";
 import { ChangePasswordUseCase } from "./application/use-cases/change-password.use-case";
@@ -19,7 +18,6 @@ import { UpdateAdminUserUseCase } from "./application/use-cases/update-admin-use
 import { UpdateProfileUseCase } from "./application/use-cases/update-profile.use-case";
 import { UpdateUserStatusUseCase } from "./application/use-cases/update-user-status.use-case";
 import { UsersMapper } from "./application/users.mapper";
-import { LazyPortRegistrarService } from "./infrastructure/lazy-port-registrar.service";
 import { OrganizationMembersRepository } from "./infrastructure/organization-members.repository";
 import { UserRoleAssignmentsPersistence } from "./infrastructure/user-role-assignments.persistence";
 import { UsersRepository } from "./infrastructure/users.repository";
@@ -34,7 +32,6 @@ import { UsersController } from "./presentation/users.controller";
     UsersRepository,
     OrganizationMembersRepository,
     UserRoleAssignmentsPersistence,
-    LazyPortRegistrarService,
     UsersMapper,
     GetUserUseCase,
     UpdateProfileUseCase,
@@ -54,10 +51,6 @@ import { UsersController } from "./presentation/users.controller";
       useExisting: UsersRepository,
     },
     {
-      provide: AUTH_USER_STORE,
-      useExisting: UsersRepository,
-    },
-    {
       provide: ORGANIZATION_MEMBERSHIP,
       useExisting: OrganizationMembersRepository,
     },
@@ -65,13 +58,17 @@ import { UsersController } from "./presentation/users.controller";
       provide: USER_ROLE_ASSIGNMENTS,
       useExisting: UserRoleAssignmentsPersistence,
     },
+    {
+      provide: ORGANIZATION_USER_ROLES_PURGE,
+      useExisting: UserRoleAssignmentsPersistence,
+    },
   ],
   exports: [
     USER_LOOKUP,
     USERS_REPOSITORY,
-    AUTH_USER_STORE,
     ORGANIZATION_MEMBERSHIP,
     USER_ROLE_ASSIGNMENTS,
+    ORGANIZATION_USER_ROLES_PURGE,
   ],
 })
 export class UsersModule {}

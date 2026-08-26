@@ -1,4 +1,4 @@
-import type { TransactionExecutor } from "../types/transaction-executor";
+import type { TransactionExecutor } from "@repo/api-kernel";
 
 /**
  * Auth-facing user persistence port. Owned by the kernel so feature-auth does

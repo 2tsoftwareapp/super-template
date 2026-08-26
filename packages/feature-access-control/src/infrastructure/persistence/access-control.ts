@@ -1,4 +1,5 @@
 import { timestamps } from "@repo/database-runtime";
+import { organizations } from "@repo/feature-organizations/schema";
 import { sql } from "drizzle-orm";
 import {
   boolean,
@@ -16,7 +17,9 @@ export const roles = pgTable(
   "m_roles",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    organizationId: uuid("organization_id"),
+    organizationId: uuid("organization_id").references(() => organizations.id, {
+      onDelete: "cascade",
+    }),
     name: text("name").notNull(),
     description: text("description"),
     isSystem: boolean("is_system").notNull().default(false),

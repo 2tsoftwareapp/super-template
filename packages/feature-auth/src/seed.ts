@@ -2,7 +2,7 @@
 import type { FeatureSeedContext, FeatureSeeder } from "@repo/api-plugin-kit";
 import type { DatabaseExecutor } from "@repo/database-runtime";
 
-import { AUTH_TOKEN_CLEANUP, type AuthTokenCleanup } from "@repo/api-runtime";
+import { AUTH_TOKEN_CLEANUP, type AuthTokenCleanup } from "@repo/feature-users/contracts";
 
 interface SeededUsersBag {
   adminUserId: string;

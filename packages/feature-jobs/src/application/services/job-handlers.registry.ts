@@ -1,14 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common";
-import {
-  AUTH_TOKEN_CLEANUP,
-  type AuthTokenCleanup,
-  type JsonObject,
-  type JsonValue,
-  MAIL_TEMPLATE_SENDER,
-  type MailTemplateSender,
-  USER_NOTIFICATION_SENDER,
-  type UserNotificationSender,
-} from "@repo/api-runtime";
+import { type JsonObject, type JsonValue, MAIL_TEMPLATE_SENDER, type MailTemplateSender, USER_NOTIFICATION_SENDER, type UserNotificationSender } from "@repo/api-runtime";
+import { AUTH_TOKEN_CLEANUP, type AuthTokenCleanup } from "@repo/feature-users/contracts";
 
 import type { JobHandler } from "../jobs.types";
 

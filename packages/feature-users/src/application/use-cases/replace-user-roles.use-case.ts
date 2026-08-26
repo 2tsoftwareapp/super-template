@@ -10,12 +10,12 @@ import {
   SYSTEM_SCOPE,
 } from "@repo/api-runtime";
 import { TRANSACTION_PORT } from "@repo/api-runtime";
+import { AccessControlService, ROLE_NAMES } from "@repo/feature-access-control/contracts";
+import { assertCanAssignRoleTargets, assertRoleScopeCanBeAssigned } from "@repo/feature-access-control/contracts";
 import {
   ORGANIZATION_MEMBERSHIP,
   type OrganizationMembership,
-} from "@repo/api-runtime";
-import { AccessControlService, ROLE_NAMES } from "@repo/feature-access-control/contracts";
-import { assertCanAssignRoleTargets, assertRoleScopeCanBeAssigned } from "@repo/feature-access-control/contracts";
+} from "@repo/feature-organizations/contracts";
 
 import type { UserView } from "../users.types";
 

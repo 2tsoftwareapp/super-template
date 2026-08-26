@@ -1,13 +1,8 @@
 import type { TransactionExecutor } from "@repo/api-runtime";
 
 import { Inject, Injectable } from "@nestjs/common";
-import {
-  AUTH_EMAIL_VERIFICATION,
-  type AuthEmailVerification,
-  durationToMilliseconds,
-  generateOpaqueToken,
-  hashOpaqueToken,
-} from "@repo/api-runtime";
+import { durationToMilliseconds, generateOpaqueToken, hashOpaqueToken } from "@repo/api-runtime";
+import { AUTH_EMAIL_VERIFICATION, type AuthEmailVerification } from "@repo/feature-users/contracts";
 
 import { AUTH_SESSION_REPOSITORY, type AuthSessionRepositoryPort } from "../ports/auth-session.repository.port";
 import { OUTBOX_REPOSITORY, type OutboxRepositoryPort } from "../ports/outbox.repository.port";

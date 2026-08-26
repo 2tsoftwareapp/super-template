@@ -2,27 +2,17 @@ import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime
 import type { TransactionPort } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {
-  ACTIVITY_EMITTER,
-  type ActivityEmitter,
-  AppError,
-  AUDIT_WRITER,
-  type AuditWriter,
-  ERROR_CODES,
-  normalizeEmail,
-  SYSTEM_SCOPE,
-  TRANSACTION_PORT,
-} from "@repo/api-runtime";
-import {
-  AUTH_EMAIL_VERIFICATION,
-  type AuthEmailVerification,
-  hashPassword,
-  ORGANIZATION_MEMBERSHIP,
-  type OrganizationMembership,
-} from "@repo/api-runtime";
+import { AppError, AUDIT_WRITER, type AuditWriter, ERROR_CODES, normalizeEmail, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
 import { AccessControlService, ROLE_NAMES } from "@repo/feature-access-control/contracts";
 import { assertCanAssignRoleTargets, assertRoleScopeCanBeAssigned } from "@repo/feature-access-control/contracts";
-import { OrganizationsService } from "@repo/feature-organizations/contracts";
+import { ACTIVITY_EMITTER, type ActivityEmitter } from "@repo/feature-activities/contracts";
+import {
+  ORGANIZATION_MEMBERSHIP,
+  type OrganizationMembership,
+  OrganizationsService,
+} from "@repo/feature-organizations/contracts";
+import { AUTH_EMAIL_VERIFICATION, type AuthEmailVerification } from "@repo/feature-users/contracts";
+import { hashPassword } from "@repo/utils/password";
 
 import type { CreateAdminUserCommand, UserView } from "../users.types";
 

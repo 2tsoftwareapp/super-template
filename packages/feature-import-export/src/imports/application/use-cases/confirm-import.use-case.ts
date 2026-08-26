@@ -1,18 +1,9 @@
 import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {
-  ACTIVITY_EMITTER,
-  type ActivityEmitter,
-  AppError,
-  ERROR_CODES,
-  type ImportValidationError,
-  SYSTEM_SCOPE,
-  TRANSACTION_PORT,
-  type TransactionPort,
-} from "@repo/api-runtime";
+import { AppError, AUDIT_WRITER, type AuditWriter, ERROR_CODES, type ImportValidationError, SYSTEM_SCOPE, TRANSACTION_PORT, type TransactionPort } from "@repo/api-runtime";
 import { ImportExportAdapterRegistry } from "@repo/api-runtime";
-import { AuditService } from "@repo/feature-audit/contracts";
+import { ACTIVITY_EMITTER, type ActivityEmitter } from "@repo/feature-activities/contracts";
 import { FileAccessService } from "@repo/feature-upload/contracts";
 
 import type { ImportJobView } from "../imports.types";
@@ -33,7 +24,8 @@ export class ConfirmImportUseCase {
     private readonly fileAccessService: FileAccessService,
     private readonly importExportAdapters: ImportExportAdapterRegistry,
     private readonly importFileParser: ImportFileParserService,
-    private readonly auditService: AuditService,
+    @Inject(AUDIT_WRITER)
+    private readonly auditWriter: AuditWriter,
     private readonly importsMapper: ImportsMapper,
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
     @Inject(ACTIVITY_EMITTER) private readonly activityEmitter: ActivityEmitter,
@@ -160,7 +152,7 @@ export class ConfirmImportUseCase {
         tx,
       );
 
-      await this.auditService.log(
+      await this.auditWriter.log(
         {
           actorId: actor.userId,
           action: "import.confirmed",

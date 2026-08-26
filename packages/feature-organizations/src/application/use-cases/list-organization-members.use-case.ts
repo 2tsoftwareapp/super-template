@@ -1,13 +1,17 @@
 import type { AuthenticatedRequestUser } from "@repo/api-runtime";
 
-import { HttpStatus, Injectable } from "@nestjs/common";
+import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { AppError, ERROR_CODES, ROLE_NAMES } from "@repo/api-runtime";
 
-import { OrganizationMembershipGateway } from "../../infrastructure/organization-membership.gateway";
+import { ORGANIZATION_MEMBERSHIP, type OrganizationMembership } from "../../public/contracts";
+
 
 @Injectable()
 export class ListOrganizationMembersUseCase {
-  constructor(private readonly membership: OrganizationMembershipGateway) {}
+  constructor(
+    @Inject(ORGANIZATION_MEMBERSHIP)
+    private readonly membership: OrganizationMembership,
+  ) {}
 
   async execute(organizationId: string, actor: string | AuthenticatedRequestUser) {
     const { userId: actorUserId, isSuperAdmin } =

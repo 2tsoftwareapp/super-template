@@ -2,20 +2,11 @@ import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime
 import type { TransactionPort } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {
-  ACTIVITY_EMITTER,
-  type ActivityEmitter,
-  AppError,
-  AUDIT_WRITER,
-  type AuditWriter,
-  ERROR_CODES,
-  ROLE_NAMES,
-  SYSTEM_SCOPE,
-  TRANSACTION_PORT,
-} from "@repo/api-runtime";
+import { AppError, AUDIT_WRITER, type AuditWriter, ERROR_CODES, ROLE_NAMES, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
+import { ACTIVITY_EMITTER, type ActivityEmitter } from "@repo/feature-activities/contracts";
 
 import { assertOrganizationRole } from "../../domain/organization-access.policy";
-import { OrganizationMembershipGateway } from "../../infrastructure/organization-membership.gateway";
+import { ORGANIZATION_MEMBERSHIP, type OrganizationMembership } from "../../public/contracts";
 import {
   ORGANIZATIONS_REPOSITORY,
   type OrganizationsRepositoryPort,
@@ -27,7 +18,8 @@ export class UpdateOrganizationUseCase {
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
     @Inject(ORGANIZATIONS_REPOSITORY)
     private readonly organizationsRepository: OrganizationsRepositoryPort,
-    private readonly membership: OrganizationMembershipGateway,
+    @Inject(ORGANIZATION_MEMBERSHIP)
+    private readonly membership: OrganizationMembership,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
     @Inject(ACTIVITY_EMITTER) private readonly activityEmitter: ActivityEmitter,
   ) {}

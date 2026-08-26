@@ -5,13 +5,13 @@ import {
   type TransactionExecutor,
 } from "@repo/api-runtime";
 import {
-  ORGANIZATION_MEMBERSHIP,
-  type OrganizationMembership,
-} from "@repo/api-runtime";
-import {
   ACCESS_CONTROL_REPOSITORY,
   type AccessControlRepositoryPort,
 } from "@repo/feature-access-control/contracts";
+import {
+  ORGANIZATION_MEMBERSHIP,
+  type OrganizationMembership,
+} from "@repo/feature-organizations/contracts";
 import {
   USERS_REPOSITORY,
   type UsersRepositoryPort,

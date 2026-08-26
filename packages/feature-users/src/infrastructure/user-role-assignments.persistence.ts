@@ -1,5 +1,5 @@
-import type { UserRoleAssignments } from "@repo/api-runtime";
 import type { DatabaseClient, DatabaseExecutor } from "@repo/database-runtime";
+import type { UserRoleAssignments } from "@repo/feature-access-control/contracts";
 
 import { Inject, Injectable } from "@nestjs/common";
 import { DATABASE } from "@repo/database-runtime";

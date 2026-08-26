@@ -5,7 +5,7 @@ import { MailModule } from "./mail.module";
 
 export const mailFeature: FeatureManifest = defineFeature({
   id: "mail",
-  dependsOn: ["jobs"],
+  dependsOn: ["jobs", "user-preferences"],
   nestModule: MailModule,
   resourceScopes: {
     mail: "platform",

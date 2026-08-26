@@ -29,8 +29,7 @@
     "drizzle-orm": "0.45.2",
     "zod": "4.4.3",
     "@nestjs/schedule": "6.1.1",
-    "express": "5.2.1",
-    "@repo/feature-audit": "workspace:*"
+    "express": "5.2.1"
   },
   "devDependencies": {
     "@repo/tsconfig": "workspace:*",

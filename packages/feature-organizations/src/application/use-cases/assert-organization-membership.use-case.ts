@@ -3,7 +3,7 @@ import type { TransactionExecutor } from "@repo/api-runtime";
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { AppError, ERROR_CODES } from "@repo/api-runtime";
 
-import { OrganizationMembershipGateway } from "../../infrastructure/organization-membership.gateway";
+import { ORGANIZATION_MEMBERSHIP, type OrganizationMembership } from "../../public/contracts";
 import {
   ORGANIZATIONS_REPOSITORY,
   type OrganizationsRepositoryPort,
@@ -14,7 +14,8 @@ export class AssertOrganizationMembershipUseCase {
   constructor(
     @Inject(ORGANIZATIONS_REPOSITORY)
     private readonly organizationsRepository: OrganizationsRepositoryPort,
-    private readonly membership: OrganizationMembershipGateway,
+    @Inject(ORGANIZATION_MEMBERSHIP)
+    private readonly membership: OrganizationMembership,
   ) {}
 
   async execute(organizationId: string, userId: string, executor?: TransactionExecutor) {

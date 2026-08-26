@@ -7,12 +7,8 @@ import {
   Inject,
   Injectable,
 } from "@nestjs/common";
-import {
-  AppError,
-  APPLICATION_SETTINGS_LOOKUP,
-  type ApplicationSettingsLookup,
-  ERROR_CODES,
-} from "@repo/api-runtime";
+import { AppError, ERROR_CODES } from "@repo/api-runtime";
+import { APPLICATION_SETTINGS_LOOKUP, type ApplicationSettingsLookup } from "@repo/feature-settings/contracts";
 
 /**
  * Paths that must stay reachable while maintenance mode is enabled so the

@@ -1,9 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { durationToMilliseconds, normalizeEmail } from "@repo/api-runtime";
-import {
-  AUTH_USER_STORE,
-  type AuthUserStore,
-} from "@repo/api-runtime";
+import { AUTH_USER_STORE, type AuthUserStore } from "@repo/feature-auth/contracts";
 
 import type { ForgotPasswordCommand } from "../auth.types";
 

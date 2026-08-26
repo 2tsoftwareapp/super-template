@@ -11,24 +11,30 @@ import {
   SYSTEM_SCOPE,
   TRANSACTION_PORT,
 } from "@repo/api-runtime";
-import { AccessControlService } from "@repo/feature-access-control/contracts";
 
 import { assertOrganizationRole } from "../../domain/organization-access.policy";
-import { OrganizationMembershipGateway } from "../../infrastructure/organization-membership.gateway";
+import { ORGANIZATION_MEMBERSHIP, type OrganizationMembership } from "../../public/contracts";
+import {
+  ORGANIZATION_ACCESS_CONTROL,
+  type OrganizationAccessControlPort,
+} from "../../public/contracts";
 import {
   ORGANIZATIONS_REPOSITORY,
   type OrganizationsRepositoryPort,
 } from "../ports/organizations.repository.port";
 
 @Injectable()
+
 export class DeleteOrganizationUseCase {
   constructor(
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
     @Inject(ORGANIZATIONS_REPOSITORY)
     private readonly organizationsRepository: OrganizationsRepositoryPort,
-    private readonly membership: OrganizationMembershipGateway,
+    @Inject(ORGANIZATION_MEMBERSHIP)
+    private readonly membership: OrganizationMembership,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
-    private readonly accessControlService: AccessControlService,
+    @Inject(ORGANIZATION_ACCESS_CONTROL)
+    private readonly accessControl: OrganizationAccessControlPort,
   ) {}
 
   async execute(
@@ -106,7 +112,7 @@ export class DeleteOrganizationUseCase {
 
       // Clean up each member's cache
       for (const member of members) {
-        await this.accessControlService.invalidateAccessProfile(member.userId);
+        await this.accessControl.invalidateAccessProfile(member.userId);
       }
 
       await this.auditWriter.log(
