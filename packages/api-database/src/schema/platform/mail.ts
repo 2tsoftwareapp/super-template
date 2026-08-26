@@ -6,7 +6,7 @@ import { mailDeliveryStatusEnum } from "./enums";
 import { jobs } from "./jobs";
 
 export const mailDeliveries = pgTable(
-  "mail_deliveries",
+  "t_mail_deliveries",
   {
     id: uuid("id").defaultRandom().primaryKey(),
     templateKey: text("template_key").notNull(),

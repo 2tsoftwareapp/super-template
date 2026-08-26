@@ -5,6 +5,7 @@ packages:
   - "apps/web"
   - "apps/web/e2e"
   - "packages/*"
+  - "packages/features/*"
 overrides:
   "@nestjs/common": "11.1.27"
   "@nestjs/core": "11.1.27"

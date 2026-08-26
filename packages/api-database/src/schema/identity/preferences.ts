@@ -5,7 +5,7 @@ import { jsonb, pgTable, text, uuid } from "drizzle-orm/pg-core";
 import { timestamps } from "../shared/timestamps";
 import { users } from "./users";
 
-export const userPreferences = pgTable("user_preferences", {
+export const userPreferences = pgTable("m_user_preferences", {
   userId: uuid("user_id")
     .primaryKey()
     .references(() => users.id, { onDelete: "cascade" }),

@@ -1,3 +1,5 @@
+import 'package:feature_identity/feature_identity.dart';
+import 'package:feature_platform/feature_platform.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -28,12 +30,12 @@ final _galleryNavKey = GlobalKey<NavigatorState>(debugLabel: 'gallery');
 final _profileNavKey = GlobalKey<NavigatorState>(debugLabel: 'profile');
 
 const _publicRoutes = {
-  '/splash',
-  '/login',
-  '/register',
-  '/forgot-password',
-  '/verify-email',
-  '/reset-password',
+  IdentityRoutes.splash,
+  IdentityRoutes.login,
+  IdentityRoutes.register,
+  IdentityRoutes.forgotPassword,
+  IdentityRoutes.verifyEmail,
+  IdentityRoutes.resetPassword,
 };
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -41,7 +43,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
   return GoRouter(
     navigatorKey: rootNavigatorKey,
-    initialLocation: '/splash',
+    initialLocation: IdentityRoutes.splash,
     redirect: (context, state) {
       final isAuthed = authState.valueOrNull?.isAuthenticated ?? false;
       final isLoading = authState.isLoading;
@@ -49,73 +51,73 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final isPublic = _publicRoutes.contains(location);
 
       if (isLoading) {
-        return location == '/splash' ? null : '/splash';
+        return location == IdentityRoutes.splash ? null : IdentityRoutes.splash;
       }
 
       if (!isAuthed) {
-        if (location == '/splash') return '/login';
+        if (location == IdentityRoutes.splash) return IdentityRoutes.login;
         if (isPublic) return null;
-        return '/login';
+        return IdentityRoutes.login;
       }
 
-      if (location == '/splash' || isPublic) return '/home';
+      if (location == IdentityRoutes.splash || isPublic) return '/home';
 
       return null;
     },
     routes: [
-      GoRoute(path: '/splash', builder: (_, _) => const SplashScreen()),
-      GoRoute(path: '/login', builder: (_, _) => const LoginScreen()),
-      GoRoute(path: '/register', builder: (_, _) => const RegisterScreen()),
+      GoRoute(path: IdentityRoutes.splash, builder: (_, _) => const SplashScreen()),
+      GoRoute(path: IdentityRoutes.login, builder: (_, _) => const LoginScreen()),
+      GoRoute(path: IdentityRoutes.register, builder: (_, _) => const RegisterScreen()),
       GoRoute(
-        path: '/forgot-password',
+        path: IdentityRoutes.forgotPassword,
         builder: (_, _) => const ForgotPasswordScreen(),
       ),
       GoRoute(
-        path: '/verify-email',
+        path: IdentityRoutes.verifyEmail,
         builder: (_, state) =>
             VerifyEmailScreen(initialToken: state.uri.queryParameters['token']),
       ),
       GoRoute(
-        path: '/reset-password',
+        path: IdentityRoutes.resetPassword,
         builder: (_, state) => ResetPasswordScreen(
           initialToken: state.uri.queryParameters['token'],
         ),
       ),
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,
-        path: '/organizations/:id',
+        path: IdentityRoutes.organizationDetail,
         builder: (_, state) => OrganizationDetailScreen(
           organizationId: state.pathParameters['id']!,
         ),
       ),
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,
-        path: '/preferences',
+        path: IdentityRoutes.preferences,
         builder: (_, _) => const PreferencesScreen(),
       ),
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,
-        path: '/security',
+        path: IdentityRoutes.security,
         builder: (_, _) => const SecurityScreen(),
       ),
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,
-        path: '/sessions',
+        path: IdentityRoutes.sessions,
         builder: (_, _) => const SessionsScreen(),
       ),
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,
-        path: '/organizations',
+        path: IdentityRoutes.organizations,
         builder: (_, _) => const OrganizationsScreen(),
       ),
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,
-        path: '/imports',
+        path: PlatformRoutes.imports,
         builder: (_, _) => const ImportsScreen(),
       ),
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,
-        path: '/exports',
+        path: PlatformRoutes.exports,
         builder: (_, _) => const ExportsScreen(),
       ),
       StatefulShellRoute.indexedStack(
@@ -132,7 +134,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             navigatorKey: _notifNavKey,
             routes: [
               GoRoute(
-                path: '/notifications',
+                path: PlatformRoutes.notifications,
                 builder: (_, _) => const NotificationsScreen(),
               ),
             ],
@@ -142,7 +144,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             preload: true,
             routes: [
               GoRoute(
-                path: '/gallery',
+                path: PlatformRoutes.gallery,
                 builder: (_, _) => const GalleryScreen(),
               ),
             ],

@@ -1,3 +1,9 @@
+export type {
+  AdminResourceConfig,
+  AdminResourceFeature,
+  AdminResourceGroup,
+} from "./admin-resource";
+export { adminResourceGroups, composeAdminResources } from "./admin-resource";
 export type * from "./api-types";
 export type { ClassifiedError, ErrorKind, ErrorScope } from "./errors";
 export { classifyError, getErrorMessage, isRetryableError, shouldRetryQuery } from "./errors";

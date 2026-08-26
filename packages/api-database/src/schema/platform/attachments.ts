@@ -6,7 +6,7 @@ import { timestamps } from "../shared/timestamps";
 import { files } from "./files";
 
 export const attachments = pgTable(
-  "attachments",
+  "r_attachments",
   {
     id: uuid("id").defaultRandom().primaryKey(),
     organizationId: uuid("organization_id")

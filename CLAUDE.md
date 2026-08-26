@@ -11,27 +11,40 @@ contract, and four clients (web, admin, mobile, API). Turborepo + pnpm workspace
 
 ```
 apps/
-  api      NestJS REST API + Swagger/OpenAPI (:3001)
+  api      NestJS REST API — thin composition root (:3001)
   web      Next.js BFF — landing + auth (:3000)
   admin    Next.js BFF — operations console (:3002)
   mobile   Flutter app (iOS/Android)
-apps/api/src
-  identity              auth, RBAC, MFA, users, orgs (core bounded context)
-  platform              mail, files, jobs, audit, notifications… (core context)
-  cli/seeds             development/demo data seeding
+apps/api/src               composition root only — no business logic
+  app.module.ts            wires kernel + composed feature modules
+  features.ts              feature manifest list → composed schema + modules
+  main.ts / shell / cli    bootstrap, guards/interceptors, seeds
 packages/
-  @repo/api-contract    OpenAPI contract source of truth
-  @repo/api-core        shared ports, config, cross-context tokens
-  @repo/api-database    Drizzle schema + migrations
-  @repo/api-health      health checks (add-on package exemplar)
-  @repo/api-sort        sorting/query helpers
-  @repo/env-loader       layered env resolution
-  @repo/web-ui          shared React UI component library (design system)
-  @repo/web-test         shared web test utilities
+  @repo/api-contract       OpenAPI contract source of truth
+  @repo/api-core           thin kernel: ports, config, cross-feature tokens, FeatureManifest
+  @repo/api-database       Drizzle schema + migrations (kernel + identity FK anchors)
+  @repo/api-sort           sorting/query helpers
+  @repo/env-loader         layered env resolution
+  @repo/web-ui             shared React UI component library (design system)
+  @repo/web-test           shared web test utilities
   @repo/eslint-config / @repo/tsconfig   shared config
+packages/mobile_core       Flutter kernel (design tokens, widgets, errors, storage)
+packages/features/         compile-time feature plugins (each exports a FeatureManifest)
+  @repo/feature-identity   auth, RBAC, MFA, SSO, users, orgs (keystone context)
+                           ./admin nav resources · ./web verify-email · Dart `feature_identity`
+  @repo/feature-platform   mail, files, jobs, audit, notifications, settings, storage, import/export…
+                           ./admin nav resources · Dart `feature_platform`
+  @repo/api-health         health checks (minimal feature-plugin exemplar)
 infra/
-  docker-compose.yml     Postgres + Redis + Mailpit for local dev
+  docker-compose.yml       Postgres + Redis + Mailpit for local dev
 ```
+
+Backend features are **compile-time plugins**: each `packages/features/*` package exports a
+`FeatureManifest` (`{ id, nestModule, schema? }`). `apps/api/src/features.ts` lists the enabled
+manifests; `app.module.ts` consumes only the composed modules + schema. To **disable a feature**,
+remove its manifest from `featureManifests` and drop the `@repo/feature-*` dependency from
+`apps/api/package.json`. To **add one**, scaffold with `pnpm scaffold:feature <name>`, then register
+its manifest. See `docs/adr/0002-feature-plugin-architecture.md`.
 
 ## Common commands
 

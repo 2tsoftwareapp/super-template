@@ -55,16 +55,30 @@ check_ctx() {
 }
 
 check_ctx 'identity imports platform services (unstable surface)' \
-  '@platform/.*[Ss]ervice' "$CTX_DIR/identity"
+  '@repo/feature-platform/.*[Ss]ervice' "packages/features/identity/src"
 check_ctx 'identity imports platform infrastructure' \
-  '@platform/.*infrastructure' "$CTX_DIR/identity"
+  '@repo/feature-platform/.*infrastructure' "packages/features/identity/src"
 check_ctx 'identity imports platform controllers/modules' \
-  '@platform/(.*controller|.*\.module)' "$CTX_DIR/identity"
+  '@repo/feature-platform/(.*controller|.*\.module)' "packages/features/identity/src"
 check_ctx 'platform imports identity services (unstable surface)' \
-  '@identity/.*[Ss]ervice' "$CTX_DIR/platform"
+  '@repo/feature-identity/.*[Ss]ervice' "packages/features/platform/src"
 check_ctx 'platform imports identity infrastructure' \
-  '@identity/.*infrastructure' "$CTX_DIR/platform"
+  '@repo/feature-identity/.*infrastructure' "packages/features/platform/src"
 check_ctx 'platform imports identity controllers/modules' \
-  '@identity/(.*controller|.*\.module)' "$CTX_DIR/platform"
+  '@repo/feature-identity/(.*controller|.*\.module)' "packages/features/platform/src"
+
+# Feature plugins must consume peer features only through their public package
+# barrel (`@repo/feature-<id>`), never a deep subpath into another feature's
+# internals. Deep imports into a feature are allowed only from the app
+# composition root / tests (apps/api), which are outside packages/features.
+if command -v rg >/dev/null 2>&1; then
+  deep_feature_imports=$(rg -n 'from "@repo/feature-[a-z-]+/' packages/features \
+    --glob '*.ts' --glob '!**/*.spec.ts' || true)
+  if [ -n "$deep_feature_imports" ]; then
+    failed=1
+    printf 'Cross-feature deep import (import the peer feature barrel instead):\n%s\n' \
+      "$deep_feature_imports" >&2
+  fi
+fi
 
 exit "$failed"

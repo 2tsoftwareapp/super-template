@@ -24,7 +24,7 @@ import {
 import { jobs } from "./jobs";
 
 export const notifications = pgTable(
-  "notifications",
+  "t_notifications",
   {
     id: uuid("id").defaultRandom().primaryKey(),
     organizationId: uuid("organization_id")
@@ -66,7 +66,7 @@ export const notifications = pgTable(
 );
 
 export const notificationDeviceTokens = pgTable(
-  "notification_device_tokens",
+  "m_notification_device_tokens",
   {
     id: uuid("id").defaultRandom().primaryKey(),
     userId: uuid("user_id")
@@ -88,7 +88,7 @@ export const notificationDeviceTokens = pgTable(
 );
 
 export const notificationDeliveries = pgTable(
-  "notification_deliveries",
+  "t_notification_deliveries",
   {
     id: uuid("id").defaultRandom().primaryKey(),
     notificationId: uuid("notification_id")
@@ -119,7 +119,7 @@ export const notificationDeliveries = pgTable(
 );
 
 export const notificationJobs = pgTable(
-  "notification_jobs",
+  "w_notification_jobs",
   {
     id: uuid("id").defaultRandom().primaryKey(),
     organizationId: uuid("organization_id").references(() => organizations.id, {

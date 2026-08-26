@@ -1,6 +1,6 @@
 import { integer, jsonb, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 
-export const outboxMessages = pgTable("outbox_messages", {
+export const outboxMessages = pgTable("w_outbox_messages", {
   id: uuid("id").defaultRandom().primaryKey(),
   topic: text("topic").notNull(),
   payload: jsonb("payload").notNull(),

@@ -164,7 +164,7 @@ export const resetTestDatabase = async (): Promise<void> => {
     );
 
     const verification = await pool.query<{ exists: boolean }>(
-      "select exists(select 1 from information_schema.tables where table_schema = 'public' and table_name = 'organizations') as exists",
+      "select exists(select 1 from information_schema.tables where table_schema = 'public' and table_name = 'm_organizations') as exists",
     );
 
     if (!verification.rows[0]?.exists) {

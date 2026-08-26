@@ -5,7 +5,7 @@ import { timestamps } from "../shared/timestamps";
 import { userStatusEnum } from "./enums";
 
 export const users = pgTable(
-  "users",
+  "m_users",
   {
     id: uuid("id").defaultRandom().primaryKey(),
     email: text("email").notNull(),

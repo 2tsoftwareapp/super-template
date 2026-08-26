@@ -1,6 +1,11 @@
+import type { Metadata } from "next";
+
+import { VerifyEmailView } from "@repo/feature-identity/web";
 import { Suspense } from "react";
 
-import { VerifyEmailView } from "@/features/verify-email";
+export const metadata: Metadata = {
+  title: "Verify email",
+};
 
 export default function VerifyEmailPage() {
   return (
@@ -9,3 +14,4 @@ export default function VerifyEmailPage() {
     </Suspense>
   );
 }
+

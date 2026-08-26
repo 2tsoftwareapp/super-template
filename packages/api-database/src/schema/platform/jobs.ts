@@ -18,7 +18,7 @@ import { timestamps } from "../shared/timestamps";
 import { jobStatusEnum } from "./enums";
 
 export const jobs = pgTable(
-  "jobs",
+  "w_jobs",
   {
     id: uuid("id").defaultRandom().primaryKey(),
     organizationId: uuid("organization_id").references(() => organizations.id, {

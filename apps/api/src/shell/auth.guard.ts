@@ -1,9 +1,16 @@
 import type { Request as ExpressRequest } from "express";
 
-import { AuthService } from "@identity/modules/auth";
-import { type CanActivate, type ExecutionContext, HttpStatus, Injectable } from "@nestjs/common";
+import {
+  type CanActivate,
+  type ExecutionContext,
+  HttpStatus,
+  Inject,
+  Injectable,
+} from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import {
+  ACCESS_TOKEN_AUTHENTICATOR,
+  type AccessTokenAuthenticator,
   ALLOW_MUST_CHANGE_PASSWORD_KEY,
   AppError,
   ERROR_CODES,
@@ -14,7 +21,8 @@ import {
 export class AuthGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
-    private readonly authService: AuthService,
+    @Inject(ACCESS_TOKEN_AUTHENTICATOR)
+    private readonly accessTokenAuthenticator: AccessTokenAuthenticator,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -39,7 +47,7 @@ export class AuthGuard implements CanActivate {
     }
 
     const token = authorization.slice("Bearer ".length);
-    request.user = await this.authService.authenticateAccessToken(token);
+    request.user = await this.accessTokenAuthenticator.authenticateAccessToken(token);
 
     if (process.env.NODE_ENV === "test" && request.headers["x-organization-id"] === "") {
       request.user.organizationId = null;

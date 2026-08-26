@@ -1,18 +1,18 @@
 import type { INestApplicationContext } from "@nestjs/common";
 import type { DatabaseClient } from "@repo/api-database";
 
-import { AccessControlService } from "@identity/modules/access-control";
-import { AUTH_SESSION_REPOSITORY, type AuthSessionRepositoryPort } from "@identity/modules/auth";
-import { OrganizationsService } from "@identity/modules/organizations";
-import { USERS_REPOSITORY, type UsersRepositoryPort } from "@identity/modules/users";
-import {
-  NOTIFICATIONS_REPOSITORY,
-  type NotificationsRepositoryPort,
-} from "@platform/modules/notifications/application/ports/notifications.repository.port";
-import { EnsureSettingsSeedDataUseCase } from "@platform/modules/settings/application/use-cases/ensure-settings-seed-data.use-case";
 import { EnvironmentService } from "@repo/api-core";
 import { TenantContextService, WORKER_DISPATCH_CONTEXT } from "@repo/api-core";
 import { DATABASE } from "@repo/api-database";
+import { AccessControlService } from "@repo/feature-identity/modules/access-control";
+import { AUTH_SESSION_REPOSITORY, type AuthSessionRepositoryPort } from "@repo/feature-identity/modules/auth";
+import { OrganizationsService } from "@repo/feature-identity/modules/organizations";
+import { USERS_REPOSITORY, type UsersRepositoryPort } from "@repo/feature-identity/modules/users";
+import {
+  NOTIFICATIONS_REPOSITORY,
+  type NotificationsRepositoryPort,
+} from "@repo/feature-platform/modules/notifications/application/ports/notifications.repository.port";
+import { EnsureSettingsSeedDataUseCase } from "@repo/feature-platform/modules/settings/application/use-cases/ensure-settings-seed-data.use-case";
 
 import { seedAccessControl } from "./seeds/access-control/seed";
 import { seedNotifications } from "./seeds/notifications/seed";

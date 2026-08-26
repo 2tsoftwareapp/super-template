@@ -6,7 +6,7 @@ import { organizations } from "../identity/organizations";
 import { users } from "../identity/users";
 
 export const auditLogs = pgTable(
-  "audit_logs",
+  "l_audit_logs",
   {
     id: uuid("id").defaultRandom().primaryKey(),
     organizationId: uuid("organization_id").references(() => organizations.id, {

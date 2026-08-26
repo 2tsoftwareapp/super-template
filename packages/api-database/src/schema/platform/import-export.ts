@@ -19,7 +19,7 @@ import { importExportJobStatusEnum } from "./enums";
 import { files } from "./files";
 
 export const importJobs = pgTable(
-  "import_jobs",
+  "t_import_jobs",
   {
     id: uuid("id").defaultRandom().primaryKey(),
     organizationId: uuid("organization_id")
@@ -52,7 +52,7 @@ export const importJobs = pgTable(
 );
 
 export const exportJobs = pgTable(
-  "export_jobs",
+  "t_export_jobs",
   {
     id: uuid("id").defaultRandom().primaryKey(),
     organizationId: uuid("organization_id")

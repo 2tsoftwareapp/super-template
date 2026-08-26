@@ -6,10 +6,10 @@
     "tsBuildInfoFile": "dist/tsconfig.build.tsbuildinfo",
     "paths": {
       "src/*": ["./src/*"],
-      "@identity": ["./src/identity/index.ts"],
-      "@identity/*": ["./src/identity/*"],
-      "@platform": ["./src/platform/index.ts"],
-      "@platform/*": ["./src/platform/*"]
+      "@repo/feature-identity": ["../../packages/features/identity/src/index.ts"],
+      "@repo/feature-identity/*": ["../../packages/features/identity/src/*"],
+      "@repo/feature-platform": ["../../packages/features/platform/src/index.ts"],
+      "@repo/feature-platform/*": ["../../packages/features/platform/src/*"]
     }
   },
   "include": ["src/**/*.ts", "test/**/*.ts"]

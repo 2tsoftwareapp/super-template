@@ -7,6 +7,8 @@
    classes must be scanned explicitly or they're silently dropped from the
    compiled CSS. */
 @source "../../../../packages/web-ui/src";
+@source "../../../../packages/features/identity/src/admin";
+@source "../../../../packages/features/platform/src/admin";
 
 @custom-variant dark (&:is(.dark *));
 

@@ -1,8 +1,8 @@
 import type { INestApplication } from "@nestjs/common";
 
 import { randomUUID } from "node:crypto";
-import { ACCESS_CONTROL_REPOSITORY, type AccessControlRepositoryPort } from "@identity";
-import { RoleManagementUseCase } from "@identity/modules/access-control/application/use-cases/role-management.use-case";
+import { ACCESS_CONTROL_REPOSITORY, type AccessControlRepositoryPort } from "@repo/feature-identity";
+import { RoleManagementUseCase } from "@repo/feature-identity/modules/access-control/application/use-cases/role-management.use-case";
 import { seedDatabase } from "../src/cli/seeds/seed-data";
 import { Pool } from "pg";
 import request from "supertest";
@@ -56,7 +56,7 @@ const createOrganization = async (pool: Pool, label: string): Promise<string> =>
   const suffix = randomUUID();
   const result = await pool.query<{ id: string }>(
     `
-      INSERT INTO organizations (name, slug)
+      INSERT INTO m_organizations (name, slug)
       VALUES ($1, $2)
       RETURNING id
     `,
@@ -70,7 +70,7 @@ const createUser = async (pool: Pool, label: string): Promise<string> => {
   const suffix = randomUUID();
   const result = await pool.query<{ id: string }>(
     `
-      INSERT INTO users (email, password_hash, display_name, status)
+      INSERT INTO m_users (email, password_hash, display_name, status)
       VALUES ($1, $2, $3, 'ACTIVE')
       RETURNING id
     `,
@@ -111,7 +111,7 @@ describe("Roles migration and provisioning (e2e)", () => {
         await pool.query<{ id: string }>(
           `
             SELECT id
-            FROM roles
+            FROM m_roles
             WHERE organization_id IS NOT NULL
             ORDER BY created_at
             LIMIT 1
@@ -125,7 +125,7 @@ describe("Roles migration and provisioning (e2e)", () => {
       (
         await pool.query<{ id: string }>(
           `
-            INSERT INTO permissions (name, description, is_system, scope)
+            INSERT INTO m_permissions (name, description, is_system, scope)
             VALUES ('billing.read', 'Legacy unknown permission', true, 'organization')
             ON CONFLICT (name)
             DO UPDATE SET scope = 'organization'
@@ -136,10 +136,10 @@ describe("Roles migration and provisioning (e2e)", () => {
       "Unknown permission fixture was not created",
     );
 
-    await pool.query(`UPDATE permissions SET scope = 'platform' WHERE name = 'users.read'`);
+    await pool.query(`UPDATE m_permissions SET scope = 'platform' WHERE name = 'users.read'`);
     await pool.query(
       `
-        INSERT INTO role_permissions (role_id, permission_id)
+        INSERT INTO r_role_permissions (role_id, permission_id)
         VALUES ($1, $2)
         ON CONFLICT DO NOTHING
       `,
@@ -157,7 +157,7 @@ describe("Roles migration and provisioning (e2e)", () => {
     const scopeRows = await pool.query<{ name: string; scope: string }>(
       `
         SELECT name, scope
-        FROM permissions
+        FROM m_permissions
         WHERE name = ANY($1::text[])
       `,
       [["users.read", "billing.read"]],
@@ -172,7 +172,7 @@ describe("Roles migration and provisioning (e2e)", () => {
         await pool.query<{ count: number }>(
           `
             SELECT COUNT(*)::int AS count
-            FROM role_permissions
+            FROM r_role_permissions
             WHERE role_id = $1 AND permission_id = $2
           `,
           [organizationRole.id, unknownPermission.id],
@@ -206,8 +206,8 @@ describe("Roles migration and provisioning (e2e)", () => {
           await pool.query<{ roles: number; permissions: number }>(
             `
               SELECT
-                (SELECT COUNT(*)::int FROM roles) AS roles,
-                (SELECT COUNT(*)::int FROM permissions) AS permissions
+                (SELECT COUNT(*)::int FROM m_roles) AS roles,
+                (SELECT COUNT(*)::int FROM m_permissions) AS permissions
             `,
           )
         ).rows,
@@ -224,7 +224,7 @@ describe("Roles migration and provisioning (e2e)", () => {
     const duplicateSystemRoles = await pool.query(
       `
         SELECT organization_id, LOWER(name), COUNT(*)
-        FROM roles
+        FROM m_roles
         WHERE is_system = true
         GROUP BY organization_id, LOWER(name)
         HAVING COUNT(*) > 1
@@ -244,7 +244,7 @@ describe("Roles migration and provisioning (e2e)", () => {
         (
           await pool.query<{ id: string }>(
             `
-              INSERT INTO roles (name, description, is_system)
+              INSERT INTO m_roles (name, description, is_system)
               VALUES ($1, 'Trigger matrix platform role', true)
               RETURNING id
             `,
@@ -257,7 +257,7 @@ describe("Roles migration and provisioning (e2e)", () => {
         (
           await pool.query<{ id: string }>(
             `
-              INSERT INTO roles (
+              INSERT INTO m_roles (
                 organization_id,
                 name,
                 description,
@@ -274,14 +274,14 @@ describe("Roles migration and provisioning (e2e)", () => {
 
       await pool.query(
         `
-          INSERT INTO user_roles (user_id, role_id, organization_id)
+          INSERT INTO r_user_roles (user_id, role_id, organization_id)
           VALUES ($1, $2, NULL)
         `,
         [userId, platformRole.id],
       );
       await pool.query(
         `
-          INSERT INTO user_roles (user_id, role_id, organization_id)
+          INSERT INTO r_user_roles (user_id, role_id, organization_id)
           VALUES ($1, $2, $3)
         `,
         [userId, organizationRole.id, organizationAId],
@@ -290,7 +290,7 @@ describe("Roles migration and provisioning (e2e)", () => {
       await expectPostgresError(
         pool.query(
           `
-            UPDATE user_roles
+            UPDATE r_user_roles
             SET organization_id = $3
             WHERE user_id = $1 AND role_id = $2
           `,
@@ -301,7 +301,7 @@ describe("Roles migration and provisioning (e2e)", () => {
       await expectPostgresError(
         pool.query(
           `
-            UPDATE user_roles
+            UPDATE r_user_roles
             SET organization_id = NULL
             WHERE user_id = $1 AND role_id = $2
           `,
@@ -312,7 +312,7 @@ describe("Roles migration and provisioning (e2e)", () => {
       await expectPostgresError(
         pool.query(
           `
-            UPDATE user_roles
+            UPDATE r_user_roles
             SET organization_id = $3
             WHERE user_id = $1 AND role_id = $2
           `,
@@ -323,7 +323,7 @@ describe("Roles migration and provisioning (e2e)", () => {
       await expectPostgresError(
         pool.query(
           `
-            INSERT INTO user_roles (user_id, role_id, organization_id)
+            INSERT INTO r_user_roles (user_id, role_id, organization_id)
             VALUES ($1, $2, NULL)
           `,
           [userId, randomUUID()],
@@ -331,8 +331,8 @@ describe("Roles migration and provisioning (e2e)", () => {
         "23503",
       );
     } finally {
-      await pool.query(`DELETE FROM users WHERE id = $1`, [userId]);
-      await pool.query(`DELETE FROM organizations WHERE id = ANY($1::uuid[])`, [
+      await pool.query(`DELETE FROM m_users WHERE id = $1`, [userId]);
+      await pool.query(`DELETE FROM m_organizations WHERE id = ANY($1::uuid[])`, [
         [organizationAId, organizationBId],
       ]);
     }
@@ -358,7 +358,7 @@ describe("Roles migration and provisioning (e2e)", () => {
       const roleRows = await pool.query<{ id: string }>(
         `
           SELECT id
-          FROM roles
+          FROM m_roles
           WHERE organization_id = $1
             AND is_system = true
             AND UPPER(name) = 'ADMIN'
@@ -375,7 +375,7 @@ describe("Roles migration and provisioning (e2e)", () => {
           await pool.query<{ count: number }>(
             `
               SELECT COUNT(*)::int AS count
-              FROM user_roles
+              FROM r_user_roles
               WHERE user_id = $1
                 AND role_id = $2
                 AND organization_id = $3
@@ -392,8 +392,8 @@ describe("Roles migration and provisioning (e2e)", () => {
           await pool.query<{ count: number }>(
             `
               SELECT COUNT(*)::int AS count
-              FROM role_permissions rp
-              JOIN permissions p ON p.id = rp.permission_id
+              FROM r_role_permissions rp
+              JOIN m_permissions p ON p.id = rp.permission_id
               WHERE rp.role_id = $1 AND p.scope = 'platform'
             `,
             [roleId],
@@ -403,15 +403,15 @@ describe("Roles migration and provisioning (e2e)", () => {
       );
       expect(platformGrant.count).toBe(0);
     } finally {
-      await pool.query(`DELETE FROM users WHERE id = $1`, [userId]);
-      await pool.query(`DELETE FROM organizations WHERE id = $1`, [organizationId]);
+      await pool.query(`DELETE FROM m_users WHERE id = $1`, [userId]);
+      await pool.query(`DELETE FROM m_organizations WHERE id = $1`, [organizationId]);
     }
   }, 120_000);
 
   it("maps concurrent same-name role creation to conflicts", async () => {
     const session = await loginAs(app, "admin@example.local", "ChangeMe123!");
     const organization = firstRow(
-      (await pool.query<{ id: string }>(`SELECT id FROM organizations ORDER BY created_at LIMIT 1`))
+      (await pool.query<{ id: string }>(`SELECT id FROM m_organizations ORDER BY created_at LIMIT 1`))
         .rows,
       "Expected a seeded organization",
     );
@@ -420,7 +420,7 @@ describe("Roles migration and provisioning (e2e)", () => {
         await pool.query<{ id: string }>(
           `
             SELECT id
-            FROM permissions
+            FROM m_permissions
             WHERE scope = 'organization'
             ORDER BY name
             LIMIT 1
@@ -458,7 +458,7 @@ describe("Roles migration and provisioning (e2e)", () => {
           await pool.query<{ count: number }>(
             `
               SELECT COUNT(*)::int AS count
-              FROM roles
+              FROM m_roles
               WHERE organization_id = $1 AND LOWER(name) = LOWER($2)
             `,
             [organization.id, roleName],
@@ -468,7 +468,7 @@ describe("Roles migration and provisioning (e2e)", () => {
       );
       expect(roleCount.count).toBe(1);
     } finally {
-      await pool.query(`DELETE FROM roles WHERE organization_id = $1 AND LOWER(name) = LOWER($2)`, [
+      await pool.query(`DELETE FROM m_roles WHERE organization_id = $1 AND LOWER(name) = LOWER($2)`, [
         organization.id,
         roleName,
       ]);
@@ -478,7 +478,7 @@ describe("Roles migration and provisioning (e2e)", () => {
   it("maps a concurrent same-target rename to one conflict", async () => {
     const session = await loginAs(app, "admin@example.local", "ChangeMe123!");
     const organization = firstRow(
-      (await pool.query<{ id: string }>(`SELECT id FROM organizations ORDER BY created_at LIMIT 1`))
+      (await pool.query<{ id: string }>(`SELECT id FROM m_organizations ORDER BY created_at LIMIT 1`))
         .rows,
       "Expected a seeded organization",
     );
@@ -487,7 +487,7 @@ describe("Roles migration and provisioning (e2e)", () => {
         await pool.query<{ id: string }>(
           `
             SELECT id
-            FROM permissions
+            FROM m_permissions
             WHERE scope = 'organization'
             ORDER BY name
             LIMIT 1
@@ -532,7 +532,7 @@ describe("Roles migration and provisioning (e2e)", () => {
       const conflict = responses.find(({ status }) => status === 409);
       expect((conflict?.body as ErrorResponse).error.code).toBe("RESOURCE_CONFLICT");
     } finally {
-      await pool.query(`DELETE FROM roles WHERE id = ANY($1::uuid[])`, [
+      await pool.query(`DELETE FROM m_roles WHERE id = ANY($1::uuid[])`, [
         [firstRoleId, secondRoleId],
       ]);
     }
@@ -541,7 +541,7 @@ describe("Roles migration and provisioning (e2e)", () => {
   it("paginates and filters more than fifty roles without overlap", async () => {
     const session = await loginAs(app, "admin@example.local", "ChangeMe123!");
     const organization = firstRow(
-      (await pool.query<{ id: string }>(`SELECT id FROM organizations ORDER BY created_at LIMIT 1`))
+      (await pool.query<{ id: string }>(`SELECT id FROM m_organizations ORDER BY created_at LIMIT 1`))
         .rows,
       "Expected a seeded organization",
     );
@@ -549,7 +549,7 @@ describe("Roles migration and provisioning (e2e)", () => {
 
     await pool.query(
       `
-        INSERT INTO roles (organization_id, name, description, is_system)
+        INSERT INTO m_roles (organization_id, name, description, is_system)
         SELECT
           $1,
           $2 || ' ' || LPAD(sequence::text, 3, '0'),
@@ -599,7 +599,7 @@ describe("Roles migration and provisioning (e2e)", () => {
         .expect(200);
       expect((searchResponse.body as PaginatedRolesResponse).data).toHaveLength(1);
     } finally {
-      await pool.query(`DELETE FROM roles WHERE organization_id = $1 AND name LIKE $2`, [
+      await pool.query(`DELETE FROM m_roles WHERE organization_id = $1 AND name LIKE $2`, [
         organization.id,
         `${prefix}%`,
       ]);
@@ -685,7 +685,7 @@ describe("Roles migration and provisioning (e2e)", () => {
       expect((forbidden.body as ErrorResponse).error.code).toBe("AUTH_FORBIDDEN");
       expect(createdUser.roles).toContain("ADMIN");
     } finally {
-      await pool.query(`DELETE FROM users WHERE id = $1`, [createdUser.id]);
+      await pool.query(`DELETE FROM m_users WHERE id = $1`, [createdUser.id]);
     }
   }, 120_000);
 });

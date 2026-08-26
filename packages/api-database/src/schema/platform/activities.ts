@@ -7,7 +7,7 @@ import { users } from "../identity/users";
 import { activityVisibilityEnum } from "./enums";
 
 export const activities = pgTable(
-  "activities",
+  "l_activities",
   {
     id: uuid("id").defaultRandom().primaryKey(),
     organizationId: uuid("organization_id")

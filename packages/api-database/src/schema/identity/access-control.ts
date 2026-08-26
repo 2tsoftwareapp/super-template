@@ -16,7 +16,7 @@ import { organizations } from "./organizations";
 import { users } from "./users";
 
 export const roles = pgTable(
-  "roles",
+  "m_roles",
   {
     id: uuid("id").defaultRandom().primaryKey(),
     organizationId: uuid("organization_id").references(() => organizations.id, {
@@ -42,7 +42,7 @@ export const roles = pgTable(
 );
 
 export const permissions = pgTable(
-  "permissions",
+  "m_permissions",
   {
     id: uuid("id").defaultRandom().primaryKey(),
     name: text("name").notNull().unique(),
@@ -57,7 +57,7 @@ export const permissions = pgTable(
 );
 
 export const userRoles = pgTable(
-  "user_roles",
+  "r_user_roles",
   {
     userId: uuid("user_id")
       .notNull()
@@ -79,7 +79,7 @@ export const userRoles = pgTable(
 );
 
 export const rolePermissions = pgTable(
-  "role_permissions",
+  "r_role_permissions",
   {
     roleId: uuid("role_id")
       .notNull()

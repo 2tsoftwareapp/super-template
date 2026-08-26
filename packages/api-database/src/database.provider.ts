@@ -4,11 +4,19 @@ import { EnvironmentService, getTenantContext } from "@repo/api-core";
 import { Pool, type PoolClient, type PoolConfig } from "pg";
 
 import { createDatabaseClient } from "./database.types";
+import { schema as defaultSchema } from "./schema";
 import { setTenantContextOnPgClient } from "./tenant-context";
 
 export const DATABASE_POOL = Symbol("DATABASE_POOL");
 export const ADVISORY_LOCK_POOL = Symbol("ADVISORY_LOCK_POOL");
 export const DATABASE = Symbol("DATABASE");
+
+/**
+ * Token holding the composed Drizzle schema. The application overrides this via
+ * {@link DatabaseModule.forRoot} to merge every enabled feature's tables; when
+ * left unset it falls back to the full built-in schema.
+ */
+export const DATABASE_SCHEMA = Symbol("DATABASE_SCHEMA");
 
 type PoolRelease = (err?: Error) => void;
 type PoolConnectCallback = (
@@ -139,9 +147,14 @@ export const databaseProviders: Provider[] = [
     },
   },
   {
+    provide: DATABASE_SCHEMA,
+    useValue: defaultSchema,
+  },
+  {
     provide: DATABASE,
-    inject: [DATABASE_POOL],
-    useFactory: createDatabaseClient,
+    inject: [DATABASE_POOL, DATABASE_SCHEMA],
+    useFactory: (pool: Pool, schema: Record<string, unknown>) =>
+      createDatabaseClient(pool, schema),
   },
   {
     provide: ADVISORY_LOCK_POOL,

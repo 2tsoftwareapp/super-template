@@ -3,7 +3,7 @@
 ## Executive summary
 
 - Full-stack monorepo starter: NestJS API (modular monolith), Next.js admin BFF, Next.js web landing, Flutter mobile — multi-tenant with RLS.
-- Core business lives in `apps/api/src/{identity,platform}`; `packages/*` holds kernel libraries plus self-contained add-on packages (`api-health` is the exemplar).
+- Core business lives in compile-time feature-plugin packages `packages/features/*` (`@repo/feature-identity`, `@repo/feature-platform`, `@repo/api-health`); `apps/api` is a thin composition root (`app.module.ts` + `features.ts`) and `packages/*` holds the kernel libraries.
 - Auth = JWT access+refresh rotation in HttpOnly cookies via same-origin Next.js BFF; CSRF + RBAC guards server-side.
 - Primary workflow: `make bootstrap` → migrate → seed → generate contracts → `make dev`.
 - Biggest risk: dual toolchain TS7/tsc for build scripts — do not bump TypeScript casually (see CLAUDE.md hazards).
@@ -25,7 +25,9 @@
 | apps/mobile | app | Flutter 3 + Riverpod + go_router | `lib/main.dart` | `make dev-mobile` | apps/mobile/pubspec.yaml |
 | packages/api-core | package (kernel) | NestJS-free kernel, ports, errors | `src/index.ts` | turbo tasks | packages/api-core/package.json |
 | packages/api-database | package (kernel) | Drizzle schema/migrations | `src/schema.ts` | — | packages/api-database/package.json |
-| packages/api-health | package (add-on exemplar) | NestJS terminus indicators | `src/health.module.ts` | — | packages/api-health/package.json |
+| packages/api-health | package (feature-plugin exemplar) | NestJS terminus indicators + FeatureManifest | `src/health.feature.ts` | — | packages/api-health/package.json |
+| packages/features/identity | feature plugin | NestJS identity context (auth/RBAC/MFA/SSO) | `src/identity.feature.ts` | turbo tasks | packages/features/identity/package.json |
+| packages/features/platform | feature plugin | NestJS platform context (jobs/mail/files/audit…) | `src/platform.feature.ts` | turbo tasks | packages/features/platform/package.json |
 | packages/api-contract | package | openapi-typescript generated | `src/generated` | `pnpm run generate:contracts` | packages/api-contract/package.json |
 | packages/web-ui / web-hooks / web-server / web-utils / web-test | packages (frontend kernel) | React 19 / Next server-only | per-package `src/index.ts` | turbo tasks | packages/*/package.json |
 
@@ -48,8 +50,9 @@
 
 | Component / flow | Responsibility | Entry point / boundary | Dependencies | Source |
 |---|---|---|---|---|
-| Identity context | auth/users/orgs/access-control/mfa/sso/preferences | `apps/api/src/identity/modules/*` presentation→application→domain→ports | api-core tokens | ARCHITECTURE_RULES §5–15 |
-| Platform context | jobs/mail/files/audit/notifications/settings/storage/import-export/activities/attachments | `apps/api/src/platform/modules/*` same layering | api-core tokens | same |
+| Identity context | auth/users/orgs/access-control/mfa/sso/preferences | `packages/features/identity/src/modules/*` presentation→application→domain→ports | api-core tokens | ARCHITECTURE_RULES §5–15 |
+| Platform context | jobs/mail/files/audit/notifications/settings/storage/import-export/activities/attachments | `packages/features/platform/src/modules/*` same layering | api-core tokens | same |
+| Feature composition | compile-time plugin wiring (manifest → schema + modules) | `apps/api/src/features.ts` + `@repo/api-core` FeatureManifest | api-core, feature-* | docs/adr/0002 |
 | Admin BFF proxy | cookie session, CSRF, refresh single-flight | `apps/admin/src/app/api/**`, `packages/web-server` | web-utils, env-loader | web-server README |
 | Contracts | OpenAPI → TS client (+Dart) | `apps/api/openapi.json` → packages/api-contract | nest swagger | scripts/generate-* |
 | Cross-context rule | only stable surface (ports/domain/constants) | eslint ctxForbidden + check-package-cycles.sh | — | eslint.config.mjs |
@@ -86,7 +89,7 @@
 
 ### Code
 
-- Structure/naming: frontend feature slices `features/<x>/{api,model,controllers,screens,ui,index.ts}`; backend contexts `apps/api/src/{identity,platform}/modules/<feature>/{presentation,application,domain,infrastructure}` (see apps/*/AGENTS.md, ARCHITECTURE_RULES).
+- Structure/naming: frontend feature slices `features/<x>/{api,model,controllers,screens,ui,index.ts}`; backend feature plugins `packages/features/<feature>/src/modules/<module>/{presentation,application,domain,infrastructure}` (see apps/*/AGENTS.md, ARCHITECTURE_RULES, docs/adr/0002).
 - Error handling: AppError + ERROR_CODES from api-core; envelope responses via interceptor.
 - Doc-comment style (detected): TSDoc-style `/** */` on exported symbols where non-obvious.
 - Flow/rationale comments: numbered `Step N:` markers for multi-stage logic; rationale comments own-marked where non-obvious.
