@@ -2,6 +2,22 @@ const CopyPlugin = require("copy-webpack-plugin");
 const nodeExternals = require("webpack-node-externals");
 const TsconfigPathsPlugin = require("tsconfig-paths-webpack-plugin");
 
+
+const externalizeNativeProviders = ({ request }, callback) => {
+  const natives = [
+    "argon2",
+    "firebase-admin",
+    "@aws-sdk/client-s3",
+    "@aws-sdk/s3-request-presigner",
+    "nodemailer",
+  ];
+  if (natives.includes(request) || natives.some((n) => request?.startsWith(n + "/"))) {
+    callback(null, `commonjs ${request}`);
+    return;
+  }
+  callback();
+};
+
 const externalizeTerminus = ({ request }, callback) => {
   if (request === "@nestjs/terminus") {
     callback(null, `commonjs ${request}`);
@@ -14,6 +30,7 @@ const externalizeTerminus = ({ request }, callback) => {
 module.exports = (options) => ({
   ...options,
   externals: [
+    externalizeNativeProviders,
     externalizeTerminus,
     nodeExternals({
       // Bundle workspace packages; keep npm deps external.
@@ -28,7 +45,7 @@ module.exports = (options) => ({
     new CopyPlugin({
       patterns: [
         {
-          from: "../../packages/features/platform/src/modules/mail/infrastructure/templates",
+          from: "../../packages/feature-mail/src/infrastructure/templates",
           to: "platform/modules/mail/infrastructure/templates",
         },
       ],

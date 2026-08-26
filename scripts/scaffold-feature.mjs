@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 /**
- * Scaffolds a new feature plugin package under `packages/features/<id>/`.
+ * Scaffolds a new feature plugin package under `packages/feature-<id>/`.
  *
  * A feature plugin owns a vertical slice across all four surfaces (API, database,
- * admin, web) and exports a single typed `FeatureManifest` from `@repo/api-core`.
- * The app composes features explicitly in `apps/api/src/features.ts`; there is no
- * kernel edit to add or remove one. See ADR 0002 and the generated README.
+ * admin, web) and exports a single typed `FeatureManifest` from `@repo/api-plugin-kit`.
+ * The app composes features explicitly in `apps/api/src/composition/feature-registry.ts`;
+ * there is no kernel edit to add or remove one. See ADR 0002 and the generated README.
  *
- * The generated package mirrors the `@repo/api-health` add-on exemplar (package
+ * The generated package mirrors the `@repo/feature-health` add-on exemplar (package
  * shape, tsconfig, turbo boundary tag) but is richer: it lays out the schema,
  * migrations, and per-surface folders so the four-surface contract is visible.
  *
@@ -88,8 +88,8 @@ const buildFiles = ({ id, pascal, camel }) => {
   },
   "dependencies": {
     "@nestjs/common": "11.1.27",
-    "@repo/api-core": "workspace:*",
-    "@repo/api-database": "workspace:*",
+    "@repo/api-runtime": "workspace:*",
+    "@repo/database-runtime": "workspace:*",
     "drizzle-orm": "0.45.2"
   },
   "devDependencies": {
@@ -127,7 +127,7 @@ const buildFiles = ({ id, pascal, camel }) => {
 }
 `;
 
-  const indexTs = `import { defineFeature } from "@repo/api-core";
+  const indexTs = `import { defineFeature } from "@repo/api-runtime";
 
 import { ${moduleClass} } from "./${id}.module";
 
@@ -164,7 +164,7 @@ export class ${moduleClass} {}
   const schemaTs = `/**
  * Drizzle tables owned by the \`${id}\` feature.
  *
- * This feature owns its tables here — the built-in \`@repo/api-database\` schema
+ * This feature owns its tables here — the built-in \`@repo/database-runtime\` schema
  * must never define them. Declare the tables in this file, export them, then
  * reference them from the manifest's \`schema\` field in \`../index.ts\`. The app
  * merges every feature's schema via \`composeFeatureSchemas\` in
@@ -199,7 +199,7 @@ Web BFF slice (routes + components) for the \`${id}\` feature, wired through a t
 
 The \`${id}\` feature as a **compile-time plugin package** (see ADR 0002). It owns a
 vertical slice across all four surfaces and exports one typed \`FeatureManifest\`
-from \`@repo/api-core\` for the backend surface.
+from \`@repo/api-runtime\` for the backend surface.
 
 ## The contract
 
@@ -213,7 +213,7 @@ export const ${manifestConst} = defineFeature({
 \`\`\`
 
 Frontend surfaces are exposed through per-surface entrypoints in this package
-(\`./admin\`, \`./web\`) rather than the backend-only manifest, so \`@repo/api-core\`
+(\`./admin\`, \`./web\`) rather than the backend-only manifest, so \`@repo/api-runtime\`
 never depends on React or Flutter.
 
 ## Layout
@@ -281,7 +281,7 @@ const main = () => {
   const pascal = toPascal(id);
   const camel = toCamel(id);
 
-  const targetDir = resolve(repoRoot, 'packages/features', id);
+  const targetDir = resolve(repoRoot, `packages/feature-${id}`);
   const targetRel = relative(repoRoot, targetDir);
 
   if (existsSync(targetDir)) {
@@ -309,13 +309,13 @@ const main = () => {
     `\nNext steps — wire it into the app:\n` +
       `  1. Add the workspace dependency to apps/api/package.json:\n` +
       `       "@repo/feature-${id}": "workspace:*"\n` +
-      `  2. Register the manifest in apps/api/src/features.ts:\n` +
+      `  2. Register the manifest in apps/api/src/composition/feature-registry.ts:\n` +
       `       import { ${camel}Feature } from "@repo/feature-${id}";\n` +
-      `       export const featureManifests: readonly FeatureManifest[] = [${camel}Feature];\n` +
+      `       export const enabledFeatures: readonly FeatureManifest[] = [..., ${camel}Feature];\n` +
       `  3. Install so pnpm links the new package:\n` +
       `       pnpm install\n` +
       `  4. As the feature grows, add the admin resource, web slice, and mobile package\n` +
-      `     (see packages/features/${id}/README.md).\n`,
+      `     (see packages/feature-${id}/README.md).\n`,
   );
 };
 

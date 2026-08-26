@@ -1,6 +1,6 @@
-import type { NotificationsRepositoryPort } from "@repo/feature-platform/modules/notifications/application/ports/notifications.repository.port";
+import type { NotificationsRepositoryPort } from "@repo/feature-notifications/contracts";
 
-import { type DatabaseExecutor } from "@repo/api-database";
+import { type DatabaseExecutor } from "@repo/database-runtime";
 
 import { type SeededUsersContext } from "../types";
 

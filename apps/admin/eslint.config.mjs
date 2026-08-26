@@ -73,7 +73,7 @@ export default defineConfig([
     // violations. New code must not add new violations; existing violations
     // should be migrated gradually (promote to "error" once clean).
     name: "admin/boundary-ui-layer",
-    files: ["src/features/*/ui/**/*.{ts,tsx}"],
+    files: ["src/features/**/ui/**/*.{ts,tsx}"],
     rules: {
       "no-restricted-imports": [
         "warn",
@@ -103,7 +103,7 @@ export default defineConfig([
     // Architecture boundary: model/ is the pure domain layer — no React, no
     // API calls, no side effects. See CODING_RULES.md §7.
     name: "admin/boundary-model-layer",
-    files: ["src/features/*/model/**/*.{ts,tsx}"],
+    files: ["src/features/**/model/**/*.{ts,tsx}"],
     rules: {
       "no-restricted-imports": [
         "error",
@@ -153,7 +153,7 @@ export default defineConfig([
     // api/ hooks re-throw or expose state; they never talk to the user.
     // See CODING_RULES.md §6 R3 and §18.4.
     name: "admin/boundary-api-no-notifications",
-    files: ["src/features/*/api/**/*.{ts,tsx}"],
+    files: ["src/features/**/api/**/*.{ts,tsx}"],
     rules: {
       // NOTE: severity is "warn" — 8 pre-existing *.mutations.ts files raise
       // toasts from api/. Promote to "error" once they are migrated.
@@ -202,9 +202,9 @@ export default defineConfig([
     // handlers, forms, and param parsers. See CODING_RULES.md §15 R2.
     name: "admin/validation-in-model",
     files: [
-      "src/features/*/controllers/**/*.{ts,tsx}",
-      "src/features/*/screens/**/*.{ts,tsx}",
-      "src/features/*/ui/**/*.{ts,tsx}",
+      "src/features/**/controllers/**/*.{ts,tsx}",
+      "src/features/**/screens/**/*.{ts,tsx}",
+      "src/features/**/ui/**/*.{ts,tsx}",
     ],
     rules: {
       "no-restricted-imports": [
@@ -227,9 +227,9 @@ export default defineConfig([
     // See CODING_RULES.md §15 R4.
     name: "admin/params-must-be-parsed",
     files: [
-      "src/features/*/controllers/**/*.{ts,tsx}",
-      "src/features/*/screens/**/*.{ts,tsx}",
-      "src/features/*/ui/**/*.{ts,tsx}",
+      "src/features/**/controllers/**/*.{ts,tsx}",
+      "src/features/**/screens/**/*.{ts,tsx}",
+      "src/features/**/ui/**/*.{ts,tsx}",
     ],
     rules: {
       "no-restricted-syntax": [

@@ -12,6 +12,7 @@ import type { MailDeliveriesColumnFactory, MailViewModel } from "@/features/mail
 import type { MailDeliveryDto } from "@/lib/api-types";
 
 import { useResourceTableConfig } from "@/components/use-resource-table-config";
+import { adminResources } from "@/features/_plugin-resources/admin-resources";
 import {
   useMailDeliveriesQuery,
   useMailPreviewQuery,
@@ -23,7 +24,6 @@ import { selectMailPermissions } from "@/features/mail/model/mail.permissions";
 import { DELIVERY_PAGE_SIZE } from "@/features/mail/model/mail.search-params";
 import { useSession } from "@/hooks/use-session";
 import { usePathname, useRouter } from "@/i18n/navigation";
-import { adminResources } from "@/lib/admin-resources";
 import { createTableSortBridge } from "@/lib/table-sort";
 
 import { useMailFilters } from "./use-mail-filters";

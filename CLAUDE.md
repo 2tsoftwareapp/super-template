@@ -21,26 +21,25 @@ apps/api/src               composition root only — no business logic
   main.ts / shell / cli    bootstrap, guards/interceptors, seeds
 packages/
   @repo/api-contract       OpenAPI contract source of truth
-  @repo/api-core           thin kernel: ports, config, cross-feature tokens, FeatureManifest
-  @repo/api-database       Drizzle schema + migrations (kernel + identity FK anchors)
+  @repo/api-runtime / @repo/api-kernel           thin kernel: ports, config, cross-feature tokens, FeatureManifest
+  @repo/database-runtime       Drizzle schema + migrations (kernel + identity FK anchors)
   @repo/api-sort           sorting/query helpers
   @repo/env-loader         layered env resolution
   @repo/web-ui             shared React UI component library (design system)
   @repo/web-test           shared web test utilities
   @repo/eslint-config / @repo/tsconfig   shared config
 packages/mobile_core       Flutter kernel (design tokens, widgets, errors, storage)
-packages/features/         compile-time feature plugins (each exports a FeatureManifest)
-  @repo/feature-identity   auth, RBAC, MFA, SSO, users, orgs (keystone context)
-                           ./admin nav resources · ./web verify-email · Dart `feature_identity`
-  @repo/feature-platform   mail, files, jobs, audit, notifications, settings, storage, import/export…
-                           ./admin nav resources · Dart `feature_platform`
-  @repo/api-health         health checks (minimal feature-plugin exemplar)
+packages/feature-*         compile-time capability plugins (each exports a FeatureManifest)
+  @repo/feature-auth|users|organizations|access-control|mfa|sso|user-preferences
+  @repo/feature-upload|jobs|mail|notifications|audit|settings|import-export|activities|health
+packages/api-kernel|api-plugin-kit|api-runtime|database-runtime|config|observability
+  kernel split: framework-free primitives, plugin contract, HTTP runtime, DB runtime, env, Sentry
 infra/
   docker-compose.yml       Postgres + Redis + Mailpit for local dev
 ```
 
 Backend features are **compile-time plugins**: each `packages/features/*` package exports a
-`FeatureManifest` (`{ id, nestModule, schema? }`). `apps/api/src/features.ts` lists the enabled
+`FeatureManifest` (`{ id, nestModule, schema? }`). `apps/api/src/composition/feature-registry.ts` lists the enabled
 manifests; `app.module.ts` consumes only the composed modules + schema. To **disable a feature**,
 remove its manifest from `featureManifests` and drop the `@repo/feature-*` dependency from
 `apps/api/package.json`. To **add one**, scaffold with `pnpm scaffold:feature <name>`, then register

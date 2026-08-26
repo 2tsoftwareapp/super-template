@@ -187,8 +187,8 @@ and symbols follow each language's idiom.
 | Adapter                         | `*.adapter.ts` / `<Service>Adapter` | `resend-email.adapter.ts` → `ResendEmailAdapter`    | backend                     |
 | Entity / policy                 | `<domain>.entity.ts` / `<Domain>Entity` | `user.entity.ts` → `UserEntity`                 | backend domain              |
 | DTO                             | `<action>-<feature>.dto.ts` / `<X>Dto` | `create-user.dto.ts` → `CreateUserDto`           | backend presentation        |
-| Drizzle table symbol            | clean `camelCase`, **no** `db`/prefix | `userRoles`, `notificationDeliveries`             | `@repo/api-database`        |
-| Drizzle enum symbol             | `camelCase` + `Enum`                | `jobStatusEnum`                                     | `@repo/api-database`        |
+| Drizzle table symbol            | clean `camelCase`, **no** `db`/prefix | `userRoles`, `notificationDeliveries`             | `@repo/database-runtime`        |
+| Drizzle enum symbol             | `camelCase` + `Enum`                | `jobStatusEnum`                                     | `@repo/database-runtime`        |
 | Zod schema                      | `create<Resource>Schema` / `<x>.schemas.ts` | `createUserSchema`                          | web/admin `model/`          |
 | FE api file / object            | `<feature>.api.ts` / `<feature>Api` | `users.api.ts` → `usersApi.list()`                  | web/admin `api/`            |
 | FE query hook                   | `<feature>.queries.ts` / `use<Feature><Action>Query` | `useUsersListQuery`                | web/admin `api/`            |
@@ -271,7 +271,7 @@ Naming is enforced by a mix of tooling and review:
   `pnpm lint`). It rejects `@boundaries-ignore`, explicit `any`, `unknown`
   outside allowed boundaries, package `index.ts` files that export repositories,
   presentation importing `drizzle-orm`/infrastructure, application importing
-  `drizzle-orm`/`express`/infrastructure/`@repo/api-database`, domain importing
+  `drizzle-orm`/`express`/infrastructure/`@repo/database-runtime`, domain importing
   any framework, and non-route files under `app/**`.
 - **Turborepo boundaries** — `layer:*` tags (`core`, `env`, `database`, `sort`,
   `contract`, and `feature` per ADR 0002) constrain which packages may depend on
@@ -282,7 +282,7 @@ Naming is enforced by a mix of tooling and review:
   kebab-case file naming inside a slice is review-enforced.
 - **The Drizzle schema is the single source of truth for the database.** The
   `m_/t_/w_/l_/r_` physical-name prefix and the column/key/enum conventions are
-  enforced by review against the schema in `@repo/api-database`, and by the
+  enforced by review against the schema in `@repo/database-runtime`, and by the
   generated OpenAPI contract keeping API field names aligned across all four
   clients. There is no second endpoint/table registry to drift from.
 

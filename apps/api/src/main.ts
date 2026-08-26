@@ -2,8 +2,8 @@ import type { ValidationPipeOptions } from "@nestjs/common";
 
 import { Logger, ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
-import { EnvironmentService } from "@repo/api-core";
-import { HealthWarningsService } from "@repo/api-health";
+import { EnvironmentService } from "@repo/api-runtime";
+import { HealthWarningsService } from "@repo/feature-health/contracts";
 import { json, urlencoded } from "express";
 import helmet from "helmet";
 

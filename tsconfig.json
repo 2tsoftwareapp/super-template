@@ -7,12 +7,11 @@
     { "path": "./apps/web/tsconfig.json" },
     { "path": "./packages/api-contract/tsconfig.json" },
     { "path": "./packages/api-contract/tsconfig.spec.json" },
-    { "path": "./packages/api-core/tsconfig.json" },
-    { "path": "./packages/api-core/tsconfig.spec.json" },
-    { "path": "./packages/api-database/tsconfig.json" },
-    { "path": "./packages/api-database/tsconfig.spec.json" },
-    { "path": "./packages/api-health/tsconfig.json" },
-    { "path": "./packages/api-health/tsconfig.spec.json" },
+    { "path": "./packages/api-kernel/tsconfig.json" },
+    { "path": "./packages/api-plugin-kit/tsconfig.json" },
+    { "path": "./packages/api-runtime/tsconfig.json" },
+    { "path": "./packages/database-runtime/tsconfig.json" },
+    { "path": "./packages/feature-health/tsconfig.json" },
     { "path": "./packages/api-sort/tsconfig.json" },
     { "path": "./packages/web-test/tsconfig.json" }
   ]

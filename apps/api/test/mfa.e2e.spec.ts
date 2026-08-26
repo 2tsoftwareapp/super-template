@@ -1,8 +1,9 @@
 import type { INestApplication } from "@nestjs/common";
 
-import { ERROR_CODES } from "@repo/api-core";
-import { DATABASE, users } from "@repo/api-database";
-import { base32Decode, generateTotpCode } from "@repo/feature-identity/modules/mfa/domain/totp";
+import { ERROR_CODES } from "@repo/api-runtime";
+import { DATABASE } from "@repo/database-runtime";
+import { users } from "@repo/feature-users/schema";
+import { base32Decode, generateTotpCode } from "@repo/feature-mfa/contracts";
 import { eq } from "drizzle-orm";
 import request from "supertest";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";

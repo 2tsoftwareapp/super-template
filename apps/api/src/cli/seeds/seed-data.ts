@@ -1,18 +1,18 @@
 import type { INestApplicationContext } from "@nestjs/common";
-import type { DatabaseClient } from "@repo/api-database";
+import type { DatabaseClient } from "@repo/database-runtime";
 
-import { EnvironmentService } from "@repo/api-core";
-import { TenantContextService, WORKER_DISPATCH_CONTEXT } from "@repo/api-core";
-import { DATABASE } from "@repo/api-database";
-import { AccessControlService } from "@repo/feature-identity/modules/access-control";
-import { AUTH_SESSION_REPOSITORY, type AuthSessionRepositoryPort } from "@repo/feature-identity/modules/auth";
-import { OrganizationsService } from "@repo/feature-identity/modules/organizations";
-import { USERS_REPOSITORY, type UsersRepositoryPort } from "@repo/feature-identity/modules/users";
+import { EnvironmentService } from "@repo/api-runtime";
+import { TenantContextService, WORKER_DISPATCH_CONTEXT } from "@repo/api-runtime";
+import { DATABASE } from "@repo/database-runtime";
+import { AccessControlService } from "@repo/feature-access-control/contracts";
+import { AUTH_SESSION_REPOSITORY, type AuthSessionRepositoryPort } from "@repo/feature-auth/contracts";
 import {
   NOTIFICATIONS_REPOSITORY,
   type NotificationsRepositoryPort,
-} from "@repo/feature-platform/modules/notifications/application/ports/notifications.repository.port";
-import { EnsureSettingsSeedDataUseCase } from "@repo/feature-platform/modules/settings/application/use-cases/ensure-settings-seed-data.use-case";
+} from "@repo/feature-notifications/contracts";
+import { OrganizationsService } from "@repo/feature-organizations/contracts";
+import { EnsureSettingsSeedDataUseCase } from "@repo/feature-settings/contracts";
+import { USERS_REPOSITORY, type UsersRepositoryPort } from "@repo/feature-users/contracts";
 
 import { seedAccessControl } from "./seeds/access-control/seed";
 import { seedNotifications } from "./seeds/notifications/seed";

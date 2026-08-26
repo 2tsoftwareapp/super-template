@@ -13,7 +13,7 @@ import type { NotificationJobDto } from "@/lib/api-types";
 
 import { ResourcePageShell } from "@/components/resource-page-shell";
 import { ResourceTable } from "@/components/resource-table";
-import { adminResources } from "@/lib/admin-resources";
+import { adminResources } from "@/features/_plugin-resources/admin-resources";
 import { scalarString, timeAgo } from "@/lib/format";
 import { cn } from "@/lib/utils";
 

@@ -3,8 +3,8 @@
 import { SectionLoading } from "@repo/web-ui/loading";
 
 import { ResourcePageShell } from "@/components/resource-page-shell";
+import { adminResources } from "@/features/_plugin-resources/admin-resources";
 import { useOrganizationDetailController } from "@/features/organizations/controllers/use-organization-detail-controller";
-import { adminResources } from "@/lib/admin-resources";
 
 import { OrganizationDetailContent } from "../ui/organization-detail-content";
 

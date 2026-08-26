@@ -1,5 +1,5 @@
 import { NestFactory } from "@nestjs/core";
-import { createDatabaseClient } from "@repo/api-database";
+import { createDatabaseClient } from "@repo/database-runtime";
 import { Pool } from "pg";
 
 import { AppModule } from "../app.module";

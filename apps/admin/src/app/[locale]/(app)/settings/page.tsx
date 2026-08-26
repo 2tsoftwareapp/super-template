@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { SettingsView } from "@repo/feature-platform/admin";
+import { SettingsView } from "@/features/_plugin-resources/platform-admin";
 
 export const metadata: Metadata = {
   title: "System Settings | Super Admin",

@@ -1,6 +1,7 @@
 import type { INestApplication } from "@nestjs/common";
 
-import { DATABASE, users } from "@repo/api-database";
+import { DATABASE } from "@repo/database-runtime";
+import { users } from "@repo/feature-users/schema";
 import { eq } from "drizzle-orm";
 import request from "supertest";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";

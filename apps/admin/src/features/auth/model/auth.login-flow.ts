@@ -1,6 +1,6 @@
 import type { AuthLoginResponse } from "@/lib/api-types";
 
-import { hasAdminAppAccess } from "@/lib/admin-resources";
+import { hasAdminAppAccess } from "@/features/_plugin-resources/admin-resources";
 
 import { AUTH_FLOW_ERROR_CODES, AUTH_FLOW_RESULTS } from "./auth.constants";
 import { AuthFlowError } from "./auth.errors";

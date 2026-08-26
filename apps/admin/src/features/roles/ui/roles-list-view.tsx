@@ -14,7 +14,7 @@ import type { RolesViewModel } from "@/features/roles/model/roles.types";
 
 import { ResourcePageShell } from "@/components/resource-page-shell";
 import { ResourceToolbar } from "@/components/resource-toolbar";
-import { adminResources } from "@/lib/admin-resources";
+import { adminResources } from "@/features/_plugin-resources/admin-resources";
 import { formatRoleName } from "@/lib/roles";
 
 import { RoleFormDrawer } from "./role-form-drawer";

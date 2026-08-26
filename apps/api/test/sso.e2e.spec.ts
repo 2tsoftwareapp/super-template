@@ -1,6 +1,6 @@
 import type { INestApplication } from "@nestjs/common";
 
-import { ERROR_CODES } from "@repo/api-core";
+import { ERROR_CODES } from "@repo/api-runtime";
 import request from "supertest";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 

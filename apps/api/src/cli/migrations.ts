@@ -7,9 +7,9 @@ const MIGRATIONS_TABLE = "public.__app_migrations";
 
 export const resolveMigrationsFolder = (): string => {
   const candidates = [
-    resolve(process.cwd(), "drizzle"),
-    resolve(process.cwd(), "packages/api-database/drizzle"),
-    resolve(process.cwd(), "../../packages/api-database/drizzle"),
+    resolve(process.cwd(), "migrations"),
+    resolve(process.cwd(), "apps/api/migrations"),
+    resolve(process.cwd(), "../../apps/api/migrations"),
   ];
 
   const folder = candidates.find((candidate) => {

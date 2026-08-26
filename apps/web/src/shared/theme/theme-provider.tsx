@@ -3,6 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 
 import type { ResolvedTheme, Theme, ThemeContextValue } from "./theme-contract";
+
 import {
   applyTheme,
   getStoredTheme,

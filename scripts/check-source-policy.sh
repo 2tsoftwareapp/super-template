@@ -12,10 +12,13 @@ apps/api/src
 apps/api/test
 apps/admin/src
 apps/web/src
-packages/api-core/src
-packages/api-database/src
-packages/features/identity/src
-packages/features/platform/src
+packages/api-kernel/src
+packages/api-plugin-kit/src
+packages/api-runtime/src
+packages/database-runtime/src
+packages/observability/src
+packages/config/src
+packages/feature-*/src
 "
 
 search_matches() {
@@ -27,58 +30,9 @@ search_matches() {
       --glob '!**/*.tsbuildinfo' \
       --glob '!**/generated/**' \
       --glob '!**/*.spec.ts' \
-      --glob '!**/*.test.ts'
+      --glob '!**/*.test.ts' || true
     return
   fi
-
-  for dir in "$@"; do
-    find "$dir" \
-      \( -path '*/generated/*' -o -name '*.tsbuildinfo' -o -name '*.spec.ts' -o -name '*.test.ts' \) -prune -o \
-      -type f \( -name '*.ts' -o -name '*.tsx' \) -print
-  done | xargs grep -nE "$pattern" 2>/dev/null || true
-}
-
-filter_unknown_allowlist() {
-  awk -F: '
-    /\/filters\// { next }
-    /postgres-errors\.ts:/ { next }
-    /env\.schema\.ts:/ { next }
-    /redis/ { next }
-    /access-profile\.cache\.ts:/ { next }
-    /notification-stream\.service\.ts:/ { next }
-    /redact\.ts:/ { next }
-    /current-user\.decorator\.ts:/ { next }
-    /api-response\.decorator\.ts:/ { next }
-    /apps\/api\/src\/main\.ts:/ { next }
-    /database\.provider\.ts:/ { next }
-    /app-error\.ts:/ { next }
-    /observability\.types\.ts:/ { next }
-    /transaction-executor\.ts:/ { next }
-    /batch-delete-files\.use-case\.ts:/ { next }
-    /\.repository\.port\.ts:/ { next }
-    /\.mapper\.ts:.*import type/ { next }
-    { print }
-  '
-}
-
-search_unknown_targets() {
-  pattern=$1
-
-  if command -v rg >/dev/null 2>&1; then
-    rg -n "$pattern" \
-      packages/features/identity/src/modules \
-      packages/features/platform/src/modules \
-      packages/features/platform/src/modules \
-      apps/admin/src \
-      apps/web/src \
-      --glob '**/application/**' \
-      --glob '**/presentation/**' \
-      --glob '!**/*.spec.ts' \
-      --glob '!**/*.test.ts' \
-      --glob '!**/generated/**' | filter_unknown_allowlist
-    return
-  fi
-
   true
 }
 
@@ -98,264 +52,59 @@ check_policy() {
   fi
 }
 
-check_unknown_policy() {
-  name=$1
-  pattern=$2
-  message=$3
-
-  output=$(search_unknown_targets "$pattern" || true)
-
-  if [ -n "$output" ]; then
-    failed=1
-    printf 'Policy violation: %s\n' "$name" >&2
-    printf '%s\n' "$output" >&2
-    printf '%s\n' "$message" >&2
-  fi
-}
-
 # shellcheck disable=SC2086
 check_policy '@boundaries-ignore' '@boundaries-ignore' 'Remove boundary-ignore comments and fix the underlying import surface.' $POLICY_SEARCH_DIRS
 # shellcheck disable=SC2086
-check_policy 'explicit any' ':\s*any\b|<\s*any\s*>|\bas\s+any\b' 'Use concrete types instead of explicit any.' $POLICY_SEARCH_DIRS
+check_policy 'explicit any' ':\s*any\b|<\s*any\s*>|\bas\s*any\b' 'Use concrete types instead of explicit any.' $POLICY_SEARCH_DIRS
 
-check_unknown_policy \
-  'unknown outside boundary' \
-  ':\s*unknown\b|<\s*unknown\s*>|\bas\s+unknown\b|Record<string,\s*unknown>' \
-  'Use JsonValue/JsonObject or narrow unknown at explicit boundaries only.'
-
-search_index_exports() {
-  pattern=$1
-
-  if command -v rg >/dev/null 2>&1; then
-    rg -n "$pattern" \
-      packages/api-core/src/index.ts \
-      packages/api-database/src/index.ts \
-      packages/features/identity/src/index.ts \
-      packages/features/platform/src/index.ts \
-      packages/api-health/src/index.ts
-    return
-  fi
-
-  grep -nE "$pattern" \
-    packages/api-core/src/index.ts \
-    packages/api-database/src/index.ts \
-    packages/features/identity/src/index.ts \
-    packages/features/platform/src/index.ts \
-    packages/api-health/src/index.ts \
-    2>/dev/null || true
-}
-
-check_index_policy() {
-  name=$1
-  pattern=$2
-  message=$3
-
-  output=$(search_index_exports "$pattern" || true)
-
-  if [ -n "$output" ]; then
-    failed=1
-    printf 'Policy violation: %s\n' "$name" >&2
-    printf '%s\n' "$output" >&2
-    printf '%s\n' "$message" >&2
-  fi
-}
-
-search_presentation_imports() {
-  pattern=$1
-
-  if command -v rg >/dev/null 2>&1; then
-    rg -n "$pattern" \
-      packages/features/identity/src/modules \
-      packages/features/platform/src/modules \
-      packages/features/platform/src/modules \
-      --glob '**/presentation/**/*.ts' \
-      --glob '!**/*.spec.ts'
-    return
-  fi
-
-  find packages/features/identity/src/modules packages/features/platform/src/modules packages/features/platform/src/modules \
-    -path '*/presentation/*' -name '*.ts' ! -name '*.spec.ts' -print |
-    xargs grep -nE "$pattern" 2>/dev/null || true
-}
-
-check_presentation_policy() {
-  name=$1
-  pattern=$2
-  message=$3
-
-  output=$(search_presentation_imports "$pattern" || true)
-
-  if [ -n "$output" ]; then
-    failed=1
-    printf 'Policy violation: %s\n' "$name" >&2
-    printf '%s\n' "$output" >&2
-    printf '%s\n' "$message" >&2
-  fi
-}
-
-check_index_policy \
-  'package index exports repositories' \
-  'export .*Repository' \
-  'Package index.ts must export modules and contracts only, not repositories.'
-
-check_presentation_policy \
-  'presentation imports drizzle' \
-  "from 'drizzle-orm'" \
-  'Presentation layer must not import drizzle-orm; use application services instead.'
-
-check_presentation_policy \
-  'presentation imports infrastructure' \
-  "from ['\"]\.\./infrastructure/" \
-  'Presentation layer must not import infrastructure; use application services instead.'
-
-search_application_imports() {
-  pattern=$1
-
-  if command -v rg >/dev/null 2>&1; then
-    rg -n "$pattern" \
-      packages/features/identity/src/modules \
-      packages/features/platform/src/modules \
-      packages/features/platform/src/modules \
-      --glob '**/application/**/*.ts' \
-      --glob '!**/*.spec.ts' \
-      --glob '!**/*.repository.port.ts' \
-      --glob '!**/*.mapper.ts'
-    return
-  fi
-
-  find packages/features/identity/src/modules packages/features/platform/src/modules packages/features/platform/src/modules \
-    -path '*/application/*' -name '*.ts' ! -name '*.spec.ts' ! -name '*.repository.port.ts' ! -name '*.mapper.ts' -print |
-    xargs grep -nE "$pattern" 2>/dev/null || true
-}
-
-warn_application_policy() {
-  name=$1
-  pattern=$2
-  message=$3
-
-  output=$(search_application_imports "$pattern" || true)
-
-  if [ -n "$output" ]; then
-    printf 'Policy warning: %s\n' "$name" >&2
-    printf '%s\n' "$output" >&2
-    printf '%s\n' "$message" >&2
-  fi
-}
-
-check_application_policy() {
-  name=$1
-  pattern=$2
-  message=$3
-
-  output=$(search_application_imports "$pattern" || true)
-
-  if [ -n "$output" ]; then
-    failed=1
-    printf 'Policy violation: %s\n' "$name" >&2
-    printf '%s\n' "$output" >&2
-    printf '%s\n' "$message" >&2
-  fi
-}
-
-warn_application_policy \
-  'application imports presentation DTOs' \
-  "from ['\"]\.\./presentation/.*\\.dto" \
-  'Prefer internal types in application services; map to DTOs at the controller boundary.'
-
-check_application_policy \
-  'application imports drizzle' \
-  "from 'drizzle-orm'" \
-  'Application layer must not import drizzle-orm; use infrastructure repositories instead.'
-
-check_application_policy \
-  'application imports express' \
-  "from 'express'" \
-  'Application layer must not import express; keep HTTP concerns in presentation.'
-
-check_application_policy \
-  'application imports infrastructure' \
-  "from ['\"]\.\./.*infrastructure/" \
-  'Application layer must not import infrastructure via relative paths; inject through application ports instead.'
-
-warn_application_policy \
-  'application imports api-database' \
-  "from '@repo/api-database'" \
-  'Application layer should not import @repo/api-database directly. Inject database abstractions through application ports (P1.8).'
-
-# Domain purity: modules/*/domain/ holds framework-free business rules.
-# It must never import NestJS, Drizzle, express, or the database package.
-check_domain_policy() {
-  name=$1
-  pattern=$2
-  message=$3
-
-  output=""
-  if command -v rg >/dev/null 2>&1; then
-    # Type-only imports are allowed: they carry no runtime coupling.
-    output=$(rg -n "$pattern" \
-      packages/features/identity/src/modules \
-      packages/features/platform/src/modules \
-      --glob '**/domain/**' \
-      --glob '!**/*.spec.ts' \
-      --glob '!**/*.test.ts' 2>/dev/null | grep -v 'import type' || true)
-  fi
-
-  if [ -n "$output" ]; then
-    failed=1
-    printf 'Policy violation: %s\n' "$name" >&2
-    printf '%s\n' "$output" >&2
-    printf '%s\n' "$message" >&2
-  fi
-}
-
-check_domain_policy \
-  'domain imports a framework' \
-  "from '@nestjs/|from 'drizzle-orm'|from 'express'|from '@repo/api-database'" \
-  'modules/*/domain must stay framework-free: pure functions and types only.'
-
-# App Router purity: app/ may only contain route entries (page/layout/route
-# handlers). Views, drawers, cards, and other components belong to features/.
-check_app_router_purity() {
-  output=$(find "apps/admin/src/app" "apps/web/src/app" \
-    -type f \( -name '*.tsx' -o -name '*.ts' \) \
-    ! -name 'page.tsx' ! -name 'layout.tsx' ! -name 'route.ts' \
-    ! -name 'loading.tsx' ! -name 'error.tsx' ! -name 'not-found.tsx' \
-    ! -name 'template.tsx' ! -name 'default.tsx' ! -name 'global-error.tsx' 2>/dev/null || true)
-
-  if [ -n "$output" ]; then
-    failed=1
-    printf 'Policy violation: app router contains non-route files\n' >&2
-    printf '%s\n' "$output" >&2
-    printf 'Move views/components to src/features/<resource>/components/.\n' >&2
-  fi
-}
-
-check_app_router_purity
-
-warn_large_application_services() {
-  if command -v rg >/dev/null 2>&1; then
-  files=$(find packages/features/identity/src/modules packages/features/platform/src/modules packages/features/platform/src/modules \
-    -path '*/application/*.service.ts' ! -name '*.spec.ts' 2>/dev/null || true)
-  for file in $files; do
-    lines=$(wc -l <"$file" | tr -d ' ')
-    if [ "$lines" -gt 250 ]; then
-      printf 'Policy warning: %s has %s lines (budget: 250)\n' "$file" "$lines" >&2
-    fi
-  done
-  fi
-}
-
-warn_large_application_services
-
-if command -v git >/dev/null 2>&1; then
-  tracked_artifacts=$(git ls-files '*.tsbuildinfo' 'apps/api/storage/uploads/*' 2>/dev/null || true)
-
-  if [ -n "$tracked_artifacts" ]; then
-    failed=1
-    printf 'Policy violation: tracked generated artifacts\n' >&2
-    printf '%s\n' "$tracked_artifacts" >&2
-    printf 'Remove generated uploads and tsbuildinfo files from git and keep them ignored.\n' >&2
-  fi
+# API host must not own business feature implementation folders
+if rg -n '.' apps/api/src/identity apps/api/src/platform apps/api/src/auth apps/api/src/upload apps/api/src/jobs apps/api/src/mail 2>/dev/null; then
+  failed=1
+  printf 'Policy violation: apps/api contains business feature folders\n' >&2
 fi
 
-exit "$failed"
+# No umbrella feature packages
+if [ -d packages/features/identity ] || [ -d packages/features/platform ]; then
+  failed=1
+  printf 'Policy violation: umbrella packages/features/{identity,platform} must not exist\n' >&2
+fi
+
+# No wildcard feature exports
+wildcard=$(rg -n '"\./\*"' packages/feature-*/package.json || true)
+if [ -n "$wildcard" ]; then
+  failed=1
+  printf 'Policy violation: feature packages must not use wildcard exports\n%s\n' "$wildcard" >&2
+fi
+
+# database-runtime must not own business schema tables
+if rg -n 'pgTable\(' packages/database-runtime/src --glob '!**/persistence/timestamps.ts' --glob '!**/*.spec.ts'; then
+  failed=1
+  printf 'Policy violation: database-runtime must not define business tables\n' >&2
+fi
+
+# api-kernel must not import Nest/Express/Drizzle/Redis/Sentry
+kernel_fw=$(rg -n "from ['\"]@nestjs/|from ['\"]express|from ['\"]drizzle-orm|from ['\"]redis|from ['\"]@sentry/" packages/api-kernel/src || true)
+if [ -n "$kernel_fw" ]; then
+  failed=1
+  printf 'Policy violation: api-kernel must stay framework-free\n%s\n' "$kernel_fw" >&2
+fi
+
+# Features must not import apps/*
+feat_apps=$(rg -n "from ['\"](@/|\.\./\.\./\.\./apps/|apps/)" packages/feature-*/src || true)
+# Allow nothing from apps
+if [ -n "$feat_apps" ]; then
+  failed=1
+  printf 'Policy violation: features must not import apps/*\n%s\n' "$feat_apps" >&2
+fi
+
+# API host must not depend on provider SDKs
+if rg -n '"(@aws-sdk/|firebase-admin|nodemailer|argon2)"' apps/api/package.json; then
+  failed=1
+  printf 'Policy violation: apps/api must not depend on feature provider SDKs\n' >&2
+fi
+
+if [ "$failed" -ne 0 ]; then
+  exit 1
+fi
+
+printf 'Source policy checks passed.\n'

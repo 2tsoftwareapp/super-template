@@ -1,6 +1,6 @@
-import type { AccessControlService } from "@repo/feature-identity/modules/access-control";
+import type { AccessControlService } from "@repo/feature-access-control/contracts";
 
-import { type DatabaseExecutor } from "@repo/api-database";
+import { type DatabaseExecutor } from "@repo/database-runtime";
 
 export async function seedAccessControl(
   accessControlService: AccessControlService,

@@ -1,40 +1,55 @@
-import { collectFeatureModules, composeFeatureSchemas } from "@repo/api-core";
-import { healthFeature } from "@repo/api-health";
-import { identityFeature } from "@repo/feature-identity";
-import { platformFeature } from "@repo/feature-platform";
+import { composeFeatures } from "@repo/api-plugin-kit";
+import { enabledFeatures } from "../../src/composition/feature-registry";
 import { describe, expect, it } from "vitest";
 
-// Smoke test for the compile-time plugin composition: it exercises the REAL
-// feature manifests exported by each `@repo/feature-*` package (not fixtures),
-// proving they are valid and that enabling/disabling a plugin is a pure,
-// data-driven edit to the manifest list — the guarantee `apps/api/src/features.ts`
-// relies on.
 describe("feature composition (compile-time plugins)", () => {
-  const allFeatures = [identityFeature, platformFeature, healthFeature];
+  it("composes the real enabled feature registry without duplicate ids/schema keys", () => {
+    const composed = composeFeatures(enabledFeatures);
 
-  it("every feature package exports a valid manifest", () => {
-    for (const feature of allFeatures) {
-      expect(typeof feature.id).toBe("string");
-      expect(feature.id.length).toBeGreaterThan(0);
-      expect(feature.nestModule).toBeTruthy();
-    }
-    expect(allFeatures.map((feature) => feature.id)).toEqual(["identity", "platform", "health"]);
+    expect(composed.features.length).toBe(enabledFeatures.length);
+    expect(composed.modules.length).toBe(enabledFeatures.length);
+    expect(typeof composed.schema).toBe("object");
+
+    const ids = composed.features.map((feature) => feature.id);
+    expect(new Set(ids).size).toBe(ids.length);
   });
 
-  it("dropping a plugin from the list drops exactly its module (omit-plugin smoke)", () => {
-    const withHealth = collectFeatureModules(allFeatures);
-    const withoutHealth = collectFeatureModules(
-      allFeatures.filter((feature) => feature.id !== "health"),
+  it("rejects duplicate feature ids", () => {
+    const [first] = enabledFeatures;
+    expect(first).toBeTruthy();
+    expect(() => composeFeatures([first!, first!])).toThrow(/Duplicate feature id/);
+  });
+
+  it("dropping an optional plugin drops exactly its module (omit-plugin smoke)", () => {
+    const withAll = composeFeatures(enabledFeatures);
+    const withoutHealth = composeFeatures(
+      enabledFeatures.filter((feature) => feature.id !== "health"),
     );
 
-    expect(withHealth).toContain(healthFeature.nestModule);
-    expect(withoutHealth).not.toContain(healthFeature.nestModule);
-    expect(withHealth.length - withoutHealth.length).toBe(1);
+    expect(withAll.modules.length - withoutHealth.modules.length).toBe(1);
+    expect(withoutHealth.features.some((feature) => feature.id === "health")).toBe(false);
   });
 
-  it("composeFeatureSchemas merges feature schemas without throwing", () => {
-    const schema = composeFeatureSchemas(allFeatures);
-    expect(typeof schema).toBe("object");
-    expect(schema).not.toBeNull();
+  it("rejects missing dependencies", () => {
+    const orphan = {
+      id: "needs-auth",
+      dependsOn: ["auth"],
+      nestModule: class OrphanModule {},
+    };
+    expect(() => composeFeatures([orphan])).toThrow(/missing feature "auth"/);
+  });
+
+  it("rejects dependency cycles", () => {
+    const a = {
+      id: "a",
+      dependsOn: ["b"],
+      nestModule: class A {},
+    };
+    const b = {
+      id: "b",
+      dependsOn: ["a"],
+      nestModule: class B {},
+    };
+    expect(() => composeFeatures([a, b])).toThrow(/cycle/i);
   });
 });

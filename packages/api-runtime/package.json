@@ -1,0 +1,43 @@
+{
+  "name": "@repo/api-runtime",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint .",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "@nestjs/common": "11.1.27",
+    "@nestjs/core": "11.1.27",
+    "@nestjs/swagger": "11.4.4",
+    "@nestjs/throttler": "6.5.0",
+    "@repo/api-kernel": "workspace:*",
+    "@repo/api-plugin-kit": "workspace:*",
+    "@repo/api-sort": "workspace:*",
+    "@repo/config": "workspace:*",
+    "@repo/utils": "workspace:*",
+    "class-transformer": "0.5.1",
+    "class-validator": "0.15.1",
+    "express": "5.2.1",
+    "redis": "^5.10.0",
+    "rxjs": "7.8.2",
+    "zod": "4.4.3",
+    "@repo/env-loader": "workspace:*",
+    "dotenv": "17.4.2",
+    "@repo/observability": "workspace:*"
+  },
+  "devDependencies": {
+    "@repo/tsconfig": "workspace:*",
+    "@types/express": "5.0.4",
+    "@types/node": "24.10.1",
+    "typescript": "5.9.3",
+    "vitest": "4.1.9"
+  }
+}

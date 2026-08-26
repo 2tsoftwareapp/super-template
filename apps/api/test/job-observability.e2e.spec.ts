@@ -1,7 +1,6 @@
 import type { INestApplication } from "@nestjs/common";
 
-import { JobsService } from "@repo/feature-platform/modules/jobs/application/jobs.service";
-import { JobsRepository } from "@repo/feature-platform/modules/jobs/infrastructure/jobs.repository";
+import { JobsRepository, JobsService } from "@repo/feature-jobs/contracts";
 import request from "supertest";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 

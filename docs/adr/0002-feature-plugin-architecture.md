@@ -6,8 +6,8 @@ Date: 2026-08-25 · Status: accepted
 
 The template shipped every capability inside `apps/*`: identity + platform Nest
 modules in `apps/api/src/{identity,platform}`, one monolithic Drizzle schema in
-`@repo/api-database`, admin/web slices under `apps/*/src/features`, and Flutter
-features under `apps/mobile/lib/features`. Only `@repo/api-health` was an optional
+`@repo/database-runtime`, admin/web slices under `apps/*/src/features`, and Flutter
+features under `apps/mobile/lib/features`. Only `@repo/feature-health` was an optional
 add-on package. Consumers who wanted "no mail" or "no import/export" had to hand-
 edit core code across four platforms with no contract telling them what a feature
 actually owns.
@@ -26,7 +26,7 @@ package under `packages/features/<id>/`. The kernel stays thin.
   runner), `web-ui`/`web-hooks`/`web-utils`/`web-server` (design system), and a
   Flutter `mobile_core`. The kernel contains **no** identity/platform tables.
 - **Feature plugin:** owns a vertical slice across all four surfaces and exports a
-  single typed `FeatureManifest` (`@repo/api-core`) for the backend surface:
+  single typed `FeatureManifest` (`@repo/api-runtime`) for the backend surface:
   `{ id, nestModule, schema?, permissions? }`. Frontend surfaces are exposed
   through per-surface package entrypoints (`./admin`, `./web`) and a Flutter
   sub-package.

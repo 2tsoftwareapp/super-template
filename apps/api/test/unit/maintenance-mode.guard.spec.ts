@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { ERROR_CODES } from "@repo/api-core";
+import { ERROR_CODES } from "@repo/api-runtime";
 
 import { MaintenanceModeGuard } from "../../src/shell/maintenance-mode.guard";
 

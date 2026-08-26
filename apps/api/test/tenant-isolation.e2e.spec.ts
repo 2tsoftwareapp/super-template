@@ -1,5 +1,5 @@
 import type { INestApplication } from "@nestjs/common";
-import { ROLE_NAMES } from "@repo/api-core";
+import { ROLE_NAMES } from "@repo/api-runtime";
 import request from "supertest";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {

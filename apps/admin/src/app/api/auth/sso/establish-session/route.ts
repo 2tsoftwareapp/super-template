@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 
 import type { ApiEnvelope } from "@/lib/api-types";
 
-import { hasAdminAppAccess } from "@/lib/admin-resources";
+import { hasAdminAppAccess } from "@/features/_plugin-resources/admin-resources";
 import { clearAuthCookies, setAuthCookies } from "@/lib/auth/cookies";
 import { callBackend, enforceOrigin } from "@/lib/server/backend";
 

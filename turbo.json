@@ -4,12 +4,22 @@
     "tags": {
       "layer:core": {
         "dependencies": {
-          "allow": ["layer:core", "layer:env", "layer:sort", "layer:tsconfig", "layer:eslint"]
+          "allow": [
+            "layer:core",
+            "layer:env",
+            "layer:sort",
+            "layer:tsconfig",
+            "layer:eslint"
+          ]
         }
       },
       "layer:env": {
         "dependencies": {
-          "allow": ["layer:env", "layer:tsconfig", "layer:eslint"]
+          "allow": [
+            "layer:env",
+            "layer:tsconfig",
+            "layer:eslint"
+          ]
         }
       },
       "layer:database": {
@@ -26,7 +36,12 @@
       },
       "layer:contract": {
         "dependencies": {
-          "allow": ["layer:contract", "layer:sort", "layer:tsconfig", "layer:eslint"]
+          "allow": [
+            "layer:contract",
+            "layer:sort",
+            "layer:tsconfig",
+            "layer:eslint"
+          ]
         }
       },
       "layer:health": {
@@ -81,12 +96,17 @@
       },
       "layer:tsconfig": {
         "dependencies": {
-          "allow": ["layer:tsconfig"]
+          "allow": [
+            "layer:tsconfig"
+          ]
         }
       },
       "layer:eslint": {
         "dependencies": {
-          "allow": ["layer:eslint", "layer:tsconfig"]
+          "allow": [
+            "layer:eslint",
+            "layer:tsconfig"
+          ]
         }
       },
       "layer:frontend-core": {
@@ -133,8 +153,14 @@
   },
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
-      "outputs": ["dist/**", ".next/**", "!.next/cache/**"],
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "dist/**",
+        ".next/**",
+        "!.next/cache/**"
+      ],
       "env": [
         "APP_ENV",
         "NEXT_PUBLIC_APP_ENV",
@@ -148,10 +174,16 @@
     "dev": {
       "cache": false,
       "persistent": true,
-      "env": ["WEB_PORT", "ADMIN_PORT", "EXTENSION_MCP_PORT"]
+      "env": [
+        "WEB_PORT",
+        "ADMIN_PORT",
+        "EXTENSION_MCP_PORT"
+      ]
     },
     "generate": {
-      "dependsOn": ["^generate"],
+      "dependsOn": [
+        "^generate"
+      ],
       "outputs": [
         "$TURBO_ROOT$/apps/api/openapi.json",
         "$TURBO_ROOT$/packages/api-contract/src/generated/**"

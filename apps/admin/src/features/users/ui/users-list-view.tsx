@@ -14,9 +14,9 @@ import { BulkActionBar } from "@/components/bulk-action-bar";
 import { ResourcePageShell } from "@/components/resource-page-shell";
 import { ResourceTable } from "@/components/resource-table";
 import { ResourceToolbar } from "@/components/resource-toolbar";
+import { adminResources } from "@/features/_plugin-resources/admin-resources";
 import { STATUS_FILTERS } from "@/features/users/model/constants";
 import { USERS_PAGE_SIZE_OPTIONS } from "@/features/users/model/users.types";
-import { adminResources } from "@/lib/admin-resources";
 
 import { CreateUserDrawer } from "./create-user-drawer";
 import { UsersConfirmBlockDialog } from "./users-confirm-block-dialog";

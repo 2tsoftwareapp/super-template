@@ -1,0 +1,25 @@
+{
+  "name": "@repo/api-plugin-kit",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint .",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "@nestjs/common": "11.1.27"
+  },
+  "devDependencies": {
+    "@repo/tsconfig": "workspace:*",
+    "@types/node": "24.10.1",
+    "typescript": "5.9.3",
+    "vitest": "4.1.9"
+  }
+}

@@ -12,7 +12,7 @@ import type { OrganizationsListViewModel } from "@/features/organizations/model/
 
 import { ResourcePageShell } from "@/components/resource-page-shell";
 import { ResourceToolbar } from "@/components/resource-toolbar";
-import { adminResources } from "@/lib/admin-resources";
+import { adminResources } from "@/features/_plugin-resources/admin-resources";
 
 import { CreateOrganizationDrawer } from "./create-organization-drawer";
 

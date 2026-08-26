@@ -79,7 +79,7 @@ Rules:
 - **`@repo/utils` must stay runtime-agnostic.** It is the only package importable by
   both the NestJS API and the Next.js BFFs. It must not import any framework, DOM,
   or Node-only API. Duplicated pure-TS logic (e.g. the JSON value model) lives here;
-  `@repo/api-core` and `@repo/web-utils` re-export from it rather than redefining.
+  `@repo/api-runtime` and `@repo/web-utils` re-export from it rather than redefining.
 - **API-shaped config is NOT shared config.** Enums, DTOs, and endpoints are synced
   across runtimes by the generated OpenAPI contract (`@repo/api-contract` → TS + Dart).
   Only non-API constants (pagination defaults, cookie names, feature flags) belong in
@@ -557,7 +557,7 @@ unless the scope is narrow and unmistakable.
 
 ## 15. Cross-context communication
 
-The identity and platform contexts (`@repo/feature-identity`, `@repo/feature-platform` under `packages/features/*`) are compile-time feature-plugin packages (see §15.1).
+The identity and platform contexts (`@repo/feature-auth`, `@repo/feature-upload` under `packages/features/*`) are compile-time feature-plugin packages (see §15.1).
 
 They communicate through:
 
@@ -593,7 +593,7 @@ two kinds of code:
 A feature plugin's **backend** surface MUST:
 
 - export exactly one public surface — its Nest `Module` — plus a
-  `FeatureManifest` (`@repo/api-core`: `{ id, nestModule, schema?, permissions? }`)
+  `FeatureManifest` (`@repo/api-runtime`: `{ id, nestModule, schema?, permissions? }`)
   from `index.ts`;
 - depend only on kernel packages (`layer:core/env/database/sort/contract`) and
   peer feature **public** surfaces (`layer:feature`) — never on another feature's
@@ -605,7 +605,7 @@ A feature plugin's **backend** surface MUST:
 
 > **Transitional exception:** `feature-identity` and `feature-platform` were
 > extracted as whole bounded contexts and still keep their tables in the built-in
-> `@repo/api-database` schema (identity because `m_users`/`m_organizations` are the
+> `@repo/database-runtime` schema (identity because `m_users`/`m_organizations` are the
 > FK anchors every other feature references). Their manifests contribute no schema;
 > `features.ts` merges the built-in schema with feature-contributed schema so the
 > composed result is identical. Finer-grained per-capability schema ownership is a

@@ -12,7 +12,7 @@ import {
   APPLICATION_SETTINGS_LOOKUP,
   type ApplicationSettingsLookup,
   ERROR_CODES,
-} from "@repo/api-core";
+} from "@repo/api-runtime";
 
 /**
  * Paths that must stay reachable while maintenance mode is enabled so the

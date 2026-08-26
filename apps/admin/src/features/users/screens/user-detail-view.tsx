@@ -3,9 +3,9 @@
 import { Skeleton } from "@repo/web-ui/skeleton";
 
 import { ResourcePageShell } from "@/components/resource-page-shell";
+import { adminResources } from "@/features/_plugin-resources/admin-resources";
 import { useUserDetailController } from "@/features/users/controllers/use-user-detail-controller";
 import { Link } from "@/i18n/navigation";
-import { adminResources } from "@/lib/admin-resources";
 
 import { UserDetailContent } from "../ui/user-detail-content";
 

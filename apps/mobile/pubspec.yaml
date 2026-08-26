@@ -28,9 +28,9 @@ dependencies:
   mobile_core:
     path: ../../packages/mobile_core
   feature_identity:
-    path: ../../packages/features/identity/mobile
+    path: ../../packages/feature_identity_mobile
   feature_platform:
-    path: ../../packages/features/platform/mobile
+    path: ../../packages/feature_platform_mobile
 
 dev_dependencies:
   flutter_test:

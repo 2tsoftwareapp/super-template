@@ -4,7 +4,7 @@ import { ErrorState } from "@repo/web-ui/error-state";
 import { Separator } from "@repo/web-ui/separator";
 import { Shield } from "lucide-react";
 
-import type { AdminResourceConfig } from "@/lib/admin-resources";
+import type { AdminResourceConfig } from "@/features/_plugin-resources/admin-resources";
 
 import { ResourcePageShell } from "@/components/resource-page-shell";
 import { useSecurityController } from "@/features/security/controllers/use-security-controller";

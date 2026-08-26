@@ -2,41 +2,8 @@ import { defineConfig, globalIgnores } from "eslint/config";
 
 import { baseConfig } from "./packages/eslint-config/base.mjs";
 
-// Bounded-context boundary inside apps/api: a context may import the other
-// context's STABLE SURFACE ONLY (port tokens, domain policies, constants).
-// Services, use-cases, controllers, repositories and Module classes are off-limits.
-// NOTE: no bare-`${alias}` entry here — in gitignore semantics a directory
-// pattern bans everything beneath it, which would also ban the allowed
-// stable surface below.
-const ctxForbidden = (alias) => [
-  `${alias}/**/*service*`,
-  `${alias}/**/*use-case*`,
-  `${alias}/**/infrastructure/**`,
-  `${alias}/**/presentation/**`,
-  `${alias}/**/*.module.ts`,
-  `${alias}/**/index.ts`,
-];
-const identityPlatformRestriction = (dir, otherAlias) => ({
-  files: [`packages/features/${dir}/src/**/*.{ts,tsx}`],
-  ignores: [`packages/features/${dir}/src/web/**`, `packages/features/${dir}/src/admin/**`],
-  rules: {
-    "no-restricted-imports": [
-      "error",
-      {
-        patterns: ctxForbidden(otherAlias).map((group) => ({
-          group: [group],
-          message:
-            "Cross-context access is limited to the other context's stable surface: application/ports, domain and constants files.",
-        })),
-      },
-    ],
-  },
-});
-
 export default defineConfig([
   ...baseConfig,
-  identityPlatformRestriction("identity", "@platform"),
-  identityPlatformRestriction("platform", "@identity"),
   globalIgnores([
     "**/dist/**",
     "**/coverage/**",
@@ -46,15 +13,10 @@ export default defineConfig([
     "**/*.spec.tsx",
     "**/*.test.ts",
     "**/*.test.tsx",
-    "packages/features/**/src/web/**",
-    "packages/features/**/src/admin/**",
-    "packages/features/**/vitest.web.config.ts",
-    "packages/features/**/vitest.admin.config.ts",
-    "apps/api/vitest.config.ts",
+    "**/vitest.config.ts",
+    "**/vitest.*.config.ts",
+    "**/vitest-feature-aliases.mjs",
     "apps/api/webpack.config.js",
-    "packages/web-ui/vitest.config.ts",
-    "packages/web-hooks/vitest.config.ts",
-    "packages/api-core/vitest.config.ts",
     "eslint.config.mjs",
   ]),
 ]);

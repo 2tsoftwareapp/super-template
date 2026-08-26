@@ -1,8 +1,11 @@
 import type { INestApplication } from "@nestjs/common";
 
 import { randomUUID } from "node:crypto";
-import { ACCESS_CONTROL_REPOSITORY, type AccessControlRepositoryPort } from "@repo/feature-identity";
-import { RoleManagementUseCase } from "@repo/feature-identity/modules/access-control/application/use-cases/role-management.use-case";
+import {
+  ACCESS_CONTROL_REPOSITORY,
+  type AccessControlRepositoryPort,
+  RoleManagementUseCase,
+} from "@repo/feature-access-control/contracts";
 import { seedDatabase } from "../src/cli/seeds/seed-data";
 import { Pool } from "pg";
 import request from "supertest";

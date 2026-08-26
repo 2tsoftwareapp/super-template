@@ -1,6 +1,6 @@
-import type { EnsureSettingsSeedDataUseCase } from "@repo/feature-platform/modules/settings/application/use-cases/ensure-settings-seed-data.use-case";
+import type { EnsureSettingsSeedDataUseCase } from "@repo/feature-settings/contracts";
 
-import { type DatabaseExecutor } from "@repo/api-database";
+import { type DatabaseExecutor } from "@repo/database-runtime";
 
 export async function seedSettings(
   ensureSettingsSeedData: EnsureSettingsSeedDataUseCase,

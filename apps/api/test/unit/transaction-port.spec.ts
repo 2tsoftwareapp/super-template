@@ -1,5 +1,5 @@
-import type { TransactionExecutor } from "@repo/api-core";
-import { DrizzleTransactionService } from "@repo/api-database";
+import type { TransactionExecutor } from "@repo/api-runtime";
+import { DrizzleTransactionService } from "@repo/database-runtime";
 import { describe, expect, it, vi } from "vitest";
 
 describe("DrizzleTransactionService", () => {

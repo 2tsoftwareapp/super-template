@@ -1,11 +1,11 @@
-import type { TenantContext } from "@repo/api-core";
+import type { TenantContext } from "@repo/api-runtime";
 import type { Server } from "node:http";
 
 import { type INestApplication, ValidationPipe } from "@nestjs/common";
 import { Test } from "@nestjs/testing";
 import { ThrottlerGuard } from "@nestjs/throttler";
-import { TenantContextService } from "@repo/api-core";
-import { DATABASE, type DatabaseClient } from "@repo/api-database";
+import { TenantContextService } from "@repo/api-runtime";
+import { DATABASE, type DatabaseClient } from "@repo/database-runtime";
 import { loadEnvFiles } from "@repo/env-loader";
 import { sql } from "drizzle-orm";
 import { Pool } from "pg";

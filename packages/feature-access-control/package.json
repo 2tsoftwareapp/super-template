@@ -1,0 +1,40 @@
+{
+  "name": "@repo/feature-access-control",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "exports": {
+    ".": "./src/access-control.feature.ts",
+    "./contracts": "./src/public/contracts.ts",
+    "./testing": "./src/testing/index.ts",
+    "./schema": "./src/infrastructure/persistence/index.ts"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint .",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "@nestjs/common": "11.1.27",
+    "@nestjs/swagger": "11.4.4",
+    "@repo/api-kernel": "workspace:*",
+    "@repo/api-plugin-kit": "workspace:*",
+    "@repo/api-runtime": "workspace:*",
+    "@repo/database-runtime": "workspace:*",
+    "@repo/config": "workspace:*",
+    "class-transformer": "0.5.1",
+    "class-validator": "0.15.1",
+    "drizzle-orm": "0.45.2",
+    "zod": "4.4.3",
+    "express": "5.2.1"
+  },
+  "devDependencies": {
+    "@repo/tsconfig": "workspace:*",
+    "@types/node": "24.10.1",
+    "typescript": "5.9.3",
+    "vitest": "4.1.9",
+    "@types/express": "5.0.4"
+  }
+}

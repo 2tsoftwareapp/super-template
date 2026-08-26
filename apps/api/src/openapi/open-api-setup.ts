@@ -1,5 +1,5 @@
 import type { INestApplication } from "@nestjs/common";
-import type { EnvironmentService } from "@repo/api-core";
+import type { EnvironmentService } from "@repo/api-runtime";
 
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 

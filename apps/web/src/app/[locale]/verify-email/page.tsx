@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 
-import { VerifyEmailView } from "@repo/feature-identity/web";
 import { Suspense } from "react";
+
+import { VerifyEmailView } from "@/features/identity-web";
 
 export const metadata: Metadata = {
   title: "Verify email",

@@ -1,14 +1,11 @@
 import type { INestApplication } from "@nestjs/common";
 
-import { ERROR_CODES } from "@repo/api-core";
-import {
-  DATABASE,
-  organizationMembers,
-  userRoles,
-  authSessions,
-  users,
-  type DatabaseClient,
-} from "@repo/api-database";
+import { ERROR_CODES } from "@repo/api-runtime";
+import { DATABASE, type DatabaseClient } from "@repo/database-runtime";
+import { organizationMembers } from "@repo/feature-organizations/schema";
+import { userRoles } from "@repo/feature-access-control/schema";
+import { authSessions } from "@repo/feature-auth/schema";
+import { users } from "@repo/feature-users/schema";
 import { and, eq } from "drizzle-orm";
 import request from "supertest";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";

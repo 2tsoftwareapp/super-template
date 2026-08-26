@@ -15,7 +15,7 @@ import {
   AppError,
   ERROR_CODES,
   IS_PUBLIC_KEY,
-} from "@repo/api-core";
+} from "@repo/api-runtime";
 
 @Injectable()
 export class AuthGuard implements CanActivate {

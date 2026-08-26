@@ -27,9 +27,9 @@ import {
 import type { OrganizationDetailViewModel } from "@/features/organizations/model/organizations.types";
 
 import { ResourcePageShell } from "@/components/resource-page-shell";
+import { adminResources } from "@/features/_plugin-resources/admin-resources";
 import { canPromoteMemberToAdmin } from "@/features/organizations/model/organizations.permissions";
 import { Link } from "@/i18n/navigation";
-import { adminResources } from "@/lib/admin-resources";
 
 import { EditOrganizationDrawer } from "./edit-organization-drawer";
 

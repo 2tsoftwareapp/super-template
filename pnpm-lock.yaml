@@ -66,12 +66,6 @@ importers:
       '@repo/env-loader':
         specifier: workspace:*
         version: link:../../packages/env-loader
-      '@repo/feature-identity':
-        specifier: workspace:*
-        version: link:../../packages/features/identity
-      '@repo/feature-platform':
-        specifier: workspace:*
-        version: link:../../packages/features/platform
       '@repo/web-hooks':
         specifier: workspace:*
         version: link:../../packages/web-hooks
@@ -223,21 +217,12 @@ importers:
 
   apps/api:
     dependencies:
-      '@aws-sdk/client-s3':
-        specifier: ^3.1068.0
-        version: 3.1085.0
-      '@aws-sdk/s3-request-presigner':
-        specifier: ^3.1068.0
-        version: 3.1085.0
       '@nestjs/common':
         specifier: 11.1.27
         version: 11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@10.2.2)
       '@nestjs/core':
         specifier: 11.1.27
         version: 11.1.27(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@10.2.2))(@nestjs/platform-express@11.1.27)(reflect-metadata@0.2.2)(rxjs@7.8.2)
-      '@nestjs/jwt':
-        specifier: 11.0.2
-        version: 11.0.2(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))
       '@nestjs/platform-express':
         specifier: 11.1.27
         version: 11.1.27(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@10.2.2))(@nestjs/core@11.1.27)
@@ -253,27 +238,75 @@ importers:
       '@nestjs/throttler':
         specifier: 6.5.0
         version: 6.5.0(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@10.2.2))(@nestjs/core@11.1.27)(reflect-metadata@0.2.2)
-      '@repo/api-core':
+      '@repo/api-kernel':
         specifier: workspace:*
-        version: link:../../packages/api-core
-      '@repo/api-database':
+        version: link:../../packages/api-kernel
+      '@repo/api-plugin-kit':
         specifier: workspace:*
-        version: link:../../packages/api-database
-      '@repo/api-health':
+        version: link:../../packages/api-plugin-kit
+      '@repo/api-runtime':
         specifier: workspace:*
-        version: link:../../packages/api-health
+        version: link:../../packages/api-runtime
+      '@repo/config':
+        specifier: workspace:*
+        version: link:../../packages/config
+      '@repo/database-runtime':
+        specifier: workspace:*
+        version: link:../../packages/database-runtime
       '@repo/env-loader':
         specifier: workspace:*
         version: link:../../packages/env-loader
-      '@repo/feature-identity':
+      '@repo/feature-access-control':
         specifier: workspace:*
-        version: link:../../packages/features/identity
-      '@repo/feature-platform':
+        version: link:../../packages/feature-access-control
+      '@repo/feature-activities':
         specifier: workspace:*
-        version: link:../../packages/features/platform
-      argon2:
-        specifier: 0.44.0
-        version: 0.44.0
+        version: link:../../packages/feature-activities
+      '@repo/feature-audit':
+        specifier: workspace:*
+        version: link:../../packages/feature-audit
+      '@repo/feature-auth':
+        specifier: workspace:*
+        version: link:../../packages/feature-auth
+      '@repo/feature-health':
+        specifier: workspace:*
+        version: link:../../packages/feature-health
+      '@repo/feature-import-export':
+        specifier: workspace:*
+        version: link:../../packages/feature-import-export
+      '@repo/feature-jobs':
+        specifier: workspace:*
+        version: link:../../packages/feature-jobs
+      '@repo/feature-mail':
+        specifier: workspace:*
+        version: link:../../packages/feature-mail
+      '@repo/feature-mfa':
+        specifier: workspace:*
+        version: link:../../packages/feature-mfa
+      '@repo/feature-notifications':
+        specifier: workspace:*
+        version: link:../../packages/feature-notifications
+      '@repo/feature-organizations':
+        specifier: workspace:*
+        version: link:../../packages/feature-organizations
+      '@repo/feature-settings':
+        specifier: workspace:*
+        version: link:../../packages/feature-settings
+      '@repo/feature-sso':
+        specifier: workspace:*
+        version: link:../../packages/feature-sso
+      '@repo/feature-upload':
+        specifier: workspace:*
+        version: link:../../packages/feature-upload
+      '@repo/feature-user-preferences':
+        specifier: workspace:*
+        version: link:../../packages/feature-user-preferences
+      '@repo/feature-users':
+        specifier: workspace:*
+        version: link:../../packages/feature-users
+      '@repo/observability':
+        specifier: workspace:*
+        version: link:../../packages/observability
       class-transformer:
         specifier: 0.5.1
         version: 0.5.1
@@ -286,15 +319,9 @@ importers:
       express:
         specifier: 5.2.1
         version: 5.2.1
-      firebase-admin:
-        specifier: 13.6.0
-        version: 13.6.0(supports-color@10.2.2)
       helmet:
         specifier: 8.2.0
         version: 8.2.0
-      nodemailer:
-        specifier: 9.0.0
-        version: 9.0.0
       pg:
         specifier: 8.21.0
         version: 8.21.0
@@ -326,9 +353,6 @@ importers:
       '@types/node':
         specifier: 24.10.1
         version: 24.10.1
-      '@types/nodemailer':
-        specifier: 7.0.4
-        version: 7.0.4
       '@types/pg':
         specifier: 8.15.6
         version: 8.15.6
@@ -386,9 +410,6 @@ importers:
       '@repo/env-loader':
         specifier: workspace:*
         version: link:../../packages/env-loader
-      '@repo/feature-identity':
-        specifier: workspace:*
-        version: link:../../packages/features/identity
       '@repo/web-hooks':
         specifier: workspace:*
         version: link:../../packages/web-hooks
@@ -440,6 +461,9 @@ importers:
       react-hook-form:
         specifier: 7.79.0
         version: 7.79.0(react@19.2.4)
+      server-only:
+        specifier: ^0.0.1
+        version: 0.0.1
       shadcn:
         specifier: ^4.11.0
         version: 4.13.0(typescript@5.9.3)
@@ -544,7 +568,51 @@ importers:
         specifier: 4.1.9
         version: 4.1.9(@opentelemetry/api@1.9.1)(@types/node@24.10.1)(@vitest/coverage-v8@4.1.9)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@8.1.4(@types/node@24.10.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.22.4))
 
-  packages/api-core:
+  packages/api-kernel:
+    dependencies:
+      '@repo/api-sort':
+        specifier: workspace:*
+        version: link:../api-sort
+      '@repo/utils':
+        specifier: workspace:*
+        version: link:../utils
+      zod:
+        specifier: 4.4.3
+        version: 4.4.3
+    devDependencies:
+      '@repo/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@types/node':
+        specifier: 24.10.1
+        version: 24.10.1
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: 4.1.9
+        version: 4.1.9(@opentelemetry/api@1.9.1)(@types/node@24.10.1)(@vitest/coverage-v8@4.1.9)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@8.1.4(@types/node@24.10.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.22.4))
+
+  packages/api-plugin-kit:
+    dependencies:
+      '@nestjs/common':
+        specifier: 11.1.27
+        version: 11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@10.2.2)
+    devDependencies:
+      '@repo/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@types/node':
+        specifier: 24.10.1
+        version: 24.10.1
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: 4.1.9
+        version: 4.1.9(@opentelemetry/api@1.9.1)(@types/node@24.10.1)(@vitest/coverage-v8@4.1.9)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@8.1.4(@types/node@24.10.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.22.4))
+
+  packages/api-runtime:
     dependencies:
       '@nestjs/common':
         specifier: 11.1.27
@@ -558,6 +626,12 @@ importers:
       '@nestjs/throttler':
         specifier: 6.5.0
         version: 6.5.0(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)(reflect-metadata@0.2.2)
+      '@repo/api-kernel':
+        specifier: workspace:*
+        version: link:../api-kernel
+      '@repo/api-plugin-kit':
+        specifier: workspace:*
+        version: link:../api-plugin-kit
       '@repo/api-sort':
         specifier: workspace:*
         version: link:../api-sort
@@ -567,12 +641,12 @@ importers:
       '@repo/env-loader':
         specifier: workspace:*
         version: link:../env-loader
+      '@repo/observability':
+        specifier: workspace:*
+        version: link:../observability
       '@repo/utils':
         specifier: workspace:*
         version: link:../utils
-      '@sentry/node':
-        specifier: 10.58.0
-        version: 10.58.0(supports-color@10.2.2)
       class-transformer:
         specifier: 0.5.1
         version: 0.5.1
@@ -582,9 +656,6 @@ importers:
       dotenv:
         specifier: 17.4.2
         version: 17.4.2
-      drizzle-orm:
-        specifier: 0.45.2
-        version: 0.45.2(@opentelemetry/api@1.9.1)(@types/pg@8.15.6)(pg@8.21.0)
       express:
         specifier: 5.2.1
         version: 5.2.1
@@ -607,9 +678,6 @@ importers:
       '@types/node':
         specifier: 24.10.1
         version: 24.10.1
-      '@vitest/coverage-v8':
-        specifier: 4.1.9
-        version: 4.1.9(vitest@4.1.9)
       typescript:
         specifier: 5.9.3
         version: 5.9.3
@@ -617,14 +685,57 @@ importers:
         specifier: 4.1.9
         version: 4.1.9(@opentelemetry/api@1.9.1)(@types/node@24.10.1)(@vitest/coverage-v8@4.1.9)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@8.1.4(@types/node@24.10.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.22.4))
 
-  packages/api-database:
+  packages/api-sort:
+    devDependencies:
+      '@repo/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: 4.1.9
+        version: 4.1.9(@opentelemetry/api@1.9.1)(@types/node@24.10.1)(@vitest/coverage-v8@4.1.9)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@8.1.4(@types/node@24.10.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.22.4))
+
+  packages/config:
+    dependencies:
+      '@repo/env-loader':
+        specifier: workspace:*
+        version: link:../env-loader
+      zod:
+        specifier: 4.4.3
+        version: 4.4.3
+    devDependencies:
+      '@repo/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@types/node':
+        specifier: 24.10.1
+        version: 24.10.1
+      tsx:
+        specifier: 4.22.4
+        version: 4.22.4
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: 4.1.9
+        version: 4.1.9(@opentelemetry/api@1.9.1)(@types/node@24.10.1)(@vitest/coverage-v8@4.1.9)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@8.1.4(@types/node@24.10.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.22.4))
+
+  packages/database-runtime:
     dependencies:
       '@nestjs/common':
         specifier: 11.1.27
         version: 11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@10.2.2)
-      '@repo/api-core':
+      '@repo/api-kernel':
         specifier: workspace:*
-        version: link:../api-core
+        version: link:../api-kernel
+      '@repo/api-runtime':
+        specifier: workspace:*
+        version: link:../api-runtime
+      '@repo/config':
+        specifier: workspace:*
+        version: link:../config
       '@repo/env-loader':
         specifier: workspace:*
         version: link:../env-loader
@@ -653,67 +764,6 @@ importers:
       vitest:
         specifier: 4.1.9
         version: 4.1.9(@opentelemetry/api@1.9.1)(@types/node@24.10.1)(@vitest/coverage-v8@4.1.9)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@8.1.4(@types/node@24.10.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.22.4))
-
-  packages/api-health:
-    dependencies:
-      '@nestjs/common':
-        specifier: 11.1.27
-        version: 11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@10.2.2)
-      '@nestjs/swagger':
-        specifier: 11.4.4
-        version: 11.4.4(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)
-      '@nestjs/terminus':
-        specifier: ^11.1.1
-        version: 11.1.1(@grpc/grpc-js@1.14.4)(@grpc/proto-loader@0.8.1)(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)(reflect-metadata@0.2.2)(rxjs@7.8.2)
-      '@repo/api-core':
-        specifier: workspace:*
-        version: link:../api-core
-      '@repo/api-database':
-        specifier: workspace:*
-        version: link:../api-database
-      drizzle-orm:
-        specifier: 0.45.2
-        version: 0.45.2(@opentelemetry/api@1.9.1)(@types/pg@8.15.6)(pg@8.21.0)
-    devDependencies:
-      '@repo/tsconfig':
-        specifier: workspace:*
-        version: link:../tsconfig
-      '@types/node':
-        specifier: 24.10.1
-        version: 24.10.1
-      typescript:
-        specifier: 5.9.3
-        version: 5.9.3
-      vitest:
-        specifier: 4.1.9
-        version: 4.1.9(@opentelemetry/api@1.9.1)(@types/node@24.10.1)(@vitest/coverage-v8@4.1.9)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@8.1.4(@types/node@24.10.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.22.4))
-
-  packages/api-sort:
-    devDependencies:
-      '@repo/tsconfig':
-        specifier: workspace:*
-        version: link:../tsconfig
-      typescript:
-        specifier: 5.9.3
-        version: 5.9.3
-      vitest:
-        specifier: 4.1.9
-        version: 4.1.9(@opentelemetry/api@1.9.1)(@types/node@24.10.1)(@vitest/coverage-v8@4.1.9)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@8.1.4(@types/node@24.10.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.22.4))
-
-  packages/config:
-    devDependencies:
-      '@repo/tsconfig':
-        specifier: workspace:*
-        version: link:../tsconfig
-      '@types/node':
-        specifier: 24.10.1
-        version: 24.10.1
-      tsx:
-        specifier: 4.22.4
-        version: 4.22.4
-      typescript:
-        specifier: 5.9.3
-        version: 5.9.3
 
   packages/env-loader:
     dependencies:
@@ -770,7 +820,175 @@ importers:
         specifier: 8.61.0
         version: 8.61.0(eslint@9.39.1(jiti@2.7.0))(typescript@5.9.3)
 
-  packages/features/identity:
+  packages/feature-access-control:
+    dependencies:
+      '@nestjs/common':
+        specifier: 11.1.27
+        version: 11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@10.2.2)
+      '@nestjs/swagger':
+        specifier: 11.4.4
+        version: 11.4.4(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)
+      '@repo/api-kernel':
+        specifier: workspace:*
+        version: link:../api-kernel
+      '@repo/api-plugin-kit':
+        specifier: workspace:*
+        version: link:../api-plugin-kit
+      '@repo/api-runtime':
+        specifier: workspace:*
+        version: link:../api-runtime
+      '@repo/config':
+        specifier: workspace:*
+        version: link:../config
+      '@repo/database-runtime':
+        specifier: workspace:*
+        version: link:../database-runtime
+      class-transformer:
+        specifier: 0.5.1
+        version: 0.5.1
+      class-validator:
+        specifier: 0.15.1
+        version: 0.15.1
+      drizzle-orm:
+        specifier: 0.45.2
+        version: 0.45.2(@opentelemetry/api@1.9.1)(@types/pg@8.15.6)(pg@8.21.0)
+      express:
+        specifier: 5.2.1
+        version: 5.2.1
+      zod:
+        specifier: 4.4.3
+        version: 4.4.3
+    devDependencies:
+      '@repo/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@types/express':
+        specifier: 5.0.4
+        version: 5.0.4
+      '@types/node':
+        specifier: 24.10.1
+        version: 24.10.1
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: 4.1.9
+        version: 4.1.9(@opentelemetry/api@1.9.1)(@types/node@24.10.1)(@vitest/coverage-v8@4.1.9)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@8.1.4(@types/node@24.10.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.22.4))
+
+  packages/feature-activities:
+    dependencies:
+      '@nestjs/common':
+        specifier: 11.1.27
+        version: 11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@10.2.2)
+      '@nestjs/swagger':
+        specifier: 11.4.4
+        version: 11.4.4(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)
+      '@repo/api-kernel':
+        specifier: workspace:*
+        version: link:../api-kernel
+      '@repo/api-plugin-kit':
+        specifier: workspace:*
+        version: link:../api-plugin-kit
+      '@repo/api-runtime':
+        specifier: workspace:*
+        version: link:../api-runtime
+      '@repo/config':
+        specifier: workspace:*
+        version: link:../config
+      '@repo/database-runtime':
+        specifier: workspace:*
+        version: link:../database-runtime
+      class-transformer:
+        specifier: 0.5.1
+        version: 0.5.1
+      class-validator:
+        specifier: 0.15.1
+        version: 0.15.1
+      drizzle-orm:
+        specifier: 0.45.2
+        version: 0.45.2(@opentelemetry/api@1.9.1)(@types/pg@8.15.6)(pg@8.21.0)
+      zod:
+        specifier: 4.4.3
+        version: 4.4.3
+    devDependencies:
+      '@repo/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@types/express':
+        specifier: 5.0.4
+        version: 5.0.4
+      '@types/node':
+        specifier: 24.10.1
+        version: 24.10.1
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: 4.1.9
+        version: 4.1.9(@opentelemetry/api@1.9.1)(@types/node@24.10.1)(@vitest/coverage-v8@4.1.9)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@8.1.4(@types/node@24.10.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.22.4))
+
+  packages/feature-audit:
+    dependencies:
+      '@nestjs/common':
+        specifier: 11.1.27
+        version: 11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@10.2.2)
+      '@nestjs/schedule':
+        specifier: 6.1.1
+        version: 6.1.1(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)
+      '@nestjs/swagger':
+        specifier: 11.4.4
+        version: 11.4.4(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)
+      '@repo/api-kernel':
+        specifier: workspace:*
+        version: link:../api-kernel
+      '@repo/api-plugin-kit':
+        specifier: workspace:*
+        version: link:../api-plugin-kit
+      '@repo/api-runtime':
+        specifier: workspace:*
+        version: link:../api-runtime
+      '@repo/config':
+        specifier: workspace:*
+        version: link:../config
+      '@repo/database-runtime':
+        specifier: workspace:*
+        version: link:../database-runtime
+      '@repo/feature-upload':
+        specifier: workspace:*
+        version: link:../feature-upload
+      class-transformer:
+        specifier: 0.5.1
+        version: 0.5.1
+      class-validator:
+        specifier: 0.15.1
+        version: 0.15.1
+      drizzle-orm:
+        specifier: 0.45.2
+        version: 0.45.2(@opentelemetry/api@1.9.1)(@types/pg@8.15.6)(pg@8.21.0)
+      express:
+        specifier: 5.2.1
+        version: 5.2.1
+      zod:
+        specifier: 4.4.3
+        version: 4.4.3
+    devDependencies:
+      '@repo/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@types/express':
+        specifier: 5.0.4
+        version: 5.0.4
+      '@types/node':
+        specifier: 24.10.1
+        version: 24.10.1
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: 4.1.9
+        version: 4.1.9(@opentelemetry/api@1.9.1)(@types/node@24.10.1)(@vitest/coverage-v8@4.1.9)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@8.1.4(@types/node@24.10.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.22.4))
+
+  packages/feature-auth:
     dependencies:
       '@nestjs/common':
         specifier: 11.1.27
@@ -787,18 +1005,30 @@ importers:
       '@nestjs/throttler':
         specifier: 6.5.0
         version: 6.5.0(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)(reflect-metadata@0.2.2)
-      '@repo/api-core':
+      '@repo/api-kernel':
         specifier: workspace:*
-        version: link:../../api-core
-      '@repo/api-database':
+        version: link:../api-kernel
+      '@repo/api-plugin-kit':
         specifier: workspace:*
-        version: link:../../api-database
-      '@repo/web-ui':
+        version: link:../api-plugin-kit
+      '@repo/api-runtime':
         specifier: workspace:*
-        version: link:../../web-ui
-      '@repo/web-utils':
+        version: link:../api-runtime
+      '@repo/config':
         specifier: workspace:*
-        version: link:../../web-utils
+        version: link:../config
+      '@repo/database-runtime':
+        specifier: workspace:*
+        version: link:../database-runtime
+      '@repo/feature-access-control':
+        specifier: workspace:*
+        version: link:../feature-access-control
+      '@repo/feature-mfa':
+        specifier: workspace:*
+        version: link:../feature-mfa
+      '@repo/feature-organizations':
+        specifier: workspace:*
+        version: link:../feature-organizations
       argon2:
         specifier: 0.44.0
         version: 0.44.0
@@ -814,52 +1044,19 @@ importers:
       express:
         specifier: 5.2.1
         version: 5.2.1
-      lucide-react:
-        specifier: 0.552.0
-        version: 0.552.0(react@19.2.4)
-      next:
-        specifier: 16.2.9
-        version: 16.2.9(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@playwright/test@1.61.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      react:
-        specifier: 19.2.4
-        version: 19.2.4
-      react-dom:
-        specifier: 19.2.4
-        version: 19.2.4(react@19.2.4)
       zod:
         specifier: 4.4.3
         version: 4.4.3
     devDependencies:
-      '@nestjs/testing':
-        specifier: 11.1.27
-        version: 11.1.27(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)(@nestjs/platform-express@11.1.27)
       '@repo/tsconfig':
         specifier: workspace:*
-        version: link:../../tsconfig
-      '@repo/web-test':
-        specifier: workspace:*
-        version: link:../../web-test
-      '@testing-library/react':
-        specifier: 16.3.2
-        version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.6))(@types/react@19.2.6)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+        version: link:../tsconfig
       '@types/express':
         specifier: 5.0.4
         version: 5.0.4
       '@types/node':
         specifier: 24.10.1
         version: 24.10.1
-      '@types/react':
-        specifier: 19.2.6
-        version: 19.2.6
-      '@types/react-dom':
-        specifier: 19.2.3
-        version: 19.2.3(@types/react@19.2.6)
-      '@vitejs/plugin-react':
-        specifier: ^5.0.0
-        version: 5.2.0(vite@8.1.4(@types/node@24.10.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.22.4))
-      jsdom:
-        specifier: 29.1.1
-        version: 29.1.1(@noble/hashes@1.8.0)
       typescript:
         specifier: 5.9.3
         version: 5.9.3
@@ -867,59 +1064,346 @@ importers:
         specifier: 4.1.9
         version: 4.1.9(@opentelemetry/api@1.9.1)(@types/node@24.10.1)(@vitest/coverage-v8@4.1.9)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@8.1.4(@types/node@24.10.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.22.4))
 
-  packages/features/platform:
+  packages/feature-health:
     dependencies:
-      '@aws-sdk/client-s3':
-        specifier: ^3.1068.0
-        version: 3.1085.0
-      '@aws-sdk/s3-request-presigner':
-        specifier: ^3.1068.0
-        version: 3.1085.0
-      '@hookform/resolvers':
-        specifier: 5.4.0
-        version: 5.4.0(react-hook-form@7.79.0(react@19.2.4))
       '@nestjs/common':
         specifier: 11.1.27
         version: 11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@10.2.2)
-      '@nestjs/platform-express':
+      '@nestjs/swagger':
+        specifier: 11.4.4
+        version: 11.4.4(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)
+      '@nestjs/terminus':
+        specifier: ^11.1.1
+        version: 11.1.1(@grpc/grpc-js@1.14.4)(@grpc/proto-loader@0.8.1)(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@repo/api-kernel':
+        specifier: workspace:*
+        version: link:../api-kernel
+      '@repo/api-plugin-kit':
+        specifier: workspace:*
+        version: link:../api-plugin-kit
+      '@repo/api-runtime':
+        specifier: workspace:*
+        version: link:../api-runtime
+      '@repo/config':
+        specifier: workspace:*
+        version: link:../config
+      '@repo/database-runtime':
+        specifier: workspace:*
+        version: link:../database-runtime
+      class-transformer:
+        specifier: 0.5.1
+        version: 0.5.1
+      class-validator:
+        specifier: 0.15.1
+        version: 0.15.1
+      drizzle-orm:
+        specifier: 0.45.2
+        version: 0.45.2(@opentelemetry/api@1.9.1)(@types/pg@8.15.6)(pg@8.21.0)
+      zod:
+        specifier: 4.4.3
+        version: 4.4.3
+    devDependencies:
+      '@repo/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@types/express':
+        specifier: 5.0.4
+        version: 5.0.4
+      '@types/node':
+        specifier: 24.10.1
+        version: 24.10.1
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: 4.1.9
+        version: 4.1.9(@opentelemetry/api@1.9.1)(@types/node@24.10.1)(@vitest/coverage-v8@4.1.9)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@8.1.4(@types/node@24.10.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.22.4))
+
+  packages/feature-import-export:
+    dependencies:
+      '@nestjs/common':
         specifier: 11.1.27
-        version: 11.1.27(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)
+        version: 11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@10.2.2)
       '@nestjs/schedule':
         specifier: 6.1.1
         version: 6.1.1(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)
       '@nestjs/swagger':
         specifier: 11.4.4
         version: 11.4.4(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)
-      '@nestjs/throttler':
-        specifier: 6.5.0
-        version: 6.5.0(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)(reflect-metadata@0.2.2)
-      '@repo/api-contract':
+      '@repo/api-kernel':
         specifier: workspace:*
-        version: link:../../api-contract
-      '@repo/api-core':
+        version: link:../api-kernel
+      '@repo/api-plugin-kit':
         specifier: workspace:*
-        version: link:../../api-core
-      '@repo/api-database':
+        version: link:../api-plugin-kit
+      '@repo/api-runtime':
         specifier: workspace:*
-        version: link:../../api-database
-      '@repo/feature-identity':
+        version: link:../api-runtime
+      '@repo/config':
         specifier: workspace:*
-        version: link:../identity
-      '@repo/web-hooks':
+        version: link:../config
+      '@repo/database-runtime':
         specifier: workspace:*
-        version: link:../../web-hooks
-      '@repo/web-ui':
+        version: link:../database-runtime
+      '@repo/feature-access-control':
         specifier: workspace:*
-        version: link:../../web-ui
-      '@repo/web-utils':
+        version: link:../feature-access-control
+      '@repo/feature-audit':
         specifier: workspace:*
-        version: link:../../web-utils
-      '@tanstack/react-query':
-        specifier: 5.101.0
-        version: 5.101.0(react@19.2.4)
+        version: link:../feature-audit
+      '@repo/feature-organizations':
+        specifier: workspace:*
+        version: link:../feature-organizations
+      '@repo/feature-upload':
+        specifier: workspace:*
+        version: link:../feature-upload
+      '@repo/feature-users':
+        specifier: workspace:*
+        version: link:../feature-users
       argon2:
         specifier: 0.44.0
         version: 0.44.0
+      class-transformer:
+        specifier: 0.5.1
+        version: 0.5.1
+      class-validator:
+        specifier: 0.15.1
+        version: 0.15.1
+      drizzle-orm:
+        specifier: 0.45.2
+        version: 0.45.2(@opentelemetry/api@1.9.1)(@types/pg@8.15.6)(pg@8.21.0)
+      express:
+        specifier: 5.2.1
+        version: 5.2.1
+      zod:
+        specifier: 4.4.3
+        version: 4.4.3
+    devDependencies:
+      '@repo/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@types/express':
+        specifier: 5.0.4
+        version: 5.0.4
+      '@types/node':
+        specifier: 24.10.1
+        version: 24.10.1
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: 4.1.9
+        version: 4.1.9(@opentelemetry/api@1.9.1)(@types/node@24.10.1)(@vitest/coverage-v8@4.1.9)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@8.1.4(@types/node@24.10.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.22.4))
+
+  packages/feature-jobs:
+    dependencies:
+      '@nestjs/common':
+        specifier: 11.1.27
+        version: 11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@10.2.2)
+      '@nestjs/schedule':
+        specifier: 6.1.1
+        version: 6.1.1(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)
+      '@nestjs/swagger':
+        specifier: 11.4.4
+        version: 11.4.4(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)
+      '@repo/api-kernel':
+        specifier: workspace:*
+        version: link:../api-kernel
+      '@repo/api-plugin-kit':
+        specifier: workspace:*
+        version: link:../api-plugin-kit
+      '@repo/api-runtime':
+        specifier: workspace:*
+        version: link:../api-runtime
+      '@repo/config':
+        specifier: workspace:*
+        version: link:../config
+      '@repo/database-runtime':
+        specifier: workspace:*
+        version: link:../database-runtime
+      class-transformer:
+        specifier: 0.5.1
+        version: 0.5.1
+      class-validator:
+        specifier: 0.15.1
+        version: 0.15.1
+      drizzle-orm:
+        specifier: 0.45.2
+        version: 0.45.2(@opentelemetry/api@1.9.1)(@types/pg@8.15.6)(pg@8.21.0)
+      zod:
+        specifier: 4.4.3
+        version: 4.4.3
+    devDependencies:
+      '@repo/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@types/express':
+        specifier: 5.0.4
+        version: 5.0.4
+      '@types/node':
+        specifier: 24.10.1
+        version: 24.10.1
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: 4.1.9
+        version: 4.1.9(@opentelemetry/api@1.9.1)(@types/node@24.10.1)(@vitest/coverage-v8@4.1.9)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@8.1.4(@types/node@24.10.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.22.4))
+
+  packages/feature-mail:
+    dependencies:
+      '@nestjs/common':
+        specifier: 11.1.27
+        version: 11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@10.2.2)
+      '@nestjs/swagger':
+        specifier: 11.4.4
+        version: 11.4.4(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)
+      '@nestjs/throttler':
+        specifier: 6.5.0
+        version: 6.5.0(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)(reflect-metadata@0.2.2)
+      '@repo/api-kernel':
+        specifier: workspace:*
+        version: link:../api-kernel
+      '@repo/api-plugin-kit':
+        specifier: workspace:*
+        version: link:../api-plugin-kit
+      '@repo/api-runtime':
+        specifier: workspace:*
+        version: link:../api-runtime
+      '@repo/config':
+        specifier: workspace:*
+        version: link:../config
+      '@repo/database-runtime':
+        specifier: workspace:*
+        version: link:../database-runtime
+      '@repo/feature-audit':
+        specifier: workspace:*
+        version: link:../feature-audit
+      '@repo/feature-jobs':
+        specifier: workspace:*
+        version: link:../feature-jobs
+      class-transformer:
+        specifier: 0.5.1
+        version: 0.5.1
+      class-validator:
+        specifier: 0.15.1
+        version: 0.15.1
+      drizzle-orm:
+        specifier: 0.45.2
+        version: 0.45.2(@opentelemetry/api@1.9.1)(@types/pg@8.15.6)(pg@8.21.0)
+      nodemailer:
+        specifier: 9.0.0
+        version: 9.0.0
+      zod:
+        specifier: 4.4.3
+        version: 4.4.3
+    devDependencies:
+      '@repo/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@types/express':
+        specifier: 5.0.4
+        version: 5.0.4
+      '@types/node':
+        specifier: 24.10.1
+        version: 24.10.1
+      '@types/nodemailer':
+        specifier: 7.0.4
+        version: 7.0.4
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: 4.1.9
+        version: 4.1.9(@opentelemetry/api@1.9.1)(@types/node@24.10.1)(@vitest/coverage-v8@4.1.9)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@8.1.4(@types/node@24.10.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.22.4))
+
+  packages/feature-mfa:
+    dependencies:
+      '@nestjs/common':
+        specifier: 11.1.27
+        version: 11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@10.2.2)
+      '@nestjs/swagger':
+        specifier: 11.4.4
+        version: 11.4.4(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)
+      '@nestjs/throttler':
+        specifier: 6.5.0
+        version: 6.5.0(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)(reflect-metadata@0.2.2)
+      '@repo/api-kernel':
+        specifier: workspace:*
+        version: link:../api-kernel
+      '@repo/api-plugin-kit':
+        specifier: workspace:*
+        version: link:../api-plugin-kit
+      '@repo/api-runtime':
+        specifier: workspace:*
+        version: link:../api-runtime
+      '@repo/config':
+        specifier: workspace:*
+        version: link:../config
+      '@repo/database-runtime':
+        specifier: workspace:*
+        version: link:../database-runtime
+      class-transformer:
+        specifier: 0.5.1
+        version: 0.5.1
+      class-validator:
+        specifier: 0.15.1
+        version: 0.15.1
+      drizzle-orm:
+        specifier: 0.45.2
+        version: 0.45.2(@opentelemetry/api@1.9.1)(@types/pg@8.15.6)(pg@8.21.0)
+      express:
+        specifier: 5.2.1
+        version: 5.2.1
+      zod:
+        specifier: 4.4.3
+        version: 4.4.3
+    devDependencies:
+      '@repo/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@types/express':
+        specifier: 5.0.4
+        version: 5.0.4
+      '@types/node':
+        specifier: 24.10.1
+        version: 24.10.1
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: 4.1.9
+        version: 4.1.9(@opentelemetry/api@1.9.1)(@types/node@24.10.1)(@vitest/coverage-v8@4.1.9)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@8.1.4(@types/node@24.10.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.22.4))
+
+  packages/feature-notifications:
+    dependencies:
+      '@nestjs/common':
+        specifier: 11.1.27
+        version: 11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@10.2.2)
+      '@nestjs/schedule':
+        specifier: 6.1.1
+        version: 6.1.1(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)
+      '@nestjs/swagger':
+        specifier: 11.4.4
+        version: 11.4.4(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)
+      '@repo/api-kernel':
+        specifier: workspace:*
+        version: link:../api-kernel
+      '@repo/api-plugin-kit':
+        specifier: workspace:*
+        version: link:../api-plugin-kit
+      '@repo/api-runtime':
+        specifier: workspace:*
+        version: link:../api-runtime
+      '@repo/config':
+        specifier: workspace:*
+        version: link:../config
+      '@repo/database-runtime':
+        specifier: workspace:*
+        version: link:../database-runtime
+      '@repo/feature-jobs':
+        specifier: workspace:*
+        version: link:../feature-jobs
       class-transformer:
         specifier: 0.5.1
         version: 0.5.1
@@ -935,30 +1419,9 @@ importers:
       firebase-admin:
         specifier: 13.6.0
         version: 13.6.0(supports-color@10.2.2)
-      lucide-react:
-        specifier: 0.552.0
-        version: 0.552.0(react@19.2.4)
-      next:
-        specifier: 16.2.9
-        version: 16.2.9(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@playwright/test@1.61.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      nodemailer:
-        specifier: 9.0.0
-        version: 9.0.0
-      react:
-        specifier: 19.2.4
-        version: 19.2.4
-      react-dom:
-        specifier: 19.2.4
-        version: 19.2.4(react@19.2.4)
-      react-hook-form:
-        specifier: 7.79.0
-        version: 7.79.0(react@19.2.4)
       rxjs:
         specifier: 7.8.2
         version: 7.8.2
-      sonner:
-        specifier: 2.0.7
-        version: 2.0.7(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       zod:
         specifier: 4.4.3
         version: 4.4.3
@@ -968,22 +1431,425 @@ importers:
         version: 11.1.27(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)(@nestjs/platform-express@11.1.27)
       '@repo/tsconfig':
         specifier: workspace:*
-        version: link:../../tsconfig
+        version: link:../tsconfig
       '@types/express':
         specifier: 5.0.4
         version: 5.0.4
       '@types/node':
         specifier: 24.10.1
         version: 24.10.1
-      '@types/nodemailer':
-        specifier: 7.0.4
-        version: 7.0.4
-      '@types/react':
-        specifier: 19.2.6
-        version: 19.2.6
-      '@types/react-dom':
-        specifier: 19.2.3
-        version: 19.2.3(@types/react@19.2.6)
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: 4.1.9
+        version: 4.1.9(@opentelemetry/api@1.9.1)(@types/node@24.10.1)(@vitest/coverage-v8@4.1.9)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@8.1.4(@types/node@24.10.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.22.4))
+
+  packages/feature-organizations:
+    dependencies:
+      '@nestjs/common':
+        specifier: 11.1.27
+        version: 11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@10.2.2)
+      '@nestjs/swagger':
+        specifier: 11.4.4
+        version: 11.4.4(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)
+      '@repo/api-kernel':
+        specifier: workspace:*
+        version: link:../api-kernel
+      '@repo/api-plugin-kit':
+        specifier: workspace:*
+        version: link:../api-plugin-kit
+      '@repo/api-runtime':
+        specifier: workspace:*
+        version: link:../api-runtime
+      '@repo/config':
+        specifier: workspace:*
+        version: link:../config
+      '@repo/database-runtime':
+        specifier: workspace:*
+        version: link:../database-runtime
+      '@repo/feature-access-control':
+        specifier: workspace:*
+        version: link:../feature-access-control
+      class-transformer:
+        specifier: 0.5.1
+        version: 0.5.1
+      class-validator:
+        specifier: 0.15.1
+        version: 0.15.1
+      drizzle-orm:
+        specifier: 0.45.2
+        version: 0.45.2(@opentelemetry/api@1.9.1)(@types/pg@8.15.6)(pg@8.21.0)
+      express:
+        specifier: 5.2.1
+        version: 5.2.1
+      zod:
+        specifier: 4.4.3
+        version: 4.4.3
+    devDependencies:
+      '@repo/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@types/express':
+        specifier: 5.0.4
+        version: 5.0.4
+      '@types/node':
+        specifier: 24.10.1
+        version: 24.10.1
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: 4.1.9
+        version: 4.1.9(@opentelemetry/api@1.9.1)(@types/node@24.10.1)(@vitest/coverage-v8@4.1.9)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@8.1.4(@types/node@24.10.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.22.4))
+
+  packages/feature-settings:
+    dependencies:
+      '@nestjs/common':
+        specifier: 11.1.27
+        version: 11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@10.2.2)
+      '@nestjs/schedule':
+        specifier: 6.1.1
+        version: 6.1.1(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)
+      '@nestjs/swagger':
+        specifier: 11.4.4
+        version: 11.4.4(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)
+      '@repo/api-kernel':
+        specifier: workspace:*
+        version: link:../api-kernel
+      '@repo/api-plugin-kit':
+        specifier: workspace:*
+        version: link:../api-plugin-kit
+      '@repo/api-runtime':
+        specifier: workspace:*
+        version: link:../api-runtime
+      '@repo/config':
+        specifier: workspace:*
+        version: link:../config
+      '@repo/database-runtime':
+        specifier: workspace:*
+        version: link:../database-runtime
+      '@repo/feature-audit':
+        specifier: workspace:*
+        version: link:../feature-audit
+      class-transformer:
+        specifier: 0.5.1
+        version: 0.5.1
+      class-validator:
+        specifier: 0.15.1
+        version: 0.15.1
+      drizzle-orm:
+        specifier: 0.45.2
+        version: 0.45.2(@opentelemetry/api@1.9.1)(@types/pg@8.15.6)(pg@8.21.0)
+      express:
+        specifier: 5.2.1
+        version: 5.2.1
+      zod:
+        specifier: 4.4.3
+        version: 4.4.3
+    devDependencies:
+      '@repo/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@types/express':
+        specifier: 5.0.4
+        version: 5.0.4
+      '@types/node':
+        specifier: 24.10.1
+        version: 24.10.1
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: 4.1.9
+        version: 4.1.9(@opentelemetry/api@1.9.1)(@types/node@24.10.1)(@vitest/coverage-v8@4.1.9)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@8.1.4(@types/node@24.10.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.22.4))
+
+  packages/feature-sso:
+    dependencies:
+      '@nestjs/common':
+        specifier: 11.1.27
+        version: 11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@10.2.2)
+      '@nestjs/schedule':
+        specifier: 6.1.1
+        version: 6.1.1(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)
+      '@nestjs/swagger':
+        specifier: 11.4.4
+        version: 11.4.4(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)
+      '@nestjs/throttler':
+        specifier: 6.5.0
+        version: 6.5.0(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)(reflect-metadata@0.2.2)
+      '@repo/api-kernel':
+        specifier: workspace:*
+        version: link:../api-kernel
+      '@repo/api-plugin-kit':
+        specifier: workspace:*
+        version: link:../api-plugin-kit
+      '@repo/api-runtime':
+        specifier: workspace:*
+        version: link:../api-runtime
+      '@repo/config':
+        specifier: workspace:*
+        version: link:../config
+      '@repo/database-runtime':
+        specifier: workspace:*
+        version: link:../database-runtime
+      '@repo/feature-access-control':
+        specifier: workspace:*
+        version: link:../feature-access-control
+      '@repo/feature-auth':
+        specifier: workspace:*
+        version: link:../feature-auth
+      '@repo/feature-mfa':
+        specifier: workspace:*
+        version: link:../feature-mfa
+      '@repo/feature-organizations':
+        specifier: workspace:*
+        version: link:../feature-organizations
+      '@repo/feature-users':
+        specifier: workspace:*
+        version: link:../feature-users
+      class-transformer:
+        specifier: 0.5.1
+        version: 0.5.1
+      class-validator:
+        specifier: 0.15.1
+        version: 0.15.1
+      drizzle-orm:
+        specifier: 0.45.2
+        version: 0.45.2(@opentelemetry/api@1.9.1)(@types/pg@8.15.6)(pg@8.21.0)
+      express:
+        specifier: 5.2.1
+        version: 5.2.1
+      zod:
+        specifier: 4.4.3
+        version: 4.4.3
+    devDependencies:
+      '@repo/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@types/express':
+        specifier: 5.0.4
+        version: 5.0.4
+      '@types/node':
+        specifier: 24.10.1
+        version: 24.10.1
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: 4.1.9
+        version: 4.1.9(@opentelemetry/api@1.9.1)(@types/node@24.10.1)(@vitest/coverage-v8@4.1.9)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@8.1.4(@types/node@24.10.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.22.4))
+
+  packages/feature-upload:
+    dependencies:
+      '@aws-sdk/client-s3':
+        specifier: ^3.1068.0
+        version: 3.1085.0
+      '@aws-sdk/s3-request-presigner':
+        specifier: ^3.1068.0
+        version: 3.1085.0
+      '@nestjs/common':
+        specifier: 11.1.27
+        version: 11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@10.2.2)
+      '@nestjs/platform-express':
+        specifier: 11.1.27
+        version: 11.1.27(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)
+      '@nestjs/schedule':
+        specifier: 6.1.1
+        version: 6.1.1(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)
+      '@nestjs/swagger':
+        specifier: 11.4.4
+        version: 11.4.4(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)
+      '@repo/api-kernel':
+        specifier: workspace:*
+        version: link:../api-kernel
+      '@repo/api-plugin-kit':
+        specifier: workspace:*
+        version: link:../api-plugin-kit
+      '@repo/api-runtime':
+        specifier: workspace:*
+        version: link:../api-runtime
+      '@repo/config':
+        specifier: workspace:*
+        version: link:../config
+      '@repo/database-runtime':
+        specifier: workspace:*
+        version: link:../database-runtime
+      class-transformer:
+        specifier: 0.5.1
+        version: 0.5.1
+      class-validator:
+        specifier: 0.15.1
+        version: 0.15.1
+      drizzle-orm:
+        specifier: 0.45.2
+        version: 0.45.2(@opentelemetry/api@1.9.1)(@types/pg@8.15.6)(pg@8.21.0)
+      express:
+        specifier: 5.2.1
+        version: 5.2.1
+      zod:
+        specifier: 4.4.3
+        version: 4.4.3
+    devDependencies:
+      '@repo/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@types/express':
+        specifier: 5.0.4
+        version: 5.0.4
+      '@types/node':
+        specifier: 24.10.1
+        version: 24.10.1
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: 4.1.9
+        version: 4.1.9(@opentelemetry/api@1.9.1)(@types/node@24.10.1)(@vitest/coverage-v8@4.1.9)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@8.1.4(@types/node@24.10.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.22.4))
+
+  packages/feature-user-preferences:
+    dependencies:
+      '@nestjs/common':
+        specifier: 11.1.27
+        version: 11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@10.2.2)
+      '@nestjs/swagger':
+        specifier: 11.4.4
+        version: 11.4.4(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)
+      '@repo/api-kernel':
+        specifier: workspace:*
+        version: link:../api-kernel
+      '@repo/api-plugin-kit':
+        specifier: workspace:*
+        version: link:../api-plugin-kit
+      '@repo/api-runtime':
+        specifier: workspace:*
+        version: link:../api-runtime
+      '@repo/config':
+        specifier: workspace:*
+        version: link:../config
+      '@repo/database-runtime':
+        specifier: workspace:*
+        version: link:../database-runtime
+      '@repo/feature-users':
+        specifier: workspace:*
+        version: link:../feature-users
+      class-transformer:
+        specifier: 0.5.1
+        version: 0.5.1
+      class-validator:
+        specifier: 0.15.1
+        version: 0.15.1
+      drizzle-orm:
+        specifier: 0.45.2
+        version: 0.45.2(@opentelemetry/api@1.9.1)(@types/pg@8.15.6)(pg@8.21.0)
+      express:
+        specifier: 5.2.1
+        version: 5.2.1
+      zod:
+        specifier: 4.4.3
+        version: 4.4.3
+    devDependencies:
+      '@repo/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@types/express':
+        specifier: 5.0.4
+        version: 5.0.4
+      '@types/node':
+        specifier: 24.10.1
+        version: 24.10.1
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: 4.1.9
+        version: 4.1.9(@opentelemetry/api@1.9.1)(@types/node@24.10.1)(@vitest/coverage-v8@4.1.9)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@8.1.4(@types/node@24.10.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.22.4))
+
+  packages/feature-users:
+    dependencies:
+      '@nestjs/common':
+        specifier: 11.1.27
+        version: 11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@10.2.2)
+      '@nestjs/swagger':
+        specifier: 11.4.4
+        version: 11.4.4(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)
+      '@repo/api-kernel':
+        specifier: workspace:*
+        version: link:../api-kernel
+      '@repo/api-plugin-kit':
+        specifier: workspace:*
+        version: link:../api-plugin-kit
+      '@repo/api-runtime':
+        specifier: workspace:*
+        version: link:../api-runtime
+      '@repo/config':
+        specifier: workspace:*
+        version: link:../config
+      '@repo/database-runtime':
+        specifier: workspace:*
+        version: link:../database-runtime
+      '@repo/feature-access-control':
+        specifier: workspace:*
+        version: link:../feature-access-control
+      '@repo/feature-auth':
+        specifier: workspace:*
+        version: link:../feature-auth
+      '@repo/feature-organizations':
+        specifier: workspace:*
+        version: link:../feature-organizations
+      class-transformer:
+        specifier: 0.5.1
+        version: 0.5.1
+      class-validator:
+        specifier: 0.15.1
+        version: 0.15.1
+      drizzle-orm:
+        specifier: 0.45.2
+        version: 0.45.2(@opentelemetry/api@1.9.1)(@types/pg@8.15.6)(pg@8.21.0)
+      express:
+        specifier: 5.2.1
+        version: 5.2.1
+      zod:
+        specifier: 4.4.3
+        version: 4.4.3
+    devDependencies:
+      '@repo/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@types/express':
+        specifier: 5.0.4
+        version: 5.0.4
+      '@types/node':
+        specifier: 24.10.1
+        version: 24.10.1
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: 4.1.9
+        version: 4.1.9(@opentelemetry/api@1.9.1)(@types/node@24.10.1)(@vitest/coverage-v8@4.1.9)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@8.1.4(@types/node@24.10.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.22.4))
+
+  packages/observability:
+    dependencies:
+      '@nestjs/common':
+        specifier: 11.1.27
+        version: 11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@10.2.2)
+      '@repo/api-kernel':
+        specifier: workspace:*
+        version: link:../api-kernel
+      '@repo/config':
+        specifier: workspace:*
+        version: link:../config
+      '@sentry/node':
+        specifier: 10.58.0
+        version: 10.58.0(supports-color@10.2.2)
+    devDependencies:
+      '@repo/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@types/node':
+        specifier: 24.10.1
+        version: 24.10.1
       typescript:
         specifier: 5.9.3
         version: 5.9.3
@@ -5362,6 +6228,7 @@ packages:
   eslint@9.39.1:
     resolution: {integrity: sha512-BhHmn2yNOFA9H9JmmIVKJmd288g9hrVRDkdoIgRCRuSySRUHH7r/DI6aAXW9T1WwUuY3DFgrcaqB+deURBLR5g==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+    deprecated: This version is no longer supported. Please see https://eslint.org/version-support for other options.
     hasBin: true
     peerDependencies:
       jiti: '*'

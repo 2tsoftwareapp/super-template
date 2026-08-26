@@ -5,7 +5,7 @@ import {
   getFirstAccessibleResourcePath,
   getResourceForPath,
   hasAdminAppAccess,
-} from "@/lib/admin-resources";
+} from "@/features/_plugin-resources/admin-resources";
 
 // The full client-gate state machine as a pure function so it can be
 // unit-tested without rendering. useAdminGuard turns each non-ready decision

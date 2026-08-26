@@ -2,7 +2,7 @@
 
 import { Shield } from "lucide-react";
 
-import type { AdminResourceConfig } from "@/lib/admin-resources";
+import type { AdminResourceConfig } from "@/features/_plugin-resources/admin-resources";
 
 import { ResourcePageShell } from "@/components/resource-page-shell";
 import { useChangePasswordController } from "@/features/security/controllers/use-change-password-controller";

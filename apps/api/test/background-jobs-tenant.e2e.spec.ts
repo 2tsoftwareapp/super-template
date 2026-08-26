@@ -1,10 +1,11 @@
 import type { INestApplication } from "@nestjs/common";
-import { JobsRepository } from "@repo/feature-platform/modules/jobs/infrastructure/jobs.repository";
-import { JobsService } from "@repo/feature-platform/modules/jobs/application/jobs.service";
-import type { JobStatus } from "@repo/feature-platform/modules/jobs/domain/job-status";
-import { type DatabaseClient, DATABASE, organizations } from "@repo/api-database";
-import { NotificationJobsRepository } from "@repo/feature-platform/modules/notifications/infrastructure/notification-jobs.repository";
-import { NotificationsService } from "@repo/feature-platform/modules/notifications/application/notifications.service";
+import { JobsRepository, JobsService, type JobStatus } from "@repo/feature-jobs/contracts";
+import { type DatabaseClient, DATABASE } from "@repo/database-runtime";
+import { organizations } from "@repo/feature-organizations/schema";
+import {
+  NotificationJobsRepository,
+  NotificationsService,
+} from "@repo/feature-notifications/contracts";
 import request from "supertest";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {

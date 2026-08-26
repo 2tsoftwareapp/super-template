@@ -1,7 +1,7 @@
 "use client";
 
+import { getResourceForPath } from "@/features/_plugin-resources/admin-resources";
 import { usePathname } from "@/i18n/navigation";
-import { getResourceForPath } from "@/lib/admin-resources";
 import { useI18n } from "@/lib/i18n";
 
 export function PageTitle() {

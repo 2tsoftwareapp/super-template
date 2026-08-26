@@ -11,13 +11,19 @@
     "generate": "tsx scripts/generate.ts",
     "lint": "eslint .",
     "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --passWithNoTests",
     "format": "prettier --write ."
+  },
+  "dependencies": {
+    "@repo/env-loader": "workspace:*",
+    "zod": "4.4.3"
   },
   "devDependencies": {
     "@repo/tsconfig": "workspace:*",
     "@types/node": "24.10.1",
     "tsx": "4.22.4",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "vitest": "4.1.9"
   },
   "sideEffects": false
 }

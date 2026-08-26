@@ -1,4 +1,4 @@
-import { AccessProfileCache } from "@repo/api-core";
+import { AccessProfileCache } from "@repo/api-runtime";
 import { describe, expect, it } from "vitest";
 
 describe("AccessProfileCache", () => {

@@ -75,7 +75,7 @@ export default defineConfig([
   },
   {
     name: "web/boundary-config-layer",
-    files: ["src/features/*/config/**/*.{ts,tsx}"],
+    files: ["src/features/**/config/**/*.{ts,tsx}"],
     rules: {
       "no-restricted-imports": [
         "error",
@@ -114,7 +114,7 @@ export default defineConfig([
   },
   {
     name: "web/boundary-ui-layer",
-    files: ["src/features/*/ui/**/*.{ts,tsx}"],
+    files: ["src/features/**/ui/**/*.{ts,tsx}"],
     rules: {
       "no-restricted-imports": [
         "error",
@@ -138,7 +138,7 @@ export default defineConfig([
   },
   {
     name: "web/boundary-screen-layer",
-    files: ["src/features/*/screens/**/*.{ts,tsx}"],
+    files: ["src/features/**/screens/**/*.{ts,tsx}"],
     rules: {
       "no-restricted-imports": [
         "error",
@@ -163,7 +163,7 @@ export default defineConfig([
   },
   {
     name: "web/boundary-controller-layer",
-    files: ["src/features/*/controllers/**/*.{ts,tsx}"],
+    files: ["src/features/**/controllers/**/*.{ts,tsx}"],
     rules: {
       "no-restricted-imports": [
         "error",
@@ -182,7 +182,7 @@ export default defineConfig([
   },
   {
     name: "web/boundary-state-layer",
-    files: ["src/features/*/state/**/*.{ts,tsx}"],
+    files: ["src/features/**/state/**/*.{ts,tsx}"],
     rules: {
       "no-restricted-imports": [
         "error",
@@ -209,7 +209,7 @@ export default defineConfig([
   },
   {
     name: "web/boundary-model-layer",
-    files: ["src/features/*/model/**/*.{ts,tsx}"],
+    files: ["src/features/**/model/**/*.{ts,tsx}"],
     rules: {
       "no-restricted-imports": [
         "error",
@@ -245,7 +245,7 @@ export default defineConfig([
   },
   {
     name: "web/boundary-contracts-layer",
-    files: ["src/features/*/contracts/**/*.{ts,tsx}"],
+    files: ["src/features/**/contracts/**/*.{ts,tsx}"],
     rules: {
       "no-restricted-imports": [
         "error",
@@ -282,7 +282,7 @@ export default defineConfig([
   },
   {
     name: "web/boundary-api-layer",
-    files: ["src/features/*/api/**/*.{ts,tsx}"],
+    files: ["src/features/**/api/**/*.{ts,tsx}"],
     rules: {
       "no-restricted-imports": [
         "error",
@@ -311,7 +311,7 @@ export default defineConfig([
   },
   {
     name: "web/boundary-api-no-notifications",
-    files: ["src/features/*/api/**/*.{ts,tsx}"],
+    files: ["src/features/**/api/**/*.{ts,tsx}"],
     rules: {
       "no-restricted-imports": [
         "error",
@@ -387,9 +387,9 @@ export default defineConfig([
   {
     name: "web/params-must-be-parsed",
     files: [
-      "src/features/*/controllers/**/*.{ts,tsx}",
-      "src/features/*/screens/**/*.{ts,tsx}",
-      "src/features/*/ui/**/*.{ts,tsx}",
+      "src/features/**/controllers/**/*.{ts,tsx}",
+      "src/features/**/screens/**/*.{ts,tsx}",
+      "src/features/**/ui/**/*.{ts,tsx}",
     ],
     rules: {
       "no-restricted-syntax": [

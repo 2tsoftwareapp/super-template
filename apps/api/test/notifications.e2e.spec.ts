@@ -1,27 +1,25 @@
-import type { TenantContext } from "@repo/api-core";
+import type { TenantContext } from "@repo/api-runtime";
 import type { INestApplication } from "@nestjs/common";
 
-import { TenantContextService, WORKER_DISPATCH_CONTEXT } from "@repo/api-core";
+import { TenantContextService, WORKER_DISPATCH_CONTEXT } from "@repo/api-runtime";
 import request from "supertest";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
 import { and, asc, eq, inArray, ne } from "drizzle-orm";
+import { type DatabaseClient, DATABASE } from "@repo/database-runtime";
 import {
-  type DatabaseClient,
-  DATABASE,
   notificationDeliveries,
   notificationDeviceTokens,
   notificationJobs,
   notifications,
-} from "@repo/api-database";
+} from "@repo/feature-notifications/schema";
 
 import {
   DELIVERIES_REPOSITORY,
   NotificationDeliveryProcessor,
   NotificationDeliveryUseCase,
   PUSH_NOTIFIER,
-} from "@repo/feature-platform";
-
+} from "@repo/feature-notifications/contracts";
 import { bearer, createTestApp, loginAs, resetTestDatabase } from "./support/test-app";
 
 // ---------------------------------------------------------------------------

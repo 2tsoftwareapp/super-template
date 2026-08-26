@@ -1,9 +1,0 @@
-{
-  "extends": "@repo/tsconfig/nest.json",
-  "compilerOptions": {
-    "outDir": "dist",
-    "strictPropertyInitialization": false
-  },
-  "include": ["src/**/*.ts"],
-  "exclude": ["src/web/**", "src/admin/**"]
-}

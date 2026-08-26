@@ -28,11 +28,11 @@ Thin CRUD modules (settings, activities, storage, …) do **not** get an empty
 ## Rules for `domain/` code
 
 1. **Framework-free**: no value imports from `@nestjs/*`, `drizzle-orm`,
-   `express`, or `@repo/api-database`. Enforced by
+   `express`, or `@repo/database-runtime`. Enforced by
    `scripts/check-source-policy.sh` (“domain imports a framework”).
    Type-only imports are allowed — they carry no runtime coupling.
 2. HTTP status codes are written as literals (`403`), not `HttpStatus.*` —
-   `AppError` accepts a number. (`@repo/api-core` is the shared kernel and is
+   `AppError` accepts a number. (`@repo/api-runtime` is the shared kernel and is
    allowed.)
 3. Every `domain/` file has a colocated `*.spec.ts` exercising the rules as
    pure functions.

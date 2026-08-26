@@ -1,10 +1,9 @@
-import type { AuthenticatedRequestUser } from "@repo/api-core";
+import type { AuthenticatedRequestUser } from "@repo/api-runtime";
 
 import { describe, expect, it, vi } from "vitest";
 
-import type { OrganizationsRepositoryPort } from "@repo/feature-identity/modules/organizations/application/ports/organizations.repository.port";
-import { UsersMapper } from "@repo/feature-identity/modules/users/application/users.mapper";
-import { GetUserUseCase } from "@repo/feature-identity/modules/users/application/use-cases/get-user.use-case";
+import type { OrganizationsRepositoryPort } from "@repo/feature-organizations/contracts";
+import { GetUserUseCase, UsersMapper } from "@repo/feature-users/contracts";
 
 const userRecord = {
   id: "user-1",

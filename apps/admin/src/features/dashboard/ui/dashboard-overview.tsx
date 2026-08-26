@@ -7,8 +7,8 @@ import { AlertTriangle } from "lucide-react";
 import type { DashboardViewModel } from "@/features/dashboard/model/dashboard.types";
 
 import { ResourcePageShell } from "@/components/resource-page-shell";
+import { adminResources } from "@/features/_plugin-resources/admin-resources";
 import { Link } from "@/i18n/navigation";
-import { adminResources } from "@/lib/admin-resources";
 import { cn } from "@/lib/utils";
 
 import { DashboardActivity } from "./dashboard-activity";

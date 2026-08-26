@@ -8,7 +8,7 @@ const envMock = vi.hoisted(() => ({
     COOKIE_SAMESITE: "lax" as const,
     CSRF_SECRET: undefined as string | undefined,
     COOKIE_SECURE: undefined as boolean | undefined,
-    APP_ENV: "test" as "development" | "test" | "staging" | "production",
+    APP_ENV: "test",
     NODE_ENV: "test" as const,
   },
 }));

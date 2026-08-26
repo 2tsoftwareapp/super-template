@@ -12,7 +12,7 @@ import type { JobDto } from "@/lib/api-types";
 import { ResourcePageShell } from "@/components/resource-page-shell";
 import { ResourceTable } from "@/components/resource-table";
 import { ResourceToolbar } from "@/components/resource-toolbar";
-import { adminResources } from "@/lib/admin-resources";
+import { adminResources } from "@/features/_plugin-resources/admin-resources";
 
 import { JobsDetailDrawer } from "./jobs-detail-drawer";
 import { JobsMetricsRow, JobsStatusRow } from "./jobs-stats";

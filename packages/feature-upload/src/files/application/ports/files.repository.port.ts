@@ -1,0 +1,157 @@
+import type { JsonObject } from "@repo/api-runtime";
+import type { TransactionExecutor } from "@repo/api-runtime";
+
+export type { JsonObject } from "@repo/api-runtime";
+
+export interface FileRecord {
+  id: string;
+  organizationId: string | null;
+  storageKey: string;
+  originalName: string;
+  mimeType: string;
+  sizeBytes: number;
+  checksum: string | null;
+  latestVersion: number;
+  kind: string;
+  visibility: string;
+  uploadedById: string | null;
+  deletedAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface CreateFileInput {
+  organizationId?: string | null;
+  storageKey: string;
+  originalName: string;
+  mimeType: string;
+  sizeBytes: number;
+  checksum?: string | null;
+  latestVersion?: number;
+  kind?: string;
+  visibility?: string;
+  uploadedById: string | null;
+}
+
+export interface SetCurrentVersionInput {
+  storageKey: string;
+  mimeType: string;
+  sizeBytes: number;
+  checksum: string | null;
+  latestVersion: number;
+}
+
+export interface FileVersionRecord {
+  id: string;
+  fileId: string;
+  organizationId: string;
+  versionNumber: number;
+  storageKey: string;
+  mimeType: string;
+  sizeBytes: number;
+  checksum: string | null;
+  createdById: string | null;
+  createdAt: Date;
+}
+
+export interface CreateFileVersionInput {
+  fileId: string;
+  organizationId: string;
+  versionNumber: number;
+  storageKey: string;
+  mimeType: string;
+  sizeBytes: number;
+  checksum: string;
+  createdById: string | null;
+}
+
+export interface FileBatchOperationRecord {
+  id: string;
+  organizationId: string;
+  actorId: string | null;
+  operation: string;
+  idempotencyKey: string | null;
+  results: JsonObject[];
+  createdAt: Date;
+}
+
+export interface CreateFileBatchOperationInput {
+  organizationId: string;
+  actorId: string;
+  operation: string;
+  idempotencyKey: string | null;
+  results: JsonObject[];
+}
+
+export interface ListFilesQuery {
+  organizationId?: string | null;
+  page: number;
+  limit: number;
+  search?: string;
+  mimeType?: string;
+  uploadedById?: string;
+  from?: string;
+  to?: string;
+  includeDeleted?: boolean;
+  excludeKinds?: string[];
+  excludeVisibilities?: string[];
+  sortField: "createdAt" | "originalName" | "sizeBytes";
+  sortOrder: "asc" | "desc";
+}
+
+export interface FileListResult {
+  rows: FileRecord[];
+  total: number;
+}
+
+export interface FilesRepositoryPort {
+  create(values: CreateFileInput, executor?: TransactionExecutor): Promise<FileRecord | null>;
+  findById(fileId: string, executor?: TransactionExecutor): Promise<FileRecord | null>;
+  softDelete(fileId: string, executor?: TransactionExecutor): Promise<FileRecord | null>;
+  listSoftDeleted(limit: number, executor?: TransactionExecutor): Promise<FileRecord[]>;
+  list(params: ListFilesQuery, executor?: TransactionExecutor): Promise<FileListResult>;
+  /**
+   * Advances the file to a new current version, guarded by a CAS on
+   * `latest_version`: the UPDATE only matches when the file still points at
+   * `expectedLatestVersion`, so a concurrent version upload cannot silently
+   * overwrite a newer state. Returns null when the guard fails.
+   */
+  setCurrentVersion(
+    fileId: string,
+    values: SetCurrentVersionInput,
+    expectedLatestVersion: number,
+    executor?: TransactionExecutor,
+  ): Promise<FileRecord | null>;
+  createVersion(
+    values: CreateFileVersionInput,
+    executor?: TransactionExecutor,
+  ): Promise<FileVersionRecord>;
+  listVersions(fileId: string, executor?: TransactionExecutor): Promise<FileVersionRecord[]>;
+  findBatchOperationByIdempotencyKey(
+    actorId: string,
+    idempotencyKey: string,
+    executor?: TransactionExecutor,
+  ): Promise<FileBatchOperationRecord | null>;
+  createBatchOperation(
+    values: CreateFileBatchOperationInput,
+    executor?: TransactionExecutor,
+  ): Promise<FileBatchOperationRecord>;
+  /**
+   * Persists a batch operation with atomic idempotency: when the insert hits
+   * the partial-unique (actor_id, idempotency_key) index, the concurrent
+   * record's results are returned instead of surfacing a 500. Returns null
+   * when neither the insert nor an existing record produced results — the
+   * caller falls back to re-running the operation. The `computeResults`
+   * callback holds the caller's domain work (deletes) that runs before the
+   * persistence attempt.
+   */
+  createBatchOperationIdempotent(
+    input: Omit<CreateFileBatchOperationInput, "results" | "idempotencyKey"> & {
+      idempotencyKey: string;
+    },
+    computeResults: () => Promise<JsonObject[]>,
+    executor?: TransactionExecutor,
+  ): Promise<JsonObject[] | null>;
+}
+
+export const FILES_REPOSITORY = Symbol("FILES_REPOSITORY");

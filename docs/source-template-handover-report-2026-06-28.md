@@ -173,7 +173,7 @@ Khách hàng chưa hài lòng về core package là hợp lý, vì repo đang c�
 |---|---|---|
 | Tooling foundation | `@repo/tsconfig`, `@repo/eslint-config`, `@repo/env-loader` | Cấu hình chung và env layering |
 | Pure shared logic | `@repo/api-sort` | Logic sort dùng chung client/server |
-| Backend foundation | `@repo/api-core`, `@repo/api-database`, `@repo/api-health` | Error, guards, ports, config, DB, health |
+| Backend foundation | `@repo/api-runtime`, `@repo/database-runtime`, `@repo/feature-health` | Error, guards, ports, config, DB, health |
 | Backend capability | `@repo/api-identity`, `@repo/api-platform`, `@repo/api-workspace` | Domain/capability modules |
 | Composition | `@repo/api-bootstrap`, `apps/api` | Seed/composition root, không phải core đáy |
 | Contract | `@repo/api-contract` | Generated OpenAPI types + client helper exports |

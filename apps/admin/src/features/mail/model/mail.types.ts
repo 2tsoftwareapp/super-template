@@ -1,6 +1,6 @@
 import type { ColumnDef, Table as ReactTable } from "@tanstack/react-table";
 
-import type { AdminResourceConfig } from "@/lib/admin-resources";
+import type { AdminResourceConfig } from "@/features/_plugin-resources/admin-resources";
 import type { MailDeliveryDto, MailPreviewDto, MailTemplateDto } from "@/lib/api-types";
 
 import type { DELIVERY_STATUS_OPTIONS } from "./mail.constants";

@@ -1,10 +1,10 @@
-import type { EnvironmentService } from "@repo/api-core";
-import type { OrganizationsService } from "@repo/feature-identity/modules/organizations";
-import type { UsersRepositoryPort } from "@repo/feature-identity/modules/users";
+import type { EnvironmentService } from "@repo/api-runtime";
+import type { OrganizationsService } from "@repo/feature-organizations/contracts";
+import type { UsersRepositoryPort } from "@repo/feature-users/contracts";
 
-import { type DatabaseExecutor } from "@repo/api-database";
-import { type AccessControlService, ROLE_NAMES } from "@repo/feature-identity/modules/access-control";
-import { hashPassword } from "@repo/feature-identity/modules/auth";
+import { type DatabaseExecutor } from "@repo/database-runtime";
+import { type AccessControlService, ROLE_NAMES } from "@repo/feature-access-control/contracts";
+import { hashPassword } from "@repo/feature-auth/contracts";
 
 import { type SeededUsersContext } from "../types";
 

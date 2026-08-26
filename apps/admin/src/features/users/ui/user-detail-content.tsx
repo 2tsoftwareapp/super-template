@@ -9,7 +9,7 @@ import type { UserDetailViewModel } from "@/features/users/model/users.types";
 import type { AdminUserDto } from "@/lib/api-types";
 
 import { ResourcePageShell } from "@/components/resource-page-shell";
-import { adminResources } from "@/lib/admin-resources";
+import { adminResources } from "@/features/_plugin-resources/admin-resources";
 import { timeAgo, truncateId } from "@/lib/format";
 
 import { UserDetailDangerZone } from "./user-detail-danger-zone";

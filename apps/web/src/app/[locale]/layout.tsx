@@ -5,7 +5,7 @@ import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { notFound } from "next/navigation";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
-import { Providers } from "@/app/providers";
+import { Providers } from "@/components/providers";
 import { routing } from "@/i18n/routing";
 import { ThemeProvider } from "@/shared/theme";
 

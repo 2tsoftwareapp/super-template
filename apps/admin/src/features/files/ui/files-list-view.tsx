@@ -12,7 +12,7 @@ import type { FilesViewModel } from "@/features/files/model/files.types";
 import { ResourcePageShell } from "@/components/resource-page-shell";
 import { ResourceTable } from "@/components/resource-table";
 import { ResourceToolbar } from "@/components/resource-toolbar";
-import { adminResources } from "@/lib/admin-resources";
+import { adminResources } from "@/features/_plugin-resources/admin-resources";
 
 import { FilesDetailDrawer } from "./files-detail-drawer";
 
