@@ -15,8 +15,10 @@ import { ResolveOrganizationIdForUserUseCase } from "./application/use-cases/res
 import { UpdateMemberRoleUseCase } from "./application/use-cases/update-member-role.use-case";
 import { UpdateOrganizationUseCase } from "./application/use-cases/update-organization.use-case";
 import { OrganizationLookupAdapter } from "./infrastructure/organization-lookup.adapter";
+import { OrganizationMembersRepository } from "./infrastructure/organization-members.repository";
 import { OrganizationsRepository } from "./infrastructure/organizations.repository";
 import { OrganizationsController } from "./presentation/organizations.controller";
+import { ORGANIZATION_MEMBERSHIP } from "./public/organization-membership.token";
 import { ORGANIZATION_LOOKUP } from "./public/organization-lookup.port";
 
 @Global()
@@ -28,6 +30,11 @@ import { ORGANIZATION_LOOKUP } from "./public/organization-lookup.port";
     {
       provide: ORGANIZATIONS_REPOSITORY,
       useExisting: OrganizationsRepository,
+    },
+    OrganizationMembersRepository,
+    {
+      provide: ORGANIZATION_MEMBERSHIP,
+      useExisting: OrganizationMembersRepository,
     },
     OrganizationLookupAdapter,
     OrganizationsService,
@@ -48,6 +55,11 @@ import { ORGANIZATION_LOOKUP } from "./public/organization-lookup.port";
       useExisting: OrganizationLookupAdapter,
     },
   ],
-  exports: [OrganizationsService, ORGANIZATIONS_REPOSITORY, ORGANIZATION_LOOKUP],
+  exports: [
+    OrganizationsService,
+    ORGANIZATIONS_REPOSITORY,
+    ORGANIZATION_MEMBERSHIP,
+    ORGANIZATION_LOOKUP,
+  ],
 })
 export class OrganizationsModule {}

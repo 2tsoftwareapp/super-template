@@ -1,8 +1,8 @@
-import { roles } from "@repo/feature-access-control/schema";
+import { users } from "@repo/feature-users/schema";
 import { organizations } from "@repo/feature-organizations/schema";
 import { index, pgTable, primaryKey, timestamp, uuid } from "drizzle-orm/pg-core";
 
-import { users } from "./users";
+import { roles } from "./access-control";
 
 export const userRoles = pgTable(
   "r_user_roles",

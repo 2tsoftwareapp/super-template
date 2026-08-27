@@ -3,7 +3,8 @@ import type { TransactionExecutor } from "@repo/api-runtime";
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { AppError, ERROR_CODES } from "@repo/api-runtime";
 
-import { ORGANIZATION_MEMBERSHIP, type OrganizationMembership } from "../../public/contracts";
+import type { OrganizationMembership } from "../../public/contracts";
+import { ORGANIZATION_MEMBERSHIP } from "../../public/organization-membership.token";
 import { AssertOrganizationMembershipUseCase } from "./assert-organization-membership.use-case";
 
 @Injectable()

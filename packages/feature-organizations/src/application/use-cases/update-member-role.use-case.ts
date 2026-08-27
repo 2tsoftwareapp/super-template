@@ -13,11 +13,10 @@ import {
   assertNotLastOwner,
   assertOrganizationRole,
 } from "../../domain/organization-access.policy";
-import { ORGANIZATION_MEMBERSHIP, type OrganizationMembership } from "../../public/contracts";
-import {
-  ORGANIZATION_ACCESS_CONTROL,
-  type OrganizationAccessControlPort,
-} from "../../public/contracts";
+import type { OrganizationMembership } from "../../public/contracts";
+import { ORGANIZATION_MEMBERSHIP } from "../../public/organization-membership.token";
+import type { OrganizationAccessControlPort } from "../../public/contracts";
+import { ORGANIZATION_ACCESS_CONTROL } from "../../public/organization-access-control.token";
 
 /** Platform super-role literal; importing access-control here would create a package cycle. */
 const PLATFORM_SUPER_ADMIN = "SUPER_ADMIN";

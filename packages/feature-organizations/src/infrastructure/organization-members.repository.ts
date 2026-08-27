@@ -7,10 +7,10 @@ import type {
 
 import { Inject, Injectable } from "@nestjs/common";
 import { DATABASE, type DatabaseClient } from "@repo/database-runtime";
-import { organizations } from "@repo/feature-organizations/schema";
+import { users } from "@repo/feature-users/schema";
 import { and, asc, count, eq, isNull, ne } from "drizzle-orm";
 
-import { organizationMembers, users } from "./persistence";
+import { organizationMembers, organizations } from "./persistence";
 
 @Injectable()
 export class OrganizationMembersRepository implements OrganizationMembership {
@@ -135,6 +135,17 @@ export class OrganizationMembersRepository implements OrganizationMembership {
       .from(organizationMembers)
       .where(eq(organizationMembers.organizationId, organizationId));
     return result?.value ?? 0;
+  }
+
+  async findUserIdsForOrganization(
+    organizationId: string,
+    executor: DatabaseExecutor = this.database,
+  ): Promise<string[]> {
+    const rows = await executor
+      .select({ userId: organizationMembers.userId })
+      .from(organizationMembers)
+      .where(eq(organizationMembers.organizationId, organizationId));
+    return rows.map((row) => row.userId);
   }
 
   async updateMemberRole(

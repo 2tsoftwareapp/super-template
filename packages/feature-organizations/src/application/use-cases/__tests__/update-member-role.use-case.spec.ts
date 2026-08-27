@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
 import { ERROR_CODES } from "@repo/api-runtime";
+import { ORGANIZATION_ERROR_CODES } from "@repo/feature-organizations/contracts";
 
 import { UpdateMemberRoleUseCase } from "../update-member-role.use-case";
 
@@ -125,7 +126,7 @@ describe("UpdateMemberRoleUseCase", () => {
     );
 
     await expect(useCase.execute("org-1", "actor", "target", "ADMIN")).rejects.toMatchObject({
-      code: ERROR_CODES.ORGANIZATION_LAST_OWNER,
+      code: ORGANIZATION_ERROR_CODES.ORGANIZATION_LAST_OWNER,
     });
   });
 
@@ -161,7 +162,7 @@ describe("UpdateMemberRoleUseCase", () => {
     );
 
     await expect(useCase.execute("org-1", "actor", "stranger", "ADMIN")).rejects.toMatchObject({
-      code: ERROR_CODES.ORGANIZATION_MEMBER_NOT_FOUND,
+      code: ORGANIZATION_ERROR_CODES.ORGANIZATION_MEMBER_NOT_FOUND,
     });
   });
 });

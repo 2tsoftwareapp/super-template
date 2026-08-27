@@ -1,19 +1,13 @@
 import { defineFeature, type FeatureManifest } from "@repo/api-plugin-kit";
 
-import {
-  organizationMemberRoleEnum,
-  organizationMembers,
-  userRoles,
-  users,
-  userStatusEnum,
-} from "./infrastructure/persistence";
+import { userStatusEnum, users } from "./infrastructure/persistence";
 import { usersSeeders } from "./seed";
 import { UsersModule } from "./users.module";
 
 export const usersFeature: FeatureManifest = defineFeature({
   id: "users",
-  dependsOn: ["access-control", "organizations", "settings", "activities", "audit", "outbox"],
-  provides: ["organization-membership", "user-role-assignments", "user-credential-store"],
+  dependsOn: ["activities", "audit", "outbox"],
+  provides: ["user-credential-store"],
   // requires: ["file-view"] removed - file lookup is optional for users
   nestModule: UsersModule,
   resourceScopes: {
@@ -31,9 +25,6 @@ export const usersFeature: FeatureManifest = defineFeature({
   schema: {
     users,
     userStatusEnum,
-    organizationMembers,
-    organizationMemberRoleEnum,
-    userRoles,
   },
   seeders: usersSeeders,
 });

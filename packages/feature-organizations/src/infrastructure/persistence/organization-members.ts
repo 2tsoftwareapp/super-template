@@ -1,9 +1,9 @@
 import { timestamps } from "@repo/database-runtime";
-import { organizations } from "@repo/feature-organizations/schema";
+import { users } from "@repo/feature-users/schema";
 import { index, pgTable, uniqueIndex, uuid } from "drizzle-orm/pg-core";
 
-import { organizationMemberRoleEnum } from "./organization-members-enums";
-import { users } from "./users";
+import { organizationMemberRoleEnum } from "./organization-member-role.enum";
+import { organizations } from "./organizations";
 
 export const organizationMembers = pgTable(
   "r_organization_members",

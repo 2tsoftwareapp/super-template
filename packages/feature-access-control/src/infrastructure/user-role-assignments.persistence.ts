@@ -3,10 +3,9 @@ import type { UserRoleAssignments } from "@repo/feature-access-control/contracts
 
 import { Inject, Injectable } from "@nestjs/common";
 import { DATABASE } from "@repo/database-runtime";
-import { permissions, rolePermissions, roles } from "@repo/feature-access-control/schema";
 import { and, eq, inArray, isNull, or, sql, type SQL } from "drizzle-orm";
 
-import { userRoles } from "./persistence";
+import { permissions, rolePermissions, roles, userRoles } from "./persistence";
 
 @Injectable()
 export class UserRoleAssignmentsPersistence implements UserRoleAssignments {
@@ -20,6 +19,27 @@ export class UserRoleAssignmentsPersistence implements UserRoleAssignments {
       .select({ userId: userRoles.userId })
       .from(userRoles)
       .where(eq(userRoles.roleId, roleId));
+    return rows.map((row) => row.userId);
+  }
+
+  async findUserIdsForRoleName(
+    roleName: string,
+    organizationId?: string | null,
+    executor: DatabaseExecutor = this.database,
+  ): Promise<string[]> {
+    const filters: SQL[] = [eq(roles.name, roleName)];
+    if (organizationId === null) {
+      filters.push(isNull(userRoles.organizationId));
+    } else if (organizationId !== undefined) {
+      filters.push(
+        or(isNull(userRoles.organizationId), eq(userRoles.organizationId, organizationId))!,
+      );
+    }
+    const rows = await executor
+      .select({ userId: userRoles.userId })
+      .from(userRoles)
+      .innerJoin(roles, eq(userRoles.roleId, roles.id))
+      .where(and(...filters));
     return rows.map((row) => row.userId);
   }
 

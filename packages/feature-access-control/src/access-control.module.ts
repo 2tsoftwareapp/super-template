@@ -1,10 +1,14 @@
 import { Global, Module } from "@nestjs/common";
 import { AccessProfileCache } from "@repo/api-runtime";
 import { AppConfigModule } from "@repo/api-runtime";
+import {
+  ORGANIZATION_USER_ROLES_PURGE,
+} from "@repo/feature-organizations/contracts";
+import { ACCESS_CONTROL_REPOSITORY } from "./public/access-control-repository.token";
+import { USER_ROLE_ASSIGNMENTS } from "./public/user-role-assignments.token";
 
 import { AccessControlMapper } from "./application/access-control.mapper";
 import { AccessControlService } from "./application/access-control.service";
-import { ACCESS_CONTROL_REPOSITORY } from "./application/ports/access-control.repository.port";
 import { AccessProfileUseCase } from "./application/use-cases/access-profile.use-case";
 import { CreateCustomRoleUseCase } from "./application/use-cases/create-custom-role.use-case";
 import { DeleteCustomRoleUseCase } from "./application/use-cases/delete-custom-role.use-case";
@@ -25,6 +29,7 @@ import {
   ORGANIZATION_CUSTOM_ROLES_PURGE_PROVIDER,
   OrganizationCustomRolesPurgeAdapter,
 } from "./infrastructure/organization-custom-roles-purge.adapter";
+import { UserRoleAssignmentsPersistence } from "./infrastructure/user-role-assignments.persistence";
 import { AdminRolesController } from "./presentation/admin-roles.controller";
 
 @Global()
@@ -34,6 +39,7 @@ import { AdminRolesController } from "./presentation/admin-roles.controller";
   providers: [
     AccessControlRolePersistence,
     AccessControlPermissionPersistence,
+    UserRoleAssignmentsPersistence,
     AccessControlRepository,
     AccessControlMapper,
     AccessProfileUseCase,
@@ -48,14 +54,26 @@ import { AdminRolesController } from "./presentation/admin-roles.controller";
     AccessControlService,
     AccessProfileCache,
     OrganizationCustomRolesPurgeAdapter,
-    ORGANIZATION_CUSTOM_ROLES_PURGE_PROVIDER,
     OrganizationAccessControlAdapter,
-    ORGANIZATION_ACCESS_CONTROL_PROVIDER,
     {
       provide: ACCESS_CONTROL_REPOSITORY,
       useExisting: AccessControlRepository,
     },
+    {
+      provide: USER_ROLE_ASSIGNMENTS,
+      useExisting: UserRoleAssignmentsPersistence,
+    },
+    {
+      provide: ORGANIZATION_USER_ROLES_PURGE,
+      useExisting: UserRoleAssignmentsPersistence,
+    },
   ],
-  exports: [AccessControlRepository, AccessControlService, ACCESS_CONTROL_REPOSITORY],
+  exports: [
+    AccessControlRepository,
+    AccessControlService,
+    ACCESS_CONTROL_REPOSITORY,
+    USER_ROLE_ASSIGNMENTS,
+    ORGANIZATION_USER_ROLES_PURGE,
+  ],
 })
 export class AccessControlModule {}

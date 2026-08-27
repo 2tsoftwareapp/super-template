@@ -7,7 +7,8 @@ import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 import { ACTIVITY_EMITTER, type ActivityEmitter } from "@repo/feature-activities/contracts";
 
 import { assertOrganizationRole } from "../../domain/organization-access.policy";
-import { ORGANIZATION_MEMBERSHIP, type OrganizationMembership } from "../../public/contracts";
+import type { OrganizationMembership } from "../../public/contracts";
+import { ORGANIZATION_MEMBERSHIP } from "../../public/organization-membership.token";
 import {
   ORGANIZATIONS_REPOSITORY,
   type OrganizationsRepositoryPort,

@@ -6,12 +6,10 @@ import { and, asc, eq, isNull } from "drizzle-orm";
 
 import type { OrganizationsRepositoryPort } from "../application/ports/organizations.repository.port";
 
-import {
-  ORGANIZATION_CUSTOM_ROLES_PURGE,
-  ORGANIZATION_USER_ROLES_PURGE,
-  type OrganizationCustomRolesPurgePort,
-  type OrganizationUserRolePurgePort,
-} from "../public/contracts";
+import { ORGANIZATION_CUSTOM_ROLES_PURGE } from "../public/organization-custom-roles-purge.token";
+import { ORGANIZATION_USER_ROLES_PURGE } from "../public/organization-purge.token";
+import type { OrganizationCustomRolesPurgePort } from "../public/contracts";
+import type { OrganizationUserRolePurgePort } from "../public/contracts";
 import { organizations } from "./persistence";
 
 @Injectable()

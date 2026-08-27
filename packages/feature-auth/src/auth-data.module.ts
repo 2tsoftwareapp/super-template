@@ -40,6 +40,10 @@ import { AUTH_USER_STORE } from "./public/auth-user-store.port";
       useExisting: AuthRepository,
     },
   ],
-  exports: [AuthMailService, AUTH_SESSION_REPOSITORY],
+  exports: [
+    AuthMailService,
+    AUTH_SESSION_REPOSITORY,
+    AUTH_USER_STORE,
+  ],
 })
 export class AuthDataModule {}

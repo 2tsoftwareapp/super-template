@@ -3,7 +3,8 @@ import type { AuthenticatedRequestUser } from "@repo/api-runtime";
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import {AppError, ERROR_CODES } from "@repo/api-runtime";
 
-import { ORGANIZATION_MEMBERSHIP, type OrganizationMembership } from "../../public/contracts";
+import type { OrganizationMembership } from "../../public/contracts";
+import { ORGANIZATION_MEMBERSHIP } from "../../public/organization-membership.token";
 
 /** Platform super-role literal; importing access-control here would create a package cycle. */
 const PLATFORM_SUPER_ADMIN = "SUPER_ADMIN";

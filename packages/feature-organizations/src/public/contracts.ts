@@ -8,6 +8,11 @@ export type * from "../application/ports/organizations.repository.port";
 /** Public contracts for @repo/feature-organizations. */
 export { OrganizationsModule } from "../organizations.module";
 
+export { ORGANIZATION_MEMBERSHIP } from "./organization-membership.token";
+export { ORGANIZATION_USER_ROLES_PURGE } from "./organization-purge.token";
+export { ORGANIZATION_CUSTOM_ROLES_PURGE } from "./organization-custom-roles-purge.token";
+export { ORGANIZATION_ACCESS_CONTROL } from "./organization-access-control.token";
+
 export interface OrganizationMemberRecord {
   organizationId: string;
   userId: string;
@@ -63,6 +68,11 @@ export interface OrganizationMembership {
     executor?: TransactionExecutor,
   ): Promise<OrganizationMemberWithUserRecord[]>;
 
+  findUserIdsForOrganization(
+    organizationId: string,
+    executor?: TransactionExecutor,
+  ): Promise<string[]>;
+
   countOwners(
     organizationId: string,
     options?: { excludingUserId?: string; executor?: TransactionExecutor; lock?: boolean },
@@ -88,8 +98,6 @@ export interface OrganizationMembership {
   deleteByOrganizationId(organizationId: string, executor?: TransactionExecutor): Promise<void>;
 }
 
-export const ORGANIZATION_MEMBERSHIP = Symbol("ORGANIZATION_MEMBERSHIP");
-
 /**
  * Narrow consumer-owned ports used when an organization is deleted: each
  * owning feature purges the rows it owns without organizations importing
@@ -99,13 +107,9 @@ export interface OrganizationUserRolePurgePort {
   deleteByOrganizationId(organizationId: string, executor?: TransactionExecutor): Promise<void>;
 }
 
-export const ORGANIZATION_USER_ROLES_PURGE = Symbol("ORGANIZATION_USER_ROLES_PURGE");
-
 export interface OrganizationCustomRolesPurgePort {
   deleteByOrganizationId(organizationId: string, executor?: TransactionExecutor): Promise<void>;
 }
-
-export const ORGANIZATION_CUSTOM_ROLES_PURGE = Symbol("ORGANIZATION_CUSTOM_ROLES_PURGE");
 
 /**
  * Consumer-owned seam for the role-management operations organizations need
@@ -129,6 +133,5 @@ export interface OrganizationAccessControlPort {
   invalidateAccessProfile(userId: string): Promise<void>;
 }
 
-export const ORGANIZATION_ACCESS_CONTROL = Symbol("ORGANIZATION_ACCESS_CONTROL");
 export * from "./organization-lookup.port";
 export { ORGANIZATION_ERROR_CODES } from "./error-codes";

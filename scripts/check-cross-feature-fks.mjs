@@ -12,14 +12,14 @@ import { resolve } from "node:path";
  */
 const required = [
   [
-    "packages/feature-users/src/infrastructure/persistence/organization-members.ts",
+    "packages/feature-organizations/src/infrastructure/persistence/organization-members.ts",
     [
       ["userId", "users.id", 1],
       ["organizationId", "organizations.id", 1],
     ],
   ],
   [
-    "packages/feature-users/src/infrastructure/persistence/user-roles.ts",
+    "packages/feature-access-control/src/infrastructure/persistence/user-roles.ts",
     [
       ["userId", "users.id", 1],
       ["roleId", "roles.id", 1],

@@ -1,7 +1,8 @@
 import { Inject, Injectable } from "@nestjs/common";
 import {type AuthenticatedRequestUser } from "@repo/api-runtime";
 
-import { ORGANIZATION_MEMBERSHIP, type OrganizationMembership } from "../../public/contracts";
+import type { OrganizationMembership } from "../../public/contracts";
+import { ORGANIZATION_MEMBERSHIP } from "../../public/organization-membership.token";
 import {
   ORGANIZATIONS_REPOSITORY,
   type OrganizationsRepositoryPort,

@@ -1,14 +1,18 @@
 import { defineFeature, type FeatureManifest } from "@repo/api-plugin-kit";
 
 import { AccessControlModule } from "./access-control.module";
-import { permissions, rolePermissions, roles } from "./infrastructure/persistence";
+import {
+  permissions,
+  rolePermissions,
+  roles,
+  userRoles,
+} from "./infrastructure/persistence";
 import { accessControlSeeders } from "./seed";
 
 export const accessControlFeature: FeatureManifest = defineFeature({
   id: "access-control",
-  dependsOn: ["organizations", "audit"],
+  dependsOn: ["users", "organizations", "audit"],
   provides: ["access-control-ops"],
-  requires: ["user-role-assignments"],
   nestModule: AccessControlModule,
   resourceScopes: {
     roles: "organization",
@@ -22,6 +26,6 @@ export const accessControlFeature: FeatureManifest = defineFeature({
       },
     },
   },
-  schema: { roles, permissions, rolePermissions },
+  schema: { roles, permissions, rolePermissions, userRoles },
   seeders: accessControlSeeders,
 });

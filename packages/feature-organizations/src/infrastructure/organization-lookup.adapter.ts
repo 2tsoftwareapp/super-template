@@ -11,7 +11,8 @@ import {
   ORGANIZATIONS_REPOSITORY,
   type OrganizationsRepositoryPort,
 } from "../application/ports/organizations.repository.port";
-import { ORGANIZATION_MEMBERSHIP, type OrganizationMembership } from "../public/contracts";
+import type { OrganizationMembership } from "../public/contracts";
+import { ORGANIZATION_MEMBERSHIP } from "../public/organization-membership.token";
 
 @Injectable()
 export class OrganizationLookupAdapter implements OrganizationLookup {

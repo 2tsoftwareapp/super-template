@@ -8,7 +8,8 @@ import type {
   RoleRecord,
 } from "../application/ports/access-control.repository.port";
 
-import { USER_ROLE_ASSIGNMENTS, type UserRoleAssignments } from "../public/contracts";
+import type { UserRoleAssignments } from "../public/contracts";
+import { USER_ROLE_ASSIGNMENTS } from "../public/user-role-assignments.token";
 import { AccessControlPermissionPersistence } from "./access-control-permission.persistence";
 import { AccessControlRolePersistence } from "./access-control-role.persistence";
 

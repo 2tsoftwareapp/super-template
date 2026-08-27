@@ -6,7 +6,8 @@ import { ACTIVITY_EMITTER, type ActivityEmitter } from "@repo/feature-activities
 
 import type { CreateOrganizationCommand } from "../organizations.types";
 
-import { ORGANIZATION_MEMBERSHIP, type OrganizationMembership } from "../../public/contracts";
+import type { OrganizationMembership } from "../../public/contracts";
+import { ORGANIZATION_MEMBERSHIP } from "../../public/organization-membership.token";
 import {
   ORGANIZATIONS_REPOSITORY,
   type OrganizationsRepositoryPort,
@@ -20,10 +21,8 @@ const slugify = (value: string) =>
     .replace(/^-+|-+$/g, "")
     .slice(0, 64) || "organization";
 
-import {
-  ORGANIZATION_ACCESS_CONTROL,
-  type OrganizationAccessControlPort,
-} from "../../public/contracts";
+import type { OrganizationAccessControlPort } from "../../public/contracts";
+import { ORGANIZATION_ACCESS_CONTROL } from "../../public/organization-access-control.token";
 
 @Injectable()
 

@@ -1,12 +1,15 @@
 import { defineFeature, type FeatureManifest } from "@repo/api-plugin-kit";
 
-import { organizations } from "./infrastructure/persistence";
+import {
+  organizationMemberRoleEnum,
+  organizationMembers,
+  organizations,
+} from "./infrastructure/persistence";
 import { OrganizationsModule } from "./organizations.module";
 
 export const organizationsFeature: FeatureManifest = defineFeature({
   id: "organizations",
-  dependsOn: ["activities", "audit"],
-  requires: ["organization-membership", "access-control-ops"],
+  dependsOn: ["users", "activities", "audit"],
   nestModule: OrganizationsModule,
-  schema: { organizations },
+  schema: { organizations, organizationMembers, organizationMemberRoleEnum },
 });

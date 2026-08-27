@@ -1,14 +1,17 @@
 import type { DatabaseClient, DatabaseExecutor } from "@repo/database-runtime";
+import type { OrganizationMembership } from "@repo/feature-organizations/contracts";
+import type { UserRoleAssignments } from "@repo/feature-access-control/contracts";
 
 import { Inject, Injectable } from "@nestjs/common";
 import { DATABASE } from "@repo/database-runtime";
-import { roles } from "@repo/feature-access-control/schema";
-import { and, asc, count, desc, eq, inArray, isNull, or, sql } from "drizzle-orm";
+import { ORGANIZATION_MEMBERSHIP } from "@repo/feature-organizations/contracts";
+import { USER_ROLE_ASSIGNMENTS } from "@repo/feature-access-control/contracts";
+import { and, asc, count, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 
 import type { UsersRepositoryPort } from "../application/ports/users.repository.port";
 import type { UserSortCriterion } from "../application/user-sort";
 
-import { organizationMembers, userRoles, users } from "./persistence";
+import { users } from "./persistence";
 
 interface ListUsersParams {
   page: number;
@@ -29,7 +32,13 @@ const USER_SORT_FIELDS = {
 
 @Injectable()
 export class UsersRepository implements UsersRepositoryPort {
-  constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
+  constructor(
+    @Inject(DATABASE) private readonly database: DatabaseClient,
+    @Inject(USER_ROLE_ASSIGNMENTS)
+    private readonly userRoleAssignments: UserRoleAssignments,
+    @Inject(ORGANIZATION_MEMBERSHIP)
+    private readonly organizationMembership: OrganizationMembership,
+  ) {}
 
   async create(values: typeof users.$inferInsert, executor: DatabaseExecutor = this.database) {
     const [user] = await executor.insert(users).values(values).returning();
@@ -103,35 +112,25 @@ export class UsersRepository implements UsersRepositoryPort {
     }
 
     if (params.role) {
-      const roleSubQuery = executor
-        .select({
-          userId: userRoles.userId,
-        })
-        .from(userRoles)
-        .innerJoin(roles, eq(userRoles.roleId, roles.id));
-
-      const roleFilters: ReturnType<typeof isNull>[] = [eq(roles.name, params.role)];
-      if (params.organizationId) {
-        roleFilters.push(
-          or(
-            isNull(userRoles.organizationId),
-            eq(userRoles.organizationId, params.organizationId),
-          )!,
-        );
+      const roleUserIds = await this.userRoleAssignments.findUserIdsForRoleName(
+        params.role,
+        params.organizationId,
+        executor,
+      );
+      if (roleUserIds.length === 0) {
+        return { rows: [], total: 0 };
       }
-
-      roleSubQuery.where(and(...roleFilters));
-      filters.push(inArray(users.id, roleSubQuery));
+      filters.push(inArray(users.id, roleUserIds));
     }
 
     if (params.organizationId) {
-      const organizationUserIds = executor
-        .select({
-          userId: organizationMembers.userId,
-        })
-        .from(organizationMembers)
-        .where(eq(organizationMembers.organizationId, params.organizationId));
-
+      const organizationUserIds = await this.organizationMembership.findUserIdsForOrganization(
+        params.organizationId,
+        executor,
+      );
+      if (organizationUserIds.length === 0) {
+        return { rows: [], total: 0 };
+      }
       filters.push(inArray(users.id, organizationUserIds));
     }
 
@@ -164,18 +163,11 @@ export class UsersRepository implements UsersRepositoryPort {
     organizationId: string,
     executor: DatabaseExecutor = this.database,
   ) {
-    const [membership] = await executor
-      .select({ userId: organizationMembers.userId })
-      .from(organizationMembers)
-      .where(
-        and(
-          eq(organizationMembers.userId, userId),
-          eq(organizationMembers.organizationId, organizationId),
-        ),
-      )
-      .limit(1);
-
-    return Boolean(membership);
+    const memberIds = await this.organizationMembership.findUserIdsForOrganization(
+      organizationId,
+      executor,
+    );
+    return memberIds.includes(userId);
   }
 
   async listDeliverableUserIds(executor: DatabaseExecutor = this.database) {
@@ -205,6 +197,13 @@ export class UsersRepository implements UsersRepositoryPort {
     organizationId: string,
     executor: DatabaseExecutor = this.database,
   ) {
+    const memberIds = await this.organizationMembership.findUserIdsForOrganization(
+      organizationId,
+      executor,
+    );
+    if (!memberIds.includes(userId)) {
+      return null;
+    }
     const [row] = await executor
       .select({
         id: users.id,
@@ -213,11 +212,9 @@ export class UsersRepository implements UsersRepositoryPort {
         status: users.status,
       })
       .from(users)
-      .innerJoin(organizationMembers, eq(users.id, organizationMembers.userId))
       .where(
         and(
           eq(users.id, userId),
-          eq(organizationMembers.organizationId, organizationId),
           isNull(users.deletedAt),
           eq(users.status, "ACTIVE"),
         ),
@@ -236,19 +233,28 @@ export class UsersRepository implements UsersRepositoryPort {
       return [];
     }
 
+    const memberIds = await this.organizationMembership.findUserIdsForOrganization(
+      organizationId,
+      executor,
+    );
+    if (memberIds.length === 0) {
+      return [];
+    }
+    const memberSet = new Set(memberIds);
+    const candidates = userIds.filter((id) => memberSet.has(id));
+    if (candidates.length === 0) {
+      return [];
+    }
     const rows = await executor
       .select({ id: users.id })
       .from(users)
-      .innerJoin(organizationMembers, eq(users.id, organizationMembers.userId))
       .where(
         and(
-          inArray(users.id, userIds),
-          eq(organizationMembers.organizationId, organizationId),
+          inArray(users.id, candidates),
           isNull(users.deletedAt),
           eq(users.status, "ACTIVE"),
         ),
       );
-
     return rows.map((row) => row.id);
   }
 
@@ -256,18 +262,23 @@ export class UsersRepository implements UsersRepositoryPort {
     organizationId: string,
     executor: DatabaseExecutor = this.database,
   ) {
+    const memberIds = await this.organizationMembership.findUserIdsForOrganization(
+      organizationId,
+      executor,
+    );
+    if (memberIds.length === 0) {
+      return [];
+    }
     const rows = await executor
       .select({ id: users.id })
       .from(users)
-      .innerJoin(organizationMembers, eq(users.id, organizationMembers.userId))
       .where(
         and(
-          eq(organizationMembers.organizationId, organizationId),
+          inArray(users.id, memberIds),
           isNull(users.deletedAt),
           eq(users.status, "ACTIVE"),
         ),
       );
-
     return rows.map((row) => row.id);
   }
 }
