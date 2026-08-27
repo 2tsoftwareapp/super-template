@@ -1,4 +1,8 @@
 import { Global, Module } from "@nestjs/common";
+import {
+  BACKGROUND_JOB_ENQUEUER,
+  BACKGROUND_JOB_ENQUEUER_WITH_RESULT,
+} from "./public/background-job-enqueuer.port";
 
 import { JobsMapper } from "./application/jobs.mapper";
 import { JobsProcessor } from "./application/jobs.processor";
@@ -19,10 +23,6 @@ import { ProcessJobsUseCase } from "./application/use-cases/process-jobs.use-cas
 import { JobObservabilityRepository } from "./infrastructure/job-observability.repository";
 import { JobsRepository } from "./infrastructure/jobs.repository";
 import { AdminJobsController } from "./presentation/admin-jobs.controller";
-import {
-  BACKGROUND_JOB_ENQUEUER,
-  BACKGROUND_JOB_ENQUEUER_WITH_RESULT,
-} from "@repo/feature-jobs/contracts";
 
 @Global()
 @Module({

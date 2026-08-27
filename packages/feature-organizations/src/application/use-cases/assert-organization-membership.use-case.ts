@@ -1,7 +1,7 @@
 import type { TransactionExecutor } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, ERROR_CODES } from "@repo/api-runtime";
+import {AppError } from "@repo/api-runtime";
 
 import { ORGANIZATION_MEMBERSHIP, type OrganizationMembership } from "../../public/contracts";
 import {
@@ -23,7 +23,7 @@ export class AssertOrganizationMembershipUseCase {
 
     if (!organization) {
       throw new AppError(
-        ERROR_CODES.ORGANIZATION_NOT_FOUND,
+        ORGANIZATION_ERROR_CODES.ORGANIZATION_NOT_FOUND,
         "Organization not found or has been deleted",
         HttpStatus.NOT_FOUND,
       );
@@ -42,3 +42,6 @@ export class AssertOrganizationMembershipUseCase {
     return membership;
   }
 }
+
+import { ERROR_CODES } from "@repo/api-runtime";
+import { ORGANIZATION_ERROR_CODES } from "@repo/feature-organizations/contracts";

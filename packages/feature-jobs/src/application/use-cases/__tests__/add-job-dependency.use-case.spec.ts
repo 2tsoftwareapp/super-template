@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { AppError, ERROR_CODES } from "@repo/api-runtime";
+import {AppError } from "@repo/api-runtime";
 
 import { AddJobDependencyUseCase } from "../add-job-dependency.use-case";
 
@@ -36,7 +36,7 @@ describe("AddJobDependencyUseCase", () => {
     );
 
     await expect(useCase.execute("job-1", "job-1", scope)).rejects.toMatchObject({
-      code: ERROR_CODES.JOB_DEPENDENCY_CYCLE,
+      code: JOB_ERROR_CODES.JOB_DEPENDENCY_CYCLE,
     });
 
     expect(jobsRepository.findById).not.toHaveBeenCalled();
@@ -60,7 +60,7 @@ describe("AddJobDependencyUseCase", () => {
     );
 
     await expect(useCase.execute("job-1", "job-missing", scope)).rejects.toMatchObject({
-      code: ERROR_CODES.JOB_NOT_FOUND,
+      code: JOB_ERROR_CODES.JOB_NOT_FOUND,
     });
   });
 
@@ -81,7 +81,7 @@ describe("AddJobDependencyUseCase", () => {
     );
 
     await expect(useCase.execute("job-1", "job-2", scope)).rejects.toMatchObject({
-      code: ERROR_CODES.JOB_DEPENDENCY_CYCLE,
+      code: JOB_ERROR_CODES.JOB_DEPENDENCY_CYCLE,
     });
     expect(jobObservabilityRepository.addDependency).not.toHaveBeenCalled();
   });
@@ -121,3 +121,5 @@ describe("AddJobDependencyUseCase", () => {
     });
   });
 });
+
+import { JOB_ERROR_CODES } from "@repo/feature-jobs/contracts";

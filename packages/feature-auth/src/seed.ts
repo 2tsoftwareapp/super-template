@@ -1,7 +1,11 @@
+ 
 import type { FeatureSeedContext, FeatureSeeder } from "@repo/api-plugin-kit";
 import type { DatabaseExecutor } from "@repo/database-runtime";
 
-import { AUTH_TOKEN_CLEANUP, type AuthTokenCleanup } from "@repo/feature-users/contracts";
+import {
+  AUTH_TOKEN_MAINTENANCE,
+  type AuthTokenMaintenance,
+} from "@repo/feature-auth/contracts";
 
 interface SeededUsersBag {
   adminUserId: string;
@@ -18,11 +22,11 @@ async function runAuthSessionCleanupSeed(ctx: FeatureSeedContext): Promise<void>
     );
   }
 
-  const authTokenCleanup = ctx.app.get(AUTH_TOKEN_CLEANUP) as AuthTokenCleanup;
+  const tokenMaintenance = ctx.app.get(AUTH_TOKEN_MAINTENANCE) as AuthTokenMaintenance;
   const executor = ctx.executor as DatabaseExecutor;
 
-  await authTokenCleanup.revokeAllSessionsForUser(seededUsers.adminUserId, executor);
-  await authTokenCleanup.revokeAllSessionsForUser(seededUsers.regularUserId, executor);
+  await tokenMaintenance.revokeAllSessionsForUser(seededUsers.adminUserId, executor);
+  await tokenMaintenance.revokeAllSessionsForUser(seededUsers.regularUserId, executor);
 }
 
 export const authSeeders: readonly FeatureSeeder[] = [

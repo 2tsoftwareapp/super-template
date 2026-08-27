@@ -2,13 +2,8 @@ import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime
 import type { TransactionPort } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {
-  AppError,
-  ERROR_CODES,
-  ROLE_NAMES,
-  SYSTEM_SCOPE,
-  TRANSACTION_PORT,
-} from "@repo/api-runtime";
+import {AppError, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
+import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 import { ACTIVITY_EMITTER, type ActivityEmitter } from "@repo/feature-activities/contracts";
 
 import type { OrganizationMemberRole } from "../../domain/organization-access.policy";
@@ -19,15 +14,16 @@ import {
   assertOrganizationRole,
 } from "../../domain/organization-access.policy";
 import { ORGANIZATION_MEMBERSHIP, type OrganizationMembership } from "../../public/contracts";
-import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
-import type { AuditWriter } from "@repo/feature-audit/contracts";
-
 import {
   ORGANIZATION_ACCESS_CONTROL,
   type OrganizationAccessControlPort,
 } from "../../public/contracts";
 
+/** Platform super-role literal; importing access-control here would create a package cycle. */
+const PLATFORM_SUPER_ADMIN = "SUPER_ADMIN";
+
 @Injectable()
+
 export class UpdateMemberRoleUseCase {
   constructor(
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
@@ -51,7 +47,7 @@ export class UpdateMemberRoleUseCase {
         ? { userId: actor, isSuperAdmin: false }
         : {
             userId: actor.userId,
-            isSuperAdmin: actor.roles?.includes(ROLE_NAMES.SUPER_ADMIN) ?? false,
+            isSuperAdmin: actor.roles?.includes(PLATFORM_SUPER_ADMIN) ?? false,
           };
 
     const tenantContext = {
@@ -86,7 +82,7 @@ export class UpdateMemberRoleUseCase {
 
         if (!targetMembership) {
           throw new AppError(
-            ERROR_CODES.ORGANIZATION_MEMBER_NOT_FOUND,
+            ORGANIZATION_ERROR_CODES.ORGANIZATION_MEMBER_NOT_FOUND,
             "This user is not a member of the organization",
             HttpStatus.NOT_FOUND,
           );
@@ -104,7 +100,7 @@ export class UpdateMemberRoleUseCase {
 
       if (!targetMembership) {
         throw new AppError(
-          ERROR_CODES.ORGANIZATION_MEMBER_NOT_FOUND,
+          ORGANIZATION_ERROR_CODES.ORGANIZATION_MEMBER_NOT_FOUND,
           "This user is not a member of the organization",
           HttpStatus.NOT_FOUND,
         );
@@ -128,7 +124,7 @@ export class UpdateMemberRoleUseCase {
 
       if (!updated) {
         throw new AppError(
-          ERROR_CODES.ORGANIZATION_MEMBER_NOT_FOUND,
+          ORGANIZATION_ERROR_CODES.ORGANIZATION_MEMBER_NOT_FOUND,
           "This user is not a member of the organization",
           HttpStatus.NOT_FOUND,
         );
@@ -136,7 +132,12 @@ export class UpdateMemberRoleUseCase {
 
       // Synchronize RBAC roles
       if (role === "MEMBER") {
-        await this.accessControl.replaceUserRoles(targetUserId, [], organizationId, transaction);
+        await this.accessControl.replaceUserRoles(
+          targetUserId,
+          [],
+          organizationId,
+          transaction,
+        );
       } else if (role === "ADMIN" || role === "OWNER") {
         await this.accessControl.ensureOrganizationAdminRole(
           organizationId,
@@ -183,3 +184,6 @@ export class UpdateMemberRoleUseCase {
     });
   }
 }
+
+import { ERROR_CODES } from "@repo/api-runtime";
+import { ORGANIZATION_ERROR_CODES } from "@repo/feature-organizations/contracts";

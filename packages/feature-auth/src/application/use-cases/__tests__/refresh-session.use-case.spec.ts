@@ -1,7 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { ERROR_CODES } from "@repo/api-runtime";
-
 import { REFRESH_ROTATION_GRACE_MS } from "../../../domain/refresh-rotation.policy";
 import { hashRefreshToken } from "../../auth.helpers";
 import { AuthMapper } from "../../auth.mapper";
@@ -139,7 +137,7 @@ describe("RefreshSessionUseCase rotation grace", () => {
     const { useCase, authRepository, sessionTokenService } = createHarness(session);
 
     await expect(useCase.execute({ refreshToken: PREVIOUS_TOKEN })).rejects.toMatchObject({
-      code: ERROR_CODES.AUTH_REFRESH_TOKEN_REUSED,
+      code: AUTH_ERROR_CODES.AUTH_REFRESH_TOKEN_REUSED,
     });
     expect(authRepository.revokeSession).toHaveBeenCalledWith("session-1");
     expect(sessionTokenService.tryRotateSessionTokens).not.toHaveBeenCalled();
@@ -154,7 +152,9 @@ describe("RefreshSessionUseCase rotation grace", () => {
 
     await expect(
       useCase.execute({ refreshToken: "stolen-or-ancient-token" }),
-    ).rejects.toMatchObject({ code: ERROR_CODES.AUTH_REFRESH_TOKEN_REUSED });
+    ).rejects.toMatchObject({ code: AUTH_ERROR_CODES.AUTH_REFRESH_TOKEN_REUSED });
     expect(authRepository.revokeSession).toHaveBeenCalledWith("session-1");
   });
 });
+
+import { AUTH_ERROR_CODES } from "@repo/feature-auth/contracts";

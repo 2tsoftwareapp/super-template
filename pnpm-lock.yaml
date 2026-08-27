@@ -265,6 +265,9 @@ importers:
       '@repo/feature-audit':
         specifier: workspace:*
         version: link:../../packages/feature-audit
+      '@repo/feature-audit-export':
+        specifier: workspace:*
+        version: link:../../packages/feature-audit-export
       '@repo/feature-auth':
         specifier: workspace:*
         version: link:../../packages/feature-auth
@@ -289,6 +292,9 @@ importers:
       '@repo/feature-organizations':
         specifier: workspace:*
         version: link:../../packages/feature-organizations
+      '@repo/feature-outbox':
+        specifier: workspace:*
+        version: link:../../packages/feature-outbox
       '@repo/feature-settings':
         specifier: workspace:*
         version: link:../../packages/feature-settings
@@ -962,6 +968,67 @@ importers:
       '@repo/database-runtime':
         specifier: workspace:*
         version: link:../database-runtime
+      class-transformer:
+        specifier: 0.5.1
+        version: 0.5.1
+      class-validator:
+        specifier: 0.15.1
+        version: 0.15.1
+      drizzle-orm:
+        specifier: 0.45.2
+        version: 0.45.2(@opentelemetry/api@1.9.1)(@types/pg@8.15.6)(pg@8.21.0)
+      express:
+        specifier: 5.2.1
+        version: 5.2.1
+      zod:
+        specifier: 4.4.3
+        version: 4.4.3
+    devDependencies:
+      '@repo/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@types/express':
+        specifier: 5.0.4
+        version: 5.0.4
+      '@types/node':
+        specifier: 24.10.1
+        version: 24.10.1
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: 4.1.9
+        version: 4.1.9(@opentelemetry/api@1.9.1)(@types/node@24.10.1)(@vitest/coverage-v8@4.1.9)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@8.1.4(@types/node@24.10.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.22.4))
+
+  packages/feature-audit-export:
+    dependencies:
+      '@nestjs/common':
+        specifier: 11.1.27
+        version: 11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@10.2.2)
+      '@nestjs/schedule':
+        specifier: 6.1.1
+        version: 6.1.1(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)
+      '@nestjs/swagger':
+        specifier: 11.4.4
+        version: 11.4.4(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)
+      '@repo/api-kernel':
+        specifier: workspace:*
+        version: link:../api-kernel
+      '@repo/api-plugin-kit':
+        specifier: workspace:*
+        version: link:../api-plugin-kit
+      '@repo/api-runtime':
+        specifier: workspace:*
+        version: link:../api-runtime
+      '@repo/config':
+        specifier: workspace:*
+        version: link:../config
+      '@repo/feature-access-control':
+        specifier: workspace:*
+        version: link:../feature-access-control
+      '@repo/feature-audit':
+        specifier: workspace:*
+        version: link:../feature-audit
       '@repo/feature-upload':
         specifier: workspace:*
         version: link:../feature-upload
@@ -1035,12 +1102,21 @@ importers:
       '@repo/feature-audit':
         specifier: workspace:*
         version: link:../feature-audit
+      '@repo/feature-jobs':
+        specifier: workspace:*
+        version: link:../feature-jobs
+      '@repo/feature-mail':
+        specifier: workspace:*
+        version: link:../feature-mail
       '@repo/feature-mfa':
         specifier: workspace:*
         version: link:../feature-mfa
       '@repo/feature-organizations':
         specifier: workspace:*
         version: link:../feature-organizations
+      '@repo/feature-outbox':
+        specifier: workspace:*
+        version: link:../feature-outbox
       '@repo/feature-settings':
         specifier: workspace:*
         version: link:../feature-settings
@@ -1248,12 +1324,6 @@ importers:
       '@repo/feature-activities':
         specifier: workspace:*
         version: link:../feature-activities
-      '@repo/feature-mail':
-        specifier: workspace:*
-        version: link:../feature-mail
-      '@repo/feature-notifications':
-        specifier: workspace:*
-        version: link:../feature-notifications
       '@repo/feature-users':
         specifier: workspace:*
         version: link:../feature-users
@@ -1566,6 +1636,43 @@ importers:
         specifier: 4.1.9
         version: 4.1.9(@opentelemetry/api@1.9.1)(@types/node@24.10.1)(@vitest/coverage-v8@4.1.9)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@8.1.4(@types/node@24.10.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.22.4))
 
+  packages/feature-outbox:
+    dependencies:
+      '@nestjs/common':
+        specifier: 11.1.27
+        version: 11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@10.2.2)
+      '@nestjs/schedule':
+        specifier: 6.1.1
+        version: 6.1.1(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)
+      '@repo/api-kernel':
+        specifier: workspace:*
+        version: link:../api-kernel
+      '@repo/api-plugin-kit':
+        specifier: workspace:*
+        version: link:../api-plugin-kit
+      '@repo/api-runtime':
+        specifier: workspace:*
+        version: link:../api-runtime
+      '@repo/database-runtime':
+        specifier: workspace:*
+        version: link:../database-runtime
+      drizzle-orm:
+        specifier: 0.45.2
+        version: 0.45.2(@opentelemetry/api@1.9.1)(@types/pg@8.15.6)(pg@8.21.0)
+    devDependencies:
+      '@repo/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@types/node':
+        specifier: 24.10.1
+        version: 24.10.1
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: 4.1.9
+        version: 4.1.9(@opentelemetry/api@1.9.1)(@types/node@24.10.1)(@vitest/coverage-v8@4.1.9)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@8.1.4(@types/node@24.10.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.22.4))
+
   packages/feature-settings:
     dependencies:
       '@nestjs/common':
@@ -1592,6 +1699,9 @@ importers:
       '@repo/database-runtime':
         specifier: workspace:*
         version: link:../database-runtime
+      '@repo/feature-access-control':
+        specifier: workspace:*
+        version: link:../feature-access-control
       '@repo/feature-audit':
         specifier: workspace:*
         version: link:../feature-audit
@@ -1744,6 +1854,9 @@ importers:
       '@repo/database-runtime':
         specifier: workspace:*
         version: link:../database-runtime
+      '@repo/feature-access-control':
+        specifier: workspace:*
+        version: link:../feature-access-control
       '@repo/feature-activities':
         specifier: workspace:*
         version: link:../feature-activities
@@ -1884,6 +1997,9 @@ importers:
       '@repo/feature-organizations':
         specifier: workspace:*
         version: link:../feature-organizations
+      '@repo/feature-outbox':
+        specifier: workspace:*
+        version: link:../feature-outbox
       '@repo/utils':
         specifier: workspace:*
         version: link:../utils

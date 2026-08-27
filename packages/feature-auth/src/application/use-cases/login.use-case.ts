@@ -1,7 +1,8 @@
 import type { RequestContext } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, ERROR_CODES, normalizeEmail, SYSTEM_SCOPE } from "@repo/api-runtime";
+import {AppError, normalizeEmail, SYSTEM_SCOPE } from "@repo/api-runtime";
+import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 import { AUTH_USER_STORE, type AuthUserStore } from "@repo/feature-auth/contracts";
 import { MfaService } from "@repo/feature-mfa/contracts";
 
@@ -9,8 +10,6 @@ import type { LoginCommand } from "../auth.types";
 
 import { verifyPasswordWithTimingPadding } from "../auth.helpers";
 import { IssueSessionUseCase } from "./issue-session.use-case";
-import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
-import type { AuditWriter } from "@repo/feature-audit/contracts";
 
 @Injectable()
 export class LoginUseCase {
@@ -40,7 +39,7 @@ export class LoginUseCase {
         scope: SYSTEM_SCOPE.PLATFORM,
       });
       throw new AppError(
-        ERROR_CODES.AUTH_INVALID_CREDENTIALS,
+        AUTH_ERROR_CODES.AUTH_INVALID_CREDENTIALS,
         "Invalid email or password",
         HttpStatus.UNAUTHORIZED,
       );
@@ -114,3 +113,6 @@ export class LoginUseCase {
     return { mfaRequired: false as const, ...session };
   }
 }
+
+import { ERROR_CODES } from "@repo/api-runtime";
+import { AUTH_ERROR_CODES } from "@repo/feature-auth/contracts";

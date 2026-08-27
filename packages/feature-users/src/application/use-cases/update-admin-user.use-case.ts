@@ -1,7 +1,8 @@
 import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, ERROR_CODES, normalizeEmail, SYSTEM_SCOPE } from "@repo/api-runtime";
+import {AppError, normalizeEmail, SYSTEM_SCOPE } from "@repo/api-runtime";
+import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 import { AccessControlService, ROLE_NAMES } from "@repo/feature-access-control/contracts";
 
 import type { UpdateAdminUserCommand, UserView } from "../users.types";
@@ -9,8 +10,6 @@ import type { UpdateAdminUserCommand, UserView } from "../users.types";
 import { assertUserBelongsToOrganization } from "../../domain/user-org-scope.policy";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";
 import { GetUserUseCase } from "./get-user.use-case";
-import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
-import type { AuditWriter } from "@repo/feature-audit/contracts";
 
 @Injectable()
 export class UpdateAdminUserUseCase {
@@ -38,7 +37,7 @@ export class UpdateAdminUserUseCase {
     const user = await this.usersRepository.findById(userId);
 
     if (!user) {
-      throw new AppError(ERROR_CODES.USER_NOT_FOUND, "User not found", HttpStatus.NOT_FOUND);
+      throw new AppError(USER_ERROR_CODES.USER_NOT_FOUND, "User not found", HttpStatus.NOT_FOUND);
     }
 
     // Org-scoped roles (e.g. an organization ADMIN) are invisible to
@@ -54,7 +53,7 @@ export class UpdateAdminUserUseCase {
       const existingUser = await this.usersRepository.findByEmail(normalizeEmail(input.email));
       if (existingUser && existingUser.id !== userId) {
         throw new AppError(
-          ERROR_CODES.USER_EMAIL_ALREADY_EXISTS,
+          USER_ERROR_CODES.USER_EMAIL_ALREADY_EXISTS,
           "A user with this email already exists",
           HttpStatus.CONFLICT,
         );
@@ -81,3 +80,5 @@ export class UpdateAdminUserUseCase {
     return this.getUserUseCase.execute(updated?.id ?? userId, actor);
   }
 }
+
+import { USER_ERROR_CODES } from "@repo/feature-users/contracts";

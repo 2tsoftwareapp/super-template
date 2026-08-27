@@ -1,7 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { ERROR_CODES } from "@repo/api-runtime";
-
 import { LeaveOrganizationUseCase } from "../leave-organization.use-case";
 
 const transactionPort = {
@@ -30,7 +28,7 @@ describe("LeaveOrganizationUseCase", () => {
     );
 
     await expect(useCase.execute("org-1", "u1")).rejects.toMatchObject({
-      code: ERROR_CODES.ORGANIZATION_LAST_OWNER,
+      code: ORGANIZATION_ERROR_CODES.ORGANIZATION_LAST_OWNER,
     });
     expect(membership.removeMember).not.toHaveBeenCalled();
   });
@@ -94,3 +92,6 @@ describe("LeaveOrganizationUseCase", () => {
     });
   });
 });
+
+import { ERROR_CODES } from "@repo/api-runtime";
+import { ORGANIZATION_ERROR_CODES } from "@repo/feature-organizations/contracts";

@@ -2,13 +2,8 @@ import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime
 import type { TransactionPort } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {
-  AppError,
-  ERROR_CODES,
-  ROLE_NAMES,
-  SYSTEM_SCOPE,
-  TRANSACTION_PORT,
-} from "@repo/api-runtime";
+import {AppError, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
+import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 
 import { assertOrganizationRole } from "../../domain/organization-access.policy";
 import { ORGANIZATION_MEMBERSHIP, type OrganizationMembership } from "../../public/contracts";
@@ -16,15 +11,16 @@ import {
   ORGANIZATION_ACCESS_CONTROL,
   type OrganizationAccessControlPort,
 } from "../../public/contracts";
-import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
-import type { AuditWriter } from "@repo/feature-audit/contracts";
-
 import {
   ORGANIZATIONS_REPOSITORY,
   type OrganizationsRepositoryPort,
 } from "../ports/organizations.repository.port";
 
+/** Platform super-role literal; importing access-control here would create a package cycle. */
+const PLATFORM_SUPER_ADMIN = "SUPER_ADMIN";
+
 @Injectable()
+
 export class DeleteOrganizationUseCase {
   constructor(
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
@@ -47,7 +43,7 @@ export class DeleteOrganizationUseCase {
         ? { userId: actor, isSuperAdmin: false }
         : {
             userId: actor.userId,
-            isSuperAdmin: actor.roles?.includes(ROLE_NAMES.SUPER_ADMIN) ?? false,
+            isSuperAdmin: actor.roles?.includes(PLATFORM_SUPER_ADMIN) ?? false,
           };
 
     const tenantContext = {
@@ -78,7 +74,7 @@ export class DeleteOrganizationUseCase {
       const org = await this.organizationsRepository.findById(organizationId, transaction);
       if (!org) {
         throw new AppError(
-          ERROR_CODES.ORGANIZATION_NOT_FOUND,
+          ORGANIZATION_ERROR_CODES.ORGANIZATION_NOT_FOUND,
           "Organization not found",
           HttpStatus.NOT_FOUND,
         );
@@ -101,7 +97,7 @@ export class DeleteOrganizationUseCase {
 
       if (!deleted) {
         throw new AppError(
-          ERROR_CODES.ORGANIZATION_NOT_FOUND,
+          ORGANIZATION_ERROR_CODES.ORGANIZATION_NOT_FOUND,
           "Organization not found",
           HttpStatus.NOT_FOUND,
         );
@@ -131,3 +127,6 @@ export class DeleteOrganizationUseCase {
     });
   }
 }
+
+import { ERROR_CODES } from "@repo/api-runtime";
+import { ORGANIZATION_ERROR_CODES } from "@repo/feature-organizations/contracts";

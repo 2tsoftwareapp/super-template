@@ -2,8 +2,6 @@ import { describe, expect, it, vi } from "vitest";
 
 import type { AuthenticatedRequestUser } from "@repo/api-runtime";
 
-import { ERROR_CODES } from "@repo/api-runtime";
-
 import { DeleteAttachmentUseCase } from "../delete-attachment.use-case";
 
 const actor = {
@@ -25,7 +23,7 @@ describe("DeleteAttachmentUseCase", () => {
     );
 
     await expect(useCase.execute(actor, "att-1")).rejects.toMatchObject({
-      code: ERROR_CODES.ATTACHMENT_NOT_FOUND,
+      code: FILE_ERROR_CODES.ATTACHMENT_NOT_FOUND,
     });
     expect(transactionPort.run).not.toHaveBeenCalled();
   });
@@ -108,3 +106,5 @@ describe("DeleteAttachmentUseCase", () => {
     expect(activityEmitter.emit).not.toHaveBeenCalled();
   });
 });
+
+import { FILE_ERROR_CODES } from "@repo/feature-upload/contracts";

@@ -4,20 +4,28 @@ import { AuthModule } from "./auth.module";
 import {
   authSessions,
   emailVerificationTokens,
-  outboxMessages,
   passwordResetTokens,
 } from "./infrastructure/persistence";
 import { authSeeders } from "./seed";
 
 export const authFeature: FeatureManifest = defineFeature({
   id: "auth",
-  dependsOn: ["access-control", "organizations", "mfa", "users", "settings", "audit"],
+  dependsOn: [
+    "access-control",
+    "organizations",
+    "mfa",
+    "users",
+    "settings",
+    "audit",
+    "jobs",
+    "mail",
+    "outbox",
+  ],
   nestModule: AuthModule,
   schema: {
     authSessions,
     emailVerificationTokens,
     passwordResetTokens,
-    outboxMessages,
   },
   seeders: authSeeders,
 });

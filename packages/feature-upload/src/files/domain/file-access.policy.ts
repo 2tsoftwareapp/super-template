@@ -1,4 +1,5 @@
-import { ACTION, perm, ROLE_NAMES } from "@repo/api-runtime";
+import { ACTION, perm } from "@repo/api-runtime";
+import { ROLE_NAMES } from "@repo/feature-access-control/contracts";
 
 import { FILE_KIND, FILE_VISIBILITY } from "../../constants/file.constants";
 

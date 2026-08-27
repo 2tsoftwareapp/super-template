@@ -1,7 +1,7 @@
 import type { RequestContext } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, ERROR_CODES } from "@repo/api-runtime";
+import {AppError } from "@repo/api-runtime";
 import { AccessControlService } from "@repo/feature-access-control/contracts";
 import { AUTH_USER_STORE, type AuthUserStore } from "@repo/feature-auth/contracts";
 import { OrganizationsService } from "@repo/feature-organizations/contracts";
@@ -57,7 +57,7 @@ export class RefreshSessionUseCase {
     if (session.expiresAt <= new Date()) {
       await this.authSessionRepository.revokeSession(session.id);
       throw new AppError(
-        ERROR_CODES.AUTH_SESSION_EXPIRED,
+        AUTH_ERROR_CODES.AUTH_SESSION_EXPIRED,
         "Session has expired",
         HttpStatus.UNAUTHORIZED,
       );
@@ -68,7 +68,7 @@ export class RefreshSessionUseCase {
     if (decision.action === "reuse") {
       await this.authSessionRepository.revokeSession(session.id);
       throw new AppError(
-        ERROR_CODES.AUTH_REFRESH_TOKEN_REUSED,
+        AUTH_ERROR_CODES.AUTH_REFRESH_TOKEN_REUSED,
         "Refresh token reuse detected",
         HttpStatus.UNAUTHORIZED,
       );
@@ -178,7 +178,7 @@ export class RefreshSessionUseCase {
 
     if (!fresh || fresh.revokedAt) {
       throw new AppError(
-        ERROR_CODES.AUTH_SESSION_REVOKED,
+        AUTH_ERROR_CODES.AUTH_SESSION_REVOKED,
         "Session has been revoked",
         HttpStatus.UNAUTHORIZED,
       );
@@ -189,7 +189,7 @@ export class RefreshSessionUseCase {
     if (fallbackDecision.action === "reuse") {
       await this.authSessionRepository.revokeSession(sessionId);
       throw new AppError(
-        ERROR_CODES.AUTH_REFRESH_TOKEN_REUSED,
+        AUTH_ERROR_CODES.AUTH_REFRESH_TOKEN_REUSED,
         "Refresh token reuse detected",
         HttpStatus.UNAUTHORIZED,
       );
@@ -253,9 +253,12 @@ export class RefreshSessionUseCase {
 
     await this.authSessionRepository.revokeSession(sessionId);
     throw new AppError(
-      ERROR_CODES.AUTH_REFRESH_TOKEN_REUSED,
+      AUTH_ERROR_CODES.AUTH_REFRESH_TOKEN_REUSED,
       "Refresh token reuse detected",
       HttpStatus.UNAUTHORIZED,
     );
   }
 }
+
+import { ERROR_CODES } from "@repo/api-runtime";
+import { AUTH_ERROR_CODES } from "@repo/feature-auth/contracts";

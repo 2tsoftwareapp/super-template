@@ -20,6 +20,14 @@ export const notificationsFeature: FeatureManifest = defineFeature({
   resourceScopes: {
     notifications: "organization",
   },
+  authorization: {
+    resources: {
+      notifications: {
+        scope: "organization",
+        actions: ["read", "create", "update", "delete"], defaultGrants: { "ADMIN": ["read", "create", "delete"], "USER": ["read"] }
+      },
+    },
+  },
   schema: {
     notifications,
     notificationDeviceTokens,

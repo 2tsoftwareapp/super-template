@@ -1,7 +1,7 @@
 import type { AuthenticatedRequestUser } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, ERROR_CODES } from "@repo/api-runtime";
+import {AppError } from "@repo/api-runtime";
 
 import type { ImportJobView } from "../imports.types";
 
@@ -38,7 +38,7 @@ export class GetImportUseCase {
       })
     ) {
       throw new AppError(
-        ERROR_CODES.IMPORT_JOB_NOT_FOUND,
+        IMPORT_EXPORT_ERROR_CODES.IMPORT_JOB_NOT_FOUND,
         "Import job not found",
         HttpStatus.NOT_FOUND,
       );
@@ -47,3 +47,5 @@ export class GetImportUseCase {
     return this.importsMapper.toImportJobView(job);
   }
 }
+
+import { IMPORT_EXPORT_ERROR_CODES } from "@repo/feature-import-export/contracts";

@@ -5,7 +5,7 @@ import { EnvironmentService } from "@repo/api-runtime";
 import { TenantContextService, WORKER_DISPATCH_CONTEXT } from "@repo/api-runtime";
 import { DATABASE } from "@repo/database-runtime";
 
-import { composedSeeders } from "../../composition/composed-schema";
+import { composedAuthorization, composedSeeders } from "../../composition/composed-schema";
 import { type SeedContext, toFeatureSeedContext } from "./seed-context";
 
 export const seedDatabase = async (app: INestApplicationContext): Promise<void> => {
@@ -20,6 +20,7 @@ export const seedDatabase = async (app: INestApplicationContext): Promise<void> 
         app,
         executor: transaction,
         bag: {},
+        authorization: composedAuthorization,
       };
 
       for (const seeder of composedSeeders) {

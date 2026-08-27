@@ -1,5 +1,5 @@
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, ERROR_CODES } from "@repo/api-runtime";
+import {AppError } from "@repo/api-runtime";
 
 import type { JobView } from "../jobs.types";
 
@@ -21,9 +21,11 @@ export class GetJobUseCase {
     const job = await this.jobsRepository.findById(jobId, scope);
 
     if (!job) {
-      throw new AppError(ERROR_CODES.JOB_NOT_FOUND, "Job not found", HttpStatus.NOT_FOUND);
+      throw new AppError(JOB_ERROR_CODES.JOB_NOT_FOUND, "Job not found", HttpStatus.NOT_FOUND);
     }
 
     return this.jobsMapper.toJobView(job);
   }
 }
+
+import { JOB_ERROR_CODES } from "@repo/feature-jobs/contracts";

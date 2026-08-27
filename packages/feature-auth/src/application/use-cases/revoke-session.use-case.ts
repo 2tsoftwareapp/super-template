@@ -1,10 +1,8 @@
 import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, ERROR_CODES, SYSTEM_SCOPE } from "@repo/api-runtime";
-
-import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
-import type { AuditWriter } from "@repo/feature-audit/contracts";
+import {AppError, SYSTEM_SCOPE } from "@repo/api-runtime";
+import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 
 import {
   AUTH_SESSION_REPOSITORY,
@@ -28,7 +26,7 @@ export class RevokeSessionUseCase {
 
     if (!session) {
       throw new AppError(
-        ERROR_CODES.AUTH_SESSION_REVOKED,
+        AUTH_ERROR_CODES.AUTH_SESSION_REVOKED,
         "Session not found",
         HttpStatus.NOT_FOUND,
       );
@@ -47,3 +45,5 @@ export class RevokeSessionUseCase {
     });
   }
 }
+
+import { AUTH_ERROR_CODES } from "@repo/feature-auth/contracts";

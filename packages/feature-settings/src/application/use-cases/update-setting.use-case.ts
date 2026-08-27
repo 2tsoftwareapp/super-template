@@ -1,7 +1,9 @@
 import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, ERROR_CODES, ROLE_NAMES, SYSTEM_SCOPE } from "@repo/api-runtime";
+import {AppError, SYSTEM_SCOPE } from "@repo/api-runtime";
+import { ROLE_NAMES } from "@repo/feature-access-control/contracts";
+import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 import { PLATFORM_TRANSACTION_PORT, type PlatformTransactionPort } from "@repo/api-runtime";
 
 import type { UpdateSettingCommand } from "../settings.types";
@@ -12,8 +14,6 @@ import {
   type SettingsRepositoryPort,
 } from "../ports/settings.repository.port";
 import { SettingsMapper } from "../settings.mapper";
-import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
-import type { AuditWriter } from "@repo/feature-audit/contracts";
 
 @Injectable()
 export class UpdateSettingUseCase {
@@ -45,7 +45,7 @@ export class UpdateSettingUseCase {
 
       if (!setting) {
         throw new AppError(
-          ERROR_CODES.SETTINGS_NOT_FOUND,
+          SETTINGS_ERROR_CODES.SETTINGS_NOT_FOUND,
           "Setting could not be updated",
           HttpStatus.NOT_FOUND,
         );
@@ -77,3 +77,6 @@ export class UpdateSettingUseCase {
     return SettingsMapper.toDto(updated);
   }
 }
+
+import { ERROR_CODES } from "@repo/api-runtime";
+import { SETTINGS_ERROR_CODES } from "@repo/feature-settings/contracts";

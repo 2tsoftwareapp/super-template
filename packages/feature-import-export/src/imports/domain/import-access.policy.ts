@@ -1,4 +1,4 @@
-import { ROLE_NAMES } from "@repo/api-runtime";
+import { ROLE_NAMES } from "@repo/feature-access-control/contracts";
 
 export interface ImportAccessActor {
   userId: string;

@@ -2,8 +2,6 @@ import { describe, expect, it, vi } from "vitest";
 
 import type { AuthenticatedRequestUser } from "@repo/api-runtime";
 
-import { ERROR_CODES } from "@repo/api-runtime";
-
 import { UpdateSettingUseCase } from "../update-setting.use-case";
 
 const actor = {
@@ -70,8 +68,10 @@ describe("UpdateSettingUseCase", () => {
 
     await expect(
       useCase.execute(actor, "missing.key", { value: { x: "y" } }),
-    ).rejects.toMatchObject({ code: ERROR_CODES.SETTINGS_NOT_FOUND });
+    ).rejects.toMatchObject({ code: SETTINGS_ERROR_CODES.SETTINGS_NOT_FOUND });
     expect(auditService.log).not.toHaveBeenCalled();
     expect(settingsLookup.invalidate).not.toHaveBeenCalled();
   });
 });
+
+import { SETTINGS_ERROR_CODES } from "@repo/feature-settings/contracts";

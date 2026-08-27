@@ -1,18 +1,34 @@
+import type { ComposedAuthorization } from "@repo/api-plugin-kit";
 import type { TransactionExecutor } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, ERROR_CODES, permissionNamesForRole, ROLE_NAMES } from "@repo/api-runtime";
+import { AppError, ERROR_CODES } from "@repo/api-runtime";
 
-import {
-  PERMISSION_SEED_ENTRIES,
-  ROLE_SEED_ENTRIES,
-} from "../../domain/access-control-seed.catalog";
 import {
   ACCESS_CONTROL_REPOSITORY,
   type AccessControlRepositoryPort,
 } from "../ports/access-control.repository.port";
 import { AccessProfileUseCase } from "./access-profile.use-case";
 
+interface RoleSeedEntry {
+  name: string;
+  description: string;
+  isSystem: boolean;
+}
+
+const ROLE_SEED_ENTRIES: RoleSeedEntry[] = [
+  { name: "SUPER_ADMIN", description: "Platform owner role", isSystem: true },
+  { name: "ADMIN", description: "Administrative role", isSystem: true },
+  { name: "USER", description: "Standard user role", isSystem: true },
+];
+
+/**
+ * Seeds the fixed platform roles plus the COMPOSED authorization catalog.
+ * Permission entries are derived at execution time from
+ * {@link ComposedAuthorization} — never from import-time module state — so
+ * organization-scoped resources are seeded with `scope = "organization"`
+ * regardless of module import order (regression: C-002).
+ */
 @Injectable()
 export class SeedAccessControlUseCase {
   constructor(
@@ -21,29 +37,22 @@ export class SeedAccessControlUseCase {
     private readonly accessProfileUseCase: AccessProfileUseCase,
   ) {}
 
-  async execute(executor?: TransactionExecutor): Promise<void> {
-    // Ensure platform roles exist first (idempotent insert).
+  async execute(
+    authorization: ComposedAuthorization,
+    executor?: TransactionExecutor,
+  ): Promise<void> {
     await this.accessControlRepository.ensureRoles(ROLE_SEED_ENTRIES, executor);
 
-    // Resolve each fixed role with explicit platform scope (organization_id IS NULL).
-    // Using findRoleByName with organizationId=null is critical: findRolesByNames
-    // might return organization-scoped ADMIN rows from other tenants, and
-    // keying by name alone would select the wrong row (C-001).
-    const superAdminRole = await this.accessControlRepository.findRoleByName(
-      ROLE_NAMES.SUPER_ADMIN,
-      null,
-      executor,
-    );
-    const adminRole = await this.accessControlRepository.findRoleByName(
-      ROLE_NAMES.ADMIN,
-      null,
-      executor,
-    );
-    const userRole = await this.accessControlRepository.findRoleByName(
-      ROLE_NAMES.USER,
-      null,
-      executor,
-    );
+    const [superAdminEntry, adminEntry, userEntry] = ROLE_SEED_ENTRIES;
+    const superAdminRole = superAdminEntry
+      ? await this.accessControlRepository.findRoleByName(superAdminEntry.name, null, executor)
+      : undefined;
+    const adminRole = adminEntry
+      ? await this.accessControlRepository.findRoleByName(adminEntry.name, null, executor)
+      : undefined;
+    const userRole = userEntry
+      ? await this.accessControlRepository.findRoleByName(userEntry.name, null, executor)
+      : undefined;
 
     if (!superAdminRole || !adminRole || !userRole) {
       throw new AppError(
@@ -53,35 +62,38 @@ export class SeedAccessControlUseCase {
       );
     }
 
+    // Permission entries derive from the composed catalog AT RUN TIME.
+    const permissionEntries = Object.entries(authorization.resources).flatMap(
+      ([resource, def]) =>
+        def.actions.map((action) => ({
+          name: `${resource}.${action}`,
+          description: `${resource}.${action}`,
+          isSystem: true,
+          scope: def.scope,
+        })),
+    );
+
     const permissions = await this.accessControlRepository.ensurePermissions(
-      PERMISSION_SEED_ENTRIES,
+      permissionEntries,
       executor,
     );
 
-    const permissionByName = new Map(
-      permissions.map((permission) => [permission.name, permission]),
+    const permissionByName = new Map<string, string>(
+      permissions.map((p) => [p.name, p.id] as const),
     );
 
-    const resolvePermissionIds = (names: string[]) =>
-      names
-        .map((name) => permissionByName.get(name)?.id)
+    const allPermissionIds = permissions.map((p) => p.id);
+
+    const resolveGrant = (role: string): string[] => {
+      const names = authorization.grantsByRole[role] ?? [];
+      return names
+        .map((name) => permissionByName.get(name))
         .filter((id): id is string => typeof id === "string");
+    };
 
-    await this.accessControlRepository.replaceRolePermissions(
-      superAdminRole.id,
-      resolvePermissionIds(permissionNamesForRole(ROLE_NAMES.SUPER_ADMIN)),
-      executor,
-    );
-    await this.accessControlRepository.replaceRolePermissions(
-      adminRole.id,
-      resolvePermissionIds(permissionNamesForRole(ROLE_NAMES.ADMIN)),
-      executor,
-    );
-    await this.accessControlRepository.replaceRolePermissions(
-      userRole.id,
-      resolvePermissionIds(permissionNamesForRole(ROLE_NAMES.USER)),
-      executor,
-    );
+    await this.accessControlRepository.replaceRolePermissions(superAdminRole.id, allPermissionIds, executor);
+    await this.accessControlRepository.replaceRolePermissions(adminRole.id, resolveGrant("ADMIN"), executor);
+    await this.accessControlRepository.replaceRolePermissions(userRole.id, resolveGrant("USER"), executor);
 
     await this.accessProfileUseCase.invalidateUsersForRole(superAdminRole.id, executor);
     await this.accessProfileUseCase.invalidateUsersForRole(adminRole.id, executor);

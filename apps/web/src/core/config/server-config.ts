@@ -7,9 +7,11 @@ const allowedOrigins = serverEnv.WEB_ORIGIN.split(",")
   .filter(Boolean);
 
 const cookieSecure =
-  serverEnv.COOKIE_SECURE ?? (serverEnv.APP_ENV !== "development" && serverEnv.APP_ENV !== "test");
+  serverEnv.COOKIE_SECURE ??
+  (serverEnv.APP_ENV !== "development" && serverEnv.APP_ENV !== "test");
 
-const requireSignedCsrf = serverEnv.APP_ENV === "staging" || serverEnv.APP_ENV === "production";
+const requireSignedCsrf =
+  serverEnv.APP_ENV === "staging" || serverEnv.APP_ENV === "production";
 
 export const serverConfig = {
   backend: {

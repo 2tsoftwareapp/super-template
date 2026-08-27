@@ -20,6 +20,26 @@ import type { DynamicModule, Type } from "@nestjs/common";
  * Removing a feature means removing its workspace dependency and the one line
  * that references its manifest — no kernel code changes.
  */
+/** Authorization contribution contributed by a single feature. */
+export interface FeatureAuthorizationResource {
+  readonly scope: "platform" | "organization";
+  readonly actions: readonly string[];
+  /**
+   * Default role grants keyed by stable platform role name (e.g. `"ADMIN"`).
+   * `"*"` grants every action of this resource.
+   */
+  readonly defaultGrants?: Readonly<Record<string, readonly string[] | "*">>;
+}
+
+export interface ComposedAuthorization {
+  /** resource -> contribution, deduplicated/conflict-checked at composition. */
+  readonly resources: Readonly<
+    Record<string, FeatureAuthorizationResource>
+  >;
+  /** role -> permission names (`resource.action`), SUPER_ADMIN excluded (implicit *). */
+  readonly grantsByRole: Readonly<Record<string, readonly string[]>>;
+}
+
 export interface FeatureManifest {
   /** Stable, unique feature id (kebab-case), e.g. `"audit"`, `"identity"`. */
   readonly id: string;
@@ -34,6 +54,23 @@ export interface FeatureManifest {
   readonly dependsOn?: readonly string[];
 
   /**
+   * Capability ids this feature exposes to other features (e.g.
+   * `"organization-membership"`). Capabilities are validated at composition:
+   * every required capability must have exactly one provider in the composed
+   * set. Use capabilities for mandatory runtime provider dependencies that
+   * would create package cycles as direct dependencies (provider binds a
+   * consumer-owned token through its own global module).
+   */
+  readonly provides?: readonly string[];
+
+  /**
+   * Capability ids this feature cannot boot without. Composition rejects the
+   * set when no composed feature provides one of these, so removal of a
+   * provider forces removal of its reverse dependents before Nest boot.
+   */
+  readonly requires?: readonly string[];
+
+  /**
    * Drizzle tables owned by this feature, keyed by their schema name. These are
    * merged into the composed schema handed to `DatabaseModule.forRoot`.
    */
@@ -44,6 +81,15 @@ export interface FeatureManifest {
 
   /** Resource → scope map this feature owns (composed into the RBAC catalog). */
   readonly resourceScopes?: Readonly<Record<string, "platform" | "organization">>;
+
+  /**
+   * Authorization contribution: resources, their scopes/actions and optional
+   * default role grants. access-control consumes the composed result at seed
+   * time — no central catalog knows feature resources in advance.
+   */
+  readonly authorization?: {
+    readonly resources?: Readonly<Record<string, FeatureAuthorizationResource>>;
+  };
 
   /** Optional seed runners contributed by this feature. */
   readonly seeders?: readonly FeatureSeeder[];
@@ -76,6 +122,12 @@ export interface FeatureSeedContext {
   readonly executor: unknown;
   /** Mutable scratch pad shared across seeders in composition order. */
   readonly bag: Record<string, unknown>;
+  /**
+   * Composed authorization contributions (resources/grants) resolved BEFORE
+   * seeding starts. Permission seeds must derive scopes from here at run()
+   * time, never from import-time module state.
+   */
+  readonly authorization: ComposedAuthorization;
 }
 
 /**
@@ -100,6 +152,8 @@ export interface ComposedFeatures {
   readonly seeders: readonly FeatureSeeder[];
   /** Merged resource scope catalog. */
   readonly resourceScopes: Readonly<Record<string, "platform" | "organization">>;
+  /** Merged authorization contributions (resources + default grants). */
+  readonly authorization: ComposedAuthorization;
 }
 
 /**
@@ -114,7 +168,9 @@ export function defineFeature(manifest: FeatureManifest): FeatureManifest {
  * Validate feature ids/deps, reject cycles, and return a deterministic
  * topological composition order. Tie-break preserves input order.
  */
-export function orderFeatureManifests(features: readonly FeatureManifest[]): FeatureManifest[] {
+export function orderFeatureManifests(
+  features: readonly FeatureManifest[],
+): FeatureManifest[] {
   const byId = new Map<string, FeatureManifest>();
   const inputIndex = new Map<string, number>();
 
@@ -135,7 +191,9 @@ export function orderFeatureManifests(features: readonly FeatureManifest[]): Fea
   for (const feature of features) {
     for (const dep of feature.dependsOn ?? []) {
       if (!byId.has(dep)) {
-        throw new Error(`Feature "${feature.id}" depends on missing feature "${dep}".`);
+        throw new Error(
+          `Feature "${feature.id}" depends on missing feature "${dep}".`,
+        );
       }
     }
   }
@@ -286,11 +344,138 @@ export function collectFeatureSeeders(
   return seeders;
 }
 
+
+
+/**
+ * Merge per-feature authorization contributions. Duplicate resource ownership
+ * is a composition error; grants must reference resources the SAME feature
+ * contributes (a feature cannot grant what it does not own).
+ */
+export function composeFeatureAuthorization(
+  features: readonly Pick<FeatureManifest, "id" | "authorization">[],
+): ComposedAuthorization {
+  const resources: Record<string, FeatureAuthorizationResource> = {};
+  const owner = new Map<string, string>();
+
+  for (const feature of features) {
+    for (const [name, def] of Object.entries(feature.authorization?.resources ?? {})) {
+      if (owner.has(name)) {
+        throw new Error(
+          `Resource "${name}" is contributed by both "${owner.get(name)}" and "${feature.id}". Resource ownership must be unique.`,
+        );
+      }
+      owner.set(name, feature.id);
+      resources[name] = def;
+    }
+  }
+
+  for (const feature of features) {
+    for (const [name, def] of Object.entries(feature.authorization?.resources ?? {})) {
+      for (const grantedResource of Object.keys(def.defaultGrants ?? {})) {
+        if (!resources[grantedResource]) {
+          throw new Error(
+            `Feature "${feature.id}" grants unknown resource "${grantedResource}" (not contributed by any composed feature).`,
+          );
+        }
+      }
+      if (def.scope !== undefined && !["platform", "organization"].includes(def.scope)) {
+        throw new Error(`Feature "${feature.id}" resource "${name}" has invalid scope.`);
+      }
+    }
+  }
+
+  const grantsByRole: Record<string, string[]> = {};
+  for (const [name, def] of Object.entries(resources)) {
+    for (const [role, actions] of Object.entries(def.defaultGrants ?? {})) {
+      const list = grantsByRole[role] ?? (grantsByRole[role] = []);
+      if (actions === "*") {
+        for (const action of def.actions) list.push(`${name}.${action}`);
+      } else {
+        for (const action of actions) list.push(`${name}.${action}`);
+      }
+    }
+  }
+  for (const role of Object.keys(grantsByRole)) {
+    grantsByRole[role] = [...new Set(grantsByRole[role])].sort();
+  }
+
+  return { resources, grantsByRole };
+}
+
+/**
+ * Validate capability wiring across a composed set:
+ * - every `requires` entry must have at least one provider,
+ * - no capability may have more than one provider (uniqueness).
+ */
+export function validateFeatureCapabilities(
+  features: readonly FeatureManifest[],
+): void {
+  const providers = new Map<string, string>();
+  for (const feature of features) {
+    for (const capability of feature.provides ?? []) {
+      const existing = providers.get(capability);
+      if (existing !== undefined) {
+        throw new Error(
+          `Capability "${capability}" is provided by both "${existing}" and "${feature.id}". Providers must be unique.`,
+        );
+      }
+      providers.set(capability, feature.id);
+    }
+  }
+
+  const ids = new Set(features.map((f) => f.id));
+  for (const feature of features) {
+    for (const capability of feature.requires ?? []) {
+      if (!providers.has(capability)) {
+        throw new Error(
+          `Feature "${feature.id}" requires capability "${capability}" but no composed feature provides it.`,
+        );
+      }
+    }
+    for (const dep of feature.dependsOn ?? []) {
+      if (!ids.has(dep)) {
+        throw new Error(`Feature "${feature.id}" depends on missing feature "${dep}".`);
+      }
+    }
+  }
+}
+
+/**
+ * Compute the reverse-dependency closure that must be removed together with
+ * `omitId`: any feature whose `dependsOn` or capability `requires` can only be
+ * satisfied by a removed feature is removed transitively.
+ */
+export function computeRemovalClosure(
+  features: readonly FeatureManifest[],
+  omitIds: readonly string[],
+): string[] {
+  const removed = new Set<string>(omitIds);
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const feature of features) {
+      if (removed.has(feature.id)) continue;
+      const dependsRemoved = (feature.dependsOn ?? []).some((d) => removed.has(d));
+      const requiresMissing = (feature.requires ?? []).some((capability) => {
+        return !features.some(
+          (f) => !removed.has(f.id) && (f.provides ?? []).includes(capability),
+        );
+      });
+      if (dependsRemoved || requiresMissing) {
+        removed.add(feature.id);
+        changed = true;
+      }
+    }
+  }
+  return [...removed].sort();
+}
+
 /**
  * Full composition entrypoint used by the API host: validates ids/deps/cycles,
  * returns deterministic order, and merges schema/modules/permissions/seeders.
  */
 export function composeFeatures(features: readonly FeatureManifest[]): ComposedFeatures {
+  validateFeatureCapabilities(features);
   const ordered = orderFeatureManifests(features);
 
   return {
@@ -300,5 +485,6 @@ export function composeFeatures(features: readonly FeatureManifest[]): ComposedF
     permissions: composeFeaturePermissions(ordered),
     seeders: collectFeatureSeeders(ordered),
     resourceScopes: composeFeatureResourceScopes(ordered),
+    authorization: composeFeatureAuthorization(ordered),
   };
 }

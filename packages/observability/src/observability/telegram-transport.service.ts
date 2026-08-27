@@ -2,7 +2,10 @@ import { Inject, Injectable } from "@nestjs/common";
 
 import type { ErrorReportContext } from "./observability.types";
 
-import { OBSERVABILITY_ENV, type ObservabilityEnvironment } from "./observability-environment";
+import {
+  OBSERVABILITY_ENV,
+  type ObservabilityEnvironment,
+} from "./observability-environment";
 
 @Injectable()
 export class TelegramTransportService {

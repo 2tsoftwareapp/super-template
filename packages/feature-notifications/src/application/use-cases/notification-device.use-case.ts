@@ -1,7 +1,7 @@
 import type { AuthenticatedRequestUser } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, ERROR_CODES } from "@repo/api-runtime";
+import {AppError } from "@repo/api-runtime";
 
 import type { RegisterDeviceCommand } from "../notifications.types";
 
@@ -53,10 +53,13 @@ export class NotificationDeviceUseCase {
 
     if (!deviceToken) {
       throw new AppError(
-        ERROR_CODES.NOTIFICATION_DEVICE_NOT_FOUND,
+        NOTIFICATION_ERROR_CODES.NOTIFICATION_DEVICE_NOT_FOUND,
         "Device token not found",
         HttpStatus.NOT_FOUND,
       );
     }
   }
 }
+
+import { ERROR_CODES } from "@repo/api-runtime";
+import { NOTIFICATION_ERROR_CODES } from "@repo/feature-notifications/contracts";

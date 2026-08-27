@@ -5,7 +5,9 @@ import { AppError } from "@repo/api-kernel";
 import { AUTHORIZE_KEY, type AuthorizeOptions } from "../decorators/authorize.decorator";
 import { IS_PUBLIC_KEY } from "../decorators/public.decorator";
 import { ERROR_CODES } from "../error-codes";
-import { ROLE_NAMES } from "../rbac";
+
+/** Platform super-role literal; role ownership lives in feature-access-control. */
+const SUPER_ADMIN_ROLE = "SUPER_ADMIN";
 
 @Injectable()
 export class AuthorizeGuard implements CanActivate {
@@ -44,7 +46,7 @@ export class AuthorizeGuard implements CanActivate {
       );
     }
 
-    if (user.roles.includes(ROLE_NAMES.SUPER_ADMIN)) {
+    if (user.roles.includes(SUPER_ADMIN_ROLE)) {
       return true;
     }
 
@@ -66,3 +68,4 @@ export class AuthorizeGuard implements CanActivate {
     return true;
   }
 }
+

@@ -1,0 +1,6 @@
+/** Domain-owned error codes for @repo/feature-organizations. Stable API contract values. */
+export const ORGANIZATION_ERROR_CODES = {
+  ORGANIZATION_NOT_FOUND: "ORGANIZATION_NOT_FOUND",
+  ORGANIZATION_MEMBER_NOT_FOUND: "ORGANIZATION_MEMBER_NOT_FOUND",
+  ORGANIZATION_LAST_OWNER: "ORGANIZATION_LAST_OWNER",
+} as const;

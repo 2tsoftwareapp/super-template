@@ -2,14 +2,13 @@ import type { RequestContext } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { AppError, ERROR_CODES, SYSTEM_SCOPE } from "@repo/api-runtime";
+import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 
 import {
   PREFERENCES_REPOSITORY,
   type PreferencesRepositoryPort,
 } from "../ports/preferences.repository.port";
 import { PreferencesMapper } from "../preferences.mapper";
-import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
-import type { AuditWriter } from "@repo/feature-audit/contracts";
 
 @Injectable()
 export class ResetPreferencesUseCase {

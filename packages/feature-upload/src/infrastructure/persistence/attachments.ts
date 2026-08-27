@@ -7,7 +7,8 @@ export const attachments = pgTable(
   "r_attachments",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    organizationId: uuid("organization_id").notNull(),
+    organizationId: uuid("organization_id")
+      .notNull(),
     fileId: uuid("file_id")
       .notNull()
       .references(() => files.id, { onDelete: "cascade" }),

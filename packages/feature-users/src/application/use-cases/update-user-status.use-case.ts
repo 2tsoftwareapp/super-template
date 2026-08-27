@@ -2,18 +2,20 @@ import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime
 import type { TransactionPort } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, ERROR_CODES, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
+import {AppError, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
+import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 import { AccessControlService, ROLE_NAMES } from "@repo/feature-access-control/contracts";
 import { ACTIVITY_EMITTER, type ActivityEmitter } from "@repo/feature-activities/contracts";
-import { AUTH_TOKEN_CLEANUP, type AuthTokenCleanup } from "@repo/feature-users/contracts";
+import {
+  OUTBOX_APPENDER,
+  type OutboxAppenderPort,
+} from "@repo/feature-outbox/contracts";
 
 import type { UserStatus, UserView } from "../users.types";
 
 import { assertUserBelongsToOrganization } from "../../domain/user-org-scope.policy";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";
 import { GetUserUseCase } from "./get-user.use-case";
-import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
-import type { AuditWriter } from "@repo/feature-audit/contracts";
 
 @Injectable()
 export class UpdateUserStatusUseCase {
@@ -23,7 +25,7 @@ export class UpdateUserStatusUseCase {
     private readonly usersRepository: UsersRepositoryPort,
     private readonly accessControlService: AccessControlService,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
-    @Inject(AUTH_TOKEN_CLEANUP) private readonly authTokenCleanup: AuthTokenCleanup,
+    @Inject(OUTBOX_APPENDER) private readonly outbox: OutboxAppenderPort,
     @Inject(ACTIVITY_EMITTER) private readonly activityEmitter: ActivityEmitter,
     private readonly getUserUseCase: GetUserUseCase,
   ) {}
@@ -44,7 +46,7 @@ export class UpdateUserStatusUseCase {
     const user = await this.usersRepository.findById(userId);
 
     if (!user) {
-      throw new AppError(ERROR_CODES.USER_NOT_FOUND, "User not found", HttpStatus.NOT_FOUND);
+      throw new AppError(USER_ERROR_CODES.USER_NOT_FOUND, "User not found", HttpStatus.NOT_FOUND);
     }
 
     if (actor.userId === userId) {
@@ -76,7 +78,8 @@ export class UpdateUserStatusUseCase {
       );
 
       if (status === "BLOCKED") {
-        await this.authTokenCleanup.revokeAllSessionsForUser(userId, transaction);
+        // Auth subscribes to this lifecycle event and revokes sessions.
+        await this.outbox.append("user.lifecycle.status-blocked", { userId }, transaction);
       }
 
       await this.auditWriter.log(
@@ -116,3 +119,6 @@ export class UpdateUserStatusUseCase {
     return this.getUserUseCase.execute(userId, actor);
   }
 }
+
+import { ERROR_CODES } from "@repo/api-runtime";
+import { USER_ERROR_CODES } from "@repo/feature-users/contracts";

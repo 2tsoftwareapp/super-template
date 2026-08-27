@@ -1,105 +1,51 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { type JsonObject, type JsonValue } from "@repo/api-runtime";
-import { AUTH_TOKEN_CLEANUP, type AuthTokenCleanup } from "@repo/feature-users/contracts";
 
-import type { JobHandler } from "../jobs.types";
-import { MAIL_TEMPLATE_SENDER } from "@repo/feature-mail/contracts";
-import type { MailTemplateSender } from "@repo/feature-mail/contracts";
-import { USER_NOTIFICATION_SENDER } from "@repo/feature-notifications/contracts";
-import type { UserNotificationSender } from "@repo/feature-notifications/contracts";
+import { JOB_HANDLER, type JobHandlerContext } from "../../public/job-handler.port";
 
-function readStringField(payload: JsonObject, key: string): string {
-  const value = payload[key];
-  return typeof value === "string" ? value : "";
+/**
+ * Reserved no-op job type for future orphaned-file cleanup.
+ */
+async function filesCleanupHandler(_context: JobHandlerContext): Promise<void> {}
+
+type Handler = (context: JobHandlerContext) => Promise<void>;
+
+interface Contribution {
+  readonly type: string;
+  readonly handle: (context: JobHandlerContext) => Promise<void>;
 }
 
-function readOptionalJsonObject(value: JsonValue | undefined): JsonObject | null {
-  if (typeof value === "object" && value !== null && !Array.isArray(value)) {
-    return value;
-  }
-  return null;
-}
-
-function readStringRecord(value: JsonValue | undefined): Record<string, string> {
-  if (typeof value !== "object" || value === null || Array.isArray(value)) {
-    return {};
-  }
-  const result: Record<string, string> = {};
-  for (const [key, entry] of Object.entries(value)) {
-    if (typeof entry === "string") {
-      result[key] = entry;
-    }
-  }
-  return result;
-}
-
+/**
+ * Dispatches jobs to feature-contributed handlers. The jobs core never imports
+ * an owning feature: mail/notification/auth features register JOB_HANDLER
+ * multi-providers for their own job types.
+ */
 @Injectable()
 export class JobHandlersRegistry {
-  private readonly handlers = new Map<string, JobHandler>();
+  private readonly handlers = new Map<string, Handler>();
 
   constructor(
-    @Inject(MAIL_TEMPLATE_SENDER)
-    private readonly mailSender: MailTemplateSender,
-    @Inject(AUTH_TOKEN_CLEANUP)
-    private readonly authTokenCleanup: AuthTokenCleanup,
-    @Inject(USER_NOTIFICATION_SENDER)
-    private readonly notificationSender: UserNotificationSender,
+    @Inject(JOB_HANDLER)
+    private readonly contributions: Contribution[],
   ) {
-    this.registerHandler("mail.send", async ({ jobId, payload }) => {
-      const templateKey = readStringField(payload, "templateKey");
-      const to = readStringField(payload, "to");
-      const variables = readStringRecord(payload.variables);
+    this.registerHandler("files.cleanup", filesCleanupHandler);
 
-      if (!templateKey || !to) {
-        throw new Error("mail.send requires templateKey and to");
-      }
-
-      await this.mailSender.sendTemplate({
-        templateKey,
-        to,
-        variables,
-        metadata: readOptionalJsonObject(payload.metadata),
-        sourceJobId: jobId,
-      });
-    });
-
-    this.registerHandler("files.cleanup", async () => {
-      // Stub: reserved for orphaned file cleanup.
-    });
-
-    this.registerHandler("auth.cleanup-tokens", async () => {
-      await this.authTokenCleanup.cleanupExpiredTokens();
-    });
-
-    this.registerHandler("notification.send", async ({ jobId, payload, organizationId }) => {
-      const userId = readStringField(payload, "userId");
-      const type = readStringField(payload, "type");
-      const title = readStringField(payload, "title");
-      const body = readStringField(payload, "body");
-
-      if (!userId || !type || !title || !body) {
-        throw new Error("notification.send requires userId, type, title, and body");
-      }
-
-      const data = readOptionalJsonObject(payload.data);
-
-      await this.notificationSender.sendToUser(null, {
-        ...(organizationId ? { organizationId } : {}),
-        userId,
-        type,
-        title,
-        body,
-        ...(data ? { data } : {}),
-        sourceBackgroundJobId: jobId,
-      });
-    });
+    for (const contribution of this.contributions) {
+      this.registerHandler(contribution.type, contribution.handle);
+    }
   }
 
-  registerHandler(type: string, handler: JobHandler) {
+  registerHandler(type: string, handler: Handler): void {
+    if (this.handlers.has(type)) {
+      throw new Error(`Duplicate job handler for type "${type}"`);
+    }
     this.handlers.set(type, handler);
   }
 
-  getHandler(type: string): JobHandler | undefined {
+  getHandler(type: string): Handler | undefined {
     return this.handlers.get(type);
+  }
+
+  hasHandler(type: string): boolean {
+    return this.handlers.has(type);
   }
 }

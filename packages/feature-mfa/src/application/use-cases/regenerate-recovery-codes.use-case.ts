@@ -2,7 +2,8 @@ import type { RequestContext } from "@repo/api-runtime";
 import type { TransactionPort } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, ERROR_CODES, SYSTEM_SCOPE } from "@repo/api-runtime";
+import {AppError, SYSTEM_SCOPE } from "@repo/api-runtime";
+import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 import { TRANSACTION_PORT } from "@repo/api-runtime";
 
 import type { MfaRegenerateRecoveryCodesCommand } from "../mfa.types";
@@ -11,8 +12,6 @@ import { hashRecoveryCode } from "../../domain/hash-recovery-code";
 import { generateRecoveryCodes } from "../../domain/recovery-codes";
 import { MFA_REPOSITORY, type MfaRepositoryPort } from "../ports/mfa.repository.port";
 import { MfaCodeVerifierService } from "../services/mfa-code-verifier.service";
-import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
-import type { AuditWriter } from "@repo/feature-audit/contracts";
 
 @Injectable()
 export class RegenerateRecoveryCodesUseCase {
@@ -31,7 +30,7 @@ export class RegenerateRecoveryCodesUseCase {
 
     if (!secretRow?.enabled) {
       throw new AppError(
-        ERROR_CODES.MFA_NOT_ENABLED,
+        MFA_ERROR_CODES.MFA_NOT_ENABLED,
         "Two-factor authentication is not enabled",
         HttpStatus.CONFLICT,
       );
@@ -41,7 +40,7 @@ export class RegenerateRecoveryCodesUseCase {
 
     if (!codeIsValid) {
       throw new AppError(
-        ERROR_CODES.MFA_INVALID_CODE,
+        MFA_ERROR_CODES.MFA_INVALID_CODE,
         "Invalid verification code",
         HttpStatus.UNAUTHORIZED,
       );
@@ -72,3 +71,5 @@ export class RegenerateRecoveryCodesUseCase {
     return { recoveryCodes };
   }
 }
+
+import { MFA_ERROR_CODES } from "@repo/feature-mfa/contracts";

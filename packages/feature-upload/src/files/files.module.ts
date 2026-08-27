@@ -1,4 +1,5 @@
 import { Global, Module } from "@nestjs/common";
+import { FILE_LOOKUP } from "@repo/feature-users/contracts";
 
 import { StorageModule } from "../storage/storage.module";
 import { FILES_REPOSITORY } from "./application/ports/files.repository.port";
@@ -16,7 +17,6 @@ import { ListFilesUseCase } from "./application/use-cases/list-files.use-case";
 import { UploadFileUseCase } from "./application/use-cases/upload-file.use-case";
 import { FilesRepository } from "./infrastructure/files.repository";
 import { FilesController } from "./presentation/files.controller";
-import { FILE_LOOKUP } from "@repo/feature-upload/contracts";
 
 @Global()
 @Module({
@@ -38,7 +38,7 @@ import { FILE_LOOKUP } from "@repo/feature-upload/contracts";
     BatchDeleteFilesUseCase,
     {
       provide: FILE_LOOKUP,
-      useExisting: FilesRepository,
+      useExisting: FilesRepository, // structural adapter for the users-owned file-view port
     },
     {
       provide: FILES_REPOSITORY,

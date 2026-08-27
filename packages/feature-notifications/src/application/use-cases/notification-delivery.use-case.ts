@@ -1,19 +1,9 @@
 import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {
-  AppError,
-  ERROR_CODES,
-  requireOrganizationId,
-  SYSTEM_SCOPE,
-  TRANSACTION_PORT,
-  type TransactionPort,
-} from "@repo/api-runtime";
-import {
-  tenantContextForJob,
-  TenantContextService,
-  WORKER_DISPATCH_CONTEXT,
-} from "@repo/api-runtime";
+import {AppError, requireOrganizationId, SYSTEM_SCOPE, TRANSACTION_PORT, type TransactionPort } from "@repo/api-runtime";
+import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
+import { tenantContextForJob, TenantContextService, WORKER_DISPATCH_CONTEXT } from "@repo/api-runtime";
 import { USER_LOOKUP, type UserLookup } from "@repo/feature-users/contracts";
 
 import type {
@@ -34,8 +24,6 @@ import {
   type NotificationsRepositoryPort,
 } from "../ports/notifications.repository.port";
 import { NotificationDispatchService } from "../services/notification-dispatch.service";
-import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
-import type { AuditWriter } from "@repo/feature-audit/contracts";
 
 const DUE_JOB_BATCH_SIZE = 20;
 const RECIPIENT_BATCH_SIZE = 100;
@@ -195,7 +183,7 @@ export class NotificationDeliveryUseCase {
 
     if (!job) {
       throw new AppError(
-        ERROR_CODES.NOTIFICATION_JOB_NOT_FOUND,
+        NOTIFICATION_ERROR_CODES.NOTIFICATION_JOB_NOT_FOUND,
         "Notification job not found",
         HttpStatus.NOT_FOUND,
       );
@@ -204,7 +192,7 @@ export class NotificationDeliveryUseCase {
     const organizationId = requireOrganizationId(actor);
     if (job.organizationId !== organizationId) {
       throw new AppError(
-        ERROR_CODES.NOTIFICATION_JOB_NOT_FOUND,
+        NOTIFICATION_ERROR_CODES.NOTIFICATION_JOB_NOT_FOUND,
         "Notification job not found",
         HttpStatus.NOT_FOUND,
       );
@@ -221,7 +209,7 @@ export class NotificationDeliveryUseCase {
 
     if (!job) {
       throw new AppError(
-        ERROR_CODES.NOTIFICATION_JOB_NOT_FOUND,
+        NOTIFICATION_ERROR_CODES.NOTIFICATION_JOB_NOT_FOUND,
         "Notification job not found",
         HttpStatus.NOT_FOUND,
       );
@@ -229,7 +217,7 @@ export class NotificationDeliveryUseCase {
 
     if (job.organizationId !== organizationId) {
       throw new AppError(
-        ERROR_CODES.NOTIFICATION_JOB_NOT_FOUND,
+        NOTIFICATION_ERROR_CODES.NOTIFICATION_JOB_NOT_FOUND,
         "Notification job not found",
         HttpStatus.NOT_FOUND,
       );
@@ -240,7 +228,7 @@ export class NotificationDeliveryUseCase {
 
       if (!result) {
         throw new AppError(
-          ERROR_CODES.NOTIFICATION_JOB_NOT_CANCELLABLE,
+          NOTIFICATION_ERROR_CODES.NOTIFICATION_JOB_NOT_CANCELLABLE,
           "Only pending notification jobs can be cancelled",
           HttpStatus.CONFLICT,
         );
@@ -415,7 +403,7 @@ export class NotificationDeliveryUseCase {
   private assertAudiencePayload(input: SendNotificationRequestCommand) {
     if (input.audience === "USER" && !input.userId) {
       throw new AppError(
-        ERROR_CODES.NOTIFICATION_INVALID_AUDIENCE,
+        NOTIFICATION_ERROR_CODES.NOTIFICATION_INVALID_AUDIENCE,
         "userId is required when audience is USER",
         HttpStatus.BAD_REQUEST,
       );
@@ -423,10 +411,13 @@ export class NotificationDeliveryUseCase {
 
     if (input.audience === "USERS" && (!input.userIds || input.userIds.length === 0)) {
       throw new AppError(
-        ERROR_CODES.NOTIFICATION_INVALID_AUDIENCE,
+        NOTIFICATION_ERROR_CODES.NOTIFICATION_INVALID_AUDIENCE,
         "userIds is required when audience is USERS",
         HttpStatus.BAD_REQUEST,
       );
     }
   }
 }
+
+import { ERROR_CODES } from "@repo/api-runtime";
+import { NOTIFICATION_ERROR_CODES } from "@repo/feature-notifications/contracts";

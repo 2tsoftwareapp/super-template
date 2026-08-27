@@ -1,16 +1,13 @@
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {
-  AppError,
-  durationToMilliseconds,
-  ERROR_CODES,
-  generateOpaqueToken,
-  hashOpaqueToken,
-} from "@repo/api-runtime";
+import {AppError, durationToMilliseconds, generateOpaqueToken, hashOpaqueToken } from "@repo/api-runtime";
 import {
   AUTH_SESSION_REPOSITORY,
   type AuthSessionRepositoryPort,
 } from "@repo/feature-auth/contracts";
-import { AUTH_TOKEN_PROVIDER, type AuthTokenProviderPort } from "@repo/feature-auth/contracts";
+import {
+  AUTH_TOKEN_PROVIDER,
+  type AuthTokenProviderPort,
+} from "@repo/feature-auth/contracts";
 
 import { SSO_REPOSITORY, type SsoRepositoryPort } from "../ports/sso.repository.port";
 
@@ -73,7 +70,7 @@ export class ExchangeSsoSessionUseCase {
 
     if (!exchange) {
       throw new AppError(
-        ERROR_CODES.SSO_EXCHANGE_INVALID,
+        SSO_ERROR_CODES.SSO_EXCHANGE_INVALID,
         "SSO exchange code is invalid or expired",
         HttpStatus.UNAUTHORIZED,
       );
@@ -83,7 +80,7 @@ export class ExchangeSsoSessionUseCase {
 
     if (!consumed) {
       throw new AppError(
-        ERROR_CODES.SSO_EXCHANGE_INVALID,
+        SSO_ERROR_CODES.SSO_EXCHANGE_INVALID,
         "SSO exchange code was already used",
         HttpStatus.UNAUTHORIZED,
       );
@@ -94,7 +91,7 @@ export class ExchangeSsoSessionUseCase {
 
     if (!session || session.revokedAt || session.expiresAt.getTime() <= Date.now()) {
       throw new AppError(
-        ERROR_CODES.SSO_EXCHANGE_INVALID,
+        SSO_ERROR_CODES.SSO_EXCHANGE_INVALID,
         "SSO exchange session is invalid or expired",
         HttpStatus.UNAUTHORIZED,
       );
@@ -120,3 +117,5 @@ export class ExchangeSsoSessionUseCase {
     };
   }
 }
+
+import { SSO_ERROR_CODES } from "@repo/feature-sso/contracts";

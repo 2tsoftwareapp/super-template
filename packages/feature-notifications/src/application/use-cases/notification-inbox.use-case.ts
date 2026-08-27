@@ -1,7 +1,7 @@
 import type { AuthenticatedRequestUser } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, ERROR_CODES, requireOrganizationId } from "@repo/api-runtime";
+import {AppError, requireOrganizationId } from "@repo/api-runtime";
 
 import type { ListNotificationsQuery, NotificationView } from "../notifications.types";
 
@@ -53,7 +53,7 @@ export class NotificationInboxUseCase {
 
     if (notification?.userId !== user.userId) {
       throw new AppError(
-        ERROR_CODES.NOTIFICATION_NOT_FOUND,
+        NOTIFICATION_ERROR_CODES.NOTIFICATION_NOT_FOUND,
         "Notification not found",
         HttpStatus.NOT_FOUND,
       );
@@ -83,7 +83,7 @@ export class NotificationInboxUseCase {
 
     if (notification?.userId !== user.userId) {
       throw new AppError(
-        ERROR_CODES.NOTIFICATION_NOT_FOUND,
+        NOTIFICATION_ERROR_CODES.NOTIFICATION_NOT_FOUND,
         "Notification not found",
         HttpStatus.NOT_FOUND,
       );
@@ -92,3 +92,5 @@ export class NotificationInboxUseCase {
     await this.notificationsRepository.delete(notificationId, user.userId, organizationId);
   }
 }
+
+import { NOTIFICATION_ERROR_CODES } from "@repo/feature-notifications/contracts";

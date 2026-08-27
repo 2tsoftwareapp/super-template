@@ -1,4 +1,5 @@
 import type { JsonObject } from "@repo/api-kernel";
+import type { ImportValidationError } from "../../public/import-export-adapter.port";
 
 import { timestamps } from "@repo/database-runtime";
 import { sql } from "drizzle-orm";
@@ -14,21 +15,23 @@ import {
 } from "drizzle-orm/pg-core";
 
 import { importExportJobStatusEnum } from "./import-export-enums";
-import type { ImportValidationError } from "@repo/feature-import-export/contracts";
 
 export const importJobs = pgTable(
   "t_import_jobs",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    organizationId: uuid("organization_id").notNull(),
+    organizationId: uuid("organization_id")
+      .notNull(),
     type: text("type").notNull(),
-    fileId: uuid("file_id").notNull(),
+    fileId: uuid("file_id")
+      .notNull(),
     status: importExportJobStatusEnum("status").notNull().default("PENDING"),
     rowCount: integer("row_count"),
     successCount: integer("success_count"),
     errorCount: integer("error_count"),
     errors: jsonb("errors").$type<ImportValidationError[] | null>(),
-    createdById: uuid("created_by_id").notNull(),
+    createdById: uuid("created_by_id")
+      .notNull(),
     confirmedAt: timestamp("confirmed_at", { withTimezone: true }),
     completedAt: timestamp("completed_at", { withTimezone: true }),
     idempotencyKey: text("idempotency_key"),
@@ -47,12 +50,14 @@ export const exportJobs = pgTable(
   "t_export_jobs",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    organizationId: uuid("organization_id").notNull(),
+    organizationId: uuid("organization_id")
+      .notNull(),
     type: text("type").notNull(),
     status: importExportJobStatusEnum("status").notNull().default("PENDING"),
     fileId: uuid("file_id"),
     filters: jsonb("filters").$type<JsonObject | null>(),
-    createdById: uuid("created_by_id").notNull(),
+    createdById: uuid("created_by_id")
+      .notNull(),
     completedAt: timestamp("completed_at", { withTimezone: true }),
     idempotencyKey: text("idempotency_key"),
     ...timestamps,

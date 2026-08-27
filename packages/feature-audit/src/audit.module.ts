@@ -9,9 +9,8 @@ import { AuditCoreModule } from "./audit-core.module";
 import { AuditController } from "./presentation/audit.controller";
 
 /**
- * Audit admin surface: list, get, purge. Free of feature-upload coupling so
- * consumers never pull the export/file-storage stack transitively.
- * Export/download lives in AuditExportModule.
+ * Audit admin surface: queries and retention. Export/download lives in the
+ * optional feature-audit-export plugin (the only piece coupled to upload).
  */
 @Module({
   imports: [AuditCoreModule],

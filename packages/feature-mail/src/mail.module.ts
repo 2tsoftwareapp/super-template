@@ -1,6 +1,10 @@
 import { forwardRef, Global, Module } from "@nestjs/common";
-
+import { MAIL_TEMPLATE_SENDER } from "./public/mail-template-sender.port";
 import { JobsModule } from "@repo/feature-jobs/contracts";
+import {
+  MAIL_JOB_HANDLER_PROVIDER,
+  MailJobHandler,
+} from "./application/mail-job.handler";
 
 import { MailMapper } from "./application/mail.mapper";
 import { MailService } from "./application/mail.service";
@@ -16,7 +20,6 @@ import { MailDeliveriesRepository } from "./infrastructure/mail-deliveries.repos
 import { SmtpMailerService } from "./infrastructure/providers/smtp-mailer.adapter";
 import { TemplateRendererService } from "./infrastructure/template-renderer.service";
 import { AdminMailController } from "./presentation/admin-mail.controller";
-import { MAIL_TEMPLATE_SENDER } from "@repo/feature-mail/contracts";
 
 @Global()
 @Module({
@@ -24,6 +27,8 @@ import { MAIL_TEMPLATE_SENDER } from "@repo/feature-mail/contracts";
   controllers: [AdminMailController],
   providers: [
     SmtpMailerService,
+    MailJobHandler,
+    MAIL_JOB_HANDLER_PROVIDER,
     TemplateRendererService,
     MailMapper,
     MailDeliveriesRepository,

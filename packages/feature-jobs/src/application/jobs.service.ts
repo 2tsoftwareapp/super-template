@@ -1,3 +1,9 @@
+import type {
+  BackgroundJobEnqueueInput,
+  BackgroundJobEnqueuerWithResult,
+  BackgroundJobRef,
+} from "../public/background-job-enqueuer.port";
+
 import { Injectable } from "@nestjs/common";
 
 import type { EnqueueJobCommand, JobHandler } from "./jobs.types";
@@ -5,11 +11,6 @@ import type { EnqueueJobCommand, JobHandler } from "./jobs.types";
 import { JobHandlersRegistry } from "./services/job-handlers.registry";
 import { EnqueueJobUseCase } from "./use-cases/enqueue-job.use-case";
 import { ProcessJobsUseCase } from "./use-cases/process-jobs.use-case";
-import type {
-  BackgroundJobEnqueueInput,
-  BackgroundJobEnqueuerWithResult,
-  BackgroundJobRef,
-} from "@repo/feature-jobs/contracts";
 
 export type { JobHandler } from "./jobs.types";
 
@@ -27,6 +28,8 @@ export class JobsService implements BackgroundJobEnqueuerWithResult {
     private readonly jobHandlersRegistry: JobHandlersRegistry,
   ) {}
 
+  /** Runtime handler registration (tests / host tooling); production
+   *  handlers arrive as JOB_HANDLER multi-providers. */
   registerHandler(type: string, handler: JobHandler) {
     this.jobHandlersRegistry.registerHandler(type, handler);
   }

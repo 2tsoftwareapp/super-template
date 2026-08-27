@@ -1,7 +1,11 @@
 import { Module } from "@nestjs/common";
 import { ScheduleModule } from "@nestjs/schedule";
 import { ThrottlerModule } from "@nestjs/throttler";
-import { EnvironmentService, LoggingModule, RedisThrottlerStorage } from "@repo/api-runtime";
+import {
+  EnvironmentService,
+  LoggingModule,
+  RedisThrottlerStorage,
+} from "@repo/api-runtime";
 import { AppConfigModule } from "@repo/api-runtime";
 import { DatabaseModule } from "@repo/database-runtime";
 

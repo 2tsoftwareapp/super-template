@@ -1,9 +1,14 @@
 import type { AuthenticatedRequestUser } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, ERROR_CODES, ROLE_NAMES } from "@repo/api-runtime";
+import {AppError, ERROR_CODES } from "@repo/api-runtime";
 
 import { ORGANIZATION_MEMBERSHIP, type OrganizationMembership } from "../../public/contracts";
+
+/** Platform super-role literal; importing access-control here would create a package cycle. */
+const PLATFORM_SUPER_ADMIN = "SUPER_ADMIN";
+
+
 
 @Injectable()
 export class ListOrganizationMembersUseCase {
@@ -18,7 +23,7 @@ export class ListOrganizationMembersUseCase {
         ? { userId: actor, isSuperAdmin: false }
         : {
             userId: actor.userId,
-            isSuperAdmin: actor.roles?.includes(ROLE_NAMES.SUPER_ADMIN) ?? false,
+            isSuperAdmin: actor.roles?.includes(PLATFORM_SUPER_ADMIN) ?? false,
           };
 
     if (!isSuperAdmin) {

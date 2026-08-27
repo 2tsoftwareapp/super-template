@@ -2,7 +2,8 @@ import type { RequestContext } from "@repo/api-runtime";
 import type { TransactionPort } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, EnvironmentService, ERROR_CODES, SYSTEM_SCOPE } from "@repo/api-runtime";
+import {AppError, EnvironmentService, SYSTEM_SCOPE } from "@repo/api-runtime";
+import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 import { TRANSACTION_PORT } from "@repo/api-runtime";
 
 import type { MfaConfirmCommand } from "../mfa.types";
@@ -12,8 +13,6 @@ import { generateRecoveryCodes } from "../../domain/recovery-codes";
 import { verifyTotpCode } from "../../domain/totp";
 import { decryptTotpSecret } from "../../domain/totp-encryption";
 import { MFA_REPOSITORY, type MfaRepositoryPort } from "../ports/mfa.repository.port";
-import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
-import type { AuditWriter } from "@repo/feature-audit/contracts";
 
 @Injectable()
 export class ConfirmMfaUseCase {
@@ -32,7 +31,7 @@ export class ConfirmMfaUseCase {
 
     if (!secretRow) {
       throw new AppError(
-        ERROR_CODES.MFA_SETUP_REQUIRED,
+        MFA_ERROR_CODES.MFA_SETUP_REQUIRED,
         "Start two-factor setup before confirming a code",
         HttpStatus.CONFLICT,
       );
@@ -40,7 +39,7 @@ export class ConfirmMfaUseCase {
 
     if (secretRow.enabled) {
       throw new AppError(
-        ERROR_CODES.MFA_ALREADY_ENABLED,
+        MFA_ERROR_CODES.MFA_ALREADY_ENABLED,
         "Two-factor authentication is already enabled",
         HttpStatus.CONFLICT,
       );
@@ -57,7 +56,7 @@ export class ConfirmMfaUseCase {
 
     if (!verifyTotpCode(secret, input.code)) {
       throw new AppError(
-        ERROR_CODES.MFA_INVALID_CODE,
+        MFA_ERROR_CODES.MFA_INVALID_CODE,
         "Invalid verification code",
         HttpStatus.UNAUTHORIZED,
       );
@@ -89,3 +88,5 @@ export class ConfirmMfaUseCase {
     return { recoveryCodes };
   }
 }
+
+import { MFA_ERROR_CODES } from "@repo/feature-mfa/contracts";

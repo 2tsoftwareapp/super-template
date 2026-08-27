@@ -29,6 +29,7 @@
     "@repo/feature-activities": "workspace:*",
     "@repo/feature-audit": "workspace:*",
     "@repo/feature-organizations": "workspace:*",
+    "@repo/feature-outbox": "workspace:*",
     "@repo/utils": "workspace:*",
     "class-transformer": "0.5.1",
     "class-validator": "0.15.1",

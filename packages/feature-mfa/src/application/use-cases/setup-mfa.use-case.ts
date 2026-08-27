@@ -1,5 +1,5 @@
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, EnvironmentService, ERROR_CODES } from "@repo/api-runtime";
+import {AppError, EnvironmentService } from "@repo/api-runtime";
 
 import type { MfaSetupResult } from "../mfa.types";
 
@@ -21,7 +21,7 @@ export class SetupMfaUseCase {
 
     if (existing?.enabled) {
       throw new AppError(
-        ERROR_CODES.MFA_ALREADY_ENABLED,
+        MFA_ERROR_CODES.MFA_ALREADY_ENABLED,
         "Two-factor authentication is already enabled",
         HttpStatus.CONFLICT,
       );
@@ -47,3 +47,5 @@ export class SetupMfaUseCase {
     };
   }
 }
+
+import { MFA_ERROR_CODES } from "@repo/feature-mfa/contracts";

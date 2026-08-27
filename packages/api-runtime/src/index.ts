@@ -5,7 +5,10 @@
 /// <reference path="./types/express.d.ts" />
 
 // --- runtime surface ---
-export { AccessProfileCache, type AccessProfileSnapshot } from "./cache/access-profile.cache";
+export {
+  AccessProfileCache,
+  type AccessProfileSnapshot,
+} from "./cache/access-profile.cache";
 export {
   APP_ENVIRONMENT,
   AppConfigModule,

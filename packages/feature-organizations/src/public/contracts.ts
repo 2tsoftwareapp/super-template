@@ -131,3 +131,4 @@ export interface OrganizationAccessControlPort {
 
 export const ORGANIZATION_ACCESS_CONTROL = Symbol("ORGANIZATION_ACCESS_CONTROL");
 export * from "./organization-lookup.port";
+export { ORGANIZATION_ERROR_CODES } from "./error-codes";

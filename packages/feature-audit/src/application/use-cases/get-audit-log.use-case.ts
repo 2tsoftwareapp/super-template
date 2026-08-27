@@ -1,10 +1,14 @@
 import type { AuthenticatedRequestUser } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, ERROR_CODES, ROLE_NAMES } from "@repo/api-runtime";
+import { AppError } from "@repo/api-runtime";
+import { AUDIT_ERROR_CODES } from "../../public/error-codes";
 
 import { AuditMapper } from "../audit.mapper";
 import { AUDIT_REPOSITORY, type AuditRepositoryPort } from "../ports/audit.repository.port";
+
+/** Platform super-role literal; importing access-control here would create a package cycle. */
+const PLATFORM_SUPER_ADMIN = "SUPER_ADMIN";
 
 @Injectable()
 export class GetAuditLogUseCase {
@@ -18,20 +22,20 @@ export class GetAuditLogUseCase {
 
     if (!row) {
       throw new AppError(
-        ERROR_CODES.AUDIT_LOG_NOT_FOUND,
+        AUDIT_ERROR_CODES.AUDIT_LOG_NOT_FOUND,
         "Audit log not found",
         HttpStatus.NOT_FOUND,
       );
     }
 
-    const isSuperAdmin = actor.roles.includes(ROLE_NAMES.SUPER_ADMIN);
+    const isSuperAdmin = actor.roles.includes(PLATFORM_SUPER_ADMIN);
 
     const expectedOrganizationId =
       isSuperAdmin && !actor.organizationId ? null : actor.organizationId;
 
     if (expectedOrganizationId && row.organizationId !== expectedOrganizationId) {
       throw new AppError(
-        ERROR_CODES.AUDIT_LOG_NOT_FOUND,
+        AUDIT_ERROR_CODES.AUDIT_LOG_NOT_FOUND,
         "Audit log not found",
         HttpStatus.NOT_FOUND,
       );
@@ -40,3 +44,4 @@ export class GetAuditLogUseCase {
     return this.auditMapper.toAuditLogDto(row);
   }
 }
+

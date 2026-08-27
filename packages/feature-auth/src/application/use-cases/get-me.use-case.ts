@@ -1,7 +1,7 @@
 import type { AuthenticatedRequestUser } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, ERROR_CODES } from "@repo/api-runtime";
+import {AppError } from "@repo/api-runtime";
 import { AUTH_USER_STORE, type AuthUserStore } from "@repo/feature-auth/contracts";
 
 import { AuthMapper } from "../auth.mapper";
@@ -18,7 +18,7 @@ export class GetMeUseCase {
     const dbUser = await this.usersRepository.findById(user.userId);
 
     if (!dbUser) {
-      throw new AppError(ERROR_CODES.USER_NOT_FOUND, "User not found", HttpStatus.NOT_FOUND);
+      throw new AppError(USER_ERROR_CODES.USER_NOT_FOUND, "User not found", HttpStatus.NOT_FOUND);
     }
 
     return {
@@ -30,3 +30,5 @@ export class GetMeUseCase {
     };
   }
 }
+
+import { USER_ERROR_CODES } from "@repo/feature-users/contracts";

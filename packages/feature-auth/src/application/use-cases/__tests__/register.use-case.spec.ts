@@ -1,5 +1,4 @@
 import { describe, expect, it, vi } from "vitest";
-import { ERROR_CODES } from "@repo/api-runtime";
 
 import { RegisterUseCase } from "../register.use-case";
 
@@ -42,7 +41,7 @@ describe("RegisterUseCase", () => {
         displayName: "New User",
       }),
     ).rejects.toMatchObject({
-      code: ERROR_CODES.REGISTRATION_DISABLED,
+      code: SETTINGS_ERROR_CODES.REGISTRATION_DISABLED,
     });
   });
 
@@ -58,9 +57,11 @@ describe("RegisterUseCase", () => {
         displayName: "New User",
       }),
     ).rejects.not.toMatchObject({
-      code: ERROR_CODES.REGISTRATION_DISABLED,
+      code: SETTINGS_ERROR_CODES.REGISTRATION_DISABLED,
     });
 
     expect(applicationSettingsLookup.isRegistrationEnabled).toHaveBeenCalled();
   });
 });
+
+import { SETTINGS_ERROR_CODES } from "@repo/feature-settings/contracts";

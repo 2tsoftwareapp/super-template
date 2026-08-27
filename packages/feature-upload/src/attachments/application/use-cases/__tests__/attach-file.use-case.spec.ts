@@ -2,8 +2,6 @@ import { describe, expect, it, vi } from "vitest";
 
 import type { AuthenticatedRequestUser } from "@repo/api-runtime";
 
-import { ERROR_CODES } from "@repo/api-runtime";
-
 import { AttachFileUseCase } from "../attach-file.use-case";
 
 const actor = {
@@ -33,7 +31,7 @@ describe("AttachFileUseCase", () => {
     );
 
     await expect(useCase.execute(actor, input)).rejects.toMatchObject({
-      code: ERROR_CODES.FILE_NOT_FOUND,
+      code: FILE_ERROR_CODES.FILE_NOT_FOUND,
     });
     expect(attachmentsRepository.create).not.toHaveBeenCalled();
   });
@@ -100,3 +98,5 @@ describe("AttachFileUseCase", () => {
     expect(result).toMatchObject({ id: "att-1", fileId: "file-1" });
   });
 });
+
+import { FILE_ERROR_CODES } from "@repo/feature-upload/contracts";

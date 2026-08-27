@@ -1,12 +1,15 @@
 import type { AuthenticatedRequestUser } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, ERROR_CODES, ROLE_NAMES } from "@repo/api-runtime";
+import {AppError, ERROR_CODES } from "@repo/api-runtime";
 
 import type { ListAuditLogsQuery } from "../audit.types";
 
 import { AuditMapper } from "../audit.mapper";
 import { AUDIT_REPOSITORY, type AuditRepositoryPort } from "../ports/audit.repository.port";
+
+/** Platform super-role literal; importing access-control here would create a package cycle. */
+const PLATFORM_SUPER_ADMIN = "SUPER_ADMIN";
 
 @Injectable()
 export class ListAuditLogsUseCase {
@@ -16,7 +19,7 @@ export class ListAuditLogsUseCase {
   ) {}
 
   async execute(actor: AuthenticatedRequestUser, query: ListAuditLogsQuery) {
-    const isSuperAdmin = actor.roles.includes(ROLE_NAMES.SUPER_ADMIN);
+    const isSuperAdmin = actor.roles.includes(PLATFORM_SUPER_ADMIN);
 
     // SUPER_ADMIN sees the full audit trail (including platform-scoped rows
     // recorded without an organization); non-super admins stay scoped to

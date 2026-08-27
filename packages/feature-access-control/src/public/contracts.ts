@@ -1,6 +1,5 @@
 import type { TransactionExecutor } from "@repo/api-kernel";
 
-export { ROLE_NAMES } from "../access-control.constants";
 /** Public contracts for @repo/feature-access-control. */
 export { AccessControlModule } from "../access-control.module";
 export { AccessControlService } from "../application/access-control.service";
@@ -27,7 +26,10 @@ export interface UserRoleAssignment {
 export interface UserRoleAssignments {
   findUserIdsForRole(roleId: string, executor?: TransactionExecutor): Promise<string[]>;
 
-  findUserIdsForPermission(permissionId: string, executor?: TransactionExecutor): Promise<string[]>;
+  findUserIdsForPermission(
+    permissionId: string,
+    executor?: TransactionExecutor,
+  ): Promise<string[]>;
 
   replaceUserRoles(
     userId: string,
@@ -83,3 +85,5 @@ export interface UserRoleAssignments {
 }
 
 export const USER_ROLE_ASSIGNMENTS = Symbol("USER_ROLE_ASSIGNMENTS");
+export { ROLE_NAMES, type RoleName } from "./role.constants";
+export { ACCESS_CONTROL_ERROR_CODES } from "./error-codes";

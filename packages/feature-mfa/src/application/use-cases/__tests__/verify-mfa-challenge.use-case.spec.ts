@@ -1,7 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { ERROR_CODES } from "@repo/api-runtime";
-
 import { VerifyMfaChallengeUseCase } from "../verify-mfa-challenge.use-case";
 
 describe("VerifyMfaChallengeUseCase", () => {
@@ -21,7 +19,7 @@ describe("VerifyMfaChallengeUseCase", () => {
         code: "000000",
         metadata: { ipAddress: null, userAgent: null },
       }),
-    ).rejects.toMatchObject({ code: ERROR_CODES.MFA_CHALLENGE_INVALID });
+    ).rejects.toMatchObject({ code: MFA_ERROR_CODES.MFA_CHALLENGE_INVALID });
   });
 
   it("rejects once max attempts are exceeded", async () => {
@@ -44,7 +42,7 @@ describe("VerifyMfaChallengeUseCase", () => {
         code: "000000",
         metadata: { ipAddress: null, userAgent: null },
       }),
-    ).rejects.toMatchObject({ code: ERROR_CODES.MFA_TOO_MANY_ATTEMPTS });
+    ).rejects.toMatchObject({ code: MFA_ERROR_CODES.MFA_TOO_MANY_ATTEMPTS });
   });
 
   it("increments attempts and rejects an invalid code", async () => {
@@ -69,7 +67,7 @@ describe("VerifyMfaChallengeUseCase", () => {
         code: "000000",
         metadata: { ipAddress: null, userAgent: null },
       }),
-    ).rejects.toMatchObject({ code: ERROR_CODES.MFA_INVALID_CODE });
+    ).rejects.toMatchObject({ code: MFA_ERROR_CODES.MFA_INVALID_CODE });
 
     expect(mfaRepository.incrementChallengeAttempts).toHaveBeenCalledWith("c1");
     expect(auditWriter.log).toHaveBeenCalledWith(
@@ -129,8 +127,10 @@ describe("VerifyMfaChallengeUseCase", () => {
         mfaToken: "token",
         code: "123456",
         metadata: { ipAddress: null, userAgent: null },
+
+import { MFA_ERROR_CODES } from "@repo/feature-mfa/contracts";
       }),
-    ).rejects.toMatchObject({ code: ERROR_CODES.MFA_CHALLENGE_INVALID });
+    ).rejects.toMatchObject({ code: MFA_ERROR_CODES.MFA_CHALLENGE_INVALID });
 
     expect(auditWriter.log).not.toHaveBeenCalled();
   });

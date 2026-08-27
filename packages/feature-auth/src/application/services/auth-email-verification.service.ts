@@ -2,21 +2,20 @@ import type { TransactionExecutor } from "@repo/api-runtime";
 
 import { Inject, Injectable } from "@nestjs/common";
 import { durationToMilliseconds, generateOpaqueToken, hashOpaqueToken } from "@repo/api-runtime";
-import { AUTH_EMAIL_VERIFICATION, type AuthEmailVerification } from "@repo/feature-users/contracts";
-
 import {
-  AUTH_SESSION_REPOSITORY,
-  type AuthSessionRepositoryPort,
-} from "../ports/auth-session.repository.port";
-import { OUTBOX_REPOSITORY, type OutboxRepositoryPort } from "../ports/outbox.repository.port";
+  OUTBOX_APPENDER,
+  type OutboxAppenderPort,
+} from "@repo/feature-outbox/contracts";
+
+import { AUTH_SESSION_REPOSITORY, type AuthSessionRepositoryPort } from "../ports/auth-session.repository.port";
 
 @Injectable()
-export class AuthEmailVerificationService implements AuthEmailVerification {
+export class AuthEmailVerificationService {
   constructor(
     @Inject(AUTH_SESSION_REPOSITORY)
     private readonly authSessionRepository: AuthSessionRepositoryPort,
-    @Inject(OUTBOX_REPOSITORY)
-    private readonly outboxRepository: OutboxRepositoryPort,
+    @Inject(OUTBOX_APPENDER)
+    private readonly outbox: OutboxAppenderPort,
   ) {}
 
   async issueVerificationEmail(
@@ -37,18 +36,14 @@ export class AuthEmailVerificationService implements AuthEmailVerification {
       executor,
     );
 
-    await this.outboxRepository.create(
+    await this.outbox.append(
+      "auth.send-verification-email",
       {
-        topic: "auth.send-verification-email",
-        payload: {
-          email: input.email,
-          token: verificationToken,
-          displayName: input.displayName ?? "",
-        },
+        email: input.email,
+        token: verificationToken,
+        displayName: input.displayName ?? "",
       },
       executor,
     );
   }
 }
-
-export { AUTH_EMAIL_VERIFICATION };

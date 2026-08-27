@@ -5,10 +5,18 @@ import { auditLogs } from "./infrastructure/persistence";
 
 export const auditFeature: FeatureManifest = defineFeature({
   id: "audit",
-  dependsOn: [],
+  dependsOn: ["upload"],
   nestModule: AuditModule,
   resourceScopes: {
     audit: "platform",
+  },
+  authorization: {
+    resources: {
+      audit: {
+        scope: "organization",
+        actions: ["read"], defaultGrants: { "ADMIN": ["read"] }
+      },
+    },
   },
   schema: { auditLogs },
 });

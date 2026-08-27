@@ -1,0 +1,29 @@
+{
+  "extends": "@repo/tsconfig/nest.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "strictPropertyInitialization": false,
+    "paths": {
+      "@repo/api-kernel": [
+        "../../api-kernel/src/index.ts"
+      ],
+      "@repo/api-plugin-kit": [
+        "../../api-plugin-kit/src/index.ts"
+      ],
+      "@repo/api-runtime": [
+        "../../api-runtime/src/index.ts"
+      ],
+      "@repo/database-runtime": [
+        "../../database-runtime/src/index.ts"
+      ]
+    },
+    "baseUrl": "."
+  },
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "src/**/*.spec.ts",
+    "test"
+  ]
+}

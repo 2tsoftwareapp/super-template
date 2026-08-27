@@ -41,18 +41,15 @@ export function useSettingsController(): SettingsViewModel {
   const session = useAdminSession();
   const { canRead, canUpdate } = selectSettingsPermissions(session.data?.data?.permissions);
 
-  const {
-    value: search,
-    debouncedValue: debouncedSearch,
-    setValue: setSearchInput,
-  } = useDebouncedUrlSearch({
-    searchParams,
-    pathname,
-    replace: (url) => {
-      void router.replace(url);
-    },
-    paramName: "q",
-  });
+  const { value: search, debouncedValue: debouncedSearch, setValue: setSearchInput } =
+    useDebouncedUrlSearch({
+      searchParams,
+      pathname,
+      replace: (url) => {
+        void router.replace(url);
+      },
+      paramName: "q",
+    });
 
   const settings = useSettingsQuery();
   const [savingKey, setSavingKey] = useState<string | null>(null);

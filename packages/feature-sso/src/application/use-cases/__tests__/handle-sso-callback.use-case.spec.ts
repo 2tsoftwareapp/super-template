@@ -1,7 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { ERROR_CODES } from "@repo/api-runtime";
-
 import { HandleSsoCallbackUseCase } from "../handle-sso-callback.use-case";
 
 const buildTransactionPort = () => ({
@@ -63,7 +61,7 @@ describe("HandleSsoCallbackUseCase", () => {
 
     await expect(
       useCase.execute({ provider: "unknown", code: "c", state: "s" }),
-    ).rejects.toMatchObject({ code: ERROR_CODES.SSO_PROVIDER_UNAVAILABLE });
+    ).rejects.toMatchObject({ code: SSO_ERROR_CODES.SSO_PROVIDER_UNAVAILABLE });
   });
 
   it("rejects an invalid or expired state", async () => {
@@ -77,7 +75,7 @@ describe("HandleSsoCallbackUseCase", () => {
 
     await expect(
       useCase.execute({ provider: "fake", code: "c", state: "s" }),
-    ).rejects.toMatchObject({ code: ERROR_CODES.SSO_STATE_INVALID });
+    ).rejects.toMatchObject({ code: SSO_ERROR_CODES.SSO_STATE_INVALID });
   });
 
   it("rejects a state a concurrent request already consumed (replay)", async () => {
@@ -98,7 +96,7 @@ describe("HandleSsoCallbackUseCase", () => {
 
     await expect(
       useCase.execute({ provider: "fake", code: "c", state: "s" }),
-    ).rejects.toMatchObject({ code: ERROR_CODES.SSO_STATE_INVALID });
+    ).rejects.toMatchObject({ code: SSO_ERROR_CODES.SSO_STATE_INVALID });
     // Consume-first: no provider exchange, no account/session side effects.
     expect(provider.exchangeCode).not.toHaveBeenCalled();
     expect(issueSessionUseCase.execute).not.toHaveBeenCalled();
@@ -115,7 +113,7 @@ describe("HandleSsoCallbackUseCase", () => {
 
     await expect(
       useCase.execute({ provider: "fake", code: "c", state: "s" }),
-    ).rejects.toMatchObject({ code: ERROR_CODES.SSO_STATE_INVALID });
+    ).rejects.toMatchObject({ code: SSO_ERROR_CODES.SSO_STATE_INVALID });
   });
 
   it("audits and rejects when the provider fails to verify the identity", async () => {
@@ -127,6 +125,8 @@ describe("HandleSsoCallbackUseCase", () => {
       exchangeCode: vi.fn(async () => {
         throw new Error("boom");
       }),
+
+import { SSO_ERROR_CODES } from "@repo/feature-sso/contracts";
     };
     const auditWriter = { log: vi.fn(async () => undefined) };
     const useCase = buildUseCase({
@@ -137,7 +137,7 @@ describe("HandleSsoCallbackUseCase", () => {
 
     await expect(
       useCase.execute({ provider: "fake", code: "c", state: "s" }),
-    ).rejects.toMatchObject({ code: ERROR_CODES.SSO_TOKEN_INVALID });
+    ).rejects.toMatchObject({ code: SSO_ERROR_CODES.SSO_TOKEN_INVALID });
     expect(auditWriter.log).toHaveBeenCalledWith(
       expect.objectContaining({ action: "auth.sso.failed" }),
     );
@@ -166,7 +166,7 @@ describe("HandleSsoCallbackUseCase", () => {
 
     await expect(
       useCase.execute({ provider: "fake", code: "c", state: "s" }),
-    ).rejects.toMatchObject({ code: ERROR_CODES.SSO_TOKEN_INVALID });
+    ).rejects.toMatchObject({ code: SSO_ERROR_CODES.SSO_TOKEN_INVALID });
   });
 
   it("rejects linking onto an unverified existing account (conflict)", async () => {
@@ -197,7 +197,7 @@ describe("HandleSsoCallbackUseCase", () => {
 
     await expect(
       useCase.execute({ provider: "fake", code: "c", state: "s" }),
-    ).rejects.toMatchObject({ code: ERROR_CODES.SSO_EMAIL_CONFLICT });
+    ).rejects.toMatchObject({ code: SSO_ERROR_CODES.SSO_EMAIL_CONFLICT });
   });
 
   it("rejects linking when the provider did not verify the email", async () => {
@@ -228,7 +228,7 @@ describe("HandleSsoCallbackUseCase", () => {
 
     await expect(
       useCase.execute({ provider: "fake", code: "c", state: "s" }),
-    ).rejects.toMatchObject({ code: ERROR_CODES.SSO_TOKEN_INVALID });
+    ).rejects.toMatchObject({ code: SSO_ERROR_CODES.SSO_TOKEN_INVALID });
   });
 
   it("links to a verified existing account and issues a session", async () => {

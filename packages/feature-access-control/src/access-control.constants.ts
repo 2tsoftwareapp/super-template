@@ -1,13 +1,10 @@
+export { ACTION, ALL_ACTIONS, hasPermission, perm } from "@repo/api-runtime";
 export {
-  ACTION,
-  ALL_ACTIONS,
-  allSeedPermissionNames,
-  DEFAULT_ROLE_GRANTS,
-  hasPermission,
+  FIXED_ROLE_NAMES,
   isFixedRoleName,
   isPrivilegedRoleName,
-  perm,
-  permissionNamesForRole,
   PRIVILEGED_ROLE_NAMES,
   ROLE_NAMES,
-} from "@repo/api-runtime";
+  type PrivilegedRoleName,
+  type RoleName,
+} from "./public/role.constants";

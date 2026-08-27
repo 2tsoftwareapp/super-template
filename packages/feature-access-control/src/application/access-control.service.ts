@@ -1,5 +1,6 @@
 import type { AuthenticatedRequestUser } from "@repo/api-runtime";
 import type { TransactionExecutor } from "@repo/api-runtime";
+import type { ComposedAuthorization } from "@repo/api-plugin-kit";
 
 import { Injectable } from "@nestjs/common";
 
@@ -25,8 +26,11 @@ export class AccessControlService {
     private readonly replaceUserRolesUseCase: ReplaceUserRolesUseCase,
   ) {}
 
-  ensureSeedData(executor?: TransactionExecutor) {
-    return this.seedAccessControlUseCase.execute(executor);
+  ensureSeedData(
+    executor: TransactionExecutor | undefined,
+    authorization: ComposedAuthorization,
+  ) {
+    return this.seedAccessControlUseCase.execute(authorization, executor);
   }
 
   getAccessProfile(userId: string, organizationId?: string | null) {

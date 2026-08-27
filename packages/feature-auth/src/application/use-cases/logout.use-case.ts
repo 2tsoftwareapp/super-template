@@ -2,9 +2,7 @@ import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime
 
 import { Inject, Injectable } from "@nestjs/common";
 import { SYSTEM_SCOPE } from "@repo/api-runtime";
-
-import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
-import type { AuditWriter } from "@repo/feature-audit/contracts";
+import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 
 import {
   AUTH_SESSION_REPOSITORY,

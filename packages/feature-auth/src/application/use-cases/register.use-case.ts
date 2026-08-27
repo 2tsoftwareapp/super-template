@@ -2,21 +2,12 @@ import type { RequestContext } from "@repo/api-runtime";
 import type { TransactionPort } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {
-  AppError,
-  durationToMilliseconds,
-  ERROR_CODES,
-  normalizeEmail,
-  SYSTEM_SCOPE,
-  TRANSACTION_PORT,
-} from "@repo/api-runtime";
+import {AppError, durationToMilliseconds, normalizeEmail, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
+import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 import { AccessControlService } from "@repo/feature-access-control/contracts";
 import { AUTH_USER_STORE, type AuthUserStore } from "@repo/feature-auth/contracts";
 import { OrganizationsService } from "@repo/feature-organizations/contracts";
-import {
-  APPLICATION_SETTINGS_LOOKUP,
-  type ApplicationSettingsLookup,
-} from "@repo/feature-settings/contracts";
+import { APPLICATION_SETTINGS_LOOKUP, type ApplicationSettingsLookup } from "@repo/feature-settings/contracts";
 
 import type { RegisterCommand } from "../auth.types";
 
@@ -25,9 +16,10 @@ import {
   AUTH_SESSION_REPOSITORY,
   type AuthSessionRepositoryPort,
 } from "../ports/auth-session.repository.port";
-import { OUTBOX_REPOSITORY, type OutboxRepositoryPort } from "../ports/outbox.repository.port";
-import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
-import type { AuditWriter } from "@repo/feature-audit/contracts";
+import {
+  OUTBOX_APPENDER,
+  type OutboxAppenderPort,
+} from "@repo/feature-outbox/contracts";
 
 @Injectable()
 export class RegisterUseCase {
@@ -39,7 +31,7 @@ export class RegisterUseCase {
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
     @Inject(AUTH_SESSION_REPOSITORY)
     private readonly authSessionRepository: AuthSessionRepositoryPort,
-    @Inject(OUTBOX_REPOSITORY) private readonly outboxRepository: OutboxRepositoryPort,
+    @Inject(OUTBOX_APPENDER) private readonly outbox: OutboxAppenderPort,
     @Inject(APPLICATION_SETTINGS_LOOKUP)
     private readonly applicationSettingsLookup: ApplicationSettingsLookup,
     private readonly organizationsService: OrganizationsService,
@@ -50,7 +42,7 @@ export class RegisterUseCase {
 
     if (!registrationEnabled) {
       throw new AppError(
-        ERROR_CODES.REGISTRATION_DISABLED,
+        SETTINGS_ERROR_CODES.REGISTRATION_DISABLED,
         "Registration is currently disabled",
         HttpStatus.FORBIDDEN,
       );
@@ -60,7 +52,7 @@ export class RegisterUseCase {
     const existingUser = await this.usersRepository.findByEmail(email);
     if (existingUser) {
       throw new AppError(
-        ERROR_CODES.USER_EMAIL_ALREADY_EXISTS,
+        USER_ERROR_CODES.USER_EMAIL_ALREADY_EXISTS,
         "A user with this email already exists",
         HttpStatus.CONFLICT,
       );
@@ -105,11 +97,9 @@ export class RegisterUseCase {
         transaction,
       );
 
-      await this.outboxRepository.create(
-        {
-          topic: "auth.send-verification-email",
-          payload: { email: user.email, token: verificationToken },
-        },
+      await this.outbox.append(
+        "auth.send-verification-email",
+        { email: user.email, token: verificationToken },
         transaction,
       );
 
@@ -132,3 +122,7 @@ export class RegisterUseCase {
     };
   }
 }
+
+import { ERROR_CODES } from "@repo/api-runtime";
+import { SETTINGS_ERROR_CODES } from "@repo/feature-settings/contracts";
+import { USER_ERROR_CODES } from "@repo/feature-users/contracts";

@@ -2,25 +2,20 @@ import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime
 import type { TransactionPort } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {
-  AppError,
-  ERROR_CODES,
-  normalizeEmail,
-  SYSTEM_SCOPE,
-  TRANSACTION_PORT,
-} from "@repo/api-runtime";
+import {AppError, normalizeEmail, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
+import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 import { AccessControlService, ROLE_NAMES } from "@repo/feature-access-control/contracts";
-import {
-  assertCanAssignRoleTargets,
-  assertRoleScopeCanBeAssigned,
-} from "@repo/feature-access-control/contracts";
+import { assertCanAssignRoleTargets, assertRoleScopeCanBeAssigned } from "@repo/feature-access-control/contracts";
 import { ACTIVITY_EMITTER, type ActivityEmitter } from "@repo/feature-activities/contracts";
 import {
   ORGANIZATION_MEMBERSHIP,
   type OrganizationMembership,
   OrganizationsService,
 } from "@repo/feature-organizations/contracts";
-import { AUTH_EMAIL_VERIFICATION, type AuthEmailVerification } from "@repo/feature-users/contracts";
+import {
+  OUTBOX_APPENDER,
+  type OutboxAppenderPort,
+} from "@repo/feature-outbox/contracts";
 import { hashPassword } from "@repo/utils/password";
 
 import type { CreateAdminUserCommand, UserView } from "../users.types";
@@ -28,8 +23,6 @@ import type { CreateAdminUserCommand, UserView } from "../users.types";
 import { resolveRoleById } from "../assignable-role.resolver";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";
 import { GetUserUseCase } from "./get-user.use-case";
-import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
-import type { AuditWriter } from "@repo/feature-audit/contracts";
 
 @Injectable()
 export class CreateAdminUserUseCase {
@@ -42,8 +35,8 @@ export class CreateAdminUserUseCase {
     private readonly organizationsService: OrganizationsService,
     @Inject(ORGANIZATION_MEMBERSHIP)
     private readonly membership: OrganizationMembership,
-    @Inject(AUTH_EMAIL_VERIFICATION)
-    private readonly authEmailVerification: AuthEmailVerification,
+    @Inject(OUTBOX_APPENDER)
+    private readonly outbox: OutboxAppenderPort,
     @Inject(ACTIVITY_EMITTER) private readonly activityEmitter: ActivityEmitter,
     private readonly getUserUseCase: GetUserUseCase,
   ) {}
@@ -57,7 +50,7 @@ export class CreateAdminUserUseCase {
     const existingUser = await this.usersRepository.findByEmail(email);
     if (existingUser) {
       throw new AppError(
-        ERROR_CODES.USER_EMAIL_ALREADY_EXISTS,
+        USER_ERROR_CODES.USER_EMAIL_ALREADY_EXISTS,
         "A user with this email already exists",
         HttpStatus.CONFLICT,
       );
@@ -182,11 +175,13 @@ export class CreateAdminUserUseCase {
       }
 
       if (status === "PENDING") {
-        await this.authEmailVerification.issueVerificationEmail(
+        // Auth subscribes and issues the verification email when composed.
+        await this.outbox.append(
+          "user.lifecycle.created",
           {
             userId: user.id,
             email: user.email,
-            displayName: user.displayName,
+            displayName: user.displayName ?? "",
           },
           transaction,
         );
@@ -234,3 +229,6 @@ export class CreateAdminUserUseCase {
     return this.getUserUseCase.execute(userId, actor);
   }
 }
+
+import { ERROR_CODES } from "@repo/api-runtime";
+import { USER_ERROR_CODES } from "@repo/feature-users/contracts";

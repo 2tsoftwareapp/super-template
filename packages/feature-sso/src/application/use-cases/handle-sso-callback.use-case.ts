@@ -2,28 +2,23 @@ import type { RequestContext } from "@repo/api-runtime";
 import type { TransactionPort } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {
-  AppError,
-  ERROR_CODES,
-  generateOpaqueToken,
-  hashOpaqueToken,
-  normalizeEmail,
-  SYSTEM_SCOPE,
-} from "@repo/api-runtime";
+import {AppError, generateOpaqueToken, hashOpaqueToken, normalizeEmail, SYSTEM_SCOPE } from "@repo/api-runtime";
+import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 import { PLATFORM_TRANSACTION_PORT } from "@repo/api-runtime";
 import { AccessControlService } from "@repo/feature-access-control/contracts";
 import { hashPassword } from "@repo/feature-auth/contracts";
 import { IssueSessionUseCase } from "@repo/feature-auth/contracts";
 import { OrganizationsService } from "@repo/feature-organizations/contracts";
-import { USERS_REPOSITORY, type UsersRepositoryPort } from "@repo/feature-users/contracts";
+import {
+  USERS_REPOSITORY,
+  type UsersRepositoryPort,
+} from "@repo/feature-users/contracts";
 
 import type { HandleSsoCallbackCommand } from "../sso.types";
 
 import { decideAccountLinking } from "../../domain/account-linking.policy";
 import { SSO_PROVIDER_REGISTRY, type SsoProviderRegistry } from "../ports/sso-provider.port";
 import { SSO_REPOSITORY, type SsoRepositoryPort } from "../ports/sso.repository.port";
-import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
-import type { AuditWriter } from "@repo/feature-audit/contracts";
 
 @Injectable()
 export class HandleSsoCallbackUseCase {
@@ -44,7 +39,7 @@ export class HandleSsoCallbackUseCase {
 
     if (!provider) {
       throw new AppError(
-        ERROR_CODES.SSO_PROVIDER_UNAVAILABLE,
+        SSO_ERROR_CODES.SSO_PROVIDER_UNAVAILABLE,
         `SSO provider "${input.provider}" is not available`,
         HttpStatus.NOT_FOUND,
       );
@@ -56,7 +51,7 @@ export class HandleSsoCallbackUseCase {
 
     if (loginState?.provider !== input.provider) {
       throw new AppError(
-        ERROR_CODES.SSO_STATE_INVALID,
+        SSO_ERROR_CODES.SSO_STATE_INVALID,
         "SSO login state is invalid or expired",
         HttpStatus.UNAUTHORIZED,
       );
@@ -69,7 +64,7 @@ export class HandleSsoCallbackUseCase {
 
     if (!stateConsumed) {
       throw new AppError(
-        ERROR_CODES.SSO_STATE_INVALID,
+        SSO_ERROR_CODES.SSO_STATE_INVALID,
         "SSO login state was already used",
         HttpStatus.UNAUTHORIZED,
       );
@@ -96,7 +91,7 @@ export class HandleSsoCallbackUseCase {
       });
 
       throw new AppError(
-        ERROR_CODES.SSO_TOKEN_INVALID,
+        SSO_ERROR_CODES.SSO_TOKEN_INVALID,
         "Failed to verify SSO identity",
         HttpStatus.UNAUTHORIZED,
       );
@@ -104,7 +99,7 @@ export class HandleSsoCallbackUseCase {
 
     if (!identity.email) {
       throw new AppError(
-        ERROR_CODES.SSO_TOKEN_INVALID,
+        SSO_ERROR_CODES.SSO_TOKEN_INVALID,
         "Provider did not return an email address",
         HttpStatus.UNAUTHORIZED,
       );
@@ -127,7 +122,7 @@ export class HandleSsoCallbackUseCase {
 
         if (!linkedUser) {
           throw new AppError(
-            ERROR_CODES.USER_NOT_FOUND,
+            USER_ERROR_CODES.USER_NOT_FOUND,
             "Linked user not found",
             HttpStatus.UNAUTHORIZED,
           );
@@ -148,7 +143,7 @@ export class HandleSsoCallbackUseCase {
 
       if (decision.kind === "conflict") {
         throw new AppError(
-          ERROR_CODES.SSO_EMAIL_CONFLICT,
+          SSO_ERROR_CODES.SSO_EMAIL_CONFLICT,
           "An account with this email already exists. Verify your email or sign in with a password first.",
           HttpStatus.CONFLICT,
         );
@@ -156,7 +151,7 @@ export class HandleSsoCallbackUseCase {
 
       if (!identity.emailVerified) {
         throw new AppError(
-          ERROR_CODES.SSO_TOKEN_INVALID,
+          SSO_ERROR_CODES.SSO_TOKEN_INVALID,
           "Provider did not verify the email address",
           HttpStatus.UNAUTHORIZED,
         );
@@ -243,3 +238,7 @@ export class HandleSsoCallbackUseCase {
     return { session, redirectUri: loginState.redirectUri };
   }
 }
+
+import { ERROR_CODES } from "@repo/api-runtime";
+import { SSO_ERROR_CODES } from "@repo/feature-sso/contracts";
+import { USER_ERROR_CODES } from "@repo/feature-users/contracts";

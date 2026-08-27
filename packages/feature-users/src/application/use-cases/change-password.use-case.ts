@@ -2,14 +2,16 @@ import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime
 import type { TransactionPort } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, ERROR_CODES, SYSTEM_SCOPE } from "@repo/api-runtime";
+import {AppError, SYSTEM_SCOPE } from "@repo/api-runtime";
+import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 import { TRANSACTION_PORT } from "@repo/api-runtime";
-import { AUTH_TOKEN_CLEANUP, type AuthTokenCleanup } from "@repo/feature-users/contracts";
+import {
+  OUTBOX_APPENDER,
+  type OutboxAppenderPort,
+} from "@repo/feature-outbox/contracts";
 import { hashPassword, verifyPassword } from "@repo/utils/password";
 
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";
-import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
-import type { AuditWriter } from "@repo/feature-audit/contracts";
 
 @Injectable()
 export class ChangePasswordUseCase {
@@ -17,7 +19,7 @@ export class ChangePasswordUseCase {
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
     @Inject(USERS_REPOSITORY)
     private readonly usersRepository: UsersRepositoryPort,
-    @Inject(AUTH_TOKEN_CLEANUP) private readonly authTokenCleanup: AuthTokenCleanup,
+    @Inject(OUTBOX_APPENDER) private readonly outbox: OutboxAppenderPort,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
   ) {}
 
@@ -30,14 +32,14 @@ export class ChangePasswordUseCase {
     const user = await this.usersRepository.findById(actor.userId);
 
     if (!user) {
-      throw new AppError(ERROR_CODES.USER_NOT_FOUND, "User not found", HttpStatus.NOT_FOUND);
+      throw new AppError(USER_ERROR_CODES.USER_NOT_FOUND, "User not found", HttpStatus.NOT_FOUND);
     }
 
     const passwordMatches = await verifyPassword(user.passwordHash, currentPassword);
 
     if (!passwordMatches) {
       throw new AppError(
-        ERROR_CODES.AUTH_INVALID_CREDENTIALS,
+        AUTH_ERROR_CODES.AUTH_INVALID_CREDENTIALS,
         "Current password is incorrect",
         HttpStatus.UNAUTHORIZED,
       );
@@ -52,7 +54,11 @@ export class ChangePasswordUseCase {
         },
         transaction,
       );
-      await this.authTokenCleanup.revokeAllSessionsForUser(actor.userId, transaction);
+      await this.outbox.append(
+        "user.lifecycle.password-changed",
+        { userId: actor.userId },
+        transaction,
+      );
       await this.auditWriter.log(
         {
           actorId: actor.userId,
@@ -69,3 +75,6 @@ export class ChangePasswordUseCase {
     });
   }
 }
+
+import { AUTH_ERROR_CODES } from "@repo/feature-auth/contracts";
+import { USER_ERROR_CODES } from "@repo/feature-users/contracts";

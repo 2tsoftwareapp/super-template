@@ -1,8 +1,9 @@
+import type { ImportValidationError } from "../../public/contracts";
+
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { IsIn, IsOptional, IsString, IsUUID, MaxLength } from "class-validator";
 
 import { SUPPORTED_IMPORT_TYPES } from "../application/import-constants";
-import type { ImportValidationError } from "@repo/feature-import-export/contracts";
 
 export class ImportJobDto {
   @ApiProperty()

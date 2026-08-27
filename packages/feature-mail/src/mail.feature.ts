@@ -10,5 +10,13 @@ export const mailFeature: FeatureManifest = defineFeature({
   resourceScopes: {
     mail: "platform",
   },
+  authorization: {
+    resources: {
+      mail: {
+        scope: "organization",
+        actions: ["read", "create"], defaultGrants: { "ADMIN": ["read", "create"] }
+      },
+    },
+  },
   schema: { mailDeliveries, mailDeliveryStatusEnum },
 });

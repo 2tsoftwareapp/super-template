@@ -1,65 +1,15 @@
-// Central application error codes. These are stable API contracts, not implementation details.
-// Keep new codes grouped by domain so client-side handling stays predictable.
+/**
+ * Generic transport/application error codes retained centrally. Every
+ * domain-specific code lives in its owning feature's public error-codes.ts
+ * (exported via that feature's contracts) — this file must not grow back into
+ * a handwritten catalog of feature vocabularies.
+ */
 export const ERROR_CODES = {
-  // Request and validation failures returned before business logic completes.
-  VALIDATION_FAILED: "VALIDATION_FAILED",
-  // Authentication failures cover missing credentials, expired sessions, or invalid refresh state.
-  AUTH_INVALID_CREDENTIALS: "AUTH_INVALID_CREDENTIALS",
-  AUTH_SESSION_EXPIRED: "AUTH_SESSION_EXPIRED",
-  AUTH_SESSION_REVOKED: "AUTH_SESSION_REVOKED",
-  AUTH_REFRESH_TOKEN_REUSED: "AUTH_REFRESH_TOKEN_REUSED",
-  AUTH_UNAUTHORIZED: "AUTH_UNAUTHORIZED",
   AUTH_FORBIDDEN: "AUTH_FORBIDDEN",
-  // Two-factor authentication setup, verification, and challenge failures.
-  MFA_ALREADY_ENABLED: "MFA_ALREADY_ENABLED",
-  MFA_NOT_ENABLED: "MFA_NOT_ENABLED",
-  MFA_SETUP_REQUIRED: "MFA_SETUP_REQUIRED",
-  MFA_INVALID_CODE: "MFA_INVALID_CODE",
-  MFA_CHALLENGE_INVALID: "MFA_CHALLENGE_INVALID",
-  MFA_CHALLENGE_EXPIRED: "MFA_CHALLENGE_EXPIRED",
-  MFA_TOO_MANY_ATTEMPTS: "MFA_TOO_MANY_ATTEMPTS",
-  // SSO (OIDC) login failures.
-  SSO_PROVIDER_UNAVAILABLE: "SSO_PROVIDER_UNAVAILABLE",
-  SSO_INVALID_REDIRECT: "SSO_INVALID_REDIRECT",
-  SSO_STATE_INVALID: "SSO_STATE_INVALID",
-  SSO_TOKEN_INVALID: "SSO_TOKEN_INVALID",
-  SSO_EMAIL_CONFLICT: "SSO_EMAIL_CONFLICT",
-  SSO_EXCHANGE_INVALID: "SSO_EXCHANGE_INVALID",
-  // User account and identity lifecycle conflicts.
-  USER_EMAIL_ALREADY_EXISTS: "USER_EMAIL_ALREADY_EXISTS",
-  USER_NOT_FOUND: "USER_NOT_FOUND",
-  // Organization membership lifecycle conflicts.
-  ORGANIZATION_NOT_FOUND: "ORGANIZATION_NOT_FOUND",
-  ORGANIZATION_MEMBER_NOT_FOUND: "ORGANIZATION_MEMBER_NOT_FOUND",
-  ORGANIZATION_LAST_OWNER: "ORGANIZATION_LAST_OWNER",
-  // Workspace and content lookup failures.
-  PROJECT_NOT_FOUND: "PROJECT_NOT_FOUND",
-  NOTIFICATION_NOT_FOUND: "NOTIFICATION_NOT_FOUND",
-  NOTIFICATION_DEVICE_NOT_FOUND: "NOTIFICATION_DEVICE_NOT_FOUND",
-  NOTIFICATION_INVALID_AUDIENCE: "NOTIFICATION_INVALID_AUDIENCE",
-  NOTIFICATION_JOB_NOT_FOUND: "NOTIFICATION_JOB_NOT_FOUND",
-  NOTIFICATION_JOB_NOT_CANCELLABLE: "NOTIFICATION_JOB_NOT_CANCELLABLE",
-  FILE_NOT_FOUND: "FILE_NOT_FOUND",
-  ROLE_NOT_FOUND: "ROLE_NOT_FOUND",
-  PERMISSION_NOT_FOUND: "PERMISSION_NOT_FOUND",
-  ATTACHMENT_NOT_FOUND: "ATTACHMENT_NOT_FOUND",
-  INVITATION_NOT_FOUND: "INVITATION_NOT_FOUND",
-  JOB_NOT_FOUND: "JOB_NOT_FOUND",
-  JOB_DEPENDENCY_CYCLE: "JOB_DEPENDENCY_CYCLE",
-  IMPORT_JOB_NOT_FOUND: "IMPORT_JOB_NOT_FOUND",
-  EXPORT_JOB_NOT_FOUND: "EXPORT_JOB_NOT_FOUND",
-  COMMENT_NOT_FOUND: "COMMENT_NOT_FOUND",
-  SETTINGS_NOT_FOUND: "SETTINGS_NOT_FOUND",
-  AUDIT_LOG_NOT_FOUND: "AUDIT_LOG_NOT_FOUND",
-  // Conflicts indicate the request was syntactically valid but violates uniqueness or state rules.
-  RESOURCE_CONFLICT: "RESOURCE_CONFLICT",
-  // Rate limiting rejects requests sent before a cooldown window has elapsed.
-  RATE_LIMITED: "RATE_LIMITED",
-  // Feature toggles enforced from application settings.
-  REGISTRATION_DISABLED: "REGISTRATION_DISABLED",
-  SERVICE_UNAVAILABLE: "SERVICE_UNAVAILABLE",
-  // Internal errors are reserved for unrecoverable server-side failures.
+  AUTH_UNAUTHORIZED: "AUTH_UNAUTHORIZED",
   INTERNAL_ERROR: "INTERNAL_ERROR",
+  RATE_LIMITED: "RATE_LIMITED",
+  RESOURCE_CONFLICT: "RESOURCE_CONFLICT",
+  SERVICE_UNAVAILABLE: "SERVICE_UNAVAILABLE",
+  VALIDATION_FAILED: "VALIDATION_FAILED",
 } as const;
-
-export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES];

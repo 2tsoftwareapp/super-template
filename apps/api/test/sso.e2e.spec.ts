@@ -1,6 +1,5 @@
 import type { INestApplication } from "@nestjs/common";
 
-import { ERROR_CODES } from "@repo/api-runtime";
 import request from "supertest";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
@@ -68,7 +67,7 @@ describe("SSO (e2e, fake provider)", () => {
       .query({ redirectUri: REDIRECT_URI })
       .expect(404)
       .expect((res) => {
-        expect(res.body.error.code).toBe(ERROR_CODES.SSO_PROVIDER_UNAVAILABLE);
+        expect(res.body.error.code).toBe(SSO_ERROR_CODES.SSO_PROVIDER_UNAVAILABLE);
       });
   });
 
@@ -78,7 +77,7 @@ describe("SSO (e2e, fake provider)", () => {
       .query({ redirectUri: "http://evil.example.com/callback" })
       .expect(400)
       .expect((res) => {
-        expect(res.body.error.code).toBe(ERROR_CODES.SSO_INVALID_REDIRECT);
+        expect(res.body.error.code).toBe(SSO_ERROR_CODES.SSO_INVALID_REDIRECT);
       });
   });
 
@@ -155,7 +154,7 @@ describe("SSO (e2e, fake provider)", () => {
       .send({ code: exchangeCode })
       .expect(401)
       .expect((res) => {
-        expect(res.body.error.code).toBe(ERROR_CODES.SSO_EXCHANGE_INVALID);
+        expect(res.body.error.code).toBe(SSO_ERROR_CODES.SSO_EXCHANGE_INVALID);
       });
   });
 
@@ -172,7 +171,7 @@ describe("SSO (e2e, fake provider)", () => {
       .query({ code, state })
       .expect(401)
       .expect((res) => {
-        expect(res.body.error.code).toBe(ERROR_CODES.SSO_STATE_INVALID);
+        expect(res.body.error.code).toBe(SSO_ERROR_CODES.SSO_STATE_INVALID);
       });
   });
 
@@ -198,7 +197,9 @@ describe("SSO (e2e, fake provider)", () => {
       .query({ code, state })
       .expect(409)
       .expect((res) => {
-        expect(res.body.error.code).toBe(ERROR_CODES.SSO_EMAIL_CONFLICT);
+        expect(res.body.error.code).toBe(SSO_ERROR_CODES.SSO_EMAIL_CONFLICT);
       });
   });
 });
+
+import { SSO_ERROR_CODES } from "@repo/feature-sso/contracts";

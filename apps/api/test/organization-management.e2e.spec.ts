@@ -1,6 +1,5 @@
 import type { INestApplication } from "@nestjs/common";
 
-import { ERROR_CODES } from "@repo/api-runtime";
 import { DATABASE, type DatabaseClient } from "@repo/database-runtime";
 import { organizationMembers } from "@repo/feature-users/schema";
 import { userRoles } from "@repo/feature-users/schema";
@@ -147,7 +146,7 @@ describe("Organization management (e2e)", () => {
       .set(bearer(ownerSession.accessToken))
       .send({});
     expect(leaveResponse.status).toBe(409);
-    expect(leaveResponse.body.error.code).toBe(ERROR_CODES.ORGANIZATION_LAST_OWNER);
+    expect(leaveResponse.body.error.code).toBe(ORGANIZATION_ERROR_CODES.ORGANIZATION_LAST_OWNER);
 
     // Promote the original admin member to co-owner, then the first owner can leave.
     await request(app.getHttpServer())
@@ -523,3 +522,5 @@ describe("Organization management (e2e)", () => {
       .expect(403);
   });
 });
+
+import { ORGANIZATION_ERROR_CODES } from "@repo/feature-organizations/contracts";

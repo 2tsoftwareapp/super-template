@@ -1,14 +1,13 @@
 import type { RequestContext } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, ERROR_CODES, hashOpaqueToken, SYSTEM_SCOPE } from "@repo/api-runtime";
+import {AppError, hashOpaqueToken, SYSTEM_SCOPE } from "@repo/api-runtime";
+import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 
 import type { MfaVerifyChallengeCommand } from "../mfa.types";
 
 import { MFA_REPOSITORY, type MfaRepositoryPort } from "../ports/mfa.repository.port";
 import { MfaCodeVerifierService } from "../services/mfa-code-verifier.service";
-import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
-import type { AuditWriter } from "@repo/feature-audit/contracts";
 
 const MAX_CHALLENGE_ATTEMPTS = 5;
 
@@ -30,7 +29,7 @@ export class VerifyMfaChallengeUseCase {
 
     if (!challenge) {
       throw new AppError(
-        ERROR_CODES.MFA_CHALLENGE_INVALID,
+        MFA_ERROR_CODES.MFA_CHALLENGE_INVALID,
         "Challenge is invalid or expired",
         HttpStatus.UNAUTHORIZED,
       );
@@ -38,7 +37,7 @@ export class VerifyMfaChallengeUseCase {
 
     if (challenge.attempts >= MAX_CHALLENGE_ATTEMPTS) {
       throw new AppError(
-        ERROR_CODES.MFA_TOO_MANY_ATTEMPTS,
+        MFA_ERROR_CODES.MFA_TOO_MANY_ATTEMPTS,
         "Too many failed attempts, request a new login",
         HttpStatus.TOO_MANY_REQUESTS,
       );
@@ -58,7 +57,7 @@ export class VerifyMfaChallengeUseCase {
       });
 
       throw new AppError(
-        ERROR_CODES.MFA_INVALID_CODE,
+        MFA_ERROR_CODES.MFA_INVALID_CODE,
         "Invalid verification code",
         HttpStatus.UNAUTHORIZED,
       );
@@ -71,7 +70,7 @@ export class VerifyMfaChallengeUseCase {
 
     if (!consumed) {
       throw new AppError(
-        ERROR_CODES.MFA_CHALLENGE_INVALID,
+        MFA_ERROR_CODES.MFA_CHALLENGE_INVALID,
         "Challenge was already used",
         HttpStatus.UNAUTHORIZED,
       );
@@ -89,3 +88,5 @@ export class VerifyMfaChallengeUseCase {
     return { userId: challenge.userId };
   }
 }
+
+import { MFA_ERROR_CODES } from "@repo/feature-mfa/contracts";

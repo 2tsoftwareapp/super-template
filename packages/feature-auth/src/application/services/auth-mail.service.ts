@@ -1,7 +1,9 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { EnvironmentService } from "@repo/api-runtime";
-import { MAIL_TEMPLATE_SENDER } from "@repo/feature-mail/contracts";
-import type { MailTemplateSender } from "@repo/feature-mail/contracts";
+import {
+  MAIL_TEMPLATE_SENDER,
+  type MailTemplateSender,
+} from "@repo/feature-mail/contracts";
 
 @Injectable()
 export class AuthMailService {

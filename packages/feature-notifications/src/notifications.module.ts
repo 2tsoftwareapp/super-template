@@ -1,6 +1,9 @@
 import { Global, Module } from "@nestjs/common";
-
-import { USER_NOTIFICATION_SENDER } from "@repo/feature-notifications/contracts";
+import {
+  NOTIFICATION_JOB_HANDLER_PROVIDER,
+  NotificationJobHandler,
+} from "./application/notification-job.handler";
+import { USER_NOTIFICATION_SENDER } from "./public/user-notification-sender.port";
 
 import { NotificationsMapper } from "./application/notifications.mapper";
 import { NotificationsService } from "./application/notifications.service";
@@ -75,6 +78,8 @@ import {
       provide: USER_NOTIFICATION_SENDER,
       useExisting: NotificationsService,
     },
+    NotificationJobHandler,
+    NOTIFICATION_JOB_HANDLER_PROVIDER,
   ],
   exports: [
     NotificationsService,

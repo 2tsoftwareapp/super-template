@@ -2,15 +2,17 @@ import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime
 import type { TransactionPort } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, ERROR_CODES, SYSTEM_SCOPE } from "@repo/api-runtime";
+import {AppError, SYSTEM_SCOPE } from "@repo/api-runtime";
+import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 import { TRANSACTION_PORT } from "@repo/api-runtime";
 import { AccessControlService, ROLE_NAMES } from "@repo/feature-access-control/contracts";
-import { AUTH_TOKEN_CLEANUP, type AuthTokenCleanup } from "@repo/feature-users/contracts";
+import {
+  OUTBOX_APPENDER,
+  type OutboxAppenderPort,
+} from "@repo/feature-outbox/contracts";
 
 import { assertUserBelongsToOrganization } from "../../domain/user-org-scope.policy";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";
-import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
-import type { AuditWriter } from "@repo/feature-audit/contracts";
 
 @Injectable()
 export class DeleteUserUseCase {
@@ -20,7 +22,7 @@ export class DeleteUserUseCase {
     private readonly usersRepository: UsersRepositoryPort,
     private readonly accessControlService: AccessControlService,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
-    @Inject(AUTH_TOKEN_CLEANUP) private readonly authTokenCleanup: AuthTokenCleanup,
+    @Inject(OUTBOX_APPENDER) private readonly outbox: OutboxAppenderPort,
   ) {}
 
   async execute(actor: AuthenticatedRequestUser, userId: string, requestContext?: RequestContext) {
@@ -34,7 +36,7 @@ export class DeleteUserUseCase {
     const user = await this.usersRepository.findById(userId);
 
     if (!user) {
-      throw new AppError(ERROR_CODES.USER_NOT_FOUND, "User not found", HttpStatus.NOT_FOUND);
+      throw new AppError(USER_ERROR_CODES.USER_NOT_FOUND, "User not found", HttpStatus.NOT_FOUND);
     }
 
     if (actor.userId === userId) {
@@ -56,7 +58,7 @@ export class DeleteUserUseCase {
 
     await this.transactionPort.run(async (transaction) => {
       await this.usersRepository.softDelete(userId, transaction);
-      await this.authTokenCleanup.revokeAllSessionsForUser(userId, transaction);
+      await this.outbox.append("user.lifecycle.deleted", { userId }, transaction);
       await this.auditWriter.log(
         {
           actorId: actor.userId,
@@ -73,3 +75,6 @@ export class DeleteUserUseCase {
     });
   }
 }
+
+import { ERROR_CODES } from "@repo/api-runtime";
+import { USER_ERROR_CODES } from "@repo/feature-users/contracts";

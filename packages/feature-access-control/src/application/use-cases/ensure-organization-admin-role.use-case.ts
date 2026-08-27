@@ -1,7 +1,7 @@
 import type { TransactionExecutor } from "@repo/api-runtime";
+import { ROLE_NAMES } from "../../access-control.constants";
 
 import { Inject, Injectable } from "@nestjs/common";
-import { permissionNamesForRole, ROLE_NAMES } from "@repo/api-runtime";
 
 import {
   ACCESS_CONTROL_REPOSITORY,
@@ -22,10 +22,9 @@ export class EnsureOrganizationAdminRoleUseCase {
     userId: string,
     executor?: TransactionExecutor,
   ): Promise<void> {
-    const allPermissions = await this.accessControlRepository.findPermissionsByNames(
-      permissionNamesForRole(ROLE_NAMES.ADMIN),
-      executor,
-    );
+    // Org-admin role receives every organization-scoped permission contributed
+    // by the composed feature set (equivalent to the previous central matrix).
+    const allPermissions = await this.accessControlRepository.findAllPermissions(executor);
     const permissions = allPermissions.filter((p) => p.scope !== "platform");
     const role = await this.accessControlRepository.ensureOrganizationSystemRole(
       ROLE_NAMES.ADMIN,

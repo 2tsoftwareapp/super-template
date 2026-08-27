@@ -10,5 +10,13 @@ export const activitiesFeature: FeatureManifest = defineFeature({
   resourceScopes: {
     activities: "organization",
   },
+  authorization: {
+    resources: {
+      activities: {
+        scope: "organization",
+        actions: ["read"], defaultGrants: { "ADMIN": ["read"], "USER": ["read"] }
+      },
+    },
+  },
   schema: { activities, activityVisibilityEnum },
 });

@@ -13,3 +13,7 @@ export {
   type FeatureSeeder,
   orderFeatureManifests,
 } from "./feature-manifest";
+export type {
+  ComposedAuthorization,
+  FeatureAuthorizationResource,
+} from "./feature-manifest";

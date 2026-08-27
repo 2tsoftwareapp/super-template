@@ -1,0 +1,35 @@
+{
+  "name": "@repo/feature-outbox",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "exports": {
+    ".": "./src/index.ts",
+    "./contracts": "./src/public/contracts.ts",
+    "./module": "./src/outbox.module.ts",
+    "./schema": "./src/infrastructure/persistence/outbox-messages.ts",
+    "./testing": "./src/testing/index.ts"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint .",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "@nestjs/common": "11.1.27",
+    "@nestjs/schedule": "6.1.1",
+    "@repo/api-kernel": "workspace:*",
+    "@repo/api-plugin-kit": "workspace:*",
+    "@repo/api-runtime": "workspace:*",
+    "@repo/database-runtime": "workspace:*",
+    "drizzle-orm": "0.45.2"
+  },
+  "devDependencies": {
+    "@repo/tsconfig": "workspace:*",
+    "@types/node": "24.10.1",
+    "typescript": "5.9.3",
+    "vitest": "4.1.9"
+  }
+}

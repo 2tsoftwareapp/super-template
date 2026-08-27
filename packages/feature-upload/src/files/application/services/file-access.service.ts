@@ -1,7 +1,7 @@
 import type { AuthenticatedRequestUser } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, ERROR_CODES } from "@repo/api-runtime";
+import {AppError } from "@repo/api-runtime";
 
 import { canAccessFile } from "../../domain/file-access.policy";
 import { FILES_REPOSITORY, type FilesRepositoryPort } from "../ports/files.repository.port";
@@ -14,7 +14,7 @@ export class FileAccessService {
     const file = await this.filesRepository.findById(fileId);
 
     if (!file) {
-      throw new AppError(ERROR_CODES.FILE_NOT_FOUND, "File not found", HttpStatus.NOT_FOUND);
+      throw new AppError(FILE_ERROR_CODES.FILE_NOT_FOUND, "File not found", HttpStatus.NOT_FOUND);
     }
 
     if (
@@ -43,3 +43,6 @@ export class FileAccessService {
     return file;
   }
 }
+
+import { ERROR_CODES } from "@repo/api-runtime";
+import { FILE_ERROR_CODES } from "@repo/feature-upload/contracts";

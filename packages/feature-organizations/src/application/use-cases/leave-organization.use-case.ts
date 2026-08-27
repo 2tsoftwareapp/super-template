@@ -2,19 +2,18 @@ import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime
 import type { TransactionPort } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, ERROR_CODES, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
+import {AppError, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
+import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 
 import { assertNotLastOwner } from "../../domain/organization-access.policy";
 import { ORGANIZATION_MEMBERSHIP, type OrganizationMembership } from "../../public/contracts";
-import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
-import type { AuditWriter } from "@repo/feature-audit/contracts";
-
 import {
   ORGANIZATION_ACCESS_CONTROL,
   type OrganizationAccessControlPort,
 } from "../../public/contracts";
 
 @Injectable()
+
 export class LeaveOrganizationUseCase {
   constructor(
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
@@ -62,7 +61,7 @@ export class LeaveOrganizationUseCase {
 
       if (!removed) {
         throw new AppError(
-          ERROR_CODES.ORGANIZATION_MEMBER_NOT_FOUND,
+          ORGANIZATION_ERROR_CODES.ORGANIZATION_MEMBER_NOT_FOUND,
           "You are not a member of this organization",
           HttpStatus.NOT_FOUND,
         );
@@ -91,3 +90,6 @@ export class LeaveOrganizationUseCase {
     });
   }
 }
+
+import { ERROR_CODES } from "@repo/api-runtime";
+import { ORGANIZATION_ERROR_CODES } from "@repo/feature-organizations/contracts";

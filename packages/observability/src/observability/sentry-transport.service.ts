@@ -3,7 +3,10 @@ import * as Sentry from "@sentry/node";
 
 import type { ErrorReportContext } from "./observability.types";
 
-import { OBSERVABILITY_ENV, type ObservabilityEnvironment } from "./observability-environment";
+import {
+  OBSERVABILITY_ENV,
+  type ObservabilityEnvironment,
+} from "./observability-environment";
 
 let sentryInitialized = false;
 

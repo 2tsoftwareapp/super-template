@@ -4,7 +4,11 @@ import type { TransactionExecutor } from "@repo/api-kernel";
 import { AUDIT_REPOSITORY } from "./application/ports/audit.repository.port";
 import { RecordAuditLogUseCase } from "./application/use-cases/record-audit-log.use-case";
 import { AuditRepository } from "./infrastructure/audit.repository";
-import { AUDIT_WRITER, type AuditWriter } from "./public/audit-writer.port";
+import {
+  AUDIT_WRITER,
+  type AuditLogInput,
+  type AuditWriter,
+} from "./public/audit-writer.port";
 
 /**
  * Audit writer core: the only surface other features need (AUDIT_WRITER).
@@ -23,10 +27,7 @@ import { AUDIT_WRITER, type AuditWriter } from "./public/audit-writer.port";
     {
       provide: AUDIT_WRITER,
       useFactory: (recordAuditLog: RecordAuditLogUseCase): AuditWriter => ({
-        async log(
-          input: Parameters<RecordAuditLogUseCase["execute"]>[0],
-          executor?: TransactionExecutor,
-        ): Promise<void> {
+        async log(input: AuditLogInput, executor?: TransactionExecutor): Promise<void> {
           await recordAuditLog.execute(input, executor);
         },
       }),

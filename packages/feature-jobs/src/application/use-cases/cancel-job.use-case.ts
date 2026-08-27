@@ -1,14 +1,7 @@
 import type { AuthenticatedRequestUser } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {
-  AppError,
-  ERROR_CODES,
-  TRANSACTION_PORT,
-  type TransactionExecutor,
-  type TransactionPort,
-  WORKER_DISPATCH_CONTEXT,
-} from "@repo/api-runtime";
+import {AppError, TRANSACTION_PORT, type TransactionExecutor, type TransactionPort, WORKER_DISPATCH_CONTEXT } from "@repo/api-runtime";
 
 import type { JobView } from "../jobs.types";
 
@@ -67,7 +60,7 @@ export class CancelJobUseCase {
       const existing = await this.jobsRepository.findById(jobId, scope);
 
       if (!existing) {
-        throw new AppError(ERROR_CODES.JOB_NOT_FOUND, "Job not found", HttpStatus.NOT_FOUND);
+        throw new AppError(JOB_ERROR_CODES.JOB_NOT_FOUND, "Job not found", HttpStatus.NOT_FOUND);
       }
 
       throw new AppError(
@@ -86,3 +79,6 @@ export class CancelJobUseCase {
       : { type: "platform" };
   }
 }
+
+import { ERROR_CODES } from "@repo/api-runtime";
+import { JOB_ERROR_CODES } from "@repo/feature-jobs/contracts";

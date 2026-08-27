@@ -1,12 +1,5 @@
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {
-  AppError,
-  ERROR_CODES,
-  TRANSACTION_PORT,
-  type TransactionExecutor,
-  type TransactionPort,
-  WORKER_DISPATCH_CONTEXT,
-} from "@repo/api-runtime";
+import {AppError, TRANSACTION_PORT, type TransactionExecutor, type TransactionPort, WORKER_DISPATCH_CONTEXT } from "@repo/api-runtime";
 
 import {
   JOB_OBSERVABILITY_REPOSITORY,
@@ -30,7 +23,7 @@ export class AddJobDependencyUseCase {
   async execute(jobId: string, dependsOnJobId: string, scope: JobScope) {
     if (jobId === dependsOnJobId) {
       throw new AppError(
-        ERROR_CODES.JOB_DEPENDENCY_CYCLE,
+        JOB_ERROR_CODES.JOB_DEPENDENCY_CYCLE,
         "A job cannot depend on itself",
         HttpStatus.CONFLICT,
       );
@@ -47,13 +40,13 @@ export class AddJobDependencyUseCase {
         ]);
 
         if (!job || !dependsOnJob) {
-          throw new AppError(ERROR_CODES.JOB_NOT_FOUND, "Job not found", HttpStatus.NOT_FOUND);
+          throw new AppError(JOB_ERROR_CODES.JOB_NOT_FOUND, "Job not found", HttpStatus.NOT_FOUND);
         }
 
         // R2-9: Status validation
         if (job.status !== "PENDING") {
           throw new AppError(
-            ERROR_CODES.JOB_DEPENDENCY_CYCLE,
+            JOB_ERROR_CODES.JOB_DEPENDENCY_CYCLE,
             "Only pending jobs can have dependencies added",
             HttpStatus.CONFLICT,
           );
@@ -62,7 +55,7 @@ export class AddJobDependencyUseCase {
         // Same-scope validation
         if (job.organizationId !== dependsOnJob.organizationId) {
           throw new AppError(
-            ERROR_CODES.JOB_DEPENDENCY_CYCLE,
+            JOB_ERROR_CODES.JOB_DEPENDENCY_CYCLE,
             "Cannot create dependency across different scopes",
             HttpStatus.CONFLICT,
           );
@@ -76,7 +69,7 @@ export class AddJobDependencyUseCase {
         );
         if (wouldCycle) {
           throw new AppError(
-            ERROR_CODES.JOB_DEPENDENCY_CYCLE,
+            JOB_ERROR_CODES.JOB_DEPENDENCY_CYCLE,
             "Adding this dependency would create a cycle",
             HttpStatus.CONFLICT,
           );
@@ -103,3 +96,5 @@ export class AddJobDependencyUseCase {
     };
   }
 }
+
+import { JOB_ERROR_CODES } from "@repo/feature-jobs/contracts";

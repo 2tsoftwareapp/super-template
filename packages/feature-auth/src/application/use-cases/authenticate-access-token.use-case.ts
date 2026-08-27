@@ -1,7 +1,7 @@
 import type { AuthenticatedRequestUser } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, ERROR_CODES } from "@repo/api-runtime";
+import {AppError } from "@repo/api-runtime";
 import { AccessControlService } from "@repo/feature-access-control/contracts";
 import { AUTH_USER_STORE, type AuthUserStore } from "@repo/feature-auth/contracts";
 import { OrganizationsService } from "@repo/feature-organizations/contracts";
@@ -50,14 +50,14 @@ export class AuthenticateAccessTokenUseCase {
 
     if (session.expiresAt <= new Date()) {
       throw new AppError(
-        ERROR_CODES.AUTH_SESSION_EXPIRED,
+        AUTH_ERROR_CODES.AUTH_SESSION_EXPIRED,
         "Session has expired",
         HttpStatus.UNAUTHORIZED,
       );
     }
 
     if (!user) {
-      throw new AppError(ERROR_CODES.USER_NOT_FOUND, "User not found", HttpStatus.NOT_FOUND);
+      throw new AppError(USER_ERROR_CODES.USER_NOT_FOUND, "User not found", HttpStatus.NOT_FOUND);
     }
 
     if (user.status !== "ACTIVE") {
@@ -87,3 +87,7 @@ export class AuthenticateAccessTokenUseCase {
     };
   }
 }
+
+import { ERROR_CODES } from "@repo/api-runtime";
+import { AUTH_ERROR_CODES } from "@repo/feature-auth/contracts";
+import { USER_ERROR_CODES } from "@repo/feature-users/contracts";

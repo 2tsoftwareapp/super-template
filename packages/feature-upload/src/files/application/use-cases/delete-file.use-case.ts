@@ -3,12 +3,11 @@ import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime
 import { Inject, Injectable } from "@nestjs/common";
 import { SYSTEM_SCOPE } from "@repo/api-runtime";
 import { TRANSACTION_PORT, type TransactionPort } from "@repo/api-runtime";
+import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 
 import { OBJECT_STORAGE, type ObjectStorage } from "../../../storage";
 import { FILES_REPOSITORY, type FilesRepositoryPort } from "../ports/files.repository.port";
 import { FileAccessService } from "../services/file-access.service";
-import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
-import type { AuditWriter } from "@repo/feature-audit/contracts";
 
 @Injectable()
 export class DeleteFileUseCase {

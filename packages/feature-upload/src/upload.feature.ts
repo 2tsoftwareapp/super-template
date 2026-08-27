@@ -12,11 +12,24 @@ import { UploadModule } from "./upload.module";
 
 export const uploadFeature: FeatureManifest = defineFeature({
   id: "upload",
-  dependsOn: ["auth", "organizations", "users", "activities", "audit"],
+  dependsOn: ["auth", "organizations", "users", "activities", "audit", "access-control"],
+  provides: ["file-view"],
   nestModule: UploadModule,
   resourceScopes: {
     files: "organization",
     attachments: "organization",
+  },
+  authorization: {
+    resources: {
+      files: {
+        scope: "organization",
+        actions: ["read", "create", "update", "delete"], defaultGrants: { "ADMIN": ["*"], "USER": ["*"] }
+      },
+      attachments: {
+        scope: "organization",
+        actions: ["read", "create", "update", "delete"], defaultGrants: { "ADMIN": ["*"], "USER": ["*"] }
+      },
+    },
   },
   schema: {
     files,

@@ -1,12 +1,5 @@
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {
-  AppError,
-  durationToMilliseconds,
-  EnvironmentService,
-  ERROR_CODES,
-  generateOpaqueToken,
-  hashOpaqueToken,
-} from "@repo/api-runtime";
+import {AppError, durationToMilliseconds, EnvironmentService, generateOpaqueToken, hashOpaqueToken } from "@repo/api-runtime";
 
 import type { StartSsoLoginCommand } from "../sso.types";
 
@@ -31,7 +24,7 @@ export class StartSsoLoginUseCase {
 
     if (!provider) {
       throw new AppError(
-        ERROR_CODES.SSO_PROVIDER_UNAVAILABLE,
+        SSO_ERROR_CODES.SSO_PROVIDER_UNAVAILABLE,
         `SSO provider "${input.provider}" is not available`,
         HttpStatus.NOT_FOUND,
       );
@@ -67,3 +60,5 @@ export class StartSsoLoginUseCase {
     return { authorizationUrl };
   }
 }
+
+import { SSO_ERROR_CODES } from "@repo/feature-sso/contracts";

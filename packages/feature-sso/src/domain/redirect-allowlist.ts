@@ -1,4 +1,4 @@
-import { AppError, ERROR_CODES } from "@repo/api-runtime";
+import {AppError } from "@repo/api-runtime";
 
 const normalizeRedirectUri = (redirectUri: string): string => {
   const parsed = new URL(redirectUri);
@@ -21,7 +21,7 @@ export const assertAllowedRedirectUri = (
     parsed = new URL(redirectUri);
   } catch {
     throw new AppError(
-      ERROR_CODES.SSO_INVALID_REDIRECT,
+      SSO_ERROR_CODES.SSO_INVALID_REDIRECT,
       "redirectUri must be an absolute URL",
       400,
     );
@@ -35,13 +35,15 @@ export const assertAllowedRedirectUri = (
 
   if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
     throw new AppError(
-      ERROR_CODES.SSO_INVALID_REDIRECT,
+      SSO_ERROR_CODES.SSO_INVALID_REDIRECT,
       "redirectUri is not an allowed origin",
       400,
     );
   }
 
   const isAllowed = allowedOrigins.some((origin) => {
+
+import { SSO_ERROR_CODES } from "@repo/feature-sso/contracts";
     try {
       return new URL(origin).origin === parsed.origin;
     } catch {
@@ -51,7 +53,7 @@ export const assertAllowedRedirectUri = (
 
   if (!isAllowed) {
     throw new AppError(
-      ERROR_CODES.SSO_INVALID_REDIRECT,
+      SSO_ERROR_CODES.SSO_INVALID_REDIRECT,
       "redirectUri is not an allowed origin",
       400,
     );

@@ -4,8 +4,6 @@ export { AUTH_SESSION_REPOSITORY } from "./application/ports/auth-session.reposi
 export type * from "./application/ports/auth-session.repository.port";
 export { AUTH_TOKEN_PROVIDER } from "./application/ports/auth-token.provider.port";
 export type * from "./application/ports/auth-token.provider.port";
-export { OUTBOX_REPOSITORY } from "./application/ports/outbox.repository.port";
-export type * from "./application/ports/outbox.repository.port";
 export { IssueSessionUseCase } from "./application/use-cases/issue-session.use-case";
 export { AuthDataModule } from "./auth-data.module";
 export { AuthModule } from "./auth.module";

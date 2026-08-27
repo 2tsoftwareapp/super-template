@@ -1,5 +1,10 @@
 import { Injectable, Logger } from "@nestjs/common";
-import { type AppLogger, type LogContext, type LogEntry, type LogLevel } from "@repo/api-kernel";
+import {
+  type AppLogger,
+  type LogContext,
+  type LogEntry,
+  type LogLevel,
+} from "@repo/api-kernel";
 
 @Injectable()
 export class ConsoleAppLogger implements AppLogger {

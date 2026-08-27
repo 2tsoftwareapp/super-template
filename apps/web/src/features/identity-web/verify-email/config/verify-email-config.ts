@@ -1,4 +1,5 @@
-export const VERIFY_EMAIL_ADMIN_URL = process.env.NEXT_PUBLIC_ADMIN_URL ?? "http://localhost:3002";
+export const VERIFY_EMAIL_ADMIN_URL =
+  process.env.NEXT_PUBLIC_ADMIN_URL ?? "http://localhost:3002";
 
 export const VERIFY_EMAIL_REDIRECT_DELAY_MS = 3000;
 

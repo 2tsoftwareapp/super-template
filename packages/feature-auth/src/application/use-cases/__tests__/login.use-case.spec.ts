@@ -1,5 +1,4 @@
 import { describe, expect, it, vi } from "vitest";
-import { ERROR_CODES } from "@repo/api-runtime";
 
 import { LoginUseCase } from "../login.use-case";
 
@@ -21,7 +20,7 @@ describe("LoginUseCase", () => {
         password: "wrong-password",
       }),
     ).rejects.toMatchObject({
-      code: ERROR_CODES.AUTH_INVALID_CREDENTIALS,
+      code: AUTH_ERROR_CODES.AUTH_INVALID_CREDENTIALS,
     });
 
     expect(auditWriter.log).toHaveBeenCalledWith(
@@ -29,3 +28,5 @@ describe("LoginUseCase", () => {
     );
   });
 });
+
+import { AUTH_ERROR_CODES } from "@repo/feature-auth/contracts";

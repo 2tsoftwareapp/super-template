@@ -3,7 +3,8 @@ import type { Request } from "express";
 
 import { Body, Controller, Get, Param, Patch, Req } from "@nestjs/common";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
-import { ACTION, ApiArrayResponse, ApiDataResponse, perm, ROLE_NAMES } from "@repo/api-runtime";
+import {ACTION, ApiArrayResponse, ApiDataResponse, perm } from "@repo/api-runtime";
+import { ROLE_NAMES } from "@repo/feature-access-control/contracts";
 import { CurrentUser } from "@repo/api-runtime";
 import { Authorize } from "@repo/api-runtime";
 

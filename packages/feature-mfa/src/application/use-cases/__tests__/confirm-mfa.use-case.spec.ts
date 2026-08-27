@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { ERROR_CODES, EnvironmentService } from "@repo/api-runtime";
+import {EnvironmentService } from "@repo/api-runtime";
 
 import { encryptTotpSecret } from "../../../domain/totp-encryption";
 import { generateTotpCode, generateTotpSecret } from "../../../domain/totp";
@@ -30,7 +30,7 @@ describe("ConfirmMfaUseCase", () => {
     );
 
     await expect(useCase.execute({ userId: "u1", code: "000000" })).rejects.toMatchObject({
-      code: ERROR_CODES.MFA_SETUP_REQUIRED,
+      code: MFA_ERROR_CODES.MFA_SETUP_REQUIRED,
     });
   });
 
@@ -46,7 +46,7 @@ describe("ConfirmMfaUseCase", () => {
     );
 
     await expect(useCase.execute({ userId: "u1", code: "000000" })).rejects.toMatchObject({
-      code: ERROR_CODES.MFA_ALREADY_ENABLED,
+      code: MFA_ERROR_CODES.MFA_ALREADY_ENABLED,
     });
   });
 
@@ -69,7 +69,7 @@ describe("ConfirmMfaUseCase", () => {
     );
 
     await expect(useCase.execute({ userId: "u1", code: "000000" })).rejects.toMatchObject({
-      code: ERROR_CODES.MFA_INVALID_CODE,
+      code: MFA_ERROR_CODES.MFA_INVALID_CODE,
     });
   });
 
@@ -109,3 +109,5 @@ describe("ConfirmMfaUseCase", () => {
     );
   });
 });
+
+import { MFA_ERROR_CODES } from "@repo/feature-mfa/contracts";

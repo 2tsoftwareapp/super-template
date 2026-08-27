@@ -1,15 +1,12 @@
 import type { AuthenticatedRequestUser, JsonValue, RequestContext } from "@repo/api-runtime";
+import { isFixedRoleName } from "../../access-control.constants";
 import type { TransactionExecutor, TransactionPort } from "@repo/api-runtime";
+import { AuditWriter } from "@repo/feature-audit/contracts";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {
-  AppError,
-  ERROR_CODES,
-  isFixedRoleName,
-  ROLE_NAMES,
-  SYSTEM_SCOPE,
-  TRANSACTION_PORT,
-} from "@repo/api-runtime";
+import {AppError, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
+import { ROLE_NAMES } from "../../access-control.constants";
+import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
 
 import type { PermissionView, RoleView, UpdateRoleCommand } from "../access-control.types";
 
@@ -20,8 +17,6 @@ import {
   type AccessControlRepositoryPort,
 } from "../ports/access-control.repository.port";
 import { AccessProfileUseCase } from "./access-profile.use-case";
-import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
-import type { AuditWriter } from "@repo/feature-audit/contracts";
 
 function normalizeRoleName(name: string): string {
   return name.trim().toUpperCase();
@@ -48,7 +43,7 @@ export class UpdateCustomRoleUseCase {
       return await this.transactionPort.run(async (tx) => {
         const role = await this.accessControlRepository.findRoleById(roleId, tx);
         if (!role)
-          throw new AppError(ERROR_CODES.ROLE_NOT_FOUND, "Role not found", HttpStatus.NOT_FOUND);
+          throw new AppError(ACCESS_CONTROL_ERROR_CODES.ROLE_NOT_FOUND, "Role not found", HttpStatus.NOT_FOUND);
         assertCanModifyCustomRole(actor, role);
         const newName = command.name !== undefined ? normalizeRoleName(command.name) : undefined;
         if (newName !== undefined && newName !== role.name) {
@@ -206,3 +201,6 @@ export class UpdateCustomRoleUseCase {
     return rows.map((p) => this.accessControlMapper.toPermissionView(p as PermissionView));
   }
 }
+
+import { ERROR_CODES } from "@repo/api-runtime";
+import { ACCESS_CONTROL_ERROR_CODES } from "@repo/feature-access-control/contracts";

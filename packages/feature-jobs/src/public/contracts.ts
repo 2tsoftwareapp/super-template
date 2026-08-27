@@ -3,11 +3,10 @@ export type { JobStatus } from "../domain/job-status";
 export { JobsRepository } from "../infrastructure/jobs.repository";
 /** Public contracts for @repo/feature-jobs. */
 export { JobsModule } from "../jobs.module";
+export * from "./background-job-enqueuer.port";
 export {
-  BACKGROUND_JOB_ENQUEUER,
-  BACKGROUND_JOB_ENQUEUER_WITH_RESULT,
-  type BackgroundJobEnqueueInput,
-  type BackgroundJobEnqueuer,
-  type BackgroundJobEnqueuerWithResult,
-  type BackgroundJobRef,
-} from "./job-enqueuer.port";
+  JOB_HANDLER,
+  type JobHandlerContribution,
+  type JobHandlerContext,
+} from "./job-handler.port";
+export { JOB_ERROR_CODES } from "./error-codes";

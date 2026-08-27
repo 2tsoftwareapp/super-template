@@ -2,8 +2,14 @@ import type { AuthenticatedRequestUser } from "@repo/api-runtime";
 
 import { Controller, Get, Param, ParseUUIDPipe, Query } from "@nestjs/common";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
-import { ACTION, ApiDataResponse, ApiPaginatedResponse, perm } from "@repo/api-runtime";
-import { Authorize, CurrentUser } from "@repo/api-runtime";
+import {
+  ACTION,
+  ApiPaginatedResponse,
+  ApiDataResponse,
+  Authorize,
+  CurrentUser,
+  perm,
+} from "@repo/api-runtime";
 
 import { GetAuditLogUseCase } from "../application/use-cases/get-audit-log.use-case";
 import { ListAuditLogsUseCase } from "../application/use-cases/list-audit-logs.use-case";

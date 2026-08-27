@@ -1,5 +1,5 @@
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, ERROR_CODES } from "@repo/api-runtime";
+import {AppError } from "@repo/api-runtime";
 
 import {
   JOB_OBSERVABILITY_REPOSITORY,
@@ -28,7 +28,7 @@ export class GetJobLogsUseCase {
     const job = await this.jobsRepository.findById(jobId, scope);
 
     if (!job) {
-      throw new AppError(ERROR_CODES.JOB_NOT_FOUND, "Job not found", HttpStatus.NOT_FOUND);
+      throw new AppError(JOB_ERROR_CODES.JOB_NOT_FOUND, "Job not found", HttpStatus.NOT_FOUND);
     }
 
     const result = await this.jobObservabilityRepository.listEvents({
@@ -51,3 +51,5 @@ export class GetJobLogsUseCase {
     };
   }
 }
+
+import { JOB_ERROR_CODES } from "@repo/feature-jobs/contracts";

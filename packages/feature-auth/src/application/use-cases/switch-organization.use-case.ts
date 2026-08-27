@@ -1,7 +1,8 @@
 import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, ERROR_CODES, SYSTEM_SCOPE } from "@repo/api-runtime";
+import {AppError, SYSTEM_SCOPE } from "@repo/api-runtime";
+import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 import { OrganizationsService } from "@repo/feature-organizations/contracts";
 
 import {
@@ -9,8 +10,6 @@ import {
   type AuthSessionRepositoryPort,
 } from "../ports/auth-session.repository.port";
 import { AUTH_TOKEN_PROVIDER, type AuthTokenProviderPort } from "../ports/auth-token.provider.port";
-import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
-import type { AuditWriter } from "@repo/feature-audit/contracts";
 
 @Injectable()
 export class SwitchOrganizationUseCase {
@@ -37,7 +36,7 @@ export class SwitchOrganizationUseCase {
 
     if (!session) {
       throw new AppError(
-        ERROR_CODES.AUTH_SESSION_REVOKED,
+        AUTH_ERROR_CODES.AUTH_SESSION_REVOKED,
         "Session not found",
         HttpStatus.UNAUTHORIZED,
       );
@@ -59,7 +58,7 @@ export class SwitchOrganizationUseCase {
 
     if (!rotated) {
       throw new AppError(
-        ERROR_CODES.AUTH_REFRESH_TOKEN_REUSED,
+        AUTH_ERROR_CODES.AUTH_REFRESH_TOKEN_REUSED,
         "Session changed during organization switch",
         HttpStatus.CONFLICT,
       );
@@ -83,3 +82,5 @@ export class SwitchOrganizationUseCase {
     };
   }
 }
+
+import { AUTH_ERROR_CODES } from "@repo/feature-auth/contracts";

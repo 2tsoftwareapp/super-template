@@ -1,7 +1,5 @@
 import { describe, expect, it } from "vitest";
 
-import { ERROR_CODES } from "@repo/api-runtime";
-
 import {
   assertCanManageTargetRole,
   assertNotLastOwner,
@@ -50,7 +48,7 @@ describe("assertNotLastOwner", () => {
 
   it("blocks removing the last owner", () => {
     expect(() => assertNotLastOwner({ userId: "u1", role: "OWNER" }, 0)).toThrowError(
-      expect.objectContaining({ code: ERROR_CODES.ORGANIZATION_LAST_OWNER }),
+      expect.objectContaining({ code: ORGANIZATION_ERROR_CODES.ORGANIZATION_LAST_OWNER }),
     );
   });
 
@@ -58,3 +56,6 @@ describe("assertNotLastOwner", () => {
     expect(() => assertNotLastOwner({ userId: "u1", role: "MEMBER" }, 0)).not.toThrow();
   });
 });
+
+import { ERROR_CODES } from "@repo/api-runtime";
+import { ORGANIZATION_ERROR_CODES } from "@repo/feature-organizations/contracts";

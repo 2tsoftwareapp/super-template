@@ -1,7 +1,7 @@
 import type { AuthenticatedRequestUser } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, ERROR_CODES } from "@repo/api-runtime";
+import {AppError } from "@repo/api-runtime";
 
 import { ExportsMapper } from "../exports.mapper";
 import {
@@ -20,7 +20,7 @@ export class GetExportUseCase {
 
     if (job?.createdById !== actor.userId) {
       throw new AppError(
-        ERROR_CODES.EXPORT_JOB_NOT_FOUND,
+        IMPORT_EXPORT_ERROR_CODES.EXPORT_JOB_NOT_FOUND,
         "Export job not found",
         HttpStatus.NOT_FOUND,
       );
@@ -29,3 +29,5 @@ export class GetExportUseCase {
     return ExportsMapper.toDto(job);
   }
 }
+
+import { IMPORT_EXPORT_ERROR_CODES } from "@repo/feature-import-export/contracts";

@@ -1,13 +1,12 @@
 import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime";
 import type { TransactionPort } from "@repo/api-runtime";
+import { AuditWriter } from "@repo/feature-audit/contracts";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, ERROR_CODES, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
+import {AppError, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
+import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
 
 import { assertCanModifyCustomRole } from "../../domain/role-assignment.policy";
-import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
-import type { AuditWriter } from "@repo/feature-audit/contracts";
-
 import {
   ACCESS_CONTROL_REPOSITORY,
   type AccessControlRepositoryPort,
@@ -30,7 +29,7 @@ export class DeleteCustomRoleUseCase {
     return this.transactionPort.run(async (tx) => {
       const role = await this.accessControlRepository.findRoleByIdWithLock(roleId, tx);
       if (!role)
-        throw new AppError(ERROR_CODES.ROLE_NOT_FOUND, "Role not found", HttpStatus.NOT_FOUND);
+        throw new AppError(ACCESS_CONTROL_ERROR_CODES.ROLE_NOT_FOUND, "Role not found", HttpStatus.NOT_FOUND);
       assertCanModifyCustomRole(actor, role);
       const assignedUserIds = await this.accessControlRepository.findUserIdsForRole(roleId, tx);
       if (assignedUserIds.length > 0)
@@ -57,3 +56,6 @@ export class DeleteCustomRoleUseCase {
     });
   }
 }
+
+import { ERROR_CODES } from "@repo/api-runtime";
+import { ACCESS_CONTROL_ERROR_CODES } from "@repo/feature-access-control/contracts";

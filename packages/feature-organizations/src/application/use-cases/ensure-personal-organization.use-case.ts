@@ -23,6 +23,7 @@ import {
 } from "../../public/contracts";
 
 @Injectable()
+
 export class EnsurePersonalOrganizationUseCase {
   constructor(
     @Inject(ORGANIZATIONS_REPOSITORY)

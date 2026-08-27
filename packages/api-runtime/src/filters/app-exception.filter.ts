@@ -16,7 +16,10 @@ import {
   type JsonObject,
   type JsonValue,
 } from "@repo/api-kernel";
-import { type ErrorReportContext, ErrorReporterService } from "@repo/observability";
+import {
+  type ErrorReportContext,
+  ErrorReporterService,
+} from "@repo/observability";
 
 import { EnvironmentService } from "../config/environment";
 import { ERROR_CODES } from "../error-codes";
@@ -170,3 +173,4 @@ export class AppExceptionFilter implements ExceptionFilter {
     });
   }
 }
+

@@ -10,7 +10,8 @@ export const fileVersions = pgTable(
       .notNull()
       .references(() => files.id, { onDelete: "cascade" }),
     // Denormalized so the tenant-isolation RLS policy can apply directly to this table.
-    organizationId: uuid("organization_id").notNull(),
+    organizationId: uuid("organization_id")
+      .notNull(),
     versionNumber: integer("version_number").notNull(),
     storageKey: text("storage_key").notNull(),
     mimeType: text("mime_type").notNull(),

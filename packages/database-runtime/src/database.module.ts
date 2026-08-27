@@ -1,12 +1,6 @@
 import type { Pool } from "pg";
 
-import {
-  type DynamicModule,
-  Global,
-  Inject,
-  Module,
-  type OnApplicationShutdown,
-} from "@nestjs/common";
+import { type DynamicModule, Global, Inject, Module, type OnApplicationShutdown } from "@nestjs/common";
 import {
   ADVISORY_LOCK_PORT,
   PLATFORM_TRANSACTION_PORT,

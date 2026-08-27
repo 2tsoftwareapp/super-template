@@ -1,4 +1,9 @@
 import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime";
+import type {
+  NotificationMessage,
+  SendUserNotificationInput,
+  UserNotificationSender,
+} from "../public/user-notification-sender.port";
 import type { TransactionExecutor } from "@repo/api-runtime";
 
 import { Injectable } from "@nestjs/common";
@@ -8,11 +13,6 @@ import type { NotificationView } from "./notifications.types";
 import { NotificationDispatchService } from "./services/notification-dispatch.service";
 import { NotificationDeliveryUseCase } from "./use-cases/notification-delivery.use-case";
 import { SendNotificationUseCase } from "./use-cases/send-notification.use-case";
-import type {
-  NotificationMessage,
-  SendUserNotificationInput,
-  UserNotificationSender,
-} from "@repo/feature-notifications/contracts";
 
 export type {
   NotificationView as NotificationDto,

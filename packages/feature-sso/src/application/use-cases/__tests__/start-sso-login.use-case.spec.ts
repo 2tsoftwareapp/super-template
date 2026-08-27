@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { ERROR_CODES, EnvironmentService } from "@repo/api-runtime";
+import {EnvironmentService } from "@repo/api-runtime";
 
 import { StartSsoLoginUseCase } from "../start-sso-login.use-case";
 
@@ -23,7 +23,7 @@ describe("StartSsoLoginUseCase", () => {
         provider: "unknown",
         redirectUri: "http://localhost:3005/sso/callback",
       }),
-    ).rejects.toMatchObject({ code: ERROR_CODES.SSO_PROVIDER_UNAVAILABLE });
+    ).rejects.toMatchObject({ code: SSO_ERROR_CODES.SSO_PROVIDER_UNAVAILABLE });
   });
 
   it("rejects a redirectUri outside the allowed origins", async () => {
@@ -42,7 +42,7 @@ describe("StartSsoLoginUseCase", () => {
         provider: "fake",
         redirectUri: "http://evil.example.com/sso/callback",
       }),
-    ).rejects.toMatchObject({ code: ERROR_CODES.SSO_INVALID_REDIRECT });
+    ).rejects.toMatchObject({ code: SSO_ERROR_CODES.SSO_INVALID_REDIRECT });
     expect(provider.buildAuthorizationUrl).not.toHaveBeenCalled();
   });
 
@@ -102,3 +102,5 @@ describe("StartSsoLoginUseCase", () => {
     );
   });
 });
+
+import { SSO_ERROR_CODES } from "@repo/feature-sso/contracts";

@@ -1,7 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { ERROR_CODES } from "@repo/api-runtime";
-
 import {
   CreateSsoSessionExchangeUseCase,
   ExchangeSsoSessionUseCase,
@@ -85,7 +83,7 @@ describe("Sso session exchange use cases", () => {
 
     // Replay: the code is gone from the exchange table → rejected.
     await expect(useCase.execute("exchange-code")).rejects.toMatchObject({
-      code: ERROR_CODES.SSO_EXCHANGE_INVALID,
+      code: SSO_ERROR_CODES.SSO_EXCHANGE_INVALID,
     });
   });
 
@@ -112,10 +110,12 @@ describe("Sso session exchange use cases", () => {
     );
 
     await expect(useCase.execute("exchange-code")).rejects.toMatchObject({
-      code: ERROR_CODES.SSO_EXCHANGE_INVALID,
+      code: SSO_ERROR_CODES.SSO_EXCHANGE_INVALID,
     });
     // Consume-first: tokens must never be re-issued after a lost race.
     expect(tokenProvider.reissueSessionTokens).not.toHaveBeenCalled();
     expect(authSessionRepository.findSessionById).not.toHaveBeenCalled();
   });
 });
+
+import { SSO_ERROR_CODES } from "@repo/feature-sso/contracts";

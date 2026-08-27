@@ -1,14 +1,10 @@
-import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime";
+import { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime";
+import type { ImportValidationError } from "../../../public/contracts";
 
+import { ImportExportAdapterRegistry } from "../../../public/contracts";
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {
-  AppError,
-  ERROR_CODES,
-  SYSTEM_SCOPE,
-  TRANSACTION_PORT,
-  type TransactionPort,
-} from "@repo/api-runtime";
-import { ImportExportAdapterRegistry } from "../../../import-export/import-export-adapter.registry";
+import {AppError, SYSTEM_SCOPE, TRANSACTION_PORT, type TransactionPort } from "@repo/api-runtime";
+import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 import { ACTIVITY_EMITTER, type ActivityEmitter } from "@repo/feature-activities/contracts";
 import { FileAccessService } from "@repo/feature-upload/contracts";
 
@@ -21,9 +17,6 @@ import {
   type ImportJobsRepositoryPort,
 } from "../ports/imports.repository.port";
 import { ImportFileParserService } from "../services/import-file-parser.service";
-import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
-import type { AuditWriter } from "@repo/feature-audit/contracts";
-import type { ImportValidationError } from "@repo/feature-import-export/contracts";
 
 @Injectable()
 export class ConfirmImportUseCase {
@@ -62,7 +55,7 @@ export class ConfirmImportUseCase {
       })
     ) {
       throw new AppError(
-        ERROR_CODES.IMPORT_JOB_NOT_FOUND,
+        IMPORT_EXPORT_ERROR_CODES.IMPORT_JOB_NOT_FOUND,
         "Import job not found",
         HttpStatus.NOT_FOUND,
       );
@@ -194,3 +187,6 @@ export class ConfirmImportUseCase {
     return this.importsMapper.toImportJobView(updatedJob ?? job);
   }
 }
+
+import { ERROR_CODES } from "@repo/api-runtime";
+import { IMPORT_EXPORT_ERROR_CODES } from "@repo/feature-import-export/contracts";

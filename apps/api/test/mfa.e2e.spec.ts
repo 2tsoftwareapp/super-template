@@ -1,6 +1,5 @@
 import type { INestApplication } from "@nestjs/common";
 
-import { ERROR_CODES } from "@repo/api-runtime";
 import { DATABASE } from "@repo/database-runtime";
 import { users } from "@repo/feature-users/schema";
 import { base32Decode, generateTotpCode } from "@repo/feature-mfa/contracts";
@@ -88,7 +87,7 @@ describe("Two-factor authentication (e2e)", () => {
       .send({ code: "000000" })
       .expect(401)
       .expect((res) => {
-        expect(res.body.error.code).toBe(ERROR_CODES.MFA_INVALID_CODE);
+        expect(res.body.error.code).toBe(MFA_ERROR_CODES.MFA_INVALID_CODE);
       });
 
     // Confirming with the right code enables MFA and returns one-time recovery codes.
@@ -124,7 +123,7 @@ describe("Two-factor authentication (e2e)", () => {
       .send({ mfaToken, code: "000000" })
       .expect(401)
       .expect((res) => {
-        expect(res.body.error.code).toBe(ERROR_CODES.MFA_INVALID_CODE);
+        expect(res.body.error.code).toBe(MFA_ERROR_CODES.MFA_INVALID_CODE);
       });
 
     // Correct TOTP code against the challenge completes login with a full session.
@@ -147,7 +146,7 @@ describe("Two-factor authentication (e2e)", () => {
       .send({ mfaToken, code: generateTotpCode(secretBuffer) })
       .expect(401)
       .expect((res) => {
-        expect(res.body.error.code).toBe(ERROR_CODES.MFA_CHALLENGE_INVALID);
+        expect(res.body.error.code).toBe(MFA_ERROR_CODES.MFA_CHALLENGE_INVALID);
       });
 
     // A recovery code can substitute for a TOTP code during a login challenge.
@@ -176,7 +175,7 @@ describe("Two-factor authentication (e2e)", () => {
       .send({ mfaToken: thirdMfaToken, code: usedRecoveryCode })
       .expect(401)
       .expect((res) => {
-        expect(res.body.error.code).toBe(ERROR_CODES.MFA_INVALID_CODE);
+        expect(res.body.error.code).toBe(MFA_ERROR_CODES.MFA_INVALID_CODE);
       });
 
     // Regenerating recovery codes invalidates the old set.
@@ -211,3 +210,5 @@ describe("Two-factor authentication (e2e)", () => {
     expect(finalLogin.body.data.accessToken).toBeTruthy();
   });
 });
+
+import { MFA_ERROR_CODES } from "@repo/feature-mfa/contracts";

@@ -37,5 +37,3 @@ export interface ImportExportAdapter<TRow extends object> {
     executor?: TransactionExecutor,
   ): Promise<void>;
 }
-
-export const IMPORT_EXPORT_ADAPTER = Symbol("IMPORT_EXPORT_ADAPTER");

@@ -1,5 +1,4 @@
 import { describe, expect, it, vi } from "vitest";
-import { ERROR_CODES } from "@repo/api-runtime";
 
 import { UpdateUserStatusUseCase } from "../update-user-status.use-case";
 
@@ -87,7 +86,7 @@ describe("UpdateUserStatusUseCase", () => {
     deps.usersRepository.findById.mockResolvedValueOnce(null);
 
     await expect(deps.useCase.execute(actor as never, "missing", "BLOCKED")).rejects.toMatchObject({
-      code: ERROR_CODES.USER_NOT_FOUND,
+      code: USER_ERROR_CODES.USER_NOT_FOUND,
     });
     expect(deps.usersRepository.update).not.toHaveBeenCalled();
   });
@@ -124,7 +123,8 @@ describe("UpdateUserStatusUseCase", () => {
   it("skips activity emission when the actor has no organization context", async () => {
     const { useCase, activityEmitter } = buildDependencies();
 
-    await useCase.execute(actor as never, "user-1", "BLOCKED");
+import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
+import { ERROR_CODES } from "@repo/api-runtime";    await useCase.execute(actor as never, "user-1", "BLOCKED");
 
     expect(activityEmitter.emit).not.toHaveBeenCalled();
   });

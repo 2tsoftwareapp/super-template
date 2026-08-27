@@ -1,13 +1,16 @@
 import type { AuthenticatedRequestUser } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, ERROR_CODES, ROLE_NAMES } from "@repo/api-runtime";
+import {AppError } from "@repo/api-runtime";
 
 import { ORGANIZATION_MEMBERSHIP, type OrganizationMembership } from "../../public/contracts";
 import {
   ORGANIZATIONS_REPOSITORY,
   type OrganizationsRepositoryPort,
 } from "../ports/organizations.repository.port";
+
+/** Platform super-role literal; importing access-control here would create a package cycle. */
+const PLATFORM_SUPER_ADMIN = "SUPER_ADMIN";
 
 @Injectable()
 export class GetOrganizationUseCase {
@@ -24,7 +27,7 @@ export class GetOrganizationUseCase {
         ? { userId: actor, isSuperAdmin: false }
         : {
             userId: actor.userId,
-            isSuperAdmin: actor.roles?.includes(ROLE_NAMES.SUPER_ADMIN) ?? false,
+            isSuperAdmin: actor.roles?.includes(PLATFORM_SUPER_ADMIN) ?? false,
           };
 
     let membership = null;
@@ -44,7 +47,7 @@ export class GetOrganizationUseCase {
 
     if (!organization) {
       throw new AppError(
-        ERROR_CODES.ORGANIZATION_NOT_FOUND,
+        ORGANIZATION_ERROR_CODES.ORGANIZATION_NOT_FOUND,
         "Organization not found",
         HttpStatus.NOT_FOUND,
       );
@@ -63,3 +66,6 @@ export class GetOrganizationUseCase {
     };
   }
 }
+
+import { ERROR_CODES } from "@repo/api-runtime";
+import { ORGANIZATION_ERROR_CODES } from "@repo/feature-organizations/contracts";

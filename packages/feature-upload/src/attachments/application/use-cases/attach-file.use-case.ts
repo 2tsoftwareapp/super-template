@@ -1,23 +1,14 @@
 import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {
-  AppError,
-  ERROR_CODES,
-  SYSTEM_SCOPE,
-  TRANSACTION_PORT,
-  type TransactionPort,
-} from "@repo/api-runtime";
-
+import {AppError, SYSTEM_SCOPE, TRANSACTION_PORT, type TransactionPort } from "@repo/api-runtime";
+import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 import { ACTIVITY_EMITTER, type ActivityEmitter } from "@repo/feature-activities/contracts";
 
 import type { AttachEntityCommand } from "../attachments.types";
 
 import { FILES_REPOSITORY, type FilesRepositoryPort } from "../../../files";
 import { AttachmentsMapper } from "../attachments.mapper";
-import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
-import type { AuditWriter } from "@repo/feature-audit/contracts";
-
 import {
   ATTACHMENTS_REPOSITORY,
   type AttachmentsRepositoryPort,
@@ -42,7 +33,7 @@ export class AttachFileUseCase {
     const file = await this.filesRepository.findById(input.fileId);
 
     if (!file) {
-      throw new AppError(ERROR_CODES.FILE_NOT_FOUND, "File not found", HttpStatus.NOT_FOUND);
+      throw new AppError(FILE_ERROR_CODES.FILE_NOT_FOUND, "File not found", HttpStatus.NOT_FOUND);
     }
 
     if (!file.organizationId) {
@@ -110,3 +101,6 @@ export class AttachFileUseCase {
     return AttachmentsMapper.toAttachmentDto(attachment);
   }
 }
+
+import { ERROR_CODES } from "@repo/api-runtime";
+import { FILE_ERROR_CODES } from "@repo/feature-upload/contracts";

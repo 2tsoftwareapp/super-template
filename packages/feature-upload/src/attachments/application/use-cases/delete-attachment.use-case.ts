@@ -1,18 +1,9 @@
 import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {
-  AppError,
-  ERROR_CODES,
-  SYSTEM_SCOPE,
-  TRANSACTION_PORT,
-  type TransactionPort,
-} from "@repo/api-runtime";
-
+import {AppError, SYSTEM_SCOPE, TRANSACTION_PORT, type TransactionPort } from "@repo/api-runtime";
+import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 import { ACTIVITY_EMITTER, type ActivityEmitter } from "@repo/feature-activities/contracts";
-
-import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
-import type { AuditWriter } from "@repo/feature-audit/contracts";
 
 import {
   ATTACHMENTS_REPOSITORY,
@@ -38,7 +29,7 @@ export class DeleteAttachmentUseCase {
 
     if (!attachment) {
       throw new AppError(
-        ERROR_CODES.ATTACHMENT_NOT_FOUND,
+        FILE_ERROR_CODES.ATTACHMENT_NOT_FOUND,
         "Attachment not found",
         HttpStatus.NOT_FOUND,
       );
@@ -83,3 +74,5 @@ export class DeleteAttachmentUseCase {
     });
   }
 }
+
+import { FILE_ERROR_CODES } from "@repo/feature-upload/contracts";

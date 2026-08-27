@@ -1,0 +1,28 @@
+import type { JsonObject } from "@repo/api-kernel";
+import type { TransactionExecutor } from "@repo/api-kernel";
+
+import { OUTBOX_APPENDER, type OutboxAppenderPort } from "./outbox-appender.port";
+
+export interface OutboxRecord {
+  id: string;
+  topic: string;
+  payload: JsonObject;
+  status: string;
+  attempts: number;
+  maxAttempts: number;
+}
+
+export interface OutboxRepositoryPort {
+  append(topic: string, payload: JsonObject, executor?: TransactionExecutor): Promise<void>;
+  claimPending(limit: number): Promise<OutboxRecord[]>;
+  markSent(id: string): Promise<void>;
+  markFailed(id: string, errorMessage: string): Promise<void>;
+  recoverStaleProcessing(): Promise<void>;
+}
+
+export const OUTBOX_REPOSITORY = Symbol("OUTBOX_REPOSITORY");
+
+export {
+  OUTBOX_APPENDER,
+  type OutboxAppenderPort,
+} from "./outbox-appender.port";

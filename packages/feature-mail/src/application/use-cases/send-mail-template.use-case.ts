@@ -1,9 +1,6 @@
 import { HttpStatus, Inject, Injectable, Logger } from "@nestjs/common";
 import { AppError, ERROR_CODES, type JsonObject } from "@repo/api-runtime";
-import {
-  USER_PREFERENCES_LOOKUP,
-  type UserPreferencesLookup,
-} from "@repo/feature-user-preferences/contracts";
+import { USER_PREFERENCES_LOOKUP, type UserPreferencesLookup } from "@repo/feature-user-preferences/contracts";
 
 import { isMandatoryMailTemplate } from "../../constants/mandatory-mail-templates";
 import {
