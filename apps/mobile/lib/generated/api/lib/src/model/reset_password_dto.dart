@@ -13,16 +13,16 @@ part 'reset_password_dto.g.dart';
 /// ResetPasswordDto
 ///
 /// Properties:
-/// * [token]
 /// * [newPassword]
+/// * [token]
 @BuiltValue()
 abstract class ResetPasswordDto
     implements Built<ResetPasswordDto, ResetPasswordDtoBuilder> {
-  @BuiltValueField(wireName: r'token')
-  String get token;
-
   @BuiltValueField(wireName: r'newPassword')
   String get newPassword;
+
+  @BuiltValueField(wireName: r'token')
+  String get token;
 
   ResetPasswordDto._();
 
@@ -50,14 +50,14 @@ class _$ResetPasswordDtoSerializer
     ResetPasswordDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'token';
-    yield serializers.serialize(
-      object.token,
-      specifiedType: const FullType(String),
-    );
     yield r'newPassword';
     yield serializers.serialize(
       object.newPassword,
+      specifiedType: const FullType(String),
+    );
+    yield r'token';
+    yield serializers.serialize(
+      object.token,
       specifiedType: const FullType(String),
     );
   }
@@ -87,19 +87,19 @@ class _$ResetPasswordDtoSerializer
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'token':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.token = valueDes;
-          break;
         case r'newPassword':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
           result.newPassword = valueDes;
+          break;
+        case r'token':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.token = valueDes;
           break;
         default:
           unhandled.add(key);

@@ -5,8 +5,8 @@
 // ignore_for_file: unused_element
 // @dart=3.0
 
+import 'package:super_template_api/src/model/auth_user_dto.dart';
 import 'package:built_collection/built_collection.dart';
-import 'package:super_template_api/src/model/user_dto.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
@@ -15,15 +15,18 @@ part 'auth_me_dto.g.dart';
 /// AuthMeDto
 ///
 /// Properties:
-/// * [user]
+/// * [mustChangePassword]
+/// * [organizationId]
 /// * [permissions]
 /// * [sessionId]
-/// * [organizationId]
-/// * [mustChangePassword]
+/// * [user]
 @BuiltValue()
 abstract class AuthMeDto implements Built<AuthMeDto, AuthMeDtoBuilder> {
-  @BuiltValueField(wireName: r'user')
-  UserDto get user;
+  @BuiltValueField(wireName: r'mustChangePassword')
+  bool? get mustChangePassword;
+
+  @BuiltValueField(wireName: r'organizationId')
+  String? get organizationId;
 
   @BuiltValueField(wireName: r'permissions')
   BuiltList<String> get permissions;
@@ -31,11 +34,8 @@ abstract class AuthMeDto implements Built<AuthMeDto, AuthMeDtoBuilder> {
   @BuiltValueField(wireName: r'sessionId')
   String get sessionId;
 
-  @BuiltValueField(wireName: r'organizationId')
-  String? get organizationId;
-
-  @BuiltValueField(wireName: r'mustChangePassword')
-  bool? get mustChangePassword;
+  @BuiltValueField(wireName: r'user')
+  AuthUserDto get user;
 
   AuthMeDto._();
 
@@ -60,11 +60,20 @@ class _$AuthMeDtoSerializer implements PrimitiveSerializer<AuthMeDto> {
     AuthMeDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'user';
-    yield serializers.serialize(
-      object.user,
-      specifiedType: const FullType(UserDto),
-    );
+    if (object.mustChangePassword != null) {
+      yield r'mustChangePassword';
+      yield serializers.serialize(
+        object.mustChangePassword,
+        specifiedType: const FullType(bool),
+      );
+    }
+    yield r'organizationId';
+    yield object.organizationId == null
+        ? null
+        : serializers.serialize(
+            object.organizationId,
+            specifiedType: const FullType.nullable(String),
+          );
     yield r'permissions';
     yield serializers.serialize(
       object.permissions,
@@ -75,20 +84,11 @@ class _$AuthMeDtoSerializer implements PrimitiveSerializer<AuthMeDto> {
       object.sessionId,
       specifiedType: const FullType(String),
     );
-    yield r'organizationId';
-    yield object.organizationId == null
-        ? null
-        : serializers.serialize(
-            object.organizationId,
-            specifiedType: const FullType.nullable(String),
-          );
-    if (object.mustChangePassword != null) {
-      yield r'mustChangePassword';
-      yield serializers.serialize(
-        object.mustChangePassword,
-        specifiedType: const FullType(bool),
-      );
-    }
+    yield r'user';
+    yield serializers.serialize(
+      object.user,
+      specifiedType: const FullType(AuthUserDto),
+    );
   }
 
   @override
@@ -116,12 +116,20 @@ class _$AuthMeDtoSerializer implements PrimitiveSerializer<AuthMeDto> {
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'user':
+        case r'mustChangePassword':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(UserDto),
-          ) as UserDto;
-          result.user.replace(valueDes);
+            specifiedType: const FullType(bool),
+          ) as bool;
+          result.mustChangePassword = valueDes;
+          break;
+        case r'organizationId':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
+          if (valueDes == null) continue;
+          result.organizationId = valueDes;
           break;
         case r'permissions':
           final valueDes = serializers.deserialize(
@@ -139,20 +147,12 @@ class _$AuthMeDtoSerializer implements PrimitiveSerializer<AuthMeDto> {
           ) as String;
           result.sessionId = valueDes;
           break;
-        case r'organizationId':
+        case r'user':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType.nullable(String),
-          ) as String?;
-          if (valueDes == null) continue;
-          result.organizationId = valueDes;
-          break;
-        case r'mustChangePassword':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(bool),
-          ) as bool;
-          result.mustChangePassword = valueDes;
+            specifiedType: const FullType(AuthUserDto),
+          ) as AuthUserDto;
+          result.user.replace(valueDes);
           break;
         default:
           unhandled.add(key);

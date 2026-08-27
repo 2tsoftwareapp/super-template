@@ -13,25 +13,31 @@ part 'file_version_dto.g.dart';
 /// FileVersionDto
 ///
 /// Properties:
-/// * [id]
+/// * [checksum]
+/// * [createdAt]
+/// * [createdById]
 /// * [fileId]
-/// * [versionNumber]
+/// * [id]
 /// * [mimeType]
 /// * [sizeBytes]
-/// * [checksum]
-/// * [createdById]
-/// * [createdAt]
+/// * [versionNumber]
 @BuiltValue()
 abstract class FileVersionDto
     implements Built<FileVersionDto, FileVersionDtoBuilder> {
-  @BuiltValueField(wireName: r'id')
-  String get id;
+  @BuiltValueField(wireName: r'checksum')
+  String get checksum;
+
+  @BuiltValueField(wireName: r'createdAt')
+  String get createdAt;
+
+  @BuiltValueField(wireName: r'createdById')
+  String? get createdById;
 
   @BuiltValueField(wireName: r'fileId')
   String get fileId;
 
-  @BuiltValueField(wireName: r'versionNumber')
-  num get versionNumber;
+  @BuiltValueField(wireName: r'id')
+  String get id;
 
   @BuiltValueField(wireName: r'mimeType')
   String get mimeType;
@@ -39,14 +45,8 @@ abstract class FileVersionDto
   @BuiltValueField(wireName: r'sizeBytes')
   num get sizeBytes;
 
-  @BuiltValueField(wireName: r'checksum')
-  String get checksum;
-
-  @BuiltValueField(wireName: r'createdById')
-  String? get createdById;
-
-  @BuiltValueField(wireName: r'createdAt')
-  String get createdAt;
+  @BuiltValueField(wireName: r'versionNumber')
+  num get versionNumber;
 
   FileVersionDto._();
 
@@ -74,20 +74,32 @@ class _$FileVersionDtoSerializer
     FileVersionDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'id';
+    yield r'checksum';
     yield serializers.serialize(
-      object.id,
+      object.checksum,
       specifiedType: const FullType(String),
     );
+    yield r'createdAt';
+    yield serializers.serialize(
+      object.createdAt,
+      specifiedType: const FullType(String),
+    );
+    if (object.createdById != null) {
+      yield r'createdById';
+      yield serializers.serialize(
+        object.createdById,
+        specifiedType: const FullType.nullable(String),
+      );
+    }
     yield r'fileId';
     yield serializers.serialize(
       object.fileId,
       specifiedType: const FullType(String),
     );
-    yield r'versionNumber';
+    yield r'id';
     yield serializers.serialize(
-      object.versionNumber,
-      specifiedType: const FullType(num),
+      object.id,
+      specifiedType: const FullType(String),
     );
     yield r'mimeType';
     yield serializers.serialize(
@@ -99,22 +111,10 @@ class _$FileVersionDtoSerializer
       object.sizeBytes,
       specifiedType: const FullType(num),
     );
-    yield r'checksum';
+    yield r'versionNumber';
     yield serializers.serialize(
-      object.checksum,
-      specifiedType: const FullType(String),
-    );
-    if (object.createdById != null) {
-      yield r'createdById';
-      yield serializers.serialize(
-        object.createdById,
-        specifiedType: const FullType.nullable(String),
-      );
-    }
-    yield r'createdAt';
-    yield serializers.serialize(
-      object.createdAt,
-      specifiedType: const FullType(String),
+      object.versionNumber,
+      specifiedType: const FullType(num),
     );
   }
 
@@ -143,12 +143,27 @@ class _$FileVersionDtoSerializer
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'id':
+        case r'checksum':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
-          result.id = valueDes;
+          result.checksum = valueDes;
+          break;
+        case r'createdAt':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.createdAt = valueDes;
+          break;
+        case r'createdById':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
+          if (valueDes == null) continue;
+          result.createdById = valueDes;
           break;
         case r'fileId':
           final valueDes = serializers.deserialize(
@@ -157,10 +172,12 @@ class _$FileVersionDtoSerializer
           ) as String;
           result.fileId = valueDes;
           break;
-        case r'versionNumber':
-          final valueDes = serializers.deserialize(value,
-              specifiedType: const FullType(num)) as num;
-          result.versionNumber = valueDes;
+        case r'id':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.id = valueDes;
           break;
         case r'mimeType':
           final valueDes = serializers.deserialize(
@@ -174,27 +191,10 @@ class _$FileVersionDtoSerializer
               specifiedType: const FullType(num)) as num;
           result.sizeBytes = valueDes;
           break;
-        case r'checksum':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.checksum = valueDes;
-          break;
-        case r'createdById':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType.nullable(String),
-          ) as String?;
-          if (valueDes == null) continue;
-          result.createdById = valueDes;
-          break;
-        case r'createdAt':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.createdAt = valueDes;
+        case r'versionNumber':
+          final valueDes = serializers.deserialize(value,
+              specifiedType: const FullType(num)) as num;
+          result.versionNumber = valueDes;
           break;
         default:
           unhandled.add(key);

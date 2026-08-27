@@ -10,15 +10,15 @@ part of 'application_setting_dto.dart';
 
 class _$ApplicationSettingDto extends ApplicationSettingDto {
   @override
+  final String createdAt;
+  @override
   final String key;
   @override
-  final BuiltMap<String, JsonObject?> value;
+  final String updatedAt;
   @override
   final JsonObject? updatedById;
   @override
-  final String createdAt;
-  @override
-  final String updatedAt;
+  final BuiltMap<String, JsonObject?> value;
 
   factory _$ApplicationSettingDto([
     void Function(ApplicationSettingDtoBuilder)? updates,
@@ -26,11 +26,11 @@ class _$ApplicationSettingDto extends ApplicationSettingDto {
       (ApplicationSettingDtoBuilder()..update(updates))._build();
 
   _$ApplicationSettingDto._({
-    required this.key,
-    required this.value,
-    this.updatedById,
     required this.createdAt,
+    required this.key,
     required this.updatedAt,
+    this.updatedById,
+    required this.value,
   }) : super._();
   @override
   ApplicationSettingDto rebuild(
@@ -46,21 +46,21 @@ class _$ApplicationSettingDto extends ApplicationSettingDto {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is ApplicationSettingDto &&
-        key == other.key &&
-        value == other.value &&
-        updatedById == other.updatedById &&
         createdAt == other.createdAt &&
-        updatedAt == other.updatedAt;
+        key == other.key &&
+        updatedAt == other.updatedAt &&
+        updatedById == other.updatedById &&
+        value == other.value;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
-    _$hash = $jc(_$hash, key.hashCode);
-    _$hash = $jc(_$hash, value.hashCode);
-    _$hash = $jc(_$hash, updatedById.hashCode);
     _$hash = $jc(_$hash, createdAt.hashCode);
+    _$hash = $jc(_$hash, key.hashCode);
     _$hash = $jc(_$hash, updatedAt.hashCode);
+    _$hash = $jc(_$hash, updatedById.hashCode);
+    _$hash = $jc(_$hash, value.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -68,11 +68,11 @@ class _$ApplicationSettingDto extends ApplicationSettingDto {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'ApplicationSettingDto')
-          ..add('key', key)
-          ..add('value', value)
-          ..add('updatedById', updatedById)
           ..add('createdAt', createdAt)
-          ..add('updatedAt', updatedAt))
+          ..add('key', key)
+          ..add('updatedAt', updatedAt)
+          ..add('updatedById', updatedById)
+          ..add('value', value))
         .toString();
   }
 }
@@ -81,26 +81,26 @@ class ApplicationSettingDtoBuilder
     implements Builder<ApplicationSettingDto, ApplicationSettingDtoBuilder> {
   _$ApplicationSettingDto? _$v;
 
+  String? _createdAt;
+  String? get createdAt => _$this._createdAt;
+  set createdAt(String? createdAt) => _$this._createdAt = createdAt;
+
   String? _key;
   String? get key => _$this._key;
   set key(String? key) => _$this._key = key;
 
-  MapBuilder<String, JsonObject?>? _value;
-  MapBuilder<String, JsonObject?> get value =>
-      _$this._value ??= MapBuilder<String, JsonObject?>();
-  set value(MapBuilder<String, JsonObject?>? value) => _$this._value = value;
+  String? _updatedAt;
+  String? get updatedAt => _$this._updatedAt;
+  set updatedAt(String? updatedAt) => _$this._updatedAt = updatedAt;
 
   JsonObject? _updatedById;
   JsonObject? get updatedById => _$this._updatedById;
   set updatedById(JsonObject? updatedById) => _$this._updatedById = updatedById;
 
-  String? _createdAt;
-  String? get createdAt => _$this._createdAt;
-  set createdAt(String? createdAt) => _$this._createdAt = createdAt;
-
-  String? _updatedAt;
-  String? get updatedAt => _$this._updatedAt;
-  set updatedAt(String? updatedAt) => _$this._updatedAt = updatedAt;
+  MapBuilder<String, JsonObject?>? _value;
+  MapBuilder<String, JsonObject?> get value =>
+      _$this._value ??= MapBuilder<String, JsonObject?>();
+  set value(MapBuilder<String, JsonObject?>? value) => _$this._value = value;
 
   ApplicationSettingDtoBuilder() {
     ApplicationSettingDto._defaults(this);
@@ -109,11 +109,11 @@ class ApplicationSettingDtoBuilder
   ApplicationSettingDtoBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _key = $v.key;
-      _value = $v.value.toBuilder();
-      _updatedById = $v.updatedById;
       _createdAt = $v.createdAt;
+      _key = $v.key;
       _updatedAt = $v.updatedAt;
+      _updatedById = $v.updatedById;
+      _value = $v.value.toBuilder();
       _$v = null;
     }
     return this;
@@ -137,23 +137,23 @@ class ApplicationSettingDtoBuilder
     try {
       _$result = _$v ??
           _$ApplicationSettingDto._(
-            key: BuiltValueNullFieldError.checkNotNull(
-              key,
-              r'ApplicationSettingDto',
-              'key',
-            ),
-            value: value.build(),
-            updatedById: updatedById,
             createdAt: BuiltValueNullFieldError.checkNotNull(
               createdAt,
               r'ApplicationSettingDto',
               'createdAt',
+            ),
+            key: BuiltValueNullFieldError.checkNotNull(
+              key,
+              r'ApplicationSettingDto',
+              'key',
             ),
             updatedAt: BuiltValueNullFieldError.checkNotNull(
               updatedAt,
               r'ApplicationSettingDto',
               'updatedAt',
             ),
+            updatedById: updatedById,
+            value: value.build(),
           );
     } catch (_) {
       late String _$failedField;

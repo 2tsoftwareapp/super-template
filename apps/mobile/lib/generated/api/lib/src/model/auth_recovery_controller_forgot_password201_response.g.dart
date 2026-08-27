@@ -2,44 +2,46 @@
 
 // @dart=3.0
 
-part of 'auth_registration_controller_register201_response.dart';
+part of 'auth_recovery_controller_forgot_password201_response.dart';
 
 // **************************************************************************
 // BuiltValueGenerator
 // **************************************************************************
 
-class _$AuthRegistrationControllerRegister201Response
-    extends AuthRegistrationControllerRegister201Response {
+class _$AuthRecoveryControllerForgotPassword201Response
+    extends AuthRecoveryControllerForgotPassword201Response {
   @override
   final SuccessMessageDto data;
   @override
   final RequestMetaDto meta;
 
-  factory _$AuthRegistrationControllerRegister201Response([
-    void Function(AuthRegistrationControllerRegister201ResponseBuilder)?
+  factory _$AuthRecoveryControllerForgotPassword201Response([
+    void Function(AuthRecoveryControllerForgotPassword201ResponseBuilder)?
         updates,
   ]) =>
-      (AuthRegistrationControllerRegister201ResponseBuilder()..update(updates))
+      (AuthRecoveryControllerForgotPassword201ResponseBuilder()
+            ..update(updates))
           ._build();
 
-  _$AuthRegistrationControllerRegister201Response._({
+  _$AuthRecoveryControllerForgotPassword201Response._({
     required this.data,
     required this.meta,
   }) : super._();
   @override
-  AuthRegistrationControllerRegister201Response rebuild(
-    void Function(AuthRegistrationControllerRegister201ResponseBuilder) updates,
+  AuthRecoveryControllerForgotPassword201Response rebuild(
+    void Function(AuthRecoveryControllerForgotPassword201ResponseBuilder)
+        updates,
   ) =>
       (toBuilder()..update(updates)).build();
 
   @override
-  AuthRegistrationControllerRegister201ResponseBuilder toBuilder() =>
-      AuthRegistrationControllerRegister201ResponseBuilder()..replace(this);
+  AuthRecoveryControllerForgotPassword201ResponseBuilder toBuilder() =>
+      AuthRecoveryControllerForgotPassword201ResponseBuilder()..replace(this);
 
   @override
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
-    return other is AuthRegistrationControllerRegister201Response &&
+    return other is AuthRecoveryControllerForgotPassword201Response &&
         data == other.data &&
         meta == other.meta;
   }
@@ -56,7 +58,7 @@ class _$AuthRegistrationControllerRegister201Response
   @override
   String toString() {
     return (newBuiltValueToStringHelper(
-      r'AuthRegistrationControllerRegister201Response',
+      r'AuthRecoveryControllerForgotPassword201Response',
     )
           ..add('data', data)
           ..add('meta', meta))
@@ -64,11 +66,11 @@ class _$AuthRegistrationControllerRegister201Response
   }
 }
 
-class AuthRegistrationControllerRegister201ResponseBuilder
+class AuthRecoveryControllerForgotPassword201ResponseBuilder
     implements
-        Builder<AuthRegistrationControllerRegister201Response,
-            AuthRegistrationControllerRegister201ResponseBuilder> {
-  _$AuthRegistrationControllerRegister201Response? _$v;
+        Builder<AuthRecoveryControllerForgotPassword201Response,
+            AuthRecoveryControllerForgotPassword201ResponseBuilder> {
+  _$AuthRecoveryControllerForgotPassword201Response? _$v;
 
   SuccessMessageDtoBuilder? _data;
   SuccessMessageDtoBuilder get data =>
@@ -79,11 +81,11 @@ class AuthRegistrationControllerRegister201ResponseBuilder
   RequestMetaDtoBuilder get meta => _$this._meta ??= RequestMetaDtoBuilder();
   set meta(RequestMetaDtoBuilder? meta) => _$this._meta = meta;
 
-  AuthRegistrationControllerRegister201ResponseBuilder() {
-    AuthRegistrationControllerRegister201Response._defaults(this);
+  AuthRecoveryControllerForgotPassword201ResponseBuilder() {
+    AuthRecoveryControllerForgotPassword201Response._defaults(this);
   }
 
-  AuthRegistrationControllerRegister201ResponseBuilder get _$this {
+  AuthRecoveryControllerForgotPassword201ResponseBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
       _data = $v.data.toBuilder();
@@ -94,26 +96,26 @@ class AuthRegistrationControllerRegister201ResponseBuilder
   }
 
   @override
-  void replace(AuthRegistrationControllerRegister201Response other) {
-    _$v = other as _$AuthRegistrationControllerRegister201Response;
+  void replace(AuthRecoveryControllerForgotPassword201Response other) {
+    _$v = other as _$AuthRecoveryControllerForgotPassword201Response;
   }
 
   @override
   void update(
-    void Function(AuthRegistrationControllerRegister201ResponseBuilder)?
+    void Function(AuthRecoveryControllerForgotPassword201ResponseBuilder)?
         updates,
   ) {
     if (updates != null) updates(this);
   }
 
   @override
-  AuthRegistrationControllerRegister201Response build() => _build();
+  AuthRecoveryControllerForgotPassword201Response build() => _build();
 
-  _$AuthRegistrationControllerRegister201Response _build() {
-    _$AuthRegistrationControllerRegister201Response _$result;
+  _$AuthRecoveryControllerForgotPassword201Response _build() {
+    _$AuthRecoveryControllerForgotPassword201Response _$result;
     try {
       _$result = _$v ??
-          _$AuthRegistrationControllerRegister201Response._(
+          _$AuthRecoveryControllerForgotPassword201Response._(
             data: data.build(),
             meta: meta.build(),
           );
@@ -126,7 +128,7 @@ class AuthRegistrationControllerRegister201ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-          r'AuthRegistrationControllerRegister201Response',
+          r'AuthRecoveryControllerForgotPassword201Response',
           _$failedField,
           e.toString(),
         );

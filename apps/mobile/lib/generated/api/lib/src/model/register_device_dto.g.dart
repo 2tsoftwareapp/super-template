@@ -76,16 +76,16 @@ class _$RegisterDeviceDtoPlatformEnumSerializer
 
 class _$RegisterDeviceDto extends RegisterDeviceDto {
   @override
-  final String token;
-  @override
   final RegisterDeviceDtoPlatformEnum platform;
+  @override
+  final String token;
 
   factory _$RegisterDeviceDto([
     void Function(RegisterDeviceDtoBuilder)? updates,
   ]) =>
       (RegisterDeviceDtoBuilder()..update(updates))._build();
 
-  _$RegisterDeviceDto._({required this.token, required this.platform})
+  _$RegisterDeviceDto._({required this.platform, required this.token})
       : super._();
   @override
   RegisterDeviceDto rebuild(void Function(RegisterDeviceDtoBuilder) updates) =>
@@ -99,15 +99,15 @@ class _$RegisterDeviceDto extends RegisterDeviceDto {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is RegisterDeviceDto &&
-        token == other.token &&
-        platform == other.platform;
+        platform == other.platform &&
+        token == other.token;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
-    _$hash = $jc(_$hash, token.hashCode);
     _$hash = $jc(_$hash, platform.hashCode);
+    _$hash = $jc(_$hash, token.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -115,8 +115,8 @@ class _$RegisterDeviceDto extends RegisterDeviceDto {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'RegisterDeviceDto')
-          ..add('token', token)
-          ..add('platform', platform))
+          ..add('platform', platform)
+          ..add('token', token))
         .toString();
   }
 }
@@ -125,14 +125,14 @@ class RegisterDeviceDtoBuilder
     implements Builder<RegisterDeviceDto, RegisterDeviceDtoBuilder> {
   _$RegisterDeviceDto? _$v;
 
-  String? _token;
-  String? get token => _$this._token;
-  set token(String? token) => _$this._token = token;
-
   RegisterDeviceDtoPlatformEnum? _platform;
   RegisterDeviceDtoPlatformEnum? get platform => _$this._platform;
   set platform(RegisterDeviceDtoPlatformEnum? platform) =>
       _$this._platform = platform;
+
+  String? _token;
+  String? get token => _$this._token;
+  set token(String? token) => _$this._token = token;
 
   RegisterDeviceDtoBuilder() {
     RegisterDeviceDto._defaults(this);
@@ -141,8 +141,8 @@ class RegisterDeviceDtoBuilder
   RegisterDeviceDtoBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _token = $v.token;
       _platform = $v.platform;
+      _token = $v.token;
       _$v = null;
     }
     return this;
@@ -164,15 +164,15 @@ class RegisterDeviceDtoBuilder
   _$RegisterDeviceDto _build() {
     final _$result = _$v ??
         _$RegisterDeviceDto._(
-          token: BuiltValueNullFieldError.checkNotNull(
-            token,
-            r'RegisterDeviceDto',
-            'token',
-          ),
           platform: BuiltValueNullFieldError.checkNotNull(
             platform,
             r'RegisterDeviceDto',
             'platform',
+          ),
+          token: BuiltValueNullFieldError.checkNotNull(
+            token,
+            r'RegisterDeviceDto',
+            'token',
           ),
         );
     replace(_$result);

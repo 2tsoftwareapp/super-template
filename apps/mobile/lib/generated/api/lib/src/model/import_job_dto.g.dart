@@ -91,29 +91,29 @@ class _$ImportJobDtoStatusEnumSerializer
 
 class _$ImportJobDto extends ImportJobDto {
   @override
-  final String id;
+  final JsonObject? completedAt;
   @override
-  final String type;
+  final JsonObject? confirmedAt;
   @override
-  final String fileId;
+  final String createdAt;
   @override
-  final ImportJobDtoStatusEnum status;
-  @override
-  final JsonObject? rowCount;
-  @override
-  final JsonObject? successCount;
+  final String createdById;
   @override
   final JsonObject? errorCount;
   @override
   final BuiltList<JsonObject>? errors;
   @override
-  final String createdById;
+  final String fileId;
   @override
-  final JsonObject? confirmedAt;
+  final String id;
   @override
-  final JsonObject? completedAt;
+  final JsonObject? rowCount;
   @override
-  final String createdAt;
+  final ImportJobDtoStatusEnum status;
+  @override
+  final JsonObject? successCount;
+  @override
+  final String type;
   @override
   final String updatedAt;
 
@@ -121,18 +121,18 @@ class _$ImportJobDto extends ImportJobDto {
       (ImportJobDtoBuilder()..update(updates))._build();
 
   _$ImportJobDto._({
-    required this.id,
-    required this.type,
-    required this.fileId,
-    required this.status,
-    this.rowCount,
-    this.successCount,
+    this.completedAt,
+    this.confirmedAt,
+    required this.createdAt,
+    required this.createdById,
     this.errorCount,
     this.errors,
-    required this.createdById,
-    this.confirmedAt,
-    this.completedAt,
-    required this.createdAt,
+    required this.fileId,
+    required this.id,
+    this.rowCount,
+    required this.status,
+    this.successCount,
+    required this.type,
     required this.updatedAt,
   }) : super._();
   @override
@@ -146,36 +146,36 @@ class _$ImportJobDto extends ImportJobDto {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is ImportJobDto &&
-        id == other.id &&
-        type == other.type &&
-        fileId == other.fileId &&
-        status == other.status &&
-        rowCount == other.rowCount &&
-        successCount == other.successCount &&
+        completedAt == other.completedAt &&
+        confirmedAt == other.confirmedAt &&
+        createdAt == other.createdAt &&
+        createdById == other.createdById &&
         errorCount == other.errorCount &&
         errors == other.errors &&
-        createdById == other.createdById &&
-        confirmedAt == other.confirmedAt &&
-        completedAt == other.completedAt &&
-        createdAt == other.createdAt &&
+        fileId == other.fileId &&
+        id == other.id &&
+        rowCount == other.rowCount &&
+        status == other.status &&
+        successCount == other.successCount &&
+        type == other.type &&
         updatedAt == other.updatedAt;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
-    _$hash = $jc(_$hash, id.hashCode);
-    _$hash = $jc(_$hash, type.hashCode);
-    _$hash = $jc(_$hash, fileId.hashCode);
-    _$hash = $jc(_$hash, status.hashCode);
-    _$hash = $jc(_$hash, rowCount.hashCode);
-    _$hash = $jc(_$hash, successCount.hashCode);
+    _$hash = $jc(_$hash, completedAt.hashCode);
+    _$hash = $jc(_$hash, confirmedAt.hashCode);
+    _$hash = $jc(_$hash, createdAt.hashCode);
+    _$hash = $jc(_$hash, createdById.hashCode);
     _$hash = $jc(_$hash, errorCount.hashCode);
     _$hash = $jc(_$hash, errors.hashCode);
-    _$hash = $jc(_$hash, createdById.hashCode);
-    _$hash = $jc(_$hash, confirmedAt.hashCode);
-    _$hash = $jc(_$hash, completedAt.hashCode);
-    _$hash = $jc(_$hash, createdAt.hashCode);
+    _$hash = $jc(_$hash, fileId.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, rowCount.hashCode);
+    _$hash = $jc(_$hash, status.hashCode);
+    _$hash = $jc(_$hash, successCount.hashCode);
+    _$hash = $jc(_$hash, type.hashCode);
     _$hash = $jc(_$hash, updatedAt.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
@@ -184,18 +184,18 @@ class _$ImportJobDto extends ImportJobDto {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'ImportJobDto')
-          ..add('id', id)
-          ..add('type', type)
-          ..add('fileId', fileId)
-          ..add('status', status)
-          ..add('rowCount', rowCount)
-          ..add('successCount', successCount)
+          ..add('completedAt', completedAt)
+          ..add('confirmedAt', confirmedAt)
+          ..add('createdAt', createdAt)
+          ..add('createdById', createdById)
           ..add('errorCount', errorCount)
           ..add('errors', errors)
-          ..add('createdById', createdById)
-          ..add('confirmedAt', confirmedAt)
-          ..add('completedAt', completedAt)
-          ..add('createdAt', createdAt)
+          ..add('fileId', fileId)
+          ..add('id', id)
+          ..add('rowCount', rowCount)
+          ..add('status', status)
+          ..add('successCount', successCount)
+          ..add('type', type)
           ..add('updatedAt', updatedAt))
         .toString();
   }
@@ -205,30 +205,21 @@ class ImportJobDtoBuilder
     implements Builder<ImportJobDto, ImportJobDtoBuilder> {
   _$ImportJobDto? _$v;
 
-  String? _id;
-  String? get id => _$this._id;
-  set id(String? id) => _$this._id = id;
+  JsonObject? _completedAt;
+  JsonObject? get completedAt => _$this._completedAt;
+  set completedAt(JsonObject? completedAt) => _$this._completedAt = completedAt;
 
-  String? _type;
-  String? get type => _$this._type;
-  set type(String? type) => _$this._type = type;
+  JsonObject? _confirmedAt;
+  JsonObject? get confirmedAt => _$this._confirmedAt;
+  set confirmedAt(JsonObject? confirmedAt) => _$this._confirmedAt = confirmedAt;
 
-  String? _fileId;
-  String? get fileId => _$this._fileId;
-  set fileId(String? fileId) => _$this._fileId = fileId;
+  String? _createdAt;
+  String? get createdAt => _$this._createdAt;
+  set createdAt(String? createdAt) => _$this._createdAt = createdAt;
 
-  ImportJobDtoStatusEnum? _status;
-  ImportJobDtoStatusEnum? get status => _$this._status;
-  set status(ImportJobDtoStatusEnum? status) => _$this._status = status;
-
-  JsonObject? _rowCount;
-  JsonObject? get rowCount => _$this._rowCount;
-  set rowCount(JsonObject? rowCount) => _$this._rowCount = rowCount;
-
-  JsonObject? _successCount;
-  JsonObject? get successCount => _$this._successCount;
-  set successCount(JsonObject? successCount) =>
-      _$this._successCount = successCount;
+  String? _createdById;
+  String? get createdById => _$this._createdById;
+  set createdById(String? createdById) => _$this._createdById = createdById;
 
   JsonObject? _errorCount;
   JsonObject? get errorCount => _$this._errorCount;
@@ -239,21 +230,30 @@ class ImportJobDtoBuilder
       _$this._errors ??= ListBuilder<JsonObject>();
   set errors(ListBuilder<JsonObject>? errors) => _$this._errors = errors;
 
-  String? _createdById;
-  String? get createdById => _$this._createdById;
-  set createdById(String? createdById) => _$this._createdById = createdById;
+  String? _fileId;
+  String? get fileId => _$this._fileId;
+  set fileId(String? fileId) => _$this._fileId = fileId;
 
-  JsonObject? _confirmedAt;
-  JsonObject? get confirmedAt => _$this._confirmedAt;
-  set confirmedAt(JsonObject? confirmedAt) => _$this._confirmedAt = confirmedAt;
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
 
-  JsonObject? _completedAt;
-  JsonObject? get completedAt => _$this._completedAt;
-  set completedAt(JsonObject? completedAt) => _$this._completedAt = completedAt;
+  JsonObject? _rowCount;
+  JsonObject? get rowCount => _$this._rowCount;
+  set rowCount(JsonObject? rowCount) => _$this._rowCount = rowCount;
 
-  String? _createdAt;
-  String? get createdAt => _$this._createdAt;
-  set createdAt(String? createdAt) => _$this._createdAt = createdAt;
+  ImportJobDtoStatusEnum? _status;
+  ImportJobDtoStatusEnum? get status => _$this._status;
+  set status(ImportJobDtoStatusEnum? status) => _$this._status = status;
+
+  JsonObject? _successCount;
+  JsonObject? get successCount => _$this._successCount;
+  set successCount(JsonObject? successCount) =>
+      _$this._successCount = successCount;
+
+  String? _type;
+  String? get type => _$this._type;
+  set type(String? type) => _$this._type = type;
 
   String? _updatedAt;
   String? get updatedAt => _$this._updatedAt;
@@ -266,18 +266,18 @@ class ImportJobDtoBuilder
   ImportJobDtoBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _id = $v.id;
-      _type = $v.type;
-      _fileId = $v.fileId;
-      _status = $v.status;
-      _rowCount = $v.rowCount;
-      _successCount = $v.successCount;
+      _completedAt = $v.completedAt;
+      _confirmedAt = $v.confirmedAt;
+      _createdAt = $v.createdAt;
+      _createdById = $v.createdById;
       _errorCount = $v.errorCount;
       _errors = $v.errors?.toBuilder();
-      _createdById = $v.createdById;
-      _confirmedAt = $v.confirmedAt;
-      _completedAt = $v.completedAt;
-      _createdAt = $v.createdAt;
+      _fileId = $v.fileId;
+      _id = $v.id;
+      _rowCount = $v.rowCount;
+      _status = $v.status;
+      _successCount = $v.successCount;
+      _type = $v.type;
       _updatedAt = $v.updatedAt;
       _$v = null;
     }
@@ -302,41 +302,41 @@ class ImportJobDtoBuilder
     try {
       _$result = _$v ??
           _$ImportJobDto._(
-            id: BuiltValueNullFieldError.checkNotNull(
-              id,
+            completedAt: completedAt,
+            confirmedAt: confirmedAt,
+            createdAt: BuiltValueNullFieldError.checkNotNull(
+              createdAt,
               r'ImportJobDto',
-              'id',
+              'createdAt',
             ),
-            type: BuiltValueNullFieldError.checkNotNull(
-              type,
-              r'ImportJobDto',
-              'type',
-            ),
-            fileId: BuiltValueNullFieldError.checkNotNull(
-              fileId,
-              r'ImportJobDto',
-              'fileId',
-            ),
-            status: BuiltValueNullFieldError.checkNotNull(
-              status,
-              r'ImportJobDto',
-              'status',
-            ),
-            rowCount: rowCount,
-            successCount: successCount,
-            errorCount: errorCount,
-            errors: _errors?.build(),
             createdById: BuiltValueNullFieldError.checkNotNull(
               createdById,
               r'ImportJobDto',
               'createdById',
             ),
-            confirmedAt: confirmedAt,
-            completedAt: completedAt,
-            createdAt: BuiltValueNullFieldError.checkNotNull(
-              createdAt,
+            errorCount: errorCount,
+            errors: _errors?.build(),
+            fileId: BuiltValueNullFieldError.checkNotNull(
+              fileId,
               r'ImportJobDto',
-              'createdAt',
+              'fileId',
+            ),
+            id: BuiltValueNullFieldError.checkNotNull(
+              id,
+              r'ImportJobDto',
+              'id',
+            ),
+            rowCount: rowCount,
+            status: BuiltValueNullFieldError.checkNotNull(
+              status,
+              r'ImportJobDto',
+              'status',
+            ),
+            successCount: successCount,
+            type: BuiltValueNullFieldError.checkNotNull(
+              type,
+              r'ImportJobDto',
+              'type',
             ),
             updatedAt: BuiltValueNullFieldError.checkNotNull(
               updatedAt,

@@ -12,12 +12,8 @@ import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
 import type { UserStatus, UserView } from "../users.types";
 
 import { assertUserBelongsToOrganization } from "../../domain/user-org-scope.policy";
+import { ROLE_NAMES, USER_ACCESS_CONTROL, type UserAccessControl } from "../../public/contracts";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";
-import {
-  ROLE_NAMES,
-  USER_ACCESS_CONTROL,
-  type UserAccessControl,
-} from "../../public/contracts";
 import { GetUserUseCase } from "./get-user.use-case";
 
 @Injectable()

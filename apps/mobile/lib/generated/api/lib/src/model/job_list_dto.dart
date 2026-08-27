@@ -15,72 +15,72 @@ part 'job_list_dto.g.dart';
 /// JobListDto
 ///
 /// Properties:
-/// * [id]
-/// * [type]
-/// * [payload]
-/// * [status]
-/// * [scheduledAt]
-/// * [priority]
 /// * [attempts]
-/// * [maxAttempts]
-/// * [startedAt]
-/// * [completedAt]
 /// * [cancelledAt]
-/// * [errorMessage]
-/// * [createdById]
+/// * [completedAt]
 /// * [createdAt]
-/// * [updatedAt]
+/// * [createdById]
+/// * [errorMessage]
+/// * [id]
+/// * [maxAttempts]
 /// * [organizationId]
+/// * [payload]
+/// * [priority]
+/// * [scheduledAt]
+/// * [startedAt]
+/// * [status]
+/// * [type]
+/// * [updatedAt]
 @BuiltValue()
 abstract class JobListDto implements Built<JobListDto, JobListDtoBuilder> {
+  @BuiltValueField(wireName: r'attempts')
+  num get attempts;
+
+  @BuiltValueField(wireName: r'cancelledAt')
+  JsonObject? get cancelledAt;
+
+  @BuiltValueField(wireName: r'completedAt')
+  JsonObject? get completedAt;
+
+  @BuiltValueField(wireName: r'createdAt')
+  String get createdAt;
+
+  @BuiltValueField(wireName: r'createdById')
+  String? get createdById;
+
+  @BuiltValueField(wireName: r'errorMessage')
+  JsonObject? get errorMessage;
+
   @BuiltValueField(wireName: r'id')
   String get id;
 
-  @BuiltValueField(wireName: r'type')
-  String get type;
+  @BuiltValueField(wireName: r'maxAttempts')
+  num get maxAttempts;
+
+  @BuiltValueField(wireName: r'organizationId')
+  JsonObject? get organizationId;
 
   @BuiltValueField(wireName: r'payload')
   BuiltMap<String, JsonObject?> get payload;
+
+  @BuiltValueField(wireName: r'priority')
+  num get priority;
+
+  @BuiltValueField(wireName: r'scheduledAt')
+  String get scheduledAt;
+
+  @BuiltValueField(wireName: r'startedAt')
+  JsonObject? get startedAt;
 
   @BuiltValueField(wireName: r'status')
   JobListDtoStatusEnum get status;
   // enum statusEnum {  PENDING,  PROCESSING,  COMPLETED,  CANCELLED,  FAILED,  BLOCKED,  };
 
-  @BuiltValueField(wireName: r'scheduledAt')
-  String get scheduledAt;
-
-  @BuiltValueField(wireName: r'priority')
-  num get priority;
-
-  @BuiltValueField(wireName: r'attempts')
-  num get attempts;
-
-  @BuiltValueField(wireName: r'maxAttempts')
-  num get maxAttempts;
-
-  @BuiltValueField(wireName: r'startedAt')
-  JsonObject? get startedAt;
-
-  @BuiltValueField(wireName: r'completedAt')
-  JsonObject? get completedAt;
-
-  @BuiltValueField(wireName: r'cancelledAt')
-  JsonObject? get cancelledAt;
-
-  @BuiltValueField(wireName: r'errorMessage')
-  JsonObject? get errorMessage;
-
-  @BuiltValueField(wireName: r'createdById')
-  String? get createdById;
-
-  @BuiltValueField(wireName: r'createdAt')
-  String get createdAt;
+  @BuiltValueField(wireName: r'type')
+  String get type;
 
   @BuiltValueField(wireName: r'updatedAt')
   String get updatedAt;
-
-  @BuiltValueField(wireName: r'organizationId')
-  JsonObject? get organizationId;
 
   JobListDto._();
 
@@ -105,53 +105,15 @@ class _$JobListDtoSerializer implements PrimitiveSerializer<JobListDto> {
     JobListDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'id';
-    yield serializers.serialize(
-      object.id,
-      specifiedType: const FullType(String),
-    );
-    yield r'type';
-    yield serializers.serialize(
-      object.type,
-      specifiedType: const FullType(String),
-    );
-    yield r'payload';
-    yield serializers.serialize(
-      object.payload,
-      specifiedType: const FullType(BuiltMap, [
-        FullType(String),
-        FullType.nullable(JsonObject),
-      ]),
-    );
-    yield r'status';
-    yield serializers.serialize(
-      object.status,
-      specifiedType: const FullType(JobListDtoStatusEnum),
-    );
-    yield r'scheduledAt';
-    yield serializers.serialize(
-      object.scheduledAt,
-      specifiedType: const FullType(String),
-    );
-    yield r'priority';
-    yield serializers.serialize(
-      object.priority,
-      specifiedType: const FullType(num),
-    );
     yield r'attempts';
     yield serializers.serialize(
       object.attempts,
       specifiedType: const FullType(num),
     );
-    yield r'maxAttempts';
-    yield serializers.serialize(
-      object.maxAttempts,
-      specifiedType: const FullType(num),
-    );
-    if (object.startedAt != null) {
-      yield r'startedAt';
+    if (object.cancelledAt != null) {
+      yield r'cancelledAt';
       yield serializers.serialize(
-        object.startedAt,
+        object.cancelledAt,
         specifiedType: const FullType(JsonObject),
       );
     }
@@ -162,11 +124,16 @@ class _$JobListDtoSerializer implements PrimitiveSerializer<JobListDto> {
         specifiedType: const FullType(JsonObject),
       );
     }
-    if (object.cancelledAt != null) {
-      yield r'cancelledAt';
+    yield r'createdAt';
+    yield serializers.serialize(
+      object.createdAt,
+      specifiedType: const FullType(String),
+    );
+    if (object.createdById != null) {
+      yield r'createdById';
       yield serializers.serialize(
-        object.cancelledAt,
-        specifiedType: const FullType(JsonObject),
+        object.createdById,
+        specifiedType: const FullType.nullable(String),
       );
     }
     if (object.errorMessage != null) {
@@ -176,22 +143,15 @@ class _$JobListDtoSerializer implements PrimitiveSerializer<JobListDto> {
         specifiedType: const FullType(JsonObject),
       );
     }
-    if (object.createdById != null) {
-      yield r'createdById';
-      yield serializers.serialize(
-        object.createdById,
-        specifiedType: const FullType.nullable(String),
-      );
-    }
-    yield r'createdAt';
+    yield r'id';
     yield serializers.serialize(
-      object.createdAt,
+      object.id,
       specifiedType: const FullType(String),
     );
-    yield r'updatedAt';
+    yield r'maxAttempts';
     yield serializers.serialize(
-      object.updatedAt,
-      specifiedType: const FullType(String),
+      object.maxAttempts,
+      specifiedType: const FullType(num),
     );
     if (object.organizationId != null) {
       yield r'organizationId';
@@ -200,6 +160,46 @@ class _$JobListDtoSerializer implements PrimitiveSerializer<JobListDto> {
         specifiedType: const FullType(JsonObject),
       );
     }
+    yield r'payload';
+    yield serializers.serialize(
+      object.payload,
+      specifiedType: const FullType(BuiltMap, [
+        FullType(String),
+        FullType.nullable(JsonObject),
+      ]),
+    );
+    yield r'priority';
+    yield serializers.serialize(
+      object.priority,
+      specifiedType: const FullType(num),
+    );
+    yield r'scheduledAt';
+    yield serializers.serialize(
+      object.scheduledAt,
+      specifiedType: const FullType(String),
+    );
+    if (object.startedAt != null) {
+      yield r'startedAt';
+      yield serializers.serialize(
+        object.startedAt,
+        specifiedType: const FullType(JsonObject),
+      );
+    }
+    yield r'status';
+    yield serializers.serialize(
+      object.status,
+      specifiedType: const FullType(JobListDtoStatusEnum),
+    );
+    yield r'type';
+    yield serializers.serialize(
+      object.type,
+      specifiedType: const FullType(String),
+    );
+    yield r'updatedAt';
+    yield serializers.serialize(
+      object.updatedAt,
+      specifiedType: const FullType(String),
+    );
   }
 
   @override
@@ -227,6 +227,47 @@ class _$JobListDtoSerializer implements PrimitiveSerializer<JobListDto> {
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
+        case r'attempts':
+          final valueDes = serializers.deserialize(value,
+              specifiedType: const FullType(num)) as num;
+          result.attempts = valueDes;
+          break;
+        case r'cancelledAt':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(JsonObject),
+          ) as JsonObject;
+          result.cancelledAt = valueDes;
+          break;
+        case r'completedAt':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(JsonObject),
+          ) as JsonObject;
+          result.completedAt = valueDes;
+          break;
+        case r'createdAt':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.createdAt = valueDes;
+          break;
+        case r'createdById':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
+          if (valueDes == null) continue;
+          result.createdById = valueDes;
+          break;
+        case r'errorMessage':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(JsonObject),
+          ) as JsonObject;
+          result.errorMessage = valueDes;
+          break;
         case r'id':
           final valueDes = serializers.deserialize(
             value,
@@ -234,12 +275,17 @@ class _$JobListDtoSerializer implements PrimitiveSerializer<JobListDto> {
           ) as String;
           result.id = valueDes;
           break;
-        case r'type':
+        case r'maxAttempts':
+          final valueDes = serializers.deserialize(value,
+              specifiedType: const FullType(num)) as num;
+          result.maxAttempts = valueDes;
+          break;
+        case r'organizationId':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.type = valueDes;
+            specifiedType: const FullType(JsonObject),
+          ) as JsonObject;
+          result.organizationId = valueDes;
           break;
         case r'payload':
           final valueDes = serializers.deserialize(
@@ -251,12 +297,10 @@ class _$JobListDtoSerializer implements PrimitiveSerializer<JobListDto> {
           ) as BuiltMap<String, JsonObject?>;
           result.payload.replace(valueDes);
           break;
-        case r'status':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(JobListDtoStatusEnum),
-          ) as JobListDtoStatusEnum;
-          result.status = valueDes;
+        case r'priority':
+          final valueDes = serializers.deserialize(value,
+              specifiedType: const FullType(num)) as num;
+          result.priority = valueDes;
           break;
         case r'scheduledAt':
           final valueDes = serializers.deserialize(
@@ -265,21 +309,6 @@ class _$JobListDtoSerializer implements PrimitiveSerializer<JobListDto> {
           ) as String;
           result.scheduledAt = valueDes;
           break;
-        case r'priority':
-          final valueDes = serializers.deserialize(value,
-              specifiedType: const FullType(num)) as num;
-          result.priority = valueDes;
-          break;
-        case r'attempts':
-          final valueDes = serializers.deserialize(value,
-              specifiedType: const FullType(num)) as num;
-          result.attempts = valueDes;
-          break;
-        case r'maxAttempts':
-          final valueDes = serializers.deserialize(value,
-              specifiedType: const FullType(num)) as num;
-          result.maxAttempts = valueDes;
-          break;
         case r'startedAt':
           final valueDes = serializers.deserialize(
             value,
@@ -287,41 +316,19 @@ class _$JobListDtoSerializer implements PrimitiveSerializer<JobListDto> {
           ) as JsonObject;
           result.startedAt = valueDes;
           break;
-        case r'completedAt':
+        case r'status':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(JsonObject),
-          ) as JsonObject;
-          result.completedAt = valueDes;
+            specifiedType: const FullType(JobListDtoStatusEnum),
+          ) as JobListDtoStatusEnum;
+          result.status = valueDes;
           break;
-        case r'cancelledAt':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(JsonObject),
-          ) as JsonObject;
-          result.cancelledAt = valueDes;
-          break;
-        case r'errorMessage':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(JsonObject),
-          ) as JsonObject;
-          result.errorMessage = valueDes;
-          break;
-        case r'createdById':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType.nullable(String),
-          ) as String?;
-          if (valueDes == null) continue;
-          result.createdById = valueDes;
-          break;
-        case r'createdAt':
+        case r'type':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
-          result.createdAt = valueDes;
+          result.type = valueDes;
           break;
         case r'updatedAt':
           final valueDes = serializers.deserialize(
@@ -329,13 +336,6 @@ class _$JobListDtoSerializer implements PrimitiveSerializer<JobListDto> {
             specifiedType: const FullType(String),
           ) as String;
           result.updatedAt = valueDes;
-          break;
-        case r'organizationId':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(JsonObject),
-          ) as JsonObject;
-          result.organizationId = valueDes;
           break;
         default:
           unhandled.add(key);

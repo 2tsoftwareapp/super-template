@@ -13,37 +13,37 @@ part 'attachment_dto.g.dart';
 /// AttachmentDto
 ///
 /// Properties:
-/// * [id]
-/// * [fileId]
-/// * [entityType]
-/// * [entityId]
-/// * [label]
-/// * [createdById]
 /// * [createdAt]
+/// * [createdById]
+/// * [entityId]
+/// * [entityType]
+/// * [fileId]
+/// * [id]
+/// * [label]
 /// * [updatedAt]
 @BuiltValue()
 abstract class AttachmentDto
     implements Built<AttachmentDto, AttachmentDtoBuilder> {
-  @BuiltValueField(wireName: r'id')
-  String get id;
-
-  @BuiltValueField(wireName: r'fileId')
-  String get fileId;
-
-  @BuiltValueField(wireName: r'entityType')
-  String get entityType;
-
-  @BuiltValueField(wireName: r'entityId')
-  String get entityId;
-
-  @BuiltValueField(wireName: r'label')
-  String? get label;
+  @BuiltValueField(wireName: r'createdAt')
+  String get createdAt;
 
   @BuiltValueField(wireName: r'createdById')
   String? get createdById;
 
-  @BuiltValueField(wireName: r'createdAt')
-  String get createdAt;
+  @BuiltValueField(wireName: r'entityId')
+  String get entityId;
+
+  @BuiltValueField(wireName: r'entityType')
+  String get entityType;
+
+  @BuiltValueField(wireName: r'fileId')
+  String get fileId;
+
+  @BuiltValueField(wireName: r'id')
+  String get id;
+
+  @BuiltValueField(wireName: r'label')
+  String? get label;
 
   @BuiltValueField(wireName: r'updatedAt')
   String get updatedAt;
@@ -73,14 +73,21 @@ class _$AttachmentDtoSerializer implements PrimitiveSerializer<AttachmentDto> {
     AttachmentDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'id';
+    yield r'createdAt';
     yield serializers.serialize(
-      object.id,
+      object.createdAt,
       specifiedType: const FullType(String),
     );
-    yield r'fileId';
+    if (object.createdById != null) {
+      yield r'createdById';
+      yield serializers.serialize(
+        object.createdById,
+        specifiedType: const FullType.nullable(String),
+      );
+    }
+    yield r'entityId';
     yield serializers.serialize(
-      object.fileId,
+      object.entityId,
       specifiedType: const FullType(String),
     );
     yield r'entityType';
@@ -88,9 +95,14 @@ class _$AttachmentDtoSerializer implements PrimitiveSerializer<AttachmentDto> {
       object.entityType,
       specifiedType: const FullType(String),
     );
-    yield r'entityId';
+    yield r'fileId';
     yield serializers.serialize(
-      object.entityId,
+      object.fileId,
+      specifiedType: const FullType(String),
+    );
+    yield r'id';
+    yield serializers.serialize(
+      object.id,
       specifiedType: const FullType(String),
     );
     if (object.label != null) {
@@ -100,18 +112,6 @@ class _$AttachmentDtoSerializer implements PrimitiveSerializer<AttachmentDto> {
         specifiedType: const FullType.nullable(String),
       );
     }
-    if (object.createdById != null) {
-      yield r'createdById';
-      yield serializers.serialize(
-        object.createdById,
-        specifiedType: const FullType.nullable(String),
-      );
-    }
-    yield r'createdAt';
-    yield serializers.serialize(
-      object.createdAt,
-      specifiedType: const FullType(String),
-    );
     yield r'updatedAt';
     yield serializers.serialize(
       object.updatedAt,
@@ -144,41 +144,12 @@ class _$AttachmentDtoSerializer implements PrimitiveSerializer<AttachmentDto> {
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'id':
+        case r'createdAt':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
-          result.id = valueDes;
-          break;
-        case r'fileId':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.fileId = valueDes;
-          break;
-        case r'entityType':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.entityType = valueDes;
-          break;
-        case r'entityId':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.entityId = valueDes;
-          break;
-        case r'label':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType.nullable(String),
-          ) as String?;
-          if (valueDes == null) continue;
-          result.label = valueDes;
+          result.createdAt = valueDes;
           break;
         case r'createdById':
           final valueDes = serializers.deserialize(
@@ -188,12 +159,41 @@ class _$AttachmentDtoSerializer implements PrimitiveSerializer<AttachmentDto> {
           if (valueDes == null) continue;
           result.createdById = valueDes;
           break;
-        case r'createdAt':
+        case r'entityId':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
-          result.createdAt = valueDes;
+          result.entityId = valueDes;
+          break;
+        case r'entityType':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.entityType = valueDes;
+          break;
+        case r'fileId':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.fileId = valueDes;
+          break;
+        case r'id':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.id = valueDes;
+          break;
+        case r'label':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
+          if (valueDes == null) continue;
+          result.label = valueDes;
           break;
         case r'updatedAt':
           final valueDes = serializers.deserialize(

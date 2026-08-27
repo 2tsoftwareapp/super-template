@@ -83,17 +83,17 @@ class _$OrganizationDetailDtoRoleEnumSerializer
 
 class _$OrganizationDetailDto extends OrganizationDetailDto {
   @override
+  final String createdAt;
+  @override
   final String id;
-  @override
-  final String name;
-  @override
-  final String slug;
-  @override
-  final OrganizationDetailDtoRoleEnum role;
   @override
   final num memberCount;
   @override
-  final String createdAt;
+  final String name;
+  @override
+  final OrganizationDetailDtoRoleEnum role;
+  @override
+  final String slug;
   @override
   final String updatedAt;
 
@@ -103,12 +103,12 @@ class _$OrganizationDetailDto extends OrganizationDetailDto {
       (OrganizationDetailDtoBuilder()..update(updates))._build();
 
   _$OrganizationDetailDto._({
-    required this.id,
-    required this.name,
-    required this.slug,
-    required this.role,
-    required this.memberCount,
     required this.createdAt,
+    required this.id,
+    required this.memberCount,
+    required this.name,
+    required this.role,
+    required this.slug,
     required this.updatedAt,
   }) : super._();
   @override
@@ -125,24 +125,24 @@ class _$OrganizationDetailDto extends OrganizationDetailDto {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is OrganizationDetailDto &&
-        id == other.id &&
-        name == other.name &&
-        slug == other.slug &&
-        role == other.role &&
-        memberCount == other.memberCount &&
         createdAt == other.createdAt &&
+        id == other.id &&
+        memberCount == other.memberCount &&
+        name == other.name &&
+        role == other.role &&
+        slug == other.slug &&
         updatedAt == other.updatedAt;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
-    _$hash = $jc(_$hash, id.hashCode);
-    _$hash = $jc(_$hash, name.hashCode);
-    _$hash = $jc(_$hash, slug.hashCode);
-    _$hash = $jc(_$hash, role.hashCode);
-    _$hash = $jc(_$hash, memberCount.hashCode);
     _$hash = $jc(_$hash, createdAt.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, memberCount.hashCode);
+    _$hash = $jc(_$hash, name.hashCode);
+    _$hash = $jc(_$hash, role.hashCode);
+    _$hash = $jc(_$hash, slug.hashCode);
     _$hash = $jc(_$hash, updatedAt.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
@@ -151,12 +151,12 @@ class _$OrganizationDetailDto extends OrganizationDetailDto {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'OrganizationDetailDto')
-          ..add('id', id)
-          ..add('name', name)
-          ..add('slug', slug)
-          ..add('role', role)
-          ..add('memberCount', memberCount)
           ..add('createdAt', createdAt)
+          ..add('id', id)
+          ..add('memberCount', memberCount)
+          ..add('name', name)
+          ..add('role', role)
+          ..add('slug', slug)
           ..add('updatedAt', updatedAt))
         .toString();
   }
@@ -166,29 +166,29 @@ class OrganizationDetailDtoBuilder
     implements Builder<OrganizationDetailDto, OrganizationDetailDtoBuilder> {
   _$OrganizationDetailDto? _$v;
 
+  String? _createdAt;
+  String? get createdAt => _$this._createdAt;
+  set createdAt(String? createdAt) => _$this._createdAt = createdAt;
+
   String? _id;
   String? get id => _$this._id;
   set id(String? id) => _$this._id = id;
-
-  String? _name;
-  String? get name => _$this._name;
-  set name(String? name) => _$this._name = name;
-
-  String? _slug;
-  String? get slug => _$this._slug;
-  set slug(String? slug) => _$this._slug = slug;
-
-  OrganizationDetailDtoRoleEnum? _role;
-  OrganizationDetailDtoRoleEnum? get role => _$this._role;
-  set role(OrganizationDetailDtoRoleEnum? role) => _$this._role = role;
 
   num? _memberCount;
   num? get memberCount => _$this._memberCount;
   set memberCount(num? memberCount) => _$this._memberCount = memberCount;
 
-  String? _createdAt;
-  String? get createdAt => _$this._createdAt;
-  set createdAt(String? createdAt) => _$this._createdAt = createdAt;
+  String? _name;
+  String? get name => _$this._name;
+  set name(String? name) => _$this._name = name;
+
+  OrganizationDetailDtoRoleEnum? _role;
+  OrganizationDetailDtoRoleEnum? get role => _$this._role;
+  set role(OrganizationDetailDtoRoleEnum? role) => _$this._role = role;
+
+  String? _slug;
+  String? get slug => _$this._slug;
+  set slug(String? slug) => _$this._slug = slug;
 
   String? _updatedAt;
   String? get updatedAt => _$this._updatedAt;
@@ -201,12 +201,12 @@ class OrganizationDetailDtoBuilder
   OrganizationDetailDtoBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _id = $v.id;
-      _name = $v.name;
-      _slug = $v.slug;
-      _role = $v.role;
-      _memberCount = $v.memberCount;
       _createdAt = $v.createdAt;
+      _id = $v.id;
+      _memberCount = $v.memberCount;
+      _name = $v.name;
+      _role = $v.role;
+      _slug = $v.slug;
       _updatedAt = $v.updatedAt;
       _$v = null;
     }
@@ -229,35 +229,35 @@ class OrganizationDetailDtoBuilder
   _$OrganizationDetailDto _build() {
     final _$result = _$v ??
         _$OrganizationDetailDto._(
+          createdAt: BuiltValueNullFieldError.checkNotNull(
+            createdAt,
+            r'OrganizationDetailDto',
+            'createdAt',
+          ),
           id: BuiltValueNullFieldError.checkNotNull(
             id,
             r'OrganizationDetailDto',
             'id',
-          ),
-          name: BuiltValueNullFieldError.checkNotNull(
-            name,
-            r'OrganizationDetailDto',
-            'name',
-          ),
-          slug: BuiltValueNullFieldError.checkNotNull(
-            slug,
-            r'OrganizationDetailDto',
-            'slug',
-          ),
-          role: BuiltValueNullFieldError.checkNotNull(
-            role,
-            r'OrganizationDetailDto',
-            'role',
           ),
           memberCount: BuiltValueNullFieldError.checkNotNull(
             memberCount,
             r'OrganizationDetailDto',
             'memberCount',
           ),
-          createdAt: BuiltValueNullFieldError.checkNotNull(
-            createdAt,
+          name: BuiltValueNullFieldError.checkNotNull(
+            name,
             r'OrganizationDetailDto',
-            'createdAt',
+            'name',
+          ),
+          role: BuiltValueNullFieldError.checkNotNull(
+            role,
+            r'OrganizationDetailDto',
+            'role',
+          ),
+          slug: BuiltValueNullFieldError.checkNotNull(
+            slug,
+            r'OrganizationDetailDto',
+            'slug',
           ),
           updatedAt: BuiltValueNullFieldError.checkNotNull(
             updatedAt,

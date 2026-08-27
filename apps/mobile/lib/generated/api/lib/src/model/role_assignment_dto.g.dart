@@ -10,11 +10,11 @@ part of 'role_assignment_dto.dart';
 
 class _$RoleAssignmentDto extends RoleAssignmentDto {
   @override
-  final String roleName;
+  final String? organizationId;
   @override
   final String roleId;
   @override
-  final String? organizationId;
+  final String roleName;
 
   factory _$RoleAssignmentDto([
     void Function(RoleAssignmentDtoBuilder)? updates,
@@ -22,9 +22,9 @@ class _$RoleAssignmentDto extends RoleAssignmentDto {
       (RoleAssignmentDtoBuilder()..update(updates))._build();
 
   _$RoleAssignmentDto._({
-    required this.roleName,
-    required this.roleId,
     this.organizationId,
+    required this.roleId,
+    required this.roleName,
   }) : super._();
   @override
   RoleAssignmentDto rebuild(void Function(RoleAssignmentDtoBuilder) updates) =>
@@ -38,17 +38,17 @@ class _$RoleAssignmentDto extends RoleAssignmentDto {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is RoleAssignmentDto &&
-        roleName == other.roleName &&
+        organizationId == other.organizationId &&
         roleId == other.roleId &&
-        organizationId == other.organizationId;
+        roleName == other.roleName;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
-    _$hash = $jc(_$hash, roleName.hashCode);
-    _$hash = $jc(_$hash, roleId.hashCode);
     _$hash = $jc(_$hash, organizationId.hashCode);
+    _$hash = $jc(_$hash, roleId.hashCode);
+    _$hash = $jc(_$hash, roleName.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -56,9 +56,9 @@ class _$RoleAssignmentDto extends RoleAssignmentDto {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'RoleAssignmentDto')
-          ..add('roleName', roleName)
+          ..add('organizationId', organizationId)
           ..add('roleId', roleId)
-          ..add('organizationId', organizationId))
+          ..add('roleName', roleName))
         .toString();
   }
 }
@@ -67,18 +67,18 @@ class RoleAssignmentDtoBuilder
     implements Builder<RoleAssignmentDto, RoleAssignmentDtoBuilder> {
   _$RoleAssignmentDto? _$v;
 
-  String? _roleName;
-  String? get roleName => _$this._roleName;
-  set roleName(String? roleName) => _$this._roleName = roleName;
+  String? _organizationId;
+  String? get organizationId => _$this._organizationId;
+  set organizationId(String? organizationId) =>
+      _$this._organizationId = organizationId;
 
   String? _roleId;
   String? get roleId => _$this._roleId;
   set roleId(String? roleId) => _$this._roleId = roleId;
 
-  String? _organizationId;
-  String? get organizationId => _$this._organizationId;
-  set organizationId(String? organizationId) =>
-      _$this._organizationId = organizationId;
+  String? _roleName;
+  String? get roleName => _$this._roleName;
+  set roleName(String? roleName) => _$this._roleName = roleName;
 
   RoleAssignmentDtoBuilder() {
     RoleAssignmentDto._defaults(this);
@@ -87,9 +87,9 @@ class RoleAssignmentDtoBuilder
   RoleAssignmentDtoBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _roleName = $v.roleName;
-      _roleId = $v.roleId;
       _organizationId = $v.organizationId;
+      _roleId = $v.roleId;
+      _roleName = $v.roleName;
       _$v = null;
     }
     return this;
@@ -111,17 +111,17 @@ class RoleAssignmentDtoBuilder
   _$RoleAssignmentDto _build() {
     final _$result = _$v ??
         _$RoleAssignmentDto._(
-          roleName: BuiltValueNullFieldError.checkNotNull(
-            roleName,
-            r'RoleAssignmentDto',
-            'roleName',
-          ),
+          organizationId: organizationId,
           roleId: BuiltValueNullFieldError.checkNotNull(
             roleId,
             r'RoleAssignmentDto',
             'roleId',
           ),
-          organizationId: organizationId,
+          roleName: BuiltValueNullFieldError.checkNotNull(
+            roleName,
+            r'RoleAssignmentDto',
+            'roleName',
+          ),
         );
     replace(_$result);
     return _$result;

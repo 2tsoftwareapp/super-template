@@ -14,8 +14,8 @@ part 'switch_organization_response_dto.g.dart';
 ///
 /// Properties:
 /// * [accessToken]
-/// * [refreshToken]
 /// * [organizationId]
+/// * [refreshToken]
 @BuiltValue()
 abstract class SwitchOrganizationResponseDto
     implements
@@ -24,11 +24,11 @@ abstract class SwitchOrganizationResponseDto
   @BuiltValueField(wireName: r'accessToken')
   String get accessToken;
 
-  @BuiltValueField(wireName: r'refreshToken')
-  String get refreshToken;
-
   @BuiltValueField(wireName: r'organizationId')
   String get organizationId;
+
+  @BuiltValueField(wireName: r'refreshToken')
+  String get refreshToken;
 
   SwitchOrganizationResponseDto._();
 
@@ -65,14 +65,14 @@ class _$SwitchOrganizationResponseDtoSerializer
       object.accessToken,
       specifiedType: const FullType(String),
     );
-    yield r'refreshToken';
-    yield serializers.serialize(
-      object.refreshToken,
-      specifiedType: const FullType(String),
-    );
     yield r'organizationId';
     yield serializers.serialize(
       object.organizationId,
+      specifiedType: const FullType(String),
+    );
+    yield r'refreshToken';
+    yield serializers.serialize(
+      object.refreshToken,
       specifiedType: const FullType(String),
     );
   }
@@ -109,19 +109,19 @@ class _$SwitchOrganizationResponseDtoSerializer
           ) as String;
           result.accessToken = valueDes;
           break;
-        case r'refreshToken':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.refreshToken = valueDes;
-          break;
         case r'organizationId':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
           result.organizationId = valueDes;
+          break;
+        case r'refreshToken':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.refreshToken = valueDes;
           break;
         default:
           unhandled.add(key);

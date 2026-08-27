@@ -14,25 +14,25 @@ part 'permission_dto.g.dart';
 /// PermissionDto
 ///
 /// Properties:
-/// * [id]
-/// * [name]
 /// * [description]
+/// * [id]
 /// * [isSystem]
+/// * [name]
 /// * [scope]
 @BuiltValue()
 abstract class PermissionDto
     implements Built<PermissionDto, PermissionDtoBuilder> {
-  @BuiltValueField(wireName: r'id')
-  String get id;
-
-  @BuiltValueField(wireName: r'name')
-  String get name;
-
   @BuiltValueField(wireName: r'description')
   String? get description;
 
+  @BuiltValueField(wireName: r'id')
+  String get id;
+
   @BuiltValueField(wireName: r'isSystem')
   bool get isSystem;
+
+  @BuiltValueField(wireName: r'name')
+  String get name;
 
   @BuiltValueField(wireName: r'scope')
   PermissionDtoScopeEnum get scope;
@@ -63,16 +63,6 @@ class _$PermissionDtoSerializer implements PrimitiveSerializer<PermissionDto> {
     PermissionDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'id';
-    yield serializers.serialize(
-      object.id,
-      specifiedType: const FullType(String),
-    );
-    yield r'name';
-    yield serializers.serialize(
-      object.name,
-      specifiedType: const FullType(String),
-    );
     yield r'description';
     yield object.description == null
         ? null
@@ -80,10 +70,20 @@ class _$PermissionDtoSerializer implements PrimitiveSerializer<PermissionDto> {
             object.description,
             specifiedType: const FullType.nullable(String),
           );
+    yield r'id';
+    yield serializers.serialize(
+      object.id,
+      specifiedType: const FullType(String),
+    );
     yield r'isSystem';
     yield serializers.serialize(
       object.isSystem,
       specifiedType: const FullType(bool),
+    );
+    yield r'name';
+    yield serializers.serialize(
+      object.name,
+      specifiedType: const FullType(String),
     );
     yield r'scope';
     yield serializers.serialize(
@@ -117,20 +117,6 @@ class _$PermissionDtoSerializer implements PrimitiveSerializer<PermissionDto> {
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'id':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.id = valueDes;
-          break;
-        case r'name':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.name = valueDes;
-          break;
         case r'description':
           final valueDes = serializers.deserialize(
             value,
@@ -139,12 +125,26 @@ class _$PermissionDtoSerializer implements PrimitiveSerializer<PermissionDto> {
           if (valueDes == null) continue;
           result.description = valueDes;
           break;
+        case r'id':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.id = valueDes;
+          break;
         case r'isSystem':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(bool),
           ) as bool;
           result.isSystem = valueDes;
+          break;
+        case r'name':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.name = valueDes;
           break;
         case r'scope':
           final valueDes = serializers.deserialize(

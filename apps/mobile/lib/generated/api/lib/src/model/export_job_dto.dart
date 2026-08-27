@@ -15,27 +15,26 @@ part 'export_job_dto.g.dart';
 /// ExportJobDto
 ///
 /// Properties:
-/// * [id]
-/// * [type]
-/// * [status]
-/// * [fileId]
-/// * [filters]
-/// * [createdById]
 /// * [completedAt]
 /// * [createdAt]
+/// * [createdById]
+/// * [fileId]
+/// * [filters]
+/// * [id]
+/// * [status]
+/// * [type]
 /// * [updatedAt]
 @BuiltValue()
 abstract class ExportJobDto
     implements Built<ExportJobDto, ExportJobDtoBuilder> {
-  @BuiltValueField(wireName: r'id')
-  String get id;
+  @BuiltValueField(wireName: r'completedAt')
+  JsonObject? get completedAt;
 
-  @BuiltValueField(wireName: r'type')
-  String get type;
+  @BuiltValueField(wireName: r'createdAt')
+  String get createdAt;
 
-  @BuiltValueField(wireName: r'status')
-  ExportJobDtoStatusEnum get status;
-  // enum statusEnum {  PENDING,  PROCESSING,  COMPLETED,  FAILED,  CANCELLED,  };
+  @BuiltValueField(wireName: r'createdById')
+  String get createdById;
 
   @BuiltValueField(wireName: r'fileId')
   JsonObject? get fileId;
@@ -43,14 +42,15 @@ abstract class ExportJobDto
   @BuiltValueField(wireName: r'filters')
   BuiltMap<String, JsonObject?>? get filters;
 
-  @BuiltValueField(wireName: r'createdById')
-  String get createdById;
+  @BuiltValueField(wireName: r'id')
+  String get id;
 
-  @BuiltValueField(wireName: r'completedAt')
-  JsonObject? get completedAt;
+  @BuiltValueField(wireName: r'status')
+  ExportJobDtoStatusEnum get status;
+  // enum statusEnum {  PENDING,  PROCESSING,  COMPLETED,  FAILED,  CANCELLED,  };
 
-  @BuiltValueField(wireName: r'createdAt')
-  String get createdAt;
+  @BuiltValueField(wireName: r'type')
+  String get type;
 
   @BuiltValueField(wireName: r'updatedAt')
   String get updatedAt;
@@ -78,20 +78,22 @@ class _$ExportJobDtoSerializer implements PrimitiveSerializer<ExportJobDto> {
     ExportJobDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'id';
+    if (object.completedAt != null) {
+      yield r'completedAt';
+      yield serializers.serialize(
+        object.completedAt,
+        specifiedType: const FullType(JsonObject),
+      );
+    }
+    yield r'createdAt';
     yield serializers.serialize(
-      object.id,
+      object.createdAt,
       specifiedType: const FullType(String),
     );
-    yield r'type';
+    yield r'createdById';
     yield serializers.serialize(
-      object.type,
+      object.createdById,
       specifiedType: const FullType(String),
-    );
-    yield r'status';
-    yield serializers.serialize(
-      object.status,
-      specifiedType: const FullType(ExportJobDtoStatusEnum),
     );
     if (object.fileId != null) {
       yield r'fileId';
@@ -110,21 +112,19 @@ class _$ExportJobDtoSerializer implements PrimitiveSerializer<ExportJobDto> {
         ]),
       );
     }
-    yield r'createdById';
+    yield r'id';
     yield serializers.serialize(
-      object.createdById,
+      object.id,
       specifiedType: const FullType(String),
     );
-    if (object.completedAt != null) {
-      yield r'completedAt';
-      yield serializers.serialize(
-        object.completedAt,
-        specifiedType: const FullType(JsonObject),
-      );
-    }
-    yield r'createdAt';
+    yield r'status';
     yield serializers.serialize(
-      object.createdAt,
+      object.status,
+      specifiedType: const FullType(ExportJobDtoStatusEnum),
+    );
+    yield r'type';
+    yield serializers.serialize(
+      object.type,
       specifiedType: const FullType(String),
     );
     yield r'updatedAt';
@@ -159,26 +159,26 @@ class _$ExportJobDtoSerializer implements PrimitiveSerializer<ExportJobDto> {
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'id':
+        case r'completedAt':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(JsonObject),
+          ) as JsonObject;
+          result.completedAt = valueDes;
+          break;
+        case r'createdAt':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
-          result.id = valueDes;
+          result.createdAt = valueDes;
           break;
-        case r'type':
+        case r'createdById':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
-          result.type = valueDes;
-          break;
-        case r'status':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(ExportJobDtoStatusEnum),
-          ) as ExportJobDtoStatusEnum;
-          result.status = valueDes;
+          result.createdById = valueDes;
           break;
         case r'fileId':
           final valueDes = serializers.deserialize(
@@ -197,26 +197,26 @@ class _$ExportJobDtoSerializer implements PrimitiveSerializer<ExportJobDto> {
           ) as BuiltMap<String, JsonObject?>;
           result.filters.replace(valueDes);
           break;
-        case r'createdById':
+        case r'id':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
-          result.createdById = valueDes;
+          result.id = valueDes;
           break;
-        case r'completedAt':
+        case r'status':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(JsonObject),
-          ) as JsonObject;
-          result.completedAt = valueDes;
+            specifiedType: const FullType(ExportJobDtoStatusEnum),
+          ) as ExportJobDtoStatusEnum;
+          result.status = valueDes;
           break;
-        case r'createdAt':
+        case r'type':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
-          result.createdAt = valueDes;
+          result.type = valueDes;
           break;
         case r'updatedAt':
           final valueDes = serializers.deserialize(

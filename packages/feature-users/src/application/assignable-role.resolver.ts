@@ -2,11 +2,11 @@ import type { TransactionExecutor } from "@repo/api-runtime";
 
 import { AppError, ERROR_CODES } from "@repo/api-runtime";
 
-import type { UserAccessControl } from "../public/user-access-control.port";
-import { ROLE_NAMES } from "../public/role.constants";
 import type { RolePolicyTarget } from "../domain/role-assignment.policy";
-
+import type { UserAccessControl } from "../public/user-access-control.port";
 import type { AssignableRoleName } from "./users.types";
+
+import { ROLE_NAMES } from "../public/role.constants";
 
 export async function resolveAssignableRole(
   accessControlService: UserAccessControl,

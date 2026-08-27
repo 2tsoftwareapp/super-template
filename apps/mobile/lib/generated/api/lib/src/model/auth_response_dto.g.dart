@@ -12,29 +12,29 @@ class _$AuthResponseDto extends AuthResponseDto {
   @override
   final String accessToken;
   @override
-  final String refreshToken;
-  @override
-  final UserDto user;
-  @override
-  final BuiltList<String> permissions;
-  @override
-  final AuthSessionDto session;
+  final bool? mustChangePassword;
   @override
   final String? organizationId;
   @override
-  final bool? mustChangePassword;
+  final BuiltList<String> permissions;
+  @override
+  final String refreshToken;
+  @override
+  final AuthSessionDto session;
+  @override
+  final AuthUserDto user;
 
   factory _$AuthResponseDto([void Function(AuthResponseDtoBuilder)? updates]) =>
       (AuthResponseDtoBuilder()..update(updates))._build();
 
   _$AuthResponseDto._({
     required this.accessToken,
-    required this.refreshToken,
-    required this.user,
-    required this.permissions,
-    required this.session,
-    this.organizationId,
     this.mustChangePassword,
+    this.organizationId,
+    required this.permissions,
+    required this.refreshToken,
+    required this.session,
+    required this.user,
   }) : super._();
   @override
   AuthResponseDto rebuild(void Function(AuthResponseDtoBuilder) updates) =>
@@ -48,24 +48,24 @@ class _$AuthResponseDto extends AuthResponseDto {
     if (identical(other, this)) return true;
     return other is AuthResponseDto &&
         accessToken == other.accessToken &&
-        refreshToken == other.refreshToken &&
-        user == other.user &&
-        permissions == other.permissions &&
-        session == other.session &&
+        mustChangePassword == other.mustChangePassword &&
         organizationId == other.organizationId &&
-        mustChangePassword == other.mustChangePassword;
+        permissions == other.permissions &&
+        refreshToken == other.refreshToken &&
+        session == other.session &&
+        user == other.user;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
     _$hash = $jc(_$hash, accessToken.hashCode);
-    _$hash = $jc(_$hash, refreshToken.hashCode);
-    _$hash = $jc(_$hash, user.hashCode);
-    _$hash = $jc(_$hash, permissions.hashCode);
-    _$hash = $jc(_$hash, session.hashCode);
-    _$hash = $jc(_$hash, organizationId.hashCode);
     _$hash = $jc(_$hash, mustChangePassword.hashCode);
+    _$hash = $jc(_$hash, organizationId.hashCode);
+    _$hash = $jc(_$hash, permissions.hashCode);
+    _$hash = $jc(_$hash, refreshToken.hashCode);
+    _$hash = $jc(_$hash, session.hashCode);
+    _$hash = $jc(_$hash, user.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -74,12 +74,12 @@ class _$AuthResponseDto extends AuthResponseDto {
   String toString() {
     return (newBuiltValueToStringHelper(r'AuthResponseDto')
           ..add('accessToken', accessToken)
-          ..add('refreshToken', refreshToken)
-          ..add('user', user)
-          ..add('permissions', permissions)
-          ..add('session', session)
+          ..add('mustChangePassword', mustChangePassword)
           ..add('organizationId', organizationId)
-          ..add('mustChangePassword', mustChangePassword))
+          ..add('permissions', permissions)
+          ..add('refreshToken', refreshToken)
+          ..add('session', session)
+          ..add('user', user))
         .toString();
   }
 }
@@ -92,13 +92,15 @@ class AuthResponseDtoBuilder
   String? get accessToken => _$this._accessToken;
   set accessToken(String? accessToken) => _$this._accessToken = accessToken;
 
-  String? _refreshToken;
-  String? get refreshToken => _$this._refreshToken;
-  set refreshToken(String? refreshToken) => _$this._refreshToken = refreshToken;
+  bool? _mustChangePassword;
+  bool? get mustChangePassword => _$this._mustChangePassword;
+  set mustChangePassword(bool? mustChangePassword) =>
+      _$this._mustChangePassword = mustChangePassword;
 
-  UserDtoBuilder? _user;
-  UserDtoBuilder get user => _$this._user ??= UserDtoBuilder();
-  set user(UserDtoBuilder? user) => _$this._user = user;
+  String? _organizationId;
+  String? get organizationId => _$this._organizationId;
+  set organizationId(String? organizationId) =>
+      _$this._organizationId = organizationId;
 
   ListBuilder<String>? _permissions;
   ListBuilder<String> get permissions =>
@@ -106,20 +108,18 @@ class AuthResponseDtoBuilder
   set permissions(ListBuilder<String>? permissions) =>
       _$this._permissions = permissions;
 
+  String? _refreshToken;
+  String? get refreshToken => _$this._refreshToken;
+  set refreshToken(String? refreshToken) => _$this._refreshToken = refreshToken;
+
   AuthSessionDtoBuilder? _session;
   AuthSessionDtoBuilder get session =>
       _$this._session ??= AuthSessionDtoBuilder();
   set session(AuthSessionDtoBuilder? session) => _$this._session = session;
 
-  String? _organizationId;
-  String? get organizationId => _$this._organizationId;
-  set organizationId(String? organizationId) =>
-      _$this._organizationId = organizationId;
-
-  bool? _mustChangePassword;
-  bool? get mustChangePassword => _$this._mustChangePassword;
-  set mustChangePassword(bool? mustChangePassword) =>
-      _$this._mustChangePassword = mustChangePassword;
+  AuthUserDtoBuilder? _user;
+  AuthUserDtoBuilder get user => _$this._user ??= AuthUserDtoBuilder();
+  set user(AuthUserDtoBuilder? user) => _$this._user = user;
 
   AuthResponseDtoBuilder() {
     AuthResponseDto._defaults(this);
@@ -129,12 +129,12 @@ class AuthResponseDtoBuilder
     final $v = _$v;
     if ($v != null) {
       _accessToken = $v.accessToken;
-      _refreshToken = $v.refreshToken;
-      _user = $v.user.toBuilder();
-      _permissions = $v.permissions.toBuilder();
-      _session = $v.session.toBuilder();
-      _organizationId = $v.organizationId;
       _mustChangePassword = $v.mustChangePassword;
+      _organizationId = $v.organizationId;
+      _permissions = $v.permissions.toBuilder();
+      _refreshToken = $v.refreshToken;
+      _session = $v.session.toBuilder();
+      _user = $v.user.toBuilder();
       _$v = null;
     }
     return this;
@@ -163,26 +163,27 @@ class AuthResponseDtoBuilder
               r'AuthResponseDto',
               'accessToken',
             ),
+            mustChangePassword: mustChangePassword,
+            organizationId: organizationId,
+            permissions: permissions.build(),
             refreshToken: BuiltValueNullFieldError.checkNotNull(
               refreshToken,
               r'AuthResponseDto',
               'refreshToken',
             ),
-            user: user.build(),
-            permissions: permissions.build(),
             session: session.build(),
-            organizationId: organizationId,
-            mustChangePassword: mustChangePassword,
+            user: user.build(),
           );
     } catch (_) {
       late String _$failedField;
       try {
-        _$failedField = 'user';
-        user.build();
         _$failedField = 'permissions';
         permissions.build();
+
         _$failedField = 'session';
         session.build();
+        _$failedField = 'user';
+        user.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
           r'AuthResponseDto',

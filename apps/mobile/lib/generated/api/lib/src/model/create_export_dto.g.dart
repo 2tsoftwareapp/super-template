@@ -10,16 +10,16 @@ part of 'create_export_dto.dart';
 
 class _$CreateExportDto extends CreateExportDto {
   @override
-  final String type;
-  @override
   final BuiltMap<String, JsonObject?>? filters;
   @override
   final String? idempotencyKey;
+  @override
+  final String type;
 
   factory _$CreateExportDto([void Function(CreateExportDtoBuilder)? updates]) =>
       (CreateExportDtoBuilder()..update(updates))._build();
 
-  _$CreateExportDto._({required this.type, this.filters, this.idempotencyKey})
+  _$CreateExportDto._({this.filters, this.idempotencyKey, required this.type})
       : super._();
   @override
   CreateExportDto rebuild(void Function(CreateExportDtoBuilder) updates) =>
@@ -32,17 +32,17 @@ class _$CreateExportDto extends CreateExportDto {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is CreateExportDto &&
-        type == other.type &&
         filters == other.filters &&
-        idempotencyKey == other.idempotencyKey;
+        idempotencyKey == other.idempotencyKey &&
+        type == other.type;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
-    _$hash = $jc(_$hash, type.hashCode);
     _$hash = $jc(_$hash, filters.hashCode);
     _$hash = $jc(_$hash, idempotencyKey.hashCode);
+    _$hash = $jc(_$hash, type.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -50,9 +50,9 @@ class _$CreateExportDto extends CreateExportDto {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'CreateExportDto')
-          ..add('type', type)
           ..add('filters', filters)
-          ..add('idempotencyKey', idempotencyKey))
+          ..add('idempotencyKey', idempotencyKey)
+          ..add('type', type))
         .toString();
   }
 }
@@ -60,10 +60,6 @@ class _$CreateExportDto extends CreateExportDto {
 class CreateExportDtoBuilder
     implements Builder<CreateExportDto, CreateExportDtoBuilder> {
   _$CreateExportDto? _$v;
-
-  String? _type;
-  String? get type => _$this._type;
-  set type(String? type) => _$this._type = type;
 
   MapBuilder<String, JsonObject?>? _filters;
   MapBuilder<String, JsonObject?> get filters =>
@@ -76,6 +72,10 @@ class CreateExportDtoBuilder
   set idempotencyKey(String? idempotencyKey) =>
       _$this._idempotencyKey = idempotencyKey;
 
+  String? _type;
+  String? get type => _$this._type;
+  set type(String? type) => _$this._type = type;
+
   CreateExportDtoBuilder() {
     CreateExportDto._defaults(this);
   }
@@ -83,9 +83,9 @@ class CreateExportDtoBuilder
   CreateExportDtoBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _type = $v.type;
       _filters = $v.filters?.toBuilder();
       _idempotencyKey = $v.idempotencyKey;
+      _type = $v.type;
       _$v = null;
     }
     return this;
@@ -109,13 +109,13 @@ class CreateExportDtoBuilder
     try {
       _$result = _$v ??
           _$CreateExportDto._(
+            filters: _filters?.build(),
+            idempotencyKey: idempotencyKey,
             type: BuiltValueNullFieldError.checkNotNull(
               type,
               r'CreateExportDto',
               'type',
             ),
-            filters: _filters?.build(),
-            idempotencyKey: idempotencyKey,
           );
     } catch (_) {
       late String _$failedField;

@@ -10,9 +10,9 @@ part of 'create_role_dto.dart';
 
 class _$CreateRoleDto extends CreateRoleDto {
   @override
-  final String name;
-  @override
   final String? description;
+  @override
+  final String name;
   @override
   final String? organizationId;
   @override
@@ -22,8 +22,8 @@ class _$CreateRoleDto extends CreateRoleDto {
       (CreateRoleDtoBuilder()..update(updates))._build();
 
   _$CreateRoleDto._({
-    required this.name,
     this.description,
+    required this.name,
     this.organizationId,
     required this.permissionIds,
   }) : super._();
@@ -38,8 +38,8 @@ class _$CreateRoleDto extends CreateRoleDto {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is CreateRoleDto &&
-        name == other.name &&
         description == other.description &&
+        name == other.name &&
         organizationId == other.organizationId &&
         permissionIds == other.permissionIds;
   }
@@ -47,8 +47,8 @@ class _$CreateRoleDto extends CreateRoleDto {
   @override
   int get hashCode {
     var _$hash = 0;
-    _$hash = $jc(_$hash, name.hashCode);
     _$hash = $jc(_$hash, description.hashCode);
+    _$hash = $jc(_$hash, name.hashCode);
     _$hash = $jc(_$hash, organizationId.hashCode);
     _$hash = $jc(_$hash, permissionIds.hashCode);
     _$hash = $jf(_$hash);
@@ -58,8 +58,8 @@ class _$CreateRoleDto extends CreateRoleDto {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'CreateRoleDto')
-          ..add('name', name)
           ..add('description', description)
+          ..add('name', name)
           ..add('organizationId', organizationId)
           ..add('permissionIds', permissionIds))
         .toString();
@@ -70,13 +70,13 @@ class CreateRoleDtoBuilder
     implements Builder<CreateRoleDto, CreateRoleDtoBuilder> {
   _$CreateRoleDto? _$v;
 
-  String? _name;
-  String? get name => _$this._name;
-  set name(String? name) => _$this._name = name;
-
   String? _description;
   String? get description => _$this._description;
   set description(String? description) => _$this._description = description;
+
+  String? _name;
+  String? get name => _$this._name;
+  set name(String? name) => _$this._name = name;
 
   String? _organizationId;
   String? get organizationId => _$this._organizationId;
@@ -96,8 +96,8 @@ class CreateRoleDtoBuilder
   CreateRoleDtoBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _name = $v.name;
       _description = $v.description;
+      _name = $v.name;
       _organizationId = $v.organizationId;
       _permissionIds = $v.permissionIds.toBuilder();
       _$v = null;
@@ -123,12 +123,12 @@ class CreateRoleDtoBuilder
     try {
       _$result = _$v ??
           _$CreateRoleDto._(
+            description: description,
             name: BuiltValueNullFieldError.checkNotNull(
               name,
               r'CreateRoleDto',
               'name',
             ),
-            description: description,
             organizationId: organizationId,
             permissionIds: permissionIds.build(),
           );

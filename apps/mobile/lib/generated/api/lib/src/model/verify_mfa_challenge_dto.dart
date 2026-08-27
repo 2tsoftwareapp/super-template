@@ -13,16 +13,16 @@ part 'verify_mfa_challenge_dto.g.dart';
 /// VerifyMfaChallengeDto
 ///
 /// Properties:
-/// * [mfaToken]
 /// * [code]
+/// * [mfaToken]
 @BuiltValue()
 abstract class VerifyMfaChallengeDto
     implements Built<VerifyMfaChallengeDto, VerifyMfaChallengeDtoBuilder> {
-  @BuiltValueField(wireName: r'mfaToken')
-  String get mfaToken;
-
   @BuiltValueField(wireName: r'code')
   String get code;
+
+  @BuiltValueField(wireName: r'mfaToken')
+  String get mfaToken;
 
   VerifyMfaChallengeDto._();
 
@@ -54,14 +54,14 @@ class _$VerifyMfaChallengeDtoSerializer
     VerifyMfaChallengeDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'mfaToken';
-    yield serializers.serialize(
-      object.mfaToken,
-      specifiedType: const FullType(String),
-    );
     yield r'code';
     yield serializers.serialize(
       object.code,
+      specifiedType: const FullType(String),
+    );
+    yield r'mfaToken';
+    yield serializers.serialize(
+      object.mfaToken,
       specifiedType: const FullType(String),
     );
   }
@@ -91,19 +91,19 @@ class _$VerifyMfaChallengeDtoSerializer
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'mfaToken':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.mfaToken = valueDes;
-          break;
         case r'code':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
           result.code = valueDes;
+          break;
+        case r'mfaToken':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.mfaToken = valueDes;
           break;
         default:
           unhandled.add(key);

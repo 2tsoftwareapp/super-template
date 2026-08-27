@@ -11,9 +11,10 @@ import {
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 import { FileAccessService } from "@repo/feature-upload/contracts";
 
+import type { ImportValidationError } from "../../../public/contracts";
 import type { CreateImportCommand, ImportJobView } from "../imports.types";
 
-import { ImportExportAdapterRegistry, type ImportValidationError } from "../../../public/contracts";
+import { ImportExportAdapterRegistry } from "../../../infrastructure/import-export-adapter.registry";
 import { MAX_IMPORT_ROWS } from "../../domain/import-types";
 import {
   IMPORT_JOBS_REPOSITORY,

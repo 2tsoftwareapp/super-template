@@ -1,10 +1,11 @@
 import { Module } from "@nestjs/common";
-import { AccessControlModule } from "@repo/feature-access-control/contracts";
-import { OrganizationsModule } from "@repo/feature-organizations/contracts";
+import { AccessControlModule } from "@repo/feature-access-control/module";
+import { OrganizationsModule } from "@repo/feature-organizations/module";
 import { FilesModule, StorageModule } from "@repo/feature-upload/module";
 import { UsersModule } from "@repo/feature-users/module";
 
-import { ImportExportAdapterRegistry } from "../public/contracts";
+import { ImportExportModule } from "../import-export/import-export.module";
+import { ImportExportAdapterRegistry } from "../infrastructure/import-export-adapter.registry";
 import { ImportsMapper } from "./application/imports.mapper";
 import { IMPORT_JOBS_REPOSITORY } from "./application/ports/imports.repository.port";
 import { ImportFileParserService } from "./application/services/import-file-parser.service";
@@ -16,7 +17,14 @@ import { UsersImportExportAdapter } from "./infrastructure/users-import-export.a
 import { ImportsController } from "./presentation/imports.controller";
 
 @Module({
-  imports: [AccessControlModule, FilesModule, OrganizationsModule, StorageModule, UsersModule],
+  imports: [
+    AccessControlModule,
+    FilesModule,
+    ImportExportModule,
+    OrganizationsModule,
+    StorageModule,
+    UsersModule,
+  ],
   controllers: [ImportsController],
   providers: [
     ImportJobsRepository,

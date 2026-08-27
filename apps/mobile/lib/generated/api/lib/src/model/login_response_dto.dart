@@ -5,8 +5,8 @@
 // ignore_for_file: unused_element
 // @dart=3.0
 
+import 'package:super_template_api/src/model/auth_user_dto.dart';
 import 'package:built_collection/built_collection.dart';
-import 'package:super_template_api/src/model/user_dto.dart';
 import 'package:super_template_api/src/model/auth_session_dto.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
@@ -16,44 +16,44 @@ part 'login_response_dto.g.dart';
 /// LoginResponseDto
 ///
 /// Properties:
+/// * [accessToken]
 /// * [mfaRequired]
 /// * [mfaToken]
-/// * [accessToken]
-/// * [refreshToken]
-/// * [user]
-/// * [permissions]
-/// * [session]
-/// * [organizationId]
 /// * [mustChangePassword]
+/// * [organizationId]
+/// * [permissions]
+/// * [refreshToken]
+/// * [session]
+/// * [user]
 @BuiltValue()
 abstract class LoginResponseDto
     implements Built<LoginResponseDto, LoginResponseDtoBuilder> {
+  @BuiltValueField(wireName: r'accessToken')
+  String? get accessToken;
+
   @BuiltValueField(wireName: r'mfaRequired')
   bool get mfaRequired;
 
   @BuiltValueField(wireName: r'mfaToken')
   String? get mfaToken;
 
-  @BuiltValueField(wireName: r'accessToken')
-  String? get accessToken;
-
-  @BuiltValueField(wireName: r'refreshToken')
-  String? get refreshToken;
-
-  @BuiltValueField(wireName: r'user')
-  UserDto? get user;
-
-  @BuiltValueField(wireName: r'permissions')
-  BuiltList<String>? get permissions;
-
-  @BuiltValueField(wireName: r'session')
-  AuthSessionDto? get session;
+  @BuiltValueField(wireName: r'mustChangePassword')
+  bool? get mustChangePassword;
 
   @BuiltValueField(wireName: r'organizationId')
   String? get organizationId;
 
-  @BuiltValueField(wireName: r'mustChangePassword')
-  bool? get mustChangePassword;
+  @BuiltValueField(wireName: r'permissions')
+  BuiltList<String>? get permissions;
+
+  @BuiltValueField(wireName: r'refreshToken')
+  String? get refreshToken;
+
+  @BuiltValueField(wireName: r'session')
+  AuthSessionDto? get session;
+
+  @BuiltValueField(wireName: r'user')
+  AuthUserDto? get user;
 
   LoginResponseDto._();
 
@@ -81,6 +81,13 @@ class _$LoginResponseDtoSerializer
     LoginResponseDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
+    if (object.accessToken != null) {
+      yield r'accessToken';
+      yield serializers.serialize(
+        object.accessToken,
+        specifiedType: const FullType(String),
+      );
+    }
     yield r'mfaRequired';
     yield serializers.serialize(
       object.mfaRequired,
@@ -93,39 +100,11 @@ class _$LoginResponseDtoSerializer
         specifiedType: const FullType(String),
       );
     }
-    if (object.accessToken != null) {
-      yield r'accessToken';
+    if (object.mustChangePassword != null) {
+      yield r'mustChangePassword';
       yield serializers.serialize(
-        object.accessToken,
-        specifiedType: const FullType(String),
-      );
-    }
-    if (object.refreshToken != null) {
-      yield r'refreshToken';
-      yield serializers.serialize(
-        object.refreshToken,
-        specifiedType: const FullType(String),
-      );
-    }
-    if (object.user != null) {
-      yield r'user';
-      yield serializers.serialize(
-        object.user,
-        specifiedType: const FullType(UserDto),
-      );
-    }
-    if (object.permissions != null) {
-      yield r'permissions';
-      yield serializers.serialize(
-        object.permissions,
-        specifiedType: const FullType(BuiltList, [FullType(String)]),
-      );
-    }
-    if (object.session != null) {
-      yield r'session';
-      yield serializers.serialize(
-        object.session,
-        specifiedType: const FullType(AuthSessionDto),
+        object.mustChangePassword,
+        specifiedType: const FullType(bool),
       );
     }
     if (object.organizationId != null) {
@@ -135,11 +114,32 @@ class _$LoginResponseDtoSerializer
         specifiedType: const FullType.nullable(String),
       );
     }
-    if (object.mustChangePassword != null) {
-      yield r'mustChangePassword';
+    if (object.permissions != null) {
+      yield r'permissions';
       yield serializers.serialize(
-        object.mustChangePassword,
-        specifiedType: const FullType(bool),
+        object.permissions,
+        specifiedType: const FullType(BuiltList, [FullType(String)]),
+      );
+    }
+    if (object.refreshToken != null) {
+      yield r'refreshToken';
+      yield serializers.serialize(
+        object.refreshToken,
+        specifiedType: const FullType(String),
+      );
+    }
+    if (object.session != null) {
+      yield r'session';
+      yield serializers.serialize(
+        object.session,
+        specifiedType: const FullType(AuthSessionDto),
+      );
+    }
+    if (object.user != null) {
+      yield r'user';
+      yield serializers.serialize(
+        object.user,
+        specifiedType: const FullType(AuthUserDto),
       );
     }
   }
@@ -169,6 +169,13 @@ class _$LoginResponseDtoSerializer
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
+        case r'accessToken':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.accessToken = valueDes;
+          break;
         case r'mfaRequired':
           final valueDes = serializers.deserialize(
             value,
@@ -183,26 +190,20 @@ class _$LoginResponseDtoSerializer
           ) as String;
           result.mfaToken = valueDes;
           break;
-        case r'accessToken':
+        case r'mustChangePassword':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.accessToken = valueDes;
+            specifiedType: const FullType(bool),
+          ) as bool;
+          result.mustChangePassword = valueDes;
           break;
-        case r'refreshToken':
+        case r'organizationId':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.refreshToken = valueDes;
-          break;
-        case r'user':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(UserDto),
-          ) as UserDto;
-          result.user.replace(valueDes);
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
+          if (valueDes == null) continue;
+          result.organizationId = valueDes;
           break;
         case r'permissions':
           final valueDes = serializers.deserialize(
@@ -213,6 +214,13 @@ class _$LoginResponseDtoSerializer
           ) as BuiltList<String>;
           result.permissions.replace(valueDes);
           break;
+        case r'refreshToken':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.refreshToken = valueDes;
+          break;
         case r'session':
           final valueDes = serializers.deserialize(
             value,
@@ -220,20 +228,12 @@ class _$LoginResponseDtoSerializer
           ) as AuthSessionDto;
           result.session.replace(valueDes);
           break;
-        case r'organizationId':
+        case r'user':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType.nullable(String),
-          ) as String?;
-          if (valueDes == null) continue;
-          result.organizationId = valueDes;
-          break;
-        case r'mustChangePassword':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(bool),
-          ) as bool;
-          result.mustChangePassword = valueDes;
+            specifiedType: const FullType(AuthUserDto),
+          ) as AuthUserDto;
+          result.user.replace(valueDes);
           break;
         default:
           unhandled.add(key);

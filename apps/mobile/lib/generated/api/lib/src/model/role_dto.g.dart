@@ -71,31 +71,31 @@ class _$RoleDtoScopeEnumSerializer
 
 class _$RoleDto extends RoleDto {
   @override
-  final String id;
-  @override
-  final String? organizationId;
-  @override
-  final String name;
-  @override
   final String? description;
   @override
-  final RoleDtoScopeEnum scope;
+  final String id;
   @override
   final bool isSystem;
   @override
+  final String name;
+  @override
+  final String? organizationId;
+  @override
   final BuiltList<PermissionDto> permissions;
+  @override
+  final RoleDtoScopeEnum scope;
 
   factory _$RoleDto([void Function(RoleDtoBuilder)? updates]) =>
       (RoleDtoBuilder()..update(updates))._build();
 
   _$RoleDto._({
-    required this.id,
-    this.organizationId,
-    required this.name,
     this.description,
-    required this.scope,
+    required this.id,
     required this.isSystem,
+    required this.name,
+    this.organizationId,
     required this.permissions,
+    required this.scope,
   }) : super._();
   @override
   RoleDto rebuild(void Function(RoleDtoBuilder) updates) =>
@@ -108,25 +108,25 @@ class _$RoleDto extends RoleDto {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is RoleDto &&
-        id == other.id &&
-        organizationId == other.organizationId &&
-        name == other.name &&
         description == other.description &&
-        scope == other.scope &&
+        id == other.id &&
         isSystem == other.isSystem &&
-        permissions == other.permissions;
+        name == other.name &&
+        organizationId == other.organizationId &&
+        permissions == other.permissions &&
+        scope == other.scope;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
-    _$hash = $jc(_$hash, id.hashCode);
-    _$hash = $jc(_$hash, organizationId.hashCode);
-    _$hash = $jc(_$hash, name.hashCode);
     _$hash = $jc(_$hash, description.hashCode);
-    _$hash = $jc(_$hash, scope.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
     _$hash = $jc(_$hash, isSystem.hashCode);
+    _$hash = $jc(_$hash, name.hashCode);
+    _$hash = $jc(_$hash, organizationId.hashCode);
     _$hash = $jc(_$hash, permissions.hashCode);
+    _$hash = $jc(_$hash, scope.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -134,13 +134,13 @@ class _$RoleDto extends RoleDto {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'RoleDto')
-          ..add('id', id)
-          ..add('organizationId', organizationId)
-          ..add('name', name)
           ..add('description', description)
-          ..add('scope', scope)
+          ..add('id', id)
           ..add('isSystem', isSystem)
-          ..add('permissions', permissions))
+          ..add('name', name)
+          ..add('organizationId', organizationId)
+          ..add('permissions', permissions)
+          ..add('scope', scope))
         .toString();
   }
 }
@@ -148,36 +148,36 @@ class _$RoleDto extends RoleDto {
 class RoleDtoBuilder implements Builder<RoleDto, RoleDtoBuilder> {
   _$RoleDto? _$v;
 
+  String? _description;
+  String? get description => _$this._description;
+  set description(String? description) => _$this._description = description;
+
   String? _id;
   String? get id => _$this._id;
   set id(String? id) => _$this._id = id;
+
+  bool? _isSystem;
+  bool? get isSystem => _$this._isSystem;
+  set isSystem(bool? isSystem) => _$this._isSystem = isSystem;
+
+  String? _name;
+  String? get name => _$this._name;
+  set name(String? name) => _$this._name = name;
 
   String? _organizationId;
   String? get organizationId => _$this._organizationId;
   set organizationId(String? organizationId) =>
       _$this._organizationId = organizationId;
 
-  String? _name;
-  String? get name => _$this._name;
-  set name(String? name) => _$this._name = name;
-
-  String? _description;
-  String? get description => _$this._description;
-  set description(String? description) => _$this._description = description;
-
-  RoleDtoScopeEnum? _scope;
-  RoleDtoScopeEnum? get scope => _$this._scope;
-  set scope(RoleDtoScopeEnum? scope) => _$this._scope = scope;
-
-  bool? _isSystem;
-  bool? get isSystem => _$this._isSystem;
-  set isSystem(bool? isSystem) => _$this._isSystem = isSystem;
-
   ListBuilder<PermissionDto>? _permissions;
   ListBuilder<PermissionDto> get permissions =>
       _$this._permissions ??= ListBuilder<PermissionDto>();
   set permissions(ListBuilder<PermissionDto>? permissions) =>
       _$this._permissions = permissions;
+
+  RoleDtoScopeEnum? _scope;
+  RoleDtoScopeEnum? get scope => _$this._scope;
+  set scope(RoleDtoScopeEnum? scope) => _$this._scope = scope;
 
   RoleDtoBuilder() {
     RoleDto._defaults(this);
@@ -186,13 +186,13 @@ class RoleDtoBuilder implements Builder<RoleDto, RoleDtoBuilder> {
   RoleDtoBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _id = $v.id;
-      _organizationId = $v.organizationId;
-      _name = $v.name;
       _description = $v.description;
-      _scope = $v.scope;
+      _id = $v.id;
       _isSystem = $v.isSystem;
+      _name = $v.name;
+      _organizationId = $v.organizationId;
       _permissions = $v.permissions.toBuilder();
+      _scope = $v.scope;
       _$v = null;
     }
     return this;
@@ -216,25 +216,25 @@ class RoleDtoBuilder implements Builder<RoleDto, RoleDtoBuilder> {
     try {
       _$result = _$v ??
           _$RoleDto._(
-            id: BuiltValueNullFieldError.checkNotNull(id, r'RoleDto', 'id'),
-            organizationId: organizationId,
-            name: BuiltValueNullFieldError.checkNotNull(
-              name,
-              r'RoleDto',
-              'name',
-            ),
             description: description,
-            scope: BuiltValueNullFieldError.checkNotNull(
-              scope,
-              r'RoleDto',
-              'scope',
-            ),
+            id: BuiltValueNullFieldError.checkNotNull(id, r'RoleDto', 'id'),
             isSystem: BuiltValueNullFieldError.checkNotNull(
               isSystem,
               r'RoleDto',
               'isSystem',
             ),
+            name: BuiltValueNullFieldError.checkNotNull(
+              name,
+              r'RoleDto',
+              'name',
+            ),
+            organizationId: organizationId,
             permissions: permissions.build(),
+            scope: BuiltValueNullFieldError.checkNotNull(
+              scope,
+              r'RoleDto',
+              'scope',
+            ),
           );
     } catch (_) {
       late String _$failedField;

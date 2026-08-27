@@ -15,37 +15,37 @@ part 'create_admin_user_dto.g.dart';
 /// CreateAdminUserDto
 ///
 /// Properties:
-/// * [email]
-/// * [password]
-/// * [displayName]
 /// * [avatarUrl]
-/// * [status]
-/// * [roleId]
+/// * [displayName]
+/// * [email]
 /// * [organizationId]
+/// * [password]
+/// * [roleId]
+/// * [status]
 @BuiltValue()
 abstract class CreateAdminUserDto
     implements Built<CreateAdminUserDto, CreateAdminUserDtoBuilder> {
-  @BuiltValueField(wireName: r'email')
-  String get email;
-
-  @BuiltValueField(wireName: r'password')
-  String get password;
+  @BuiltValueField(wireName: r'avatarUrl')
+  JsonObject? get avatarUrl;
 
   @BuiltValueField(wireName: r'displayName')
   String get displayName;
 
-  @BuiltValueField(wireName: r'avatarUrl')
-  JsonObject? get avatarUrl;
+  @BuiltValueField(wireName: r'email')
+  String get email;
 
-  @BuiltValueField(wireName: r'status')
-  CreateAdminUserDtoStatusEnum? get status;
-  // enum statusEnum {  PENDING,  ACTIVE,  BLOCKED,  };
+  @BuiltValueField(wireName: r'organizationId')
+  String? get organizationId;
+
+  @BuiltValueField(wireName: r'password')
+  String get password;
 
   @BuiltValueField(wireName: r'roleId')
   String? get roleId;
 
-  @BuiltValueField(wireName: r'organizationId')
-  String? get organizationId;
+  @BuiltValueField(wireName: r'status')
+  CreateAdminUserDtoStatusEnum? get status;
+  // enum statusEnum {  PENDING,  ACTIVE,  BLOCKED,  };
 
   CreateAdminUserDto._();
 
@@ -73,21 +73,6 @@ class _$CreateAdminUserDtoSerializer
     CreateAdminUserDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'email';
-    yield serializers.serialize(
-      object.email,
-      specifiedType: const FullType(String),
-    );
-    yield r'password';
-    yield serializers.serialize(
-      object.password,
-      specifiedType: const FullType(String),
-    );
-    yield r'displayName';
-    yield serializers.serialize(
-      object.displayName,
-      specifiedType: const FullType(String),
-    );
     if (object.avatarUrl != null) {
       yield r'avatarUrl';
       yield serializers.serialize(
@@ -95,13 +80,28 @@ class _$CreateAdminUserDtoSerializer
         specifiedType: const FullType(JsonObject),
       );
     }
-    if (object.status != null) {
-      yield r'status';
+    yield r'displayName';
+    yield serializers.serialize(
+      object.displayName,
+      specifiedType: const FullType(String),
+    );
+    yield r'email';
+    yield serializers.serialize(
+      object.email,
+      specifiedType: const FullType(String),
+    );
+    if (object.organizationId != null) {
+      yield r'organizationId';
       yield serializers.serialize(
-        object.status,
-        specifiedType: const FullType(CreateAdminUserDtoStatusEnum),
+        object.organizationId,
+        specifiedType: const FullType(String),
       );
     }
+    yield r'password';
+    yield serializers.serialize(
+      object.password,
+      specifiedType: const FullType(String),
+    );
     if (object.roleId != null) {
       yield r'roleId';
       yield serializers.serialize(
@@ -109,11 +109,11 @@ class _$CreateAdminUserDtoSerializer
         specifiedType: const FullType(String),
       );
     }
-    if (object.organizationId != null) {
-      yield r'organizationId';
+    if (object.status != null) {
+      yield r'status';
       yield serializers.serialize(
-        object.organizationId,
-        specifiedType: const FullType(String),
+        object.status,
+        specifiedType: const FullType(CreateAdminUserDtoStatusEnum),
       );
     }
   }
@@ -143,19 +143,12 @@ class _$CreateAdminUserDtoSerializer
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'email':
+        case r'avatarUrl':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.email = valueDes;
-          break;
-        case r'password':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.password = valueDes;
+            specifiedType: const FullType(JsonObject),
+          ) as JsonObject;
+          result.avatarUrl = valueDes;
           break;
         case r'displayName':
           final valueDes = serializers.deserialize(
@@ -164,19 +157,26 @@ class _$CreateAdminUserDtoSerializer
           ) as String;
           result.displayName = valueDes;
           break;
-        case r'avatarUrl':
+        case r'email':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(JsonObject),
-          ) as JsonObject;
-          result.avatarUrl = valueDes;
+            specifiedType: const FullType(String),
+          ) as String;
+          result.email = valueDes;
           break;
-        case r'status':
+        case r'organizationId':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(CreateAdminUserDtoStatusEnum),
-          ) as CreateAdminUserDtoStatusEnum;
-          result.status = valueDes;
+            specifiedType: const FullType(String),
+          ) as String;
+          result.organizationId = valueDes;
+          break;
+        case r'password':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.password = valueDes;
           break;
         case r'roleId':
           final valueDes = serializers.deserialize(
@@ -185,12 +185,12 @@ class _$CreateAdminUserDtoSerializer
           ) as String;
           result.roleId = valueDes;
           break;
-        case r'organizationId':
+        case r'status':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.organizationId = valueDes;
+            specifiedType: const FullType(CreateAdminUserDtoStatusEnum),
+          ) as CreateAdminUserDtoStatusEnum;
+          result.status = valueDes;
           break;
         default:
           unhandled.add(key);

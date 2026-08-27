@@ -13,16 +13,16 @@ part 'success_message_dto.g.dart';
 /// SuccessMessageDto
 ///
 /// Properties:
-/// * [success]
 /// * [message]
+/// * [success]
 @BuiltValue()
 abstract class SuccessMessageDto
     implements Built<SuccessMessageDto, SuccessMessageDtoBuilder> {
-  @BuiltValueField(wireName: r'success')
-  bool get success;
-
   @BuiltValueField(wireName: r'message')
   String get message;
+
+  @BuiltValueField(wireName: r'success')
+  bool get success;
 
   SuccessMessageDto._();
 
@@ -50,15 +50,15 @@ class _$SuccessMessageDtoSerializer
     SuccessMessageDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'success';
-    yield serializers.serialize(
-      object.success,
-      specifiedType: const FullType(bool),
-    );
     yield r'message';
     yield serializers.serialize(
       object.message,
       specifiedType: const FullType(String),
+    );
+    yield r'success';
+    yield serializers.serialize(
+      object.success,
+      specifiedType: const FullType(bool),
     );
   }
 
@@ -87,19 +87,19 @@ class _$SuccessMessageDtoSerializer
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'success':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(bool),
-          ) as bool;
-          result.success = valueDes;
-          break;
         case r'message':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
           result.message = valueDes;
+          break;
+        case r'success':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(bool),
+          ) as bool;
+          result.success = valueDes;
           break;
         default:
           unhandled.add(key);

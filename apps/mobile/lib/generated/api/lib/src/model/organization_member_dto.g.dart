@@ -83,17 +83,17 @@ class _$OrganizationMemberDtoRoleEnumSerializer
 
 class _$OrganizationMemberDto extends OrganizationMemberDto {
   @override
-  final String userId;
-  @override
-  final String email;
+  final String createdAt;
   @override
   final String displayName;
   @override
+  final String email;
+  @override
   final OrganizationMemberDtoRoleEnum role;
   @override
-  final String createdAt;
-  @override
   final String updatedAt;
+  @override
+  final String userId;
 
   factory _$OrganizationMemberDto([
     void Function(OrganizationMemberDtoBuilder)? updates,
@@ -101,12 +101,12 @@ class _$OrganizationMemberDto extends OrganizationMemberDto {
       (OrganizationMemberDtoBuilder()..update(updates))._build();
 
   _$OrganizationMemberDto._({
-    required this.userId,
-    required this.email,
-    required this.displayName,
-    required this.role,
     required this.createdAt,
+    required this.displayName,
+    required this.email,
+    required this.role,
     required this.updatedAt,
+    required this.userId,
   }) : super._();
   @override
   OrganizationMemberDto rebuild(
@@ -122,23 +122,23 @@ class _$OrganizationMemberDto extends OrganizationMemberDto {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is OrganizationMemberDto &&
-        userId == other.userId &&
-        email == other.email &&
-        displayName == other.displayName &&
-        role == other.role &&
         createdAt == other.createdAt &&
-        updatedAt == other.updatedAt;
+        displayName == other.displayName &&
+        email == other.email &&
+        role == other.role &&
+        updatedAt == other.updatedAt &&
+        userId == other.userId;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
-    _$hash = $jc(_$hash, userId.hashCode);
-    _$hash = $jc(_$hash, email.hashCode);
-    _$hash = $jc(_$hash, displayName.hashCode);
-    _$hash = $jc(_$hash, role.hashCode);
     _$hash = $jc(_$hash, createdAt.hashCode);
+    _$hash = $jc(_$hash, displayName.hashCode);
+    _$hash = $jc(_$hash, email.hashCode);
+    _$hash = $jc(_$hash, role.hashCode);
     _$hash = $jc(_$hash, updatedAt.hashCode);
+    _$hash = $jc(_$hash, userId.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -146,12 +146,12 @@ class _$OrganizationMemberDto extends OrganizationMemberDto {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'OrganizationMemberDto')
-          ..add('userId', userId)
-          ..add('email', email)
-          ..add('displayName', displayName)
-          ..add('role', role)
           ..add('createdAt', createdAt)
-          ..add('updatedAt', updatedAt))
+          ..add('displayName', displayName)
+          ..add('email', email)
+          ..add('role', role)
+          ..add('updatedAt', updatedAt)
+          ..add('userId', userId))
         .toString();
   }
 }
@@ -160,29 +160,29 @@ class OrganizationMemberDtoBuilder
     implements Builder<OrganizationMemberDto, OrganizationMemberDtoBuilder> {
   _$OrganizationMemberDto? _$v;
 
-  String? _userId;
-  String? get userId => _$this._userId;
-  set userId(String? userId) => _$this._userId = userId;
-
-  String? _email;
-  String? get email => _$this._email;
-  set email(String? email) => _$this._email = email;
+  String? _createdAt;
+  String? get createdAt => _$this._createdAt;
+  set createdAt(String? createdAt) => _$this._createdAt = createdAt;
 
   String? _displayName;
   String? get displayName => _$this._displayName;
   set displayName(String? displayName) => _$this._displayName = displayName;
 
+  String? _email;
+  String? get email => _$this._email;
+  set email(String? email) => _$this._email = email;
+
   OrganizationMemberDtoRoleEnum? _role;
   OrganizationMemberDtoRoleEnum? get role => _$this._role;
   set role(OrganizationMemberDtoRoleEnum? role) => _$this._role = role;
 
-  String? _createdAt;
-  String? get createdAt => _$this._createdAt;
-  set createdAt(String? createdAt) => _$this._createdAt = createdAt;
-
   String? _updatedAt;
   String? get updatedAt => _$this._updatedAt;
   set updatedAt(String? updatedAt) => _$this._updatedAt = updatedAt;
+
+  String? _userId;
+  String? get userId => _$this._userId;
+  set userId(String? userId) => _$this._userId = userId;
 
   OrganizationMemberDtoBuilder() {
     OrganizationMemberDto._defaults(this);
@@ -191,12 +191,12 @@ class OrganizationMemberDtoBuilder
   OrganizationMemberDtoBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _userId = $v.userId;
-      _email = $v.email;
-      _displayName = $v.displayName;
-      _role = $v.role;
       _createdAt = $v.createdAt;
+      _displayName = $v.displayName;
+      _email = $v.email;
+      _role = $v.role;
       _updatedAt = $v.updatedAt;
+      _userId = $v.userId;
       _$v = null;
     }
     return this;
@@ -218,35 +218,35 @@ class OrganizationMemberDtoBuilder
   _$OrganizationMemberDto _build() {
     final _$result = _$v ??
         _$OrganizationMemberDto._(
-          userId: BuiltValueNullFieldError.checkNotNull(
-            userId,
+          createdAt: BuiltValueNullFieldError.checkNotNull(
+            createdAt,
             r'OrganizationMemberDto',
-            'userId',
-          ),
-          email: BuiltValueNullFieldError.checkNotNull(
-            email,
-            r'OrganizationMemberDto',
-            'email',
+            'createdAt',
           ),
           displayName: BuiltValueNullFieldError.checkNotNull(
             displayName,
             r'OrganizationMemberDto',
             'displayName',
           ),
+          email: BuiltValueNullFieldError.checkNotNull(
+            email,
+            r'OrganizationMemberDto',
+            'email',
+          ),
           role: BuiltValueNullFieldError.checkNotNull(
             role,
             r'OrganizationMemberDto',
             'role',
           ),
-          createdAt: BuiltValueNullFieldError.checkNotNull(
-            createdAt,
-            r'OrganizationMemberDto',
-            'createdAt',
-          ),
           updatedAt: BuiltValueNullFieldError.checkNotNull(
             updatedAt,
             r'OrganizationMemberDto',
             'updatedAt',
+          ),
+          userId: BuiltValueNullFieldError.checkNotNull(
+            userId,
+            r'OrganizationMemberDto',
+            'userId',
           ),
         );
     replace(_$result);

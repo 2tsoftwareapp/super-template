@@ -10,19 +10,19 @@ part of 'register_dto.dart';
 
 class _$RegisterDto extends RegisterDto {
   @override
+  final String displayName;
+  @override
   final String email;
   @override
   final String password;
-  @override
-  final String displayName;
 
   factory _$RegisterDto([void Function(RegisterDtoBuilder)? updates]) =>
       (RegisterDtoBuilder()..update(updates))._build();
 
   _$RegisterDto._({
+    required this.displayName,
     required this.email,
     required this.password,
-    required this.displayName,
   }) : super._();
   @override
   RegisterDto rebuild(void Function(RegisterDtoBuilder) updates) =>
@@ -35,17 +35,17 @@ class _$RegisterDto extends RegisterDto {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is RegisterDto &&
+        displayName == other.displayName &&
         email == other.email &&
-        password == other.password &&
-        displayName == other.displayName;
+        password == other.password;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
+    _$hash = $jc(_$hash, displayName.hashCode);
     _$hash = $jc(_$hash, email.hashCode);
     _$hash = $jc(_$hash, password.hashCode);
-    _$hash = $jc(_$hash, displayName.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -53,15 +53,19 @@ class _$RegisterDto extends RegisterDto {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'RegisterDto')
+          ..add('displayName', displayName)
           ..add('email', email)
-          ..add('password', password)
-          ..add('displayName', displayName))
+          ..add('password', password))
         .toString();
   }
 }
 
 class RegisterDtoBuilder implements Builder<RegisterDto, RegisterDtoBuilder> {
   _$RegisterDto? _$v;
+
+  String? _displayName;
+  String? get displayName => _$this._displayName;
+  set displayName(String? displayName) => _$this._displayName = displayName;
 
   String? _email;
   String? get email => _$this._email;
@@ -71,10 +75,6 @@ class RegisterDtoBuilder implements Builder<RegisterDto, RegisterDtoBuilder> {
   String? get password => _$this._password;
   set password(String? password) => _$this._password = password;
 
-  String? _displayName;
-  String? get displayName => _$this._displayName;
-  set displayName(String? displayName) => _$this._displayName = displayName;
-
   RegisterDtoBuilder() {
     RegisterDto._defaults(this);
   }
@@ -82,9 +82,9 @@ class RegisterDtoBuilder implements Builder<RegisterDto, RegisterDtoBuilder> {
   RegisterDtoBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
+      _displayName = $v.displayName;
       _email = $v.email;
       _password = $v.password;
-      _displayName = $v.displayName;
       _$v = null;
     }
     return this;
@@ -106,6 +106,11 @@ class RegisterDtoBuilder implements Builder<RegisterDto, RegisterDtoBuilder> {
   _$RegisterDto _build() {
     final _$result = _$v ??
         _$RegisterDto._(
+          displayName: BuiltValueNullFieldError.checkNotNull(
+            displayName,
+            r'RegisterDto',
+            'displayName',
+          ),
           email: BuiltValueNullFieldError.checkNotNull(
             email,
             r'RegisterDto',
@@ -115,11 +120,6 @@ class RegisterDtoBuilder implements Builder<RegisterDto, RegisterDtoBuilder> {
             password,
             r'RegisterDto',
             'password',
-          ),
-          displayName: BuiltValueNullFieldError.checkNotNull(
-            displayName,
-            r'RegisterDto',
-            'displayName',
           ),
         );
     replace(_$result);

@@ -10,20 +10,20 @@ import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
 import type { UserView } from "../users.types";
 
 import { assertUserBelongsToOrganization } from "../../domain/user-org-scope.policy";
-import { resolveRoleById } from "../assignable-role.resolver";
-import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";
 import {
   assertCanAssignRoleTargets,
   assertRoleScopeCanBeAssigned,
   ORGANIZATION_MEMBERSHIP,
-  type OrganizationMembership,
   type OrganizationMemberRole,
+  type OrganizationMembership,
   ROLE_NAMES,
   USER_ACCESS_CONTROL,
-  type UserAccessControl,
   USER_PROFILE_INVALIDATOR,
+  type UserAccessControl,
   type UserProfileInvalidator,
 } from "../../public/contracts";
+import { resolveRoleById } from "../assignable-role.resolver";
+import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";
 import { GetUserUseCase } from "./get-user.use-case";
 
 @Injectable()

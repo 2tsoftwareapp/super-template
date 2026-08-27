@@ -16,30 +16,30 @@ part 'job_metrics_dto.g.dart';
 /// JobMetricsDto
 ///
 /// Properties:
+/// * [averageDurationMs]
 /// * [byStatus]
 /// * [byType]
-/// * [averageDurationMs]
-/// * [retryRate]
 /// * [failureRate]
+/// * [retryRate]
 /// * [totalCompleted]
 /// * [totalFailed]
 @BuiltValue()
 abstract class JobMetricsDto
     implements Built<JobMetricsDto, JobMetricsDtoBuilder> {
+  @BuiltValueField(wireName: r'averageDurationMs')
+  num? get averageDurationMs;
+
   @BuiltValueField(wireName: r'byStatus')
   BuiltList<JobStatusCountDto> get byStatus;
 
   @BuiltValueField(wireName: r'byType')
   BuiltList<JobTypeCountDto> get byType;
 
-  @BuiltValueField(wireName: r'averageDurationMs')
-  num? get averageDurationMs;
+  @BuiltValueField(wireName: r'failureRate')
+  num get failureRate;
 
   @BuiltValueField(wireName: r'retryRate')
   num get retryRate;
-
-  @BuiltValueField(wireName: r'failureRate')
-  num get failureRate;
 
   @BuiltValueField(wireName: r'totalCompleted')
   num get totalCompleted;
@@ -72,6 +72,13 @@ class _$JobMetricsDtoSerializer implements PrimitiveSerializer<JobMetricsDto> {
     JobMetricsDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
+    if (object.averageDurationMs != null) {
+      yield r'averageDurationMs';
+      yield serializers.serialize(
+        object.averageDurationMs,
+        specifiedType: const FullType.nullable(num),
+      );
+    }
     yield r'byStatus';
     yield serializers.serialize(
       object.byStatus,
@@ -82,21 +89,14 @@ class _$JobMetricsDtoSerializer implements PrimitiveSerializer<JobMetricsDto> {
       object.byType,
       specifiedType: const FullType(BuiltList, [FullType(JobTypeCountDto)]),
     );
-    if (object.averageDurationMs != null) {
-      yield r'averageDurationMs';
-      yield serializers.serialize(
-        object.averageDurationMs,
-        specifiedType: const FullType.nullable(num),
-      );
-    }
-    yield r'retryRate';
-    yield serializers.serialize(
-      object.retryRate,
-      specifiedType: const FullType(num),
-    );
     yield r'failureRate';
     yield serializers.serialize(
       object.failureRate,
+      specifiedType: const FullType(num),
+    );
+    yield r'retryRate';
+    yield serializers.serialize(
+      object.retryRate,
       specifiedType: const FullType(num),
     );
     yield r'totalCompleted';
@@ -136,6 +136,14 @@ class _$JobMetricsDtoSerializer implements PrimitiveSerializer<JobMetricsDto> {
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
+        case r'averageDurationMs':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType.nullable(num),
+          ) as num?;
+          if (valueDes == null) continue;
+          result.averageDurationMs = valueDes;
+          break;
         case r'byStatus':
           final valueDes = serializers.deserialize(
             value,
@@ -154,23 +162,15 @@ class _$JobMetricsDtoSerializer implements PrimitiveSerializer<JobMetricsDto> {
           ) as BuiltList<JobTypeCountDto>;
           result.byType.replace(valueDes);
           break;
-        case r'averageDurationMs':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType.nullable(num),
-          ) as num?;
-          if (valueDes == null) continue;
-          result.averageDurationMs = valueDes;
+        case r'failureRate':
+          final valueDes = serializers.deserialize(value,
+              specifiedType: const FullType(num)) as num;
+          result.failureRate = valueDes;
           break;
         case r'retryRate':
           final valueDes = serializers.deserialize(value,
               specifiedType: const FullType(num)) as num;
           result.retryRate = valueDes;
-          break;
-        case r'failureRate':
-          final valueDes = serializers.deserialize(value,
-              specifiedType: const FullType(num)) as num;
-          result.failureRate = valueDes;
           break;
         case r'totalCompleted':
           final valueDes = serializers.deserialize(value,

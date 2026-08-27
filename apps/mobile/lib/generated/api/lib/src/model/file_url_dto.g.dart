@@ -10,19 +10,19 @@ part of 'file_url_dto.dart';
 
 class _$FileUrlDto extends FileUrlDto {
   @override
+  final num expiresInSeconds;
+  @override
   final String id;
   @override
   final String url;
-  @override
-  final num expiresInSeconds;
 
   factory _$FileUrlDto([void Function(FileUrlDtoBuilder)? updates]) =>
       (FileUrlDtoBuilder()..update(updates))._build();
 
   _$FileUrlDto._({
+    required this.expiresInSeconds,
     required this.id,
     required this.url,
-    required this.expiresInSeconds,
   }) : super._();
   @override
   FileUrlDto rebuild(void Function(FileUrlDtoBuilder) updates) =>
@@ -35,17 +35,17 @@ class _$FileUrlDto extends FileUrlDto {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is FileUrlDto &&
+        expiresInSeconds == other.expiresInSeconds &&
         id == other.id &&
-        url == other.url &&
-        expiresInSeconds == other.expiresInSeconds;
+        url == other.url;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
+    _$hash = $jc(_$hash, expiresInSeconds.hashCode);
     _$hash = $jc(_$hash, id.hashCode);
     _$hash = $jc(_$hash, url.hashCode);
-    _$hash = $jc(_$hash, expiresInSeconds.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -53,15 +53,20 @@ class _$FileUrlDto extends FileUrlDto {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'FileUrlDto')
+          ..add('expiresInSeconds', expiresInSeconds)
           ..add('id', id)
-          ..add('url', url)
-          ..add('expiresInSeconds', expiresInSeconds))
+          ..add('url', url))
         .toString();
   }
 }
 
 class FileUrlDtoBuilder implements Builder<FileUrlDto, FileUrlDtoBuilder> {
   _$FileUrlDto? _$v;
+
+  num? _expiresInSeconds;
+  num? get expiresInSeconds => _$this._expiresInSeconds;
+  set expiresInSeconds(num? expiresInSeconds) =>
+      _$this._expiresInSeconds = expiresInSeconds;
 
   String? _id;
   String? get id => _$this._id;
@@ -71,11 +76,6 @@ class FileUrlDtoBuilder implements Builder<FileUrlDto, FileUrlDtoBuilder> {
   String? get url => _$this._url;
   set url(String? url) => _$this._url = url;
 
-  num? _expiresInSeconds;
-  num? get expiresInSeconds => _$this._expiresInSeconds;
-  set expiresInSeconds(num? expiresInSeconds) =>
-      _$this._expiresInSeconds = expiresInSeconds;
-
   FileUrlDtoBuilder() {
     FileUrlDto._defaults(this);
   }
@@ -83,9 +83,9 @@ class FileUrlDtoBuilder implements Builder<FileUrlDto, FileUrlDtoBuilder> {
   FileUrlDtoBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
+      _expiresInSeconds = $v.expiresInSeconds;
       _id = $v.id;
       _url = $v.url;
-      _expiresInSeconds = $v.expiresInSeconds;
       _$v = null;
     }
     return this;
@@ -107,13 +107,13 @@ class FileUrlDtoBuilder implements Builder<FileUrlDto, FileUrlDtoBuilder> {
   _$FileUrlDto _build() {
     final _$result = _$v ??
         _$FileUrlDto._(
-          id: BuiltValueNullFieldError.checkNotNull(id, r'FileUrlDto', 'id'),
-          url: BuiltValueNullFieldError.checkNotNull(url, r'FileUrlDto', 'url'),
           expiresInSeconds: BuiltValueNullFieldError.checkNotNull(
             expiresInSeconds,
             r'FileUrlDto',
             'expiresInSeconds',
           ),
+          id: BuiltValueNullFieldError.checkNotNull(id, r'FileUrlDto', 'id'),
+          url: BuiltValueNullFieldError.checkNotNull(url, r'FileUrlDto', 'url'),
         );
     replace(_$result);
     return _$result;

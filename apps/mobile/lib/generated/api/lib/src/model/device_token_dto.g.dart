@@ -72,20 +72,20 @@ class _$DeviceTokenDto extends DeviceTokenDto {
   @override
   final String id;
   @override
+  final String lastUsedAt;
+  @override
   final DeviceTokenDtoPlatformEnum platform;
   @override
   final String token;
-  @override
-  final String lastUsedAt;
 
   factory _$DeviceTokenDto([void Function(DeviceTokenDtoBuilder)? updates]) =>
       (DeviceTokenDtoBuilder()..update(updates))._build();
 
   _$DeviceTokenDto._({
     required this.id,
+    required this.lastUsedAt,
     required this.platform,
     required this.token,
-    required this.lastUsedAt,
   }) : super._();
   @override
   DeviceTokenDto rebuild(void Function(DeviceTokenDtoBuilder) updates) =>
@@ -99,18 +99,18 @@ class _$DeviceTokenDto extends DeviceTokenDto {
     if (identical(other, this)) return true;
     return other is DeviceTokenDto &&
         id == other.id &&
+        lastUsedAt == other.lastUsedAt &&
         platform == other.platform &&
-        token == other.token &&
-        lastUsedAt == other.lastUsedAt;
+        token == other.token;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
     _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, lastUsedAt.hashCode);
     _$hash = $jc(_$hash, platform.hashCode);
     _$hash = $jc(_$hash, token.hashCode);
-    _$hash = $jc(_$hash, lastUsedAt.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -119,9 +119,9 @@ class _$DeviceTokenDto extends DeviceTokenDto {
   String toString() {
     return (newBuiltValueToStringHelper(r'DeviceTokenDto')
           ..add('id', id)
+          ..add('lastUsedAt', lastUsedAt)
           ..add('platform', platform)
-          ..add('token', token)
-          ..add('lastUsedAt', lastUsedAt))
+          ..add('token', token))
         .toString();
   }
 }
@@ -134,6 +134,10 @@ class DeviceTokenDtoBuilder
   String? get id => _$this._id;
   set id(String? id) => _$this._id = id;
 
+  String? _lastUsedAt;
+  String? get lastUsedAt => _$this._lastUsedAt;
+  set lastUsedAt(String? lastUsedAt) => _$this._lastUsedAt = lastUsedAt;
+
   DeviceTokenDtoPlatformEnum? _platform;
   DeviceTokenDtoPlatformEnum? get platform => _$this._platform;
   set platform(DeviceTokenDtoPlatformEnum? platform) =>
@@ -143,10 +147,6 @@ class DeviceTokenDtoBuilder
   String? get token => _$this._token;
   set token(String? token) => _$this._token = token;
 
-  String? _lastUsedAt;
-  String? get lastUsedAt => _$this._lastUsedAt;
-  set lastUsedAt(String? lastUsedAt) => _$this._lastUsedAt = lastUsedAt;
-
   DeviceTokenDtoBuilder() {
     DeviceTokenDto._defaults(this);
   }
@@ -155,9 +155,9 @@ class DeviceTokenDtoBuilder
     final $v = _$v;
     if ($v != null) {
       _id = $v.id;
+      _lastUsedAt = $v.lastUsedAt;
       _platform = $v.platform;
       _token = $v.token;
-      _lastUsedAt = $v.lastUsedAt;
       _$v = null;
     }
     return this;
@@ -184,6 +184,11 @@ class DeviceTokenDtoBuilder
             r'DeviceTokenDto',
             'id',
           ),
+          lastUsedAt: BuiltValueNullFieldError.checkNotNull(
+            lastUsedAt,
+            r'DeviceTokenDto',
+            'lastUsedAt',
+          ),
           platform: BuiltValueNullFieldError.checkNotNull(
             platform,
             r'DeviceTokenDto',
@@ -193,11 +198,6 @@ class DeviceTokenDtoBuilder
             token,
             r'DeviceTokenDto',
             'token',
-          ),
-          lastUsedAt: BuiltValueNullFieldError.checkNotNull(
-            lastUsedAt,
-            r'DeviceTokenDto',
-            'lastUsedAt',
           ),
         );
     replace(_$result);

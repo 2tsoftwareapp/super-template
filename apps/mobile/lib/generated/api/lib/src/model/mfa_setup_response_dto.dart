@@ -13,16 +13,16 @@ part 'mfa_setup_response_dto.g.dart';
 /// MfaSetupResponseDto
 ///
 /// Properties:
-/// * [secret]
 /// * [otpauthUrl]
+/// * [secret]
 @BuiltValue()
 abstract class MfaSetupResponseDto
     implements Built<MfaSetupResponseDto, MfaSetupResponseDtoBuilder> {
-  @BuiltValueField(wireName: r'secret')
-  String get secret;
-
   @BuiltValueField(wireName: r'otpauthUrl')
   String get otpauthUrl;
+
+  @BuiltValueField(wireName: r'secret')
+  String get secret;
 
   MfaSetupResponseDto._();
 
@@ -53,14 +53,14 @@ class _$MfaSetupResponseDtoSerializer
     MfaSetupResponseDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'secret';
-    yield serializers.serialize(
-      object.secret,
-      specifiedType: const FullType(String),
-    );
     yield r'otpauthUrl';
     yield serializers.serialize(
       object.otpauthUrl,
+      specifiedType: const FullType(String),
+    );
+    yield r'secret';
+    yield serializers.serialize(
+      object.secret,
       specifiedType: const FullType(String),
     );
   }
@@ -90,19 +90,19 @@ class _$MfaSetupResponseDtoSerializer
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'secret':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.secret = valueDes;
-          break;
         case r'otpauthUrl':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
           result.otpauthUrl = valueDes;
+          break;
+        case r'secret':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.secret = valueDes;
           break;
         default:
           unhandled.add(key);

@@ -98,31 +98,31 @@ class _$JobEventDtoTypeEnumSerializer
 
 class _$JobEventDto extends JobEventDto {
   @override
+  final String? attemptId;
+  @override
+  final String createdAt;
+  @override
   final String id;
   @override
   final String jobId;
-  @override
-  final String? attemptId;
-  @override
-  final JobEventDtoTypeEnum type;
   @override
   final String? message;
   @override
   final BuiltMap<String, JsonObject?>? metadata;
   @override
-  final String createdAt;
+  final JobEventDtoTypeEnum type;
 
   factory _$JobEventDto([void Function(JobEventDtoBuilder)? updates]) =>
       (JobEventDtoBuilder()..update(updates))._build();
 
   _$JobEventDto._({
+    this.attemptId,
+    required this.createdAt,
     required this.id,
     required this.jobId,
-    this.attemptId,
-    required this.type,
     this.message,
     this.metadata,
-    required this.createdAt,
+    required this.type,
   }) : super._();
   @override
   JobEventDto rebuild(void Function(JobEventDtoBuilder) updates) =>
@@ -135,25 +135,25 @@ class _$JobEventDto extends JobEventDto {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is JobEventDto &&
+        attemptId == other.attemptId &&
+        createdAt == other.createdAt &&
         id == other.id &&
         jobId == other.jobId &&
-        attemptId == other.attemptId &&
-        type == other.type &&
         message == other.message &&
         metadata == other.metadata &&
-        createdAt == other.createdAt;
+        type == other.type;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
+    _$hash = $jc(_$hash, attemptId.hashCode);
+    _$hash = $jc(_$hash, createdAt.hashCode);
     _$hash = $jc(_$hash, id.hashCode);
     _$hash = $jc(_$hash, jobId.hashCode);
-    _$hash = $jc(_$hash, attemptId.hashCode);
-    _$hash = $jc(_$hash, type.hashCode);
     _$hash = $jc(_$hash, message.hashCode);
     _$hash = $jc(_$hash, metadata.hashCode);
-    _$hash = $jc(_$hash, createdAt.hashCode);
+    _$hash = $jc(_$hash, type.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -161,19 +161,27 @@ class _$JobEventDto extends JobEventDto {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'JobEventDto')
+          ..add('attemptId', attemptId)
+          ..add('createdAt', createdAt)
           ..add('id', id)
           ..add('jobId', jobId)
-          ..add('attemptId', attemptId)
-          ..add('type', type)
           ..add('message', message)
           ..add('metadata', metadata)
-          ..add('createdAt', createdAt))
+          ..add('type', type))
         .toString();
   }
 }
 
 class JobEventDtoBuilder implements Builder<JobEventDto, JobEventDtoBuilder> {
   _$JobEventDto? _$v;
+
+  String? _attemptId;
+  String? get attemptId => _$this._attemptId;
+  set attemptId(String? attemptId) => _$this._attemptId = attemptId;
+
+  String? _createdAt;
+  String? get createdAt => _$this._createdAt;
+  set createdAt(String? createdAt) => _$this._createdAt = createdAt;
 
   String? _id;
   String? get id => _$this._id;
@@ -182,14 +190,6 @@ class JobEventDtoBuilder implements Builder<JobEventDto, JobEventDtoBuilder> {
   String? _jobId;
   String? get jobId => _$this._jobId;
   set jobId(String? jobId) => _$this._jobId = jobId;
-
-  String? _attemptId;
-  String? get attemptId => _$this._attemptId;
-  set attemptId(String? attemptId) => _$this._attemptId = attemptId;
-
-  JobEventDtoTypeEnum? _type;
-  JobEventDtoTypeEnum? get type => _$this._type;
-  set type(JobEventDtoTypeEnum? type) => _$this._type = type;
 
   String? _message;
   String? get message => _$this._message;
@@ -201,9 +201,9 @@ class JobEventDtoBuilder implements Builder<JobEventDto, JobEventDtoBuilder> {
   set metadata(MapBuilder<String, JsonObject?>? metadata) =>
       _$this._metadata = metadata;
 
-  String? _createdAt;
-  String? get createdAt => _$this._createdAt;
-  set createdAt(String? createdAt) => _$this._createdAt = createdAt;
+  JobEventDtoTypeEnum? _type;
+  JobEventDtoTypeEnum? get type => _$this._type;
+  set type(JobEventDtoTypeEnum? type) => _$this._type = type;
 
   JobEventDtoBuilder() {
     JobEventDto._defaults(this);
@@ -212,13 +212,13 @@ class JobEventDtoBuilder implements Builder<JobEventDto, JobEventDtoBuilder> {
   JobEventDtoBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
+      _attemptId = $v.attemptId;
+      _createdAt = $v.createdAt;
       _id = $v.id;
       _jobId = $v.jobId;
-      _attemptId = $v.attemptId;
-      _type = $v.type;
       _message = $v.message;
       _metadata = $v.metadata?.toBuilder();
-      _createdAt = $v.createdAt;
+      _type = $v.type;
       _$v = null;
     }
     return this;
@@ -242,24 +242,24 @@ class JobEventDtoBuilder implements Builder<JobEventDto, JobEventDtoBuilder> {
     try {
       _$result = _$v ??
           _$JobEventDto._(
+            attemptId: attemptId,
+            createdAt: BuiltValueNullFieldError.checkNotNull(
+              createdAt,
+              r'JobEventDto',
+              'createdAt',
+            ),
             id: BuiltValueNullFieldError.checkNotNull(id, r'JobEventDto', 'id'),
             jobId: BuiltValueNullFieldError.checkNotNull(
               jobId,
               r'JobEventDto',
               'jobId',
             ),
-            attemptId: attemptId,
+            message: message,
+            metadata: _metadata?.build(),
             type: BuiltValueNullFieldError.checkNotNull(
               type,
               r'JobEventDto',
               'type',
-            ),
-            message: message,
-            metadata: _metadata?.build(),
-            createdAt: BuiltValueNullFieldError.checkNotNull(
-              createdAt,
-              r'JobEventDto',
-              'createdAt',
             ),
           );
     } catch (_) {

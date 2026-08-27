@@ -13,20 +13,20 @@ part 'role_assignment_dto.g.dart';
 /// RoleAssignmentDto
 ///
 /// Properties:
-/// * [roleName]
-/// * [roleId]
 /// * [organizationId]
+/// * [roleId]
+/// * [roleName]
 @BuiltValue()
 abstract class RoleAssignmentDto
     implements Built<RoleAssignmentDto, RoleAssignmentDtoBuilder> {
-  @BuiltValueField(wireName: r'roleName')
-  String get roleName;
+  @BuiltValueField(wireName: r'organizationId')
+  String? get organizationId;
 
   @BuiltValueField(wireName: r'roleId')
   String get roleId;
 
-  @BuiltValueField(wireName: r'organizationId')
-  String? get organizationId;
+  @BuiltValueField(wireName: r'roleName')
+  String get roleName;
 
   RoleAssignmentDto._();
 
@@ -54,16 +54,6 @@ class _$RoleAssignmentDtoSerializer
     RoleAssignmentDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'roleName';
-    yield serializers.serialize(
-      object.roleName,
-      specifiedType: const FullType(String),
-    );
-    yield r'roleId';
-    yield serializers.serialize(
-      object.roleId,
-      specifiedType: const FullType(String),
-    );
     yield r'organizationId';
     yield object.organizationId == null
         ? null
@@ -71,6 +61,16 @@ class _$RoleAssignmentDtoSerializer
             object.organizationId,
             specifiedType: const FullType.nullable(String),
           );
+    yield r'roleId';
+    yield serializers.serialize(
+      object.roleId,
+      specifiedType: const FullType(String),
+    );
+    yield r'roleName';
+    yield serializers.serialize(
+      object.roleName,
+      specifiedType: const FullType(String),
+    );
   }
 
   @override
@@ -98,12 +98,13 @@ class _$RoleAssignmentDtoSerializer
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'roleName':
+        case r'organizationId':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.roleName = valueDes;
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
+          if (valueDes == null) continue;
+          result.organizationId = valueDes;
           break;
         case r'roleId':
           final valueDes = serializers.deserialize(
@@ -112,13 +113,12 @@ class _$RoleAssignmentDtoSerializer
           ) as String;
           result.roleId = valueDes;
           break;
-        case r'organizationId':
+        case r'roleName':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType.nullable(String),
-          ) as String?;
-          if (valueDes == null) continue;
-          result.organizationId = valueDes;
+            specifiedType: const FullType(String),
+          ) as String;
+          result.roleName = valueDes;
           break;
         default:
           unhandled.add(key);

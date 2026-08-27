@@ -10,11 +10,11 @@ part of 'pagination_meta_dto.dart';
 
 class _$PaginationMetaDto extends PaginationMetaDto {
   @override
-  final String requestId;
+  final num limit;
   @override
   final num page;
   @override
-  final num limit;
+  final String requestId;
   @override
   final num total;
   @override
@@ -26,9 +26,9 @@ class _$PaginationMetaDto extends PaginationMetaDto {
       (PaginationMetaDtoBuilder()..update(updates))._build();
 
   _$PaginationMetaDto._({
-    required this.requestId,
-    required this.page,
     required this.limit,
+    required this.page,
+    required this.requestId,
     required this.total,
     required this.totalPages,
   }) : super._();
@@ -44,9 +44,9 @@ class _$PaginationMetaDto extends PaginationMetaDto {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is PaginationMetaDto &&
-        requestId == other.requestId &&
-        page == other.page &&
         limit == other.limit &&
+        page == other.page &&
+        requestId == other.requestId &&
         total == other.total &&
         totalPages == other.totalPages;
   }
@@ -54,9 +54,9 @@ class _$PaginationMetaDto extends PaginationMetaDto {
   @override
   int get hashCode {
     var _$hash = 0;
-    _$hash = $jc(_$hash, requestId.hashCode);
-    _$hash = $jc(_$hash, page.hashCode);
     _$hash = $jc(_$hash, limit.hashCode);
+    _$hash = $jc(_$hash, page.hashCode);
+    _$hash = $jc(_$hash, requestId.hashCode);
     _$hash = $jc(_$hash, total.hashCode);
     _$hash = $jc(_$hash, totalPages.hashCode);
     _$hash = $jf(_$hash);
@@ -66,9 +66,9 @@ class _$PaginationMetaDto extends PaginationMetaDto {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'PaginationMetaDto')
-          ..add('requestId', requestId)
-          ..add('page', page)
           ..add('limit', limit)
+          ..add('page', page)
+          ..add('requestId', requestId)
           ..add('total', total)
           ..add('totalPages', totalPages))
         .toString();
@@ -79,17 +79,17 @@ class PaginationMetaDtoBuilder
     implements Builder<PaginationMetaDto, PaginationMetaDtoBuilder> {
   _$PaginationMetaDto? _$v;
 
-  String? _requestId;
-  String? get requestId => _$this._requestId;
-  set requestId(String? requestId) => _$this._requestId = requestId;
+  num? _limit;
+  num? get limit => _$this._limit;
+  set limit(num? limit) => _$this._limit = limit;
 
   num? _page;
   num? get page => _$this._page;
   set page(num? page) => _$this._page = page;
 
-  num? _limit;
-  num? get limit => _$this._limit;
-  set limit(num? limit) => _$this._limit = limit;
+  String? _requestId;
+  String? get requestId => _$this._requestId;
+  set requestId(String? requestId) => _$this._requestId = requestId;
 
   num? _total;
   num? get total => _$this._total;
@@ -106,9 +106,9 @@ class PaginationMetaDtoBuilder
   PaginationMetaDtoBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _requestId = $v.requestId;
-      _page = $v.page;
       _limit = $v.limit;
+      _page = $v.page;
+      _requestId = $v.requestId;
       _total = $v.total;
       _totalPages = $v.totalPages;
       _$v = null;
@@ -132,20 +132,20 @@ class PaginationMetaDtoBuilder
   _$PaginationMetaDto _build() {
     final _$result = _$v ??
         _$PaginationMetaDto._(
-          requestId: BuiltValueNullFieldError.checkNotNull(
-            requestId,
+          limit: BuiltValueNullFieldError.checkNotNull(
+            limit,
             r'PaginationMetaDto',
-            'requestId',
+            'limit',
           ),
           page: BuiltValueNullFieldError.checkNotNull(
             page,
             r'PaginationMetaDto',
             'page',
           ),
-          limit: BuiltValueNullFieldError.checkNotNull(
-            limit,
+          requestId: BuiltValueNullFieldError.checkNotNull(
+            requestId,
             r'PaginationMetaDto',
-            'limit',
+            'requestId',
           ),
           total: BuiltValueNullFieldError.checkNotNull(
             total,

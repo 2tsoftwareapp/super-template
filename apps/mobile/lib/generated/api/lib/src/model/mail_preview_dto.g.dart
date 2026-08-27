@@ -10,22 +10,22 @@ part of 'mail_preview_dto.dart';
 
 class _$MailPreviewDto extends MailPreviewDto {
   @override
-  final String subject;
-  @override
-  final String text;
-  @override
   final String html;
   @override
   final BuiltList<String> missingVariables;
+  @override
+  final String subject;
+  @override
+  final String text;
 
   factory _$MailPreviewDto([void Function(MailPreviewDtoBuilder)? updates]) =>
       (MailPreviewDtoBuilder()..update(updates))._build();
 
   _$MailPreviewDto._({
-    required this.subject,
-    required this.text,
     required this.html,
     required this.missingVariables,
+    required this.subject,
+    required this.text,
   }) : super._();
   @override
   MailPreviewDto rebuild(void Function(MailPreviewDtoBuilder) updates) =>
@@ -38,19 +38,19 @@ class _$MailPreviewDto extends MailPreviewDto {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is MailPreviewDto &&
-        subject == other.subject &&
-        text == other.text &&
         html == other.html &&
-        missingVariables == other.missingVariables;
+        missingVariables == other.missingVariables &&
+        subject == other.subject &&
+        text == other.text;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
-    _$hash = $jc(_$hash, subject.hashCode);
-    _$hash = $jc(_$hash, text.hashCode);
     _$hash = $jc(_$hash, html.hashCode);
     _$hash = $jc(_$hash, missingVariables.hashCode);
+    _$hash = $jc(_$hash, subject.hashCode);
+    _$hash = $jc(_$hash, text.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -58,10 +58,10 @@ class _$MailPreviewDto extends MailPreviewDto {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'MailPreviewDto')
-          ..add('subject', subject)
-          ..add('text', text)
           ..add('html', html)
-          ..add('missingVariables', missingVariables))
+          ..add('missingVariables', missingVariables)
+          ..add('subject', subject)
+          ..add('text', text))
         .toString();
   }
 }
@@ -69,14 +69,6 @@ class _$MailPreviewDto extends MailPreviewDto {
 class MailPreviewDtoBuilder
     implements Builder<MailPreviewDto, MailPreviewDtoBuilder> {
   _$MailPreviewDto? _$v;
-
-  String? _subject;
-  String? get subject => _$this._subject;
-  set subject(String? subject) => _$this._subject = subject;
-
-  String? _text;
-  String? get text => _$this._text;
-  set text(String? text) => _$this._text = text;
 
   String? _html;
   String? get html => _$this._html;
@@ -88,6 +80,14 @@ class MailPreviewDtoBuilder
   set missingVariables(ListBuilder<String>? missingVariables) =>
       _$this._missingVariables = missingVariables;
 
+  String? _subject;
+  String? get subject => _$this._subject;
+  set subject(String? subject) => _$this._subject = subject;
+
+  String? _text;
+  String? get text => _$this._text;
+  set text(String? text) => _$this._text = text;
+
   MailPreviewDtoBuilder() {
     MailPreviewDto._defaults(this);
   }
@@ -95,10 +95,10 @@ class MailPreviewDtoBuilder
   MailPreviewDtoBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _subject = $v.subject;
-      _text = $v.text;
       _html = $v.html;
       _missingVariables = $v.missingVariables.toBuilder();
+      _subject = $v.subject;
+      _text = $v.text;
       _$v = null;
     }
     return this;
@@ -122,6 +122,12 @@ class MailPreviewDtoBuilder
     try {
       _$result = _$v ??
           _$MailPreviewDto._(
+            html: BuiltValueNullFieldError.checkNotNull(
+              html,
+              r'MailPreviewDto',
+              'html',
+            ),
+            missingVariables: missingVariables.build(),
             subject: BuiltValueNullFieldError.checkNotNull(
               subject,
               r'MailPreviewDto',
@@ -132,12 +138,6 @@ class MailPreviewDtoBuilder
               r'MailPreviewDto',
               'text',
             ),
-            html: BuiltValueNullFieldError.checkNotNull(
-              html,
-              r'MailPreviewDto',
-              'html',
-            ),
-            missingVariables: missingVariables.build(),
           );
     } catch (_) {
       late String _$failedField;

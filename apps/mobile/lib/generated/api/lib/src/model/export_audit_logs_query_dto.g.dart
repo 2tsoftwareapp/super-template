@@ -10,19 +10,17 @@ part of 'export_audit_logs_query_dto.dart';
 
 class _$ExportAuditLogsQueryDto extends ExportAuditLogsQueryDto {
   @override
-  final String? actorId;
-  @override
   final String? action;
   @override
-  final String? resourceType;
+  final String? actorId;
+  @override
+  final DateTime? from;
   @override
   final String? resourceId;
   @override
-  final String? from;
+  final String? resourceType;
   @override
-  final String? to;
-  @override
-  final String? q;
+  final DateTime? to;
 
   factory _$ExportAuditLogsQueryDto([
     void Function(ExportAuditLogsQueryDtoBuilder)? updates,
@@ -30,13 +28,12 @@ class _$ExportAuditLogsQueryDto extends ExportAuditLogsQueryDto {
       (ExportAuditLogsQueryDtoBuilder()..update(updates))._build();
 
   _$ExportAuditLogsQueryDto._({
-    this.actorId,
     this.action,
-    this.resourceType,
-    this.resourceId,
+    this.actorId,
     this.from,
+    this.resourceId,
+    this.resourceType,
     this.to,
-    this.q,
   }) : super._();
   @override
   ExportAuditLogsQueryDto rebuild(
@@ -52,25 +49,23 @@ class _$ExportAuditLogsQueryDto extends ExportAuditLogsQueryDto {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is ExportAuditLogsQueryDto &&
-        actorId == other.actorId &&
         action == other.action &&
-        resourceType == other.resourceType &&
-        resourceId == other.resourceId &&
+        actorId == other.actorId &&
         from == other.from &&
-        to == other.to &&
-        q == other.q;
+        resourceId == other.resourceId &&
+        resourceType == other.resourceType &&
+        to == other.to;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
-    _$hash = $jc(_$hash, actorId.hashCode);
     _$hash = $jc(_$hash, action.hashCode);
-    _$hash = $jc(_$hash, resourceType.hashCode);
-    _$hash = $jc(_$hash, resourceId.hashCode);
+    _$hash = $jc(_$hash, actorId.hashCode);
     _$hash = $jc(_$hash, from.hashCode);
+    _$hash = $jc(_$hash, resourceId.hashCode);
+    _$hash = $jc(_$hash, resourceType.hashCode);
     _$hash = $jc(_$hash, to.hashCode);
-    _$hash = $jc(_$hash, q.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -78,13 +73,12 @@ class _$ExportAuditLogsQueryDto extends ExportAuditLogsQueryDto {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'ExportAuditLogsQueryDto')
-          ..add('actorId', actorId)
           ..add('action', action)
-          ..add('resourceType', resourceType)
-          ..add('resourceId', resourceId)
+          ..add('actorId', actorId)
           ..add('from', from)
-          ..add('to', to)
-          ..add('q', q))
+          ..add('resourceId', resourceId)
+          ..add('resourceType', resourceType)
+          ..add('to', to))
         .toString();
   }
 }
@@ -94,33 +88,29 @@ class ExportAuditLogsQueryDtoBuilder
         Builder<ExportAuditLogsQueryDto, ExportAuditLogsQueryDtoBuilder> {
   _$ExportAuditLogsQueryDto? _$v;
 
-  String? _actorId;
-  String? get actorId => _$this._actorId;
-  set actorId(String? actorId) => _$this._actorId = actorId;
-
   String? _action;
   String? get action => _$this._action;
   set action(String? action) => _$this._action = action;
 
-  String? _resourceType;
-  String? get resourceType => _$this._resourceType;
-  set resourceType(String? resourceType) => _$this._resourceType = resourceType;
+  String? _actorId;
+  String? get actorId => _$this._actorId;
+  set actorId(String? actorId) => _$this._actorId = actorId;
+
+  DateTime? _from;
+  DateTime? get from => _$this._from;
+  set from(DateTime? from) => _$this._from = from;
 
   String? _resourceId;
   String? get resourceId => _$this._resourceId;
   set resourceId(String? resourceId) => _$this._resourceId = resourceId;
 
-  String? _from;
-  String? get from => _$this._from;
-  set from(String? from) => _$this._from = from;
+  String? _resourceType;
+  String? get resourceType => _$this._resourceType;
+  set resourceType(String? resourceType) => _$this._resourceType = resourceType;
 
-  String? _to;
-  String? get to => _$this._to;
-  set to(String? to) => _$this._to = to;
-
-  String? _q;
-  String? get q => _$this._q;
-  set q(String? q) => _$this._q = q;
+  DateTime? _to;
+  DateTime? get to => _$this._to;
+  set to(DateTime? to) => _$this._to = to;
 
   ExportAuditLogsQueryDtoBuilder() {
     ExportAuditLogsQueryDto._defaults(this);
@@ -129,13 +119,12 @@ class ExportAuditLogsQueryDtoBuilder
   ExportAuditLogsQueryDtoBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _actorId = $v.actorId;
       _action = $v.action;
-      _resourceType = $v.resourceType;
-      _resourceId = $v.resourceId;
+      _actorId = $v.actorId;
       _from = $v.from;
+      _resourceId = $v.resourceId;
+      _resourceType = $v.resourceType;
       _to = $v.to;
-      _q = $v.q;
       _$v = null;
     }
     return this;
@@ -157,13 +146,12 @@ class ExportAuditLogsQueryDtoBuilder
   _$ExportAuditLogsQueryDto _build() {
     final _$result = _$v ??
         _$ExportAuditLogsQueryDto._(
-          actorId: actorId,
           action: action,
-          resourceType: resourceType,
-          resourceId: resourceId,
+          actorId: actorId,
           from: from,
+          resourceId: resourceId,
+          resourceType: resourceType,
           to: to,
-          q: q,
         );
     replace(_$result);
     return _$result;

@@ -14,15 +14,15 @@ part 'job_dependency_dto.g.dart';
 /// JobDependencyDto
 ///
 /// Properties:
-/// * [id]
+/// * [createdAt]
 /// * [dependsOnJobId]
 /// * [dependsOnJobStatus]
-/// * [createdAt]
+/// * [id]
 @BuiltValue()
 abstract class JobDependencyDto
     implements Built<JobDependencyDto, JobDependencyDtoBuilder> {
-  @BuiltValueField(wireName: r'id')
-  String get id;
+  @BuiltValueField(wireName: r'createdAt')
+  String get createdAt;
 
   @BuiltValueField(wireName: r'dependsOnJobId')
   String get dependsOnJobId;
@@ -31,8 +31,8 @@ abstract class JobDependencyDto
   JobDependencyDtoDependsOnJobStatusEnum get dependsOnJobStatus;
   // enum dependsOnJobStatusEnum {  PENDING,  PROCESSING,  COMPLETED,  CANCELLED,  FAILED,  BLOCKED,  };
 
-  @BuiltValueField(wireName: r'createdAt')
-  String get createdAt;
+  @BuiltValueField(wireName: r'id')
+  String get id;
 
   JobDependencyDto._();
 
@@ -60,9 +60,9 @@ class _$JobDependencyDtoSerializer
     JobDependencyDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'id';
+    yield r'createdAt';
     yield serializers.serialize(
-      object.id,
+      object.createdAt,
       specifiedType: const FullType(String),
     );
     yield r'dependsOnJobId';
@@ -75,9 +75,9 @@ class _$JobDependencyDtoSerializer
       object.dependsOnJobStatus,
       specifiedType: const FullType(JobDependencyDtoDependsOnJobStatusEnum),
     );
-    yield r'createdAt';
+    yield r'id';
     yield serializers.serialize(
-      object.createdAt,
+      object.id,
       specifiedType: const FullType(String),
     );
   }
@@ -107,12 +107,12 @@ class _$JobDependencyDtoSerializer
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'id':
+        case r'createdAt':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
-          result.id = valueDes;
+          result.createdAt = valueDes;
           break;
         case r'dependsOnJobId':
           final valueDes = serializers.deserialize(
@@ -130,12 +130,12 @@ class _$JobDependencyDtoSerializer
           ) as JobDependencyDtoDependsOnJobStatusEnum;
           result.dependsOnJobStatus = valueDes;
           break;
-        case r'createdAt':
+        case r'id':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
-          result.createdAt = valueDes;
+          result.id = valueDes;
           break;
         default:
           unhandled.add(key);

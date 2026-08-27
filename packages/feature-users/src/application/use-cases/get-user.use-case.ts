@@ -5,7 +5,6 @@ import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
 import type { UserView } from "../users.types";
 
 import { assertUserBelongsToOrganization } from "../../domain/user-org-scope.policy";
-import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";
 import {
   ORGANIZATION_MEMBERSHIP,
   type OrganizationMembership,
@@ -13,6 +12,7 @@ import {
   USER_ACCESS_CONTROL,
   type UserAccessControl,
 } from "../../public/contracts";
+import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";
 import { UsersMapper } from "../users.mapper";
 
 @Injectable()

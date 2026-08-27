@@ -13,16 +13,16 @@ part 'job_type_count_dto.g.dart';
 /// JobTypeCountDto
 ///
 /// Properties:
-/// * [type]
 /// * [total]
+/// * [type]
 @BuiltValue()
 abstract class JobTypeCountDto
     implements Built<JobTypeCountDto, JobTypeCountDtoBuilder> {
-  @BuiltValueField(wireName: r'type')
-  String get type;
-
   @BuiltValueField(wireName: r'total')
   num get total;
+
+  @BuiltValueField(wireName: r'type')
+  String get type;
 
   JobTypeCountDto._();
 
@@ -50,15 +50,15 @@ class _$JobTypeCountDtoSerializer
     JobTypeCountDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'type';
-    yield serializers.serialize(
-      object.type,
-      specifiedType: const FullType(String),
-    );
     yield r'total';
     yield serializers.serialize(
       object.total,
       specifiedType: const FullType(num),
+    );
+    yield r'type';
+    yield serializers.serialize(
+      object.type,
+      specifiedType: const FullType(String),
     );
   }
 
@@ -87,17 +87,17 @@ class _$JobTypeCountDtoSerializer
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
+        case r'total':
+          final valueDes = serializers.deserialize(value,
+              specifiedType: const FullType(num)) as num;
+          result.total = valueDes;
+          break;
         case r'type':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
           result.type = valueDes;
-          break;
-        case r'total':
-          final valueDes = serializers.deserialize(value,
-              specifiedType: const FullType(num)) as num;
-          result.total = valueDes;
           break;
         default:
           unhandled.add(key);

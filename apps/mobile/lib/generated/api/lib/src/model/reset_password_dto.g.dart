@@ -10,16 +10,16 @@ part of 'reset_password_dto.dart';
 
 class _$ResetPasswordDto extends ResetPasswordDto {
   @override
-  final String token;
-  @override
   final String newPassword;
+  @override
+  final String token;
 
   factory _$ResetPasswordDto([
     void Function(ResetPasswordDtoBuilder)? updates,
   ]) =>
       (ResetPasswordDtoBuilder()..update(updates))._build();
 
-  _$ResetPasswordDto._({required this.token, required this.newPassword})
+  _$ResetPasswordDto._({required this.newPassword, required this.token})
       : super._();
   @override
   ResetPasswordDto rebuild(void Function(ResetPasswordDtoBuilder) updates) =>
@@ -33,15 +33,15 @@ class _$ResetPasswordDto extends ResetPasswordDto {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is ResetPasswordDto &&
-        token == other.token &&
-        newPassword == other.newPassword;
+        newPassword == other.newPassword &&
+        token == other.token;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
-    _$hash = $jc(_$hash, token.hashCode);
     _$hash = $jc(_$hash, newPassword.hashCode);
+    _$hash = $jc(_$hash, token.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -49,8 +49,8 @@ class _$ResetPasswordDto extends ResetPasswordDto {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'ResetPasswordDto')
-          ..add('token', token)
-          ..add('newPassword', newPassword))
+          ..add('newPassword', newPassword)
+          ..add('token', token))
         .toString();
   }
 }
@@ -59,13 +59,13 @@ class ResetPasswordDtoBuilder
     implements Builder<ResetPasswordDto, ResetPasswordDtoBuilder> {
   _$ResetPasswordDto? _$v;
 
-  String? _token;
-  String? get token => _$this._token;
-  set token(String? token) => _$this._token = token;
-
   String? _newPassword;
   String? get newPassword => _$this._newPassword;
   set newPassword(String? newPassword) => _$this._newPassword = newPassword;
+
+  String? _token;
+  String? get token => _$this._token;
+  set token(String? token) => _$this._token = token;
 
   ResetPasswordDtoBuilder() {
     ResetPasswordDto._defaults(this);
@@ -74,8 +74,8 @@ class ResetPasswordDtoBuilder
   ResetPasswordDtoBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _token = $v.token;
       _newPassword = $v.newPassword;
+      _token = $v.token;
       _$v = null;
     }
     return this;
@@ -97,15 +97,15 @@ class ResetPasswordDtoBuilder
   _$ResetPasswordDto _build() {
     final _$result = _$v ??
         _$ResetPasswordDto._(
-          token: BuiltValueNullFieldError.checkNotNull(
-            token,
-            r'ResetPasswordDto',
-            'token',
-          ),
           newPassword: BuiltValueNullFieldError.checkNotNull(
             newPassword,
             r'ResetPasswordDto',
             'newPassword',
+          ),
+          token: BuiltValueNullFieldError.checkNotNull(
+            token,
+            r'ResetPasswordDto',
+            'token',
           ),
         );
     replace(_$result);

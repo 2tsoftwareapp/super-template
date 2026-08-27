@@ -10,13 +10,13 @@ part of 'send_admin_mail_dto.dart';
 
 class _$SendAdminMailDto extends SendAdminMailDto {
   @override
+  final String? idempotencyKey;
+  @override
   final String templateKey;
   @override
   final String to;
   @override
   final BuiltMap<String, String>? variables;
-  @override
-  final String? idempotencyKey;
 
   factory _$SendAdminMailDto([
     void Function(SendAdminMailDtoBuilder)? updates,
@@ -24,10 +24,10 @@ class _$SendAdminMailDto extends SendAdminMailDto {
       (SendAdminMailDtoBuilder()..update(updates))._build();
 
   _$SendAdminMailDto._({
+    this.idempotencyKey,
     required this.templateKey,
     required this.to,
     this.variables,
-    this.idempotencyKey,
   }) : super._();
   @override
   SendAdminMailDto rebuild(void Function(SendAdminMailDtoBuilder) updates) =>
@@ -41,19 +41,19 @@ class _$SendAdminMailDto extends SendAdminMailDto {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is SendAdminMailDto &&
+        idempotencyKey == other.idempotencyKey &&
         templateKey == other.templateKey &&
         to == other.to &&
-        variables == other.variables &&
-        idempotencyKey == other.idempotencyKey;
+        variables == other.variables;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
+    _$hash = $jc(_$hash, idempotencyKey.hashCode);
     _$hash = $jc(_$hash, templateKey.hashCode);
     _$hash = $jc(_$hash, to.hashCode);
     _$hash = $jc(_$hash, variables.hashCode);
-    _$hash = $jc(_$hash, idempotencyKey.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -61,10 +61,10 @@ class _$SendAdminMailDto extends SendAdminMailDto {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'SendAdminMailDto')
+          ..add('idempotencyKey', idempotencyKey)
           ..add('templateKey', templateKey)
           ..add('to', to)
-          ..add('variables', variables)
-          ..add('idempotencyKey', idempotencyKey))
+          ..add('variables', variables))
         .toString();
   }
 }
@@ -72,6 +72,11 @@ class _$SendAdminMailDto extends SendAdminMailDto {
 class SendAdminMailDtoBuilder
     implements Builder<SendAdminMailDto, SendAdminMailDtoBuilder> {
   _$SendAdminMailDto? _$v;
+
+  String? _idempotencyKey;
+  String? get idempotencyKey => _$this._idempotencyKey;
+  set idempotencyKey(String? idempotencyKey) =>
+      _$this._idempotencyKey = idempotencyKey;
 
   String? _templateKey;
   String? get templateKey => _$this._templateKey;
@@ -87,11 +92,6 @@ class SendAdminMailDtoBuilder
   set variables(MapBuilder<String, String>? variables) =>
       _$this._variables = variables;
 
-  String? _idempotencyKey;
-  String? get idempotencyKey => _$this._idempotencyKey;
-  set idempotencyKey(String? idempotencyKey) =>
-      _$this._idempotencyKey = idempotencyKey;
-
   SendAdminMailDtoBuilder() {
     SendAdminMailDto._defaults(this);
   }
@@ -99,10 +99,10 @@ class SendAdminMailDtoBuilder
   SendAdminMailDtoBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
+      _idempotencyKey = $v.idempotencyKey;
       _templateKey = $v.templateKey;
       _to = $v.to;
       _variables = $v.variables?.toBuilder();
-      _idempotencyKey = $v.idempotencyKey;
       _$v = null;
     }
     return this;
@@ -126,6 +126,7 @@ class SendAdminMailDtoBuilder
     try {
       _$result = _$v ??
           _$SendAdminMailDto._(
+            idempotencyKey: idempotencyKey,
             templateKey: BuiltValueNullFieldError.checkNotNull(
               templateKey,
               r'SendAdminMailDto',
@@ -137,7 +138,6 @@ class SendAdminMailDtoBuilder
               'to',
             ),
             variables: _variables?.build(),
-            idempotencyKey: idempotencyKey,
           );
     } catch (_) {
       late String _$failedField;

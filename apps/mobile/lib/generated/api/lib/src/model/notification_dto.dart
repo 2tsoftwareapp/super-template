@@ -15,40 +15,40 @@ part 'notification_dto.g.dart';
 /// NotificationDto
 ///
 /// Properties:
-/// * [id]
-/// * [userId]
-/// * [type]
-/// * [title]
 /// * [body]
-/// * [data]
-/// * [readAt]
 /// * [createdAt]
+/// * [data]
+/// * [id]
+/// * [readAt]
+/// * [title]
+/// * [type]
+/// * [userId]
 @BuiltValue()
 abstract class NotificationDto
     implements Built<NotificationDto, NotificationDtoBuilder> {
-  @BuiltValueField(wireName: r'id')
-  String get id;
-
-  @BuiltValueField(wireName: r'userId')
-  String get userId;
-
-  @BuiltValueField(wireName: r'type')
-  String get type;
-
-  @BuiltValueField(wireName: r'title')
-  String get title;
-
   @BuiltValueField(wireName: r'body')
   String get body;
+
+  @BuiltValueField(wireName: r'createdAt')
+  String get createdAt;
 
   @BuiltValueField(wireName: r'data')
   BuiltMap<String, JsonObject?>? get data;
 
+  @BuiltValueField(wireName: r'id')
+  String get id;
+
   @BuiltValueField(wireName: r'readAt')
   JsonObject? get readAt;
 
-  @BuiltValueField(wireName: r'createdAt')
-  String get createdAt;
+  @BuiltValueField(wireName: r'title')
+  String get title;
+
+  @BuiltValueField(wireName: r'type')
+  String get type;
+
+  @BuiltValueField(wireName: r'userId')
+  String get userId;
 
   NotificationDto._();
 
@@ -76,29 +76,14 @@ class _$NotificationDtoSerializer
     NotificationDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'id';
-    yield serializers.serialize(
-      object.id,
-      specifiedType: const FullType(String),
-    );
-    yield r'userId';
-    yield serializers.serialize(
-      object.userId,
-      specifiedType: const FullType(String),
-    );
-    yield r'type';
-    yield serializers.serialize(
-      object.type,
-      specifiedType: const FullType(String),
-    );
-    yield r'title';
-    yield serializers.serialize(
-      object.title,
-      specifiedType: const FullType(String),
-    );
     yield r'body';
     yield serializers.serialize(
       object.body,
+      specifiedType: const FullType(String),
+    );
+    yield r'createdAt';
+    yield serializers.serialize(
+      object.createdAt,
       specifiedType: const FullType(String),
     );
     if (object.data != null) {
@@ -111,6 +96,11 @@ class _$NotificationDtoSerializer
         ]),
       );
     }
+    yield r'id';
+    yield serializers.serialize(
+      object.id,
+      specifiedType: const FullType(String),
+    );
     if (object.readAt != null) {
       yield r'readAt';
       yield serializers.serialize(
@@ -118,9 +108,19 @@ class _$NotificationDtoSerializer
         specifiedType: const FullType(JsonObject),
       );
     }
-    yield r'createdAt';
+    yield r'title';
     yield serializers.serialize(
-      object.createdAt,
+      object.title,
+      specifiedType: const FullType(String),
+    );
+    yield r'type';
+    yield serializers.serialize(
+      object.type,
+      specifiedType: const FullType(String),
+    );
+    yield r'userId';
+    yield serializers.serialize(
+      object.userId,
       specifiedType: const FullType(String),
     );
   }
@@ -150,40 +150,19 @@ class _$NotificationDtoSerializer
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'id':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.id = valueDes;
-          break;
-        case r'userId':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.userId = valueDes;
-          break;
-        case r'type':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.type = valueDes;
-          break;
-        case r'title':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.title = valueDes;
-          break;
         case r'body':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
           result.body = valueDes;
+          break;
+        case r'createdAt':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.createdAt = valueDes;
           break;
         case r'data':
           final valueDes = serializers.deserialize(
@@ -195,6 +174,13 @@ class _$NotificationDtoSerializer
           ) as BuiltMap<String, JsonObject?>;
           result.data.replace(valueDes);
           break;
+        case r'id':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.id = valueDes;
+          break;
         case r'readAt':
           final valueDes = serializers.deserialize(
             value,
@@ -202,12 +188,26 @@ class _$NotificationDtoSerializer
           ) as JsonObject;
           result.readAt = valueDes;
           break;
-        case r'createdAt':
+        case r'title':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
-          result.createdAt = valueDes;
+          result.title = valueDes;
+          break;
+        case r'type':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.type = valueDes;
+          break;
+        case r'userId':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.userId = valueDes;
           break;
         default:
           unhandled.add(key);

@@ -14,34 +14,34 @@ part 'organization_detail_dto.g.dart';
 /// OrganizationDetailDto
 ///
 /// Properties:
-/// * [id]
-/// * [name]
-/// * [slug]
-/// * [role]
-/// * [memberCount]
 /// * [createdAt]
+/// * [id]
+/// * [memberCount]
+/// * [name]
+/// * [role]
+/// * [slug]
 /// * [updatedAt]
 @BuiltValue()
 abstract class OrganizationDetailDto
     implements Built<OrganizationDetailDto, OrganizationDetailDtoBuilder> {
+  @BuiltValueField(wireName: r'createdAt')
+  String get createdAt;
+
   @BuiltValueField(wireName: r'id')
   String get id;
 
+  @BuiltValueField(wireName: r'memberCount')
+  num get memberCount;
+
   @BuiltValueField(wireName: r'name')
   String get name;
-
-  @BuiltValueField(wireName: r'slug')
-  String get slug;
 
   @BuiltValueField(wireName: r'role')
   OrganizationDetailDtoRoleEnum get role;
   // enum roleEnum {  OWNER,  ADMIN,  MEMBER,  };
 
-  @BuiltValueField(wireName: r'memberCount')
-  num get memberCount;
-
-  @BuiltValueField(wireName: r'createdAt')
-  String get createdAt;
+  @BuiltValueField(wireName: r'slug')
+  String get slug;
 
   @BuiltValueField(wireName: r'updatedAt')
   String get updatedAt;
@@ -76,19 +76,24 @@ class _$OrganizationDetailDtoSerializer
     OrganizationDetailDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
+    yield r'createdAt';
+    yield serializers.serialize(
+      object.createdAt,
+      specifiedType: const FullType(String),
+    );
     yield r'id';
     yield serializers.serialize(
       object.id,
       specifiedType: const FullType(String),
     );
+    yield r'memberCount';
+    yield serializers.serialize(
+      object.memberCount,
+      specifiedType: const FullType(num),
+    );
     yield r'name';
     yield serializers.serialize(
       object.name,
-      specifiedType: const FullType(String),
-    );
-    yield r'slug';
-    yield serializers.serialize(
-      object.slug,
       specifiedType: const FullType(String),
     );
     yield r'role';
@@ -96,14 +101,9 @@ class _$OrganizationDetailDtoSerializer
       object.role,
       specifiedType: const FullType(OrganizationDetailDtoRoleEnum),
     );
-    yield r'memberCount';
+    yield r'slug';
     yield serializers.serialize(
-      object.memberCount,
-      specifiedType: const FullType(num),
-    );
-    yield r'createdAt';
-    yield serializers.serialize(
-      object.createdAt,
+      object.slug,
       specifiedType: const FullType(String),
     );
     yield r'updatedAt';
@@ -138,6 +138,13 @@ class _$OrganizationDetailDtoSerializer
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
+        case r'createdAt':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.createdAt = valueDes;
+          break;
         case r'id':
           final valueDes = serializers.deserialize(
             value,
@@ -145,19 +152,17 @@ class _$OrganizationDetailDtoSerializer
           ) as String;
           result.id = valueDes;
           break;
+        case r'memberCount':
+          final valueDes = serializers.deserialize(value,
+              specifiedType: const FullType(num)) as num;
+          result.memberCount = valueDes;
+          break;
         case r'name':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
           result.name = valueDes;
-          break;
-        case r'slug':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.slug = valueDes;
           break;
         case r'role':
           final valueDes = serializers.deserialize(
@@ -168,17 +173,12 @@ class _$OrganizationDetailDtoSerializer
           ) as OrganizationDetailDtoRoleEnum;
           result.role = valueDes;
           break;
-        case r'memberCount':
-          final valueDes = serializers.deserialize(value,
-              specifiedType: const FullType(num)) as num;
-          result.memberCount = valueDes;
-          break;
-        case r'createdAt':
+        case r'slug':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
-          result.createdAt = valueDes;
+          result.slug = valueDes;
           break;
         case r'updatedAt':
           final valueDes = serializers.deserialize(

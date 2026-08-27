@@ -73,15 +73,15 @@ class _$FileHistoryEventDtoTypeEnumSerializer
 
 class _$FileHistoryEventDto extends FileHistoryEventDto {
   @override
-  final FileHistoryEventDtoTypeEnum type;
-  @override
   final String action;
   @override
   final String? actorId;
   @override
+  final String createdAt;
+  @override
   final BuiltMap<String, JsonObject?>? metadata;
   @override
-  final String createdAt;
+  final FileHistoryEventDtoTypeEnum type;
 
   factory _$FileHistoryEventDto([
     void Function(FileHistoryEventDtoBuilder)? updates,
@@ -89,11 +89,11 @@ class _$FileHistoryEventDto extends FileHistoryEventDto {
       (FileHistoryEventDtoBuilder()..update(updates))._build();
 
   _$FileHistoryEventDto._({
-    required this.type,
     required this.action,
     this.actorId,
-    this.metadata,
     required this.createdAt,
+    this.metadata,
+    required this.type,
   }) : super._();
   @override
   FileHistoryEventDto rebuild(
@@ -109,21 +109,21 @@ class _$FileHistoryEventDto extends FileHistoryEventDto {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is FileHistoryEventDto &&
-        type == other.type &&
         action == other.action &&
         actorId == other.actorId &&
+        createdAt == other.createdAt &&
         metadata == other.metadata &&
-        createdAt == other.createdAt;
+        type == other.type;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
-    _$hash = $jc(_$hash, type.hashCode);
     _$hash = $jc(_$hash, action.hashCode);
     _$hash = $jc(_$hash, actorId.hashCode);
-    _$hash = $jc(_$hash, metadata.hashCode);
     _$hash = $jc(_$hash, createdAt.hashCode);
+    _$hash = $jc(_$hash, metadata.hashCode);
+    _$hash = $jc(_$hash, type.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -131,11 +131,11 @@ class _$FileHistoryEventDto extends FileHistoryEventDto {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'FileHistoryEventDto')
-          ..add('type', type)
           ..add('action', action)
           ..add('actorId', actorId)
+          ..add('createdAt', createdAt)
           ..add('metadata', metadata)
-          ..add('createdAt', createdAt))
+          ..add('type', type))
         .toString();
   }
 }
@@ -143,10 +143,6 @@ class _$FileHistoryEventDto extends FileHistoryEventDto {
 class FileHistoryEventDtoBuilder
     implements Builder<FileHistoryEventDto, FileHistoryEventDtoBuilder> {
   _$FileHistoryEventDto? _$v;
-
-  FileHistoryEventDtoTypeEnum? _type;
-  FileHistoryEventDtoTypeEnum? get type => _$this._type;
-  set type(FileHistoryEventDtoTypeEnum? type) => _$this._type = type;
 
   String? _action;
   String? get action => _$this._action;
@@ -156,15 +152,19 @@ class FileHistoryEventDtoBuilder
   String? get actorId => _$this._actorId;
   set actorId(String? actorId) => _$this._actorId = actorId;
 
+  String? _createdAt;
+  String? get createdAt => _$this._createdAt;
+  set createdAt(String? createdAt) => _$this._createdAt = createdAt;
+
   MapBuilder<String, JsonObject?>? _metadata;
   MapBuilder<String, JsonObject?> get metadata =>
       _$this._metadata ??= MapBuilder<String, JsonObject?>();
   set metadata(MapBuilder<String, JsonObject?>? metadata) =>
       _$this._metadata = metadata;
 
-  String? _createdAt;
-  String? get createdAt => _$this._createdAt;
-  set createdAt(String? createdAt) => _$this._createdAt = createdAt;
+  FileHistoryEventDtoTypeEnum? _type;
+  FileHistoryEventDtoTypeEnum? get type => _$this._type;
+  set type(FileHistoryEventDtoTypeEnum? type) => _$this._type = type;
 
   FileHistoryEventDtoBuilder() {
     FileHistoryEventDto._defaults(this);
@@ -173,11 +173,11 @@ class FileHistoryEventDtoBuilder
   FileHistoryEventDtoBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _type = $v.type;
       _action = $v.action;
       _actorId = $v.actorId;
-      _metadata = $v.metadata?.toBuilder();
       _createdAt = $v.createdAt;
+      _metadata = $v.metadata?.toBuilder();
+      _type = $v.type;
       _$v = null;
     }
     return this;
@@ -201,22 +201,22 @@ class FileHistoryEventDtoBuilder
     try {
       _$result = _$v ??
           _$FileHistoryEventDto._(
-            type: BuiltValueNullFieldError.checkNotNull(
-              type,
-              r'FileHistoryEventDto',
-              'type',
-            ),
             action: BuiltValueNullFieldError.checkNotNull(
               action,
               r'FileHistoryEventDto',
               'action',
             ),
             actorId: actorId,
-            metadata: _metadata?.build(),
             createdAt: BuiltValueNullFieldError.checkNotNull(
               createdAt,
               r'FileHistoryEventDto',
               'createdAt',
+            ),
+            metadata: _metadata?.build(),
+            type: BuiltValueNullFieldError.checkNotNull(
+              type,
+              r'FileHistoryEventDto',
+              'type',
             ),
           );
     } catch (_) {

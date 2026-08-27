@@ -8,10 +8,10 @@ import {
   PERSONAL_ORGANIZATION_PROVIDER,
   type PersonalOrganizationProvider,
   ROLE_NAMES,
-  USERS_REPOSITORY,
-  type UsersRepositoryPort,
   USER_ACCESS_CONTROL,
   type UserAccessControl,
+  USERS_REPOSITORY,
+  type UsersRepositoryPort,
 } from "./public/contracts";
 
 /** Bag key written by the users seeder for downstream notifications/auth seeders. */

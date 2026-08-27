@@ -14,48 +14,48 @@ part 'auth_session_dto.g.dart';
 /// AuthSessionDto
 ///
 /// Properties:
-/// * [id]
-/// * [userId]
-/// * [expiresAt]
-/// * [revokedAt]
-/// * [lastUsedAt]
-/// * [ipAddress]
-/// * [userAgent]
 /// * [createdAt]
-/// * [updatedAt]
 /// * [current]
+/// * [expiresAt]
+/// * [id]
+/// * [ipAddress]
+/// * [lastUsedAt]
+/// * [revokedAt]
+/// * [updatedAt]
+/// * [userAgent]
+/// * [userId]
 @BuiltValue()
 abstract class AuthSessionDto
     implements Built<AuthSessionDto, AuthSessionDtoBuilder> {
-  @BuiltValueField(wireName: r'id')
-  String get id;
+  @BuiltValueField(wireName: r'createdAt')
+  String get createdAt;
 
-  @BuiltValueField(wireName: r'userId')
-  String get userId;
+  @BuiltValueField(wireName: r'current')
+  bool get current;
 
   @BuiltValueField(wireName: r'expiresAt')
   String get expiresAt;
 
-  @BuiltValueField(wireName: r'revokedAt')
-  JsonObject? get revokedAt;
-
-  @BuiltValueField(wireName: r'lastUsedAt')
-  JsonObject? get lastUsedAt;
+  @BuiltValueField(wireName: r'id')
+  String get id;
 
   @BuiltValueField(wireName: r'ipAddress')
   JsonObject? get ipAddress;
 
-  @BuiltValueField(wireName: r'userAgent')
-  JsonObject? get userAgent;
+  @BuiltValueField(wireName: r'lastUsedAt')
+  JsonObject? get lastUsedAt;
 
-  @BuiltValueField(wireName: r'createdAt')
-  String get createdAt;
+  @BuiltValueField(wireName: r'revokedAt')
+  JsonObject? get revokedAt;
 
   @BuiltValueField(wireName: r'updatedAt')
   String get updatedAt;
 
-  @BuiltValueField(wireName: r'current')
-  bool get current;
+  @BuiltValueField(wireName: r'userAgent')
+  JsonObject? get userAgent;
+
+  @BuiltValueField(wireName: r'userId')
+  String get userId;
 
   AuthSessionDto._();
 
@@ -83,25 +83,30 @@ class _$AuthSessionDtoSerializer
     AuthSessionDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'id';
+    yield r'createdAt';
     yield serializers.serialize(
-      object.id,
+      object.createdAt,
       specifiedType: const FullType(String),
     );
-    yield r'userId';
+    yield r'current';
     yield serializers.serialize(
-      object.userId,
-      specifiedType: const FullType(String),
+      object.current,
+      specifiedType: const FullType(bool),
     );
     yield r'expiresAt';
     yield serializers.serialize(
       object.expiresAt,
       specifiedType: const FullType(String),
     );
-    if (object.revokedAt != null) {
-      yield r'revokedAt';
+    yield r'id';
+    yield serializers.serialize(
+      object.id,
+      specifiedType: const FullType(String),
+    );
+    if (object.ipAddress != null) {
+      yield r'ipAddress';
       yield serializers.serialize(
-        object.revokedAt,
+        object.ipAddress,
         specifiedType: const FullType(JsonObject),
       );
     }
@@ -112,13 +117,18 @@ class _$AuthSessionDtoSerializer
         specifiedType: const FullType(JsonObject),
       );
     }
-    if (object.ipAddress != null) {
-      yield r'ipAddress';
+    if (object.revokedAt != null) {
+      yield r'revokedAt';
       yield serializers.serialize(
-        object.ipAddress,
+        object.revokedAt,
         specifiedType: const FullType(JsonObject),
       );
     }
+    yield r'updatedAt';
+    yield serializers.serialize(
+      object.updatedAt,
+      specifiedType: const FullType(String),
+    );
     if (object.userAgent != null) {
       yield r'userAgent';
       yield serializers.serialize(
@@ -126,20 +136,10 @@ class _$AuthSessionDtoSerializer
         specifiedType: const FullType(JsonObject),
       );
     }
-    yield r'createdAt';
+    yield r'userId';
     yield serializers.serialize(
-      object.createdAt,
+      object.userId,
       specifiedType: const FullType(String),
-    );
-    yield r'updatedAt';
-    yield serializers.serialize(
-      object.updatedAt,
-      specifiedType: const FullType(String),
-    );
-    yield r'current';
-    yield serializers.serialize(
-      object.current,
-      specifiedType: const FullType(bool),
     );
   }
 
@@ -168,19 +168,19 @@ class _$AuthSessionDtoSerializer
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'id':
+        case r'createdAt':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
-          result.id = valueDes;
+          result.createdAt = valueDes;
           break;
-        case r'userId':
+        case r'current':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.userId = valueDes;
+            specifiedType: const FullType(bool),
+          ) as bool;
+          result.current = valueDes;
           break;
         case r'expiresAt':
           final valueDes = serializers.deserialize(
@@ -189,19 +189,12 @@ class _$AuthSessionDtoSerializer
           ) as String;
           result.expiresAt = valueDes;
           break;
-        case r'revokedAt':
+        case r'id':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(JsonObject),
-          ) as JsonObject;
-          result.revokedAt = valueDes;
-          break;
-        case r'lastUsedAt':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(JsonObject),
-          ) as JsonObject;
-          result.lastUsedAt = valueDes;
+            specifiedType: const FullType(String),
+          ) as String;
+          result.id = valueDes;
           break;
         case r'ipAddress':
           final valueDes = serializers.deserialize(
@@ -210,19 +203,19 @@ class _$AuthSessionDtoSerializer
           ) as JsonObject;
           result.ipAddress = valueDes;
           break;
-        case r'userAgent':
+        case r'lastUsedAt':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(JsonObject),
           ) as JsonObject;
-          result.userAgent = valueDes;
+          result.lastUsedAt = valueDes;
           break;
-        case r'createdAt':
+        case r'revokedAt':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.createdAt = valueDes;
+            specifiedType: const FullType(JsonObject),
+          ) as JsonObject;
+          result.revokedAt = valueDes;
           break;
         case r'updatedAt':
           final valueDes = serializers.deserialize(
@@ -231,12 +224,19 @@ class _$AuthSessionDtoSerializer
           ) as String;
           result.updatedAt = valueDes;
           break;
-        case r'current':
+        case r'userAgent':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(bool),
-          ) as bool;
-          result.current = valueDes;
+            specifiedType: const FullType(JsonObject),
+          ) as JsonObject;
+          result.userAgent = valueDes;
+          break;
+        case r'userId':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.userId = valueDes;
           break;
         default:
           unhandled.add(key);

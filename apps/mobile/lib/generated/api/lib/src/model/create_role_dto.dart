@@ -14,18 +14,18 @@ part 'create_role_dto.g.dart';
 /// CreateRoleDto
 ///
 /// Properties:
-/// * [name]
 /// * [description]
+/// * [name]
 /// * [organizationId]
 /// * [permissionIds]
 @BuiltValue()
 abstract class CreateRoleDto
     implements Built<CreateRoleDto, CreateRoleDtoBuilder> {
-  @BuiltValueField(wireName: r'name')
-  String get name;
-
   @BuiltValueField(wireName: r'description')
   String? get description;
+
+  @BuiltValueField(wireName: r'name')
+  String get name;
 
   @BuiltValueField(wireName: r'organizationId')
   String? get organizationId;
@@ -58,11 +58,6 @@ class _$CreateRoleDtoSerializer implements PrimitiveSerializer<CreateRoleDto> {
     CreateRoleDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'name';
-    yield serializers.serialize(
-      object.name,
-      specifiedType: const FullType(String),
-    );
     if (object.description != null) {
       yield r'description';
       yield serializers.serialize(
@@ -70,6 +65,11 @@ class _$CreateRoleDtoSerializer implements PrimitiveSerializer<CreateRoleDto> {
         specifiedType: const FullType.nullable(String),
       );
     }
+    yield r'name';
+    yield serializers.serialize(
+      object.name,
+      specifiedType: const FullType(String),
+    );
     if (object.organizationId != null) {
       yield r'organizationId';
       yield serializers.serialize(
@@ -109,13 +109,6 @@ class _$CreateRoleDtoSerializer implements PrimitiveSerializer<CreateRoleDto> {
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'name':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.name = valueDes;
-          break;
         case r'description':
           final valueDes = serializers.deserialize(
             value,
@@ -123,6 +116,13 @@ class _$CreateRoleDtoSerializer implements PrimitiveSerializer<CreateRoleDto> {
           ) as String?;
           if (valueDes == null) continue;
           result.description = valueDes;
+          break;
+        case r'name':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.name = valueDes;
           break;
         case r'organizationId':
           final valueDes = serializers.deserialize(

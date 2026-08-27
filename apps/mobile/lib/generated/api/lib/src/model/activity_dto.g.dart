@@ -77,34 +77,34 @@ class _$ActivityDtoVisibilityEnumSerializer
 
 class _$ActivityDto extends ActivityDto {
   @override
-  final String id;
+  final String? actorId;
   @override
-  final String summary;
-  @override
-  final String entityType;
+  final String createdAt;
   @override
   final String entityId;
   @override
-  final String? actorId;
+  final String entityType;
   @override
-  final ActivityDtoVisibilityEnum visibility;
+  final String id;
   @override
   final BuiltMap<String, JsonObject?>? metadata;
   @override
-  final String createdAt;
+  final String summary;
+  @override
+  final ActivityDtoVisibilityEnum visibility;
 
   factory _$ActivityDto([void Function(ActivityDtoBuilder)? updates]) =>
       (ActivityDtoBuilder()..update(updates))._build();
 
   _$ActivityDto._({
-    required this.id,
-    required this.summary,
-    required this.entityType,
-    required this.entityId,
     this.actorId,
-    required this.visibility,
-    this.metadata,
     required this.createdAt,
+    required this.entityId,
+    required this.entityType,
+    required this.id,
+    this.metadata,
+    required this.summary,
+    required this.visibility,
   }) : super._();
   @override
   ActivityDto rebuild(void Function(ActivityDtoBuilder) updates) =>
@@ -117,27 +117,27 @@ class _$ActivityDto extends ActivityDto {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is ActivityDto &&
-        id == other.id &&
-        summary == other.summary &&
-        entityType == other.entityType &&
-        entityId == other.entityId &&
         actorId == other.actorId &&
-        visibility == other.visibility &&
+        createdAt == other.createdAt &&
+        entityId == other.entityId &&
+        entityType == other.entityType &&
+        id == other.id &&
         metadata == other.metadata &&
-        createdAt == other.createdAt;
+        summary == other.summary &&
+        visibility == other.visibility;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
-    _$hash = $jc(_$hash, id.hashCode);
-    _$hash = $jc(_$hash, summary.hashCode);
-    _$hash = $jc(_$hash, entityType.hashCode);
-    _$hash = $jc(_$hash, entityId.hashCode);
     _$hash = $jc(_$hash, actorId.hashCode);
-    _$hash = $jc(_$hash, visibility.hashCode);
-    _$hash = $jc(_$hash, metadata.hashCode);
     _$hash = $jc(_$hash, createdAt.hashCode);
+    _$hash = $jc(_$hash, entityId.hashCode);
+    _$hash = $jc(_$hash, entityType.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, metadata.hashCode);
+    _$hash = $jc(_$hash, summary.hashCode);
+    _$hash = $jc(_$hash, visibility.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -145,14 +145,14 @@ class _$ActivityDto extends ActivityDto {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'ActivityDto')
-          ..add('id', id)
-          ..add('summary', summary)
-          ..add('entityType', entityType)
-          ..add('entityId', entityId)
           ..add('actorId', actorId)
-          ..add('visibility', visibility)
+          ..add('createdAt', createdAt)
+          ..add('entityId', entityId)
+          ..add('entityType', entityType)
+          ..add('id', id)
           ..add('metadata', metadata)
-          ..add('createdAt', createdAt))
+          ..add('summary', summary)
+          ..add('visibility', visibility))
         .toString();
   }
 }
@@ -160,30 +160,25 @@ class _$ActivityDto extends ActivityDto {
 class ActivityDtoBuilder implements Builder<ActivityDto, ActivityDtoBuilder> {
   _$ActivityDto? _$v;
 
-  String? _id;
-  String? get id => _$this._id;
-  set id(String? id) => _$this._id = id;
+  String? _actorId;
+  String? get actorId => _$this._actorId;
+  set actorId(String? actorId) => _$this._actorId = actorId;
 
-  String? _summary;
-  String? get summary => _$this._summary;
-  set summary(String? summary) => _$this._summary = summary;
-
-  String? _entityType;
-  String? get entityType => _$this._entityType;
-  set entityType(String? entityType) => _$this._entityType = entityType;
+  String? _createdAt;
+  String? get createdAt => _$this._createdAt;
+  set createdAt(String? createdAt) => _$this._createdAt = createdAt;
 
   String? _entityId;
   String? get entityId => _$this._entityId;
   set entityId(String? entityId) => _$this._entityId = entityId;
 
-  String? _actorId;
-  String? get actorId => _$this._actorId;
-  set actorId(String? actorId) => _$this._actorId = actorId;
+  String? _entityType;
+  String? get entityType => _$this._entityType;
+  set entityType(String? entityType) => _$this._entityType = entityType;
 
-  ActivityDtoVisibilityEnum? _visibility;
-  ActivityDtoVisibilityEnum? get visibility => _$this._visibility;
-  set visibility(ActivityDtoVisibilityEnum? visibility) =>
-      _$this._visibility = visibility;
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
 
   MapBuilder<String, JsonObject?>? _metadata;
   MapBuilder<String, JsonObject?> get metadata =>
@@ -191,9 +186,14 @@ class ActivityDtoBuilder implements Builder<ActivityDto, ActivityDtoBuilder> {
   set metadata(MapBuilder<String, JsonObject?>? metadata) =>
       _$this._metadata = metadata;
 
-  String? _createdAt;
-  String? get createdAt => _$this._createdAt;
-  set createdAt(String? createdAt) => _$this._createdAt = createdAt;
+  String? _summary;
+  String? get summary => _$this._summary;
+  set summary(String? summary) => _$this._summary = summary;
+
+  ActivityDtoVisibilityEnum? _visibility;
+  ActivityDtoVisibilityEnum? get visibility => _$this._visibility;
+  set visibility(ActivityDtoVisibilityEnum? visibility) =>
+      _$this._visibility = visibility;
 
   ActivityDtoBuilder() {
     ActivityDto._defaults(this);
@@ -202,14 +202,14 @@ class ActivityDtoBuilder implements Builder<ActivityDto, ActivityDtoBuilder> {
   ActivityDtoBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _id = $v.id;
-      _summary = $v.summary;
-      _entityType = $v.entityType;
-      _entityId = $v.entityId;
       _actorId = $v.actorId;
-      _visibility = $v.visibility;
-      _metadata = $v.metadata?.toBuilder();
       _createdAt = $v.createdAt;
+      _entityId = $v.entityId;
+      _entityType = $v.entityType;
+      _id = $v.id;
+      _metadata = $v.metadata?.toBuilder();
+      _summary = $v.summary;
+      _visibility = $v.visibility;
       _$v = null;
     }
     return this;
@@ -233,33 +233,33 @@ class ActivityDtoBuilder implements Builder<ActivityDto, ActivityDtoBuilder> {
     try {
       _$result = _$v ??
           _$ActivityDto._(
-            id: BuiltValueNullFieldError.checkNotNull(id, r'ActivityDto', 'id'),
-            summary: BuiltValueNullFieldError.checkNotNull(
-              summary,
+            actorId: actorId,
+            createdAt: BuiltValueNullFieldError.checkNotNull(
+              createdAt,
               r'ActivityDto',
-              'summary',
-            ),
-            entityType: BuiltValueNullFieldError.checkNotNull(
-              entityType,
-              r'ActivityDto',
-              'entityType',
+              'createdAt',
             ),
             entityId: BuiltValueNullFieldError.checkNotNull(
               entityId,
               r'ActivityDto',
               'entityId',
             ),
-            actorId: actorId,
+            entityType: BuiltValueNullFieldError.checkNotNull(
+              entityType,
+              r'ActivityDto',
+              'entityType',
+            ),
+            id: BuiltValueNullFieldError.checkNotNull(id, r'ActivityDto', 'id'),
+            metadata: _metadata?.build(),
+            summary: BuiltValueNullFieldError.checkNotNull(
+              summary,
+              r'ActivityDto',
+              'summary',
+            ),
             visibility: BuiltValueNullFieldError.checkNotNull(
               visibility,
               r'ActivityDto',
               'visibility',
-            ),
-            metadata: _metadata?.build(),
-            createdAt: BuiltValueNullFieldError.checkNotNull(
-              createdAt,
-              r'ActivityDto',
-              'createdAt',
             ),
           );
     } catch (_) {

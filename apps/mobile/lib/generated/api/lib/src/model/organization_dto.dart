@@ -14,37 +14,37 @@ part 'organization_dto.g.dart';
 /// OrganizationDto
 ///
 /// Properties:
+/// * [createdAt]
+/// * [current]
 /// * [id]
 /// * [name]
-/// * [slug]
 /// * [role]
-/// * [createdAt]
+/// * [slug]
 /// * [updatedAt]
-/// * [current]
 @BuiltValue()
 abstract class OrganizationDto
     implements Built<OrganizationDto, OrganizationDtoBuilder> {
+  @BuiltValueField(wireName: r'createdAt')
+  String get createdAt;
+
+  @BuiltValueField(wireName: r'current')
+  bool get current;
+
   @BuiltValueField(wireName: r'id')
   String get id;
 
   @BuiltValueField(wireName: r'name')
   String get name;
 
-  @BuiltValueField(wireName: r'slug')
-  String get slug;
-
   @BuiltValueField(wireName: r'role')
   OrganizationDtoRoleEnum get role;
   // enum roleEnum {  OWNER,  ADMIN,  MEMBER,  };
 
-  @BuiltValueField(wireName: r'createdAt')
-  String get createdAt;
+  @BuiltValueField(wireName: r'slug')
+  String get slug;
 
   @BuiltValueField(wireName: r'updatedAt')
   String get updatedAt;
-
-  @BuiltValueField(wireName: r'current')
-  bool get current;
 
   OrganizationDto._();
 
@@ -72,6 +72,16 @@ class _$OrganizationDtoSerializer
     OrganizationDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
+    yield r'createdAt';
+    yield serializers.serialize(
+      object.createdAt,
+      specifiedType: const FullType(String),
+    );
+    yield r'current';
+    yield serializers.serialize(
+      object.current,
+      specifiedType: const FullType(bool),
+    );
     yield r'id';
     yield serializers.serialize(
       object.id,
@@ -82,30 +92,20 @@ class _$OrganizationDtoSerializer
       object.name,
       specifiedType: const FullType(String),
     );
-    yield r'slug';
-    yield serializers.serialize(
-      object.slug,
-      specifiedType: const FullType(String),
-    );
     yield r'role';
     yield serializers.serialize(
       object.role,
       specifiedType: const FullType(OrganizationDtoRoleEnum),
     );
-    yield r'createdAt';
+    yield r'slug';
     yield serializers.serialize(
-      object.createdAt,
+      object.slug,
       specifiedType: const FullType(String),
     );
     yield r'updatedAt';
     yield serializers.serialize(
       object.updatedAt,
       specifiedType: const FullType(String),
-    );
-    yield r'current';
-    yield serializers.serialize(
-      object.current,
-      specifiedType: const FullType(bool),
     );
   }
 
@@ -134,6 +134,20 @@ class _$OrganizationDtoSerializer
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
+        case r'createdAt':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.createdAt = valueDes;
+          break;
+        case r'current':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(bool),
+          ) as bool;
+          result.current = valueDes;
+          break;
         case r'id':
           final valueDes = serializers.deserialize(
             value,
@@ -148,13 +162,6 @@ class _$OrganizationDtoSerializer
           ) as String;
           result.name = valueDes;
           break;
-        case r'slug':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.slug = valueDes;
-          break;
         case r'role':
           final valueDes = serializers.deserialize(
             value,
@@ -162,12 +169,12 @@ class _$OrganizationDtoSerializer
           ) as OrganizationDtoRoleEnum;
           result.role = valueDes;
           break;
-        case r'createdAt':
+        case r'slug':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
-          result.createdAt = valueDes;
+          result.slug = valueDes;
           break;
         case r'updatedAt':
           final valueDes = serializers.deserialize(
@@ -175,13 +182,6 @@ class _$OrganizationDtoSerializer
             specifiedType: const FullType(String),
           ) as String;
           result.updatedAt = valueDes;
-          break;
-        case r'current':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(bool),
-          ) as bool;
-          result.current = valueDes;
           break;
         default:
           unhandled.add(key);

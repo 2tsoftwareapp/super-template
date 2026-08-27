@@ -38,20 +38,22 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(AttachmentDto.serializer)
       ..add(AttachmentsControllerAttach201Response.serializer)
       ..add(AttachmentsControllerList200Response.serializer)
-      ..add(AuditControllerExportAuditLogs201Response.serializer)
       ..add(AuditControllerGetAuditLog200Response.serializer)
       ..add(AuditControllerListAuditLogs200Response.serializer)
+      ..add(AuditExportControllerExportAuditLogs201Response.serializer)
       ..add(AuditExportResultDto.serializer)
       ..add(AuditLogDto.serializer)
       ..add(AuthLoginControllerLogin201Response.serializer)
       ..add(AuthLoginControllerVerifyMfaChallenge201Response.serializer)
       ..add(AuthMeDto.serializer)
-      ..add(AuthRegistrationControllerRegister201Response.serializer)
+      ..add(AuthRecoveryControllerForgotPassword201Response.serializer)
       ..add(AuthResponseDto.serializer)
       ..add(AuthSessionControllerGetMe200Response.serializer)
       ..add(AuthSessionControllerGetSessions200Response.serializer)
       ..add(AuthSessionControllerSwitchOrganization201Response.serializer)
       ..add(AuthSessionDto.serializer)
+      ..add(AuthUserDto.serializer)
+      ..add(AuthUserDtoStatusEnum.serializer)
       ..add(BatchDeleteFilesDto.serializer)
       ..add(BatchDeleteResultDto.serializer)
       ..add(BatchDeleteResultItemDto.serializer)
@@ -354,24 +356,6 @@ Serializers _$serializers = (Serializers().toBuilder()
         () => ListBuilder<String>(),
       )
       ..addBuilderFactory(
-        const FullType(BuiltMap, const [
-          const FullType(String),
-          const FullType.nullable(JsonObject),
-        ]),
-        () => MapBuilder<String, JsonObject?>(),
-      )
-      ..addBuilderFactory(
-        const FullType(BuiltList, const [const FullType(String)]),
-        () => ListBuilder<String>(),
-      )
-      ..addBuilderFactory(
-        const FullType(BuiltMap, const [
-          const FullType(String),
-          const FullType.nullable(JsonObject),
-        ]),
-        () => MapBuilder<String, JsonObject?>(),
-      )
-      ..addBuilderFactory(
         const FullType(BuiltList, const [const FullType(UserDto)]),
         () => ListBuilder<UserDto>(),
       )
@@ -465,6 +449,28 @@ Serializers _$serializers = (Serializers().toBuilder()
           const FullType.nullable(JsonObject),
         ]),
         () => MapBuilder<String, JsonObject?>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltMap, const [
+          const FullType(String),
+          const FullType.nullable(JsonObject),
+        ]),
+        () => MapBuilder<String, JsonObject?>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, const [const FullType(String)]),
+        () => ListBuilder<String>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltMap, const [
+          const FullType(String),
+          const FullType.nullable(JsonObject),
+        ]),
+        () => MapBuilder<String, JsonObject?>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, const [const FullType(String)]),
+        () => ListBuilder<String>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltMap, const [

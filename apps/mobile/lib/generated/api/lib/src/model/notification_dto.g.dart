@@ -10,34 +10,34 @@ part of 'notification_dto.dart';
 
 class _$NotificationDto extends NotificationDto {
   @override
-  final String id;
-  @override
-  final String userId;
-  @override
-  final String type;
-  @override
-  final String title;
-  @override
   final String body;
+  @override
+  final String createdAt;
   @override
   final BuiltMap<String, JsonObject?>? data;
   @override
+  final String id;
+  @override
   final JsonObject? readAt;
   @override
-  final String createdAt;
+  final String title;
+  @override
+  final String type;
+  @override
+  final String userId;
 
   factory _$NotificationDto([void Function(NotificationDtoBuilder)? updates]) =>
       (NotificationDtoBuilder()..update(updates))._build();
 
   _$NotificationDto._({
-    required this.id,
-    required this.userId,
-    required this.type,
-    required this.title,
     required this.body,
-    this.data,
-    this.readAt,
     required this.createdAt,
+    this.data,
+    required this.id,
+    this.readAt,
+    required this.title,
+    required this.type,
+    required this.userId,
   }) : super._();
   @override
   NotificationDto rebuild(void Function(NotificationDtoBuilder) updates) =>
@@ -50,27 +50,27 @@ class _$NotificationDto extends NotificationDto {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is NotificationDto &&
-        id == other.id &&
-        userId == other.userId &&
-        type == other.type &&
-        title == other.title &&
         body == other.body &&
+        createdAt == other.createdAt &&
         data == other.data &&
+        id == other.id &&
         readAt == other.readAt &&
-        createdAt == other.createdAt;
+        title == other.title &&
+        type == other.type &&
+        userId == other.userId;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
-    _$hash = $jc(_$hash, id.hashCode);
-    _$hash = $jc(_$hash, userId.hashCode);
-    _$hash = $jc(_$hash, type.hashCode);
-    _$hash = $jc(_$hash, title.hashCode);
     _$hash = $jc(_$hash, body.hashCode);
-    _$hash = $jc(_$hash, data.hashCode);
-    _$hash = $jc(_$hash, readAt.hashCode);
     _$hash = $jc(_$hash, createdAt.hashCode);
+    _$hash = $jc(_$hash, data.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, readAt.hashCode);
+    _$hash = $jc(_$hash, title.hashCode);
+    _$hash = $jc(_$hash, type.hashCode);
+    _$hash = $jc(_$hash, userId.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -78,14 +78,14 @@ class _$NotificationDto extends NotificationDto {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'NotificationDto')
-          ..add('id', id)
-          ..add('userId', userId)
-          ..add('type', type)
-          ..add('title', title)
           ..add('body', body)
+          ..add('createdAt', createdAt)
           ..add('data', data)
+          ..add('id', id)
           ..add('readAt', readAt)
-          ..add('createdAt', createdAt))
+          ..add('title', title)
+          ..add('type', type)
+          ..add('userId', userId))
         .toString();
   }
 }
@@ -94,38 +94,38 @@ class NotificationDtoBuilder
     implements Builder<NotificationDto, NotificationDtoBuilder> {
   _$NotificationDto? _$v;
 
-  String? _id;
-  String? get id => _$this._id;
-  set id(String? id) => _$this._id = id;
-
-  String? _userId;
-  String? get userId => _$this._userId;
-  set userId(String? userId) => _$this._userId = userId;
-
-  String? _type;
-  String? get type => _$this._type;
-  set type(String? type) => _$this._type = type;
-
-  String? _title;
-  String? get title => _$this._title;
-  set title(String? title) => _$this._title = title;
-
   String? _body;
   String? get body => _$this._body;
   set body(String? body) => _$this._body = body;
+
+  String? _createdAt;
+  String? get createdAt => _$this._createdAt;
+  set createdAt(String? createdAt) => _$this._createdAt = createdAt;
 
   MapBuilder<String, JsonObject?>? _data;
   MapBuilder<String, JsonObject?> get data =>
       _$this._data ??= MapBuilder<String, JsonObject?>();
   set data(MapBuilder<String, JsonObject?>? data) => _$this._data = data;
 
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
+
   JsonObject? _readAt;
   JsonObject? get readAt => _$this._readAt;
   set readAt(JsonObject? readAt) => _$this._readAt = readAt;
 
-  String? _createdAt;
-  String? get createdAt => _$this._createdAt;
-  set createdAt(String? createdAt) => _$this._createdAt = createdAt;
+  String? _title;
+  String? get title => _$this._title;
+  set title(String? title) => _$this._title = title;
+
+  String? _type;
+  String? get type => _$this._type;
+  set type(String? type) => _$this._type = type;
+
+  String? _userId;
+  String? get userId => _$this._userId;
+  set userId(String? userId) => _$this._userId = userId;
 
   NotificationDtoBuilder() {
     NotificationDto._defaults(this);
@@ -134,14 +134,14 @@ class NotificationDtoBuilder
   NotificationDtoBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _id = $v.id;
-      _userId = $v.userId;
-      _type = $v.type;
-      _title = $v.title;
       _body = $v.body;
-      _data = $v.data?.toBuilder();
-      _readAt = $v.readAt;
       _createdAt = $v.createdAt;
+      _data = $v.data?.toBuilder();
+      _id = $v.id;
+      _readAt = $v.readAt;
+      _title = $v.title;
+      _type = $v.type;
+      _userId = $v.userId;
       _$v = null;
     }
     return this;
@@ -165,37 +165,37 @@ class NotificationDtoBuilder
     try {
       _$result = _$v ??
           _$NotificationDto._(
+            body: BuiltValueNullFieldError.checkNotNull(
+              body,
+              r'NotificationDto',
+              'body',
+            ),
+            createdAt: BuiltValueNullFieldError.checkNotNull(
+              createdAt,
+              r'NotificationDto',
+              'createdAt',
+            ),
+            data: _data?.build(),
             id: BuiltValueNullFieldError.checkNotNull(
               id,
               r'NotificationDto',
               'id',
             ),
-            userId: BuiltValueNullFieldError.checkNotNull(
-              userId,
+            readAt: readAt,
+            title: BuiltValueNullFieldError.checkNotNull(
+              title,
               r'NotificationDto',
-              'userId',
+              'title',
             ),
             type: BuiltValueNullFieldError.checkNotNull(
               type,
               r'NotificationDto',
               'type',
             ),
-            title: BuiltValueNullFieldError.checkNotNull(
-              title,
+            userId: BuiltValueNullFieldError.checkNotNull(
+              userId,
               r'NotificationDto',
-              'title',
-            ),
-            body: BuiltValueNullFieldError.checkNotNull(
-              body,
-              r'NotificationDto',
-              'body',
-            ),
-            data: _data?.build(),
-            readAt: readAt,
-            createdAt: BuiltValueNullFieldError.checkNotNull(
-              createdAt,
-              r'NotificationDto',
-              'createdAt',
+              'userId',
             ),
           );
     } catch (_) {

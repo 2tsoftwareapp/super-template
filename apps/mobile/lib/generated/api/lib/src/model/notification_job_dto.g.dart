@@ -167,37 +167,37 @@ class _$NotificationJobDtoStatusEnumSerializer
 
 class _$NotificationJobDto extends NotificationJobDto {
   @override
-  final String id;
-  @override
   final String? actorId;
   @override
   final NotificationJobDtoAudienceEnum audience;
   @override
-  final String? targetUserId;
-  @override
-  final BuiltList<String>? userIds;
-  @override
-  final String type;
-  @override
-  final String title;
-  @override
   final String body;
   @override
+  final String createdAt;
+  @override
   final BuiltMap<String, JsonObject?>? data;
+  @override
+  final JsonObject? errorMessage;
+  @override
+  final String id;
+  @override
+  final JsonObject? processedAt;
+  @override
+  final JsonObject? recipientCount;
   @override
   final String scheduledAt;
   @override
   final NotificationJobDtoStatusEnum status;
   @override
-  final JsonObject? recipientCount;
+  final String? targetUserId;
   @override
-  final JsonObject? processedAt;
+  final String title;
   @override
-  final JsonObject? errorMessage;
-  @override
-  final String createdAt;
+  final String type;
   @override
   final String updatedAt;
+  @override
+  final BuiltList<String>? userIds;
 
   factory _$NotificationJobDto([
     void Function(NotificationJobDtoBuilder)? updates,
@@ -205,22 +205,22 @@ class _$NotificationJobDto extends NotificationJobDto {
       (NotificationJobDtoBuilder()..update(updates))._build();
 
   _$NotificationJobDto._({
-    required this.id,
     this.actorId,
     required this.audience,
-    this.targetUserId,
-    this.userIds,
-    required this.type,
-    required this.title,
     required this.body,
+    required this.createdAt,
     this.data,
+    this.errorMessage,
+    required this.id,
+    this.processedAt,
+    this.recipientCount,
     required this.scheduledAt,
     required this.status,
-    this.recipientCount,
-    this.processedAt,
-    this.errorMessage,
-    required this.createdAt,
+    this.targetUserId,
+    required this.title,
+    required this.type,
     required this.updatedAt,
+    this.userIds,
   }) : super._();
   @override
   NotificationJobDto rebuild(
@@ -236,43 +236,43 @@ class _$NotificationJobDto extends NotificationJobDto {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is NotificationJobDto &&
-        id == other.id &&
         actorId == other.actorId &&
         audience == other.audience &&
-        targetUserId == other.targetUserId &&
-        userIds == other.userIds &&
-        type == other.type &&
-        title == other.title &&
         body == other.body &&
+        createdAt == other.createdAt &&
         data == other.data &&
+        errorMessage == other.errorMessage &&
+        id == other.id &&
+        processedAt == other.processedAt &&
+        recipientCount == other.recipientCount &&
         scheduledAt == other.scheduledAt &&
         status == other.status &&
-        recipientCount == other.recipientCount &&
-        processedAt == other.processedAt &&
-        errorMessage == other.errorMessage &&
-        createdAt == other.createdAt &&
-        updatedAt == other.updatedAt;
+        targetUserId == other.targetUserId &&
+        title == other.title &&
+        type == other.type &&
+        updatedAt == other.updatedAt &&
+        userIds == other.userIds;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
-    _$hash = $jc(_$hash, id.hashCode);
     _$hash = $jc(_$hash, actorId.hashCode);
     _$hash = $jc(_$hash, audience.hashCode);
-    _$hash = $jc(_$hash, targetUserId.hashCode);
-    _$hash = $jc(_$hash, userIds.hashCode);
-    _$hash = $jc(_$hash, type.hashCode);
-    _$hash = $jc(_$hash, title.hashCode);
     _$hash = $jc(_$hash, body.hashCode);
+    _$hash = $jc(_$hash, createdAt.hashCode);
     _$hash = $jc(_$hash, data.hashCode);
+    _$hash = $jc(_$hash, errorMessage.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, processedAt.hashCode);
+    _$hash = $jc(_$hash, recipientCount.hashCode);
     _$hash = $jc(_$hash, scheduledAt.hashCode);
     _$hash = $jc(_$hash, status.hashCode);
-    _$hash = $jc(_$hash, recipientCount.hashCode);
-    _$hash = $jc(_$hash, processedAt.hashCode);
-    _$hash = $jc(_$hash, errorMessage.hashCode);
-    _$hash = $jc(_$hash, createdAt.hashCode);
+    _$hash = $jc(_$hash, targetUserId.hashCode);
+    _$hash = $jc(_$hash, title.hashCode);
+    _$hash = $jc(_$hash, type.hashCode);
     _$hash = $jc(_$hash, updatedAt.hashCode);
+    _$hash = $jc(_$hash, userIds.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -280,22 +280,22 @@ class _$NotificationJobDto extends NotificationJobDto {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'NotificationJobDto')
-          ..add('id', id)
           ..add('actorId', actorId)
           ..add('audience', audience)
-          ..add('targetUserId', targetUserId)
-          ..add('userIds', userIds)
-          ..add('type', type)
-          ..add('title', title)
           ..add('body', body)
+          ..add('createdAt', createdAt)
           ..add('data', data)
+          ..add('errorMessage', errorMessage)
+          ..add('id', id)
+          ..add('processedAt', processedAt)
+          ..add('recipientCount', recipientCount)
           ..add('scheduledAt', scheduledAt)
           ..add('status', status)
-          ..add('recipientCount', recipientCount)
-          ..add('processedAt', processedAt)
-          ..add('errorMessage', errorMessage)
-          ..add('createdAt', createdAt)
-          ..add('updatedAt', updatedAt))
+          ..add('targetUserId', targetUserId)
+          ..add('title', title)
+          ..add('type', type)
+          ..add('updatedAt', updatedAt)
+          ..add('userIds', userIds))
         .toString();
   }
 }
@@ -303,10 +303,6 @@ class _$NotificationJobDto extends NotificationJobDto {
 class NotificationJobDtoBuilder
     implements Builder<NotificationJobDto, NotificationJobDtoBuilder> {
   _$NotificationJobDto? _$v;
-
-  String? _id;
-  String? get id => _$this._id;
-  set id(String? id) => _$this._id = id;
 
   String? _actorId;
   String? get actorId => _$this._actorId;
@@ -317,30 +313,36 @@ class NotificationJobDtoBuilder
   set audience(NotificationJobDtoAudienceEnum? audience) =>
       _$this._audience = audience;
 
-  String? _targetUserId;
-  String? get targetUserId => _$this._targetUserId;
-  set targetUserId(String? targetUserId) => _$this._targetUserId = targetUserId;
-
-  ListBuilder<String>? _userIds;
-  ListBuilder<String> get userIds => _$this._userIds ??= ListBuilder<String>();
-  set userIds(ListBuilder<String>? userIds) => _$this._userIds = userIds;
-
-  String? _type;
-  String? get type => _$this._type;
-  set type(String? type) => _$this._type = type;
-
-  String? _title;
-  String? get title => _$this._title;
-  set title(String? title) => _$this._title = title;
-
   String? _body;
   String? get body => _$this._body;
   set body(String? body) => _$this._body = body;
+
+  String? _createdAt;
+  String? get createdAt => _$this._createdAt;
+  set createdAt(String? createdAt) => _$this._createdAt = createdAt;
 
   MapBuilder<String, JsonObject?>? _data;
   MapBuilder<String, JsonObject?> get data =>
       _$this._data ??= MapBuilder<String, JsonObject?>();
   set data(MapBuilder<String, JsonObject?>? data) => _$this._data = data;
+
+  JsonObject? _errorMessage;
+  JsonObject? get errorMessage => _$this._errorMessage;
+  set errorMessage(JsonObject? errorMessage) =>
+      _$this._errorMessage = errorMessage;
+
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
+
+  JsonObject? _processedAt;
+  JsonObject? get processedAt => _$this._processedAt;
+  set processedAt(JsonObject? processedAt) => _$this._processedAt = processedAt;
+
+  JsonObject? _recipientCount;
+  JsonObject? get recipientCount => _$this._recipientCount;
+  set recipientCount(JsonObject? recipientCount) =>
+      _$this._recipientCount = recipientCount;
 
   String? _scheduledAt;
   String? get scheduledAt => _$this._scheduledAt;
@@ -350,27 +352,25 @@ class NotificationJobDtoBuilder
   NotificationJobDtoStatusEnum? get status => _$this._status;
   set status(NotificationJobDtoStatusEnum? status) => _$this._status = status;
 
-  JsonObject? _recipientCount;
-  JsonObject? get recipientCount => _$this._recipientCount;
-  set recipientCount(JsonObject? recipientCount) =>
-      _$this._recipientCount = recipientCount;
+  String? _targetUserId;
+  String? get targetUserId => _$this._targetUserId;
+  set targetUserId(String? targetUserId) => _$this._targetUserId = targetUserId;
 
-  JsonObject? _processedAt;
-  JsonObject? get processedAt => _$this._processedAt;
-  set processedAt(JsonObject? processedAt) => _$this._processedAt = processedAt;
+  String? _title;
+  String? get title => _$this._title;
+  set title(String? title) => _$this._title = title;
 
-  JsonObject? _errorMessage;
-  JsonObject? get errorMessage => _$this._errorMessage;
-  set errorMessage(JsonObject? errorMessage) =>
-      _$this._errorMessage = errorMessage;
-
-  String? _createdAt;
-  String? get createdAt => _$this._createdAt;
-  set createdAt(String? createdAt) => _$this._createdAt = createdAt;
+  String? _type;
+  String? get type => _$this._type;
+  set type(String? type) => _$this._type = type;
 
   String? _updatedAt;
   String? get updatedAt => _$this._updatedAt;
   set updatedAt(String? updatedAt) => _$this._updatedAt = updatedAt;
+
+  ListBuilder<String>? _userIds;
+  ListBuilder<String> get userIds => _$this._userIds ??= ListBuilder<String>();
+  set userIds(ListBuilder<String>? userIds) => _$this._userIds = userIds;
 
   NotificationJobDtoBuilder() {
     NotificationJobDto._defaults(this);
@@ -379,22 +379,22 @@ class NotificationJobDtoBuilder
   NotificationJobDtoBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _id = $v.id;
       _actorId = $v.actorId;
       _audience = $v.audience;
-      _targetUserId = $v.targetUserId;
-      _userIds = $v.userIds?.toBuilder();
-      _type = $v.type;
-      _title = $v.title;
       _body = $v.body;
+      _createdAt = $v.createdAt;
       _data = $v.data?.toBuilder();
+      _errorMessage = $v.errorMessage;
+      _id = $v.id;
+      _processedAt = $v.processedAt;
+      _recipientCount = $v.recipientCount;
       _scheduledAt = $v.scheduledAt;
       _status = $v.status;
-      _recipientCount = $v.recipientCount;
-      _processedAt = $v.processedAt;
-      _errorMessage = $v.errorMessage;
-      _createdAt = $v.createdAt;
+      _targetUserId = $v.targetUserId;
+      _title = $v.title;
+      _type = $v.type;
       _updatedAt = $v.updatedAt;
+      _userIds = $v.userIds?.toBuilder();
       _$v = null;
     }
     return this;
@@ -418,35 +418,31 @@ class NotificationJobDtoBuilder
     try {
       _$result = _$v ??
           _$NotificationJobDto._(
-            id: BuiltValueNullFieldError.checkNotNull(
-              id,
-              r'NotificationJobDto',
-              'id',
-            ),
             actorId: actorId,
             audience: BuiltValueNullFieldError.checkNotNull(
               audience,
               r'NotificationJobDto',
               'audience',
             ),
-            targetUserId: targetUserId,
-            userIds: _userIds?.build(),
-            type: BuiltValueNullFieldError.checkNotNull(
-              type,
-              r'NotificationJobDto',
-              'type',
-            ),
-            title: BuiltValueNullFieldError.checkNotNull(
-              title,
-              r'NotificationJobDto',
-              'title',
-            ),
             body: BuiltValueNullFieldError.checkNotNull(
               body,
               r'NotificationJobDto',
               'body',
             ),
+            createdAt: BuiltValueNullFieldError.checkNotNull(
+              createdAt,
+              r'NotificationJobDto',
+              'createdAt',
+            ),
             data: _data?.build(),
+            errorMessage: errorMessage,
+            id: BuiltValueNullFieldError.checkNotNull(
+              id,
+              r'NotificationJobDto',
+              'id',
+            ),
+            processedAt: processedAt,
+            recipientCount: recipientCount,
             scheduledAt: BuiltValueNullFieldError.checkNotNull(
               scheduledAt,
               r'NotificationJobDto',
@@ -457,28 +453,32 @@ class NotificationJobDtoBuilder
               r'NotificationJobDto',
               'status',
             ),
-            recipientCount: recipientCount,
-            processedAt: processedAt,
-            errorMessage: errorMessage,
-            createdAt: BuiltValueNullFieldError.checkNotNull(
-              createdAt,
+            targetUserId: targetUserId,
+            title: BuiltValueNullFieldError.checkNotNull(
+              title,
               r'NotificationJobDto',
-              'createdAt',
+              'title',
+            ),
+            type: BuiltValueNullFieldError.checkNotNull(
+              type,
+              r'NotificationJobDto',
+              'type',
             ),
             updatedAt: BuiltValueNullFieldError.checkNotNull(
               updatedAt,
               r'NotificationJobDto',
               'updatedAt',
             ),
+            userIds: _userIds?.build(),
           );
     } catch (_) {
       late String _$failedField;
       try {
-        _$failedField = 'userIds';
-        _userIds?.build();
-
         _$failedField = 'data';
         _data?.build();
+
+        _$failedField = 'userIds';
+        _userIds?.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
           r'NotificationJobDto',

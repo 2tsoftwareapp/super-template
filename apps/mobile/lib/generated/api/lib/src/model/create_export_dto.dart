@@ -15,21 +15,21 @@ part 'create_export_dto.g.dart';
 /// CreateExportDto
 ///
 /// Properties:
-/// * [type]
 /// * [filters]
 /// * [idempotencyKey] - Client-supplied idempotency key. Retries with the same key return the original export job.
+/// * [type]
 @BuiltValue()
 abstract class CreateExportDto
     implements Built<CreateExportDto, CreateExportDtoBuilder> {
-  @BuiltValueField(wireName: r'type')
-  String get type;
-
   @BuiltValueField(wireName: r'filters')
   BuiltMap<String, JsonObject?>? get filters;
 
   /// Client-supplied idempotency key. Retries with the same key return the original export job.
   @BuiltValueField(wireName: r'idempotencyKey')
   String? get idempotencyKey;
+
+  @BuiltValueField(wireName: r'type')
+  String get type;
 
   CreateExportDto._();
 
@@ -57,11 +57,6 @@ class _$CreateExportDtoSerializer
     CreateExportDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'type';
-    yield serializers.serialize(
-      object.type,
-      specifiedType: const FullType(String),
-    );
     if (object.filters != null) {
       yield r'filters';
       yield serializers.serialize(
@@ -79,6 +74,11 @@ class _$CreateExportDtoSerializer
         specifiedType: const FullType(String),
       );
     }
+    yield r'type';
+    yield serializers.serialize(
+      object.type,
+      specifiedType: const FullType(String),
+    );
   }
 
   @override
@@ -106,13 +106,6 @@ class _$CreateExportDtoSerializer
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'type':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.type = valueDes;
-          break;
         case r'filters':
           final valueDes = serializers.deserialize(
             value,
@@ -129,6 +122,13 @@ class _$CreateExportDtoSerializer
             specifiedType: const FullType(String),
           ) as String;
           result.idempotencyKey = valueDes;
+          break;
+        case r'type':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.type = valueDes;
           break;
         default:
           unhandled.add(key);

@@ -15,45 +15,45 @@ part 'mail_delivery_dto.g.dart';
 /// MailDeliveryDto
 ///
 /// Properties:
-/// * [id]
-/// * [templateKey]
-/// * [recipient]
-/// * [subject]
-/// * [status]
-/// * [errorMessage]
-/// * [metadata]
-/// * [sentAt]
 /// * [createdAt]
+/// * [errorMessage]
+/// * [id]
+/// * [metadata]
+/// * [recipient]
+/// * [sentAt]
+/// * [status]
+/// * [subject]
+/// * [templateKey]
 @BuiltValue()
 abstract class MailDeliveryDto
     implements Built<MailDeliveryDto, MailDeliveryDtoBuilder> {
+  @BuiltValueField(wireName: r'createdAt')
+  String get createdAt;
+
+  @BuiltValueField(wireName: r'errorMessage')
+  JsonObject? get errorMessage;
+
   @BuiltValueField(wireName: r'id')
   String get id;
 
-  @BuiltValueField(wireName: r'templateKey')
-  String get templateKey;
+  @BuiltValueField(wireName: r'metadata')
+  BuiltMap<String, JsonObject?>? get metadata;
 
   @BuiltValueField(wireName: r'recipient')
   String get recipient;
 
-  @BuiltValueField(wireName: r'subject')
-  String get subject;
+  @BuiltValueField(wireName: r'sentAt')
+  JsonObject? get sentAt;
 
   @BuiltValueField(wireName: r'status')
   MailDeliveryDtoStatusEnum get status;
   // enum statusEnum {  SENT,  FAILED,  };
 
-  @BuiltValueField(wireName: r'errorMessage')
-  JsonObject? get errorMessage;
+  @BuiltValueField(wireName: r'subject')
+  String get subject;
 
-  @BuiltValueField(wireName: r'metadata')
-  BuiltMap<String, JsonObject?>? get metadata;
-
-  @BuiltValueField(wireName: r'sentAt')
-  JsonObject? get sentAt;
-
-  @BuiltValueField(wireName: r'createdAt')
-  String get createdAt;
+  @BuiltValueField(wireName: r'templateKey')
+  String get templateKey;
 
   MailDeliveryDto._();
 
@@ -81,30 +81,10 @@ class _$MailDeliveryDtoSerializer
     MailDeliveryDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'id';
+    yield r'createdAt';
     yield serializers.serialize(
-      object.id,
+      object.createdAt,
       specifiedType: const FullType(String),
-    );
-    yield r'templateKey';
-    yield serializers.serialize(
-      object.templateKey,
-      specifiedType: const FullType(String),
-    );
-    yield r'recipient';
-    yield serializers.serialize(
-      object.recipient,
-      specifiedType: const FullType(String),
-    );
-    yield r'subject';
-    yield serializers.serialize(
-      object.subject,
-      specifiedType: const FullType(String),
-    );
-    yield r'status';
-    yield serializers.serialize(
-      object.status,
-      specifiedType: const FullType(MailDeliveryDtoStatusEnum),
     );
     if (object.errorMessage != null) {
       yield r'errorMessage';
@@ -113,6 +93,11 @@ class _$MailDeliveryDtoSerializer
         specifiedType: const FullType(JsonObject),
       );
     }
+    yield r'id';
+    yield serializers.serialize(
+      object.id,
+      specifiedType: const FullType(String),
+    );
     if (object.metadata != null) {
       yield r'metadata';
       yield serializers.serialize(
@@ -123,6 +108,11 @@ class _$MailDeliveryDtoSerializer
         ]),
       );
     }
+    yield r'recipient';
+    yield serializers.serialize(
+      object.recipient,
+      specifiedType: const FullType(String),
+    );
     if (object.sentAt != null) {
       yield r'sentAt';
       yield serializers.serialize(
@@ -130,9 +120,19 @@ class _$MailDeliveryDtoSerializer
         specifiedType: const FullType(JsonObject),
       );
     }
-    yield r'createdAt';
+    yield r'status';
     yield serializers.serialize(
-      object.createdAt,
+      object.status,
+      specifiedType: const FullType(MailDeliveryDtoStatusEnum),
+    );
+    yield r'subject';
+    yield serializers.serialize(
+      object.subject,
+      specifiedType: const FullType(String),
+    );
+    yield r'templateKey';
+    yield serializers.serialize(
+      object.templateKey,
       specifiedType: const FullType(String),
     );
   }
@@ -162,40 +162,12 @@ class _$MailDeliveryDtoSerializer
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'id':
+        case r'createdAt':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
-          result.id = valueDes;
-          break;
-        case r'templateKey':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.templateKey = valueDes;
-          break;
-        case r'recipient':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.recipient = valueDes;
-          break;
-        case r'subject':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.subject = valueDes;
-          break;
-        case r'status':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(MailDeliveryDtoStatusEnum),
-          ) as MailDeliveryDtoStatusEnum;
-          result.status = valueDes;
+          result.createdAt = valueDes;
           break;
         case r'errorMessage':
           final valueDes = serializers.deserialize(
@@ -203,6 +175,13 @@ class _$MailDeliveryDtoSerializer
             specifiedType: const FullType(JsonObject),
           ) as JsonObject;
           result.errorMessage = valueDes;
+          break;
+        case r'id':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.id = valueDes;
           break;
         case r'metadata':
           final valueDes = serializers.deserialize(
@@ -214,6 +193,13 @@ class _$MailDeliveryDtoSerializer
           ) as BuiltMap<String, JsonObject?>;
           result.metadata.replace(valueDes);
           break;
+        case r'recipient':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.recipient = valueDes;
+          break;
         case r'sentAt':
           final valueDes = serializers.deserialize(
             value,
@@ -221,12 +207,26 @@ class _$MailDeliveryDtoSerializer
           ) as JsonObject;
           result.sentAt = valueDes;
           break;
-        case r'createdAt':
+        case r'status':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(MailDeliveryDtoStatusEnum),
+          ) as MailDeliveryDtoStatusEnum;
+          result.status = valueDes;
+          break;
+        case r'subject':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
-          result.createdAt = valueDes;
+          result.subject = valueDes;
+          break;
+        case r'templateKey':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.templateKey = valueDes;
           break;
         default:
           unhandled.add(key);

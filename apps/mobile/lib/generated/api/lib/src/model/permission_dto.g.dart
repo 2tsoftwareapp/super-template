@@ -70,13 +70,13 @@ class _$PermissionDtoScopeEnumSerializer
 
 class _$PermissionDto extends PermissionDto {
   @override
-  final String id;
-  @override
-  final String name;
-  @override
   final String? description;
   @override
+  final String id;
+  @override
   final bool isSystem;
+  @override
+  final String name;
   @override
   final PermissionDtoScopeEnum scope;
 
@@ -84,10 +84,10 @@ class _$PermissionDto extends PermissionDto {
       (PermissionDtoBuilder()..update(updates))._build();
 
   _$PermissionDto._({
-    required this.id,
-    required this.name,
     this.description,
+    required this.id,
     required this.isSystem,
+    required this.name,
     required this.scope,
   }) : super._();
   @override
@@ -101,20 +101,20 @@ class _$PermissionDto extends PermissionDto {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is PermissionDto &&
-        id == other.id &&
-        name == other.name &&
         description == other.description &&
+        id == other.id &&
         isSystem == other.isSystem &&
+        name == other.name &&
         scope == other.scope;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
-    _$hash = $jc(_$hash, id.hashCode);
-    _$hash = $jc(_$hash, name.hashCode);
     _$hash = $jc(_$hash, description.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
     _$hash = $jc(_$hash, isSystem.hashCode);
+    _$hash = $jc(_$hash, name.hashCode);
     _$hash = $jc(_$hash, scope.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
@@ -123,10 +123,10 @@ class _$PermissionDto extends PermissionDto {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'PermissionDto')
-          ..add('id', id)
-          ..add('name', name)
           ..add('description', description)
+          ..add('id', id)
           ..add('isSystem', isSystem)
+          ..add('name', name)
           ..add('scope', scope))
         .toString();
   }
@@ -136,21 +136,21 @@ class PermissionDtoBuilder
     implements Builder<PermissionDto, PermissionDtoBuilder> {
   _$PermissionDto? _$v;
 
-  String? _id;
-  String? get id => _$this._id;
-  set id(String? id) => _$this._id = id;
-
-  String? _name;
-  String? get name => _$this._name;
-  set name(String? name) => _$this._name = name;
-
   String? _description;
   String? get description => _$this._description;
   set description(String? description) => _$this._description = description;
 
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
+
   bool? _isSystem;
   bool? get isSystem => _$this._isSystem;
   set isSystem(bool? isSystem) => _$this._isSystem = isSystem;
+
+  String? _name;
+  String? get name => _$this._name;
+  set name(String? name) => _$this._name = name;
 
   PermissionDtoScopeEnum? _scope;
   PermissionDtoScopeEnum? get scope => _$this._scope;
@@ -163,10 +163,10 @@ class PermissionDtoBuilder
   PermissionDtoBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _id = $v.id;
-      _name = $v.name;
       _description = $v.description;
+      _id = $v.id;
       _isSystem = $v.isSystem;
+      _name = $v.name;
       _scope = $v.scope;
       _$v = null;
     }
@@ -189,17 +189,17 @@ class PermissionDtoBuilder
   _$PermissionDto _build() {
     final _$result = _$v ??
         _$PermissionDto._(
-          id: BuiltValueNullFieldError.checkNotNull(id, r'PermissionDto', 'id'),
-          name: BuiltValueNullFieldError.checkNotNull(
-            name,
-            r'PermissionDto',
-            'name',
-          ),
           description: description,
+          id: BuiltValueNullFieldError.checkNotNull(id, r'PermissionDto', 'id'),
           isSystem: BuiltValueNullFieldError.checkNotNull(
             isSystem,
             r'PermissionDto',
             'isSystem',
+          ),
+          name: BuiltValueNullFieldError.checkNotNull(
+            name,
+            r'PermissionDto',
+            'name',
           ),
           scope: BuiltValueNullFieldError.checkNotNull(
             scope,

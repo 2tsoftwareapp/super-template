@@ -16,53 +16,53 @@ part 'user_dto.g.dart';
 /// UserDto
 ///
 /// Properties:
-/// * [id]
-/// * [email]
-/// * [displayName]
 /// * [avatarUrl]
-/// * [status]
-/// * [emailVerifiedAt]
-/// * [roles]
-/// * [roleIds]
-/// * [roleAssignments]
-/// * [memberOrganizationIds]
 /// * [createdAt]
+/// * [displayName]
+/// * [email]
+/// * [emailVerifiedAt]
+/// * [id]
+/// * [memberOrganizationIds]
+/// * [roleAssignments]
+/// * [roleIds]
+/// * [roles]
+/// * [status]
 /// * [updatedAt]
 @BuiltValue()
 abstract class UserDto implements Built<UserDto, UserDtoBuilder> {
-  @BuiltValueField(wireName: r'id')
-  String get id;
+  @BuiltValueField(wireName: r'avatarUrl')
+  JsonObject? get avatarUrl;
 
-  @BuiltValueField(wireName: r'email')
-  String get email;
+  @BuiltValueField(wireName: r'createdAt')
+  String get createdAt;
 
   @BuiltValueField(wireName: r'displayName')
   String get displayName;
 
-  @BuiltValueField(wireName: r'avatarUrl')
-  JsonObject? get avatarUrl;
-
-  @BuiltValueField(wireName: r'status')
-  UserDtoStatusEnum get status;
-  // enum statusEnum {  PENDING,  ACTIVE,  BLOCKED,  };
+  @BuiltValueField(wireName: r'email')
+  String get email;
 
   @BuiltValueField(wireName: r'emailVerifiedAt')
   String? get emailVerifiedAt;
 
-  @BuiltValueField(wireName: r'roles')
-  BuiltList<String> get roles;
-
-  @BuiltValueField(wireName: r'roleIds')
-  BuiltList<String> get roleIds;
-
-  @BuiltValueField(wireName: r'roleAssignments')
-  BuiltList<RoleAssignmentDto> get roleAssignments;
+  @BuiltValueField(wireName: r'id')
+  String get id;
 
   @BuiltValueField(wireName: r'memberOrganizationIds')
   BuiltList<String> get memberOrganizationIds;
 
-  @BuiltValueField(wireName: r'createdAt')
-  String get createdAt;
+  @BuiltValueField(wireName: r'roleAssignments')
+  BuiltList<RoleAssignmentDto> get roleAssignments;
+
+  @BuiltValueField(wireName: r'roleIds')
+  BuiltList<String> get roleIds;
+
+  @BuiltValueField(wireName: r'roles')
+  BuiltList<String> get roles;
+
+  @BuiltValueField(wireName: r'status')
+  UserDtoStatusEnum get status;
+  // enum statusEnum {  PENDING,  ACTIVE,  BLOCKED,  };
 
   @BuiltValueField(wireName: r'updatedAt')
   String get updatedAt;
@@ -90,21 +90,6 @@ class _$UserDtoSerializer implements PrimitiveSerializer<UserDto> {
     UserDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'id';
-    yield serializers.serialize(
-      object.id,
-      specifiedType: const FullType(String),
-    );
-    yield r'email';
-    yield serializers.serialize(
-      object.email,
-      specifiedType: const FullType(String),
-    );
-    yield r'displayName';
-    yield serializers.serialize(
-      object.displayName,
-      specifiedType: const FullType(String),
-    );
     if (object.avatarUrl != null) {
       yield r'avatarUrl';
       yield serializers.serialize(
@@ -112,10 +97,20 @@ class _$UserDtoSerializer implements PrimitiveSerializer<UserDto> {
         specifiedType: const FullType(JsonObject),
       );
     }
-    yield r'status';
+    yield r'createdAt';
     yield serializers.serialize(
-      object.status,
-      specifiedType: const FullType(UserDtoStatusEnum),
+      object.createdAt,
+      specifiedType: const FullType(String),
+    );
+    yield r'displayName';
+    yield serializers.serialize(
+      object.displayName,
+      specifiedType: const FullType(String),
+    );
+    yield r'email';
+    yield serializers.serialize(
+      object.email,
+      specifiedType: const FullType(String),
     );
     yield r'emailVerifiedAt';
     yield object.emailVerifiedAt == null
@@ -124,14 +119,14 @@ class _$UserDtoSerializer implements PrimitiveSerializer<UserDto> {
             object.emailVerifiedAt,
             specifiedType: const FullType.nullable(String),
           );
-    yield r'roles';
+    yield r'id';
     yield serializers.serialize(
-      object.roles,
-      specifiedType: const FullType(BuiltList, [FullType(String)]),
+      object.id,
+      specifiedType: const FullType(String),
     );
-    yield r'roleIds';
+    yield r'memberOrganizationIds';
     yield serializers.serialize(
-      object.roleIds,
+      object.memberOrganizationIds,
       specifiedType: const FullType(BuiltList, [FullType(String)]),
     );
     yield r'roleAssignments';
@@ -139,15 +134,20 @@ class _$UserDtoSerializer implements PrimitiveSerializer<UserDto> {
       object.roleAssignments,
       specifiedType: const FullType(BuiltList, [FullType(RoleAssignmentDto)]),
     );
-    yield r'memberOrganizationIds';
+    yield r'roleIds';
     yield serializers.serialize(
-      object.memberOrganizationIds,
+      object.roleIds,
       specifiedType: const FullType(BuiltList, [FullType(String)]),
     );
-    yield r'createdAt';
+    yield r'roles';
     yield serializers.serialize(
-      object.createdAt,
-      specifiedType: const FullType(String),
+      object.roles,
+      specifiedType: const FullType(BuiltList, [FullType(String)]),
+    );
+    yield r'status';
+    yield serializers.serialize(
+      object.status,
+      specifiedType: const FullType(UserDtoStatusEnum),
     );
     yield r'updatedAt';
     yield serializers.serialize(
@@ -181,19 +181,19 @@ class _$UserDtoSerializer implements PrimitiveSerializer<UserDto> {
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'id':
+        case r'avatarUrl':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.id = valueDes;
+            specifiedType: const FullType(JsonObject),
+          ) as JsonObject;
+          result.avatarUrl = valueDes;
           break;
-        case r'email':
+        case r'createdAt':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
-          result.email = valueDes;
+          result.createdAt = valueDes;
           break;
         case r'displayName':
           final valueDes = serializers.deserialize(
@@ -202,19 +202,12 @@ class _$UserDtoSerializer implements PrimitiveSerializer<UserDto> {
           ) as String;
           result.displayName = valueDes;
           break;
-        case r'avatarUrl':
+        case r'email':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(JsonObject),
-          ) as JsonObject;
-          result.avatarUrl = valueDes;
-          break;
-        case r'status':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(UserDtoStatusEnum),
-          ) as UserDtoStatusEnum;
-          result.status = valueDes;
+            specifiedType: const FullType(String),
+          ) as String;
+          result.email = valueDes;
           break;
         case r'emailVerifiedAt':
           final valueDes = serializers.deserialize(
@@ -224,32 +217,12 @@ class _$UserDtoSerializer implements PrimitiveSerializer<UserDto> {
           if (valueDes == null) continue;
           result.emailVerifiedAt = valueDes;
           break;
-        case r'roles':
+        case r'id':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(BuiltList, [
-              FullType(String),
-            ]),
-          ) as BuiltList<String>;
-          result.roles.replace(valueDes);
-          break;
-        case r'roleIds':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(BuiltList, [
-              FullType(String),
-            ]),
-          ) as BuiltList<String>;
-          result.roleIds.replace(valueDes);
-          break;
-        case r'roleAssignments':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(BuiltList, [
-              FullType(RoleAssignmentDto),
-            ]),
-          ) as BuiltList<RoleAssignmentDto>;
-          result.roleAssignments.replace(valueDes);
+            specifiedType: const FullType(String),
+          ) as String;
+          result.id = valueDes;
           break;
         case r'memberOrganizationIds':
           final valueDes = serializers.deserialize(
@@ -260,12 +233,39 @@ class _$UserDtoSerializer implements PrimitiveSerializer<UserDto> {
           ) as BuiltList<String>;
           result.memberOrganizationIds.replace(valueDes);
           break;
-        case r'createdAt':
+        case r'roleAssignments':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.createdAt = valueDes;
+            specifiedType: const FullType(BuiltList, [
+              FullType(RoleAssignmentDto),
+            ]),
+          ) as BuiltList<RoleAssignmentDto>;
+          result.roleAssignments.replace(valueDes);
+          break;
+        case r'roleIds':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(BuiltList, [
+              FullType(String),
+            ]),
+          ) as BuiltList<String>;
+          result.roleIds.replace(valueDes);
+          break;
+        case r'roles':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(BuiltList, [
+              FullType(String),
+            ]),
+          ) as BuiltList<String>;
+          result.roles.replace(valueDes);
+          break;
+        case r'status':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(UserDtoStatusEnum),
+          ) as UserDtoStatusEnum;
+          result.status = valueDes;
           break;
         case r'updatedAt':
           final valueDes = serializers.deserialize(

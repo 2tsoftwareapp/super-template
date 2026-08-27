@@ -12,22 +12,22 @@ import { hashPassword } from "@repo/utils/password";
 
 import type { CreateAdminUserCommand, UserView } from "../users.types";
 
-import { resolveRoleById } from "../assignable-role.resolver";
-import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";
 import {
   assertCanAssignRoleTargets,
   assertRoleScopeCanBeAssigned,
   ORGANIZATION_MEMBERSHIP,
-  type OrganizationMembership,
   type OrganizationMemberRole,
+  type OrganizationMembership,
   PERSONAL_ORGANIZATION_PROVIDER,
   type PersonalOrganizationProvider,
   ROLE_NAMES,
   USER_ACCESS_CONTROL,
+  USER_PROFILE_INVALIDATOR,
   type UserAccessControl,
   type UserProfileInvalidator,
-  USER_PROFILE_INVALIDATOR,
 } from "../../public/contracts";
+import { resolveRoleById } from "../assignable-role.resolver";
+import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";
 import { GetUserUseCase } from "./get-user.use-case";
 
 @Injectable()

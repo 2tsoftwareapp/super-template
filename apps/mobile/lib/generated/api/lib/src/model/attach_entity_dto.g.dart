@@ -10,11 +10,11 @@ part of 'attach_entity_dto.dart';
 
 class _$AttachEntityDto extends AttachEntityDto {
   @override
-  final String fileId;
+  final String entityId;
   @override
   final String entityType;
   @override
-  final String entityId;
+  final String fileId;
   @override
   final String? label;
 
@@ -22,9 +22,9 @@ class _$AttachEntityDto extends AttachEntityDto {
       (AttachEntityDtoBuilder()..update(updates))._build();
 
   _$AttachEntityDto._({
-    required this.fileId,
-    required this.entityType,
     required this.entityId,
+    required this.entityType,
+    required this.fileId,
     this.label,
   }) : super._();
   @override
@@ -38,18 +38,18 @@ class _$AttachEntityDto extends AttachEntityDto {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is AttachEntityDto &&
-        fileId == other.fileId &&
-        entityType == other.entityType &&
         entityId == other.entityId &&
+        entityType == other.entityType &&
+        fileId == other.fileId &&
         label == other.label;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
-    _$hash = $jc(_$hash, fileId.hashCode);
-    _$hash = $jc(_$hash, entityType.hashCode);
     _$hash = $jc(_$hash, entityId.hashCode);
+    _$hash = $jc(_$hash, entityType.hashCode);
+    _$hash = $jc(_$hash, fileId.hashCode);
     _$hash = $jc(_$hash, label.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
@@ -58,9 +58,9 @@ class _$AttachEntityDto extends AttachEntityDto {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'AttachEntityDto')
-          ..add('fileId', fileId)
-          ..add('entityType', entityType)
           ..add('entityId', entityId)
+          ..add('entityType', entityType)
+          ..add('fileId', fileId)
           ..add('label', label))
         .toString();
   }
@@ -70,17 +70,17 @@ class AttachEntityDtoBuilder
     implements Builder<AttachEntityDto, AttachEntityDtoBuilder> {
   _$AttachEntityDto? _$v;
 
-  String? _fileId;
-  String? get fileId => _$this._fileId;
-  set fileId(String? fileId) => _$this._fileId = fileId;
+  String? _entityId;
+  String? get entityId => _$this._entityId;
+  set entityId(String? entityId) => _$this._entityId = entityId;
 
   String? _entityType;
   String? get entityType => _$this._entityType;
   set entityType(String? entityType) => _$this._entityType = entityType;
 
-  String? _entityId;
-  String? get entityId => _$this._entityId;
-  set entityId(String? entityId) => _$this._entityId = entityId;
+  String? _fileId;
+  String? get fileId => _$this._fileId;
+  set fileId(String? fileId) => _$this._fileId = fileId;
 
   String? _label;
   String? get label => _$this._label;
@@ -93,9 +93,9 @@ class AttachEntityDtoBuilder
   AttachEntityDtoBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _fileId = $v.fileId;
-      _entityType = $v.entityType;
       _entityId = $v.entityId;
+      _entityType = $v.entityType;
+      _fileId = $v.fileId;
       _label = $v.label;
       _$v = null;
     }
@@ -118,20 +118,20 @@ class AttachEntityDtoBuilder
   _$AttachEntityDto _build() {
     final _$result = _$v ??
         _$AttachEntityDto._(
-          fileId: BuiltValueNullFieldError.checkNotNull(
-            fileId,
+          entityId: BuiltValueNullFieldError.checkNotNull(
+            entityId,
             r'AttachEntityDto',
-            'fileId',
+            'entityId',
           ),
           entityType: BuiltValueNullFieldError.checkNotNull(
             entityType,
             r'AttachEntityDto',
             'entityType',
           ),
-          entityId: BuiltValueNullFieldError.checkNotNull(
-            entityId,
+          fileId: BuiltValueNullFieldError.checkNotNull(
+            fileId,
             r'AttachEntityDto',
-            'entityId',
+            'fileId',
           ),
           label: label,
         );

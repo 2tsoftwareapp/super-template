@@ -15,29 +15,29 @@ part 'file_history_event_dto.g.dart';
 /// FileHistoryEventDto
 ///
 /// Properties:
-/// * [type]
 /// * [action]
 /// * [actorId]
-/// * [metadata]
 /// * [createdAt]
+/// * [metadata]
+/// * [type]
 @BuiltValue()
 abstract class FileHistoryEventDto
     implements Built<FileHistoryEventDto, FileHistoryEventDtoBuilder> {
-  @BuiltValueField(wireName: r'type')
-  FileHistoryEventDtoTypeEnum get type;
-  // enum typeEnum {  version,  audit,  };
-
   @BuiltValueField(wireName: r'action')
   String get action;
 
   @BuiltValueField(wireName: r'actorId')
   String? get actorId;
 
+  @BuiltValueField(wireName: r'createdAt')
+  String get createdAt;
+
   @BuiltValueField(wireName: r'metadata')
   BuiltMap<String, JsonObject?>? get metadata;
 
-  @BuiltValueField(wireName: r'createdAt')
-  String get createdAt;
+  @BuiltValueField(wireName: r'type')
+  FileHistoryEventDtoTypeEnum get type;
+  // enum typeEnum {  version,  audit,  };
 
   FileHistoryEventDto._();
 
@@ -68,11 +68,6 @@ class _$FileHistoryEventDtoSerializer
     FileHistoryEventDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'type';
-    yield serializers.serialize(
-      object.type,
-      specifiedType: const FullType(FileHistoryEventDtoTypeEnum),
-    );
     yield r'action';
     yield serializers.serialize(
       object.action,
@@ -85,6 +80,11 @@ class _$FileHistoryEventDtoSerializer
         specifiedType: const FullType.nullable(String),
       );
     }
+    yield r'createdAt';
+    yield serializers.serialize(
+      object.createdAt,
+      specifiedType: const FullType(String),
+    );
     if (object.metadata != null) {
       yield r'metadata';
       yield serializers.serialize(
@@ -95,10 +95,10 @@ class _$FileHistoryEventDtoSerializer
         ]),
       );
     }
-    yield r'createdAt';
+    yield r'type';
     yield serializers.serialize(
-      object.createdAt,
-      specifiedType: const FullType(String),
+      object.type,
+      specifiedType: const FullType(FileHistoryEventDtoTypeEnum),
     );
   }
 
@@ -127,13 +127,6 @@ class _$FileHistoryEventDtoSerializer
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'type':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(FileHistoryEventDtoTypeEnum),
-          ) as FileHistoryEventDtoTypeEnum;
-          result.type = valueDes;
-          break;
         case r'action':
           final valueDes = serializers.deserialize(
             value,
@@ -149,6 +142,13 @@ class _$FileHistoryEventDtoSerializer
           if (valueDes == null) continue;
           result.actorId = valueDes;
           break;
+        case r'createdAt':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.createdAt = valueDes;
+          break;
         case r'metadata':
           final valueDes = serializers.deserialize(
             value,
@@ -159,12 +159,12 @@ class _$FileHistoryEventDtoSerializer
           ) as BuiltMap<String, JsonObject?>;
           result.metadata.replace(valueDes);
           break;
-        case r'createdAt':
+        case r'type':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.createdAt = valueDes;
+            specifiedType: const FullType(FileHistoryEventDtoTypeEnum),
+          ) as FileHistoryEventDtoTypeEnum;
+          result.type = valueDes;
           break;
         default:
           unhandled.add(key);

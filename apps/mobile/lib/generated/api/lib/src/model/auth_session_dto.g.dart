@@ -10,40 +10,40 @@ part of 'auth_session_dto.dart';
 
 class _$AuthSessionDto extends AuthSessionDto {
   @override
-  final String id;
+  final String createdAt;
   @override
-  final String userId;
+  final bool current;
   @override
   final String expiresAt;
   @override
-  final JsonObject? revokedAt;
-  @override
-  final JsonObject? lastUsedAt;
+  final String id;
   @override
   final JsonObject? ipAddress;
   @override
-  final JsonObject? userAgent;
+  final JsonObject? lastUsedAt;
   @override
-  final String createdAt;
+  final JsonObject? revokedAt;
   @override
   final String updatedAt;
   @override
-  final bool current;
+  final JsonObject? userAgent;
+  @override
+  final String userId;
 
   factory _$AuthSessionDto([void Function(AuthSessionDtoBuilder)? updates]) =>
       (AuthSessionDtoBuilder()..update(updates))._build();
 
   _$AuthSessionDto._({
-    required this.id,
-    required this.userId,
-    required this.expiresAt,
-    this.revokedAt,
-    this.lastUsedAt,
-    this.ipAddress,
-    this.userAgent,
     required this.createdAt,
-    required this.updatedAt,
     required this.current,
+    required this.expiresAt,
+    required this.id,
+    this.ipAddress,
+    this.lastUsedAt,
+    this.revokedAt,
+    required this.updatedAt,
+    this.userAgent,
+    required this.userId,
   }) : super._();
   @override
   AuthSessionDto rebuild(void Function(AuthSessionDtoBuilder) updates) =>
@@ -56,31 +56,31 @@ class _$AuthSessionDto extends AuthSessionDto {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is AuthSessionDto &&
-        id == other.id &&
-        userId == other.userId &&
-        expiresAt == other.expiresAt &&
-        revokedAt == other.revokedAt &&
-        lastUsedAt == other.lastUsedAt &&
-        ipAddress == other.ipAddress &&
-        userAgent == other.userAgent &&
         createdAt == other.createdAt &&
+        current == other.current &&
+        expiresAt == other.expiresAt &&
+        id == other.id &&
+        ipAddress == other.ipAddress &&
+        lastUsedAt == other.lastUsedAt &&
+        revokedAt == other.revokedAt &&
         updatedAt == other.updatedAt &&
-        current == other.current;
+        userAgent == other.userAgent &&
+        userId == other.userId;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
-    _$hash = $jc(_$hash, id.hashCode);
-    _$hash = $jc(_$hash, userId.hashCode);
-    _$hash = $jc(_$hash, expiresAt.hashCode);
-    _$hash = $jc(_$hash, revokedAt.hashCode);
-    _$hash = $jc(_$hash, lastUsedAt.hashCode);
-    _$hash = $jc(_$hash, ipAddress.hashCode);
-    _$hash = $jc(_$hash, userAgent.hashCode);
     _$hash = $jc(_$hash, createdAt.hashCode);
-    _$hash = $jc(_$hash, updatedAt.hashCode);
     _$hash = $jc(_$hash, current.hashCode);
+    _$hash = $jc(_$hash, expiresAt.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, ipAddress.hashCode);
+    _$hash = $jc(_$hash, lastUsedAt.hashCode);
+    _$hash = $jc(_$hash, revokedAt.hashCode);
+    _$hash = $jc(_$hash, updatedAt.hashCode);
+    _$hash = $jc(_$hash, userAgent.hashCode);
+    _$hash = $jc(_$hash, userId.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -88,16 +88,16 @@ class _$AuthSessionDto extends AuthSessionDto {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'AuthSessionDto')
-          ..add('id', id)
-          ..add('userId', userId)
-          ..add('expiresAt', expiresAt)
-          ..add('revokedAt', revokedAt)
-          ..add('lastUsedAt', lastUsedAt)
-          ..add('ipAddress', ipAddress)
-          ..add('userAgent', userAgent)
           ..add('createdAt', createdAt)
+          ..add('current', current)
+          ..add('expiresAt', expiresAt)
+          ..add('id', id)
+          ..add('ipAddress', ipAddress)
+          ..add('lastUsedAt', lastUsedAt)
+          ..add('revokedAt', revokedAt)
           ..add('updatedAt', updatedAt)
-          ..add('current', current))
+          ..add('userAgent', userAgent)
+          ..add('userId', userId))
         .toString();
   }
 }
@@ -106,45 +106,45 @@ class AuthSessionDtoBuilder
     implements Builder<AuthSessionDto, AuthSessionDtoBuilder> {
   _$AuthSessionDto? _$v;
 
-  String? _id;
-  String? get id => _$this._id;
-  set id(String? id) => _$this._id = id;
+  String? _createdAt;
+  String? get createdAt => _$this._createdAt;
+  set createdAt(String? createdAt) => _$this._createdAt = createdAt;
 
-  String? _userId;
-  String? get userId => _$this._userId;
-  set userId(String? userId) => _$this._userId = userId;
+  bool? _current;
+  bool? get current => _$this._current;
+  set current(bool? current) => _$this._current = current;
 
   String? _expiresAt;
   String? get expiresAt => _$this._expiresAt;
   set expiresAt(String? expiresAt) => _$this._expiresAt = expiresAt;
 
-  JsonObject? _revokedAt;
-  JsonObject? get revokedAt => _$this._revokedAt;
-  set revokedAt(JsonObject? revokedAt) => _$this._revokedAt = revokedAt;
-
-  JsonObject? _lastUsedAt;
-  JsonObject? get lastUsedAt => _$this._lastUsedAt;
-  set lastUsedAt(JsonObject? lastUsedAt) => _$this._lastUsedAt = lastUsedAt;
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
 
   JsonObject? _ipAddress;
   JsonObject? get ipAddress => _$this._ipAddress;
   set ipAddress(JsonObject? ipAddress) => _$this._ipAddress = ipAddress;
 
-  JsonObject? _userAgent;
-  JsonObject? get userAgent => _$this._userAgent;
-  set userAgent(JsonObject? userAgent) => _$this._userAgent = userAgent;
+  JsonObject? _lastUsedAt;
+  JsonObject? get lastUsedAt => _$this._lastUsedAt;
+  set lastUsedAt(JsonObject? lastUsedAt) => _$this._lastUsedAt = lastUsedAt;
 
-  String? _createdAt;
-  String? get createdAt => _$this._createdAt;
-  set createdAt(String? createdAt) => _$this._createdAt = createdAt;
+  JsonObject? _revokedAt;
+  JsonObject? get revokedAt => _$this._revokedAt;
+  set revokedAt(JsonObject? revokedAt) => _$this._revokedAt = revokedAt;
 
   String? _updatedAt;
   String? get updatedAt => _$this._updatedAt;
   set updatedAt(String? updatedAt) => _$this._updatedAt = updatedAt;
 
-  bool? _current;
-  bool? get current => _$this._current;
-  set current(bool? current) => _$this._current = current;
+  JsonObject? _userAgent;
+  JsonObject? get userAgent => _$this._userAgent;
+  set userAgent(JsonObject? userAgent) => _$this._userAgent = userAgent;
+
+  String? _userId;
+  String? get userId => _$this._userId;
+  set userId(String? userId) => _$this._userId = userId;
 
   AuthSessionDtoBuilder() {
     AuthSessionDto._defaults(this);
@@ -153,16 +153,16 @@ class AuthSessionDtoBuilder
   AuthSessionDtoBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _id = $v.id;
-      _userId = $v.userId;
-      _expiresAt = $v.expiresAt;
-      _revokedAt = $v.revokedAt;
-      _lastUsedAt = $v.lastUsedAt;
-      _ipAddress = $v.ipAddress;
-      _userAgent = $v.userAgent;
       _createdAt = $v.createdAt;
-      _updatedAt = $v.updatedAt;
       _current = $v.current;
+      _expiresAt = $v.expiresAt;
+      _id = $v.id;
+      _ipAddress = $v.ipAddress;
+      _lastUsedAt = $v.lastUsedAt;
+      _revokedAt = $v.revokedAt;
+      _updatedAt = $v.updatedAt;
+      _userAgent = $v.userAgent;
+      _userId = $v.userId;
       _$v = null;
     }
     return this;
@@ -184,39 +184,39 @@ class AuthSessionDtoBuilder
   _$AuthSessionDto _build() {
     final _$result = _$v ??
         _$AuthSessionDto._(
-          id: BuiltValueNullFieldError.checkNotNull(
-            id,
+          createdAt: BuiltValueNullFieldError.checkNotNull(
+            createdAt,
             r'AuthSessionDto',
-            'id',
+            'createdAt',
           ),
-          userId: BuiltValueNullFieldError.checkNotNull(
-            userId,
+          current: BuiltValueNullFieldError.checkNotNull(
+            current,
             r'AuthSessionDto',
-            'userId',
+            'current',
           ),
           expiresAt: BuiltValueNullFieldError.checkNotNull(
             expiresAt,
             r'AuthSessionDto',
             'expiresAt',
           ),
-          revokedAt: revokedAt,
-          lastUsedAt: lastUsedAt,
-          ipAddress: ipAddress,
-          userAgent: userAgent,
-          createdAt: BuiltValueNullFieldError.checkNotNull(
-            createdAt,
+          id: BuiltValueNullFieldError.checkNotNull(
+            id,
             r'AuthSessionDto',
-            'createdAt',
+            'id',
           ),
+          ipAddress: ipAddress,
+          lastUsedAt: lastUsedAt,
+          revokedAt: revokedAt,
           updatedAt: BuiltValueNullFieldError.checkNotNull(
             updatedAt,
             r'AuthSessionDto',
             'updatedAt',
           ),
-          current: BuiltValueNullFieldError.checkNotNull(
-            current,
+          userAgent: userAgent,
+          userId: BuiltValueNullFieldError.checkNotNull(
+            userId,
             r'AuthSessionDto',
-            'current',
+            'userId',
           ),
         );
     replace(_$result);

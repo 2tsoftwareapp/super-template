@@ -5,10 +5,10 @@ import { ERROR_CODES } from "@repo/api-runtime";
 import { AppError } from "@repo/api-runtime";
 import { AccessControlService } from "@repo/feature-access-control/contracts";
 import { AUTH_ERROR_CODES } from "@repo/feature-auth/contracts";
-import { AUTH_USER_STORE, type AuthUserStore } from "@repo/feature-auth/contracts";
 import { OrganizationsService } from "@repo/feature-organizations/contracts";
 import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
 
+import { AUTH_USER_STORE, type AuthUserStore } from "../../public/auth-user-store.port";
 import { assertSessionUsable } from "../auth.helpers";
 import {
   AUTH_SESSION_REPOSITORY,

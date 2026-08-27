@@ -14,22 +14,22 @@ part 'create_import_dto.g.dart';
 /// CreateImportDto
 ///
 /// Properties:
-/// * [type]
 /// * [fileId]
 /// * [idempotencyKey] - Client-supplied idempotency key. Retries with the same key return the original import job.
+/// * [type]
 @BuiltValue()
 abstract class CreateImportDto
     implements Built<CreateImportDto, CreateImportDtoBuilder> {
-  @BuiltValueField(wireName: r'type')
-  CreateImportDtoTypeEnum get type;
-  // enum typeEnum {  users,  };
-
   @BuiltValueField(wireName: r'fileId')
   String get fileId;
 
   /// Client-supplied idempotency key. Retries with the same key return the original import job.
   @BuiltValueField(wireName: r'idempotencyKey')
   String? get idempotencyKey;
+
+  @BuiltValueField(wireName: r'type')
+  CreateImportDtoTypeEnum get type;
+  // enum typeEnum {  users,  };
 
   CreateImportDto._();
 
@@ -57,11 +57,6 @@ class _$CreateImportDtoSerializer
     CreateImportDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'type';
-    yield serializers.serialize(
-      object.type,
-      specifiedType: const FullType(CreateImportDtoTypeEnum),
-    );
     yield r'fileId';
     yield serializers.serialize(
       object.fileId,
@@ -74,6 +69,11 @@ class _$CreateImportDtoSerializer
         specifiedType: const FullType(String),
       );
     }
+    yield r'type';
+    yield serializers.serialize(
+      object.type,
+      specifiedType: const FullType(CreateImportDtoTypeEnum),
+    );
   }
 
   @override
@@ -101,13 +101,6 @@ class _$CreateImportDtoSerializer
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'type':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(CreateImportDtoTypeEnum),
-          ) as CreateImportDtoTypeEnum;
-          result.type = valueDes;
-          break;
         case r'fileId':
           final valueDes = serializers.deserialize(
             value,
@@ -121,6 +114,13 @@ class _$CreateImportDtoSerializer
             specifiedType: const FullType(String),
           ) as String;
           result.idempotencyKey = valueDes;
+          break;
+        case r'type':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(CreateImportDtoTypeEnum),
+          ) as CreateImportDtoTypeEnum;
+          result.type = valueDes;
           break;
         default:
           unhandled.add(key);

@@ -5,8 +5,8 @@
 // ignore_for_file: unused_element
 // @dart=3.0
 
+import 'package:super_template_api/src/model/auth_user_dto.dart';
 import 'package:built_collection/built_collection.dart';
-import 'package:super_template_api/src/model/user_dto.dart';
 import 'package:super_template_api/src/model/auth_session_dto.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
@@ -17,35 +17,35 @@ part 'auth_response_dto.g.dart';
 ///
 /// Properties:
 /// * [accessToken]
-/// * [refreshToken]
-/// * [user]
-/// * [permissions]
-/// * [session]
-/// * [organizationId]
 /// * [mustChangePassword]
+/// * [organizationId]
+/// * [permissions]
+/// * [refreshToken]
+/// * [session]
+/// * [user]
 @BuiltValue()
 abstract class AuthResponseDto
     implements Built<AuthResponseDto, AuthResponseDtoBuilder> {
   @BuiltValueField(wireName: r'accessToken')
   String get accessToken;
 
-  @BuiltValueField(wireName: r'refreshToken')
-  String get refreshToken;
-
-  @BuiltValueField(wireName: r'user')
-  UserDto get user;
-
-  @BuiltValueField(wireName: r'permissions')
-  BuiltList<String> get permissions;
-
-  @BuiltValueField(wireName: r'session')
-  AuthSessionDto get session;
+  @BuiltValueField(wireName: r'mustChangePassword')
+  bool? get mustChangePassword;
 
   @BuiltValueField(wireName: r'organizationId')
   String? get organizationId;
 
-  @BuiltValueField(wireName: r'mustChangePassword')
-  bool? get mustChangePassword;
+  @BuiltValueField(wireName: r'permissions')
+  BuiltList<String> get permissions;
+
+  @BuiltValueField(wireName: r'refreshToken')
+  String get refreshToken;
+
+  @BuiltValueField(wireName: r'session')
+  AuthSessionDto get session;
+
+  @BuiltValueField(wireName: r'user')
+  AuthUserDto get user;
 
   AuthResponseDto._();
 
@@ -78,33 +78,6 @@ class _$AuthResponseDtoSerializer
       object.accessToken,
       specifiedType: const FullType(String),
     );
-    yield r'refreshToken';
-    yield serializers.serialize(
-      object.refreshToken,
-      specifiedType: const FullType(String),
-    );
-    yield r'user';
-    yield serializers.serialize(
-      object.user,
-      specifiedType: const FullType(UserDto),
-    );
-    yield r'permissions';
-    yield serializers.serialize(
-      object.permissions,
-      specifiedType: const FullType(BuiltList, [FullType(String)]),
-    );
-    yield r'session';
-    yield serializers.serialize(
-      object.session,
-      specifiedType: const FullType(AuthSessionDto),
-    );
-    yield r'organizationId';
-    yield object.organizationId == null
-        ? null
-        : serializers.serialize(
-            object.organizationId,
-            specifiedType: const FullType.nullable(String),
-          );
     if (object.mustChangePassword != null) {
       yield r'mustChangePassword';
       yield serializers.serialize(
@@ -112,6 +85,33 @@ class _$AuthResponseDtoSerializer
         specifiedType: const FullType(bool),
       );
     }
+    yield r'organizationId';
+    yield object.organizationId == null
+        ? null
+        : serializers.serialize(
+            object.organizationId,
+            specifiedType: const FullType.nullable(String),
+          );
+    yield r'permissions';
+    yield serializers.serialize(
+      object.permissions,
+      specifiedType: const FullType(BuiltList, [FullType(String)]),
+    );
+    yield r'refreshToken';
+    yield serializers.serialize(
+      object.refreshToken,
+      specifiedType: const FullType(String),
+    );
+    yield r'session';
+    yield serializers.serialize(
+      object.session,
+      specifiedType: const FullType(AuthSessionDto),
+    );
+    yield r'user';
+    yield serializers.serialize(
+      object.user,
+      specifiedType: const FullType(AuthUserDto),
+    );
   }
 
   @override
@@ -146,19 +146,20 @@ class _$AuthResponseDtoSerializer
           ) as String;
           result.accessToken = valueDes;
           break;
-        case r'refreshToken':
+        case r'mustChangePassword':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.refreshToken = valueDes;
+            specifiedType: const FullType(bool),
+          ) as bool;
+          result.mustChangePassword = valueDes;
           break;
-        case r'user':
+        case r'organizationId':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(UserDto),
-          ) as UserDto;
-          result.user.replace(valueDes);
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
+          if (valueDes == null) continue;
+          result.organizationId = valueDes;
           break;
         case r'permissions':
           final valueDes = serializers.deserialize(
@@ -169,6 +170,13 @@ class _$AuthResponseDtoSerializer
           ) as BuiltList<String>;
           result.permissions.replace(valueDes);
           break;
+        case r'refreshToken':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.refreshToken = valueDes;
+          break;
         case r'session':
           final valueDes = serializers.deserialize(
             value,
@@ -176,20 +184,12 @@ class _$AuthResponseDtoSerializer
           ) as AuthSessionDto;
           result.session.replace(valueDes);
           break;
-        case r'organizationId':
+        case r'user':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType.nullable(String),
-          ) as String?;
-          if (valueDes == null) continue;
-          result.organizationId = valueDes;
-          break;
-        case r'mustChangePassword':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(bool),
-          ) as bool;
-          result.mustChangePassword = valueDes;
+            specifiedType: const FullType(AuthUserDto),
+          ) as AuthUserDto;
+          result.user.replace(valueDes);
           break;
         default:
           unhandled.add(key);

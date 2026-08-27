@@ -111,13 +111,13 @@ class _$JobDependencyDtoDependsOnJobStatusEnumSerializer
 
 class _$JobDependencyDto extends JobDependencyDto {
   @override
-  final String id;
+  final String createdAt;
   @override
   final String dependsOnJobId;
   @override
   final JobDependencyDtoDependsOnJobStatusEnum dependsOnJobStatus;
   @override
-  final String createdAt;
+  final String id;
 
   factory _$JobDependencyDto([
     void Function(JobDependencyDtoBuilder)? updates,
@@ -125,10 +125,10 @@ class _$JobDependencyDto extends JobDependencyDto {
       (JobDependencyDtoBuilder()..update(updates))._build();
 
   _$JobDependencyDto._({
-    required this.id,
+    required this.createdAt,
     required this.dependsOnJobId,
     required this.dependsOnJobStatus,
-    required this.createdAt,
+    required this.id,
   }) : super._();
   @override
   JobDependencyDto rebuild(void Function(JobDependencyDtoBuilder) updates) =>
@@ -142,19 +142,19 @@ class _$JobDependencyDto extends JobDependencyDto {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is JobDependencyDto &&
-        id == other.id &&
+        createdAt == other.createdAt &&
         dependsOnJobId == other.dependsOnJobId &&
         dependsOnJobStatus == other.dependsOnJobStatus &&
-        createdAt == other.createdAt;
+        id == other.id;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
-    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, createdAt.hashCode);
     _$hash = $jc(_$hash, dependsOnJobId.hashCode);
     _$hash = $jc(_$hash, dependsOnJobStatus.hashCode);
-    _$hash = $jc(_$hash, createdAt.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -162,10 +162,10 @@ class _$JobDependencyDto extends JobDependencyDto {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'JobDependencyDto')
-          ..add('id', id)
+          ..add('createdAt', createdAt)
           ..add('dependsOnJobId', dependsOnJobId)
           ..add('dependsOnJobStatus', dependsOnJobStatus)
-          ..add('createdAt', createdAt))
+          ..add('id', id))
         .toString();
   }
 }
@@ -174,9 +174,9 @@ class JobDependencyDtoBuilder
     implements Builder<JobDependencyDto, JobDependencyDtoBuilder> {
   _$JobDependencyDto? _$v;
 
-  String? _id;
-  String? get id => _$this._id;
-  set id(String? id) => _$this._id = id;
+  String? _createdAt;
+  String? get createdAt => _$this._createdAt;
+  set createdAt(String? createdAt) => _$this._createdAt = createdAt;
 
   String? _dependsOnJobId;
   String? get dependsOnJobId => _$this._dependsOnJobId;
@@ -191,9 +191,9 @@ class JobDependencyDtoBuilder
   ) =>
       _$this._dependsOnJobStatus = dependsOnJobStatus;
 
-  String? _createdAt;
-  String? get createdAt => _$this._createdAt;
-  set createdAt(String? createdAt) => _$this._createdAt = createdAt;
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
 
   JobDependencyDtoBuilder() {
     JobDependencyDto._defaults(this);
@@ -202,10 +202,10 @@ class JobDependencyDtoBuilder
   JobDependencyDtoBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _id = $v.id;
+      _createdAt = $v.createdAt;
       _dependsOnJobId = $v.dependsOnJobId;
       _dependsOnJobStatus = $v.dependsOnJobStatus;
-      _createdAt = $v.createdAt;
+      _id = $v.id;
       _$v = null;
     }
     return this;
@@ -227,10 +227,10 @@ class JobDependencyDtoBuilder
   _$JobDependencyDto _build() {
     final _$result = _$v ??
         _$JobDependencyDto._(
-          id: BuiltValueNullFieldError.checkNotNull(
-            id,
+          createdAt: BuiltValueNullFieldError.checkNotNull(
+            createdAt,
             r'JobDependencyDto',
-            'id',
+            'createdAt',
           ),
           dependsOnJobId: BuiltValueNullFieldError.checkNotNull(
             dependsOnJobId,
@@ -242,10 +242,10 @@ class JobDependencyDtoBuilder
             r'JobDependencyDto',
             'dependsOnJobStatus',
           ),
-          createdAt: BuiltValueNullFieldError.checkNotNull(
-            createdAt,
+          id: BuiltValueNullFieldError.checkNotNull(
+            id,
             r'JobDependencyDto',
-            'createdAt',
+            'id',
           ),
         );
     replace(_$result);

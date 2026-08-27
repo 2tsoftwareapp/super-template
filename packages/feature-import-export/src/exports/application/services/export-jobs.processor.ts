@@ -18,7 +18,7 @@ import { FILES_REPOSITORY, type FilesRepositoryPort } from "@repo/feature-upload
 import { OBJECT_STORAGE, type ObjectStorage } from "@repo/feature-upload/contracts";
 import { randomUUID } from "node:crypto";
 
-import { ImportExportAdapterRegistry } from "../../../public/contracts";
+import { ImportExportAdapterRegistry } from "../../../infrastructure/import-export-adapter.registry";
 import { MAX_EXPORT_ROWS } from "../../domain/export-policy";
 import {
   EXPORT_JOBS_REPOSITORY,

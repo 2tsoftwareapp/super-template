@@ -10,15 +10,15 @@ part of 'job_metrics_dto.dart';
 
 class _$JobMetricsDto extends JobMetricsDto {
   @override
+  final num? averageDurationMs;
+  @override
   final BuiltList<JobStatusCountDto> byStatus;
   @override
   final BuiltList<JobTypeCountDto> byType;
   @override
-  final num? averageDurationMs;
+  final num failureRate;
   @override
   final num retryRate;
-  @override
-  final num failureRate;
   @override
   final num totalCompleted;
   @override
@@ -28,11 +28,11 @@ class _$JobMetricsDto extends JobMetricsDto {
       (JobMetricsDtoBuilder()..update(updates))._build();
 
   _$JobMetricsDto._({
+    this.averageDurationMs,
     required this.byStatus,
     required this.byType,
-    this.averageDurationMs,
-    required this.retryRate,
     required this.failureRate,
+    required this.retryRate,
     required this.totalCompleted,
     required this.totalFailed,
   }) : super._();
@@ -47,11 +47,11 @@ class _$JobMetricsDto extends JobMetricsDto {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is JobMetricsDto &&
+        averageDurationMs == other.averageDurationMs &&
         byStatus == other.byStatus &&
         byType == other.byType &&
-        averageDurationMs == other.averageDurationMs &&
-        retryRate == other.retryRate &&
         failureRate == other.failureRate &&
+        retryRate == other.retryRate &&
         totalCompleted == other.totalCompleted &&
         totalFailed == other.totalFailed;
   }
@@ -59,11 +59,11 @@ class _$JobMetricsDto extends JobMetricsDto {
   @override
   int get hashCode {
     var _$hash = 0;
+    _$hash = $jc(_$hash, averageDurationMs.hashCode);
     _$hash = $jc(_$hash, byStatus.hashCode);
     _$hash = $jc(_$hash, byType.hashCode);
-    _$hash = $jc(_$hash, averageDurationMs.hashCode);
-    _$hash = $jc(_$hash, retryRate.hashCode);
     _$hash = $jc(_$hash, failureRate.hashCode);
+    _$hash = $jc(_$hash, retryRate.hashCode);
     _$hash = $jc(_$hash, totalCompleted.hashCode);
     _$hash = $jc(_$hash, totalFailed.hashCode);
     _$hash = $jf(_$hash);
@@ -73,11 +73,11 @@ class _$JobMetricsDto extends JobMetricsDto {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'JobMetricsDto')
+          ..add('averageDurationMs', averageDurationMs)
           ..add('byStatus', byStatus)
           ..add('byType', byType)
-          ..add('averageDurationMs', averageDurationMs)
-          ..add('retryRate', retryRate)
           ..add('failureRate', failureRate)
+          ..add('retryRate', retryRate)
           ..add('totalCompleted', totalCompleted)
           ..add('totalFailed', totalFailed))
         .toString();
@@ -87,6 +87,11 @@ class _$JobMetricsDto extends JobMetricsDto {
 class JobMetricsDtoBuilder
     implements Builder<JobMetricsDto, JobMetricsDtoBuilder> {
   _$JobMetricsDto? _$v;
+
+  num? _averageDurationMs;
+  num? get averageDurationMs => _$this._averageDurationMs;
+  set averageDurationMs(num? averageDurationMs) =>
+      _$this._averageDurationMs = averageDurationMs;
 
   ListBuilder<JobStatusCountDto>? _byStatus;
   ListBuilder<JobStatusCountDto> get byStatus =>
@@ -99,18 +104,13 @@ class JobMetricsDtoBuilder
       _$this._byType ??= ListBuilder<JobTypeCountDto>();
   set byType(ListBuilder<JobTypeCountDto>? byType) => _$this._byType = byType;
 
-  num? _averageDurationMs;
-  num? get averageDurationMs => _$this._averageDurationMs;
-  set averageDurationMs(num? averageDurationMs) =>
-      _$this._averageDurationMs = averageDurationMs;
+  num? _failureRate;
+  num? get failureRate => _$this._failureRate;
+  set failureRate(num? failureRate) => _$this._failureRate = failureRate;
 
   num? _retryRate;
   num? get retryRate => _$this._retryRate;
   set retryRate(num? retryRate) => _$this._retryRate = retryRate;
-
-  num? _failureRate;
-  num? get failureRate => _$this._failureRate;
-  set failureRate(num? failureRate) => _$this._failureRate = failureRate;
 
   num? _totalCompleted;
   num? get totalCompleted => _$this._totalCompleted;
@@ -128,11 +128,11 @@ class JobMetricsDtoBuilder
   JobMetricsDtoBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
+      _averageDurationMs = $v.averageDurationMs;
       _byStatus = $v.byStatus.toBuilder();
       _byType = $v.byType.toBuilder();
-      _averageDurationMs = $v.averageDurationMs;
-      _retryRate = $v.retryRate;
       _failureRate = $v.failureRate;
+      _retryRate = $v.retryRate;
       _totalCompleted = $v.totalCompleted;
       _totalFailed = $v.totalFailed;
       _$v = null;
@@ -158,18 +158,18 @@ class JobMetricsDtoBuilder
     try {
       _$result = _$v ??
           _$JobMetricsDto._(
+            averageDurationMs: averageDurationMs,
             byStatus: byStatus.build(),
             byType: byType.build(),
-            averageDurationMs: averageDurationMs,
-            retryRate: BuiltValueNullFieldError.checkNotNull(
-              retryRate,
-              r'JobMetricsDto',
-              'retryRate',
-            ),
             failureRate: BuiltValueNullFieldError.checkNotNull(
               failureRate,
               r'JobMetricsDto',
               'failureRate',
+            ),
+            retryRate: BuiltValueNullFieldError.checkNotNull(
+              retryRate,
+              r'JobMetricsDto',
+              'retryRate',
             ),
             totalCompleted: BuiltValueNullFieldError.checkNotNull(
               totalCompleted,

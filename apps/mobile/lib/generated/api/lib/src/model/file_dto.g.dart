@@ -10,37 +10,37 @@ part of 'file_dto.dart';
 
 class _$FileDto extends FileDto {
   @override
-  final String id;
-  @override
-  final String originalName;
-  @override
-  final String mimeType;
-  @override
-  final num sizeBytes;
-  @override
   final String? checksum;
-  @override
-  final num latestVersion;
-  @override
-  final String? uploadedById;
   @override
   final String createdAt;
   @override
+  final String id;
+  @override
+  final num latestVersion;
+  @override
+  final String mimeType;
+  @override
+  final String originalName;
+  @override
+  final num sizeBytes;
+  @override
   final String updatedAt;
+  @override
+  final String? uploadedById;
 
   factory _$FileDto([void Function(FileDtoBuilder)? updates]) =>
       (FileDtoBuilder()..update(updates))._build();
 
   _$FileDto._({
-    required this.id,
-    required this.originalName,
-    required this.mimeType,
-    required this.sizeBytes,
     this.checksum,
-    required this.latestVersion,
-    this.uploadedById,
     required this.createdAt,
+    required this.id,
+    required this.latestVersion,
+    required this.mimeType,
+    required this.originalName,
+    required this.sizeBytes,
     required this.updatedAt,
+    this.uploadedById,
   }) : super._();
   @override
   FileDto rebuild(void Function(FileDtoBuilder) updates) =>
@@ -53,29 +53,29 @@ class _$FileDto extends FileDto {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is FileDto &&
-        id == other.id &&
-        originalName == other.originalName &&
-        mimeType == other.mimeType &&
-        sizeBytes == other.sizeBytes &&
         checksum == other.checksum &&
-        latestVersion == other.latestVersion &&
-        uploadedById == other.uploadedById &&
         createdAt == other.createdAt &&
-        updatedAt == other.updatedAt;
+        id == other.id &&
+        latestVersion == other.latestVersion &&
+        mimeType == other.mimeType &&
+        originalName == other.originalName &&
+        sizeBytes == other.sizeBytes &&
+        updatedAt == other.updatedAt &&
+        uploadedById == other.uploadedById;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
-    _$hash = $jc(_$hash, id.hashCode);
-    _$hash = $jc(_$hash, originalName.hashCode);
-    _$hash = $jc(_$hash, mimeType.hashCode);
-    _$hash = $jc(_$hash, sizeBytes.hashCode);
     _$hash = $jc(_$hash, checksum.hashCode);
-    _$hash = $jc(_$hash, latestVersion.hashCode);
-    _$hash = $jc(_$hash, uploadedById.hashCode);
     _$hash = $jc(_$hash, createdAt.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, latestVersion.hashCode);
+    _$hash = $jc(_$hash, mimeType.hashCode);
+    _$hash = $jc(_$hash, originalName.hashCode);
+    _$hash = $jc(_$hash, sizeBytes.hashCode);
     _$hash = $jc(_$hash, updatedAt.hashCode);
+    _$hash = $jc(_$hash, uploadedById.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -83,15 +83,15 @@ class _$FileDto extends FileDto {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'FileDto')
-          ..add('id', id)
-          ..add('originalName', originalName)
-          ..add('mimeType', mimeType)
-          ..add('sizeBytes', sizeBytes)
           ..add('checksum', checksum)
-          ..add('latestVersion', latestVersion)
-          ..add('uploadedById', uploadedById)
           ..add('createdAt', createdAt)
-          ..add('updatedAt', updatedAt))
+          ..add('id', id)
+          ..add('latestVersion', latestVersion)
+          ..add('mimeType', mimeType)
+          ..add('originalName', originalName)
+          ..add('sizeBytes', sizeBytes)
+          ..add('updatedAt', updatedAt)
+          ..add('uploadedById', uploadedById))
         .toString();
   }
 }
@@ -99,42 +99,42 @@ class _$FileDto extends FileDto {
 class FileDtoBuilder implements Builder<FileDto, FileDtoBuilder> {
   _$FileDto? _$v;
 
-  String? _id;
-  String? get id => _$this._id;
-  set id(String? id) => _$this._id = id;
-
-  String? _originalName;
-  String? get originalName => _$this._originalName;
-  set originalName(String? originalName) => _$this._originalName = originalName;
-
-  String? _mimeType;
-  String? get mimeType => _$this._mimeType;
-  set mimeType(String? mimeType) => _$this._mimeType = mimeType;
-
-  num? _sizeBytes;
-  num? get sizeBytes => _$this._sizeBytes;
-  set sizeBytes(num? sizeBytes) => _$this._sizeBytes = sizeBytes;
-
   String? _checksum;
   String? get checksum => _$this._checksum;
   set checksum(String? checksum) => _$this._checksum = checksum;
+
+  String? _createdAt;
+  String? get createdAt => _$this._createdAt;
+  set createdAt(String? createdAt) => _$this._createdAt = createdAt;
+
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
 
   num? _latestVersion;
   num? get latestVersion => _$this._latestVersion;
   set latestVersion(num? latestVersion) =>
       _$this._latestVersion = latestVersion;
 
-  String? _uploadedById;
-  String? get uploadedById => _$this._uploadedById;
-  set uploadedById(String? uploadedById) => _$this._uploadedById = uploadedById;
+  String? _mimeType;
+  String? get mimeType => _$this._mimeType;
+  set mimeType(String? mimeType) => _$this._mimeType = mimeType;
 
-  String? _createdAt;
-  String? get createdAt => _$this._createdAt;
-  set createdAt(String? createdAt) => _$this._createdAt = createdAt;
+  String? _originalName;
+  String? get originalName => _$this._originalName;
+  set originalName(String? originalName) => _$this._originalName = originalName;
+
+  num? _sizeBytes;
+  num? get sizeBytes => _$this._sizeBytes;
+  set sizeBytes(num? sizeBytes) => _$this._sizeBytes = sizeBytes;
 
   String? _updatedAt;
   String? get updatedAt => _$this._updatedAt;
   set updatedAt(String? updatedAt) => _$this._updatedAt = updatedAt;
+
+  String? _uploadedById;
+  String? get uploadedById => _$this._uploadedById;
+  set uploadedById(String? uploadedById) => _$this._uploadedById = uploadedById;
 
   FileDtoBuilder() {
     FileDto._defaults(this);
@@ -143,15 +143,15 @@ class FileDtoBuilder implements Builder<FileDto, FileDtoBuilder> {
   FileDtoBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _id = $v.id;
-      _originalName = $v.originalName;
-      _mimeType = $v.mimeType;
-      _sizeBytes = $v.sizeBytes;
       _checksum = $v.checksum;
-      _latestVersion = $v.latestVersion;
-      _uploadedById = $v.uploadedById;
       _createdAt = $v.createdAt;
+      _id = $v.id;
+      _latestVersion = $v.latestVersion;
+      _mimeType = $v.mimeType;
+      _originalName = $v.originalName;
+      _sizeBytes = $v.sizeBytes;
       _updatedAt = $v.updatedAt;
+      _uploadedById = $v.uploadedById;
       _$v = null;
     }
     return this;
@@ -173,39 +173,39 @@ class FileDtoBuilder implements Builder<FileDto, FileDtoBuilder> {
   _$FileDto _build() {
     final _$result = _$v ??
         _$FileDto._(
-          id: BuiltValueNullFieldError.checkNotNull(id, r'FileDto', 'id'),
-          originalName: BuiltValueNullFieldError.checkNotNull(
-            originalName,
+          checksum: checksum,
+          createdAt: BuiltValueNullFieldError.checkNotNull(
+            createdAt,
             r'FileDto',
-            'originalName',
+            'createdAt',
+          ),
+          id: BuiltValueNullFieldError.checkNotNull(id, r'FileDto', 'id'),
+          latestVersion: BuiltValueNullFieldError.checkNotNull(
+            latestVersion,
+            r'FileDto',
+            'latestVersion',
           ),
           mimeType: BuiltValueNullFieldError.checkNotNull(
             mimeType,
             r'FileDto',
             'mimeType',
           ),
+          originalName: BuiltValueNullFieldError.checkNotNull(
+            originalName,
+            r'FileDto',
+            'originalName',
+          ),
           sizeBytes: BuiltValueNullFieldError.checkNotNull(
             sizeBytes,
             r'FileDto',
             'sizeBytes',
-          ),
-          checksum: checksum,
-          latestVersion: BuiltValueNullFieldError.checkNotNull(
-            latestVersion,
-            r'FileDto',
-            'latestVersion',
-          ),
-          uploadedById: uploadedById,
-          createdAt: BuiltValueNullFieldError.checkNotNull(
-            createdAt,
-            r'FileDto',
-            'createdAt',
           ),
           updatedAt: BuiltValueNullFieldError.checkNotNull(
             updatedAt,
             r'FileDto',
             'updatedAt',
           ),
+          uploadedById: uploadedById,
         );
     replace(_$result);
     return _$result;

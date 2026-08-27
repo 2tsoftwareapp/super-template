@@ -13,36 +13,32 @@ part 'export_audit_logs_query_dto.g.dart';
 /// ExportAuditLogsQueryDto
 ///
 /// Properties:
-/// * [actorId]
 /// * [action]
-/// * [resourceType]
-/// * [resourceId]
+/// * [actorId]
 /// * [from]
+/// * [resourceId]
+/// * [resourceType]
 /// * [to]
-/// * [q]
 @BuiltValue()
 abstract class ExportAuditLogsQueryDto
     implements Built<ExportAuditLogsQueryDto, ExportAuditLogsQueryDtoBuilder> {
-  @BuiltValueField(wireName: r'actorId')
-  String? get actorId;
-
   @BuiltValueField(wireName: r'action')
   String? get action;
 
-  @BuiltValueField(wireName: r'resourceType')
-  String? get resourceType;
+  @BuiltValueField(wireName: r'actorId')
+  String? get actorId;
+
+  @BuiltValueField(wireName: r'from')
+  DateTime? get from;
 
   @BuiltValueField(wireName: r'resourceId')
   String? get resourceId;
 
-  @BuiltValueField(wireName: r'from')
-  String? get from;
+  @BuiltValueField(wireName: r'resourceType')
+  String? get resourceType;
 
   @BuiltValueField(wireName: r'to')
-  String? get to;
-
-  @BuiltValueField(wireName: r'q')
-  String? get q;
+  DateTime? get to;
 
   ExportAuditLogsQueryDto._();
 
@@ -74,6 +70,13 @@ class _$ExportAuditLogsQueryDtoSerializer
     ExportAuditLogsQueryDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
+    if (object.action != null) {
+      yield r'action';
+      yield serializers.serialize(
+        object.action,
+        specifiedType: const FullType(String),
+      );
+    }
     if (object.actorId != null) {
       yield r'actorId';
       yield serializers.serialize(
@@ -81,10 +84,17 @@ class _$ExportAuditLogsQueryDtoSerializer
         specifiedType: const FullType(String),
       );
     }
-    if (object.action != null) {
-      yield r'action';
+    if (object.from != null) {
+      yield r'from';
       yield serializers.serialize(
-        object.action,
+        object.from,
+        specifiedType: const FullType(DateTime),
+      );
+    }
+    if (object.resourceId != null) {
+      yield r'resourceId';
+      yield serializers.serialize(
+        object.resourceId,
         specifiedType: const FullType(String),
       );
     }
@@ -95,32 +105,11 @@ class _$ExportAuditLogsQueryDtoSerializer
         specifiedType: const FullType(String),
       );
     }
-    if (object.resourceId != null) {
-      yield r'resourceId';
-      yield serializers.serialize(
-        object.resourceId,
-        specifiedType: const FullType(String),
-      );
-    }
-    if (object.from != null) {
-      yield r'from';
-      yield serializers.serialize(
-        object.from,
-        specifiedType: const FullType(String),
-      );
-    }
     if (object.to != null) {
       yield r'to';
       yield serializers.serialize(
         object.to,
-        specifiedType: const FullType(String),
-      );
-    }
-    if (object.q != null) {
-      yield r'q';
-      yield serializers.serialize(
-        object.q,
-        specifiedType: const FullType(String),
+        specifiedType: const FullType(DateTime),
       );
     }
   }
@@ -150,13 +139,6 @@ class _$ExportAuditLogsQueryDtoSerializer
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'actorId':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.actorId = valueDes;
-          break;
         case r'action':
           final valueDes = serializers.deserialize(
             value,
@@ -164,12 +146,19 @@ class _$ExportAuditLogsQueryDtoSerializer
           ) as String;
           result.action = valueDes;
           break;
-        case r'resourceType':
+        case r'actorId':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
-          result.resourceType = valueDes;
+          result.actorId = valueDes;
+          break;
+        case r'from':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(DateTime),
+          ) as DateTime;
+          result.from = valueDes;
           break;
         case r'resourceId':
           final valueDes = serializers.deserialize(
@@ -178,26 +167,19 @@ class _$ExportAuditLogsQueryDtoSerializer
           ) as String;
           result.resourceId = valueDes;
           break;
-        case r'from':
+        case r'resourceType':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
-          result.from = valueDes;
+          result.resourceType = valueDes;
           break;
         case r'to':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(String),
-          ) as String;
+            specifiedType: const FullType(DateTime),
+          ) as DateTime;
           result.to = valueDes;
-          break;
-        case r'q':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.q = valueDes;
           break;
         default:
           unhandled.add(key);

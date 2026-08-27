@@ -70,37 +70,37 @@ class _$MailDeliveryDtoStatusEnumSerializer
 
 class _$MailDeliveryDto extends MailDeliveryDto {
   @override
-  final String id;
-  @override
-  final String templateKey;
-  @override
-  final String recipient;
-  @override
-  final String subject;
-  @override
-  final MailDeliveryDtoStatusEnum status;
+  final String createdAt;
   @override
   final JsonObject? errorMessage;
   @override
+  final String id;
+  @override
   final BuiltMap<String, JsonObject?>? metadata;
+  @override
+  final String recipient;
   @override
   final JsonObject? sentAt;
   @override
-  final String createdAt;
+  final MailDeliveryDtoStatusEnum status;
+  @override
+  final String subject;
+  @override
+  final String templateKey;
 
   factory _$MailDeliveryDto([void Function(MailDeliveryDtoBuilder)? updates]) =>
       (MailDeliveryDtoBuilder()..update(updates))._build();
 
   _$MailDeliveryDto._({
-    required this.id,
-    required this.templateKey,
-    required this.recipient,
-    required this.subject,
-    required this.status,
-    this.errorMessage,
-    this.metadata,
-    this.sentAt,
     required this.createdAt,
+    this.errorMessage,
+    required this.id,
+    this.metadata,
+    required this.recipient,
+    this.sentAt,
+    required this.status,
+    required this.subject,
+    required this.templateKey,
   }) : super._();
   @override
   MailDeliveryDto rebuild(void Function(MailDeliveryDtoBuilder) updates) =>
@@ -113,29 +113,29 @@ class _$MailDeliveryDto extends MailDeliveryDto {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is MailDeliveryDto &&
-        id == other.id &&
-        templateKey == other.templateKey &&
-        recipient == other.recipient &&
-        subject == other.subject &&
-        status == other.status &&
+        createdAt == other.createdAt &&
         errorMessage == other.errorMessage &&
+        id == other.id &&
         metadata == other.metadata &&
+        recipient == other.recipient &&
         sentAt == other.sentAt &&
-        createdAt == other.createdAt;
+        status == other.status &&
+        subject == other.subject &&
+        templateKey == other.templateKey;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
-    _$hash = $jc(_$hash, id.hashCode);
-    _$hash = $jc(_$hash, templateKey.hashCode);
-    _$hash = $jc(_$hash, recipient.hashCode);
-    _$hash = $jc(_$hash, subject.hashCode);
-    _$hash = $jc(_$hash, status.hashCode);
-    _$hash = $jc(_$hash, errorMessage.hashCode);
-    _$hash = $jc(_$hash, metadata.hashCode);
-    _$hash = $jc(_$hash, sentAt.hashCode);
     _$hash = $jc(_$hash, createdAt.hashCode);
+    _$hash = $jc(_$hash, errorMessage.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, metadata.hashCode);
+    _$hash = $jc(_$hash, recipient.hashCode);
+    _$hash = $jc(_$hash, sentAt.hashCode);
+    _$hash = $jc(_$hash, status.hashCode);
+    _$hash = $jc(_$hash, subject.hashCode);
+    _$hash = $jc(_$hash, templateKey.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -143,15 +143,15 @@ class _$MailDeliveryDto extends MailDeliveryDto {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'MailDeliveryDto')
-          ..add('id', id)
-          ..add('templateKey', templateKey)
-          ..add('recipient', recipient)
-          ..add('subject', subject)
-          ..add('status', status)
+          ..add('createdAt', createdAt)
           ..add('errorMessage', errorMessage)
+          ..add('id', id)
           ..add('metadata', metadata)
+          ..add('recipient', recipient)
           ..add('sentAt', sentAt)
-          ..add('createdAt', createdAt))
+          ..add('status', status)
+          ..add('subject', subject)
+          ..add('templateKey', templateKey))
         .toString();
   }
 }
@@ -160,30 +160,18 @@ class MailDeliveryDtoBuilder
     implements Builder<MailDeliveryDto, MailDeliveryDtoBuilder> {
   _$MailDeliveryDto? _$v;
 
-  String? _id;
-  String? get id => _$this._id;
-  set id(String? id) => _$this._id = id;
-
-  String? _templateKey;
-  String? get templateKey => _$this._templateKey;
-  set templateKey(String? templateKey) => _$this._templateKey = templateKey;
-
-  String? _recipient;
-  String? get recipient => _$this._recipient;
-  set recipient(String? recipient) => _$this._recipient = recipient;
-
-  String? _subject;
-  String? get subject => _$this._subject;
-  set subject(String? subject) => _$this._subject = subject;
-
-  MailDeliveryDtoStatusEnum? _status;
-  MailDeliveryDtoStatusEnum? get status => _$this._status;
-  set status(MailDeliveryDtoStatusEnum? status) => _$this._status = status;
+  String? _createdAt;
+  String? get createdAt => _$this._createdAt;
+  set createdAt(String? createdAt) => _$this._createdAt = createdAt;
 
   JsonObject? _errorMessage;
   JsonObject? get errorMessage => _$this._errorMessage;
   set errorMessage(JsonObject? errorMessage) =>
       _$this._errorMessage = errorMessage;
+
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
 
   MapBuilder<String, JsonObject?>? _metadata;
   MapBuilder<String, JsonObject?> get metadata =>
@@ -191,13 +179,25 @@ class MailDeliveryDtoBuilder
   set metadata(MapBuilder<String, JsonObject?>? metadata) =>
       _$this._metadata = metadata;
 
+  String? _recipient;
+  String? get recipient => _$this._recipient;
+  set recipient(String? recipient) => _$this._recipient = recipient;
+
   JsonObject? _sentAt;
   JsonObject? get sentAt => _$this._sentAt;
   set sentAt(JsonObject? sentAt) => _$this._sentAt = sentAt;
 
-  String? _createdAt;
-  String? get createdAt => _$this._createdAt;
-  set createdAt(String? createdAt) => _$this._createdAt = createdAt;
+  MailDeliveryDtoStatusEnum? _status;
+  MailDeliveryDtoStatusEnum? get status => _$this._status;
+  set status(MailDeliveryDtoStatusEnum? status) => _$this._status = status;
+
+  String? _subject;
+  String? get subject => _$this._subject;
+  set subject(String? subject) => _$this._subject = subject;
+
+  String? _templateKey;
+  String? get templateKey => _$this._templateKey;
+  set templateKey(String? templateKey) => _$this._templateKey = templateKey;
 
   MailDeliveryDtoBuilder() {
     MailDeliveryDto._defaults(this);
@@ -206,15 +206,15 @@ class MailDeliveryDtoBuilder
   MailDeliveryDtoBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _id = $v.id;
-      _templateKey = $v.templateKey;
-      _recipient = $v.recipient;
-      _subject = $v.subject;
-      _status = $v.status;
-      _errorMessage = $v.errorMessage;
-      _metadata = $v.metadata?.toBuilder();
-      _sentAt = $v.sentAt;
       _createdAt = $v.createdAt;
+      _errorMessage = $v.errorMessage;
+      _id = $v.id;
+      _metadata = $v.metadata?.toBuilder();
+      _recipient = $v.recipient;
+      _sentAt = $v.sentAt;
+      _status = $v.status;
+      _subject = $v.subject;
+      _templateKey = $v.templateKey;
       _$v = null;
     }
     return this;
@@ -238,38 +238,38 @@ class MailDeliveryDtoBuilder
     try {
       _$result = _$v ??
           _$MailDeliveryDto._(
+            createdAt: BuiltValueNullFieldError.checkNotNull(
+              createdAt,
+              r'MailDeliveryDto',
+              'createdAt',
+            ),
+            errorMessage: errorMessage,
             id: BuiltValueNullFieldError.checkNotNull(
               id,
               r'MailDeliveryDto',
               'id',
             ),
-            templateKey: BuiltValueNullFieldError.checkNotNull(
-              templateKey,
-              r'MailDeliveryDto',
-              'templateKey',
-            ),
+            metadata: _metadata?.build(),
             recipient: BuiltValueNullFieldError.checkNotNull(
               recipient,
               r'MailDeliveryDto',
               'recipient',
+            ),
+            sentAt: sentAt,
+            status: BuiltValueNullFieldError.checkNotNull(
+              status,
+              r'MailDeliveryDto',
+              'status',
             ),
             subject: BuiltValueNullFieldError.checkNotNull(
               subject,
               r'MailDeliveryDto',
               'subject',
             ),
-            status: BuiltValueNullFieldError.checkNotNull(
-              status,
+            templateKey: BuiltValueNullFieldError.checkNotNull(
+              templateKey,
               r'MailDeliveryDto',
-              'status',
-            ),
-            errorMessage: errorMessage,
-            metadata: _metadata?.build(),
-            sentAt: sentAt,
-            createdAt: BuiltValueNullFieldError.checkNotNull(
-              createdAt,
-              r'MailDeliveryDto',
-              'createdAt',
+              'templateKey',
             ),
           );
     } catch (_) {

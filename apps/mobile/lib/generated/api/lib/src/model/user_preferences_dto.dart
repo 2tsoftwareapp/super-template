@@ -15,42 +15,42 @@ part 'user_preferences_dto.g.dart';
 /// UserPreferencesDto
 ///
 /// Properties:
-/// * [userId]
-/// * [theme]
-/// * [language]
-/// * [timezone]
-/// * [notificationPreferences]
-/// * [emailPreferences]
 /// * [createdAt]
+/// * [emailPreferences]
+/// * [language]
+/// * [notificationPreferences]
+/// * [theme]
+/// * [timezone]
 /// * [updatedAt]
+/// * [userId]
 @BuiltValue()
 abstract class UserPreferencesDto
     implements Built<UserPreferencesDto, UserPreferencesDtoBuilder> {
-  @BuiltValueField(wireName: r'userId')
-  String get userId;
+  @BuiltValueField(wireName: r'createdAt')
+  String get createdAt;
 
-  @BuiltValueField(wireName: r'theme')
-  UserPreferencesDtoThemeEnum get theme;
-  // enum themeEnum {  system,  light,  dark,  };
+  @BuiltValueField(wireName: r'emailPreferences')
+  BuiltMap<String, JsonObject?> get emailPreferences;
 
   @BuiltValueField(wireName: r'language')
   UserPreferencesDtoLanguageEnum get language;
   // enum languageEnum {  en,  vi,  };
 
-  @BuiltValueField(wireName: r'timezone')
-  String get timezone;
-
   @BuiltValueField(wireName: r'notificationPreferences')
   BuiltMap<String, JsonObject?> get notificationPreferences;
 
-  @BuiltValueField(wireName: r'emailPreferences')
-  BuiltMap<String, JsonObject?> get emailPreferences;
+  @BuiltValueField(wireName: r'theme')
+  UserPreferencesDtoThemeEnum get theme;
+  // enum themeEnum {  system,  light,  dark,  };
 
-  @BuiltValueField(wireName: r'createdAt')
-  String get createdAt;
+  @BuiltValueField(wireName: r'timezone')
+  String get timezone;
 
   @BuiltValueField(wireName: r'updatedAt')
   String get updatedAt;
+
+  @BuiltValueField(wireName: r'userId')
+  String get userId;
 
   UserPreferencesDto._();
 
@@ -78,33 +78,10 @@ class _$UserPreferencesDtoSerializer
     UserPreferencesDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'userId';
+    yield r'createdAt';
     yield serializers.serialize(
-      object.userId,
+      object.createdAt,
       specifiedType: const FullType(String),
-    );
-    yield r'theme';
-    yield serializers.serialize(
-      object.theme,
-      specifiedType: const FullType(UserPreferencesDtoThemeEnum),
-    );
-    yield r'language';
-    yield serializers.serialize(
-      object.language,
-      specifiedType: const FullType(UserPreferencesDtoLanguageEnum),
-    );
-    yield r'timezone';
-    yield serializers.serialize(
-      object.timezone,
-      specifiedType: const FullType(String),
-    );
-    yield r'notificationPreferences';
-    yield serializers.serialize(
-      object.notificationPreferences,
-      specifiedType: const FullType(BuiltMap, [
-        FullType(String),
-        FullType.nullable(JsonObject),
-      ]),
     );
     yield r'emailPreferences';
     yield serializers.serialize(
@@ -114,14 +91,37 @@ class _$UserPreferencesDtoSerializer
         FullType.nullable(JsonObject),
       ]),
     );
-    yield r'createdAt';
+    yield r'language';
     yield serializers.serialize(
-      object.createdAt,
+      object.language,
+      specifiedType: const FullType(UserPreferencesDtoLanguageEnum),
+    );
+    yield r'notificationPreferences';
+    yield serializers.serialize(
+      object.notificationPreferences,
+      specifiedType: const FullType(BuiltMap, [
+        FullType(String),
+        FullType.nullable(JsonObject),
+      ]),
+    );
+    yield r'theme';
+    yield serializers.serialize(
+      object.theme,
+      specifiedType: const FullType(UserPreferencesDtoThemeEnum),
+    );
+    yield r'timezone';
+    yield serializers.serialize(
+      object.timezone,
       specifiedType: const FullType(String),
     );
     yield r'updatedAt';
     yield serializers.serialize(
       object.updatedAt,
+      specifiedType: const FullType(String),
+    );
+    yield r'userId';
+    yield serializers.serialize(
+      object.userId,
       specifiedType: const FullType(String),
     );
   }
@@ -151,45 +151,12 @@ class _$UserPreferencesDtoSerializer
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'userId':
+        case r'createdAt':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
-          result.userId = valueDes;
-          break;
-        case r'theme':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(UserPreferencesDtoThemeEnum),
-          ) as UserPreferencesDtoThemeEnum;
-          result.theme = valueDes;
-          break;
-        case r'language':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(
-              UserPreferencesDtoLanguageEnum,
-            ),
-          ) as UserPreferencesDtoLanguageEnum;
-          result.language = valueDes;
-          break;
-        case r'timezone':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.timezone = valueDes;
-          break;
-        case r'notificationPreferences':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(BuiltMap, [
-              FullType(String),
-              FullType.nullable(JsonObject),
-            ]),
-          ) as BuiltMap<String, JsonObject?>;
-          result.notificationPreferences.replace(valueDes);
+          result.createdAt = valueDes;
           break;
         case r'emailPreferences':
           final valueDes = serializers.deserialize(
@@ -201,12 +168,38 @@ class _$UserPreferencesDtoSerializer
           ) as BuiltMap<String, JsonObject?>;
           result.emailPreferences.replace(valueDes);
           break;
-        case r'createdAt':
+        case r'language':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(
+              UserPreferencesDtoLanguageEnum,
+            ),
+          ) as UserPreferencesDtoLanguageEnum;
+          result.language = valueDes;
+          break;
+        case r'notificationPreferences':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(BuiltMap, [
+              FullType(String),
+              FullType.nullable(JsonObject),
+            ]),
+          ) as BuiltMap<String, JsonObject?>;
+          result.notificationPreferences.replace(valueDes);
+          break;
+        case r'theme':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(UserPreferencesDtoThemeEnum),
+          ) as UserPreferencesDtoThemeEnum;
+          result.theme = valueDes;
+          break;
+        case r'timezone':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
-          result.createdAt = valueDes;
+          result.timezone = valueDes;
           break;
         case r'updatedAt':
           final valueDes = serializers.deserialize(
@@ -214,6 +207,13 @@ class _$UserPreferencesDtoSerializer
             specifiedType: const FullType(String),
           ) as String;
           result.updatedAt = valueDes;
+          break;
+        case r'userId':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.userId = valueDes;
           break;
         default:
           unhandled.add(key);
@@ -244,6 +244,25 @@ class _$UserPreferencesDtoSerializer
   }
 }
 
+class UserPreferencesDtoLanguageEnum extends EnumClass {
+  @BuiltValueEnumConst(wireName: r'en')
+  static const UserPreferencesDtoLanguageEnum en =
+      _$userPreferencesDtoLanguageEnum_en;
+  @BuiltValueEnumConst(wireName: r'vi')
+  static const UserPreferencesDtoLanguageEnum vi =
+      _$userPreferencesDtoLanguageEnum_vi;
+
+  static Serializer<UserPreferencesDtoLanguageEnum> get serializer =>
+      _$userPreferencesDtoLanguageEnumSerializer;
+
+  const UserPreferencesDtoLanguageEnum._(String name) : super(name);
+
+  static BuiltSet<UserPreferencesDtoLanguageEnum> get values =>
+      _$userPreferencesDtoLanguageEnumValues;
+  static UserPreferencesDtoLanguageEnum valueOf(String name) =>
+      _$userPreferencesDtoLanguageEnumValueOf(name);
+}
+
 class UserPreferencesDtoThemeEnum extends EnumClass {
   @BuiltValueEnumConst(wireName: r'system')
   static const UserPreferencesDtoThemeEnum system =
@@ -264,23 +283,4 @@ class UserPreferencesDtoThemeEnum extends EnumClass {
       _$userPreferencesDtoThemeEnumValues;
   static UserPreferencesDtoThemeEnum valueOf(String name) =>
       _$userPreferencesDtoThemeEnumValueOf(name);
-}
-
-class UserPreferencesDtoLanguageEnum extends EnumClass {
-  @BuiltValueEnumConst(wireName: r'en')
-  static const UserPreferencesDtoLanguageEnum en =
-      _$userPreferencesDtoLanguageEnum_en;
-  @BuiltValueEnumConst(wireName: r'vi')
-  static const UserPreferencesDtoLanguageEnum vi =
-      _$userPreferencesDtoLanguageEnum_vi;
-
-  static Serializer<UserPreferencesDtoLanguageEnum> get serializer =>
-      _$userPreferencesDtoLanguageEnumSerializer;
-
-  const UserPreferencesDtoLanguageEnum._(String name) : super(name);
-
-  static BuiltSet<UserPreferencesDtoLanguageEnum> get values =>
-      _$userPreferencesDtoLanguageEnumValues;
-  static UserPreferencesDtoLanguageEnum valueOf(String name) =>
-      _$userPreferencesDtoLanguageEnumValueOf(name);
 }

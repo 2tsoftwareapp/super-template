@@ -10,34 +10,34 @@ part of 'file_version_dto.dart';
 
 class _$FileVersionDto extends FileVersionDto {
   @override
-  final String id;
+  final String checksum;
+  @override
+  final String createdAt;
+  @override
+  final String? createdById;
   @override
   final String fileId;
   @override
-  final num versionNumber;
+  final String id;
   @override
   final String mimeType;
   @override
   final num sizeBytes;
   @override
-  final String checksum;
-  @override
-  final String? createdById;
-  @override
-  final String createdAt;
+  final num versionNumber;
 
   factory _$FileVersionDto([void Function(FileVersionDtoBuilder)? updates]) =>
       (FileVersionDtoBuilder()..update(updates))._build();
 
   _$FileVersionDto._({
-    required this.id,
+    required this.checksum,
+    required this.createdAt,
+    this.createdById,
     required this.fileId,
-    required this.versionNumber,
+    required this.id,
     required this.mimeType,
     required this.sizeBytes,
-    required this.checksum,
-    this.createdById,
-    required this.createdAt,
+    required this.versionNumber,
   }) : super._();
   @override
   FileVersionDto rebuild(void Function(FileVersionDtoBuilder) updates) =>
@@ -50,27 +50,27 @@ class _$FileVersionDto extends FileVersionDto {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is FileVersionDto &&
-        id == other.id &&
+        checksum == other.checksum &&
+        createdAt == other.createdAt &&
+        createdById == other.createdById &&
         fileId == other.fileId &&
-        versionNumber == other.versionNumber &&
+        id == other.id &&
         mimeType == other.mimeType &&
         sizeBytes == other.sizeBytes &&
-        checksum == other.checksum &&
-        createdById == other.createdById &&
-        createdAt == other.createdAt;
+        versionNumber == other.versionNumber;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
-    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, checksum.hashCode);
+    _$hash = $jc(_$hash, createdAt.hashCode);
+    _$hash = $jc(_$hash, createdById.hashCode);
     _$hash = $jc(_$hash, fileId.hashCode);
-    _$hash = $jc(_$hash, versionNumber.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
     _$hash = $jc(_$hash, mimeType.hashCode);
     _$hash = $jc(_$hash, sizeBytes.hashCode);
-    _$hash = $jc(_$hash, checksum.hashCode);
-    _$hash = $jc(_$hash, createdById.hashCode);
-    _$hash = $jc(_$hash, createdAt.hashCode);
+    _$hash = $jc(_$hash, versionNumber.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -78,14 +78,14 @@ class _$FileVersionDto extends FileVersionDto {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'FileVersionDto')
-          ..add('id', id)
+          ..add('checksum', checksum)
+          ..add('createdAt', createdAt)
+          ..add('createdById', createdById)
           ..add('fileId', fileId)
-          ..add('versionNumber', versionNumber)
+          ..add('id', id)
           ..add('mimeType', mimeType)
           ..add('sizeBytes', sizeBytes)
-          ..add('checksum', checksum)
-          ..add('createdById', createdById)
-          ..add('createdAt', createdAt))
+          ..add('versionNumber', versionNumber))
         .toString();
   }
 }
@@ -94,18 +94,25 @@ class FileVersionDtoBuilder
     implements Builder<FileVersionDto, FileVersionDtoBuilder> {
   _$FileVersionDto? _$v;
 
-  String? _id;
-  String? get id => _$this._id;
-  set id(String? id) => _$this._id = id;
+  String? _checksum;
+  String? get checksum => _$this._checksum;
+  set checksum(String? checksum) => _$this._checksum = checksum;
+
+  String? _createdAt;
+  String? get createdAt => _$this._createdAt;
+  set createdAt(String? createdAt) => _$this._createdAt = createdAt;
+
+  String? _createdById;
+  String? get createdById => _$this._createdById;
+  set createdById(String? createdById) => _$this._createdById = createdById;
 
   String? _fileId;
   String? get fileId => _$this._fileId;
   set fileId(String? fileId) => _$this._fileId = fileId;
 
-  num? _versionNumber;
-  num? get versionNumber => _$this._versionNumber;
-  set versionNumber(num? versionNumber) =>
-      _$this._versionNumber = versionNumber;
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
 
   String? _mimeType;
   String? get mimeType => _$this._mimeType;
@@ -115,17 +122,10 @@ class FileVersionDtoBuilder
   num? get sizeBytes => _$this._sizeBytes;
   set sizeBytes(num? sizeBytes) => _$this._sizeBytes = sizeBytes;
 
-  String? _checksum;
-  String? get checksum => _$this._checksum;
-  set checksum(String? checksum) => _$this._checksum = checksum;
-
-  String? _createdById;
-  String? get createdById => _$this._createdById;
-  set createdById(String? createdById) => _$this._createdById = createdById;
-
-  String? _createdAt;
-  String? get createdAt => _$this._createdAt;
-  set createdAt(String? createdAt) => _$this._createdAt = createdAt;
+  num? _versionNumber;
+  num? get versionNumber => _$this._versionNumber;
+  set versionNumber(num? versionNumber) =>
+      _$this._versionNumber = versionNumber;
 
   FileVersionDtoBuilder() {
     FileVersionDto._defaults(this);
@@ -134,14 +134,14 @@ class FileVersionDtoBuilder
   FileVersionDtoBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _id = $v.id;
+      _checksum = $v.checksum;
+      _createdAt = $v.createdAt;
+      _createdById = $v.createdById;
       _fileId = $v.fileId;
-      _versionNumber = $v.versionNumber;
+      _id = $v.id;
       _mimeType = $v.mimeType;
       _sizeBytes = $v.sizeBytes;
-      _checksum = $v.checksum;
-      _createdById = $v.createdById;
-      _createdAt = $v.createdAt;
+      _versionNumber = $v.versionNumber;
       _$v = null;
     }
     return this;
@@ -163,20 +163,26 @@ class FileVersionDtoBuilder
   _$FileVersionDto _build() {
     final _$result = _$v ??
         _$FileVersionDto._(
-          id: BuiltValueNullFieldError.checkNotNull(
-            id,
+          checksum: BuiltValueNullFieldError.checkNotNull(
+            checksum,
             r'FileVersionDto',
-            'id',
+            'checksum',
           ),
+          createdAt: BuiltValueNullFieldError.checkNotNull(
+            createdAt,
+            r'FileVersionDto',
+            'createdAt',
+          ),
+          createdById: createdById,
           fileId: BuiltValueNullFieldError.checkNotNull(
             fileId,
             r'FileVersionDto',
             'fileId',
           ),
-          versionNumber: BuiltValueNullFieldError.checkNotNull(
-            versionNumber,
+          id: BuiltValueNullFieldError.checkNotNull(
+            id,
             r'FileVersionDto',
-            'versionNumber',
+            'id',
           ),
           mimeType: BuiltValueNullFieldError.checkNotNull(
             mimeType,
@@ -188,16 +194,10 @@ class FileVersionDtoBuilder
             r'FileVersionDto',
             'sizeBytes',
           ),
-          checksum: BuiltValueNullFieldError.checkNotNull(
-            checksum,
+          versionNumber: BuiltValueNullFieldError.checkNotNull(
+            versionNumber,
             r'FileVersionDto',
-            'checksum',
-          ),
-          createdById: createdById,
-          createdAt: BuiltValueNullFieldError.checkNotNull(
-            createdAt,
-            r'FileVersionDto',
-            'createdAt',
+            'versionNumber',
           ),
         );
     replace(_$result);

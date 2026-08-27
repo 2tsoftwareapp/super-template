@@ -81,19 +81,19 @@ class _$CreateAdminUserDtoStatusEnumSerializer
 
 class _$CreateAdminUserDto extends CreateAdminUserDto {
   @override
-  final String email;
-  @override
-  final String password;
+  final JsonObject? avatarUrl;
   @override
   final String displayName;
   @override
-  final JsonObject? avatarUrl;
+  final String email;
   @override
-  final CreateAdminUserDtoStatusEnum? status;
+  final String? organizationId;
+  @override
+  final String password;
   @override
   final String? roleId;
   @override
-  final String? organizationId;
+  final CreateAdminUserDtoStatusEnum? status;
 
   factory _$CreateAdminUserDto([
     void Function(CreateAdminUserDtoBuilder)? updates,
@@ -101,13 +101,13 @@ class _$CreateAdminUserDto extends CreateAdminUserDto {
       (CreateAdminUserDtoBuilder()..update(updates))._build();
 
   _$CreateAdminUserDto._({
-    required this.email,
-    required this.password,
-    required this.displayName,
     this.avatarUrl,
-    this.status,
-    this.roleId,
+    required this.displayName,
+    required this.email,
     this.organizationId,
+    required this.password,
+    this.roleId,
+    this.status,
   }) : super._();
   @override
   CreateAdminUserDto rebuild(
@@ -123,25 +123,25 @@ class _$CreateAdminUserDto extends CreateAdminUserDto {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is CreateAdminUserDto &&
-        email == other.email &&
-        password == other.password &&
-        displayName == other.displayName &&
         avatarUrl == other.avatarUrl &&
-        status == other.status &&
+        displayName == other.displayName &&
+        email == other.email &&
+        organizationId == other.organizationId &&
+        password == other.password &&
         roleId == other.roleId &&
-        organizationId == other.organizationId;
+        status == other.status;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
-    _$hash = $jc(_$hash, email.hashCode);
-    _$hash = $jc(_$hash, password.hashCode);
-    _$hash = $jc(_$hash, displayName.hashCode);
     _$hash = $jc(_$hash, avatarUrl.hashCode);
-    _$hash = $jc(_$hash, status.hashCode);
-    _$hash = $jc(_$hash, roleId.hashCode);
+    _$hash = $jc(_$hash, displayName.hashCode);
+    _$hash = $jc(_$hash, email.hashCode);
     _$hash = $jc(_$hash, organizationId.hashCode);
+    _$hash = $jc(_$hash, password.hashCode);
+    _$hash = $jc(_$hash, roleId.hashCode);
+    _$hash = $jc(_$hash, status.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -149,13 +149,13 @@ class _$CreateAdminUserDto extends CreateAdminUserDto {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'CreateAdminUserDto')
-          ..add('email', email)
-          ..add('password', password)
-          ..add('displayName', displayName)
           ..add('avatarUrl', avatarUrl)
-          ..add('status', status)
+          ..add('displayName', displayName)
+          ..add('email', email)
+          ..add('organizationId', organizationId)
+          ..add('password', password)
           ..add('roleId', roleId)
-          ..add('organizationId', organizationId))
+          ..add('status', status))
         .toString();
   }
 }
@@ -164,34 +164,34 @@ class CreateAdminUserDtoBuilder
     implements Builder<CreateAdminUserDto, CreateAdminUserDtoBuilder> {
   _$CreateAdminUserDto? _$v;
 
-  String? _email;
-  String? get email => _$this._email;
-  set email(String? email) => _$this._email = email;
-
-  String? _password;
-  String? get password => _$this._password;
-  set password(String? password) => _$this._password = password;
+  JsonObject? _avatarUrl;
+  JsonObject? get avatarUrl => _$this._avatarUrl;
+  set avatarUrl(JsonObject? avatarUrl) => _$this._avatarUrl = avatarUrl;
 
   String? _displayName;
   String? get displayName => _$this._displayName;
   set displayName(String? displayName) => _$this._displayName = displayName;
 
-  JsonObject? _avatarUrl;
-  JsonObject? get avatarUrl => _$this._avatarUrl;
-  set avatarUrl(JsonObject? avatarUrl) => _$this._avatarUrl = avatarUrl;
-
-  CreateAdminUserDtoStatusEnum? _status;
-  CreateAdminUserDtoStatusEnum? get status => _$this._status;
-  set status(CreateAdminUserDtoStatusEnum? status) => _$this._status = status;
-
-  String? _roleId;
-  String? get roleId => _$this._roleId;
-  set roleId(String? roleId) => _$this._roleId = roleId;
+  String? _email;
+  String? get email => _$this._email;
+  set email(String? email) => _$this._email = email;
 
   String? _organizationId;
   String? get organizationId => _$this._organizationId;
   set organizationId(String? organizationId) =>
       _$this._organizationId = organizationId;
+
+  String? _password;
+  String? get password => _$this._password;
+  set password(String? password) => _$this._password = password;
+
+  String? _roleId;
+  String? get roleId => _$this._roleId;
+  set roleId(String? roleId) => _$this._roleId = roleId;
+
+  CreateAdminUserDtoStatusEnum? _status;
+  CreateAdminUserDtoStatusEnum? get status => _$this._status;
+  set status(CreateAdminUserDtoStatusEnum? status) => _$this._status = status;
 
   CreateAdminUserDtoBuilder() {
     CreateAdminUserDto._defaults(this);
@@ -200,13 +200,13 @@ class CreateAdminUserDtoBuilder
   CreateAdminUserDtoBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _email = $v.email;
-      _password = $v.password;
-      _displayName = $v.displayName;
       _avatarUrl = $v.avatarUrl;
-      _status = $v.status;
-      _roleId = $v.roleId;
+      _displayName = $v.displayName;
+      _email = $v.email;
       _organizationId = $v.organizationId;
+      _password = $v.password;
+      _roleId = $v.roleId;
+      _status = $v.status;
       _$v = null;
     }
     return this;
@@ -228,25 +228,25 @@ class CreateAdminUserDtoBuilder
   _$CreateAdminUserDto _build() {
     final _$result = _$v ??
         _$CreateAdminUserDto._(
-          email: BuiltValueNullFieldError.checkNotNull(
-            email,
-            r'CreateAdminUserDto',
-            'email',
-          ),
-          password: BuiltValueNullFieldError.checkNotNull(
-            password,
-            r'CreateAdminUserDto',
-            'password',
-          ),
+          avatarUrl: avatarUrl,
           displayName: BuiltValueNullFieldError.checkNotNull(
             displayName,
             r'CreateAdminUserDto',
             'displayName',
           ),
-          avatarUrl: avatarUrl,
-          status: status,
-          roleId: roleId,
+          email: BuiltValueNullFieldError.checkNotNull(
+            email,
+            r'CreateAdminUserDto',
+            'email',
+          ),
           organizationId: organizationId,
+          password: BuiltValueNullFieldError.checkNotNull(
+            password,
+            r'CreateAdminUserDto',
+            'password',
+          ),
+          roleId: roleId,
+          status: status,
         );
     replace(_$result);
     return _$result;

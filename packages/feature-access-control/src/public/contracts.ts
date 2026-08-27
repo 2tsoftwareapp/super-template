@@ -1,5 +1,3 @@
-import type { TransactionExecutor } from "@repo/api-kernel";
-
 /** Public contracts for @repo/feature-access-control. */
 export { AccessControlModule } from "../access-control.module";
 export { AccessControlService } from "../application/access-control.service";
@@ -14,6 +12,7 @@ export { ACCESS_CONTROL_REPOSITORY } from "./access-control-repository.token";
 
 export { ACCESS_CONTROL_ERROR_CODES } from "./error-codes";
 
+export { ROLE_NAMES, type RoleName } from "./role.constants";
 /**
  * The user-role-assignments port is owned by @repo/feature-users (the
  * implementer). Re-exported here so existing access-control and consumer
@@ -21,6 +20,5 @@ export { ACCESS_CONTROL_ERROR_CODES } from "./error-codes";
  * working.
  */
 export type { UserRoleAssignment, UserRoleAssignments } from "@repo/feature-users/contracts";
-export { USER_ROLE_ASSIGNMENTS } from "@repo/feature-users/contracts";
 
-export { ROLE_NAMES, type RoleName } from "./role.constants";
+export { USER_ROLE_ASSIGNMENTS } from "@repo/feature-users/contracts";

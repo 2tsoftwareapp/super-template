@@ -5,8 +5,8 @@ import { Inject, Injectable } from "@nestjs/common";
 import type { ListUsersQuery } from "../users.types";
 
 import { resolveUsersListOrganizationId } from "../../domain/user-org-scope.policy";
-import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";
 import { USER_ACCESS_CONTROL, type UserAccessControl } from "../../public/contracts";
+import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";
 import { UsersMapper } from "../users.mapper";
 
 @Injectable()

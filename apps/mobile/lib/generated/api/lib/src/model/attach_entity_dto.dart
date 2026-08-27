@@ -13,21 +13,21 @@ part 'attach_entity_dto.g.dart';
 /// AttachEntityDto
 ///
 /// Properties:
-/// * [fileId]
-/// * [entityType]
 /// * [entityId]
+/// * [entityType]
+/// * [fileId]
 /// * [label]
 @BuiltValue()
 abstract class AttachEntityDto
     implements Built<AttachEntityDto, AttachEntityDtoBuilder> {
-  @BuiltValueField(wireName: r'fileId')
-  String get fileId;
+  @BuiltValueField(wireName: r'entityId')
+  String get entityId;
 
   @BuiltValueField(wireName: r'entityType')
   String get entityType;
 
-  @BuiltValueField(wireName: r'entityId')
-  String get entityId;
+  @BuiltValueField(wireName: r'fileId')
+  String get fileId;
 
   @BuiltValueField(wireName: r'label')
   String? get label;
@@ -58,9 +58,9 @@ class _$AttachEntityDtoSerializer
     AttachEntityDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'fileId';
+    yield r'entityId';
     yield serializers.serialize(
-      object.fileId,
+      object.entityId,
       specifiedType: const FullType(String),
     );
     yield r'entityType';
@@ -68,9 +68,9 @@ class _$AttachEntityDtoSerializer
       object.entityType,
       specifiedType: const FullType(String),
     );
-    yield r'entityId';
+    yield r'fileId';
     yield serializers.serialize(
-      object.entityId,
+      object.fileId,
       specifiedType: const FullType(String),
     );
     if (object.label != null) {
@@ -107,12 +107,12 @@ class _$AttachEntityDtoSerializer
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'fileId':
+        case r'entityId':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
-          result.fileId = valueDes;
+          result.entityId = valueDes;
           break;
         case r'entityType':
           final valueDes = serializers.deserialize(
@@ -121,12 +121,12 @@ class _$AttachEntityDtoSerializer
           ) as String;
           result.entityType = valueDes;
           break;
-        case r'entityId':
+        case r'fileId':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
-          result.entityId = valueDes;
+          result.fileId = valueDes;
           break;
         case r'label':
           final valueDes = serializers.deserialize(

@@ -77,31 +77,31 @@ class _$OrganizationDtoRoleEnumSerializer
 
 class _$OrganizationDto extends OrganizationDto {
   @override
+  final String createdAt;
+  @override
+  final bool current;
+  @override
   final String id;
   @override
   final String name;
   @override
-  final String slug;
-  @override
   final OrganizationDtoRoleEnum role;
   @override
-  final String createdAt;
+  final String slug;
   @override
   final String updatedAt;
-  @override
-  final bool current;
 
   factory _$OrganizationDto([void Function(OrganizationDtoBuilder)? updates]) =>
       (OrganizationDtoBuilder()..update(updates))._build();
 
   _$OrganizationDto._({
+    required this.createdAt,
+    required this.current,
     required this.id,
     required this.name,
-    required this.slug,
     required this.role,
-    required this.createdAt,
+    required this.slug,
     required this.updatedAt,
-    required this.current,
   }) : super._();
   @override
   OrganizationDto rebuild(void Function(OrganizationDtoBuilder) updates) =>
@@ -114,25 +114,25 @@ class _$OrganizationDto extends OrganizationDto {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is OrganizationDto &&
+        createdAt == other.createdAt &&
+        current == other.current &&
         id == other.id &&
         name == other.name &&
-        slug == other.slug &&
         role == other.role &&
-        createdAt == other.createdAt &&
-        updatedAt == other.updatedAt &&
-        current == other.current;
+        slug == other.slug &&
+        updatedAt == other.updatedAt;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
+    _$hash = $jc(_$hash, createdAt.hashCode);
+    _$hash = $jc(_$hash, current.hashCode);
     _$hash = $jc(_$hash, id.hashCode);
     _$hash = $jc(_$hash, name.hashCode);
-    _$hash = $jc(_$hash, slug.hashCode);
     _$hash = $jc(_$hash, role.hashCode);
-    _$hash = $jc(_$hash, createdAt.hashCode);
+    _$hash = $jc(_$hash, slug.hashCode);
     _$hash = $jc(_$hash, updatedAt.hashCode);
-    _$hash = $jc(_$hash, current.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -140,13 +140,13 @@ class _$OrganizationDto extends OrganizationDto {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'OrganizationDto')
+          ..add('createdAt', createdAt)
+          ..add('current', current)
           ..add('id', id)
           ..add('name', name)
-          ..add('slug', slug)
           ..add('role', role)
-          ..add('createdAt', createdAt)
-          ..add('updatedAt', updatedAt)
-          ..add('current', current))
+          ..add('slug', slug)
+          ..add('updatedAt', updatedAt))
         .toString();
   }
 }
@@ -154,6 +154,14 @@ class _$OrganizationDto extends OrganizationDto {
 class OrganizationDtoBuilder
     implements Builder<OrganizationDto, OrganizationDtoBuilder> {
   _$OrganizationDto? _$v;
+
+  String? _createdAt;
+  String? get createdAt => _$this._createdAt;
+  set createdAt(String? createdAt) => _$this._createdAt = createdAt;
+
+  bool? _current;
+  bool? get current => _$this._current;
+  set current(bool? current) => _$this._current = current;
 
   String? _id;
   String? get id => _$this._id;
@@ -163,25 +171,17 @@ class OrganizationDtoBuilder
   String? get name => _$this._name;
   set name(String? name) => _$this._name = name;
 
-  String? _slug;
-  String? get slug => _$this._slug;
-  set slug(String? slug) => _$this._slug = slug;
-
   OrganizationDtoRoleEnum? _role;
   OrganizationDtoRoleEnum? get role => _$this._role;
   set role(OrganizationDtoRoleEnum? role) => _$this._role = role;
 
-  String? _createdAt;
-  String? get createdAt => _$this._createdAt;
-  set createdAt(String? createdAt) => _$this._createdAt = createdAt;
+  String? _slug;
+  String? get slug => _$this._slug;
+  set slug(String? slug) => _$this._slug = slug;
 
   String? _updatedAt;
   String? get updatedAt => _$this._updatedAt;
   set updatedAt(String? updatedAt) => _$this._updatedAt = updatedAt;
-
-  bool? _current;
-  bool? get current => _$this._current;
-  set current(bool? current) => _$this._current = current;
 
   OrganizationDtoBuilder() {
     OrganizationDto._defaults(this);
@@ -190,13 +190,13 @@ class OrganizationDtoBuilder
   OrganizationDtoBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
+      _createdAt = $v.createdAt;
+      _current = $v.current;
       _id = $v.id;
       _name = $v.name;
-      _slug = $v.slug;
       _role = $v.role;
-      _createdAt = $v.createdAt;
+      _slug = $v.slug;
       _updatedAt = $v.updatedAt;
-      _current = $v.current;
       _$v = null;
     }
     return this;
@@ -218,6 +218,16 @@ class OrganizationDtoBuilder
   _$OrganizationDto _build() {
     final _$result = _$v ??
         _$OrganizationDto._(
+          createdAt: BuiltValueNullFieldError.checkNotNull(
+            createdAt,
+            r'OrganizationDto',
+            'createdAt',
+          ),
+          current: BuiltValueNullFieldError.checkNotNull(
+            current,
+            r'OrganizationDto',
+            'current',
+          ),
           id: BuiltValueNullFieldError.checkNotNull(
             id,
             r'OrganizationDto',
@@ -228,30 +238,20 @@ class OrganizationDtoBuilder
             r'OrganizationDto',
             'name',
           ),
-          slug: BuiltValueNullFieldError.checkNotNull(
-            slug,
-            r'OrganizationDto',
-            'slug',
-          ),
           role: BuiltValueNullFieldError.checkNotNull(
             role,
             r'OrganizationDto',
             'role',
           ),
-          createdAt: BuiltValueNullFieldError.checkNotNull(
-            createdAt,
+          slug: BuiltValueNullFieldError.checkNotNull(
+            slug,
             r'OrganizationDto',
-            'createdAt',
+            'slug',
           ),
           updatedAt: BuiltValueNullFieldError.checkNotNull(
             updatedAt,
             r'OrganizationDto',
             'updatedAt',
-          ),
-          current: BuiltValueNullFieldError.checkNotNull(
-            current,
-            r'OrganizationDto',
-            'current',
           ),
         );
     replace(_$result);

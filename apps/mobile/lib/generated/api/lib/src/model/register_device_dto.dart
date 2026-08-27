@@ -14,17 +14,17 @@ part 'register_device_dto.g.dart';
 /// RegisterDeviceDto
 ///
 /// Properties:
-/// * [token]
 /// * [platform]
+/// * [token]
 @BuiltValue()
 abstract class RegisterDeviceDto
     implements Built<RegisterDeviceDto, RegisterDeviceDtoBuilder> {
-  @BuiltValueField(wireName: r'token')
-  String get token;
-
   @BuiltValueField(wireName: r'platform')
   RegisterDeviceDtoPlatformEnum get platform;
   // enum platformEnum {  IOS,  ANDROID,  };
+
+  @BuiltValueField(wireName: r'token')
+  String get token;
 
   RegisterDeviceDto._();
 
@@ -52,15 +52,15 @@ class _$RegisterDeviceDtoSerializer
     RegisterDeviceDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'token';
-    yield serializers.serialize(
-      object.token,
-      specifiedType: const FullType(String),
-    );
     yield r'platform';
     yield serializers.serialize(
       object.platform,
       specifiedType: const FullType(RegisterDeviceDtoPlatformEnum),
+    );
+    yield r'token';
+    yield serializers.serialize(
+      object.token,
+      specifiedType: const FullType(String),
     );
   }
 
@@ -89,13 +89,6 @@ class _$RegisterDeviceDtoSerializer
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'token':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.token = valueDes;
-          break;
         case r'platform':
           final valueDes = serializers.deserialize(
             value,
@@ -104,6 +97,13 @@ class _$RegisterDeviceDtoSerializer
             ),
           ) as RegisterDeviceDtoPlatformEnum;
           result.platform = valueDes;
+          break;
+        case r'token':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.token = valueDes;
           break;
         default:
           unhandled.add(key);

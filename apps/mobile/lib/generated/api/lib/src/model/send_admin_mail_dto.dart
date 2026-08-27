@@ -14,13 +14,17 @@ part 'send_admin_mail_dto.g.dart';
 /// SendAdminMailDto
 ///
 /// Properties:
+/// * [idempotencyKey] - Replaying the same key returns the original job instead of sending again.
 /// * [templateKey] - Non-mandatory template key (security templates cannot be sent ad hoc).
 /// * [to]
 /// * [variables]
-/// * [idempotencyKey] - Replaying the same key returns the original job instead of sending again.
 @BuiltValue()
 abstract class SendAdminMailDto
     implements Built<SendAdminMailDto, SendAdminMailDtoBuilder> {
+  /// Replaying the same key returns the original job instead of sending again.
+  @BuiltValueField(wireName: r'idempotencyKey')
+  String? get idempotencyKey;
+
   /// Non-mandatory template key (security templates cannot be sent ad hoc).
   @BuiltValueField(wireName: r'templateKey')
   String get templateKey;
@@ -30,10 +34,6 @@ abstract class SendAdminMailDto
 
   @BuiltValueField(wireName: r'variables')
   BuiltMap<String, String>? get variables;
-
-  /// Replaying the same key returns the original job instead of sending again.
-  @BuiltValueField(wireName: r'idempotencyKey')
-  String? get idempotencyKey;
 
   SendAdminMailDto._();
 
@@ -61,6 +61,13 @@ class _$SendAdminMailDtoSerializer
     SendAdminMailDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
+    if (object.idempotencyKey != null) {
+      yield r'idempotencyKey';
+      yield serializers.serialize(
+        object.idempotencyKey,
+        specifiedType: const FullType(String),
+      );
+    }
     yield r'templateKey';
     yield serializers.serialize(
       object.templateKey,
@@ -79,13 +86,6 @@ class _$SendAdminMailDtoSerializer
           FullType(String),
           FullType(String),
         ]),
-      );
-    }
-    if (object.idempotencyKey != null) {
-      yield r'idempotencyKey';
-      yield serializers.serialize(
-        object.idempotencyKey,
-        specifiedType: const FullType(String),
       );
     }
   }
@@ -115,6 +115,13 @@ class _$SendAdminMailDtoSerializer
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
+        case r'idempotencyKey':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.idempotencyKey = valueDes;
+          break;
         case r'templateKey':
           final valueDes = serializers.deserialize(
             value,
@@ -138,13 +145,6 @@ class _$SendAdminMailDtoSerializer
             ]),
           ) as BuiltMap<String, String>;
           result.variables.replace(valueDes);
-          break;
-        case r'idempotencyKey':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.idempotencyKey = valueDes;
           break;
         default:
           unhandled.add(key);

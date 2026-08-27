@@ -13,16 +13,16 @@ part 'replace_user_roles_dto.g.dart';
 /// ReplaceUserRolesDto
 ///
 /// Properties:
-/// * [roleId]
 /// * [organizationId]
+/// * [roleId]
 @BuiltValue()
 abstract class ReplaceUserRolesDto
     implements Built<ReplaceUserRolesDto, ReplaceUserRolesDtoBuilder> {
-  @BuiltValueField(wireName: r'roleId')
-  String get roleId;
-
   @BuiltValueField(wireName: r'organizationId')
   String? get organizationId;
+
+  @BuiltValueField(wireName: r'roleId')
+  String get roleId;
 
   ReplaceUserRolesDto._();
 
@@ -53,11 +53,6 @@ class _$ReplaceUserRolesDtoSerializer
     ReplaceUserRolesDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'roleId';
-    yield serializers.serialize(
-      object.roleId,
-      specifiedType: const FullType(String),
-    );
     if (object.organizationId != null) {
       yield r'organizationId';
       yield serializers.serialize(
@@ -65,6 +60,11 @@ class _$ReplaceUserRolesDtoSerializer
         specifiedType: const FullType(String),
       );
     }
+    yield r'roleId';
+    yield serializers.serialize(
+      object.roleId,
+      specifiedType: const FullType(String),
+    );
   }
 
   @override
@@ -92,19 +92,19 @@ class _$ReplaceUserRolesDtoSerializer
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'roleId':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.roleId = valueDes;
-          break;
         case r'organizationId':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
           result.organizationId = valueDes;
+          break;
+        case r'roleId':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.roleId = valueDes;
           break;
         default:
           unhandled.add(key);

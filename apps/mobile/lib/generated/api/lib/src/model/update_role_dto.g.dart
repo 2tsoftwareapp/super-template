@@ -10,16 +10,16 @@ part of 'update_role_dto.dart';
 
 class _$UpdateRoleDto extends UpdateRoleDto {
   @override
-  final String? name;
-  @override
   final String? description;
+  @override
+  final String? name;
   @override
   final BuiltList<String>? permissionIds;
 
   factory _$UpdateRoleDto([void Function(UpdateRoleDtoBuilder)? updates]) =>
       (UpdateRoleDtoBuilder()..update(updates))._build();
 
-  _$UpdateRoleDto._({this.name, this.description, this.permissionIds})
+  _$UpdateRoleDto._({this.description, this.name, this.permissionIds})
       : super._();
   @override
   UpdateRoleDto rebuild(void Function(UpdateRoleDtoBuilder) updates) =>
@@ -32,16 +32,16 @@ class _$UpdateRoleDto extends UpdateRoleDto {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is UpdateRoleDto &&
-        name == other.name &&
         description == other.description &&
+        name == other.name &&
         permissionIds == other.permissionIds;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
-    _$hash = $jc(_$hash, name.hashCode);
     _$hash = $jc(_$hash, description.hashCode);
+    _$hash = $jc(_$hash, name.hashCode);
     _$hash = $jc(_$hash, permissionIds.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
@@ -50,8 +50,8 @@ class _$UpdateRoleDto extends UpdateRoleDto {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'UpdateRoleDto')
-          ..add('name', name)
           ..add('description', description)
+          ..add('name', name)
           ..add('permissionIds', permissionIds))
         .toString();
   }
@@ -61,13 +61,13 @@ class UpdateRoleDtoBuilder
     implements Builder<UpdateRoleDto, UpdateRoleDtoBuilder> {
   _$UpdateRoleDto? _$v;
 
-  String? _name;
-  String? get name => _$this._name;
-  set name(String? name) => _$this._name = name;
-
   String? _description;
   String? get description => _$this._description;
   set description(String? description) => _$this._description = description;
+
+  String? _name;
+  String? get name => _$this._name;
+  set name(String? name) => _$this._name = name;
 
   ListBuilder<String>? _permissionIds;
   ListBuilder<String> get permissionIds =>
@@ -82,8 +82,8 @@ class UpdateRoleDtoBuilder
   UpdateRoleDtoBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _name = $v.name;
       _description = $v.description;
+      _name = $v.name;
       _permissionIds = $v.permissionIds?.toBuilder();
       _$v = null;
     }
@@ -108,8 +108,8 @@ class UpdateRoleDtoBuilder
     try {
       _$result = _$v ??
           _$UpdateRoleDto._(
-            name: name,
             description: description,
+            name: name,
             permissionIds: _permissionIds?.build(),
           );
     } catch (_) {

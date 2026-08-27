@@ -10,16 +10,16 @@ part of 'success_message_dto.dart';
 
 class _$SuccessMessageDto extends SuccessMessageDto {
   @override
-  final bool success;
-  @override
   final String message;
+  @override
+  final bool success;
 
   factory _$SuccessMessageDto([
     void Function(SuccessMessageDtoBuilder)? updates,
   ]) =>
       (SuccessMessageDtoBuilder()..update(updates))._build();
 
-  _$SuccessMessageDto._({required this.success, required this.message})
+  _$SuccessMessageDto._({required this.message, required this.success})
       : super._();
   @override
   SuccessMessageDto rebuild(void Function(SuccessMessageDtoBuilder) updates) =>
@@ -33,15 +33,15 @@ class _$SuccessMessageDto extends SuccessMessageDto {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is SuccessMessageDto &&
-        success == other.success &&
-        message == other.message;
+        message == other.message &&
+        success == other.success;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
-    _$hash = $jc(_$hash, success.hashCode);
     _$hash = $jc(_$hash, message.hashCode);
+    _$hash = $jc(_$hash, success.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -49,8 +49,8 @@ class _$SuccessMessageDto extends SuccessMessageDto {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'SuccessMessageDto')
-          ..add('success', success)
-          ..add('message', message))
+          ..add('message', message)
+          ..add('success', success))
         .toString();
   }
 }
@@ -59,13 +59,13 @@ class SuccessMessageDtoBuilder
     implements Builder<SuccessMessageDto, SuccessMessageDtoBuilder> {
   _$SuccessMessageDto? _$v;
 
-  bool? _success;
-  bool? get success => _$this._success;
-  set success(bool? success) => _$this._success = success;
-
   String? _message;
   String? get message => _$this._message;
   set message(String? message) => _$this._message = message;
+
+  bool? _success;
+  bool? get success => _$this._success;
+  set success(bool? success) => _$this._success = success;
 
   SuccessMessageDtoBuilder() {
     SuccessMessageDto._defaults(this);
@@ -74,8 +74,8 @@ class SuccessMessageDtoBuilder
   SuccessMessageDtoBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _success = $v.success;
       _message = $v.message;
+      _success = $v.success;
       _$v = null;
     }
     return this;
@@ -97,15 +97,15 @@ class SuccessMessageDtoBuilder
   _$SuccessMessageDto _build() {
     final _$result = _$v ??
         _$SuccessMessageDto._(
-          success: BuiltValueNullFieldError.checkNotNull(
-            success,
-            r'SuccessMessageDto',
-            'success',
-          ),
           message: BuiltValueNullFieldError.checkNotNull(
             message,
             r'SuccessMessageDto',
             'message',
+          ),
+          success: BuiltValueNullFieldError.checkNotNull(
+            success,
+            r'SuccessMessageDto',
+            'success',
           ),
         );
     replace(_$result);

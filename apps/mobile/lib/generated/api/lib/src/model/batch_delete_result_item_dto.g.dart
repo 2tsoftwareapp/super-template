@@ -10,11 +10,11 @@ part of 'batch_delete_result_item_dto.dart';
 
 class _$BatchDeleteResultItemDto extends BatchDeleteResultItemDto {
   @override
+  final String? error;
+  @override
   final String fileId;
   @override
   final bool success;
-  @override
-  final String? error;
 
   factory _$BatchDeleteResultItemDto([
     void Function(BatchDeleteResultItemDtoBuilder)? updates,
@@ -22,9 +22,9 @@ class _$BatchDeleteResultItemDto extends BatchDeleteResultItemDto {
       (BatchDeleteResultItemDtoBuilder()..update(updates))._build();
 
   _$BatchDeleteResultItemDto._({
+    this.error,
     required this.fileId,
     required this.success,
-    this.error,
   }) : super._();
   @override
   BatchDeleteResultItemDto rebuild(
@@ -40,17 +40,17 @@ class _$BatchDeleteResultItemDto extends BatchDeleteResultItemDto {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is BatchDeleteResultItemDto &&
+        error == other.error &&
         fileId == other.fileId &&
-        success == other.success &&
-        error == other.error;
+        success == other.success;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
+    _$hash = $jc(_$hash, error.hashCode);
     _$hash = $jc(_$hash, fileId.hashCode);
     _$hash = $jc(_$hash, success.hashCode);
-    _$hash = $jc(_$hash, error.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -58,9 +58,9 @@ class _$BatchDeleteResultItemDto extends BatchDeleteResultItemDto {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'BatchDeleteResultItemDto')
+          ..add('error', error)
           ..add('fileId', fileId)
-          ..add('success', success)
-          ..add('error', error))
+          ..add('success', success))
         .toString();
   }
 }
@@ -70,6 +70,10 @@ class BatchDeleteResultItemDtoBuilder
         Builder<BatchDeleteResultItemDto, BatchDeleteResultItemDtoBuilder> {
   _$BatchDeleteResultItemDto? _$v;
 
+  String? _error;
+  String? get error => _$this._error;
+  set error(String? error) => _$this._error = error;
+
   String? _fileId;
   String? get fileId => _$this._fileId;
   set fileId(String? fileId) => _$this._fileId = fileId;
@@ -78,10 +82,6 @@ class BatchDeleteResultItemDtoBuilder
   bool? get success => _$this._success;
   set success(bool? success) => _$this._success = success;
 
-  String? _error;
-  String? get error => _$this._error;
-  set error(String? error) => _$this._error = error;
-
   BatchDeleteResultItemDtoBuilder() {
     BatchDeleteResultItemDto._defaults(this);
   }
@@ -89,9 +89,9 @@ class BatchDeleteResultItemDtoBuilder
   BatchDeleteResultItemDtoBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
+      _error = $v.error;
       _fileId = $v.fileId;
       _success = $v.success;
-      _error = $v.error;
       _$v = null;
     }
     return this;
@@ -113,6 +113,7 @@ class BatchDeleteResultItemDtoBuilder
   _$BatchDeleteResultItemDto _build() {
     final _$result = _$v ??
         _$BatchDeleteResultItemDto._(
+          error: error,
           fileId: BuiltValueNullFieldError.checkNotNull(
             fileId,
             r'BatchDeleteResultItemDto',
@@ -123,7 +124,6 @@ class BatchDeleteResultItemDtoBuilder
             r'BatchDeleteResultItemDto',
             'success',
           ),
-          error: error,
         );
     replace(_$result);
     return _$result;

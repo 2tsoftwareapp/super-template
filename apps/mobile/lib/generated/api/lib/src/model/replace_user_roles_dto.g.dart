@@ -10,16 +10,16 @@ part of 'replace_user_roles_dto.dart';
 
 class _$ReplaceUserRolesDto extends ReplaceUserRolesDto {
   @override
-  final String roleId;
-  @override
   final String? organizationId;
+  @override
+  final String roleId;
 
   factory _$ReplaceUserRolesDto([
     void Function(ReplaceUserRolesDtoBuilder)? updates,
   ]) =>
       (ReplaceUserRolesDtoBuilder()..update(updates))._build();
 
-  _$ReplaceUserRolesDto._({required this.roleId, this.organizationId})
+  _$ReplaceUserRolesDto._({this.organizationId, required this.roleId})
       : super._();
   @override
   ReplaceUserRolesDto rebuild(
@@ -35,15 +35,15 @@ class _$ReplaceUserRolesDto extends ReplaceUserRolesDto {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is ReplaceUserRolesDto &&
-        roleId == other.roleId &&
-        organizationId == other.organizationId;
+        organizationId == other.organizationId &&
+        roleId == other.roleId;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
-    _$hash = $jc(_$hash, roleId.hashCode);
     _$hash = $jc(_$hash, organizationId.hashCode);
+    _$hash = $jc(_$hash, roleId.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -51,8 +51,8 @@ class _$ReplaceUserRolesDto extends ReplaceUserRolesDto {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'ReplaceUserRolesDto')
-          ..add('roleId', roleId)
-          ..add('organizationId', organizationId))
+          ..add('organizationId', organizationId)
+          ..add('roleId', roleId))
         .toString();
   }
 }
@@ -61,14 +61,14 @@ class ReplaceUserRolesDtoBuilder
     implements Builder<ReplaceUserRolesDto, ReplaceUserRolesDtoBuilder> {
   _$ReplaceUserRolesDto? _$v;
 
-  String? _roleId;
-  String? get roleId => _$this._roleId;
-  set roleId(String? roleId) => _$this._roleId = roleId;
-
   String? _organizationId;
   String? get organizationId => _$this._organizationId;
   set organizationId(String? organizationId) =>
       _$this._organizationId = organizationId;
+
+  String? _roleId;
+  String? get roleId => _$this._roleId;
+  set roleId(String? roleId) => _$this._roleId = roleId;
 
   ReplaceUserRolesDtoBuilder() {
     ReplaceUserRolesDto._defaults(this);
@@ -77,8 +77,8 @@ class ReplaceUserRolesDtoBuilder
   ReplaceUserRolesDtoBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _roleId = $v.roleId;
       _organizationId = $v.organizationId;
+      _roleId = $v.roleId;
       _$v = null;
     }
     return this;
@@ -100,12 +100,12 @@ class ReplaceUserRolesDtoBuilder
   _$ReplaceUserRolesDto _build() {
     final _$result = _$v ??
         _$ReplaceUserRolesDto._(
+          organizationId: organizationId,
           roleId: BuiltValueNullFieldError.checkNotNull(
             roleId,
             r'ReplaceUserRolesDto',
             'roleId',
           ),
-          organizationId: organizationId,
         );
     replace(_$result);
     return _$result;

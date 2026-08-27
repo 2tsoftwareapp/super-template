@@ -13,19 +13,19 @@ part 'register_dto.g.dart';
 /// RegisterDto
 ///
 /// Properties:
+/// * [displayName]
 /// * [email]
 /// * [password]
-/// * [displayName]
 @BuiltValue()
 abstract class RegisterDto implements Built<RegisterDto, RegisterDtoBuilder> {
+  @BuiltValueField(wireName: r'displayName')
+  String get displayName;
+
   @BuiltValueField(wireName: r'email')
   String get email;
 
   @BuiltValueField(wireName: r'password')
   String get password;
-
-  @BuiltValueField(wireName: r'displayName')
-  String get displayName;
 
   RegisterDto._();
 
@@ -50,6 +50,11 @@ class _$RegisterDtoSerializer implements PrimitiveSerializer<RegisterDto> {
     RegisterDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
+    yield r'displayName';
+    yield serializers.serialize(
+      object.displayName,
+      specifiedType: const FullType(String),
+    );
     yield r'email';
     yield serializers.serialize(
       object.email,
@@ -58,11 +63,6 @@ class _$RegisterDtoSerializer implements PrimitiveSerializer<RegisterDto> {
     yield r'password';
     yield serializers.serialize(
       object.password,
-      specifiedType: const FullType(String),
-    );
-    yield r'displayName';
-    yield serializers.serialize(
-      object.displayName,
       specifiedType: const FullType(String),
     );
   }
@@ -92,6 +92,13 @@ class _$RegisterDtoSerializer implements PrimitiveSerializer<RegisterDto> {
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
+        case r'displayName':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.displayName = valueDes;
+          break;
         case r'email':
           final valueDes = serializers.deserialize(
             value,
@@ -105,13 +112,6 @@ class _$RegisterDtoSerializer implements PrimitiveSerializer<RegisterDto> {
             specifiedType: const FullType(String),
           ) as String;
           result.password = valueDes;
-          break;
-        case r'displayName':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.displayName = valueDes;
           break;
         default:
           unhandled.add(key);

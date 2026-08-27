@@ -15,27 +15,26 @@ part 'job_event_dto.g.dart';
 /// JobEventDto
 ///
 /// Properties:
+/// * [attemptId]
+/// * [createdAt]
 /// * [id]
 /// * [jobId]
-/// * [attemptId]
-/// * [type]
 /// * [message]
 /// * [metadata]
-/// * [createdAt]
+/// * [type]
 @BuiltValue()
 abstract class JobEventDto implements Built<JobEventDto, JobEventDtoBuilder> {
+  @BuiltValueField(wireName: r'attemptId')
+  String? get attemptId;
+
+  @BuiltValueField(wireName: r'createdAt')
+  String get createdAt;
+
   @BuiltValueField(wireName: r'id')
   String get id;
 
   @BuiltValueField(wireName: r'jobId')
   String get jobId;
-
-  @BuiltValueField(wireName: r'attemptId')
-  String? get attemptId;
-
-  @BuiltValueField(wireName: r'type')
-  JobEventDtoTypeEnum get type;
-  // enum typeEnum {  claimed,  completed,  failed,  retry_scheduled,  cancelled,  no_handler,  };
 
   @BuiltValueField(wireName: r'message')
   String? get message;
@@ -43,8 +42,9 @@ abstract class JobEventDto implements Built<JobEventDto, JobEventDtoBuilder> {
   @BuiltValueField(wireName: r'metadata')
   BuiltMap<String, JsonObject?>? get metadata;
 
-  @BuiltValueField(wireName: r'createdAt')
-  String get createdAt;
+  @BuiltValueField(wireName: r'type')
+  JobEventDtoTypeEnum get type;
+  // enum typeEnum {  claimed,  completed,  failed,  retry_scheduled,  cancelled,  no_handler,  };
 
   JobEventDto._();
 
@@ -69,6 +69,18 @@ class _$JobEventDtoSerializer implements PrimitiveSerializer<JobEventDto> {
     JobEventDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
+    if (object.attemptId != null) {
+      yield r'attemptId';
+      yield serializers.serialize(
+        object.attemptId,
+        specifiedType: const FullType.nullable(String),
+      );
+    }
+    yield r'createdAt';
+    yield serializers.serialize(
+      object.createdAt,
+      specifiedType: const FullType(String),
+    );
     yield r'id';
     yield serializers.serialize(
       object.id,
@@ -78,18 +90,6 @@ class _$JobEventDtoSerializer implements PrimitiveSerializer<JobEventDto> {
     yield serializers.serialize(
       object.jobId,
       specifiedType: const FullType(String),
-    );
-    if (object.attemptId != null) {
-      yield r'attemptId';
-      yield serializers.serialize(
-        object.attemptId,
-        specifiedType: const FullType.nullable(String),
-      );
-    }
-    yield r'type';
-    yield serializers.serialize(
-      object.type,
-      specifiedType: const FullType(JobEventDtoTypeEnum),
     );
     if (object.message != null) {
       yield r'message';
@@ -108,10 +108,10 @@ class _$JobEventDtoSerializer implements PrimitiveSerializer<JobEventDto> {
         ]),
       );
     }
-    yield r'createdAt';
+    yield r'type';
     yield serializers.serialize(
-      object.createdAt,
-      specifiedType: const FullType(String),
+      object.type,
+      specifiedType: const FullType(JobEventDtoTypeEnum),
     );
   }
 
@@ -140,6 +140,21 @@ class _$JobEventDtoSerializer implements PrimitiveSerializer<JobEventDto> {
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
+        case r'attemptId':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
+          if (valueDes == null) continue;
+          result.attemptId = valueDes;
+          break;
+        case r'createdAt':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.createdAt = valueDes;
+          break;
         case r'id':
           final valueDes = serializers.deserialize(
             value,
@@ -153,21 +168,6 @@ class _$JobEventDtoSerializer implements PrimitiveSerializer<JobEventDto> {
             specifiedType: const FullType(String),
           ) as String;
           result.jobId = valueDes;
-          break;
-        case r'attemptId':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType.nullable(String),
-          ) as String?;
-          if (valueDes == null) continue;
-          result.attemptId = valueDes;
-          break;
-        case r'type':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(JobEventDtoTypeEnum),
-          ) as JobEventDtoTypeEnum;
-          result.type = valueDes;
           break;
         case r'message':
           final valueDes = serializers.deserialize(
@@ -188,12 +188,12 @@ class _$JobEventDtoSerializer implements PrimitiveSerializer<JobEventDto> {
           if (valueDes == null) continue;
           result.metadata.replace(valueDes);
           break;
-        case r'createdAt':
+        case r'type':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.createdAt = valueDes;
+            specifiedType: const FullType(JobEventDtoTypeEnum),
+          ) as JobEventDtoTypeEnum;
+          result.type = valueDes;
           break;
         default:
           unhandled.add(key);

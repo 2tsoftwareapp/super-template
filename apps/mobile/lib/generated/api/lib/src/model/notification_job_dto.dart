@@ -15,28 +15,25 @@ part 'notification_job_dto.g.dart';
 /// NotificationJobDto
 ///
 /// Properties:
-/// * [id]
 /// * [actorId]
 /// * [audience]
-/// * [targetUserId]
-/// * [userIds]
-/// * [type]
-/// * [title]
 /// * [body]
+/// * [createdAt]
 /// * [data]
+/// * [errorMessage]
+/// * [id]
+/// * [processedAt]
+/// * [recipientCount]
 /// * [scheduledAt]
 /// * [status]
-/// * [recipientCount]
-/// * [processedAt]
-/// * [errorMessage]
-/// * [createdAt]
+/// * [targetUserId]
+/// * [title]
+/// * [type]
 /// * [updatedAt]
+/// * [userIds]
 @BuiltValue()
 abstract class NotificationJobDto
     implements Built<NotificationJobDto, NotificationJobDtoBuilder> {
-  @BuiltValueField(wireName: r'id')
-  String get id;
-
   @BuiltValueField(wireName: r'actorId')
   String? get actorId;
 
@@ -44,23 +41,26 @@ abstract class NotificationJobDto
   NotificationJobDtoAudienceEnum get audience;
   // enum audienceEnum {  USER,  USERS,  ALL,  };
 
-  @BuiltValueField(wireName: r'targetUserId')
-  String? get targetUserId;
-
-  @BuiltValueField(wireName: r'userIds')
-  BuiltList<String>? get userIds;
-
-  @BuiltValueField(wireName: r'type')
-  String get type;
-
-  @BuiltValueField(wireName: r'title')
-  String get title;
-
   @BuiltValueField(wireName: r'body')
   String get body;
 
+  @BuiltValueField(wireName: r'createdAt')
+  String get createdAt;
+
   @BuiltValueField(wireName: r'data')
   BuiltMap<String, JsonObject?>? get data;
+
+  @BuiltValueField(wireName: r'errorMessage')
+  JsonObject? get errorMessage;
+
+  @BuiltValueField(wireName: r'id')
+  String get id;
+
+  @BuiltValueField(wireName: r'processedAt')
+  JsonObject? get processedAt;
+
+  @BuiltValueField(wireName: r'recipientCount')
+  JsonObject? get recipientCount;
 
   @BuiltValueField(wireName: r'scheduledAt')
   String get scheduledAt;
@@ -69,20 +69,20 @@ abstract class NotificationJobDto
   NotificationJobDtoStatusEnum get status;
   // enum statusEnum {  PENDING,  PROCESSING,  COMPLETED,  CANCELLED,  FAILED,  };
 
-  @BuiltValueField(wireName: r'recipientCount')
-  JsonObject? get recipientCount;
+  @BuiltValueField(wireName: r'targetUserId')
+  String? get targetUserId;
 
-  @BuiltValueField(wireName: r'processedAt')
-  JsonObject? get processedAt;
+  @BuiltValueField(wireName: r'title')
+  String get title;
 
-  @BuiltValueField(wireName: r'errorMessage')
-  JsonObject? get errorMessage;
-
-  @BuiltValueField(wireName: r'createdAt')
-  String get createdAt;
+  @BuiltValueField(wireName: r'type')
+  String get type;
 
   @BuiltValueField(wireName: r'updatedAt')
   String get updatedAt;
+
+  @BuiltValueField(wireName: r'userIds')
+  BuiltList<String>? get userIds;
 
   NotificationJobDto._();
 
@@ -110,11 +110,6 @@ class _$NotificationJobDtoSerializer
     NotificationJobDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'id';
-    yield serializers.serialize(
-      object.id,
-      specifiedType: const FullType(String),
-    );
     if (object.actorId != null) {
       yield r'actorId';
       yield serializers.serialize(
@@ -127,33 +122,14 @@ class _$NotificationJobDtoSerializer
       object.audience,
       specifiedType: const FullType(NotificationJobDtoAudienceEnum),
     );
-    if (object.targetUserId != null) {
-      yield r'targetUserId';
-      yield serializers.serialize(
-        object.targetUserId,
-        specifiedType: const FullType.nullable(String),
-      );
-    }
-    if (object.userIds != null) {
-      yield r'userIds';
-      yield serializers.serialize(
-        object.userIds,
-        specifiedType: const FullType(BuiltList, [FullType(String)]),
-      );
-    }
-    yield r'type';
-    yield serializers.serialize(
-      object.type,
-      specifiedType: const FullType(String),
-    );
-    yield r'title';
-    yield serializers.serialize(
-      object.title,
-      specifiedType: const FullType(String),
-    );
     yield r'body';
     yield serializers.serialize(
       object.body,
+      specifiedType: const FullType(String),
+    );
+    yield r'createdAt';
+    yield serializers.serialize(
+      object.createdAt,
       specifiedType: const FullType(String),
     );
     if (object.data != null) {
@@ -166,6 +142,32 @@ class _$NotificationJobDtoSerializer
         ]),
       );
     }
+    if (object.errorMessage != null) {
+      yield r'errorMessage';
+      yield serializers.serialize(
+        object.errorMessage,
+        specifiedType: const FullType(JsonObject),
+      );
+    }
+    yield r'id';
+    yield serializers.serialize(
+      object.id,
+      specifiedType: const FullType(String),
+    );
+    if (object.processedAt != null) {
+      yield r'processedAt';
+      yield serializers.serialize(
+        object.processedAt,
+        specifiedType: const FullType(JsonObject),
+      );
+    }
+    if (object.recipientCount != null) {
+      yield r'recipientCount';
+      yield serializers.serialize(
+        object.recipientCount,
+        specifiedType: const FullType(JsonObject),
+      );
+    }
     yield r'scheduledAt';
     yield serializers.serialize(
       object.scheduledAt,
@@ -176,30 +178,21 @@ class _$NotificationJobDtoSerializer
       object.status,
       specifiedType: const FullType(NotificationJobDtoStatusEnum),
     );
-    if (object.recipientCount != null) {
-      yield r'recipientCount';
+    if (object.targetUserId != null) {
+      yield r'targetUserId';
       yield serializers.serialize(
-        object.recipientCount,
-        specifiedType: const FullType(JsonObject),
+        object.targetUserId,
+        specifiedType: const FullType.nullable(String),
       );
     }
-    if (object.processedAt != null) {
-      yield r'processedAt';
-      yield serializers.serialize(
-        object.processedAt,
-        specifiedType: const FullType(JsonObject),
-      );
-    }
-    if (object.errorMessage != null) {
-      yield r'errorMessage';
-      yield serializers.serialize(
-        object.errorMessage,
-        specifiedType: const FullType(JsonObject),
-      );
-    }
-    yield r'createdAt';
+    yield r'title';
     yield serializers.serialize(
-      object.createdAt,
+      object.title,
+      specifiedType: const FullType(String),
+    );
+    yield r'type';
+    yield serializers.serialize(
+      object.type,
       specifiedType: const FullType(String),
     );
     yield r'updatedAt';
@@ -207,6 +200,13 @@ class _$NotificationJobDtoSerializer
       object.updatedAt,
       specifiedType: const FullType(String),
     );
+    if (object.userIds != null) {
+      yield r'userIds';
+      yield serializers.serialize(
+        object.userIds,
+        specifiedType: const FullType(BuiltList, [FullType(String)]),
+      );
+    }
   }
 
   @override
@@ -234,13 +234,6 @@ class _$NotificationJobDtoSerializer
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'id':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.id = valueDes;
-          break;
         case r'actorId':
           final valueDes = serializers.deserialize(
             value,
@@ -258,43 +251,19 @@ class _$NotificationJobDtoSerializer
           ) as NotificationJobDtoAudienceEnum;
           result.audience = valueDes;
           break;
-        case r'targetUserId':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType.nullable(String),
-          ) as String?;
-          if (valueDes == null) continue;
-          result.targetUserId = valueDes;
-          break;
-        case r'userIds':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(BuiltList, [
-              FullType(String),
-            ]),
-          ) as BuiltList<String>;
-          result.userIds.replace(valueDes);
-          break;
-        case r'type':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.type = valueDes;
-          break;
-        case r'title':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.title = valueDes;
-          break;
         case r'body':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
           result.body = valueDes;
+          break;
+        case r'createdAt':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.createdAt = valueDes;
           break;
         case r'data':
           final valueDes = serializers.deserialize(
@@ -305,6 +274,34 @@ class _$NotificationJobDtoSerializer
             ]),
           ) as BuiltMap<String, JsonObject?>;
           result.data.replace(valueDes);
+          break;
+        case r'errorMessage':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(JsonObject),
+          ) as JsonObject;
+          result.errorMessage = valueDes;
+          break;
+        case r'id':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.id = valueDes;
+          break;
+        case r'processedAt':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(JsonObject),
+          ) as JsonObject;
+          result.processedAt = valueDes;
+          break;
+        case r'recipientCount':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(JsonObject),
+          ) as JsonObject;
+          result.recipientCount = valueDes;
           break;
         case r'scheduledAt':
           final valueDes = serializers.deserialize(
@@ -320,33 +317,27 @@ class _$NotificationJobDtoSerializer
           ) as NotificationJobDtoStatusEnum;
           result.status = valueDes;
           break;
-        case r'recipientCount':
+        case r'targetUserId':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(JsonObject),
-          ) as JsonObject;
-          result.recipientCount = valueDes;
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
+          if (valueDes == null) continue;
+          result.targetUserId = valueDes;
           break;
-        case r'processedAt':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(JsonObject),
-          ) as JsonObject;
-          result.processedAt = valueDes;
-          break;
-        case r'errorMessage':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(JsonObject),
-          ) as JsonObject;
-          result.errorMessage = valueDes;
-          break;
-        case r'createdAt':
+        case r'title':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
-          result.createdAt = valueDes;
+          result.title = valueDes;
+          break;
+        case r'type':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.type = valueDes;
           break;
         case r'updatedAt':
           final valueDes = serializers.deserialize(
@@ -354,6 +345,15 @@ class _$NotificationJobDtoSerializer
             specifiedType: const FullType(String),
           ) as String;
           result.updatedAt = valueDes;
+          break;
+        case r'userIds':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(BuiltList, [
+              FullType(String),
+            ]),
+          ) as BuiltList<String>;
+          result.userIds.replace(valueDes);
           break;
         default:
           unhandled.add(key);

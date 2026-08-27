@@ -15,51 +15,51 @@ part 'audit_log_dto.g.dart';
 /// AuditLogDto
 ///
 /// Properties:
-/// * [id]
-/// * [organizationId]
-/// * [actorId]
 /// * [action]
-/// * [entityType]
-/// * [entityId]
-/// * [metadata]
-/// * [ipAddress]
-/// * [userAgent]
-/// * [requestId]
+/// * [actorId]
 /// * [createdAt]
+/// * [entityId]
+/// * [entityType]
+/// * [id]
+/// * [ipAddress]
+/// * [metadata]
+/// * [organizationId]
+/// * [requestId]
+/// * [userAgent]
 @BuiltValue()
 abstract class AuditLogDto implements Built<AuditLogDto, AuditLogDtoBuilder> {
-  @BuiltValueField(wireName: r'id')
-  String get id;
-
-  @BuiltValueField(wireName: r'organizationId')
-  String? get organizationId;
+  @BuiltValueField(wireName: r'action')
+  String get action;
 
   @BuiltValueField(wireName: r'actorId')
   String? get actorId;
 
-  @BuiltValueField(wireName: r'action')
-  String get action;
-
-  @BuiltValueField(wireName: r'entityType')
-  String get entityType;
+  @BuiltValueField(wireName: r'createdAt')
+  String get createdAt;
 
   @BuiltValueField(wireName: r'entityId')
   String? get entityId;
 
-  @BuiltValueField(wireName: r'metadata')
-  BuiltMap<String, JsonObject?>? get metadata;
+  @BuiltValueField(wireName: r'entityType')
+  String get entityType;
+
+  @BuiltValueField(wireName: r'id')
+  String get id;
 
   @BuiltValueField(wireName: r'ipAddress')
   String? get ipAddress;
 
-  @BuiltValueField(wireName: r'userAgent')
-  String? get userAgent;
+  @BuiltValueField(wireName: r'metadata')
+  BuiltMap<String, JsonObject?>? get metadata;
+
+  @BuiltValueField(wireName: r'organizationId')
+  String? get organizationId;
 
   @BuiltValueField(wireName: r'requestId')
   String? get requestId;
 
-  @BuiltValueField(wireName: r'createdAt')
-  String get createdAt;
+  @BuiltValueField(wireName: r'userAgent')
+  String? get userAgent;
 
   AuditLogDto._();
 
@@ -84,18 +84,11 @@ class _$AuditLogDtoSerializer implements PrimitiveSerializer<AuditLogDto> {
     AuditLogDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'id';
+    yield r'action';
     yield serializers.serialize(
-      object.id,
+      object.action,
       specifiedType: const FullType(String),
     );
-    if (object.organizationId != null) {
-      yield r'organizationId';
-      yield serializers.serialize(
-        object.organizationId,
-        specifiedType: const FullType.nullable(String),
-      );
-    }
     if (object.actorId != null) {
       yield r'actorId';
       yield serializers.serialize(
@@ -103,20 +96,32 @@ class _$AuditLogDtoSerializer implements PrimitiveSerializer<AuditLogDto> {
         specifiedType: const FullType.nullable(String),
       );
     }
-    yield r'action';
+    yield r'createdAt';
     yield serializers.serialize(
-      object.action,
-      specifiedType: const FullType(String),
-    );
-    yield r'entityType';
-    yield serializers.serialize(
-      object.entityType,
+      object.createdAt,
       specifiedType: const FullType(String),
     );
     if (object.entityId != null) {
       yield r'entityId';
       yield serializers.serialize(
         object.entityId,
+        specifiedType: const FullType.nullable(String),
+      );
+    }
+    yield r'entityType';
+    yield serializers.serialize(
+      object.entityType,
+      specifiedType: const FullType(String),
+    );
+    yield r'id';
+    yield serializers.serialize(
+      object.id,
+      specifiedType: const FullType(String),
+    );
+    if (object.ipAddress != null) {
+      yield r'ipAddress';
+      yield serializers.serialize(
+        object.ipAddress,
         specifiedType: const FullType.nullable(String),
       );
     }
@@ -130,17 +135,10 @@ class _$AuditLogDtoSerializer implements PrimitiveSerializer<AuditLogDto> {
         ]),
       );
     }
-    if (object.ipAddress != null) {
-      yield r'ipAddress';
+    if (object.organizationId != null) {
+      yield r'organizationId';
       yield serializers.serialize(
-        object.ipAddress,
-        specifiedType: const FullType.nullable(String),
-      );
-    }
-    if (object.userAgent != null) {
-      yield r'userAgent';
-      yield serializers.serialize(
-        object.userAgent,
+        object.organizationId,
         specifiedType: const FullType.nullable(String),
       );
     }
@@ -151,11 +149,13 @@ class _$AuditLogDtoSerializer implements PrimitiveSerializer<AuditLogDto> {
         specifiedType: const FullType.nullable(String),
       );
     }
-    yield r'createdAt';
-    yield serializers.serialize(
-      object.createdAt,
-      specifiedType: const FullType(String),
-    );
+    if (object.userAgent != null) {
+      yield r'userAgent';
+      yield serializers.serialize(
+        object.userAgent,
+        specifiedType: const FullType.nullable(String),
+      );
+    }
   }
 
   @override
@@ -183,20 +183,12 @@ class _$AuditLogDtoSerializer implements PrimitiveSerializer<AuditLogDto> {
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'id':
+        case r'action':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
-          result.id = valueDes;
-          break;
-        case r'organizationId':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType.nullable(String),
-          ) as String?;
-          if (valueDes == null) continue;
-          result.organizationId = valueDes;
+          result.action = valueDes;
           break;
         case r'actorId':
           final valueDes = serializers.deserialize(
@@ -206,19 +198,12 @@ class _$AuditLogDtoSerializer implements PrimitiveSerializer<AuditLogDto> {
           if (valueDes == null) continue;
           result.actorId = valueDes;
           break;
-        case r'action':
+        case r'createdAt':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
-          result.action = valueDes;
-          break;
-        case r'entityType':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.entityType = valueDes;
+          result.createdAt = valueDes;
           break;
         case r'entityId':
           final valueDes = serializers.deserialize(
@@ -227,6 +212,28 @@ class _$AuditLogDtoSerializer implements PrimitiveSerializer<AuditLogDto> {
           ) as String?;
           if (valueDes == null) continue;
           result.entityId = valueDes;
+          break;
+        case r'entityType':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.entityType = valueDes;
+          break;
+        case r'id':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.id = valueDes;
+          break;
+        case r'ipAddress':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
+          if (valueDes == null) continue;
+          result.ipAddress = valueDes;
           break;
         case r'metadata':
           final valueDes = serializers.deserialize(
@@ -238,21 +245,13 @@ class _$AuditLogDtoSerializer implements PrimitiveSerializer<AuditLogDto> {
           ) as BuiltMap<String, JsonObject?>;
           result.metadata.replace(valueDes);
           break;
-        case r'ipAddress':
+        case r'organizationId':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType.nullable(String),
           ) as String?;
           if (valueDes == null) continue;
-          result.ipAddress = valueDes;
-          break;
-        case r'userAgent':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType.nullable(String),
-          ) as String?;
-          if (valueDes == null) continue;
-          result.userAgent = valueDes;
+          result.organizationId = valueDes;
           break;
         case r'requestId':
           final valueDes = serializers.deserialize(
@@ -262,12 +261,13 @@ class _$AuditLogDtoSerializer implements PrimitiveSerializer<AuditLogDto> {
           if (valueDes == null) continue;
           result.requestId = valueDes;
           break;
-        case r'createdAt':
+        case r'userAgent':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.createdAt = valueDes;
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
+          if (valueDes == null) continue;
+          result.userAgent = valueDes;
           break;
         default:
           unhandled.add(key);

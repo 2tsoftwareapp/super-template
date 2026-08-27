@@ -10,16 +10,16 @@ part of 'mfa_setup_response_dto.dart';
 
 class _$MfaSetupResponseDto extends MfaSetupResponseDto {
   @override
-  final String secret;
-  @override
   final String otpauthUrl;
+  @override
+  final String secret;
 
   factory _$MfaSetupResponseDto([
     void Function(MfaSetupResponseDtoBuilder)? updates,
   ]) =>
       (MfaSetupResponseDtoBuilder()..update(updates))._build();
 
-  _$MfaSetupResponseDto._({required this.secret, required this.otpauthUrl})
+  _$MfaSetupResponseDto._({required this.otpauthUrl, required this.secret})
       : super._();
   @override
   MfaSetupResponseDto rebuild(
@@ -35,15 +35,15 @@ class _$MfaSetupResponseDto extends MfaSetupResponseDto {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is MfaSetupResponseDto &&
-        secret == other.secret &&
-        otpauthUrl == other.otpauthUrl;
+        otpauthUrl == other.otpauthUrl &&
+        secret == other.secret;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
-    _$hash = $jc(_$hash, secret.hashCode);
     _$hash = $jc(_$hash, otpauthUrl.hashCode);
+    _$hash = $jc(_$hash, secret.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -51,8 +51,8 @@ class _$MfaSetupResponseDto extends MfaSetupResponseDto {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'MfaSetupResponseDto')
-          ..add('secret', secret)
-          ..add('otpauthUrl', otpauthUrl))
+          ..add('otpauthUrl', otpauthUrl)
+          ..add('secret', secret))
         .toString();
   }
 }
@@ -61,13 +61,13 @@ class MfaSetupResponseDtoBuilder
     implements Builder<MfaSetupResponseDto, MfaSetupResponseDtoBuilder> {
   _$MfaSetupResponseDto? _$v;
 
-  String? _secret;
-  String? get secret => _$this._secret;
-  set secret(String? secret) => _$this._secret = secret;
-
   String? _otpauthUrl;
   String? get otpauthUrl => _$this._otpauthUrl;
   set otpauthUrl(String? otpauthUrl) => _$this._otpauthUrl = otpauthUrl;
+
+  String? _secret;
+  String? get secret => _$this._secret;
+  set secret(String? secret) => _$this._secret = secret;
 
   MfaSetupResponseDtoBuilder() {
     MfaSetupResponseDto._defaults(this);
@@ -76,8 +76,8 @@ class MfaSetupResponseDtoBuilder
   MfaSetupResponseDtoBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _secret = $v.secret;
       _otpauthUrl = $v.otpauthUrl;
+      _secret = $v.secret;
       _$v = null;
     }
     return this;
@@ -99,15 +99,15 @@ class MfaSetupResponseDtoBuilder
   _$MfaSetupResponseDto _build() {
     final _$result = _$v ??
         _$MfaSetupResponseDto._(
-          secret: BuiltValueNullFieldError.checkNotNull(
-            secret,
-            r'MfaSetupResponseDto',
-            'secret',
-          ),
           otpauthUrl: BuiltValueNullFieldError.checkNotNull(
             otpauthUrl,
             r'MfaSetupResponseDto',
             'otpauthUrl',
+          ),
+          secret: BuiltValueNullFieldError.checkNotNull(
+            secret,
+            r'MfaSetupResponseDto',
+            'secret',
           ),
         );
     replace(_$result);

@@ -14,25 +14,25 @@ part 'mail_preview_dto.g.dart';
 /// MailPreviewDto
 ///
 /// Properties:
-/// * [subject]
-/// * [text]
 /// * [html]
 /// * [missingVariables] - Template variables with no supplied or default value.
+/// * [subject]
+/// * [text]
 @BuiltValue()
 abstract class MailPreviewDto
     implements Built<MailPreviewDto, MailPreviewDtoBuilder> {
-  @BuiltValueField(wireName: r'subject')
-  String get subject;
-
-  @BuiltValueField(wireName: r'text')
-  String get text;
-
   @BuiltValueField(wireName: r'html')
   String get html;
 
   /// Template variables with no supplied or default value.
   @BuiltValueField(wireName: r'missingVariables')
   BuiltList<String> get missingVariables;
+
+  @BuiltValueField(wireName: r'subject')
+  String get subject;
+
+  @BuiltValueField(wireName: r'text')
+  String get text;
 
   MailPreviewDto._();
 
@@ -60,16 +60,6 @@ class _$MailPreviewDtoSerializer
     MailPreviewDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'subject';
-    yield serializers.serialize(
-      object.subject,
-      specifiedType: const FullType(String),
-    );
-    yield r'text';
-    yield serializers.serialize(
-      object.text,
-      specifiedType: const FullType(String),
-    );
     yield r'html';
     yield serializers.serialize(
       object.html,
@@ -79,6 +69,16 @@ class _$MailPreviewDtoSerializer
     yield serializers.serialize(
       object.missingVariables,
       specifiedType: const FullType(BuiltList, [FullType(String)]),
+    );
+    yield r'subject';
+    yield serializers.serialize(
+      object.subject,
+      specifiedType: const FullType(String),
+    );
+    yield r'text';
+    yield serializers.serialize(
+      object.text,
+      specifiedType: const FullType(String),
     );
   }
 
@@ -107,20 +107,6 @@ class _$MailPreviewDtoSerializer
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'subject':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.subject = valueDes;
-          break;
-        case r'text':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.text = valueDes;
-          break;
         case r'html':
           final valueDes = serializers.deserialize(
             value,
@@ -136,6 +122,20 @@ class _$MailPreviewDtoSerializer
             ]),
           ) as BuiltList<String>;
           result.missingVariables.replace(valueDes);
+          break;
+        case r'subject':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.subject = valueDes;
+          break;
+        case r'text':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.text = valueDes;
           break;
         default:
           unhandled.add(key);

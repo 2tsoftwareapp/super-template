@@ -10,19 +10,19 @@ part of 'attachment_dto.dart';
 
 class _$AttachmentDto extends AttachmentDto {
   @override
-  final String id;
-  @override
-  final String fileId;
-  @override
-  final String entityType;
-  @override
-  final String entityId;
-  @override
-  final String? label;
+  final String createdAt;
   @override
   final String? createdById;
   @override
-  final String createdAt;
+  final String entityId;
+  @override
+  final String entityType;
+  @override
+  final String fileId;
+  @override
+  final String id;
+  @override
+  final String? label;
   @override
   final String updatedAt;
 
@@ -30,13 +30,13 @@ class _$AttachmentDto extends AttachmentDto {
       (AttachmentDtoBuilder()..update(updates))._build();
 
   _$AttachmentDto._({
-    required this.id,
-    required this.fileId,
-    required this.entityType,
-    required this.entityId,
-    this.label,
-    this.createdById,
     required this.createdAt,
+    this.createdById,
+    required this.entityId,
+    required this.entityType,
+    required this.fileId,
+    required this.id,
+    this.label,
     required this.updatedAt,
   }) : super._();
   @override
@@ -50,26 +50,26 @@ class _$AttachmentDto extends AttachmentDto {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is AttachmentDto &&
-        id == other.id &&
-        fileId == other.fileId &&
-        entityType == other.entityType &&
-        entityId == other.entityId &&
-        label == other.label &&
-        createdById == other.createdById &&
         createdAt == other.createdAt &&
+        createdById == other.createdById &&
+        entityId == other.entityId &&
+        entityType == other.entityType &&
+        fileId == other.fileId &&
+        id == other.id &&
+        label == other.label &&
         updatedAt == other.updatedAt;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
-    _$hash = $jc(_$hash, id.hashCode);
-    _$hash = $jc(_$hash, fileId.hashCode);
-    _$hash = $jc(_$hash, entityType.hashCode);
-    _$hash = $jc(_$hash, entityId.hashCode);
-    _$hash = $jc(_$hash, label.hashCode);
-    _$hash = $jc(_$hash, createdById.hashCode);
     _$hash = $jc(_$hash, createdAt.hashCode);
+    _$hash = $jc(_$hash, createdById.hashCode);
+    _$hash = $jc(_$hash, entityId.hashCode);
+    _$hash = $jc(_$hash, entityType.hashCode);
+    _$hash = $jc(_$hash, fileId.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, label.hashCode);
     _$hash = $jc(_$hash, updatedAt.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
@@ -78,13 +78,13 @@ class _$AttachmentDto extends AttachmentDto {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'AttachmentDto')
-          ..add('id', id)
-          ..add('fileId', fileId)
-          ..add('entityType', entityType)
-          ..add('entityId', entityId)
-          ..add('label', label)
-          ..add('createdById', createdById)
           ..add('createdAt', createdAt)
+          ..add('createdById', createdById)
+          ..add('entityId', entityId)
+          ..add('entityType', entityType)
+          ..add('fileId', fileId)
+          ..add('id', id)
+          ..add('label', label)
           ..add('updatedAt', updatedAt))
         .toString();
   }
@@ -94,33 +94,33 @@ class AttachmentDtoBuilder
     implements Builder<AttachmentDto, AttachmentDtoBuilder> {
   _$AttachmentDto? _$v;
 
-  String? _id;
-  String? get id => _$this._id;
-  set id(String? id) => _$this._id = id;
-
-  String? _fileId;
-  String? get fileId => _$this._fileId;
-  set fileId(String? fileId) => _$this._fileId = fileId;
-
-  String? _entityType;
-  String? get entityType => _$this._entityType;
-  set entityType(String? entityType) => _$this._entityType = entityType;
-
-  String? _entityId;
-  String? get entityId => _$this._entityId;
-  set entityId(String? entityId) => _$this._entityId = entityId;
-
-  String? _label;
-  String? get label => _$this._label;
-  set label(String? label) => _$this._label = label;
+  String? _createdAt;
+  String? get createdAt => _$this._createdAt;
+  set createdAt(String? createdAt) => _$this._createdAt = createdAt;
 
   String? _createdById;
   String? get createdById => _$this._createdById;
   set createdById(String? createdById) => _$this._createdById = createdById;
 
-  String? _createdAt;
-  String? get createdAt => _$this._createdAt;
-  set createdAt(String? createdAt) => _$this._createdAt = createdAt;
+  String? _entityId;
+  String? get entityId => _$this._entityId;
+  set entityId(String? entityId) => _$this._entityId = entityId;
+
+  String? _entityType;
+  String? get entityType => _$this._entityType;
+  set entityType(String? entityType) => _$this._entityType = entityType;
+
+  String? _fileId;
+  String? get fileId => _$this._fileId;
+  set fileId(String? fileId) => _$this._fileId = fileId;
+
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
+
+  String? _label;
+  String? get label => _$this._label;
+  set label(String? label) => _$this._label = label;
 
   String? _updatedAt;
   String? get updatedAt => _$this._updatedAt;
@@ -133,13 +133,13 @@ class AttachmentDtoBuilder
   AttachmentDtoBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _id = $v.id;
-      _fileId = $v.fileId;
-      _entityType = $v.entityType;
-      _entityId = $v.entityId;
-      _label = $v.label;
-      _createdById = $v.createdById;
       _createdAt = $v.createdAt;
+      _createdById = $v.createdById;
+      _entityId = $v.entityId;
+      _entityType = $v.entityType;
+      _fileId = $v.fileId;
+      _id = $v.id;
+      _label = $v.label;
       _updatedAt = $v.updatedAt;
       _$v = null;
     }
@@ -162,29 +162,29 @@ class AttachmentDtoBuilder
   _$AttachmentDto _build() {
     final _$result = _$v ??
         _$AttachmentDto._(
-          id: BuiltValueNullFieldError.checkNotNull(id, r'AttachmentDto', 'id'),
-          fileId: BuiltValueNullFieldError.checkNotNull(
-            fileId,
+          createdAt: BuiltValueNullFieldError.checkNotNull(
+            createdAt,
             r'AttachmentDto',
-            'fileId',
+            'createdAt',
+          ),
+          createdById: createdById,
+          entityId: BuiltValueNullFieldError.checkNotNull(
+            entityId,
+            r'AttachmentDto',
+            'entityId',
           ),
           entityType: BuiltValueNullFieldError.checkNotNull(
             entityType,
             r'AttachmentDto',
             'entityType',
           ),
-          entityId: BuiltValueNullFieldError.checkNotNull(
-            entityId,
+          fileId: BuiltValueNullFieldError.checkNotNull(
+            fileId,
             r'AttachmentDto',
-            'entityId',
+            'fileId',
           ),
+          id: BuiltValueNullFieldError.checkNotNull(id, r'AttachmentDto', 'id'),
           label: label,
-          createdById: createdById,
-          createdAt: BuiltValueNullFieldError.checkNotNull(
-            createdAt,
-            r'AttachmentDto',
-            'createdAt',
-          ),
           updatedAt: BuiltValueNullFieldError.checkNotNull(
             updatedAt,
             r'AttachmentDto',

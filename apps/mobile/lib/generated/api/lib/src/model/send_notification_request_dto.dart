@@ -16,14 +16,14 @@ part 'send_notification_request_dto.g.dart';
 ///
 /// Properties:
 /// * [audience]
-/// * [userId]
-/// * [userIds]
-/// * [type]
-/// * [title]
 /// * [body]
 /// * [data]
-/// * [scheduledAt] - ISO-8601 datetime. Omit or set to now for immediate delivery.
 /// * [idempotencyKey] - Client-supplied idempotency key. Retries with the same key return the original notification job.
+/// * [scheduledAt] - ISO-8601 datetime. Omit or set to now for immediate delivery.
+/// * [title]
+/// * [type]
+/// * [userId]
+/// * [userIds]
 @BuiltValue()
 abstract class SendNotificationRequestDto
     implements
@@ -32,31 +32,31 @@ abstract class SendNotificationRequestDto
   SendNotificationRequestDtoAudienceEnum get audience;
   // enum audienceEnum {  USER,  USERS,  ALL,  };
 
-  @BuiltValueField(wireName: r'userId')
-  String? get userId;
-
-  @BuiltValueField(wireName: r'userIds')
-  BuiltList<String>? get userIds;
-
-  @BuiltValueField(wireName: r'type')
-  String get type;
-
-  @BuiltValueField(wireName: r'title')
-  String get title;
-
   @BuiltValueField(wireName: r'body')
   String get body;
 
   @BuiltValueField(wireName: r'data')
   BuiltMap<String, JsonObject?>? get data;
 
+  /// Client-supplied idempotency key. Retries with the same key return the original notification job.
+  @BuiltValueField(wireName: r'idempotencyKey')
+  String? get idempotencyKey;
+
   /// ISO-8601 datetime. Omit or set to now for immediate delivery.
   @BuiltValueField(wireName: r'scheduledAt')
   String? get scheduledAt;
 
-  /// Client-supplied idempotency key. Retries with the same key return the original notification job.
-  @BuiltValueField(wireName: r'idempotencyKey')
-  String? get idempotencyKey;
+  @BuiltValueField(wireName: r'title')
+  String get title;
+
+  @BuiltValueField(wireName: r'type')
+  String get type;
+
+  @BuiltValueField(wireName: r'userId')
+  String? get userId;
+
+  @BuiltValueField(wireName: r'userIds')
+  BuiltList<String>? get userIds;
 
   SendNotificationRequestDto._();
 
@@ -93,30 +93,6 @@ class _$SendNotificationRequestDtoSerializer
       object.audience,
       specifiedType: const FullType(SendNotificationRequestDtoAudienceEnum),
     );
-    if (object.userId != null) {
-      yield r'userId';
-      yield serializers.serialize(
-        object.userId,
-        specifiedType: const FullType(String),
-      );
-    }
-    if (object.userIds != null) {
-      yield r'userIds';
-      yield serializers.serialize(
-        object.userIds,
-        specifiedType: const FullType(BuiltList, [FullType(String)]),
-      );
-    }
-    yield r'type';
-    yield serializers.serialize(
-      object.type,
-      specifiedType: const FullType(String),
-    );
-    yield r'title';
-    yield serializers.serialize(
-      object.title,
-      specifiedType: const FullType(String),
-    );
     yield r'body';
     yield serializers.serialize(
       object.body,
@@ -132,6 +108,13 @@ class _$SendNotificationRequestDtoSerializer
         ]),
       );
     }
+    if (object.idempotencyKey != null) {
+      yield r'idempotencyKey';
+      yield serializers.serialize(
+        object.idempotencyKey,
+        specifiedType: const FullType(String),
+      );
+    }
     if (object.scheduledAt != null) {
       yield r'scheduledAt';
       yield serializers.serialize(
@@ -139,11 +122,28 @@ class _$SendNotificationRequestDtoSerializer
         specifiedType: const FullType(String),
       );
     }
-    if (object.idempotencyKey != null) {
-      yield r'idempotencyKey';
+    yield r'title';
+    yield serializers.serialize(
+      object.title,
+      specifiedType: const FullType(String),
+    );
+    yield r'type';
+    yield serializers.serialize(
+      object.type,
+      specifiedType: const FullType(String),
+    );
+    if (object.userId != null) {
+      yield r'userId';
       yield serializers.serialize(
-        object.idempotencyKey,
+        object.userId,
         specifiedType: const FullType(String),
+      );
+    }
+    if (object.userIds != null) {
+      yield r'userIds';
+      yield serializers.serialize(
+        object.userIds,
+        specifiedType: const FullType(BuiltList, [FullType(String)]),
       );
     }
   }
@@ -182,36 +182,6 @@ class _$SendNotificationRequestDtoSerializer
           ) as SendNotificationRequestDtoAudienceEnum;
           result.audience = valueDes;
           break;
-        case r'userId':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.userId = valueDes;
-          break;
-        case r'userIds':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(BuiltList, [
-              FullType(String),
-            ]),
-          ) as BuiltList<String>;
-          result.userIds.replace(valueDes);
-          break;
-        case r'type':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.type = valueDes;
-          break;
-        case r'title':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.title = valueDes;
-          break;
         case r'body':
           final valueDes = serializers.deserialize(
             value,
@@ -229,6 +199,13 @@ class _$SendNotificationRequestDtoSerializer
           ) as BuiltMap<String, JsonObject?>;
           result.data.replace(valueDes);
           break;
+        case r'idempotencyKey':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.idempotencyKey = valueDes;
+          break;
         case r'scheduledAt':
           final valueDes = serializers.deserialize(
             value,
@@ -236,12 +213,35 @@ class _$SendNotificationRequestDtoSerializer
           ) as String;
           result.scheduledAt = valueDes;
           break;
-        case r'idempotencyKey':
+        case r'title':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
-          result.idempotencyKey = valueDes;
+          result.title = valueDes;
+          break;
+        case r'type':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.type = valueDes;
+          break;
+        case r'userId':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.userId = valueDes;
+          break;
+        case r'userIds':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(BuiltList, [
+              FullType(String),
+            ]),
+          ) as BuiltList<String>;
+          result.userIds.replace(valueDes);
           break;
         default:
           unhandled.add(key);

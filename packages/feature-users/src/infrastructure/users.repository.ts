@@ -7,10 +7,10 @@ import { and, asc, count, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import type { UsersRepositoryPort } from "../application/ports/users.repository.port";
 import type { UserSortCriterion } from "../application/user-sort";
 import type { OrganizationMembership } from "../public/organization-membership.port";
-import { ORGANIZATION_MEMBERSHIP } from "../public/organization-membership.token";
 import type { UserRoleAssignments } from "../public/user-role-assignments.port";
-import { USER_ROLE_ASSIGNMENTS } from "../public/user-role-assignments.token";
 
+import { ORGANIZATION_MEMBERSHIP } from "../public/organization-membership.token";
+import { USER_ROLE_ASSIGNMENTS } from "../public/user-role-assignments.token";
 import { users } from "./persistence";
 
 interface ListUsersParams {

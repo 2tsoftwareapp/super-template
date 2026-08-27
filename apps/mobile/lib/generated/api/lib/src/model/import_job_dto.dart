@@ -15,40 +15,33 @@ part 'import_job_dto.g.dart';
 /// ImportJobDto
 ///
 /// Properties:
-/// * [id]
-/// * [type]
-/// * [fileId]
-/// * [status]
-/// * [rowCount]
-/// * [successCount]
+/// * [completedAt]
+/// * [confirmedAt]
+/// * [createdAt]
+/// * [createdById]
 /// * [errorCount]
 /// * [errors]
-/// * [createdById]
-/// * [confirmedAt]
-/// * [completedAt]
-/// * [createdAt]
+/// * [fileId]
+/// * [id]
+/// * [rowCount]
+/// * [status]
+/// * [successCount]
+/// * [type]
 /// * [updatedAt]
 @BuiltValue()
 abstract class ImportJobDto
     implements Built<ImportJobDto, ImportJobDtoBuilder> {
-  @BuiltValueField(wireName: r'id')
-  String get id;
+  @BuiltValueField(wireName: r'completedAt')
+  JsonObject? get completedAt;
 
-  @BuiltValueField(wireName: r'type')
-  String get type;
+  @BuiltValueField(wireName: r'confirmedAt')
+  JsonObject? get confirmedAt;
 
-  @BuiltValueField(wireName: r'fileId')
-  String get fileId;
+  @BuiltValueField(wireName: r'createdAt')
+  String get createdAt;
 
-  @BuiltValueField(wireName: r'status')
-  ImportJobDtoStatusEnum get status;
-  // enum statusEnum {  PENDING,  PROCESSING,  COMPLETED,  FAILED,  CANCELLED,  };
-
-  @BuiltValueField(wireName: r'rowCount')
-  JsonObject? get rowCount;
-
-  @BuiltValueField(wireName: r'successCount')
-  JsonObject? get successCount;
+  @BuiltValueField(wireName: r'createdById')
+  String get createdById;
 
   @BuiltValueField(wireName: r'errorCount')
   JsonObject? get errorCount;
@@ -56,17 +49,24 @@ abstract class ImportJobDto
   @BuiltValueField(wireName: r'errors')
   BuiltList<JsonObject>? get errors;
 
-  @BuiltValueField(wireName: r'createdById')
-  String get createdById;
+  @BuiltValueField(wireName: r'fileId')
+  String get fileId;
 
-  @BuiltValueField(wireName: r'confirmedAt')
-  JsonObject? get confirmedAt;
+  @BuiltValueField(wireName: r'id')
+  String get id;
 
-  @BuiltValueField(wireName: r'completedAt')
-  JsonObject? get completedAt;
+  @BuiltValueField(wireName: r'rowCount')
+  JsonObject? get rowCount;
 
-  @BuiltValueField(wireName: r'createdAt')
-  String get createdAt;
+  @BuiltValueField(wireName: r'status')
+  ImportJobDtoStatusEnum get status;
+  // enum statusEnum {  PENDING,  PROCESSING,  COMPLETED,  FAILED,  CANCELLED,  };
+
+  @BuiltValueField(wireName: r'successCount')
+  JsonObject? get successCount;
+
+  @BuiltValueField(wireName: r'type')
+  String get type;
 
   @BuiltValueField(wireName: r'updatedAt')
   String get updatedAt;
@@ -94,40 +94,30 @@ class _$ImportJobDtoSerializer implements PrimitiveSerializer<ImportJobDto> {
     ImportJobDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'id';
-    yield serializers.serialize(
-      object.id,
-      specifiedType: const FullType(String),
-    );
-    yield r'type';
-    yield serializers.serialize(
-      object.type,
-      specifiedType: const FullType(String),
-    );
-    yield r'fileId';
-    yield serializers.serialize(
-      object.fileId,
-      specifiedType: const FullType(String),
-    );
-    yield r'status';
-    yield serializers.serialize(
-      object.status,
-      specifiedType: const FullType(ImportJobDtoStatusEnum),
-    );
-    if (object.rowCount != null) {
-      yield r'rowCount';
+    if (object.completedAt != null) {
+      yield r'completedAt';
       yield serializers.serialize(
-        object.rowCount,
+        object.completedAt,
         specifiedType: const FullType(JsonObject),
       );
     }
-    if (object.successCount != null) {
-      yield r'successCount';
+    if (object.confirmedAt != null) {
+      yield r'confirmedAt';
       yield serializers.serialize(
-        object.successCount,
+        object.confirmedAt,
         specifiedType: const FullType(JsonObject),
       );
     }
+    yield r'createdAt';
+    yield serializers.serialize(
+      object.createdAt,
+      specifiedType: const FullType(String),
+    );
+    yield r'createdById';
+    yield serializers.serialize(
+      object.createdById,
+      specifiedType: const FullType(String),
+    );
     if (object.errorCount != null) {
       yield r'errorCount';
       yield serializers.serialize(
@@ -142,28 +132,38 @@ class _$ImportJobDtoSerializer implements PrimitiveSerializer<ImportJobDto> {
         specifiedType: const FullType(BuiltList, [FullType(JsonObject)]),
       );
     }
-    yield r'createdById';
+    yield r'fileId';
     yield serializers.serialize(
-      object.createdById,
+      object.fileId,
       specifiedType: const FullType(String),
     );
-    if (object.confirmedAt != null) {
-      yield r'confirmedAt';
-      yield serializers.serialize(
-        object.confirmedAt,
-        specifiedType: const FullType(JsonObject),
-      );
-    }
-    if (object.completedAt != null) {
-      yield r'completedAt';
-      yield serializers.serialize(
-        object.completedAt,
-        specifiedType: const FullType(JsonObject),
-      );
-    }
-    yield r'createdAt';
+    yield r'id';
     yield serializers.serialize(
-      object.createdAt,
+      object.id,
+      specifiedType: const FullType(String),
+    );
+    if (object.rowCount != null) {
+      yield r'rowCount';
+      yield serializers.serialize(
+        object.rowCount,
+        specifiedType: const FullType(JsonObject),
+      );
+    }
+    yield r'status';
+    yield serializers.serialize(
+      object.status,
+      specifiedType: const FullType(ImportJobDtoStatusEnum),
+    );
+    if (object.successCount != null) {
+      yield r'successCount';
+      yield serializers.serialize(
+        object.successCount,
+        specifiedType: const FullType(JsonObject),
+      );
+    }
+    yield r'type';
+    yield serializers.serialize(
+      object.type,
       specifiedType: const FullType(String),
     );
     yield r'updatedAt';
@@ -198,47 +198,33 @@ class _$ImportJobDtoSerializer implements PrimitiveSerializer<ImportJobDto> {
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'id':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.id = valueDes;
-          break;
-        case r'type':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.type = valueDes;
-          break;
-        case r'fileId':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.fileId = valueDes;
-          break;
-        case r'status':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(ImportJobDtoStatusEnum),
-          ) as ImportJobDtoStatusEnum;
-          result.status = valueDes;
-          break;
-        case r'rowCount':
+        case r'completedAt':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(JsonObject),
           ) as JsonObject;
-          result.rowCount = valueDes;
+          result.completedAt = valueDes;
           break;
-        case r'successCount':
+        case r'confirmedAt':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(JsonObject),
           ) as JsonObject;
-          result.successCount = valueDes;
+          result.confirmedAt = valueDes;
+          break;
+        case r'createdAt':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.createdAt = valueDes;
+          break;
+        case r'createdById':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.createdById = valueDes;
           break;
         case r'errorCount':
           final valueDes = serializers.deserialize(
@@ -256,33 +242,47 @@ class _$ImportJobDtoSerializer implements PrimitiveSerializer<ImportJobDto> {
           ) as BuiltList<JsonObject>;
           result.errors.replace(valueDes);
           break;
-        case r'createdById':
+        case r'fileId':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
-          result.createdById = valueDes;
+          result.fileId = valueDes;
           break;
-        case r'confirmedAt':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(JsonObject),
-          ) as JsonObject;
-          result.confirmedAt = valueDes;
-          break;
-        case r'completedAt':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(JsonObject),
-          ) as JsonObject;
-          result.completedAt = valueDes;
-          break;
-        case r'createdAt':
+        case r'id':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
-          result.createdAt = valueDes;
+          result.id = valueDes;
+          break;
+        case r'rowCount':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(JsonObject),
+          ) as JsonObject;
+          result.rowCount = valueDes;
+          break;
+        case r'status':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(ImportJobDtoStatusEnum),
+          ) as ImportJobDtoStatusEnum;
+          result.status = valueDes;
+          break;
+        case r'successCount':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(JsonObject),
+          ) as JsonObject;
+          result.successCount = valueDes;
+          break;
+        case r'type':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.type = valueDes;
           break;
         case r'updatedAt':
           final valueDes = serializers.deserialize(

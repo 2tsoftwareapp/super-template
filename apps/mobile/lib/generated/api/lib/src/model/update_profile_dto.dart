@@ -14,20 +14,20 @@ part 'update_profile_dto.g.dart';
 /// UpdateProfileDto
 ///
 /// Properties:
-/// * [displayName]
-/// * [avatarUrl]
 /// * [avatarFileId]
+/// * [avatarUrl]
+/// * [displayName]
 @BuiltValue()
 abstract class UpdateProfileDto
     implements Built<UpdateProfileDto, UpdateProfileDtoBuilder> {
-  @BuiltValueField(wireName: r'displayName')
-  String? get displayName;
+  @BuiltValueField(wireName: r'avatarFileId')
+  JsonObject? get avatarFileId;
 
   @BuiltValueField(wireName: r'avatarUrl')
   JsonObject? get avatarUrl;
 
-  @BuiltValueField(wireName: r'avatarFileId')
-  JsonObject? get avatarFileId;
+  @BuiltValueField(wireName: r'displayName')
+  String? get displayName;
 
   UpdateProfileDto._();
 
@@ -55,11 +55,11 @@ class _$UpdateProfileDtoSerializer
     UpdateProfileDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    if (object.displayName != null) {
-      yield r'displayName';
+    if (object.avatarFileId != null) {
+      yield r'avatarFileId';
       yield serializers.serialize(
-        object.displayName,
-        specifiedType: const FullType(String),
+        object.avatarFileId,
+        specifiedType: const FullType(JsonObject),
       );
     }
     if (object.avatarUrl != null) {
@@ -69,11 +69,11 @@ class _$UpdateProfileDtoSerializer
         specifiedType: const FullType(JsonObject),
       );
     }
-    if (object.avatarFileId != null) {
-      yield r'avatarFileId';
+    if (object.displayName != null) {
+      yield r'displayName';
       yield serializers.serialize(
-        object.avatarFileId,
-        specifiedType: const FullType(JsonObject),
+        object.displayName,
+        specifiedType: const FullType(String),
       );
     }
   }
@@ -103,12 +103,12 @@ class _$UpdateProfileDtoSerializer
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'displayName':
+        case r'avatarFileId':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.displayName = valueDes;
+            specifiedType: const FullType(JsonObject),
+          ) as JsonObject;
+          result.avatarFileId = valueDes;
           break;
         case r'avatarUrl':
           final valueDes = serializers.deserialize(
@@ -117,12 +117,12 @@ class _$UpdateProfileDtoSerializer
           ) as JsonObject;
           result.avatarUrl = valueDes;
           break;
-        case r'avatarFileId':
+        case r'displayName':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(JsonObject),
-          ) as JsonObject;
-          result.avatarFileId = valueDes;
+            specifiedType: const FullType(String),
+          ) as String;
+          result.displayName = valueDes;
           break;
         default:
           unhandled.add(key);

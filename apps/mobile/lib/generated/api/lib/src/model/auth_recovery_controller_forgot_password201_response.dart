@@ -6,63 +6,67 @@
 // @dart=3.0
 
 import 'package:super_template_api/src/model/request_meta_dto.dart';
-import 'package:super_template_api/src/model/audit_export_result_dto.dart';
+import 'package:super_template_api/src/model/success_message_dto.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
-part 'audit_controller_export_audit_logs201_response.g.dart';
+part 'auth_recovery_controller_forgot_password201_response.g.dart';
 
-/// AuditControllerExportAuditLogs201Response
+/// AuthRecoveryControllerForgotPassword201Response
 ///
 /// Properties:
 /// * [data]
 /// * [meta]
 @BuiltValue()
-abstract class AuditControllerExportAuditLogs201Response
+abstract class AuthRecoveryControllerForgotPassword201Response
     implements
-        Built<AuditControllerExportAuditLogs201Response,
-            AuditControllerExportAuditLogs201ResponseBuilder> {
+        Built<AuthRecoveryControllerForgotPassword201Response,
+            AuthRecoveryControllerForgotPassword201ResponseBuilder> {
   @BuiltValueField(wireName: r'data')
-  AuditExportResultDto get data;
+  SuccessMessageDto get data;
 
   @BuiltValueField(wireName: r'meta')
   RequestMetaDto get meta;
 
-  AuditControllerExportAuditLogs201Response._();
+  AuthRecoveryControllerForgotPassword201Response._();
 
-  factory AuditControllerExportAuditLogs201Response([
-    void updates(AuditControllerExportAuditLogs201ResponseBuilder b),
-  ]) = _$AuditControllerExportAuditLogs201Response;
+  factory AuthRecoveryControllerForgotPassword201Response([
+    void updates(AuthRecoveryControllerForgotPassword201ResponseBuilder b),
+  ]) = _$AuthRecoveryControllerForgotPassword201Response;
 
   @BuiltValueHook(initializeBuilder: true)
-  static void _defaults(AuditControllerExportAuditLogs201ResponseBuilder b) =>
+  static void _defaults(
+    AuthRecoveryControllerForgotPassword201ResponseBuilder b,
+  ) =>
       b;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<AuditControllerExportAuditLogs201Response> get serializer =>
-      _$AuditControllerExportAuditLogs201ResponseSerializer();
+  static Serializer<AuthRecoveryControllerForgotPassword201Response>
+      get serializer =>
+          _$AuthRecoveryControllerForgotPassword201ResponseSerializer();
 }
 
-class _$AuditControllerExportAuditLogs201ResponseSerializer
-    implements PrimitiveSerializer<AuditControllerExportAuditLogs201Response> {
+class _$AuthRecoveryControllerForgotPassword201ResponseSerializer
+    implements
+        PrimitiveSerializer<AuthRecoveryControllerForgotPassword201Response> {
   @override
   final Iterable<Type> types = const [
-    AuditControllerExportAuditLogs201Response,
-    _$AuditControllerExportAuditLogs201Response,
+    AuthRecoveryControllerForgotPassword201Response,
+    _$AuthRecoveryControllerForgotPassword201Response,
   ];
 
   @override
-  final String wireName = r'AuditControllerExportAuditLogs201Response';
+  final String wireName = r'AuthRecoveryControllerForgotPassword201Response';
 
   Iterable<Object?> _serializeProperties(
     Serializers serializers,
-    AuditControllerExportAuditLogs201Response object, {
+    AuthRecoveryControllerForgotPassword201Response object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
     yield r'data';
     yield serializers.serialize(
       object.data,
-      specifiedType: const FullType(AuditExportResultDto),
+      specifiedType: const FullType(SuccessMessageDto),
     );
     yield r'meta';
     yield serializers.serialize(
@@ -74,7 +78,7 @@ class _$AuditControllerExportAuditLogs201ResponseSerializer
   @override
   Object serialize(
     Serializers serializers,
-    AuditControllerExportAuditLogs201Response object, {
+    AuthRecoveryControllerForgotPassword201Response object, {
     FullType specifiedType = FullType.unspecified,
   }) {
     return _serializeProperties(
@@ -89,7 +93,7 @@ class _$AuditControllerExportAuditLogs201ResponseSerializer
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
     required List<Object?> serializedList,
-    required AuditControllerExportAuditLogs201ResponseBuilder result,
+    required AuthRecoveryControllerForgotPassword201ResponseBuilder result,
     required List<Object?> unhandled,
   }) {
     for (var i = 0; i < serializedList.length; i += 2) {
@@ -99,8 +103,8 @@ class _$AuditControllerExportAuditLogs201ResponseSerializer
         case r'data':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(AuditExportResultDto),
-          ) as AuditExportResultDto;
+            specifiedType: const FullType(SuccessMessageDto),
+          ) as SuccessMessageDto;
           result.data.replace(valueDes);
           break;
         case r'meta':
@@ -119,12 +123,12 @@ class _$AuditControllerExportAuditLogs201ResponseSerializer
   }
 
   @override
-  AuditControllerExportAuditLogs201Response deserialize(
+  AuthRecoveryControllerForgotPassword201Response deserialize(
     Serializers serializers,
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    final result = AuditControllerExportAuditLogs201ResponseBuilder();
+    final result = AuthRecoveryControllerForgotPassword201ResponseBuilder();
     final serializedList = (serialized as Iterable<Object?>).toList();
     final unhandled = <Object?>[];
     _deserializeProperties(

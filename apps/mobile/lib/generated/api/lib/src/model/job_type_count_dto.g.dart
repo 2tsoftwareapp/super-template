@@ -10,14 +10,14 @@ part of 'job_type_count_dto.dart';
 
 class _$JobTypeCountDto extends JobTypeCountDto {
   @override
-  final String type;
-  @override
   final num total;
+  @override
+  final String type;
 
   factory _$JobTypeCountDto([void Function(JobTypeCountDtoBuilder)? updates]) =>
       (JobTypeCountDtoBuilder()..update(updates))._build();
 
-  _$JobTypeCountDto._({required this.type, required this.total}) : super._();
+  _$JobTypeCountDto._({required this.total, required this.type}) : super._();
   @override
   JobTypeCountDto rebuild(void Function(JobTypeCountDtoBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -29,15 +29,15 @@ class _$JobTypeCountDto extends JobTypeCountDto {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is JobTypeCountDto &&
-        type == other.type &&
-        total == other.total;
+        total == other.total &&
+        type == other.type;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
-    _$hash = $jc(_$hash, type.hashCode);
     _$hash = $jc(_$hash, total.hashCode);
+    _$hash = $jc(_$hash, type.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -45,8 +45,8 @@ class _$JobTypeCountDto extends JobTypeCountDto {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'JobTypeCountDto')
-          ..add('type', type)
-          ..add('total', total))
+          ..add('total', total)
+          ..add('type', type))
         .toString();
   }
 }
@@ -55,13 +55,13 @@ class JobTypeCountDtoBuilder
     implements Builder<JobTypeCountDto, JobTypeCountDtoBuilder> {
   _$JobTypeCountDto? _$v;
 
-  String? _type;
-  String? get type => _$this._type;
-  set type(String? type) => _$this._type = type;
-
   num? _total;
   num? get total => _$this._total;
   set total(num? total) => _$this._total = total;
+
+  String? _type;
+  String? get type => _$this._type;
+  set type(String? type) => _$this._type = type;
 
   JobTypeCountDtoBuilder() {
     JobTypeCountDto._defaults(this);
@@ -70,8 +70,8 @@ class JobTypeCountDtoBuilder
   JobTypeCountDtoBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _type = $v.type;
       _total = $v.total;
+      _type = $v.type;
       _$v = null;
     }
     return this;
@@ -93,15 +93,15 @@ class JobTypeCountDtoBuilder
   _$JobTypeCountDto _build() {
     final _$result = _$v ??
         _$JobTypeCountDto._(
-          type: BuiltValueNullFieldError.checkNotNull(
-            type,
-            r'JobTypeCountDto',
-            'type',
-          ),
           total: BuiltValueNullFieldError.checkNotNull(
             total,
             r'JobTypeCountDto',
             'total',
+          ),
+          type: BuiltValueNullFieldError.checkNotNull(
+            type,
+            r'JobTypeCountDto',
+            'type',
           ),
         );
     replace(_$result);

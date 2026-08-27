@@ -91,21 +91,21 @@ class _$ExportJobDtoStatusEnumSerializer
 
 class _$ExportJobDto extends ExportJobDto {
   @override
-  final String id;
+  final JsonObject? completedAt;
   @override
-  final String type;
+  final String createdAt;
   @override
-  final ExportJobDtoStatusEnum status;
+  final String createdById;
   @override
   final JsonObject? fileId;
   @override
   final BuiltMap<String, JsonObject?>? filters;
   @override
-  final String createdById;
+  final String id;
   @override
-  final JsonObject? completedAt;
+  final ExportJobDtoStatusEnum status;
   @override
-  final String createdAt;
+  final String type;
   @override
   final String updatedAt;
 
@@ -113,14 +113,14 @@ class _$ExportJobDto extends ExportJobDto {
       (ExportJobDtoBuilder()..update(updates))._build();
 
   _$ExportJobDto._({
-    required this.id,
-    required this.type,
-    required this.status,
-    this.fileId,
-    this.filters,
-    required this.createdById,
     this.completedAt,
     required this.createdAt,
+    required this.createdById,
+    this.fileId,
+    this.filters,
+    required this.id,
+    required this.status,
+    required this.type,
     required this.updatedAt,
   }) : super._();
   @override
@@ -134,28 +134,28 @@ class _$ExportJobDto extends ExportJobDto {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is ExportJobDto &&
-        id == other.id &&
-        type == other.type &&
-        status == other.status &&
-        fileId == other.fileId &&
-        filters == other.filters &&
-        createdById == other.createdById &&
         completedAt == other.completedAt &&
         createdAt == other.createdAt &&
+        createdById == other.createdById &&
+        fileId == other.fileId &&
+        filters == other.filters &&
+        id == other.id &&
+        status == other.status &&
+        type == other.type &&
         updatedAt == other.updatedAt;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
-    _$hash = $jc(_$hash, id.hashCode);
-    _$hash = $jc(_$hash, type.hashCode);
-    _$hash = $jc(_$hash, status.hashCode);
-    _$hash = $jc(_$hash, fileId.hashCode);
-    _$hash = $jc(_$hash, filters.hashCode);
-    _$hash = $jc(_$hash, createdById.hashCode);
     _$hash = $jc(_$hash, completedAt.hashCode);
     _$hash = $jc(_$hash, createdAt.hashCode);
+    _$hash = $jc(_$hash, createdById.hashCode);
+    _$hash = $jc(_$hash, fileId.hashCode);
+    _$hash = $jc(_$hash, filters.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, status.hashCode);
+    _$hash = $jc(_$hash, type.hashCode);
     _$hash = $jc(_$hash, updatedAt.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
@@ -164,14 +164,14 @@ class _$ExportJobDto extends ExportJobDto {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'ExportJobDto')
-          ..add('id', id)
-          ..add('type', type)
-          ..add('status', status)
-          ..add('fileId', fileId)
-          ..add('filters', filters)
-          ..add('createdById', createdById)
           ..add('completedAt', completedAt)
           ..add('createdAt', createdAt)
+          ..add('createdById', createdById)
+          ..add('fileId', fileId)
+          ..add('filters', filters)
+          ..add('id', id)
+          ..add('status', status)
+          ..add('type', type)
           ..add('updatedAt', updatedAt))
         .toString();
   }
@@ -181,17 +181,17 @@ class ExportJobDtoBuilder
     implements Builder<ExportJobDto, ExportJobDtoBuilder> {
   _$ExportJobDto? _$v;
 
-  String? _id;
-  String? get id => _$this._id;
-  set id(String? id) => _$this._id = id;
+  JsonObject? _completedAt;
+  JsonObject? get completedAt => _$this._completedAt;
+  set completedAt(JsonObject? completedAt) => _$this._completedAt = completedAt;
 
-  String? _type;
-  String? get type => _$this._type;
-  set type(String? type) => _$this._type = type;
+  String? _createdAt;
+  String? get createdAt => _$this._createdAt;
+  set createdAt(String? createdAt) => _$this._createdAt = createdAt;
 
-  ExportJobDtoStatusEnum? _status;
-  ExportJobDtoStatusEnum? get status => _$this._status;
-  set status(ExportJobDtoStatusEnum? status) => _$this._status = status;
+  String? _createdById;
+  String? get createdById => _$this._createdById;
+  set createdById(String? createdById) => _$this._createdById = createdById;
 
   JsonObject? _fileId;
   JsonObject? get fileId => _$this._fileId;
@@ -203,17 +203,17 @@ class ExportJobDtoBuilder
   set filters(MapBuilder<String, JsonObject?>? filters) =>
       _$this._filters = filters;
 
-  String? _createdById;
-  String? get createdById => _$this._createdById;
-  set createdById(String? createdById) => _$this._createdById = createdById;
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
 
-  JsonObject? _completedAt;
-  JsonObject? get completedAt => _$this._completedAt;
-  set completedAt(JsonObject? completedAt) => _$this._completedAt = completedAt;
+  ExportJobDtoStatusEnum? _status;
+  ExportJobDtoStatusEnum? get status => _$this._status;
+  set status(ExportJobDtoStatusEnum? status) => _$this._status = status;
 
-  String? _createdAt;
-  String? get createdAt => _$this._createdAt;
-  set createdAt(String? createdAt) => _$this._createdAt = createdAt;
+  String? _type;
+  String? get type => _$this._type;
+  set type(String? type) => _$this._type = type;
 
   String? _updatedAt;
   String? get updatedAt => _$this._updatedAt;
@@ -226,14 +226,14 @@ class ExportJobDtoBuilder
   ExportJobDtoBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _id = $v.id;
-      _type = $v.type;
-      _status = $v.status;
-      _fileId = $v.fileId;
-      _filters = $v.filters?.toBuilder();
-      _createdById = $v.createdById;
       _completedAt = $v.completedAt;
       _createdAt = $v.createdAt;
+      _createdById = $v.createdById;
+      _fileId = $v.fileId;
+      _filters = $v.filters?.toBuilder();
+      _id = $v.id;
+      _status = $v.status;
+      _type = $v.type;
       _updatedAt = $v.updatedAt;
       _$v = null;
     }
@@ -258,33 +258,33 @@ class ExportJobDtoBuilder
     try {
       _$result = _$v ??
           _$ExportJobDto._(
+            completedAt: completedAt,
+            createdAt: BuiltValueNullFieldError.checkNotNull(
+              createdAt,
+              r'ExportJobDto',
+              'createdAt',
+            ),
+            createdById: BuiltValueNullFieldError.checkNotNull(
+              createdById,
+              r'ExportJobDto',
+              'createdById',
+            ),
+            fileId: fileId,
+            filters: _filters?.build(),
             id: BuiltValueNullFieldError.checkNotNull(
               id,
               r'ExportJobDto',
               'id',
-            ),
-            type: BuiltValueNullFieldError.checkNotNull(
-              type,
-              r'ExportJobDto',
-              'type',
             ),
             status: BuiltValueNullFieldError.checkNotNull(
               status,
               r'ExportJobDto',
               'status',
             ),
-            fileId: fileId,
-            filters: _filters?.build(),
-            createdById: BuiltValueNullFieldError.checkNotNull(
-              createdById,
+            type: BuiltValueNullFieldError.checkNotNull(
+              type,
               r'ExportJobDto',
-              'createdById',
-            ),
-            completedAt: completedAt,
-            createdAt: BuiltValueNullFieldError.checkNotNull(
-              createdAt,
-              r'ExportJobDto',
-              'createdAt',
+              'type',
             ),
             updatedAt: BuiltValueNullFieldError.checkNotNull(
               updatedAt,

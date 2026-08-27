@@ -15,28 +15,28 @@ part 'application_setting_dto.g.dart';
 /// ApplicationSettingDto
 ///
 /// Properties:
-/// * [key]
-/// * [value]
-/// * [updatedById]
 /// * [createdAt]
+/// * [key]
 /// * [updatedAt]
+/// * [updatedById]
+/// * [value]
 @BuiltValue()
 abstract class ApplicationSettingDto
     implements Built<ApplicationSettingDto, ApplicationSettingDtoBuilder> {
+  @BuiltValueField(wireName: r'createdAt')
+  String get createdAt;
+
   @BuiltValueField(wireName: r'key')
   String get key;
 
-  @BuiltValueField(wireName: r'value')
-  BuiltMap<String, JsonObject?> get value;
+  @BuiltValueField(wireName: r'updatedAt')
+  String get updatedAt;
 
   @BuiltValueField(wireName: r'updatedById')
   JsonObject? get updatedById;
 
-  @BuiltValueField(wireName: r'createdAt')
-  String get createdAt;
-
-  @BuiltValueField(wireName: r'updatedAt')
-  String get updatedAt;
+  @BuiltValueField(wireName: r'value')
+  BuiltMap<String, JsonObject?> get value;
 
   ApplicationSettingDto._();
 
@@ -68,18 +68,20 @@ class _$ApplicationSettingDtoSerializer
     ApplicationSettingDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
+    yield r'createdAt';
+    yield serializers.serialize(
+      object.createdAt,
+      specifiedType: const FullType(String),
+    );
     yield r'key';
     yield serializers.serialize(
       object.key,
       specifiedType: const FullType(String),
     );
-    yield r'value';
+    yield r'updatedAt';
     yield serializers.serialize(
-      object.value,
-      specifiedType: const FullType(BuiltMap, [
-        FullType(String),
-        FullType.nullable(JsonObject),
-      ]),
+      object.updatedAt,
+      specifiedType: const FullType(String),
     );
     if (object.updatedById != null) {
       yield r'updatedById';
@@ -88,15 +90,13 @@ class _$ApplicationSettingDtoSerializer
         specifiedType: const FullType(JsonObject),
       );
     }
-    yield r'createdAt';
+    yield r'value';
     yield serializers.serialize(
-      object.createdAt,
-      specifiedType: const FullType(String),
-    );
-    yield r'updatedAt';
-    yield serializers.serialize(
-      object.updatedAt,
-      specifiedType: const FullType(String),
+      object.value,
+      specifiedType: const FullType(BuiltMap, [
+        FullType(String),
+        FullType.nullable(JsonObject),
+      ]),
     );
   }
 
@@ -125,12 +125,33 @@ class _$ApplicationSettingDtoSerializer
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
+        case r'createdAt':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.createdAt = valueDes;
+          break;
         case r'key':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
           result.key = valueDes;
+          break;
+        case r'updatedAt':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.updatedAt = valueDes;
+          break;
+        case r'updatedById':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(JsonObject),
+          ) as JsonObject;
+          result.updatedById = valueDes;
           break;
         case r'value':
           final valueDes = serializers.deserialize(
@@ -141,27 +162,6 @@ class _$ApplicationSettingDtoSerializer
             ]),
           ) as BuiltMap<String, JsonObject?>;
           result.value.replace(valueDes);
-          break;
-        case r'updatedById':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(JsonObject),
-          ) as JsonObject;
-          result.updatedById = valueDes;
-          break;
-        case r'createdAt':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.createdAt = valueDes;
-          break;
-        case r'updatedAt':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.updatedAt = valueDes;
           break;
         default:
           unhandled.add(key);

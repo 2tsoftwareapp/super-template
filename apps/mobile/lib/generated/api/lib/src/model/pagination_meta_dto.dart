@@ -13,22 +13,22 @@ part 'pagination_meta_dto.g.dart';
 /// PaginationMetaDto
 ///
 /// Properties:
-/// * [requestId]
-/// * [page]
 /// * [limit]
+/// * [page]
+/// * [requestId]
 /// * [total]
 /// * [totalPages]
 @BuiltValue()
 abstract class PaginationMetaDto
     implements Built<PaginationMetaDto, PaginationMetaDtoBuilder> {
-  @BuiltValueField(wireName: r'requestId')
-  String get requestId;
+  @BuiltValueField(wireName: r'limit')
+  num get limit;
 
   @BuiltValueField(wireName: r'page')
   num get page;
 
-  @BuiltValueField(wireName: r'limit')
-  num get limit;
+  @BuiltValueField(wireName: r'requestId')
+  String get requestId;
 
   @BuiltValueField(wireName: r'total')
   num get total;
@@ -62,20 +62,20 @@ class _$PaginationMetaDtoSerializer
     PaginationMetaDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'requestId';
+    yield r'limit';
     yield serializers.serialize(
-      object.requestId,
-      specifiedType: const FullType(String),
+      object.limit,
+      specifiedType: const FullType(num),
     );
     yield r'page';
     yield serializers.serialize(
       object.page,
       specifiedType: const FullType(num),
     );
-    yield r'limit';
+    yield r'requestId';
     yield serializers.serialize(
-      object.limit,
-      specifiedType: const FullType(num),
+      object.requestId,
+      specifiedType: const FullType(String),
     );
     yield r'total';
     yield serializers.serialize(
@@ -114,22 +114,22 @@ class _$PaginationMetaDtoSerializer
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'requestId':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.requestId = valueDes;
+        case r'limit':
+          final valueDes = serializers.deserialize(value,
+              specifiedType: const FullType(num)) as num;
+          result.limit = valueDes;
           break;
         case r'page':
           final valueDes = serializers.deserialize(value,
               specifiedType: const FullType(num)) as num;
           result.page = valueDes;
           break;
-        case r'limit':
-          final valueDes = serializers.deserialize(value,
-              specifiedType: const FullType(num)) as num;
-          result.limit = valueDes;
+        case r'requestId':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.requestId = valueDes;
           break;
         case r'total':
           final valueDes = serializers.deserialize(value,

@@ -89,21 +89,21 @@ class _$SendNotificationRequestDto extends SendNotificationRequestDto {
   @override
   final SendNotificationRequestDtoAudienceEnum audience;
   @override
-  final String? userId;
-  @override
-  final BuiltList<String>? userIds;
-  @override
-  final String type;
-  @override
-  final String title;
-  @override
   final String body;
   @override
   final BuiltMap<String, JsonObject?>? data;
   @override
+  final String? idempotencyKey;
+  @override
   final String? scheduledAt;
   @override
-  final String? idempotencyKey;
+  final String title;
+  @override
+  final String type;
+  @override
+  final String? userId;
+  @override
+  final BuiltList<String>? userIds;
 
   factory _$SendNotificationRequestDto([
     void Function(SendNotificationRequestDtoBuilder)? updates,
@@ -112,14 +112,14 @@ class _$SendNotificationRequestDto extends SendNotificationRequestDto {
 
   _$SendNotificationRequestDto._({
     required this.audience,
-    this.userId,
-    this.userIds,
-    required this.type,
-    required this.title,
     required this.body,
     this.data,
-    this.scheduledAt,
     this.idempotencyKey,
+    this.scheduledAt,
+    required this.title,
+    required this.type,
+    this.userId,
+    this.userIds,
   }) : super._();
   @override
   SendNotificationRequestDto rebuild(
@@ -136,28 +136,28 @@ class _$SendNotificationRequestDto extends SendNotificationRequestDto {
     if (identical(other, this)) return true;
     return other is SendNotificationRequestDto &&
         audience == other.audience &&
-        userId == other.userId &&
-        userIds == other.userIds &&
-        type == other.type &&
-        title == other.title &&
         body == other.body &&
         data == other.data &&
+        idempotencyKey == other.idempotencyKey &&
         scheduledAt == other.scheduledAt &&
-        idempotencyKey == other.idempotencyKey;
+        title == other.title &&
+        type == other.type &&
+        userId == other.userId &&
+        userIds == other.userIds;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
     _$hash = $jc(_$hash, audience.hashCode);
-    _$hash = $jc(_$hash, userId.hashCode);
-    _$hash = $jc(_$hash, userIds.hashCode);
-    _$hash = $jc(_$hash, type.hashCode);
-    _$hash = $jc(_$hash, title.hashCode);
     _$hash = $jc(_$hash, body.hashCode);
     _$hash = $jc(_$hash, data.hashCode);
-    _$hash = $jc(_$hash, scheduledAt.hashCode);
     _$hash = $jc(_$hash, idempotencyKey.hashCode);
+    _$hash = $jc(_$hash, scheduledAt.hashCode);
+    _$hash = $jc(_$hash, title.hashCode);
+    _$hash = $jc(_$hash, type.hashCode);
+    _$hash = $jc(_$hash, userId.hashCode);
+    _$hash = $jc(_$hash, userIds.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -166,14 +166,14 @@ class _$SendNotificationRequestDto extends SendNotificationRequestDto {
   String toString() {
     return (newBuiltValueToStringHelper(r'SendNotificationRequestDto')
           ..add('audience', audience)
-          ..add('userId', userId)
-          ..add('userIds', userIds)
-          ..add('type', type)
-          ..add('title', title)
           ..add('body', body)
           ..add('data', data)
+          ..add('idempotencyKey', idempotencyKey)
           ..add('scheduledAt', scheduledAt)
-          ..add('idempotencyKey', idempotencyKey))
+          ..add('title', title)
+          ..add('type', type)
+          ..add('userId', userId)
+          ..add('userIds', userIds))
         .toString();
   }
 }
@@ -188,22 +188,6 @@ class SendNotificationRequestDtoBuilder
   set audience(SendNotificationRequestDtoAudienceEnum? audience) =>
       _$this._audience = audience;
 
-  String? _userId;
-  String? get userId => _$this._userId;
-  set userId(String? userId) => _$this._userId = userId;
-
-  ListBuilder<String>? _userIds;
-  ListBuilder<String> get userIds => _$this._userIds ??= ListBuilder<String>();
-  set userIds(ListBuilder<String>? userIds) => _$this._userIds = userIds;
-
-  String? _type;
-  String? get type => _$this._type;
-  set type(String? type) => _$this._type = type;
-
-  String? _title;
-  String? get title => _$this._title;
-  set title(String? title) => _$this._title = title;
-
   String? _body;
   String? get body => _$this._body;
   set body(String? body) => _$this._body = body;
@@ -213,14 +197,30 @@ class SendNotificationRequestDtoBuilder
       _$this._data ??= MapBuilder<String, JsonObject?>();
   set data(MapBuilder<String, JsonObject?>? data) => _$this._data = data;
 
-  String? _scheduledAt;
-  String? get scheduledAt => _$this._scheduledAt;
-  set scheduledAt(String? scheduledAt) => _$this._scheduledAt = scheduledAt;
-
   String? _idempotencyKey;
   String? get idempotencyKey => _$this._idempotencyKey;
   set idempotencyKey(String? idempotencyKey) =>
       _$this._idempotencyKey = idempotencyKey;
+
+  String? _scheduledAt;
+  String? get scheduledAt => _$this._scheduledAt;
+  set scheduledAt(String? scheduledAt) => _$this._scheduledAt = scheduledAt;
+
+  String? _title;
+  String? get title => _$this._title;
+  set title(String? title) => _$this._title = title;
+
+  String? _type;
+  String? get type => _$this._type;
+  set type(String? type) => _$this._type = type;
+
+  String? _userId;
+  String? get userId => _$this._userId;
+  set userId(String? userId) => _$this._userId = userId;
+
+  ListBuilder<String>? _userIds;
+  ListBuilder<String> get userIds => _$this._userIds ??= ListBuilder<String>();
+  set userIds(ListBuilder<String>? userIds) => _$this._userIds = userIds;
 
   SendNotificationRequestDtoBuilder() {
     SendNotificationRequestDto._defaults(this);
@@ -230,14 +230,14 @@ class SendNotificationRequestDtoBuilder
     final $v = _$v;
     if ($v != null) {
       _audience = $v.audience;
-      _userId = $v.userId;
-      _userIds = $v.userIds?.toBuilder();
-      _type = $v.type;
-      _title = $v.title;
       _body = $v.body;
       _data = $v.data?.toBuilder();
-      _scheduledAt = $v.scheduledAt;
       _idempotencyKey = $v.idempotencyKey;
+      _scheduledAt = $v.scheduledAt;
+      _title = $v.title;
+      _type = $v.type;
+      _userId = $v.userId;
+      _userIds = $v.userIds?.toBuilder();
       _$v = null;
     }
     return this;
@@ -266,35 +266,35 @@ class SendNotificationRequestDtoBuilder
               r'SendNotificationRequestDto',
               'audience',
             ),
-            userId: userId,
-            userIds: _userIds?.build(),
-            type: BuiltValueNullFieldError.checkNotNull(
-              type,
-              r'SendNotificationRequestDto',
-              'type',
-            ),
-            title: BuiltValueNullFieldError.checkNotNull(
-              title,
-              r'SendNotificationRequestDto',
-              'title',
-            ),
             body: BuiltValueNullFieldError.checkNotNull(
               body,
               r'SendNotificationRequestDto',
               'body',
             ),
             data: _data?.build(),
-            scheduledAt: scheduledAt,
             idempotencyKey: idempotencyKey,
+            scheduledAt: scheduledAt,
+            title: BuiltValueNullFieldError.checkNotNull(
+              title,
+              r'SendNotificationRequestDto',
+              'title',
+            ),
+            type: BuiltValueNullFieldError.checkNotNull(
+              type,
+              r'SendNotificationRequestDto',
+              'type',
+            ),
+            userId: userId,
+            userIds: _userIds?.build(),
           );
     } catch (_) {
       late String _$failedField;
       try {
-        _$failedField = 'userIds';
-        _userIds?.build();
-
         _$failedField = 'data';
         _data?.build();
+
+        _$failedField = 'userIds';
+        _userIds?.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
           r'SendNotificationRequestDto',

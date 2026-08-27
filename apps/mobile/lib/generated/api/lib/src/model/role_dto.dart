@@ -15,36 +15,36 @@ part 'role_dto.g.dart';
 /// RoleDto
 ///
 /// Properties:
-/// * [id]
-/// * [organizationId]
-/// * [name]
 /// * [description]
-/// * [scope]
+/// * [id]
 /// * [isSystem]
+/// * [name]
+/// * [organizationId]
 /// * [permissions]
+/// * [scope]
 @BuiltValue()
 abstract class RoleDto implements Built<RoleDto, RoleDtoBuilder> {
-  @BuiltValueField(wireName: r'id')
-  String get id;
-
-  @BuiltValueField(wireName: r'organizationId')
-  String? get organizationId;
-
-  @BuiltValueField(wireName: r'name')
-  String get name;
-
   @BuiltValueField(wireName: r'description')
   String? get description;
 
-  @BuiltValueField(wireName: r'scope')
-  RoleDtoScopeEnum get scope;
-  // enum scopeEnum {  platform,  organization,  };
+  @BuiltValueField(wireName: r'id')
+  String get id;
 
   @BuiltValueField(wireName: r'isSystem')
   bool get isSystem;
 
+  @BuiltValueField(wireName: r'name')
+  String get name;
+
+  @BuiltValueField(wireName: r'organizationId')
+  String? get organizationId;
+
   @BuiltValueField(wireName: r'permissions')
   BuiltList<PermissionDto> get permissions;
+
+  @BuiltValueField(wireName: r'scope')
+  RoleDtoScopeEnum get scope;
+  // enum scopeEnum {  platform,  organization,  };
 
   RoleDto._();
 
@@ -69,9 +69,26 @@ class _$RoleDtoSerializer implements PrimitiveSerializer<RoleDto> {
     RoleDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
+    yield r'description';
+    yield object.description == null
+        ? null
+        : serializers.serialize(
+            object.description,
+            specifiedType: const FullType.nullable(String),
+          );
     yield r'id';
     yield serializers.serialize(
       object.id,
+      specifiedType: const FullType(String),
+    );
+    yield r'isSystem';
+    yield serializers.serialize(
+      object.isSystem,
+      specifiedType: const FullType(bool),
+    );
+    yield r'name';
+    yield serializers.serialize(
+      object.name,
       specifiedType: const FullType(String),
     );
     yield r'organizationId';
@@ -81,32 +98,15 @@ class _$RoleDtoSerializer implements PrimitiveSerializer<RoleDto> {
             object.organizationId,
             specifiedType: const FullType.nullable(String),
           );
-    yield r'name';
-    yield serializers.serialize(
-      object.name,
-      specifiedType: const FullType(String),
-    );
-    yield r'description';
-    yield object.description == null
-        ? null
-        : serializers.serialize(
-            object.description,
-            specifiedType: const FullType.nullable(String),
-          );
-    yield r'scope';
-    yield serializers.serialize(
-      object.scope,
-      specifiedType: const FullType(RoleDtoScopeEnum),
-    );
-    yield r'isSystem';
-    yield serializers.serialize(
-      object.isSystem,
-      specifiedType: const FullType(bool),
-    );
     yield r'permissions';
     yield serializers.serialize(
       object.permissions,
       specifiedType: const FullType(BuiltList, [FullType(PermissionDto)]),
+    );
+    yield r'scope';
+    yield serializers.serialize(
+      object.scope,
+      specifiedType: const FullType(RoleDtoScopeEnum),
     );
   }
 
@@ -135,12 +135,34 @@ class _$RoleDtoSerializer implements PrimitiveSerializer<RoleDto> {
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
+        case r'description':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
+          if (valueDes == null) continue;
+          result.description = valueDes;
+          break;
         case r'id':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
           result.id = valueDes;
+          break;
+        case r'isSystem':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(bool),
+          ) as bool;
+          result.isSystem = valueDes;
+          break;
+        case r'name':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.name = valueDes;
           break;
         case r'organizationId':
           final valueDes = serializers.deserialize(
@@ -150,35 +172,6 @@ class _$RoleDtoSerializer implements PrimitiveSerializer<RoleDto> {
           if (valueDes == null) continue;
           result.organizationId = valueDes;
           break;
-        case r'name':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.name = valueDes;
-          break;
-        case r'description':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType.nullable(String),
-          ) as String?;
-          if (valueDes == null) continue;
-          result.description = valueDes;
-          break;
-        case r'scope':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(RoleDtoScopeEnum),
-          ) as RoleDtoScopeEnum;
-          result.scope = valueDes;
-          break;
-        case r'isSystem':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(bool),
-          ) as bool;
-          result.isSystem = valueDes;
-          break;
         case r'permissions':
           final valueDes = serializers.deserialize(
             value,
@@ -187,6 +180,13 @@ class _$RoleDtoSerializer implements PrimitiveSerializer<RoleDto> {
             ]),
           ) as BuiltList<PermissionDto>;
           result.permissions.replace(valueDes);
+          break;
+        case r'scope':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(RoleDtoScopeEnum),
+          ) as RoleDtoScopeEnum;
+          result.scope = valueDes;
           break;
         default:
           unhandled.add(key);

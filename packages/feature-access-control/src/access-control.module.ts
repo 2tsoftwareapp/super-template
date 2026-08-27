@@ -6,6 +6,7 @@ import {
   ORGANIZATION_CUSTOM_ROLES_PURGE,
   ORGANIZATION_USER_ROLES_PURGE,
 } from "@repo/feature-organizations/contracts";
+import { USER_ACCESS_CONTROL, USER_PROFILE_INVALIDATOR } from "@repo/feature-users/contracts";
 
 import { AccessControlMapper } from "./application/access-control.mapper";
 import { AccessControlService } from "./application/access-control.service";
@@ -21,20 +22,12 @@ import { UpdateCustomRoleUseCase } from "./application/use-cases/update-custom-r
 import { AccessControlPermissionPersistence } from "./infrastructure/access-control-permission.persistence";
 import { AccessControlRolePersistence } from "./infrastructure/access-control-role.persistence";
 import { AccessControlRepository } from "./infrastructure/access-control.repository";
-import {
-  OrganizationAccessControlAdapter,
-} from "./infrastructure/organization-access-control.adapter";
-import {
-  OrganizationCustomRolesPurgeAdapter,
-} from "./infrastructure/organization-custom-roles-purge.adapter";
+import { OrganizationAccessControlAdapter } from "./infrastructure/organization-access-control.adapter";
+import { OrganizationCustomRolesPurgeAdapter } from "./infrastructure/organization-custom-roles-purge.adapter";
 import { UserRoleAssignmentsPersistence } from "./infrastructure/user-role-assignments.persistence";
 import { AdminRolesController } from "./presentation/admin-roles.controller";
 import { ACCESS_CONTROL_REPOSITORY } from "./public/access-control-repository.token";
 import { USER_ROLE_ASSIGNMENTS } from "./public/user-role-assignments.token";
-import {
-  USER_ACCESS_CONTROL,
-  USER_PROFILE_INVALIDATOR,
-} from "@repo/feature-users/contracts";
 
 @Global()
 @Module({

@@ -8,7 +8,7 @@ import { FileAccessService } from "@repo/feature-upload/contracts";
 import type { ImportValidationError } from "../../../public/contracts";
 import type { ImportJobView } from "../imports.types";
 
-import { ImportExportAdapterRegistry } from "../../../public/contracts";
+import { ImportExportAdapterRegistry } from "../../../infrastructure/import-export-adapter.registry";
 import { canAccessImportJob } from "../../domain/import-access.policy";
 import { ImportsMapper } from "../imports.mapper";
 import {

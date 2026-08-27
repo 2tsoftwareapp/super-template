@@ -14,7 +14,7 @@ import 'package:super_template_api/src/api_util.dart';
 import 'package:super_template_api/src/model/admin_roles_controller_delete_role200_response.dart';
 import 'package:super_template_api/src/model/auth_login_controller_login201_response.dart';
 import 'package:super_template_api/src/model/auth_login_controller_verify_mfa_challenge201_response.dart';
-import 'package:super_template_api/src/model/auth_registration_controller_register201_response.dart';
+import 'package:super_template_api/src/model/auth_recovery_controller_forgot_password201_response.dart';
 import 'package:super_template_api/src/model/auth_session_controller_get_me200_response.dart';
 import 'package:super_template_api/src/model/auth_session_controller_get_sessions200_response.dart';
 import 'package:super_template_api/src/model/auth_session_controller_switch_organization201_response.dart';
@@ -320,9 +320,9 @@ class AuthApi {
   /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
   /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
   ///
-  /// Returns a [Future] containing a [Response] with a [AuthRegistrationControllerRegister201Response] as data
+  /// Returns a [Future] containing a [Response] with a [AuthRecoveryControllerForgotPassword201Response] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<AuthRegistrationControllerRegister201Response>>
+  Future<Response<AuthRecoveryControllerForgotPassword201Response>>
       authRecoveryControllerForgotPassword({
     required ForgotPasswordDto forgotPasswordDto,
     CancelToken? cancelToken,
@@ -372,7 +372,7 @@ class AuthApi {
       onReceiveProgress: onReceiveProgress,
     );
 
-    AuthRegistrationControllerRegister201Response? _responseData;
+    AuthRecoveryControllerForgotPassword201Response? _responseData;
 
     try {
       final rawResponse = _response.data;
@@ -381,9 +381,9 @@ class AuthApi {
           : _serializers.deserialize(
               rawResponse,
               specifiedType: const FullType(
-                AuthRegistrationControllerRegister201Response,
+                AuthRecoveryControllerForgotPassword201Response,
               ),
-            ) as AuthRegistrationControllerRegister201Response;
+            ) as AuthRecoveryControllerForgotPassword201Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -394,7 +394,7 @@ class AuthApi {
       );
     }
 
-    return Response<AuthRegistrationControllerRegister201Response>(
+    return Response<AuthRecoveryControllerForgotPassword201Response>(
       data: _responseData,
       headers: _response.headers,
       isRedirect: _response.isRedirect,
@@ -516,9 +516,9 @@ class AuthApi {
   /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
   /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
   ///
-  /// Returns a [Future] containing a [Response] with a [AuthRegistrationControllerRegister201Response] as data
+  /// Returns a [Future] containing a [Response] with a [AuthRecoveryControllerForgotPassword201Response] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<AuthRegistrationControllerRegister201Response>>
+  Future<Response<AuthRecoveryControllerForgotPassword201Response>>
       authRegistrationControllerRegister({
     required RegisterDto registerDto,
     CancelToken? cancelToken,
@@ -565,7 +565,7 @@ class AuthApi {
       onReceiveProgress: onReceiveProgress,
     );
 
-    AuthRegistrationControllerRegister201Response? _responseData;
+    AuthRecoveryControllerForgotPassword201Response? _responseData;
 
     try {
       final rawResponse = _response.data;
@@ -574,9 +574,9 @@ class AuthApi {
           : _serializers.deserialize(
               rawResponse,
               specifiedType: const FullType(
-                AuthRegistrationControllerRegister201Response,
+                AuthRecoveryControllerForgotPassword201Response,
               ),
-            ) as AuthRegistrationControllerRegister201Response;
+            ) as AuthRecoveryControllerForgotPassword201Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -587,7 +587,7 @@ class AuthApi {
       );
     }
 
-    return Response<AuthRegistrationControllerRegister201Response>(
+    return Response<AuthRecoveryControllerForgotPassword201Response>(
       data: _responseData,
       headers: _response.headers,
       isRedirect: _response.isRedirect,
@@ -611,9 +611,9 @@ class AuthApi {
   /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
   /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
   ///
-  /// Returns a [Future] containing a [Response] with a [AuthRegistrationControllerRegister201Response] as data
+  /// Returns a [Future] containing a [Response] with a [AuthRecoveryControllerForgotPassword201Response] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<AuthRegistrationControllerRegister201Response>>
+  Future<Response<AuthRecoveryControllerForgotPassword201Response>>
       authRegistrationControllerResendVerification({
     required ResendVerificationDto resendVerificationDto,
     CancelToken? cancelToken,
@@ -663,7 +663,7 @@ class AuthApi {
       onReceiveProgress: onReceiveProgress,
     );
 
-    AuthRegistrationControllerRegister201Response? _responseData;
+    AuthRecoveryControllerForgotPassword201Response? _responseData;
 
     try {
       final rawResponse = _response.data;
@@ -672,9 +672,9 @@ class AuthApi {
           : _serializers.deserialize(
               rawResponse,
               specifiedType: const FullType(
-                AuthRegistrationControllerRegister201Response,
+                AuthRecoveryControllerForgotPassword201Response,
               ),
-            ) as AuthRegistrationControllerRegister201Response;
+            ) as AuthRecoveryControllerForgotPassword201Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -685,7 +685,7 @@ class AuthApi {
       );
     }
 
-    return Response<AuthRegistrationControllerRegister201Response>(
+    return Response<AuthRecoveryControllerForgotPassword201Response>(
       data: _responseData,
       headers: _response.headers,
       isRedirect: _response.isRedirect,

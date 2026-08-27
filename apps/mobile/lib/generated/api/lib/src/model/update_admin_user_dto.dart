@@ -14,20 +14,20 @@ part 'update_admin_user_dto.g.dart';
 /// UpdateAdminUserDto
 ///
 /// Properties:
-/// * [email]
-/// * [displayName]
 /// * [avatarUrl]
+/// * [displayName]
+/// * [email]
 @BuiltValue()
 abstract class UpdateAdminUserDto
     implements Built<UpdateAdminUserDto, UpdateAdminUserDtoBuilder> {
-  @BuiltValueField(wireName: r'email')
-  String? get email;
+  @BuiltValueField(wireName: r'avatarUrl')
+  JsonObject? get avatarUrl;
 
   @BuiltValueField(wireName: r'displayName')
   String? get displayName;
 
-  @BuiltValueField(wireName: r'avatarUrl')
-  JsonObject? get avatarUrl;
+  @BuiltValueField(wireName: r'email')
+  String? get email;
 
   UpdateAdminUserDto._();
 
@@ -55,11 +55,11 @@ class _$UpdateAdminUserDtoSerializer
     UpdateAdminUserDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    if (object.email != null) {
-      yield r'email';
+    if (object.avatarUrl != null) {
+      yield r'avatarUrl';
       yield serializers.serialize(
-        object.email,
-        specifiedType: const FullType(String),
+        object.avatarUrl,
+        specifiedType: const FullType(JsonObject),
       );
     }
     if (object.displayName != null) {
@@ -69,11 +69,11 @@ class _$UpdateAdminUserDtoSerializer
         specifiedType: const FullType(String),
       );
     }
-    if (object.avatarUrl != null) {
-      yield r'avatarUrl';
+    if (object.email != null) {
+      yield r'email';
       yield serializers.serialize(
-        object.avatarUrl,
-        specifiedType: const FullType(JsonObject),
+        object.email,
+        specifiedType: const FullType(String),
       );
     }
   }
@@ -103,12 +103,12 @@ class _$UpdateAdminUserDtoSerializer
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'email':
+        case r'avatarUrl':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.email = valueDes;
+            specifiedType: const FullType(JsonObject),
+          ) as JsonObject;
+          result.avatarUrl = valueDes;
           break;
         case r'displayName':
           final valueDes = serializers.deserialize(
@@ -117,12 +117,12 @@ class _$UpdateAdminUserDtoSerializer
           ) as String;
           result.displayName = valueDes;
           break;
-        case r'avatarUrl':
+        case r'email':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(JsonObject),
-          ) as JsonObject;
-          result.avatarUrl = valueDes;
+            specifiedType: const FullType(String),
+          ) as String;
+          result.email = valueDes;
           break;
         default:
           unhandled.add(key);

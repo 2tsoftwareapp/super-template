@@ -15,40 +15,40 @@ part 'activity_dto.g.dart';
 /// ActivityDto
 ///
 /// Properties:
-/// * [id]
-/// * [summary]
-/// * [entityType]
-/// * [entityId]
 /// * [actorId]
-/// * [visibility]
-/// * [metadata]
 /// * [createdAt]
+/// * [entityId]
+/// * [entityType]
+/// * [id]
+/// * [metadata]
+/// * [summary]
+/// * [visibility]
 @BuiltValue()
 abstract class ActivityDto implements Built<ActivityDto, ActivityDtoBuilder> {
-  @BuiltValueField(wireName: r'id')
-  String get id;
+  @BuiltValueField(wireName: r'actorId')
+  String? get actorId;
 
-  @BuiltValueField(wireName: r'summary')
-  String get summary;
-
-  @BuiltValueField(wireName: r'entityType')
-  String get entityType;
+  @BuiltValueField(wireName: r'createdAt')
+  String get createdAt;
 
   @BuiltValueField(wireName: r'entityId')
   String get entityId;
 
-  @BuiltValueField(wireName: r'actorId')
-  String? get actorId;
+  @BuiltValueField(wireName: r'entityType')
+  String get entityType;
 
-  @BuiltValueField(wireName: r'visibility')
-  ActivityDtoVisibilityEnum get visibility;
-  // enum visibilityEnum {  PUBLIC,  PRIVATE,  INTERNAL,  };
+  @BuiltValueField(wireName: r'id')
+  String get id;
 
   @BuiltValueField(wireName: r'metadata')
   BuiltMap<String, JsonObject?>? get metadata;
 
-  @BuiltValueField(wireName: r'createdAt')
-  String get createdAt;
+  @BuiltValueField(wireName: r'summary')
+  String get summary;
+
+  @BuiltValueField(wireName: r'visibility')
+  ActivityDtoVisibilityEnum get visibility;
+  // enum visibilityEnum {  PUBLIC,  PRIVATE,  INTERNAL,  };
 
   ActivityDto._();
 
@@ -73,26 +73,6 @@ class _$ActivityDtoSerializer implements PrimitiveSerializer<ActivityDto> {
     ActivityDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'id';
-    yield serializers.serialize(
-      object.id,
-      specifiedType: const FullType(String),
-    );
-    yield r'summary';
-    yield serializers.serialize(
-      object.summary,
-      specifiedType: const FullType(String),
-    );
-    yield r'entityType';
-    yield serializers.serialize(
-      object.entityType,
-      specifiedType: const FullType(String),
-    );
-    yield r'entityId';
-    yield serializers.serialize(
-      object.entityId,
-      specifiedType: const FullType(String),
-    );
     if (object.actorId != null) {
       yield r'actorId';
       yield serializers.serialize(
@@ -100,10 +80,25 @@ class _$ActivityDtoSerializer implements PrimitiveSerializer<ActivityDto> {
         specifiedType: const FullType.nullable(String),
       );
     }
-    yield r'visibility';
+    yield r'createdAt';
     yield serializers.serialize(
-      object.visibility,
-      specifiedType: const FullType(ActivityDtoVisibilityEnum),
+      object.createdAt,
+      specifiedType: const FullType(String),
+    );
+    yield r'entityId';
+    yield serializers.serialize(
+      object.entityId,
+      specifiedType: const FullType(String),
+    );
+    yield r'entityType';
+    yield serializers.serialize(
+      object.entityType,
+      specifiedType: const FullType(String),
+    );
+    yield r'id';
+    yield serializers.serialize(
+      object.id,
+      specifiedType: const FullType(String),
     );
     if (object.metadata != null) {
       yield r'metadata';
@@ -115,10 +110,15 @@ class _$ActivityDtoSerializer implements PrimitiveSerializer<ActivityDto> {
         ]),
       );
     }
-    yield r'createdAt';
+    yield r'summary';
     yield serializers.serialize(
-      object.createdAt,
+      object.summary,
       specifiedType: const FullType(String),
+    );
+    yield r'visibility';
+    yield serializers.serialize(
+      object.visibility,
+      specifiedType: const FullType(ActivityDtoVisibilityEnum),
     );
   }
 
@@ -147,34 +147,6 @@ class _$ActivityDtoSerializer implements PrimitiveSerializer<ActivityDto> {
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'id':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.id = valueDes;
-          break;
-        case r'summary':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.summary = valueDes;
-          break;
-        case r'entityType':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.entityType = valueDes;
-          break;
-        case r'entityId':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.entityId = valueDes;
-          break;
         case r'actorId':
           final valueDes = serializers.deserialize(
             value,
@@ -183,12 +155,33 @@ class _$ActivityDtoSerializer implements PrimitiveSerializer<ActivityDto> {
           if (valueDes == null) continue;
           result.actorId = valueDes;
           break;
-        case r'visibility':
+        case r'createdAt':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(ActivityDtoVisibilityEnum),
-          ) as ActivityDtoVisibilityEnum;
-          result.visibility = valueDes;
+            specifiedType: const FullType(String),
+          ) as String;
+          result.createdAt = valueDes;
+          break;
+        case r'entityId':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.entityId = valueDes;
+          break;
+        case r'entityType':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.entityType = valueDes;
+          break;
+        case r'id':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.id = valueDes;
           break;
         case r'metadata':
           final valueDes = serializers.deserialize(
@@ -200,12 +193,19 @@ class _$ActivityDtoSerializer implements PrimitiveSerializer<ActivityDto> {
           ) as BuiltMap<String, JsonObject?>;
           result.metadata.replace(valueDes);
           break;
-        case r'createdAt':
+        case r'summary':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
-          result.createdAt = valueDes;
+          result.summary = valueDes;
+          break;
+        case r'visibility':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(ActivityDtoVisibilityEnum),
+          ) as ActivityDtoVisibilityEnum;
+          result.visibility = valueDes;
           break;
         default:
           unhandled.add(key);

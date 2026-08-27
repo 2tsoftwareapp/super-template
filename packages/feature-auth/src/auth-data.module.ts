@@ -1,5 +1,4 @@
 import { Module } from "@nestjs/common";
-
 import { UsersModule } from "@repo/feature-users/module";
 
 import { AUTH_SESSION_REPOSITORY } from "./application/ports/auth-session.repository.port";

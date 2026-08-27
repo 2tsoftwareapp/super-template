@@ -15,14 +15,17 @@ part 'device_token_dto.g.dart';
 ///
 /// Properties:
 /// * [id]
+/// * [lastUsedAt]
 /// * [platform]
 /// * [token]
-/// * [lastUsedAt]
 @BuiltValue()
 abstract class DeviceTokenDto
     implements Built<DeviceTokenDto, DeviceTokenDtoBuilder> {
   @BuiltValueField(wireName: r'id')
   String get id;
+
+  @BuiltValueField(wireName: r'lastUsedAt')
+  String get lastUsedAt;
 
   @BuiltValueField(wireName: r'platform')
   DeviceTokenDtoPlatformEnum get platform;
@@ -30,9 +33,6 @@ abstract class DeviceTokenDto
 
   @BuiltValueField(wireName: r'token')
   String get token;
-
-  @BuiltValueField(wireName: r'lastUsedAt')
-  String get lastUsedAt;
 
   DeviceTokenDto._();
 
@@ -65,6 +65,11 @@ class _$DeviceTokenDtoSerializer
       object.id,
       specifiedType: const FullType(String),
     );
+    yield r'lastUsedAt';
+    yield serializers.serialize(
+      object.lastUsedAt,
+      specifiedType: const FullType(String),
+    );
     yield r'platform';
     yield serializers.serialize(
       object.platform,
@@ -73,11 +78,6 @@ class _$DeviceTokenDtoSerializer
     yield r'token';
     yield serializers.serialize(
       object.token,
-      specifiedType: const FullType(String),
-    );
-    yield r'lastUsedAt';
-    yield serializers.serialize(
-      object.lastUsedAt,
       specifiedType: const FullType(String),
     );
   }
@@ -114,6 +114,13 @@ class _$DeviceTokenDtoSerializer
           ) as String;
           result.id = valueDes;
           break;
+        case r'lastUsedAt':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.lastUsedAt = valueDes;
+          break;
         case r'platform':
           final valueDes = serializers.deserialize(
             value,
@@ -127,13 +134,6 @@ class _$DeviceTokenDtoSerializer
             specifiedType: const FullType(String),
           ) as String;
           result.token = valueDes;
-          break;
-        case r'lastUsedAt':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.lastUsedAt = valueDes;
           break;
         default:
           unhandled.add(key);

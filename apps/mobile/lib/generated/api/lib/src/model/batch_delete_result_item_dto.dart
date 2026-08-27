@@ -13,21 +13,21 @@ part 'batch_delete_result_item_dto.g.dart';
 /// BatchDeleteResultItemDto
 ///
 /// Properties:
+/// * [error]
 /// * [fileId]
 /// * [success]
-/// * [error]
 @BuiltValue()
 abstract class BatchDeleteResultItemDto
     implements
         Built<BatchDeleteResultItemDto, BatchDeleteResultItemDtoBuilder> {
+  @BuiltValueField(wireName: r'error')
+  String? get error;
+
   @BuiltValueField(wireName: r'fileId')
   String get fileId;
 
   @BuiltValueField(wireName: r'success')
   bool get success;
-
-  @BuiltValueField(wireName: r'error')
-  String? get error;
 
   BatchDeleteResultItemDto._();
 
@@ -59,6 +59,13 @@ class _$BatchDeleteResultItemDtoSerializer
     BatchDeleteResultItemDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
+    if (object.error != null) {
+      yield r'error';
+      yield serializers.serialize(
+        object.error,
+        specifiedType: const FullType.nullable(String),
+      );
+    }
     yield r'fileId';
     yield serializers.serialize(
       object.fileId,
@@ -69,13 +76,6 @@ class _$BatchDeleteResultItemDtoSerializer
       object.success,
       specifiedType: const FullType(bool),
     );
-    if (object.error != null) {
-      yield r'error';
-      yield serializers.serialize(
-        object.error,
-        specifiedType: const FullType.nullable(String),
-      );
-    }
   }
 
   @override
@@ -103,6 +103,14 @@ class _$BatchDeleteResultItemDtoSerializer
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
+        case r'error':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
+          if (valueDes == null) continue;
+          result.error = valueDes;
+          break;
         case r'fileId':
           final valueDes = serializers.deserialize(
             value,
@@ -116,14 +124,6 @@ class _$BatchDeleteResultItemDtoSerializer
             specifiedType: const FullType(bool),
           ) as bool;
           result.success = valueDes;
-          break;
-        case r'error':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType.nullable(String),
-          ) as String?;
-          if (valueDes == null) continue;
-          result.error = valueDes;
           break;
         default:
           unhandled.add(key);

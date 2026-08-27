@@ -13,43 +13,43 @@ part 'file_dto.g.dart';
 /// FileDto
 ///
 /// Properties:
-/// * [id]
-/// * [originalName]
-/// * [mimeType]
-/// * [sizeBytes]
 /// * [checksum]
-/// * [latestVersion]
-/// * [uploadedById]
 /// * [createdAt]
+/// * [id]
+/// * [latestVersion]
+/// * [mimeType]
+/// * [originalName]
+/// * [sizeBytes]
 /// * [updatedAt]
+/// * [uploadedById]
 @BuiltValue()
 abstract class FileDto implements Built<FileDto, FileDtoBuilder> {
-  @BuiltValueField(wireName: r'id')
-  String get id;
-
-  @BuiltValueField(wireName: r'originalName')
-  String get originalName;
-
-  @BuiltValueField(wireName: r'mimeType')
-  String get mimeType;
-
-  @BuiltValueField(wireName: r'sizeBytes')
-  num get sizeBytes;
-
   @BuiltValueField(wireName: r'checksum')
   String? get checksum;
-
-  @BuiltValueField(wireName: r'latestVersion')
-  num get latestVersion;
-
-  @BuiltValueField(wireName: r'uploadedById')
-  String? get uploadedById;
 
   @BuiltValueField(wireName: r'createdAt')
   String get createdAt;
 
+  @BuiltValueField(wireName: r'id')
+  String get id;
+
+  @BuiltValueField(wireName: r'latestVersion')
+  num get latestVersion;
+
+  @BuiltValueField(wireName: r'mimeType')
+  String get mimeType;
+
+  @BuiltValueField(wireName: r'originalName')
+  String get originalName;
+
+  @BuiltValueField(wireName: r'sizeBytes')
+  num get sizeBytes;
+
   @BuiltValueField(wireName: r'updatedAt')
   String get updatedAt;
+
+  @BuiltValueField(wireName: r'uploadedById')
+  String? get uploadedById;
 
   FileDto._();
 
@@ -74,26 +74,6 @@ class _$FileDtoSerializer implements PrimitiveSerializer<FileDto> {
     FileDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'id';
-    yield serializers.serialize(
-      object.id,
-      specifiedType: const FullType(String),
-    );
-    yield r'originalName';
-    yield serializers.serialize(
-      object.originalName,
-      specifiedType: const FullType(String),
-    );
-    yield r'mimeType';
-    yield serializers.serialize(
-      object.mimeType,
-      specifiedType: const FullType(String),
-    );
-    yield r'sizeBytes';
-    yield serializers.serialize(
-      object.sizeBytes,
-      specifiedType: const FullType(num),
-    );
     if (object.checksum != null) {
       yield r'checksum';
       yield serializers.serialize(
@@ -101,10 +81,40 @@ class _$FileDtoSerializer implements PrimitiveSerializer<FileDto> {
         specifiedType: const FullType.nullable(String),
       );
     }
+    yield r'createdAt';
+    yield serializers.serialize(
+      object.createdAt,
+      specifiedType: const FullType(String),
+    );
+    yield r'id';
+    yield serializers.serialize(
+      object.id,
+      specifiedType: const FullType(String),
+    );
     yield r'latestVersion';
     yield serializers.serialize(
       object.latestVersion,
       specifiedType: const FullType(num),
+    );
+    yield r'mimeType';
+    yield serializers.serialize(
+      object.mimeType,
+      specifiedType: const FullType(String),
+    );
+    yield r'originalName';
+    yield serializers.serialize(
+      object.originalName,
+      specifiedType: const FullType(String),
+    );
+    yield r'sizeBytes';
+    yield serializers.serialize(
+      object.sizeBytes,
+      specifiedType: const FullType(num),
+    );
+    yield r'updatedAt';
+    yield serializers.serialize(
+      object.updatedAt,
+      specifiedType: const FullType(String),
     );
     yield r'uploadedById';
     yield object.uploadedById == null
@@ -113,16 +123,6 @@ class _$FileDtoSerializer implements PrimitiveSerializer<FileDto> {
             object.uploadedById,
             specifiedType: const FullType.nullable(String),
           );
-    yield r'createdAt';
-    yield serializers.serialize(
-      object.createdAt,
-      specifiedType: const FullType(String),
-    );
-    yield r'updatedAt';
-    yield serializers.serialize(
-      object.updatedAt,
-      specifiedType: const FullType(String),
-    );
   }
 
   @override
@@ -150,32 +150,6 @@ class _$FileDtoSerializer implements PrimitiveSerializer<FileDto> {
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'id':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.id = valueDes;
-          break;
-        case r'originalName':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.originalName = valueDes;
-          break;
-        case r'mimeType':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.mimeType = valueDes;
-          break;
-        case r'sizeBytes':
-          final valueDes = serializers.deserialize(value,
-              specifiedType: const FullType(num)) as num;
-          result.sizeBytes = valueDes;
-          break;
         case r'checksum':
           final valueDes = serializers.deserialize(
             value,
@@ -184,10 +158,50 @@ class _$FileDtoSerializer implements PrimitiveSerializer<FileDto> {
           if (valueDes == null) continue;
           result.checksum = valueDes;
           break;
+        case r'createdAt':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.createdAt = valueDes;
+          break;
+        case r'id':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.id = valueDes;
+          break;
         case r'latestVersion':
           final valueDes = serializers.deserialize(value,
               specifiedType: const FullType(num)) as num;
           result.latestVersion = valueDes;
+          break;
+        case r'mimeType':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.mimeType = valueDes;
+          break;
+        case r'originalName':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.originalName = valueDes;
+          break;
+        case r'sizeBytes':
+          final valueDes = serializers.deserialize(value,
+              specifiedType: const FullType(num)) as num;
+          result.sizeBytes = valueDes;
+          break;
+        case r'updatedAt':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.updatedAt = valueDes;
           break;
         case r'uploadedById':
           final valueDes = serializers.deserialize(
@@ -196,20 +210,6 @@ class _$FileDtoSerializer implements PrimitiveSerializer<FileDto> {
           ) as String?;
           if (valueDes == null) continue;
           result.uploadedById = valueDes;
-          break;
-        case r'createdAt':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.createdAt = valueDes;
-          break;
-        case r'updatedAt':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.updatedAt = valueDes;
           break;
         default:
           unhandled.add(key);

@@ -44,20 +44,21 @@ import 'package:super_template_api/src/model/attach_entity_dto.dart';
 import 'package:super_template_api/src/model/attachment_dto.dart';
 import 'package:super_template_api/src/model/attachments_controller_attach201_response.dart';
 import 'package:super_template_api/src/model/attachments_controller_list200_response.dart';
-import 'package:super_template_api/src/model/audit_controller_export_audit_logs201_response.dart';
 import 'package:super_template_api/src/model/audit_controller_get_audit_log200_response.dart';
 import 'package:super_template_api/src/model/audit_controller_list_audit_logs200_response.dart';
+import 'package:super_template_api/src/model/audit_export_controller_export_audit_logs201_response.dart';
 import 'package:super_template_api/src/model/audit_export_result_dto.dart';
 import 'package:super_template_api/src/model/audit_log_dto.dart';
 import 'package:super_template_api/src/model/auth_login_controller_login201_response.dart';
 import 'package:super_template_api/src/model/auth_login_controller_verify_mfa_challenge201_response.dart';
 import 'package:super_template_api/src/model/auth_me_dto.dart';
-import 'package:super_template_api/src/model/auth_registration_controller_register201_response.dart';
+import 'package:super_template_api/src/model/auth_recovery_controller_forgot_password201_response.dart';
 import 'package:super_template_api/src/model/auth_response_dto.dart';
 import 'package:super_template_api/src/model/auth_session_controller_get_me200_response.dart';
 import 'package:super_template_api/src/model/auth_session_controller_get_sessions200_response.dart';
 import 'package:super_template_api/src/model/auth_session_controller_switch_organization201_response.dart';
 import 'package:super_template_api/src/model/auth_session_dto.dart';
+import 'package:super_template_api/src/model/auth_user_dto.dart';
 import 'package:super_template_api/src/model/batch_delete_files_dto.dart';
 import 'package:super_template_api/src/model/batch_delete_result_dto.dart';
 import 'package:super_template_api/src/model/batch_delete_result_item_dto.dart';
@@ -188,20 +189,21 @@ part 'serializers.g.dart';
   AttachmentDto,
   AttachmentsControllerAttach201Response,
   AttachmentsControllerList200Response,
-  AuditControllerExportAuditLogs201Response,
   AuditControllerGetAuditLog200Response,
   AuditControllerListAuditLogs200Response,
+  AuditExportControllerExportAuditLogs201Response,
   AuditExportResultDto,
   AuditLogDto,
   AuthLoginControllerLogin201Response,
   AuthLoginControllerVerifyMfaChallenge201Response,
   AuthMeDto,
-  AuthRegistrationControllerRegister201Response,
+  AuthRecoveryControllerForgotPassword201Response,
   AuthResponseDto,
   AuthSessionControllerGetMe200Response,
   AuthSessionControllerGetSessions200Response,
   AuthSessionControllerSwitchOrganization201Response,
   AuthSessionDto,
+  AuthUserDto,
   BatchDeleteFilesDto,
   BatchDeleteResultDto,
   BatchDeleteResultItemDto,

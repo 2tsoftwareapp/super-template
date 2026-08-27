@@ -2,43 +2,46 @@
 
 // @dart=3.0
 
-part of 'audit_controller_export_audit_logs201_response.dart';
+part of 'audit_export_controller_export_audit_logs201_response.dart';
 
 // **************************************************************************
 // BuiltValueGenerator
 // **************************************************************************
 
-class _$AuditControllerExportAuditLogs201Response
-    extends AuditControllerExportAuditLogs201Response {
+class _$AuditExportControllerExportAuditLogs201Response
+    extends AuditExportControllerExportAuditLogs201Response {
   @override
   final AuditExportResultDto data;
   @override
   final RequestMetaDto meta;
 
-  factory _$AuditControllerExportAuditLogs201Response([
-    void Function(AuditControllerExportAuditLogs201ResponseBuilder)? updates,
+  factory _$AuditExportControllerExportAuditLogs201Response([
+    void Function(AuditExportControllerExportAuditLogs201ResponseBuilder)?
+        updates,
   ]) =>
-      (AuditControllerExportAuditLogs201ResponseBuilder()..update(updates))
+      (AuditExportControllerExportAuditLogs201ResponseBuilder()
+            ..update(updates))
           ._build();
 
-  _$AuditControllerExportAuditLogs201Response._({
+  _$AuditExportControllerExportAuditLogs201Response._({
     required this.data,
     required this.meta,
   }) : super._();
   @override
-  AuditControllerExportAuditLogs201Response rebuild(
-    void Function(AuditControllerExportAuditLogs201ResponseBuilder) updates,
+  AuditExportControllerExportAuditLogs201Response rebuild(
+    void Function(AuditExportControllerExportAuditLogs201ResponseBuilder)
+        updates,
   ) =>
       (toBuilder()..update(updates)).build();
 
   @override
-  AuditControllerExportAuditLogs201ResponseBuilder toBuilder() =>
-      AuditControllerExportAuditLogs201ResponseBuilder()..replace(this);
+  AuditExportControllerExportAuditLogs201ResponseBuilder toBuilder() =>
+      AuditExportControllerExportAuditLogs201ResponseBuilder()..replace(this);
 
   @override
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
-    return other is AuditControllerExportAuditLogs201Response &&
+    return other is AuditExportControllerExportAuditLogs201Response &&
         data == other.data &&
         meta == other.meta;
   }
@@ -55,7 +58,7 @@ class _$AuditControllerExportAuditLogs201Response
   @override
   String toString() {
     return (newBuiltValueToStringHelper(
-      r'AuditControllerExportAuditLogs201Response',
+      r'AuditExportControllerExportAuditLogs201Response',
     )
           ..add('data', data)
           ..add('meta', meta))
@@ -63,11 +66,11 @@ class _$AuditControllerExportAuditLogs201Response
   }
 }
 
-class AuditControllerExportAuditLogs201ResponseBuilder
+class AuditExportControllerExportAuditLogs201ResponseBuilder
     implements
-        Builder<AuditControllerExportAuditLogs201Response,
-            AuditControllerExportAuditLogs201ResponseBuilder> {
-  _$AuditControllerExportAuditLogs201Response? _$v;
+        Builder<AuditExportControllerExportAuditLogs201Response,
+            AuditExportControllerExportAuditLogs201ResponseBuilder> {
+  _$AuditExportControllerExportAuditLogs201Response? _$v;
 
   AuditExportResultDtoBuilder? _data;
   AuditExportResultDtoBuilder get data =>
@@ -78,11 +81,11 @@ class AuditControllerExportAuditLogs201ResponseBuilder
   RequestMetaDtoBuilder get meta => _$this._meta ??= RequestMetaDtoBuilder();
   set meta(RequestMetaDtoBuilder? meta) => _$this._meta = meta;
 
-  AuditControllerExportAuditLogs201ResponseBuilder() {
-    AuditControllerExportAuditLogs201Response._defaults(this);
+  AuditExportControllerExportAuditLogs201ResponseBuilder() {
+    AuditExportControllerExportAuditLogs201Response._defaults(this);
   }
 
-  AuditControllerExportAuditLogs201ResponseBuilder get _$this {
+  AuditExportControllerExportAuditLogs201ResponseBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
       _data = $v.data.toBuilder();
@@ -93,25 +96,26 @@ class AuditControllerExportAuditLogs201ResponseBuilder
   }
 
   @override
-  void replace(AuditControllerExportAuditLogs201Response other) {
-    _$v = other as _$AuditControllerExportAuditLogs201Response;
+  void replace(AuditExportControllerExportAuditLogs201Response other) {
+    _$v = other as _$AuditExportControllerExportAuditLogs201Response;
   }
 
   @override
   void update(
-    void Function(AuditControllerExportAuditLogs201ResponseBuilder)? updates,
+    void Function(AuditExportControllerExportAuditLogs201ResponseBuilder)?
+        updates,
   ) {
     if (updates != null) updates(this);
   }
 
   @override
-  AuditControllerExportAuditLogs201Response build() => _build();
+  AuditExportControllerExportAuditLogs201Response build() => _build();
 
-  _$AuditControllerExportAuditLogs201Response _build() {
-    _$AuditControllerExportAuditLogs201Response _$result;
+  _$AuditExportControllerExportAuditLogs201Response _build() {
+    _$AuditExportControllerExportAuditLogs201Response _$result;
     try {
       _$result = _$v ??
-          _$AuditControllerExportAuditLogs201Response._(
+          _$AuditExportControllerExportAuditLogs201Response._(
             data: data.build(),
             meta: meta.build(),
           );
@@ -124,7 +128,7 @@ class AuditControllerExportAuditLogs201ResponseBuilder
         meta.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-          r'AuditControllerExportAuditLogs201Response',
+          r'AuditExportControllerExportAuditLogs201Response',
           _$failedField,
           e.toString(),
         );

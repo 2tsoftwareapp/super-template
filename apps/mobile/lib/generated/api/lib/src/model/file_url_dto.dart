@@ -13,19 +13,19 @@ part 'file_url_dto.g.dart';
 /// FileUrlDto
 ///
 /// Properties:
+/// * [expiresInSeconds]
 /// * [id]
 /// * [url]
-/// * [expiresInSeconds]
 @BuiltValue()
 abstract class FileUrlDto implements Built<FileUrlDto, FileUrlDtoBuilder> {
+  @BuiltValueField(wireName: r'expiresInSeconds')
+  num get expiresInSeconds;
+
   @BuiltValueField(wireName: r'id')
   String get id;
 
   @BuiltValueField(wireName: r'url')
   String get url;
-
-  @BuiltValueField(wireName: r'expiresInSeconds')
-  num get expiresInSeconds;
 
   FileUrlDto._();
 
@@ -50,6 +50,11 @@ class _$FileUrlDtoSerializer implements PrimitiveSerializer<FileUrlDto> {
     FileUrlDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
+    yield r'expiresInSeconds';
+    yield serializers.serialize(
+      object.expiresInSeconds,
+      specifiedType: const FullType(num),
+    );
     yield r'id';
     yield serializers.serialize(
       object.id,
@@ -59,11 +64,6 @@ class _$FileUrlDtoSerializer implements PrimitiveSerializer<FileUrlDto> {
     yield serializers.serialize(
       object.url,
       specifiedType: const FullType(String),
-    );
-    yield r'expiresInSeconds';
-    yield serializers.serialize(
-      object.expiresInSeconds,
-      specifiedType: const FullType(num),
     );
   }
 
@@ -92,6 +92,11 @@ class _$FileUrlDtoSerializer implements PrimitiveSerializer<FileUrlDto> {
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
+        case r'expiresInSeconds':
+          final valueDes = serializers.deserialize(value,
+              specifiedType: const FullType(num)) as num;
+          result.expiresInSeconds = valueDes;
+          break;
         case r'id':
           final valueDes = serializers.deserialize(
             value,
@@ -105,11 +110,6 @@ class _$FileUrlDtoSerializer implements PrimitiveSerializer<FileUrlDto> {
             specifiedType: const FullType(String),
           ) as String;
           result.url = valueDes;
-          break;
-        case r'expiresInSeconds':
-          final valueDes = serializers.deserialize(value,
-              specifiedType: const FullType(num)) as num;
-          result.expiresInSeconds = valueDes;
           break;
         default:
           unhandled.add(key);

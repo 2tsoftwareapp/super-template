@@ -8,6 +8,33 @@ part of 'user_preferences_dto.dart';
 // BuiltValueGenerator
 // **************************************************************************
 
+const UserPreferencesDtoLanguageEnum _$userPreferencesDtoLanguageEnum_en =
+    const UserPreferencesDtoLanguageEnum._('en');
+const UserPreferencesDtoLanguageEnum _$userPreferencesDtoLanguageEnum_vi =
+    const UserPreferencesDtoLanguageEnum._('vi');
+
+UserPreferencesDtoLanguageEnum _$userPreferencesDtoLanguageEnumValueOf(
+  String name,
+) {
+  switch (name) {
+    case 'en':
+      return _$userPreferencesDtoLanguageEnum_en;
+    case 'vi':
+      return _$userPreferencesDtoLanguageEnum_vi;
+    default:
+      throw ArgumentError(name);
+  }
+}
+
+final BuiltSet<UserPreferencesDtoLanguageEnum>
+    _$userPreferencesDtoLanguageEnumValues =
+    BuiltSet<UserPreferencesDtoLanguageEnum>(
+  const <UserPreferencesDtoLanguageEnum>[
+    _$userPreferencesDtoLanguageEnum_en,
+    _$userPreferencesDtoLanguageEnum_vi,
+  ],
+);
+
 const UserPreferencesDtoThemeEnum _$userPreferencesDtoThemeEnum_system =
     const UserPreferencesDtoThemeEnum._('system');
 const UserPreferencesDtoThemeEnum _$userPreferencesDtoThemeEnum_light =
@@ -36,39 +63,47 @@ final BuiltSet<UserPreferencesDtoThemeEnum>
   _$userPreferencesDtoThemeEnum_dark,
 ]);
 
-const UserPreferencesDtoLanguageEnum _$userPreferencesDtoLanguageEnum_en =
-    const UserPreferencesDtoLanguageEnum._('en');
-const UserPreferencesDtoLanguageEnum _$userPreferencesDtoLanguageEnum_vi =
-    const UserPreferencesDtoLanguageEnum._('vi');
-
-UserPreferencesDtoLanguageEnum _$userPreferencesDtoLanguageEnumValueOf(
-  String name,
-) {
-  switch (name) {
-    case 'en':
-      return _$userPreferencesDtoLanguageEnum_en;
-    case 'vi':
-      return _$userPreferencesDtoLanguageEnum_vi;
-    default:
-      throw ArgumentError(name);
-  }
-}
-
-final BuiltSet<UserPreferencesDtoLanguageEnum>
-    _$userPreferencesDtoLanguageEnumValues =
-    BuiltSet<UserPreferencesDtoLanguageEnum>(
-  const <UserPreferencesDtoLanguageEnum>[
-    _$userPreferencesDtoLanguageEnum_en,
-    _$userPreferencesDtoLanguageEnum_vi,
-  ],
-);
-
-Serializer<UserPreferencesDtoThemeEnum>
-    _$userPreferencesDtoThemeEnumSerializer =
-    _$UserPreferencesDtoThemeEnumSerializer();
 Serializer<UserPreferencesDtoLanguageEnum>
     _$userPreferencesDtoLanguageEnumSerializer =
     _$UserPreferencesDtoLanguageEnumSerializer();
+Serializer<UserPreferencesDtoThemeEnum>
+    _$userPreferencesDtoThemeEnumSerializer =
+    _$UserPreferencesDtoThemeEnumSerializer();
+
+class _$UserPreferencesDtoLanguageEnumSerializer
+    implements PrimitiveSerializer<UserPreferencesDtoLanguageEnum> {
+  static const Map<String, Object> _toWire = const <String, Object>{
+    'en': 'en',
+    'vi': 'vi',
+  };
+  static const Map<Object, String> _fromWire = const <Object, String>{
+    'en': 'en',
+    'vi': 'vi',
+  };
+
+  @override
+  final Iterable<Type> types = const <Type>[UserPreferencesDtoLanguageEnum];
+  @override
+  final String wireName = 'UserPreferencesDtoLanguageEnum';
+
+  @override
+  Object serialize(
+    Serializers serializers,
+    UserPreferencesDtoLanguageEnum object, {
+    FullType specifiedType = FullType.unspecified,
+  }) =>
+      _toWire[object.name] ?? object.name;
+
+  @override
+  UserPreferencesDtoLanguageEnum deserialize(
+    Serializers serializers,
+    Object serialized, {
+    FullType specifiedType = FullType.unspecified,
+  }) =>
+      UserPreferencesDtoLanguageEnum.valueOf(
+        _fromWire[serialized] ?? (serialized is String ? serialized : ''),
+      );
+}
 
 class _$UserPreferencesDtoThemeEnumSerializer
     implements PrimitiveSerializer<UserPreferencesDtoThemeEnum> {
@@ -107,58 +142,23 @@ class _$UserPreferencesDtoThemeEnumSerializer
       );
 }
 
-class _$UserPreferencesDtoLanguageEnumSerializer
-    implements PrimitiveSerializer<UserPreferencesDtoLanguageEnum> {
-  static const Map<String, Object> _toWire = const <String, Object>{
-    'en': 'en',
-    'vi': 'vi',
-  };
-  static const Map<Object, String> _fromWire = const <Object, String>{
-    'en': 'en',
-    'vi': 'vi',
-  };
-
-  @override
-  final Iterable<Type> types = const <Type>[UserPreferencesDtoLanguageEnum];
-  @override
-  final String wireName = 'UserPreferencesDtoLanguageEnum';
-
-  @override
-  Object serialize(
-    Serializers serializers,
-    UserPreferencesDtoLanguageEnum object, {
-    FullType specifiedType = FullType.unspecified,
-  }) =>
-      _toWire[object.name] ?? object.name;
-
-  @override
-  UserPreferencesDtoLanguageEnum deserialize(
-    Serializers serializers,
-    Object serialized, {
-    FullType specifiedType = FullType.unspecified,
-  }) =>
-      UserPreferencesDtoLanguageEnum.valueOf(
-        _fromWire[serialized] ?? (serialized is String ? serialized : ''),
-      );
-}
-
 class _$UserPreferencesDto extends UserPreferencesDto {
-  @override
-  final String userId;
-  @override
-  final UserPreferencesDtoThemeEnum theme;
-  @override
-  final UserPreferencesDtoLanguageEnum language;
-  @override
-  final String timezone;
-  @override
-  final BuiltMap<String, JsonObject?> notificationPreferences;
-  @override
-  final BuiltMap<String, JsonObject?> emailPreferences;
   @override
   final String createdAt;
   @override
+  final BuiltMap<String, JsonObject?> emailPreferences;
+  @override
+  final UserPreferencesDtoLanguageEnum language;
+  @override
+  final BuiltMap<String, JsonObject?> notificationPreferences;
+  @override
+  final UserPreferencesDtoThemeEnum theme;
+  @override
+  final String timezone;
+  @override
   final String updatedAt;
+  @override
+  final String userId;
 
   factory _$UserPreferencesDto([
     void Function(UserPreferencesDtoBuilder)? updates,
@@ -166,14 +166,14 @@ class _$UserPreferencesDto extends UserPreferencesDto {
       (UserPreferencesDtoBuilder()..update(updates))._build();
 
   _$UserPreferencesDto._({
-    required this.userId,
-    required this.theme,
-    required this.language,
-    required this.timezone,
-    required this.notificationPreferences,
-    required this.emailPreferences,
     required this.createdAt,
+    required this.emailPreferences,
+    required this.language,
+    required this.notificationPreferences,
+    required this.theme,
+    required this.timezone,
     required this.updatedAt,
+    required this.userId,
   }) : super._();
   @override
   UserPreferencesDto rebuild(
@@ -189,27 +189,27 @@ class _$UserPreferencesDto extends UserPreferencesDto {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is UserPreferencesDto &&
-        userId == other.userId &&
-        theme == other.theme &&
-        language == other.language &&
-        timezone == other.timezone &&
-        notificationPreferences == other.notificationPreferences &&
-        emailPreferences == other.emailPreferences &&
         createdAt == other.createdAt &&
-        updatedAt == other.updatedAt;
+        emailPreferences == other.emailPreferences &&
+        language == other.language &&
+        notificationPreferences == other.notificationPreferences &&
+        theme == other.theme &&
+        timezone == other.timezone &&
+        updatedAt == other.updatedAt &&
+        userId == other.userId;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
-    _$hash = $jc(_$hash, userId.hashCode);
-    _$hash = $jc(_$hash, theme.hashCode);
-    _$hash = $jc(_$hash, language.hashCode);
-    _$hash = $jc(_$hash, timezone.hashCode);
-    _$hash = $jc(_$hash, notificationPreferences.hashCode);
-    _$hash = $jc(_$hash, emailPreferences.hashCode);
     _$hash = $jc(_$hash, createdAt.hashCode);
+    _$hash = $jc(_$hash, emailPreferences.hashCode);
+    _$hash = $jc(_$hash, language.hashCode);
+    _$hash = $jc(_$hash, notificationPreferences.hashCode);
+    _$hash = $jc(_$hash, theme.hashCode);
+    _$hash = $jc(_$hash, timezone.hashCode);
     _$hash = $jc(_$hash, updatedAt.hashCode);
+    _$hash = $jc(_$hash, userId.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -217,14 +217,14 @@ class _$UserPreferencesDto extends UserPreferencesDto {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'UserPreferencesDto')
-          ..add('userId', userId)
-          ..add('theme', theme)
-          ..add('language', language)
-          ..add('timezone', timezone)
-          ..add('notificationPreferences', notificationPreferences)
-          ..add('emailPreferences', emailPreferences)
           ..add('createdAt', createdAt)
-          ..add('updatedAt', updatedAt))
+          ..add('emailPreferences', emailPreferences)
+          ..add('language', language)
+          ..add('notificationPreferences', notificationPreferences)
+          ..add('theme', theme)
+          ..add('timezone', timezone)
+          ..add('updatedAt', updatedAt)
+          ..add('userId', userId))
         .toString();
   }
 }
@@ -233,22 +233,20 @@ class UserPreferencesDtoBuilder
     implements Builder<UserPreferencesDto, UserPreferencesDtoBuilder> {
   _$UserPreferencesDto? _$v;
 
-  String? _userId;
-  String? get userId => _$this._userId;
-  set userId(String? userId) => _$this._userId = userId;
+  String? _createdAt;
+  String? get createdAt => _$this._createdAt;
+  set createdAt(String? createdAt) => _$this._createdAt = createdAt;
 
-  UserPreferencesDtoThemeEnum? _theme;
-  UserPreferencesDtoThemeEnum? get theme => _$this._theme;
-  set theme(UserPreferencesDtoThemeEnum? theme) => _$this._theme = theme;
+  MapBuilder<String, JsonObject?>? _emailPreferences;
+  MapBuilder<String, JsonObject?> get emailPreferences =>
+      _$this._emailPreferences ??= MapBuilder<String, JsonObject?>();
+  set emailPreferences(MapBuilder<String, JsonObject?>? emailPreferences) =>
+      _$this._emailPreferences = emailPreferences;
 
   UserPreferencesDtoLanguageEnum? _language;
   UserPreferencesDtoLanguageEnum? get language => _$this._language;
   set language(UserPreferencesDtoLanguageEnum? language) =>
       _$this._language = language;
-
-  String? _timezone;
-  String? get timezone => _$this._timezone;
-  set timezone(String? timezone) => _$this._timezone = timezone;
 
   MapBuilder<String, JsonObject?>? _notificationPreferences;
   MapBuilder<String, JsonObject?> get notificationPreferences =>
@@ -258,19 +256,21 @@ class UserPreferencesDtoBuilder
   ) =>
       _$this._notificationPreferences = notificationPreferences;
 
-  MapBuilder<String, JsonObject?>? _emailPreferences;
-  MapBuilder<String, JsonObject?> get emailPreferences =>
-      _$this._emailPreferences ??= MapBuilder<String, JsonObject?>();
-  set emailPreferences(MapBuilder<String, JsonObject?>? emailPreferences) =>
-      _$this._emailPreferences = emailPreferences;
+  UserPreferencesDtoThemeEnum? _theme;
+  UserPreferencesDtoThemeEnum? get theme => _$this._theme;
+  set theme(UserPreferencesDtoThemeEnum? theme) => _$this._theme = theme;
 
-  String? _createdAt;
-  String? get createdAt => _$this._createdAt;
-  set createdAt(String? createdAt) => _$this._createdAt = createdAt;
+  String? _timezone;
+  String? get timezone => _$this._timezone;
+  set timezone(String? timezone) => _$this._timezone = timezone;
 
   String? _updatedAt;
   String? get updatedAt => _$this._updatedAt;
   set updatedAt(String? updatedAt) => _$this._updatedAt = updatedAt;
+
+  String? _userId;
+  String? get userId => _$this._userId;
+  set userId(String? userId) => _$this._userId = userId;
 
   UserPreferencesDtoBuilder() {
     UserPreferencesDto._defaults(this);
@@ -279,14 +279,14 @@ class UserPreferencesDtoBuilder
   UserPreferencesDtoBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _userId = $v.userId;
-      _theme = $v.theme;
-      _language = $v.language;
-      _timezone = $v.timezone;
-      _notificationPreferences = $v.notificationPreferences.toBuilder();
-      _emailPreferences = $v.emailPreferences.toBuilder();
       _createdAt = $v.createdAt;
+      _emailPreferences = $v.emailPreferences.toBuilder();
+      _language = $v.language;
+      _notificationPreferences = $v.notificationPreferences.toBuilder();
+      _theme = $v.theme;
+      _timezone = $v.timezone;
       _updatedAt = $v.updatedAt;
+      _userId = $v.userId;
       _$v = null;
     }
     return this;
@@ -310,46 +310,47 @@ class UserPreferencesDtoBuilder
     try {
       _$result = _$v ??
           _$UserPreferencesDto._(
-            userId: BuiltValueNullFieldError.checkNotNull(
-              userId,
+            createdAt: BuiltValueNullFieldError.checkNotNull(
+              createdAt,
               r'UserPreferencesDto',
-              'userId',
+              'createdAt',
             ),
-            theme: BuiltValueNullFieldError.checkNotNull(
-              theme,
-              r'UserPreferencesDto',
-              'theme',
-            ),
+            emailPreferences: emailPreferences.build(),
             language: BuiltValueNullFieldError.checkNotNull(
               language,
               r'UserPreferencesDto',
               'language',
+            ),
+            notificationPreferences: notificationPreferences.build(),
+            theme: BuiltValueNullFieldError.checkNotNull(
+              theme,
+              r'UserPreferencesDto',
+              'theme',
             ),
             timezone: BuiltValueNullFieldError.checkNotNull(
               timezone,
               r'UserPreferencesDto',
               'timezone',
             ),
-            notificationPreferences: notificationPreferences.build(),
-            emailPreferences: emailPreferences.build(),
-            createdAt: BuiltValueNullFieldError.checkNotNull(
-              createdAt,
-              r'UserPreferencesDto',
-              'createdAt',
-            ),
             updatedAt: BuiltValueNullFieldError.checkNotNull(
               updatedAt,
               r'UserPreferencesDto',
               'updatedAt',
             ),
+            userId: BuiltValueNullFieldError.checkNotNull(
+              userId,
+              r'UserPreferencesDto',
+              'userId',
+            ),
           );
     } catch (_) {
       late String _$failedField;
       try {
-        _$failedField = 'notificationPreferences';
-        notificationPreferences.build();
         _$failedField = 'emailPreferences';
         emailPreferences.build();
+
+        _$failedField = 'notificationPreferences';
+        notificationPreferences.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
           r'UserPreferencesDto',

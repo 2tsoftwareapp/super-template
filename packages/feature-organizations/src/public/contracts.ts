@@ -1,7 +1,5 @@
 import type { TransactionExecutor } from "@repo/api-kernel";
 
-import type { OrganizationMemberRole } from "./organization-lookup.port";
-
 export { OrganizationsService } from "../application/organizations.service";
 export { ORGANIZATIONS_REPOSITORY } from "../application/ports/organizations.repository.port";
 export type * from "../application/ports/organizations.repository.port";
@@ -48,6 +46,7 @@ export interface OrganizationAccessControlPort {
   invalidateAccessProfile(userId: string): Promise<void>;
 }
 
+export { ORGANIZATION_USER_ROLES_PURGE } from "./organization-purge.token";
 /**
  * Organization-membership port is owned by @repo/feature-users (the
  * implementer). Re-exported here so existing organizations and consumer
@@ -56,10 +55,9 @@ export interface OrganizationAccessControlPort {
  */
 export type {
   OrganizationMemberRecord,
-  OrganizationMemberWithUserRecord,
   OrganizationMembership,
+  OrganizationMemberWithUserRecord,
   UserOrganizationRecord,
 } from "@repo/feature-users/contracts";
-export { ORGANIZATION_MEMBERSHIP } from "@repo/feature-users/contracts";
 
-export { ORGANIZATION_USER_ROLES_PURGE } from "./organization-purge.token";
+export { ORGANIZATION_MEMBERSHIP } from "@repo/feature-users/contracts";

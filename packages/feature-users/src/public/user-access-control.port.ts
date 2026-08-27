@@ -13,10 +13,7 @@ export interface UserAccessControl {
     organizationId?: string | null,
   ): Promise<{ roles: string[]; permissions: string[] }>;
 
-  getRoleIdsForUser(
-    userId: string,
-    organizationId?: string | null,
-  ): Promise<string[]>;
+  getRoleIdsForUser(userId: string, organizationId?: string | null): Promise<string[]>;
 
   getRoleAssignmentsForUser(
     userId: string,
@@ -69,8 +66,5 @@ export interface UserAccessControl {
     desiredRoleNames: string[],
   ): void;
 
-  assertCanManageUserAccount(
-    actor: AuthenticatedRequestUser,
-    targetRoleNames: string[],
-  ): void;
+  assertCanManageUserAccount(actor: AuthenticatedRequestUser, targetRoleNames: string[]): void;
 }
