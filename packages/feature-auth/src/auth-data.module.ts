@@ -1,4 +1,4 @@
-import { Global, Module } from "@nestjs/common";
+import { Module } from "@nestjs/common";
 
 import { AUTH_SESSION_REPOSITORY } from "./application/ports/auth-session.repository.port";
 import { AuthEmailVerificationService } from "./application/services/auth-email-verification.service";
@@ -16,7 +16,6 @@ import { AuthRepository } from "./infrastructure/auth.repository";
 import { AUTH_TOKEN_MAINTENANCE } from "./public/auth-token-maintenance.port";
 import { AUTH_USER_STORE } from "./public/auth-user-store.port";
 
-@Global()
 @Module({
   providers: [
     AuthRepository,
@@ -40,10 +39,6 @@ import { AUTH_USER_STORE } from "./public/auth-user-store.port";
       useExisting: AuthRepository,
     },
   ],
-  exports: [
-    AuthMailService,
-    AUTH_SESSION_REPOSITORY,
-    AUTH_USER_STORE,
-  ],
+  exports: [AuthMailService, AUTH_SESSION_REPOSITORY, AUTH_USER_STORE],
 })
 export class AuthDataModule {}

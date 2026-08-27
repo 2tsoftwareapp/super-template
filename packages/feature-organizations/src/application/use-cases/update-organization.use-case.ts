@@ -2,12 +2,13 @@ import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime
 import type { TransactionPort } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {AppError, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
-import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
+import { AppError, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
 import { ACTIVITY_EMITTER, type ActivityEmitter } from "@repo/feature-activities/contracts";
+import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
+
+import type { OrganizationMembership } from "../../public/contracts";
 
 import { assertOrganizationRole } from "../../domain/organization-access.policy";
-import type { OrganizationMembership } from "../../public/contracts";
 import { ORGANIZATION_MEMBERSHIP } from "../../public/organization-membership.token";
 import {
   ORGANIZATIONS_REPOSITORY,

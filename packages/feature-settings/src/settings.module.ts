@@ -1,5 +1,4 @@
 import { Global, Module } from "@nestjs/common";
-import { APPLICATION_SETTINGS_LOOKUP } from "./public/application-settings-lookup.port";
 
 import { ApplicationSettingsLookupService } from "./application/application-settings-lookup.service";
 import { SETTINGS_REPOSITORY } from "./application/ports/settings.repository.port";
@@ -8,6 +7,7 @@ import { ListSettingsUseCase } from "./application/use-cases/list-settings.use-c
 import { UpdateSettingUseCase } from "./application/use-cases/update-setting.use-case";
 import { SettingsRepository } from "./infrastructure/settings.repository";
 import { AdminSettingsController } from "./presentation/admin-settings.controller";
+import { APPLICATION_SETTINGS_LOOKUP } from "./public/application-settings-lookup.port";
 
 @Global()
 @Module({

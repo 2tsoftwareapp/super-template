@@ -1,12 +1,7 @@
 import { defineFeature, type FeatureManifest } from "@repo/api-plugin-kit";
 
 import { AccessControlModule } from "./access-control.module";
-import {
-  permissions,
-  rolePermissions,
-  roles,
-  userRoles,
-} from "./infrastructure/persistence";
+import { permissions, rolePermissions, roles, userRoles } from "./infrastructure/persistence";
 import { accessControlSeeders } from "./seed";
 
 export const accessControlFeature: FeatureManifest = defineFeature({

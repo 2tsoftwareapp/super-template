@@ -1,12 +1,17 @@
 import type { AuthenticatedRequestUser } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, ERROR_CODES, PLATFORM_TRANSACTION_PORT, type PlatformTransactionPort } from "@repo/api-runtime";
+import {
+  AppError,
+  ERROR_CODES,
+  PLATFORM_TRANSACTION_PORT,
+  type PlatformTransactionPort,
+} from "@repo/api-runtime";
 import { ACTIVITY_EMITTER, type ActivityEmitter } from "@repo/feature-activities/contracts";
 
+import type { OrganizationMembership } from "../../public/contracts";
 import type { CreateOrganizationCommand } from "../organizations.types";
 
-import type { OrganizationMembership } from "../../public/contracts";
 import { ORGANIZATION_MEMBERSHIP } from "../../public/organization-membership.token";
 import {
   ORGANIZATIONS_REPOSITORY,
@@ -22,10 +27,10 @@ const slugify = (value: string) =>
     .slice(0, 64) || "organization";
 
 import type { OrganizationAccessControlPort } from "../../public/contracts";
+
 import { ORGANIZATION_ACCESS_CONTROL } from "../../public/organization-access-control.token";
 
 @Injectable()
-
 export class CreateOrganizationUseCase {
   constructor(
     // Creating an organization is a platform-level operation: the new tenant's

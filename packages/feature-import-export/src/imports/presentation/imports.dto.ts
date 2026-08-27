@@ -1,7 +1,7 @@
-import type { ImportValidationError } from "../../public/contracts";
-
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { IsIn, IsOptional, IsString, IsUUID, MaxLength } from "class-validator";
+
+import type { ImportValidationError } from "../../public/contracts";
 
 import { SUPPORTED_IMPORT_TYPES } from "../application/import-constants";
 

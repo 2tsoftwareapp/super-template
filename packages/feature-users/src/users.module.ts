@@ -1,4 +1,6 @@
 import { Global, Module } from "@nestjs/common";
+import { AccessControlModule } from "@repo/feature-access-control/module";
+import { OrganizationsModule } from "@repo/feature-organizations/module";
 
 import { USERS_REPOSITORY } from "./application/ports/users.repository.port";
 import { ChangePasswordUseCase } from "./application/use-cases/change-password.use-case";
@@ -18,7 +20,7 @@ import { USER_LOOKUP } from "./public/user-lookup.port";
 
 @Global()
 @Module({
-  imports: [],
+  imports: [AccessControlModule, OrganizationsModule],
   controllers: [AdminUsersController, UsersController],
   providers: [
     UsersRepository,

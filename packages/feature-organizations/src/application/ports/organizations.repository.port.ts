@@ -35,10 +35,7 @@ export interface OrganizationsRepositoryPort {
     executor?: TransactionExecutor,
   ): Promise<OrganizationRecord | null>;
 
-  deleteOrganizationRoles(
-    organizationId: string,
-    executor?: TransactionExecutor,
-  ): Promise<void>;
+  deleteOrganizationRoles(organizationId: string, executor?: TransactionExecutor): Promise<void>;
 }
 
 export const ORGANIZATIONS_REPOSITORY = Symbol("ORGANIZATIONS_REPOSITORY");

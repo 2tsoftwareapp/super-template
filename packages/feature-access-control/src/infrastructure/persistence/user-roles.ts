@@ -1,5 +1,5 @@
-import { users } from "@repo/feature-users/schema";
 import { organizations } from "@repo/feature-organizations/schema";
+import { users } from "@repo/feature-users/schema";
 import { index, pgTable, primaryKey, timestamp, uuid } from "drizzle-orm/pg-core";
 
 import { roles } from "./access-control";

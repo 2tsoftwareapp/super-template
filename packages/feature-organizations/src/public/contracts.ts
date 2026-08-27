@@ -8,10 +8,10 @@ export type * from "../application/ports/organizations.repository.port";
 /** Public contracts for @repo/feature-organizations. */
 export { OrganizationsModule } from "../organizations.module";
 
-export { ORGANIZATION_MEMBERSHIP } from "./organization-membership.token";
-export { ORGANIZATION_USER_ROLES_PURGE } from "./organization-purge.token";
-export { ORGANIZATION_CUSTOM_ROLES_PURGE } from "./organization-custom-roles-purge.token";
+export { ORGANIZATION_ERROR_CODES } from "./error-codes";
 export { ORGANIZATION_ACCESS_CONTROL } from "./organization-access-control.token";
+export { ORGANIZATION_CUSTOM_ROLES_PURGE } from "./organization-custom-roles-purge.token";
+export * from "./organization-lookup.port";
 
 export interface OrganizationMemberRecord {
   organizationId: string;
@@ -133,5 +133,5 @@ export interface OrganizationAccessControlPort {
   invalidateAccessProfile(userId: string): Promise<void>;
 }
 
-export * from "./organization-lookup.port";
-export { ORGANIZATION_ERROR_CODES } from "./error-codes";
+export { ORGANIZATION_MEMBERSHIP } from "./organization-membership.token";
+export { ORGANIZATION_USER_ROLES_PURGE } from "./organization-purge.token";

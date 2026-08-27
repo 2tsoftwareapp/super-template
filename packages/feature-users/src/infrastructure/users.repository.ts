@@ -1,11 +1,11 @@
 import type { DatabaseClient, DatabaseExecutor } from "@repo/database-runtime";
-import type { OrganizationMembership } from "@repo/feature-organizations/contracts";
 import type { UserRoleAssignments } from "@repo/feature-access-control/contracts";
+import type { OrganizationMembership } from "@repo/feature-organizations/contracts";
 
 import { Inject, Injectable } from "@nestjs/common";
 import { DATABASE } from "@repo/database-runtime";
-import { ORGANIZATION_MEMBERSHIP } from "@repo/feature-organizations/contracts";
 import { USER_ROLE_ASSIGNMENTS } from "@repo/feature-access-control/contracts";
+import { ORGANIZATION_MEMBERSHIP } from "@repo/feature-organizations/contracts";
 import { and, asc, count, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 
 import type { UsersRepositoryPort } from "../application/ports/users.repository.port";
@@ -212,13 +212,7 @@ export class UsersRepository implements UsersRepositoryPort {
         status: users.status,
       })
       .from(users)
-      .where(
-        and(
-          eq(users.id, userId),
-          isNull(users.deletedAt),
-          eq(users.status, "ACTIVE"),
-        ),
-      )
+      .where(and(eq(users.id, userId), isNull(users.deletedAt), eq(users.status, "ACTIVE")))
       .limit(1);
 
     return row ?? null;
@@ -249,11 +243,7 @@ export class UsersRepository implements UsersRepositoryPort {
       .select({ id: users.id })
       .from(users)
       .where(
-        and(
-          inArray(users.id, candidates),
-          isNull(users.deletedAt),
-          eq(users.status, "ACTIVE"),
-        ),
+        and(inArray(users.id, candidates), isNull(users.deletedAt), eq(users.status, "ACTIVE")),
       );
     return rows.map((row) => row.id);
   }
@@ -273,11 +263,7 @@ export class UsersRepository implements UsersRepositoryPort {
       .select({ id: users.id })
       .from(users)
       .where(
-        and(
-          inArray(users.id, memberIds),
-          isNull(users.deletedAt),
-          eq(users.status, "ACTIVE"),
-        ),
+        and(inArray(users.id, memberIds), isNull(users.deletedAt), eq(users.status, "ACTIVE")),
       );
     return rows.map((row) => row.id);
   }

@@ -18,8 +18,8 @@ import { OrganizationLookupAdapter } from "./infrastructure/organization-lookup.
 import { OrganizationMembersRepository } from "./infrastructure/organization-members.repository";
 import { OrganizationsRepository } from "./infrastructure/organizations.repository";
 import { OrganizationsController } from "./presentation/organizations.controller";
-import { ORGANIZATION_MEMBERSHIP } from "./public/organization-membership.token";
 import { ORGANIZATION_LOOKUP } from "./public/organization-lookup.port";
+import { ORGANIZATION_MEMBERSHIP } from "./public/organization-membership.token";
 
 @Global()
 @Module({

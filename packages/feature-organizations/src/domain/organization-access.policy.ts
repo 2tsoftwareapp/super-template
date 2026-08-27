@@ -1,4 +1,5 @@
 import { AppError, ERROR_CODES } from "@repo/api-runtime";
+
 import { ORGANIZATION_ERROR_CODES } from "../public/contracts";
 export type OrganizationMemberRole = "OWNER" | "ADMIN" | "MEMBER";
 
@@ -42,7 +43,6 @@ export function assertNotLastOwner(
   membership: OrganizationMembership,
   remainingOwnerCount: number,
 ): void {
-
   if (membership.role === "OWNER" && remainingOwnerCount === 0) {
     throw new AppError(
       ORGANIZATION_ERROR_CODES.ORGANIZATION_LAST_OWNER,

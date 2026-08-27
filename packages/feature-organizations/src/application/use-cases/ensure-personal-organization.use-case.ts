@@ -4,6 +4,7 @@ import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { AppError, ERROR_CODES } from "@repo/api-runtime";
 
 import type { OrganizationMembership } from "../../public/contracts";
+
 import { ORGANIZATION_MEMBERSHIP } from "../../public/organization-membership.token";
 import {
   ORGANIZATIONS_REPOSITORY,
@@ -19,10 +20,10 @@ const slugify = (value: string) =>
     .slice(0, 64) || "organization";
 
 import type { OrganizationAccessControlPort } from "../../public/contracts";
+
 import { ORGANIZATION_ACCESS_CONTROL } from "../../public/organization-access-control.token";
 
 @Injectable()
-
 export class EnsurePersonalOrganizationUseCase {
   constructor(
     @Inject(ORGANIZATIONS_REPOSITORY)

@@ -1,7 +1,7 @@
 import type { AuthenticatedRequestUser } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {AppError } from "@repo/api-runtime";
+import { AppError } from "@repo/api-runtime";
 
 import type { ImportJobView } from "../imports.types";
 

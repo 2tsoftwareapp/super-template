@@ -1,7 +1,6 @@
 import { Global, Module } from "@nestjs/common";
 import { JwtModule } from "@nestjs/jwt";
 import { AccessControlModule } from "@repo/feature-access-control/contracts";
-import { ACCESS_TOKEN_AUTHENTICATOR } from "./public/access-token-authenticator.port";
 import { MfaModule } from "@repo/feature-mfa/contracts";
 import { OrganizationsModule } from "@repo/feature-organizations/contracts";
 
@@ -30,6 +29,7 @@ import { AuthLoginController } from "./presentation/auth-login.controller";
 import { AuthRecoveryController } from "./presentation/auth-recovery.controller";
 import { AuthRegistrationController } from "./presentation/auth-registration.controller";
 import { AuthSessionController } from "./presentation/auth-session.controller";
+import { ACCESS_TOKEN_AUTHENTICATOR } from "./public/access-token-authenticator.port";
 
 @Global()
 @Module({

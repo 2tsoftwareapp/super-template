@@ -3,9 +3,6 @@ import type { TransactionExecutor } from "@repo/api-kernel";
 /** Public contracts for @repo/feature-access-control. */
 export { AccessControlModule } from "../access-control.module";
 export { AccessControlService } from "../application/access-control.service";
-export {
-  ACCESS_CONTROL_REPOSITORY,
-} from "./access-control-repository.token";
 export type * from "../application/ports/access-control.repository.port";
 export { RoleManagementUseCase } from "../application/use-cases/role-management.use-case";
 export {
@@ -13,8 +10,9 @@ export {
   assertRoleScopeCanBeAssigned,
   type RolePolicyTarget,
 } from "../domain/role-assignment.policy";
+export { ACCESS_CONTROL_REPOSITORY } from "./access-control-repository.token";
 
-export { USER_ROLE_ASSIGNMENTS } from "./user-role-assignments.token";
+export { ACCESS_CONTROL_ERROR_CODES } from "./error-codes";
 
 /**
  * Consumer-owned port: role assignment persistence lives in feature-users
@@ -91,5 +89,5 @@ export interface UserRoleAssignments {
   deleteByOrganizationId(organizationId: string, executor?: TransactionExecutor): Promise<void>;
 }
 
-export { ACCESS_CONTROL_ERROR_CODES } from "./error-codes";
 export { ROLE_NAMES, type RoleName } from "./role.constants";
+export { USER_ROLE_ASSIGNMENTS } from "./user-role-assignments.token";

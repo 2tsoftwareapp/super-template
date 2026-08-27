@@ -1,5 +1,4 @@
 import { Global, Module } from "@nestjs/common";
-import { ACTIVITY_EMITTER } from "./public/activity-emitter.port";
 
 import { ActivitiesService } from "./application/activities.service";
 import { ACTIVITIES_REPOSITORY } from "./application/ports/activities.repository.port";
@@ -7,6 +6,7 @@ import { EmitActivityUseCase } from "./application/use-cases/emit-activity.use-c
 import { ListActivitiesUseCase } from "./application/use-cases/list-activities.use-case";
 import { ActivitiesRepository } from "./infrastructure/activities.repository";
 import { ActivitiesController } from "./presentation/activities.controller";
+import { ACTIVITY_EMITTER } from "./public/activity-emitter.port";
 
 @Global()
 @Module({

@@ -1,6 +1,6 @@
-import { Inject, Injectable } from "@nestjs/common";
 import type { TransactionExecutor } from "@repo/api-runtime";
-import type { ImportExportAdapter, ImportExportRowContext } from "../../public/contracts";
+
+import { Inject, Injectable } from "@nestjs/common";
 import {
   ACCESS_CONTROL_REPOSITORY,
   type AccessControlRepositoryPort,
@@ -9,12 +9,11 @@ import {
   ORGANIZATION_MEMBERSHIP,
   type OrganizationMembership,
 } from "@repo/feature-organizations/contracts";
-import {
-  USERS_REPOSITORY,
-  type UsersRepositoryPort,
-} from "@repo/feature-users/contracts";
+import { USERS_REPOSITORY, type UsersRepositoryPort } from "@repo/feature-users/contracts";
 import { hash } from "argon2";
 import { randomBytes } from "node:crypto";
+
+import type { ImportExportAdapter, ImportExportRowContext } from "../../public/contracts";
 
 export interface UserRow {
   id?: string;

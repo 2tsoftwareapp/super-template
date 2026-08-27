@@ -1,5 +1,4 @@
 import { Global, Module } from "@nestjs/common";
-import { USER_PREFERENCES_LOOKUP } from "./public/user-preferences-lookup.port";
 import { UsersModule } from "@repo/feature-users/module";
 
 import { PREFERENCES_REPOSITORY } from "./application/ports/preferences.repository.port";
@@ -10,6 +9,7 @@ import { UpdatePreferencesUseCase } from "./application/use-cases/update-prefere
 import { PreferencesLookupAdapter } from "./infrastructure/preferences-lookup.adapter";
 import { PreferencesRepository } from "./infrastructure/preferences.repository";
 import { PreferencesController } from "./presentation/preferences.controller";
+import { USER_PREFERENCES_LOOKUP } from "./public/user-preferences-lookup.port";
 
 @Global()
 @Module({

@@ -1,11 +1,7 @@
 import { defineFeature, type FeatureManifest } from "@repo/api-plugin-kit";
 
 import { ImportExportFeatureModule } from "./import-export.module";
-import {
-  exportJobs,
-  importExportJobStatusEnum,
-  importJobs,
-} from "./infrastructure/persistence";
+import { exportJobs, importExportJobStatusEnum, importJobs } from "./infrastructure/persistence";
 
 export const importExportFeature: FeatureManifest = defineFeature({
   id: "import-export",
@@ -19,11 +15,13 @@ export const importExportFeature: FeatureManifest = defineFeature({
     resources: {
       imports: {
         scope: "organization",
-        actions: ["read", "create", "update", "delete"], defaultGrants: { "ADMIN": ["read", "create", "update"], "USER": ["read", "create", "update"] }
+        actions: ["read", "create", "update", "delete"],
+        defaultGrants: { ADMIN: ["read", "create", "update"], USER: ["read", "create", "update"] },
       },
       exports: {
         scope: "organization",
-        actions: ["read", "create"], defaultGrants: { "ADMIN": ["read", "create"], "USER": ["read", "create"] }
+        actions: ["read", "create"],
+        defaultGrants: { ADMIN: ["read", "create"], USER: ["read", "create"] },
       },
     },
   },

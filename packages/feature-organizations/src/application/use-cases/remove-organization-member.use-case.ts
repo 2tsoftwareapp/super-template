@@ -2,25 +2,25 @@ import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime
 import type { TransactionPort } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {AppError, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
-import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
+import { AppError, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
 import { ACTIVITY_EMITTER, type ActivityEmitter } from "@repo/feature-activities/contracts";
+import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
+
+import type { OrganizationMembership } from "../../public/contracts";
+import type { OrganizationAccessControlPort } from "../../public/contracts";
 
 import {
   assertCanManageTargetRole,
   assertNotLastOwner,
   assertOrganizationRole,
 } from "../../domain/organization-access.policy";
-import type { OrganizationMembership } from "../../public/contracts";
-import { ORGANIZATION_MEMBERSHIP } from "../../public/organization-membership.token";
-import type { OrganizationAccessControlPort } from "../../public/contracts";
 import { ORGANIZATION_ACCESS_CONTROL } from "../../public/organization-access-control.token";
+import { ORGANIZATION_MEMBERSHIP } from "../../public/organization-membership.token";
 
 /** Platform super-role literal; importing access-control here would create a package cycle. */
 const PLATFORM_SUPER_ADMIN = "SUPER_ADMIN";
 
 @Injectable()
-
 export class RemoveOrganizationMemberUseCase {
   constructor(
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
@@ -121,12 +121,7 @@ export class RemoveOrganizationMemberUseCase {
       }
 
       // Cleanup user roles scoped to organization
-      await this.accessControl.replaceUserRoles(
-        targetUserId,
-        [],
-        organizationId,
-        transaction,
-      );
+      await this.accessControl.replaceUserRoles(targetUserId, [], organizationId, transaction);
 
       // Invalidate access profile cache
       await this.accessControl.invalidateAccessProfile(targetUserId);

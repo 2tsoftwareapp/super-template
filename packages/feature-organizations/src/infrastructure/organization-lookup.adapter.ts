@@ -2,6 +2,7 @@ import type { TransactionExecutor } from "@repo/api-runtime";
 
 import { Inject, Injectable } from "@nestjs/common";
 
+import type { OrganizationMembership } from "../public/contracts";
 import type {
   OrganizationLookup,
   OrganizationMemberRole,
@@ -11,7 +12,6 @@ import {
   ORGANIZATIONS_REPOSITORY,
   type OrganizationsRepositoryPort,
 } from "../application/ports/organizations.repository.port";
-import type { OrganizationMembership } from "../public/contracts";
 import { ORGANIZATION_MEMBERSHIP } from "../public/organization-membership.token";
 
 @Injectable()
