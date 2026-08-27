@@ -1,15 +1,15 @@
 import type { DatabaseClient, DatabaseExecutor } from "@repo/database-runtime";
-import type { UserRoleAssignments } from "@repo/feature-access-control/contracts";
-import type { OrganizationMembership } from "@repo/feature-organizations/contracts";
 
 import { Inject, Injectable } from "@nestjs/common";
 import { DATABASE } from "@repo/database-runtime";
-import { USER_ROLE_ASSIGNMENTS } from "@repo/feature-access-control/contracts";
-import { ORGANIZATION_MEMBERSHIP } from "@repo/feature-organizations/contracts";
 import { and, asc, count, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 
 import type { UsersRepositoryPort } from "../application/ports/users.repository.port";
 import type { UserSortCriterion } from "../application/user-sort";
+import type { OrganizationMembership } from "../public/organization-membership.port";
+import { ORGANIZATION_MEMBERSHIP } from "../public/organization-membership.token";
+import type { UserRoleAssignments } from "../public/user-role-assignments.port";
+import { USER_ROLE_ASSIGNMENTS } from "../public/user-role-assignments.token";
 
 import { users } from "./persistence";
 

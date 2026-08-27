@@ -1,5 +1,7 @@
 import { Module } from "@nestjs/common";
 
+import { UsersModule } from "@repo/feature-users/module";
+
 import { AUTH_SESSION_REPOSITORY } from "./application/ports/auth-session.repository.port";
 import { AuthEmailVerificationService } from "./application/services/auth-email-verification.service";
 import { AuthMailService } from "./application/services/auth-mail.service";
@@ -17,6 +19,7 @@ import { AUTH_TOKEN_MAINTENANCE } from "./public/auth-token-maintenance.port";
 import { AUTH_USER_STORE } from "./public/auth-user-store.port";
 
 @Module({
+  imports: [UsersModule],
   providers: [
     AuthRepository,
     AuthMailService,

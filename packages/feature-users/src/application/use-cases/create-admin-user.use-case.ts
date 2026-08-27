@@ -4,18 +4,8 @@ import type { TransactionPort } from "@repo/api-runtime";
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { ERROR_CODES } from "@repo/api-runtime";
 import { AppError, normalizeEmail, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
-import { AccessControlService, ROLE_NAMES } from "@repo/feature-access-control/contracts";
-import {
-  assertCanAssignRoleTargets,
-  assertRoleScopeCanBeAssigned,
-} from "@repo/feature-access-control/contracts";
 import { ACTIVITY_EMITTER, type ActivityEmitter } from "@repo/feature-activities/contracts";
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
-import {
-  ORGANIZATION_MEMBERSHIP,
-  type OrganizationMembership,
-  OrganizationsService,
-} from "@repo/feature-organizations/contracts";
 import { OUTBOX_APPENDER, type OutboxAppenderPort } from "@repo/feature-outbox/contracts";
 import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
 import { hashPassword } from "@repo/utils/password";
@@ -24,6 +14,20 @@ import type { CreateAdminUserCommand, UserView } from "../users.types";
 
 import { resolveRoleById } from "../assignable-role.resolver";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";
+import {
+  assertCanAssignRoleTargets,
+  assertRoleScopeCanBeAssigned,
+  ORGANIZATION_MEMBERSHIP,
+  type OrganizationMembership,
+  type OrganizationMemberRole,
+  PERSONAL_ORGANIZATION_PROVIDER,
+  type PersonalOrganizationProvider,
+  ROLE_NAMES,
+  USER_ACCESS_CONTROL,
+  type UserAccessControl,
+  type UserProfileInvalidator,
+  USER_PROFILE_INVALIDATOR,
+} from "../../public/contracts";
 import { GetUserUseCase } from "./get-user.use-case";
 
 @Injectable()
@@ -32,9 +36,13 @@ export class CreateAdminUserUseCase {
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
     @Inject(USERS_REPOSITORY)
     private readonly usersRepository: UsersRepositoryPort,
-    private readonly accessControlService: AccessControlService,
+    @Inject(USER_ACCESS_CONTROL)
+    private readonly accessControlService: UserAccessControl,
+    @Inject(USER_PROFILE_INVALIDATOR)
+    private readonly profileInvalidator: UserProfileInvalidator,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
-    private readonly organizationsService: OrganizationsService,
+    @Inject(PERSONAL_ORGANIZATION_PROVIDER)
+    private readonly personalOrganizationProvider: PersonalOrganizationProvider,
     @Inject(ORGANIZATION_MEMBERSHIP)
     private readonly membership: OrganizationMembership,
     @Inject(OUTBOX_APPENDER)
@@ -74,12 +82,7 @@ export class CreateAdminUserUseCase {
           displayName: input.displayName,
           avatarUrl: input.avatarUrl ?? null,
           status,
-          // An admin explicitly setting ACTIVE is vouching for the account, so it
-          // must be usable immediately instead of being stuck behind the email
-          // verification gate in LoginUseCase.
           emailVerifiedAt: status === "ACTIVE" ? new Date() : null,
-          // Force the user to change their password on first login since
-          // the admin chose it, not the user.
           mustChangePassword: true,
         },
         transaction,
@@ -132,7 +135,7 @@ export class CreateAdminUserUseCase {
           {
             organizationId,
             userId: user.id,
-            role: "ADMIN",
+            role: "ADMIN" satisfies OrganizationMemberRole,
           },
           transaction,
         );
@@ -162,13 +165,13 @@ export class CreateAdminUserUseCase {
               {
                 organizationId,
                 userId: user.id,
-                role: "MEMBER",
+                role: "MEMBER" satisfies OrganizationMemberRole,
               },
               transaction,
             );
           }
         } else if (actorIsSuperAdmin && resolvedRole.organizationId === null) {
-          await this.organizationsService.ensurePersonalOrganization(
+          await this.personalOrganizationProvider.ensurePersonalOrganization(
             user.id,
             user.displayName,
             transaction,
@@ -177,7 +180,6 @@ export class CreateAdminUserUseCase {
       }
 
       if (status === "PENDING") {
-        // Auth subscribes and issues the verification email when composed.
         await this.outbox.append(
           "user.lifecycle.created",
           {
@@ -227,6 +229,10 @@ export class CreateAdminUserUseCase {
 
       return { userId: user.id };
     });
+
+    // Invalidate the cached access profile so the newly created user picks
+    // up the assigned role on their next request.
+    await this.profileInvalidator.invalidateAccessProfile(userId);
 
     return this.getUserUseCase.execute(userId, actor);
   }

@@ -1,0 +1,1 @@
+export const USER_ACCESS_CONTROL = Symbol("USER_ACCESS_CONTROL");

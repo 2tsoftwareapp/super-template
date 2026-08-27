@@ -1,0 +1,1 @@
+export const USER_ROLE_ASSIGNMENTS = Symbol("USER_ROLE_ASSIGNMENTS");

@@ -1,4 +1,4 @@
-import { Global, Module } from "@nestjs/common";
+import { Global, Module, type Provider } from "@nestjs/common";
 
 import { JobsMapper } from "./application/jobs.mapper";
 import { JobsProcessor } from "./application/jobs.processor";
@@ -23,6 +23,7 @@ import {
   BACKGROUND_JOB_ENQUEUER,
   BACKGROUND_JOB_ENQUEUER_WITH_RESULT,
 } from "./public/background-job-enqueuer.port";
+import { JOB_HANDLER } from "./public/job-handler.port";
 
 @Global()
 @Module({
@@ -61,6 +62,11 @@ import {
       provide: BACKGROUND_JOB_ENQUEUER_WITH_RESULT,
       useExisting: JobsService,
     },
+    {
+      provide: JOB_HANDLER,
+      useFactory: () => [],
+      multi: true,
+    } as Provider,
   ],
   exports: [
     BACKGROUND_JOB_ENQUEUER,

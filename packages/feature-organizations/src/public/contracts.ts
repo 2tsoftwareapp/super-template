@@ -13,91 +13,6 @@ export { ORGANIZATION_ACCESS_CONTROL } from "./organization-access-control.token
 export { ORGANIZATION_CUSTOM_ROLES_PURGE } from "./organization-custom-roles-purge.token";
 export * from "./organization-lookup.port";
 
-export interface OrganizationMemberRecord {
-  organizationId: string;
-  userId: string;
-  role: OrganizationMemberRole;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface OrganizationMemberWithUserRecord {
-  userId: string;
-  role: OrganizationMemberRole;
-  email: string;
-  displayName: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface UserOrganizationRecord {
-  id: string;
-  name: string;
-  slug: string;
-  role: OrganizationMemberRole;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-/**
- * Consumer-owned port: membership rows live in feature-users storage, but
- * organizations defines the contract it needs. Implemented by feature-users
- * and bound through its global integration providers.
- */
-export interface OrganizationMembership {
-  addMember(
-    values: { organizationId: string; userId: string; role: OrganizationMemberRole },
-    executor?: TransactionExecutor,
-  ): Promise<OrganizationMemberRecord | null>;
-
-  upsertMember(
-    values: { organizationId: string; userId: string; role: OrganizationMemberRole },
-    executor?: TransactionExecutor,
-  ): Promise<OrganizationMemberRecord | null>;
-
-  findMembership(
-    organizationId: string,
-    userId: string,
-    executor?: TransactionExecutor,
-  ): Promise<OrganizationMemberRecord | null>;
-
-  listForUser(userId: string, executor?: TransactionExecutor): Promise<UserOrganizationRecord[]>;
-
-  listMembers(
-    organizationId: string,
-    executor?: TransactionExecutor,
-  ): Promise<OrganizationMemberWithUserRecord[]>;
-
-  findUserIdsForOrganization(
-    organizationId: string,
-    executor?: TransactionExecutor,
-  ): Promise<string[]>;
-
-  countOwners(
-    organizationId: string,
-    options?: { excludingUserId?: string; executor?: TransactionExecutor; lock?: boolean },
-  ): Promise<number>;
-
-  countMembers(organizationId: string, executor?: TransactionExecutor): Promise<number>;
-
-  updateMemberRole(
-    organizationId: string,
-    userId: string,
-    role: OrganizationMemberRole,
-    executor?: TransactionExecutor,
-  ): Promise<OrganizationMemberRecord | null>;
-
-  removeMember(
-    organizationId: string,
-    userId: string,
-    executor?: TransactionExecutor,
-  ): Promise<OrganizationMemberRecord | null>;
-
-  findPrimaryOrganizationId(userId: string, executor?: TransactionExecutor): Promise<string | null>;
-
-  deleteByOrganizationId(organizationId: string, executor?: TransactionExecutor): Promise<void>;
-}
-
 /**
  * Narrow consumer-owned ports used when an organization is deleted: each
  * owning feature purges the rows it owns without organizations importing
@@ -133,5 +48,18 @@ export interface OrganizationAccessControlPort {
   invalidateAccessProfile(userId: string): Promise<void>;
 }
 
-export { ORGANIZATION_MEMBERSHIP } from "./organization-membership.token";
+/**
+ * Organization-membership port is owned by @repo/feature-users (the
+ * implementer). Re-exported here so existing organizations and consumer
+ * code that imports it from feature-organizations/contracts keeps
+ * working.
+ */
+export type {
+  OrganizationMemberRecord,
+  OrganizationMemberWithUserRecord,
+  OrganizationMembership,
+  UserOrganizationRecord,
+} from "@repo/feature-users/contracts";
+export { ORGANIZATION_MEMBERSHIP } from "@repo/feature-users/contracts";
+
 export { ORGANIZATION_USER_ROLES_PURGE } from "./organization-purge.token";

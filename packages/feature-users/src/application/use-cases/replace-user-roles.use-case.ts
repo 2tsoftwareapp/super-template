@@ -3,18 +3,8 @@ import type { TransactionPort } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { ERROR_CODES } from "@repo/api-runtime";
-import { AppError, SYSTEM_SCOPE } from "@repo/api-runtime";
-import { TRANSACTION_PORT } from "@repo/api-runtime";
-import { AccessControlService, ROLE_NAMES } from "@repo/feature-access-control/contracts";
-import {
-  assertCanAssignRoleTargets,
-  assertRoleScopeCanBeAssigned,
-} from "@repo/feature-access-control/contracts";
+import { AppError, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
-import {
-  ORGANIZATION_MEMBERSHIP,
-  type OrganizationMembership,
-} from "@repo/feature-organizations/contracts";
 import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
 
 import type { UserView } from "../users.types";
@@ -22,6 +12,18 @@ import type { UserView } from "../users.types";
 import { assertUserBelongsToOrganization } from "../../domain/user-org-scope.policy";
 import { resolveRoleById } from "../assignable-role.resolver";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";
+import {
+  assertCanAssignRoleTargets,
+  assertRoleScopeCanBeAssigned,
+  ORGANIZATION_MEMBERSHIP,
+  type OrganizationMembership,
+  type OrganizationMemberRole,
+  ROLE_NAMES,
+  USER_ACCESS_CONTROL,
+  type UserAccessControl,
+  USER_PROFILE_INVALIDATOR,
+  type UserProfileInvalidator,
+} from "../../public/contracts";
 import { GetUserUseCase } from "./get-user.use-case";
 
 @Injectable()
@@ -30,7 +32,10 @@ export class ReplaceUserRolesUseCase {
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
     @Inject(USERS_REPOSITORY)
     private readonly usersRepository: UsersRepositoryPort,
-    private readonly accessControlService: AccessControlService,
+    @Inject(USER_ACCESS_CONTROL)
+    private readonly accessControlService: UserAccessControl,
+    @Inject(USER_PROFILE_INVALIDATOR)
+    private readonly profileInvalidator: UserProfileInvalidator,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
     @Inject(ORGANIZATION_MEMBERSHIP)
     private readonly membership: OrganizationMembership,
@@ -114,7 +119,8 @@ export class ReplaceUserRolesUseCase {
           );
         }
 
-        const targetMembershipRole = resolvedRole.name === ROLE_NAMES.ADMIN ? "ADMIN" : "MEMBER";
+        const targetMembershipRole: OrganizationMemberRole =
+          resolvedRole.name === ROLE_NAMES.ADMIN ? "ADMIN" : "MEMBER";
 
         if (!membership) {
           await this.membership.addMember(
@@ -173,6 +179,8 @@ export class ReplaceUserRolesUseCase {
         transaction,
       );
     });
+
+    await this.profileInvalidator.invalidateAccessProfile(userId);
 
     return this.getUserUseCase.execute(userId, actor);
   }

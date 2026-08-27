@@ -15,79 +15,12 @@ export { ACCESS_CONTROL_REPOSITORY } from "./access-control-repository.token";
 export { ACCESS_CONTROL_ERROR_CODES } from "./error-codes";
 
 /**
- * Consumer-owned port: role assignment persistence lives in feature-users
- * storage, but access-control defines the contract it needs. Bound by the
- * users integration providers.
+ * The user-role-assignments port is owned by @repo/feature-users (the
+ * implementer). Re-exported here so existing access-control and consumer
+ * code that imports it from feature-access-control/contracts keeps
+ * working.
  */
-export interface UserRoleAssignment {
-  roleName: string;
-  roleId: string;
-  organizationId: string | null;
-}
-
-export interface UserRoleAssignments {
-  findUserIdsForRole(roleId: string, executor?: TransactionExecutor): Promise<string[]>;
-
-  findUserIdsForRoleName(
-    roleName: string,
-    organizationId?: string | null,
-    executor?: TransactionExecutor,
-  ): Promise<string[]>;
-
-  findUserIdsForPermission(permissionId: string, executor?: TransactionExecutor): Promise<string[]>;
-
-  replaceUserRoles(
-    userId: string,
-    roleIds: string[],
-    organizationId: string | null,
-    executor?: TransactionExecutor,
-  ): Promise<void>;
-
-  findRoleNamesForUser(
-    userId: string,
-    organizationId?: string | null,
-    executor?: TransactionExecutor,
-  ): Promise<string[]>;
-
-  findPermissionNamesForUser(
-    userId: string,
-    organizationId?: string | null,
-    executor?: TransactionExecutor,
-  ): Promise<string[]>;
-
-  findRoleNamesForUsers(
-    userIds: string[],
-    organizationId?: string | null,
-    executor?: TransactionExecutor,
-  ): Promise<{ userId: string; roleName: string }[]>;
-
-  findRoleIdsForUser(
-    userId: string,
-    organizationId?: string | null,
-    executor?: TransactionExecutor,
-  ): Promise<string[]>;
-
-  findRoleAssignmentsForUser(
-    userId: string,
-    organizationId?: string | null,
-    executor?: TransactionExecutor,
-  ): Promise<UserRoleAssignment[]>;
-
-  findRoleIdsForUsers(
-    userIds: string[],
-    organizationId?: string | null,
-    executor?: TransactionExecutor,
-  ): Promise<{ userId: string; roleId: string }[]>;
-
-  assignUserRole(
-    userId: string,
-    roleId: string,
-    organizationId: string | null,
-    executor?: TransactionExecutor,
-  ): Promise<void>;
-
-  deleteByOrganizationId(organizationId: string, executor?: TransactionExecutor): Promise<void>;
-}
+export type { UserRoleAssignment, UserRoleAssignments } from "@repo/feature-users/contracts";
+export { USER_ROLE_ASSIGNMENTS } from "@repo/feature-users/contracts";
 
 export { ROLE_NAMES, type RoleName } from "./role.constants";
-export { USER_ROLE_ASSIGNMENTS } from "./user-role-assignments.token";

@@ -1,9 +1,10 @@
-import { Global, Module } from "@nestjs/common";
+import { Global, Module, type Provider } from "@nestjs/common";
 
 import { OutboxDispatcher } from "./application/outbox-dispatcher.service";
 import { OutboxRepository } from "./infrastructure/outbox.repository";
 import { OUTBOX_APPENDER } from "./public/outbox-appender.port";
 import { OUTBOX_REPOSITORY } from "./public/outbox.port";
+import { OUTBOX_TOPIC_HANDLER } from "./public/outbox-handler.port";
 
 /**
  * Generic transactional outbox: producers append events in their own
@@ -23,6 +24,11 @@ import { OUTBOX_REPOSITORY } from "./public/outbox.port";
       provide: OUTBOX_APPENDER,
       useExisting: OutboxRepository,
     },
+    {
+      provide: OUTBOX_TOPIC_HANDLER,
+      useFactory: () => [],
+      multi: true,
+    } as Provider,
   ],
   exports: [OUTBOX_REPOSITORY, OUTBOX_APPENDER],
 })

@@ -27,11 +27,22 @@
             "type": "string"
           },
           "visibility": {
-            "enum": ["PUBLIC", "PRIVATE", "INTERNAL"],
+            "enum": [
+              "PUBLIC",
+              "PRIVATE",
+              "INTERNAL"
+            ],
             "type": "string"
           }
         },
-        "required": ["id", "summary", "entityType", "entityId", "visibility", "createdAt"],
+        "required": [
+          "id",
+          "summary",
+          "entityType",
+          "entityId",
+          "visibility",
+          "createdAt"
+        ],
         "type": "object"
       },
       "AddJobDependencyDto": {
@@ -40,7 +51,9 @@
             "type": "string"
           }
         },
-        "required": ["dependsOnJobId"],
+        "required": [
+          "dependsOnJobId"
+        ],
         "type": "object"
       },
       "ApplicationSettingDto": {
@@ -62,7 +75,12 @@
             "type": "object"
           }
         },
-        "required": ["key", "value", "createdAt", "updatedAt"],
+        "required": [
+          "key",
+          "value",
+          "createdAt",
+          "updatedAt"
+        ],
         "type": "object"
       },
       "AttachEntityDto": {
@@ -80,7 +98,11 @@
             "type": "string"
           }
         },
-        "required": ["fileId", "entityType", "entityId"],
+        "required": [
+          "fileId",
+          "entityType",
+          "entityId"
+        ],
         "type": "object"
       },
       "AttachmentDto": {
@@ -112,12 +134,20 @@
             "type": "string"
           }
         },
-        "required": ["id", "fileId", "entityType", "entityId", "createdAt", "updatedAt"],
+        "required": [
+          "id",
+          "fileId",
+          "entityType",
+          "entityId",
+          "createdAt",
+          "updatedAt"
+        ],
         "type": "object"
       },
       "AuditExportResultDto": {
         "properties": {
           "fileId": {
+            "format": "uuid",
             "type": "string"
           },
           "rowCount": {
@@ -130,7 +160,12 @@
             "type": "boolean"
           }
         },
-        "required": ["fileId", "rowCount", "totalMatching", "truncated"],
+        "required": [
+          "fileId",
+          "rowCount",
+          "totalMatching",
+          "truncated"
+        ],
         "type": "object"
       },
       "AuditLogDto": {
@@ -176,7 +211,12 @@
             "type": "string"
           }
         },
-        "required": ["id", "action", "entityType", "createdAt"],
+        "required": [
+          "id",
+          "action",
+          "entityType",
+          "createdAt"
+        ],
         "type": "object"
       },
       "AuthMeDto": {
@@ -201,7 +241,12 @@
             "$ref": "#/components/schemas/AuthUserDto"
           }
         },
-        "required": ["user", "permissions", "sessionId", "organizationId"],
+        "required": [
+          "user",
+          "permissions",
+          "sessionId",
+          "organizationId"
+        ],
         "type": "object"
       },
       "AuthResponseDto": {
@@ -275,7 +320,14 @@
             "type": "string"
           }
         },
-        "required": ["id", "userId", "expiresAt", "createdAt", "updatedAt", "current"],
+        "required": [
+          "id",
+          "userId",
+          "expiresAt",
+          "createdAt",
+          "updatedAt",
+          "current"
+        ],
         "type": "object"
       },
       "AuthUserDto": {
@@ -306,7 +358,11 @@
             "type": "array"
           },
           "status": {
-            "enum": ["PENDING", "ACTIVE", "BLOCKED"],
+            "enum": [
+              "PENDING",
+              "ACTIVE",
+              "BLOCKED"
+            ],
             "type": "string"
           },
           "updatedAt": {
@@ -338,7 +394,9 @@
             "type": "string"
           }
         },
-        "required": ["fileIds"],
+        "required": [
+          "fileIds"
+        ],
         "type": "object"
       },
       "BatchDeleteResultDto": {
@@ -350,7 +408,9 @@
             "type": "array"
           }
         },
-        "required": ["results"],
+        "required": [
+          "results"
+        ],
         "type": "object"
       },
       "BatchDeleteResultItemDto": {
@@ -366,7 +426,10 @@
             "type": "boolean"
           }
         },
-        "required": ["fileId", "success"],
+        "required": [
+          "fileId",
+          "success"
+        ],
         "type": "object"
       },
       "ChangePasswordDto": {
@@ -378,7 +441,10 @@
             "type": "string"
           }
         },
-        "required": ["currentPassword", "newPassword"],
+        "required": [
+          "currentPassword",
+          "newPassword"
+        ],
         "type": "object"
       },
       "CountDto": {
@@ -387,7 +453,9 @@
             "type": "number"
           }
         },
-        "required": ["count"],
+        "required": [
+          "count"
+        ],
         "type": "object"
       },
       "CreateAdminUserDto": {
@@ -411,11 +479,19 @@
             "type": "string"
           },
           "status": {
-            "enum": ["PENDING", "ACTIVE", "BLOCKED"],
+            "enum": [
+              "PENDING",
+              "ACTIVE",
+              "BLOCKED"
+            ],
             "type": "string"
           }
         },
-        "required": ["email", "password", "displayName"],
+        "required": [
+          "email",
+          "password",
+          "displayName"
+        ],
         "type": "object"
       },
       "CreateExportDto": {
@@ -432,7 +508,9 @@
             "type": "string"
           }
         },
-        "required": ["type"],
+        "required": [
+          "type"
+        ],
         "type": "object"
       },
       "CreateImportDto": {
@@ -445,11 +523,16 @@
             "type": "string"
           },
           "type": {
-            "enum": ["users"],
+            "enum": [
+              "users"
+            ],
             "type": "string"
           }
         },
-        "required": ["type", "fileId"],
+        "required": [
+          "type",
+          "fileId"
+        ],
         "type": "object"
       },
       "CreateOrganizationDto": {
@@ -459,7 +542,9 @@
             "type": "string"
           }
         },
-        "required": ["name"],
+        "required": [
+          "name"
+        ],
         "type": "object"
       },
       "CreateRoleDto": {
@@ -482,7 +567,10 @@
             "type": "array"
           }
         },
-        "required": ["name", "permissionIds"],
+        "required": [
+          "name",
+          "permissionIds"
+        ],
         "type": "object"
       },
       "DeviceTokenDto": {
@@ -494,14 +582,22 @@
             "type": "string"
           },
           "platform": {
-            "enum": ["IOS", "ANDROID"],
+            "enum": [
+              "IOS",
+              "ANDROID"
+            ],
             "type": "string"
           },
           "token": {
             "type": "string"
           }
         },
-        "required": ["id", "platform", "token", "lastUsedAt"],
+        "required": [
+          "id",
+          "platform",
+          "token",
+          "lastUsedAt"
+        ],
         "type": "object"
       },
       "ExchangeSsoSessionDto": {
@@ -510,7 +606,9 @@
             "type": "string"
           }
         },
-        "required": ["code"],
+        "required": [
+          "code"
+        ],
         "type": "object"
       },
       "ExportAuditLogsQueryDto": {
@@ -519,21 +617,22 @@
             "type": "string"
           },
           "actorId": {
+            "format": "uuid",
             "type": "string"
           },
           "from": {
-            "type": "string"
-          },
-          "q": {
+            "format": "date-time",
             "type": "string"
           },
           "resourceId": {
+            "format": "uuid",
             "type": "string"
           },
           "resourceType": {
             "type": "string"
           },
           "to": {
+            "format": "date-time",
             "type": "string"
           }
         },
@@ -561,7 +660,13 @@
             "type": "string"
           },
           "status": {
-            "enum": ["PENDING", "PROCESSING", "COMPLETED", "FAILED", "CANCELLED"],
+            "enum": [
+              "PENDING",
+              "PROCESSING",
+              "COMPLETED",
+              "FAILED",
+              "CANCELLED"
+            ],
             "type": "string"
           },
           "type": {
@@ -571,7 +676,14 @@
             "type": "string"
           }
         },
-        "required": ["id", "type", "status", "createdById", "createdAt", "updatedAt"],
+        "required": [
+          "id",
+          "type",
+          "status",
+          "createdById",
+          "createdAt",
+          "updatedAt"
+        ],
         "type": "object"
       },
       "FileDto": {
@@ -635,11 +747,18 @@
             "type": "object"
           },
           "type": {
-            "enum": ["version", "audit"],
+            "enum": [
+              "version",
+              "audit"
+            ],
             "type": "string"
           }
         },
-        "required": ["type", "action", "createdAt"],
+        "required": [
+          "type",
+          "action",
+          "createdAt"
+        ],
         "type": "object"
       },
       "FileUrlDto": {
@@ -654,7 +773,11 @@
             "type": "string"
           }
         },
-        "required": ["id", "url", "expiresInSeconds"],
+        "required": [
+          "id",
+          "url",
+          "expiresInSeconds"
+        ],
         "type": "object"
       },
       "FileVersionDto": {
@@ -702,13 +825,18 @@
             "type": "string"
           }
         },
-        "required": ["email"],
+        "required": [
+          "email"
+        ],
         "type": "object"
       },
       "HealthStatusDto": {
         "properties": {
           "status": {
-            "enum": ["ok", "ready"],
+            "enum": [
+              "ok",
+              "ready"
+            ],
             "type": "string"
           },
           "warnings": {
@@ -719,7 +847,9 @@
             "type": "array"
           }
         },
-        "required": ["status"],
+        "required": [
+          "status"
+        ],
         "type": "object"
       },
       "ImportJobDto": {
@@ -755,7 +885,13 @@
             "type": "object"
           },
           "status": {
-            "enum": ["PENDING", "PROCESSING", "COMPLETED", "FAILED", "CANCELLED"],
+            "enum": [
+              "PENDING",
+              "PROCESSING",
+              "COMPLETED",
+              "FAILED",
+              "CANCELLED"
+            ],
             "type": "string"
           },
           "successCount": {
@@ -768,7 +904,15 @@
             "type": "string"
           }
         },
-        "required": ["id", "type", "fileId", "status", "createdById", "createdAt", "updatedAt"],
+        "required": [
+          "id",
+          "type",
+          "fileId",
+          "status",
+          "createdById",
+          "createdAt",
+          "updatedAt"
+        ],
         "type": "object"
       },
       "JobDependencyDto": {
@@ -780,14 +924,26 @@
             "type": "string"
           },
           "dependsOnJobStatus": {
-            "enum": ["PENDING", "PROCESSING", "COMPLETED", "CANCELLED", "FAILED", "BLOCKED"],
+            "enum": [
+              "PENDING",
+              "PROCESSING",
+              "COMPLETED",
+              "CANCELLED",
+              "FAILED",
+              "BLOCKED"
+            ],
             "type": "string"
           },
           "id": {
             "type": "string"
           }
         },
-        "required": ["id", "dependsOnJobId", "dependsOnJobStatus", "createdAt"],
+        "required": [
+          "id",
+          "dependsOnJobId",
+          "dependsOnJobStatus",
+          "createdAt"
+        ],
         "type": "object"
       },
       "JobDto": {
@@ -834,7 +990,14 @@
             "type": "object"
           },
           "status": {
-            "enum": ["PENDING", "PROCESSING", "COMPLETED", "CANCELLED", "FAILED", "BLOCKED"],
+            "enum": [
+              "PENDING",
+              "PROCESSING",
+              "COMPLETED",
+              "CANCELLED",
+              "FAILED",
+              "BLOCKED"
+            ],
             "type": "string"
           },
           "type": {
@@ -894,7 +1057,12 @@
             "type": "string"
           }
         },
-        "required": ["id", "jobId", "type", "createdAt"],
+        "required": [
+          "id",
+          "jobId",
+          "type",
+          "createdAt"
+        ],
         "type": "object"
       },
       "JobListDto": {
@@ -941,7 +1109,14 @@
             "type": "object"
           },
           "status": {
-            "enum": ["PENDING", "PROCESSING", "COMPLETED", "CANCELLED", "FAILED", "BLOCKED"],
+            "enum": [
+              "PENDING",
+              "PROCESSING",
+              "COMPLETED",
+              "CANCELLED",
+              "FAILED",
+              "BLOCKED"
+            ],
             "type": "string"
           },
           "type": {
@@ -1015,7 +1190,10 @@
             "type": "number"
           }
         },
-        "required": ["status", "total"],
+        "required": [
+          "status",
+          "total"
+        ],
         "type": "object"
       },
       "JobTypeCountDto": {
@@ -1027,7 +1205,10 @@
             "type": "string"
           }
         },
-        "required": ["type", "total"],
+        "required": [
+          "type",
+          "total"
+        ],
         "type": "object"
       },
       "LoginDto": {
@@ -1039,7 +1220,10 @@
             "type": "string"
           }
         },
-        "required": ["email", "password"],
+        "required": [
+          "email",
+          "password"
+        ],
         "type": "object"
       },
       "LoginResponseDto": {
@@ -1076,7 +1260,9 @@
             "$ref": "#/components/schemas/AuthUserDto"
           }
         },
-        "required": ["mfaRequired"],
+        "required": [
+          "mfaRequired"
+        ],
         "type": "object"
       },
       "MailDeliveryDto": {
@@ -1101,7 +1287,10 @@
             "type": "object"
           },
           "status": {
-            "enum": ["SENT", "FAILED"],
+            "enum": [
+              "SENT",
+              "FAILED"
+            ],
             "type": "string"
           },
           "subject": {
@@ -1111,7 +1300,14 @@
             "type": "string"
           }
         },
-        "required": ["id", "templateKey", "recipient", "subject", "status", "createdAt"],
+        "required": [
+          "id",
+          "templateKey",
+          "recipient",
+          "subject",
+          "status",
+          "createdAt"
+        ],
         "type": "object"
       },
       "MailPreviewDto": {
@@ -1133,7 +1329,12 @@
             "type": "string"
           }
         },
-        "required": ["subject", "text", "html", "missingVariables"],
+        "required": [
+          "subject",
+          "text",
+          "html",
+          "missingVariables"
+        ],
         "type": "object"
       },
       "MailTemplateDto": {
@@ -1155,7 +1356,12 @@
             "type": "array"
           }
         },
-        "required": ["key", "mandatory", "sendable", "variables"],
+        "required": [
+          "key",
+          "mandatory",
+          "sendable",
+          "variables"
+        ],
         "type": "object"
       },
       "MfaCodeDto": {
@@ -1164,7 +1370,9 @@
             "type": "string"
           }
         },
-        "required": ["code"],
+        "required": [
+          "code"
+        ],
         "type": "object"
       },
       "MfaRecoveryCodesResponseDto": {
@@ -1176,7 +1384,9 @@
             "type": "array"
           }
         },
-        "required": ["recoveryCodes"],
+        "required": [
+          "recoveryCodes"
+        ],
         "type": "object"
       },
       "MfaSetupResponseDto": {
@@ -1188,7 +1398,10 @@
             "type": "string"
           }
         },
-        "required": ["secret", "otpauthUrl"],
+        "required": [
+          "secret",
+          "otpauthUrl"
+        ],
         "type": "object"
       },
       "MfaStatusDto": {
@@ -1197,7 +1410,9 @@
             "type": "boolean"
           }
         },
-        "required": ["enabled"],
+        "required": [
+          "enabled"
+        ],
         "type": "object"
       },
       "NotificationDto": {
@@ -1228,7 +1443,14 @@
             "type": "string"
           }
         },
-        "required": ["id", "userId", "type", "title", "body", "createdAt"],
+        "required": [
+          "id",
+          "userId",
+          "type",
+          "title",
+          "body",
+          "createdAt"
+        ],
         "type": "object"
       },
       "NotificationJobDto": {
@@ -1238,7 +1460,11 @@
             "type": "string"
           },
           "audience": {
-            "enum": ["USER", "USERS", "ALL"],
+            "enum": [
+              "USER",
+              "USERS",
+              "ALL"
+            ],
             "type": "string"
           },
           "body": {
@@ -1267,7 +1493,13 @@
             "type": "string"
           },
           "status": {
-            "enum": ["PENDING", "PROCESSING", "COMPLETED", "CANCELLED", "FAILED"],
+            "enum": [
+              "PENDING",
+              "PROCESSING",
+              "COMPLETED",
+              "CANCELLED",
+              "FAILED"
+            ],
             "type": "string"
           },
           "targetUserId": {
@@ -1318,7 +1550,11 @@
             "type": "string"
           },
           "role": {
-            "enum": ["OWNER", "ADMIN", "MEMBER"],
+            "enum": [
+              "OWNER",
+              "ADMIN",
+              "MEMBER"
+            ],
             "type": "string"
           },
           "slug": {
@@ -1328,7 +1564,15 @@
             "type": "string"
           }
         },
-        "required": ["id", "name", "slug", "role", "memberCount", "createdAt", "updatedAt"],
+        "required": [
+          "id",
+          "name",
+          "slug",
+          "role",
+          "memberCount",
+          "createdAt",
+          "updatedAt"
+        ],
         "type": "object"
       },
       "OrganizationDto": {
@@ -1346,7 +1590,11 @@
             "type": "string"
           },
           "role": {
-            "enum": ["OWNER", "ADMIN", "MEMBER"],
+            "enum": [
+              "OWNER",
+              "ADMIN",
+              "MEMBER"
+            ],
             "type": "string"
           },
           "slug": {
@@ -1356,7 +1604,15 @@
             "type": "string"
           }
         },
-        "required": ["id", "name", "slug", "role", "createdAt", "updatedAt", "current"],
+        "required": [
+          "id",
+          "name",
+          "slug",
+          "role",
+          "createdAt",
+          "updatedAt",
+          "current"
+        ],
         "type": "object"
       },
       "OrganizationMemberDto": {
@@ -1371,7 +1627,11 @@
             "type": "string"
           },
           "role": {
-            "enum": ["OWNER", "ADMIN", "MEMBER"],
+            "enum": [
+              "OWNER",
+              "ADMIN",
+              "MEMBER"
+            ],
             "type": "string"
           },
           "updatedAt": {
@@ -1381,7 +1641,14 @@
             "type": "string"
           }
         },
-        "required": ["userId", "email", "displayName", "role", "createdAt", "updatedAt"],
+        "required": [
+          "userId",
+          "email",
+          "displayName",
+          "role",
+          "createdAt",
+          "updatedAt"
+        ],
         "type": "object"
       },
       "PaginationMetaDto": {
@@ -1402,7 +1669,13 @@
             "type": "number"
           }
         },
-        "required": ["requestId", "page", "limit", "total", "totalPages"],
+        "required": [
+          "requestId",
+          "page",
+          "limit",
+          "total",
+          "totalPages"
+        ],
         "type": "object"
       },
       "PermissionDto": {
@@ -1421,11 +1694,20 @@
             "type": "string"
           },
           "scope": {
-            "enum": ["platform", "organization"],
+            "enum": [
+              "platform",
+              "organization"
+            ],
             "type": "string"
           }
         },
-        "required": ["id", "name", "description", "isSystem", "scope"],
+        "required": [
+          "id",
+          "name",
+          "description",
+          "isSystem",
+          "scope"
+        ],
         "type": "object"
       },
       "RefreshTokenDto": {
@@ -1434,20 +1716,28 @@
             "type": "string"
           }
         },
-        "required": ["refreshToken"],
+        "required": [
+          "refreshToken"
+        ],
         "type": "object"
       },
       "RegisterDeviceDto": {
         "properties": {
           "platform": {
-            "enum": ["IOS", "ANDROID"],
+            "enum": [
+              "IOS",
+              "ANDROID"
+            ],
             "type": "string"
           },
           "token": {
             "type": "string"
           }
         },
-        "required": ["token", "platform"],
+        "required": [
+          "token",
+          "platform"
+        ],
         "type": "object"
       },
       "RegisterDto": {
@@ -1462,7 +1752,11 @@
             "type": "string"
           }
         },
-        "required": ["email", "password", "displayName"],
+        "required": [
+          "email",
+          "password",
+          "displayName"
+        ],
         "type": "object"
       },
       "ReplaceRolePermissionsDto": {
@@ -1474,7 +1768,9 @@
             "type": "array"
           }
         },
-        "required": ["permissionIds"],
+        "required": [
+          "permissionIds"
+        ],
         "type": "object"
       },
       "ReplaceUserRolesDto": {
@@ -1486,7 +1782,9 @@
             "type": "string"
           }
         },
-        "required": ["roleId"],
+        "required": [
+          "roleId"
+        ],
         "type": "object"
       },
       "RequestMetaDto": {
@@ -1495,7 +1793,9 @@
             "type": "string"
           }
         },
-        "required": ["requestId"],
+        "required": [
+          "requestId"
+        ],
         "type": "object"
       },
       "ResendVerificationDto": {
@@ -1504,7 +1804,9 @@
             "type": "string"
           }
         },
-        "required": ["email"],
+        "required": [
+          "email"
+        ],
         "type": "object"
       },
       "ResetPasswordDto": {
@@ -1516,7 +1818,10 @@
             "type": "string"
           }
         },
-        "required": ["token", "newPassword"],
+        "required": [
+          "token",
+          "newPassword"
+        ],
         "type": "object"
       },
       "RoleAssignmentDto": {
@@ -1532,7 +1837,11 @@
             "type": "string"
           }
         },
-        "required": ["roleName", "roleId", "organizationId"],
+        "required": [
+          "roleName",
+          "roleId",
+          "organizationId"
+        ],
         "type": "object"
       },
       "RoleDto": {
@@ -1561,7 +1870,10 @@
             "type": "array"
           },
           "scope": {
-            "enum": ["platform", "organization"],
+            "enum": [
+              "platform",
+              "organization"
+            ],
             "type": "string"
           }
         },
@@ -1596,7 +1908,10 @@
             "type": "object"
           }
         },
-        "required": ["templateKey", "to"],
+        "required": [
+          "templateKey",
+          "to"
+        ],
         "type": "object"
       },
       "SendAdminMailResultDto": {
@@ -1605,17 +1920,30 @@
             "type": "string"
           },
           "status": {
-            "enum": ["PENDING", "PROCESSING", "COMPLETED", "CANCELLED", "FAILED"],
+            "enum": [
+              "PENDING",
+              "PROCESSING",
+              "COMPLETED",
+              "CANCELLED",
+              "FAILED"
+            ],
             "type": "string"
           }
         },
-        "required": ["jobId", "status"],
+        "required": [
+          "jobId",
+          "status"
+        ],
         "type": "object"
       },
       "SendNotificationRequestDto": {
         "properties": {
           "audience": {
-            "enum": ["USER", "USERS", "ALL"],
+            "enum": [
+              "USER",
+              "USERS",
+              "ALL"
+            ],
             "type": "string"
           },
           "body": {
@@ -1649,7 +1977,12 @@
             "type": "array"
           }
         },
-        "required": ["audience", "type", "title", "body"],
+        "required": [
+          "audience",
+          "type",
+          "title",
+          "body"
+        ],
         "type": "object"
       },
       "SsoCallbackQueryDto": {
@@ -1661,7 +1994,10 @@
             "type": "string"
           }
         },
-        "required": ["code", "state"],
+        "required": [
+          "code",
+          "state"
+        ],
         "type": "object"
       },
       "StartSsoLoginResponseDto": {
@@ -1670,7 +2006,9 @@
             "type": "string"
           }
         },
-        "required": ["authorizationUrl"],
+        "required": [
+          "authorizationUrl"
+        ],
         "type": "object"
       },
       "SuccessFlagDto": {
@@ -1679,7 +2017,9 @@
             "type": "boolean"
           }
         },
-        "required": ["success"],
+        "required": [
+          "success"
+        ],
         "type": "object"
       },
       "SuccessMessageDto": {
@@ -1691,7 +2031,10 @@
             "type": "boolean"
           }
         },
-        "required": ["success", "message"],
+        "required": [
+          "success",
+          "message"
+        ],
         "type": "object"
       },
       "SwitchOrganizationDto": {
@@ -1700,7 +2043,9 @@
             "type": "string"
           }
         },
-        "required": ["organizationId"],
+        "required": [
+          "organizationId"
+        ],
         "type": "object"
       },
       "SwitchOrganizationResponseDto": {
@@ -1715,7 +2060,11 @@
             "type": "string"
           }
         },
-        "required": ["accessToken", "refreshToken", "organizationId"],
+        "required": [
+          "accessToken",
+          "refreshToken",
+          "organizationId"
+        ],
         "type": "object"
       },
       "UpdateAdminUserDto": {
@@ -1735,11 +2084,17 @@
       "UpdateMemberRoleDto": {
         "properties": {
           "role": {
-            "enum": ["OWNER", "ADMIN", "MEMBER"],
+            "enum": [
+              "OWNER",
+              "ADMIN",
+              "MEMBER"
+            ],
             "type": "string"
           }
         },
-        "required": ["role"],
+        "required": [
+          "role"
+        ],
         "type": "object"
       },
       "UpdateOrganizationDto": {
@@ -1749,7 +2104,9 @@
             "type": "string"
           }
         },
-        "required": ["name"],
+        "required": [
+          "name"
+        ],
         "type": "object"
       },
       "UpdatePreferencesDto": {
@@ -1759,7 +2116,10 @@
             "type": "object"
           },
           "language": {
-            "enum": ["en", "vi"],
+            "enum": [
+              "en",
+              "vi"
+            ],
             "type": "string"
           },
           "notificationPreferences": {
@@ -1767,7 +2127,11 @@
             "type": "object"
           },
           "theme": {
-            "enum": ["system", "light", "dark"],
+            "enum": [
+              "system",
+              "light",
+              "dark"
+            ],
             "type": "string"
           },
           "timezone": {
@@ -1815,17 +2179,25 @@
             "type": "object"
           }
         },
-        "required": ["value"],
+        "required": [
+          "value"
+        ],
         "type": "object"
       },
       "UpdateUserStatusDto": {
         "properties": {
           "status": {
-            "enum": ["PENDING", "ACTIVE", "BLOCKED"],
+            "enum": [
+              "PENDING",
+              "ACTIVE",
+              "BLOCKED"
+            ],
             "type": "string"
           }
         },
-        "required": ["status"],
+        "required": [
+          "status"
+        ],
         "type": "object"
       },
       "UserDto": {
@@ -1874,7 +2246,11 @@
             "type": "array"
           },
           "status": {
-            "enum": ["PENDING", "ACTIVE", "BLOCKED"],
+            "enum": [
+              "PENDING",
+              "ACTIVE",
+              "BLOCKED"
+            ],
             "type": "string"
           },
           "updatedAt": {
@@ -1906,7 +2282,10 @@
             "type": "object"
           },
           "language": {
-            "enum": ["en", "vi"],
+            "enum": [
+              "en",
+              "vi"
+            ],
             "type": "string"
           },
           "notificationPreferences": {
@@ -1914,7 +2293,11 @@
             "type": "object"
           },
           "theme": {
-            "enum": ["system", "light", "dark"],
+            "enum": [
+              "system",
+              "light",
+              "dark"
+            ],
             "type": "string"
           },
           "timezone": {
@@ -1945,7 +2328,9 @@
             "type": "string"
           }
         },
-        "required": ["token"],
+        "required": [
+          "token"
+        ],
         "type": "object"
       },
       "VerifyMfaChallengeDto": {
@@ -1957,7 +2342,10 @@
             "type": "string"
           }
         },
-        "required": ["mfaToken", "code"],
+        "required": [
+          "mfaToken",
+          "code"
+        ],
         "type": "object"
       }
     },
@@ -2006,7 +2394,10 @@
             "required": false,
             "schema": {
               "default": "desc",
-              "enum": ["asc", "desc"],
+              "enum": [
+                "asc",
+                "desc"
+              ],
               "type": "string"
             }
           },
@@ -2051,7 +2442,10 @@
                       "$ref": "#/components/schemas/PaginationMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -2064,7 +2458,9 @@
             "bearer": []
           }
         ],
-        "tags": ["activities"]
+        "tags": [
+          "activities"
+        ]
       }
     },
     "/api/v1/admin/audit-logs": {
@@ -2096,7 +2492,10 @@
             "required": false,
             "schema": {
               "default": "desc",
-              "enum": ["asc", "desc"],
+              "enum": [
+                "asc",
+                "desc"
+              ],
               "type": "string"
             }
           },
@@ -2174,7 +2573,10 @@
                       "$ref": "#/components/schemas/PaginationMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -2187,7 +2589,9 @@
             "bearer": []
           }
         ],
-        "tags": ["admin-audit"]
+        "tags": [
+          "admin-audit"
+        ]
       }
     },
     "/api/v1/admin/audit-logs/{id}": {
@@ -2216,7 +2620,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -2229,12 +2636,14 @@
             "bearer": []
           }
         ],
-        "tags": ["admin-audit"]
+        "tags": [
+          "admin-audit"
+        ]
       }
     },
     "/api/v1/admin/audit-logs/export": {
       "post": {
-        "operationId": "AuditController_exportAuditLogs",
+        "operationId": "AuditExportController_exportAuditLogs",
         "parameters": [],
         "requestBody": {
           "content": {
@@ -2259,7 +2668,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -2272,12 +2684,14 @@
             "bearer": []
           }
         ],
-        "tags": ["admin-audit"]
+        "tags": [
+          "admin-audit"
+        ]
       }
     },
     "/api/v1/admin/audit-logs/exports/{fileId}/download": {
       "get": {
-        "operationId": "AuditController_downloadExport",
+        "operationId": "AuditExportController_downloadExport",
         "parameters": [
           {
             "in": "path",
@@ -2307,7 +2721,9 @@
             "bearer": []
           }
         ],
-        "tags": ["admin-audit"]
+        "tags": [
+          "admin-audit"
+        ]
       }
     },
     "/api/v1/admin/jobs": {
@@ -2339,7 +2755,10 @@
             "required": false,
             "schema": {
               "default": "desc",
-              "enum": ["asc", "desc"],
+              "enum": [
+                "asc",
+                "desc"
+              ],
               "type": "string"
             }
           },
@@ -2348,7 +2767,14 @@
             "name": "status",
             "required": false,
             "schema": {
-              "enum": ["PENDING", "PROCESSING", "COMPLETED", "CANCELLED", "FAILED", "BLOCKED"],
+              "enum": [
+                "PENDING",
+                "PROCESSING",
+                "COMPLETED",
+                "CANCELLED",
+                "FAILED",
+                "BLOCKED"
+              ],
               "type": "string"
             }
           },
@@ -2385,7 +2811,10 @@
                       "$ref": "#/components/schemas/PaginationMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -2398,7 +2827,9 @@
             "bearer": []
           }
         ],
-        "tags": ["admin-jobs"]
+        "tags": [
+          "admin-jobs"
+        ]
       }
     },
     "/api/v1/admin/jobs/{id}": {
@@ -2427,7 +2858,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -2440,7 +2874,9 @@
             "bearer": []
           }
         ],
-        "tags": ["admin-jobs"]
+        "tags": [
+          "admin-jobs"
+        ]
       },
       "get": {
         "operationId": "AdminJobsController_getJob",
@@ -2467,7 +2903,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -2480,7 +2919,9 @@
             "bearer": []
           }
         ],
-        "tags": ["admin-jobs"]
+        "tags": [
+          "admin-jobs"
+        ]
       }
     },
     "/api/v1/admin/jobs/{id}/dependencies": {
@@ -2512,7 +2953,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -2525,7 +2969,9 @@
             "bearer": []
           }
         ],
-        "tags": ["admin-jobs"]
+        "tags": [
+          "admin-jobs"
+        ]
       },
       "post": {
         "operationId": "AdminJobsController_addDependency",
@@ -2562,7 +3008,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -2575,7 +3024,9 @@
             "bearer": []
           }
         ],
-        "tags": ["admin-jobs"]
+        "tags": [
+          "admin-jobs"
+        ]
       }
     },
     "/api/v1/admin/jobs/{id}/logs": {
@@ -2615,7 +3066,10 @@
             "required": false,
             "schema": {
               "default": "desc",
-              "enum": ["asc", "desc"],
+              "enum": [
+                "asc",
+                "desc"
+              ],
               "type": "string"
             }
           }
@@ -2636,7 +3090,10 @@
                       "$ref": "#/components/schemas/PaginationMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -2649,7 +3106,9 @@
             "bearer": []
           }
         ],
-        "tags": ["admin-jobs"]
+        "tags": [
+          "admin-jobs"
+        ]
       }
     },
     "/api/v1/admin/jobs/metrics": {
@@ -2686,7 +3145,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -2699,7 +3161,9 @@
             "bearer": []
           }
         ],
-        "tags": ["admin-jobs"]
+        "tags": [
+          "admin-jobs"
+        ]
       }
     },
     "/api/v1/admin/mail/deliveries": {
@@ -2731,7 +3195,10 @@
             "required": false,
             "schema": {
               "default": "desc",
-              "enum": ["asc", "desc"],
+              "enum": [
+                "asc",
+                "desc"
+              ],
               "type": "string"
             }
           },
@@ -2748,7 +3215,10 @@
             "name": "status",
             "required": false,
             "schema": {
-              "enum": ["SENT", "FAILED"],
+              "enum": [
+                "SENT",
+                "FAILED"
+              ],
               "type": "string"
             }
           }
@@ -2769,7 +3239,10 @@
                       "$ref": "#/components/schemas/PaginationMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -2782,7 +3255,9 @@
             "bearer": []
           }
         ],
-        "tags": ["admin-mail"]
+        "tags": [
+          "admin-mail"
+        ]
       }
     },
     "/api/v1/admin/mail/preview/{templateKey}": {
@@ -2820,7 +3295,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -2833,7 +3311,9 @@
             "bearer": []
           }
         ],
-        "tags": ["admin-mail"]
+        "tags": [
+          "admin-mail"
+        ]
       }
     },
     "/api/v1/admin/mail/send": {
@@ -2863,7 +3343,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -2876,7 +3359,9 @@
             "bearer": []
           }
         ],
-        "tags": ["admin-mail"]
+        "tags": [
+          "admin-mail"
+        ]
       }
     },
     "/api/v1/admin/mail/templates": {
@@ -2899,7 +3384,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -2912,7 +3400,9 @@
             "bearer": []
           }
         ],
-        "tags": ["admin-mail"]
+        "tags": [
+          "admin-mail"
+        ]
       }
     },
     "/api/v1/admin/notifications": {
@@ -2942,7 +3432,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -2955,7 +3448,9 @@
             "bearer": []
           }
         ],
-        "tags": ["admin-notifications"]
+        "tags": [
+          "admin-notifications"
+        ]
       }
     },
     "/api/v1/admin/notifications/jobs": {
@@ -2987,7 +3482,10 @@
             "required": false,
             "schema": {
               "default": "desc",
-              "enum": ["asc", "desc"],
+              "enum": [
+                "asc",
+                "desc"
+              ],
               "type": "string"
             }
           },
@@ -2996,7 +3494,13 @@
             "name": "status",
             "required": false,
             "schema": {
-              "enum": ["PENDING", "PROCESSING", "COMPLETED", "CANCELLED", "FAILED"],
+              "enum": [
+                "PENDING",
+                "PROCESSING",
+                "COMPLETED",
+                "CANCELLED",
+                "FAILED"
+              ],
               "type": "string"
             }
           }
@@ -3017,7 +3521,10 @@
                       "$ref": "#/components/schemas/PaginationMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -3030,7 +3537,9 @@
             "bearer": []
           }
         ],
-        "tags": ["admin-notifications"]
+        "tags": [
+          "admin-notifications"
+        ]
       }
     },
     "/api/v1/admin/notifications/jobs/{id}": {
@@ -3059,7 +3568,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -3072,7 +3584,9 @@
             "bearer": []
           }
         ],
-        "tags": ["admin-notifications"]
+        "tags": [
+          "admin-notifications"
+        ]
       },
       "get": {
         "operationId": "AdminNotificationsController_getJob",
@@ -3099,7 +3613,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -3112,7 +3629,9 @@
             "bearer": []
           }
         ],
-        "tags": ["admin-notifications"]
+        "tags": [
+          "admin-notifications"
+        ]
       }
     },
     "/api/v1/admin/roles": {
@@ -3158,7 +3677,10 @@
             "name": "scope",
             "required": false,
             "schema": {
-              "enum": ["platform", "organization"],
+              "enum": [
+                "platform",
+                "organization"
+              ],
               "type": "string"
             }
           }
@@ -3179,7 +3701,10 @@
                       "$ref": "#/components/schemas/PaginationMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -3192,7 +3717,9 @@
             "bearer": []
           }
         ],
-        "tags": ["admin-roles"]
+        "tags": [
+          "admin-roles"
+        ]
       },
       "post": {
         "operationId": "AdminRolesController_createRole",
@@ -3220,7 +3747,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -3233,7 +3763,9 @@
             "bearer": []
           }
         ],
-        "tags": ["admin-roles"]
+        "tags": [
+          "admin-roles"
+        ]
       }
     },
     "/api/v1/admin/roles/{id}": {
@@ -3262,7 +3794,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -3275,7 +3810,9 @@
             "bearer": []
           }
         ],
-        "tags": ["admin-roles"]
+        "tags": [
+          "admin-roles"
+        ]
       },
       "patch": {
         "operationId": "AdminRolesController_updateRole",
@@ -3312,7 +3849,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -3325,7 +3865,9 @@
             "bearer": []
           }
         ],
-        "tags": ["admin-roles"]
+        "tags": [
+          "admin-roles"
+        ]
       }
     },
     "/api/v1/admin/roles/{id}/permissions": {
@@ -3364,7 +3906,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -3377,7 +3922,9 @@
             "bearer": []
           }
         ],
-        "tags": ["admin-roles"]
+        "tags": [
+          "admin-roles"
+        ]
       }
     },
     "/api/v1/admin/roles/permissions": {
@@ -3400,7 +3947,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -3413,7 +3963,9 @@
             "bearer": []
           }
         ],
-        "tags": ["admin-roles"]
+        "tags": [
+          "admin-roles"
+        ]
       }
     },
     "/api/v1/admin/settings": {
@@ -3436,7 +3988,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -3449,7 +4004,9 @@
             "bearer": []
           }
         ],
-        "tags": ["admin-settings"]
+        "tags": [
+          "admin-settings"
+        ]
       }
     },
     "/api/v1/admin/settings/{key}": {
@@ -3488,7 +4045,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -3501,7 +4061,9 @@
             "bearer": []
           }
         ],
-        "tags": ["admin-settings"]
+        "tags": [
+          "admin-settings"
+        ]
       }
     },
     "/api/v1/admin/users": {
@@ -3533,7 +4095,10 @@
             "required": false,
             "schema": {
               "default": "desc",
-              "enum": ["asc", "desc"],
+              "enum": [
+                "asc",
+                "desc"
+              ],
               "type": "string"
             }
           },
@@ -3550,7 +4115,11 @@
             "name": "status",
             "required": false,
             "schema": {
-              "enum": ["PENDING", "ACTIVE", "BLOCKED"],
+              "enum": [
+                "PENDING",
+                "ACTIVE",
+                "BLOCKED"
+              ],
               "type": "string"
             }
           },
@@ -3578,7 +4147,12 @@
             "required": false,
             "schema": {
               "default": "createdAt",
-              "enum": ["createdAt", "displayName", "email", "status"],
+              "enum": [
+                "createdAt",
+                "displayName",
+                "email",
+                "status"
+              ],
               "type": "string"
             }
           }
@@ -3599,7 +4173,10 @@
                       "$ref": "#/components/schemas/PaginationMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -3612,7 +4189,9 @@
             "bearer": []
           }
         ],
-        "tags": ["admin-users"]
+        "tags": [
+          "admin-users"
+        ]
       },
       "post": {
         "operationId": "AdminUsersController_createUser",
@@ -3640,7 +4219,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -3653,7 +4235,9 @@
             "bearer": []
           }
         ],
-        "tags": ["admin-users"]
+        "tags": [
+          "admin-users"
+        ]
       }
     },
     "/api/v1/admin/users/{id}": {
@@ -3682,7 +4266,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -3695,7 +4282,9 @@
             "bearer": []
           }
         ],
-        "tags": ["admin-users"]
+        "tags": [
+          "admin-users"
+        ]
       },
       "get": {
         "operationId": "AdminUsersController_getUser",
@@ -3722,7 +4311,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -3735,7 +4327,9 @@
             "bearer": []
           }
         ],
-        "tags": ["admin-users"]
+        "tags": [
+          "admin-users"
+        ]
       },
       "patch": {
         "operationId": "AdminUsersController_updateUser",
@@ -3772,7 +4366,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -3785,7 +4382,9 @@
             "bearer": []
           }
         ],
-        "tags": ["admin-users"]
+        "tags": [
+          "admin-users"
+        ]
       }
     },
     "/api/v1/admin/users/{id}/roles": {
@@ -3824,7 +4423,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -3837,7 +4439,9 @@
             "bearer": []
           }
         ],
-        "tags": ["admin-users"]
+        "tags": [
+          "admin-users"
+        ]
       }
     },
     "/api/v1/admin/users/{id}/status": {
@@ -3876,7 +4480,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -3889,7 +4496,9 @@
             "bearer": []
           }
         ],
-        "tags": ["admin-users"]
+        "tags": [
+          "admin-users"
+        ]
       }
     },
     "/api/v1/attachments": {
@@ -3929,7 +4538,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -3942,7 +4554,9 @@
             "bearer": []
           }
         ],
-        "tags": ["attachments"]
+        "tags": [
+          "attachments"
+        ]
       },
       "post": {
         "operationId": "AttachmentsController_attach",
@@ -3970,7 +4584,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -3983,7 +4600,9 @@
             "bearer": []
           }
         ],
-        "tags": ["attachments"]
+        "tags": [
+          "attachments"
+        ]
       }
     },
     "/api/v1/attachments/{id}": {
@@ -4012,7 +4631,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -4025,7 +4647,9 @@
             "bearer": []
           }
         ],
-        "tags": ["attachments"]
+        "tags": [
+          "attachments"
+        ]
       }
     },
     "/api/v1/auth/forgot-password": {
@@ -4055,7 +4679,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -4068,7 +4695,9 @@
             "bearer": []
           }
         ],
-        "tags": ["auth"]
+        "tags": [
+          "auth"
+        ]
       }
     },
     "/api/v1/auth/login": {
@@ -4098,7 +4727,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -4106,7 +4738,9 @@
             "description": ""
           }
         },
-        "tags": ["auth"]
+        "tags": [
+          "auth"
+        ]
       }
     },
     "/api/v1/auth/logout": {
@@ -4126,7 +4760,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -4139,7 +4776,9 @@
             "bearer": []
           }
         ],
-        "tags": ["auth"]
+        "tags": [
+          "auth"
+        ]
       }
     },
     "/api/v1/auth/logout-all": {
@@ -4159,7 +4798,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -4172,7 +4814,9 @@
             "bearer": []
           }
         ],
-        "tags": ["auth"]
+        "tags": [
+          "auth"
+        ]
       }
     },
     "/api/v1/auth/me": {
@@ -4192,7 +4836,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -4205,7 +4852,9 @@
             "bearer": []
           }
         ],
-        "tags": ["auth"]
+        "tags": [
+          "auth"
+        ]
       }
     },
     "/api/v1/auth/mfa/confirm": {
@@ -4235,7 +4884,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -4248,7 +4900,9 @@
             "bearer": []
           }
         ],
-        "tags": ["mfa"]
+        "tags": [
+          "mfa"
+        ]
       }
     },
     "/api/v1/auth/mfa/disable": {
@@ -4278,7 +4932,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -4291,7 +4948,9 @@
             "bearer": []
           }
         ],
-        "tags": ["mfa"]
+        "tags": [
+          "mfa"
+        ]
       }
     },
     "/api/v1/auth/mfa/recovery-codes/regenerate": {
@@ -4321,7 +4980,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -4334,7 +4996,9 @@
             "bearer": []
           }
         ],
-        "tags": ["mfa"]
+        "tags": [
+          "mfa"
+        ]
       }
     },
     "/api/v1/auth/mfa/setup": {
@@ -4354,7 +5018,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -4367,7 +5034,9 @@
             "bearer": []
           }
         ],
-        "tags": ["mfa"]
+        "tags": [
+          "mfa"
+        ]
       }
     },
     "/api/v1/auth/mfa/status": {
@@ -4387,7 +5056,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -4400,7 +5072,9 @@
             "bearer": []
           }
         ],
-        "tags": ["mfa"]
+        "tags": [
+          "mfa"
+        ]
       }
     },
     "/api/v1/auth/mfa/verify-challenge": {
@@ -4430,7 +5104,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -4438,7 +5115,9 @@
             "description": ""
           }
         },
-        "tags": ["auth"]
+        "tags": [
+          "auth"
+        ]
       }
     },
     "/api/v1/auth/refresh": {
@@ -4468,7 +5147,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -4476,7 +5158,9 @@
             "description": ""
           }
         },
-        "tags": ["auth"]
+        "tags": [
+          "auth"
+        ]
       }
     },
     "/api/v1/auth/register": {
@@ -4506,7 +5190,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -4519,7 +5206,9 @@
             "bearer": []
           }
         ],
-        "tags": ["auth"]
+        "tags": [
+          "auth"
+        ]
       }
     },
     "/api/v1/auth/resend-verification": {
@@ -4549,7 +5238,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -4562,7 +5254,9 @@
             "bearer": []
           }
         ],
-        "tags": ["auth"]
+        "tags": [
+          "auth"
+        ]
       }
     },
     "/api/v1/auth/reset-password": {
@@ -4592,7 +5286,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -4605,7 +5302,9 @@
             "bearer": []
           }
         ],
-        "tags": ["auth"]
+        "tags": [
+          "auth"
+        ]
       }
     },
     "/api/v1/auth/sessions": {
@@ -4628,7 +5327,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -4641,7 +5343,9 @@
             "bearer": []
           }
         ],
-        "tags": ["auth"]
+        "tags": [
+          "auth"
+        ]
       }
     },
     "/api/v1/auth/sessions/{sessionId}": {
@@ -4670,7 +5374,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -4683,7 +5390,9 @@
             "bearer": []
           }
         ],
-        "tags": ["auth"]
+        "tags": [
+          "auth"
+        ]
       }
     },
     "/api/v1/auth/sso/{provider}/callback": {
@@ -4720,7 +5429,9 @@
             "description": ""
           }
         },
-        "tags": ["sso"]
+        "tags": [
+          "sso"
+        ]
       },
       "post": {
         "operationId": "SsoController_handleCallbackPost",
@@ -4749,7 +5460,9 @@
             "description": ""
           }
         },
-        "tags": ["sso"]
+        "tags": [
+          "sso"
+        ]
       }
     },
     "/api/v1/auth/sso/{provider}/start": {
@@ -4795,7 +5508,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -4803,7 +5519,9 @@
             "description": ""
           }
         },
-        "tags": ["sso"]
+        "tags": [
+          "sso"
+        ]
       }
     },
     "/api/v1/auth/sso/exchange": {
@@ -4825,7 +5543,9 @@
             "description": ""
           }
         },
-        "tags": ["sso"]
+        "tags": [
+          "sso"
+        ]
       }
     },
     "/api/v1/auth/switch-organization": {
@@ -4855,7 +5575,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -4868,7 +5591,9 @@
             "bearer": []
           }
         ],
-        "tags": ["auth"]
+        "tags": [
+          "auth"
+        ]
       }
     },
     "/api/v1/auth/verify-email": {
@@ -4898,7 +5623,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -4911,7 +5639,9 @@
             "bearer": []
           }
         ],
-        "tags": ["auth"]
+        "tags": [
+          "auth"
+        ]
       }
     },
     "/api/v1/exports": {
@@ -4941,7 +5671,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -4954,7 +5687,9 @@
             "bearer": []
           }
         ],
-        "tags": ["exports"]
+        "tags": [
+          "exports"
+        ]
       }
     },
     "/api/v1/exports/{id}": {
@@ -4983,7 +5718,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -4996,7 +5734,9 @@
             "bearer": []
           }
         ],
-        "tags": ["exports"]
+        "tags": [
+          "exports"
+        ]
       }
     },
     "/api/v1/files": {
@@ -5028,7 +5768,10 @@
             "required": false,
             "schema": {
               "default": "desc",
-              "enum": ["asc", "desc"],
+              "enum": [
+                "asc",
+                "desc"
+              ],
               "type": "string"
             }
           },
@@ -5079,7 +5822,11 @@
             "required": false,
             "schema": {
               "default": "createdAt",
-              "enum": ["createdAt", "originalName", "sizeBytes"],
+              "enum": [
+                "createdAt",
+                "originalName",
+                "sizeBytes"
+              ],
               "type": "string"
             }
           }
@@ -5100,7 +5847,10 @@
                       "$ref": "#/components/schemas/PaginationMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -5113,7 +5863,9 @@
             "bearer": []
           }
         ],
-        "tags": ["files"]
+        "tags": [
+          "files"
+        ]
       },
       "post": {
         "operationId": "FilesController_upload",
@@ -5147,7 +5899,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -5160,7 +5915,9 @@
             "bearer": []
           }
         ],
-        "tags": ["files"]
+        "tags": [
+          "files"
+        ]
       }
     },
     "/api/v1/files/{id}": {
@@ -5189,7 +5946,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -5202,7 +5962,9 @@
             "bearer": []
           }
         ],
-        "tags": ["files"]
+        "tags": [
+          "files"
+        ]
       },
       "get": {
         "operationId": "FilesController_getById",
@@ -5229,7 +5991,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -5242,7 +6007,9 @@
             "bearer": []
           }
         ],
-        "tags": ["files"]
+        "tags": [
+          "files"
+        ]
       }
     },
     "/api/v1/files/{id}/download": {
@@ -5268,7 +6035,9 @@
             "bearer": []
           }
         ],
-        "tags": ["files"]
+        "tags": [
+          "files"
+        ]
       }
     },
     "/api/v1/files/{id}/history": {
@@ -5300,7 +6069,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -5313,7 +6085,9 @@
             "bearer": []
           }
         ],
-        "tags": ["files"]
+        "tags": [
+          "files"
+        ]
       }
     },
     "/api/v1/files/{id}/url": {
@@ -5342,7 +6116,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -5355,7 +6132,9 @@
             "bearer": []
           }
         ],
-        "tags": ["files"]
+        "tags": [
+          "files"
+        ]
       }
     },
     "/api/v1/files/{id}/versions": {
@@ -5387,7 +6166,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -5400,7 +6182,9 @@
             "bearer": []
           }
         ],
-        "tags": ["files"]
+        "tags": [
+          "files"
+        ]
       },
       "post": {
         "operationId": "FilesController_uploadVersion",
@@ -5443,7 +6227,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -5456,7 +6243,9 @@
             "bearer": []
           }
         ],
-        "tags": ["files"]
+        "tags": [
+          "files"
+        ]
       }
     },
     "/api/v1/files/batch-delete": {
@@ -5486,7 +6275,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -5499,7 +6291,9 @@
             "bearer": []
           }
         ],
-        "tags": ["files"]
+        "tags": [
+          "files"
+        ]
       }
     },
     "/api/v1/health": {
@@ -5519,7 +6313,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -5527,7 +6324,9 @@
             "description": ""
           }
         },
-        "tags": ["health"]
+        "tags": [
+          "health"
+        ]
       }
     },
     "/api/v1/health/ready": {
@@ -5547,7 +6346,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -5555,7 +6357,9 @@
             "description": ""
           }
         },
-        "tags": ["health"]
+        "tags": [
+          "health"
+        ]
       }
     },
     "/api/v1/imports": {
@@ -5585,7 +6389,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -5598,7 +6405,9 @@
             "bearer": []
           }
         ],
-        "tags": ["imports"]
+        "tags": [
+          "imports"
+        ]
       }
     },
     "/api/v1/imports/{id}": {
@@ -5627,7 +6436,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -5640,7 +6452,9 @@
             "bearer": []
           }
         ],
-        "tags": ["imports"]
+        "tags": [
+          "imports"
+        ]
       }
     },
     "/api/v1/imports/{id}/confirm": {
@@ -5669,7 +6483,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -5682,7 +6499,9 @@
             "bearer": []
           }
         ],
-        "tags": ["imports"]
+        "tags": [
+          "imports"
+        ]
       }
     },
     "/api/v1/notifications": {
@@ -5714,7 +6533,10 @@
             "required": false,
             "schema": {
               "default": "desc",
-              "enum": ["asc", "desc"],
+              "enum": [
+                "asc",
+                "desc"
+              ],
               "type": "string"
             }
           },
@@ -5751,7 +6573,10 @@
                       "$ref": "#/components/schemas/PaginationMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -5764,7 +6589,9 @@
             "bearer": []
           }
         ],
-        "tags": ["notifications"]
+        "tags": [
+          "notifications"
+        ]
       }
     },
     "/api/v1/notifications/{id}": {
@@ -5793,7 +6620,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -5806,7 +6636,9 @@
             "bearer": []
           }
         ],
-        "tags": ["notifications"]
+        "tags": [
+          "notifications"
+        ]
       }
     },
     "/api/v1/notifications/{id}/read": {
@@ -5835,7 +6667,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -5848,7 +6683,9 @@
             "bearer": []
           }
         ],
-        "tags": ["notifications"]
+        "tags": [
+          "notifications"
+        ]
       }
     },
     "/api/v1/notifications/devices": {
@@ -5878,7 +6715,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -5891,7 +6731,9 @@
             "bearer": []
           }
         ],
-        "tags": ["notifications"]
+        "tags": [
+          "notifications"
+        ]
       }
     },
     "/api/v1/notifications/devices/{token}": {
@@ -5920,7 +6762,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -5933,7 +6778,9 @@
             "bearer": []
           }
         ],
-        "tags": ["notifications"]
+        "tags": [
+          "notifications"
+        ]
       }
     },
     "/api/v1/notifications/read-all": {
@@ -5953,7 +6800,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -5966,7 +6816,9 @@
             "bearer": []
           }
         ],
-        "tags": ["notifications"]
+        "tags": [
+          "notifications"
+        ]
       }
     },
     "/api/v1/notifications/stream": {
@@ -5983,7 +6835,9 @@
             "bearer": []
           }
         ],
-        "tags": ["notifications"]
+        "tags": [
+          "notifications"
+        ]
       }
     },
     "/api/v1/notifications/unread-count": {
@@ -6003,7 +6857,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -6016,7 +6873,9 @@
             "bearer": []
           }
         ],
-        "tags": ["notifications"]
+        "tags": [
+          "notifications"
+        ]
       }
     },
     "/api/v1/organizations": {
@@ -6048,7 +6907,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -6061,7 +6923,9 @@
             "bearer": []
           }
         ],
-        "tags": ["organizations"]
+        "tags": [
+          "organizations"
+        ]
       },
       "post": {
         "operationId": "OrganizationsController_create",
@@ -6089,7 +6953,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -6102,7 +6969,9 @@
             "bearer": []
           }
         ],
-        "tags": ["organizations"]
+        "tags": [
+          "organizations"
+        ]
       }
     },
     "/api/v1/organizations/{id}": {
@@ -6131,7 +7000,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -6144,7 +7016,9 @@
             "bearer": []
           }
         ],
-        "tags": ["organizations"]
+        "tags": [
+          "organizations"
+        ]
       },
       "get": {
         "operationId": "OrganizationsController_getOne",
@@ -6171,7 +7045,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -6184,7 +7061,9 @@
             "bearer": []
           }
         ],
-        "tags": ["organizations"]
+        "tags": [
+          "organizations"
+        ]
       },
       "patch": {
         "operationId": "OrganizationsController_update",
@@ -6221,7 +7100,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -6234,7 +7116,9 @@
             "bearer": []
           }
         ],
-        "tags": ["organizations"]
+        "tags": [
+          "organizations"
+        ]
       }
     },
     "/api/v1/organizations/{id}/leave": {
@@ -6263,7 +7147,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -6276,7 +7163,9 @@
             "bearer": []
           }
         ],
-        "tags": ["organizations"]
+        "tags": [
+          "organizations"
+        ]
       }
     },
     "/api/v1/organizations/{id}/members": {
@@ -6308,7 +7197,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -6321,7 +7213,9 @@
             "bearer": []
           }
         ],
-        "tags": ["organizations"]
+        "tags": [
+          "organizations"
+        ]
       }
     },
     "/api/v1/organizations/{id}/members/{userId}": {
@@ -6358,7 +7252,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -6371,7 +7268,9 @@
             "bearer": []
           }
         ],
-        "tags": ["organizations"]
+        "tags": [
+          "organizations"
+        ]
       },
       "patch": {
         "operationId": "OrganizationsController_updateMemberRole",
@@ -6416,7 +7315,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -6429,7 +7331,9 @@
             "bearer": []
           }
         ],
-        "tags": ["organizations"]
+        "tags": [
+          "organizations"
+        ]
       }
     },
     "/api/v1/users/me": {
@@ -6449,7 +7353,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -6462,7 +7369,9 @@
             "bearer": []
           }
         ],
-        "tags": ["users"]
+        "tags": [
+          "users"
+        ]
       },
       "patch": {
         "operationId": "UsersController_updateMe",
@@ -6490,7 +7399,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -6503,7 +7415,9 @@
             "bearer": []
           }
         ],
-        "tags": ["users"]
+        "tags": [
+          "users"
+        ]
       }
     },
     "/api/v1/users/me/password": {
@@ -6533,7 +7447,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -6546,7 +7463,9 @@
             "bearer": []
           }
         ],
-        "tags": ["users"]
+        "tags": [
+          "users"
+        ]
       }
     },
     "/api/v1/users/me/preferences": {
@@ -6566,7 +7485,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -6579,7 +7501,9 @@
             "bearer": []
           }
         ],
-        "tags": ["users"]
+        "tags": [
+          "users"
+        ]
       },
       "get": {
         "operationId": "PreferencesController_getMyPreferences",
@@ -6597,7 +7521,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -6610,7 +7537,9 @@
             "bearer": []
           }
         ],
-        "tags": ["users"]
+        "tags": [
+          "users"
+        ]
       },
       "patch": {
         "operationId": "PreferencesController_updateMyPreferences",
@@ -6638,7 +7567,10 @@
                       "$ref": "#/components/schemas/RequestMetaDto"
                     }
                   },
-                  "required": ["data", "meta"],
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
                   "type": "object"
                 }
               }
@@ -6651,7 +7583,9 @@
             "bearer": []
           }
         ],
-        "tags": ["users"]
+        "tags": [
+          "users"
+        ]
       }
     }
   },

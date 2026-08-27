@@ -2,14 +2,17 @@ import type { FeatureSeedContext, FeatureSeeder } from "@repo/api-plugin-kit";
 import type { DatabaseExecutor } from "@repo/database-runtime";
 
 import { EnvironmentService } from "@repo/api-runtime";
-import { AccessControlService, ROLE_NAMES } from "@repo/feature-access-control/contracts";
-import { OrganizationsService } from "@repo/feature-organizations/contracts";
 import { hashPassword } from "@repo/utils/password";
 
 import {
+  PERSONAL_ORGANIZATION_PROVIDER,
+  type PersonalOrganizationProvider,
+  ROLE_NAMES,
   USERS_REPOSITORY,
   type UsersRepositoryPort,
-} from "./application/ports/users.repository.port";
+  USER_ACCESS_CONTROL,
+  type UserAccessControl,
+} from "./public/contracts";
 
 /** Bag key written by the users seeder for downstream notifications/auth seeders. */
 export const SEEDED_USERS_BAG_KEY = "seededUsers";
@@ -22,13 +25,14 @@ export interface SeededUsersBag {
 }
 
 async function runUsersSeed(ctx: FeatureSeedContext): Promise<void> {
-  const accessControlService = ctx.app.get(AccessControlService) as AccessControlService;
+  const accessControlService = ctx.app.get(USER_ACCESS_CONTROL) as UserAccessControl;
   const environmentService = ctx.app.get(EnvironmentService) as EnvironmentService;
-  const organizationsService = ctx.app.get(OrganizationsService) as OrganizationsService;
+  const personalOrganizationProvider = ctx.app.get(
+    PERSONAL_ORGANIZATION_PROVIDER,
+  ) as PersonalOrganizationProvider;
   const usersRepository = ctx.app.get(USERS_REPOSITORY) as UsersRepositoryPort;
   const executor = ctx.executor as DatabaseExecutor;
 
-  // Keep user creation/update idempotent so repeated seeds do not duplicate accounts.
   const ensureUser = async (input: {
     email: string;
     displayName: string;
@@ -78,11 +82,11 @@ async function runUsersSeed(ctx: FeatureSeedContext): Promise<void> {
 
     await accessControlService.replaceUserRoles(user.id, [role.id], null, executor);
 
-    const organizationId = await organizationsService.ensurePersonalOrganization(
+    const organizationId = (await personalOrganizationProvider.ensurePersonalOrganization(
       user.id,
       user.displayName,
       executor,
-    );
+    )) as string;
 
     return { userId: user.id, organizationId };
   };

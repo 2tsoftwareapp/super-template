@@ -2,7 +2,6 @@ import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { AppError, normalizeEmail, SYSTEM_SCOPE } from "@repo/api-runtime";
-import { AccessControlService, ROLE_NAMES } from "@repo/feature-access-control/contracts";
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
 
@@ -10,6 +9,11 @@ import type { UpdateAdminUserCommand, UserView } from "../users.types";
 
 import { assertUserBelongsToOrganization } from "../../domain/user-org-scope.policy";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";
+import {
+  ROLE_NAMES,
+  USER_ACCESS_CONTROL,
+  type UserAccessControl,
+} from "../../public/contracts";
 import { GetUserUseCase } from "./get-user.use-case";
 
 @Injectable()
@@ -17,7 +21,8 @@ export class UpdateAdminUserUseCase {
   constructor(
     @Inject(USERS_REPOSITORY)
     private readonly usersRepository: UsersRepositoryPort,
-    private readonly accessControlService: AccessControlService,
+    @Inject(USER_ACCESS_CONTROL)
+    private readonly accessControlService: UserAccessControl,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
     private readonly getUserUseCase: GetUserUseCase,
   ) {}
@@ -41,9 +46,6 @@ export class UpdateAdminUserUseCase {
       throw new AppError(USER_ERROR_CODES.USER_NOT_FOUND, "User not found", HttpStatus.NOT_FOUND);
     }
 
-    // Org-scoped roles (e.g. an organization ADMIN) are invisible to
-    // getAccessProfile unless the relevant organizationId is passed, so the
-    // privileged-account check below would otherwise silently miss them.
     const targetProfile = await this.accessControlService.getAccessProfile(
       userId,
       actor.roles.includes(ROLE_NAMES.SUPER_ADMIN) ? null : (actor.organizationId ?? null),

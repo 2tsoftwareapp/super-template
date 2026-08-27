@@ -1,16 +1,15 @@
 import type { TransactionExecutor } from "@repo/api-runtime";
 
 import { AppError, ERROR_CODES } from "@repo/api-runtime";
-import {
-  type AccessControlService,
-  ROLE_NAMES,
-  type RolePolicyTarget,
-} from "@repo/feature-access-control/contracts";
+
+import type { UserAccessControl } from "../public/user-access-control.port";
+import { ROLE_NAMES } from "../public/role.constants";
+import type { RolePolicyTarget } from "../domain/role-assignment.policy";
 
 import type { AssignableRoleName } from "./users.types";
 
 export async function resolveAssignableRole(
-  accessControlService: AccessControlService,
+  accessControlService: UserAccessControl,
   roleName: AssignableRoleName,
   organizationId: string | null,
   executor?: TransactionExecutor,
@@ -73,7 +72,7 @@ export async function resolveAssignableRole(
 }
 
 export async function resolveRoleById(
-  accessControlService: AccessControlService,
+  accessControlService: UserAccessControl,
   roleId: string,
   executor?: TransactionExecutor,
 ): Promise<{ id: string; name: string; organizationId: string | null; isSystem: boolean }> {

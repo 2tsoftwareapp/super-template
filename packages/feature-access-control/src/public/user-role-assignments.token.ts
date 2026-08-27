@@ -1,1 +1,1 @@
-export const USER_ROLE_ASSIGNMENTS = Symbol("USER_ROLE_ASSIGNMENTS");
+export { USER_ROLE_ASSIGNMENTS } from "@repo/feature-users/contracts";

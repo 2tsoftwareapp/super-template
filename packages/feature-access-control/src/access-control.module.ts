@@ -1,7 +1,11 @@
 import { Global, Module } from "@nestjs/common";
 import { AccessProfileCache } from "@repo/api-runtime";
 import { AppConfigModule } from "@repo/api-runtime";
-import { ORGANIZATION_USER_ROLES_PURGE } from "@repo/feature-organizations/contracts";
+import {
+  ORGANIZATION_ACCESS_CONTROL,
+  ORGANIZATION_CUSTOM_ROLES_PURGE,
+  ORGANIZATION_USER_ROLES_PURGE,
+} from "@repo/feature-organizations/contracts";
 
 import { AccessControlMapper } from "./application/access-control.mapper";
 import { AccessControlService } from "./application/access-control.service";
@@ -27,6 +31,10 @@ import { UserRoleAssignmentsPersistence } from "./infrastructure/user-role-assig
 import { AdminRolesController } from "./presentation/admin-roles.controller";
 import { ACCESS_CONTROL_REPOSITORY } from "./public/access-control-repository.token";
 import { USER_ROLE_ASSIGNMENTS } from "./public/user-role-assignments.token";
+import {
+  USER_ACCESS_CONTROL,
+  USER_PROFILE_INVALIDATOR,
+} from "@repo/feature-users/contracts";
 
 @Global()
 @Module({
@@ -63,6 +71,22 @@ import { USER_ROLE_ASSIGNMENTS } from "./public/user-role-assignments.token";
       provide: ORGANIZATION_USER_ROLES_PURGE,
       useExisting: UserRoleAssignmentsPersistence,
     },
+    {
+      provide: ORGANIZATION_CUSTOM_ROLES_PURGE,
+      useExisting: OrganizationCustomRolesPurgeAdapter,
+    },
+    {
+      provide: ORGANIZATION_ACCESS_CONTROL,
+      useExisting: OrganizationAccessControlAdapter,
+    },
+    {
+      provide: USER_ACCESS_CONTROL,
+      useExisting: AccessControlService,
+    },
+    {
+      provide: USER_PROFILE_INVALIDATOR,
+      useExisting: AccessControlService,
+    },
   ],
   exports: [
     AccessControlRepository,
@@ -70,6 +94,10 @@ import { USER_ROLE_ASSIGNMENTS } from "./public/user-role-assignments.token";
     ACCESS_CONTROL_REPOSITORY,
     USER_ROLE_ASSIGNMENTS,
     ORGANIZATION_USER_ROLES_PURGE,
+    ORGANIZATION_CUSTOM_ROLES_PURGE,
+    ORGANIZATION_ACCESS_CONTROL,
+    USER_ACCESS_CONTROL,
+    USER_PROFILE_INVALIDATOR,
   ],
 })
 export class AccessControlModule {}

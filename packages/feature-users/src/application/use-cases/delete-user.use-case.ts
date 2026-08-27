@@ -3,15 +3,18 @@ import type { TransactionPort } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { ERROR_CODES } from "@repo/api-runtime";
-import { AppError, SYSTEM_SCOPE } from "@repo/api-runtime";
-import { TRANSACTION_PORT } from "@repo/api-runtime";
-import { AccessControlService, ROLE_NAMES } from "@repo/feature-access-control/contracts";
+import { AppError, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 import { OUTBOX_APPENDER, type OutboxAppenderPort } from "@repo/feature-outbox/contracts";
 import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
 
 import { assertUserBelongsToOrganization } from "../../domain/user-org-scope.policy";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";
+import {
+  ROLE_NAMES,
+  USER_ACCESS_CONTROL,
+  type UserAccessControl,
+} from "../../public/contracts";
 
 @Injectable()
 export class DeleteUserUseCase {
@@ -19,7 +22,8 @@ export class DeleteUserUseCase {
     @Inject(TRANSACTION_PORT) private readonly transactionPort: TransactionPort,
     @Inject(USERS_REPOSITORY)
     private readonly usersRepository: UsersRepositoryPort,
-    private readonly accessControlService: AccessControlService,
+    @Inject(USER_ACCESS_CONTROL)
+    private readonly accessControlService: UserAccessControl,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
     @Inject(OUTBOX_APPENDER) private readonly outbox: OutboxAppenderPort,
   ) {}
@@ -46,9 +50,6 @@ export class DeleteUserUseCase {
       );
     }
 
-    // Org-scoped roles (e.g. an organization ADMIN) are invisible to
-    // getAccessProfile unless the relevant organizationId is passed, so the
-    // privileged-account check below would otherwise silently miss them.
     const targetProfile = await this.accessControlService.getAccessProfile(
       userId,
       actor.roles.includes(ROLE_NAMES.SUPER_ADMIN) ? null : (actor.organizationId ?? null),

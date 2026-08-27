@@ -1,7 +1,8 @@
 import type { AuthenticatedRequestUser } from "@repo/api-runtime";
 
 import { AppError, ERROR_CODES } from "@repo/api-runtime";
-import { ROLE_NAMES } from "@repo/feature-access-control/contracts";
+
+import { ROLE_NAMES } from "../public/role.constants";
 
 export function resolveUsersListOrganizationId(
   actor: AuthenticatedRequestUser,

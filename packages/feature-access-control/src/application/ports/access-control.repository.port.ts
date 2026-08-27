@@ -181,4 +181,4 @@ export interface AccessControlRepositoryPort {
   ): Promise<void>;
 }
 
-export const ACCESS_CONTROL_REPOSITORY = Symbol("ACCESS_CONTROL_REPOSITORY");
+export { ACCESS_CONTROL_REPOSITORY } from "../../public/access-control-repository.token";

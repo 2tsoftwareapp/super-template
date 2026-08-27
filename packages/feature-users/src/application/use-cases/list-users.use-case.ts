@@ -1,12 +1,12 @@
 import type { AuthenticatedRequestUser } from "@repo/api-runtime";
 
 import { Inject, Injectable } from "@nestjs/common";
-import { AccessControlService } from "@repo/feature-access-control/contracts";
 
 import type { ListUsersQuery } from "../users.types";
 
 import { resolveUsersListOrganizationId } from "../../domain/user-org-scope.policy";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";
+import { USER_ACCESS_CONTROL, type UserAccessControl } from "../../public/contracts";
 import { UsersMapper } from "../users.mapper";
 
 @Injectable()
@@ -14,7 +14,8 @@ export class ListUsersUseCase {
   constructor(
     @Inject(USERS_REPOSITORY)
     private readonly usersRepository: UsersRepositoryPort,
-    private readonly accessControlService: AccessControlService,
+    @Inject(USER_ACCESS_CONTROL)
+    private readonly accessControlService: UserAccessControl,
     private readonly usersMapper: UsersMapper,
   ) {}
 
@@ -24,8 +25,6 @@ export class ListUsersUseCase {
       ...query,
       ...(organizationId ? { organizationId } : {}),
     });
-    // Scope role data to the same organization so that roles from other orgs
-    // are never leaked to users who shouldn't see them.
     const [rolesByUserId, roleIdsByUserId] = await Promise.all([
       this.accessControlService.getRoleNamesForUsers(
         result.rows.map((row) => row.id),
