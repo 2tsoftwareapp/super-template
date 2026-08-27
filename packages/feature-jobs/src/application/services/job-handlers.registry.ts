@@ -5,7 +5,9 @@ import { JOB_HANDLER, type JobHandlerContext } from "../../public/job-handler.po
 /**
  * Reserved no-op job type for future orphaned-file cleanup.
  */
-async function filesCleanupHandler(_context: JobHandlerContext): Promise<void> {}
+async function filesCleanupHandler(_context: JobHandlerContext): Promise<void> {
+  // Reserved no-op job type for future orphaned-file cleanup.
+}
 
 type Handler = (context: JobHandlerContext) => Promise<void>;
 

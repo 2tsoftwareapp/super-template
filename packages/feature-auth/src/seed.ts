@@ -1,11 +1,7 @@
- 
 import type { FeatureSeedContext, FeatureSeeder } from "@repo/api-plugin-kit";
 import type { DatabaseExecutor } from "@repo/database-runtime";
 
-import {
-  AUTH_TOKEN_MAINTENANCE,
-  type AuthTokenMaintenance,
-} from "@repo/feature-auth/contracts";
+import { AUTH_TOKEN_MAINTENANCE, type AuthTokenMaintenance } from "@repo/feature-auth/contracts";
 
 interface SeededUsersBag {
   adminUserId: string;

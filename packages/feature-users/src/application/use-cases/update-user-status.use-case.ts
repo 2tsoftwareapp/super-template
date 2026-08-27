@@ -2,14 +2,13 @@ import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime
 import type { TransactionPort } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {AppError, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
-import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
+import { ERROR_CODES } from "@repo/api-runtime";
+import { AppError, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
 import { AccessControlService, ROLE_NAMES } from "@repo/feature-access-control/contracts";
 import { ACTIVITY_EMITTER, type ActivityEmitter } from "@repo/feature-activities/contracts";
-import {
-  OUTBOX_APPENDER,
-  type OutboxAppenderPort,
-} from "@repo/feature-outbox/contracts";
+import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
+import { OUTBOX_APPENDER, type OutboxAppenderPort } from "@repo/feature-outbox/contracts";
+import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
 
 import type { UserStatus, UserView } from "../users.types";
 
@@ -119,6 +118,3 @@ export class UpdateUserStatusUseCase {
     return this.getUserUseCase.execute(userId, actor);
   }
 }
-
-import { ERROR_CODES } from "@repo/api-runtime";
-import { USER_ERROR_CODES } from "@repo/feature-users/contracts";

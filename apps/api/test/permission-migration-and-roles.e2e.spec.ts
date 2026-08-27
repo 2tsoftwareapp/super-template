@@ -414,8 +414,11 @@ describe("Roles migration and provisioning (e2e)", () => {
   it("maps concurrent same-name role creation to conflicts", async () => {
     const session = await loginAs(app, "admin@example.local", "ChangeMe123!");
     const organization = firstRow(
-      (await pool.query<{ id: string }>(`SELECT id FROM m_organizations ORDER BY created_at LIMIT 1`))
-        .rows,
+      (
+        await pool.query<{ id: string }>(
+          `SELECT id FROM m_organizations ORDER BY created_at LIMIT 1`,
+        )
+      ).rows,
       "Expected a seeded organization",
     );
     const permission = firstRow(
@@ -471,18 +474,21 @@ describe("Roles migration and provisioning (e2e)", () => {
       );
       expect(roleCount.count).toBe(1);
     } finally {
-      await pool.query(`DELETE FROM m_roles WHERE organization_id = $1 AND LOWER(name) = LOWER($2)`, [
-        organization.id,
-        roleName,
-      ]);
+      await pool.query(
+        `DELETE FROM m_roles WHERE organization_id = $1 AND LOWER(name) = LOWER($2)`,
+        [organization.id, roleName],
+      );
     }
   }, 120_000);
 
   it("maps a concurrent same-target rename to one conflict", async () => {
     const session = await loginAs(app, "admin@example.local", "ChangeMe123!");
     const organization = firstRow(
-      (await pool.query<{ id: string }>(`SELECT id FROM m_organizations ORDER BY created_at LIMIT 1`))
-        .rows,
+      (
+        await pool.query<{ id: string }>(
+          `SELECT id FROM m_organizations ORDER BY created_at LIMIT 1`,
+        )
+      ).rows,
       "Expected a seeded organization",
     );
     const permission = firstRow(
@@ -544,8 +550,11 @@ describe("Roles migration and provisioning (e2e)", () => {
   it("paginates and filters more than fifty roles without overlap", async () => {
     const session = await loginAs(app, "admin@example.local", "ChangeMe123!");
     const organization = firstRow(
-      (await pool.query<{ id: string }>(`SELECT id FROM m_organizations ORDER BY created_at LIMIT 1`))
-        .rows,
+      (
+        await pool.query<{ id: string }>(
+          `SELECT id FROM m_organizations ORDER BY created_at LIMIT 1`,
+        )
+      ).rows,
       "Expected a seeded organization",
     );
     const prefix = `PAGINATION ${randomUUID().slice(0, 8).toUpperCase()}`;

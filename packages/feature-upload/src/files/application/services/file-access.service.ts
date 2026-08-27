@@ -1,7 +1,9 @@
 import type { AuthenticatedRequestUser } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {AppError } from "@repo/api-runtime";
+import { ERROR_CODES } from "@repo/api-runtime";
+import { AppError } from "@repo/api-runtime";
+import { FILE_ERROR_CODES } from "@repo/feature-upload/contracts";
 
 import { canAccessFile } from "../../domain/file-access.policy";
 import { FILES_REPOSITORY, type FilesRepositoryPort } from "../ports/files.repository.port";
@@ -43,6 +45,3 @@ export class FileAccessService {
     return file;
   }
 }
-
-import { ERROR_CODES } from "@repo/api-runtime";
-import { FILE_ERROR_CODES } from "@repo/feature-upload/contracts";

@@ -21,6 +21,7 @@ import { ORGANIZATION_LOOKUP } from "./public/organization-lookup.port";
 
 @Global()
 @Module({
+  imports: [],
   controllers: [OrganizationsController],
   providers: [
     OrganizationsRepository,

@@ -24,7 +24,8 @@ export const notificationsFeature: FeatureManifest = defineFeature({
     resources: {
       notifications: {
         scope: "organization",
-        actions: ["read", "create", "update", "delete"], defaultGrants: { "ADMIN": ["read", "create", "delete"], "USER": ["read"] }
+        actions: ["read", "create", "update", "delete"],
+        defaultGrants: { ADMIN: ["read", "create", "delete"], USER: ["read"] },
       },
     },
   },

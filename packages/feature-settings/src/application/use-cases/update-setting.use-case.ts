@@ -1,10 +1,12 @@
 import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {AppError, SYSTEM_SCOPE } from "@repo/api-runtime";
+import { ERROR_CODES } from "@repo/api-runtime";
+import { AppError, SYSTEM_SCOPE } from "@repo/api-runtime";
+import { PLATFORM_TRANSACTION_PORT, type PlatformTransactionPort } from "@repo/api-runtime";
 import { ROLE_NAMES } from "@repo/feature-access-control/contracts";
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
-import { PLATFORM_TRANSACTION_PORT, type PlatformTransactionPort } from "@repo/api-runtime";
+import { SETTINGS_ERROR_CODES } from "@repo/feature-settings/contracts";
 
 import type { UpdateSettingCommand } from "../settings.types";
 
@@ -77,6 +79,3 @@ export class UpdateSettingUseCase {
     return SettingsMapper.toDto(updated);
   }
 }
-
-import { ERROR_CODES } from "@repo/api-runtime";
-import { SETTINGS_ERROR_CODES } from "@repo/feature-settings/contracts";

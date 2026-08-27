@@ -1,8 +1,10 @@
 import type { RequestContext } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {AppError, normalizeEmail, SYSTEM_SCOPE } from "@repo/api-runtime";
+import { ERROR_CODES } from "@repo/api-runtime";
+import { AppError, normalizeEmail, SYSTEM_SCOPE } from "@repo/api-runtime";
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
+import { AUTH_ERROR_CODES } from "@repo/feature-auth/contracts";
 import { AUTH_USER_STORE, type AuthUserStore } from "@repo/feature-auth/contracts";
 import { MfaService } from "@repo/feature-mfa/contracts";
 
@@ -113,6 +115,3 @@ export class LoginUseCase {
     return { mfaRequired: false as const, ...session };
   }
 }
-
-import { ERROR_CODES } from "@repo/api-runtime";
-import { AUTH_ERROR_CODES } from "@repo/feature-auth/contracts";

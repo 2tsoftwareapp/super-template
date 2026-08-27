@@ -1,14 +1,11 @@
-import { Global, Module } from "@nestjs/common";
 import type { TransactionExecutor } from "@repo/api-kernel";
+
+import { Global, Module } from "@nestjs/common";
 
 import { AUDIT_REPOSITORY } from "./application/ports/audit.repository.port";
 import { RecordAuditLogUseCase } from "./application/use-cases/record-audit-log.use-case";
 import { AuditRepository } from "./infrastructure/audit.repository";
-import {
-  AUDIT_WRITER,
-  type AuditLogInput,
-  type AuditWriter,
-} from "./public/audit-writer.port";
+import { AUDIT_WRITER, type AuditLogInput, type AuditWriter } from "./public/audit-writer.port";
 
 /**
  * Audit writer core: the only surface other features need (AUDIT_WRITER).

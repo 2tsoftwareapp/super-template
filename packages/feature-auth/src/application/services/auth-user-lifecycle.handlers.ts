@@ -1,15 +1,19 @@
-import { Inject, Injectable } from "@nestjs/common";
 import type { JsonObject } from "@repo/api-kernel";
+
+import { Inject, Injectable } from "@nestjs/common";
 import {
   OUTBOX_APPENDER,
-  type OutboxAppenderPort,
   OUTBOX_TOPIC_HANDLER,
+  type OutboxAppenderPort,
   type OutboxMessage,
 } from "@repo/feature-outbox/contracts";
 
-import { AuthMailService } from "./auth-mail.service";
+import {
+  AUTH_TOKEN_MAINTENANCE,
+  type AuthTokenMaintenance,
+} from "../../public/auth-token-maintenance.port";
 import { AuthEmailVerificationService } from "./auth-email-verification.service";
-import { AUTH_TOKEN_MAINTENANCE, type AuthTokenMaintenance } from "../../public/auth-token-maintenance.port";
+import { AuthMailService } from "./auth-mail.service";
 
 function readString(payload: JsonObject, key: string): string {
   const value = payload[key];

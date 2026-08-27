@@ -22,12 +22,8 @@
       "@repo/feature-access-control/testing": [
         "../../packages/feature-access-control/src/testing/index.ts"
       ],
-      "@repo/feature-access-control/*": [
-        "../../packages/feature-access-control/src/*"
-      ],
-      "@repo/feature-activities": [
-        "../../packages/feature-activities/src/activities.feature.ts"
-      ],
+      "@repo/feature-access-control/*": ["../../packages/feature-access-control/src/*"],
+      "@repo/feature-activities": ["../../packages/feature-activities/src/activities.feature.ts"],
       "@repo/feature-activities/contracts": [
         "../../packages/feature-activities/src/public/contracts.ts"
       ],
@@ -42,48 +38,30 @@
       ],
       "@repo/feature-activities/*": ["../../packages/feature-activities/src/*"],
       "@repo/feature-audit": ["../../packages/feature-audit/src/audit.feature.ts"],
-      "@repo/feature-audit/contracts": [
-        "../../packages/feature-audit/src/public/contracts.ts"
-      ],
+      "@repo/feature-audit/contracts": ["../../packages/feature-audit/src/public/contracts.ts"],
       "@repo/feature-audit/schema": [
         "../../packages/feature-audit/src/infrastructure/persistence/index.ts"
       ],
-      "@repo/feature-audit/module": [
-        "../../packages/feature-audit/src/audit.module.ts"
-      ],
-      "@repo/feature-audit/testing": [
-        "../../packages/feature-audit/src/testing/index.ts"
-      ],
+      "@repo/feature-audit/module": ["../../packages/feature-audit/src/audit.module.ts"],
+      "@repo/feature-audit/testing": ["../../packages/feature-audit/src/testing/index.ts"],
       "@repo/feature-audit/*": ["../../packages/feature-audit/src/*"],
-      "@repo/feature-audit-export": [
-        "../../packages/feature-audit-export/src/index.ts"
-      ],
+      "@repo/feature-audit-export": ["../../packages/feature-audit-export/src/index.ts"],
       "@repo/feature-auth": ["../../packages/feature-auth/src/auth.feature.ts"],
-      "@repo/feature-auth/contracts": [
-        "../../packages/feature-auth/src/public/contracts.ts"
-      ],
+      "@repo/feature-auth/contracts": ["../../packages/feature-auth/src/public/contracts.ts"],
       "@repo/feature-auth/schema": [
         "../../packages/feature-auth/src/infrastructure/persistence/index.ts"
       ],
       "@repo/feature-auth/module": ["../../packages/feature-auth/src/auth.module.ts"],
       "@repo/feature-auth/testing": ["../../packages/feature-auth/src/testing/index.ts"],
       "@repo/feature-auth/*": ["../../packages/feature-auth/src/*"],
-      "@repo/feature-outbox": [
-        "../../packages/feature-outbox/src/index.ts"
-      ],
+      "@repo/feature-outbox": ["../../packages/feature-outbox/src/index.ts"],
       "@repo/feature-health": ["../../packages/feature-health/src/health.feature.ts"],
-      "@repo/feature-health/contracts": [
-        "../../packages/feature-health/src/public/contracts.ts"
-      ],
+      "@repo/feature-health/contracts": ["../../packages/feature-health/src/public/contracts.ts"],
       "@repo/feature-health/schema": [
         "../../packages/feature-health/src/infrastructure/persistence/index.ts"
       ],
-      "@repo/feature-health/module": [
-        "../../packages/feature-health/src/health.module.ts"
-      ],
-      "@repo/feature-health/testing": [
-        "../../packages/feature-health/src/testing/index.ts"
-      ],
+      "@repo/feature-health/module": ["../../packages/feature-health/src/health.module.ts"],
+      "@repo/feature-health/testing": ["../../packages/feature-health/src/testing/index.ts"],
       "@repo/feature-health/*": ["../../packages/feature-health/src/*"],
       "@repo/feature-import-export": [
         "../../packages/feature-import-export/src/import-export.feature.ts"
@@ -100,13 +78,9 @@
       "@repo/feature-import-export/testing": [
         "../../packages/feature-import-export/src/testing/index.ts"
       ],
-      "@repo/feature-import-export/*": [
-        "../../packages/feature-import-export/src/*"
-      ],
+      "@repo/feature-import-export/*": ["../../packages/feature-import-export/src/*"],
       "@repo/feature-jobs": ["../../packages/feature-jobs/src/jobs.feature.ts"],
-      "@repo/feature-jobs/contracts": [
-        "../../packages/feature-jobs/src/public/contracts.ts"
-      ],
+      "@repo/feature-jobs/contracts": ["../../packages/feature-jobs/src/public/contracts.ts"],
       "@repo/feature-jobs/schema": [
         "../../packages/feature-jobs/src/infrastructure/persistence/index.ts"
       ],
@@ -114,9 +88,7 @@
       "@repo/feature-jobs/testing": ["../../packages/feature-jobs/src/testing/index.ts"],
       "@repo/feature-jobs/*": ["../../packages/feature-jobs/src/*"],
       "@repo/feature-mail": ["../../packages/feature-mail/src/mail.feature.ts"],
-      "@repo/feature-mail/contracts": [
-        "../../packages/feature-mail/src/public/contracts.ts"
-      ],
+      "@repo/feature-mail/contracts": ["../../packages/feature-mail/src/public/contracts.ts"],
       "@repo/feature-mail/schema": [
         "../../packages/feature-mail/src/infrastructure/persistence/index.ts"
       ],
@@ -124,9 +96,7 @@
       "@repo/feature-mail/testing": ["../../packages/feature-mail/src/testing/index.ts"],
       "@repo/feature-mail/*": ["../../packages/feature-mail/src/*"],
       "@repo/feature-mfa": ["../../packages/feature-mfa/src/mfa.feature.ts"],
-      "@repo/feature-mfa/contracts": [
-        "../../packages/feature-mfa/src/public/contracts.ts"
-      ],
+      "@repo/feature-mfa/contracts": ["../../packages/feature-mfa/src/public/contracts.ts"],
       "@repo/feature-mfa/schema": [
         "../../packages/feature-mfa/src/infrastructure/persistence/index.ts"
       ],
@@ -148,9 +118,7 @@
       "@repo/feature-notifications/testing": [
         "../../packages/feature-notifications/src/testing/index.ts"
       ],
-      "@repo/feature-notifications/*": [
-        "../../packages/feature-notifications/src/*"
-      ],
+      "@repo/feature-notifications/*": ["../../packages/feature-notifications/src/*"],
       "@repo/feature-organizations": [
         "../../packages/feature-organizations/src/organizations.feature.ts"
       ],
@@ -166,29 +134,19 @@
       "@repo/feature-organizations/testing": [
         "../../packages/feature-organizations/src/testing/index.ts"
       ],
-      "@repo/feature-organizations/*": [
-        "../../packages/feature-organizations/src/*"
-      ],
-      "@repo/feature-settings": [
-        "../../packages/feature-settings/src/settings.feature.ts"
-      ],
+      "@repo/feature-organizations/*": ["../../packages/feature-organizations/src/*"],
+      "@repo/feature-settings": ["../../packages/feature-settings/src/settings.feature.ts"],
       "@repo/feature-settings/contracts": [
         "../../packages/feature-settings/src/public/contracts.ts"
       ],
       "@repo/feature-settings/schema": [
         "../../packages/feature-settings/src/infrastructure/persistence/index.ts"
       ],
-      "@repo/feature-settings/module": [
-        "../../packages/feature-settings/src/settings.module.ts"
-      ],
-      "@repo/feature-settings/testing": [
-        "../../packages/feature-settings/src/testing/index.ts"
-      ],
+      "@repo/feature-settings/module": ["../../packages/feature-settings/src/settings.module.ts"],
+      "@repo/feature-settings/testing": ["../../packages/feature-settings/src/testing/index.ts"],
       "@repo/feature-settings/*": ["../../packages/feature-settings/src/*"],
       "@repo/feature-sso": ["../../packages/feature-sso/src/sso.feature.ts"],
-      "@repo/feature-sso/contracts": [
-        "../../packages/feature-sso/src/public/contracts.ts"
-      ],
+      "@repo/feature-sso/contracts": ["../../packages/feature-sso/src/public/contracts.ts"],
       "@repo/feature-sso/schema": [
         "../../packages/feature-sso/src/infrastructure/persistence/index.ts"
       ],
@@ -196,18 +154,12 @@
       "@repo/feature-sso/testing": ["../../packages/feature-sso/src/testing/index.ts"],
       "@repo/feature-sso/*": ["../../packages/feature-sso/src/*"],
       "@repo/feature-upload": ["../../packages/feature-upload/src/upload.feature.ts"],
-      "@repo/feature-upload/contracts": [
-        "../../packages/feature-upload/src/public/contracts.ts"
-      ],
+      "@repo/feature-upload/contracts": ["../../packages/feature-upload/src/public/contracts.ts"],
       "@repo/feature-upload/schema": [
         "../../packages/feature-upload/src/infrastructure/persistence/index.ts"
       ],
-      "@repo/feature-upload/module": [
-        "../../packages/feature-upload/src/upload.module.ts"
-      ],
-      "@repo/feature-upload/testing": [
-        "../../packages/feature-upload/src/testing/index.ts"
-      ],
+      "@repo/feature-upload/module": ["../../packages/feature-upload/src/upload.module.ts"],
+      "@repo/feature-upload/testing": ["../../packages/feature-upload/src/testing/index.ts"],
       "@repo/feature-upload/*": ["../../packages/feature-upload/src/*"],
       "@repo/feature-user-preferences": [
         "../../packages/feature-user-preferences/src/user-preferences.feature.ts"
@@ -224,20 +176,14 @@
       "@repo/feature-user-preferences/testing": [
         "../../packages/feature-user-preferences/src/testing/index.ts"
       ],
-      "@repo/feature-user-preferences/*": [
-        "../../packages/feature-user-preferences/src/*"
-      ],
+      "@repo/feature-user-preferences/*": ["../../packages/feature-user-preferences/src/*"],
       "@repo/feature-users": ["../../packages/feature-users/src/users.feature.ts"],
-      "@repo/feature-users/contracts": [
-        "../../packages/feature-users/src/public/contracts.ts"
-      ],
+      "@repo/feature-users/contracts": ["../../packages/feature-users/src/public/contracts.ts"],
       "@repo/feature-users/schema": [
         "../../packages/feature-users/src/infrastructure/persistence/index.ts"
       ],
       "@repo/feature-users/module": ["../../packages/feature-users/src/users.module.ts"],
-      "@repo/feature-users/testing": [
-        "../../packages/feature-users/src/testing/index.ts"
-      ],
+      "@repo/feature-users/testing": ["../../packages/feature-users/src/testing/index.ts"],
       "@repo/feature-users/*": ["../../packages/feature-users/src/*"]
     }
   },

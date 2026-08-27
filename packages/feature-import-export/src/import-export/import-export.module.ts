@@ -1,5 +1,5 @@
 import { Global, Module } from "@nestjs/common";
-import { ImportExportAdapterRegistry } from "../public/contracts";
+import { ImportExportAdapterRegistry } from "../infrastructure/import-export-adapter.registry";
 
 @Global()
 @Module({

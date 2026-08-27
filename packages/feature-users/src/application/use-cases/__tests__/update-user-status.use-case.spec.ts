@@ -1,3 +1,5 @@
+import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
+import { ERROR_CODES } from "@repo/api-runtime";
 import { describe, expect, it, vi } from "vitest";
 
 import { UpdateUserStatusUseCase } from "../update-user-status.use-case";
@@ -38,6 +40,7 @@ function buildDependencies(
     cleanupExpiredTokens: vi.fn(async () => undefined),
     revokeAllSessionsForUser: vi.fn(async () => undefined),
   };
+  const outbox = { append: vi.fn(async () => undefined) };
   const activityEmitter = { emit: vi.fn(async () => undefined) };
   const getUserUseCase = {
     execute: vi.fn(async () => ({ id: target.id, status: "ACTIVE" })),
@@ -57,7 +60,7 @@ function buildDependencies(
     usersRepository as never,
     accessControlService as never,
     auditWriter as never,
-    authTokenCleanup as never,
+    outbox as never,
     activityEmitter as never,
     getUserUseCase as never,
   );
@@ -68,6 +71,7 @@ function buildDependencies(
     accessControlService,
     auditWriter,
     authTokenCleanup,
+    outbox,
     activityEmitter,
   };
 }
@@ -92,11 +96,15 @@ describe("UpdateUserStatusUseCase", () => {
   });
 
   it("revokes all sessions and writes an audit log when blocking", async () => {
-    const { useCase, auditWriter, authTokenCleanup, activityEmitter } = buildDependencies();
+    const { useCase, auditWriter, authTokenCleanup, activityEmitter, outbox } = buildDependencies();
 
     await useCase.execute(actor as never, "user-1", "BLOCKED");
 
-    expect(authTokenCleanup.revokeAllSessionsForUser).toHaveBeenCalledWith("user-1", null);
+    expect(outbox.append).toHaveBeenCalledWith(
+      "user.lifecycle.status-blocked",
+      { userId: "user-1" },
+      null,
+    );
     expect(auditWriter.log).toHaveBeenCalledWith(
       expect.objectContaining({ action: "user.blocked", entityId: "user-1" }),
       null,
@@ -123,8 +131,7 @@ describe("UpdateUserStatusUseCase", () => {
   it("skips activity emission when the actor has no organization context", async () => {
     const { useCase, activityEmitter } = buildDependencies();
 
-import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
-import { ERROR_CODES } from "@repo/api-runtime";    await useCase.execute(actor as never, "user-1", "BLOCKED");
+    await useCase.execute(actor as never, "user-1", "BLOCKED");
 
     expect(activityEmitter.emit).not.toHaveBeenCalled();
   });

@@ -1,3 +1,4 @@
+import { SETTINGS_ERROR_CODES } from "@repo/feature-settings/contracts";
 import { describe, expect, it, vi } from "vitest";
 
 import { RegisterUseCase } from "../register.use-case";
@@ -63,5 +64,3 @@ describe("RegisterUseCase", () => {
     expect(applicationSettingsLookup.isRegistrationEnabled).toHaveBeenCalled();
   });
 });
-
-import { SETTINGS_ERROR_CODES } from "@repo/feature-settings/contracts";

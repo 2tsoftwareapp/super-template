@@ -17,7 +17,9 @@ describe("feature composition (compile-time plugins)", () => {
   it("rejects duplicate feature ids", () => {
     const [first] = enabledFeatures;
     expect(first).toBeTruthy();
-    expect(() => composeFeatures([first!, first!])).toThrow(/Duplicate feature id/);
+    expect(() => composeFeatures([first!, first!])).toThrow(
+      /(Duplicate feature id|is provided by both)/,
+    );
   });
 
   it("dropping an optional plugin drops exactly its module (omit-plugin smoke)", () => {

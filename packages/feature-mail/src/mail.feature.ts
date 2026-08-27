@@ -14,7 +14,8 @@ export const mailFeature: FeatureManifest = defineFeature({
     resources: {
       mail: {
         scope: "organization",
-        actions: ["read", "create"], defaultGrants: { "ADMIN": ["read", "create"] }
+        actions: ["read", "create"],
+        defaultGrants: { ADMIN: ["read", "create"] },
       },
     },
   },

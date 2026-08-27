@@ -1,13 +1,11 @@
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {AppError, type AuthenticatedRequestUser } from "@repo/api-runtime";
-import {
-  AccessControlService,
-  ROLE_NAMES,
-} from "@repo/feature-access-control/contracts";
+import { AppError, type AuthenticatedRequestUser } from "@repo/api-runtime";
+import { AccessControlService, ROLE_NAMES } from "@repo/feature-access-control/contracts";
 import {
   ORGANIZATION_MEMBERSHIP,
   type OrganizationMembership,
 } from "@repo/feature-organizations/contracts";
+import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
 
 import type { UserView } from "../users.types";
 
@@ -73,5 +71,3 @@ export class GetUserUseCase {
     );
   }
 }
-
-import { USER_ERROR_CODES } from "@repo/feature-users/contracts";

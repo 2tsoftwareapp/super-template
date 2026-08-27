@@ -7,8 +7,8 @@ import {
 import { Reflector } from "@nestjs/core";
 import { IS_PUBLIC_KEY } from "@repo/api-runtime";
 import { TenantContextService } from "@repo/api-runtime";
-import { Observable } from "rxjs";
 import { ROLE_NAMES } from "@repo/feature-access-control/contracts";
+import { Observable } from "rxjs";
 @Injectable()
 export class TenantContextInterceptor implements NestInterceptor {
   constructor(

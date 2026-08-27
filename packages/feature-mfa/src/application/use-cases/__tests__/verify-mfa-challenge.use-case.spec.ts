@@ -1,3 +1,5 @@
+import { MFA_ERROR_CODES } from "@repo/feature-mfa/contracts";
+
 import { describe, expect, it, vi } from "vitest";
 
 import { VerifyMfaChallengeUseCase } from "../verify-mfa-challenge.use-case";
@@ -127,8 +129,6 @@ describe("VerifyMfaChallengeUseCase", () => {
         mfaToken: "token",
         code: "123456",
         metadata: { ipAddress: null, userAgent: null },
-
-import { MFA_ERROR_CODES } from "@repo/feature-mfa/contracts";
       }),
     ).rejects.toMatchObject({ code: MFA_ERROR_CODES.MFA_CHALLENGE_INVALID });
 

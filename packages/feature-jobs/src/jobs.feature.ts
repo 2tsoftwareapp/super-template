@@ -20,7 +20,8 @@ export const jobsFeature: FeatureManifest = defineFeature({
     resources: {
       jobs: {
         scope: "organization",
-        actions: ["read", "update", "delete"], defaultGrants: { "ADMIN": ["read", "update", "delete"] }
+        actions: ["read", "update", "delete"],
+        defaultGrants: { ADMIN: ["read", "update", "delete"] },
       },
     },
   },

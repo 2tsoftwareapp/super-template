@@ -153,8 +153,7 @@ export const databaseProviders: Provider[] = [
   {
     provide: DATABASE,
     inject: [DATABASE_POOL, DATABASE_SCHEMA],
-    useFactory: (pool: Pool, schema: Record<string, unknown>) =>
-      createDatabaseClient(pool, schema),
+    useFactory: (pool: Pool, schema: Record<string, unknown>) => createDatabaseClient(pool, schema),
   },
   {
     provide: ADVISORY_LOCK_POOL,

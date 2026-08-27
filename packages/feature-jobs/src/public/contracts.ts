@@ -4,9 +4,9 @@ export { JobsRepository } from "../infrastructure/jobs.repository";
 /** Public contracts for @repo/feature-jobs. */
 export { JobsModule } from "../jobs.module";
 export * from "./background-job-enqueuer.port";
+export { JOB_ERROR_CODES } from "./error-codes";
 export {
   JOB_HANDLER,
-  type JobHandlerContribution,
   type JobHandlerContext,
+  type JobHandlerContribution,
 } from "./job-handler.port";
-export { JOB_ERROR_CODES } from "./error-codes";

@@ -1,12 +1,9 @@
 import type { AuthenticatedRequestUser } from "@repo/api-runtime";
+
 import { ACTION, hasPermission, perm } from "@repo/api-runtime";
-
 import { AppError, ERROR_CODES } from "@repo/api-runtime";
-import {
-  isPrivilegedRoleName,
-  ROLE_NAMES,
-} from "../access-control.constants";
 
+import { isPrivilegedRoleName, ROLE_NAMES } from "../access-control.constants";
 
 export interface RolePolicyTarget {
   name: string;

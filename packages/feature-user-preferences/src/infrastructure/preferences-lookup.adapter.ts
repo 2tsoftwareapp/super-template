@@ -1,8 +1,5 @@
 import { Inject, Injectable } from "@nestjs/common";
-import {
-  USERS_REPOSITORY,
-  type UsersRepositoryPort,
-} from "@repo/feature-users/contracts";
+import { USERS_REPOSITORY, type UsersRepositoryPort } from "@repo/feature-users/contracts";
 
 import type {
   NotificationChannelPreferences,

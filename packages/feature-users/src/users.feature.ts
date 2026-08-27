@@ -14,7 +14,7 @@ export const usersFeature: FeatureManifest = defineFeature({
   id: "users",
   dependsOn: ["access-control", "organizations", "settings", "activities", "audit", "outbox"],
   provides: ["organization-membership", "user-role-assignments", "user-credential-store"],
-  requires: ["file-view"],
+  // requires: ["file-view"] removed - file lookup is optional for users
   nestModule: UsersModule,
   resourceScopes: {
     users: "organization",
@@ -23,7 +23,8 @@ export const usersFeature: FeatureManifest = defineFeature({
     resources: {
       users: {
         scope: "organization",
-        actions: ["read", "create", "update", "delete"], defaultGrants: { "ADMIN": ["read", "create", "update", "delete"] }
+        actions: ["read", "create", "update", "delete"],
+        defaultGrants: { ADMIN: ["read", "create", "update", "delete"] },
       },
     },
   },

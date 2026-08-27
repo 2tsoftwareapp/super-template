@@ -1,3 +1,4 @@
+import { AUTH_ERROR_CODES } from "@repo/feature-auth/contracts";
 import { describe, expect, it, vi } from "vitest";
 
 import { REFRESH_ROTATION_GRACE_MS } from "../../../domain/refresh-rotation.policy";
@@ -156,5 +157,3 @@ describe("RefreshSessionUseCase rotation grace", () => {
     expect(authRepository.revokeSession).toHaveBeenCalledWith("session-1");
   });
 });
-
-import { AUTH_ERROR_CODES } from "@repo/feature-auth/contracts";

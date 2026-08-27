@@ -4,8 +4,8 @@ import { Controller, Get, Param, ParseUUIDPipe, Query } from "@nestjs/common";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import {
   ACTION,
-  ApiPaginatedResponse,
   ApiDataResponse,
+  ApiPaginatedResponse,
   Authorize,
   CurrentUser,
   perm,

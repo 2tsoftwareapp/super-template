@@ -14,6 +14,7 @@ vi.mock("../../../composition/composed-schema", () => ({
     { id: "notifications", run: runNotifications },
     { id: "auth-session-cleanup", run: runAuth },
   ],
+  composedAuthorization: { resources: {}, grantsByRole: {} },
 }));
 
 describe("seedDatabase", () => {

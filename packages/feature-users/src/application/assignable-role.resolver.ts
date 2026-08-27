@@ -1,7 +1,11 @@
 import type { TransactionExecutor } from "@repo/api-runtime";
 
 import { AppError, ERROR_CODES } from "@repo/api-runtime";
-import { type AccessControlService, ROLE_NAMES, type RolePolicyTarget } from "@repo/feature-access-control/contracts";
+import {
+  type AccessControlService,
+  ROLE_NAMES,
+  type RolePolicyTarget,
+} from "@repo/feature-access-control/contracts";
 
 import type { AssignableRoleName } from "./users.types";
 

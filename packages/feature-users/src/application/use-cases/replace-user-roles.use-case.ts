@@ -2,15 +2,20 @@ import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime
 import type { TransactionPort } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {AppError, SYSTEM_SCOPE } from "@repo/api-runtime";
-import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
+import { ERROR_CODES } from "@repo/api-runtime";
+import { AppError, SYSTEM_SCOPE } from "@repo/api-runtime";
 import { TRANSACTION_PORT } from "@repo/api-runtime";
 import { AccessControlService, ROLE_NAMES } from "@repo/feature-access-control/contracts";
-import { assertCanAssignRoleTargets, assertRoleScopeCanBeAssigned } from "@repo/feature-access-control/contracts";
+import {
+  assertCanAssignRoleTargets,
+  assertRoleScopeCanBeAssigned,
+} from "@repo/feature-access-control/contracts";
+import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 import {
   ORGANIZATION_MEMBERSHIP,
   type OrganizationMembership,
 } from "@repo/feature-organizations/contracts";
+import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
 
 import type { UserView } from "../users.types";
 
@@ -172,6 +177,3 @@ export class ReplaceUserRolesUseCase {
     return this.getUserUseCase.execute(userId, actor);
   }
 }
-
-import { ERROR_CODES } from "@repo/api-runtime";
-import { USER_ERROR_CODES } from "@repo/feature-users/contracts";

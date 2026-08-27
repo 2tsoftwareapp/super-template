@@ -1,12 +1,12 @@
 import type { DatabaseClient, DatabaseExecutor } from "@repo/database-runtime";
 
 import { Inject, Injectable } from "@nestjs/common";
-import { FIXED_ROLE_NAMES, ROLE_NAMES } from "../access-control.constants";
 import { DATABASE } from "@repo/database-runtime";
 import { and, count, eq, ilike, inArray, isNotNull, isNull, or, type SQL } from "drizzle-orm";
 
 import type { RoleRecord } from "../application/ports/access-control.repository.port";
 
+import { FIXED_ROLE_NAMES, ROLE_NAMES } from "../access-control.constants";
 import { roles } from "./persistence";
 
 @Injectable()

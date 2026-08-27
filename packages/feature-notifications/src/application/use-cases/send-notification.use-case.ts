@@ -2,9 +2,18 @@ import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime
 import type { TransactionExecutor } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, ERROR_CODES, SYSTEM_SCOPE, TRANSACTION_PORT, type TransactionPort } from "@repo/api-runtime";
+import {
+  AppError,
+  ERROR_CODES,
+  SYSTEM_SCOPE,
+  TRANSACTION_PORT,
+  type TransactionPort,
+} from "@repo/api-runtime";
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
-import { ORGANIZATION_LOOKUP, type OrganizationLookup } from "@repo/feature-organizations/contracts";
+import {
+  ORGANIZATION_LOOKUP,
+  type OrganizationLookup,
+} from "@repo/feature-organizations/contracts";
 
 import type { NotificationView, SendNotificationCommand } from "../notifications.types";
 

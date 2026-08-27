@@ -1,9 +1,10 @@
 import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {AppError, SYSTEM_SCOPE, TRANSACTION_PORT, type TransactionPort } from "@repo/api-runtime";
-import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
+import { AppError, SYSTEM_SCOPE, TRANSACTION_PORT, type TransactionPort } from "@repo/api-runtime";
 import { ACTIVITY_EMITTER, type ActivityEmitter } from "@repo/feature-activities/contracts";
+import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
+import { FILE_ERROR_CODES } from "@repo/feature-upload/contracts";
 
 import {
   ATTACHMENTS_REPOSITORY,
@@ -74,5 +75,3 @@ export class DeleteAttachmentUseCase {
     });
   }
 }
-
-import { FILE_ERROR_CODES } from "@repo/feature-upload/contracts";

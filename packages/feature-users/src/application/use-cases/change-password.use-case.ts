@@ -2,13 +2,11 @@ import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime
 import type { TransactionPort } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {AppError, SYSTEM_SCOPE } from "@repo/api-runtime";
-import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
+import { AppError, SYSTEM_SCOPE } from "@repo/api-runtime";
 import { TRANSACTION_PORT } from "@repo/api-runtime";
-import {
-  OUTBOX_APPENDER,
-  type OutboxAppenderPort,
-} from "@repo/feature-outbox/contracts";
+import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
+import { OUTBOX_APPENDER, type OutboxAppenderPort } from "@repo/feature-outbox/contracts";
+import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
 import { hashPassword, verifyPassword } from "@repo/utils/password";
 
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";
@@ -39,7 +37,7 @@ export class ChangePasswordUseCase {
 
     if (!passwordMatches) {
       throw new AppError(
-        AUTH_ERROR_CODES.AUTH_INVALID_CREDENTIALS,
+        "AUTH_INVALID_CREDENTIALS",
         "Current password is incorrect",
         HttpStatus.UNAUTHORIZED,
       );
@@ -75,6 +73,3 @@ export class ChangePasswordUseCase {
     });
   }
 }
-
-import { AUTH_ERROR_CODES } from "@repo/feature-auth/contracts";
-import { USER_ERROR_CODES } from "@repo/feature-users/contracts";

@@ -2,9 +2,10 @@ import type { RequestContext } from "@repo/api-runtime";
 import type { TransactionPort } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {AppError, SYSTEM_SCOPE } from "@repo/api-runtime";
-import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
+import { AppError, SYSTEM_SCOPE } from "@repo/api-runtime";
 import { TRANSACTION_PORT } from "@repo/api-runtime";
+import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
+import { MFA_ERROR_CODES } from "@repo/feature-mfa/contracts";
 
 import type { MfaRegenerateRecoveryCodesCommand } from "../mfa.types";
 
@@ -71,5 +72,3 @@ export class RegenerateRecoveryCodesUseCase {
     return { recoveryCodes };
   }
 }
-
-import { MFA_ERROR_CODES } from "@repo/feature-mfa/contracts";

@@ -1,9 +1,10 @@
 import type { TransactionExecutor } from "@repo/api-runtime";
-import type { AuditLogInput } from "../../public/audit-writer.port";
 
 import { Inject, Injectable } from "@nestjs/common";
 import { isJsonObject, redactSensitive, SYSTEM_SCOPE } from "@repo/api-runtime";
 import { PLATFORM_TRANSACTION_PORT, type PlatformTransactionPort } from "@repo/api-runtime";
+
+import type { AuditLogInput } from "../../public/audit-writer.port";
 
 import { AUDIT_REPOSITORY, type AuditRepositoryPort } from "../ports/audit.repository.port";
 

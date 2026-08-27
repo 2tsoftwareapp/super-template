@@ -7,11 +7,7 @@ import type { TransactionExecutor } from "@repo/api-kernel";
  * to registered handlers exactly-once-per-attempt afterwards.
  */
 export interface OutboxAppenderPort {
-  append(
-    topic: string,
-    payload: JsonObject,
-    executor?: TransactionExecutor,
-  ): Promise<void>;
+  append(topic: string, payload: JsonObject, executor?: TransactionExecutor): Promise<void>;
 }
 
 export const OUTBOX_APPENDER = Symbol("OUTBOX_APPENDER");

@@ -4,38 +4,17 @@
     "outDir": "dist",
     "strictPropertyInitialization": false,
     "paths": {
-      "@repo/api-kernel": [
-        "../../api-kernel/src/index.ts"
-      ],
-      "@repo/api-plugin-kit": [
-        "../../api-plugin-kit/src/index.ts"
-      ],
-      "@repo/api-runtime": [
-        "../../api-runtime/src/index.ts"
-      ],
-      "@repo/feature-audit": [
-        "../../feature-audit/src/audit.feature.ts"
-      ],
-      "@repo/feature-audit/contracts": [
-        "../../feature-audit/src/public/contracts.ts"
-      ],
-      "@repo/feature-upload": [
-        "../../feature-upload/src/upload.feature.ts"
-      ],
-      "@repo/feature-upload/contracts": [
-        "../../feature-upload/src/public/contracts.ts"
-      ],
-      "@repo/feature-upload/module": [
-        "../../feature-upload/src/upload.module.ts"
-      ]
+      "@repo/api-kernel": ["../../api-kernel/src/index.ts"],
+      "@repo/api-plugin-kit": ["../../api-plugin-kit/src/index.ts"],
+      "@repo/api-runtime": ["../../api-runtime/src/index.ts"],
+      "@repo/feature-audit": ["../../feature-audit/src/audit.feature.ts"],
+      "@repo/feature-audit/contracts": ["../../feature-audit/src/public/contracts.ts"],
+      "@repo/feature-upload": ["../../feature-upload/src/upload.feature.ts"],
+      "@repo/feature-upload/contracts": ["../../feature-upload/src/public/contracts.ts"],
+      "@repo/feature-upload/module": ["../../feature-upload/src/upload.module.ts"]
     },
     "baseUrl": "."
   },
-  "include": [
-    "src/**/*.ts"
-  ],
-  "exclude": [
-    "src/**/*.spec.ts",
-    "test"
-  ]
+  "include": ["src/**/*.ts"],
+  "exclude": ["src/**/*.spec.ts", "test"]
 }

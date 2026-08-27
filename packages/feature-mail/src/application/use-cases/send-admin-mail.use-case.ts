@@ -1,12 +1,12 @@
 import type { AuthenticatedRequestUser } from "@repo/api-runtime";
-import {
-  BACKGROUND_JOB_ENQUEUER_WITH_RESULT,
-  type BackgroundJobEnqueuerWithResult,
-} from "@repo/feature-jobs/contracts";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { AppError, ERROR_CODES, SYSTEM_SCOPE } from "@repo/api-runtime";
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
+import {
+  BACKGROUND_JOB_ENQUEUER_WITH_RESULT,
+  type BackgroundJobEnqueuerWithResult,
+} from "@repo/feature-jobs/contracts";
 
 import { isMandatoryMailTemplate } from "../../constants/mandatory-mail-templates";
 import {

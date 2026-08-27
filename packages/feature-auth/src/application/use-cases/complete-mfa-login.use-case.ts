@@ -1,9 +1,10 @@
 import type { RequestContext } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {AppError } from "@repo/api-runtime";
+import { AppError } from "@repo/api-runtime";
 import { AUTH_USER_STORE, type AuthUserStore } from "@repo/feature-auth/contracts";
 import { MfaService } from "@repo/feature-mfa/contracts";
+import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
 
 import type { VerifyMfaChallengeCommand } from "../auth.types";
 
@@ -32,7 +33,11 @@ export class CompleteMfaLoginUseCase {
     const user = await this.usersRepository.findById(userId);
 
     if (!user) {
-      throw new AppError(USER_ERROR_CODES.USER_NOT_FOUND, "User not found", HttpStatus.UNAUTHORIZED);
+      throw new AppError(
+        USER_ERROR_CODES.USER_NOT_FOUND,
+        "User not found",
+        HttpStatus.UNAUTHORIZED,
+      );
     }
 
     return this.issueSessionUseCase.execute(user, requestContext, {
@@ -40,5 +45,3 @@ export class CompleteMfaLoginUseCase {
     });
   }
 }
-
-import { USER_ERROR_CODES } from "@repo/feature-users/contracts";

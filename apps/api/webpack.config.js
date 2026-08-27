@@ -2,7 +2,6 @@ const CopyPlugin = require("copy-webpack-plugin");
 const nodeExternals = require("webpack-node-externals");
 const TsconfigPathsPlugin = require("tsconfig-paths-webpack-plugin");
 
-
 const externalizeNativeProviders = ({ request }, callback) => {
   const natives = [
     "argon2",

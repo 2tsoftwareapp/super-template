@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import {AppError } from "@repo/api-runtime";
+import { AppError } from "@repo/api-runtime";
 
 import { AddJobDependencyUseCase } from "../add-job-dependency.use-case";
 

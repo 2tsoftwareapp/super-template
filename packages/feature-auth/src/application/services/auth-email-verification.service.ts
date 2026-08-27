@@ -2,12 +2,12 @@ import type { TransactionExecutor } from "@repo/api-runtime";
 
 import { Inject, Injectable } from "@nestjs/common";
 import { durationToMilliseconds, generateOpaqueToken, hashOpaqueToken } from "@repo/api-runtime";
-import {
-  OUTBOX_APPENDER,
-  type OutboxAppenderPort,
-} from "@repo/feature-outbox/contracts";
+import { OUTBOX_APPENDER, type OutboxAppenderPort } from "@repo/feature-outbox/contracts";
 
-import { AUTH_SESSION_REPOSITORY, type AuthSessionRepositoryPort } from "../ports/auth-session.repository.port";
+import {
+  AUTH_SESSION_REPOSITORY,
+  type AuthSessionRepositoryPort,
+} from "../ports/auth-session.repository.port";
 
 @Injectable()
 export class AuthEmailVerificationService {

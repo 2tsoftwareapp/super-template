@@ -1,9 +1,6 @@
 import { type MiddlewareConsumer, Module, type NestModule } from "@nestjs/common";
 
-import {
-  configureGlobalMiddleware,
-  globalPipelineProviders,
-} from "./composition/global-pipeline";
+import { configureGlobalMiddleware, globalPipelineProviders } from "./composition/global-pipeline";
 import { RuntimeModule } from "./composition/runtime.module";
 
 @Module({

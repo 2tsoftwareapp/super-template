@@ -2,8 +2,8 @@ import type { AuthenticatedRequestUser } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { AppError } from "@repo/api-runtime";
-import { AUDIT_ERROR_CODES } from "../../public/error-codes";
 
+import { AUDIT_ERROR_CODES } from "../../public/error-codes";
 import { AuditMapper } from "../audit.mapper";
 import { AUDIT_REPOSITORY, type AuditRepositoryPort } from "../ports/audit.repository.port";
 
@@ -44,4 +44,3 @@ export class GetAuditLogUseCase {
     return this.auditMapper.toAuditLogDto(row);
   }
 }
-

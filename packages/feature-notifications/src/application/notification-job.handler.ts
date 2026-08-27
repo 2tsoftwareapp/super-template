@@ -1,7 +1,7 @@
-import type { JobHandlerContribution, JobHandlerContext } from "@repo/feature-jobs/contracts";
+import type { JsonObject } from "@repo/api-kernel";
+import type { JobHandlerContext, JobHandlerContribution } from "@repo/feature-jobs/contracts";
 
 import { Injectable } from "@nestjs/common";
-import type { JsonObject } from "@repo/api-kernel";
 import { JOB_HANDLER } from "@repo/feature-jobs/contracts";
 
 import { NotificationsService } from "./notifications.service";
@@ -46,7 +46,7 @@ export class NotificationJobHandler implements JobHandlerContribution {
       title,
       body,
       ...(readOptionalJsonObject(payload.data)
-        ? { data: readOptionalJsonObject(payload.data) as JsonObject }
+        ? { data: readOptionalJsonObject(payload.data)! }
         : {}),
       sourceBackgroundJobId: context.jobId,
     });

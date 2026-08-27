@@ -1,7 +1,4 @@
-import type { JsonObject } from "@repo/api-kernel";
-import type { TransactionExecutor } from "@repo/api-kernel";
-
-import { OUTBOX_APPENDER, type OutboxAppenderPort } from "./outbox-appender.port";
+import type { JsonObject, TransactionExecutor } from "@repo/api-kernel";
 
 export interface OutboxRecord {
   id: string;
@@ -22,7 +19,4 @@ export interface OutboxRepositoryPort {
 
 export const OUTBOX_REPOSITORY = Symbol("OUTBOX_REPOSITORY");
 
-export {
-  OUTBOX_APPENDER,
-  type OutboxAppenderPort,
-} from "./outbox-appender.port";
+export { OUTBOX_APPENDER, type OutboxAppenderPort } from "./outbox-appender.port";

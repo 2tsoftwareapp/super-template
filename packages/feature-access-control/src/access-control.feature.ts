@@ -17,7 +17,8 @@ export const accessControlFeature: FeatureManifest = defineFeature({
     resources: {
       roles: {
         scope: "organization",
-        actions: ["read", "create", "update", "delete"], defaultGrants: { "ADMIN": ["read", "update"] }
+        actions: ["read", "create", "update", "delete"],
+        defaultGrants: { ADMIN: ["read", "update"] },
       },
     },
   },

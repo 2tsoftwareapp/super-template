@@ -14,7 +14,8 @@ export const activitiesFeature: FeatureManifest = defineFeature({
     resources: {
       activities: {
         scope: "organization",
-        actions: ["read"], defaultGrants: { "ADMIN": ["read"], "USER": ["read"] }
+        actions: ["read"],
+        defaultGrants: { ADMIN: ["read"], USER: ["read"] },
       },
     },
   },

@@ -1,7 +1,7 @@
 import type { AuthenticatedRequestUser } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {AppError, ERROR_CODES } from "@repo/api-runtime";
+import { AppError, ERROR_CODES } from "@repo/api-runtime";
 import { ROLE_NAMES } from "@repo/feature-access-control/contracts";
 
 import {

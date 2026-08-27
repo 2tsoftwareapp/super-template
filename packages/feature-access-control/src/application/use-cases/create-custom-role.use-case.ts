@@ -1,15 +1,15 @@
 import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime";
-import { isFixedRoleName } from "../../access-control.constants";
 import type { TransactionExecutor, TransactionPort } from "@repo/api-runtime";
-import { AuditWriter } from "@repo/feature-audit/contracts";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {AppError, ERROR_CODES, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
-import { ROLE_NAMES } from "../../access-control.constants";
+import { AppError, ERROR_CODES, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
+import { AuditWriter } from "@repo/feature-audit/contracts";
 import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
 
 import type { CreateRoleCommand, PermissionView, RoleView } from "../access-control.types";
 
+import { isFixedRoleName } from "../../access-control.constants";
+import { ROLE_NAMES } from "../../access-control.constants";
 import { assertCanCreateCustomRole } from "../../domain/role-assignment.policy";
 import { AccessControlMapper } from "../access-control.mapper";
 import {

@@ -1,7 +1,8 @@
 import type { AuthenticatedRequestUser } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {AppError, requireOrganizationId } from "@repo/api-runtime";
+import { AppError, requireOrganizationId } from "@repo/api-runtime";
+import { NOTIFICATION_ERROR_CODES } from "@repo/feature-notifications/contracts";
 
 import type { ListNotificationsQuery, NotificationView } from "../notifications.types";
 
@@ -92,5 +93,3 @@ export class NotificationInboxUseCase {
     await this.notificationsRepository.delete(notificationId, user.userId, organizationId);
   }
 }
-
-import { NOTIFICATION_ERROR_CODES } from "@repo/feature-notifications/contracts";

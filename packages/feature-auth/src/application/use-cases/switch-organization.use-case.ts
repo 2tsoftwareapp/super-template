@@ -1,8 +1,9 @@
 import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {AppError, SYSTEM_SCOPE } from "@repo/api-runtime";
+import { AppError, SYSTEM_SCOPE } from "@repo/api-runtime";
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
+import { AUTH_ERROR_CODES } from "@repo/feature-auth/contracts";
 import { OrganizationsService } from "@repo/feature-organizations/contracts";
 
 import {
@@ -82,5 +83,3 @@ export class SwitchOrganizationUseCase {
     };
   }
 }
-
-import { AUTH_ERROR_CODES } from "@repo/feature-auth/contracts";

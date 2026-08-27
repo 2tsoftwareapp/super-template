@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import {EnvironmentService } from "@repo/api-runtime";
+import { EnvironmentService } from "@repo/api-runtime";
 
 import { encryptTotpSecret } from "../../../domain/totp-encryption";
 import { generateTotpCode, generateTotpSecret } from "../../../domain/totp";

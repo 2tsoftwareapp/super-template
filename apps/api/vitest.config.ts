@@ -70,11 +70,7 @@ export default defineConfig({
           },
           {
             find: new RegExp(`^@repo/${name}/schema$`),
-            replacement: path.join(
-              packagesDir,
-              name,
-              "src/infrastructure/persistence/index.ts",
-            ),
+            replacement: path.join(packagesDir, name, "src/infrastructure/persistence/index.ts"),
           },
           {
             find: new RegExp(`^@repo/${name}/module$`),
@@ -86,10 +82,7 @@ export default defineConfig({
       // Preferences module file keeps legacy name
       {
         find: /^@repo\/feature-user-preferences\/module$/,
-        replacement: path.join(
-          packagesDir,
-          "feature-user-preferences/src/preferences.module.ts",
-        ),
+        replacement: path.join(packagesDir, "feature-user-preferences/src/preferences.module.ts"),
       },
       {
         find: /^@repo\/feature-import-export\/module$/,

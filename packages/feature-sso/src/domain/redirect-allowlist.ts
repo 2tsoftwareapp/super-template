@@ -1,4 +1,6 @@
-import {AppError } from "@repo/api-runtime";
+import { AppError } from "@repo/api-runtime";
+
+import { SSO_ERROR_CODES } from "../public/error-codes";
 
 const normalizeRedirectUri = (redirectUri: string): string => {
   const parsed = new URL(redirectUri);
@@ -42,8 +44,6 @@ export const assertAllowedRedirectUri = (
   }
 
   const isAllowed = allowedOrigins.some((origin) => {
-
-import { SSO_ERROR_CODES } from "@repo/feature-sso/contracts";
     try {
       return new URL(origin).origin === parsed.origin;
     } catch {

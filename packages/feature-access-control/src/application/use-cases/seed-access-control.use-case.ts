@@ -63,14 +63,13 @@ export class SeedAccessControlUseCase {
     }
 
     // Permission entries derive from the composed catalog AT RUN TIME.
-    const permissionEntries = Object.entries(authorization.resources).flatMap(
-      ([resource, def]) =>
-        def.actions.map((action) => ({
-          name: `${resource}.${action}`,
-          description: `${resource}.${action}`,
-          isSystem: true,
-          scope: def.scope,
-        })),
+    const permissionEntries = Object.entries(authorization.resources).flatMap(([resource, def]) =>
+      def.actions.map((action) => ({
+        name: `${resource}.${action}`,
+        description: `${resource}.${action}`,
+        isSystem: true,
+        scope: def.scope,
+      })),
     );
 
     const permissions = await this.accessControlRepository.ensurePermissions(
@@ -91,9 +90,21 @@ export class SeedAccessControlUseCase {
         .filter((id): id is string => typeof id === "string");
     };
 
-    await this.accessControlRepository.replaceRolePermissions(superAdminRole.id, allPermissionIds, executor);
-    await this.accessControlRepository.replaceRolePermissions(adminRole.id, resolveGrant("ADMIN"), executor);
-    await this.accessControlRepository.replaceRolePermissions(userRole.id, resolveGrant("USER"), executor);
+    await this.accessControlRepository.replaceRolePermissions(
+      superAdminRole.id,
+      allPermissionIds,
+      executor,
+    );
+    await this.accessControlRepository.replaceRolePermissions(
+      adminRole.id,
+      resolveGrant("ADMIN"),
+      executor,
+    );
+    await this.accessControlRepository.replaceRolePermissions(
+      userRole.id,
+      resolveGrant("USER"),
+      executor,
+    );
 
     await this.accessProfileUseCase.invalidateUsersForRole(superAdminRole.id, executor);
     await this.accessProfileUseCase.invalidateUsersForRole(adminRole.id, executor);

@@ -1,7 +1,8 @@
-import type { JobHandlerContribution, JobHandlerContext } from "@repo/feature-jobs/contracts";
+import type { JobHandlerContext, JobHandlerContribution } from "@repo/feature-jobs/contracts";
 
 import { Inject, Injectable } from "@nestjs/common";
 import { JOB_HANDLER } from "@repo/feature-jobs/contracts";
+
 import {
   AUTH_TOKEN_MAINTENANCE,
   type AuthTokenMaintenance,

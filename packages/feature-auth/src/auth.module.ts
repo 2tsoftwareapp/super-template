@@ -1,7 +1,7 @@
 import { Global, Module } from "@nestjs/common";
 import { JwtModule } from "@nestjs/jwt";
 import { AccessControlModule } from "@repo/feature-access-control/contracts";
-import { ACCESS_TOKEN_AUTHENTICATOR } from "@repo/feature-auth/contracts";
+import { ACCESS_TOKEN_AUTHENTICATOR } from "./public/access-token-authenticator.port";
 import { MfaModule } from "@repo/feature-mfa/contracts";
 import { OrganizationsModule } from "@repo/feature-organizations/contracts";
 

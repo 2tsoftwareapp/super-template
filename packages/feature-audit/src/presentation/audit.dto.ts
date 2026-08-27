@@ -76,5 +76,3 @@ export class AuditLogsQueryDto extends PaginationQueryDto {
   @MaxLength(200)
   q?: string;
 }
-
-

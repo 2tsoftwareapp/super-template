@@ -53,8 +53,7 @@ export const ssoSessionExchanges = pgTable(
   {
     id: uuid("id").defaultRandom().primaryKey(),
     codeHash: text("code_hash").notNull(),
-    sessionId: uuid("session_id")
-      .notNull(),
+    sessionId: uuid("session_id").notNull(),
     organizationId: text("organization_id"),
     expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
     consumedAt: timestamp("consumed_at", { withTimezone: true }),

@@ -1,3 +1,5 @@
+import { SSO_ERROR_CODES } from "@repo/feature-sso/contracts";
+
 import { describe, expect, it, vi } from "vitest";
 
 import { HandleSsoCallbackUseCase } from "../handle-sso-callback.use-case";
@@ -125,8 +127,6 @@ describe("HandleSsoCallbackUseCase", () => {
       exchangeCode: vi.fn(async () => {
         throw new Error("boom");
       }),
-
-import { SSO_ERROR_CODES } from "@repo/feature-sso/contracts";
     };
     const auditWriter = { log: vi.fn(async () => undefined) };
     const useCase = buildUseCase({

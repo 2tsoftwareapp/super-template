@@ -12,9 +12,6 @@ export { IssueSessionUseCase } from "../application/use-cases/issue-session.use-
  */
 export { AuthDataModule } from "../auth-data.module";
 export * from "./access-token-authenticator.port";
+export { AUTH_TOKEN_MAINTENANCE, type AuthTokenMaintenance } from "./auth-token-maintenance.port";
 export * from "./auth-user-store.port";
-export {
-  AUTH_TOKEN_MAINTENANCE,
-  type AuthTokenMaintenance,
-} from "./auth-token-maintenance.port";
 export { AUTH_ERROR_CODES } from "./error-codes";

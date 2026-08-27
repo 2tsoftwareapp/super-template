@@ -1,11 +1,10 @@
+import { Injectable } from "@nestjs/common";
+
 import type {
   BackgroundJobEnqueueInput,
   BackgroundJobEnqueuerWithResult,
   BackgroundJobRef,
 } from "../public/background-job-enqueuer.port";
-
-import { Injectable } from "@nestjs/common";
-
 import type { EnqueueJobCommand, JobHandler } from "./jobs.types";
 
 import { JobHandlersRegistry } from "./services/job-handlers.registry";

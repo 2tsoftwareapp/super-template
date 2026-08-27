@@ -1,13 +1,13 @@
 import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime";
+import type { TransactionExecutor } from "@repo/api-runtime";
+
+import { Injectable } from "@nestjs/common";
+
 import type {
   NotificationMessage,
   SendUserNotificationInput,
   UserNotificationSender,
 } from "../public/user-notification-sender.port";
-import type { TransactionExecutor } from "@repo/api-runtime";
-
-import { Injectable } from "@nestjs/common";
-
 import type { NotificationView } from "./notifications.types";
 
 import { NotificationDispatchService } from "./services/notification-dispatch.service";

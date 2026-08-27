@@ -1,14 +1,11 @@
+import type { JsonObject } from "@repo/api-kernel";
 import type { DatabaseExecutor } from "@repo/database-runtime";
 
 import { Inject, Injectable } from "@nestjs/common";
 import { DATABASE } from "@repo/database-runtime";
 import { eq, sql } from "drizzle-orm";
-import type { JsonObject } from "@repo/api-kernel";
 
-import type {
-  OutboxRecord,
-  OutboxRepositoryPort,
-} from "../public/outbox.port";
+import type { OutboxRecord, OutboxRepositoryPort } from "../public/outbox.port";
 
 import { outboxMessages } from "./persistence/outbox-messages";
 
@@ -16,11 +13,7 @@ import { outboxMessages } from "./persistence/outbox-messages";
 export class OutboxRepository implements OutboxRepositoryPort {
   constructor(@Inject(DATABASE) private readonly database: DatabaseExecutor) {}
 
-  async append(
-    topic: string,
-    payload: JsonObject,
-    executor?: DatabaseExecutor,
-  ): Promise<void> {
+  async append(topic: string, payload: JsonObject, executor?: DatabaseExecutor): Promise<void> {
     const client = executor ?? this.database;
     await client.insert(outboxMessages).values({ topic, payload });
   }

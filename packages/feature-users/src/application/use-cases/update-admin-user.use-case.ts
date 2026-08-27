@@ -1,9 +1,10 @@
 import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {AppError, normalizeEmail, SYSTEM_SCOPE } from "@repo/api-runtime";
-import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
+import { AppError, normalizeEmail, SYSTEM_SCOPE } from "@repo/api-runtime";
 import { AccessControlService, ROLE_NAMES } from "@repo/feature-access-control/contracts";
+import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
+import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
 
 import type { UpdateAdminUserCommand, UserView } from "../users.types";
 
@@ -80,5 +81,3 @@ export class UpdateAdminUserUseCase {
     return this.getUserUseCase.execute(updated?.id ?? userId, actor);
   }
 }
-
-import { USER_ERROR_CODES } from "@repo/feature-users/contracts";

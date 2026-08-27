@@ -3,13 +3,11 @@ import type { JsonObject } from "@repo/api-kernel";
 import { sql } from "drizzle-orm";
 import { index, jsonb, pgTable, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
 
-
 export const fileBatchOperations = pgTable(
   "t_file_batch_operations",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    organizationId: uuid("organization_id")
-      .notNull(),
+    organizationId: uuid("organization_id").notNull(),
     actorId: uuid("actor_id"),
     operation: text("operation").notNull(),
     idempotencyKey: text("idempotency_key"),

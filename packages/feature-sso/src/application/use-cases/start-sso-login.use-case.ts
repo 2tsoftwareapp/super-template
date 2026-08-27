@@ -1,5 +1,12 @@
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {AppError, durationToMilliseconds, EnvironmentService, generateOpaqueToken, hashOpaqueToken } from "@repo/api-runtime";
+import {
+  AppError,
+  durationToMilliseconds,
+  EnvironmentService,
+  generateOpaqueToken,
+  hashOpaqueToken,
+} from "@repo/api-runtime";
+import { SSO_ERROR_CODES } from "@repo/feature-sso/contracts";
 
 import type { StartSsoLoginCommand } from "../sso.types";
 
@@ -60,5 +67,3 @@ export class StartSsoLoginUseCase {
     return { authorizationUrl };
   }
 }
-
-import { SSO_ERROR_CODES } from "@repo/feature-sso/contracts";

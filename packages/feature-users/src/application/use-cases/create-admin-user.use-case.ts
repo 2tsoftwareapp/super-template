@@ -2,20 +2,22 @@ import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime
 import type { TransactionPort } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {AppError, normalizeEmail, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
-import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
+import { ERROR_CODES } from "@repo/api-runtime";
+import { AppError, normalizeEmail, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
 import { AccessControlService, ROLE_NAMES } from "@repo/feature-access-control/contracts";
-import { assertCanAssignRoleTargets, assertRoleScopeCanBeAssigned } from "@repo/feature-access-control/contracts";
+import {
+  assertCanAssignRoleTargets,
+  assertRoleScopeCanBeAssigned,
+} from "@repo/feature-access-control/contracts";
 import { ACTIVITY_EMITTER, type ActivityEmitter } from "@repo/feature-activities/contracts";
+import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 import {
   ORGANIZATION_MEMBERSHIP,
   type OrganizationMembership,
   OrganizationsService,
 } from "@repo/feature-organizations/contracts";
-import {
-  OUTBOX_APPENDER,
-  type OutboxAppenderPort,
-} from "@repo/feature-outbox/contracts";
+import { OUTBOX_APPENDER, type OutboxAppenderPort } from "@repo/feature-outbox/contracts";
+import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
 import { hashPassword } from "@repo/utils/password";
 
 import type { CreateAdminUserCommand, UserView } from "../users.types";
@@ -229,6 +231,3 @@ export class CreateAdminUserUseCase {
     return this.getUserUseCase.execute(userId, actor);
   }
 }
-
-import { ERROR_CODES } from "@repo/api-runtime";
-import { USER_ERROR_CODES } from "@repo/feature-users/contracts";

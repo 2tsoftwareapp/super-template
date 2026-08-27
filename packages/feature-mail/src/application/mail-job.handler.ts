@@ -1,10 +1,11 @@
-import type { JobHandlerContribution, JobHandlerContext } from "@repo/feature-jobs/contracts";
+import type { JsonObject } from "@repo/api-kernel";
+import type { JobHandlerContext, JobHandlerContribution } from "@repo/feature-jobs/contracts";
 
 import { Injectable } from "@nestjs/common";
-import type { JsonObject } from "@repo/api-kernel";
 import { JOB_HANDLER } from "@repo/feature-jobs/contracts";
 
 import type { SendTemplateInput } from "./use-cases/send-mail-template.use-case";
+
 import { MailService } from "./mail.service";
 
 function readStringField(payload: Record<string, unknown>, key: string): string {

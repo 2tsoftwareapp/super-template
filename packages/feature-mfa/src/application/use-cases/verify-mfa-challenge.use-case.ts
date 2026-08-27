@@ -1,8 +1,9 @@
 import type { RequestContext } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {AppError, hashOpaqueToken, SYSTEM_SCOPE } from "@repo/api-runtime";
+import { AppError, hashOpaqueToken, SYSTEM_SCOPE } from "@repo/api-runtime";
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
+import { MFA_ERROR_CODES } from "@repo/feature-mfa/contracts";
 
 import type { MfaVerifyChallengeCommand } from "../mfa.types";
 
@@ -88,5 +89,3 @@ export class VerifyMfaChallengeUseCase {
     return { userId: challenge.userId };
   }
 }
-
-import { MFA_ERROR_CODES } from "@repo/feature-mfa/contracts";

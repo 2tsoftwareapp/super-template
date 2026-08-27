@@ -33,9 +33,7 @@ export interface FeatureAuthorizationResource {
 
 export interface ComposedAuthorization {
   /** resource -> contribution, deduplicated/conflict-checked at composition. */
-  readonly resources: Readonly<
-    Record<string, FeatureAuthorizationResource>
-  >;
+  readonly resources: Readonly<Record<string, FeatureAuthorizationResource>>;
   /** role -> permission names (`resource.action`), SUPER_ADMIN excluded (implicit *). */
   readonly grantsByRole: Readonly<Record<string, readonly string[]>>;
 }
@@ -168,9 +166,7 @@ export function defineFeature(manifest: FeatureManifest): FeatureManifest {
  * Validate feature ids/deps, reject cycles, and return a deterministic
  * topological composition order. Tie-break preserves input order.
  */
-export function orderFeatureManifests(
-  features: readonly FeatureManifest[],
-): FeatureManifest[] {
+export function orderFeatureManifests(features: readonly FeatureManifest[]): FeatureManifest[] {
   const byId = new Map<string, FeatureManifest>();
   const inputIndex = new Map<string, number>();
 
@@ -191,9 +187,7 @@ export function orderFeatureManifests(
   for (const feature of features) {
     for (const dep of feature.dependsOn ?? []) {
       if (!byId.has(dep)) {
-        throw new Error(
-          `Feature "${feature.id}" depends on missing feature "${dep}".`,
-        );
+        throw new Error(`Feature "${feature.id}" depends on missing feature "${dep}".`);
       }
     }
   }
@@ -344,8 +338,6 @@ export function collectFeatureSeeders(
   return seeders;
 }
 
-
-
 /**
  * Merge per-feature authorization contributions. Duplicate resource ownership
  * is a composition error; grants must reference resources the SAME feature
@@ -371,15 +363,22 @@ export function composeFeatureAuthorization(
 
   for (const feature of features) {
     for (const [name, def] of Object.entries(feature.authorization?.resources ?? {})) {
-      for (const grantedResource of Object.keys(def.defaultGrants ?? {})) {
-        if (!resources[grantedResource]) {
-          throw new Error(
-            `Feature "${feature.id}" grants unknown resource "${grantedResource}" (not contributed by any composed feature).`,
-          );
-        }
-      }
       if (def.scope !== undefined && !["platform", "organization"].includes(def.scope)) {
         throw new Error(`Feature "${feature.id}" resource "${name}" has invalid scope.`);
+      }
+      const declaredActions = new Set(def.actions);
+      for (const actions of Object.values(def.defaultGrants ?? {})) {
+        const isWildcard =
+          actions === "*" || (Array.isArray(actions) && actions.length === 1 && actions[0] === "*");
+        if (!isWildcard) {
+          for (const action of actions) {
+            if (!declaredActions.has(action)) {
+              throw new Error(
+                `Feature "${feature.id}" resource "${name}" grants action "${action}" which is not in declared actions [${def.actions.join(", ")}].`,
+              );
+            }
+          }
+        }
       }
     }
   }
@@ -388,7 +387,9 @@ export function composeFeatureAuthorization(
   for (const [name, def] of Object.entries(resources)) {
     for (const [role, actions] of Object.entries(def.defaultGrants ?? {})) {
       const list = grantsByRole[role] ?? (grantsByRole[role] = []);
-      if (actions === "*") {
+      const isWildcard =
+        actions === "*" || (Array.isArray(actions) && actions.length === 1 && actions[0] === "*");
+      if (isWildcard) {
         for (const action of def.actions) list.push(`${name}.${action}`);
       } else {
         for (const action of actions) list.push(`${name}.${action}`);
@@ -407,9 +408,7 @@ export function composeFeatureAuthorization(
  * - every `requires` entry must have at least one provider,
  * - no capability may have more than one provider (uniqueness).
  */
-export function validateFeatureCapabilities(
-  features: readonly FeatureManifest[],
-): void {
+export function validateFeatureCapabilities(features: readonly FeatureManifest[]): void {
   const providers = new Map<string, string>();
   for (const feature of features) {
     for (const capability of feature.provides ?? []) {
@@ -442,7 +441,7 @@ export function validateFeatureCapabilities(
 
 /**
  * Compute the reverse-dependency closure that must be removed together with
- * `omitId`: any feature whose `dependsOn` or capability `requires` can only be
+ * `omitId`: every feature whose `dependsOn` or capability `requires` can only be
  * satisfied by a removed feature is removed transitively.
  */
 export function computeRemovalClosure(
@@ -457,9 +456,7 @@ export function computeRemovalClosure(
       if (removed.has(feature.id)) continue;
       const dependsRemoved = (feature.dependsOn ?? []).some((d) => removed.has(d));
       const requiresMissing = (feature.requires ?? []).some((capability) => {
-        return !features.some(
-          (f) => !removed.has(f.id) && (f.provides ?? []).includes(capability),
-        );
+        return !features.some((f) => !removed.has(f.id) && (f.provides ?? []).includes(capability));
       });
       if (dependsRemoved || requiresMissing) {
         removed.add(feature.id);

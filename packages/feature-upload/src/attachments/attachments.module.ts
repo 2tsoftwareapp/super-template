@@ -1,5 +1,5 @@
 import { Global, Module } from "@nestjs/common";
-import { ENTITY_ATTACHMENT_LISTING } from "@repo/feature-upload/contracts";
+import { ENTITY_ATTACHMENT_LISTING } from "../public/entity-attachment-listing.port";
 
 import { FilesModule } from "../files/files.module";
 import { ATTACHMENTS_REPOSITORY } from "./application/ports/attachments.repository.port";

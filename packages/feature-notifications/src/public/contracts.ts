@@ -10,5 +10,5 @@ export { NotificationDeliveryUseCase } from "../application/use-cases/notificati
 export { NotificationJobsRepository } from "../infrastructure/notification-jobs.repository";
 /** Public contracts for @repo/feature-notifications. */
 export { NotificationsModule } from "../notifications.module";
-export * from "./user-notification-sender.port";
 export { NOTIFICATION_ERROR_CODES } from "./error-codes";
+export * from "./user-notification-sender.port";

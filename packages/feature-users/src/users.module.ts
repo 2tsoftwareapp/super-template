@@ -1,11 +1,10 @@
 import { Global, Module } from "@nestjs/common";
-import { AccessControlModule, USER_ROLE_ASSIGNMENTS } from "@repo/feature-access-control/contracts";
+import { USER_ROLE_ASSIGNMENTS } from "@repo/feature-access-control/contracts";
 import {
   ORGANIZATION_MEMBERSHIP,
   ORGANIZATION_USER_ROLES_PURGE,
 } from "@repo/feature-organizations/contracts";
-import { OrganizationsModule } from "@repo/feature-organizations/contracts";
-import { USER_LOOKUP } from "@repo/feature-users/contracts";
+import { USER_LOOKUP } from "./public/user-lookup.port";
 
 import { USERS_REPOSITORY } from "./application/ports/users.repository.port";
 import { ChangePasswordUseCase } from "./application/use-cases/change-password.use-case";
@@ -26,7 +25,7 @@ import { UsersController } from "./presentation/users.controller";
 
 @Global()
 @Module({
-  imports: [AccessControlModule, OrganizationsModule],
+  imports: [],
   controllers: [AdminUsersController, UsersController],
   providers: [
     UsersRepository,

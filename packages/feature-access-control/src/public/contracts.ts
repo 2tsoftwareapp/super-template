@@ -26,10 +26,7 @@ export interface UserRoleAssignment {
 export interface UserRoleAssignments {
   findUserIdsForRole(roleId: string, executor?: TransactionExecutor): Promise<string[]>;
 
-  findUserIdsForPermission(
-    permissionId: string,
-    executor?: TransactionExecutor,
-  ): Promise<string[]>;
+  findUserIdsForPermission(permissionId: string, executor?: TransactionExecutor): Promise<string[]>;
 
   replaceUserRoles(
     userId: string,
@@ -85,5 +82,5 @@ export interface UserRoleAssignments {
 }
 
 export const USER_ROLE_ASSIGNMENTS = Symbol("USER_ROLE_ASSIGNMENTS");
-export { ROLE_NAMES, type RoleName } from "./role.constants";
 export { ACCESS_CONTROL_ERROR_CODES } from "./error-codes";
+export { ROLE_NAMES, type RoleName } from "./role.constants";

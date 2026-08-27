@@ -2,7 +2,6 @@ import type { JsonObject } from "@repo/api-kernel";
 
 import { index, jsonb, pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 
-
 export const auditLogs = pgTable(
   "l_audit_logs",
   {

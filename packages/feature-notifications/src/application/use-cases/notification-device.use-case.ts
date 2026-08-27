@@ -1,7 +1,9 @@
 import type { AuthenticatedRequestUser } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {AppError } from "@repo/api-runtime";
+import { ERROR_CODES } from "@repo/api-runtime";
+import { AppError } from "@repo/api-runtime";
+import { NOTIFICATION_ERROR_CODES } from "@repo/feature-notifications/contracts";
 
 import type { RegisterDeviceCommand } from "../notifications.types";
 
@@ -60,6 +62,3 @@ export class NotificationDeviceUseCase {
     }
   }
 }
-
-import { ERROR_CODES } from "@repo/api-runtime";
-import { NOTIFICATION_ERROR_CODES } from "@repo/feature-notifications/contracts";

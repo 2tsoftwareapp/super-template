@@ -1,7 +1,8 @@
 import type { AuthenticatedRequestUser } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {AppError } from "@repo/api-runtime";
+import { AppError } from "@repo/api-runtime";
+import { FILE_ERROR_CODES } from "@repo/feature-upload/contracts";
 import { FILES_REPOSITORY, type FilesRepositoryPort } from "@repo/feature-upload/contracts";
 import { OBJECT_STORAGE, type ObjectStorage } from "@repo/feature-upload/contracts";
 
@@ -37,5 +38,3 @@ export class DownloadAuditExportUseCase {
     return { content, originalName: file.originalName };
   }
 }
-
-import { FILE_ERROR_CODES } from "@repo/feature-upload/contracts";

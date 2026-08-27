@@ -1,7 +1,6 @@
-import type { MailTemplateSender } from "../public/mail-template-sender.port";
-
 import { Injectable } from "@nestjs/common";
 
+import type { MailTemplateSender } from "../public/mail-template-sender.port";
 import type { SendTemplateInput } from "./use-cases/send-mail-template.use-case";
 
 import { SendMailTemplateUseCase } from "./use-cases/send-mail-template.use-case";

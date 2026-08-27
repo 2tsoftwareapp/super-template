@@ -1,8 +1,9 @@
 import type { AuthenticatedRequestUser } from "@repo/api-runtime";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {AppError } from "@repo/api-runtime";
+import { AppError } from "@repo/api-runtime";
 import { AUTH_USER_STORE, type AuthUserStore } from "@repo/feature-auth/contracts";
+import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
 
 import { AuthMapper } from "../auth.mapper";
 
@@ -30,5 +31,3 @@ export class GetMeUseCase {
     };
   }
 }
-
-import { USER_ERROR_CODES } from "@repo/feature-users/contracts";

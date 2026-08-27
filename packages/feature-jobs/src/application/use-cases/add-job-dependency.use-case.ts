@@ -1,5 +1,12 @@
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {AppError, TRANSACTION_PORT, type TransactionExecutor, type TransactionPort, WORKER_DISPATCH_CONTEXT } from "@repo/api-runtime";
+import {
+  AppError,
+  TRANSACTION_PORT,
+  type TransactionExecutor,
+  type TransactionPort,
+  WORKER_DISPATCH_CONTEXT,
+} from "@repo/api-runtime";
+import { JOB_ERROR_CODES } from "@repo/feature-jobs/contracts";
 
 import {
   JOB_OBSERVABILITY_REPOSITORY,
@@ -96,5 +103,3 @@ export class AddJobDependencyUseCase {
     };
   }
 }
-
-import { JOB_ERROR_CODES } from "@repo/feature-jobs/contracts";

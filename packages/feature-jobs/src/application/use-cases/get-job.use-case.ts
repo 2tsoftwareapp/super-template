@@ -1,5 +1,6 @@
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {AppError } from "@repo/api-runtime";
+import { AppError } from "@repo/api-runtime";
+import { JOB_ERROR_CODES } from "@repo/feature-jobs/contracts";
 
 import type { JobView } from "../jobs.types";
 
@@ -27,5 +28,3 @@ export class GetJobUseCase {
     return this.jobsMapper.toJobView(job);
   }
 }
-
-import { JOB_ERROR_CODES } from "@repo/feature-jobs/contracts";

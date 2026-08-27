@@ -2,7 +2,11 @@
 
 import { Tooltip } from "@repo/web-ui/tooltip";
 
-import { adminResourceGroups, adminResources, canAccessResource } from "@/features/_plugin-resources/admin-resources";
+import {
+  adminResourceGroups,
+  adminResources,
+  canAccessResource,
+} from "@/features/_plugin-resources/admin-resources";
 import { Link } from "@/i18n/navigation";
 import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";

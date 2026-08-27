@@ -1,5 +1,6 @@
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import {AppError } from "@repo/api-runtime";
+import { AppError } from "@repo/api-runtime";
+import { JOB_ERROR_CODES } from "@repo/feature-jobs/contracts";
 
 import {
   JOB_OBSERVABILITY_REPOSITORY,
@@ -36,5 +37,3 @@ export class ListJobDependenciesUseCase {
     }));
   }
 }
-
-import { JOB_ERROR_CODES } from "@repo/feature-jobs/contracts";

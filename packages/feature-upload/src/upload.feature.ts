@@ -23,11 +23,13 @@ export const uploadFeature: FeatureManifest = defineFeature({
     resources: {
       files: {
         scope: "organization",
-        actions: ["read", "create", "update", "delete"], defaultGrants: { "ADMIN": ["*"], "USER": ["*"] }
+        actions: ["read", "create", "update", "delete"],
+        defaultGrants: { ADMIN: ["*"], USER: ["*"] },
       },
       attachments: {
         scope: "organization",
-        actions: ["read", "create", "update", "delete"], defaultGrants: { "ADMIN": ["*"], "USER": ["*"] }
+        actions: ["read", "create", "update", "delete"],
+        defaultGrants: { ADMIN: ["*"], USER: ["*"] },
       },
     },
   },
