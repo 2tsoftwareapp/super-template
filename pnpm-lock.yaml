@@ -1705,9 +1705,6 @@ importers:
       '@repo/database-runtime':
         specifier: workspace:*
         version: link:../database-runtime
-      '@repo/feature-access-control':
-        specifier: workspace:*
-        version: link:../feature-access-control
       '@repo/feature-audit':
         specifier: workspace:*
         version: link:../feature-audit

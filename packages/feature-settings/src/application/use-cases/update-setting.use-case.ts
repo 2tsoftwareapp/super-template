@@ -4,7 +4,6 @@ import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { ERROR_CODES } from "@repo/api-runtime";
 import { AppError, SYSTEM_SCOPE } from "@repo/api-runtime";
 import { PLATFORM_TRANSACTION_PORT, type PlatformTransactionPort } from "@repo/api-runtime";
-import { ROLE_NAMES } from "@repo/feature-access-control/contracts";
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 import { SETTINGS_ERROR_CODES } from "@repo/feature-settings/contracts";
 
@@ -34,7 +33,7 @@ export class UpdateSettingUseCase {
     input: UpdateSettingCommand,
     requestContext?: RequestContext,
   ) {
-    if (!actor.roles.includes(ROLE_NAMES.SUPER_ADMIN)) {
+    if (!actor.roles.includes("SUPER_ADMIN")) {
       throw new AppError(
         ERROR_CODES.AUTH_FORBIDDEN,
         "Only SUPER_ADMIN can update application settings",

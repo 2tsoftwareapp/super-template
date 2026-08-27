@@ -7,7 +7,7 @@ import { SettingsModule } from "./settings.module";
 export const settingsFeature: FeatureManifest = defineFeature({
   id: "settings",
   // Writes audit synchronously inside the update transaction via AUDIT_WRITER.
-  dependsOn: ["audit", "access-control"],
+  dependsOn: ["audit"],
   nestModule: SettingsModule,
   resourceScopes: {
     settings: "platform",

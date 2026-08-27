@@ -6,7 +6,6 @@ import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { ACTION, ApiArrayResponse, ApiDataResponse, perm } from "@repo/api-runtime";
 import { CurrentUser } from "@repo/api-runtime";
 import { Authorize } from "@repo/api-runtime";
-import { ROLE_NAMES } from "@repo/feature-access-control/contracts";
 
 import { ListSettingsUseCase } from "../application/use-cases/list-settings.use-case";
 import { UpdateSettingUseCase } from "../application/use-cases/update-setting.use-case";
@@ -22,7 +21,7 @@ export class AdminSettingsController {
   ) {}
 
   @Get()
-  @Authorize({ roles: [ROLE_NAMES.SUPER_ADMIN], permissions: [perm("settings", ACTION.READ)] })
+  @Authorize({ roles: ["SUPER_ADMIN"], permissions: [perm("settings", ACTION.READ)] })
   @ApiArrayResponse(ApplicationSettingDto)
   async listSettings(@CurrentUser() user: AuthenticatedRequestUser) {
     const settings = await this.listSettingsUseCase.execute(user);
@@ -34,7 +33,7 @@ export class AdminSettingsController {
   }
 
   @Patch(":key")
-  @Authorize({ roles: [ROLE_NAMES.SUPER_ADMIN], permissions: [perm("settings", ACTION.UPDATE)] })
+  @Authorize({ roles: ["SUPER_ADMIN"], permissions: [perm("settings", ACTION.UPDATE)] })
   @ApiDataResponse(ApplicationSettingDto)
   updateSetting(
     @CurrentUser() user: AuthenticatedRequestUser,
