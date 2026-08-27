@@ -18,11 +18,9 @@ import { AccessControlPermissionPersistence } from "./infrastructure/access-cont
 import { AccessControlRolePersistence } from "./infrastructure/access-control-role.persistence";
 import { AccessControlRepository } from "./infrastructure/access-control.repository";
 import {
-  ORGANIZATION_ACCESS_CONTROL_PROVIDER,
   OrganizationAccessControlAdapter,
 } from "./infrastructure/organization-access-control.adapter";
 import {
-  ORGANIZATION_CUSTOM_ROLES_PURGE_PROVIDER,
   OrganizationCustomRolesPurgeAdapter,
 } from "./infrastructure/organization-custom-roles-purge.adapter";
 import { UserRoleAssignmentsPersistence } from "./infrastructure/user-role-assignments.persistence";

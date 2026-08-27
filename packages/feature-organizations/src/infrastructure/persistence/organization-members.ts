@@ -1,5 +1,4 @@
 import { timestamps } from "@repo/database-runtime";
-import { users } from "@repo/feature-users/schema";
 import { index, pgTable, uniqueIndex, uuid } from "drizzle-orm/pg-core";
 
 import { organizationMemberRoleEnum } from "./organization-member-role.enum";
@@ -12,9 +11,8 @@ export const organizationMembers = pgTable(
     organizationId: uuid("organization_id")
       .notNull()
       .references(() => organizations.id, { onDelete: "cascade" }),
-    userId: uuid("user_id")
-      .notNull()
-      .references(() => users.id, { onDelete: "cascade" }),
+    // FK to feature-users.users is enforced at the SQL level by migration 0000.
+    userId: uuid("user_id").notNull(),
     role: organizationMemberRoleEnum("role").notNull().default("MEMBER"),
     ...timestamps,
   },

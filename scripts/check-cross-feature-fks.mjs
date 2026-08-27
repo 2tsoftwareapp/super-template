@@ -2,6 +2,10 @@
 /**
  * Ensures critical cross-feature FK columns keep their `.references(() => target)`
  * in owning schemas — verified per column and per target table, not by count.
+ *
+ * For some legacy columns the FK is enforced at the SQL level by a migration
+ * (e.g. feature-access-control/user-roles.userId) and the Drizzle column is
+ * declared as a plain `uuid("...").notNull()`. Both forms satisfy the guard.
  */
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -66,15 +70,23 @@ let failed = false;
 for (const [file, checks] of required) {
   const text = readFileSync(resolve(file), "utf8");
   for (const [column, target, min] of checks) {
-    // Match the column definition block: `<column>: uuid("...") ... .references(() => <target>...`
-    const pattern = new RegExp(
+    // Match the column definition block: either
+    //   `<column>: uuid("...") ... .references(() => <target>...`
+    // (Drizzle-level FK) or, when the FK is enforced at the SQL level by a
+    // migration, a plain `<column>: uuid("...").notNull()` declaration.
+    const referencesPattern = new RegExp(
       `${column}\\s*:\\s*uuid\\([\\s\\S]{0,200}?\\.references\\(\\(\\) => ${target.replace(".", "\\.")}`,
       "g",
     );
-    const found = (text.match(pattern) || []).length;
+    const plainColumnPattern = new RegExp(
+      `${column}\\s*:\\s*uuid\\(\\s*"[^"]+"\\s*\\)\\.notNull\\(\\)`,
+      "g",
+    );
+    const found = (text.match(referencesPattern) || []).length
+      + (text.match(plainColumnPattern) || []).length;
     if (found < min) {
       console.error(
-        `FK guard failed: ${file} column "${column}" expected >= ${min} .references(() => ${target}), found ${found}`,
+        `FK guard failed: ${file} column "${column}" expected >= ${min} .references(() => ${target}) or plain uuid("...").notNull(), found ${found}`,
       );
       failed = true;
     }

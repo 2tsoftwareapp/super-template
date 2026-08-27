@@ -1991,18 +1991,12 @@ importers:
       '@repo/database-runtime':
         specifier: workspace:*
         version: link:../database-runtime
-      '@repo/feature-access-control':
-        specifier: workspace:*
-        version: link:../feature-access-control
       '@repo/feature-activities':
         specifier: workspace:*
         version: link:../feature-activities
       '@repo/feature-audit':
         specifier: workspace:*
         version: link:../feature-audit
-      '@repo/feature-organizations':
-        specifier: workspace:*
-        version: link:../feature-organizations
       '@repo/feature-outbox':
         specifier: workspace:*
         version: link:../feature-outbox

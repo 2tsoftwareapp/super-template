@@ -6,7 +6,7 @@ import { UsersModule } from "./users.module";
 
 export const usersFeature: FeatureManifest = defineFeature({
   id: "users",
-  dependsOn: ["activities", "audit", "outbox"],
+  dependsOn: ["settings", "activities", "audit", "outbox"],
   provides: ["user-credential-store"],
   // requires: ["file-view"] removed - file lookup is optional for users
   nestModule: UsersModule,
