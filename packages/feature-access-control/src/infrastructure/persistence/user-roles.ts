@@ -1,4 +1,5 @@
 import { organizations } from "@repo/feature-organizations/schema";
+import { users } from "@repo/feature-users/schema";
 import { index, pgTable, primaryKey, timestamp, uuid } from "drizzle-orm/pg-core";
 
 import { roles } from "./access-control";
@@ -6,8 +7,9 @@ import { roles } from "./access-control";
 export const userRoles = pgTable(
   "r_user_roles",
   {
-    // FK to feature-users.users is enforced at the SQL level by migration 0000.
-    userId: uuid("user_id").notNull(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
     organizationId: uuid("organization_id").references(() => organizations.id, {
       onDelete: "cascade",
     }),
