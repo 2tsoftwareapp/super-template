@@ -2,7 +2,8 @@
 export { OutboxModule } from "../outbox.module";
 export { OUTBOX_APPENDER, type OutboxAppenderPort } from "./outbox-appender.port";
 export {
-  OUTBOX_TOPIC_HANDLER,
+  OUTBOX_HANDLER_REGISTRY,
+  type OutboxHandlerRegistryPort,
   type OutboxMessage,
   type OutboxTopicHandlerContribution,
 } from "./outbox-handler.port";

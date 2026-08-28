@@ -1,4 +1,4 @@
-import { timestamps } from "@repo/database-runtime";
+import { timestamps } from "@repo/database-runtime/schema/timestamps";
 import { organizations } from "@repo/feature-organizations/schema";
 import { sql } from "drizzle-orm";
 import {

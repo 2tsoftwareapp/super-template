@@ -19,4 +19,8 @@ export interface OutboxTopicHandlerContribution {
   readonly handle: (message: OutboxMessage) => Promise<void>;
 }
 
-export const OUTBOX_TOPIC_HANDLER = Symbol("OUTBOX_TOPIC_HANDLER");
+export const OUTBOX_HANDLER_REGISTRY = Symbol("OUTBOX_HANDLER_REGISTRY");
+export interface OutboxHandlerRegistryPort {
+  register(contribution: OutboxTopicHandlerContribution): void;
+  getAll(): readonly OutboxTopicHandlerContribution[];
+}

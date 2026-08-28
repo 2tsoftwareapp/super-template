@@ -30,6 +30,7 @@
     "generate:config": "pnpm --filter @repo/config generate",
     "generate": "sh ./scripts/generate-contracts.sh",
     "generate:check": "sh ./scripts/generate-check.sh",
+    "schema:check": "node scripts/check-schema.mjs",
     "scaffold:feature": "node scripts/scaffold-feature.mjs",
     "verify": "sh ./scripts/verify.sh",
     "extension:plan": "node .agents/skills/playwright-extension-live-browser/scripts/run-plan.mjs",

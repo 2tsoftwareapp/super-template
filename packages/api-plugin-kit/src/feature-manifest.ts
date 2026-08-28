@@ -91,6 +91,13 @@ export interface FeatureManifest {
 
   /** Optional seed runners contributed by this feature. */
   readonly seeders?: readonly FeatureSeeder[];
+
+  /**
+   * Outbox handler classes contributed by this feature. Each class must have
+   * a static `topic: string` property and a `handle(message: OutboxMessage): Promise<void>` method.
+   * Composition validates that no two handlers share the same topic.
+   */
+  readonly outboxHandlers?: readonly Type<unknown>[];
 }
 
 /**
@@ -152,6 +159,8 @@ export interface ComposedFeatures {
   readonly resourceScopes: Readonly<Record<string, "platform" | "organization">>;
   /** Merged authorization contributions (resources + default grants). */
   readonly authorization: ComposedAuthorization;
+  /** Composed outbox handler classes in dependency order. */
+  readonly outboxHandlerClasses: readonly Type<unknown>[];
 }
 
 /**
@@ -475,6 +484,32 @@ export function composeFeatures(features: readonly FeatureManifest[]): ComposedF
   validateFeatureCapabilities(features);
   const ordered = orderFeatureManifests(features);
 
+  const handlerClasses: Type<unknown>[] = [];
+  const topicMap = new Map<string, string[]>();
+
+  for (const feature of ordered) {
+    for (const handlerClass of feature.outboxHandlers ?? []) {
+      const topic = (handlerClass as { readonly topic?: string }).topic;
+      if (!topic) {
+        throw new Error(
+          `Outbox handler "${handlerClass.name}" in feature "${feature.id}" is missing static topic property.`,
+        );
+      }
+      const existing = topicMap.get(topic) ?? [];
+      existing.push(handlerClass.name);
+      topicMap.set(topic, existing);
+      handlerClasses.push(handlerClass);
+    }
+  }
+
+  const duplicates = [...topicMap.entries()].filter(([, names]) => names.length > 1);
+  if (duplicates.length > 0) {
+    const details = duplicates
+      .map(([topic, names]) => `topic "${topic}" by ${names.join(", ")}`)
+      .join("; ");
+    throw new Error(`Duplicate outbox ${details}.`);
+  }
+
   return {
     features: ordered,
     schema: composeFeatureSchemas(ordered),
@@ -483,5 +518,6 @@ export function composeFeatures(features: readonly FeatureManifest[]): ComposedF
     seeders: collectFeatureSeeders(ordered),
     resourceScopes: composeFeatureResourceScopes(ordered),
     authorization: composeFeatureAuthorization(ordered),
+    outboxHandlerClasses: handlerClasses,
   };
 }

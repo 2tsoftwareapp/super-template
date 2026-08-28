@@ -1,4 +1,4 @@
-import { timestamps } from "@repo/database-runtime";
+import { timestamps } from "@repo/database-runtime/schema/timestamps";
 import { users } from "@repo/feature-users/schema";
 import { index, pgTable, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
 

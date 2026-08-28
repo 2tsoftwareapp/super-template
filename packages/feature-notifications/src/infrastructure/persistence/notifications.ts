@@ -1,6 +1,6 @@
 import type { JsonObject } from "@repo/api-kernel";
 
-import { timestamps } from "@repo/database-runtime";
+import { timestamps } from "@repo/database-runtime/schema/timestamps";
 import { jobs } from "@repo/feature-jobs/schema";
 import { organizations } from "@repo/feature-organizations/schema";
 import { users } from "@repo/feature-users/schema";

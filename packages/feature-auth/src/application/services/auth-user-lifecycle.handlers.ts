@@ -3,7 +3,6 @@ import type { JsonObject } from "@repo/api-kernel";
 import { Inject, Injectable } from "@nestjs/common";
 import {
   OUTBOX_APPENDER,
-  OUTBOX_TOPIC_HANDLER,
   type OutboxAppenderPort,
   type OutboxMessage,
 } from "@repo/feature-outbox/contracts";
@@ -75,18 +74,82 @@ export class AuthUserLifecycleHandlers {
   }
 }
 
-export const AUTH_USER_LIFECYCLE_HANDLER_PROVIDERS = [
-  "auth.send-verification-email",
-  "user.lifecycle.created",
-  "user.lifecycle.deleted",
-  "user.lifecycle.password-changed",
-  "user.lifecycle.status-blocked",
-].map((topic) => ({
-  provide: OUTBOX_TOPIC_HANDLER,
-  useFactory: (service: AuthUserLifecycleHandlers) => ({
-    topic,
-    handle: (message: OutboxMessage) => service.handleMessage(message),
-  }),
-  inject: [AuthUserLifecycleHandlers],
-  multi: true as const,
-}));
+@Injectable()
+export class AuthSendVerificationEmailHandler {
+  static readonly topic = "auth.send-verification-email";
+
+  constructor(private readonly authMailService: AuthMailService) {}
+
+  async handle(message: OutboxMessage): Promise<void> {
+    const email = readString(message.payload, "email");
+    const token = readString(message.payload, "token");
+    const displayName = readString(message.payload, "displayName");
+    await this.authMailService.sendVerificationEmail(email, token, displayName);
+  }
+}
+
+@Injectable()
+export class UserLifecycleCreatedHandler {
+  static readonly topic = "user.lifecycle.created";
+
+  constructor(private readonly emailVerification: AuthEmailVerificationService) {}
+
+  async handle(message: OutboxMessage): Promise<void> {
+    await this.emailVerification.issueVerificationEmail(
+      {
+        userId: readString(message.payload, "userId"),
+        email: readString(message.payload, "email"),
+        displayName: readString(message.payload, "displayName") || null,
+      },
+      undefined,
+    );
+  }
+}
+
+@Injectable()
+export class UserLifecycleDeletedHandler {
+  static readonly topic = "user.lifecycle.deleted";
+
+  constructor(
+    @Inject(AUTH_TOKEN_MAINTENANCE) private readonly tokenMaintenance: AuthTokenMaintenance,
+  ) {}
+
+  async handle(message: OutboxMessage): Promise<void> {
+    const userId = readString(message.payload, "userId");
+    if (userId) {
+      await this.tokenMaintenance.revokeAllSessionsForUser(userId);
+    }
+  }
+}
+
+@Injectable()
+export class UserLifecyclePasswordChangedHandler {
+  static readonly topic = "user.lifecycle.password-changed";
+
+  constructor(
+    @Inject(AUTH_TOKEN_MAINTENANCE) private readonly tokenMaintenance: AuthTokenMaintenance,
+  ) {}
+
+  async handle(message: OutboxMessage): Promise<void> {
+    const userId = readString(message.payload, "userId");
+    if (userId) {
+      await this.tokenMaintenance.revokeAllSessionsForUser(userId);
+    }
+  }
+}
+
+@Injectable()
+export class UserLifecycleStatusBlockedHandler {
+  static readonly topic = "user.lifecycle.status-blocked";
+
+  constructor(
+    @Inject(AUTH_TOKEN_MAINTENANCE) private readonly tokenMaintenance: AuthTokenMaintenance,
+  ) {}
+
+  async handle(message: OutboxMessage): Promise<void> {
+    const userId = readString(message.payload, "userId");
+    if (userId) {
+      await this.tokenMaintenance.revokeAllSessionsForUser(userId);
+    }
+  }
+}

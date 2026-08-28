@@ -21,3 +21,7 @@ export interface JobHandlerContribution {
 }
 
 export const JOB_HANDLER = Symbol("JOB_HANDLER");
+export const JOB_HANDLER_REGISTRY = Symbol("JOB_HANDLER_REGISTRY");
+export interface JobHandlerRegistryPort {
+  registerHandler(type: string, handler: JobHandlerContribution["handle"]): void;
+}

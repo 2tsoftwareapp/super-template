@@ -1,4 +1,4 @@
-import { timestamps } from "@repo/database-runtime";
+import { timestamps } from "@repo/database-runtime/schema/timestamps";
 import { index, pgTable, uniqueIndex, uuid } from "drizzle-orm/pg-core";
 
 import { organizationMemberRoleEnum } from "./organization-member-role.enum";

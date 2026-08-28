@@ -1,7 +1,7 @@
 import { forwardRef, Global, Module } from "@nestjs/common";
 import { JobsModule } from "@repo/feature-jobs/contracts";
 
-import { MAIL_JOB_HANDLER_PROVIDER, MailJobHandler } from "./application/mail-job.handler";
+import { MailJobHandler } from "./application/mail-job.handler";
 import { MailMapper } from "./application/mail.mapper";
 import { MailService } from "./application/mail.service";
 import { MAIL_DELIVERIES_REPOSITORY } from "./application/ports/mail-deliveries.repository.port";
@@ -25,7 +25,6 @@ import { MAIL_TEMPLATE_SENDER } from "./public/mail-template-sender.port";
   providers: [
     SmtpMailerService,
     MailJobHandler,
-    MAIL_JOB_HANDLER_PROVIDER,
     TemplateRendererService,
     MailMapper,
     MailDeliveriesRepository,

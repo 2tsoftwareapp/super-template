@@ -1,6 +1,6 @@
 import type { JsonObject } from "@repo/api-kernel";
 
-import { timestamps } from "@repo/database-runtime";
+import { timestamps } from "@repo/database-runtime/schema/timestamps";
 import { users } from "@repo/feature-users/schema";
 import { jsonb, pgTable, text, uuid } from "drizzle-orm/pg-core";
 

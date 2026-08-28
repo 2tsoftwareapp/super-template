@@ -1,4 +1,4 @@
-import { timestamps } from "@repo/database-runtime";
+import { timestamps } from "@repo/database-runtime/schema/timestamps";
 import { integer, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 
 /**

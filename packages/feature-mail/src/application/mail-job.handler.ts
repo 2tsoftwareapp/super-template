@@ -1,8 +1,8 @@
 import type { JsonObject } from "@repo/api-kernel";
 import type { JobHandlerContext, JobHandlerContribution } from "@repo/feature-jobs/contracts";
 
-import { Injectable } from "@nestjs/common";
-import { JOB_HANDLER } from "@repo/feature-jobs/contracts";
+import { Inject, Injectable, type OnModuleInit } from "@nestjs/common";
+import { JOB_HANDLER_REGISTRY, type JobHandlerRegistryPort } from "@repo/feature-jobs/contracts";
 
 import type { SendTemplateInput } from "./use-cases/send-mail-template.use-case";
 
@@ -38,10 +38,17 @@ function readOptionalJsonObject(value: unknown): JsonObject | null {
  * core never imports a concrete mailer.
  */
 @Injectable()
-export class MailJobHandler implements JobHandlerContribution {
+export class MailJobHandler implements JobHandlerContribution, OnModuleInit {
   readonly type = "mail.send";
 
-  constructor(private readonly mailService: MailService) {}
+  constructor(
+    private readonly mailService: MailService,
+    @Inject(JOB_HANDLER_REGISTRY) private readonly handlerRegistry: JobHandlerRegistryPort,
+  ) {}
+
+  onModuleInit(): void {
+    this.handlerRegistry.registerHandler(this.type, (context) => this.handle(context));
+  }
 
   async handle(context: JobHandlerContext): Promise<void> {
     const payload = context.payload as unknown as Record<string, unknown>;
@@ -62,10 +69,3 @@ export class MailJobHandler implements JobHandlerContribution {
     await this.mailService.sendTemplate(input);
   }
 }
-
-export const MAIL_JOB_HANDLER_PROVIDER = {
-  provide: JOB_HANDLER,
-  useFactory: (handler: MailJobHandler) => handler,
-  inject: [MailJobHandler],
-  multi: true,
-};

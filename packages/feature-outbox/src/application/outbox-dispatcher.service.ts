@@ -3,9 +3,9 @@ import { Cron, CronExpression } from "@nestjs/schedule";
 import { APP_LOGGER, type AppLogger } from "@repo/api-runtime";
 
 import {
-  OUTBOX_TOPIC_HANDLER,
+  OUTBOX_HANDLER_REGISTRY,
+  type OutboxHandlerRegistryPort,
   type OutboxMessage,
-  type OutboxTopicHandlerContribution,
 } from "../public/outbox-handler.port";
 import { OUTBOX_REPOSITORY, type OutboxRepositoryPort } from "../public/outbox.port";
 
@@ -21,8 +21,8 @@ export class OutboxDispatcher {
   constructor(
     @Inject(APP_LOGGER) private readonly logger: AppLogger,
     @Inject(OUTBOX_REPOSITORY) private readonly outboxRepository: OutboxRepositoryPort,
-    @Inject(OUTBOX_TOPIC_HANDLER)
-    private readonly handlers: OutboxTopicHandlerContribution[],
+    @Inject(OUTBOX_HANDLER_REGISTRY)
+    private readonly handlerRegistry: OutboxHandlerRegistryPort,
   ) {}
 
   @Cron(CronExpression.EVERY_10_SECONDS)
@@ -47,7 +47,7 @@ export class OutboxDispatcher {
   }
 
   private async deliver(message: OutboxMessage): Promise<void> {
-    const handler = this.handlers.find((h) => h.topic === message.topic);
+    const handler = this.handlerRegistry.getAll().find((h) => h.topic === message.topic);
 
     if (!handler) {
       // No subscriber composed for this topic: park it as failed so it does

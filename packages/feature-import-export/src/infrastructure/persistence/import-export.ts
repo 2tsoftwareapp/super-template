@@ -1,6 +1,6 @@
 import type { JsonObject } from "@repo/api-kernel";
 
-import { timestamps } from "@repo/database-runtime";
+import { timestamps } from "@repo/database-runtime/schema/timestamps";
 import { sql } from "drizzle-orm";
 import {
   index,

@@ -10,4 +10,5 @@ export const outboxFeature: FeatureManifest = defineFeature({
   nestModule: OutboxModule,
   resourceScopes: {},
   schema: { outboxMessages },
+  outboxHandlers: [],
 });

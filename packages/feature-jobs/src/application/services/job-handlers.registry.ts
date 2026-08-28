@@ -1,6 +1,6 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 
-import { JOB_HANDLER, type JobHandlerContext } from "../../public/job-handler.port";
+import type { JobHandlerContext } from "../../public/job-handler.port";
 
 /**
  * Reserved no-op job type for future orphaned-file cleanup.
@@ -11,11 +11,6 @@ async function filesCleanupHandler(_context: JobHandlerContext): Promise<void> {
 
 type Handler = (context: JobHandlerContext) => Promise<void>;
 
-interface Contribution {
-  readonly type: string;
-  readonly handle: (context: JobHandlerContext) => Promise<void>;
-}
-
 /**
  * Dispatches jobs to feature-contributed handlers. The jobs core never imports
  * an owning feature: mail/notification/auth features register JOB_HANDLER
@@ -25,15 +20,8 @@ interface Contribution {
 export class JobHandlersRegistry {
   private readonly handlers = new Map<string, Handler>();
 
-  constructor(
-    @Inject(JOB_HANDLER)
-    private readonly contributions: Contribution[],
-  ) {
+  constructor() {
     this.registerHandler("files.cleanup", filesCleanupHandler);
-
-    for (const contribution of this.contributions) {
-      this.registerHandler(contribution.type, contribution.handle);
-    }
   }
 
   registerHandler(type: string, handler: Handler): void {

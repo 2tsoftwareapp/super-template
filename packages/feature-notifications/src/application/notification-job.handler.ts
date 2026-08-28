@@ -1,8 +1,8 @@
 import type { JsonObject } from "@repo/api-kernel";
 import type { JobHandlerContext, JobHandlerContribution } from "@repo/feature-jobs/contracts";
 
-import { Injectable } from "@nestjs/common";
-import { JOB_HANDLER } from "@repo/feature-jobs/contracts";
+import { Inject, Injectable, type OnModuleInit } from "@nestjs/common";
+import { JOB_HANDLER_REGISTRY, type JobHandlerRegistryPort } from "@repo/feature-jobs/contracts";
 
 import { NotificationsService } from "./notifications.service";
 
@@ -23,10 +23,17 @@ function readOptionalJsonObject(value: unknown): JsonObject | null {
  * the jobs core stays free of notification imports.
  */
 @Injectable()
-export class NotificationJobHandler implements JobHandlerContribution {
+export class NotificationJobHandler implements JobHandlerContribution, OnModuleInit {
   readonly type = "notification.send";
 
-  constructor(private readonly notifications: NotificationsService) {}
+  constructor(
+    private readonly notifications: NotificationsService,
+    @Inject(JOB_HANDLER_REGISTRY) private readonly handlerRegistry: JobHandlerRegistryPort,
+  ) {}
+
+  onModuleInit(): void {
+    this.handlerRegistry.registerHandler(this.type, (context) => this.handle(context));
+  }
 
   async handle(context: JobHandlerContext): Promise<void> {
     const payload = context.payload as unknown as Record<string, unknown>;
@@ -52,10 +59,3 @@ export class NotificationJobHandler implements JobHandlerContribution {
     });
   }
 }
-
-export const NOTIFICATION_JOB_HANDLER_PROVIDER = {
-  provide: JOB_HANDLER,
-  useFactory: (handler: NotificationJobHandler) => handler,
-  inject: [NotificationJobHandler],
-  multi: true,
-};
