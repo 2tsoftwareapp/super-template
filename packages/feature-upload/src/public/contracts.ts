@@ -10,3 +10,4 @@ export { OBJECT_STORAGE } from "../storage/application/ports/object-storage.inte
 export type { ObjectStorage } from "../storage/application/ports/object-storage.interface";
 export * from "./entity-attachment-listing.port";
 export { FILE_ERROR_CODES } from "./error-codes";
+export * from "./file-lookup.port";

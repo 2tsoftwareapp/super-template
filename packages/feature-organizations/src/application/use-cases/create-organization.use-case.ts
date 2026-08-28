@@ -1,6 +1,6 @@
 import type { AuthenticatedRequestUser } from "@repo/api-runtime";
 
-import { HttpStatus, Inject, Injectable } from "@nestjs/common";
+import { HttpStatus, Inject, Injectable, Optional } from "@nestjs/common";
 import {
   AppError,
   ERROR_CODES,
@@ -46,7 +46,7 @@ export class CreateOrganizationUseCase {
     private readonly membership: OrganizationMembership,
     @Inject(ACTIVITY_EMITTER) private readonly activityEmitter: ActivityEmitter,
     @Inject(ORGANIZATION_ACCESS_CONTROL)
-    private readonly accessControl: OrganizationAccessControlPort,
+    @Optional() private readonly accessControl: OrganizationAccessControlPort,
   ) {}
 
   async execute(user: AuthenticatedRequestUser, input: CreateOrganizationCommand) {

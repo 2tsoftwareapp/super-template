@@ -16,9 +16,9 @@ import { outboxFeature } from "@repo/feature-outbox";
 import { settingsFeature } from "@repo/feature-settings";
 import { ssoFeature } from "@repo/feature-sso";
 import { uploadFeature } from "@repo/feature-upload";
+import { userManagementFeature } from "@repo/feature-user-management";
 import { userPreferencesFeature } from "@repo/feature-user-preferences";
 import { usersFeature } from "@repo/feature-users";
-import { userManagementFeature } from "@repo/feature-user-management";
 
 /**
  * Explicit compile-time feature registry for the API host.

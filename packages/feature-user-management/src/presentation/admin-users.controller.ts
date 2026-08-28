@@ -2,28 +2,13 @@ import type { AuthenticatedRequestUser } from "@repo/api-runtime";
 import type { Request } from "express";
 
 import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseUUIDPipe,
-  Patch,
-  Post,
-  Put,
-  Query,
-  Req,
-} from "@nestjs/common";
+  Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post, Put, Query, Req, } from "@nestjs/common";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import {
-  ACTION,
-  ApiDataResponse,
-  ApiPaginatedResponse,
-  perm,
-  SuccessFlagDto,
-} from "@repo/api-runtime";
+  ACTION, ApiDataResponse, ApiPaginatedResponse, perm, SuccessFlagDto, } from "@repo/api-runtime";
 import { CurrentUser } from "@repo/api-runtime";
 import { Authorize } from "@repo/api-runtime";
+import { userSortsFromQuery } from "@repo/feature-users/contracts";
 
 import { CreateAdminUserUseCase } from "../application/use-cases/create-admin-user.use-case";
 import { DeleteUserUseCase } from "../application/use-cases/delete-user.use-case";
@@ -32,7 +17,6 @@ import { ListUsersUseCase } from "../application/use-cases/list-users.use-case";
 import { ReplaceUserRolesUseCase } from "../application/use-cases/replace-user-roles.use-case";
 import { UpdateAdminUserUseCase } from "../application/use-cases/update-admin-user.use-case";
 import { UpdateUserStatusUseCase } from "../application/use-cases/update-user-status.use-case";
-import { userSortsFromQuery } from "@repo/feature-users/contracts";
 import {
   AdminUsersQueryDto,
   CreateAdminUserDto,

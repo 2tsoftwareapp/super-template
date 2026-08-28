@@ -2,17 +2,20 @@ import type { FeatureSeedContext, FeatureSeeder } from "@repo/api-plugin-kit";
 import type { DatabaseExecutor } from "@repo/database-runtime";
 
 import { EnvironmentService } from "@repo/api-runtime";
-import { hashPassword } from "@repo/utils/password";
-
 import {
-  PERSONAL_ORGANIZATION_PROVIDER,
-  type PersonalOrganizationProvider,
   ROLE_NAMES,
   USER_ACCESS_CONTROL,
   type UserAccessControl,
+} from "@repo/feature-access-control/contracts";
+import {
+  PERSONAL_ORGANIZATION_PROVIDER,
+  type PersonalOrganizationProvider,
+} from "@repo/feature-organizations/contracts";
+import {
   USERS_REPOSITORY,
   type UsersRepositoryPort,
-} from "./public/contracts";
+} from "@repo/feature-users/contracts";
+import { hashPassword } from "@repo/utils/password";
 
 /** Bag key written by the users seeder for downstream notifications/auth seeders. */
 export const SEEDED_USERS_BAG_KEY = "seededUsers";

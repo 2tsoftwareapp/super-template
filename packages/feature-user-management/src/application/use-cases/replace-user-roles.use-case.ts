@@ -1,28 +1,19 @@
 import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime";
 import type { TransactionPort } from "@repo/api-runtime";
+import type { UserView } from "@repo/feature-users/contracts";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { ERROR_CODES } from "@repo/api-runtime";
 import { AppError, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
+import { ROLE_NAMES, USER_ACCESS_CONTROL, USER_PROFILE_INVALIDATOR, type UserAccessControl, type UserProfileInvalidator } from "@repo/feature-access-control/contracts";
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
+import { ORGANIZATION_MEMBERSHIP, type OrganizationMemberRole, type OrganizationMembership } from "@repo/feature-organizations/contracts";
 import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
-
-import type { UserView } from "@repo/feature-users/contracts";
-
-import { assertUserBelongsToOrganization } from "@repo/feature-users/contracts";
-import {
-  ORGANIZATION_MEMBERSHIP,
-  type OrganizationMemberRole,
-  type OrganizationMembership,
-  ROLE_NAMES,
-  USER_ACCESS_CONTROL,
-  USER_PROFILE_INVALIDATOR,
-  type UserAccessControl,
-  type UserProfileInvalidator,
-} from "@repo/feature-users/contracts";
-import { assertCanAssignRoleTargets, assertRoleScopeCanBeAssigned } from "../../domain-role-assignment.policy";
-import { resolveRoleById } from "../assignable-role.resolver";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "@repo/feature-users/contracts";
+
+import { assertCanAssignRoleTargets, assertRoleScopeCanBeAssigned } from "../../domain-role-assignment.policy";
+import { assertUserBelongsToOrganization } from "../../user-org-scope.policy";
+import { resolveRoleById } from "../assignable-role.resolver";
 import { GetUserUseCase } from "./get-user.use-case";
 
 @Injectable()

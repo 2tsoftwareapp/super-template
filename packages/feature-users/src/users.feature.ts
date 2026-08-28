@@ -1,7 +1,6 @@
 import { defineFeature, type FeatureManifest } from "@repo/api-plugin-kit";
 
 import { users, userStatusEnum } from "./infrastructure/persistence";
-import { usersSeeders } from "./seed";
 import { UsersModule } from "./users.module";
 
 export const usersFeature: FeatureManifest = defineFeature({
@@ -22,5 +21,4 @@ export const usersFeature: FeatureManifest = defineFeature({
     users,
     userStatusEnum,
   },
-  seeders: usersSeeders,
 });

@@ -1,15 +1,14 @@
 import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime";
+import type { UpdateAdminUserCommand, UserView } from "@repo/feature-users/contracts";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { AppError, normalizeEmail, SYSTEM_SCOPE } from "@repo/api-runtime";
+import { ROLE_NAMES, USER_ACCESS_CONTROL, type UserAccessControl } from "@repo/feature-access-control/contracts";
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
-
-import type { UpdateAdminUserCommand, UserView } from "@repo/feature-users/contracts";
-
-import { assertUserBelongsToOrganization } from "@repo/feature-users/contracts";
-import { ROLE_NAMES, USER_ACCESS_CONTROL, type UserAccessControl } from "@repo/feature-users/contracts";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "@repo/feature-users/contracts";
+
+import { assertUserBelongsToOrganization } from "../../user-org-scope.policy";
 import { GetUserUseCase } from "./get-user.use-case";
 
 @Injectable()

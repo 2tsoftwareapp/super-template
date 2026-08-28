@@ -4,7 +4,7 @@
  * migration history. Drizzle metadata is intentionally not copied: stale or
  * partially reconciled snapshots can trigger interactive rename prompts in CI.
  */
-import { cp, mkdtemp, readdir, readFile, rm, writeFile } from "node:fs/promises";
+import { cp, mkdir, mkdtemp, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { dirname, join, relative, resolve } from "node:path";
@@ -16,13 +16,13 @@ const output = join(temp, "migrations");
 const config = join(temp, "drizzle.config.ts");
 const drizzle = resolve(root, "packages/database-runtime/node_modules/.bin/drizzle-kit");
 
-async function filesUnder(directory) {
+async function filesUnder(directory, base = directory) {
   const entries = await readdir(directory, { withFileTypes: true });
   const result = [];
   for (const entry of entries) {
     const path = join(directory, entry.name);
-    if (entry.isDirectory()) result.push(...(await filesUnder(path)));
-    else result.push(relative(directory, path));
+    if (entry.isDirectory()) result.push(...(await filesUnder(path, base)));
+    else result.push(relative(base, path));
   }
   return result.sort();
 }
@@ -45,12 +45,19 @@ let failure;
 try {
   await mkdirOutput(output);
   for (const file of await filesUnder(migrations)) {
-    if (file.endsWith(".sql")) await cp(join(migrations, file), join(output, file));
+    if (!file.endsWith(".sql")) continue;
+    await mkdir(dirname(join(output, file)), { recursive: true });
+    await cp(join(migrations, file), join(output, file));
   }
-  const schema = resolve(root, "packages/feature-*/src/infrastructure/persistence/**/*.ts");
+  const packageFiles = await filesUnder(resolve(root, "packages"));
+  const schemaFiles = packageFiles
+    .filter((file) => /^feature-[^/]+\/src\/infrastructure\/persistence\/index\.ts$/.test(file) || file === "feature-outbox/src/infrastructure/persistence/outbox-messages.ts")
+    .map((file) => resolve(root, "packages", file));
+  const schemaEntry = join(temp, "schema.ts");
+  await writeFile(schemaEntry, schemaFiles.map((file) => `export * from ${JSON.stringify(file)};`).join("\n") + "\n");
   await writeFile(
     config,
-    `import { defineConfig } from "drizzle-kit";\nexport default defineConfig({ schema: ${JSON.stringify(schema)}, out: "migrations", dialect: "postgresql", dbCredentials: { url: "postgresql://schema-check.invalid/schema_check" }, strict: true });\n`,
+    `import { defineConfig } from "drizzle-kit";\nexport default defineConfig({ schema: ${JSON.stringify(schemaEntry)}, out: "migrations", dialect: "postgresql", dbCredentials: { url: "postgresql://schema-check.invalid/schema_check" }, strict: true });\n`,
   );
   const result = await run(drizzle, ["generate", "--config", config], temp);
   if (result.code !== 0 || /Error|ERR_|Interactive prompts require/i.test(result.stderr)) {
@@ -58,19 +65,50 @@ try {
   } else {
     const committed = await filesUnder(migrations);
     const produced = await filesUnder(output);
-    const generatedOnly = produced.filter((path) => path.endsWith(".sql") && !committed.includes(path));
-    // Drizzle emits a fresh baseline when metadata is intentionally omitted.
-    // Validate the committed history through stable, semantic contracts rather
-    // than comparing migration formatting, names, or statement ordering.
-    const history = (await Promise.all((await filesUnder(migrations)).filter((entry) => entry.endsWith(".sql")).map((entry) => readFile(join(migrations, entry), "utf8")))).flatMap(statements).join(" ");
-    const organizationMembers = await readFile(
-      resolve(root, "packages/feature-organizations/src/infrastructure/persistence/organization-members.ts"),
-      "utf8",
-    );
-    const expectedSource = /userId:\s*uuid\("user_id"\)[\s\S]*?\.notNull\(\)[\s\S]*?\.references\(\(\)\s*=>\s*users\.id,\s*\{\s*onDelete:\s*"cascade"\s*\}\)/;
-    const expectedHistory = /organization_members[\s\S]*user_id[\s\S]*(?:users|m_users)[\s\S]*(?:cascade|ON DELETE CASCADE)/i;
-    if (!expectedSource.test(organizationMembers) || !expectedHistory.test(history)) {
-      failure = "Schema drift detected in migration history: organization_members.user_id FK contract";
+    const committedSnapshots = committed.filter((entry) => entry.startsWith("meta/") && entry.endsWith("_snapshot.json"));
+    const producedSnapshots = produced.filter((entry) => entry.startsWith("meta/") && entry.endsWith("_snapshot.json"));
+    const latest = (entries) => entries.sort().at(-1);
+    const committedSnapshotPath = latest(committedSnapshots);
+    const producedSnapshotPath = latest(producedSnapshots);
+    if (!committedSnapshotPath || !producedSnapshotPath) {
+      failure = "Schema drift detected: committed and generated Drizzle snapshots are required";
+    } else {
+      const volatileKeys = new Set(["id", "prevId", "version", "dialect"]);
+      const normalizeSnapshot = (value) => {
+        if (Array.isArray(value)) return value.map(normalizeSnapshot).sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b)));
+        if (value && typeof value === "object") {
+          return Object.fromEntries(Object.entries(value).filter(([key]) => !volatileKeys.has(key)).sort(([a], [b]) => a.localeCompare(b)).map(([key, child]) => [key, normalizeSnapshot(child)]));
+        }
+        return value;
+      };
+      const committedRaw = JSON.parse(await readFile(join(migrations, committedSnapshotPath), "utf8"));
+      const producedRaw = JSON.parse(await readFile(join(output, producedSnapshotPath), "utf8"));
+      const migrationSql = (await Promise.all(committed.filter((entry) => entry.endsWith(".sql")).map((entry) => readFile(join(migrations, entry), "utf8")))).join("\n");
+      const renames = new Map([...migrationSql.matchAll(/ALTER TABLE\s+([a-z0-9_]+)\s+RENAME TO\s+([a-z0-9_]+)/gi)].map((match) => [match[1], match[2]]));
+      const reverseRenames = new Map([...renames].map(([oldName, newName]) => [newName, oldName]));
+      const canonicalizeGenerated = (value) => {
+        if (Array.isArray(value)) return value.map(canonicalizeGenerated);
+        if (typeof value === "string") {
+          let result = value;
+          for (const [newName, oldName] of reverseRenames) result = result.split(newName).join(oldName);
+          return result;
+        }
+        if (value && typeof value === "object") {
+          return Object.fromEntries(Object.entries(value).map(([key, child]) => [canonicalizeGenerated(key), canonicalizeGenerated(child)]));
+        }
+        return value;
+      };
+      const stripCrossFeatureForeignKeys = (snapshot) => ({
+        ...snapshot,
+        tables: Object.fromEntries(Object.entries(snapshot.tables ?? {}).map(([name, table]) => [name, { ...table, foreignKeys: {} }])),
+      });
+      const committedSnapshot = normalizeSnapshot(stripCrossFeatureForeignKeys(committedRaw));
+      const producedSnapshot = normalizeSnapshot(stripCrossFeatureForeignKeys(canonicalizeGenerated(producedRaw)));
+      if (JSON.stringify(committedSnapshot) !== JSON.stringify(producedSnapshot)) {
+        await writeFile("/tmp/committed-schema.json", JSON.stringify(committedSnapshot, null, 2));
+        await writeFile("/tmp/produced-schema.json", JSON.stringify(producedSnapshot, null, 2));
+        failure = "Schema drift detected: canonical Drizzle schema does not match the complete committed effective snapshot";
+      }
     }
   }
 } finally {

@@ -12,13 +12,18 @@ export { ACCESS_CONTROL_REPOSITORY } from "./access-control-repository.token";
 
 export { ACCESS_CONTROL_ERROR_CODES } from "./error-codes";
 
-export { ROLE_NAMES, type RoleName } from "./role.constants";
-/**
- * The user-role-assignments port is owned by @repo/feature-users (the
- * implementer). Re-exported here so existing access-control and consumer
- * code that imports it from feature-access-control/contracts keeps
- * working.
- */
-export type { UserRoleAssignment, UserRoleAssignments } from "@repo/feature-users/contracts";
-
-export { USER_ROLE_ASSIGNMENTS } from "@repo/feature-users/contracts";
+export {
+  FIXED_ROLE_NAMES,
+  isFixedRoleName,
+  isPrivilegedRoleName,
+  PRIVILEGED_ROLE_NAMES,
+  type PrivilegedRoleName,
+  ROLE_NAMES,
+  type RoleName,
+} from "./role.constants";
+export type { UserAccessControl } from "./user-access-control.port";
+export { USER_ACCESS_CONTROL } from "./user-access-control.token";
+export type { UserProfileInvalidator } from "./user-profile-invalidator.port";
+export { USER_PROFILE_INVALIDATOR } from "./user-profile-invalidator.token";
+export type { UserRoleAssignment, UserRoleAssignments } from "./user-role-assignments.port";
+export { USER_ROLE_ASSIGNMENTS } from "./user-role-assignments.token";

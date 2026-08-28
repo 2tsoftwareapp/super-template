@@ -4,12 +4,7 @@ import type { TransactionPort } from "@repo/api-runtime";
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { ERROR_CODES } from "@repo/api-runtime";
 import {
-  AppError,
-  durationToMilliseconds,
-  normalizeEmail,
-  SYSTEM_SCOPE,
-  TRANSACTION_PORT,
-} from "@repo/api-runtime";
+  AppError, durationToMilliseconds, normalizeEmail, SYSTEM_SCOPE, TRANSACTION_PORT, } from "@repo/api-runtime";
 import { AccessControlService } from "@repo/feature-access-control/contracts";
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 import { AUTH_USER_STORE, type AuthUserStore } from "@repo/feature-auth/contracts";
@@ -17,9 +12,7 @@ import { OrganizationsService } from "@repo/feature-organizations/contracts";
 import { OUTBOX_APPENDER, type OutboxAppenderPort } from "@repo/feature-outbox/contracts";
 import { SETTINGS_ERROR_CODES } from "@repo/feature-settings/contracts";
 import {
-  APPLICATION_SETTINGS_LOOKUP,
-  type ApplicationSettingsLookup,
-} from "@repo/feature-settings/contracts";
+  APPLICATION_SETTINGS_LOOKUP, type ApplicationSettingsLookup, } from "@repo/feature-settings/contracts";
 import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
 
 import type { RegisterCommand } from "../auth.types";

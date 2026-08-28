@@ -2,11 +2,7 @@ import { Global, Module } from "@nestjs/common";
 import { AccessProfileCache } from "@repo/api-runtime";
 import { AppConfigModule } from "@repo/api-runtime";
 import {
-  ORGANIZATION_ACCESS_CONTROL,
-  ORGANIZATION_CUSTOM_ROLES_PURGE,
-  ORGANIZATION_USER_ROLES_PURGE,
-} from "@repo/feature-organizations/contracts";
-import { USER_ACCESS_CONTROL, USER_PROFILE_INVALIDATOR } from "@repo/feature-users/contracts";
+  ORGANIZATION_ACCESS_CONTROL, ORGANIZATION_CUSTOM_ROLES_PURGE, ORGANIZATION_USER_ROLES_PURGE, } from "@repo/feature-organizations/contracts";
 
 import { AccessControlMapper } from "./application/access-control.mapper";
 import { AccessControlService } from "./application/access-control.service";
@@ -27,6 +23,8 @@ import { OrganizationCustomRolesPurgeAdapter } from "./infrastructure/organizati
 import { UserRoleAssignmentsPersistence } from "./infrastructure/user-role-assignments.persistence";
 import { AdminRolesController } from "./presentation/admin-roles.controller";
 import { ACCESS_CONTROL_REPOSITORY } from "./public/access-control-repository.token";
+import { USER_ACCESS_CONTROL } from "./public/user-access-control.token";
+import { USER_PROFILE_INVALIDATOR } from "./public/user-profile-invalidator.token";
 import { USER_ROLE_ASSIGNMENTS } from "./public/user-role-assignments.token";
 
 @Global()

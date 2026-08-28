@@ -5,7 +5,7 @@ import {
   assertActorHasOrganizationContext,
   assertUserBelongsToOrganization,
   resolveUsersListOrganizationId,
-} from "../user-org-scope.policy";
+} from "./user-org-scope.policy";
 
 const superAdmin = {
   userId: "super",

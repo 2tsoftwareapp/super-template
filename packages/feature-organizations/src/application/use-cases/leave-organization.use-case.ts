@@ -1,7 +1,7 @@
 import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime";
 import type { TransactionPort } from "@repo/api-runtime";
 
-import { HttpStatus, Inject, Injectable } from "@nestjs/common";
+import { HttpStatus, Inject, Injectable, Optional } from "@nestjs/common";
 import { AppError, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 
@@ -20,7 +20,7 @@ export class LeaveOrganizationUseCase {
     private readonly membership: OrganizationMembership,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
     @Inject(ORGANIZATION_ACCESS_CONTROL)
-    private readonly accessControl: OrganizationAccessControlPort,
+    @Optional() private readonly accessControl: OrganizationAccessControlPort,
   ) {}
 
   async execute(

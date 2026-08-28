@@ -1,8 +1,4 @@
 import { Global, Module } from "@nestjs/common";
-import {
-  ORGANIZATION_MEMBERSHIP,
-  PERSONAL_ORGANIZATION_PROVIDER,
-} from "@repo/feature-users/contracts";
 
 import { OrganizationsService } from "./application/organizations.service";
 import { ORGANIZATIONS_REPOSITORY } from "./application/ports/organizations.repository.port";
@@ -23,6 +19,8 @@ import { OrganizationMembersRepository } from "./infrastructure/organization-mem
 import { OrganizationsRepository } from "./infrastructure/organizations.repository";
 import { OrganizationsController } from "./presentation/organizations.controller";
 import { ORGANIZATION_LOOKUP } from "./public/organization-lookup.port";
+import { ORGANIZATION_MEMBERSHIP } from "./public/organization-membership.token";
+import { PERSONAL_ORGANIZATION_PROVIDER } from "./public/personal-organization-provider.token";
 
 @Global()
 @Module({

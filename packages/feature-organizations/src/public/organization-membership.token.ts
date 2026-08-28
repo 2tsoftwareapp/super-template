@@ -1,1 +1,1 @@
-export { ORGANIZATION_MEMBERSHIP } from "@repo/feature-users/contracts";
+export const ORGANIZATION_MEMBERSHIP = Symbol("ORGANIZATION_MEMBERSHIP");

@@ -2,10 +2,11 @@ import type { DatabaseClient, DatabaseExecutor } from "@repo/database-runtime";
 
 import { Inject, Injectable } from "@nestjs/common";
 import { DATABASE } from "@repo/database-runtime";
-import { and, asc, count, desc, eq, inArray, isNull, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, isNull, sql } from "drizzle-orm";
 
 import type { UsersRepositoryPort } from "../application/ports/users.repository.port";
 import type { UserSortCriterion } from "../application/user-sort";
+
 import { users } from "./persistence";
 
 interface ListUsersParams {
@@ -128,7 +129,7 @@ export class UsersRepository implements UsersRepositoryPort {
     };
   }
 
-  async isUserInOrganization(
+  isUserInOrganization(
     userId: string,
     organizationId: string,
     executor: DatabaseExecutor = this.database,
@@ -136,7 +137,7 @@ export class UsersRepository implements UsersRepositoryPort {
     void userId;
     void organizationId;
     void executor;
-    return false;
+    return Promise.resolve(false);
   }
 
 }

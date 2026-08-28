@@ -2,7 +2,7 @@ import type { AuthenticatedRequestUser } from "@repo/api-runtime";
 
 import { describe, expect, it, vi } from "vitest";
 
-import type { OrganizationMembership } from "@repo/feature-users/contracts";
+import type { OrganizationMembership } from "@repo/feature-organizations/contracts";
 import { UsersMapper } from "@repo/feature-users/module";
 import { GetUserUseCase } from "../get-user.use-case";
 

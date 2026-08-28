@@ -1,14 +1,11 @@
 import type { TransactionExecutor } from "@repo/api-runtime";
+import type { OrganizationMembership } from "@repo/feature-organizations/contracts";
 
 import { Inject, Injectable } from "@nestjs/common";
 import {
-  ACCESS_CONTROL_REPOSITORY,
-  type AccessControlRepositoryPort,
-} from "@repo/feature-access-control/contracts";
+  ACCESS_CONTROL_REPOSITORY, type AccessControlRepositoryPort, } from "@repo/feature-access-control/contracts";
 import {
-  ORGANIZATION_MEMBERSHIP,
-  type OrganizationMembership,
-} from "@repo/feature-organizations/contracts";
+  ORGANIZATION_MEMBERSHIP, } from "@repo/feature-organizations/contracts";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "@repo/feature-users/contracts";
 import { hash } from "argon2";
 import { randomBytes } from "node:crypto";

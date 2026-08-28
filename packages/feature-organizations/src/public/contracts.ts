@@ -10,6 +10,10 @@ export { ORGANIZATION_ERROR_CODES } from "./error-codes";
 export { ORGANIZATION_ACCESS_CONTROL } from "./organization-access-control.token";
 export { ORGANIZATION_CUSTOM_ROLES_PURGE } from "./organization-custom-roles-purge.token";
 export * from "./organization-lookup.port";
+export type * from "./organization-membership.port";
+export { ORGANIZATION_MEMBERSHIP } from "./organization-membership.token";
+export { ORGANIZATION_USER_ROLES_PURGE } from "./organization-purge.token";
+export type * from "./personal-organization-provider.port";
 
 /**
  * Narrow consumer-owned ports used when an organization is deleted: each
@@ -46,18 +50,4 @@ export interface OrganizationAccessControlPort {
   invalidateAccessProfile(userId: string): Promise<void>;
 }
 
-export { ORGANIZATION_USER_ROLES_PURGE } from "./organization-purge.token";
-/**
- * Organization-membership port is owned by @repo/feature-users (the
- * implementer). Re-exported here so existing organizations and consumer
- * code that imports it from feature-organizations/contracts keeps
- * working.
- */
-export type {
-  OrganizationMemberRecord,
-  OrganizationMembership,
-  OrganizationMemberWithUserRecord,
-  UserOrganizationRecord,
-} from "@repo/feature-users/contracts";
-
-export { ORGANIZATION_MEMBERSHIP } from "@repo/feature-users/contracts";
+export { PERSONAL_ORGANIZATION_PROVIDER } from "./personal-organization-provider.token";

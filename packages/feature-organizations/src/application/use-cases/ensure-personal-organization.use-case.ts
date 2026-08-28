@@ -1,6 +1,6 @@
 import type { TransactionExecutor } from "@repo/api-runtime";
 
-import { HttpStatus, Inject, Injectable } from "@nestjs/common";
+import { HttpStatus, Inject, Injectable, Optional } from "@nestjs/common";
 import { AppError, ERROR_CODES } from "@repo/api-runtime";
 
 import type { OrganizationMembership } from "../../public/contracts";
@@ -31,7 +31,7 @@ export class EnsurePersonalOrganizationUseCase {
     @Inject(ORGANIZATION_MEMBERSHIP)
     private readonly membership: OrganizationMembership,
     @Inject(ORGANIZATION_ACCESS_CONTROL)
-    private readonly accessControl: OrganizationAccessControlPort,
+    @Optional() private readonly accessControl: OrganizationAccessControlPort,
   ) {}
 
   async execute(userId: string, displayName: string, executor?: TransactionExecutor) {

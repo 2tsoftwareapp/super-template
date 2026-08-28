@@ -1,14 +1,13 @@
 import type { RequestContext } from "@repo/api-runtime";
+import type { UpdateProfileCommand, UserView } from "@repo/feature-users/contracts";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { AppError, SYSTEM_SCOPE } from "@repo/api-runtime";
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
+import { FILE_LOOKUP, type FileLookup } from "@repo/feature-upload/contracts";
 import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
-
-import type { UpdateProfileCommand, UserView } from "@repo/feature-users/contracts";
-
-import { FILE_LOOKUP, type FileLookup } from "@repo/feature-users/contracts";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "@repo/feature-users/contracts";
+
 import { GetUserUseCase } from "./get-user.use-case";
 
 @Injectable()
