@@ -48,7 +48,14 @@ export default defineConfig({
       packageAlias("api-runtime"),
       packageSubpathAlias("api-runtime"),
       packageAlias("database-runtime"),
-      packageSubpathAlias("database-runtime"),
+      {
+        find: /^@repo\/database-runtime\/schema\/timestamps$/,
+        replacement: path.join(packagesDir, "database-runtime/src/persistence/timestamps.ts"),
+      },
+      {
+        find: /^@repo\/database-runtime\/schema$/,
+        replacement: path.join(packagesDir, "database-runtime/src/schema.ts"),
+      },
       packageAlias("config"),
       packageSubpathAlias("config"),
       packageAlias("observability"),
