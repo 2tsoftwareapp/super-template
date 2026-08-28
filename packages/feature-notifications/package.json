@@ -44,6 +44,7 @@
     "typescript": "5.9.3",
     "vitest": "4.1.9",
     "@types/express": "5.0.4",
-    "@nestjs/testing": "11.1.27"
+    "@nestjs/testing": "11.1.27",
+    "@repo/test-config": "workspace:*"
   }
 }

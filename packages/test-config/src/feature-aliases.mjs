@@ -1,8 +1,10 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-// This file lives in packages/<feature>/ so packages root is one level up.
-const packagesDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+// Single source of truth for vitest aliases across the monorepo. The shared
+// implementation is imported by every package's vitest.config.ts. Anchored
+// regex `find` values are required: vite treats string finds as prefix matches
+// and would mangle subpath imports like @repo/database-runtime/schema/timestamps.
 
 // Per-package subpath mappings, mirroring each package's `exports` map.
 // Keep this list narrow: only subpaths that are actually consumed by
@@ -44,6 +46,7 @@ const subpathExports = {
     contracts: "public/contracts.ts",
     testing: "testing/index.ts",
     schema: "infrastructure/persistence/index.ts",
+    module: "import-export-feature.module.ts",
   },
   "feature-jobs": {
     contracts: "public/contracts.ts",
@@ -96,6 +99,7 @@ const subpathExports = {
     contracts: "public/contracts.ts",
     testing: "testing/index.ts",
     schema: "infrastructure/persistence/index.ts",
+    module: "preferences.module.ts",
   },
   "feature-users": {
     contracts: "public/contracts.ts",
@@ -116,20 +120,18 @@ function featureEntry(pkg) {
   const id = pkg.replace(/^feature-/, "");
   if (pkg === "feature-audit-export") return "index.ts";
   if (pkg === "feature-outbox") return "index.ts";
+  if (pkg === "feature-user-preferences") return "user-preferences.feature.ts";
+  if (pkg === "feature-import-export") return "import-export.feature.ts";
+  if (pkg === "feature-upload") return "upload.feature.ts";
   return `${id}.feature.ts`;
 }
 
-export function featureAliases() {
-  const features = Object.keys(subpathExports);
+export function buildFeatureAliases(packagesDir) {
   const aliases = [];
 
-  for (const pkg of features) {
+  for (const pkg of Object.keys(subpathExports)) {
     const src = path.join(packagesDir, pkg, "src");
     const entry = featureEntry(pkg);
-    // Subpath aliases (regex-anchored) must come BEFORE the bare-specifier
-    // alias so the more specific regex wins. Vite resolves aliases by first
-    // match; an unanchored string find would treat "@repo/<pkg>/foo" as a
-    // prefix and append "/foo" to the bare replacement.
     for (const [sub, rel] of Object.entries(subpathExports[pkg])) {
       aliases.push({
         find: new RegExp(`^@repo/${pkg}/${sub}$`),
@@ -158,3 +160,8 @@ export function featureAliases() {
 
   return aliases;
 }
+
+const here = path.dirname(fileURLToPath(import.meta.url));
+const defaultPackagesDir = path.resolve(here, "..", "..");
+
+export const featureAliases = () => buildFeatureAliases(defaultPackagesDir);

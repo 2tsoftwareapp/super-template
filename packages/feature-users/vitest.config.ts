@@ -1,5 +1,5 @@
+import { featureAliases } from "@repo/test-config/feature-aliases";
 import { defineConfig } from "vitest/config";
-import { featureAliases } from "./vitest-feature-aliases.mjs";
 
 export default defineConfig({
   test: {

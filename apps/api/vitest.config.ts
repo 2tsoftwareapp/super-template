@@ -1,3 +1,4 @@
+import { buildFeatureAliases } from "@repo/test-config/feature-aliases";
 import path from "node:path";
 import { defineConfig } from "vitest/config";
 
@@ -12,25 +13,6 @@ const packageSubpathAlias = (name: string) => ({
   find: new RegExp(`^@repo/${name}/(.+)$`),
   replacement: path.join(packagesDir, name, "src/$1"),
 });
-
-const featureNames = [
-  "feature-access-control",
-  "feature-activities",
-  "feature-audit",
-  "feature-auth",
-  "feature-health",
-  "feature-import-export",
-  "feature-jobs",
-  "feature-mail",
-  "feature-mfa",
-  "feature-notifications",
-  "feature-organizations",
-  "feature-settings",
-  "feature-sso",
-  "feature-upload",
-  "feature-user-preferences",
-  "feature-users",
-];
 
 export default defineConfig({
   test: {
@@ -57,6 +39,10 @@ export default defineConfig({
         replacement: path.join(packagesDir, "database-runtime/src/schema.ts"),
       },
       packageAlias("config"),
+      {
+        find: /^@repo\/config\/environment$/,
+        replacement: path.join(packagesDir, "config/src/environment/index.ts"),
+      },
       packageSubpathAlias("config"),
       packageAlias("observability"),
       packageSubpathAlias("observability"),
@@ -64,44 +50,7 @@ export default defineConfig({
       packageSubpathAlias("api-sort"),
       packageAlias("env-loader"),
       packageSubpathAlias("env-loader"),
-      ...featureNames.flatMap((name) => {
-        const id = name.replace(/^feature-/, "");
-        return [
-          {
-            find: new RegExp(`^@repo/${name}$`),
-            replacement: path.join(packagesDir, name, `src/${id}.feature.ts`),
-          },
-          {
-            find: new RegExp(`^@repo/${name}/contracts$`),
-            replacement: path.join(packagesDir, name, "src/public/contracts.ts"),
-          },
-          {
-            find: new RegExp(`^@repo/${name}/schema$`),
-            replacement: path.join(packagesDir, name, "src/infrastructure/persistence/index.ts"),
-          },
-          {
-            find: new RegExp(`^@repo/${name}/module$`),
-            replacement: path.join(packagesDir, name, `src/${id}.module.ts`),
-          },
-          packageSubpathAlias(name),
-        ];
-      }),
-      // Preferences module file keeps legacy name
-      {
-        find: /^@repo\/feature-user-preferences\/module$/,
-        replacement: path.join(packagesDir, "feature-user-preferences/src/preferences.module.ts"),
-      },
-      {
-        find: /^@repo\/feature-import-export\/module$/,
-        replacement: path.join(
-          packagesDir,
-          "feature-import-export/src/import-export-feature.module.ts",
-        ),
-      },
-      {
-        find: /^@repo\/config\/environment$/,
-        replacement: path.join(packagesDir, "config/src/environment/index.ts"),
-      },
+      ...buildFeatureAliases(packagesDir),
     ],
   },
 });

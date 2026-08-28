@@ -52,6 +52,7 @@ export class AuditExportController {
         ...(input.resourceId !== undefined ? { resourceId: input.resourceId } : {}),
         ...(input.from !== undefined ? { from: input.from } : {}),
         ...(input.to !== undefined ? { to: input.to } : {}),
+        ...(input.q !== undefined ? { q: input.q } : {}),
       },
       request.requestContext,
     );

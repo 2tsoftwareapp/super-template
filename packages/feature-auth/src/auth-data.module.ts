@@ -5,7 +5,13 @@ import { AUTH_SESSION_REPOSITORY } from "./application/ports/auth-session.reposi
 import { AuthEmailVerificationService } from "./application/services/auth-email-verification.service";
 import { AuthMailService } from "./application/services/auth-mail.service";
 import { AuthTokenCleanupJobHandler } from "./application/services/auth-token-cleanup-job.handler";
-import { AuthUserLifecycleHandlers } from "./application/services/auth-user-lifecycle.handlers";
+import {
+  AuthSendVerificationEmailHandler,
+  UserLifecycleCreatedHandler,
+  UserLifecycleDeletedHandler,
+  UserLifecyclePasswordChangedHandler,
+  UserLifecycleStatusBlockedHandler,
+} from "./application/services/auth-user-lifecycle.handlers";
 import { AuthUserStoreAdapter } from "./infrastructure/auth-user-store.adapter";
 import { AuthRepository } from "./infrastructure/auth.repository";
 import { AUTH_TOKEN_MAINTENANCE } from "./public/auth-token-maintenance.port";
@@ -27,12 +33,25 @@ import { AUTH_USER_STORE } from "./public/auth-user-store.port";
       useExisting: AuthRepository,
     },
     AuthTokenCleanupJobHandler,
-    AuthUserLifecycleHandlers,
+    AuthSendVerificationEmailHandler,
+    UserLifecycleCreatedHandler,
+    UserLifecycleDeletedHandler,
+    UserLifecyclePasswordChangedHandler,
+    UserLifecycleStatusBlockedHandler,
     {
       provide: AUTH_SESSION_REPOSITORY,
       useExisting: AuthRepository,
     },
   ],
-  exports: [AuthMailService, AUTH_SESSION_REPOSITORY, AUTH_USER_STORE],
+  exports: [
+    AuthMailService,
+    AUTH_SESSION_REPOSITORY,
+    AUTH_USER_STORE,
+    AuthSendVerificationEmailHandler,
+    UserLifecycleCreatedHandler,
+    UserLifecycleDeletedHandler,
+    UserLifecyclePasswordChangedHandler,
+    UserLifecycleStatusBlockedHandler,
+  ],
 })
 export class AuthDataModule {}

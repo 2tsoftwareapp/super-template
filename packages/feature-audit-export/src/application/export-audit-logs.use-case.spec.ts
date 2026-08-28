@@ -163,6 +163,43 @@ describe("ExportAuditLogsUseCase", () => {
     );
   });
 
+  it("propagates the q filter to listForExport and count", async () => {
+    const auditRepository = {
+      listForExport: vi.fn(async () => [auditRow]),
+      count: vi.fn(async () => 1),
+    };
+    const filesRepository = {
+      create: vi.fn(async () => ({ id: "file-1" })),
+    };
+    const objectStorage = {
+      upload: vi.fn(async () => ({ key: "exports/audit/q.csv" })),
+      delete: vi.fn(async () => undefined),
+    };
+    const transactionPort = { withTenant: vi.fn(async (_, cb) => cb({} as any)) };
+    const platformTransactionPort = { run: vi.fn(async (cb) => cb({} as any)) };
+    const auditWriter = { log: vi.fn() };
+
+    const useCase = new ExportAuditLogsUseCase(
+      auditRepository as never,
+      filesRepository as never,
+      objectStorage as never,
+      transactionPort as never,
+      platformTransactionPort as never,
+      auditWriter as never,
+    );
+
+    await useCase.execute(actor, { q: "project" });
+
+    expect(auditRepository.listForExport).toHaveBeenCalledWith(
+      { q: "project", limit: 5000, organizationId: "org-1" },
+      expect.anything(),
+    );
+    expect(auditRepository.count).toHaveBeenCalledWith(
+      { q: "project", organizationId: "org-1" },
+      expect.anything(),
+    );
+  });
+
   it("deletes the uploaded object and rethrows if the file record fails to persist", async () => {
     const auditRepository = {
       listForExport: vi.fn(async () => [auditRow]),

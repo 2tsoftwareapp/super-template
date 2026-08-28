@@ -8,7 +8,10 @@
     "./contracts": "./src/public/contracts.ts",
     "./module": "./src/outbox.module.ts",
     "./schema": "./src/infrastructure/persistence/outbox-messages.ts",
-    "./testing": "./src/testing/index.ts"
+    "./testing": "./src/testing/index.ts",
+    "./dispatcher": "./src/application/outbox-dispatcher.service.ts",
+    "./registry": "./src/application/outbox-handler.registry.ts",
+    "./repository": "./src/infrastructure/outbox.repository.ts"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json --noEmit",
@@ -30,6 +33,8 @@
     "@repo/tsconfig": "workspace:*",
     "@types/node": "24.10.1",
     "typescript": "5.9.3",
-    "vitest": "4.1.9"
+    "vitest": "4.1.9",
+    "@repo/test-config": "workspace:*",
+    "@nestjs/testing": "11.1.27"
   }
 }

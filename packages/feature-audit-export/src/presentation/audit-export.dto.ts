@@ -38,6 +38,15 @@ export class ExportAuditLogsQueryDto {
   @IsOptional()
   @IsDateString()
   to?: string;
+
+  @ApiProperty({
+    required: false,
+    description: "Free-text match against action, entity type, and request ID.",
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  q?: string;
 }
 
 export class AuditExportResultDto {

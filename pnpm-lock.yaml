@@ -347,6 +347,9 @@ importers:
       '@nestjs/testing':
         specifier: 11.1.27
         version: 11.1.27(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@10.2.2))(@nestjs/core@11.1.27)(@nestjs/platform-express@11.1.27)
+      '@repo/test-config':
+        specifier: workspace:*
+        version: link:../../packages/test-config
       '@repo/tsconfig':
         specifier: workspace:*
         version: link:../../packages/tsconfig
@@ -877,6 +880,9 @@ importers:
         specifier: 4.4.3
         version: 4.4.3
     devDependencies:
+      '@repo/test-config':
+        specifier: workspace:*
+        version: link:../test-config
       '@repo/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
@@ -929,6 +935,9 @@ importers:
         specifier: 4.4.3
         version: 4.4.3
     devDependencies:
+      '@repo/test-config':
+        specifier: workspace:*
+        version: link:../test-config
       '@repo/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
@@ -987,6 +996,9 @@ importers:
         specifier: 4.4.3
         version: 4.4.3
     devDependencies:
+      '@repo/test-config':
+        specifier: workspace:*
+        version: link:../test-config
       '@repo/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
@@ -1051,6 +1063,9 @@ importers:
         specifier: 4.4.3
         version: 4.4.3
     devDependencies:
+      '@repo/test-config':
+        specifier: workspace:*
+        version: link:../test-config
       '@repo/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
@@ -1148,6 +1163,9 @@ importers:
         specifier: 4.4.3
         version: 4.4.3
     devDependencies:
+      '@repo/test-config':
+        specifier: workspace:*
+        version: link:../test-config
       '@repo/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
@@ -1203,6 +1221,9 @@ importers:
         specifier: 4.4.3
         version: 4.4.3
     devDependencies:
+      '@repo/test-config':
+        specifier: workspace:*
+        version: link:../test-config
       '@repo/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
@@ -1282,6 +1303,9 @@ importers:
         specifier: 4.4.3
         version: 4.4.3
     devDependencies:
+      '@repo/test-config':
+        specifier: workspace:*
+        version: link:../test-config
       '@repo/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
@@ -1343,6 +1367,9 @@ importers:
         specifier: 4.4.3
         version: 4.4.3
     devDependencies:
+      '@repo/test-config':
+        specifier: workspace:*
+        version: link:../test-config
       '@repo/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
@@ -1410,6 +1437,9 @@ importers:
         specifier: 4.4.3
         version: 4.4.3
     devDependencies:
+      '@repo/test-config':
+        specifier: workspace:*
+        version: link:../test-config
       '@repo/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
@@ -1477,6 +1507,9 @@ importers:
         specifier: 4.4.3
         version: 4.4.3
     devDependencies:
+      '@repo/test-config':
+        specifier: workspace:*
+        version: link:../test-config
       '@repo/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
@@ -1559,6 +1592,9 @@ importers:
       '@nestjs/testing':
         specifier: 11.1.27
         version: 11.1.27(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)(@nestjs/platform-express@11.1.27)
+      '@repo/test-config':
+        specifier: workspace:*
+        version: link:../test-config
       '@repo/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
@@ -1626,6 +1662,9 @@ importers:
         specifier: 4.4.3
         version: 4.4.3
     devDependencies:
+      '@repo/test-config':
+        specifier: workspace:*
+        version: link:../test-config
       '@repo/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
@@ -1666,6 +1705,12 @@ importers:
         specifier: 0.45.2
         version: 0.45.2(@opentelemetry/api@1.9.1)(@types/pg@8.15.6)(pg@8.21.0)
     devDependencies:
+      '@nestjs/testing':
+        specifier: 11.1.27
+        version: 11.1.27(@nestjs/common@11.1.27(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.27)(@nestjs/platform-express@11.1.27)
+      '@repo/test-config':
+        specifier: workspace:*
+        version: link:../test-config
       '@repo/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
@@ -1724,6 +1769,9 @@ importers:
         specifier: 4.4.3
         version: 4.4.3
     devDependencies:
+      '@repo/test-config':
+        specifier: workspace:*
+        version: link:../test-config
       '@repo/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
@@ -1806,6 +1854,9 @@ importers:
         specifier: 4.4.3
         version: 4.4.3
     devDependencies:
+      '@repo/test-config':
+        specifier: workspace:*
+        version: link:../test-config
       '@repo/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
@@ -1888,6 +1939,9 @@ importers:
         specifier: 4.4.3
         version: 4.4.3
     devDependencies:
+      '@repo/test-config':
+        specifier: workspace:*
+        version: link:../test-config
       '@repo/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
@@ -1949,6 +2003,9 @@ importers:
         specifier: 4.4.3
         version: 4.4.3
     devDependencies:
+      '@repo/test-config':
+        specifier: workspace:*
+        version: link:../test-config
       '@repo/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
@@ -2016,6 +2073,9 @@ importers:
         specifier: 4.4.3
         version: 4.4.3
     devDependencies:
+      '@repo/test-config':
+        specifier: workspace:*
+        version: link:../test-config
       '@repo/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
@@ -2059,6 +2119,8 @@ importers:
       vitest:
         specifier: 4.1.9
         version: 4.1.9(@opentelemetry/api@1.9.1)(@types/node@24.10.1)(@vitest/coverage-v8@4.1.9)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@8.1.4(@types/node@24.10.1)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.22.4))
+
+  packages/test-config: {}
 
   packages/tsconfig: {}
 

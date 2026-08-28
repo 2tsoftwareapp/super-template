@@ -1,5 +1,12 @@
 import { defineFeature, type FeatureManifest } from "@repo/api-plugin-kit";
 
+import {
+  AuthSendVerificationEmailHandler,
+  UserLifecycleCreatedHandler,
+  UserLifecycleDeletedHandler,
+  UserLifecyclePasswordChangedHandler,
+  UserLifecycleStatusBlockedHandler,
+} from "./application/services/auth-user-lifecycle.handlers";
 import { AuthModule } from "./auth.module";
 import {
   authSessions,
@@ -28,4 +35,11 @@ export const authFeature: FeatureManifest = defineFeature({
     passwordResetTokens,
   },
   seeders: authSeeders,
+  outboxHandlers: [
+    AuthSendVerificationEmailHandler,
+    UserLifecycleCreatedHandler,
+    UserLifecycleDeletedHandler,
+    UserLifecyclePasswordChangedHandler,
+    UserLifecycleStatusBlockedHandler,
+  ],
 });

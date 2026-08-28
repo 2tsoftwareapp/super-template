@@ -624,6 +624,10 @@
             "format": "date-time",
             "type": "string"
           },
+          "q": {
+            "description": "Free-text match against action, entity type, and request ID.",
+            "type": "string"
+          },
           "resourceId": {
             "format": "uuid",
             "type": "string"

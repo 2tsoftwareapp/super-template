@@ -1478,6 +1478,8 @@ export interface components {
             actorId?: string;
             /** Format: date-time */
             from?: string;
+            /** @description Free-text match against action, entity type, and request ID. */
+            q?: string;
             /** Format: uuid */
             resourceId?: string;
             resourceType?: string;
