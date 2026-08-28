@@ -1,0 +1,11 @@
+{
+  "$schema": "https://v2-9-18.turborepo.dev/schema.json",
+  "extends": ["//"],
+  "tags": ["layer:feature"],
+  "tasks": {
+    "build": {
+      "dependsOn": [],
+      "outputs": []
+    }
+  }
+}

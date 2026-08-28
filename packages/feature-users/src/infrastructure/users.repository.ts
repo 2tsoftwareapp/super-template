@@ -6,11 +6,6 @@ import { and, asc, count, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 
 import type { UsersRepositoryPort } from "../application/ports/users.repository.port";
 import type { UserSortCriterion } from "../application/user-sort";
-import type { OrganizationMembership } from "../public/organization-membership.port";
-import type { UserRoleAssignments } from "../public/user-role-assignments.port";
-
-import { ORGANIZATION_MEMBERSHIP } from "../public/organization-membership.token";
-import { USER_ROLE_ASSIGNMENTS } from "../public/user-role-assignments.token";
 import { users } from "./persistence";
 
 interface ListUsersParams {
@@ -32,13 +27,7 @@ const USER_SORT_FIELDS = {
 
 @Injectable()
 export class UsersRepository implements UsersRepositoryPort {
-  constructor(
-    @Inject(DATABASE) private readonly database: DatabaseClient,
-    @Inject(USER_ROLE_ASSIGNMENTS)
-    private readonly userRoleAssignments: UserRoleAssignments,
-    @Inject(ORGANIZATION_MEMBERSHIP)
-    private readonly organizationMembership: OrganizationMembership,
-  ) {}
+  constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
 
   async create(values: typeof users.$inferInsert, executor: DatabaseExecutor = this.database) {
     const [user] = await executor.insert(users).values(values).returning();
@@ -111,27 +100,8 @@ export class UsersRepository implements UsersRepositoryPort {
       filters.push(eq(users.status, params.status));
     }
 
-    if (params.role) {
-      const roleUserIds = await this.userRoleAssignments.findUserIdsForRoleName(
-        params.role,
-        params.organizationId,
-        executor,
-      );
-      if (roleUserIds.length === 0) {
-        return { rows: [], total: 0 };
-      }
-      filters.push(inArray(users.id, roleUserIds));
-    }
-
-    if (params.organizationId) {
-      const organizationUserIds = await this.organizationMembership.findUserIdsForOrganization(
-        params.organizationId,
-        executor,
-      );
-      if (organizationUserIds.length === 0) {
-        return { rows: [], total: 0 };
-      }
-      filters.push(inArray(users.id, organizationUserIds));
+    if (params.role || params.organizationId) {
+      throw new Error("Role and organization filtering requires the user-management feature.");
     }
 
     const sortClauses = params.sort.map((criterion) => {
@@ -163,108 +133,10 @@ export class UsersRepository implements UsersRepositoryPort {
     organizationId: string,
     executor: DatabaseExecutor = this.database,
   ) {
-    const memberIds = await this.organizationMembership.findUserIdsForOrganization(
-      organizationId,
-      executor,
-    );
-    return memberIds.includes(userId);
+    void userId;
+    void organizationId;
+    void executor;
+    return false;
   }
 
-  async listDeliverableUserIds(executor: DatabaseExecutor = this.database) {
-    const rows = await executor
-      .select({ id: users.id })
-      .from(users)
-      .where(and(isNull(users.deletedAt), eq(users.status, "ACTIVE")));
-
-    return rows.map((row) => row.id);
-  }
-
-  async filterExistingUserIds(userIds: string[], executor: DatabaseExecutor = this.database) {
-    if (userIds.length === 0) {
-      return [];
-    }
-
-    const rows = await executor
-      .select({ id: users.id })
-      .from(users)
-      .where(and(inArray(users.id, userIds), isNull(users.deletedAt), eq(users.status, "ACTIVE")));
-
-    return rows.map((row) => row.id);
-  }
-
-  async findActiveUserInOrganization(
-    userId: string,
-    organizationId: string,
-    executor: DatabaseExecutor = this.database,
-  ) {
-    const memberIds = await this.organizationMembership.findUserIdsForOrganization(
-      organizationId,
-      executor,
-    );
-    if (!memberIds.includes(userId)) {
-      return null;
-    }
-    const [row] = await executor
-      .select({
-        id: users.id,
-        email: users.email,
-        displayName: users.displayName,
-        status: users.status,
-      })
-      .from(users)
-      .where(and(eq(users.id, userId), isNull(users.deletedAt), eq(users.status, "ACTIVE")))
-      .limit(1);
-
-    return row ?? null;
-  }
-
-  async filterActiveUserIdsInOrganization(
-    userIds: string[],
-    organizationId: string,
-    executor: DatabaseExecutor = this.database,
-  ) {
-    if (userIds.length === 0) {
-      return [];
-    }
-
-    const memberIds = await this.organizationMembership.findUserIdsForOrganization(
-      organizationId,
-      executor,
-    );
-    if (memberIds.length === 0) {
-      return [];
-    }
-    const memberSet = new Set(memberIds);
-    const candidates = userIds.filter((id) => memberSet.has(id));
-    if (candidates.length === 0) {
-      return [];
-    }
-    const rows = await executor
-      .select({ id: users.id })
-      .from(users)
-      .where(
-        and(inArray(users.id, candidates), isNull(users.deletedAt), eq(users.status, "ACTIVE")),
-      );
-    return rows.map((row) => row.id);
-  }
-
-  async listDeliverableUserIdsInOrganization(
-    organizationId: string,
-    executor: DatabaseExecutor = this.database,
-  ) {
-    const memberIds = await this.organizationMembership.findUserIdsForOrganization(
-      organizationId,
-      executor,
-    );
-    if (memberIds.length === 0) {
-      return [];
-    }
-    const rows = await executor
-      .select({ id: users.id })
-      .from(users)
-      .where(
-        and(inArray(users.id, memberIds), isNull(users.deletedAt), eq(users.status, "ACTIVE")),
-      );
-    return rows.map((row) => row.id);
-  }
 }

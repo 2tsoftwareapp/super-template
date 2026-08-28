@@ -32,7 +32,7 @@ import { ListUsersUseCase } from "../application/use-cases/list-users.use-case";
 import { ReplaceUserRolesUseCase } from "../application/use-cases/replace-user-roles.use-case";
 import { UpdateAdminUserUseCase } from "../application/use-cases/update-admin-user.use-case";
 import { UpdateUserStatusUseCase } from "../application/use-cases/update-user-status.use-case";
-import { userSortsFromQuery } from "../application/user-sort";
+import { userSortsFromQuery } from "@repo/feature-users/contracts";
 import {
   AdminUsersQueryDto,
   CreateAdminUserDto,

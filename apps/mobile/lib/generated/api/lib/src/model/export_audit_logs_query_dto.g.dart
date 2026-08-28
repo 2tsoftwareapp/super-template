@@ -16,6 +16,8 @@ class _$ExportAuditLogsQueryDto extends ExportAuditLogsQueryDto {
   @override
   final DateTime? from;
   @override
+  final String? q;
+  @override
   final String? resourceId;
   @override
   final String? resourceType;
@@ -31,6 +33,7 @@ class _$ExportAuditLogsQueryDto extends ExportAuditLogsQueryDto {
     this.action,
     this.actorId,
     this.from,
+    this.q,
     this.resourceId,
     this.resourceType,
     this.to,
@@ -52,6 +55,7 @@ class _$ExportAuditLogsQueryDto extends ExportAuditLogsQueryDto {
         action == other.action &&
         actorId == other.actorId &&
         from == other.from &&
+        q == other.q &&
         resourceId == other.resourceId &&
         resourceType == other.resourceType &&
         to == other.to;
@@ -63,6 +67,7 @@ class _$ExportAuditLogsQueryDto extends ExportAuditLogsQueryDto {
     _$hash = $jc(_$hash, action.hashCode);
     _$hash = $jc(_$hash, actorId.hashCode);
     _$hash = $jc(_$hash, from.hashCode);
+    _$hash = $jc(_$hash, q.hashCode);
     _$hash = $jc(_$hash, resourceId.hashCode);
     _$hash = $jc(_$hash, resourceType.hashCode);
     _$hash = $jc(_$hash, to.hashCode);
@@ -76,6 +81,7 @@ class _$ExportAuditLogsQueryDto extends ExportAuditLogsQueryDto {
           ..add('action', action)
           ..add('actorId', actorId)
           ..add('from', from)
+          ..add('q', q)
           ..add('resourceId', resourceId)
           ..add('resourceType', resourceType)
           ..add('to', to))
@@ -100,6 +106,10 @@ class ExportAuditLogsQueryDtoBuilder
   DateTime? get from => _$this._from;
   set from(DateTime? from) => _$this._from = from;
 
+  String? _q;
+  String? get q => _$this._q;
+  set q(String? q) => _$this._q = q;
+
   String? _resourceId;
   String? get resourceId => _$this._resourceId;
   set resourceId(String? resourceId) => _$this._resourceId = resourceId;
@@ -122,6 +132,7 @@ class ExportAuditLogsQueryDtoBuilder
       _action = $v.action;
       _actorId = $v.actorId;
       _from = $v.from;
+      _q = $v.q;
       _resourceId = $v.resourceId;
       _resourceType = $v.resourceType;
       _to = $v.to;
@@ -149,6 +160,7 @@ class ExportAuditLogsQueryDtoBuilder
           action: action,
           actorId: actorId,
           from: from,
+          q: q,
           resourceId: resourceId,
           resourceType: resourceType,
           to: to,

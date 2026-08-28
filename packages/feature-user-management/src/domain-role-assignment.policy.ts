@@ -2,7 +2,7 @@ import type { AuthenticatedRequestUser } from "@repo/api-runtime";
 
 import { AppError, ERROR_CODES } from "@repo/api-runtime";
 
-import { isPrivilegedRoleName, ROLE_NAMES } from "../public/role.constants";
+import { isPrivilegedRoleName, ROLE_NAMES } from "@repo/feature-users/contracts";
 
 /**
  * Role-assignment policy. Duplicated from

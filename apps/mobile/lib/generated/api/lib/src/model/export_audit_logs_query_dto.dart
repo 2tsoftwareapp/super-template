@@ -16,6 +16,7 @@ part 'export_audit_logs_query_dto.g.dart';
 /// * [action]
 /// * [actorId]
 /// * [from]
+/// * [q] - Free-text match against action, entity type, and request ID.
 /// * [resourceId]
 /// * [resourceType]
 /// * [to]
@@ -30,6 +31,10 @@ abstract class ExportAuditLogsQueryDto
 
   @BuiltValueField(wireName: r'from')
   DateTime? get from;
+
+  /// Free-text match against action, entity type, and request ID.
+  @BuiltValueField(wireName: r'q')
+  String? get q;
 
   @BuiltValueField(wireName: r'resourceId')
   String? get resourceId;
@@ -89,6 +94,13 @@ class _$ExportAuditLogsQueryDtoSerializer
       yield serializers.serialize(
         object.from,
         specifiedType: const FullType(DateTime),
+      );
+    }
+    if (object.q != null) {
+      yield r'q';
+      yield serializers.serialize(
+        object.q,
+        specifiedType: const FullType(String),
       );
     }
     if (object.resourceId != null) {
@@ -159,6 +171,13 @@ class _$ExportAuditLogsQueryDtoSerializer
             specifiedType: const FullType(DateTime),
           ) as DateTime;
           result.from = valueDes;
+          break;
+        case r'q':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.q = valueDes;
           break;
         case r'resourceId':
           final valueDes = serializers.deserialize(

@@ -9,11 +9,13 @@ set -eu
 ROOT_DIR=$(pwd)
 cd "$ROOT_DIR"
 
-# Paths owned by the generation pipeline. Dart/Flutter client output is only
-# regenerated when Docker + Dart are available, so it is checked too: when the
-# toolchain is missing the generator keeps the committed client intact, which
-# means no drift is reported.
-GENERATED_PATHS="apps/api/openapi.json packages/api-contract/src/generated apps/mobile/lib/generated/api"
+# Paths owned by the generation pipeline. Dart/Flutter output is checked only
+# when its Docker and Dart toolchain is available; otherwise generation keeps
+# the committed client intact and the check intentionally excludes that path.
+GENERATED_PATHS="apps/api/openapi.json packages/api-contract/src/generated"
+if [ "${CI:-}" != "true" ] && command -v docker >/dev/null 2>&1 && docker info >/dev/null 2>&1 && command -v dart >/dev/null 2>&1; then
+  GENERATED_PATHS="$GENERATED_PATHS apps/mobile/lib/generated/api"
+fi
 
 cleanup() {
   # Always restore the working tree for the generated paths so the check never

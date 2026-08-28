@@ -4,12 +4,13 @@
  */
 export { USERS_REPOSITORY } from "../application/ports/users.repository.port";
 export type * from "../application/ports/users.repository.port";
-export {
-  assertCanAssignRoleTargets,
-  assertRoleScopeCanBeAssigned,
-  type RolePolicyTarget,
-} from "../domain/role-assignment.policy";
 export { USER_ERROR_CODES } from "./error-codes";
+export type * from "../application/users.types";
+export { userSortsFromQuery } from "../application/user-sort";
+export {
+  assertUserBelongsToOrganization,
+  resolveUsersListOrganizationId,
+} from "../domain/user-org-scope.policy";
 export * from "./file-lookup.port";
 
 export type {

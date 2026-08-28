@@ -1,103 +1,103 @@
 #!/usr/bin/env node
-/**
- * Keeps feature manifests honest:
- *   1. Every @repo/feature-* workspace dependency of a feature package must be
- *      declared in that feature's manifest `dependsOn`.
- *   2. Every `dependsOn` id must exist.
- *   3. The dependsOn graph must stay acyclic.
- *
- * Runtime port bindings (consumer-owned tokens bound through @Global modules)
- * intentionally do NOT require a static dependency — Nest fails fast at boot
- * when a binding is missing.
- */
-import { readdirSync, readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { readdirSync, readFileSync, statSync } from "node:fs";
+import { dirname, join, resolve } from "node:path";
+import ts from "typescript";
 
-const packagesDir = resolve("packages");
-const features = []; // { pkgName, dir, id, dependsOn }
-
-for (const dir of readdirSync(packagesDir)) {
-  if (!dir.startsWith("feature-")) continue;
-  const manifestPath = resolve(packagesDir, dir, "src", `${dir.replace(/^feature-/, "")}.feature.ts`);
-  let manifestText;
-  try {
-    manifestText = readFileSync(manifestPath, "utf8");
-  } catch {
-    continue; // no manifest in this package
+const root = process.cwd();
+const packageRoot = resolve(root, "packages");
+const featureDirs = readdirSync(packageRoot).filter((name) => name.startsWith("feature-") && statSync(join(packageRoot, name)).isDirectory()).sort();
+const failures = [];
+const fail = (message) => failures.push(`Manifest guard failed: ${message}`);
+const entryReexports = (entry, target) => {
+  const source = ts.createSourceFile(entry, readFileSync(entry, "utf8"), ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+  return source.statements.some((statement) => {
+    if (!ts.isExportDeclaration(statement) || !statement.moduleSpecifier || !ts.isStringLiteral(statement.moduleSpecifier)) return false;
+    const candidate = resolve(dirname(entry), statement.moduleSpecifier.text.endsWith(".ts") ? statement.moduleSpecifier.text : `${statement.moduleSpecifier.text}.ts`);
+    return candidate === target;
+  });
+};
+const sourceFiles = (directory) => {
+  const result = [];
+  for (const entry of readdirSync(directory, { withFileTypes: true })) {
+    const file = join(directory, entry.name);
+    if (entry.isDirectory()) result.push(...sourceFiles(file));
+    else if (entry.name.endsWith(".ts") && !entry.name.endsWith(".d.ts")) result.push(file);
   }
-  const idMatch = manifestText.match(/id:\s*"([^"]+)"/);
-  const depMatch = manifestText.match(/dependsOn:\s*\[([^\]]*)\]/s);
-  const id = idMatch?.[1];
-  if (!id) {
-    console.error(`Manifest guard failed: cannot parse id in ${manifestPath}`);
-    process.exit(1);
-  }
-  const dependsOn = (depMatch?.[1] ?? "")
-    .split(",")
-    .map((s) => s.trim().replace(/^["']|["']$/g, ""))
-    .filter(Boolean);
-
-  const pkg = JSON.parse(readFileSync(resolve(packagesDir, dir, "package.json"), "utf8"));
-  const featureDeps = Object.keys(pkg.dependencies ?? {}).filter((k) =>
-    /^@repo\/feature-[a-z0-9-]+$/.test(k),
-  );
-
-  features.push({ pkgName: pkg.name, dir, id, dependsOn, featureDeps });
-}
-
-let failed = false;
-
-// 1. package deps ⊆ dependsOn
-const idByPkg = new Map(features.map((f) => [f.pkgName, f.id]));
-for (const f of features) {
-  for (const dep of f.featureDeps) {
-    const depId = idByPkg.get(dep);
-    if (!depId) continue; // dependency without a manifest (not a plugin feature)
-    if (!f.dependsOn.includes(depId)) {
-      console.error(
-        `Manifest guard failed: @repo/${f.dir} depends on package ${dep} (feature "${depId}") but it is missing from dependsOn [${f.dependsOn.join(", ")}]`,
-      );
-      failed = true;
+  return result;
+};
+const literal = (node, label, file) => {
+  if (!node || !ts.isStringLiteral(node)) { fail(`${file}: ${label} must be a string literal.`); return undefined; }
+  return node.text;
+};
+const literals = (node, label, file) => {
+  if (!node) return [];
+  if (!ts.isArrayLiteralExpression(node)) { fail(`${file}: ${label} must be an array literal.`); return []; }
+  return node.elements.flatMap((element) => { const value = literal(element, label, file); return value === undefined ? [] : [value]; });
+};
+function discover(file) {
+  const source = ts.createSourceFile(file, readFileSync(file, "utf8"), ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+  const result = [];
+  for (const statement of source.statements) {
+    if (!ts.isVariableStatement(statement) || !statement.modifiers?.some((m) => m.kind === ts.SyntaxKind.ExportKeyword)) continue;
+    for (const declaration of statement.declarationList.declarations) {
+      const init = declaration.initializer;
+      if (!init || !ts.isCallExpression(init) || !ts.isIdentifier(init.expression) || init.expression.text !== "defineFeature") continue;
+      if (!ts.isIdentifier(declaration.name) || init.arguments.length !== 1 || !ts.isObjectLiteralExpression(init.arguments[0])) { fail(`${file}: malformed defineFeature declaration.`); continue; }
+      const obj = init.arguments[0];
+      const get = (name) => obj.properties.find((p) => ts.isPropertyAssignment(p) && ts.isIdentifier(p.name) && p.name.text === name)?.initializer;
+      const id = literal(get("id"), "id", file);
+      if (id) result.push({ id, dependsOn: literals(get("dependsOn"), "dependsOn", file), requires: literals(get("requires"), "requires", file), provides: literals(get("provides"), "provides", file), file, imports: source.statements.filter(ts.isImportDeclaration) });
     }
   }
+  return result;
 }
-
-// 2. dependsOn ids exist
-const ids = new Set(features.map((f) => f.id));
-for (const f of features) {
-  for (const d of f.dependsOn) {
-    if (!ids.has(d)) {
-      console.error(`Manifest guard failed: ${f.pkgName} dependsOn unknown feature "${d}"`);
-      failed = true;
-    }
+const manifests = [];
+for (const dir of featureDirs) {
+  const packageDir = join(packageRoot, dir);
+  const pkg = JSON.parse(readFileSync(join(packageDir, "package.json"), "utf8"));
+  const found = sourceFiles(join(packageDir, "src")).flatMap(discover);
+  if (found.length === 0) { fail(`${dir}: no exported defineFeature manifest discovered.`); continue; }
+  if (found.length !== 1) { fail(`${dir}: expected exactly one exported feature manifest, found ${found.length}.`); continue; }
+  const manifest = { ...found[0], dir, pkg, packageDir, pkgName: pkg.name };
+  const entry = pkg.exports?.["."];
+  if (typeof entry !== "string") fail(`${dir}: missing package.json exports["."] feature entrypoint.`);
+  else {
+    const entryFile = resolve(packageDir, entry);
+    if (entryFile !== resolve(manifest.file) && !entryReexports(entryFile, resolve(manifest.file))) fail(`${dir}: public entrypoint ${entry} does not export the discovered manifest.`);
+  }
+  manifests.push(manifest);
+}
+const byId = new Map();
+const byPackage = new Map(manifests.map((m) => [m.pkgName, m]));
+for (const manifest of manifests) { if (byId.has(manifest.id)) fail(`duplicate feature id "${manifest.id}".`); byId.set(manifest.id, manifest); }
+const featurePackage = /^@repo\/feature-[a-z0-9-]+$/;
+for (const manifest of manifests) {
+  const packageDeps = Object.keys(manifest.pkg.dependencies ?? {}).filter((name) => featurePackage.test(name));
+  for (const depPackage of packageDeps) {
+    const dep = byPackage.get(depPackage);
+    if (!dep) fail(`${manifest.dir}: package dependency ${depPackage} has no validated manifest.`);
+    else if (!manifest.dependsOn.includes(dep.id)) fail(`${manifest.dir}: package dependency ${depPackage} is missing from dependsOn.`);
+  }
+  for (const depId of manifest.dependsOn) {
+    const dep = byId.get(depId);
+    if (!dep) fail(`${manifest.dir}: dependsOn references unknown feature "${depId}".`);
+    else if (!packageDeps.includes(dep.pkgName)) fail(`${manifest.dir}: dependsOn "${depId}" lacks a matching package dependency.`);
+  }
+  for (const importDecl of manifest.imports) {
+    const spec = importDecl.moduleSpecifier;
+    if (!ts.isStringLiteral(spec) || !featurePackage.test(spec.text) || spec.text === manifest.pkgName) continue;
+    const dep = byPackage.get(spec.text);
+    if (!dep) fail(`${manifest.dir}: source import ${spec.text} has no validated manifest.`);
+    else if (!manifest.dependsOn.includes(dep.id)) fail(`${manifest.dir}: undeclared cross-feature source import ${spec.text}.`);
   }
 }
-
-// 3. acyclicity over declared ids
-const graph = new Map(features.filter((f) => ids.has(f.id)).map((f) => [f.id, f.dependsOn]));
-const state = new Map(); // 1=visiting, 2=done
-const stack = [];
-function visit(node) {
-  if (state.get(node) === 2) return true;
-  if (state.get(node) === 1) {
-    console.error(`Manifest guard failed: dependsOn cycle: ${[...stack, node].join(" -> ")}`);
-    return false;
-  }
-  state.set(node, 1);
-  stack.push(node);
-  for (const next of graph.get(node) ?? []) {
-    if (!visit(next)) return false;
-  }
-  stack.pop();
-  state.set(node, 2);
-  return true;
-}
-for (const id of graph.keys()) {
-  if (!visit(id)) {
-    failed = true;
-    break;
-  }
-}
-
-if (failed) process.exit(1);
-console.log("Feature manifest dependency guard passed.");
+const providers = new Map();
+for (const manifest of manifests) for (const capability of manifest.provides) { if (providers.has(capability)) fail(`capability "${capability}" has duplicate providers.`); else providers.set(capability, manifest); }
+for (const manifest of manifests) for (const capability of manifest.requires) if (!providers.has(capability)) fail(`${manifest.id} requires capability "${capability}" but no provider exists.`);
+const graph = new Map(manifests.map((m) => [m.id, new Set(m.dependsOn)]));
+for (const manifest of manifests) for (const capability of manifest.requires) { const provider = providers.get(capability); if (provider && provider.id !== manifest.id) graph.get(manifest.id).add(provider.id); }
+const visiting = new Set(); const visited = new Set();
+function visit(id, stack) { if (visited.has(id)) return; if (visiting.has(id)) { fail(`dependency/capability cycle: ${[...stack, id].join(" -> ")}.`); return; } visiting.add(id); for (const dep of graph.get(id) ?? []) if (byId.has(dep)) visit(dep, [...stack, id]); visiting.delete(id); visited.add(id); }
+for (const manifest of manifests) visit(manifest.id, []);
+if (failures.length) { console.error(failures.join("\n")); process.exit(1); }
+console.log(`Feature manifest dependency guard passed for ${manifests.length} feature packages.`);

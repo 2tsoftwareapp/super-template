@@ -1,4 +1,5 @@
 import { Global, Module } from "@nestjs/common";
+import { UsersModule } from "@repo/feature-users/module";
 
 import { NotificationJobHandler } from "./application/notification-job.handler";
 import { NotificationsMapper } from "./application/notifications.mapper";
@@ -30,6 +31,7 @@ import { USER_NOTIFICATION_SENDER } from "./public/user-notification-sender.port
 
 @Global()
 @Module({
+  imports: [UsersModule],
   controllers: [NotificationsController, AdminNotificationsController],
   providers: [
     NotificationsRepository,

@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { ERROR_CODES } from "@repo/api-runtime";
 
-import { resolveAssignableRole } from "../assignable-role.resolver";
+import { resolveAssignableRole } from "./assignable-role.resolver";
 
 function mockService(overrides: Record<string, unknown> = {}) {
   return {

@@ -10,11 +10,9 @@ import { OUTBOX_APPENDER, type OutboxAppenderPort } from "@repo/feature-outbox/c
 import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
 import { hashPassword } from "@repo/utils/password";
 
-import type { CreateAdminUserCommand, UserView } from "../users.types";
+import type { CreateAdminUserCommand, UserView } from "@repo/feature-users/contracts";
 
 import {
-  assertCanAssignRoleTargets,
-  assertRoleScopeCanBeAssigned,
   ORGANIZATION_MEMBERSHIP,
   type OrganizationMemberRole,
   type OrganizationMembership,
@@ -25,9 +23,10 @@ import {
   USER_PROFILE_INVALIDATOR,
   type UserAccessControl,
   type UserProfileInvalidator,
-} from "../../public/contracts";
+} from "@repo/feature-users/contracts";
+import { assertCanAssignRoleTargets, assertRoleScopeCanBeAssigned } from "../../domain-role-assignment.policy";
 import { resolveRoleById } from "../assignable-role.resolver";
-import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";
+import { USERS_REPOSITORY, type UsersRepositoryPort } from "@repo/feature-users/contracts";
 import { GetUserUseCase } from "./get-user.use-case";
 
 @Injectable()

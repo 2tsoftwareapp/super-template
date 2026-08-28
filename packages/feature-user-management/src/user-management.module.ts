@@ -10,7 +10,9 @@ import { UpdateUserStatusUseCase } from "./application/use-cases/update-user-sta
 import { ReplaceUserRolesUseCase } from "./application/use-cases/replace-user-roles.use-case";
 import { AdminUsersController } from "./presentation/admin-users.controller";
 import { UsersController } from "./presentation/users.controller";
-import { UsersModule } from "./users.module";
+import { UsersModule } from "@repo/feature-users/module";
+import { USERS_REPOSITORY } from "@repo/feature-users/contracts";
+import { UserManagementRepository } from "./infrastructure-users.repository";
 
 @Module({
   imports: [UsersModule],
@@ -18,7 +20,9 @@ import { UsersModule } from "./users.module";
   providers: [
     GetUserUseCase, ListUsersUseCase, UpdateProfileUseCase, ChangePasswordUseCase,
     CreateAdminUserUseCase, UpdateAdminUserUseCase, DeleteUserUseCase,
-    UpdateUserStatusUseCase, ReplaceUserRolesUseCase,
+    UpdateUserStatusUseCase,     ReplaceUserRolesUseCase,
+    UserManagementRepository,
+    { provide: USERS_REPOSITORY, useExisting: UserManagementRepository },
   ],
 })
 export class UserManagementModule {}

@@ -2,18 +2,18 @@ import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { AppError, type AuthenticatedRequestUser } from "@repo/api-runtime";
 import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
 
-import type { UserView } from "../users.types";
+import type { UserView } from "@repo/feature-users/contracts";
 
-import { assertUserBelongsToOrganization } from "../../domain/user-org-scope.policy";
+import { assertUserBelongsToOrganization } from "@repo/feature-users/contracts";
 import {
   ORGANIZATION_MEMBERSHIP,
   type OrganizationMembership,
   ROLE_NAMES,
   USER_ACCESS_CONTROL,
   type UserAccessControl,
-} from "../../public/contracts";
-import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";
-import { UsersMapper } from "../users.mapper";
+} from "@repo/feature-users/contracts";
+import { USERS_REPOSITORY, type UsersRepositoryPort } from "@repo/feature-users/contracts";
+import { UsersMapper } from "@repo/feature-users/module";
 
 @Injectable()
 export class GetUserUseCase {

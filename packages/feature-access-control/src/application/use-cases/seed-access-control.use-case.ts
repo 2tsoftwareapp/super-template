@@ -85,9 +85,17 @@ export class SeedAccessControlUseCase {
 
     const resolveGrant = (role: string): string[] => {
       const names = authorization.grantsByRole[role] ?? [];
-      return names
-        .map((name) => permissionByName.get(name))
-        .filter((id): id is string => typeof id === "string");
+      return names.map((name) => {
+        const permissionId = permissionByName.get(name);
+        if (!permissionId) {
+          throw new AppError(
+            ERROR_CODES.INTERNAL_ERROR,
+            `Authorization grant for role "${role}" references unknown permission "${name}"`,
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          );
+        }
+        return permissionId;
+      });
     };
 
     await this.accessControlRepository.replaceRolePermissions(

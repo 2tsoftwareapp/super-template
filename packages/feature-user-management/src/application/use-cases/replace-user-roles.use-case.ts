@@ -7,12 +7,10 @@ import { AppError, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
 
-import type { UserView } from "../users.types";
+import type { UserView } from "@repo/feature-users/contracts";
 
-import { assertUserBelongsToOrganization } from "../../domain/user-org-scope.policy";
+import { assertUserBelongsToOrganization } from "@repo/feature-users/contracts";
 import {
-  assertCanAssignRoleTargets,
-  assertRoleScopeCanBeAssigned,
   ORGANIZATION_MEMBERSHIP,
   type OrganizationMemberRole,
   type OrganizationMembership,
@@ -21,9 +19,10 @@ import {
   USER_PROFILE_INVALIDATOR,
   type UserAccessControl,
   type UserProfileInvalidator,
-} from "../../public/contracts";
+} from "@repo/feature-users/contracts";
+import { assertCanAssignRoleTargets, assertRoleScopeCanBeAssigned } from "../../domain-role-assignment.policy";
 import { resolveRoleById } from "../assignable-role.resolver";
-import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";
+import { USERS_REPOSITORY, type UsersRepositoryPort } from "@repo/feature-users/contracts";
 import { GetUserUseCase } from "./get-user.use-case";
 
 @Injectable()

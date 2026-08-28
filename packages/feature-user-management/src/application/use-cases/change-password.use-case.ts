@@ -9,7 +9,7 @@ import { OUTBOX_APPENDER, type OutboxAppenderPort } from "@repo/feature-outbox/c
 import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
 import { hashPassword, verifyPassword } from "@repo/utils/password";
 
-import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";
+import { USERS_REPOSITORY, type UsersRepositoryPort } from "@repo/feature-users/contracts";
 
 @Injectable()
 export class ChangePasswordUseCase {

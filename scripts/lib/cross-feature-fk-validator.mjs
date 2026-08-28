@@ -34,10 +34,10 @@ import ts from "typescript";
  *   sourceFile: string,
  *   sourceTableExport: string,
  *   propertyName: string,
- *   physicalColumn: string,
+ *   physicalColumnName: string,
  *   targetFile: string,
  *   targetTableExport: string,
- *   targetProperty: string,
+ *   targetPropertyName: string,
  *   nullable: boolean,
  *   onDelete: "cascade" | "set null" | "restrict" | "no action",
  * }} FkCheck
@@ -75,8 +75,41 @@ export function validateForeignKeys(file, sourceText, checks, resolveImport) {
   );
   /** @type {FkFailure[]} */
   const failures = [];
+  const seenKeys = new Set();
+  const requiredFields = [
+    "sourceFile",
+    "sourceTableExport",
+    "propertyName",
+    "physicalColumnName",
+    "targetFile",
+    "targetTableExport",
+    "targetPropertyName",
+    "nullable",
+    "onDelete",
+  ];
   for (const check of checks) {
-    const sourceTableExport = check.sourceTableExport ?? inferSourceTable(file, check);
+    const missing = requiredFields.filter((field) => check[field] === undefined);
+    if (missing.length > 0) {
+      failures.push({
+        file,
+        property: check.propertyName ?? "(unknown)",
+        reason: `missing required FK specification field(s): ${missing.join(", ")}.`,
+        expected: check,
+      });
+      continue;
+    }
+    const key = `${check.sourceFile}+${check.sourceTableExport}+${check.propertyName}`;
+    if (seenKeys.has(key)) {
+      failures.push({
+        file,
+        property: check.propertyName,
+        reason: `duplicate FK specification key: ${key}.`,
+        expected: check,
+      });
+      continue;
+    }
+    seenKeys.add(key);
+    const sourceTableExport = check.sourceTableExport;
     const table = findExportedPgTable(sourceFile, sourceTableExport);
     if (!table) {
       failures.push({
@@ -110,33 +143,6 @@ export function validateForeignKeys(file, sourceText, checks, resolveImport) {
     if (fail) failures.push(fail);
   }
   return failures;
-}
-
-function inferSourceTable(file, check) {
-  const base = file.replace(/\\/g, "/");
-  if (base.endsWith("organization-members.ts")) return "organizationMembers";
-  if (base.endsWith("user-roles.ts")) return "userRoles";
-  if (base.endsWith("access-control.ts"))
-    return check.propertyName === "organizationId"
-      ? "roles"
-      : check.propertyName === "permissionId"
-        ? "rolePermissions"
-        : "rolePermissions";
-  if (base.endsWith("auth.ts")) return "authSessions";
-  if (base.endsWith("two-factor.ts")) return "userTwoFactorSecrets";
-
-  if (base.endsWith("notifications.ts"))
-    return check.propertyName === "organizationId" && check.nullable
-      ? "notificationJobs"
-      : check.propertyName === "actorId" || check.propertyName === "targetUserId"
-        ? "notificationJobs"
-        : "notifications";
-  if (base.endsWith("users.ts")) return "users";
-  if (base.endsWith("organizations.ts")) return "organizations";
-  if (base.endsWith("files.ts")) return "files";
-  if (base.endsWith("sso.ts")) return "externalIdentities";
-  if (base.endsWith("preferences.ts")) return "userPreferences";
-  return undefined;
 }
 
 function findExportedPgTable(sourceFile, exportName) {
@@ -190,7 +196,7 @@ function collectColumnDeclarations(sourceFile, property) {
  * @returns {FkFailure | null}
  */
 function checkColumnDeclaration(file, decl, check, resolveImport) {
-  const targetTableExport = check.targetTableExport ?? check.targetExport;
+  const targetTableExport = check.targetTableExport;
   const initializer = decl.initializer;
   if (!initializer || !ts.isCallExpression(initializer)) {
     return {
@@ -220,12 +226,12 @@ function checkColumnDeclaration(file, decl, check, resolveImport) {
     };
   }
   const physicalColumn = extractUuidStringLiteralFromArgs(uuidEntry.args);
-  if (physicalColumn !== check.physicalColumn) {
+  if (physicalColumn !== check.physicalColumnName) {
     return {
       file,
       property: check.propertyName,
       reason:
-        `${check.propertyName}: physical column name expected "${check.physicalColumn}", ` +
+        `${check.propertyName}: physical column name expected "${check.physicalColumnName}", ` +
         `found "${physicalColumn ?? "(missing)"}".`,
       expected: check,
     };
@@ -254,7 +260,7 @@ function checkColumnDeclaration(file, decl, check, resolveImport) {
     return {
       file,
       property: check.propertyName,
-      reason: `${check.propertyName}: missing .references(() => ${targetTableExport}.${check.targetProperty}, { onDelete: "${check.onDelete}" }) chain.`,
+      reason: `${check.propertyName}: missing .references(() => ${targetTableExport}.${check.targetPropertyName}, { onDelete: "${check.onDelete}" }) chain.`,
       expected: check,
     };
   }
@@ -296,12 +302,12 @@ function checkColumnDeclaration(file, decl, check, resolveImport) {
       expected: check,
     };
   }
-  if (body.name.text !== check.targetProperty) {
+  if (body.name.text !== check.targetPropertyName) {
     return {
       file,
       property: check.propertyName,
       reason:
-        `${check.propertyName}: .references() target property expected "${check.targetProperty}", ` +
+        `${check.propertyName}: .references() target property expected "${check.targetPropertyName}", ` +
         `found "${body.name.text}".`,
       expected: check,
     };

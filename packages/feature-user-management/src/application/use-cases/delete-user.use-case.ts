@@ -8,9 +8,9 @@ import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 import { OUTBOX_APPENDER, type OutboxAppenderPort } from "@repo/feature-outbox/contracts";
 import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
 
-import { assertUserBelongsToOrganization } from "../../domain/user-org-scope.policy";
-import { ROLE_NAMES, USER_ACCESS_CONTROL, type UserAccessControl } from "../../public/contracts";
-import { USERS_REPOSITORY, type UsersRepositoryPort } from "../ports/users.repository.port";
+import { assertUserBelongsToOrganization } from "@repo/feature-users/contracts";
+import { ROLE_NAMES, USER_ACCESS_CONTROL, type UserAccessControl } from "@repo/feature-users/contracts";
+import { USERS_REPOSITORY, type UsersRepositoryPort } from "@repo/feature-users/contracts";
 
 @Injectable()
 export class DeleteUserUseCase {
