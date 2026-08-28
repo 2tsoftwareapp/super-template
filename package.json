@@ -10,7 +10,7 @@
     "bootstrap": "node scripts/bootstrap.mjs",
     "env:doctor": "node scripts/env-doctor.mjs",
     "lint:web-architecture": "node scripts/check-web-architecture-boundaries.mjs",
-    "lint:policy": "sh scripts/check-source-policy.sh && node scripts/check-web-architecture-boundaries.mjs && sh scripts/check-package-cycles.sh && node scripts/check-cross-feature-fks.mjs && node scripts/check-feature-manifest-deps.mjs && sh scripts/clean-policy-artifacts.sh && pnpm exec turbo boundaries",
+    "lint:policy": "sh scripts/check-source-policy.sh && node scripts/check-web-architecture-boundaries.mjs && sh scripts/check-package-cycles.sh && node scripts/check-cross-feature-fks.mjs && node scripts/__tests__/check-cross-feature-fks.regression.mjs && node scripts/check-feature-manifest-deps.mjs && sh scripts/clean-policy-artifacts.sh && pnpm exec turbo boundaries",
     "build": "turbo run build",
     "dev": "./scripts/dev.sh",
     "dev:turbo": "turbo run dev",

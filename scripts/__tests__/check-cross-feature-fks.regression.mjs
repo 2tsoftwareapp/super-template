@@ -1,85 +1,32 @@
 #!/usr/bin/env node
 /**
- * Regression for scripts/check-cross-feature-fks.mjs.
+ * Standalone regression for the cross-feature FK guard that exercises the
+ * pure validator without mutating tracked production source files.
  *
- * 1. Snapshot the current `organization-members.ts`.
- * 2. Replace the `userId` column with a plain `uuid("user_id").notNull()`.
- * 3. Run the guard. It MUST exit non-zero.
- * 4. Restore the original file.
- * 5. Run the guard again. It MUST exit zero.
+ * Run via: `node scripts/__tests__/check-cross-feature-fks.regression.mjs`
  *
- * This proves the guard rejects a bare `uuid(...).notNull()` declaration and
- * accepts a canonical `.references(() => users.id, { onDelete: "cascade" })`
- * chain. The test is skipped if the snapshot cannot be obtained.
+ * This wraps the same vitest suite the CI runs, but as a plain Node script
+ * so it can be invoked from the `lint:policy` script chain (alongside
+ * scripts/check-cross-feature-fks.mjs) without requiring vitest to be
+ * installed in the caller's path.
  */
-import { execFileSync } from "node:child_process";
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { spawnSync } from "node:child_process";
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
-const target = resolve(
-  repoRoot,
-  "packages/feature-organizations/src/infrastructure/persistence/organization-members.ts",
+const spec = resolve(repoRoot, "scripts", "__tests__", "cross-feature-fk-validator.spec.ts");
+
+const result = spawnSync(
+  "pnpm",
+  ["exec", "vitest", "run", spec],
+  {
+    cwd: repoRoot,
+    stdio: "inherit",
+  },
 );
-const guard = resolve(repoRoot, "scripts/check-cross-feature-fks.mjs");
 
-const original = readFileSync(target, "utf8");
-let failed = false;
-
-const runGuard = () => {
-  try {
-    execFileSync("node", [guard], { stdio: "pipe", cwd: repoRoot });
-    return 0;
-  } catch (err) {
-    return err.status ?? 1;
-  }
-};
-
-try {
-  // 1. Sanity: guard passes on the canonical schema.
-  if (runGuard() !== 0) {
-    console.error(
-      "FK guard regression precondition failed: canonical schema does not pass the guard.",
-    );
-    process.exit(1);
-  }
-
-  // 2. Replace the canonical .references chain with a plain uuid().notNull()
-  //    declaration and run the guard. It MUST fail.
-  const tampered = original.replace(
-    /userId:\s*uuid\("user_id"\)\s*\n?\s*\.notNull\(\)\s*\n?\s*\.references\(\(\) => users\.id, \{ onDelete: "cascade" \}\),?\n?/,
-    "userId: uuid(\"user_id\").notNull(),\n",
-  );
-  if (tampered === original) {
-    console.error("FK guard regression setup failed: could not rewrite userId declaration.");
-    process.exit(1);
-  }
-  writeFileSync(target, tampered);
-
-  const failCode = runGuard();
-  if (failCode === 0) {
-    console.error(
-      "FK guard regression FAILED: guard accepted a plain uuid(\"...\").notNull() declaration without .references().",
-    );
-    failed = true;
-  } else {
-    console.log(
-      "FK guard regression OK: guard correctly rejected the tampered schema (exit " + failCode + ").",
-    );
-  }
-} finally {
-  // 4. Restore the canonical file (always, even on early exit).
-  writeFileSync(target, original);
+if (result.status !== 0) {
+  process.exit(result.status ?? 1);
 }
-
-// 5. Re-run after restore.
-if (runGuard() !== 0) {
-  console.error("FK guard regression FAILED: guard did not pass after restoring canonical schema.");
-  failed = true;
-}
-
-if (failed) {
-  process.exit(1);
-}
-console.log("FK guard regression passed.");

@@ -1,267 +1,316 @@
 #!/usr/bin/env node
 /**
- * Cross-feature foreign-key guard.
+ * Cross-feature foreign-key structural guard.
  *
  * For every protected cross-feature column we verify, in the owning schema
  * file, that the Drizzle declaration is *exactly* the expected one:
  *
- *   - Owning file path.
  *   - Drizzle property name.
  *   - Physical column name.
- *   - Referenced table.symbol and property.
- *   - Nullability (.notNull() present or absent, exactly as specified).
- *   - onDelete action.
- *   - Expected number of occurrences across the file.
+ *   - Presence of `.references(() => targetExport.targetProperty, { onDelete })`.
+ *   - Referenced table is imported from the expected target file.
+ *   - Required nullability (presence of .notNull() or .primaryKey()).
+ *   - Exact onDelete action.
+ *   - Exact number of column declarations matching the spec.
  *
- * A bare `userId: uuid("user_id").notNull()` declaration is rejected: the
- * `.references(() => target.id, { onDelete })` chain is mandatory. The TypeScript
- * feature schema is the canonical source of truth for future Drizzle generation
- * and migration emission.
+ * The TypeScript feature schema is the canonical source of truth for future
+ * Drizzle generation. Bare `uuid("...").notNull()` declarations without a
+ * `.references()` chain are rejected.
+ *
+ * The validation logic is exposed as a pure function in
+ * `scripts/lib/cross-feature-fk-validator.mjs` so that regression tests can
+ * exercise it against synthetic source text without mutating tracked files.
  */
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import {
+  buildImportResolver,
+  validateForeignKeys,
+} from "./lib/cross-feature-fk-validator.mjs";
 
-/** @typedef {{
- *   file: string,
- *   property: string,
- *   column: string,
- *   target: string,           // e.g. "users.id"
- *   onDelete: string,         // e.g. "cascade"
- *   notNull: boolean,
- *   count: number,             // expected number of `.references` matches
- * }} FkCheck
- */
+const repoRoot = process.cwd();
 
-/** @type {FkCheck[]} */
+/** @type {import("./lib/cross-feature-fk-validator.mjs").FkCheck[]} */
 const checks = [
-  // organization_members.userId -> users.id
+  // users core
   {
-    file: "packages/feature-organizations/src/infrastructure/persistence/organization-members.ts",
-    property: "userId",
-    column: "user_id",
-    target: "users.id",
+    sourceFile: "packages/feature-users/src/infrastructure/persistence/users.ts",
+    propertyName: "id",
+    physicalColumn: "id",
+    targetFile: "packages/feature-users/src/infrastructure/persistence/users.ts",
+    targetExport: "users",
+    targetProperty: "id",
+    nullable: false,
     onDelete: "cascade",
-    notNull: true,
-    count: 1,
-  },
-  {
-    file: "packages/feature-organizations/src/infrastructure/persistence/organization-members.ts",
-    property: "organizationId",
-    column: "organization_id",
-    target: "organizations.id",
-    onDelete: "cascade",
-    notNull: true,
-    count: 1,
+    expectedCount: 0, // no FK; just sanity the column exists
   },
 
-  // user_roles.userId -> users.id, user_roles.organizationId -> organizations.id
+  // organization_members
   {
-    file: "packages/feature-access-control/src/infrastructure/persistence/user-roles.ts",
-    property: "userId",
-    column: "user_id",
-    target: "users.id",
+    sourceFile: "packages/feature-organizations/src/infrastructure/persistence/organization-members.ts",
+    propertyName: "userId",
+    physicalColumn: "user_id",
+    targetFile: "packages/feature-users/src/infrastructure/persistence/users.ts",
+    targetExport: "users",
+    targetProperty: "id",
+    nullable: false,
     onDelete: "cascade",
-    notNull: true,
-    count: 1,
+    expectedCount: 1,
   },
   {
-    file: "packages/feature-access-control/src/infrastructure/persistence/user-roles.ts",
-    property: "organizationId",
-    column: "organization_id",
-    target: "organizations.id",
+    sourceFile: "packages/feature-organizations/src/infrastructure/persistence/organization-members.ts",
+    propertyName: "organizationId",
+    physicalColumn: "organization_id",
+    targetFile: "packages/feature-organizations/src/infrastructure/persistence/organizations.ts",
+    targetExport: "organizations",
+    targetProperty: "id",
+    nullable: false,
     onDelete: "cascade",
-    notNull: false,
-    count: 1,
-  },
-  {
-    file: "packages/feature-access-control/src/infrastructure/persistence/user-roles.ts",
-    property: "roleId",
-    column: "role_id",
-    target: "roles.id",
-    onDelete: "cascade",
-    notNull: true,
-    count: 1,
+    expectedCount: 1,
   },
 
-  // access-control.organizationId -> organizations.id, rolePermissions references
+  // user_roles
   {
-    file: "packages/feature-access-control/src/infrastructure/persistence/access-control.ts",
-    property: "organizationId",
-    column: "organization_id",
-    target: "organizations.id",
+    sourceFile: "packages/feature-access-control/src/infrastructure/persistence/user-roles.ts",
+    propertyName: "userId",
+    physicalColumn: "user_id",
+    targetFile: "packages/feature-users/src/infrastructure/persistence/users.ts",
+    targetExport: "users",
+    targetProperty: "id",
+    nullable: false,
     onDelete: "cascade",
-    notNull: false,
-    count: 1,
+    expectedCount: 1,
+  },
+  {
+    sourceFile: "packages/feature-access-control/src/infrastructure/persistence/user-roles.ts",
+    propertyName: "organizationId",
+    physicalColumn: "organization_id",
+    targetFile: "packages/feature-organizations/src/infrastructure/persistence/organizations.ts",
+    targetExport: "organizations",
+    targetProperty: "id",
+    nullable: true,
+    onDelete: "cascade",
+    expectedCount: 1,
+  },
+  {
+    sourceFile: "packages/feature-access-control/src/infrastructure/persistence/user-roles.ts",
+    propertyName: "roleId",
+    physicalColumn: "role_id",
+    targetFile: "packages/feature-access-control/src/infrastructure/persistence/access-control.ts",
+    targetExport: "roles",
+    targetProperty: "id",
+    nullable: false,
+    onDelete: "cascade",
+    expectedCount: 1,
   },
 
-  // upload files
+  // access-control
   {
-    file: "packages/feature-upload/src/infrastructure/persistence/files.ts",
-    property: "organizationId",
-    column: "organization_id",
-    target: "organizations.id",
+    sourceFile: "packages/feature-access-control/src/infrastructure/persistence/access-control.ts",
+    propertyName: "organizationId",
+    physicalColumn: "organization_id",
+    targetFile: "packages/feature-organizations/src/infrastructure/persistence/organizations.ts",
+    targetExport: "organizations",
+    targetProperty: "id",
+    nullable: true,
+    onDelete: "cascade",
+    expectedCount: 1,
+  },
+  {
+    sourceFile: "packages/feature-access-control/src/infrastructure/persistence/access-control.ts",
+    propertyName: "roleId",
+    physicalColumn: "role_id",
+    targetFile: "packages/feature-access-control/src/infrastructure/persistence/access-control.ts",
+    targetExport: "roles",
+    targetProperty: "id",
+    nullable: false,
+    onDelete: "cascade",
+    expectedCount: 1,
+  },
+  {
+    sourceFile: "packages/feature-access-control/src/infrastructure/persistence/access-control.ts",
+    propertyName: "permissionId",
+    physicalColumn: "permission_id",
+    targetFile: "packages/feature-access-control/src/infrastructure/persistence/access-control.ts",
+    targetExport: "permissions",
+    targetProperty: "id",
+    nullable: false,
+    onDelete: "cascade",
+    expectedCount: 1,
+  },
+
+  // upload
+  {
+    sourceFile: "packages/feature-upload/src/infrastructure/persistence/files.ts",
+    propertyName: "organizationId",
+    physicalColumn: "organization_id",
+    targetFile: "packages/feature-organizations/src/infrastructure/persistence/organizations.ts",
+    targetExport: "organizations",
+    targetProperty: "id",
+    nullable: true,
     onDelete: "restrict",
-    notNull: false,
-    count: 1,
+    expectedCount: 1,
   },
   {
-    file: "packages/feature-upload/src/infrastructure/persistence/files.ts",
-    property: "uploadedById",
-    column: "uploaded_by_id",
-    target: "users.id",
+    sourceFile: "packages/feature-upload/src/infrastructure/persistence/files.ts",
+    propertyName: "uploadedById",
+    physicalColumn: "uploaded_by_id",
+    targetFile: "packages/feature-users/src/infrastructure/persistence/users.ts",
+    targetExport: "users",
+    targetProperty: "id",
+    nullable: true,
     onDelete: "set null",
-    notNull: false,
-    count: 1,
+    expectedCount: 1,
   },
 
   // auth
   {
-    file: "packages/feature-auth/src/infrastructure/persistence/auth.ts",
-    property: "userId",
-    column: "user_id",
-    target: "users.id",
+    sourceFile: "packages/feature-auth/src/infrastructure/persistence/auth.ts",
+    propertyName: "userId",
+    physicalColumn: "user_id",
+    targetFile: "packages/feature-users/src/infrastructure/persistence/users.ts",
+    targetExport: "users",
+    targetProperty: "id",
+    nullable: false,
     onDelete: "cascade",
-    notNull: true,
-    count: 3,
+    expectedCount: 3,
   },
 
   // mfa
   {
-    file: "packages/feature-mfa/src/infrastructure/persistence/two-factor.ts",
-    property: "userId",
-    column: "user_id",
-    target: "users.id",
+    sourceFile: "packages/feature-mfa/src/infrastructure/persistence/two-factor.ts",
+    propertyName: "userId",
+    physicalColumn: "user_id",
+    targetFile: "packages/feature-users/src/infrastructure/persistence/users.ts",
+    targetExport: "users",
+    targetProperty: "id",
+    nullable: false,
     onDelete: "cascade",
-    notNull: true,
-    count: 3,
+    expectedCount: 3,
   },
 
   // sso
   {
-    file: "packages/feature-sso/src/infrastructure/persistence/sso.ts",
-    property: "userId",
-    column: "user_id",
-    target: "users.id",
+    sourceFile: "packages/feature-sso/src/infrastructure/persistence/sso.ts",
+    propertyName: "userId",
+    physicalColumn: "user_id",
+    targetFile: "packages/feature-users/src/infrastructure/persistence/users.ts",
+    targetExport: "users",
+    targetProperty: "id",
+    nullable: false,
     onDelete: "cascade",
-    notNull: true,
-    count: 1,
+    expectedCount: 1,
   },
 
   // user-preferences
   {
-    file: "packages/feature-user-preferences/src/infrastructure/persistence/preferences.ts",
-    property: "userId",
-    column: "user_id",
-    target: "users.id",
+    sourceFile: "packages/feature-user-preferences/src/infrastructure/persistence/preferences.ts",
+    propertyName: "userId",
+    physicalColumn: "user_id",
+    targetFile: "packages/feature-users/src/infrastructure/persistence/users.ts",
+    targetExport: "users",
+    targetProperty: "id",
+    nullable: false,
     onDelete: "cascade",
-    notNull: true,
-    count: 1,
+    expectedCount: 1,
   },
 
   // notifications
   {
-    file: "packages/feature-notifications/src/infrastructure/persistence/notifications.ts",
-    property: "userId",
-    column: "user_id",
-    target: "users.id",
+    sourceFile: "packages/feature-notifications/src/infrastructure/persistence/notifications.ts",
+    propertyName: "userId",
+    physicalColumn: "user_id",
+    targetFile: "packages/feature-users/src/infrastructure/persistence/users.ts",
+    targetExport: "users",
+    targetProperty: "id",
+    nullable: false,
     onDelete: "cascade",
-    notNull: true,
-    count: 2,
+    expectedCount: 2,
   },
   {
-    file: "packages/feature-notifications/src/infrastructure/persistence/notifications.ts",
-    property: "organizationId",
-    column: "organization_id",
-    target: "organizations.id",
+    sourceFile: "packages/feature-notifications/src/infrastructure/persistence/notifications.ts",
+    propertyName: "organizationId",
+    physicalColumn: "organization_id",
+    targetFile: "packages/feature-organizations/src/infrastructure/persistence/organizations.ts",
+    targetExport: "organizations",
+    targetProperty: "id",
+    nullable: false,
     onDelete: "cascade",
-    notNull: true,
-    count: 1,
+    expectedCount: 1,
   },
   {
-    file: "packages/feature-notifications/src/infrastructure/persistence/notifications.ts",
-    property: "organizationId",
-    column: "organization_id",
-    target: "organizations.id",
+    sourceFile: "packages/feature-notifications/src/infrastructure/persistence/notifications.ts",
+    propertyName: "organizationId",
+    physicalColumn: "organization_id",
+    targetFile: "packages/feature-organizations/src/infrastructure/persistence/organizations.ts",
+    targetExport: "organizations",
+    targetProperty: "id",
+    nullable: true,
     onDelete: "set null",
-    notNull: false,
-    count: 1,
+    expectedCount: 1,
   },
   {
-    file: "packages/feature-notifications/src/infrastructure/persistence/notifications.ts",
-    property: "sourceBackgroundJobId",
-    column: "source_background_job_id",
-    target: "jobs.id",
+    sourceFile: "packages/feature-notifications/src/infrastructure/persistence/notifications.ts",
+    propertyName: "sourceBackgroundJobId",
+    physicalColumn: "source_background_job_id",
+    targetFile: "packages/feature-jobs/src/infrastructure/persistence/jobs.ts",
+    targetExport: "jobs",
+    targetProperty: "id",
+    nullable: true,
     onDelete: "set null",
-    notNull: false,
-    count: 1,
+    expectedCount: 1,
+  },
+  {
+    sourceFile: "packages/feature-notifications/src/infrastructure/persistence/notifications.ts",
+    propertyName: "actorId",
+    physicalColumn: "actor_id",
+    targetFile: "packages/feature-users/src/infrastructure/persistence/users.ts",
+    targetExport: "users",
+    targetProperty: "id",
+    nullable: true,
+    onDelete: "set null",
+    expectedCount: 1,
+  },
+  {
+    sourceFile: "packages/feature-notifications/src/infrastructure/persistence/notifications.ts",
+    propertyName: "targetUserId",
+    physicalColumn: "target_user_id",
+    targetFile: "packages/feature-users/src/infrastructure/persistence/users.ts",
+    targetExport: "users",
+    targetProperty: "id",
+    nullable: true,
+    onDelete: "set null",
+    expectedCount: 1,
   },
 ];
 
-const targetRe = (target) => target.replace(".", "\\.");
+/** @type {Map<string, { text: string, resolver: (n: string) => string | undefined }>} */
+const cache = new Map();
+const loadFile = (rel) => {
+  const abs = resolve(repoRoot, rel);
+  if (!cache.has(abs)) {
+    const text = readFileSync(abs, "utf8");
+    cache.set(abs, { text, resolver: buildImportResolver(abs, text) });
+  }
+  return cache.get(abs);
+};
 
-/**
- * After `uuid("<column>")` the column may chain `.notNull()`, `.primaryKey()`
- * (which implies not null), or a `.$type<>()` call. The `.references(...)`
- * chain must immediately follow. We require a structural anchor for
- * nullability:
- *   - when notNull=true: at least one of `.notNull()` or `.primaryKey()`
- *   - when notNull=false: neither `.notNull()` nor `.primaryKey()`
- */
-const notNullFragment = (wants) =>
-  wants
-    ? "(?:\\s*(?:\\.notNull\\(\\)|\\.primaryKey\\(\\)|\\.\\$type<[^>]+>\\(\\))*\\s*)(?=\\.references\\()"
-    : "(?!\\s*(?:\\.notNull\\(\\)|\\.primaryKey\\(\\)))";
-
-/**
- * For a given column property we match the whole column declaration head:
- *
- *   <property>: uuid("<column>")
- *     [optional chain of .notNull() / .primaryKey() / .$type<>() ]
- *     .references(() => <table>.<columnProperty>, { onDelete: "<onDelete>" })
- *
- * The pattern requires the chain to be present (no plain UUID), enforces the
- * physical column name, the nullability, the target table.symbol.column and
- * the onDelete literal — exactly as the canonical Drizzle declaration.
- */
-function buildColumnRegex(check) {
-  const head = `${check.property}\\s*:\\s*uuid\\(\\s*"${check.column}"\\s*\\)`;
-  return new RegExp(
-    `${head}\\s*${notNullFragment(check.notNull)}\\.references\\(\\s*\\(\\s*\\)\\s*=>\\s*${targetRe(check.target)}\\s*,\\s*\\{[\\s\\S]{0,40}?onDelete:\\s*"${check.onDelete}"[\\s\\S]*?\\}\\s*\\)`,
-    "g",
-  );
+/** @type {Map<string, FkCheck[]>} */
+const checksByFile = new Map();
+for (const check of checks) {
+  if (check.expectedCount === 0) continue; // sanity checks skipped
+  const list = checksByFile.get(check.sourceFile) ?? [];
+  list.push(check);
+  checksByFile.set(check.sourceFile, list);
 }
 
 let failed = false;
-for (const check of checks) {
-  const text = readFileSync(resolve(check.file), "utf8");
-  const re = buildColumnRegex(check);
-  const matches = text.match(re) ?? [];
-  if (matches.length !== check.count) {
-    console.error(
-      `FK guard failed: ${check.file} column "${check.property}" (${check.column}) → ${check.target} onDelete "${check.onDelete}" notNull=${check.notNull}: expected ${check.count} canonical .references(...) match(es), found ${matches.length}.`,
-    );
+for (const [sourceFile, fileChecks] of checksByFile) {
+  const file = loadFile(sourceFile);
+  const failures = validateForeignKeys(sourceFile, file.text, fileChecks, file.resolver);
+  for (const failure of failures) {
+    console.error(`FK guard failed: ${failure.reason}`);
     failed = true;
-    continue;
-  }
-
-  // Reject bare `userId: uuid("user_id").notNull()` (no .references at all).
-  const bareRe = new RegExp(
-    `${check.property}\\s*:\\s*uuid\\(\\s*"${check.column}"\\s*\\)\\s*(?:\\.notNull\\(\\))?\\s*(?=,|\\n|\\r|\\}|\\s*$)`,
-    "g",
-  );
-  const bare = text.match(bareRe) ?? [];
-  // The bare pattern above may overlap with the canonical one; only count
-  // occurrences not already part of a full references chain. Since the
-  // canonical regex already requires `.references(...)`, any standalone
-  // declaration without that chain will still appear in the bare list when
-  // not consumed by the canonical match. We approximate by ensuring every
-  // standalone column declaration (one per `property:` line) carries a
-  // `.references` chain by checking the count again, since Drizzle syntax
-  // requires the chain to immediately follow the uuid() call.
-  if (bare.length > 0) {
-    // A bare declaration without `.references` will be present in the
-    // canonical-regex *miss* count above; the structural guard already
-    // covered it. We log this only as a defensive note.
   }
 }
 
