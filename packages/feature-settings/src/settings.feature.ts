@@ -9,9 +9,6 @@ export const settingsFeature: FeatureManifest = defineFeature({
   // Writes audit synchronously inside the update transaction via AUDIT_WRITER.
   dependsOn: ["audit"],
   nestModule: SettingsModule,
-  resourceScopes: {
-    settings: "platform",
-  },
   authorization: {
     resources: {
       settings: {

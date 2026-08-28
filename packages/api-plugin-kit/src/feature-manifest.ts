@@ -77,9 +77,6 @@ export interface FeatureManifest {
   /** RBAC permission keys this feature defines (for documentation/seeding). */
   readonly permissions?: readonly string[];
 
-  /** Resource → scope map this feature owns (composed into the RBAC catalog). */
-  readonly resourceScopes?: Readonly<Record<string, "platform" | "organization">>;
-
   /**
    * Authorization contribution: resources, their scopes/actions and optional
    * default role grants. access-control consumes the composed result at seed
@@ -155,8 +152,6 @@ export interface ComposedFeatures {
   readonly permissions: readonly string[];
   /** Seeders in composition order. */
   readonly seeders: readonly FeatureSeeder[];
-  /** Merged resource scope catalog. */
-  readonly resourceScopes: Readonly<Record<string, "platform" | "organization">>;
   /** Merged authorization contributions (resources + default grants). */
   readonly authorization: ComposedAuthorization;
   /** Composed outbox handler classes in dependency order. */
@@ -310,27 +305,6 @@ export function composeFeaturePermissions(
 /**
  * Collect seeders across features in composition order.
  */
-
-/**
- * Merge resource scope catalogs across features. Later duplicates must match.
- */
-export function composeFeatureResourceScopes(
-  features: readonly Pick<FeatureManifest, "id" | "resourceScopes">[],
-): Record<string, "platform" | "organization"> {
-  const composed: Record<string, "platform" | "organization"> = {};
-  for (const feature of features) {
-    for (const [resource, scope] of Object.entries(feature.resourceScopes ?? {})) {
-      const existing = composed[resource];
-      if (existing && existing !== scope) {
-        throw new Error(
-          `Conflicting resource scope for "${resource}" from feature "${feature.id}": ${existing} vs ${scope}`,
-        );
-      }
-      composed[resource] = scope;
-    }
-  }
-  return composed;
-}
 
 export function collectFeatureSeeders(
   features: readonly Pick<FeatureManifest, "seeders">[],
@@ -516,7 +490,6 @@ export function composeFeatures(features: readonly FeatureManifest[]): ComposedF
     modules: collectFeatureModules(ordered),
     permissions: composeFeaturePermissions(ordered),
     seeders: collectFeatureSeeders(ordered),
-    resourceScopes: composeFeatureResourceScopes(ordered),
     authorization: composeFeatureAuthorization(ordered),
     outboxHandlerClasses: handlerClasses,
   };

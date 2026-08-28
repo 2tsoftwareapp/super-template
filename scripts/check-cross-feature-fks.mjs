@@ -23,50 +23,34 @@
  */
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import {
-  buildImportResolver,
-  validateForeignKeys,
-} from "./lib/cross-feature-fk-validator.mjs";
+import { buildImportResolver, validateForeignKeys } from "./lib/cross-feature-fk-validator.mjs";
 
 const repoRoot = process.cwd();
 
 /** @type {import("./lib/cross-feature-fk-validator.mjs").FkCheck[]} */
 const checks = [
-  // users core
-  {
-    sourceFile: "packages/feature-users/src/infrastructure/persistence/users.ts",
-    propertyName: "id",
-    physicalColumn: "id",
-    targetFile: "packages/feature-users/src/infrastructure/persistence/users.ts",
-    targetExport: "users",
-    targetProperty: "id",
-    nullable: false,
-    onDelete: "cascade",
-    expectedCount: 0, // no FK; just sanity the column exists
-  },
-
   // organization_members
   {
-    sourceFile: "packages/feature-organizations/src/infrastructure/persistence/organization-members.ts",
+    sourceFile:
+      "packages/feature-organizations/src/infrastructure/persistence/organization-members.ts",
     propertyName: "userId",
     physicalColumn: "user_id",
     targetFile: "packages/feature-users/src/infrastructure/persistence/users.ts",
-    targetExport: "users",
+    targetTableExport: "users",
     targetProperty: "id",
     nullable: false,
     onDelete: "cascade",
-    expectedCount: 1,
   },
   {
-    sourceFile: "packages/feature-organizations/src/infrastructure/persistence/organization-members.ts",
+    sourceFile:
+      "packages/feature-organizations/src/infrastructure/persistence/organization-members.ts",
     propertyName: "organizationId",
     physicalColumn: "organization_id",
     targetFile: "packages/feature-organizations/src/infrastructure/persistence/organizations.ts",
-    targetExport: "organizations",
+    targetTableExport: "organizations",
     targetProperty: "id",
     nullable: false,
     onDelete: "cascade",
-    expectedCount: 1,
   },
 
   // user_roles
@@ -75,33 +59,30 @@ const checks = [
     propertyName: "userId",
     physicalColumn: "user_id",
     targetFile: "packages/feature-users/src/infrastructure/persistence/users.ts",
-    targetExport: "users",
+    targetTableExport: "users",
     targetProperty: "id",
     nullable: false,
     onDelete: "cascade",
-    expectedCount: 1,
   },
   {
     sourceFile: "packages/feature-access-control/src/infrastructure/persistence/user-roles.ts",
     propertyName: "organizationId",
     physicalColumn: "organization_id",
     targetFile: "packages/feature-organizations/src/infrastructure/persistence/organizations.ts",
-    targetExport: "organizations",
+    targetTableExport: "organizations",
     targetProperty: "id",
     nullable: true,
     onDelete: "cascade",
-    expectedCount: 1,
   },
   {
     sourceFile: "packages/feature-access-control/src/infrastructure/persistence/user-roles.ts",
     propertyName: "roleId",
     physicalColumn: "role_id",
     targetFile: "packages/feature-access-control/src/infrastructure/persistence/access-control.ts",
-    targetExport: "roles",
+    targetTableExport: "roles",
     targetProperty: "id",
     nullable: false,
     onDelete: "cascade",
-    expectedCount: 1,
   },
 
   // access-control
@@ -110,33 +91,30 @@ const checks = [
     propertyName: "organizationId",
     physicalColumn: "organization_id",
     targetFile: "packages/feature-organizations/src/infrastructure/persistence/organizations.ts",
-    targetExport: "organizations",
+    targetTableExport: "organizations",
     targetProperty: "id",
     nullable: true,
     onDelete: "cascade",
-    expectedCount: 1,
   },
   {
     sourceFile: "packages/feature-access-control/src/infrastructure/persistence/access-control.ts",
     propertyName: "roleId",
     physicalColumn: "role_id",
     targetFile: "packages/feature-access-control/src/infrastructure/persistence/access-control.ts",
-    targetExport: "roles",
+    targetTableExport: "roles",
     targetProperty: "id",
     nullable: false,
     onDelete: "cascade",
-    expectedCount: 1,
   },
   {
     sourceFile: "packages/feature-access-control/src/infrastructure/persistence/access-control.ts",
     propertyName: "permissionId",
     physicalColumn: "permission_id",
     targetFile: "packages/feature-access-control/src/infrastructure/persistence/access-control.ts",
-    targetExport: "permissions",
+    targetTableExport: "permissions",
     targetProperty: "id",
     nullable: false,
     onDelete: "cascade",
-    expectedCount: 1,
   },
 
   // upload
@@ -145,22 +123,20 @@ const checks = [
     propertyName: "organizationId",
     physicalColumn: "organization_id",
     targetFile: "packages/feature-organizations/src/infrastructure/persistence/organizations.ts",
-    targetExport: "organizations",
+    targetTableExport: "organizations",
     targetProperty: "id",
     nullable: true,
     onDelete: "restrict",
-    expectedCount: 1,
   },
   {
     sourceFile: "packages/feature-upload/src/infrastructure/persistence/files.ts",
     propertyName: "uploadedById",
     physicalColumn: "uploaded_by_id",
     targetFile: "packages/feature-users/src/infrastructure/persistence/users.ts",
-    targetExport: "users",
+    targetTableExport: "users",
     targetProperty: "id",
     nullable: true,
     onDelete: "set null",
-    expectedCount: 1,
   },
 
   // auth
@@ -169,11 +145,10 @@ const checks = [
     propertyName: "userId",
     physicalColumn: "user_id",
     targetFile: "packages/feature-users/src/infrastructure/persistence/users.ts",
-    targetExport: "users",
+    targetTableExport: "users",
     targetProperty: "id",
     nullable: false,
     onDelete: "cascade",
-    expectedCount: 3,
   },
 
   // mfa
@@ -182,11 +157,10 @@ const checks = [
     propertyName: "userId",
     physicalColumn: "user_id",
     targetFile: "packages/feature-users/src/infrastructure/persistence/users.ts",
-    targetExport: "users",
+    targetTableExport: "users",
     targetProperty: "id",
     nullable: false,
     onDelete: "cascade",
-    expectedCount: 3,
   },
 
   // sso
@@ -195,11 +169,10 @@ const checks = [
     propertyName: "userId",
     physicalColumn: "user_id",
     targetFile: "packages/feature-users/src/infrastructure/persistence/users.ts",
-    targetExport: "users",
+    targetTableExport: "users",
     targetProperty: "id",
     nullable: false,
     onDelete: "cascade",
-    expectedCount: 1,
   },
 
   // user-preferences
@@ -208,11 +181,10 @@ const checks = [
     propertyName: "userId",
     physicalColumn: "user_id",
     targetFile: "packages/feature-users/src/infrastructure/persistence/users.ts",
-    targetExport: "users",
+    targetTableExport: "users",
     targetProperty: "id",
     nullable: false,
     onDelete: "cascade",
-    expectedCount: 1,
   },
 
   // notifications
@@ -221,66 +193,60 @@ const checks = [
     propertyName: "userId",
     physicalColumn: "user_id",
     targetFile: "packages/feature-users/src/infrastructure/persistence/users.ts",
-    targetExport: "users",
+    targetTableExport: "users",
     targetProperty: "id",
     nullable: false,
     onDelete: "cascade",
-    expectedCount: 2,
   },
   {
     sourceFile: "packages/feature-notifications/src/infrastructure/persistence/notifications.ts",
     propertyName: "organizationId",
     physicalColumn: "organization_id",
     targetFile: "packages/feature-organizations/src/infrastructure/persistence/organizations.ts",
-    targetExport: "organizations",
+    targetTableExport: "organizations",
     targetProperty: "id",
     nullable: false,
     onDelete: "cascade",
-    expectedCount: 1,
   },
   {
     sourceFile: "packages/feature-notifications/src/infrastructure/persistence/notifications.ts",
     propertyName: "organizationId",
     physicalColumn: "organization_id",
     targetFile: "packages/feature-organizations/src/infrastructure/persistence/organizations.ts",
-    targetExport: "organizations",
+    targetTableExport: "organizations",
     targetProperty: "id",
     nullable: true,
     onDelete: "set null",
-    expectedCount: 1,
   },
   {
     sourceFile: "packages/feature-notifications/src/infrastructure/persistence/notifications.ts",
     propertyName: "sourceBackgroundJobId",
     physicalColumn: "source_background_job_id",
     targetFile: "packages/feature-jobs/src/infrastructure/persistence/jobs.ts",
-    targetExport: "jobs",
+    targetTableExport: "jobs",
     targetProperty: "id",
     nullable: true,
     onDelete: "set null",
-    expectedCount: 1,
   },
   {
     sourceFile: "packages/feature-notifications/src/infrastructure/persistence/notifications.ts",
     propertyName: "actorId",
     physicalColumn: "actor_id",
     targetFile: "packages/feature-users/src/infrastructure/persistence/users.ts",
-    targetExport: "users",
+    targetTableExport: "users",
     targetProperty: "id",
     nullable: true,
     onDelete: "set null",
-    expectedCount: 1,
   },
   {
     sourceFile: "packages/feature-notifications/src/infrastructure/persistence/notifications.ts",
     propertyName: "targetUserId",
     physicalColumn: "target_user_id",
     targetFile: "packages/feature-users/src/infrastructure/persistence/users.ts",
-    targetExport: "users",
+    targetTableExport: "users",
     targetProperty: "id",
     nullable: true,
     onDelete: "set null",
-    expectedCount: 1,
   },
 ];
 
@@ -298,7 +264,6 @@ const loadFile = (rel) => {
 /** @type {Map<string, FkCheck[]>} */
 const checksByFile = new Map();
 for (const check of checks) {
-  if (check.expectedCount === 0) continue; // sanity checks skipped
   const list = checksByFile.get(check.sourceFile) ?? [];
   list.push(check);
   checksByFile.set(check.sourceFile, list);

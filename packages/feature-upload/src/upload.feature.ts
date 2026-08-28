@@ -15,10 +15,6 @@ export const uploadFeature: FeatureManifest = defineFeature({
   dependsOn: ["auth", "organizations", "users", "activities", "audit", "access-control"],
   provides: ["file-view"],
   nestModule: UploadModule,
-  resourceScopes: {
-    files: "organization",
-    attachments: "organization",
-  },
   authorization: {
     resources: {
       files: {

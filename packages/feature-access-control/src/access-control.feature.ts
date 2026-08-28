@@ -9,9 +9,6 @@ export const accessControlFeature: FeatureManifest = defineFeature({
   dependsOn: ["users", "organizations", "audit"],
   provides: ["access-control-ops"],
   nestModule: AccessControlModule,
-  resourceScopes: {
-    roles: "organization",
-  },
   authorization: {
     resources: {
       roles: {

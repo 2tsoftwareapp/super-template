@@ -7,10 +7,6 @@ export const importExportFeature: FeatureManifest = defineFeature({
   id: "import-export",
   dependsOn: ["upload", "users", "organizations", "access-control", "activities", "audit"],
   nestModule: ImportExportFeatureModule,
-  resourceScopes: {
-    imports: "organization",
-    exports: "organization",
-  },
   authorization: {
     resources: {
       imports: {

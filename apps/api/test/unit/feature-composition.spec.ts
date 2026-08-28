@@ -108,10 +108,10 @@ describe("feature composition (compile-time plugins)", () => {
     expect(withoutHealth.features.some((feature) => feature.id === "health")).toBe(false);
   });
 
-  it("composes resource scopes from feature manifests", () => {
+  it("composes authorization resources from feature manifests", () => {
     const composed = composeFeatures(enabledFeatures);
-    expect(composed.resourceScopes.users).toBe("organization");
-    expect(composed.resourceScopes.audit).toBe("platform");
-    expect(composed.resourceScopes.files).toBe("organization");
+    expect(composed.authorization.resources.users?.scope).toBe("organization");
+    expect(composed.authorization.resources.audit?.scope).toBe("platform");
+    expect(composed.authorization.resources.files?.scope).toBe("organization");
   });
 });

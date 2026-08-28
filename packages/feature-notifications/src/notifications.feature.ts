@@ -17,9 +17,6 @@ export const notificationsFeature: FeatureManifest = defineFeature({
   id: "notifications",
   dependsOn: ["jobs", "users", "organizations", "user-preferences", "audit"],
   nestModule: NotificationsModule,
-  resourceScopes: {
-    notifications: "organization",
-  },
   authorization: {
     resources: {
       notifications: {

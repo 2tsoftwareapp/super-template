@@ -8,7 +8,9 @@
     "./contracts": "./src/public/contracts.ts",
     "./testing": "./src/testing/index.ts",
     "./schema": "./src/infrastructure/persistence/index.ts",
-    "./module": "./src/users.module.ts"
+    "./module": "./src/users.module.ts",
+    "./management": "./src/user-management.feature.ts",
+    "./management-module": "./src/user-management.module.ts"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json --noEmit",

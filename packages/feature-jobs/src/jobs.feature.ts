@@ -13,9 +13,6 @@ export const jobsFeature: FeatureManifest = defineFeature({
   id: "jobs",
   dependsOn: ["activities", "users"],
   nestModule: JobsModule,
-  resourceScopes: {
-    jobs: "platform",
-  },
   authorization: {
     resources: {
       jobs: {

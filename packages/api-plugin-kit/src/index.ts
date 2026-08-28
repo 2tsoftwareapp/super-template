@@ -3,7 +3,6 @@ export {
   collectFeatureSeeders,
   type ComposedFeatures,
   composeFeaturePermissions,
-  composeFeatureResourceScopes,
   composeFeatures,
   composeFeatureSchemas,
   defineFeature,

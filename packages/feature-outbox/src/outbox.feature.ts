@@ -8,7 +8,6 @@ export const outboxFeature: FeatureManifest = defineFeature({
   dependsOn: [],
   provides: ["outbox"],
   nestModule: OutboxModule,
-  resourceScopes: {},
   schema: { outboxMessages },
   outboxHandlers: [],
 });

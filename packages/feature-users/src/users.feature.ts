@@ -9,9 +9,6 @@ export const usersFeature: FeatureManifest = defineFeature({
   dependsOn: ["settings", "activities", "audit", "outbox"],
   provides: ["user-credential-store"],
   nestModule: UsersModule,
-  resourceScopes: {
-    users: "organization",
-  },
   authorization: {
     resources: {
       users: {

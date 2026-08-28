@@ -6,7 +6,7 @@
  *
  *   - the source property name,
  *   - the physical column name,
- *   - presence of `.references(() => targetExport.targetProperty, { onDelete: ... })`,
+ *   - presence of `.references(() => targetTableExport.targetProperty, { onDelete: ... })`,
  *   - the referenced table export resolves to the expected source file and
  *     exports the same property name,
  *   - required nullability (.notNull() / .primaryKey() / no .notNull() chain),
@@ -32,14 +32,14 @@ import ts from "typescript";
 /**
  * @typedef {{
  *   sourceFile: string,
+ *   sourceTableExport: string,
  *   propertyName: string,
  *   physicalColumn: string,
  *   targetFile: string,
- *   targetExport: string,
+ *   targetTableExport: string,
  *   targetProperty: string,
  *   nullable: boolean,
  *   onDelete: "cascade" | "set null" | "restrict" | "no action",
- *   expectedCount: number,
  * }} FkCheck
  */
 
@@ -70,60 +70,94 @@ export function validateForeignKeys(file, sourceText, checks, resolveImport) {
     file,
     sourceText,
     ts.ScriptTarget.ESNext,
-    /* setParentNodes */ true,
+    true,
     ts.ScriptKind.TS,
   );
-
   /** @type {FkFailure[]} */
   const failures = [];
-
-  /** @type {Map<string, FkCheck[]>} */
-  const byProperty = new Map();
   for (const check of checks) {
-    const list = byProperty.get(check.propertyName) ?? [];
-    list.push(check);
-    byProperty.set(check.propertyName, list);
-  }
-
-  for (const [property, list] of byProperty) {
-    const expectedTotal = list.reduce((sum, c) => sum + c.expectedCount, 0);
-    const found = collectColumnDeclarations(sourceFile, property);
-    if (found.length !== expectedTotal) {
-      for (const check of list) {
-        if (found.length !== check.expectedCount) {
-          failures.push({
-            file,
-            property,
-            reason:
-              `expected ${check.expectedCount} column declaration(s) named "${property}", ` +
-              `found ${found.length} in ${file}.`,
-            expected: check,
-          });
-        }
-      }
+    const sourceTableExport = check.sourceTableExport ?? inferSourceTable(file, check);
+    const table = findExportedPgTable(sourceFile, sourceTableExport);
+    if (!table) {
+      failures.push({
+        file,
+        property: check.propertyName,
+        reason: `source table "${sourceTableExport}" is not an exported pgTable.`,
+        expected: check,
+      });
       continue;
     }
-    // Flatten the checks into a queue of check instances, each consumed
-    // once per declaration it covers (expectedCount times).
-    /** @type {FkCheck[]} */
-    const queue = [];
-    for (const c of list) {
-      for (let i = 0; i < c.expectedCount; i += 1) queue.push(c);
+    const columns = table.arguments[1];
+    const decl =
+      columns && ts.isObjectLiteralExpression(columns)
+        ? columns.properties.find(
+            (p) =>
+              ts.isPropertyAssignment(p) &&
+              ts.isIdentifier(p.name) &&
+              p.name.text === check.propertyName,
+          )
+        : undefined;
+    if (!decl || !ts.isPropertyAssignment(decl)) {
+      failures.push({
+        file,
+        property: check.propertyName,
+        reason: `expected property "${check.propertyName}" in table "${sourceTableExport}" was not found.`,
+        expected: check,
+      });
+      continue;
     }
-    for (let i = 0; i < found.length; i += 1) {
-      const decl = found[i];
-      const check = queue[i];
-      if (!check || !decl) {
-        failures.push({ file, property, reason: `internal: queue/decl mismatch at ${i}` });
-        continue;
-      }
-      const fail = checkColumnDeclaration(file, decl, check, resolveImport);
-      if (fail) {
-        failures.push(fail);
-      }
-    }
+    const fail = checkColumnDeclaration(file, decl, check, resolveImport);
+    if (fail) failures.push(fail);
   }
   return failures;
+}
+
+function inferSourceTable(file, check) {
+  const base = file.replace(/\\/g, "/");
+  if (base.endsWith("organization-members.ts")) return "organizationMembers";
+  if (base.endsWith("user-roles.ts")) return "userRoles";
+  if (base.endsWith("access-control.ts"))
+    return check.propertyName === "organizationId"
+      ? "roles"
+      : check.propertyName === "permissionId"
+        ? "rolePermissions"
+        : "rolePermissions";
+  if (base.endsWith("auth.ts")) return "authSessions";
+  if (base.endsWith("two-factor.ts")) return "userTwoFactorSecrets";
+
+  if (base.endsWith("notifications.ts"))
+    return check.propertyName === "organizationId" && check.nullable
+      ? "notificationJobs"
+      : check.propertyName === "actorId" || check.propertyName === "targetUserId"
+        ? "notificationJobs"
+        : "notifications";
+  if (base.endsWith("users.ts")) return "users";
+  if (base.endsWith("organizations.ts")) return "organizations";
+  if (base.endsWith("files.ts")) return "files";
+  if (base.endsWith("sso.ts")) return "externalIdentities";
+  if (base.endsWith("preferences.ts")) return "userPreferences";
+  return undefined;
+}
+
+function findExportedPgTable(sourceFile, exportName) {
+  for (const statement of sourceFile.statements) {
+    if (
+      !ts.isVariableStatement(statement) ||
+      !statement.modifiers?.some((m) => m.kind === ts.SyntaxKind.ExportKeyword)
+    )
+      continue;
+    for (const declaration of statement.declarationList.declarations) {
+      if (
+        ts.isIdentifier(declaration.name) &&
+        declaration.name.text === exportName &&
+        ts.isCallExpression(declaration.initializer) &&
+        ts.isIdentifier(declaration.initializer.expression) &&
+        declaration.initializer.expression.text === "pgTable"
+      )
+        return declaration.initializer;
+    }
+  }
+  return undefined;
 }
 
 /**
@@ -135,7 +169,11 @@ function collectColumnDeclarations(sourceFile, property) {
   /** @type {ts.PropertyAssignment[]} */
   const out = [];
   const visit = (node) => {
-    if (ts.isPropertyAssignment(node) && ts.isIdentifier(node.name) && node.name.text === property) {
+    if (
+      ts.isPropertyAssignment(node) &&
+      ts.isIdentifier(node.name) &&
+      node.name.text === property
+    ) {
       out.push(node);
     }
     ts.forEachChild(node, visit);
@@ -152,6 +190,7 @@ function collectColumnDeclarations(sourceFile, property) {
  * @returns {FkFailure | null}
  */
 function checkColumnDeclaration(file, decl, check, resolveImport) {
+  const targetTableExport = check.targetTableExport ?? check.targetExport;
   const initializer = decl.initializer;
   if (!initializer || !ts.isCallExpression(initializer)) {
     return {
@@ -209,16 +248,13 @@ function checkColumnDeclaration(file, decl, check, resolveImport) {
     };
   }
   const referencesCall = chain.find(
-    (c) =>
-      ts.isPropertyAccessExpression(c.expr) &&
-      c.expr.name.text === "references",
+    (c) => ts.isPropertyAccessExpression(c.expr) && c.expr.name.text === "references",
   );
   if (!referencesCall) {
     return {
       file,
       property: check.propertyName,
-      reason:
-        `${check.propertyName}: missing .references(() => ${check.targetExport}.${check.targetProperty}, { onDelete: "${check.onDelete}" }) chain.`,
+      reason: `${check.propertyName}: missing .references(() => ${targetTableExport}.${check.targetProperty}, { onDelete: "${check.onDelete}" }) chain.`,
       expected: check,
     };
   }
@@ -231,7 +267,7 @@ function checkColumnDeclaration(file, decl, check, resolveImport) {
       expected: check,
     };
   }
-  // First argument: () => targetExport.targetProperty
+  // First argument: () => targetTableExport.targetProperty
   const arrow = args[0];
   if (!arrow || !ts.isArrowFunction(arrow)) {
     return {
@@ -250,12 +286,12 @@ function checkColumnDeclaration(file, decl, check, resolveImport) {
       expected: check,
     };
   }
-  if (!ts.isIdentifier(body.expression) || body.expression.text !== check.targetExport) {
+  if (!ts.isIdentifier(body.expression) || body.expression.text !== targetTableExport) {
     return {
       file,
       property: check.propertyName,
       reason:
-        `${check.propertyName}: .references() target table expected "${check.targetExport}", ` +
+        `${check.propertyName}: .references() target table expected "${targetTableExport}", ` +
         `found "${ts.isIdentifier(body.expression) ? body.expression.text : "(not an identifier)"}".`,
       expected: check,
     };
@@ -276,8 +312,7 @@ function checkColumnDeclaration(file, decl, check, resolveImport) {
     return {
       file,
       property: check.propertyName,
-      reason:
-        `${check.propertyName}: .references() missing options object { onDelete: "${check.onDelete}" }.`,
+      reason: `${check.propertyName}: .references() missing options object { onDelete: "${check.onDelete}" }.`,
       expected: check,
     };
   }
@@ -306,8 +341,16 @@ function checkColumnDeclaration(file, decl, check, resolveImport) {
   // Verify the import path resolves to the expected target file. Both sides
   // are normalized to forward-slash absolute paths without the `.ts`
   // extension before comparison.
-  const resolved = resolveImport(check.targetExport);
-  if (resolved) {
+  const resolved = resolveImport(targetTableExport);
+  if (!resolved) {
+    return {
+      file,
+      property: check.propertyName,
+      reason: `${check.propertyName}: target import for "${targetTableExport}" cannot be resolved.`,
+      expected: check,
+    };
+  }
+  {
     const normalize = (p) => p.replace(/\\/g, "/").replace(/\.ts$/, "");
     // If the caller supplied a relative targetFile (e.g. "packages/..."),
     // resolve it against the current working directory. The validator is
@@ -321,7 +364,7 @@ function checkColumnDeclaration(file, decl, check, resolveImport) {
         file,
         property: check.propertyName,
         reason:
-          `${check.propertyName}: target table "${check.targetExport}" resolved to ${resolved}, ` +
+          `${check.propertyName}: target table "${targetTableExport}" resolved to ${resolved}, ` +
           `expected ${check.targetFile}.`,
         expected: check,
       };
@@ -345,7 +388,10 @@ function readChain(outermost) {
   /** @type {ts.CallExpression | null} */
   let current = outermost;
   while (current) {
-    out.push({ expr: /** @type {ts.LeftHandSideExpression} */ (current.expression), args: current.arguments });
+    out.push({
+      expr: /** @type {ts.LeftHandSideExpression} */ (current.expression),
+      args: current.arguments,
+    });
     const expr = current.expression;
     if (ts.isCallExpression(expr)) {
       current = expr;
@@ -438,11 +484,7 @@ function followReExports(resolved, name, seen) {
         if (localName === name) {
           const base = dirname(resolved);
           const next = resolve(base, stmt.moduleSpecifier.text);
-          const candidates = [
-            next + ".ts",
-            resolve(next, "index.ts"),
-            next,
-          ];
+          const candidates = [next + ".ts", resolve(next, "index.ts"), next];
           for (const c of candidates) {
             if (existsSync(c)) {
               const followed = followReExports(c, el.name.text, seen);
@@ -478,7 +520,11 @@ export function buildImportResolver(file, sourceText) {
   /** @type {string[]} */
   const reExports = [];
   for (const stmt of sourceFile.statements) {
-    if (ts.isImportDeclaration(stmt) && stmt.moduleSpecifier && ts.isStringLiteral(stmt.moduleSpecifier)) {
+    if (
+      ts.isImportDeclaration(stmt) &&
+      stmt.moduleSpecifier &&
+      ts.isStringLiteral(stmt.moduleSpecifier)
+    ) {
       const spec = stmt.moduleSpecifier.text;
       const clause = stmt.importClause;
       if (clause) {
@@ -500,6 +546,16 @@ export function buildImportResolver(file, sourceText) {
   }
   /** @type {Map<string, string>} */
   const resolved = new Map();
+  for (const stmt of sourceFile.statements) {
+    if (
+      ts.isVariableStatement(stmt) &&
+      stmt.modifiers?.some((m) => m.kind === ts.SyntaxKind.ExportKeyword)
+    ) {
+      for (const declaration of stmt.declarationList.declarations) {
+        if (ts.isIdentifier(declaration.name)) resolved.set(declaration.name.text, file);
+      }
+    }
+  }
   const repoRoot = process.cwd();
   const resolveSpec = (spec) => {
     if (spec.startsWith("@repo/")) {
@@ -544,11 +600,13 @@ export function buildImportResolver(file, sourceText) {
           if (typeof target === "string") {
             return resolve(pkgDir, target);
           }
-        } catch {
-          /* ignore parse errors */
+        } catch (error) {
+          throw new Error(
+            `Cannot parse package exports at ${pkgJson}: ${error instanceof Error ? error.message : String(error)}`,
+          );
         }
       }
-      return resolve(pkgDir, "src", sub || "index");
+      return undefined;
     }
     const base = dirname(resolve(repoRoot, file));
     const abs = resolve(base, spec);

@@ -7,5 +7,4 @@ export const auditExportFeature: FeatureManifest = defineFeature({
   dependsOn: ["audit", "upload"],
   provides: ["audit-export"],
   nestModule: AuditExportModule,
-  resourceScopes: {},
 });

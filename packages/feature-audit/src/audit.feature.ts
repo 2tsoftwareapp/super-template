@@ -7,9 +7,6 @@ export const auditFeature: FeatureManifest = defineFeature({
   id: "audit",
   dependsOn: [],
   nestModule: AuditModule,
-  resourceScopes: {
-    audit: "platform",
-  },
   authorization: {
     resources: {
       audit: {

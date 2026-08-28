@@ -1,10 +1,21 @@
 import { describe, expect, it } from "vitest";
 
 import { execFileSync } from "node:child_process";
+import { existsSync } from "node:fs";
 import { readFile, writeFile } from "node:fs/promises";
-import { resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
 
-const repoRoot = resolve(process.cwd(), "..", "..");
+const findRepoRoot = (start: string): string => {
+  let current = resolve(start);
+  while (true) {
+    if (existsSync(join(current, "scripts/check-schema.mjs"))) return current;
+    const parent = dirname(current);
+    if (parent === current) throw new Error("Unable to locate repository root");
+    current = parent;
+  }
+};
+
+const repoRoot = findRepoRoot(process.cwd());
 const committedMigrationsDir = resolve(repoRoot, "apps/api/migrations");
 
 const runDriftCheck = () => {
@@ -80,8 +91,8 @@ describe("Schema drift check (committed migration comparison)", () => {
     );
     const original = await readFile(target, "utf8");
     const mutated = original.replace(
-      'userId: uuid("user_id")\n    .notNull()\n    .references',
-      'userId: uuid("user_id")\n    .references',
+      /userId: uuid\("user_id"\)\s*\.notNull\(\)\s*\.references/,
+      'userId: uuid("user_id").references',
     );
     expect(mutated).not.toBe(original);
     await writeFile(target, mutated);

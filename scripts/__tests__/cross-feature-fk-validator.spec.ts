@@ -1,3 +1,6 @@
+import { fileURLToPath } from "node:url";
+import { dirname, resolve } from "node:path";
+
 import { describe, expect, it } from "vitest";
 
 import {
@@ -21,26 +24,23 @@ export const organizationMembers = pgTable("r_organization_members", {
 });
 `;
 
-const repoRoot = "/home/vietis/orca/workspaces/super-template/main";
+const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const check: FkCheck = {
   sourceFile: "fixture.ts",
+  sourceTableExport: "organizationMembers",
   propertyName: "userId",
   physicalColumn: "user_id",
   targetFile: `${repoRoot}/packages/feature-users/src/infrastructure/persistence/users.ts`,
-  targetExport: "users",
+  targetTableExport: "users",
   targetProperty: "id",
   nullable: false,
   onDelete: "cascade",
-  expectedCount: 1,
 };
 
 const buildResolver = () => {
-  const repoRoot = "/home/vietis/orca/workspaces/super-template/main";
+  const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
   const map = new Map<string, string>([
-    [
-      "users",
-      `${repoRoot}/packages/feature-users/src/infrastructure/persistence/users.ts`,
-    ],
+    ["users", `${repoRoot}/packages/feature-users/src/infrastructure/persistence/users.ts`],
     [
       "organizations",
       `${repoRoot}/packages/feature-organizations/src/infrastructure/persistence/organizations.ts`,
@@ -56,8 +56,10 @@ describe("FK guard: pure validation", () => {
   });
 
   it("rejects when .references() is removed", () => {
-    const mutated = fixture
-      .replace(".notNull()\n    .references(() => users.id, { onDelete: \"cascade\" })", ".notNull()");
+    const mutated = fixture.replace(
+      '.notNull()\n    .references(() => users.id, { onDelete: "cascade" })',
+      ".notNull()",
+    );
     const failures = validateForeignKeys("fixture.ts", mutated, [check], buildResolver());
     expect(failures.length).toBeGreaterThan(0);
     expect(failures[0]?.reason).toMatch(/missing \.references/);
@@ -85,10 +87,7 @@ describe("FK guard: pure validation", () => {
   });
 
   it("rejects when onDelete action is altered", () => {
-    const mutated = fixture.replace(
-      '{ onDelete: "cascade" }',
-      '{ onDelete: "set null" }',
-    );
+    const mutated = fixture.replace('{ onDelete: "cascade" }', '{ onDelete: "set null" }');
     const failures = validateForeignKeys("fixture.ts", mutated, [check], buildResolver());
     expect(failures.length).toBeGreaterThan(0);
     expect(failures[0]?.reason).toMatch(/onDelete expected "cascade"/);
@@ -106,35 +105,31 @@ export const notificationJobs = pgTable("w_notification_jobs", {
 });
 `;
     const map = new Map<string, string>([
-      [
-        "users",
-        `${repoRoot}/packages/feature-users/src/infrastructure/persistence/users.ts`,
-      ],
+      ["users", `${repoRoot}/packages/feature-users/src/infrastructure/persistence/users.ts`],
     ]);
     const actorCheck: FkCheck = {
       sourceFile: "fixture.ts",
+      sourceTableExport: "notificationJobs",
       propertyName: "actorId",
       physicalColumn: "actor_id",
       targetFile: `${repoRoot}/packages/feature-users/src/infrastructure/persistence/users.ts`,
-      targetExport: "users",
+      targetTableExport: "users",
       targetProperty: "id",
       nullable: true,
       onDelete: "set null",
-      expectedCount: 1,
     };
     // Remove the entire actorId line (including the trailing comma on the next property).
     const idx = nfFixture.indexOf("actorId:");
-    const withoutActor = nfFixture.slice(0, idx) + nfFixture.slice(nfFixture.indexOf("\n", idx) + 1).slice(nfFixture.indexOf("actorId:") + 8);
+    const withoutActor =
+      nfFixture.slice(0, idx) +
+      nfFixture.slice(nfFixture.indexOf("\n", idx) + 1).slice(nfFixture.indexOf("actorId:") + 8);
     // Simpler: just remove the actorId line text including newline.
     const withoutActorLine = nfFixture
       .split("\n")
       .filter((l) => !l.includes("actorId:"))
       .join("\n");
-    const failures = validateForeignKeys(
-      "fixture.ts",
-      withoutActorLine,
-      [actorCheck],
-      (n) => map.get(n),
+    const failures = validateForeignKeys("fixture.ts", withoutActorLine, [actorCheck], (n) =>
+      map.get(n),
     );
     expect(failures.length).toBeGreaterThan(0);
   });
@@ -150,31 +145,25 @@ export const notificationJobs = pgTable("w_notification_jobs", {
 });
 `;
     const map = new Map<string, string>([
-      [
-        "users",
-        `${repoRoot}/packages/feature-users/src/infrastructure/persistence/users.ts`,
-      ],
+      ["users", `${repoRoot}/packages/feature-users/src/infrastructure/persistence/users.ts`],
     ]);
     const targetCheck: FkCheck = {
       sourceFile: "fixture.ts",
+      sourceTableExport: "notificationJobs",
       propertyName: "targetUserId",
       physicalColumn: "target_user_id",
       targetFile: `${repoRoot}/packages/feature-users/src/infrastructure/persistence/users.ts`,
-      targetExport: "users",
+      targetTableExport: "users",
       targetProperty: "id",
       nullable: true,
       onDelete: "set null",
-      expectedCount: 1,
     };
     const withoutTargetLine = nfFixture
       .split("\n")
       .filter((l) => !l.includes("targetUserId:"))
       .join("\n");
-    const failures = validateForeignKeys(
-      "fixture.ts",
-      withoutTargetLine,
-      [targetCheck],
-      (n) => map.get(n),
+    const failures = validateForeignKeys("fixture.ts", withoutTargetLine, [targetCheck], (n) =>
+      map.get(n),
     );
     expect(failures.length).toBeGreaterThan(0);
   });
@@ -200,12 +189,59 @@ describe("FK guard: import resolver follows re-exports", () => {
     const text = `import { users } from "@repo/feature-users/schema";`;
     // Pass an absolute source file path so the resolver can find packages/.
     const resolver = buildImportResolver(
-      "/home/vietis/orca/workspaces/super-template/main/packages/feature-organizations/src/x.ts",
+      resolve(repoRoot, "packages/feature-organizations/src/x.ts"),
       text,
     );
     const resolved = resolver("users");
     expect(resolved).toBe(
-      "/home/vietis/orca/workspaces/super-template/main/packages/feature-users/src/infrastructure/persistence/users.ts",
+      resolve(repoRoot, "packages/feature-users/src/infrastructure/persistence/users.ts"),
     );
+  });
+});
+
+describe("FK guard: exact source-table ownership", () => {
+  it("rejects removal of one same-named property from a different table", () => {
+    const source = `import { organizations } from "@repo/feature-organizations/schema";
+import { pgTable, uuid } from "drizzle-orm/pg-core";
+export const first = pgTable("first", {
+  organizationId: uuid("organization_id").references(() => organizations.id, { onDelete: "cascade" }),
+});
+export const second = pgTable("second", {
+  organizationId: uuid("organization_id").references(() => organizations.id, { onDelete: "cascade" }),
+});`;
+    const checks = [
+      {
+        sourceFile: "fixture.ts",
+        sourceTableExport: "first",
+        propertyName: "organizationId",
+        physicalColumn: "organization_id",
+        targetFile: resolve(
+          repoRoot,
+          "packages/feature-organizations/src/infrastructure/persistence/organizations.ts",
+        ),
+        targetTableExport: "organizations",
+        targetProperty: "id",
+        nullable: true,
+        onDelete: "cascade",
+      },
+      {
+        sourceFile: "fixture.ts",
+        sourceTableExport: "second",
+        propertyName: "organizationId",
+        physicalColumn: "organization_id",
+        targetFile: resolve(
+          repoRoot,
+          "packages/feature-organizations/src/infrastructure/persistence/organizations.ts",
+        ),
+        targetTableExport: "organizations",
+        targetProperty: "id",
+        nullable: true,
+        onDelete: "cascade",
+      },
+    ];
+    const removed = source.split("export const second")[0] ?? source;
+    const failures = validateForeignKeys("fixture.ts", removed, checks, buildResolver());
+    expect(failures).toHaveLength(1);
+    expect(failures[0]?.reason).toMatch(/source table "second"/);
   });
 });

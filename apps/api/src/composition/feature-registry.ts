@@ -18,6 +18,7 @@ import { ssoFeature } from "@repo/feature-sso";
 import { uploadFeature } from "@repo/feature-upload";
 import { userPreferencesFeature } from "@repo/feature-user-preferences";
 import { usersFeature } from "@repo/feature-users";
+import { userManagementFeature } from "@repo/feature-users/management";
 
 /**
  * Explicit compile-time feature registry for the API host.
@@ -28,6 +29,7 @@ export const enabledFeatures: readonly FeatureManifest[] = [
   authFeature,
   organizationsFeature,
   usersFeature,
+  userManagementFeature,
   mfaFeature,
   ssoFeature,
   userPreferencesFeature,
