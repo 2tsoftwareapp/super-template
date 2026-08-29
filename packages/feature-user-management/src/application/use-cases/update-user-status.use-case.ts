@@ -5,9 +5,17 @@ import type { UserStatus, UserView } from "@repo/feature-users/contracts";
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { ERROR_CODES } from "@repo/api-runtime";
 import { AppError, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
-import { ROLE_NAMES, USER_ACCESS_CONTROL, type UserAccessControl } from "@repo/feature-access-control/contracts";
+import {
+  ROLE_NAMES,
+  USER_ACCESS_CONTROL,
+  type UserAccessControl,
+} from "@repo/feature-access-control/contracts";
 import { ACTIVITY_EMITTER, type ActivityEmitter } from "@repo/feature-activities/contracts";
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
+import {
+  ORGANIZATION_MEMBERSHIP,
+  type OrganizationMembership,
+} from "@repo/feature-organizations/contracts";
 import { OUTBOX_APPENDER, type OutboxAppenderPort } from "@repo/feature-outbox/contracts";
 import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "@repo/feature-users/contracts";
@@ -23,6 +31,8 @@ export class UpdateUserStatusUseCase {
     private readonly usersRepository: UsersRepositoryPort,
     @Inject(USER_ACCESS_CONTROL)
     private readonly accessControlService: UserAccessControl,
+    @Inject(ORGANIZATION_MEMBERSHIP)
+    private readonly membership: OrganizationMembership,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
     @Inject(OUTBOX_APPENDER) private readonly outbox: OutboxAppenderPort,
     @Inject(ACTIVITY_EMITTER) private readonly activityEmitter: ActivityEmitter,
@@ -35,12 +45,7 @@ export class UpdateUserStatusUseCase {
     status: UserStatus,
     requestContext?: RequestContext,
   ): Promise<UserView> {
-    await assertUserBelongsToOrganization(
-      (targetUserId, organizationId) =>
-        this.usersRepository.isUserInOrganization(targetUserId, organizationId),
-      actor,
-      userId,
-    );
+    await assertUserBelongsToOrganization(this.membership, actor, userId);
 
     const user = await this.usersRepository.findById(userId);
 

@@ -25,7 +25,6 @@ function buildDependencies(
   };
 
   const usersRepository = {
-    isUserInOrganization: vi.fn(async () => true),
     findById: vi.fn(async (): Promise<typeof target | null> => target),
     update: vi.fn(async () => target),
   };
@@ -35,11 +34,22 @@ function buildDependencies(
     assertCanManageUserAccount: vi.fn(() => undefined),
   };
 
-  const auditWriter = { log: vi.fn(async () => undefined) };
-  const authTokenCleanup = {
-    cleanupExpiredTokens: vi.fn(async () => undefined),
-    revokeAllSessionsForUser: vi.fn(async () => undefined),
+  const membership = {
+    findMembership: vi.fn(async () => ({ role: "MEMBER" })),
+    listForUser: vi.fn(async () => []),
+    findUserIdsForOrganization: vi.fn(async () => []),
+    addMember: vi.fn(async () => null),
+    removeMember: vi.fn(async () => null),
+    updateMemberRole: vi.fn(async () => null),
+    countOwners: vi.fn(async () => 1),
+    countMembers: vi.fn(async () => 1),
+    listMembers: vi.fn(async () => []),
+    deleteByOrganizationId: vi.fn(async () => undefined),
+    findPrimaryOrganizationId: vi.fn(async () => null),
+    upsertMember: vi.fn(async () => null),
   };
+
+  const auditWriter = { log: vi.fn(async () => undefined) };
   const outbox = { append: vi.fn(async () => undefined) };
   const activityEmitter = { emit: vi.fn(async () => undefined) };
   const getUserUseCase = {
@@ -59,6 +69,7 @@ function buildDependencies(
     transactionPort as never,
     usersRepository as never,
     accessControlService as never,
+    membership as never,
     auditWriter as never,
     outbox as never,
     activityEmitter as never,
@@ -70,9 +81,9 @@ function buildDependencies(
     usersRepository,
     accessControlService,
     auditWriter,
-    authTokenCleanup,
     outbox,
     activityEmitter,
+    membership,
   };
 }
 
@@ -96,7 +107,7 @@ describe("UpdateUserStatusUseCase", () => {
   });
 
   it("revokes all sessions and writes an audit log when blocking", async () => {
-    const { useCase, auditWriter, authTokenCleanup, activityEmitter, outbox } = buildDependencies();
+    const { useCase, auditWriter, activityEmitter, outbox } = buildDependencies();
 
     await useCase.execute(actor as never, "user-1", "BLOCKED");
 

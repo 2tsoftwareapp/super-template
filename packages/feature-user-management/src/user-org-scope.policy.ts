@@ -1,4 +1,5 @@
 import type { AuthenticatedRequestUser } from "@repo/api-runtime";
+import type { OrganizationMembership } from "@repo/feature-organizations/contracts";
 
 import { AppError, ERROR_CODES, ROLE_NAMES } from "@repo/api-runtime";
 
@@ -37,7 +38,7 @@ export function assertActorHasOrganizationContext(actor: AuthenticatedRequestUse
 }
 
 export async function assertUserBelongsToOrganization(
-  isMember: (userId: string, organizationId: string) => Promise<boolean>,
+  membership: OrganizationMembership,
   actor: AuthenticatedRequestUser,
   targetUserId: string,
 ): Promise<void> {
@@ -46,9 +47,9 @@ export async function assertUserBelongsToOrganization(
   }
 
   const organizationId = assertActorHasOrganizationContext(actor);
-  const belongs = await isMember(targetUserId, organizationId);
+  const record = await membership.findMembership(organizationId, targetUserId);
 
-  if (!belongs) {
+  if (!record) {
     throw new AppError(
       ERROR_CODES.AUTH_FORBIDDEN,
       "You can only manage users in your organization",

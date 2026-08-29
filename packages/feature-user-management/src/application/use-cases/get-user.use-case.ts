@@ -2,8 +2,15 @@ import type { UserView } from "@repo/feature-users/contracts";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { AppError, type AuthenticatedRequestUser } from "@repo/api-runtime";
-import { ROLE_NAMES, USER_ACCESS_CONTROL, type UserAccessControl } from "@repo/feature-access-control/contracts";
-import { ORGANIZATION_MEMBERSHIP, type OrganizationMembership } from "@repo/feature-organizations/contracts";
+import {
+  ROLE_NAMES,
+  USER_ACCESS_CONTROL,
+  type UserAccessControl,
+} from "@repo/feature-access-control/contracts";
+import {
+  ORGANIZATION_MEMBERSHIP,
+  type OrganizationMembership,
+} from "@repo/feature-organizations/contracts";
 import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "@repo/feature-users/contracts";
 import { UsersMapper } from "@repo/feature-users/module";
@@ -30,12 +37,7 @@ export class GetUserUseCase {
     }
 
     if (actor) {
-      await assertUserBelongsToOrganization(
-        (targetUserId, organizationId) =>
-          this.usersRepository.isUserInOrganization(targetUserId, organizationId),
-        actor,
-        userId,
-      );
+      await assertUserBelongsToOrganization(this.membership, actor, userId);
     }
 
     const organizationId = actor

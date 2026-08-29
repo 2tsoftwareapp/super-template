@@ -47,24 +47,39 @@ describe("user-org-scope.policy", () => {
   });
 
   describe("assertUserBelongsToOrganization", () => {
+    const makeMembership = (isMember: boolean) => ({
+      findMembership: vi.fn().mockResolvedValue(isMember ? { role: "MEMBER" } : null),
+      listForUser: vi.fn().mockResolvedValue([]),
+      addMember: vi.fn().mockResolvedValue(null),
+      upsertMember: vi.fn().mockResolvedValue(null),
+      listMembers: vi.fn().mockResolvedValue([]),
+      findUserIdsForOrganization: vi.fn().mockResolvedValue([]),
+      countOwners: vi.fn().mockResolvedValue(1),
+      countMembers: vi.fn().mockResolvedValue(1),
+      updateMemberRole: vi.fn().mockResolvedValue(null),
+      removeMember: vi.fn().mockResolvedValue(null),
+      findPrimaryOrganizationId: vi.fn().mockResolvedValue(null),
+      deleteByOrganizationId: vi.fn().mockResolvedValue(undefined),
+    });
+
     it("allows SUPER_ADMIN regardless", async () => {
-      const isMember = vi.fn();
+      const membership = makeMembership(false);
       await expect(
-        assertUserBelongsToOrganization(isMember, superAdmin, "u1"),
+        assertUserBelongsToOrganization(membership as never, superAdmin, "u1"),
       ).resolves.toBeUndefined();
-      expect(isMember).not.toHaveBeenCalled();
+      expect(membership.findMembership).not.toHaveBeenCalled();
     });
     it("passes when user belongs to org", async () => {
-      const isMember = vi.fn().mockResolvedValue(true);
+      const membership = makeMembership(true);
       await expect(
-        assertUserBelongsToOrganization(isMember, orgAdmin, "u1"),
+        assertUserBelongsToOrganization(membership as never, orgAdmin, "u1"),
       ).resolves.toBeUndefined();
     });
     it("throws when user does not belong to org", async () => {
-      const isMember = vi.fn().mockResolvedValue(false);
-      await expect(assertUserBelongsToOrganization(isMember, orgAdmin, "u1")).rejects.toThrow(
-        AppError,
-      );
+      const membership = makeMembership(false);
+      await expect(
+        assertUserBelongsToOrganization(membership as never, orgAdmin, "u1"),
+      ).rejects.toThrow(AppError);
     });
   });
 });

@@ -2,7 +2,10 @@ import { Global, Module } from "@nestjs/common";
 import { AccessProfileCache } from "@repo/api-runtime";
 import { AppConfigModule } from "@repo/api-runtime";
 import {
-  ORGANIZATION_ACCESS_CONTROL, ORGANIZATION_CUSTOM_ROLES_PURGE, ORGANIZATION_USER_ROLES_PURGE, } from "@repo/feature-organizations/contracts";
+  ORGANIZATION_ACCESS_CONTROL,
+  ORGANIZATION_CUSTOM_ROLES_PURGE,
+  ORGANIZATION_USER_ROLES_PURGE,
+} from "@repo/feature-organizations/contracts";
 
 import { AccessControlMapper } from "./application/access-control.mapper";
 import { AccessControlService } from "./application/access-control.service";

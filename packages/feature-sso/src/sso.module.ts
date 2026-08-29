@@ -2,7 +2,7 @@ import { Global, Module } from "@nestjs/common";
 import { EnvironmentService } from "@repo/api-runtime";
 import { AccessControlModule } from "@repo/feature-access-control/contracts";
 import { AuthModule } from "@repo/feature-auth/module";
-import { OrganizationsModule } from "@repo/feature-organizations/contracts";
+import { OrganizationsModule } from "@repo/feature-organizations/module";
 import { UsersModule } from "@repo/feature-users/module";
 
 import {

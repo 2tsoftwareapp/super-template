@@ -6,7 +6,7 @@ import { AppError } from "@repo/api-runtime";
 import { AccessControlService } from "@repo/feature-access-control/contracts";
 import { AUTH_ERROR_CODES } from "@repo/feature-auth/contracts";
 import { AUTH_USER_STORE, type AuthUserStore } from "@repo/feature-auth/contracts";
-import { OrganizationsService } from "@repo/feature-organizations/contracts";
+import { OrganizationsService } from "@repo/feature-organizations/module";
 
 import type { RefreshSessionCommand } from "../auth.types";
 

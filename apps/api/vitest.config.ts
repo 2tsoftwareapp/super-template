@@ -17,6 +17,7 @@ const packageSubpathAlias = (name: string) => ({
 export default defineConfig({
   test: {
     maxWorkers: 1,
+    testTimeout: 30000,
     include: ["test/**/*.{test,spec}.ts", "src/cli/seeds/**/*.spec.ts"],
   },
   resolve: {

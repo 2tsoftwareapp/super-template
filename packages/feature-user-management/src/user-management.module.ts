@@ -17,9 +17,15 @@ import { UsersController } from "./presentation/users.controller";
   imports: [UsersModule],
   controllers: [AdminUsersController, UsersController],
   providers: [
-    GetUserUseCase, ListUsersUseCase, UpdateProfileUseCase, ChangePasswordUseCase,
-    CreateAdminUserUseCase, UpdateAdminUserUseCase, DeleteUserUseCase,
-    UpdateUserStatusUseCase,     ReplaceUserRolesUseCase,
+    GetUserUseCase,
+    ListUsersUseCase,
+    UpdateProfileUseCase,
+    ChangePasswordUseCase,
+    CreateAdminUserUseCase,
+    UpdateAdminUserUseCase,
+    DeleteUserUseCase,
+    UpdateUserStatusUseCase,
+    ReplaceUserRolesUseCase,
   ],
 })
 export class UserManagementModule {}

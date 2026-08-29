@@ -67,4 +67,7 @@ export interface UserAccessControl {
   ): void;
 
   assertCanManageUserAccount(actor: AuthenticatedRequestUser, targetRoleNames: string[]): void;
+
+  /** Get all user IDs who hold the named role within the given organization scope. */
+  getUserIdsForRole(roleName: string, organizationId?: string | null): Promise<string[]>;
 }

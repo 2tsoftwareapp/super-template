@@ -21,6 +21,7 @@ function createAdapter(
 
   const membership = {
     addMember: vi.fn(),
+    findUserIdsForOrganization: vi.fn(async () => []),
     ...overrides?.membership,
   } as never;
 
@@ -317,14 +318,14 @@ describe("UsersImportExportAdapter", () => {
       expect(usersRepo.list).toHaveBeenCalledWith({
         page: 1,
         limit: 1000,
-        organizationId: "org-1",
         sort: [{ field: "createdAt", order: "asc" }],
+        candidateUserIds: [],
       });
       expect(usersRepo.list).toHaveBeenCalledWith({
         page: 2,
         limit: 1000,
-        organizationId: "org-1",
         sort: [{ field: "createdAt", order: "asc" }],
+        candidateUserIds: [],
       });
 
       expect(result).toHaveLength(1500);

@@ -6,16 +6,30 @@ import type { CreateAdminUserCommand, UserView } from "@repo/feature-users/contr
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { ERROR_CODES } from "@repo/api-runtime";
 import { AppError, normalizeEmail, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
-import { ROLE_NAMES, USER_ACCESS_CONTROL, USER_PROFILE_INVALIDATOR, type UserAccessControl, type UserProfileInvalidator } from "@repo/feature-access-control/contracts";
+import {
+  ROLE_NAMES,
+  USER_ACCESS_CONTROL,
+  USER_PROFILE_INVALIDATOR,
+  type UserAccessControl,
+  type UserProfileInvalidator,
+} from "@repo/feature-access-control/contracts";
 import { ACTIVITY_EMITTER, type ActivityEmitter } from "@repo/feature-activities/contracts";
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
-import { ORGANIZATION_MEMBERSHIP, type OrganizationMemberRole, type OrganizationMembership, PERSONAL_ORGANIZATION_PROVIDER } from "@repo/feature-organizations/contracts";
+import {
+  ORGANIZATION_MEMBERSHIP,
+  type OrganizationMemberRole,
+  type OrganizationMembership,
+  PERSONAL_ORGANIZATION_PROVIDER,
+} from "@repo/feature-organizations/contracts";
 import { OUTBOX_APPENDER, type OutboxAppenderPort } from "@repo/feature-outbox/contracts";
 import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "@repo/feature-users/contracts";
 import { hashPassword } from "@repo/utils/password";
 
-import { assertCanAssignRoleTargets, assertRoleScopeCanBeAssigned } from "../../domain-role-assignment.policy";
+import {
+  assertCanAssignRoleTargets,
+  assertRoleScopeCanBeAssigned,
+} from "../../domain-role-assignment.policy";
 import { resolveRoleById } from "../assignable-role.resolver";
 import { GetUserUseCase } from "./get-user.use-case";
 

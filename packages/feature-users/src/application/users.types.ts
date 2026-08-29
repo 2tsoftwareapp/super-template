@@ -31,6 +31,7 @@ export interface UpdateProfileCommand {
   avatarFileId?: string | null;
 }
 
+/** HTTP-facing query parameters from the list-users endpoint. */
 export interface ListUsersQuery {
   page: number;
   limit: number;

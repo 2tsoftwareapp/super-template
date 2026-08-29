@@ -16,7 +16,6 @@ const findRepoRoot = (start: string): string => {
 };
 
 const repoRoot = findRepoRoot(process.cwd());
-const committedMigrationsDir = resolve(repoRoot, "apps/api/migrations");
 
 const runDriftCheck = () => {
   try {
@@ -42,16 +41,15 @@ describe("Schema drift check (committed migration comparison)", () => {
   });
 
   it("fails when a pgTable column loses its FK references()", async () => {
-    // Pick a stable, non-changing file to mutate, then restore it.
     const target = resolve(
       repoRoot,
       "packages/feature-organizations/src/infrastructure/persistence/organization-members.ts",
     );
     const original = await readFile(target, "utf8");
-    // Drop the .references() chain on the userId column.
+    // Drop the .references() chain on the userId column (multiline format).
     const mutated = original.replace(
-      /\n    userId: uuid\("user_id"\)\s*\n\s*\.notNull\(\)\s*\n\s*\.references\(\(\) => users\.id, \{ onDelete: "cascade" \}\),/m,
-      '\n    userId: uuid("user_id").notNull(),',
+      /userId: uuid\("user_id"\)\s*\n\s*\.notNull\(\)\s*\n\s*\.references\(\(\) => users\.id, \{ onDelete: "cascade" \}\),/,
+      'userId: uuid("user_id").notNull(),',
     );
     expect(mutated).not.toBe(original);
     await writeFile(target, mutated);
@@ -71,7 +69,7 @@ describe("Schema drift check (committed migration comparison)", () => {
     );
     const original = await readFile(target, "utf8");
     const mutated = original.replace(
-      /userId: uuid\("user_id"\)\s*\n\s*\.notNull\(\)\s*\n\s*\.references\(\(\) => users\.id, \{ onDelete: "cascade" \}\),/m,
+      /userId: uuid\("user_id"\)\s*\n\s*\.notNull\(\)\s*\n\s*\.references\(\(\) => users\.id, \{ onDelete: "cascade" \}\),/,
       'userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "set null" }),',
     );
     expect(mutated).not.toBe(original);
@@ -91,8 +89,8 @@ describe("Schema drift check (committed migration comparison)", () => {
     );
     const original = await readFile(target, "utf8");
     const mutated = original.replace(
-      /userId: uuid\("user_id"\)\s*\.notNull\(\)\s*\.references/,
-      'userId: uuid("user_id").references',
+      /userId: uuid\("user_id"\)\s*\n\s*\.notNull\(\)\s*\n\s*\.references/,
+      'userId: uuid("user_id")\n      .references',
     );
     expect(mutated).not.toBe(original);
     await writeFile(target, mutated);
@@ -110,9 +108,9 @@ describe("Schema drift check (committed migration comparison)", () => {
       "packages/feature-organizations/src/infrastructure/persistence/organization-members.ts",
     );
     const original = await readFile(target, "utf8");
-    // Remove the entire userId column declaration.
+    // Remove the entire userId column declaration (multiline).
     const mutated = original.replace(
-      /\n    userId: uuid\("user_id"\)\s*\n\s*\.notNull\(\)\s*\n\s*\.references\(\(\) => users\.id, \{ onDelete: "cascade" \}\),/m,
+      /    userId: uuid\("user_id"\)\s*\n\s*\.notNull\(\)\s*\n\s*\.references\(\(\) => users\.id, \{ onDelete: "cascade" \}\),\n/,
       "",
     );
     expect(mutated).not.toBe(original);

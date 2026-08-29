@@ -2,7 +2,7 @@ import type { RequestContext } from "@repo/api-runtime";
 
 import { Inject, Injectable } from "@nestjs/common";
 import { AccessControlService } from "@repo/feature-access-control/contracts";
-import { OrganizationsService } from "@repo/feature-organizations/contracts";
+import { OrganizationsService } from "@repo/feature-organizations/module";
 
 import type { AuthUserModel } from "../models/auth-user";
 

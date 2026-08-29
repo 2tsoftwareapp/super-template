@@ -49,6 +49,7 @@
     "@repo/feature-mfa": "workspace:*",
     "@repo/feature-notifications": "workspace:*",
     "@repo/feature-organizations": "workspace:*",
+    "@repo/feature-organization-management": "workspace:*",
     "@repo/feature-outbox": "workspace:*",
     "@repo/feature-settings": "workspace:*",
     "@repo/feature-sso": "workspace:*",

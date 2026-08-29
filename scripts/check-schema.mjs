@@ -83,27 +83,8 @@ try {
       };
       const committedRaw = JSON.parse(await readFile(join(migrations, committedSnapshotPath), "utf8"));
       const producedRaw = JSON.parse(await readFile(join(output, producedSnapshotPath), "utf8"));
-      const migrationSql = (await Promise.all(committed.filter((entry) => entry.endsWith(".sql")).map((entry) => readFile(join(migrations, entry), "utf8")))).join("\n");
-      const renames = new Map([...migrationSql.matchAll(/ALTER TABLE\s+([a-z0-9_]+)\s+RENAME TO\s+([a-z0-9_]+)/gi)].map((match) => [match[1], match[2]]));
-      const reverseRenames = new Map([...renames].map(([oldName, newName]) => [newName, oldName]));
-      const canonicalizeGenerated = (value) => {
-        if (Array.isArray(value)) return value.map(canonicalizeGenerated);
-        if (typeof value === "string") {
-          let result = value;
-          for (const [newName, oldName] of reverseRenames) result = result.split(newName).join(oldName);
-          return result;
-        }
-        if (value && typeof value === "object") {
-          return Object.fromEntries(Object.entries(value).map(([key, child]) => [canonicalizeGenerated(key), canonicalizeGenerated(child)]));
-        }
-        return value;
-      };
-      const stripCrossFeatureForeignKeys = (snapshot) => ({
-        ...snapshot,
-        tables: Object.fromEntries(Object.entries(snapshot.tables ?? {}).map(([name, table]) => [name, { ...table, foreignKeys: {} }])),
-      });
-      const committedSnapshot = normalizeSnapshot(stripCrossFeatureForeignKeys(committedRaw));
-      const producedSnapshot = normalizeSnapshot(stripCrossFeatureForeignKeys(canonicalizeGenerated(producedRaw)));
+      const committedSnapshot = normalizeSnapshot(committedRaw);
+      const producedSnapshot = normalizeSnapshot(producedRaw);
       if (JSON.stringify(committedSnapshot) !== JSON.stringify(producedSnapshot)) {
         await writeFile("/tmp/committed-schema.json", JSON.stringify(committedSnapshot, null, 2));
         await writeFile("/tmp/produced-schema.json", JSON.stringify(producedSnapshot, null, 2));

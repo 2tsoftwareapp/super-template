@@ -5,13 +5,26 @@ import type { UserView } from "@repo/feature-users/contracts";
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { ERROR_CODES } from "@repo/api-runtime";
 import { AppError, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
-import { ROLE_NAMES, USER_ACCESS_CONTROL, USER_PROFILE_INVALIDATOR, type UserAccessControl, type UserProfileInvalidator } from "@repo/feature-access-control/contracts";
+import {
+  ROLE_NAMES,
+  USER_ACCESS_CONTROL,
+  USER_PROFILE_INVALIDATOR,
+  type UserAccessControl,
+  type UserProfileInvalidator,
+} from "@repo/feature-access-control/contracts";
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
-import { ORGANIZATION_MEMBERSHIP, type OrganizationMemberRole, type OrganizationMembership } from "@repo/feature-organizations/contracts";
+import {
+  ORGANIZATION_MEMBERSHIP,
+  type OrganizationMemberRole,
+  type OrganizationMembership,
+} from "@repo/feature-organizations/contracts";
 import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "@repo/feature-users/contracts";
 
-import { assertCanAssignRoleTargets, assertRoleScopeCanBeAssigned } from "../../domain-role-assignment.policy";
+import {
+  assertCanAssignRoleTargets,
+  assertRoleScopeCanBeAssigned,
+} from "../../domain-role-assignment.policy";
 import { assertUserBelongsToOrganization } from "../../user-org-scope.policy";
 import { resolveRoleById } from "../assignable-role.resolver";
 import { GetUserUseCase } from "./get-user.use-case";
@@ -53,11 +66,7 @@ export class ReplaceUserRolesUseCase {
       );
     }
 
-    await assertUserBelongsToOrganization(
-      (targetUserId, orgId) => this.usersRepository.isUserInOrganization(targetUserId, orgId),
-      actor,
-      userId,
-    );
+    await assertUserBelongsToOrganization(this.membership, actor, userId);
 
     const actorIsSuperAdmin = actor.roles.includes(ROLE_NAMES.SUPER_ADMIN);
     const resolvedOrganizationId = actorIsSuperAdmin

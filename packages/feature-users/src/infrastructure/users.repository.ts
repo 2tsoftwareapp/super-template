@@ -2,22 +2,14 @@ import type { DatabaseClient, DatabaseExecutor } from "@repo/database-runtime";
 
 import { Inject, Injectable } from "@nestjs/common";
 import { DATABASE } from "@repo/database-runtime";
-import { and, asc, count, desc, eq, isNull, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 
-import type { UsersRepositoryPort } from "../application/ports/users.repository.port";
-import type { UserSortCriterion } from "../application/user-sort";
+import type {
+  UsersCoreListQuery,
+  UsersRepositoryPort,
+} from "../application/ports/users.repository.port";
 
 import { users } from "./persistence";
-
-interface ListUsersParams {
-  page: number;
-  limit: number;
-  search?: string;
-  status?: "PENDING" | "ACTIVE" | "BLOCKED";
-  role?: string;
-  organizationId?: string;
-  sort: UserSortCriterion[];
-}
 
 const USER_SORT_FIELDS = {
   createdAt: users.createdAt,
@@ -88,7 +80,7 @@ export class UsersRepository implements UsersRepositoryPort {
     );
   }
 
-  async list(params: ListUsersParams, executor: DatabaseExecutor = this.database) {
+  async list(params: UsersCoreListQuery, executor: DatabaseExecutor = this.database) {
     const filters = [isNull(users.deletedAt)];
 
     if (params.search) {
@@ -101,12 +93,15 @@ export class UsersRepository implements UsersRepositoryPort {
       filters.push(eq(users.status, params.status));
     }
 
-    if (params.role || params.organizationId) {
-      throw new Error("Role and organization filtering requires the user-management feature.");
+    if (params.candidateUserIds && params.candidateUserIds.length > 0) {
+      filters.push(inArray(users.id, params.candidateUserIds));
     }
 
     const sortClauses = params.sort.map((criterion) => {
-      const sortColumn = USER_SORT_FIELDS[criterion.field];
+      const sortColumn = USER_SORT_FIELDS[criterion.field as keyof typeof USER_SORT_FIELDS];
+      if (!sortColumn) {
+        throw new Error(`Invalid sort field: ${criterion.field}`);
+      }
       return criterion.order === "asc" ? asc(sortColumn) : desc(sortColumn);
     });
     const whereClause = filters.length > 0 ? and(...filters) : undefined;
@@ -128,16 +123,4 @@ export class UsersRepository implements UsersRepositoryPort {
       total: Number(totalRows[0]?.total ?? 0),
     };
   }
-
-  isUserInOrganization(
-    userId: string,
-    organizationId: string,
-    executor: DatabaseExecutor = this.database,
-  ) {
-    void userId;
-    void organizationId;
-    void executor;
-    return Promise.resolve(false);
-  }
-
 }

@@ -3,8 +3,16 @@ import type { UpdateAdminUserCommand, UserView } from "@repo/feature-users/contr
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { AppError, normalizeEmail, SYSTEM_SCOPE } from "@repo/api-runtime";
-import { ROLE_NAMES, USER_ACCESS_CONTROL, type UserAccessControl } from "@repo/feature-access-control/contracts";
+import {
+  ROLE_NAMES,
+  USER_ACCESS_CONTROL,
+  type UserAccessControl,
+} from "@repo/feature-access-control/contracts";
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
+import {
+  ORGANIZATION_MEMBERSHIP,
+  type OrganizationMembership,
+} from "@repo/feature-organizations/contracts";
 import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "@repo/feature-users/contracts";
 
@@ -18,6 +26,8 @@ export class UpdateAdminUserUseCase {
     private readonly usersRepository: UsersRepositoryPort,
     @Inject(USER_ACCESS_CONTROL)
     private readonly accessControlService: UserAccessControl,
+    @Inject(ORGANIZATION_MEMBERSHIP)
+    private readonly membership: OrganizationMembership,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
     private readonly getUserUseCase: GetUserUseCase,
   ) {}
@@ -28,12 +38,7 @@ export class UpdateAdminUserUseCase {
     input: UpdateAdminUserCommand,
     requestContext?: RequestContext,
   ): Promise<UserView> {
-    await assertUserBelongsToOrganization(
-      (targetUserId, organizationId) =>
-        this.usersRepository.isUserInOrganization(targetUserId, organizationId),
-      actor,
-      userId,
-    );
+    await assertUserBelongsToOrganization(this.membership, actor, userId);
 
     const user = await this.usersRepository.findById(userId);
 

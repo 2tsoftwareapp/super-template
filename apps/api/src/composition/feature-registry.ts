@@ -11,6 +11,7 @@ import { jobsFeature } from "@repo/feature-jobs";
 import { mailFeature } from "@repo/feature-mail";
 import { mfaFeature } from "@repo/feature-mfa";
 import { notificationsFeature } from "@repo/feature-notifications";
+import { organizationManagementFeature } from "@repo/feature-organization-management";
 import { organizationsFeature } from "@repo/feature-organizations";
 import { outboxFeature } from "@repo/feature-outbox";
 import { settingsFeature } from "@repo/feature-settings";
@@ -28,6 +29,7 @@ export const enabledFeatures: readonly FeatureManifest[] = [
   accessControlFeature,
   authFeature,
   organizationsFeature,
+  organizationManagementFeature,
   usersFeature,
   userManagementFeature,
   mfaFeature,

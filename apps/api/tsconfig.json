@@ -135,6 +135,15 @@
         "../../packages/feature-organizations/src/testing/index.ts"
       ],
       "@repo/feature-organizations/*": ["../../packages/feature-organizations/src/*"],
+      "@repo/feature-organization-management": [
+        "../../packages/feature-organization-management/src/organization-management.feature.ts"
+      ],
+      "@repo/feature-organization-management/module": [
+        "../../packages/feature-organization-management/src/organization-management.module.ts"
+      ],
+      "@repo/feature-organization-management/*": [
+        "../../packages/feature-organization-management/src/*"
+      ],
       "@repo/feature-settings": ["../../packages/feature-settings/src/settings.feature.ts"],
       "@repo/feature-settings/contracts": [
         "../../packages/feature-settings/src/public/contracts.ts"

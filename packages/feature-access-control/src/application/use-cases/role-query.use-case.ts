@@ -147,6 +147,10 @@ export class RoleQueryUseCase {
     };
   }
 
+  async getUserIdsForRole(roleId: string): Promise<string[]> {
+    return this.accessControlRepository.findUserIdsForRole(roleId);
+  }
+
   async listPermissions(actor?: AuthenticatedRequestUser): Promise<PermissionView[]> {
     const permissions = await this.accessControlRepository.findAllPermissions();
     const isSuperAdmin = actor?.roles.includes(ROLE_NAMES.SUPER_ADMIN) ?? false;

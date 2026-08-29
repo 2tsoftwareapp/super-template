@@ -24,7 +24,6 @@ const userRecord = {
 function makeUseCase() {
   const usersRepository = {
     findById: vi.fn(() => Promise.resolve(userRecord)),
-    isUserInOrganization: vi.fn(() => Promise.resolve(true)),
   };
   const accessControlService = {
     getAccessProfile: vi.fn(() => Promise.resolve({ roles: ["ACCOUNTANT"] })),
@@ -40,6 +39,7 @@ function makeUseCase() {
     ),
   };
   const membership = {
+    findMembership: vi.fn(async () => ({ role: "MEMBER" })),
     listForUser: vi.fn(() =>
       Promise.resolve([
         {
@@ -60,11 +60,22 @@ function makeUseCase() {
         },
       ]),
     ),
+    addMember: vi.fn(),
+    upsertMember: vi.fn(),
+    listMembers: vi.fn(),
+    findUserIdsForOrganization: vi.fn(),
+    countOwners: vi.fn(),
+    countMembers: vi.fn(),
+    updateMemberRole: vi.fn(),
+    removeMember: vi.fn(),
+    deleteByOrganizationId: vi.fn(),
+    findPrimaryOrganizationId: vi.fn(),
   };
 
   return {
     usersRepository,
     accessControlService,
+    membership,
     useCase: new GetUserUseCase(
       usersRepository as never,
       accessControlService as never,
@@ -76,7 +87,7 @@ function makeUseCase() {
 
 describe("GetUserUseCase", () => {
   it("scopes memberOrganizationIds to the actor organization for org admins", async () => {
-    const { useCase, usersRepository, accessControlService } = makeUseCase();
+    const { useCase, membership, accessControlService } = makeUseCase();
 
     const result = await useCase.execute("user-1", {
       userId: "actor-1",
@@ -89,7 +100,7 @@ describe("GetUserUseCase", () => {
       organizationId: "org-a",
     } satisfies AuthenticatedRequestUser);
 
-    expect(usersRepository.isUserInOrganization).toHaveBeenCalledWith("user-1", "org-a");
+    expect(membership.findMembership).toHaveBeenCalledWith("org-a", "user-1");
     expect(accessControlService.getAccessProfile).toHaveBeenCalledWith("user-1", "org-a");
     expect(result.memberOrganizationIds).toEqual(["org-a"]);
   });

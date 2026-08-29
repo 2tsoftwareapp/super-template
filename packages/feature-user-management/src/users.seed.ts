@@ -11,10 +11,7 @@ import {
   PERSONAL_ORGANIZATION_PROVIDER,
   type PersonalOrganizationProvider,
 } from "@repo/feature-organizations/contracts";
-import {
-  USERS_REPOSITORY,
-  type UsersRepositoryPort,
-} from "@repo/feature-users/contracts";
+import { USERS_REPOSITORY, type UsersRepositoryPort } from "@repo/feature-users/contracts";
 import { hashPassword } from "@repo/utils/password";
 
 /** Bag key written by the users seeder for downstream notifications/auth seeders. */

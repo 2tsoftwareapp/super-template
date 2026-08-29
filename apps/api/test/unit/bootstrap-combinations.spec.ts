@@ -7,11 +7,23 @@ import { enabledFeatures } from "../../src/composition/feature-registry";
 import { composeFeatures } from "@repo/api-plugin-kit";
 import { DATABASE } from "@repo/database-runtime";
 import { USER_LOOKUP } from "@repo/feature-users/contracts";
-import { ORGANIZATION_ACCESS_CONTROL, ORGANIZATION_CUSTOM_ROLES_PURGE, ORGANIZATION_USER_ROLES_PURGE } from "@repo/feature-organizations/contracts";
+import {
+  ORGANIZATION_ACCESS_CONTROL,
+  ORGANIZATION_CUSTOM_ROLES_PURGE,
+  ORGANIZATION_USER_ROLES_PURGE,
+} from "@repo/feature-organizations/contracts";
 import { ACTIVITY_EMITTER } from "@repo/feature-activities/contracts";
 import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
 import { OUTBOX_APPENDER } from "@repo/feature-outbox/contracts";
-import { ADVISORY_LOCK_PORT, APP_LOGGER, EnvironmentService, ErrorReporterService, PLATFORM_TRANSACTION_PORT, TenantContextService, TRANSACTION_PORT } from "@repo/api-runtime";
+import {
+  ADVISORY_LOCK_PORT,
+  APP_LOGGER,
+  EnvironmentService,
+  ErrorReporterService,
+  PLATFORM_TRANSACTION_PORT,
+  TenantContextService,
+  TRANSACTION_PORT,
+} from "@repo/api-runtime";
 
 const databaseFake = {
   query: async () => [],
@@ -22,26 +34,73 @@ const databaseFake = {
 @Module({
   providers: [
     { provide: DATABASE, useValue: databaseFake },
-    { provide: PLATFORM_TRANSACTION_PORT, useValue: { run: async (callback: (tx: unknown) => Promise<unknown>) => callback(databaseFake) } },
-    { provide: TRANSACTION_PORT, useValue: { run: async (callback: (tx: unknown) => Promise<unknown>) => callback(databaseFake) } },
+    {
+      provide: PLATFORM_TRANSACTION_PORT,
+      useValue: {
+        run: async (callback: (tx: unknown) => Promise<unknown>) => callback(databaseFake),
+      },
+    },
+    {
+      provide: TRANSACTION_PORT,
+      useValue: {
+        run: async (callback: (tx: unknown) => Promise<unknown>) => callback(databaseFake),
+      },
+    },
     TenantContextService,
     { provide: APP_LOGGER, useValue: { debug() {}, info() {}, warn() {}, error() {} } },
-    { provide: ADVISORY_LOCK_PORT, useValue: { withLock: async (_key: string, operation: () => Promise<unknown>) => operation() } },
+    {
+      provide: ADVISORY_LOCK_PORT,
+      useValue: {
+        withLock: async (_key: string, operation: () => Promise<unknown>) => operation(),
+      },
+    },
     { provide: USER_LOOKUP, useValue: { findById: async () => null } },
     { provide: OUTBOX_APPENDER, useValue: { append: async () => undefined } },
-    { provide: ORGANIZATION_CUSTOM_ROLES_PURGE, useValue: { deleteByOrganizationId: async () => undefined } },
-    { provide: ORGANIZATION_USER_ROLES_PURGE, useValue: { deleteByOrganizationId: async () => undefined } },
-    { provide: ORGANIZATION_ACCESS_CONTROL, useValue: { ensureOrganizationAdminRole: async () => undefined, replaceUserRoles: async () => undefined, invalidateAccessProfile: async () => undefined } },
+    {
+      provide: ORGANIZATION_CUSTOM_ROLES_PURGE,
+      useValue: { deleteByOrganizationId: async () => undefined },
+    },
+    {
+      provide: ORGANIZATION_USER_ROLES_PURGE,
+      useValue: { deleteByOrganizationId: async () => undefined },
+    },
+    {
+      provide: ORGANIZATION_ACCESS_CONTROL,
+      useValue: {
+        ensureOrganizationAdminRole: async () => undefined,
+        replaceUserRoles: async () => undefined,
+        invalidateAccessProfile: async () => undefined,
+      },
+    },
     { provide: ACTIVITY_EMITTER, useValue: { emit: async () => undefined } },
     { provide: AUDIT_WRITER, useValue: { write: async () => undefined } },
-    { provide: EnvironmentService, useValue: { isTest: true, values: { THROTTLER_TTL_MS: 60000, THROTTLER_LIMIT: 100 } } },
+    {
+      provide: EnvironmentService,
+      useValue: { isTest: true, values: { THROTTLER_TTL_MS: 60000, THROTTLER_LIMIT: 100 } },
+    },
     { provide: ErrorReporterService, useValue: { captureException() {}, captureMessage() {} } },
   ],
-  exports: [DATABASE, PLATFORM_TRANSACTION_PORT, TRANSACTION_PORT, TenantContextService, APP_LOGGER, ADVISORY_LOCK_PORT, USER_LOOKUP, OUTBOX_APPENDER, ORGANIZATION_CUSTOM_ROLES_PURGE, ORGANIZATION_USER_ROLES_PURGE, ORGANIZATION_ACCESS_CONTROL, ACTIVITY_EMITTER, AUDIT_WRITER, EnvironmentService, ErrorReporterService],
+  exports: [
+    DATABASE,
+    PLATFORM_TRANSACTION_PORT,
+    TRANSACTION_PORT,
+    TenantContextService,
+    APP_LOGGER,
+    ADVISORY_LOCK_PORT,
+    USER_LOOKUP,
+    OUTBOX_APPENDER,
+    ORGANIZATION_CUSTOM_ROLES_PURGE,
+    ORGANIZATION_USER_ROLES_PURGE,
+    ORGANIZATION_ACCESS_CONTROL,
+    ACTIVITY_EMITTER,
+    AUDIT_WRITER,
+    EnvironmentService,
+    ErrorReporterService,
+  ],
 })
 class DeterministicInfrastructureModule {}
 
-async function compileGraph(modules: readonly (typeof featureModules[number])[]) {
+async function compileGraph(modules: readonly (typeof featureModules)[number][]) {
   const moduleRef = await Test.createTestingModule({
     imports: [DeterministicInfrastructureModule, ...modules],
   }).compile();
@@ -71,25 +130,33 @@ describe("deterministic Nest feature bootstrap matrix", () => {
     ["audit", ["users"]],
     ["notifications", ["users"]],
     ["health", ["users"]],
-  ])("composes and compiles the omit-feature acceptance closure for %s", async (omitted, required) => {
-    const byId = new Map(orderedFeatures.map((feature) => [feature.id, feature]));
-    const removed = new Set([omitted]);
-    let changed = true;
-    while (changed) {
-      changed = false;
-      for (const feature of orderedFeatures) {
-        if (feature.dependsOn?.some((dependency) => removed.has(dependency)) && !removed.has(feature.id)) {
-          removed.add(feature.id);
-          changed = true;
+  ])(
+    "composes and compiles the omit-feature acceptance closure for %s",
+    async (omitted, required) => {
+      const byId = new Map(orderedFeatures.map((feature) => [feature.id, feature]));
+      const removed = new Set([omitted]);
+      let changed = true;
+      while (changed) {
+        changed = false;
+        for (const feature of orderedFeatures) {
+          if (
+            feature.dependsOn?.some((dependency) => removed.has(dependency)) &&
+            !removed.has(feature.id)
+          ) {
+            removed.add(feature.id);
+            changed = true;
+          }
         }
       }
-    }
-    const remaining = orderedFeatures.filter((feature) => !removed.has(feature.id));
-    expect(remaining.map((feature) => feature.id)).toEqual(expect.arrayContaining(required));
-    expect(byId.has(omitted)).toBe(true);
-    const composed = composeFeatures(enabledFeatures.filter((feature) => !removed.has(feature.id)));
-    const moduleRef = await compileGraph(composed.modules);
-    expect(composed.features.map((feature) => feature.id)).not.toContain(omitted);
-    await moduleRef.close();
-  });
+      const remaining = orderedFeatures.filter((feature) => !removed.has(feature.id));
+      expect(remaining.map((feature) => feature.id)).toEqual(expect.arrayContaining(required));
+      expect(byId.has(omitted)).toBe(true);
+      const composed = composeFeatures(
+        enabledFeatures.filter((feature) => !removed.has(feature.id)),
+      );
+      const moduleRef = await compileGraph(composed.modules);
+      expect(composed.features.map((feature) => feature.id)).not.toContain(omitted);
+      await moduleRef.close();
+    },
+  );
 });

@@ -4,13 +4,18 @@ import type { TransactionPort } from "@repo/api-runtime";
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { ERROR_CODES } from "@repo/api-runtime";
 import {
-  AppError, generateOpaqueToken, hashOpaqueToken, normalizeEmail, SYSTEM_SCOPE, } from "@repo/api-runtime";
+  AppError,
+  generateOpaqueToken,
+  hashOpaqueToken,
+  normalizeEmail,
+  SYSTEM_SCOPE,
+} from "@repo/api-runtime";
 import { PLATFORM_TRANSACTION_PORT } from "@repo/api-runtime";
 import { AccessControlService } from "@repo/feature-access-control/contracts";
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 import { hashPassword } from "@repo/feature-auth/contracts";
 import { IssueSessionUseCase } from "@repo/feature-auth/contracts";
-import { OrganizationsService } from "@repo/feature-organizations/contracts";
+import { OrganizationsService } from "@repo/feature-organizations/module";
 import { SSO_ERROR_CODES } from "@repo/feature-sso/contracts";
 import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "@repo/feature-users/contracts";

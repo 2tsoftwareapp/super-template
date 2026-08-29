@@ -1,0 +1,36 @@
+{
+  "extends": "@repo/tsconfig/nest.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "strictPropertyInitialization": false,
+    "paths": {
+      "@repo/feature-access-control": ["../feature-access-control/src/access-control.feature.ts"],
+      "@repo/feature-access-control/contracts": [
+        "../feature-access-control/src/public/contracts.ts"
+      ],
+      "@repo/feature-access-control/module": [
+        "../feature-access-control/src/access-control.module.ts"
+      ],
+      "@repo/feature-activities": ["../feature-activities/src/activities.feature.ts"],
+      "@repo/feature-activities/contracts": ["../feature-activities/src/public/contracts.ts"],
+      "@repo/feature-activities/module": ["../feature-activities/src/activities.module.ts"],
+      "@repo/feature-audit": ["../feature-audit/src/audit.feature.ts"],
+      "@repo/feature-audit/contracts": ["../feature-audit/src/public/contracts.ts"],
+      "@repo/feature-audit/module": ["../feature-audit/src/audit.module.ts"],
+      "@repo/feature-organizations": ["../feature-organizations/src/organizations.feature.ts"],
+      "@repo/feature-organizations/contracts": ["../feature-organizations/src/public/contracts.ts"],
+      "@repo/feature-organizations/module": [
+        "../feature-organizations/src/organizations.module.ts"
+      ],
+      "@repo/feature-outbox": ["../feature-outbox/src/outbox.feature.ts"],
+      "@repo/feature-outbox/contracts": ["../feature-outbox/src/public/contracts.ts"],
+      "@repo/feature-outbox/module": ["../feature-outbox/src/outbox.module.ts"],
+      "@repo/feature-users": ["../feature-users/src/users.feature.ts"],
+      "@repo/feature-users/contracts": ["../feature-users/src/public/contracts.ts"],
+      "@repo/feature-users/module": ["../feature-users/src/users.module.ts"]
+    },
+    "baseUrl": "."
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["src/**/*.spec.ts", "test"]
+}

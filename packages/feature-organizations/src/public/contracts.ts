@@ -1,10 +1,10 @@
 import type { TransactionExecutor } from "@repo/api-kernel";
 
-export { OrganizationsService } from "../application/organizations.service";
+export type { CreateOrganizationCommand } from "../application/organizations.types";
+
 export { ORGANIZATIONS_REPOSITORY } from "../application/ports/organizations.repository.port";
 export type * from "../application/ports/organizations.repository.port";
 /** Public contracts for @repo/feature-organizations. */
-export { OrganizationsModule } from "../organizations.module";
 
 export { ORGANIZATION_ERROR_CODES } from "./error-codes";
 export { ORGANIZATION_ACCESS_CONTROL } from "./organization-access-control.token";

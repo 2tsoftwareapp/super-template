@@ -1,6 +1,6 @@
 import type { TransactionExecutor } from "@repo/api-runtime";
 
-import { HttpStatus, Inject, Injectable, Optional } from "@nestjs/common";
+import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { AppError, ERROR_CODES } from "@repo/api-runtime";
 
 import type { OrganizationMembership } from "../../public/contracts";
@@ -19,10 +19,11 @@ const slugify = (value: string) =>
     .replace(/^-+|-+$/g, "")
     .slice(0, 64) || "organization";
 
-import type { OrganizationAccessControlPort } from "../../public/contracts";
-
-import { ORGANIZATION_ACCESS_CONTROL } from "../../public/organization-access-control.token";
-
+/**
+ * Core personal-organization creation — no access-control dependency.
+ * When RBAC admin-role assignment is needed, the orchestration layer
+ * (feature-organization-management) wraps this with access-control calls.
+ */
 @Injectable()
 export class EnsurePersonalOrganizationUseCase {
   constructor(
@@ -30,8 +31,6 @@ export class EnsurePersonalOrganizationUseCase {
     private readonly organizationsRepository: OrganizationsRepositoryPort,
     @Inject(ORGANIZATION_MEMBERSHIP)
     private readonly membership: OrganizationMembership,
-    @Inject(ORGANIZATION_ACCESS_CONTROL)
-    @Optional() private readonly accessControl: OrganizationAccessControlPort,
   ) {}
 
   async execute(userId: string, displayName: string, executor?: TransactionExecutor) {
@@ -66,7 +65,6 @@ export class EnsurePersonalOrganizationUseCase {
       },
       executor,
     );
-    await this.accessControl.ensureOrganizationAdminRole(organization.id, userId, executor);
 
     return organization.id;
   }

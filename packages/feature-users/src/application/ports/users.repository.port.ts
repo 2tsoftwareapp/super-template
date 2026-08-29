@@ -36,6 +36,16 @@ export interface UsersListResult {
   total: number;
 }
 
+export interface UsersCoreListQuery {
+  page: number;
+  limit: number;
+  search?: string;
+  status?: "PENDING" | "ACTIVE" | "BLOCKED";
+  sort: readonly { field: string; order: "asc" | "desc" }[];
+  /** Restrict results to this set of user ids. Empty/undefined = no filter. */
+  candidateUserIds?: readonly string[];
+}
+
 export interface UsersRepositoryPort {
   create(values: CreateUserInput, executor?: TransactionExecutor): Promise<UserRecord>;
   findById(userId: string, executor?: TransactionExecutor): Promise<UserRecord | null>;
@@ -46,12 +56,7 @@ export interface UsersRepositoryPort {
     executor?: TransactionExecutor,
   ): Promise<UserRecord | null>;
   softDelete(userId: string, executor?: TransactionExecutor): Promise<UserRecord | null>;
-  list(params: ListUsersQuery, executor?: TransactionExecutor): Promise<UsersListResult>;
-  isUserInOrganization(
-    userId: string,
-    organizationId: string,
-    executor?: TransactionExecutor,
-  ): Promise<boolean>;
+  list(params: UsersCoreListQuery, executor?: TransactionExecutor): Promise<UsersListResult>;
 }
 
 export const USERS_REPOSITORY = Symbol("USERS_REPOSITORY");

@@ -98,4 +98,12 @@ export class AccessControlService {
   ) {
     return this.replaceUserRolesUseCase.execute(userId, roleIds, organizationId, executor);
   }
+
+  async getUserIdsForRole(roleName: string, organizationId?: string | null): Promise<string[]> {
+    const role = await this.roleQueryUseCase.getRoleByName(roleName, organizationId ?? null);
+    if (!role) {
+      return [];
+    }
+    return this.roleQueryUseCase.getUserIdsForRole(role.id);
+  }
 }

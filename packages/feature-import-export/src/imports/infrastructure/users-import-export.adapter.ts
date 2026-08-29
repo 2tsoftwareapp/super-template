@@ -3,9 +3,10 @@ import type { OrganizationMembership } from "@repo/feature-organizations/contrac
 
 import { Inject, Injectable } from "@nestjs/common";
 import {
-  ACCESS_CONTROL_REPOSITORY, type AccessControlRepositoryPort, } from "@repo/feature-access-control/contracts";
-import {
-  ORGANIZATION_MEMBERSHIP, } from "@repo/feature-organizations/contracts";
+  ACCESS_CONTROL_REPOSITORY,
+  type AccessControlRepositoryPort,
+} from "@repo/feature-access-control/contracts";
+import { ORGANIZATION_MEMBERSHIP } from "@repo/feature-organizations/contracts";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "@repo/feature-users/contracts";
 import { hash } from "argon2";
 import { randomBytes } from "node:crypto";
@@ -47,12 +48,17 @@ export class UsersImportExportAdapter implements ImportExportAdapter<UserRow> {
     let page = 1;
     const pageSize = 1000;
 
+    // Resolve organization member IDs for scoped export
+    const candidateUserIds = await this.membership.findUserIdsForOrganization(
+      params.organizationId,
+    );
+
     while (true) {
       const result = await this.usersRepository.list({
         page,
         limit: pageSize,
-        organizationId: params.organizationId,
         sort: [{ field: "createdAt", order: "asc" }],
+        candidateUserIds,
       });
 
       for (const user of result.rows) {

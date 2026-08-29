@@ -1,6 +1,11 @@
 import type { AuthenticatedRequestUser } from "@repo/api-runtime";
+import type {
+  CreateOrganizationCommand,
+  OrganizationAccessControlPort,
+  OrganizationMembership,
+} from "@repo/feature-organizations/contracts";
 
-import { HttpStatus, Inject, Injectable, Optional } from "@nestjs/common";
+import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import {
   AppError,
   ERROR_CODES,
@@ -8,15 +13,12 @@ import {
   type PlatformTransactionPort,
 } from "@repo/api-runtime";
 import { ACTIVITY_EMITTER, type ActivityEmitter } from "@repo/feature-activities/contracts";
-
-import type { OrganizationMembership } from "../../public/contracts";
-import type { CreateOrganizationCommand } from "../organizations.types";
-
-import { ORGANIZATION_MEMBERSHIP } from "../../public/organization-membership.token";
 import {
+  ORGANIZATION_ACCESS_CONTROL,
+  ORGANIZATION_MEMBERSHIP,
   ORGANIZATIONS_REPOSITORY,
   type OrganizationsRepositoryPort,
-} from "../ports/organizations.repository.port";
+} from "@repo/feature-organizations/contracts";
 
 const slugify = (value: string) =>
   value
@@ -26,27 +28,18 @@ const slugify = (value: string) =>
     .replace(/^-+|-+$/g, "")
     .slice(0, 64) || "organization";
 
-import type { OrganizationAccessControlPort } from "../../public/contracts";
-
-import { ORGANIZATION_ACCESS_CONTROL } from "../../public/organization-access-control.token";
-
 @Injectable()
 export class CreateOrganizationUseCase {
   constructor(
-    // Creating an organization is a platform-level operation: the new tenant's
-    // id is unknown until the insert, so the write cannot run under a request
-    // tenant context. The platform transaction runs with RLS bypass so the
-    // cross-context activity emit (which references the brand-new org) passes
-    // the tenant-isolation policies.
     @Inject(PLATFORM_TRANSACTION_PORT)
     private readonly transactionPort: PlatformTransactionPort,
     @Inject(ORGANIZATIONS_REPOSITORY)
     private readonly organizationsRepository: OrganizationsRepositoryPort,
     @Inject(ORGANIZATION_MEMBERSHIP)
     private readonly membership: OrganizationMembership,
-    @Inject(ACTIVITY_EMITTER) private readonly activityEmitter: ActivityEmitter,
     @Inject(ORGANIZATION_ACCESS_CONTROL)
-    @Optional() private readonly accessControl: OrganizationAccessControlPort,
+    private readonly accessControl: OrganizationAccessControlPort,
+    @Inject(ACTIVITY_EMITTER) private readonly activityEmitter: ActivityEmitter,
   ) {}
 
   async execute(user: AuthenticatedRequestUser, input: CreateOrganizationCommand) {
