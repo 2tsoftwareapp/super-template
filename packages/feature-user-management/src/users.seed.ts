@@ -8,9 +8,9 @@ import {
   type UserAccessControl,
 } from "@repo/feature-access-control/contracts";
 import {
-  PERSONAL_ORGANIZATION_PROVIDER,
-  type PersonalOrganizationProvider,
-} from "@repo/feature-organizations/contracts";
+  PERSONAL_ORGANIZATION_PROVISIONER,
+  type PersonalOrganizationProvisioner,
+} from "@repo/feature-organization-management/contracts";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "@repo/feature-users/contracts";
 import { hashPassword } from "@repo/utils/password";
 
@@ -27,9 +27,9 @@ export interface SeededUsersBag {
 async function runUsersSeed(ctx: FeatureSeedContext): Promise<void> {
   const accessControlService = ctx.app.get(USER_ACCESS_CONTROL) as UserAccessControl;
   const environmentService = ctx.app.get(EnvironmentService) as EnvironmentService;
-  const personalOrganizationProvider = ctx.app.get(
-    PERSONAL_ORGANIZATION_PROVIDER,
-  ) as PersonalOrganizationProvider;
+  const personalOrganizationProvisioner = ctx.app.get(
+    PERSONAL_ORGANIZATION_PROVISIONER,
+  ) as PersonalOrganizationProvisioner;
   const usersRepository = ctx.app.get(USERS_REPOSITORY) as UsersRepositoryPort;
   const executor = ctx.executor as DatabaseExecutor;
 
@@ -82,7 +82,7 @@ async function runUsersSeed(ctx: FeatureSeedContext): Promise<void> {
 
     await accessControlService.replaceUserRoles(user.id, [role.id], null, executor);
 
-    const organizationId = (await personalOrganizationProvider.ensurePersonalOrganization(
+    const organizationId = (await personalOrganizationProvisioner.ensurePersonalOrganization(
       user.id,
       user.displayName,
       executor,

@@ -2,7 +2,20 @@
   "extends": "@repo/tsconfig/nest.json",
   "compilerOptions": {
     "outDir": "dist",
-    "strictPropertyInitialization": false
+    "strictPropertyInitialization": false,
+    "paths": {
+      "@repo/feature-organization-management": [
+        "../feature-organization-management/src/organization-management.feature.ts"
+      ],
+      "@repo/feature-organization-management/contracts": [
+        "../feature-organization-management/src/public/contracts.ts"
+      ],
+      "@repo/feature-organization-management/module": [
+        "../feature-organization-management/src/organization-management.module.ts"
+      ],
+      "@repo/feature-organization-management/*": ["../feature-organization-management/src/*"]
+    },
+    "baseUrl": "."
   },
   "include": ["src/**/*.ts"]
 }

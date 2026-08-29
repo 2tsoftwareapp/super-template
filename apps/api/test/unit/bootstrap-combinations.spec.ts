@@ -15,6 +15,7 @@ import {
 import { ACTIVITY_EMITTER } from "@repo/feature-activities/contracts";
 import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
 import { OUTBOX_APPENDER } from "@repo/feature-outbox/contracts";
+import { PERSONAL_ORGANIZATION_PROVISIONER } from "@repo/feature-organization-management/contracts";
 import {
   ADVISORY_LOCK_PORT,
   APP_LOGGER,
@@ -75,6 +76,10 @@ const databaseFake = {
     { provide: ACTIVITY_EMITTER, useValue: { emit: async () => undefined } },
     { provide: AUDIT_WRITER, useValue: { write: async () => undefined } },
     {
+      provide: PERSONAL_ORGANIZATION_PROVISIONER,
+      useValue: { ensurePersonalOrganization: async () => "org-fake" },
+    },
+    {
       provide: EnvironmentService,
       useValue: { isTest: true, values: { THROTTLER_TTL_MS: 60000, THROTTLER_LIMIT: 100 } },
     },
@@ -94,6 +99,7 @@ const databaseFake = {
     ORGANIZATION_ACCESS_CONTROL,
     ACTIVITY_EMITTER,
     AUDIT_WRITER,
+    PERSONAL_ORGANIZATION_PROVISIONER,
     EnvironmentService,
     ErrorReporterService,
   ],

@@ -13,7 +13,6 @@ export * from "./organization-lookup.port";
 export type * from "./organization-membership.port";
 export { ORGANIZATION_MEMBERSHIP } from "./organization-membership.token";
 export { ORGANIZATION_USER_ROLES_PURGE } from "./organization-purge.token";
-export type * from "./personal-organization-provider.port";
 
 /**
  * Narrow consumer-owned ports used when an organization is deleted: each
@@ -49,5 +48,3 @@ export interface OrganizationAccessControlPort {
 
   invalidateAccessProfile(userId: string): Promise<void>;
 }
-
-export { PERSONAL_ORGANIZATION_PROVIDER } from "./personal-organization-provider.token";

@@ -2069,6 +2069,9 @@ importers:
       '@repo/feature-audit':
         specifier: workspace:*
         version: link:../feature-audit
+      '@repo/feature-organization-management':
+        specifier: workspace:*
+        version: link:../feature-organization-management
       '@repo/feature-organizations':
         specifier: workspace:*
         version: link:../feature-organizations

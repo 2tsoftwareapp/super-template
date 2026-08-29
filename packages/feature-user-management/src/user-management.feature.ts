@@ -8,6 +8,7 @@ export const userManagementFeature: FeatureManifest = defineFeature({
   dependsOn: [
     "users",
     "organizations",
+    "organization-management",
     "access-control",
     "audit",
     "activities",

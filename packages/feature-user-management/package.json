@@ -23,6 +23,7 @@
     "@repo/feature-access-control": "workspace:*",
     "@repo/feature-activities": "workspace:*",
     "@repo/feature-audit": "workspace:*",
+    "@repo/feature-organization-management": "workspace:*",
     "@repo/feature-organizations": "workspace:*",
     "@repo/feature-outbox": "workspace:*",
     "@repo/feature-upload": "workspace:*",

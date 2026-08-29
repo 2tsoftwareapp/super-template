@@ -1,6 +1,6 @@
 import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime";
 import type { TransactionPort } from "@repo/api-runtime";
-import type { PersonalOrganizationProvider } from "@repo/feature-organizations/contracts";
+import type { PersonalOrganizationProvisioner } from "@repo/feature-organization-management/contracts";
 import type { CreateAdminUserCommand, UserView } from "@repo/feature-users/contracts";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
@@ -15,11 +15,11 @@ import {
 } from "@repo/feature-access-control/contracts";
 import { ACTIVITY_EMITTER, type ActivityEmitter } from "@repo/feature-activities/contracts";
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
+import { PERSONAL_ORGANIZATION_PROVISIONER } from "@repo/feature-organization-management/contracts";
 import {
   ORGANIZATION_MEMBERSHIP,
   type OrganizationMemberRole,
   type OrganizationMembership,
-  PERSONAL_ORGANIZATION_PROVIDER,
 } from "@repo/feature-organizations/contracts";
 import { OUTBOX_APPENDER, type OutboxAppenderPort } from "@repo/feature-outbox/contracts";
 import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
@@ -44,8 +44,8 @@ export class CreateAdminUserUseCase {
     @Inject(USER_PROFILE_INVALIDATOR)
     private readonly profileInvalidator: UserProfileInvalidator,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
-    @Inject(PERSONAL_ORGANIZATION_PROVIDER)
-    private readonly personalOrganizationProvider: PersonalOrganizationProvider,
+    @Inject(PERSONAL_ORGANIZATION_PROVISIONER)
+    private readonly personalOrganizationProvisioner: PersonalOrganizationProvisioner,
     @Inject(ORGANIZATION_MEMBERSHIP)
     private readonly membership: OrganizationMembership,
     @Inject(OUTBOX_APPENDER)
@@ -174,7 +174,7 @@ export class CreateAdminUserUseCase {
             );
           }
         } else if (actorIsSuperAdmin && resolvedRole.organizationId === null) {
-          await this.personalOrganizationProvider.ensurePersonalOrganization(
+          await this.personalOrganizationProvisioner.ensurePersonalOrganization(
             user.id,
             user.displayName,
             transaction,

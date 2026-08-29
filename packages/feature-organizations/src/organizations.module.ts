@@ -15,7 +15,6 @@ import { OrganizationsRepository } from "./infrastructure/organizations.reposito
 import { OrganizationsController } from "./presentation/organizations.controller";
 import { ORGANIZATION_LOOKUP } from "./public/organization-lookup.port";
 import { ORGANIZATION_MEMBERSHIP } from "./public/organization-membership.token";
-import { PERSONAL_ORGANIZATION_PROVIDER } from "./public/personal-organization-provider.token";
 
 export { OrganizationsService } from "./application/organizations.service";
 export { EnsurePersonalOrganizationUseCase } from "./application/use-cases/ensure-personal-organization.use-case";
@@ -45,10 +44,6 @@ export { EnsurePersonalOrganizationUseCase } from "./application/use-cases/ensur
     ListOrganizationMembersUseCase,
     EnsurePersonalOrganizationUseCase,
     {
-      provide: PERSONAL_ORGANIZATION_PROVIDER,
-      useExisting: EnsurePersonalOrganizationUseCase,
-    },
-    {
       provide: ORGANIZATION_LOOKUP,
       useExisting: OrganizationLookupAdapter,
     },
@@ -58,7 +53,6 @@ export { EnsurePersonalOrganizationUseCase } from "./application/use-cases/ensur
     ORGANIZATIONS_REPOSITORY,
     ORGANIZATION_MEMBERSHIP,
     ORGANIZATION_LOOKUP,
-    PERSONAL_ORGANIZATION_PROVIDER,
     GetOrganizationUseCase,
     ListOrganizationsForUserUseCase,
     ListOrganizationMembersUseCase,
