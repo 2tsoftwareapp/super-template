@@ -119,7 +119,10 @@
       "@repo/feature-organization-management/module": [
         "../feature-organization-management/src/organization-management.module.ts"
       ],
-      "@repo/feature-organization-management/*": ["../feature-organization-management/src/*"]
+      "@repo/feature-organization-management/*": ["../feature-organization-management/src/*"],
+      "@repo/feature-organization-management/contracts": [
+        "../feature-organization-management/src/public/contracts.ts"
+      ]
     },
     "baseUrl": "."
   },

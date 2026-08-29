@@ -5,6 +5,7 @@
   "type": "commonjs",
   "exports": {
     ".": "./src/organization-management.feature.ts",
+    "./contracts": "./src/public/contracts.ts",
     "./module": "./src/organization-management.module.ts"
   },
   "scripts": {

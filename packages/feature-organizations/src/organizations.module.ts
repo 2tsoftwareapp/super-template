@@ -9,7 +9,6 @@ import { ListOrganizationMembersUseCase } from "./application/use-cases/list-org
 import { ListOrganizationsForUserUseCase } from "./application/use-cases/list-organizations-for-user.use-case";
 import { ResolveOrganizationIdForUserUseCase } from "./application/use-cases/resolve-organization-id-for-user.use-case";
 import { UpdateOrganizationUseCase } from "./application/use-cases/update-organization.use-case";
-import { CorePersonalOrganizationProvider } from "./infrastructure/core-personal-organization.provider";
 import { OrganizationLookupAdapter } from "./infrastructure/organization-lookup.adapter";
 import { OrganizationMembersRepository } from "./infrastructure/organization-members.repository";
 import { OrganizationsRepository } from "./infrastructure/organizations.repository";
@@ -20,7 +19,6 @@ import { PERSONAL_ORGANIZATION_PROVIDER } from "./public/personal-organization-p
 
 export { OrganizationsService } from "./application/organizations.service";
 export { EnsurePersonalOrganizationUseCase } from "./application/use-cases/ensure-personal-organization.use-case";
-export { PERSONAL_ORGANIZATION_PROVIDER } from "./public/personal-organization-provider.token";
 
 @Global()
 @Module({
@@ -46,10 +44,9 @@ export { PERSONAL_ORGANIZATION_PROVIDER } from "./public/personal-organization-p
     ResolveOrganizationIdForUserUseCase,
     ListOrganizationMembersUseCase,
     EnsurePersonalOrganizationUseCase,
-    CorePersonalOrganizationProvider,
     {
       provide: PERSONAL_ORGANIZATION_PROVIDER,
-      useExisting: CorePersonalOrganizationProvider,
+      useExisting: EnsurePersonalOrganizationUseCase,
     },
     {
       provide: ORGANIZATION_LOOKUP,

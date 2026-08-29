@@ -1,42 +1,38 @@
 import type { TransactionExecutor } from "@repo/api-runtime";
 
-import { Inject, Injectable } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 
-import type { PersonalOrganizationProvider } from "../public/personal-organization-provider.port";
-
-import { PERSONAL_ORGANIZATION_PROVIDER } from "../public/personal-organization-provider.token";
 import { AssertOrganizationMembershipUseCase } from "./use-cases/assert-organization-membership.use-case";
+import { EnsurePersonalOrganizationUseCase } from "./use-cases/ensure-personal-organization.use-case";
 import { ResolveOrganizationIdForUserUseCase } from "./use-cases/resolve-organization-id-for-user.use-case";
 
 /**
  * Cross-module facade for the organization operations other bounded contexts
- * (auth, sso, users, seed) depend on: personal-org provisioning, membership
- * assertion, and organization resolution. Self-service organization endpoints
- * inject the organization use cases directly instead of this facade.
+ * (seed, etc.) depend on: membership assertion and organization resolution.
  *
- * Personal-organization provisioning is delegated through the
- * PERSONAL_ORGANIZATION_PROVIDER token so the orchestration layer
- * (feature-organization-management) can override it with RBAC-aware behavior.
+ * Personal-organization provisioning is NOT done through this facade.
+ * Features that create users (auth, sso) must inject
+ * PERSONAL_ORGANIZATION_PROVISIONER from feature-organization-management
+ * to get RBAC-aware behavior.
  */
 @Injectable()
 export class OrganizationsService {
   constructor(
-    @Inject(PERSONAL_ORGANIZATION_PROVIDER)
-    private readonly personalOrganizationProvider: PersonalOrganizationProvider,
+    private readonly ensurePersonalOrganizationUseCase: EnsurePersonalOrganizationUseCase,
     private readonly assertOrganizationMembershipUseCase: AssertOrganizationMembershipUseCase,
     private readonly resolveOrganizationIdForUserUseCase: ResolveOrganizationIdForUserUseCase,
   ) {}
 
+  /**
+   * @deprecated Use PERSONAL_ORGANIZATION_PROVISIONER from
+   * feature-organization-management instead for RBAC-aware provisioning.
+   */
   async ensurePersonalOrganization(
     userId: string,
     displayName: string,
     executor?: TransactionExecutor,
   ) {
-    return this.personalOrganizationProvider.ensurePersonalOrganization(
-      userId,
-      displayName,
-      executor,
-    );
+    return this.ensurePersonalOrganizationUseCase.execute(userId, displayName, executor);
   }
 
   async assertMembership(organizationId: string, userId: string, executor?: TransactionExecutor) {

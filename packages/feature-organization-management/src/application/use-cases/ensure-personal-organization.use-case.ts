@@ -1,19 +1,19 @@
 import type { TransactionExecutor } from "@repo/api-runtime";
-import type { PersonalOrganizationProvider } from "@repo/feature-organizations/contracts";
 import type { OrganizationAccessControlPort } from "@repo/feature-organizations/contracts";
 
 import { Inject, Injectable } from "@nestjs/common";
 import { ORGANIZATION_ACCESS_CONTROL } from "@repo/feature-organizations/contracts";
 import { EnsurePersonalOrganizationUseCase as CoreEnsurePersonalOrganization } from "@repo/feature-organizations/module";
 
+import type { PersonalOrganizationProvisioner } from "../../public/contracts";
+
 /**
- * Orchestration-layer personal-organization creation that adds RBAC
- * admin-role assignment after the core organization is created.
- * Implements PersonalOrganizationProvider so the management module
- * can override the core PERSONAL_ORGANIZATION_PROVIDER token.
+ * RBAC-aware personal-organization creation.
+ * Creates the organization via the core use case, then assigns
+ * the organization admin role through access-control.
  */
 @Injectable()
-export class EnsurePersonalOrganizationUseCase implements PersonalOrganizationProvider {
+export class EnsurePersonalOrganizationUseCase implements PersonalOrganizationProvisioner {
   constructor(
     private readonly coreEnsurePersonalOrganization: CoreEnsurePersonalOrganization,
     @Inject(ORGANIZATION_ACCESS_CONTROL)

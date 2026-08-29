@@ -15,7 +15,10 @@ import { AccessControlService } from "@repo/feature-access-control/contracts";
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 import { hashPassword } from "@repo/feature-auth/contracts";
 import { IssueSessionUseCase } from "@repo/feature-auth/contracts";
-import { OrganizationsService } from "@repo/feature-organizations/module";
+import {
+  PERSONAL_ORGANIZATION_PROVISIONER,
+  type PersonalOrganizationProvisioner,
+} from "@repo/feature-organization-management/contracts";
 import { SSO_ERROR_CODES } from "@repo/feature-sso/contracts";
 import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "@repo/feature-users/contracts";
@@ -35,7 +38,8 @@ export class HandleSsoCallbackUseCase {
     @Inject(SSO_REPOSITORY) private readonly ssoRepository: SsoRepositoryPort,
     @Inject(USERS_REPOSITORY) private readonly usersRepository: UsersRepositoryPort,
     private readonly accessControlService: AccessControlService,
-    private readonly organizationsService: OrganizationsService,
+    @Inject(PERSONAL_ORGANIZATION_PROVISIONER)
+    private readonly personalOrganizationProvisioner: PersonalOrganizationProvisioner,
     private readonly issueSessionUseCase: IssueSessionUseCase,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
   ) {}
@@ -196,7 +200,7 @@ export class HandleSsoCallbackUseCase {
           transaction,
         );
 
-        await this.organizationsService.ensurePersonalOrganization(
+        await this.personalOrganizationProvisioner.ensurePersonalOrganization(
           targetUser.id,
           targetUser.displayName,
           transaction,

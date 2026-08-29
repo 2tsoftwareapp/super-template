@@ -13,7 +13,10 @@ import {
 import { AccessControlService } from "@repo/feature-access-control/contracts";
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 import { AUTH_USER_STORE, type AuthUserStore } from "@repo/feature-auth/contracts";
-import { OrganizationsService } from "@repo/feature-organizations/module";
+import {
+  PERSONAL_ORGANIZATION_PROVISIONER,
+  type PersonalOrganizationProvisioner,
+} from "@repo/feature-organization-management/contracts";
 import { OUTBOX_APPENDER, type OutboxAppenderPort } from "@repo/feature-outbox/contracts";
 import { SETTINGS_ERROR_CODES } from "@repo/feature-settings/contracts";
 import {
@@ -43,7 +46,8 @@ export class RegisterUseCase {
     @Inject(OUTBOX_APPENDER) private readonly outbox: OutboxAppenderPort,
     @Inject(APPLICATION_SETTINGS_LOOKUP)
     private readonly applicationSettingsLookup: ApplicationSettingsLookup,
-    private readonly organizationsService: OrganizationsService,
+    @Inject(PERSONAL_ORGANIZATION_PROVISIONER)
+    private readonly personalOrganizationProvisioner: PersonalOrganizationProvisioner,
   ) {}
 
   async execute(input: RegisterCommand, requestContext?: RequestContext) {
@@ -90,7 +94,7 @@ export class RegisterUseCase {
 
       await this.accessControlService.replaceUserRoles(user.id, [userRole.id], null, transaction);
 
-      await this.organizationsService.ensurePersonalOrganization(
+      await this.personalOrganizationProvisioner.ensurePersonalOrganization(
         user.id,
         user.displayName,
         transaction,
