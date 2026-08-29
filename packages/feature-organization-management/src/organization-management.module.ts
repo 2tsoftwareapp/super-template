@@ -1,6 +1,9 @@
 import { Module } from "@nestjs/common";
 import { AccessControlModule } from "@repo/feature-access-control/module";
-import { OrganizationsModule } from "@repo/feature-organizations/module";
+import {
+  OrganizationsModule,
+  PERSONAL_ORGANIZATION_PROVIDER,
+} from "@repo/feature-organizations/module";
 
 import { CreateOrganizationUseCase } from "./application/use-cases/create-organization.use-case";
 import { DeleteOrganizationUseCase } from "./application/use-cases/delete-organization.use-case";
@@ -20,6 +23,10 @@ import { OrganizationManagementController } from "./presentation/organization-ma
     LeaveOrganizationUseCase,
     RemoveOrganizationMemberUseCase,
     UpdateMemberRoleUseCase,
+    {
+      provide: PERSONAL_ORGANIZATION_PROVIDER,
+      useExisting: EnsurePersonalOrganizationUseCase,
+    },
   ],
   exports: [EnsurePersonalOrganizationUseCase],
 })

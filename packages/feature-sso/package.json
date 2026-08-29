@@ -30,6 +30,7 @@
     "@repo/feature-audit": "workspace:*",
     "@repo/feature-auth": "workspace:*",
     "@repo/feature-mfa": "workspace:*",
+    "@repo/feature-organization-management": "workspace:*",
     "@repo/feature-organizations": "workspace:*",
     "@repo/feature-users": "workspace:*",
     "@repo/utils": "workspace:*",

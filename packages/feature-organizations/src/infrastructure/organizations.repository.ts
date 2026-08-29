@@ -5,22 +5,12 @@ import { DATABASE, type DatabaseClient } from "@repo/database-runtime";
 import { and, asc, eq, isNull } from "drizzle-orm";
 
 import type { OrganizationsRepositoryPort } from "../application/ports/organizations.repository.port";
-import type { OrganizationCustomRolesPurgePort } from "../public/contracts";
-import type { OrganizationUserRolePurgePort } from "../public/contracts";
 
-import { ORGANIZATION_CUSTOM_ROLES_PURGE } from "../public/organization-custom-roles-purge.token";
-import { ORGANIZATION_USER_ROLES_PURGE } from "../public/organization-purge.token";
 import { organizations } from "./persistence";
 
 @Injectable()
 export class OrganizationsRepository implements OrganizationsRepositoryPort {
-  constructor(
-    @Inject(DATABASE) private readonly database: DatabaseClient,
-    @Inject(ORGANIZATION_USER_ROLES_PURGE)
-    private readonly userRolesPurge: OrganizationUserRolePurgePort,
-    @Inject(ORGANIZATION_CUSTOM_ROLES_PURGE)
-    private readonly customRolesPurge: OrganizationCustomRolesPurgePort,
-  ) {}
+  constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
 
   async createOrganization(
     values: typeof organizations.$inferInsert,
@@ -76,13 +66,5 @@ export class OrganizationsRepository implements OrganizationsRepositoryPort {
       .where(and(eq(organizations.id, organizationId), isNull(organizations.deletedAt)))
       .returning();
     return organization ?? null;
-  }
-
-  async deleteOrganizationRoles(
-    organizationId: string,
-    executor: DatabaseExecutor = this.database,
-  ): Promise<void> {
-    await this.userRolesPurge.deleteByOrganizationId(organizationId, executor);
-    await this.customRolesPurge.deleteByOrganizationId(organizationId, executor);
   }
 }

@@ -1135,6 +1135,9 @@ importers:
       '@repo/feature-mfa':
         specifier: workspace:*
         version: link:../feature-mfa
+      '@repo/feature-organization-management':
+        specifier: workspace:*
+        version: link:../feature-organization-management
       '@repo/feature-organizations':
         specifier: workspace:*
         version: link:../feature-organizations
@@ -1902,6 +1905,9 @@ importers:
       '@repo/feature-mfa':
         specifier: workspace:*
         version: link:../feature-mfa
+      '@repo/feature-organization-management':
+        specifier: workspace:*
+        version: link:../feature-organization-management
       '@repo/feature-organizations':
         specifier: workspace:*
         version: link:../feature-organizations

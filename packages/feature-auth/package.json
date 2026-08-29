@@ -33,6 +33,7 @@
     "@repo/feature-jobs": "workspace:*",
     "@repo/feature-mail": "workspace:*",
     "@repo/feature-mfa": "workspace:*",
+    "@repo/feature-organization-management": "workspace:*",
     "@repo/feature-organizations": "workspace:*",
     "@repo/feature-outbox": "workspace:*",
     "@repo/feature-settings": "workspace:*",

@@ -5,8 +5,7 @@
   "type": "commonjs",
   "exports": {
     ".": "./src/user-management.feature.ts",
-    "./module": "./src/user-management.module.ts",
-    "./testing": "./src/testing/index.ts"
+    "./module": "./src/user-management.module.ts"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json --noEmit",

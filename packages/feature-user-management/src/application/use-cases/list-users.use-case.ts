@@ -1,5 +1,5 @@
 import type { AuthenticatedRequestUser } from "@repo/api-runtime";
-import type { ListUsersQuery } from "@repo/feature-users/contracts";
+import type { ListUsersQuery, UsersCoreListQuery } from "@repo/feature-users/contracts";
 
 import { Inject, Injectable } from "@nestjs/common";
 import {
@@ -66,7 +66,7 @@ export class ListUsersUseCase {
       }
     }
 
-    const listParams: import("@repo/feature-users/contracts").UsersCoreListQuery = {
+    const listParams: UsersCoreListQuery = {
       page: query.page,
       limit: query.limit,
       sort: query.sort,

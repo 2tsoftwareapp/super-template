@@ -2,8 +2,10 @@ import type { AuthenticatedRequestUser, RequestContext } from "@repo/api-runtime
 import type { TransactionPort } from "@repo/api-runtime";
 import type {
   OrganizationAccessControlPort,
+  OrganizationCustomRolesPurgePort,
   OrganizationMembership,
   OrganizationsRepositoryPort,
+  OrganizationUserRolePurgePort,
 } from "@repo/feature-organizations/contracts";
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
@@ -11,8 +13,10 @@ import { AppError, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 import {
   ORGANIZATION_ACCESS_CONTROL,
+  ORGANIZATION_CUSTOM_ROLES_PURGE,
   ORGANIZATION_ERROR_CODES,
   ORGANIZATION_MEMBERSHIP,
+  ORGANIZATION_USER_ROLES_PURGE,
   ORGANIZATIONS_REPOSITORY,
 } from "@repo/feature-organizations/contracts";
 
@@ -29,6 +33,10 @@ export class DeleteOrganizationUseCase {
     private readonly organizationsRepository: OrganizationsRepositoryPort,
     @Inject(ORGANIZATION_MEMBERSHIP)
     private readonly membership: OrganizationMembership,
+    @Inject(ORGANIZATION_USER_ROLES_PURGE)
+    private readonly userRolesPurge: OrganizationUserRolePurgePort,
+    @Inject(ORGANIZATION_CUSTOM_ROLES_PURGE)
+    private readonly customRolesPurge: OrganizationCustomRolesPurgePort,
     @Inject(AUDIT_WRITER) private readonly auditWriter: AuditWriter,
     @Inject(ORGANIZATION_ACCESS_CONTROL)
     private readonly accessControl: OrganizationAccessControlPort,
@@ -105,7 +113,10 @@ export class DeleteOrganizationUseCase {
       }
 
       await this.membership.deleteByOrganizationId(organizationId, transaction);
-      await this.organizationsRepository.deleteOrganizationRoles(organizationId, transaction);
+
+      // Purge cross-feature role data directly (not through repository)
+      await this.userRolesPurge.deleteByOrganizationId(organizationId, transaction);
+      await this.customRolesPurge.deleteByOrganizationId(organizationId, transaction);
 
       // Clean up each member's cache
       for (const member of members) {

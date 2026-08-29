@@ -1,7 +1,5 @@
 import type { TransactionExecutor } from "@repo/api-runtime";
 
-import type { ListUsersQuery } from "../users.types";
-
 export interface UserRecord {
   id: string;
   email: string;

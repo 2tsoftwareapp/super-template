@@ -20,6 +20,7 @@ export const authFeature: FeatureManifest = defineFeature({
   dependsOn: [
     "access-control",
     "organizations",
+    "organization-management",
     "mfa",
     "users",
     "settings",

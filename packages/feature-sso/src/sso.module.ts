@@ -2,7 +2,7 @@ import { Global, Module } from "@nestjs/common";
 import { EnvironmentService } from "@repo/api-runtime";
 import { AccessControlModule } from "@repo/feature-access-control/contracts";
 import { AuthModule } from "@repo/feature-auth/module";
-import { OrganizationsModule } from "@repo/feature-organizations/module";
+import { OrganizationManagementModule } from "@repo/feature-organization-management/module";
 import { UsersModule } from "@repo/feature-users/module";
 
 import {
@@ -26,7 +26,7 @@ import { SsoController } from "./presentation/sso.controller";
 
 @Global()
 @Module({
-  imports: [AccessControlModule, AuthModule, OrganizationsModule, UsersModule],
+  imports: [AccessControlModule, AuthModule, OrganizationManagementModule, UsersModule],
   controllers: [SsoController],
   providers: [
     SsoRepository,

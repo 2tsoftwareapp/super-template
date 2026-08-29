@@ -110,7 +110,16 @@
       "@repo/feature-user-preferences/schema": [
         "../feature-user-preferences/src/infrastructure/persistence/index.ts"
       ],
-      "@repo/feature-user-preferences/testing": ["../feature-user-preferences/src/testing/index.ts"]
+      "@repo/feature-user-preferences/testing": [
+        "../feature-user-preferences/src/testing/index.ts"
+      ],
+      "@repo/feature-organization-management": [
+        "../feature-organization-management/src/organization-management.feature.ts"
+      ],
+      "@repo/feature-organization-management/module": [
+        "../feature-organization-management/src/organization-management.module.ts"
+      ],
+      "@repo/feature-organization-management/*": ["../feature-organization-management/src/*"]
     },
     "baseUrl": "."
   },

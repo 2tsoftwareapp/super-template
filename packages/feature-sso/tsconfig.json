@@ -115,7 +115,14 @@
       "@repo/feature-users/contracts": ["../feature-users/src/public/contracts.ts"],
       "@repo/feature-users/schema": ["../feature-users/src/infrastructure/persistence/index.ts"],
       "@repo/feature-users/module": ["../feature-users/src/users.module.ts"],
-      "@repo/feature-users/testing": ["../feature-users/src/testing/index.ts"]
+      "@repo/feature-users/testing": ["../feature-users/src/testing/index.ts"],
+      "@repo/feature-organization-management": [
+        "../feature-organization-management/src/organization-management.feature.ts"
+      ],
+      "@repo/feature-organization-management/module": [
+        "../feature-organization-management/src/organization-management.module.ts"
+      ],
+      "@repo/feature-organization-management/*": ["../feature-organization-management/src/*"]
     },
     "baseUrl": "."
   },
