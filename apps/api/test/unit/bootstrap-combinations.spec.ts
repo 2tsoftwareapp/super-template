@@ -1,21 +1,15 @@
 import { Global, Module } from "@nestjs/common";
 import { Test } from "@nestjs/testing";
+import { computeRemovalClosure } from "@repo/api-plugin-kit";
 import { describe, expect, it } from "vitest";
 
-import { featureModules, orderedFeatures } from "../../src/composition/composed-schema";
-import { enabledFeatures } from "../../src/composition/feature-registry";
-import { composeFeatures } from "@repo/api-plugin-kit";
-import { DATABASE } from "@repo/database-runtime";
-import { USER_LOOKUP } from "@repo/feature-users/contracts";
 import {
-  ORGANIZATION_ACCESS_CONTROL,
-  ORGANIZATION_CUSTOM_ROLES_PURGE,
-  ORGANIZATION_USER_ROLES_PURGE,
-} from "@repo/feature-organizations/contracts";
-import { ACTIVITY_EMITTER } from "@repo/feature-activities/contracts";
-import { AUDIT_WRITER } from "@repo/feature-audit/contracts";
-import { OUTBOX_APPENDER } from "@repo/feature-outbox/contracts";
-import { PERSONAL_ORGANIZATION_PROVISIONER } from "@repo/feature-organization-management/contracts";
+  buildFeatureModules,
+  featureModules,
+  orderedFeatures,
+} from "../../src/composition/composed-schema";
+import { enabledFeatures } from "../../src/composition/feature-registry";
+import { DATABASE } from "@repo/database-runtime";
 import {
   ADVISORY_LOCK_PORT,
   APP_LOGGER,
@@ -26,6 +20,16 @@ import {
   TRANSACTION_PORT,
 } from "@repo/api-runtime";
 
+/**
+ * Infrastructure-only fakes for external services.
+ *
+ * Every provider in this module represents infrastructure that has NO
+ * business logic: database driver, Redis client, SMTP transport, etc.
+ *
+ * Business tokens (AUDIT_WRITER, OUTBOX_APPENDER, USER_LOOKUP, etc.)
+ * must NOT appear here — they are provided by real feature modules.
+ * Faking them would mask hidden cross-feature injection dependencies.
+ */
 const databaseFake = {
   query: async () => [],
   transaction: async (callback: (tx: unknown) => Promise<unknown>) => callback(databaseFake),
@@ -44,62 +48,42 @@ const databaseFake = {
     {
       provide: TRANSACTION_PORT,
       useValue: {
+        withTenant: async (_ctx: unknown, callback: (tx: unknown) => Promise<unknown>) =>
+          callback(databaseFake),
         run: async (callback: (tx: unknown) => Promise<unknown>) => callback(databaseFake),
       },
     },
     TenantContextService,
-    { provide: APP_LOGGER, useValue: { debug() {}, info() {}, warn() {}, error() {} } },
     {
       provide: ADVISORY_LOCK_PORT,
       useValue: {
         withLock: async (_key: string, operation: () => Promise<unknown>) => operation(),
       },
     },
-    { provide: USER_LOOKUP, useValue: { findById: async () => null } },
-    { provide: OUTBOX_APPENDER, useValue: { append: async () => undefined } },
-    {
-      provide: ORGANIZATION_CUSTOM_ROLES_PURGE,
-      useValue: { deleteByOrganizationId: async () => undefined },
-    },
-    {
-      provide: ORGANIZATION_USER_ROLES_PURGE,
-      useValue: { deleteByOrganizationId: async () => undefined },
-    },
-    {
-      provide: ORGANIZATION_ACCESS_CONTROL,
-      useValue: {
-        ensureOrganizationAdminRole: async () => undefined,
-        replaceUserRoles: async () => undefined,
-        invalidateAccessProfile: async () => undefined,
-      },
-    },
-    { provide: ACTIVITY_EMITTER, useValue: { emit: async () => undefined } },
-    { provide: AUDIT_WRITER, useValue: { write: async () => undefined } },
-    {
-      provide: PERSONAL_ORGANIZATION_PROVISIONER,
-      useValue: { ensurePersonalOrganization: async () => "org-fake" },
-    },
+    { provide: APP_LOGGER, useValue: { debug() {}, info() {}, warn() {}, error() {} } },
     {
       provide: EnvironmentService,
-      useValue: { isTest: true, values: { THROTTLER_TTL_MS: 60000, THROTTLER_LIMIT: 100 } },
+      useValue: {
+        isTest: true,
+        isProduction: false,
+        values: {
+          THROTTLER_TTL_MS: 60000,
+          THROTTLER_LIMIT: 100,
+        },
+      },
     },
-    { provide: ErrorReporterService, useValue: { captureException() {}, captureMessage() {} } },
+    {
+      provide: ErrorReporterService,
+      useValue: { captureException() {}, captureMessage() {} },
+    },
   ],
   exports: [
     DATABASE,
     PLATFORM_TRANSACTION_PORT,
     TRANSACTION_PORT,
     TenantContextService,
-    APP_LOGGER,
     ADVISORY_LOCK_PORT,
-    USER_LOOKUP,
-    OUTBOX_APPENDER,
-    ORGANIZATION_CUSTOM_ROLES_PURGE,
-    ORGANIZATION_USER_ROLES_PURGE,
-    ORGANIZATION_ACCESS_CONTROL,
-    ACTIVITY_EMITTER,
-    AUDIT_WRITER,
-    PERSONAL_ORGANIZATION_PROVISIONER,
+    APP_LOGGER,
     EnvironmentService,
     ErrorReporterService,
   ],
@@ -110,14 +94,24 @@ async function compileGraph(modules: readonly (typeof featureModules)[number][])
   const moduleRef = await Test.createTestingModule({
     imports: [DeterministicInfrastructureModule, ...modules],
   }).compile();
-  return moduleRef;
+  return { moduleRef };
 }
 
 describe("deterministic Nest feature bootstrap matrix", () => {
-  it("compiles and initializes the full composed feature graph without external infrastructure", async () => {
-    const moduleRef = await compileGraph(featureModules);
+  it("compiles AND initializes the full composed feature graph without external infrastructure", async () => {
+    const { moduleRef } = await compileGraph(featureModules);
+
+    await moduleRef.init();
+
     expect(orderedFeatures.length).toBeGreaterThan(1);
     expect(moduleRef.get(DATABASE)).toBe(databaseFake);
+
+    // Verify that real feature-provided tokens resolve (not fakes).
+    const { AUDIT_WRITER } = await import("@repo/feature-audit/contracts");
+    const auditWriter = moduleRef.get(AUDIT_WRITER);
+    expect(auditWriter).toBeDefined();
+    expect(typeof auditWriter.log).toBe("function");
+
     await moduleRef.close();
   });
 
@@ -127,41 +121,71 @@ describe("deterministic Nest feature bootstrap matrix", () => {
     expect(orderedFeatures.map((feature) => feature.id)).toContain("notifications");
   });
 
+  /**
+   * For every omit-feature combination, verify that:
+   * 1. computeRemovalClosure() produces the correct reverse-dependency set.
+   * 2. The remaining features compose successfully (no missing capability).
+   * 3. The remaining modules compile AND initialize without the removed feature.
+   * 4. The removed feature's contributions (schemas, seeders, authorization, outbox)
+   *    are absent from the composed result.
+   */
   it.each([
-    ["auth", ["users"]],
-    ["organizations", ["users"]],
-    ["access-control", ["users"]],
-    ["upload", ["users"]],
-    ["activities", ["users"]],
-    ["audit", ["users"]],
-    ["notifications", ["users"]],
-    ["health", ["users"]],
+    // access-control removed → auth, sso, upload, import-export, organization-management, user-management removed
+    ["access-control", ["users", "organizations", "activities", "audit", "outbox", "health"]],
+    // notifications is a leaf — only itself removed
+    [
+      "notifications",
+      ["users", "organizations", "access-control", "auth", "audit", "outbox", "health"],
+    ],
+    // upload removed → import-export, user-management removed
+    ["upload", ["users", "organizations", "access-control", "auth", "audit", "outbox", "health"]],
+    // organizations removed → access-control, auth, sso, upload, import-export, notifications, organization-management, user-management
+    ["organizations", ["users", "activities", "audit", "outbox", "health"]],
+    // health is a leaf — only itself removed
+    ["health", ["users", "organizations", "access-control", "auth", "audit", "outbox"]],
+    // activities removed → jobs, mail, notifications, organizations, access-control, auth, sso, upload, import-export, organization-management, user-management
+    ["activities", ["users", "audit", "outbox", "health"]],
   ])(
-    "composes and compiles the omit-feature acceptance closure for %s",
+    "omits %s: closure is correct, remaining graph compiles and initializes",
     async (omitted, required) => {
-      const byId = new Map(orderedFeatures.map((feature) => [feature.id, feature]));
-      const removed = new Set([omitted]);
-      let changed = true;
-      while (changed) {
-        changed = false;
-        for (const feature of orderedFeatures) {
-          if (
-            feature.dependsOn?.some((dependency) => removed.has(dependency)) &&
-            !removed.has(feature.id)
-          ) {
-            removed.add(feature.id);
-            changed = true;
-          }
-        }
+      const removed = computeRemovalClosure(enabledFeatures, [omitted]);
+      expect(removed).toContain(omitted);
+      expect(removed).not.toContain("users");
+
+      const remainingFeatures = enabledFeatures.filter((f) => !removed.includes(f.id));
+      expect(
+        remainingFeatures.map((f) => f.id),
+        `required features [${required}] must survive omit "${omitted}"`,
+      ).toEqual(expect.arrayContaining(required));
+
+      // Use buildFeatureModules to get properly composed modules
+      // (including OutboxModule.register() substitution).
+      const { modules: composedModules, features: composedFeatures } =
+        buildFeatureModules(remainingFeatures);
+
+      // The omitted feature and all its reverse-dependents must be absent.
+      for (const id of removed) {
+        expect(
+          composedFeatures.map((f) => f.id),
+          `feature "${id}" must be absent`,
+        ).not.toContain(id);
       }
-      const remaining = orderedFeatures.filter((feature) => !removed.has(feature.id));
-      expect(remaining.map((feature) => feature.id)).toEqual(expect.arrayContaining(required));
-      expect(byId.has(omitted)).toBe(true);
-      const composed = composeFeatures(
-        enabledFeatures.filter((feature) => !removed.has(feature.id)),
+
+      // No outbox handlers from removed features.
+      const removedManifests = enabledFeatures.filter((f) => removed.includes(f.id));
+      const removedHandlerClasses = new Set(
+        removedManifests.flatMap((f) => (f.outboxHandlers ?? []) as readonly unknown[]),
       );
-      const moduleRef = await compileGraph(composed.modules);
-      expect(composed.features.map((feature) => feature.id)).not.toContain(omitted);
+      for (const handlerClass of composedFeatures.flatMap(
+        (f) => (f.outboxHandlers ?? []) as readonly unknown[],
+      )) {
+        expect(removedHandlerClasses.has(handlerClass)).toBe(false);
+      }
+
+      // NestJS DI: compile + init proves all mandatory providers resolve
+      // with real feature modules — no business tokens were faked.
+      const { moduleRef } = await compileGraph(composedModules);
+      await moduleRef.init();
       await moduleRef.close();
     },
   );

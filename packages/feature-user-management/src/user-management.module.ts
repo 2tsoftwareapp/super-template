@@ -1,4 +1,5 @@
 import { Module } from "@nestjs/common";
+import { OrganizationManagementModule } from "@repo/feature-organization-management/module";
 import { UsersModule } from "@repo/feature-users/module";
 
 import { ChangePasswordUseCase } from "./application/use-cases/change-password.use-case";
@@ -14,7 +15,7 @@ import { AdminUsersController } from "./presentation/admin-users.controller";
 import { UsersController } from "./presentation/users.controller";
 
 @Module({
-  imports: [UsersModule],
+  imports: [UsersModule, OrganizationManagementModule],
   controllers: [AdminUsersController, UsersController],
   providers: [
     GetUserUseCase,

@@ -30,7 +30,7 @@ const buildAccessControlService = () => ({
   replaceUserRoles: vi.fn(async () => undefined),
 });
 
-const buildOrganizationsService = () => ({
+const buildPersonalOrganizationProvisioner = () => ({
   ensurePersonalOrganization: vi.fn(async () => undefined),
 });
 
@@ -40,7 +40,7 @@ interface BuildArgsOverrides {
   ssoRepository?: unknown;
   usersRepository?: unknown;
   accessControlService?: unknown;
-  organizationsService?: unknown;
+  personalOrganizationProvisioner?: unknown;
   issueSessionUseCase?: unknown;
   auditWriter?: unknown;
 }
@@ -52,7 +52,7 @@ const buildUseCase = (overrides: BuildArgsOverrides = {}) =>
     (overrides.ssoRepository ?? {}) as never,
     (overrides.usersRepository ?? {}) as never,
     (overrides.accessControlService ?? buildAccessControlService()) as never,
-    (overrides.organizationsService ?? buildOrganizationsService()) as never,
+    (overrides.personalOrganizationProvisioner ?? buildPersonalOrganizationProvisioner()) as never,
     (overrides.issueSessionUseCase ?? buildIssueSessionUseCase()) as never,
     (overrides.auditWriter ?? { log: vi.fn(async () => undefined) }) as never,
   );
@@ -255,13 +255,13 @@ describe("HandleSsoCallbackUseCase", () => {
     };
     const issueSessionUseCase = buildIssueSessionUseCase();
     const accessControlService = buildAccessControlService();
-    const organizationsService = buildOrganizationsService();
+    const personalOrganizationProvisioner = buildPersonalOrganizationProvisioner();
     const useCase = buildUseCase({
       providers: new Map([["fake", provider]]),
       ssoRepository,
       usersRepository,
       accessControlService,
-      organizationsService,
+      personalOrganizationProvisioner,
       issueSessionUseCase,
     });
 
@@ -282,7 +282,7 @@ describe("HandleSsoCallbackUseCase", () => {
     );
     // Linking onto an existing account must not re-run new-account bootstrap.
     expect(accessControlService.replaceUserRoles).not.toHaveBeenCalled();
-    expect(organizationsService.ensurePersonalOrganization).not.toHaveBeenCalled();
+    expect(personalOrganizationProvisioner.ensurePersonalOrganization).not.toHaveBeenCalled();
     expect(result.redirectUri).toBe("http://localhost:3005/sso/callback");
     expect(result.session.accessToken).toBe("access-token");
   });
@@ -309,13 +309,13 @@ describe("HandleSsoCallbackUseCase", () => {
     };
     const issueSessionUseCase = buildIssueSessionUseCase();
     const accessControlService = buildAccessControlService();
-    const organizationsService = buildOrganizationsService();
+    const personalOrganizationProvisioner = buildPersonalOrganizationProvisioner();
     const useCase = buildUseCase({
       providers: new Map([["fake", provider]]),
       ssoRepository,
       usersRepository,
       accessControlService,
-      organizationsService,
+      personalOrganizationProvisioner,
       issueSessionUseCase,
     });
 
@@ -335,7 +335,7 @@ describe("HandleSsoCallbackUseCase", () => {
       null,
       "tx",
     );
-    expect(organizationsService.ensurePersonalOrganization).toHaveBeenCalledWith(
+    expect(personalOrganizationProvisioner.ensurePersonalOrganization).toHaveBeenCalledWith(
       "new-user",
       "fresh",
       "tx",

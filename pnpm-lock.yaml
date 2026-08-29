@@ -1671,6 +1671,9 @@ importers:
         specifier: 5.2.1
         version: 5.2.1
     devDependencies:
+      '@repo/test-config':
+        specifier: workspace:*
+        version: link:../test-config
       '@repo/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig

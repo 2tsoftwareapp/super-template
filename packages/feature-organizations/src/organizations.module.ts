@@ -19,6 +19,14 @@ import { ORGANIZATION_MEMBERSHIP } from "./public/organization-membership.token"
 export { OrganizationsService } from "./application/organizations.service";
 export { EnsurePersonalOrganizationUseCase } from "./application/use-cases/ensure-personal-organization.use-case";
 
+/**
+ * Core organizations module — provides schema, repository, membership queries,
+ * and the core personal-organization creation (no RBAC).
+ *
+ * RBAC-aware personal-organization provisioning is provided by
+ * feature-organization-management, which wraps the core use case
+ * and exports PERSONAL_ORGANIZATION_PROVISIONER.
+ */
 @Global()
 @Module({
   imports: [],

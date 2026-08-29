@@ -5,6 +5,7 @@ export {
   composeFeaturePermissions,
   composeFeatures,
   composeFeatureSchemas,
+  computeRemovalClosure,
   defineFeature,
   type FeatureManifest,
   type FeatureSchema,
