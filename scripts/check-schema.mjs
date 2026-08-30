@@ -10,8 +10,8 @@
  * Usage:
  *   node check-schema.mjs                          # normal check (read-only)
  *   node check-schema.mjs --migrations <dir>       # check against a custom migrations dir
- *   node check-schema.mjs --schema-root <dir>      # read schema files from <dir>
- *   node check-schema.mjs --generate               # (re)generate the integrity manifest
+ *   node check-schema.mjs --packages-dir <dir>     # read schema files from <dir> (directly the packages directory)
+ *   node check-schema.mjs --generate               # append-only: add new SQL checksums, fail if existing modified
  *   node check-schema.mjs --generate --migrations <dir> # generate for a custom dir
  */
 import { cp, mkdir, mkdtemp, readdir, readFile, rm, writeFile } from "node:fs/promises";
@@ -33,7 +33,8 @@ function flagValue(name) {
 
 const generateMode = argv.includes("--generate");
 const migrations = flagValue("--migrations") ?? resolve(root, "apps/api/migrations");
-const schemaRoot = flagValue("--schema-root") ?? root;
+// --packages-dir points directly to the packages directory (no "packages" suffix appended)
+const packagesDir = flagValue("--packages-dir") ?? resolve(root, "packages");
 
 // --- Helpers ---
 
@@ -63,12 +64,9 @@ function sha256hex(data) {
   return createHash("sha256").update(data).digest("hex");
 }
 
-const normalize = (value) =>
-  value.replace(/\/\*[^]*?\*\//g, "").replace(/--[^\n]*/g, "").replace(/\s+/g, " ").trim();
-
 let failures = [];
 
-// --- 1. Migration integrity: SHA-256 checksums ---
+// --- 1. Migration integrity: SHA-256 checksums (append-only enforcement) ---
 const INTEGRITY_MANIFEST = "migration-integrity.json";
 
 try {
@@ -86,15 +84,45 @@ try {
   }
 
   if (generateMode) {
-    // Write/update the manifest. Called when migrations change intentionally.
-    const manifest = { version: 1, files: currentChecksums };
-    await mkdir(dirname(manifestPath), { recursive: true });
-    await writeFile(manifestPath, JSON.stringify(manifest, null, 2) + "\n");
-    console.log(
-      `Integrity manifest written: ${manifestPath} (${Object.keys(currentChecksums).length} files)`,
-    );
+    // Append-only: read existing manifest, verify no tampering, then add new files.
+    if (existsSync(manifestPath)) {
+      const previous = JSON.parse(await readFile(manifestPath, "utf8"));
+
+      // Fail if any previously tracked file was modified or deleted.
+      for (const [file, oldChecksum] of Object.entries(previous.files ?? {})) {
+        if (!(file in currentChecksums)) {
+          failures.push(
+            `Integrity --generate: "${file}" was deleted. Cannot re-seal a deleted migration. Restore it and re-run.`,
+          );
+        } else if (currentChecksums[file] !== oldChecksum) {
+          failures.push(
+            `Integrity --generate: "${file}" was modified. --generate is append-only and cannot overwrite existing checksums. Restore the original content.`,
+          );
+        }
+      }
+
+      if (failures.length === 0) {
+        // Merge: keep existing entries, add new ones only.
+        const merged = { ...previous.files, ...currentChecksums };
+        const manifest = { version: 1, files: merged };
+        await mkdir(dirname(manifestPath), { recursive: true });
+        await writeFile(manifestPath, JSON.stringify(manifest, null, 2) + "\n");
+        const added = sqlFiles.filter((f) => !(f in (previous.files ?? {})));
+        console.log(
+          `Integrity manifest updated: ${manifestPath} (${Object.keys(merged).length} files, ${added.length} new)`,
+        );
+      }
+    } else {
+      // No existing manifest — create from scratch.
+      const manifest = { version: 1, files: currentChecksums };
+      await mkdir(dirname(manifestPath), { recursive: true });
+      await writeFile(manifestPath, JSON.stringify(manifest, null, 2) + "\n");
+      console.log(
+        `Integrity manifest created: ${manifestPath} (${Object.keys(currentChecksums).length} files)`,
+      );
+    }
   } else if (existsSync(manifestPath)) {
-    // Verify that no previously committed SQL was modified or deleted.
+    // Read-only verification: verify no previously committed SQL was modified or deleted.
     const previous = JSON.parse(await readFile(manifestPath, "utf8"));
 
     for (const [file, oldChecksum] of Object.entries(previous.files ?? {})) {
@@ -104,17 +132,16 @@ try {
         );
       } else if (currentChecksums[file] !== oldChecksum) {
         failures.push(
-          `Migration integrity: "${file}" was modified (checksum changed). Migration history must be append-only. Run "node scripts/check-schema.mjs --generate" to re-seal.`,
+          `Migration integrity: "${file}" was modified (checksum changed). Migration history must be append-only.`,
         );
       }
     }
 
-    // Check for new files not in manifest (informational — these are fine in
-    // append-only mode, but the manifest should be regenerated after merging).
+    // New files not in manifest are a hard failure — they must be sealed before committing.
     const newFiles = sqlFiles.filter((f) => !(f in (previous.files ?? {})));
     if (newFiles.length > 0) {
-      console.warn(
-        `Info: ${newFiles.length} new SQL file(s) not yet in integrity manifest: ${newFiles.join(", ")}. Run "node scripts/check-schema.mjs --generate" to include them.`,
+      failures.push(
+        `Migration integrity: ${newFiles.length} new SQL file(s) not in integrity manifest: ${newFiles.join(", ")}. Run "node scripts/check-schema.mjs --generate --migrations ${migrations}" to seal them.`,
       );
     }
   } else {
@@ -166,15 +193,15 @@ try {
     await cp(join(migrations, file), join(output, file));
   }
 
-  // Build schema entry from packages — use schemaRoot so tests can override.
-  const packageFiles = await filesUnder(resolve(schemaRoot, "packages"));
+  // Build schema entry from packagesDir (directly the packages directory).
+  const packageFiles = await filesUnder(packagesDir);
   const schemaFiles = packageFiles
     .filter(
       (file) =>
         /^feature-[^/]+\/src\/infrastructure\/persistence\/index\.ts$/.test(file) ||
         file === "feature-outbox/src/infrastructure/persistence/outbox-messages.ts",
     )
-    .map((file) => resolve(schemaRoot, "packages", file));
+    .map((file) => resolve(packagesDir, file));
 
   const schemaEntry = join(temp, "schema.ts");
   await writeFile(
@@ -232,14 +259,6 @@ try {
       const committedSnapshot = normalizeSnapshot(committedRaw);
       const producedSnapshot = normalizeSnapshot(producedRaw);
       if (JSON.stringify(committedSnapshot) !== JSON.stringify(producedSnapshot)) {
-        await writeFile(
-          "/tmp/committed-schema.json",
-          JSON.stringify(committedSnapshot, null, 2),
-        );
-        await writeFile(
-          "/tmp/produced-schema.json",
-          JSON.stringify(producedSnapshot, null, 2),
-        );
         failures.push(
           "Schema drift detected: canonical Drizzle schema does not match the complete committed effective snapshot",
         );
