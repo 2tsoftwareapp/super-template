@@ -1,5 +1,7 @@
 import type { INestApplication } from "@nestjs/common";
-import { JobsRepository, JobsService, type JobStatus } from "@repo/feature-jobs/contracts";
+import { JobsService } from "@repo/feature-jobs/module";
+import { JobsRepository } from "@repo/feature-jobs/module";
+import type { JobStatus } from "@repo/feature-jobs/contracts";
 import { type DatabaseClient, DATABASE } from "@repo/database-runtime";
 import { organizations } from "@repo/feature-organizations/schema";
 import {

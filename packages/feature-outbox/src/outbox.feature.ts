@@ -6,7 +6,6 @@ import { OutboxModule } from "./outbox.module";
 export const outboxFeature: FeatureManifest = defineFeature({
   id: "outbox",
   dependsOn: [],
-  provides: ["outbox"],
   nestModule: OutboxModule,
   schema: { outboxMessages },
   outboxHandlers: [],

@@ -1,4 +1,4 @@
-import type { DynamicModule, Type } from "@nestjs/common";
+import type { DynamicModule, Provider, Type } from "@nestjs/common";
 
 /**
  * A feature package participates in the application by exporting exactly one
@@ -9,6 +9,7 @@ import type { DynamicModule, Type } from "@nestjs/common";
  * - `schema` contributes the Drizzle tables the feature owns.
  * - `permissions` contributes RBAC permission keys the feature defines.
  * - `seeders` contributes optional bootstrap seed runners.
+ * - `httpPipeline` contributes feature-owned global Nest guards/interceptors.
  * - `dependsOn` declares other feature ids that must be composed first.
  *
  * Frontend surfaces (admin/web nav, mobile routes) are wired through their own
@@ -20,6 +21,7 @@ import type { DynamicModule, Type } from "@nestjs/common";
  * Removing a feature means removing its workspace dependency and the one line
  * that references its manifest — no kernel code changes.
  */
+
 /** Authorization contribution contributed by a single feature. */
 export interface FeatureAuthorizationResource {
   readonly scope: "platform" | "organization";
@@ -38,6 +40,25 @@ export interface ComposedAuthorization {
   readonly grantsByRole: Readonly<Record<string, readonly string[]>>;
 }
 
+/**
+ * Feature-owned HTTP pipeline contributions. Each guard/interceptor is
+ * registered as a global APP_GUARD or APP_INTERCEPTOR. The application
+ * composer collects these in deterministic order based on feature dependency
+ * ordering and the declared `httpPipelineOrder`.
+ */
+export interface FeatureHttpPipeline {
+  /**
+   * Global guards contributed by this feature. Registered as APP_GUARD in
+   * the order features appear in the composition.
+   */
+  readonly guards?: readonly Provider[];
+  /**
+   * Global interceptors contributed by this feature. Registered as
+   * APP_INTERCEPTOR in the order features appear in the composition.
+   */
+  readonly interceptors?: readonly Provider[];
+}
+
 export interface FeatureManifest {
   /** Stable, unique feature id (kebab-case), e.g. `"audit"`, `"identity"`. */
   readonly id: string;
@@ -50,23 +71,6 @@ export interface FeatureManifest {
    * Validated by {@link composeFeatures} (missing deps + cycles rejected).
    */
   readonly dependsOn?: readonly string[];
-
-  /**
-   * Capability ids this feature exposes to other features (e.g.
-   * `"organization-membership"`). Capabilities are validated at composition:
-   * every required capability must have exactly one provider in the composed
-   * set. Use capabilities for mandatory runtime provider dependencies that
-   * would create package cycles as direct dependencies (provider binds a
-   * consumer-owned token through its own global module).
-   */
-  readonly provides?: readonly string[];
-
-  /**
-   * Capability ids this feature cannot boot without. Composition rejects the
-   * set when no composed feature provides one of these, so removal of a
-   * provider forces removal of its reverse dependents before Nest boot.
-   */
-  readonly requires?: readonly string[];
 
   /**
    * Drizzle tables owned by this feature, keyed by their schema name. These are
@@ -85,6 +89,20 @@ export interface FeatureManifest {
   readonly authorization?: {
     readonly resources?: Readonly<Record<string, FeatureAuthorizationResource>>;
   };
+
+  /**
+   * Global HTTP pipeline contributions (guards/interceptors). The application
+   * composer collects these from all features and registers them in
+   * deterministic order.
+   */
+  readonly httpPipeline?: FeatureHttpPipeline;
+
+  /**
+   * Ordering priority for this feature's HTTP pipeline contributions.
+   * Lower numbers are registered first. Default is 100.
+   * Features without pipeline contributions are ignored.
+   */
+  readonly httpPipelineOrder?: number;
 
   /** Optional seed runners contributed by this feature. */
   readonly seeders?: readonly FeatureSeeder[];
@@ -156,6 +174,12 @@ export interface ComposedFeatures {
   readonly authorization: ComposedAuthorization;
   /** Composed outbox handler classes in dependency order. */
   readonly outboxHandlerClasses: readonly Type<unknown>[];
+  /**
+   * HTTP pipeline providers collected from features in deterministic order.
+   * Guards first, then interceptors, each group in feature composition order.
+   */
+  readonly httpPipelineGuards: readonly Provider[];
+  readonly httpPipelineInterceptors: readonly Provider[];
 }
 
 /**
@@ -387,44 +411,8 @@ export function composeFeatureAuthorization(
 }
 
 /**
- * Validate capability wiring across a composed set:
- * - every `requires` entry must have at least one provider,
- * - no capability may have more than one provider (uniqueness).
- */
-export function validateFeatureCapabilities(features: readonly FeatureManifest[]): void {
-  const providers = new Map<string, string>();
-  for (const feature of features) {
-    for (const capability of feature.provides ?? []) {
-      const existing = providers.get(capability);
-      if (existing !== undefined) {
-        throw new Error(
-          `Capability "${capability}" is provided by both "${existing}" and "${feature.id}". Providers must be unique.`,
-        );
-      }
-      providers.set(capability, feature.id);
-    }
-  }
-
-  const ids = new Set(features.map((f) => f.id));
-  for (const feature of features) {
-    for (const capability of feature.requires ?? []) {
-      if (!providers.has(capability)) {
-        throw new Error(
-          `Feature "${feature.id}" requires capability "${capability}" but no composed feature provides it.`,
-        );
-      }
-    }
-    for (const dep of feature.dependsOn ?? []) {
-      if (!ids.has(dep)) {
-        throw new Error(`Feature "${feature.id}" depends on missing feature "${dep}".`);
-      }
-    }
-  }
-}
-
-/**
  * Compute the reverse-dependency closure that must be removed together with
- * `omitId`: every feature whose `dependsOn` or capability `requires` can only be
+ * `omitId`: every feature whose `dependsOn` can only be
  * satisfied by a removed feature is removed transitively.
  */
 export function computeRemovalClosure(
@@ -438,10 +426,7 @@ export function computeRemovalClosure(
     for (const feature of features) {
       if (removed.has(feature.id)) continue;
       const dependsRemoved = (feature.dependsOn ?? []).some((d) => removed.has(d));
-      const requiresMissing = (feature.requires ?? []).some((capability) => {
-        return !features.some((f) => !removed.has(f.id) && (f.provides ?? []).includes(capability));
-      });
-      if (dependsRemoved || requiresMissing) {
+      if (dependsRemoved) {
         removed.add(feature.id);
         changed = true;
       }
@@ -451,11 +436,35 @@ export function computeRemovalClosure(
 }
 
 /**
+ * Collect HTTP pipeline contributions from features in composition order.
+ * Features with lower `httpPipelineOrder` contribute first.
+ */
+export function collectFeatureHttpPipeline(features: readonly FeatureManifest[]): {
+  guards: Provider[];
+  interceptors: Provider[];
+} {
+  const sorted = [...features]
+    .filter((f) => f.httpPipeline)
+    .sort((a, b) => (a.httpPipelineOrder ?? 100) - (b.httpPipelineOrder ?? 100));
+
+  const guards: Provider[] = [];
+  const interceptors: Provider[] = [];
+
+  for (const feature of sorted) {
+    if (!feature.httpPipeline) continue;
+    guards.push(...(feature.httpPipeline.guards ?? []));
+    interceptors.push(...(feature.httpPipeline.interceptors ?? []));
+  }
+
+  return { guards, interceptors };
+}
+
+/**
  * Full composition entrypoint used by the API host: validates ids/deps/cycles,
- * returns deterministic order, and merges schema/modules/permissions/seeders.
+ * returns deterministic order, and merges schema/modules/permissions/seeders
+ * and HTTP pipeline contributions.
  */
 export function composeFeatures(features: readonly FeatureManifest[]): ComposedFeatures {
-  validateFeatureCapabilities(features);
   const ordered = orderFeatureManifests(features);
 
   const handlerClasses: Type<unknown>[] = [];
@@ -484,6 +493,8 @@ export function composeFeatures(features: readonly FeatureManifest[]): ComposedF
     throw new Error(`Duplicate outbox ${details}.`);
   }
 
+  const { guards, interceptors } = collectFeatureHttpPipeline(ordered);
+
   return {
     features: ordered,
     schema: composeFeatureSchemas(ordered),
@@ -492,5 +503,7 @@ export function composeFeatures(features: readonly FeatureManifest[]): ComposedF
     seeders: collectFeatureSeeders(ordered),
     authorization: composeFeatureAuthorization(ordered),
     outboxHandlerClasses: handlerClasses,
+    httpPipelineGuards: guards,
+    httpPipelineInterceptors: interceptors,
   };
 }

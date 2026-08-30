@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { ACTION, AppError, perm, ROLE_NAMES } from "@repo/api-runtime";
+import { ACTION, AppError, perm } from "@repo/api-runtime";
+import { ROLE_NAMES } from "../../public/role.constants";
 
 import {
   assertCanAssignRoles,

@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
-import { ACTION, ERROR_CODES, ROLE_NAMES } from "@repo/api-runtime";
+import { ACTION, ERROR_CODES } from "@repo/api-runtime";
+import { ROLE_NAMES } from "../../../public/role.constants";
 
 import { AccessControlMapper } from "../../access-control.mapper";
 import { CreateCustomRoleUseCase } from "../create-custom-role.use-case";

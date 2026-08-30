@@ -14,12 +14,11 @@ import {
   notifications,
 } from "@repo/feature-notifications/schema";
 
+import { DELIVERIES_REPOSITORY, PUSH_NOTIFIER } from "@repo/feature-notifications/contracts";
 import {
-  DELIVERIES_REPOSITORY,
   NotificationDeliveryProcessor,
   NotificationDeliveryUseCase,
-  PUSH_NOTIFIER,
-} from "@repo/feature-notifications/contracts";
+} from "@repo/feature-notifications/module";
 import { bearer, createTestApp, loginAs, resetTestDatabase } from "./support/test-app";
 
 // ---------------------------------------------------------------------------

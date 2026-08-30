@@ -1,4 +1,4 @@
-import { ROLE_NAMES } from "@repo/api-runtime";
+import { ROLE_NAMES } from "@repo/feature-access-control/contracts";
 import { describe, expect, it } from "vitest";
 
 import { canAccessImportJob } from "../import-access.policy";

@@ -128,3 +128,9 @@ export const composedAuthorization = composed.authorization;
 /** Composed outbox handler classes in dependency order. */
 export const composedOutboxHandlers: readonly OutboxTopicHandlerClass[] =
   composed.outboxHandlerClasses as readonly OutboxTopicHandlerClass[];
+
+/** Global HTTP pipeline guards collected from feature manifests. */
+export const composedHttpPipelineGuards = composed.httpPipelineGuards;
+
+/** Global HTTP pipeline interceptors collected from feature manifests. */
+export const composedHttpPipelineInterceptors = composed.httpPipelineInterceptors;

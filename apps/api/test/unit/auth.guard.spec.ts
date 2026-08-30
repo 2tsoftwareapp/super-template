@@ -5,7 +5,7 @@ import { AppError } from "@repo/api-runtime";
 import { type AccessTokenAuthenticator } from "@repo/feature-auth/contracts";
 import { describe, expect, it, vi } from "vitest";
 
-import { AuthGuard } from "../../src/shell/auth.guard";
+import { AuthGuard } from "@repo/feature-auth/guard";
 
 interface RequestStub {
   headers: { authorization?: string };

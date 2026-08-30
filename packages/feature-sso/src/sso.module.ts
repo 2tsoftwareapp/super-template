@@ -1,6 +1,6 @@
 import { Global, Module } from "@nestjs/common";
 import { EnvironmentService } from "@repo/api-runtime";
-import { AccessControlModule } from "@repo/feature-access-control/contracts";
+import { AccessControlModule } from "@repo/feature-access-control/module";
 import { AuthModule } from "@repo/feature-auth/module";
 import { OrganizationManagementModule } from "@repo/feature-organization-management/module";
 import { UsersModule } from "@repo/feature-users/module";

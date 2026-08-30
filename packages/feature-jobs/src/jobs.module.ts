@@ -76,3 +76,5 @@ import { JOB_HANDLER_REGISTRY } from "./public/job-handler.port";
   ],
 })
 export class JobsModule {}
+export { JobsService } from "./application/jobs.service";
+export { JobsRepository } from "./infrastructure/jobs.repository";

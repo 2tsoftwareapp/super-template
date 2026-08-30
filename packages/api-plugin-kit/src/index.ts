@@ -1,4 +1,5 @@
 export {
+  collectFeatureHttpPipeline,
   collectFeatureModules,
   collectFeatureSeeders,
   type ComposedFeatures,
@@ -7,6 +8,7 @@ export {
   composeFeatureSchemas,
   computeRemovalClosure,
   defineFeature,
+  type FeatureHttpPipeline,
   type FeatureManifest,
   type FeatureSchema,
   type FeatureSeedContext,

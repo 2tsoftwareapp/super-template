@@ -6,7 +6,6 @@ import { UsersModule } from "./users.module";
 export const usersFeature: FeatureManifest = defineFeature({
   id: "users",
   dependsOn: [],
-  provides: ["user-credential-store"],
   nestModule: UsersModule,
   authorization: {
     resources: {

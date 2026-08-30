@@ -6,6 +6,7 @@
   "exports": {
     ".": "./src/notifications.feature.ts",
     "./contracts": "./src/public/contracts.ts",
+    "./module": "./src/notifications.module.ts",
     "./testing": "./src/testing/index.ts",
     "./schema": "./src/infrastructure/persistence/index.ts"
   },

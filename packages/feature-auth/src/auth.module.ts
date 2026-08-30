@@ -1,6 +1,6 @@
 import { Global, Module } from "@nestjs/common";
 import { JwtModule } from "@nestjs/jwt";
-import { AccessControlModule } from "@repo/feature-access-control/contracts";
+import { AccessControlModule } from "@repo/feature-access-control/module";
 import { MfaModule } from "@repo/feature-mfa/contracts";
 import { OrganizationManagementModule } from "@repo/feature-organization-management/module";
 

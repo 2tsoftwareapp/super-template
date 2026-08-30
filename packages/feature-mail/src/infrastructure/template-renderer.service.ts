@@ -10,9 +10,6 @@ function resolveTemplatesDir(): string {
   const candidates = [
     // Ops escape hatch: point at templates shipped outside the bundle.
     process.env.MAIL_TEMPLATES_DIR,
-    // Webpack build (nest build): CopyPlugin emits them beside the bundle
-    // mirroring the src layout.
-    join(process.cwd(), "dist", "platform", "modules", "mail", "infrastructure", "templates"),
     // tsc-style builds / running from compiled folder.
     join(__dirname, "templates"),
     join(__dirname, "infrastructure", "templates"),

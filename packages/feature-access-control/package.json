@@ -9,7 +9,8 @@
     "./tokens": "./src/public/tokens.ts",
     "./testing": "./src/testing/index.ts",
     "./schema": "./src/infrastructure/persistence/index.ts",
-    "./module": "./src/access-control.module.ts"
+    "./module": "./src/access-control.module.ts",
+    "./interceptor": "./src/tenant-context.interceptor.ts"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json --noEmit",
@@ -34,6 +35,7 @@
     "class-validator": "0.15.1",
     "drizzle-orm": "0.45.2",
     "express": "5.2.1",
+    "rxjs": "7.8.2",
     "zod": "4.4.3"
   },
   "devDependencies": {

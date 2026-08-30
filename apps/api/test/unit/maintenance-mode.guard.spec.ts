@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { ERROR_CODES } from "@repo/api-runtime";
 
-import { MaintenanceModeGuard } from "../../src/shell/maintenance-mode.guard";
+import { MaintenanceModeGuard } from "@repo/feature-settings/guard";
 
 function buildContext(path: string) {
   return {

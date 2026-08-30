@@ -5,10 +5,11 @@ import {
   type NestInterceptor,
 } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
-import { IS_PUBLIC_KEY } from "@repo/api-runtime";
-import { TenantContextService } from "@repo/api-runtime";
-import { ROLE_NAMES } from "@repo/feature-access-control/contracts";
+import { IS_PUBLIC_KEY, TenantContextService } from "@repo/api-runtime";
 import { Observable } from "rxjs";
+
+import { ROLE_NAMES } from "./public/role.constants";
+
 @Injectable()
 export class TenantContextInterceptor implements NestInterceptor {
   constructor(

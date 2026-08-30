@@ -7,7 +7,8 @@
     ".": "./src/settings.feature.ts",
     "./contracts": "./src/public/contracts.ts",
     "./testing": "./src/testing/index.ts",
-    "./schema": "./src/infrastructure/persistence/index.ts"
+    "./schema": "./src/infrastructure/persistence/index.ts",
+    "./guard": "./src/maintenance-mode.guard.ts"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json --noEmit",

@@ -14,10 +14,8 @@ import {
   ERROR_CODES,
   IS_PUBLIC_KEY,
 } from "@repo/api-runtime";
-import {
-  ACCESS_TOKEN_AUTHENTICATOR,
-  type AccessTokenAuthenticator,
-} from "@repo/feature-auth/contracts";
+
+import { ACCESS_TOKEN_AUTHENTICATOR, type AccessTokenAuthenticator } from "./public/contracts";
 
 @Injectable()
 export class AuthGuard implements CanActivate {

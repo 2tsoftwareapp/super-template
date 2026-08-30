@@ -5,7 +5,7 @@ import type { TenantContextService } from "@repo/api-runtime";
 import { lastValueFrom, of } from "rxjs";
 import { describe, expect, it, vi } from "vitest";
 
-import { TenantContextInterceptor } from "../../src/shell/tenant-context.interceptor";
+import { TenantContextInterceptor } from "@repo/feature-access-control/interceptor";
 
 interface RequestStub {
   user?: {

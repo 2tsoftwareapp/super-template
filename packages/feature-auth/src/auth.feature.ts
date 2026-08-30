@@ -7,6 +7,7 @@ import {
   UserLifecyclePasswordChangedHandler,
   UserLifecycleStatusBlockedHandler,
 } from "./application/services/auth-user-lifecycle.handlers";
+import { AuthGuard } from "./auth.guard";
 import { AuthModule } from "./auth.module";
 import {
   authSessions,
@@ -30,6 +31,10 @@ export const authFeature: FeatureManifest = defineFeature({
     "outbox",
   ],
   nestModule: AuthModule,
+  httpPipeline: {
+    guards: [AuthGuard],
+  },
+  httpPipelineOrder: 20,
   schema: {
     authSessions,
     emailVerificationTokens,

@@ -1,4 +1,3 @@
-export * from "./constants/organization-role";
 export * from "./constants/system.constants";
 export * from "./errors/app-error";
 export * from "./logging/logger.interface";

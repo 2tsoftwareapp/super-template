@@ -8,7 +8,8 @@
     "./contracts": "./src/public/contracts.ts",
     "./testing": "./src/testing/index.ts",
     "./schema": "./src/infrastructure/persistence/index.ts",
-    "./module": "./src/auth.module.ts"
+    "./module": "./src/auth.module.ts",
+    "./guard": "./src/auth.guard.ts"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json --noEmit",
@@ -19,6 +20,7 @@
   },
   "dependencies": {
     "@nestjs/common": "11.1.27",
+    "@nestjs/core": "11.1.27",
     "@nestjs/jwt": "11.0.2",
     "@nestjs/schedule": "6.1.1",
     "@nestjs/swagger": "11.4.4",

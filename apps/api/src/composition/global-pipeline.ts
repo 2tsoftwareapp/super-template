@@ -1,4 +1,4 @@
-import type { MiddlewareConsumer, NestModule } from "@nestjs/common";
+import type { MiddlewareConsumer, NestModule, Provider, Type } from "@nestjs/common";
 
 import { RequestMethod } from "@nestjs/common";
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, Reflector } from "@nestjs/core";
@@ -14,18 +14,18 @@ import {
   ResponseEnvelopeInterceptor,
   TenantContextService,
 } from "@repo/api-runtime";
-import {
-  ACCESS_TOKEN_AUTHENTICATOR,
-  type AccessTokenAuthenticator,
-} from "@repo/feature-auth/contracts";
 import { ErrorReporterService } from "@repo/observability";
 
-import { AuthGuard } from "../shell/auth.guard";
-import { MaintenanceModeGuard } from "../shell/maintenance-mode.guard";
-import { TenantContextInterceptor } from "../shell/tenant-context.interceptor";
+import { composedHttpPipelineGuards, composedHttpPipelineInterceptors } from "./composed-schema";
 
-/** Global HTTP pipeline providers for the API host. */
-export const globalPipelineProviders = [
+/**
+ * Generic global HTTP pipeline providers. Feature-specific guards and
+ * interceptors are composed from feature manifests by the plugin kit.
+ *
+ * Ordering: maintenance (settings) → throttling → auth → authorization →
+ * tenant context → response envelope → exception mapping.
+ */
+export const globalPipelineProviders: Provider[] = [
   RequestLoggerMiddleware,
   {
     provide: APP_FILTER,
@@ -36,14 +36,13 @@ export const globalPipelineProviders = [
     ) => new AppExceptionFilter(environmentService, logger, errorReporter),
     inject: [EnvironmentService, APP_LOGGER, ErrorReporterService],
   },
-  { provide: APP_GUARD, useClass: MaintenanceModeGuard },
+  // Feature-contributed guards (maintenance-mode, auth) are registered here
+  // in the order declared by each feature's httpPipelineOrder.
   { provide: APP_GUARD, useClass: ThrottlerGuard },
-  {
+  ...composedHttpPipelineGuards.map((guard) => ({
     provide: APP_GUARD,
-    useFactory: (reflector: Reflector, accessTokenAuthenticator: AccessTokenAuthenticator) =>
-      new AuthGuard(reflector, accessTokenAuthenticator),
-    inject: [Reflector, ACCESS_TOKEN_AUTHENTICATOR],
-  },
+    useClass: guard as Type<unknown>,
+  })),
   {
     provide: APP_GUARD,
     useFactory: (reflector: Reflector) => new AuthorizeGuard(reflector),
@@ -54,12 +53,12 @@ export const globalPipelineProviders = [
     useFactory: (reflector: Reflector) => new ResponseEnvelopeInterceptor(reflector),
     inject: [Reflector],
   },
-  {
+  // Feature-contributed interceptors (tenant context) are registered here
+  // in the order declared by each feature's httpPipelineOrder.
+  ...composedHttpPipelineInterceptors.map((interceptor) => ({
     provide: APP_INTERCEPTOR,
-    useFactory: (reflector: Reflector, tenantContextService: TenantContextService) =>
-      new TenantContextInterceptor(reflector, tenantContextService),
-    inject: [Reflector, TenantContextService],
-  },
+    useClass: interceptor as Type<unknown>,
+  })),
   TenantContextService,
 ];
 

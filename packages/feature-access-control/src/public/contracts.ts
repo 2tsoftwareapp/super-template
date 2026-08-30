@@ -1,5 +1,7 @@
 /** Public contracts for @repo/feature-access-control. */
-export { AccessControlModule } from "../access-control.module";
+
+// Cross-feature integration surfaces: stable use-case and service
+// that auth/sso/user-management depend on for role management.
 export { AccessControlService } from "../application/access-control.service";
 export type * from "../application/ports/access-control.repository.port";
 export { RoleManagementUseCase } from "../application/use-cases/role-management.use-case";
@@ -9,9 +11,7 @@ export {
   type RolePolicyTarget,
 } from "../domain/role-assignment.policy";
 export { ACCESS_CONTROL_REPOSITORY } from "./access-control-repository.token";
-
 export { ACCESS_CONTROL_ERROR_CODES } from "./error-codes";
-
 export {
   FIXED_ROLE_NAMES,
   isFixedRoleName,
