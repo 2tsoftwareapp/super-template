@@ -224,6 +224,10 @@ describe("Schema drift check", () => {
         try {
           bootstrapManifest(tempMigrations);
 
+          // Read the manifest before tampering so we can verify it was not changed.
+          const manifestPath = join(tempMigrations, "meta", "migration-integrity.json");
+          const manifestBefore = readFileSync(manifestPath, "utf8");
+
           const sqls = readdirSync(tempMigrations)
             .filter((f) => f.endsWith(".sql"))
             .sort();
@@ -234,14 +238,33 @@ describe("Schema drift check", () => {
           const original = readFileSync(targetSql, "utf8");
           writeFileSync(targetSql, original + "\n-- tampered\n");
 
-          // --generate must refuse to overwrite.
-          const result = runDriftCheck({
-            migrationsPath: tempMigrations,
-            // Note: we can't pass --generate through runDriftCheck, so use execFileSync directly.
-          });
-          // This is just a read-only check — it should fail because the mutation is detected.
-          expect(result.code, result.stderr).toBe(1);
-          expect(result.stderr).toMatch(/modified/i);
+          // --generate must refuse to overwrite — call it directly with execFileSync.
+          let generateError: { status?: number | null; stderr?: Buffer | string } | null = null;
+          try {
+            execFileSync(
+              "node",
+              [
+                resolve(repoRoot, "scripts/check-schema.mjs"),
+                "--generate",
+                "--migrations",
+                tempMigrations,
+              ],
+              { cwd: repoRoot, stdio: "pipe" },
+            );
+          } catch (err) {
+            generateError = err as { status?: number | null; stderr?: Buffer | string };
+          }
+
+          // --generate must exit with code 1.
+          expect(generateError).not.toBeNull();
+          expect(generateError!.status, "--generate should fail with exit code 1").toBe(1);
+
+          const stderr = generateError!.stderr ? String(generateError!.stderr) : "";
+          expect(stderr).toMatch(/modified|cannot overwrite|append-only/i);
+
+          // The manifest must NOT have been overwritten — checksums must be unchanged.
+          const manifestAfter = readFileSync(manifestPath, "utf8");
+          expect(manifestAfter).toBe(manifestBefore);
         } finally {
           cleanup();
         }
