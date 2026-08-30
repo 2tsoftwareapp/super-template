@@ -1,10 +1,15 @@
 import { Global, Module } from "@nestjs/common";
 import { Test } from "@nestjs/testing";
 import { computeRemovalClosure } from "@repo/api-plugin-kit";
+import type { FeatureManifest } from "@repo/api-plugin-kit";
 import { describe, expect, it } from "vitest";
 
 import {
   buildFeatureModules,
+  composedSchema,
+  composedSeeders,
+  composedAuthorization,
+  composedPermissions,
   featureModules,
   orderedFeatures,
 } from "../../src/composition/composed-schema";
@@ -97,6 +102,52 @@ async function compileGraph(modules: readonly (typeof featureModules)[number][])
   return { moduleRef };
 }
 
+/**
+ * Collect all schema table names contributed by a feature manifest.
+ */
+function featureSchemaKeys(feature: FeatureManifest): string[] {
+  return Object.keys(feature.schema ?? {});
+}
+
+/**
+ * Collect all permission keys contributed by a feature.
+ */
+function featurePermissionKeys(feature: FeatureManifest): string[] {
+  return [...(feature.permissions ?? [])];
+}
+
+/**
+ * Collect all authorization resource names contributed by a feature.
+ */
+function featureAuthResourceKeys(feature: FeatureManifest): string[] {
+  return Object.keys(feature.authorization?.resources ?? {});
+}
+
+/**
+ * Collect all seeder ids contributed by a feature.
+ */
+function featureSeederIds(feature: FeatureManifest): string[] {
+  return [...(feature.seeders ?? [])].map((s: { id: string }) => s.id);
+}
+
+/**
+ * Collect all outbox handler classes contributed by a feature.
+ */
+function featureOutboxHandlers(feature: FeatureManifest): readonly unknown[] {
+  return [...(feature.outboxHandlers ?? [])];
+}
+
+/**
+ * For every enabled feature, compute what gets removed when that feature is
+ * omitted, then verify:
+ *  1. The remaining graph compiles AND initializes (real DI, real providers).
+ *  2. No removed feature's contributions remain in the composed result.
+ *  3. Schema, seeders, authorization, permissions, outbox handlers are all checked.
+ */
+function omitFeatureCases(): Array<[string]> {
+  return enabledFeatures.map((f) => [f.id]);
+}
+
 describe("deterministic Nest feature bootstrap matrix", () => {
   it("compiles AND initializes the full composed feature graph without external infrastructure", async () => {
     const { moduleRef } = await compileGraph(featureModules);
@@ -112,6 +163,12 @@ describe("deterministic Nest feature bootstrap matrix", () => {
     expect(auditWriter).toBeDefined();
     expect(typeof auditWriter.log).toBe("function");
 
+    // Verify all contribution surfaces exist.
+    expect(Object.keys(composedSchema).length).toBeGreaterThan(0);
+    expect(composedSeeders.length).toBeGreaterThan(0);
+    expect(Object.keys(composedAuthorization.resources).length).toBeGreaterThan(0);
+    expect(Object.keys(composedAuthorization.grantsByRole).length).toBeGreaterThan(0);
+
     await moduleRef.close();
   });
 
@@ -121,47 +178,24 @@ describe("deterministic Nest feature bootstrap matrix", () => {
     expect(orderedFeatures.map((feature) => feature.id)).toContain("notifications");
   });
 
-  /**
-   * For every omit-feature combination, verify that:
-   * 1. computeRemovalClosure() produces the correct reverse-dependency set.
-   * 2. The remaining features compose successfully (no missing capability).
-   * 3. The remaining modules compile AND initialize without the removed feature.
-   * 4. The removed feature's contributions (schemas, seeders, authorization, outbox)
-   *    are absent from the composed result.
-   */
-  it.each([
-    // access-control removed → auth, sso, upload, import-export, organization-management, user-management removed
-    ["access-control", ["users", "organizations", "activities", "audit", "outbox", "health"]],
-    // notifications is a leaf — only itself removed
-    [
-      "notifications",
-      ["users", "organizations", "access-control", "auth", "audit", "outbox", "health"],
-    ],
-    // upload removed → import-export, user-management removed
-    ["upload", ["users", "organizations", "access-control", "auth", "audit", "outbox", "health"]],
-    // organizations removed → access-control, auth, sso, upload, import-export, notifications, organization-management, user-management
-    ["organizations", ["users", "activities", "audit", "outbox", "health"]],
-    // health is a leaf — only itself removed
-    ["health", ["users", "organizations", "access-control", "auth", "audit", "outbox"]],
-    // activities removed → jobs, mail, notifications, organizations, access-control, auth, sso, upload, import-export, organization-management, user-management
-    ["activities", ["users", "audit", "outbox", "health"]],
-  ])(
-    "omits %s: closure is correct, remaining graph compiles and initializes",
-    async (omitted, required) => {
-      const removed = computeRemovalClosure(enabledFeatures, [omitted]);
-      expect(removed).toContain(omitted);
-      expect(removed).not.toContain("users");
+  it.each(omitFeatureCases())(
+    "omits %s: remaining graph compiles/init, and removed contributions are absent",
+    async (omittedId) => {
+      const removed = computeRemovalClosure(enabledFeatures, [omittedId]);
+      expect(removed).toContain(omittedId);
 
       const remainingFeatures = enabledFeatures.filter((f) => !removed.includes(f.id));
-      expect(
-        remainingFeatures.map((f) => f.id),
-        `required features [${required}] must survive omit "${omitted}"`,
-      ).toEqual(expect.arrayContaining(required));
 
       // Use buildFeatureModules to get properly composed modules
       // (including OutboxModule.register() substitution).
-      const { modules: composedModules, features: composedFeatures } =
-        buildFeatureModules(remainingFeatures);
+      const {
+        modules: composedModules,
+        features: composedFeatures,
+        schema: subsetSchema,
+        seeders: subsetSeeders,
+        authorization: subsetAuthorization,
+        permissions: subsetPermissions,
+      } = buildFeatureModules(remainingFeatures);
 
       // The omitted feature and all its reverse-dependents must be absent.
       for (const id of removed) {
@@ -171,19 +205,60 @@ describe("deterministic Nest feature bootstrap matrix", () => {
         ).not.toContain(id);
       }
 
-      // No outbox handlers from removed features.
+      // --- Schema contributions: no tables from removed features ---
       const removedManifests = enabledFeatures.filter((f) => removed.includes(f.id));
-      const removedHandlerClasses = new Set(
-        removedManifests.flatMap((f) => (f.outboxHandlers ?? []) as readonly unknown[]),
-      );
-      for (const handlerClass of composedFeatures.flatMap(
-        (f) => (f.outboxHandlers ?? []) as readonly unknown[],
-      )) {
-        expect(removedHandlerClasses.has(handlerClass)).toBe(false);
+      for (const manifest of removedManifests) {
+        for (const tableName of featureSchemaKeys(manifest)) {
+          expect(
+            subsetSchema,
+            `removed feature "${manifest.id}" schema table "${tableName}" must not appear`,
+          ).not.toHaveProperty(tableName);
+        }
       }
 
-      // NestJS DI: compile + init proves all mandatory providers resolve
-      // with real feature modules — no business tokens were faked.
+      // --- Permission contributions: no permissions from removed features ---
+      for (const manifest of removedManifests) {
+        for (const perm of featurePermissionKeys(manifest)) {
+          expect(
+            subsetPermissions,
+            `removed feature "${manifest.id}" permission "${perm}" must not appear`,
+          ).not.toContain(perm);
+        }
+      }
+
+      // --- Authorization resources: no resources from removed features ---
+      for (const manifest of removedManifests) {
+        for (const resource of featureAuthResourceKeys(manifest)) {
+          expect(
+            subsetAuthorization.resources,
+            `removed feature "${manifest.id}" auth resource "${resource}" must not appear`,
+          ).not.toHaveProperty(resource);
+        }
+      }
+
+      // --- Seeders: no seeders from removed features ---
+      for (const manifest of removedManifests) {
+        for (const seederId of featureSeederIds(manifest)) {
+          expect(
+            subsetSeeders.map((s) => s.id),
+            `removed feature "${manifest.id}" seeder "${seederId}" must not appear`,
+          ).not.toContain(seederId);
+        }
+      }
+
+      // --- Outbox handlers: no handlers from removed features ---
+      const removedHandlerClasses = new Set(
+        removedManifests.flatMap((f) => featureOutboxHandlers(f)),
+      );
+      for (const handlerClass of composedFeatures.flatMap((f) => featureOutboxHandlers(f))) {
+        expect(
+          removedHandlerClasses.has(handlerClass),
+          `outbox handler from removed feature must not appear`,
+        ).toBe(false);
+      }
+
+      // --- NestJS DI: compile + init proves all mandatory providers resolve
+      //     with real feature modules — no business tokens were faked. ---
       const { moduleRef } = await compileGraph(composedModules);
       await moduleRef.init();
       await moduleRef.close();

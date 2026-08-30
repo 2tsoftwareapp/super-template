@@ -1,32 +1,41 @@
 #!/usr/bin/env node
 /**
  * Verify that canonical Drizzle schemas are represented by the committed SQL
- * migration history. Drizzle metadata is intentionally not copied: stale or
- * partially reconciled snapshots can trigger interactive rename prompts in CI.
+ * migration history, and that the SQL migration history is append-only.
+ *
+ * Two integrity checks:
+ * 1. Canonical TypeScript schema matches the committed Drizzle snapshot.
+ * 2. All previously committed SQL migration files are unmodified (SHA-256 checksums).
  *
  * Usage:
- *   node check-schema.mjs                    # normal check (committed migrations)
- *   node check-schema.mjs --migrations <dir> # check against a custom migrations dir
+ *   node check-schema.mjs                          # normal check (read-only)
+ *   node check-schema.mjs --migrations <dir>       # check against a custom migrations dir
+ *   node check-schema.mjs --schema-root <dir>      # read schema files from <dir>
+ *   node check-schema.mjs --generate               # (re)generate the integrity manifest
+ *   node check-schema.mjs --generate --migrations <dir> # generate for a custom dir
  */
 import { cp, mkdir, mkdtemp, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { spawn } from "node:child_process";
+import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { dirname, join, relative, resolve } from "node:path";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
-// Allow overriding the migrations directory via --migrations flag.
-const migrationsFlagIndex = process.argv.indexOf("--migrations");
-const migrations =
-  migrationsFlagIndex !== -1
-    ? resolve(process.argv[migrationsFlagIndex + 1])
-    : resolve(root, "apps/api/migrations");
+// --- CLI flags ---
+const argv = process.argv.slice(2);
 
-const temp = await mkdtemp(join(process.env.TMPDIR ?? "/tmp", "super-template-schema-"));
-const output = join(temp, "migrations");
-const config = join(temp, "drizzle.config.ts");
-const drizzle = resolve(root, "packages/database-runtime/node_modules/.bin/drizzle-kit");
+function flagValue(name) {
+  const idx = argv.indexOf(name);
+  return idx !== -1 && idx + 1 < argv.length ? resolve(argv[idx + 1]) : null;
+}
+
+const generateMode = argv.includes("--generate");
+const migrations = flagValue("--migrations") ?? resolve(root, "apps/api/migrations");
+const schemaRoot = flagValue("--schema-root") ?? root;
+
+// --- Helpers ---
 
 async function filesUnder(directory, base = directory) {
   const entries = await readdir(directory, { withFileTypes: true });
@@ -50,25 +59,123 @@ function run(command, args, cwd) {
   });
 }
 
+function sha256hex(data) {
+  return createHash("sha256").update(data).digest("hex");
+}
+
 const normalize = (value) =>
   value.replace(/\/\*[^]*?\*\//g, "").replace(/--[^\n]*/g, "").replace(/\s+/g, " ").trim();
 
-let failure;
+let failures = [];
+
+// --- 1. Migration integrity: SHA-256 checksums ---
+const INTEGRITY_MANIFEST = "migration-integrity.json";
+
+try {
+  const manifestPath = join(migrations, "meta", INTEGRITY_MANIFEST);
+
+  // Compute current checksums for all SQL files.
+  const sqlFiles = (await readdir(migrations))
+    .filter((f) => f.endsWith(".sql"))
+    .sort();
+
+  const currentChecksums = {};
+  for (const file of sqlFiles) {
+    const content = await readFile(join(migrations, file), "utf8");
+    currentChecksums[file] = sha256hex(content);
+  }
+
+  if (generateMode) {
+    // Write/update the manifest. Called when migrations change intentionally.
+    const manifest = { version: 1, files: currentChecksums };
+    await mkdir(dirname(manifestPath), { recursive: true });
+    await writeFile(manifestPath, JSON.stringify(manifest, null, 2) + "\n");
+    console.log(
+      `Integrity manifest written: ${manifestPath} (${Object.keys(currentChecksums).length} files)`,
+    );
+  } else if (existsSync(manifestPath)) {
+    // Verify that no previously committed SQL was modified or deleted.
+    const previous = JSON.parse(await readFile(manifestPath, "utf8"));
+
+    for (const [file, oldChecksum] of Object.entries(previous.files ?? {})) {
+      if (!(file in currentChecksums)) {
+        failures.push(
+          `Migration integrity: "${file}" was deleted (present in manifest but not on disk). Migration history must be append-only.`,
+        );
+      } else if (currentChecksums[file] !== oldChecksum) {
+        failures.push(
+          `Migration integrity: "${file}" was modified (checksum changed). Migration history must be append-only. Run "node scripts/check-schema.mjs --generate" to re-seal.`,
+        );
+      }
+    }
+
+    // Check for new files not in manifest (informational — these are fine in
+    // append-only mode, but the manifest should be regenerated after merging).
+    const newFiles = sqlFiles.filter((f) => !(f in (previous.files ?? {})));
+    if (newFiles.length > 0) {
+      console.warn(
+        `Info: ${newFiles.length} new SQL file(s) not yet in integrity manifest: ${newFiles.join(", ")}. Run "node scripts/check-schema.mjs --generate" to include them.`,
+      );
+    }
+  } else {
+    failures.push(
+      `Migration integrity manifest not found at ${manifestPath}. Run "node scripts/check-schema.mjs --generate" to create it.`,
+    );
+  }
+} catch (err) {
+  failures.push(`Migration integrity check failed: ${err.message}`);
+}
+
+// --- 2. Journal cross-reference (warning only) ---
+try {
+  const journalPath = join(migrations, "meta", "_journal.json");
+  if (existsSync(journalPath)) {
+    const journal = JSON.parse(await readFile(journalPath, "utf8"));
+    const journalTags = new Set((journal.entries ?? []).map((e) => e.tag));
+    const sqlFiles = (await readdir(migrations)).filter((f) => f.endsWith(".sql")).sort();
+    const untracked = sqlFiles.filter((f) => {
+      const base = f.replace(/\.sql$/, "");
+      return ![...journalTags].some(
+        (tag) => tag.startsWith(base.split("_")[0]) || base.startsWith(tag.split("_")[0]),
+      );
+    });
+    if (untracked.length > 0) {
+      console.warn(
+        `Warning: ${untracked.length} SQL migration file(s) not tracked in _journal.json: ${untracked.join(", ")}`,
+      );
+      console.warn(
+        "The runtime migrator will still apply these; the schema drift check covers the effective result.",
+      );
+    }
+  }
+} catch {
+  // journal check is best-effort
+}
+
+// --- 3. Canonical schema vs committed snapshot ---
+const temp = await mkdtemp(join(process.env.TMPDIR ?? "/tmp", "super-template-schema-"));
+const output = join(temp, "migrations");
+const config = join(temp, "drizzle.config.ts");
+const drizzle = resolve(root, "packages/database-runtime/node_modules/.bin/drizzle-kit");
+
 try {
   await mkdirOutput(output);
   for (const file of await filesUnder(migrations)) {
     if (!file.endsWith(".sql")) continue;
-    await mkdir(dirname(join(output, file)), { recursive: true });
+    await mkdir(join(output, dirname(file)), { recursive: true });
     await cp(join(migrations, file), join(output, file));
   }
-  const packageFiles = await filesUnder(resolve(root, "packages"));
+
+  // Build schema entry from packages — use schemaRoot so tests can override.
+  const packageFiles = await filesUnder(resolve(schemaRoot, "packages"));
   const schemaFiles = packageFiles
     .filter(
       (file) =>
         /^feature-[^/]+\/src\/infrastructure\/persistence\/index\.ts$/.test(file) ||
         file === "feature-outbox/src/infrastructure/persistence/outbox-messages.ts",
     )
-    .map((file) => resolve(root, "packages", file));
+    .map((file) => resolve(schemaRoot, "packages", file));
+
   const schemaEntry = join(temp, "schema.ts");
   await writeFile(
     schemaEntry,
@@ -80,7 +187,9 @@ try {
   );
   const result = await run(drizzle, ["generate", "--config", config], temp);
   if (result.code !== 0 || /Error|ERR_|Interactive prompts require/i.test(result.stderr)) {
-    failure = `drizzle-kit generate failed: ${result.stderr.trim() || `exit code ${result.code}`}`;
+    failures.push(
+      `drizzle-kit generate failed: ${result.stderr.trim() || `exit code ${result.code}`}`,
+    );
   } else {
     const committed = await filesUnder(migrations);
     const produced = await filesUnder(output);
@@ -94,8 +203,9 @@ try {
     const committedSnapshotPath = latest(committedSnapshots);
     const producedSnapshotPath = latest(producedSnapshots);
     if (!committedSnapshotPath || !producedSnapshotPath) {
-      failure =
-        "Schema drift detected: committed and generated Drizzle snapshots are required";
+      failures.push(
+        "Schema drift detected: committed and generated Drizzle snapshots are required",
+      );
     } else {
       const volatileKeys = new Set(["id", "prevId", "version", "dialect"]);
       const normalizeSnapshot = (value) => {
@@ -130,8 +240,9 @@ try {
           "/tmp/produced-schema.json",
           JSON.stringify(producedSnapshot, null, 2),
         );
-        failure =
-          "Schema drift detected: canonical Drizzle schema does not match the complete committed effective snapshot";
+        failures.push(
+          "Schema drift detected: canonical Drizzle schema does not match the complete committed effective snapshot",
+        );
       }
     }
   }
@@ -139,36 +250,14 @@ try {
   await rm(temp, { recursive: true, force: true });
 }
 
-// Migration history integrity: warn about SQL files not tracked in the journal.
-try {
-  const journalPath = join(migrations, "meta", "_journal.json");
-  if (existsSync(journalPath)) {
-    const journal = JSON.parse(await readFile(journalPath, "utf8"));
-    const journalTags = new Set((journal.entries ?? []).map((e) => e.tag));
-    const sqlFiles = (await readdir(migrations))
-      .filter((f) => f.endsWith(".sql"))
-      .sort();
-    const untracked = sqlFiles.filter((f) => {
-      const base = f.replace(/\.sql$/, "");
-      // Match by idx prefix (e.g. 0037_table_naming...) against journal entries
-      return ![...journalTags].some((tag) => tag.startsWith(base.split("_")[0]) || base.startsWith(tag.split("_")[0]));
-    });
-    if (untracked.length > 0) {
-      console.warn(
-        `Warning: ${untracked.length} SQL migration file(s) not tracked in _journal.json: ${untracked.join(", ")}`,
-      );
-      console.warn("The runtime migrator will still apply these; the schema drift check covers the effective result.");
-    }
-  }
-} catch {
-  // journal check is best-effort; do not fail the gate on parse issues
-}
-
-if (failure) {
-  console.error(failure);
+// --- Report ---
+if (failures.length > 0) {
+  for (const f of failures) console.error(f);
   process.exit(1);
 }
-console.log("Schema drift check passed: canonical schemas match committed migration history.");
+console.log(
+  "Schema check passed: canonical schemas match committed migration history and all SQL files are intact.",
+);
 
 async function mkdirOutput(directory) {
   await (await import("node:fs/promises")).mkdir(directory, { recursive: true });

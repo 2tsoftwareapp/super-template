@@ -77,7 +77,15 @@ export function buildFeatureModules(features: readonly FeatureManifest[]) {
       return module;
     },
   );
-  return { modules, features: composedSubset.features };
+  return {
+    modules,
+    features: composedSubset.features,
+    schema: composedSubset.schema,
+    permissions: composedSubset.permissions,
+    seeders: composedSubset.seeders,
+    authorization: composedSubset.authorization,
+    outboxHandlerClasses: composedSubset.outboxHandlerClasses,
+  };
 }
 
 /**
