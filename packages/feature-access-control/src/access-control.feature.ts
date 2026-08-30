@@ -1,4 +1,6 @@
+import { APP_INTERCEPTOR, Reflector } from "@nestjs/core";
 import { defineFeature, type FeatureManifest } from "@repo/api-plugin-kit";
+import { TenantContextService } from "@repo/api-runtime";
 
 import { AccessControlModule } from "./access-control.module";
 import { permissions, rolePermissions, roles, userRoles } from "./infrastructure/persistence";
@@ -10,7 +12,14 @@ export const accessControlFeature: FeatureManifest = defineFeature({
   dependsOn: ["users", "organizations", "audit"],
   nestModule: AccessControlModule,
   httpPipeline: {
-    interceptors: [TenantContextInterceptor],
+    interceptors: [
+      {
+        provide: APP_INTERCEPTOR,
+        useFactory: (reflector: Reflector, tenantContextService: TenantContextService) =>
+          new TenantContextInterceptor(reflector, tenantContextService),
+        inject: [Reflector, TenantContextService],
+      },
+    ],
   },
   httpPipelineOrder: 30,
   authorization: {

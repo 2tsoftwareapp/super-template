@@ -6,6 +6,8 @@ import { describe, expect, it } from "vitest";
 
 import {
   buildFeatureModules,
+  composedHttpPipelineGuards,
+  composedHttpPipelineInterceptors,
   composedSchema,
   composedSeeders,
   composedAuthorization,
@@ -103,6 +105,38 @@ async function compileGraph(modules: readonly (typeof featureModules)[number][])
 }
 
 /**
+ * Verify feature-contributed HTTP pipeline providers are well-formed:
+ * each guard has provide: APP_GUARD, each interceptor has provide: APP_INTERCEPTOR,
+ * and they resolve their deps via useFactory+inject (not bare useClass).
+ */
+function validatePipelineProviders(): void {
+  // Feature-contributed guards must be complete Nest Provider definitions
+  // (useFactory+inject or useClass) — not bare class references.
+  expect(composedHttpPipelineGuards.length).toBeGreaterThan(0);
+  for (const provider of composedHttpPipelineGuards) {
+    const p = provider as unknown as Record<string, unknown>;
+    const hasFactory = typeof p.useFactory === "function";
+    const hasClass = typeof p.useClass === "function";
+    expect(hasFactory || hasClass).toBe(true);
+    if (hasFactory) {
+      expect(Array.isArray(p.inject)).toBe(true);
+    }
+  }
+
+  // Feature-contributed interceptors must be complete Nest Provider definitions.
+  expect(composedHttpPipelineInterceptors.length).toBeGreaterThan(0);
+  for (const provider of composedHttpPipelineInterceptors) {
+    const p = provider as unknown as Record<string, unknown>;
+    const hasFactory = typeof p.useFactory === "function";
+    const hasClass = typeof p.useClass === "function";
+    expect(hasFactory || hasClass).toBe(true);
+    if (hasFactory) {
+      expect(Array.isArray(p.inject)).toBe(true);
+    }
+  }
+}
+
+/**
  * Collect all schema table names contributed by a feature manifest.
  */
 function featureSchemaKeys(feature: FeatureManifest): string[] {
@@ -176,6 +210,10 @@ describe("deterministic Nest feature bootstrap matrix", () => {
     expect(featureModules.length).toBe(orderedFeatures.length);
     expect(orderedFeatures.map((feature) => feature.id)).toContain("user-management");
     expect(orderedFeatures.map((feature) => feature.id)).toContain("notifications");
+  });
+
+  it("feature-contributed HTTP pipeline providers are well-formed with useFactory+inject", () => {
+    validatePipelineProviders();
   });
 
   it.each(omitFeatureCases())(

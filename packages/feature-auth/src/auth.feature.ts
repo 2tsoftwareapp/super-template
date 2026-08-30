@@ -1,3 +1,4 @@
+import { APP_GUARD, Reflector } from "@nestjs/core";
 import { defineFeature, type FeatureManifest } from "@repo/api-plugin-kit";
 
 import {
@@ -14,6 +15,7 @@ import {
   emailVerificationTokens,
   passwordResetTokens,
 } from "./infrastructure/persistence";
+import { ACCESS_TOKEN_AUTHENTICATOR, type AccessTokenAuthenticator } from "./public/contracts";
 import { authSeeders } from "./seed";
 
 export const authFeature: FeatureManifest = defineFeature({
@@ -32,7 +34,14 @@ export const authFeature: FeatureManifest = defineFeature({
   ],
   nestModule: AuthModule,
   httpPipeline: {
-    guards: [AuthGuard],
+    guards: [
+      {
+        provide: APP_GUARD,
+        useFactory: (reflector: Reflector, accessTokenAuthenticator: AccessTokenAuthenticator) =>
+          new AuthGuard(reflector, accessTokenAuthenticator),
+        inject: [Reflector, ACCESS_TOKEN_AUTHENTICATOR],
+      },
+    ],
   },
   httpPipelineOrder: 20,
   schema: {

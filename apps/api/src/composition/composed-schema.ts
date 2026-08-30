@@ -89,29 +89,11 @@ export function buildFeatureModules(features: readonly FeatureManifest[]) {
 }
 
 /**
- * Full-graph handler-import modules (computed once for the default export).
+ * Full-graph modules — uses the same buildFeatureModules() path as
+ * omit-feature tests so production and tests exercise identical composition.
  */
-const fullHandlerImportModules = resolveHandlerImportModules(
-  composed.outboxHandlerClasses,
-  composed.features,
-);
-
-/**
- * Nest modules in dependency order, with the outbox dynamic module
- * substituted for its placeholder so handler wiring is part of composition.
- */
-export const featureModules: (typeof composed.modules)[number][] = composed.modules.map(
-  (module, index) => {
-    const manifest = composed.features[index];
-    if (manifest?.id === "outbox") {
-      const slots: OutboxHandlerSlot[] = composed.outboxHandlerClasses.map((handlerClass) => ({
-        handlerClass: handlerClass as OutboxTopicHandlerClass,
-      }));
-      return OutboxModule.register({ handlers: slots, imports: fullHandlerImportModules });
-    }
-    return module;
-  },
-);
+const fullGraph = buildFeatureModules(enabledFeatures);
+export const featureModules = fullGraph.modules;
 
 /** Ordered manifests after dependency validation. */
 export const orderedFeatures = composed.features;

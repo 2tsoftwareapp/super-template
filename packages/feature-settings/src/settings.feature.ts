@@ -1,3 +1,4 @@
+import { APP_GUARD } from "@nestjs/core";
 import { defineFeature, type FeatureManifest } from "@repo/api-plugin-kit";
 
 import { applicationSettings } from "./infrastructure/persistence";
@@ -11,7 +12,12 @@ export const settingsFeature: FeatureManifest = defineFeature({
   dependsOn: ["audit"],
   nestModule: SettingsModule,
   httpPipeline: {
-    guards: [MaintenanceModeGuard],
+    guards: [
+      {
+        provide: APP_GUARD,
+        useClass: MaintenanceModeGuard,
+      },
+    ],
   },
   httpPipelineOrder: 10,
   authorization: {
