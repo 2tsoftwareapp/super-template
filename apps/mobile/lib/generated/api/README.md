@@ -152,15 +152,15 @@ Class | Method | HTTP request | Description
 [*NotificationsApi*](doc/NotificationsApi.md) | [**notificationsControllerStream**](doc/NotificationsApi.md#notificationscontrollerstream) | **GET** /api/v1/notifications/stream | 
 [*NotificationsApi*](doc/NotificationsApi.md) | [**notificationsControllerUnreadCount**](doc/NotificationsApi.md#notificationscontrollerunreadcount) | **GET** /api/v1/notifications/unread-count | 
 [*NotificationsApi*](doc/NotificationsApi.md) | [**notificationsControllerUnregisterDevice**](doc/NotificationsApi.md#notificationscontrollerunregisterdevice) | **DELETE** /api/v1/notifications/devices/{token} | 
-[*OrganizationsApi*](doc/OrganizationsApi.md) | [**organizationsControllerCreate**](doc/OrganizationsApi.md#organizationscontrollercreate) | **POST** /api/v1/organizations | 
+[*OrganizationsApi*](doc/OrganizationsApi.md) | [**organizationManagementControllerCreate**](doc/OrganizationsApi.md#organizationmanagementcontrollercreate) | **POST** /api/v1/organizations | 
+[*OrganizationsApi*](doc/OrganizationsApi.md) | [**organizationManagementControllerLeave**](doc/OrganizationsApi.md#organizationmanagementcontrollerleave) | **POST** /api/v1/organizations/{id}/leave | 
+[*OrganizationsApi*](doc/OrganizationsApi.md) | [**organizationManagementControllerRemove**](doc/OrganizationsApi.md#organizationmanagementcontrollerremove) | **DELETE** /api/v1/organizations/{id} | 
+[*OrganizationsApi*](doc/OrganizationsApi.md) | [**organizationManagementControllerRemoveMember**](doc/OrganizationsApi.md#organizationmanagementcontrollerremovemember) | **DELETE** /api/v1/organizations/{id}/members/{userId} | 
+[*OrganizationsApi*](doc/OrganizationsApi.md) | [**organizationManagementControllerUpdateMemberRole**](doc/OrganizationsApi.md#organizationmanagementcontrollerupdatememberrole) | **PATCH** /api/v1/organizations/{id}/members/{userId} | 
 [*OrganizationsApi*](doc/OrganizationsApi.md) | [**organizationsControllerGetOne**](doc/OrganizationsApi.md#organizationscontrollergetone) | **GET** /api/v1/organizations/{id} | 
-[*OrganizationsApi*](doc/OrganizationsApi.md) | [**organizationsControllerLeave**](doc/OrganizationsApi.md#organizationscontrollerleave) | **POST** /api/v1/organizations/{id}/leave | 
 [*OrganizationsApi*](doc/OrganizationsApi.md) | [**organizationsControllerList**](doc/OrganizationsApi.md#organizationscontrollerlist) | **GET** /api/v1/organizations | 
 [*OrganizationsApi*](doc/OrganizationsApi.md) | [**organizationsControllerListMembers**](doc/OrganizationsApi.md#organizationscontrollerlistmembers) | **GET** /api/v1/organizations/{id}/members | 
-[*OrganizationsApi*](doc/OrganizationsApi.md) | [**organizationsControllerRemove**](doc/OrganizationsApi.md#organizationscontrollerremove) | **DELETE** /api/v1/organizations/{id} | 
-[*OrganizationsApi*](doc/OrganizationsApi.md) | [**organizationsControllerRemoveMember**](doc/OrganizationsApi.md#organizationscontrollerremovemember) | **DELETE** /api/v1/organizations/{id}/members/{userId} | 
 [*OrganizationsApi*](doc/OrganizationsApi.md) | [**organizationsControllerUpdate**](doc/OrganizationsApi.md#organizationscontrollerupdate) | **PATCH** /api/v1/organizations/{id} | 
-[*OrganizationsApi*](doc/OrganizationsApi.md) | [**organizationsControllerUpdateMemberRole**](doc/OrganizationsApi.md#organizationscontrollerupdatememberrole) | **PATCH** /api/v1/organizations/{id}/members/{userId} | 
 [*SsoApi*](doc/SsoApi.md) | [**ssoControllerExchangeSession**](doc/SsoApi.md#ssocontrollerexchangesession) | **POST** /api/v1/auth/sso/exchange | 
 [*SsoApi*](doc/SsoApi.md) | [**ssoControllerHandleCallbackGet**](doc/SsoApi.md#ssocontrollerhandlecallbackget) | **GET** /api/v1/auth/sso/{provider}/callback | 
 [*SsoApi*](doc/SsoApi.md) | [**ssoControllerHandleCallbackPost**](doc/SsoApi.md#ssocontrollerhandlecallbackpost) | **POST** /api/v1/auth/sso/{provider}/callback | 
@@ -275,12 +275,11 @@ Class | Method | HTTP request | Description
  - [NotificationsControllerUnreadCount200Response](doc/NotificationsControllerUnreadCount200Response.md)
  - [OrganizationDetailDto](doc/OrganizationDetailDto.md)
  - [OrganizationDto](doc/OrganizationDto.md)
+ - [OrganizationManagementControllerCreate200Response](doc/OrganizationManagementControllerCreate200Response.md)
  - [OrganizationMemberDto](doc/OrganizationMemberDto.md)
- - [OrganizationsControllerCreate200Response](doc/OrganizationsControllerCreate200Response.md)
  - [OrganizationsControllerGetOne200Response](doc/OrganizationsControllerGetOne200Response.md)
  - [OrganizationsControllerList200Response](doc/OrganizationsControllerList200Response.md)
  - [OrganizationsControllerListMembers200Response](doc/OrganizationsControllerListMembers200Response.md)
- - [OrganizationsControllerUpdateMemberRole200Response](doc/OrganizationsControllerUpdateMemberRole200Response.md)
  - [PaginationMetaDto](doc/PaginationMetaDto.md)
  - [PermissionDto](doc/PermissionDto.md)
  - [PreferencesControllerGetMyPreferences200Response](doc/PreferencesControllerGetMyPreferences200Response.md)

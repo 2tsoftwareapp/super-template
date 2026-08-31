@@ -79,8 +79,6 @@ class _$OrganizationDto extends OrganizationDto {
   @override
   final String createdAt;
   @override
-  final bool current;
-  @override
   final String id;
   @override
   final String name;
@@ -96,7 +94,6 @@ class _$OrganizationDto extends OrganizationDto {
 
   _$OrganizationDto._({
     required this.createdAt,
-    required this.current,
     required this.id,
     required this.name,
     required this.role,
@@ -115,7 +112,6 @@ class _$OrganizationDto extends OrganizationDto {
     if (identical(other, this)) return true;
     return other is OrganizationDto &&
         createdAt == other.createdAt &&
-        current == other.current &&
         id == other.id &&
         name == other.name &&
         role == other.role &&
@@ -127,7 +123,6 @@ class _$OrganizationDto extends OrganizationDto {
   int get hashCode {
     var _$hash = 0;
     _$hash = $jc(_$hash, createdAt.hashCode);
-    _$hash = $jc(_$hash, current.hashCode);
     _$hash = $jc(_$hash, id.hashCode);
     _$hash = $jc(_$hash, name.hashCode);
     _$hash = $jc(_$hash, role.hashCode);
@@ -141,7 +136,6 @@ class _$OrganizationDto extends OrganizationDto {
   String toString() {
     return (newBuiltValueToStringHelper(r'OrganizationDto')
           ..add('createdAt', createdAt)
-          ..add('current', current)
           ..add('id', id)
           ..add('name', name)
           ..add('role', role)
@@ -158,10 +152,6 @@ class OrganizationDtoBuilder
   String? _createdAt;
   String? get createdAt => _$this._createdAt;
   set createdAt(String? createdAt) => _$this._createdAt = createdAt;
-
-  bool? _current;
-  bool? get current => _$this._current;
-  set current(bool? current) => _$this._current = current;
 
   String? _id;
   String? get id => _$this._id;
@@ -191,7 +181,6 @@ class OrganizationDtoBuilder
     final $v = _$v;
     if ($v != null) {
       _createdAt = $v.createdAt;
-      _current = $v.current;
       _id = $v.id;
       _name = $v.name;
       _role = $v.role;
@@ -222,11 +211,6 @@ class OrganizationDtoBuilder
             createdAt,
             r'OrganizationDto',
             'createdAt',
-          ),
-          current: BuiltValueNullFieldError.checkNotNull(
-            current,
-            r'OrganizationDto',
-            'current',
           ),
           id: BuiltValueNullFieldError.checkNotNull(
             id,

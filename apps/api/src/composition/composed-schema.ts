@@ -1,5 +1,6 @@
 import type { Provider, Type } from "@nestjs/common";
 
+import { Reflector } from "@nestjs/core";
 import { composeFeatures, type FeatureManifest } from "@repo/api-plugin-kit";
 import {
   type OutboxHandlerSlot,
@@ -8,8 +9,6 @@ import {
 } from "@repo/feature-outbox/contracts";
 
 import { enabledFeatures } from "./feature-registry";
-
-import { Reflector } from "@nestjs/core";
 
 const composed = composeFeatures(enabledFeatures);
 
@@ -60,19 +59,19 @@ function normalizePipelineProviders(providers: readonly Provider[]): Provider[] 
     if (
       provider &&
       typeof provider === "object" &&
-      "inject" in (provider as any) &&
-      Array.isArray((provider as any).inject)
+      "inject" in provider &&
+      Array.isArray((provider as { inject?: unknown[] }).inject)
     ) {
-      const inject = (provider as any).inject.map((token: any) => {
-        if (typeof token === "function" && token.name === "Reflector") {
+      const inject = (provider as { inject: unknown[] }).inject.map((token) => {
+        if (typeof token === "function" && "name" in token && token.name === "Reflector") {
           return Reflector;
         }
         return token;
       });
-      return { ...provider, inject } as any;
+      return { ...provider, inject } as Provider;
     }
     return provider;
-  }) as Provider[];
+  });
 }
 
 /**

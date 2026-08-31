@@ -15,7 +15,6 @@ part 'organization_dto.g.dart';
 ///
 /// Properties:
 /// * [createdAt]
-/// * [current]
 /// * [id]
 /// * [name]
 /// * [role]
@@ -26,9 +25,6 @@ abstract class OrganizationDto
     implements Built<OrganizationDto, OrganizationDtoBuilder> {
   @BuiltValueField(wireName: r'createdAt')
   String get createdAt;
-
-  @BuiltValueField(wireName: r'current')
-  bool get current;
 
   @BuiltValueField(wireName: r'id')
   String get id;
@@ -76,11 +72,6 @@ class _$OrganizationDtoSerializer
     yield serializers.serialize(
       object.createdAt,
       specifiedType: const FullType(String),
-    );
-    yield r'current';
-    yield serializers.serialize(
-      object.current,
-      specifiedType: const FullType(bool),
     );
     yield r'id';
     yield serializers.serialize(
@@ -140,13 +131,6 @@ class _$OrganizationDtoSerializer
             specifiedType: const FullType(String),
           ) as String;
           result.createdAt = valueDes;
-          break;
-        case r'current':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(bool),
-          ) as bool;
-          result.current = valueDes;
           break;
         case r'id':
           final valueDes = serializers.deserialize(

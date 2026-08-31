@@ -13,11 +13,10 @@ import 'package:dio/dio.dart';
 import 'package:super_template_api/src/api_util.dart';
 import 'package:super_template_api/src/model/admin_roles_controller_delete_role200_response.dart';
 import 'package:super_template_api/src/model/create_organization_dto.dart';
-import 'package:super_template_api/src/model/organizations_controller_create200_response.dart';
+import 'package:super_template_api/src/model/organization_management_controller_create200_response.dart';
 import 'package:super_template_api/src/model/organizations_controller_get_one200_response.dart';
 import 'package:super_template_api/src/model/organizations_controller_list200_response.dart';
 import 'package:super_template_api/src/model/organizations_controller_list_members200_response.dart';
-import 'package:super_template_api/src/model/organizations_controller_update_member_role200_response.dart';
 import 'package:super_template_api/src/model/update_member_role_dto.dart';
 import 'package:super_template_api/src/model/update_organization_dto.dart';
 
@@ -28,7 +27,7 @@ class OrganizationsApi {
 
   const OrganizationsApi(this._dio, this._serializers);
 
-  /// organizationsControllerCreate
+  /// organizationManagementControllerCreate
   ///
   ///
   /// Parameters:
@@ -40,10 +39,10 @@ class OrganizationsApi {
   /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
   /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
   ///
-  /// Returns a [Future] containing a [Response] with a [OrganizationsControllerCreate200Response] as data
+  /// Returns a [Future] containing a [Response] with a [OrganizationManagementControllerCreate200Response] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<OrganizationsControllerCreate200Response>>
-      organizationsControllerCreate({
+  Future<Response<OrganizationManagementControllerCreate200Response>>
+      organizationManagementControllerCreate({
     required CreateOrganizationDto createOrganizationDto,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
@@ -92,7 +91,7 @@ class OrganizationsApi {
       onReceiveProgress: onReceiveProgress,
     );
 
-    OrganizationsControllerCreate200Response? _responseData;
+    OrganizationManagementControllerCreate200Response? _responseData;
 
     try {
       final rawResponse = _response.data;
@@ -101,9 +100,9 @@ class OrganizationsApi {
           : _serializers.deserialize(
               rawResponse,
               specifiedType: const FullType(
-                OrganizationsControllerCreate200Response,
+                OrganizationManagementControllerCreate200Response,
               ),
-            ) as OrganizationsControllerCreate200Response;
+            ) as OrganizationManagementControllerCreate200Response;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -114,7 +113,398 @@ class OrganizationsApi {
       );
     }
 
-    return Response<OrganizationsControllerCreate200Response>(
+    return Response<OrganizationManagementControllerCreate200Response>(
+      data: _responseData,
+      headers: _response.headers,
+      isRedirect: _response.isRedirect,
+      requestOptions: _response.requestOptions,
+      redirects: _response.redirects,
+      statusCode: _response.statusCode,
+      statusMessage: _response.statusMessage,
+      extra: _response.extra,
+    );
+  }
+
+  /// organizationManagementControllerLeave
+  ///
+  ///
+  /// Parameters:
+  /// * [id]
+  /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
+  /// * [headers] - Can be used to add additional headers to the request
+  /// * [extras] - Can be used to add flags to the request
+  /// * [validateStatus] - A [ValidateStatus] callback that can be used to determine request success based on the HTTP status of the response
+  /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
+  /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
+  ///
+  /// Returns a [Future] containing a [Response] with a [AdminRolesControllerDeleteRole200Response] as data
+  /// Throws [DioException] if API call or serialization fails
+  Future<Response<AdminRolesControllerDeleteRole200Response>>
+      organizationManagementControllerLeave({
+    required String id,
+    CancelToken? cancelToken,
+    Map<String, dynamic>? headers,
+    Map<String, dynamic>? extra,
+    ValidateStatus? validateStatus,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+  }) async {
+    final _path = r'/api/v1/organizations/{id}/leave'.replaceAll(
+      '{'
+      r'id'
+      '}',
+      encodeQueryParameter(_serializers, id, const FullType(String)).toString(),
+    );
+    final _options = Options(
+      method: r'POST',
+      headers: <String, dynamic>{...?headers},
+      extra: <String, dynamic>{
+        'secure': <Map<String, String>>[
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
+        ],
+        ...?extra,
+      },
+      validateStatus: validateStatus,
+    );
+
+    final _response = await _dio.request<Object>(
+      _path,
+      options: _options,
+      cancelToken: cancelToken,
+      onSendProgress: onSendProgress,
+      onReceiveProgress: onReceiveProgress,
+    );
+
+    AdminRolesControllerDeleteRole200Response? _responseData;
+
+    try {
+      final rawResponse = _response.data;
+      _responseData = rawResponse == null
+          ? null
+          : _serializers.deserialize(
+              rawResponse,
+              specifiedType: const FullType(
+                AdminRolesControllerDeleteRole200Response,
+              ),
+            ) as AdminRolesControllerDeleteRole200Response;
+    } catch (error, stackTrace) {
+      throw DioException(
+        requestOptions: _response.requestOptions,
+        response: _response,
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    return Response<AdminRolesControllerDeleteRole200Response>(
+      data: _responseData,
+      headers: _response.headers,
+      isRedirect: _response.isRedirect,
+      requestOptions: _response.requestOptions,
+      redirects: _response.redirects,
+      statusCode: _response.statusCode,
+      statusMessage: _response.statusMessage,
+      extra: _response.extra,
+    );
+  }
+
+  /// organizationManagementControllerRemove
+  ///
+  ///
+  /// Parameters:
+  /// * [id]
+  /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
+  /// * [headers] - Can be used to add additional headers to the request
+  /// * [extras] - Can be used to add flags to the request
+  /// * [validateStatus] - A [ValidateStatus] callback that can be used to determine request success based on the HTTP status of the response
+  /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
+  /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
+  ///
+  /// Returns a [Future] containing a [Response] with a [AdminRolesControllerDeleteRole200Response] as data
+  /// Throws [DioException] if API call or serialization fails
+  Future<Response<AdminRolesControllerDeleteRole200Response>>
+      organizationManagementControllerRemove({
+    required String id,
+    CancelToken? cancelToken,
+    Map<String, dynamic>? headers,
+    Map<String, dynamic>? extra,
+    ValidateStatus? validateStatus,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+  }) async {
+    final _path = r'/api/v1/organizations/{id}'.replaceAll(
+      '{'
+      r'id'
+      '}',
+      encodeQueryParameter(_serializers, id, const FullType(String)).toString(),
+    );
+    final _options = Options(
+      method: r'DELETE',
+      headers: <String, dynamic>{...?headers},
+      extra: <String, dynamic>{
+        'secure': <Map<String, String>>[
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
+        ],
+        ...?extra,
+      },
+      validateStatus: validateStatus,
+    );
+
+    final _response = await _dio.request<Object>(
+      _path,
+      options: _options,
+      cancelToken: cancelToken,
+      onSendProgress: onSendProgress,
+      onReceiveProgress: onReceiveProgress,
+    );
+
+    AdminRolesControllerDeleteRole200Response? _responseData;
+
+    try {
+      final rawResponse = _response.data;
+      _responseData = rawResponse == null
+          ? null
+          : _serializers.deserialize(
+              rawResponse,
+              specifiedType: const FullType(
+                AdminRolesControllerDeleteRole200Response,
+              ),
+            ) as AdminRolesControllerDeleteRole200Response;
+    } catch (error, stackTrace) {
+      throw DioException(
+        requestOptions: _response.requestOptions,
+        response: _response,
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    return Response<AdminRolesControllerDeleteRole200Response>(
+      data: _responseData,
+      headers: _response.headers,
+      isRedirect: _response.isRedirect,
+      requestOptions: _response.requestOptions,
+      redirects: _response.redirects,
+      statusCode: _response.statusCode,
+      statusMessage: _response.statusMessage,
+      extra: _response.extra,
+    );
+  }
+
+  /// organizationManagementControllerRemoveMember
+  ///
+  ///
+  /// Parameters:
+  /// * [id]
+  /// * [userId]
+  /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
+  /// * [headers] - Can be used to add additional headers to the request
+  /// * [extras] - Can be used to add flags to the request
+  /// * [validateStatus] - A [ValidateStatus] callback that can be used to determine request success based on the HTTP status of the response
+  /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
+  /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
+  ///
+  /// Returns a [Future] containing a [Response] with a [AdminRolesControllerDeleteRole200Response] as data
+  /// Throws [DioException] if API call or serialization fails
+  Future<Response<AdminRolesControllerDeleteRole200Response>>
+      organizationManagementControllerRemoveMember({
+    required String id,
+    required String userId,
+    CancelToken? cancelToken,
+    Map<String, dynamic>? headers,
+    Map<String, dynamic>? extra,
+    ValidateStatus? validateStatus,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+  }) async {
+    final _path = r'/api/v1/organizations/{id}/members/{userId}'
+        .replaceAll(
+          '{'
+          r'id'
+          '}',
+          encodeQueryParameter(
+            _serializers,
+            id,
+            const FullType(String),
+          ).toString(),
+        )
+        .replaceAll(
+          '{'
+          r'userId'
+          '}',
+          encodeQueryParameter(
+            _serializers,
+            userId,
+            const FullType(String),
+          ).toString(),
+        );
+    final _options = Options(
+      method: r'DELETE',
+      headers: <String, dynamic>{...?headers},
+      extra: <String, dynamic>{
+        'secure': <Map<String, String>>[
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
+        ],
+        ...?extra,
+      },
+      validateStatus: validateStatus,
+    );
+
+    final _response = await _dio.request<Object>(
+      _path,
+      options: _options,
+      cancelToken: cancelToken,
+      onSendProgress: onSendProgress,
+      onReceiveProgress: onReceiveProgress,
+    );
+
+    AdminRolesControllerDeleteRole200Response? _responseData;
+
+    try {
+      final rawResponse = _response.data;
+      _responseData = rawResponse == null
+          ? null
+          : _serializers.deserialize(
+              rawResponse,
+              specifiedType: const FullType(
+                AdminRolesControllerDeleteRole200Response,
+              ),
+            ) as AdminRolesControllerDeleteRole200Response;
+    } catch (error, stackTrace) {
+      throw DioException(
+        requestOptions: _response.requestOptions,
+        response: _response,
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    return Response<AdminRolesControllerDeleteRole200Response>(
+      data: _responseData,
+      headers: _response.headers,
+      isRedirect: _response.isRedirect,
+      requestOptions: _response.requestOptions,
+      redirects: _response.redirects,
+      statusCode: _response.statusCode,
+      statusMessage: _response.statusMessage,
+      extra: _response.extra,
+    );
+  }
+
+  /// organizationManagementControllerUpdateMemberRole
+  ///
+  ///
+  /// Parameters:
+  /// * [id]
+  /// * [userId]
+  /// * [updateMemberRoleDto]
+  /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
+  /// * [headers] - Can be used to add additional headers to the request
+  /// * [extras] - Can be used to add flags to the request
+  /// * [validateStatus] - A [ValidateStatus] callback that can be used to determine request success based on the HTTP status of the response
+  /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
+  /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
+  ///
+  /// Returns a [Future] containing a [Response] with a [OrganizationManagementControllerCreate200Response] as data
+  /// Throws [DioException] if API call or serialization fails
+  Future<Response<OrganizationManagementControllerCreate200Response>>
+      organizationManagementControllerUpdateMemberRole({
+    required String id,
+    required String userId,
+    required UpdateMemberRoleDto updateMemberRoleDto,
+    CancelToken? cancelToken,
+    Map<String, dynamic>? headers,
+    Map<String, dynamic>? extra,
+    ValidateStatus? validateStatus,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+  }) async {
+    final _path = r'/api/v1/organizations/{id}/members/{userId}'
+        .replaceAll(
+          '{'
+          r'id'
+          '}',
+          encodeQueryParameter(
+            _serializers,
+            id,
+            const FullType(String),
+          ).toString(),
+        )
+        .replaceAll(
+          '{'
+          r'userId'
+          '}',
+          encodeQueryParameter(
+            _serializers,
+            userId,
+            const FullType(String),
+          ).toString(),
+        );
+    final _options = Options(
+      method: r'PATCH',
+      headers: <String, dynamic>{...?headers},
+      extra: <String, dynamic>{
+        'secure': <Map<String, String>>[
+          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
+        ],
+        ...?extra,
+      },
+      contentType: 'application/json',
+      validateStatus: validateStatus,
+    );
+
+    dynamic _bodyData;
+
+    try {
+      const _type = FullType(UpdateMemberRoleDto);
+      _bodyData = _serializers.serialize(
+        updateMemberRoleDto,
+        specifiedType: _type,
+      );
+    } catch (error, stackTrace) {
+      throw DioException(
+        requestOptions: _options.compose(_dio.options, _path),
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    final _response = await _dio.request<Object>(
+      _path,
+      data: _bodyData,
+      options: _options,
+      cancelToken: cancelToken,
+      onSendProgress: onSendProgress,
+      onReceiveProgress: onReceiveProgress,
+    );
+
+    OrganizationManagementControllerCreate200Response? _responseData;
+
+    try {
+      final rawResponse = _response.data;
+      _responseData = rawResponse == null
+          ? null
+          : _serializers.deserialize(
+              rawResponse,
+              specifiedType: const FullType(
+                OrganizationManagementControllerCreate200Response,
+              ),
+            ) as OrganizationManagementControllerCreate200Response;
+    } catch (error, stackTrace) {
+      throw DioException(
+        requestOptions: _response.requestOptions,
+        response: _response,
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    return Response<OrganizationManagementControllerCreate200Response>(
       data: _responseData,
       headers: _response.headers,
       isRedirect: _response.isRedirect,
@@ -199,90 +589,6 @@ class OrganizationsApi {
     }
 
     return Response<OrganizationsControllerGetOne200Response>(
-      data: _responseData,
-      headers: _response.headers,
-      isRedirect: _response.isRedirect,
-      requestOptions: _response.requestOptions,
-      redirects: _response.redirects,
-      statusCode: _response.statusCode,
-      statusMessage: _response.statusMessage,
-      extra: _response.extra,
-    );
-  }
-
-  /// organizationsControllerLeave
-  ///
-  ///
-  /// Parameters:
-  /// * [id]
-  /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
-  /// * [headers] - Can be used to add additional headers to the request
-  /// * [extras] - Can be used to add flags to the request
-  /// * [validateStatus] - A [ValidateStatus] callback that can be used to determine request success based on the HTTP status of the response
-  /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
-  /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
-  ///
-  /// Returns a [Future] containing a [Response] with a [AdminRolesControllerDeleteRole200Response] as data
-  /// Throws [DioException] if API call or serialization fails
-  Future<Response<AdminRolesControllerDeleteRole200Response>>
-      organizationsControllerLeave({
-    required String id,
-    CancelToken? cancelToken,
-    Map<String, dynamic>? headers,
-    Map<String, dynamic>? extra,
-    ValidateStatus? validateStatus,
-    ProgressCallback? onSendProgress,
-    ProgressCallback? onReceiveProgress,
-  }) async {
-    final _path = r'/api/v1/organizations/{id}/leave'.replaceAll(
-      '{'
-      r'id'
-      '}',
-      encodeQueryParameter(_serializers, id, const FullType(String)).toString(),
-    );
-    final _options = Options(
-      method: r'POST',
-      headers: <String, dynamic>{...?headers},
-      extra: <String, dynamic>{
-        'secure': <Map<String, String>>[
-          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
-        ],
-        ...?extra,
-      },
-      validateStatus: validateStatus,
-    );
-
-    final _response = await _dio.request<Object>(
-      _path,
-      options: _options,
-      cancelToken: cancelToken,
-      onSendProgress: onSendProgress,
-      onReceiveProgress: onReceiveProgress,
-    );
-
-    AdminRolesControllerDeleteRole200Response? _responseData;
-
-    try {
-      final rawResponse = _response.data;
-      _responseData = rawResponse == null
-          ? null
-          : _serializers.deserialize(
-              rawResponse,
-              specifiedType: const FullType(
-                AdminRolesControllerDeleteRole200Response,
-              ),
-            ) as AdminRolesControllerDeleteRole200Response;
-    } catch (error, stackTrace) {
-      throw DioException(
-        requestOptions: _response.requestOptions,
-        response: _response,
-        type: DioExceptionType.unknown,
-        error: error,
-        stackTrace: stackTrace,
-      );
-    }
-
-    return Response<AdminRolesControllerDeleteRole200Response>(
       data: _responseData,
       headers: _response.headers,
       isRedirect: _response.isRedirect,
@@ -466,191 +772,6 @@ class OrganizationsApi {
     );
   }
 
-  /// organizationsControllerRemove
-  ///
-  ///
-  /// Parameters:
-  /// * [id]
-  /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
-  /// * [headers] - Can be used to add additional headers to the request
-  /// * [extras] - Can be used to add flags to the request
-  /// * [validateStatus] - A [ValidateStatus] callback that can be used to determine request success based on the HTTP status of the response
-  /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
-  /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
-  ///
-  /// Returns a [Future] containing a [Response] with a [AdminRolesControllerDeleteRole200Response] as data
-  /// Throws [DioException] if API call or serialization fails
-  Future<Response<AdminRolesControllerDeleteRole200Response>>
-      organizationsControllerRemove({
-    required String id,
-    CancelToken? cancelToken,
-    Map<String, dynamic>? headers,
-    Map<String, dynamic>? extra,
-    ValidateStatus? validateStatus,
-    ProgressCallback? onSendProgress,
-    ProgressCallback? onReceiveProgress,
-  }) async {
-    final _path = r'/api/v1/organizations/{id}'.replaceAll(
-      '{'
-      r'id'
-      '}',
-      encodeQueryParameter(_serializers, id, const FullType(String)).toString(),
-    );
-    final _options = Options(
-      method: r'DELETE',
-      headers: <String, dynamic>{...?headers},
-      extra: <String, dynamic>{
-        'secure': <Map<String, String>>[
-          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
-        ],
-        ...?extra,
-      },
-      validateStatus: validateStatus,
-    );
-
-    final _response = await _dio.request<Object>(
-      _path,
-      options: _options,
-      cancelToken: cancelToken,
-      onSendProgress: onSendProgress,
-      onReceiveProgress: onReceiveProgress,
-    );
-
-    AdminRolesControllerDeleteRole200Response? _responseData;
-
-    try {
-      final rawResponse = _response.data;
-      _responseData = rawResponse == null
-          ? null
-          : _serializers.deserialize(
-              rawResponse,
-              specifiedType: const FullType(
-                AdminRolesControllerDeleteRole200Response,
-              ),
-            ) as AdminRolesControllerDeleteRole200Response;
-    } catch (error, stackTrace) {
-      throw DioException(
-        requestOptions: _response.requestOptions,
-        response: _response,
-        type: DioExceptionType.unknown,
-        error: error,
-        stackTrace: stackTrace,
-      );
-    }
-
-    return Response<AdminRolesControllerDeleteRole200Response>(
-      data: _responseData,
-      headers: _response.headers,
-      isRedirect: _response.isRedirect,
-      requestOptions: _response.requestOptions,
-      redirects: _response.redirects,
-      statusCode: _response.statusCode,
-      statusMessage: _response.statusMessage,
-      extra: _response.extra,
-    );
-  }
-
-  /// organizationsControllerRemoveMember
-  ///
-  ///
-  /// Parameters:
-  /// * [id]
-  /// * [userId]
-  /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
-  /// * [headers] - Can be used to add additional headers to the request
-  /// * [extras] - Can be used to add flags to the request
-  /// * [validateStatus] - A [ValidateStatus] callback that can be used to determine request success based on the HTTP status of the response
-  /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
-  /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
-  ///
-  /// Returns a [Future] containing a [Response] with a [AdminRolesControllerDeleteRole200Response] as data
-  /// Throws [DioException] if API call or serialization fails
-  Future<Response<AdminRolesControllerDeleteRole200Response>>
-      organizationsControllerRemoveMember({
-    required String id,
-    required String userId,
-    CancelToken? cancelToken,
-    Map<String, dynamic>? headers,
-    Map<String, dynamic>? extra,
-    ValidateStatus? validateStatus,
-    ProgressCallback? onSendProgress,
-    ProgressCallback? onReceiveProgress,
-  }) async {
-    final _path = r'/api/v1/organizations/{id}/members/{userId}'
-        .replaceAll(
-          '{'
-          r'id'
-          '}',
-          encodeQueryParameter(
-            _serializers,
-            id,
-            const FullType(String),
-          ).toString(),
-        )
-        .replaceAll(
-          '{'
-          r'userId'
-          '}',
-          encodeQueryParameter(
-            _serializers,
-            userId,
-            const FullType(String),
-          ).toString(),
-        );
-    final _options = Options(
-      method: r'DELETE',
-      headers: <String, dynamic>{...?headers},
-      extra: <String, dynamic>{
-        'secure': <Map<String, String>>[
-          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
-        ],
-        ...?extra,
-      },
-      validateStatus: validateStatus,
-    );
-
-    final _response = await _dio.request<Object>(
-      _path,
-      options: _options,
-      cancelToken: cancelToken,
-      onSendProgress: onSendProgress,
-      onReceiveProgress: onReceiveProgress,
-    );
-
-    AdminRolesControllerDeleteRole200Response? _responseData;
-
-    try {
-      final rawResponse = _response.data;
-      _responseData = rawResponse == null
-          ? null
-          : _serializers.deserialize(
-              rawResponse,
-              specifiedType: const FullType(
-                AdminRolesControllerDeleteRole200Response,
-              ),
-            ) as AdminRolesControllerDeleteRole200Response;
-    } catch (error, stackTrace) {
-      throw DioException(
-        requestOptions: _response.requestOptions,
-        response: _response,
-        type: DioExceptionType.unknown,
-        error: error,
-        stackTrace: stackTrace,
-      );
-    }
-
-    return Response<AdminRolesControllerDeleteRole200Response>(
-      data: _responseData,
-      headers: _response.headers,
-      isRedirect: _response.isRedirect,
-      requestOptions: _response.requestOptions,
-      redirects: _response.redirects,
-      statusCode: _response.statusCode,
-      statusMessage: _response.statusMessage,
-      extra: _response.extra,
-    );
-  }
-
   /// organizationsControllerUpdate
   ///
   ///
@@ -745,128 +866,6 @@ class OrganizationsApi {
     }
 
     return Response<OrganizationsControllerGetOne200Response>(
-      data: _responseData,
-      headers: _response.headers,
-      isRedirect: _response.isRedirect,
-      requestOptions: _response.requestOptions,
-      redirects: _response.redirects,
-      statusCode: _response.statusCode,
-      statusMessage: _response.statusMessage,
-      extra: _response.extra,
-    );
-  }
-
-  /// organizationsControllerUpdateMemberRole
-  ///
-  ///
-  /// Parameters:
-  /// * [id]
-  /// * [userId]
-  /// * [updateMemberRoleDto]
-  /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
-  /// * [headers] - Can be used to add additional headers to the request
-  /// * [extras] - Can be used to add flags to the request
-  /// * [validateStatus] - A [ValidateStatus] callback that can be used to determine request success based on the HTTP status of the response
-  /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
-  /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
-  ///
-  /// Returns a [Future] containing a [Response] with a [OrganizationsControllerUpdateMemberRole200Response] as data
-  /// Throws [DioException] if API call or serialization fails
-  Future<Response<OrganizationsControllerUpdateMemberRole200Response>>
-      organizationsControllerUpdateMemberRole({
-    required String id,
-    required String userId,
-    required UpdateMemberRoleDto updateMemberRoleDto,
-    CancelToken? cancelToken,
-    Map<String, dynamic>? headers,
-    Map<String, dynamic>? extra,
-    ValidateStatus? validateStatus,
-    ProgressCallback? onSendProgress,
-    ProgressCallback? onReceiveProgress,
-  }) async {
-    final _path = r'/api/v1/organizations/{id}/members/{userId}'
-        .replaceAll(
-          '{'
-          r'id'
-          '}',
-          encodeQueryParameter(
-            _serializers,
-            id,
-            const FullType(String),
-          ).toString(),
-        )
-        .replaceAll(
-          '{'
-          r'userId'
-          '}',
-          encodeQueryParameter(
-            _serializers,
-            userId,
-            const FullType(String),
-          ).toString(),
-        );
-    final _options = Options(
-      method: r'PATCH',
-      headers: <String, dynamic>{...?headers},
-      extra: <String, dynamic>{
-        'secure': <Map<String, String>>[
-          {'type': 'http', 'scheme': 'bearer', 'name': 'bearer'},
-        ],
-        ...?extra,
-      },
-      contentType: 'application/json',
-      validateStatus: validateStatus,
-    );
-
-    dynamic _bodyData;
-
-    try {
-      const _type = FullType(UpdateMemberRoleDto);
-      _bodyData = _serializers.serialize(
-        updateMemberRoleDto,
-        specifiedType: _type,
-      );
-    } catch (error, stackTrace) {
-      throw DioException(
-        requestOptions: _options.compose(_dio.options, _path),
-        type: DioExceptionType.unknown,
-        error: error,
-        stackTrace: stackTrace,
-      );
-    }
-
-    final _response = await _dio.request<Object>(
-      _path,
-      data: _bodyData,
-      options: _options,
-      cancelToken: cancelToken,
-      onSendProgress: onSendProgress,
-      onReceiveProgress: onReceiveProgress,
-    );
-
-    OrganizationsControllerUpdateMemberRole200Response? _responseData;
-
-    try {
-      final rawResponse = _response.data;
-      _responseData = rawResponse == null
-          ? null
-          : _serializers.deserialize(
-              rawResponse,
-              specifiedType: const FullType(
-                OrganizationsControllerUpdateMemberRole200Response,
-              ),
-            ) as OrganizationsControllerUpdateMemberRole200Response;
-    } catch (error, stackTrace) {
-      throw DioException(
-        requestOptions: _response.requestOptions,
-        response: _response,
-        type: DioExceptionType.unknown,
-        error: error,
-        stackTrace: stackTrace,
-      );
-    }
-
-    return Response<OrganizationsControllerUpdateMemberRole200Response>(
       data: _responseData,
       headers: _response.headers,
       isRedirect: _response.isRedirect,

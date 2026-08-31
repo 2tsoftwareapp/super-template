@@ -132,12 +132,11 @@ export 'package:super_template_api/src/model/notifications_controller_register_d
 export 'package:super_template_api/src/model/notifications_controller_unread_count200_response.dart';
 export 'package:super_template_api/src/model/organization_detail_dto.dart';
 export 'package:super_template_api/src/model/organization_dto.dart';
+export 'package:super_template_api/src/model/organization_management_controller_create200_response.dart';
 export 'package:super_template_api/src/model/organization_member_dto.dart';
-export 'package:super_template_api/src/model/organizations_controller_create200_response.dart';
 export 'package:super_template_api/src/model/organizations_controller_get_one200_response.dart';
 export 'package:super_template_api/src/model/organizations_controller_list200_response.dart';
 export 'package:super_template_api/src/model/organizations_controller_list_members200_response.dart';
-export 'package:super_template_api/src/model/organizations_controller_update_member_role200_response.dart';
 export 'package:super_template_api/src/model/pagination_meta_dto.dart';
 export 'package:super_template_api/src/model/permission_dto.dart';
 export 'package:super_template_api/src/model/preferences_controller_get_my_preferences200_response.dart';
