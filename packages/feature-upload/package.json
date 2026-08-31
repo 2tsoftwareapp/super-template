@@ -30,7 +30,6 @@
     "@repo/config": "workspace:*",
     "@repo/database-runtime": "workspace:*",
     "@repo/feature-access-control": "workspace:*",
-    "@repo/feature-auth": "workspace:*",
     "@repo/feature-activities": "workspace:*",
     "@repo/feature-audit": "workspace:*",
     "@repo/feature-organizations": "workspace:*",

@@ -125,7 +125,10 @@ export class UsersRepository implements UsersRepositoryPort, UserLookup {
     };
   }
 
-  async filterExistingUserIds(userIds: string[], executor: DatabaseExecutor = this.database): Promise<string[]> {
+  async filterExistingUserIds(
+    userIds: string[],
+    executor: DatabaseExecutor = this.database,
+  ): Promise<string[]> {
     if (userIds.length === 0) return [];
     const rows = await executor
       .select({ id: users.id })
@@ -163,8 +166,8 @@ export class UsersRepository implements UsersRepositoryPort, UserLookup {
           sql`exists(
             select 1 from r_organization_members
             where organization_id = ${organizationId}::uuid and user_id = ${users.id}
-          )`
-        )
+          )`,
+        ),
       )
       .limit(1);
     return rows[0] ?? null;
@@ -187,8 +190,8 @@ export class UsersRepository implements UsersRepositoryPort, UserLookup {
           sql`exists(
             select 1 from r_organization_members
             where organization_id = ${organizationId}::uuid and user_id = ${users.id}
-          )`
-        )
+          )`,
+        ),
       );
     return rows.map((r) => r.id);
   }
@@ -207,8 +210,8 @@ export class UsersRepository implements UsersRepositoryPort, UserLookup {
           sql`exists(
             select 1 from r_organization_members
             where organization_id = ${organizationId}::uuid and user_id = ${users.id}
-          )`
-        )
+          )`,
+        ),
       );
     return rows.map((r) => r.id);
   }

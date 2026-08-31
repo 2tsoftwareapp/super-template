@@ -58,7 +58,6 @@
     "@repo/feature-users": "workspace:*",
     "@repo/feature-user-management": "workspace:*",
     "@repo/observability": "workspace:*",
-    "argon2": "0.44.0",
     "class-transformer": "0.5.1",
     "class-validator": "0.15.1",
     "drizzle-orm": "0.45.2",

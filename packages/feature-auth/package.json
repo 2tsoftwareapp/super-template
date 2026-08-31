@@ -39,6 +39,7 @@
     "@repo/feature-organizations": "workspace:*",
     "@repo/feature-outbox": "workspace:*",
     "@repo/feature-settings": "workspace:*",
+    "@repo/feature-user-management": "workspace:*",
     "@repo/feature-users": "workspace:*",
     "@repo/utils": "workspace:*",
     "argon2": "0.44.0",
