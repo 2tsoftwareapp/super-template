@@ -10,6 +10,8 @@ function resolveTemplatesDir(): string {
   const candidates = [
     // Ops escape hatch: point at templates shipped outside the bundle.
     process.env.MAIL_TEMPLATES_DIR,
+    // Webpack bundle: templates copied to dist/templates/mail/ by CopyPlugin.
+    join(__dirname, "templates", "mail"),
     // tsc-style builds / running from compiled folder.
     join(__dirname, "templates"),
     join(__dirname, "infrastructure", "templates"),

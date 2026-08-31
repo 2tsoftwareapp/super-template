@@ -1,8 +1,28 @@
+const path = require("path");
+const CopyPlugin = require("copy-webpack-plugin");
 const nodeExternals = require("webpack-node-externals");
 const TsconfigPathsPlugin = require("tsconfig-paths-webpack-plugin");
 
+const MAIL_TEMPLATES_SRC = path.resolve(
+  __dirname,
+  "../../packages/feature-mail/src/infrastructure/templates",
+);
+
 module.exports = (options) => ({
   ...options,
+  plugins: [
+    ...(options.plugins ?? []),
+    new CopyPlugin({
+      patterns: [
+        {
+          from: MAIL_TEMPLATES_SRC,
+          to: path.resolve(__dirname, "dist/templates/mail"),
+          globOptions: { ignore: ["**/.gitkeep"] },
+          noErrorOnMissing: true,
+        },
+      ],
+    }),
+  ],
   externals: [
     nodeExternals({
       // Bundle workspace packages; keep npm deps external.
