@@ -175,6 +175,8 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(UpdateUserStatusDtoStatusEnum.serializer)
       ..add(UserDto.serializer)
       ..add(UserDtoStatusEnum.serializer)
+      ..add(UserOrganizationDto.serializer)
+      ..add(UserOrganizationDtoRoleEnum.serializer)
       ..add(UserPreferencesDto.serializer)
       ..add(UserPreferencesDtoLanguageEnum.serializer)
       ..add(UserPreferencesDtoThemeEnum.serializer)
@@ -267,10 +269,6 @@ Serializers _$serializers = (Serializers().toBuilder()
         () => ListBuilder<NotificationJobDto>(),
       )
       ..addBuilderFactory(
-        const FullType(BuiltList, const [const FullType(OrganizationDto)]),
-        () => ListBuilder<OrganizationDto>(),
-      )
-      ..addBuilderFactory(
         const FullType(BuiltList, const [
           const FullType(OrganizationMemberDto),
         ]),
@@ -357,6 +355,12 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..addBuilderFactory(
         const FullType(BuiltList, const [const FullType(UserDto)]),
         () => ListBuilder<UserDto>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, const [
+          const FullType(UserOrganizationDto),
+        ]),
+        () => ListBuilder<UserOrganizationDto>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltMap, const [

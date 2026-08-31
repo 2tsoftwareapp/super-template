@@ -5,9 +5,9 @@
 // ignore_for_file: unused_element
 // @dart=3.0
 
-import 'package:super_template_api/src/model/organization_dto.dart';
 import 'package:super_template_api/src/model/request_meta_dto.dart';
 import 'package:built_collection/built_collection.dart';
+import 'package:super_template_api/src/model/user_organization_dto.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
@@ -24,7 +24,7 @@ abstract class OrganizationsControllerList200Response
         Built<OrganizationsControllerList200Response,
             OrganizationsControllerList200ResponseBuilder> {
   @BuiltValueField(wireName: r'data')
-  BuiltList<OrganizationDto> get data;
+  BuiltList<UserOrganizationDto> get data;
 
   @BuiltValueField(wireName: r'meta')
   RequestMetaDto get meta;
@@ -62,7 +62,7 @@ class _$OrganizationsControllerList200ResponseSerializer
     yield r'data';
     yield serializers.serialize(
       object.data,
-      specifiedType: const FullType(BuiltList, [FullType(OrganizationDto)]),
+      specifiedType: const FullType(BuiltList, [FullType(UserOrganizationDto)]),
     );
     yield r'meta';
     yield serializers.serialize(
@@ -100,9 +100,9 @@ class _$OrganizationsControllerList200ResponseSerializer
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(BuiltList, [
-              FullType(OrganizationDto),
+              FullType(UserOrganizationDto),
             ]),
-          ) as BuiltList<OrganizationDto>;
+          ) as BuiltList<UserOrganizationDto>;
           result.data.replace(valueDes);
           break;
         case r'meta':

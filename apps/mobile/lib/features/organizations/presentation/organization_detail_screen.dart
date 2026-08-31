@@ -197,8 +197,9 @@ class _OrganizationDetailScreenState
                                 ),
                               );
                             } catch (e) {
-                              if (context.mounted)
+                              if (context.mounted) {
                                 showErrorSnackBar(context, e);
+                              }
                             }
                           },
                           onRemove: () async {
@@ -213,8 +214,9 @@ class _OrganizationDetailScreenState
                                 ),
                               );
                             } catch (e) {
-                              if (context.mounted)
+                              if (context.mounted) {
                                 showErrorSnackBar(context, e);
+                              }
                             }
                           },
                         ),

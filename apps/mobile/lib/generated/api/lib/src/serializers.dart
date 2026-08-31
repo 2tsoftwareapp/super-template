@@ -153,6 +153,7 @@ import 'package:super_template_api/src/model/update_role_dto.dart';
 import 'package:super_template_api/src/model/update_setting_dto.dart';
 import 'package:super_template_api/src/model/update_user_status_dto.dart';
 import 'package:super_template_api/src/model/user_dto.dart';
+import 'package:super_template_api/src/model/user_organization_dto.dart';
 import 'package:super_template_api/src/model/user_preferences_dto.dart';
 import 'package:super_template_api/src/model/verify_email_dto.dart';
 import 'package:super_template_api/src/model/verify_mfa_challenge_dto.dart';
@@ -297,6 +298,7 @@ part 'serializers.g.dart';
   UpdateSettingDto,
   UpdateUserStatusDto,
   UserDto,
+  UserOrganizationDto,
   UserPreferencesDto,
   VerifyEmailDto,
   VerifyMfaChallengeDto,

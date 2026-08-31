@@ -11,7 +11,7 @@ part of 'organizations_controller_list200_response.dart';
 class _$OrganizationsControllerList200Response
     extends OrganizationsControllerList200Response {
   @override
-  final BuiltList<OrganizationDto> data;
+  final BuiltList<UserOrganizationDto> data;
   @override
   final RequestMetaDto meta;
 
@@ -69,10 +69,10 @@ class OrganizationsControllerList200ResponseBuilder
             OrganizationsControllerList200ResponseBuilder> {
   _$OrganizationsControllerList200Response? _$v;
 
-  ListBuilder<OrganizationDto>? _data;
-  ListBuilder<OrganizationDto> get data =>
-      _$this._data ??= ListBuilder<OrganizationDto>();
-  set data(ListBuilder<OrganizationDto>? data) => _$this._data = data;
+  ListBuilder<UserOrganizationDto>? _data;
+  ListBuilder<UserOrganizationDto> get data =>
+      _$this._data ??= ListBuilder<UserOrganizationDto>();
+  set data(ListBuilder<UserOrganizationDto>? data) => _$this._data = data;
 
   RequestMetaDtoBuilder? _meta;
   RequestMetaDtoBuilder get meta => _$this._meta ??= RequestMetaDtoBuilder();

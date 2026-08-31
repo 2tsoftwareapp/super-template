@@ -76,7 +76,7 @@ class OrganizationsRepository {
 
   Future<OrganizationSummary> create({required String name}) async {
     try {
-      final response = await _api.organizationsControllerCreate(
+      final response = await _api.organizationManagementControllerCreate(
         createOrganizationDto: CreateOrganizationDto((b) => b..name = name),
       );
       final org = response.data!.data;
@@ -85,7 +85,7 @@ class OrganizationsRepository {
         name: org.name,
         slug: org.slug,
         role: org.role.name,
-        isCurrent: org.current,
+        isCurrent: false,
       );
     } on DioException catch (error) {
       throw AppException.fromDio(error);
@@ -136,7 +136,7 @@ class OrganizationsRepository {
 
   Future<void> delete(String id) async {
     try {
-      await _api.organizationsControllerRemove(id: id);
+      await _api.organizationManagementControllerRemove(id: id);
     } on DioException catch (error) {
       throw AppException.fromDio(error);
     }
@@ -144,7 +144,7 @@ class OrganizationsRepository {
 
   Future<void> leave(String id) async {
     try {
-      await _api.organizationsControllerLeave(id: id);
+      await _api.organizationManagementControllerLeave(id: id);
     } on DioException catch (error) {
       throw AppException.fromDio(error);
     }
@@ -176,7 +176,7 @@ class OrganizationsRepository {
     required String role,
   }) async {
     try {
-      await _api.organizationsControllerUpdateMemberRole(
+      await _api.organizationManagementControllerUpdateMemberRole(
         id: organizationId,
         userId: userId,
         updateMemberRoleDto: UpdateMemberRoleDto(
@@ -193,7 +193,7 @@ class OrganizationsRepository {
     required String userId,
   }) async {
     try {
-      await _api.organizationsControllerRemoveMember(
+      await _api.organizationManagementControllerRemoveMember(
         id: organizationId,
         userId: userId,
       );

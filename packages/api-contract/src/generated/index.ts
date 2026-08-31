@@ -1930,6 +1930,16 @@ export interface components {
             status: "PENDING" | "ACTIVE" | "BLOCKED";
             updatedAt: string;
         };
+        UserOrganizationDto: {
+            createdAt: string;
+            current: boolean;
+            id: string;
+            name: string;
+            /** @enum {string} */
+            role: "OWNER" | "ADMIN" | "MEMBER";
+            slug: string;
+            updatedAt: string;
+        };
         UserPreferencesDto: {
             createdAt: string;
             emailPreferences: {
@@ -4146,7 +4156,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        data: components["schemas"]["OrganizationDto"][];
+                        data: components["schemas"]["UserOrganizationDto"][];
                         meta: components["schemas"]["RequestMetaDto"];
                     };
                 };

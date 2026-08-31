@@ -169,6 +169,7 @@ export 'package:super_template_api/src/model/update_role_dto.dart';
 export 'package:super_template_api/src/model/update_setting_dto.dart';
 export 'package:super_template_api/src/model/update_user_status_dto.dart';
 export 'package:super_template_api/src/model/user_dto.dart';
+export 'package:super_template_api/src/model/user_organization_dto.dart';
 export 'package:super_template_api/src/model/user_preferences_dto.dart';
 export 'package:super_template_api/src/model/verify_email_dto.dart';
 export 'package:super_template_api/src/model/verify_mfa_challenge_dto.dart';

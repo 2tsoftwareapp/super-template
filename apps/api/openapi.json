@@ -2272,6 +2272,46 @@
         ],
         "type": "object"
       },
+      "UserOrganizationDto": {
+        "properties": {
+          "createdAt": {
+            "type": "string"
+          },
+          "current": {
+            "type": "boolean"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "role": {
+            "enum": [
+              "OWNER",
+              "ADMIN",
+              "MEMBER"
+            ],
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "slug",
+          "role",
+          "createdAt",
+          "updatedAt",
+          "current"
+        ],
+        "type": "object"
+      },
       "UserPreferencesDto": {
         "properties": {
           "createdAt": {
@@ -6899,7 +6939,7 @@
                   "properties": {
                     "data": {
                       "items": {
-                        "$ref": "#/components/schemas/OrganizationDto"
+                        "$ref": "#/components/schemas/UserOrganizationDto"
                       },
                       "type": "array"
                     },

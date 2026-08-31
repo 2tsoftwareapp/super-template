@@ -12,9 +12,9 @@ import { ListOrganizationsForUserUseCase } from "../application/use-cases/list-o
 import { UpdateOrganizationUseCase } from "../application/use-cases/update-organization.use-case";
 import {
   OrganizationDetailDto,
-  OrganizationDto,
   OrganizationMemberDto,
   UpdateOrganizationDto,
+  UserOrganizationDto,
 } from "./organizations.dto";
 
 @ApiTags("organizations")
@@ -29,7 +29,7 @@ export class OrganizationsController {
   ) {}
 
   @Get()
-  @ApiArrayResponse(OrganizationDto)
+  @ApiArrayResponse(UserOrganizationDto)
   list(@CurrentUser() user: AuthenticatedRequestUser, @Query("memberOnly") memberOnly?: string) {
     return this.listOrganizationsForUser.execute(user, memberOnly === "true");
   }

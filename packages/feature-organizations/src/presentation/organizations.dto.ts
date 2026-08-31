@@ -66,7 +66,7 @@ export class UpdateMemberRoleDto {
   role!: "OWNER" | "ADMIN" | "MEMBER";
 }
 
-export class OrganizationDto {
+export class UserOrganizationDto {
   @ApiProperty()
   id!: string;
 

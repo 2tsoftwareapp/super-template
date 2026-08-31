@@ -312,6 +312,7 @@ Class | Method | HTTP request | Description
  - [UpdateSettingDto](doc/UpdateSettingDto.md)
  - [UpdateUserStatusDto](doc/UpdateUserStatusDto.md)
  - [UserDto](doc/UserDto.md)
+ - [UserOrganizationDto](doc/UserOrganizationDto.md)
  - [UserPreferencesDto](doc/UserPreferencesDto.md)
  - [VerifyEmailDto](doc/VerifyEmailDto.md)
  - [VerifyMfaChallengeDto](doc/VerifyMfaChallengeDto.md)
