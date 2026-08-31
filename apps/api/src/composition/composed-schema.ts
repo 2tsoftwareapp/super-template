@@ -9,6 +9,8 @@ import {
 
 import { enabledFeatures } from "./feature-registry";
 
+import { Reflector } from "@nestjs/core";
+
 const composed = composeFeatures(enabledFeatures);
 
 /** Drizzle schema composed from enabled feature manifests (deterministic order). */
@@ -47,6 +49,30 @@ function resolveHandlerImportModules(
     }
   }
   return modules;
+}
+
+/**
+ * Normalizes HTTP pipeline providers by replacing any foreign Reflector reference
+ * (e.g. from sub-packages' node_modules in the monorepo) with the local Reflector class.
+ */
+function normalizePipelineProviders(providers: readonly Provider[]): Provider[] {
+  return providers.map((provider) => {
+    if (
+      provider &&
+      typeof provider === "object" &&
+      "inject" in (provider as any) &&
+      Array.isArray((provider as any).inject)
+    ) {
+      const inject = (provider as any).inject.map((token: any) => {
+        if (typeof token === "function" && token.name === "Reflector") {
+          return Reflector;
+        }
+        return token;
+      });
+      return { ...provider, inject } as any;
+    }
+    return provider;
+  }) as Provider[];
 }
 
 /**
@@ -117,11 +143,14 @@ export const composedOutboxHandlers: readonly OutboxTopicHandlerClass[] =
  * HTTP pipeline guard providers collected from features in deterministic order.
  * Each is a Provider definition using `useFactory` + `inject` with tokens.
  */
-export const composedHttpPipelineGuards: readonly Provider[] = fullGraph.httpPipelineGuards;
+export const composedHttpPipelineGuards: readonly Provider[] = normalizePipelineProviders(
+  fullGraph.httpPipelineGuards,
+);
 
 /**
  * HTTP pipeline interceptor providers collected from features in deterministic order.
  * Each is a Provider definition using `useFactory` + `inject` with tokens.
  */
-export const composedHttpPipelineInterceptors: readonly Provider[] =
-  fullGraph.httpPipelineInterceptors;
+export const composedHttpPipelineInterceptors: readonly Provider[] = normalizePipelineProviders(
+  fullGraph.httpPipelineInterceptors,
+);
