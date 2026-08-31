@@ -2,39 +2,37 @@
 
 import { Avatar } from "@repo/web-ui/avatar";
 import { Dropdown, type DropdownItem } from "@repo/web-ui/dropdown";
-import { Tooltip } from "@repo/web-ui/tooltip";
 import { LogOut, Shield } from "lucide-react";
 
+import { useSidebar } from "@/components/ui/sidebar";
 import { useRouter } from "@/i18n/navigation";
 import { useI18n } from "@/lib/i18n";
-import { cn } from "@/lib/utils";
 
 interface UserMenuProps {
-  collapsed?: boolean;
   displayName: string;
   roles: string;
   onSignOut: () => void;
 }
 
-export function UserMenu({ collapsed, displayName, roles, onSignOut }: UserMenuProps) {
+export function UserMenu({ displayName, roles, onSignOut }: UserMenuProps) {
+  const { state } = useSidebar();
   const router = useRouter();
   const { t } = useI18n();
+  const collapsed = state === "collapsed";
 
   return (
-    <div className={cn("p-2", collapsed && "flex justify-center pt-3")}>
+    <div className={collapsed ? "flex justify-center p-2" : "p-2"}>
       <Dropdown
         align="start"
         trigger={
           collapsed ? (
-            <Tooltip content={displayName} side="right">
-              <button
-                type="button"
-                className="flex size-9 items-center justify-center rounded-xl transition-all duration-200 hover:bg-accent hover:scale-105"
-                aria-label={displayName}
-              >
-                <Avatar name={displayName} size="sm" className="ring-1 ring-border/20" />
-              </button>
-            </Tooltip>
+            <button
+              type="button"
+              className="flex size-9 items-center justify-center rounded-xl transition-all duration-200 hover:bg-accent hover:scale-105"
+              aria-label={displayName}
+            >
+              <Avatar name={displayName} size="sm" className="ring-1 ring-border/20" />
+            </button>
           ) : (
             <button
               type="button"

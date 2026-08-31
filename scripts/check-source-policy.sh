@@ -97,8 +97,11 @@ if [ -n "$feat_apps" ]; then
   printf 'Policy violation: features must not import apps/*\n%s\n' "$feat_apps" >&2
 fi
 
-# API host must not depend on provider SDKs
-if rg -n '"(@aws-sdk/|firebase-admin|nodemailer|argon2)"' apps/api/package.json; then
+# API host must not depend on feature provider SDKs.
+# Note: argon2 is allowed because webpack externalizes all native npm
+# packages via nodeExternals(); the bundle requires argon2 at runtime
+# for password hashing and pnpm strict isolation needs it as a direct dep.
+if rg -n '"(@aws-sdk/|firebase-admin|nodemailer)"' apps/api/package.json; then
   failed=1
   printf 'Policy violation: apps/api must not depend on feature provider SDKs\n' >&2
 fi
