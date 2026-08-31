@@ -1,12 +1,13 @@
 import { APP_GUARD } from "@nestjs/core";
-import { defineFeature, type FeatureManifest } from "@repo/api-plugin-kit";
+import { defineFeature } from "@repo/api-plugin-kit";
 
 import { applicationSettings } from "./infrastructure/persistence";
 import { MaintenanceModeGuard } from "./maintenance-mode.guard";
+import { APPLICATION_SETTINGS_LOOKUP, type ApplicationSettingsLookup } from "./public/contracts";
 import { settingsSeeders } from "./seed";
 import { SettingsModule } from "./settings.module";
 
-export const settingsFeature: FeatureManifest = defineFeature({
+export const settingsFeature = defineFeature({
   id: "settings",
   // Writes audit synchronously inside the update transaction via AUDIT_WRITER.
   dependsOn: ["audit"],
@@ -15,7 +16,9 @@ export const settingsFeature: FeatureManifest = defineFeature({
     guards: [
       {
         provide: APP_GUARD,
-        useClass: MaintenanceModeGuard,
+        useFactory: (applicationSettingsLookup: ApplicationSettingsLookup) =>
+          new MaintenanceModeGuard(applicationSettingsLookup),
+        inject: [APPLICATION_SETTINGS_LOOKUP],
       },
     ],
   },

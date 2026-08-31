@@ -1,5 +1,5 @@
 import { APP_GUARD, Reflector } from "@nestjs/core";
-import { defineFeature, type FeatureManifest } from "@repo/api-plugin-kit";
+import { defineFeature } from "@repo/api-plugin-kit";
 
 import {
   AuthSendVerificationEmailHandler,
@@ -18,7 +18,7 @@ import {
 import { ACCESS_TOKEN_AUTHENTICATOR, type AccessTokenAuthenticator } from "./public/contracts";
 import { authSeeders } from "./seed";
 
-export const authFeature: FeatureManifest = defineFeature({
+export const authFeature = defineFeature({
   id: "auth",
   dependsOn: [
     "access-control",

@@ -1,4 +1,4 @@
-import type { Type } from "@nestjs/common";
+import type { Provider, Type } from "@nestjs/common";
 
 import { composeFeatures, type FeatureManifest } from "@repo/api-plugin-kit";
 import {
@@ -85,6 +85,8 @@ export function buildFeatureModules(features: readonly FeatureManifest[]) {
     seeders: composedSubset.seeders,
     authorization: composedSubset.authorization,
     outboxHandlerClasses: composedSubset.outboxHandlerClasses,
+    httpPipelineGuards: composedSubset.httpPipelineGuards,
+    httpPipelineInterceptors: composedSubset.httpPipelineInterceptors,
   };
 }
 
@@ -111,8 +113,15 @@ export const composedAuthorization = composed.authorization;
 export const composedOutboxHandlers: readonly OutboxTopicHandlerClass[] =
   composed.outboxHandlerClasses as readonly OutboxTopicHandlerClass[];
 
-/** Global HTTP pipeline guards collected from feature manifests. */
-export const composedHttpPipelineGuards = composed.httpPipelineGuards;
+/**
+ * HTTP pipeline guard providers collected from features in deterministic order.
+ * Each is a Provider definition using `useFactory` + `inject` with tokens.
+ */
+export const composedHttpPipelineGuards: readonly Provider[] = fullGraph.httpPipelineGuards;
 
-/** Global HTTP pipeline interceptors collected from feature manifests. */
-export const composedHttpPipelineInterceptors = composed.httpPipelineInterceptors;
+/**
+ * HTTP pipeline interceptor providers collected from features in deterministic order.
+ * Each is a Provider definition using `useFactory` + `inject` with tokens.
+ */
+export const composedHttpPipelineInterceptors: readonly Provider[] =
+  fullGraph.httpPipelineInterceptors;

@@ -41,20 +41,38 @@ export interface ComposedAuthorization {
 }
 
 /**
- * Feature-owned HTTP pipeline contributions. Each guard/interceptor is
- * registered as a global APP_GUARD or APP_INTERCEPTOR. The application
- * composer collects these in deterministic order based on feature dependency
- * ordering and the declared `httpPipelineOrder`.
+ * Feature-owned HTTP pipeline contributions.
+ *
+ * Each guard/interceptor is registered as a global `APP_GUARD` or
+ * `APP_INTERCEPTOR`. The providers MUST use `useFactory` + `inject` with
+ * injection TOKENS (not classes). This is because NestJS resolves
+ * `APP_GUARD`/`APP_INTERCEPTOR` at the application root scope, and
+ * `useExisting: GuardClass` fails when the guard's `@Inject(TOKEN)`
+ * dependencies cannot be resolved from the registering module's scope.
+ *
+ * The factory receives tokens from the root scope (where @Global modules
+ * register them) and manually creates the guard/interceptor instance.
+ *
+ * Example:
+ * ```ts
+ * httpPipeline: {
+ *   guards: [{
+ *     provide: APP_GUARD,
+ *     useFactory: (reflector, authenticator) => new AuthGuard(reflector, authenticator),
+ *     inject: [Reflector, ACCESS_TOKEN_AUTHENTICATOR],
+ *   }],
+ * }
+ * ```
  */
 export interface FeatureHttpPipeline {
   /**
-   * Global guards contributed by this feature. Registered as APP_GUARD in
-   * the order features appear in the composition.
+   * Global guards contributed by this feature. Each must be a `Provider`
+   * definition using `useFactory` + `inject` with injection tokens.
    */
   readonly guards?: readonly Provider[];
   /**
-   * Global interceptors contributed by this feature. Registered as
-   * APP_INTERCEPTOR in the order features appear in the composition.
+   * Global interceptors contributed by this feature. Each must be a
+   * `Provider` definition using `useFactory` + `inject` with injection tokens.
    */
   readonly interceptors?: readonly Provider[];
 }
@@ -91,9 +109,10 @@ export interface FeatureManifest {
   };
 
   /**
-   * Global HTTP pipeline contributions (guards/interceptors). The application
-   * composer collects these from all features and registers them in
-   * deterministic order.
+   * Global HTTP pipeline contributions (guards/interceptors). Each provider
+   * uses `useFactory` + `inject` with injection TOKENS. The composition
+   * layer collects these and registers them as APP_GUARD/APP_INTERCEPTOR
+   * in deterministic order based on `httpPipelineOrder`.
    */
   readonly httpPipeline?: FeatureHttpPipeline;
 
@@ -176,9 +195,13 @@ export interface ComposedFeatures {
   readonly outboxHandlerClasses: readonly Type<unknown>[];
   /**
    * HTTP pipeline providers collected from features in deterministic order.
-   * Guards first, then interceptors, each group in feature composition order.
+   * Each is a Provider definition using `useFactory` + `inject` with tokens.
    */
   readonly httpPipelineGuards: readonly Provider[];
+  /**
+   * HTTP pipeline interceptor providers collected from features in deterministic order.
+   * Each is a Provider definition using `useFactory` + `inject` with tokens.
+   */
   readonly httpPipelineInterceptors: readonly Provider[];
 }
 
@@ -438,6 +461,7 @@ export function computeRemovalClosure(
 /**
  * Collect HTTP pipeline contributions from features in composition order.
  * Features with lower `httpPipelineOrder` contribute first.
+ * Returns Provider[] definitions (useFactory + inject with tokens).
  */
 export function collectFeatureHttpPipeline(features: readonly FeatureManifest[]): {
   guards: Provider[];

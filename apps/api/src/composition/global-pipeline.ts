@@ -1,4 +1,4 @@
-import type { MiddlewareConsumer, NestModule, Provider } from "@nestjs/common";
+import type { MiddlewareConsumer, Provider } from "@nestjs/common";
 
 import { RequestMethod } from "@nestjs/common";
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, Reflector } from "@nestjs/core";
@@ -19,19 +19,21 @@ import { ErrorReporterService } from "@repo/observability";
 import { composedHttpPipelineGuards, composedHttpPipelineInterceptors } from "./composed-schema";
 
 /**
- * Global HTTP pipeline providers for the API host.
- *
  * Effective guard ordering (first registered runs first):
- *   exception mapping → maintenance check → throttling → authentication →
- *   authorization → response envelope → tenant context
+ *   exception filter → request middleware →
+ *   maintenance (10, feature-settings) →
+ *   ThrottlerGuard (generic) →
+ *   auth (20, feature-auth) →
+ *   AuthorizeGuard (generic) →
+ *   ResponseEnvelopeInterceptor →
+ *   tenant context (30, feature-access-control)
  *
- * Feature-contributed providers are complete Nest Provider definitions
- * (with useFactory/useClass and inject) spread directly into the pipeline.
- * The composition step sorts features by httpPipelineOrder, so the arrays
- * are already in deterministic order.
+ * Feature-contributed guards use `useFactory` + `inject` with tokens
+ * resolved from the root scope. The factory manually creates the
+ * guard instance, avoiding Nest's class-level DI resolution which
+ * fails for APP_GUARD at root scope.
  *
- * Interceptors wrap inward: first registered is innermost (closest to
- * handler), last registered is outermost (closest to response).
+ * Interceptors are registered innermost-first (first = closest to handler).
  */
 export const globalPipelineProviders: Provider[] = [
   // --- Exception filter (outermost) ---
@@ -48,13 +50,16 @@ export const globalPipelineProviders: Provider[] = [
   // --- Request middleware ---
   RequestLoggerMiddleware,
 
-  // --- Guards (checked in registration order: first = outermost) ---
-  // Feature-contributed guards are interleaved with generic guards.
-  // composedHttpPipelineGuards is sorted by httpPipelineOrder.
-  // We place guards before the ThrottlerGuard (order < 15) and after it (order >= 15).
-  ...composedHttpPipelineGuards.filter((_, i) => i === 0), // maintenance (order 10) — before throttling
+  // --- Guards ---
+  // composedHttpPipelineGuards is sorted by httpPipelineOrder ascending.
+  // Settings (10) comes first, Auth (20) comes second.
+  // We place the first feature guard(s) before ThrottlerGuard,
+  // and the rest after it. For the current feature set:
+  //   maintenance (10) → ThrottlerGuard → auth (20) → AuthorizeGuard
+  // This split point is derived from the feature manifest ordering.
+  ...composedHttpPipelineGuards.slice(0, 1), // maintenance (order 10)
   { provide: APP_GUARD, useClass: ThrottlerGuard },
-  ...composedHttpPipelineGuards.filter((_, i) => i > 0), // auth (order 20) — after throttling
+  ...composedHttpPipelineGuards.slice(1), // auth (order 20)
   {
     provide: APP_GUARD,
     useFactory: (reflector: Reflector) => new AuthorizeGuard(reflector),
@@ -67,7 +72,7 @@ export const globalPipelineProviders: Provider[] = [
     useFactory: (reflector: Reflector) => new ResponseEnvelopeInterceptor(reflector),
     inject: [Reflector],
   },
-  ...composedHttpPipelineInterceptors, // tenant context (order 30)
+  ...composedHttpPipelineInterceptors,
 
   // --- Global providers ---
   TenantContextService,
@@ -79,4 +84,4 @@ export function configureGlobalMiddleware(consumer: MiddlewareConsumer): void {
     .forRoutes({ path: "*path", method: RequestMethod.ALL });
 }
 
-export type { NestModule };
+export type { MiddlewareConsumer };

@@ -1,5 +1,5 @@
 import { APP_INTERCEPTOR, Reflector } from "@nestjs/core";
-import { defineFeature, type FeatureManifest } from "@repo/api-plugin-kit";
+import { defineFeature } from "@repo/api-plugin-kit";
 import { TenantContextService } from "@repo/api-runtime";
 
 import { AccessControlModule } from "./access-control.module";
@@ -7,7 +7,7 @@ import { permissions, rolePermissions, roles, userRoles } from "./infrastructure
 import { accessControlSeeders } from "./seed";
 import { TenantContextInterceptor } from "./tenant-context.interceptor";
 
-export const accessControlFeature: FeatureManifest = defineFeature({
+export const accessControlFeature = defineFeature({
   id: "access-control",
   dependsOn: ["users", "organizations", "audit"],
   nestModule: AccessControlModule,

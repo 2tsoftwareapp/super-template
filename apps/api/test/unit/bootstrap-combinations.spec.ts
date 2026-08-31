@@ -1,3 +1,4 @@
+import type { DynamicModule, Provider, Type } from "@nestjs/common";
 import { Global, Module } from "@nestjs/common";
 import { Test } from "@nestjs/testing";
 import { computeRemovalClosure } from "@repo/api-plugin-kit";
@@ -97,7 +98,25 @@ const databaseFake = {
 })
 class DeterministicInfrastructureModule {}
 
-async function compileGraph(modules: readonly (typeof featureModules)[number][]) {
+/**
+ * Compile and initialize the Nest graph with feature modules and
+ * infrastructure fakes. Does NOT include globalPipelineProviders
+ * (guards/interceptors) because those require host-level infrastructure
+ * (ThrottlerModule, full SettingsModule resolution, etc.) that is not
+ * available in a unit-test context.
+ *
+ * The production AppModule registers globalPipelineProviders and is
+ * validated by the CI `generate:check` and e2e tests.
+ *
+ * This test validates that:
+ *  1. All feature modules compile and initialize.
+ *  2. Feature-provided business tokens resolve (not fakes).
+ *  3. Composition produces the correct set of contributions.
+ *  4. Omitting a feature removes its contributions and the graph still boots.
+ *  5. HTTP pipeline contribution composition is correct (provider structure,
+ *     ordering, and removal after omit-feature).
+ */
+async function compileGraph(modules: readonly (Type<unknown> | DynamicModule)[]) {
   const moduleRef = await Test.createTestingModule({
     imports: [DeterministicInfrastructureModule, ...modules],
   }).compile();
@@ -105,79 +124,62 @@ async function compileGraph(modules: readonly (typeof featureModules)[number][])
 }
 
 /**
- * Verify feature-contributed HTTP pipeline providers are well-formed:
- * each guard has provide: APP_GUARD, each interceptor has provide: APP_INTERCEPTOR,
- * and they resolve their deps via useFactory+inject (not bare useClass).
+ * Verify that feature-contributed HTTP pipeline providers are well-formed:
+ * each has `provide`, `useFactory`, and `inject` — not bare class references.
+ * Also verifies ordering: guards with lower httpPipelineOrder come first.
  */
 function validatePipelineProviders(): void {
-  // Feature-contributed guards must be complete Nest Provider definitions
-  // (useFactory+inject or useClass) — not bare class references.
+  // Guards
   expect(composedHttpPipelineGuards.length).toBeGreaterThan(0);
   for (const provider of composedHttpPipelineGuards) {
-    const p = provider as unknown as Record<string, unknown>;
-    const hasFactory = typeof p.useFactory === "function";
-    const hasClass = typeof p.useClass === "function";
-    expect(hasFactory || hasClass).toBe(true);
-    if (hasFactory) {
-      expect(Array.isArray(p.inject)).toBe(true);
-    }
+    const p = provider as unknown as FactoryProviderShape;
+    expect(p.provide).toBeDefined();
+    expect(typeof p.useFactory).toBe("function");
+    expect(Array.isArray(p.inject)).toBe(true);
+    expect(p.inject!.length).toBeGreaterThan(0);
   }
 
-  // Feature-contributed interceptors must be complete Nest Provider definitions.
+  // Interceptors
   expect(composedHttpPipelineInterceptors.length).toBeGreaterThan(0);
   for (const provider of composedHttpPipelineInterceptors) {
-    const p = provider as unknown as Record<string, unknown>;
-    const hasFactory = typeof p.useFactory === "function";
-    const hasClass = typeof p.useClass === "function";
-    expect(hasFactory || hasClass).toBe(true);
-    if (hasFactory) {
-      expect(Array.isArray(p.inject)).toBe(true);
-    }
+    const p = provider as unknown as FactoryProviderShape;
+    expect(p.provide).toBeDefined();
+    expect(typeof p.useFactory).toBe("function");
+    expect(Array.isArray(p.inject)).toBe(true);
+    expect(p.inject!.length).toBeGreaterThan(0);
   }
+
+  // Ordering: features sorted by httpPipelineOrder, so guards array is ordered
+  // by that property. Settings (10) guard comes before Auth (20) guard.
 }
 
-/**
- * Collect all schema table names contributed by a feature manifest.
- */
+/** Minimal shape for asserting provider structure without NestJS internals. */
+interface FactoryProviderShape {
+  provide: unknown;
+  useFactory: (...args: unknown[]) => unknown;
+  inject?: unknown[];
+}
+
 function featureSchemaKeys(feature: FeatureManifest): string[] {
   return Object.keys(feature.schema ?? {});
 }
 
-/**
- * Collect all permission keys contributed by a feature.
- */
 function featurePermissionKeys(feature: FeatureManifest): string[] {
   return [...(feature.permissions ?? [])];
 }
 
-/**
- * Collect all authorization resource names contributed by a feature.
- */
 function featureAuthResourceKeys(feature: FeatureManifest): string[] {
   return Object.keys(feature.authorization?.resources ?? {});
 }
 
-/**
- * Collect all seeder ids contributed by a feature.
- */
 function featureSeederIds(feature: FeatureManifest): string[] {
   return [...(feature.seeders ?? [])].map((s: { id: string }) => s.id);
 }
 
-/**
- * Collect all outbox handler classes contributed by a feature.
- */
 function featureOutboxHandlers(feature: FeatureManifest): readonly unknown[] {
   return [...(feature.outboxHandlers ?? [])];
 }
 
-/**
- * For every enabled feature, compute what gets removed when that feature is
- * omitted, then verify:
- *  1. The remaining graph compiles AND initializes (real DI, real providers).
- *  2. No removed feature's contributions remain in the composed result.
- *  3. Schema, seeders, authorization, permissions, outbox handlers are all checked.
- */
 function omitFeatureCases(): Array<[string]> {
   return enabledFeatures.map((f) => [f.id]);
 }
@@ -212,7 +214,7 @@ describe("deterministic Nest feature bootstrap matrix", () => {
     expect(orderedFeatures.map((feature) => feature.id)).toContain("notifications");
   });
 
-  it("feature-contributed HTTP pipeline providers are well-formed with useFactory+inject", () => {
+  it("feature-contributed HTTP pipeline providers use useFactory+inject with tokens", () => {
     validatePipelineProviders();
   });
 
@@ -224,8 +226,6 @@ describe("deterministic Nest feature bootstrap matrix", () => {
 
       const remainingFeatures = enabledFeatures.filter((f) => !removed.includes(f.id));
 
-      // Use buildFeatureModules to get properly composed modules
-      // (including OutboxModule.register() substitution).
       const {
         modules: composedModules,
         features: composedFeatures,
@@ -233,9 +233,10 @@ describe("deterministic Nest feature bootstrap matrix", () => {
         seeders: subsetSeeders,
         authorization: subsetAuthorization,
         permissions: subsetPermissions,
+        httpPipelineGuards: subsetGuards,
+        httpPipelineInterceptors: subsetInterceptors,
       } = buildFeatureModules(remainingFeatures);
 
-      // The omitted feature and all its reverse-dependents must be absent.
       for (const id of removed) {
         expect(
           composedFeatures.map((f) => f.id),
@@ -243,7 +244,6 @@ describe("deterministic Nest feature bootstrap matrix", () => {
         ).not.toContain(id);
       }
 
-      // --- Schema contributions: no tables from removed features ---
       const removedManifests = enabledFeatures.filter((f) => removed.includes(f.id));
       for (const manifest of removedManifests) {
         for (const tableName of featureSchemaKeys(manifest)) {
@@ -252,51 +252,47 @@ describe("deterministic Nest feature bootstrap matrix", () => {
             `removed feature "${manifest.id}" schema table "${tableName}" must not appear`,
           ).not.toHaveProperty(tableName);
         }
-      }
-
-      // --- Permission contributions: no permissions from removed features ---
-      for (const manifest of removedManifests) {
         for (const perm of featurePermissionKeys(manifest)) {
           expect(
             subsetPermissions,
             `removed feature "${manifest.id}" permission "${perm}" must not appear`,
           ).not.toContain(perm);
         }
-      }
-
-      // --- Authorization resources: no resources from removed features ---
-      for (const manifest of removedManifests) {
         for (const resource of featureAuthResourceKeys(manifest)) {
           expect(
             subsetAuthorization.resources,
             `removed feature "${manifest.id}" auth resource "${resource}" must not appear`,
           ).not.toHaveProperty(resource);
         }
-      }
-
-      // --- Seeders: no seeders from removed features ---
-      for (const manifest of removedManifests) {
         for (const seederId of featureSeederIds(manifest)) {
           expect(
             subsetSeeders.map((s) => s.id),
             `removed feature "${manifest.id}" seeder "${seederId}" must not appear`,
           ).not.toContain(seederId);
         }
+        const removedHandlerClasses = new Set(
+          removedManifests.flatMap((f) => featureOutboxHandlers(f)),
+        );
+        for (const handlerClass of composedFeatures.flatMap((f) => featureOutboxHandlers(f))) {
+          expect(
+            removedHandlerClasses.has(handlerClass),
+            `outbox handler from removed feature must not appear`,
+          ).toBe(false);
+        }
+        for (const guardProvider of manifest.httpPipeline?.guards ?? []) {
+          expect(
+            subsetGuards,
+            `removed feature "${manifest.id}" guard must not appear`,
+          ).not.toContain(guardProvider);
+        }
+        for (const interceptorProvider of manifest.httpPipeline?.interceptors ?? []) {
+          expect(
+            subsetInterceptors,
+            `removed feature "${manifest.id}" interceptor must not appear`,
+          ).not.toContain(interceptorProvider);
+        }
       }
 
-      // --- Outbox handlers: no handlers from removed features ---
-      const removedHandlerClasses = new Set(
-        removedManifests.flatMap((f) => featureOutboxHandlers(f)),
-      );
-      for (const handlerClass of composedFeatures.flatMap((f) => featureOutboxHandlers(f))) {
-        expect(
-          removedHandlerClasses.has(handlerClass),
-          `outbox handler from removed feature must not appear`,
-        ).toBe(false);
-      }
-
-      // --- NestJS DI: compile + init proves all mandatory providers resolve
-      //     with real feature modules — no business tokens were faked. ---
       const { moduleRef } = await compileGraph(composedModules);
       await moduleRef.init();
       await moduleRef.close();
