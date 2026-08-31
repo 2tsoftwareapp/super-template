@@ -1,12 +1,5 @@
-import type { Metadata } from "next";
-
-import { SecurityView } from "@/features/security";
-
-export const metadata: Metadata = {
-  title: "Account Security & Preferences | Super Admin",
-  description: "Configure password, security options, theme preferences, and locale.",
-};
+import { redirect } from "next/navigation";
 
 export default function SecurityPage() {
-  return <SecurityView />;
+  redirect("/settings/security");
 }

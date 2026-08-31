@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 
-import { SettingsView } from "@/features/_plugin-resources/platform-admin";
+import { ProfileSettingsView } from "@/features/settings/screens/profile-settings-view";
 
 export const metadata: Metadata = {
-  title: "System Settings | Super Admin",
-  description: "View and customize platform-wide operations and settings.",
+  title: "Profile Settings | Super Admin",
+  description: "Manage your account profile and display preferences.",
 };
 
-export default function Page() {
-  return <SettingsView />;
+export default function ProfileSettingsPage() {
+  return <ProfileSettingsView />;
 }
