@@ -8,8 +8,8 @@ import type {
   UsersCoreListQuery,
   UsersRepositoryPort,
 } from "../application/ports/users.repository.port";
-
 import type { UserLookup } from "../public/user-lookup.port";
+
 import { users } from "./persistence";
 
 const USER_SORT_FIELDS = {
