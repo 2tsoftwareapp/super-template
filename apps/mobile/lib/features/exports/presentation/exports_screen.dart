@@ -47,7 +47,9 @@ class _ExportsScreenState extends ConsumerState<ExportsScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             FilledButton.icon(
-              onPressed: _working || !permissions.canCreate ? null : _startExport,
+              onPressed: _working || !permissions.canCreate
+                  ? null
+                  : _startExport,
               icon: const Icon(Icons.download),
               label: const Text('Export data CSV'),
             ),

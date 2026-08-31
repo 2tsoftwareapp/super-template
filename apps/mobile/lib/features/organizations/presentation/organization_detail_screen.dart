@@ -197,7 +197,8 @@ class _OrganizationDetailScreenState
                                 ),
                               );
                             } catch (e) {
-                              if (context.mounted) showErrorSnackBar(context, e);
+                              if (context.mounted)
+                                showErrorSnackBar(context, e);
                             }
                           },
                           onRemove: () async {
@@ -212,7 +213,8 @@ class _OrganizationDetailScreenState
                                 ),
                               );
                             } catch (e) {
-                              if (context.mounted) showErrorSnackBar(context, e);
+                              if (context.mounted)
+                                showErrorSnackBar(context, e);
                             }
                           },
                         ),
@@ -273,7 +275,8 @@ class _MemberTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isSelf = member.userId == currentUserId;
-    final canManage = !isSelf && (isOwner || (isAdmin && member.role == 'MEMBER'));
+    final canManage =
+        !isSelf && (isOwner || (isAdmin && member.role == 'MEMBER'));
     final canChangeRole = canManage;
     final canRemove = canManage;
 

@@ -10,7 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
   mobile_core:
-    path: ../../../mobile_core
+    path: ../mobile_core
 
 dev_dependencies:
   flutter_lints: ^6.0.0

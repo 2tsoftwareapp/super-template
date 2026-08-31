@@ -9,11 +9,7 @@ DioException _dioError({Object? data, int? statusCode, String? message}) {
     message: message,
     response: data == null && statusCode == null
         ? null
-        : Response(
-            requestOptions: options,
-            data: data,
-            statusCode: statusCode,
-          ),
+        : Response(requestOptions: options, data: data, statusCode: statusCode),
   );
 }
 

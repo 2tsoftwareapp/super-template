@@ -150,8 +150,7 @@ void main() {
     );
 
     final interceptor = container.read(authInterceptorProvider);
-    final opts = RequestOptions(path: '/api/v1/users')
-      ..extra['retried'] = true;
+    final opts = RequestOptions(path: '/api/v1/users')..extra['retried'] = true;
     final err = DioException(
       requestOptions: opts,
       response: Response<dynamic>(requestOptions: opts, statusCode: 401),

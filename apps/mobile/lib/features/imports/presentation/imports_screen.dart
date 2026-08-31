@@ -48,7 +48,9 @@ class _ImportsScreenState extends ConsumerState<ImportsScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             FilledButton.icon(
-              onPressed: _working || !permissions.canCreate ? null : _startImport,
+              onPressed: _working || !permissions.canCreate
+                  ? null
+                  : _startImport,
               icon: const Icon(Icons.upload_file),
               label: const Text('Pick CSV and import data'),
             ),

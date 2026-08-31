@@ -17,7 +17,9 @@ class ActivitiesSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final activities = ref.watch(organizationActivitiesProvider(organizationId));
+    final activities = ref.watch(
+      organizationActivitiesProvider(organizationId),
+    );
 
     return AsyncScreenBody(
       value: activities,

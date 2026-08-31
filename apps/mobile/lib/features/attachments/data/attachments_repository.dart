@@ -100,5 +100,4 @@ class AttachmentsRepository {
     );
     return file;
   }
-
 }

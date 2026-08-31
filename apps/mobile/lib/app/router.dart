@@ -65,9 +65,18 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
-      GoRoute(path: IdentityRoutes.splash, builder: (_, _) => const SplashScreen()),
-      GoRoute(path: IdentityRoutes.login, builder: (_, _) => const LoginScreen()),
-      GoRoute(path: IdentityRoutes.register, builder: (_, _) => const RegisterScreen()),
+      GoRoute(
+        path: IdentityRoutes.splash,
+        builder: (_, _) => const SplashScreen(),
+      ),
+      GoRoute(
+        path: IdentityRoutes.login,
+        builder: (_, _) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: IdentityRoutes.register,
+        builder: (_, _) => const RegisterScreen(),
+      ),
       GoRoute(
         path: IdentityRoutes.forgotPassword,
         builder: (_, _) => const ForgotPasswordScreen(),
