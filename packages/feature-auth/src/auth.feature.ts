@@ -26,6 +26,7 @@ export const authFeature = defineFeature({
     "organization-management",
     "mfa",
     "users",
+    "user-management",
     "settings",
     "audit",
     "jobs",

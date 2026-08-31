@@ -9,6 +9,7 @@ import type {
   UsersRepositoryPort,
 } from "../application/ports/users.repository.port";
 
+import type { UserLookup } from "../public/user-lookup.port";
 import { users } from "./persistence";
 
 const USER_SORT_FIELDS = {
@@ -19,7 +20,7 @@ const USER_SORT_FIELDS = {
 } as const;
 
 @Injectable()
-export class UsersRepository implements UsersRepositoryPort {
+export class UsersRepository implements UsersRepositoryPort, UserLookup {
   constructor(@Inject(DATABASE) private readonly database: DatabaseClient) {}
 
   async create(values: typeof users.$inferInsert, executor: DatabaseExecutor = this.database) {
@@ -122,5 +123,93 @@ export class UsersRepository implements UsersRepositoryPort {
       rows,
       total: Number(totalRows[0]?.total ?? 0),
     };
+  }
+
+  async filterExistingUserIds(userIds: string[], executor: DatabaseExecutor = this.database): Promise<string[]> {
+    if (userIds.length === 0) return [];
+    const rows = await executor
+      .select({ id: users.id })
+      .from(users)
+      .where(and(inArray(users.id, userIds), isNull(users.deletedAt)));
+    return rows.map((r) => r.id);
+  }
+
+  async listDeliverableUserIds(executor: DatabaseExecutor = this.database): Promise<string[]> {
+    const rows = await executor
+      .select({ id: users.id })
+      .from(users)
+      .where(and(eq(users.status, "ACTIVE"), isNull(users.deletedAt)));
+    return rows.map((r) => r.id);
+  }
+
+  async findActiveUserInOrganization(
+    userId: string,
+    organizationId: string,
+    executor: DatabaseExecutor = this.database,
+  ): Promise<{ id: string; email: string; displayName: string; status: string } | null> {
+    const rows = await executor
+      .select({
+        id: users.id,
+        email: users.email,
+        displayName: users.displayName,
+        status: users.status,
+      })
+      .from(users)
+      .where(
+        and(
+          eq(users.id, userId),
+          eq(users.status, "ACTIVE"),
+          isNull(users.deletedAt),
+          sql`exists(
+            select 1 from r_organization_members
+            where organization_id = ${organizationId}::uuid and user_id = ${users.id}
+          )`
+        )
+      )
+      .limit(1);
+    return rows[0] ?? null;
+  }
+
+  async filterActiveUserIdsInOrganization(
+    userIds: string[],
+    organizationId: string,
+    executor: DatabaseExecutor = this.database,
+  ): Promise<string[]> {
+    if (userIds.length === 0) return [];
+    const rows = await executor
+      .select({ id: users.id })
+      .from(users)
+      .where(
+        and(
+          inArray(users.id, userIds),
+          eq(users.status, "ACTIVE"),
+          isNull(users.deletedAt),
+          sql`exists(
+            select 1 from r_organization_members
+            where organization_id = ${organizationId}::uuid and user_id = ${users.id}
+          )`
+        )
+      );
+    return rows.map((r) => r.id);
+  }
+
+  async listDeliverableUserIdsInOrganization(
+    organizationId: string,
+    executor: DatabaseExecutor = this.database,
+  ): Promise<string[]> {
+    const rows = await executor
+      .select({ id: users.id })
+      .from(users)
+      .where(
+        and(
+          eq(users.status, "ACTIVE"),
+          isNull(users.deletedAt),
+          sql`exists(
+            select 1 from r_organization_members
+            where organization_id = ${organizationId}::uuid and user_id = ${users.id}
+          )`
+        )
+      );
+    return rows.map((r) => r.id);
   }
 }

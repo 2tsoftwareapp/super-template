@@ -155,7 +155,18 @@ describe("Roles migration and provisioning (e2e)", () => {
       `,
     );
 
-    await applySqlMigrations(pool);
+    // Create temporary views/aliases for renamed tables so the historical migration runs successfully
+    await pool.query(`CREATE OR REPLACE VIEW permissions AS SELECT * FROM m_permissions`);
+    await pool.query(`CREATE OR REPLACE VIEW roles AS SELECT * FROM m_roles`);
+    await pool.query(`CREATE OR REPLACE VIEW role_permissions AS SELECT * FROM r_role_permissions`);
+
+    try {
+      await applySqlMigrations(pool);
+    } finally {
+      await pool.query(`DROP VIEW IF EXISTS role_permissions CASCADE`);
+      await pool.query(`DROP VIEW IF EXISTS roles CASCADE`);
+      await pool.query(`DROP VIEW IF EXISTS permissions CASCADE`);
+    }
 
     const scopeRows = await pool.query<{ name: string; scope: string }>(
       `
