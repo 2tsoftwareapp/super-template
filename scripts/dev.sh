@@ -29,14 +29,19 @@ Mailpit: http://localhost:${MAILPIT_HTTP_PORT:-8025}
 Run Flutter separately with: make dev-mobile
 EOF
 
+# Stop any PM2 instances if PM2 is running to avoid port conflicts
+command -v pm2 >/dev/null 2>&1 && pm2 stop all >/dev/null 2>&1 || true
+
 # Kill any existing processes on target ports so stale code isn't reused.
 for kv in "API_PORT:${API_PORT:-3001}" "WEB_PORT:${WEB_PORT:-3000}" "ADMIN_PORT:${ADMIN_PORT:-3002}"; do
   port="${kv#*:}"
   if is_port_listening "$port"; then
     printf '%s\n' "Killing existing process on port ${port}..."
     lsof -tiTCP:"$port" -sTCP:LISTEN | xargs kill 2>/dev/null || true
-    # Give the process time to release the port.
-    while is_port_listening "$port"; do sleep 0.5; done
+    sleep 0.5
+    if is_port_listening "$port"; then
+      lsof -tiTCP:"$port" -sTCP:LISTEN | xargs kill -9 2>/dev/null || true
+    fi
   fi
 done
 
@@ -50,9 +55,12 @@ pnpm --filter admin dev &
 ADMIN_PID=$!
 
 cleanup() {
-  [[ -n "$API_PID" ]] && kill "$API_PID" 2>/dev/null || true
-  [[ -n "$WEB_PID" ]] && kill "$WEB_PID" 2>/dev/null || true
-  [[ -n "$ADMIN_PID" ]] && kill "$ADMIN_PID" 2>/dev/null || true
+  for pid in "${API_PID:-}" "${WEB_PID:-}" "${ADMIN_PID:-}"; do
+    if [[ -n "$pid" ]]; then
+      pkill -P "$pid" 2>/dev/null || true
+      kill "$pid" 2>/dev/null || true
+    fi
+  done
 }
 
 trap cleanup EXIT INT TERM

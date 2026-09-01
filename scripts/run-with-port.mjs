@@ -16,6 +16,14 @@ const child = spawn(command, [...args, "--port", port], {
   shell: process.platform === "win32",
 });
 
+for (const sig of ["SIGINT", "SIGTERM", "SIGHUP"]) {
+  process.on(sig, () => {
+    if (!child.killed) {
+      child.kill(sig);
+    }
+  });
+}
+
 child.on("exit", (code, signal) => {
   if (signal) {
     process.kill(process.pid, signal);
