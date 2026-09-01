@@ -1,10 +1,14 @@
 import { Controller, Get } from "@nestjs/common";
 import { ApiProperty, ApiTags } from "@nestjs/swagger";
 import { HealthCheckService } from "@nestjs/terminus";
-import { ApiDataResponse, Public } from "@repo/api-runtime";
+import { ApiDataResponse, EnvironmentService, Public } from "@repo/api-runtime";
 
 import { HealthWarningsService } from "../application/health-warnings.service";
-import { AppHealthIndicator, DatabaseHealthIndicator } from "../application/health.indicators";
+import {
+  AppHealthIndicator,
+  DatabaseHealthIndicator,
+  RedisHealthIndicator,
+} from "../application/health.indicators";
 
 class HealthStatusDto {
   @ApiProperty({ enum: ["ok", "ready"] })
@@ -26,7 +30,9 @@ export class HealthController {
     private readonly health: HealthCheckService,
     private readonly appHealthIndicator: AppHealthIndicator,
     private readonly databaseHealthIndicator: DatabaseHealthIndicator,
+    private readonly redisHealthIndicator: RedisHealthIndicator,
     private readonly healthWarningsService: HealthWarningsService,
+    private readonly environmentService: EnvironmentService,
   ) {}
 
   @Get()
@@ -47,11 +53,17 @@ export class HealthController {
   @Public()
   @ApiDataResponse(HealthStatusDto)
   async getReady() {
-    // Readiness requires both the process and the database to be available.
-    await this.health.check([
+    // Readiness requires the process, database, and Redis (when configured) to be available.
+    const checks = [
       () => this.appHealthIndicator.isHealthy("app"),
       () => this.databaseHealthIndicator.isHealthy("database"),
-    ]);
+    ];
+
+    if (this.environmentService.redisUrl) {
+      checks.push(() => this.redisHealthIndicator.isHealthy("redis"));
+    }
+
+    await this.health.check(checks);
     return {
       data: {
         status: "ready" as const,

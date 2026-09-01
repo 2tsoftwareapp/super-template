@@ -3,11 +3,12 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { EnvironmentService } from "../../config/environment";
 
 // Controllable fake redis client shared with the mocked adapter module.
-const { connectMock, getMock, setMock, delMock, onMock } = vi.hoisted(() => ({
+const { connectMock, getMock, setMock, delMock, keysMock, onMock } = vi.hoisted(() => ({
   connectMock: vi.fn(),
   getMock: vi.fn(),
   setMock: vi.fn(),
   delMock: vi.fn(),
+  keysMock: vi.fn(),
   onMock: vi.fn(),
 }));
 
@@ -18,6 +19,7 @@ vi.mock("../../redis/redis-client.adapter", () => ({
     get: getMock,
     set: setMock,
     del: delMock,
+    keys: keysMock,
     on: onMock,
     quit: vi.fn(),
   }),
@@ -66,6 +68,33 @@ describe("AccessProfileCache (redis path resilience)", () => {
     });
   });
 
+  it("reads and parses an organization-scoped profile from redis", async () => {
+    connectMock.mockResolvedValue(undefined);
+    getMock.mockResolvedValue(JSON.stringify({ roles: ["ORG_ADMIN"], permissions: ["org.write"] }));
+    const cache = new AccessProfileCache(redisEnv());
+
+    const result = await cache.get("user-1", "org-1");
+
+    expect(getMock).toHaveBeenCalledWith("access-profile:user-1:org-1");
+    expect(result).toEqual({
+      roles: ["ORG_ADMIN"],
+      permissions: ["org.write"],
+    });
+  });
+
+  it("stores an organization-scoped profile in redis with TTL", async () => {
+    connectMock.mockResolvedValue(undefined);
+    setMock.mockResolvedValue("OK");
+    const cache = new AccessProfileCache(redisEnv());
+
+    await cache.set("user-1", { roles: ["ORG_ADMIN"], permissions: ["org.write"] }, "org-1");
+
+    expect(setMock).toHaveBeenCalledWith(
+      "access-profile:user-1:org-1",
+      JSON.stringify({ roles: ["ORG_ADMIN"], permissions: ["org.write"] }),
+      { EX: 60 },
+    );
+  });
   it("treats a transient redis get error as a cache miss instead of throwing", async () => {
     connectMock.mockResolvedValue(undefined);
     getMock.mockRejectedValue(new Error("connection lost"));
@@ -74,14 +103,46 @@ describe("AccessProfileCache (redis path resilience)", () => {
     await expect(cache.get("user-1")).resolves.toBeNull();
   });
 
-  it("invalidates multiple users in a single redis call", async () => {
+  it("invalidates multiple users in a single redis call when keys pattern matching is used", async () => {
     connectMock.mockResolvedValue(undefined);
-    delMock.mockResolvedValue(2);
+    keysMock.mockImplementation((pattern: string) => {
+      if (pattern === "access-profile:user-1*") {
+        return Promise.resolve([
+          "access-profile:user-1",
+          "access-profile:user-1:org-1",
+          "access-profile:user-10", // should be filtered out
+        ]);
+      }
+      if (pattern === "access-profile:user-2*") {
+        return Promise.resolve(["access-profile:user-2:org-2"]);
+      }
+      return Promise.resolve([]);
+    });
+    delMock.mockResolvedValue(3);
     const cache = new AccessProfileCache(redisEnv());
 
     await cache.invalidateUsers(["user-1", "user-2"]);
 
     expect(delMock).toHaveBeenCalledTimes(1);
-    expect(delMock).toHaveBeenCalledWith(["access-profile:user-1", "access-profile:user-2"]);
+    expect(delMock).toHaveBeenCalledWith([
+      "access-profile:user-1",
+      "access-profile:user-1:org-1",
+      "access-profile:user-2:org-2",
+    ]);
+  });
+
+  it("invalidates a single user in redis matching both global and org scopes", async () => {
+    connectMock.mockResolvedValue(undefined);
+    keysMock.mockResolvedValue([
+      "access-profile:user-1",
+      "access-profile:user-1:org-1",
+      "access-profile:user-10", // should be filtered out
+    ]);
+    delMock.mockResolvedValue(2);
+    const cache = new AccessProfileCache(redisEnv());
+
+    await cache.invalidateUser("user-1");
+
+    expect(delMock).toHaveBeenCalledWith(["access-profile:user-1", "access-profile:user-1:org-1"]);
   });
 });

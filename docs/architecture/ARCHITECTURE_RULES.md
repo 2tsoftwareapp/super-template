@@ -41,14 +41,15 @@ apps/
   mobile/     Flutter application
 
 apps/api/src/
-  identity/       identity bounded context (core business)
-  platform/       platform bounded context (core business)
+  composition/    runtime composition and feature registry
+  openapi/        OpenAPI / Swagger configuration
   cli/            migrate / seed / reset entry points (+ seeds/)
 
-packages/          kernel libraries + optional ADD-ON feature packages
+packages/          kernel libraries + compile-time feature packages
   api-core/       shared backend kernel, ports, errors, auth primitives
   api-database/   Drizzle schema, database runtime, migration support
-  api-health/     health-check capability — the exemplar add-on package
+  feature-health/ health-check capability — the exemplar feature package
+  feature-*/      compile-time feature plugin packages (feature-auth, feature-mail, ...)
   api-contract/   generated TypeScript API contract
   api-sort/       shared sorting contract/helpers
   env-loader/     environment resolution
@@ -103,12 +104,11 @@ It may contain:
 
 It must not contain feature business logic.
 
-Business features belong in compile-time feature-plugin packages, each module
+Business features belong in compile-time feature-plugin packages, each package
 keeping the standard vertical-slice layering (see §15.1):
 
 ```text
-packages/features/identity/src/modules/<feature>/
-packages/features/platform/src/modules/<feature>/
+packages/feature-<name>/src/...
 ```
 
 `apps/admin/src/app/**` and `apps/web/src/app/**` are routing composition roots.
@@ -557,7 +557,7 @@ unless the scope is narrow and unmistakable.
 
 ## 15. Cross-context communication
 
-The identity and platform contexts (`@repo/feature-auth`, `@repo/feature-upload` under `packages/features/*`) are compile-time feature-plugin packages (see §15.1).
+The identity and platform contexts (`@repo/feature-auth`, `@repo/feature-upload` under `packages/feature-*`) are compile-time feature-plugin packages (see §15.1).
 
 They communicate through:
 
@@ -587,7 +587,7 @@ two kinds of code:
    `api-sort`, `env-loader`, `config`, `utils`, all `web-*` packages, and the
    Flutter `mobile_core`. The kernel holds no identity/platform business tables.
 2. **Feature plugins** — optional, self-contained capabilities under
-   `packages/features/<id>/`, wired in explicitly at compile time. `api-health`
+   `packages/feature-<name>/`, wired in explicitly at compile time. `feature-health`
    is the minimal exemplar (backend-only, no schema).
 
 A feature plugin's **backend** surface MUST:

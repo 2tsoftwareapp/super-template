@@ -27,7 +27,9 @@ final publicDioProvider = Provider<Dio>((ref) {
 final dioProvider = Provider<Dio>((ref) {
   final config = ref.watch(appConfigProvider);
   final dio = Dio(_baseOptions(config.apiBaseUrl));
-  dio.interceptors.add(ref.watch(authInterceptorProvider));
+  final authInterceptor = ref.watch(authInterceptorProvider);
+  authInterceptor.dio = dio;
+  dio.interceptors.add(authInterceptor);
   return dio;
 });
 

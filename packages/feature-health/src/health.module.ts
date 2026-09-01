@@ -2,7 +2,11 @@ import { Module } from "@nestjs/common";
 import { TerminusModule } from "@nestjs/terminus";
 
 import { HealthWarningsService } from "./application/health-warnings.service";
-import { AppHealthIndicator, DatabaseHealthIndicator } from "./application/health.indicators";
+import {
+  AppHealthIndicator,
+  DatabaseHealthIndicator,
+  RedisHealthIndicator,
+} from "./application/health.indicators";
 import { HealthController } from "./presentation/health.controller";
 
 @Module({
@@ -10,7 +14,12 @@ import { HealthController } from "./presentation/health.controller";
   imports: [TerminusModule],
   // The controller exposes the legacy HTTP contract while the indicators encapsulate the actual checks.
   controllers: [HealthController],
-  providers: [AppHealthIndicator, DatabaseHealthIndicator, HealthWarningsService],
+  providers: [
+    AppHealthIndicator,
+    DatabaseHealthIndicator,
+    RedisHealthIndicator,
+    HealthWarningsService,
+  ],
   exports: [HealthWarningsService],
 })
 export class HealthModule {}

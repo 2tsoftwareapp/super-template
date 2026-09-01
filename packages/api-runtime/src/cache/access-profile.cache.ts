@@ -18,6 +18,7 @@ interface RedisCacheClient {
   connect: () => Promise<void>;
   del: (key: string | string[]) => Promise<number>;
   get: (key: string) => Promise<string | null>;
+  keys?: (pattern: string) => Promise<string[]>;
   on: (event: "error", listener: (error: Error) => void) => void;
   quit: () => Promise<void>;
   set: (key: string, value: string, options: { EX: number }) => Promise<"OK" | null>;
@@ -31,8 +32,15 @@ interface LocalCacheEntry {
 const CACHE_KEY_PREFIX = "access-profile:";
 const DEFAULT_TTL_SECONDS = 60;
 
-function cacheKey(userId: string): string {
-  return `${CACHE_KEY_PREFIX}${userId}`;
+function cacheKey(userId: string, organizationId?: string | null): string {
+  return organizationId
+    ? `${CACHE_KEY_PREFIX}${userId}:${organizationId}`
+    : `${CACHE_KEY_PREFIX}${userId}`;
+}
+
+function isUserKey(key: string, userId: string): boolean {
+  const prefix = `${CACHE_KEY_PREFIX}${userId}`;
+  return key === prefix || key.startsWith(`${prefix}:`);
 }
 
 function errorMessage(error: unknown): string {
@@ -58,12 +66,13 @@ export class AccessProfileCache {
 
   constructor(private readonly environmentService: EnvironmentService) {}
 
-  async get(userId: string): Promise<AccessProfileSnapshot | null> {
+  async get(userId: string, organizationId?: string | null): Promise<AccessProfileSnapshot | null> {
+    const key = cacheKey(userId, organizationId);
     const redis = await this.ensureRedis();
 
     if (redis) {
       try {
-        const cached = await redis.get(cacheKey(userId));
+        const cached = await redis.get(key);
 
         if (!cached) {
           return null;
@@ -72,7 +81,7 @@ export class AccessProfileCache {
         const profile = parseAccessProfileSnapshot(cached);
 
         if (!profile) {
-          await redis.del(cacheKey(userId));
+          await redis.del(key);
           return null;
         }
 
@@ -87,27 +96,32 @@ export class AccessProfileCache {
       }
     }
 
-    const entry = this.localEntries.get(userId);
+    const entry = this.localEntries.get(key);
 
     if (!entry) {
       return null;
     }
 
     if (entry.expiresAt <= Date.now()) {
-      this.localEntries.delete(userId);
+      this.localEntries.delete(key);
       return null;
     }
 
     return entry.profile;
   }
 
-  async set(userId: string, profile: AccessProfileSnapshot): Promise<void> {
+  async set(
+    userId: string,
+    profile: AccessProfileSnapshot,
+    organizationId?: string | null,
+  ): Promise<void> {
+    const key = cacheKey(userId, organizationId);
     const redis = await this.ensureRedis();
     const ttlSeconds = this.resolveTtlSeconds();
 
     if (redis) {
       try {
-        await redis.set(cacheKey(userId), JSON.stringify(profile), {
+        await redis.set(key, JSON.stringify(profile), {
           EX: ttlSeconds,
         });
       } catch (error) {
@@ -116,7 +130,7 @@ export class AccessProfileCache {
       return;
     }
 
-    this.localEntries.set(userId, {
+    this.localEntries.set(key, {
       profile,
       expiresAt: Date.now() + ttlSeconds * 1000,
     });
@@ -127,14 +141,26 @@ export class AccessProfileCache {
 
     if (redis) {
       try {
-        await redis.del(cacheKey(userId));
+        if (typeof redis.keys === "function") {
+          const keys = await redis.keys(`${CACHE_KEY_PREFIX}${userId}*`);
+          const matchingKeys = keys.filter((k) => isUserKey(k, userId));
+          if (matchingKeys.length > 0) {
+            await redis.del(matchingKeys);
+          }
+        } else {
+          await redis.del(cacheKey(userId));
+        }
       } catch (error) {
         this.logger.warn(`Redis invalidate failed for access profile: ${errorMessage(error)}`);
       }
       return;
     }
 
-    this.localEntries.delete(userId);
+    for (const key of this.localEntries.keys()) {
+      if (isUserKey(key, userId)) {
+        this.localEntries.delete(key);
+      }
+    }
   }
 
   async invalidateUsers(userIds: string[]): Promise<void> {
@@ -146,8 +172,18 @@ export class AccessProfileCache {
 
     if (redis) {
       try {
-        // Single round-trip instead of one DEL per user.
-        await redis.del(userIds.map(cacheKey));
+        if (typeof redis.keys === "function") {
+          const patterns = userIds.map((userId) => `${CACHE_KEY_PREFIX}${userId}*`);
+          const matchingKeyArrays = await Promise.all(patterns.map((p) => redis.keys!(p)));
+          const allKeys = Array.from(new Set(matchingKeyArrays.flat()));
+          const validKeys = allKeys.filter((k) => userIds.some((userId) => isUserKey(k, userId)));
+          if (validKeys.length > 0) {
+            await redis.del(validKeys);
+          }
+        } else {
+          // Single round-trip instead of one DEL per user.
+          await redis.del(userIds.map((userId) => cacheKey(userId)));
+        }
       } catch (error) {
         this.logger.warn(
           `Redis batch invalidate failed for access profiles: ${errorMessage(error)}`,
@@ -157,7 +193,11 @@ export class AccessProfileCache {
     }
 
     for (const userId of userIds) {
-      this.localEntries.delete(userId);
+      for (const key of this.localEntries.keys()) {
+        if (isUserKey(key, userId)) {
+          this.localEntries.delete(key);
+        }
+      }
     }
   }
 

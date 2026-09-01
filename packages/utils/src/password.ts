@@ -1,3 +1,5 @@
+import { Buffer } from "node:buffer";
+import { createHash, timingSafeEqual } from "node:crypto";
 import * as argon2 from "argon2";
 
 const DUMMY_PASSWORD_HASH =
@@ -25,5 +27,21 @@ export const verifyPasswordWithTimingPadding = async (
   return passwordMatches;
 };
 
-export const hashRefreshToken = hashPassword;
-export const verifyRefreshTokenHash = verifyPassword;
+export const hashRefreshToken = async (value: string): Promise<string> => {
+  return createHash("sha256").update(value).digest("hex");
+};
+
+export const verifyRefreshTokenHash = async (hash: string, value: string): Promise<boolean> => {
+  if (typeof hash !== "string" || typeof value !== "string") {
+    return false;
+  }
+  const computedHash = createHash("sha256").update(value).digest("hex");
+  const a = Buffer.from(hash, "utf8");
+  const b = Buffer.from(computedHash, "utf8");
+
+  if (a.length !== b.length) {
+    return false;
+  }
+
+  return timingSafeEqual(a, b);
+};

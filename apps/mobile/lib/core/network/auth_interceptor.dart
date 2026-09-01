@@ -13,14 +13,24 @@ final authInterceptorProvider = Provider<AuthInterceptor>(
 );
 
 class AuthInterceptor extends Interceptor {
-  AuthInterceptor(this._ref);
+  AuthInterceptor(
+    this._ref, {
+    Dio? dio,
+    HttpClientAdapter? httpClientAdapter,
+  })  : _dio = dio,
+        _httpClientAdapter = httpClientAdapter;
 
   final Ref _ref;
+  Dio? _dio;
+  HttpClientAdapter? _httpClientAdapter;
+
+  set dio(Dio? dio) => _dio = dio;
+  set httpClientAdapter(HttpClientAdapter? adapter) =>
+      _httpClientAdapter = adapter;
 
   /// Shared future for in-flight token refresh.
   /// Concurrent 401s await the same future so refresh is called only once.
   Future<TokenBundle?>? _refreshFlight;
-
   @override
   Future<void> onRequest(
     RequestOptions options,
@@ -56,6 +66,11 @@ class AuthInterceptor extends Interceptor {
       request.headers['authorization'] = 'Bearer ${refreshed.accessToken}';
       request.extra['retried'] = true;
       final retryDio = Dio(BaseOptions(baseUrl: request.baseUrl));
+      if (_dio != null) {
+        retryDio.httpClientAdapter = _dio!.httpClientAdapter;
+      } else if (_httpClientAdapter != null) {
+        retryDio.httpClientAdapter = _httpClientAdapter!;
+      }
       final response = await retryDio.fetch<dynamic>(request);
       handler.resolve(response);
     } on AppException {

@@ -16,6 +16,7 @@ class MockTokenStorage extends Mock implements TokenStorage {}
 
 class MockAuthRepository extends Mock implements AuthRepository {}
 
+class MockHttpClientAdapter extends Mock implements HttpClientAdapter {}
 class _FakeAuthController extends AuthController {
   @override
   Future<AuthSession?> build() async => const AuthSession(
@@ -56,6 +57,7 @@ void main() {
 
   setUp(() {
     registerFallbackValue(const TokenBundle(accessToken: '', refreshToken: ''));
+    registerFallbackValue(RequestOptions(path: ''));
 
     mockStorage = MockTokenStorage();
     mockRepo = MockAuthRepository();
@@ -162,5 +164,96 @@ void main() {
 
     verifyNever(() => mockRepo.refresh());
     expect(handler.passed, isNotNull);
+  });
+
+  test('401 retry inherits httpClientAdapter from parent dio and resolves', () async {
+    final mockAdapter = MockHttpClientAdapter();
+    final parentDio = Dio()..httpClientAdapter = mockAdapter;
+
+    when(() => mockRepo.refresh()).thenAnswer(
+      (_) async => const TokenBundle(
+        accessToken: 'new-access',
+        refreshToken: 'new-refresh',
+      ),
+    );
+
+    RequestOptions? capturedOptions;
+    when(() => mockAdapter.fetch(any(), any(), any())).thenAnswer(
+      (invocation) async {
+        capturedOptions = invocation.positionalArguments[0] as RequestOptions;
+        return ResponseBody.fromString(
+          '{"success": true}',
+          200,
+          headers: {
+            Headers.contentTypeHeader: [Headers.jsonContentType],
+          },
+        );
+      },
+    );
+
+    final interceptor = container.read(authInterceptorProvider);
+    interceptor.dio = parentDio;
+
+    final handler = _CapturingHandler();
+    await interceptor.onError(_make401(), handler);
+
+    expect(handler.resolved, isNotNull);
+    expect(handler.resolved?.statusCode, equals(200));
+    expect(capturedOptions, isNotNull);
+    expect(
+      capturedOptions!.headers['authorization'],
+      equals('Bearer new-access'),
+    );
+    expect(capturedOptions!.extra['retried'], isTrue);
+  });
+
+  test('401 retry uses httpClientAdapter directly when provided', () async {
+    final mockAdapter = MockHttpClientAdapter();
+
+    when(() => mockRepo.refresh()).thenAnswer(
+      (_) async => const TokenBundle(
+        accessToken: 'new-access-2',
+        refreshToken: 'new-refresh-2',
+      ),
+    );
+
+    RequestOptions? capturedOptions;
+    when(() => mockAdapter.fetch(any(), any(), any())).thenAnswer(
+      (invocation) async {
+        capturedOptions = invocation.positionalArguments[0] as RequestOptions;
+        return ResponseBody.fromString(
+          '{"success": true}',
+          200,
+          headers: {
+            Headers.contentTypeHeader: [Headers.jsonContentType],
+          },
+        );
+      },
+    );
+
+    final interceptor = container.read(authInterceptorProvider);
+    interceptor.httpClientAdapter = mockAdapter;
+
+    final handler = _CapturingHandler();
+    await interceptor.onError(_make401(), handler);
+
+    expect(handler.resolved, isNotNull);
+    expect(handler.resolved?.statusCode, equals(200));
+    expect(capturedOptions, isNotNull);
+    expect(
+      capturedOptions!.headers['authorization'],
+      equals('Bearer new-access-2'),
+    );
+    expect(capturedOptions!.extra['retried'], isTrue);
+  });
+
+  test('onRequest injects authorization bearer token when available', () async {
+    final interceptor = container.read(authInterceptorProvider);
+    final options = RequestOptions(path: '/api/v1/users');
+    final handler = RequestInterceptorHandler();
+
+    await interceptor.onRequest(options, handler);
+
+    expect(options.headers['authorization'], equals('Bearer old-access'));
   });
 }

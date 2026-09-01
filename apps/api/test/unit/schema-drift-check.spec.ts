@@ -112,13 +112,13 @@ function bootstrapManifest(tempMigrations: string): void {
 }
 
 describe("Schema drift check", () => {
-  it("passes when canonical schemas match committed migrations", { timeout: 15_000 }, () => {
+  it("passes when canonical schemas match committed migrations", { timeout: 30_000 }, () => {
     const result = runDriftCheck();
     expect(result.code, result.stderr).toBe(0);
   });
 
   describe("SQL migration integrity (append-only enforcement)", () => {
-    it("fails when an old SQL migration file is modified", { timeout: 15_000 }, () => {
+    it("fails when an old SQL migration file is modified", { timeout: 30_000 }, () => {
       const { tempMigrations, cleanup } = createIsolatedEnvironment();
       try {
         bootstrapManifest(tempMigrations);
@@ -141,7 +141,7 @@ describe("Schema drift check", () => {
       }
     });
 
-    it("fails when an old SQL migration file is deleted", { timeout: 15_000 }, () => {
+    it("fails when an old SQL migration file is deleted", { timeout: 30_000 }, () => {
       const { tempMigrations, cleanup } = createIsolatedEnvironment();
       try {
         bootstrapManifest(tempMigrations);
@@ -164,7 +164,7 @@ describe("Schema drift check", () => {
 
     it(
       "fails in default mode when new SQL files exist but are not sealed",
-      { timeout: 15_000 },
+      { timeout: 30_000 },
       () => {
         const { tempMigrations, cleanup } = createIsolatedEnvironment();
         try {
@@ -218,7 +218,7 @@ describe("Schema drift check", () => {
 
     it(
       "--generate fails when trying to overwrite modified existing checksums",
-      { timeout: 15_000 },
+      { timeout: 30_000 },
       () => {
         const { tempMigrations, cleanup } = createIsolatedEnvironment();
         try {

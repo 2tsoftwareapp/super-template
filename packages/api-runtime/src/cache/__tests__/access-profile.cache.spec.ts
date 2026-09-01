@@ -38,6 +38,20 @@ describe("AccessProfileCache (in-process fallback)", () => {
     await expect(cache.get("user-1")).resolves.toEqual(profile);
   });
 
+  it("stores and reads an organization-scoped profile", async () => {
+    const cache = new AccessProfileCache(localOnlyEnv());
+    const orgProfile: AccessProfileSnapshot = {
+      roles: ["ORG_MEMBER"],
+      permissions: ["org.read"],
+    };
+
+    await cache.set("user-1", profile);
+    await cache.set("user-1", orgProfile, "org-1");
+
+    await expect(cache.get("user-1")).resolves.toEqual(profile);
+    await expect(cache.get("user-1", "org-1")).resolves.toEqual(orgProfile);
+    await expect(cache.get("user-1", "org-2")).resolves.toBeNull();
+  });
   it("returns null for an unknown user", async () => {
     const cache = new AccessProfileCache(localOnlyEnv());
     await expect(cache.get("missing")).resolves.toBeNull();
@@ -54,22 +68,44 @@ describe("AccessProfileCache (in-process fallback)", () => {
     await expect(cache.get("user-1")).resolves.toBeNull();
   });
 
-  it("invalidates a single user", async () => {
+  it("invalidates a single user across global and organization scopes", async () => {
     const cache = new AccessProfileCache(localOnlyEnv());
+    const orgProfile: AccessProfileSnapshot = {
+      roles: ["ORG_MEMBER"],
+      permissions: ["org.read"],
+    };
+
     await cache.set("user-1", profile);
+    await cache.set("user-1", orgProfile, "org-1");
+    await cache.set("user-10", profile); // should not be invalidated
+
     await cache.invalidateUser("user-1");
+
     await expect(cache.get("user-1")).resolves.toBeNull();
+    await expect(cache.get("user-1", "org-1")).resolves.toBeNull();
+    await expect(cache.get("user-10")).resolves.toEqual(profile);
   });
 
-  it("invalidates multiple users at once", async () => {
+  it("invalidates multiple users at once across scopes", async () => {
     const cache = new AccessProfileCache(localOnlyEnv());
+    const orgProfile: AccessProfileSnapshot = {
+      roles: ["ORG_MEMBER"],
+      permissions: ["org.read"],
+    };
+
     await cache.set("user-1", profile);
+    await cache.set("user-1", orgProfile, "org-1");
     await cache.set("user-2", profile);
+    await cache.set("user-2", orgProfile, "org-2");
+    await cache.set("user-20", profile);
 
     await cache.invalidateUsers(["user-1", "user-2"]);
 
     await expect(cache.get("user-1")).resolves.toBeNull();
+    await expect(cache.get("user-1", "org-1")).resolves.toBeNull();
     await expect(cache.get("user-2")).resolves.toBeNull();
+    await expect(cache.get("user-2", "org-2")).resolves.toBeNull();
+    await expect(cache.get("user-20")).resolves.toEqual(profile);
   });
 
   it("falls back to the default TTL when the configured value is non-positive", async () => {

@@ -1,6 +1,12 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { AppHealthIndicator, DatabaseHealthIndicator } from "../health.indicators";
+import type { EnvironmentService } from "@repo/api-runtime";
+
+import {
+  AppHealthIndicator,
+  DatabaseHealthIndicator,
+  RedisHealthIndicator,
+} from "../health.indicators";
 
 function createIndicator() {
   return {
@@ -53,6 +59,101 @@ describe("health indicators", () => {
     expect(result).toEqual({
       status: "down",
       details: { reason: "database query failed" },
+    });
+  });
+
+  it("marks redis readiness as up when ping succeeds", async () => {
+    const indicator = createIndicator();
+    const client = {
+      isOpen: true,
+      connect: vi.fn().mockResolvedValue(undefined),
+      ping: vi.fn().mockResolvedValue("PONG"),
+    };
+    const healthIndicatorService = {
+      check: vi.fn(() => indicator),
+    };
+    const environmentService = {
+      redisUrl: "redis://localhost:6379",
+    } as unknown as EnvironmentService;
+
+    const result = await new RedisHealthIndicator(
+      environmentService,
+      healthIndicatorService as never,
+      client as never,
+    ).isHealthy("redis");
+
+    expect(client.ping).toHaveBeenCalledTimes(1);
+    expect(result).toEqual({ status: "up" });
+  });
+
+  it("connects client before pinging when isOpen is false", async () => {
+    const indicator = createIndicator();
+    const client = {
+      isOpen: false,
+      connect: vi.fn().mockResolvedValue(undefined),
+      ping: vi.fn().mockResolvedValue("PONG"),
+    };
+    const healthIndicatorService = {
+      check: vi.fn(() => indicator),
+    };
+    const environmentService = {
+      redisUrl: "redis://localhost:6379",
+    } as unknown as EnvironmentService;
+
+    const result = await new RedisHealthIndicator(
+      environmentService,
+      healthIndicatorService as never,
+      client as never,
+    ).isHealthy("redis");
+
+    expect(client.connect).toHaveBeenCalledTimes(1);
+    expect(client.ping).toHaveBeenCalledTimes(1);
+    expect(result).toEqual({ status: "up" });
+  });
+
+  it("marks redis readiness as down when ping fails", async () => {
+    const indicator = createIndicator();
+    const client = {
+      isOpen: true,
+      connect: vi.fn().mockResolvedValue(undefined),
+      ping: vi.fn().mockRejectedValue(new Error("redis connection lost")),
+    };
+    const healthIndicatorService = {
+      check: vi.fn(() => indicator),
+    };
+    const environmentService = {
+      redisUrl: "redis://localhost:6379",
+    } as unknown as EnvironmentService;
+
+    const result = await new RedisHealthIndicator(
+      environmentService,
+      healthIndicatorService as never,
+      client as never,
+    ).isHealthy("redis");
+
+    expect(result).toEqual({
+      status: "down",
+      details: { reason: "redis ping failed" },
+    });
+  });
+
+  it("marks redis readiness as down when redisUrl is not configured", async () => {
+    const indicator = createIndicator();
+    const healthIndicatorService = {
+      check: vi.fn(() => indicator),
+    };
+    const environmentService = {
+      redisUrl: undefined,
+    } as unknown as EnvironmentService;
+
+    const result = await new RedisHealthIndicator(
+      environmentService,
+      healthIndicatorService as never,
+    ).isHealthy("redis");
+
+    expect(result).toEqual({
+      status: "down",
+      details: { reason: "redis url not configured" },
     });
   });
 });
