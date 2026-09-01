@@ -23,6 +23,7 @@ import { Button } from "../button";
 import { Calendar } from "../calendar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../card";
 import { Checkbox } from "../checkbox";
+import { CommonResourcePage } from "../common-resource-page";
 import { ConfirmDialog } from "../confirm-dialog";
 import { DatePicker } from "../date-picker";
 import { Empty } from "../empty";
@@ -41,7 +42,19 @@ import { LoadingButton } from "../loading-button";
 import { Pagination } from "../pagination";
 import { PasswordInput } from "../password-input";
 import { RefreshButton } from "../refresh-button";
+import { ResourceDataTable } from "../resource-data-table";
+import { ResourceFilterBar } from "../resource-filter-bar";
+import { ResourceDetailPane } from "../resource-detail-pane";
+import {
+  CopyableBadge,
+  JsonCodeBlock,
+  ResourcePropertyGrid,
+  StatusBadge,
+  TimestampValue,
+} from "../resource-property-grid";
+import { ResourceStatCard, ResourceStatCards } from "../resource-stat-cards";
 import { Separator } from "../separator";
+import { Sidebar, SidebarMenuButton, SidebarProvider } from "../sidebar";
 import { Show } from "../show";
 import { Skeleton } from "../skeleton";
 import { Spinner } from "../spinner";
@@ -307,5 +320,91 @@ describe("UI Component Smoke Tests", () => {
       </TooltipProvider>,
     );
     expect(screen.getByText("hover me")).toBeInTheDocument();
+  });
+
+  it("renders ResourceStatCards and ResourceStatCard", () => {
+    render(
+      <ResourceStatCards items={[{ label: "Active", value: 42, description: "Total active" }]} />,
+    );
+    expect(screen.getByText("Active")).toBeInTheDocument();
+    expect(screen.getByText("42")).toBeInTheDocument();
+  });
+
+  it("renders ResourcePropertyGrid", () => {
+    render(
+      <ResourcePropertyGrid
+        properties={[
+          { label: "Status", value: "active", type: "status" },
+          { label: "ID", value: "item-123", type: "id" },
+        ]}
+      />,
+    );
+    expect(screen.getByText("Status")).toBeInTheDocument();
+    expect(screen.getByText("active")).toBeInTheDocument();
+    expect(screen.getByText("item-123")).toBeInTheDocument();
+  });
+
+  it("renders ResourceDetailPane", () => {
+    render(
+      <ResourceDetailPane open={true} onClose={() => {}} title="Detail Smoke Test">
+        <div>Pane Content</div>
+      </ResourceDetailPane>,
+    );
+    expect(screen.getByText("Detail Smoke Test")).toBeInTheDocument();
+    expect(screen.getByText("Pane Content")).toBeInTheDocument();
+  });
+
+  it("renders CommonResourcePage", () => {
+    const dummyResource = {
+      id: "items",
+      label: "Items",
+      group: "System" as const,
+      path: "/items",
+      icon: () => null,
+      features: ["list" as const],
+      queryKey: "items",
+    };
+    render(
+      <CommonResourcePage resource={dummyResource} description="Common Resource Page Smoke Test">
+        <div>Page Content</div>
+      </CommonResourcePage>,
+    );
+    expect(screen.getByText("Items")).toBeInTheDocument();
+    expect(screen.getByText("Common Resource Page Smoke Test")).toBeInTheDocument();
+    expect(screen.getByText("Page Content")).toBeInTheDocument();
+  });
+
+  it("renders ResourceFilterBar", () => {
+    render(
+      <ResourceFilterBar
+        search={{ value: "test", onChange: () => {}, placeholder: "Search..." }}
+      />,
+    );
+    expect(screen.getByRole("textbox")).toBeInTheDocument();
+  });
+
+  it("renders ResourceDataTable", () => {
+    const dummyTable = {
+      getHeaderGroups: () => [],
+      getVisibleLeafColumns: () => [],
+      getAllLeafColumns: () => [],
+      getState: () => ({ sorting: [] }),
+      getRowModel: () => ({ rows: [] }),
+    } as unknown as Parameters<typeof ResourceDataTable>[0]["table"];
+    render(<ResourceDataTable table={dummyTable} />);
+    expect(screen.getByText("No results found")).toBeInTheDocument();
+  });
+
+  it("renders SidebarProvider and SidebarMenuButton with tooltip without crashing", () => {
+    render(
+      <SidebarProvider>
+        <Sidebar>
+          <SidebarMenuButton tooltip="Dashboard tooltip">
+            <span>Dashboard</span>
+          </SidebarMenuButton>
+        </Sidebar>
+      </SidebarProvider>,
+    );
+    expect(screen.getByText("Dashboard")).toBeInTheDocument();
   });
 });

@@ -1,37 +1,47 @@
-import { Label } from "@repo/web-ui/label";
-import { Separator } from "@repo/web-ui/separator";
+"use client";
+
+import {
+  ResourcePropertyGrid,
+  type ResourcePropertyItem,
+} from "@repo/web-ui/resource-property-grid";
 
 import type { FileDto } from "@/lib/api-types";
 
-import { formatDateTime, scalarString, truncateId } from "@/lib/format";
+import { scalarString } from "@/lib/format";
 
 interface FilesDetailMetadataProps {
   file: FileDto;
 }
 
 export function FilesDetailMetadata({ file }: FilesDetailMetadataProps) {
-  return (
-    <>
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <Label className="text-xs text-muted-foreground">ID</Label>
-          <p className="text-sm font-mono">{truncateId(file.id)}</p>
-        </div>
-        <div>
-          <Label className="text-xs text-muted-foreground">Uploaded by</Label>
-          <p className="text-sm">{scalarString(file.uploadedById)}</p>
-        </div>
-        <div>
-          <Label className="text-xs text-muted-foreground">Created</Label>
-          <p className="text-sm">{formatDateTime(file.createdAt)}</p>
-        </div>
-        <div>
-          <Label className="text-xs text-muted-foreground">Updated</Label>
-          <p className="text-sm">{formatDateTime(file.updatedAt)}</p>
-        </div>
-      </div>
+  const properties: ResourcePropertyItem[] = [
+    {
+      label: "ID",
+      value: file.id,
+      type: "id",
+      copyable: true,
+    },
+    {
+      label: "Uploaded by",
+      value: file.uploadedById ? scalarString(file.uploadedById) : "System",
+      type: "id",
+      copyable: Boolean(file.uploadedById),
+    },
+    {
+      label: "Created",
+      value: file.createdAt,
+      type: "timestamp",
+    },
+    {
+      label: "Updated",
+      value: file.updatedAt,
+      type: "timestamp",
+    },
+  ];
 
-      <Separator />
-    </>
+  return (
+    <div className="space-y-4">
+      <ResourcePropertyGrid properties={properties} columns={2} density="compact" />
+    </div>
   );
 }

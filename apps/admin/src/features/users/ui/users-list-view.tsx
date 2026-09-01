@@ -1,19 +1,15 @@
 "use client";
 
 import { Button } from "@repo/web-ui/button";
-import { Card, CardContent } from "@repo/web-ui/card";
-import { ErrorState } from "@repo/web-ui/error-state";
-import { Pagination } from "@repo/web-ui/pagination";
+import { CommonResourcePage } from "@repo/web-ui/common-resource-page";
+import { ResourceDataTable } from "@repo/web-ui/resource-data-table";
+import { ResourceFilterBar } from "@repo/web-ui/resource-filter-bar";
 import { Show } from "@repo/web-ui/show";
 import { Spinner } from "@repo/web-ui/spinner";
-import { UserPlus } from "lucide-react";
+import { ShieldAlert, ShieldCheck, UserCheck, UserPlus, Users } from "lucide-react";
 
-import type { UsersListViewModel } from "@/features/users/model/users.types";
+import type { UsersListViewModel, UserStatusFilter } from "@/features/users/model/users.types";
 
-import { BulkActionBar } from "@/components/bulk-action-bar";
-import { ResourcePageShell } from "@/components/resource-page-shell";
-import { ResourceTable } from "@/components/resource-table";
-import { ResourceToolbar } from "@/components/resource-toolbar";
 import { adminResources } from "@/features/_plugin-resources/admin-resources";
 import { STATUS_FILTERS } from "@/features/users/model/constants";
 import { USERS_PAGE_SIZE_OPTIONS } from "@/features/users/model/users.types";
@@ -22,6 +18,11 @@ import { CreateUserDrawer } from "./create-user-drawer";
 import { UsersConfirmBlockDialog } from "./users-confirm-block-dialog";
 
 const usersResource = adminResources.find((r) => r.id === "users")!;
+
+const statusFacetOptions = STATUS_FILTERS.filter((tab) => tab.value !== "all").map((tab) => ({
+  label: tab.label,
+  value: tab.value,
+}));
 
 /**
  * Presentational users list view. Receives a fully-resolved view model
@@ -38,6 +39,13 @@ export function UsersListView({
   confirmBlock,
   table,
 }: UsersListViewModel) {
+  const rows = table.getRowModel().rows;
+  const activeCount = rows.filter((r) => r.original.status === "ACTIVE").length;
+  const blockedCount = rows.filter((r) => r.original.status === "BLOCKED").length;
+  const privilegedCount = rows.filter((r) =>
+    r.original.roles?.some((role) => role === "SUPER_ADMIN" || role === "ADMIN"),
+  ).length;
+
   return (
     <>
       <Show when={createDrawer.open}>
@@ -64,7 +72,7 @@ export function UsersListView({
         />
       ) : null}
 
-      <ResourcePageShell
+      <CommonResourcePage
         resource={usersResource}
         description={
           header.isLoading
@@ -75,7 +83,35 @@ export function UsersListView({
         }
         isRefreshing={header.isFetching}
         onRefresh={header.onRefresh}
-        actions={
+        statsLoading={header.isLoading}
+        statsColumns={4}
+        stats={[
+          {
+            label: "Total Users",
+            value: header.total,
+            icon: Users,
+            description: "Registered identity accounts",
+          },
+          {
+            label: "Active Accounts",
+            value: activeCount,
+            icon: UserCheck,
+            description: "Currently active on page",
+          },
+          {
+            label: "Blocked / Suspended",
+            value: blockedCount,
+            icon: ShieldAlert,
+            description: "Access disabled on page",
+          },
+          {
+            label: "Privileged Users",
+            value: privilegedCount,
+            icon: ShieldCheck,
+            description: "Admin & Super Admin accounts",
+          },
+        ]}
+        headerActions={
           header.canCreate ? (
             <Button size="sm" onClick={header.onCreateClick}>
               <UserPlus data-icon="inline-start" />
@@ -83,90 +119,94 @@ export function UsersListView({
             </Button>
           ) : null
         }
+        filterBar={
+          <ResourceFilterBar
+            className="border-b border-border p-4"
+            search={{
+              value: toolbar.search,
+              onChange: toolbar.onSearchChange,
+              placeholder: "Search name or email",
+            }}
+            facets={[
+              {
+                key: "status",
+                label: "Status",
+                options: statusFacetOptions,
+                selectedValues: toolbar.currentStatus !== "all" ? [toolbar.currentStatus] : [],
+                onChange: (values) => {
+                  const next = values[values.length - 1] as UserStatusFilter | undefined;
+                  toolbar.onStatusFilter(next ?? "all");
+                },
+              },
+            ]}
+            onClearAll={list.hasFilters ? toolbar.onClearFilters : undefined}
+          />
+        }
+        bulkActions={
+          bulk.selectedIds.length > 0
+            ? {
+                selectedCount: bulk.selectedIds.length,
+                onClear: bulk.onClearSelection,
+                actions: (
+                  <Show when={bulk.canUpdate}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={bulk.isMutating}
+                      onClick={bulk.onBulkActivate}
+                    >
+                      <Show when={bulk.isActivating}>
+                        <Spinner className="size-3.5" />
+                      </Show>
+                      Activate
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={bulk.isMutating}
+                      onClick={bulk.onBulkBlock}
+                    >
+                      <Show when={bulk.isBlocking}>
+                        <Spinner className="size-3.5" />
+                      </Show>
+                      Block
+                    </Button>
+                  </Show>
+                ),
+              }
+            : undefined
+        }
+        pagination={{
+          page: pagination.page,
+          pageSize: pagination.pageSize,
+          totalPages: pagination.totalPages,
+          total: pagination.total,
+          pageSizeOptions: USERS_PAGE_SIZE_OPTIONS,
+          isLoading: pagination.isFetching,
+          onPageChange: pagination.onPageChange,
+          onPageSizeChange: pagination.onPageSizeChange,
+        }}
       >
-        <Card>
-          <Show when={list.isError}>
-            <ErrorState
-              variant="inline"
-              title="Could not load users."
-              action={{ label: "Retry", onClick: list.onRetry }}
-            />
-          </Show>
-          <ResourceToolbar
-            search={toolbar.search}
-            onSearchChange={toolbar.onSearchChange}
-            searchPlaceholder="Search name or email"
-            hasFilters={list.hasFilters}
-            onClearFilters={toolbar.onClearFilters}
-            filters={
-              <div className="flex flex-wrap items-center gap-1 rounded-lg border border-border p-1">
-                {STATUS_FILTERS.map((tab) => (
-                  <Button
-                    key={tab.value}
-                    type="button"
-                    variant={toolbar.currentStatus === tab.value ? "default" : "ghost"}
-                    size="sm"
-                    onClick={() => toolbar.onStatusFilter(tab.value)}
-                  >
-                    {tab.label}
-                  </Button>
-                ))}
-              </div>
-            }
-          />
-          <BulkActionBar
-            selectedCount={bulk.selectedIds.length}
-            onClear={bulk.onClearSelection}
-            actions={
-              <Show when={bulk.canUpdate}>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={bulk.isMutating}
-                  onClick={bulk.onBulkActivate}
-                >
-                  <Show when={bulk.isActivating}>
-                    <Spinner className="size-3.5" />
-                  </Show>
-                  Activate
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={bulk.isMutating}
-                  onClick={bulk.onBulkBlock}
-                >
-                  <Show when={bulk.isBlocking}>
-                    <Spinner className="size-3.5" />
-                  </Show>
-                  Block
-                </Button>
-              </Show>
-            }
-          />
-          <CardContent className="p-0 pb-1">
-            <ResourceTable
-              table={table}
-              binarySort
-              multiSort
-              isLoading={list.isLoading}
-              emptyTitle={list.emptyTitle}
-              emptyDescription={list.emptyDescription}
-              onRowClick={(row) => list.onRowClick(row.original.id)}
-            />
-            <Pagination
-              page={pagination.page}
-              pageSize={pagination.pageSize}
-              totalPages={pagination.totalPages}
-              total={pagination.total}
-              pageSizeOptions={USERS_PAGE_SIZE_OPTIONS}
-              isLoading={pagination.isFetching}
-              onPageChange={pagination.onPageChange}
-              onPageSizeChange={pagination.onPageSizeChange}
-            />
-          </CardContent>
-        </Card>
-      </ResourcePageShell>
+        <ResourceDataTable
+          table={table}
+          isLoading={list.isLoading}
+          error={
+            list.isError
+              ? {
+                  title: "Could not load users.",
+                  onRetry: list.onRetry,
+                }
+              : undefined
+          }
+          empty={{
+            title: list.emptyTitle,
+            description: list.emptyDescription,
+          }}
+          onRowClick={(row) => list.onRowClick(row.id)}
+          enableDensityToggle
+          enableColumnVisibility
+        />
+      </CommonResourcePage>
     </>
   );
 }

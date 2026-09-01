@@ -1,10 +1,12 @@
+"use client";
+
 import { Button } from "@repo/web-ui/button";
 import { LoadingButton } from "@repo/web-ui/loading-button";
+import { ResourceDetailPane } from "@repo/web-ui/resource-detail-pane";
 import { Download, History, Layers, Trash2, Upload } from "lucide-react";
 
 import type { FileDto, FileHistoryEventDto, FileVersionDto } from "@/lib/api-types";
 
-import { ResourceDrawer } from "@/components/resource-drawer";
 import { cn } from "@/lib/utils";
 
 import { FilesDetailMetadata } from "./files-detail-metadata";
@@ -12,11 +14,11 @@ import { FilesHistoryList } from "./files-history-list";
 import { FilesVersionList } from "./files-version-list";
 
 const tabOptions = [
-  { value: "versions" as const, label: "Versions", icon: Layers },
-  { value: "history" as const, label: "History", icon: History },
-];
+  { id: "versions" as const, label: "Versions", icon: Layers },
+  { id: "history" as const, label: "History", icon: History },
+] as const;
 
-interface FilesDetailDrawerProps {
+export interface FilesDetailDrawerProps {
   file: FileDto | null;
   description: string;
   onClose: () => void;
@@ -51,22 +53,23 @@ function FilesDetailTabNav({
   return (
     <div className="flex gap-1 border-b border-border pb-1">
       {tabOptions.map((tab) => {
-        const TabIcon = tab.icon;
+        const Icon = tab.icon;
+        const isActive = activeTab === tab.id;
         return (
-          <Button
-            key={tab.value}
-            variant="ghost"
-            size="sm"
-            onClick={() => onTabChange(tab.value)}
+          <button
+            key={tab.id}
+            type="button"
+            onClick={() => onTabChange(tab.id)}
             className={cn(
-              "relative rounded-b-none",
-              activeTab === tab.value &&
-                "after:absolute after:bottom-[-4px] after:left-0 after:h-[2px] after:w-full after:bg-primary",
+              "flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
+              isActive
+                ? "bg-accent text-accent-foreground"
+                : "text-muted-foreground hover:bg-muted hover:text-foreground",
             )}
           >
-            <TabIcon className="mr-2 size-4" />
+            <Icon className="size-3.5" />
             {tab.label}
-          </Button>
+          </button>
         );
       })}
     </div>
@@ -98,10 +101,11 @@ export function FilesDetailDrawer({
   formatMimeType,
 }: FilesDetailDrawerProps) {
   return (
-    <ResourceDrawer
+    <ResourceDetailPane
       open={!!file}
       title={file?.originalName ?? ""}
       description={description}
+      id={file?.id}
       onClose={onClose}
       footer={
         file ? (
@@ -157,6 +161,6 @@ export function FilesDetailDrawer({
           )}
         </div>
       )}
-    </ResourceDrawer>
+    </ResourceDetailPane>
   );
 }

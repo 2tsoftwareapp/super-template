@@ -46,13 +46,11 @@ interface UseAuditLogsControllerOptions {
 /**
  * Orchestration hook for the audit-logs screen.
  *
- * Flow:
- *   1. Parse URL filters; debounce free-text search before the list query.
- *   2. Load paginated audit entries (placeholderData keeps prior page).
- *   3. Export CSV with toast on truncate/error; classifyError for export fails.
- *   4. Detail selection is local UI state (no extra fetch).
- * Owns: URL ↔ filter sync, list query, export, detail selection.
- * Does not own: table column definitions (presentational UI).
+ * Coordinates:
+ *   - URL search params for pagination, filtering, and sort order.
+ *   - React Query for data fetching and CSV/JSON export.
+ *   - Selected entry state for slide-over detail pane.
+ *   - React Table column models and sorting bridges.
  */
 export function useAuditLogsController({
   createColumns,
@@ -156,6 +154,23 @@ export function useAuditLogsController({
     );
   }
 
+  function handleExportJson() {
+    try {
+      const dataToExport = entries;
+      const jsonString = JSON.stringify(dataToExport, null, 2);
+      const blob = new Blob([jsonString], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `audit-logs-export-${Date.now()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success("Audit logs exported to JSON successfully.");
+    } catch {
+      toast.error("Failed to export audit logs as JSON.");
+    }
+  }
+
   return {
     filters,
     hasFilters,
@@ -170,6 +185,7 @@ export function useAuditLogsController({
     selectedEntry,
     onSelectEntry: setSelectedEntry,
     onExport: handleExport,
+    onExportJson: handleExportJson,
     isExporting: exportMutation.isPending,
     formatAction: formatAuditAction,
     table,

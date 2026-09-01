@@ -67,6 +67,7 @@ Established by the 2026-07 re-architecture (roadmap:
 - **Design system**: `@repo/web-ui/components/*` is the single source of UI
   primitives; apps never keep local copies. Full convention set in
   `apps/admin/AGENTS.md`.
+- **Unified Admin Layout**: Complete architectural specification for admin layout hierarchy, component APIs (`CommonResourcePage`, `ResourceDataTable`, `ResourceFilterBar`, `ResourceDetailPane`, `ResourcePropertyGrid`, `ResourceStatCards`, `ResourceDrawer`, `ConfirmDialog`), and feature domain matrices in [`docs/architecture/ADMIN_UNIFIED_LAYOUT.md`](architecture/ADMIN_UNIFIED_LAYOUT.md).
 - **Layering**: `app/[locale]/**` holds route entries only; business logic
   (services, react-query hooks, zod schemas, feature views) lives under
   `src/features/<resource>/`. ESLint boundary rules enforce that `app/**`

@@ -3,9 +3,11 @@
 import { cn } from "@repo/web-utils/utils";
 import * as React from "react";
 
-function getInitials(name: string): string {
+function getInitials(name?: string | undefined): string {
+  if (!name) return "";
   return name
     .split(" ")
+    .filter(Boolean)
     .slice(0, 2)
     .map((word) => word[0])
     .join("")

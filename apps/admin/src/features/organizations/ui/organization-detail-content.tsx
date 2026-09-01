@@ -1,16 +1,17 @@
 "use client";
 
+import { Avatar } from "@repo/web-ui/avatar";
 import { Badge } from "@repo/web-ui/badge";
 import { Button } from "@repo/web-ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/web-ui/card";
 import { ConfirmDialog } from "@repo/web-ui/confirm-dialog";
 import { Empty, EmptyContent, EmptyHeader, EmptyTitle } from "@repo/web-ui/empty";
 import { ErrorState } from "@repo/web-ui/error-state";
+import { ResourcePropertyGrid } from "@repo/web-ui/resource-property-grid";
 import { Show } from "@repo/web-ui/show";
 import { Spinner } from "@repo/web-ui/spinner";
 import {
   Building,
-  Calendar,
   ChevronLeft,
   Crown,
   LogOut,
@@ -29,6 +30,7 @@ import type { OrganizationDetailViewModel } from "@/features/organizations/model
 import { ResourcePageShell } from "@/components/resource-page-shell";
 import { adminResources } from "@/features/_plugin-resources/admin-resources";
 import { canPromoteMemberToAdmin } from "@/features/organizations/model/organizations.permissions";
+import { timeAgo } from "@/lib/format";
 import { Link } from "@/i18n/navigation";
 
 import { EditOrganizationDrawer } from "./edit-organization-drawer";
@@ -65,8 +67,10 @@ export function OrganizationDetailContent(vm: OrganizationDetailViewModel) {
 
   if (isError) {
     return (
-      <ResourcePageShell resource={organizationsResource} description="Organization details">
+      <ResourcePageShell resource={organizationsResource} description="Organization detail">
         <ErrorState
+          variant="inline"
+          className="m-4"
           title="Could not load organization."
           action={{ label: "Retry", onClick: onRetry }}
         />
@@ -77,15 +81,10 @@ export function OrganizationDetailContent(vm: OrganizationDetailViewModel) {
   if (!org) {
     return (
       <ResourcePageShell resource={organizationsResource} description="Organization not found">
-        <div className="flex flex-col items-center gap-3 py-16">
-          <Building className="size-12 text-muted-foreground/50" />
-          <p className="text-sm text-muted-foreground">
-            Organization not found or has been deleted.
-          </p>
-          <Link href="/organizations" className="text-sm underline text-primary">
-            Back to organizations
-          </Link>
-        </div>
+        <Empty
+          title="Organization not found"
+          description="The requested organization does not exist or has been deleted."
+        />
       </ResourcePageShell>
     );
   }
@@ -106,10 +105,10 @@ export function OrganizationDetailContent(vm: OrganizationDetailViewModel) {
         message={
           <>
             Are you sure you want to delete <span className="font-semibold">{org.name}</span>? This
-            action is a soft-delete but will disable access for all members.
+            action will soft-delete the workspace and disable access for all members.
           </>
         }
-        confirmLabel={deleteConfirm.isPending ? "Deleting…" : "Delete"}
+        confirmLabel={deleteConfirm.isPending ? "Deleting…" : "Delete organization"}
         destructive
         loading={deleteConfirm.isPending}
         onCancel={deleteConfirm.onCancel}
@@ -126,10 +125,10 @@ export function OrganizationDetailContent(vm: OrganizationDetailViewModel) {
               or delete the organization instead.
             </p>
           ) : (
-            <>Are you sure you want to leave {org.name}?</>
+            <>Are you sure you want to leave {org.name}? You will lose access to its resources.</>
           )
         }
-        confirmLabel={leaveConfirm.isPending ? "Leaving…" : "Leave"}
+        confirmLabel={leaveConfirm.isPending ? "Leaving…" : "Leave organization"}
         destructive={!isLastOwner}
         loading={leaveConfirm.isPending}
         onCancel={leaveConfirm.onCancel}
@@ -138,7 +137,8 @@ export function OrganizationDetailContent(vm: OrganizationDetailViewModel) {
 
       <ResourcePageShell
         resource={organizationsResource}
-        description={`Manage ${org.name} workspace details and team members.`}
+        title={org.name}
+        description={`Manage ${org.name} workspace details and team members directory.`}
         actions={
           <div className="flex items-center gap-2">
             <Link href={backHref}>
@@ -180,47 +180,53 @@ export function OrganizationDetailContent(vm: OrganizationDetailViewModel) {
                 <Building className="size-4 text-muted-foreground" />
                 Workspace Information
               </CardTitle>
-              <CardDescription>System properties for this tenant.</CardDescription>
+              <CardDescription>Tenant identity and metadata properties.</CardDescription>
             </CardHeader>
-            <CardContent className="flex flex-col gap-4 text-sm">
-              <div className="flex flex-col gap-1">
-                <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
-                  Name
-                </span>
-                <span className="font-semibold text-foreground">{org.name}</span>
-              </div>
-              <div className="flex flex-col gap-1">
-                <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
-                  Slug
-                </span>
-                <span className="font-mono bg-muted/70 px-2 py-0.5 rounded border border-border/80 w-fit text-xs">
-                  {org.slug}
-                </span>
-              </div>
-              <div className="flex flex-col gap-1">
-                <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
-                  Organization ID
-                </span>
-                <span className="font-mono text-xs select-all text-muted-foreground break-all">
-                  {org.id}
-                </span>
-              </div>
-              <div className="flex flex-col gap-1 border-t border-border pt-3">
-                <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider flex items-center gap-1.5">
-                  <Calendar className="size-3.5" /> Created At
-                </span>
-                <span className="text-muted-foreground text-xs">
-                  {new Date(org.createdAt).toLocaleString()}
-                </span>
-              </div>
-              <div className="flex flex-col gap-1">
-                <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider flex items-center gap-1.5">
-                  <Calendar className="size-3.5" /> Updated At
-                </span>
-                <span className="text-muted-foreground text-xs">
-                  {new Date(org.updatedAt).toLocaleString()}
-                </span>
-              </div>
+            <CardContent>
+              <ResourcePropertyGrid
+                columns={1}
+                density="default"
+                properties={[
+                  {
+                    key: "name",
+                    label: "Organization name",
+                    value: org.name,
+                  },
+                  {
+                    key: "slug",
+                    label: "Slug identifier",
+                    value: org.slug,
+                    type: "code",
+                    copyable: true,
+                  },
+                  {
+                    key: "orgId",
+                    label: "Organization ID",
+                    value: org.id,
+                    type: "id",
+                    copyable: true,
+                  },
+                  {
+                    key: "membersCount",
+                    label: "Team size",
+                    value: `${members.length} member${members.length === 1 ? "" : "s"}`,
+                    type: "badge",
+                    badgeVariant: "secondary",
+                  },
+                  {
+                    key: "createdAt",
+                    label: "Created",
+                    value: org.createdAt,
+                    type: "timestamp",
+                  },
+                  {
+                    key: "updatedAt",
+                    label: "Last updated",
+                    value: org.updatedAt,
+                    type: "timestamp",
+                  },
+                ]}
+              />
             </CardContent>
           </Card>
 
@@ -230,15 +236,19 @@ export function OrganizationDetailContent(vm: OrganizationDetailViewModel) {
                 <UserCheck className="size-4 text-muted-foreground" />
                 Members Directory
               </CardTitle>
-              <CardDescription>Manage user roles and memberships.</CardDescription>
+              <CardDescription>
+                Manage team memberships, role hierarchy, and access privileges.
+              </CardDescription>
             </CardHeader>
             <CardContent className="p-0">
               <Show when={membersError}>
-                <ErrorState
-                  variant="inline"
-                  title="Failed to load members"
-                  action={{ label: "Retry", onClick: onRetryMembers }}
-                />
+                <div className="p-4">
+                  <ErrorState
+                    variant="inline"
+                    title="Failed to load members"
+                    action={{ label: "Retry", onClick: onRetryMembers }}
+                  />
+                </div>
               </Show>
 
               {!membersError && members.length === 0 ? (
@@ -263,15 +273,10 @@ export function OrganizationDetailContent(vm: OrganizationDetailViewModel) {
                         className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-5 py-4 transition-colors hover:bg-muted/10"
                       >
                         <div className="flex items-center gap-3 min-w-0">
-                          <div className="flex size-9 shrink-0 items-center justify-center rounded-full border border-border bg-muted/40">
-                            {member.role === "OWNER" ? (
-                              <Crown className="size-4 text-yellow-500 fill-yellow-500/20" />
-                            ) : member.role === "ADMIN" ? (
-                              <Shield className="size-4 text-blue-500 fill-blue-500/10" />
-                            ) : (
-                              <User className="size-4 text-muted-foreground" />
-                            )}
-                          </div>
+                          <Avatar
+                            name={member.displayName || member.email || "User"}
+                            className="size-9 border border-border"
+                          />
                           <div className="min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
                               <span className="font-medium text-sm text-foreground">
@@ -283,13 +288,15 @@ export function OrganizationDetailContent(vm: OrganizationDetailViewModel) {
                                 </Badge>
                               ) : null}
                             </div>
-                            <span className="block text-xs text-muted-foreground truncate">
-                              {member.email}
-                            </span>
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                              <span className="truncate">{member.email}</span>
+                              <span>·</span>
+                              <span>Joined {timeAgo(member.createdAt)}</span>
+                            </div>
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-3 shrink-0 self-end sm:self-center">
+                        <div className="flex items-center gap-2.5 shrink-0 self-end sm:self-center">
                           <Badge
                             variant={
                               member.role === "OWNER"
@@ -298,8 +305,15 @@ export function OrganizationDetailContent(vm: OrganizationDetailViewModel) {
                                   ? "secondary"
                                   : "outline"
                             }
-                            className="capitalize text-xs font-semibold"
+                            className="capitalize text-xs font-semibold gap-1"
                           >
+                            {member.role === "OWNER" ? (
+                              <Crown className="size-3 text-yellow-500 fill-yellow-500/20" />
+                            ) : member.role === "ADMIN" ? (
+                              <Shield className="size-3 text-blue-500 fill-blue-500/10" />
+                            ) : (
+                              <User className="size-3 text-muted-foreground" />
+                            )}
                             {member.role.toLowerCase()}
                           </Badge>
 

@@ -12,7 +12,7 @@ import type { MailTemplateDto } from "@/lib/api-types";
 import { type SendMailFormValues, sendMailSchema } from "../model/mail.schemas";
 
 export function MailSendForm({
-  templates,
+  templates = [],
   isPending,
   onSubmit,
 }: {
@@ -20,14 +20,14 @@ export function MailSendForm({
   isPending: boolean;
   onSubmit: (values: SendMailFormValues) => void;
 }) {
-  const sendableTemplates = templates.filter((t) => t.sendable);
+  const safeTemplates = templates ?? [];
+  const sendableTemplates = safeTemplates.filter((t) => t.sendable);
 
   const form = useForm<SendMailFormValues>({
     resolver: zodResolver(sendMailSchema),
     defaultValues: {
-      templateKey: "",
+      templateKey: sendableTemplates[0]?.key ?? "",
       to: "",
-      idempotencyKey: "",
       variables: {},
     },
   });
@@ -51,80 +51,74 @@ export function MailSendForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-3 sm:grid-cols-2">
         <div className="space-y-1.5">
-          <Label htmlFor="send-template-key" className="text-xs text-muted-foreground">
-            Template key
+          <Label htmlFor="send-template" className="text-xs">
+            Template
           </Label>
           <select
-            id="send-template-key"
-            className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            aria-invalid={Boolean(form.formState.errors.templateKey)}
+            id="send-template"
+            className="flex h-9 w-full rounded-lg border border-input bg-background px-3 text-sm shadow-xs outline-hidden transition-colors focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+            disabled={sendableTemplates.length === 0}
             {...form.register("templateKey")}
           >
-            <option value="">Select a template</option>
-            {sendableTemplates.map((tmpl) => (
-              <option key={tmpl.key} value={tmpl.key}>
-                {tmpl.key}
+            {sendableTemplates.map((t) => (
+              <option key={t.key} value={t.key}>
+                {t.key}
               </option>
             ))}
           </select>
-          {form.formState.errors.templateKey ? (
-            <p className="text-xs text-destructive">{form.formState.errors.templateKey.message}</p>
-          ) : null}
+          {sendableTemplates.length === 0 && (
+            <p className="text-[10px] text-muted-foreground">No sendable templates available.</p>
+          )}
         </div>
+
         <div className="space-y-1.5">
-          <Label htmlFor="send-recipient" className="text-xs text-muted-foreground">
-            Recipient email
+          <Label htmlFor="send-to" className="text-xs">
+            Recipient
           </Label>
           <Input
-            id="send-recipient"
-            type="email"
+            id="send-to"
             placeholder="user@example.com"
+            className="h-9"
             aria-invalid={Boolean(form.formState.errors.to)}
             {...form.register("to")}
           />
-          {form.formState.errors.to ? (
-            <p className="text-xs text-destructive">{form.formState.errors.to.message}</p>
-          ) : null}
+          {form.formState.errors.to && (
+            <p className="text-[10px] text-destructive">{form.formState.errors.to.message}</p>
+          )}
         </div>
-        {selectedTemplate?.variables && selectedTemplate.variables.length > 0 ? (
-          <div className="space-y-3 sm:col-span-2">
-            <Label className="text-xs text-muted-foreground">Variables</Label>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {selectedTemplate.variables.map((varName) => (
-                <div key={varName} className="space-y-1">
-                  <Label className="font-mono text-[11px] text-muted-foreground">{varName}</Label>
-                  <Input
-                    placeholder={`Value for ${varName}`}
-                    {...form.register(`variables.${varName}`)}
-                  />
-                </div>
-              ))}
-            </div>
+      </div>
+
+      {selectedTemplate?.variables && selectedTemplate.variables.length > 0 && (
+        <div className="space-y-2 rounded-lg border border-border/80 bg-muted/20 p-3">
+          <p className="text-xs font-medium text-foreground">Template variables</p>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {selectedTemplate.variables.map((variable) => (
+              <div key={variable} className="space-y-1">
+                <Label htmlFor={`var-${variable}`} className="font-mono text-[10px]">
+                  {variable}
+                </Label>
+                <Input
+                  id={`var-${variable}`}
+                  placeholder={`Value for ${variable}`}
+                  className="h-8 text-xs font-mono"
+                  {...form.register(`variables.${variable}`)}
+                />
+              </div>
+            ))}
           </div>
-        ) : null}
-        <div className="space-y-1.5">
-          <Label htmlFor="send-idempotency-key" className="text-xs text-muted-foreground">
-            Idempotency key (optional)
-          </Label>
-          <Input
-            id="send-idempotency-key"
-            placeholder="uuid or unique string"
-            {...form.register("idempotencyKey")}
-          />
         </div>
-      </div>
-      <div className="mt-4 flex justify-end">
-        <LoadingButton
-          type="submit"
-          size="sm"
-          disabled={!form.formState.isValid}
-          loading={isPending}
-        >
-          Send mail
-        </LoadingButton>
-      </div>
+      )}
+
+      <LoadingButton
+        type="submit"
+        size="sm"
+        loading={isPending}
+        disabled={sendableTemplates.length === 0}
+      >
+        Send email
+      </LoadingButton>
     </form>
   );
 }

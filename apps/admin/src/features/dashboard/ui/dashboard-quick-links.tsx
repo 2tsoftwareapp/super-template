@@ -1,6 +1,6 @@
 import { Button } from "@repo/web-ui/button";
 import { Card, CardContent } from "@repo/web-ui/card";
-import { Mail, Megaphone, Shield, Users, Workflow } from "lucide-react";
+import { Folder, Mail, Megaphone, Shield, Upload, Users, Workflow } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
 
@@ -9,6 +9,8 @@ const QUICK_ACTIONS = [
   { href: "/jobs", label: "Jobs", icon: Workflow },
   { href: "/mail", label: "Mail", icon: Mail },
   { href: "/notifications", label: "Notify", icon: Megaphone },
+  { href: "/files", label: "Files", icon: Folder },
+  { href: "/imports", label: "Imports", icon: Upload },
   { href: "/audit-logs", label: "Audit", icon: Shield },
 ] as const;
 

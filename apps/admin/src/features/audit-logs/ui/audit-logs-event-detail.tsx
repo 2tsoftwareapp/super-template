@@ -1,11 +1,11 @@
 "use client";
 
-import { Label } from "@repo/web-ui/label";
-import { Separator } from "@repo/web-ui/separator";
+import {
+  ResourcePropertyGrid,
+  type ResourcePropertyItem,
+} from "@repo/web-ui/resource-property-grid";
 
 import type { AuditLogDto } from "@/lib/api-types";
-
-import { formatDateTime } from "@/lib/format";
 
 interface AuditLogsEventDetailProps {
   entry: AuditLogDto;
@@ -13,63 +13,70 @@ interface AuditLogsEventDetailProps {
 }
 
 export function AuditLogsEventDetail({ entry, formatAction }: AuditLogsEventDetailProps) {
+  const properties: ResourcePropertyItem[] = [
+    {
+      label: "ID",
+      value: entry.id,
+      type: "id",
+      copyable: true,
+    },
+    {
+      label: "Action",
+      value: formatAction(entry.action),
+      type: "badge",
+      badgeVariant: "secondary",
+    },
+    {
+      label: "Entity type",
+      value: entry.entityType ?? "—",
+    },
+    {
+      label: "Entity ID",
+      value: entry.entityId,
+      type: "id",
+      copyable: Boolean(entry.entityId),
+    },
+    {
+      label: "Actor ID",
+      value: entry.actorId ?? "System",
+      type: "id",
+      copyable: Boolean(entry.actorId),
+    },
+    {
+      label: "Request ID",
+      value: entry.requestId,
+      type: "id",
+      copyable: Boolean(entry.requestId),
+    },
+    {
+      label: "IP address",
+      value: entry.ipAddress,
+      copyable: Boolean(entry.ipAddress),
+    },
+    {
+      label: "Created at",
+      value: entry.createdAt,
+      type: "timestamp",
+    },
+    {
+      label: "User agent",
+      value: entry.userAgent ?? "—",
+      colSpan: "full",
+    },
+  ];
+
+  if (entry.metadata && Object.keys(entry.metadata).length > 0) {
+    properties.push({
+      label: "Metadata",
+      value: entry.metadata,
+      type: "json",
+      colSpan: "full",
+    });
+  }
+
   return (
-    <div className="space-y-4 text-sm">
-      <div>
-        <Label className="text-xs text-muted-foreground">ID</Label>
-        <p className="mt-0.5 font-mono text-xs">{entry.id}</p>
-      </div>
-      <Separator />
-      <div>
-        <Label className="text-xs text-muted-foreground">Action</Label>
-        <p className="mt-0.5 font-medium">{formatAction(entry.action)}</p>
-      </div>
-      <Separator />
-      <div>
-        <Label className="text-xs text-muted-foreground">Entity type</Label>
-        <p className="mt-0.5">{entry.entityType ?? "—"}</p>
-      </div>
-      <Separator />
-      <div>
-        <Label className="text-xs text-muted-foreground">Entity ID</Label>
-        <p className="mt-0.5 font-mono text-xs">{entry.entityId ?? "—"}</p>
-      </div>
-      <Separator />
-      <div>
-        <Label className="text-xs text-muted-foreground">Actor ID</Label>
-        <p className="mt-0.5 font-mono text-xs">{entry.actorId ?? "System"}</p>
-      </div>
-      <Separator />
-      {entry.metadata && (
-        <>
-          <div>
-            <Label className="text-xs text-muted-foreground">Metadata</Label>
-            <pre className="mt-0.5 max-h-48 overflow-auto whitespace-pre-wrap rounded-lg bg-muted p-3 font-mono text-xs leading-relaxed">
-              {JSON.stringify(entry.metadata, null, 2)}
-            </pre>
-          </div>
-          <Separator />
-        </>
-      )}
-      <div>
-        <Label className="text-xs text-muted-foreground">Request ID</Label>
-        <p className="mt-0.5 font-mono text-xs">{entry.requestId ?? "—"}</p>
-      </div>
-      <Separator />
-      <div>
-        <Label className="text-xs text-muted-foreground">IP address</Label>
-        <p className="mt-0.5 font-mono text-xs">{entry.ipAddress ?? "—"}</p>
-      </div>
-      <Separator />
-      <div>
-        <Label className="text-xs text-muted-foreground">User agent</Label>
-        <p className="mt-0.5 break-all text-xs text-muted-foreground">{entry.userAgent ?? "—"}</p>
-      </div>
-      <Separator />
-      <div>
-        <Label className="text-xs text-muted-foreground">Created at</Label>
-        <p className="mt-0.5">{formatDateTime(entry.createdAt)}</p>
-      </div>
+    <div className="space-y-4">
+      <ResourcePropertyGrid properties={properties} columns={2} density="default" />
     </div>
   );
 }

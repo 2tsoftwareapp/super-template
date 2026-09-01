@@ -13,6 +13,13 @@ export const vi: AdminMessages = {
     files: "Tệp tin",
     imports: "Nhập dữ liệu",
     settings: "Cài đặt hệ thống",
+    security: "Bảo mật",
+    password: "Mật khẩu",
+    organization: "Tổ chức",
+    profile: "Hồ sơ",
+    details: "Chi tiết",
+    new: "Tạo mới",
+    edit: "Chỉnh sửa",
     groups: {
       Overview: "Tổng quan",
       People: "Thành viên",
@@ -40,5 +47,11 @@ export const vi: AdminMessages = {
     degraded: "Bị suy giảm",
     refresh: "Làm mới",
     refreshing: "Đang làm mới",
+  },
+  errors: {
+    title: "Đã xảy ra lỗi",
+    description: "Đã xảy ra lỗi không mong muốn khi tải phần này.",
+    digest: "Mã lỗi",
+    reset: "Thử lại",
   },
 };

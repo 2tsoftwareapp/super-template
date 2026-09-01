@@ -1,111 +1,135 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/web-ui/card";
+import type { ResourceStatCardItem } from "@repo/web-ui/resource-stat-cards";
+
+import { CommonResourcePage } from "@repo/web-ui/common-resource-page";
 import { ErrorState } from "@repo/web-ui/error-state";
-import { Pagination } from "@repo/web-ui/pagination";
-import { Show } from "@repo/web-ui/show";
+import { ResourceDataTable } from "@repo/web-ui/resource-data-table";
+import { ResourceFilterBar } from "@repo/web-ui/resource-filter-bar";
+import { AlertCircle, CheckCircle2, Clock, Workflow } from "lucide-react";
 
 import type { JobsViewModel } from "@/features/jobs/model/jobs.types";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars -- used in row.original cast
-import type { JobDto } from "@/lib/api-types";
 
-import { ResourcePageShell } from "@/components/resource-page-shell";
-import { ResourceTable } from "@/components/resource-table";
-import { ResourceToolbar } from "@/components/resource-toolbar";
 import { adminResources } from "@/features/_plugin-resources/admin-resources";
+import {
+  getActiveJobsCount,
+  getCompletedJobsCount,
+  getFailedJobsCount,
+  getTotalJobsCount,
+} from "@/features/jobs/model/jobs.metrics";
 
-import { JobsDetailDrawer } from "./jobs-detail-drawer";
-import { JobsMetricsRow, JobsStatusRow } from "./jobs-stats";
+import { JobsDetailPane } from "./jobs-detail-drawer";
 
 const jobsResource = adminResources.find((r) => r.id === "jobs")!;
 
 export function JobsListView({ header, filters, list, detail, logs, table }: JobsViewModel) {
+  const stats: ResourceStatCardItem[] | undefined = header.metrics
+    ? [
+        {
+          label: "Total",
+          value: getTotalJobsCount(header.metrics),
+          description: "All recorded jobs",
+          icon: Workflow,
+        },
+        {
+          label: "Active",
+          value: getActiveJobsCount(header.metrics),
+          description: "Queued and processing",
+          icon: Clock,
+        },
+        {
+          label: "Failed",
+          value: getFailedJobsCount(header.metrics),
+          description:
+            (header.metrics.totalFailed ?? 0) > 0 ? "Requires attention" : "No failed jobs",
+          icon: AlertCircle,
+        },
+        {
+          label: "Completed",
+          value: getCompletedJobsCount(header.metrics),
+          description: "Successfully finished",
+          icon: CheckCircle2,
+        },
+      ]
+    : undefined;
+
   return (
-    <>
-      <ResourcePageShell
-        resource={jobsResource}
-        description="Inspect queued background jobs and cancel stalled work."
-        isRefreshing={header.isFetching}
-        onRefresh={header.onRefresh}
-      >
-        <Show when={header.metricsError}>
+    <CommonResourcePage
+      resource={jobsResource}
+      description="Inspect queued background jobs and cancel stalled work."
+      isRefreshing={header.isFetching}
+      onRefresh={header.onRefresh}
+      stats={stats}
+      statsColumns={4}
+      statsLoading={header.metricsLoading}
+      error={
+        header.metricsError ? (
           <ErrorState
             variant="inline"
             title="Could not load job metrics."
             action={{ label: "Retry", onClick: header.onRetryMetrics }}
           />
-        </Show>
-
-        <Show when={!!header.metrics}>
-          <JobsMetricsRow metrics={header.metrics!} />
-        </Show>
-
-        <Show when={!!header.metrics}>
-          <JobsStatusRow metrics={header.metrics!} />
-        </Show>
-
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base">Queue</CardTitle>
-            <CardDescription className="text-xs">
-              {list.total > 0
-                ? `${list.total} job${list.total !== 1 ? "s" : ""}`
-                : "Manage scheduled and running jobs."}
-            </CardDescription>
-          </CardHeader>
-          <ResourceToolbar
-            search={filters.type}
-            onSearchChange={filters.onTypeChange}
-            searchPlaceholder="Job type (e.g. SEND_NOTIFICATION)"
-            hasFilters={filters.hasFilters}
-            onClearFilters={filters.onClearFilters}
-            filters={
-              <select
-                className="h-9 rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                value={filters.status}
-                onChange={(e) => filters.onStatusChange(e.target.value)}
-              >
-                {filters.statusOptions.map((opt) => (
-                  <option key={opt.value || "all"} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-            }
-          />
-          <CardContent className="p-0 pb-1">
-            <ResourceTable
-              table={table}
-              isLoading={list.isLoading}
-              {...(list.isError ? { error: { title: "Could not load jobs." } } : {})}
-              onRetry={list.onRetry}
-              emptyTitle={list.emptyMessage}
-            />
-            <Pagination
-              page={list.page}
-              pageSize={50}
-              totalPages={list.totalPages}
-              total={list.total}
-              isLoading={list.isFetching}
-              onPageChange={list.onPageChange}
-            />
-          </CardContent>
-        </Card>
-      </ResourcePageShell>
-
-      <JobsDetailDrawer
-        isOpen={detail.isOpen}
-        selectedJob={detail.selectedJob}
-        detailLoading={detail.detailLoading}
-        detailError={detail.detailError}
-        onRetryDetail={detail.onRetryDetail}
-        events={logs.events}
-        eventsLoading={logs.isLoading}
-        eventsError={logs.isError}
-        onRetryEvents={logs.onRetry}
-        onClose={detail.onClose}
-        statusProps={list.statusProps}
+        ) : undefined
+      }
+      filterBar={
+        <ResourceFilterBar
+          search={{
+            value: filters.type,
+            onChange: filters.onTypeChange,
+            placeholder: "Job type (e.g. SEND_NOTIFICATION)",
+          }}
+          facets={[
+            {
+              key: "status",
+              label: "Status",
+              options: filters.statusOptions
+                .filter((opt) => opt.value !== "")
+                .map((opt) => ({
+                  label: opt.label,
+                  value: opt.value,
+                })),
+              selectedValues: filters.status ? [filters.status] : [],
+              onChange: (values) => {
+                filters.onStatusChange(values[values.length - 1] ?? "");
+              },
+            },
+          ]}
+          onClearAll={filters.onClearFilters}
+        />
+      }
+      pagination={{
+        page: list.page,
+        pageSize: 50,
+        total: list.total,
+        totalPages: list.totalPages,
+        isLoading: list.isFetching,
+        onPageChange: list.onPageChange,
+      }}
+      detailPane={
+        <JobsDetailPane
+          isOpen={detail.isOpen}
+          selectedJob={detail.selectedJob}
+          detailLoading={detail.detailLoading}
+          detailError={detail.detailError}
+          onRetryDetail={detail.onRetryDetail}
+          events={logs.events}
+          eventsLoading={logs.isLoading}
+          eventsError={logs.isError}
+          onRetryEvents={logs.onRetry}
+          onClose={detail.onClose}
+          statusProps={list.statusProps}
+        />
+      }
+    >
+      <ResourceDataTable
+        table={table}
+        isLoading={list.isLoading}
+        error={list.isError ? { title: "Could not load jobs.", onRetry: list.onRetry } : undefined}
+        onRowClick={(job) => detail.onOpen(job.id)}
+        empty={{
+          title: list.emptyMessage,
+        }}
       />
-    </>
+    </CommonResourcePage>
   );
 }

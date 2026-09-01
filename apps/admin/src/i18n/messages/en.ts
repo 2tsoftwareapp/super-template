@@ -11,6 +11,13 @@ export const en = {
     files: "Files",
     imports: "Imports",
     settings: "Settings",
+    security: "Security",
+    password: "Password",
+    organization: "Organization",
+    profile: "Profile",
+    details: "Details",
+    new: "New",
+    edit: "Edit",
     groups: {
       Overview: "Overview",
       People: "People",
@@ -38,6 +45,12 @@ export const en = {
     degraded: "Degraded",
     refresh: "Refresh",
     refreshing: "Refreshing",
+  },
+  errors: {
+    title: "Something went wrong",
+    description: "An unexpected error occurred while loading this section.",
+    digest: "Error digest",
+    reset: "Try again",
   },
 };
 

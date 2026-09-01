@@ -32,6 +32,7 @@ export interface AuditLogsViewModel {
   selectedEntry: AuditLogDto | null;
   onSelectEntry: (entry: AuditLogDto | null) => void;
   onExport: () => void;
+  onExportJson?: () => void;
   isExporting: boolean;
   formatAction: (action: string) => string;
   table: ReactTable<AuditLogDto>;

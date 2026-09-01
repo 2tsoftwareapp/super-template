@@ -1,91 +1,94 @@
 "use client";
 
-import { Badge } from "@repo/web-ui/badge";
-import { Label } from "@repo/web-ui/label";
-import { Separator } from "@repo/web-ui/separator";
+import { ResourceDetailPane } from "@repo/web-ui/resource-detail-pane";
+import {
+  ResourcePropertyGrid,
+  type ResourcePropertyItem,
+} from "@repo/web-ui/resource-property-grid";
 
 import type { MailDeliveryDto } from "@/lib/api-types";
 
-import { ResourceDrawer } from "@/components/resource-drawer";
 import { mailStatusProps } from "@/features/mail/model/mail.constants";
-import { formatDateTime, formatUnknownDateTime, scalarString } from "@/lib/format";
-import { cn } from "@/lib/utils";
+import { scalarString } from "@/lib/format";
 
-interface MailDetailDrawerProps {
+export interface MailDetailProps {
   selectedDelivery: MailDeliveryDto | null;
   onClose: () => void;
 }
 
-export function MailDetailDrawer({ selectedDelivery, onClose }: MailDetailDrawerProps) {
+export function MailDetailContent({ selectedDelivery }: { selectedDelivery: MailDeliveryDto }) {
+  const statusInfo = mailStatusProps(String(selectedDelivery.status));
+
+  const properties: ResourcePropertyItem[] = [
+    {
+      label: "ID",
+      value: selectedDelivery.id,
+      type: "id",
+      copyable: true,
+    },
+    {
+      label: "Template key",
+      value: selectedDelivery.templateKey,
+      type: "id",
+      copyable: true,
+    },
+    {
+      label: "Recipient",
+      value: selectedDelivery.recipient,
+      copyable: true,
+    },
+    {
+      label: "Subject",
+      value: selectedDelivery.subject,
+      colSpan: "full",
+    },
+    {
+      label: "Status",
+      value: String(selectedDelivery.status).toLowerCase(),
+      type: "badge",
+      badgeVariant: statusInfo.variant,
+    },
+    {
+      label: "Created at",
+      value: selectedDelivery.createdAt,
+      type: "timestamp",
+    },
+  ];
+
+  if (selectedDelivery.sentAt) {
+    properties.push({
+      label: "Sent at",
+      value: selectedDelivery.sentAt,
+      type: "timestamp",
+    });
+  }
+
+  if (selectedDelivery.errorMessage) {
+    properties.push({
+      label: "Error",
+      value: scalarString(selectedDelivery.errorMessage),
+      colSpan: "full",
+      className: "text-destructive",
+    });
+  }
+
   return (
-    <ResourceDrawer
+    <div className="space-y-4">
+      <ResourcePropertyGrid properties={properties} columns={2} density="default" />
+    </div>
+  );
+}
+
+export function MailDetailDrawer({ selectedDelivery, onClose }: MailDetailProps) {
+  return (
+    <ResourceDetailPane
       open={!!selectedDelivery}
       title="Delivery detail"
       description={selectedDelivery ? `Template: ${selectedDelivery.templateKey}` : ""}
+      id={selectedDelivery?.id}
       onClose={onClose}
     >
-      {selectedDelivery && (
-        <div className="space-y-4 text-sm">
-          <div>
-            <Label className="text-xs text-muted-foreground">ID</Label>
-            <p className="mt-0.5 font-mono text-xs">{selectedDelivery.id}</p>
-          </div>
-          <Separator />
-          <div>
-            <Label className="text-xs text-muted-foreground">Template key</Label>
-            <p className="mt-0.5 font-mono text-xs">{selectedDelivery.templateKey}</p>
-          </div>
-          <Separator />
-          <div>
-            <Label className="text-xs text-muted-foreground">Recipient</Label>
-            <p className="mt-0.5">{selectedDelivery.recipient}</p>
-          </div>
-          <Separator />
-          <div>
-            <Label className="text-xs text-muted-foreground">Subject</Label>
-            <p className="mt-0.5">{selectedDelivery.subject}</p>
-          </div>
-          <Separator />
-          <div>
-            <Label className="text-xs text-muted-foreground">Status</Label>
-            <div className="mt-0.5">
-              <Badge
-                variant={mailStatusProps(String(selectedDelivery.status)).variant}
-                className={cn(
-                  "text-xs capitalize",
-                  mailStatusProps(String(selectedDelivery.status)).className,
-                )}
-              >
-                {String(selectedDelivery.status).toLowerCase()}
-              </Badge>
-            </div>
-          </div>
-          {selectedDelivery.errorMessage && (
-            <>
-              <Separator />
-              <div>
-                <Label className="text-xs text-muted-foreground">Error</Label>
-                <p className="mt-0.5 text-destructive">
-                  {scalarString(selectedDelivery.errorMessage)}
-                </p>
-              </div>
-            </>
-          )}
-          <Separator />
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label className="text-xs text-muted-foreground">Created at</Label>
-              <p className="mt-0.5">{formatDateTime(selectedDelivery.createdAt)}</p>
-            </div>
-            {selectedDelivery.sentAt && (
-              <div>
-                <Label className="text-xs text-muted-foreground">Sent at</Label>
-                <p className="mt-0.5">{formatUnknownDateTime(selectedDelivery.sentAt)}</p>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-    </ResourceDrawer>
+      {selectedDelivery ? <MailDetailContent selectedDelivery={selectedDelivery} /> : null}
+    </ResourceDetailPane>
   );
 }

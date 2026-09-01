@@ -1,1 +1,1 @@
-import "@testing-library/jest-dom/vitest";
+import "@repo/web-test/setup";

@@ -1,8 +1,11 @@
+"use client";
+
+import { Badge } from "@repo/web-ui/badge";
 import { LoadingButton } from "@repo/web-ui/loading-button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@repo/web-ui/select";
 import { Show } from "@repo/web-ui/show";
 import { Spinner } from "@repo/web-ui/spinner";
-import { Building2, CheckCircle2 } from "lucide-react";
+import { Building2, CheckCircle2, LockKeyhole, ShieldCheck } from "lucide-react";
 
 import type { UserDetailViewModel } from "@/features/users/model/users.types";
 
@@ -15,22 +18,37 @@ interface UserDetailRolesProps {
 
 export function UserDetailRoles({ roles }: UserDetailRolesProps) {
   return (
-    <div>
-      <h4 className="mb-3 text-sm font-medium">Roles</h4>
+    <div className="space-y-4">
+      <div>
+        <h4 className="text-sm font-medium">Role &amp; Access Assignment</h4>
+        <p className="text-xs text-muted-foreground mt-0.5">
+          Assign a platform or organization-scoped role to control access permissions.
+        </p>
+      </div>
 
       <Show when={roles.organizations.length > 0}>
-        <div className="mb-4 space-y-1.5">
-          <label className="text-sm font-medium">Organization</label>
+        <div className="space-y-1.5">
+          <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            Target Organization
+          </label>
           <Select
             value={roles.selectedOrganizationId}
-            onValueChange={(value) => {
-              if (value) roles.onOrganizationSelect(value);
-            }}
-            disabled={roles.organizationsLoading}
+            onValueChange={roles.onOrganizationSelect}
+            disabled={roles.disabled || roles.organizationsLoading}
           >
-            <SelectTrigger className="w-full">
-              <Building2 className="size-3.5 shrink-0 text-muted-foreground" />
-              <SelectValue placeholder="Select an organization..." />
+            <SelectTrigger className="w-full sm:w-80">
+              <SelectValue placeholder="Select an organization">
+                {roles.selectedOrganizationId ? (
+                  <span className="flex items-center gap-2">
+                    <Building2 className="size-4 shrink-0 text-muted-foreground" />
+                    <span>
+                      {roles.organizations.find((o) => o.id === roles.selectedOrganizationId)?.name}
+                    </span>
+                  </span>
+                ) : (
+                  "Select organization"
+                )}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               {roles.organizations.map((org) => (
@@ -47,11 +65,16 @@ export function UserDetailRoles({ roles }: UserDetailRolesProps) {
       </Show>
 
       {roles.isLoading ? (
-        <Spinner className="size-4" />
+        <div className="flex items-center gap-2 py-4 text-xs text-muted-foreground">
+          <Spinner className="size-4" />
+          <span>Loading available roles…</span>
+        </div>
       ) : (
-        <div className="space-y-1.5">
+        <div className="grid gap-2 sm:grid-cols-2">
           {roles.options.map((role) => {
             const checked = roles.selectedRoleId === role.id;
+            const isSystemRole =
+              role.name === "SUPER_ADMIN" || role.name === "ADMIN" || role.name === "USER";
             return (
               <button
                 key={role.id}
@@ -59,25 +82,40 @@ export function UserDetailRoles({ roles }: UserDetailRolesProps) {
                 disabled={roles.disabled}
                 onClick={() => roles.onSelect(role.id)}
                 className={cn(
-                  "flex w-full items-center gap-3 rounded-lg border px-3 py-2.5 text-left transition-colors",
+                  "flex items-start gap-3 rounded-lg border p-3 text-left transition-all",
                   "disabled:cursor-not-allowed disabled:opacity-40",
                   checked
-                    ? "border-foreground bg-foreground/5"
-                    : "border-border hover:border-foreground/30",
+                    ? "border-primary bg-primary/5 shadow-xs ring-1 ring-primary/30"
+                    : "border-border hover:border-foreground/30 hover:bg-muted/30",
                 )}
               >
                 <span
                   className={cn(
-                    "flex size-4 shrink-0 items-center justify-center rounded-full border-2 transition-colors",
-                    checked ? "border-foreground bg-foreground" : "border-muted-foreground",
+                    "mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full border-2 transition-colors",
+                    checked ? "border-primary bg-primary" : "border-muted-foreground",
                   )}
                 >
                   {checked && <span className="size-1.5 rounded-full bg-background" />}
                 </span>
-                <div className="min-w-0">
-                  <p className="text-sm font-medium">{formatRoleName(role.name)}</p>
+                <div className="min-w-0 flex-1 space-y-1">
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <span className="text-sm font-medium text-foreground">
+                      {formatRoleName(role.name)}
+                    </span>
+                    <Badge
+                      variant={isSystemRole ? "secondary" : "outline"}
+                      className="text-[10px] px-1.5 py-0 gap-1 font-normal"
+                    >
+                      {isSystemRole ? (
+                        <LockKeyhole className="size-2.5" />
+                      ) : (
+                        <ShieldCheck className="size-2.5" />
+                      )}
+                      {role.scope || (isSystemRole ? "System" : "Custom")}
+                    </Badge>
+                  </div>
                   {typeof role.description === "string" && (
-                    <p className="text-xs text-muted-foreground">{role.description}</p>
+                    <p className="text-xs text-muted-foreground line-clamp-2">{role.description}</p>
                   )}
                 </div>
               </button>
@@ -86,24 +124,24 @@ export function UserDetailRoles({ roles }: UserDetailRolesProps) {
         </div>
       )}
 
-      <div className="mt-3 flex items-center gap-3">
+      <div className="flex items-center gap-3 pt-2">
         <LoadingButton
-          variant="outline"
+          variant="default"
           size="sm"
           disabled={!roles.canSave}
           onClick={roles.onSave}
           loading={roles.state.isPending}
         >
-          Save roles
+          Save role assignment
         </LoadingButton>
         {roles.state.isSuccess && (
-          <span className="flex items-center gap-1 text-xs text-primary">
-            <CheckCircle2 className="size-3" /> Saved
+          <span className="flex items-center gap-1 text-xs text-primary font-medium">
+            <CheckCircle2 className="size-3.5" /> Saved
           </span>
         )}
         <Show when={roles.state.isError}>
           <span className="text-xs text-destructive">
-            Failed.{" "}
+            Save failed.{" "}
             <button type="button" className="underline" onClick={roles.onSave}>
               Retry
             </button>

@@ -25,7 +25,7 @@ export function DashboardHealth({
           { label: "API", ok: apiHealthy },
           { label: "Database", ok: dbHealthy },
           {
-            label: "Job queue",
+            label: "Redis / Queue",
             ok: failedJobs === 0,
             detail: failedJobs > 0 ? `${failedJobs} failed` : `${pendingJobs} pending`,
           },

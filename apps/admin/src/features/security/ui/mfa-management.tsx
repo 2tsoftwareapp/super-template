@@ -3,7 +3,7 @@
 import { Button } from "@repo/web-ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/web-ui/card";
 import { Spinner } from "@repo/web-ui/spinner";
-import { Shield } from "lucide-react";
+import { Shield, ShieldCheck } from "lucide-react";
 
 import type { MfaSetupResponse } from "@/features/security/model/security.types";
 
@@ -97,11 +97,16 @@ export function MfaManagement({
         <div className="flex items-start justify-between gap-4">
           <div>
             <CardTitle className="flex items-center gap-2 text-lg">
-              <Shield className="size-5" />
+              {mfaEnabled ? (
+                <ShieldCheck className="size-5 text-primary" />
+              ) : (
+                <Shield className="size-5 text-muted-foreground" />
+              )}
               Two-factor authentication
             </CardTitle>
             <CardDescription>
-              Add an extra layer of security to your account with a TOTP authenticator app.
+              Add an extra layer of security to your admin account using time-based one-time
+              passwords (TOTP).
             </CardDescription>
           </div>
           <MfaStatusBadge enabled={mfaEnabled} />
@@ -109,19 +114,31 @@ export function MfaManagement({
       </CardHeader>
       <CardContent className="space-y-4">
         {mfaEnabled ? (
-          <MfaEnabledActions
-            otpCode={otpCode}
-            onOtpChange={onOtpChange}
-            onDisable={onDisable}
-            onRegenerate={onRegenerate}
-            isDisabling={isDisabling}
-            isRegenerating={isRegenerating}
-          />
+          <div className="space-y-4">
+            <p className="text-xs text-muted-foreground">
+              Two-factor authentication is active. You will be required to provide a 6-digit
+              verification code upon signing in from unrecognized devices.
+            </p>
+            <MfaEnabledActions
+              otpCode={otpCode}
+              onOtpChange={onOtpChange}
+              onDisable={onDisable}
+              onRegenerate={onRegenerate}
+              isDisabling={isDisabling}
+              isRegenerating={isRegenerating}
+            />
+          </div>
         ) : (
-          <Button onClick={onStartSetup}>
-            {isSettingUp && <Spinner className="mr-2 size-4" />}
-            Enable two-factor authentication
-          </Button>
+          <div className="space-y-3">
+            <p className="text-xs text-muted-foreground">
+              When two-factor authentication is enabled, you will need your authenticator app (such
+              as Google Authenticator, 1Password, or Authy) to verify your sign-in attempts.
+            </p>
+            <Button onClick={onStartSetup} disabled={isSettingUp}>
+              {isSettingUp && <Spinner className="mr-2 size-4" />}
+              Enable two-factor authentication
+            </Button>
+          </div>
         )}
       </CardContent>
     </Card>

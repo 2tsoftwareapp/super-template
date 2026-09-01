@@ -37,11 +37,18 @@ export function RoleTreeItem({
 
   return (
     <div className="border-b border-border last:border-b-0">
-      <button
-        type="button"
+      <div
+        role="button"
+        tabIndex={0}
         onClick={() => setExpanded(!expanded)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            setExpanded(!expanded);
+          }
+        }}
         className={cn(
-          "flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-muted/50",
+          "flex w-full cursor-pointer items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-muted/50",
         )}
       >
         <div className="shrink-0 rounded-lg border border-border bg-muted p-1.5">
@@ -101,7 +108,7 @@ export function RoleTreeItem({
             <ChevronRight className="size-4 text-muted-foreground" />
           )}
         </div>
-      </button>
+      </div>
       {expanded && (
         <div className="space-y-2 px-4 pb-3 pt-0">
           {organizationName && (

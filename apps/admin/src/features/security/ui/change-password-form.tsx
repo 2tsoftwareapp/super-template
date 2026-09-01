@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo
 import { Label } from "@repo/web-ui/label";
 import { PasswordInput } from "@repo/web-ui/password-input";
 import { Spinner } from "@repo/web-ui/spinner";
+import { KeyRound, Lock } from "lucide-react";
 import { useForm } from "react-hook-form";
 
 import {
@@ -23,6 +24,7 @@ export function ChangePasswordForm({
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<ChangePasswordFormValues>({
     resolver: zodResolver(changePasswordSchema),
@@ -35,13 +37,20 @@ export function ChangePasswordForm({
 
   const onSubmit = (values: ChangePasswordFormValues) => {
     onChangePassword(values);
+    reset();
   };
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Change password</CardTitle>
-        <CardDescription>Update your password to keep your account secure.</CardDescription>
+        <CardTitle className="text-lg flex items-center gap-2">
+          <KeyRound className="size-5 text-primary" />
+          Change password
+        </CardTitle>
+        <CardDescription>
+          Update your account password. Use at least 8 characters with a mix of letters, numbers,
+          and symbols.
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="max-w-md space-y-4">
@@ -50,6 +59,7 @@ export function ChangePasswordForm({
             <PasswordInput
               id="currentPassword"
               autoComplete="current-password"
+              placeholder="Enter current password"
               {...register("currentPassword")}
             />
             {errors.currentPassword && (
@@ -62,6 +72,7 @@ export function ChangePasswordForm({
             <PasswordInput
               id="newPassword"
               autoComplete="new-password"
+              placeholder="Enter new password (min. 8 characters)"
               {...register("newPassword")}
             />
             {errors.newPassword && (
@@ -74,6 +85,7 @@ export function ChangePasswordForm({
             <PasswordInput
               id="confirmPassword"
               autoComplete="new-password"
+              placeholder="Re-enter new password"
               {...register("confirmPassword")}
             />
             {errors.confirmPassword && (
@@ -81,8 +93,8 @@ export function ChangePasswordForm({
             )}
           </div>
 
-          <Button type="submit" disabled={isSaving}>
-            {isSaving && <Spinner className="mr-2 size-4" />}
+          <Button type="submit" disabled={isSaving} className="mt-2">
+            {isSaving ? <Spinner className="mr-2 size-4" /> : <Lock className="mr-1.5 size-4" />}
             Update password
           </Button>
         </form>
