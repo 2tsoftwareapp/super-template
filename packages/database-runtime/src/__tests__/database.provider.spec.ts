@@ -40,6 +40,17 @@ describe("database.provider helpers", () => {
     expect(applyTenantContext).toHaveBeenCalledWith(client);
   });
 
+  it("releases the client when promise-based tenant context application fails", async () => {
+    const client = createClient();
+    const error = new Error("tenant context failed");
+    const applyTenantContext = vi.fn().mockRejectedValue(error);
+    const originalConnect = vi.fn().mockResolvedValue(client);
+    const connect = createTenantAwareConnect(originalConnect as never, applyTenantContext);
+
+    await expect(connect()).rejects.toBe(error);
+    expect(client.release).toHaveBeenCalledWith(error);
+  });
+
   it("reports callback-based connect failures from tenant context application", async () => {
     const client = createClient();
     const release = vi.fn();

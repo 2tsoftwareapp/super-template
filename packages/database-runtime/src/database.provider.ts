@@ -83,8 +83,15 @@ export function createTenantAwareConnect(
     }
 
     return originalConnect().then(async (client) => {
-      await applyTenantContext(client);
-      return client;
+      try {
+        await applyTenantContext(client);
+        return client;
+      } catch (error) {
+        // Mirror the callback branch: a failed context application must not
+        // leak the checked-out client back into the pool.
+        client.release(error instanceof Error ? error : new Error(String(error)));
+        throw error;
+      }
     });
   }) as typeof originalConnect;
 }

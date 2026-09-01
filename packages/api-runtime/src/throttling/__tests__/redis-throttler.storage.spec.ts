@@ -4,6 +4,31 @@ import type { EnvironmentService } from "../../config/environment";
 
 import { RedisThrottlerStorage } from "../redis-throttler.storage";
 
+const adapterState = vi.hoisted(() => ({
+  connectCalls: 0,
+  failNextConnect: false,
+}));
+
+vi.mock("../../redis/redis-client.adapter", () => ({
+  adaptRedisClient: (client: unknown) => client,
+  createRedisClient: () => ({
+    connect: vi.fn(async () => {
+      adapterState.connectCalls += 1;
+      if (adapterState.failNextConnect) {
+        throw new Error("connect ECONNREFUSED");
+      }
+    }),
+    incr: vi.fn(async () => 1),
+    pExpire: vi.fn(async () => true),
+    pTTL: vi.fn(async () => -2),
+    set: vi.fn(async () => "OK" as const),
+    del: vi.fn(async () => 1),
+    get: vi.fn(async () => null),
+    duplicate: vi.fn(),
+    on: vi.fn(),
+  }),
+}));
+
 function createStorage(redisUrl: string | null = null) {
   const environmentService = {
     redisUrl,
@@ -147,5 +172,29 @@ describe("RedisThrottlerStorage (redis path)", () => {
     // Subsequent hit while blocked short-circuits on the block TTL.
     const blocked = await storage.increment("ip-9", 1_000, 2, 5_000, "login");
     expect(blocked.isBlocked).toBe(true);
+  });
+});
+
+describe("RedisThrottlerStorage (connection retry)", () => {
+  it("retries the redis connection on the next increment after a failed connect", async () => {
+    adapterState.connectCalls = 0;
+    adapterState.failNextConnect = true;
+    const storage = createStorage("redis://localhost:6379");
+
+    // First hit: connect fails, so the local fallback handles the count.
+    const first = await storage.increment("ip-retry", 1_000, 5, 5_000, "login");
+    expect(first.totalHits).toBe(1);
+    expect(adapterState.connectCalls).toBe(1);
+
+    // Redis becomes reachable: the next increment must retry the connection
+    // instead of staying stranded on the local fallback until restart.
+    adapterState.failNextConnect = false;
+    const second = await storage.increment("ip-retry", 1_000, 5, 5_000, "login");
+    expect(adapterState.connectCalls).toBe(2);
+    // A fresh redis bucket starts at 1; the local count is not carried over.
+    expect(second.totalHits).toBe(1);
+
+    adapterState.connectCalls = 0;
+    adapterState.failNextConnect = false;
   });
 });

@@ -1,5 +1,7 @@
 import type { ThrottlerStorage } from "@nestjs/throttler";
 
+import { Logger } from "@nestjs/common";
+
 import type { EnvironmentService } from "../config/environment";
 
 import { adaptRedisClient, createRedisClient } from "../redis/redis-client.adapter";
@@ -34,6 +36,7 @@ function isPositiveNumber(value: number): boolean {
 }
 
 export class RedisThrottlerStorage implements ThrottlerStorage {
+  private readonly logger = new Logger(RedisThrottlerStorage.name);
   private readonly localBuckets = new Map<string, LocalBucketState>();
   private redisClient: RedisStorageClient | null = null;
   private redisReady: Promise<void> | null = null;
@@ -164,13 +167,26 @@ export class RedisThrottlerStorage implements ThrottlerStorage {
 
     this.redisReady = (async () => {
       const client = adaptRedisClient<RedisStorageClient>(createRedisClient(redisUrl));
-      client.on("error", () => void 0);
+
+      client.on("error", (error) => {
+        // node-redis reconnects internally; log the blip instead of discarding
+        // the self-healing client.
+        this.logger.warn(`Redis client error for throttler storage: ${error.message}`);
+      });
 
       try {
         await client.connect();
         this.redisClient = client;
-      } catch {
+      } catch (error) {
+        // Clear redisReady so the next increment retries the connection instead
+        // of being stuck on the local fallback until the process restarts.
+        this.logger.warn(
+          `Redis connect failed for throttler storage; using in-process fallback: ${
+            error instanceof Error ? error.message : String(error)
+          }`,
+        );
         this.redisClient = null;
+        this.redisReady = null;
       }
     })();
 
