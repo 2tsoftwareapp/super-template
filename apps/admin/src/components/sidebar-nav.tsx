@@ -7,7 +7,8 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar";
+} from "@repo/web-ui/sidebar";
+
 import {
   adminResourceGroups,
   adminResources,

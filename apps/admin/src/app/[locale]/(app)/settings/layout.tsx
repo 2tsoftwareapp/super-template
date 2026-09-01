@@ -1,5 +1,6 @@
+import { Separator } from "@repo/web-ui/separator";
+
 import { SettingsNav } from "@/components/settings-nav";
-import { Separator } from "@/components/ui/separator";
 
 export default function SettingsLayout({
   children,

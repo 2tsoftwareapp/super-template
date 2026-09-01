@@ -2,9 +2,9 @@
 
 import { Avatar } from "@repo/web-ui/avatar";
 import { Dropdown, type DropdownItem } from "@repo/web-ui/dropdown";
+import { useSidebar } from "@repo/web-ui/sidebar";
 import { LogOut, Shield } from "lucide-react";
 
-import { useSidebar } from "@/components/ui/sidebar";
 import { useRouter } from "@/i18n/navigation";
 import { useI18n } from "@/lib/i18n";
 

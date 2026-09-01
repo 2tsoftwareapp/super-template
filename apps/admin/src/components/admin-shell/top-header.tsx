@@ -1,9 +1,6 @@
 "use client";
 
 import { Avatar } from "@repo/web-ui/avatar";
-import { Dropdown, type DropdownItem } from "@repo/web-ui/dropdown";
-import { LogOut, Search, Settings, Shield } from "lucide-react";
-
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -11,9 +8,12 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Separator } from "@/components/ui/separator";
-import { SidebarTrigger } from "@/components/ui/sidebar";
+} from "@repo/web-ui/breadcrumb";
+import { Dropdown, type DropdownItem } from "@repo/web-ui/dropdown";
+import { Separator } from "@repo/web-ui/separator";
+import { SidebarTrigger } from "@repo/web-ui/sidebar";
+import { LogOut, Search, Settings, Shield } from "lucide-react";
+
 import { getResourceForPath } from "@/features/_plugin-resources/admin-resources";
 import { OrganizationSwitcher } from "@/features/organizations/ui/organization-switcher";
 import { usePathname, useRouter } from "@/i18n/navigation";
@@ -32,7 +32,6 @@ function Breadcrumbs() {
   const { t } = useI18n();
   const segments = pathname.split("/").filter(Boolean);
 
-  // Build breadcrumb items from pathname
   const crumbs: { label: string; href?: string }[] = [];
   let accumulatedPath = "";
 
@@ -41,13 +40,11 @@ function Breadcrumbs() {
     const resource = getResourceForPath(accumulatedPath);
 
     if (resource?.path === accumulatedPath) {
-      // This is a registered resource — use its translated label
       crumbs.push({
         label: t(`nav.${resource.id}`),
         href: accumulatedPath,
       });
     } else if (segment !== segments[0]) {
-      // Skip locale segment, add sub-page as non-linked
       crumbs.push({ label: segment });
     }
   }
@@ -107,7 +104,6 @@ export function TopHeader({ displayName, onSignOut }: TopHeaderProps) {
         <button
           type="button"
           onClick={() => {
-            // Trigger command menu via keyboard event
             document.dispatchEvent(
               new KeyboardEvent("keydown", { key: "k", metaKey: true, bubbles: true }),
             );

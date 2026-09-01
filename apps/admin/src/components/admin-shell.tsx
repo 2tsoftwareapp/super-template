@@ -1,9 +1,5 @@
 "use client";
 
-import { useAdminSession } from "@/components/admin-guard";
-import { TopHeader } from "@/components/admin-shell/top-header";
-import { CommandMenu } from "@/components/command-menu";
-import { SidebarNav } from "@/components/sidebar-nav";
 import {
   Sidebar,
   SidebarContent,
@@ -12,7 +8,12 @@ import {
   SidebarInset,
   SidebarProvider,
   SidebarSeparator,
-} from "@/components/ui/sidebar";
+} from "@repo/web-ui/sidebar";
+
+import { useAdminSession } from "@/components/admin-guard";
+import { TopHeader } from "@/components/admin-shell/top-header";
+import { CommandMenu } from "@/components/command-menu";
+import { SidebarNav } from "@/components/sidebar-nav";
 
 import { Brand } from "./admin-shell/brand";
 import { UserMenu } from "./admin-shell/user-menu";

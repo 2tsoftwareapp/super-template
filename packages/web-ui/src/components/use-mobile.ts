@@ -7,7 +7,6 @@ export function useIsMobile() {
 
   React.useEffect(() => {
     const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`);
-    // Trigger initial check via the change handler
     mql.dispatchEvent(new MediaQueryListEvent("change"));
     mql.addEventListener("change", () => {
       setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);

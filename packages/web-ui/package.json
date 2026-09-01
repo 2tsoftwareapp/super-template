@@ -5,10 +5,10 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./composables": "./src/composables/index.ts",
     "./alert": "./src/components/alert.tsx",
     "./avatar": "./src/components/avatar.tsx",
     "./badge": "./src/components/badge.tsx",
+    "./breadcrumb": "./src/components/breadcrumb.tsx",
     "./button": "./src/components/button.tsx",
     "./button-variants": "./src/components/button-variants.ts",
     "./calendar": "./src/components/calendar.tsx",
@@ -16,6 +16,7 @@
     "./checkbox": "./src/components/checkbox.tsx",
     "./combobox": "./src/components/combobox.tsx",
     "./command": "./src/components/command.tsx",
+    "./composables": "./src/composables/index.ts",
     "./confirm-dialog": "./src/components/confirm-dialog.tsx",
     "./csrf-bootstrap": "./src/components/csrf-bootstrap.tsx",
     "./date-picker": "./src/components/date-picker.tsx",
@@ -39,15 +40,18 @@
     "./resource-empty": "./src/components/resource-empty.tsx",
     "./resource-page-shell": "./src/components/resource-page-shell.tsx",
     "./resource-toolbar": "./src/components/resource-toolbar.tsx",
+    "./scroll-area": "./src/components/scroll-area.tsx",
     "./select": "./src/components/select.tsx",
     "./separator": "./src/components/separator.tsx",
     "./sheet": "./src/components/sheet.tsx",
     "./show": "./src/components/show.tsx",
+    "./sidebar": "./src/components/sidebar.tsx",
     "./skeleton": "./src/components/skeleton.tsx",
     "./spinner": "./src/components/spinner.tsx",
     "./table": "./src/components/table.tsx",
     "./textarea": "./src/components/textarea.tsx",
-    "./tooltip": "./src/components/tooltip.tsx"
+    "./tooltip": "./src/components/tooltip.tsx",
+    "./use-mobile": "./src/components/use-mobile.ts"
   },
   "scripts": {
     "build": "node ../../tools/tsc7/node_modules/typescript7/bin/tsc -p tsconfig.json",
@@ -57,6 +61,7 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@base-ui/react": "^1.5.0",
     "@radix-ui/react-dialog": "^1.1.23",
     "@radix-ui/react-dropdown-menu": "^2.1.24",
     "@radix-ui/react-popover": "^1.1.23",
