@@ -1,13 +1,16 @@
 "use client";
 
+import { FullScreenLoading } from "@repo/web-ui/loading";
+
 interface LoginStatusProps {
   message: string;
 }
 
 export function LoginStatus({ message }: LoginStatusProps) {
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <p className="text-sm text-muted-foreground">{message}</p>
-    </div>
+    <FullScreenLoading
+      title={message}
+      description="Verifying credentials and workspace permissions..."
+    />
   );
 }

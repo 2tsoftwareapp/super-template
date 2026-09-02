@@ -20,27 +20,27 @@ function FullScreenLoading({
   return (
     <div
       className={cn(
-        "fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-md transition-all duration-300",
+        "fixed inset-0 z-50 flex min-h-dvh w-full items-center justify-center bg-background/80 p-4 backdrop-blur-md transition-all duration-300",
         className,
       )}
     >
-      <div className="relative w-full max-w-xs text-center space-y-4">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-20 rounded-full bg-primary/20 blur-xl animate-pulse" />
-        <Card className="border border-border/50 bg-card/90 shadow-2xl relative">
-          <CardHeader className="items-center gap-3.5 pt-6 pb-6 px-5">
-            <div className="relative">
-              <Spinner className="size-6 text-primary" />
-            </div>
-            <div className="space-y-1">
-              <CardTitle className="text-sm font-semibold tracking-tight text-foreground">
-                {title}
-              </CardTitle>
-              <CardDescription className="text-xs text-muted-foreground leading-normal">
+      <div className="relative flex w-full max-w-sm flex-col items-center justify-center text-center">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-24 rounded-full bg-primary/20 blur-2xl animate-pulse pointer-events-none" />
+        <div className="relative flex w-full flex-col items-center justify-center rounded-2xl border border-border/80 bg-card/95 p-6 shadow-2xl backdrop-blur-xl">
+          <div className="flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20 mb-3.5 shadow-2xs">
+            <Spinner className="size-5 text-primary" />
+          </div>
+          <div className="space-y-1 text-center">
+            <h3 className="text-sm font-semibold tracking-tight text-foreground">
+              {title}
+            </h3>
+            {description ? (
+              <p className="text-xs text-muted-foreground leading-relaxed">
                 {description}
-              </CardDescription>
-            </div>
-          </CardHeader>
-        </Card>
+              </p>
+            ) : null}
+          </div>
+        </div>
       </div>
     </div>
   );
