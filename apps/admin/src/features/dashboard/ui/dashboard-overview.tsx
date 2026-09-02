@@ -1,8 +1,10 @@
 "use client";
 
+import { Badge } from "@repo/web-ui/badge";
+import { Button } from "@repo/web-ui/button";
 import { Show } from "@repo/web-ui/show";
 import { Spinner } from "@repo/web-ui/spinner";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, ArrowRight, CheckCircle2 } from "lucide-react";
 
 import type { DashboardViewModel } from "@/features/dashboard/model/dashboard.types";
 
@@ -20,9 +22,10 @@ import { DashboardUsers } from "./dashboard-users";
 const dashboardResource = adminResources.find((r) => r.id === "dashboard")!;
 
 /**
- * Presentational dashboard overview. Receives a fully-resolved view model from
- * the dashboard controller and composes the overview sub-components; it owns no
- * server state, session, or query orchestration.
+ * Presentational dashboard overview.
+ * Renders a responsive, clean, and modern administration dashboard
+ * with natural page scrolling, KPI statistics, activity timelines,
+ * infrastructure health, user rosters, and quick action shortcuts.
  */
 export function DashboardOverview({
   isRefreshing,
@@ -40,47 +43,64 @@ export function DashboardOverview({
       isRefreshing={isRefreshing}
       onRefresh={header.onRefresh}
       meta={
-        <span
-          className={cn(
-            "inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[10px] font-medium",
-            header.healthFetching
-              ? "border-border"
+        <div className="flex items-center gap-2">
+          <span
+            className={cn(
+              "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold shadow-2xs transition-colors",
+              header.isHealthy
+                ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
+                : "border-destructive/30 bg-destructive/10 text-destructive",
+            )}
+          >
+            {header.healthFetching ? (
+              <Spinner className="size-3 text-muted-foreground" />
+            ) : (
+              <span
+                className={cn(
+                  "size-1.5 rounded-full",
+                  header.isHealthy ? "bg-emerald-500 animate-pulse" : "bg-destructive",
+                )}
+              />
+            )}
+            {header.healthFetching
+              ? "Checking status..."
               : header.isHealthy
-                ? "border-primary/30 bg-primary/10 text-primary"
-                : "border-destructive/30 bg-destructive/5 text-destructive",
-          )}
-        >
-          {header.healthFetching ? (
-            <Spinner className="size-2" />
-          ) : (
-            <span
-              className={cn(
-                "size-1.5 rounded-full",
-                header.isHealthy ? "bg-primary" : "bg-destructive",
-              )}
-            />
-          )}
-          {header.healthFetching ? "Checking" : header.isHealthy ? "Healthy" : "Degraded"}
-        </span>
+                ? "System Healthy"
+                : "System Degraded"}
+          </span>
+        </div>
       }
     >
-      <div className="flex h-[calc(100dvh-7rem)] max-h-[calc(100dvh-7rem)] flex-col gap-4 overflow-hidden">
+      <div className="space-y-6 pb-12">
+        {/* Urgent Alerts (e.g. Failed background jobs) */}
         <Show when={failedJobsAlert.show}>
-          <div className="flex shrink-0 items-center gap-2 rounded-md border border-border bg-accent px-2.5 py-1.5 text-xs">
-            <AlertTriangle className="size-3.5 shrink-0 text-accent-foreground" />
-            <span className="text-foreground">
-              <strong>
-                {failedJobsAlert.failed} failed job
-                {failedJobsAlert.failed > 1 ? "s" : ""}
-              </strong>
-              {" · "}
-              <Link href="/jobs" className="underline underline-offset-2 hover:no-underline">
-                Review
+          <div className="flex items-center justify-between gap-3 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive shadow-xs">
+            <div className="flex items-center gap-2.5">
+              <AlertTriangle className="size-4.5 shrink-0 text-destructive" />
+              <div>
+                <span className="font-semibold">
+                  {failedJobsAlert.failed} background job{failedJobsAlert.failed > 1 ? "s" : ""} failed
+                </span>
+                <span className="hidden text-xs text-destructive/80 sm:inline ml-2">
+                  Some background operations require attention or retry.
+                </span>
+              </div>
+            </div>
+            <Button
+              variant="destructive"
+              size="sm"
+              className="h-7.5 gap-1 px-3 text-xs font-medium"
+              asChild
+            >
+              <Link href="/jobs">
+                Review jobs
+                <ArrowRight className="size-3" />
               </Link>
-            </span>
+            </Button>
           </div>
         </Show>
 
+        {/* Top KPI Statistics Grid */}
         <DashboardStats
           firstLoad={stats.firstLoad}
           totalUsers={stats.totalUsers}
@@ -98,15 +118,22 @@ export function DashboardOverview({
           isHealthy={stats.isHealthy}
         />
 
-        <div className="grid min-h-0 flex-1 gap-3 lg:grid-cols-[minmax(0,1fr)_260px]">
-          <DashboardActivity
-            isLoading={activity.isLoading}
-            isError={activity.isError}
-            onRetry={activity.onRetry}
-            recentActivity={activity.recentActivity}
-          />
+        {/* Primary Content Split: 2/3 Feed & Shortcuts + 1/3 Health & Users */}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          {/* Main 2-Column Section */}
+          <div className="space-y-6 lg:col-span-2">
+            <DashboardActivity
+              isLoading={activity.isLoading}
+              isError={activity.isError}
+              onRetry={activity.onRetry}
+              recentActivity={activity.recentActivity}
+            />
 
-          <div className="flex min-h-0 flex-col gap-3">
+            <DashboardQuickLinks />
+          </div>
+
+          {/* Right 1-Column Section */}
+          <div className="space-y-6 lg:col-span-1">
             <DashboardHealth
               apiHealthy={health.apiHealthy}
               dbHealthy={health.dbHealthy}
@@ -122,8 +149,6 @@ export function DashboardOverview({
             />
           </div>
         </div>
-
-        <DashboardQuickLinks />
       </div>
     </ResourcePageShell>
   );
