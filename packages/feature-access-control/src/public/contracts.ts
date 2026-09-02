@@ -7,6 +7,7 @@ export type * from "../application/ports/access-control.repository.port";
 export { RoleManagementUseCase } from "../application/use-cases/role-management.use-case";
 export {
   assertCanAssignRoleTargets,
+  assertCanManagePrivilegedAccount,
   assertRoleScopeCanBeAssigned,
   type RolePolicyTarget,
 } from "../domain/role-assignment.policy";

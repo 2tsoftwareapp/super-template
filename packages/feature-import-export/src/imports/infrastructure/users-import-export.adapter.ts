@@ -8,9 +8,8 @@ import {
 } from "@repo/feature-access-control/contracts";
 import { ORGANIZATION_MEMBERSHIP } from "@repo/feature-organizations/contracts";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "@repo/feature-users/contracts";
-import { hash } from "argon2";
+import { hashPassword } from "@repo/utils/password";
 import { randomBytes } from "node:crypto";
-
 import type { ImportExportAdapter, ImportExportRowContext } from "../../public/contracts";
 
 export interface UserRow {
@@ -123,7 +122,7 @@ export class UsersImportExportAdapter implements ImportExportAdapter<UserRow> {
     executor?: TransactionExecutor,
   ): Promise<void> {
     const temporaryPassword = randomBytes(32).toString("hex");
-    const passwordHash = await hash(temporaryPassword);
+    const passwordHash = await hashPassword(temporaryPassword);
 
     const user = await this.usersRepository.create(
       {

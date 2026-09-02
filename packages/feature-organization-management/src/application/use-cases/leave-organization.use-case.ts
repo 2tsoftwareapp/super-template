@@ -11,9 +11,7 @@ import {
   type OrganizationAccessControlPort,
   type OrganizationMembership,
 } from "@repo/feature-organizations/contracts";
-
-import { assertNotLastOwner } from "../../domain/organization-access.policy";
-
+import { assertNotLastOwner } from "@repo/feature-organizations/contracts";
 @Injectable()
 export class LeaveOrganizationUseCase {
   constructor(

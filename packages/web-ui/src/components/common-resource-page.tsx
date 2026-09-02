@@ -5,7 +5,7 @@ import type { ComponentType, ReactNode } from "react";
 
 import { cn } from "@repo/web-utils/utils";
 
-import { BulkActionBar } from "../composables/bulk-action-bar";
+import { BulkActionBar } from "./bulk-action-bar";
 import { Pagination } from "./pagination";
 import { type ResourcePageLinkComponent, ResourcePageShell } from "./resource-page-shell";
 import { type ResourceStatCardItem, ResourceStatCards } from "./resource-stat-cards";

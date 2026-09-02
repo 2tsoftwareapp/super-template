@@ -1,8 +1,9 @@
 "use client";
 
+import { useAnimatePresence } from "@repo/web-hooks/use-animate-presence";
 import { cn } from "@repo/web-utils/utils";
 import { X } from "lucide-react";
-import { type ReactNode, useEffect, useState } from "react";
+import type { ReactNode } from "react";
 
 import { Button } from "./button";
 
@@ -23,21 +24,7 @@ export function ResourceDrawer({
   onClose: () => void;
   className?: string;
 }) {
-  const [visible, setVisible] = useState(false);
-  const [animate, setAnimate] = useState(false);
-
-  useEffect(() => {
-    if (open) {
-      setVisible(true);
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => setAnimate(true));
-      });
-    } else {
-      setAnimate(false);
-      const timer = setTimeout(() => setVisible(false), 200);
-      return () => clearTimeout(timer);
-    }
-  }, [open]);
+  const { visible, animate } = useAnimatePresence(open);
 
   if (!visible) return null;
 
@@ -69,7 +56,12 @@ export function ResourceDrawer({
               {title}
             </h2>
             {description ? (
-              <p id="resource-drawer-description" className="mt-1 text-sm leading-6 text-muted-foreground">{description}</p>
+              <p
+                id="resource-drawer-description"
+                className="mt-1 text-sm leading-6 text-muted-foreground"
+              >
+                {description}
+              </p>
             ) : null}
           </div>
           <Button variant="ghost" size="icon" onClick={onClose} aria-label="Close panel">

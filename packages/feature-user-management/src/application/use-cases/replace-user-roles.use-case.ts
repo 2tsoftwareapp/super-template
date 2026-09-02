@@ -24,7 +24,7 @@ import { USERS_REPOSITORY, type UsersRepositoryPort } from "@repo/feature-users/
 import {
   assertCanAssignRoleTargets,
   assertRoleScopeCanBeAssigned,
-} from "../../domain-role-assignment.policy";
+} from "@repo/feature-access-control/contracts";
 import { assertUserBelongsToOrganization } from "../../user-org-scope.policy";
 import { resolveRoleById } from "../assignable-role.resolver";
 import { GetUserUseCase } from "./get-user.use-case";

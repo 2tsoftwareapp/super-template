@@ -19,9 +19,7 @@ import {
   ORGANIZATION_USER_ROLES_PURGE,
   ORGANIZATIONS_REPOSITORY,
 } from "@repo/feature-organizations/contracts";
-
-import { assertOrganizationRole } from "../../domain/organization-access.policy";
-
+import { assertOrganizationRole } from "@repo/feature-organizations/contracts";
 /** Platform super-role literal; importing access-control here would create a package cycle. */
 const PLATFORM_SUPER_ADMIN = "SUPER_ADMIN";
 

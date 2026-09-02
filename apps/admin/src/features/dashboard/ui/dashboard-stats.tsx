@@ -119,12 +119,7 @@ export function DashboardStats({
         badgeVariant={isHealthy ? "default" : "destructive"}
         sub={healthFetching ? "Verifying connectivity..." : "All services communicating"}
         icon={
-          <Activity
-            className={cn(
-              "size-4",
-              isHealthy ? "text-primary" : "text-destructive",
-            )}
-          />
+          <Activity className={cn("size-4", isHealthy ? "text-primary" : "text-destructive")} />
         }
         iconBg={cn(
           "border",
@@ -204,7 +199,12 @@ function StatCard({
               {badge}
             </Badge>
           ) : null}
-          <div className={cn("flex size-7.5 items-center justify-center rounded-lg transition-transform group-hover:scale-105", iconBg)}>
+          <div
+            className={cn(
+              "flex size-7.5 items-center justify-center rounded-lg transition-transform group-hover:scale-105",
+              iconBg,
+            )}
+          >
             {icon}
           </div>
         </div>
@@ -214,9 +214,7 @@ function StatCard({
         {loading ? (
           <div className="h-7.5 w-20 animate-pulse rounded-lg bg-muted" />
         ) : (
-          <p className="text-2xl font-bold tracking-tight text-foreground tabular-nums">
-            {value}
-          </p>
+          <p className="text-2xl font-bold tracking-tight text-foreground tabular-nums">{value}</p>
         )}
         {sub ? (
           <p className="mt-1 flex items-center gap-1 text-[11px] text-muted-foreground truncate">

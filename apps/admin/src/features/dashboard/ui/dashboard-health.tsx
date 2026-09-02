@@ -1,6 +1,14 @@
 import { Badge } from "@repo/web-ui/badge";
 import { Card, CardContent, CardHeader } from "@repo/web-ui/card";
-import { CheckCircle2, Database, HardDrive, Layers, Server, ShieldCheck, Workflow } from "lucide-react";
+import {
+  CheckCircle2,
+  Database,
+  HardDrive,
+  Layers,
+  Server,
+  ShieldCheck,
+  Workflow,
+} from "lucide-react";
 
 import { cn } from "@/lib/utils";
 

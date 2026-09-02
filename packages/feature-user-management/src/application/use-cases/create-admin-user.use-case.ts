@@ -29,7 +29,7 @@ import { hashPassword } from "@repo/utils/password";
 import {
   assertCanAssignRoleTargets,
   assertRoleScopeCanBeAssigned,
-} from "../../domain-role-assignment.policy";
+} from "@repo/feature-access-control/contracts";
 import { resolveRoleById } from "../assignable-role.resolver";
 import { GetUserUseCase } from "./get-user.use-case";
 

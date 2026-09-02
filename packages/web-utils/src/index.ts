@@ -7,6 +7,14 @@ export { adminResourceGroups, composeAdminResources } from "./admin-resource";
 export type * from "./api-types";
 export type { ClassifiedError, ErrorKind, ErrorScope } from "./errors";
 export { classifyError, getErrorMessage, isRetryableError, shouldRetryQuery } from "./errors";
+export {
+  formatBytes,
+  formatDateTime,
+  formatUnknownDateTime,
+  scalarString,
+  timeAgo,
+  truncateId,
+} from "./format";
 export { ApiClientError, getCsrfCookieName, webFetch, webFetchBlob } from "./http";
 export type { JsonArray, JsonObject, JsonPrimitive, JsonValue } from "./json";
 export { isJsonObject, isJsonValue, parseJsonValue } from "./json";

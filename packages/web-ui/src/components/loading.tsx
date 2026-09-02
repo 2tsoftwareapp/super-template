@@ -31,13 +31,9 @@ function FullScreenLoading({
             <Spinner className="size-5 text-primary" />
           </div>
           <div className="space-y-1 text-center">
-            <h3 className="text-sm font-semibold tracking-tight text-foreground">
-              {title}
-            </h3>
+            <h3 className="text-sm font-semibold tracking-tight text-foreground">{title}</h3>
             {description ? (
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                {description}
-              </p>
+              <p className="text-xs text-muted-foreground leading-relaxed">{description}</p>
             ) : null}
           </div>
         </div>

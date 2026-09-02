@@ -1,6 +1,7 @@
 import type { PlatformTransactionPort, TransactionExecutor } from "@repo/api-runtime";
 
 import { Inject, Injectable } from "@nestjs/common";
+import { sql } from "drizzle-orm";
 
 import type { DatabaseClient } from "./database.types";
 
@@ -30,16 +31,17 @@ export class DrizzlePlatformTransactionService implements PlatformTransactionPor
     fn: () => Promise<T>,
   ): Promise<T> {
     const tx = toSavepointExecutor(executor);
+    const escaped = name.replace(/"/g, '""');
+    const identifier = `"${escaped}"`;
 
-    const { sql } = await import("drizzle-orm");
     try {
-      await tx.execute(sql.raw(`SAVEPOINT ${name}`));
+      await tx.execute(sql.raw(`SAVEPOINT ${identifier}`));
       const result = await fn();
-      await tx.execute(sql.raw(`RELEASE SAVEPOINT ${name}`));
+      await tx.execute(sql.raw(`RELEASE SAVEPOINT ${identifier}`));
       return result;
     } catch (error) {
-      await tx.execute(sql.raw(`ROLLBACK TO SAVEPOINT ${name}`));
-      await tx.execute(sql.raw(`RELEASE SAVEPOINT ${name}`));
+      await tx.execute(sql.raw(`ROLLBACK TO SAVEPOINT ${identifier}`));
+      await tx.execute(sql.raw(`RELEASE SAVEPOINT ${identifier}`));
       throw error;
     }
   }

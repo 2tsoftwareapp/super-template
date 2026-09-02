@@ -11,7 +11,7 @@ import { useEffect, useMemo } from "react";
 import { useForm, useWatch } from "react-hook-form";
 
 import { PermissionMultiSelect } from "@/components/permission-multi-select";
-import { ResourceDrawer } from "@/components/resource-drawer";
+import { ResourceDrawer } from "@repo/web-ui/resource-drawer";
 import { selectDelegatablePermissions } from "@/features/roles/model/roles.permissions";
 import {
   createRoleFormSchema,

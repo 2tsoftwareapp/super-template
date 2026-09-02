@@ -1,12 +1,15 @@
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
+// @vitest-environment jsdom
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { BulkActionBar } from "../bulk-action-bar";
 
-describe("BulkActionBar re-export", () => {
-  it("renders selected record count and clear button", async () => {
-    const user = userEvent.setup();
+describe("BulkActionBar", () => {
+  afterEach(() => {
+    cleanup();
+  });
+
+  it("renders selected record count and clear button", () => {
     const onClear = vi.fn();
 
     render(
@@ -21,7 +24,7 @@ describe("BulkActionBar re-export", () => {
     expect(screen.getByText("Delete")).toBeInTheDocument();
 
     const clearButton = screen.getByRole("button", { name: "Clear selection" });
-    await user.click(clearButton);
+    fireEvent.click(clearButton);
     expect(onClear).toHaveBeenCalledTimes(1);
   });
 

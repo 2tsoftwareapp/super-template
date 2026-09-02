@@ -13,8 +13,7 @@ import { useForm, useWatch } from "react-hook-form";
 
 import type { CreateUserForm } from "@/features/users/model/users.schemas";
 import type { AdminUserDto, RoleDto } from "@/lib/api-types";
-
-import { ResourceDrawer } from "@/components/resource-drawer";
+import { ResourceDrawer } from "@repo/web-ui/resource-drawer";
 import { createUserSchema } from "@/features/users/model/users.schemas";
 import { filterRolesForOrganization, findPlatformUserRoleId, formatRoleName } from "@/lib/roles";
 

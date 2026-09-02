@@ -7,9 +7,7 @@ import { Label } from "@repo/web-ui/label";
 import { Spinner } from "@repo/web-ui/spinner";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-
-import { ResourceDrawer } from "@/components/resource-drawer";
-
+import { ResourceDrawer } from "@repo/web-ui/resource-drawer";
 import {
   type CreateOrganizationForm,
   createOrganizationSchema,

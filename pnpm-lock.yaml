@@ -1311,9 +1311,9 @@ importers:
       '@repo/feature-users':
         specifier: workspace:*
         version: link:../feature-users
-      argon2:
-        specifier: 0.44.0
-        version: 0.44.0
+      '@repo/utils':
+        specifier: workspace:*
+        version: link:../utils
       class-transformer:
         specifier: 0.5.1
         version: 0.5.1

@@ -35,7 +35,12 @@ export function DashboardUsers({ isLoading, isError, onRetry, recentUsers }: Das
           <p className="text-xs text-muted-foreground">Newly active accounts in workspace</p>
         </div>
 
-        <Button variant="ghost" size="sm" className="h-8 gap-1 px-2.5 text-xs text-muted-foreground hover:text-foreground" asChild>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 gap-1 px-2.5 text-xs text-muted-foreground hover:text-foreground"
+          asChild
+        >
           <Link href="/users">
             View all
             <ArrowRight className="size-3.5" />
@@ -81,9 +86,7 @@ export function DashboardUsers({ isLoading, isError, onRetry, recentUsers }: Das
                     <p className="truncate text-xs font-semibold text-foreground group-hover:text-primary transition-colors">
                       {user.displayName || "Unknown User"}
                     </p>
-                    <p className="truncate text-[11px] text-muted-foreground">
-                      {user.email}
-                    </p>
+                    <p className="truncate text-[11px] text-muted-foreground">{user.email}</p>
                   </div>
                 </div>
 

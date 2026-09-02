@@ -2,6 +2,7 @@ import type { TenantContext, TransactionExecutor, TransactionPort } from "@repo/
 
 import { Inject, Injectable } from "@nestjs/common";
 import { TenantContextService } from "@repo/api-runtime";
+import { sql } from "drizzle-orm";
 
 import type { DatabaseClient } from "./database.types";
 
@@ -43,7 +44,6 @@ export class DrizzleTransactionService implements TransactionPort {
     // hyphens ("550e8400-e29b-..."), which is not a valid bare identifier, so
     // the name must be double-quoted (and any embedded quote escaped) to avoid
     // a syntax error. See H-002 (Feature 07 Round 5).
-    const { sql } = await import("drizzle-orm");
     const escaped = name.replace(/"/g, '""');
     const identifier = `"${escaped}"`;
     try {

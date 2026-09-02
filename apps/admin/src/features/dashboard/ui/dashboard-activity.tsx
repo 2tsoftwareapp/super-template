@@ -54,7 +54,12 @@ export function DashboardActivity({
           </p>
         </div>
 
-        <Button variant="ghost" size="sm" className="h-8 gap-1 px-2.5 text-xs text-muted-foreground hover:text-foreground" asChild>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 gap-1 px-2.5 text-xs text-muted-foreground hover:text-foreground"
+          asChild
+        >
           <Link href="/audit-logs">
             View all
             <ArrowRight className="size-3.5" />
@@ -108,12 +113,18 @@ export function DashboardActivity({
                         <p className="truncate text-xs font-semibold text-foreground">
                           {formatAction(entry.action)}
                         </p>
-                        <Badge variant="outline" className="hidden px-1.5 py-0 text-[9px] font-normal sm:inline-flex">
+                        <Badge
+                          variant="outline"
+                          className="hidden px-1.5 py-0 text-[9px] font-normal sm:inline-flex"
+                        >
                           {category}
                         </Badge>
                       </div>
                       <p className="truncate text-[11px] text-muted-foreground">
-                        Target: <span className="font-mono text-[10px] text-foreground/80">{entry.entityType}</span>
+                        Target:{" "}
+                        <span className="font-mono text-[10px] text-foreground/80">
+                          {entry.entityType}
+                        </span>
                       </p>
                     </div>
                   </div>
@@ -192,7 +203,11 @@ function auditIcon(action: string) {
       textClass: "text-amber-600 dark:text-amber-400",
     };
   }
-  if (action.startsWith("role") || action.startsWith("permission") || action.startsWith("security")) {
+  if (
+    action.startsWith("role") ||
+    action.startsWith("permission") ||
+    action.startsWith("security")
+  ) {
     return {
       category: "Security",
       icon: <Shield className="size-3.5" />,

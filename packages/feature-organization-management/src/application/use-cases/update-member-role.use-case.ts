@@ -6,6 +6,9 @@ import { AppError, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
 import { ACTIVITY_EMITTER, type ActivityEmitter } from "@repo/feature-activities/contracts";
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 import {
+  assertCanManageTargetRole,
+  assertNotLastOwner,
+  assertOrganizationRole,
   ORGANIZATION_ACCESS_CONTROL,
   ORGANIZATION_ERROR_CODES,
   ORGANIZATION_MEMBERSHIP,
@@ -13,12 +16,6 @@ import {
   type OrganizationMemberRole,
   type OrganizationMembership,
 } from "@repo/feature-organizations/contracts";
-
-import {
-  assertCanManageTargetRole,
-  assertNotLastOwner,
-  assertOrganizationRole,
-} from "../../domain/organization-access.policy";
 
 /** Platform super-role literal; importing access-control here would create a package cycle. */
 const PLATFORM_SUPER_ADMIN = "SUPER_ADMIN";

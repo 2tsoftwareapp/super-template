@@ -6,14 +6,15 @@ import { CommonResourcePage } from "@repo/web-ui/common-resource-page";
 import { Empty, EmptyContent, EmptyHeader, EmptyTitle } from "@repo/web-ui/empty";
 import { ErrorState } from "@repo/web-ui/error-state";
 import { SectionLoading } from "@repo/web-ui/loading";
+import { ResourceDataTable } from "@repo/web-ui/resource-data-table";
 import { Show } from "@repo/web-ui/show";
+import type { Table as ReactTable } from "@tanstack/react-table";
 
-import type { NotificationsViewModel } from "@/features/notifications/model/notifications.types";
-
-import { ResourceTable } from "@/components/resource-table";
 import { adminResources } from "@/features/_plugin-resources/admin-resources";
 import { scalarString, timeAgo } from "@/lib/format";
 import { cn } from "@/lib/utils";
+
+import type { NotificationsViewModel } from "../model/notifications.types";
 
 import { NotificationComposeForm } from "./notification-compose-form";
 
@@ -68,12 +69,15 @@ export function NotificationsListView({
                 </CardDescription>
               </CardHeader>
               <CardContent className="p-0 pb-1">
-                <ResourceTable
+                <ResourceDataTable
                   table={table}
                   isLoading={jobs.isLoading}
-                  {...(jobs.isError ? { error: { title: "Could not load delivery jobs." } } : {})}
-                  onRetry={jobs.onRetry}
-                  emptyTitle="No notification jobs yet."
+                  error={
+                    jobs.isError
+                      ? { title: "Could not load delivery jobs.", onRetry: jobs.onRetry }
+                      : undefined
+                  }
+                  empty={{ title: "No notification jobs yet." }}
                 />
               </CardContent>
             </Card>

@@ -79,7 +79,8 @@ export function DashboardOverview({
               <AlertTriangle className="size-4.5 shrink-0 text-destructive" />
               <div>
                 <span className="font-semibold">
-                  {failedJobsAlert.failed} background job{failedJobsAlert.failed > 1 ? "s" : ""} failed
+                  {failedJobsAlert.failed} background job{failedJobsAlert.failed > 1 ? "s" : ""}{" "}
+                  failed
                 </span>
                 <span className="hidden text-xs text-destructive/80 sm:inline ml-2">
                   Some background operations require attention or retry.

@@ -1,4 +1,4 @@
-export { BulkActionBar } from "./bulk-action-bar";
-export { ResourceDrawer } from "./resource-drawer";
-export { ResourcePageShell } from "./resource-page-shell";
-export { ResourceToolbar } from "./resource-toolbar";
+export { BulkActionBar } from "../components/bulk-action-bar";
+export { ResourceDrawer } from "../components/resource-drawer";
+export { ResourcePageShell } from "../components/resource-page-shell";
+export { ResourceToolbar } from "../components/resource-toolbar";
