@@ -108,7 +108,7 @@ export function ResourceFacetedFilter({
               <Badge variant="secondary" className="rounded-sm px-1 font-normal lg:hidden">
                 {selectedValues.length}
               </Badge>
-              <div className="hidden gap-1 lg:flex">
+              <span className="hidden gap-1 lg:flex">
                 {selectedValues.length > 2 ? (
                   <Badge variant="secondary" className="rounded-sm px-1 font-normal">
                     {selectedValues.length} selected
@@ -126,7 +126,7 @@ export function ResourceFacetedFilter({
                       </Badge>
                     ))
                 )}
-              </div>
+              </span>
             </>
           ) : null}
         </Button>

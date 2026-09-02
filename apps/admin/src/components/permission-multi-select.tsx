@@ -83,7 +83,7 @@ export function PermissionMultiSelect({
             error && "border-destructive",
           )}
         >
-          <div className="flex flex-wrap items-center gap-1.5 overflow-hidden">
+          <span className="flex flex-wrap items-center gap-1.5 overflow-hidden">
             {selected.length === 0 ? (
               <span className="text-muted-foreground text-xs">Select permissions…</span>
             ) : selected.length <= 2 ? (
@@ -102,7 +102,7 @@ export function PermissionMultiSelect({
                 </span>
               </>
             )}
-          </div>
+          </span>
           <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
         </PopoverTrigger>
         <PopoverContent

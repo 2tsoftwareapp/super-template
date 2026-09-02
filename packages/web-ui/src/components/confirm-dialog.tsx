@@ -52,10 +52,12 @@ export function ConfirmDialog({
       <div
         role="dialog"
         aria-modal="true"
+        aria-labelledby="confirm-dialog-title"
+        aria-describedby="confirm-dialog-message"
         className="relative z-10 w-full max-w-sm rounded-xl border border-border bg-card p-5 shadow-2xl"
       >
-        <h3 className="text-sm font-semibold">{title}</h3>
-        <div className="mt-2 text-sm text-muted-foreground">{message}</div>
+        <h3 id="confirm-dialog-title" className="text-sm font-semibold">{title}</h3>
+        <div id="confirm-dialog-message" className="mt-2 text-sm text-muted-foreground">{message}</div>
         <div className="mt-4 flex justify-end gap-2">
           <Button variant="outline" size="sm" onClick={onCancel} disabled={loading}>
             {cancelLabel}

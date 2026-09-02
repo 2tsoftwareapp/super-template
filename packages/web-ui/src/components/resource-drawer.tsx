@@ -56,6 +56,7 @@ export function ResourceDrawer({
         aria-modal="true"
         role="dialog"
         aria-labelledby="resource-drawer-title"
+        aria-describedby={description ? "resource-drawer-description" : undefined}
         className={cn(
           "fixed right-0 top-0 z-50 flex h-dvh w-full max-w-[440px] flex-col border-l border-border bg-card shadow-2xl transition-transform duration-200",
           animate ? "translate-x-0" : "translate-x-full",
@@ -68,7 +69,7 @@ export function ResourceDrawer({
               {title}
             </h2>
             {description ? (
-              <p className="mt-1 text-sm leading-6 text-muted-foreground">{description}</p>
+              <p id="resource-drawer-description" className="mt-1 text-sm leading-6 text-muted-foreground">{description}</p>
             ) : null}
           </div>
           <Button variant="ghost" size="icon" onClick={onClose} aria-label="Close panel">
