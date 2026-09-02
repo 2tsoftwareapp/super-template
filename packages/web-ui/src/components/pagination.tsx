@@ -1,8 +1,10 @@
 import { cn } from "@repo/web-utils/utils";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import type { ReactNode } from "react";
 
 import { Button } from "./button";
 import { Label } from "./label";
-
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./select";
 export const DEFAULT_PAGE_SIZES = [10, 20, 50, 100] as const;
 export type PageSize = (typeof DEFAULT_PAGE_SIZES)[number];
 
@@ -14,7 +16,7 @@ export function Pagination({
   pageSizeOptions = DEFAULT_PAGE_SIZES,
   onPageChange,
   onPageSizeChange,
-  isLoading,
+  isLoading = false,
 }: {
   page: number;
   pageSize: number;
@@ -53,22 +55,22 @@ export function Pagination({
             <Label htmlFor="pagination-page-size" className="text-xs text-muted-foreground">
               Rows
             </Label>
-            <select
-              id="pagination-page-size"
-              value={pageSize}
+            <Select
+              value={String(pageSize)}
               disabled={isLoading}
-              onChange={(e) => onPageSizeChange(Number(e.target.value))}
-              className={cn(
-                "h-7 rounded-md border border-input bg-background px-2 text-xs text-foreground",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-              )}
+              onValueChange={(val) => onPageSizeChange(Number(val))}
             >
-              {pageSizeOptions.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
+              <SelectTrigger id="pagination-page-size" size="sm" className="h-7 w-[72px] text-xs">
+                <SelectValue placeholder={String(pageSize)} />
+              </SelectTrigger>
+              <SelectContent side="top" align="start">
+                {pageSizeOptions.map((option) => (
+                  <SelectItem key={option} value={String(option)} className="text-xs">
+                    {option}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         )}
       </div>

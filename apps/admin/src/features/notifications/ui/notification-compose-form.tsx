@@ -5,6 +5,7 @@ import { ErrorState } from "@repo/web-ui/error-state";
 import { Input } from "@repo/web-ui/input";
 import { Label } from "@repo/web-ui/label";
 import { LoadingButton } from "@repo/web-ui/loading-button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@repo/web-ui/select";
 import { Show } from "@repo/web-ui/show";
 import { Textarea } from "@repo/web-ui/textarea";
 import { useForm, useWatch } from "react-hook-form";
@@ -53,18 +54,23 @@ export function NotificationComposeForm({
           action={{ label: "Retry", onClick: () => onSubmit(form.getValues()) }}
         />
       </Show>
-
       <div className="space-y-1.5">
         <Label htmlFor="notif-audience">Audience</Label>
-        <select
-          id="notif-audience"
-          className="flex h-9 w-full rounded-lg border border-input bg-background px-3 text-sm shadow-xs outline-hidden transition-colors focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
-          {...form.register("audience")}
+        <Select
+          value={audience}
+          onValueChange={(val: "ALL" | "USER" | "USERS") => {
+            form.setValue("audience", val, { shouldValidate: true, shouldDirty: true });
+          }}
         >
-          <option value="ALL">All users</option>
-          <option value="USER">Single user</option>
-          <option value="USERS">Multiple users</option>
-        </select>
+          <SelectTrigger id="notif-audience" className="w-full">
+            <SelectValue placeholder="Select audience…" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="ALL">All users</SelectItem>
+            <SelectItem value="USER">Single user</SelectItem>
+            <SelectItem value="USERS">Multiple users</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {audience === "USER" ? (

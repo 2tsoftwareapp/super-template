@@ -4,6 +4,7 @@ import { standardSchemaResolver as zodResolver } from "@hookform/resolvers/stand
 import { Input } from "@repo/web-ui/input";
 import { Label } from "@repo/web-ui/label";
 import { LoadingButton } from "@repo/web-ui/loading-button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@repo/web-ui/select";
 import { useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 
@@ -56,18 +57,24 @@ export function MailSendForm({
           <Label htmlFor="send-template" className="text-xs">
             Template
           </Label>
-          <select
-            id="send-template"
-            className="flex h-9 w-full rounded-lg border border-input bg-background px-3 text-sm shadow-xs outline-hidden transition-colors focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+          <Select
+            value={selectedTemplateKey}
             disabled={sendableTemplates.length === 0}
-            {...form.register("templateKey")}
+            onValueChange={(val) => {
+              form.setValue("templateKey", val, { shouldValidate: true, shouldDirty: true });
+            }}
           >
-            {sendableTemplates.map((t) => (
-              <option key={t.key} value={t.key}>
-                {t.key}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger id="send-template" className="w-full">
+              <SelectValue placeholder="Select template…" />
+            </SelectTrigger>
+            <SelectContent>
+              {sendableTemplates.map((t) => (
+                <SelectItem key={t.key} value={t.key}>
+                  {t.key}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           {sendableTemplates.length === 0 && (
             <p className="text-[10px] text-muted-foreground">No sendable templates available.</p>
           )}

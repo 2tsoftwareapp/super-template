@@ -4,8 +4,8 @@ import { standardSchemaResolver as zodResolver } from "@hookform/resolvers/stand
 import { Input } from "@repo/web-ui/input";
 import { Label } from "@repo/web-ui/label";
 import { LoadingButton } from "@repo/web-ui/loading-button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@repo/web-ui/select";
 import { useForm } from "react-hook-form";
-
 import type { IMPORT_TYPES } from "../model/imports.constants";
 
 import { type CreateImportFormValues, createImportSchema } from "../model/imports.schemas";
@@ -50,19 +50,24 @@ export function CreateImportForm({
       </div>
       <div className="space-y-2">
         <Label htmlFor="import-type">Type</Label>
-        <select
-          id="import-type"
-          className="flex h-9 w-full rounded-lg border border-input bg-background px-3 text-sm shadow-xs outline-hidden transition-colors focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
-          aria-invalid={Boolean(form.formState.errors.type)}
+        <Select
+          value={form.watch("type")}
           disabled={!canCreate}
-          {...form.register("type")}
+          onValueChange={(val) => {
+            form.setValue("type", val, { shouldValidate: true, shouldDirty: true });
+          }}
         >
-          {importTypes.map((t) => (
-            <option key={t.value} value={t.value}>
-              {t.label}
-            </option>
-          ))}
-        </select>
+          <SelectTrigger id="import-type" className="w-full">
+            <SelectValue placeholder="Select type…" />
+          </SelectTrigger>
+          <SelectContent>
+            {importTypes.map((t) => (
+              <SelectItem key={t.value} value={t.value}>
+                {t.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         {form.formState.errors.type ? (
           <p className="text-xs text-destructive">{form.formState.errors.type.message}</p>
         ) : null}
