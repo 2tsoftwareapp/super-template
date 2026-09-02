@@ -37,12 +37,8 @@ export function OrganizationsListView(vm: OrganizationsListViewModel) {
     noOrgs,
     onNavigate,
     drawer,
+    stats,
   } = vm;
-
-  const totalOrgs = organizations.length;
-  const ownerCount = organizations.filter((o) => o.role === "OWNER").length;
-  const adminCount = organizations.filter((o) => o.role === "ADMIN").length;
-  const memberCount = organizations.filter((o) => o.role === "MEMBER").length;
 
   return (
     <>
@@ -63,25 +59,25 @@ export function OrganizationsListView(vm: OrganizationsListViewModel) {
         stats={[
           {
             label: "Total Organizations",
-            value: totalOrgs,
+            value: stats.total,
             icon: Building,
             description: "Registered workspace tenants",
           },
           {
             label: "Owned Workspaces",
-            value: ownerCount,
+            value: stats.owner,
             icon: Crown,
             description: "Workspaces you own",
           },
           {
             label: "Admin Workspaces",
-            value: adminCount,
+            value: stats.admin,
             icon: Shield,
             description: "Workspaces you administer",
           },
           {
             label: "Member Workspaces",
-            value: memberCount,
+            value: stats.member,
             icon: Users,
             description: "General team memberships",
           },

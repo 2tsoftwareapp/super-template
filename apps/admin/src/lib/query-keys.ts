@@ -13,6 +13,7 @@ export const organizationsKeys = {
   details: () => [...organizationsKeys.all, "detail"] as const,
   detail: (id: string) => [...organizationsKeys.details(), id] as const,
   members: (id: string) => [...organizationsKeys.all, "members", id] as const,
+  member: (orgId: string, userId: string) => [...organizationsKeys.members(orgId), userId] as const,
 };
 
 export const rolesKeys = {

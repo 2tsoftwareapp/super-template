@@ -79,6 +79,11 @@ export function useOrganizationsController(): OrganizationsListViewModel {
   const noResults = Boolean(debouncedSearch) && filteredOrgs.length === 0;
   const noOrgs = !debouncedSearch && filteredOrgs.length === 0;
 
+  const totalOrgs = filteredOrgs.length;
+  const ownerCount = filteredOrgs.filter((o) => o.role === "OWNER").length;
+  const adminCount = filteredOrgs.filter((o) => o.role === "ADMIN").length;
+  const memberCount = filteredOrgs.filter((o) => o.role === "MEMBER").length;
+
   const handleRetry = () => {
     void queryClient.invalidateQueries({ queryKey: organizationsKeys.all });
   };
@@ -109,6 +114,12 @@ export function useOrganizationsController(): OrganizationsListViewModel {
     noResults,
     noOrgs,
     onNavigate: (orgId) => router.push(`/organizations/${orgId}`),
+    stats: {
+      total: totalOrgs,
+      owner: ownerCount,
+      admin: adminCount,
+      member: memberCount,
+    },
     drawer: {
       open: drawerOpen,
       onOpen: () => setDrawerOpen(true),

@@ -33,6 +33,14 @@ function getSegmentLabel(
   accumulatedPath: string,
   t: (key: string) => string,
 ): string {
+  // Dynamic identifier patterns (UUIDs, prefixed IDs, numeric IDs) — skip translation
+  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(segment)) {
+    return `#${segment.slice(0, 8)}`;
+  }
+  if (/^[a-z]{2,5}_[a-zA-Z0-9]+$/.test(segment) || /^\d+$/.test(segment)) {
+    return `#${segment}`;
+  }
+
   const resource = getResourceForPath(accumulatedPath);
   if (resource?.path === accumulatedPath) {
     try {
@@ -53,15 +61,7 @@ function getSegmentLabel(
       return translatedNav;
     }
   } catch {
-    // Fall through to pattern detection
-  }
-
-  // Dynamic identifier patterns (UUIDs, prefixed IDs, numeric IDs)
-  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(segment)) {
-    return `#${segment.slice(0, 8)}`;
-  }
-  if (/^[a-z]{2,5}_[a-zA-Z0-9]+$/.test(segment) || /^\d+$/.test(segment)) {
-    return `#${segment}`;
+    // Fall through to fallback
   }
 
   // Fallback: title-case kebab / snake string

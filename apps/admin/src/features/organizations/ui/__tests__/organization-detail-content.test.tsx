@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
+import React from "react";
 
 import type { OrganizationDetailViewModel } from "@/features/organizations/model/organizations.types";
 import type { OrganizationDetailDto, OrganizationMemberDto } from "@/lib/api-types";
@@ -15,6 +16,27 @@ vi.mock("@/i18n/navigation", () => ({
       {children}
     </a>
   ),
+}));
+
+vi.mock("../organization-members-table", () => ({
+  OrganizationMembersTable: ({ table }: any) => (
+    <div data-testid="members-table-mock">
+      {table.getRowModel().rows.map((row: any) => (
+        <div key={row.id}>
+          <span>{row.original.displayName}</span>
+          <span>{row.original.role.toLowerCase()}</span>
+        </div>
+      ))}
+    </div>
+  ),
+}));
+
+vi.mock("../member-detail-pane", () => ({
+  MemberDetailPane: () => <div data-testid="member-detail-pane-mock" />,
+}));
+
+vi.mock("../edit-organization-drawer", () => ({
+  EditOrganizationDrawer: () => <div data-testid="edit-drawer-mock" />,
 }));
 
 const mockOrg: OrganizationDetailDto = {
@@ -57,6 +79,18 @@ const mockMembers: OrganizationMemberDto[] = [
 function createMockDetailViewModel(
   overrides?: Partial<OrganizationDetailViewModel>,
 ): OrganizationDetailViewModel {
+  const tableMock = {
+    getRowModel: () => ({
+      rows: mockMembers.map((m) => ({
+        id: m.userId,
+        original: m,
+      })),
+    }),
+    getVisibleLeafColumns: () => [],
+    getAllLeafColumns: () => [],
+    getState: () => ({ sorting: [] }),
+  } as any;
+
   return {
     orgId: "org-1",
     backHref: "/organizations",
@@ -104,6 +138,13 @@ function createMockDetailViewModel(
       isUpdatingRole: false,
       isRemoving: false,
     },
+    memberDetail: {
+      open: false,
+      selectedMember: null,
+      onOpen: vi.fn(),
+      onClose: vi.fn(),
+    },
+    table: tableMock,
     ...overrides,
   };
 }
@@ -117,6 +158,12 @@ describe("OrganizationDetailContent", () => {
     expect(screen.getByText("Slug identifier")).toBeInTheDocument();
     expect(screen.getByText("acme-corp")).toBeInTheDocument();
     expect(screen.getByText("Members Directory")).toBeInTheDocument();
+  });
+
+  it("renders member names from the directory", () => {
+    const vm = createMockDetailViewModel();
+    render(<OrganizationDetailContent {...vm} />);
+
     expect(screen.getByText("Alice Owner")).toBeInTheDocument();
     expect(screen.getByText("Bob Admin")).toBeInTheDocument();
     expect(screen.getByText("Charlie Member")).toBeInTheDocument();
@@ -131,25 +178,6 @@ describe("OrganizationDetailContent", () => {
     expect(screen.getByText("member")).toBeInTheDocument();
   });
 
-  it("renders role management action buttons for manageable members", () => {
-    const vm = createMockDetailViewModel();
-    render(<OrganizationDetailContent {...vm} />);
-
-    expect(screen.getByRole("button", { name: /make owner/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /demote to member/i })).toBeInTheDocument();
-  });
-
-  it("calls member role update when clicking Make Owner", async () => {
-    const user = userEvent.setup();
-    const vm = createMockDetailViewModel();
-    render(<OrganizationDetailContent {...vm} />);
-
-    const makeOwnerBtn = screen.getByRole("button", { name: /make owner/i });
-    await user.click(makeOwnerBtn);
-
-    expect(vm.memberActions.onUpdateRole).toHaveBeenCalledWith("u-admin", "OWNER");
-  });
-
   it("opens delete modal when clicking Delete button", async () => {
     const user = userEvent.setup();
     const vm = createMockDetailViewModel();
@@ -159,5 +187,19 @@ describe("OrganizationDetailContent", () => {
     await user.click(deleteBtn);
 
     expect(vm.deleteConfirm.onOpen).toHaveBeenCalled();
+  });
+
+  it("renders error state when isError is true", () => {
+    const vm = createMockDetailViewModel({ isError: true, org: null });
+    render(<OrganizationDetailContent {...vm} />);
+
+    expect(screen.getByText("Could not load organization.")).toBeInTheDocument();
+  });
+
+  it("renders empty state when org is not found", () => {
+    const vm = createMockDetailViewModel({ org: null });
+    render(<OrganizationDetailContent {...vm} />);
+
+    expect(screen.getAllByText("Organization not found").length).toBeGreaterThan(0);
   });
 });

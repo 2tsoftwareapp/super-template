@@ -1,7 +1,5 @@
 "use client";
 
-import { Avatar } from "@repo/web-ui/avatar";
-import { Badge } from "@repo/web-ui/badge";
 import { Button } from "@repo/web-ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@repo/web-ui/card";
 import { ConfirmDialog } from "@repo/web-ui/confirm-dialog";
@@ -9,31 +7,26 @@ import { Empty, EmptyContent, EmptyHeader, EmptyTitle } from "@repo/web-ui/empty
 import { ErrorState } from "@repo/web-ui/error-state";
 import { ResourcePropertyGrid } from "@repo/web-ui/resource-property-grid";
 import { Show } from "@repo/web-ui/show";
-import { Spinner } from "@repo/web-ui/spinner";
+import type { Table } from "@tanstack/react-table";
 import {
   Building,
   ChevronLeft,
-  Crown,
   LogOut,
   Settings,
-  Shield,
   Trash2,
-  User,
   UserCheck,
-  UserCog,
-  UserMinus,
-  UserX,
 } from "lucide-react";
 
 import type { OrganizationDetailViewModel } from "@/features/organizations/model/organizations.types";
+import type { MemberRow } from "./organization-members-table";
 
 import { ResourcePageShell } from "@/components/resource-page-shell";
 import { adminResources } from "@/features/_plugin-resources/admin-resources";
-import { canPromoteMemberToAdmin } from "@/features/organizations/model/organizations.permissions";
-import { timeAgo } from "@/lib/format";
 import { Link } from "@/i18n/navigation";
 
 import { EditOrganizationDrawer } from "./edit-organization-drawer";
+import { MemberDetailPane } from "./member-detail-pane";
+import { OrganizationMembersTable } from "./organization-members-table";
 
 const organizationsResource = adminResources.find((r) => r.id === "organizations")!;
 
@@ -50,19 +43,15 @@ export function OrganizationDetailContent(vm: OrganizationDetailViewModel) {
     members,
     membersError,
     onRetryMembers,
-    actorUserId,
     canRename,
     canDelete,
     canLeave,
     isLastOwner,
-    canManageMember,
-    canDemoteAdminToMember,
-    canPromoteAdminToOwner,
-    canDemoteOwnerToAdmin,
     editDialog,
     deleteConfirm,
     leaveConfirm,
-    memberActions,
+    memberDetail,
+    table,
   } = vm;
 
   if (isError) {
@@ -135,6 +124,12 @@ export function OrganizationDetailContent(vm: OrganizationDetailViewModel) {
         onConfirm={isLastOwner ? leaveConfirm.onCancel : leaveConfirm.onConfirm}
       />
 
+      <MemberDetailPane
+        open={memberDetail.open}
+        onClose={memberDetail.onClose}
+        member={memberDetail.selectedMember}
+      />
+
       <ResourcePageShell
         resource={organizationsResource}
         title={org.name}
@@ -187,44 +182,18 @@ export function OrganizationDetailContent(vm: OrganizationDetailViewModel) {
                 columns={1}
                 density="default"
                 properties={[
-                  {
-                    key: "name",
-                    label: "Organization name",
-                    value: org.name,
-                  },
-                  {
-                    key: "slug",
-                    label: "Slug identifier",
-                    value: org.slug,
-                    type: "code",
-                    copyable: true,
-                  },
-                  {
-                    key: "orgId",
-                    label: "Organization ID",
-                    value: org.id,
-                    type: "id",
-                    copyable: true,
-                  },
+                  { key: "name", label: "Organization name", value: org.name },
+                  { key: "slug", label: "Slug identifier", value: org.slug, type: "code" as const, copyable: true },
+                  { key: "orgId", label: "Organization ID", value: org.id, type: "id" as const, copyable: true },
                   {
                     key: "membersCount",
                     label: "Team size",
                     value: `${members.length} member${members.length === 1 ? "" : "s"}`,
-                    type: "badge",
-                    badgeVariant: "secondary",
+                    type: "badge" as const,
+                    badgeVariant: "secondary" as const,
                   },
-                  {
-                    key: "createdAt",
-                    label: "Created",
-                    value: org.createdAt,
-                    type: "timestamp",
-                  },
-                  {
-                    key: "updatedAt",
-                    label: "Last updated",
-                    value: org.updatedAt,
-                    type: "timestamp",
-                  },
+                  { key: "createdAt", label: "Created", value: org.createdAt, type: "timestamp" as const },
+                  { key: "updatedAt", label: "Last updated", value: org.updatedAt, type: "timestamp" as const },
                 ]}
               />
             </CardContent>
@@ -262,149 +231,13 @@ export function OrganizationDetailContent(vm: OrganizationDetailViewModel) {
               ) : null}
 
               {!membersError && members.length > 0 ? (
-                <div className="divide-y divide-border">
-                  {members.map((member) => {
-                    const isSelf = member.userId === actorUserId;
-                    const showManage = canManageMember(member);
-
-                    return (
-                      <div
-                        key={member.userId}
-                        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-5 py-4 transition-colors hover:bg-muted/10"
-                      >
-                        <div className="flex items-center gap-3 min-w-0">
-                          <Avatar
-                            name={member.displayName || member.email || "User"}
-                            className="size-9 border border-border"
-                          />
-                          <div className="min-w-0">
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <span className="font-medium text-sm text-foreground">
-                                {member.displayName || "Unknown User"}
-                              </span>
-                              {isSelf ? (
-                                <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
-                                  You
-                                </Badge>
-                              ) : null}
-                            </div>
-                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                              <span className="truncate">{member.email}</span>
-                              <span>·</span>
-                              <span>Joined {timeAgo(member.createdAt)}</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center gap-2.5 shrink-0 self-end sm:self-center">
-                          <Badge
-                            variant={
-                              member.role === "OWNER"
-                                ? "default"
-                                : member.role === "ADMIN"
-                                  ? "secondary"
-                                  : "outline"
-                            }
-                            className="capitalize text-xs font-semibold gap-1"
-                          >
-                            {member.role === "OWNER" ? (
-                              <Crown className="size-3 text-yellow-500 fill-yellow-500/20" />
-                            ) : member.role === "ADMIN" ? (
-                              <Shield className="size-3 text-blue-500 fill-blue-500/10" />
-                            ) : (
-                              <User className="size-3 text-muted-foreground" />
-                            )}
-                            {member.role.toLowerCase()}
-                          </Badge>
-
-                          <Show when={showManage}>
-                            <div className="flex items-center gap-1.5">
-                              {canPromoteMemberToAdmin(member) ? (
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  disabled={memberActions.isUpdatingRole}
-                                  onClick={() => memberActions.onUpdateRole(member.userId, "ADMIN")}
-                                >
-                                  {memberActions.isUpdatingRole ? (
-                                    <Spinner className="size-3 mr-1" />
-                                  ) : (
-                                    <UserCog className="size-3 mr-1" />
-                                  )}
-                                  Make Admin
-                                </Button>
-                              ) : null}
-
-                              {canDemoteAdminToMember(member) ? (
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  disabled={memberActions.isUpdatingRole}
-                                  onClick={() =>
-                                    memberActions.onUpdateRole(member.userId, "MEMBER")
-                                  }
-                                >
-                                  {memberActions.isUpdatingRole ? (
-                                    <Spinner className="size-3 mr-1" />
-                                  ) : (
-                                    <UserMinus className="size-3 mr-1" />
-                                  )}
-                                  Demote to Member
-                                </Button>
-                              ) : null}
-
-                              {canPromoteAdminToOwner(member) ? (
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  disabled={memberActions.isUpdatingRole}
-                                  onClick={() => memberActions.onUpdateRole(member.userId, "OWNER")}
-                                >
-                                  {memberActions.isUpdatingRole ? (
-                                    <Spinner className="size-3 mr-1" />
-                                  ) : (
-                                    <Crown className="size-3 mr-1" />
-                                  )}
-                                  Make Owner
-                                </Button>
-                              ) : null}
-
-                              {canDemoteOwnerToAdmin(member) ? (
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  disabled={memberActions.isUpdatingRole}
-                                  onClick={() => memberActions.onUpdateRole(member.userId, "ADMIN")}
-                                >
-                                  {memberActions.isUpdatingRole ? (
-                                    <Spinner className="size-3 mr-1" />
-                                  ) : (
-                                    <UserMinus className="size-3 mr-1" />
-                                  )}
-                                  Demote to Admin
-                                </Button>
-                              ) : null}
-
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="text-destructive hover:bg-destructive/5 hover:text-destructive hover:border-destructive/30"
-                                disabled={memberActions.isRemoving}
-                                onClick={() => memberActions.onRemove(member.userId)}
-                              >
-                                {memberActions.isRemoving ? (
-                                  <Spinner className="size-3" />
-                                ) : (
-                                  <UserX className="size-3" />
-                                )}
-                              </Button>
-                            </div>
-                          </Show>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
+                <OrganizationMembersTable
+                  table={table}
+                  onRowClick={(row) => {
+                    const member = members.find((m) => m.userId === row.userId);
+                    if (member) memberDetail.onOpen(member);
+                  }}
+                />
               ) : null}
             </CardContent>
           </Card>

@@ -4,10 +4,11 @@ import { standardSchemaResolver as zodResolver } from "@hookform/resolvers/stand
 import { Button } from "@repo/web-ui/button";
 import { Input } from "@repo/web-ui/input";
 import { Label } from "@repo/web-ui/label";
+import { ResourceDrawer } from "@repo/web-ui/resource-drawer";
 import { Spinner } from "@repo/web-ui/spinner";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { ResourceDrawer } from "@repo/web-ui/resource-drawer";
+
 import {
   type CreateOrganizationForm,
   createOrganizationSchema,

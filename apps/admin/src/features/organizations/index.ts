@@ -18,4 +18,8 @@ export { useOrganizationSwitcherController } from "./controllers/use-organizatio
 export { useOrganizationsController } from "./controllers/use-organizations-controller";
 export { OrganizationDetailView } from "./screens/organization-detail-view";
 export { OrganizationsView } from "./screens/organizations-view";
+export { MemberActionsMenu } from "./ui/member-actions-menu";
+export { MemberDetailPane } from "./ui/member-detail-pane";
+export { createOrganizationMemberColumns } from "./ui/organization-member-columns";
+export { OrganizationMembersTable } from "./ui/organization-members-table";
 export { OrganizationSwitcher } from "./ui/organization-switcher";

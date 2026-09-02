@@ -5,6 +5,8 @@ import type {
 } from "@/lib/api-types";
 
 import type { CreateOrganizationForm } from "./organizations.schemas";
+import type { Table } from "@tanstack/react-table";
+import type { MemberRow } from "@/features/organizations/ui/organization-members-table";
 
 export interface OrganizationSwitcherViewModel {
   organizationId: string | null;
@@ -27,6 +29,12 @@ export interface OrganizationsListViewModel {
   noResults: boolean;
   noOrgs: boolean;
   onNavigate: (orgId: string) => void;
+  stats: {
+    total: number;
+    owner: number;
+    admin: number;
+    member: number;
+  };
   drawer: {
     open: boolean;
     onOpen: () => void;
@@ -83,4 +91,11 @@ export interface OrganizationDetailViewModel {
     isUpdatingRole: boolean;
     isRemoving: boolean;
   };
+  memberDetail: {
+    open: boolean;
+    selectedMember: OrganizationMemberDto | null;
+    onOpen: (member: OrganizationMemberDto) => void;
+    onClose: () => void;
+  };
+  table: Table<MemberRow>;
 }

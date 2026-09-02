@@ -31,6 +31,7 @@ function createMockViewModel(
     noResults: false,
     noOrgs: false,
     onNavigate: vi.fn(),
+    stats: { total: 1, owner: 1, admin: 0, member: 0 },
     drawer: {
       open: false,
       onOpen: vi.fn(),

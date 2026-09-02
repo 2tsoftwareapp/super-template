@@ -4,10 +4,13 @@ import { getErrorMessage } from "@repo/web-utils/errors";
 import { internalPath, parseRouteParams } from "@repo/web-utils/params";
 import { useQueryClient } from "@tanstack/react-query";
 import { notFound, useParams, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
+import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
 
 import type { OrganizationDetailViewModel } from "@/features/organizations/model/organizations.types";
+import type { OrganizationMemberDto } from "@/lib/api-types";
+import type { MemberRow } from "@/features/organizations/ui/organization-members-table";
 
 import {
   useDeleteOrganizationMutation,
@@ -38,6 +41,7 @@ import {
 } from "@/features/organizations/model/organizations.schemas";
 import { useSession } from "@/hooks/use-session";
 import { useRouter } from "@/i18n/navigation";
+import { createOrganizationMemberColumns } from "@/features/organizations/ui/organization-member-columns";
 
 export type { OrganizationDetailViewModel };
 
@@ -66,6 +70,7 @@ export function useOrganizationDetailController(): OrganizationDetailViewModel {
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [leaveOpen, setLeaveOpen] = useState(false);
+  const [selectedMember, setSelectedMember] = useState<OrganizationMemberDto | null>(null);
 
   const detailQuery = useOrganizationDetailQuery(orgId);
   const membersQuery = useOrganizationMembersQuery(orgId);
@@ -153,6 +158,46 @@ export function useOrganizationDetailController(): OrganizationDetailViewModel {
 
   const lastOwner = isLastOwner(actorContext, members);
 
+  const memberActions = {
+    onUpdateRole: handleUpdateRole,
+    onRemove: handleRemoveMember,
+  };
+
+  const memberRows: MemberRow[] = useMemo(
+    () =>
+      members.map((m) => ({
+        userId: m.userId,
+        displayName: m.displayName,
+        email: m.email,
+        role: m.role,
+        createdAt: m.createdAt,
+      })),
+    [members],
+  );
+
+  const columns = useMemo(() => createOrganizationMemberColumns({
+    canManageMember: (member) => canManageMember(actorContext, member),
+    canDemoteAdminToMember: (member) => canDemoteAdminToMember(actorContext, member),
+    canPromoteAdminToOwner: (member) => canPromoteAdminToOwner(actorContext, member),
+    canDemoteOwnerToAdmin: (member) => canDemoteOwnerToAdmin(actorContext, member),
+    memberActions,
+  }), [actorContext, members, memberActions]);
+
+  const table = useReactTable({
+    data: memberRows,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getRowId: (row) => row.userId,
+  });
+
+  const handleOpenMemberDetail = (member: OrganizationMemberDto) => {
+    setSelectedMember(member);
+  };
+
+  const handleCloseMemberDetail = () => {
+    setSelectedMember(null);
+  };
+
   return {
     orgId,
     backHref,
@@ -195,10 +240,16 @@ export function useOrganizationDetailController(): OrganizationDetailViewModel {
       isPending: leaveOrg.isPending,
     },
     memberActions: {
-      onUpdateRole: handleUpdateRole,
-      onRemove: handleRemoveMember,
+      ...memberActions,
       isUpdatingRole: updateMemberRole.isPending,
       isRemoving: removeMember.isPending,
     },
+    memberDetail: {
+      open: selectedMember !== null,
+      selectedMember,
+      onOpen: handleOpenMemberDetail,
+      onClose: handleCloseMemberDetail,
+    },
+    table,
   };
 }
