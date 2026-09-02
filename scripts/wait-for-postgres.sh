@@ -4,11 +4,9 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
-if [[ -f .env ]]; then
-  set -a
+if [[ -f ./scripts/load-env.sh ]]; then
   # shellcheck disable=SC1091
-  source .env
-  set +a
+  . ./scripts/load-env.sh
 fi
 
 host="${POSTGRES_HOST:-localhost}"
