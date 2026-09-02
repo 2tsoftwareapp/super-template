@@ -6,10 +6,14 @@ export const ADMIN_AUTH_ROUTES = {
   ssoCallback: "/login/sso/callback",
 } as const;
 
-/** Empty defaults — seed credentials stay in UI copy, not prefilled secrets. */
+const isDev =
+  process.env.NODE_ENV === "development" ||
+  process.env.NEXT_PUBLIC_APP_ENV === "development";
+
+/** Default values for admin login form: pre-fills default seeded admin credentials in development for DX. */
 export const ADMIN_LOGIN_DEFAULT_VALUES = {
-  email: "",
-  password: "",
+  email: isDev ? "admin@example.local" : "",
+  password: isDev ? "ChangeMe123!" : "",
 } as const;
 
 export const AUTH_ERROR_QUERY_VALUES = {
