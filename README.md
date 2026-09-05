@@ -239,11 +239,14 @@ Sign in at Web `/login` or Admin `/login`.
 <details>
 <summary><strong>Production checklist</strong></summary>
 
-- Replace JWT secrets, seed credentials, MFA encryption key
+- Replace JWT secrets, seed credentials, MFA encryption key, CSRF secret
 - Set `APP_ENV=production`, `COOKIE_SECURE=true`, HTTPS origins
 - Disable or protect Swagger in production
+- Leave `DATABASE_SKIP_RLS_CHECK` unset/false (refused when deployed)
+- Do not run `db:seed` / `db:reset` in prod without `ALLOW_PROD_SEED=1` / `ALLOW_PROD_RESET=1`
 - Inject secrets from your orchestrator — never commit them
 - Keep generated clients in sync (`pnpm run generate:check` in CI)
+- Confirm CI required checks include quality, contracts, API e2e, and mobile
 
 </details>
 

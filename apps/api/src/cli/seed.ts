@@ -1,10 +1,12 @@
 import { NestFactory } from "@nestjs/core";
 
 import { AppModule } from "../app.module";
+import { assertDestructiveCliAllowed } from "./assert-destructive-cli";
 import { loadCliEnv } from "./load-cli-env";
 import { seedDatabase } from "./seeds/seed-data";
 
 loadCliEnv();
+assertDestructiveCliAllowed({ action: "db:seed", overrideEnv: "ALLOW_PROD_SEED" });
 
 const main = async (): Promise<void> => {
   const app = await NestFactory.createApplicationContext(AppModule, {

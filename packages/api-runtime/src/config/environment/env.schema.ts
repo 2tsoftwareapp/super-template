@@ -147,6 +147,13 @@ export const envSchema = z
     // placeholder secrets that ship with the template.
     const isDeployed = env.APP_ENV === "staging" || env.APP_ENV === "production";
     if (isDeployed) {
+      if (env.DATABASE_SKIP_RLS_CHECK) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["DATABASE_SKIP_RLS_CHECK"],
+          message: "must be false in staging/production",
+        });
+      }
       if (DEV_PLACEHOLDER_SECRETS.has(env.JWT_ACCESS_SECRET)) {
         ctx.addIssue({
           code: "custom",
