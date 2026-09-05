@@ -1,0 +1,46 @@
+name: format-and-schema
+
+# Lightweight, independent gate so formatting and schema drift can never be
+# skipped silently when a heavier job (e.g. generate:check) fails earlier in
+# the same workflow. Runs format:check and schema:check on every push and PR.
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: format-schema-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Format and schema drift
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Format check
+        run: pnpm run format:check
+
+      - name: Schema drift and migration integrity check
+        run: pnpm run schema:check
