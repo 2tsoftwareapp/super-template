@@ -1,12 +1,18 @@
-import type { TenantContext } from "@repo/api-kernel";
-
 import { Injectable } from "@nestjs/common";
 import { AsyncLocalStorage } from "node:async_hooks";
 
+import type { TenantContext } from "../ports/tenant-context.port";
+
 const tenantContextStorage = new AsyncLocalStorage<TenantContext>();
 
+/** Read the active request/job tenant context from AsyncLocalStorage. */
 export const getTenantContext = (): TenantContext | undefined => tenantContextStorage.getStore();
 
+/**
+ * Nest-injectable ALS runner for {@link TenantContext}.
+ * Lives in the kernel so database-runtime and features share one store without
+ * depending on the HTTP runtime package.
+ */
 @Injectable()
 export class TenantContextService {
   run<T>(context: TenantContext, operation: () => T): T {

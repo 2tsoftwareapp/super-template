@@ -567,7 +567,8 @@ The identity and platform contexts (`@repo/feature-auth`, `@repo/feature-upload`
 They communicate through:
 
 - deliberate types in `api-kernel`;
-- stable port tokens;
+- stable port tokens (including `DATABASE_RUNTIME_ENV` for DB pool wiring);
+- `TenantContextService` / `getTenantContext` (ALS) in `api-kernel`;
 - explicit public facades;
 - events when event-driven communication is introduced.
 

@@ -7,8 +7,7 @@ import {
   Module,
   type OnApplicationShutdown,
 } from "@nestjs/common";
-import { ADVISORY_LOCK_PORT, PLATFORM_TRANSACTION_PORT, TRANSACTION_PORT } from "@repo/api-kernel";
-import { TenantContextService } from "@repo/api-runtime";
+import { ADVISORY_LOCK_PORT, PLATFORM_TRANSACTION_PORT, TenantContextService, TRANSACTION_PORT } from "@repo/api-kernel";
 
 import { DatabaseRlsGuard } from "./database-rls.guard";
 import {

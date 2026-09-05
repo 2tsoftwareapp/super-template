@@ -1,6 +1,10 @@
 import type { Provider } from "@nestjs/common";
 
-import { EnvironmentService, getTenantContext } from "@repo/api-runtime";
+import {
+  DATABASE_RUNTIME_ENV,
+  type DatabaseRuntimeEnv,
+  getTenantContext,
+} from "@repo/api-kernel";
 import { Pool, type PoolClient, type PoolConfig } from "pg";
 
 import { createDatabaseClient } from "./database.types";
@@ -140,11 +144,11 @@ export const createTenantAwarePool = (config: PoolConfig): Pool => {
 export const databaseProviders: Provider[] = [
   {
     provide: DATABASE_POOL,
-    inject: [EnvironmentService],
-    useFactory: (environmentService: EnvironmentService) => {
-      const connectionString = environmentService.isTest
-        ? environmentService.databaseUrlTest
-        : environmentService.databaseUrl;
+    inject: [DATABASE_RUNTIME_ENV],
+    useFactory: (databaseEnv: DatabaseRuntimeEnv) => {
+      const connectionString = databaseEnv.isTest
+        ? databaseEnv.databaseUrlTest
+        : databaseEnv.databaseUrl;
 
       if (!connectionString) {
         throw new Error("DATABASE_URL_TEST is required when APP_ENV=test but was not provided");
@@ -164,11 +168,11 @@ export const databaseProviders: Provider[] = [
   },
   {
     provide: ADVISORY_LOCK_POOL,
-    inject: [EnvironmentService],
-    useFactory: (environmentService: EnvironmentService) => {
-      const connectionString = environmentService.isTest
-        ? environmentService.databaseUrlTest
-        : environmentService.databaseUrl;
+    inject: [DATABASE_RUNTIME_ENV],
+    useFactory: (databaseEnv: DatabaseRuntimeEnv) => {
+      const connectionString = databaseEnv.isTest
+        ? databaseEnv.databaseUrlTest
+        : databaseEnv.databaseUrl;
 
       if (!connectionString) {
         throw new Error("DATABASE_URL_TEST is required when APP_ENV=test but was not provided");

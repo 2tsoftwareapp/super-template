@@ -11,8 +11,9 @@ Drizzle pool, RLS/GUC helpers, transactions, and the Nest `DatabaseModule`.
 - `schema/` — **empty built-in schema**; tables come from feature packages via
   `FeatureManifest.schema` and are composed in `apps/api`
 
-Tenant ALS / `TenantContextService` currently live in `@repo/api-runtime`
-(planned extraction — do not add new coupling).
+Tenant ALS / `TenantContextService` and `DATABASE_RUNTIME_ENV` live in
+`@repo/api-kernel`. The host's `AppConfigModule` provides `DATABASE_RUNTIME_ENV`
+from validated env so this package never depends on `@repo/api-runtime`.
 
 ## Rules
 

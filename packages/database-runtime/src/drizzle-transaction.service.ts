@@ -1,7 +1,7 @@
 import type { TenantContext, TransactionExecutor, TransactionPort } from "@repo/api-kernel";
 
 import { Inject, Injectable } from "@nestjs/common";
-import { TenantContextService } from "@repo/api-runtime";
+import { TenantContextService } from "@repo/api-kernel";
 import { sql } from "drizzle-orm";
 
 import type { DatabaseClient } from "./database.types";

@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import type { TenantContext } from "@repo/api-kernel";
+import type { TenantContext } from "../../ports/tenant-context.port";
 
-import { getTenantContext, TenantContextService } from "@repo/api-runtime";
+import { getTenantContext, TenantContextService } from "../tenant-context.service";
 
 const context: TenantContext = {
   tenantId: "org-1",

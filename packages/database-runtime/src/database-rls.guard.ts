@@ -1,7 +1,7 @@
 import type { Pool } from "pg";
 
 import { Inject, Injectable, Logger, type OnModuleInit } from "@nestjs/common";
-import { EnvironmentService } from "@repo/api-runtime";
+import { DATABASE_RUNTIME_ENV, type DatabaseRuntimeEnv } from "@repo/api-kernel";
 
 import { DATABASE_POOL } from "./database.provider";
 
@@ -17,11 +17,11 @@ export class DatabaseRlsGuard implements OnModuleInit {
 
   constructor(
     @Inject(DATABASE_POOL) private readonly pool: Pool,
-    private readonly environmentService: EnvironmentService,
+    @Inject(DATABASE_RUNTIME_ENV) private readonly databaseEnv: DatabaseRuntimeEnv,
   ) {}
 
   async onModuleInit(): Promise<void> {
-    if (this.environmentService.databaseSkipRlsCheck) {
+    if (this.databaseEnv.databaseSkipRlsCheck) {
       this.logger.warn(
         "DATABASE_SKIP_RLS_CHECK is enabled; skipping database RLS capability check",
       );

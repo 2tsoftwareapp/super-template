@@ -32,7 +32,6 @@ export * from "./pagination/pagination.dto";
 export * from "./rbac";
 
 export { adaptRedisClient, createRedisClient } from "./redis/redis-client.adapter";
-export { getTenantContext, TenantContextService } from "./services/tenant-context.service";
 export { RedisThrottlerStorage } from "./throttling/redis-throttler.storage";
 
 // --- convenience re-exports (Nest app host + features) ---
