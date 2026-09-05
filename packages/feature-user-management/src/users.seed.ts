@@ -1,6 +1,7 @@
 import type { FeatureSeedContext, FeatureSeeder } from "@repo/api-plugin-kit";
 import type { DatabaseExecutor } from "@repo/database-runtime";
 
+import { hashPassword } from "@repo/api-kernel";
 import { EnvironmentService } from "@repo/api-runtime";
 import {
   ROLE_NAMES,
@@ -12,7 +13,6 @@ import {
   type PersonalOrganizationProvisioner,
 } from "@repo/feature-organization-management/contracts";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "@repo/feature-users/contracts";
-import { hashPassword } from "@repo/api-kernel";
 
 /** Bag key written by the users seeder for downstream notifications/auth seeders. */
 export const SEEDED_USERS_BAG_KEY = "seededUsers";
