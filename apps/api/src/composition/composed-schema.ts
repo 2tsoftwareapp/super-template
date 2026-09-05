@@ -1,7 +1,11 @@
 import type { Provider, Type } from "@nestjs/common";
 
 import { Reflector } from "@nestjs/core";
-import { composeFeatures, type FeatureManifest } from "@repo/api-plugin-kit";
+import {
+  composeFeatures,
+  type FeatureManifest,
+  type HttpPipelineProviderEntry,
+} from "@repo/api-plugin-kit";
 import {
   type OutboxHandlerSlot,
   OutboxModule,
@@ -51,27 +55,36 @@ function resolveHandlerImportModules(
 }
 
 /**
- * Normalizes HTTP pipeline providers by replacing any foreign Reflector reference
- * (e.g. from sub-packages' node_modules in the monorepo) with the local Reflector class.
+ * Normalizes a single HTTP pipeline provider by replacing any foreign
+ * Reflector reference (e.g. from sub-packages' node_modules in the monorepo)
+ * with the local Reflector class.
  */
-function normalizePipelineProviders(providers: readonly Provider[]): Provider[] {
-  return providers.map((provider) => {
-    if (
-      provider &&
-      typeof provider === "object" &&
-      "inject" in provider &&
-      Array.isArray((provider as { inject?: unknown[] }).inject)
-    ) {
-      const inject = (provider as { inject: unknown[] }).inject.map((token) => {
-        if (typeof token === "function" && "name" in token && token.name === "Reflector") {
-          return Reflector;
-        }
-        return token;
-      });
-      return { ...provider, inject } as Provider;
-    }
-    return provider;
-  });
+function normalizePipelineProvider(provider: Provider): Provider {
+  if (
+    provider &&
+    typeof provider === "object" &&
+    "inject" in provider &&
+    Array.isArray((provider as { inject?: unknown[] }).inject)
+  ) {
+    const inject = (provider as { inject: unknown[] }).inject.map((token) => {
+      if (typeof token === "function" && "name" in token && token.name === "Reflector") {
+        return Reflector;
+      }
+      return token;
+    });
+    return { ...provider, inject } as Provider;
+  }
+  return provider;
+}
+
+/**
+ * Normalizes feature HTTP pipeline entries (order + provider), replacing any
+ * foreign Reflector reference with the local Reflector class.
+ */
+function normalizePipelineEntries(
+  entries: readonly HttpPipelineProviderEntry[],
+): HttpPipelineProviderEntry[] {
+  return entries.map((entry) => ({ order: entry.order, provider: normalizePipelineProvider(entry.provider) }));
 }
 
 /**
@@ -139,17 +152,19 @@ export const composedOutboxHandlers: readonly OutboxTopicHandlerClass[] =
   composed.outboxHandlerClasses as readonly OutboxTopicHandlerClass[];
 
 /**
- * HTTP pipeline guard providers collected from features in deterministic order.
- * Each is a Provider definition using `useFactory` + `inject` with tokens.
+ * HTTP pipeline guard contributions (order + provider) collected from features.
+ * Providers are `useFactory` + `inject` definitions with tokens, normalized to
+ * the host's Reflector. Kept as ordered entries so the host can merge generic
+ * guards (ThrottlerGuard, AuthorizeGuard) into a single sorted catalog without
+ * assuming a fixed array index.
  */
-export const composedHttpPipelineGuards: readonly Provider[] = normalizePipelineProviders(
-  fullGraph.httpPipelineGuards,
-);
+export const composedHttpPipelineGuards: readonly HttpPipelineProviderEntry[] =
+  normalizePipelineEntries(fullGraph.httpPipelineGuards);
 
 /**
- * HTTP pipeline interceptor providers collected from features in deterministic order.
- * Each is a Provider definition using `useFactory` + `inject` with tokens.
+ * HTTP pipeline interceptor contributions (order + provider) collected from
+ * features in deterministic order. Providers are `useFactory` + `inject`
+ * definitions with tokens, normalized to the host's Reflector.
  */
-export const composedHttpPipelineInterceptors: readonly Provider[] = normalizePipelineProviders(
-  fullGraph.httpPipelineInterceptors,
-);
+export const composedHttpPipelineInterceptors: readonly HttpPipelineProviderEntry[] =
+  normalizePipelineEntries(fullGraph.httpPipelineInterceptors);

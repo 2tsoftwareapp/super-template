@@ -178,6 +178,18 @@ export interface FeatureSeeder {
   readonly run: (ctx: FeatureSeedContext) => Promise<void> | void;
 }
 
+/**
+ * A single feature-contributed HTTP pipeline provider paired with its
+ * registration priority (`httpPipelineOrder`). Keeping the order on the entry
+ * lets the host interleave feature providers with generic providers
+ * (e.g. ThrottlerGuard) by sorting one catalog, instead of assuming a fixed
+ * array index. Lower `order` registers (and therefore runs) first.
+ */
+export interface HttpPipelineProviderEntry {
+  readonly order: number;
+  readonly provider: Provider;
+}
+
 export interface ComposedFeatures {
   /** Manifests in deterministic dependency order. */
   readonly features: readonly FeatureManifest[];
@@ -194,15 +206,18 @@ export interface ComposedFeatures {
   /** Composed outbox handler classes in dependency order. */
   readonly outboxHandlerClasses: readonly Type<unknown>[];
   /**
-   * HTTP pipeline providers collected from features in deterministic order.
-   * Each is a Provider definition using `useFactory` + `inject` with tokens.
+   * HTTP pipeline guard providers collected from features, each paired with
+   * its `httpPipelineOrder`. Providers are `useFactory` + `inject` definitions
+   * with injection tokens; the host sorts this catalog together with generic
+   * guard providers by `order` before registration.
    */
-  readonly httpPipelineGuards: readonly Provider[];
+  readonly httpPipelineGuards: readonly HttpPipelineProviderEntry[];
   /**
-   * HTTP pipeline interceptor providers collected from features in deterministic order.
-   * Each is a Provider definition using `useFactory` + `inject` with tokens.
+   * HTTP pipeline interceptor providers collected from features, each paired
+   * with its `httpPipelineOrder`. Providers are `useFactory` + `inject`
+   * definitions with injection tokens.
    */
-  readonly httpPipelineInterceptors: readonly Provider[];
+  readonly httpPipelineInterceptors: readonly HttpPipelineProviderEntry[];
 }
 
 /**
@@ -460,24 +475,30 @@ export function computeRemovalClosure(
 
 /**
  * Collect HTTP pipeline contributions from features in composition order.
- * Features with lower `httpPipelineOrder` contribute first.
- * Returns Provider[] definitions (useFactory + inject with tokens).
+ * Features with lower `httpPipelineOrder` contribute first; every contributed
+ * provider is paired with its feature's order so hosts can merge feature and
+ * generic providers in a single sorted catalog.
  */
 export function collectFeatureHttpPipeline(features: readonly FeatureManifest[]): {
-  guards: Provider[];
-  interceptors: Provider[];
+  guards: HttpPipelineProviderEntry[];
+  interceptors: HttpPipelineProviderEntry[];
 } {
   const sorted = [...features]
     .filter((f) => f.httpPipeline)
     .sort((a, b) => (a.httpPipelineOrder ?? 100) - (b.httpPipelineOrder ?? 100));
 
-  const guards: Provider[] = [];
-  const interceptors: Provider[] = [];
+  const guards: HttpPipelineProviderEntry[] = [];
+  const interceptors: HttpPipelineProviderEntry[] = [];
 
   for (const feature of sorted) {
     if (!feature.httpPipeline) continue;
-    guards.push(...(feature.httpPipeline.guards ?? []));
-    interceptors.push(...(feature.httpPipeline.interceptors ?? []));
+    const order = feature.httpPipelineOrder ?? 100;
+    for (const provider of feature.httpPipeline.guards ?? []) {
+      guards.push({ order, provider });
+    }
+    for (const provider of feature.httpPipeline.interceptors ?? []) {
+      interceptors.push({ order, provider });
+    }
   }
 
   return { guards, interceptors };

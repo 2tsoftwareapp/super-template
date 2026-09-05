@@ -13,6 +13,7 @@ export {
   type FeatureSchema,
   type FeatureSeedContext,
   type FeatureSeeder,
+  type HttpPipelineProviderEntry,
   orderFeatureManifests,
 } from "./feature-manifest";
 export type { ComposedAuthorization, FeatureAuthorizationResource } from "./feature-manifest";

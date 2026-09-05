@@ -1,8 +1,9 @@
 import type { DynamicModule, Provider, Type } from "@nestjs/common";
 import { Global, Module } from "@nestjs/common";
+import { APP_GUARD } from "@nestjs/core";
 import { Test } from "@nestjs/testing";
 import { computeRemovalClosure } from "@repo/api-plugin-kit";
-import type { FeatureManifest } from "@repo/api-plugin-kit";
+import type { FeatureManifest, HttpPipelineProviderEntry } from "@repo/api-plugin-kit";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -17,6 +18,7 @@ import {
   orderedFeatures,
 } from "../../src/composition/composed-schema";
 import { enabledFeatures } from "../../src/composition/feature-registry";
+import { buildOrderedGuardCatalog } from "../../src/composition/global-pipeline";
 import { DATABASE } from "@repo/database-runtime";
 import {
   ADVISORY_LOCK_PORT,
@@ -125,14 +127,16 @@ async function compileGraph(modules: readonly (Type<unknown> | DynamicModule)[])
 
 /**
  * Verify that feature-contributed HTTP pipeline providers are well-formed:
- * each has `provide`, `useFactory`, and `inject` — not bare class references.
- * Also verifies ordering: guards with lower httpPipelineOrder come first.
+ * each entry pairs an `order` with a `useFactory` + `inject` provider (not a
+ * bare class reference), and feature guards are ordered by `httpPipelineOrder`.
  */
 function validatePipelineProviders(): void {
-  // Guards
+  // Guards: settings (10) must sort before auth (20).
   expect(composedHttpPipelineGuards.length).toBeGreaterThan(0);
-  for (const provider of composedHttpPipelineGuards) {
-    const p = provider as unknown as FactoryProviderShape;
+  const guardOrders = composedHttpPipelineGuards.map((entry) => entry.order);
+  expect([...guardOrders].sort((a, b) => a - b)).toEqual(guardOrders);
+  for (const entry of composedHttpPipelineGuards) {
+    const p = entry.provider as unknown as FactoryProviderShape;
     expect(p.provide).toBeDefined();
     expect(typeof p.useFactory).toBe("function");
     expect(Array.isArray(p.inject)).toBe(true);
@@ -141,16 +145,15 @@ function validatePipelineProviders(): void {
 
   // Interceptors
   expect(composedHttpPipelineInterceptors.length).toBeGreaterThan(0);
-  for (const provider of composedHttpPipelineInterceptors) {
-    const p = provider as unknown as FactoryProviderShape;
+  const interceptorOrders = composedHttpPipelineInterceptors.map((entry) => entry.order);
+  expect([...interceptorOrders].sort((a, b) => a - b)).toEqual(interceptorOrders);
+  for (const entry of composedHttpPipelineInterceptors) {
+    const p = entry.provider as unknown as FactoryProviderShape;
     expect(p.provide).toBeDefined();
     expect(typeof p.useFactory).toBe("function");
     expect(Array.isArray(p.inject)).toBe(true);
     expect(p.inject!.length).toBeGreaterThan(0);
   }
-
-  // Ordering: features sorted by httpPipelineOrder, so guards array is ordered
-  // by that property. Settings (10) guard comes before Auth (20) guard.
 }
 
 /** Minimal shape for asserting provider structure without NestJS internals. */
@@ -158,6 +161,25 @@ interface FactoryProviderShape {
   provide: unknown;
   useFactory: (...args: unknown[]) => unknown;
   inject?: unknown[];
+}
+
+/**
+ * Host-merged guard catalog orders for a given feature-guard order set.
+ * Generic guards occupy fixed slots: throttler=15, authorize=25.
+ */
+function catalogOrders(featureGuards: readonly HttpPipelineProviderEntry[]): number[] {
+  return buildOrderedGuardCatalog(featureGuards).map((entry) => entry.order);
+}
+
+/**
+ * Classifies host-merged catalog entries by their fixed slot: generic guards
+ * occupy order 15 (throttler) and 25 (authorize); other orders are feature
+ * contributions.
+ */
+function catalogKinds(featureGuards: readonly HttpPipelineProviderEntry[]): string[] {
+  return buildOrderedGuardCatalog(featureGuards).map((entry) =>
+    entry.order === 15 || entry.order === 25 ? "generic" : "feature",
+  );
 }
 
 function featureSchemaKeys(feature: FeatureManifest): string[] {
@@ -216,6 +238,36 @@ describe("deterministic Nest feature bootstrap matrix", () => {
 
   it("feature-contributed HTTP pipeline providers use useFactory+inject with tokens", () => {
     validatePipelineProviders();
+  });
+
+  it("host guard catalog keeps feature guards sorted with generic throttler (15) and authorize (25) slots", () => {
+    // Full graph: feature guards (settings=10, auth=20) merge to 10/15/20/25.
+    const featureOrders = composedHttpPipelineGuards.map((g) => g.order);
+    expect([...featureOrders].sort((a, b) => a - b)).toEqual(featureOrders);
+    expect(catalogOrders(composedHttpPipelineGuards)).toEqual([...featureOrders, 15, 25].sort((a, b) => a - b));
+    expect(catalogOrders(composedHttpPipelineGuards)).toEqual([10, 15, 20, 25]);
+    expect(catalogKinds(composedHttpPipelineGuards).filter((k) => k === "generic")).toHaveLength(2);
+  });
+
+  it("omitting settings removes its guard and all dependents via closure (no orphan guard)", () => {
+    const removed = computeRemovalClosure(enabledFeatures, ["settings"]);
+    const remaining = enabledFeatures.filter((f) => !removed.includes(f.id));
+    const { modules, httpPipelineGuards } = buildFeatureModules(remaining);
+
+    // Settings (order 10) removal closes over auth (its dependent, order 20),
+    // so no feature guard with order 20 may survive on its own.
+    expect(removed).toContain("settings");
+    expect(httpPipelineGuards).toEqual([]);
+
+    // Even with feature guards gone, generic throttler (15) + authorize (25) stay.
+    expect(catalogOrders(httpPipelineGuards)).toEqual([15, 25]);
+    void modules;
+  });
+
+  it("a guard with order below throttler still registers first (numeric, not index)", () => {
+    const fakeGuard = { provide: APP_GUARD, useFactory: () => ({ canActivate: () => true }), inject: [] };
+    const subset = [{ order: 5, provider: fakeGuard }, ...composedHttpPipelineGuards];
+    expect(catalogOrders(subset)).toEqual([5, 10, 15, 20, 25]);
   });
 
   it.each(omitFeatureCases())(
@@ -281,13 +333,13 @@ describe("deterministic Nest feature bootstrap matrix", () => {
         }
         for (const guardProvider of manifest.httpPipeline?.guards ?? []) {
           expect(
-            subsetGuards,
+            subsetGuards.map((g) => g.provider),
             `removed feature "${manifest.id}" guard must not appear`,
           ).not.toContain(guardProvider);
         }
         for (const interceptorProvider of manifest.httpPipeline?.interceptors ?? []) {
           expect(
-            subsetInterceptors,
+            subsetInterceptors.map((g) => g.provider),
             `removed feature "${manifest.id}" interceptor must not appear`,
           ).not.toContain(interceptorProvider);
         }
