@@ -89,6 +89,7 @@ Production must create an equivalent non-superuser role, rotate its password, an
 - role-permission mappings are reconciled
 - admin and regular users are inserted or reused
 - sample seed data is inserted for development
+- `db:seed` and `db:reset` refuse `APP_ENV=staging|production` unless `ALLOW_PROD_SEED=1` / `ALLOW_PROD_RESET=1` is set
 
 ## Soft Delete Strategy
 

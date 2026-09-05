@@ -27,7 +27,12 @@ export const webPackageBoundaryConfig = [
                 "@repo/web-ui must not fetch data. Use @repo/web-hooks or app Providers for CSRF/HTTP side effects.",
             },
             {
-              group: ["@repo/api-kernel", "@repo/api-kernel/*", "@repo/api-runtime", "@repo/utils/password"],
+              group: [
+                "@repo/api-kernel",
+                "@repo/api-kernel/*",
+                "@repo/api-runtime",
+                "@repo/utils/password",
+              ],
               message: "@repo/web-ui must not import backend kernel packages.",
             },
           ],
@@ -53,7 +58,12 @@ export const webPackageBoundaryConfig = [
               message: "@repo/web-hooks must not import UI components (dependency direction).",
             },
             {
-              group: ["@repo/api-kernel", "@repo/api-kernel/*", "@repo/api-runtime", "@repo/utils/password"],
+              group: [
+                "@repo/api-kernel",
+                "@repo/api-kernel/*",
+                "@repo/api-runtime",
+                "@repo/utils/password",
+              ],
               message: "@repo/web-hooks must not import backend kernel packages.",
             },
           ],
@@ -87,7 +97,12 @@ export const webPackageBoundaryConfig = [
               message: "@repo/web-utils must not import web-ui or web-hooks.",
             },
             {
-              group: ["@repo/api-kernel", "@repo/api-kernel/*", "@repo/api-runtime", "@repo/utils/password"],
+              group: [
+                "@repo/api-kernel",
+                "@repo/api-kernel/*",
+                "@repo/api-runtime",
+                "@repo/utils/password",
+              ],
               message: "@repo/web-utils must not import backend kernel packages.",
             },
           ],
@@ -107,7 +122,12 @@ export const webPackageBoundaryConfig = [
               message: "@repo/web-server is server-only — no UI or client hooks.",
             },
             {
-              group: ["@repo/api-kernel", "@repo/api-kernel/*", "@repo/api-runtime", "@repo/utils/password"],
+              group: [
+                "@repo/api-kernel",
+                "@repo/api-kernel/*",
+                "@repo/api-runtime",
+                "@repo/utils/password",
+              ],
               message: "@repo/web-server must not import Nest/api-kernel packages.",
             },
           ],

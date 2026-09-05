@@ -13,12 +13,7 @@ final authInterceptorProvider = Provider<AuthInterceptor>(
 );
 
 class AuthInterceptor extends Interceptor {
-  AuthInterceptor(
-    this._ref, {
-    Dio? dio,
-    HttpClientAdapter? httpClientAdapter,
-  })  : _dio = dio,
-        _httpClientAdapter = httpClientAdapter;
+  AuthInterceptor(this._ref, {this._dio, this._httpClientAdapter});
 
   final Ref _ref;
   Dio? _dio;

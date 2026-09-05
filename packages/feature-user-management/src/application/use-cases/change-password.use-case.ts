@@ -4,11 +4,11 @@ import type { TransactionPort } from "@repo/api-kernel";
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { AppError, SYSTEM_SCOPE } from "@repo/api-kernel";
 import { TRANSACTION_PORT } from "@repo/api-kernel";
+import { hashPassword, verifyPassword } from "@repo/api-kernel";
 import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 import { OUTBOX_APPENDER, type OutboxAppenderPort } from "@repo/feature-outbox/contracts";
 import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "@repo/feature-users/contracts";
-import { hashPassword, verifyPassword } from "@repo/api-kernel";
 
 @Injectable()
 export class ChangePasswordUseCase {

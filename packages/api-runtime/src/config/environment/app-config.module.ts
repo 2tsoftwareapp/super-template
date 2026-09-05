@@ -1,8 +1,5 @@
 import { Global, Module } from "@nestjs/common";
-import {
-  DATABASE_RUNTIME_ENV,
-  type DatabaseRuntimeEnv,
-} from "@repo/api-kernel";
+import { DATABASE_RUNTIME_ENV, type DatabaseRuntimeEnv } from "@repo/api-kernel";
 import { loadEnvFiles } from "@repo/env-loader";
 
 import { APP_ENVIRONMENT } from "./config.constants";

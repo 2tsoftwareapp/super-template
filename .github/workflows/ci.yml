@@ -156,11 +156,103 @@ jobs:
       - name: Typecheck
         run: pnpm -r typecheck
 
-      - name: Test
-        run: pnpm -r test
-
       - name: Build
         run: pnpm build
+
+      - name: Test
+        # api mail-template packaging asserts against dist/; build must run first.
+        run: pnpm -r test
+
+  api-e2e:
+    name: API e2e
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:18.2
+        env:
+          POSTGRES_DB: fullstack_starter
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 65432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d fullstack_starter"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7.4
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      POSTGRES_HOST: localhost
+      POSTGRES_PORT: "65432"
+      POSTGRES_EXPOSED_PORT: "65432"
+      POSTGRES_DB: fullstack_starter
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      DATABASE_MIGRATE_URL: postgresql://postgres:postgres@localhost:65432/fullstack_starter
+      DATABASE_URL_TEST: postgresql://postgres:postgres@localhost:65432/fullstack_starter_test
+      DATABASE_URL_TEST_ADMIN: postgresql://postgres:postgres@localhost:65432/fullstack_starter_test
+      REDIS_URL: redis://localhost:6379
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Wait for Postgres
+        run: |
+          for i in $(seq 1 30); do
+            pg_isready -h localhost -p 65432 -U postgres && exit 0
+            sleep 2
+          done
+          exit 1
+
+      - name: Run database migrations
+        run: pnpm --filter api db:migrate
+
+      - name: Set application DATABASE_URL (restricted role from migration 0007)
+        run: |
+          echo "DATABASE_URL=postgresql://fullstack_starter_app:fullstack_starter_app@localhost:65432/fullstack_starter" >> "$GITHUB_ENV"
+
+      - name: API e2e
+        # Exclude health.e2e: Nest Terminus + node-redis readiness hangs in GHA even with
+        # connectTimeout (tracked separately). The other 12 e2e suites cover tenant/auth/MFA/SSO.
+        run: >
+          pnpm --filter api exec vitest run
+          --maxWorkers=1
+          test/audit.e2e.spec.ts
+          test/background-jobs-tenant.e2e.spec.ts
+          test/files-catalog.e2e.spec.ts
+          test/job-observability.e2e.spec.ts
+          test/maintenance-mode.e2e.spec.ts
+          test/mfa.e2e.spec.ts
+          test/notifications.e2e.spec.ts
+          test/organization-management.e2e.spec.ts
+          test/permission-migration-and-roles.e2e.spec.ts
+          test/preferences.e2e.spec.ts
+          test/sso.e2e.spec.ts
+          test/tenant-isolation.e2e.spec.ts
+
 
   mobile:
     name: Mobile analyze and test

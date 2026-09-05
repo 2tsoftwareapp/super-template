@@ -213,4 +213,33 @@ describe("validateEnvironment", () => {
     expect(env.APP_ENV).toBe("production");
     expect(env.COOKIE_SECURE).toBe(true);
   });
+
+  it("rejects DATABASE_SKIP_RLS_CHECK in production", () => {
+    expect(() =>
+      validateEnvironment({
+        ...baseEnv,
+        ...secureProdOverrides,
+        DATABASE_SKIP_RLS_CHECK: "true",
+      }),
+    ).toThrow(/DATABASE_SKIP_RLS_CHECK/);
+  });
+
+  it("rejects DATABASE_SKIP_RLS_CHECK in staging", () => {
+    expect(() =>
+      validateEnvironment({
+        ...baseEnv,
+        ...secureStagingOverrides,
+        DATABASE_SKIP_RLS_CHECK: "true",
+      }),
+    ).toThrow(/DATABASE_SKIP_RLS_CHECK/);
+  });
+
+  it("allows DATABASE_SKIP_RLS_CHECK in development", () => {
+    const env = validateEnvironment({
+      ...baseEnv,
+      APP_ENV: "development",
+      DATABASE_SKIP_RLS_CHECK: "true",
+    });
+    expect(env.DATABASE_SKIP_RLS_CHECK).toBe(true);
+  });
 });

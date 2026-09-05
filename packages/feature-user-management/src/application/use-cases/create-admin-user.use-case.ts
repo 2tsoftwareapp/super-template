@@ -5,6 +5,7 @@ import type { CreateAdminUserCommand, UserView } from "@repo/feature-users/contr
 
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { AppError, normalizeEmail, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-kernel";
+import { hashPassword } from "@repo/api-kernel";
 import { ERROR_CODES } from "@repo/api-runtime";
 import {
   assertCanAssignRoleTargets,
@@ -29,7 +30,6 @@ import {
   USERS_REPOSITORY,
   type UsersRepositoryPort,
 } from "@repo/feature-users/contracts";
-import { hashPassword } from "@repo/api-kernel";
 
 import { resolveRoleById } from "../assignable-role.resolver";
 import { GetUserUseCase } from "./get-user.use-case";

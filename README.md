@@ -130,16 +130,16 @@ Shared packages: `@repo/web-ui` · `@repo/web-hooks` · `@repo/web-utils` · `@r
 
 ## Documentation
 
-| | |
-|---|---|
-| [Onboarding](docs/onboarding.md) | Day 1 setup — terminals, ports, accounts |
-| [Environments](docs/environments.md) | Dev / staging / prod config layering |
-| [Architecture](docs/architecture.md) | System design and module boundaries |
-| [Authentication](docs/authentication.md) | Sessions, cookies, SSO, MFA |
-| [Database](docs/database.md) | Drizzle, migrations, RLS |
-| [Development](docs/development.md) | Local workflow and conventions |
-| [Deployment](docs/deployment.md) | Production deployment guide |
-| [Mobile design system](apps/mobile/design-system/MASTER.md) | Flutter tokens and components |
+|                                                             |                                          |
+| ----------------------------------------------------------- | ---------------------------------------- |
+| [Onboarding](docs/onboarding.md)                            | Day 1 setup — terminals, ports, accounts |
+| [Environments](docs/environments.md)                        | Dev / staging / prod config layering     |
+| [Architecture](docs/architecture.md)                        | System design and module boundaries      |
+| [Authentication](docs/authentication.md)                    | Sessions, cookies, SSO, MFA              |
+| [Database](docs/database.md)                                | Drizzle, migrations, RLS                 |
+| [Development](docs/development.md)                          | Local workflow and conventions           |
+| [Deployment](docs/deployment.md)                            | Production deployment guide              |
+| [Mobile design system](apps/mobile/design-system/MASTER.md) | Flutter tokens and components            |
 
 <br />
 
@@ -172,19 +172,19 @@ super-template/
 <details>
 <summary><strong>Commands</strong></summary>
 
-| Command | Description |
-|---------|-------------|
-| `make bootstrap` / `pnpm bootstrap` | First-time setup (cross-platform) |
-| `pnpm run env:doctor` | Validate toolchain + env layering |
-| `make dev` / `pnpm dev` | API + Web + Admin |
-| `make dev-api` / `dev-web` / `dev-admin` | Single surface |
-| `make dev-mobile` | Flutter (dev env) |
-| `make dev-mobile-staging` | Flutter (staging env) |
-| `make db-migrate` / `db-seed` / `db-generate` | Database |
-| `make generate` | Regenerate OpenAPI + clients |
+| Command                                           | Description                          |
+| ------------------------------------------------- | ------------------------------------ |
+| `make bootstrap` / `pnpm bootstrap`               | First-time setup (cross-platform)    |
+| `pnpm run env:doctor`                             | Validate toolchain + env layering    |
+| `make dev` / `pnpm dev`                           | API + Web + Admin                    |
+| `make dev-api` / `dev-web` / `dev-admin`          | Single surface                       |
+| `make dev-mobile`                                 | Flutter (dev env)                    |
+| `make dev-mobile-staging`                         | Flutter (staging env)                |
+| `make db-migrate` / `db-seed` / `db-generate`     | Database                             |
+| `make generate`                                   | Regenerate OpenAPI + clients         |
 | `make generate-check` / `pnpm run generate:check` | Verify generated output is committed |
-| `make verify` / `pnpm verify` | Local CI-style verify |
-| `make test-mobile` | Flutter tests |
+| `make verify` / `pnpm verify`                     | Local CI-style verify                |
+| `make test-mobile`                                | Flutter tests                        |
 
 </details>
 
@@ -209,10 +209,10 @@ make dev-mobile-staging
 <details>
 <summary><strong>Seeded accounts</strong></summary>
 
-| Role | Email |
-|------|-------|
+| Role  | Email                 |
+| ----- | --------------------- |
 | Admin | `admin@example.local` |
-| User | `user@example.local` |
+| User  | `user@example.local`  |
 
 Passwords: `SEED_ADMIN_PASSWORD` and `SEED_USER_PASSWORD` in `.env.example` (override in `.env.local` if needed).
 
@@ -223,27 +223,30 @@ Sign in at Web `/login` or Admin `/login`.
 <details>
 <summary><strong>Troubleshooting</strong></summary>
 
-| Issue | Fix |
-|-------|-----|
-| Postgres not ready | `docker compose -f infra/docker-compose.yml ps` |
-| Port 5432 / 6379 conflict | Override `POSTGRES_EXPOSED_PORT` or `REDIS_PORT` in `.env.local` |
-| Auth / cookies fail | Check `WEB_ORIGIN`, `ADMIN_ORIGIN`, `API_INTERNAL_URL` |
-| Env / toolchain sanity | `pnpm run env:doctor` |
-| Flutter missing | `pnpm run mobile:doctor` |
-| Android can't reach API | Ensure API is running; `AppConfig` rewrites `localhost` → `10.0.2.2` on Android |
-| Stale codegen | `make generate` then `make generate-check` |
-| Port conflict (apps) | Override `*_PORT` in `.env.local` |
+| Issue                     | Fix                                                                             |
+| ------------------------- | ------------------------------------------------------------------------------- |
+| Postgres not ready        | `docker compose -f infra/docker-compose.yml ps`                                 |
+| Port 5432 / 6379 conflict | Override `POSTGRES_EXPOSED_PORT` or `REDIS_PORT` in `.env.local`                |
+| Auth / cookies fail       | Check `WEB_ORIGIN`, `ADMIN_ORIGIN`, `API_INTERNAL_URL`                          |
+| Env / toolchain sanity    | `pnpm run env:doctor`                                                           |
+| Flutter missing           | `pnpm run mobile:doctor`                                                        |
+| Android can't reach API   | Ensure API is running; `AppConfig` rewrites `localhost` → `10.0.2.2` on Android |
+| Stale codegen             | `make generate` then `make generate-check`                                      |
+| Port conflict (apps)      | Override `*_PORT` in `.env.local`                                               |
 
 </details>
 
 <details>
 <summary><strong>Production checklist</strong></summary>
 
-- Replace JWT secrets, seed credentials, MFA encryption key
+- Replace JWT secrets, seed credentials, MFA encryption key, CSRF secret
 - Set `APP_ENV=production`, `COOKIE_SECURE=true`, HTTPS origins
 - Disable or protect Swagger in production
+- Leave `DATABASE_SKIP_RLS_CHECK` unset/false (refused when deployed)
+- Do not run `db:seed` / `db:reset` in prod without `ALLOW_PROD_SEED=1` / `ALLOW_PROD_RESET=1`
 - Inject secrets from your orchestrator — never commit them
 - Keep generated clients in sync (`pnpm run generate:check` in CI)
+- Confirm CI required checks include quality, contracts, API e2e, and mobile
 
 </details>
 
