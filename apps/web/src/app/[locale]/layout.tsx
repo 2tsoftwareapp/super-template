@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 
-import { tweakcnFontClassName } from "@/lib/tweakcn-fonts";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { notFound } from "next/navigation";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 import { Providers } from "@/components/providers";
 import { routing } from "@/i18n/routing";
+import { tweakcnFontClassName } from "@/lib/tweakcn-fonts";
 import { ThemeProvider } from "@/shared/theme";
 
 import "../globals.css";
