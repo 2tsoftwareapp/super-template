@@ -26,7 +26,12 @@ export function MemberDetailPane({ open, onClose, member }: MemberDetailPaneProp
           properties={[
             { key: "email", label: "Email", value: member?.email },
             { key: "role", label: "Role", value: member?.role, type: "badge" as const },
-            { key: "joined", label: "Joined", value: member?.createdAt, type: "timestamp" as const },
+            {
+              key: "joined",
+              label: "Joined",
+              value: member?.createdAt,
+              type: "timestamp" as const,
+            },
           ]}
         />
       }

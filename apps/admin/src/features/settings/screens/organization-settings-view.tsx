@@ -12,7 +12,10 @@ import { toast } from "sonner";
 
 import { useUpdateOrganizationMutation } from "@/features/organizations/api/organizations.mutations";
 import { useOrganizationDetailQuery } from "@/features/organizations/api/organizations.queries";
-import { type CreateOrganizationForm, createOrganizationSchema } from "@/features/organizations/model/organizations.schemas";
+import {
+  type CreateOrganizationForm,
+  createOrganizationSchema,
+} from "@/features/organizations/model/organizations.schemas";
 import { useSession } from "@/hooks/use-session";
 import { Link } from "@/i18n/navigation";
 

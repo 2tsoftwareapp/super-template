@@ -24,7 +24,11 @@ import {
   type OrganizationMembership,
 } from "@repo/feature-organizations/contracts";
 import { OUTBOX_APPENDER, type OutboxAppenderPort } from "@repo/feature-outbox/contracts";
-import { USER_ERROR_CODES, USERS_REPOSITORY, type UsersRepositoryPort } from "@repo/feature-users/contracts";
+import {
+  USER_ERROR_CODES,
+  USERS_REPOSITORY,
+  type UsersRepositoryPort,
+} from "@repo/feature-users/contracts";
 import { hashPassword } from "@repo/utils/password";
 
 import { resolveRoleById } from "../assignable-role.resolver";

@@ -20,7 +20,12 @@ import {
 import { enabledFeatures } from "../../src/composition/feature-registry";
 import { buildOrderedGuardCatalog } from "../../src/composition/global-pipeline";
 import { DATABASE } from "@repo/database-runtime";
-import { ADVISORY_LOCK_PORT, APP_LOGGER, PLATFORM_TRANSACTION_PORT, TRANSACTION_PORT } from "@repo/api-kernel";
+import {
+  ADVISORY_LOCK_PORT,
+  APP_LOGGER,
+  PLATFORM_TRANSACTION_PORT,
+  TRANSACTION_PORT,
+} from "@repo/api-kernel";
 import { EnvironmentService, ErrorReporterService, TenantContextService } from "@repo/api-runtime";
 
 /**
@@ -237,7 +242,9 @@ describe("deterministic Nest feature bootstrap matrix", () => {
     // Full graph: feature guards (settings=10, auth=20) merge to 10/15/20/25.
     const featureOrders = composedHttpPipelineGuards.map((g) => g.order);
     expect([...featureOrders].sort((a, b) => a - b)).toEqual(featureOrders);
-    expect(catalogOrders(composedHttpPipelineGuards)).toEqual([...featureOrders, 15, 25].sort((a, b) => a - b));
+    expect(catalogOrders(composedHttpPipelineGuards)).toEqual(
+      [...featureOrders, 15, 25].sort((a, b) => a - b),
+    );
     expect(catalogOrders(composedHttpPipelineGuards)).toEqual([10, 15, 20, 25]);
     expect(catalogKinds(composedHttpPipelineGuards).filter((k) => k === "generic")).toHaveLength(2);
   });
@@ -258,7 +265,11 @@ describe("deterministic Nest feature bootstrap matrix", () => {
   });
 
   it("a guard with order below throttler still registers first (numeric, not index)", () => {
-    const fakeGuard = { provide: APP_GUARD, useFactory: () => ({ canActivate: () => true }), inject: [] };
+    const fakeGuard = {
+      provide: APP_GUARD,
+      useFactory: () => ({ canActivate: () => true }),
+      inject: [],
+    };
     const subset = [{ order: 5, provider: fakeGuard }, ...composedHttpPipelineGuards];
     expect(catalogOrders(subset)).toEqual([5, 10, 15, 20, 25]);
   });

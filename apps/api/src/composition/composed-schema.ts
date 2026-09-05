@@ -84,7 +84,10 @@ function normalizePipelineProvider(provider: Provider): Provider {
 function normalizePipelineEntries(
   entries: readonly HttpPipelineProviderEntry[],
 ): HttpPipelineProviderEntry[] {
-  return entries.map((entry) => ({ order: entry.order, provider: normalizePipelineProvider(entry.provider) }));
+  return entries.map((entry) => ({
+    order: entry.order,
+    provider: normalizePipelineProvider(entry.provider),
+  }));
 }
 
 /**

@@ -177,13 +177,17 @@ export function useOrganizationDetailController(): OrganizationDetailViewModel {
     [members],
   );
 
-  const columns = useMemo(() => createOrganizationMemberColumns({
-    canManageMember: (member) => canManageMember(actorContext, member),
-    canDemoteAdminToMember: (member) => canDemoteAdminToMember(actorContext, member),
-    canPromoteAdminToOwner: (member) => canPromoteAdminToOwner(actorContext, member),
-    canDemoteOwnerToAdmin: (member) => canDemoteOwnerToAdmin(actorContext, member),
-    memberActions,
-  }), [actorContext, members, memberActions]);
+  const columns = useMemo(
+    () =>
+      createOrganizationMemberColumns({
+        canManageMember: (member) => canManageMember(actorContext, member),
+        canDemoteAdminToMember: (member) => canDemoteAdminToMember(actorContext, member),
+        canPromoteAdminToOwner: (member) => canPromoteAdminToOwner(actorContext, member),
+        canDemoteOwnerToAdmin: (member) => canDemoteOwnerToAdmin(actorContext, member),
+        memberActions,
+      }),
+    [actorContext, members, memberActions],
+  );
 
   const table = useReactTable({
     data: memberRows,

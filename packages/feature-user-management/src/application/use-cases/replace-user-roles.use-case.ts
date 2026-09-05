@@ -20,7 +20,11 @@ import {
   type OrganizationMemberRole,
   type OrganizationMembership,
 } from "@repo/feature-organizations/contracts";
-import { USER_ERROR_CODES, USERS_REPOSITORY, type UsersRepositoryPort } from "@repo/feature-users/contracts";
+import {
+  USER_ERROR_CODES,
+  USERS_REPOSITORY,
+  type UsersRepositoryPort,
+} from "@repo/feature-users/contracts";
 
 import { assertUserBelongsToOrganization } from "../../user-org-scope.policy";
 import { resolveRoleById } from "../assignable-role.resolver";

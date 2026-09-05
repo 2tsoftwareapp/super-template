@@ -7,14 +7,7 @@ import { Empty, EmptyContent, EmptyHeader, EmptyTitle } from "@repo/web-ui/empty
 import { ErrorState } from "@repo/web-ui/error-state";
 import { ResourcePropertyGrid } from "@repo/web-ui/resource-property-grid";
 import { Show } from "@repo/web-ui/show";
-import {
-  Building,
-  ChevronLeft,
-  LogOut,
-  Settings,
-  Trash2,
-  UserCheck,
-} from "lucide-react";
+import { Building, ChevronLeft, LogOut, Settings, Trash2, UserCheck } from "lucide-react";
 
 import type { OrganizationDetailViewModel } from "@/features/organizations/model/organizations.types";
 
@@ -181,8 +174,20 @@ export function OrganizationDetailContent(vm: OrganizationDetailViewModel) {
                 density="default"
                 properties={[
                   { key: "name", label: "Organization name", value: org.name },
-                  { key: "slug", label: "Slug identifier", value: org.slug, type: "code" as const, copyable: true },
-                  { key: "orgId", label: "Organization ID", value: org.id, type: "id" as const, copyable: true },
+                  {
+                    key: "slug",
+                    label: "Slug identifier",
+                    value: org.slug,
+                    type: "code" as const,
+                    copyable: true,
+                  },
+                  {
+                    key: "orgId",
+                    label: "Organization ID",
+                    value: org.id,
+                    type: "id" as const,
+                    copyable: true,
+                  },
                   {
                     key: "membersCount",
                     label: "Team size",
@@ -190,8 +195,18 @@ export function OrganizationDetailContent(vm: OrganizationDetailViewModel) {
                     type: "badge" as const,
                     badgeVariant: "secondary" as const,
                   },
-                  { key: "createdAt", label: "Created", value: org.createdAt, type: "timestamp" as const },
-                  { key: "updatedAt", label: "Last updated", value: org.updatedAt, type: "timestamp" as const },
+                  {
+                    key: "createdAt",
+                    label: "Created",
+                    value: org.createdAt,
+                    type: "timestamp" as const,
+                  },
+                  {
+                    key: "updatedAt",
+                    label: "Last updated",
+                    value: org.updatedAt,
+                    type: "timestamp" as const,
+                  },
                 ]}
               />
             </CardContent>

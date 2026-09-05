@@ -1,5 +1,10 @@
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { AppError, durationToMilliseconds, generateOpaqueToken, hashOpaqueToken } from "@repo/api-kernel";
+import {
+  AppError,
+  durationToMilliseconds,
+  generateOpaqueToken,
+  hashOpaqueToken,
+} from "@repo/api-kernel";
 import {
   AUTH_SESSION_REPOSITORY,
   type AuthSessionRepositoryPort,

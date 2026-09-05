@@ -22,7 +22,11 @@ vi.mock("@/i18n/navigation", () => ({
 }));
 
 vi.mock("../organization-members-table", () => ({
-  OrganizationMembersTable: ({ table }: { table: { getRowModel: () => { rows: { id: string; original: MemberRow }[] } } }) => (
+  OrganizationMembersTable: ({
+    table,
+  }: {
+    table: { getRowModel: () => { rows: { id: string; original: MemberRow }[] } };
+  }) => (
     <div data-testid="members-table-mock">
       {table.getRowModel().rows.map((row) => (
         <div key={row.id}>

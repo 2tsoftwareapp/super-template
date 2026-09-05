@@ -23,7 +23,13 @@ export interface MemberColumnConfig {
 }
 
 export function createOrganizationMemberColumns(config: MemberColumnConfig) {
-  const { canManageMember, canDemoteAdminToMember, canPromoteAdminToOwner, canDemoteOwnerToAdmin, memberActions } = config;
+  const {
+    canManageMember,
+    canDemoteAdminToMember,
+    canPromoteAdminToOwner,
+    canDemoteOwnerToAdmin,
+    memberActions,
+  } = config;
 
   return [
     columnHelper.accessor("displayName", {
