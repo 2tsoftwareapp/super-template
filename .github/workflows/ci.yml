@@ -147,6 +147,9 @@ jobs:
       - name: Format check
         run: pnpm run format:check
 
+      - name: Schema drift and migration integrity check
+        run: pnpm run schema:check
+
       - name: Source policy
         run: bash scripts/check-source-policy.sh
 
