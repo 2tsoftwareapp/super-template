@@ -594,9 +594,6 @@ importers:
 
   packages/api-kernel:
     dependencies:
-      '@repo/api-sort':
-        specifier: workspace:*
-        version: link:../api-sort
       '@repo/utils':
         specifier: workspace:*
         version: link:../utils
@@ -2227,6 +2224,9 @@ importers:
       '@repo/api-runtime':
         specifier: workspace:*
         version: link:../api-runtime
+      '@repo/api-sort':
+        specifier: workspace:*
+        version: link:../api-sort
       '@repo/config':
         specifier: workspace:*
         version: link:../config

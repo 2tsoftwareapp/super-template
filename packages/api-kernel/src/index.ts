@@ -5,7 +5,6 @@ export * from "./ports/advisory-lock.port";
 export * from "./ports/platform-transaction.port";
 export * from "./ports/tenant-context.port";
 export * from "./ports/transaction.port";
-export * from "./sort/multi-sort";
 export * from "./types/json-value";
 export * from "./types/request-context";
 export * from "./types/transaction-executor";

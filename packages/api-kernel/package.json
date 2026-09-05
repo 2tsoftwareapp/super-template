@@ -14,7 +14,6 @@
     "format": "prettier --write ."
   },
   "dependencies": {
-    "@repo/api-sort": "workspace:*",
     "@repo/utils": "workspace:*",
     "zod": "4.4.3"
   },
