@@ -12,5 +12,6 @@ export * from "./utils/csv";
 export * from "./utils/duration";
 export * from "./utils/normalize-email";
 export * from "./utils/opaque-token";
+export * from "./utils/password";
 export * from "./utils/redact";
 export * from "./utils/require-organization";

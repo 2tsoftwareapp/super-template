@@ -8,7 +8,7 @@ import { AUDIT_WRITER, type AuditWriter } from "@repo/feature-audit/contracts";
 import { OUTBOX_APPENDER, type OutboxAppenderPort } from "@repo/feature-outbox/contracts";
 import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "@repo/feature-users/contracts";
-import { hashPassword, verifyPassword } from "@repo/utils/password";
+import { hashPassword, verifyPassword } from "@repo/api-kernel";
 
 @Injectable()
 export class ChangePasswordUseCase {

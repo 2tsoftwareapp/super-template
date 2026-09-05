@@ -8,7 +8,7 @@ import {
 } from "@repo/feature-access-control/contracts";
 import { ORGANIZATION_MEMBERSHIP } from "@repo/feature-organizations/contracts";
 import { USERS_REPOSITORY, type UsersRepositoryPort } from "@repo/feature-users/contracts";
-import { hashPassword } from "@repo/utils/password";
+import { hashPassword } from "@repo/api-kernel";
 import { randomBytes } from "node:crypto";
 
 import type { ImportExportAdapter, ImportExportRowContext } from "../../public/contracts";

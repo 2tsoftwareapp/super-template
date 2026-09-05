@@ -5,7 +5,7 @@ import {
   verifyPassword,
   verifyPasswordWithTimingPadding,
   verifyRefreshTokenHash,
-} from "./password";
+} from "../password";
 
 describe("password utility", () => {
   describe("password hashing (argon2)", () => {

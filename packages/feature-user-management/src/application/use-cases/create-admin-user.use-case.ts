@@ -29,7 +29,7 @@ import {
   USERS_REPOSITORY,
   type UsersRepositoryPort,
 } from "@repo/feature-users/contracts";
-import { hashPassword } from "@repo/utils/password";
+import { hashPassword } from "@repo/api-kernel";
 
 import { resolveRoleById } from "../assignable-role.resolver";
 import { GetUserUseCase } from "./get-user.use-case";

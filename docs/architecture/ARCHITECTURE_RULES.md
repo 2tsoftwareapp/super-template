@@ -84,6 +84,8 @@ Rules:
   both the NestJS API and the Next.js BFFs. It must not import any framework, DOM,
   or Node-only API. Duplicated pure-TS logic (e.g. the JSON value model) lives here;
   `@repo/api-runtime` and `@repo/web-utils` re-export from it rather than redefining.
+  Node-only crypto (Argon2 password hashing, refresh-token digests) lives in
+  `@repo/api-kernel`, not `@repo/utils`.
 - **API-shaped config is NOT shared config.** Enums, DTOs, and endpoints are synced
   across runtimes by the generated OpenAPI contract (`@repo/api-contract` → TS + Dart).
   Only non-API constants (pagination defaults, cookie names, feature flags) belong in

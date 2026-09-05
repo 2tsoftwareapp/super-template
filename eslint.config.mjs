@@ -1,9 +1,11 @@
 import { defineConfig, globalIgnores } from "eslint/config";
 
 import { baseConfig } from "./packages/eslint-config/base.mjs";
+import { webPackageBoundaryConfig } from "./packages/eslint-config/web-packages.mjs";
 
 export default defineConfig([
   ...baseConfig,
+  ...webPackageBoundaryConfig,
   globalIgnores([
     "**/dist/**",
     "**/coverage/**",

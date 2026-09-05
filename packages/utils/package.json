@@ -4,8 +4,7 @@
   "private": true,
   "exports": {
     ".": "./src/index.ts",
-    "./json": "./src/json.ts",
-    "./password": "./src/password.ts"
+    "./json": "./src/json.ts"
   },
   "scripts": {
     "build": "node ../../tools/tsc7/node_modules/typescript7/bin/tsc -p tsconfig.json",
@@ -20,8 +19,5 @@
     "typescript": "5.9.3",
     "vitest": "4.1.9"
   },
-  "sideEffects": false,
-  "dependencies": {
-    "argon2": "0.44.0"
-  }
+  "sideEffects": false
 }
