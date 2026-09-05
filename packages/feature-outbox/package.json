@@ -25,7 +25,6 @@
     "@nestjs/schedule": "6.1.1",
     "@repo/api-kernel": "workspace:*",
     "@repo/api-plugin-kit": "workspace:*",
-    "@repo/api-runtime": "workspace:*",
     "@repo/database-runtime": "workspace:*",
     "drizzle-orm": "0.45.2"
   },

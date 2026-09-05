@@ -70,7 +70,7 @@ const buildFiles = ({ id, pascal, camel }) => {
   const moduleFile = `${id}.module.ts`;
 
   // JSON files are hand-formatted (not JSON.stringify) to byte-match the repo's
-  // prettier style — short arrays stay inline, as in packages/api-health.
+  // prettier style — short arrays stay inline, as in packages/feature-health.
   const packageJson = `{
   "name": "${pkgName}",
   "version": "1.0.0",

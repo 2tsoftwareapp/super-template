@@ -23,7 +23,6 @@
     "@repo/api-kernel": "workspace:*",
     "@repo/api-plugin-kit": "workspace:*",
     "@repo/api-runtime": "workspace:*",
-    "@repo/config": "workspace:*",
     "@repo/feature-access-control": "workspace:*",
     "@repo/feature-audit": "workspace:*",
     "@repo/feature-upload": "workspace:*",

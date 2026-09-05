@@ -5,7 +5,6 @@
   "type": "commonjs",
   "exports": {
     ".": "./src/index.ts",
-    "./schema": "./src/schema.ts",
     "./schema/timestamps": "./src/persistence/timestamps.ts"
   },
   "scripts": {

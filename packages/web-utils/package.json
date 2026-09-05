@@ -13,7 +13,6 @@
     "./http-config": "./src/http-config.ts",
     "./json": "./src/json.ts",
     "./params": "./src/params.ts",
-    "./storage": "./src/storage.ts",
     "./utils": "./src/utils.ts"
   },
   "scripts": {
