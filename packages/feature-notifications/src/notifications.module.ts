@@ -95,5 +95,7 @@ import { USER_NOTIFICATION_SENDER } from "./public/user-notification-sender.port
 export class NotificationsModule {}
 
 // Re-export concrete classes for e2e/integration test access via @repo/feature-notifications/module.
+export { NotificationsService } from "./application/notifications.service";
 export { NotificationDeliveryProcessor } from "./application/services/notification-delivery.processor";
 export { NotificationDeliveryUseCase } from "./application/use-cases/notification-delivery.use-case";
+export { NotificationJobsRepository } from "./infrastructure/notification-jobs.repository";

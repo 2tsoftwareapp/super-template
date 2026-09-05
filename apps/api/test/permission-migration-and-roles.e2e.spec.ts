@@ -4,8 +4,8 @@ import { randomUUID } from "node:crypto";
 import {
   ACCESS_CONTROL_REPOSITORY,
   type AccessControlRepositoryPort,
-  RoleManagementUseCase,
 } from "@repo/feature-access-control/contracts";
+import { RoleManagementUseCase } from "@repo/feature-access-control/module";
 import { seedDatabase } from "../src/cli/seeds/seed-data";
 import { Pool } from "pg";
 import request from "supertest";

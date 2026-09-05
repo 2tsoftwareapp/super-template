@@ -1,5 +1,5 @@
 import { forwardRef, Global, Module } from "@nestjs/common";
-import { JobsModule } from "@repo/feature-jobs/contracts";
+import { JobsModule } from "@repo/feature-jobs/module";
 
 import { MailJobHandler } from "./application/mail-job.handler";
 import { MailMapper } from "./application/mail.mapper";

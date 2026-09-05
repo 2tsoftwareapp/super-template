@@ -95,3 +95,6 @@ import { USER_ROLE_ASSIGNMENTS } from "./public/user-role-assignments.token";
   ],
 })
 export class AccessControlModule {}
+
+// Re-export concrete classes for e2e/integration test access via @repo/feature-access-control/module.
+export { RoleManagementUseCase } from "./application/use-cases/role-management.use-case";

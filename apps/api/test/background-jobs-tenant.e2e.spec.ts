@@ -7,7 +7,7 @@ import { organizations } from "@repo/feature-organizations/schema";
 import {
   NotificationJobsRepository,
   NotificationsService,
-} from "@repo/feature-notifications/contracts";
+} from "@repo/feature-notifications/module";
 import request from "supertest";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {

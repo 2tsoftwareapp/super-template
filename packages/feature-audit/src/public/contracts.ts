@@ -6,9 +6,6 @@ export type {
   CreateAuditLogInput,
   ListAuditLogsParams,
 } from "../application/ports/audit.repository.port";
-export { AuditCoreModule } from "../audit-core.module";
-/** Public contracts for @repo/feature-audit. */
-export { AuditModule } from "../audit.module";
 export {
   AUDIT_WRITER,
   type AuditLogBaseInput,

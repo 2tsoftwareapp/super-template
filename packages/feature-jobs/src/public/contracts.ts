@@ -1,6 +1,5 @@
 /** Public contracts for @repo/feature-jobs. */
 export type { JobStatus } from "../domain/job-status";
-export { JobsModule } from "../jobs.module";
 export * from "./background-job-enqueuer.port";
 export { JOB_ERROR_CODES } from "./error-codes";
 export {

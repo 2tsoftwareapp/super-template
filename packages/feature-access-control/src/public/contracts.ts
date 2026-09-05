@@ -1,10 +1,10 @@
 /** Public contracts for @repo/feature-access-control. */
 
-// Cross-feature integration surfaces: stable use-case and service
-// that auth/sso/user-management depend on for role management.
+// Cross-feature integration surface: stable service that auth/sso
+// depend on for role/profile management. RoleManagementUseCase (and the
+// Nest module) live under @repo/feature-access-control/module.
 export { AccessControlService } from "../application/access-control.service";
 export type * from "../application/ports/access-control.repository.port";
-export { RoleManagementUseCase } from "../application/use-cases/role-management.use-case";
 export {
   assertCanAssignRoleTargets,
   assertCanManagePrivilegedAccount,
