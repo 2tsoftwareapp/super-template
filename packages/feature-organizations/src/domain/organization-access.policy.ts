@@ -1,6 +1,6 @@
 import { AppError, ERROR_CODES } from "@repo/api-runtime";
 
-import { ORGANIZATION_ERROR_CODES } from "../public/contracts";
+import { ORGANIZATION_ERROR_CODES } from "../public/error-codes";
 export type OrganizationMemberRole = "OWNER" | "ADMIN" | "MEMBER";
 
 export interface OrganizationMembership {

@@ -1,8 +1,8 @@
 import { Module } from "@nestjs/common";
 
 import { ExportsModule } from "./exports/exports.module";
-import { ImportExportModule } from "./infrastructure/import-export.module";
 import { ImportsModule } from "./imports/imports.module";
+import { ImportExportModule } from "./infrastructure/import-export.module";
 
 @Module({
   imports: [ImportExportModule, ImportsModule, ExportsModule],

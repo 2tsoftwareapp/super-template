@@ -4,6 +4,12 @@ export type { CreateOrganizationCommand } from "../application/organizations.typ
 
 export { ORGANIZATIONS_REPOSITORY } from "../application/ports/organizations.repository.port";
 export type * from "../application/ports/organizations.repository.port";
+export {
+  assertCanManageTargetRole,
+  assertNotLastOwner,
+  assertOrganizationRole,
+} from "../domain/organization-access.policy";
+
 /** Public contracts for @repo/feature-organizations. */
 
 export { ORGANIZATION_ERROR_CODES } from "./error-codes";

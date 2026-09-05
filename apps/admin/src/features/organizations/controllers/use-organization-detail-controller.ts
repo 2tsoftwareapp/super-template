@@ -3,14 +3,16 @@
 import { getErrorMessage } from "@repo/web-utils/errors";
 import { internalPath, parseRouteParams } from "@repo/web-utils/params";
 import { useQueryClient } from "@tanstack/react-query";
+import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { notFound, useParams, useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
 
-import type { OrganizationDetailViewModel } from "@/features/organizations/model/organizations.types";
+import type {
+  MemberRow,
+  OrganizationDetailViewModel,
+} from "@/features/organizations/model/organizations.types";
 import type { OrganizationMemberDto } from "@/lib/api-types";
-import type { MemberRow } from "@/features/organizations/ui/organization-members-table";
 
 import {
   useDeleteOrganizationMutation,
@@ -39,9 +41,9 @@ import {
   type CreateOrganizationForm,
   organizationRouteParamsSchema,
 } from "@/features/organizations/model/organizations.schemas";
+import { createOrganizationMemberColumns } from "@/features/organizations/ui/organization-member-columns";
 import { useSession } from "@/hooks/use-session";
 import { useRouter } from "@/i18n/navigation";
-import { createOrganizationMemberColumns } from "@/features/organizations/ui/organization-member-columns";
 
 export type { OrganizationDetailViewModel };
 

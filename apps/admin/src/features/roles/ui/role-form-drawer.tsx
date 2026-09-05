@@ -4,6 +4,7 @@ import { standardSchemaResolver as zodResolver } from "@hookform/resolvers/stand
 import { Button } from "@repo/web-ui/button";
 import { Input } from "@repo/web-ui/input";
 import { Label } from "@repo/web-ui/label";
+import { ResourceDrawer } from "@repo/web-ui/resource-drawer";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@repo/web-ui/select";
 import { Spinner } from "@repo/web-ui/spinner";
 import { Building2 } from "lucide-react";
@@ -11,7 +12,6 @@ import { useEffect, useMemo } from "react";
 import { useForm, useWatch } from "react-hook-form";
 
 import { PermissionMultiSelect } from "@/components/permission-multi-select";
-import { ResourceDrawer } from "@repo/web-ui/resource-drawer";
 import { selectDelegatablePermissions } from "@/features/roles/model/roles.permissions";
 import {
   createRoleFormSchema,

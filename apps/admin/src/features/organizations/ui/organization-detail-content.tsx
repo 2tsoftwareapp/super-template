@@ -7,7 +7,6 @@ import { Empty, EmptyContent, EmptyHeader, EmptyTitle } from "@repo/web-ui/empty
 import { ErrorState } from "@repo/web-ui/error-state";
 import { ResourcePropertyGrid } from "@repo/web-ui/resource-property-grid";
 import { Show } from "@repo/web-ui/show";
-import type { Table } from "@tanstack/react-table";
 import {
   Building,
   ChevronLeft,
@@ -18,7 +17,6 @@ import {
 } from "lucide-react";
 
 import type { OrganizationDetailViewModel } from "@/features/organizations/model/organizations.types";
-import type { MemberRow } from "./organization-members-table";
 
 import { ResourcePageShell } from "@/components/resource-page-shell";
 import { adminResources } from "@/features/_plugin-resources/admin-resources";

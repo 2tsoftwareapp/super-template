@@ -12,8 +12,8 @@ import type { AdminUserDto } from "@/lib/api-types";
 
 import { ResourcePageShell } from "@/components/resource-page-shell";
 import { adminResources } from "@/features/_plugin-resources/admin-resources";
-import { formatRoleName } from "@/lib/roles";
 import { timeAgo, truncateId } from "@/lib/format";
+import { formatRoleName } from "@/lib/roles";
 
 import { UserDetailAuditTimeline } from "./user-detail-audit-timeline";
 import { UserDetailDangerZone } from "./user-detail-danger-zone";

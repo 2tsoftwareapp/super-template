@@ -6,6 +6,8 @@ import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { ERROR_CODES } from "@repo/api-runtime";
 import { AppError, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
 import {
+  assertCanAssignRoleTargets,
+  assertRoleScopeCanBeAssigned,
   ROLE_NAMES,
   USER_ACCESS_CONTROL,
   USER_PROFILE_INVALIDATOR,
@@ -18,13 +20,8 @@ import {
   type OrganizationMemberRole,
   type OrganizationMembership,
 } from "@repo/feature-organizations/contracts";
-import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
-import { USERS_REPOSITORY, type UsersRepositoryPort } from "@repo/feature-users/contracts";
+import { USER_ERROR_CODES, USERS_REPOSITORY, type UsersRepositoryPort } from "@repo/feature-users/contracts";
 
-import {
-  assertCanAssignRoleTargets,
-  assertRoleScopeCanBeAssigned,
-} from "@repo/feature-access-control/contracts";
 import { assertUserBelongsToOrganization } from "../../user-org-scope.policy";
 import { resolveRoleById } from "../assignable-role.resolver";
 import { GetUserUseCase } from "./get-user.use-case";

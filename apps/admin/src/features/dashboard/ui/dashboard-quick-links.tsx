@@ -3,7 +3,6 @@ import {
   ArrowUpRight,
   Building2,
   Folder,
-  Layers,
   Mail,
   Megaphone,
   Shield,

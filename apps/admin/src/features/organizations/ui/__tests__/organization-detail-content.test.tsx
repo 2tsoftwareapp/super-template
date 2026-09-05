@@ -1,9 +1,12 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
 import React from "react";
+import { describe, expect, it, vi } from "vitest";
 
-import type { OrganizationDetailViewModel } from "@/features/organizations/model/organizations.types";
+import type {
+  MemberRow,
+  OrganizationDetailViewModel,
+} from "@/features/organizations/model/organizations.types";
 import type { OrganizationDetailDto, OrganizationMemberDto } from "@/lib/api-types";
 
 import { OrganizationDetailContent } from "../organization-detail-content";
@@ -19,9 +22,9 @@ vi.mock("@/i18n/navigation", () => ({
 }));
 
 vi.mock("../organization-members-table", () => ({
-  OrganizationMembersTable: ({ table }: any) => (
+  OrganizationMembersTable: ({ table }: { table: { getRowModel: () => { rows: { id: string; original: MemberRow }[] } } }) => (
     <div data-testid="members-table-mock">
-      {table.getRowModel().rows.map((row: any) => (
+      {table.getRowModel().rows.map((row) => (
         <div key={row.id}>
           <span>{row.original.displayName}</span>
           <span>{row.original.role.toLowerCase()}</span>
@@ -89,7 +92,7 @@ function createMockDetailViewModel(
     getVisibleLeafColumns: () => [],
     getAllLeafColumns: () => [],
     getState: () => ({ sorting: [] }),
-  } as any;
+  } as unknown as OrganizationDetailViewModel["table"];
 
   return {
     orgId: "org-1",

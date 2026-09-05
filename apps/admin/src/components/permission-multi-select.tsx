@@ -1,7 +1,6 @@
 "use client";
 
 import { Badge } from "@repo/web-ui/badge";
-import { Button } from "@repo/web-ui/button";
 import { Checkbox } from "@repo/web-ui/checkbox";
 import { Input } from "@repo/web-ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@repo/web-ui/popover";
@@ -43,10 +42,8 @@ export function PermissionMultiSelect({
         : p.name.includes(":")
           ? p.name.split(":")[0]!
           : "general";
-      if (!groups[prefix]) {
-        groups[prefix] = [];
-      }
-      groups[prefix]!.push(p);
+      groups[prefix] ??= [];
+      groups[prefix].push(p);
     }
     return groups;
   }, [filteredPermissions]);

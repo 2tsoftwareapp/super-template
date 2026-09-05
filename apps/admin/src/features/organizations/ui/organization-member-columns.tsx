@@ -4,8 +4,8 @@ import { Badge } from "@repo/web-ui/badge";
 import { createColumnHelper } from "@tanstack/react-table";
 import { Crown, Shield, User } from "lucide-react";
 
+import type { MemberRow } from "@/features/organizations/model/organizations.types";
 import type { OrganizationMemberDto } from "@/lib/api-types";
-import type { MemberRow } from "./organization-members-table";
 
 import { MemberActionsMenu } from "./member-actions-menu";
 

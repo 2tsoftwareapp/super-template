@@ -7,6 +7,8 @@ import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { ERROR_CODES } from "@repo/api-runtime";
 import { AppError, normalizeEmail, SYSTEM_SCOPE, TRANSACTION_PORT } from "@repo/api-runtime";
 import {
+  assertCanAssignRoleTargets,
+  assertRoleScopeCanBeAssigned,
   ROLE_NAMES,
   USER_ACCESS_CONTROL,
   USER_PROFILE_INVALIDATOR,
@@ -22,14 +24,9 @@ import {
   type OrganizationMembership,
 } from "@repo/feature-organizations/contracts";
 import { OUTBOX_APPENDER, type OutboxAppenderPort } from "@repo/feature-outbox/contracts";
-import { USER_ERROR_CODES } from "@repo/feature-users/contracts";
-import { USERS_REPOSITORY, type UsersRepositoryPort } from "@repo/feature-users/contracts";
+import { USER_ERROR_CODES, USERS_REPOSITORY, type UsersRepositoryPort } from "@repo/feature-users/contracts";
 import { hashPassword } from "@repo/utils/password";
 
-import {
-  assertCanAssignRoleTargets,
-  assertRoleScopeCanBeAssigned,
-} from "@repo/feature-access-control/contracts";
 import { resolveRoleById } from "../assignable-role.resolver";
 import { GetUserUseCase } from "./get-user.use-case";
 

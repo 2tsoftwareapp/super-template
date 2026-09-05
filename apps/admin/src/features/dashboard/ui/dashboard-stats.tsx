@@ -1,7 +1,7 @@
 import { Badge } from "@repo/web-ui/badge";
 import { Card, CardContent } from "@repo/web-ui/card";
 import { ErrorState } from "@repo/web-ui/error-state";
-import { Activity, ArrowUpRight, CheckCircle2, ShieldCheck, Users, Workflow } from "lucide-react";
+import { Activity, ArrowUpRight, ShieldCheck, Users, Workflow } from "lucide-react";
 import { type ReactNode } from "react";
 
 import { Link } from "@/i18n/navigation";

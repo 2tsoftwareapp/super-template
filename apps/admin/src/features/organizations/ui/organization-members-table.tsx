@@ -4,13 +4,7 @@ import type { Table } from "@tanstack/react-table";
 
 import { ResourceDataTable } from "@repo/web-ui/resource-data-table";
 
-export interface MemberRow {
-  userId: string;
-  displayName: string | null;
-  email: string | null;
-  role: "OWNER" | "ADMIN" | "MEMBER";
-  createdAt: string;
-}
+import type { MemberRow } from "@/features/organizations/model/organizations.types";
 
 interface OrganizationMembersTableProps {
   table: Table<MemberRow>;

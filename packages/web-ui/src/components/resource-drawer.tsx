@@ -1,9 +1,10 @@
 "use client";
 
+import type { ReactNode } from "react";
+
 import { useAnimatePresence } from "@repo/web-hooks/use-animate-presence";
 import { cn } from "@repo/web-utils/utils";
 import { X } from "lucide-react";
-import type { ReactNode } from "react";
 
 import { Button } from "./button";
 

@@ -1,10 +1,9 @@
 "use client";
 
-import { Badge } from "@repo/web-ui/badge";
 import { Button } from "@repo/web-ui/button";
 import { Show } from "@repo/web-ui/show";
 import { Spinner } from "@repo/web-ui/spinner";
-import { AlertTriangle, ArrowRight, CheckCircle2 } from "lucide-react";
+import { AlertTriangle, ArrowRight } from "lucide-react";
 
 import type { DashboardViewModel } from "@/features/dashboard/model/dashboard.types";
 

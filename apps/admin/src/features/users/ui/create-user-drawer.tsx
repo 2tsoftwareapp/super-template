@@ -5,6 +5,7 @@ import { Button } from "@repo/web-ui/button";
 import { Input } from "@repo/web-ui/input";
 import { Label } from "@repo/web-ui/label";
 import { PasswordInput } from "@repo/web-ui/password-input";
+import { ResourceDrawer } from "@repo/web-ui/resource-drawer";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@repo/web-ui/select";
 import { Spinner } from "@repo/web-ui/spinner";
 import { Building2 } from "lucide-react";
@@ -13,7 +14,7 @@ import { useForm, useWatch } from "react-hook-form";
 
 import type { CreateUserForm } from "@/features/users/model/users.schemas";
 import type { AdminUserDto, RoleDto } from "@/lib/api-types";
-import { ResourceDrawer } from "@repo/web-ui/resource-drawer";
+
 import { createUserSchema } from "@/features/users/model/users.schemas";
 import { filterRolesForOrganization, findPlatformUserRoleId, formatRoleName } from "@/lib/roles";
 

@@ -8,8 +8,6 @@ import {
   Activity,
   ArrowRight,
   Clock,
-  FileText,
-  KeyRound,
   LogIn,
   Mail,
   Shield,

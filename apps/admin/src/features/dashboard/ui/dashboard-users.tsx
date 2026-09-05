@@ -4,10 +4,9 @@ import { Card, CardContent, CardHeader } from "@repo/web-ui/card";
 import { Empty, EmptyContent, EmptyHeader, EmptyTitle } from "@repo/web-ui/empty";
 import { ErrorState } from "@repo/web-ui/error-state";
 import { SectionLoading } from "@repo/web-ui/loading";
-import { ArrowRight, UserCheck, Users } from "lucide-react";
+import { ArrowRight, Users } from "lucide-react";
 
 import { Link } from "@/i18n/navigation";
-import { cn } from "@/lib/utils";
 
 interface User {
   id: string;

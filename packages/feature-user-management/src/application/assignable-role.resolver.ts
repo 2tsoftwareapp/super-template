@@ -3,7 +3,7 @@ import type { UserAccessControl } from "@repo/feature-access-control/contracts";
 import type { AssignableRoleName } from "@repo/feature-users/contracts";
 
 import { AppError, ERROR_CODES } from "@repo/api-runtime";
-import { type RolePolicyTarget, ROLE_NAMES } from "@repo/feature-access-control/contracts";
+import { ROLE_NAMES, type RolePolicyTarget } from "@repo/feature-access-control/contracts";
 
 export async function resolveAssignableRole(
   accessControlService: UserAccessControl,

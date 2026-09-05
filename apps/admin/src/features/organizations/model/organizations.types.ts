@@ -1,3 +1,5 @@
+import type { Table } from "@tanstack/react-table";
+
 import type {
   OrganizationDetailDto,
   OrganizationDto,
@@ -5,8 +7,14 @@ import type {
 } from "@/lib/api-types";
 
 import type { CreateOrganizationForm } from "./organizations.schemas";
-import type { Table } from "@tanstack/react-table";
-import type { MemberRow } from "@/features/organizations/ui/organization-members-table";
+
+export interface MemberRow {
+  userId: string;
+  displayName: string | null;
+  email: string | null;
+  role: "OWNER" | "ADMIN" | "MEMBER";
+  createdAt: string;
+}
 
 export interface OrganizationSwitcherViewModel {
   organizationId: string | null;

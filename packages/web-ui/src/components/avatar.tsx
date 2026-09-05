@@ -3,7 +3,7 @@
 import { cn } from "@repo/web-utils/utils";
 import * as React from "react";
 
-function getInitials(name?: string | undefined): string {
+function getInitials(name?: string): string {
   if (!name) return "";
   return name
     .split(" ")

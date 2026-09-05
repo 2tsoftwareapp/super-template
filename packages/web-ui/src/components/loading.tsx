@@ -2,7 +2,6 @@
 
 import { cn } from "@repo/web-utils/utils";
 
-import { Card, CardDescription, CardHeader, CardTitle } from "./card";
 import { Skeleton } from "./skeleton";
 import { Spinner } from "./spinner";
 

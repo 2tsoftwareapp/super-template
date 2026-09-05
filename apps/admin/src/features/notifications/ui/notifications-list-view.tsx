@@ -8,7 +8,6 @@ import { ErrorState } from "@repo/web-ui/error-state";
 import { SectionLoading } from "@repo/web-ui/loading";
 import { ResourceDataTable } from "@repo/web-ui/resource-data-table";
 import { Show } from "@repo/web-ui/show";
-import type { Table as ReactTable } from "@tanstack/react-table";
 
 import { adminResources } from "@/features/_plugin-resources/admin-resources";
 import { scalarString, timeAgo } from "@/lib/format";
