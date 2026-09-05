@@ -86,6 +86,9 @@ Rules:
   `@repo/api-runtime` and `@repo/web-utils` re-export from it rather than redefining.
   Node-only crypto (Argon2 password hashing, refresh-token digests) lives in
   `@repo/api-kernel`, not `@repo/utils`.
+- **Import from the owning package.** Features should import ports/errors from
+  `@repo/api-kernel` and `FeatureManifest` from `@repo/api-plugin-kit`. Prefer those
+  over the convenience re-exports on `@repo/api-runtime` (kept for the Nest host).
 - **API-shaped config is NOT shared config.** Enums, DTOs, and endpoints are synced
   across runtimes by the generated OpenAPI contract (`@repo/api-contract` → TS + Dart).
   Only non-API constants (pagination defaults, cookie names, feature flags) belong in
@@ -94,6 +97,9 @@ Rules:
   TypeScript; `pnpm generate` serializes it to `generated/config.json` and a Dart
   artifact under `apps/mobile/lib/generated/config/`. Do not hand-edit the generated
   files. Backend and web import the TS directly; the app consumes the generated Dart.
+- **`@repo/web-ui` primitives.** Prefer consolidating on one headless stack over time
+  (Base UI vs Radix). Do not add a third primitive library; new composites should
+  reuse the stack already used by neighboring components.
 
 ## 3. Composition roots
 

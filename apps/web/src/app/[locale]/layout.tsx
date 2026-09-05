@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { tweakcnFontClassName } from "@repo/web-utils/theme/tweakcn-fonts";
+import { tweakcnFontClassName } from "@/lib/tweakcn-fonts";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { notFound } from "next/navigation";
 import { NuqsAdapter } from "nuqs/adapters/next/app";

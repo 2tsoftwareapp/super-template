@@ -2,6 +2,31 @@
   "$schema": "https://v2-9-18.turborepo.dev/schema.json",
   "boundaries": {
     "tags": {
+      "layer:kernel": {
+        "dependencies": {
+          "allow": [
+            "layer:kernel",
+            "layer:core",
+            "layer:env",
+            "layer:sort",
+            "layer:tsconfig",
+            "layer:eslint"
+          ]
+        }
+      },
+      "layer:runtime": {
+        "dependencies": {
+          "allow": [
+            "layer:runtime",
+            "layer:kernel",
+            "layer:core",
+            "layer:env",
+            "layer:sort",
+            "layer:tsconfig",
+            "layer:eslint"
+          ]
+        }
+      },
       "layer:core": {
         "dependencies": {
           "allow": [
@@ -25,6 +50,7 @@
       "layer:database": {
         "dependencies": {
           "allow": [
+            "layer:kernel",
             "layer:core",
             "layer:env",
             "layer:database",
@@ -47,6 +73,8 @@
       "layer:health": {
         "dependencies": {
           "allow": [
+            "layer:kernel",
+            "layer:runtime",
             "layer:core",
             "layer:env",
             "layer:database",
@@ -60,6 +88,8 @@
       "layer:app": {
         "dependencies": {
           "allow": [
+            "layer:kernel",
+            "layer:runtime",
             "layer:core",
             "layer:env",
             "layer:database",
@@ -72,13 +102,16 @@
             "layer:app",
             "layer:sort",
             "layer:tsconfig",
-            "layer:eslint"
+            "layer:eslint",
+            "layer:test"
           ]
         }
       },
       "layer:feature": {
         "dependencies": {
           "allow": [
+            "layer:kernel",
+            "layer:runtime",
             "layer:core",
             "layer:env",
             "layer:database",
@@ -90,7 +123,8 @@
             "layer:feature",
             "layer:sort",
             "layer:tsconfig",
-            "layer:eslint"
+            "layer:eslint",
+            "layer:test"
           ]
         }
       },
@@ -106,6 +140,15 @@
           "allow": [
             "layer:eslint",
             "layer:tsconfig"
+          ]
+        }
+      },
+      "layer:test": {
+        "dependencies": {
+          "allow": [
+            "layer:test",
+            "layer:tsconfig",
+            "layer:eslint"
           ]
         }
       },

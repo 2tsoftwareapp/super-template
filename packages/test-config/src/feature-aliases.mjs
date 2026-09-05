@@ -107,6 +107,13 @@ const subpathExports = {
     schema: "infrastructure/persistence/index.ts",
     module: "users.module.ts",
   },
+  "feature-user-management": {
+    module: "user-management.module.ts",
+  },
+  "feature-organization-management": {
+    contracts: "public/contracts.ts",
+    module: "organization-management.module.ts",
+  },
 };
 
 const sharedSubpathExports = {
@@ -122,7 +129,8 @@ function featureEntry(pkg) {
   if (pkg === "feature-outbox") return "index.ts";
   if (pkg === "feature-user-preferences") return "user-preferences.feature.ts";
   if (pkg === "feature-import-export") return "import-export.feature.ts";
-  if (pkg === "feature-upload") return "upload.feature.ts";
+  if (pkg === "feature-user-management") return "user-management.feature.ts";
+  if (pkg === "feature-organization-management") return "organization-management.feature.ts";
   return `${id}.feature.ts`;
 }
 
