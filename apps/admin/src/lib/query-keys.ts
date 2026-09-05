@@ -13,7 +13,8 @@ export const organizationsKeys = {
   details: () => [...organizationsKeys.all, "detail"] as const,
   detail: (id: string) => [...organizationsKeys.details(), id] as const,
   members: (id: string) => [...organizationsKeys.all, "members", id] as const,
-  member: (orgId: string, userId: string) => [...organizationsKeys.members(orgId), userId] as const,
+  member: (orgId: string, userId: string) =>
+    [...organizationsKeys.members(orgId), userId] as const,
 };
 
 export const rolesKeys = {
@@ -22,3 +23,6 @@ export const rolesKeys = {
   list: (params: RolesListParams) => [...rolesKeys.lists(), params] as const,
   permissions: () => [...rolesKeys.all, "permissions"] as const,
 };
+
+/** Session query key for admin BFF `/api/auth/session`. */
+export const adminSessionQueryKey = ["admin-session"] as const;

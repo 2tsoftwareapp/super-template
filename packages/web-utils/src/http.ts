@@ -14,7 +14,8 @@ export class ApiClientError extends Error {
 
 let csrfFetchPromise: Promise<void> | null = null;
 
-async function ensureCsrfToken(): Promise<void> {
+/** Eagerly bootstrap the CSRF cookie when missing (e.g. app Providers). */
+export async function ensureCsrfToken(): Promise<void> {
   if (typeof document === "undefined") {
     return;
   }

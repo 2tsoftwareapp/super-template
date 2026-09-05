@@ -39,7 +39,7 @@ interface LocalCacheEntry {
 /**
  * Adapter implementing the APPLICATION_SETTINGS_LOOKUP port for the platform
  * settings store. Consumers that only need to enforce toggles depend on the
- * api-core port instead of the settings repository directly.
+ * api-kernel port instead of the settings repository directly.
  *
  * Flag values are cached briefly (default 5s) so the global MaintenanceModeGuard
  * does not hit the DB on every request. With Redis configured the cache is

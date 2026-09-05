@@ -46,20 +46,23 @@ apps/api/src/
   cli/            migrate / seed / reset entry points (+ seeds/)
 
 packages/          kernel libraries + compile-time feature packages
-  api-core/       shared backend kernel, ports, errors, auth primitives
-  api-database/   Drizzle schema, database runtime, migration support
-  feature-health/ health-check capability — the exemplar feature package
-  feature-*/      compile-time feature plugin packages (feature-auth, feature-mail, ...)
-  api-contract/   generated TypeScript API contract
-  api-sort/       shared sorting contract/helpers
-  env-loader/     environment resolution
-  config/         cross-runtime non-API config, single source of truth
-  utils/          runtime-agnostic pure-TS shared by backend AND web
-  web-ui/         shared frontend UI components (no hooks, no logic)
-  web-hooks/      shared frontend React hooks
-  web-utils/      web-only non-hook logic (http, session, storage, cn)
-  web-server/     server-only web logic (auth, cookies, BFF backend)
-  web-test/       shared frontend test utilities
+  api-kernel/         framework-free ports, errors, types, pure helpers
+  api-plugin-kit/     FeatureManifest + compose helpers
+  api-runtime/        Nest HTTP runtime (env schema, guards, filters, Redis)
+  database-runtime/   Drizzle pool, RLS/GUC, transactions (composed schema)
+  feature-health/     health-check capability — the exemplar feature package
+  feature-*/          compile-time feature plugin packages (feature-auth, feature-mail, ...)
+  api-contract/       generated TypeScript API contract
+  api-sort/           shared sorting contract/helpers
+  env-loader/         environment resolution
+  config/             cross-runtime non-API config, single source of truth
+  utils/              runtime-agnostic pure-TS shared by backend AND web
+  observability/      Sentry / error reporting
+  web-ui/             shared frontend UI components (no hooks, no logic)
+  web-hooks/          shared frontend React hooks
+  web-utils/          web-only non-hook logic (http, session, storage, cn)
+  web-server/         server-only web logic (auth, cookies, BFF backend)
+  web-test/           shared frontend test utilities
 ```
 
 ### 2.1 Shared-package layering
@@ -561,7 +564,7 @@ The identity and platform contexts (`@repo/feature-auth`, `@repo/feature-upload`
 
 They communicate through:
 
-- deliberate types in `api-core`;
+- deliberate types in `api-kernel`;
 - stable port tokens;
 - explicit public facades;
 - events when event-driven communication is introduced.
@@ -583,9 +586,10 @@ Before adding `forwardRef()`:
 See [ADR 0002](../adr/0002-feature-plugin-architecture.md). `packages/` contains
 two kinds of code:
 
-1. **Kernel libraries** (always on) — `api-core`, `api-database`, `api-contract`,
-   `api-sort`, `env-loader`, `config`, `utils`, all `web-*` packages, and the
-   Flutter `mobile_core`. The kernel holds no identity/platform business tables.
+1. **Kernel libraries** (always on) — `api-kernel`, `api-plugin-kit`, `api-runtime`,
+   `database-runtime`, `api-contract`, `api-sort`, `env-loader`, `config`, `utils`,
+   `observability`, all `web-*` packages, and the Flutter `mobile_core`. The kernel
+   holds no identity/platform business tables.
 2. **Feature plugins** — optional, self-contained capabilities under
    `packages/feature-<name>/`, wired in explicitly at compile time. `feature-health`
    is the minimal exemplar (backend-only, no schema).
@@ -593,23 +597,21 @@ two kinds of code:
 A feature plugin's **backend** surface MUST:
 
 - export exactly one public surface — its Nest `Module` — plus a
-  `FeatureManifest` (`@repo/api-runtime`: `{ id, nestModule, schema?, permissions? }`)
+  `FeatureManifest` (`@repo/api-plugin-kit`: `{ id, nestModule, schema?, permissions? }`)
   from `index.ts`;
 - depend only on kernel packages (`layer:core/env/database/sort/contract`) and
   peer feature **public** surfaces (`layer:feature`) — never on another feature's
   internals, never on any `apps/*` internals;
 - keep its full vertical slice inside the package
   (application/infrastructure/presentation/domain as needed);
-- own its Drizzle tables + SQL migrations under `src/database/`;
+- own its Drizzle tables under `src/infrastructure/persistence/` (SQL migrations
+  are composed into `apps/api/migrations` via `@repo/database-runtime` drizzle-kit);
 - carry colocated unit tests and its own lint/typecheck scripts.
 
-> **Transitional exception:** `feature-identity` and `feature-platform` were
-> extracted as whole bounded contexts and still keep their tables in the built-in
-> `@repo/database-runtime` schema (identity because `m_users`/`m_organizations` are the
-> FK anchors every other feature references). Their manifests contribute no schema;
-> `features.ts` merges the built-in schema with feature-contributed schema so the
-> composed result is identical. Finer-grained per-capability schema ownership is a
-> follow-up.
+> **Schema composition:** `@repo/database-runtime` exports an empty built-in schema.
+> Feature packages contribute tables via `FeatureManifest.schema`;
+> `apps/api/src/composition/feature-registry.ts` composes them for
+> `DatabaseModule.forRoot({ schema })`.
 
 A feature plugin's **frontend** surfaces (admin/web slices, Flutter package) live
 in the same package behind per-surface entrypoints (`./admin`, `./web`) and a Dart

@@ -23,8 +23,10 @@
 | apps/admin | app | Next.js 16 + RHF + TanStack Query/Table | `src/app/[locale]/(app)` | `pnpm --filter admin dev` | apps/admin/package.json |
 | apps/web | app | Next.js 16 (landing + auth BFF) | `src/app/[locale]` | `pnpm --filter web dev` | apps/web/package.json |
 | apps/mobile | app | Flutter 3 + Riverpod + go_router | `lib/main.dart` | `make dev-mobile` | apps/mobile/pubspec.yaml |
-| packages/api-core | package (kernel) | NestJS-free kernel, ports, errors | `src/index.ts` | turbo tasks | packages/api-core/package.json |
-| packages/api-database | package (kernel) | Drizzle schema/migrations | `src/schema.ts` | — | packages/api-database/package.json |
+| packages/api-kernel | package (kernel) | NestJS-free kernel, ports, errors | `src/index.ts` | turbo tasks | packages/api-kernel/package.json |
+| packages/api-plugin-kit | package (kernel) | FeatureManifest + compose helpers | `src/index.ts` | turbo tasks | packages/api-plugin-kit/package.json |
+| packages/api-runtime | package (kernel) | Nest HTTP runtime, env schema, guards | `src/index.ts` | turbo tasks | packages/api-runtime/package.json |
+| packages/database-runtime | package (kernel) | Drizzle pool/RLS/transactions | `src/index.ts` | — | packages/database-runtime/package.json |
 | packages/feature-health | package (feature-plugin exemplar) | NestJS terminus indicators + FeatureManifest | `src/health.feature.ts` | — | packages/feature-health/package.json |
 | packages/feature-auth, feature-users, feature-access-control, ... | feature plugins | Identity context packages (auth/users/orgs/access-control/mfa/sso) | per-package `src/*.feature.ts` | turbo tasks | packages/feature-*/package.json |
 | packages/feature-mail, feature-jobs, feature-upload, ... | feature plugins | Platform context packages (jobs/mail/files/audit/settings…) | per-package `src/*.feature.ts` | turbo tasks | packages/feature-*/package.json |
@@ -40,7 +42,7 @@
 | TypeScript | language | 5.9.3 (+TS7 toolchain for scripts) | all | package.json files | high |
 | NestJS | API framework | 11.1.x | apps/api | apps/api/package.json | high |
 | Next.js | admin/web framework | 16 | apps/admin, apps/web | apps/*/package.json | high |
-| Drizzle ORM | SQL | 0.45 | api-database, api | packages/api-database | high |
+| Drizzle ORM | SQL | 0.45 | database-runtime, feature-*, api | packages/database-runtime | high |
 | PostgreSQL | store | 18 (compose), RLS multi-tenant | infra/docker-compose.yml | infra | high |
 | Redis | cache/throttle (optional) | compose | apps/api | docker-compose | medium |
 | Flutter/Dart | mobile | 3.x | apps/mobile | pubspec.yaml | high |
@@ -50,9 +52,9 @@
 
 | Component / flow | Responsibility | Entry point / boundary | Dependencies | Source |
 |---|---|---|---|---|
-| Identity context | auth/users/orgs/access-control/mfa/sso/preferences | `packages/feature-*/src/...` (e.g. `feature-auth`, `feature-users`, `feature-access-control`) presentation→application→domain→infrastructure | api-core tokens | ARCHITECTURE_RULES §5–15 |
-| Platform context | jobs/mail/files/audit/notifications/settings/storage/import-export/activities/attachments | `packages/feature-*/src/...` (e.g. `feature-mail`, `feature-jobs`, `feature-upload`) same layering | api-core tokens | same |
-| Feature composition | compile-time plugin wiring (manifest → schema + modules) | `apps/api/src/composition/feature-registry.ts` + `@repo/api-plugin-kit` FeatureManifest | api-core, feature-* | docs/adr/0002 |
+| Identity context | auth/users/orgs/access-control/mfa/sso/preferences | `packages/feature-*/src/...` (e.g. `feature-auth`, `feature-users`, `feature-access-control`) presentation→application→domain→infrastructure | api-kernel tokens | ARCHITECTURE_RULES §5–15 |
+| Platform context | jobs/mail/files/audit/notifications/settings/storage/import-export/activities/attachments | `packages/feature-*/src/...` (e.g. `feature-mail`, `feature-jobs`, `feature-upload`) same layering | api-kernel tokens | same |
+| Feature composition | compile-time plugin wiring (manifest → schema + modules) | `apps/api/src/composition/feature-registry.ts` + `@repo/api-plugin-kit` FeatureManifest | api-kernel, feature-* | docs/adr/0002 |
 | Admin BFF proxy | cookie session, CSRF, refresh single-flight | `apps/admin/src/app/api/**`, `packages/web-server` | web-utils, env-loader | web-server README |
 | Contracts | OpenAPI → TS client (+Dart) | `apps/api/openapi.json` → packages/api-contract | nest swagger | scripts/generate-* |
 | Cross-context rule | only stable surface (ports/domain/constants) | eslint ctxForbidden + check-package-cycles.sh | — | eslint.config.mjs |
@@ -90,7 +92,7 @@
 ### Code
 
 - Structure/naming: frontend feature slices `features/<x>/{api,model,controllers,screens,ui,index.ts}`; backend feature plugins `packages/feature-<name>/src/{presentation,application,domain,infrastructure}` (see apps/*/AGENTS.md, ARCHITECTURE_RULES, docs/adr/0002).
-- Error handling: AppError + ERROR_CODES from api-core; envelope responses via interceptor.
+- Error handling: AppError + ERROR_CODES from api-kernel; envelope responses via interceptor.
 - Doc-comment style (detected): TSDoc-style `/** */` on exported symbols where non-obvious.
 - Flow/rationale comments: numbered `Step N:` markers for multi-stage logic; rationale comments own-marked where non-obvious.
 

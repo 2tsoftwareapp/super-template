@@ -1,6 +1,6 @@
 "use client";
 
-import { adminSessionQueryKey } from "@repo/web-hooks/admin-session-query-key";
+import { adminSessionQueryKey } from "@/lib/query-keys";
 import { useDebouncedUrlSearch } from "@repo/web-hooks/use-debounced-url-search";
 import { createUseSession } from "@repo/web-hooks/use-session-factory";
 import { classifyError, getErrorMessage } from "@repo/web-utils/errors";

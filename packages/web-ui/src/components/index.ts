@@ -11,7 +11,6 @@ export * from "./checkbox";
 export * from "./command";
 export * from "./common-resource-page";
 export * from "./confirm-dialog";
-export * from "./csrf-bootstrap";
 export * from "./date-picker";
 export * from "./dialog";
 export * from "./dropdown";

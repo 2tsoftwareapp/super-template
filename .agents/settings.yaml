@@ -19,7 +19,7 @@ rules:
   #   direct    — work/commit on base/main
   #   checkout  — create/checkout a work branch first (safer default)
   branch:
-    mode: checkout
+    mode: direct
     base: ""       # empty = detect (e.g. main)
     naming: ""     # e.g. feat/<slug>
 

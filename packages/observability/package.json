@@ -15,8 +15,6 @@
   },
   "dependencies": {
     "@nestjs/common": "11.1.27",
-    "@repo/api-kernel": "workspace:*",
-    "@repo/config": "workspace:*",
     "@sentry/node": "10.58.0"
   },
   "devDependencies": {

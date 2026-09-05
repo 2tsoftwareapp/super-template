@@ -1223,7 +1223,7 @@ rg "useQuery|useMutation" apps/admin/src/features/**/ui
 ```
 
 ```bash
-rg "@repo/api-database|drizzle-orm" \
+rg "@repo/database-runtime|drizzle-orm" \
   packages/api-*/src/modules/**/application
 ```
 

@@ -17,29 +17,28 @@ apps/
   mobile   Flutter app (iOS/Android)
 apps/api/src               composition root only — no business logic
   app.module.ts            wires kernel + composed feature modules
-  features.ts              feature manifest list → composed schema + modules
+  composition/feature-registry.ts  enabled FeatureManifest list → composed schema + modules
   main.ts / shell / cli    bootstrap, guards/interceptors, seeds
 packages/
+  @repo/api-kernel         framework-free ports, errors, types, pure helpers
+  @repo/api-plugin-kit     FeatureManifest + compose helpers
+  @repo/api-runtime        Nest HTTP runtime (env schema, guards, filters, Redis)
+  @repo/database-runtime   Drizzle pool/RLS/transactions (composed schema from features)
   @repo/api-contract       OpenAPI contract source of truth
-  @repo/api-runtime / @repo/api-kernel           thin kernel: ports, config, cross-feature tokens, FeatureManifest
-  @repo/database-runtime       Drizzle schema + migrations (kernel + identity FK anchors)
   @repo/api-sort           sorting/query helpers
-  @repo/env-loader         layered env resolution
-  @repo/web-ui             shared React UI component library (design system)
-  @repo/web-test           shared web test utilities
-  @repo/eslint-config / @repo/tsconfig   shared config
+  @repo/config / @repo/utils / @repo/observability / @repo/env-loader
+  @repo/web-ui / web-hooks / web-utils / web-server / web-test
+  @repo/eslint-config / @repo/tsconfig
 packages/mobile_core       Flutter kernel (design tokens, widgets, errors, storage)
 packages/feature-*         compile-time capability plugins (each exports a FeatureManifest)
   @repo/feature-auth|users|organizations|access-control|mfa|sso|user-preferences
   @repo/feature-upload|jobs|mail|notifications|audit|settings|import-export|activities|health
-packages/api-kernel|api-plugin-kit|api-runtime|database-runtime|config|observability
-  kernel split: framework-free primitives, plugin contract, HTTP runtime, DB runtime, env, Sentry
 infra/
   docker-compose.yml       Postgres + Redis + Mailpit for local dev
 ```
 
-Backend features are **compile-time plugins**: each `packages/features/*` package exports a
-`FeatureManifest` (`{ id, nestModule, schema? }`). `apps/api/src/composition/feature-registry.ts` lists the enabled
+Backend features are **compile-time plugins**: each `packages/feature-*` package exports a
+`FeatureManifest` from `@repo/api-plugin-kit` (`{ id, nestModule, schema? }`). `apps/api/src/composition/feature-registry.ts` lists the enabled
 manifests; `app.module.ts` consumes only the composed modules + schema. To **disable a feature**,
 remove its manifest from `featureManifests` and drop the `@repo/feature-*` dependency from
 `apps/api/package.json`. To **add one**, scaffold with `pnpm scaffold:feature <name>`, then register

@@ -10,7 +10,7 @@
     "./use-session-factory": "./src/use-session-factory.ts",
     "./use-animate-presence": "./src/use-animate-presence.ts",
     "./use-debounced-url-search": "./src/use-debounced-url-search.ts",
-    "./admin-session-query-key": "./src/admin-session-query-key.ts"
+    "./use-csrf-bootstrap": "./src/use-csrf-bootstrap.ts"
   },
   "scripts": {
     "build": "node ../../tools/tsc7/node_modules/typescript7/bin/tsc -p tsconfig.json",

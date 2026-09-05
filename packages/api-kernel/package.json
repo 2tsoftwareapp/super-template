@@ -14,8 +14,7 @@
     "format": "prettier --write ."
   },
   "dependencies": {
-    "@repo/utils": "workspace:*",
-    "zod": "4.4.3"
+    "@repo/utils": "workspace:*"
   },
   "devDependencies": {
     "@repo/tsconfig": "workspace:*",

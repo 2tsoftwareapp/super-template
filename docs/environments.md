@@ -54,7 +54,7 @@ APP_ENV=staging . ./scripts/load-env.sh
 
 ## Guard rails (enforced at API boot)
 
-`packages/api-core/src/config/env.schema.ts` rejects unsafe deployed configs:
+`packages/api-runtime/src/config/environment/env.schema.ts` rejects unsafe deployed configs:
 
 - **staging + production:** must not reuse the development placeholder `JWT_*` secrets
   or `MFA_ENCRYPTION_KEY`.

@@ -4,6 +4,6 @@
     "noEmit": true,
     "types": ["node", "vitest/globals"]
   },
-  "include": ["src/**/*.spec.ts", "../api-core/src/common/types/express.d.ts"],
+  "include": ["src/**/*.spec.ts", "../api-runtime/src/types/express.d.ts"],
   "exclude": []
 }

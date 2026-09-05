@@ -21,17 +21,18 @@ the full template was validated. That validation is done; this ADR supersedes th
 Every capability — including identity — becomes a **compile-time feature plugin**
 package under `packages/features/<id>/`. The kernel stays thin.
 
-- **Kernel (always on):** `api-core` (ports, errors, guards that depend on ports,
-  RBAC types), `api-database` (pool, RLS/GUC runtime, transactions, migrate
-  runner), `web-ui`/`web-hooks`/`web-utils`/`web-server` (design system), and a
+- **Kernel (always on):** `api-kernel` (ports, errors, types), `api-plugin-kit`
+  (`FeatureManifest` + compose helpers), `api-runtime` (Nest HTTP guards/filters/
+  env schema), `database-runtime` (pool, RLS/GUC, transactions, drizzle-kit
+  config), `web-ui`/`web-hooks`/`web-utils`/`web-server` (design system), and a
   Flutter `mobile_core`. The kernel contains **no** identity/platform tables.
 - **Feature plugin:** owns a vertical slice across all four surfaces and exports a
-  single typed `FeatureManifest` (`@repo/api-runtime`) for the backend surface:
+  single typed `FeatureManifest` (`@repo/api-plugin-kit`) for the backend surface:
   `{ id, nestModule, schema?, permissions? }`. Frontend surfaces are exposed
   through per-surface package entrypoints (`./admin`, `./web`) and a Flutter
   sub-package.
 - **Composition is explicit and compile-time.** Apps import each manifest in one
-  place: `apps/api/src/features.ts` builds `composedSchema` for
+  place: `apps/api/src/composition/feature-registry.ts` builds `composedSchema` for
   `DatabaseModule.forRoot({ schema })` and the module list for `AppModule`. Admin
   concatenates each feature's `resource.ts`; Flutter lists path dependencies and
   registers routes. Disabling a feature = remove the workspace dependency + the
@@ -44,7 +45,7 @@ package under `packages/features/<id>/`. The kernel stays thin.
 
 | Surface  | Contribution                        | Composed in |
 | -------- | ----------------------------------- | ----------- |
-| API      | `nestModule` in `FeatureManifest`   | `apps/api/src/features.ts` → `AppModule` |
+| API      | `nestModule` in `FeatureManifest`   | `apps/api/src/composition/feature-registry.ts` → `AppModule` |
 | Database | `schema` + SQL migrations           | `composeFeatureSchemas` → `DatabaseModule.forRoot` |
 | Admin/Web| `resource.ts` + feature slice       | `apps/admin/src/lib/admin-resources.ts` + thin `page.tsx` |
 | Mobile   | Dart sub-package + routes           | `apps/mobile/pubspec.yaml` + `GoRouter` |

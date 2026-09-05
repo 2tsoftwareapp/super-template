@@ -2,41 +2,46 @@
 
 ## Repository Architecture
 
-- `apps/api`: modular monolith NestJS backend — core business lives here
-  (`src/identity`, `src/platform` bounded contexts)
-- `apps/web`: Next.js SEO landing (static marketing surface, no BFF)
+- `apps/api`: NestJS composition root — business logic lives in `packages/feature-*`
+- `apps/web`: Next.js SEO landing + auth BFF
 - `apps/admin`: Next.js primary app with same-origin BFF for auth and operations
 - `apps/mobile`: Flutter app using generated Dart API client (auth + profile shell)
+- `packages/api-kernel` / `api-plugin-kit` / `api-runtime`: backend kernel split
+- `packages/database-runtime`: Drizzle pool, RLS, transactions (composed schema)
+- `packages/feature-*`: compile-time feature plugins (auth, users, orgs, mail, …)
+- `packages/feature-health`: health-check exemplar plugin
 - `packages/api-contract`: generated TypeScript OpenAPI types
-- `packages/api-health`: health-check add-on module (exemplar addon package)
-- `packages/api-database`: Drizzle schema and migrations
-- `packages/api-core`: shared backend primitives, RBAC, ports
 - seeding: `apps/api/src/cli/seeds` (run via `pnpm --filter api db:seed`)
 - `infra`: Docker Compose for PostgreSQL, Redis, and Mailpit
 - `scripts`: bootstrap, contract generation, verification, and infra helpers
 
 ## Backend Boundaries
 
-API features live in two in-app bounded contexts — `apps/api/src/identity` and `apps/api/src/platform` — inside a pragmatic clean modular monolith. `packages/` hosts kernel libraries plus self-contained add-on packages (see ARCHITECTURE_RULES §15.1). Dependency direction matters: HTTP/controllers stay at the edge, services own application behavior, repositories own database access, and cross-context calls go through stable module exports or `api-core` port tokens.
+API capabilities are **compile-time feature plugins** under `packages/feature-*`
+(see ARCHITECTURE_RULES §15.1 and ADR 0002). `apps/api` only registers manifests
+in `src/composition/feature-registry.ts`. Dependency direction matters:
+HTTP/controllers stay at the edge, services own application behavior,
+repositories own database access, and cross-feature calls go through stable
+module exports or `@repo/api-kernel` port tokens.
 
-### Identity context (`apps/api/src/identity`)
+### Identity features (`packages/feature-*`)
 
-- `auth`: registration, login, refresh rotation, logout, reset, verification, session management, MFA, SSO
-- `users`: self-service profile plus administrative user management
-- `organizations`: tenant membership and organization management
-- `access-control`: roles, permissions, enforcement helpers
+- `feature-auth` / `feature-mfa` / `feature-sso`: registration, login, refresh rotation, logout, reset, verification, sessions
+- `feature-users` / `feature-user-management` / `feature-user-preferences`: profile + admin user management
+- `feature-organizations` / `feature-organization-management`: tenant membership and org management
+- `feature-access-control`: roles, permissions, enforcement helpers
 
-### Platform context (`apps/api/src/platform`)
+### Platform features (`packages/feature-*`)
 
 Cross-cutting capabilities shared across tenants:
 
-- `notifications` + `activities`: inbox, SSE, FCM push, scheduled sends, activity feed
-- `audit`: append-only audit logging
-- `storage` + `files` + `attachments`: object storage, upload metadata, polymorphic attachments
-- `mail`: SMTP delivery, templates, delivery log
-- `settings`: application settings
-- `jobs`: PostgreSQL-backed background job queue
-- `imports` + `exports`: CSV import/export framework
+- `feature-notifications` + `feature-activities`: inbox, SSE, FCM push, scheduled sends, activity feed
+- `feature-audit` / `feature-audit-export`: append-only audit logging
+- `feature-upload`: object storage, upload metadata, attachments
+- `feature-mail`: SMTP delivery, templates, delivery log
+- `feature-settings`: application settings
+- `feature-jobs` / `feature-outbox`: PostgreSQL-backed background job queue + outbox
+- `feature-import-export`: CSV import/export framework
 
 Workspace domain features (projects, comments, invitations) have been removed from the template.
 
@@ -44,7 +49,7 @@ Workspace domain features (projects, comments, invitations) have been removed fr
 
 Authorization uses three layers:
 
-1. **Permission check** — `resource.action` grants from role matrix (`api-core`)
+1. **Permission check** — `resource.action` grants from role matrix (`api-kernel` / access-control)
 2. **Role scope** — route guards and `@Authorize()` decorators
 3. **RLS** — PostgreSQL row-level security via `TenantContextService`
 
@@ -102,7 +107,7 @@ purity is enforced by `scripts/check-source-policy.sh`.
 
 The Flutter app stores tokens in secure storage and uses a single-flight refresh path in the Dio interceptor.
 
-## Port tokens (`api-core`)
+## Port tokens (`api-kernel`)
 
 | Token                      | Bound in                                      | Purpose                                     |
 | -------------------------- | --------------------------------------------- | ------------------------------------------- |

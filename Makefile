@@ -67,7 +67,7 @@ infra-down:
 	docker compose -f infra/docker-compose.yml down
 
 db-generate:
-	pnpm --filter api-database db:generate
+	pnpm --filter @repo/database-runtime db:generate
 
 db-migrate:
 	pnpm --filter api db:migrate
@@ -79,7 +79,7 @@ db-reset:
 	pnpm --filter api db:reset
 
 db-studio:
-	pnpm --filter api-database db:studio
+	pnpm --filter @repo/database-runtime db:studio
 
 generate:
 	./scripts/generate-contracts.sh

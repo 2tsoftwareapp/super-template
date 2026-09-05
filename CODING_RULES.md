@@ -60,9 +60,10 @@
 │   ├── web-ui/       # Shared React UI component library (design system)
 │   ├── web-hooks/    # Shared React hooks
 │   ├── api-contract/ # Shared API types/DTOs (generated)
-│   ├── api-core/     # Shared NestJS base infrastructure
-│   ├── (apps/api) identity/  # Bounded Context: auth, users, organizations
-│   ├── (apps/api) platform/  # Bounded Context: files, notifications, audit, exports
+│   ├── api-kernel/   # Framework-free ports, errors, types
+│   ├── api-runtime/  # Nest HTTP runtime (env, guards, filters)
+│   ├── database-runtime/ # Drizzle pool / RLS / transactions
+│   ├── feature-*/    # Compile-time feature plugins (auth, users, orgs, …)
 │   └── eslint-config/ # Shared ESLint config
 └── CODING_RULES.md   # ← file này
 ```
@@ -897,7 +898,7 @@ export class UserPolicy {
 ✅ **DO** (từ codebase thực tế)
 ```ts
 // apps/api/src/identity/modules/auth/application/ports/auth-session.repository.port.ts
-import type { TransactionExecutor } from "@repo/api-core";
+import type { TransactionExecutor } from "@repo/api-kernel";
 import type { AuthSessionModel, CreateSessionInput } from "../models/auth-session";
 
 // Chỉ là interface — không có implementation
@@ -1041,7 +1042,7 @@ constructor(private readonly repo: UsersRepository) {} // ← inject Port, khôn
 ❌ **DON'T**
 ```ts
 // WRONG: Use Case import Drizzle schema
-import { usersTable } from "@repo/api-database/schema"; // ← vi phạm
+import { usersTable } from "@repo/feature-users/..."; // ← vi phạm (schema outside infra)
 
 @Injectable()
 export class GetUserUseCase {

@@ -22,7 +22,6 @@
     "@nestjs/common": "11.1.27",
     "@repo/api-kernel": "workspace:*",
     "@repo/api-runtime": "workspace:*",
-    "@repo/config": "workspace:*",
     "@repo/env-loader": "workspace:*",
     "drizzle-orm": "0.45.2",
     "pg": "8.21.0"

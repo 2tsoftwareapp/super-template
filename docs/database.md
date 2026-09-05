@@ -56,9 +56,9 @@
 
 ## Migration Workflow
 
-1. Edit `packages/api-database/src/schema.ts`
-2. Run `make db-generate`
-3. Review generated SQL under `packages/api-database/drizzle/`
+1. Edit feature schema under `packages/feature-*/src/infrastructure/persistence/`
+2. Run `make db-generate` (`pnpm --filter @repo/database-runtime db:generate`)
+3. Review generated SQL under `apps/api/migrations/`
 4. Run `make db-migrate` (uses `DATABASE_MIGRATE_URL` or `POSTGRES_*` admin credentials)
 5. Run `make db-seed` if needed
 

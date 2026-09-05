@@ -19,7 +19,6 @@
     "./confirm-dialog": "./src/components/confirm-dialog.tsx",
     "./common-resource-page": "./src/components/common-resource-page.tsx",
     "./composables": "./src/composables/index.ts",
-    "./csrf-bootstrap": "./src/components/csrf-bootstrap.tsx",
     "./date-picker": "./src/components/date-picker.tsx",
     "./dialog": "./src/components/dialog.tsx",
     "./dropdown": "./src/components/dropdown.tsx",
@@ -56,8 +55,7 @@
     "./spinner": "./src/components/spinner.tsx",
     "./table": "./src/components/table.tsx",
     "./textarea": "./src/components/textarea.tsx",
-    "./tooltip": "./src/components/tooltip.tsx",
-    "./use-mobile": "./src/components/use-mobile.ts"
+    "./tooltip": "./src/components/tooltip.tsx"
   },
   "scripts": {
     "build": "node ../../tools/tsc7/node_modules/typescript7/bin/tsc -p tsconfig.json",
@@ -79,15 +77,13 @@
     "@repo/web-utils": "workspace:*",
     "@tanstack/react-table": "8.21.3",
     "class-variance-authority": "0.7.1",
-    "clsx": "2.1.1",
     "cmdk": "^1.1.1",
     "date-fns": "^4.4.0",
     "input-otp": "^1.4.2",
     "lucide-react": "0.552.0",
     "react": "19.2.4",
     "react-day-picker": "^10.0.1",
-    "react-dom": "19.2.4",
-    "tailwind-merge": "3.6.0"
+    "react-dom": "19.2.4"
   },
   "devDependencies": {
     "@repo/tsconfig": "workspace:*",
