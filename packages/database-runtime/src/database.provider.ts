@@ -1,10 +1,6 @@
 import type { Provider } from "@nestjs/common";
 
-import {
-  DATABASE_RUNTIME_ENV,
-  type DatabaseRuntimeEnv,
-  getTenantContext,
-} from "@repo/api-kernel";
+import { DATABASE_RUNTIME_ENV, type DatabaseRuntimeEnv, getTenantContext } from "@repo/api-kernel";
 import { Pool, type PoolClient, type PoolConfig } from "pg";
 
 import { createDatabaseClient } from "./database.types";

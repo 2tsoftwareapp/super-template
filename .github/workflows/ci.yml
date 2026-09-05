@@ -180,6 +180,15 @@ jobs:
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
+      redis:
+        image: redis:7.4
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
 
     env:
       POSTGRES_HOST: localhost
@@ -191,6 +200,7 @@ jobs:
       DATABASE_MIGRATE_URL: postgresql://postgres:postgres@localhost:65432/fullstack_starter
       DATABASE_URL_TEST: postgresql://postgres:postgres@localhost:65432/fullstack_starter_test
       DATABASE_URL_TEST_ADMIN: postgresql://postgres:postgres@localhost:65432/fullstack_starter_test
+      REDIS_URL: redis://localhost:6379
 
     steps:
       - name: Checkout
